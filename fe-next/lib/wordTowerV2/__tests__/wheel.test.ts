@@ -54,3 +54,17 @@ describe('isAcceptedWord', () => {
     expect(isAcceptedWord('sad', wheel, null)).toBe(false);
   });
 });
+
+describe('spinWheel run seed', () => {
+  it('given two different runs, when spun, then the opening wheels differ', () => {
+    // A constant seed opened every run on the same seven letters, so a player
+    // could replay one word forever.
+    const a = spinWheel('en', 0, 'run-a').join('');
+    const b = spinWheel('en', 0, 'run-b').join('');
+    expect(a).not.toBe(b);
+  });
+
+  it('given the same run and draw, when spun twice, then identical', () => {
+    expect(spinWheel('en', 3, 'run-a')).toEqual(spinWheel('en', 3, 'run-a'));
+  });
+});

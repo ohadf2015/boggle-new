@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { aimBand, classifyLanding } from '../landing';
+import { classifyLanding } from '../landing';
 
 const below = { x: 0, topY: -100, widthPx: 150 };
 
@@ -29,15 +29,5 @@ describe('classifyLanding', () => {
   it('given no block below (first drop onto the ground), when classified, then judged against the ground centre', () => {
     expect(classifyLanding({ x: 0, bottomY: 0, angleRad: 0 }, null)).toBe('perfect');
     expect(classifyLanding({ x: 120, bottomY: 0, angleRad: 0 }, null)).toBe('sloppy');
-  });
-});
-
-describe('aimBand', () => {
-  it('given the hook straight above the tower top, when previewed, then perfect', () => {
-    expect(aimBand(1, below)).toBe('perfect');
-  });
-
-  it('given the hook past the tower edge, when previewed, then miss', () => {
-    expect(aimBand(140, below)).toBe('miss');
   });
 });

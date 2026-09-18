@@ -8,8 +8,9 @@ import type { Language } from '@/shared/types/game';
  * are lowercase. Borrowed raw, every word failed the wheel check and nothing
  * could ever be hoisted. Normalise once, here.
  */
-export function spinWheel(language: Language, drawIndex = 0): string[] {
-  return generateWheel('word-tower-v2', 'local', language, drawIndex).map((l) => l.toLowerCase());
+export function spinWheel(language: Language, drawIndex = 0, runSeed = 'word-tower-v2'): string[] {
+  // runSeed varies per run: a constant opened every run on the same letters.
+  return generateWheel(runSeed, 'local', language, drawIndex).map((l) => l.toLowerCase());
 }
 
 export function canBuildFromWheel(word: string, wheel: string[]): boolean {

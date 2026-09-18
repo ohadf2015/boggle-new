@@ -16,7 +16,7 @@ import {
   spawnBlock,
   stepWorld,
 } from '@/lib/wordTowerV2/engine';
-import { type LandingQuality, type SupportTop, aimBand, classifyLanding } from '@/lib/wordTowerV2/landing';
+import { type LandingQuality, type SupportTop, classifyLanding } from '@/lib/wordTowerV2/landing';
 import { type RunState, type SurprisePayout, applyLanding, consumeWidthMult, createRun } from '@/lib/wordTowerV2/run';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
 import type { TowerFx } from './TowerCanvas';
@@ -107,7 +107,6 @@ export function useTowerRun() {
   const [peakM, setPeakM] = useState(0);
   const [run, setRun] = useState<RunState>(runRef.current);
   const [bestM, setBestM] = useState(0);
-  const [aim, setAim] = useState<LandingQuality | null>(null);
   const [landing, setLanding] = useState<LandingEvent | null>(null);
   const [surprise, setSurprise] = useState<SurpriseEvent | null>(null);
   const [newBest, setNewBest] = useState(false);
@@ -172,7 +171,7 @@ export function useTowerRun() {
     setPhase('over');
   }, [playSound, resolveLanding]);
 
-  // One poll drives the HUD height, the aim preview, verdicts and collapse.
+  // One poll drives the HUD height, verdicts and collapse.
   useEffect(() => {
     const id = window.setInterval(() => {
       const world = worldRef.current;
@@ -198,12 +197,6 @@ export function useTowerRun() {
         if (!snap || (snap.resting && world.landed.has(pending.id)) || timedOut) resolveLanding();
       }
 
-      const hanging = hangingRef.current;
-      if (hanging) {
-        const x = releaseKinematics(performance.now() - hanging.startedAt, SWING, 0).x;
-        const band = aimBand(x, supportTop(world, hanging.id));
-        setAim((prev) => (prev === band ? prev : band));
-      } else setAim(null);
     }, POLL_MS);
     return () => window.clearInterval(id);
   }, [phase, endRun, resolveLanding, playSound]);
@@ -215,6 +208,12 @@ export function useTowerRun() {
     const world = worldRef.current;
     const { x } = releaseKinematics(nowMs - hanging.startedAt, SWING, 0);
     moveAttachedBlock(world, hanging.id, x, -(getTowerHeightM(world) * PX_PER_M + CRANE_CLEARANCE_PX));
+  }, []);
+
+  /** Sideways speed (px/ms) the hanging block would leave the hook with right now. */
+  const getHangVx = useCallback(() => {
+    const hanging = hangingRef.current;
+    return hanging ? releaseKinematics(performance.now() - hanging.startedAt, SWING, 0).vx : 0;
   }, []);
 
   /** Width the next block would get for `word`, including any banked updraft. */
@@ -309,7 +308,7 @@ export function useTowerRun() {
 
   return {
     worldRef, labelsRef, fxRef, hangingRef,
-    phase, heightM, peakM, bestM, run, aim, landing, surprise, newBest,
-    onBeforeStep, previewWidth, hoist, drop, restart, setScrambles, seedDemo,
+    phase, heightM, peakM, bestM, run, landing, surprise, newBest,
+    onBeforeStep, getHangVx, previewWidth, hoist, drop, restart, setScrambles, seedDemo,
   };
 }

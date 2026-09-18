@@ -3,7 +3,7 @@
 import { Application, Container, Graphics } from 'pixi.js';
 import { useEffect, useRef } from 'react';
 import { PX_PER_M, type TowerWorld, snapshotWorld, stepWorld } from '@/lib/wordTowerV2/engine';
-import { CRANE_ARM_PX, CRANE_CLEARANCE_PX } from '@/lib/wordTowerV2/crane';
+import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, throwArc } from '@/lib/wordTowerV2/crane';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
 import { frameCamera } from '@/lib/wordTowerV2/camera';
 import type { LandingQuality } from '@/lib/wordTowerV2/landing';
@@ -18,9 +18,9 @@ import {
   paintBestLine,
   paintBlock,
   paintCrane,
-  paintDropGuide,
   paintGhost,
   paintGround,
+  paintThrowArc,
   setBlockGold,
   tickBlock,
 } from './towerArt';
@@ -57,6 +57,8 @@ interface Props {
   labels: Map<string, string>;
   getDockPx: () => number;
   getHangingId: () => string | null;
+  /** Sideways speed (px/ms) the hanging block would be released with now. */
+  getHangVx: () => number;
   /** The slab being spelled (composing phase), or null. */
   getGhost: () => GhostPreview | null;
   /** Best height so far (metres) for the goal line, or null. */
@@ -255,8 +257,14 @@ export default function TowerCanvas(props: Props) {
         const idleY = hangY + Math.sin(ts / 420) * 2;
         const hookTarget = hanging ?? { x: 0, y: ghostPreview ? ghost.container.y : idleY, heightPx: BLOCK_HEIGHT_PX };
         paintCrane(crane, scale, halfW + 40, pivotY, { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 });
-        if (hanging) paintDropGuide(guide, scale, hanging.x, hanging.y + hanging.heightPx / 2 + 8 / scale, -snap.towerHeightM * PX_PER_M);
-        else guide.clear();
+        if (hanging) {
+          // Only the first ~40% of the fall: enough to read the throw's
+          // direction, not enough to solve the landing for the player.
+          const gravity = world.engine.gravity.y * (world.engine.gravity.scale ?? 0.001);
+          const bottom = hanging.y + hanging.heightPx / 2;
+          const fallMs = Math.sqrt((2 * Math.max(1, -snap.towerHeightM * PX_PER_M - bottom)) / gravity);
+          paintThrowArc(guide, scale, throwArc({ x: hanging.x, y: bottom + 10 / scale, vx: p.getHangVx(), gravity, durationMs: fallMs * 0.4, points: 9 }));
+        } else guide.clear();
 
         // Offscreen settled blocks still cost a draw call — hide them.
         for (const [id, view] of views) {

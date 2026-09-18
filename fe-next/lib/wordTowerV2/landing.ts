@@ -46,16 +46,3 @@ export function classifyLanding(block: LandedBlock, support: SupportTop | null):
   if (r < GOOD_RATIO) return 'good';
   return 'sloppy';
 }
-
-/**
- * Live preview of the band a release RIGHT NOW would roughly earn, for the drop
- * hub. Only the lateral offset is knowable before release; `miss` means the hook
- * is past the support's edge.
- */
-export function aimBand(hookX: number, support: SupportTop | null): LandingQuality {
-  const r = offsetRatio(hookX, support);
-  if (r < PERFECT_RATIO) return 'perfect';
-  if (r < GOOD_RATIO) return 'good';
-  if (r < 1) return 'sloppy';
-  return 'miss';
-}

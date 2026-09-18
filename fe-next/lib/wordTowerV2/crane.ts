@@ -80,3 +80,37 @@ export function releaseKinematics(
     spin: angularVelRadPerMs * SPIN_TRANSFER,
   };
 }
+
+/**
+ * Matter's default per-step air drag (`frictionAir` 0.01 at its 16.67ms base
+ * step), as a continuous time constant: v(t) = v0 * e^(-t / tau).
+ */
+const AIR_DRAG_TAU_MS = (1000 / 60) / -Math.log(1 - 0.01);
+
+/**
+ * Points along a released block's path: gravity down, the swing's sideways
+ * speed decaying under air drag. Drives the dotted throw arc, which replaced a
+ * straight "drop guide" that lied — a block released mid-swing never falls
+ * straight down.
+ */
+export function throwArc(opts: {
+  x: number;
+  y: number;
+  /** px per ms. */
+  vx: number;
+  /** px per ms^2. */
+  gravity: number;
+  durationMs: number;
+  points: number;
+}): Array<{ x: number; y: number }> {
+  const { x, y, vx, gravity, durationMs, points } = opts;
+  const out: Array<{ x: number; y: number }> = [];
+  for (let i = 0; i < points; i += 1) {
+    const t = (durationMs * i) / Math.max(1, points - 1);
+    out.push({
+      x: x + vx * AIR_DRAG_TAU_MS * (1 - Math.exp(-t / AIR_DRAG_TAU_MS)),
+      y: y + 0.5 * gravity * t * t,
+    });
+  }
+  return out;
+}

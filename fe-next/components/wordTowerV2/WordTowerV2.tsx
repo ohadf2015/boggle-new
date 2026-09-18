@@ -95,11 +95,20 @@ export default function WordTowerV2() {
     };
   }, [language]);
 
-  useEffect(() => {
-    drawRef.current = 0;
-    setWheel(spinWheel(language as Parameters<typeof spinWheel>[0]));
-    setSelected([]);
-  }, [language]);
+  // Fresh letters per run AND after every hoisted word, so each turn is a new
+  // little anagram rather than the same seven letters all run.
+  const [runSeed, setRunSeed] = useState('');
+  useEffect(() => setRunSeed(`wt2-${Date.now()}`), []);
+  const deal = useCallback(
+    (draw: number) => {
+      if (!runSeed) return;
+      drawRef.current = draw;
+      setWheel(spinWheel(language as Parameters<typeof spinWheel>[0], draw, runSeed));
+      setSelected([]);
+    },
+    [language, runSeed],
+  );
+  useEffect(() => deal(0), [deal]);
 
   const word = useMemo(() => selected.map((i) => wheel[i]).join(''), [selected, wheel]);
   const valid = dictReady && isAcceptedWord(word, wheel, dictRef.current);
@@ -149,18 +158,16 @@ export default function WordTowerV2() {
       return;
     }
     hoist(word);
-    setSelected([]);
-  }, [phase, word, wheel, hoist, playSound]);
+    deal(drawRef.current + 1);
+  }, [phase, word, wheel, hoist, playSound, deal]);
 
   const scramble = useCallback(() => {
     const next = spendScramble(run);
     if (!next || phase === 'over') return;
     setScrambles(next);
-    drawRef.current += 1;
-    setWheel(spinWheel(language as Parameters<typeof spinWheel>[0], drawRef.current));
-    setSelected([]);
+    deal(drawRef.current + 1);
     playSound('boardShuffle');
-  }, [run, phase, setScrambles, language, playSound]);
+  }, [run, phase, setScrambles, deal, playSound]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -209,6 +216,7 @@ export default function WordTowerV2() {
         fxQueue={game.fxRef.current}
         getDockPx={getDockPx}
         getHangingId={getHangingId}
+        getHangVx={game.getHangVx}
         getGhost={getGhost}
         getBestM={getBestM}
         bestLabel={t('wordTowerV2.bestFlag')}
@@ -235,12 +243,13 @@ export default function WordTowerV2() {
         </div>
       ) : null}
 
-      {/* Dock: a dark fade rather than a slab, so the sky reads through it. The
-          canvas frames the ground at its top edge, and its height must never
-          change between phases — the wheel morphs in place into the drop dial. */}
+      {/* Dock: SOLID. The canvas frames the ground at its top edge; once the
+          camera pans up a tall tower, the base sinks below that edge and must
+          not ghost through behind the wheel. Its height never changes between
+          phases — the wheel morphs in place into the drop dial. */}
       <div
         ref={dockRef}
-        className="absolute inset-x-0 bottom-0 z-30 bg-gradient-to-t from-neo-navy via-neo-navy/90 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-12"
+        className="absolute inset-x-0 bottom-0 z-30 border-t-4 border-black bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-7"
       >
         {rejected ? (
           <div className="absolute inset-x-0 top-1 z-40 mx-auto w-fit rounded-neo border-neo border-black bg-neo-red px-3 py-1 font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-shake">
@@ -275,7 +284,6 @@ export default function WordTowerV2() {
               selected={selected}
               word={word.toUpperCase()}
               placing={phase === 'swinging'}
-              aimBand={game.aim}
               canBuild={valid}
               intensity={Math.min(1, heightM / 40)}
               accentHex={accentHex}
@@ -311,7 +319,7 @@ export default function WordTowerV2() {
           isBest={game.newBest || game.peakM >= game.bestM - 0.01}
           onRestart={() => {
             restart();
-            setSelected([]);
+            setRunSeed(`wt2-${Date.now()}`);
           }}
         />
       ) : null}

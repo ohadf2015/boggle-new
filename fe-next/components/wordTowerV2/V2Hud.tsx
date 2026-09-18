@@ -100,7 +100,7 @@ export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landi
         </div>
       ) : null}
 
-      <div className="pointer-events-none absolute inset-x-0 top-[22%] z-20 flex flex-col items-center gap-2">
+      <div className="pointer-events-none absolute inset-x-0 top-[13%] z-20 flex flex-col items-center gap-1.5">
         {verdict ? (
           <div
             key={verdict.key}

@@ -3,6 +3,7 @@ import {
   CRANE_ARM_PX,
   craneStateAt,
   releaseKinematics,
+  throwArc,
 } from '../crane';
 
 /**
@@ -63,5 +64,28 @@ describe('releaseKinematics', () => {
     // A released block starts from rest vertically; gravity does the rest. This
     // keeps the release->contact window (a feel target) governed by gravity alone.
     expect(releaseKinematics(321, { amplitudeRad: 0.5, periodMs: 1800, phase: 0 }, 0).vy).toBe(0);
+  });
+});
+
+describe('throwArc', () => {
+  const G = 0.003; // px/ms^2, the tuned world gravity
+
+  it('given no sideways speed, when traced, then the arc falls straight down', () => {
+    const pts = throwArc({ x: 10, y: -300, vx: 0, gravity: G, durationMs: 400, points: 5 });
+    expect(pts.every((p) => p.x === 10)).toBe(true);
+  });
+
+  it('given a sideways throw, when traced, then it drifts that way and accelerates downward', () => {
+    const pts = throwArc({ x: 0, y: 0, vx: 0.5, gravity: G, durationMs: 400, points: 5 });
+    const dys = pts.slice(1).map((p, i) => p.y - pts[i].y);
+
+    expect(pts[4].x).toBeGreaterThan(0);
+    // Falls further each interval: it is a parabola, not the old straight guide.
+    expect(dys[3]).toBeGreaterThan(dys[0]);
+  });
+
+  it('given air drag, when traced, then sideways travel is less than a drag-free throw', () => {
+    const pts = throwArc({ x: 0, y: 0, vx: 0.5, gravity: G, durationMs: 400, points: 3 });
+    expect(pts[2].x).toBeLessThan(0.5 * 400);
   });
 });

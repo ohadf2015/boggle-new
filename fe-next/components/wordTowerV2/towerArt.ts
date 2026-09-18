@@ -192,12 +192,17 @@ export function paintCrane(
   g.roundRect(hook.x - px(12), hook.y - px(12), px(24), px(9), px(2)).fill(CRANE_YELLOW).stroke({ width: px(2), color: INK });
 }
 
-/** Dashed drop guide straight down from the hanging block. */
-export function paintDropGuide(g: Graphics, scale: number, x: number, fromY: number, toY: number): void {
+/**
+ * Dotted throw arc from the hanging block — the first part of its real path.
+ * Dots shrink and fade along the arc so it reads as a hint, not a ruler.
+ */
+export function paintThrowArc(g: Graphics, scale: number, pts: Array<{ x: number; y: number }>): void {
   const px = (n: number) => n / scale;
   g.clear();
-  for (let y = fromY; y < toY; y += px(14)) g.rect(x - px(1), y, px(2), px(7));
-  g.fill({ color: CREAM, alpha: 0.35 });
+  pts.forEach((p, i) => {
+    const k = 1 - i / Math.max(1, pts.length);
+    g.circle(p.x, p.y, px(1.5 + 2.2 * k)).fill({ color: CREAM, alpha: 0.2 + 0.6 * k });
+  });
 }
 
 export interface GhostView {
