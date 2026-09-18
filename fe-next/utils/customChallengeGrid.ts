@@ -13,6 +13,7 @@ import {
   japaneseLetters,
 } from './consts';
 import type { Language, LetterGrid } from '@/types';
+import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
 import { normalizeHebrewFinalLetters } from './dailyChallenge/constants';
 
 // ==========================================
@@ -212,7 +213,7 @@ export function generateCustomChallengeGrid(
   // Get letters for the language
   let letters: string[];
   if (language === 'en') {
-    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    letters = ENGLISH_LETTER_POOL;
   } else if (language === 'sv') {
     letters = swedishLetters;
   } else if (language === 'es') {
@@ -226,7 +227,7 @@ export function generateCustomChallengeGrid(
     letters = hebrewLetters;
   } else {
     // Unknown language must not silently become a Hebrew board. Default English.
-    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    letters = ENGLISH_LETTER_POOL;
   }
 
   // Normalize Hebrew final letters to regular letters for grid display
