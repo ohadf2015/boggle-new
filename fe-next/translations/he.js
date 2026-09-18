@@ -1927,6 +1927,7 @@ const he = {
   },
   "errors": {
     "unstableConnection": "החיבור מתנדנד - מחזירים אותך...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "חיבור איטי - עובדים על זה",
     "sessionExpired": "הסשן נגמר. התחלה חדשה!",
     "gameCodeNotExist": "קוד לא נמצא. בדוק ונסה שוב!",
@@ -12657,13 +12658,14 @@ const he = {
         "title": "דוחות התקדמות הם תכונת Pro",
         "body": "ראו איך כל תלמיד מתקדם בכל הכיתות ובכל המשחקים: מילים שהושגו, שלבים, XP ודוחות PDF להדפסה לערב הורים. שדרגו ל-Teacher Pro כדי לפתוח דוחות כיתה ותלמיד."
       },
-      "cta": "לפתוח עם Pro — ${{price}} לחודש"
+      "cta": "לפתוח עם Pro — {{price}} לחודש"
     },
     "subscription": {
       "giftedNoCard": "אין כרטיס במערכת ואין חידוש — זה פשוט מסתיים וחוזרים לחינמי.",
       "giftedUntil": "Pro במתנה עד",
       "giftedBadge": "מתנה",
       "classLimitTitle": "הגעת למגבלת הכיתות",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "יצרת {{current}} מתוך {{limit}} כיתות בחינם. שדרגו ל-Pro לכיתות ותלמידים ללא הגבלה.",
       "upgradeProDescription": "Pro מעניק כיתות ותלמידים ללא הגבלה בכל כיתה — בלי מגבלות לצמיחת ההוראה שלכם.",
       "proFeatures": "Pro כולל",
@@ -13469,6 +13471,19 @@ const he = {
         "synonym": "הוסיפו מילים נרדפות לשיעור כדי לפתוח",
         "antonym": "הוסיפו ניגודים לשיעור כדי לפתוח"
       }
+    },
+    "wordcraftAssignment": {
+      "title": "וורדקראפט",
+      "intro": "נצחו את הבוט על לוח המילים. בנו מילים מהשיעור וקבלו XP בונוס.",
+      "lessonWords": "המילים מהשיעור",
+      "play": "שחקו",
+      "score": "ניקוד",
+      "result": "תוצאה",
+      "won": "ניצחתם",
+      "lost": "הבוט ניצח",
+      "recommended": "מומלץ",
+      "teacherHint": "משחק יחיד מול בוט ידידותי. התלמידים משחקים מדף הכיתה.",
+      "studentPlay": "שחקו וורדקראפט"
     },
     "vocabFocus": {
       "title": "מיקוד אוצר מילים",

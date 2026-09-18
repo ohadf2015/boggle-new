@@ -11,7 +11,10 @@ import * as classroomMembership from '../../modules/supabase/classroomMembership
 
 // Mock the modules
 vi.mock('../../modules/classroomGameManager');
-vi.mock('../../modules/gameStateManager');
+vi.mock('../../modules/gameStateManager', () => ({
+  bindSocketToGame: vi.fn(),
+  unbindSocketFromGame: vi.fn(),
+}));
 vi.mock('../../modules/supabase/classroomMembership', () => ({
   isClassroomTeacher: vi.fn(),
   isClassroomStudent: vi.fn(),

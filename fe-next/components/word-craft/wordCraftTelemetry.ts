@@ -171,10 +171,33 @@ export function trackWordCraftTurnSubmitted(params: {
  * win/loss verdict rides in extras.isWinner. wordCount counts only the player's
  * own words (bot moves excluded).
  */
+type WordCraftGameEndListener = (state: WordCraftState, opts: { hotseat: boolean }) => void;
+const gameEndListeners = new Set<WordCraftGameEndListener>();
+
+/**
+ * Subscribe to finished games (fires with the same state the analytics event
+ * uses). The classroom Word Craft assignment hosts the stock game view and
+ * learns about the finish here instead of through a new prop. Returns an
+ * unsubscribe.
+ */
+export function onWordCraftGameEnd(listener: WordCraftGameEndListener): () => void {
+  gameEndListeners.add(listener);
+  return () => {
+    gameEndListeners.delete(listener);
+  };
+}
+
 export function emitWordCraftGameEnd(
   state: WordCraftState,
   opts: { hotseat: boolean },
 ): void {
+  for (const listener of gameEndListeners) {
+    try {
+      listener(state, opts);
+    } catch {
+      // a host's bug must not break the game-over flow or the other listeners
+    }
+  }
   const playerWordCount = state.history.reduce(
     (sum, h) => sum + (h.who === 'player' ? h.words.length : 0),
     0,

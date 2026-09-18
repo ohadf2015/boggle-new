@@ -14,6 +14,7 @@ import { useGameActions } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
+import { useClassroomModeSeed } from '../../hooks/useClassroomModeSeed';
 import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
@@ -155,6 +156,10 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     setStoreGameMode(mode);
     setHostSelectedGameMode(mode);
   }, [selectedGameMode, setStoreGameMode, setHostSelectedGameMode]);
+
+  // Declared AFTER the effect above on purpose: on first mount that one writes
+  // the store default, this one then writes the teacher's launch-time mode.
+  useClassroomModeSeed({ isClassroomMode, gameCode, classroomGameMode });
 
   // Solo demo flow: teacher presses button → emit setAutoFill → wait for bots to seat → call startGame
   const [soloDemoInProgress, setSoloDemoInProgress] = useState(false);

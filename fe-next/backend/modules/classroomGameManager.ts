@@ -58,6 +58,8 @@ export interface ClassroomGameSettings {
   vocabQuizQuestionCount?: number;
   /** Vocab Quiz only: seconds on each question's clock. */
   vocabQuizSeconds?: number;
+  /** Vocab Quiz only: whether to enable treasure chests (Gold-Quest-style rewards). */
+  treasureChestsEnabled?: boolean;
   /** Free-for-all or team battle (weekly teams / juegos en equipo). */
   playStyle?: 'ffa' | 'teams';
   /** Team count when playStyle === 'teams' (server clamps to 2-4). */

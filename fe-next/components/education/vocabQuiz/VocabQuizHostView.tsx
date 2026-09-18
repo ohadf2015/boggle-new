@@ -28,6 +28,7 @@ import { useVocabQuizJuice } from './useVocabQuizJuice';
 import { VocabQuizFinale } from './VocabQuizFinale';
 import { VocabQuizChoiceBars } from './VocabQuizChoiceBars';
 import { VocabQuizNextUp } from './VocabQuizNextUp';
+import { TreasureChestTicker } from './TreasureChestTicker';
 
 export interface VocabQuizHostViewProps {
   socket: Socket | null;
@@ -214,6 +215,9 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
       {phase === 'ended' && (
         <VocabQuizFinale standings={quiz.standings} totalQuestions={quiz.totalQuestions} t={t} />
       )}
+
+      {/* Treasure chest ticker — shows steals and swaps during the round */}
+      <TreasureChestTicker chestEvents={quiz.chestEvents} t={t} />
     </div>
   );
 }

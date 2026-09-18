@@ -47,6 +47,7 @@ import {
   type VocabQuizSession,
 } from '../services/vocabQuizEngine.js';
 import { buildLockIn, decorateReveal } from '../services/vocabQuizJuice.js';
+import { registerTreasureChestHandlers } from './treasureChestHandler.js';
 import {
   setQuizSession,
   getQuizSession,
@@ -177,10 +178,12 @@ function readQuizSettings(settings: Record<string, unknown> | undefined) {
   const focus = isPracticeFocusSetting(focusRaw) ? focusRaw : 'any';
   const count = Number(settings?.vocabQuizQuestionCount);
   const seconds = Number(settings?.vocabQuizSeconds);
+  const treasureChestsEnabled = settings?.treasureChestsEnabled ?? true;
   return {
     focus,
     questionCount: Number.isFinite(count) && count > 0 ? count : VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
     secondsPerQuestion: Number.isFinite(seconds) && seconds > 0 ? seconds : VOCAB_QUIZ_DEFAULT_SECONDS,
+    treasureChestsEnabled: treasureChestsEnabled === true,
   };
 }
 
@@ -212,7 +215,7 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   const settings = (classroomGame.settings ?? {}) as Record<string, unknown>;
   if (settings.gameMode !== VOCAB_QUIZ_MODE) return false;
 
-  const { focus, questionCount, secondsPerQuestion } = readQuizSettings(settings);
+  const { focus, questionCount, secondsPerQuestion, treasureChestsEnabled } = readQuizSettings(settings);
   const { words, language } = await loadLessonVocabulary(classroomGame.lessonIds ?? []);
 
   const session = createQuizSession({
@@ -225,6 +228,7 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
     seed: `${gameCode}:${Date.now()}`,
     now: Date.now(),
     language,
+    treasureChestsEnabled,
   });
 
   if (session.questions.length === 0) {
@@ -333,6 +337,8 @@ function hostQuizForSocket(socket: Socket): { gameCode: string; session: VocabQu
 }
 
 export function registerVocabQuizHandlers(io: Server, socket: Socket): void {
+  registerTreasureChestHandlers(io, socket);
+
   socket.on(VOCAB_QUIZ_EVENTS.answer, (data: unknown) => {
     if (!checkRateLimit(socket.id)) return;
     const ctx = quizForSocket(socket);

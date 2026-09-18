@@ -2212,6 +2212,7 @@ const sv = {
   },
   "errors": {
     "unstableConnection": "Anslutningen vinglar - kopplar upp dig...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "Långsam anslutning - vi jobbar på det",
     "sessionExpired": "Sessionen slutade. Dags att börja om!",
     "roomNoLongerExists": "Rummet stängdes - alla gick",
@@ -13037,13 +13038,14 @@ const sv = {
         "title": "Framstegsrapporter är en Pro-funktion",
         "body": "Se hur varje elev klarar sig i alla dina klasser och spel: inlärda ord, nivåer, XP och utskrivbara PDF:er till utvecklingssamtal. Uppgradera till Teacher Pro för att låsa upp klass- och elevrapporter."
       },
-      "cta": "Lås upp med Pro — ${{price}}/månad"
+      "cta": "Lås upp med Pro — {{price}}/månad"
     },
     "subscription": {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",
       "giftedUntil": "Kostnadsfritt Pro till",
       "giftedBadge": "Gåva",
       "classLimitTitle": "Du har nått din klassgräns",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
       "upgradeProDescription": "Pro ger dig obegränsat antal klassrum och elever per klass — inga gränser för att växa din undervisning.",
       "proFeatures": "Pro innehåller",
@@ -13849,6 +13851,19 @@ const sv = {
         "synonym": "Lägg till synonymer i den här lektionen för att låsa upp",
         "antonym": "Lägg till antonymer i den här lektionen för att låsa upp"
       }
+    },
+    "wordcraftAssignment": {
+      "title": "WordCraft",
+      "intro": "Slå boten på ordbrädet. Bygg lektionens ord för bonus-XP.",
+      "lessonWords": "Lektionens ord",
+      "play": "Spela",
+      "score": "Poäng",
+      "result": "Resultat",
+      "won": "Du vann",
+      "lost": "Boten vann",
+      "recommended": "Rekommenderas",
+      "teacherHint": "Solo mot en snäll bot. Eleverna spelar från klassens sida.",
+      "studentPlay": "Spela WordCraft"
     },
     "vocabFocus": {
       "title": "Ordförrådsfokus",

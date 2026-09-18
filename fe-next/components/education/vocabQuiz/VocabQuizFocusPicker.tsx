@@ -17,7 +17,7 @@
 
 import { useMemo } from 'react';
 import {
-  BookOpen, ArrowLeftRight, Split, AlignLeft, Shuffle, Timer, ListOrdered, Layers, Puzzle, HelpCircle,
+  BookOpen, ArrowLeftRight, Split, AlignLeft, Shuffle, Timer, ListOrdered, Layers, Puzzle, HelpCircle, Gift,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { focusAvailability } from '@/lib/education/vocabQuizQuestions';
@@ -66,9 +66,11 @@ export interface VocabQuizFocusPickerProps {
   focus: PracticeFocusSetting;
   questionCount: number;
   secondsPerQuestion: number;
+  treasureChestsEnabled?: boolean;
   onFocusChange: (focus: PracticeFocusSetting) => void;
   onQuestionCountChange: (count: number) => void;
   onSecondsChange: (seconds: number) => void;
+  onTreasureChestsChange?: (enabled: boolean) => void;
   t: TranslateFn;
 }
 
@@ -78,9 +80,11 @@ export function VocabQuizFocusPicker({
   focus,
   questionCount,
   secondsPerQuestion,
+  treasureChestsEnabled,
   onFocusChange,
   onQuestionCountChange,
   onSecondsChange,
+  onTreasureChestsChange,
   t,
 }: VocabQuizFocusPickerProps) {
   const availability = useMemo(() => focusAvailability(words, { language }), [words, language]);
@@ -233,6 +237,36 @@ export function VocabQuizFocusPicker({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Advanced: Treasure Chests toggle */}
+      <div className="border-t-2 border-neo-cream/20 pt-6">
+        <button
+          type="button"
+          onClick={() => onTreasureChestsChange?.(!treasureChestsEnabled)}
+          className={cn(
+            'w-full flex items-center gap-3 px-4 py-3 rounded-neo border-[2px] transition-all',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2',
+            treasureChestsEnabled
+              ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow shadow-hard'
+              : 'bg-neo-navy/50 border-neo-cream text-neo-white hover:bg-neo-navy shadow-hard-sm'
+          )}
+        >
+          <Gift className="w-5 h-5 flex-shrink-0" aria-hidden />
+          <span className="flex-1 text-start font-bold">
+            {t('vocabQuiz.setup.treasureChests')}
+          </span>
+          <span
+            className={cn(
+              'flex-shrink-0 px-2 py-1 rounded text-xs font-bold',
+              treasureChestsEnabled
+                ? 'bg-neo-yellow text-neo-black'
+                : 'bg-neo-navy text-neo-white'
+            )}
+          >
+            {treasureChestsEnabled ? t('vocabQuiz.setup.on') : t('vocabQuiz.setup.off')}
+          </span>
+        </button>
       </div>
     </div>
   );

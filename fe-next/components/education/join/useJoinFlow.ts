@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useJoinClassroom } from '@/hooks/useClassroom';
+import { useJoinClassroom } from '@/hooks/useJoinClassroom';
 import { trackEduClassroomJoin } from '@/lib/education/telemetry';
+import logger from '@/utils/logger';
 import { resolveJoinTarget, type JoinTarget } from './joinTarget';
 import { sanitizeJoinCode, JOIN_CODE_LENGTH } from './JoinCodeField';
 
@@ -77,7 +78,10 @@ export interface JoinFlowState {
   submit: (overrideName?: string) => void;
 }
 
-export function useJoinFlow(initialCode = ''): JoinFlowState {
+export function useJoinFlow(
+  initialCode = '',
+  onSuccessBeforeNavigation?: () => Promise<void> | void
+): JoinFlowState {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { user, loading: authLoading } = useAuth();
@@ -263,8 +267,10 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
           );
 
           if (result.success) {
+            // Determine the outcome: success or already_member
+            const joinOutcome = result.alreadyMember ? 'already_member' : 'success';
             trackEduClassroomJoin({
-              result: 'success',
+              result: joinOutcome,
               classroomId: result.classroomId,
               attemptedCode: trimmedCode,
               // The ONLY signal that separates the two six-character systems —
@@ -272,6 +278,18 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
               matchedCodeType: result.gameCode ? 'game_code' : 'roster_code',
             });
             toast.success(t('education.student.join.success'));
+
+            // Call the success callback (e.g. to show confetti) before navigating
+            if (onSuccessBeforeNavigation) {
+              try {
+                await Promise.resolve(onSuccessBeforeNavigation());
+              } catch (err) {
+                if (process.env.NODE_ENV === 'development') {
+                  logger.debug('onSuccessBeforeNavigation error:', err);
+                }
+              }
+            }
+
             // A student who typed the LIVE GAME code came to PLAY, not to be
             // enrolled. Walk them straight in; the enrolment already happened.
             router.push(
@@ -282,8 +300,18 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
             return;
           }
 
+          // Determine the outcome based on the error code
+          let joinOutcome: 'invalid_code' | 'full' | 'name_taken' | 'server_error' = 'server_error';
+          if (result.code === 'INVALID_CODE') {
+            joinOutcome = 'invalid_code';
+          } else if (result.code === 'STUDENT_LIMIT_REACHED') {
+            joinOutcome = 'full';
+          } else if (result.code === 'NAME_TAKEN') {
+            joinOutcome = 'name_taken';
+          }
+
           trackEduClassroomJoin({
-            result: result.code === 'INVALID_CODE' ? 'not_found' : 'error',
+            result: joinOutcome,
             attemptedCode: trimmedCode,
           });
 
@@ -305,7 +333,7 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
             setFormErrorKey('common.error');
           }
         } catch {
-          trackEduClassroomJoin({ result: 'error', attemptedCode: trimmedCode });
+          trackEduClassroomJoin({ result: 'server_error', attemptedCode: trimmedCode });
           setFormErrorKey('common.error');
         } finally {
           setIsSubmitting(false);
@@ -323,6 +351,7 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
       language,
       router,
       t,
+      onSuccessBeforeNavigation,
     ]
   );
 

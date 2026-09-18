@@ -61,7 +61,7 @@ describe('<PlayNowLauncher> — the action precedes the menu', () => {
 
   it('labels the section below the button as a way to change the words', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
-    const change = screen.getByTestId('play-now-change');
+    const change = screen.getByTestId('play-now-change-disclosure');
     expect(order(screen.getByTestId('play-now-go'), change)).toBe(-1);
   });
 });

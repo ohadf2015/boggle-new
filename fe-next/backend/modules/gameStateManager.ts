@@ -538,6 +538,9 @@ function clearSocketMappings(socketId: string): { gameCode: string | null; usern
 
 const clearSocketMappingsForLeave = userManager.clearSocketMappingsForLeave;
 
+const bindSocketToGame = userManager.bindSocketToGame;
+const unbindSocketFromGame = userManager.unbindSocketFromGame;
+
 // Host Management Delegation
 const getNextEligibleHost = (gameCode: string, exclude?: string | string[]): string | null =>
   hostManager.getNextEligibleHost(asBase<HostGameBase>(games[gameCode]), exclude);
@@ -721,6 +724,7 @@ export {
   createGame, getGame, getGameAsync, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
   addUserToGame, removeUserFromGame, removeUserBySocketId, getGameBySocketId, getUsernameBySocketId,
   getSocketIdByUsername, getUserBySocketId, updateUserSocketId, updateUsernameMapping, getGameUsers,
+  bindSocketToGame, unbindSocketFromGame,
   addSpectatorToGame, removeSpectatorFromGame, getGameSpectators, upgradeSpectatorToPlayer, isSpectator,
   markPlayerReadyForNextGame, getPlayersReadyCount, isPlayerReadyForNextGame, clearPlayersReadyForNextGame, unmarkPlayerReady,
   getAllGames, getDetailedGames, getActiveRooms, getEmptyRooms, isRoomEmpty, cleanupEmptyRooms,
@@ -742,6 +746,7 @@ export default {
   createGame, getGame, getGameAsync, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
   addUserToGame, removeUserFromGame, removeUserBySocketId, getGameBySocketId, getUsernameBySocketId,
   getSocketIdByUsername, getUserBySocketId, updateUserSocketId, updateUsernameMapping, getGameUsers,
+  bindSocketToGame, unbindSocketFromGame,
   addSpectatorToGame, removeSpectatorFromGame, getGameSpectators, upgradeSpectatorToPlayer, isSpectator,
   markPlayerReadyForNextGame, getPlayersReadyCount, isPlayerReadyForNextGame, clearPlayersReadyForNextGame, unmarkPlayerReady,
   getAllGames, getDetailedGames, getActiveRooms, getEmptyRooms, isRoomEmpty, cleanupEmptyRooms,

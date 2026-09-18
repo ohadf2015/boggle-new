@@ -438,9 +438,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         )}
       </AnimatePresence>
 
-      {/* Main Content: Activity Panel + Leaderboard */}
       <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[1fr_1fr] md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
-        {/* Left: Mode-specific Activity Panel (anti-spoiler: grid removed) */}
         <div className="min-h-[180px] md:min-h-0 overflow-hidden">
           <TvActivityPanel
             playerScores={playerScores}
@@ -454,12 +452,11 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             wordHuntTotalPlayers={Object.keys(wordHuntPlayerLives).length}
           />
         </div>
-
-        {/* Right: Leaderboard - fills grid cell, needs overflow-auto for scrolling */}
         <div className="min-h-[120px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-auto">
           <TvLeaderboard
             players={leaderboardData}
             teams={classroomLive?.teams}
+            classroom={!!classroomLive}
             playerCombos={playerCombos}
             hostUsername={username}
             gameMode={gameMode}

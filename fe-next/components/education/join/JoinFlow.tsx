@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ClipboardPaste, Sparkles } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { JoinCodeField, JOIN_CODE_LENGTH, sanitizeJoinCode } from './JoinCodeField';
 import { useJoinFlow } from './useJoinFlow';
+import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
+import { PopPressButton } from '@/components/motion/PopPressButton';
 
 /**
  * The student's whole way in: code, nickname, playing.
@@ -25,17 +27,38 @@ import { useJoinFlow } from './useJoinFlow';
  *    (the original "first tap does nothing, second tap works" report);
  *  - no entrance opacity tween on the fullscreen surface, and the navy is
  *    hardcoded — this is a dark-only surface (recurring pitfall class 5).
+ *  - confetti burst on success, with navigation deferred until animation
+ *    completes (~750ms), so the celebration is not instantly erased by
+ *    page transition.
  */
 interface JoinFlowProps {
   /** From `/join/[code]` or `/join?code=` — the QR lands here pre-filled. */
   initialCode?: string;
+  /**
+   * Called on successful join, before navigation. Can return a Promise
+   * to delay navigation (e.g. for celebration animations).
+   */
+  onSuccessBeforeNavigation?: () => Promise<void> | void;
 }
 
 const K = 'education.student.join';
 
-export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
+export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: externalCallback }: JoinFlowProps) {
   const { t, dir } = useLanguage();
-  const flow = useJoinFlow(initialCode);
+  const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
+
+  // Create a callback that shows confetti and waits for animation
+  const handleSuccessBeforeNavigation = useCallback(async () => {
+    setShowSuccessCelebration(true);
+    // Wait for confetti animation (~750ms)
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    // Then call external callback if provided
+    if (externalCallback) {
+      await Promise.resolve(externalCallback());
+    }
+  }, [externalCallback]);
+
+  const flow = useJoinFlow(initialCode, handleSuccessBeforeNavigation);
   const nameRef = useRef<HTMLInputElement>(null);
   const [pasteNoteKey, setPasteNoteKey] = useState<string | null>(null);
 
@@ -78,18 +101,23 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
         : null;
 
   return (
-    <div
-      dir={dir}
-      className="relative flex min-h-dvh flex-col overflow-hidden bg-neo-navy text-neo-white"
+    <BoundedConfettiBurst
+      trigger={showSuccessCelebration}
+      anchorDimensions={{ width: 390, height: 844 }}
+      colors={['#22C55E', '#EC4899', '#06B6D4', '#D946EF']}
     >
-      {/* Loud, cheap, and behind everything — no layout cost, no tween. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -start-16 -top-16 h-56 w-56 rotate-12 rounded-neo border-3 border-neo-purple bg-neo-purple/20" />
-        <div className="absolute -end-20 top-1/3 h-64 w-64 -rotate-6 rounded-neo border-3 border-neo-pink bg-neo-pink/20" />
-        <div className="absolute -bottom-24 start-1/4 h-52 w-52 rotate-6 rounded-neo border-3 border-neo-cyan bg-neo-cyan/15" />
-      </div>
+      <div
+        dir={dir}
+        className="relative flex min-h-dvh flex-col overflow-hidden bg-neo-navy text-neo-white"
+      >
+        {/* Loud, cheap, and behind everything — no layout cost, no tween. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -start-16 -top-16 h-56 w-56 rotate-12 rounded-neo border-3 border-neo-purple bg-neo-purple/20" />
+          <div className="absolute -end-20 top-1/3 h-64 w-64 -rotate-6 rounded-neo border-3 border-neo-pink bg-neo-pink/20" />
+          <div className="absolute -bottom-24 start-1/4 h-52 w-52 rotate-6 rounded-neo border-3 border-neo-cyan bg-neo-cyan/15" />
+        </div>
 
-      <main className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-6">
+        <main className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-6">
         <header className="mb-5 flex items-center justify-between gap-3">
           <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-navy shadow-hard">
             LexiClash
@@ -129,6 +157,7 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
               value={flow.code}
               onChange={flow.setCode}
               onComplete={(next) => flow.advance(next)}
+              onPaste={handlePaste}
               label={t(`${K}.codeLabel`)}
               describedBy="join-code-note"
               invalid={!!flow.codeErrorKey || flow.codeRejected}
@@ -150,22 +179,12 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
               )}
             </div>
 
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handlePaste}
-                className="flex shrink-0 items-center gap-2 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-4 py-4 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform active:translate-y-0.5"
-              >
-                <ClipboardPaste aria-hidden="true" className="h-5 w-5" />
-                {t(`${K}.pasteButton`)}
-              </button>
-              <button
-                type="submit"
-                className="flex-1 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-4 font-neo-display text-xl font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-transform active:translate-y-0.5 active:shadow-hard-pressed"
-              >
-                {t(`${K}.flow.next`)}
-              </button>
-            </div>
+            <PopPressButton
+              type="submit"
+              className="font-neo-display text-xl font-black uppercase tracking-wide"
+            >
+              {t(`${K}.flow.next`)}
+            </PopPressButton>
           </form>
         ) : (
           <form
@@ -285,14 +304,15 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
               </p>
             )}
 
-            <button
+            <PopPressButton
               type="submit"
               disabled={!flow.canSubmit}
-              className="flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cyan px-4 py-5 font-neo-display text-2xl font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-transform active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-45"
+              variant="primary"
+              className="flex items-center justify-center gap-2 font-neo-display text-2xl font-black uppercase tracking-wide disabled:opacity-45"
             >
               <Sparkles aria-hidden="true" className="h-6 w-6" />
               {flow.isSubmitting ? t(`${K}.joining`) : t(`${K}.flow.go`)}
-            </button>
+            </PopPressButton>
 
             {/* A held or in-flight tap says what it is waiting on. A button that
                 just sits there is the silent no-op with a spinner painted on. */}
@@ -307,7 +327,8 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
           </form>
         )}
       </main>
-    </div>
+      </div>
+    </BoundedConfettiBurst>
   );
 }
 

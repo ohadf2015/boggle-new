@@ -50,6 +50,7 @@ export async function resolveJoinTarget(code: string): Promise<JoinTarget> {
           id?: string;
           name?: string;
           classroomId?: string;
+          classroomName?: string;
           teacherName?: string;
           gameCode?: string;
         }
@@ -59,11 +60,11 @@ export async function resolveJoinTarget(code: string): Promise<JoinTarget> {
       return { verdict: 'classroom', label: data.name, classroomId: data.id };
     }
     if (data?.kind === 'game') {
-      // A live game has no name worth showing; the teacher's name is what tells
-      // a student they are in the right place.
+      // A live game: prefer classroom name to show students a friendly preview,
+      // fall back to teacher name if classroom name is unavailable.
       return {
         verdict: 'game',
-        label: data.teacherName,
+        label: data.classroomName || data.teacherName,
         classroomId: data.classroomId,
         gameCode: data.gameCode ?? normalized,
       };

@@ -25,6 +25,7 @@ import {
   type VocabQuizEnded,
   type VocabQuizPhase,
   type VocabQuizLockIn,
+  type TreasureChestState,
 } from '@/shared/types/vocabQuiz';
 
 export interface VocabQuizClientState {
@@ -53,6 +54,21 @@ export interface VocabQuizClientState {
    * repaint the bars the class just watched settle.
    */
   lockIn: VocabQuizLockIn | null;
+  /**
+   * True when this player answered correctly and a chest awaits reveal.
+   * Set by answerResult.chestPending; cleared when moving to the next question.
+   */
+  chestPending?: boolean;
+  /**
+   * The resolved chest outcome for this question, once the player picks a chest.
+   * Null until treasureChestResult arrives; cleared when moving to next question.
+   */
+  myChest: TreasureChestState | null;
+  /**
+   * All chest events that have occurred on this question (for the host ticker).
+   * Cleared when moving to the next question.
+   */
+  chestEvents: TreasureChestState[];
 }
 
 const IDLE: VocabQuizClientState = {
@@ -71,6 +87,9 @@ const IDLE: VocabQuizClientState = {
   questionNumber: 0,
   finished: false,
   lockIn: null,
+  chestPending: false,
+  myChest: null,
+  chestEvents: [],
 };
 
 export interface UseVocabQuizResult extends VocabQuizClientState {
@@ -122,6 +141,10 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         // re-broadcast (resume / extend time) has had its answers kept by the
         // server — either way the next lockIn packet is the truth.
         lockIn: prev.questionNumber === payload.index + 1 ? prev.lockIn : null,
+        // Clear chest state when moving to the next question
+        chestPending: false,
+        myChest: null,
+        chestEvents: [],
       }));
     };
 
@@ -161,6 +184,16 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         myAnswer: payload,
         myScore: payload.totalScore,
         myStreak: payload.streak,
+        chestPending: payload.chestPending ?? false,
+      }));
+    };
+
+    const onTreasureChestResult = (payload: TreasureChestState) => {
+      setState((prev) => ({
+        ...prev,
+        myChest: payload,
+        standings: payload.standings,
+        chestEvents: [...prev.chestEvents, payload],
       }));
     };
 
@@ -185,6 +218,9 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         questionNumber: snap.index + 1,
         finished: !snap.active,
         lockIn: null,
+        chestPending: snap.myAnswer?.chestPending ?? false,
+        myChest: snap.myChest ?? null,
+        chestEvents: [],
       });
     };
 
@@ -214,6 +250,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
     socket.on(VOCAB_QUIZ_EVENTS.reveal, onReveal);
     socket.on(VOCAB_QUIZ_EVENTS.lockIn, onLockIn);
     socket.on(VOCAB_QUIZ_EVENTS.answerResult, onAnswerResult);
+    socket.on(VOCAB_QUIZ_EVENTS.treasureChestResult, onTreasureChestResult);
     socket.on(VOCAB_QUIZ_EVENTS.state, onState);
     socket.on(VOCAB_QUIZ_EVENTS.ended, onEnded);
     socket.on(VOCAB_QUIZ_EVENTS.paused, onPaused);
@@ -247,6 +284,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
       socket.off(VOCAB_QUIZ_EVENTS.reveal, onReveal);
       socket.off(VOCAB_QUIZ_EVENTS.lockIn, onLockIn);
       socket.off(VOCAB_QUIZ_EVENTS.answerResult, onAnswerResult);
+      socket.off(VOCAB_QUIZ_EVENTS.treasureChestResult, onTreasureChestResult);
       socket.off(VOCAB_QUIZ_EVENTS.state, onState);
       socket.off(VOCAB_QUIZ_EVENTS.ended, onEnded);
       socket.off(VOCAB_QUIZ_EVENTS.paused, onPaused);

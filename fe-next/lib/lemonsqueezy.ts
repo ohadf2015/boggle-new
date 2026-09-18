@@ -71,7 +71,6 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
       `Up to ${FREE_TIER_LIMITS.classes} ${(FREE_TIER_LIMITS.classes as number) === 1 ? 'class' : 'classes'}`,
       `${FREE_TIER_LIMITS.studentsPerClass} students per class`,
       'Custom word lists & lesson builder',
-      'Classroom duels',
       'No advertising for your students',
     ],
     variantId: undefined,

@@ -18,6 +18,8 @@ interface SessionCounts {
   blitz: number;
   /** Targeted vocab practice — not surfaced in the quick menu, counted for completeness. */
   vocab_focus?: number;
+  /** Word Craft assignment — not surfaced in the quick menu, counted for completeness. */
+  wordcraft?: number;
 }
 
 interface QuickPracticeButtonProps {
@@ -94,6 +96,7 @@ export function QuickPracticeButton({
       spelling: t('education.practice.spelling'),
       blitz: t('education.practice.blitz'),
       vocab_focus: t('education.vocabFocus.title'),
+      wordcraft: t('education.practice.wordcraft', 'Word Craft'),
     };
     return labels[type];
   };

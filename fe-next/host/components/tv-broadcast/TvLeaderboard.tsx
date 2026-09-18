@@ -6,6 +6,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { Users } from 'lucide-react';
 import TvPlayerCard from './TvPlayerCard';
 import TvGapIndicator from './TvGapIndicator';
+import LiveClassroomLeaderboard from '@/components/education/duels/LiveClassroomLeaderboard';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { ClassroomTeam } from '@/shared/utils/teamBattle';
 
@@ -38,8 +39,16 @@ interface TvLeaderboardProps {
   gameMode?: string | null;
   wordHuntPlayerLives?: Record<string, number>;
   wordHuntEliminatedPlayers?: string[];
+  /**
+   * A classroom room. A free-for-all classroom round gets the big animated
+   * top-N board; team rounds keep their coloured cards, Word Hunt its lives.
+   */
+  classroom?: boolean;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
+
+/** Rows that fit the projector's half-panel at 1920×1080 with no scroll. */
+const CLASSROOM_TOP_N = 8;
 
 // Virtual item height for performance
 const ITEM_HEIGHT = 80;
@@ -57,6 +66,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   gameMode,
   wordHuntPlayerLives = {},
   wordHuntEliminatedPlayers = [],
+  classroom = false,
   t,
 }) => {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -106,6 +116,23 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
         <Users className="w-12 h-12 text-neo-black/30 mb-3" />
         <p className="text-neo-black/60 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.noPlayersYet')}</p>
         <p className="text-neo-black/40 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers')}</p>
+      </div>
+    );
+  }
+
+  if (classroom && !teams?.length && gameMode !== 'word-hunt') {
+    return (
+      <div className="h-full overflow-hidden p-4 flex flex-col" data-testid="tv-classroom-standings">
+        <h3 className="text-xl font-black uppercase text-neo-black mb-2 text-center border-b-2 border-neo-black pb-2 shrink-0">
+          {t('tvBroadcast.leaderboard')}
+        </h3>
+        <LiveClassroomLeaderboard
+          variant="projector"
+          leaderboard={sortedPlayers}
+          topN={CLASSROOM_TOP_N}
+          gameMode={gameMode}
+          className="min-h-0 flex-1"
+        />
       </div>
     );
   }

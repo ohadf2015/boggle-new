@@ -51,8 +51,9 @@ vi.mock('@/components/lobby/LobbyReactions', () => ({
   LobbyReactions: () => <div data-testid="lobby-reactions" />,
 }));
 vi.mock('@/hooks/gameState/store', () => ({ useHostSelectedGameMode: () => 'random' }));
+const storeActions = vi.hoisted(() => ({ setGameMode: vi.fn(), setHostSelectedGameMode: vi.fn() }));
 vi.mock('@/hooks/gameState', () => ({
-  useGameActions: () => ({ setGameMode: vi.fn(), setHostSelectedGameMode: vi.fn() }),
+  useGameActions: () => storeActions,
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAdmin: false }) }));
 vi.mock('@/utils/SocketContext', () => ({
@@ -112,5 +113,13 @@ describe('TvLobbyView — one lobby surface per room type', () => {
     expect(screen.getByTestId('tv-join-bar')).toBeInTheDocument();
     expect(screen.queryByTestId('projector-lobby')).not.toBeInTheDocument();
     expect(screen.getByTestId('battle-mode-card')).toBeInTheDocument();
+  });
+
+  it('hands the teacher-chosen CLASSIC to the start intent (the emit used to carry "random")', () => {
+    // Given a CLASSIC classroom room and a store still holding 'random'
+    render(<TvLobbyView {...baseProps} gameCode="CLSSC1" isClassroomMode classroomGameMode="classic" />);
+    // Then the LAST write to the host intent — what startGame emits — is 'classic'
+    const calls = storeActions.setHostSelectedGameMode.mock.calls;
+    expect(calls[calls.length - 1][0]).toBe('classic');
   });
 });

@@ -62,8 +62,8 @@ vi.mock('@/components/education/practicePicker/PracticePicker', () => ({
 
 vi.mock('@/components/education/practice/PracticeModeStage', () => ({
   __esModule: true,
-  default: ({ mode, onBack }: { mode: string; onBack: () => void }) => (
-    <div data-testid="stage" data-mode={mode}>
+  default: ({ mode, variant, onBack }: { mode: string; variant: string | null; onBack: () => void }) => (
+    <div data-testid="stage" data-mode={mode} data-variant={variant ?? ''}>
       <button type="button" data-testid="stage-back" onClick={onBack}>leave</button>
     </div>
   ),
@@ -131,6 +131,14 @@ describe('PracticeContent', () => {
 
     expect(screen.getByTestId('picker')).toBeInTheDocument();
     expect(screen.queryByTestId('stage')).not.toBeInTheDocument();
+  });
+
+  it('GIVEN a Word Craft assignment link WHEN it opens THEN Word Craft starts as a solo_board session with the wordcraft variant', async () => {
+    renderContent({ initialMode: 'solo_board', initialVariant: 'wordcraft' });
+    const stage = await screen.findByTestId('stage');
+    expect(stage).toHaveAttribute('data-mode', 'solo_board');
+    expect(stage).toHaveAttribute('data-variant', 'wordcraft');
+    expect(mockStartSession).toHaveBeenCalledWith('solo_board', { variant: 'wordcraft' });
   });
 
   it('GIVEN a deep link WHEN it carries a mode THEN the round opens without a picker tap', async () => {

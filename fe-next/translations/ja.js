@@ -1927,6 +1927,7 @@ const ja = {
   },
   "errors": {
     "unstableConnection": "接続がふらついてる - 戻すね...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "接続遅い - 対応中",
     "sessionExpired": "セッション終了。新しく始めよう！",
     "roomNoLongerExists": "ルーム閉鎖 - みんな退室したよ",
@@ -12803,13 +12804,14 @@ const ja = {
         "title": "進捗レポートはPro機能です",
         "body": "すべてのクラスとゲームでの生徒の様子を確認できます。習得した単語、レベル、XP、保護者面談向けの印刷可能なPDF。Teacher Proにアップグレードすると、クラスと生徒のレポートが使えるようになります。"
       },
-      "cta": "Pro で解除 — 月額 ${{price}}"
+      "cta": "Pro で解除 — 月額 {{price}}"
     },
     "subscription": {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",
       "giftedUntil": "無償 Pro の期限",
       "giftedBadge": "ギフト",
       "classLimitTitle": "クラスの上限に達しました",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
       "upgradeProDescription": "Proなら、クラス数も1クラスあたりの生徒数も無制限。指導の拡大に制限はありません。",
       "proFeatures": "Proに含まれるもの",
@@ -13615,6 +13617,19 @@ const ja = {
         "synonym": "このレッスンに類義語を追加して解除",
         "antonym": "このレッスンに対義語を追加して解除"
       }
+    },
+    "wordcraftAssignment": {
+      "title": "ワードクラフト",
+      "intro": "ことばボードでボットに勝とう。レッスンの単語を作るとボーナスXP!",
+      "lessonWords": "レッスンの単語",
+      "play": "プレイ",
+      "score": "スコア",
+      "result": "結果",
+      "won": "勝ち!",
+      "lost": "ボットの勝ち",
+      "recommended": "おすすめ",
+      "teacherHint": "やさしいボットと1対1。生徒はクラスのページから遊べます。",
+      "studentPlay": "ワードクラフトで遊ぶ"
     },
     "vocabFocus": {
       "title": "語彙フォーカス",

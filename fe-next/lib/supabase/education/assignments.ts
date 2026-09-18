@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import type { LessonAssignment, TeacherAssignment } from './types';
-import { isVocabFocus, isPracticeFocusSetting, type PracticeFocusSetting } from '@/lib/education/vocabFocus';
+import { isPracticeFocusSetting, type PracticeFocusSetting } from '@/lib/education/vocabFocus';
 
 /**
  * Assign a lesson to a classroom (legacy - kept for backward compatibility)
@@ -107,9 +107,10 @@ export async function createAssignment(data: {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
   try {
-    // Only write the column when a real focus was chosen, so the legacy insert
-    // shape is untouched on databases that have not run 20260905140000 yet.
-    const focus = isVocabFocus(data.practice_focus) ? { practice_focus: data.practice_focus } : {};
+    // 'any' is written explicitly: a NULL practice_focus means a Word Craft
+    // assignment (lib/education/wordcraftAssignment.ts — the table has no mode
+    // column). Unknown values are never written (they would fail the CHECK).
+    const focus = isPracticeFocusSetting(data.practice_focus) ? { practice_focus: data.practice_focus } : {};
     const { data: assignment, error } = await supabase
       .from('lesson_assignments')
       .insert({

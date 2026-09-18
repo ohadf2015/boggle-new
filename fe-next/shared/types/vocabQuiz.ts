@@ -153,6 +153,8 @@ export interface VocabQuizAnswerResult {
   streakBonus: number;
   streak: number;
   totalScore: number;
+  /** Whether this correct answer unlocks a treasure chest reveal. */
+  chestPending?: boolean;
 }
 
 /**
@@ -178,6 +180,8 @@ export interface VocabQuizStateSnapshot {
   myScore: number;
   myStreak: number;
   standings: VocabQuizStanding[];
+  /** The resolved chest outcome for this question, if the player picked a chest. */
+  myChest?: TreasureChestState;
 }
 
 export interface VocabQuizEnded {
@@ -215,6 +219,30 @@ export const VOCAB_QUIZ_DEFAULT_SETTINGS: VocabQuizSettings = {
   secondsPerQuestion: VOCAB_QUIZ_DEFAULT_SECONDS,
 };
 
+// ---------------------------------------------------------------------------
+// Treasure Chests (Gold-Quest-style rewards)
+// ---------------------------------------------------------------------------
+
+export type TreasureChestOutcome = 'gain' | 'double' | 'steal' | 'swap' | 'small-loss';
+
+export interface TreasureChestState {
+  /** Username of the player who opened this chest. */
+  actor: string;
+  /** Outcome seeded server-side for (gameCode, questionIndex, studentId). */
+  outcome: TreasureChestOutcome;
+  /** Amount of points gained or lost. */
+  amount: number;
+  /** Player the outcome affects (for steal/swap). */
+  targetUsername?: string;
+  /** Updated standings after chest reveal. */
+  standings: VocabQuizStanding[];
+}
+
+export interface TreasureChestRequest {
+  /** Question index to fetch from. */
+  index: number;
+}
+
 /** Socket event names, in one place so client and server cannot drift. */
 export const VOCAB_QUIZ_EVENTS = {
   question: 'vocabQuiz:question',
@@ -226,6 +254,8 @@ export const VOCAB_QUIZ_EVENTS = {
   lockIn: 'vocabQuiz:lockIn',
   answer: 'vocabQuiz:answer',
   requestState: 'vocabQuiz:requestState',
+  treasureChestResult: 'vocabQuiz:treasureChestResult',
+  openChest: 'vocabQuiz:openChest',
 } as const;
 
 /**

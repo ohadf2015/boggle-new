@@ -54,9 +54,15 @@ describe('createAssignment practice_focus', () => {
     });
   });
 
-  it('omits the column entirely for "any" / unset (legacy insert shape)', async () => {
+  it('persists "any" explicitly — NULL now means a Word Craft assignment', async () => {
     const insert = insertChain();
     await createAssignment({ classroom_id: 'c1', lesson_id: 'l1', teacher_id: 't1', practice_focus: 'any' });
+    expect(insert).toHaveBeenCalledWith({ classroom_id: 'c1', lesson_id: 'l1', due_date: null, practice_focus: 'any' });
+  });
+
+  it('omits the column when unset or null (stored NULL = Word Craft)', async () => {
+    const insert = insertChain();
+    await createAssignment({ classroom_id: 'c1', lesson_id: 'l1', teacher_id: 't1', practice_focus: null });
     expect(insert).toHaveBeenCalledWith({ classroom_id: 'c1', lesson_id: 'l1', due_date: null });
 
     await createAssignment({ classroom_id: 'c1', lesson_id: 'l1', teacher_id: 't1' });

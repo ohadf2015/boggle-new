@@ -58,6 +58,13 @@ export function headerTitle(name: string): string {
   return `${trimmed.slice(0, HEADER_TITLE_MAX - 1).trimEnd()}…`;
 }
 
+/** Session-start options; only Word Craft's variant is persisted (as `mode`). */
+function sessionOptions(focus: VocabFocus | null, variant: PracticeVariant | null) {
+  if (focus) return { focus };
+  if (variant === 'wordcraft') return { variant: 'wordcraft' as const };
+  return undefined;
+}
+
 export interface PracticeLessonShape {
   id: string;
   name: string;
@@ -78,6 +85,8 @@ export interface PracticeContentProps {
   initialMode: PracticeType | null;
   /** vocab_focus only: skill pinned by the teacher's assignment / deep link. */
   initialFocus: VocabFocus | null;
+  /** solo_board only: 'wordcraft' when a Word Craft assignment deep-links here. */
+  initialVariant?: PracticeVariant | null;
   /** Records a finished round on the device when there is no account. */
   onGuestResult: (result: { cardsReviewed?: number; cardsCorrect?: number; vocabularyWordsFound?: string[] }) => void;
 }
@@ -92,6 +101,7 @@ export default function PracticeContent({
   router,
   initialMode,
   initialFocus,
+  initialVariant = null,
   onGuestResult,
 }: PracticeContentProps) {
   const { t } = useLanguage();
@@ -100,7 +110,7 @@ export default function PracticeContent({
   // Word Tower records as `solo_board` (no 'word_tower' value exists in the
   // practice_type CHECK), so the variant is what decides which screen opens.
   // Client-side only: there is no `?mode=` deep link for it yet.
-  const [selectedVariant, setSelectedVariant] = useState<PracticeVariant | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<PracticeVariant | null>(initialVariant);
   const [hasInitialized, setHasInitialized] = useState(false);
   // Set the moment a round finishes, cleared on every mode change. It is what
   // turns the round-end into a fork rather than a dead end.
@@ -140,7 +150,7 @@ export default function PracticeContent({
   useEffect(() => {
     if (initialMode && !hasInitialized) {
       setHasInitialized(true);
-      void startSession(initialMode, initialFocus ? { focus: initialFocus } : undefined).then((result) => {
+      void startSession(initialMode, sessionOptions(initialFocus, initialVariant)).then((result) => {
         if (!result.success) {
           setStartError(t('education.practice.startFailed'));
           setSelectedMode(null);
@@ -149,7 +159,7 @@ export default function PracticeContent({
         }
       });
     }
-  }, [initialMode, initialFocus, hasInitialized, startSession, t]);
+  }, [initialMode, initialFocus, initialVariant, hasInitialized, startSession, t]);
 
   // Access XP context
   const {
@@ -185,7 +195,7 @@ export default function PracticeContent({
     setStartError(null);
     // The variant is a client-side routing detail; the session still starts as
     // the practice type the database accepts.
-    const result = await startSession(mode, options?.focus ? { focus: options.focus } : undefined);
+    const result = await startSession(mode, sessionOptions(options?.focus ?? null, options?.variant ?? null));
     if (!result.success) {
       // Don't leave the student staring at a round with no session behind
       // it — back out to the picker and say so.
