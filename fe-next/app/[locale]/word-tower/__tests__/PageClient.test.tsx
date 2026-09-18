@@ -9,8 +9,8 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ replace }) }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => useAuth() }));
 vi.mock('@/hooks/useExperiment', () => ({ useExperiment: () => useExperiment() }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en' }) }));
-vi.mock('@/components/wordTower/WordTowerGame', () => ({
-  WordTowerGame: () => <div data-testid="word-tower-game" />,
+vi.mock('@/components/wordTowerV2/WordTowerV2', () => ({
+  default: () => <div data-testid="word-tower-game" />,
 }));
 
 import { WordTowerPageClient } from '../PageClient';
@@ -21,32 +21,32 @@ beforeEach(() => {
 });
 
 describe('WordTowerPageClient gate', () => {
-  it('renders the game for a user with in-work access (admin or beta)', () => {
+  it('renders the game for a user with in-work access (admin or beta)', async () => {
     useAuth.mockReturnValue({ canSeeInWorkModes: true, loading: false });
     render(<WordTowerPageClient />);
-    expect(screen.getByTestId('word-tower-game')).toBeInTheDocument();
+    expect(await screen.findByTestId('word-tower-game')).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('renders the game for an ORDINARY player — the mode is public now, no redirect', () => {
+  it('renders the game for an ORDINARY player — the mode is public now, no redirect', async () => {
     useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: false });
     render(<WordTowerPageClient />);
-    expect(screen.getByTestId('word-tower-game')).toBeInTheDocument();
+    expect(await screen.findByTestId('word-tower-game')).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('renders for in-work access even when the experiment flag is off (gate is access-based)', () => {
+  it('renders for in-work access even when the experiment flag is off (gate is access-based)', async () => {
     useAuth.mockReturnValue({ canSeeInWorkModes: true, loading: false });
     useExperiment.mockReturnValue({ variant: 'off', trackExposure: vi.fn() });
     render(<WordTowerPageClient />);
-    expect(screen.getByTestId('word-tower-game')).toBeInTheDocument();
+    expect(await screen.findByTestId('word-tower-game')).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('renders immediately while auth is still loading — nothing is gated on it', () => {
+  it('renders immediately while auth is still loading — nothing is gated on it', async () => {
     useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: true });
     render(<WordTowerPageClient />);
-    expect(screen.getByTestId('word-tower-game')).toBeInTheDocument();
+    expect(await screen.findByTestId('word-tower-game')).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
 });
