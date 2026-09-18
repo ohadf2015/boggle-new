@@ -5,6 +5,7 @@ import type { LetterGrid } from '@/shared/types/game';
 import type { FoundWord } from '../types';
 import { trackGameStart } from '@/utils/growthTracking';
 import { useAuth } from '@/contexts/AuthContext';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface UseSinglePlayerEffectsOptions {
   grid: LetterGrid | null;
@@ -205,7 +206,7 @@ export function useSinglePlayerEffects({
     const hasKeyboardLayout = isLandscape || isDesktop || isTv;
     if (!hasKeyboardLayout || isGameOver) return;
     function handleKeyPress(e: KeyboardEvent): void {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (isTypingTarget(e)) return;
       if (e.key === 'Escape' && isTypingModeRef.current) return;
       if (e.key === 'Escape') {
         e.preventDefault();

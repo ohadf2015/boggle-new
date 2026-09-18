@@ -39,21 +39,25 @@ describe('ConnectionsKeyboard', () => {
     expect(backspaceKey.parentElement).toBe(z.parentElement);
   });
 
-  it('gives every Hebrew letter key the same width, including the last row', () => {
-    // Hebrew rows are 6/8/8, so the last row is already the longest and the
-    // submit/backspace keys have no column budget of their own. Sizing letters
-    // off the longest row alone let the bottom row shrink under them.
-    // NB: asserting the two keys share a flex-basis would be vacuous — they
-    // always did. The old bug was runtime flex-SHRINK, which jsdom does not
-    // compute. What actually changed is the divisor: the budget must be 11
-    // columns (8 letters + 3 for the action keys), not the bare longest row of
-    // 8. Pinning the number is what makes this test able to fail.
+  it('gives every Hebrew letter key the same 9.5-column width', () => {
+    // Hebrew rows are 6/8/8: backspace moves to the short top row, submit stays
+    // on the last row, so the widest row is 8 + 1.5 = 9.5 columns (was 11,
+    // which rendered skinny pills). jsdom does not compute flex-shrink, so the
+    // divisor is what this pins.
     render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('he')} canSubmit />);
-    const firstRowKey = screen.getByRole('button', { name: 'ק' });   // row 1
-    const lastRowKey = screen.getByRole('button', { name: 'ת' });    // row 3, beside the action keys
-    const expected = `calc(${(100 / 11).toFixed(4)}% - 0.375rem)`;
+    const firstRowKey = screen.getByRole('button', { name: 'ק' });
+    const lastRowKey = screen.getByRole('button', { name: 'ת' });
+    const expected = `calc(${(100 / 9.5).toFixed(4)}% - 0.25rem)`;
     expect(firstRowKey.style.flexBasis).toBe(expected);
     expect(lastRowKey.style.flexBasis).toBe(expected);
+  });
+
+  it('puts Hebrew backspace on the top row and submit on the bottom row', () => {
+    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('he')} canSubmit />);
+    const backspaceKey = screen.getByRole('button', { name: 'Delete letter' });
+    const submit = screen.getByRole('button', { name: 'Submit' });
+    expect(backspaceKey.parentElement).toBe(screen.getByRole('button', { name: 'ק' }).parentElement);
+    expect(submit.parentElement).toBe(screen.getByRole('button', { name: 'ת' }).parentElement);
   });
 
   it('renders the physical-layout keyboard left-to-right for Hebrew (ק top-left, not mirrored)', () => {

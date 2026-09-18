@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface UseGridKeyboardNavOptions {
   gridSize: number;
@@ -57,7 +58,7 @@ export function useGridKeyboardNav({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't handle if typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (isTypingTarget(e)) return;
       // Don't conflict with power-up shortcuts when no tile is focused
       if (focusedIndex < 0 && !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
 

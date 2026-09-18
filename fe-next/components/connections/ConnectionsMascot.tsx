@@ -7,9 +7,11 @@ export type MascotMood = 'idle' | 'wrong' | 'happy' | 'encourage' | 'panic' | 'w
 
 /** Mood → transparent mascot art (same pool the rest of the app uses). */
 export const MOOD_SRC: Record<MascotMood, string> = {
-  idle: '/mascot/question.webp',
-  wrong: '/mascot/oops.webp',
-  happy: '/mascot/celebration.webp',
+  // Bridge poses are static transparent cutouts (~20KB) — the older animated
+  // webps carry an opaque dark square that reads as a box over the card.
+  idle: '/mascot/bridge-think-nobg.webp',
+  wrong: '/mascot/bridge-oops-nobg.webp',
+  happy: '/mascot/bridge-cheer-nobg.webp',
   encourage: '/mascot/encouraging.webp',
   panic: '/mascot/panic.webp',
   won: '/mascot/trophy.webp',

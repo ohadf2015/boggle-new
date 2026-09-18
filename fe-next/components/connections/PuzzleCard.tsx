@@ -9,6 +9,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import ConnectionsKeyboard from './ConnectionsKeyboard';
+import ConnectionsMascot from './ConnectionsMascot';
 import AnswerSlots from './AnswerSlots';
 import { useBridgeTyping } from './useBridgeTyping';
 import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
@@ -179,6 +180,14 @@ export default function PuzzleCard({
         ].join(' ')}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
+        {/* Mood mascot sits in the start corner and reacts to every guess. */}
+        <span
+          data-testid="puzzle-mascot"
+          className={['pointer-events-none absolute top-1', isRTL ? 'right-1' : 'left-1'].join(' ')}
+        >
+          <ConnectionsMascot status={state.status} className="h-12 w-12" />
+        </span>
+
         {puzzle.difficulty && (
           <span
             className={[

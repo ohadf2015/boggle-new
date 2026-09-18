@@ -15,6 +15,7 @@ import {
 } from '@/lib/wordTowerV2/engine';
 import { BLOCK_HEIGHT_PX, blockWidthForWord, scoreFromHeightM } from '@/lib/wordTowerV2/scoring';
 import TowerCanvas, { type FrameStats } from './TowerCanvas';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 /**
  * Word Tower v2.
@@ -185,6 +186,8 @@ export default function WordTowerV2() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      // Keys typed into the feedback widget (shadow root) / any input are not ours.
+      if (isTypingTarget(event)) return;
       if (event.code === 'Space') {
         event.preventDefault();
         if (phase === 'swinging') drop();
