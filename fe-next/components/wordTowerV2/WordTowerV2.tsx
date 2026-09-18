@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
-import { generateWheel } from '@/lib/wordTower/wordTowerManager';
-import { type CraneSwing, releaseKinematics } from '@/lib/wordTowerV2/crane';
+import { CRANE_CLEARANCE_PX, type CraneSwing, releaseKinematics } from '@/lib/wordTowerV2/crane';
 import {
+  PX_PER_M,
   createTowerWorld,
   getTowerHeightM,
   moveAttachedBlock,
@@ -16,6 +16,9 @@ import {
 import { BLOCK_HEIGHT_PX, blockWidthForWord, scoreFromHeightM } from '@/lib/wordTowerV2/scoring';
 import TowerCanvas, { type FrameStats } from './TowerCanvas';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
+import { canBuildFromWheel, isAcceptedWord, spinWheel, usedLetterMask } from '@/lib/wordTowerV2/wheel';
+import { Delete } from 'lucide-react';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 
 /**
  * Word Tower v2.
@@ -27,24 +30,8 @@ import { isTypingTarget } from '@/lib/dom/isTypingTarget';
  */
 
 const SWING: CraneSwing = { amplitudeRad: 0.62, periodMs: 2200, phase: 0 };
-/** How far above the tower top the crane hangs. */
-const CRANE_CLEARANCE_PX = 230;
-const MIN_WORD_LEN = 3;
 
 type Phase = 'composing' | 'swinging';
-
-function canBuildFromWheel(word: string, wheel: string[]): boolean {
-  const pool = new Map<string, number>();
-  for (const letter of wheel) pool.set(letter, (pool.get(letter) ?? 0) + 1);
-
-  for (const letter of word) {
-    const left = pool.get(letter) ?? 0;
-    if (left === 0) return false;
-    pool.set(letter, left - 1);
-  }
-
-  return true;
-}
 
 export default function WordTowerV2() {
   const { t, language } = useLanguage();
@@ -67,6 +54,35 @@ export default function WordTowerV2() {
   const hangingRef = useRef<{ id: string; startedAt: number } | null>(null);
   const droppedRef = useRef(0);
   const seededRef = useRef(false);
+  const dockRef = useRef<HTMLDivElement | null>(null);
+  const dockPxRef = useRef(200);
+  const [debug, setDebug] = useState(false);
+
+  // The canvas reserves exactly the dock's real height. A hardcoded reserve
+  // drifted as soon as the letter row wrapped, and blocks slid under the dock.
+  useEffect(() => {
+    const el = dockRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      dockPxRef.current = el.getBoundingClientRect().height;
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    setDebug(new URLSearchParams(window.location.search).has('debug'));
+  }, []);
+
+  // Gameplay owns the whole screen — the global bottom nav covered the Hoist button.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
+
+  const getDockPx = useCallback(() => dockPxRef.current, []);
+  const getHangingId = useCallback(() => hangingRef.current?.id ?? null, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,7 +109,7 @@ export default function WordTowerV2() {
   }, [language]);
 
   useEffect(() => {
-    setWheel(generateWheel('word-tower-v2', 'local', language, 0));
+    setWheel(spinWheel(language as Parameters<typeof spinWheel>[0]));
   }, [language]);
 
   /**
@@ -122,7 +138,7 @@ export default function WordTowerV2() {
         // A slight alternating drift so the stack reads as hand-placed rather
         // than as a column snapped to a grid.
         x: (index % 2 === 0 ? 1 : -1) * index * 2.6,
-        y: -(getTowerHeightM(world) * 32 + 170),
+        y: -(getTowerHeightM(world) * PX_PER_M + 170),
         widthPx: blockWidthForWord(word),
         heightPx: BLOCK_HEIGHT_PX,
         vx: 0,
@@ -141,7 +157,7 @@ export default function WordTowerV2() {
 
     const world = worldRef.current;
     const { x } = releaseKinematics(nowMs - hanging.startedAt, SWING, 0);
-    const y = -(getTowerHeightM(world) * 32 + CRANE_CLEARANCE_PX);
+    const y = -(getTowerHeightM(world) * PX_PER_M + CRANE_CLEARANCE_PX);
 
     moveAttachedBlock(world, hanging.id, x, y);
   }, []);
@@ -149,7 +165,7 @@ export default function WordTowerV2() {
   const submitWord = useCallback(() => {
     const word = typed.toLowerCase();
 
-    if (word.length < MIN_WORD_LEN || !canBuildFromWheel(word, wheel) || !dictRef.current?.has(word)) {
+    if (!isAcceptedWord(word, wheel, dictRef.current)) {
       setRejected(true);
       window.setTimeout(() => setRejected(false), 420);
       return;
@@ -162,7 +178,7 @@ export default function WordTowerV2() {
     spawnBlock(worldRef.current, {
       id,
       x: 0,
-      y: -(getTowerHeightM(worldRef.current) * 32 + CRANE_CLEARANCE_PX),
+      y: -(getTowerHeightM(worldRef.current) * PX_PER_M + CRANE_CLEARANCE_PX),
       widthPx: blockWidthForWord(word),
       heightPx: BLOCK_HEIGHT_PX,
       vx: 0,
@@ -198,12 +214,16 @@ export default function WordTowerV2() {
 
       if (event.key === 'Backspace') setTyped((w) => w.slice(0, -1));
       else if (event.key === 'Enter') submitWord();
-      else if (/^[a-zA-Z]$/.test(event.key)) setTyped((w) => w + event.key.toLowerCase());
+      else if (/^[a-zA-Z]$/.test(event.key)) {
+        // Only letters still left on the wheel — the slate can never hold an unbuildable word.
+        const next = event.key.toLowerCase();
+        setTyped((w) => (canBuildFromWheel(w + next, wheel) ? w + next : w));
+      }
     };
 
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, drop, submitWord]);
+  }, [phase, drop, submitWord, wheel]);
 
   // Poll measured height for the HUD. The tower's height is whatever physics
   // says it is, so there is no running total that can disagree with the screen.
@@ -213,30 +233,33 @@ export default function WordTowerV2() {
   }, []);
 
   const score = useMemo(() => scoreFromHeightM(heightM), [heightM]);
+  const used = useMemo(() => usedLetterMask(typed, wheel), [typed, wheel]);
 
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-neo-navy">
       <TowerCanvas
         world={worldRef.current}
         labels={labelsRef.current}
-        onFrameStats={setStats}
+        getDockPx={getDockPx}
+        getHangingId={getHangingId}
+        onFrameStats={debug ? setStats : undefined}
         onBeforeStep={onBeforeStep}
         className="absolute inset-0"
       />
 
       <div className="pointer-events-none absolute left-4 top-4 flex flex-col gap-1">
         <div className="flex items-center gap-2">
-          <div className="rounded-lg border-4 border-neo-navy bg-neo-lime px-3 py-1 font-fredoka text-2xl font-bold text-neo-navy shadow-[4px_4px_0_0_#12162b]">
+          <div className="rounded-lg border-4 border-black bg-neo-lime px-3 py-1 font-fredoka text-2xl font-bold text-neo-navy shadow-[4px_4px_0_0_#000]">
             {heightM.toFixed(1)}m
           </div>
           {/* This mode is a beta preview — say so on the screen, not just in
               the route gate, so testers know what they are reporting on. */}
-          <div className="rounded-md border-2 border-neo-navy bg-neo-pink px-2 py-0.5 font-fredoka text-xs font-bold uppercase tracking-widest text-neo-white shadow-[3px_3px_0_0_#12162b]">
+          <div className="rounded-md border-2 border-black bg-neo-pink px-2 py-0.5 font-fredoka text-xs font-bold uppercase tracking-widest text-neo-white shadow-[3px_3px_0_0_#000]">
             {t('common.beta', 'Beta')}
           </div>
         </div>
         <div className="font-fredoka text-lg font-bold text-neo-white">{score}</div>
-        {stats ? (
+        {debug && stats ? (
           <div className="font-mono text-[11px] text-neo-white/60">
             {stats.fps}fps · p95 {stats.p95Ms}ms · {stats.bodies}
           </div>
@@ -246,20 +269,38 @@ export default function WordTowerV2() {
       {/* Opaque dock. The canvas reserves this height, but a tall tower still
           extends past it — without a solid surface the blocks show through
           between the letter buttons. */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 border-t-4 border-[#2a3050] bg-neo-navy px-4 pb-5 pt-4">
-        {phase === 'composing' ? (
-          <>
-            {/* Only render the word slate once there is a word. An always-on
-                empty box floated over the tower as a blank white rectangle. */}
-            {typed ? (
+      <div
+        ref={dockRef}
+        className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-center border-t-4 border-neo-cream bg-neo-navy px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4"
+      >
+        {/* The composing controls stay mounted (just hidden) while swinging so
+            the dock never changes height between phases — the camera frames
+            off the dock, and a shrinking dock made the whole scene jump. */}
+        <div
+          className={`flex flex-col items-center gap-3 ${phase === 'swinging' ? 'invisible' : ''}`}
+          inert={phase === 'swinging'}
+        >
+            {/* Fixed-height slate so the dock (and the camera framing that
+                reads its height) does not jump on the first letter. */}
+            <div className="flex h-12 items-center gap-2">
               <div
-                className={`rounded-xl border-4 border-neo-navy px-5 py-2 font-fredoka text-3xl font-bold uppercase tracking-widest text-neo-navy shadow-[5px_5px_0_0_#12162b] ${
-                  rejected ? 'animate-shake bg-neo-pink' : 'bg-neo-white'
+                className={`flex h-12 min-w-[8rem] items-center justify-center rounded-xl border-4 border-black px-5 font-fredoka text-3xl font-bold uppercase tracking-widest text-neo-navy shadow-[4px_4px_0_0_#000] ${
+                  rejected ? 'animate-shake bg-neo-pink' : typed ? 'bg-neo-cream' : 'border-dashed border-neo-cream/40 bg-transparent shadow-none'
                 }`}
               >
                 {typed}
               </div>
-            ) : null}
+              {typed ? (
+                <button
+                  type="button"
+                  onClick={() => setTyped((w) => w.slice(0, -1))}
+                  aria-label={t('wordTower.hud.backspace', 'Delete')}
+                  className="flex h-12 w-12 items-center justify-center rounded-xl border-4 border-black bg-neo-cream text-neo-navy shadow-[4px_4px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_0_#000]"
+                >
+                  <Delete className="h-6 w-6" aria-hidden />
+                </button>
+              ) : null}
+            </div>
 
             <div className="flex flex-wrap justify-center gap-2">
               {wheel.map((letter, index) => (
@@ -267,7 +308,8 @@ export default function WordTowerV2() {
                   key={`${letter}-${index}`}
                   type="button"
                   onClick={() => setTyped((w) => w + letter)}
-                  className="h-14 w-14 rounded-xl border-4 border-neo-navy bg-neo-cyan font-fredoka text-2xl font-bold uppercase text-neo-navy shadow-[4px_4px_0_0_#12162b] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_0_#12162b]"
+                  disabled={used[index]}
+                  className="h-14 w-14 rounded-xl border-4 border-black bg-neo-cyan font-fredoka text-2xl font-bold uppercase text-neo-navy shadow-[4px_4px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_0_#000] disabled:translate-x-[2px] disabled:translate-y-[2px] disabled:bg-neo-cyan/25 disabled:shadow-none"
                 >
                   {letter}
                 </button>
@@ -278,7 +320,7 @@ export default function WordTowerV2() {
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="rounded-xl border-4 border-neo-navy bg-neo-red px-8 py-3 font-fredoka text-base font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#12162b]"
+                className="rounded-xl border-4 border-black bg-neo-red px-8 py-3 font-fredoka text-base font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#000]"
               >
                 {t('wordTower.loadError')}
               </button>
@@ -287,21 +329,21 @@ export default function WordTowerV2() {
                 type="button"
                 onClick={submitWord}
                 disabled={!dictReady}
-                className="rounded-xl border-4 border-neo-navy bg-neo-lime px-8 py-3 font-fredoka text-xl font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#12162b] disabled:opacity-50"
+                className="rounded-xl border-4 border-black bg-neo-lime px-8 py-3 font-fredoka text-xl font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#000] disabled:opacity-50"
               >
                 {t('wordTowerV2.hoist', 'Hoist')}
               </button>
             )}
-          </>
-        ) : (
+        </div>
+        {phase === 'swinging' ? (
           <button
             type="button"
             onClick={drop}
-            className="rounded-2xl border-4 border-neo-navy bg-neo-pink px-16 py-5 font-fredoka text-3xl font-bold uppercase text-neo-white shadow-[6px_6px_0_0_#12162b] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[3px_3px_0_0_#12162b]"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-4 border-black bg-neo-pink px-16 py-5 font-fredoka text-3xl font-bold uppercase text-neo-white shadow-[6px_6px_0_0_#000] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[3px_3px_0_0_#000]"
           >
             {t('wordTowerV2.drop', 'Drop')}
           </button>
-        )}
+        ) : null}
       </div>
     </div>
   );

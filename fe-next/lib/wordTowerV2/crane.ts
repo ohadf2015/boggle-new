@@ -9,6 +9,9 @@
 /** Distance from the crane pivot to the block, in physics pixels. */
 export const CRANE_ARM_PX = 220;
 
+/** How far above the tower top the hanging block rides, physics pixels. */
+export const CRANE_CLEARANCE_PX = 230;
+
 export interface CraneSwing {
   /** Peak swing angle from vertical, radians. */
   amplitudeRad: number;

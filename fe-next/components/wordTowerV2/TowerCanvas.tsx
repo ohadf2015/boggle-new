@@ -1,6 +1,6 @@
 'use client';
 
-import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
+import { Application, Container, Graphics, type Text } from 'pixi.js';
 import { useEffect, useRef } from 'react';
 import {
   PX_PER_M,
@@ -8,9 +8,21 @@ import {
   snapshotWorld,
   stepWorld,
 } from '@/lib/wordTowerV2/engine';
+import { CRANE_ARM_PX } from '@/lib/wordTowerV2/crane';
+import { HUD_TOP_PX, frameCamera } from '@/lib/wordTowerV2/camera';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { RUBBLE_BURST, COMBO_FLASH } from '@/lib/gameEngine/presets/particles';
+import {
+  BG,
+  type BlockView,
+  createBlockView,
+  paintBlock,
+  paintCrane,
+  paintDots,
+  paintGround,
+  paintRuler,
+} from './towerArt';
 
 /**
  * Pixi renderer + the rAF loop that drives the fixed-timestep world.
@@ -20,26 +32,7 @@ import { RUBBLE_BURST, COMBO_FLASH } from '@/lib/gameEngine/presets/particles';
  * substeps would add a frame of latency to buy smoothness we already have.
  */
 
-const COLOURS = [0xc4f000, 0xff4d9d, 0x37e0ff, 0xb06cff, 0xffc93c];
-const NAVY = 0x12162b;
-const SHADOW = 0x000000;
-
-/**
- * Physics pixels are not screen pixels. A 34px-tall block drawn 1:1 on a 1280px
- * viewport reads as a pebble — the tower occupied a fifth of the screen and the
- * rest was empty. Scale to the viewport so the tower is the subject.
- */
-function worldScale(viewportWidth: number): number {
-  return Math.max(0.75, Math.min(2, viewportWidth / 620));
-}
-
-/**
- * Height reserved at the bottom for the letter wheel and drop button. Without
- * it the controls render on top of the tower they are controlling.
- */
-function dockHeight(viewportHeight: number): number {
-  return Math.min(210, viewportHeight * 0.3);
-}
+const DOT_SPACING = 22;
 
 export interface FrameStats {
   /** 95th percentile frame time over the last sample window, ms. */
@@ -52,16 +45,14 @@ interface Props {
   world: TowerWorld;
   /** block id -> the word that built it. */
   labels: Map<string, string>;
+  /** Measured height of the DOM control dock over the canvas bottom. */
+  getDockPx: () => number;
+  /** Id of the block currently on the crane, if any. */
+  getHangingId: () => string | null;
   onFrameStats?: (stats: FrameStats) => void;
   /** Runs before each physics step — used to drive the crane. */
   onBeforeStep?: (nowMs: number) => void;
   className?: string;
-}
-
-interface BlockView {
-  container: Container;
-  body: Graphics;
-  labels: Text[];
 }
 
 function percentile(sorted: number[], p: number): number {
@@ -73,6 +64,8 @@ function percentile(sorted: number[], p: number): number {
 export default function TowerCanvas({
   world,
   labels,
+  getDockPx,
+  getHangingId,
   onFrameStats,
   onBeforeStep,
   className,
@@ -84,10 +77,14 @@ export default function TowerCanvas({
   const labelsRef = useRef(labels);
   const statsRef = useRef(onFrameStats);
   const beforeStepRef = useRef(onBeforeStep);
+  const dockRef = useRef(getDockPx);
+  const hangingRef = useRef(getHangingId);
   worldRef.current = world;
   labelsRef.current = labels;
   statsRef.current = onFrameStats;
   beforeStepRef.current = onBeforeStep;
+  dockRef.current = getDockPx;
+  hangingRef.current = getHangingId;
 
   useEffect(() => {
     const host = hostRef.current;
@@ -98,21 +95,17 @@ export default function TowerCanvas({
     let app: Application | null = null;
 
     const views = new Map<string, BlockView>();
+    const rulerLabels = new Map<number, Text>();
     const frameTimes: number[] = [];
     let lastStatsAt = 0;
     let cameraY = 0;
-
-    const labelStyle = new TextStyle({
-      fontFamily: 'Fredoka, system-ui, sans-serif',
-      fontSize: 18,
-      fontWeight: '700',
-      fill: NAVY,
-    });
+    let dotsSize = '';
+    let groundKey = '';
 
     void (async () => {
       const created = new Application();
       await created.init({
-        background: NAVY,
+        background: BG,
         antialias: true,
         resizeTo: host,
         // Capping DPR is the single biggest mobile win here: a 3x device would
@@ -129,11 +122,15 @@ export default function TowerCanvas({
       app = created;
       host.appendChild(created.canvas);
 
+      const dots = new Graphics();
       const scene = new Container();
-      created.stage.addChild(scene);
+      created.stage.addChild(dots, scene);
 
+      const ruler = new Graphics();
       const ground = new Graphics();
-      scene.addChild(ground);
+      const crane = new Graphics();
+      const blocks = new Container();
+      scene.addChild(ruler, crane, blocks, ground);
 
       const shake = new ScreenShake();
       const particles = new ParticlePool(scene);
@@ -153,21 +150,13 @@ export default function TowerCanvas({
 
         for (const impact of worldRef.current.pendingImpacts) {
           // A heavy impact (speed > 4) triggers juice. Micro-vibrations (<4) are ignored.
-          if (impact.speed > 4.0) {
-            const intensity = Math.min(12, impact.speed * 0.4);
-            shake.shake({ intensity, duration: 0.25, decay: 'exponential' });
-            
-            const block = snap.blocks.find((b) => b.id === impact.id);
-            if (block) {
-              // Impact point is roughly the bottom of the block
-              const impactY = block.y + block.heightPx / 2;
-              particles.burst(COMBO_FLASH, block.x, impactY, 10);
-              
-              if (impact.speed > 10.0) {
-                particles.burst(RUBBLE_BURST, block.x, impactY, 8);
-              }
-            }
-          }
+          if (impact.speed <= 4.0) continue;
+          shake.shake({ intensity: Math.min(12, impact.speed * 0.4), duration: 0.25, decay: 'exponential' });
+          const block = snap.blocks.find((b) => b.id === impact.id);
+          if (!block) continue;
+          const impactY = block.y + block.heightPx / 2;
+          particles.burst(COMBO_FLASH, block.x, impactY, 10);
+          if (impact.speed > 10.0) particles.burst(RUBBLE_BURST, block.x, impactY, 8);
         }
 
         shake.update(frameMs / 1000);
@@ -176,87 +165,73 @@ export default function TowerCanvas({
         const w = created.renderer.width / created.renderer.resolution;
         const h = created.renderer.height / created.renderer.resolution;
 
-        const scale = worldScale(w);
-        const dock = dockHeight(h);
-        const groundLineY = h - dock;
-        const playHeight = groundLineY;
-
-        // The crane is always a fixed distance above the highest landed block.
-        // We track this point so the camera stays stable while blocks fall,
-        // and keeps the swinging block perfectly in frame.
-        const CRANE_CLEARANCE_PX = 230;
-        const craneVisualY = (snap.towerHeightM * PX_PER_M + CRANE_CLEARANCE_PX) * scale;
-        
-        const targetCameraY = Math.max(0, craneVisualY - playHeight * 0.55);
-        cameraY += (targetCameraY - cameraY) * 0.08;
+        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: dockRef.current(), towerTopM: snap.towerHeightM });
+        const { scale } = frame;
+        cameraY += (frame.cameraY - cameraY) * 0.08;
 
         scene.scale.set(scale);
         scene.x = w / 2 + shake.offset.x;
-        scene.y = groundLineY + cameraY + shake.offset.y;
+        scene.y = frame.groundScreenY + cameraY + shake.offset.y;
 
-        ground.clear();
-        const currentScale = scene.scale.x;
-        const groundW = (w * 2) / currentScale;
-        ground.rect(-groundW / 2, 0, groundW, 240 / currentScale).fill(0x0a0d1c);
-        ground.rect(-groundW / 2, 0, groundW, 6 / currentScale).fill(0x2a3050);
+        // Background dots scroll at a third of the camera speed — depth for free.
+        if (dotsSize !== `${w}x${h}`) {
+          dotsSize = `${w}x${h}`;
+          paintDots(dots, w, h, DOT_SPACING);
+        }
+        dots.y = (cameraY * 0.3) % DOT_SPACING;
 
+        const halfW = w / 2 / scale;
+        if (groundKey !== `${halfW}|${scale}`) {
+          groundKey = `${halfW}|${scale}`;
+          paintGround(ground, halfW + 40, scale);
+        }
+        // Visible metre range: from the dock edge up to the top of the screen.
+        const bottomM = (scene.y - h) / scale / PX_PER_M;
+        const topVisibleM = scene.y / scale / PX_PER_M;
+        paintRuler(ruler, rulerLabels, scene, {
+          leftX: -halfW + 10 / scale,
+          halfW,
+          scale,
+          pxPerM: PX_PER_M,
+          fromM: Math.max(0, bottomM),
+          toM: topVisibleM,
+          topM: snap.towerHeightM,
+        });
+
+        // Ruler labels must not print through the HUD in the top-left corner.
+        for (const t of rulerLabels.values()) {
+          if (t.visible && scene.y + t.y * scale < HUD_TOP_PX) t.visible = false;
+        }
+
+        const hangingId = hangingRef.current();
         for (const block of snap.blocks) {
           let view = views.get(block.id);
-
           if (!view) {
-            const container = new Container();
-            const body = new Graphics();
-            const colour = COLOURS[views.size % COLOURS.length];
-
-            // Entire block shadow
-            body.rect(-block.widthPx / 2 + 5, -block.heightPx / 2 + 5, block.widthPx, block.heightPx).fill(SHADOW);
-
-            // Block body
-            body.rect(-block.widthPx / 2, -block.heightPx / 2, block.widthPx, block.heightPx).fill(colour).stroke({ width: 3, color: NAVY, alignment: 1 });
-
-            // Inset highlight (top/left)
-            body.moveTo(-block.widthPx / 2, -block.heightPx / 2 + block.heightPx)
-              .lineTo(-block.widthPx / 2, -block.heightPx / 2)
-              .lineTo(-block.widthPx / 2 + block.widthPx, -block.heightPx / 2)
-              .stroke({ width: 4, color: 0xffffff, alpha: 0.38, alignment: 0 });
-            
-            // Inset shadow (bottom/right)
-            body.moveTo(-block.widthPx / 2, -block.heightPx / 2 + block.heightPx)
-              .lineTo(-block.widthPx / 2 + block.widthPx, -block.heightPx / 2 + block.heightPx)
-              .lineTo(-block.widthPx / 2 + block.widthPx, -block.heightPx / 2)
-              .stroke({ width: 4, color: 0x000000, alpha: 0.34, alignment: 0 });
-
-            // Ensure label style has generous letter spacing to fill the block
-            const labelStyle = new TextStyle({
-              fontFamily: 'Fredoka, system-ui, sans-serif',
-              fontSize: 18,
-              fontWeight: '700',
-              fill: NAVY,
-              letterSpacing: 4,
-            });
-
-            const label = new Text({
-              text: (labelsRef.current.get(block.id) ?? '').toUpperCase(),
-              style: labelStyle,
-            });
-            label.anchor.set(0.5);
-
-            container.addChild(body, label);
-            scene.addChild(container);
-            view = { container, body, labels: [label] };
+            const word = labelsRef.current.get(block.id) ?? '';
+            view = createBlockView(views.size, block.widthPx, block.heightPx, word, scale);
+            blocks.addChild(view.container);
             views.set(block.id, view);
           }
-
+          paintBlock(view, scale);
           view.container.x = block.x;
           view.container.y = block.y;
           view.container.rotation = block.angleRad;
         }
 
+        const hanging = hangingId ? snap.blocks.find((b) => b.id === hangingId) : undefined;
+        paintCrane(
+          crane,
+          scale,
+          hanging ? { x: hanging.x, y: hanging.y, h: hanging.heightPx } : null,
+          (hanging?.y ?? 0) - CRANE_ARM_PX,
+          -snap.towerHeightM * PX_PER_M,
+        );
+
         // Settled bodies far below the camera still cost a draw call — hide what
         // cannot be seen. Screen position, not scene-local, or the check is
         // wrong at any scale other than 1.
         for (const [id, view] of views) {
-          const screenY = scene.y + view.container.y * currentScale;
+          const screenY = scene.y + view.container.y * scale;
           view.container.visible = screenY > -120 && screenY < h + 120;
           if (!snap.blocks.some((b) => b.id === id)) {
             view.container.destroy({ children: true });
