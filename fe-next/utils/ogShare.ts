@@ -5,6 +5,8 @@
  * for better social media previews.
  */
 
+import { stripEmoji } from '@/lib/share/stripEmoji';
+
 const BASE_URL = typeof window !== 'undefined'
   ? `${window.location.origin}`
   : 'https://www.lexiclash.live';
@@ -33,8 +35,8 @@ export async function shareWithOgImage(params: {
   if (typeof navigator !== 'undefined' && 'share' in navigator) {
     try {
       await navigator.share({
-        title: params.title,
-        text: params.text,
+        title: stripEmoji(params.title),
+        text: stripEmoji(params.text),
         url: params.url,
       });
       return true;

@@ -13,6 +13,7 @@ import Link from 'next/link';
 import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
 import { buildPuzzleShareUrl, type LeaderboardEntry } from '@/utils/customPuzzle';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import { PageLoader } from '@/components/ui/PageLoader';
 import {
   useCustomPuzzlePhase,
@@ -181,8 +182,8 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: t('customPuzzle.title'),
-          text: shareText,
+          title: stripEmoji(t('customPuzzle.title')),
+          text: stripEmoji(shareText),
           url: shareUrl,
         });
       } catch {

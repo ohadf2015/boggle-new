@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Copy, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import type { RoundResult } from '@/lib/sealedBid/sp/sbEngine';
 
 interface Props {
@@ -38,7 +39,7 @@ export function SealedBidSessionSummary({ history, totalScore, chips, coinsAward
   const total = history.length;
 
   const handleShare = async () => {
-    const text = buildBluffShareText(history, totalScore, t);
+    const text = stripEmoji(buildBluffShareText(history, totalScore, t));
     const canNative = typeof navigator !== 'undefined' && !!navigator.share;
     if (canNative) {
       await navigator.share({ text }).catch(() => {});

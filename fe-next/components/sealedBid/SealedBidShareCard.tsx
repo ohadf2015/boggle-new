@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Copy, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import type { RoundResult } from '@/lib/sealedBid/sp/sbEngine';
 
 const OUTCOME_EMOJI: Record<RoundResult['outcome'], string> = {
@@ -57,7 +58,7 @@ export function SealedBidShareCard({ history, totalScore }: Props) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
-    const text = buildShareText(history, totalScore, t);
+    const text = stripEmoji(buildShareText(history, totalScore, t));
     const canNativeShare = typeof navigator !== 'undefined' && !!navigator.share;
     if (canNativeShare) {
       await navigator.share({ text }).catch(() => {});

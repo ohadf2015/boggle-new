@@ -7,6 +7,7 @@
 
 import type { DailyChallengeResult, DailyStreak } from './dailyChallenge';
 import logger from '@/utils/logger';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 // ==========================================
 // Neo-Brutalist Color Palette
@@ -582,7 +583,7 @@ export async function shareImageWithNativeShare(
       if (navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          text: shareText,
+          text: stripEmoji(shareText),
         });
         return true;
       }
@@ -596,7 +597,7 @@ export async function shareImageWithNativeShare(
   if (typeof navigator !== 'undefined' && 'share' in navigator) {
     try {
       await navigator.share({
-        text: shareText,
+        text: stripEmoji(shareText),
       });
       return true;
     } catch {

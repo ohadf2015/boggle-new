@@ -5,6 +5,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Copy, Check, Share2, Star, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 interface LevelShareCardProps {
   worldNumber: number;
@@ -50,7 +51,7 @@ export function LevelShareCard(props: LevelShareCardProps) {
   const handleNativeShare = useCallback(async () => {
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        await navigator.share({ text: shareText, url: 'https://lexiclash.live/adventure' });
+        await navigator.share({ text: stripEmoji(shareText), url: 'https://lexiclash.live/adventure' });
       } catch {
         await handleCopy();
       }

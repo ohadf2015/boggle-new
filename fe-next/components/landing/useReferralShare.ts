@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackShare } from '@/utils/growthTracking';
 import { getWithAuth } from '@/utils/authFetch';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 export interface ReferralShareState {
   referralCode: string | null;
@@ -80,7 +81,7 @@ export function useReferralShare(): ReferralShareState {
 
       if (platform === 'native' && navigator.share) {
         try {
-          await navigator.share({ title: t('landing.shareNativeTitle'), text: shareText, url: shareUrl });
+          await navigator.share({ title: stripEmoji(t('landing.shareNativeTitle')), text: stripEmoji(shareText), url: shareUrl });
           trackShare('native');
           return;
         } catch {

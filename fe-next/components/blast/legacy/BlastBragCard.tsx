@@ -28,6 +28,7 @@ import { Crown, Share2, Trophy, Zap, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import { trackBlastBrag } from './utils/blastTelemetry';
 import type { BlastResultsData } from './types';
 
@@ -106,7 +107,7 @@ export function BlastBragCard({ results, t }: BlastBragCardProps) {
     // Prefer Web Share API (mobile). Fall back to clipboard.
     if (typeof navigator !== 'undefined' && 'share' in navigator) {
       try {
-        await navigator.share({ title, text: body });
+        await navigator.share({ title: stripEmoji(title), text: stripEmoji(body) });
         trackBlastBrag({
           finalScore: results.finalScore,
           percentile: results.percentile ?? null,
@@ -119,7 +120,7 @@ export function BlastBragCard({ results, t }: BlastBragCardProps) {
     }
 
     try {
-      await navigator.clipboard.writeText(body);
+      await navigator.clipboard.writeText(stripEmoji(body));
       toast.success(t('blast.results.brag.copied'));
       trackBlastBrag({
         finalScore: results.finalScore,

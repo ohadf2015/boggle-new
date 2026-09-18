@@ -28,6 +28,7 @@ import { getSolvedIds, markSolved } from '@/lib/connections/solvedStore';
 import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
 import { todayUTC, markConnectionsPlayedToday, advanceClientStreak } from '@/lib/connections/dailyClient';
 import { gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import type { GameState } from '@/lib/connections/types';
 import PyramidProgress from './PyramidProgress';
 import FinaleCard from './FinaleCard';
@@ -252,10 +253,11 @@ function PyramidRun({
       url,
     });
     try {
+      const shareText = stripEmoji(text);
       if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({ text });
+        await navigator.share({ text: shareText });
       } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(shareText);
         setResults({ copied: true });
       }
     } catch {

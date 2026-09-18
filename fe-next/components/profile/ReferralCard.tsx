@@ -26,6 +26,7 @@ import { trackShare } from '@/utils/growthTracking';
 import { getWithAuth } from '@/utils/authFetch';
 import Avatar from '@/components/Avatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 interface ReferralData {
   referralCode: string;
@@ -112,7 +113,7 @@ export function ReferralCard() {
         try {
           await navigator.share({
             title: 'Join LexiClash',
-            text: shareText,
+            text: stripEmoji(shareText),
             url: referralData.shareUrl,
           });
           trackShare('native');
