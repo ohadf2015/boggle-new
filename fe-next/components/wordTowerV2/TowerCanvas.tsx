@@ -152,13 +152,19 @@ export default function TowerCanvas({
         const snap = snapshotWorld(worldRef.current);
 
         for (const impact of worldRef.current.pendingImpacts) {
-          if (impact.speed > 0.8) {
-            shake.shake({ intensity: impact.speed * 1.5, duration: 0.3, decay: 'exponential' });
+          // A heavy impact (speed > 4) triggers juice. Micro-vibrations (<4) are ignored.
+          if (impact.speed > 4.0) {
+            const intensity = Math.min(12, impact.speed * 0.4);
+            shake.shake({ intensity, duration: 0.25, decay: 'exponential' });
+            
             const block = snap.blocks.find((b) => b.id === impact.id);
             if (block) {
-              particles.burst(COMBO_FLASH, block.x, block.y + block.heightPx / 2, 20);
-              if (impact.speed > 2.0) {
-                particles.burst(RUBBLE_BURST, block.x, block.y + block.heightPx / 2, 10);
+              // Impact point is roughly the bottom of the block
+              const impactY = block.y + block.heightPx / 2;
+              particles.burst(COMBO_FLASH, block.x, impactY, 10);
+              
+              if (impact.speed > 10.0) {
+                particles.burst(RUBBLE_BURST, block.x, impactY, 8);
               }
             }
           }
@@ -175,21 +181,12 @@ export default function TowerCanvas({
         const groundLineY = h - dock;
         const playHeight = groundLineY;
 
-        let highestVisualY = snap.towerHeightM * PX_PER_M * scale;
-        // Also follow the crane's block and the falling block
-        for (const b of snap.blocks) {
-           highestVisualY = Math.max(highestVisualY, -b.y * scale);
-        }
+        // Camera smoothly follows the settled tower height
+        const towerTopPx = snap.towerHeightM * PX_PER_M * scale;
+        const targetCameraY = Math.max(0, towerTopPx - playHeight * 0.55);
+        cameraY += (targetCameraY - cameraY) * 0.08;
 
-        const targetCameraY = Math.max(0, highestVisualY - playHeight * 0.55);
-        // Soften the spring so it sweeps smoothly after the falling block
-        cameraY += (targetCameraY - cameraY) * 0.06;
-
-        // Dynamic zoom: pull back slightly when aiming/falling to see more of the tower
-        const isActionHappening = highestVisualY > (snap.towerHeightM * PX_PER_M * scale + 50);
-        const targetZoom = isActionHappening ? scale * 0.9 : scale;
-        scene.scale.x += (targetZoom - scene.scale.x) * 0.05;
-        scene.scale.y = scene.scale.x;
+        scene.scale.set(scale);
         scene.x = w / 2 + shake.offset.x;
         scene.y = groundLineY + cameraY + shake.offset.y;
 
@@ -207,45 +204,42 @@ export default function TowerCanvas({
             const body = new Graphics();
             const colour = COLOURS[views.size % COLOURS.length];
 
-            const wordStr = (labelsRef.current.get(block.id) ?? '').toUpperCase();
-            const numLetters = Math.max(1, wordStr.length);
-            const gap = 3;
-            const totalGapWidth = (numLetters - 1) * gap;
-            const letterW = (block.widthPx - totalGapWidth) / numLetters;
-            const letterH = block.heightPx;
-
             // Entire block shadow
             body.rect(-block.widthPx / 2 + 5, -block.heightPx / 2 + 5, block.widthPx, block.heightPx).fill(SHADOW);
 
-            const labels: Text[] = [];
+            // Block body
+            body.rect(-block.widthPx / 2, -block.heightPx / 2, block.widthPx, block.heightPx).fill(colour).stroke({ width: 3, color: NAVY, alignment: 1 });
 
-            for (let i = 0; i < numLetters; i++) {
-              const tileX = -block.widthPx / 2 + i * (letterW + gap);
-              const tileY = -block.heightPx / 2;
+            // Inset highlight (top/left)
+            body.moveTo(-block.widthPx / 2, -block.heightPx / 2 + block.heightPx)
+              .lineTo(-block.widthPx / 2, -block.heightPx / 2)
+              .lineTo(-block.widthPx / 2 + block.widthPx, -block.heightPx / 2)
+              .stroke({ width: 4, color: 0xffffff, alpha: 0.38, alignment: 0 });
+            
+            // Inset shadow (bottom/right)
+            body.moveTo(-block.widthPx / 2, -block.heightPx / 2 + block.heightPx)
+              .lineTo(-block.widthPx / 2 + block.widthPx, -block.heightPx / 2 + block.heightPx)
+              .lineTo(-block.widthPx / 2 + block.widthPx, -block.heightPx / 2)
+              .stroke({ width: 4, color: 0x000000, alpha: 0.34, alignment: 0 });
 
-              body.rect(tileX, tileY, letterW, letterH).fill(colour).stroke({ width: 3, color: NAVY, alignment: 1 });
+            // Ensure label style has generous letter spacing to fill the block
+            const labelStyle = new TextStyle({
+              fontFamily: 'Fredoka, system-ui, sans-serif',
+              fontSize: 18,
+              fontWeight: '700',
+              fill: NAVY,
+              letterSpacing: 4,
+            });
 
-              // Inset highlight (top/left)
-              body.moveTo(tileX, tileY + letterH).lineTo(tileX, tileY).lineTo(tileX + letterW, tileY)
-                .stroke({ width: 4, color: 0xffffff, alpha: 0.38, alignment: 0 });
-              // Inset shadow (bottom/right)
-              body.moveTo(tileX, tileY + letterH).lineTo(tileX + letterW, tileY + letterH).lineTo(tileX + letterW, tileY)
-                .stroke({ width: 4, color: 0x000000, alpha: 0.34, alignment: 0 });
+            const label = new Text({
+              text: (labelsRef.current.get(block.id) ?? '').toUpperCase(),
+              style: labelStyle,
+            });
+            label.anchor.set(0.5);
 
-              const label = new Text({
-                text: wordStr[i] ?? '',
-                style: labelStyle,
-              });
-              label.anchor.set(0.5);
-              label.x = tileX + letterW / 2;
-              label.y = tileY + letterH / 2;
-              container.addChild(label);
-              labels.push(label);
-            }
-
-            container.addChildAt(body, 0);
+            container.addChild(body, label);
             scene.addChild(container);
-            view = { container, body, labels };
+            view = { container, body, labels: [label] };
             views.set(block.id, view);
           }
 
