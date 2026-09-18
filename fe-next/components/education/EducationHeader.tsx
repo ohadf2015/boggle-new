@@ -25,6 +25,7 @@ import { EducationBreadcrumbs } from './EducationBreadcrumbs';
 import { EducationMenuDropdown } from './EducationMenuDropdown';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
+import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
 
 interface EducationHeaderProps {
   /** Additional class names */
@@ -355,6 +356,16 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                         </span>
                         <span>{t('education.header.teacherDashboard')}</span>
                       </Link>
+                    )}
+
+                    {isTeacher && (
+                      <TeacherProNavLink
+                        onNavigate={() => setShowMobileMenu(false)}
+                        className={cn(
+                          'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
+                          'bg-neo-cream dark:bg-neo-navy hover:bg-neo-lime/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-neo-cream shadow-hard-sm hover:shadow-hard',
+                        )}
+                      />
                     )}
 
                     {/* Student Dashboard */}

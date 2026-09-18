@@ -79,3 +79,47 @@ describe('pickTeacherBanner for a Pro teacher', () => {
     expect(pickTeacherBanner({ hasTrial: true, isAdmin: false, hasPro: false, proLoading: false })).toBe('trial');
   });
 });
+
+describe('pickTeacherBanner milestone + dismiss', () => {
+  it('does not show the Pro ask until a classroom has hit the engagement milestone', () => {
+    expect(
+      pickTeacherBanner({ hasTrial: false, isAdmin: false, hasPro: false, hasMilestone: false }),
+    ).toBe('none');
+  });
+
+  it('shows nothing while the milestone read is still open — never an ask a later frame retracts', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: false,
+        isAdmin: false,
+        hasPro: false,
+        hasMilestone: false,
+        milestoneLoading: true,
+      }),
+    ).toBe('none');
+  });
+
+  it('stays quiet after the teacher dismissed the ask', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: false,
+        isAdmin: false,
+        hasPro: false,
+        hasMilestone: true,
+        proAskDismissed: true,
+      }),
+    ).toBe('none');
+  });
+
+  it('shows the Pro ask once a free teacher has a milestone and has not dismissed', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: false,
+        isAdmin: false,
+        hasPro: false,
+        hasMilestone: true,
+        proAskDismissed: false,
+      }),
+    ).toBe('pro');
+  });
+});
