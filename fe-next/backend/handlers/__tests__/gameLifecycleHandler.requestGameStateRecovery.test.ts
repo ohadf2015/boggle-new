@@ -10,7 +10,7 @@
  * Fix: server's `requestGameState` handler detects the orphan (state says
  * in-progress but `hasGameTimer` returns false) and restarts the interval.
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 const {
   mockCheckRateLimit,
@@ -23,7 +23,9 @@ const {
   mockGetGameRoom,
   mockSentryCapture,
   mockSentryBreadcrumb,
+  mockQuizShellStartFor,
 } = vi.hoisted(() => ({
+  mockQuizShellStartFor: vi.fn(() => null as Record<string, unknown> | null),
   mockCheckRateLimit: vi.fn().mockReturnValue(true),
   mockGetGameBySocketId: vi.fn(),
   mockGetGame: vi.fn(),
@@ -117,6 +119,9 @@ vi.mock('../../../backend/utils/socketValidation', () => ({
   validatePayload: vi.fn(),
   createGameSchema: {},
   getWordsForBoardSchema: {},
+}));
+vi.mock('../../services/vocabQuizShell', () => ({
+  quizShellStartFor: mockQuizShellStartFor,
 }));
 vi.mock('../../../backend/utils/errorHandler', async () => {
   const actual = await vi.importActual<typeof import('../../../backend/utils/errorHandler')>(
@@ -325,5 +330,48 @@ describe('requestGameState — score restore on reconnect', () => {
       (c) => c[1] === 'updateLeaderboard',
     );
     expect(updateLeaderboardCalls).toHaveLength(0);
+  });
+});
+
+describe('requestGameState — a room running a Vocab Quiz', () => {
+  const SHELL = {
+    letterGrid: [['A', 'B'], ['C', 'D']], timerSeconds: 80, remainingTime: 80,
+    language: 'en', minWordLength: 3, boardTheme: null, gameMode: 'classic', goldenLetters: [],
+  };
+  const quizRoom = {
+    gameState: 'in-progress', remainingTime: undefined, timerSeconds: 120, letterGrid: null,
+    language: 'he', minWordLength: 2, gameMode: 'blast', gameSessionId: 1,
+    users: { Ada: { isHost: false } },
+  };
+  afterEach(() => { mockQuizShellStartFor.mockReturnValue(null); });
+
+  it('restores the quiz SHELL start (not the null room grid) — same payload as join', () => {
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('ABC');
+    mockGetGame.mockReturnValue(quizRoom);
+    mockHasGameTimer.mockReturnValue(false);
+    mockQuizShellStartFor.mockReturnValue(SHELL);
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestGameState']();
+
+    expect(mockSafeEmit).toHaveBeenCalledWith(
+      socket,
+      'startGame',
+      expect.objectContaining({ letterGrid: SHELL.letterGrid, gameMode: 'classic', timerSeconds: 80, reconnect: true }),
+    );
+  });
+
+  it('never starts a BOARD clock under a quiz — its "orphan" timer is by design', () => {
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('ABC');
+    mockGetGame.mockReturnValue(quizRoom);
+    mockHasGameTimer.mockReturnValue(false);
+    mockQuizShellStartFor.mockReturnValue(SHELL);
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestGameState']();
+
+    expect(mockStartGameTimer).not.toHaveBeenCalled();
   });
 });

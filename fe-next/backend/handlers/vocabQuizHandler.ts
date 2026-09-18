@@ -47,6 +47,7 @@ import {
   type VocabQuizSession,
 } from '../services/vocabQuizEngine.js';
 import { buildLockIn, decorateReveal } from '../services/vocabQuizJuice.js';
+import { buildQuizShellStart, QUIZ_SHELL_GAME_MODE } from '../services/vocabQuizShell.js';
 import { registerTreasureChestHandlers } from './treasureChestHandler.js';
 import { chestsStillOpening } from '../services/treasureChestResolver.js';
 import {
@@ -71,22 +72,6 @@ import logger from '../utils/logger.js';
 
 /** How often the round clock is checked. Fine-grained enough to feel instant. */
 const TICK_MS = 250;
-
-/**
- * The mode reported to the client shells in the start payload. The quiz is not
- * a `GameMode`, but the shells demand one; they branch to the quiz surface on
- * the server's quiz traffic before any board is drawn, so this value is only
- * ever used to satisfy their mount conditions.
- */
-const QUIZ_SHELL_GAME_MODE = 'classic';
-
-/** Never rendered — see the start sequence for why it has to exist. */
-const QUIZ_PLACEHOLDER_GRID = [
-  ['A', 'B', 'C', 'D'],
-  ['E', 'F', 'G', 'H'],
-  ['I', 'J', 'K', 'L'],
-  ['M', 'N', 'O', 'P'],
-];
 
 const answerSchema = z.object({
   index: z.number().int().min(0).max(200),
@@ -289,16 +274,13 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   // The grid is a placeholder that no quiz surface ever draws; it exists only
   // to satisfy the shells' mount conditions.
   broadcastToRoom(io, getGameRoom(gameCode), 'gameStarting', { gameMode: QUIZ_SHELL_GAME_MODE });
+  // The shell fields come from `vocabQuizShell` — the same builder late join,
+  // reconnect and `requestGameState` use, so a student arriving mid-quiz gets
+  // this exact start rather than the room's (null) grid.
   broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
-    letterGrid: QUIZ_PLACEHOLDER_GRID,
-    timerSeconds: Math.ceil((session.limitMs * session.questions.length) / 1000),
-    language: 'en',
-    minWordLength: 3,
+    ...buildQuizShellStart(session),
     messageId: `vocab-quiz-${gameCode}-${now}`,
     gameSessionId: `${gameCode}:${now}`,
-    boardTheme: null,
-    gameMode: QUIZ_SHELL_GAME_MODE,
-    goldenLetters: [],
   });
 
   // The question broadcast is itself the "a quiz is live" signal. A room-wide
