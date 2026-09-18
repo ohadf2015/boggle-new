@@ -4,6 +4,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import type { Language } from '@/types';
 import { ShareRecapCard } from '@/components/shared/ShareRecapCard';
 import type { ShareParts } from '@/components/shared/gameShareParts';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 
 interface WordEntry {
   word: string;
@@ -121,18 +122,19 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   }, [shareText]);
 
   const handleNativeShare = useCallback(async () => {
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        // The link is already the text's last line; a separate `url` field
-        // makes some share targets paste it twice.
-        await navigator.share({ text: shareText });
-      } catch {
-        await handleCopy();
-      }
-    } else {
-      await handleCopy();
+    // Same contract as shareWithFallback: native share gets the link as its
+    // own `url` field; only the clipboard text carries it as the last line.
+    const body = shareText.split('\n').slice(0, -1).join('\n');
+    const result = await shareWithFallback({
+      text: body,
+      url: shareUrl ?? 'https://lexiclash.live',
+      clipboardText: shareText,
+    });
+    if (result === 'copied') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-  }, [shareText, handleCopy]);
+  }, [shareText, shareUrl]);
 
   return (
     <ShareRecapCard

@@ -26,6 +26,8 @@ describe('English letter pool', () => {
   it.each([
     ['backend', () => backendTable(5, 5, 'en')],
     ['client host', () => clientTable(5, 5, 'en')],
+    // Daily and classroom rooms embed lesson words, then fill the rest from the pool.
+    ['backend, with embedded words', () => backendTable(5, 5, 'en', ['CAT', 'DOG'])],
     ['custom challenge', () => generateCustomChallengeGrid(5, 5, 'en', 'CAT')],
   ])('%s English boards rarely show Q/Z/X/J', (_name, make) => {
     const boards = Array.from({ length: 400 }, make) as string[][][];
