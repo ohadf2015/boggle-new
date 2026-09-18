@@ -250,9 +250,11 @@ export function VocabQuizView({ socket, username, t, onPractice, onPlayAgain }: 
       {/* Treasure chest flow — picker and reveal overlay */}
       <VocabQuizChestFlow
         socket={socket}
-        chestPending={quiz.chestPending ?? false}
+        chestPending={quiz.chestPending}
         myChest={quiz.myChest}
-        currentQuestionIndex={quiz.questionNumber - 1}
+        chestHit={quiz.chestHit}
+        questionIndex={quiz.question?.index ?? quiz.questionNumber - 1}
+        ended={quiz.phase === 'ended'}
         username={username}
         t={t}
       />

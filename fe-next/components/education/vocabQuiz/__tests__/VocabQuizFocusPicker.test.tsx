@@ -131,4 +131,14 @@ describe('VocabQuizFocusPicker', () => {
     expect(screen.getByRole('radio', { name: /vocabQuiz\.focus\.synonym/ })).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByRole('radio', { name: /vocabQuiz\.focus\.any/ })).toHaveAttribute('aria-checked', 'false');
   });
+
+  it('treasure chests are an on/off switch the teacher can flip, explained in one line', async () => {
+    const onTreasureChestsChange = vi.fn();
+    setup(ENRICHED, { treasureChestsEnabled: true, onTreasureChestsChange });
+    const toggle = screen.getByRole('switch', { name: /vocabQuiz\.setup\.treasureChests/ });
+    expect(toggle).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByText('vocabQuiz.setup.treasureChestsHint')).toBeInTheDocument();
+    await userEvent.click(toggle);
+    expect(onTreasureChestsChange).toHaveBeenCalledWith(false);
+  });
 });

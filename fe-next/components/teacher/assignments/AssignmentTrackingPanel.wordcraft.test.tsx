@@ -1,7 +1,7 @@
 /**
  * AssignmentTrackingPanel — a real `lesson_assignments` row has no
- * assignment_type column. A Word Craft assignment (practice_focus NULL) must
- * read as Word Craft, not as a '?' fallback badge.
+ * assignment_type column. A Word Craft assignment (practice_focus 'wordcraft')
+ * must read as Word Craft; a legacy NULL row must not, and never as '?'.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -29,14 +29,14 @@ const row = (id: string, practice_focus: string | null) => ({
 describe('AssignmentTrackingPanel — Word Craft', () => {
   beforeEach(() => {
     (useAssignments as jest.Mock).mockReturnValue({
-      assignments: [row('1', null), row('2', 'any')],
+      assignments: [row('1', 'wordcraft'), row('2', null)],
       isLoading: false,
       error: null,
       getAssignmentStatus: () => 'active',
     });
   });
 
-  it('Given a live row with practice_focus NULL, Then its badge says Word Craft', () => {
+  it("Given a 'wordcraft' row and a legacy NULL row, Then only the first badge says Word Craft", () => {
     render(<AssignmentTrackingPanel classroomId="c1" onCreateAssignment={vi.fn()} />);
     const badges = screen.getAllByTestId('assignment-type-badge');
     expect(badges[0]).toHaveTextContent('education.wordcraftAssignment.title');

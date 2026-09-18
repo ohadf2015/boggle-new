@@ -49,7 +49,7 @@ function AssignmentCard({
   };
 
   // Live `lesson_assignments` rows carry no assignment_type — the mode rides on
-  // practice_focus (NULL = Word Craft, see lib/education/wordcraftAssignment).
+  // practice_focus ('wordcraft' = Word Craft, see lib/education/wordcraftAssignment).
   const byMode = readAssignmentMode(assignment) === 'wordcraft'
     ? { label: t('education.wordcraftAssignment.title'), icon: Grid2x2, color: 'bg-neo-lime' }
     : typeConfig.practice;

@@ -146,6 +146,55 @@ export function StudentRankRail({
 
   const { myScore } = framing;
 
+  // My own progress. Score first — it is the number that moves when I find a
+  // word, and it belongs to nobody else. It rides in MY slot of the strip.
+  const ownProgress = (
+    <div
+      data-testid="student-own-progress"
+      className={cn(
+        'relative flex items-center gap-1 rounded-neo border-neo border-neo-cream/40 px-2 py-1',
+        'bg-neo-navy-light font-neo-display text-neo-cream shadow-hard-sm select-none',
+      )}
+      role="status"
+      aria-live="polite"
+    >
+      {scorePop && <ScoreSparkBurst id={scorePop.id} testId="student-score-burst" />}
+      <AdaptiveMotion.span
+        animate={{ scale: scorePop ? [1, 1.5, 1] : 1 }}
+        transition={{ duration: 0.35 }}
+        className="relative text-base font-black tabular-nums leading-none"
+      >
+        {myScore}
+      </AdaptiveMotion.span>
+      <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
+        {t('education.student.feel.points')}
+      </span>
+      <span className="opacity-40" aria-hidden="true">
+        ·
+      </span>
+      <span className="text-sm font-black tabular-nums leading-none">{wordsFound}</span>
+      <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
+        {t('education.student.feel.words')}
+      </span>
+      {scorePop && scorePop.points > 0 && (
+        <AdaptiveMotion.span
+          key={scorePop.id}
+          data-testid="student-score-pop"
+          aria-hidden="true"
+          initial={{ y: 4, scale: 0.6 }}
+          animate={{ y: -14, scale: 1.1 }}
+          transition={{ type: 'spring', stiffness: 520, damping: 20 }}
+          className={cn(
+            'pointer-events-none absolute -top-2 start-1 z-10 rounded-neo border-2 border-neo-black',
+            'bg-neo-lime px-1 text-[11px] font-black leading-tight text-neo-black tabular-nums',
+          )}
+        >
+          {`+${scorePop.points}`}
+        </AdaptiveMotion.span>
+      )}
+    </div>
+  );
+
   return (
     <div className="block lg:hidden relative" dir={dir}>
       <div className="flex items-center justify-center gap-1.5">
@@ -169,65 +218,16 @@ export function StudentRankRail({
           />
         </span>
 
-        {/* My own progress. Score first — it is the number that moves when I
-            find a word, and it belongs to nobody else. */}
-        <div
-          data-testid="student-own-progress"
-          className={cn(
-            'relative flex items-center gap-1.5 rounded-neo border-neo border-neo-cream/40 px-3 py-1',
-            'bg-neo-navy-light font-neo-display text-neo-cream shadow-hard-sm select-none',
-          )}
-          role="status"
-          aria-live="polite"
-        >
-          {scorePop && <ScoreSparkBurst id={scorePop.id} testId="student-score-burst" />}
-          <AdaptiveMotion.span
-            key={scorePop?.id ?? 'still'}
-            initial={scorePop ? { scale: 1.5 } : false}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 600, damping: 16 }}
-            className="relative text-base font-black tabular-nums leading-none"
-          >
-            {myScore}
-          </AdaptiveMotion.span>
-          <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
-            {t('education.student.feel.points')}
-          </span>
-          <span className="opacity-40" aria-hidden="true">
-            ·
-          </span>
-          <span className="text-sm font-black tabular-nums leading-none">{wordsFound}</span>
-          <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
-            {t('education.student.feel.words')}
-          </span>
-          {scorePop && scorePop.points > 0 && (
-            <AdaptiveMotion.span
-              key={scorePop.id}
-              data-testid="student-score-pop"
-              aria-hidden="true"
-              initial={{ y: 4, scale: 0.6 }}
-              animate={{ y: -14, scale: 1.1 }}
-              transition={{ type: 'spring', stiffness: 520, damping: 20 }}
-              className={cn(
-                'pointer-events-none absolute -top-2 start-1 z-10 rounded-neo border-2 border-neo-black',
-                'bg-neo-lime px-1 text-[11px] font-black leading-tight text-neo-black tabular-nums',
-              )}
-            >
-              {`+${scorePop.points}`}
-            </AdaptiveMotion.span>
-          )}
-        </div>
-
+        {/* Me between the classmate just above and just below — the server's
+            board, re-sorted live; direction is an icon, never a place number.
+            MY slot is my own progress chip, so the whole HUD stays one row. */}
+        <LiveClassroomLeaderboard
+          variant="phone"
+          leaderboard={neighbours}
+          currentPlayer={currentUsername}
+          renderMe={() => ownProgress}
+        />
       </div>
-
-      {/* Me between the classmate just above and just below — the server's
-          board, re-sorted live. Direction is an icon, never a place number. */}
-      <LiveClassroomLeaderboard
-        variant="phone"
-        leaderboard={neighbours}
-        currentPlayer={currentUsername}
-        className="mt-1"
-      />
 
       {/* The reaction line. Small, transient, and keyed on the feedback id so a
           second correct word re-fires it instead of sitting there. */}

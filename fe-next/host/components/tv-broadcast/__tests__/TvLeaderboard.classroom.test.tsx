@@ -71,4 +71,17 @@ describe('TvLeaderboard — classroom projector', () => {
     );
     expect(screen.queryByTestId('live-classroom-board')).toBeNull();
   });
+
+  it('still knows it is a classroom when the start payload that carried `classroom` was replaced by a retry that did not', () => {
+    // The start coordinator's retry `startGame` omits `classroom`, and the host
+    // stores the LAST payload's value — so after round 1 the flag went null and
+    // the projector fell back to the arcade cards. The page URL is stable.
+    window.history.pushState(null, '', '/en/multiplayer?room=ABC123&classroom=true&host=true');
+    try {
+      render(<TvLeaderboard players={players} gameMode="classic" t={t} />);
+      expect(screen.getByTestId('live-classroom-board')).toBeInTheDocument();
+    } finally {
+      window.history.pushState(null, '', '/');
+    }
+  });
 });

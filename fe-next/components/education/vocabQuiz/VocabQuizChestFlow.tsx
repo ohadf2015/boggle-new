@@ -1,20 +1,24 @@
 /**
- * Vocab Quiz Chest Flow
+ * Vocab Quiz Chest Flow — the student's side of the Gold-Quest chest loop.
  *
- * Manages the treasure chest interaction:
- * 1. Shows picker after correct answer (chestPending=true)
- * 2. Emits openChest event when student picks
- * 3. Shows reveal when server responds
- * 4. Clears when moving to next question
+ * 1. Correct answer → `chestPending` → three chests.
+ * 2. Tap → emit `openChest {index, chest}` → every chest locks (single choice).
+ * 3. Private `treasureChestResult` → reveal overlay, auto-dismissed.
+ * 4. A steal/swap landing on this student → kind banner, non-blocking.
  *
- * Housed in a separate component to keep VocabQuizView lean (max 500 lines).
+ * Every number comes from the server; this component only sequences them.
  */
 
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Socket } from 'socket.io-client';
-import { VOCAB_QUIZ_EVENTS, type TranslateFn, type TreasureChestState } from '@/shared/types/vocabQuiz';
+import {
+  VOCAB_QUIZ_EVENTS,
+  type TranslateFn,
+  type TreasureChestHit,
+  type TreasureChestState,
+} from '@/shared/types/vocabQuiz';
 import { TreasureChestPicker } from './TreasureChestPicker';
 import { TreasureChestReveal } from './TreasureChestReveal';
 
@@ -22,42 +26,97 @@ export interface VocabQuizChestFlowProps {
   socket: Socket | null;
   chestPending: boolean;
   myChest: TreasureChestState | null;
-  currentQuestionIndex: number;
+  chestHit: TreasureChestHit | null;
+  /** Zero-based index of the question on screen. */
+  questionIndex: number;
+  ended: boolean;
   username: string;
   t: TranslateFn;
 }
+
+const REVEAL_MS = 3200;
+const HIT_BANNER_MS = 4000;
 
 export function VocabQuizChestFlow({
   socket,
   chestPending,
   myChest,
-  currentQuestionIndex,
+  chestHit,
+  questionIndex,
+  ended,
   username,
   t,
 }: VocabQuizChestFlowProps) {
-  const handlePickChest = useCallback(
-    (index: number) => {
-      if (!socket) return;
-      socket.emit(VOCAB_QUIZ_EVENTS.openChest, { index: currentQuestionIndex });
+  // Local UI state is keyed by the question it belongs to, so a new question
+  // resets it without an effect.
+  const [picked, setPicked] = useState<{ q: number; chest: number } | null>(null);
+  const [dismissedQ, setDismissedQ] = useState<number | null>(null);
+  const [hiddenHit, setHiddenHit] = useState<TreasureChestHit | null>(null);
+
+  const pickedChest = picked?.q === questionIndex ? picked.chest : null;
+  const ownChest = myChest && myChest.actor === username ? myChest : null;
+  const showReveal = !!ownChest && dismissedQ !== questionIndex;
+  const showHit = !!chestHit && chestHit !== hiddenHit;
+
+  const handlePick = useCallback(
+    (chest: number) => {
+      if (!socket || pickedChest !== null) return;
+      setPicked({ q: questionIndex, chest });
+      socket.emit(VOCAB_QUIZ_EVENTS.openChest, { index: questionIndex, chest });
     },
-    [socket, currentQuestionIndex]
+    [socket, pickedChest, questionIndex]
   );
 
-  // Show picker if chest pending and no result yet
-  if (chestPending && !myChest) {
+  const dismissReveal = useCallback(() => setDismissedQ(questionIndex), [questionIndex]);
+
+  useEffect(() => {
+    if (!showReveal) return;
+    const id = setTimeout(dismissReveal, REVEAL_MS);
+    return () => clearTimeout(id);
+  }, [showReveal, dismissReveal]);
+
+  useEffect(() => {
+    if (!chestHit) return;
+    const id = setTimeout(() => setHiddenHit(chestHit), HIT_BANNER_MS);
+    return () => clearTimeout(id);
+  }, [chestHit]);
+
+  if (ended) return null;
+
+  const hitBanner = showHit && chestHit && (
+    <div
+      role="status"
+      className="fixed top-3 start-4 end-16 z-[60] mx-auto max-w-sm rounded-neo border-[3px] border-neo-cyan bg-neo-navy-elevated p-3 text-center shadow-hard"
+    >
+      <p className="font-neo-display font-bold text-neo-white">
+        {chestHit.outcome === 'steal'
+          ? t('vocabQuiz.treasure.hitSteal', { actor: chestHit.actor, amount: chestHit.amount })
+          : t('vocabQuiz.treasure.hitSwap', { actor: chestHit.actor })}
+      </p>
+    </div>
+  );
+
+  if (showReveal && ownChest) {
     return (
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-neo-navy/60 p-3">
-        <div className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 max-w-sm">
-          <TreasureChestPicker onPick={handlePickChest} t={t} />
-        </div>
-      </div>
+      <>
+        <TreasureChestReveal state={ownChest} t={t} onDismiss={dismissReveal} />
+        {hitBanner}
+      </>
     );
   }
 
-  // Show reveal if result arrived and it's for this player
-  if (myChest && myChest.actor === username) {
-    return <TreasureChestReveal state={myChest} t={t} />;
+  if (chestPending && !ownChest) {
+    return (
+      <>
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-neo-navy px-4">
+          <div className="w-full max-w-sm rounded-neo border-[3px] border-neo-yellow bg-neo-navy-elevated shadow-hard">
+            <TreasureChestPicker onPick={handlePick} disabled={pickedChest !== null} pickedIndex={pickedChest} t={t} />
+          </div>
+        </div>
+        {hitBanner}
+      </>
+    );
   }
 
-  return null;
+  return hitBanner || null;
 }

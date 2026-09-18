@@ -141,6 +141,23 @@ describe('PracticeContent', () => {
     expect(mockStartSession).toHaveBeenCalledWith('solo_board', { variant: 'wordcraft' });
   });
 
+  // Guard test. NOTE: under this vitest setup StrictMode does not replay mount
+  // effects (probed: 1 run), so the double-POST it guards against was proven in
+  // the dev browser (2 POSTs per deep link before the ref guard, 1 after).
+  it('GIVEN StrictMode (dev) WHEN a deep link auto-starts THEN exactly one session is created', async () => {
+    render(
+      <React.StrictMode>
+        <PracticeContent {...({
+          lesson: LESSON, language: 'en', isRTL: false, progress: {}, mastery: 'learning',
+          startSession: mockStartSession, router: { push: mockPush }, initialMode: 'solo_board',
+          initialFocus: null, initialVariant: 'wordcraft', onGuestResult: vi.fn(),
+        } as unknown as React.ComponentProps<typeof PracticeContent>)} />
+      </React.StrictMode>
+    );
+    await screen.findByTestId('stage');
+    expect(mockStartSession).toHaveBeenCalledTimes(1);
+  });
+
   it('GIVEN a deep link WHEN it carries a mode THEN the round opens without a picker tap', async () => {
     renderContent({ initialMode: 'blitz' });
     expect(await screen.findByTestId('stage')).toHaveAttribute('data-mode', 'blitz');

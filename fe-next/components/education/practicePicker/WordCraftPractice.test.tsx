@@ -82,7 +82,7 @@ describe('WordCraftPractice', () => {
       { who: 'bot', words: ['DOG'] },
     ]);
     await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
-    expect(onComplete.mock.calls[0][0]).toEqual({ vocabularyWordsFound: ['CAT'], score: 80, won: true });
+    expect(onComplete.mock.calls[0][0]).toEqual({ vocabularyWordsFound: ['CAT'], score: 80, botScore: 60, won: true });
     expect(await screen.findByTestId('wordcraft-practice-complete')).toBeTruthy();
   });
 
@@ -98,5 +98,13 @@ describe('WordCraftPractice', () => {
     renderIt();
     fireEvent.click(screen.getByLabelText('common.back'));
     expect(onBack).toHaveBeenCalled();
+  });
+
+  it('Given a 0-0 game, When it ends, Then the result reads as a tie, not a bot win', async () => {
+    renderIt();
+    fireEvent.click(screen.getByTestId('wordcraft-practice-play'));
+    await screen.findByTestId('stub-game-view');
+    finish([], 0, 0);
+    expect(await screen.findByText('education.wordcraftAssignment.tie')).toBeTruthy();
   });
 });

@@ -58,6 +58,9 @@ describe('StudentRankRail — what a classroom student sees while the round runs
     render(<StudentRankRail leaderboard={board} currentUsername="Me" wordsFound={6} t={t} />);
     const strip = screen.getAllByTestId('live-board-row').map((r) => r.getAttribute('data-player'));
     expect(strip).toEqual(['Maya', 'Me', 'Sam']);
+    // One row: MY slot in the strip IS my own progress chip (a second row
+    // pushed the rail under the board at 390×844).
+    expect(screen.getByTestId('student-own-progress').closest('[data-me="true"]')).not.toBeNull();
     // Nobody further away is named.
     expect(screen.queryByText(/Ana/)).toBeNull();
   });

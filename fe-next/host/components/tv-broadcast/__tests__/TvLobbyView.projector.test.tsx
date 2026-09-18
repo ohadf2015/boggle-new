@@ -122,4 +122,17 @@ describe('TvLobbyView — one lobby surface per room type', () => {
     const calls = storeActions.setHostSelectedGameMode.mock.calls;
     expect(calls[calls.length - 1][0]).toBe('classic');
   });
+
+  it('keeps CLASSIC when effects re-run (StrictMode / reconnected effects) — the arcade picker write must not win', () => {
+    // Measured live: React re-ran TvLobbyView's store write AFTER the one-shot
+    // seed, and the room launched as a random roll again.
+    render(
+      <React.StrictMode>
+        <TvLobbyView {...baseProps} gameCode="CLSSC2" isClassroomMode classroomGameMode="classic" />
+      </React.StrictMode>
+    );
+    const calls = storeActions.setHostSelectedGameMode.mock.calls;
+    expect(calls[calls.length - 1][0]).toBe('classic');
+    expect(calls.map((c) => c[0])).not.toContain('random');
+  });
 });

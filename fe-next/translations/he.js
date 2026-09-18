@@ -78,10 +78,32 @@ const he = {
       "questionCount": "כמה שאלות?",
       "cappedNotice": "מהמילים האלה אפשר לבנות {count} שאלות, ולכן זה אורך הסבב.",
       "secondsPerQuestion": "זמן לכל שאלה",
-      "seconds": "{seconds} שנ׳"
+      "seconds": "{seconds} שנ׳",
+      "treasureChests": "תיבות אוצר",
+      "treasureChestsHint": "אחרי תשובה נכונה התלמידים פותחים תיבה: נקודות בונוס, חטיפה או החלפה.",
+      "on": "פועל",
+      "off": "כבוי"
     },
     "errors": {
       "noQuestions": "בשיעור הזה עדיין אין מילים שמתאימות לחידון."
+    },
+    "treasure": {
+      "prompt": "בחרו תיבה!",
+      "hint": "בכל תיבה מסתתר משהו אחר. בחרו בחוכמה!",
+      "chestLabel": "תיבה {number}",
+      "outcome": {
+        "gain": "+{amount} נקודות!",
+        "double": "כפול! +{amount} נקודות!",
+        "steal": "חטפתם {amount} נקודות מ־{target}!",
+        "swap": "החלפתם ניקוד עם {target}!",
+        "small-loss": "אופס, {amount} נקודות נעלמו. עוד תחזירו אותן!"
+      },
+      "newTotal": "הניקוד שלכם: {score}",
+      "tapToContinue": "הקישו כדי להמשיך",
+      "hitSteal": "{amount} מהנקודות שלכם עברו אל {actor}. אפשר להחזיר אותן!",
+      "hitSwap": "הניקוד שלכם הוחלף עם {actor}. ממשיכים!",
+      "tickerSteal": "{amount} נקודות עברו מ־{target} אל {actor}!",
+      "tickerSwap": "{actor} ו־{target} החליפו ניקוד!"
     }
   },
   "pricing": {
@@ -13481,6 +13503,7 @@ const he = {
       "result": "תוצאה",
       "won": "ניצחתם",
       "lost": "הבוט ניצח",
+      "tie": "תיקו",
       "recommended": "מומלץ",
       "teacherHint": "משחק יחיד מול בוט ידידותי. התלמידים משחקים מדף הכיתה.",
       "studentPlay": "שחקו וורדקראפט"
@@ -13637,6 +13660,9 @@ const he = {
       "classCoverage": "הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור",
       "reteach": "אף אחד לא מצא את אלה",
       "allFound": "הכיתה מצאה את כל מילות השיעור.",
+      "waitingForTeacher": "מחכים שהמורה יתחיל את הסבב הבא…",
+      "stayInClass": "הישארו כאן — המשחק הבא יתחיל במסך הזה.",
+      "playAgain": "שחקו שוב",
       "practiceMissed": "תרגלו את המילים האלה",
       "playReteachRound": "שחקו סבב חזרה — רק המילים שהחסרנו",
       "backToLobby": "חזרה ללובי",

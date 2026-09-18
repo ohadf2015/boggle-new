@@ -1,14 +1,19 @@
 /**
- * Treasure Chest Ticker — Host Screen
+ * Treasure Chest Ticker — projector.
  *
- * Shows a scrolling feed of steal and swap events from the current round.
- * Only displays dramatic outcomes (steal/swap), not quiet ones (gain/double/loss).
- * Respects reduced motion: shows the latest event without scrolling animation.
+ * Announces the newest steal or swap to the room for a few seconds. Quiet
+ * outcomes (gain / double / small loss) stay private to the student.
+ *
+ * Derived, not queued: the banner is simply "the latest dramatic event, until
+ * it has been on screen for TICKER_MS". The earlier queue re-pushed every
+ * event on each render and cleared its own hide-timer, so a banner could
+ * stick forever.
  */
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import type { TreasureChestState, TranslateFn } from '@/shared/types/vocabQuiz';
 import { cn } from '@/lib/utils';
 
@@ -17,100 +22,53 @@ export interface TreasureChestTickerProps {
   t: TranslateFn;
 }
 
-interface TickerEvent {
-  id: string;
-  actor: string;
-  outcome: string;
-  targetUsername?: string;
-  amount: number;
-  timestamp: number;
-}
+const TICKER_MS = 4000;
 
-const TICKER_DURATION_MS = 4000; // Show each event for 4 seconds
-const PREFERS_REDUCED_MOTION =
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isDramatic = (e: TreasureChestState) => e.outcome === 'steal' || e.outcome === 'swap';
 
 export function TreasureChestTicker({ chestEvents, t }: TreasureChestTickerProps) {
-  const [visibleEvents, setVisibleEvents] = useState<TickerEvent[]>([]);
-  const eventQueueRef = useRef<TickerEvent[]>([]);
-  const activeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reduceMotion = useReducedMotion();
+  const latest = [...chestEvents].reverse().find(isDramatic) ?? null;
+  const [expired, setExpired] = useState<TreasureChestState | null>(null);
 
-  // Convert chest outcomes to ticker events, filter dramatic ones only
   useEffect(() => {
-    chestEvents.forEach((chest) => {
-      if (chest.outcome === 'steal' || chest.outcome === 'swap') {
-        const id = `${chest.actor}:${chest.outcome}:${Date.now()}`;
-        eventQueueRef.current.push({
-          id,
-          actor: chest.actor,
-          outcome: chest.outcome,
-          targetUsername: chest.targetUsername,
-          amount: chest.amount,
-          timestamp: Date.now(),
-        });
-      }
-    });
+    if (!latest) return;
+    const id = setTimeout(() => setExpired(latest), TICKER_MS);
+    return () => clearTimeout(id);
+  }, [latest]);
 
-    // Process the queue if nothing is currently showing
-    if (visibleEvents.length === 0 && eventQueueRef.current.length > 0) {
-      const event = eventQueueRef.current.shift();
-      if (event) {
-        setVisibleEvents([event]);
-        // Schedule removal after duration
-        if (activeTimeoutRef.current) {
-          clearTimeout(activeTimeoutRef.current);
-        }
-        activeTimeoutRef.current = setTimeout(() => {
-          setVisibleEvents([]);
-          // Recursively process next event
-          if (eventQueueRef.current.length > 0) {
-            const next = eventQueueRef.current.shift();
-            if (next) {
-              setVisibleEvents([next]);
-            }
-          }
-        }, TICKER_DURATION_MS);
-      }
-    }
+  if (!latest || latest === expired) return null;
 
-    return () => {
-      if (activeTimeoutRef.current) {
-        clearTimeout(activeTimeoutRef.current);
-      }
-    };
-  }, [chestEvents, visibleEvents]);
-
-  if (visibleEvents.length === 0) {
-    return null;
-  }
-
-  const event = visibleEvents[0];
+  const target = latest.targetUsername || '?';
   const label =
-    event.outcome === 'steal'
-      ? t('vocabQuiz.treasure.tickerSteal', {
-          actor: event.actor,
-          target: event.targetUsername || '?',
-          amount: event.amount,
-        })
-      : t('vocabQuiz.treasure.tickerSwap', {
-          actor: event.actor,
-          target: event.targetUsername || '?',
-        });
+    latest.outcome === 'steal'
+      ? t('vocabQuiz.treasure.tickerSteal', { actor: latest.actor, target, amount: latest.amount })
+      : t('vocabQuiz.treasure.tickerSwap', { actor: latest.actor, target });
 
   return (
-    <div
-      className={cn(
-        'fixed bottom-4 left-4 right-4 max-w-sm z-30',
-        'rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-3 shadow-hard',
-        !PREFERS_REDUCED_MOTION && 'animate-[cosy-quiet-in_400ms_ease-out]'
-      )}
+    <motion.div
+      key={`${latest.actor}:${latest.outcome}:${chestEvents.length}`}
       role="status"
       aria-live="polite"
+      initial={reduceMotion ? false : { y: 40, scale: 0.9 }}
+      animate={{ y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+      className={cn(
+        // Above the host control bar (fixed to the bottom of the projector).
+        'fixed bottom-32 inset-x-4 z-[70] mx-auto w-fit max-w-3xl',
+        'rounded-neo border-[3px] bg-neo-navy-elevated px-6 py-3 shadow-hard',
+        latest.outcome === 'steal' ? 'border-neo-pink' : 'border-neo-cyan'
+      )}
     >
-      <p className={cn('font-neo-body text-sm text-neo-white', event.outcome === 'steal' ? 'text-neo-pink' : 'text-neo-pink')}>
+      <p
+        className={cn(
+          'font-neo-display font-bold text-2xl md:text-4xl text-center',
+          latest.outcome === 'steal' ? 'text-neo-pink' : 'text-neo-cyan'
+        )}
+      >
         {label}
       </p>
-    </div>
+    </motion.div>
   );
 }
 

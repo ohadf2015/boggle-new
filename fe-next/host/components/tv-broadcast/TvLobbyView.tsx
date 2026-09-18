@@ -152,13 +152,16 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   });
 
   useEffect(() => {
+    // A classroom lobby has no mode picker: its start intent is the teacher's
+    // launch-time mode (seeded below) or an in-place switch. Writing the local
+    // default here re-ran after the seed whenever React re-ran effects, and
+    // the room launched as a random roll — CLASSIC played as Word Hunt.
+    if (isClassroomMode) return;
     const mode = selectedGameMode || 'random';
     setStoreGameMode(mode);
     setHostSelectedGameMode(mode);
-  }, [selectedGameMode, setStoreGameMode, setHostSelectedGameMode]);
+  }, [isClassroomMode, selectedGameMode, setStoreGameMode, setHostSelectedGameMode]);
 
-  // Declared AFTER the effect above on purpose: on first mount that one writes
-  // the store default, this one then writes the teacher's launch-time mode.
   useClassroomModeSeed({ isClassroomMode, gameCode, classroomGameMode });
 
   // Solo demo flow: teacher presses button → emit setAutoFill → wait for bots to seat → call startGame

@@ -1,7 +1,7 @@
 /**
  * AssignmentCreator — Word Craft as the recommended default homework mode.
  * `lesson_assignments` has no mode column: Word Craft is stored as
- * practice_focus NULL (see lib/education/wordcraftAssignment.ts).
+ * practice_focus 'wordcraft' (see lib/education/wordcraftAssignment.ts).
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -55,11 +55,11 @@ describe('AssignmentCreator — Word Craft', () => {
     expect(option).toHaveTextContent('education.wordcraftAssignment.recommended');
   });
 
-  it('Given the default, When the teacher picks a lesson + date and creates, Then it saves as Word Craft (practice_focus null)', async () => {
+  it("Given the default, When the teacher picks a lesson + date and creates, Then it saves as Word Craft (practice_focus 'wordcraft')", async () => {
     renderIt();
     const payload = await submit();
     expect(payload).toEqual(expect.objectContaining({
-      lesson_id: 'lesson-1', assignment_type: 'practice', practice_focus: null,
+      lesson_id: 'lesson-1', assignment_type: 'practice', practice_focus: 'wordcraft',
     }));
   });
 
@@ -69,10 +69,17 @@ describe('AssignmentCreator — Word Craft', () => {
     expect(screen.queryByRole('radiogroup', { name: 'teacher.assignment.focus.label' })).not.toBeInTheDocument();
   });
 
-  it("Given Practice with the student-picks default, When created, Then practice_focus is 'any' (not NULL, which means Word Craft)", async () => {
+  it("Given Practice with the student-picks default, When created, Then practice_focus is 'any' (unchanged legacy behaviour)", async () => {
     renderIt();
     fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
     const payload = await submit();
     expect(payload.practice_focus).toBe('any');
+  });
+
+  it('Given Duel, When created, Then practice_focus is null — a duel never reads as Word Craft', async () => {
+    renderIt();
+    fireEvent.click(screen.getByText('teacher.assignment.duelChallenge'));
+    const payload = await submit();
+    expect(payload.practice_focus).toBeNull();
   });
 });

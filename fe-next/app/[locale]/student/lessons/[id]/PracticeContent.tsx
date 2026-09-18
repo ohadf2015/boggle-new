@@ -111,7 +111,10 @@ export default function PracticeContent({
   // practice_type CHECK), so the variant is what decides which screen opens.
   // Client-side only: there is no `?mode=` deep link for it yet.
   const [selectedVariant, setSelectedVariant] = useState<PracticeVariant | null>(initialVariant);
-  const [hasInitialized, setHasInitialized] = useState(false);
+  // A ref, not state: React StrictMode (dev) re-runs a mount effect with the
+  // SAME closure, where state still reads false — that fired two POSTs 20ms
+  // apart per deep link and left an orphan practice_sessions row.
+  const hasInitializedRef = useRef(false);
   // Set the moment a round finishes, cleared on every mode change. It is what
   // turns the round-end into a fork rather than a dead end.
   const [roundFinished, setRoundFinished] = useState(false);
@@ -148,8 +151,8 @@ export default function PracticeContent({
   // `initialMode`); a failure here must walk that back to the picker instead
   // of leaving a round on screen with no session behind it.
   useEffect(() => {
-    if (initialMode && !hasInitialized) {
-      setHasInitialized(true);
+    if (initialMode && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
       void startSession(initialMode, sessionOptions(initialFocus, initialVariant)).then((result) => {
         if (!result.success) {
           setStartError(t('education.practice.startFailed'));
@@ -159,7 +162,7 @@ export default function PracticeContent({
         }
       });
     }
-  }, [initialMode, initialFocus, initialVariant, hasInitialized, startSession, t]);
+  }, [initialMode, initialFocus, initialVariant, startSession, t]);
 
   // Access XP context
   const {

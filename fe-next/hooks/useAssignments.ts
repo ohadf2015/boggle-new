@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+
+const ASSIGNMENTS_CHANGED_EVENT = 'lexiclash:assignments-changed';
 import {
   getClassroomAssignments,
   createAssignment as createAssignmentAPI,
   deleteAssignment as deleteAssignmentAPI,
 } from '@/lib/supabase/education/assignments';
 import type { TeacherAssignment, AssignmentStatus, AssignmentType } from '@/lib/supabase/education/types';
-import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
+import type { AssignmentFocusValue } from '@/lib/education/wordcraftAssignment';
 import logger from '@/utils/logger';
 import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
 
@@ -26,7 +28,7 @@ interface UseAssignmentsActions {
     due_date?: string | null;
     title?: string | null;
     instructions?: string | null;
-    practice_focus?: PracticeFocusSetting | null;
+    practice_focus?: AssignmentFocusValue | null;
   }) => Promise<{ success: boolean; error?: string }>;
   deleteAssignment: (assignmentId: string) => Promise<void>;
   refresh: () => Promise<void>;
@@ -79,6 +81,19 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
     fetchAssignments();
   }, [fetchAssignments]);
 
+  // Sibling instances (the dashboard's creator dialog vs its tracking panel)
+  // refetch when one of them creates an assignment for this classroom.
+  const instanceId = useRef(Symbol('useAssignments'));
+  useEffect(() => {
+    if (!classroomId || typeof window === 'undefined') return;
+    const onChanged = (e: Event) => {
+      const detail = (e as CustomEvent<{ classroomId: string; source: symbol }>).detail;
+      if (detail?.classroomId === classroomId && detail.source !== instanceId.current) void fetchAssignments();
+    };
+    window.addEventListener(ASSIGNMENTS_CHANGED_EVENT, onChanged);
+    return () => window.removeEventListener(ASSIGNMENTS_CHANGED_EVENT, onChanged);
+  }, [classroomId, fetchAssignments]);
+
   const createAssignment = useCallback(
     async (data: {
       classroom_id: string;
@@ -88,7 +103,7 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
       due_date?: string | null;
       title?: string | null;
       instructions?: string | null;
-      practice_focus?: PracticeFocusSetting | null;
+      practice_focus?: AssignmentFocusValue | null;
     }): Promise<{ success: boolean; error?: string }> => {
       // Optimistic update: add temporary assignment
       const tempId = `temp-${Date.now()}`;
@@ -133,6 +148,9 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
               ? ({ ...newAssignment, completion_count: 0, student_count: 0 } as TeacherAssignment)
               : a
           ),
+        }));
+        window.dispatchEvent(new CustomEvent(ASSIGNMENTS_CHANGED_EVENT, {
+          detail: { classroomId: data.classroom_id, source: instanceId.current },
         }));
 
         return { success: true };

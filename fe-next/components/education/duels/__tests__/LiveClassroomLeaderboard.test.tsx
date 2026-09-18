@@ -95,6 +95,29 @@ describe('LiveClassroomLeaderboard — projector', () => {
   });
 });
 
+describe('LiveClassroomLeaderboard — pops expire', () => {
+  it('clears an earlier "+N" even when another score lands before it expires', () => {
+    // Measured live: Bo scoring 300ms after Ada cancelled Ada's clear-timer, and
+    // her "+220" stayed on the projector for the rest of the round.
+    vi.useFakeTimers();
+    try {
+      const { rerender } = render(
+        <LiveClassroomLeaderboard variant="projector" leaderboard={board(['Ada', 0], ['Bo', 0])} />
+      );
+      rerender(<LiveClassroomLeaderboard variant="projector" leaderboard={board(['Ada', 220], ['Bo', 0])} />);
+      act(() => { vi.advanceTimersByTime(300); });
+      rerender(<LiveClassroomLeaderboard variant="projector" leaderboard={board(['Ada', 220], ['Bo', 389])} />);
+      act(() => { vi.advanceTimersByTime(700); });
+      const pops = screen.queryAllByTestId('live-board-pop').map((p) => p.textContent);
+      expect(pops).toEqual(['+389']);
+      act(() => { vi.advanceTimersByTime(400); });
+      expect(screen.queryAllByTestId('live-board-pop')).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe('LiveClassroomLeaderboard — phone', () => {
   beforeEach(() => playModeSound.mockClear());
 

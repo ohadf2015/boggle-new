@@ -48,6 +48,7 @@ import {
 } from '../services/vocabQuizEngine.js';
 import { buildLockIn, decorateReveal } from '../services/vocabQuizJuice.js';
 import { registerTreasureChestHandlers } from './treasureChestHandler.js';
+import { chestsStillOpening } from '../services/treasureChestResolver.js';
 import {
   setQuizSession,
   getQuizSession,
@@ -59,6 +60,7 @@ import {
   VOCAB_QUIZ_EVENTS,
   VOCAB_QUIZ_MODE,
   VOCAB_QUIZ_REVEAL_MS,
+  VOCAB_QUIZ_CHEST_HOLD_MS,
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
 } from '@/shared/types/vocabQuiz';
@@ -128,6 +130,7 @@ function emitLockIn(io: Server, session: VocabQuizSession): void {
 function beginReveal(io: Server, session: VocabQuizSession, now: number): void {
   session.phase = 'reveal';
   session.revealEndsAt = now + VOCAB_QUIZ_REVEAL_MS;
+  session.chestHoldEndsAt = session.revealEndsAt + VOCAB_QUIZ_CHEST_HOLD_MS;
   emitReveal(io, session);
 }
 
@@ -152,7 +155,8 @@ function tick(io: Server, gameCode: string): void {
   }
 
   if (session.phase === 'reveal') {
-    if (now < session.revealEndsAt) return;
+    // Hold (capped) while a student who got it right still has a chest to open.
+    if (now < session.revealEndsAt || chestsStillOpening(session, now)) return;
     const phase = advanceQuiz(session, now);
     if (phase === 'ended') {
       void finishQuiz(io, gameCode);

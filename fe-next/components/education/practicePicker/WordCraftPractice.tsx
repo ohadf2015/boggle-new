@@ -33,6 +33,7 @@ export interface WordCraftPracticeResults {
   /** Lesson words the student built, canonical, each once. */
   vocabularyWordsFound: string[];
   score: number;
+  botScore: number;
   won: boolean;
 }
 
@@ -75,6 +76,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
       const results: WordCraftPracticeResults = {
         vocabularyWordsFound: lessonWordsPlayed(state.history, lessonWords, lang),
         score: state.player.score,
+        botScore: state.bot.score,
         won: state.player.score > state.bot.score,
       };
       setPhase({ name: 'done', results });
@@ -102,7 +104,11 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
             {
               key: 'result',
               label: t('education.wordcraftAssignment.result'),
-              value: t(results.won ? 'education.wordcraftAssignment.won' : 'education.wordcraftAssignment.lost'),
+              value: t(
+                results.won ? 'education.wordcraftAssignment.won'
+                  : results.score === results.botScore ? 'education.wordcraftAssignment.tie'
+                  : 'education.wordcraftAssignment.lost',
+              ),
             },
           ]}
           onAgain={() => setPhase({ name: 'playing', seed: newSeed() })}

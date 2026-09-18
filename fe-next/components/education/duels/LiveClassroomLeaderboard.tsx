@@ -19,7 +19,7 @@
  * classroom teacher projects, she does not play.
  */
 
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
@@ -48,6 +48,11 @@ export interface LiveClassroomLeaderboardProps {
   topN?: number;
   /** Mode for the sting. */
   gameMode?: string | null;
+  /**
+   * Phone: render MY slot yourself (the student HUD puts its own score chip
+   * there), so the strip is one row — me between my two neighbours.
+   */
+  renderMe?: (row: LiveBoardEntry) => ReactNode;
   className?: string;
 }
 
@@ -75,6 +80,14 @@ function useScorePops(
   const onIncreaseRef = useRef(onIncrease);
   onIncreaseRef.current = onIncrease;
   const [pops, setPops] = useState<Record<string, Pop>>({});
+  // Each pop owns its clear-timer. They must NOT be cancelled when the next
+  // payload lands — a second scorer inside the window left the first "+N" up
+  // for the rest of the round. Cleared only on unmount.
+  const timersRef = useRef(new Set<ReturnType<typeof setTimeout>>());
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   useEffect(() => {
     const prev = prevRef.current;
@@ -90,13 +103,14 @@ function useScorePops(
     onIncreaseRef.current(ups);
     const ids = new Set(Object.values(ups).map((u) => u.id));
     const timer = setTimeout(() => {
+      timersRef.current.delete(timer);
       setPops((p) => {
         const next: Record<string, Pop> = {};
         for (const [name, pop] of Object.entries(p)) if (!ids.has(pop.id)) next[name] = pop;
         return next;
       });
     }, POP_MS);
-    return () => clearTimeout(timer);
+    timersRef.current.add(timer);
   }, [entries]);
 
   return pops;
@@ -108,11 +122,13 @@ function ScorePop({ pop }: { pop: Pop }) {
     <AdaptiveMotion.span
       key={pop.id}
       data-testid="live-board-pop"
-      initial={{ y: 6, scale: 0.6, opacity: 0 }}
-      animate={{ y: -18, scale: 1.1, opacity: 1 }}
+      initial={{ y: 10, scale: 0.6, opacity: 0 }}
+      animate={{ y: 0, scale: 1.1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 520, damping: 22 }}
       className={cn(
-        'pointer-events-none absolute -top-2 end-1 z-10 rounded-neo border-2 border-neo-black bg-neo-lime',
+        // Inside the row's box: the burst wrapper clips (overflow-hidden), so a
+        // pop above the row's top edge was cut in half on the projector.
+        'pointer-events-none absolute top-2 end-44 z-10 rounded-neo border-2 border-neo-black bg-neo-lime',
         'px-2 py-0.5 font-neo-display text-2xl font-black text-neo-black tabular-nums shadow-hard-sm'
       )}
     >
@@ -127,6 +143,7 @@ function PhoneStrip({
   pops,
   pointsLabel,
   dir,
+  renderMe,
   className,
 }: {
   rows: ReadonlyArray<LiveBoardEntry>;
@@ -134,6 +151,7 @@ function PhoneStrip({
   pops: Record<string, Pop>;
   pointsLabel: string;
   dir: 'ltr' | 'rtl';
+  renderMe?: (row: LiveBoardEntry) => ReactNode;
   className?: string;
 }) {
   const myIndex = rows.findIndex((r) => r.username === me);
@@ -147,6 +165,21 @@ function PhoneStrip({
         const above = rows.indexOf(row) < myIndex;
         const pop = pops[row.username];
         const Icon = isMe ? null : above ? ChevronUp : ChevronDown;
+        if (isMe && renderMe) {
+          return (
+            <AdaptiveMotion.div
+              key={row.username}
+              layout
+              transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+              data-testid="live-board-row"
+              data-player={row.username}
+              data-me="true"
+              className="relative min-w-0 shrink-0"
+            >
+              {renderMe(row)}
+            </AdaptiveMotion.div>
+          );
+        }
         return (
           <AdaptiveMotion.div
             key={row.username}
@@ -160,17 +193,15 @@ function PhoneStrip({
               'font-neo-display',
               isMe
                 ? 'max-w-[9.5rem] bg-neo-cyan text-neo-black border-neo-black'
-                : 'max-w-[7.5rem] bg-neo-navy-light text-neo-cream border-neo-cream/40'
+                : 'max-w-[6rem] bg-neo-navy-light text-neo-cream border-neo-cream/40'
             )}
           >
             {pop && <ScoreSparkBurst id={pop.id} />}
             {Icon && <Icon className="relative h-3 w-3 shrink-0" aria-hidden="true" />}
             <span className="relative truncate text-xs font-black">{row.username}</span>
             <AdaptiveMotion.span
-              key={pop?.id ?? 'still'}
-              initial={pop ? { scale: 1.45 } : false}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 600, damping: 18 }}
+              animate={{ scale: pop ? [1, 1.45, 1] : 1 }}
+              transition={{ duration: 0.35 }}
               className="relative text-xs font-black tabular-nums"
             >
               {row.score}
@@ -231,10 +262,8 @@ function ProjectorBoard({
                   <span className="min-w-0 flex-1 truncate font-neo-display text-3xl font-black">{row.username}</span>
                   <span className="relative flex shrink-0 items-baseline gap-2">
                     <AdaptiveMotion.span
-                      key={pop?.id ?? 'still'}
-                      initial={pop ? { scale: 1.35 } : false}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 520, damping: 16 }}
+                      animate={{ scale: pop ? [1, 1.35, 1] : 1 }}
+                      transition={{ duration: 0.35 }}
                       className="font-neo-display text-4xl font-black tabular-nums text-neo-lime"
                     >
                       {row.score}
@@ -253,7 +282,7 @@ function ProjectorBoard({
 }
 
 const LiveClassroomLeaderboard = memo<LiveClassroomLeaderboardProps>(
-  ({ leaderboard, currentPlayer, variant = 'phone', topN = 8, gameMode, className }) => {
+  ({ leaderboard, currentPlayer, variant = 'phone', topN = 8, gameMode, renderMe, className }) => {
     const { t, dir } = useLanguage();
     const { playModeSound } = useModeSting();
     const lastStingRef = useRef(0);
@@ -281,7 +310,15 @@ const LiveClassroomLeaderboard = memo<LiveClassroomLeaderboardProps>(
     if (variant === 'phone') {
       if (!currentPlayer) return null;
       return (
-        <PhoneStrip rows={sorted} me={currentPlayer} pops={pops} pointsLabel={pointsLabel} dir={textDir} className={className} />
+        <PhoneStrip
+          rows={sorted}
+          me={currentPlayer}
+          pops={pops}
+          pointsLabel={pointsLabel}
+          dir={textDir}
+          renderMe={renderMe}
+          className={className}
+        />
       );
     }
     if (sorted.length === 0) return null;

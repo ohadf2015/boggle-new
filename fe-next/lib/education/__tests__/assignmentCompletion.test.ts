@@ -18,14 +18,19 @@ const NOW = '2026-09-18T10:00:00.000Z';
 
 describe('findSatisfiedAssignment', () => {
   it('Given a Word Craft assignment, When a Word Craft session finishes, Then that assignment is found', async () => {
-    const { client, eq } = fakeClient([{ id: 'A1', practice_focus: null }]);
+    const { client, eq } = fakeClient([{ id: 'A1', practice_focus: 'wordcraft' }]);
     expect(await findSatisfiedAssignment(client, { lessonId: 'L', sessionMode: 'wordcraft' })).toBe('A1');
     expect(eq).toHaveBeenCalledWith('lesson_id', 'L');
   });
 
   it('Given a Word Craft assignment, When a flashcard session finishes, Then it does not count', async () => {
-    const { client } = fakeClient([{ id: 'A1', practice_focus: null }]);
+    const { client } = fakeClient([{ id: 'A1', practice_focus: 'wordcraft' }]);
     expect(await findSatisfiedAssignment(client, { lessonId: 'L', sessionMode: null })).toBeNull();
+  });
+
+  it('Given a legacy NULL assignment, When a Word Craft session finishes, Then it still counts (NULL = student picks)', async () => {
+    const { client } = fakeClient([{ id: 'A3', practice_focus: null }]);
+    expect(await findSatisfiedAssignment(client, { lessonId: 'L', sessionMode: 'wordcraft' })).toBe('A3');
   });
 
   it('Given a student-picks assignment, When any session finishes, Then it counts', async () => {

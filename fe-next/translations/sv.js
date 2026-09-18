@@ -78,10 +78,32 @@ const sv = {
       "questionCount": "Hur många frågor?",
       "cappedNotice": "Orden räcker till {count} frågor, så lång blir rundan.",
       "secondsPerQuestion": "Tid per fråga",
-      "seconds": "{seconds} s"
+      "seconds": "{seconds} s",
+      "treasureChests": "Skattkistor",
+      "treasureChestsHint": "Efter ett rätt svar öppnar eleven en kista: bonuspoäng, en stöld eller ett byte.",
+      "on": "På",
+      "off": "Av"
     },
     "errors": {
       "noQuestions": "Den här lektionen har inga ord redo för ett quiz än."
+    },
+    "treasure": {
+      "prompt": "Välj en kista!",
+      "hint": "Varje kista döljer något eget. Välj klokt!",
+      "chestLabel": "Kista {number}",
+      "outcome": {
+        "gain": "+{amount} poäng!",
+        "double": "Dubbelt! +{amount} poäng!",
+        "steal": "Du knyckte {amount} poäng från {target}!",
+        "swap": "Poängbyte med {target}!",
+        "small-loss": "Hoppsan, {amount} poäng försvann. Du tar igen dem!"
+      },
+      "newTotal": "Dina poäng: {score}",
+      "tapToContinue": "Tryck för att fortsätta",
+      "hitSteal": "{actor} knyckte {amount} av dina poäng. Ta tillbaka dem!",
+      "hitSwap": "{actor} bytte poäng med dig. Kör vidare!",
+      "tickerSteal": "{actor} knyckte {amount} poäng från {target}!",
+      "tickerSwap": "{actor} bytte poäng med {target}!"
     }
   },
   "pricing": {
@@ -13861,6 +13883,7 @@ const sv = {
       "result": "Resultat",
       "won": "Du vann",
       "lost": "Boten vann",
+      "tie": "Oavgjort",
       "recommended": "Rekommenderas",
       "teacherHint": "Solo mot en snäll bot. Eleverna spelar från klassens sida.",
       "studentPlay": "Spela WordCraft"
@@ -14017,6 +14040,9 @@ const sv = {
       "classCoverage": "Klassen hittade {{found}} av {{total}} lektionsord",
       "reteach": "Ingen hittade de här",
       "allFound": "Klassen hittade alla lektionsord.",
+      "waitingForTeacher": "Väntar på att din lärare startar nästa runda…",
+      "stayInClass": "Stanna kvar — nästa spel startar här.",
+      "playAgain": "Spela igen",
       "practiceMissed": "Öva de här orden",
       "playReteachRound": "Spela repetitionsrunda — bara missade ord",
       "backToLobby": "Tillbaka till lobbyn",

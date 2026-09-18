@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, useRef, useEffect, Fragment } from 'react';
+import { memo, useMemo, useRef, useEffect, useState, Fragment } from 'react';
 import { m, LayoutGroup } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Users } from 'lucide-react';
@@ -70,6 +70,13 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   t,
 }) => {
   const parentRef = useRef<HTMLDivElement>(null);
+  // The `classroom` prop derives from the start payload, and a coordinator
+  // retry `startGame` arrives without it — the host keeps the last value, so it
+  // went null after round 1. The teacher's URL carries `classroom=true` for the
+  // whole session (classroomMultiplayerPath), so it backs the prop up.
+  const [classroomUrl] = useState(
+    () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('classroom') === 'true'
+  );
 
   // Guest students retype their nickname every round, so the lookup is
   // case-insensitive — the same rule the roster and the deal already use. A
@@ -120,7 +127,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
     );
   }
 
-  if (classroom && !teams?.length && gameMode !== 'word-hunt') {
+  if ((classroom || classroomUrl) && !teams?.length && gameMode !== 'word-hunt') {
     return (
       <div className="h-full overflow-hidden p-4 flex flex-col" data-testid="tv-classroom-standings">
         <h3 className="text-xl font-black uppercase text-neo-black mb-2 text-center border-b-2 border-neo-black pb-2 shrink-0">

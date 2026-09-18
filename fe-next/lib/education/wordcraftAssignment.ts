@@ -4,10 +4,12 @@
  * classroom home, and the teacher sees who finished it.
  *
  * Data path — NO schema change:
- *  - `lesson_assignments` has no mode column and `practice_focus` is CHECK-locked
- *    to 'any' + the six vocab focuses. So the mode rides on `practice_focus`:
- *      NULL        → Word Craft (the recommended default)
- *      'any'       → student picks any game
+ *  - `lesson_assignments` has no mode column, so the mode rides on
+ *    `practice_focus` (CHECK widened by migration
+ *    20260918210000_lesson_assignments_practice_focus_wordcraft.sql):
+ *      'wordcraft'   → Word Craft (the dialog's recommended default)
+ *      NULL / 'any'  → student picks any game (unchanged legacy meaning —
+ *                      legacy rows, create-and-assign and duels stay here)
  *      <vocab focus> → that targeted drill
  *  - `practice_sessions.practice_type` is CHECK-locked too, so a Word Craft round
  *    records as `solo_board` with the unconstrained `mode` column set to
@@ -18,24 +20,34 @@
 
 import type { Language } from '@/lib/supabase/education/types';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
-import { isPracticeFocusSetting, type PracticeFocusSetting } from './vocabFocus';
+import { isVocabFocus, type PracticeFocusSetting } from './vocabFocus';
 
 /** Value written to `practice_sessions.mode` for a Word Craft round. */
 export const WORDCRAFT_SESSION_MODE = 'wordcraft';
 
-export type AssignmentMode = 'wordcraft' | PracticeFocusSetting;
+/** `practice_focus` value that marks a Word Craft assignment. */
+export const WORDCRAFT_FOCUS = 'wordcraft';
+
+export type AssignmentMode = typeof WORDCRAFT_FOCUS | PracticeFocusSetting;
+
+/** Every value the app may write to `lesson_assignments.practice_focus`. */
+export type AssignmentFocusValue = PracticeFocusSetting | typeof WORDCRAFT_FOCUS;
+
+export function isAssignmentFocusValue(value: unknown): value is AssignmentFocusValue {
+  return value === WORDCRAFT_FOCUS || value === 'any' || isVocabFocus(value);
+}
 
 /** What the student is steered to by this assignment; null = not assigned. */
 export function readAssignmentMode(assignment: unknown): AssignmentMode | null {
   if (!assignment || typeof assignment !== 'object') return null;
   const focus = (assignment as { practice_focus?: unknown }).practice_focus;
-  if (focus === null || focus === undefined) return 'wordcraft';
-  return isPracticeFocusSetting(focus) ? focus : 'any';
+  if (focus === WORDCRAFT_FOCUS) return 'wordcraft';
+  return isVocabFocus(focus) ? focus : 'any';
 }
 
-/** The `practice_focus` value that stores this mode. */
-export function practiceFocusForMode(mode: AssignmentMode): PracticeFocusSetting | null {
-  return mode === 'wordcraft' ? null : mode;
+/** The `practice_focus` value that stores this mode ('any' keeps the legacy NULL). */
+export function practiceFocusForMode(mode: AssignmentMode): AssignmentFocusValue | null {
+  return mode === 'any' ? null : mode;
 }
 
 export function wordCraftPracticeHref(locale: string, lessonId: string): string {

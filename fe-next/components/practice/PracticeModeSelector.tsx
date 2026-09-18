@@ -73,9 +73,8 @@ export default function PracticeModeSelector({
         spelling: progress.progress.spelling_sessions,
         blitz: progress.progress.blitz_sessions,
         vocab_focus: 0,
-        wordcraft: 0,
       }
-    : { flashcard: 0, solo_board: 0, warmup: 0, word_list: 0, matching: 0, spelling: 0, blitz: 0, vocab_focus: 0, wordcraft: 0 };
+    : { flashcard: 0, solo_board: 0, warmup: 0, word_list: 0, matching: 0, spelling: 0, blitz: 0, vocab_focus: 0 };
   const { t } = useLanguage();
 
   const practiceOptions: PracticeModeOption[] = [
@@ -127,12 +126,6 @@ export default function PracticeModeSelector({
       colorClass: 'text-neo-lime',
       bgClass: 'bg-neo-lime/10 hover:bg-neo-lime/20',
     },
-    {
-      type: 'wordcraft',
-      icon: <Lock className="w-8 h-8" />,
-      colorClass: 'text-neo-yellow',
-      bgClass: 'bg-neo-yellow/10 hover:bg-neo-yellow/20',
-    },
   ];
 
   const getMasteryColor = (level: MasteryLevel) => {
@@ -171,7 +164,6 @@ export default function PracticeModeSelector({
       spelling: { title: 'education.practice.spelling', desc: 'education.practice.spellingDesc' },
       blitz: { title: 'education.practice.blitz', desc: 'education.practice.blitzDesc' },
       vocab_focus: { title: 'education.vocabFocus.title', desc: 'education.vocabFocus.desc' },
-      wordcraft: { title: 'education.practice.wordcraft', desc: 'education.practice.wordcraftDesc' },
     };
     return map[type][key];
   };

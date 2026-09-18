@@ -22,6 +22,7 @@ import {
   focusQuestionCounts,
   type PracticeFocusSetting,
 } from '@/lib/education/vocabFocus';
+import { WORDCRAFT_FOCUS } from '@/lib/education/wordcraftAssignment';
 
 interface AssignmentCreatorProps {
   classroomId: string;
@@ -33,7 +34,7 @@ interface AssignmentCreatorProps {
 /**
  * 'wordcraft' is the recommended default: students play Word Craft solo vs the
  * bot. `lesson_assignments` has no mode column, so it is saved as
- * practice_focus NULL; 'practice' saves 'any' or a focus explicitly.
+ * practice_focus 'wordcraft'; 'practice' saves a focus or 'any' (→ NULL).
  */
 type AssignmentType = 'wordcraft' | 'practice' | 'duel';
 
@@ -121,7 +122,7 @@ export default function AssignmentCreator({
       assignment_type: selectedType === 'duel' ? 'duel' : 'practice',
       due_date: dueDate,
       instructions: instructions || null,
-      practice_focus: selectedType === 'practice' ? focus : null,
+      practice_focus: selectedType === 'practice' ? focus : selectedType === 'wordcraft' ? WORDCRAFT_FOCUS : null,
     });
 
     setIsSubmitting(false);

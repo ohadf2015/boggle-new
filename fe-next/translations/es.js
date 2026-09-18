@@ -78,25 +78,32 @@ const es = {
       "questionCount": "¿Cuántas preguntas?",
       "cappedNotice": "Con estas palabras salen {count} preguntas, así que esa será la duración de la ronda.",
       "secondsPerQuestion": "Tiempo por pregunta",
-      "seconds": "{seconds} s"
+      "seconds": "{seconds} s",
+      "treasureChests": "Cofres del tesoro",
+      "treasureChestsHint": "Tras una respuesta correcta, cada estudiante abre un cofre: puntos extra, un robo o un intercambio.",
+      "on": "Sí",
+      "off": "No"
     },
     "errors": {
       "noQuestions": "Esta lección todavía no tiene palabras listas para un test."
     },
     "treasure": {
       "prompt": "¡Elige un cofre!",
+      "hint": "Cada cofre esconde algo distinto. ¡Elige bien!",
       "chestLabel": "Cofre {number}",
       "outcome": {
-        "gain": "¡Ganaste {amount} puntos!",
-        "double": "¡Doble! ¡{amount} puntos!",
-        "steal": "¡Roba {amount} de {target}!",
-        "swap": "¡Intercambia puntos con {target}!",
-        "small-loss": "Perdiste {amount} puntos."
+        "gain": "¡+{amount} puntos!",
+        "double": "¡Doble! ¡+{amount} puntos!",
+        "steal": "¡Le birlaste {amount} puntos a {target}!",
+        "swap": "¡Cambio de puntos con {target}!",
+        "small-loss": "Uy, se te escaparon {amount} puntos. ¡Ya los recuperarás!"
       },
-      "stolenFrom": "Le robaste a {name}",
-      "swappedWith": "Intercambiaste con {name}",
-      "tickerSteal": "¡{actor} robó {amount} a {target}!",
-      "tickerSwap": "¡{actor} intercambió con {target}!"
+      "newTotal": "Tus puntos: {score}",
+      "tapToContinue": "Toca para seguir",
+      "hitSteal": "{actor} te birló {amount} puntos. ¡A recuperarlos!",
+      "hitSwap": "{actor} cambió sus puntos por los tuyos. ¡Sigue así!",
+      "tickerSteal": "¡{actor} le birló {amount} puntos a {target}!",
+      "tickerSwap": "¡{actor} cambió puntos con {target}!"
     }
   },
   "pricing": {
@@ -13634,6 +13641,7 @@ const es = {
       "result": "Resultado",
       "won": "¡Ganaste!",
       "lost": "Ganó el bot",
+      "tie": "Empate",
       "recommended": "Recomendado",
       "teacherHint": "En solitario contra un bot amistoso. Se juega desde la página de la clase.",
       "studentPlay": "Jugar WordCraft"
@@ -13791,6 +13799,7 @@ const es = {
       "reteach": "Nadie encontró estas",
       "allFound": "La clase encontró todas las palabras de la lección.",
       "waitingForTeacher": "Esperando que tu maestro comience la próxima ronda…",
+      "stayInClass": "Quédate aquí: el próximo juego empieza en esta pantalla.",
       "practiceMissed": "Practicar estas palabras",
       "playReteachRound": "Jugar ronda de repaso — solo las palabras que faltan",
       "backToLobby": "Volver a la sala",

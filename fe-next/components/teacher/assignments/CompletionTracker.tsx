@@ -141,8 +141,9 @@ export default function CompletionTracker({
               </div>
             </div>
             <div className="flex items-center gap-4 text-sm">
-              <div className="text-neo-cyan font-bold">{completion.score}</div>
-              <div className="text-neo-white">{completion.accuracy}%</div>
+              {/* Live progress rows carry no score/accuracy — never draw a bare "%". */}
+              {completion.score != null && <div className="text-neo-cyan font-bold">{completion.score}</div>}
+              {completion.accuracy != null && <div className="text-neo-white">{completion.accuracy}%</div>}
             </div>
           </div>
         ))}

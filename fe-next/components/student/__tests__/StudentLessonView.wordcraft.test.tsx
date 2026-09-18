@@ -1,5 +1,5 @@
 /**
- * StudentLessonView — a Word Craft assignment (practice_focus NULL) gets a
+ * StudentLessonView — a Word Craft assignment (practice_focus 'wordcraft') gets a
  * one-tap "Play Word Craft" button that deep-links into the Word Craft variant.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -70,7 +70,7 @@ describe('StudentLessonView — Word Craft assignment', () => {
   });
 
   it('Given a Word Craft assignment, When the card renders, Then one tap opens Word Craft for that lesson', () => {
-    withAssignment({ id: 'a1', lesson_id: 'l1', classroom_id: 'c1', practice_focus: null });
+    withAssignment({ id: 'a1', lesson_id: 'l1', classroom_id: 'c1', practice_focus: 'wordcraft' });
     render(<StudentLessonView />);
     const button = screen.getByTestId('assigned-wordcraft-practice');
     expect(button).toHaveTextContent('education.wordcraftAssignment.studentPlay');
@@ -79,11 +79,15 @@ describe('StudentLessonView — Word Craft assignment', () => {
     expect(mockPush).toHaveBeenCalledWith('/en/student/lessons/l1?mode=solo_board&variant=wordcraft');
   });
 
-  it('Given a student-picks or focus assignment, Then no Word Craft button', () => {
+  it('Given a student-picks, legacy NULL, or focus assignment, Then no Word Craft button', () => {
     withAssignment({ id: 'a1', practice_focus: 'any' });
     const { unmount } = render(<StudentLessonView />);
     expect(screen.queryByTestId('assigned-wordcraft-practice')).not.toBeInTheDocument();
     unmount();
+    withAssignment({ id: 'a1', practice_focus: null });
+    const second = render(<StudentLessonView />);
+    expect(screen.queryByTestId('assigned-wordcraft-practice')).not.toBeInTheDocument();
+    second.unmount();
     withAssignment({ id: 'a1', practice_focus: 'synonym' });
     render(<StudentLessonView />);
     expect(screen.queryByTestId('assigned-wordcraft-practice')).not.toBeInTheDocument();

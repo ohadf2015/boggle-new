@@ -10,8 +10,8 @@ import {
 
 /**
  * Word Craft as classroom homework. `lesson_assignments` has no mode column, so
- * the mode rides on `practice_focus`: NULL = Word Craft (the recommended
- * default), 'any' = student picks, a vocab focus = that drill.
+ * the mode rides on `practice_focus`: 'wordcraft' = Word Craft, NULL/'any' =
+ * student picks (unchanged legacy meaning), a vocab focus = that drill.
  */
 describe('readAssignmentMode', () => {
   it('Given no assignment, When read, Then there is no mode', () => {
@@ -19,9 +19,13 @@ describe('readAssignmentMode', () => {
     expect(readAssignmentMode(undefined)).toBeNull();
   });
 
-  it('Given an assignment with practice_focus NULL, When read, Then it is Word Craft', () => {
-    expect(readAssignmentMode({ practice_focus: null })).toBe('wordcraft');
-    expect(readAssignmentMode({})).toBe('wordcraft');
+  it("Given practice_focus 'wordcraft', When read, Then it is Word Craft", () => {
+    expect(readAssignmentMode({ practice_focus: 'wordcraft' })).toBe('wordcraft');
+  });
+
+  it('Given a legacy/duel row with practice_focus NULL (or missing), When read, Then it is NOT Word Craft — the student picks', () => {
+    expect(readAssignmentMode({ practice_focus: null })).toBe('any');
+    expect(readAssignmentMode({})).toBe('any');
   });
 
   it("Given practice_focus 'any', When read, Then the student picks", () => {
@@ -38,9 +42,9 @@ describe('readAssignmentMode', () => {
 });
 
 describe('practiceFocusForMode', () => {
-  it('Word Craft is stored as NULL; everything else as itself', () => {
-    expect(practiceFocusForMode('wordcraft')).toBeNull();
-    expect(practiceFocusForMode('any')).toBe('any');
+  it("Word Craft is stored as 'wordcraft'; student-picks as NULL (legacy shape); a focus as itself", () => {
+    expect(practiceFocusForMode('wordcraft')).toBe('wordcraft');
+    expect(practiceFocusForMode('any')).toBeNull();
     expect(practiceFocusForMode('antonym')).toBe('antonym');
   });
 

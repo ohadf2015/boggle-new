@@ -78,10 +78,32 @@ const ja = {
       "questionCount": "問題数",
       "cappedNotice": "この単語でつくれるのは{count}問なので、ラウンドはその長さになります。",
       "secondsPerQuestion": "1問あたりの時間",
-      "seconds": "{seconds}秒"
+      "seconds": "{seconds}秒",
+      "treasureChests": "宝箱",
+      "treasureChestsHint": "正解すると宝箱をひとつ開けられます。ボーナス、ポイント横取り、スコア交換のどれかが出ます。",
+      "on": "オン",
+      "off": "オフ"
     },
     "errors": {
       "noQuestions": "このレッスンには小テストに使える単語がまだありません。"
+    },
+    "treasure": {
+      "prompt": "宝箱をえらぼう！",
+      "hint": "中身は箱ごとにちがうよ。よく考えてえらんでね！",
+      "chestLabel": "宝箱 {number}",
+      "outcome": {
+        "gain": "+{amount}ポイント！",
+        "double": "ダブル！+{amount}ポイント！",
+        "steal": "{target}さんから{amount}ポイントゲット！",
+        "swap": "{target}さんとスコアを交換！",
+        "small-loss": "おっと、{amount}ポイント落としちゃった。すぐ取り返せるよ！"
+      },
+      "newTotal": "あなたのスコア：{score}",
+      "tapToContinue": "タップしてつづける",
+      "hitSteal": "{actor}さんに{amount}ポイント取られた！取り返そう！",
+      "hitSwap": "{actor}さんとスコアが入れかわった！この調子でいこう！",
+      "tickerSteal": "{actor}さんが{target}さんから{amount}ポイントゲット！",
+      "tickerSwap": "{actor}さんと{target}さんがスコア交換！"
     }
   },
   "pricing": {
@@ -13627,6 +13649,7 @@ const ja = {
       "result": "結果",
       "won": "勝ち!",
       "lost": "ボットの勝ち",
+      "tie": "引き分け",
       "recommended": "おすすめ",
       "teacherHint": "やさしいボットと1対1。生徒はクラスのページから遊べます。",
       "studentPlay": "ワードクラフトで遊ぶ"
@@ -13783,6 +13806,9 @@ const ja = {
       "classCoverage": "クラスはレッスンの単語 {{total}} 個のうち {{found}} 個を発見",
       "reteach": "誰も見つけられなかった単語",
       "allFound": "クラスはすべての単語を見つけました。",
+      "waitingForTeacher": "先生が次のラウンドを始めるのを待っています…",
+      "stayInClass": "このまま待ってね。次のゲームはこの画面で始まります。",
+      "playAgain": "もう一度プレイ",
       "practiceMissed": "この単語を練習する",
       "playReteachRound": "復習ラウンドをプレイ — 見つからなかった単語だけ",
       "backToLobby": "ロビーに戻る",

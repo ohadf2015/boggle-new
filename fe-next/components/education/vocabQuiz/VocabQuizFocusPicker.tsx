@@ -243,6 +243,8 @@ export function VocabQuizFocusPicker({
       <div className="border-t-2 border-neo-cream/20 pt-6">
         <button
           type="button"
+          role="switch"
+          aria-checked={!!treasureChestsEnabled}
           onClick={() => onTreasureChestsChange?.(!treasureChestsEnabled)}
           className={cn(
             'w-full flex items-center gap-3 px-4 py-3 rounded-neo border-[2px] transition-all',
@@ -267,6 +269,7 @@ export function VocabQuizFocusPicker({
             {treasureChestsEnabled ? t('vocabQuiz.setup.on') : t('vocabQuiz.setup.off')}
           </span>
         </button>
+        <p className="mt-2 text-sm text-neo-white/70">{t('vocabQuiz.setup.treasureChestsHint')}</p>
       </div>
     </div>
   );

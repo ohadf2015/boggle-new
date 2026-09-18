@@ -28,15 +28,33 @@ describe('StudentNextActions', () => {
     expect(playAgainBtn.className).toMatch(/bg-neo-(lime|pink)/);
   });
 
-  it('renders "Wait for teacher" as secondary option', () => {
+  it('makes "wait for the next game" the loud primary when the teacher paces the room', () => {
     render(
       <StudentNextActions t={t} />
     );
     const waitMsg = screen.getByTestId('wait-for-teacher-message');
-    expect(waitMsg).toBeInTheDocument();
-    // Secondary should not have the solid full-strength primary colors like the Play Again button
-    // The wait message has a subtle background (lime/10) not a loud one
-    expect(waitMsg.className).toMatch(/bg-neo-lime\/10/);
+    // It IS the student's primary in a teacher-paced room: a solid fill, not a
+    // faint hint the eye slides past on its way to the back button.
+    expect(waitMsg.className).toMatch(/\bbg-neo-lime\b(?!\/)/);
+    expect(waitMsg.className).toContain('text-neo-black');
+    expect(waitMsg).toHaveAttribute('role', 'status');
+    expect(waitMsg.textContent).toContain('education.results.waitingForTeacher');
+    // ...and tells them to stay put, because leaving is the drop-off.
+    expect(waitMsg.textContent).toContain('education.results.stayInClass');
+    // A spinning clock reads as "loading/broken", not "you're in".
+    expect(waitMsg.innerHTML).not.toContain('animate-spin');
+  });
+
+  it('never offers a way out of the class (home, multiplayer, paywall)', () => {
+    const { container } = render(<StudentNextActions onPractice={vi.fn()} t={t} />);
+    const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href'));
+    expect(hrefs.filter((h) => /access|multiplayer|pricing|upgrade|^\/[a-z]{2}\/?$/.test(h ?? ''))).toEqual([]);
+  });
+
+  it('keeps practice quieter than the primary', () => {
+    render(<StudentNextActions onPractice={vi.fn()} t={t} />);
+    const practice = screen.getByTestId('practice-missed-button');
+    expect(practice.className).not.toMatch(/\bbg-neo-lime\b(?!\/)/);
   });
 
   it('calls onPlayAgain when Play Again button is clicked', () => {

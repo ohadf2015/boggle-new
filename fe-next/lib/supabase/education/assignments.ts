@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import type { LessonAssignment, TeacherAssignment } from './types';
-import { isPracticeFocusSetting, type PracticeFocusSetting } from '@/lib/education/vocabFocus';
+import { isVocabFocus } from '@/lib/education/vocabFocus';
+import { WORDCRAFT_FOCUS, isAssignmentFocusValue, type AssignmentFocusValue } from '@/lib/education/wordcraftAssignment';
 
 /**
  * Assign a lesson to a classroom (legacy - kept for backward compatibility)
@@ -101,16 +102,18 @@ export async function createAssignment(data: {
   /**
    * Vocabulary skill to drill: definition | synonym | antonym | context |
    * multiple_meaning | roots_affixes. `any`/unset = student picks.
+   * 'wordcraft' = play Word Craft.
    */
-  practice_focus?: PracticeFocusSetting | null;
+  practice_focus?: AssignmentFocusValue | null;
 }): Promise<{ data: TeacherAssignment | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
   try {
-    // 'any' is written explicitly: a NULL practice_focus means a Word Craft
-    // assignment (lib/education/wordcraftAssignment.ts — the table has no mode
-    // column). Unknown values are never written (they would fail the CHECK).
-    const focus = isPracticeFocusSetting(data.practice_focus) ? { practice_focus: data.practice_focus } : {};
+    // Only write the column when a real focus (or 'wordcraft') was chosen, so the
+    // legacy insert shape is untouched: 'any'/unset stays NULL = student picks.
+    const focus = isVocabFocus(data.practice_focus) || data.practice_focus === WORDCRAFT_FOCUS
+      ? { practice_focus: data.practice_focus }
+      : {};
     const { data: assignment, error } = await supabase
       .from('lesson_assignments')
       .insert({
@@ -274,7 +277,7 @@ export async function updateAssignment(
     due_date?: string | null;
     title?: string | null;
     instructions?: string | null;
-    practice_focus?: PracticeFocusSetting | null;
+    practice_focus?: AssignmentFocusValue | null;
   }
 ): Promise<{ data: TeacherAssignment | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
@@ -283,7 +286,7 @@ export async function updateAssignment(
     // Same guard as createAssignment: a focus the app does not know would fail
     // the table's CHECK at the database, which reads as a generic 500.
     const patch = { ...updates };
-    if ('practice_focus' in patch && patch.practice_focus !== null && !isPracticeFocusSetting(patch.practice_focus)) {
+    if ('practice_focus' in patch && patch.practice_focus !== null && !isAssignmentFocusValue(patch.practice_focus)) {
       delete patch.practice_focus;
     }
     const { data: assignment, error } = await supabase

@@ -32,6 +32,7 @@ import {
   type VocabQuizStanding,
   type VocabQuizStateSnapshot,
   type VocabQuizAnswerResult,
+  type TreasureChestState,
 } from '@/shared/types/vocabQuiz';
 
 // ---------------------------------------------------------------------------
@@ -86,8 +87,10 @@ export interface VocabQuizSession {
   startedAt: number;
   /** Whether treasure chests are enabled for this quiz. */
   treasureChestsEnabled: boolean;
+  /** Hard stop for the reveal's chest hold (absolute wall clock). */
+  chestHoldEndsAt: number;
   /** Treasure chest results, keyed by `${questionIndex}:${username}`. */
-  chestResults: Map<string, any>;
+  chestResults: Map<string, TreasureChestState>;
 }
 
 export interface CreateQuizSessionInput {
@@ -159,6 +162,7 @@ export function createQuizSession(input: CreateQuizSessionInput): VocabQuizSessi
     startedAt: input.now,
     treasureChestsEnabled: input.treasureChestsEnabled ?? true,
     chestResults: new Map(),
+    chestHoldEndsAt: 0,
   };
 }
 

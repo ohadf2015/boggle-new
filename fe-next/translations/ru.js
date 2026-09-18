@@ -78,25 +78,32 @@ const ru = {
       "questionCount": "Сколько вопросов?",
       "cappedNotice": "Из этих слов получается {count} вопросов — столько и продлится раунд.",
       "secondsPerQuestion": "Время на вопрос",
-      "seconds": "{seconds} с"
+      "seconds": "{seconds} с",
+      "treasureChests": "Сундуки с сокровищами",
+      "treasureChestsHint": "После верного ответа ученик открывает сундук: бонус, кража очков или обмен.",
+      "on": "Вкл",
+      "off": "Выкл"
     },
     "errors": {
       "noQuestions": "В этом уроке пока нет слов, подходящих для викторины."
     },
     "treasure": {
-      "prompt": "Выберите сундук!",
+      "prompt": "Выбери сундук!",
+      "hint": "В каждом сундуке что-то своё. Выбирай с умом!",
       "chestLabel": "Сундук {number}",
       "outcome": {
-        "gain": "Получили {amount} очков!",
-        "double": "Двойка! Получили {amount} очков!",
-        "steal": "Украли {amount} у {target}!",
-        "swap": "Поменялись очками с {target}!",
-        "small-loss": "Потеряли {amount} очков."
+        "gain": "+{amount} очков!",
+        "double": "Удвоение! +{amount} очков!",
+        "steal": "{amount} очков от {target} теперь твои!",
+        "swap": "Обмен очками: {target}!",
+        "small-loss": "Ой, {amount} очков потерялись. Ты их вернёшь!"
       },
-      "stolenFrom": "Вы украли у {name}",
-      "swappedWith": "Вы поменялись с {name}",
-      "tickerSteal": "{actor} украл {amount} у {target}!",
-      "tickerSwap": "{actor} поменялся с {target}!"
+      "newTotal": "Твои очки: {score}",
+      "tapToContinue": "Нажми, чтобы продолжить",
+      "hitSteal": "{actor} забирает у тебя {amount} очков. Отыграйся!",
+      "hitSwap": "{actor} меняется с тобой очками. Не сдавайся!",
+      "tickerSteal": "{actor} забирает {amount} очков у {target}!",
+      "tickerSwap": "{actor} и {target} меняются очками!"
     }
   },
   "pricing": {
@@ -1643,6 +1650,7 @@ const ru = {
       "result": "Итог",
       "won": "Ты победил!",
       "lost": "Бот победил",
+      "tie": "Ничья",
       "recommended": "Рекомендуем",
       "teacherHint": "Один на один с дружелюбным ботом. Ученики играют со страницы класса.",
       "studentPlay": "Играть в WordCraft"
@@ -1800,6 +1808,7 @@ const ru = {
       "reteach": "Эти слова не нашёл никто",
       "allFound": "Класс нашёл все слова урока.",
       "waitingForTeacher": "Ждём, когда учитель запустит следующий раунд…",
+      "stayInClass": "Оставайтесь здесь — следующая игра начнётся на этом экране.",
       "practiceMissed": "Потренировать эти слова",
       "playReteachRound": "Сыграть раунд повторения — только пропущенные слова",
       "backToLobby": "Назад в лобби",

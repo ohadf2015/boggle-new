@@ -68,7 +68,6 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
       spelling: t('education.practice.spelling'),
       blitz: t('education.practice.blitz'),
       vocab_focus: t('education.vocabFocus.title'),
-      wordcraft: t('education.practice.wordcraft', 'Word Craft'),
     };
     return labels[type];
   };
@@ -80,7 +79,6 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
         return 'thinking';
       case 'solo_board':
       case 'warmup':
-      case 'wordcraft':
         return 'gaming';
       case 'word_list':
         return 'happy';

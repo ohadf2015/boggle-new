@@ -34,6 +34,10 @@ const ENDED = {
   questionNumber: 10,
   finished: true,
   lockIn: { gameCode: 'H9M5YJ', index: 9, locked: 2, total: 2, distribution: [2, 0, 0, 0] },
+  chestPending: false,
+  myChest: null,
+  chestEvents: [],
+  chestHit: null,
   answer: vi.fn(),
   isQuizRoom: true,
 };

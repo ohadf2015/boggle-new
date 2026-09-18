@@ -348,8 +348,11 @@ describe('round progression', () => {
 
 describe('end of round persistence', () => {
   it('hands the lesson words each student got right to the classroom persistence path', async () => {
+    // Chests off: ana answers right and never opens a chest, and the reveal
+    // would hold for it (vocabQuizChestHold.test.ts) — this test pins
+    // persistence on a fixed 13.2s-per-question clock.
     (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(
-      classroomGame('vocab-quiz', { vocabQuizQuestionCount: 4, vocabQuizSeconds: 10 })
+      classroomGame('vocab-quiz', { vocabQuizQuestionCount: 4, vocabQuizSeconds: 10, treasureChestsEnabled: false })
     );
     const { io, emit } = makeIo();
     await startVocabQuizForClassroom(io, GAME_CODE);

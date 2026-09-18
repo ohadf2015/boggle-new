@@ -223,7 +223,7 @@ export default function StudentLessonView() {
           lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
         // Teacher pinned one vocabulary skill on this assignment → offer it first
         const assignedFocus = readAssignmentFocus(studentLesson.assignment);
-        // Teacher assigned Word Craft (practice_focus NULL) → one tap into the game
+        // Teacher assigned Word Craft (practice_focus 'wordcraft') → one tap into the game
         const assignedWordCraft = readAssignmentMode(studentLesson.assignment) === 'wordcraft';
 
         // Homework has to LOOK like homework. Every card rendered identically,

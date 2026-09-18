@@ -79,7 +79,8 @@ const en = {
       "cappedNotice": "These words can make {count} questions, so that is how long the round will be.",
       "secondsPerQuestion": "Time per question",
       "seconds": "{seconds}s",
-      "treasureChests": "Treasure chests (Gold Quest style)",
+      "treasureChests": "Treasure chests",
+      "treasureChestsHint": "After a correct answer, students open a chest for bonus points, a steal or a swap.",
       "on": "On",
       "off": "Off"
     },
@@ -88,18 +89,21 @@ const en = {
     },
     "treasure": {
       "prompt": "Pick a chest!",
+      "hint": "Every chest hides something different. Choose wisely!",
       "chestLabel": "Chest {number}",
       "outcome": {
-        "gain": "Gain {amount} points!",
-        "double": "Double! You earned {amount} points!",
-        "steal": "Steal {amount} from {target}!",
-        "swap": "Swap scores with {target}!",
-        "small-loss": "Lost {amount} points."
+        "gain": "+{amount} points!",
+        "double": "Double up! +{amount} points!",
+        "steal": "You swiped {amount} points from {target}!",
+        "swap": "Score swap with {target}!",
+        "small-loss": "Oops, {amount} points slipped away. You'll win them back!"
       },
-      "stolenFrom": "You stole from {name}",
-      "swappedWith": "You swapped with {name}",
-      "tickerSteal": "{actor} stole {amount} from {target}!",
-      "tickerSwap": "{actor} swapped with {target}!"
+      "newTotal": "Your score: {score}",
+      "tapToContinue": "Tap to continue",
+      "hitSteal": "{actor} swiped {amount} of your points. Win them back!",
+      "hitSwap": "{actor} swapped scores with you. Keep going!",
+      "tickerSteal": "{actor} swiped {amount} points from {target}!",
+      "tickerSwap": "{actor} swapped scores with {target}!"
     }
   },
   "report": {
@@ -12175,6 +12179,7 @@ const en = {
       "result": "Result",
       "won": "You won",
       "lost": "Bot won",
+      "tie": "Tie",
       "recommended": "Recommended",
       "teacherHint": "Solo vs a friendly bot. Students play it from their class page.",
       "studentPlay": "Play WordCraft"
@@ -12332,6 +12337,7 @@ const en = {
       "reteach": "Nobody found these",
       "allFound": "The class found every lesson word.",
       "waitingForTeacher": "Waiting for your teacher to start the next round…",
+      "stayInClass": "Stay here — the next game starts on this screen.",
       "practiceMissed": "Practise these words",
       "playReteachRound": "Play reteach round — missed words only",
       "backToLobby": "Back to lobby",
