@@ -14,7 +14,7 @@
  * already as long as the longest), and Hebrew is the locale with real players.
  */
 import { describe, it, expect } from 'vitest';
-import { getKeyboardRows, letterColumnCount, ACTION_KEY_COLUMNS } from '../keyboard';
+import { getKeyboardRows, letterColumnCount, backspaceRowIndex } from '../keyboard';
 
 describe('letterColumnCount', () => {
   it('uses the longest row when the last row has room for the action keys', () => {
@@ -27,12 +27,20 @@ describe('letterColumnCount', () => {
     expect(letterColumnCount(getKeyboardRows('ru'))).toBe(12);
   });
 
-  it('widens the budget for Hebrew, whose last row leaves no room for the action keys', () => {
-    // Hebrew rows are 6/8/8 — the last row is already the longest, so the
-    // submit + backspace keys have nothing to sit in without squashing letters.
+  it('moves Hebrew backspace to the short top row instead of widening every key', () => {
+    // Hebrew rows are 6/8/8 — the last row is already the longest. Budgeting
+    // both action keys onto it (8 + 3 = 11 columns) shrank EVERY key to 1/11
+    // and left the 6-key top row floating in dead space. Backspace sits on the
+    // top row instead (top-right, like a physical Hebrew keyboard): rows become
+    // 6+1.5 / 8 / 8+1.5, so the budget is 9.5 and keys are ~16% wider.
     const rows = getKeyboardRows('he');
-    expect(Math.max(...rows.map((r) => r.length))).toBe(8);
-    expect(letterColumnCount(rows)).toBe(8 + ACTION_KEY_COLUMNS);
+    expect(backspaceRowIndex(rows)).toBe(0);
+    expect(letterColumnCount(rows)).toBe(9.5);
+  });
+
+  it('keeps backspace on the last row when it fits (en, ru)', () => {
+    expect(backspaceRowIndex(getKeyboardRows('en'))).toBe(2);
+    expect(backspaceRowIndex(getKeyboardRows('ru'))).toBe(2);
   });
 
   it('never returns fewer columns than the longest row', () => {

@@ -6,6 +6,7 @@
  */
 
 import { useEffect } from 'react';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface UseAdventureKeyboardShortcutsOptions {
   entryPhase: string;
@@ -39,7 +40,7 @@ export function useAdventureKeyboardShortcuts({
   useEffect(() => {
     if (entryPhase !== 'playing' || showLevelComplete) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (isTypingTarget(e)) return;
       switch (e.key.toLowerCase()) {
         case 'h':
           if (hasHintsAvailable) onHintClick();

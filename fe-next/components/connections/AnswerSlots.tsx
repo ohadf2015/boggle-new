@@ -77,12 +77,15 @@ export default function AnswerSlots({ value, slotCount, state, dir, label }: Ans
       {Array.from({ length: slotCount }, (_, i) => {
         const ch = letters[i] ?? '';
         const filled = ch !== '';
-        // The next empty cell pulses so players see where the letter lands.
+        // The next empty cell gets a steady bright border + glow so players see
+        // where the letter lands. Never an opacity loop: animate-pulse on the
+        // first (empty-guess) cell strobed for the whole puzzle.
         const active = state === 'idle' && !filled && i === letters.length;
         return (
           <m.span
             key={`slot-${i}`}
             data-testid="answer-slot"
+            data-active={active || undefined}
             initial={false}
             animate={
               state === 'correct'
@@ -96,8 +99,7 @@ export default function AnswerSlots({ value, slotCount, state, dir, label }: Ans
               `flex min-w-0 aspect-[5/6] ${CELL_W} ${CELL_TEXT}`,
               'items-center justify-center rounded-neo border-2 shadow-hard-sm',
               'font-neo-display font-black uppercase leading-none transition-colors duration-150',
-              filled ? styles.filled : styles.empty,
-              active ? 'animate-pulse border-neo-purple/80' : '',
+              active ? 'border-neo-cyan bg-neo-cyan/10 text-transparent' : filled ? styles.filled : styles.empty,
             ].join(' ')}
           >
             {ch}
