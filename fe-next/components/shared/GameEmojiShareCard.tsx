@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { ShareRecapCard } from '@/components/shared/ShareRecapCard';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import {
   buildShareText,
   getShareParts,
@@ -26,9 +27,9 @@ export interface GameEmojiShareCardProps {
   /** Extra content rendered inside the card (e.g. the connections outcome tiles). */
   extra?: React.ReactNode;
   /**
-   * Override the generated paste text (e.g. the connections emoji-callout grid
-   * from buildDailyBridgeGrid). The card UI never changes — only what Copy /
-   * native share put on the clipboard.
+   * Override the generated paste text (e.g. the connections chain recap from
+   * buildDailyBridgeGrid). The card UI never changes — only what Copy /
+   * native share put on the clipboard. Emoji are always stripped.
    */
   shareText?: string;
 }
@@ -48,7 +49,7 @@ function lengthBarsFor(words: string[]): Array<{ len: number; found: number; tot
 
 export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t, onShareClick, extra, shareText: shareTextOverride }) => {
   const [copied, setCopied] = useState(false);
-  const shareText = shareTextOverride ?? buildShareText(data, t);
+  const shareText = stripEmoji(shareTextOverride ?? buildShareText(data, t));
   const parts = getShareParts(data, t);
 
   const findWords = data.mode === 'classic' || data.mode === 'singleplayer' ? data.words : [];

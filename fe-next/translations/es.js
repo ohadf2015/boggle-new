@@ -17183,11 +17183,11 @@ const es = {
       "zeroSolved": "Ningún puente construido, pero ya conoces los {total}. Mañana hay set nuevo.",
       "answerKey": "Los puentes de hoy",
       "shareCallout": {
-        "perfect": "¡Cadena perfecta! ⚡ Sin fallos.",
-        "flawless": "Todos los puentes, tendidos. 🌉",
+        "perfect": "¡Cadena perfecta! Sin fallos.",
+        "flawless": "Todos los puentes, tendidos.",
         "oneAway": "¡Casi! Un puente de nada.",
         "solid": "Puentes tendidos. ¿Me superas?",
-        "tough": "Hoy tocó duro. Te toca 😤"
+        "tough": "Hoy tocó duro. Te toca"
       },
       "medal": {
         "gold": "Oro — ¡Impecable!",

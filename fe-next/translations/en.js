@@ -15086,11 +15086,11 @@ const en = {
       "zeroSolved": "No bridges built — but now you know all {total}. Fresh set tomorrow.",
       "answerKey": "Today's bridges",
       "shareCallout": {
-        "perfect": "Perfect chain! ⚡ Not one slip.",
-        "flawless": "Every bridge built. 🌉",
+        "perfect": "Perfect chain! Not one slip.",
+        "flawless": "Every bridge built.",
         "oneAway": "So close — one bridge away!",
         "solid": "Bridges built. Can you beat me?",
-        "tough": "Brutal one today. Your turn 😤"
+        "tough": "Brutal one today. Your turn"
       },
       "medal": {
         "gold": "Gold — Flawless!",

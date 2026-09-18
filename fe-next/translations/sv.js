@@ -369,11 +369,11 @@ const sv = {
       "zeroSolved": "Inga broar byggda — men nu kan du alla {total}. Nytt set imorgon.",
       "answerKey": "Dagens broar",
       "shareCallout": {
-        "perfect": "Perfekt kedja! ⚡ Inte ett snedsteg.",
-        "flawless": "Alla broar byggda. 🌉",
+        "perfect": "Perfekt kedja! Inte ett snedsteg.",
+        "flawless": "Alla broar byggda.",
         "oneAway": "Så nära — en bro kvar!",
         "solid": "Broar byggda. Slår du mig?",
-        "tough": "Brutal idag. Din tur 😤"
+        "tough": "Brutal idag. Din tur"
       },
       "medal": {
         "gold": "Guld — Felfritt!",

@@ -5,6 +5,7 @@ import type { Language } from '@/types';
 import { ShareRecapCard } from '@/components/shared/ShareRecapCard';
 import type { ShareParts } from '@/components/shared/gameShareParts';
 import { shareWithFallback } from '@/utils/shareWithFallback';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 interface WordEntry {
   word: string;
@@ -82,12 +83,12 @@ export function buildDailyShareText(
   shareUrl?: string,
 ): string {
   const parts = buildParts(puzzleNumber, score, solved, words, t);
-  return [
+  return stripEmoji([
     `LexiClash · ${parts.header}`,
     `${parts.score} ${parts.scoreLabel}`,
     parts.stats.map((s) => `${s.value} ${s.label}`).join(' · '),
     shareUrl ?? 'lexiclash.live',
-  ].join('\n');
+  ].join('\n'));
 }
 
 export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
