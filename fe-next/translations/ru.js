@@ -3582,7 +3582,12 @@ const ru = {
   "forfeit": "Сдаться",
   "wordTowerV2": {
     "cardTitle": "Башня слов v2",
-    "cardDesc": "Настоящая физика — бета"
+    "cardDesc": "Настоящая физика — бета",
+    "collapsed": "Башня рухнула!",
+    "newBest": "Новый рекорд!",
+    "plusScramble": "+{n} перемешивание",
+    "wider": "Следующий блок шире ×{n}",
+    "bestFlag": "РЕКОРД"
   },
   "wordTower": {
     "mutator": {

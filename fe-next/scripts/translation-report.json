@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6995,
+    "totalKeysInCode": 6956,
     "keyCountByLanguage": {
-      "en": 13480,
-      "es": 13784,
-      "he": 13664,
-      "ja": 13724,
-      "ru": 13519,
-      "sv": 13720
+      "en": 13441,
+      "es": 13746,
+      "he": 13651,
+      "ja": 13711,
+      "ru": 13481,
+      "sv": 13707
     },
-    "missingFromEnglish": 108,
+    "missingFromEnglish": 103,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 350,
@@ -1472,14 +1472,14 @@
         "pattern": "`teacher.classroom.timer.min${m}`",
         "type": "template_literal",
         "file": "components/education/lobby/LobbyRoundSettings.tsx",
-        "line": 116,
+        "line": 110,
         "context": "choices={TIMER_MINUTES.map((m) => ({ value: m, label: t(`teacher.classroom.timer.min${m}`) }))}"
       },
       {
         "pattern": "`teacher.classroom.minWordLength.len${len}`",
         "type": "template_literal",
         "file": "components/education/lobby/LobbyRoundSettings.tsx",
-        "line": 139,
+        "line": 133,
         "context": "label: t(`teacher.classroom.minWordLength.len${len}`),"
       },
       {
@@ -1521,21 +1521,21 @@
         "pattern": "`vocabQuiz.focus.${key}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizFocusPicker.tsx",
-        "line": 156,
+        "line": 152,
         "context": "{t(`vocabQuiz.focus.${key}`)}"
       },
       {
         "pattern": "`vocabQuiz.focus.${question.focus}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizHostView.tsx",
-        "line": 175,
+        "line": 174,
         "context": "{t(`vocabQuiz.focus.${question.focus}`)}"
       },
       {
         "pattern": "`vocabQuiz.focus.${question.focus}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizView.tsx",
-        "line": 74,
+        "line": 68,
         "context": "() => (question ? t(`vocabQuiz.focus.${question.focus}`) : ''),"
       },
       {
@@ -1745,28 +1745,28 @@
         "pattern": "`education.practice.mastery.${mastery}`",
         "type": "template_literal",
         "file": "components/practice/PracticeModeSelector.tsx",
-        "line": 230,
+        "line": 216,
         "context": "{t(`education.practice.mastery.${mastery}`) || mastery}"
       },
       {
         "pattern": "`education.vocabFocus.focus.${focus}`",
         "type": "template_literal",
         "file": "components/practice/PracticeModeSelector.tsx",
-        "line": 368,
+        "line": 354,
         "context": "{t(`education.vocabFocus.focus.${focus}`)}"
       },
       {
         "pattern": "`education.vocabFocus.instructions.${focus}`",
         "type": "template_literal",
         "file": "components/practice/PracticeModeSelector.tsx",
-        "line": 372,
+        "line": 358,
         "context": "? t(`education.vocabFocus.instructions.${focus}`)"
       },
       {
         "pattern": "`education.vocabFocus.unlock.${focus}`",
         "type": "template_literal",
         "file": "components/practice/PracticeModeSelector.tsx",
-        "line": 373,
+        "line": 359,
         "context": ": t(`education.vocabFocus.unlock.${focus}`, { min: MIN_WORDS_PER_FOCUS })}"
       },
       {
@@ -2025,14 +2025,14 @@
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 373,
+        "line": 361,
         "context": "{t(`education.vocabFocus.focus.${assignedFocus}`)}"
       },
       {
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 432,
+        "line": 409,
         "context": "{t('education.vocabFocus.startAssigned', { focus: t(`education.vocabFocus.focus.${assignedFocus}`) }"
       },
       {
@@ -2053,14 +2053,14 @@
         "pattern": "`teacher.proGate.${feature}.title`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 103,
+        "line": 93,
         "context": "{t(`teacher.proGate.${feature}.title`)}"
       },
       {
         "pattern": "`teacher.proGate.${feature}.body`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 106,
+        "line": 96,
         "context": "{t(`teacher.proGate.${feature}.body`)}"
       },
       {
@@ -2088,28 +2088,28 @@
         "pattern": "`education.vocabFocus.focus.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 280,
+        "line": 254,
         "context": "{t(`education.vocabFocus.focus.${option}`)}"
       },
       {
         "pattern": "`education.vocabFocus.instructions.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 286,
+        "line": 260,
         "context": "skill: t(`education.vocabFocus.instructions.${option}`),"
       },
       {
         "pattern": "`education.vocabFocus.unlock.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 288,
+        "line": 262,
         "context": ": t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}"
       },
       {
         "pattern": "`education.vocabFocus.focus.${practiceFocus}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentTrackingPanel.tsx",
-        "line": 87,
+        "line": 81,
         "context": "{t(`education.vocabFocus.focus.${practiceFocus}`)}"
       },
       {
@@ -2559,15 +2559,15 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 331,
-        "context": "<h3 className=\"text-sm font-bold text-neo-cyan mb-1\">{t(q)}</h3>"
+        "line": 441,
+        "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
       },
       {
         "pattern": "t(a)",
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 333,
+        "line": 443,
         "context": "{t(a)}"
       },
       {
@@ -2967,7 +2967,7 @@
         "variable": "startError",
         "type": "variable_key",
         "file": "components/education/ClassroomGameLobby.tsx",
-        "line": 363,
+        "line": 330,
         "context": "{t(startError)}"
       },
       {
@@ -3039,7 +3039,7 @@
         "variable": "pasteNoteKey",
         "type": "variable_key",
         "file": "components/education/join/JoinFlow.tsx",
-        "line": 176,
+        "line": 147,
         "context": "<p className=\"font-neo-body text-sm font-bold text-neo-lime\">{t(pasteNoteKey)}</p>"
       },
       {
@@ -4485,7 +4485,7 @@
       "usages": [
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 235
+          "line": 258
         }
       ]
     },
@@ -4513,59 +4513,6 @@
         {
           "file": "app/[locale]/PageClient.tsx",
           "line": 253
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.createdClassroom",
-      "usages": [
-        {
-          "file": "components/education/ClassroomGameLobby.tsx",
-          "line": 102
-        }
-      ]
-    },
-    {
-      "key": "education.lobby.joinTitle",
-      "usages": [
-        {
-          "file": "components/education/lobby/ClassroomLiveLobby.tsx",
-          "line": 71
-        }
-      ]
-    },
-    {
-      "key": "education.lobby.qrPlaceholder",
-      "usages": [
-        {
-          "file": "components/education/lobby/ClassroomLiveLobby.tsx",
-          "line": 87
-        }
-      ]
-    },
-    {
-      "key": "education.practice.wordcraft",
-      "usages": [
-        {
-          "file": "components/practice/PracticeHeader.tsx",
-          "line": 71
-        },
-        {
-          "file": "components/practice/PracticeModeSelector.tsx",
-          "line": 174
-        },
-        {
-          "file": "components/practice/QuickPracticeButton.tsx",
-          "line": 99
-        }
-      ]
-    },
-    {
-      "key": "education.subscription.classLimitReached",
-      "usages": [
-        {
-          "file": "components/education/ClassroomGameLobby.tsx",
-          "line": 95
         }
       ]
     },
@@ -4628,7 +4575,7 @@
       "usages": [
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 302
+          "line": 344
         }
       ]
     },
@@ -4637,16 +4584,13 @@
       "usages": [
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 292
+          "line": 334
         }
       ]
     }
   ],
   "missingByLanguage": {
     "es": [
-      "vocabQuiz.setup.treasureChests",
-      "vocabQuiz.setup.on",
-      "vocabQuiz.setup.off",
       "sealedBidLegacy.chipStack",
       "sealedBidLegacy.gameOver",
       "sealedBidLegacy.busted",
@@ -4678,7 +4622,6 @@
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
       "seo.quickPlay.ogDescription",
-      "education.classroomGame.defaultClassroomName",
       "vs.feature",
       "vs.gamesPerDay",
       "vs.multiplayer",
@@ -4707,20 +4650,6 @@
       "vs.bestFor"
     ],
     "he": [
-      "vocabQuiz.setup.treasureChests",
-      "vocabQuiz.setup.on",
-      "vocabQuiz.setup.off",
-      "vocabQuiz.treasure.prompt",
-      "vocabQuiz.treasure.chestLabel",
-      "vocabQuiz.treasure.outcome.gain",
-      "vocabQuiz.treasure.outcome.double",
-      "vocabQuiz.treasure.outcome.steal",
-      "vocabQuiz.treasure.outcome.swap",
-      "vocabQuiz.treasure.outcome.small-loss",
-      "vocabQuiz.treasure.stolenFrom",
-      "vocabQuiz.treasure.swappedWith",
-      "vocabQuiz.treasure.tickerSteal",
-      "vocabQuiz.treasure.tickerSwap",
       "sealedBidLegacy.chipStack",
       "sealedBidLegacy.gameOver",
       "sealedBidLegacy.busted",
@@ -4750,35 +4679,9 @@
       "seo.quickPlay.title",
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
-      "seo.quickPlay.ogDescription",
-      "education.results.waitingForTeacher",
-      "education.results.playAgain",
-      "education.classroomGame.defaultClassroomName",
-      "education.header.exitEducation",
-      "education.starterPacks.beginnerSpanish.name",
-      "education.starterPacks.beginnerSpanish.description",
-      "education.starterPacks.beginnerSwedish.name",
-      "education.starterPacks.beginnerSwedish.description",
-      "education.starterPacks.beginnerJapanese.name",
-      "education.starterPacks.beginnerJapanese.description",
-      "education.starterPacks.beginnerRussian.name",
-      "education.starterPacks.beginnerRussian.description"
+      "seo.quickPlay.ogDescription"
     ],
     "ja": [
-      "vocabQuiz.setup.treasureChests",
-      "vocabQuiz.setup.on",
-      "vocabQuiz.setup.off",
-      "vocabQuiz.treasure.prompt",
-      "vocabQuiz.treasure.chestLabel",
-      "vocabQuiz.treasure.outcome.gain",
-      "vocabQuiz.treasure.outcome.double",
-      "vocabQuiz.treasure.outcome.steal",
-      "vocabQuiz.treasure.outcome.swap",
-      "vocabQuiz.treasure.outcome.small-loss",
-      "vocabQuiz.treasure.stolenFrom",
-      "vocabQuiz.treasure.swappedWith",
-      "vocabQuiz.treasure.tickerSteal",
-      "vocabQuiz.treasure.tickerSwap",
       "sealedBidLegacy.chipStack",
       "sealedBidLegacy.gameOver",
       "sealedBidLegacy.busted",
@@ -4809,18 +4712,6 @@
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
       "seo.quickPlay.ogDescription",
-      "education.results.waitingForTeacher",
-      "education.results.playAgain",
-      "education.classroomGame.defaultClassroomName",
-      "education.header.exitEducation",
-      "education.starterPacks.beginnerSpanish.name",
-      "education.starterPacks.beginnerSpanish.description",
-      "education.starterPacks.beginnerSwedish.name",
-      "education.starterPacks.beginnerSwedish.description",
-      "education.starterPacks.beginnerJapanese.name",
-      "education.starterPacks.beginnerJapanese.description",
-      "education.starterPacks.beginnerRussian.name",
-      "education.starterPacks.beginnerRussian.description",
       "vs.feature",
       "vs.gamesPerDay",
       "vs.multiplayer",
@@ -4849,14 +4740,10 @@
       "vs.bestFor"
     ],
     "ru": [
-      "vocabQuiz.setup.treasureChests",
-      "vocabQuiz.setup.on",
-      "vocabQuiz.setup.off",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
-      "education.classroomGame.defaultClassroomName",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",
@@ -4866,20 +4753,6 @@
       "sealedBid.session.shareHeader"
     ],
     "sv": [
-      "vocabQuiz.setup.treasureChests",
-      "vocabQuiz.setup.on",
-      "vocabQuiz.setup.off",
-      "vocabQuiz.treasure.prompt",
-      "vocabQuiz.treasure.chestLabel",
-      "vocabQuiz.treasure.outcome.gain",
-      "vocabQuiz.treasure.outcome.double",
-      "vocabQuiz.treasure.outcome.steal",
-      "vocabQuiz.treasure.outcome.swap",
-      "vocabQuiz.treasure.outcome.small-loss",
-      "vocabQuiz.treasure.stolenFrom",
-      "vocabQuiz.treasure.swappedWith",
-      "vocabQuiz.treasure.tickerSteal",
-      "vocabQuiz.treasure.tickerSwap",
       "sealedBidLegacy.chipStack",
       "sealedBidLegacy.gameOver",
       "sealedBidLegacy.busted",
@@ -4910,18 +4783,6 @@
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
       "seo.quickPlay.ogDescription",
-      "education.results.waitingForTeacher",
-      "education.results.playAgain",
-      "education.classroomGame.defaultClassroomName",
-      "education.header.exitEducation",
-      "education.starterPacks.beginnerSpanish.name",
-      "education.starterPacks.beginnerSpanish.description",
-      "education.starterPacks.beginnerSwedish.name",
-      "education.starterPacks.beginnerSwedish.description",
-      "education.starterPacks.beginnerJapanese.name",
-      "education.starterPacks.beginnerJapanese.description",
-      "education.starterPacks.beginnerRussian.name",
-      "education.starterPacks.beginnerRussian.description",
       "vs.feature",
       "vs.gamesPerDay",
       "vs.multiplayer",
@@ -4952,7 +4813,6 @@
   },
   "keysNotInEnglish": {
     "es": [
-      "skills.xpBoost.classroomCreateFailed",
       "hostView.progressAnnouncement",
       "playerView.loadFailed",
       "howToPlay.steps.mpResults.boardCleared",
@@ -5191,8 +5051,6 @@
       "adventure.skills.goldRush.name",
       "blast.results.mpResults.boardCleared",
       "blast.tutorial.mpResults.boardCleared",
-      "blast.progress.classLimitReached",
-      "teacher.proGate.defaultClassroomName",
       "leadChange.tookTheLeadVerb",
       "leadChange.tookLeadWitty_0",
       "leadChange.tookLeadWitty_1",
@@ -5892,7 +5750,6 @@
       "student.quickStart.title",
       "student.quickStart.subtitle",
       "student.quickStart.action",
-      "education.classroomCreateFailed",
       "education.student.join.codeNotRecognised",
       "education.student.join.codePlaceholder",
       "education.student.join.nameRequired",
@@ -5940,8 +5797,6 @@
       "sealedBid.err.notInRack",
       "sealedBid.err.notWord",
       "sealedBid.yourWord",
-      "classLimitReached",
-      "tutorial.defaultClassroomName",
       "adventure.surprise.russian"
     ],
     "sv": [

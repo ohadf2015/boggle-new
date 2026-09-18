@@ -463,7 +463,12 @@ const ja = {
   },
   "wordTowerV2": {
     "cardTitle": "ワードタワー v2",
-    "cardDesc": "本物の物理演算 — ベータ版"
+    "cardDesc": "本物の物理演算 — ベータ版",
+    "collapsed": "タワー崩壊！",
+    "newBest": "自己ベスト更新！",
+    "plusScramble": "シャッフル +{n}",
+    "wider": "次のブロック幅 ×{n}",
+    "bestFlag": "ベスト"
   },
   "wordTower": {
     "mutator": {
