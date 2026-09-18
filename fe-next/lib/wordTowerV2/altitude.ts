@@ -10,8 +10,14 @@ import { WORD_TOWER_BIOMES, type WordTowerBiomeId } from '@/shared/constants/wor
  *
  * One multiplier keeps all of v1's altitude-anchored art (props, sightings,
  * milestones) usable unmodified: it all reads this number.
+ *
+ * Tuned to OBSERVED runs, not guessed: at x10 real runs (6-10m) never left the
+ * sky and 4 of 6 biomes were dead art. At x26 a ~6-block run reaches the
+ * stratosphere and a great 30-block run the galaxy — a new sky every ~5 blocks.
+ * ponytail: linear; the ceiling is parallax speed (v1 scrolls 5.2px per visual
+ * m), so a bigger multiplier needs v1's scroll rate scaled down with it.
  */
-export const VISUAL_ALT_PER_M = 10;
+export const VISUAL_ALT_PER_M = 26;
 
 export function visualAltitudeM(heightM: number): number {
   return Math.max(0, heightM) * VISUAL_ALT_PER_M;

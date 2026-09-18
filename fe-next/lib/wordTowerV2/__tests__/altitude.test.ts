@@ -26,15 +26,18 @@ describe('biomeAtHeight', () => {
     expect(biomeAtHeight(0)).toBe('city');
   });
 
-  it('given a 30-block tower, when resolved, then it has left the lower atmosphere', () => {
-    // v1 biome thresholds (50/150/300m) sit on a scale where one word was worth
-    // metres; a v2 block is ~1m. Ported literally, every run stayed in `city`
-    // forever and the whole backdrop system was invisible.
-    expect(biomeIndex(biomeAtHeight(blocksToM(30)))).toBeGreaterThanOrEqual(biomeIndex('orbit'));
+  it('given a typical first run (~6 blocks, observed 6.3m peak), when resolved, then it reached the stratosphere', () => {
+    // Pinned to OBSERVED play, not a guess: with a x10 map real runs (6-10m)
+    // only ever saw city and sky, and 4 of 6 skies were dead content.
+    expect(biomeIndex(biomeAtHeight(blocksToM(6)))).toBeGreaterThanOrEqual(biomeIndex('stratosphere'));
   });
 
-  it('given a 10-block tower, when resolved, then the sky has already changed once', () => {
-    expect(biomeIndex(biomeAtHeight(blocksToM(10)))).toBeGreaterThanOrEqual(biomeIndex('sky'));
+  it('given a great run of 30 blocks, when resolved, then the final biome', () => {
+    expect(biomeAtHeight(blocksToM(30))).toBe('galaxy');
+  });
+
+  it('given one block, when resolved, then still the city (the first change is earned)', () => {
+    expect(biomeAtHeight(blocksToM(1))).toBe('city');
   });
 
   it('given an enormous tower, when resolved, then the top biome', () => {
