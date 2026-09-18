@@ -27,4 +27,24 @@ describe('TeacherProAskBanner', () => {
     const cta = screen.getByRole('link', { name: en.teacher.subscription.upgradeNow });
     expect(cta).toHaveAttribute('href', '/en/pricing');
   });
+
+  it('does not render a dismiss control unless the caller provided one', () => {
+    renderBanner();
+    expect(screen.queryByTestId('teacher-pro-ask-dismiss')).toBeNull();
+  });
+
+  it('calls onDismiss from the dismiss button without leaving the Polar checkout link', () => {
+    const onDismiss = vi.fn();
+    render(
+      <LanguageProvider initialLanguage="en" initialTranslations={en}>
+        <TeacherProAskBanner onDismiss={onDismiss} />
+      </LanguageProvider>,
+    );
+    screen.getByTestId('teacher-pro-ask-dismiss').click();
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('link', { name: en.teacher.subscription.upgradeNow })).toHaveAttribute(
+      'href',
+      '/en/pricing',
+    );
+  });
 });
