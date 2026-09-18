@@ -1,13 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { useExperiment } from '@/hooks/useExperiment';
+import { WordTowerGame } from '@/components/wordTower/WordTowerGame';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
-
-const WordTowerV2 = dynamic(() => import('@/components/wordTowerV2/WordTowerV2'), {
-  ssr: false,
-});
 
 /**
  * Word Tower is PUBLIC — the route no longer gates anyone.
@@ -29,7 +25,7 @@ export function WordTowerPageClient() {
   return (
     <>
       <ModeCoach mode="wordTower" />
-      <WordTowerV2 />
+      <WordTowerGame />
     </>
   );
 }
