@@ -181,9 +181,13 @@ export default function TowerCanvas({
         const groundLineY = h - dock;
         const playHeight = groundLineY;
 
-        // Camera smoothly follows the settled tower height
-        const towerTopPx = snap.towerHeightM * PX_PER_M * scale;
-        const targetCameraY = Math.max(0, towerTopPx - playHeight * 0.55);
+        // The crane is always a fixed distance above the highest landed block.
+        // We track this point so the camera stays stable while blocks fall,
+        // and keeps the swinging block perfectly in frame.
+        const CRANE_CLEARANCE_PX = 230;
+        const craneVisualY = (snap.towerHeightM * PX_PER_M + CRANE_CLEARANCE_PX) * scale;
+        
+        const targetCameraY = Math.max(0, craneVisualY - playHeight * 0.55);
         cameraY += (targetCameraY - cameraY) * 0.08;
 
         scene.scale.set(scale);
