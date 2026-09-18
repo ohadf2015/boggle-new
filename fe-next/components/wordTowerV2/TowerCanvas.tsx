@@ -1,90 +1,87 @@
 'use client';
 
-import { Application, Container, Graphics, type Text } from 'pixi.js';
+import { Application, Container, Graphics } from 'pixi.js';
 import { useEffect, useRef } from 'react';
-import {
-  PX_PER_M,
-  type TowerWorld,
-  snapshotWorld,
-  stepWorld,
-} from '@/lib/wordTowerV2/engine';
-import { CRANE_ARM_PX } from '@/lib/wordTowerV2/crane';
-import { HUD_TOP_PX, frameCamera } from '@/lib/wordTowerV2/camera';
+import { PX_PER_M, type TowerWorld, snapshotWorld, stepWorld } from '@/lib/wordTowerV2/engine';
+import { CRANE_ARM_PX, CRANE_CLEARANCE_PX } from '@/lib/wordTowerV2/crane';
+import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
+import { frameCamera } from '@/lib/wordTowerV2/camera';
+import type { LandingQuality } from '@/lib/wordTowerV2/landing';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
-import { RUBBLE_BURST, COMBO_FLASH } from '@/lib/gameEngine/presets/particles';
+import { COMBO_FLASH, CONFETTI_BURST, GOLD_STARS, RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
 import {
-  BG,
   type BlockView,
+  createBestLabel,
   createBlockView,
+  createGhost,
+  paintBestLine,
   paintBlock,
   paintCrane,
-  paintDots,
+  paintDropGuide,
+  paintGhost,
   paintGround,
-  paintRuler,
+  setBlockGold,
+  tickBlock,
 } from './towerArt';
 
 /**
  * Pixi renderer + the rAF loop that drives the fixed-timestep world.
  *
+ * The canvas is TRANSPARENT: v1's DOM sky (gradient, parallax, sightings) sits
+ * behind it. Pixi owns only what physics owns — blocks, crane, ground, FX.
+ *
  * ponytail: no interpolation. Physics runs at 120Hz and displays run at 60-120Hz,
- * so there is always at least one fresh substep per frame; interpolating between
- * substeps would add a frame of latency to buy smoothness we already have.
+ * so there is always at least one fresh substep per frame.
  */
 
-const DOT_SPACING = 22;
+export type TowerFx =
+  | { kind: 'land'; id: string; quality: LandingQuality }
+  | { kind: 'gold'; id: string }
+  | { kind: 'collapse' };
 
 export interface FrameStats {
-  /** 95th percentile frame time over the last sample window, ms. */
   p95Ms: number;
   fps: number;
   bodies: number;
 }
 
+export interface GhostPreview {
+  word: string;
+  widthPx: number;
+  valid: boolean;
+}
+
 interface Props {
   world: TowerWorld;
-  /** block id -> the word that built it. */
   labels: Map<string, string>;
-  /** Measured height of the DOM control dock over the canvas bottom. */
   getDockPx: () => number;
-  /** Id of the block currently on the crane, if any. */
   getHangingId: () => string | null;
+  /** The slab being spelled (composing phase), or null. */
+  getGhost: () => GhostPreview | null;
+  /** Best height so far (metres) for the goal line, or null. */
+  getBestM: () => number | null;
+  /** Effects queued by game logic; the loop drains it every frame. */
+  fxQueue: TowerFx[];
+  bestLabel: string;
   onFrameStats?: (stats: FrameStats) => void;
-  /** Runs before each physics step — used to drive the crane. */
   onBeforeStep?: (nowMs: number) => void;
   className?: string;
 }
 
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
-  const idx = Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length));
-  return sorted[idx];
+  return sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))];
 }
 
-export default function TowerCanvas({
-  world,
-  labels,
-  getDockPx,
-  getHangingId,
-  onFrameStats,
-  onBeforeStep,
-  className,
-}: Props) {
+const FLASH_COLOUR: Partial<Record<LandingQuality, number>> = { perfect: 0xbfff00, miss: 0xff3366 };
+
+export default function TowerCanvas(props: Props) {
   const hostRef = useRef<HTMLDivElement | null>(null);
-  // Props the rAF loop reads every frame. Kept in refs so the loop is created
-  // once and never torn down by a re-render mid-run.
-  const worldRef = useRef(world);
-  const labelsRef = useRef(labels);
-  const statsRef = useRef(onFrameStats);
-  const beforeStepRef = useRef(onBeforeStep);
-  const dockRef = useRef(getDockPx);
-  const hangingRef = useRef(getHangingId);
-  worldRef.current = world;
-  labelsRef.current = labels;
-  statsRef.current = onFrameStats;
-  beforeStepRef.current = onBeforeStep;
-  dockRef.current = getDockPx;
-  hangingRef.current = getHangingId;
+  // Everything the rAF loop reads, in one ref, so the loop is created once and
+  // never torn down by a re-render mid-run.
+  const propsRef = useRef(props);
+  propsRef.current = props;
 
   useEffect(() => {
     const host = hostRef.current;
@@ -95,21 +92,21 @@ export default function TowerCanvas({
     let app: Application | null = null;
 
     const views = new Map<string, BlockView>();
-    const rulerLabels = new Map<number, Text>();
     const frameTimes: number[] = [];
     let lastStatsAt = 0;
     let cameraY = 0;
-    let dotsSize = '';
     let groundKey = '';
+    let flashAlpha = 0;
+    let flashColour = 0xffffff;
 
     void (async () => {
       const created = new Application();
       await created.init({
-        background: BG,
+        backgroundAlpha: 0,
         antialias: true,
         resizeTo: host,
-        // Capping DPR is the single biggest mobile win here: a 3x device would
-        // otherwise shade 9x the pixels for no visible gain on 34px blocks.
+        // Capping DPR is the single biggest mobile win: a 3x device would shade
+        // 9x the pixels for no visible gain on 34px blocks.
         resolution: Math.min(window.devicePixelRatio || 1, 2),
         autoDensity: true,
       });
@@ -122,15 +119,19 @@ export default function TowerCanvas({
       app = created;
       host.appendChild(created.canvas);
 
-      const dots = new Graphics();
       const scene = new Container();
-      created.stage.addChild(dots, scene);
+      const flash = new Graphics();
+      created.stage.addChild(scene, flash);
 
-      const ruler = new Graphics();
-      const ground = new Graphics();
+      const bestLine = new Graphics();
+      let bestText = propsRef.current.bestLabel;
+      let bestLabel = createBestLabel(bestText);
+      const guide = new Graphics();
       const crane = new Graphics();
       const blocks = new Container();
-      scene.addChild(ruler, crane, blocks, ground);
+      const ghost = createGhost();
+      const ground = new Graphics();
+      scene.addChild(bestLine, bestLabel, guide, crane, blocks, ghost.container, ground);
 
       const shake = new ScreenShake();
       const particles = new ParticlePool(scene);
@@ -139,33 +140,64 @@ export default function TowerCanvas({
 
       const tick = (ts: number) => {
         raf = requestAnimationFrame(tick);
+        const p = propsRef.current;
+        const world = p.world;
 
         const frameMs = ts - lastTs;
         lastTs = ts;
+        const dt = frameMs / 1000;
         frameTimes.push(frameMs);
 
-        beforeStepRef.current?.(ts);
-        stepWorld(worldRef.current, Math.min(frameMs, 100));
-        const snap = snapshotWorld(worldRef.current);
+        p.onBeforeStep?.(ts);
+        stepWorld(world, Math.min(frameMs, 100));
+        const snap = snapshotWorld(world);
+        const byId = new Map(snap.blocks.map((b) => [b.id, b]));
 
-        for (const impact of worldRef.current.pendingImpacts) {
-          // A heavy impact (speed > 4) triggers juice. Micro-vibrations (<4) are ignored.
-          if (impact.speed <= 4.0) continue;
+        for (const impact of world.pendingImpacts) {
+          // Micro-vibrations (speed <= 4) are ignored; heavy impacts get juice.
+          if (impact.speed <= 4) continue;
           shake.shake({ intensity: Math.min(12, impact.speed * 0.4), duration: 0.25, decay: 'exponential' });
-          const block = snap.blocks.find((b) => b.id === impact.id);
+          const block = byId.get(impact.id);
           if (!block) continue;
           const impactY = block.y + block.heightPx / 2;
-          particles.burst(COMBO_FLASH, block.x, impactY, 10);
-          if (impact.speed > 10.0) particles.burst(RUBBLE_BURST, block.x, impactY, 8);
+          particles.burst(TOWER_DUST, block.x, impactY, 8);
+          if (impact.speed > 10) particles.burst(RUBBLE_BURST, block.x, impactY, 8);
         }
 
-        shake.update(frameMs / 1000);
-        particles.update(frameMs / 1000);
+        for (const fx of p.fxQueue.splice(0)) {
+          if (fx.kind === 'collapse') {
+            shake.shake({ intensity: 16, duration: 0.6, decay: 'exponential' });
+            flashColour = 0xff3366;
+            flashAlpha = 0.35;
+            continue;
+          }
+          const block = byId.get(fx.id);
+          const view = views.get(fx.id);
+          if (!block) continue;
+          if (fx.kind === 'gold') {
+            if (view) setBlockGold(view);
+            particles.burst(GOLD_STARS, block.x, block.y, 20);
+            continue;
+          }
+          if (fx.quality === 'perfect') {
+            if (view) view.flash = 1;
+            particles.burst(COMBO_FLASH, block.x, block.y, 14);
+            particles.burst(CONFETTI_BURST, block.x, block.y - block.heightPx, 18);
+          }
+          const colour = FLASH_COLOUR[fx.quality];
+          if (colour !== undefined) {
+            flashColour = colour;
+            flashAlpha = fx.quality === 'perfect' ? 0.18 : 0.22;
+          }
+        }
+
+        shake.update(dt);
+        particles.update(dt);
 
         const w = created.renderer.width / created.renderer.resolution;
         const h = created.renderer.height / created.renderer.resolution;
 
-        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: dockRef.current(), towerTopM: snap.towerHeightM });
+        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: snap.towerHeightM });
         const { scale } = frame;
         cameraY += (frame.cameraY - cameraY) * 0.08;
 
@@ -173,75 +205,76 @@ export default function TowerCanvas({
         scene.x = w / 2 + shake.offset.x;
         scene.y = frame.groundScreenY + cameraY + shake.offset.y;
 
-        // Background dots scroll at a third of the camera speed — depth for free.
-        if (dotsSize !== `${w}x${h}`) {
-          dotsSize = `${w}x${h}`;
-          paintDots(dots, w, h, DOT_SPACING);
-        }
-        dots.y = (cameraY * 0.3) % DOT_SPACING;
-
         const halfW = w / 2 / scale;
         if (groundKey !== `${halfW}|${scale}`) {
           groundKey = `${halfW}|${scale}`;
           paintGround(ground, halfW + 40, scale);
         }
-        // Visible metre range: from the dock edge up to the top of the screen.
-        const bottomM = (scene.y - h) / scale / PX_PER_M;
-        const topVisibleM = scene.y / scale / PX_PER_M;
-        paintRuler(ruler, rulerLabels, scene, {
-          leftX: -halfW + 10 / scale,
-          halfW,
-          scale,
-          pxPerM: PX_PER_M,
-          fromM: Math.max(0, bottomM),
-          toM: topVisibleM,
-          topM: snap.towerHeightM,
-        });
 
-        // Ruler labels must not print through the HUD in the top-left corner.
-        for (const t of rulerLabels.values()) {
-          if (t.visible && scene.y + t.y * scale < HUD_TOP_PX) t.visible = false;
+        // Translations can land after init; rebuild the flag when its text changes.
+        if (p.bestLabel !== bestText) {
+          bestText = p.bestLabel;
+          const next = createBestLabel(bestText);
+          scene.addChildAt(next, scene.getChildIndex(bestLabel));
+          bestLabel.destroy({ children: true });
+          bestLabel = next;
         }
+        const bestM = p.getBestM();
+        paintBestLine(bestLine, bestLabel, halfW, scale, bestM && bestM > 0.5 ? -bestM * PX_PER_M : null);
 
-        const hangingId = hangingRef.current();
+        const hangingId = p.getHangingId();
         for (const block of snap.blocks) {
           let view = views.get(block.id);
           if (!view) {
-            const word = labelsRef.current.get(block.id) ?? '';
-            view = createBlockView(views.size, block.widthPx, block.heightPx, word, scale);
+            view = createBlockView(views.size, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale);
             blocks.addChild(view.container);
             views.set(block.id, view);
           }
           paintBlock(view, scale);
-          view.container.x = block.x;
-          view.container.y = block.y;
+          tickBlock(view, dt);
+          view.container.position.set(block.x, block.y);
           view.container.rotation = block.angleRad;
         }
 
-        const hanging = hangingId ? snap.blocks.find((b) => b.id === hangingId) : undefined;
-        paintCrane(
-          crane,
-          scale,
-          hanging ? { x: hanging.x, y: hanging.y, h: hanging.heightPx } : null,
-          (hanging?.y ?? 0) - CRANE_ARM_PX,
-          -snap.towerHeightM * PX_PER_M,
-        );
+        // Crane geometry: the block hangs CRANE_CLEARANCE_PX above the tower top,
+        // the pivot a full arm above that.
+        const hangY = -(snap.towerHeightM * PX_PER_M + CRANE_CLEARANCE_PX);
+        const pivotY = hangY - CRANE_ARM_PX;
+        const hanging = hangingId ? byId.get(hangingId) : undefined;
+        const ghostPreview = hanging ? null : p.getGhost();
 
-        // Settled bodies far below the camera still cost a draw call — hide what
-        // cannot be seen. Screen position, not scene-local, or the check is
-        // wrong at any scale other than 1.
+        ghost.container.visible = !!ghostPreview;
+        if (ghostPreview) {
+          paintGhost(ghost, scale, ghostPreview.word, ghostPreview.widthPx, BLOCK_HEIGHT_PX, ghostPreview.valid);
+          // A gentle idle bob so the waiting slab reads as hanging, not pasted.
+          ghost.container.position.set(0, hangY + Math.sin(ts / 420) * 2);
+        }
+
+        // Idle: an empty hook still hangs where the next slab will appear, so
+        // the crane is always on screen and the player knows where words go.
+        const idleY = hangY + Math.sin(ts / 420) * 2;
+        const hookTarget = hanging ?? { x: 0, y: ghostPreview ? ghost.container.y : idleY, heightPx: BLOCK_HEIGHT_PX };
+        paintCrane(crane, scale, halfW + 40, pivotY, { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 });
+        if (hanging) paintDropGuide(guide, scale, hanging.x, hanging.y + hanging.heightPx / 2 + 8 / scale, -snap.towerHeightM * PX_PER_M);
+        else guide.clear();
+
+        // Offscreen settled blocks still cost a draw call — hide them.
         for (const [id, view] of views) {
           const screenY = scene.y + view.container.y * scale;
           view.container.visible = screenY > -120 && screenY < h + 120;
-          if (!snap.blocks.some((b) => b.id === id)) {
+          if (!byId.has(id)) {
             view.container.destroy({ children: true });
             views.delete(id);
           }
         }
 
-        if (ts - lastStatsAt > 500 && statsRef.current) {
+        flashAlpha = Math.max(0, flashAlpha - dt * 1.6);
+        flash.clear();
+        if (flashAlpha > 0) flash.rect(0, 0, w, h).fill({ color: flashColour, alpha: flashAlpha });
+
+        if (ts - lastStatsAt > 500 && p.onFrameStats) {
           const sorted = [...frameTimes].sort((a, b) => a - b);
-          statsRef.current({
+          p.onFrameStats({
             p95Ms: Number(percentile(sorted, 95).toFixed(2)),
             fps: Math.round(1000 / (sorted.reduce((s, v) => s + v, 0) / sorted.length || 16.7)),
             bodies: snap.blocks.length,
@@ -261,5 +294,5 @@ export default function TowerCanvas({
     };
   }, []);
 
-  return <div ref={hostRef} className={className} />;
+  return <div ref={hostRef} className={props.className} />;
 }

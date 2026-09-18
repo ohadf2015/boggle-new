@@ -1,65 +1,56 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Delete, Shuffle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
-import { CRANE_CLEARANCE_PX, type CraneSwing, releaseKinematics } from '@/lib/wordTowerV2/crane';
-import {
-  PX_PER_M,
-  createTowerWorld,
-  getTowerHeightM,
-  moveAttachedBlock,
-  releaseBlock,
-  spawnBlock,
-  stepWorld,
-} from '@/lib/wordTowerV2/engine';
-import { BLOCK_HEIGHT_PX, blockWidthForWord, scoreFromHeightM } from '@/lib/wordTowerV2/scoring';
-import TowerCanvas, { type FrameStats } from './TowerCanvas';
-import { isTypingTarget } from '@/lib/dom/isTypingTarget';
-import { canBuildFromWheel, isAcceptedWord, spinWheel, usedLetterMask } from '@/lib/wordTowerV2/wheel';
-import { Delete } from 'lucide-react';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
+import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
+import { WordTowerWheel } from '@/components/wordTower/WordTowerWheel';
+import { BIOME_THEME } from '@/components/wordTower/biomeTheme';
+import { biomeAtHeight } from '@/lib/wordTowerV2/altitude';
+import { MIN_WORD_LEN, isAcceptedWord, spinWheel } from '@/lib/wordTowerV2/wheel';
+import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
+import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
+import { V2Backdrop } from './V2Backdrop';
+import { V2GameOver, V2Hud } from './V2Hud';
+import { useTowerRun } from './useTowerRun';
 
 /**
  * Word Tower v2.
  *
- * Two beats per turn: spell a word, then time the drop. The word decides how
- * WIDE the block is — long words buy a better platform rather than a number —
- * and physics decides everything after release. Nothing here can topple the
- * tower on a rule; only the simulation can.
+ * Two beats per turn: SPELL a word on the swipe wheel — the slab widens on the
+ * hook letter by letter and snaps lime when the word is real — then TIME the
+ * drop. Physics decides everything after release; the verdict, combo and
+ * surprises are read off where the block actually settled.
  */
 
-const SWING: CraneSwing = { amplitudeRad: 0.62, periodMs: 2200, phase: 0 };
-
-type Phase = 'composing' | 'swinging';
+/** Pentatonic steps: every letter rings a higher note and no pair clashes. */
+const PENTATONIC = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
 
 export default function WordTowerV2() {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
+  const { playSound } = useSoundEffects();
+  const reducedMotion = usePrefersReducedMotion();
+  const game = useTowerRun();
+  const { phase, heightM, run, hoist, drop, restart, setScrambles, previewWidth, seedDemo } = game;
 
-  const worldRef = useRef(createTowerWorld({ seed: 1 }));
-  const labelsRef = useRef(new Map<string, string>());
   const dictRef = useRef<Set<string> | null>(null);
-
   const [dictReady, setDictReady] = useState(false);
   const [dictError, setDictError] = useState(false);
+  const drawRef = useRef(0);
   const [wheel, setWheel] = useState<string[]>([]);
-  const [typed, setTyped] = useState('');
-  const [phase, setPhase] = useState<Phase>('composing');
-  const [heightM, setHeightM] = useState(0);
+  const [selected, setSelected] = useState<number[]>([]);
+  const [rejected, setRejected] = useState<string | null>(null);
   const [stats, setStats] = useState<FrameStats | null>(null);
-  const [rejected, setRejected] = useState(false);
-
-  // The hanging block, tracked outside React state: the rAF loop moves it every
-  // frame and must never trigger a re-render to do so.
-  const hangingRef = useRef<{ id: string; startedAt: number } | null>(null);
-  const droppedRef = useRef(0);
-  const seededRef = useRef(false);
-  const dockRef = useRef<HTMLDivElement | null>(null);
-  const dockPxRef = useRef(200);
   const [debug, setDebug] = useState(false);
 
-  // The canvas reserves exactly the dock's real height. A hardcoded reserve
-  // drifted as soon as the letter row wrapped, and blocks slid under the dock.
+  const dockRef = useRef<HTMLDivElement | null>(null);
+  const dockPxRef = useRef(260);
+
+  // The canvas frames the ground at the dock's real top edge.
   useEffect(() => {
     const el = dockRef.current;
     if (!el) return;
@@ -71,23 +62,20 @@ export default function WordTowerV2() {
   }, []);
 
   useEffect(() => {
-    setDebug(new URLSearchParams(window.location.search).has('debug'));
-  }, []);
+    const params = new URLSearchParams(window.location.search);
+    setDebug(params.has('debug'));
+    if (params.has('demo')) seedDemo();
+  }, [seedDemo]);
 
-  // Gameplay owns the whole screen — the global bottom nav covered the Hoist button.
+  // Gameplay owns the whole screen — the global bottom nav covered the dock.
   const setIsInGame = useHideNavigation();
   useEffect(() => {
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
 
-  const getDockPx = useCallback(() => dockPxRef.current, []);
-  const getHangingId = useCallback(() => hangingRef.current?.id ?? null, []);
-
   useEffect(() => {
     let cancelled = false;
-    // Language covers more locales than the word-craft dictionary ships; an
-    // unsupported one simply never resolves and the Hoist button stays disabled.
     setDictError(false);
     loadWordCraftDictionary(language as Parameters<typeof loadWordCraftDictionary>[0])
       .then((set) => {
@@ -96,8 +84,7 @@ export default function WordTowerV2() {
         setDictReady(true);
       })
       .catch(() => {
-        // Without this the Hoist button just stays disabled forever with no
-        // explanation — the screen reads as broken rather than as "retry me".
+        // Without this the wheel stays dead with no explanation.
         if (!cancelled) {
           setDictReady(false);
           setDictError(true);
@@ -109,242 +96,225 @@ export default function WordTowerV2() {
   }, [language]);
 
   useEffect(() => {
+    drawRef.current = 0;
     setWheel(spinWheel(language as Parameters<typeof spinWheel>[0]));
+    setSelected([]);
   }, [language]);
 
-  /**
-   * `?demo=1` builds a tower before first paint.
-   *
-   * Without it the page opens on an empty field, which makes the mode
-   * impossible to review against a screenshot of any other stacking game — the
-   * comparison would be "empty screen versus game" every time.
-   */
+  const word = useMemo(() => selected.map((i) => wheel[i]).join(''), [selected, wheel]);
+  const valid = dictReady && isAcceptedWord(word, wheel, dictRef.current);
+
+  // The slab on the hook, read by the canvas every frame.
+  const ghostRef = useRef<GhostPreview | null>(null);
+  ghostRef.current =
+    phase === 'composing' && word.length > 0 ? { word, widthPx: previewWidth(word), valid } : null;
+  const getGhost = useCallback(() => ghostRef.current, []);
+  const getDockPx = useCallback(() => dockPxRef.current, []);
+  const getHangingId = useCallback(() => game.hangingRef.current?.id ?? null, [game.hangingRef]);
+  const bestRef = useRef(game.bestM);
+  bestRef.current = game.bestM;
+  const getBestM = useCallback(() => bestRef.current, []);
+
+  // A distinct chime the moment the spelled letters become a real word.
+  const wasValid = useRef(false);
   useEffect(() => {
-    if (!new URLSearchParams(window.location.search).has('demo')) return;
-    // Seeding must be idempotent. React StrictMode double-invokes effects, which
-    // ran this twice: the block ids collided so the Map kept 8 entries while the
-    // world held 16 bodies, and the tower silently reported double height.
-    if (seededRef.current) return;
-    seededRef.current = true;
+    if (valid && !wasValid.current) playSound('matchFound', { volume: 0.45 });
+    wasValid.current = valid;
+  }, [valid, playSound]);
 
-    const world = worldRef.current;
-    const words = ['tower', 'slab', 'anchor', 'crane', 'brick', 'ledge', 'beam', 'stack'];
-
-    words.forEach((word, index) => {
-      const id = `demo-${index}`;
-      labelsRef.current.set(id, word);
-      spawnBlock(world, {
-        id,
-        // A slight alternating drift so the stack reads as hand-placed rather
-        // than as a column snapped to a grid.
-        x: (index % 2 === 0 ? 1 : -1) * index * 2.6,
-        y: -(getTowerHeightM(world) * PX_PER_M + 170),
-        widthPx: blockWidthForWord(word),
-        heightPx: BLOCK_HEIGHT_PX,
-        vx: 0,
+  const selectTile = useCallback(
+    (i: number) => {
+      if (phase !== 'composing') return;
+      setSelected((sel) => {
+        if (sel.includes(i)) return sel;
+        const step = PENTATONIC[Math.min(sel.length, PENTATONIC.length - 1)];
+        playSound('tileSelect', { rate: 2 ** (step / 12), volume: 0.5 });
+        return [...sel, i];
       });
-      for (let t = 0; t < 900; t += 16.667) stepWorld(world, 16.667);
-    });
+    },
+    [phase, playSound],
+  );
 
-    droppedRef.current = words.length;
-    setHeightM(getTowerHeightM(world));
+  const deselectTile = useCallback((i: number) => {
+    setSelected((sel) => (sel.includes(i) ? sel.slice(0, sel.indexOf(i)) : sel));
   }, []);
 
-  /** Drives the crane: the hanging block follows the swing until released. */
-  const onBeforeStep = useCallback((nowMs: number) => {
-    const hanging = hangingRef.current;
-    if (!hanging) return;
-
-    const world = worldRef.current;
-    const { x } = releaseKinematics(nowMs - hanging.startedAt, SWING, 0);
-    const y = -(getTowerHeightM(world) * PX_PER_M + CRANE_CLEARANCE_PX);
-
-    moveAttachedBlock(world, hanging.id, x, y);
-  }, []);
-
-  const submitWord = useCallback(() => {
-    const word = typed.toLowerCase();
-
+  const submit = useCallback(() => {
+    if (phase !== 'composing' || word.length === 0) return;
     if (!isAcceptedWord(word, wheel, dictRef.current)) {
-      setRejected(true);
-      window.setTimeout(() => setRejected(false), 420);
+      setRejected(word.length < MIN_WORD_LEN ? 'too_short' : 'not_in_dictionary');
+      playSound('wordRejected');
+      window.setTimeout(() => setRejected(null), 900);
+      setSelected([]);
       return;
     }
+    hoist(word);
+    setSelected([]);
+  }, [phase, word, wheel, hoist, playSound]);
 
-    const id = `b${droppedRef.current}`;
-    droppedRef.current += 1;
-    labelsRef.current.set(id, word);
-
-    spawnBlock(worldRef.current, {
-      id,
-      x: 0,
-      y: -(getTowerHeightM(worldRef.current) * PX_PER_M + CRANE_CLEARANCE_PX),
-      widthPx: blockWidthForWord(word),
-      heightPx: BLOCK_HEIGHT_PX,
-      vx: 0,
-      attached: true,
-    });
-
-    hangingRef.current = { id, startedAt: performance.now() };
-    setTyped('');
-    setPhase('swinging');
-  }, [typed, wheel]);
-
-  const drop = useCallback(() => {
-    const hanging = hangingRef.current;
-    if (!hanging) return;
-
-    const { vx, spin } = releaseKinematics(performance.now() - hanging.startedAt, SWING, 0);
-    releaseBlock(worldRef.current, hanging.id, vx, spin);
-    hangingRef.current = null;
-    setPhase('composing');
-  }, []);
+  const scramble = useCallback(() => {
+    const next = spendScramble(run);
+    if (!next || phase === 'over') return;
+    setScrambles(next);
+    drawRef.current += 1;
+    setWheel(spinWheel(language as Parameters<typeof spinWheel>[0], drawRef.current));
+    setSelected([]);
+    playSound('boardShuffle');
+  }, [run, phase, setScrambles, language, playSound]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      // Keys typed into the feedback widget (shadow root) / any input are not ours.
-      if (isTypingTarget(event)) return;
+      if (isTypingTarget(event) || phase === 'over') return;
       if (event.code === 'Space') {
         event.preventDefault();
         if (phase === 'swinging') drop();
-        else submitWord();
+        else submit();
         return;
       }
       if (phase !== 'composing') return;
-
-      if (event.key === 'Backspace') setTyped((w) => w.slice(0, -1));
-      else if (event.key === 'Enter') submitWord();
-      else if (/^[a-zA-Z]$/.test(event.key)) {
-        // Only letters still left on the wheel — the slate can never hold an unbuildable word.
-        const next = event.key.toLowerCase();
-        setTyped((w) => (canBuildFromWheel(w + next, wheel) ? w + next : w));
+      if (event.key === 'Backspace') setSelected((s) => s.slice(0, -1));
+      else if (event.key === 'Enter') submit();
+      else if (event.key.length === 1) {
+        const letter = event.key.toLowerCase();
+        const slot = wheel.findIndex((l, i) => l === letter && !selected.includes(i));
+        if (slot !== -1) selectTile(slot);
       }
     };
-
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, drop, submitWord, wheel]);
+  }, [phase, drop, submit, wheel, selected, selectTile]);
 
-  // Poll measured height for the HUD. The tower's height is whatever physics
-  // says it is, so there is no running total that can disagree with the screen.
+  // Hold the results a beat so the player watches their tower come down.
+  const [showOver, setShowOver] = useState(false);
   useEffect(() => {
-    const id = window.setInterval(() => setHeightM(getTowerHeightM(worldRef.current)), 120);
-    return () => window.clearInterval(id);
-  }, []);
+    if (phase !== 'over') {
+      setShowOver(false);
+      return;
+    }
+    const id = window.setTimeout(() => setShowOver(true), 1300);
+    return () => window.clearTimeout(id);
+  }, [phase]);
 
-  const score = useMemo(() => scoreFromHeightM(heightM), [heightM]);
-  const used = useMemo(() => usedLetterMask(typed, wheel), [typed, wheel]);
+  const biome = biomeAtHeight(heightM);
+  const score = totalScore(heightM, run.bonus);
+  const accentHex = `#${BIOME_THEME[biome].block.toString(16).padStart(6, '0')}`;
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-neo-navy">
+    <div className="relative h-dvh w-full overflow-hidden bg-neo-navy" dir={dir}>
+      <V2Backdrop heightM={heightM} groundInsetPx={dockPxRef.current} reducedMotion={reducedMotion} />
+
       <TowerCanvas
-        world={worldRef.current}
-        labels={labelsRef.current}
+        world={game.worldRef.current}
+        labels={game.labelsRef.current}
+        fxQueue={game.fxRef.current}
         getDockPx={getDockPx}
         getHangingId={getHangingId}
+        getGhost={getGhost}
+        getBestM={getBestM}
+        bestLabel={t('wordTowerV2.bestFlag')}
         onFrameStats={debug ? setStats : undefined}
-        onBeforeStep={onBeforeStep}
+        onBeforeStep={game.onBeforeStep}
         className="absolute inset-0"
       />
 
-      <div className="pointer-events-none absolute left-4 top-4 flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <div className="rounded-lg border-4 border-black bg-neo-lime px-3 py-1 font-fredoka text-2xl font-bold text-neo-navy shadow-[4px_4px_0_0_#000]">
-            {heightM.toFixed(1)}m
-          </div>
-          {/* This mode is a beta preview — say so on the screen, not just in
-              the route gate, so testers know what they are reporting on. */}
-          <div className="rounded-md border-2 border-black bg-neo-pink px-2 py-0.5 font-fredoka text-xs font-bold uppercase tracking-widest text-neo-white shadow-[3px_3px_0_0_#000]">
-            {t('common.beta', 'Beta')}
-          </div>
+      <V2Hud
+        t={t}
+        heightM={heightM}
+        score={score}
+        bestM={game.bestM}
+        combo={run.combo}
+        scrambles={run.scrambles}
+        biome={biome}
+        landing={game.landing}
+        surprise={game.surprise}
+        newBest={game.newBest}
+      />
+      {debug && stats ? (
+        <div className="absolute end-3 top-14 z-20 font-mono text-[11px] text-neo-white/70">
+          {stats.fps}fps · p95 {stats.p95Ms}ms · {stats.bodies}
         </div>
-        <div className="font-fredoka text-lg font-bold text-neo-white">{score}</div>
-        {debug && stats ? (
-          <div className="font-mono text-[11px] text-neo-white/60">
-            {stats.fps}fps · p95 {stats.p95Ms}ms · {stats.bodies}
-          </div>
-        ) : null}
-      </div>
+      ) : null}
 
-      {/* Opaque dock. The canvas reserves this height, but a tall tower still
-          extends past it — without a solid surface the blocks show through
-          between the letter buttons. */}
+      {/* Dock: a dark fade rather than a slab, so the sky reads through it. The
+          canvas frames the ground at its top edge, and its height must never
+          change between phases — the wheel morphs in place into the drop dial. */}
       <div
         ref={dockRef}
-        className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-center border-t-4 border-neo-cream bg-neo-navy px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4"
+        className="absolute inset-x-0 bottom-0 z-30 bg-gradient-to-t from-neo-navy via-neo-navy/90 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-12"
       >
-        {/* The composing controls stay mounted (just hidden) while swinging so
-            the dock never changes height between phases — the camera frames
-            off the dock, and a shrinking dock made the whole scene jump. */}
-        <div
-          className={`flex flex-col items-center gap-3 ${phase === 'swinging' ? 'invisible' : ''}`}
-          inert={phase === 'swinging'}
-        >
-            {/* Fixed-height slate so the dock (and the camera framing that
-                reads its height) does not jump on the first letter. */}
-            <div className="flex h-12 items-center gap-2">
-              <div
-                className={`flex h-12 min-w-[8rem] items-center justify-center rounded-xl border-4 border-black px-5 font-fredoka text-3xl font-bold uppercase tracking-widest text-neo-navy shadow-[4px_4px_0_0_#000] ${
-                  rejected ? 'animate-shake bg-neo-pink' : typed ? 'bg-neo-cream' : 'border-dashed border-neo-cream/40 bg-transparent shadow-none'
-                }`}
-              >
-                {typed}
-              </div>
-              {typed ? (
-                <button
-                  type="button"
-                  onClick={() => setTyped((w) => w.slice(0, -1))}
-                  aria-label={t('wordTower.hud.backspace', 'Delete')}
-                  className="flex h-12 w-12 items-center justify-center rounded-xl border-4 border-black bg-neo-cream text-neo-navy shadow-[4px_4px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_0_#000]"
-                >
-                  <Delete className="h-6 w-6" aria-hidden />
-                </button>
-              ) : null}
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-2">
-              {wheel.map((letter, index) => (
-                <button
-                  key={`${letter}-${index}`}
-                  type="button"
-                  onClick={() => setTyped((w) => w + letter)}
-                  disabled={used[index]}
-                  className="h-14 w-14 rounded-xl border-4 border-black bg-neo-cyan font-fredoka text-2xl font-bold uppercase text-neo-navy shadow-[4px_4px_0_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0_0_#000] disabled:translate-x-[2px] disabled:translate-y-[2px] disabled:bg-neo-cyan/25 disabled:shadow-none"
-                >
-                  {letter}
-                </button>
-              ))}
-            </div>
-
-            {dictError ? (
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                className="rounded-xl border-4 border-black bg-neo-red px-8 py-3 font-fredoka text-base font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#000]"
-              >
-                {t('wordTower.loadError')}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={submitWord}
-                disabled={!dictReady}
-                className="rounded-xl border-4 border-black bg-neo-lime px-8 py-3 font-fredoka text-xl font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#000] disabled:opacity-50"
-              >
-                {t('wordTowerV2.hoist', 'Hoist')}
-              </button>
-            )}
-        </div>
-        {phase === 'swinging' ? (
+        {rejected ? (
+          <div className="absolute inset-x-0 top-1 z-40 mx-auto w-fit rounded-neo border-neo border-black bg-neo-red px-3 py-1 font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-shake">
+            {t(`wordTower.error.${rejected}`)}
+          </div>
+        ) : null}
+        <div className="mx-auto grid max-w-md grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2">
           <button
             type="button"
-            onClick={drop}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-4 border-black bg-neo-pink px-16 py-5 font-fredoka text-3xl font-bold uppercase text-neo-white shadow-[6px_6px_0_0_#000] active:translate-x-[3px] active:translate-y-[3px] active:shadow-[3px_3px_0_0_#000]"
+            onClick={scramble}
+            disabled={run.scrambles === 0 || phase !== 'composing'}
+            aria-label={t('wordTower.hud.scramble')}
+            className="relative flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-purple text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none"
           >
-            {t('wordTowerV2.drop', 'Drop')}
+            <Shuffle className="h-6 w-6" aria-hidden />
+            <span className="absolute -end-2 -top-2 rounded-full border-neo border-black bg-neo-cream px-1.5 font-neo-display text-xs font-black">
+              {run.scrambles}
+            </span>
           </button>
-        ) : null}
+
+          {dictError ? (
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mx-auto rounded-neo border-neo-thick border-black bg-neo-red px-6 py-3 font-neo-display text-base font-bold uppercase text-neo-navy shadow-hard"
+            >
+              {t('wordTower.loadError')}
+            </button>
+          ) : (
+            <WordTowerWheel
+              tray={wheel.map((l) => l.toUpperCase())}
+              selected={selected}
+              word={word.toUpperCase()}
+              placing={phase === 'swinging'}
+              aimBand={game.aim}
+              canBuild={valid}
+              intensity={Math.min(1, heightM / 40)}
+              accentHex={accentHex}
+              reducedMotion={reducedMotion}
+              dir={dir}
+              t={t}
+              onSelectTile={selectTile}
+              onDeselectTile={deselectTile}
+              onSubmit={submit}
+              onDrop={drop}
+            />
+          )}
+
+          <button
+            type="button"
+            onClick={() => setSelected((s) => s.slice(0, -1))}
+            disabled={selected.length === 0 || phase !== 'composing'}
+            aria-label={t('wordTower.hud.backspace')}
+            className="flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none"
+          >
+            <Delete className="h-6 w-6" aria-hidden />
+          </button>
+        </div>
       </div>
+
+      {showOver ? (
+        <V2GameOver
+          t={t}
+          peakM={game.peakM}
+          score={totalScore(game.peakM, run.bonus)}
+          bestM={game.bestM}
+          bestCombo={run.bestCombo}
+          isBest={game.newBest || game.peakM >= game.bestM - 0.01}
+          onRestart={() => {
+            restart();
+            setSelected([]);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

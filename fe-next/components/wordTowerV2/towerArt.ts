@@ -4,13 +4,18 @@ import { Container, Graphics, Text, TextStyle } from 'pixi.js';
  * Pixi drawing for Word Tower v2. Every stroke width is divided by the scene
  * scale so borders and shadows stay a constant number of SCREEN pixels — the
  * neo-brutalist look breaks the moment a 3px border renders at 1.8px or 6px.
+ *
+ * Style follows v1's tile art: hard stepped bevel (light top band, dark bottom
+ * band), black outline, hard offset shadow. No soft gradients anywhere.
  */
 
-export const BG = 0x1a1a2e;
-const DOT = 0x2a2f52;
 const INK = 0x0b0e1c;
 const CREAM = 0xfffef0;
 const LIME = 0xbfff00;
+const GOLD = 0xffe135;
+const GOLD_SIDE = 0xb8860b;
+const CRANE_YELLOW = 0xffc629;
+const CRANE_SHADE = 0xc98a00;
 
 /** Fill + darker extrusion side, per block. Lime / pink / cyan / purple. */
 const PALETTE: Array<[number, number]> = [
@@ -23,11 +28,16 @@ const PALETTE: Array<[number, number]> = [
 export interface BlockView {
   container: Container;
   body: Graphics;
+  /** White overlay whose alpha is the landing flash (tint can only darken). */
+  glow: Graphics;
   label: Text;
   colour: [number, number];
   builtScale: number;
   w: number;
   h: number;
+  gold: boolean;
+  /** 0..1 white landing flash, decays in `tickBlock`. */
+  flash: number;
 }
 
 const labelStyle = new TextStyle({
@@ -38,19 +48,34 @@ const labelStyle = new TextStyle({
   letterSpacing: 2,
 });
 
+function fitLabel(label: Text, w: number): void {
+  label.scale.set(1);
+  const fit = (w - 16) / Math.max(1, label.width);
+  if (fit < 1) label.scale.set(fit);
+}
+
 export function createBlockView(index: number, w: number, h: number, word: string, scale: number): BlockView {
   const container = new Container();
   const body = new Graphics();
+  const glow = new Graphics();
+  glow.alpha = 0;
   const label = new Text({ text: word.toUpperCase(), style: labelStyle });
   label.anchor.set(0.5);
-  // Long words must not overflow their own slab.
-  const fit = (w - 14) / Math.max(1, label.width);
-  if (fit < 1) label.scale.set(fit);
-  container.addChild(body, label);
+  fitLabel(label, w);
+  container.addChild(body, glow, label);
 
-  const view: BlockView = { container, body, label, colour: PALETTE[index % PALETTE.length], builtScale: 0, w, h };
+  const view: BlockView = {
+    container, body, glow, label, colour: PALETTE[index % PALETTE.length], builtScale: 0, w, h, gold: false, flash: 0,
+  };
   paintBlock(view, scale);
   return view;
+}
+
+/** Turn a block gold — a surprise's payout stays visible IN the tower. */
+export function setBlockGold(view: BlockView): void {
+  view.gold = true;
+  view.colour = [GOLD, GOLD_SIDE];
+  view.builtScale = 0;
 }
 
 /** Repaint only when the scale moved enough for stroke widths to visibly drift. */
@@ -63,95 +88,164 @@ export function paintBlock(view: BlockView, scale: number): void {
   const px = (n: number) => n / scale;
   const x = -w / 2;
   const y = -h / 2;
-  const depth = px(6);
+  const depth = px(5);
 
   body.clear();
-  // Extrusion: the darker side peeking out bottom-right reads as a chunky slab.
-  body.rect(x + depth, y + depth, w, h).fill(side).stroke({ width: px(3), color: INK, alignment: 1 });
-  body.rect(x, y, w, h).fill(fill).stroke({ width: px(3), color: INK, alignment: 1 });
-  // Top highlight strip.
-  body.rect(x + px(3), y + px(3), w - px(6), px(4)).fill({ color: 0xffffff, alpha: 0.45 });
-}
-
-/** Halftone dot field, screen space. Scrolled by the caller for parallax. */
-export function paintDots(g: Graphics, w: number, h: number, spacing: number): void {
-  g.clear();
-  for (let yy = -spacing; yy < h + spacing; yy += spacing) {
-    const offset = (Math.round(yy / spacing) % 2) * (spacing / 2);
-    for (let xx = -spacing; xx < w + spacing; xx += spacing) g.circle(xx + offset, yy, 1.6);
+  // Hard offset shadow / extrusion.
+  body.rect(x + depth, y + depth, w, h).fill(INK);
+  body.rect(x, y, w, h).fill(fill);
+  // Stepped bevel: light top band, dark bottom band.
+  body.rect(x, y, w, px(5)).fill({ color: 0xffffff, alpha: 0.42 });
+  body.rect(x, y + h - px(6), w, px(6)).fill(side);
+  // Bolts at the ends read as a built slab rather than a flat label.
+  for (const bx of [x + px(8), x + w - px(8)]) {
+    body.circle(bx, 0, px(2.6)).fill({ color: INK, alpha: 0.55 });
   }
-  g.fill(DOT);
+  body.rect(x, y, w, h).stroke({ width: px(3), color: INK, alignment: 1 });
+  view.glow.clear().rect(x, y, w, h).fill(0xffffff);
+
+  if (view.gold) {
+    // Diagonal glints.
+    body.poly([x + w * 0.62, y, x + w * 0.7, y, x + w * 0.58, y + h, x + w * 0.5, y + h]).fill({ color: 0xffffff, alpha: 0.5 });
+    body.poly([x + w * 0.76, y, x + w * 0.79, y, x + w * 0.67, y + h, x + w * 0.64, y + h]).fill({ color: 0xffffff, alpha: 0.4 });
+  }
 }
 
-/** Ground slab: cream lip, ink body, hazard hatching. Scene space. */
+/** Per-frame decay of transient block effects. */
+export function tickBlock(view: BlockView, dt: number): void {
+  if (view.flash <= 0) return;
+  view.flash = Math.max(0, view.flash - dt * 3.5);
+  view.glow.alpha = view.flash * 0.85;
+}
+
+/** Ground slab: concrete footing with a lime lip, dark earth, hazard hatching. */
 export function paintGround(g: Graphics, halfW: number, scale: number): void {
   const px = (n: number) => n / scale;
   g.clear();
-  g.rect(-halfW, 0, halfW * 2, px(600)).fill(0x10101f);
+  g.rect(-halfW, 0, halfW * 2, px(900)).fill(0x141424);
+  g.rect(-halfW, px(6), halfW * 2, px(26)).fill(0x2a2a40);
   for (let x = -halfW; x < halfW; x += px(28)) {
-    g.poly([x, px(10), x + px(14), px(10), x + px(4), px(28), x - px(10), px(28)]).fill(0x24243d);
+    g.poly([x, px(10), x + px(14), px(10), x + px(4), px(28), x - px(10), px(28)]).fill({ color: GOLD, alpha: 0.22 });
   }
-  g.rect(-halfW, 0, halfW * 2, px(5)).fill(CREAM);
+  g.rect(-halfW, 0, halfW * 2, px(6)).fill(LIME);
+  g.rect(-halfW, px(6), halfW * 2, px(3)).fill(INK);
+}
+
+/** Dashed gold line + flag at the player's best height — the thing to beat. */
+export function paintBestLine(g: Graphics, label: Container, halfW: number, scale: number, y: number | null): void {
+  g.clear();
+  label.visible = y !== null;
+  if (y === null) return;
+  const px = (n: number) => n / scale;
+  for (let x = -halfW; x < halfW; x += px(18)) g.rect(x, y - px(1.5), px(10), px(3));
+  g.fill({ color: GOLD, alpha: 0.85 });
+  label.scale.set(1 / scale);
+  label.position.set(halfW - px(10), y - px(4));
+}
+
+/** Gold pill label, anchored bottom-right. Pixi v8 leaf nodes take no children, hence the wrapper. */
+export function createBestLabel(text: string): Container {
+  const t = new Text({
+    text,
+    style: { fontFamily: 'Fredoka, system-ui, sans-serif', fontSize: 13, fontWeight: '700', fill: INK, letterSpacing: 1 },
+  });
+  t.anchor.set(1, 1);
+  const pill = new Graphics();
+  pill.roundRect(-t.width - 8, -t.height - 2, t.width + 14, t.height + 4, 4).fill(GOLD).stroke({ width: 2, color: INK });
+  const wrap = new Container();
+  wrap.addChild(pill, t);
+  return wrap;
 }
 
 /**
- * Metre ruler on the left edge plus a lime line at the current tower top.
- * Labels are pooled by metre so nothing is allocated per frame.
+ * Crane: yellow truss jib across the top with a trolley at the pivot, steel
+ * cable down to a hook. Drawn every frame (cheap: a handful of rects).
  */
-export function paintRuler(
-  g: Graphics,
-  labels: Map<number, Text>,
-  parent: Container,
-  opts: { leftX: number; halfW: number; scale: number; pxPerM: number; fromM: number; toM: number; topM: number },
-): void {
-  const { leftX, halfW, scale, pxPerM, fromM, toM, topM } = opts;
-  const px = (n: number) => n / scale;
-  g.clear();
-
-  for (let m = Math.max(1, Math.floor(fromM)); m <= Math.ceil(toM); m += 1) {
-    const major = m % 5 === 0;
-    g.rect(leftX, -m * pxPerM - px(1), px(major ? 18 : 9), px(2)).fill({ color: CREAM, alpha: major ? 0.7 : 0.3 });
-    if (major && !labels.has(m)) {
-      const t = new Text({ text: `${m}m`, style: { fontFamily: 'Fredoka, system-ui, sans-serif', fontSize: 13, fontWeight: '700', fill: CREAM } });
-      t.alpha = 0.7;
-      t.anchor.set(0, 0.5);
-      parent.addChild(t);
-      labels.set(m, t);
-    }
-  }
-  for (const [m, t] of labels) {
-    t.visible = m >= fromM - 1 && m <= toM + 1;
-    t.scale.set(1 / scale);
-    t.position.set(leftX + px(22), -m * pxPerM);
-  }
-
-  if (topM > 0.2) {
-    const y = -topM * pxPerM;
-    for (let x = -halfW; x < halfW; x += px(16)) g.rect(x, y - px(1), px(8), px(2));
-    g.fill({ color: LIME, alpha: 0.55 });
-  }
-}
-
-/** Crane rope + hook to the hanging block, and a faint drop guide below it. */
 export function paintCrane(
   g: Graphics,
   scale: number,
-  hanging: { x: number; y: number; h: number } | null,
+  halfW: number,
   pivotY: number,
-  groundGuideY: number,
+  hook: { x: number; y: number } | null,
 ): void {
   const px = (n: number) => n / scale;
   g.clear();
-  if (!hanging) return;
 
-  const topY = hanging.y - hanging.h / 2;
-  g.moveTo(0, pivotY).lineTo(hanging.x, topY - px(10)).stroke({ width: px(3), color: CREAM });
-  g.rect(hanging.x - px(10), topY - px(12), px(20), px(8)).fill(CREAM).stroke({ width: px(2), color: INK });
-  g.circle(0, pivotY, px(7)).fill(CREAM).stroke({ width: px(2), color: INK });
-
-  // Dashed drop guide — where the block falls if released right now.
-  for (let y = hanging.y + hanging.h / 2 + px(8); y < groundGuideY; y += px(14)) {
-    g.rect(hanging.x - px(1), y, px(2), px(7));
+  const jibH = px(16);
+  const top = pivotY - jibH - px(6);
+  g.rect(-halfW, top, halfW * 2, jibH).fill(CRANE_YELLOW);
+  // Lattice: alternating diagonals between the chords.
+  for (let x = -halfW; x < halfW; x += px(22)) {
+    g.moveTo(x, top).lineTo(x + px(11), top + jibH).lineTo(x + px(22), top);
   }
-  g.fill({ color: CREAM, alpha: 0.25 });
+  g.stroke({ width: px(2.5), color: CRANE_SHADE });
+  g.rect(-halfW, top, halfW * 2, jibH).stroke({ width: px(3), color: INK, alignment: 1 });
+
+  // Trolley riding under the jib.
+  g.roundRect(-px(16), top + jibH, px(32), px(10), px(2)).fill(INK);
+  g.circle(-px(9), top + jibH + px(10), px(3)).fill(CREAM);
+  g.circle(px(9), top + jibH + px(10), px(3)).fill(CREAM);
+
+  if (!hook) return;
+  g.moveTo(0, top + jibH + px(10)).lineTo(hook.x, hook.y - px(10)).stroke({ width: px(3), color: INK });
+  g.moveTo(0, top + jibH + px(10)).lineTo(hook.x, hook.y - px(10)).stroke({ width: px(1.2), color: 0xcfd6e6 });
+  g.roundRect(hook.x - px(12), hook.y - px(12), px(24), px(9), px(2)).fill(CRANE_YELLOW).stroke({ width: px(2), color: INK });
+}
+
+/** Dashed drop guide straight down from the hanging block. */
+export function paintDropGuide(g: Graphics, scale: number, x: number, fromY: number, toY: number): void {
+  const px = (n: number) => n / scale;
+  g.clear();
+  for (let y = fromY; y < toY; y += px(14)) g.rect(x - px(1), y, px(2), px(7));
+  g.fill({ color: CREAM, alpha: 0.35 });
+}
+
+export interface GhostView {
+  container: Container;
+  body: Graphics;
+  label: Text;
+  key: string;
+}
+
+export function createGhost(): GhostView {
+  const container = new Container();
+  const body = new Graphics();
+  // Own style: the ghost recolours its text, which must not leak into blocks.
+  const label = new Text({ text: '', style: labelStyle.clone() });
+  label.anchor.set(0.5);
+  container.addChild(body, label);
+  return { container, body, label, key: '' };
+}
+
+/**
+ * The slab the player is spelling, hanging on the hook BEFORE it is hoisted.
+ * It widens letter by letter — the word's reward (width) is visible while it is
+ * still being typed — and snaps solid lime once the word is valid.
+ */
+export function paintGhost(ghost: GhostView, scale: number, word: string, w: number, h: number, valid: boolean): void {
+  const key = `${word}|${w}|${valid}|${scale.toFixed(2)}`;
+  if (ghost.key === key) return;
+  ghost.key = key;
+
+  const px = (n: number) => n / scale;
+  const { body, label } = ghost;
+  const x = -w / 2;
+  const y = -h / 2;
+  body.clear();
+  if (valid) {
+    body.rect(x + px(5), y + px(5), w, h).fill(INK);
+    body.rect(x, y, w, h).fill(LIME).stroke({ width: px(3), color: INK, alignment: 1 });
+  } else {
+    body.rect(x, y, w, h).fill({ color: CREAM, alpha: 0.16 });
+    for (let dx = 0; dx < w; dx += px(12)) {
+      body.rect(x + dx, y, px(6), px(3));
+      body.rect(x + dx, y + h - px(3), px(6), px(3));
+    }
+    body.rect(x, y, px(3), h);
+    body.rect(x + w - px(3), y, px(3), h);
+    body.fill({ color: CREAM, alpha: 0.85 });
+  }
+  label.text = word.toUpperCase();
+  label.style.fill = valid ? INK : CREAM;
+  fitLabel(label, w);
 }

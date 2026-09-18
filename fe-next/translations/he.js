@@ -441,7 +441,12 @@ const he = {
   },
   "wordTowerV2": {
     "cardTitle": "מגדל מילים 2",
-    "cardDesc": "פיזיקה אמיתית — גרסת בטא"
+    "cardDesc": "פיזיקה אמיתית — גרסת בטא",
+    "collapsed": "המגדל קרס!",
+    "newBest": "שיא חדש!",
+    "plusScramble": "+{n} ערבוב",
+    "wider": "הבלוק הבא רחב ×{n}",
+    "bestFlag": "שיא"
   },
   "wordTower": {
     "mutator": {

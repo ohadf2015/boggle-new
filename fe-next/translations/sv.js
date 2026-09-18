@@ -726,7 +726,12 @@ const sv = {
   },
   "wordTowerV2": {
     "cardTitle": "Ordtornet v2",
-    "cardDesc": "Äkta fysik – betaversion"
+    "cardDesc": "Äkta fysik – betaversion",
+    "collapsed": "Tornet rasade!",
+    "newBest": "Nytt rekord!",
+    "plusScramble": "+{n} blandning",
+    "wider": "Nästa block ×{n} bredare",
+    "bestFlag": "REKORD"
   },
   "wordTower": {
     "mutator": {
