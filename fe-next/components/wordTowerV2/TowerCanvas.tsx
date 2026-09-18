@@ -8,6 +8,9 @@ import {
   snapshotWorld,
   stepWorld,
 } from '@/lib/wordTowerV2/engine';
+import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
+import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
+import { RUBBLE_BURST, COMBO_FLASH } from '@/lib/gameEngine/presets/particles';
 
 /**
  * Pixi renderer + the rAF loop that drives the fixed-timestep world.
@@ -58,7 +61,7 @@ interface Props {
 interface BlockView {
   container: Container;
   body: Graphics;
-  label: Text;
+  labels: Text[];
 }
 
 function percentile(sorted: number[], p: number): number {
@@ -132,6 +135,9 @@ export default function TowerCanvas({
       const ground = new Graphics();
       scene.addChild(ground);
 
+      const shake = new ScreenShake();
+      const particles = new ParticlePool(scene);
+
       let lastTs = performance.now();
 
       const tick = (ts: number) => {
@@ -145,30 +151,53 @@ export default function TowerCanvas({
         stepWorld(worldRef.current, Math.min(frameMs, 100));
         const snap = snapshotWorld(worldRef.current);
 
+        for (const impact of worldRef.current.pendingImpacts) {
+          if (impact.speed > 0.8) {
+            shake.shake({ intensity: impact.speed * 1.5, duration: 0.3, decay: 'exponential' });
+            const block = snap.blocks.find((b) => b.id === impact.id);
+            if (block) {
+              particles.burst(COMBO_FLASH, block.x, block.y + block.heightPx / 2, 20);
+              if (impact.speed > 2.0) {
+                particles.burst(RUBBLE_BURST, block.x, block.y + block.heightPx / 2, 10);
+              }
+            }
+          }
+        }
+
+        shake.update(frameMs / 1000);
+        particles.update(frameMs / 1000);
+
         const w = created.renderer.width / created.renderer.resolution;
         const h = created.renderer.height / created.renderer.resolution;
 
         const scale = worldScale(w);
         const dock = dockHeight(h);
-        // The ground line sits just above the control dock, so the play area is
-        // everything from the top of the screen down to the wheel.
         const groundLineY = h - dock;
         const playHeight = groundLineY;
 
-        // Hold the top of the tower around 45% down the play area: enough
-        // headroom to see the swinging block, enough tower to feel the height.
-        const towerTopPx = snap.towerHeightM * PX_PER_M * scale;
-        const targetCameraY = Math.max(0, towerTopPx - playHeight * 0.55);
-        cameraY += (targetCameraY - cameraY) * 0.08;
+        let highestVisualY = snap.towerHeightM * PX_PER_M * scale;
+        // Also follow the crane's block and the falling block
+        for (const b of snap.blocks) {
+           highestVisualY = Math.max(highestVisualY, -b.y * scale);
+        }
 
-        scene.scale.set(scale);
-        scene.x = w / 2;
-        scene.y = groundLineY + cameraY;
+        const targetCameraY = Math.max(0, highestVisualY - playHeight * 0.55);
+        // Soften the spring so it sweeps smoothly after the falling block
+        cameraY += (targetCameraY - cameraY) * 0.06;
+
+        // Dynamic zoom: pull back slightly when aiming/falling to see more of the tower
+        const isActionHappening = highestVisualY > (snap.towerHeightM * PX_PER_M * scale + 50);
+        const targetZoom = isActionHappening ? scale * 0.9 : scale;
+        scene.scale.x += (targetZoom - scene.scale.x) * 0.05;
+        scene.scale.y = scene.scale.x;
+        scene.x = w / 2 + shake.offset.x;
+        scene.y = groundLineY + cameraY + shake.offset.y;
 
         ground.clear();
-        const groundW = (w * 2) / scale;
-        ground.rect(-groundW / 2, 0, groundW, 240 / scale).fill(0x0a0d1c);
-        ground.rect(-groundW / 2, 0, groundW, 6 / scale).fill(0x2a3050);
+        const currentScale = scene.scale.x;
+        const groundW = (w * 2) / currentScale;
+        ground.rect(-groundW / 2, 0, groundW, 240 / currentScale).fill(0x0a0d1c);
+        ground.rect(-groundW / 2, 0, groundW, 6 / currentScale).fill(0x2a3050);
 
         for (const block of snap.blocks) {
           let view = views.get(block.id);
@@ -178,23 +207,45 @@ export default function TowerCanvas({
             const body = new Graphics();
             const colour = COLOURS[views.size % COLOURS.length];
 
-            // Neo-brutalist: hard offset shadow, solid fill, thick dark border.
-            body
-              .rect(-block.widthPx / 2 + 5, -block.heightPx / 2 + 5, block.widthPx, block.heightPx)
-              .fill(SHADOW)
-              .rect(-block.widthPx / 2, -block.heightPx / 2, block.widthPx, block.heightPx)
-              .fill(colour)
-              .stroke({ width: 3, color: NAVY, alignment: 1 });
+            const wordStr = (labelsRef.current.get(block.id) ?? '').toUpperCase();
+            const numLetters = Math.max(1, wordStr.length);
+            const gap = 3;
+            const totalGapWidth = (numLetters - 1) * gap;
+            const letterW = (block.widthPx - totalGapWidth) / numLetters;
+            const letterH = block.heightPx;
 
-            const label = new Text({
-              text: (labelsRef.current.get(block.id) ?? '').toUpperCase(),
-              style: labelStyle,
-            });
-            label.anchor.set(0.5);
+            // Entire block shadow
+            body.rect(-block.widthPx / 2 + 5, -block.heightPx / 2 + 5, block.widthPx, block.heightPx).fill(SHADOW);
 
-            container.addChild(body, label);
+            const labels: Text[] = [];
+
+            for (let i = 0; i < numLetters; i++) {
+              const tileX = -block.widthPx / 2 + i * (letterW + gap);
+              const tileY = -block.heightPx / 2;
+
+              body.rect(tileX, tileY, letterW, letterH).fill(colour).stroke({ width: 3, color: NAVY, alignment: 1 });
+
+              // Inset highlight (top/left)
+              body.moveTo(tileX, tileY + letterH).lineTo(tileX, tileY).lineTo(tileX + letterW, tileY)
+                .stroke({ width: 4, color: 0xffffff, alpha: 0.38, alignment: 0 });
+              // Inset shadow (bottom/right)
+              body.moveTo(tileX, tileY + letterH).lineTo(tileX + letterW, tileY + letterH).lineTo(tileX + letterW, tileY)
+                .stroke({ width: 4, color: 0x000000, alpha: 0.34, alignment: 0 });
+
+              const label = new Text({
+                text: wordStr[i] ?? '',
+                style: labelStyle,
+              });
+              label.anchor.set(0.5);
+              label.x = tileX + letterW / 2;
+              label.y = tileY + letterH / 2;
+              container.addChild(label);
+              labels.push(label);
+            }
+
+            container.addChildAt(body, 0);
             scene.addChild(container);
-            view = { container, body, label };
+            view = { container, body, labels };
             views.set(block.id, view);
           }
 
@@ -207,7 +258,7 @@ export default function TowerCanvas({
         // cannot be seen. Screen position, not scene-local, or the check is
         // wrong at any scale other than 1.
         for (const [id, view] of views) {
-          const screenY = scene.y + view.container.y * scale;
+          const screenY = scene.y + view.container.y * currentScale;
           view.container.visible = screenY > -120 && screenY < h + 120;
           if (!snap.blocks.some((b) => b.id === id)) {
             view.container.destroy({ children: true });
