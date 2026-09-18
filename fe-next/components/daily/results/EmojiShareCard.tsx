@@ -18,6 +18,9 @@ export interface EmojiShareCardProps {
   words: WordEntry[];
   language: Language;
   t: (key: string) => string;
+  /** "Beat my score" link to this same puzzle. Without it a shared result
+   *  sends the friend to the homepage instead of the board they were dared on. */
+  shareUrl?: string;
 }
 
 function countByLength(words: WordEntry[]): Array<{ len: number; found: number; total: number }> {
@@ -75,13 +78,14 @@ export function buildDailyShareText(
   solved: boolean,
   words: WordEntry[],
   t: (key: string) => string,
+  shareUrl?: string,
 ): string {
   const parts = buildParts(puzzleNumber, score, solved, words, t);
   return [
     `LexiClash · ${parts.header}`,
     `${parts.score} ${parts.scoreLabel}`,
     parts.stats.map((s) => `${s.value} ${s.label}`).join(' · '),
-    'lexiclash.live',
+    shareUrl ?? 'lexiclash.live',
   ].join('\n');
 }
 
@@ -92,13 +96,14 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   words,
   language: _language,
   t,
+  shareUrl,
 }) => {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const shareText = useMemo(
-    () => buildDailyShareText(puzzleNumber, score, solved, words, t),
-    [puzzleNumber, score, solved, words, t],
+    () => buildDailyShareText(puzzleNumber, score, solved, words, t, shareUrl),
+    [puzzleNumber, score, solved, words, t, shareUrl],
   );
   const parts = useMemo(
     () => buildParts(puzzleNumber, score, solved, words, t),
@@ -118,7 +123,9 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   const handleNativeShare = useCallback(async () => {
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        await navigator.share({ text: shareText, url: 'https://lexiclash.live' });
+        // The link is already the text's last line; a separate `url` field
+        // makes some share targets paste it twice.
+        await navigator.share({ text: shareText });
       } catch {
         await handleCopy();
       }
