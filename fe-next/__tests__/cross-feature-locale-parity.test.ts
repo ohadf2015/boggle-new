@@ -42,15 +42,8 @@ const REQUIRED_KEYS: string[] = [
   // Boss mechanic tutorial
   'adventure.bosses.newMechanic',
   'adventure.bosses.tutorialGotIt',
-  // Adventure end-of-level "words you missed" panel
-  'adventure.game.missedWordsSummary',
-  'adventure.game.showLess',
-  'adventure.game.showMore',
-  'adventure.game.wordsYouMissed',
-  // Adventure level share card
-  'adventure.share.bestWord',
-  'adventure.share.perfectClear',
-  'adventure.share.wordsFound',
+  // (adventure.game "words you missed" panel + adventure.share card keys removed 2026-09-19:
+  // the adventure rebuild deleted both UIs and 808e07800 pruned the now-unreferenced keys.)
   // Async challenge card
   'asyncChallenge.recentResults',
   // Email OTP login modal
@@ -82,7 +75,6 @@ const REQUIRED_KEYS: string[] = [
 
 // Keys whose value MUST keep an interpolation placeholder in every locale.
 const PLACEHOLDER_KEYS: Record<string, string> = {
-  'adventure.game.missedWordsSummary': '{{count}}',
   'multiplayer.winStreak': '{{count}}',
   'wordHunt.categoryHint': '{{category}}',
 };
