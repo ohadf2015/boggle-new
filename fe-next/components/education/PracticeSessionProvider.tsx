@@ -369,6 +369,9 @@ export function PracticeSessionProvider({
     },
     [
       awardPracticeXp,
+      completedLessonsRef,
+      modesTriedRef,
+      uniqueWordsRef,
       streak,
       currentLevel,
       totalXp,

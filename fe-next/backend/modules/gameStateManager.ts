@@ -742,7 +742,7 @@ export {
 };
 
 // Default export for tests and legacy CommonJS-style imports
-export default {
+const gameStateManager = {
   createGame, getGame, getGameAsync, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
   addUserToGame, removeUserFromGame, removeUserBySocketId, getGameBySocketId, getUsernameBySocketId,
   getSocketIdByUsername, getUserBySocketId, updateUserSocketId, updateUsernameMapping, getGameUsers,
@@ -762,6 +762,7 @@ export default {
   persistGameState, persistGameStateNow, restoreGameFromRedis, restoreAllGamesFromRedis, getAllGameCodesFromRedis,
   initCacheInvalidation, shutdownCacheInvalidation
 };
+export default gameStateManager;
 
 // Expose game query helpers on globalThis so integration tests can access
 // the same module instance used by handlers (avoids Vitest dual-specifier issues).
