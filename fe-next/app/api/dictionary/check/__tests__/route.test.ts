@@ -37,3 +37,15 @@ describe('POST /api/dictionary/check — Japanese', () => {
     expect(await isValid('ぬぬぬぬぬ', 'ja')).toBe(false);
   });
 });
+
+describe('POST /api/dictionary/check — Russian', () => {
+  // Regression: ru fell through to an empty Set, so every Russian word was rejected here.
+  it('accepts a Russian word, including a board spelling of ё as е', async () => {
+    expect(await isValid('кот', 'ru')).toBe(true);
+    expect(await isValid('елка', 'ru')).toBe(true);
+  });
+
+  it('rejects a non-word string', async () => {
+    expect(await isValid('кттт', 'ru')).toBe(false);
+  });
+});

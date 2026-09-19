@@ -7,8 +7,7 @@ export function attemptSecret(): string {
   return process.env.ADVENTURE_ATTEMPT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 }
 
-// ponytail: ru has no server word set yet (dictionary/check returns empty) — ru players get an English board
-export const ADVENTURE_LANGS = new Set(['en', 'he', 'sv', 'es', 'ja']);
+export const ADVENTURE_LANGS = new Set(['en', 'he', 'sv', 'es', 'ja', 'ru']);
 export const adventureLang = (lang: unknown) =>
   typeof lang === 'string' && ADVENTURE_LANGS.has(lang) ? lang : 'en';
 

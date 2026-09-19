@@ -1,5 +1,6 @@
 /** Per-language dictionary membership sets for server routes (dictionary check, adventure scoring). */
 import * as fsp from 'fs/promises';
+import { isRussianWord } from './russianWordLookup';
 import * as path from 'path';
 import {
   getEnglishWordSet,
@@ -56,4 +57,14 @@ export async function loadDictionarySet(language: string): Promise<Set<string>> 
     default:
       return new Set<string>();
   }
+}
+
+/**
+ * Membership check for any supported language. Russian is too large for a Set
+ * (1.4M words), so it binary-searches the word file instead.
+ */
+export async function loadWordChecker(language: string): Promise<((word: string) => boolean) | null> {
+  if (language === 'ru') return isRussianWord;
+  const set = await loadDictionarySet(language);
+  return set.size ? (word) => set.has(word) : null;
 }

@@ -12,7 +12,7 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
-import { loadDictionarySet } from '@/lib/server/dictionarySet';
+import { loadWordChecker } from '@/lib/server/dictionarySet';
 import { verifyAttempt } from '@/lib/adventure/play/attemptToken';
 import { settleRun } from '@/lib/adventure/play/settleRun';
 import { totalStarsOf, type Completion } from '@/lib/adventure/play/progress';
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const dict = await loadDictionarySet(payload.lang);
-    if (dict.size === 0) throw new Error(`empty dictionary for ${payload.lang}`);
+    const isWord = await loadWordChecker(payload.lang);
+    if (!isWord) throw new Error(`no dictionary for ${payload.lang}`);
 
     const completions = await loadCompletions(db, user.id);
     const prev = completions.find((c) => c.world === payload.w && c.level === payload.l);
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       payload,
       words,
       now: Date.now(),
-      isWord: (w) => dict.has(w),
+      isWord,
       prevStars: prev?.stars ?? 0,
     });
     if (!result.ok) return NextResponse.json({ error: result.error }, { status: 409 });

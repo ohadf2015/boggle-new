@@ -158,7 +158,7 @@ describe('POST /api/adventure/start', () => {
     expect(res.data.language).toBe('en');
   });
 
-  it('given an unsupported language (ru), when POST is called, then falls back to en in the response', async () => {
+  it('given Russian, when POST is called, then the board is dealt in Russian', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'user-1' });
     const { db } = makeFakeDb({ level_completions: [] });
     mockCreateAdminClient.mockReturnValue(db);
@@ -166,6 +166,6 @@ describe('POST /api/adventure/start', () => {
     const res = await POST(makeRequest({ world: 1, level: 1, language: 'ru' }));
 
     expect(res.status).toBe(200);
-    expect(res.data.language).toBe('en');
+    expect(res.data.language).toBe('ru');
   });
 });

@@ -100,7 +100,7 @@ export default function AdventureView() {
 
   return (
     <div className="min-h-dvh bg-[#0f1b3d] text-neo-cream">
-      <header className="sticky top-0 z-40 flex items-center gap-2 px-4 py-2.5 bg-[#0f1b3d]/90 backdrop-blur-sm border-b-[3px] border-black">
+      <header className="sticky top-0 z-40 flex items-center gap-1.5 px-3 py-2.5 bg-[#0f1b3d]/90 backdrop-blur-sm border-b-[3px] border-black">
         {view.kind === 'world' ? (
           <button type="button" onClick={() => setView({ kind: 'map' })} aria-label={t('adventurePlay.backToMap')}
             className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000]">
@@ -112,23 +112,23 @@ export default function AdventureView() {
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </Link>
         )}
-        <h1 className="flex-1 font-neo-display text-xl font-bold truncate">
+        <h1 className="flex-1 min-w-0 font-neo-display text-lg font-bold truncate">
           {worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : t('adventurePlay.title')}
         </h1>
-        <span className="inline-flex items-center gap-1 rounded-full border-2 border-black bg-neo-yellow text-black px-2.5 py-1 font-bold tabular-nums text-sm">
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-black bg-neo-yellow text-black px-2 py-1 font-bold tabular-nums text-sm">
           <Star className="w-4 h-4 fill-black" /> {totalStars}
         </span>
         <button type="button" onClick={() => setPanel('skins')} aria-label={t('adventurePlay.skinVault')}
-          className="relative rounded-xl border-[3px] border-black bg-neo-pink text-black p-2 shadow-[3px_3px_0_#000]">
+          className="relative rounded-xl border-[3px] border-black bg-neo-pink text-black p-1.5 shadow-[3px_3px_0_#000]">
           <Palette className="w-5 h-5" />
           {skins.size > 0 && <span className="absolute -top-2 -end-2 min-w-5 h-5 px-1 rounded-full bg-neo-lime border-2 border-black text-[10px] font-bold grid place-items-center">{skins.size}</span>}
         </button>
         <button type="button" onClick={() => setPanel('collection')} aria-label={t('adventure.collection.title')}
-          className="rounded-xl border-[3px] border-black bg-neo-cyan text-black p-2 shadow-[3px_3px_0_#000]">
+          className="rounded-xl border-[3px] border-black bg-neo-cyan text-black p-1.5 shadow-[3px_3px_0_#000]">
           <Backpack className="w-5 h-5" />
         </button>
         <Link href={`/${language}/adventure/achievements`} aria-label={t('adventurePlay.achievements')}
-          className="rounded-xl border-[3px] border-black bg-neo-lime text-black p-2 shadow-[3px_3px_0_#000]">
+          className="rounded-xl border-[3px] border-black bg-neo-lime text-black p-1.5 shadow-[3px_3px_0_#000]">
           <Trophy className="w-5 h-5" />
         </Link>
       </header>

@@ -1,31 +1,24 @@
 {
   "summary": {
-    "totalKeysInCode": 6959,
+    "totalKeysInCode": 6645,
     "keyCountByLanguage": {
-      "en": 13446,
-      "es": 13751,
-      "he": 13656,
-      "ja": 13716,
-      "ru": 13486,
-      "sv": 13712
+      "en": 12778,
+      "es": 13066,
+      "he": 12988,
+      "ja": 13047,
+      "ru": 12820,
+      "sv": 13044
     },
     "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 354,
+      "templateLiterals": 337,
       "fallbackUsages": 1,
-      "variableKeys": 133
+      "variableKeys": 107
     }
   },
   "runtimeRisks": {
     "templateLiterals": [
-      {
-        "pattern": "`adventure.worlds.${currentWorldConfig.name}`",
-        "type": "template_literal",
-        "file": "app/[locale]/adventure/boss-rush/BossRushPageClient.tsx",
-        "line": 273,
-        "context": "{currentWorldConfig && t(`adventure.worlds.${currentWorldConfig.name}`)}"
-      },
       {
         "pattern": "`education.access.${key}`",
         "type": "template_literal",
@@ -398,39 +391,11 @@
         "context": "label={t(`admin.todayGames.${b.labelKey}`, b.label)}"
       },
       {
-        "pattern": "`adventure.tiles.aria.${tile.type}`",
-        "type": "template_literal",
-        "file": "components/adventure/AdventureGrid.tsx",
-        "line": 361,
-        "context": "const typeLabel = t(`adventure.tiles.aria.${tile.type}`);"
-      },
-      {
-        "pattern": "`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`",
-        "type": "template_literal",
-        "file": "components/adventure/AdventureHub.tsx",
-        "line": 121,
-        "context": "alt={t(`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`)}"
-      },
-      {
-        "pattern": "`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`",
-        "type": "template_literal",
-        "file": "components/adventure/AdventureHub.tsx",
-        "line": 155,
-        "context": "{t(`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`)}"
-      },
-      {
-        "pattern": "`adventure.worlds.${nextWorldConfig.name}`",
-        "type": "template_literal",
-        "file": "components/adventure/AdventureHub.tsx",
-        "line": 271,
-        "context": "{t(`adventure.worlds.${nextWorldConfig.name}`)} — {t('adventure.level')} {nextLevel.level}"
-      },
-      {
-        "pattern": "`adventure.worlds.${selectedWorldConfig.name}`",
+        "pattern": "`adventure.worlds.${worldCfg.name}`",
         "type": "template_literal",
         "file": "components/adventure/AdventureView.tsx",
-        "line": 446,
-        "context": "worldName={selectedWorldConfig ? t(`adventure.worlds.${selectedWorldConfig.name}`) : undefined}"
+        "line": 116,
+        "context": "{worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : t('adventurePlay.title')}"
       },
       {
         "pattern": "`adventure.collection.category.${key}`",
@@ -447,81 +412,11 @@
         "context": "{t(`adventure.collection.rarity.${item.rarity}`)}"
       },
       {
-        "pattern": "`adventure.defeatExplainer.tip.${worstObjective.type}`",
-        "type": "template_literal",
-        "file": "components/adventure/LevelCompleteContent.tsx",
-        "line": 257,
-        "context": "💡 {t(`adventure.defeatExplainer.tip.${worstObjective.type}`)}"
-      },
-      {
-        "pattern": "`adventure.worlds.mechanicHint${worldNumber}`",
-        "type": "template_literal",
-        "file": "components/adventure/LevelEntryOverlay.tsx",
-        "line": 277,
-        "context": "{t(`adventure.worlds.mechanicHint${worldNumber}`)}"
-      },
-      {
         "pattern": "`adventure.worlds.${world.name}`",
         "type": "template_literal",
         "file": "components/adventure/LevelGridHeader.tsx",
         "line": 32,
         "context": "const worldName = t(`adventure.worlds.${world.name}`) || world.name;"
-      },
-      {
-        "pattern": "`adventure.mechanic.${mechanic}`",
-        "type": "template_literal",
-        "file": "components/adventure/MechanicIndicator.tsx",
-        "line": 42,
-        "context": "{t(`adventure.mechanic.${mechanic}`)}"
-      },
-      {
-        "pattern": "`adventure.mechanics.${mechanic}`",
-        "type": "template_literal",
-        "file": "components/adventure/MechanicIndicator.tsx",
-        "line": 45,
-        "context": "{t(`adventure.mechanics.${mechanic}`)}"
-      },
-      {
-        "pattern": "adventure.mechanic.${mechanic}",
-        "file": "components/adventure/MechanicIndicator.tsx",
-        "line": 42,
-        "context": "{t(`adventure.mechanic.${mechanic}`)}",
-        "type": "template_literal"
-      },
-      {
-        "pattern": "adventure.mechanics.${mechanic}",
-        "file": "components/adventure/MechanicIndicator.tsx",
-        "line": 45,
-        "context": "{t(`adventure.mechanics.${mechanic}`)}",
-        "type": "template_literal"
-      },
-      {
-        "pattern": "`adventure.objectives.${obj.type}`",
-        "type": "template_literal",
-        "file": "components/adventure/RetryAssistModal.tsx",
-        "line": 215,
-        "context": "const label = t(`adventure.objectives.${obj.type}`);"
-      },
-      {
-        "pattern": "`adventure.runes.rarity.${def.rarity}`",
-        "type": "template_literal",
-        "file": "components/adventure/RunePanel.tsx",
-        "line": 206,
-        "context": "{t(`adventure.runes.rarity.${def.rarity}`)}"
-      },
-      {
-        "pattern": "`adventure.skills.paths.${path}`",
-        "type": "template_literal",
-        "file": "components/adventure/SkillTree/SkillPath.tsx",
-        "line": 116,
-        "context": "{t(`adventure.skills.paths.${path}`) || path}"
-      },
-      {
-        "pattern": "adventure.skills.paths.${path}",
-        "file": "components/adventure/SkillTree/SkillPath.tsx",
-        "line": 116,
-        "context": "{t(`adventure.skills.paths.${path}`) || path}",
-        "type": "template_literal"
       },
       {
         "pattern": "`adventure.worlds.${world.name}`",
@@ -534,64 +429,22 @@
         "pattern": "`adventure.worlds.${nextWorldConfig.name}`",
         "type": "template_literal",
         "file": "components/adventure/WorldMap.tsx",
-        "line": 650,
+        "line": 637,
         "context": "{t(`adventure.worlds.${nextWorldConfig.name}`)} — {t('adventure.level')} {nextLevel.level}"
       },
       {
-        "pattern": "`adventure.bosses.twist.${twistType}.name`",
+        "pattern": "`adventure.worlds.${worldCfg.name}`",
         "type": "template_literal",
-        "file": "components/adventure/boss/BossMechanicTutorial.tsx",
-        "line": 89,
-        "context": "{t(`adventure.bosses.twist.${twistType}.name`)}"
+        "file": "components/adventure/play/AdventureLevel.tsx",
+        "line": 123,
+        "context": "<div className=\"text-[11px] uppercase tracking-wider opacity-80 truncate\">{worldCfg ? t(`adventure.w"
       },
       {
-        "pattern": "`adventure.bosses.twist.${twistType}.desc`",
+        "pattern": "`adventure.worlds.${cfg.name}`",
         "type": "template_literal",
-        "file": "components/adventure/boss/BossMechanicTutorial.tsx",
-        "line": 96,
-        "context": "{t(`adventure.bosses.twist.${twistType}.desc`)}"
-      },
-      {
-        "pattern": "`adventure.bosses.twist.${twistType}.tip`",
-        "type": "template_literal",
-        "file": "components/adventure/boss/BossMechanicTutorial.tsx",
-        "line": 102,
-        "context": "💡 {t(`adventure.bosses.twist.${twistType}.tip`)}"
-      },
-      {
-        "pattern": "`adventure.worlds.${currentWorldConfig.name}`",
-        "type": "template_literal",
-        "file": "components/adventure/hooks/useAdventureGameCallbacks.ts",
-        "line": 112,
-        "context": "previousWorldName: t(`adventure.worlds.${currentWorldConfig.name}`),"
-      },
-      {
-        "pattern": "`adventure.worlds.${nextWorldConfig.name}`",
-        "type": "template_literal",
-        "file": "components/adventure/hooks/useAdventureGameCallbacks.ts",
-        "line": 114,
-        "context": "newWorldName: t(`adventure.worlds.${nextWorldConfig.name}`),"
-      },
-      {
-        "pattern": "`${mechanicKey}Desc`",
-        "type": "template_literal",
-        "file": "components/adventure/themed/ModifierBadge.tsx",
-        "line": 86,
-        "context": "{t(`${mechanicKey}Desc`, '')}"
-      },
-      {
-        "pattern": "`adventure.mechanic.${mechanic}`",
-        "type": "template_literal",
-        "file": "components/adventure/ui/GameInfoStrip.tsx",
-        "line": 87,
-        "context": "{t(`adventure.mechanic.${mechanic}`)}"
-      },
-      {
-        "pattern": "adventure.mechanic.${mechanic}",
-        "file": "components/adventure/ui/GameInfoStrip.tsx",
-        "line": 87,
-        "context": "{t(`adventure.mechanic.${mechanic}`)}",
-        "type": "template_literal"
+        "file": "components/adventure/play/SkinVault.tsx",
+        "line": 52,
+        "context": "<div className=\"mt-2 text-sm font-bold leading-tight truncate\">{cfg ? t(`adventure.worlds.${cfg.name"
       },
       {
         "pattern": "`auth.inlineSignup.${randomMessage}`",
@@ -1353,7 +1206,7 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 312,
+        "line": 321,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}"
       },
       {
@@ -1472,14 +1325,14 @@
         "pattern": "`teacher.classroom.timer.min${m}`",
         "type": "template_literal",
         "file": "components/education/lobby/LobbyRoundSettings.tsx",
-        "line": 110,
+        "line": 116,
         "context": "choices={TIMER_MINUTES.map((m) => ({ value: m, label: t(`teacher.classroom.timer.min${m}`) }))}"
       },
       {
         "pattern": "`teacher.classroom.minWordLength.len${len}`",
         "type": "template_literal",
         "file": "components/education/lobby/LobbyRoundSettings.tsx",
-        "line": 133,
+        "line": 139,
         "context": "label: t(`teacher.classroom.minWordLength.len${len}`),"
       },
       {
@@ -1521,21 +1374,21 @@
         "pattern": "`vocabQuiz.focus.${key}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizFocusPicker.tsx",
-        "line": 152,
+        "line": 156,
         "context": "{t(`vocabQuiz.focus.${key}`)}"
       },
       {
         "pattern": "`vocabQuiz.focus.${question.focus}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizHostView.tsx",
-        "line": 174,
+        "line": 183,
         "context": "{t(`vocabQuiz.focus.${question.focus}`)}"
       },
       {
         "pattern": "`vocabQuiz.focus.${question.focus}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizView.tsx",
-        "line": 68,
+        "line": 78,
         "context": "() => (question ? t(`vocabQuiz.focus.${question.focus}`) : ''),"
       },
       {
@@ -2025,14 +1878,14 @@
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 361,
+        "line": 373,
         "context": "{t(`education.vocabFocus.focus.${assignedFocus}`)}"
       },
       {
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 409,
+        "line": 432,
         "context": "{t('education.vocabFocus.startAssigned', { focus: t(`education.vocabFocus.focus.${assignedFocus}`) }"
       },
       {
@@ -2053,14 +1906,14 @@
         "pattern": "`teacher.proGate.${feature}.title`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 93,
+        "line": 103,
         "context": "{t(`teacher.proGate.${feature}.title`)}"
       },
       {
         "pattern": "`teacher.proGate.${feature}.body`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 96,
+        "line": 106,
         "context": "{t(`teacher.proGate.${feature}.body`)}"
       },
       {
@@ -2069,6 +1922,20 @@
         "file": "components/teacher/ProWelcomeCelebration.tsx",
         "line": 122,
         "context": "<span className=\"text-sm font-bold text-black\">{t(`teacher.proWelcome.perk.${key}`)}</span>"
+      },
+      {
+        "pattern": "`education.whatsNew.entries.${entry.id}.title`",
+        "type": "template_literal",
+        "file": "components/teacher/TeacherWhatsNew.tsx",
+        "line": 103,
+        "context": "{t(`education.whatsNew.entries.${entry.id}.title`)}"
+      },
+      {
+        "pattern": "`education.whatsNew.entries.${entry.id}.${key}`",
+        "type": "template_literal",
+        "file": "components/teacher/TeacherWhatsNew.tsx",
+        "line": 114,
+        "context": "{t(`education.whatsNew.entries.${entry.id}.${key}`)}"
       },
       {
         "pattern": "`teacher.lastGame.mode.${key}`",
@@ -2088,28 +1955,28 @@
         "pattern": "`education.vocabFocus.focus.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 254,
+        "line": 281,
         "context": "{t(`education.vocabFocus.focus.${option}`)}"
       },
       {
         "pattern": "`education.vocabFocus.instructions.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 260,
+        "line": 287,
         "context": "skill: t(`education.vocabFocus.instructions.${option}`),"
       },
       {
         "pattern": "`education.vocabFocus.unlock.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 262,
+        "line": 289,
         "context": ": t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}"
       },
       {
         "pattern": "`education.vocabFocus.focus.${practiceFocus}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentTrackingPanel.tsx",
-        "line": 81,
+        "line": 87,
         "context": "{t(`education.vocabFocus.focus.${practiceFocus}`)}"
       },
       {
@@ -2165,7 +2032,7 @@
         "pattern": "`wordcraft.encouragement.${encIdx}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftGameScreen.tsx",
-        "line": 627,
+        "line": 631,
         "context": "const encouragement = t(`wordcraft.encouragement.${encIdx}`);"
       },
       {
@@ -2253,11 +2120,25 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`wordcraft.run.card.${c.id}.desc`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunHUD.tsx",
+        "line": 44,
+        "context": "title={t(`wordcraft.run.card.${c.id}.desc`)}"
+      },
+      {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
         "type": "template_literal",
         "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 38,
+        "line": 48,
         "context": "{t(`wordcraft.run.card.${c.id}.name`)}"
+      },
+      {
+        "pattern": "`wordcraft.run.card.${c.id}.desc`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunHUD.tsx",
+        "line": 51,
+        "context": "{t(`wordcraft.run.card.${c.id}.desc`)}"
       },
       {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
@@ -2389,28 +2270,28 @@
         "pattern": "`wordTower.crane.${verdict.quality}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Hud.tsx",
-        "line": 109,
+        "line": 121,
         "context": "{t(`wordTower.crane.${verdict.quality}`)}"
       },
       {
         "pattern": "`wordTower.surprise.${TOWER_SURPRISE_META[pop.event].key}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Hud.tsx",
-        "line": 121,
+        "line": 133,
         "context": "{t(`wordTower.surprise.${TOWER_SURPRISE_META[pop.event].key}`)}"
       },
       {
         "pattern": "`wordTower.biome.${zoneShown.id}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Hud.tsx",
-        "line": 141,
+        "line": 153,
         "context": "<span className=\"font-neo-display text-2xl font-black\">{t(`wordTower.biome.${zoneShown.id}`)}</span>"
       },
       {
         "pattern": "`wordTower.error.${rejected}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/WordTowerV2.tsx",
-        "line": 256,
+        "line": 293,
         "context": "{t(`wordTower.error.${rejected}`)}"
       },
       {
@@ -2555,7 +2436,7 @@
         "variable": "CLASSROOM_ROOM_GONE_KEY",
         "type": "variable_key",
         "file": "app/[locale]/multiplayer/PageClient.tsx",
-        "line": 277,
+        "line": 278,
         "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });"
       },
       {
@@ -2587,15 +2468,15 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 441,
-        "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
+        "line": 331,
+        "context": "<h3 className=\"text-sm font-bold text-neo-cyan mb-1\">{t(q)}</h3>"
       },
       {
         "pattern": "t(a)",
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 443,
+        "line": 333,
         "context": "{t(a)}"
       },
       {
@@ -2615,212 +2496,12 @@
         "context": "{t(labelKey) || stat.mode}"
       },
       {
-        "pattern": "t(translationKey)",
-        "variable": "translationKey",
+        "pattern": "t(taunt)",
+        "variable": "taunt",
         "type": "variable_key",
-        "file": "components/adventure/AdventureObjectives.tsx",
-        "line": 148,
-        "context": "const label = t(translationKey, { target: objective.target });"
-      },
-      {
-        "pattern": "t(currentTaunt)",
-        "variable": "currentTaunt",
-        "type": "variable_key",
-        "file": "components/adventure/BossDialogue.tsx",
-        "line": 62,
-        "context": "const translatedTaunt = t(currentTaunt) || currentTaunt;"
-      },
-      {
-        "pattern": "t(currentTaunt)",
-        "variable": "currentTaunt",
-        "file": "components/adventure/BossDialogue.tsx",
-        "line": 62,
-        "context": "const translatedTaunt = t(currentTaunt) || currentTaunt;",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(bossName)",
-        "variable": "bossName",
-        "type": "variable_key",
-        "file": "components/adventure/BossHPBar.tsx",
-        "line": 63,
-        "context": "aria-label={`${t(bossName)} health: ${hpPercentage}%`}"
-      },
-      {
-        "pattern": "t(bossName)",
-        "variable": "bossName",
-        "type": "variable_key",
-        "file": "components/adventure/BossHPBar.tsx",
-        "line": 69,
-        "context": "{t(bossName)}"
-      },
-      {
-        "pattern": "t(translationKey)",
-        "variable": "translationKey",
-        "type": "variable_key",
-        "file": "components/adventure/HintMessage.tsx",
-        "line": 50,
-        "context": "{t(translationKey, params)}"
-      },
-      {
-        "pattern": "t(key)",
-        "variable": "key",
-        "type": "variable_key",
-        "file": "components/adventure/LevelPreviewCard.tsx",
-        "line": 253,
-        "context": "{t(key)}"
-      },
-      {
-        "pattern": "t(messageKey)",
-        "variable": "messageKey",
-        "type": "variable_key",
-        "file": "components/adventure/LexiReaction.tsx",
-        "line": 152,
-        "context": "const message = t(messageKey);"
-      },
-      {
-        "pattern": "t(defaultKey)",
-        "variable": "defaultKey",
-        "type": "variable_key",
-        "file": "components/adventure/LexiReaction.tsx",
-        "line": 159,
-        "context": "const defaultMessage = t(defaultKey);"
-      },
-      {
-        "pattern": "t(key)",
-        "variable": "key",
-        "type": "variable_key",
-        "file": "components/adventure/NextLevelPreview.tsx",
-        "line": 62,
-        "context": "<span>{t(key)}</span>"
-      },
-      {
-        "pattern": "t(dialogueKey)",
-        "variable": "dialogueKey",
-        "type": "variable_key",
-        "file": "components/adventure/StoryBeatCard.tsx",
-        "line": 26,
-        "context": "const fullText = t(dialogueKey);"
-      },
-      {
-        "pattern": "t(mechanicName)",
-        "variable": "mechanicName",
-        "type": "variable_key",
-        "file": "components/adventure/boss/BossMechanicWidget.tsx",
+        "file": "components/adventure/play/BossPanel.tsx",
         "line": 72,
-        "context": "{t(mechanicName) || mechanicName}"
-      },
-      {
-        "pattern": "t(currentTaunt)",
-        "variable": "currentTaunt",
-        "type": "variable_key",
-        "file": "components/adventure/boss/BossOverlay.tsx",
-        "line": 565,
-        "context": "dialogue={t(currentTaunt)}"
-      },
-      {
-        "pattern": "t(hintKey)",
-        "variable": "hintKey",
-        "type": "variable_key",
-        "file": "components/adventure/boss/ParryPrompt.tsx",
-        "line": 65,
-        "context": "{t(hintKey)}"
-      },
-      {
-        "pattern": "t(labelKey)",
-        "variable": "labelKey",
-        "type": "variable_key",
-        "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 144,
-        "context": "aria-label={t(labelKey)}"
-      },
-      {
-        "pattern": "t(bossName)",
-        "variable": "bossName",
-        "type": "variable_key",
-        "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 331,
-        "context": "{t(bossName) || bossName}"
-      },
-      {
-        "pattern": "t(bossName)",
-        "variable": "bossName",
-        "type": "variable_key",
-        "file": "components/adventure/boss/SegmentedHPBar.tsx",
-        "line": 363,
-        "context": "aria-label={t('adventure.hpBar.healthLabel', { bossName: t(bossName) || bossName, percentage: hpPerc"
-      },
-      {
-        "pattern": "t(labelKey)",
-        "variable": "labelKey",
-        "type": "variable_key",
-        "file": "components/adventure/boss/WeaknessBadge.tsx",
-        "line": 29,
-        "context": "aria-label={`${t('adventure.boss.combat.weakLabel')}: ${t(labelKey)}`}"
-      },
-      {
-        "pattern": "t(labelKey)",
-        "variable": "labelKey",
-        "type": "variable_key",
-        "file": "components/adventure/boss/WeaknessBadge.tsx",
-        "line": 33,
-        "context": "{t(labelKey)}"
-      },
-      {
-        "pattern": "t(label)",
-        "variable": "label",
-        "type": "variable_key",
-        "file": "components/adventure/power-ups/PowerUpButton.tsx",
-        "line": 69,
-        "context": "const ariaLabel = `${t(label)} - ${"
-      },
-      {
-        "pattern": "t(label)",
-        "variable": "label",
-        "type": "variable_key",
-        "file": "components/adventure/power-ups/PowerUpButton.tsx",
-        "line": 113,
-        "context": "label={t(label)}"
-      },
-      {
-        "pattern": "t(mechanicKey)",
-        "variable": "mechanicKey",
-        "type": "variable_key",
-        "file": "components/adventure/themed/ModifierBadge.tsx",
-        "line": 80,
-        "context": "{t(mechanicKey) || mechanic}"
-      },
-      {
-        "pattern": "t(mechanicKey)",
-        "variable": "mechanicKey",
-        "type": "variable_key",
-        "file": "components/adventure/themed/ModifierBadge.tsx",
-        "line": 97,
-        "context": "{t(mechanicKey) || mechanic}"
-      },
-      {
-        "pattern": "t(mechanicKey)",
-        "variable": "mechanicKey",
-        "file": "components/adventure/themed/ModifierBadge.tsx",
-        "line": 80,
-        "context": "{t(mechanicKey) || mechanic}",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(mechanicKey)",
-        "variable": "mechanicKey",
-        "file": "components/adventure/themed/ModifierBadge.tsx",
-        "line": 97,
-        "context": "{t(mechanicKey) || mechanic}",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(modeDisplayKey)",
-        "variable": "modeDisplayKey",
-        "type": "variable_key",
-        "file": "components/adventure/ui/GameHeader.tsx",
-        "line": 151,
-        "context": "{t(modeDisplayKey)}"
+        "context": "{t(taunt, { requirement: t('adventurePlay.longerWords') })}"
       },
       {
         "pattern": "t(subtitleKey)",
@@ -2995,7 +2676,7 @@
         "variable": "startError",
         "type": "variable_key",
         "file": "components/education/ClassroomGameLobby.tsx",
-        "line": 330,
+        "line": 363,
         "context": "{t(startError)}"
       },
       {
@@ -3067,7 +2748,7 @@
         "variable": "pasteNoteKey",
         "type": "variable_key",
         "file": "components/education/join/JoinFlow.tsx",
-        "line": 147,
+        "line": 176,
         "context": "<p className=\"font-neo-body text-sm font-bold text-neo-lime\">{t(pasteNoteKey)}</p>"
       },
       {
@@ -3509,14 +3190,6 @@
         "file": "host/components/tv-results/TvResultsPlayerSpotlight.tsx",
         "line": 152,
         "context": "{t(quip)}"
-      },
-      {
-        "pattern": "t(key)",
-        "variable": "key",
-        "type": "variable_key",
-        "file": "lib/adventure/objectiveProgress.ts",
-        "line": 36,
-        "context": "return t(key, { target: objective.target });"
       },
       {
         "pattern": "t(defaultKey)",
@@ -4814,6 +4487,7 @@
   },
   "keysNotInEnglish": {
     "es": [
+      "skills.xpBoost.classroomCreateFailed",
       "hostView.progressAnnouncement",
       "playerView.loadFailed",
       "howToPlay.steps.mpResults.boardCleared",
@@ -5030,28 +4704,10 @@
       "admin.moderation.cheatSignals",
       "admin.moderation.flaggedPlayers",
       "admin.moderation.noFlags",
-      "adventure.mastery.title",
-      "adventure.mastery.tier.none",
-      "adventure.mastery.progress",
-      "adventure.mastery.bonusUnlocked",
-      "adventure.mastery.nextTier",
-      "adventure.achievements.cinematic.unlocked",
-      "adventure.achievements.cinematic.gold",
-      "adventure.achievements.cinematic.platinum",
-      "adventure.skills.available",
-      "adventure.skills.powerStrike.name",
-      "adventure.skills.longWordMastery.name",
-      "adventure.skills.devastatingBlow.name",
-      "adventure.skills.comboStarter.name",
-      "adventure.skills.chainReaction.name",
-      "adventure.skills.comboMaster.name",
-      "adventure.skills.quickCharge.name",
-      "adventure.skills.powerUpSlot.name",
-      "adventure.skills.hintMaster.name",
-      "adventure.skills.xpBoost.name",
-      "adventure.skills.goldRush.name",
       "blast.results.mpResults.boardCleared",
       "blast.tutorial.mpResults.boardCleared",
+      "blast.progress.classLimitReached",
+      "teacher.proGate.defaultClassroomName",
       "leadChange.tookTheLeadVerb",
       "leadChange.tookLeadWitty_0",
       "leadChange.tookLeadWitty_1",
@@ -5629,7 +5285,6 @@
       "admin.moderation.cheatSignals",
       "admin.moderation.flaggedPlayers",
       "admin.moderation.noFlags",
-      "adventure.gestureTutorial",
       "blast.results.mpResults.boardCleared",
       "blast.tutorial.mpResults.boardCleared",
       "student.quickStart.title",
@@ -5751,6 +5406,7 @@
       "student.quickStart.title",
       "student.quickStart.subtitle",
       "student.quickStart.action",
+      "education.classroomCreateFailed",
       "education.student.join.codeNotRecognised",
       "education.student.join.codePlaceholder",
       "education.student.join.nameRequired",
@@ -5798,7 +5454,8 @@
       "sealedBid.err.notInRack",
       "sealedBid.err.notWord",
       "sealedBid.yourWord",
-      "adventure.surprise.russian"
+      "classLimitReached",
+      "tutorial.defaultClassroomName"
     ],
     "sv": [
       "leadChange.tookTheLeadVerb",

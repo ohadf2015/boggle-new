@@ -28,6 +28,10 @@ vi.mock('@/utils/supabase/admin', () => ({
 const mockLoadDictionarySet = vi.fn();
 vi.mock('@/lib/server/dictionarySet', () => ({
   loadDictionarySet: (...args: unknown[]) => mockLoadDictionarySet(...args),
+  loadWordChecker: async (lang: string) => {
+    const set: Set<string> = await mockLoadDictionarySet(lang);
+    return set.size ? (w: string) => set.has(w) : null;
+  },
 }));
 
 const mockCaptureApiError = vi.fn();

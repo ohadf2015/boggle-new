@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { loadDictionarySet } from '@/lib/server/dictionarySet';
+import { loadWordChecker } from '@/lib/server/dictionarySet';
 
 export const runtime = 'nodejs';
 
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     const lang = language || 'en';
-    if (!['en', 'es', 'he', 'sv', 'ja'].includes(lang)) {
+    if (!['en', 'es', 'he', 'sv', 'ja', 'ru'].includes(lang)) {
       return NextResponse.json({ isValid: false, error: 'Invalid language' }, { status: 400 });
     }
 
@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ isValid: false });
     }
 
-    const dictionary = await loadDictionarySet(lang);
-    const isValid = dictionary.has(normalizedWord);
+    const isWord = await loadWordChecker(lang);
+    const isValid = isWord ? isWord(normalizedWord) : false;
 
     return NextResponse.json(
       { isValid, source: 'dictionary' },
