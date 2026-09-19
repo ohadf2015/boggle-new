@@ -19,8 +19,10 @@
  *     re-embeds the same stored lesson words (gameStartHandler always
  *     regenerates a classroom board from classroomGame.vocabularyWords). So
  *     "same list, same code" is literal, not a hopeful label.
- * The seven ways to send missed words home deliberately do NOT appear here —
- * a wall projector is read, not tapped; those live on the teacher's own device.
+ *  4. ReteachActions — the host is forced onto this wall (`hostLeavesProjectorRecap`)
+ *     and never mounts ClassroomResultsCard, so re-teach / share / assign live
+ *     here too. Same `useReteachLinks` + `stageReteachLessonData` as the phone
+ *     card; the disclosure stays collapsed so the wall still fits.
  *
  * Everything is server-built (`ClassroomSummary`), so the projector, the
  * teacher's laptop and every student phone celebrate the same three names.
@@ -51,8 +53,11 @@ import { isRevealed, sweepReached } from '@/lib/education/roundEndStage';
 import { classSwept } from '@/lib/education/roundEndSweep';
 import { sessionKeyFor } from '@/lib/education/roundEndHistory';
 import { podiumWithoutHost } from '@/lib/education/roundEndPodium';
+import { stageReteachLessonData } from '@/lib/education/classroomGameHandoff';
 import { useSessionRoundHistory } from '@/hooks/useSessionRoundHistory';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
+import { ReteachActions } from './ReteachActions';
+import { useReteachLinks } from './useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { trackResultsAction } from './trackResultsAction';
 
@@ -64,6 +69,14 @@ export interface ClassroomTvResultsProps {
 }
 
 export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResultsProps) {
+  // This screen IS the teacher's results page. `isTeacher: true` so the same
+  // link builders the phone card uses actually produce hrefs (they gate on it).
+  const links = useReteachLinks(summary, true);
+  const handleReteach = () => {
+    if (!stageReteachLessonData(summary)) return;
+    window.location.reload();
+  };
+
   // `neverPlacedWords` is a subset of `missedWords`: lesson words the board
   // generator never embedded. Absent means "we cannot tell" — then every miss
   // reads as a miss. Never treat an unknown source as proof.
@@ -216,25 +229,33 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
             />
           </section>
 
-          {onRematch && (
+          {onRematch || summary.missedWords.length > 0 ? (
             <div className="shrink-0 flex flex-col gap-2">
-              <button
-                type="button"
-                data-testid="classroom-tv-rematch"
-                onClick={() => {
-                  trackResultsAction('rematch', 'projector');
-                  onRematch();
-                }}
-                className={cn(
-                  'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4',
-                  'font-neo-display font-bold text-2xl md:text-3xl',
-                  'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
-                  'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
-                )}
-              >
-                <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />
-                {t('education.results.rematch')}
-              </button>
+              {onRematch && (
+                <button
+                  type="button"
+                  data-testid="classroom-tv-rematch"
+                  onClick={() => {
+                    trackResultsAction('rematch', 'projector');
+                    onRematch();
+                  }}
+                  className={cn(
+                    'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4',
+                    'font-neo-display font-bold text-2xl md:text-3xl',
+                    'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
+                    'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                  )}
+                >
+                  <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />
+                  {t('education.results.rematch')}
+                </button>
+              )}
+
+              {summary.missedWords.length > 0 && (
+                <div data-testid="classroom-tv-reteach">
+                  <ReteachActions links={links} onReteach={handleReteach} t={t} />
+                </div>
+              )}
 
               {/* Momentum, not decoration: a room that can see it is on round
                   three plays round four. Both chips are silent in round one. */}
@@ -260,7 +281,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
                 </div>
               )}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

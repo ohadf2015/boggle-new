@@ -38,6 +38,14 @@ vi.mock('@/lib/education/roundEndSound', () => ({
   CLASS_SWEEP_SOUND: '/sounds/education-class-sweep.mp3',
 }));
 
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    language: 'en',
+    t: (key: string, params?: Record<string, string | number>) =>
+      params ? `${key}:${JSON.stringify(params)}` : key,
+  }),
+}));
+
 import { ClassroomTvResults } from '../ClassroomTvResults';
 import { WordCoverageGlance } from '../WordCoverageGlance';
 import type { ClassroomSummary } from '@/shared/types/classroom';
