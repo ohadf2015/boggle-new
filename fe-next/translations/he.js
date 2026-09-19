@@ -12471,6 +12471,15 @@ const he = {
       "regionLabel": "מצב הכיתה {{classroom}}",
       "switcherLabel": "איזו כיתה"
     },
+    "activation": {
+      "shareTitle": "התלמידים מצטרפים עם הקישור הזה",
+      "shareBody": "שתפו את הקוד או את הקישור. בלי חשבון — בוחרים שם ונרשמים לרשימת הכיתה.",
+      "copyLink": "העתיקו קישור הצטרפות",
+      "share": "שיתוף",
+      "firstAssignmentTitle": "צרו את המטלה הראשונה",
+      "firstAssignmentBody": "יש תלמידים ברשימה. שייכו תרגול כדי שיהיה להם מה לעשות כשאתם לא בשידור חי.",
+      "firstAssignmentCta": "צרו מטלה ראשונה"
+    },
     "playNow": {
       "recommended": "מומלץ",
       "title": "משחקים עכשיו",

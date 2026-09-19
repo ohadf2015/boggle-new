@@ -12617,6 +12617,15 @@ const ja = {
       "regionLabel": "{{classroom}}のクラス状況",
       "switcherLabel": "どのクラス"
     },
+    "activation": {
+      "shareTitle": "生徒はこのリンクで参加します",
+      "shareBody": "コードかリンクを共有してください。アカウントは不要 — 名前を選ぶだけで名簿に入ります。",
+      "copyLink": "参加リンクをコピー",
+      "share": "共有",
+      "firstAssignmentTitle": "最初の課題を作る",
+      "firstAssignmentBody": "名簿に生徒がいます。ライブ中でないときも取り組める練習課題を出しましょう。",
+      "firstAssignmentCta": "最初の課題を作成"
+    },
     "playNow": {
       "recommended": "おすすめ",
       "title": "いますぐプレイ",

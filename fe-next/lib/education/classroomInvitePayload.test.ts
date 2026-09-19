@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { classroomInvitePayload } from './classroomInvitePayload';
+import { classroomInvitePayload, classroomJoinUrl } from './classroomInvitePayload';
 
 /**
  * COPY CODE handed students a code with no destination.
@@ -27,5 +27,19 @@ describe('classroomInvitePayload', () => {
 
   it('still yields the code when there is no origin to build a link from', () => {
     expect(classroomInvitePayload('', 'en', 'C7ESL5')).toBe('C7ESL5');
+  });
+});
+
+describe('classroomJoinUrl', () => {
+  it('is the roster join page, not a live-game room', () => {
+    expect(classroomJoinUrl('https://www.lexiclash.live', 'he', 'C7ESL5')).toBe(
+      'https://www.lexiclash.live/he/join/C7ESL5',
+    );
+  });
+
+  it('does not double a trailing slash on the origin', () => {
+    expect(classroomJoinUrl('https://www.lexiclash.live/', 'en', 'ABC123')).toBe(
+      'https://www.lexiclash.live/en/join/ABC123',
+    );
   });
 });

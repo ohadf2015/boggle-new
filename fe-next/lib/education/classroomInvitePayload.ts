@@ -6,11 +6,17 @@
  * else — and the only page that accepts it, /[locale]/join/[code], is not
  * guessable. The bare domain has no code box at all. Carry the destination.
  */
+/** The page a student opens to join this classroom's roster. */
+export function classroomJoinUrl(origin: string, language: string, code: string): string {
+  const base = origin.replace(/\/$/, '');
+  return `${base}/${language}/join/${code}`;
+}
+
 export function classroomInvitePayload(
   origin: string,
   language: string,
   code: string
 ): string {
   if (!origin) return code;
-  return `${code}\n${origin}/${language}/join/${code}`;
+  return `${code}\n${classroomJoinUrl(origin, language, code)}`;
 }
