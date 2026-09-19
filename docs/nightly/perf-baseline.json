@@ -1,28 +1,29 @@
 {
-  "date": "2026-09-16",
-  "note": "Brief's top item (/en/multiplayer?quickPlay=true LCP 104760ms) and the 4 other frontend LCP items are per-URL (query-string-specific) single-session outliers -- re-queried live PostHog grouped by bare pathname: /en/multiplayer n=46, /en n=39, /en/teacher/upgrade n=3, /he/teacher/upgrade n=2, /sv/swedish-multiplayer-word-game n=2. ALL below the mandatory 50-sample floor -- same noise pattern as 09-15, no regression verdict issued, no fix applied. Checked /en/teacher/upgrade PageClient.tsx for a safe general SPEED win anyway (above-fold Image) -- already has `priority` from a prior night, nothing to add. Backend: supabase MCP again did not connect within the lane window (3rd straight night -- 09-14, 09-15, 09-16), but used the Supabase Management API raw-SQL fallback (POST /v1/projects/{ref}/database/query with SUPABASE_ACCESS_TOKEN) to unblock both advisor items without the MCP. vocabulary_lessons has only 18 rows (`SELECT count(*)`) -- the unindexed-FK advisor warning is a correctly-skipped false positive at this scale (a btree index has zero read benefit over a scan on 18 rows and nonzero write cost); CLOSING this item rather than carrying it again. pg_stat_statements top-2 by total_exec_time are both `realtime.list_changes` (3.6M + 0.77M calls) -- confirms the existing 50-supabase-perf.md WAL/publication-cost finding, not a new regression, no action (founder-scope publication call, not this lane's). auth_db_connections_absolute remains a dashboard toggle, carried. Bundle: not re-measured (no fresh .next build; out of budget) -- carrying prior numbers unchanged. Net: no code shipped -- every brief item verified as noise or already-fixed; one advisor item resolved to a definitive skip instead of another carry.",
+  "date": "2026-09-19",
+  "note": "Brief's top item (imposketch.io LCP 2636ms) is a DIFFERENT TENANT on the shared PostHog project (151059, ~12 apps) -- not lexiclash, no action. Re-queried PostHog filtered to $host LIKE '%lexiclash%': every route is far below the mandatory 50-sample floor (max n=14, /en/multiplayer), same noise pattern as every prior night this week -- no regression verdict possible, none issued. Backend: MCP supabase server again did not connect within the lane window (4th straight night -- 09-14..09-19); used the Supabase Management API raw-SQL fallback. vocabulary_lessons row count is now 29 (was 18 on 09-16) -- still trivial, a btree index on classroom_id has zero read benefit at this cardinality and nonzero write cost (hard rule: no speculative indexes) -- RE-CONFIRMED correctly-skipped false positive, staying closed. word_pacts has 1 row -- idx_word_pacts_player2_id unused-index warning is likewise a trivial-table false positive, not worth a DDL migration for undetectable benefit -- closed, not carrying. pg_stat_statements top-2 by total_exec_time are still realtime.list_changes (3.7M + 0.78M calls since stats_reset 2026-05-06) -- cross-checked against db_perf_top_query_audit (weekly, non-'ok' verdicts only): the SAME query has been the sole offender every week since 07-20, and its share of total DB time is climbing (42.84% -> 57.40% over 8 weeks, 07-20 to 09-14). This is the existing 50-supabase-perf.md Realtime WAL/publication-cost finding, not a new regression -- tracked by pg_cron guardrails, remediation is a founder-scope publication-membership call, not a code/index fix this lane can make. auth_db_connections_absolute remains a dashboard toggle, carried to human queue. Frontend code scan: grepped for raw <img> (bypassing next/image) on the two highest-traffic routes (home, multiplayer) -- none found, both already on next/image. No unoptimized-image or missing-priority win available to ship tonight. Net: no code shipped -- every brief item verified as noise, already-fixed, or already-tracked; two advisor items re-confirmed as closed rather than re-opened as new carries.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
     "closed": {
-      "vocabulary_lessons_classroom_id_fkey_unindexed": "verified via Supabase Management API raw-SQL (MCP unavailable) -- table has 18 rows. No index added: zero read benefit at this cardinality, nonzero write cost (hard rule: no speculative indexes). Correctly-skipped false positive, not carrying further unless row count grows."
+      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified via Supabase Management API raw-SQL (MCP unavailable) -- table now has 29 rows (was 18 on 09-16). Still no index added: zero read benefit at this cardinality, nonzero write cost. Correctly-skipped false positive; will only reopen if row count grows to a scale where a seq scan is measurable.",
+      "word_pacts_player2_id_unused_index": "table has 1 row. Unused-index advisor warning is a trivial-table false positive -- not worth a DDL migration for undetectable benefit. Closed, not carrying further."
     },
     "deferred": {
       "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
-      "realtime_wal_json_parser_cpu": "confirmed still #1+#2 in pg_stat_statements total_exec_time (list_changes, 3.6M+0.77M calls) -- systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- human/founder call needed on publication scope"
+      "realtime_wal_json_parser_cpu": "confirmed still #1 in both pg_stat_statements AND weekly db_perf_top_query_audit (sole non-ok verdict every week since 07-20, share climbing 42.84%->57.40% over 8 weeks) -- systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- founder-scope publication-membership call, not this lane's fix"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/en/multiplayer?quickPlay=true", "p75_lcp": 104760, "n": 1, "window": "24h", "status": "brief's headline item -- query-string-specific URL is a single-session outlier; bare-pathname /en/multiplayer is n=46, still below 50-floor. DEFERRED, no verdict." },
-      { "route": "/en/multiplayer", "p75_lcp": 824, "n": 46, "window": "24h", "status": "DEFERRED -- n=46, just below 50-sample floor" },
-      { "route": "/en", "p75_lcp": 11290, "n": 39, "window": "24h", "status": "DEFERRED -- n=39, below floor; carried optimizations (priority image, preload link, dynamic FTUE) from prior nights still in place" },
-      { "route": "/en/teacher/upgrade", "p75_lcp": 7990, "n": 3, "window": "24h", "status": "DEFERRED -- n=3; PageClient.tsx above-fold Image already has `priority` (prior night), no action needed" }
+      { "route": "/en/multiplayer", "n": 14, "window": "24h", "status": "DEFERRED -- n=14, far below 50-sample floor" },
+      { "route": "/es/multiplayer", "n": 5, "window": "24h", "status": "DEFERRED -- n=5, far below 50-sample floor" },
+      { "route": "/en/teacher", "n": 3, "window": "24h", "status": "DEFERRED -- n=3, far below 50-sample floor" }
     ],
-    "shipped": []
+    "shipped": [],
+    "note": "brief's headline LCP item (imposketch.io) is cross-tenant PostHog noise from a different domain sharing project 151059 -- not lexiclash, excluded entirely rather than deferred"
   },
   "bundle": {
-    "note": "not re-measured tonight -- no .next build artifact present and building one is out of budget for this lane; carrying 09-14 baseline numbers unchanged",
+    "note": "not re-measured tonight -- no fresh .next build present, building one is out of lane time budget; carrying 09-16 baseline numbers unchanged",
     "total_kb": 34104,
     "top_chunks": [
       { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },

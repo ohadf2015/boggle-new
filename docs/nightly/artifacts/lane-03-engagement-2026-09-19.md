@@ -1,0 +1,3 @@
+status: partial
+files_touched: fe-next/components/student/StudentHubPlayZone.tsx (new student_play_zone_viewed impression event), docs/nightly/impact-ledger.ndjson (2 lines), docs/nightly/triage-queue.md (findings), docs/nightly/reports/2026-09-19.md (lane report)
+next_steps: full flag-hygiene sweep not done tonight (need per-flag experiment-result stats, not just the flag list, to find real ≥14d/p<0.05 winners — 15+ active exp-* flags queued for next engagement lane). es/multiplayer rageclick (brief score 0.605) needs a screenshot/browser pass, not a data query — deferred. Re-check student_play_zone_viewed vs pageview count in 3 days to confirm whether the play-zone CTAs are even reaching viewport, or if it's a real 0% click-appeal problem.
