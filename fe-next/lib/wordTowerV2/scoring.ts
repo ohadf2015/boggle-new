@@ -6,13 +6,14 @@
  * drop. The reward stays on the screen and changes how the rest of the run plays.
  */
 
-/** 34 read as slivers, 46 still small next to the wheel (round 4). */
-export const BLOCK_HEIGHT_PX = 56;
+/** 34 read as slivers, 46/56 still small next to the wheel (rounds 4-5). */
+export const BLOCK_HEIGHT_PX = 76;
 
-const MIN_BLOCK_WIDTH_PX = 96;
-const WIDTH_PER_LETTER_PX = 14;
-/** Beyond this, extra letters stop widening the block. */
-const MAX_WORD_LETTERS = 12;
+/** Round 5: 96+14/letter left half the screen empty beside the tower. */
+const MIN_BLOCK_WIDTH_PX = 150;
+const WIDTH_PER_LETTER_PX = 16;
+/** Beyond this, extra letters stop widening the block (keeps the swing on screen). */
+const MAX_WORD_LETTERS = 8;
 
 /** Points per metre climbed. Height is measured from physics, not accumulated. */
 const POINTS_PER_M = 100;

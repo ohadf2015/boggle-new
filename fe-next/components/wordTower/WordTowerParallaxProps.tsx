@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { gsap } from 'gsap';
-import { visiblePropsAt, type ActiveParallaxProp } from '@/lib/wordTower/parallaxProps';
+import { strongestProps, visiblePropsAt, type ActiveParallaxProp } from '@/lib/wordTower/parallaxProps';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { BIOME_THEME, type BiomeEvent } from './biomeTheme';
 
@@ -263,12 +263,15 @@ export function WordTowerParallaxProps({
   heightM = 0,
   reducedMotion = false,
   themed = true,
+  maxProps,
 }: {
   heightM?: number;
   reducedMotion?: boolean;
   /** False shows every prop in its altitude window. v2 runs cross a biome every
    *  few blocks, so the per-biome whitelist hid most of the art. */
   themed?: boolean;
+  /** Cap on props shown at once (most visible win). Unset = no cap (v1). */
+  maxProps?: number;
 }) {
   const biome = biomeBlendAt(heightM).fromId;
   const themeData = BIOME_THEME[biome];
@@ -276,7 +279,8 @@ export function WordTowerParallaxProps({
 
   const allActive = visiblePropsAt(heightM);
   // Filter to keep native props (if specified) + generic props always visible
-  const active = themed && nativePropIds.size > 0 ? allActive.filter((p) => nativePropIds.has(p.id)) : allActive;
+  const inBiome = themed && nativePropIds.size > 0 ? allActive.filter((p) => nativePropIds.has(p.id)) : allActive;
+  const active = maxProps === undefined ? inBiome : strongestProps(inBiome, maxProps);
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>

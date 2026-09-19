@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { V2GameOver, V2Hud } from '../V2Hud';
 
 afterEach(cleanup);
@@ -47,6 +47,34 @@ describe('V2Hud', () => {
     expect(screen.queryByText('wordTower.zone.entered')).toBeNull();
     rerender(hud({ biome: 'sky' }));
     expect(screen.getByText('wordTower.biome.sky')).toBeTruthy();
+  });
+});
+
+describe('V2Hud toasts never stick', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('given a verdict, when its time passes, then it clears', () => {
+    vi.useFakeTimers();
+    render(hud({ landing: { key: 1, quality: 'good', points: 0, combo: 0 } }));
+    act(() => vi.advanceTimersByTime(2000));
+    expect(screen.queryByText('wordTower.crane.good')).toBeNull();
+  });
+
+  it('given a verdict, when the event is reset mid-show, then it clears at once', () => {
+    vi.useFakeTimers();
+    const { rerender } = render(hud({ landing: { key: 1, quality: 'good', points: 0, combo: 0 } }));
+    rerender(hud({ landing: null }));
+    expect(screen.queryByText('wordTower.crane.good')).toBeNull();
+  });
+
+  it('given height jitter across a biome line, when it flips back and forth, then the zone toasts once', () => {
+    vi.useFakeTimers();
+    const { rerender } = render(hud());
+    rerender(hud({ biome: 'sky' }));
+    act(() => vi.advanceTimersByTime(3000));
+    rerender(hud({ biome: 'city' }));
+    rerender(hud({ biome: 'sky' }));
+    expect(screen.queryByText('wordTower.zone.entered')).toBeNull();
   });
 });
 

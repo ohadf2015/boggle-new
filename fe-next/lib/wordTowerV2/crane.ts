@@ -26,10 +26,11 @@ export interface CraneSwing {
 }
 
 /**
- * The one swing every run uses. Width of a block versus the landing sweep is
+ * The one swing every run uses. 0.38 -> 0.5 in round 5: slabs grew ~40% wider,
+ * and at 0.38 the landing never left a 5-letter slab — every tap scored. Width of a block versus the landing sweep is
  * the real difficulty dial — see feel.test.ts, which pins it in ms.
  */
-export const SWING: CraneSwing = { amplitudeRad: 0.38, periodMs: 2600, phase: 0 };
+export const SWING: CraneSwing = { amplitudeRad: 0.5, periodMs: 2600, phase: 0 };
 
 export interface CraneState {
   angleRad: number;

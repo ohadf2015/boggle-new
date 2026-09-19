@@ -18,8 +18,9 @@ const VERDICT_CLASS: Record<LandingQuality, string> = {
 function useFlash<V extends { key: number }>(value: V | null, ms: number): V | null {
   const [shown, setShown] = useState<V | null>(null);
   useEffect(() => {
-    if (!value) return;
+    // A reset (value -> null) must clear too, or the last toast sticks forever.
     setShown(value);
+    if (!value) return;
     const id = window.setTimeout(() => setShown(null), ms);
     return () => window.clearTimeout(id);
   }, [value, ms]);
@@ -47,14 +48,17 @@ export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landi
   const verdict = useFlash(landing, 1100);
   const pop = useFlash(surprise, 2200);
 
-  // Zone toast: only on a CLIMB into a new biome, never on the first paint.
-  const prevBiome = useRef(biome);
+  // Zone toast: once per biome per run, never on the first paint. Height jitter
+  // across a biome line flipped it back and forth, re-popping it every second.
+  const seenBiomes = useRef(new Set([biome]));
   const [zone, setZone] = useState<{ key: number; id: WordTowerBiomeId } | null>(null);
   useEffect(() => {
-    if (prevBiome.current === biome) return;
-    prevBiome.current = biome;
+    // Back on the ground = a new run: every biome is news again.
+    if (heightM === 0) seenBiomes.current = new Set([biome]);
+    if (seenBiomes.current.has(biome)) return;
+    seenBiomes.current.add(biome);
     setZone({ key: Date.now(), id: biome });
-  }, [biome]);
+  }, [biome, heightM]);
   const zoneShown = useFlash(zone, 2400);
 
   const bestKey = useRef(0);

@@ -20,8 +20,13 @@ export const HUD_TOP_PX = 96;
  */
 export const GROUND_STRIP_PX = 30;
 
-/** Widest the hanging block reaches from centre: full swing + a typical half-block. */
-const SWING_HALF_SPAN_PX = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad) + 90;
+/**
+ * Widest the hanging block reaches from centre: full swing + 80px of slab.
+ * ponytail: less than a real half-slab (99-139px), on purpose — at the swing's
+ * far end a 5-letter slab pokes <=20% past the edge (camera.test pins it), and
+ * fitting the whole slab shrank every block to 38% of a phone's width.
+ */
+const SWING_HALF_SPAN_PX = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad) + 80;
 const SIDE_GUTTER_PX = 12;
 /** Play-area height that maps to scale 1 — sets block size on big screens. */
 const COMFORT_PLAY_HEIGHT_PX = 400;

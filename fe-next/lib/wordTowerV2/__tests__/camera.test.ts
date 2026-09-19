@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, SWING } from '../crane';
 import { PX_PER_M } from '../engine';
-import { BLOCK_HEIGHT_PX } from '../scoring';
+import { BLOCK_HEIGHT_PX, blockWidthForWord } from '../scoring';
 import { GROUND_STRIP_PX, HUD_TOP_PX, frameCamera } from '../camera';
 
 const VIEWPORTS = [
@@ -39,9 +39,10 @@ describe('frameCamera', () => {
 
     it(`fits the full crane swing horizontally — ${vp.name}`, () => {
       const f = frameCamera({ viewportW: vp.w, viewportH: vp.h, dockPx: vp.dock, towerTopM: 0 });
-      // The real swing plus half a 5-letter block (83px) must stay on screen.
+      // At the swing's far end a 5-letter slab keeps >=80% of itself on screen.
+      // Fitting all of it shrank every slab to 38% of a phone's width (round 5).
       const maxSwingX = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad);
-      const halfSpan = (maxSwingX + 83) * f.scale;
+      const halfSpan = (maxSwingX + 0.8 * (blockWidthForWord('tower') / 2)) * f.scale;
       expect(halfSpan).toBeLessThanOrEqual(vp.w / 2);
     });
   }

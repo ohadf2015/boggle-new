@@ -17,7 +17,6 @@ const LIME = 0xbfff00;
 const GOLD = 0xffe135;
 const GOLD_SIDE = 0xb8860b;
 const CRANE_YELLOW = 0xffc629;
-const CRANE_SHADE = 0xc98a00;
 
 /** Fill + darker extrusion side, per block. Lime / pink / cyan / purple. */
 const PALETTE: Array<[number, number]> = [
@@ -50,7 +49,8 @@ export interface BlockView {
 
 const labelStyle = new TextStyle({
   fontFamily: 'Fredoka, system-ui, sans-serif',
-  fontSize: 32,
+  // ~58% of BLOCK_HEIGHT_PX (76); fitLabel shrinks long words.
+  fontSize: 44,
   fontWeight: '700',
   fill: INK,
 });
@@ -169,7 +169,8 @@ export function paintGround(g: Graphics, halfW: number, scale: number): void {
   for (let x = -halfW; x < halfW; x += px(34)) g.rect(x, px(17), px(16), px(3));
   g.fill({ color: CREAM, alpha: 0.35 });
   // Footing under the tower: hazard stripes, so the base reads as a build site.
-  const footW = px(130);
+  // World units: the footing matches a slab's width at every zoom.
+  const footW = 130;
   g.rect(-footW, px(9), footW * 2, px(21)).fill(0x1b1b2c);
   for (let x = -footW; x < footW; x += px(20)) {
     g.poly([x, px(9), x + px(10), px(9), x + px(1), px(30), x - px(9), px(30)]).fill({ color: GOLD, alpha: 0.55 });
@@ -248,41 +249,6 @@ export function createBestLabel(text: string): Container {
   const wrap = new Container();
   wrap.addChild(pill, t);
   return wrap;
-}
-
-/**
- * Crane: yellow truss jib across the top with a trolley at the pivot, steel
- * cable down to a hook. Drawn every frame (cheap: a handful of rects).
- */
-export function paintCrane(
-  g: Graphics,
-  scale: number,
-  halfW: number,
-  pivotY: number,
-  hook: { x: number; y: number } | null,
-): void {
-  const px = (n: number) => n / scale;
-  g.clear();
-
-  const jibH = px(16);
-  const top = pivotY - jibH - px(6);
-  g.rect(-halfW, top, halfW * 2, jibH).fill(CRANE_YELLOW);
-  // Lattice: alternating diagonals between the chords.
-  for (let x = -halfW; x < halfW; x += px(22)) {
-    g.moveTo(x, top).lineTo(x + px(11), top + jibH).lineTo(x + px(22), top);
-  }
-  g.stroke({ width: px(2.5), color: CRANE_SHADE });
-  g.rect(-halfW, top, halfW * 2, jibH).stroke({ width: px(3), color: INK, alignment: 1 });
-
-  // Trolley riding under the jib.
-  g.roundRect(-px(16), top + jibH, px(32), px(10), px(2)).fill(INK);
-  g.circle(-px(9), top + jibH + px(10), px(3)).fill(CREAM);
-  g.circle(px(9), top + jibH + px(10), px(3)).fill(CREAM);
-
-  if (!hook) return;
-  g.moveTo(0, top + jibH + px(10)).lineTo(hook.x, hook.y - px(10)).stroke({ width: px(3), color: INK });
-  g.moveTo(0, top + jibH + px(10)).lineTo(hook.x, hook.y - px(10)).stroke({ width: px(1.2), color: 0xcfd6e6 });
-  g.roundRect(hook.x - px(12), hook.y - px(12), px(24), px(9), px(2)).fill(CRANE_YELLOW).stroke({ width: px(2), color: INK });
 }
 
 /**

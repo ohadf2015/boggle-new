@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { visiblePropsAt, WORD_TOWER_PROPS, type ParallaxProp } from '../parallaxProps';
+import { strongestProps, visiblePropsAt, WORD_TOWER_PROPS, type ParallaxProp } from '../parallaxProps';
 
 const PX = 5;
 const props: ParallaxProp[] = [
@@ -77,5 +77,20 @@ describe('altitude coverage', () => {
       expect(p.src.startsWith('/images/word-tower/')).toBe(true);
       expect(p.src.endsWith('.png')).toBe(true);
     }
+  });
+});
+
+describe('strongestProps (v2 declutter)', () => {
+  it('given every prop in a busy window, when capped at one, then only the most visible stays', () => {
+    const active = visiblePropsAt(12);
+    const best = Math.max(...active.map((p) => p.opacity));
+    const kept = strongestProps(active, 1);
+    expect(kept).toHaveLength(1);
+    expect(kept[0].opacity).toBe(best);
+  });
+
+  it('given fewer props than the cap, when capped, then all stay', () => {
+    const active = visiblePropsAt(12).slice(0, 1);
+    expect(strongestProps(active, 3)).toEqual(active);
   });
 });

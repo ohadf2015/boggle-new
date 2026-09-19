@@ -135,3 +135,11 @@ export function visiblePropsAt(
   }
   return out;
 }
+
+/**
+ * The `n` most visible props. v2 shows every prop in its window, and a busy
+ * altitude stacked four stickers at the tower top's height.
+ */
+export function strongestProps(active: ActiveParallaxProp[], n: number): ActiveParallaxProp[] {
+  return active.length <= n ? active : [...active].sort((a, b) => b.opacity - a.opacity).slice(0, n);
+}

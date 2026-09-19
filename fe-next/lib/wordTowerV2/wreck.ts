@@ -17,7 +17,8 @@ import { BLOCK_HEIGHT_PX, blockWidthForWord } from './scoring';
 
 export { MAX_BALLS } from './run';
 
-export const BALL_RADIUS_PX = 34;
+/** Grows with the slabs (56->76px): a 34px ball bounced off the heavier tower. */
+export const BALL_RADIUS_PX = 46;
 export const CHAIN_PX = 180;
 /** Starting angle from vertical, radians — the ball is pulled back to the left. */
 export const START_ANGLE = 0.9;

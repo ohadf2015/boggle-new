@@ -87,6 +87,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
   band = 'sky',
   panning = false,
   city = true,
+  calm = false,
 }: {
   biomeId: WordTowerBiomeId;
   heightM?: number;
@@ -105,6 +106,10 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
    *  in Pixi, on the same camera as the tower) — two cities on two cameras
    *  never share a floor. */
   city?: boolean;
+  /** Word Tower v2: skip the far skyline + mountains (Pixi draws the city), the
+   *  aurora and the speed streaks. Big animated layers flickered on mobile and
+   *  the extra silhouettes cluttered the tower's own height band. */
+  calm?: boolean;
 }) {
   const b = biomeBackdrop(biomeId);
   const theme = BIOME_THEME[biomeId];
@@ -151,7 +156,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
           <div className="absolute inset-0" style={{ background: theme.accentGlow, opacity: 0.9 }} />
           {/* Slow drifting aurora — gives the sky life + a sense of "changing"
               weather. Soft electric tints, stronger as you climb into the dark. */}
-          <div className="wt-aurora absolute" style={{ opacity: 0.18 + stars * 0.42 }} />
+          {!calm && <div className="wt-aurora absolute" style={{ opacity: 0.18 + stars * 0.42 }} />}
           {/* Warm sun glow (low altitude only) */}
           <div
             className="absolute inset-0 transition-opacity duration-1000"
@@ -194,7 +199,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
         </>
       )}
 
-      {isHorizon && (
+      {isHorizon && !calm && (
         <>
           {/* Far city skyline — light, atmospheric (recedes into the haze). Slow
               parallax. Anchored to the control-deck top so it reads as the horizon. */}
@@ -235,7 +240,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
       )}
 
       {/* Faint air-current streaks — horizontal speed lines in the upper bands. */}
-      {isSky && stars > 0.15 && (
+      {isSky && !calm && stars > 0.15 && (
         <div
           className="absolute inset-0"
           style={{ opacity: Math.min(0.35, stars * 0.4), transition: flow }}

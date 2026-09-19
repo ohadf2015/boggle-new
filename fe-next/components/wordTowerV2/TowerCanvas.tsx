@@ -18,7 +18,6 @@ import {
   createGhost,
   paintBestLine,
   paintBlock,
-  paintCrane,
   paintGhost,
   paintGround,
   paintLandingMark,
@@ -29,6 +28,7 @@ import {
   tickBlock,
 } from './towerArt';
 import { createCity, paintCity, placeCity } from './skylineArt';
+import { paintCrane } from './craneArt';
 import { TenantCrowd } from './tenantArt';
 
 /**
@@ -108,6 +108,7 @@ export default function TowerCanvas(props: Props) {
     let disposed = false;
     let raf = 0;
     let app: Application | null = null;
+    let resizeObserver: ResizeObserver | null = null;
 
     const views = new Map<string, BlockView>();
     const frameTimes: number[] = [];
@@ -136,6 +137,11 @@ export default function TowerCanvas(props: Props) {
 
       app = created;
       host.appendChild(created.canvas);
+      // `resizeTo` only listens to window resize. In the Android WebView the host
+      // can settle AFTER init with no window event, leaving a canvas stuck at
+      // ~60% width — the tower then played in the left half of the screen.
+      resizeObserver = new ResizeObserver(() => created.resize());
+      resizeObserver.observe(host);
 
       const scene = new Container();
       const flash = new Graphics();
@@ -321,7 +327,16 @@ export default function TowerCanvas(props: Props) {
         // the crane is always on screen and the player knows where words go.
         const idleY = hangY + Math.sin(ts / 420) * 2;
         const hookTarget = hanging ?? { x: 0, y: ghostPreview ? ghost.container.y : idleY, heightPx: BLOCK_HEIGHT_PX };
-        paintCrane(crane, scale, halfW + 40, pivotY, { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 });
+        paintCrane(crane, {
+          scale,
+          halfW,
+          topY: -scene.y / scale,
+          bottomY: (h - scene.y) / scale,
+          // Mast on the HUD's side: the ruler owns the other edge.
+          side: p.rulerSide === 'left' ? 'right' : 'left',
+          pivot: { x: 0, y: pivotY },
+          hook: { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 },
+        });
         if (hanging) {
           // The WHOLE arc, and where it touches down. Round 2 drew only the first
           // 40% so as not to "solve the landing" — but the block keeps drifting
@@ -386,6 +401,7 @@ export default function TowerCanvas(props: Props) {
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
+      resizeObserver?.disconnect();
       app?.destroy(true, { children: true });
     };
   }, []);
