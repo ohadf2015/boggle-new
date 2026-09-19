@@ -62,7 +62,7 @@ export function LiveActivityIndicator({
       } else {
         statusText = t('education.analytics.live');
         statusColor = 'text-neo-white';
-        dotColor = 'bg-green-500';
+        dotColor = 'bg-neo-lime';
         shouldPulse = false;
       }
       break;

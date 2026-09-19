@@ -5,6 +5,8 @@ import { gsap } from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
+import { ArrowRight } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { locales } from '@/lib/i18n';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { EducationModeMock } from './EducationModeMock';
@@ -137,12 +139,10 @@ export function EducationHero() {
               className="group inline-flex items-center gap-3 rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-8 py-4 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-xl transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-hard motion-safe:animate-pulse-subtle"
             >
               {teacherProCheckoutCtaLabel(language)}
-              <span
-                aria-hidden
-                className="text-xl transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
-              >
-                →
-              </span>
+              <DirectionalIcon
+                icon={ArrowRight}
+                className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+              />
             </Link>
             <Link
               href={`/${language}/education/access`}

@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { m } from 'framer-motion';
 import { BookOpen, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 
 export interface PostGameWordReviewProps {
   vocabularyWords: string[];
@@ -39,11 +40,11 @@ export default function PostGameWordReview({
   }, [vocabularyWords, foundSet]);
 
   return (
-    <m.div
+    <AdaptiveMotion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 120, damping: 20 }}
-      className="bg-neo-navy border-neo shadow-hard-lg rounded-neo p-4 space-y-4"
+      className="bg-neo-navy border-neo border-neo-cream/40 shadow-hard-lg rounded-neo p-4 space-y-4"
     >
       {/* Header */}
       <div className="flex items-center gap-2">
@@ -111,6 +112,6 @@ export default function PostGameWordReview({
       >
         {t('education.postGame.practiceTheseWords')}
       </m.button>
-    </m.div>
+    </AdaptiveMotion.div>
   );
 }

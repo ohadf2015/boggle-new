@@ -106,7 +106,7 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, t }: V
             sizeClassName="w-16 h-16 md:w-28 md:h-28"
             clipShape="rounded-square"
             clipBorder="lime"
-            clipBg="var(--neo-navy, #141a33)"
+            clipBg="var(--neo-navy, #1a1a2e)"
             animated
             enableHover={false}
             enableClick={false}

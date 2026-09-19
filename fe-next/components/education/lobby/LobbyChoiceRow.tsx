@@ -61,7 +61,7 @@ export function LobbyChoiceRow<T extends string | number>({
               aria-label={choice.label}
               onClick={() => onChange(choice.value)}
               className={cn(
-                'min-h-9 rounded-neo border-2 px-3 py-1 font-neo-display text-xs font-black uppercase transition-all',
+                'min-h-11 rounded-neo border-2 px-3 py-1 font-neo-display text-xs font-black uppercase transition-all',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isSelected
                   ? selectedClassName

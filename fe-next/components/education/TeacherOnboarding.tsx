@@ -264,8 +264,8 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
             // border, so the only way out of a first-run modal was a shape you
             // had to already know was there. Cream edge, ~15:1 against navy.
             'rounded-neo border-2 border-neo-cream bg-neo-navy text-neo-white',
-            'hover:bg-neo-pink hover:text-black transition-colors',
-            isRTL ? 'left-3' : 'right-3'
+            'hover:bg-neo-pink hover:text-neo-black transition-colors',
+            'end-3'
           )}
           aria-label={t('common.skip')}
         >

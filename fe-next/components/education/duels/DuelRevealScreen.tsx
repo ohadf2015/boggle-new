@@ -186,7 +186,7 @@ export function DuelRevealScreen({
         {/* Final head-to-head */}
         <div className="flex w-full max-w-md items-stretch gap-2">
           <div className="flex-1 rounded-neo border-[2px] border-neo-black bg-neo-cyan px-3 py-2 text-center shadow-hard-sm">
-            <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/80">
+            <p className="truncate font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/80">
               {myName}
             </p>
             <p
@@ -200,7 +200,7 @@ export function DuelRevealScreen({
             {t('education.duels.vs')}
           </div>
           <div className="flex-1 rounded-neo border-[2px] border-neo-black bg-neo-pink px-3 py-2 text-center shadow-hard-sm">
-            <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/80">
+            <p className="truncate font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/80">
               {opponentName}
             </p>
             <p

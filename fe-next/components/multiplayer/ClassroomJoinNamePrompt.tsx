@@ -60,7 +60,7 @@ export const ClassroomJoinNamePrompt: React.FC<ClassroomJoinNamePromptProps> = (
       <form
         data-testid="classroom-name-prompt"
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy-light/90 shadow-hard-lg p-5 sm:p-6"
+        className="w-full max-w-sm rounded-neo-lg border-neo-thick border-neo-cream/40 bg-neo-navy-light/90 shadow-hard-lg p-5 sm:p-6"
       >
         <div className="flex items-center gap-2 text-neo-cyan font-bold mb-1">
           <GraduationCap className="w-5 h-5" />

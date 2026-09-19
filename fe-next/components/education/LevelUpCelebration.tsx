@@ -77,8 +77,12 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
           className={cn(
             'fixed inset-0 z-60',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-xs',
-            'animate-in fade-in-0 duration-300'
+            'bg-neo-black/80 backdrop-blur-xs'
+            // No entrance tween on this layer: it is a fullscreen overlay, and
+            // an opacity-from-zero tween on a fullscreen surface is exactly the
+            // Class 5 mobile flash this project keeps re-fixing. It paints at
+            // full opacity on frame one; only the (small) card below tweens,
+            // and only when the OS allows motion.
           )}
           onClick={onClose}
         >
@@ -91,13 +95,13 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               'rounded-neo shadow-hard-lg',
               'p-6 md:p-8',
               'text-center',
-              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
+              'motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:slide-in-from-bottom-2 motion-safe:duration-300'
             )}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             {/* Celebration mascot */}
             <div
-              className="mb-4 animate-in zoom-in-50 duration-300"
+              className="mb-4 motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:duration-300"
               style={{ animationDelay: '0.2s' }}
             >
               <SilentVideo
@@ -116,7 +120,9 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               className={cn(
                 'text-3xl md:text-4xl font-black',
                 'text-neo-lime',
-                'drop-shadow-[0_0_15px_rgb(255_225_53/0.6)]',
+                // Referenced from the live --neo-yellow token, not re-typed as
+                // a literal RGB triplet, so a token change can't drift here.
+                'drop-shadow-[0_0_15px_color-mix(in_srgb,var(--neo-yellow)_60%,transparent)]',
                 'mb-4'
               )}
             >
@@ -134,7 +140,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                   'w-20 h-20 md:w-24 md:h-24',
                   'bg-neo-pink/20 border-4 border-neo-pink',
                   'rounded-full',
-                  'animate-in zoom-in-50 duration-300'
+                  'motion-safe:animate-in motion-safe:zoom-in-50 motion-safe:duration-300'
                 )}
                 style={{ animationDelay: '0.4s' }}
               >
@@ -142,7 +148,10 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                   className={cn(
                     'text-4xl md:text-5xl font-black tabular-nums',
                     'text-neo-pink',
-                    'drop-shadow-[0_0_10px_rgb(255_107_53/0.5)]'
+                    // Deliberate: a warm --neo-orange halo under the pink
+                    // number, not a duplicate of the pink itself. Referenced
+                    // from the live token rather than a literal RGB triplet.
+                    'drop-shadow-[0_0_10px_color-mix(in_srgb,var(--neo-orange)_50%,transparent)]'
                   )}
                 >
                   {levelUpData.newLevel}
@@ -156,7 +165,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 className={cn(
                   'mb-6 p-4 rounded-neo',
                   'bg-neo-pink/20 border-[3px] border-neo-pink',
-                  'animate-in fade-in-0 slide-in-from-bottom-2 duration-300'
+                  'motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:duration-300'
                 )}
                 style={{ animationDelay: '0.6s' }}
               >
@@ -170,7 +179,11 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                       className={cn(
                         'text-lg md:text-xl font-black',
                         'text-neo-white',
-                        'animate-in fade-in-0 slide-in-from-left-2 duration-300 fill-mode-both'
+                        // Physical `slide-in-from-left` reversed in Hebrew
+                        // (it entered from the wrong edge). Fade only — no
+                        // directional slide — per the project's RTL rule for
+                        // this shape.
+                        'motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-300 fill-mode-both'
                       )}
                       style={{ animationDelay: `${0.7 + index * 0.1}s` }}
                     >
@@ -193,7 +206,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 'active:translate-y-0.5 active:shadow-hard-pressed',
                 'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
                 'transition-all duration-200',
-                'animate-in fade-in-0 slide-in-from-bottom-2 duration-300'
+                'motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:duration-300'
               )}
               style={{ animationDelay: '0.8s' }}
             >

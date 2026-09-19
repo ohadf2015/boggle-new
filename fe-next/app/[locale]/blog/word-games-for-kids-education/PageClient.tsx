@@ -16,7 +16,7 @@ import { contentByLocale } from './content';
 import { AuthorBioCard } from '@/components/blog/AuthorBioCard';
 
 export default function WordGamesEducationPageClient(): React.ReactElement {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { theme } = useTheme();
   const params = useParams();
   const locale = (params.locale as string) || language;
@@ -69,7 +69,7 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
             size="sm"
             className={cn(
               'mb-6 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
+              isDarkMode ? 'bg-neo-navy-light text-neo-white hover:bg-neo-navy-elevated' : 'bg-neo-white text-neo-black hover:bg-neo-cream'
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -89,7 +89,7 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
 
           <h1 className={cn(
             'text-3xl md:text-4xl font-black mb-3 leading-tight',
-            isDarkMode ? 'text-white' : 'text-neo-black'
+            isDarkMode ? 'text-neo-white' : 'text-neo-black'
           )}>
             {content.title}
           </h1>
@@ -119,7 +119,7 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
           <div className="relative w-full h-64 md:h-80 rounded-neo border-3 border-neo-black overflow-hidden shadow-hard mb-6">
             <Image
               src="/images/blog/kids-education.jpg"
-              alt="Children playing word games in a classroom setting"
+              alt={t('blog.wordGamesForKidsEducation.heroAlt')}
               fill
               sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
@@ -140,7 +140,7 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
               {section.title && (
                 <h2 className={cn(
                   'text-xl font-bold mb-3 mt-8',
-                  isDarkMode ? 'text-white' : 'text-neo-black'
+                  isDarkMode ? 'text-neo-white' : 'text-neo-black'
                 )}>
                   {section.title}
                 </h2>
@@ -189,15 +189,15 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
               </h3>
               <div className="grid gap-3 sm:grid-cols-3">
                 <Link href={`/${locale}/education/vocabulary-games-classroom`} className="group rounded-neo border-3 border-neo-black bg-neo-cyan p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy">Vocabulary Games for Classroom</span>
+                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy">{t('blog.wordGamesForKidsEducation.vocabTitle')}</span>
                   <span className="mt-2 block text-xs text-neo-navy/80">No signup, 6 languages, free to start.</span>
                 </Link>
                 <Link href={`/${locale}/education/esl-word-games`} className="group rounded-neo border-3 border-neo-black bg-neo-pink p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">ESL Word Games Online</span>
+                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">{t('blog.wordGamesForKidsEducation.eslTitle')}</span>
                   <span className="mt-2 block text-xs text-neo-white">Three levels, 6 dictionaries, no student accounts.</span>
                 </Link>
                 <Link href={`/${locale}/education/games-for-teachers`} className="group rounded-neo border-3 border-neo-black bg-neo-purple p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">Word Games for Teachers</span>
+                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">{t('blog.wordGamesForKidsEducation.teachersTitle')}</span>
                   <span className="mt-2 block text-xs text-neo-white">Sub-day, brain-break, warm-up — zero prep.</span>
                 </Link>
               </div>

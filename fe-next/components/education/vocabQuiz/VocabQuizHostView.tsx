@@ -150,7 +150,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
       {phase === 'question' && (
         <div
           className={cn(
-            'h-5 w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden',
+            'h-5 w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden md:h-[0.9vw]',
             juice.ticking && 'animate-pulse'
           )}
           role="timer"
@@ -179,10 +179,15 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
       {(phase === 'question' || phase === 'reveal') && question && (
         <div className="flex flex-col gap-3 md:gap-5 md:flex-1 md:min-h-0 md:overflow-hidden">
           <div className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 md:p-6 shadow-hard">
-            <p className="text-sm font-bold uppercase tracking-widest text-neo-cyan mb-2">
+            {/* `md:` scale-up via vw — projector legibility grows with the
+                viewport (matching ProjectorLobby/ProjectorRoster) while the
+                mobile base sizes stay the ones fixed for a host on their own
+                phone (< md). */}
+            <p className="text-sm font-bold uppercase tracking-widest text-neo-cyan mb-2 md:text-[1.1vw]">
               {t(`vocabQuiz.focus.${question.focus}`)}
             </p>
-            <p className="font-neo-display font-bold text-2xl md:text-4xl leading-snug break-words">{question.prompt}</p>
+            <p className="font-neo-display font-bold text-2xl leading-snug break-words md:text-[3.2vw]">{question.prompt}</p>
+
           </div>
 
           <VocabQuizChoiceBars

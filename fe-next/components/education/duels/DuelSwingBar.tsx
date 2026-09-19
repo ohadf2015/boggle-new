@@ -91,7 +91,7 @@ export function DuelSwingBar({
           </span>
         </div>
 
-        <span className="shrink-0 rounded-neo border-2 border-neo-black bg-neo-yellow px-1.5 font-neo-display text-[10px] font-black uppercase text-neo-black">
+        <span className="shrink-0 rounded-neo border-2 border-neo-black bg-neo-yellow px-1.5 font-neo-display text-xs font-black uppercase text-neo-black">
           {t('education.duels.vs')}
         </span>
 

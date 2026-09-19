@@ -230,7 +230,7 @@ export function UnpluggedStage({
                 data-testid="unplugged-hands-down"
                 aria-label={labels.handsFewer}
                 onClick={() => onAdjustHands(-1)}
-                className="grid place-items-center w-8 h-8 sm:w-10 sm:h-10 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream"
+                className="grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream"
               >
                 <Minus className="w-4 h-4" aria-hidden />
               </button>
@@ -245,7 +245,7 @@ export function UnpluggedStage({
                 data-testid="unplugged-hands-up"
                 aria-label={labels.handsMore}
                 onClick={() => onAdjustHands(1)}
-                className="grid place-items-center w-8 h-8 sm:w-10 sm:h-10 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream"
+                className="grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream"
               >
                 <Plus className="w-4 h-4" aria-hidden />
               </button>

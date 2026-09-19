@@ -1,6 +1,8 @@
 /**
  * SSR money-path guard: /education must ship a Teacher Pro checkout href in
- * HTML even while AuthContext loading=true hides EducationHero / ProFraming.
+ * HTML unconditionally, ahead of the marketing block that swaps out once
+ * auth resolves to a teacher (EducationHero / ProFraming render immediately
+ * too now, but this CTA must not depend on that gate at all).
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -18,9 +20,9 @@ describe('Teacher Pro checkout CTAs on education surfaces', () => {
     const src = readFileSync(PAGE_CLIENT, 'utf8');
     expect(src).toMatch(/<TeacherProCheckoutCta\b/);
     expect(src).toMatch(/from '@\/components\/education\/TeacherProCheckoutCta'/);
-    // Must appear before the loading-gated marketing block.
+    // Must appear before the marketing block gated on teacher access.
     const ctaIdx = src.indexOf('<TeacherProCheckoutCta');
-    const gatedIdx = src.indexOf('!loading && !hasTeacherAccess');
+    const gatedIdx = src.indexOf('!hasTeacherAccess');
     expect(ctaIdx).toBeGreaterThan(-1);
     expect(gatedIdx).toBeGreaterThan(-1);
     expect(ctaIdx).toBeLessThan(gatedIdx);

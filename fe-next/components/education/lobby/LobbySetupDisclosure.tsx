@@ -79,7 +79,10 @@ export function LobbySetupDisclosure({
             primary action would be the stacked-banner the addendum forbids. */}
         <span
           {...(incomplete ? { 'data-testid': 'mode-picker-blocked', role: 'alert' } : {})}
-          className="min-w-0 flex-1 truncate"
+          // Two lines, not one: a single `truncate` line can cut a long
+          // ru/he lesson-name join before the word count — the fact that
+          // answers "am I ready to go live" — off the end entirely.
+          className="min-w-0 flex-1 line-clamp-2 break-words"
         >
           {summary}
         </span>

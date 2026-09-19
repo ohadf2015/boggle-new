@@ -122,7 +122,7 @@ export function StudentProgressReport({ studentId, classroomId, lessonId, dateRa
               </thead>
               <tbody>
                 {data.wordMastery.map((word) => (
-                  <tr key={word.word} className="border-t border-neo-cream/10 transition-colors hover:bg-neo-cream/5">
+                  <tr key={word.word} className="border-t border-neo-cream/40 transition-colors hover:bg-neo-cream/5">
                     <td className="p-3 font-bold text-neo-white">{word.word}</td>
                     <td className="p-3">
                       <span

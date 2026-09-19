@@ -6254,6 +6254,10 @@ const he = {
     "kofiTooltip": "תמוך בפיתוח לקסיקלאש"
   },
   "blog": {
+    "wordGamesForKidsEducation": {
+      "teachersTitle": "משחקי מילים למורים",
+      "eslTitle": "משחקי מילים אונליין לאנגלית כשפה שנייה",
+      "vocabTitle": "משחקי אוצר מילים לכיתה", "heroAlt": "ילדים משחקים במשחקי מילים בכיתה" },
     "backToBlog": "חזרה לבלוג",
     "dailyChallenge": "אתגר יומי",
     "date": "פורסם",
@@ -12296,6 +12300,7 @@ const he = {
     }
   },
   "student": {
+    "achievements": { "emptyHint": "שחקו שיעור או דו-קרב כדי לזכות בתג הראשון שלכם!" },
     "practiceFun": {
       "headline": {
         "perfect": "מושלם!",
@@ -12478,7 +12483,7 @@ const he = {
       "tabsLabel": "אזורים ראשיים"
     },
     "emptyClassroom": {
-      "title": "עדיין אין כיתה — ולא צריך",
+      "title": "עדיין אין כיתה, ולא צריך",
       "body": "לחצו על יוצאים לשידור, ואנחנו נפתח את הכיתה בזמן שקוד ההצטרפות עולה ללוח.",
       "getCode": "קבלו קוד הצטרפות"
     },
@@ -12536,7 +12541,7 @@ const he = {
       "goLive": "יוצאים לדרך",
       "armedWith": "{{title}} · {{count}} מילים",
       "pickSomething": "בחרו רשימת מילים ויוצאים",
-      "noSetupNeeded": "בלי ליצור כיתה ובלי להקליד שמות — התלמידים נכנסים עם הקוד.",
+      "noSetupNeeded": "בלי ליצור כיתה ובלי להקליד שמות. התלמידים נכנסים עם הקוד.",
       "changeWords": "רוצה מילים אחרות?",
       "shortcutsLabel": "קיצורי דרך למורה",
       "shortcutLastGame": "המשחק האחרון",
@@ -12568,11 +12573,11 @@ const he = {
       "antonymsPlaceholder": "מילים הפוכות, מופרדות בפסיקים (למשל: עצוב)",
       "example": "משפט לדוגמה",
       "examplePlaceholder": "משפט שמשתמש במילה",
-      "exampleHelp": "כתבו ___ במקום המילה — למשל: 'הכלב ה___ נבח.'",
+      "exampleHelp": "כתבו ___ במקום המילה, למשל: 'הכלב ה___ נבח.'",
       "summary": "{{count}} מילים · {{definitions}} עם הגדרה · {{synonyms}} עם מילים נרדפות · {{antonyms}} עם מילים הפוכות · {{examples}} עם משפט לדוגמה",
-      "aiFill": "השלמת הגדרות, מילים נרדפות ודוגמאות חסרות (AI — בדקו לפני השמירה)",
+      "aiFill": "השלמת הגדרות, מילים נרדפות ודוגמאות חסרות (AI, בדקו לפני השמירה)",
       "aiFilling": "כותב הצעות…",
-      "aiFilledNote": "השדות המודגשים הוצעו על ידי AI — בדקו אותם לפני השמירה.",
+      "aiFilledNote": "השדות המודגשים הוצעו על ידי AI, בדקו אותם לפני השמירה.",
       "aiError": "לא הצלחנו לקבל הצעות כרגע. נסו שוב בעוד דקה.",
       "meanings": "משמעויות נוספות",
       "meaningsPlaceholder": "משמעויות, מופרדות ב-; (למשל: גדת נהר; מקום שמחזיק כסף)",
@@ -12598,7 +12603,7 @@ const he = {
       "challenge": "אתגר",
       "legend": "תמיכה: רואה בנק מילים במשחק חי ומתרגל/ת מילות תמיכה ובסיס · בסיס: ברירת המחדל · אתגר: מתרגל/ת את כל המילים כולל אתגר, עם יעד למילים ארוכות יותר",
       "saved": "הרמה נשמרה",
-      "saveFailed": "לא הצלחנו לשמור את הרמה — נסו שוב"
+      "saveFailed": "לא הצלחנו לשמור את הרמה, נסו שוב"
     },
     "lastGame": {
       "title": "המשחק הכיתתי האחרון",
@@ -12606,7 +12611,7 @@ const he = {
       "error": "לא הצלחנו לטעון את תוצאות המשחק האחרון.",
       "retry": "לנסות שוב",
       "emptyTitle": "עדיין לא שיחקתם משחק כיתתי",
-      "emptyHint": "מתחילים משחק מ'משחקים עכשיו' למעלה — המילים שהכיתה מצאה ופספסה יופיעו כאן.",
+      "emptyHint": "מתחילים משחק מ'משחקים עכשיו' למעלה. המילים שהכיתה מצאה ופספסה יופיעו כאן.",
       "previousGames": "משחקים קודמים",
       "playersPlayed": "{{count}} תלמידים שיחקו",
       "studentFallback": "תלמיד/ה",
@@ -12614,7 +12619,7 @@ const he = {
       "nobodyFound": "מילים שאף אחד לא מצא",
       "avgAccuracy": "דיוק ממוצע במילות השיעור",
       "wordsToReview": "מילים לחזרה",
-      "nothingToReview": "אין מה לחזור עליו — הכיתה מצאה את כל מילות השיעור.",
+      "nothingToReview": "אין מה לחזור עליו, הכיתה מצאה את כל מילות השיעור.",
       "missedBy": "פספסו",
       "student": "תלמיד/ה",
       "score": "ניקוד",
@@ -12632,7 +12637,7 @@ const he = {
     },
     "classReport": {
       "title": "מילה מול תלמיד",
-      "hint": "כל מילה מהשיעור מול כל תלמיד. המילים הקשות למעלה — זו רשימת החזרה שלך.",
+      "hint": "כל מילה מהשיעור מול כל תלמיד. המילים הקשות למעלה, זו רשימת החזרה שלך.",
       "word": "מילה",
       "classMiss": "הכיתה פספסה",
       "accuracy": "דיוק",
@@ -12664,9 +12669,9 @@ const he = {
         "close": "סגירה"
       },
       "practice": {
-        "flashcard": "קודם משמעות — כרטיסיות ואז חידון",
+        "flashcard": "קודם משמעות: כרטיסיות ואז חידון",
         "spelling": "תרגול כתיב קצר על המילים שפספס",
-        "none": "אין על מה לחזור — אפשר לתת את הרשימה הבאה",
+        "none": "אין על מה לחזור, אפשר לתת את הרשימה הבאה",
         "absent": "השלימי איתו אחד על אחד לפני המשחק הבא"
       },
       "notes": {
@@ -12683,7 +12688,7 @@ const he = {
     },
     "proWelcome": {
       "title": "את/ה ב-Teacher Pro",
-      "until": "שלך עד {date} — אין מה לממש, בלי כרטיס.",
+      "until": "שלך עד {date}, אין מה לממש, בלי כרטיס.",
       "perk": {
         "analytics": "לראות אילו מילים היו קשות לכיתה, אחרי כל משחק",
         "reports": "דוחות כיתה ותלמיד להדפסה",
@@ -12711,16 +12716,16 @@ const he = {
         "title": "דוחות התקדמות הם תכונת Pro",
         "body": "ראו איך כל תלמיד מתקדם בכל הכיתות ובכל המשחקים: מילים שהושגו, שלבים, XP ודוחות PDF להדפסה לערב הורים. שדרגו ל-Teacher Pro כדי לפתוח דוחות כיתה ותלמיד."
       },
-      "cta": "לפתוח עם Pro — {{price}} לחודש"
+      "cta": "לפתוח עם Pro, {{price}} לחודש"
     },
     "subscription": {
-      "giftedNoCard": "אין כרטיס במערכת ואין חידוש — זה פשוט מסתיים וחוזרים לחינמי.",
+      "giftedNoCard": "אין כרטיס במערכת ואין חידוש, זה פשוט מסתיים וחוזרים לחינמי.",
       "giftedUntil": "Pro במתנה עד",
       "giftedBadge": "מתנה",
       "classLimitTitle": "הגעת למגבלת הכיתות",
       "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "יצרת {{current}} מתוך {{limit}} כיתות בחינם. שדרגו ל-Pro לכיתות ותלמידים ללא הגבלה.",
-      "upgradeProDescription": "Pro מעניק כיתות ותלמידים ללא הגבלה בכל כיתה — בלי מגבלות לצמיחת ההוראה שלכם.",
+      "upgradeProDescription": "Pro מעניק כיתות ותלמידים ללא הגבלה בכל כיתה, בלי מגבלות לצמיחת ההוראה שלכם.",
       "proFeatures": "Pro כולל",
       "unlimitedClasses": "כיתות ללא הגבלה",
       "unlimitedStudents": "תלמידים ללא הגבלה בכל כיתה",
@@ -12731,12 +12736,12 @@ const he = {
       "checkoutError": "התשלום לא הצליח להתחיל. נסו שוב.",
       "signInRequired": "אנא התחברו כדי לשדרג ל-Teacher Pro.",
       "currentPlan": "אתם במסלול הזה",
-      "upgradePricingTitle": "תראו מי הבין — לפני הצלצול.",
+      "upgradePricingTitle": "תראו מי הבין, לפני הצלצול.",
       "upgradePricingSubtitle": "ניהול כיתות ותלמידים ללא הגבלה",
-      "upgradePricingReassure": "אפשר לבטל בכל עת — הכיתות, השיעורים ונתוני התלמידים שלכם תמיד נשמרים.",
+      "upgradePricingReassure": "אפשר לבטל בכל עת. הכיתות, השיעורים ונתוני התלמידים שלכם תמיד נשמרים.",
       "pricePerDay": "בערך ‎$0.30‎ ליום",
       "everythingInFree": "כל מה שבמסלול החינמי, ובנוסף:",
-      "freeStartNote": "כיתה אמיתית נכנסת — עד 3 כיתות עם 50 תלמידים בכל אחת. Pro נועד ליותר כיתות או לדוחות.",
+      "freeStartNote": "כיתה אמיתית נכנסת: עד 3 כיתות עם 50 תלמידים בכל אחת. Pro נועד ליותר כיתות או לדוחות.",
       "proCtaSubtext": "מוכן תוך 30 שניות · ניתן לבטל בכל עת",
       "trustCancel": "ביטול בכל עת, בלי התחייבות",
       "trustDataSafe": "הנתונים שלכם נשמרים",
@@ -12872,7 +12877,7 @@ const he = {
         "teams": "קבוצות",
         "teamsDesc": "חלוקה אוטומטית לקבוצות מאוזנות",
         "teamCount": "כמה קבוצות?",
-        "autoAssignNote": "התלמידים מתחלקים אוטומטית — בלי הכנה, הוגן בכל פעם."
+        "autoAssignNote": "התלמידים מתחלקים אוטומטית, בלי הכנה, הוגן בכל פעם."
       },
       "support": {
         "title": "תמיכה (SPED)",
@@ -12893,7 +12898,7 @@ const he = {
         "title": "מילת המטרה",
         "description": "קבעו את המילה שהכיתה תחפש, או תנו למשחק לבחור.",
         "random": "הפתיעו את הכיתה",
-        "noneEligible": "אף מילה בשיעור הזה לא מתאימה לחיפוש — מילת מטרה חייבת להיות באורך {{min}}–{{max}} אותיות. המשחק יבחר אחת."
+        "noneEligible": "אף מילה בשיעור הזה לא מתאימה לחיפוש. מילת מטרה חייבת להיות באורך {{min}}-{{max}} אותיות. המשחק יבחר אחת."
       },
       "minWordLength": {
         "title": "אורך המילה הקצרה ביותר",
@@ -12944,7 +12949,7 @@ const he = {
       "createdBannerTitle": "הכיתה מוכנה!",
       "googleClassroom": "פרסום ב-Google Classroom",
       "googleClassroomTitle": "הצטרפו ל{{name}} ב-LexiClash",
-      "googleClassroomBody": "הקישו על הקישור כדי להצטרף לכיתה. בלי חשבון — פשוט בוחרים שם.",
+      "googleClassroomBody": "הקישו על הקישור כדי להצטרף לכיתה. בלי חשבון, פשוט בוחרים שם.",
       "createdBannerBody": "שתפו את הקוד עם התלמידים.",
       "dismissBanner": "סגור",
       "wizard": {
@@ -13001,10 +13006,11 @@ const he = {
       }
     },
     "lesson": {
+      "bulkImportDropCsv": "גררו קובץ CSV לכאן או לחצו לבחירה",
       "sectionTitle": "השיעורים שלך",
       "sectionHint": "שיעור הוא רשימת מילים. אפשר להריץ אותו בשידור חי עם כל הכיתה, או לשתף אותו כדי שהתלמידים יתרגלו לבד.",
       "pasteWords": "הדביקו את רשימת המילים",
-      "pasteWordsPlaceholder": "מילה אחת בכל שורה — או מופרדות בפסיקים",
+      "pasteWordsPlaceholder": "מילה אחת בכל שורה, או מופרדות בפסיקים",
       "pasteWordsParsed": "{count} מילים מוכנות",
       "pasteWordsAdd": "הוסיפו {count} מילים",
       "create": "צור שיעור",
@@ -13061,9 +13067,9 @@ const he = {
       "bulkImportLabel": "הדבק מילים כאן",
       "bulkImportPlaceholder": "הדבק מילים, אחת בכל שורה. השתמש ב'מילה - הגדרה' להוספת הגדרות.",
       "bulkImportDetected": "זוהו {{count}} מילים",
-      "bulkImportUnreadable": "לא הצלחנו לקרוא {{count}} שורות (שורה {{rows}}) — לא נמצאה בהן מילה, ולכן הן לא יובאו. בדקו אם יש | מיותר או מילה חסרה.",
+      "bulkImportUnreadable": "לא הצלחנו לקרוא {{count}} שורות (שורה {{rows}}): לא נמצאה בהן מילה, ולכן הן לא יובאו. בדקו אם יש | מיותר או מילה חסרה.",
       "bulkImportOneWordPerLine": "שורה {{rows}} נראית כמו כמה מילים בשורה אחת. כתבו מילה אחת בכל שורה ונסו לייבא שוב.",
-      "savedAndAssigned": "השיעור נשמר והוקצה ל{{classroom}} — התלמידים רואים אותו עכשיו.",
+      "savedAndAssigned": "השיעור נשמר והוקצה ל{{classroom}}, התלמידים רואים אותו עכשיו.",
       "savedNotAssigned": "השיעור נשמר, אבל לא הצלחנו להקצות אותו ל{{classroom}}. נסו שוב עם הכפתור \"הקצאה לכיתה\" בכרטיס השיעור.",
       "bulkImportButton": "ייבא",
       "templates": "תבניות שיעורים",
@@ -13245,8 +13251,8 @@ const he = {
         "downloading": "מוריד...",
         "failed": "לא הצלחנו ליצור את ה-PDF. נסו שוב.",
         "done": "הקובץ הורד",
-        "fileStudent": "{{name}} – דוח התקדמות",
-        "fileClass": "{{name}} – דוח כיתה"
+        "fileStudent": "{{name}} - דוח התקדמות",
+        "fileClass": "{{name}} - דוח כיתה"
       },
       "teacherLine": "מורה: {{name}}",
       "generatedOn": "הופק ב-LexiClash · {{date}}",
@@ -13346,13 +13352,13 @@ const he = {
     "homework": {
       "takeHomeToggle": "כרטיס תרגול לקחת הביתה",
       "backToDashboard": "חזרה ללוח המורה",
-      "classmatesFirst": "את/ה הראשון/ה שסיים/ה היום — הרצף מתחיל ממך.",
+      "classmatesFirst": "את/ה הראשון/ה שסיים/ה היום, הרצף מתחיל ממך.",
       "introTitle": "{{count}} מילים שהכיתה פספסה",
       "introSubtitle": "לוחצים על התשובה הנכונה, ומאייתים את הקשות. בערך שתי דקות.",
       "nameLabel": "השם הפרטי שלך",
       "namePlaceholder": "למשל: מאיה",
       "start": "יאללה",
-      "startCta": "מתחילים — {{count}} מילים",
+      "startCta": "מתחילים: {{count}} מילים",
       "playAgainCta": "עוד סיבוב",
       "exit": "סגירת המשחק",
       "promptMeaning": "מה הפירוש?",
@@ -13383,7 +13389,7 @@ const he = {
       "teacherAverage": "ממוצע כיתתי",
       "teacherEmpty": "אף אחד עוד לא שיחק. שתפו את הקישור והרשימה תתמלא בזמן אמת.",
       "teacherNamesSignedOut": "התחברו כמורה כדי לראות מי שיחק.",
-      "gradeOnTime": "הוגש בזמן — רצף הכיתה שמור.",
+      "gradeOnTime": "הוגש בזמן, רצף הכיתה שמור.",
       "teacherLoadFailed": "לא הצלחנו לטעון מי שיחק. נסו שוב עוד רגע.",
       "teacherOnTime": "בזמן",
       "teacherLate": "באיחור"
@@ -13392,7 +13398,7 @@ const he = {
       "title": "בוחרים משחק",
       "subtitle": "נגיעה בפוסטר, ושנייה אחר כך הכיתה כבר משחקת.",
       "recommended": "הכי מתאים",
-      "recommendedHint": "{{mode}} הכי מתאים למילים האלה — לרשימה שלך יש הגדרות לשאול עליהן.",
+      "recommendedHint": "{{mode}} הכי מתאים למילים האלה, לרשימה שלך יש הגדרות לשאול עליהן.",
       "minutes": "{{count}} דק'",
       "playing": "משחקים עכשיו",
       "change": "החלפת משחק",
@@ -13402,12 +13408,12 @@ const he = {
       "settings": "כוונון עדין",
       "settingsHide": "סגירת הכוונון",
       "needsLesson": "קודם בוחרים רשימת מילים",
-      "launch": "יוצאים לדרך — {{mode}}",
+      "launch": "יוצאים לדרך: {{mode}}",
       "tapAgain": "הקישו שוב כדי להתחיל",
       "moreModes": "עוד משחקים ({{count}})",
       "fewerModes": "פחות משחקים",
-      "sameCode": "אותו קוד — אף אחד לא צריך להיכנס מחדש.",
-      "switched": "עכשיו משחקים {{mode}} — אותו קוד.",
+      "sameCode": "אותו קוד, אף אחד לא צריך להיכנס מחדש.",
+      "switched": "עכשיו משחקים {{mode}}, אותו קוד.",
       "switchFailed": "ההחלפה לא נתפסה. נסו שוב.",
       "switchMidRound": "מסיימים את הסיבוב, ואז מחליפים משחק.",
       "how": {
@@ -13415,7 +13421,7 @@ const he = {
         "wordHunt": "מתחרים מי ראשון מוצא את מילת המטרה החבויה בלוח.",
         "blast": "משרשרים מילים מהר ומפוצצים אריחים בשרשרת קומבו.",
         "wheelRush": "מסובבים את גלגל האותיות ויורים מילים נגד השעון.",
-        "vocabQuiz": "ארבע אפשרויות, משמעות אחת — התשובה הנכונה המהירה שווה הכי הרבה."
+        "vocabQuiz": "ארבע אפשרויות, משמעות אחת: התשובה הנכונה המהירה שווה הכי הרבה."
       }
     },
     "projectorLobby": {
@@ -13431,7 +13437,7 @@ const he = {
       "lateJoinOff": "אי אפשר להצטרף באיחור"
     },
     "errors": {
-      "serverUnavailable": "לא מצליחים להגיע לרשימת הכיתה כרגע. זו תקלה אצלנו, לא אצלך — נסו שוב בעוד רגע."
+      "serverUnavailable": "לא מצליחים להגיע לרשימת הכיתה כרגע. זו תקלה אצלנו, לא אצלך. נסו שוב בעוד רגע."
     },
     "intentCta": {
       "forTeachers": "למורים / ללמוד אנגלית",
@@ -13491,7 +13497,7 @@ const he = {
           }
       },
       "locked": {
-        "word_tower": "צריך 4 מילים לפחות מהרשימה, באורך 4–6 אותיות",
+        "word_tower": "צריך 4 מילים לפחות מהרשימה, באורך 4-6 אותיות",
         "solo_board": "הוסיפו מילים לשיעור כדי לפתוח",
         "warmup": "הוסיפו מילים לשיעור כדי לפתוח",
         "blitz": "הוסיפו מילים לשיעור כדי לפתוח",
@@ -13504,7 +13510,7 @@ const he = {
     "produce": {
       "title": "בית המלאכה למילים",
       "desc": "קראו את המשמעות וכתבו את המילה",
-      "newWord": "מילה חדשה — הציצו",
+      "newWord": "מילה חדשה, הציצו",
       "gotIt": "הבנתי",
       "hint": "רמז",
       "hintLength": "{count} אותיות",
@@ -13521,7 +13527,7 @@ const he = {
       },
       "verdict": {
         "correct": "נכון!",
-        "near-miss": "כמעט — בדקו את האיות",
+        "near-miss": "כמעט, בדקו את האיות",
         "wrong": "לא הפעם"
       },
       "notEnough": {
@@ -13620,7 +13626,7 @@ const he = {
       "skipWord": "דלגו על המילה",
       "skipQuestion": "דלגו על השאלה",
       "pausedTitle": "המשחק מושהה",
-      "pausedBody": "המורה השהה את המשחק. רגע של סבלנות — ממשיכים בקרוב.",
+      "pausedBody": "המורה השהה את המשחק. רגע של סבלנות, ממשיכים בקרוב.",
       "pausedBodyHost": "הכיתה מוקפאת. לחצו על ״המשך״ כשתהיו מוכנים להמשיך.",
       "timeAddedToast": "המורה הוסיף {{seconds}} שניות",
       "wordSkippedToast": "המורה בחר מילה חדשה לחיפוש",
@@ -13701,9 +13707,9 @@ const he = {
       "stayInClass": "הישארו כאן — המשחק הבא יתחיל במסך הזה.",
       "playAgain": "שחקו שוב",
       "practiceMissed": "תרגלו את המילים האלה",
-      "playReteachRound": "שחקו סבב חזרה — רק המילים שהחסרנו",
+      "playReteachRound": "שחקו סבב חזרה: רק המילים שהחסרנו",
       "backToLobby": "חזרה ללובי",
-      "rematch": "ריבאץ' — אותה רשימה, אותו קוד",
+      "rematch": "ריבאץ': אותה רשימה, אותו קוד",
       "teamBattle": {
         "title": "קרב קבוצות",
         "teamName": "קבוצה {number}",
@@ -13711,7 +13717,7 @@ const he = {
       },
       "participationBonus": "+{points} נקודות השתתפות לכולם",
       "shareGap": "שיתוף פער הכיתה",
-      "shareGapCopied": "הקישור הועתק — הדביקו ב-Slack או בצ'אט הורים",
+      "shareGapCopied": "הקישור הועתק, הדביקו ב-Slack או בצ'אט הורים",
       "podium": {
         "title": "המובילים",
         "wordsFound": "{{found}} מתוך {{total}} מילים",
@@ -13749,7 +13755,7 @@ const he = {
       "moreWaysToReteach": "עוד דרכים ללמד מחדש את המילים",
       "fullReport": "דוח מלא",
       "neverPlaced": "לא הופיעו על הלוח",
-      "neverPlacedHint": "הלוח לא הצליח להכיל אותן — הכיתה מעולם לא ראתה אותן. התחילו סיבוב חוזר כדי לתת להן הזדמנות.",
+      "neverPlacedHint": "הלוח לא הצליח להכיל אותן, הכיתה מעולם לא ראתה אותן. התחילו סיבוב חוזר כדי לתת להן הזדמנות.",
       "needsHelp": {
         "title": "כדאי לעבור איתם ({{count}})",
         "none": "כולם מצאו לפחות חצי מהרשימה. אפשר לסבב נוסף.",
@@ -13759,21 +13765,21 @@ const he = {
       "fewerWords": "הצגה מצומצמת",
       "allBoardWordsFound": "הכיתה מצאה כל מילת שיעור שהופיעה על הלוח.",
       "shareGapTitle": "פער אוצר המילים של הכיתה",
-      "shareGapText": "{{lesson}} — הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור. לתרגול: {{missed}}",
-      "shareGapAllFoundText": "{{lesson}} — הכיתה מצאה את כל מילות השיעור.",
+      "shareGapText": "{{lesson}}: הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור. לתרגול: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}}: הכיתה מצאה את כל מילות השיעור.",
       "shareGapCta": "שחקו משחק כיתה",
       "shareGapEyebrow": "פער הכיתה מהיום",
       "shareGapPracticeHome": "מילים לתרגול בבית",
       "startReteachLive": "התחלת Live חזרה ל-3 דקות",
       "postReteachGoogleClassroom": "פרסום חזרה ל-3 דקות ב-Google Classroom",
-      "postReteachGoogleClassroomTitle": "Live חזרה ל-3 דקות — {{lesson}}",
+      "postReteachGoogleClassroomTitle": "Live חזרה ל-3 דקות: {{lesson}}",
       "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו Live ל-3 דקות על המילים החסרות: {{missed}}. התלמידים מצטרפים מה-Stream.",
       "assignPracticeGoogleClassroom": "שיבוץ תרגול ב-Google Classroom",
-      "assignPracticeGoogleClassroomTitle": "תרגול מילים חסרות — {{lesson}}",
+      "assignPracticeGoogleClassroomTitle": "תרגול מילים חסרות: {{lesson}}",
       "assignPracticeGoogleClassroomBody": "פתחו את הקישור ותרגלו בבית את המילים החסרות: {{missed}}. הגישו כשתסיימו.",
       "printPracticeSheet": "הדפסת דף תרגול",
-      "printPracticeSheetTitle": "תרגול מילים חסרות — {{lesson}}",
-      "printPracticeSheetSubtitle": "חזרה בלי מכשירים — כתבו כל מילה והשתמשו בה במשפט",
+      "printPracticeSheetTitle": "תרגול מילים חסרות: {{lesson}}",
+      "printPracticeSheetSubtitle": "חזרה בלי מכשירים, כתבו כל מילה והשתמשו בה במשפט",
       "printPracticeSheetWriteLabel": "כתבו את המילה",
       "printPracticeSheetSentenceLabel": "השתמשו בה במשפט",
       "printPracticeSheetNameLine": "שם: ________________",
@@ -13793,7 +13799,7 @@ const he = {
       "teamTilesMascotAlt": "לקסי מעודדת את הקבוצות",
       "teamTilesMascotWinAlt": "לקסי חוגגת Team Tiles",
       "teamTilesWinHeadline": "האריחים נוקו!",
-      "teamTilesWinSub": "{{cleared}} מתוך {{total}} מילים — Team Tiles ללא מכשירים.",
+      "teamTilesWinSub": "{{cleared}} מתוך {{total}} מילים, Team Tiles ללא מכשירים.",
       "teamTilesPerfectHeadline": "ריצת Team Tiles מושלמת!",
       "teamTilesPerfectSub": "כל אריח miss-gap הופך ונוקה.",
       "teamTilesPlayAgain": "ערבב ושחק שוב",
@@ -13812,19 +13818,19 @@ const he = {
       "classicUnpluggedMascotAlt": "לקסי מנחה Classic Unplugged",
       "classicUnpluggedMascotWinAlt": "לקסי חוגגת Classic Unplugged",
       "classicUnpluggedWinHeadline": "Classic Unplugged הושלם!",
-      "classicUnpluggedWinSub": "{{cleared}} מתוך {{total}} מילים — המורה שלח/ה, בלי מכשירים.",
+      "classicUnpluggedWinSub": "{{cleared}} מתוך {{total}} מילים, המורה שלח/ה, בלי מכשירים.",
       "classicUnpluggedPerfectHeadline": "Classic Unplugged מושלם!",
       "classicUnpluggedPerfectSub": "כל מילת miss-gap נסגרה בכיתה.",
       "classicUnpluggedPlayAgain": "שחקו שוב",
       "assignUnpluggedGoogleClassroom": "שיבוץ שיעור מנותק ב-Google Classroom",
-      "assignUnpluggedGoogleClassroomTitle": "שיעורי בית מנותקים ממסכים — {{lesson}}",
-      "assignUnpluggedGoogleClassroomBody": "שיעורי בית בלי מכשירים: פתחו את קישור Unplugged Live, הדפיסו את דף התרגול למילים החסרות ותרגלו: {{missed}}. בלי מכשירי תלמידים — הגישו כשתסיימו.",
+      "assignUnpluggedGoogleClassroomTitle": "שיעורי בית מנותקים ממסכים: {{lesson}}",
+      "assignUnpluggedGoogleClassroomBody": "שיעורי בית בלי מכשירים: פתחו את קישור Unplugged Live, הדפיסו את דף התרגול למילים החסרות ותרגלו: {{missed}}. בלי מכשירי תלמידים, הגישו כשתסיימו.",
       "assignMissGapLiveGoogleClassroom": "שיבוץ Live לפי miss-gap ל-Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "Live miss-gap ל-3 דק׳ — {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "פתחו את הקישור והתחילו Live של 3 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מ-Classwork. עובד ב-Google Workspace for Education החינמי — בלי Education Plus.",
-      "launchMissGapQuestionPackLive": "הפעלת חבילת שאלות בשידור חי — מילים שחסרו",
-      "missGapQuestionPackTitle": "חבילת שאלות miss-gap — {{lesson}}",
-      "unpluggedReteachHint": "התלמידים עונים על דף התרגול המודפס — בלי מכשירים",
+      "assignMissGapLiveGoogleClassroomTitle": "Live miss-gap ל-3 דק׳: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "פתחו את הקישור והתחילו Live של 3 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מ-Classwork. עובד ב-Google Workspace for Education החינמי, בלי Education Plus.",
+      "launchMissGapQuestionPackLive": "הפעלת חבילת שאלות בשידור חי: מילים שחסרו",
+      "missGapQuestionPackTitle": "חבילת שאלות miss-gap: {{lesson}}",
+      "unpluggedReteachHint": "התלמידים עונים על דף התרגול המודפס, בלי מכשירים",
       "unpluggedReteachReveal": "חשוף",
       "unpluggedReteachNext": "הבא",
       "unpluggedReteachPrev": "הקודם",
@@ -13847,7 +13853,7 @@ const he = {
       "unpluggedGameMascotAlt": "לקסי מעודדת את הכיתה",
       "unpluggedGameMascotWinAlt": "לקסי חוגגת עם הכיתה",
       "unpluggedGameWinHeadline": "הכיתה סיימה הכול!",
-      "unpluggedGameWinSub": "{{cleared}} מתוך {{total}} מילים נוצחו — כקבוצה אחת.",
+      "unpluggedGameWinSub": "{{cleared}} מתוך {{total}} מילים נוצחו, כקבוצה אחת.",
       "unpluggedGamePerfectHeadline": "סבב מושלם!",
       "unpluggedGamePerfectSub": "כל המילים, כולם יחד, בלי החמצות.",
       "unpluggedGamePerfectBadge": "ניצחון מוחלט",
@@ -13855,80 +13861,80 @@ const he = {
       "unpluggedGameBestStreak": "הרצף הטוב ביותר",
       "unpluggedGamePlayAgain": "עוד סבב",
       "shareMissGapPractice": "שיתוף כרטיס תרגול miss-gap",
-      "shareMissGapPracticeCopied": "קישור כרטיס התרגול הועתק — להדבקה להורים",
+      "shareMissGapPracticeCopied": "קישור כרטיס התרגול הועתק, להדבקה להורים",
       "shareMissGapPracticeTitle": "כרטיס תרגול miss-gap",
-      "shareMissGapPracticeText": "{{lesson}} — תרגול miss-gap לבית (הדפסה או שמירת PDF): {{missed}}",
+      "shareMissGapPracticeText": "{{lesson}}: תרגול miss-gap לבית (הדפסה או שמירת PDF): {{missed}}",
       "missGapPracticeEyebrow": "תרגול לבית",
-      "missGapPracticeSubtitle": "דף תרגול להדפסה עם המילים שהכיתה פספסה — פותחים, מדפיסים או שומרים כ-PDF. בלי מכשירים.",
-      "missGapPracticeFoil": "ל-Kahoot Unplugged אין שיעורי בית — ל-LexiClash יש",
+      "missGapPracticeSubtitle": "דף תרגול להדפסה עם המילים שהכיתה פספסה, פותחים, מדפיסים או שומרים כ-PDF. בלי מכשירים.",
+      "missGapPracticeFoil": "ל-Kahoot Unplugged אין שיעורי בית, ל-LexiClash יש",
       "missGapPracticePrintPdf": "הדפסה / שמירת PDF לתרגול",
       "assignMissGapAsyncHomework": "שיבוץ שיעורי בית miss-gap אסינכרוניים",
       "assignMissGapAsyncEyebrow": "שיעורי בית אסינכרוניים",
       "assignMissGapAsyncHeading": "תרגול miss-gap עם תאריך יעד",
       "assignMissGapAsyncSubtitle": "התלמידים משחקים משחק של שתי דקות על המילים שהכיתה פספסה. אתם רואים מי סיים, וסיום בזמן שומר על רצף הכיתה.",
-      "assignMissGapAsyncFoil": "Kahootopia Assignments הם שיעורי בית של משחק חי — LexiClash משבצת תרגול miss-gap אסינכרוני שמזין את רצף הכיתה",
+      "assignMissGapAsyncFoil": "Kahootopia Assignments הם שיעורי בית של משחק חי, LexiClash משבצת תרגול miss-gap אסינכרוני שמזין את רצף הכיתה",
       "assignMissGapAsyncDueLabel": "תאריך יעד",
-      "assignMissGapAsyncDueBanner": "יעד {{due}} — סיימו את תרגול ה-miss-gap כדי לשמור על רצף הכיתה",
+      "assignMissGapAsyncDueBanner": "יעד {{due}}: סיימו את תרגול ה-miss-gap כדי לשמור על רצף הכיתה",
       "assignMissGapAsyncGoogleClassroom": "שיבוץ miss-gap אסינכרוני ב-Google Classroom",
-      "assignMissGapAsyncTitle": "שיעורי בית miss-gap אסינכרוניים — {{lesson}}",
+      "assignMissGapAsyncTitle": "שיעורי בית miss-gap אסינכרוניים: {{lesson}}",
       "assignMissGapAsyncBody": "תרגול miss-gap אסינכרוני (לא משחק חי). פתחו את הקישור ותרגלו: {{missed}}. יעד {{due}}. השלמה בזמן מזינה את רצף הכיתה.",
       "assignMissGapAsyncShare": "העתקת קישור שיעורי בית אסינכרוניים",
-      "assignMissGapAsyncShareCopied": "הקישור הועתק — הדביקו להורים או ל-Classroom",
-      "assignMissGapAsyncShareText": "{{lesson}} — שיעורי בית miss-gap אסינכרוניים עד {{due}}: {{missed}}",
+      "assignMissGapAsyncShareCopied": "הקישור הועתק, הדביקו להורים או ל-Classroom",
+      "assignMissGapAsyncShareText": "{{lesson}}: שיעורי בית miss-gap אסינכרוניים עד {{due}}: {{missed}}",
       "assignMissGapAsyncComplete": "סמנו תרגול כהושלם (מזין את רצף הכיתה)",
-      "assignMissGapAsyncCompleted": "התרגול הושלם — רצף הכיתה עודכן",
+      "assignMissGapAsyncCompleted": "התרגול הושלם, רצף הכיתה עודכן",
       "assignMissGapAsyncStreak": "רצף כיתה: {{streak}} יום/ימים",
       "missGapGradePassbackEyebrow": "העברת ציון ל-Google Classroom",
       "missGapGradePassbackHeading": "הגשת ציון miss-gap",
-      "missGapGradePassbackSubtitle": "התרגול הושלם — הציון מוכן להגשה ליומן הציונים של הכיתה.",
-      "missGapGradePassbackFoil": "Kahoot Marketplace מסנכרן ציונים ל-Classroom — LexiClash עושה זאת לשיעורי miss-gap אסינכרוניים, בלי OAuth לרשימת תלמידים",
+      "missGapGradePassbackSubtitle": "התרגול הושלם, הציון מוכן להגשה ליומן הציונים של הכיתה.",
+      "missGapGradePassbackFoil": "Kahoot Marketplace מסנכרן ציונים ל-Classroom, LexiClash עושה זאת לשיעורי miss-gap אסינכרוניים, בלי OAuth לרשימת תלמידים",
       "missGapGradePassbackScore": "ציון: {{points}} / {{max}}",
-      "missGapGradePassbackOnTime": "בזמן — ציון מלא + רצף כיתה",
-      "missGapGradePassbackLate": "הגשה באיחור — ציון טיוטה מופחת (הרצף לא משתנה)",
+      "missGapGradePassbackOnTime": "בזמן: ציון מלא + רצף כיתה",
+      "missGapGradePassbackLate": "הגשה באיחור: ציון טיוטה מופחת (הרצף לא משתנה)",
       "missGapGradePassbackDue": "תאריך יעד {{due}}",
       "missGapGradePassbackPrivacy": "לא משתפים שמות ולא מייבאים רשימת כיתה. מוגש רק הציון של התרגול הזה.",
       "missGapGradePassbackCopy": "העתקת קישור קבלה לציון",
-      "missGapGradePassbackCopied": "הקבלה הועתקה — הדביקו ב-Classroom או שתפו עם המורה",
-      "missGapGradePassbackShareText": "{{lesson}} — ציון miss-gap {{points}}/{{max}} (יעד {{due}})",
-      "missGapGradePassbackTitle": "ציון miss-gap — {{lesson}}",
+      "missGapGradePassbackCopied": "הקבלה הועתקה, הדביקו ב-Classroom או שתפו עם המורה",
+      "missGapGradePassbackShareText": "{{lesson}}: ציון miss-gap {{points}}/{{max}} (יעד {{due}})",
+      "missGapGradePassbackTitle": "ציון miss-gap: {{lesson}}",
       "missGapGradePassbackBackHomework": "חזרה לשיעורי miss-gap",
       "missGapGradePassbackOpen": "פתיחת קבלת ציון ב-Google Classroom",
 
       "unpluggedGradePassbackEyebrow": "העברת ציון ל־Google Classroom",
       "unpluggedGradePassbackHeading": "הגשת ציון Unplugged reteach",
-      "unpluggedGradePassbackSubtitle": "השיעור החי הסתיים — cleared/total של הכיתה מוכן לספר הציונים של Classroom.",
-      "unpluggedGradePassbackFoil": "תוסף Kahoot Classroom מסנכרן ציונים חיים — LexiClash עושה את אותו דבר ל־Unplugged reteach בלי OAuth של רשימת תלמידים",
+      "unpluggedGradePassbackSubtitle": "השיעור החי הסתיים, cleared/total של הכיתה מוכן לספר הציונים של Classroom.",
+      "unpluggedGradePassbackFoil": "תוסף Kahoot Classroom מסנכרן ציונים חיים, LexiClash עושה את אותו דבר ל־Unplugged reteach בלי OAuth של רשימת תלמידים",
       "unpluggedGradePassbackScore": "ציון: {{points}} / {{max}}",
       "unpluggedGradePassbackCleared": "הכיתה הצליחה {{cleared}} / {{total}} ({{accuracy}}%)",
-      "unpluggedGradePassbackOnTime": "בזמן — מלוא נקודות הדיוק",
-      "unpluggedGradePassbackLate": "הגשה מאוחרת — ציון טיוטה מופחת",
+      "unpluggedGradePassbackOnTime": "בזמן: מלוא נקודות הדיוק",
+      "unpluggedGradePassbackLate": "הגשה מאוחרת: ציון טיוטה מופחת",
       "unpluggedGradePassbackDue": "מפגש / תאריך יעד {{due}}",
       "unpluggedGradePassbackPrivacy": "לא משתפים שמות ולא מייבאים רשימה. רק ציון cleared/total של הכיתה מועבר.",
       "unpluggedGradePassbackCopy": "העתקת קישור קבלה",
-      "unpluggedGradePassbackCopied": "הקבלה הועתקה — הדביקו ב־Classroom",
-      "unpluggedGradePassbackShareText": "{{lesson}} — ציון Unplugged {{points}}/{{max}} (הצליחו {{cleared}}/{{total}})",
-      "unpluggedGradePassbackTitle": "ציון Unplugged — {{lesson}}",
+      "unpluggedGradePassbackCopied": "הקבלה הועתקה, הדביקו ב־Classroom",
+      "unpluggedGradePassbackShareText": "{{lesson}}: ציון Unplugged {{points}}/{{max}} (הצליחו {{cleared}}/{{total}})",
+      "unpluggedGradePassbackTitle": "ציון Unplugged: {{lesson}}",
       "unpluggedGradePassbackBackLive": "חזרה ל־Unplugged Live",
       "unpluggedGradePassbackOpen": "הגשת ציון ל־Google Classroom",
 
       "missGapWhatsAppEyebrow": "תרגול להורים בוואטסאפ",
       "missGapWhatsAppHeading": "שליחת כרטיס תרגול miss-gap להורים בוואטסאפ",
-      "missGapWhatsAppSubtitle": "שולחים את כרטיס התרגול ישירות לצ'אט ההורים בלחיצה אחת — מילים של הכיתה בלבד, בלי שמות תלמידים.",
-      "missGapWhatsAppParentSubtitle": "תרגלו עם הילד/ה את המילים שפספסו מ־{{lesson}} — הדפיסו או פתחו את הכרטיס.",
-      "missGapWhatsAppFoil": "סנכרון ציונים של Classroom נעצר ביומן הציונים — LexiClash שולח את כרטיס miss-gap הביתה בוואטסאפ",
+      "missGapWhatsAppSubtitle": "שולחים את כרטיס התרגול ישירות לצ'אט ההורים בלחיצה אחת, מילים של הכיתה בלבד, בלי שמות תלמידים.",
+      "missGapWhatsAppParentSubtitle": "תרגלו עם הילד/ה את המילים שפספסו מ־{{lesson}}, הדפיסו או פתחו את הכרטיס.",
+      "missGapWhatsAppFoil": "סנכרון ציונים של Classroom נעצר ביומן הציונים, LexiClash שולח את כרטיס miss-gap הביתה בוואטסאפ",
       "missGapWhatsAppDue": "מועד הגשה {{due}}",
       "missGapWhatsAppWordsLabel": "מילות כיתה לתרגול",
-      "missGapWhatsAppPrivacy": "בלי שמות תלמידים. רק מילות כיתה — בטוח להדבקה בקבוצת הורים בוואטסאפ.",
+      "missGapWhatsAppPrivacy": "בלי שמות תלמידים. רק מילות כיתה, בטוח להדבקה בקבוצת הורים בוואטסאפ.",
       "missGapWhatsAppShare": "שיתוף כרטיס תרגול בוואטסאפ",
-      "missGapWhatsAppOpened": "וואטסאפ נפתח — בחרו צ'אט הורים",
-      "missGapWhatsAppShareText": "{{lesson}} — תרגלו בבית את מילות ה-miss-gap (עד {{due}}): {{missed}}",
-      "missGapWhatsAppOgTitle": "תרגול miss-gap להורים — {{lesson}}",
+      "missGapWhatsAppOpened": "וואטסאפ נפתח, בחרו צ'אט הורים",
+      "missGapWhatsAppShareText": "{{lesson}}: תרגלו בבית את מילות ה-miss-gap (עד {{due}}): {{missed}}",
+      "missGapWhatsAppOgTitle": "תרגול miss-gap להורים: {{lesson}}",
       "missGapWhatsAppOpenPractice": "פתיחת כרטיס תרגול miss-gap",
       "missGapWhatsAppOpenHomework": "פתיחת שיעורי בית miss-gap",
       "printUnpluggedReteachPack": "הדפסת חבילת Unplugged reteach (PDF + QR)",
-      "unpluggedReteachPackTitle": "חבילת Unplugged reteach — {{lesson}}",
-      "unpluggedReteachPackSubtitle": "חבילה להדפסה ממילים שפספסו במפגש האחרון — ה-QR פותח Unplugged Live על המקרן",
-      "unpluggedReteachPackFoil": "ל-Kahoot Classic Unplugged אין חבילה להדפסה עם QR ל-Live — ל-LexiClash יש",
+      "unpluggedReteachPackTitle": "חבילת Unplugged reteach: {{lesson}}",
+      "unpluggedReteachPackSubtitle": "חבילה להדפסה ממילים שפספסו במפגש האחרון, ה-QR פותח Unplugged Live על המקרן",
+      "unpluggedReteachPackFoil": "ל-Kahoot Classic Unplugged אין חבילה להדפסה עם QR ל-Live, ל-LexiClash יש",
       "unpluggedReteachPackQrHint": "סריקה לפתיחת Unplugged reteach Live",
       "unpluggedReteachPackHowTo": "1) הדפיסו את החבילה 2) חלקו דפי תרגול לתלמידים 3) סרקו את ה-QR על מסך המורה",
       "unpluggedReteachPackPracticeHeading": "דפי תרגול לתלמידים",
@@ -13937,34 +13943,34 @@ const he = {
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
       "title": "שיבוץ Live לפי miss-gap",
-      "subtitle": "שיבוץ Classwork בלחיצה ל-Live של 3 דקות על מילים שפספסו — עובד ב-Workspace for Education החינמי. ה-add-on של Quizlet דורש Education Plus. רק מילות כיתה — בלי שמות תלמידים.",
+      "subtitle": "שיבוץ Classwork בלחיצה ל-Live של 3 דקות על מילים שפספסו, עובד ב-Workspace for Education החינמי. ה-add-on של Quizlet דורש Education Plus. רק מילות כיתה, בלי שמות תלמידים.",
       "assignLive": "שבצו Live miss-gap ל-Classroom",
-      "freeWorkspaceFoil": "עובד ב-Google Workspace for Education החינמי — ה-add-on של Quizlet דורש Education Plus. LexiClash משתמש בדיאלוג השיתוף של Google, בלי Plus.",
+      "freeWorkspaceFoil": "עובד ב-Google Workspace for Education החינמי, ה-add-on של Quizlet דורש Education Plus. LexiClash משתמש בדיאלוג השיתוף של Google, בלי Plus.",
       "lessonLabel": "שם השיעור",
       "missedWordsLabel": "מילים שפספסו (מופרדות בפסיקים)",
-      "privacyNote": "בלי ייבוא רשימות. בלי שמות תלמידים. הפרסום דרך דיאלוג Google — אנחנו לא רואים איזו כיתה נבחרה.",
+      "privacyNote": "בלי ייבוא רשימות. בלי שמות תלמידים. הפרסום דרך דיאלוג Google, אנחנו לא רואים איזו כיתה נבחרה.",
       "postToStream": "פרסמו Unplugged ל-Stream של Classroom",
       "openUnplugged": "פתח Unplugged Live",
             "needMissedWords": "הוסיפו לפחות מילה אחת שפספסו כדי לאפשר שיבוץ בלחיצה אחת.",
       "planner": {
         "eyebrow": "מתכנן Classroom שיחתי",
-        "title": "תגידו מה צריך — אנחנו מנתבים את ה-Live",
-        "subtitle": "כתבו תוכנית בשפה פשוטה. נפתח Classic או Team Unplugged, או reteach Live עם החזרת ציון. מילים ברמת הכיתה בלבד — בלי שמות.",
+        "title": "תגידו מה צריך, אנחנו מנתבים את ה-Live",
+        "subtitle": "כתבו תוכנית בשפה פשוטה. נפתח Classic או Team Unplugged, או reteach Live עם החזרת ציון. מילים ברמת הכיתה בלבד, בלי שמות.",
         "promptLabel": "מה תרצו להריץ?",
         "promptPlaceholder": "לדוגמה: Unplugged reteach על הפספוסים מאתמול",
-        "privacyNote": "בלי ייבוא רשימות. בלי שמות תלמידים. מנתב למצבי Unplugged שכבר קיימים — בלי לוגיקת משחק חדשה.",
+        "privacyNote": "בלי ייבוא רשימות. בלי שמות תלמידים. מנתב למצבי Unplugged שכבר קיימים, בלי לוגיקת משחק חדשה.",
         "needPrompt": "כתבו פרומפט בשפה פשוטה כדי לתכנן את ה-Live.",
         "needMissedWords": "הוסיפו מילים שפספסו, או בקשו רמת CEFR כדי לזרוע פערי מילים.",
-        "modeClassic": "Classic Unplugged — הכיתה/קבוצות דנות על המקרן",
-        "modeTeam": "Team Tiles Unplugged — לוח משותף, המורה מסמן",
-        "modeReteach": "Unplugged reteach Live — להדפסה + מקרן",
-        "modeLive3min": "reteach Live של 3 דק׳ — מקרן + החזרת ציון",
+        "modeClassic": "Classic Unplugged: הכיתה/קבוצות דנות על המקרן",
+        "modeTeam": "Team Tiles Unplugged: לוח משותף, המורה מסמן",
+        "modeReteach": "Unplugged reteach Live: להדפסה + מקרן",
+        "modeLive3min": "reteach Live של 3 דק׳: מקרן + החזרת ציון",
         "timerNote": "טיימר {{seconds}} שנ׳",
         "cefrNote": "פערי CEFR {{level}}",
         "openLive": "פתח Live מתוכנן",
         "openGradePassback": "פתח קבלה להחזרת ציון",
         "postToStream": "פרסם משימת Unplugged לזרם Classroom",
-        "foilNote": "מול Discovery Education Gemini השיחתי ב-Classroom — LexiClash מנתב ל-Live Unplugged אמיתי עם החזרת ציון."
+        "foilNote": "מול Discovery Education Gemini השיחתי ב-Classroom, LexiClash מנתב ל-Live Unplugged אמיתי עם החזרת ציון."
       }
     },
     "nav": {
@@ -14018,7 +14024,7 @@ const he = {
       "turnPlay": "לשחק את התור",
       "turnDecline": "דילוג",
       "turnLiveBadge": "חי",
-      "turnLiveInvite": "{{name}} מחכה — עכשיו!",
+      "turnLiveInvite": "{{name}} מחכה, עכשיו!",
       "turnAcceptLive": "לשחק עכשיו",
       "tauntPrompt": "שלחו מדבקה",
       "tauntSent": "המדבקה נשלחה",
@@ -14112,11 +14118,11 @@ const he = {
       "spellingProgress": "כתבתם נכון {{count}} מילים!",
       "blitzResult": "מצאתם {{count}} מילים ב-60 שניות!",
       "dailyChallengeComplete": "האתגר היומי הושלם!",
-      "lessonMastered": "השיעור הושלם בשליטה מלאה — המילים בכיס.",
+      "lessonMastered": "השיעור הושלם בשליטה מלאה, המילים בכיס.",
       "lessonProgress": "כל הכבוד! המשיכו לתרגל.",
       "duel": {
         "win": "ניצחון! משחק מעולה!",
-        "loss": "ניסיון יפה — בסיבוב הבא תנצחו!",
+        "loss": "ניסיון יפה, בסיבוב הבא תנצחו!",
         "draw": "תיקו! יריבים שווים!"
       }
     },
@@ -14180,6 +14186,8 @@ const he = {
       "yesterday": "אתמול"
     },
     "classroomGame": {
+      "forSchoolsCta": "גלו את LexiClash לבתי ספר",
+      "forSchoolsFooter": "רוצים להביא את LexiClash לכל בית הספר או המחוז שלכם?",
       "defaultClassroomName": "הכיתה שלי",
       "questions": "שאלות",
       "perQuestion": "לכל שאלה",
@@ -14204,7 +14212,7 @@ const he = {
       "lessonsSelected": "{{count}} שיעורים נבחרו",
       "missingRequirements": "חסרים פרטים",
       "startFailed": "לא הצלחנו להתחיל את המשחק. נסו שוב.",
-      "tooFast": "רגע אחד — נסו שוב בעוד כמה שניות.",
+      "tooFast": "רגע אחד, נסו שוב בעוד כמה שניות.",
       "more": "עוד",
       "multiLessonHelp": "שלבו שיעורים למגוון",
       "noClassrooms": "עדיין אין כיתות",
@@ -14259,7 +14267,7 @@ const he = {
       "badge_teacher": "מורה",
       "badge_student": "כיתה",
       "badge_promo": "מצב כיתה",
-      "promo_title": "ללמד עם LexiClash — בחינם",
+      "promo_title": "ללמד עם LexiClash, בחינם",
       "promo_subtitle": "משחקי מילים עם הכיתה, רשימות מילים משלכם, ורואים מי נתקע.",
       "promo_cta": "לראות את מצב הכיתה",
       "teacher_title": "הכיתה שלך מוכנה",
@@ -14271,9 +14279,10 @@ const he = {
       "trial_ended": "הניסיון הסתיים"
     },
     "landing": {
+      "resourcesAriaLabel": "משאבי חינוך",
       "pro": {
         "title": "שתי תוכניות. בלי טריקים.",
-        "subtitle": "כל מה שצריך כדי להעביר שיעור ראשון — חינם. Pro מסיר את המגבלות.",
+        "subtitle": "כל מה שצריך כדי להעביר שיעור ראשון, חינם. Pro מסיר את המגבלות.",
         "comparisonAlt": "השוואה בין התוכנית החינמית לבין Teacher Pro",
         "freeTier": "חינם",
         "perMonth": "לחודש",
@@ -14321,8 +14330,8 @@ const he = {
       "startGame": "התחל משחק",
       "hero": {
         "eyebrow": "למורים בכיתות בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית",
-        "h1": "משחקי אוצר מילים לכיתה שלכם — בלי חשבונות לתלמידים.",
-        "sub": "משחקי מילים רב-משתתפים לכל הכיתה עם רשימות המילים שלכם. בלי חשבונות, בלי פרסומות, בלי הורדות — משחקים בכל דפדפן. נבנה במקור ל-{count} שפות. מסלול בסיסי חינם למורים; מסלול Teacher Pro עולה $9 לחודש לכיתות ותלמידים ללא הגבלה.",
+        "h1": "משחקי אוצר מילים לכיתה שלכם, בלי חשבונות לתלמידים.",
+        "sub": "משחקי מילים רב-משתתפים לכל הכיתה עם רשימות המילים שלכם. בלי חשבונות, בלי פרסומות, בלי הורדות, משחקים בכל דפדפן. נבנה במקור ל-{count} שפות. מסלול בסיסי חינם למורים; מסלול Teacher Pro עולה $9 לחודש לכיתות ותלמידים ללא הגבלה.",
         "cta_primary": "בקשו גישת מורה",
         "cta_secondary": "צפו בהדגמה",
         "cta_note": "מסלול חינם להתחלה • אישור תוך כ-24 שעות",
@@ -14335,32 +14344,32 @@ const he = {
         "players": "28 משחקים",
         "board_caption": "הקישו על אותיות כדי לאיית מילים",
         "leaderboard_title": "טבלת מובילים חיה",
-        "caption": "הכיתה שלכם בזמן אמת: תלמידים מצטרפים עם קוד, מתחרים באיות מילים ומטפסים בטבלת מובילים חיה — בלי התחברות, בלי התקנות.",
+        "caption": "הכיתה שלכם בזמן אמת: תלמידים מצטרפים עם קוד, מתחרים באיות מילים ומטפסים בטבלת מובילים חיה, בלי התחברות, בלי התקנות.",
         "s1": "מאיה",
         "s2": "איתי",
         "s3": "נועה"
       },
       "moat": {
         "title": "למה מורים בשש שפות בוחרים בלקסיקלאש",
-        "subtitle": "שלוש סיבות שאנחנו עומדים מאחוריהן — לא סתם סיסמאות שיווק.",
+        "subtitle": "שלוש סיבות שאנחנו עומדים מאחוריהן, לא סתם סיסמאות שיווק.",
         "native_multilingual": {
           "tag": "אותנטי",
           "title": "בנוי בשפה שלכם, לא מתורגם אליה",
-          "body": "עברית מימין לשמאל, יפנית עם קאנה ו-IME, מילים מורכבות בשוודית, סימני ניקוד בספרדית — הכל ברמת המנוע. לא Google Translate."
+          "body": "עברית מימין לשמאל, יפנית עם קאנה ו-IME, מילים מורכבות בשוודית, סימני ניקוד בספרדית, הכל ברמת המנוע. לא Google Translate."
         },
         "local_inventory": {
           "tag": "מקומי",
           "title": "מילים מהמקור המקומי",
-          "body": "אוצר המילים נשאב מוויקיפדיה בעברית וממילון מילוג. התלמידים פוגשים מילים מהעולם שלהם — לא מילים שתורגמו מספרי לימוד אמריקאיים."
+          "body": "אוצר המילים נשאב מוויקיפדיה בעברית וממילון מילוג. התלמידים פוגשים מילים מהעולם שלהם, לא מילים שתורגמו מספרי לימוד אמריקאיים."
         },
         "ad_free": {
           "tag": "בלי פרסומות",
           "title": "אפס פרסומות לתלמידים. לעולם.",
-          "body": "Kahoot, Quizlet ו-Blooket מציגים פרסומות לתלמידים. אנחנו לא — כל מסך חינוכי נקי. תואם COPPA ו-GDPR."
+          "body": "Kahoot, Quizlet ו-Blooket מציגים פרסומות לתלמידים. אנחנו לא. כל מסך חינוכי נקי. תואם COPPA ו-GDPR."
         }
       },
       "modes": {
-        "title": "6 מצבי משחק בפלטפורמה אחת — מחליפים, כדי שאף תלמיד לא ישתעמם",
+        "title": "6 מצבי משחק בפלטפורמה אחת: מחליפים, כדי שאף תלמיד לא ישתעמם",
         "teaches": "מה לומדים",
         "classroom_game": {
           "tag": "חי",
@@ -14371,7 +14380,7 @@ const he = {
         "vocab_duels": {
           "tag": "דו-קרב",
           "title": "דו-קרב מילים",
-          "body": "אחד-על-אחד מול חבר — בזמן אמת או כשנוח לכם.",
+          "body": "אחד-על-אחד מול חבר, בזמן אמת או כשנוח לכם.",
           "teaches": "זיכרון, שליפה"
         },
         "brain_drills": {
@@ -14400,8 +14409,9 @@ const he = {
         }
       },
       "compare": {
+        "rowHeader": "תכונה",
         "title": "לקסיקלאש מול האחרים",
-        "subtitle": "השוואה כנה — רק מה שאנחנו באמת עושים אחרת.",
+        "subtitle": "השוואה כנה, רק מה שאנחנו באמת עושים אחרת.",
         "col": {
           "lexiclash": "LexiClash",
           "kahoot": "Kahoot!",
@@ -14420,18 +14430,18 @@ const he = {
       "trust": {
         "title": "בנוי על אמון",
         "bullet1": "אפס פרסומות בכל מסך חינוכי.",
-        "bullet2": "נתוני התלמידים מטופלים בהתאם ל-GDPR. טלמטריה — רק בהסכמה.",
-        "bullet3": "תואם COPPA — תלמידים מתחת לגיל 13 מוגנים."
+        "bullet2": "נתוני התלמידים מטופלים בהתאם ל-GDPR. טלמטריה רק בהסכמה.",
+        "bullet3": "תואם COPPA, תלמידים מתחת לגיל 13 מוגנים."
       },
       "faq": {
         "title": "שאלות שמורים שואלים",
         "q1": {
           "q": "איך מקבלים גישה?",
-          "a": "ממלאים טופס קצר ב-/education/access — הגישה נפתחת ברגע השליחה, ולוח המורה נפתח מיד."
+          "a": "ממלאים טופס קצר ב-/education/access, הגישה נפתחת ברגע השליחה, ולוח המורה נפתח מיד."
         },
         "q2": {
           "q": "יש מסלול חינם?",
-          "a": "כן — מסלול בסיסי חינם למורים מאומתים: עד 3 כיתות עם 50 תלמידים בכל אחת, בלי פרסומות לתלמידים. מסלול Teacher Pro ($9 לחודש) פותח כיתות ותלמידים ללא הגבלה."
+          "a": "כן, מסלול בסיסי חינם למורים מאומתים: עד 3 כיתות עם 50 תלמידים בכל אחת, בלי פרסומות לתלמידים. מסלול Teacher Pro ($9 לחודש) פותח כיתות ותלמידים ללא הגבלה."
         },
         "q3": {
           "q": "זה עובד בעברית, יפנית, שוודית וספרדית?",
@@ -14443,7 +14453,7 @@ const he = {
         },
         "q5": {
           "q": "האם צריך חשבון?",
-          "a": "לא — אפשר לשחק כאורח ברוב המצבים."
+          "a": "לא, אפשר לשחק כאורח ברוב המצבים."
         },
         "q6": {
           "q": "מה מבדיל אתכם מ-Kahoot, Quizlet או Wordwall?",
@@ -14460,12 +14470,12 @@ const he = {
       },
       "cta": {
         "title": "מוכנים להתחיל?",
-        "body": "טופס קצר — דקה אחת, והגישה נפתחת מיד עם השליחה.",
+        "body": "טופס קצר, דקה אחת, והגישה נפתחת מיד עם השליחה.",
         "button": "בקשו גישה"
       },
       "teacherLeadCta": {
         "title": "אתם מורים?",
-        "body": "ל-LexiClash יש מסלול בסיסי חינם למורים — שדרגו ל-Pro לכיתות ללא הגבלה.",
+        "body": "ל-LexiClash יש מסלול בסיסי חינם למורים, שדרגו ל-Pro לכיתות ללא הגבלה.",
         "button": "קבלו גישת מורה"
       },
       "districtCta": {
@@ -14511,6 +14521,7 @@ const he = {
       "xp": "{{xp}} XP"
     },
     "milestones": {
+      "levelTooltipWithTitle": "רמה {{level}} - {{title}}",
       "coinBonus": "+{{coins}} מטבעות",
       "continue": "המשך",
       "level": "רמה {{level}}",
@@ -14526,13 +14537,13 @@ const he = {
       "title": "איך LexiClash עובד בכיתה שלך",
       "subtitle": "חמישה צעדים קצרים מאפס ועד משחק המילים החי הראשון שלך.",
       "steps": {
-        "create": { "title": "צרו כיתה", "text": "ברגע אחד — נותנים שם ומוכנים." },
+        "create": { "title": "צרו כיתה", "text": "ברגע אחד, נותנים שם ומוכנים." },
         "share": { "title": "שתפו את קוד ההצטרפות", "text": "הקרינו על הלוח או שלחו קישור." },
-        "join": { "title": "התלמידים מצטרפים", "text": "מכל מכשיר — בלי צורך בחשבון." },
+        "join": { "title": "התלמידים מצטרפים", "text": "מכל מכשיר, בלי צורך בחשבון." },
         "play": { "title": "הריצו משחק מילים חי", "text": "בוחרים שיעור ולוחצים התחל." },
         "results": { "title": "צפו בתוצאות", "text": "עוקבים אחר התקדמות כל תלמיד בלוח הבקרה." }
       },
-      "gotIt": "הבנתי — יאללה מלמדים!",
+      "gotIt": "הבנתי, יאללה מלמדים!",
       "showTutorial": "איך זה עובד"
     },
     "practice": {
@@ -14669,7 +14680,7 @@ const he = {
     "student": {
       "join": {
         "alreadyMember": "כבר בכיתה!",
-        "classroomFull": "הכיתה מלאה — בקשו מהמורה לפנות מקום.",
+        "classroomFull": "הכיתה מלאה, בקשו מהמורה לפנות מקום.",
         "button": "הצטרף",
         "clipboardError": "לא ניתן לקרוא מהלוח",
         "codeHint": "6 תווים מהמורה",
@@ -14679,11 +14690,11 @@ const he = {
           "steps": "שלבי ההצטרפות",
           "codeHeadline": "הקלידו את הקוד",
           "codeSub": "שישה תווים, ישר מהמסך של המורה.",
-          "codeTooShort": "צריך שישה תווים — חסרים עוד כמה.",
+          "codeTooShort": "צריך שישה תווים, חסרים עוד כמה.",
           "next": "הלאה",
           "changeCode": "שינוי הקוד",
           "nameHeadline": "בחרו שם",
-          "nameRequired": "קודם בחרו שם — כל הכיתה תראה אותו.",
+          "nameRequired": "קודם בחרו שם, כל הכיתה תראה אותו.",
           "readyHeadline": "מוכנים?",
           "readySub": "לחיצה אחת ואתם בפנים.",
           "go": "יאללה, נכנסים",
@@ -14691,14 +14702,14 @@ const he = {
         },
         "heroLine": "בקשו מהמורה את קוד הכיתה",
         "preparing": "רגע, מתכוננים…",
-        "queuedNeedsName": "כמעט בפנים — כתבו את השם למעלה ואנחנו ניכנס מיד.",
+        "queuedNeedsName": "כמעט בפנים, כתבו את השם למעלה ואנחנו ניכנס מיד.",
         "nameTaken": "כבר יש בכיתה מישהו עם השם הזה. אפשר {{suggestedName}}.",
         "useSuggestedName": "להצטרף בתור {{suggestedName}}",
         "emptyClipboard": "אין מה להדביק",
         "guestError": "לא הצלחנו להתחיל. נסו שוב או פנו למורה.",
-        "invalidCode": "לא זיהינו את הקוד הזה. בדקו אותו שוב עם המורה — כשהמשחק נגמר הקוד מפסיק לעבוד.",
+        "invalidCode": "לא זיהינו את הקוד הזה. בדקו אותו שוב עם המורה, כשהמשחק נגמר הקוד מפסיק לעבוד.",
         "joining": "מצטרף...",
-        "nameHint": "לא צריך חשבון — פשוט בחרו שם",
+        "nameHint": "לא צריך חשבון, פשוט בחרו שם",
         "nameLabel": "השם שלך",
         "namePlaceholder": "למשל מאיה",
         "pasteButton": "הדבק",
@@ -14706,7 +14717,7 @@ const he = {
           "label": "מצטרף אל:",
           "confirm": "זו הכיתה שלך",
           "gameLabel": "משחק פעיל:",
-          "gameConfirm": "הכיתה שלך משחקת עכשיו — תצטרפו ישר"
+          "gameConfirm": "הכיתה שלך משחקת עכשיו, תצטרפו ישר"
         },
         "subtitle": "הכנס את הקוד מהמורה",
         "success": "נכנסת!",
@@ -14719,7 +14730,7 @@ const he = {
         "words": "מילים",
         "correct": "יפה מאוד!",
         "lessonWord": "מילה מהשיעור!",
-        "tryAgain": "לא זו — תמשיכו",
+        "tryAgain": "לא זו, תמשיכו",
         "roundOver": "הסיבוב נגמר!",
         "rival": {
           "toCatch": "להשיג",
@@ -14855,9 +14866,9 @@ const he = {
     },
     "access": {
       "h1": "בקשה לגישת מורה",
-      "lede": "ספרו לנו קצת על הכיתה. הגישה ניתנת מיד — בלי המתנה לאישור.",
+      "lede": "ספרו לנו קצת על הכיתה. הגישה ניתנת מיד, בלי המתנה לאישור.",
       "redirect_title": "לעמוד הזה צריך גישת מורה",
-      "redirect_body": "הייתם בדרך אל {{dest}}. האישור מיידי — הטופס הקצר שלמטה פותח את זה.",
+      "redirect_body": "הייתם בדרך אל {{dest}}. האישור מיידי, הטופס הקצר שלמטה פותח את זה.",
       "redirect_dest_fallback": "כלי הכיתה שלכם",
       "full_name": "שם מלא",
       "email": "דוא״ל",
@@ -14890,7 +14901,7 @@ const he = {
       "auth_required_title": "הירשמו כדי לבקש גישת מורה",
       "auth_required_body": "גישת מורה מחוברת לחשבון מאומת. פִּתחו חשבון חינם או התחברו, ונמשיך בדיוק מכאן.",
       "auth_required_cta": "פתחו לי חשבון מורה בחינם",
-      "trust_instant": "גישה מיידית — בלי תור לאישור",
+      "trust_instant": "גישה מיידית, בלי תור לאישור",
       "trust_free": "תוכנית מורה חינמית, ללא תפוגה",
       "trust_nologins": "בלי חשבונות לתלמידים, בלי התקנות",
       "cta_micro": "לוקח 60 שניות · בלי כרטיס אשראי",
@@ -14899,14 +14910,14 @@ const he = {
       "verify_email_body": "שלחנו קישור אימות אל {email}. אשרו אותו כדי לפתוח את בקשת גישת המורה.",
       "verify_email_resend": "שליחת אימייל אימות מחדש",
       "verify_email_sending": "שולח…",
-      "verify_email_resent": "נשלח — בדקו בתיבת הדואר",
-      "verify_email_refresh": "אימתתי — רענון",
+      "verify_email_resent": "נשלח, בדקו בתיבת הדואר",
+      "verify_email_refresh": "אימתתי, רענון",
       "email_locked_hint": "הבקשות מקושרות לכתובת האימייל המאומתת של החשבון.",
       "greeting": "היי {name}! 👋",
       "greeting_noname": "עוד רגע וסיימנו! 👋",
-      "greeting_sub": "כבר יש לנו את השם והאימייל שלכם מהחשבון — נשארו רק שני דברים קטנים.",
+      "greeting_sub": "כבר יש לנו את השם והאימייל שלכם מהחשבון, נשארו רק שני דברים קטנים.",
       "applying_as": "מגישים בתור",
-      "role_q": "נתחיל — מה הכי מתאים לכם?",
+      "role_q": "נתחיל, מה הכי מתאים לכם?",
       "use_case_q": "עכשיו החלק הכיפי 🎯",
       "use_case_hint": "איך תשתמשו בלקסיקלאש עם התלמידים? משפט־שניים זה מושלם.",
       "use_case_placeholder": "לדוגמה: קרב אוצר מילים בכל יום שישי עם כיתה ז׳…",
@@ -14915,16 +14926,16 @@ const he = {
       "use_case_ex2": "תרגול בית שהתלמידים באמת נהנים ממנו",
       "use_case_ex3": "משחקים קבוצתיים חיים לתרגול איות",
       "use_case_remaining": "עוד {count} תווים",
-      "use_case_ready": "מושלם — זה בדיוק מספיק! ✨",
+      "use_case_ready": "מושלם, זה בדיוק מספיק! ✨",
       "school_q": "איפה הכיתה שלכם? (לא חובה)",
       "school_placeholder": "בית ספר, מרכז לימודי או לימוד ביתי",
       "next": {
         "step1_title": "טופס קצר",
         "step1_body": "כדקה אחת.",
         "step2_title": "אישור מיידי",
-        "step2_body": "בלי בדיקה ידנית — מורים מאומתים מקבלים גישה ברגע ההרשמה.",
+        "step2_body": "בלי בדיקה ידנית, מורים מאומתים מקבלים גישה ברגע ההרשמה.",
         "step3_title": "גישה פתוחה!",
-        "step3_body": "לוח הבקרה נפתח מיד — וגם מייל אישי מאוהד."
+        "step3_body": "לוח הבקרה נפתח מיד, וגם מייל אישי מאוהד."
       },
       "regular_game_title": "לא מורה?",
       "regular_game_body": "לקסיקלאש חינם לכולם. בואו לשחק, ותחזרו אם בא לכם כלים למורים.",
@@ -14934,8 +14945,8 @@ const he = {
     },
     "trial": {
       "title": "תקופת הניסיון שלך כמורה פעילה 🎉",
-      "urgent_title": "הזדמנות אחרונה — הניסיון כמעט נגמר ⏳",
-      "body": "גישה מלאה לכיתה עד {date}. הקם/י כיתה והפעל/י משחק חי עכשיו — אל תפספס/י.",
+      "urgent_title": "הזדמנות אחרונה, הניסיון כמעט נגמר ⏳",
+      "body": "גישה מלאה לכיתה עד {date}. הקם/י כיתה והפעל/י משחק חי עכשיו, אל תפספס/י.",
       "days_left": "ימים נותרו",
       "day_left": "יום נותר",
       "hours_left": "שעות נותרו",
@@ -14959,9 +14970,9 @@ const he = {
         "role_other": "אחר",
         "student_count": "כמה תלמידים?",
         "count_lt_50": "פחות מ-50",
-        "count_50_200": "50–200",
-        "count_200_500": "200–500",
-        "count_500_2000": "500–2,000",
+        "count_50_200": "50-200",
+        "count_200_500": "200-500",
+        "count_500_2000": "500-2,000",
         "count_gte_2000": "2,000 ומעלה",
         "interests_legend": "מה מעניין אותך? (אופציונלי)",
         "interest_district_admin_dashboard": "לוח בקרה למנהל מחוז",
@@ -14976,26 +14987,26 @@ const he = {
         "submitting": "שולח…",
         "submit_error": "משהו השתבש. אנא נסו שוב.",
         "rate_limited": "יותר מדי שליחות. אנא נסו שוב בעוד 24 שעות.",
-        "success_title": "תודה — קיבלנו!",
-        "success_body": "נאשר את גישת הניסיון שלכם ונשתף פרטים על תוכנית בית הספר תוך 1–2 ימי עסקים. בינתיים המשיכו לשחק עם הכיתה — זה חינם.",
+        "success_title": "תודה, קיבלנו!",
+        "success_body": "נאשר את גישת הניסיון שלכם ונשתף פרטים על תוכנית בית הספר תוך 1-2 ימי עסקים. בינתיים המשיכו לשחק עם הכיתה, זה חינם.",
         "class_size": "גודל כיתה",
         "privacy_note": "נשתמש בזה רק כדי ליצור אתכם קשר בנוגע לתכונות בית ספר. ללא ספאם."
       }
     },
     "packages": {
       "title": "חבילות לחינוך",
-      "subtitle": "Teacher Pro הוא חיוב חי. תוכנית כיתה היא עוגן מחיר — ספרו לנו על הכיתה. בתי ספר ורשויות: צרו קשר. אין קופה לכיתה עד שנגיע לסף הביקוש.",
+      "subtitle": "Teacher Pro הוא חיוב חי. תוכנית כיתה היא עוגן מחיר, ספרו לנו על הכיתה. בתי ספר ורשויות: צרו קשר. אין קופה לכיתה עד שנגיע לסף הביקוש.",
       "teacherPro": {
         "name": "Teacher Pro",
         "interval": "/חודש",
         "blurb": "כל הדוחות, שיעורי בית על פערי פיספוס וכלי הוראה מחדש למורה אחד.",
-        "cta": "שדרוג — $9 לחודש"
+        "cta": "שדרוג: $9 לחודש"
       },
       "classroom": {
         "name": "תוכנית כיתה",
         "interval": "/סמסטר",
         "blurb": "כל הכיתה, כל יכולות Pro, רצפי כיתה ותמיכה בעדיפות.",
-        "cta": "בקשת כיתה — $39 לסמסטר"
+        "cta": "בקשת כיתה: $39 לסמסטר"
       },
       "school": {
         "name": "בתי ספר ורשויות",

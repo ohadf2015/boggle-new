@@ -17,6 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { MetricCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 import { AchievementGrid, type Achievement } from '@/components/education/achievements/AchievementGrid';
 import { STUDENT_PROGRESS_SELECT, buildAchievementsRecord } from '@/lib/education/achievementProgress';
 import { cn } from '@/lib/utils';
@@ -143,8 +144,13 @@ export default function StudentAchievementsPageClient() {
 
         {/* Achievement Grid */}
         {isLoadingAchievements ? (
-          <div className="flex items-center justify-center p-12">
-            <PageLoader size="md" text={t('common.loading')} />
+          <div aria-busy="true">
+            <span className="sr-only">{t('common.loading')}</span>
+            <SkeletonGrid
+              count={8}
+              skeleton={MetricCardSkeleton}
+              className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
+            />
           </div>
         ) : (
           <AchievementGrid

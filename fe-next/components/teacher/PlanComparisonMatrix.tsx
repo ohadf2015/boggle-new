@@ -41,7 +41,7 @@ export function PlanComparisonMatrix() {
         <span
           data-plan-mark
           aria-hidden="true"
-          className={value ? 'text-neo-lime font-black' : 'text-neo-white/40 font-black'}
+          className={value ? 'text-neo-lime font-black' : 'text-neo-white/60 font-black'}
         >
           {value ? '✓' : '✗'}
         </span>
@@ -65,10 +65,10 @@ export function PlanComparisonMatrix() {
       {/* Horizontal scroll container, not a squeeze: at 390px three columns of short values
           fit, but a long row label in German-length Swedish or Russian would otherwise force
           the whole page body to scroll sideways. Keep the overflow on the wrapper. */}
-      <div className="overflow-x-auto rounded-neo border-neo border-black shadow-hard">
+      <div className="overflow-x-auto rounded-neo border-neo border-neo-cream/40 shadow-hard">
         <table className="w-full border-collapse bg-neo-navy-light text-start">
           <thead>
-            <tr className="border-b-2 border-black">
+            <tr className="border-b-2 border-neo-cream/40">
               <th
                 scope="col"
                 className="p-3 sm:p-4 text-start font-neo-display font-black text-neo-white/80 text-sm sm:text-base"

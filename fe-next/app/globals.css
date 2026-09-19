@@ -5644,3 +5644,17 @@ html.ads-free-route [id^='google_ads_iframe'],
 html.ads-free-route .google-auto-placed {
   display: none !important;
 }
+
+/* OS "reduce motion" must stop perpetual Tailwind loops too. Framer already
+   honours it via MotionConfigProvider; these CSS keyframes were only killed
+   under html[data-cosy], so a user with the OS setting (but not cosy mode) got
+   radar pings and pulsing chips for a whole class session. animate-spin stays:
+   it is a functional loading signal, not decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-bounce,
+  .animate-ping,
+  .animate-pulse-ring {
+    animation: none;
+  }
+}

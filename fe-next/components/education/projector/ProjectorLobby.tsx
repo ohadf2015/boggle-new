@@ -172,7 +172,15 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         // Full-screen by construction: the lobby OWNS the viewport rather than
         // sitting under the page header with its Start button below the fold —
         // a teacher must never scroll a projector to find the way to begin.
-        // z-[65] clears EducationHeader's z-[60]; toasts sit far above both.
+        //
+        // z-[65] IS ON THE SCALE, deliberately reserved as the half-step
+        // between EducationHeader's z-60 and the mode-switcher sheet's z-80:
+        // this surface has to sit above the header (which it otherwise sits
+        // UNDER in normal document flow — see LobbyModeSwitcher's header
+        // comment for the y=92 measurement that proved it) but below any
+        // overlay this lobby itself opens. Restructuring EducationHeader to
+        // never need leap-frogging would touch every other route it renders
+        // on; formalizing 65 here is the smaller, safer fix.
         'fixed inset-0 z-[65] flex flex-col gap-[1vw] overflow-hidden',
         'bg-neo-navy px-[2.5vw] py-[1.2vw]'
       )}

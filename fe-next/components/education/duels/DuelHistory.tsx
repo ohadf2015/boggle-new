@@ -26,7 +26,7 @@ import {
 } from '@/lib/supabase/education/duels';
 import { readStudentName } from '@/lib/education/duelOpponentNames';
 import { cn } from '@/lib/utils';
-import { Loader } from '@/components/ui/Loader';
+import { MetricCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -98,9 +98,10 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader size="lg" />
-        <p className="ms-4 text-neo-white">{t('duels.loading')}</p>
+      <div className={cn('max-w-4xl mx-auto p-6', className)} aria-busy="true">
+        <p className="sr-only">{t('duels.loading')}</p>
+        <SkeletonGrid count={3} skeleton={MetricCardSkeleton} className="grid-cols-3 mb-5" />
+        <SkeletonGrid count={3} skeleton={MetricCardSkeleton} className="grid-cols-1" />
       </div>
     );
   }
@@ -138,7 +139,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
         className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-neo border-[3px] border-neo-black bg-neo-cream px-4 py-3 shadow-hard"
       >
         <div>
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
+          <p className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">
             {t('duels.wins')}
           </p>
           <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
@@ -146,7 +147,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
           </p>
         </div>
         <div>
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
+          <p className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">
             {t('duels.losses')}
           </p>
           <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
@@ -154,7 +155,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
           </p>
         </div>
         <div>
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
+          <p className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">
             {t('duels.winRate')}
           </p>
           <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
@@ -171,7 +172,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
             <span className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-black">
               {stats.winStreak}
             </span>
-            <span className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black">
+            <span className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black">
               {t('duels.winStreak')}
             </span>
           </span>
@@ -230,9 +231,9 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 className={cn(
                   'p-4 rounded-neo border-[2px] border-neo-cream shadow-hard flex items-center gap-4',
                   'bg-neo-navy',
-                  isWin && 'border-s-4 border-s-green-500',
-                  isLoss && 'border-s-4 border-s-red-500',
-                  isDraw && 'border-s-4 border-s-yellow-500'
+                  isWin && 'border-s-4 border-s-neo-lime',
+                  isLoss && 'border-s-4 border-s-neo-red',
+                  isDraw && 'border-s-4 border-s-neo-cream'
                 )}
                 data-testid={
                   isDraw
@@ -245,15 +246,15 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 {/* Badge */}
                 <div
                   className={cn(
-                    'shrink-0 w-10 h-10 rounded-neo border-[2px] border-neo-cream shadow-hard flex items-center justify-center',
-                    isWin && 'bg-green-500',
-                    isLoss && 'bg-red-500',
-                    isDraw && 'bg-yellow-500'
+                    'shrink-0 w-10 h-10 rounded-neo border-[2px] border-neo-black shadow-hard flex items-center justify-center',
+                    isWin && 'bg-neo-lime',
+                    isLoss && 'bg-neo-red',
+                    isDraw && 'bg-neo-cream'
                   )}
                 >
-                  {isWin && <Trophy className="w-5 h-5 text-white" />}
-                  {isLoss && <X className="w-5 h-5 text-white" />}
-                  {isDraw && <Minus className="w-5 h-5 text-white" />}
+                  {isWin && <Trophy className="w-5 h-5 text-neo-navy" />}
+                  {isLoss && <X className="w-5 h-5 text-neo-white" />}
+                  {isDraw && <Minus className="w-5 h-5 text-neo-navy" />}
                 </div>
 
                 {/* Info */}

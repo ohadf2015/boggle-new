@@ -26,6 +26,7 @@ import { useGameTimer } from '@/hooks/useGameTimer';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { outcomeTone } from '@/lib/education/outcomeTone';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -203,7 +204,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-        <X className="w-12 h-12 text-red-500 mb-4" />
+        <X className="w-12 h-12 text-neo-red mb-4" />
         <p className="text-neo-white text-lg mb-6" data-testid="duel-error">
           {error}
         </p>
@@ -243,14 +244,14 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           className={cn(
-            'mb-6 p-6 rounded-neo border-[3px] shadow-hard',
-            isDraw ? 'bg-yellow-500 border-neo-black' : isWinner ? 'bg-neo-lime border-neo-black' : 'bg-red-500 border-neo-black'
+            'mb-6 p-6 rounded-neo border-[3px] border-neo-black shadow-hard',
+            (isDraw ? outcomeTone('draw') : isWinner ? outcomeTone('win') : outcomeTone('loss')).badge
           )}
         >
           {isWinner ? (
-            <Trophy className="w-16 h-16 text-neo-black" />
+            <Trophy className="w-16 h-16 text-neo-navy" />
           ) : (
-            <Swords className="w-16 h-16 text-neo-white" />
+            <Swords className={cn('w-16 h-16', isDraw ? 'text-neo-navy' : 'text-neo-white')} />
           )}
         </AdaptiveMotion.div>
 
@@ -330,7 +331,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         <div className="bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard p-6 mb-6 max-w-md">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-green-500" />
+              <Check className="w-5 h-5 text-neo-lime" />
               <span className="text-neo-white">{t('duels.wordsAccepted')}</span>
             </div>
             <span className="text-neo-lime font-bold">{validatedScore.wordsValidated}</span>
@@ -338,10 +339,10 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <X className="w-5 h-5 text-red-500" />
+              <X className="w-5 h-5 text-neo-red" />
               <span className="text-neo-white">{t('duels.wordsRejected')}</span>
             </div>
-            <span className="text-red-400 font-bold">{validatedScore.wordsRejected}</span>
+            <span className="text-neo-red font-bold">{validatedScore.wordsRejected}</span>
           </div>
         </div>
 
@@ -372,7 +373,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           {/* G4: Countdown timer */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-[2px] border-neo-cream font-neo-display font-bold',
-            timeRemaining <= 30 ? 'bg-red-500 text-neo-white animate-pulse' :
+            timeRemaining <= 30 ? 'bg-neo-red text-neo-white animate-pulse' :
             timeRemaining <= 60 ? 'bg-neo-pink text-neo-black' :
             'bg-neo-lime text-neo-black'
           )}>

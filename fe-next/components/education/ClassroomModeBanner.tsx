@@ -211,7 +211,7 @@ export function ClassroomModeBanner({
       <div
         className={cn(
           'w-full px-4 py-2',
-          'bg-neo-cyan/15 border-b-3 border-neo-cyan/40',
+          'bg-neo-cyan/15 border-b-3 border-neo-cyan',
           'flex items-center justify-center gap-3 flex-wrap',
           'text-sm font-neo-body'
         )}

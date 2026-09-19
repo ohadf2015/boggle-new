@@ -87,8 +87,8 @@ export function MetricCard({
 
   // Trend color based on direction
   const trendColor = {
-    up: 'text-green-400',
-    down: 'text-red-400',
+    up: 'text-neo-lime',
+    down: 'text-neo-red',
     neutral: 'text-neo-white',
   }[trend || 'neutral'];
 

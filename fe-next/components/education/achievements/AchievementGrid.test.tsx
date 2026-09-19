@@ -298,4 +298,31 @@ describe('AchievementGrid', () => {
     const allTab = screen.getByText('education.achievements.all');
     expect(allTab).toHaveClass('bg-neo-lime');
   });
+
+  it('shows an empty hint above the grid when nothing is earned yet', () => {
+    const noProgress = {
+      'practice-master': mockAchievements['practice-master'],
+      'secret-word': mockAchievements['secret-word'],
+    };
+
+    render(
+      <AchievementGrid
+        studentId="student-1"
+        achievements={noProgress}
+      />
+    );
+
+    expect(screen.getByText('student.achievements.emptyHint')).toBeInTheDocument();
+  });
+
+  it('does not show the empty hint once at least one achievement is earned', () => {
+    render(
+      <AchievementGrid
+        studentId="student-1"
+        achievements={mockAchievements}
+      />
+    );
+
+    expect(screen.queryByText('student.achievements.emptyHint')).not.toBeInTheDocument();
+  });
 });

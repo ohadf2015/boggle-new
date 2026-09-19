@@ -1,32 +1,29 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { ArrowRight } from 'lucide-react';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { Suspense } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { buildEducationClassroomJsonLd, getEducationSubpageContent } from '@/lib/seo/educationSubpageJsonLd';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { loadTranslation } from '@/translations/loadTranslation';
+import type { Language } from '@/types';
 import PageClient from './PageClient';
 import { LobbySeoTail } from './LobbySeoTail';
 
 export const dynamic = 'force-dynamic';
 
-// Contextual entry point into the school/district lead funnel for teachers who are
-// already running class games here (the warmest audience). Localized inline.
-const FOR_SCHOOLS_FOOTER: Record<string, string> = {
-  en: 'Bringing LexiClash to your whole school or district?',
-  he: 'רוצים להביא את LexiClash לכל בית הספר או המחוז שלכם?',
-  sv: 'Vill du ta LexiClash till hela din skola eller kommun?',
-  ja: '学校や地域全体でLexiClashを使いませんか？',
-  es: '¿Quieres llevar LexiClash a toda tu escuela o distrito?',
-};
-const FOR_SCHOOLS_CTA: Record<string, string> = {
-  en: 'See LexiClash for Schools →',
-  he: 'גלו את LexiClash לבתי ספר →',
-  sv: 'Se LexiClash för skolor →',
-  ja: '学校向けLexiClashを見る →',
-  es: 'Ver LexiClash para escuelas →',
-};
+/** Dotted-path lookup into the loaded catalogue, same helper other server pages use. */
+function readString(catalogue: unknown, path: string, fallback: string): string {
+  let node: unknown = catalogue;
+  for (const part of path.split('.')) {
+    if (!node || typeof node !== 'object') return fallback;
+    node = (node as Record<string, unknown>)[part];
+  }
+  return typeof node === 'string' ? node : fallback;
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -37,6 +34,17 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
   const { locale } = await params;
   const { howTo, resource, breadcrumb } = buildEducationClassroomJsonLd(locale);
   const copy = getEducationSubpageContent('classroomGame', locale);
+  const catalogue = await loadTranslation(locale as Language);
+  const forSchoolsFooter = readString(
+    catalogue,
+    'education.classroomGame.forSchoolsFooter',
+    'Bringing LexiClash to your whole school or district?'
+  );
+  const forSchoolsCta = readString(
+    catalogue,
+    'education.classroomGame.forSchoolsCta',
+    'See LexiClash for Schools'
+  );
 
   return (
     <>
@@ -72,14 +80,15 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
         asH1
       />
       <section className="mx-auto max-w-3xl px-4 pb-12 text-center">
-        <div className="rounded-neo border-neo-thick bg-neo-navy-light px-6 py-6 shadow-hard-lg">
-          <p className="text-base text-neo-white/90">{FOR_SCHOOLS_FOOTER[locale] ?? FOR_SCHOOLS_FOOTER.en}</p>
+        <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light px-6 py-6 shadow-hard-lg">
+          <p className="text-base text-neo-white/90">{forSchoolsFooter}</p>
           <Link
             href={`/${locale}/education/for-schools`}
             data-ph-capture-attribute-cta="classroom_for_schools"
-            className="mt-4 inline-block rounded-neo border-neo-thick bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg"
+            className="mt-4 inline-flex items-center gap-2 rounded-neo border-neo-thick bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg"
           >
-            {FOR_SCHOOLS_CTA[locale] ?? FOR_SCHOOLS_CTA.en}
+            {forSchoolsCta}
+            <DirectionalIcon icon={ArrowRight} className="inline size-4" />
           </Link>
         </div>
       </section>

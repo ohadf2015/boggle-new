@@ -54,7 +54,7 @@ export function VocabQuizOwnFinale({ correct, total, bestStreak, t }: VocabQuizO
         sizeClassName="w-24 h-24"
         clipShape="rounded-square"
         clipBorder="cyan"
-        clipBg="var(--neo-navy, #12172b)"
+        clipBg="var(--neo-navy, #1a1a2e)"
         animated
         // A reaction, not a control — see VocabQuizStudentHeader.
         enableHover={false}

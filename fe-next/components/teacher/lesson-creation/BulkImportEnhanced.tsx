@@ -324,7 +324,7 @@ export default function BulkImportEnhanced({
                 )}
               >
                 <FileUp className="w-5 h-5" />
-                <span>Drop CSV file here or click to browse</span>
+                <span>{t('teacher.lesson.bulkImportDropCsv')}</span>
               </button>
             </div>
 

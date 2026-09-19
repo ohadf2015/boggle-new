@@ -190,7 +190,9 @@ describe('BulkImportEnhanced', () => {
       expect(screen.getByText(/2 words detected/i)).toBeInTheDocument();
     });
 
-    const importButton = screen.getByRole('button', { name: /Import/i });
+    // Anchored match: a bare `/Import/i` also matches the drop-CSV button,
+    // whose mocked `t()` returns the raw key `teacher.lesson.bulkImportDropCsv`.
+    const importButton = screen.getByRole('button', { name: /^Import/i });
     await user.click(importButton);
 
     expect(mockOnImport).toHaveBeenCalledTimes(1);

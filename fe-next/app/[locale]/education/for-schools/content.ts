@@ -34,6 +34,8 @@ export interface ForSchoolsContent {
   /** Comparison-table column headers. Previously hardcoded English. */
   compareHeaders: { tool: string; theirFreeTier: string };
   compareRows: ForSchoolsCompareRow[];
+  /** "See the full breakdown" link under the comparison table. Was hardcoded English. */
+  compareMore: { text: string; linkLabel: string };
   comingTitle: string;
   comingIntro: string;
   coming: { title: string; body: string }[];
@@ -79,6 +81,7 @@ const EN: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'No real free tier -- $199/classroom to start.', lexiclash: 'Full trial, no card. School plans from $39/term.' },
     { competitor: 'Wordwall', freeTierLimit: 'Free tier limited to a handful of activities.', lexiclash: 'Unlimited play in trial. School plans from $39/term.' },
   ],
+  compareMore: { text: 'Want the full breakdown?', linkLabel: 'LexiClash vs Kahoot, feature by feature' },
   comingTitle: 'What school & district plans include',
   comingIntro:
     'These are the features schools tell us they need at scale -- available in school plans ($39/term), layered on top of the free classroom, never gating it.',
@@ -141,6 +144,7 @@ const RU: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'Нет настоящей бесплатной версии — $199 за класс для начала.', lexiclash: 'Полный пробный период, без карты. Школьные планы от $39 за семестр.' },
     { competitor: 'Wordwall', freeTierLimit: 'Бесплатная версия ограничена несколькими упражнениями.', lexiclash: 'Неограниченная игра во время пробы. Школьные планы от $39 за семестр.' },
   ],
+  compareMore: { text: 'Хотите увидеть подробности?', linkLabel: 'LexiClash и Kahoot: сравнение по функциям' },
   comingTitle: 'Что включают школьные и районные планы',
   comingIntro:
     'Это функции, которые школы говорят нам, что им нужны в масштабе — доступны в школьных планах ($39 за семестр), расположены поверх бесплатного класса, никогда не блокируя его.',
@@ -203,6 +207,7 @@ const HE: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'אין מסלול חינמי אמיתי — $199 לכיתה כדי להתחיל.', lexiclash: 'ניסיון מלא, בלי כרטיס. תוכניות בית ספר החל מ-$39 לסמסטר.' },
     { competitor: 'Wordwall', freeTierLimit: 'המסלול החינמי מוגבל לקומץ פעילויות.', lexiclash: 'משחק בלי הגבלה בזמן הניסיון. תוכניות בית ספר החל מ-$39 לסמסטר.' },
   ],
+  compareMore: { text: 'רוצים את הפירוט המלא?', linkLabel: 'LexiClash מול Kahoot, השוואה מלאה' },
   comingTitle: 'מה כוללות תוכניות בית ספר ורשות',
   comingIntro:
     'אלה היכולות שבתי ספר אומרים לנו שהם צריכים בקנה מידה גדול — זמינות בתוכניות בית ספר ($39 לסמסטר), נבנות מעל הכיתה החינמית ולעולם לא חוסמות אותה.',
@@ -265,6 +270,7 @@ const SV: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'Ingen verklig gratisversion — $199/klassrum för att komma igång.', lexiclash: 'Fullständig provperiod, inget kort. Skolplaner från $39/termin.' },
     { competitor: 'Wordwall', freeTierLimit: 'Gratisversionen begränsad till ett fåtal aktiviteter.', lexiclash: 'Obegränsad speltid under provperioden. Skolplaner från $39/termin.' },
   ],
+  compareMore: { text: 'Vill du se hela jämförelsen?', linkLabel: 'LexiClash mot Kahoot, funktion för funktion' },
   comingTitle: 'Vad skol- och distriktsplaner inkluderar',
   comingIntro:
     'Det här är de funktioner som skolor säger att de behöver i stor skala — tillgängliga i skolplaner ($39/termin), byggda ovanpå det gratis klassrummet, aldrig låsta bakom det.',
@@ -327,6 +333,7 @@ const JA: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: '本当の無料プランなし — スタート時に教室ごとに$199。', lexiclash: '完全なトライアル、カード不要。学校プランは学期$39から。' },
     { competitor: 'Wordwall', freeTierLimit: '無料プランは少数のアクティビティに制限。', lexiclash: 'トライアル中は無制限プレイ。学校プランは学期$39から。' },
   ],
+  compareMore: { text: '詳細な比較を見ますか？', linkLabel: 'LexiClashとKahootの機能比較' },
   comingTitle: '学校・学区プランに含まれるもの',
   comingIntro:
     'これらは、規模を拡大する際に学校が必要だと教えてくれる機能です — 学校プラン（学期$39）で利用可能。無料クラスルームの上に積み重ねられ、決して制限することはありません。',
@@ -389,6 +396,7 @@ const ES: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'Sin nivel gratuito real — $199/clase para empezar.', lexiclash: 'Prueba completa, sin tarjeta. Planes escolares desde $39/trimestre.' },
     { competitor: 'Wordwall', freeTierLimit: 'El nivel gratuito se limita a un puñado de actividades.', lexiclash: 'Juego ilimitado en la prueba. Planes escolares desde $39/trimestre.' },
   ],
+  compareMore: { text: '¿Quieres ver la comparación completa?', linkLabel: 'LexiClash frente a Kahoot, función por función' },
   comingTitle: 'Qué incluyen los planes escolares y de distrito',
   comingIntro:
     'Estas son las funciones que las escuelas nos dicen que necesitan a escala — disponibles en los planes escolares ($39/trimestre), superpuestas al aula gratuita, sin limitarla nunca.',

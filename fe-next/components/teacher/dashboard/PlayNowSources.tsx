@@ -127,7 +127,7 @@ export const PickRow = memo(function PickRow({
           {recommendedLabel ? (
             <span
               data-testid={`${testId}-recommended`}
-              className="shrink-0 rounded-full border-2 border-black bg-neo-white px-1.5 py-px font-neo-display text-[10px] font-black uppercase leading-tight text-black"
+              className="shrink-0 rounded-full border-2 border-black bg-neo-white px-1.5 py-px font-neo-display text-xs font-black uppercase leading-tight text-black"
             >
               {recommendedLabel}
             </span>

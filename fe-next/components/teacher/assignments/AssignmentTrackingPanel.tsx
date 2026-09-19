@@ -38,8 +38,8 @@ function AssignmentCard({
       : 0;
 
   const statusConfig = {
-    active: { label: t('teacher.tracking.statusActive'), color: 'bg-green-500' },
-    overdue: { label: t('teacher.tracking.statusOverdue'), color: 'bg-red-500 animate-pulse' },
+    active: { label: t('teacher.tracking.statusActive'), color: 'bg-neo-lime' },
+    overdue: { label: t('teacher.tracking.statusOverdue'), color: 'bg-neo-red motion-reduce:animate-none animate-pulse' },
     completed: { label: t('teacher.tracking.statusCompleted'), color: 'bg-neo-navy' },
   };
 
@@ -132,7 +132,7 @@ function AssignmentCard({
 
       {/* Expanded: Completion Tracker */}
       {isExpanded && (
-        <div className="border-t border-neo-black/30 p-4 bg-neo-black/10">
+        <div className="border-t border-neo-cream/40 p-4 bg-neo-black/10">
           <CompletionTracker
             assignmentId={assignment.id}
             totalStudents={assignment.student_count || 0}
@@ -200,8 +200,8 @@ export default function AssignmentTrackingPanel({
 
   if (error) {
     return (
-      <div className="p-6 bg-red-500/10 border border-red-500/30 rounded-neo">
-        <p className="text-red-400">{error}</p>
+      <div className="p-6 bg-neo-red/10 border border-neo-red rounded-neo">
+        <p className="text-neo-red">{error}</p>
       </div>
     );
   }

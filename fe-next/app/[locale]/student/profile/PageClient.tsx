@@ -22,7 +22,8 @@ import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getXpProgress } from '@/backend/modules/xpManager';
 import { getDuelStats, getDuelHistory, type DuelHistoryEntry, type DuelStatsResult } from '@/lib/supabase/education/duels';
-import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
+import { Swords, Trophy, X, Minus, Flame, ArrowRight } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { formatDistanceToNow } from 'date-fns';
 import { transformAchievementRow } from './achievementTransform';
 import { m } from 'framer-motion';
@@ -261,7 +262,7 @@ export default function StudentProfilePageClient() {
               )}
             </div>
             <div
-              className="h-4 bg-neo-navy-light border-2 border-neo-black rounded-neo overflow-hidden"
+              className="h-4 bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo overflow-hidden"
               role="progressbar"
               aria-label={t('common.aria.levelProgress')}
               aria-valuenow={xpProgress.progressPercent}
@@ -281,7 +282,7 @@ export default function StudentProfilePageClient() {
             // Skeleton loaders for stats
             <>
               {['a', 'b', 'c'].map((id) => (
-                <div key={`stats-${id}`} className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard animate-pulse">
+                <div key={`stats-${id}`} className="p-6 bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo shadow-hard animate-pulse">
                   <div className="h-4 w-24 bg-neo-white/10 rounded mb-2" />
                   <div className="h-9 w-16 bg-neo-white/20 rounded" />
                 </div>
@@ -289,7 +290,7 @@ export default function StudentProfilePageClient() {
             </>
           ) : (
             <>
-              <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
+              <div className="p-6 bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo shadow-hard">
                 <div className="text-neo-white font-neo-body text-sm mb-1">
                   {t('education.student.lessonsAssigned')}
                 </div>
@@ -298,7 +299,7 @@ export default function StudentProfilePageClient() {
                 </div>
               </div>
 
-              <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
+              <div className="p-6 bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo shadow-hard">
                 <div className="text-neo-white font-neo-body text-sm mb-1">
                   {t('education.practice.wordsFound')}
                 </div>
@@ -307,7 +308,7 @@ export default function StudentProfilePageClient() {
                 </div>
               </div>
 
-              <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
+              <div className="p-6 bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo shadow-hard">
                 <div className="text-neo-white font-neo-body text-sm mb-1">
                   {t('education.practice.complete')}
                 </div>
@@ -329,7 +330,7 @@ export default function StudentProfilePageClient() {
             // Skeleton loader
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {['a', 'b', 'c', 'd'].map((id) => (
-                <div key={`duel-${id}`} className="p-4 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard animate-pulse">
+                <div key={`duel-${id}`} className="p-4 bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo shadow-hard animate-pulse">
                   <div className="h-4 w-16 bg-neo-white/10 rounded mb-2" />
                   <div className="h-8 w-12 bg-neo-white/20 rounded" />
                 </div>
@@ -344,11 +345,11 @@ export default function StudentProfilePageClient() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="p-4 bg-green-500/20 border-neo border-neo-black rounded-neo shadow-hard"
+                  className="p-4 bg-neo-lime/20 border-neo border-neo-lime rounded-neo shadow-hard"
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <Trophy className="w-4 h-4 text-green-400" />
-                    <span className="text-green-400 font-neo-body text-sm">
+                    <Trophy className="w-4 h-4 text-neo-lime" />
+                    <span className="text-neo-lime font-neo-body text-sm">
                       {t('duels.wins')}
                     </span>
                   </div>
@@ -362,11 +363,11 @@ export default function StudentProfilePageClient() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="p-4 bg-red-500/20 border-neo border-neo-black rounded-neo shadow-hard"
+                  className="p-4 bg-neo-red/20 border-neo border-neo-red rounded-neo shadow-hard"
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <X className="w-4 h-4 text-red-400" />
-                    <span className="text-red-400 font-neo-body text-sm">
+                    <X className="w-4 h-4 text-neo-red" />
+                    <span className="text-neo-red font-neo-body text-sm">
                       {t('duels.losses')}
                     </span>
                   </div>
@@ -380,7 +381,7 @@ export default function StudentProfilePageClient() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="p-4 bg-neo-cyan/20 border-neo border-neo-black rounded-neo shadow-hard"
+                  className="p-4 bg-neo-cyan/20 border-neo border-neo-cyan rounded-neo shadow-hard"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-neo-cyan font-neo-body text-sm">
@@ -401,7 +402,7 @@ export default function StudentProfilePageClient() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="p-4 bg-neo-orange/20 border-neo border-neo-black rounded-neo shadow-hard"
+                  className="p-4 bg-neo-orange/20 border-neo border-neo-orange rounded-neo shadow-hard"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     {duelStats.currentStreak >= 3 && <Flame className="w-4 h-4 text-neo-orange" />}
@@ -420,11 +421,11 @@ export default function StudentProfilePageClient() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25 }}
-                    className="p-4 bg-gray-500/20 border-neo border-neo-black rounded-neo shadow-hard col-span-2 md:col-span-1"
+                    className="p-4 bg-neo-cream/10 border-neo border-neo-cream rounded-neo shadow-hard col-span-2 md:col-span-1"
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Minus className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-400 font-neo-body text-sm">
+                      <Minus className="w-4 h-4 text-neo-cream/70" />
+                      <span className="text-neo-cream/70 font-neo-body text-sm">
                         {t('duels.draws')}
                       </span>
                     </div>
@@ -473,15 +474,15 @@ export default function StudentProfilePageClient() {
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="flex items-center justify-between p-3 bg-neo-navy/30 border-2 border-neo-black rounded-neo hover:bg-neo-navy/50 transition-colors"
+                          className="flex items-center justify-between p-3 bg-neo-navy/30 border-2 border-neo-cream/40 rounded-neo hover:bg-neo-navy/50 transition-colors"
                         >
                           <div className="flex items-center gap-3">
                             {/* Win/Loss/Draw badge */}
                             <div className={cn(
                               'px-2 py-1 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs',
-                              duel.isWin && 'bg-green-500 text-white',
-                              !duel.isWin && duel.winner_id !== null && 'bg-red-500 text-white',
-                              duel.winner_id === null && 'bg-gray-500 text-white'
+                              duel.isWin && 'bg-neo-lime text-neo-navy',
+                              !duel.isWin && duel.winner_id !== null && 'bg-neo-red text-neo-white',
+                              duel.winner_id === null && 'bg-neo-cream text-neo-navy'
                             )}>
                               {duel.isWin ? 'W' : duel.winner_id === null ? 'D' : 'L'}
                             </div>
@@ -508,13 +509,14 @@ export default function StudentProfilePageClient() {
 
                   {/* Link to full duel history */}
                   <Link
-                    href={`/${language}/duels/history`}
+                    href={`/${language}/education/duels`}
                     className={cn(
-                      'block text-center text-neo-cyan hover:text-neo-cyan/80 font-neo-body text-sm',
+                      'flex items-center justify-center gap-1 text-center text-neo-cyan hover:text-neo-cyan/80 font-neo-body text-sm',
                       'transition-colors underline underline-offset-4 mt-2'
                     )}
                   >
-                    {t('student.profile.viewDuelHistory')} →
+                    {t('student.profile.viewDuelHistory')}
+                    <DirectionalIcon icon={ArrowRight} className="inline size-4" />
                   </Link>
                 </div>
               )}
@@ -524,7 +526,7 @@ export default function StudentProfilePageClient() {
             <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-8 bg-neo-navy/30 border-neo border-neo-black rounded-neo shadow-hard text-center"
+              className="p-8 bg-neo-navy/30 border-neo border-neo-cream/40 rounded-neo shadow-hard text-center"
             >
               <Swords className="w-12 h-12 text-neo-white mx-auto mb-3" />
               <div className="text-neo-white font-neo-body mb-1">
@@ -545,11 +547,12 @@ export default function StudentProfilePageClient() {
           <Link
             href={`/${language}/student/achievements`}
             className={cn(
-              'text-neo-cyan hover:text-neo-cyan/80 font-neo-body text-sm',
+              'flex items-center gap-1 text-neo-cyan hover:text-neo-cyan/80 font-neo-body text-sm',
               'transition-colors underline underline-offset-4'
             )}
           >
-            {t('student.dashboard.viewAll')} →
+            {t('student.dashboard.viewAll')}
+            <DirectionalIcon icon={ArrowRight} className="inline size-4" />
           </Link>
         </div>
 

@@ -135,7 +135,9 @@ export function ComparisonStrip() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-neo-cream border-b-neo-thick border-b-neo-navy">
-              <th className="p-3 text-start font-bold text-neo-navy" />
+              <th scope="col" className="p-3 text-start font-bold text-neo-navy">
+                <span className="sr-only">{t('education.landing.compare.rowHeader')}</span>
+              </th>
               {COMPETITORS.map((c) => (
                 <th
                   key={c}
@@ -155,7 +157,7 @@ export function ComparisonStrip() {
                 data-compare-row
                 className={`${
                   fi % 2 === 0 ? 'bg-neo-cream/40' : 'bg-neo-cream'
-                } border-b border-neo-navy/20`}
+                } border-b border-neo-navy`}
               >
                 <td className="p-3 font-bold text-neo-navy text-sm">
                   {t(`education.landing.compare.row.${f}`)}

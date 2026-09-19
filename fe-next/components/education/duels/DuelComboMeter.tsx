@@ -74,7 +74,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
           </span>
           <span
             className={cn(
-              'truncate font-neo-body text-[10px] font-black uppercase tracking-widest',
+              'truncate font-neo-body text-xs font-black uppercase tracking-wide',
               isHot ? 'text-neo-white' : 'text-neo-cream/80'
             )}
           >

@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Script from 'next/script';
 import { m, useReducedMotion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { EducationHero } from '@/components/education/EducationHero';
 import { MoatTrifectaSection } from '@/components/education/MoatTrifectaSection';
 import { ProFramingSection } from '@/components/education/ProFramingSection';
@@ -91,19 +92,11 @@ export function PageClient() {
       <TopBackLink className="mb-4" />
 
       {/*
-        The no-account path, deliberately OUTSIDE the auth gates below.
-
-        Everything else on this page is gated on `!loading` to avoid the auth flash,
-        which means none of it is in the server-rendered HTML — a crawler, and a
-        teacher on a slow connection, see nothing. This block needs no auth state to
-        be true, so gating it would hide the one CTA that asks for nothing from the
-        exact reader it is for. Rendered unconditionally: it never changes, so it
-        cannot flash.
-      */}
-      {/*
-        Money path must be in SSR HTML. EducationHero / ProFraming sit behind
-        AuthContext loading=true, so crawlers never saw /teacher/upgrade.
-        Both CTAs are auth-agnostic and render unconditionally (like NoAccountCta).
+        The no-account path and the Teacher Pro checkout CTA, deliberately
+        OUTSIDE the marketing gate below. Both are auth-agnostic — they never
+        change based on `hasTeacherAccess` — so rendering them unconditionally
+        here means they can never flash regardless of how the marketing gate
+        is written below.
       */}
       <div className="mx-auto grid w-full max-w-6xl gap-4 px-4 pb-2 sm:grid-cols-2 sm:px-6 lg:px-8">
         <TeacherProCheckoutCta locale={language} />
@@ -187,7 +180,7 @@ export function PageClient() {
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-cyan text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
                   >
                     {t('education.landing.openDashboard')}
-                    <span aria-hidden="true">→</span>
+                    <DirectionalIcon icon={ArrowRight} className="inline size-4" />
                   </Link>
                 </div>
               </div>
@@ -196,7 +189,7 @@ export function PageClient() {
             {/* Start Game shortcut */}
             <m.div
               variants={teacherBar}
-              className="bg-neo-navy-light border-b border-neo-white/10 px-4 py-3"
+              className="bg-neo-navy-light border-b border-neo-cream/40 px-4 py-3"
             >
               <div className="mx-auto max-w-3xl">
                 <Link
@@ -237,12 +230,20 @@ export function PageClient() {
               </div>
             </aside>
           </div>
-          <EducationFAQ />
+          <EducationFAQ jsonLd={false} />
         </>
       )}
 
-      {/* Marketing landing for unauthenticated and student views — gate on !loading to avoid flash */}
-      {!loading && !hasTeacherAccess && (
+      {/* Marketing landing: the pessimistic/safe default. `hasTeacherAccess` is
+          `false` while `loading` is true, so this — not the teacher shortcut
+          bar above — is what SSR and first client paint render. It only hides
+          once auth resolves to an actual teacher; a redirecting student never
+          sees it flash because of the early `return null` above. Trade-off:
+          a teacher sees this marketing view for one render before their
+          dashboard shortcuts replace it, which beats a crawler/slow-connection
+          visitor seeing no H1 at all (Class 1 pitfall run in reverse — the
+          pessimistic state for an anon marketing page IS the marketing page). */}
+      {!hasTeacherAccess && (
         <>
           <EducationHero />
           <MoatTrifectaSection />
@@ -258,8 +259,8 @@ export function PageClient() {
         </>
       )}
 
-      {/* Role cards for unauthenticated users only — gate on !loading */}
-      {!loading && !hasTeacherAccess && (
+      {/* Role cards for unauthenticated users only */}
+      {!hasTeacherAccess && (
         <section className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
           <div className="grid gap-6 md:grid-cols-2">
             {/* Teacher card */}
@@ -284,9 +285,10 @@ export function PageClient() {
                 href={`/${language}/education/for-schools`}
                 data-testid="district-role-card-link"
                 onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'district_role_card' })}
-                className="self-start text-sm font-bold text-neo-purple underline underline-offset-2 hover:text-neo-purple/80 transition-colors"
+                className="self-start inline-flex items-center gap-1 text-sm font-bold text-neo-purple underline underline-offset-2 hover:text-neo-purple/80 transition-colors"
               >
-                {t('education.landing.districtCta.title')} →
+                {t('education.landing.districtCta.title')}
+                <DirectionalIcon icon={ArrowRight} className="inline size-3.5" />
               </Link>
             </div>
             {/* Student card. The teacher card has two routes out; this one had
@@ -315,8 +317,8 @@ export function PageClient() {
         </section>
       )}
 
-      {/* Social proof for unauthenticated users — gate on !loading */}
-      {!loading && !hasTeacherAccess && (
+      {/* Social proof for unauthenticated users */}
+      {!hasTeacherAccess && (
         <section className="mx-auto max-w-3xl px-4 py-8 text-center">
           <p className="text-neo-white">
             {t('education.landing.socialProof')}
@@ -324,7 +326,7 @@ export function PageClient() {
         </section>
       )}
 
-      {!loading && !hasTeacherAccess && (
+      {!hasTeacherAccess && (
         <>
           {/* Pricing lands here, after the visitor has chosen a role — not third
               on the page. See the note by SixModeTour above. */}
@@ -350,7 +352,7 @@ export function PageClient() {
             </ul>
           </section>
 
-          <EducationFAQ />
+          <EducationFAQ jsonLd={false} />
 
           {/* Same container as the sections above it. Without one this sat at left:0 across
               the full 1440px viewport, so "Explore More" and its three links ran flush into

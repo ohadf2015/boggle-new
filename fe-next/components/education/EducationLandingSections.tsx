@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   BookOpen,
   Clock,
   Coins,
@@ -19,6 +20,7 @@ import {
 import type { EducationAccent, EducationSection } from '@/lib/seo/educationLanding';
 import Link from 'next/link';
 import { ClassGameList } from '@/components/education/ClassGameList';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { EducationDepthSections } from '@/components/education/EducationDepthSections';
 import { EducationPlayFormats } from '@/components/education/EducationPlayFormats';
 import { EslPlayableDemo } from '@/components/education/EslPlayableDemo';
@@ -240,9 +242,10 @@ export function EducationSectionRenderer({
         <p className="mt-3 max-w-[68ch] text-sm leading-relaxed text-neo-white/75 sm:text-base">{section.body}</p>
         <a
           href={section.href}
-          className="mt-4 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4"
+          className="mt-4 inline-flex items-center gap-1.5 font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4"
         >
-          {section.cta} ↗
+          {section.cta}
+          <DirectionalIcon icon={ArrowRight} className="inline size-4" />
         </a>
       </section>
     );
@@ -286,7 +289,7 @@ export function EducationSectionRenderer({
             </thead>
             <tbody>
               {section.rows.map((row) => (
-                <tr key={row.join('|')} className="border-t-2 border-neo-black bg-neo-navy-light">
+                <tr key={row.join('|')} className="border-t-2 border-neo-cream/40 bg-neo-navy-light">
                   {row.map((cell, ci) => (
                     <td
                       key={`${row[0]}-${ci}`}
