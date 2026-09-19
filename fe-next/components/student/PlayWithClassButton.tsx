@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { Play, Swords } from 'lucide-react';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useActiveClassroomGame } from '@/hooks/useActiveClassroomGame';
@@ -29,6 +30,7 @@ export function PlayWithClassButton({
   // Only ever called when a game is running — see `hasGame` below.
   const handleClick = () => {
     if (!activeGame) return;
+    posthog.capture('student_play_zone_card_clicked', { card: 'play_with_class' });
     // `room`, not `code`: useMultiplayerSession reads ONLY `?room=` to prefill and
     // auto-join. `?code=` left the room empty, so auto-join never fired and
     // `?classroom=true` parked the student on a spinner forever.

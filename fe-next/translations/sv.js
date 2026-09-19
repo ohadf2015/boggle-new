@@ -7681,6 +7681,7 @@ const sv = {
     "wordsFound": "{count} ord hittade",
     "scoreLabel": "Poäng",
     "timeLeft": "Tid kvar",
+    "closeRace": "Jämnt lopp!",
     "gameOver": "Tiden är ute!",
     "submit": "SKICKA",
     "alreadyFound": "Redan hittad!",

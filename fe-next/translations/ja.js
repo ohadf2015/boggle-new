@@ -7446,6 +7446,7 @@ const ja = {
     "wordsFound": "{count}語見つかりました",
     "scoreLabel": "スコア",
     "timeLeft": "残り時間",
+    "closeRace": "接戦中!",
     "gameOver": "時間切れ！",
     "submit": "送信",
     "alreadyFound": "すでに見つかりました！",

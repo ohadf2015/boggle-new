@@ -89,4 +89,38 @@ describe('WheelRushHeader', () => {
     fireEvent.click(screen.getByRole('button', { name: /quit/i }));
     expect(props.onQuit).toHaveBeenCalled();
   });
+
+  it('flags a close race with an orange pulse + zap icon when self and rival are within 8% of the leader score', () => {
+    // leaderScore=50 (bob), gap |30-28|=2 → 4% of 50, under the 8% threshold.
+    setup({
+      leaderboard: [
+        { username: 'alice', score: 30 },
+        { username: 'bob', score: 50 },
+        { username: 'carol', score: 28 },
+      ],
+    });
+    expect(screen.getByTestId('wheel-close-race-indicator')).toBeTruthy();
+    expect(screen.getByTestId('wheel-opp-carol').className).toContain('border-neo-orange');
+    expect(screen.getByTestId('wheel-self-badge').className).toContain('border-neo-orange');
+  });
+
+  it('does not flag a close race when the rival gap is wide', () => {
+    setup(); // alice=30 vs rival bob=50 → 40% of leader score, well outside threshold
+    expect(screen.queryByTestId('wheel-close-race-indicator')).toBeNull();
+    expect(screen.getByTestId('wheel-opp-bob').className).not.toContain('border-neo-orange');
+    expect(screen.getByTestId('wheel-self-badge').className).not.toContain('border-neo-orange');
+  });
+
+  it('suppresses the close-race cue during fog so proximity is never leaked via animation', () => {
+    setup({
+      fogActive: true,
+      leaderboard: [
+        { username: 'alice', score: 30 },
+        { username: 'bob', score: 50 },
+        { username: 'carol', score: 28 },
+      ],
+    });
+    expect(screen.queryByTestId('wheel-close-race-indicator')).toBeNull();
+    expect(screen.getByTestId('wheel-opp-carol').className).not.toContain('border-neo-orange');
+  });
 });

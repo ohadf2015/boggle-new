@@ -6,6 +6,7 @@ import { ArrowRight, Flag, Check, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
+import { useExperiment } from '@/hooks/useExperiment';
 import type { PyramidPuzzle } from '@/lib/connections/pyramid/types';
 import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -90,6 +91,17 @@ export default function FinaleCard({
     setFreeHints(consumeFreeHint());
     onRevealHint();
   };
+
+  // Same rage-click-mitigation gate as PuzzleCard — previously missing here,
+  // leaving finale-stage (highest-investment) non-admin players with NO hint
+  // path at all once free hints ran out and no ad was available.
+  const { variant: hintGateVariant, trackExposure: trackHintGateExposure } =
+    useExperiment('exp-connections-hint-gate-v1');
+  const showFallbackHint =
+    hintGateVariant === 'after-3-wrong' && wrongAttempts >= 3 && !isAdmin;
+  useEffect(() => {
+    if (showFallbackHint && pyramid.metaHint && !hintRevealed) trackHintGateExposure();
+  }, [showFallbackHint, pyramid.metaHint, hintRevealed, trackHintGateExposure]);
 
   // Rewarded-ad gate for hint
   const revealHintAd = useRewardedFeatureUnlock({
@@ -312,12 +324,12 @@ export default function FinaleCard({
                   <Lightbulb className="w-4 h-4" aria-hidden="true" />
                   {t('connections.freeHint', { count: freeHints })}
                 </m.button>
-              ) : revealHintAd.canShowAd ? (
+              ) : (revealHintAd.canShowAd || showFallbackHint) ? (
                 <m.button
                   type="button"
-                  onClick={revealHintAd.offer}
+                  onClick={revealHintAd.canShowAd ? revealHintAd.offer : onRevealHint}
                   whileTap={{ scale: 0.96 }}
-                  disabled={revealHintAd.status === 'loading' || revealHintAd.status === 'showing'}
+                  disabled={revealHintAd.canShowAd && (revealHintAd.status === 'loading' || revealHintAd.status === 'showing')}
                   className="inline-flex items-center gap-1.5 text-neo-white/55 font-neo-body text-xs px-2 py-1 hover:text-neo-yellow underline-offset-4 hover:underline transition-colors disabled:opacity-60"
                 >
                   <Lightbulb className="w-3.5 h-3.5" aria-hidden="true" />

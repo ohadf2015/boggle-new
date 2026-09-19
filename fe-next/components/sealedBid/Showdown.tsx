@@ -169,12 +169,19 @@ export default function Showdown({
     };
   }, [bannerVisible, onDone]);
 
+  // Rejected and pass both settle as 'none' but shouldn't feel the same: a
+  // rejected word forfeits chips (a small foot-fault) while a pass risks
+  // nothing. The warning-orange tone (reserved for non-critical warnings,
+  // see design-system.md) marks the forfeit without overstating it as a
+  // clash-grade loss.
   const bannerTone =
     outcome === 'unique'
       ? 'border-neo-yellow bg-neo-yellow text-neo-navy'
       : outcome === 'clash'
         ? 'border-neo-red bg-neo-red text-neo-white'
-        : 'border-neo-cream bg-neo-navy-light text-neo-cream';
+        : rejected
+          ? 'border-neo-orange bg-neo-orange text-neo-navy'
+          : 'border-neo-cream bg-neo-navy-light text-neo-cream';
 
   return (
     <div

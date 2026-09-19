@@ -14,9 +14,11 @@
  * have a playable action available.
  */
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { Swords, Sparkles } from 'lucide-react';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PlayWithClassButton } from '@/components/student/PlayWithClassButton';
 
@@ -36,6 +38,10 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
   const { t, language } = useLanguage();
   const router = useRouter();
 
+  useEffect(() => {
+    posthog.capture('student_play_zone_viewed');
+  }, []);
+
   return (
     <section aria-label={t('student.hub.playZone')}>
       <h2 className="text-lg font-neo-display font-black text-neo-lime mb-3 uppercase tracking-wide">
@@ -50,7 +56,10 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
         />
 
         <m.button
-          onClick={() => router.push(`/${language}/quick-play`)}
+          onClick={() => {
+            posthog.capture('student_play_zone_card_clicked', { card: 'solo_practice' });
+            router.push(`/${language}/quick-play`);
+          }}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           whileHover={{ scale: 1.02 }}
@@ -72,7 +81,10 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
         </m.button>
 
         <m.button
-          onClick={() => router.push(`/${language}/education/duels?classroomId=${classroomId}`)}
+          onClick={() => {
+            posthog.capture('student_play_zone_card_clicked', { card: 'quick_duel' });
+            router.push(`/${language}/education/duels?classroomId=${classroomId}`);
+          }}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           whileHover={{ scale: 1.02 }}

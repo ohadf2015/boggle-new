@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Crown, X } from 'lucide-react';
+import { Crown, X, Zap } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { Button } from '@/components/ui/button';
 import CircularTimer from '@/components/ui/CircularTimer';
@@ -50,6 +50,10 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
   const leaderScore = Math.max(maxScore, 1);
   const selfScore = self?.score ?? 0;
   const isLeader = selfScore >= maxScore && maxScore > 0;
+  const rival = opponents[0];
+  // Near-miss tension: flag when self and the closest rival are within 8% of
+  // the leader score. Hidden during fog so the pulse can't leak proximity.
+  const isCloseRace = !fogActive && maxScore > 0 && !!rival && Math.abs(selfScore - rival.score) / leaderScore <= 0.08;
 
   // CircularTimer needs a positive duration. Fall back to a safe envelope:
   // prefer caller's totalTime, else cover current remaining, else 90s (current MP default).
@@ -69,7 +73,12 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
               <div
                 key={p.username}
                 data-testid={`wheel-opp-${p.username}`}
-                className="shrink-0 w-28 px-2 py-1 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard"
+                className={cn(
+                  'shrink-0 w-28 px-2 py-1 rounded-neo border-2 bg-neo-navy-light shadow-hard',
+                  isCloseRace && p.username === rival?.username
+                    ? 'border-neo-orange motion-safe:animate-pulse'
+                    : 'border-neo-black',
+                )}
               >
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span data-testid={`wheel-opp-avatar-${p.username}`} className="relative shrink-0">
@@ -134,7 +143,10 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
       {/* Row 2 — prominent self score bar */}
       <div
         data-testid="wheel-self-badge"
-        className="flex items-center gap-2.5 px-3 py-1.5 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard-lg"
+        className={cn(
+          'flex items-center gap-2.5 px-3 py-1.5 rounded-neo border-3 bg-neo-lime text-neo-black shadow-hard-lg',
+          isCloseRace ? 'border-neo-orange motion-safe:animate-pulse' : 'border-neo-black',
+        )}
       >
         <span data-testid="wheel-self-avatar" className="shrink-0">
           <Avatar pixelSize={34} customAvatar={self?.avatar?.customAvatar} userId={username} disableEffects className="rounded-full" />
@@ -142,6 +154,13 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
         <div className="flex flex-col min-w-0 flex-1">
           <span className="flex items-center gap-1 text-[11px] font-neo-display font-bold uppercase tracking-wide opacity-70">
             {isLeader && <Crown className="w-3 h-3" />}
+            {isCloseRace && (
+              <Zap
+                data-testid="wheel-close-race-indicator"
+                aria-label={t('wordWheel.closeRace')}
+                className="w-3 h-3 text-neo-orange motion-safe:animate-pulse"
+              />
+            )}
             <span dir="auto" translate="no" className="notranslate truncate">{self?.username ?? username}</span>
           </span>
           {!fogActive && <ProgressBar ratio={selfScore / leaderScore} tone="self" />}

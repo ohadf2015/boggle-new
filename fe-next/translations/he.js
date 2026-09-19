@@ -7375,6 +7375,7 @@ const he = {
     "wordsFound": "נמצאו {count} מילים",
     "scoreLabel": "ניקוד",
     "timeLeft": "זמן שנותר",
+    "closeRace": "מרוץ צמוד!",
     "gameOver": "הזמן נגמר!",
     "submit": "שלח",
     "alreadyFound": "כבר נמצאה!",

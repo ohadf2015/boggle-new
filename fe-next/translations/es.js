@@ -7407,6 +7407,7 @@ const es = {
     "wordsFound": "{count} palabras encontradas",
     "scoreLabel": "Puntuación",
     "timeLeft": "Tiempo restante",
+    "closeRace": "¡Carrera reñida!",
     "gameOver": "¡Se acabó el tiempo!",
     "submit": "ENVIAR",
     "alreadyFound": "¡Ya encontrada!",

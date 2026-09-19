@@ -215,6 +215,7 @@ export default function StudentProfilePageClient() {
                 alt={`${profile.display_name || profile.username}'s avatar`}
                 width={96}
                 height={96}
+                priority
                 className="w-24 h-24 rounded-full border-4 border-neo-black shadow-hard"
               />
             ) : (

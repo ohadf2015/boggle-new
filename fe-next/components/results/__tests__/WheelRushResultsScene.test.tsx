@@ -207,4 +207,18 @@ describe('WheelRushResultsScene', () => {
     render(<WheelRushResultsScene playerStats={{ alice: mkStats() }} />);
     expect(screen.getByTestId('wheel-spin-canvas-mock')).toBeInTheDocument();
   });
+
+  it('breaks a full totalScore+wordsLocked tie deterministically by username, not object insertion order', () => {
+    render(
+      <WheelRushResultsScene
+        playerStats={{
+          zoe: mkStats({ totalScore: 50, wordsLocked: 2 }),
+          amy: mkStats({ totalScore: 50, wordsLocked: 2 }),
+        }}
+      />
+    );
+    // amy sorts first alphabetically — she must win regardless of key order above.
+    const avatars = screen.getAllByTestId('avatar');
+    expect(avatars[0]).toHaveAttribute('data-username', 'amy');
+  });
 });

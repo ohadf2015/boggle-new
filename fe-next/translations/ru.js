@@ -12728,6 +12728,7 @@ const ru = {
     "wordsFound": "{count} слов найдено",
     "scoreLabel": "Оценка",
     "timeLeft": "Времени Осталось",
+    "closeRace": "Гонка почти равна!",
     "gameOver": "Время Вышло!",
     "submit": "ОТПРАВИТЬ",
     "alreadyFound": "Уже найдено!",

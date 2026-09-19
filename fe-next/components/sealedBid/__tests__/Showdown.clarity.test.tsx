@@ -63,6 +63,35 @@ describe('Showdown clarity', () => {
       expect(banner).toHaveTextContent('Pass');
       expect(banner).not.toHaveTextContent('Not a word');
     });
+
+    // Text alone wasn't enough — both banners rendered with the same neutral
+    // cream/navy tone, so a rejected word (a small forfeit) read as calmly as
+    // a risk-free pass. Give the rejected case its own warning tone.
+    it('gives a rejected word a warning tone distinct from a neutral pass', () => {
+      render(
+        <Showdown
+          {...base}
+          playerWord="ZZZQX"
+          bots={[{ name: 'Rival 1', word: 'TRAIN' }]}
+          settlement={{ outcome: 'none', stake: 20, multiplier: 0, delta: -5 }}
+        />
+      );
+      expect(screen.getByTestId('showdown-outcome').className).toContain('border-neo-orange');
+    });
+
+    it('keeps a deliberate pass on the neutral tone', () => {
+      render(
+        <Showdown
+          {...base}
+          playerWord={null}
+          bots={[{ name: 'Rival 1', word: 'TRAIN' }]}
+          settlement={{ outcome: 'none', stake: 0, multiplier: 0, delta: 0 }}
+        />
+      );
+      const banner = screen.getByTestId('showdown-outcome');
+      expect(banner.className).not.toContain('border-neo-orange');
+      expect(banner.className).toContain('border-neo-cream');
+    });
   });
 
   describe('clash attribution', () => {

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BlogPostingJsonLd, generateBlogMetadata } from '@/components/seo/BlogJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import AiVsWordGamesPageClient from './PageClient';
 import { contentByLocale } from './content';
 
@@ -86,6 +87,7 @@ export default async function AiVsWordGamesPage({ params }: PageProps) {
         ]}
       />
       <AiVsWordGamesPageClient />
+      <EducationCalloutLink locale={locale} />
     </>
   );
 }

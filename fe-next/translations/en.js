@@ -6851,6 +6851,7 @@ const en = {
     "wordsFound": "{count} words found",
     "scoreLabel": "Score",
     "timeLeft": "Time Left",
+    "closeRace": "Close race!",
     "gameOver": "Time's Up!",
     "submit": "SUBMIT",
     "alreadyFound": "Already found!",

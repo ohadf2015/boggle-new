@@ -57,7 +57,8 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
 
   const ranked = useMemo(() => {
     return Object.entries(playerStats)
-      .sort(([, a], [, b]) => (b.totalScore - a.totalScore) || (b.wordsLocked - a.wordsLocked));
+      .sort(([nameA, a], [nameB, b]) =>
+        (b.totalScore - a.totalScore) || (b.wordsLocked - a.wordsLocked) || nameA.localeCompare(nameB));
   }, [playerStats]);
 
   const avatarByUsername = useMemo(() => {
