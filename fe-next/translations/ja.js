@@ -441,7 +441,12 @@ const ja = {
   },
   "wordTowerV2": {
     "cardTitle": "ワードタワー v2",
-    "cardDesc": "本物の物理演算 — ベータ版"
+    "cardDesc": "本物の物理演算 — ベータ版",
+    "collapsed": "タワー崩壊！",
+    "newBest": "自己ベスト更新！",
+    "plusScramble": "シャッフル +{n}",
+    "wider": "次のブロック幅 ×{n}",
+    "bestFlag": "ベスト"
   },
   "wordTower": {
     "mutator": {
@@ -12617,6 +12622,15 @@ const ja = {
       "regionLabel": "{{classroom}}のクラス状況",
       "switcherLabel": "どのクラス"
     },
+    "activation": {
+      "shareTitle": "生徒はこのリンクで参加します",
+      "shareBody": "コードかリンクを共有してください。アカウントは不要 — 名前を選ぶだけで名簿に入ります。",
+      "copyLink": "参加リンクをコピー",
+      "share": "共有",
+      "firstAssignmentTitle": "最初の課題を作る",
+      "firstAssignmentBody": "名簿に生徒がいます。ライブ中でないときも取り組める練習課題を出しましょう。",
+      "firstAssignmentCta": "最初の課題を作成"
+    },
     "playNow": {
       "recommended": "おすすめ",
       "title": "いますぐプレイ",
@@ -17141,11 +17155,11 @@ const ja = {
       "zeroSolved": "橋は架からなかったけど、{total}個すべての答えがわかりました。明日は新しい問題です。",
       "answerKey": "今日の橋",
       "shareCallout": {
-        "perfect": "完璧な連鎖！⚡ ミスゼロ。",
-        "flawless": "すべての橋を架けた。🌉",
+        "perfect": "完璧な連鎖！ミスゼロ。",
+        "flawless": "すべての橋を架けた。",
         "oneAway": "惜しい！あと橋ひとつ。",
         "solid": "橋を架けたよ。超えられる？",
-        "tough": "今日は手強い。次は君だ 😤"
+        "tough": "今日は手強い。次は君だ"
       },
       "medal": {
         "gold": "金 — 完璧！",

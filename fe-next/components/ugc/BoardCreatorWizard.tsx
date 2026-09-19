@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useSafeBack } from '@/hooks/useSafeBack';
 import { useBoardCreator, type UseBoardCreatorReturn } from '@/hooks/useBoardCreator';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import { AnimatedBoardGrid } from './AnimatedBoardGrid';
 import { SeedWordTags } from './SeedWordTags';
 
@@ -396,7 +397,7 @@ function PublishedStep({ creator }: { creator: UseBoardCreatorReturn }) {
     const url = `${window.location.origin}/en/custom/${publishedBoard.boardCode}`;
     const text = t('ugc.board.shareMessage');
     if (navigator.share) {
-      void navigator.share({ text, url }).catch(() => undefined);
+      void navigator.share({ text: stripEmoji(text), url }).catch(() => undefined);
     }
   }, [publishedBoard, t]);
 

@@ -1,3 +1,5 @@
+import { stripEmoji } from '@/lib/share/stripEmoji';
+
 export type ShareResult = 'shared' | 'copied' | 'cancelled' | 'failed';
 
 export interface ShareWithFallbackOptions {
@@ -11,10 +13,12 @@ export async function shareWithFallback(
   opts: ShareWithFallbackOptions,
 ): Promise<ShareResult> {
   const nav = typeof navigator !== 'undefined' ? navigator : undefined;
+  const title = opts.title === undefined ? undefined : stripEmoji(opts.title);
+  const text = stripEmoji(opts.text);
 
   if (nav && typeof nav.share === 'function') {
     try {
-      await nav.share({ title: opts.title, text: opts.text, url: opts.url });
+      await nav.share({ title, text, url: opts.url });
       return 'shared';
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') {
@@ -23,8 +27,9 @@ export async function shareWithFallback(
     }
   }
 
-  const clipboardText =
-    opts.clipboardText ?? (opts.url ? `${opts.text}${opts.url}` : opts.text);
+  const clipboardText = stripEmoji(
+    opts.clipboardText ?? (opts.url ? `${opts.text}${opts.url}` : opts.text),
+  );
 
   try {
     await nav?.clipboard?.writeText(clipboardText);

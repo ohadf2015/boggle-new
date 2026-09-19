@@ -80,6 +80,7 @@ export interface WordHuntResultsContentProps {
     showSharePanel: boolean;
     setShowSharePanel: (show: boolean) => void;
     ogImageUrl: string | null;
+    challengeUrl?: string;
   };
   coinActions: {
     coinReward: CoinReward | null;
@@ -409,6 +410,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           words={emojiWords}
           language={language}
           t={t}
+          shareUrl={shareHandlers.challengeUrl}
         />
         {failStateNode}
         {leaderboardNode}
@@ -428,6 +430,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       words={emojiWords}
       language={language}
       t={t}
+      shareUrl={shareHandlers.challengeUrl}
     />
 
     {/* Primary CTA — one or the other, never both */}

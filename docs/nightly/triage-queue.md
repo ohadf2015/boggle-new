@@ -2386,3 +2386,10 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: 26-file cross-cutting restore (game logic + i18n + tests) exceeds what one 15-min lane can land AND self-verify; rsync restore has no merge safety so needs careful per-file diff against current master before landing
   - recommended owner: self (next lane 01 run) or a dedicated restore lane — restore via `scripts/nightly/restore-salvaged-code.sh 20260915-000000`, diff each file against HEAD before keeping, re-gate
+
+## 2026-09-19
+- [Nightly-restore] Partial restore of dropped 20260915-000000 salvage
+  - 14/26 files restored (all non-shared, verified clean: tsc+eslint+vitest scoped)
+  - status: shipped
+  - why: next.config.mjs + translations/*.js (en/es/he/ja/ru/sv) + dictionary candidates/*.txt were NOT restored — all had later commits (09-17/09-19) and blind-copying the 09-15 backup would clobber newer shipped work
+  - recommended owner: review-by-eod — if the 09-15 translation/dictionary additions are still wanted, a manual diff-merge (not blind copy) is needed against current translations/*.js

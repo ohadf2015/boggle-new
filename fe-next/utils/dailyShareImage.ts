@@ -11,6 +11,7 @@
 
 import type { Language } from '@/types';
 import logger from '@/utils/logger';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 // ==========================================
 // Types
@@ -595,7 +596,7 @@ export async function shareDailyImage(
       if (navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          text: shareText,
+          text: stripEmoji(shareText),
         });
         return true;
       }
@@ -608,7 +609,7 @@ export async function shareDailyImage(
   if (typeof navigator !== 'undefined' && 'share' in navigator) {
     try {
       await navigator.share({
-        text: shareText,
+        text: stripEmoji(shareText),
       });
       return true;
     } catch {

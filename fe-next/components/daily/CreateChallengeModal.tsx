@@ -16,6 +16,7 @@ import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { CustomChallengeStats } from '@/components/daily/CustomChallengeStats';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 interface CreateChallengeModalProps {
   isOpen: boolean;
@@ -148,7 +149,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
   const handleNativeShare = async () => {
     const shareData = {
       title: 'Custom Boggle Challenge',
-      text: `Can you solve my ${boardSize}x${boardSize} challenge?`,
+      text: stripEmoji(`Can you solve my ${boardSize}x${boardSize} challenge?`),
       url: shareUrl,
     };
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ChevronRight, Flame } from 'lucide-react';
-import Avatar from '../Avatar';
+import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
 import { CoinBalance } from '../CoinBalance';
 import { RankTierChip } from '../seasons/RankTierChip';
 import { tierVisual, type TierId } from '@/lib/seasons/scoreTier';
@@ -15,7 +15,7 @@ interface DrawerProfileHeroProps {
   href: string;
   onNavigate: () => void;
   displayName: string;
-  avatarConfig: React.ComponentProps<typeof Avatar>['customAvatar'];
+  avatarConfig: AvatarLiteConfig | null;
   userId?: string;
   /** XP/game level — shown ONCE, on the avatar badge. */
   currentLevel: number | null;
@@ -67,7 +67,7 @@ export function DrawerProfileHero({
             className="rounded-full border-3 shadow-hard-sm p-0.5 bg-neo-navy transition-colors"
             style={{ borderColor: ringColor }}
           >
-            <Avatar customAvatar={avatarConfig} userId={userId} size="lg" />
+            <AvatarLite customAvatar={avatarConfig} userId={userId} size="lg" />
           </div>
           {currentLevel != null && (
             <div className="absolute -bottom-1 -right-1 bg-neo-lime text-neo-black text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-neo-black shadow-hard-sm">

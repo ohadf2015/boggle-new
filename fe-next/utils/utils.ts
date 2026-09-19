@@ -1,5 +1,6 @@
 import { hebrewLetters, swedishLetters, spanishLetters, russianLetterPool, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS, AVATAR_IMAGE_IDS } from "./consts";
 import type { Language, LetterGrid, GridPosition, Avatar } from "@/types";
+import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
 
 // Import and re-export word normalization functions from shared module
 import {
@@ -176,7 +177,7 @@ export function generateRandomTable(
 
     let letters;
     if (language === 'en') {
-      letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      letters = ENGLISH_LETTER_POOL;
     } else if (language === 'sv') {
       letters = swedishLetters;
     } else if (language === 'es') {
@@ -192,7 +193,7 @@ export function generateRandomTable(
       // Unknown/undefined language must NOT silently become Hebrew — that leaked
       // Hebrew (and, before this branch existed, a Hebrew board onto Russian
       // players). Hebrew requires an explicit 'he'; everything else → English.
-      letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      letters = ENGLISH_LETTER_POOL;
     }
 
     // If we have words to embed, use enhanced generation

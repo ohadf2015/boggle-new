@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface BuiltLetter { letter: string; wheelIndex: number }
 
@@ -34,7 +35,7 @@ export function useWordWheelKeyboard({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (refs.current.gameOver) return;
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (isTypingTarget(e)) return;
       const key = e.key;
       const { handleSubmit: submit, handleClear: clear, usedIndices: used, outerLetters: outer } = refs.current;
 

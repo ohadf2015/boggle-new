@@ -36,6 +36,14 @@ describe('AnswerSlots', () => {
     expect(screen.getByRole('group', { name: 'Your guess' })).toBeTruthy();
   });
 
+  it('marks the next empty cell without an opacity pulse (it strobed on the first cell)', () => {
+    render(<AnswerSlots value="" slotCount={3} state="idle" dir="rtl" />);
+    const cells = screen.getAllByTestId('answer-slot');
+    for (const cell of cells) expect(cell.className).not.toContain('animate-pulse');
+    expect(cells[0].getAttribute('data-active')).toBe('true');
+    expect(cells[1].getAttribute('data-active')).toBeNull();
+  });
+
   it('respects rtl direction', () => {
     render(<AnswerSlots value="של" slotCount={3} state="idle" dir="rtl" />);
     expect(screen.getByRole('group').getAttribute('dir')).toBe('rtl');

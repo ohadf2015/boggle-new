@@ -4,6 +4,8 @@ import React, { useState, useCallback, useMemo } from 'react';
 import type { Language } from '@/types';
 import { ShareRecapCard } from '@/components/shared/ShareRecapCard';
 import type { ShareParts } from '@/components/shared/gameShareParts';
+import { shareWithFallback } from '@/utils/shareWithFallback';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 interface WordEntry {
   word: string;
@@ -18,6 +20,9 @@ export interface EmojiShareCardProps {
   words: WordEntry[];
   language: Language;
   t: (key: string) => string;
+  /** "Beat my score" link to this same puzzle. Without it a shared result
+   *  sends the friend to the homepage instead of the board they were dared on. */
+  shareUrl?: string;
 }
 
 function countByLength(words: WordEntry[]): Array<{ len: number; found: number; total: number }> {
@@ -75,14 +80,15 @@ export function buildDailyShareText(
   solved: boolean,
   words: WordEntry[],
   t: (key: string) => string,
+  shareUrl?: string,
 ): string {
   const parts = buildParts(puzzleNumber, score, solved, words, t);
-  return [
+  return stripEmoji([
     `LexiClash · ${parts.header}`,
     `${parts.score} ${parts.scoreLabel}`,
     parts.stats.map((s) => `${s.value} ${s.label}`).join(' · '),
-    'lexiclash.live',
-  ].join('\n');
+    shareUrl ?? 'lexiclash.live',
+  ].join('\n'));
 }
 
 export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
@@ -92,13 +98,14 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   words,
   language: _language,
   t,
+  shareUrl,
 }) => {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const shareText = useMemo(
-    () => buildDailyShareText(puzzleNumber, score, solved, words, t),
-    [puzzleNumber, score, solved, words, t],
+    () => buildDailyShareText(puzzleNumber, score, solved, words, t, shareUrl),
+    [puzzleNumber, score, solved, words, t, shareUrl],
   );
   const parts = useMemo(
     () => buildParts(puzzleNumber, score, solved, words, t),
@@ -116,16 +123,19 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   }, [shareText]);
 
   const handleNativeShare = useCallback(async () => {
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({ text: shareText, url: 'https://lexiclash.live' });
-      } catch {
-        await handleCopy();
-      }
-    } else {
-      await handleCopy();
+    // Same contract as shareWithFallback: native share gets the link as its
+    // own `url` field; only the clipboard text carries it as the last line.
+    const body = shareText.split('\n').slice(0, -1).join('\n');
+    const result = await shareWithFallback({
+      text: body,
+      url: shareUrl ?? 'https://lexiclash.live',
+      clipboardText: shareText,
+    });
+    if (result === 'copied') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-  }, [shareText, handleCopy]);
+  }, [shareText, shareUrl]);
 
   return (
     <ShareRecapCard

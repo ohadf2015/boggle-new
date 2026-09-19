@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-17T11:14:38.573Z",
+  "generatedAt": "2026-09-18T18:35:58.239Z",
   "commits": [
+    {
+      "sha": "2c125b149566fbd0d58f18d343d4867623d62afb",
+      "shortSha": "2c125b1",
+      "subject": "fix(share): strip emoji at every navigator.share call site",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T17:42:26+03:00"
+    },
+    {
+      "sha": "a247a9f68848e325b98c4100a6fea3813bc7b458",
+      "shortSha": "a247a9f",
+      "subject": "fix(word-tower): restore v1 as the /word-tower mode",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T17:32:55+03:00"
+    },
+    {
+      "sha": "b8e5aaaeb93c1f3d1537e54be1f56812cdcca546",
+      "shortSha": "b8e5aaa",
+      "subject": "fix(word-tower): fix camera panning making swinging block invisible and bouncing on drops",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T17:23:56+03:00"
+    },
+    {
+      "sha": "cce862d7776f7b87918b1feb2850d720b58e9b62",
+      "shortSha": "cce862d",
+      "subject": "fix(share): shares never carry emoji",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T17:13:58+03:00"
+    },
+    {
+      "sha": "e223398ea031976e3c1362927746b2032811d70a",
+      "shortSha": "e223398",
+      "subject": "chore(skills): add apple-design agent skill",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T17:01:17+03:00"
+    },
+    {
+      "sha": "cbdea4fd8efdcadb9574ab3b66226836f13925f8",
+      "shortSha": "cbdea4f",
+      "subject": "Merge remote-tracking branch 'origin/master' into feat/share-challenge-links",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T15:22:17+03:00"
+    },
+    {
+      "sha": "03a7da1a639ea92c965eac504b8a0c756d31e8f9",
+      "shortSha": "03a7da1",
+      "subject": "fix(word-tower): refine block visuals, tame screen shake, and stabilize camera",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T14:40:24+03:00"
+    },
+    {
+      "sha": "a314d5f694b340031fc9419a9b76c3e1e0f7b4bc",
+      "shortSha": "a314d5f",
+      "subject": "Merge remote-tracking branch 'origin/master' into feat/share-challenge-links",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T14:38:40+03:00"
+    },
+    {
+      "sha": "ffcd7dcf3621440c468b8374394764b73687b822",
+      "shortSha": "ffcd7dc",
+      "subject": "fix(connections): Hebrew keyboard layout, steady slot cursor, reactive mascot; guard game keydown handlers",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T14:12:30+03:00"
+    },
+    {
+      "sha": "9ecd5c6b36d95990f663208189880c385bd34ba8",
+      "shortSha": "9ecd5c6",
+      "subject": "fix(share): hand native share the challenge link as its url field",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T13:40:46+03:00"
+    },
+    {
+      "sha": "c098936c625f13b55639463c79a1b18f1fcc668c",
+      "shortSha": "c098936",
+      "subject": "feat(boards): weight English letters by frequency",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T13:37:29+03:00"
+    },
+    {
+      "sha": "11fa451f03a7caa8d04ed38d80bb7a1df0da392e",
+      "shortSha": "11fa451",
+      "subject": "fix(share): daily result share links to the same puzzle, not the homepage",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T13:33:15+03:00"
+    },
+    {
+      "sha": "eee2a69414dfbde50333886f383e9acc9a8a4e8b",
+      "shortSha": "eee2a69",
+      "subject": "test(word-tower): fix failing page client tests for v2 replacement",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T13:22:24+03:00"
+    },
+    {
+      "sha": "fc10dab1e1a02535396bb4aa09ff2057b07d859a",
+      "shortSha": "fc10dab",
+      "subject": "feat(word-tower): replace v1 with physics-based v2 public beta",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T13:19:53+03:00"
+    },
+    {
+      "sha": "f4373e0952b57f714e89fdef587d2296a8ecf66a",
+      "shortSha": "f4373e0",
+      "subject": "SEO: daily meta tag improvements (2026-09-18) (#1078)",
+      "author": "ohadf2015",
+      "date": "2026-09-18T11:33:30+04:00"
+    },
+    {
+      "sha": "b577017ee81eb87b5e8a6d913ebdc56059c44ef7",
+      "shortSha": "b577017",
+      "subject": "feat(education): milestone-triggered Teacher Pro upgrade ask (#1079)",
+      "author": "ohadf2015",
+      "date": "2026-09-18T11:33:28+04:00"
+    },
+    {
+      "sha": "ef3246ced026fb70990b602322408d7103c4732c",
+      "shortSha": "ef3246c",
+      "subject": "fix(growth): un-gate One Tap from the cookie click; stop collapsing routes to /:id",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T00:17:48+03:00"
+    },
+    {
+      "sha": "4abacd5cfb6606796fbc5d189b5ca8e2a0ac69da",
+      "shortSha": "4abacd5",
+      "subject": "refactor(education): no-account and Teacher Pro CTAs as compact tickets",
+      "author": "Ohad Fisher",
+      "date": "2026-09-17T14:16:52+03:00"
+    },
+    {
+      "sha": "0d3d7bb90dc5ff85116b7e554c7a846b0a4e3ecd",
+      "shortSha": "0d3d7bb",
+      "subject": "refactor(landing): one primary hero CTA, no duplicate classroom strip",
+      "author": "Ohad Fisher",
+      "date": "2026-09-17T14:16:44+03:00"
+    },
     {
       "sha": "682317ae26715487fa407f57b9a068b338ef5d88",
       "shortSha": "682317a",
       "subject": "chore: regenerate deployment changelog, i18n manifest and translation report",
       "author": "Ohad Fisher",
       "date": "2026-09-17T12:16:01+03:00"
-    },
-    {
-      "sha": "40ba762919d134bada1e20f065c82fb81a30dbc7",
-      "shortSha": "40ba762",
-      "subject": "ci(quality-audit): plain build for bundle size report — analyzer OOM'd every nightly",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T11:53:32+03:00"
-    },
-    {
-      "sha": "a5e3dbd09c0908481727586a1280dbc559df814c",
-      "shortSha": "a5e3dbd",
-      "subject": "fix(ci): master reds — report border contrast + stale SEO meta test",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T11:52:54+03:00"
-    },
-    {
-      "sha": "91da6f5d432c18603469db233989e79da367784c",
-      "shortSha": "91da6f5",
-      "subject": "feat(education): teacher dashboard observability + funnel reads lesson_assignments",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T11:41:51+03:00"
-    },
-    {
-      "sha": "5837504795180efd161ac539b86e18f9afc565a8",
-      "shortSha": "5837504",
-      "subject": "feat(seo): daily meta tag improvements 2026-09-17 (#1074)",
-      "author": "ohadf2015",
-      "date": "2026-09-17T10:21:59+04:00"
-    },
-    {
-      "sha": "3c6f66ce67b54a155b4fe9275493b3bea28757d0",
-      "shortSha": "3c6f66c",
-      "subject": "feat(teacher): pro-grade progress reports and a PDF that speaks every locale",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T20:36:38+03:00"
-    },
-    {
-      "sha": "ab85c8bac492637dbb5e1c7e7cf2df5852e8855e",
-      "shortSha": "ab85c8b",
-      "subject": "fix(education): lesson form offers every language and says what is optional",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T20:32:17+03:00"
-    },
-    {
-      "sha": "7db1449c6c9d583294a9b9116ed32fbe17e20ae4",
-      "shortSha": "7db1449",
-      "subject": "fix(education): lesson card Results opens that class, nav tab says Word lists",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T19:50:37+03:00"
-    },
-    {
-      "sha": "ce213f3adbe02960b0c96034f6585c80fc090df3",
-      "shortSha": "ce213f3",
-      "subject": "fix(analytics): drop events from blocked guests and accounts at ingest",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T13:33:35+03:00"
-    },
-    {
-      "sha": "096efab7efadc4c14c4ed24b1216e23c0e9012fe",
-      "shortSha": "096efab",
-      "subject": "feat(admin): block a player or guest directly from the games log",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T09:22:47+03:00"
-    },
-    {
-      "sha": "3846194c85a644719e87eedc59c1bcaeede495a2",
-      "shortSha": "3846194",
-      "subject": "fix(education): record which gate turns a student away from a live game",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T10:55:36+03:00"
-    },
-    {
-      "sha": "38e2d5a2ced21fb2bf30d722e12b8d9b20c640af",
-      "shortSha": "38e2d5a",
-      "subject": "feat(education): show the class what it is playing, live on the projector",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T10:55:09+03:00"
-    },
-    {
-      "sha": "8ccf71c71ea7429867f38ab8d4fdb27b3f520702",
-      "shortSha": "8ccf71c",
-      "subject": "feat(education): show who won the lesson, not just the last round",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T09:28:16+03:00"
-    },
-    {
-      "sha": "f3862e1cfb63c17b1851bcf5190643b4b69a2718",
-      "shortSha": "f3862e1",
-      "subject": "fix(education): classroom banner socket stayed anonymous for life",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T09:27:47+03:00"
-    },
-    {
-      "sha": "a3ef5e4e72c5fc0a428982513c04c925ebd5f0ba",
-      "shortSha": "a3ef5e4",
-      "subject": "fix(education): roster code during a live game was a dead end",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T09:27:26+03:00"
-    },
-    {
-      "sha": "4b7c856ce3f3315a467f146715f32e7dce49e2f7",
-      "shortSha": "4b7c856",
-      "subject": "fix: education gaps round 2 — teacher funnel, SP game_started double-count, student lesson merge (#1072)",
-      "author": "ohadf2015",
-      "date": "2026-09-16T10:22:42+04:00"
-    },
-    {
-      "sha": "0837777adafd03a78d59c49ba918ae2a85ce00a9",
-      "shortSha": "0837777",
-      "subject": "seo: shorten meta titles to fix SERP truncation (2026-09-16) (#1071)",
-      "author": "ohadf2015",
-      "date": "2026-09-16T09:35:04+04:00"
-    },
-    {
-      "sha": "aae72ee6dc89820e7eec041d634f4fc9fe92caa9",
-      "shortSha": "aae72ee",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-16",
-      "author": "Ohad Fisher",
-      "date": "2026-09-16T03:19:59+03:00"
-    },
-    {
-      "sha": "70af7247df3afc11acf564dc46e45dd8b6d7c78e",
-      "shortSha": "70af724",
-      "subject": "fix: idle auto-play loop, Sentry i18n keys, education practice start/complete + XP RPC guard (#1070)",
-      "author": "ohadf2015",
-      "date": "2026-09-16T01:53:56+04:00"
-    },
-    {
-      "sha": "19bc16fa3a5988a17515ba06306c2de8c51366d8",
-      "shortSha": "19bc16f",
-      "subject": "perf(web): delete rejected AdSense Auto-Ads loader — 162 KiB of zero-revenue JS off first paint (#1061)",
-      "author": "ohadf2015",
-      "date": "2026-09-16T00:31:27+04:00"
     }
   ]
 }

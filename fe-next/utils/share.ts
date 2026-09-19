@@ -3,6 +3,7 @@ import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
 import { trackReferralInviteSent } from '@/utils/viralTracking';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 export type ShareMethod =
   | 'whatsapp'
@@ -733,10 +734,10 @@ export const shareBoard = (
   t: TranslationFunction
 ): void => {
   const url = getBoardUrl(boardCode, locale);
-  const message = `${t('ugc.board.shareMessage')}\n${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`;
+  const message = stripEmoji(`${t('ugc.board.shareMessage')}\n${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`);
 
   if (navigator.share) {
-    navigator.share({ title, text: message, url })
+    navigator.share({ title: stripEmoji(title), text: message, url })
       .then(() => trackShareCompleted('web_share_api', { surface: 'board' }))
       .catch(() => {
         // Fallback to clipboard
@@ -772,10 +773,10 @@ export const shareWordPack = (
   t: TranslationFunction
 ): void => {
   const url = getWordPackUrl(packId, locale);
-  const message = `${t('ugc.pack.shareMessage')}\n"${name}" ${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`;
+  const message = stripEmoji(`${t('ugc.pack.shareMessage')}\n"${name}" ${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`);
 
   if (navigator.share) {
-    navigator.share({ title: name, text: message, url })
+    navigator.share({ title: stripEmoji(name), text: message, url })
       .then(() => trackShareCompleted('web_share_api', { surface: 'word_pack' }))
       .catch(() => {
         navigator.clipboard.writeText(message)

@@ -130,4 +130,14 @@ describe('PuzzleCard — bridge connect moment', () => {
     renderCard(makeState());
     expect(screen.queryByTestId('bridge-connector')).not.toBeInTheDocument();
   });
+
+  it('shows the idle mood mascot on the card mid-play', () => {
+    renderCard(makeState());
+    expect(document.querySelector('[data-testid="puzzle-mascot"] img')?.getAttribute('src')).toBe('/mascot/bridge-think-nobg.webp');
+  });
+
+  it('mascot reacts to a wrong guess', () => {
+    renderCard(makeState({ status: 'wrong', input: 'WARM' }));
+    expect(document.querySelector('[data-testid="puzzle-mascot"] img')?.getAttribute('src')).toBe('/mascot/bridge-oops-nobg.webp');
+  });
 });

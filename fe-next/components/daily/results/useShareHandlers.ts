@@ -10,6 +10,7 @@ import {
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
 import { generateChallengeShareUrl } from '@/utils/dailyChallenge/shareUtils';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 // dailyShareImage (620 LOC + canvas rendering) is dynamically imported inside the
 // share handler so it stays out of the results-screen chunk — it only runs on share-tap.
 import type { Language } from '@/types';
@@ -100,7 +101,7 @@ export function useShareHandlers({
   // Handle copy to clipboard
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(shareTextWithUrl);
+      await navigator.clipboard.writeText(stripEmoji(shareTextWithUrl));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -158,7 +159,7 @@ export function useShareHandlers({
     if (navigator.share) {
       try {
         await navigator.share({
-          text: shareTextWithUrl,
+          text: stripEmoji(shareTextWithUrl),
         });
       } catch (err) {
         // AbortError means user cancelled the share dialog - this is normal behavior
@@ -197,8 +198,8 @@ export function useShareHandlers({
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
-          title: t('wordHunt.title'),
-          text,
+          title: stripEmoji(t('wordHunt.title')),
+          text: stripEmoji(text),
           url: challengeUrl,
         });
       } catch {

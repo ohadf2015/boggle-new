@@ -5,8 +5,7 @@ import { m } from 'framer-motion';
 import { Trophy, ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import Avatar from '@/components/Avatar';
-import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
+import AvatarLite from '@/components/AvatarLite';
 import PrestigeBadge from '@/components/ui/PrestigeBadge';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 
@@ -104,23 +103,11 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               )}>
                 {i + 1}
               </span>
-              <Avatar
-                avatarImage={player.avatarImage ?? undefined}
+              <AvatarLite
                 userId={player.id}
                 customAvatar={player.avatarConfig}
                 size="sm"
               />
-              <PlayerProfileTooltip
-                player={{
-                  id: player.id,
-                  username: player.username,
-                  displayName: player.displayName ?? undefined,
-
-                  avatarImage: player.avatarImage ?? undefined,
-                  customAvatar: player.avatarConfig,
-                }}
-                side="bottom"
-              >
                 <Link
                   href={`/${language}/player/${encodeURIComponent(player.id)}`}
                   prefetch={false}
@@ -129,7 +116,6 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
                   <PrestigeBadge level={player.prestigeLevel ?? 0} size="xs" hideLabel />
                   <span className="truncate">{player.displayName || player.username}</span>
                 </Link>
-              </PlayerProfileTooltip>
               <span className="font-black text-neo-lime text-xs">
                 {player.totalScore.toLocaleString()}
               </span>
@@ -176,23 +162,10 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             )}>
               {i + 1}
             </span>
-            <Avatar
-              avatarImage={player.avatarImage ?? undefined}
-
+            <AvatarLite
               customAvatar={player.avatarConfig}
               size="sm"
             />
-            <PlayerProfileTooltip
-              player={{
-                id: player.id,
-                username: player.username,
-                displayName: player.displayName ?? undefined,
-
-                avatarImage: player.avatarImage ?? undefined,
-                customAvatar: player.avatarConfig,
-              }}
-              side="right"
-            >
               <Link
                 href={`/${language}/player/${encodeURIComponent(player.id)}`}
                 prefetch={false}
@@ -201,7 +174,6 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
                 <PrestigeBadge level={player.prestigeLevel ?? 0} size="sm" />
                 <span className="truncate">{player.displayName || player.username}</span>
               </Link>
-            </PlayerProfileTooltip>
             <span className="font-black text-neo-lime text-sm">
               {player.totalScore.toLocaleString()}
             </span>

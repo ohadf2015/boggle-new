@@ -440,7 +440,12 @@ const es = {
   },
   "wordTowerV2": {
     "cardTitle": "Torre de Palabras v2",
-    "cardDesc": "Física real: versión beta"
+    "cardDesc": "Física real: versión beta",
+    "collapsed": "¡Se cayó la torre!",
+    "newBest": "¡Nuevo récord!",
+    "plusScramble": "+{n} mezcla",
+    "wider": "Siguiente bloque ×{n} más ancho",
+    "bestFlag": "RÉCORD"
   },
   "wordTower": {
     "mutator": {
@@ -12606,6 +12611,15 @@ const es = {
       "regionLabel": "Estado de la clase {{classroom}}",
       "switcherLabel": "Qué clase"
     },
+    "activation": {
+      "shareTitle": "El alumnado entra con este enlace",
+      "shareBody": "Comparte el código o el enlace. Sin cuenta: eligen un nombre y entran en la lista.",
+      "copyLink": "Copiar enlace de unión",
+      "share": "Compartir",
+      "firstAssignmentTitle": "Crea su primera tarea",
+      "firstAssignmentBody": "Ya hay estudiantes en la lista. Asigna una práctica para que la clase tenga algo que hacer cuando no estés en directo.",
+      "firstAssignmentCta": "Crear primera tarea"
+    },
     "playNow": {
       "recommended": "Recomendado",
       "title": "Jugar ya",
@@ -17194,11 +17208,11 @@ const es = {
       "zeroSolved": "Ningún puente construido, pero ya conoces los {total}. Mañana hay set nuevo.",
       "answerKey": "Los puentes de hoy",
       "shareCallout": {
-        "perfect": "¡Cadena perfecta! ⚡ Sin fallos.",
-        "flawless": "Todos los puentes, tendidos. 🌉",
+        "perfect": "¡Cadena perfecta! Sin fallos.",
+        "flawless": "Todos los puentes, tendidos.",
         "oneAway": "¡Casi! Un puente de nada.",
         "solid": "Puentes tendidos. ¿Me superas?",
-        "tough": "Hoy tocó duro. Te toca 😤"
+        "tough": "Hoy tocó duro. Te toca"
       },
       "medal": {
         "gold": "Oro — ¡Impecable!",

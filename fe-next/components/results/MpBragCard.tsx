@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { hashString } from '@/shared/types/customAvatar';
 import type { AvatarMood } from '@/lib/avatar/avatarMood';
 import type { BragCardData, BragAccent } from '@/lib/results/bragCard';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import toast from 'react-hot-toast';
 
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
@@ -106,7 +107,7 @@ function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, sha
   const handleNativeShare = useCallback(async () => {
     if (!shareText) return;
     try {
-      await navigator.share({ text: shareText, url: shareUrl });
+      await navigator.share({ text: stripEmoji(shareText), url: shareUrl });
       onNativeShare?.();
     } catch {
       /* cancelled the sheet (AbortError) or share blocked — nothing to report */

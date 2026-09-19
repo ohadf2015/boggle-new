@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 interface ShareData {
   title: string;
@@ -61,8 +62,8 @@ export function useNativeShare(): UseNativeShareReturn {
 
     try {
       await navigator.share({
-        title: data.title,
-        text: data.text,
+        title: stripEmoji(data.title),
+        text: stripEmoji(data.text),
         url: data.url,
       });
       return true;

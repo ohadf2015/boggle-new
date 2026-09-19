@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { neoSuccessToast } from '@/components/NeoToast';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 interface ReferralData {
   referralCode: string;
@@ -68,9 +69,9 @@ export default function ReferralShareBanner() {
     const text = `${t('leaderboard.referral.shareText', '🎮 Play LexiClash with me! Challenge me to a word game!')}\n\n${data.shareUrl}`;
 
     if (navigator.share) {
-      await navigator.share({ title: 'LexiClash', text, url: data.shareUrl });
+      await navigator.share({ title: 'LexiClash', text: stripEmoji(text), url: data.shareUrl });
     } else {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(stripEmoji(text));
       neoSuccessToast(t('leaderboard.referral.copied', 'Copied to clipboard!'));
     }
   }, [data, t]);

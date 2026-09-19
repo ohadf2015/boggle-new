@@ -2,7 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Flame } from 'lucide-react';
+import { ArrowRight, Flame } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames, detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
@@ -96,7 +97,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
       <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 lg:gap-10">
         {/* Left: Mascot + Title (mobile = inline row, ≥sm = stacked) */}
         <div className="flex flex-col items-center text-center sm:flex-1 lg:items-start lg:text-start">
-          <div className="flex flex-row items-center gap-3 sm:flex-col sm:gap-0">
+          <div className="flex flex-row items-center gap-3 sm:flex-col sm:gap-0 lg:items-start">
             <div className="relative">
               {energetic && <FloatingTiles />}
               <HeroStyleMascot isMobilePortrait={isMobilePortrait} energetic={energetic} />
@@ -114,12 +115,12 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
           )}
 
           {showClassroomHero && (
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-3 lg:justify-start animate-[fadeInUp_0.4s_ease-out_0.3s_both]">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-3 lg:justify-start animate-[fadeInUp_0.4s_ease-out_0.3s_both]">
               <Link
                 href={`/${language}/education`}
                 prefetch={false}
                 data-testid="landing-for-teachers-cta"
-                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+                className="inline-flex min-h-12 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-7 py-3 font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
               >
                 {t('landing.forTeachers')}
               </Link>
@@ -127,7 +128,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
                 href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
                 prefetch={false}
                 data-testid="landing-teacher-pro-cta"
-                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-pink px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-pink px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
               >
                 {teacherProCheckoutCtaLabel(language)}
               </Link>
@@ -135,9 +136,10 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
                 href={`/${language}/multiplayer`}
                 prefetch={false}
                 data-testid="landing-play-cta"
-                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-navy px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+                className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 px-1 font-neo-body text-sm font-bold text-neo-white/85 underline decoration-2 underline-offset-4 transition-colors hover:text-neo-lime lg:w-auto lg:justify-start"
               >
                 {t('landing.playNowFree')}
+                <DirectionalIcon icon={ArrowRight} className="h-4 w-4" />
               </Link>
             </div>
           )}

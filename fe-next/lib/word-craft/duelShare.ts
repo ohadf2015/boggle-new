@@ -5,6 +5,7 @@
  * strip). One helper keeps them identical so a fix lands everywhere at once.
  */
 import { buildDuelUrl, type Duel } from './duel';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 export interface DuelShareData {
   title: string;
@@ -42,7 +43,7 @@ export async function performDuelShare(
 ): Promise<void> {
   if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
     try {
-      await navigator.share({ title: data.title, text: data.text, url: data.url });
+      await navigator.share({ title: stripEmoji(data.title), text: stripEmoji(data.text), url: data.url });
       return;
     } catch (err: unknown) {
       // User cancelled — normal, don't fall back or toast.

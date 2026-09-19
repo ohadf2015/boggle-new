@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
 import { Loader } from '@/components/ui/Loader';
 import { trackShare } from '@/utils/growthTracking';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 // Sign-in modal opens only on a CTA click — lazy-load to keep its ~40KB out of this
 // route's initial parse. ssr:false: renders nothing when closed (no CLS).
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -260,7 +261,7 @@ export default function ReferralDashboardClient() {
 
       if (platform === 'native' && navigator.share) {
         try {
-          await navigator.share({ title: 'LexiClash', text: shareText, url: data.shareUrl });
+          await navigator.share({ title: 'LexiClash', text: stripEmoji(shareText), url: data.shareUrl });
           trackShare('native');
           return;
         } catch {

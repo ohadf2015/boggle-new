@@ -14,6 +14,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useWordOfTheDay } from '@/hooks/useWordOfTheDay';
 import { WOTD_BONUS } from '@/utils/coinManager';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 interface WotdRevealProps {
   /** Words the player found during the game */
@@ -75,12 +76,12 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        await navigator.share({ text: shareText, url: `https://lexiclash.live/${language}/word-of-the-day` });
+        await navigator.share({ text: stripEmoji(shareText), url: `https://lexiclash.live/${language}/word-of-the-day` });
         return;
       } catch { /* cancelled, fall through to copy */ }
     }
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(stripEmoji(shareText));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* silently fail */ }

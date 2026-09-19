@@ -12,6 +12,7 @@ import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { getChallengeUrl, generateChallengeShareMessage, type ScoreChallenge } from '@/utils/challenges';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
 
@@ -118,7 +119,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
       try {
         await navigator.share({
           title: 'LexiClash Challenge',
-          text: message,
+          text: stripEmoji(message),
           url,
         });
       } catch {

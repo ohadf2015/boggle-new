@@ -10,6 +10,7 @@
  * here: it already exists in `shareImageWithNativeShare`.
  */
 import { shareImageWithNativeShare, type ShareImageResult } from './shareImageGenerator';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import type { StreakTierConfig } from '@/lib/streakTierRewards';
 
 type Translate = (key: string, fallback?: string, params?: Record<string, string | number>) => string;
@@ -86,7 +87,7 @@ export async function shareStreak({
 
   if (typeof navigator !== 'undefined' && 'share' in navigator && typeof navigator.share === 'function') {
     try {
-      await navigator.share({ text: shareText });
+      await navigator.share({ text: stripEmoji(shareText) });
       return true;
     } catch {
       return false;
@@ -96,7 +97,7 @@ export async function shareStreak({
   // Last resort: leave it on the clipboard so the brag is not simply lost.
   if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(stripEmoji(shareText));
       return true;
     } catch {
       return false;

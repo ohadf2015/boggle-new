@@ -27,6 +27,7 @@ import {
   spanishLetterPool,
   japaneseLetters,
 } from '../utils/gameUtils';
+import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
 
 // Use require for cross-rootDir modules (outside backend/)
 const { embedMultipleWordsInGrid: _embedMultipleWordsInGrid } = require('../../utils/dailyChallenge/gridPathFinding');
@@ -105,7 +106,7 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
     // Use first seed word as primary, rest as bonus
     const [primary, ...bonus] = seedWords as string[];
     const letterPoolByLang: Record<string, string[]> = {
-      en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+      en: ENGLISH_LETTER_POOL,
       he: hebrewLetters,
       sv: swedishLetters,
       ja: japaneseLetters,

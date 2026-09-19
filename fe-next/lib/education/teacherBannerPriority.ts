@@ -22,11 +22,19 @@ export function pickTeacherBanner({
   isAdmin,
   hasPro = false,
   proLoading = false,
+  hasMilestone = true,
+  milestoneLoading = false,
+  proAskDismissed = false,
 }: {
   hasTrial: boolean;
   isAdmin: boolean;
   hasPro?: boolean;
   proLoading?: boolean;
+  /** A classroom has actually engaged (see teacherProMilestone). Default true
+   *  so callers that only know entitlement keep the old "free → ask" path. */
+  hasMilestone?: boolean;
+  milestoneLoading?: boolean;
+  proAskDismissed?: boolean;
 }): TeacherBanner {
   // Pro is checked FIRST, and so is "Pro has not answered yet". A gifted-Pro
   // teacher keeps the trial deadline she was granted Pro to replace; checking
@@ -35,5 +43,8 @@ export function pickTeacherBanner({
   if (proLoading || hasPro) return 'none';
   if (hasTrial) return 'trial';
   if (isAdmin) return 'none';
+  // The Pro strip is a milestone ask, not a first-visit billboard. Hide it
+  // until engagement is known and real, and stay quiet after a dismiss.
+  if (milestoneLoading || !hasMilestone || proAskDismissed) return 'none';
   return 'pro';
 }

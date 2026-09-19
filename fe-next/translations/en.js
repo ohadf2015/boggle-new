@@ -385,7 +385,12 @@ const en = {
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss","issueProbe":{"prompt":"What made it feel that way?","botsStrong":"Bots too strong","technical":"Technical issue"}},
   "wordTowerV2": {
     "cardTitle": "Word Tower v2",
-    "cardDesc": "Real physics — beta preview"
+    "cardDesc": "Real physics — beta preview",
+    "collapsed": "Tower down!",
+    "newBest": "New best!",
+    "plusScramble": "+{n} scramble",
+    "wider": "Next block ×{n} wider",
+    "bestFlag": "BEST"
   },
   "wordTower": {
     "mutator": {
@@ -11147,6 +11152,15 @@ const en = {
       "regionLabel": "Class status for {{classroom}}",
       "switcherLabel": "Which class"
     },
+    "activation": {
+      "shareTitle": "Students join with this link",
+      "shareBody": "Share the code or the link. No account needed — they pick a name and land on the roster.",
+      "copyLink": "Copy join link",
+      "share": "Share",
+      "firstAssignmentTitle": "Create their first assignment",
+      "firstAssignmentBody": "Students are on the roster. Assign a practice so the class has something to do when you're not live.",
+      "firstAssignmentCta": "Create first assignment"
+    },
     "playNow": {
       "recommended": "Recommended",
       "title": "Play now",
@@ -15097,11 +15111,11 @@ const en = {
       "zeroSolved": "No bridges built — but now you know all {total}. Fresh set tomorrow.",
       "answerKey": "Today's bridges",
       "shareCallout": {
-        "perfect": "Perfect chain! ⚡ Not one slip.",
-        "flawless": "Every bridge built. 🌉",
+        "perfect": "Perfect chain! Not one slip.",
+        "flawless": "Every bridge built.",
         "oneAway": "So close — one bridge away!",
         "solid": "Bridges built. Can you beat me?",
-        "tough": "Brutal one today. Your turn 😤"
+        "tough": "Brutal one today. Your turn"
       },
       "medal": {
         "gold": "Gold — Flawless!",

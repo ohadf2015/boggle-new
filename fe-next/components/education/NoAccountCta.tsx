@@ -81,19 +81,21 @@ export function NoAccountCta({
   const c = copy ?? noAccountCopy(locale);
   return (
     <div
-      className={`max-w-xl rounded-neo border-4 border-neo-black bg-neo-lime p-5 text-neo-navy shadow-hard-lg sm:p-6 ${className}`}
+      className={`max-w-xl rounded-neo border-2 border-s-4 border-neo-cream/40 border-s-neo-lime bg-neo-navy-light p-4 text-neo-white sm:p-5 ${className}`}
     >
-      <p className="font-neo-display text-lg font-black uppercase leading-[1.05] tracking-tight sm:text-xl">
+      <p className="font-neo-display text-base font-bold leading-snug text-neo-lime sm:text-lg">
         {c.heading}
       </p>
-      <p className="mt-3 text-sm leading-relaxed sm:text-base">{c.body}</p>
-      <Link
-        href={`/${locale}${QUICK_PLAY_PATH}`}
-        className="mt-4 inline-block rounded-neo border-4 border-neo-cream/40 bg-neo-navy px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
-      >
-        {c.cta}
-      </Link>
-      <p className="mt-3 text-[10px] font-bold uppercase tracking-widest opacity-70">{c.note}</p>
+      <p className="mt-1.5 text-sm leading-relaxed text-neo-white/80">{c.body}</p>
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <Link
+          href={`/${locale}${QUICK_PLAY_PATH}`}
+          className="inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-lime px-5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+        >
+          {c.cta}
+        </Link>
+        <p className="text-xs font-semibold text-neo-white/65">{c.note}</p>
+      </div>
     </div>
   );
 }

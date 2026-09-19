@@ -14,6 +14,7 @@ import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
 import { cn } from '@/lib/utils';
 import { NeoPanel } from '@/components/ui/panel';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import PuzzleWordEditor from './PuzzleWordEditor';
 
 import {
@@ -189,7 +190,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: t('customPuzzle.title'), text: shareText, url: shareUrl });
+        await navigator.share({ title: stripEmoji(t('customPuzzle.title')), text: stripEmoji(shareText), url: shareUrl });
       } catch {
         await handleCopyLink();
       }

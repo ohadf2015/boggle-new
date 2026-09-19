@@ -12,6 +12,8 @@
  *   —      — never reached
  */
 
+import { stripEmoji } from '@/lib/share/stripEmoji';
+
 export interface BridgeOutcome {
   reached: boolean;
   solved: boolean;
@@ -70,5 +72,5 @@ export function buildDailyBridgeGrid({
   if (callout) lines.push(callout);
   lines.push(score.join(' · '));
   if (url) lines.push(url);
-  return lines.join('\n');
+  return stripEmoji(lines.join('\n'));
 }

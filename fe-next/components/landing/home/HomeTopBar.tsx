@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Avatar from '@/components/Avatar';
+import AvatarLite from '@/components/AvatarLite';
 import { NeoSkeleton } from '@/components/ui/skeleton';
 import { getXpProgress, getTitleForLevel } from '@/backend/modules/xpManager';
 import { clampPercent } from '@/lib/landing/homeHubFormat';
@@ -118,11 +118,10 @@ export function HomeTopBar({
           aria-hidden="true"
         >
           <div className="h-full w-full overflow-hidden rounded-full border-2 border-black bg-neo-navy-light">
-            <Avatar
+            <AvatarLite
               customAvatar={p?.avatar_config ?? null}
               userId={avatarSeed}
               pixelSize={44}
-              disableEffects
             />
           </div>
           {/* Level badge — skeleton dot while the profile loads, never empty. */}

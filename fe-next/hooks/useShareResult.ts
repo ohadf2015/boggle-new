@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { generateShareText, type ShareParams } from '@/shared/utils/shareResultGenerator';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 type TFunction = (key: string) => string;
 
@@ -10,7 +11,7 @@ export function useShareResult(params: ShareParams, t: TFunction) {
 
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(stripEmoji(shareText));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -22,7 +23,7 @@ export function useShareResult(params: ShareParams, t: TFunction) {
   const handleNativeShare = useCallback(async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ text: shareText });
+        await navigator.share({ text: stripEmoji(shareText) });
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
         console.error('Share failed:', err);

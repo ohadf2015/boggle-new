@@ -34,7 +34,16 @@ let recentState = { hasRecentConfig: true };
 vi.mock('@/hooks/useRecentGameSettings', () => ({
   useRecentGameSettings: () => recentState,
 }));
-vi.mock('lucide-react', () => ({ Shield: () => null, ArrowLeft: () => null }));
+let milestoneState = {
+  hasMilestone: true,
+  loading: false,
+  dismissed: false,
+  dismiss: vi.fn(),
+};
+vi.mock('@/hooks/useTeacherProMilestone', () => ({
+  useTeacherProMilestone: () => milestoneState,
+}));
+vi.mock('lucide-react', () => ({ Shield: () => null, ArrowLeft: () => null, X: () => null }));
 vi.mock('@/components/ui/button', () => ({ Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => <button onClick={onClick}>{children}</button> }));
 
 import * as AuthContext from '@/contexts/AuthContext';
@@ -52,6 +61,7 @@ describe('TeacherPage upgrade CTA', () => {
     vi.clearAllMocks();
     proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
     recentState = { hasRecentConfig: true };
+    milestoneState = { hasMilestone: true, loading: false, dismissed: false, dismiss: vi.fn() };
   });
 
   it('hides the upgrade strip for a Pro teacher (paid or gifted)', () => {
@@ -108,8 +118,8 @@ describe('TeacherPage upgrade CTA', () => {
     );
   });
 
-  it('buries the Pro ask until the teacher has run a live game', () => {
-    recentState = { hasRecentConfig: false };
+  it('buries the Pro ask until a classroom hits the engagement milestone', () => {
+    milestoneState = { ...milestoneState, hasMilestone: false };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
@@ -117,5 +127,19 @@ describe('TeacherPage upgrade CTA', () => {
       'iap_viewed',
       expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
     );
+  });
+
+  it('stays quiet after the teacher dismissed the milestone ask', () => {
+    milestoneState = { ...milestoneState, dismissed: true };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+  });
+
+  it('shows no Pro ask while the milestone read is still open', () => {
+    milestoneState = { ...milestoneState, loading: true, hasMilestone: false };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
   });
 });

@@ -119,6 +119,18 @@ describe('AndroidInstallPill', () => {
     expect(captureMock).toHaveBeenCalledTimes(1);
   });
 
+  // Mid-edge on a 390px phone the labelled pill covered ~40% of a mode card.
+  it('collapses to an icon tab on phones and gives close a 44px target', () => {
+    useAndroidInstallStore.setState({ pillVisible: true });
+    render(<AndroidInstallPill />);
+    settle();
+    expect(screen.getByText('androidAppPromo.pillLabel').className).toContain('sr-only');
+    expect(screen.getByText('androidAppPromo.pillLabel').className).toContain('sm:not-sr-only');
+    const close = screen.getByRole('button', { name: 'androidAppPromo.pillClose' });
+    expect(close.className).toContain('min-h-11');
+    expect(close.className).toContain('min-w-11');
+  });
+
   it('reopens the promo tagged as a pill re-entry when tapped', () => {
     useAndroidInstallStore.setState({ pillVisible: true });
     render(<AndroidInstallPill />);

@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
 import { EmojiShareCard, buildDailyShareText } from '../EmojiShareCard';
 
 const t = (key: string) => {
@@ -114,6 +115,12 @@ describe('EmojiShareCard', () => {
 });
 
 describe('buildDailyShareText', () => {
+  it('ends with the challenge link when one is given, so a friend lands on the same puzzle', () => {
+    const url = 'https://lexiclash.live/en/daily?whName=Ohad&whScore=444&whPuzzle=251';
+    const text = buildDailyShareText(251, 444, true, mockWords, t, url);
+    expect(text.split('\n').pop()).toBe(url);
+  });
+
   it('is a labeled LexiClash recap, not a Wordle grid', () => {
     const text = buildDailyShareText(251, 444, true, mockWords, t);
     expect(text).toContain('LexiClash');
@@ -128,5 +135,20 @@ describe('buildDailyShareText', () => {
     expect(text).not.toContain('✅');
     expect(text).not.toContain('❌');
     expect(text).not.toContain('CATCH');
+  });
+});
+
+describe('EmojiShareCard — share link', () => {
+  it('native share carries the challenge link, not the bare homepage', async () => {
+    const url = 'https://lexiclash.live/en/daily?whName=Ohad&whScore=444&whPuzzle=251';
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    render(
+      <EmojiShareCard puzzleNumber={251} score={444} solved words={mockWords} language="en" t={t} shareUrl={url} />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+    await waitFor(() => expect(share).toHaveBeenCalled());
+    expect(JSON.stringify(share.mock.calls[0][0])).toContain('whPuzzle=251');
+    expect(JSON.stringify(share.mock.calls[0][0])).not.toContain('"url":"https://lexiclash.live"');
   });
 });

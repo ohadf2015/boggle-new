@@ -252,8 +252,8 @@ export default function ConnectionsDailyChallenge() {
       outcomesRef.current.get(i) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
     ), [total]);
 
-  // Paste-text share path (emoji callouts live here — the on-screen share card
-  // stays emoji-free). Built once the run is terminal; the results card's
+  // Paste-text share path — plain text only, never emoji (stripped in
+  // buildDailyBridgeGrid; the unfurl is the page's og:image). Built once the run is terminal; the results card's
   // copy/native-share buttons put exactly this on the clipboard.
   const buildShareText = useCallback((): string => {
     const outcomes = collectOutcomes();

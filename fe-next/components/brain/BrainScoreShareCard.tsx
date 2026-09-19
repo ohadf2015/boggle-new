@@ -18,6 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import type { BrainTier, CognitiveDomains } from '@/shared/types/cognitive';
 
 interface BrainScoreShareCardProps {
@@ -108,7 +109,7 @@ lexiclash.live`;
 
   // Copy to clipboard
   const handleCopy = useCallback(async () => {
-    const text = generateShareText();
+    const text = stripEmoji(generateShareText());
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -126,8 +127,8 @@ lexiclash.live`;
     setIsSharing(true);
     try {
       await navigator.share({
-        title: t('brain.share.title'),
-        text: generateShareText(),
+        title: stripEmoji(t('brain.share.title')),
+        text: stripEmoji(generateShareText()),
         url: 'https://www.lexiclash.live',
       });
     } catch (err) {

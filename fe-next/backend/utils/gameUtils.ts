@@ -20,6 +20,7 @@ import { normalizeWord } from '@/shared/utils/wordNormalization';
 // Japanese hiragana board pool — single source of truth shared with the frontend
 // grid, /api/dictionary-words, serverDicts validation, and the ja.dict.gz build.
 import { japaneseHiraganaFrequency, JAPANESE_HIRAGANA_POOL } from '@/shared/constants/japaneseLetters';
+import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
 
 // ==========================================
 // Type Definitions
@@ -263,7 +264,7 @@ export function generateRandomTable(
 
   let letters: string | string[];
   if (language === 'en') {
-    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    letters = ENGLISH_LETTER_POOL;
   } else if (language === 'sv') {
     letters = swedishLetters;
   } else if (language === 'es') {
@@ -277,7 +278,7 @@ export function generateRandomTable(
   } else {
     // Unknown/undefined language must NOT silently become Hebrew — that leaked a
     // Hebrew board onto English players. Hebrew now requires an explicit 'he'.
-    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    letters = ENGLISH_LETTER_POOL;
   }
 
   // If we have words to embed, use enhanced generation

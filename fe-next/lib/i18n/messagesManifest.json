@@ -1,9 +1,15 @@
 {
-  "en": "/i18n/en.a4b95eb0.js",
-  "he": "/i18n/he.5d453458.js",
-  "sv": "/i18n/sv.42b15d8e.js",
-  "ja": "/i18n/ja.cc8b22e6.js",
-  "es": "/i18n/es.df2791a2.js",
-  "ru": "/i18n/ru.5c39af57.js",
-  "__sources": "aa6ea0efb6ba714b"
+  "en": "/i18n/en.32199f55.js",
+  "enLanding": "/i18n/en.landing.cd78ee21.js",
+  "he": "/i18n/he.aca66c5e.js",
+  "heLanding": "/i18n/he.landing.ef353f7f.js",
+  "sv": "/i18n/sv.55ef8a03.js",
+  "svLanding": "/i18n/sv.landing.b8e106bc.js",
+  "ja": "/i18n/ja.e442fc05.js",
+  "jaLanding": "/i18n/ja.landing.e652328e.js",
+  "es": "/i18n/es.8cf9f9c6.js",
+  "esLanding": "/i18n/es.landing.d04f308d.js",
+  "ru": "/i18n/ru.d1c97dbb.js",
+  "ruLanding": "/i18n/ru.landing.c5049ff5.js",
+  "__sources": "24454549aaec8d15"
 }

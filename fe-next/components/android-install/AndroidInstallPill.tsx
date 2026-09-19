@@ -133,16 +133,16 @@ export default function AndroidInstallPill() {
       <button
         type="button"
         onClick={handleOpen}
-        className="flex items-center gap-2 rounded-s-neo border-3 border-e-0 border-neo-black bg-neo-lime py-2 ps-3 pe-2 font-neo-display text-sm font-black uppercase tracking-tight text-neo-black shadow-hard-sm transition-transform duration-100 hover:-translate-x-px active:translate-x-[1px]"
+        className="flex min-h-11 items-center gap-2 rounded-s-neo border-3 border-e-0 border-neo-black bg-neo-lime py-2 ps-3 pe-2 font-neo-display text-sm font-black uppercase tracking-tight text-neo-black shadow-hard-sm transition-transform duration-100 hover:-translate-x-px active:translate-x-[1px]"
       >
         <Smartphone className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
-        <span>{t('androidAppPromo.pillLabel')}</span>
+        <span className="sr-only sm:not-sr-only">{t('androidAppPromo.pillLabel')}</span>
       </button>
       <button
         type="button"
         onClick={handleClose}
         aria-label={t('androidAppPromo.pillClose')}
-        className="flex items-center justify-center border-3 border-s-0 border-neo-black bg-neo-navy px-1.5 text-neo-white/80 transition-colors hover:text-neo-white"
+        className="flex min-h-11 min-w-11 items-center justify-center border-3 border-s-0 border-neo-black bg-neo-navy text-neo-white/80 transition-colors hover:text-neo-white"
       >
         <X className="h-3.5 w-3.5 stroke-[3]" aria-hidden="true" />
       </button>
