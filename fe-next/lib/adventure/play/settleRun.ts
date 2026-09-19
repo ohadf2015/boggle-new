@@ -1,18 +1,28 @@
 /**
  * Decide the outcome of a finished adventure run from server-trusted inputs only:
- * the signed board, the word list, and the server clock.
+ * the signed board (+ kind, relics, hunt targets), the word list, and the server clock.
  */
 import type { AttemptPayload } from './attemptToken';
-import { getPlayLevel, starsForScore, bossStarsForElapsed } from './levels';
+import { getPlayLevel, starsForScore, bossStarsForElapsed, isCombatKind } from './levels';
 import { scoreRun } from './scoreRun';
 import { rewardsFor } from './progress';
+import { secondsBonus, POTION_TIME_MS } from './relics';
 
 /** Network + intro-countdown slack on top of the level clock. */
 export const GRACE_MS = 25_000;
 
 export type SettleResult =
   | { ok: false; error: 'expired' }
-  | { ok: true; score: number; valid: string[]; stars: number; won: boolean; rewards: string[]; elapsedMs: number };
+  | {
+    ok: true; score: number; valid: string[]; points: number[]; stars: number; won: boolean;
+    rewards: string[]; elapsedMs: number; targetsFound?: string[];
+  };
+
+/** Full clock for an attempt: level seconds + hourglass + every time potion it held. */
+export function attemptSeconds(payload: Pick<AttemptPayload, 'w' | 'l' | 'r' | 'tp'>): number {
+  const lvl = getPlayLevel(payload.w, payload.l);
+  return lvl.seconds + secondsBonus(payload.r ?? []) + (payload.tp ?? 0) * (POTION_TIME_MS / 1000);
+}
 
 export function settleRun(input: {
   payload: AttemptPayload;
@@ -24,15 +34,31 @@ export function settleRun(input: {
 }): SettleResult {
   const { payload, words, now, isWord, prevStars, pointsFor } = input;
   const lvl = getPlayLevel(payload.w, payload.l);
+  const kind = payload.k ?? lvl.kind;
+  const seconds = attemptSeconds(payload);
   const elapsedMs = now - payload.t;
-  if (elapsedMs > lvl.seconds * 1000 + GRACE_MS) return { ok: false, error: 'expired' };
+  if (elapsedMs > seconds * 1000 + GRACE_MS) return { ok: false, error: 'expired' };
 
-  const { valid, score } = scoreRun({
+  const { valid, score, points } = scoreRun({
     grid: payload.g, words, language: payload.lang, minLength: lvl.minLength, isWord, pointsFor,
+    relics: payload.r ?? [], kind,
   });
 
-  const won = lvl.isBoss ? score >= lvl.bossHp : score >= lvl.stars[0];
-  const stars = !won ? 0 : lvl.isBoss ? bossStarsForElapsed(elapsedMs, lvl.seconds) : starsForScore(score, lvl.stars);
+  let won: boolean;
+  let stars: number;
+  let targetsFound: string[] | undefined;
+  if (isCombatKind(kind)) {
+    won = score >= (lvl.enemyHp ?? lvl.bossHp);
+    stars = won ? bossStarsForElapsed(elapsedMs, seconds) : 0;
+  } else if (kind === 'hunt') {
+    const targets = new Set((payload.tg ?? []).map((w) => w.toLowerCase()));
+    targetsFound = valid.filter((w) => targets.has(w));
+    won = targetsFound.length >= (lvl.huntCount ?? targets.size);
+    stars = won ? Math.max(1, starsForScore(score, lvl.stars)) : 0;
+  } else {
+    won = score >= lvl.stars[0];
+    stars = won ? starsForScore(score, lvl.stars) : 0;
+  }
   const rewards = rewardsFor({ world: payload.w, level: payload.l, prevStars, stars, isBoss: lvl.isBoss });
-  return { ok: true, score, valid, stars, won, rewards, elapsedMs };
+  return { ok: true, score, valid, points, stars, won, rewards, elapsedMs, ...(targetsFound ? { targetsFound } : {}) };
 }

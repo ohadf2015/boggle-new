@@ -1,9 +1,10 @@
 'use client';
 
-import React, { memo, useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
 import { Sparkles, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useParallax } from '@/hooks/useParallax';
 import {
   LEVELS_PER_WORLD,
@@ -14,13 +15,19 @@ import {
 } from '@/lib/adventure';
 import {
   WORLD_IMAGES,
-  containerVariants,
   cardVariants,
 } from './levelGridConfig';
 import { canPlayLevel } from '@/lib/adventure/play/progress';
+import { getPlayLevel } from '@/lib/adventure/play/levels';
+import { getBossConfig } from '@/lib/adventure/bossConfig';
+import { useLanguage } from '@/contexts/LanguageContext';
 import LevelGridHeader from './LevelGridHeader';
 import RPGLevelCard from './RPGLevelCard';
-import MilestoneDivider from './MilestoneDivider';
+import { readRun } from './play/runStorage';
+import { levelThreat, runPathState, KIND_META } from './play/variants/levelKinds';
+import KindBadge from './play/variants/KindBadge';
+import DifficultyRamp from './play/variants/DifficultyRamp';
+import { TRAIL_W, TRAIL_H, trailNodes, nodeStatus, linkDone, linkPaths, rampOf } from './play/variants/trailLayout';
 import './LevelGrid.css';
 
 interface LevelGridProps {
@@ -30,8 +37,9 @@ interface LevelGridProps {
   onLevelSelect: (worldId: number, levelId: number) => void;
 }
 
-// Milestone dividers appear after these level numbers
-const MILESTONE_AFTER = [3, 6];
+const enemyArtFor = (world: number, kind: string) =>
+  kind === 'elite' ? `/images/adventure/enemies/w${world}-idle.webp`
+    : kind === 'boss' ? `/videos/adventure/boss-w${world}.webp` : undefined;
 
 // Seeded random for stable particle positions
 function seededRandom(seed: number) {
@@ -63,6 +71,11 @@ const LevelGrid = memo(function LevelGrid({
 }: LevelGridProps): React.JSX.Element {
   // Interactive parallax from gyroscope/mouse/touch
   useParallax(LEVEL_GRID_PARALLAX_OPTIONS);
+  const { t } = useLanguage();
+
+  // Active run (sessionStorage) → the path's cleared / current / ahead marks. Read after mount (no SSR mismatch).
+  const [runStep, setRunStep] = useState<number | null>(null);
+  useEffect(() => { setRunStep(readRun(world.id)?.run.step ?? null); }, [world.id]);
 
   // Compute level data
   const levels = useMemo(() => {
@@ -75,8 +88,9 @@ const LevelGrid = memo(function LevelGrid({
       const stars = completion?.stars || 0;
       const isPerfect = stars === MAX_STARS_PER_LEVEL;
       const isBoss = levelNum === LEVELS_PER_WORLD;
+      const lvl = getPlayLevel(world.id, levelNum);
 
-      return { levelNum, isUnlocked, stars, isPerfect, isBoss };
+      return { levelNum, isUnlocked, stars, isPerfect, isBoss, kind: lvl.kind, threat: levelThreat(lvl) };
     });
 
     // Find first unlocked level with 0 stars = current level
@@ -85,8 +99,9 @@ const LevelGrid = memo(function LevelGrid({
     return result.map((l) => ({
       ...l,
       isCurrent: l.levelNum === currentNum,
+      pathState: runPathState(l.levelNum, runStep),
     }));
-  }, [world.id, completions]);
+  }, [world.id, completions, runStep]);
 
   // Aggregate stats — reuse levels array instead of re-filtering completions
   const { worldStars, maxWorldStars, completedLevels, worldColors, glowColor } = useMemo(() => ({
@@ -102,7 +117,7 @@ const LevelGrid = memo(function LevelGrid({
   // Auto-scroll to current level on mount
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const currentLevelNum = useMemo(
-    () => levels.find((l) => l.isCurrent)?.levelNum ?? null,
+    () => levels.find((l) => l.pathState === 'current')?.levelNum ?? levels.find((l) => l.isCurrent)?.levelNum ?? null,
     [levels]
   );
 
@@ -117,13 +132,17 @@ const LevelGrid = memo(function LevelGrid({
       );
       if (!el) return;
 
-      // Scroll the container itself to center the card — never el.scrollIntoView(),
-      // which bubbles to the document and drags the whole page to the footer.
-      const delta =
-        el.getBoundingClientRect().top -
-        container.getBoundingClientRect().top -
-        (container.clientHeight - el.clientHeight) / 2;
+      // Center the node without el.scrollIntoView() (it bubbles to every scrollable
+      // ancestor and can drag the page to the footer). Scroll the panel; when the
+      // page owns the scroll instead (phone layout: the panel never overflows),
+      // bring just this node into the window's middle.
+      const rect = el.getBoundingClientRect();
+      const delta = rect.top - container.getBoundingClientRect().top - (container.clientHeight - rect.height) / 2;
       container.scrollBy({ top: delta, behavior: 'smooth' });
+      const panelScrolls = container.scrollHeight > container.clientHeight + 1;
+      if (!panelScrolls && rect.height > 0 && (rect.bottom > window.innerHeight - 80 || rect.top < 80)) {
+        window.scrollBy({ top: rect.top - (window.innerHeight - rect.height) / 2, behavior: 'smooth' });
+      }
     }, 600);
 
     return () => clearTimeout(timer);
@@ -149,36 +168,28 @@ const LevelGrid = memo(function LevelGrid({
     })),
   []);
 
-  // Build grid items with milestone dividers inserted
-  const gridItems: React.ReactNode[] = [];
-  let chapterIndex = 0;
-
-  for (const level of levels) {
-    gridItems.push(
-      <AdaptiveMotion.div key={level.levelNum} variants={cardVariants}>
-        <RPGLevelCard
-          levelNum={level.levelNum}
-          stars={level.stars}
-          maxStars={MAX_STARS_PER_LEVEL}
-          isUnlocked={level.isUnlocked}
-          isPerfect={level.isPerfect}
-          isCurrent={level.isCurrent}
-          isBoss={level.isBoss}
-          worldAccentColor={glowColor}
-          glowColor={glowColor}
-          onClick={() => handleLevelClick(level.levelNum)}
-        />
-      </AdaptiveMotion.div>
-    );
-
-    if (MILESTONE_AFTER.includes(level.levelNum)) {
-      chapterIndex++;
-      gridItems.push(
-        <MilestoneDivider key={`milestone-${chapterIndex}`} chapter={chapterIndex} />
-      );
+  // The world trail: nodes zig-zag down, elite + boss span the full width.
+  const worldTwist = useMemo(() => {
+    for (let l = 1; l <= LEVELS_PER_WORLD; l++) {
+      const lv = getPlayLevel(world.id, l);
+      if (lv.twist) return lv;
     }
-  }
+    return null;
+  }, [world.id]);
 
+  const bossCfg = getBossConfig(world.id);
+  const bossName = bossCfg ? t(bossCfg.displayName) : undefined;
+  const eliteName = t(`adventurePlay.combat.elite.w${world.id}`);
+
+  // The world trail: a climbing node map, level 1 at the bottom, the boss on top.
+  const trail = useMemo(() => {
+    const nodes = trailNodes(levels.map((l) => l.kind));
+    const status = levels.map((l) => nodeStatus(l));
+    const paths = linkPaths(nodes);
+    return { nodes, status, paths };
+  }, [levels]);
+  const ramp = useMemo(() => rampOf(world.id), [world.id]);
+  const currentStatusIdx = trail.status.indexOf('current');
   return (
     <div data-testid="level-grid" className="relative h-full">
       {/* Background layers — absolute sibling, NOT fixed inside scroll container */}
@@ -273,17 +284,73 @@ const LevelGrid = memo(function LevelGrid({
           totalLevels={LEVELS_PER_WORLD}
           glowColor={glowColor}
           worldColors={worldColors}
-        />
-
-        {/* Level Grid — RPG cards with milestone dividers */}
-        <AdaptiveMotion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5 mt-6"
         >
-          {gridItems}
-        </AdaptiveMotion.div>
+          <div className="grid gap-2">
+            {worldTwist && (
+              <div data-testid="chapter-intro" className="flex items-start gap-2.5 rounded-xl border-[3px] border-black bg-[#0f1b3d] px-3 py-2">
+                <KindBadge kind={worldTwist.kind} label={t(`adventurePlay.variety.kind.${worldTwist.kind}`)} size="md" iconOnly />
+                <div className="min-w-0">
+                  <div className="text-[10px] font-black uppercase tracking-wider" style={{ color: KIND_META[worldTwist.kind].hex }}>
+                    {t('adventurePlay.variety.worldNewRule')}
+                  </div>
+                  <p className="text-sm font-bold leading-snug text-neo-cream">{t(`adventurePlay.variety.twist.${worldTwist.twist}`)}</p>
+                </div>
+              </div>
+            )}
+            <DifficultyRamp steps={ramp} current={currentStatusIdx >= 0 ? currentStatusIdx + 1 : null}
+              title={t('adventurePlay.variety.rampTitle')}
+              describe={(st) => `${t('adventurePlay.variety.pathLabel', { level: st.level, total: LEVELS_PER_WORLD })}, ${t(`adventurePlay.variety.kind.${st.kind}`)}, ${t('adventurePlay.variety.threat', { threat: st.threat })}`} />
+          </div>
+        </LevelGridHeader>
+
+        {/* World trail — node map (climbs to the boss) */}
+        <div data-testid="level-trail" dir="ltr"
+          className="trail-board relative mx-auto mt-2 w-full max-w-[560px] md:w-[max(360px,min(100%,calc((100dvh-240px)*0.595)))]"
+          style={{ aspectRatio: `${TRAIL_W} / ${TRAIL_H}` }}>
+          {/* danger rises toward the boss: calm at the bottom, hot at the top */}
+          <div aria-hidden className="absolute inset-x-[-4%] inset-y-0 rounded-3xl opacity-60"
+            style={{ background: 'linear-gradient(0deg, rgba(191,255,0,0.10) 0%, rgba(255,225,53,0.08) 45%, rgba(255,51,102,0.22) 100%)' }} />
+          <svg aria-hidden className="absolute inset-0 h-full w-full" viewBox={`0 0 ${TRAIL_W} ${TRAIL_H}`}>
+            {trail.paths.map((d, i) => {
+              const upper = trail.status[i + 1];
+              const walked = linkDone(upper);
+              const next = i === currentStatusIdx;
+              return (
+                <g key={d} data-testid="trail-link" data-walked={walked}>
+                  <path d={d} fill="none" stroke="#000" strokeWidth={walked ? 6.5 : 4.5} strokeLinecap="round" />
+                  <path d={d} fill="none" strokeLinecap="round"
+                    className={next ? 'trail-link-walked' : undefined}
+                    stroke={walked ? '#bfff00' : next ? '#bfff00' : 'rgba(255,248,231,0.55)'}
+                    strokeWidth={walked ? 3.6 : 2.2}
+                    strokeDasharray={walked ? undefined : next ? undefined : '2.5 3'} />
+                </g>
+              );
+            })}
+          </svg>
+          {trail.nodes.map((n, i) => {
+            const level = levels[i];
+            return (
+              <AdaptiveMotion.div key={n.level} variants={cardVariants} initial="hidden" animate="visible"
+                transition={{ delay: 0.05 * i }}
+                className="absolute"
+                style={{ left: `${n.x - n.size / 2}%`, top: `${((n.y - n.size / 2) / TRAIL_H) * 100}%`, width: `${n.size}%`, aspectRatio: '1 / 1', zIndex: trail.status[i] === 'current' ? 30 : 10 + i }}>
+                <RPGLevelCard
+                  levelNum={n.level}
+                  stars={level.stars}
+                  maxStars={MAX_STARS_PER_LEVEL}
+                  kind={n.kind}
+                  status={trail.status[i]}
+                  isPerfect={level.isPerfect}
+                  threat={level.threat}
+                  labelSide={n.labelSide}
+                  onClick={() => handleLevelClick(n.level)}
+                  enemyArt={enemyArtFor(world.id, n.kind)}
+                  enemyName={n.kind === 'boss' ? bossName : n.kind === 'elite' ? eliteName : undefined}
+                />
+              </AdaptiveMotion.div>
+            );
+          })}
+        </div>
       </div>
       </div>
     </div>

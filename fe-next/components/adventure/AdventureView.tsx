@@ -23,19 +23,25 @@ import AdventureLevel from './play/AdventureLevel';
 import SkinVault from './play/SkinVault';
 import { useAdventureProgress } from './play/useAdventureProgress';
 import { equipWorldSkin, equippedWorld } from './play/equipWorldSkin';
+import { readRun } from './play/runStorage';
+import RunBanner from './play/run/RunBanner';
 
 type View = { kind: 'map' } | { kind: 'world'; world: number } | { kind: 'play'; world: number; level: number };
 
 export default function AdventureView() {
   const { t, language } = useLanguageSafe();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
+  // A session user is enough to play: the profile row can land later (or fail) — the APIs only need the session.
+  const signedIn = isAuthenticated || !!user;
   const setInGame = useHideNavigation();
-  const { completions, state, refresh } = useAdventureProgress(isAuthenticated);
+  const { completions, state, refresh } = useAdventureProgress(signedIn);
   const { inventory, refresh: refreshInventory } = useAdventureInventory();
   const { earnAchievement } = useAdventureAchievements();
   const [view, setView] = useState<View>({ kind: 'map' });
   const [panel, setPanel] = useState<'collection' | 'skins' | null>(null);
   const [skinWorld, setSkinWorld] = useState<number | null>(null);
+  // Bumped on a run restart so the same level remounts fresh.
+  const [runNonce, setRunNonce] = useState(0);
 
   useEffect(() => setSkinWorld(equippedWorld()), []);
   useEffect(() => {
@@ -63,7 +69,17 @@ export default function AdventureView() {
   const nextOf = (world: number, level: number) =>
     level < LEVELS_PER_WORLD ? { world, level: level + 1 } : world < WORLD_COUNT ? { world: world + 1, level: 1 } : null;
 
-  if (!isAuthenticated) {
+  // Auth resolves after first paint (loading → user). Hold a loader until it does,
+  // or a signed-in player sees the sign-in wall flash (or stick) on a hard load.
+  if (!signedIn && authLoading) {
+    return (
+      <div data-testid="adventure-auth-pending" className="min-h-dvh grid place-items-center bg-[#0f1b3d] text-neo-cream">
+        <Loader2 className="w-8 h-8 animate-spin" aria-hidden />
+      </div>
+    );
+  }
+
+  if (!signedIn) {
     return (
       <div className="min-h-dvh grid place-items-center p-6 bg-[#0f1b3d] text-neo-cream text-center">
         <div className="max-w-sm">
@@ -81,12 +97,13 @@ export default function AdventureView() {
     const next = nextOf(view.world, view.level);
     return (
       <AdventureLevel
-        key={`${view.world}-${view.level}`}
+        key={`${view.world}-${view.level}-${runNonce}`}
         world={view.world}
         level={view.level}
         hasNext={!!next}
         onExit={() => setView({ kind: 'world', world: view.world })}
         onNext={() => next && setView({ kind: 'play', ...next })}
+        onRestartRun={() => { setRunNonce((n) => n + 1); setView({ kind: 'play', world: view.world, level: 1 }); }}
         onSaved={onSaved}
         onEquipSkin={equip}
         earnAchievement={earnAchievement}
@@ -97,6 +114,8 @@ export default function AdventureView() {
   }
 
   const worldCfg = view.kind === 'world' ? getWorldConfig(view.world) : null;
+  // sessionStorage: read on render of the world view only (client component, guarded in readRun).
+  const activeRun = view.kind === 'world' ? readRun(view.world)?.run ?? null : null;
 
   return (
     <div className="min-h-dvh bg-[#0f1b3d] text-neo-cream">
@@ -141,12 +160,17 @@ export default function AdventureView() {
           <button type="button" onClick={() => void refresh()} className="mt-3 rounded-xl border-[3px] border-black bg-neo-cyan text-black font-bold px-4 py-2">{t('adventurePlay.tryAgain')}</button>
         </div>
       ) : view.kind === 'world' && worldCfg ? (
+        <>
+        {activeRun && activeRun.step > 1 && (
+          <RunBanner run={activeRun} onContinue={() => setView({ kind: 'play', world: view.world, level: activeRun.step })} />
+        )}
         <LevelGrid
           world={worldCfg}
           completions={completions}
           totalStars={totalStars}
           onLevelSelect={(world, level) => canPlayLevel(completions, world, level) && setView({ kind: 'play', world, level })}
         />
+        </>
       ) : (
         <WorldMap
           totalStars={totalStars}

@@ -82,4 +82,62 @@ describe('settleRun', () => {
     expect(r.ok && r.stars).toBe(3);
     expect(r.ok && r.rewards).toEqual(['rune-fragment']);
   });
+
+  it('given an elite level, when damage reaches enemy HP, then it is a combat win with time stars', () => {
+    const lvl = getPlayLevel(1, 4);
+    const r = settleRun({
+      payload: { ...base, w: 1, l: 4, k: 'elite' },
+      words: ['cat'],
+      now: base.t + 10_000,
+      isWord: (w) => dict.has(w),
+      prevStars: 0,
+      pointsFor: () => lvl.enemyHp!,
+    });
+    expect(r.ok && r.won).toBe(true);
+    expect(r.ok && r.stars).toBe(3);
+  });
+
+  it('given relics in the token, when settled, then damage is relic-modified', () => {
+    const r = settleRun({
+      payload: { ...base, w: 1, l: 1, r: ['twin-ink'] },
+      words: ['cat', 'dog'],
+      now: base.t + 10_000,
+      isWord: (w) => dict.has(w),
+      prevStars: 0,
+    });
+    expect(r.ok && r.score).toBe(wordPoints('cat') * 2 + wordPoints('dog'));
+  });
+
+  it('given a hunt, when fewer targets than huntCount are found, then it is a loss even with a big score', () => {
+    const lvl = getPlayLevel(1, 2);
+    expect(lvl.kind).toBe('hunt');
+    const payload = { ...base, w: 1, l: 2, k: 'hunt' as const, tg: ['cats', 'dog', 'cat'] };
+    const lose = settleRun({ payload, words: ['cats'], now: base.t + 5_000, isWord: (w) => dict.has(w), prevStars: 0, pointsFor: () => 999 });
+    expect(lose.ok && lose.won).toBe(false);
+    expect(lose.ok && lose.stars).toBe(0);
+    expect(lose.ok && lose.targetsFound).toEqual(['cats']);
+    const win = settleRun({ payload, words: ['cats', 'dog'], now: base.t + 5_000, isWord: (w) => dict.has(w), prevStars: 0 });
+    expect(win.ok && win.won).toBe(true);
+    expect(win.ok && win.stars).toBeGreaterThanOrEqual(1);
+  });
+
+  it('given a chain level, when words break the chain, then broken words score 0', () => {
+    const r = settleRun({
+      payload: { ...base, w: 2, l: 2, k: 'chain' },
+      words: ['cat', 'dog'],
+      now: base.t + 5_000,
+      isWord: (w) => dict.has(w),
+      prevStars: 0,
+    });
+    expect(r.ok && r.score).toBe(wordPoints('cat'));
+  });
+
+  it('given hourglass + time potions in the token, when submitted late, then the clock allowance grows', () => {
+    const lvl = getPlayLevel(1, 1);
+    const late = base.t + lvl.seconds * 1000 + GRACE_MS + 20_000;
+    const plain = settleRun({ payload: { ...base, w: 1, l: 1 }, words: ['cat'], now: late, isWord: (w) => dict.has(w), prevStars: 0 });
+    expect(plain.ok).toBe(false);
+    const boosted = settleRun({ payload: { ...base, w: 1, l: 1, r: ['hourglass'], tp: 1 }, words: ['cat'], now: late, isWord: (w) => dict.has(w), prevStars: 0 });
+    expect(boosted.ok).toBe(true);
+  });
 });

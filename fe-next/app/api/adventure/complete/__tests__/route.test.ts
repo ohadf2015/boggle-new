@@ -41,7 +41,10 @@ vi.mock('@/utils/sentry', () => ({
 
 import { POST } from '../route';
 import { signAttempt } from '@/lib/adventure/play/attemptToken';
+import { eliteTrophy } from '@/lib/adventure/play/trophy';
 import { GRACE_MS } from '@/lib/adventure/play/settleRun';
+import { freshRun, verifyRun } from '@/lib/adventure/play/runToken';
+import { wordPoints } from '@/lib/adventure/play/scoreRun';
 
 const USER_ID = 'user-1';
 const SECRET = 'test-key';
@@ -72,7 +75,7 @@ function makeRequest(body?: unknown) {
   };
 }
 
-function makeToken(overrides: Partial<{ u: string; w: number; l: number; g: string[][]; lang: string; t: number }> = {}) {
+function makeToken(overrides: Record<string, unknown> = {}) {
   return signAttempt(
     {
       u: USER_ID,
@@ -320,5 +323,83 @@ describe('POST /api/adventure/complete', () => {
 
     expect(res.status).toBe(200);
     expect(res.data.validWords).toEqual([]);
+  });
+
+  describe('roguelike run', () => {
+    const run = () => ({ ...freshRun(1, USER_ID, 'seed-x'), potions: { heal: 1, time: 1, cleanse: 0, insight: 0 } });
+
+    beforeEach(() => {
+      mockGetAuthedUser.mockResolvedValue({ id: USER_ID });
+      mockCreateAdminClient.mockReturnValue(makeFakeDb({ level_completions: [] }).db);
+    });
+
+    it('given a won level in a run, when completed, then a signed next run (step+1, clamped hp, spent potions, offer) comes back', async () => {
+      const token = makeToken({ k: 'classic', r: [], run: run() });
+      const res = await POST(makeRequest({ token, words: ['catser'], hpLeft: 3, potionsUsed: { heal: 1, time: 5 }, died: false }));
+
+      expect(res.status).toBe(200);
+      expect(res.data.won).toBe(true);
+      const next = verifyRun(res.data.nextRunToken, SECRET);
+      expect(next).toMatchObject({ u: USER_ID, step: 2, hp: 3, potions: { heal: 0, time: 0 } });
+      expect(next!.gold).toBeGreaterThan(0);
+      expect(res.data.nextRun).toMatchObject({ step: 2, hp: 3 });
+      expect(res.data.nextRun).not.toHaveProperty('seed');
+      expect(res.data.offer).toHaveLength(3);
+      expect(res.data.offer).toEqual(next!.offer);
+    });
+
+    it('given no hpLeft, when completed, then hp carries over unchanged rather than dropping to 0', async () => {
+      const token = makeToken({ run: { ...run(), hp: 4 } });
+      const res = await POST(makeRequest({ token, words: ['catser'] }));
+      expect(verifyRun(res.data.nextRunToken, SECRET)?.hp).toBe(4);
+    });
+
+    it('given a request claiming relics the token does not hold, when completed, then the score is unchanged', async () => {
+      const plain = await POST(makeRequest({ token: makeToken({ r: [], run: run() }), words: ['cats', 'catser'] }));
+      const claimed = await POST(makeRequest({
+        token: makeToken({ r: [], run: run() }), words: ['cats', 'catser'], relics: ['magnet', 'twin-ink', 'long-bow'],
+      }));
+      expect(claimed.data.score).toBe(plain.data.score);
+      expect(plain.data.score).toBe(wordPoints('cats') + wordPoints('catser'));
+    });
+
+    it('given relics in the token, when completed, then they modify damage', async () => {
+      const res = await POST(makeRequest({ token: makeToken({ r: ['twin-ink'], run: { ...run(), relics: ['twin-ink'] } }), words: ['cats'] }));
+      expect(res.data.score).toBe(wordPoints('cats') * 2);
+    });
+
+    it('given the player died, when completed, then no next run is issued (run over)', async () => {
+      const res = await POST(makeRequest({ token: makeToken({ run: run() }), words: ['catser'], hpLeft: 0, died: true }));
+      expect(res.status).toBe(200);
+      expect(res.data.nextRunToken).toBeUndefined();
+      expect(res.data.runOver).toBe(true);
+    });
+
+    it('given a lost level, when completed, then no next run is issued', async () => {
+      const res = await POST(makeRequest({ token: makeToken({ run: run() }), words: [] }));
+      expect(res.data.won).toBe(false);
+      expect(res.data.nextRunToken).toBeUndefined();
+      expect(res.data.runOver).toBe(true);
+    });
+
+    it('given the elite (L4) falls, when completed, then its trophy relic is minted into the next signed run', async () => {
+      const relics = ['twin-ink', 'sharp-quill', 'magnet'] as const;
+      const token = makeToken({ w: 1, l: 4, k: 'elite', r: [...relics], run: { ...run(), step: 4, relics: [...relics] } });
+      const res = await POST(makeRequest({ token, words: ['catser'], hpLeft: 2 }));
+      expect(res.data.won).toBe(true);
+      const trophy = eliteTrophy(1, [...relics]);
+      expect(res.data.trophy).toBe(trophy);
+      expect(verifyRun(res.data.nextRunToken, SECRET)?.relics).toContain(trophy);
+      expect(res.data.nextRun.relics).toContain(trophy);
+    });
+
+    it('given the boss falls, when completed, then the run is complete with no further offer', async () => {
+      const relics = ['twin-ink', 'sharp-quill', 'magnet'];
+      const token = makeToken({ w: 1, l: 7, k: 'boss', r: relics, run: { ...run(), step: 7, relics } });
+      const res = await POST(makeRequest({ token, words: ['catser'], hpLeft: 2 }));
+      expect(res.data.won).toBe(true);
+      expect(res.data.runComplete).toBe(true);
+      expect(res.data.nextRunToken).toBeUndefined();
+    });
   });
 });
