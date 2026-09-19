@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 6956,
+    "totalKeysInCode": 6960,
     "keyCountByLanguage": {
-      "en": 13441,
-      "es": 13746,
-      "he": 13651,
-      "ja": 13711,
-      "ru": 13481,
-      "sv": 13707
+      "en": 13446,
+      "es": 13751,
+      "he": 13656,
+      "ja": 13716,
+      "ru": 13486,
+      "sv": 13712
     },
-    "missingFromEnglish": 103,
+    "missingFromEnglish": 101,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 350,
+      "templateLiterals": 356,
       "fallbackUsages": 1,
       "variableKeys": 133
     }
@@ -2253,11 +2253,25 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`wordcraft.run.card.${c.id}.desc`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunHUD.tsx",
+        "line": 44,
+        "context": "title={t(`wordcraft.run.card.${c.id}.desc`)}"
+      },
+      {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
         "type": "template_literal",
         "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 38,
+        "line": 48,
         "context": "{t(`wordcraft.run.card.${c.id}.name`)}"
+      },
+      {
+        "pattern": "`wordcraft.run.card.${c.id}.desc`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunHUD.tsx",
+        "line": 51,
+        "context": "{t(`wordcraft.run.card.${c.id}.desc`)}"
       },
       {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
@@ -2384,6 +2398,34 @@
         "file": "components/wordTower/WordTowerVersus.tsx",
         "line": 172,
         "context": "<p key={`err-${tower.state.errorKey}`} className=\"text-center font-neo-body text-sm font-bold text-n"
+      },
+      {
+        "pattern": "`wordTower.crane.${verdict.quality}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/V2Hud.tsx",
+        "line": 109,
+        "context": "{t(`wordTower.crane.${verdict.quality}`)}"
+      },
+      {
+        "pattern": "`wordTower.surprise.${TOWER_SURPRISE_META[pop.event].key}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/V2Hud.tsx",
+        "line": 121,
+        "context": "{t(`wordTower.surprise.${TOWER_SURPRISE_META[pop.event].key}`)}"
+      },
+      {
+        "pattern": "`wordTower.biome.${zoneShown.id}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/V2Hud.tsx",
+        "line": 141,
+        "context": "<span className=\"font-neo-display text-2xl font-black\">{t(`wordTower.biome.${zoneShown.id}`)}</span>"
+      },
+      {
+        "pattern": "`wordTower.error.${rejected}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/WordTowerV2.tsx",
+        "line": 256,
+        "context": "{t(`wordTower.error.${rejected}`)}"
       },
       {
         "pattern": "`boosts.${type}.title`",
@@ -4481,15 +4523,6 @@
       ]
     },
     {
-      "key": "common.beta",
-      "usages": [
-        {
-          "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 258
-        }
-      ]
-    },
-    {
       "key": "daily.qrWelcome.badge",
       "usages": [
         {
@@ -4571,20 +4604,11 @@
       ]
     },
     {
-      "key": "wordTowerV2.drop",
+      "key": "wordWheel.closeRace",
       "usages": [
         {
-          "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 344
-        }
-      ]
-    },
-    {
-      "key": "wordTowerV2.hoist",
-      "usages": [
-        {
-          "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 334
+          "file": "components/multiplayer/WheelRushHeader.tsx",
+          "line": 160
         }
       ]
     }
