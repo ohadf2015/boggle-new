@@ -79,6 +79,7 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
       if (result.data?.id && result.data.join_code) {
         trackEduClassroomCreated({
           classroomId: result.data.id,
+          createdVia: 'dashboard',
           language: result.data.language ?? classroomLanguage,
         });
         setCreatedClassroom({

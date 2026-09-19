@@ -287,11 +287,13 @@ describe('education telemetry', () => {
       throw new Error('boom');
     });
     expect(() => setEduClassroomContext('cls-1')).not.toThrow();
+  });
 
   it('classroom created event captures id + language so we can quote create vs join', () => {
-    trackEduClassroomCreated({ classroomId: 'cls-1', language: 'en' });
+    trackEduClassroomCreated({ classroomId: 'cls-1', createdVia: 'dashboard', language: 'en' });
     expect(captureMock).toHaveBeenCalledWith('edu_classroom_created', {
       classroom_id: 'cls-1',
+      created_via: 'dashboard',
       language: 'en',
     });
   });

@@ -192,6 +192,7 @@ describe('ClassroomManager invite + celebration UX', () => {
     await waitFor(() => {
       expect(trackEduClassroomCreated).toHaveBeenCalledWith({
         classroomId: 'cls-new',
+        createdVia: 'dashboard',
         language: 'he',
       });
     });

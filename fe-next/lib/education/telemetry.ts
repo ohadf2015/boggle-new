@@ -145,6 +145,8 @@ export interface EduClassroomCreatedArgs {
   classroomId: string;
   /** Which surface created it — the dashboard form or the express game lobby. */
   createdVia: 'dashboard' | 'express_lobby' | 'onboarding';
+  /** Classroom UI language, so create vs join can be quoted per language. */
+  language?: string;
 }
 
 /**
@@ -153,10 +155,12 @@ export interface EduClassroomCreatedArgs {
  * teacher who never created a classroom from one whose students never joined.
  */
 export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
-  safeCapture('edu_classroom_created', {
+  const props: Record<string, unknown> = {
     classroom_id: args.classroomId,
     created_via: args.createdVia,
-  });
+  };
+  if (args.language) props.language = args.language;
+  safeCapture('edu_classroom_created', props);
 }
 
 export interface EduTeacherOnboardingStepArgs {
@@ -311,16 +315,6 @@ export function setEduTestAccountFlag(isTestAccount: boolean): void {
 export function isTestAccountEmail(email: string | null | undefined): boolean {
   if (!email) return false;
   return email.trim().toLowerCase().endsWith('@lexiclash.test');
-
-export interface EduClassroomCreatedArgs {
-  classroomId: string;
-  language?: string;
-}
-
-export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
-  const props: Record<string, unknown> = { classroom_id: args.classroomId };
-  if (args.language) props.language = args.language;
-  safeCapture('edu_classroom_created', props);
 }
 
 export type LiveGameStartSource = 'create_room' | 'quick_start';
@@ -349,5 +343,5 @@ export function trackEduReportsViewed(args: EduReportsViewedArgs = {}): void {
   const props: Record<string, unknown> = {};
   if (args.classroomId) props.classroom_id = args.classroomId;
   if (args.studentId) props.student_id = args.studentId;
-  safeCapture('edu_reports_viewed', props);e84ddb2f2 (feat(edu): instrument classroom create, live start, reports viewed)
+  safeCapture('edu_reports_viewed', props);
 }
