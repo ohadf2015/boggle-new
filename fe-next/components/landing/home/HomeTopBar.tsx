@@ -56,6 +56,10 @@ export function HomeTopBar({
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  // PNG avatar failed to load (API down / stale WebView) — fall back to the
+  // AvatarLite disc instead of a broken-image glyph.
+  const [avatarImgErrored, setAvatarImgErrored] = useState(false);
+
   // Stable per-device random seed → a new player (or anyone whose profile hasn't
   // loaded) gets a generated avatar instead of an endless skeleton. localStorage
   // keeps it identical across reloads. Client-only (SSR can't read it), so the
@@ -117,11 +121,30 @@ export function HomeTopBar({
           aria-hidden="true"
         >
           <div className="h-full w-full overflow-hidden rounded-full border-2 border-black bg-neo-navy-light">
-            <AvatarLite
-              customAvatar={p?.avatar_config ?? null}
-              userId={avatarSeed}
-              pixelSize={44}
-            />
+            {/* The real face WITHOUT the 477 KiB client part library: the server
+                renders avatar_config → PNG at /api/avatar/png/[id] (CDN-cached).
+                A static/dynamic import of Avatar.tsx here would put the renderer
+                chunk on the landing first-paint graph (LandingView.bundleGraph
+                guard). Guests (no UUID) and the pre-mount frame keep the cheap
+                AvatarLite disc; an img error falls back to it too. */}
+            {mounted && p?.id && !avatarImgErrored ? (
+              // eslint-disable-next-line @next/next/no-img-element -- tiny CDN-cached PNG; next/image optimizer adds no value here
+              <img
+                data-testid="home-avatar-png"
+                src={`/api/avatar/png/${p.id}`}
+                width={44}
+                height={44}
+                alt=""
+                className="h-full w-full object-cover"
+                onError={() => setAvatarImgErrored(true)}
+              />
+            ) : (
+              <AvatarLite
+                customAvatar={p?.avatar_config ?? null}
+                userId={avatarSeed}
+                pixelSize={44}
+              />
+            )}
           </div>
           {/* Level badge — skeleton dot while the profile loads, never empty. */}
           {showProfileSkeleton ? (
