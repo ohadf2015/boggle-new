@@ -600,7 +600,13 @@ export function BlastGame({
             Tile size = min(width-fit, height-fit) so a 6-col / 2-row board
             no longer collapses to a thin strip at the bottom of the screen. */}
         <div
-          className="relative w-full max-w-[min(96vw,520px)] h-full mx-auto flex items-stretch justify-center"
+          // overflow-hidden clips the playfield frame on tall boards: the
+          // frame is vertically centered with a "drop shaft" of up to 150px
+          // above the grid, and on 8-10 row boards that shaft extended up
+          // INTO the HUD bands (visible through the 80-85% opaque rails).
+          // Tiles, selection path and FX all stay inside the grid, so nothing
+          // gameplay-visible is clipped — only dead headroom.
+          className="relative overflow-hidden w-full max-w-[min(96vw,520px)] h-full mx-auto flex items-stretch justify-center"
           style={{ zIndex: 10 }}
         >
         <BlastBoard

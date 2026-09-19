@@ -1,6 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render as rtlRender, screen, fireEvent } from '@testing-library/react';
+import type { ReactElement } from 'react';
+import { MusicProviderStub } from '@/contexts/MusicContext';
 import { BlastHud } from '../BlastHud';
+
+// The HUD mounts BlastHudMuteButton, which reads MusicContext via
+// useMasterMute — provide the test stub so bare renders keep working.
+const render = (ui: ReactElement) => rtlRender(<MusicProviderStub>{ui}</MusicProviderStub>);
 
 describe('BlastHud', () => {
   it('renders coin count', () => {
@@ -118,6 +124,33 @@ describe('BlastHud', () => {
       );
       expect(screen.queryByTestId('hud-words-strip')).not.toBeInTheDocument();
       expect(screen.getByTestId('hud-bonus-count')).toBeInTheDocument();
+    });
+  });
+
+  describe('audio + RTL polish', () => {
+    it('renders the dedicated mute button in the header band', () => {
+      render(
+        <BlastHud levelNumber={5} coins={0} chestProgress={0} onShuffle={vi.fn()} onHint={vi.fn()} />
+      );
+      expect(screen.getByTestId('blast-mute-btn')).toBeInTheDocument();
+    });
+
+    it('pins the progress counter to LTR so RTL pages render "2/3", not the bidi scramble', () => {
+      render(
+        <BlastHud
+          levelNumber={5}
+          coins={0}
+          chestProgress={0}
+          onShuffle={vi.fn()}
+          onHint={vi.fn()}
+          targetWords={['CAT', 'SUN', 'EGG']}
+          foundWords={['CAT', 'SUN']}
+        />
+      );
+      const pill = screen.getByTestId('hud-progress');
+      const counter = pill.querySelector('span[dir="ltr"]');
+      expect(counter).not.toBeNull();
+      expect(counter?.textContent).toBe('2/3');
     });
   });
 });

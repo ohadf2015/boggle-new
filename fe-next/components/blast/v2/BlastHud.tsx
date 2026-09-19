@@ -3,7 +3,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { m, useMotionValue, animate } from 'framer-motion';
 import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { BlastChestBadge } from './BlastChestBadge';
+import { BlastHudMuteButton } from './BlastHudMuteButton';
 import { BlastChestPreviewModal } from './BlastChestPreviewModal';
 import { themeArt } from '@/lib/blast/v2/themeArt';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
@@ -109,6 +111,10 @@ export function BlastHud({
   strikesUsed = 0,
 }: Props) {
   const { t } = useLanguage();
+  // The HUD carries its own mute control (BlastHudMuteButton in band 1), so
+  // the global in-game audio FAB stands down on blast screens instead of
+  // floating over the chest badge. No-op when no NavigationProvider is present.
+  useRegisterHeaderAudioControl();
   const mech = mechanicsForLevel(levelNumber);
   const hasStrikes = typeof strikeBudget === 'number' && strikeBudget > 0;
   const strikesRemaining = hasStrikes ? Math.max(0, strikeBudget - strikesUsed) : 0;
@@ -217,6 +223,7 @@ export function BlastHud({
           modeColor={modeColor}
           onPreview={() => setShowPreview(true)}
         />
+        <BlastHudMuteButton />
       </div>
       {chestContents && (
         <BlastChestPreviewModal
@@ -229,7 +236,7 @@ export function BlastHud({
       {showTargetWords && (
         <div
           data-testid="hud-words-strip"
-          className="flex items-center justify-center gap-1.5 px-3 py-1.5 flex-wrap bg-[#0b1530]/80"
+          className="flex items-center justify-center gap-1.5 px-3 py-1.5 flex-wrap bg-[#0b1530]"
           style={{ borderBottom: `1px solid color-mix(in srgb, ${modeColor} 25%, transparent)` }}
         >
           {targetWords!.map((w) => {
@@ -263,7 +270,7 @@ export function BlastHud({
       {showRail && (
         <div
           data-testid="hud-rail"
-          className="flex items-center gap-2 px-3 py-1.5 bg-[#0b1530]/85"
+          className="flex items-center gap-2 px-3 py-1.5 bg-[#0b1530]"
           style={{ borderBottom: `1px solid color-mix(in srgb, ${modeColor} 20%, transparent)` }}
         >
           {showProgressPill && (
@@ -276,16 +283,21 @@ export function BlastHud({
                 total: String(targetTotal),
               })}
             >
-              <m.span
-                key={themeFound}
-                initial={{ scale: 1.4 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                style={{ color: modeColor, display: 'inline-block' }}
-              >
-                {themeFound}
-              </m.span>
-              <span className="opacity-45">/{targetTotal}</span>
+              {/* dir="ltr" keeps the counter readable in RTL locales — with the
+                  page direction set to Hebrew, a bare "9/10" across separate
+                  inline runs reorders to "9/0" (bidi splits at the slash). */}
+              <span dir="ltr" className="inline-flex items-baseline gap-0.5">
+                <m.span
+                  key={themeFound}
+                  initial={{ scale: 1.4 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  style={{ color: modeColor, display: 'inline-block' }}
+                >
+                  {themeFound}
+                </m.span>
+                <span className="opacity-45">/{targetTotal}</span>
+              </span>
             </span>
           )}
           {hasStrikes && (
@@ -321,7 +333,7 @@ export function BlastHud({
                         ? { duration: 0.9, repeat: Infinity, ease: 'easeInOut' }
                         : { duration: 0.3, ease: 'easeOut' }
                     }
-                    className="inline-block w-2.5 h-2.5 rounded-[3px]"
+                    className="inline-block w-3 h-3 rounded-[3px]"
                     style={{
                       background: spent ? 'rgba(255,255,255,0.12)' : liveColor,
                       boxShadow: spent ? 'none' : `0 0 6px ${liveColor}`,
