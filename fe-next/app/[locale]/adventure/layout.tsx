@@ -1,7 +1,6 @@
 import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import AdventureProviderWrapper from './AdventureProviderWrapper';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -12,10 +11,10 @@ interface LayoutParams {
 const EN_ADVENTURE_SEO = {
   title: 'Word Adventure Game - RPG Word Puzzle Free',
   description:
-    'Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.',
+    'Embark on an epic word adventure! Battle word bosses across 70 levels in 10 themed worlds and win a new tile skin from every boss. No download needed.',
   ogTitle: 'Word Adventure Game - RPG Word Puzzle Free | LexiClash',
   ogDescription:
-    'Battle bosses and conquer 100 levels in LexiClash Adventure! Free RPG word puzzle with special tiles, power-ups, and epic progression. No download needed.',
+    'Battle word bosses across 10 worlds in LexiClash Adventure and win a tile skin from each one. No download needed.',
 };
 
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
@@ -100,5 +99,5 @@ interface AdventureLayoutProps {
 export default async function AdventureLayout({
   children,
 }: AdventureLayoutProps): Promise<ReactNode> {
-  return <AdventureProviderWrapper>{children}</AdventureProviderWrapper>;
+  return children;
 }

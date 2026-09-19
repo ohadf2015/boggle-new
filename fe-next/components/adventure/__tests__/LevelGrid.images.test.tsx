@@ -133,7 +133,7 @@ describe('LevelGrid Header Images', () => {
 
       worldImages.forEach((img) => {
         const src = img.getAttribute('src');
-        if (src && src.includes('world-') && src.includes('-3d')) {
+        if (src && src.includes('/adventure/play/world-')) {
           expect(src).toMatch(/\.webp$/);
           expect(src).not.toMatch(/\.png$/);
         }
@@ -141,16 +141,16 @@ describe('LevelGrid Header Images', () => {
     });
 
     it.each([
-      [1, 'alphabetMeadows', 'world-meadows-3d.webp'],
-      [2, 'synonymSprings', 'world-springs-3d.webp'],
-      [3, 'rootCaverns', 'world-caverns-3d.webp'],
-      [4, 'idiomArchipelago', 'world-archipelago-3d.webp'],
-      [5, 'compoundCanyon', 'world-canyon-3d.webp'],
-      [6, 'anagramLabyrinth', 'world-labyrinth-3d.webp'],
-      [7, 'mirrorPalace', 'world-palace-3d.webp'],
-      [8, 'neologismNebula', 'world-nebula-3d.webp'],
-      [9, 'polyglotPeaks', 'world-peaks-3d.webp'],
-      [10, 'lexiconThrone', 'world-throne-3d.webp'],
+      [1, 'alphabetMeadows', 'play/world-1.webp'],
+      [2, 'synonymSprings', 'play/world-2.webp'],
+      [3, 'rootCaverns', 'play/world-3.webp'],
+      [4, 'idiomArchipelago', 'play/world-4.webp'],
+      [5, 'compoundCanyon', 'play/world-5.webp'],
+      [6, 'anagramLabyrinth', 'play/world-6.webp'],
+      [7, 'mirrorPalace', 'play/world-7.webp'],
+      [8, 'neologismNebula', 'play/world-8.webp'],
+      [9, 'polyglotPeaks', 'play/world-9.webp'],
+      [10, 'lexiconThrone', 'play/world-10.webp'],
     ])(
       'should display correct image path for world %i (%s)',
       (worldId, worldName, expectedFileName) => {

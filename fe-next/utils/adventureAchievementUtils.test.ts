@@ -16,11 +16,11 @@ import {
 
 describe('ADVENTURE_ACHIEVEMENTS', () => {
   it('has at least 15 achievements', () => {
-    expect(Object.keys(ADVENTURE_ACHIEVEMENTS).length).toBeGreaterThanOrEqual(15);
+    expect(Object.keys(ADVENTURE_ACHIEVEMENTS).length).toBeGreaterThanOrEqual(14);
   });
 
-  it('has exactly 17 achievements', () => {
-    expect(Object.keys(ADVENTURE_ACHIEVEMENTS).length).toBe(17);
+  it('has exactly 14 achievements', () => {
+    expect(Object.keys(ADVENTURE_ACHIEVEMENTS).length).toBe(14);
   });
 
   it('each achievement has required fields', () => {
@@ -35,7 +35,7 @@ describe('ADVENTURE_ACHIEVEMENTS', () => {
   });
 
   it('each achievement has valid category', () => {
-    const validCategories = ['gameplay', 'bosses', 'progression', 'mastery'];
+    const validCategories = ['gameplay', 'bosses', 'progression'];
     Object.values(ADVENTURE_ACHIEVEMENTS).forEach((achievement) => {
       expect(validCategories).toContain(achievement.category);
     });
@@ -48,7 +48,6 @@ describe('ADVENTURE_ACHIEVEMENTS', () => {
     expect(categories.has('gameplay')).toBe(true);
     expect(categories.has('bosses')).toBe(true);
     expect(categories.has('progression')).toBe(true);
-    expect(categories.has('mastery')).toBe(true);
   });
 
   it('each achievement has unique id matching its key', () => {
@@ -72,13 +71,12 @@ describe('ADVENTURE_ACHIEVEMENTS', () => {
 });
 
 describe('getAchievementCategories', () => {
-  it('returns all 4 categories', () => {
+  it('returns all 3 categories', () => {
     const categories = getAchievementCategories();
-    expect(categories).toHaveLength(4);
+    expect(categories).toHaveLength(3);
     expect(categories).toContain('gameplay');
     expect(categories).toContain('bosses');
     expect(categories).toContain('progression');
-    expect(categories).toContain('mastery');
   });
 });
 
@@ -107,13 +105,6 @@ describe('getAchievementsByCategory', () => {
     });
   });
 
-  it('returns mastery achievements', () => {
-    const mastery = getAchievementsByCategory('mastery');
-    expect(mastery.length).toBeGreaterThan(0);
-    mastery.forEach((a) => {
-      expect(a.category).toBe('mastery');
-    });
-  });
 
   it('all achievements are accounted for across categories', () => {
     const categories = getAchievementCategories();
@@ -276,13 +267,4 @@ describe('achievement definitions content', () => {
     });
   });
 
-  describe('mastery achievements', () => {
-    it('SKILL_UNLOCKED is repeatable', () => {
-      expect(ADVENTURE_ACHIEVEMENTS.SKILL_UNLOCKED.oneTime).toBe(false);
-    });
-
-    it('COMBO_KING is repeatable', () => {
-      expect(ADVENTURE_ACHIEVEMENTS.COMBO_KING.oneTime).toBe(false);
-    });
-  });
 });

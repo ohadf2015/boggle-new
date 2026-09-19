@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useMemo, useCallback, memo, useState, CSSProp
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css';
+import { canPlayLevel } from '@/lib/adventure/play/progress';
 import { Star, Lock, Crown, Play } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -15,7 +16,6 @@ import {
   LEVELS_PER_WORLD,
   MAX_STARS_PER_LEVEL,
   getWorldUnlockRequirement,
-  isWorldUnlocked,
   WORLD_CONFIGS,
   getWorldGlow,
   type WorldConfig,
@@ -198,7 +198,7 @@ const WorldNode = memo(function WorldNode({
             data-testid={`world-${world.id}`}
             aria-label={isUnlocked
               ? `${t('adventure.playWorld')} ${worldName} - ${currentStars}/${totalWorldStars} ${t('adventure.stars')}, ${completedLevels}/${LEVELS_PER_WORLD} ${t('adventure.levelsCompleted')}`
-              : `${worldName} - ${t('adventure.locked')}, ${t('adventure.requires')} ${unlockRequirement} ${t('adventure.stars')}`
+              : `${worldName} - ${t('adventure.locked')}, ${t('adventurePlay.beatPrevBoss')}`
             }
             whileHover={isUnlocked ? WORLD_HOVER_VARIANT : undefined}
             whileTap={isUnlocked ? WORLD_TAP_VARIANT : undefined}
@@ -265,14 +265,11 @@ const WorldNode = memo(function WorldNode({
               {!isUnlocked && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-neo-black/50">
                   <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-neo-white" />
-                  {showStarGate && (() => {
-                    const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
-                    return starsNeeded > 0 ? (
-                      <span className="text-[9px] font-bold text-neo-yellow mt-1 text-center px-1 leading-tight">
-                        {t('adventure.starsNeeded', { count: starsNeeded })}
-                      </span>
-                    ) : null;
-                  })()}
+                  {showStarGate && (
+                    <span className="text-[9px] font-bold text-neo-yellow mt-1 text-center px-1 leading-tight">
+                      {t('adventurePlay.beatPrevBoss')}
+                    </span>
+                  )}
                 </div>
               )}
               {fogState === 'heavy' && (
@@ -400,25 +397,15 @@ const WorldNode = memo(function WorldNode({
             )}
           </div>
 
-          {/* Locked state — star requirement */}
-          {!isUnlocked && (() => {
-            const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
-            return (
-              <div className="px-3 pb-3 space-y-1">
-                <div className="flex items-center gap-1.5 text-[11px] text-neo-white font-mono">
-                  <Lock className="w-3 h-3 shrink-0" />
-                  <span>{unlockRequirement}</span>
-                  <Star className="w-3 h-3 shrink-0 text-neo-yellow/40" />
-                  <span>{t('adventure.stars')}</span>
-                </div>
-                {starsNeeded > 0 && starsNeeded <= unlockRequirement && (
-                  <p className="text-[10px] font-bold text-neo-cyan/60">
-                    {t('adventure.starsToUnlock', { count: starsNeeded })}
-                  </p>
-                )}
+          {/* Locked state — previous world's boss gates this one */}
+          {!isUnlocked && (
+            <div className="px-3 pb-3">
+              <div className="flex items-center gap-1.5 text-[11px] text-neo-white font-bold">
+                <Lock className="w-3 h-3 shrink-0" />
+                <span>{t('adventurePlay.beatPrevBoss')}</span>
               </div>
-            );
-          })()}
+            </div>
+          )}
 
           {/* Subtle world-colored gradient at bottom for depth */}
           {isUnlocked && (
@@ -500,7 +487,7 @@ const WorldMap = memo(function WorldMap({
   // Prepare worlds data (World 10 at top, World 1 at bottom)
   const worldsData = useMemo(() => {
     return [...WORLD_CONFIGS].reverse().map((world) => {
-      const unlocked = isWorldUnlocked(world.id, totalStars);
+      const unlocked = canPlayLevel(completions, world.id, 1);
       const unlockRequirement = getWorldUnlockRequirement(world.id);
       const worldCompletions = completions.filter((c) => c.world === world.id);
       const worldStars = worldCompletions.reduce((sum, c) => sum + c.stars, 0);
@@ -515,7 +502,7 @@ const WorldMap = memo(function WorldMap({
         totalWorldStars: worldTotalStars,
       };
     });
-  }, [totalStars, completions]);
+  }, [completions]);
 
   // Stable per-world click handlers to preserve WorldNode memo
   const worldClickHandlers = useMemo(() => {

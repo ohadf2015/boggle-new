@@ -17,8 +17,7 @@ import { calculateTier, getTierProgress, getTierDisplay, type TierName } from '.
 export type AdventureAchievementCategory =
   | 'gameplay'    // Word-finding achievements
   | 'bosses'      // Boss battle achievements
-  | 'progression' // Level/world completion
-  | 'mastery';    // Skill and strategy achievements
+  | 'progression'; // Level/world completion
 
 /**
  * Adventure achievement definition
@@ -60,11 +59,7 @@ export type AdventureAchievementId =
   | 'WORLD_COMPLETE'
   | 'STAR_COLLECTOR_50'
   | 'STAR_COLLECTOR_100'
-  | 'LEVEL_MASTER'
-  // Mastery achievements
-  | 'SKILL_UNLOCKED'
-  | 'SKILL_PATH_COMPLETE'
-  | 'COMBO_KING';
+  | 'LEVEL_MASTER';
 
 /**
  * Adventure achievements catalog
@@ -189,31 +184,6 @@ export const ADVENTURE_ACHIEVEMENTS: Record<AdventureAchievementId, AdventureAch
     oneTime: false,
   },
 
-  // Mastery
-  SKILL_UNLOCKED: {
-    id: 'SKILL_UNLOCKED',
-    nameKey: 'adventure.achievements.skillUnlocked.name',
-    descriptionKey: 'adventure.achievements.skillUnlocked.desc',
-    category: 'mastery',
-    icon: '🔓',
-    oneTime: false,
-  },
-  SKILL_PATH_COMPLETE: {
-    id: 'SKILL_PATH_COMPLETE',
-    nameKey: 'adventure.achievements.skillPathComplete.name',
-    descriptionKey: 'adventure.achievements.skillPathComplete.desc',
-    category: 'mastery',
-    icon: '🌳',
-    oneTime: false,
-  },
-  COMBO_KING: {
-    id: 'COMBO_KING',
-    nameKey: 'adventure.achievements.comboKing.name',
-    descriptionKey: 'adventure.achievements.comboKing.desc',
-    category: 'mastery',
-    icon: '👑',
-    oneTime: false,
-  },
 };
 
 // ==============================================
@@ -235,7 +205,7 @@ export function getAchievementsByCategory(
  * Get all achievement categories
  */
 export function getAchievementCategories(): AdventureAchievementCategory[] {
-  return ['gameplay', 'bosses', 'progression', 'mastery'];
+  return ['gameplay', 'bosses', 'progression'];
 }
 
 /**

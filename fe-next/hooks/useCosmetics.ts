@@ -16,8 +16,8 @@ import {
   saveJsonToLocalStorage,
 } from '@/utils/storageHelpers';
 
-const EQUIPPED_KEY = 'lexiclash_cosmetics_equipped';
-const PURCHASED_KEY = 'lexiclash_cosmetics_purchased';
+export const EQUIPPED_KEY = 'lexiclash_cosmetics_equipped';
+export const PURCHASED_KEY = 'lexiclash_cosmetics_purchased';
 
 interface UseCosmeticsInput {
   rankTier: string;
@@ -31,7 +31,7 @@ interface CosmeticWithStatus extends Cosmetic {
   isEquipped: boolean;
 }
 
-function syncCosmeticsToSupabase(
+export function syncCosmeticsToSupabase(
   userId: string,
   equipped: Partial<Record<CosmeticCategory, string>>,
   purchased: string[],

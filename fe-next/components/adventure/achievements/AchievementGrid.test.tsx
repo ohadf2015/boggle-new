@@ -180,14 +180,14 @@ describe('AchievementGrid', () => {
     expect(screen.getByText('Gameplay')).toBeInTheDocument();
     expect(screen.getByText('Bosses')).toBeInTheDocument();
     expect(screen.getByText('Progression')).toBeInTheDocument();
-    expect(screen.getByText('Mastery')).toBeInTheDocument();
+    expect(screen.queryByText('Mastery')).not.toBeInTheDocument();
   });
 
   it('shows earned count', () => {
     render(<AchievementGrid />);
 
     // Should show "2 / 17 Earned" (FIRST_WORD and BOSS_SLAYER are earned)
-    expect(screen.getByText(/2.*\/.*17.*Earned/i)).toBeInTheDocument();
+    expect(screen.getByText(/2.*\/.*14.*Earned/i)).toBeInTheDocument();
   });
 
   it('calls onSelectAchievement when achievement clicked', () => {

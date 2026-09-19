@@ -86,6 +86,8 @@ interface GridComponentProps {
    * yields the moment the player touches a tile.
    */
   showHandCoach?: boolean;
+  /** Force a tile skin (e.g. an adventure world's skin) over the player's equipped one. */
+  tileSkinOverride?: string;
 }
 
 // Stable, module-level "no combo" colors. Passed to NON-selected cells so a
@@ -128,6 +130,7 @@ const GridComponent = memo<GridComponentProps>(({
   effectsProfile = 'full',
   submitFeedback,
   showHandCoach = false,
+  tileSkinOverride,
 }) => {
   const { t } = useLanguage();
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -150,7 +153,8 @@ const GridComponent = memo<GridComponentProps>(({
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
-  const equippedTileSkin = useEquippedCosmetic('tileSkin');
+  const playerTileSkin = useEquippedCosmetic('tileSkin');
+  const equippedTileSkin = tileSkinOverride ?? playerTileSkin;
 
   const disableEarthquakeEffects = useDisableEarthquakeEffects();
   const accessibilityLargeLetters = useLargeLetters();

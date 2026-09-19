@@ -8,7 +8,6 @@ import { useParallax } from '@/hooks/useParallax';
 import {
   LEVELS_PER_WORLD,
   MAX_STARS_PER_LEVEL,
-  isLevelUnlocked,
   getWorldColors,
   getWorldGlow,
   type WorldConfig,
@@ -18,6 +17,7 @@ import {
   containerVariants,
   cardVariants,
 } from './levelGridConfig';
+import { canPlayLevel } from '@/lib/adventure/play/progress';
 import LevelGridHeader from './LevelGridHeader';
 import RPGLevelCard from './RPGLevelCard';
 import MilestoneDivider from './MilestoneDivider';
@@ -71,7 +71,7 @@ const LevelGrid = memo(function LevelGrid({
       const completion = completions.find(
         (c) => c.world === world.id && c.level === levelNum
       );
-      const isUnlocked = isLevelUnlocked(world.id, levelNum, completions);
+      const isUnlocked = canPlayLevel(completions, world.id, levelNum);
       const stars = completion?.stars || 0;
       const isPerfect = stars === MAX_STARS_PER_LEVEL;
       const isBoss = levelNum === LEVELS_PER_WORLD;
