@@ -120,7 +120,7 @@ export function ClassroomTvResultsScreen({
 
       {/* The shell is locked; this is the one region allowed to scroll (it
           rarely needs to — the recap is built to fit a 16:9 wall). */}
-      <div className="h-full px-8 py-6">
+      <div className="h-full px-3 pt-20 pb-4 md:px-8 md:pt-6 md:pb-6">
         <ClassroomTvResults summary={summary} onRematch={onRematch} t={t} />
       </div>
     </div>

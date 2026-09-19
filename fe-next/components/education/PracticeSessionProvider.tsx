@@ -29,6 +29,7 @@ import useEducationXp, {
   type DailyStreak,
 } from '@/hooks/useEducationXp';
 import useAchievementUnlock from '@/hooks/useAchievementUnlock';
+import { useAchievementTracking } from '@/hooks/useAchievementTracking';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 // supabase import removed — XP persistence handled server-side only
 import type { VocabFocus } from '@/lib/education/vocabFocus';
@@ -150,63 +151,20 @@ export function PracticeSessionProvider({
   const [totalWordsMastered, setTotalWordsMastered] = useState<number>(0);
 
   // Achievement tracking state — persisted to localStorage per student
-  const [perfectGames, setPerfectGames] = useState<number>(0);
-  const [morningPractices, setMorningPractices] = useState<number>(0);
-  const modesTriedRef = useRef<Set<string>>(new Set());
-  const [, setModesTriedCount] = useState<number>(1);
-  const completedLessonsRef = useRef<Set<string>>(new Set());
-  const [, setCompletedLessonsCount] = useState<number>(0);
-  const uniqueWordsRef = useRef<Set<string>>(new Set());
-  const [, setUniqueWordsCount] = useState<number>(0);
-  const [practiceDaysThisMonth, setPracticeDaysThisMonth] = useState<number>(0);
+  const {
+    perfectGames,
+    morningPractices,
+    modesTriedRef,
+    completedLessonsRef,
+    uniqueWordsRef,
+    practiceDaysThisMonth,
+  } = useAchievementTracking(studentId);
+
   // Guards the server PATCH against a double-send (e.g. a fast double-tap on
   // the same completion). Independent of the server's own idempotency guard
   // (completed_at already set → no re-award) — this just avoids firing the
   // request twice from one client.
   const completedSessionIdsRef = useRef<Set<string>>(new Set());
-
-  // Initialize achievement trackers from localStorage on mount
-  useEffect(() => {
-    try {
-      const storedPerfect = localStorage.getItem(`edu_perfect_games_${studentId}`);
-      if (storedPerfect) setPerfectGames(parseInt(storedPerfect, 10) || 0);
-
-      const storedMorning = localStorage.getItem(`edu_morning_practices_${studentId}`);
-      if (storedMorning) setMorningPractices(parseInt(storedMorning, 10) || 0);
-
-      const storedLessons = localStorage.getItem(`education_completed_lessons_${studentId}`);
-      if (storedLessons) {
-        const parsed: string[] = JSON.parse(storedLessons);
-        completedLessonsRef.current = new Set(parsed);
-        setCompletedLessonsCount(completedLessonsRef.current.size);
-      }
-
-      const storedModes = localStorage.getItem(`education_modes_tried_${studentId}`);
-      if (storedModes) {
-        const parsed: string[] = JSON.parse(storedModes);
-        modesTriedRef.current = new Set(parsed);
-        setModesTriedCount(modesTriedRef.current.size || 1);
-      }
-
-      const storedWords = localStorage.getItem(`education_unique_words_${studentId}`);
-      if (storedWords) {
-        const parsed: string[] = JSON.parse(storedWords);
-        uniqueWordsRef.current = new Set(parsed);
-        setUniqueWordsCount(uniqueWordsRef.current.size);
-      }
-
-      const storedDays = localStorage.getItem(`edu_practice_days_${studentId}`);
-      if (storedDays) {
-        const parsed: string[] = JSON.parse(storedDays);
-        const now = new Date();
-        const thisMonth = `${now.getFullYear()}-${now.getMonth()}`;
-        const daysThisMonth = parsed.filter((d: string) => d.startsWith(thisMonth)).length;
-        setPracticeDaysThisMonth(daysThisMonth);
-      }
-    } catch {
-      // localStorage unavailable or corrupt — use defaults
-    }
-  }, [studentId]);
 
   /**
    * Complete a practice session and award XP
@@ -325,7 +283,6 @@ export function PracticeSessionProvider({
           sessionData.cardsCorrect === sessionData.cardsReviewed
         ) {
           newPerfectGames = perfectGames + 1;
-          setPerfectGames(newPerfectGames);
           try { localStorage.setItem(`edu_perfect_games_${studentId}`, String(newPerfectGames)); } catch { /* noop */ }
         }
 
@@ -333,22 +290,19 @@ export function PracticeSessionProvider({
         let newMorningPractices = morningPractices;
         if (new Date().getHours() < 9) {
           newMorningPractices = morningPractices + 1;
-          setMorningPractices(newMorningPractices);
           try { localStorage.setItem(`edu_morning_practices_${studentId}`, String(newMorningPractices)); } catch { /* noop */ }
         }
 
-        // completedLessons: track unique lesson IDs finished (only on lesson_completion)
-        if (sessionData.type === 'lesson_completion') {
+        // completedLessons: track unique lesson IDs finished when a lesson is mastered
+        if (sessionData.masteryLevel === 'mastered') {
           completedLessonsRef.current.add(lessonId);
           try { localStorage.setItem(`education_completed_lessons_${studentId}`, JSON.stringify([...completedLessonsRef.current])); } catch { /* noop */ }
         }
         const newCompletedLessonsCount = completedLessonsRef.current.size;
-        setCompletedLessonsCount(newCompletedLessonsCount);
 
         // modesTried: track unique practice mode types
         modesTriedRef.current.add(sessionData.type);
         const newModesTriedCount = modesTriedRef.current.size;
-        setModesTriedCount(newModesTriedCount);
         try { localStorage.setItem(`education_modes_tried_${studentId}`, JSON.stringify([...modesTriedRef.current])); } catch { /* noop */ }
 
         // uniqueWords: cumulative unique words across sessions
@@ -357,7 +311,6 @@ export function PracticeSessionProvider({
           uniqueWordsRef.current.add(word);
         }
         const newUniqueWordsCount = uniqueWordsRef.current.size;
-        setUniqueWordsCount(newUniqueWordsCount);
         try { localStorage.setItem(`education_unique_words_${studentId}`, JSON.stringify([...uniqueWordsRef.current])); } catch { /* noop */ }
 
         // daysThisMonth: record today's practice date
@@ -372,7 +325,6 @@ export function PracticeSessionProvider({
           }
           const thisMonthPrefix = `${now.getFullYear()}-${now.getMonth()}`;
           newDaysThisMonth = storedDays.filter((d: string) => d.startsWith(thisMonthPrefix)).length;
-          setPracticeDaysThisMonth(newDaysThisMonth);
         } catch { /* noop */ }
 
         // F1: announce session completion to PostHog so we can build
@@ -417,6 +369,9 @@ export function PracticeSessionProvider({
     },
     [
       awardPracticeXp,
+      completedLessonsRef,
+      modesTriedRef,
+      uniqueWordsRef,
       streak,
       currentLevel,
       totalXp,

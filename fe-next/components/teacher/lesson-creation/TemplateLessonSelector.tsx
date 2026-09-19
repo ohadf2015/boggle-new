@@ -163,6 +163,82 @@ const LESSON_TEMPLATES: LessonTemplate[] = [
       { word: 'עוגיה', definition: 'חטיף מתוק קטן', canIntegrate: true },
     ],
   },
+  // Swedish Templates
+  {
+    id: 'sv-grade1-animals',
+    name: 'Årskurs 1: Djur',
+    description: 'Vanliga djurord för små elever',
+    language: 'sv',
+    wordCount: 8,
+    category: 'grade-1',
+    words: [
+      { word: 'katt', definition: 'Ett litet fluffigt husdjur', canIntegrate: true },
+      { word: 'hund', definition: 'En trogen fyrfotat husdjur', canIntegrate: true },
+      { word: 'fisk', definition: 'Ett djur som lever i vatten', canIntegrate: true },
+      { word: 'fågel', definition: 'Ett djur som kan flyga', canIntegrate: true },
+      { word: 'häst', definition: 'Ett större djur som man kan rida', canIntegrate: true },
+      { word: 'orm', definition: 'Ett långt djur utan ben', canIntegrate: true },
+      { word: 'björn', definition: 'Ett stort fluffigt djur', canIntegrate: true },
+      { word: 'lejon', definition: 'En stor katt från Afrika', canIntegrate: true },
+    ],
+  },
+  // Spanish Templates
+  {
+    id: 'es-grade1-animals',
+    name: 'Grado 1: Animales',
+    description: 'Palabras de animales comunes',
+    language: 'es',
+    wordCount: 8,
+    category: 'grade-1',
+    words: [
+      { word: 'gato', definition: 'Un pequeño animal doméstico esponjoso', canIntegrate: true },
+      { word: 'perro', definition: 'Un animal leal de cuatro patas', canIntegrate: true },
+      { word: 'pez', definition: 'Un animal que vive en el agua', canIntegrate: true },
+      { word: 'pájaro', definition: 'Un animal que puede volar', canIntegrate: true },
+      { word: 'caballo', definition: 'Un animal grande para montar', canIntegrate: true },
+      { word: 'serpiente', definition: 'Un animal largo sin patas', canIntegrate: true },
+      { word: 'oso', definition: 'Un animal grande y esponjoso', canIntegrate: true },
+      { word: 'león', definition: 'Un gran gato de África', canIntegrate: true },
+    ],
+  },
+  // Japanese Templates
+  {
+    id: 'ja-grade1-animals',
+    name: '1年生：動物',
+    description: 'よくある動物の言葉',
+    language: 'ja',
+    wordCount: 8,
+    category: 'grade-1',
+    words: [
+      { word: 'ねこ', definition: '小さくてかわいいペット', canIntegrate: true },
+      { word: 'いぬ', definition: '忠実な四本足のペット', canIntegrate: true },
+      { word: 'さかな', definition: '水に住んでいる動物', canIntegrate: true },
+      { word: 'とり', definition: '飛べる動物', canIntegrate: true },
+      { word: 'うま', definition: 'のれる大きな動物', canIntegrate: true },
+      { word: 'へび', definition: '足がない長い動物', canIntegrate: true },
+      { word: 'くま', definition: '大きくてふかふかな動物', canIntegrate: true },
+      { word: 'ライオン', definition: 'アフリカの大きなねこ', canIntegrate: true },
+    ],
+  },
+  // Russian Templates
+  {
+    id: 'ru-grade1-animals',
+    name: 'Класс 1: Животные',
+    description: 'Распространённые слова животных',
+    language: 'ru',
+    wordCount: 8,
+    category: 'grade-1',
+    words: [
+      { word: 'кошка', definition: 'Маленькое пушистое домашнее животное', canIntegrate: true },
+      { word: 'собака', definition: 'Верный четырёхногий питомец', canIntegrate: true },
+      { word: 'рыба', definition: 'Животное, которое живёт в воде', canIntegrate: true },
+      { word: 'птица', definition: 'Животное, которое может летать', canIntegrate: true },
+      { word: 'лошадь', definition: 'Большое животное для верховой езды', canIntegrate: true },
+      { word: 'змея', definition: 'Длинное животное без ног', canIntegrate: true },
+      { word: 'медведь', definition: 'Большое пушистое животное', canIntegrate: true },
+      { word: 'лев', definition: 'Большой кот из Африки', canIntegrate: true },
+    ],
+  },
 ];
 
 // ============================================

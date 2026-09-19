@@ -9,7 +9,13 @@ vi.mock('@/hooks/useTeacherPro', () => ({
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
+  useLanguage: () => ({ t: (key: string, params?: Record<string, string | number>) => {
+    // Mock interpolation for the CTA test
+    if (key === 'teacher.proGate.cta' && params?.price) {
+      return `Unlock this with Pro — {{price}}/month`.replace('{{price}}', String(params.price));
+    }
+    return key;
+  }, language: 'en' }),
 }));
 
 const mockTrackGrowthEvent = vi.fn();
@@ -97,5 +103,23 @@ describe('ProGate', () => {
       </ProGate>,
     );
     expect(mockTrackGrowthEvent).not.toHaveBeenCalled();
+  });
+
+  it('RED: CTA link renders with dollar sign and price (currently fails due to translation bug)', () => {
+    // The ProGate unlock CTA should render "Unlock this with Pro — $9/month"
+    // This test will pass once we fix the translation to use {{price}} instead of ${{price}}
+    // and update ProGate to pass price with the $ sign included
+    mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false });
+
+    render(
+      <ProGate feature="analytics">
+        <div>paid surface</div>
+      </ProGate>,
+    );
+
+    const link = screen.getByRole('link');
+    expect(link).toBeInTheDocument();
+    // After the fix, this will pass because price="$9" will be passed to t()
+    expect(link.textContent).toMatch(/\$\d+\/month/);
   });
 });

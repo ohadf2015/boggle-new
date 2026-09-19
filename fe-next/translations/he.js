@@ -78,10 +78,32 @@ const he = {
       "questionCount": "כמה שאלות?",
       "cappedNotice": "מהמילים האלה אפשר לבנות {count} שאלות, ולכן זה אורך הסבב.",
       "secondsPerQuestion": "זמן לכל שאלה",
-      "seconds": "{seconds} שנ׳"
+      "seconds": "{seconds} שנ׳",
+      "treasureChests": "תיבות אוצר",
+      "treasureChestsHint": "אחרי תשובה נכונה התלמידים פותחים תיבה: נקודות בונוס, חטיפה או החלפה.",
+      "on": "פועל",
+      "off": "כבוי"
     },
     "errors": {
       "noQuestions": "בשיעור הזה עדיין אין מילים שמתאימות לחידון."
+    },
+    "treasure": {
+      "prompt": "בחרו תיבה!",
+      "hint": "בכל תיבה מסתתר משהו אחר. בחרו בחוכמה!",
+      "chestLabel": "תיבה {number}",
+      "outcome": {
+        "gain": "+{amount} נקודות!",
+        "double": "כפול! +{amount} נקודות!",
+        "steal": "חטפתם {amount} נקודות מ־{target}!",
+        "swap": "החלפתם ניקוד עם {target}!",
+        "small-loss": "אופס, {amount} נקודות נעלמו. עוד תחזירו אותן!"
+      },
+      "newTotal": "הניקוד שלכם: {score}",
+      "tapToContinue": "הקישו כדי להמשיך",
+      "hitSteal": "{amount} מהנקודות שלכם עברו אל {actor}. אפשר להחזיר אותן!",
+      "hitSwap": "הניקוד שלכם הוחלף עם {actor}. ממשיכים!",
+      "tickerSteal": "{amount} נקודות עברו מ־{target} אל {actor}!",
+      "tickerSwap": "{actor} ו־{target} החליפו ניקוד!"
     }
   },
   "pricing": {
@@ -440,6 +462,23 @@ const he = {
     "issueProbe": {"prompt": "מה גרם לתחושה הזו?", "botsStrong": "הבוטים חזקים מדי", "technical": "בעיה טכנית"}
   },
   "wordTowerV2": {
+    "unitM": "מ'",
+    "wreck": {
+      "smash": "לרסק את המגדל של {name}",
+      "smashOwn": "לרסק את המגדל שלך",
+      "title": "המגדל של {name}",
+      "titleOwn": "המגדל שלך",
+      "cut": "לשחרר!",
+      "balls": "{n} כדורי הריסה",
+      "crash": "בום!",
+      "result": "{n} מתוך {total} קרסו!",
+      "share": "לאתגר חבר",
+      "shareText": "המגדל שלי הגיע ל-{m} מ'. נסו להפיל אותו:",
+      "copied": "הקישור הועתק!",
+      "challenge": "אתגר חדש מ-{name}! נחיתות מושלמות = כדורי הריסה. בסוף מרסקים את המגדל.",
+      "friend": "חבר",
+      "back": "עוד פעם",
+    },
     "cardTitle": "מגדל מילים 2",
     "cardDesc": "פיזיקה אמיתית — גרסת בטא",
     "collapsed": "המגדל קרס!",
@@ -1932,6 +1971,7 @@ const he = {
   },
   "errors": {
     "unstableConnection": "החיבור מתנדנד - מחזירים אותך...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "חיבור איטי - עובדים על זה",
     "sessionExpired": "הסשן נגמר. התחלה חדשה!",
     "gameCodeNotExist": "קוד לא נמצא. בדוק ונסה שוב!",
@@ -12676,13 +12716,14 @@ const he = {
         "title": "דוחות התקדמות הם תכונת Pro",
         "body": "ראו איך כל תלמיד מתקדם בכל הכיתות ובכל המשחקים: מילים שהושגו, שלבים, XP ודוחות PDF להדפסה לערב הורים. שדרגו ל-Teacher Pro כדי לפתוח דוחות כיתה ותלמיד."
       },
-      "cta": "לפתוח עם Pro, ${{price}} לחודש"
+      "cta": "לפתוח עם Pro, {{price}} לחודש"
     },
     "subscription": {
       "giftedNoCard": "אין כרטיס במערכת ואין חידוש, זה פשוט מסתיים וחוזרים לחינמי.",
       "giftedUntil": "Pro במתנה עד",
       "giftedBadge": "מתנה",
       "classLimitTitle": "הגעת למגבלת הכיתות",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "יצרת {{current}} מתוך {{limit}} כיתות בחינם. שדרגו ל-Pro לכיתות ותלמידים ללא הגבלה.",
       "upgradeProDescription": "Pro מעניק כיתות ותלמידים ללא הגבלה בכל כיתה, בלי מגבלות לצמיחת ההוראה שלכם.",
       "proFeatures": "Pro כולל",
@@ -13302,6 +13343,12 @@ const he = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "הגעתם למגבלת הכיתות בחינם. שדרגו ל-Pro לכיתות ללא הגבלה.",
+    },
+    "lobby": {
+      "joinTitle": "הצטרפו למשחק",
+    },
     "homework": {
       "takeHomeToggle": "כרטיס תרגול לקחת הביתה",
       "backToDashboard": "חזרה ללוח המורה",
@@ -13490,6 +13537,20 @@ const he = {
         "antonym": "הוסיפו ניגודים לשיעור כדי לפתוח"
       }
     },
+    "wordcraftAssignment": {
+      "title": "וורדקראפט",
+      "intro": "נצחו את הבוט על לוח המילים. בנו מילים מהשיעור וקבלו XP בונוס.",
+      "lessonWords": "המילים מהשיעור",
+      "play": "שחקו",
+      "score": "ניקוד",
+      "result": "תוצאה",
+      "won": "ניצחתם",
+      "lost": "הבוט ניצח",
+      "tie": "תיקו",
+      "recommended": "מומלץ",
+      "teacherHint": "משחק יחיד מול בוט ידידותי. התלמידים משחקים מדף הכיתה.",
+      "studentPlay": "שחקו וורדקראפט"
+    },
     "vocabFocus": {
       "title": "מיקוד אוצר מילים",
       "desc": "מתרגלים מיומנות אחת בכל פעם",
@@ -13642,6 +13703,9 @@ const he = {
       "classCoverage": "הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור",
       "reteach": "אף אחד לא מצא את אלה",
       "allFound": "הכיתה מצאה את כל מילות השיעור.",
+      "waitingForTeacher": "מחכים שהמורה יתחיל את הסבב הבא…",
+      "stayInClass": "הישארו כאן — המשחק הבא יתחיל במסך הזה.",
+      "playAgain": "שחקו שוב",
       "practiceMissed": "תרגלו את המילים האלה",
       "playReteachRound": "שחקו סבב חזרה: רק המילים שהחסרנו",
       "backToLobby": "חזרה ללובי",
@@ -14124,6 +14188,7 @@ const he = {
     "classroomGame": {
       "forSchoolsCta": "גלו את LexiClash לבתי ספר",
       "forSchoolsFooter": "רוצים להביא את LexiClash לכל בית הספר או המחוז שלכם?",
+      "defaultClassroomName": "הכיתה שלי",
       "questions": "שאלות",
       "perQuestion": "לכל שאלה",
       "namePrompt": {
@@ -14173,6 +14238,7 @@ const he = {
       "words": "{{count}} מילים"
     },
     "header": {
+      "exitEducation": "יציאה מאזור החינוך",
       "breadcrumbs": {
         "analytics": "אנליטיקה",
         "classroomGame": "משחק כיתתי",
@@ -14558,6 +14624,22 @@ const he = {
       "wordsFound": "מילים שנמצאו"
     },
     "starterPacks": {
+      "beginnerRussian": {
+        "description": "מילים בסיסיות ברוסית למתחילים",
+        "name": "רוסית למתחילים",
+      },
+      "beginnerJapanese": {
+        "description": "מילים בסיסיות ביפנית למתחילים",
+        "name": "יפנית למתחילים",
+      },
+      "beginnerSwedish": {
+        "description": "מילים בסיסיות בשוודית למתחילים",
+        "name": "שוודית למתחילים",
+      },
+      "beginnerSpanish": {
+        "description": "מילים בסיסיות בספרדית למתחילים",
+        "name": "ספרדית למתחילים",
+      },
       "title": "חבילות התחלה",
       "subtitle": "סטים מוכנים של אוצר מילים",
       "useThisPack": "השתמש בחבילה",
@@ -14575,6 +14657,7 @@ const he = {
       }
     },
     "lesson": {
+      "createdClassroom": "הכיתה נוצרה",
       "autoPronounce": "הגייה אוטומטית",
       "classicMode": "מצב קלאסי",
       "contextualExamples": "דוגמאות",

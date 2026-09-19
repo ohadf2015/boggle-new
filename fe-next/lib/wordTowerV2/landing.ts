@@ -22,9 +22,12 @@ export interface SupportTop {
   widthPx: number;
 }
 
-/** Offset as a fraction of the support's half-width. */
-const PERFECT_RATIO = 0.08;
-const GOOD_RATIO = 0.35;
+/**
+ * Offset as a fraction of the support's half-width. Was .08/.35: a ~9ms perfect
+ * window. feel.test.ts pins these in ms against the real swing.
+ */
+export const PERFECT_RATIO = 0.14;
+export const GOOD_RATIO = 0.5;
 /** Radians. A block settled more tilted than this rocked onto a corner. */
 const PERFECT_TILT = 0.06;
 /** A block resting this far (px) below the old top slid off the tower. */

@@ -54,6 +54,12 @@ describe('createAssignment practice_focus', () => {
     });
   });
 
+  it("persists 'wordcraft' for a Word Craft assignment", async () => {
+    const insert = insertChain();
+    await createAssignment({ classroom_id: 'c1', lesson_id: 'l1', teacher_id: 't1', practice_focus: 'wordcraft' });
+    expect(insert).toHaveBeenCalledWith({ classroom_id: 'c1', lesson_id: 'l1', due_date: null, practice_focus: 'wordcraft' });
+  });
+
   it('omits the column entirely for "any" / unset (legacy insert shape)', async () => {
     const insert = insertChain();
     await createAssignment({ classroom_id: 'c1', lesson_id: 'l1', teacher_id: 't1', practice_focus: 'any' });
@@ -80,5 +86,8 @@ describe('updateAssignment practice_focus', () => {
 
     await updateAssignment('a1', { practice_focus: null });
     expect(update).toHaveBeenLastCalledWith({ practice_focus: null });
+
+    await updateAssignment('a1', { practice_focus: 'wordcraft' });
+    expect(update).toHaveBeenLastCalledWith({ practice_focus: 'wordcraft' });
   });
 });

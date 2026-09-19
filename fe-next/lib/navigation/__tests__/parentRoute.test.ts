@@ -59,4 +59,36 @@ describe('parentRoute', () => {
     expect(parentRoute('/')).toBe('/');
     expect(parentRoute('')).toBe('/');
   });
+
+  describe('education route PARENT_OVERRIDES', () => {
+    it('sends top-level /teacher to /education, not home', () => {
+      expect(parentRoute('/en/teacher')).toBe('/en/education');
+      expect(parentRoute('/he/teacher')).toBe('/he/education');
+      expect(parentRoute('/ru/teacher')).toBe('/ru/education');
+    });
+
+    it('sends top-level /student to /education, not home', () => {
+      expect(parentRoute('/en/student')).toBe('/en/education');
+      expect(parentRoute('/sv/student')).toBe('/sv/education');
+    });
+
+    it('sends top-level /join to /education, not home', () => {
+      expect(parentRoute('/en/join')).toBe('/en/education');
+      expect(parentRoute('/ja/join')).toBe('/ja/education');
+    });
+
+    it('sends top-level /classroom to /education, not home', () => {
+      expect(parentRoute('/en/classroom')).toBe('/en/education');
+      expect(parentRoute('/es/classroom')).toBe('/es/education');
+    });
+
+    it('does NOT override nested education routes — they follow normal parent rules', () => {
+      // /en/teacher/classroom → /en/teacher (drop one segment)
+      // /en/teacher/classroom/abc/analytics → /en/teacher/classroom/abc (drop one segment)
+      // Not affected by override, follows default "drop one segment" rule
+      expect(parentRoute('/en/teacher/classroom')).toBe('/en/teacher');
+      expect(parentRoute('/en/teacher/classroom/abc/analytics')).toBe('/en/teacher/classroom/abc');
+      expect(parentRoute('/en/student/join')).toBe('/en/student');
+    });
+  });
 });

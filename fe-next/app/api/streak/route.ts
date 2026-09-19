@@ -131,16 +131,18 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (!engagement) {
-        // Create new engagement record
-        const { error: insertError } = await supabase.from('player_engagement').insert({
+        // Create new engagement record (use upsert to avoid race conditions)
+        const { error: upsertError } = await supabase.from('player_engagement').upsert({
           player_id: user.id,
           current_streak: 1,
           longest_streak: 1,
           last_login_date: today,
           last_played_at: new Date().toISOString(),
+        }, {
+          onConflict: 'player_id',
         });
-        if (insertError) {
-          console.error('Error creating engagement record:', insertError);
+        if (upsertError) {
+          console.error('Error creating engagement record:', upsertError);
           return NextResponse.json({ error: 'Failed to create streak' }, { status: 500 });
         }
         return NextResponse.json({
@@ -206,11 +208,18 @@ export async function POST(request: NextRequest) {
 
     if (action === 'merge' && localData) {
       // Merge localStorage data on login — take the max of each field
-      const { data: engagement } = await supabase
+      const { data: engagement, error: selectError } = await supabase
         .from('player_engagement')
         .select('current_streak, longest_streak, last_login_date, streak_freezes_available')
         .eq('player_id', user.id)
         .single();
+
+      // Handle select error explicitly (don't swallow it like before)
+      if (selectError && selectError.code !== 'PGRST116') {
+        // PGRST116 means "no rows" which is expected for new users
+        console.error('Error querying engagement:', selectError);
+        return NextResponse.json({ error: 'Failed to query streak' }, { status: 500 });
+      }
 
       const serverStreak = engagement?.current_streak || 0;
       const serverBest = engagement?.longest_streak || 0;
@@ -218,28 +227,22 @@ export async function POST(request: NextRequest) {
       const mergedStreak = Math.max(serverStreak, localData.currentStreak || 0);
       const mergedBest = Math.max(serverBest, localData.bestStreak || 0);
 
-      if (!engagement) {
-        const { error: mergeInsertError } = await supabase.from('player_engagement').insert({
-          player_id: user.id,
-          current_streak: mergedStreak,
-          longest_streak: mergedBest,
-          last_login_date: localData.lastWinDate?.split('T')[0] || today,
-          last_played_at: new Date().toISOString(),
-        });
-        if (mergeInsertError) {
-          console.error('Error inserting merged engagement:', mergeInsertError);
-          return NextResponse.json({ error: 'Failed to merge streak' }, { status: 500 });
-        }
-      } else {
-        const { error: mergeUpdateError } = await supabase.from('player_engagement').update({
-          current_streak: mergedStreak,
-          longest_streak: mergedBest,
-          last_played_at: new Date().toISOString(),
-        }).eq('player_id', user.id);
-        if (mergeUpdateError) {
-          console.error('Error updating merged engagement:', mergeUpdateError);
-          return NextResponse.json({ error: 'Failed to merge streak' }, { status: 500 });
-        }
+      // Use upsert to avoid duplicate key errors (handles both create and update)
+      const { error: mergeUpsertError } = await supabase.from('player_engagement').upsert({
+        player_id: user.id,
+        current_streak: mergedStreak,
+        longest_streak: mergedBest,
+        // An existing row keeps its own date — the old update path never
+        // touched it, and rewinding it to a stale local win breaks the streak.
+        last_login_date: engagement?.last_login_date || localData.lastWinDate?.split('T')[0] || today,
+        last_played_at: new Date().toISOString(),
+      }, {
+        onConflict: 'player_id',
+      });
+
+      if (mergeUpsertError) {
+        console.error('Error upserting merged engagement:', mergeUpsertError);
+        return NextResponse.json({ error: 'Failed to merge streak' }, { status: 500 });
       }
 
       return NextResponse.json({

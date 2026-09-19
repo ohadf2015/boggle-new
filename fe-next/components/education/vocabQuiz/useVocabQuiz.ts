@@ -25,6 +25,8 @@ import {
   type VocabQuizEnded,
   type VocabQuizPhase,
   type VocabQuizLockIn,
+  type TreasureChestState,
+  type TreasureChestHit,
 } from '@/shared/types/vocabQuiz';
 
 export interface VocabQuizClientState {
@@ -53,6 +55,25 @@ export interface VocabQuizClientState {
    * repaint the bars the class just watched settle.
    */
   lockIn: VocabQuizLockIn | null;
+  /**
+   * True when this player answered correctly and a chest awaits reveal.
+   * Set by answerResult.chestPending; cleared when moving to the next question.
+   */
+  chestPending: boolean;
+  /**
+   * THIS player's resolved chest for the current question. Only the private
+   * `treasureChestResult` sets it — another student's chest (room-wide
+   * `treasureChestEvent`) must never land here or it would hide this
+   * player's own picker. Null until then; cleared on the next question.
+   */
+  myChest: TreasureChestState | null;
+  /**
+   * Every chest opened in the room on this question (drives the projector
+   * ticker). Cleared when moving to the next question.
+   */
+  chestEvents: TreasureChestState[];
+  /** The last steal/swap that landed on this player, if any this question. */
+  chestHit: TreasureChestHit | null;
 }
 
 const IDLE: VocabQuizClientState = {
@@ -71,6 +92,10 @@ const IDLE: VocabQuizClientState = {
   questionNumber: 0,
   finished: false,
   lockIn: null,
+  chestPending: false,
+  myChest: null,
+  chestEvents: [],
+  chestHit: null,
 };
 
 export interface UseVocabQuizResult extends VocabQuizClientState {
@@ -122,6 +147,11 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         // re-broadcast (resume / extend time) has had its answers kept by the
         // server — either way the next lockIn packet is the truth.
         lockIn: prev.questionNumber === payload.index + 1 ? prev.lockIn : null,
+        // Clear chest state when moving to the next question
+        chestPending: false,
+        myChest: null,
+        chestEvents: [],
+        chestHit: null,
       }));
     };
 
@@ -161,7 +191,32 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         myAnswer: payload,
         myScore: payload.totalScore,
         myStreak: payload.streak,
+        chestPending: payload.chestPending ?? false,
       }));
+    };
+
+    // Private: my own chest. The server's total is the truth (Class 3).
+    const onTreasureChestResult = (payload: TreasureChestState) => {
+      setState((prev) => ({
+        ...prev,
+        myChest: payload,
+        myScore: payload.myScore ?? prev.myScore,
+        standings: payload.standings,
+      }));
+    };
+
+    // Room-wide: anyone's chest — ticker + standings only.
+    const onTreasureChestEvent = (payload: TreasureChestState) => {
+      setState((prev) => ({
+        ...prev,
+        standings: payload.standings,
+        chestEvents: [...prev.chestEvents, payload],
+      }));
+    };
+
+    // Someone stole from / swapped with me: my total moved without my input.
+    const onChestHit = (payload: TreasureChestHit) => {
+      setState((prev) => ({ ...prev, myScore: payload.score, chestHit: payload }));
     };
 
     const onState = (snap: VocabQuizStateSnapshot) => {
@@ -185,6 +240,10 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         questionNumber: snap.index + 1,
         finished: !snap.active,
         lockIn: null,
+        chestPending: snap.myAnswer?.chestPending ?? false,
+        myChest: snap.myChest ?? null,
+        chestEvents: [],
+        chestHit: null,
       });
     };
 
@@ -201,6 +260,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         fractionLeft: 0,
         finished: true,
         lockIn: null,
+        chestPending: false,
       }));
     };
 
@@ -214,6 +274,9 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
     socket.on(VOCAB_QUIZ_EVENTS.reveal, onReveal);
     socket.on(VOCAB_QUIZ_EVENTS.lockIn, onLockIn);
     socket.on(VOCAB_QUIZ_EVENTS.answerResult, onAnswerResult);
+    socket.on(VOCAB_QUIZ_EVENTS.treasureChestResult, onTreasureChestResult);
+    socket.on(VOCAB_QUIZ_EVENTS.treasureChestEvent, onTreasureChestEvent);
+    socket.on(VOCAB_QUIZ_EVENTS.chestHit, onChestHit);
     socket.on(VOCAB_QUIZ_EVENTS.state, onState);
     socket.on(VOCAB_QUIZ_EVENTS.ended, onEnded);
     socket.on(VOCAB_QUIZ_EVENTS.paused, onPaused);
@@ -247,6 +310,9 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
       socket.off(VOCAB_QUIZ_EVENTS.reveal, onReveal);
       socket.off(VOCAB_QUIZ_EVENTS.lockIn, onLockIn);
       socket.off(VOCAB_QUIZ_EVENTS.answerResult, onAnswerResult);
+      socket.off(VOCAB_QUIZ_EVENTS.treasureChestResult, onTreasureChestResult);
+      socket.off(VOCAB_QUIZ_EVENTS.treasureChestEvent, onTreasureChestEvent);
+      socket.off(VOCAB_QUIZ_EVENTS.chestHit, onChestHit);
       socket.off(VOCAB_QUIZ_EVENTS.state, onState);
       socket.off(VOCAB_QUIZ_EVENTS.ended, onEnded);
       socket.off(VOCAB_QUIZ_EVENTS.paused, onPaused);

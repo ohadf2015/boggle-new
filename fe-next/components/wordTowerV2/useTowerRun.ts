@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { SOUND_EFFECTS } from '@/lib/audio/soundEffectsConfig';
 import { TOWER_SURPRISE_META, type TowerSurpriseSound } from '@/lib/wordTower/towerSurprise';
-import { CRANE_CLEARANCE_PX, type CraneSwing, releaseKinematics } from '@/lib/wordTowerV2/crane';
+import { CRANE_CLEARANCE_PX, SWING, releaseKinematics } from '@/lib/wordTowerV2/crane';
 import {
   PX_PER_M,
   type TowerWorld,
@@ -27,7 +27,6 @@ import type { TowerFx } from './TowerCanvas';
  * and ends the run when physics says the tower fell.
  */
 
-const SWING: CraneSwing = { amplitudeRad: 0.62, periodMs: 2200, phase: 0 };
 const POLL_MS = 100;
 /** Stop waiting for a block to settle after this long and judge it anyway. */
 const SETTLE_TIMEOUT_MS = 2600;

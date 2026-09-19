@@ -59,7 +59,7 @@ export function VocabQuizChoiceBars({
     // The bars OWN the wall: `flex-1` plus `auto-rows-fr` below is what stops
     // the projector resting with 200px of dead navy under four short rows on a
     // 1440x900 screen. A classroom reads this from the back of the room.
-    <div className="flex-1 flex flex-col gap-4 min-h-0">
+    <div className="flex flex-col gap-3 md:gap-4 md:flex-1 md:min-h-0">
       {sweep && (
         <div
           // Scale-in over an already-painted surface, never an opacity tween on
@@ -68,14 +68,14 @@ export function VocabQuizChoiceBars({
           role="status"
         >
           <Sparkles className="w-8 h-8 shrink-0" aria-hidden />
-          <span className="font-neo-display font-black text-3xl uppercase tracking-wide md:text-[2.2vw]">
+          <span className="font-neo-display font-black text-xl uppercase tracking-wide md:text-[2.2vw]">
             {t('vocabQuiz.sweep.title')}
           </span>
-          <span className="font-neo-body text-xl md:text-[1.3vw]">{t('vocabQuiz.sweep.subtitle')}</span>
+          <span className="font-neo-body text-base md:text-[1.3vw]">{t('vocabQuiz.sweep.subtitle')}</span>
         </div>
       )}
 
-      <ul className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 auto-rows-fr gap-4">
+      <ul className="grid grid-cols-1 md:grid-cols-2 auto-rows-fr gap-2 md:gap-4 md:flex-1 md:min-h-0">
         {choices.map((choice, index) => {
           const style = OPTION_BARS[index % OPTION_BARS.length];
           const count = distribution[index] ?? 0;
@@ -123,7 +123,7 @@ export function VocabQuizChoiceBars({
                 style={{ width: `${Math.min(1, share) * 100}%` }}
                 aria-hidden
               />
-              <div className="relative h-full flex items-center gap-4 px-5 py-4">
+              <div className="relative h-full flex items-center gap-3 md:gap-4 px-4 py-3 md:px-5 md:py-4">
                 <span
                   className={cn(
                     'grid place-items-center w-10 h-10 shrink-0 rounded-neo border-[2px] border-neo-black text-xl md:w-[2.6vw] md:h-[2.6vw] md:text-[1.4vw]',
@@ -133,7 +133,7 @@ export function VocabQuizChoiceBars({
                 >
                   {style.glyph}
                 </span>
-                <span className="flex-1 font-neo-display font-bold text-2xl break-words md:text-[1.8vw]">{choice}</span>
+                <span className="flex-1 min-w-0 font-neo-display font-bold text-lg break-words md:text-[1.8vw]">{choice}</span>
                 {isCorrect && (
                   <Check data-testid="vocab-quiz-bar-correct" className="w-8 h-8 shrink-0 text-neo-yellow" aria-hidden />
                 )}

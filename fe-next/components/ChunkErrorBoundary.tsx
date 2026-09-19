@@ -7,6 +7,7 @@ import {
   claimChunkRecoveryGuard,
   clearChunkRecoveryGuard,
 } from '@/lib/deploy/staleDeployReload';
+import { sectionHome } from '@/lib/navigation/sectionHome';
 
 /**
  * Lightweight React error boundary dedicated to stale-chunk / CDN-missing
@@ -74,7 +75,8 @@ export class ChunkErrorBoundary extends Component<Props, State> {
             <button
               type="button"
               onClick={() => {
-                window.location.href = '/';
+                const home = sectionHome({ pathname: typeof window !== 'undefined' ? window.location.pathname : '' });
+                window.location.href = home;
               }}
               className="btn-neo-secondary px-6 py-3 text-lg"
             >

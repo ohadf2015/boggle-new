@@ -42,9 +42,14 @@ const TvJoinBar = memo<TvJoinBarProps>(({
     >
       <div className="max-w-7xl mx-auto px-4 py-4 md:py-5">
         {/* Main row: Join info + Code + QR */}
-        <div className="flex items-center justify-between gap-4">
+        {/* Wraps below md: on a teacher's phone the code + QR alone fill the
+            row, so the join address takes its own line above them. */}
+        <div
+          data-testid="tv-join-row"
+          className="flex flex-wrap md:flex-nowrap items-center justify-between gap-x-4 gap-y-2"
+        >
           {/* Left: Join URL */}
-          <div className="flex-1">
+          <div className="basis-full md:basis-auto md:flex-1 min-w-0 text-center md:text-start">
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
               {t('tvBroadcast.joinAt')}
             </p>
@@ -57,7 +62,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
           </div>
 
           {/* Center: Game Code (HUGE) */}
-          <div className="shrink-0 text-center px-6">
+          <div className="shrink-0 text-center md:px-6">
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1" id="game-code-label">
               {t('tvBroadcast.gameCode')}
             </p>
@@ -65,11 +70,11 @@ const TvJoinBar = memo<TvJoinBarProps>(({
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-              className="bg-neo-cream text-neo-purple px-6 py-2 rounded-neo border-4 border-neo-black shadow-hard"
+              className="bg-neo-cream text-neo-purple px-3 md:px-6 py-2 rounded-neo border-4 border-neo-black shadow-hard"
               role="status"
               aria-labelledby="game-code-label"
             >
-              <span className="text-5xl md:text-6xl lg:text-7xl font-black tracking-[0.15em] uppercase" aria-label={`Game code: ${gameCode.split('').join(' ')}`}>
+              <span className="text-4xl md:text-6xl lg:text-7xl font-black tracking-[0.1em] md:tracking-[0.15em] uppercase" aria-label={`Game code: ${gameCode.split('').join(' ')}`}>
                 {gameCode}
               </span>
             </m.div>

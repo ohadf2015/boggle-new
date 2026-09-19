@@ -63,3 +63,22 @@ describe('usePracticeProgress.startSession — authed', () => {
     expect(outcome?.sessionId).toBeUndefined();
   });
 });
+
+describe('usePracticeProgress.startSession — Word Craft variant', () => {
+  it('GIVEN the wordcraft variant WHEN a solo_board session starts THEN the POST carries variant so the row records mode=wordcraft', async () => {
+    const fetchMock = stubFetch({ session: { id: 'session-wc' } });
+    const { result } = renderHook(() => usePracticeProgress('lesson-1'));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.startSession('solo_board', { variant: 'wordcraft' });
+    });
+
+    const post = fetchMock.mock.calls.find(([, init]) => (init as RequestInit | undefined)?.method === 'POST');
+    expect(JSON.parse((post?.[1] as RequestInit).body as string)).toEqual({
+      lessonId: 'lesson-1',
+      practiceType: 'solo_board',
+      variant: 'wordcraft',
+    });
+  });
+});

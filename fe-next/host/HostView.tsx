@@ -853,6 +853,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
           classroomLive={classroomLive}
+          onQuizPlayAgain={() => actions.handleStartNewGame({ gameMode: currentGameMode })} // same rematch as TvResultsView
         />
       )}
     </div>

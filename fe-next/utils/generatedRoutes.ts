@@ -115,6 +115,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/education/unplugged-grade-passback",
   "/education/unplugged-reteach",
   "/education/vocabulary-games-classroom",
+  "/education/word-craft-assignment",
   "/erudit-onlayn",
   "/faq",
   "/filvordy-onlayn",

@@ -16,6 +16,10 @@ vi.mock('../socketHelpers', () => ({
   broadcastToRoom: vi.fn(),
   getGameRoom: (code: string) => `game:${code}`,
 }));
+const lb = vi.hoisted(() => ({ rows: [] as Array<{ username: string; score: number }> }));
+vi.mock('../../modules/gameStateManager', () => ({
+  getLeaderboard: () => lb.rows,
+}));
 
 import {
   queuePlayerFoundWord,
@@ -99,5 +103,29 @@ describe('playerFoundWordBatcher', () => {
     const [, , , payload] = (broadcastToRoom as any).mock.calls[0];
     expect(payload.words.length).toBeLessThanOrEqual(60);
     expect(payload.words[payload.words.length - 1].username).toBe('p199');
+  });
+
+  describe('reliable standings on every flush', () => {
+    // The per-word `updateLeaderboard` in wordHandler is VOLATILE and is emitted
+    // in the same tick as the reliable `scoreUpdate` — socket.io drops a volatile
+    // packet whenever the transport is mid-write, so in practice no player ever
+    // received it (measured 2026-09-18: a joined probe socket logged scoreUpdate
+    // and playerFoundWordBatch, never updateLeaderboard). Students' live rank
+    // strip and score were frozen until a refresh.
+    it('broadcasts the server leaderboard RELIABLY right after the batch', () => {
+      lb.rows = [{ username: 'ada', score: 30 }, { username: 'bo', score: 10 }];
+      queuePlayerFoundWord(mockIo, 'G1', item('ada'));
+      flushPlayerFoundWords(mockIo, 'G1');
+      const calls = vi.mocked(broadcastToRoom).mock.calls;
+      expect(calls.map((c) => c[2])).toEqual(['playerFoundWordBatch', 'updateLeaderboard']);
+      expect(calls[1][1]).toBe('game:G1');
+      expect(calls[1][3]).toEqual({ leaderboard: lb.rows });
+    });
+
+    it('sends no standings when nothing was found in the window', () => {
+      lb.rows = [{ username: 'ada', score: 30 }];
+      flushPlayerFoundWords(mockIo, 'G1');
+      expect(broadcastToRoom).not.toHaveBeenCalled();
+    });
   });
 });

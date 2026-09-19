@@ -11,6 +11,7 @@ import {
   claimChunkRecoveryGuard,
   clearChunkRecoveryGuard,
 } from '@/lib/deploy/staleDeployReload';
+import { sectionHome } from '@/lib/navigation/sectionHome';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 
@@ -244,7 +245,10 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
   };
 
   handleGoHome = (): void => {
-    window.location.href = '/';
+    const home = sectionHome({
+      pathname: typeof window !== 'undefined' ? window.location.pathname : '',
+    });
+    window.location.href = home;
   };
 
   handleHardRefresh = (): void => {

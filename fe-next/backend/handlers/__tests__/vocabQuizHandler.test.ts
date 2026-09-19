@@ -348,8 +348,11 @@ describe('round progression', () => {
 
 describe('end of round persistence', () => {
   it('hands the lesson words each student got right to the classroom persistence path', async () => {
+    // Chests off: ana answers right and never opens a chest, and the reveal
+    // would hold for it (vocabQuizChestHold.test.ts) — this test pins
+    // persistence on a fixed 13.2s-per-question clock.
     (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(
-      classroomGame('vocab-quiz', { vocabQuizQuestionCount: 4, vocabQuizSeconds: 10 })
+      classroomGame('vocab-quiz', { vocabQuizQuestionCount: 4, vocabQuizSeconds: 10, treasureChestsEnabled: false })
     );
     const { io, emit } = makeIo();
     await startVocabQuizForClassroom(io, GAME_CODE);
@@ -414,5 +417,59 @@ describe('end of round persistence', () => {
       expect.objectContaining({ immediate: true })
     );
     expect(classroomGameManager.updateClassroomGameStatus).toHaveBeenCalledWith(GAME_CODE, 'finished');
+  });
+});
+
+describe('reconnect after browser refresh', () => {
+  beforeEach(async () => {
+    (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(classroomGame('vocab-quiz'));
+    await startVocabQuizForClassroom(makeIo().io, GAME_CODE);
+  });
+
+  it('restores quiz state when socket reconnects with the correct gameCode binding', () => {
+    // SETUP: Student "ana" initially connected as socket-ana and quiz is running
+    // The quiz is already running with ana enrolled (from startVocabQuizForClassroom setup)
+    (gameStateManager.getGameBySocketId as Mock).mockReturnValue(GAME_CODE);
+    (gameStateManager.getUsernameBySocketId as Mock).mockReturnValue('ana');
+
+    const quiz = getActiveQuiz(GAME_CODE)!;
+    expect(quiz).toBeDefined();
+    expect(quiz.players.get('ana')).toBeDefined();
+
+    // SIMULATE REFRESH: New socket with different ID, but same auth user
+    // The fix: when the classroom game handler's joinClassroomGame is called,
+    // it calls bindSocketToGame(socket.id, gameCode), which registers the new
+    // socket.id in the socketToGame map. So when the new socket calls requestState,
+    // getGameBySocketId('socket-ana-reconnect') now returns GAME_CODE instead of null.
+
+    const { socket: reconnectedSocket, listeners: reconnectedListeners, emitted: reconnectedEmitted } = makeSocket(
+      'socket-ana-reconnect'
+    );
+    reconnectedSocket.data = { verifiedUserId: 'user-ana' };
+    registerVocabQuizHandlers(makeIo().io, reconnectedSocket);
+
+    // SIMULATE THE JOIN: classroomGameHandler's joinClassroomGame would call
+    // bindSocketToGame('socket-ana-reconnect', GAME_CODE). For the test,
+    // we simulate that by updating the mock to return GAME_CODE for the new socket.
+    let callCount = 0;
+    (gameStateManager.getGameBySocketId as Mock).mockImplementation((socketId: string) => {
+      // Return GAME_CODE for both the original and reconnected sockets
+      return socketId === 'socket-ana' || socketId === 'socket-ana-reconnect' ? GAME_CODE : null;
+    });
+
+    const requestState = reconnectedListeners.get(VOCAB_QUIZ_EVENTS.requestState)!;
+    requestState();
+
+    // VERIFY: The reconnected socket should receive the full quiz state
+    // This was the bug: before the fix, requestState would return silently
+    // with "unbound socket" because getGameBySocketId returned null.
+    // After the fix, it gets the quiz state because bindSocketToGame registers the socket.
+    const statePayload = reconnectedEmitted.mock.calls.find((c) => c[0] === VOCAB_QUIZ_EVENTS.state);
+    expect(statePayload).toBeDefined();
+    expect(statePayload![1]).toMatchObject({
+      active: true,
+      phase: 'question', // Student should be in question phase
+      index: 0,
+    });
   });
 });

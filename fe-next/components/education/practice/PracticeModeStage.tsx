@@ -31,6 +31,12 @@ import {
   VocabFocusPractice,
 } from '@/components/practice';
 import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
+import dynamic from 'next/dynamic';
+
+// Word Craft carries the Pixi board; only a Word Craft assignment pays for it.
+const WordCraftPractice = dynamic(() => import('@/components/education/practicePicker/WordCraftPractice'), {
+  ssr: false,
+});
 import { availableFocuses, type VocabFocus } from '@/lib/education/vocabFocus';
 import { ProducePractice } from '@/components/practice/ProducePractice';
 import { PRODUCE_FOCUSES, type ProduceFocus } from '@/lib/education/produceQuestions';
@@ -104,6 +110,21 @@ export default function PracticeModeStage({
       );
 
     case 'solo_board':
+      if (variant === 'wordcraft') {
+        // Classroom Word Craft homework. Records as solo_board (mode=wordcraft);
+        // XP pays for the lesson words the student built on the board.
+        return (
+          <WordCraftPractice
+            words={words.map((entry) => entry.word)}
+            language={language}
+            onComplete={async (results) => {
+              await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, newWordsFound: [] });
+            }}
+            onBack={onBack}
+            {...forward}
+          />
+        );
+      }
       if (variant === 'word_tower') {
         return (
           <WordTowerPractice

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Flame, Shuffle, Trophy } from 'lucide-react';
+import { Flame, Hammer, Send, Shuffle, Trophy } from 'lucide-react';
 import { TOWER_SURPRISE_META } from '@/lib/wordTower/towerSurprise';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import type { LandingQuality } from '@/lib/wordTowerV2/landing';
@@ -37,9 +37,11 @@ interface Props {
   landing: LandingEvent | null;
   surprise: SurpriseEvent | null;
   newBest: boolean;
+  /** Wrecking balls banked for the smash round. */
+  balls?: number;
 }
 
-export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landing, surprise, newBest }: Props) {
+export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landing, surprise, newBest, balls }: Props) {
   const verdict = useFlash(landing, 1100);
   const pop = useFlash(surprise, 2200);
 
@@ -68,7 +70,7 @@ export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landi
           aria-label={t('wordTower.a11y.height', { m: heightM.toFixed(1) })}
         >
           {heightM.toFixed(1)}
-          <span className="text-lg">m</span>
+          <span className="ms-0.5 text-lg">{t('wordTowerV2.unitM')}</span>
         </div>
         <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-lg font-bold tabular-nums text-neo-cream">
           {score.toLocaleString()}
@@ -87,6 +89,16 @@ export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landi
             <Shuffle className="h-3.5 w-3.5" aria-hidden />
             {scrambles}
           </div>
+          {balls !== undefined ? (
+            <div
+              key={balls}
+              className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-pink px-2 py-0.5 font-neo-display text-xs font-bold text-neo-navy shadow-hard-sm animate-neo-pop"
+              aria-label={t('wordTowerV2.wreck.balls', { n: balls })}
+            >
+              <Hammer className="h-3.5 w-3.5" aria-hidden />
+              {balls}
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -157,9 +169,14 @@ export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landi
 }
 
 export function V2GameOver({
-  t, peakM, score, bestM, bestCombo, isBest, onRestart,
+  t, peakM, score, bestM, bestCombo, isBest, onRestart, smashLabel, onSmash, onShare,
 }: {
   t: T; peakM: number; score: number; bestM: number; bestCombo: number; isBest: boolean; onRestart: () => void;
+  /** Smash round entry, when there is a tower to wreck. */
+  smashLabel?: string;
+  onSmash?: () => void;
+  /** Send your tower to a friend. */
+  onShare?: () => void;
 }) {
   return (
     <div className="absolute inset-0 z-40 flex items-center justify-center bg-neo-navy/70 p-4" role="dialog" aria-modal="true">
@@ -173,7 +190,7 @@ export function V2GameOver({
         ) : null}
         <div className="mt-4 font-neo-display text-6xl font-black tabular-nums">
           {peakM.toFixed(1)}
-          <span className="text-2xl">m</span>
+          <span className="ms-0.5 text-2xl">{t('wordTowerV2.unitM')}</span>
         </div>
         <dl className="mt-4 grid grid-cols-3 gap-2 font-neo-display">
           <div className="rounded-neo border-neo border-black bg-neo-lime p-2">
@@ -188,14 +205,37 @@ export function V2GameOver({
             <dt className="text-[11px] font-bold uppercase">
               <Trophy className="mx-auto h-3.5 w-3.5" aria-hidden />
             </dt>
-            <dd className="text-lg font-black tabular-nums">{bestM.toFixed(1)}m</dd>
+            <dd className="text-lg font-black tabular-nums">
+              {bestM.toFixed(1)}
+              {t('wordTowerV2.unitM')}
+            </dd>
           </div>
         </dl>
+        {onSmash && smashLabel ? (
+          <button
+            type="button"
+            onClick={onSmash}
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          >
+            <Hammer className="h-5 w-5" aria-hidden />
+            {smashLabel}
+          </button>
+        ) : null}
+        {onShare ? (
+          <button
+            type="button"
+            onClick={onShare}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan px-6 py-2 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          >
+            <Send className="h-5 w-5" aria-hidden />
+            {t('wordTowerV2.wreck.share')}
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={onRestart}
           autoFocus
-          className="mt-5 w-full rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          className="mt-3 w-full rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
         >
           {t('common.playAgain')}
         </button>

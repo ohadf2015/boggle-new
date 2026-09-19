@@ -72,6 +72,7 @@ export const ErrorCodes = {
   GAME_FULL: 'GAME_FULL',
   GAME_INVALID_CODE: 'GAME_INVALID_CODE',
   GAME_CLOSED: 'GAME_CLOSED',
+  CLASSROOM_NOT_OPEN: 'CLASSROOM_NOT_OPEN',
 
   // Player errors (2xxx)
   PLAYER_NOT_IN_GAME: 'PLAYER_NOT_IN_GAME',
@@ -169,6 +170,13 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
     message: 'Game room has been closed',
     severity: ErrorSeverity.LOW,
     httpStatus: 410
+  },
+  // A live classroom session whose teacher has not tapped START yet — the
+  // client waits and re-joins, it is not a refusal (see classroomMissingRoom).
+  [ErrorCodes.CLASSROOM_NOT_OPEN]: {
+    message: 'Your teacher has not opened the game yet',
+    severity: ErrorSeverity.LOW,
+    httpStatus: 409
   },
 
   [ErrorCodes.PLAYER_NOT_IN_GAME]: {

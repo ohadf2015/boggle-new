@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Grid3x3, UserPlus, X, Clock, Building2, Grid2x2, Gavel, Brain } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -11,6 +11,8 @@ import type { Language } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import type { LiveClassroomGameInfo } from '@/lib/education/liveClassroomGameInfo';
 import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
+import { SocketContext } from '@/utils/SocketContext';
+import { useIsVocabQuizRoom } from './vocabQuiz/useIsVocabQuizRoom';
 
 interface LessonData {
   lessonId: string;
@@ -154,7 +156,14 @@ export function ClassroomModeBanner({
   // whenever the lookup fails — and it fails per IP, which a whole class shares.
   // Recurring pitfall class 4. Show the class and the lesson, and nothing we do
   // not actually know.
-  const showPanel = expanded && !!gameCode && (isHost || !!liveGame);
+  // A quiz never sets the store's `gameActive`, so `expanded` (= !gameActive)
+  // reads "lobby" at the final whistle and re-opened this whole card over the
+  // student's podium, pushing their next action off a 390x844 phone. Once the
+  // room has shown quiz traffic the quiz surface owns the screen; the same
+  // detector the shell uses to hide this chrome during play releases on the
+  // next board round (Class 3: one signal, not a second guess).
+  const quizOwnsScreen = useIsVocabQuizRoom(useContext(SocketContext)?.socket ?? null);
+  const showPanel = expanded && !quizOwnsScreen && !!gameCode && (isHost || !!liveGame);
 
   const previewWords = useMemo(
     () => (lessonData?.vocabularyWords || []).slice(0, 12),

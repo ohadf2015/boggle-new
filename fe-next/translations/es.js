@@ -78,10 +78,32 @@ const es = {
       "questionCount": "¿Cuántas preguntas?",
       "cappedNotice": "Con estas palabras salen {count} preguntas, así que esa será la duración de la ronda.",
       "secondsPerQuestion": "Tiempo por pregunta",
-      "seconds": "{seconds} s"
+      "seconds": "{seconds} s",
+      "treasureChests": "Cofres del tesoro",
+      "treasureChestsHint": "Tras una respuesta correcta, cada estudiante abre un cofre: puntos extra, un robo o un intercambio.",
+      "on": "Sí",
+      "off": "No"
     },
     "errors": {
       "noQuestions": "Esta lección todavía no tiene palabras listas para un test."
+    },
+    "treasure": {
+      "prompt": "¡Elige un cofre!",
+      "hint": "Cada cofre esconde algo distinto. ¡Elige bien!",
+      "chestLabel": "Cofre {number}",
+      "outcome": {
+        "gain": "¡+{amount} puntos!",
+        "double": "¡Doble! ¡+{amount} puntos!",
+        "steal": "¡Le birlaste {amount} puntos a {target}!",
+        "swap": "¡Cambio de puntos con {target}!",
+        "small-loss": "Uy, se te escaparon {amount} puntos. ¡Ya los recuperarás!"
+      },
+      "newTotal": "Tus puntos: {score}",
+      "tapToContinue": "Toca para seguir",
+      "hitSteal": "{actor} te birló {amount} puntos. ¡A recuperarlos!",
+      "hitSwap": "{actor} cambió sus puntos por los tuyos. ¡Sigue así!",
+      "tickerSteal": "¡{actor} le birló {amount} puntos a {target}!",
+      "tickerSwap": "¡{actor} cambió puntos con {target}!"
     }
   },
   "pricing": {
@@ -439,6 +461,23 @@ const es = {
     "issueProbe": {"prompt": "¿Qué lo hizo sentir así?", "botsStrong": "Bots muy fuertes", "technical": "Problema técnico"}
   },
   "wordTowerV2": {
+    "unitM": "m",
+    "wreck": {
+      "smash": "Derriba la torre de {name}",
+      "smashOwn": "Derriba tu torre",
+      "title": "La torre de {name}",
+      "titleOwn": "Tu torre",
+      "cut": "¡Suelta!",
+      "balls": "{n} bolas de demolición",
+      "crash": "¡CRASH!",
+      "result": "¡{n} de {total} al suelo!",
+      "share": "Reta a un amigo",
+      "shareText": "Mi torre de palabras llegó a {m} m. ¿Puedes derribarla?",
+      "copied": "¡Enlace copiado!",
+      "challenge": "¡{name} te reta! Las caídas perfectas dan bolas de demolición. Luego derriba su torre.",
+      "friend": "Tu amigo",
+      "back": "Otra vez",
+    },
     "cardTitle": "Torre de Palabras v2",
     "cardDesc": "Física real: versión beta",
     "collapsed": "¡Se cayó la torre!",
@@ -1547,6 +1586,7 @@ const es = {
       "name": "Maestro de Pistas"
     },
     "xpBoost": {
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
       "name": "Impulso de XP"
     },
     "goldRush": {
@@ -1990,6 +2030,7 @@ const es = {
   },
   "errors": {
     "unstableConnection": "La conexión tambalea - te reconectamos...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "Conexión lenta - trabajando",
     "sessionExpired": "Sesión terminada. ¡Hora de empezar de nuevo!",
     "roomNoLongerExists": "Sala cerrada - todos se fueron",
@@ -11916,6 +11957,7 @@ const es = {
       "progressSafe": "Tu progreso está a salvo — nivel {n}"
     },
     "progress": {
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "aria": "{found} de {total} palabras encontradas"
     },
     "strikes": {
@@ -12807,17 +12849,19 @@ const es = {
         "title": "Mira cómo va de verdad tu clase",
         "body": "Con Pro cada partida se convierte en una radiografía de tu clase: qué palabras se afianzan, qué alumnos se atascan y cuánto ha avanzado cada uno desde septiembre. Llévalo a una reunión de padres o de departamento."
       },
+      "defaultClassroomName": "My Classroom",
       "reports": {
         "title": "Los informes de progreso son una función Pro",
         "body": "Mira cómo le va a cada estudiante en todas tus clases y juegos: palabras dominadas, niveles, XP e informes PDF imprimibles para reuniones de padres. Actualiza a Teacher Pro para desbloquear los informes de clase y de estudiantes."
       },
-      "cta": "Desbloquéalo con Pro: ${{price}}/mes"
+      "cta": "Desbloquéalo con Pro: {{price}}/mes"
     },
     "subscription": {
       "giftedNoCard": "Sin tarjeta ni renovación: simplemente termina y vuelves al plan gratuito.",
       "giftedUntil": "Pro de cortesía hasta",
       "giftedBadge": "Regalo",
       "classLimitTitle": "Has alcanzado el límite de clases",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Mejora a Pro para tener clases y estudiantes ilimitados.",
       "upgradeProDescription": "Pro te da aulas ilimitadas y estudiantes ilimitados por clase, sin límites para hacer crecer tu enseñanza.",
       "proFeatures": "Pro incluye",
@@ -13437,6 +13481,12 @@ const es = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "Has alcanzado el límite de clases gratuitas. Pásate a Pro para tener clases ilimitadas.",
+    },
+    "lobby": {
+      "joinTitle": "Únete al juego",
+    },
     "homework": {
       "takeHomeToggle": "Tarjeta de práctica para casa",
       "backToDashboard": "Volver al panel",
@@ -13625,6 +13675,20 @@ const es = {
         "antonym": "Añade antónimos a esta lección para desbloquear"
       }
     },
+    "wordcraftAssignment": {
+      "title": "WordCraft",
+      "intro": "Gánale al bot en el tablero de palabras. Forma las palabras de la lección para ganar XP extra.",
+      "lessonWords": "Palabras de la lección",
+      "play": "Jugar",
+      "score": "Puntos",
+      "result": "Resultado",
+      "won": "¡Ganaste!",
+      "lost": "Ganó el bot",
+      "tie": "Empate",
+      "recommended": "Recomendado",
+      "teacherHint": "En solitario contra un bot amistoso. Se juega desde la página de la clase.",
+      "studentPlay": "Jugar WordCraft"
+    },
     "vocabFocus": {
       "title": "Enfoque de vocabulario",
       "desc": "Practica una habilidad a la vez",
@@ -13777,10 +13841,13 @@ const es = {
       "classCoverage": "La clase encontró {{found}} de {{total}} palabras de la lección",
       "reteach": "Nadie encontró estas",
       "allFound": "La clase encontró todas las palabras de la lección.",
+      "waitingForTeacher": "Esperando que tu maestro comience la próxima ronda…",
+      "stayInClass": "Quédate aquí: el próximo juego empieza en esta pantalla.",
       "practiceMissed": "Practicar estas palabras",
       "playReteachRound": "Jugar ronda de repaso (solo las palabras que faltan)",
       "backToLobby": "Volver a la sala",
       "rematch": "Revancha: misma lista, mismo código",
+      "playAgain": "Juega de nuevo",
       "teamBattle": {
         "title": "Batalla por equipos",
         "teamName": "Equipo {number}",
@@ -14259,6 +14326,7 @@ const es = {
     "classroomGame": {
       "forSchoolsCta": "Ver LexiClash para escuelas",
       "forSchoolsFooter": "¿Quieres llevar LexiClash a toda tu escuela o distrito?",
+      "defaultClassroomName": "Mi aula",
       "questions": "Preguntas",
       "perQuestion": "Por pregunta",
       "namePrompt": {
@@ -14324,6 +14392,7 @@ const es = {
         "teacher": "Docente"
       },
       "educationHome": "Portal educativo",
+      "exitEducation": "Salir de educación",
       "homeLink": "Inicio",
       "menu": "Menú",
       "navigation": "Navegación",
@@ -14707,9 +14776,26 @@ const es = {
       "beginnerHebrew": {
         "name": "Hebreo para principiantes",
         "description": "Palabras esenciales de hebreo para principiantes"
+      },
+      "beginnerSpanish": {
+        "name": "Español para principiantes",
+        "description": "Palabras esenciales de español para principiantes"
+      },
+      "beginnerSwedish": {
+        "name": "Sueco para principiantes",
+        "description": "Palabras esenciales de sueco para principiantes"
+      },
+      "beginnerJapanese": {
+        "name": "Japonés para principiantes",
+        "description": "Palabras esenciales de japonés para principiantes"
+      },
+      "beginnerRussian": {
+        "name": "Ruso para principiantes",
+        "description": "Palabras esenciales de ruso para principiantes"
       }
     },
     "lesson": {
+      "createdClassroom": "Aula creada",
       "autoPronounce": "Auto-pronunciar",
       "classicMode": "Modo clásico",
       "contextualExamples": "Ejemplos",

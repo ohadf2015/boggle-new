@@ -11,6 +11,12 @@ vi.mock('@/components/motion/AdaptiveMotion', () => ({
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
   },
 }));
+const playModeSound = vi.hoisted(() => vi.fn());
+vi.mock('@/hooks/useModeSting', () => ({ useModeSting: () => ({ playModeSound }) }));
+vi.mock('@/hooks/gameState/selectors', () => ({ useGameMode: () => 'classic' }));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, dir: 'ltr' }),
+}));
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
@@ -48,13 +54,28 @@ describe('StudentRankRail — what a classroom student sees while the round runs
     expect(screen.getByTestId('student-own-progress')).toHaveTextContent('6');
   });
 
-  it('shows one nearby classmate and the gap, not the class standings', () => {
+  it('shows me between the classmate just above and just below — nobody else', () => {
     render(<StudentRankRail leaderboard={board} currentUsername="Me" wordsFound={6} t={t} />);
-    const chip = screen.getByTestId('student-rival-chip');
-    expect(chip).toHaveTextContent('Maya');
-    expect(chip).toHaveTextContent('12');
-    // Nobody else on the board is named.
-    expect(screen.queryByText(/Sam|Ana/)).toBeNull();
+    const strip = screen.getAllByTestId('live-board-row').map((r) => r.getAttribute('data-player'));
+    expect(strip).toEqual(['Maya', 'Me', 'Sam']);
+    // One row: MY slot in the strip IS my own progress chip (a second row
+    // pushed the rail under the board at 390×844).
+    expect(screen.getByTestId('student-own-progress').closest('[data-me="true"]')).not.toBeNull();
+    // Nobody further away is named.
+    expect(screen.queryByText(/Ana/)).toBeNull();
+  });
+
+  it('never puts the host (the projecting teacher) in my neighbours', () => {
+    render(
+      <StudentRankRail
+        leaderboard={[{ username: 'Teacher', score: 99, isHost: true }, ...board]}
+        currentUsername="Maya"
+        wordsFound={6}
+        t={t}
+      />,
+    );
+    const strip = screen.getAllByTestId('live-board-row').map((r) => r.getAttribute('data-player'));
+    expect(strip).toEqual(['Maya', 'Me']);
   });
 
   it('NEVER prints an absolute position — no "#4", no "/ 28"', () => {
@@ -81,7 +102,7 @@ describe('StudentRankRail — what a classroom student sees while the round runs
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('still shows my progress in a class of one, with no rival chip', () => {
+  it('still shows my progress in a class of one, with no neighbours', () => {
     render(
       <StudentRankRail
         leaderboard={[{ username: 'Me', score: 9 }]}
@@ -91,7 +112,33 @@ describe('StudentRankRail — what a classroom student sees while the round runs
       />,
     );
     expect(screen.getByTestId('student-own-progress')).toHaveTextContent('9');
-    expect(screen.queryByTestId('student-rival-chip')).toBeNull();
+    expect(screen.getAllByTestId('live-board-row').map((r) => r.getAttribute('data-player'))).toEqual(['Me']);
+  });
+
+  describe('a correct word lands instantly on my own score', () => {
+    const rail = (fb: WordFeedback | null) => (
+      <StudentRankRail leaderboard={board} currentUsername="Me" wordsFound={6} feedback={fb} t={t} />
+    );
+
+    it('bursts, pops "+N" and stings the mode on an accepted word', () => {
+      playModeSound.mockClear();
+      const { rerender } = render(rail(null));
+      rerender(rail({ id: 'w1', type: 'accepted', word: 'HOUSE', score: 5, timestamp: 1 }));
+      expect(screen.getByTestId('student-score-burst')).toBeInTheDocument();
+      expect(screen.getByTestId('student-score-pop')).toHaveTextContent('+5');
+      expect(playModeSound).toHaveBeenCalledWith('classic', 'start');
+    });
+
+    it('does nothing for a rejected word, and never re-fires the same word', () => {
+      playModeSound.mockClear();
+      const accepted: WordFeedback = { id: 'w1', type: 'accepted', word: 'HOUSE', score: 5, timestamp: 1 };
+      const { rerender } = render(rail({ id: 'r1', type: 'rejected', word: 'XQ', timestamp: 1 }));
+      expect(screen.queryByTestId('student-score-burst')).toBeNull();
+      expect(playModeSound).not.toHaveBeenCalled();
+      rerender(rail(accepted));
+      rerender(rail({ ...accepted }));
+      expect(playModeSound).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('the mascot reaction', () => {

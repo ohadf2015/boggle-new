@@ -78,10 +78,32 @@ const sv = {
       "questionCount": "Hur många frågor?",
       "cappedNotice": "Orden räcker till {count} frågor, så lång blir rundan.",
       "secondsPerQuestion": "Tid per fråga",
-      "seconds": "{seconds} s"
+      "seconds": "{seconds} s",
+      "treasureChests": "Skattkistor",
+      "treasureChestsHint": "Efter ett rätt svar öppnar eleven en kista: bonuspoäng, en stöld eller ett byte.",
+      "on": "På",
+      "off": "Av"
     },
     "errors": {
       "noQuestions": "Den här lektionen har inga ord redo för ett quiz än."
+    },
+    "treasure": {
+      "prompt": "Välj en kista!",
+      "hint": "Varje kista döljer något eget. Välj klokt!",
+      "chestLabel": "Kista {number}",
+      "outcome": {
+        "gain": "+{amount} poäng!",
+        "double": "Dubbelt! +{amount} poäng!",
+        "steal": "Du knyckte {amount} poäng från {target}!",
+        "swap": "Poängbyte med {target}!",
+        "small-loss": "Hoppsan, {amount} poäng försvann. Du tar igen dem!"
+      },
+      "newTotal": "Dina poäng: {score}",
+      "tapToContinue": "Tryck för att fortsätta",
+      "hitSteal": "{actor} knyckte {amount} av dina poäng. Ta tillbaka dem!",
+      "hitSwap": "{actor} bytte poäng med dig. Kör vidare!",
+      "tickerSteal": "{actor} knyckte {amount} poäng från {target}!",
+      "tickerSwap": "{actor} bytte poäng med {target}!"
     }
   },
   "pricing": {
@@ -725,6 +747,23 @@ const sv = {
     "issueProbe": {"prompt": "Vad fick det att kännas så?", "botsStrong": "Bottar för starka", "technical": "Tekniskt problem"}
   },
   "wordTowerV2": {
+    "unitM": "m",
+    "wreck": {
+      "smash": "Krossa {name}s torn",
+      "smashOwn": "Krossa ditt torn",
+      "title": "{name}s torn",
+      "titleOwn": "Ditt torn",
+      "cut": "Släpp!",
+      "balls": "{n} rivningskulor",
+      "crash": "PANG!",
+      "result": "{n} av {total} nedslagna!",
+      "share": "Utmana en vän",
+      "shareText": "Mitt ordtorn nådde {m} m. Försök riva det:",
+      "copied": "Länk kopierad!",
+      "challenge": "{name} utmanar dig! Perfekta släpp ger rivningskulor. Sen river du tornet.",
+      "friend": "Din vän",
+      "back": "Spela igen",
+    },
     "cardTitle": "Ordtornet v2",
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",
@@ -2217,6 +2256,7 @@ const sv = {
   },
   "errors": {
     "unstableConnection": "Anslutningen vinglar - kopplar upp dig...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "Långsam anslutning - vi jobbar på det",
     "sessionExpired": "Sessionen slutade. Dags att börja om!",
     "roomNoLongerExists": "Rummet stängdes - alla gick",
@@ -13056,13 +13096,14 @@ const sv = {
         "title": "Framstegsrapporter är en Pro-funktion",
         "body": "Se hur varje elev klarar sig i alla dina klasser och spel: inlärda ord, nivåer, XP och utskrivbara PDF:er till utvecklingssamtal. Uppgradera till Teacher Pro för att låsa upp klass- och elevrapporter."
       },
-      "cta": "Lås upp med Pro: ${{price}}/månad"
+      "cta": "Lås upp med Pro: {{price}}/månad"
     },
     "subscription": {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse. Det tar bara slut och du går tillbaka till gratis.",
       "giftedUntil": "Kostnadsfritt Pro till",
       "giftedBadge": "Gåva",
       "classLimitTitle": "Du har nått din klassgräns",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
       "upgradeProDescription": "Pro ger dig obegränsat antal klassrum och elever per klass, inga gränser för att växa din undervisning.",
       "proFeatures": "Pro innehåller",
@@ -13682,6 +13723,12 @@ const sv = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "Du har nått gränsen för gratisklasser. Uppgradera till Pro för obegränsat antal klasser.",
+    },
+    "lobby": {
+      "joinTitle": "Gå med i spelet",
+    },
     "homework": {
       "takeHomeToggle": "Övningskort att ta hem",
       "backToDashboard": "Tillbaka till panelen",
@@ -13870,6 +13917,20 @@ const sv = {
         "antonym": "Lägg till antonymer i den här lektionen för att låsa upp"
       }
     },
+    "wordcraftAssignment": {
+      "title": "WordCraft",
+      "intro": "Slå boten på ordbrädet. Bygg lektionens ord för bonus-XP.",
+      "lessonWords": "Lektionens ord",
+      "play": "Spela",
+      "score": "Poäng",
+      "result": "Resultat",
+      "won": "Du vann",
+      "lost": "Boten vann",
+      "tie": "Oavgjort",
+      "recommended": "Rekommenderas",
+      "teacherHint": "Solo mot en snäll bot. Eleverna spelar från klassens sida.",
+      "studentPlay": "Spela WordCraft"
+    },
     "vocabFocus": {
       "title": "Ordförrådsfokus",
       "desc": "Öva en färdighet i taget",
@@ -14022,6 +14083,9 @@ const sv = {
       "classCoverage": "Klassen hittade {{found}} av {{total}} lektionsord",
       "reteach": "Ingen hittade de här",
       "allFound": "Klassen hittade alla lektionsord.",
+      "waitingForTeacher": "Väntar på att din lärare startar nästa runda…",
+      "stayInClass": "Stanna kvar — nästa spel startar här.",
+      "playAgain": "Spela igen",
       "practiceMissed": "Öva de här orden",
       "playReteachRound": "Spela repetitionsrunda: bara missade ord",
       "backToLobby": "Tillbaka till lobbyn",
@@ -14504,6 +14568,7 @@ const sv = {
     "classroomGame": {
       "forSchoolsCta": "Se LexiClash för skolor",
       "forSchoolsFooter": "Vill du ta LexiClash till hela din skola eller kommun?",
+      "defaultClassroomName": "Mitt klassrum",
       "questions": "Frågor",
       "perQuestion": "Per fråga",
       "namePrompt": {
@@ -14553,6 +14618,7 @@ const sv = {
       "words": "{{count}} ord"
     },
     "header": {
+      "exitEducation": "Lämna utbildningsläget",
       "breadcrumbs": {
         "analytics": "Statistik",
         "classroomGame": "Klassrumsspel",
@@ -14938,6 +15004,22 @@ const sv = {
       "wordsFound": "Hittade ord"
     },
     "starterPacks": {
+      "beginnerRussian": {
+        "description": "Viktiga ryska ord för nybörjare",
+        "name": "Ryska för nybörjare",
+      },
+      "beginnerJapanese": {
+        "description": "Viktiga japanska ord för nybörjare",
+        "name": "Japanska för nybörjare",
+      },
+      "beginnerSwedish": {
+        "description": "Viktiga svenska ord för nybörjare",
+        "name": "Svenska för nybörjare",
+      },
+      "beginnerSpanish": {
+        "description": "Viktiga spanska ord för nybörjare",
+        "name": "Spanska för nybörjare",
+      },
       "title": "Startpaket",
       "subtitle": "Färdiga ordsamlingar",
       "useThisPack": "Använd det här paketet",
@@ -14955,6 +15037,7 @@ const sv = {
       }
     },
     "lesson": {
+      "createdClassroom": "Klassrummet har skapats",
       "autoPronounce": "Automatisk uttal",
       "classicMode": "Klassiskt läge",
       "contextualExamples": "Exempel",

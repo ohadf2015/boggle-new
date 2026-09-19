@@ -13,8 +13,8 @@ import { convertPackWordsToLessonWords } from '../../../lib/education/createLess
 
 describe('Starter Packs Integration', () => {
   describe('Starter pack structure', () => {
-    it('should have 3 starter packs', () => {
-      expect(STARTER_LESSON_PACKS).toHaveLength(3);
+    it('should have at least 7 starter packs (3 original + 4 new locales)', () => {
+      expect(STARTER_LESSON_PACKS.length).toBeGreaterThanOrEqual(7);
     });
 
     it('should have language field for each pack', () => {

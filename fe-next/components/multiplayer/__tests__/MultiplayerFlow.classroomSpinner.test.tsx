@@ -142,6 +142,11 @@ describe('MultiplayerFlow — classroom mode must never dead-end on a spinner', 
     expect(screen.queryByTestId('room-list-view')).toBeNull();
   });
 
+  it('says "waiting for your teacher" while an early joiner waits for the room to open', () => {
+    render(<MultiplayerFlow {...baseProps} isClassroomMode prefilledRoom="ABC123" waitingForTeacher />);
+    expect(screen.getByTestId('classroom-waiting').textContent).toContain('education.studentPreview.waiting.title');
+  });
+
   it('does NOT strand a student on the spinner when there is no room to join', () => {
     render(<MultiplayerFlow {...baseProps} isClassroomMode prefilledRoom={undefined} />);
     expect(screen.queryByTestId('classroom-waiting')).toBeNull();

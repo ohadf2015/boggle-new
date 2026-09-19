@@ -7,54 +7,21 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
-import { PlanComparisonMatrix } from '@/components/teacher/PlanComparisonMatrix';
+import { EducationShell } from '@/components/education/shell/EducationShell';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
-import { Check, X, ShieldCheck, BellRing, Lock, Sparkles } from 'lucide-react';
+import {
+  markResumeCheckoutIntent,
+  clearResumeCheckoutIntent,
+  consumeResumeCheckoutIntent,
+} from '@/lib/teacher/resumeCheckout';
+import { ShieldCheck, BellRing, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { PricingCards } from '@/components/teacher/PricingCards';
 
 const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
-
-// A guest who hits the 401 checkout wall proves intent to buy before the wall ever
-// shows up — they already clicked "Upgrade Now". Losing that click to a second manual
-// click after they finish signing in is the wall this flag removes: it survives a full
-// page reload (localStorage, not React state) so it also covers a magic-link or
-// email-confirmation click, which authenticates in a fresh navigation, not inside the
-// modal. Timestamped and capped at 15 minutes so a teacher who abandons the auth flow
-// and logs in hours/days later for an unrelated reason never gets an unsolicited
-// redirect to Polar checkout the next time they happen to land on this page.
-const RESUME_CHECKOUT_KEY = 'lc_resume_checkout_after_auth';
-const RESUME_CHECKOUT_TTL_MS = 15 * 60 * 1000;
-
-function markResumeCheckoutIntent() {
-  try {
-    localStorage.setItem(RESUME_CHECKOUT_KEY, String(Date.now()));
-  } catch {
-    // localStorage unavailable (private mode, etc.) — the teacher just clicks twice.
-  }
-}
-
-function clearResumeCheckoutIntent() {
-  try {
-    localStorage.removeItem(RESUME_CHECKOUT_KEY);
-  } catch {
-    // no-op
-  }
-}
-
-function consumeResumeCheckoutIntent(): boolean {
-  try {
-    const raw = localStorage.getItem(RESUME_CHECKOUT_KEY);
-    if (!raw) return false;
-    localStorage.removeItem(RESUME_CHECKOUT_KEY);
-    const setAt = Number(raw);
-    return Number.isFinite(setAt) && Date.now() - setAt < RESUME_CHECKOUT_TTL_MS;
-  } catch {
-    return false;
-  }
-}
 
 export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
@@ -157,16 +124,12 @@ export default function UpgradePricingPageClient() {
       }),
       included: true,
     },
-    // These three are the real free tier — the same three the landing page's free card lists,
-    // both sourced from getTierConfig('free'). They are deliberately generous: word lists,
-    // duels and no-ads are what get a teacher to a first lesson, and a teacher who never runs
-    // a lesson never buys anything.
+    // These two are genuinely free. Custom lists (19 created in prod, per usage data)
+    // and ad-free play work today. Duels is a dead feature (0 student_duels rows ever),
+    // so we don't advertise it as part of any tier.
     //
-    // The `education.landing.pro.*` namespace is borrowed rather than duplicated here. These
-    // are the same five sentences about the same two tiers, already translated into six
-    // locales; a parallel `teacher.subscription.*` copy would be one more place to drift.
+    // The `education.landing.pro.*` namespace is already translated into six locales.
     { label: t('education.landing.pro.customLists'), included: true },
-    { label: t('education.landing.pro.duels'), included: true },
     { label: t('education.landing.pro.noAds'), included: true },
     { label: t('teacher.subscription.unlimitedClasses'), included: false },
     { label: t('teacher.subscription.unlimitedStudents'), included: false },
@@ -201,297 +164,179 @@ export default function UpgradePricingPageClient() {
   ];
 
   return (
-    <div
-      className={cn('flex flex-col min-h-screen bg-neo-navy', isRTL && 'rtl')}
+    <EducationShell
+      data-testid="education-shell"
+      header={<EducationHeader showBackButton />}
+      contentClassName={cn('w-full px-4 lg:px-6', isRTL && 'rtl')}
+      footer={
+        <div
+          data-testid="upgrade-footer"
+          className="shrink-0 border-t border-neo-cream/20 pt-3 pb-3 px-4 text-center"
+        >
+          <p className="text-neo-white/70 font-bold text-xs mb-1.5">
+            {t('teacher.subscription.legalNote')}
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link
+              href={`/${language}/legal/terms`}
+              className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
+            >
+              {t('legal.termsOfService')}
+            </Link>
+            <Link
+              href={`/${language}/legal/refund`}
+              className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
+            >
+              {t('legal.refundPolicy')}
+            </Link>
+            <Link
+              href={`/${language}/legal/privacy`}
+              className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
+            >
+              {t('legal.privacyPolicy')}
+            </Link>
+          </div>
+        </div>
+      }
+      className="bg-neo-navy"
     >
-      <EducationHeader showBackButton />
-
-      <div className="flex-1 w-full max-w-5xl mx-auto px-4 py-12 sm:py-16">
-        {/* Header — outcome first, product name as eyebrow. Kahoot's bar is
-            "Achieve awesome classroom results with Kahoot!+" then a "Best for"
-            use-case under each plan. A checkout-command H1 ("Upgrade to…") lost
-            that comparison before the teacher ever reached the price. */}
-        <div className="text-center mb-10 sm:mb-14">
+      {/* Two-column layout at lg: hero/image on left, pricing/CTA on right.
+          Stacks to single column on smaller screens. */}
+      <div className="max-w-7xl mx-auto">
+        {/* Compact header — eyebrow + h1 only. Value prop and reassure fold into pricing column. */}
+        <div className="text-center mb-2 lg:mb-3">
           <p
             data-testid="upgrade-value-eyebrow"
-            className="text-sm font-black uppercase tracking-widest text-neo-cyan mb-3"
+            className="text-xs font-black uppercase tracking-widest text-neo-cyan mb-1"
           >
             {t('teacher.subscription.proPlanName')}
           </p>
           <h1
-            className="text-4xl md:text-5xl font-neo-display font-black text-neo-white mb-3"
+            className="text-2xl md:text-3xl font-neo-display font-black text-neo-white"
             style={{ textWrap: 'balance' }}
           >
             {t('teacher.subscription.upgradePricingTitle')}
           </h1>
-          <p
-            data-testid="upgrade-value-prop"
-            className="text-xl text-neo-lime font-black mb-4 max-w-2xl mx-auto"
-            style={{ textWrap: 'balance' }}
-          >
-            {t('teacher.subscription.valueHeadline')}
-          </p>
-          <p className="text-base text-neo-white/80 font-bold max-w-xl mx-auto">
-            {t('teacher.subscription.upgradePricingReassure')}
-          </p>
         </div>
 
-        {/* The thing being sold, before the price of it. This page was entirely text and
-            bordered cards; a teacher deciding whether to spend their own money should see a
-            class mid-game first. `priority` because it sits above the fold on the one page
-            that takes payment — a lazy-loaded hero here would pop in after the CTA. */}
-        <Image
-          src="/images/education/pro-hero-poster.webp"
-          alt={t('teacher.subscription.proHeroAlt')}
-          width={960}
-          height={540}
-          priority
-          sizes="(max-width: 768px) 100vw, 768px"
-          className="mx-auto mb-10 sm:mb-14 w-full max-w-3xl rounded-neo border-neo border-black shadow-hard-lg"
-        />
-
-        {/* Pricing Cards — Pro leads on mobile, sits right on desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start mb-8">
-          {/* Free Card */}
-          <div
-            className={cn(
-              'order-2 md:order-1',
-              'border-3 border-black rounded-neo p-7 sm:p-8 shadow-hard bg-neo-cream',
-              'flex flex-col'
-            )}
-          >
-            <div className="mb-6">
-              <h2 className="text-2xl font-neo-display font-black text-neo-black mb-1">
-                {t('teacher.subscription.freePlanName')}
-              </h2>
-              <p className="text-neo-black/70 font-bold text-sm">
-                {t('teacher.subscription.freeForever')}
-              </p>
-            </div>
-
-            <div className="mb-7 pb-7 border-b-3 border-black">
-              <p className="text-4xl font-neo-display font-black text-neo-black">
-                $0
-                <span className="text-base text-neo-black/70 font-bold ms-2">
-                  {t('teacher.subscription.perMonth')}
-                </span>
-              </p>
-            </div>
-
-            <div className="space-y-3 flex-1 mb-6">
-              {freeFeatures.map((feature) => (
-                <div key={feature.label} className="flex items-start gap-3">
-                  <div
-                    className={cn(
-                      'w-5 h-5 rounded border-2 border-black flex items-center justify-center flex-shrink-0 mt-0.5',
-                      feature.included ? 'bg-neo-lime' : 'bg-neo-black/10'
-                    )}
-                  >
-                    {feature.included ? (
-                      <Check className="w-4 h-4 text-black" strokeWidth={3} />
-                    ) : (
-                      <X className="w-4 h-4 text-neo-black/50" strokeWidth={3} />
-                    )}
-                  </div>
-                  <span
-                    className={cn(
-                      'font-bold',
-                      feature.included
-                        ? 'text-neo-black'
-                        : 'text-neo-black/50 line-through decoration-2'
-                    )}
-                  >
-                    {feature.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-sm font-bold text-neo-black/70 mb-4 leading-snug">
-              {t('teacher.subscription.freeStartNote')}
-            </p>
-
-            <Button
-              disabled
-              className="w-full bg-neo-black/40 text-neo-white font-black border-2 border-neo-cream/40 cursor-not-allowed"
-            >
-              {t('teacher.subscription.currentPlan')}
-            </Button>
+        {/* Two-column layout: image left, pricing cards + metadata right */}
+        <div
+          data-testid="upgrade-hero-section"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-6 items-stretch mb-3"
+        >
+          {/* Hero image — capped by height on lg to preserve vertical budget. ONE primary CTA
+              lives in the Pro card, so this stays decorative and shrinks first when the
+              pricing column is taller. */}
+          <div className="flex justify-center order-2 lg:order-1">
+            <Image
+              src="/images/education/pro-hero-poster.webp"
+              alt={t('teacher.subscription.proHeroAlt')}
+              width={960}
+              height={540}
+              priority
+              sizes="(max-width: 1024px) 100vw, (max-width: 1920px) 50vw, 960px"
+              className="w-full max-w-sm h-auto max-h-40 lg:max-h-full rounded-neo border-neo border-black shadow-hard-lg object-cover"
+            />
           </div>
 
-          {/* Pro Card */}
-          <div
-            className={cn(
-              'order-1 md:order-2',
-              'border-3 border-black rounded-neo p-7 sm:p-8 shadow-hard-lg',
-              'bg-neo-cyan md:scale-105 md:z-10 flex flex-col relative'
-            )}
-          >
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-neo-pink px-4 py-1 border-2 border-black rounded-neo animate-neo-pop">
-              <span className="font-neo-display font-black text-black text-sm inline-flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" strokeWidth={3} />
-                {t('teacher.subscription.popular')}
-              </span>
-            </div>
-
-            <div className="mb-6 mt-2">
-              <h2 className="text-2xl font-neo-display font-black text-neo-black mb-1">
-                {t('teacher.subscription.proPlanName')}
-              </h2>
-              <p className="text-neo-black/80 font-bold text-sm">
-                {t('teacher.subscription.unlimitedAccess')}
-              </p>
-            </div>
-
-            <div className="mb-7 pb-7 border-b-3 border-black">
-              <p className="text-4xl sm:text-5xl font-neo-display font-black text-neo-black leading-none">
-                $9
-                <span className="text-sm sm:text-base text-neo-black/80 font-bold ms-2">
-                  {t('teacher.subscription.perMonth')}
-                </span>
-              </p>
-              <div className="flex flex-col gap-2 mt-3">
-                <p className="inline-block bg-neo-black text-neo-cyan text-xs font-black px-2.5 py-1 rounded-neo border-2 border-black w-fit">
-                  {t('teacher.subscription.pricePerDay')}
-                </p>
-                <p className="text-xs font-bold text-neo-black/80">
-                  {t('teacher.subscription.priceTaxNote')}
-                </p>
-              </div>
-            </div>
-
+          {/* Pricing cards + reassurance text — right side on lg */}
+          <div className="order-1 lg:order-2 flex flex-col gap-2">
+            {/* Value prop + reassurance fit above pricing cards. mb-4 (not the flex gap
+                alone) is load-bearing: the "Most Popular" badge is absolutely positioned
+                above the Pro card's top edge (-top-3, plus the card's own md:scale-105),
+                so this block needs real clearance or the badge overlaps the reassure
+                line's last wrapped words. */}
             <div className="mb-4">
-              <p className="text-xs font-black uppercase tracking-wide text-neo-black/70 mb-3">
-                {t('teacher.subscription.everythingInFree')}
+              <p
+                data-testid="upgrade-value-prop"
+                className="text-sm lg:text-base text-neo-lime font-black mb-1"
+                style={{ textWrap: 'balance' }}
+              >
+                {t('teacher.subscription.valueHeadline')}
               </p>
-              <div className="space-y-3">
-                {proFeatures.map((label) => (
-                  <div key={label} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded bg-neo-black border-2 border-black flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-neo-cyan" strokeWidth={3} />
-                    </div>
-                    <span className="font-bold text-neo-black">{label}</span>
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-neo-white/80 font-bold leading-snug">
+                {t('teacher.subscription.upgradePricingReassure')}
+              </p>
             </div>
 
-            <div className="flex-1" />
-
-            <Button
-              onClick={handleUpgrade}
-              disabled={isLoading}
-              className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
-            >
-              {isLoading
-                ? t('common.loading')
-                : t('teacher.subscription.upgradeNow')}
-            </Button>
-            <p className="text-center text-xs font-bold text-neo-black/80 mt-3">
-              {t('teacher.subscription.proCtaSubtext')}
-            </p>
+            {/* Pricing cards — the ONE primary CTA on this page lives inside the Pro card. */}
+            <PricingCards
+              freeFeatures={freeFeatures}
+              proFeatures={proFeatures}
+              isLoading={isLoading}
+              onUpgradeClick={handleUpgrade}
+            />
           </div>
         </div>
 
-        {/* Trust / risk-reversal row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-14">
+        {/* Trust / risk-reversal row — compact single row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
           {trustChips.map(({ icon: Icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-2.5 bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo px-4 py-3 shadow-hard-sm"
+              data-testid="trust-chip"
+              className="flex items-center justify-center lg:justify-start gap-2 bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo px-2.5 py-1 text-center lg:text-start"
             >
               <Icon
-                className="w-5 h-5 text-neo-lime flex-shrink-0"
+                className="w-3.5 h-3.5 text-neo-lime flex-shrink-0"
                 strokeWidth={2.5}
               />
-              <span className="text-sm font-bold text-neo-white leading-snug">
+              <span className="text-xs font-bold text-neo-white leading-snug">
                 {label}
               </span>
             </div>
           ))}
         </div>
 
-        {/* The same two tiers as the cards above, with the rows aligned. It sits AFTER the
-            cards and the risk-reversal chips on purpose: a teacher who has already decided
-            never needs it, and a teacher who has not is the one who wants to read across. */}
-        <PlanComparisonMatrix />
-
-        {/* FAQ Section */}
-        <div className="bg-neo-navy-light border-3 border-neo-cream/40 rounded-neo p-7 sm:p-8 mb-12 shadow-hard">
-          <h2 className="text-2xl font-neo-display font-black text-neo-white mb-6">
-            {t('teacher.subscription.faqTitle')}
-          </h2>
-
-          <div className="space-y-6">
-            {[
-              {
-                q: 'teacher.subscription.faqCancel',
-                a: 'teacher.subscription.faqCancelAnswer',
-              },
-              {
-                q: 'teacher.subscription.faqAutoRenew',
-                a: 'teacher.subscription.faqAutoRenewAnswer',
-              },
-              {
-                q: 'teacher.subscription.faqDataLoss',
-                a: 'teacher.subscription.faqDataLossAnswer',
-              },
-            ].map(({ q, a }) => (
-              <div key={q}>
-                <h3 className="text-lg font-bold text-neo-cyan mb-2">{t(q)}</h3>
-                <p className="text-neo-white/90 font-bold leading-relaxed">
-                  {t(a)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* District / school bulk pricing CTA */}
-        <div className="border-3 border-black rounded-neo p-7 sm:p-8 shadow-hard bg-neo-lime mb-12 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-          <div className="flex-1 text-center sm:text-start">
-            <h2 className="text-xl font-neo-display font-black text-neo-black mb-1">
-              {t('teacher.subscription.districtTitle')}
-            </h2>
-            <p className="text-sm font-bold text-neo-black/80 leading-snug">
-              {t('teacher.subscription.districtSubtitle')}
-            </p>
-          </div>
+        {/* District / school pricing — a plain text link, deliberately NOT a bordered
+            card: the page has exactly one button-styled CTA (Upgrade to Pro), and a second
+            CTA-shaped box here would compete with it. */}
+        <p className="text-center text-xs font-bold text-neo-white/60 mb-1.5">
+          {t('teacher.subscription.districtTitle')}{' '}
           <Link
             href={`/${language}/education/for-schools`}
             onClick={() => trackGrowthEvent('iap_viewed', { product: 'district_inquiry' })}
-            className="flex-shrink-0 bg-neo-black text-neo-white font-black text-sm border-2 border-black rounded-neo px-5 py-3 shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none whitespace-nowrap"
+            className="text-neo-cyan hover:text-neo-lime underline"
           >
             {t('teacher.subscription.districtCta')}
           </Link>
-        </div>
+        </p>
 
-        {/* Legal Links */}
-        <div className="text-center border-t border-neo-cream/20 pt-8">
-          <p className="text-neo-white/70 font-bold text-sm mb-4">
-            {t('teacher.subscription.legalNote')}
-          </p>
-          <div className="flex flex-wrap justify-center gap-6">
-            <Link
-              href={`/${language}/legal/terms`}
-              className="text-neo-cyan hover:text-neo-lime font-bold underline transition-colors"
-            >
-              {t('legal.termsOfService')}
-            </Link>
-            <Link
-              href={`/${language}/legal/refund`}
-              className="text-neo-cyan hover:text-neo-lime font-bold underline transition-colors"
-            >
-              {t('legal.refundPolicy')}
-            </Link>
-            <Link
-              href={`/${language}/legal/privacy`}
-              className="text-neo-cyan hover:text-neo-lime font-bold underline transition-colors"
-            >
-              {t('legal.privacyPolicy')}
-            </Link>
+        {/* FAQ Section — behind a disclosure (collapsed by default) — compact */}
+        <details className="mb-0">
+          <summary className="cursor-pointer bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo p-2 hover:bg-neo-navy transition-colors">
+            <h2 className="text-sm lg:text-base font-neo-display font-black text-neo-white inline-flex items-center gap-2">
+              {t('teacher.subscription.faqTitle')}
+              <span className="text-xs text-neo-lime font-bold">▼</span>
+            </h2>
+          </summary>
+
+          <div className="bg-neo-navy-light border-2 border-t-0 border-neo-cream/40 rounded-b-neo p-4 shadow-hard">
+            <div className="space-y-3">
+              {[
+                {
+                  q: 'teacher.subscription.faqCancel',
+                  a: 'teacher.subscription.faqCancelAnswer',
+                },
+                {
+                  q: 'teacher.subscription.faqAutoRenew',
+                  a: 'teacher.subscription.faqAutoRenewAnswer',
+                },
+                {
+                  q: 'teacher.subscription.faqDataLoss',
+                  a: 'teacher.subscription.faqDataLossAnswer',
+                },
+              ].map(({ q, a }) => (
+                <div key={q}>
+                  <h3 className="text-sm font-bold text-neo-cyan mb-1">{t(q)}</h3>
+                  <p className="text-xs text-neo-white/90 font-bold leading-relaxed">
+                    {t(a)}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </details>
       </div>
 
       {/* Auth modal for unauthenticated checkout attempts (401). onAuthSuccess is a
@@ -514,6 +359,6 @@ export default function UpgradePricingPageClient() {
           onAuthSuccess={handleUpgrade}
         />
       )}
-    </div>
+    </EducationShell>
   );
 }

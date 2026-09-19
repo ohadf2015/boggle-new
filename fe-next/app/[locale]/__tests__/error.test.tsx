@@ -13,7 +13,7 @@
  * These tests pin the fallback to render with ZERO heavy/lazy dependencies.
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -99,6 +99,32 @@ describe('app/[locale]/error.tsx — resilient fallback (black-screen fix)', () 
   });
 });
 
+describe('app/[locale]/error.tsx — Home button is education-aware (sectionHome)', () => {
+  it('routes to /{locale}/education for an education pathname, not bare /{locale}', () => {
+    mockLocale = 'es';
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { href: '', pathname: '/es/teacher/classroom/x', reload: vi.fn(), replace: vi.fn() },
+    });
+    render(<Error error={makeError('Error', 'boom')} reset={vi.fn()} />);
+    const buttons = screen.getAllByRole('button');
+    fireEvent.click(buttons[1]); // second button is the "go home" action
+    expect(window.location.href).toBe('/es/education');
+  });
+
+  it('routes to bare /{locale} for a non-education pathname', () => {
+    mockLocale = 'es';
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { href: '', pathname: '/es/multiplayer', reload: vi.fn(), replace: vi.fn() },
+    });
+    render(<Error error={makeError('Error', 'boom')} reset={vi.fn()} />);
+    const buttons = screen.getAllByRole('button');
+    fireEvent.click(buttons[1]);
+    expect(window.location.href).toBe('/es');
+  });
+});
+
 describe('app/global-error.tsx — last-resort boundary depends on no lazy chunk', () => {
   it('imports no icon/animation library (emoji-only, so it can never fail to render)', () => {
     // global-error is the final fallback when [locale]/error.tsx itself throws.
@@ -116,5 +142,36 @@ describe('app/global-error.tsx — last-resort boundary depends on no lazy chunk
     // Reject real call sites; comments mentioning reload are fine.
     expect(src).not.toMatch(/window\.location\.reload\s*\(/);
     expect(src.split('\n').filter((l) => /location\.reload\s*\(/.test(l) && !l.trim().startsWith('//') && !l.includes('*')).length).toBe(0);
+  });
+});
+
+describe('app/global-error.tsx — Home button is education-aware (sectionHome)', () => {
+  beforeEach(() => {
+    vi.doMock('@/utils/sentry', () => ({ captureError: vi.fn() }));
+    vi.doMock('@/utils/crashlytics', () => ({ recordNativeError: vi.fn() }));
+  });
+
+  it('routes to /{locale}/education for an education pathname, not bare /{locale}', async () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { href: '', pathname: '/he/student/lessons/5', reload: vi.fn(), replace: vi.fn() },
+    });
+    const { default: GlobalError } = await import('../../global-error');
+    render(<GlobalError error={makeError('Error', 'boom')} reset={vi.fn()} />);
+    const buttons = screen.getAllByRole('button');
+    fireEvent.click(buttons[1]); // second button is the "go home" action
+    expect(window.location.href).toBe('/he/education');
+  });
+
+  it('routes to bare /{locale} for a non-education pathname', async () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { href: '', pathname: '/he/daily', reload: vi.fn(), replace: vi.fn() },
+    });
+    const { default: GlobalError } = await import('../../global-error');
+    render(<GlobalError error={makeError('Error', 'boom')} reset={vi.fn()} />);
+    const buttons = screen.getAllByRole('button');
+    fireEvent.click(buttons[1]);
+    expect(window.location.href).toBe('/he');
   });
 });

@@ -58,6 +58,8 @@ export default function LessonPracticePageClient() {
       ? (modeParam as PracticeType)
       : null;
   const initialFocus = parseFocusParam(searchParams?.get('focus'));
+  // Word Craft assignment deep link: ?mode=solo_board&variant=wordcraft
+  const initialVariant = initialMode === 'solo_board' && searchParams?.get('variant') === 'wordcraft' ? 'wordcraft' : null;
 
   const { lesson, isLoading: isLoadingLesson, error: lessonError } = usePracticeLesson(lessonId);
   const totalWords = lesson?.words?.length ?? 0;
@@ -146,6 +148,7 @@ export default function LessonPracticePageClient() {
         router={router}
         initialMode={initialMode}
         initialFocus={initialFocus}
+        initialVariant={initialVariant}
         onGuestResult={handleGuestResult}
       />
     </PracticeSessionProvider>

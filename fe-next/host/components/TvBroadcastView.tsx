@@ -81,6 +81,8 @@ interface TvBroadcastViewProps {
    * rosters. Null outside classroom games, which is every public room.
    */
   classroomLive?: ClassroomLiveContext | null;
+  /** Quiz finale "Play Again" — the host's rematch; without it the teacher is stranded. */
+  onQuizPlayAgain?: () => void;
 }
 
 // ==================== Component ====================
@@ -119,6 +121,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   fireRoundActive = false,
   fireRoundRemaining = 0,
   classroomLive = null,
+  onQuizPlayAgain,
 }) => {
   // Mode-overlay state read directly from store — keeps HostView from
   // re-rendering on word-hunt updates when the host isn't using TV broadcast.
@@ -224,15 +227,9 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       });
   }, [playersReady, playerScores, playerWordCounts, username]);
 
-  // Live Vocab Quiz — the classroom projector.
-  //
-  // A classroom teacher runs the room as a NON-PLAYING host, which is the only
-  // way to reach this component; `HostInGameView` (host playing) is where the
-  // quiz projector was originally wired, and a teacher never renders it. So the
-  // one surface the quiz projector was built for could not display it: the
-  // students got their questions while the projector sat on the board-game
-  // broadcast saying "waiting for the action to begin".
-  //
+  // Live Vocab Quiz — the classroom projector. A classroom teacher runs the room
+  // as a NON-PLAYING host, the only way to reach this component (the quiz was
+  // first wired only into `HostInGameView`, which a teacher never renders).
   // The quiz has no letter grid and is deliberately not a `GameMode` (see
   // shared/types/vocabQuiz), so the room's mode stays whatever the lobby last
   // held — the server's quiz traffic is the signal, exactly as on the playing
@@ -248,6 +245,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           socket={socket}
           joinCode={gameCode}
           playerCount={leaderboardData.length}
+          onPlayAgain={onQuizPlayAgain}
           t={t}
         />
       </div>
@@ -438,9 +436,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         )}
       </AnimatePresence>
 
-      {/* Main Content: Activity Panel + Leaderboard */}
       <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[1fr_1fr] md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
-        {/* Left: Mode-specific Activity Panel (anti-spoiler: grid removed) */}
         <div className="min-h-[180px] md:min-h-0 overflow-hidden">
           <TvActivityPanel
             playerScores={playerScores}
@@ -454,12 +450,11 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             wordHuntTotalPlayers={Object.keys(wordHuntPlayerLives).length}
           />
         </div>
-
-        {/* Right: Leaderboard - fills grid cell, needs overflow-auto for scrolling */}
         <div className="min-h-[120px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-auto">
           <TvLeaderboard
             players={leaderboardData}
             teams={classroomLive?.teams}
+            classroom={!!classroomLive}
             playerCombos={playerCombos}
             hostUsername={username}
             gameMode={gameMode}

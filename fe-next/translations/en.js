@@ -78,10 +78,32 @@ const en = {
       "questionCount": "How many questions?",
       "cappedNotice": "These words can make {count} questions, so that is how long the round will be.",
       "secondsPerQuestion": "Time per question",
-      "seconds": "{seconds}s"
+      "seconds": "{seconds}s",
+      "treasureChests": "Treasure chests",
+      "treasureChestsHint": "After a correct answer, students open a chest for bonus points, a steal or a swap.",
+      "on": "On",
+      "off": "Off"
     },
     "errors": {
       "noQuestions": "This lesson has no words ready for a quiz yet."
+    },
+    "treasure": {
+      "prompt": "Pick a chest!",
+      "hint": "Every chest hides something different. Choose wisely!",
+      "chestLabel": "Chest {number}",
+      "outcome": {
+        "gain": "+{amount} points!",
+        "double": "Double up! +{amount} points!",
+        "steal": "You swiped {amount} points from {target}!",
+        "swap": "Score swap with {target}!",
+        "small-loss": "Oops, {amount} points slipped away. You'll win them back!"
+      },
+      "newTotal": "Your score: {score}",
+      "tapToContinue": "Tap to continue",
+      "hitSteal": "{actor} swiped {amount} of your points. Win them back!",
+      "hitSwap": "{actor} swapped scores with you. Keep going!",
+      "tickerSteal": "{actor} swiped {amount} points from {target}!",
+      "tickerSwap": "{actor} swapped scores with {target}!"
     }
   },
   "report": {
@@ -384,6 +406,23 @@ const en = {
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss","issueProbe":{"prompt":"What made it feel that way?","botsStrong":"Bots too strong","technical":"Technical issue"}},
   "wordTowerV2": {
+    "unitM": "m",
+    "wreck": {
+      "smash": "Smash {name}'s tower",
+      "smashOwn": "Smash your tower",
+      "title": "{name}'s tower",
+      "titleOwn": "Your tower",
+      "cut": "Let it fly",
+      "balls": "{n} wrecking balls",
+      "crash": "CRASH!",
+      "result": "{n} of {total} knocked down!",
+      "share": "Dare a friend",
+      "shareText": "My word tower hit {m}m. Try to smash it:",
+      "copied": "Link copied!",
+      "challenge": "{name} dares you! Perfect drops earn wrecking balls. Then smash their tower.",
+      "friend": "Your friend",
+      "back": "Play again",
+    },
     "cardTitle": "Word Tower v2",
     "cardDesc": "Real physics — beta preview",
     "collapsed": "Tower down!",
@@ -1544,6 +1583,7 @@ const en = {
   },
   "errors": {
     "unstableConnection": "Connection's wobbling - getting you back in...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "Slow connection - we're on it",
     "sessionExpired": "Session ended. Time for a fresh start!",
     "gameCodeNotExist": "Code not found. Check and try again!",
@@ -11903,7 +11943,7 @@ const en = {
         "title": "Progress reports are a Pro feature",
         "body": "See how every student is doing across all your classes and games: words mastered, levels, XP, and printable PDFs for parent evenings. Upgrade to Teacher Pro to unlock class and student reports."
       },
-      "cta": "Unlock this with Pro: ${{price}}/month"
+      "cta": "Unlock this with Pro: {{price}}/month"
     },
     "subscription": {
       "giftedNoCard": "No card on file, no renewal. It just ends, and you go back to Free.",
@@ -11925,6 +11965,7 @@ const en = {
       "upgradePricingTitle": "See who understood, before the bell.",
       "upgradePricingSubtitle": "Manage unlimited classrooms and students",
       "upgradePricingReassure": "Cancel anytime. Your classrooms, lessons and student data always stay safe.",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "pricePerDay": "About $0.30 a day",
       "everythingInFree": "Everything in Free, plus:",
       "freeStartNote": "Real classes fit: up to 3 classes of 50 students each. Pro is for when you run more sections or need the reports.",
@@ -11978,6 +12019,12 @@ const en = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "You've reached the free class limit. Upgrade to Pro for unlimited classes.",
+    },
+    "lobby": {
+      "joinTitle": "Join the game",
+    },
     "homework": {
       "takeHomeToggle": "Take-home practice card",
       "backToDashboard": "Back to dashboard",
@@ -12166,6 +12213,20 @@ const en = {
         "antonym": "Add antonyms to this lesson to unlock"
       }
     },
+    "wordcraftAssignment": {
+      "title": "WordCraft",
+      "intro": "Beat the bot on the word board. Build your lesson words for bonus XP.",
+      "lessonWords": "Your lesson words",
+      "play": "Play",
+      "score": "Score",
+      "result": "Result",
+      "won": "You won",
+      "lost": "Bot won",
+      "tie": "Tie",
+      "recommended": "Recommended",
+      "teacherHint": "Solo vs a friendly bot. Students play it from their class page.",
+      "studentPlay": "Play WordCraft"
+    },
     "vocabFocus": {
       "title": "Vocabulary focus",
       "desc": "Drill one skill at a time",
@@ -12318,10 +12379,13 @@ const en = {
       "classCoverage": "The class found {{found}} of {{total}} lesson words",
       "reteach": "Nobody found these",
       "allFound": "The class found every lesson word.",
+      "waitingForTeacher": "Waiting for your teacher to start the next round…",
+      "stayInClass": "Stay here — the next game starts on this screen.",
       "practiceMissed": "Practise these words",
       "playReteachRound": "Play reteach round: missed words only",
       "backToLobby": "Back to lobby",
       "rematch": "Rematch: same list, same code",
+      "playAgain": "Play Again",
       "teamBattle": {
         "title": "Team battle",
         "teamName": "Team {number}",
@@ -12806,6 +12870,7 @@ const en = {
       "classroomNotFound": "Classroom not found",
       "classroomSession": "Classroom Session",
       "createClassroom": "Create Classroom",
+      "defaultClassroomName": "My Classroom",
       "createLesson": "Create Lesson",
       "deselectAll": "Deselect All",
       "gameCreated": "Game created!",
@@ -12856,6 +12921,7 @@ const en = {
         "teacher": "Teacher"
       },
       "educationHome": "Education Home",
+      "exitEducation": "Exit Education",
       "homeLink": "Home",
       "menu": "Menu",
       "navigation": "Education Nav",
@@ -13240,9 +13306,26 @@ const en = {
       "commonEnglish": {
         "name": "Common English",
         "description": "Everyday English words for all levels"
+      },
+      "beginnerSpanish": {
+        "name": "Beginner Spanish",
+        "description": "Essential Spanish words for beginners"
+      },
+      "beginnerSwedish": {
+        "name": "Beginner Swedish",
+        "description": "Essential Swedish words for beginners"
+      },
+      "beginnerJapanese": {
+        "name": "Beginner Japanese",
+        "description": "Essential Japanese words for beginners"
+      },
+      "beginnerRussian": {
+        "name": "Beginner Russian",
+        "description": "Essential Russian words for beginners"
       }
     },
     "lesson": {
+      "createdClassroom": "Classroom created",
       "autoPronounce": "Auto-Pronounce",
       "classicMode": "Classic Mode",
       "contextualExamples": "Examples",

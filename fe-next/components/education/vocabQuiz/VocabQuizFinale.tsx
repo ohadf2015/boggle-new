@@ -26,17 +26,25 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Flame, Target, Trophy } from 'lucide-react';
+import { Flame, RotateCcw, Target, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import type { VocabQuizStanding, TranslateFn } from '@/shared/types/vocabQuiz';
 import { classFinaleStats } from './vocabQuizJuice';
 import { VocabQuizStandings } from './VocabQuizStandings';
+import { trackResultsAction } from '../results/trackResultsAction';
 
 export interface VocabQuizFinaleProps {
   standings: VocabQuizStanding[];
   totalQuestions: number;
+  /**
+   * Same room, same code, same quiz — the host's `handleStartNewGame`, exactly
+   * what the board rounds' projector rematch calls. Absent = no button: a quiz
+   * produces no `classroomSummary`, so without this the wall ends on controls
+   * that do nothing.
+   */
+  onPlayAgain?: () => void;
   t: TranslateFn;
 }
 
@@ -58,12 +66,12 @@ function StatTile({
     <div
       data-testid={testId}
       className={cn(
-        'flex flex-col items-center justify-center gap-0.5 px-6 py-3 min-w-[9rem]',
+        'flex flex-col items-center justify-center gap-0.5 px-3 py-2 min-w-[6rem] md:px-6 md:py-3 md:min-w-[9rem]',
         'rounded-neo border-[3px] border-neo-black shadow-hard text-neo-black',
         fill
       )}
     >
-      <span className="flex items-center gap-2 font-neo-display font-black text-4xl leading-none tabular-nums">
+      <span className="flex items-center gap-2 font-neo-display font-black text-2xl md:text-4xl leading-none tabular-nums">
         {icon}
         {value}
       </span>
@@ -72,7 +80,7 @@ function StatTile({
   );
 }
 
-export function VocabQuizFinale({ standings, totalQuestions, t }: VocabQuizFinaleProps) {
+export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, t }: VocabQuizFinaleProps) {
   const stats = classFinaleStats(standings, totalQuestions);
 
   // One burst, on arrival. Latched in a ref rather than keyed on render, because
@@ -89,13 +97,13 @@ export function VocabQuizFinale({ standings, totalQuestions, t }: VocabQuizFinal
   return (
     <section
       data-testid="vocab-quiz-finale"
-      className="flex-1 min-h-0 flex flex-col gap-5 overflow-hidden bg-neo-navy"
+      className="flex flex-col gap-3 md:gap-5 md:flex-1 md:min-h-0 md:overflow-hidden bg-neo-navy"
     >
-      <div className="shrink-0 flex items-center gap-6 flex-wrap rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-5 shadow-hard">
+      <div className="shrink-0 flex items-center gap-3 md:gap-6 flex-wrap rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-3 md:p-5 shadow-hard">
         <div data-testid="quiz-finale-mascot" className="shrink-0">
           <InteractiveMascot
             variant="trophy"
-            sizeClassName="w-28 h-28"
+            sizeClassName="w-16 h-16 md:w-28 md:h-28"
             clipShape="rounded-square"
             clipBorder="lime"
             clipBg="var(--neo-navy, #1a1a2e)"
@@ -107,11 +115,11 @@ export function VocabQuizFinale({ standings, totalQuestions, t }: VocabQuizFinal
         </div>
 
         <div className="min-w-0">
-          <h2 className="flex items-center gap-3 font-neo-display font-black text-5xl leading-none text-neo-white">
-            <Trophy className="w-11 h-11 shrink-0 text-neo-yellow" aria-hidden />
+          <h2 className="flex items-center gap-3 font-neo-display font-black text-3xl md:text-5xl leading-none text-neo-white">
+            <Trophy className="w-8 h-8 md:w-11 md:h-11 shrink-0 text-neo-yellow" aria-hidden />
             {t('vocabQuiz.finished.title')}
           </h2>
-          <p className="mt-2 font-neo-body font-bold text-xl text-neo-cream">
+          <p className="mt-2 font-neo-body font-bold text-base md:text-xl text-neo-cream">
             {t('vocabQuiz.finished.subtitle', {
               questions: totalQuestions,
               players: stats.players,
@@ -119,7 +127,7 @@ export function VocabQuizFinale({ standings, totalQuestions, t }: VocabQuizFinal
           </p>
         </div>
 
-        <div className="ms-auto flex items-center gap-3 flex-wrap">
+        <div className="md:ms-auto flex items-center gap-2 md:gap-3 flex-wrap">
           <StatTile
             testId="quiz-finale-accuracy"
             icon={<Target className="w-8 h-8 shrink-0" aria-hidden />}
@@ -152,10 +160,30 @@ export function VocabQuizFinale({ standings, totalQuestions, t }: VocabQuizFinal
           screen that had failed to finish loading. */}
       <div
         data-testid="vocab-quiz-finale-stage"
-        className="flex-1 min-h-0 overflow-hidden flex flex-col justify-center"
+        className="flex flex-col justify-center md:flex-1 md:min-h-0 md:overflow-hidden"
       >
         <VocabQuizStandings standings={standings} limit={5} size="projector" podium t={t} />
       </div>
+
+      {onPlayAgain && (
+        <button
+          type="button"
+          data-testid="quiz-finale-play-again"
+          onClick={() => {
+            trackResultsAction('rematch', 'projector');
+            onPlayAgain();
+          }}
+          className={cn(
+            'shrink-0 w-full flex items-center justify-center gap-3 px-6 py-4',
+            'font-neo-display font-bold text-3xl',
+            'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
+            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+          )}
+        >
+          <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />
+          {t('education.results.rematch')}
+        </button>
+      )}
     </section>
   );
 }

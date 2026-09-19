@@ -1,4 +1,4 @@
-import { CRANE_ARM_PX, CRANE_CLEARANCE_PX } from './crane';
+import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, SWING } from './crane';
 import { PX_PER_M } from './engine';
 import { BLOCK_HEIGHT_PX } from './scoring';
 
@@ -14,10 +14,10 @@ import { BLOCK_HEIGHT_PX } from './scoring';
 export const HUD_TOP_PX = 96;
 
 /** Widest the hanging block reaches from centre: full swing + a typical half-block. */
-const SWING_HALF_SPAN_PX = CRANE_ARM_PX * Math.sin(0.62) + 80;
+const SWING_HALF_SPAN_PX = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad) + 90;
 const SIDE_GUTTER_PX = 12;
 /** Play-area height that maps to scale 1 — sets block size on big screens. */
-const COMFORT_PLAY_HEIGHT_PX = 460;
+const COMFORT_PLAY_HEIGHT_PX = 400;
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 2;
 

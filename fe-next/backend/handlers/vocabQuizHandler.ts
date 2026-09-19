@@ -47,6 +47,9 @@ import {
   type VocabQuizSession,
 } from '../services/vocabQuizEngine.js';
 import { buildLockIn, decorateReveal } from '../services/vocabQuizJuice.js';
+import { buildQuizShellStart, QUIZ_SHELL_GAME_MODE } from '../services/vocabQuizShell.js';
+import { registerTreasureChestHandlers } from './treasureChestHandler.js';
+import { chestsStillOpening } from '../services/treasureChestResolver.js';
 import {
   setQuizSession,
   getQuizSession,
@@ -58,6 +61,7 @@ import {
   VOCAB_QUIZ_EVENTS,
   VOCAB_QUIZ_MODE,
   VOCAB_QUIZ_REVEAL_MS,
+  VOCAB_QUIZ_CHEST_HOLD_MS,
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
 } from '@/shared/types/vocabQuiz';
@@ -68,22 +72,6 @@ import logger from '../utils/logger.js';
 
 /** How often the round clock is checked. Fine-grained enough to feel instant. */
 const TICK_MS = 250;
-
-/**
- * The mode reported to the client shells in the start payload. The quiz is not
- * a `GameMode`, but the shells demand one; they branch to the quiz surface on
- * the server's quiz traffic before any board is drawn, so this value is only
- * ever used to satisfy their mount conditions.
- */
-const QUIZ_SHELL_GAME_MODE = 'classic';
-
-/** Never rendered — see the start sequence for why it has to exist. */
-const QUIZ_PLACEHOLDER_GRID = [
-  ['A', 'B', 'C', 'D'],
-  ['E', 'F', 'G', 'H'],
-  ['I', 'J', 'K', 'L'],
-  ['M', 'N', 'O', 'P'],
-];
 
 const answerSchema = z.object({
   index: z.number().int().min(0).max(200),
@@ -127,6 +115,7 @@ function emitLockIn(io: Server, session: VocabQuizSession): void {
 function beginReveal(io: Server, session: VocabQuizSession, now: number): void {
   session.phase = 'reveal';
   session.revealEndsAt = now + VOCAB_QUIZ_REVEAL_MS;
+  session.chestHoldEndsAt = session.revealEndsAt + VOCAB_QUIZ_CHEST_HOLD_MS;
   emitReveal(io, session);
 }
 
@@ -151,7 +140,8 @@ function tick(io: Server, gameCode: string): void {
   }
 
   if (session.phase === 'reveal') {
-    if (now < session.revealEndsAt) return;
+    // Hold (capped) while a student who got it right still has a chest to open.
+    if (now < session.revealEndsAt || chestsStillOpening(session, now)) return;
     const phase = advanceQuiz(session, now);
     if (phase === 'ended') {
       void finishQuiz(io, gameCode);
@@ -177,10 +167,12 @@ function readQuizSettings(settings: Record<string, unknown> | undefined) {
   const focus = isPracticeFocusSetting(focusRaw) ? focusRaw : 'any';
   const count = Number(settings?.vocabQuizQuestionCount);
   const seconds = Number(settings?.vocabQuizSeconds);
+  const treasureChestsEnabled = settings?.treasureChestsEnabled ?? true;
   return {
     focus,
     questionCount: Number.isFinite(count) && count > 0 ? count : VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
     secondsPerQuestion: Number.isFinite(seconds) && seconds > 0 ? seconds : VOCAB_QUIZ_DEFAULT_SECONDS,
+    treasureChestsEnabled: treasureChestsEnabled === true,
   };
 }
 
@@ -212,7 +204,7 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   const settings = (classroomGame.settings ?? {}) as Record<string, unknown>;
   if (settings.gameMode !== VOCAB_QUIZ_MODE) return false;
 
-  const { focus, questionCount, secondsPerQuestion } = readQuizSettings(settings);
+  const { focus, questionCount, secondsPerQuestion, treasureChestsEnabled } = readQuizSettings(settings);
   const { words, language } = await loadLessonVocabulary(classroomGame.lessonIds ?? []);
 
   const session = createQuizSession({
@@ -225,6 +217,7 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
     seed: `${gameCode}:${Date.now()}`,
     now: Date.now(),
     language,
+    treasureChestsEnabled,
   });
 
   if (session.questions.length === 0) {
@@ -281,16 +274,13 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   // The grid is a placeholder that no quiz surface ever draws; it exists only
   // to satisfy the shells' mount conditions.
   broadcastToRoom(io, getGameRoom(gameCode), 'gameStarting', { gameMode: QUIZ_SHELL_GAME_MODE });
+  // The shell fields come from `vocabQuizShell` — the same builder late join,
+  // reconnect and `requestGameState` use, so a student arriving mid-quiz gets
+  // this exact start rather than the room's (null) grid.
   broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
-    letterGrid: QUIZ_PLACEHOLDER_GRID,
-    timerSeconds: Math.ceil((session.limitMs * session.questions.length) / 1000),
-    language: 'en',
-    minWordLength: 3,
+    ...buildQuizShellStart(session),
     messageId: `vocab-quiz-${gameCode}-${now}`,
     gameSessionId: `${gameCode}:${now}`,
-    boardTheme: null,
-    gameMode: QUIZ_SHELL_GAME_MODE,
-    goldenLetters: [],
   });
 
   // The question broadcast is itself the "a quiz is live" signal. A room-wide
@@ -333,6 +323,8 @@ function hostQuizForSocket(socket: Socket): { gameCode: string; session: VocabQu
 }
 
 export function registerVocabQuizHandlers(io: Server, socket: Socket): void {
+  registerTreasureChestHandlers(io, socket);
+
   socket.on(VOCAB_QUIZ_EVENTS.answer, (data: unknown) => {
     if (!checkRateLimit(socket.id)) return;
     const ctx = quizForSocket(socket);
