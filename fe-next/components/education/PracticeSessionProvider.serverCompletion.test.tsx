@@ -249,3 +249,29 @@ describe('PracticeSessionProvider — server completion PATCH', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe('PracticeSessionProvider — a round the server records only as an ATTEMPT', () => {
+  it('GIVEN the server leaves completed_at NULL (Word Craft below the bar) WHEN it resolves THEN XP shows 0 and the SAME session may complete on a replay', async () => {
+    let call = 0;
+    const fetchMock = stubFetch(async () => ({
+      ok: true,
+      json: async () => (++call === 1
+        ? { session: { id: 'session-9', completed_at: null, xp_awarded: null } }
+        : { session: { id: 'session-9', completed_at: '2026-09-19T00:00:00Z', xp_awarded: 60 } }),
+    }));
+    const user = userEvent.setup();
+
+    render(
+      <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+        <TestConsumer sessionId="session-9" />
+      </PracticeSessionProvider>
+    );
+
+    await user.click(screen.getByTestId('complete-btn'));
+    await waitFor(() => expect(screen.getByTestId('session-xp')).toHaveTextContent('0'));
+
+    await user.click(screen.getByTestId('complete-btn'));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(screen.getByTestId('session-xp')).toHaveTextContent('60'));
+  });
+});

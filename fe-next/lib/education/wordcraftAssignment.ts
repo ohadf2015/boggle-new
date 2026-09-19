@@ -84,3 +84,18 @@ export function sessionCompletesAssignment(
   if (mode === 'wordcraft') return session.mode === WORDCRAFT_SESSION_MODE;
   return true;
 }
+
+/**
+ * The bar a Word Craft round must clear to count as homework done: at least one
+ * lesson word built, or this many distinct valid words. Below it the round is
+ * recorded as an attempt — passing straight to the bot's win is not homework.
+ */
+export const WORDCRAFT_MIN_VALID_WORDS = 3;
+
+export function wordCraftAttemptIsMeaningful(round: {
+  lessonWordsFound: readonly string[];
+  validWordsFound: readonly string[];
+}): boolean {
+  if (round.lessonWordsFound.length > 0) return true;
+  return new Set(round.validWordsFound.map((w) => w.toUpperCase())).size >= WORDCRAFT_MIN_VALID_WORDS;
+}

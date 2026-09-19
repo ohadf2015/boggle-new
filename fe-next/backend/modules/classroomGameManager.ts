@@ -467,6 +467,9 @@ async function markRoundLive(game: ClassroomGame): Promise<void> {
     JSON.stringify(game)
   );
   await redis.sadd(`classroom_games:${game.classroomId}`, game.gameCode);
+  // The persistence lock is once per ROUND, not per code: a Rematch reuses the
+  // code, and round two's results were refused as "already persisted".
+  await redis.del(`classroom_game_persisted:${game.gameCode}`);
 
   logger.info('CLASSROOM_GAME', `Reopened classroom game ${game.gameCode} for a new round`);
 }

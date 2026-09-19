@@ -197,13 +197,16 @@ export function usePracticeProgress(
    *  server row to compute it from. */
   options?: { totalWords?: number }
 ): UsePracticeProgressReturn {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const isMounted = useMounted();
   // Resolved-and-anonymous, not merely "not authenticated yet". `isAuthenticated`
-  // starts false on every first paint, so branching on it alone would run the
-  // guest path for one frame on a signed-in student's device and write a local
-  // session count that belongs to nobody.
-  const isGuest = !authLoading && !isAuthenticated;
+  // starts false on every first paint, and also stays false for a moment AFTER
+  // `loading` clears while the profile row is still in flight. A guest is
+  // therefore "auth resolved and NO session at all"; a session whose profile is
+  // pending keeps loading (Pitfalls Class 1) — otherwise a cold deep link ran the
+  // round as a device-local guest round and never POSTed the homework session.
+  const isGuest = !authLoading && !user && !isAuthenticated;
+  const profilePending = !authLoading && !!user && !isAuthenticated;
   const totalWords = options?.totalWords ?? 0;
 
   const [state, setState] = useState<UsePracticeProgressState>({
@@ -235,7 +238,7 @@ export function usePracticeProgress(
     }
 
     if (!isAuthenticated) {
-      setState(prev => ({ ...prev, progress: null, mastery: 'not_started', isLoading: false }));
+      setState(prev => ({ ...prev, progress: null, mastery: 'not_started', isLoading: authLoading || profilePending }));
       return;
     }
 
@@ -260,7 +263,7 @@ export function usePracticeProgress(
         }));
       }
     }
-  }, [isAuthenticated, isGuest, totalWords, lessonId, studentId, isMounted]);
+  }, [isAuthenticated, isGuest, authLoading, profilePending, totalWords, lessonId, studentId, isMounted]);
 
   // Refresh data
   const refresh = useCallback(async () => {

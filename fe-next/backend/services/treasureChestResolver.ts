@@ -167,27 +167,63 @@ export function resolveChestResult(input: ResolveChestInput): TreasureChestState
 }
 
 /**
- * True while the reveal should keep waiting: chests are on, someone answered
- * the current question correctly and has not opened theirs, and the hold cap
- * (`chestHoldEndsAt`, set when the reveal begins) has not run out.
+ * Per-question chest bookkeeping the session object does not carry (the engine
+ * file is at its size limit): when each chest opened, and which students told
+ * us their reveal has been seen. Keys are `${index}:${username}`, like
+ * `session.chestResults`, so a new question never inherits an old entry.
  */
-export function chestsStillOpening(session: VocabQuizSession, now: number): boolean {
-  if (!session.treasureChestsEnabled || session.phase !== 'reveal') return false;
-  if (now >= session.chestHoldEndsAt) return false;
-  for (const [username, answer] of session.answers) {
-    if (answer.correct && !session.chestResults.has(`${session.index}:${username}`)) return true;
+interface ChestPacing {
+  openedAt: Map<string, number>;
+  seen: Set<string>;
+}
+const pacingBySession = new WeakMap<VocabQuizSession, ChestPacing>();
+
+function pacingOf(session: VocabQuizSession): ChestPacing {
+  let pacing = pacingBySession.get(session);
+  if (!pacing) {
+    pacing = { openedAt: new Map(), seen: new Set() };
+    pacingBySession.set(session, pacing);
   }
-  return false;
+  return pacing;
+}
+
+/** A chest just opened: its owner gets a short beat to see the outcome. */
+export function markChestOpened(session: VocabQuizSession, username: string, now: number): void {
+  pacingOf(session).openedAt.set(`${session.index}:${username}`, now);
+}
+
+/** The student's phone dismissed the reveal — nothing left to wait for. */
+export function markChestSeen(session: VocabQuizSession, index: number, username: string): void {
+  if (index !== session.index) return;
+  pacingOf(session).seen.add(`${index}:${username}`);
 }
 
 /**
- * A chest just opened. If the reveal is on screen, keep it there one short
- * beat so the student actually sees the outcome — never past the hold cap.
+ * True while the reveal should keep waiting, capped by `chestHoldEndsAt`.
+ *
+ * Only ELIGIBLE students count: answered the current question correctly and
+ * still in the room (`isPresent`). For each of them the room waits until they
+ * have opened their chest AND seen it — the phone's ack, or one
+ * VOCAB_QUIZ_CHEST_REVEAL_BEAT_MS after the pick if the ack never arrives. So
+ * the hold ends the moment the last eligible student has looked, instead of a
+ * fixed beat after every pick, and a student who answered right and then lost
+ * signal no longer holds the class to the cap.
  */
-export function lingerForChestReveal(session: VocabQuizSession, now: number): void {
-  if (session.phase !== 'reveal') return;
-  session.revealEndsAt = Math.min(
-    Math.max(session.revealEndsAt, now + VOCAB_QUIZ_CHEST_REVEAL_BEAT_MS),
-    Math.max(session.revealEndsAt, session.chestHoldEndsAt)
-  );
+export function chestsStillOpening(
+  session: VocabQuizSession,
+  now: number,
+  isPresent: (username: string) => boolean = () => true
+): boolean {
+  if (!session.treasureChestsEnabled || session.phase !== 'reveal') return false;
+  if (now >= session.chestHoldEndsAt) return false;
+  const pacing = pacingOf(session);
+  for (const [username, answer] of session.answers) {
+    if (!answer.correct || !isPresent(username)) continue;
+    const key = `${session.index}:${username}`;
+    if (!session.chestResults.has(key)) return true;
+    if (pacing.seen.has(key)) continue;
+    const openedAt = pacing.openedAt.get(key);
+    if (openedAt !== undefined && now < openedAt + VOCAB_QUIZ_CHEST_REVEAL_BEAT_MS) return true;
+  }
+  return false;
 }

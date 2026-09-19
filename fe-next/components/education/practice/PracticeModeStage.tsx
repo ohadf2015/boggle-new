@@ -58,6 +58,8 @@ export interface PracticeRoundPayload {
   cardsReviewed?: number;
   cardsCorrect?: number;
   vocabularyWordsFound?: string[];
+  /** Word Craft: every word the player built — the server's "3 valid words" leg of the homework bar. */
+  wordsFound?: string[];
   newWordsFound?: string[];
 }
 
@@ -118,7 +120,7 @@ export default function PracticeModeStage({
             words={words.map((entry) => entry.word)}
             language={language}
             onComplete={async (results) => {
-              await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, newWordsFound: [] });
+              await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, wordsFound: results.wordsFound, newWordsFound: [] });
             }}
             onBack={onBack}
             {...forward}

@@ -9,14 +9,16 @@
  * `onWordCraftGameEnd` (fired by the same call that logs the game to analytics),
  * so the game view needed no new prop.
  *
- * Lesson words: the engine deals letters from a per-locale tile bag and cannot
- * be seeded with words, so the lesson shapes the round by being the TARGET —
- * shown before play, and every lesson word the student builds is reported as
- * `vocabularyWordsFound`, which is what solo_board XP pays for.
+ * Lesson words: the round is dealt in the LESSON's language (not the UI's) and
+ * the deal is seeded so every lesson word is buildable (lib/word-craft/lessonBag.ts).
+ * Every lesson word built is reported as `vocabularyWordsFound` (what solo_board
+ * XP pays for), all the player's words as `wordsFound`. A round below
+ * `wordCraftAttemptIsMeaningful` only counts as an attempt — the server decides;
+ * this screen mirrors the rule to nudge the student into another go.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Play, Grid2x2 } from 'lucide-react';
+import { ArrowLeft, Play, Grid2x2, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -25,13 +27,16 @@ import { DRILL_ROOT_CLASS } from '@/components/practice/drillLayout';
 import { WordCraftGameView } from '@/components/word-craft/WordCraftGameScreen';
 import { onWordCraftGameEnd } from '@/components/word-craft/wordCraftTelemetry';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
-import { lessonWordsPlayed } from '@/lib/education/wordcraftAssignment';
+import { lessonWordsPlayed, wordCraftAttemptIsMeaningful, WORDCRAFT_MIN_VALID_WORDS } from '@/lib/education/wordcraftAssignment';
+import { lessonTargetsFor, wordCraftLocaleFor } from '@/lib/word-craft/lessonBag';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education/types';
 
 export interface WordCraftPracticeResults {
   /** Lesson words the student built, canonical, each once. */
   vocabularyWordsFound: string[];
+  /** Every word the player built (bot moves excluded), each once. */
+  wordsFound: string[];
   score: number;
   botScore: number;
   won: boolean;
@@ -52,12 +57,17 @@ type Phase = { name: 'intro' } | { name: 'playing'; seed: number } | { name: 'do
 const newSeed = () => Math.floor(Math.random() * 1_000_000);
 
 export default function WordCraftPractice({ words, language, onComplete, onBack, onNext, nextLabel }: WordCraftPracticeProps) {
-  const { t } = useLanguage();
+  const { t, language: uiLanguage } = useLanguage();
   const [phase, setPhase] = useState<Phase>({ name: 'intro' });
   const targets = useMemo(
     () => [...new Set(words.map((w) => canonLessonWord(w, language)).filter(Boolean))],
     [words, language],
   );
+  // Dealt in the lesson's language with its words seeded; ru has no Word Craft bag → UI locale, unseeded.
+  const deal = useMemo(() => {
+    const { locale, seeded } = wordCraftLocaleFor(language, uiLanguage ?? 'en');
+    return { locale, targets: seeded ? lessonTargetsFor(words, locale) : [] };
+  }, [words, language, uiLanguage]);
 
   // Latest props for the listener without re-subscribing on every render.
   const latest = useRef({ words, language, onComplete });
@@ -75,6 +85,7 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
       const { words: lessonWords, language: lang, onComplete: report } = latest.current;
       const results: WordCraftPracticeResults = {
         vocabularyWordsFound: lessonWordsPlayed(state.history, lessonWords, lang),
+        wordsFound: [...new Set(state.history.filter((m) => m.who === 'player').flatMap((m) => m.words))],
         score: state.player.score,
         botScore: state.bot.score,
         won: state.player.score > state.bot.score,
@@ -87,13 +98,35 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
   if (phase.name === 'playing') {
     return (
       <div className="fixed inset-0 z-50 bg-neo-navy" data-testid="wordcraft-practice-game">
-        <WordCraftGameView seed={phase.seed} duel={null} hotseat={false} difficulty="easy" />
+        <WordCraftGameView seed={phase.seed} duel={null} hotseat={false} difficulty="easy" modifierOverride="none" lesson={{ ...deal, onExit: onBack }} />
       </div>
     );
   }
 
   if (phase.name === 'done') {
     const { results } = phase;
+    if (!wordCraftAttemptIsMeaningful({ lessonWordsFound: results.vocabularyWordsFound, validWordsFound: results.wordsFound })) {
+      return (
+        <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-black p-4 text-center')} data-testid="wordcraft-practice-nudge">
+          <Grid2x2 className="w-10 h-10 mx-auto mb-2 text-neo-cyan" aria-hidden="true" />
+          <p className="font-neo-display text-lg text-neo-white mb-4 text-balance">
+            {t('education.wordcraftAssignment.needLessonWord', { count: WORDCRAFT_MIN_VALID_WORDS })}
+          </p>
+          <button
+            type="button"
+            data-testid="wordcraft-practice-retry"
+            onClick={() => setPhase({ name: 'playing', seed: newSeed() })}
+            className="w-full min-h-14 mb-2 flex items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime font-neo-display text-xl font-black uppercase text-black shadow-hard active:translate-y-0.5 active:shadow-none"
+          >
+            <RotateCcw className="w-6 h-6" aria-hidden="true" />
+            {t('education.wordcraftAssignment.tryAgain')}
+          </button>
+          <Button variant="ghost" onClick={onBack} className="w-full text-neo-white hover:text-neo-white hover:bg-neo-white/10">
+            {t('common.back')}
+          </Button>
+        </div>
+      );
+    }
     return (
       <div className="flex w-full items-center justify-center py-4" data-testid="wordcraft-practice-complete">
         <PracticeCompletionMoment

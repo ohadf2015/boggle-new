@@ -9,6 +9,7 @@ import { isExpectedSocketErrorCode } from '@/utils/sentry';
 import { getRejoinIntent, planReconnectRejoin } from '@/utils/socketRejoin';
 import { readGuestBirthYear } from '@/lib/families/guestAge';
 import { resolveGrandfatheredAdult } from '@/lib/families/grandfather';
+import { watchSocketAuthUpgrade } from '@/utils/socketAuthUpgrade';
 import type { LetterGrid, Language, Avatar } from '@/types';
 
 // Socket.IO Context Value Type
@@ -74,6 +75,9 @@ let sharedSocketInstance: Socket | null =
   (typeof globalThis !== 'undefined' && (globalThis as any)[HMR_KEY]) || null;
 let sharedSocketRefCount: number =
   (typeof globalThis !== 'undefined' && (globalThis as any)[HMR_RC_KEY]) || 0;
+/** Did the last handshake carry a JWT? A later sign-in must re-handshake if not. */
+let handshakeHadToken = false;
+let stopAuthUpgrade: (() => void) | null = null;
 
 function syncHMR() {
   if (process.env.NODE_ENV === 'development' && typeof globalThis !== 'undefined') {
@@ -161,6 +165,7 @@ export function getSharedSocket(): Socket {
       // reconnects is re-resolved correctly.
       auth: (cb: (data: Record<string, string>) => void) => {
         Promise.all([getAuthToken(), getCrazyGamesToken()]).then(([token, cgToken]) => {
+          handshakeHadToken = !!token;
           const declaredBirthYear = !token ? readGuestBirthYear() : null;
           // Grandfather claim (2026-07-13): pre-existing guest installs are
           // adults without a declaration. Same trust level as declaredBirthYear.
@@ -177,6 +182,7 @@ export function getSharedSocket(): Socket {
     });
 
     sharedSocketInstance.connect();
+    stopAuthUpgrade = watchSocketAuthUpgrade(sharedSocketInstance, () => handshakeHadToken);
   }
   sharedSocketRefCount++;
   syncHMR();
@@ -191,6 +197,8 @@ export function releaseSharedSocket(): void {
   sharedSocketRefCount--;
   if (sharedSocketRefCount <= 0 && sharedSocketInstance) {
     logger.log('[SOCKET.IO] Cleaning up shared socket (no more references)');
+    stopAuthUpgrade?.();
+    stopAuthUpgrade = null;
     sharedSocketInstance.removeAllListeners();
     sharedSocketInstance.disconnect();
     sharedSocketInstance = null;

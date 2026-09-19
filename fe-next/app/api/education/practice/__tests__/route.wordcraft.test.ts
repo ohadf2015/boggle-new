@@ -120,6 +120,8 @@ describe('POST /api/education/practice — Word Craft', () => {
 });
 
 describe('PATCH /api/education/practice — Word Craft completion', () => {
+  let updateSpy: ReturnType<typeof vi.fn>;
+  let rpcSpy: ReturnType<typeof vi.fn>;
   function mockClient() {
     const existing = {
       id: SESSION, student_id: USER, lesson_id: LESSON, completed_at: null,
@@ -131,9 +133,9 @@ describe('PATCH /api/education/practice — Word Craft completion', () => {
           select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({ data: existing, error: null }),
           }) }) }),
-          update: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({
+          update: (updateSpy = vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({
             select: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { ...existing, completed_at: 'now' }, error: null }) }),
-          }) }),
+          }) })),
         };
       }
       return {
@@ -145,7 +147,15 @@ describe('PATCH /api/education/practice — Word Craft completion', () => {
     (createClient as any).mockResolvedValue({
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER } }, error: null }) },
       from,
-      rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
+      rpc: (rpcSpy = vi.fn().mockResolvedValue({ data: null, error: null })),
+    });
+    // The gate re-reads the lesson's own words (service role) — never the client's claim.
+    (mockAdmin as any).mockReturnValue({
+      from: vi.fn(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: { words: [{ word: 'cat' }, { word: 'dog' }], language: 'en' }, error: null }),
+      })),
     });
   }
 
@@ -169,6 +179,37 @@ describe('PATCH /api/education/practice — Word Craft completion', () => {
     });
   });
 
+  it('Given a round passed straight to the bot (0 words), When completed:true is sent, Then it records as attempted — no stamp, no XP, no completed_at', async () => {
+    const res = await PATCH(new NextRequest('http://localhost/api/education/practice', {
+      method: 'PATCH',
+      body: JSON.stringify({ sessionId: SESSION, vocabularyWordsFound: [], wordsFound: [], completed: true }),
+    }));
+    expect(res.status).toBe(200);
+    expect(mockStamp).not.toHaveBeenCalled();
+    expect(rpcSpy).not.toHaveBeenCalled();
+    const written = updateSpy.mock.calls[0][0];
+    expect(written.completed_at).toBeUndefined();
+    expect(written.results).toEqual({ outcome: 'attempted', lessonWords: 0, validWords: 0 });
+  });
+
+  it('Given two valid words and a fake "lesson word" claim, When completed, Then it is still only an attempt', async () => {
+    await PATCH(new NextRequest('http://localhost/api/education/practice', {
+      method: 'PATCH',
+      body: JSON.stringify({ sessionId: SESSION, vocabularyWordsFound: ['ZEBRA'], wordsFound: ['SUN', 'ZEBRA'], completed: true }),
+    }));
+    expect(mockStamp).not.toHaveBeenCalled();
+    expect(updateSpy.mock.calls[0][0].completed_at).toBeUndefined();
+  });
+
+  it('Given three valid words, When completed, Then it completes without a lesson word', async () => {
+    await PATCH(new NextRequest('http://localhost/api/education/practice', {
+      method: 'PATCH',
+      body: JSON.stringify({ sessionId: SESSION, wordsFound: ['SUN', 'RUN', 'FUN'], completed: true }),
+    }));
+    expect(mockStamp).toHaveBeenCalled();
+    expect(updateSpy.mock.calls[0][0].completed_at).toEqual(expect.any(String));
+  });
+
   it('Given a progress update without completion, When patched, Then no assignment is stamped', async () => {
     await PATCH(new NextRequest('http://localhost/api/education/practice', {
       method: 'PATCH',
@@ -182,7 +223,7 @@ describe('PATCH /api/education/practice — Word Craft completion', () => {
     mockFind.mockRejectedValueOnce(new Error('boom'));
     const res = await PATCH(new NextRequest('http://localhost/api/education/practice', {
       method: 'PATCH',
-      body: JSON.stringify({ sessionId: SESSION, completed: true }),
+      body: JSON.stringify({ sessionId: SESSION, wordsFound: ['CAT'], completed: true }),
     }));
     expect(res.status).toBe(200);
     expect(mockStamp).not.toHaveBeenCalled();
@@ -192,7 +233,7 @@ describe('PATCH /api/education/practice — Word Craft completion', () => {
     mockFind.mockResolvedValueOnce(null);
     await PATCH(new NextRequest('http://localhost/api/education/practice', {
       method: 'PATCH',
-      body: JSON.stringify({ sessionId: SESSION, completed: true }),
+      body: JSON.stringify({ sessionId: SESSION, wordsFound: ['CAT'], completed: true }),
     }));
     expect(mockStamp).not.toHaveBeenCalled();
   });

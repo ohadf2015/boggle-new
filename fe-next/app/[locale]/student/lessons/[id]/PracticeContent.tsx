@@ -232,6 +232,7 @@ export default function PracticeContent({
       cardsReviewed?: number;
       cardsCorrect?: number;
       vocabularyWordsFound?: string[];
+      wordsFound?: string[];
       newWordsFound?: string[];
     }
   ) => {

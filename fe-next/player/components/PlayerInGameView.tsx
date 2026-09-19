@@ -56,7 +56,6 @@ import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
 import { useRouter, useParams } from 'next/navigation';
-import { useQuizPracticeNav } from '@/components/education/vocabQuiz/useQuizPracticeNav';
 
 // ==================== Hint Types ====================
 
@@ -317,7 +316,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   const shellEnabled = useDesktopShellEnabled();
   // Live Vocab Quiz rooms replace the board entirely.
   const isVocabQuizRoom = useIsVocabQuizRoom(socket);
-  const onQuizPractice = useQuizPracticeNav();
 
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   // caused by the host handler setting tableData (React state) and gameMode (Zustand)
@@ -330,7 +328,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // GameMode union (see shared/types/vocabQuiz), and the start payload that
   // mounts this view therefore carries a placeholder board mode.
   if (isVocabQuizRoom) {
-    return <VocabQuizView socket={socket} username={username} t={t} onPractice={onQuizPractice} />;
+    return <VocabQuizView socket={socket} username={username} t={t} />;
   }
 
   // Wheel-rush has no letter grid — render dedicated view before grid guard

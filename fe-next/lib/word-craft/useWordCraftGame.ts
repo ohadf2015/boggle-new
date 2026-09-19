@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { createBoard, getCell, isFirstMove, type Board, type BoardSize } from './board';
 import { createBag, draw, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
+import { seedOpeningRack, drawTowardTarget, nextLessonTarget } from './lessonBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import { botTuning, shouldBotSkipTurn, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
@@ -83,6 +84,8 @@ export interface WordCraftState {
    * (seed, tileId) with zero extra plumbing.
    */
   seed: number;
+  /** Classroom homework: lesson words the deal steers toward (lib/word-craft/lessonBag.ts). */
+  lesson?: { targets: readonly string[]; locale: SupportedLocale };
   /**
    * The game's very first tile-select auto-places that tile on the center cell
    * (recallable) to remove the blank-board "where do I start?" decision. This
@@ -113,7 +116,7 @@ type Action =
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean; modifierOverride?: WordCraftModifier }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean; modifierOverride?: WordCraftModifier; lessonTargets?: readonly string[] }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
@@ -121,6 +124,7 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
   const territoryEnabled = typeof init === 'number' ? true : (init.territoryEnabled ?? true);
   const hotseat = typeof init === 'number' ? false : (init.hotseat ?? false);
   const modifierOverride = typeof init === 'number' ? undefined : init.modifierOverride;
+  const lessonTargets = typeof init === 'number' ? undefined : init.lessonTargets;
 
   const finalBoardSize = viewportDims?.size ?? boardSize;
   const bag = createBag({ seed, locale, bagSize: viewportDims?.bagSize });
@@ -130,6 +134,7 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
       ? modifierOverride
       : rollModifier(seed);
   const rackSize = modifierRackSize(modifier);
+  if (lessonTargets?.length) bag.tiles = seedOpeningRack(bag.tiles, lessonTargets[0], locale);
   const playerRack = draw(bag, rackSize);
   const botRack = draw(bag, rackSize);
   return {
@@ -159,6 +164,7 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
     modifier,
     rackSize,
     seed,
+    ...(lessonTargets?.length ? { lesson: { targets: lessonTargets, locale } } : {}),
     autoCenterDone: false,
   };
 }
@@ -180,8 +186,9 @@ function commitMove(
   // and (b) double-drained the sack under React StrictMode's double-invoke.
   // Cloning the tile list and carrying a FRESH bag object fixes both.
   const drawCount = Math.max(0, state.rackSize - remainingRack.length);
-  const nextBagTiles = state.bag.tiles.slice();
-  const replenish = nextBagTiles.splice(0, Math.min(drawCount, nextBagTiles.length));
+  // Lesson homework steers the PLAYER's refill toward the next unbuilt lesson word.
+  const target = who === 'player' && state.lesson ? nextLessonTarget(state.lesson.targets, [...state.history, { who, words }]) : null;
+  const { drawn: replenish, rest: nextBagTiles } = drawTowardTarget(state.bag.tiles, drawCount, remainingRack, target, state.lesson?.locale ?? 'en');
   const nextBag: TileBag = { ...state.bag, tiles: nextBagTiles };
   const newRack = [...remainingRack, ...replenish];
 
@@ -378,7 +385,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       // viewportDims carries the locked board size + solo bag size so a
       // play-again (or locale switch) keeps the same tight bag instead of
       // silently falling back to the full default 100-tile bag.
-      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims, modifierOverride: action.modifierOverride });
+      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims, modifierOverride: action.modifierOverride, lessonTargets: state.lesson?.targets });
     default:
       return state;
   }
@@ -420,11 +427,13 @@ export interface UseWordCraftGameOptions {
    * duel boards must derive the identical modifier from the shared seed.
    */
   modifierOverride?: WordCraftModifier;
+  /** Classroom homework: canonical lesson targets (`lessonTargetsFor`) — seeded into the deal and always valid words. */
+  lessonTargets?: readonly string[];
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride, lessonTargets }: UseWordCraftGameOptions) {
   const tuning = botTuning(difficulty);
   const effectiveVariance = botSkillVariance ?? tuning.skillVariance;
   // Capture dims at initialization and lock them for the game lifetime. A duel
@@ -435,7 +444,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   );
   const initialDims = initialDimsRef.current;
 
-  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat, modifierOverride }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat, modifierOverride]);
+  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat, modifierOverride, lessonTargets }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat, modifierOverride, lessonTargets]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
 
   // Active per-game scoring modifier, applied symmetrically to player commits,
@@ -449,6 +458,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   const isWordValid: DictionaryCheck = useCallback(
     (w: string) => {
       if (!dict) return false;
+      if (lessonTargets?.includes(normalizeHebrewWord(w).toUpperCase())) return true; // a lesson word always counts
       const candidates = new Set<string>();
       const lower = w.toLowerCase();
       const upper = w.toUpperCase();
@@ -471,7 +481,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       }
       return false;
     },
-    [dict, locale],
+    [dict, locale, lessonTargets],
   );
 
   // Locale or board-size flipping mid-session must restart the game so the

@@ -20,7 +20,7 @@
 
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import { PauseCircle, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,7 @@ import { VocabQuizStudentHeader } from './VocabQuizStudentHeader';
 import { VocabQuizRevealBanner } from './VocabQuizRevealBanner';
 import { VocabQuizOwnFinale } from './VocabQuizOwnFinale';
 import { VocabQuizChestFlow } from './VocabQuizChestFlow';
+import { VocabQuizMissedSheet } from './VocabQuizMissedSheet';
 import { StudentRoundOutcome } from '../results/StudentRoundOutcome';
 import { StudentNextActions } from '../results/StudentNextActions';
 
@@ -40,14 +41,17 @@ export interface VocabQuizViewProps {
   socket: Socket | null;
   username: string;
   t: TranslateFn;
-  /** Callback to start practice mode on missed words. */
-  onPractice?: () => void;
   /** Callback to re-launch the game (same mode+settings). */
   onPlayAgain?: () => void;
 }
 
-export function VocabQuizView({ socket, username, t, onPractice, onPlayAgain }: VocabQuizViewProps) {
+export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizViewProps) {
   const quiz = useVocabQuiz(socket);
+  // Practice opens IN PLACE — navigating away dropped the student out of the
+  // live room and missed the teacher's Rematch. Keyed to this quiz's missed
+  // list, so the next quiz (a fresh array) never inherits an open sheet.
+  const [practiceFor, setPracticeFor] = useState<unknown>(null);
+  const practiceOpen = practiceFor === quiz.missed;
   const { question, reveal, myAnswer, pendingChoice, phase } = quiz;
 
   // The student's own row out of the standings the SERVER sorted — never a
@@ -240,10 +244,17 @@ export function VocabQuizView({ socket, username, t, onPractice, onPlayAgain }: 
             />
           </div>
 
-          {/* Primary actions — always visible (wait for teacher + practice escape hatch) */}
+          {/* Primary actions — always visible (wait for teacher + in-place practice) */}
           <div className="shrink-0">
-            <StudentNextActions onPlayAgain={onPlayAgain} onPractice={onPractice} t={t} />
+            <StudentNextActions
+              onPlayAgain={onPlayAgain}
+              onPractice={quiz.missed.length > 0 ? () => setPracticeFor(quiz.missed) : undefined}
+              t={t}
+            />
           </div>
+          {practiceOpen && (
+            <VocabQuizMissedSheet missed={quiz.missed} onClose={() => setPracticeFor(null)} t={t} />
+          )}
         </div>
       )}
 

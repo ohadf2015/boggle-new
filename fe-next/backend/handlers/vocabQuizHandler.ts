@@ -119,6 +119,13 @@ function beginReveal(io: Server, session: VocabQuizSession, now: number): void {
   emitReveal(io, session);
 }
 
+/** Still seated: a dropped phone must not hold the chest reveal to its cap. */
+function isInRoom(gameCode: string, username: string): boolean {
+  const users = (getGame(gameCode) as { users?: Record<string, { disconnected?: boolean }> } | undefined)?.users;
+  if (!users) return true; // room not in this instance's memory: do not guess
+  return !!users[username] && !users[username].disconnected;
+}
+
 /**
  * One clock tick. Everything time-driven happens here so there is a single
  * place where "the question ended" is decided — not one rule for the timer and
@@ -141,7 +148,7 @@ function tick(io: Server, gameCode: string): void {
 
   if (session.phase === 'reveal') {
     // Hold (capped) while a student who got it right still has a chest to open.
-    if (now < session.revealEndsAt || chestsStillOpening(session, now)) return;
+    if (now < session.revealEndsAt || chestsStillOpening(session, now, (u) => isInRoom(gameCode, u))) return;
     const phase = advanceQuiz(session, now);
     if (phase === 'ended') {
       void finishQuiz(io, gameCode);

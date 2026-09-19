@@ -183,6 +183,29 @@ describe('getRecentClassroomGames', () => {
     expect(data[0].coveragePct).toBe(100);
   });
 
+  it('a Rematch in the same room counts each student once — their latest round', async () => {
+    // Rows arrive newest first. Round 2 (the Rematch) reuses game code G1.
+    mockTables({
+      practice_sessions: {
+        data: [
+          sessionRow('stu-1', 'G1', '2026-09-04T10:05:00Z', ['cat', 'dog'], [], { score: 200 }),
+          sessionRow('stu-2', 'G1', '2026-09-04T10:05:00Z', ['cat'], ['dog'], { score: 90 }),
+          sessionRow('stu-1', 'G1', '2026-09-04T10:00:00Z', [], ['cat', 'dog'], { score: 10 }),
+          sessionRow('stu-2', 'G1', '2026-09-04T10:00:00Z', [], ['cat', 'dog'], { score: 0 }),
+        ],
+      },
+      classroom_memberships: { count: 17 },
+      public_profiles: { data: [{ id: 'stu-1', display_name: 'Cy' }, { id: 'stu-2', display_name: 'Dee' }] },
+    });
+
+    const { data } = await getRecentClassroomGames('class-1', 5);
+
+    expect(data).toHaveLength(1);
+    expect(data[0].participation).toEqual({ played: 2, roster: 17 });
+    expect(data[0].players.map((p) => [p.name, p.score])).toEqual([['Cy', 200], ['Dee', 90]]);
+    expect(data[0].missedWords.find((w) => w.word === 'dog')).toEqual({ word: 'dog', missedBy: 1, total: 2, pct: 50 });
+  });
+
   it('honours the game limit after grouping', async () => {
     mockTables({
       practice_sessions: {

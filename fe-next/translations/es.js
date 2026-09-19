@@ -140,6 +140,11 @@ const es = {
       "hitSwap": "{actor} cambió sus puntos por los tuyos. ¡Sigue así!",
       "tickerSteal": "¡{actor} le birló {amount} puntos a {target}!",
       "tickerSwap": "¡{actor} cambió puntos con {target}!"
+    },
+    "practice": {
+      "title": "Palabras para practicar",
+      "stillIn": "Sigues en la clase. La próxima partida te traerá de vuelta al momento.",
+      "close": "Volver a mis resultados"
     }
   },
   "pricing": {
@@ -13513,6 +13518,24 @@ const es = {
     }
   },
   "education": {
+    "whatsNew": {
+      "entries": {
+        "sep2026": {
+          "packs": "Paquetes de inicio listos en español, sueco, japonés y ruso.",
+          "reports": "Informes más precisos: se registran los alumnos invitados, una revancha cuenta a cada alumno una sola vez y se ve qué tareas están completadas.",
+          "rematch": "Revancha con un toque después de un cuestionario, y el modo que eliges es siempre el que se juega.",
+          "join": "Unirse es más fácil: un solo campo de código, un código QR de verdad, quien entra antes te espera en lugar de ver un error y quien llega tarde entra en la pregunta actual.",
+          "wordcraft": "Asigna Word Craft como tarea. Las palabras de la lección aparecen en el tablero, y una ronda solo cuenta si el alumno juega de verdad.",
+          "leaderboard": "Una clasificación en directo en el proyector que se reordena cuando los alumnos se adelantan, y cada alumno ve en qué puesto va.",
+          "chests": "Cofres de premio en los cuestionarios de vocabulario: una respuesta correcta abre 1 de 3 cofres (ganar, doble, robar o intercambiar). Activado por defecto; puedes desactivarlo en los ajustes del juego.",
+          "title": "Los juegos de clase, rehechos para divertir",
+        },
+      },
+      "close": "Entendido",
+      "subtitle": "Cada mejora de tus juegos de clase, en cuanto sale.",
+      "title": "Novedades para docentes",
+      "button": "Novedades",
+    },
     "subscription": {
       "classLimitReached": "Has alcanzado el límite de clases gratuitas. Pásate a Pro para tener clases ilimitadas.",
     },
@@ -13719,7 +13742,9 @@ const es = {
       "tie": "Empate",
       "recommended": "Recomendado",
       "teacherHint": "En solitario contra un bot amistoso. Se juega desde la página de la clase.",
-      "studentPlay": "Jugar WordCraft"
+      "studentPlay": "Jugar WordCraft",
+      "needLessonWord": "Para terminar, forma al menos una palabra de la lección, o {count} palabras cualesquiera.",
+      "tryAgain": "Otra vez"
     },
     "vocabFocus": {
       "title": "Enfoque de vocabulario",

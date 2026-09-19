@@ -6,6 +6,8 @@ import {
   lessonWordsPlayed,
   sessionCompletesAssignment,
   WORDCRAFT_SESSION_MODE,
+  WORDCRAFT_MIN_VALID_WORDS,
+  wordCraftAttemptIsMeaningful,
 } from '../wordcraftAssignment';
 
 /**
@@ -87,5 +89,28 @@ describe('sessionCompletesAssignment', () => {
   it('a student-picks or focus assignment is completed by any finished session', () => {
     expect(sessionCompletesAssignment('any', { mode: null })).toBe(true);
     expect(sessionCompletesAssignment('synonym', { mode: 'vocab_focus' })).toBe(true);
+  });
+});
+
+describe('wordCraftAttemptIsMeaningful — a pass-immediately round is not homework done', () => {
+  it('Given the named bar, When read, Then it is 3 valid words', () => {
+    expect(WORDCRAFT_MIN_VALID_WORDS).toBe(3);
+  });
+
+  it('Given zero words, When judged, Then it is only an attempt', () => {
+    expect(wordCraftAttemptIsMeaningful({ lessonWordsFound: [], validWordsFound: [] })).toBe(false);
+  });
+
+  it('Given one lesson word, When judged, Then it counts', () => {
+    expect(wordCraftAttemptIsMeaningful({ lessonWordsFound: ['CAT'], validWordsFound: ['CAT'] })).toBe(true);
+  });
+
+  it('Given two (or a repeated) valid words and no lesson word, When judged, Then it is below the bar', () => {
+    expect(wordCraftAttemptIsMeaningful({ lessonWordsFound: [], validWordsFound: ['SUN', 'RUN'] })).toBe(false);
+    expect(wordCraftAttemptIsMeaningful({ lessonWordsFound: [], validWordsFound: ['SUN', 'sun', 'SUN'] })).toBe(false);
+  });
+
+  it('Given three distinct valid words, When judged, Then it counts even without a lesson word', () => {
+    expect(wordCraftAttemptIsMeaningful({ lessonWordsFound: [], validWordsFound: ['SUN', 'RUN', 'FUN'] })).toBe(true);
   });
 });

@@ -140,6 +140,11 @@ const sv = {
       "hitSwap": "{actor} bytte poäng med dig. Kör vidare!",
       "tickerSteal": "{actor} knyckte {amount} poäng från {target}!",
       "tickerSwap": "{actor} bytte poäng med {target}!"
+    },
+    "practice": {
+      "title": "Ord att öva på",
+      "stillIn": "Du är kvar i klassen. Nästa spel tar dig direkt tillbaka.",
+      "close": "Tillbaka till mitt resultat"
     }
   },
   "pricing": {
@@ -13755,6 +13760,24 @@ const sv = {
     }
   },
   "education": {
+    "whatsNew": {
+      "entries": {
+        "sep2026": {
+          "packs": "Färdiga startpaket på spanska, svenska, japanska och ryska.",
+          "reports": "Mer träffsäkra rapporter: gästelever registreras, en returmatch räknar varje elev en gång och slutförda läxor syns.",
+          "rematch": "Returmatch med ett tryck efter en quiz, och spelläget du väljer är alltid det som spelas.",
+          "join": "Enklare att gå med: ett kodfält, en riktig QR-kod, elever som går med tidigt väntar på dig i stället för att få ett fel, och sena elever hamnar direkt på aktuell fråga.",
+          "wordcraft": "Ge Word Craft som läxa. Lektionens ord finns på brädet, och en runda räknas bara när eleven verkligen spelar.",
+          "leaderboard": "En live-topplista på projektorn som sorteras om när elever går om varandra, och varje elev ser var hen ligger.",
+          "chests": "Skattkistor i glosquiz: ett rätt svar öppnar 1 av 3 kistor (vinst, dubbelt, stöld eller byte). På som standard – stäng av i spelinställningarna.",
+          "title": "Klassrumsspelen – ombyggda för mer glädje",
+        },
+      },
+      "close": "Uppfattat",
+      "subtitle": "Varje förbättring av dina klassrumsspel, så fort den släpps.",
+      "title": "Nyheter för lärare",
+      "button": "Nyheter",
+    },
     "subscription": {
       "classLimitReached": "Du har nått gränsen för gratisklasser. Uppgradera till Pro för obegränsat antal klasser.",
     },
@@ -13961,7 +13984,9 @@ const sv = {
       "tie": "Oavgjort",
       "recommended": "Rekommenderas",
       "teacherHint": "Solo mot en snäll bot. Eleverna spelar från klassens sida.",
-      "studentPlay": "Spela WordCraft"
+      "studentPlay": "Spela WordCraft",
+      "needLessonWord": "Bygg minst ett ord från lektionen för att bli klar – eller {count} valfria ord.",
+      "tryAgain": "Försök igen"
     },
     "vocabFocus": {
       "title": "Ordförrådsfokus",

@@ -288,6 +288,8 @@ export const VOCAB_QUIZ_EVENTS = {
   /** Private: tells a student someone stole from / swapped with them. */
   chestHit: 'vocabQuiz:chestHit',
   openChest: 'vocabQuiz:openChest',
+  /** Student → server: my chest reveal has been seen (ends the reveal hold early). */
+  chestSeen: 'vocabQuiz:chestSeen',
 } as const;
 
 /**

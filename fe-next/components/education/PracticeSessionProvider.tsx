@@ -246,6 +246,11 @@ export function PracticeSessionProvider({
               if (typeof data?.session?.xp_awarded === 'number') {
                 setSessionXpEarned(data.session.xp_awarded);
               }
+              // Recorded only as an ATTEMPT (Word Craft below the bar): no XP, and a replay may still finish this session.
+              if (data?.session && data.session.completed_at == null) {
+                setSessionXpEarned(0);
+                completedSessionIdsRef.current.delete(sessionData.sessionId);
+              }
             } else {
               logger.error('Failed to complete practice session on server', {
                 sessionId: sessionData.sessionId,

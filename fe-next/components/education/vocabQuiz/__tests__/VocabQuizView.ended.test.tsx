@@ -152,25 +152,16 @@ describe('VocabQuizView — the quiz ends on a moment', () => {
 
   /**
    * The student's finished screen needs a CTA even when the teacher is in charge.
-   * The primary is "Wait for Teacher" (since the student can't replay alone), and
-   * tertiary is "Practice" as an escape hatch for productive downtime. Both must
-   * fit on screen without scrolling the main content region.
+   * The primary is "Wait for Teacher" (the student can't replay alone). The
+   * practice sheet is covered in VocabQuizView.practice.test.tsx — it opens in
+   * place and only when there is something to practise.
    */
-  it('gives students a "wait for teacher" action and practice escape hatch', () => {
-    const handlePractice = vi.fn();
+  it('gives students a "wait for teacher" action', () => {
     const { socket, server } = makeSocket();
-    render(
-      <VocabQuizView
-        socket={socket}
-        username="bo"
-        t={t}
-        onPractice={handlePractice}
-      />
-    );
+    render(<VocabQuizView socket={socket} username="bo" t={t} />);
     server(VOCAB_QUIZ_EVENTS.ended, ENDED);
 
     expect(screen.getByTestId('wait-for-teacher-message')).toBeInTheDocument();
-    expect(screen.getByTestId('practice-missed-button')).toBeInTheDocument();
   });
 
   it('keeps actions visible without scrolling off-screen on a 390×844 phone', () => {
@@ -178,12 +169,7 @@ describe('VocabQuizView — the quiz ends on a moment', () => {
     // actions are always visible. Measured via scrollHeight vs clientHeight.
     const { socket, server } = makeSocket();
     const { container } = render(
-      <VocabQuizView
-        socket={socket}
-        username="bo"
-        t={t}
-        onPractice={() => {}}
-      />
+      <VocabQuizView socket={socket} username="bo" t={t} />
     );
     server(VOCAB_QUIZ_EVENTS.ended, ENDED);
 

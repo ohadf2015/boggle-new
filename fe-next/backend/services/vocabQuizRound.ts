@@ -24,7 +24,7 @@ import {
   getClassroomGame,
   updateClassroomGameStatus,
 } from '../modules/classroomGameManager.js';
-import { getUsernameBySocketId, transitionGameState } from '../modules/gameStateManager.js';
+import { getGame, getUsernameBySocketId, transitionGameState } from '../modules/gameStateManager.js';
 import { persistClassroomGameScores } from '../handlers/classroomGamePersistence.js';
 import {
   quizStandings,
@@ -91,6 +91,15 @@ export async function finishQuiz(io: Server, gameCode: string): Promise<void> {
 
     await updateClassroomGameStatus(gameCode, 'finished');
 
+    const unrecorded = adoptRoomAccounts(session, gameCode);
+    if (unrecorded.length > 0) {
+      logger.warn(
+        'VOCAB_QUIZ',
+        `Quiz ${gameCode}: ${unrecorded.length} player(s) had no verified account and cannot be recorded: ` +
+          unrecorded.join(', ')
+      );
+    }
+
     const wordsByUser = correctWordsByUser(session);
     const scoreByUser = new Map<string, number>();
     for (const player of session.players.values()) {
@@ -119,6 +128,25 @@ export async function finishQuiz(io: Server, gameCode: string): Promise<void> {
   } catch (err) {
     logger.error('VOCAB_QUIZ', `Failed to persist quiz ${gameCode}: ${(err as Error).message}`);
   }
+}
+
+/**
+ * Fill in each player's account from the ROOM's user map — the same
+ * `users[name].authUserId` the board end path (`playerScoresFromGameResults`)
+ * records by. The quiz enrols players when it starts; a classroom guest whose
+ * socket only re-handshook with its anonymous session after that has the id
+ * in the room but not in the quiz snapshot. Returns who is still account-less
+ * (a pure guest — `practice_sessions.student_id` needs a real user), so the
+ * drop is logged instead of silent.
+ */
+function adoptRoomAccounts(session: VocabQuizSession, gameCode: string): string[] {
+  const users = (getGame(gameCode) as { users?: Record<string, { authUserId?: string | null }> } | undefined)?.users;
+  const unrecorded: string[] = [];
+  for (const player of session.players.values()) {
+    if (!player.userId) player.userId = users?.[player.username]?.authUserId ?? null;
+    if (!player.userId) unrecorded.push(player.username);
+  }
+  return unrecorded;
 }
 
 /** A round nothing will ever advance again — the 250ms ticker is gone. */

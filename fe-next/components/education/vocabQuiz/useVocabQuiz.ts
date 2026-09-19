@@ -74,6 +74,19 @@ export interface VocabQuizClientState {
   chestEvents: TreasureChestState[];
   /** The last steal/swap that landed on this player, if any this question. */
   chestHit: TreasureChestHit | null;
+  /**
+   * Words this viewer got wrong (or never answered) in the CURRENT quiz, read
+   * off each reveal. Feeds the in-place practice sheet; a new quiz (question
+   * index 0) starts a fresh array.
+   */
+  missed: VocabQuizMissedWord[];
+}
+
+export interface VocabQuizMissedWord {
+  index: number;
+  word: string;
+  /** The right answer as the reveal showed it (a definition, a word, …). */
+  meaning: string;
 }
 
 const IDLE: VocabQuizClientState = {
@@ -96,6 +109,7 @@ const IDLE: VocabQuizClientState = {
   myChest: null,
   chestEvents: [],
   chestHit: null,
+  missed: [],
 };
 
 export interface UseVocabQuizResult extends VocabQuizClientState {
@@ -152,6 +166,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         myChest: null,
         chestEvents: [],
         chestHit: null,
+        missed: payload.index === 0 && prev.questionNumber !== 1 ? [] : prev.missed,
       }));
     };
 
@@ -168,6 +183,13 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         secondsLeft: 0,
         fractionLeft: 0,
         lockIn: null,
+        missed:
+          prev.myAnswer?.correct || prev.missed.some((m) => m.index === payload.index)
+            ? prev.missed
+            : [
+                ...prev.missed,
+                { index: payload.index, word: payload.word, meaning: payload.definition ?? payload.answer },
+              ],
       }));
     };
 
@@ -224,7 +246,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
       if (snap.question) anchorClock(snap.question.remainingMs, snap.question.limitMs);
       else deadlineRef.current = null;
 
-      setState({
+      setState((prev) => ({
         phase: snap.phase,
         paused: snap.paused,
         question: snap.question ?? null,
@@ -244,7 +266,9 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         myChest: snap.myChest ?? null,
         chestEvents: [],
         chestHit: null,
-      });
+        // A reconnect keeps what this phone already saw of the current quiz.
+        missed: prev.missed,
+      }));
     };
 
     const onEnded = (payload: VocabQuizEnded) => {

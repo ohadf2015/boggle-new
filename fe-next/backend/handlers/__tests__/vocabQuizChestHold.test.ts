@@ -140,6 +140,40 @@ describe('reveal holds for unopened chests', () => {
     expect(session.index).toBe(1);
   });
 
+  it('ends the hold as soon as every eligible student has picked AND acknowledged their reveal', async () => {
+    const { session, ana } = await startWithBothAnswered();
+    await vi.advanceTimersByTimeAsync(VOCAB_QUIZ_REVEAL_MS + 200);
+    ana.get(VOCAB_QUIZ_EVENTS.openChest)!({ index: 0, chest: 0 });
+    await vi.advanceTimersByTimeAsync(300);
+    expect(session.index).toBe(0); // picked, reveal not seen yet
+    ana.get(VOCAB_QUIZ_EVENTS.chestSeen)!({ index: 0 });
+    await vi.advanceTimersByTimeAsync(300);
+    // Well inside the old 2.5s linger — the room moves on the moment it was seen.
+    expect(session.index).toBe(1);
+  });
+
+  it('a seen-ack for a stale question does not release the current hold', async () => {
+    const { session, ana } = await startWithBothAnswered();
+    await vi.advanceTimersByTimeAsync(VOCAB_QUIZ_REVEAL_MS + 200);
+    ana.get(VOCAB_QUIZ_EVENTS.chestSeen)!({ index: 3 });
+    await vi.advanceTimersByTimeAsync(600);
+    expect(session.index).toBe(0);
+  });
+
+  it('does not wait for a correct answerer who has left the room', async () => {
+    const { session } = await startWithBothAnswered();
+    (gameStateManager.getGame as Mock).mockReturnValue({
+      gameCode: GAME,
+      isClassroom: true,
+      users: {
+        ana: { socketId: 'socket-ana', authUserId: null, isHost: false, isBot: false, disconnected: true },
+        bo: { socketId: 'socket-bo', authUserId: null, isHost: false, isBot: false },
+      },
+    });
+    await vi.advanceTimersByTimeAsync(VOCAB_QUIZ_REVEAL_MS + 400);
+    expect(session.index).toBe(1);
+  });
+
   it('keeps the normal pace when the teacher turned chests off', async () => {
     const { session } = await startWithBothAnswered({ treasureChestsEnabled: false });
     await vi.advanceTimersByTimeAsync(VOCAB_QUIZ_REVEAL_MS + 400);

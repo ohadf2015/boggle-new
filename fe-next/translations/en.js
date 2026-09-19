@@ -140,6 +140,11 @@ const en = {
       "hitSwap": "{actor} swapped scores with you. Keep going!",
       "tickerSteal": "{actor} swiped {amount} points from {target}!",
       "tickerSwap": "{actor} swapped scores with {target}!"
+    },
+    "practice": {
+      "title": "Words to practise",
+      "stillIn": "You're still in the class. The next game brings you straight back.",
+      "close": "Back to my results"
     }
   },
   "report": {
@@ -12051,6 +12056,24 @@ const en = {
     }
   },
   "education": {
+    "whatsNew": {
+      "entries": {
+        "sep2026": {
+          "packs": "Ready-made starter packs in Spanish, Swedish, Japanese and Russian.",
+          "reports": "More accurate reports: guest students are recorded, a rematch counts each student once, and homework completion shows up.",
+          "rematch": "One-tap Rematch after a quiz, and the game mode you pick is always the one that plays.",
+          "join": "Easier joining: one code field, a real QR code, students who join early wait for you instead of seeing an error, and latecomers land on the current question.",
+          "wordcraft": "Assign Word Craft as homework. Lesson words appear on the board, and a round only counts when the student really plays.",
+          "leaderboard": "A live leaderboard on the projector that re-sorts as students overtake each other, and every student sees where they stand.",
+          "chests": "Chest rewards in vocab quizzes: a right answer opens 1 of 3 chests (gain, double, steal or swap). On by default; turn it off in game settings.",
+          "title": "Classroom games, rebuilt for fun",
+        },
+      },
+      "close": "Got it",
+      "subtitle": "Every improvement to your classroom games, as it ships.",
+      "title": "What's new for teachers",
+      "button": "What's new",
+    },
     "subscription": {
       "classLimitReached": "You've reached the free class limit. Upgrade to Pro for unlimited classes.",
     },
@@ -12257,7 +12280,9 @@ const en = {
       "tie": "Tie",
       "recommended": "Recommended",
       "teacherHint": "Solo vs a friendly bot. Students play it from their class page.",
-      "studentPlay": "Play WordCraft"
+      "studentPlay": "Play WordCraft",
+      "needLessonWord": "Build at least one lesson word to finish — or any {count} words.",
+      "tryAgain": "Try again"
     },
     "vocabFocus": {
       "title": "Vocabulary focus",

@@ -20,11 +20,13 @@ import { z } from 'zod';
 
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager.js';
 import { getQuizSession } from '../modules/vocabQuizStore.js';
-import { lingerForChestReveal, resolveChestResult } from '../services/treasureChestResolver.js';
+import { markChestOpened, markChestSeen, resolveChestResult } from '../services/treasureChestResolver.js';
 import { VOCAB_QUIZ_EVENTS, type TreasureChestHit, type TreasureChestState } from '@/shared/types/vocabQuiz';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
+
+const chestSeenSchema = z.object({ index: z.number().int().min(0).max(200) });
 
 const openChestSchema = z.object({
   index: z.number().int().min(0).max(200),
@@ -42,6 +44,17 @@ function publicPayload(result: TreasureChestState): TreasureChestState {
 }
 
 export function registerTreasureChestHandlers(io: Server, socket: Socket): void {
+  // The phone dismissed its chest reveal: the reveal hold may end early.
+  socket.on(VOCAB_QUIZ_EVENTS.chestSeen, (data: unknown) => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
+    const parsed = chestSeenSchema.safeParse(data);
+    if (!gameCode || !username || !parsed.success) return;
+    const session = getQuizSession(gameCode);
+    if (session) markChestSeen(session, parsed.data.index, username);
+  });
+
   socket.on(VOCAB_QUIZ_EVENTS.openChest, (data: unknown) => {
     if (!checkRateLimit(socket.id)) return;
 
@@ -81,7 +94,7 @@ export function registerTreasureChestHandlers(io: Server, socket: Socket): void 
       answerPoints: playerAnswer.points,
     });
     session.chestResults.set(chestKey, result);
-    lingerForChestReveal(session, Date.now());
+    markChestOpened(session, username, Date.now());
 
     socket.emit(VOCAB_QUIZ_EVENTS.treasureChestResult, result);
     broadcastToRoom(io, getGameRoom(gameCode), VOCAB_QUIZ_EVENTS.treasureChestEvent, publicPayload(result));

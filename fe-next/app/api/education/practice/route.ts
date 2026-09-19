@@ -11,6 +11,7 @@ import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 import { canStudentPracticeLesson } from '@/lib/education/lessonAccess';
 import { WORDCRAFT_SESSION_MODE } from '@/lib/education/wordcraftAssignment';
 import { findSatisfiedAssignment, stampAssignmentCompletion } from '@/lib/education/assignmentCompletion';
+import { gateWordCraftCompletion } from '@/lib/education/wordcraftCompletionGate';
 
 function tooManyRequests(retryAfter: number | undefined) {
   return NextResponse.json(
@@ -308,7 +309,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { sessionId, completed, ...updateData } = parseResult.data;
+    const { sessionId, completed: completionRequested, ...updateData } = parseResult.data;
 
     // Verify user owns the session + idempotency guard.
     // PERF: the extra columns are exactly the ones the completion path needs to
@@ -356,6 +357,12 @@ export async function PATCH(request: NextRequest) {
     if (updateData.accuracy !== undefined) updateObj.accuracy = updateData.accuracy;
     if (updateData.maxCombo !== undefined) updateObj.max_combo = updateData.maxCombo;
     if (updateData.timeSpentSeconds !== undefined) updateObj.time_spent_seconds = updateData.timeSpentSeconds;
+    // Word Craft homework: below the bar = attempted (no completed_at/XP/stamp) — decided here, never by the client.
+    const gate = await gateWordCraftCompletion(existing.mode === WORDCRAFT_SESSION_MODE && completionRequested ? createAdminClient() : null,
+      { requested: completionRequested, sessionMode: existing.mode, lessonId: existing.lesson_id, ...updateData });
+    const completed = gate.completed;
+    if (gate.vocabularyWordsFound) updateObj.vocabulary_words_found = gate.vocabularyWordsFound;
+    if (gate.results) updateObj.results = gate.results;
     if (completed) updateObj.completed_at = new Date().toISOString();
 
     // Server-side XP recalculation (H3 fix: never trust client-supplied xpAwarded).

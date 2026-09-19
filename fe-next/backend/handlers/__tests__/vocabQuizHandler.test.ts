@@ -38,6 +38,7 @@ import * as classroomGameManager from '../../modules/classroomGameManager';
 import * as gameStateManager from '../../modules/gameStateManager';
 import * as lessonWords from '../../services/vocabQuizLessonWords';
 import * as persistence from '../classroomGamePersistence';
+import logger from '../../utils/logger';
 import {
   startVocabQuizForClassroom,
   registerVocabQuizHandlers,
@@ -383,6 +384,37 @@ describe('end of round persistence', () => {
 
     expect(emit.mock.calls.some((c) => c[0] === VOCAB_QUIZ_EVENTS.ended)).toBe(true);
     expect(emit.mock.calls.some((c) => c[0] === 'classroomGameEnded')).toBe(true);
+  });
+
+  it('records a guest whose account reached the room AFTER the quiz enrolled them, and says who it could not record', async () => {
+    // The classroom guest's socket connects tokenless, then re-handshakes once
+    // its anonymous session lands. The room's user map learns the verified id;
+    // the quiz enrolled the guest before that. The end path must read the same
+    // room user map the board path does, not only the snapshot taken at start.
+    (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(
+      classroomGame('vocab-quiz', { vocabQuizQuestionCount: 1, vocabQuizSeconds: 5, treasureChestsEnabled: false })
+    );
+    const guests = () => ({
+      ...roomState(),
+      users: {
+        ...roomState().users,
+        eve: { socketId: 'socket-eve', authUserId: null, isHost: false, isBot: false },
+        zed: { socketId: 'socket-zed', authUserId: null, isHost: false, isBot: false },
+      },
+    });
+    (gameStateManager.getGame as Mock).mockReturnValue(guests());
+    const { io } = makeIo();
+    await startVocabQuizForClassroom(io, GAME_CODE);
+
+    const upgraded = guests();
+    upgraded.users.eve = { ...upgraded.users.eve, authUserId: 'user-eve' };
+    (gameStateManager.getGame as Mock).mockReturnValue(upgraded);
+    await vi.advanceTimersByTimeAsync(60_000);
+
+    const [, playerScores] = (persistence.persistClassroomGameScores as Mock).mock.calls[0];
+    expect(playerScores.map((p: { userId: string }) => p.userId).sort()).toEqual(['user-ana', 'user-bo', 'user-eve']);
+    const warned = (logger.warn as Mock).mock.calls.map((c) => String(c[1])).join('\n');
+    expect(warned).toMatch(/zed/);
   });
 
   it('tells persistence which words it asked, so unasked words are not reported as missed', async () => {

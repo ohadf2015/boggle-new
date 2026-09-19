@@ -3,7 +3,8 @@
  *
  * 1. Correct answer → `chestPending` → three chests.
  * 2. Tap → emit `openChest {index, chest}` → every chest locks (single choice).
- * 3. Private `treasureChestResult` → reveal overlay, auto-dismissed.
+ * 3. Private `treasureChestResult` → reveal overlay, auto-dismissed; the
+ *    dismissal acks `chestSeen` so the server can end the reveal hold early.
  * 4. A steal/swap landing on this student → kind banner, non-blocking.
  *
  * Every number comes from the server; this component only sequences them.
@@ -14,6 +15,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import {
+  VOCAB_QUIZ_CHEST_REVEAL_BEAT_MS,
   VOCAB_QUIZ_EVENTS,
   type TranslateFn,
   type TreasureChestHit,
@@ -34,7 +36,8 @@ export interface VocabQuizChestFlowProps {
   t: TranslateFn;
 }
 
-const REVEAL_MS = 3200;
+/** Matches the server's fallback beat, so an un-tapped reveal acks as it ends. */
+const REVEAL_MS = VOCAB_QUIZ_CHEST_REVEAL_BEAT_MS;
 const HIT_BANNER_MS = 4000;
 
 export function VocabQuizChestFlow({
@@ -67,7 +70,12 @@ export function VocabQuizChestFlow({
     [socket, pickedChest, questionIndex]
   );
 
-  const dismissReveal = useCallback(() => setDismissedQ(questionIndex), [questionIndex]);
+  // Dismissing is the "seen" signal: the server ends the reveal hold as soon
+  // as every eligible student has looked, instead of waiting out a fixed beat.
+  const dismissReveal = useCallback(() => {
+    setDismissedQ(questionIndex);
+    socket?.emit(VOCAB_QUIZ_EVENTS.chestSeen, { index: questionIndex });
+  }, [socket, questionIndex]);
 
   useEffect(() => {
     if (!showReveal) return;

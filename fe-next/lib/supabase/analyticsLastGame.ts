@@ -235,7 +235,10 @@ export async function getRecentClassroomGames(
         if (byGame.size >= limit) continue;
         byGame.set(code, []);
       }
-      byGame.get(code)!.push(row);
+      const game = byGame.get(code)!;
+      // A Rematch reuses the room code: rows are newest-first, so the first row
+      // per student is their latest round — older rounds must not double-count.
+      if (!game.some((r) => r.student_id === row.student_id)) game.push(row);
     }
 
     const playedIds = [...new Set([...byGame.values()].flat().map((r) => r.student_id))];

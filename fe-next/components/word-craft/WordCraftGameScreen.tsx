@@ -117,13 +117,15 @@ interface GameViewProps {
   difficulty: BotDifficulty;
   /** Player-picked twist from the setup screen; undefined = seeded surprise roll. */
   modifierOverride?: WordCraftModifier;
+  /** Classroom homework: dealt in the lesson's locale with its words seeded; Back/Home return to the lesson. */
+  lesson?: { locale: SupportedLocale; targets: readonly string[]; onExit: () => void };
 }
 
-export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, difficulty, modifierOverride }: GameViewProps) {
+export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, difficulty, modifierOverride, lesson }: GameViewProps) {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { loading: authLoading, profile } = useAuth();
-  const isRTL = language === 'he';
+  const isRTL = (lesson?.locale ?? language) === 'he'; // the board reads in the DEALT language's direction
 
   // Identity embedded in outgoing duel invites — sourced from the auth profile
   // (display name + avatar), not the legacy unset localStorage key.
@@ -131,7 +133,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
     () => resolveChallengerIdentity(profile, t('wordcraft.duel.unnamedChallenger')),
     [profile, t],
   );
-  const locale = (language ?? 'en') as SupportedLocale;
+  const locale = lesson?.locale ?? ((language ?? 'en') as SupportedLocale);
+  const exit = lesson?.onExit ?? (() => router.push(`/${language}`));
 
   // Bottom-nav hiding lives in the page-level phase switcher (PageClient) so
   // it covers the setup phase too and START's remount can't flicker it.
@@ -180,6 +183,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
     // modifier from the shared seed.
     modifierOverride: duel ? undefined : modifierOverride,
     forcedDims,
+    lessonTargets: lesson?.targets,
   });
   const { cosyMode } = useAccessibility();
   const prefersReducedMotion = useReducedMotion();
@@ -899,7 +903,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
       <main data-wc-main className="flex-1 min-h-0 px-3 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
         {/* Topbar: back · title · play-friend · How to play · loading (public — no beta badge) */}
         <div className="relative flex items-center gap-2 shrink-0">
-          <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} aria-label={t('common.back')} className="shrink-0 h-8 px-2">
+          <Button variant="outline" size="sm" onClick={exit} aria-label={t('common.back')} className="shrink-0 h-8 px-2">
             <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
           </Button>
           {/* Logo badge + visual title removed for a lighter HUD — the board IS
@@ -1265,7 +1269,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           currentDifficulty={effectiveDifficulty}
           challengeIntent={challengeIntent}
           onPlayAgain={() => game.reset(Math.floor(Math.random() * 1_000_000))}
-          onHome={() => router.push(`/${language}`)}
+          onHome={exit}
         />
       ) : null}
 

@@ -63,6 +63,21 @@ describe('VocabQuizChestFlow', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('tells the server my reveal was seen when I tap it away, so the room need not wait', () => {
+    const { socket } = renderFlow({ myChest: mine });
+    fireEvent.click(screen.getByRole('dialog'));
+    expect(socket.emit).toHaveBeenCalledWith(VOCAB_QUIZ_EVENTS.chestSeen, { index: 2 });
+  });
+
+  it('acks the reveal once when it auto-dismisses', () => {
+    const { socket } = renderFlow({ myChest: mine });
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    const acks = socket.emit.mock.calls.filter(([e]) => e === VOCAB_QUIZ_EVENTS.chestSeen);
+    expect(acks).toEqual([[VOCAB_QUIZ_EVENTS.chestSeen, { index: 2 }]]);
+  });
+
   it('never shows another student\'s chest as mine', () => {
     renderFlow({ myChest: { ...mine, actor: 'ben' }, chestPending: false });
     expect(screen.queryByRole('dialog')).toBeNull();

@@ -69,6 +69,24 @@ describe('reopenClassroomGameForRound', () => {
     mockRedis.sadd.mockResolvedValue(1);
   });
 
+  it('hands the next round its own once-per-round persistence key (a Rematch was never recorded)', async () => {
+    // GIVEN round one finished and its results took `classroom_game_persisted:<code>`
+    mockRedis.get.mockResolvedValue(record('finished'));
+    mockRedis.del.mockResolvedValue(1);
+
+    // WHEN the teacher's Rematch starts round two in the same room
+    await reopenClassroomGameForRound(CODE);
+
+    // THEN round two's end can write its own results instead of "already persisted"
+    expect(mockRedis.del).toHaveBeenCalledWith(`classroom_game_persisted:${CODE}`);
+  });
+
+  it('leaves the key alone for a round that is already live (a duplicate end must still be refused)', async () => {
+    mockRedis.get.mockResolvedValue(record('playing'));
+    await reopenClassroomGameForRound(CODE);
+    expect(mockRedis.del).not.toHaveBeenCalled();
+  });
+
   it('flips a finished game back to playing', async () => {
     // GIVEN the code of a game whose first round ended
     mockRedis.get.mockResolvedValue(record('finished'));
