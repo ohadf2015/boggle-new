@@ -56,13 +56,13 @@ const richLesson: VocabularyWord[] = [
 ];
 
 describe('buildPracticeTiles', () => {
-  it('offers one tile per base practice mode plus Word Tower plus one per vocabulary skill plus one per produce cue', () => {
+  it('offers one tile per base practice mode plus Word Tower and Word Craft plus one per vocabulary skill plus one per produce cue', () => {
     const tiles = buildPracticeTiles(richLesson, { language: 'en' });
-    // The +1 is Word Tower: a variant of solo_board rather than a base mode of
-    // its own, so it is not in BASE_PRACTICE_MODES. PRODUCE_FOCUSES are the
+    // The +2 is Word Tower and Word Craft: variants of solo_board rather than
+    // base modes of their own, so they are not in BASE_PRACTICE_MODES. PRODUCE_FOCUSES are the
     // Word Forge tiles — variants of vocab_focus, likewise not base modes.
     expect(tiles).toHaveLength(
-      BASE_PRACTICE_MODES.length + 1 + VOCAB_FOCUSES.length + PRODUCE_FOCUSES.length
+      BASE_PRACTICE_MODES.length + 2 + VOCAB_FOCUSES.length + PRODUCE_FOCUSES.length
     );
     expect(new Set(tiles.map((t) => t.id)).size).toBe(tiles.length);
   });

@@ -25,6 +25,7 @@ import {
   buildPracticeTiles,
   nextReadyTile,
   WORD_TOWER_TILE_ID,
+  WORD_CRAFT_TILE_ID,
   type PracticeTile,
   type PracticeVariant,
 } from '@/lib/education/practicePicker';
@@ -243,7 +244,9 @@ export default function PracticeContent({
   /** The tile currently on screen, so the round-end knows what "next" means. */
   const currentTileId = selectedVariant === 'word_tower'
     ? WORD_TOWER_TILE_ID
-    : selectedMode === 'vocab_focus' && selectedFocus
+    : selectedVariant === 'word_craft'
+      ? WORD_CRAFT_TILE_ID
+      : selectedMode === 'vocab_focus' && selectedFocus
       ? `vocab_focus:${selectedFocus}`
       : selectedMode ?? '';
   const nextTile: PracticeTile | null = roundFinished ? nextReadyTile(tiles, currentTileId) : null;

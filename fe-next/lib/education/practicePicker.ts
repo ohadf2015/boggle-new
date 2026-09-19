@@ -7,6 +7,7 @@
  * Counts come straight from the question builder so a badge can never promise
  * questions the drill will not produce.
  */
+import { lessonTargets } from '@/lib/word-craft/lesson';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { Language } from '@/shared/types/game';
 import type { PracticeType } from '@/hooks/usePracticeSession';
@@ -31,6 +32,13 @@ export type BasePracticeMode = Exclude<PracticeType, 'vocab_focus'>;
 export const WORD_TOWER_TILE_ID = 'word_tower';
 
 /**
+ * Word Craft — the territory board game vs an easy bot, with the lesson's
+ * words steering the student's rack. Also a `solo_board` variant, for the same
+ * CHECK-constraint reason as Word Tower.
+ */
+export const WORD_CRAFT_TILE_ID = 'word_craft';
+
+/**
  * The Word Forge tiles' id prefix — `produce:<cue>`.
  *
  * Same reasoning as Word Tower above: producing a word is a VARIANT of
@@ -42,7 +50,7 @@ export const WORD_TOWER_TILE_ID = 'word_tower';
 export const PRODUCE_TILE_PREFIX = 'produce:';
 
 /** Distinguishes tiles that share a `mode` but open different screens. */
-export type PracticeVariant = 'word_tower' | 'produce';
+export type PracticeVariant = 'word_tower' | 'word_craft' | 'produce';
 
 /** Board and drill modes, in the order they appear in the grid. */
 export const BASE_PRACTICE_MODES: readonly BasePracticeMode[] = [
@@ -217,6 +225,22 @@ export function buildPracticeTiles(
     ...(towerReady ? {} : { lockedKey: `education.practicePicker.locked.${WORD_TOWER_TILE_ID}` }),
   };
 
+  // Word Craft: ready as soon as one lesson word fits a rack in a language
+  // Word Craft has tiles for. Locked (not hidden) otherwise, like Word Tower.
+  const craftCount = lessonTargets(lessonWords, language).length;
+  const craftTile: PracticeTile = {
+    id: WORD_CRAFT_TILE_ID,
+    mode: 'solo_board',
+    variant: 'word_craft',
+    titleKey: `education.practicePicker.name.${WORD_CRAFT_TILE_ID}`,
+    skillKey: `education.practicePicker.skill.${WORD_CRAFT_TILE_ID}`,
+    ready: craftCount > 0,
+    count: craftCount,
+    countKind: 'words',
+    sessions: 0,
+    ...(craftCount > 0 ? {} : { lockedKey: `education.practicePicker.locked.${WORD_CRAFT_TILE_ID}` }),
+  };
+
   const counts = focusQuestionCounts(words, {
     language: options.language,
     seed: options.seed ?? PICKER_SEED,
@@ -265,7 +289,7 @@ export function buildPracticeTiles(
     };
   });
 
-  return [...baseTiles, towerTile, ...focusTiles, ...produceTiles];
+  return [...baseTiles, towerTile, craftTile, ...focusTiles, ...produceTiles];
 }
 
 /** The playable tiles, in picker order. */

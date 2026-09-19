@@ -15,9 +15,9 @@
  * at the bottom of the viewport, so the two halves of the same decision lived
  * 400px apart and one of them was routinely off-screen on a phone.
  *
- * Word Tower is the one special case. It records as `solo_board` (there is no
- * `word_tower` value in the practice_type CHECK constraint), so the variant is
- * what decides which of the two screens opens.
+ * Word Tower and Word Craft are the special cases. Both record as `solo_board`
+ * (the practice_type CHECK constraint has no value for either), so the variant
+ * is what decides which screen opens.
  */
 
 import {
@@ -31,6 +31,7 @@ import {
   VocabFocusPractice,
 } from '@/components/practice';
 import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
+import WordCraftPractice from '@/components/education/practicePicker/WordCraftPractice';
 import { availableFocuses, type VocabFocus } from '@/lib/education/vocabFocus';
 import { ProducePractice } from '@/components/practice/ProducePractice';
 import { PRODUCE_FOCUSES, type ProduceFocus } from '@/lib/education/produceQuestions';
@@ -104,6 +105,23 @@ export default function PracticeModeStage({
       );
 
     case 'solo_board':
+      if (variant === 'word_craft') {
+        return (
+          <WordCraftPractice
+            words={words.map((entry) => entry.word)}
+            language={language}
+            onComplete={async (results) => {
+              // Holds the screen with its own completion moment, like Word Tower.
+              await onFinish('solo_board', {
+                vocabularyWordsFound: results.vocabularyWordsFound,
+                newWordsFound: [],
+              });
+            }}
+            onBack={onBack}
+            {...forward}
+          />
+        );
+      }
       if (variant === 'word_tower') {
         return (
           <WordTowerPractice
