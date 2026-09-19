@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ZOOM_FEEL, boardFilter, computeAutoZoomScale } from '../zoomFeel';
+import { ZOOM_FEEL, boardFilter, computeAutoZoomScale, shouldAutoZoom } from '../zoomFeel';
 
 /** Old (heavy) curve, kept here purely as a regression baseline to compare against. */
 function oldAutoZoomScale(boxFrac: number): number {
@@ -62,5 +62,20 @@ describe('zoomFeel — lighter camera', () => {
     expect(ZOOM_FEEL.minScale).toBe(1);
     expect(computeAutoZoomScale(0)).toBe(ZOOM_FEEL.maxScale); // degenerate box → ceiling
     expect(computeAutoZoomScale(1)).toBe(ZOOM_FEEL.minScale); // box fills board → no zoom
+  });
+});
+
+describe('shouldAutoZoom', () => {
+  it('Given cells already big enough to tap, Then the board is NOT auto-zoomed (zoom cropped a readable board)', () => {
+    expect(shouldAutoZoom(34)).toBe(false);
+    expect(shouldAutoZoom(48)).toBe(false);
+  });
+
+  it('Given small cells, Then auto-zoom still helps', () => {
+    expect(shouldAutoZoom(22)).toBe(true);
+  });
+
+  it('Given an unmeasured board (0px), Then it falls back to zooming', () => {
+    expect(shouldAutoZoom(0)).toBe(true);
   });
 });

@@ -5,6 +5,9 @@ import {
   nextEmptyAlongAxis,
   resolveTap,
   resolveDrag,
+  preferredAxis,
+  clueAnchors,
+  centerOpeningMove,
   type Axis,
 } from '../placement';
 import type { PlacedTile, RackTile } from '../types';
@@ -244,5 +247,75 @@ describe('resolveDrag', () => {
       board,
     );
     expect('placement' in result).toBe(true);
+  });
+});
+
+describe('preferredAxis (direction for tap-to-build after the first tile, replaces the Across/Down chip)', () => {
+  it('Given a lone tile with no neighbours, Then it defaults to across', () => {
+    const board = createBoard(11);
+    expect(preferredAxis(board, p(5, 5))).toBe('h');
+  });
+
+  it('Given the tile sits directly under a board letter, Then it continues down', () => {
+    const board = createBoard(11);
+    placeTiles(board, [p(4, 5, 'C')]);
+    expect(preferredAxis(board, p(5, 5))).toBe('v');
+  });
+
+  it('Given the tile sits right of a board letter, Then it continues across', () => {
+    const board = createBoard(11);
+    placeTiles(board, [p(5, 4, 'C')]);
+    expect(preferredAxis(board, p(5, 5))).toBe('h');
+  });
+
+  it('Given letters on both axes, Then horizontal neighbours win the tie', () => {
+    const board = createBoard(11);
+    placeTiles(board, [p(5, 4, 'C'), p(5, 6, 'T'), p(4, 5, 'X')]);
+    expect(preferredAxis(board, p(5, 5))).toBe('h');
+  });
+});
+
+describe('clueAnchors (existing board letters a suggested word hooks onto)', () => {
+  it('Given a word built through a board letter, Then that letter is the anchor', () => {
+    const board = createBoard(11);
+    placeTiles(board, [p(5, 5, 'A')]);
+    const anchors = clueAnchors(board, [p(5, 4, 'C'), p(5, 6, 'T')], [
+      { row: 5, col: 4 },
+      { row: 5, col: 5 },
+      { row: 5, col: 6 },
+    ]);
+    expect(anchors).toEqual([{ row: 5, col: 5, letter: 'A' }]);
+  });
+
+  it('Given a word on empty cells only, Then there are no anchors', () => {
+    const board = createBoard(11);
+    expect(clueAnchors(board, [p(5, 4, 'C')], [{ row: 5, col: 4 }])).toEqual([]);
+  });
+});
+
+describe('centerOpeningMove (opening word starts on the centre cell, where auto-centre drops the first tile)', () => {
+  it('Given an opening move in the corner, Then it is shifted so its first tile sits on the centre, same direction', () => {
+    const board = createBoard(11);
+    const moved = centerOpeningMove(board, [p(0, 0, 'C'), p(0, 1, 'A'), p(0, 2, 'T')]);
+    expect(moved.map((t) => [t.row, t.col, t.letter])).toEqual([
+      [5, 5, 'C'],
+      [5, 6, 'A'],
+      [5, 7, 'T'],
+    ]);
+  });
+
+  it('Given a board that already has tiles, Then placements are untouched', () => {
+    const board = createBoard(11);
+    placeTiles(board, [p(2, 2, 'X')]);
+    const orig = [p(2, 3, 'A')];
+    expect(centerOpeningMove(board, orig)).toBe(orig);
+  });
+
+  it('Given a long word that would overflow from the centre, Then it is pulled back inside the board', () => {
+    const board = createBoard(11);
+    const word = [0, 1, 2, 3, 4, 5, 6].map((c) => p(0, c, 'A'));
+    const moved = centerOpeningMove(board, word);
+    expect(Math.max(...moved.map((t) => t.col))).toBe(10);
+    expect(moved.every((t) => t.row === 5)).toBe(true);
   });
 });

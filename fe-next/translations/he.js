@@ -13401,6 +13401,10 @@ const he = {
       "wheelRush": "לבנות מילים מגלגל אותיות אחד",
       "vocabQuiz": "שאלות אמריקאיות מנתוני המילים שלכם"
     },
+    "wordCraftPractice": {
+      "hit": "מילה מהשיעור: {{word}}!",
+      "progress": "{{found}} מתוך {{total}} מילים מהרשימה"
+    },
     "wordTowerPractice": {
       "unavailable": "המילים בשיעור הזה עדיין לא בונות מגדל. צריך לפחות 4 מילים באורך 4 עד 6 אותיות.",
       "done": "סיימתי",
@@ -13410,7 +13414,8 @@ const he = {
     },
     "practicePicker": {
       "name": {
-        "word_tower": "מגדל מילים"
+        "word_tower": "מגדל מילים",
+        "word_craft": "WordCraft"
       },
       "title": "בחרו תרגול",
       "readyCount": "{{ready}} מתוך {{total}} מוכנים למשחק",
@@ -13423,6 +13428,7 @@ const he = {
       "allModes": "כל המשחקים",
       "skill": {
         "word_tower": "בנו מילים מהאותיות של הרשימה השבועית",
+        "word_craft": "כבשו את הלוח עם המילים של השבוע",
         "solo_board": "מוצאים את מילות השיעור בלוח האותיות",
         "warmup": "סיבוב לוח קצר לחימום",
         "blitz": "כמה מילים תספיקו לפני שהזמן נגמר",
@@ -13445,6 +13451,7 @@ const he = {
       },
       "locked": {
         "word_tower": "צריך 4 מילים לפחות מהרשימה, באורך 4–6 אותיות",
+        "word_craft": "צריך מילה מהרשימה באורך 2–7 אותיות",
         "solo_board": "הוסיפו מילים לשיעור כדי לפתוח",
         "warmup": "הוסיפו מילים לשיעור כדי לפתוח",
         "blitz": "הוסיפו מילים לשיעור כדי לפתוח",
@@ -16846,6 +16853,17 @@ const he = {
     "tied": "תיקו",
     "yourTurn": "התור שלך",
     "botTurn": "WordBot חושב…",
+    "surprise": {
+      "title": "הפתעה!",
+      "otherTitle": "{{name}} תפס קופסה!",
+      "paint": "התזת צבע: ‎+{{count}} משבצות",
+      "mega": "התזת מגה: ‎+{{count}} משבצות",
+      "steal": "שוד: {{count}} אריחים נגנבו",
+      "clue": "רמז חינם נפתח"
+    },
+    "botSkipped": "{name} מדלג — תור בונוס בשבילך!",
+    "botSwapped": "{name} החליף אותיות",
+    "botPassed": "{name} ויתר על התור",
     "player1": "שחקן 1",
     "player2": "שחקן 2",
     "player1Turn": "תור שחקן 1",
@@ -16872,6 +16890,7 @@ const he = {
     "clue": {
       "button": "רמז",
       "reveal": "נסה: {{word}}",
+      "revealAnchor": "נסה {{word}} — חבר אותה ל-{{letter}}",
       "none": "לא נמצא מהלך — נסה להחליף",
       "granted": "‎+1 רמז!",
       "adFailed": "הפרסומת לא זמינה — נסה שוב"

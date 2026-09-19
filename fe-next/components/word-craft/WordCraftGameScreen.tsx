@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
+import { useWordCraftGame, type WordCraftClue } from '@/lib/word-craft/useWordCraftGame';
 import { useAdMob } from '@/hooks/useAdMob';
 import { isNative } from '@/utils/platform';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
@@ -24,7 +24,6 @@ import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
 import { WordCraftComboBadge } from '@/components/word-craft/WordCraftComboBadge';
 import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
-import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
 import { WordCraftHandoff } from '@/components/word-craft/WordCraftHandoff';
@@ -42,17 +41,18 @@ import { useWordCraftSound } from '@/components/word-craft/useWordCraftSound';
 import { recordBest } from '@/lib/word-craft/bestScore';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
+import { WordCraftEventToast } from '@/components/word-craft/WordCraftEventToast';
+import { useWordCraftEventToasts } from '@/components/word-craft/useWordCraftEventToasts';
+import { wordCraftErrorText } from '@/components/word-craft/wordCraftErrorText';
 import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
 import { playGameOverBurst } from '@/lib/word-craft/pixi/scenes/gameOverBurst';
 import { shouldCelebrateEnding } from '@/lib/word-craft/celebration/endingCelebration';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { inferAxis, resolveTap, type Axis } from '@/lib/word-craft/placement';
+import { inferAxis, preferredAxis, resolveTap } from '@/lib/word-craft/placement';
 import { resolveScoreboardOpponent } from '@/lib/word-craft/opponentIdentity';
 import { alphabetForLocale } from '@/lib/word-craft/wordCraftAlphabet';
 import { isUnassignedBlank } from '@/lib/word-craft/blankAssign';
 import { WordCraftBlankPicker } from '@/components/word-craft/WordCraftBlankPicker';
-import { WordCraftAxisChip } from '@/components/word-craft/WordCraftAxisChip';
-import { WordCraftPlacementGuide } from '@/components/word-craft/WordCraftPlacementGuide';
 import { WordCraftStepHint } from '@/components/word-craft/WordCraftStepHint';
 import { resolveWordCraftStep } from '@/lib/word-craft/stepHint';
 import { WordCraftModifierChip } from '@/components/word-craft/WordCraftModifierChip';
@@ -300,18 +300,6 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
     return (tileId: string) => isGoldenTile(seed, tileId);
   }, [game.state.modifier, game.state.seed]);
 
-  // Player-chosen direction for building a word, honored before a 2nd tile
-  // locks the line. Default 'across'. Persistent so the player can pre-pick the
-  // orientation and keep tapping rack letters without dragging.
-  const [chosenAxis, setChosenAxis] = useState<Axis>('h');
-  // The axis actually in effect: a committed 2+ tile line wins; otherwise the
-  // player's pick. Never null, so the toggle is always meaningful.
-  const effectiveAxis: Axis = axis ?? chosenAxis;
-  const flipAxis = useCallback(() => {
-    // A locked line can't be re-oriented mid-word; only flip the free pick.
-    if (axis) return;
-    setChosenAxis((a) => (a === 'v' ? 'h' : 'v'));
-  }, [axis]);
 
   // Scoreboard opponent identity. In a duel the friend's name + avatar own the
   // slot (the score is their target); otherwise the on-board bot, with a seeded
@@ -377,7 +365,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
     (tile: { id: string }) => {
       const rackTile = game.activePlayer.rack.find((t) => t.id === tile.id);
       if (!rackTile) return;
-      const result = resolveTap(rackTile, game.state.pendingPlacements, game.state.board, chosenAxis);
+      const lone = game.state.pendingPlacements.length === 1 ? game.state.pendingPlacements[0] : null;
+      const result = resolveTap(rackTile, game.state.pendingPlacements, game.state.board, lone ? preferredAxis(game.state.board, lone) : 'h');
       if ('placement' in result) {
         inputCountsRef.current.fastTap += 1;
         trackWordCraftFastTapUsed({
@@ -392,18 +381,10 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
         game.placeTileOnBoard(rackTile.id, result.placement.row, result.placement.col);
       }
     },
-    [game, juice, chosenAxis],
+    [game, juice],
   );
 
-  // Wrap raw recall handlers so the strip / board cells share the same
-  // telemetry surface but the analytics can disambiguate the source.
-  const recallFromStrip = useCallback(
-    (rackTileId: string) => {
-      trackWordCraftPendingRecall({ turnId: turnIdRef.current, source: 'strip' });
-      game.recallTile(rackTileId);
-    },
-    [game],
-  );
+  // Recall handlers share one telemetry surface (source disambiguates).
   const recallFromBoard = useCallback(
     (rackTileId: string) => {
       trackWordCraftPendingRecall({ turnId: turnIdRef.current, source: 'board' });
@@ -457,47 +438,68 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // only — on web we free-grant so there's never a dead button). A clue reveals
   // the strongest word the player could play, shown as a transient pill.
   const { showRewarded } = useAdMob();
-  const [clueReveal, setClueReveal] = useState<{ word: string; row: number; col: number } | null>(null);
-  const [clueMessage, setClueMessage] = useState<string | null>(null);
-  const clueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Turn-event banner: bot skip/swap/pass, surprise reveals, clue text.
+  const { toast: eventToast, show: setEventToast } = useWordCraftEventToasts(game.state, t);
+
+  // Surprise-box reveal sparkle (the toast text comes from the shared hook).
+  const lastSurprise = game.state.lastSurprise;
+  useEffect(() => {
+    if (!lastSurprise || cosyMode || prefersReducedMotion) return;
+    requestAnimationFrame(() => {
+      const cell = document.querySelector(`[data-board-cell="${lastSurprise.row},${lastSurprise.col}"]`);
+      if (cell) juice.jokerSparkle(cell as Element);
+    });
+  }, [lastSurprise, cosyMode, prefersReducedMotion, juice]);
+
+  // Active clue: its path stays marked on the board until the player's turn
+  // ends; the text rides the overlay toast so the board never shrinks for it.
+  const [clueReveal, setClueReveal] = useState<WordCraftClue | null>(null);
+  const clueToast = useCallback(
+    (text: string) => setEventToast({ key: Date.now(), tone: 'player', text, ms: 4500 }),
+    [setEventToast],
+  );
   const showClue = useCallback(
-    (clue: { word: string; row: number; col: number } | null, message?: string) => {
-      if (clueTimerRef.current) clearTimeout(clueTimerRef.current);
+    (clue: WordCraftClue) => {
       setClueReveal(clue);
-      setClueMessage(message ?? null);
-      // Sparkle the suggested start cell so the eye is drawn to where to begin.
-      if (clue && !cosyMode && !prefersReducedMotion) {
+      const anchor = clue.anchors[0];
+      clueToast(
+        anchor
+          ? t('wordcraft.clue.revealAnchor', { word: clue.word, letter: anchor.letter })
+          : t('wordcraft.clue.reveal', { word: clue.word }),
+      );
+      // Sparkle the first cell so the eye is drawn to where to begin.
+      if (!cosyMode && !prefersReducedMotion) {
         requestAnimationFrame(() => {
           const cell = document.querySelector(`[data-board-cell="${clue.row},${clue.col}"]`);
           if (cell) juice.jokerSparkle(cell as Element);
         });
       }
-      // Auto-dismiss after a few seconds so it doesn't obscure the board.
-      clueTimerRef.current = setTimeout(() => { setClueReveal(null); setClueMessage(null); }, 6000);
     },
-    [cosyMode, prefersReducedMotion, juice],
+    [cosyMode, prefersReducedMotion, juice, clueToast, t],
   );
+  useEffect(() => {
+    if (game.state.turn !== 'player') setClueReveal(null);
+  }, [game.state.turn]);
   const handleClue = useCallback(() => {
     if (game.state.cluesRemaining > 0) {
       const clue = game.requestClue();
       if (clue) showClue(clue);
-      else showClue(null, t('wordcraft.clue.none'));
+      else clueToast(t('wordcraft.clue.none'));
       return;
     }
     // Out of clues → earn one more.
     if (isNative()) {
       showRewarded(
         () => game.grantClue(),
-        () => setClueMessage(t('wordcraft.clue.adFailed')),
+        () => clueToast(t('wordcraft.clue.adFailed')),
         { surface: 'generic' },
       );
     } else {
       // Web has no rewarded inventory; grant directly (wordlists are public).
       game.grantClue();
-      setClueMessage(t('wordcraft.clue.granted'));
+      clueToast(t('wordcraft.clue.granted'));
     }
-  }, [game, showClue, showRewarded, t]);
-  useEffect(() => () => { if (clueTimerRef.current) clearTimeout(clueTimerRef.current); }, []);
+  }, [game, showClue, clueToast, showRewarded, t]);
 
   // Keyboard shortcuts and arrow-key reticle (declared AFTER the callbacks it consumes)
   const { reticle } = useWordCraftKeyboardShortcuts({
@@ -829,7 +831,6 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // First-move flag drives the rack glow (no center star to ping anymore).
   const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
 
-  const showPendingStrip = game.state.pendingPlacements.length > 0;
   // Whether the on-screen human may act now. Bot-mode: only on the player's
   // turn. Hot-seat: either seat's turn, but not while the hand-off curtain is
   // up or the game is over.
@@ -846,22 +847,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
     !game.state.selectedRackTileId &&
     game.state.pendingPlacements.length === 0;
 
-  const errorMessage = (() => {
-    const e = game.state.lastError;
-    if (!e) return null;
-    if (e === 'DICT_LOADING') return t('wordcraft.error.dictLoading');
-    if (e.startsWith('INVALID_WORD:')) return t('wordcraft.error.invalidWord', { word: e.slice('INVALID_WORD:'.length) });
-    if (e === 'FIRST_MOVE_MUST_COVER_CENTER') return t('wordcraft.error.mustCoverCenter');
-    if (e === 'FIRST_MOVE_TOO_SHORT') return t('wordcraft.error.tooShort');
-    if (e === 'NOT_LINEAR') return t('wordcraft.error.notLinear');
-    if (e === 'NOT_CONTIGUOUS') return t('wordcraft.error.notContiguous');
-    if (e === 'DISCONNECTED') return t('wordcraft.error.disconnected');
-    if (e === 'OUT_OF_BOUNDS') return t('wordcraft.error.outOfBounds');
-    if (e === 'NO_TILES') return t('wordcraft.error.noTiles');
-    if (e === 'BAG_TOO_SMALL_TO_SWAP') return t('wordcraft.error.bagTooSmallToSwap');
-    if (e === 'BLANK_UNASSIGNED') return t('wordcraft.error.blankUnassigned');
-    return e;
-  })();
+  const errorMessage = wordCraftErrorText(game.state.lastError, t);
 
   return (
     <div
@@ -896,33 +882,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
       {/* data-wc-main: landscape-phone grid override lives in globals.css —
           board left, all chrome stacked right (the portrait flex column
           collapsed the cqmin board to 0 height on ~360px-tall screens). */}
-      <main data-wc-main className="flex-1 min-h-0 px-3 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
-        {/* Topbar: back · title · play-friend · How to play · loading (public — no beta badge) */}
-        <div className="relative flex items-center gap-2 shrink-0">
-          <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} aria-label={t('common.back')} className="shrink-0 h-8 px-2">
-            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
-          </Button>
-          {/* Logo badge + visual title removed for a lighter HUD — the board IS
-              the game's identity. Heading kept sr-only so the page still has a
-              document heading for screen readers / SEO. */}
-          <h1 className="sr-only">{t('wordcraft.title')}</h1>
-          <div className="flex-1" />
-          {/* Difficulty + play-vs-friend moved to the pre-game setup screen and
-              the game-over scene — in-game chrome stays board-first. */}
-          <WordCraftTutor
-            isRTL={isRTL}
-            labels={{
-              title: t('wordcraft.tutor.title'),
-              step1: t('wordcraft.tutor.step1'),
-              step2: t('wordcraft.tutor.step2'),
-              step3: t('wordcraft.tutor.step3'),
-              tipFirst: t('wordcraft.tutor.tipFirst'),
-              tipScore: t('wordcraft.tutor.tipScore'),
-              dismiss: t('wordcraft.tutor.dismiss'),
-              show: t('wordcraft.tutor.show'),
-            }}
-          />
-        </div>
+      <main data-wc-main className="flex-1 min-h-0 px-1.5 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
+        <h1 className="sr-only">{t('wordcraft.title')}</h1>
 
         <DictStatusChip
           loading={!dict && !dictError}
@@ -957,11 +918,31 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
             botCount: countClaimed(game.state.board, 'bot'),
             label: t('wordcraft.territory.label'),
           } : undefined}
+          // Active per-game modifier folded into the meta row — felt, not silent,
+          // without costing a row of board height. None → territory caption.
+          center={game.state.modifier !== 'none' ? <WordCraftModifierChip modifier={game.state.modifier} t={t} /> : undefined}
+          leading={
+            <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} aria-label={t('common.back')} className="shrink-0 h-8 px-2">
+              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
+            </Button>
+          }
+          trailing={
+            <WordCraftTutor
+              isRTL={isRTL}
+              labels={{
+                title: t('wordcraft.tutor.title'),
+                step1: t('wordcraft.tutor.step1'),
+                step2: t('wordcraft.tutor.step2'),
+                step3: t('wordcraft.tutor.step3'),
+                tipFirst: t('wordcraft.tutor.tipFirst'),
+                tipScore: t('wordcraft.tutor.tipScore'),
+                dismiss: t('wordcraft.tutor.dismiss'),
+                show: t('wordcraft.tutor.show'),
+              }}
+            />
+          }
         />
 
-        {/* Active per-game modifier — surfaced so the twist (esp. land_grab
-            chain-capture) is felt, not silent. Hidden for the 'none' baseline. */}
-        <WordCraftModifierChip modifier={game.state.modifier} t={t} />
 
         {/* Duel target: keeps the challenger's avatar + name + score-to-beat
             visible for the whole async duel (the bot stays as the live board
@@ -1033,6 +1014,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
               zoomLabel={t('wordcraft.zoomLabel')}
               zoomResetLabel={t('wordcraft.zoomReset')}
               isGolden={goldenLookup}
+              clue={clueReveal}
+              surprises={game.state.surprises}
             />
             {scoreFloat ? (
               <ScoreFloat
@@ -1047,53 +1030,9 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
               <WordCraftComboBadge streak={game.state.streaks.player} t={t} />
             ) : null}
             <WordCraftScorePreviewBadge board={game.state.board} placements={game.state.pendingPlacements} />
+            <WordCraftEventToast toast={eventToast} />
           </div>
         </div>
-
-        {showPendingStrip ? (
-          <WordCraftPendingStrip
-            pending={game.state.pendingPlacements}
-            axis={effectiveAxis}
-            onRecallOne={recallFromStrip}
-            onRecallAll={recallAllPending}
-            onFlipAxis={flipAxis}
-            locale={locale}
-            labels={{
-              headerEmpty: t('wordcraft.pending.empty'),
-              recallAll: t('wordcraft.pending.recallAll'),
-              recallOne: t('wordcraft.pending.recallOne'),
-              axisHorizontal: t('wordcraft.axis.horizontal'),
-              axisVertical: t('wordcraft.axis.vertical'),
-              axisFlipAria: t('wordcraft.axis.flipAria'),
-            }}
-          />
-        ) : canInteract ? (
-          // Persistent direction toggle, available before the first tile lands so
-          // the player can pre-pick across/down and just keep tapping letters.
-          // On the very first move we also surface the place→submit steps inline
-          // so new players know how to put letters down without opening the tutor.
-          <div className="flex flex-col items-center gap-1 py-0.5 shrink-0">
-            {isFirstMove ? (
-              <WordCraftPlacementGuide
-                labels={{
-                  step1: t('wordcraft.place.step1', 'Tap a letter'),
-                  step2: t('wordcraft.place.step2', 'Tap a square'),
-                  step3: t('wordcraft.place.step3', 'Submit'),
-                }}
-              />
-            ) : null}
-            <div className="flex items-center justify-center gap-2">
-              <WordCraftAxisChip
-                axis={effectiveAxis}
-                onFlip={flipAxis}
-                labelHorizontal={t('wordcraft.axis.horizontal')}
-                labelVertical={t('wordcraft.axis.vertical')}
-                ariaLabel={t('wordcraft.axis.flipAria')}
-              />
-              <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>
-            </div>
-          </div>
-        ) : null}
 
         {/* Live coaching pill for new players: updates pick → place → submit as
             the player acts (the static guide above only covers the first move).
@@ -1138,16 +1077,6 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           isGolden={goldenLookup}
         />
 
-        {(clueReveal || clueMessage) ? (
-          <div
-            role="status"
-            className="self-center mb-1 px-3 py-1.5 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wide animate-neo-pop text-sm"
-          >
-            {clueReveal
-              ? t('wordcraft.clue.reveal', { word: clueReveal.word })
-              : clueMessage}
-          </div>
-        ) : null}
 
         <WordCraftControls
           canSubmit={game.state.pendingPlacements.length > 0 && !!dict && canInteract}

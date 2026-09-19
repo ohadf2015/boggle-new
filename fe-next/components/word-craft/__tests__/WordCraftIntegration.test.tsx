@@ -4,7 +4,6 @@ import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
 import { inferAxis, resolveTap } from '@/lib/word-craft/placement';
 import { WordCraftBoard } from '../WordCraftBoard';
 import { WordCraftRack } from '../WordCraftRack';
-import { WordCraftPendingStrip } from '../WordCraftPendingStrip';
 import { useMemo } from 'react';
 import type { RackTile } from '@/lib/word-craft/types';
 
@@ -12,13 +11,13 @@ import type { RackTile } from '@/lib/word-craft/types';
  * "Playwright-equivalent" integration test.
  *
  * Mounts the real reducer + the three UI primitives that own input
- * (Rack, Board, PendingStrip) together with a mocked dictionary, and
+ * (Rack, Board) together with a mocked dictionary, and
  * walks through the mobile-redesign happy path:
  *
  *   1. tap rack → tap board: 1 pending tile, no axis yet
  *   2. tap rack → tap board (same row): 2 pending tiles, axis 'h' inferred
  *   3. fast-tap rack with axis locked: auto-places along axis
- *   4. PendingStrip × button: recalls all
+ *   4. recall-all button: recalls all
  *
  * No browser needed; vitest-jsdom drives the same code path the user
  * triggers on mobile. Far cheaper than Playwright + sidesteps the
@@ -59,20 +58,8 @@ function TestHarness() {
           isFirstMove={game.state.history.length === 0 && game.state.pendingPlacements.length === 0}
         />
       </div>
-      <WordCraftPendingStrip
-        pending={game.state.pendingPlacements}
-        axis={axis}
-        onRecallOne={game.recallTile}
-        onRecallAll={game.recallAll}
-        labels={{
-          headerEmpty: 'place a tile',
-          recallAll: 'recall all',
-          recallOne: 'recall',
-          axisHorizontal: 'Across',
-          axisVertical: 'Down',
-          axisFlipAria: 'flip',
-        }}
-      />
+      {/* Recall-all lives in the controls row in the real screen. */}
+      <button type="button" aria-label="recall all" onClick={game.recallAll} />
       <WordCraftRack
         tiles={game.state.player.rack}
         selectedId={game.state.selectedRackTileId}
@@ -135,8 +122,6 @@ describe('WordCraft mobile-redesign integration', () => {
     fireEvent.click(document.querySelector(`[data-board-cell="${row},${col + 2}"]`) as HTMLElement);
 
     expect(readState()).toEqual({ pending: 2, axis: 'h' });
-    // Axis chip should appear inside the pending strip
-    expect(screen.getByText('Across')).toBeInTheDocument();
   });
 
   it('fast-tap with axis locked auto-places at the next empty axis cell', () => {
@@ -172,7 +157,7 @@ describe('WordCraft mobile-redesign integration', () => {
     expect(filledCell.dataset.tileState).toBe('pending');
   });
 
-  it('PendingStrip × button recalls every pending tile', () => {
+  it('recall-all recalls every pending tile', () => {
     render(<TestHarness />);
 
     const rackButtons = () =>

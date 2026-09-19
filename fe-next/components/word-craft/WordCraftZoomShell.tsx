@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { ZOOM_FEEL, boardFilter, computeAutoZoomScale } from '@/lib/word-craft/zoomFeel';
+import { ZOOM_FEEL, boardFilter, computeAutoZoomScale, shouldAutoZoom } from '@/lib/word-craft/zoomFeel';
 
 /**
  * Pinch-zoom + 1-finger pan wrapper for the WordCraft board.
@@ -269,7 +269,10 @@ export function WordCraftZoomShell({
   );
 
   useEffect(() => {
-    if (focusKey === '' || !boardSize) {
+    // Cells already comfortable to tap → leave the whole board in view.
+    const wrapW = wrapperRef.current?.getBoundingClientRect().width ?? 0;
+    const bigEnough = Boolean(boardSize) && !shouldAutoZoom(wrapW / (boardSize || 1));
+    if (focusKey === '' || !boardSize || bigEnough) {
       // Nothing to follow — ease back out of an auto-set view and re-arm.
       if (autoAppliedRef.current) {
         autoAppliedRef.current = false;

@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { WordCraftBoard } from './WordCraftBoard';
+import { WordCraftBoard, type WordCraftBoardProps } from './WordCraftBoard';
 import { WordCraftZoomShell } from './WordCraftZoomShell';
 import { WordCraftPixiStage } from './WordCraftPixiStage';
 import type { Board } from '@/lib/word-craft/board';
@@ -28,6 +28,8 @@ interface Props {
   zoomResetLabel?: string;
   /** golden_tiles modifier: true for tile ids that ring-capture on commit. */
   isGolden?: (tileId: string) => boolean;
+  clue?: WordCraftBoardProps['clue'];
+  surprises?: WordCraftBoardProps['surprises'];
 }
 
 export function WordCraftBoardSection(props: Props) {
@@ -73,6 +75,8 @@ export function WordCraftBoardSection(props: Props) {
           locale={props.locale}
           reticle={props.reticle}
           isGolden={props.isGolden}
+          clue={props.clue}
+          surprises={props.surprises}
         />
         <WordCraftPixiStage
           boardRef={boardRef}

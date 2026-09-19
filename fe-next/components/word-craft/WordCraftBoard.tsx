@@ -32,6 +32,13 @@ export interface WordCraftBoardProps {
    * Golden pending/placed tiles carry a gold ring so the twist reads on-board.
    */
   isGolden?: (tileId: string) => boolean;
+  /**
+   * Active clue: empty cells of the suggested word show a ghost letter, board
+   * letters it builds through pulse as the anchor. Cleared by the screen.
+   */
+  clue?: { cells: { row: number; col: number; letter: string }[]; anchors: { row: number; col: number }[] } | null;
+  /** Unopened surprise boxes — rendered as "?" blocks; the reward stays hidden. */
+  surprises?: readonly { row: number; col: number }[];
 }
 
 /** Build the set of axis-hint cells (N/E/S/W neighbors) for a single anchor. */
@@ -57,6 +64,8 @@ function WordCraftBoardImpl({
   dragHoverCell,
   reticle,
   isGolden,
+  clue,
+  surprises,
 }: WordCraftBoardProps) {
   const size = board.size;
   const centerIndex = Math.floor(size / 2);
@@ -67,6 +76,10 @@ function WordCraftBoardImpl({
     () => computeAxisHintCells(pendingPlacements, size),
     [pendingPlacements, size],
   );
+
+  const clueGhost = useMemo(() => new Map((clue?.cells ?? []).map((c) => [`${c.row},${c.col}`, c.letter])), [clue]);
+  const surpriseSet = useMemo(() => new Set((surprises ?? []).map((b) => `${b.row},${b.col}`)), [surprises]);
+  const clueAnchorSet = useMemo(() => new Set((clue?.anchors ?? []).map((c) => `${c.row},${c.col}`)), [clue]);
 
   // Roving tabindex anchor: only ONE cell carries tabIndex=0 so keyboard
   // users hit a single tab stop on the board instead of N². Reticle drives the
@@ -116,6 +129,11 @@ function WordCraftBoardImpl({
           const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
           const isReticle = reticle?.row === r && reticle?.col === c;
           const isTabAnchor = tabAnchor.row === r && tabAnchor.col === c;
+          const clueLetter = isEmpty ? clueGhost.get(key) : undefined;
+          const isSurprise = isEmpty && surpriseSet.has(key);
+          // Painted squares (surprise splash) are owned but still empty.
+          const paintedBy = !placedTile && !pending ? cell.claim ?? null : null;
+          const isClueAnchor = Boolean(placedTile) && clueAnchorSet.has(key);
           const goldenId = pending?.rackTileId ?? placedTile?.rackTileId;
           const golden = goldenId ? (isGolden?.(goldenId) ?? false) : false;
 
@@ -126,7 +144,9 @@ function WordCraftBoardImpl({
             ? `pending ${pending.letter}`
             : placedTile
               ? `${owner === 'player' ? 'your' : owner === 'bot' ? 'rival' : ''} letter ${placedTile.letter}`.trim()
-              : 'empty';
+              : isSurprise
+                ? 'surprise box'
+                : 'empty';
           const ariaLabel = `row ${r + 1} column ${c + 1} ${occupant}`;
 
           return (
@@ -137,13 +157,15 @@ function WordCraftBoardImpl({
               data-board-cell={key}
               data-golden={golden ? 'true' : undefined}
               data-premium=""
-              data-claim={placedTile && cell.claim ? cell.claim : undefined}
+              data-claim={cell.claim ?? undefined}
+              data-surprise={isSurprise ? 'true' : undefined}
               data-tile-id={pending?.rackTileId ?? placedTile?.rackTileId ?? undefined}
               data-tile-state={pending ? 'pending' : placedTile ? 'placed' : 'empty'}
               data-cell-invite={inviteEmpty ? 'true' : undefined}
               data-drag-target={isDragTarget ? 'true' : undefined}
               data-axis-hint={isAxisHint ? 'true' : undefined}
               data-reticle={isReticle ? 'true' : undefined}
+              data-clue={clueLetter ? 'path' : isClueAnchor ? 'anchor' : undefined}
               aria-label={ariaLabel}
               tabIndex={isTabAnchor ? 0 : -1}
               disabled={!isInteractive}
@@ -171,7 +193,13 @@ function WordCraftBoardImpl({
                       : 'bg-neo-cream text-neo-navy shadow-[0_2px_0_0_rgba(0,0,0,0.85)]'
                   : pending
                     ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
-                    : 'bg-neo-navy-light/70',
+                    : isSurprise
+                      ? 'bg-neo-yellow text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] wc-surprise'
+                      : paintedBy === 'player'
+                        ? 'bg-neo-cyan/35'
+                        : paintedBy === 'bot'
+                          ? 'bg-neo-pink/35'
+                          : 'bg-neo-navy-light/70',
                 golden && !isDragTarget && 'ring-2 ring-neo-yellow z-10',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
@@ -181,6 +209,8 @@ function WordCraftBoardImpl({
                 isInteractive && 'focus-visible:ring-2 focus-visible:ring-neo-yellow focus-visible:z-10 focus-visible:outline-none',
                 pending && 'cursor-pointer',
                 inviteEmpty && 'wc-cell-invite',
+                clueLetter && 'wc-clue-path',
+                isClueAnchor && 'ring-4 ring-neo-yellow z-10 animate-pulse',
               )}
               style={{ minWidth: 0 }}
             >
@@ -211,6 +241,12 @@ function WordCraftBoardImpl({
                     </span>
                   )}
                   {isUnassignedBlank(pending) ? JOKER_GLYPH : pending.letter}
+                </span>
+              ) : isSurprise && !clueLetter ? (
+                <span aria-hidden className={cn('wc-tile-glyph font-black', tileFontClass)}>?</span>
+              ) : clueLetter ? (
+                <span aria-hidden className={cn('wc-tile-glyph text-neo-lime/80', tileFontClass)}>
+                  {clueLetter}
                 </span>
               ) : isAxisHint ? (
                 // tiny dot hints player at where next tile in a line could go

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import { Crown } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import type { PlayerState } from '@/lib/word-craft/types';
@@ -39,6 +39,11 @@ export interface WordCraftScoreboardProps {
     botCount: number;
     label: string;
   };
+  /** Inline controls at the row edges (back / help) — replaces a separate topbar row. */
+  leading?: ReactNode;
+  trailing?: ReactNode;
+  /** Replaces the territory caption in the meta row (e.g. the active modifier chip). */
+  center?: ReactNode;
 }
 
 /**
@@ -67,6 +72,9 @@ function WordCraftScoreboardImpl({
   isBot = false,
   labels,
   territory,
+  leading,
+  trailing,
+  center,
 }: WordCraftScoreboardProps) {
   // Conquest score IS territory — the number on the HUD is cells controlled.
   // Falls back to the internal point total only if no territory is supplied.
@@ -91,8 +99,9 @@ function WordCraftScoreboardImpl({
   return (
     <div className="space-y-1">
       {/* Score numbers + names */}
-      <div className="flex items-center justify-between gap-3 px-1">
+      <div className="flex items-center justify-between gap-2 px-1">
         <div className="flex items-center gap-2 min-w-0">
+          {leading}
           <Avatar
             customAvatar={playerAvatar ?? null}
             userId={playerSeed || labels.you}
@@ -102,7 +111,7 @@ function WordCraftScoreboardImpl({
           />
           <span
             data-score-value="player"
-            className="font-neo-display font-black text-3xl sm:text-4xl text-neo-cyan leading-none tabular-nums origin-bottom-left inline-block"
+            className="font-neo-display font-black text-2xl sm:text-3xl text-neo-cyan leading-none tabular-nums origin-bottom-left inline-block"
           >
             {pScore}
           </span>
@@ -115,6 +124,7 @@ function WordCraftScoreboardImpl({
           —
         </div>
         <div className="flex items-center gap-2 flex-row-reverse min-w-0">
+          {trailing}
           <Avatar
             customAvatar={opponentAvatar ?? null}
             userId={opponentSeed || opponentName}
@@ -128,7 +138,7 @@ function WordCraftScoreboardImpl({
           />
           <span
             data-score-value="bot"
-            className="font-neo-display font-black text-3xl sm:text-4xl text-neo-pink leading-none tabular-nums origin-bottom-right inline-block"
+            className="font-neo-display font-black text-2xl sm:text-3xl text-neo-pink leading-none tabular-nums origin-bottom-right inline-block"
           >
             {bScore}
           </span>
@@ -162,12 +172,12 @@ function WordCraftScoreboardImpl({
         </span>
         {/* Territory label sits with the bag meta — the headline numbers above
             already ARE the cell counts, so no separate chip is needed. */}
-        {territory ? (
+        {center ?? (territory ? (
           <span className="inline-flex items-center gap-1 font-neo-display font-black uppercase tracking-wider text-neo-white/70">
             <Crown className="w-3 h-3" aria-hidden />
             {territory.label}
           </span>
-        ) : null}
+        ) : null)}
         <span className="inline-flex items-center gap-1 text-neo-white">
           {/* The tile sack — letters left to draw. Gives the bag count a
               physical object instead of a generic hourglass; it wobbles on the

@@ -36,7 +36,18 @@ export const ZOOM_FEEL = {
    * blur was the single biggest "cinematic heaviness" tell, so it is removed.
    */
   motionBlurPx: 0,
+  /**
+   * Rendered cell size (px) at which the board is already comfortable to read
+   * and tap. At or above it auto-zoom is skipped — zooming a readable board
+   * only cropped it and made it feel smaller.
+   */
+  comfortableCellPx: 30,
 } as const;
+
+/** Whether auto-follow zoom should engage for a board rendering cells at `cellPx`. */
+export function shouldAutoZoom(cellPx: number): boolean {
+  return !(cellPx >= ZOOM_FEEL.comfortableCellPx);
+}
 
 /**
  * Auto-zoom scale for a focus box that spans `boxFrac` (0..1) of the board's

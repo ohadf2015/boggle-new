@@ -30,12 +30,9 @@ describe('WordCraftStepHint', () => {
     expect(getByText('Over')).toBeInTheDocument();
   });
 
-  it('renders only a spacer when step is idle', () => {
-    const { container, queryByText } = render(<WordCraftStepHint step="idle" labels={labels} />);
-    expect(queryByText('Pick')).toBeNull();
-    expect(queryByText('Place')).toBeNull();
-    // idle path returns a single empty div with reserved height
-    expect(container.querySelector('[data-step]')).toBeNull();
+  it('renders nothing when step is idle (a retired coach must not keep stealing board height)', () => {
+    const { container } = render(<WordCraftStepHint step="idle" labels={labels} />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('exposes the active step via data-step for animation hooks', () => {

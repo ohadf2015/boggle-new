@@ -13536,6 +13536,10 @@ const es = {
       "wheelRush": "Forma palabras con una sola rueda de letras",
       "vocabQuiz": "Preguntas de cuatro opciones con tus propias palabras"
     },
+    "wordCraftPractice": {
+      "hit": "¡Palabra de la lección: {{word}}!",
+      "progress": "{{found}} de {{total}} palabras de la lista jugadas"
+    },
     "wordTowerPractice": {
       "unavailable": "Las palabras de esta lección aún no pueden construir una torre. Hacen falta al menos 4 palabras de 4 a 6 letras.",
       "done": "Listo",
@@ -13545,7 +13549,8 @@ const es = {
     },
     "practicePicker": {
       "name": {
-        "word_tower": "Torre de palabras"
+        "word_tower": "Torre de palabras",
+        "word_craft": "WordCraft"
       },
       "title": "Elige tu práctica",
       "readyCount": "{{ready}} de {{total}} listas para jugar",
@@ -13558,6 +13563,7 @@ const es = {
       "allModes": "Todos los juegos",
       "skill": {
         "word_tower": "Forma palabras con las letras de la lista de esta semana",
+        "word_craft": "Conquista el tablero con las palabras de esta semana",
         "solo_board": "Encuentra las palabras de la lección en la cuadrícula",
         "warmup": "Una ronda corta para entrar en calor",
         "blitz": "Gánale al reloj con todas las palabras que puedas",
@@ -13580,6 +13586,7 @@ const es = {
       },
       "locked": {
         "word_tower": "Necesita 4 palabras de la lista de 4 a 6 letras",
+        "word_craft": "Necesita una palabra de la lista de 2 a 7 letras",
         "solo_board": "Añade palabras a esta lección para desbloquear",
         "warmup": "Añade palabras a esta lección para desbloquear",
         "blitz": "Añade palabras a esta lección para desbloquear",
@@ -16791,6 +16798,17 @@ const es = {
     "tied": "Empate",
     "yourTurn": "Tu turno",
     "botTurn": "WordBot está pensando…",
+    "surprise": {
+      "title": "¡SORPRESA!",
+      "otherTitle": "¡{{name}} abrió una caja!",
+      "paint": "Salpicadura: +{{count}} casillas",
+      "mega": "MEGA salpicadura: +{{count}} casillas",
+      "steal": "Golpe: {{count}} fichas robadas",
+      "clue": "Pista gratis desbloqueada"
+    },
+    "botSkipped": "{name} pasa — ¡turno extra para ti!",
+    "botSwapped": "{name} cambió sus letras",
+    "botPassed": "{name} pasó",
     "player1": "Jugador 1",
     "player2": "Jugador 2",
     "player1Turn": "Turno del Jugador 1",
@@ -16817,6 +16835,7 @@ const es = {
     "clue": {
       "button": "Pista",
       "reveal": "Prueba: {{word}}",
+      "revealAnchor": "Prueba {{word}}: engánchala a la {{letter}}",
       "none": "Sin jugada — prueba a cambiar fichas",
       "granted": "¡+1 pista!",
       "adFailed": "Anuncio no disponible — reinténtalo"

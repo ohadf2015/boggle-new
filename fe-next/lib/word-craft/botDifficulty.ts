@@ -28,8 +28,10 @@
  *                      Conquest: territory accrues roughly in proportion to tiles
  *                      placed, so capping word length or widening the word pool
  *                      barely dents the bot's claim rate — but a bot that skips
- *                      a third of its turns hands the player free ground to seize.
- *                      Easy skips often, hard never skips.
+ *                      turns hands the player free ground to seize. Kept low
+ *                      (and announced in the UI): at 0.35 a third of easy turns
+ *                      were a silent no-op that read as a broken bot.
+ *                      Easy skips sometimes, hard never skips.
  *
  * Default is EASY: the repeated user complaint is "the bot is too good", so the
  * out-of-the-box opponent must be comfortably beatable by a casual solo player.
@@ -54,9 +56,9 @@ const TUNING: Record<BotDifficulty, BotTuning> = {
   // Short words only (no bingos), wide pool pressed hard toward the weakest word,
   // never hunts steals, and skips ~1 turn in 3 → grows its own ground slowly with
   // weak words and regularly gifts the player a free turn. Easily beatable.
-  easy: { maxLength: 4, skillVariance: 6, selectionSkew: 4, captureAggression: 0, turnSkipChance: 0.35 },
+  easy: { maxLength: 4, skillVariance: 6, selectionSkew: 4, captureAggression: 0, turnSkipChance: 0.12 },
   // Moderate, occasionally sharp; chases some steals; rarely skips.
-  medium: { maxLength: 5, skillVariance: 2.5, selectionSkew: 1.5, captureAggression: 0.5, turnSkipChance: 0.1 },
+  medium: { maxLength: 5, skillVariance: 2.5, selectionSkew: 1.5, captureAggression: 0.5, turnSkipChance: 0.05 },
   // Full length (bingo-capable), near-optimal selection, full-on thief, never skips.
   hard: { maxLength: 7, skillVariance: 0.5, selectionSkew: 0.5, captureAggression: 1, turnSkipChance: 0 },
 };

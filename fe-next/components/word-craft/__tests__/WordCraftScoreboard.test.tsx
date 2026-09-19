@@ -70,4 +70,22 @@ describe('WordCraftScoreboard (Conquest)', () => {
     expect(screen.getByText('Bot')).toBeTruthy();
     expect(screen.queryByText('Rival')).toBeNull();
   });
+
+  it('Given leading/trailing slots, When rendered, Then the back + help controls sit inside the score row (no separate topbar)', () => {
+    renderBoard({
+      leading: <button type="button">Back</button>,
+      trailing: <button type="button">Help</button>,
+    });
+    expect(screen.getByRole('button', { name: 'Back' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Help' })).toBeTruthy();
+  });
+
+  it('Given a center slot, When rendered, Then it replaces the territory caption in the meta row (modifier chip no longer costs its own row)', () => {
+    renderBoard({
+      territory: { playerCount: 1, botCount: 1, label: 'Territory' },
+      center: <span>Land Grab</span>,
+    });
+    expect(screen.getByText('Land Grab')).toBeTruthy();
+    expect(screen.queryByText('Territory')).toBeNull();
+  });
 });

@@ -11,6 +11,10 @@ import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNo
 import { getBoardDims, type BoardDims } from './boardDimensions';
 import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
 import { assignBlankLetter, hasUnassignedBlank } from './blankAssign';
+import { centerOpeningMove, clueAnchors } from './placement';
+import { foundLessonWords, lessonDraw, nextLessonTarget } from './lesson';
+import type { Language } from '@/shared/types/game';
+import { MAX_SURPRISES, openSurprise, spawnSurprise, surprisesCovered, surpriseValue, type SurpriseBox, type SurpriseKind } from './surprises';
 import type { PlacedTile, PlayerState, RackTile } from './types';
 import {
   trackWordCraftSubmitBlockedDictLoading,
@@ -19,11 +23,17 @@ import {
 
 export type Turn = 'player' | 'bot' | 'over';
 
-interface MoveHistoryEntry {
+export interface MoveHistoryEntry {
   who: 'player' | 'bot';
   words: string[];
   score: number;
   placedTileIds: string[];
+  /**
+   * What the turn was. Absent on committed plays (legacy shape). `skip` is a
+   * pass that does NOT count toward the two-pass game end (the bot's
+   * voluntary easy-mode skip, or a solver failure) — the UI announces it.
+   */
+  kind?: 'pass' | 'skip' | 'swap';
 }
 
 export interface LastCapture {
@@ -89,6 +99,48 @@ export interface WordCraftState {
    * flag flips after that one nudge so a recall hands full control back.
    */
   autoCenterDone: boolean;
+  /** Unopened surprise boxes on the board (see ./surprises). */
+  surprises: SurpriseBox[];
+  /** The most recent box opened — drives the reveal toast. */
+  lastSurprise: LastSurprise | null;
+  /**
+   * Classroom mode: the teacher's words (canonical) and which the player has
+   * built. Steers the player's draws toward the next unfound word. Null in a
+   * normal game.
+   */
+  lesson: LessonState | null;
+}
+
+export interface LessonState {
+  targets: string[];
+  language: Language;
+  found: string[];
+}
+
+export interface LessonInit {
+  targets: string[];
+  language: Language;
+}
+
+export interface LastSurprise {
+  by: Owner;
+  kind: SurpriseKind;
+  /** Squares painted or stolen (0 for a clue). */
+  count: number;
+  row: number;
+  col: number;
+  turnIndex: number;
+}
+
+export interface WordCraftClue {
+  word: string;
+  /** Start cell of the first tile to place. */
+  row: number;
+  col: number;
+  /** Every cell of the suggested word, in reading order. */
+  cells: { row: number; col: number; letter: string }[];
+  /** Existing board letters the word builds through. */
+  anchors: { row: number; col: number; letter: string }[];
 }
 
 /** Free clues granted at the start of every WordCraft game. */
@@ -103,7 +155,7 @@ type Action =
   | { type: 'COMMIT_PLAYER'; placements: PlacedTile[]; score: number; words: string[]; wordCells?: Coord[][] }
   | { type: 'COMMIT_BOT'; placements: PlacedTile[]; score: number; words: string[]; wordCells?: Coord[][] }
   | { type: 'SET_ERROR'; message: string | null }
-  | { type: 'PASS' }
+  | { type: 'PASS'; voluntary?: boolean }
   | { type: 'SWAP'; tilesToReturn: RackTile[]; replacements: RackTile[] }
   | { type: 'END_GAME' }
   | { type: 'USE_CLUE' }
@@ -113,7 +165,7 @@ type Action =
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean; modifierOverride?: WordCraftModifier }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean; modifierOverride?: WordCraftModifier; lesson?: LessonInit | null }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
@@ -121,6 +173,7 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
   const territoryEnabled = typeof init === 'number' ? true : (init.territoryEnabled ?? true);
   const hotseat = typeof init === 'number' ? false : (init.hotseat ?? false);
   const modifierOverride = typeof init === 'number' ? undefined : init.modifierOverride;
+  const lessonInit = typeof init === 'number' ? null : init.lesson ?? null;
 
   const finalBoardSize = viewportDims?.size ?? boardSize;
   const bag = createBag({ seed, locale, bagSize: viewportDims?.bagSize });
@@ -130,7 +183,10 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
       ? modifierOverride
       : rollModifier(seed);
   const rackSize = modifierRackSize(modifier);
-  const playerRack = draw(bag, rackSize);
+  // Lesson mode: the opening rack carries the first lesson word's letters.
+  const opening = lessonDraw(bag.tiles, rackSize, [], lessonInit?.targets[0] ?? null);
+  bag.tiles = opening.rest;
+  const playerRack = opening.drawn;
   const botRack = draw(bag, rackSize);
   return {
     // Conquest mode: a neutral grid with no premium squares and no center
@@ -160,6 +216,9 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
     rackSize,
     seed,
     autoCenterDone: false,
+    surprises: [],
+    lastSurprise: null,
+    lesson: lessonInit ? { targets: lessonInit.targets, language: lessonInit.language, found: [] } : null,
   };
 }
 
@@ -180,8 +239,15 @@ function commitMove(
   // and (b) double-drained the sack under React StrictMode's double-invoke.
   // Cloning the tile list and carrying a FRESH bag object fixes both.
   const drawCount = Math.max(0, state.rackSize - remainingRack.length);
-  const nextBagTiles = state.bag.tiles.slice();
-  const replenish = nextBagTiles.splice(0, Math.min(drawCount, nextBagTiles.length));
+  // Lesson mode: a lesson word just played is found; the player's refill then
+  // pulls the next unfound word's letters.
+  let lesson = state.lesson;
+  if (lesson && who === 'player') {
+    const hits = foundLessonWords(words, lesson.targets, lesson.language).filter((w) => !lesson!.found.includes(w));
+    if (hits.length > 0) lesson = { ...lesson, found: [...lesson.found, ...hits] };
+  }
+  const target = lesson && who === 'player' ? nextLessonTarget(lesson.targets, lesson.found) : null;
+  const { drawn: replenish, rest: nextBagTiles } = lessonDraw(state.bag.tiles, drawCount, remainingRack, target);
   const nextBag: TileBag = { ...state.bag, tiles: nextBagTiles };
   const newRack = [...remainingRack, ...replenish];
 
@@ -226,6 +292,25 @@ function commitMove(
     }
   }
 
+  // Surprise boxes: covering one opens it for whoever committed; a fresh box
+  // drops after each bot/second-seat move so the player always sees it first.
+  let surprises = state.surprises;
+  let lastSurprise = state.lastSurprise;
+  let bonusClues = 0;
+  if (state.territoryEnabled) {
+    for (const box of surprisesCovered(surprises, placements)) {
+      const opened = openSurprise(nextBoard, box, who);
+      nextBoard = opened.board;
+      if (opened.clue) bonusClues += 1;
+      lastSurprise = { by: who, kind: opened.kind, count: opened.cells.length, row: box.row, col: box.col, turnIndex: state.history.length };
+    }
+    surprises = surprises.filter((b) => !placements.some((p) => p.row === b.row && p.col === b.col));
+    if (who === 'bot' && surprises.length < MAX_SURPRISES) {
+      const box = spawnSurprise(nextBoard, surprises, state.seed, state.history.length + 1);
+      if (box) surprises = [...surprises, box];
+    }
+  }
+
   const totalScore = baseScore + captureBonus;
   const updatedOwner: PlayerState = { ...owner, score: owner.score + totalScore, rack: newRack };
   const nextStreaks = {
@@ -246,6 +331,10 @@ function commitMove(
     turn: who === 'player' ? 'bot' : 'player',
     lastCapture,
     streaks: nextStreaks,
+    surprises,
+    lastSurprise,
+    cluesRemaining: state.cluesRemaining + bonusClues,
+    lesson,
   };
   // The sack is the game clock: the game finishes the moment it empties (or
   // the active player exhausts their rack). Check the post-refill bag.
@@ -333,7 +422,9 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
     case 'SET_ERROR':
       return { ...state, lastError: action.message };
     case 'PASS': {
-      const passes = state.consecutivePasses + 1;
+      // A voluntary skip hands the turn over without advancing the two-pass
+      // game end — otherwise "player passes, easy bot skips" ended the game.
+      const passes = action.voluntary ? state.consecutivePasses : state.consecutivePasses + 1;
       const turn: Turn = passes >= 2 ? 'over' : state.turn === 'player' ? 'bot' : 'player';
       const passingSide = state.turn === 'player' ? 'player' : 'bot';
       return {
@@ -342,7 +433,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
         selectedRackTileId: null,
         consecutivePasses: passes,
         turn,
-        history: [...state.history, { who: passingSide, words: [], score: 0, placedTileIds: [] }],
+        history: [...state.history, { who: passingSide, words: [], score: 0, placedTileIds: [], kind: action.voluntary ? 'skip' : 'pass' }],
         streaks: { ...state.streaks, [passingSide]: 0 },
       };
     }
@@ -360,6 +451,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
         selectedRackTileId: null,
         turn: state.turn === 'player' ? 'bot' : 'player',
         consecutivePasses: 0,
+        history: [...state.history, { who: state.turn === 'bot' ? 'bot' : 'player', words: [], score: 0, placedTileIds: [], kind: 'swap' }],
       };
     }
     case 'END_GAME':
@@ -378,7 +470,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       // viewportDims carries the locked board size + solo bag size so a
       // play-again (or locale switch) keeps the same tight bag instead of
       // silently falling back to the full default 100-tile bag.
-      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims, modifierOverride: action.modifierOverride });
+      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims, modifierOverride: action.modifierOverride, lesson: state.lesson });
     default:
       return state;
   }
@@ -420,11 +512,13 @@ export interface UseWordCraftGameOptions {
    * duel boards must derive the identical modifier from the shared seed.
    */
   modifierOverride?: WordCraftModifier;
+  /** Classroom mode — see {@link LessonState}. Must be referentially stable. */
+  lesson?: LessonInit | null;
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride, lesson = null }: UseWordCraftGameOptions) {
   const tuning = botTuning(difficulty);
   const effectiveVariance = botSkillVariance ?? tuning.skillVariance;
   // Capture dims at initialization and lock them for the game lifetime. A duel
@@ -435,7 +529,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   );
   const initialDims = initialDimsRef.current;
 
-  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat, modifierOverride }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat, modifierOverride]);
+  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat, modifierOverride, lesson }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat, modifierOverride, lesson]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
 
   // Active per-game scoring modifier, applied symmetrically to player commits,
@@ -607,18 +701,46 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   const pass = useCallback(() => dispatch({ type: 'PASS' }), []);
 
   // Clue: surface the strongest word the PLAYER could play right now (capped at
-  // length 5 so it's a nudge, not a free bingo) plus its starting cell. Spends a
-  // clue only when a playable word actually exists. The reveal is intentionally
-  // hint-not-autoplay — the player still has to place the tiles.
-  const requestClue = useCallback((): { word: string; row: number; col: number } | null => {
+  // length 5 so it's a nudge, not a free bingo), ranked with the same board
+  // context the bot uses (territory steals) so the tip fits the live board.
+  // Returns every cell of the word plus the existing letters it hooks onto so
+  // the board can mark the path. Spends a clue only when a word exists. Hint,
+  // not autoplay — the player still places the tiles.
+  const requestClue = useCallback((): WordCraftClue | null => {
     if (state.cluesRemaining <= 0) return null;
     if (!dict) return null;
-    const move = findBestBotMove(state.board, state.player.rack, isWordValid, { maxLength: 5 });
+    const move = findBestBotMove(state.board, state.player.rack, isWordValid, {
+      maxLength: 5,
+      scoreModifier: modifierSpec,
+      extraScore: state.territoryEnabled
+        ? (placements, wordCells) =>
+            resolveCaptures(state.board, placements, wordCells, 'player', {
+              spreadToNeighbors: modifierCaptureSpread(state.modifier),
+            }).bonus + surpriseValue(state.surprises, placements)
+        : undefined,
+    });
     if (!move) return null;
     dispatch({ type: 'USE_CLUE' });
-    const start = move.placements[0];
-    return { word: move.word, row: start?.row ?? -1, col: start?.col ?? -1 };
-  }, [state.cluesRemaining, state.board, state.player.rack, dict, isWordValid]);
+    const placements = centerOpeningMove(state.board, move.placements);
+    const start = placements[0];
+    const result = validateAndScoreMove(state.board, placements, isWordValid, modifierSpec, false);
+    const main = result.words?.find((w) => w.word === move.word) ?? result.words?.[0];
+    const letterAt = new Map(placements.map((p) => [`${p.row},${p.col}`, p.letter]));
+    const cells = main
+      ? main.cells.map((c) => ({
+          row: c.row,
+          col: c.col,
+          letter: letterAt.get(`${c.row},${c.col}`) ?? state.board.cells[c.row]?.[c.col]?.tile?.letter ?? '',
+        }))
+      : placements.map((p) => ({ row: p.row, col: p.col, letter: p.letter }));
+    return {
+      word: move.word,
+      row: start?.row ?? -1,
+      col: start?.col ?? -1,
+      cells,
+      anchors: main ? clueAnchors(state.board, placements, main.cells) : [],
+    };
+  }, [state.cluesRemaining, state.board, state.player.rack, state.territoryEnabled, state.modifier, state.surprises, dict, isWordValid, modifierSpec]);
 
   // Rewarded-ad outcome (or web free-grant fallback): top up one clue.
   const grantClue = useCallback(() => dispatch({ type: 'GRANT_CLUE' }), []);
@@ -652,57 +774,72 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       // difficulty lever a player actually feels in a territory game (claims
       // scale with tiles placed, so word-length nerfs barely register).
       if (shouldBotSkipTurn(tuning)) {
-        dispatch({ type: 'PASS' });
+        dispatch({ type: 'PASS', voluntary: true });
         botTurnRunning.current = false;
         return;
       }
-      // Inherit botMove's DEFAULT_MAX_LENGTH (7) — old call passed an explicit
-      // 5 that capped the bot below bingo length and made it feel weak.
-      const move = findBestBotMove(state.board, state.bot.rack, isWordValid, {
-        // Territory bias: rank candidate by score + capture potential so the
-        // bot doesn't ignore juicy flips. Scaled by the difficulty's
-        // captureAggression so easy stops hunting the player's cells. No-op when
-        // territory is disabled.
-        extraScore: state.territoryEnabled
-          ? (placements, wordCells) =>
-              resolveCaptures(state.board, placements, wordCells, 'bot', {
-                spreadToNeighbors: modifierCaptureSpread(state.modifier),
-                // Keep the bot's valuation symmetric with commit-time rules:
-                // golden placements ring-capture, so it should chase them too.
-                ringCenters:
-                  state.modifier === 'golden_tiles'
-                    ? placements
-                        .filter((p) => isGoldenTile(state.seed, p.rackTileId))
-                        .map((p) => ({ row: p.row, col: p.col }))
-                    : undefined,
-              }).bonus * tuning.captureAggression
-          : undefined,
-        // Difficulty: cap word length (easy/medium kill bingos) and pick from a
-        // wider, weaker pool so the bot is beatable. Both derived from the
-        // selected difficulty preset (default 'easy').
-        maxLength: tuning.maxLength,
-        skillVariance: effectiveVariance,
-        // Press the pick toward the weakest pooled word on lower difficulties.
-        selectionSkew: tuning.selectionSkew,
-        scoreModifier: modifierSpec,
-      });
-      if (move) {
-        const result = validateAndScoreMove(state.board, move.placements, isWordValid, modifierSpec, false);
-        if (result.ok) {
-          dispatch({
-            type: 'COMMIT_BOT',
-            placements: move.placements,
-            score: result.score ?? 0,
-            words: result.words?.map((w) => w.word) ?? [],
-            wordCells: result.words?.map((w) => w.cells) ?? [],
-          });
+      try {
+        // Inherit botMove's DEFAULT_MAX_LENGTH (7) — old call passed an explicit
+        // 5 that capped the bot below bingo length and made it feel weak.
+        const move = findBestBotMove(state.board, state.bot.rack, isWordValid, {
+          // Territory bias: rank candidate by score + capture potential so the
+          // bot doesn't ignore juicy flips. Scaled by the difficulty's
+          // captureAggression so easy stops hunting the player's cells. No-op when
+          // territory is disabled.
+          extraScore: state.territoryEnabled
+            ? (placements, wordCells) =>
+                resolveCaptures(state.board, placements, wordCells, 'bot', {
+                  spreadToNeighbors: modifierCaptureSpread(state.modifier),
+                  // Keep the bot's valuation symmetric with commit-time rules:
+                  // golden placements ring-capture, so it should chase them too.
+                  ringCenters:
+                    state.modifier === 'golden_tiles'
+                      ? placements
+                          .filter((p) => isGoldenTile(state.seed, p.rackTileId))
+                          .map((p) => ({ row: p.row, col: p.col }))
+                      : undefined,
+                }).bonus * tuning.captureAggression +
+                // Boxes too, scaled the same way: easy leaves them for you.
+                surpriseValue(state.surprises, placements) * tuning.captureAggression
+            : undefined,
+          // Difficulty: cap word length (easy/medium kill bingos) and pick from a
+          // wider, weaker pool so the bot is beatable. Both derived from the
+          // selected difficulty preset (default 'easy').
+          maxLength: tuning.maxLength,
+          skillVariance: effectiveVariance,
+          // Press the pick toward the weakest pooled word on lower difficulties.
+          selectionSkew: tuning.selectionSkew,
+          scoreModifier: modifierSpec,
+        });
+        if (move) {
+          const placements = centerOpeningMove(state.board, move.placements);
+          const result = validateAndScoreMove(state.board, placements, isWordValid, modifierSpec, false);
+          if (result.ok) {
+            dispatch({
+              type: 'COMMIT_BOT',
+              placements,
+              score: result.score ?? 0,
+              words: result.words?.map((w) => w.word) ?? [],
+              wordCells: result.words?.map((w) => w.cells) ?? [],
+            });
+          } else {
+            dispatch({ type: 'PASS', voluntary: true });
+          }
         } else {
-          dispatch({ type: 'PASS' });
+          // Stuck rack: exchange it like a real player would instead of a
+          // silent pass that also advanced the two-pass game end.
+          const replacements = swapBag(state.bag, state.bot.rack, state.rackSize);
+          if (replacements) dispatch({ type: 'SWAP', tilesToReturn: state.bot.rack, replacements });
+          else dispatch({ type: 'PASS' });
         }
-      } else {
-        dispatch({ type: 'PASS' });
+      } catch (err) {
+        // A solver throw used to leave botTurnRunning stuck true with turn
+        // parked on 'bot' forever. Skip the turn instead.
+        console.error('[wordcraft] bot move failed', err);
+        dispatch({ type: 'PASS', voluntary: true });
+      } finally {
+        botTurnRunning.current = false;
       }
-      botTurnRunning.current = false;
     }, 500);
     return () => {
       clearTimeout(handle);
@@ -711,7 +848,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     // `tuning` is a stable module-level object keyed by difficulty (see
     // botDifficulty's TUNING record), so listing it whole is both correct and
     // satisfies exhaustive-deps for the shouldBotSkipTurn(tuning) call.
-  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning, effectiveVariance, state.modifier, state.seed, modifierSpec]);
+  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning, effectiveVariance, state.modifier, state.seed, modifierSpec, state.bag, state.rackSize, state.surprises]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);

@@ -13781,6 +13781,10 @@ const sv = {
       "wheelRush": "Bygg ord från ett enda bokstavshjul",
       "vocabQuiz": "Frågor med fyra svar från dina egna orddata"
     },
+    "wordCraftPractice": {
+      "hit": "Lektionsord: {{word}}!",
+      "progress": "{{found}} av {{total}} listord spelade"
+    },
     "wordTowerPractice": {
       "unavailable": "Lektionens ord kan inte bygga ett torn än. Det behövs minst 4 ord på 4 till 6 bokstäver.",
       "done": "Klar",
@@ -13790,7 +13794,8 @@ const sv = {
     },
     "practicePicker": {
       "name": {
-        "word_tower": "Ordtorn"
+        "word_tower": "Ordtorn",
+        "word_craft": "WordCraft"
       },
       "title": "Välj din övning",
       "readyCount": "{{ready}} av {{total}} klara att spela",
@@ -13803,6 +13808,7 @@ const sv = {
       "allModes": "Alla spel",
       "skill": {
         "word_tower": "Bygg ord av bokstäverna i veckans lista",
+        "word_craft": "Ta över brädet med veckans ord",
         "solo_board": "Hitta lektionens ord i bokstavsrutan",
         "warmup": "En kort runda för att komma igång",
         "blitz": "Slå klockan med så många ord du hinner",
@@ -13825,6 +13831,7 @@ const sv = {
       },
       "locked": {
         "word_tower": "Kräver minst 4 listord på 4–6 bokstäver",
+        "word_craft": "Kräver ett listord på 2–7 bokstäver",
         "solo_board": "Lägg till ord i lektionen för att låsa upp",
         "warmup": "Lägg till ord i lektionen för att låsa upp",
         "blitz": "Lägg till ord i lektionen för att låsa upp",
@@ -16943,6 +16950,17 @@ const sv = {
     "tied": "Oavgjort",
     "yourTurn": "Din tur",
     "botTurn": "WordBot tänker…",
+    "surprise": {
+      "title": "ÖVERRASKNING!",
+      "otherTitle": "{{name}} tog en låda!",
+      "paint": "Färgstänk: +{{count}} rutor",
+      "mega": "MEGA-stänk: +{{count}} rutor",
+      "steal": "Kupp: {{count}} brickor stulna",
+      "clue": "Gratis ledtråd upplåst"
+    },
+    "botSkipped": "{name} står över — gratis drag!",
+    "botSwapped": "{name} bytte bokstäver",
+    "botPassed": "{name} passade",
     "player1": "Spelare 1",
     "player2": "Spelare 2",
     "player1Turn": "Spelare 1:s tur",
@@ -16970,6 +16988,7 @@ const sv = {
     "clue": {
       "button": "Ledtråd",
       "reveal": "Prova: {{word}}",
+      "revealAnchor": "Testa {{word}} — bygg vidare på {{letter}}",
       "none": "Inget drag hittat — prova att byta",
       "granted": "+1 ledtråd!",
       "adFailed": "Annons otillgänglig — försök igen"

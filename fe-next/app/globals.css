@@ -3813,6 +3813,14 @@ html.has-cookie-consent {
   }
 }
 
+/* WordCraft in-game: immersive at every size. The scoreboard row carries
+   Back, so the global header + its flow spacer are pure board-height loss
+   (62px on phones, ~124px on desktop with the game-nav band). */
+[data-wc-page] > header,
+[data-wc-page] > .h-header {
+  display: none !important;
+}
+
 /* WordCraft landscape-phone game layout.
    Portrait stacks chrome above/below a container-query-sized board; on a
    ~360px-tall landscape phone the chrome consumed the whole column and the
@@ -3851,15 +3859,8 @@ html.has-cookie-consent {
     height: min(78svh, 42vw) !important;
     flex-shrink: 0;
   }
-  /* The page is immersive and the in-main topbar already has Back — the
-     global header + its flow spacer are pure height loss at ~360px tall. */
-  [data-wc-page] > header,
-  [data-wc-page] > .h-header {
-    display: none !important;
-  }
-  /* Coach rows (first-move guide + live step hint) don't fit the right rail;
-     the tutor "?" stays available in the topbar. */
-  [data-wc-page] [data-wc-placement-guide],
+  /* The live step hint doesn't fit the right rail; the tutor "?" stays in
+     the scoreboard row. */
   [data-wc-page] [data-wc-step-hint] {
     display: none !important;
   }
@@ -4443,7 +4444,31 @@ body.crazygames-embed .game-view-container,
   animation: wc-axis-hint-kf 1.4s ease-in-out infinite;
 }
 
+/* Clue path: the suggested word's empty cells get a dashed lime frame + ghost
+   letter, breathing so the eye finds it on a busy board. */
+@keyframes wc-clue-kf {
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(190, 242, 100, 0.55); }
+  50% { box-shadow: inset 0 0 0 3px rgba(190, 242, 100, 1); }
+}
+.wc-clue-path {
+  outline: 2px dashed rgba(190, 242, 100, 0.9);
+  outline-offset: -3px;
+  animation: wc-clue-kf 1.2s ease-in-out infinite;
+}
+
+/* Surprise box: a gold "?" block that bobs so it reads as grabbable loot. */
+@keyframes wc-surprise-kf {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8%) rotate(-4deg); }
+}
+.wc-surprise > span {
+  display: inline-block;
+  animation: wc-surprise-kf 1.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .wc-surprise > span,
+  .wc-clue-path,
   .wc-cell-invite,
   .wc-cell-center-ping,
   .wc-rack-glow,

@@ -62,11 +62,11 @@ export function WordCraftModifierChip({ modifier, t }: { modifier: WordCraftModi
     <div
       role="status"
       data-wc-modifier={modifier}
-      className="self-center inline-flex items-center gap-2 px-2.5 py-1 rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard-sm shrink-0"
+      className="self-center inline-flex items-center gap-1.5 px-2 py-0.5 rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard-sm shrink-0"
     >
       <span
         aria-hidden
-        className={`inline-flex items-center justify-center w-5 h-5 rounded-neo border-2 border-black text-[11px] leading-none ${p.tone}`}
+        className={`inline-flex items-center justify-center w-4 h-4 rounded-neo border-2 border-black text-[11px] leading-none ${p.tone}`}
       >
         {p.emoji}
       </span>

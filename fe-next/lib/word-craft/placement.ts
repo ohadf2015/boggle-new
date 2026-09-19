@@ -146,3 +146,54 @@ export function resolveDrag(
   if (axis === 'v' && target.col !== pending[0].col) return { reason: 'breaks-line' };
   return { placement: tileToPlacement(rackTile, target.row, target.col) };
 }
+
+/**
+ * Direction to extend a lone pending tile when the player taps rack letters
+ * (no second tile placed yet). Continues whatever word the tile is touching:
+ * a board letter left/right → across, above/below → down, otherwise across.
+ * Replaced the manual Across/Down chip, which cost a whole row of board height.
+ */
+export function preferredAxis(board: Board, tile: { row: number; col: number }): Axis {
+  const has = (r: number, c: number) => Boolean(board.cells[r]?.[c]?.tile);
+  if (has(tile.row, tile.col - 1) || has(tile.row, tile.col + 1)) return 'h';
+  if (has(tile.row - 1, tile.col) || has(tile.row + 1, tile.col)) return 'v';
+  return 'h';
+}
+
+/**
+ * Existing board letters inside a suggested word — the "hook it onto this
+ * letter" cells a clue highlights so the player sees how the word connects.
+ */
+export function clueAnchors(
+  board: Board,
+  placements: PlacedTile[],
+  wordCells: { row: number; col: number }[],
+): { row: number; col: number; letter: string }[] {
+  const placed = new Set(placements.map((p) => `${p.row},${p.col}`));
+  const out: { row: number; col: number; letter: string }[] = [];
+  for (const c of wordCells) {
+    if (placed.has(`${c.row},${c.col}`)) continue;
+    const tile = board.cells[c.row]?.[c.col]?.tile;
+    if (tile) out.push({ row: c.row, col: c.col, letter: tile.letter });
+  }
+  return out;
+}
+
+/**
+ * An opening move (empty board) re-anchored so its first tile sits on the
+ * centre cell — where the opening auto-centre drops the player's first tile —
+ * keeping direction, clamped inside the board. Territory boards have no centre
+ * star, so the solver's own pick is the top-left corner. Non-opening moves are
+ * returned as-is.
+ */
+export function centerOpeningMove(board: Board, placements: PlacedTile[]): PlacedTile[] {
+  if (placements.length === 0 || board.cells.some((row) => row.some((c) => c.tile))) return placements;
+  const size = board.cells.length;
+  const mid = Math.floor(size / 2);
+  const first = placements[0];
+  const maxR = Math.max(...placements.map((t) => t.row - first.row));
+  const maxC = Math.max(...placements.map((t) => t.col - first.col));
+  const row0 = Math.min(mid, size - 1 - maxR);
+  const col0 = Math.min(mid, size - 1 - maxC);
+  return placements.map((t) => ({ ...t, row: row0 + (t.row - first.row), col: col0 + (t.col - first.col) }));
+}

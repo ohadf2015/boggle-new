@@ -77,7 +77,10 @@ describe('botDifficulty', () => {
     // Territory accrues ∝ tiles placed, so word-length/variance knobs barely
     // change the bot's claim rate. A per-turn skip chance is the one knob the
     // player actually feels: easy gives the player free turns, hard never does.
-    expect(e.turnSkipChance).toBeGreaterThan(0.25);
+    // Capped: at 0.35 a third of easy turns were a silent no-op and players
+    // read it as "the bot is broken", not "the bot is easy".
+    expect(e.turnSkipChance).toBeGreaterThan(0);
+    expect(e.turnSkipChance).toBeLessThanOrEqual(0.15);
     expect(e.turnSkipChance).toBeGreaterThan(m.turnSkipChance);
     expect(m.turnSkipChance).toBeGreaterThan(h.turnSkipChance);
     expect(h.turnSkipChance).toBe(0);
@@ -86,8 +89,8 @@ describe('botDifficulty', () => {
 
 describe('shouldBotSkipTurn', () => {
   it('skips when the roll lands under the skip chance', () => {
-    // easy ~0.35 → a 0.1 roll skips.
-    expect(shouldBotSkipTurn(botTuning('easy'), () => 0.1)).toBe(true);
+    // easy ~0.12 → a 0.05 roll skips.
+    expect(shouldBotSkipTurn(botTuning('easy'), () => 0.05)).toBe(true);
   });
 
   it('plays when the roll lands above the skip chance', () => {

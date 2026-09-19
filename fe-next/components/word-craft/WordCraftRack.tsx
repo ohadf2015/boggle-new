@@ -87,7 +87,9 @@ function WordCraftRackImpl({
       style={{
         // Keep contents readable: maintain at least one tile-height so layout
         // doesn't collapse if rack briefly empties.
-        minHeight: '5.5rem',
+        minHeight: '4.5rem',
+        // Tiles size off the rack's width, not the viewport (fits padded hosts).
+        containerType: 'inline-size',
         // End-of-content padding ensures the last tile can scroll fully into
         // view without being clipped by the scroll viewport edge.
         scrollPaddingInline: '1rem',
@@ -95,7 +97,7 @@ function WordCraftRackImpl({
     >
       <div
         className={cn(
-          'flex gap-2 sm:gap-3 items-center justify-start p-3 pt-5',
+          'flex gap-1.5 sm:gap-3 items-center justify-start px-2 pb-2 pt-4 sm:p-3 sm:pt-5',
           'mx-auto w-fit max-w-full flex-nowrap',
         )}
       >
@@ -150,7 +152,7 @@ function WordCraftRackImpl({
               // vertical-dominant motion still wins for drag-to-board.
               // Desktop cursor: grab on draggable tiles, not-allowed when
               // pending or disabled so mouse players see the affordance.
-              'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-pan-x shrink-0 snap-center',
+              'relative w-[min(3.5rem,calc((100cqw_-_3.25rem)/7))] h-[min(4rem,calc((100cqw_-_3.25rem)/6.2))] sm:w-16 sm:h-[72px] flex items-center justify-center touch-pan-x shrink-0 snap-center',
               disabled || isPending ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing',
               'rounded-neo border-neo-thick border-black',
               'transition-all duration-200 ease-out',
@@ -174,7 +176,7 @@ function WordCraftRackImpl({
               </span>
             )}
             <span
-              className={cn('wc-tile-glyph relative text-3xl sm:text-4xl', tile.isBlank && 'text-neo-purple')}
+              className={cn('wc-tile-glyph relative text-2xl sm:text-4xl', tile.isBlank && 'text-neo-purple')}
             >
               {displayTileLetter(tile)}
             </span>

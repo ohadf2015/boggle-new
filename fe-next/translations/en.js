@@ -12077,6 +12077,10 @@ const en = {
       "wheelRush": "Build words from one wheel of letters",
       "vocabQuiz": "Four-choice questions from your own word data"
     },
+    "wordCraftPractice": {
+      "hit": "Lesson word: {{word}}!",
+      "progress": "{{found}} of {{total}} list words played"
+    },
     "wordTowerPractice": {
       "unavailable": "This lesson's words can't build a tower yet. It needs at least 4 words of 4 to 6 letters.",
       "done": "Done",
@@ -12086,7 +12090,8 @@ const en = {
     },
     "practicePicker": {
       "name": {
-        "word_tower": "Word Tower"
+        "word_tower": "Word Tower",
+        "word_craft": "WordCraft"
       },
       "title": "Pick your practice",
       "readyCount": "{{ready}} of {{total}} ready to play",
@@ -12099,6 +12104,7 @@ const en = {
       "allModes": "All games",
       "skill": {
         "word_tower": "Build words from the letters of this week's list",
+        "word_craft": "Win the board with this week's words",
         "solo_board": "Find the lesson words in a letter grid",
         "warmup": "A short grid round to get going",
         "blitz": "Beat the clock on as many words as you can",
@@ -12121,6 +12127,7 @@ const en = {
       },
       "locked": {
         "word_tower": "Needs 4+ list words of 4–6 letters to unlock",
+        "word_craft": "Needs a list word of 2–7 letters",
         "solo_board": "Add words to this lesson to unlock",
         "warmup": "Add words to this lesson to unlock",
         "blitz": "Add words to this lesson to unlock",
@@ -15364,6 +15371,17 @@ const en = {
     "tied": "Tied",
     "yourTurn": "Your turn",
     "botTurn": "WordBot is thinking…",
+    "surprise": {
+      "title": "SURPRISE!",
+      "otherTitle": "{{name}} grabbed a box!",
+      "paint": "Paint splash: +{{count}} squares",
+      "mega": "MEGA splash: +{{count}} squares",
+      "steal": "Heist: {{count}} tiles stolen",
+      "clue": "Free clue unlocked"
+    },
+    "botSkipped": "{name} skips — free turn!",
+    "botSwapped": "{name} swapped letters",
+    "botPassed": "{name} passed",
     "player1": "Player 1",
     "player2": "Player 2",
     "player1Turn": "Player 1's turn",
@@ -15382,7 +15400,7 @@ const en = {
     "home": "Home",
     "finalTiles": "Final tiles!",
     "difficulty": { "label": "Bot difficulty", "easy": "Easy", "medium": "Medium", "hard": "Hard" },
-    "clue": { "button": "Clue", "reveal": "Try: {{word}}", "none": "No move found — try swapping", "granted": "+1 clue!", "adFailed": "Ad unavailable — try again" },
+    "clue": { "button": "Clue", "reveal": "Try: {{word}}", "revealAnchor": "Try {{word}} — hook it onto the {{letter}}", "none": "No move found — try swapping", "granted": "+1 clue!", "adFailed": "Ad unavailable — try again" },
     "modifier": { "bingo_bonanza": "Bingo Bonanza", "long_words": "Long Words", "rich_letters": "Rich Letters", "land_grab": "Land Grab", "quick_draw": "Quick Draw", "golden_tiles": "Golden Tiles", "none": "", "desc": { "bingo_bonanza": "Bingos score +90", "long_words": "5+ letter words +15", "rich_letters": "Rare tiles count double", "land_grab": "Captures spread to neighbours", "quick_draw": "5-tile rack — faster turns", "golden_tiles": "✦ tiles capture the cells around them" } },
     "setup": { "title": "Set up your match", "opponent": { "label": "Opponent", "bot": "Vs. Bot", "botDesc": "Play against WordBot", "hotseat": "Pass & Play", "hotseatDesc": "Two players, one device", "friend": "Challenge a Friend", "friendDesc": "Send a beat-my-score link anywhere" }, "difficulty": { "label": "Bot level" }, "twist": { "label": "Twist", "surprise": "Surprise me" }, "start": "Start game", "challengeHint": "Beat-a-friend links appear on your results screen", "sendChallengeNow": "Now send your challenge!" },
     "squares": "squares",

@@ -41,8 +41,29 @@ describe('useWordCraftGame clues', () => {
       clue = result.current.requestClue();
     });
 
-    expect(clue).toEqual({ word: 'CAT', row: 5, col: 4 });
+    // Opening move: re-anchored so the first tile sits on the centre cell
+    // (where auto-centre drops it), direction kept.
+    expect(clue).toMatchObject({ word: 'CAT', row: 5, col: 5 });
+    // Every cell of the suggestion is returned so the board can mark the path.
+    expect(clue).toMatchObject({
+      cells: [
+        { row: 5, col: 5, letter: 'C' },
+        { row: 5, col: 6, letter: 'A' },
+        { row: 5, col: 7, letter: 'T' },
+      ],
+      anchors: [],
+    });
     expect(result.current.state.cluesRemaining).toBe(1);
+  });
+
+  it('requestClue ranks with board context (territory captures) so the tip fits the live board', () => {
+    mockedFind.mockReturnValue(null);
+    const { result } = renderHook(() =>
+      useWordCraftGame({ seed: 1, locale: 'en', dict: new Set(['CAT']), territoryEnabled: true }),
+    );
+    act(() => { result.current.requestClue(); });
+    const opts = mockedFind.mock.calls[0][3];
+    expect(typeof opts?.extraScore).toBe('function');
   });
 
   it('requestClue returns null and spends nothing when no word is playable', () => {

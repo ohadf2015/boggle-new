@@ -13547,6 +13547,10 @@ const ja = {
       "wheelRush": "1つの文字ホイールから単語を作る",
       "vocabQuiz": "先生の単語データから作る4択問題"
     },
+    "wordCraftPractice": {
+      "hit": "レッスンの単語：{{word}}！",
+      "progress": "リスト単語 {{found}}/{{total}}"
+    },
     "wordTowerPractice": {
       "unavailable": "このレッスンの単語ではまだタワーを作れません。4〜6文字の単語が4つ以上必要です。",
       "done": "おわり",
@@ -13556,7 +13560,8 @@ const ja = {
     },
     "practicePicker": {
       "name": {
-        "word_tower": "ワードタワー"
+        "word_tower": "ワードタワー",
+        "word_craft": "WordCraft"
       },
       "title": "練習をえらぼう",
       "readyCount": "{{total}}件中 {{ready}}件がすぐ遊べます",
@@ -13569,6 +13574,7 @@ const ja = {
       "allModes": "すべてのゲーム",
       "skill": {
         "word_tower": "今週のリストの文字から単語を作ろう",
+        "word_craft": "今週の単語で盤面を制覇しよう",
         "solo_board": "文字盤からレッスンの単語をさがそう",
         "warmup": "短いウォームアップの盤面",
         "blitz": "制限時間内にできるだけ多くの単語を",
@@ -13591,6 +13597,7 @@ const ja = {
       },
       "locked": {
         "word_tower": "4〜6文字のリスト単語が4つ以上必要です",
+        "word_craft": "2〜7文字のリスト単語が必要です",
         "solo_board": "このレッスンに単語を追加すると使えます",
         "warmup": "このレッスンに単語を追加すると使えます",
         "blitz": "このレッスンに単語を追加すると使えます",
@@ -16659,6 +16666,17 @@ const ja = {
     "tied": "引き分け",
     "yourTurn": "あなたの番",
     "botTurn": "WordBotが考え中…",
+    "surprise": {
+      "title": "サプライズ！",
+      "otherTitle": "{{name}}がボックスを取った！",
+      "paint": "ペイント：+{{count}}マス",
+      "mega": "メガペイント：+{{count}}マス",
+      "steal": "強奪：{{count}}枚奪取",
+      "clue": "ヒント1回ゲット"
+    },
+    "botSkipped": "{name}はパス — もう一回あなたの番！",
+    "botSwapped": "{name}は文字を交換した",
+    "botPassed": "{name}はパスした",
     "player1": "プレイヤー1",
     "player2": "プレイヤー2",
     "player1Turn": "プレイヤー1のターン",
@@ -16686,6 +16704,7 @@ const ja = {
     "clue": {
       "button": "ヒント",
       "reveal": "試して: {{word}}",
+      "revealAnchor": "「{{word}}」を試そう — {{letter}}につなげて",
       "none": "手が見つかりません — 交換してみよう",
       "granted": "ヒント+1!",
       "adFailed": "広告を利用できません — もう一度"
