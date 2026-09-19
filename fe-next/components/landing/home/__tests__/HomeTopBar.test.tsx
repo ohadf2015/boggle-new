@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { HomeTopBar } from '../HomeTopBar';
 import type { ProfileData } from '@/contexts/auth/authTypes';
-import { useRetentionStreak } from '@/hooks/useRetentionStreak';
+import { useAccountStreak } from '@/hooks/useAccountStreak';
 
 // AvatarLite is the pre-mount / guest / error fallback disc — stub so we can
 // assert the cheap path without depending on palette hashing.
@@ -20,8 +20,8 @@ vi.mock('@/components/AvatarLite', () => ({
   ),
 }));
 
-vi.mock('@/hooks/useRetentionStreak', () => ({
-  useRetentionStreak: vi.fn(() => ({ streak: 0, best: 0, freezeAvailable: false })),
+vi.mock('@/hooks/useAccountStreak', () => ({
+  useAccountStreak: vi.fn(() => ({ streak: 0, loading: false })),
 }));
 
 // Simple interpolating t — substitutes {param} tokens so we can assert real
@@ -49,10 +49,9 @@ const t = (
 
 describe('HomeTopBar', () => {
   beforeEach(() => {
-    vi.mocked(useRetentionStreak).mockReturnValue({
+    vi.mocked(useAccountStreak).mockReturnValue({
       streak: 0,
-      best: 0,
-      freezeAvailable: false,
+      loading: false,
     });
   });
 
@@ -66,10 +65,9 @@ describe('HomeTopBar', () => {
       total_coins: 2840,
     } as unknown as ProfileData;
 
-    vi.mocked(useRetentionStreak).mockReturnValue({
+    vi.mocked(useAccountStreak).mockReturnValue({
       streak: 12,
-      best: 12,
-      freezeAvailable: false,
+      loading: false,
     });
     render(<HomeTopBar profile={profile} language="en" t={t} />);
 
@@ -142,17 +140,16 @@ describe('HomeTopBar', () => {
     const profile = {
       id: 'u1', username: 'm', display_name: 'Maya', current_level: 7, total_xp: 0, total_coins: 2840,
     } as unknown as ProfileData;
-    vi.mocked(useRetentionStreak).mockReturnValue({
+    vi.mocked(useAccountStreak).mockReturnValue({
       streak: 12,
-      best: 12,
-      freezeAvailable: false,
+      loading: false,
     });
     render(<HomeTopBar profile={profile} language="en" t={t} profileLoading />);
 
     // Profile-derived values are withheld behind skeletons while auth loads.
     expect(screen.queryByText('Hey, Maya')).toBeNull();
     expect(screen.queryByText('2,840')).toBeNull();
-    // Retention streak is independent of profile loading — pill shows once mounted.
+    // Account streak is independent of profile loading — pill shows once mounted.
     expect(screen.getByText('12')).toBeInTheDocument();
     // Skeleton placeholders are present (NeoSkeleton uses role="status").
     expect(screen.getAllByRole('status').length).toBeGreaterThanOrEqual(1);
@@ -161,14 +158,13 @@ describe('HomeTopBar', () => {
     expect(screen.getByTestId('home-avatar-png')).toHaveAttribute('src', '/api/avatar/png/u1');
   });
 
-  it('streak pill renders the retention streak from useRetentionStreak', () => {
+  it('streak pill renders the account streak from useAccountStreak', () => {
     const profile = {
       id: 'u1', username: 'm', display_name: 'Maya', current_level: 7, total_xp: 0, total_coins: 2840,
     } as unknown as ProfileData;
-    vi.mocked(useRetentionStreak).mockReturnValue({
+    vi.mocked(useAccountStreak).mockReturnValue({
       streak: 3,
-      best: 5,
-      freezeAvailable: false,
+      loading: false,
     });
     render(<HomeTopBar profile={profile} language="en" t={t} />);
 
@@ -177,14 +173,26 @@ describe('HomeTopBar', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('HomeTopBar streak pill and StreakBadge both read useRetentionStreak', () => {
+  it('shows a skeleton, never a stale/guessed number, while the account streak is loading', () => {
+    const profile = {
+      id: 'u1', username: 'm', display_name: 'Maya', current_level: 7, total_xp: 0, total_coins: 2840,
+    } as unknown as ProfileData;
+    vi.mocked(useAccountStreak).mockReturnValue({
+      streak: 9,
+      loading: true,
+    });
+    render(<HomeTopBar profile={profile} language="en" t={t} />);
+
+    // The resolved value must not flash onto the screen while still loading.
+    expect(screen.queryByText('9')).toBeNull();
+    expect(screen.getAllByRole('status').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('HomeTopBar streak pill and StreakBadge both read the shared useAccountStreak hook', () => {
     const topBar = readFileSync(path.resolve(__dirname, '../HomeTopBar.tsx'), 'utf8');
     const badge = readFileSync(path.resolve(__dirname, '../../../StreakBadge.tsx'), 'utf8');
-    const hub = readFileSync(path.resolve(__dirname, '../HomeHub.tsx'), 'utf8');
-    expect(topBar).toMatch(/from '@\/hooks\/useRetentionStreak'/);
-    expect(badge).toMatch(/from '@\/hooks\/useRetentionStreak'/);
-    expect(hub).not.toMatch(/streak=\{dailyChallengeStats/);
-    expect(hub).not.toMatch(/streakLoading=/);
+    expect(topBar).toMatch(/from '@\/hooks\/useAccountStreak'/);
+    expect(badge).toMatch(/from '@\/hooks\/useAccountStreak'/);
   });
 
   it('renders the real avatar face via the server-rendered PNG once mounted', () => {

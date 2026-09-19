@@ -2,6 +2,7 @@
 
 import { Flame, Snowflake } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAccountStreak } from '@/hooks/useAccountStreak';
 import { useRetentionStreak } from '@/hooks/useRetentionStreak';
 
 /**
@@ -9,12 +10,19 @@ import { useRetentionStreak } from '@/hooks/useRetentionStreak';
  * Flame + day count; a snowflake pip while this week's streak freeze is
  * still in inventory. Self-hides at 0 days (no streak to advertise yet) so
  * brand-new players don't see an empty counter.
+ *
+ * The day count follows the PLAYER'S ACCOUNT via `useAccountStreak` (the same
+ * server number the daily-puzzle card shows), not the device — a signed-in
+ * player sees the same streak here as everywhere else. Only the freeze pip
+ * (a device-local inventory perk, unrelated to the account streak count)
+ * still reads `useRetentionStreak` directly.
  */
 export default function StreakBadge() {
   const { t } = useLanguage();
-  const { streak, freezeAvailable } = useRetentionStreak();
+  const { streak, loading } = useAccountStreak();
+  const { freezeAvailable } = useRetentionStreak();
 
-  if (streak <= 0) return null;
+  if (loading || streak <= 0) return null;
 
   const label = t('dailyStreak.badge', { count: streak });
   const freezeLabel = freezeAvailable ? t('dailyStreak.freezeReady') : '';

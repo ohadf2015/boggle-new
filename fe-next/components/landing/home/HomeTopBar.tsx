@@ -8,7 +8,7 @@ import AvatarLite from '@/components/AvatarLite';
 import { NeoSkeleton } from '@/components/ui/skeleton';
 import { getXpProgress, getTitleForLevel } from '@/backend/modules/xpManager';
 import { clampPercent } from '@/lib/landing/homeHubFormat';
-import { useRetentionStreak } from '@/hooks/useRetentionStreak';
+import { useAccountStreak } from '@/hooks/useAccountStreak';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
 /** localStorage key — a stable per-device seed so a guest's random avatar is the
@@ -43,9 +43,10 @@ export function HomeTopBar({
   t,
   profileLoading = false,
 }: HomeTopBarProps) {
-  // Same source as the header StreakBadge — the cross-mode retention streak,
-  // not the weekly-chest / daily-puzzle streak. Client-only (localStorage).
-  const { streak } = useRetentionStreak();
+  // Same source as the header StreakBadge — the player's ACCOUNT streak for a
+  // signed-in player (the same server number the daily-puzzle card shows),
+  // falling back to the device-local retention streak only for a guest.
+  const { streak, loading: streakLoading } = useAccountStreak();
 
   // Profile + streak are client-resolved (auth / retention store). On the server and
   // the first client render they may differ — and `coins.toLocaleString()` is
@@ -86,7 +87,7 @@ export function HomeTopBar({
   // gets the neutral state ("Player", level 1, 0), never an endless skeleton.
   // Pre-mount paints skeleton too so SSR matches the first client frame.
   const showProfileSkeleton = !mounted || profileLoading;
-  const showStreakSkeleton = !mounted;
+  const showStreakSkeleton = !mounted || streakLoading;
 
   // The avatar always has a seed → generated avatar, never a skeleton. The real
   // profile id wins once loaded; otherwise the stable guest seed gives a random one.
