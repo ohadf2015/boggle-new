@@ -469,8 +469,14 @@ const en = {
     "cardDesc": "Real physics — beta preview",
     "collapsed": "Tower down!",
     "newBest": "New best!",
-    "plusScramble": "+{n} scramble",
-    "wider": "Next block ×{n} wider",
+    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left"},
+    "biome": {"downtown": "Downtown", "sunset": "Sunset Rooftops", "clouds": "Cloud Deck", "jetstream": "Jet Stream", "aurora": "Aurora", "orbit": "Orbit", "cosmos": "Deep Cosmos"},
+    "newSky": "New sky",
+    "call": {"perfect": {"0": "PERFECT!", "1": "BULLSEYE!", "2": "SPOT ON!", "3": "FLAWLESS!"}, "good": {"0": "NICE!", "1": "SOLID!", "2": "CLEAN!", "3": "SMOOTH!"}, "sloppy": {"0": "WOBBLY…", "1": "CLOSE ONE!", "2": "HANGING ON!"}, "miss": {"0": "OOPS!", "1": "WHOOPS!", "2": "TIMBER!"}, "combo": {"double": "DOUBLE!", "triple": "TRIPLE!", "quad": "QUAD!", "unstoppable": "UNSTOPPABLE ×{n}", "legendary": "LEGENDARY ×{n}"}, "word": {"big": "BIG WORD!", "mega": "MEGA WORD!"}},
+    "reward": {"crate": "Crate!", "steady": {"name": "Steady Crane", "desc": "The next 3 floors swing slower"}, "plumb": {"name": "Plumb Line", "desc": "The next 2 floors drop dead straight"}, "wide": {"name": "Wide Load", "desc": "Your next floor is built wider"}, "rebar": {"name": "Rebar", "desc": "Lower floors welded — they can't topple"}, "scramble": {"name": "Fresh Letters", "desc": "+2 scrambles"}, "jackpot": {"name": "Jackpot", "desc": "Bonus points!"}},
+    "ach": {"unlocked": "Badge unlocked", "groundbreaker": {"name": "Groundbreaker", "desc": "Land your first floor"}, "fiveStory": {"name": "Five-Story Walk-Up", "desc": "Stack 5 floors in one run"}, "highRise": {"name": "High-Rise", "desc": "Stack 10 floors in one run"}, "skyscraper": {"name": "Skyscraper", "desc": "Stack 20 floors in one run"}, "megatower": {"name": "Megatower", "desc": "Stack 30 floors in one run"}, "steadyHands": {"name": "Steady Hands", "desc": "3 perfect drops in a row"}, "surgeon": {"name": "Surgeon", "desc": "6 perfect drops in a row"}, "flawless": {"name": "Flawless", "desc": "10 perfect drops in a row"}, "perfectionist": {"name": "Perfectionist", "desc": "15 perfect drops in one run"}, "wordsmith": {"name": "Wordsmith", "desc": "Hoist a 6-letter word"}, "lexicon": {"name": "Walking Lexicon", "desc": "Hoist an 8-letter word"}, "fullHouse": {"name": "Full House", "desc": "50 tenants in one run"}, "cityPlanner": {"name": "City Planner", "desc": "150 tenants in one run"}, "lucky": {"name": "Lucky Streak", "desc": "Open 5 crates in one run"}, "welder": {"name": "Welder", "desc": "Weld your tower with rebar"}, "sunsetView": {"name": "Sunset View", "desc": "Climb into the sunset sky"}, "aboveClouds": {"name": "Above the Clouds", "desc": "Climb past the clouds"}, "orbiter": {"name": "Orbiter", "desc": "Build all the way to orbit"}},
+    "results": {"floorsA11y": "Reached floor {n}", "combo": "Best streak", "tenants": "Tenants", "crates": "Crates", "badges": "Badges earned", "nextGoal": "Next goal"},
+    "hint": {"spell": "Spell a word to build the next floor", "drop": "Tap DROP when the floor is over the tower"},
     "bestFlag": "BEST"
   },
   "wordTower": {

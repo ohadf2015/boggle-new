@@ -1,16 +1,41 @@
 /** Letter-wheel bookkeeping for Word Tower v2. Pure — no React, no DOM. */
 
 import { generateWheel } from '@/lib/wordTower/wordTowerManager';
+import { WORD_TOWER_WHEEL_SIZE as WHEEL_SIZE } from '@/shared/constants/wordTowerConstants';
 import type { Language } from '@/shared/types/game';
+
+/** 2-3 vowels of 7: v1's floor-only rule dealt 4-5, leaving nothing to spell with. */
+const MAX_VOWELS = 3;
 
 /**
  * v1's generator draws from UPPERCASE bags while the dictionary and typed input
  * are lowercase. Borrowed raw, every word failed the wheel check and nothing
  * could ever be hoisted. Normalise once, here.
  */
+/**
+ * Letters that rarely make words. More than one on a 7-letter ring (a real deal
+ * was Q,Q,V,C + 3 vowels) leaves nothing to spell. Lowercase, per language.
+ */
+const RARE: Partial<Record<Language, string>> = { en: 'jqxz', es: 'jkqwxz', sv: 'cjqwxz', ru: 'ёжщъфцэю' };
+/** Re-deals tried per draw before settling for the last candidate. */
+const DEAL_TRIES = 12;
+
+function playable(wheel: string[], language: Language): boolean {
+  const rare = RARE[language] ?? '';
+  if (wheel.filter((l) => rare.includes(l)).length > 1) return false;
+  return !(wheel.includes('q') && !wheel.includes('u') && (language === 'en' || language === 'es'));
+}
+
 export function spinWheel(language: Language, drawIndex = 0, runSeed = 'word-tower-v2'): string[] {
   // runSeed varies per run: a constant opened every run on the same letters.
-  return generateWheel(runSeed, 'local', language, drawIndex).map((l) => l.toLowerCase());
+  // Deterministic re-deals: candidate k of draw d is sub-draw d*DEAL_TRIES+k.
+  let wheel: string[] = [];
+  for (let k = 0; k < DEAL_TRIES; k += 1) {
+    wheel = generateWheel(runSeed, 'local', language, drawIndex * DEAL_TRIES + k, WHEEL_SIZE, 2, MAX_VOWELS).map((l) => l.toLowerCase());
+    if (playable(wheel, language)) return wheel;
+  }
+  // ponytail: 12 misses in a row is vanishingly rare; ship the last deal rather than loop.
+  return wheel;
 }
 
 export function canBuildFromWheel(word: string, wheel: string[]): boolean {

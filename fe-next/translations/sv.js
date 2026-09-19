@@ -810,8 +810,14 @@ const sv = {
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",
     "newBest": "Nytt rekord!",
-    "plusScramble": "+{n} blandning",
-    "wider": "Nästa block ×{n} bredare",
+    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar"},
+    "biome": {"downtown": "Centrum", "sunset": "Tak i solnedgång", "clouds": "Molnhavet", "jetstream": "Jetströmmen", "aurora": "Norrsken", "orbit": "Omloppsbana", "cosmos": "Djupa rymden"},
+    "newSky": "Ny himmel",
+    "call": {"perfect": {"0": "PERFEKT!", "1": "MITT I PRICK!", "2": "EXAKT!", "3": "FELFRITT!"}, "good": {"0": "SNYGGT!", "1": "STADIGT!", "2": "RENT!", "3": "SMIDIGT!"}, "sloppy": {"0": "VINGLIGT…", "1": "NÄRA ÖGAT!", "2": "HÄNGER KVAR!"}, "miss": {"0": "HOPPSAN!", "1": "OJ!", "2": "DET RASAR!"}, "combo": {"double": "DUBBEL!", "triple": "TRIPPEL!", "quad": "FYRDUBBEL!", "unstoppable": "OSTOPPBAR ×{n}!", "legendary": "LEGENDARISK ×{n}!"}, "word": {"big": "STORT ORD!", "mega": "MEGAORD!"}},
+    "reward": {"crate": "Låda!", "steady": {"name": "Stadig kran", "desc": "De 3 nästa våningarna svänger långsammare"}, "plumb": {"name": "Lod", "desc": "De 2 nästa våningarna faller rakt ner"}, "wide": {"name": "Bred last", "desc": "Nästa våning byggs bredare"}, "rebar": {"name": "Armering", "desc": "De nedre våningarna är svetsade – de kan inte rasa"}, "scramble": {"name": "Nya bokstäver", "desc": "+2 blandningar"}, "jackpot": {"name": "Jackpott", "desc": "Bonuspoäng!"}},
+    "ach": {"unlocked": "Märke upplåst", "groundbreaker": {"name": "Första spadtaget", "desc": "Landa din första våning"}, "fiveStory": {"name": "Femvåningshus", "desc": "Stapla 5 våningar i en omgång"}, "highRise": {"name": "Höghus", "desc": "Stapla 10 våningar i en omgång"}, "skyscraper": {"name": "Skyskrapa", "desc": "Stapla 20 våningar i en omgång"}, "megatower": {"name": "Megatorn", "desc": "Stapla 30 våningar i en omgång"}, "steadyHands": {"name": "Stadiga händer", "desc": "3 perfekta släpp i rad"}, "surgeon": {"name": "Kirurg", "desc": "6 perfekta släpp i rad"}, "flawless": {"name": "Felfri", "desc": "10 perfekta släpp i rad"}, "perfectionist": {"name": "Perfektionist", "desc": "15 perfekta släpp i en omgång"}, "wordsmith": {"name": "Ordsmed", "desc": "Lyft ett ord på 6 bokstäver"}, "lexicon": {"name": "Levande lexikon", "desc": "Lyft ett ord på 8 bokstäver"}, "fullHouse": {"name": "Fullt hus", "desc": "50 hyresgäster i en omgång"}, "cityPlanner": {"name": "Stadsplanerare", "desc": "150 hyresgäster i en omgång"}, "lucky": {"name": "Tur i serie", "desc": "Öppna 5 lådor i en omgång"}, "welder": {"name": "Svetsare", "desc": "Svetsa ditt torn med armering"}, "sunsetView": {"name": "Solnedgångsutsikt", "desc": "Klättra upp i solnedgångshimlen"}, "aboveClouds": {"name": "Ovanför molnen", "desc": "Klättra förbi molnen"}, "orbiter": {"name": "I omloppsbana", "desc": "Bygg ända upp i omloppsbana"}},
+    "results": {"floorsA11y": "Nådde våning {n}", "combo": "Bästa serie", "tenants": "Hyresgäster", "crates": "Lådor", "badges": "Märken du tog", "nextGoal": "Nästa mål"},
+    "hint": {"spell": "Stava ett ord för att bygga nästa våning", "drop": "Tryck SLÄPP när våningen är över tornet"},
     "bestFlag": "REKORD"
   },
   "wordTower": {

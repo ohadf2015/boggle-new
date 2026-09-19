@@ -11,10 +11,10 @@ import { GRAVITY_PX_PER_MS2 } from './engine';
 export const CRANE_ARM_PX = 220;
 
 /**
- * How far above the tower top the hanging block rides, physics pixels. Was 230:
- * a tall dead band of sky between hook and tower that read as wasted screen.
+ * How far above the tower top the hanging block's CENTRE rides, physics px.
+ * Leaves ~1.3 floors of air under a 120px floor — enough to read the throw arc.
  */
-export const CRANE_CLEARANCE_PX = 180;
+export const CRANE_CLEARANCE_PX = 220;
 
 export interface CraneSwing {
   /** Peak swing angle from vertical, radians. */
@@ -26,11 +26,11 @@ export interface CraneSwing {
 }
 
 /**
- * The one swing every run uses. 0.38 -> 0.5 in round 5: slabs grew ~40% wider,
- * and at 0.38 the landing never left a 5-letter slab — every tap scored. Width of a block versus the landing sweep is
+ * The one swing every run uses. 0.38 -> 0.5 -> 0.58 (rounds 5-6): each time the
+ * slabs grew, the landing sweep had to grow past half a slab or every tap scored. Width of a block versus the landing sweep is
  * the real difficulty dial — see feel.test.ts, which pins it in ms.
  */
-export const SWING: CraneSwing = { amplitudeRad: 0.5, periodMs: 2600, phase: 0 };
+export const SWING: CraneSwing = { amplitudeRad: 0.58, periodMs: 2600, phase: 0 };
 
 export interface CraneState {
   angleRad: number;

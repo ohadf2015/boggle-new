@@ -45,7 +45,14 @@ export interface CraneFrame {
   hook: { x: number; y: number } | null;
 }
 
-export function paintCrane(g: Graphics, f: CraneFrame): void {
+/**
+ * Mast, jib, counterweight and cab: everything that does not follow the hook.
+ * Repainted only when the camera or viewport moved (the key), not every frame —
+ * this was ~60 path ops per frame at rest.
+ */
+export function paintCraneFrame(g: Graphics, f: CraneFrame, prevKey: string): string {
+  const key = `${f.scale.toFixed(3)}|${f.halfW.toFixed(1)}|${f.topY.toFixed(1)}|${Math.min(0, f.bottomY).toFixed(1)}|${f.side}`;
+  if (key === prevKey) return key;
   const px = (n: number) => n / f.scale;
   const dir = f.side === 'left' ? -1 : 1;
   g.clear();
@@ -93,7 +100,15 @@ export function paintCrane(g: Graphics, f: CraneFrame): void {
   g.roundRect(cabX, jibBottom, cabW, px(24), px(3)).fill(YELLOW).stroke({ width: px(2.5), color: INK });
   g.rect(cabX + px(5), jibBottom + px(5), cabW - px(10), px(9)).fill({ color: 0x9fe7ff, alpha: 0.9 });
 
+  return key;
+}
+
+/** Trolley, cable and hook — the only crane parts that move every frame. */
+export function paintCraneHook(g: Graphics, f: CraneFrame): void {
+  g.clear();
   if (!f.hook) return;
+  const px = (n: number) => n / f.scale;
+  const jibBottom = f.topY + px(JIB_SCREEN_Y) + px(JIB_H);
   const cableTopY = jibBottom + px(8);
   const tx = trolleyX(f.pivot, f.hook, cableTopY);
   g.roundRect(tx - px(15), jibBottom - px(2), px(30), px(10), px(2)).fill(INK);

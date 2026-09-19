@@ -525,8 +525,14 @@ const ja = {
     "cardDesc": "本物の物理演算 — ベータ版",
     "collapsed": "タワー崩壊！",
     "newBest": "自己ベスト更新！",
-    "plusScramble": "シャッフル +{n}",
-    "wider": "次のブロック幅 ×{n}",
+    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "effect": "{name}：残り{n}"},
+    "biome": {"downtown": "ダウンタウン", "sunset": "夕焼けの屋上", "clouds": "雲海", "jetstream": "ジェット気流", "aurora": "オーロラ", "orbit": "軌道", "cosmos": "深宇宙"},
+    "newSky": "新しい空",
+    "call": {"perfect": {"0": "パーフェクト！", "1": "ど真ん中！", "2": "ぴったり！", "3": "完璧！"}, "good": {"0": "ナイス！", "1": "いいね！", "2": "きれい！", "3": "スムーズ！"}, "sloppy": {"0": "グラグラ…", "1": "あぶない！", "2": "ギリギリ！"}, "miss": {"0": "おっと！", "1": "うわっ！", "2": "崩れる！"}, "combo": {"double": "ダブル！", "triple": "トリプル！", "quad": "クアッド！", "unstoppable": "止まらない ×{n}！", "legendary": "伝説 ×{n}！"}, "word": {"big": "長い単語！", "mega": "超長い単語！"}},
+    "reward": {"crate": "ボックス！", "steady": {"name": "安定クレーン", "desc": "次の3フロアはゆっくり揺れる"}, "plumb": {"name": "下げ振り", "desc": "次の2フロアはまっすぐ落ちる"}, "wide": {"name": "ワイドロード", "desc": "次のフロアが広くなる"}, "rebar": {"name": "鉄筋", "desc": "下のフロアを溶接。もう崩れない"}, "scramble": {"name": "新しい文字", "desc": "シャッフル+2"}, "jackpot": {"name": "ジャックポット", "desc": "ボーナスポイント！"}},
+    "ach": {"unlocked": "バッジ獲得", "groundbreaker": {"name": "着工", "desc": "最初のフロアを置く"}, "fiveStory": {"name": "5階建て", "desc": "1回で5フロア積む"}, "highRise": {"name": "高層ビル", "desc": "1回で10フロア積む"}, "skyscraper": {"name": "摩天楼", "desc": "1回で20フロア積む"}, "megatower": {"name": "メガタワー", "desc": "1回で30フロア積む"}, "steadyHands": {"name": "ブレない手", "desc": "3回連続パーフェクト"}, "surgeon": {"name": "外科医", "desc": "6回連続パーフェクト"}, "flawless": {"name": "完全無欠", "desc": "10回連続パーフェクト"}, "perfectionist": {"name": "完璧主義者", "desc": "1回で15回パーフェクト"}, "wordsmith": {"name": "言葉の職人", "desc": "6文字の単語を吊り上げる"}, "lexicon": {"name": "歩く辞書", "desc": "8文字の単語を吊り上げる"}, "fullHouse": {"name": "満室", "desc": "1回で住人50人"}, "cityPlanner": {"name": "都市計画家", "desc": "1回で住人150人"}, "lucky": {"name": "ラッキー続き", "desc": "1回でボックスを5個開ける"}, "welder": {"name": "溶接工", "desc": "鉄筋でタワーを溶接する"}, "sunsetView": {"name": "夕焼けの眺め", "desc": "夕焼けの空まで登る"}, "aboveClouds": {"name": "雲の上", "desc": "雲を突き抜ける"}, "orbiter": {"name": "軌道到達", "desc": "軌道まで建てる"}},
+    "results": {"floorsA11y": "{n}階に到達", "combo": "最高連続", "tenants": "住人", "crates": "ボックス", "badges": "獲得バッジ", "nextGoal": "次の目標"},
+    "hint": {"spell": "単語をつくって次のフロアを建てよう", "drop": "タワーの真上に来たら「落とす」をタップ"},
     "bestFlag": "ベスト"
   },
   "wordTower": {

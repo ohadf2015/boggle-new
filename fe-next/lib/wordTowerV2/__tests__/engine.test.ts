@@ -4,11 +4,13 @@ import {
   FIXED_DT_MS,
   PX_PER_M,
   createTowerWorld,
+  getTowerHeightM,
   moveAttachedBlock,
   releaseBlock,
   snapshotWorld,
   spawnBlock,
   stepWorld,
+  weldBelow,
 } from '../engine';
 
 const block = (x: number, y: number, id: string, widthPx = 96) => ({
@@ -238,5 +240,36 @@ describe('drop feel', () => {
 describe('constants', () => {
   it('given the sim rate, when read, then it is 120Hz', () => {
     expect(FIXED_DT_MS).toBeCloseTo(1000 / 120, 6);
+  });
+});
+
+describe('weldBelow (rebar crate)', () => {
+  const stack = (n: number) => {
+    const world = createTowerWorld({ seed: 1 });
+    for (let i = 0; i < n; i += 1) {
+      spawnBlock(world, { id: `b${i}`, x: 0, y: -(i * 120 + 62), widthPx: 220, heightPx: 120, vx: 0 });
+      for (let t = 0; t < 700; t += 1000 / 120) stepWorld(world, 1000 / 120);
+    }
+    return world;
+  };
+
+  it('given a 5-floor tower, when welded keeping 2, then the bottom 3 are fixed and the top 2 still live', () => {
+    const world = stack(5);
+    const welded = weldBelow(world, 2);
+    expect(welded.sort()).toEqual(['b0', 'b1', 'b2']);
+    expect(world.blocks.get('b0')!.isStatic).toBe(true);
+    expect(world.blocks.get('b4')!.isStatic).toBe(false);
+  });
+
+  it('given a welded base, when time passes, then the tower height is unchanged', () => {
+    const world = stack(5);
+    const before = getTowerHeightM(world);
+    weldBelow(world, 2);
+    for (let t = 0; t < 1000; t += 1000 / 120) stepWorld(world, 1000 / 120);
+    expect(getTowerHeightM(world)).toBeCloseTo(before, 1);
+  });
+
+  it('given a short tower, when welded, then nothing is fixed', () => {
+    expect(weldBelow(stack(2), 2)).toEqual([]);
   });
 });

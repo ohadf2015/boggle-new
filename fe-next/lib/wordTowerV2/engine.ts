@@ -19,7 +19,7 @@ import { Bodies, Body, Composite, Engine, Events } from 'matter-js';
 export const FIXED_DT_MS = 1000 / 120;
 
 /** World scale. Tower height is reported in metres; physics thinks in pixels. */
-export const PX_PER_M = 32;
+export const PX_PER_M = 40;
 
 /**
  * Matter expresses velocity per its own base delta (16.67ms), NOT per simulation
@@ -258,6 +258,26 @@ export function releaseBlock(
   // threw every block sideways at 8.3x the intended speed.
   Body.setVelocity(body, { x: vx * MATTER_BASE_DELTA_MS, y: 0 });
   Body.setAngularVelocity(body, angularVel * MATTER_BASE_DELTA_MS);
+}
+
+/**
+ * Rebar crate: weld every landed floor except the top `keepTop` in place. Welded
+ * floors become static, so the base can no longer shear or topple — only the
+ * live top of the tower still rocks. Returns the ids welded.
+ */
+export function weldBelow(world: TowerWorld, keepTop: number): string[] {
+  // Only RESTING floors: freezing one mid-bounce would lock in a crooked pose.
+  const landed = [...world.blocks].filter(([id, body]) => world.landed.has(id) && !body.isStatic && isResting(world, id, body));
+  // Highest first: smaller y is higher.
+  landed.sort((a, b) => a[1].position.y - b[1].position.y);
+  const welded: string[] = [];
+  for (const [id, body] of landed.slice(keepTop)) {
+    Body.setVelocity(body, { x: 0, y: 0 });
+    Body.setAngularVelocity(body, 0);
+    Body.setStatic(body, true);
+    welded.push(id);
+  }
+  return welded;
 }
 
 function isSlow(body: Body): boolean {

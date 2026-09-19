@@ -39,10 +39,11 @@ describe('frameCamera', () => {
 
     it(`fits the full crane swing horizontally — ${vp.name}`, () => {
       const f = frameCamera({ viewportW: vp.w, viewportH: vp.h, dockPx: vp.dock, towerTopM: 0 });
-      // At the swing's far end a 5-letter slab keeps >=80% of itself on screen.
-      // Fitting all of it shrank every slab to 38% of a phone's width (round 5).
+      // At the swing's far end a 5-letter slab keeps >=65% of itself on screen:
+      // only for the instant it turns. Keeping 80% held slabs at 58% of a
+      // phone's width, which read as "the game is so little" (round 6).
       const maxSwingX = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad);
-      const halfSpan = (maxSwingX + 0.8 * (blockWidthForWord('tower') / 2)) * f.scale;
+      const halfSpan = (maxSwingX + 0.15 * blockWidthForWord('tower')) * f.scale;
       expect(halfSpan).toBeLessThanOrEqual(vp.w / 2);
     });
   }

@@ -2,6 +2,7 @@
  * Procedural scenery for the v2 backdrop — pure, seeded, so server and client
  * (and every test) agree on the exact same skyline.
  */
+import { BIOMES, type PropKind } from './biomes';
 
 export interface SkylineWindow {
   x: number;
@@ -76,4 +77,43 @@ export function rulerTicks(fromM: number, toM: number): RulerTick[] {
   const ticks: RulerTick[] = [];
   for (let m = Math.max(0, Math.ceil(fromM)); m <= Math.floor(toM); m += 1) ticks.push({ m, major: m % 5 === 0 });
   return ticks;
+}
+
+export interface SkyProp {
+  kind: PropKind;
+  /** Altitude, in floors. */
+  floor: number;
+  /** Horizontal position, -1 (left edge) .. 1 (right edge). */
+  x: number;
+  /** Size multiplier, ~0.7..1.3. */
+  size: number;
+  /** 0..1 seed for per-prop animation phase / variant. */
+  phase: number;
+}
+
+/** Floors of sky per prop: dense enough to feel the climb, sparse enough to stay calm. */
+const FLOORS_PER_PROP = 1.8;
+/** Nothing in the first floors of sky: it would hang right on the street. */
+const FIRST_PROP_FLOOR = 2;
+/** How far past the last sky's start props keep coming. */
+const LAST_BAND_FLOORS = 30;
+
+/** Every sky prop for a run, placed inside the band of the sky that owns it. */
+export function skyProps(seed: number): SkyProp[] {
+  const r = rng(seed);
+  const out: SkyProp[] = [];
+  BIOMES.forEach((biome, i) => {
+    const from = Math.max(FIRST_PROP_FLOOR, biome.fromFloor);
+    const to = BIOMES[i + 1]?.fromFloor ?? biome.fromFloor + LAST_BAND_FLOORS;
+    for (let floor = from + r() * FLOORS_PER_PROP; floor < to; floor += FLOORS_PER_PROP * (0.6 + r() * 0.8)) {
+      out.push({
+        kind: biome.props[Math.floor(r() * biome.props.length)],
+        floor,
+        x: r() * 2 - 1,
+        size: 0.7 + r() * 0.6,
+        phase: r(),
+      });
+    }
+  });
+  return out;
 }

@@ -1,3 +1,4 @@
+import { generateWheel } from '@/lib/wordTower/wordTowerManager';
 import { describe, expect, it } from 'vitest';
 import { canBuildFromWheel, isAcceptedWord, spinWheel, usedLetterMask } from '../wheel';
 
@@ -66,5 +67,45 @@ describe('spinWheel run seed', () => {
 
   it('given the same run and draw, when spun twice, then identical', () => {
     expect(spinWheel('en', 3, 'run-a')).toEqual(spinWheel('en', 3, 'run-a'));
+  });
+});
+
+describe('spinWheel vowel balance', () => {
+  const VOWELS: Record<string, string> = { en: 'aeiou', es: 'aeiou', sv: 'aeiouyåäö', ru: 'аеиоуы', he: 'אהויע' };
+
+  for (const [lang, vowels] of Object.entries(VOWELS)) {
+    it(`given many ${lang} wheels, when spun, then 2-3 vowels in every 7 letters`, () => {
+      // A vowel-heavy ring (4-5 of 7) leaves too few consonants to spell with.
+      for (let draw = 0; draw < 200; draw += 1) {
+        const wheel = spinWheel(lang as Parameters<typeof spinWheel>[0], draw, `seed-${lang}`);
+        const n = wheel.filter((l) => vowels.includes(l)).length;
+        expect(n, wheel.join('')).toBeGreaterThanOrEqual(2);
+        expect(n, wheel.join('')).toBeLessThanOrEqual(3);
+      }
+    });
+  }
+
+  it('given the v1 generator with no cap, when spun, then v1 behaviour is untouched', () => {
+    expect(generateWheel('g', 'p', 'en', 0)).toEqual(generateWheel('g', 'p', 'en', 0, 7, 2));
+  });
+});
+
+describe('spinWheel rare letters', () => {
+  it('given many english wheels, when spun, then at most one of q/x/z/j, and a q always brings its u', () => {
+    for (let draw = 0; draw < 400; draw += 1) {
+      const wheel = spinWheel('en', draw, 'rare-seed');
+      const rare = wheel.filter((l) => 'qxzj'.includes(l)).length;
+      expect(rare, wheel.join('')).toBeLessThanOrEqual(1);
+      if (wheel.includes('q')) expect(wheel, wheel.join('')).toContain('u');
+    }
+  });
+
+  it('given many wheels, when spun, then no letter appears more than twice', () => {
+    for (let draw = 0; draw < 200; draw += 1) {
+      const wheel = spinWheel('es', draw, 'dup-seed');
+      const counts = new Map<string, number>();
+      for (const l of wheel) counts.set(l, (counts.get(l) ?? 0) + 1);
+      expect(Math.max(...counts.values()), wheel.join('')).toBeLessThanOrEqual(2);
+    }
   });
 });
