@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 6960,
+    "totalKeysInCode": 6959,
     "keyCountByLanguage": {
       "en": 13446,
       "es": 13751,
@@ -9,10 +9,10 @@
       "ru": 13486,
       "sv": 13712
     },
-    "missingFromEnglish": 101,
+    "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 356,
+      "templateLiterals": 354,
       "fallbackUsages": 1,
       "variableKeys": 133
     }
@@ -2253,25 +2253,11 @@
         "type": "template_literal"
       },
       {
-        "pattern": "`wordcraft.run.card.${c.id}.desc`",
-        "type": "template_literal",
-        "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 44,
-        "context": "title={t(`wordcraft.run.card.${c.id}.desc`)}"
-      },
-      {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
         "type": "template_literal",
         "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 48,
+        "line": 38,
         "context": "{t(`wordcraft.run.card.${c.id}.name`)}"
-      },
-      {
-        "pattern": "`wordcraft.run.card.${c.id}.desc`",
-        "type": "template_literal",
-        "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 51,
-        "context": "{t(`wordcraft.run.card.${c.id}.desc`)}"
       },
       {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
@@ -4600,15 +4586,6 @@
         {
           "file": "components/word-craft/WordCraftSetup.tsx",
           "line": 89
-        }
-      ]
-    },
-    {
-      "key": "wordWheel.closeRace",
-      "usages": [
-        {
-          "file": "components/multiplayer/WheelRushHeader.tsx",
-          "line": 160
         }
       ]
     }

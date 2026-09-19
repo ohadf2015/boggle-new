@@ -747,6 +747,23 @@ const sv = {
     "issueProbe": {"prompt": "Vad fick det att kännas så?", "botsStrong": "Bottar för starka", "technical": "Tekniskt problem"}
   },
   "wordTowerV2": {
+    "unitM": "m",
+    "wreck": {
+      "smash": "Krossa {name}s torn",
+      "smashOwn": "Krossa ditt torn",
+      "title": "{name}s torn",
+      "titleOwn": "Ditt torn",
+      "cut": "Släpp!",
+      "balls": "{n} rivningskulor",
+      "crash": "PANG!",
+      "result": "{n} av {total} nedslagna!",
+      "share": "Utmana en vän",
+      "shareText": "Mitt ordtorn nådde {m} m. Försök riva det:",
+      "copied": "Länk kopierad!",
+      "challenge": "{name} utmanar dig! Perfekta släpp ger rivningskulor. Sen river du tornet.",
+      "friend": "Din vän",
+      "back": "Spela igen",
+    },
     "cardTitle": "Ordtornet v2",
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",

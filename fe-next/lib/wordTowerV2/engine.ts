@@ -29,6 +29,14 @@ export const PX_PER_M = 32;
 const MATTER_BASE_DELTA_MS = 1000 / 60;
 
 /**
+ * Tuned, not guessed: t = sqrt(2h/a). A 300px fall should reach contact in
+ * ~450ms (the Tower Bloxx drop weight), which needs ~2963 px/s^2. Matter reads
+ * gravity.y in units of 0.001 px/ms^2, so 3.0 lands inside the target window.
+ */
+const GRAVITY_Y = 3.0;
+export const GRAVITY_PX_PER_MS2 = GRAVITY_Y * 0.001;
+
+/**
  * Upper bound on substeps for one call. A backgrounded tab hands back a huge
  * delta; simulating all of it would block the main thread and produce an even
  * bigger delta next frame. We drop the excess rather than spiral.
@@ -145,10 +153,7 @@ export function createTowerWorld(_options: CreateWorldOptions): TowerWorld {
     constraintIterations: 4,
     enableSleeping: false,
   });
-  // Tuned, not guessed: t = sqrt(2h/a). A 300px fall should reach contact in
-  // ~450ms (the Tower Bloxx drop weight), which needs ~2963 px/s^2. Matter reads
-  // gravity.y in units of 0.001 px/ms^2, so 3.0 lands inside the target window.
-  engine.gravity.y = 3.0;
+  engine.gravity.y = GRAVITY_Y;
 
   const world: TowerWorld = {
     engine,

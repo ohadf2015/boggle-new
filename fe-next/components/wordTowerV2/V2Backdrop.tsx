@@ -8,6 +8,7 @@ import { WordTowerAmbient } from '@/components/wordTower/WordTowerAmbient';
 import { BIOME_THEME } from '@/components/wordTower/biomeTheme';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { visualAltitudeM } from '@/lib/wordTowerV2/altitude';
+import { V2Scenery } from './V2Scenery';
 
 /**
  * v1's whole sky — gradient, skylines, clouds, altitude props, rare sightings,
@@ -19,10 +20,12 @@ import { visualAltitudeM } from '@/lib/wordTowerV2/altitude';
 export const V2Backdrop = memo(function V2Backdrop({
   heightM,
   groundInsetPx,
+  accentHex,
   reducedMotion,
 }: {
   heightM: number;
   groundInsetPx: number;
+  accentHex: string;
   reducedMotion: boolean;
 }) {
   const alt = visualAltitudeM(heightM);
@@ -43,6 +46,7 @@ export const V2Backdrop = memo(function V2Backdrop({
       <WordTowerParallaxProps heightM={alt} reducedMotion={reducedMotion} />
       <WordTowerSighting heightM={alt} reducedMotion={reducedMotion} />
       <WordTowerAmbient biomeId={fromId} heightM={alt} reducedMotion={reducedMotion} enableComplexAnimations={!reducedMotion} />
+      <V2Scenery heightM={heightM} groundInsetPx={groundInsetPx} accentHex={accentHex} reducedMotion={reducedMotion} />
       <WordTowerBackdrop band="front" {...common} />
     </div>
   );

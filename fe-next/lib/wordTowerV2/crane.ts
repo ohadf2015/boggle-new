@@ -1,16 +1,20 @@
 /**
  * Crane swing — pure kinematics.
  *
- * Deliberately imports nothing. The swing is a closed-form function of time, so
- * a release at t is reproducible on any device and in any test, and the velocity
- * handed to the physics world carries no frame-rate history.
+ * Imports only the gravity constant. The swing is a closed-form function of
+ * time, so a release at t is reproducible on any device and in any test, and
+ * the velocity handed to the physics world carries no frame-rate history.
  */
+import { GRAVITY_PX_PER_MS2 } from './engine';
 
 /** Distance from the crane pivot to the block, in physics pixels. */
 export const CRANE_ARM_PX = 220;
 
-/** How far above the tower top the hanging block rides, physics pixels. */
-export const CRANE_CLEARANCE_PX = 230;
+/**
+ * How far above the tower top the hanging block rides, physics pixels. Was 230:
+ * a tall dead band of sky between hook and tower that read as wasted screen.
+ */
+export const CRANE_CLEARANCE_PX = 180;
 
 export interface CraneSwing {
   /** Peak swing angle from vertical, radians. */
@@ -20,6 +24,12 @@ export interface CraneSwing {
   /** Phase offset, radians — lets a run start mid-swing. */
   phase: number;
 }
+
+/**
+ * The one swing every run uses. Width of a block versus the landing sweep is
+ * the real difficulty dial — see feel.test.ts, which pins it in ms.
+ */
+export const SWING: CraneSwing = { amplitudeRad: 0.5, periodMs: 2600, phase: 0 };
 
 export interface CraneState {
   angleRad: number;
@@ -87,6 +97,25 @@ export function releaseKinematics(
  */
 const AIR_DRAG_TAU_MS = (1000 / 60) / -Math.log(1 - 0.01);
 
+/** Sideways drift (px) after `tMs` of flight, for a release at `vx` px/ms. */
+function driftPx(vx: number, tMs: number): number {
+  return vx * AIR_DRAG_TAU_MS * (1 - Math.exp(-tMs / AIR_DRAG_TAU_MS));
+}
+
+/** Time for a released block (vy = 0) to fall `dropPx`, ms. */
+export function fallTimeMs(dropPx: number, gravity = GRAVITY_PX_PER_MS2): number {
+  return Math.sqrt((2 * Math.max(0, dropPx)) / gravity);
+}
+
+/**
+ * Where a block released at `x` with `vx` touches down `dropPx` below. Drives
+ * the landing footprint: round 2 drew only 40% of the arc, so every drop landed
+ * well past where the guide pointed — which read as "impossible to align".
+ */
+export function predictLandingX(x: number, vx: number, dropPx: number): number {
+  return x + driftPx(vx, fallTimeMs(dropPx));
+}
+
 /**
  * Points along a released block's path: gravity down, the swing's sideways
  * speed decaying under air drag. Drives the dotted throw arc, which replaced a
@@ -108,7 +137,7 @@ export function throwArc(opts: {
   for (let i = 0; i < points; i += 1) {
     const t = (durationMs * i) / Math.max(1, points - 1);
     out.push({
-      x: x + vx * AIR_DRAG_TAU_MS * (1 - Math.exp(-t / AIR_DRAG_TAU_MS)),
+      x: x + driftPx(vx, t),
       y: y + 0.5 * gravity * t * t,
     });
   }

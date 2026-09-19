@@ -1,12 +1,13 @@
 'use client';
 
-import { Application, Container, Graphics } from 'pixi.js';
+import { Application, Container, Graphics, type Text } from 'pixi.js';
 import { useEffect, useRef } from 'react';
 import { PX_PER_M, type TowerWorld, snapshotWorld, stepWorld } from '@/lib/wordTowerV2/engine';
-import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, throwArc } from '@/lib/wordTowerV2/crane';
+import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc } from '@/lib/wordTowerV2/crane';
+import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
+import { rulerTicks } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
 import { frameCamera } from '@/lib/wordTowerV2/camera';
-import type { LandingQuality } from '@/lib/wordTowerV2/landing';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { COMBO_FLASH, CONFETTI_BURST, GOLD_STARS, RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
@@ -20,6 +21,8 @@ import {
   paintCrane,
   paintGhost,
   paintGround,
+  paintLandingMark,
+  paintRuler,
   paintThrowArc,
   setBlockGold,
   tickBlock,
@@ -66,6 +69,8 @@ interface Props {
   /** Effects queued by game logic; the loop drains it every frame. */
   fxQueue: TowerFx[];
   bestLabel: string;
+  /** Screen edge for the altitude ruler — the side the HUD is NOT on. */
+  rulerSide: 'left' | 'right';
   onFrameStats?: (stats: FrameStats) => void;
   onBeforeStep?: (nowMs: number) => void;
   className?: string;
@@ -125,15 +130,19 @@ export default function TowerCanvas(props: Props) {
       const flash = new Graphics();
       created.stage.addChild(scene, flash);
 
+      const ruler = new Graphics();
+      const rulerLayer = new Container();
+      const rulerLabels = new Map<number, Text>();
       const bestLine = new Graphics();
       let bestText = propsRef.current.bestLabel;
       let bestLabel = createBestLabel(bestText);
       const guide = new Graphics();
+      const landingMark = new Graphics();
       const crane = new Graphics();
       const blocks = new Container();
       const ghost = createGhost();
       const ground = new Graphics();
-      scene.addChild(bestLine, bestLabel, guide, crane, blocks, ghost.container, ground);
+      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, guide, crane, blocks, landingMark, ghost.container, ground);
 
       const shake = new ScreenShake();
       const particles = new ParticlePool(scene);
@@ -221,6 +230,11 @@ export default function TowerCanvas(props: Props) {
           bestLabel.destroy({ children: true });
           bestLabel = next;
         }
+        // Visible metres, from the screen's bottom to top edge.
+        const mAt = (screenY: number) => -((screenY - scene.y) / scale) / PX_PER_M;
+        const edgeX = (p.rulerSide === 'left' ? -1 : 1) * (halfW - 10 / scale);
+        paintRuler(ruler, rulerLabels, rulerLayer, scale, edgeX, p.rulerSide, rulerTicks(mAt(h), mAt(0)), PX_PER_M);
+
         const bestM = p.getBestM();
         paintBestLine(bestLine, bestLabel, halfW, scale, bestM && bestM > 0.5 ? -bestM * PX_PER_M : null);
 
@@ -258,13 +272,32 @@ export default function TowerCanvas(props: Props) {
         const hookTarget = hanging ?? { x: 0, y: ghostPreview ? ghost.container.y : idleY, heightPx: BLOCK_HEIGHT_PX };
         paintCrane(crane, scale, halfW + 40, pivotY, { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 });
         if (hanging) {
-          // Only the first ~40% of the fall: enough to read the throw's
-          // direction, not enough to solve the landing for the player.
-          const gravity = world.engine.gravity.y * (world.engine.gravity.scale ?? 0.001);
+          // The WHOLE arc, and where it touches down. Round 2 drew only the first
+          // 40% so as not to "solve the landing" — but the block keeps drifting
+          // for the entire fall, so every drop landed well past the guide's tip
+          // and alignment felt impossible. A truthful guide is not an aim-bot:
+          // the target still sweeps and the tap still has to be timed.
           const bottom = hanging.y + hanging.heightPx / 2;
-          const fallMs = Math.sqrt((2 * Math.max(1, -snap.towerHeightM * PX_PER_M - bottom)) / gravity);
-          paintThrowArc(guide, scale, throwArc({ x: hanging.x, y: bottom + 10 / scale, vx: p.getHangVx(), gravity, durationMs: fallMs * 0.4, points: 9 }));
-        } else guide.clear();
+          const towerTopY = -snap.towerHeightM * PX_PER_M;
+          const dropPx = Math.max(1, towerTopY - bottom);
+          const vx = p.getHangVx();
+          const landX = predictLandingX(hanging.x, vx, dropPx);
+          const gravity = world.engine.gravity.y * (world.engine.gravity.scale ?? 0.001);
+          paintThrowArc(guide, scale, throwArc({ x: hanging.x, y: bottom + 10 / scale, vx, gravity, durationMs: fallTimeMs(dropPx) * 0.92, points: 12 }));
+          const top = snap.blocks.reduce<(typeof snap.blocks)[number] | null>(
+            (best, b) =>
+              // Same rule as the judge (supportTop): only blocks that have landed.
+              b.id === hanging.id || !world.landed.has(b.id) || (best && best.y - best.heightPx / 2 <= b.y - b.heightPx / 2) ? best : b,
+            null,
+          );
+          const supportX = top?.x ?? 0;
+          const supportHalfW = (top?.widthPx ?? 150) / 2;
+          paintLandingMark(landingMark, scale, landX, towerTopY, hanging.widthPx, Math.abs(landX - supportX) < PERFECT_RATIO * supportHalfW);
+          landingMark.visible = true;
+        } else {
+          guide.clear();
+          landingMark.visible = false;
+        }
 
         // Offscreen settled blocks still cost a draw call — hide them.
         for (const [id, view] of views) {

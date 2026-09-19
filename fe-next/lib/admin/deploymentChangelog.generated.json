@@ -1,6 +1,55 @@
 {
-  "generatedAt": "2026-09-18T18:35:58.239Z",
+  "generatedAt": "2026-09-19T09:00:41.976Z",
   "commits": [
+    {
+      "sha": "243ab43ef47b9905be502b5c6a6198fb04fd4f2c",
+      "shortSha": "243ab43",
+      "subject": "chore(i18n): refresh translation report",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T10:19:54+03:00"
+    },
+    {
+      "sha": "5225f87892be2d672f7270d898eeb07781ee1c92",
+      "shortSha": "5225f87",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-19",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T04:37:55+03:00"
+    },
+    {
+      "sha": "a124c41cb18e64ae78df9f6edfca2896e1481460",
+      "shortSha": "a124c41",
+      "subject": "fix(word-tower-v2): make every sky reachable in a real run",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T01:29:32+03:00"
+    },
+    {
+      "sha": "2677c4095bbb3d3ac78392d46f49d99f9f510cb4",
+      "shortSha": "2677c40",
+      "subject": "feat(word-tower-v2): swipe wheel, throw arc, gold surprise blocks and solid dock",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T01:15:11+03:00"
+    },
+    {
+      "sha": "a6591403ebeedcd3d4c9ddfe78aeeb69f3d34d5b",
+      "shortSha": "a659140",
+      "subject": "feat(word-tower-v2): altitude, landing and run modules with new HUD and backdrop",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T01:01:13+03:00"
+    },
+    {
+      "sha": "cb58084693bf1e2fdda73abcabb9066a93a7b410",
+      "shortSha": "cb58084",
+      "subject": "fix(blast): readable tile letters",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T00:40:36+03:00"
+    },
+    {
+      "sha": "f5709f668f6d84dd024319d9b21fa3e60907f835",
+      "shortSha": "f5709f6",
+      "subject": "fix(word-tower-v2): make words hoistable and frame the tower at every viewport",
+      "author": "Ohad Fisher",
+      "date": "2026-09-18T23:40:26+03:00"
+    },
     {
       "sha": "2c125b149566fbd0d58f18d343d4867623d62afb",
       "shortSha": "2c125b1",
@@ -91,55 +140,6 @@
       "subject": "test(word-tower): fix failing page client tests for v2 replacement",
       "author": "Ohad Fisher",
       "date": "2026-09-18T13:22:24+03:00"
-    },
-    {
-      "sha": "fc10dab1e1a02535396bb4aa09ff2057b07d859a",
-      "shortSha": "fc10dab",
-      "subject": "feat(word-tower): replace v1 with physics-based v2 public beta",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T13:19:53+03:00"
-    },
-    {
-      "sha": "f4373e0952b57f714e89fdef587d2296a8ecf66a",
-      "shortSha": "f4373e0",
-      "subject": "SEO: daily meta tag improvements (2026-09-18) (#1078)",
-      "author": "ohadf2015",
-      "date": "2026-09-18T11:33:30+04:00"
-    },
-    {
-      "sha": "b577017ee81eb87b5e8a6d913ebdc56059c44ef7",
-      "shortSha": "b577017",
-      "subject": "feat(education): milestone-triggered Teacher Pro upgrade ask (#1079)",
-      "author": "ohadf2015",
-      "date": "2026-09-18T11:33:28+04:00"
-    },
-    {
-      "sha": "ef3246ced026fb70990b602322408d7103c4732c",
-      "shortSha": "ef3246c",
-      "subject": "fix(growth): un-gate One Tap from the cookie click; stop collapsing routes to /:id",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T00:17:48+03:00"
-    },
-    {
-      "sha": "4abacd5cfb6606796fbc5d189b5ca8e2a0ac69da",
-      "shortSha": "4abacd5",
-      "subject": "refactor(education): no-account and Teacher Pro CTAs as compact tickets",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T14:16:52+03:00"
-    },
-    {
-      "sha": "0d3d7bb90dc5ff85116b7e554c7a846b0a4e3ecd",
-      "shortSha": "0d3d7bb",
-      "subject": "refactor(landing): one primary hero CTA, no duplicate classroom strip",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T14:16:44+03:00"
-    },
-    {
-      "sha": "682317ae26715487fa407f57b9a068b338ef5d88",
-      "shortSha": "682317a",
-      "subject": "chore: regenerate deployment changelog, i18n manifest and translation report",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T12:16:01+03:00"
     }
   ]
 }

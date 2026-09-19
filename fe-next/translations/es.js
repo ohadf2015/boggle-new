@@ -461,6 +461,23 @@ const es = {
     "issueProbe": {"prompt": "¿Qué lo hizo sentir así?", "botsStrong": "Bots muy fuertes", "technical": "Problema técnico"}
   },
   "wordTowerV2": {
+    "unitM": "m",
+    "wreck": {
+      "smash": "Derriba la torre de {name}",
+      "smashOwn": "Derriba tu torre",
+      "title": "La torre de {name}",
+      "titleOwn": "Tu torre",
+      "cut": "¡Suelta!",
+      "balls": "{n} bolas de demolición",
+      "crash": "¡CRASH!",
+      "result": "¡{n} de {total} al suelo!",
+      "share": "Reta a un amigo",
+      "shareText": "Mi torre de palabras llegó a {m} m. ¿Puedes derribarla?",
+      "copied": "¡Enlace copiado!",
+      "challenge": "¡{name} te reta! Las caídas perfectas dan bolas de demolición. Luego derriba su torre.",
+      "friend": "Tu amigo",
+      "back": "Otra vez",
+    },
     "cardTitle": "Torre de Palabras v2",
     "cardDesc": "Física real: versión beta",
     "collapsed": "¡Se cayó la torre!",

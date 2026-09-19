@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Delete, Shuffle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -16,7 +17,9 @@ import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Backdrop } from './V2Backdrop';
 import { V2GameOver, V2Hud } from './V2Hud';
+import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
+import { WreckScene } from './WreckScene';
 
 /**
  * Word Tower v2.
@@ -35,6 +38,9 @@ export default function WordTowerV2() {
   const { playSound } = useSoundEffects();
   const reducedMotion = usePrefersReducedMotion();
   const game = useTowerRun();
+  const { profile } = useAuth();
+  const { rival, share, copied } = useRivalTower(language);
+  const [smashing, setSmashing] = useState(false);
   const { phase, heightM, run, hoist, drop, restart, setScrambles, previewWidth, seedDemo } = game;
 
   const dictRef = useRef<Set<string> | null>(null);
@@ -65,6 +71,8 @@ export default function WordTowerV2() {
     const params = new URLSearchParams(window.location.search);
     setDebug(params.has('debug'));
     if (params.has('demo')) seedDemo();
+    // `?demo=1&smash=1`: jump straight into the smash round for review.
+    if (params.has('demo') && params.has('smash')) setSmashing(true);
   }, [seedDemo]);
 
   // Gameplay owns the whole screen — the global bottom nav covered the dock.
@@ -171,7 +179,7 @@ export default function WordTowerV2() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (isTypingTarget(event) || phase === 'over') return;
+      if (isTypingTarget(event) || phase === 'over' || smashing) return;
       if (event.code === 'Space') {
         event.preventDefault();
         if (phase === 'swinging') drop();
@@ -189,7 +197,7 @@ export default function WordTowerV2() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, drop, submit, wheel, selected, selectTile]);
+  }, [phase, drop, submit, wheel, selected, selectTile, smashing]);
 
   // Hold the results a beat so the player watches their tower come down.
   const [showOver, setShowOver] = useState(false);
@@ -202,28 +210,46 @@ export default function WordTowerV2() {
     return () => window.clearTimeout(id);
   }, [phase]);
 
+  // Smash round target: the friend who sent the link, else your own tower.
+  const myWords = Array.from(game.labelsRef.current.values()).slice(0, 30);
+  const smashWords = rival?.words ?? (myWords.length >= 3 ? myWords : null);
+  const rivalName = rival?.name || t('wordTowerV2.wreck.friend');
+  const shareMine = () =>
+    share({
+      name: profile?.display_name ?? profile?.username ?? '',
+      words: myWords,
+      text: t('wordTowerV2.wreck.shareText', { m: game.peakM.toFixed(1) }),
+    });
+
   const biome = biomeAtHeight(heightM);
   const score = totalScore(heightM, run.bonus);
   const accentHex = `#${BIOME_THEME[biome].block.toString(16).padStart(6, '0')}`;
 
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-neo-navy" dir={dir}>
-      <V2Backdrop heightM={heightM} groundInsetPx={dockPxRef.current} reducedMotion={reducedMotion} />
+      {/* The smash round covers everything: don't run a second Pixi loop and
+          backdrop tree underneath it. */}
+      {!smashing ? (
+        <V2Backdrop heightM={heightM} groundInsetPx={dockPxRef.current} accentHex={accentHex} reducedMotion={reducedMotion} />
+      ) : null}
 
-      <TowerCanvas
-        world={game.worldRef.current}
-        labels={game.labelsRef.current}
-        fxQueue={game.fxRef.current}
-        getDockPx={getDockPx}
-        getHangingId={getHangingId}
-        getHangVx={game.getHangVx}
-        getGhost={getGhost}
-        getBestM={getBestM}
-        bestLabel={t('wordTowerV2.bestFlag')}
-        onFrameStats={debug ? setStats : undefined}
-        onBeforeStep={game.onBeforeStep}
-        className="absolute inset-0"
-      />
+      {!smashing ? (
+        <TowerCanvas
+          world={game.worldRef.current}
+          labels={game.labelsRef.current}
+          fxQueue={game.fxRef.current}
+          getDockPx={getDockPx}
+          getHangingId={getHangingId}
+          getHangVx={game.getHangVx}
+          getGhost={getGhost}
+          getBestM={getBestM}
+          bestLabel={t('wordTowerV2.bestFlag')}
+          rulerSide={dir === 'rtl' ? 'left' : 'right'}
+          onFrameStats={debug ? setStats : undefined}
+          onBeforeStep={game.onBeforeStep}
+          className="absolute inset-0"
+        />
+      ) : null}
 
       <V2Hud
         t={t}
@@ -236,7 +262,18 @@ export default function WordTowerV2() {
         landing={game.landing}
         surprise={game.surprise}
         newBest={game.newBest}
+        balls={run.balls}
       />
+      {rival && phase === 'composing' && run.floors === 0 ? (
+        <div className="pointer-events-none absolute inset-x-4 top-28 z-20 mx-auto max-w-sm rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-2 text-center font-neo-display text-base font-bold text-neo-navy shadow-hard animate-neo-pop">
+          {t('wordTowerV2.wreck.challenge', { name: rivalName })}
+        </div>
+      ) : null}
+      {copied ? (
+        <div className="pointer-events-none absolute inset-x-0 top-1/3 z-[60] mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-2 font-neo-display text-lg font-black text-neo-navy shadow-hard animate-neo-pop">
+          {t('wordTowerV2.wreck.copied')}
+        </div>
+      ) : null}
       {debug && stats ? (
         <div className="absolute end-3 top-14 z-20 font-mono text-[11px] text-neo-white/70">
           {stats.fps}fps · p95 {stats.p95Ms}ms · {stats.bodies}
@@ -256,7 +293,7 @@ export default function WordTowerV2() {
             {t(`wordTower.error.${rejected}`)}
           </div>
         ) : null}
-        <div className="mx-auto grid max-w-md grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2">
+        <div className="mx-auto grid max-w-md grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 md:max-w-4xl md:grid-cols-[5rem_1fr_5rem] md:px-6">
           <button
             type="button"
             onClick={scramble}
@@ -318,6 +355,25 @@ export default function WordTowerV2() {
           bestCombo={run.bestCombo}
           isBest={game.newBest || game.peakM >= game.bestM - 0.01}
           onRestart={() => {
+            restart();
+            setRunSeed(`wt2-${Date.now()}`);
+          }}
+          smashLabel={rival ? t('wordTowerV2.wreck.smash', { name: rivalName }) : t('wordTowerV2.wreck.smashOwn')}
+          onSmash={smashWords ? () => setSmashing(true) : undefined}
+          onShare={myWords.length >= 3 ? shareMine : undefined}
+        />
+      ) : null}
+
+      {smashing && smashWords ? (
+        <WreckScene
+          t={t}
+          title={rival ? t('wordTowerV2.wreck.title', { name: rivalName }) : t('wordTowerV2.wreck.titleOwn')}
+          words={smashWords}
+          balls={run.balls}
+          reducedMotion={reducedMotion}
+          onShare={shareMine}
+          onClose={() => {
+            setSmashing(false);
             restart();
             setRunSeed(`wt2-${Date.now()}`);
           }}
