@@ -55,6 +55,25 @@ export function BlastChestBadge({
     return () => ctrl.stop();
   }, [progress, widthMv]);
   const percent = Math.round(progress * 100);
+  // Collapsed badge stays compact: icon+tier row, progress bar, "Chest #N · %".
+  // The full contents roll (+coins/+boost/+avatar) lives in the tap-to-open
+  // preview modal — duplicating it here made the badge tower over the level
+  // box in band 1. The summary moves to the aria-label so it's still
+  // announced.
+  const parts: string[] = [];
+  if (contents) {
+    parts.push(`+${safeToLocaleString(contents.coins, language)} ${t('blast.chest.coinsSuffix', 'coins')}`);
+    if (contents.boosts.length > 0) {
+      parts.push(`+${safeToLocaleString(contents.boosts.length, language)} ${t('blast.chest.boostSuffix', 'boost')}`);
+    }
+    if (contents.avatarPart) parts.push(`+1 ${t('blast.chest.avatarSuffix', 'avatar part')}`);
+  }
+  const ariaLabel = [
+    t(`blast.chest.tier.${tier}`, tier.toUpperCase()),
+    t('blast.chest.title', `Chest #${chestNumber}`, { n: String(chestNumber) }),
+    `${percent}%`,
+    ...parts,
+  ].join(' · ');
 
   // GSAP celebratory bounce + glow flash when the chest crosses to full.
   // Separate from the framer fill tween so the two reactions don't fight
@@ -130,7 +149,8 @@ export function BlastChestBadge({
       ref={buttonRef}
       onClick={onPreview}
       data-testid="chest-badge"
-      className="rounded-xl px-3 py-1.5 text-xs space-y-1.5 text-white transition-transform active:scale-95"
+      aria-label={ariaLabel}
+      className="rounded-xl px-3 py-1.5 text-xs space-y-1 text-white transition-transform active:scale-95"
       style={{
         background: 'rgba(0,0,0,0.45)',
         border: `2px solid ${rimColor}`,
@@ -144,6 +164,12 @@ export function BlastChestBadge({
           style={{ color: '#fff', textShadow: `1px 1px 0 #0b1530` }}
         >
           {t(`blast.chest.tier.${tier}`, tier.toUpperCase())}
+        </span>
+        <span
+          className="ms-1 text-[10px] font-bold tabular-nums opacity-90"
+          style={{ textShadow: `1px 1px 0 #0b1530` }}
+        >
+          {percent}%
         </span>
       </div>
       <div
@@ -174,21 +200,6 @@ export function BlastChestBadge({
           }}
         />
       </div>
-      <div
-        className="text-[10px] font-bold tabular-nums opacity-90 leading-none"
-        style={{ textShadow: `1px 1px 0 #0b1530` }}
-      >
-        {t('blast.chest.title', `Chest #${chestNumber}`, { n: String(chestNumber) })} · {percent}%
-      </div>
-      {contents && (
-        <div className="text-[10px] space-y-0.5 leading-tight opacity-95">
-          <div>+{safeToLocaleString(contents.coins, language)} {t('blast.chest.coinsSuffix', 'coins')}</div>
-          {contents.boosts.length > 0 && (
-            <div>+{safeToLocaleString(contents.boosts.length, language)} {t('blast.chest.boostSuffix', 'boost')}</div>
-          )}
-          {contents.avatarPart && <div>+1 {t('blast.chest.avatarSuffix', 'avatar part')}</div>}
-        </div>
-      )}
     </button>
   );
 }

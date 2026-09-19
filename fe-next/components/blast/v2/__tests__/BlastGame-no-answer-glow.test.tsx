@@ -11,8 +11,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string, fallback: string) => fallback }),
 }));
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => vi.fn(),
   useNavigation: () => ({ isInGame: false, setIsInGame: vi.fn(), activeTab: 'home', setActiveTab: vi.fn() }),
+}));
+vi.mock('@/hooks/useMasterMute', () => ({
+  useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute audio', title: '' }),
 }));
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: () => ({

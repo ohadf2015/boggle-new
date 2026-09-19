@@ -11,6 +11,7 @@ import type { QuickRoundConfig } from '../../types';
 const setIsInGame = vi.fn();
 
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => setIsInGame,
 }));
 
