@@ -74,7 +74,7 @@ export function ProgressDigestDashboard({
         <div
           data-testid="progress-digest-loading"
           aria-busy="true"
-          className="flex min-h-24 items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/30 bg-neo-navy-light text-neo-cream/80"
+          className="flex min-h-24 items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light text-neo-cream/80"
         >
           <Loader2 className="size-5 animate-spin" aria-hidden="true" />
           <span>{t('teacher.reports.loading')}</span>
@@ -91,11 +91,11 @@ export function ProgressDigestDashboard({
           </button>
         </NeoPanel>
       ) : digest.state === 'noRoster' ? (
-        <p data-testid="progress-digest-empty" className="rounded-neo border-2 border-dashed border-neo-cream/30 p-6 text-center text-neo-cream/80">
+        <p data-testid="progress-digest-empty" className="rounded-neo border-2 border-dashed border-neo-cream/50 p-6 text-center text-neo-cream/80">
           {t('teacher.digest.emptyNoRoster')}
         </p>
       ) : digest.state === 'neverPlayed' ? (
-        <p data-testid="progress-digest-empty" className="rounded-neo border-2 border-dashed border-neo-cream/30 p-6 text-center text-neo-cream/80">
+        <p data-testid="progress-digest-empty" className="rounded-neo border-2 border-dashed border-neo-cream/50 p-6 text-center text-neo-cream/80">
           {t('teacher.digest.emptyNeverPlayed')}
         </p>
       ) : (
