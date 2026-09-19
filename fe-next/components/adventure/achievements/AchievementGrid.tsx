@@ -40,14 +40,12 @@ const CATEGORY_COLORS: Record<AdventureAchievementCategory, string> = {
   gameplay: 'text-neo-lime',
   bosses: 'text-neo-red',
   progression: 'text-neo-cyan',
-  mastery: 'text-neo-yellow',
 };
 
 const CATEGORY_NAMES: Record<AdventureAchievementCategory, string> = {
   gameplay: 'adventure.achievements.categories.gameplay',
   bosses: 'adventure.achievements.categories.bosses',
   progression: 'adventure.achievements.categories.progression',
-  mastery: 'adventure.achievements.categories.mastery',
 };
 
 // ==============================================

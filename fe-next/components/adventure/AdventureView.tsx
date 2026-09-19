@@ -91,6 +91,7 @@ export default function AdventureView() {
         onEquipSkin={equip}
         earnAchievement={earnAchievement}
         totalBossesBeaten={bossesBeaten}
+        otherPerfectLevels={completions.filter((c) => c.stars === 3 && !(c.world === view.world && c.level === view.level)).length}
       />
     );
   }

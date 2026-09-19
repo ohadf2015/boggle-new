@@ -290,7 +290,7 @@ describe('useAdventureAchievements', () => {
       mockFetchGet({});
       const { result } = renderHook(() => useAdventureAchievements());
       await waitFor(() => expect(mockFetch).toHaveBeenCalled());
-      expect(result.current.getCount('COMBO_KING')).toBe(0);
+      expect(result.current.getCount('LEVEL_MASTER')).toBe(0);
     });
   });
 
@@ -314,7 +314,7 @@ describe('useAdventureAchievements', () => {
       const { result } = renderHook(() => useAdventureAchievements());
       await waitFor(() => expect(mockFetch).toHaveBeenCalled());
 
-      const tierInfo = result.current.getTierInfo('COMBO_KING');
+      const tierInfo = result.current.getTierInfo('LEVEL_MASTER');
       expect(tierInfo.count).toBe(0);
       expect(tierInfo.tier).toBeNull();
     });

@@ -34,9 +34,11 @@ interface Props {
   onEquipSkin: (world: number) => void;
   earnAchievement: (id: AdventureAchievementId) => void;
   totalBossesBeaten: number;
+  /** Levels already at 3 stars, not counting this one. */
+  otherPerfectLevels: number;
 }
 
-export default function AdventureLevel({ world, level, hasNext, onExit, onNext, onSaved, onEquipSkin, earnAchievement, totalBossesBeaten }: Props) {
+export default function AdventureLevel({ world, level, hasNext, onExit, onNext, onSaved, onEquipSkin, earnAchievement, totalBossesBeaten, otherPerfectLevels }: Props) {
   const { t, language } = useLanguageSafe();
   const sfx = useSoundEffects();
   const isWord = useWordChecker(language);
@@ -80,6 +82,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     reported.current = res;
     onSaved();
     if (res.stars === 3) earnAchievement('PERFECT_LEVEL');
+    if (otherPerfectLevels + (res.bestStars === 3 ? 1 : 0) >= 10) earnAchievement('LEVEL_MASTER');
     if (res.totalStars >= 50) earnAchievement('STAR_COLLECTOR_50');
     if (res.totalStars >= 100) earnAchievement('STAR_COLLECTOR_100');
     if (lvl?.isBoss && res.won) {
@@ -89,7 +92,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       if (invalidRef.current === 0) earnAchievement('BOSS_NO_DAMAGE');
       if (totalBossesBeaten + (res.rewards.some((r) => r.startsWith('boss-trophy-')) ? 1 : 0) >= 10) earnAchievement('ALL_BOSSES');
     }
-  }, [run.result, lvl, onSaved, earnAchievement, totalBossesBeaten]);
+  }, [run.result, lvl, onSaved, earnAchievement, totalBossesBeaten, otherPerfectLevels]);
 
   const begin = () => {
     streakRef.current = 0;
