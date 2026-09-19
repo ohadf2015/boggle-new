@@ -73,3 +73,17 @@ nightly_schedule_lanes() {
   done
   return 0
 }
+
+# nightly_lane_rc_class <lane_rc> → spendcap | throttle | code
+# Classifies a FAILED lane's exit code for the circuit breaker + summary (2026-09-19):
+#   76      → spendcap  (monthly Claude spend limit — headless.sh; won't reset tonight,
+#                        so the breaker trips IMMEDIATELY and the rest are deferred)
+#   75, 124 → throttle  (usage-window cutoff / idle-kill; counts toward the breaker)
+#   other   → code      (a genuine lane failure; resets the breaker)
+nightly_lane_rc_class() {
+  case "${1:-}" in
+    76)     printf 'spendcap\n' ;;
+    75|124) printf 'throttle\n' ;;
+    *)      printf 'code\n' ;;
+  esac
+}

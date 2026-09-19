@@ -52,6 +52,14 @@
     <key>TimeOut</key>
     <integer>3600</integer>
 
+    <!-- 2026-09-19: run.sh's preflight-abort self-retry is a detached
+         `nohup bash -c "sleep 10800; run.sh" &`. When the job's main process exits,
+         launchd KILLS every remaining process in the job's process group unless
+         AbandonProcessGroup is true — so the retry died with its parent every time
+         (retry.log 0 bytes since 2026-07-16; no retry run ever logged). -->
+    <key>AbandonProcessGroup</key>
+    <true/>
+
     <!-- Skip if mac asleep at trigger; do NOT wake from sleep. -->
     <key>RunAtLoad</key>
     <false/>

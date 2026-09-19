@@ -87,10 +87,16 @@ _seconds_until_reset() {
 # _detect_limit_signal <sidecar_file> — classify a failed lane's stream-json:
 #   "WAIT <secs>" → an explicit usage/session limit with a parseable reset clock
 #   "BACKOFF"     → a limit/rate_limit with no reset clock (short bounded wait)
+#   "SPENDCAP"    → the MONTHLY spend limit (HTTP 429 "You've hit your monthly spend
+#                   limit"). Does NOT reset tonight — never sleep/retry on it.
 #   ""            → no limit signal: a genuine code failure (caller reverts as usual)
 _detect_limit_signal() {
   local f="$1" result_line secs
   [ -f "$f" ] || { printf ''; return; }
+  # Checked FIRST (2026-09-19): the spend-cap sidecar ALSO carries a rate_limit_event, so
+  # the bare rate_limit grep below classified it BACKOFF → 120s sleep → retry → rc=1 →
+  # counted as a CODE failure (breaker reset, summary said "failed"). Lanes 04 + 08 died so.
+  if grep -aqiE 'monthly spend limit|spend limit' "$f" 2>/dev/null; then printf 'SPENDCAP'; return; fi
   # The session-limit surfaces as a result string mentioning "session/usage limit"
   # or "resets <clock>". Match the full "result":"..." value to feed the parser.
   result_line=$(grep -aoiE '"result":"[^"]*(session limit|usage limit|resets[^"]*)[^"]*"' "$f" 2>/dev/null | head -1)
@@ -484,6 +490,12 @@ PY
       fi
     fi
     [ -z "$signal" ] && break   # genuine failure → fall through to the normal revert
+    if [ "$signal" = "SPENDCAP" ]; then
+      # Monthly spend cap: no reset within the night → no sleep, no retry. rc=76 is a
+      # distinct "spend cap" class run.sh's circuit breaker trips on immediately.
+      echo "headless: lane=$lane_id MONTHLY SPEND CAP hit (\"You've hit your monthly spend limit\") — not a code failure; rc=76, no retry (cap does not reset tonight)" | tee -a "$log_file"
+      rc=76; break
+    fi
     case "$signal" in
       WAIT\ *) wait_secs="${signal#WAIT }" ;;
       *)       wait_secs="${LANE_LIMIT_BACKOFF:-120}" ;;   # BACKOFF / unparsed

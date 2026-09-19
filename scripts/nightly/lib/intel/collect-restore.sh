@@ -41,7 +41,7 @@ while IFS= read -r entry; do
   if [ "$nights" -ge 2 ]; then
     sev=0.99
     title="⚠️ STALE RESTORE ($nights nights unshipped) $tag ($nfiles files, dropped $date)"
-    stale_note="STALE: dropped $nights nights ago, still not re-shipped — lane code stranded uncommitted on master (Class 4). Restore FIRST, before any other work tonight. "
+    stale_note="STALE: dropped $nights nights ago, still not re-shipped — lane code stranded uncommitted on master (Class 4). Restore it tonight right AFTER the Sentry sweep (merge-safe script only; LANDED dir = just resolve). "
   else
     sev=0.95
     title="Restore dropped nightly work $tag ($nfiles files, dropped $date)"

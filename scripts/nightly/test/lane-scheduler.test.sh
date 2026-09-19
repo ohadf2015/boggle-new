@@ -65,6 +65,19 @@ assert "missing brief → all lanes"    '[ "$(echo "$OUT" | grep -c .)" = "12" ]
 OUT=$(NIGHTLY_SCHEDULER=0 nightly_schedule_lanes "$BJSON" $ALL)
 assert "kill-switch → all lanes"      '[ "$(echo "$OUT" | grep -c .)" = "12" ]'
 
+echo "── nightly_lane_rc_class: breaker classification (2026-09-19 spend cap) ──"
+assert "rc 76 → spendcap"  '[ "$(nightly_lane_rc_class 76)" = spendcap ]'
+assert "rc 75 → throttle"  '[ "$(nightly_lane_rc_class 75)" = throttle ]'
+assert "rc 124 → throttle" '[ "$(nightly_lane_rc_class 124)" = throttle ]'
+assert "rc 1 → code"       '[ "$(nightly_lane_rc_class 1)" = code ]'
+# run.sh wiring: spendcap trips the breaker immediately + result keeps the ❌ prefix the
+# Telegram _concerns grep (^(⏱|❌|⏭)) needs, and says "spend cap".
+RUNSH="$DIR/../run.sh"
+assert "run.sh routes rc through nightly_lane_rc_class" 'grep -q "nightly_lane_rc_class \"\$rc\"" "$RUNSH"'
+assert "run.sh spendcap sets consec_dead to the break threshold" 'grep -q "consec_dead=\"\$throttle_break\"" "$RUNSH"'
+assert "run.sh spendcap lane result is ❌-prefixed and says spend cap" 'grep -q "LANE_RESULTS+=(\"❌ lane \$i (\$lane) — spend cap" "$RUNSH"'
+assert "run.sh _concerns grep still matches ❌" 'grep -q "grep -E .\^(⏱|❌|⏭)" "$RUNSH"'
+
 echo
 echo "lane-scheduler: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

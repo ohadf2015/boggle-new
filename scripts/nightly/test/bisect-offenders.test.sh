@@ -129,6 +129,46 @@ NIGHTLY_BISECT_MAX_GATES=2 nightly_bisect_offenders "$ALL" "$OUT"; rc=$?
 assert "returns 1 when gate-call budget is exhausted" "[ $rc -eq 1 ]"
 rm -f "$ALL" "$OUT"; unset BAD_QUICK
 
+echo "── bisect: full gate INCONCLUSIVE (heap OOM rc=3) → typecheck-tier verify ships (2026-09-19) ──"
+# Every night 09-13→09-19 the full gate OOMed → bisect could never succeed.
+FULL_RC=3
+oom_gate() { if [ "${2:-quick}" = full ]; then return "$FULL_RC"; fi; mock_gate "$@"; }
+BAD_QUICK="fe-next/bad.tsx"
+ALL=$(mklist "fe-next/bad.tsx" "fe-next/good1.tsx" "fe-next/good2.tsx"); OUT=$(mktemp)
+unset NIGHTLY_BISECT_VERIFY_TIER
+NIGHTLY_BISECT_GATE_FN=oom_gate nightly_bisect_offenders "$ALL" "$OUT"; rc=$?
+assert "returns 0 when the full gate is inconclusive but the typecheck tier passes" "[ $rc -eq 0 ]"
+assert "offender still isolated" "[ \"\$(cat \"$OUT\")\" = fe-next/bad.tsx ]"
+assert "reports reduced-strength tier (typecheck)" '[ "${NIGHTLY_BISECT_VERIFY_TIER:-}" = typecheck ]'
+FULL_RC=1
+NIGHTLY_BISECT_GATE_FN=oom_gate nightly_bisect_offenders "$ALL" "$OUT"; rc=$?
+assert "a genuine full-gate REJECTION (rc=1) still refuses to ship" "[ $rc -eq 1 ]"
+rm -f "$ALL" "$OUT"; unset BAD_QUICK FULL_RC
+
+echo "── bisect: every give-up path LOGS (was silent return 1) ──"
+BLOG=$(mktemp)
+log() { echo "$*" >> "$BLOG"; }
+ALL=$(mklist "fe-next/only.ts"); OUT=$(mktemp)
+nightly_bisect_offenders "$ALL" "$OUT"
+assert "≤1 file logs GAVE UP" 'grep -q "GAVE UP — only 1 code file" "$BLOG"'
+BAD_QUICK="fe-next/x9.tsx"; files=(); for i in $(seq 0 9); do files+=("fe-next/x$i.tsx"); done
+ALL=$(mklist "${files[@]}")
+NIGHTLY_BISECT_MAX_GATES=2 nightly_bisect_offenders "$ALL" "$OUT"
+assert "budget exhaustion logs BISECT BUDGET EXHAUSTED" 'grep -q "BISECT BUDGET EXHAUSTED" "$BLOG"'
+BAD_QUICK=$'fe-next/a.ts\nfe-next/b.ts'; ALL=$(mklist "fe-next/a.ts" "fe-next/b.ts")
+nightly_bisect_offenders "$ALL" "$OUT"
+assert "all-bad logs NO PASSING SUBSET" 'grep -q "NO PASSING SUBSET" "$BLOG"'
+MOCK_WEDGE=1; nightly_bisect_offenders "$ALL" "$OUT"; unset MOCK_WEDGE
+assert "wedge logs INCONCLUSIVE give-up" 'grep -q "GAVE UP — typecheck-tier trial was INCONCLUSIVE" "$BLOG"'
+BAD_QUICK="fe-next/realbreak.tsx"; BAD_FULL=$'fe-next/realbreak.tsx\nfe-next/sneaky.tsx'
+ALL=$(mklist "fe-next/realbreak.tsx" "fe-next/sneaky.tsx" "fe-next/ok.tsx")
+nightly_bisect_offenders "$ALL" "$OUT"
+assert "full-gate rejection logs FAILS the authoritative full gate" 'grep -q "FAILS the authoritative full gate" "$BLOG"'
+BAD_QUICK=""; unset BAD_FULL; ALL=$(mklist "fe-next/a.ts" "fe-next/b.ts")
+nightly_bisect_offenders "$ALL" "$OUT"
+assert "no isolable offender logs its reason" 'grep -q "no isolable offender" "$BLOG"'
+log() { :; }; rm -f "$BLOG" "$ALL" "$OUT"; unset BAD_QUICK
+
 # ── INTEGRATION: real worktree gate via NIGHTLY_GATE_CMD seam ─────────────────
 echo "── bisect: INTEGRATION — real worktree isolates a broken file, ships the rest ──"
 unset NIGHTLY_BISECT_GATE_FN   # use the real _nightly_bisect_gate → run_isolated_gate

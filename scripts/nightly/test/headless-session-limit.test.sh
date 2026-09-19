@@ -108,6 +108,15 @@ check "custom cutoff 08:00 lets the 07:33 resume sleep" "$g" sleep
 g=$(LANE_LIMIT_NO_SLEEP_PAST=garbage verdict "$NOW" 99999) # unparseable → never abort
 check "unparseable cutoff → sleep (fail-open, preserves old behavior)" "$g" sleep
 
+echo "── _detect_limit_signal: MONTHLY SPEND CAP (2026-09-19 lanes 04/08) ──"
+SC=$(mktemp)
+# Real 09-19 sidecar shape: a rate_limit_event (which USED to win → BACKOFF) + the spend-cap result.
+printf '%s\n' '{"type":"rate_limit_event","rate_limit_info":{"status":"rejected","rateLimitType":"five_hour","overageStatus":"rejected"}}' \
+  '{"type":"result","is_error":true,"num_turns":1,"result":"You'"'"'ve hit your monthly spend limit · raise it at claude.ai/settings/usage?from=cc_cli_limit_message"}' > "$SC"
+g=$(_detect_limit_signal "$SC")
+check "monthly spend limit (+ rate_limit_event) → SPENDCAP, not BACKOFF" "$g" "SPENDCAP"
+rm -f "$SC"
+
 echo
 echo "headless-session-limit: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

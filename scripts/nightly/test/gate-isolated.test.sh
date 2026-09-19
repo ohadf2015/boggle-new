@@ -743,6 +743,70 @@ run_isolated_gate "$AUTH"; rc=$?
 assert "a real content failure (no crash signature) still returns rc=1 (peel intact)" "[ $rc -eq 1 ]"
 unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
 
+echo "── heap ceiling: every next-build chain carries BUILD_HEAP_MB (2026-09-19 OOM) ──"
+assert "default nightly heap is 12288MB" '[ "$(nightly_build_heap_mb)" = 12288 ]'
+assert "NIGHTLY_BUILD_HEAP_MB overrides" '[ "$(NIGHTLY_BUILD_HEAP_MB=16384 nightly_build_heap_mb)" = 16384 ]'
+assert "full chain passes BUILD_HEAP_MB=12288 to build:fast" '_gate_npm_chain 0 | grep -q "BUILD_HEAP_MB=12288 NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast"'
+assert "build-only chain passes BUILD_HEAP_MB=12288 to build:fast" '_gate_npm_chain 0 1 | grep -q "BUILD_HEAP_MB=12288 NEXT_BUILD_DIR"'
+PKG="$HERE/../../../fe-next/package.json"
+assert "package.json build:fast heap is overridable" 'grep -q "\"build:fast\": \"NODE_OPTIONS=--max-old-space-size=\${BUILD_HEAP_MB:-6144} " "$PKG"'
+assert "package.json build heap is overridable" 'grep -q "\"build\": .*--max-old-space-size=\${BUILD_HEAP_MB:-6144} next build" "$PKG"'
+assert "in-place fallback gate passes BUILD_HEAP_MB too" 'grep -q "BUILD_HEAP_MB=\$(nightly_build_heap_mb) NEXT_BUILD_DIR" "$HERE/../run.sh"'
+
+echo "── wedge reason: rc=134 heap OOM is reported as OOM, not a TS-phase wedge ──"
+O=$(mktemp)
+printf 'FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory\n' > "$O"
+assert "heap-OOM output → oom" '[ "$(nightly_gate_wedge_reason "$O")" = oom ]'
+printf 'Creating an optimized production build ...\n' > "$O"
+assert "silent hang output → wedge" '[ "$(nightly_gate_wedge_reason "$O")" = wedge ]'
+assert "missing output → wedge" '[ "$(nightly_gate_wedge_reason /nonexistent)" = wedge ]'
+rm -f "$O"
+setup
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='echo "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory"; exit 134'
+run_isolated_gate "$AUTH"; rc=$?
+assert "rc=134 heap OOM → INCONCLUSIVE rc=3" "[ $rc -eq 3 ]"
+assert "rc=134 heap OOM → NIGHTLY_LAST_GATE_WEDGE_REASON=oom" '[ "${NIGHTLY_LAST_GATE_WEDGE_REASON:-}" = oom ]'
+export NIGHTLY_GATE_CMD='echo ok; exit 0'
+run_isolated_gate "$AUTH"; rc=$?
+assert "a passing gate clears the wedge reason" '[ -z "${NIGHTLY_LAST_GATE_WEDGE_REASON:-}" ]'
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
+assert "run.sh logs OOM truthfully when the reason is oom" 'grep -q "ran OUT OF MEMORY (JavaScript heap out of memory" "$HERE/../run.sh"'
+
+echo "── baseline gate: frontend-only test list must not fail the backend project (09-19) ──"
+CMD=$(nightly_baseline_test_cmd "WordWheelChallenge.exit.test.tsx")
+assert "backend run passes --passWithNoTests" 'printf "%s" "$CMD" | grep -q "test:backend -- --passWithNoTests WordWheelChallenge.exit.test.tsx"'
+assert "frontend run passes --passWithNoTests" 'printf "%s" "$CMD" | grep -q "test:frontend -- --passWithNoTests WordWheelChallenge.exit.test.tsx"'
+O=$(mktemp)
+printf '\033[31mNo test files found, exiting with code 0\n\033[39m\n Test Files  7 passed (7)\n' > "$O"
+assert "one project empty + one ran → tests DID run" '! nightly_baseline_ran_no_tests "$O"'
+printf 'No test files found, exiting with code 0\nNo test files found, exiting with code 0\n' > "$O"
+assert "both projects empty → ran no tests" 'nightly_baseline_ran_no_tests "$O"'
+rm -f "$O"
+# End-to-end via the seam: fake npm where the backend project matches nothing and the
+# frontend project runs + passes → baseline rc=0 (was rc=1 → undecidable every night).
+setup
+mkdir -p "$PROJECT_DIR/fe-next/node_modules/.bin"
+cat > "$PROJECT_DIR/fe-next/node_modules/.bin/npm" <<'SH'
+#!/bin/bash
+case "$*" in
+  *test:backend*) case "$*" in *--passWithNoTests*) echo "No test files found, exiting with code 0"; exit 0;; *) echo "No test files found, exiting with code 1"; exit 1;; esac ;;
+  *test:frontend*) echo " Test Files  7 passed (7)"; exit 0 ;;
+  *) exit 0 ;;
+esac
+SH
+chmod +x "$PROJECT_DIR/fe-next/node_modules/.bin/npm"
+PATH="$PROJECT_DIR/fe-next/node_modules/.bin:$PATH" run_baseline_gate 0 "WordWheelChallenge.exit.test.tsx"; rc=$?
+assert "frontend-only baseline on green master → rc=0 (decidable: clean HEAD green)" "[ $rc -eq 0 ]"
+cat > "$PROJECT_DIR/fe-next/node_modules/.bin/npm" <<'SH'
+#!/bin/bash
+case "$*" in *test:*) echo "No test files found, exiting with code 0"; exit 0 ;; *) exit 0 ;; esac
+SH
+PATH="$PROJECT_DIR/fe-next/node_modules/.bin:$PATH" run_baseline_gate 0 "Nope.test.tsx"; rc=$?
+assert "NEITHER project matched → rc=3 undecidable (never a false 'green' that peels)" "[ $rc -eq 3 ]"
+[ -n "${NIGHTLY_GATE_CMD:-}" ] && assert "baseline gate restores NIGHTLY_GATE_CMD" 'false' || true
+teardown
+
 echo
 echo "gate-isolated: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

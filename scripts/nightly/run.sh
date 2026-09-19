@@ -448,6 +448,7 @@ should_run() {
 # failing identically, so stop starting new lanes and DEFER the rest to the next run.
 # A productive lane (success, or a timeout that KEPT partials) resets the counter.
 consec_dead=0
+SPEND_CAP_HIT=0
 throttle_break="${NIGHTLY_THROTTLE_BREAK:-3}"
 for i in $(seq 1 "${#LANES[@]}"); do
   lane="${LANES[$((i-1))]}"
@@ -507,16 +508,30 @@ for i in $(seq 1 "${#LANES[@]}"); do
     else
       log "lane $i — exit $rc (continuing); reverting THIS lane's own files only"
       revert_authored "$PRE_LANE" "$LANE_AUTHORED"
-      LANE_RESULTS+=("❌ lane $i ($lane) — exit $rc")
-      echo "- ❌ **$lane** — failed (exit $rc), reverted" >> "$REPORT"
       # rc 75 (usage-cutoff abort) / 124 (idle-kill) = no-productive-output failures
       # strongly correlated with an exhausted usage window → count toward the breaker.
+      # rc 76 = MONTHLY SPEND CAP (headless.sh) — cannot recover tonight → trip NOW.
       # Any other rc is a genuine code failure (not a throttle) → reset the counter.
-      if [ "$rc" = "75" ] || [ "$rc" = "124" ]; then
-        consec_dead=$(( consec_dead + 1 ))
-      else
-        consec_dead=0
-      fi
+      # Keep the ❌ prefix: the Telegram _concerns grep keys on ^(⏱|❌|⏭).
+      case "$(nightly_lane_rc_class "$rc")" in
+        spendcap)
+          SPEND_CAP_HIT=1
+          consec_dead="$throttle_break"
+          log "lane $i — MONTHLY SPEND CAP hit (rc=76) — not a code failure; tripping the circuit breaker now"
+          LANE_RESULTS+=("❌ lane $i ($lane) — spend cap (monthly Claude spend limit hit; not a code failure)")
+          echo "- ❌ **$lane** — spend cap (monthly Claude spend limit hit — not a code failure), reverted" >> "$REPORT"
+          ;;
+        throttle)
+          consec_dead=$(( consec_dead + 1 ))
+          LANE_RESULTS+=("❌ lane $i ($lane) — exit $rc")
+          echo "- ❌ **$lane** — failed (exit $rc), reverted" >> "$REPORT"
+          ;;
+        *)
+          consec_dead=0
+          LANE_RESULTS+=("❌ lane $i ($lane) — exit $rc")
+          echo "- ❌ **$lane** — failed (exit $rc), reverted" >> "$REPORT"
+          ;;
+      esac
     fi
     rm -f "$LANE_AFTER" "$LANE_AUTHORED"
   fi
@@ -524,11 +539,18 @@ for i in $(seq 1 "${#LANES[@]}"); do
 
   # Trip the breaker: too many consecutive no-output failures → defer the rest.
   if [ "$consec_dead" -ge "$throttle_break" ] && [ "$i" -lt "${#LANES[@]}" ]; then
-    log "circuit-breaker: $consec_dead consecutive no-output lane failures (rc 75/124) — usage window almost certainly exhausted; stopping early and deferring remaining lanes"
+    if [ "${SPEND_CAP_HIT:-0}" = "1" ]; then
+      _brk_why="monthly spend cap"
+      log "circuit-breaker: MONTHLY SPEND CAP hit — every further lane would fail identically; stopping early and deferring remaining lanes"
+      tg_alert "nightly $TODAY: Claude MONTHLY SPEND CAP hit (lane $lane) — remaining lanes deferred. Not a code failure. Raise the limit at claude.ai/settings/usage."
+    else
+      _brk_why="usage window exhausted"
+      log "circuit-breaker: $consec_dead consecutive no-output lane failures (rc 75/124) — usage window almost certainly exhausted; stopping early and deferring remaining lanes"
+    fi
     for j in $(seq $((i+1)) "${#LANES[@]}"); do
       _dl="${LANES[$((j-1))]}"
-      LANE_RESULTS+=("⏭️  lane $j ($_dl) — deferred (usage window exhausted)")
-      echo "- ⏭️  **$_dl** — deferred (circuit-breaker: usage window exhausted)" >> "$REPORT"
+      LANE_RESULTS+=("⏭️  lane $j ($_dl) — deferred ($_brk_why)")
+      echo "- ⏭️  **$_dl** — deferred (circuit-breaker: $_brk_why)" >> "$REPORT"
     done
     break
   fi
@@ -656,7 +678,14 @@ if [ "$gate_ok" = "0" ]; then
         # signal, but it is conclusive and unwedgeable, and strictly better than the old
         # path that DROPPED all code on this wedge. Run it (tsc --noEmit + test:changed,
         # lane-scoped) before docs-only; ship on green at reduced strength with a loud alert.
-        log "gate-timeout: build-only re-gate ALSO wedged (idle ${NIGHTLY_GATE_IDLE_SECS:-2700}s / backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s) — next-build's TS phase is the wedge; running the conclusive standalone typecheck tier (tsc --noEmit + test:changed, ~1min)"
+        # Say WHY truthfully (2026-09-19): every "wedge" 09-13→09-19 was really rc=134 — next
+        # build ran out of V8 heap ("JavaScript heap out of memory") — yet this line blamed
+        # next-build's TS phase, sending every investigation the wrong way.
+        if [ "${NIGHTLY_LAST_GATE_WEDGE_REASON:-}" = "oom" ]; then
+          log "gate-timeout: build-only re-gate ALSO did not complete — next build ran OUT OF MEMORY (JavaScript heap out of memory at BUILD_HEAP_MB=$(nightly_build_heap_mb)MB, rc=134), NOT a TS-phase wedge; raise NIGHTLY_BUILD_HEAP_MB. Running the conclusive standalone typecheck tier (tsc --noEmit + test:changed)"
+        else
+          log "gate-timeout: build-only re-gate ALSO wedged (idle ${NIGHTLY_GATE_IDLE_SECS:-2700}s / backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s, no heap-OOM in output) — probable next-build TS-phase wedge; running the conclusive standalone typecheck tier (tsc --noEmit + test:changed, ~1min)"
+        fi
         run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 0 1; _to_tc_rc=$?
         _tc_route=$(nightly_gate_typecheck_route "$_to_tc_rc")
         if [ "$_tc_route" = "ship" ]; then
@@ -664,7 +693,7 @@ if [ "$gate_ok" = "0" ]; then
           # stayed unverified (they wedged), so ship at reduced strength with a loud
           # alert — mirrors the build-only 'ship' path above.
           gate_ok=1
-          log "gate-timeout: standalone typecheck tier PASSED (tsc --noEmit clean + test:changed green) — shipping the authored set; full next-build + full test suite UNVERIFIED this run (both wedged in next-build's TS phase)"
+          log "gate-timeout: standalone typecheck tier PASSED (tsc --noEmit clean + test:changed green) — shipping the authored set; full next-build + full test suite UNVERIFIED this run (both inconclusive: OOM or wedge — see the reason logged above)"
           mkdir -p docs/nightly 2>/dev/null || true
           {
             echo "# Nightly TYPECHECK-TIER ship — ${TODAY}"
@@ -687,8 +716,8 @@ if [ "$gate_ok" = "0" ]; then
             echo "ACTION: none required (autonomous reduced-strength ship)."
           } > "docs/nightly/TYPECHECK-TIER-${TODAY}.md" 2>/dev/null || true
           echo "docs/nightly/TYPECHECK-TIER-${TODAY}.md" >> "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true
-          echo -e "\n**Outcome (typecheck-tier):** full gate + build-only both wedged in next-build's TS phase; a standalone tsc --noEmit + test:changed tier passed, so the authored set shipped type-checked (standalone tsc) + affected-tests-green — full route-type coverage, SSG, and full suite UNVERIFIED. See docs/nightly/TYPECHECK-TIER-${TODAY}.md." >> "$REPORT"
-          tg_alert "nightly $TODAY: gate wedged in next-build's TS phase; standalone typecheck tier (tsc --noEmit + test:changed) passed + shipped at REDUCED strength — full route-type/SSG/suite UNVERIFIED. No action required. See docs/nightly/TYPECHECK-TIER-${TODAY}.md."
+          echo -e "\n**Outcome (typecheck-tier):** full gate + build-only both inconclusive (OOM or wedge); a standalone tsc --noEmit + test:changed tier passed, so the authored set shipped type-checked (standalone tsc) + affected-tests-green — full route-type coverage, SSG, and full suite UNVERIFIED. See docs/nightly/TYPECHECK-TIER-${TODAY}.md." >> "$REPORT"
+          tg_alert "nightly $TODAY: full gate inconclusive (OOM or wedge); standalone typecheck tier (tsc --noEmit + test:changed) passed + shipped at REDUCED strength — full route-type/SSG/suite UNVERIFIED. No action required. See docs/nightly/TYPECHECK-TIER-${TODAY}.md."
         elif [ "$_tc_route" = "peel" ]; then
           # Typecheck tier FAILED → a real type error or a lane-broken test, and the
           # output now names the offender → route to the drop-and-re-gate peel loop.
@@ -720,7 +749,7 @@ if [ "$gate_ok" = "0" ]; then
         # NIGHTLY_SKIP_NEXT_TS=1: skip next build's slow/silent "Running TypeScript" phase
         # (wedges >900s); the isolated gate's standalone tsc --noEmit already covers types.
         ( cd fe-next; rm -rf .next-nightly 2>/dev/null
-          NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast 2>&1 | tail -30 ) >> "$RUN_LOG" 2>&1 \
+          BUILD_HEAP_MB=$(nightly_build_heap_mb) NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast 2>&1 | tail -30 ) >> "$RUN_LOG" 2>&1 \
           || { log "build failed (attempt $attempt)"; continue; }
         gate_ok=1; break
       done
@@ -1130,9 +1159,11 @@ if [ "$gate_ok" = "0" ]; then
     _kept_n=$(grep -vE '^docs/' "$NIGHTLY_AUTHORED_FILE" | grep -c . 2>/dev/null); _kept_n=${_kept_n:-0}
     gate_ok=1
     _restore_cmd="scripts/nightly/restore-salvaged-code.sh ${DATE_TAG}"
-    log "subset-peel bisect: isolated ${_off_n} offending code file(s); the kept ${_kept_n} code file(s) PASSED the full gate — dropped ONLY the offenders, shipping the rest + docs (recover offenders: ${_restore_cmd})"
-    echo -e "\n**Outcome (subset-peel bisect):** gate went red; delta-debug isolated ${_off_n} offending code file(s) and shipped the remaining ${_kept_n} code file(s) + docs after a full-gate re-verify of the kept set. Offenders backed up + requeued for next-night triage — recover: \`${_restore_cmd}\`." >> "$REPORT"
-    tg_alert "nightly $TODAY: gate red → SUBSET-PEEL bisect shipped ${_kept_n} code file(s) + docs, dropped only ${_off_n} offender(s) (kept set full-gate verified). Offenders recoverable: \`${_restore_cmd}\`. Founder WIP untouched."
+    _bis_tier="${NIGHTLY_BISECT_VERIFY_TIER:-full}"
+    [ "$_bis_tier" = "typecheck" ] && _bis_tier_txt="the typecheck tier (tsc --noEmit + test:changed; full gate was INCONCLUSIVE — REDUCED strength)" || _bis_tier_txt="the full gate"
+    log "subset-peel bisect: isolated ${_off_n} offending code file(s); the kept ${_kept_n} code file(s) PASSED ${_bis_tier_txt} — dropped ONLY the offenders, shipping the rest + docs (recover offenders: ${_restore_cmd})"
+    echo -e "\n**Outcome (subset-peel bisect):** gate went red; delta-debug isolated ${_off_n} offending code file(s) and shipped the remaining ${_kept_n} code file(s) + docs after a re-verify of the kept set by ${_bis_tier_txt}. Offenders backed up + requeued for next-night triage — recover: \`${_restore_cmd}\`." >> "$REPORT"
+    tg_alert "nightly $TODAY: gate red → SUBSET-PEEL bisect shipped ${_kept_n} code file(s) + docs, dropped only ${_off_n} offender(s) (kept set verified by ${_bis_tier_txt}). Offenders recoverable: \`${_restore_cmd}\`. Founder WIP untouched."
     rm -f "$AUTHORED_CODE" "$_BISECT_OFF"
   else
   rm -f "$_BISECT_OFF"

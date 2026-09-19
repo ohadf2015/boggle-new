@@ -73,6 +73,31 @@ nightly_gate_output_is_native_crash() {
   LC_ALL=C grep -qaE 'Abort trap: 6|Bus error: 10|Segmentation fault: 11' "$out" 2>/dev/null
 }
 
+# nightly_build_heap_mb → the V8 old-space ceiling (MB) the nightly passes to `next build`
+# via BUILD_HEAP_MB (fe-next/package.json: `--max-old-space-size=${BUILD_HEAP_MB:-6144}`).
+# WHY (2026-09-13 → 09-19, 5 of 7 nights): build:fast died "JavaScript heap out of memory"
+# at the hard-coded 6144MB → Abort trap: 6 (rc 134) on BOTH the full gate and the build-only
+# re-gate, forcing every night down to the typecheck tier. This workstation has 32GB; 12GB
+# gives the webpack build ~2x headroom. CI/dev keep the 6144 default (unset var).
+# Override: NIGHTLY_BUILD_HEAP_MB.
+nightly_build_heap_mb() { printf '%s' "${NIGHTLY_BUILD_HEAP_MB:-12288}"; }
+
+# nightly_gate_wedge_reason <gate_output_file> → "oom" | "wedge"
+# Why an INCONCLUSIVE (rc=3) gate did not complete. "oom" = the output shows a V8 heap
+# exhaustion (next build / tsc / vitest worker) — a MEMORY ceiling, fixable by heap size,
+# NOT the silent next-build TS-phase hang. Everything else (idle-kill, backstop, other
+# native crash) = "wedge". Before this, run.sh logged every rc=3 as "next-build's TS phase
+# is the wedge" — on 2026-09-19 both "wedges" were in fact rc=134 heap OOMs.
+nightly_gate_wedge_reason() {
+  local out="$1"
+  if [ -n "$out" ] && [ -s "$out" ] \
+     && LC_ALL=C grep -qaE 'heap out of memory|Ineffective mark-compacts near heap limit|ERR_WORKER_OUT_OF_MEMORY' "$out" 2>/dev/null; then
+    printf 'oom\n'
+  else
+    printf 'wedge\n'
+  fi
+}
+
 # _gate_ensure_bin <worktree_fe_next_dir> → self-heal node_modules/.bin before gating.
 # The CoW-cloned node_modules inherits the main repo's (recurringly) broken .bin, so
 # the bare-binary npm scripts (lint, test:changed, build:fast) would fail with
@@ -145,7 +170,7 @@ _gate_npm_chain() {
     # SKIP its own "Running TypeScript" phase — which wedges silently >900s in a fresh
     # worktree (2026-07-01: the build-only re-gate wedged there, dropping to the slow
     # typecheck tier after a ~40min hang). Mirrors the happy-path chain (line ~103).
-    printf '%s' "npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; }"
+    printf '%s' "npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; BUILD_HEAP_MB=$(nightly_build_heap_mb) NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; }"
     return 0
   fi
   [ "$skip_lint" = "1" ] || chain="npm run lint && "
@@ -175,7 +200,7 @@ _gate_npm_chain() {
   # never ran). tsc --noEmit gives the identical type/import verdict fast + non-silent; next
   # build still runs webpack so import/module breakage is still caught. Same pattern the
   # typecheck_only fallback tier already uses (line ~64) — just promoted to the happy path.
-  printf '%s' "${chain}npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; } && ${test_cmd}"
+  printf '%s' "${chain}npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; BUILD_HEAP_MB=$(nightly_build_heap_mb) NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; } && ${test_cmd}"
 }
 
 # nightly_map_test_to_authored_source <newline-separated test paths> <authored_allowlist_file>
@@ -338,7 +363,10 @@ _nightly_bisect_gate() {
 # gate. Returns 1 (out file empty) on: ≤1 code file, no isolable offender, an empty
 # kept set, a kept set that fails the full gate (cheap oracle too weak), a wedge, or
 # budget/wall-time exhaustion → caller falls back to the conservative docs-only
-# drop-all (never a regression, never ships un-full-gated code).
+# drop-all. Every give-up path LOGS its reason (it used to return 1 silently).
+# If the full gate is INCONCLUSIVE (rc 3/2 — heap OOM / wedge), the kept set is
+# re-verified with the typecheck tier instead; NIGHTLY_BISECT_VERIFY_TIER=typecheck
+# then tells the caller it shipped at reduced strength.
 #
 # Cost is bounded: NIGHTLY_BISECT_MAX_GATES gate calls (default 2*units+3) and
 # NIGHTLY_BISECT_BUDGET_SECS wall-time (default 3600s). Seam: NIGHTLY_BISECT_GATE_FN.
@@ -346,7 +374,7 @@ nightly_bisect_offenders() {
   local all="$1" out="$2"
   : > "$out"
   local n; n=$(grep -c . "$all" 2>/dev/null); n=${n:-0}
-  [ "$n" -gt 1 ] || return 1   # 0/1 code file → docs-only is already minimal
+  [ "$n" -gt 1 ] || { log "subset-peel bisect: GAVE UP — only $n code file(s); nothing to bisect (docs-only is already minimal)"; return 1; }
 
   local gate_fn="${NIGHTLY_BISECT_GATE_FN:-_nightly_bisect_gate}"
   local budget_secs="${NIGHTLY_BISECT_BUDGET_SECS:-3600}"
@@ -377,38 +405,73 @@ nightly_bisect_offenders() {
   # --- Incremental accept: grow a kept set, flag units that break it. Order-independent
   # for the common case (one real offender + independent innocents).
   for u in "${units[@]}"; do
-    _bisect_over_budget && { _bisect_cleanup; return 1; }
+    if _bisect_over_budget; then
+      log "subset-peel bisect: GAVE UP — BISECT BUDGET EXHAUSTED ($calls/$budget gate calls, $(( SECONDS - start ))/${budget_secs}s) before every unit was tried → docs-only drop-all"
+      _bisect_cleanup; return 1
+    fi
     trial=$(mktemp); cat "$kept" "$u" > "$trial"
     "$gate_fn" "$trial" quick; rc=$?; calls=$(( calls + 1 ))
     if [ "$rc" = "0" ]; then cp "$trial" "$kept"
     elif [ "$rc" = "1" ]; then offender_units+=("$u")
-    else rm -f "$trial"; _bisect_cleanup; return 1; fi   # wedge/setup → bail
+    else   # wedge/setup → bail (never ship on an unknown verdict)
+      log "subset-peel bisect: GAVE UP — typecheck-tier trial was INCONCLUSIVE (rc=$rc${NIGHTLY_LAST_GATE_WEDGE_REASON:+, $NIGHTLY_LAST_GATE_WEDGE_REASON}) on $(tr '\n' ' ' < "$u") → docs-only drop-all"
+      rm -f "$trial"; _bisect_cleanup; return 1
+    fi
     rm -f "$trial"
   done
 
   # --- Second chance: a unit may have failed only because a dependency wasn't kept yet
   # (import ordering). Retry each flagged unit against the FINAL kept set.
   local -a still_bad=()
-  for u in "${offender_units[@]}"; do
+  # ${a[@]+"${a[@]}"}: an EMPTY array under `set -u` is "unbound" on macOS /bin/bash 3.2 —
+  # the plain form aborted the whole caller (run.sh is set -u) on the no-offender path.
+  for u in ${offender_units[@]+"${offender_units[@]}"}; do
     if _bisect_over_budget; then still_bad+=("$u"); continue; fi
     trial=$(mktemp); cat "$kept" "$u" > "$trial"
     "$gate_fn" "$trial" quick; rc=$?; calls=$(( calls + 1 ))
     if [ "$rc" = "0" ]; then cp "$trial" "$kept"; else still_bad+=("$u"); fi
     rm -f "$trial"
   done
-  offender_units=("${still_bad[@]}")
+  offender_units=(${still_bad[@]+"${still_bad[@]}"})
 
   # --- Decide: need a non-empty kept set AND a non-empty offender set (a proper split).
   local kept_n=0 off_n=${#offender_units[@]}
   kept_n=$(grep -c . "$kept" 2>/dev/null); kept_n=${kept_n:-0}
-  if [ "$kept_n" -eq 0 ] || [ "$off_n" -eq 0 ]; then _bisect_cleanup; return 1; fi
+  if [ "$kept_n" -eq 0 ]; then
+    log "subset-peel bisect: GAVE UP — NO PASSING SUBSET (every one of ${#units[@]} unit(s) failed the typecheck tier) → docs-only drop-all"
+    _bisect_cleanup; return 1
+  fi
+  if [ "$off_n" -eq 0 ]; then
+    log "subset-peel bisect: GAVE UP — no isolable offender (all ${#units[@]} unit(s) pass the typecheck tier individually/cumulatively; the red is outside what the cheap oracle sees) → docs-only drop-all"
+    _bisect_cleanup; return 1
+  fi
 
   # --- Authoritative FULL gate on the reconstructed kept set (the cheap oracle is
   # weaker than the ship gate — never ship code the full gate rejects).
+  # rc=1 → the full gate REJECTS the kept set → never ship (weak-oracle guard).
+  # rc=3/2 (2026-09-19) → the full gate did NOT COMPLETE (next-build heap OOM rc=134 /
+  # idle wedge / setup) — every night 09-13→09-19 OOMed here, so bisect could NEVER
+  # succeed and always fell to drop-all. An inconclusive full gate is not a rejection:
+  # fall back to the CONCLUSIVE typecheck tier (build:schemas + tsc --noEmit + test:changed)
+  # on the exact kept set — the same tier run.sh already ships on after a next-build wedge.
+  # NIGHTLY_BISECT_VERIFY_TIER tells the caller which tier verified (full|typecheck).
+  NIGHTLY_BISECT_VERIFY_TIER=full
   "$gate_fn" "$kept" full; rc=$?; calls=$(( calls + 1 ))
-  if [ "$rc" != "0" ]; then _bisect_cleanup; return 1; fi
+  if [ "$rc" = "1" ]; then
+    log "subset-peel bisect: GAVE UP — the kept set ($kept_n file(s)) FAILS the authoritative full gate (typecheck-tier oracle too weak) → docs-only drop-all"
+    _bisect_cleanup; return 1
+  elif [ "$rc" != "0" ]; then
+    log "subset-peel bisect: full-gate re-verify of the kept set was INCONCLUSIVE (rc=$rc${NIGHTLY_LAST_GATE_WEDGE_REASON:+, $NIGHTLY_LAST_GATE_WEDGE_REASON}) — re-verifying with the conclusive typecheck tier instead"
+    "$gate_fn" "$kept" quick; rc=$?; calls=$(( calls + 1 ))
+    if [ "$rc" != "0" ]; then
+      log "subset-peel bisect: GAVE UP — full gate inconclusive AND the typecheck-tier re-verify of the kept set returned rc=$rc → docs-only drop-all"
+      _bisect_cleanup; return 1
+    fi
+    NIGHTLY_BISECT_VERIFY_TIER=typecheck
+    log "subset-peel bisect: kept set VERIFIED by the typecheck tier (full gate inconclusive) — shipping at REDUCED gate strength"
+  fi
 
-  local ou; for ou in "${offender_units[@]}"; do cat "$ou" >> "$out"; done
+  local ou; for ou in ${offender_units[@]+"${offender_units[@]}"}; do cat "$ou" >> "$out"; done
   sort -u "$out" -o "$out"
   _bisect_cleanup
   return 0
@@ -475,6 +538,7 @@ run_isolated_gate() {
   # drop-and-re-gate salvage needs to know WHICH file failed). Path is exposed
   # via the global NIGHTLY_LAST_GATE_OUTPUT; caller parses then removes it.
   NIGHTLY_LAST_GATE_OUTPUT=$(mktemp -t nightly-gate-out.XXXXXX)
+  NIGHTLY_LAST_GATE_WEDGE_REASON=""   # set to oom|wedge only when this gate is INCONCLUSIVE (rc=3)
   local rc=0
   # TIMEOUT: lanes get a gtimeout ceiling; the gate must too. A hung lint/test/build
   # (the .next-verify eslint wedge on 2026-05-31 ran 75min) otherwise stalls the run
@@ -533,7 +597,12 @@ run_isolated_gate() {
     # UNKNOWN, not a content failure. The old code only special-cased 124, so a 137 wedge
     # or a 134 crash silently fell through to rc=1 → docs-only drop-all (the catastrophe in
     # a different exit code). "timeout/OOM/native-crash" keeps a recurring crash visible.
-    log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle / ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop, or a native toolchain crash) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    NIGHTLY_LAST_GATE_WEDGE_REASON=$(nightly_gate_wedge_reason "$NIGHTLY_LAST_GATE_OUTPUT")
+    if [ "$NIGHTLY_LAST_GATE_WEDGE_REASON" = "oom" ]; then
+      log "isolated-gate: did NOT complete (rc=${rc:-0}: JavaScript HEAP OUT OF MEMORY — next build heap ceiling BUILD_HEAP_MB=$(nightly_build_heap_mb)MB exhausted; not a code failure) — INCONCLUSIVE (rc=3; caller re-verifies, does NOT drop code)"
+    else
+      log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle / ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop, or a native toolchain crash) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    fi
     rc=3
   elif [ "${rc:-0}" != "0" ] && nightly_gate_output_is_native_crash "$NIGHTLY_LAST_GATE_OUTPUT"; then
     # npm can remap a crashed child's 134/138/139 to its OWN rc=1, hiding the SIGABRT.
@@ -541,7 +610,8 @@ run_isolated_gate() {
     # survives in the output → treat it as the same INCONCLUSIVE native-crash class, never
     # a code failure. The rc=3 path re-verifies build-only, so a misfire can only cost a
     # re-verify, never ship broken code. (2026-07-09 + 07-14 build:fast Abort-trap drops.)
-    log "isolated-gate: output shows a native toolchain crash (Abort trap / bus error / segfault) though the exit code was ${rc:-0} — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    NIGHTLY_LAST_GATE_WEDGE_REASON=$(nightly_gate_wedge_reason "$NIGHTLY_LAST_GATE_OUTPUT")
+    log "isolated-gate: output shows a native toolchain crash (Abort trap / bus error / segfault$([ "$NIGHTLY_LAST_GATE_WEDGE_REASON" = oom ] && printf ' — JavaScript HEAP OUT OF MEMORY')) though the exit code was ${rc:-0} — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
     rc=3
   elif [ "${rc:-0}" != "0" ]; then
     # A MISSING TOOL BINARY (rc 127 "command not found") is an ENVIRONMENT failure, not
@@ -751,6 +821,27 @@ nightly_baseline_test_tokens() {
   awk -F/ 'NF{print $NF}' "$f" 2>/dev/null | sort -u | tr '\n' ' ' | sed 's/ *$//'
 }
 
+# nightly_baseline_test_cmd <space-joined tokens> → the scoped clean-HEAD test command.
+# Runs BOTH vitest projects with the same basename filters; each file belongs to exactly one
+# project, so the OTHER project matches nothing. WHY --passWithNoTests (2026-09-13 → 09-19):
+# without it vitest exits 1 on "No test files found" — every frontend-only failing-test list
+# (WordWheelChallenge.*.test.tsx) made test:backend exit 1 right after test:frontend reported
+# "Test Files 7 passed", so the baseline read RED with ZERO FAIL lines → "not a decidable
+# pre-existing baseline" every night, and the lane's own test break was never peeled.
+nightly_baseline_test_cmd() {
+  local tokens="$1"
+  printf '%s' "npm run build:schemas && { npm run test:backend -- --passWithNoTests $tokens; _bk=\$?; npm run test:frontend -- --passWithNoTests $tokens; _fe=\$?; [ \$_bk -eq 0 ] && [ \$_fe -eq 0 ]; }"
+}
+
+# nightly_baseline_ran_no_tests <gate_output_file> → exit 0 iff BOTH vitest projects reported
+# "No test files found" (i.e. the scoped baseline tested nothing at all). Strips ANSI first.
+nightly_baseline_ran_no_tests() {
+  local out="$1" n
+  [ -n "$out" ] && [ -s "$out" ] || return 1
+  n=$(sed -E $'s/\x1b\\[[0-9;]*m//g' "$out" 2>/dev/null | grep -c 'No test files found')
+  [ "${n:-0}" -ge 2 ]
+}
+
 # run_baseline_gate [skip_lint=0] [targeted_tokens=""] — gate a CLEAN HEAD checkout with
 # NO authored files applied, to learn whether master ITSELF is red (a pre-existing failing
 # test/lint that no lane introduced). Output is left in NIGHTLY_LAST_GATE_OUTPUT for the
@@ -771,9 +862,17 @@ run_baseline_gate() {
     # build:schemas precedes the tests (the dist bridge handler suites import ../dist/...).
     local _saved_cmd="${NIGHTLY_GATE_CMD:-}" _had_cmd=0
     [ -n "${NIGHTLY_GATE_CMD:-}" ] && _had_cmd=1
-    export NIGHTLY_GATE_CMD="npm run build:schemas && { npm run test:backend -- $targeted_tokens; _bk=\$?; npm run test:frontend -- $targeted_tokens; _fe=\$?; [ \$_bk -eq 0 ] && [ \$_fe -eq 0 ]; }"
+    export NIGHTLY_GATE_CMD="$(nightly_baseline_test_cmd "$targeted_tokens")"
     run_isolated_gate "$_empty" "$skip_lint" 1; rc=$?
     if [ "$_had_cmd" = 1 ]; then export NIGHTLY_GATE_CMD="$_saved_cmd"; else unset NIGHTLY_GATE_CMD; fi
+    # --passWithNoTests makes the NON-owning project pass; but if NEITHER project matched a
+    # file (e.g. unresolvable tokens) a rc=0 would read as "clean HEAD green on all of them"
+    # → nightly_baseline_ship_decision would PEEL authored files on zero evidence. Nothing
+    # ran = UNDECIDABLE, not green → rc=3 (the decision's conservative fallthrough).
+    if [ "$rc" = "0" ] && nightly_baseline_ran_no_tests "${NIGHTLY_LAST_GATE_OUTPUT:-}"; then
+      log "baseline-gate: NEITHER vitest project matched the scoped test file(s) — no test ran, baseline UNDECIDABLE (rc=3), not green"
+      rc=3
+    fi
   else
     log "baseline-gate: gating CLEAN HEAD (no authored files) to detect pre-existing master breakage"
     run_isolated_gate "$_empty" "$skip_lint" 1; rc=$?

@@ -404,6 +404,14 @@ assert "  …left the tree on the stray branch (no switch)"     '[ "$(cd "$REPO"
 ( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null; git checkout -q master; git branch -qD stray2 2>/dev/null || true )
 rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
 
+echo "── launchd plist: self-retry must survive the job's exit (2026-09-19) ──"
+PL="$HERE/../com.claude.nightly-loop.plist"
+if plutil -extract AbandonProcessGroup raw "$PL" 2>/dev/null | grep -qx true; then
+  echo "  ✓ AbandonProcessGroup=true (launchd won't SIGKILL the nohup'd retry)"; PASS=$((PASS+1))
+else
+  echo "  ✗ AbandonProcessGroup missing/false — launchd kills the detached self-retry"; FAIL=$((FAIL+1))
+fi
+
 rm -rf "$ROOT"
 echo
 echo "──────────────────────────────────────────"
