@@ -8,6 +8,7 @@ import AvatarLite from '@/components/AvatarLite';
 import { NeoSkeleton } from '@/components/ui/skeleton';
 import { getXpProgress, getTitleForLevel } from '@/backend/modules/xpManager';
 import { clampPercent } from '@/lib/landing/homeHubFormat';
+import { useRetentionStreak } from '@/hooks/useRetentionStreak';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
 /** localStorage key — a stable per-device seed so a guest's random avatar is the
@@ -16,8 +17,6 @@ const GUEST_AVATAR_SEED_KEY = 'lc:guestAvatarSeed';
 
 interface HomeTopBarProps {
   profile: ProfileData | null;
-  /** daily-challenge streak (days) */
-  streak: number;
   /** active locale — powers the avatar's link to the profile page */
   language: string;
   t: (
@@ -27,8 +26,6 @@ interface HomeTopBarProps {
   ) => string;
   /** auth still resolving — show skeletons for profile-derived values (name/level/coins) */
   profileLoading?: boolean;
-  /** daily-challenge feed still resolving — show a skeleton for the streak value */
-  streakLoading?: boolean;
 }
 
 /**
@@ -42,13 +39,15 @@ interface HomeTopBarProps {
  */
 export function HomeTopBar({
   profile,
-  streak,
   language,
   t,
   profileLoading = false,
-  streakLoading = false,
 }: HomeTopBarProps) {
-  // Profile + streak are client-resolved (auth/daily hooks). On the server and
+  // Same source as the header StreakBadge — the cross-mode retention streak,
+  // not the weekly-chest / daily-puzzle streak. Client-only (localStorage).
+  const { streak } = useRetentionStreak();
+
+  // Profile + streak are client-resolved (auth / retention store). On the server and
   // the first client render they may differ — and `coins.toLocaleString()` is
   // locale-dependent (Node vs browser) — so gate ALL dynamic values behind a
   // mount flag. SSR + first client render both paint the skeleton state → identical
@@ -56,6 +55,10 @@ export function HomeTopBar({
   // mount (the same reflow the rest of the landing already accepts).
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // PNG avatar failed to load (API down / stale WebView) — fall back to the
+  // AvatarLite disc instead of a broken-image glyph.
+  const [avatarImgErrored, setAvatarImgErrored] = useState(false);
 
   // Stable per-device random seed → a new player (or anyone whose profile hasn't
   // loaded) gets a generated avatar instead of an endless skeleton. localStorage
@@ -83,7 +86,7 @@ export function HomeTopBar({
   // gets the neutral state ("Player", level 1, 0), never an endless skeleton.
   // Pre-mount paints skeleton too so SSR matches the first client frame.
   const showProfileSkeleton = !mounted || profileLoading;
-  const showStreakSkeleton = !mounted || streakLoading;
+  const showStreakSkeleton = !mounted;
 
   // The avatar always has a seed → generated avatar, never a skeleton. The real
   // profile id wins once loaded; otherwise the stable guest seed gives a random one.
@@ -118,11 +121,30 @@ export function HomeTopBar({
           aria-hidden="true"
         >
           <div className="h-full w-full overflow-hidden rounded-full border-2 border-black bg-neo-navy-light">
-            <AvatarLite
-              customAvatar={p?.avatar_config ?? null}
-              userId={avatarSeed}
-              pixelSize={44}
-            />
+            {/* The real face WITHOUT the 477 KiB client part library: the server
+                renders avatar_config → PNG at /api/avatar/png/[id] (CDN-cached).
+                A static/dynamic import of Avatar.tsx here would put the renderer
+                chunk on the landing first-paint graph (LandingView.bundleGraph
+                guard). Guests (no UUID) and the pre-mount frame keep the cheap
+                AvatarLite disc; an img error falls back to it too. */}
+            {mounted && p?.id && !avatarImgErrored ? (
+              // eslint-disable-next-line @next/next/no-img-element -- tiny CDN-cached PNG; next/image optimizer adds no value here
+              <img
+                data-testid="home-avatar-png"
+                src={`/api/avatar/png/${p.id}`}
+                width={44}
+                height={44}
+                alt=""
+                className="h-full w-full object-cover"
+                onError={() => setAvatarImgErrored(true)}
+              />
+            ) : (
+              <AvatarLite
+                customAvatar={p?.avatar_config ?? null}
+                userId={avatarSeed}
+                pixelSize={44}
+              />
+            )}
           </div>
           {/* Level badge — skeleton dot while the profile loads, never empty. */}
           {showProfileSkeleton ? (

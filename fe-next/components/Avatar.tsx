@@ -1,6 +1,19 @@
 'use client';
 
-import { useMemo, memo } from 'react';
+import {
+  useMemo,
+  memo,
+  useRef,
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useContext,
+  createContext,
+  Component,
+  type ComponentProps,
+  type ReactNode,
+} from 'react';
 import nextDynamic from 'next/dynamic';
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { AvatarMode } from '@/components/avatar/AvatarRenderer';
@@ -8,6 +21,69 @@ import type { AvatarMood } from '@/lib/avatar/avatarMood';
 import type { AvatarOverlay } from '@/lib/avatar/avatarOverlay';
 import { cn } from '@/lib/utils';
 import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
+
+/** If the lazy renderer never commits (stale WebView chunk), swap to a letter disc. */
+const AVATAR_RENDERER_LOAD_TIMEOUT_MS = 8000;
+
+const AvatarCommitContext = createContext<() => void>(() => {});
+
+function InitialLetterDisc({ seed }: { seed: string }) {
+  const hash = hashString(seed);
+  const letter = (seed.trim().charAt(0) || '?').toUpperCase();
+  const backgroundColor = `hsl(${hash % 360}, 55%, 40%)`;
+  return (
+    <div
+      data-testid="avatar-letter-fallback"
+      className="flex h-full w-full items-center justify-center font-neo-display font-black leading-none text-white"
+      style={{ backgroundColor }}
+      aria-hidden
+    >
+      {letter}
+    </div>
+  );
+}
+
+class AvatarRendererErrorBoundary extends Component<
+  { seed: string; children: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { seed: string; children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): { hasError: boolean } {
+    return { hasError: true };
+  }
+
+  override render() {
+    if (this.state.hasError) return <InitialLetterDisc seed={this.props.seed} />;
+    return this.props.children;
+  }
+}
+
+function AvatarRendererGuard({ seed, children }: { seed: string; children: ReactNode }) {
+  const committedRef = useRef(false);
+  const [timedOut, setTimedOut] = useState(false);
+  const markCommitted = useCallback(() => {
+    committedRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      if (!committedRef.current) setTimedOut(true);
+    }, AVATAR_RENDERER_LOAD_TIMEOUT_MS);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  if (timedOut) return <InitialLetterDisc seed={seed} />;
+
+  return (
+    <AvatarCommitContext.Provider value={markCommitted}>
+      <AvatarRendererErrorBoundary seed={seed}>{children}</AvatarRendererErrorBoundary>
+    </AvatarCommitContext.Provider>
+  );
+}
 
 /**
  * The renderer drags in `avatar/parts/*` — ~8300 lines of inline SVG that minify
@@ -17,11 +93,28 @@ import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
  * render no avatar at all. Lazy keeps it off `/legal`, `/about` and the SEO
  * landings entirely, and off the critical path everywhere else.
  * Guarded by `components/__tests__/Avatar.bundleGraph.test.ts`.
+ *
+ * The resolved module is wrapped so we can tell when the real renderer has
+ * committed (the dynamic `loading` placeholder does not count).
  */
-const AvatarRenderer = nextDynamic(() => import('@/components/avatar/AvatarRenderer'), {
-  ssr: false,
-  loading: () => <div className="w-full h-full bg-neo-navy-light animate-pulse" />,
-});
+const AvatarRenderer = nextDynamic(
+  () =>
+    import('@/components/avatar/AvatarRenderer').then((mod) => {
+      const Inner = mod.default;
+      function TrackedAvatarRenderer(props: ComponentProps<typeof Inner>) {
+        const onCommit = useContext(AvatarCommitContext);
+        useLayoutEffect(() => {
+          onCommit();
+        }, [onCommit]);
+        return <Inner {...props} />;
+      }
+      return TrackedAvatarRenderer;
+    }),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-neo-navy-light animate-pulse" />,
+  },
+);
 
 /** @deprecated No longer used — profile pictures removed in favor of custom avatars */
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
@@ -151,7 +244,9 @@ const Avatar = memo<AvatarProps>((props) => {
         data-avatar-type="custom"
         {...frameAttr}
       >
-        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
+        <AvatarRendererGuard seed={fallbackSeed}>
+          <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
+        </AvatarRendererGuard>
       </div>
     );
   }
@@ -165,7 +260,9 @@ const Avatar = memo<AvatarProps>((props) => {
       data-avatar-type="generated"
       {...frameAttr}
     >
-      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
+      <AvatarRendererGuard seed={fallbackSeed}>
+        <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
+      </AvatarRendererGuard>
     </div>
   );
 });

@@ -73,11 +73,9 @@ export function HomeHub({
     <div className={cn('flex w-full min-h-[28rem] flex-col gap-[18px] px-1.5 pt-1', className)}>
       <HomeTopBar
         profile={profile}
-        streak={dailyChallengeStats.currentStreak}
         language={language}
         t={t}
         profileLoading={authLoading}
-        streakLoading={dailyChallengeStats.loading}
       />
 
       <LandingChallengeCards
