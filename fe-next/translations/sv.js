@@ -726,7 +726,12 @@ const sv = {
   },
   "wordTowerV2": {
     "cardTitle": "Ordtornet v2",
-    "cardDesc": "Äkta fysik – betaversion"
+    "cardDesc": "Äkta fysik – betaversion",
+    "collapsed": "Tornet rasade!",
+    "newBest": "Nytt rekord!",
+    "plusScramble": "+{n} blandning",
+    "wider": "Nästa block ×{n} bredare",
+    "bestFlag": "REKORD"
   },
   "wordTower": {
     "mutator": {
@@ -12845,6 +12850,15 @@ const sv = {
       "struggling": "{{count}} kämpar: {{names}}",
       "regionLabel": "Klasstatus för {{classroom}}",
       "switcherLabel": "Vilken klass"
+    },
+    "activation": {
+      "shareTitle": "Eleverna går med via den här länken",
+      "shareBody": "Dela koden eller länken. Inget konto behövs — de väljer ett namn och hamnar på klasslistan.",
+      "copyLink": "Kopiera inbjudningslänk",
+      "share": "Dela",
+      "firstAssignmentTitle": "Skapa deras första uppgift",
+      "firstAssignmentBody": "Eleverna är på listan. Ge dem en övning så klassen har något att göra när du inte sänder live.",
+      "firstAssignmentCta": "Skapa första uppgiften"
     },
     "playNow": {
       "recommended": "Rekommenderas",

@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 6956,
+    "totalKeysInCode": 6960,
     "keyCountByLanguage": {
-      "en": 13441,
-      "es": 13746,
-      "he": 13651,
-      "ja": 13711,
-      "ru": 13481,
-      "sv": 13707
+      "en": 13446,
+      "es": 13751,
+      "he": 13656,
+      "ja": 13716,
+      "ru": 13486,
+      "sv": 13712
     },
-    "missingFromEnglish": 103,
+    "missingFromEnglish": 101,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 350,
+      "templateLiterals": 356,
       "fallbackUsages": 1,
       "variableKeys": 133
     }
@@ -667,7 +667,7 @@
         "pattern": "`blast.results.brag.${tier.key}`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastBragCard.tsx",
-        "line": 171,
+        "line": 172,
         "context": "{t(`blast.results.brag.${tier.key}`)}"
       },
       {
@@ -947,14 +947,14 @@
         "pattern": "`brain.tiers.${tier}`",
         "type": "template_literal",
         "file": "components/brain/BrainScoreShareCard.tsx",
-        "line": 102,
+        "line": 103,
         "context": "${t('brain.share.tier')}: ${t(`brain.tiers.${tier}`)}"
       },
       {
         "pattern": "`brain.tiers.${tier}`",
         "type": "template_literal",
         "file": "components/brain/BrainScoreShareCard.tsx",
-        "line": 205,
+        "line": 206,
         "context": "{t(`brain.tiers.${tier}`)}"
       },
       {
@@ -1129,14 +1129,14 @@
         "pattern": "`connections.difficulty.${puzzle.difficulty}`",
         "type": "template_literal",
         "file": "components/connections/PuzzleCard.tsx",
-        "line": 191,
+        "line": 200,
         "context": "{t(`connections.difficulty.${puzzle.difficulty}`)}"
       },
       {
         "pattern": "`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]))}`",
         "type": "template_literal",
         "file": "components/connections/pyramid/PyramidChallenge.tsx",
-        "line": 251,
+        "line": 252,
         "context": "callout: t(`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]"
       },
       {
@@ -1983,7 +1983,7 @@
         "pattern": "`sealedBid.outcomeEmoji.${r.outcome}`",
         "type": "template_literal",
         "file": "components/sealedBid/SealedBidSessionSummary.tsx",
-        "line": 129,
+        "line": 130,
         "context": "{t(`sealedBid.outcomeEmoji.${r.outcome}`)}"
       },
       {
@@ -2151,14 +2151,14 @@
         "pattern": "`ugc.board.${generatedBoard.difficulty.toLowerCase()}`",
         "type": "template_literal",
         "file": "components/ugc/BoardCreatorWizard.tsx",
-        "line": 128,
+        "line": 129,
         "context": "{t(`ugc.board.${generatedBoard.difficulty.toLowerCase()}`)}"
       },
       {
         "pattern": "`ugc.board.${generatedBoard.difficulty.toLowerCase()}`",
         "type": "template_literal",
         "file": "components/ugc/BoardCreatorWizard.tsx",
-        "line": 241,
+        "line": 242,
         "context": "{t(`ugc.board.${generatedBoard.difficulty.toLowerCase()}`)}"
       },
       {
@@ -2253,11 +2253,25 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`wordcraft.run.card.${c.id}.desc`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunHUD.tsx",
+        "line": 44,
+        "context": "title={t(`wordcraft.run.card.${c.id}.desc`)}"
+      },
+      {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
         "type": "template_literal",
         "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 38,
+        "line": 48,
         "context": "{t(`wordcraft.run.card.${c.id}.name`)}"
+      },
+      {
+        "pattern": "`wordcraft.run.card.${c.id}.desc`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunHUD.tsx",
+        "line": 51,
+        "context": "{t(`wordcraft.run.card.${c.id}.desc`)}"
       },
       {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
@@ -2384,6 +2398,34 @@
         "file": "components/wordTower/WordTowerVersus.tsx",
         "line": 172,
         "context": "<p key={`err-${tower.state.errorKey}`} className=\"text-center font-neo-body text-sm font-bold text-n"
+      },
+      {
+        "pattern": "`wordTower.crane.${verdict.quality}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/V2Hud.tsx",
+        "line": 109,
+        "context": "{t(`wordTower.crane.${verdict.quality}`)}"
+      },
+      {
+        "pattern": "`wordTower.surprise.${TOWER_SURPRISE_META[pop.event].key}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/V2Hud.tsx",
+        "line": 121,
+        "context": "{t(`wordTower.surprise.${TOWER_SURPRISE_META[pop.event].key}`)}"
+      },
+      {
+        "pattern": "`wordTower.biome.${zoneShown.id}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/V2Hud.tsx",
+        "line": 141,
+        "context": "<span className=\"font-neo-display text-2xl font-black\">{t(`wordTower.biome.${zoneShown.id}`)}</span>"
+      },
+      {
+        "pattern": "`wordTower.error.${rejected}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/WordTowerV2.tsx",
+        "line": 256,
+        "context": "{t(`wordTower.error.${rejected}`)}"
       },
       {
         "pattern": "`boosts.${type}.title`",
@@ -4481,15 +4523,6 @@
       ]
     },
     {
-      "key": "common.beta",
-      "usages": [
-        {
-          "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 232
-        }
-      ]
-    },
-    {
       "key": "daily.qrWelcome.badge",
       "usages": [
         {
@@ -4571,20 +4604,11 @@
       ]
     },
     {
-      "key": "wordTowerV2.drop",
+      "key": "wordWheel.closeRace",
       "usages": [
         {
-          "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 299
-        }
-      ]
-    },
-    {
-      "key": "wordTowerV2.hoist",
-      "usages": [
-        {
-          "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 289
+          "file": "components/multiplayer/WheelRushHeader.tsx",
+          "line": 160
         }
       ]
     }

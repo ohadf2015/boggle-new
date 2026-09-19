@@ -441,7 +441,12 @@ const he = {
   },
   "wordTowerV2": {
     "cardTitle": "מגדל מילים 2",
-    "cardDesc": "פיזיקה אמיתית — גרסת בטא"
+    "cardDesc": "פיזיקה אמיתית — גרסת בטא",
+    "collapsed": "המגדל קרס!",
+    "newBest": "שיא חדש!",
+    "plusScramble": "+{n} ערבוב",
+    "wider": "הבלוק הבא רחב ×{n}",
+    "bestFlag": "שיא"
   },
   "wordTower": {
     "mutator": {
@@ -12465,6 +12470,15 @@ const he = {
       "struggling": "{{count}} מתקשים: {{names}}",
       "regionLabel": "מצב הכיתה {{classroom}}",
       "switcherLabel": "איזו כיתה"
+    },
+    "activation": {
+      "shareTitle": "התלמידים מצטרפים עם הקישור הזה",
+      "shareBody": "שתפו את הקוד או את הקישור. בלי חשבון — בוחרים שם ונרשמים לרשימת הכיתה.",
+      "copyLink": "העתיקו קישור הצטרפות",
+      "share": "שיתוף",
+      "firstAssignmentTitle": "צרו את המטלה הראשונה",
+      "firstAssignmentBody": "יש תלמידים ברשימה. שייכו תרגול כדי שיהיה להם מה לעשות כשאתם לא בשידור חי.",
+      "firstAssignmentCta": "צרו מטלה ראשונה"
     },
     "playNow": {
       "recommended": "מומלץ",

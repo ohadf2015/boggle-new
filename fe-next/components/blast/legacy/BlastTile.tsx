@@ -12,8 +12,17 @@ import { BlastJellyOverlay } from './BlastJellyOverlay';
 import { BlastCakeOverlay } from './BlastCakeOverlay';
 import { BlastChocolateOverlay } from './BlastChocolateOverlay';
 
-const TILE_TEXT_SHADOW_STYLE = { textShadow: '0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.2)' } as const;
-const TILE_TEXT_SHADOW_LIGHT_STYLE = { textShadow: '0 1px 2px rgba(0,0,0,0.4)' } as const;
+/* Dark letters on light faces: a crisp (blur-free) light emboss — the old
+ * blurred drop shadow smeared the glyph edges at small sizes. */
+const TILE_LETTER_DARK_STYLE = { textShadow: '0 1.5px 0 rgba(255,255,255,0.55)' } as const;
+/* White letters sit on saturated faces (red, pink, violet, teal…) where plain
+ * white is low-contrast. An ink outline + hard ink drop makes them read as a
+ * sticker on ANY face. paint-order keeps the stroke outside the fill. */
+const TILE_LETTER_LIGHT_STYLE = {
+  WebkitTextStroke: '0.09em #0b1530',
+  paintOrder: 'stroke fill',
+  textShadow: '0 0.07em 0 #0b1530',
+} as const;
 
 export type TilePhase = 'idle' | 'selected' | 'anticipation' | 'clearing' | 'falling' | 'appearing' | 'landing';
 
@@ -302,7 +311,7 @@ export const BlastTile = memo(function BlastTile({
       className={[
         'relative aspect-square flex items-center justify-center',
         'rounded-neo',
-        'font-neo-display text-[clamp(1.1rem,4.5cqw,1.85rem)] font-black uppercase',
+        'font-neo-display font-black uppercase',
         'select-none',
         // Only apply CSS transition + active press when idle/selected — animated phases use keyframes
         ...(effectivePhase === 'idle' || effectivePhase === 'selected'
@@ -344,16 +353,29 @@ export const BlastTile = memo(function BlastTile({
         />
       )}
       <BlastChocolateOverlay active={type === 'chocolate'} />
-      <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
+      {/* Letter size lives on this CHILD span: `cqw` resolves against the nearest
+          ANCESTOR container, so on the button itself it never saw the tile (the
+          1.1rem floor always bound — 17.6px on a 53px tile). Here 54cqw is a
+          share of the tile width, so the letter scales from phone to TV. */}
+      <span
+        data-testid="blast-tile-letter"
+        // Specials: me-[18cqw] nudges the centred letter ~9cqw toward the START edge,
+        // clear of the corner type chip. Logical margin, so it flips for RTL.
+        className={`relative z-10 leading-none text-[clamp(1.1rem,54cqw,3.25rem)] ${visual.indicator ? 'me-[18cqw]' : ''}`}
+        style={visual.text === 'text-white' ? TILE_LETTER_LIGHT_STYLE : TILE_LETTER_DARK_STYLE}
+      >
+        {letter}
+      </span>
       {visual.indicator && (
-        <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
-          {/* Sized up from clamp(11px,2.9cqw,17px) — the cqw term never binds (measured 15px on an 88px cell), so the floor is what matters. MP blast now spawns specials
-              on ~40% of cells, and at an 84px desktop tile an 11px mark could not
-              carry type identity — colour was doing all the work, which PRODUCT.md
-              forbids ("must not rely on color alone"). Heavier stroke too: the
-              glyph has to hold against both the white standard fill and the
-              saturated special fills. */}
-          <visual.indicator className="w-[clamp(20px,6cqw,28px)] h-[clamp(20px,6cqw,28px)]" strokeWidth={2.75} />
+        /* Type icon on a solid navy chip in the corner: holds against every face
+           (colour alone must not carry type identity) and no longer paints over
+           the letter now that the letter fills the tile. */
+        <span
+          data-testid="blast-tile-type-chip"
+          className="absolute top-0.5 inset-e-0.5 z-5 grid place-items-center rounded-full bg-neo-navy text-white w-[clamp(15px,30cqw,28px)] h-[clamp(15px,30cqw,28px)] pointer-events-none"
+          aria-hidden="true"
+        >
+          <visual.indicator className="w-[62%] h-[62%]" strokeWidth={2.75} />
         </span>
       )}
       {hitsRemaining != null && hitsRemaining > 0 && (
@@ -370,7 +392,7 @@ export const BlastTile = memo(function BlastTile({
       )}
       {MULTIPLIER_BADGES[type] && (
         <span
-          className="absolute bottom-0.5 inset-e-0.5 text-[clamp(0.35rem,1.3cqw,0.5rem)] font-neo-body font-bold bg-black/40 text-white rounded px-0.5 leading-tight"
+          className="absolute bottom-0.5 inset-e-0.5 text-[clamp(0.6rem,22cqw,0.95rem)] font-neo-body font-black bg-neo-navy text-white rounded px-1 leading-tight tabular-nums"
           aria-hidden="true"
         >
           {MULTIPLIER_BADGES[type]}

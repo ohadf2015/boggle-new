@@ -4,9 +4,9 @@ import { render, screen } from '@testing-library/react';
 import { HomeTopBar } from '../HomeTopBar';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
-// Avatar pulls app contexts we don't need here — stub it to a marker node that
-// echoes the seed it was handed (userId) so we can assert the random-avatar wiring.
-vi.mock('@/components/Avatar', () => ({
+// AvatarLite is a colored circle with no renderer — still stub so we can
+// assert the seed wiring without depending on palette hashing.
+vi.mock('@/components/AvatarLite', () => ({
   __esModule: true,
   default: (props: { userId?: string; customAvatar?: unknown }) => (
     <div

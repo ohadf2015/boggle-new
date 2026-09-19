@@ -9,11 +9,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Stub subcomponents to keep test focused on prestige rendering
-vi.mock('@/components/Avatar', () => ({
+vi.mock('@/components/AvatarLite', () => ({
   default: () => <div data-testid="avatar" />,
-}));
-vi.mock('@/components/ui/PlayerProfileTooltip', () => ({
-  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 const makePlayer = (overrides: Partial<TopPlayer> = {}): TopPlayer => ({

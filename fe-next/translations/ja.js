@@ -441,7 +441,12 @@ const ja = {
   },
   "wordTowerV2": {
     "cardTitle": "ワードタワー v2",
-    "cardDesc": "本物の物理演算 — ベータ版"
+    "cardDesc": "本物の物理演算 — ベータ版",
+    "collapsed": "タワー崩壊！",
+    "newBest": "自己ベスト更新！",
+    "plusScramble": "シャッフル +{n}",
+    "wider": "次のブロック幅 ×{n}",
+    "bestFlag": "ベスト"
   },
   "wordTower": {
     "mutator": {
@@ -12611,6 +12616,15 @@ const ja = {
       "struggling": "{{count}}人が苦戦: {{names}}",
       "regionLabel": "{{classroom}}のクラス状況",
       "switcherLabel": "どのクラス"
+    },
+    "activation": {
+      "shareTitle": "生徒はこのリンクで参加します",
+      "shareBody": "コードかリンクを共有してください。アカウントは不要 — 名前を選ぶだけで名簿に入ります。",
+      "copyLink": "参加リンクをコピー",
+      "share": "共有",
+      "firstAssignmentTitle": "最初の課題を作る",
+      "firstAssignmentBody": "名簿に生徒がいます。ライブ中でないときも取り組める練習課題を出しましょう。",
+      "firstAssignmentCta": "最初の課題を作成"
     },
     "playNow": {
       "recommended": "おすすめ",

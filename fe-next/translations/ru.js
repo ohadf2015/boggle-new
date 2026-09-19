@@ -3525,7 +3525,12 @@ const ru = {
   "forfeit": "Сдаться",
   "wordTowerV2": {
     "cardTitle": "Башня слов v2",
-    "cardDesc": "Настоящая физика — бета"
+    "cardDesc": "Настоящая физика — бета",
+    "collapsed": "Башня рухнула!",
+    "newBest": "Новый рекорд!",
+    "plusScramble": "+{n} перемешивание",
+    "wider": "Следующий блок шире ×{n}",
+    "bestFlag": "РЕКОРД"
   },
   "wordTower": {
     "mutator": {
@@ -10264,6 +10269,15 @@ const ru = {
       "struggling": "{{count}} испытывают трудности: {{names}}",
       "regionLabel": "Состояние класса {{classroom}}",
       "switcherLabel": "Какой класс"
+    },
+    "activation": {
+      "shareTitle": "Ученики входят по этой ссылке",
+      "shareBody": "Поделитесь кодом или ссылкой. Аккаунт не нужен — выбирают имя и попадают в список класса.",
+      "copyLink": "Скопировать ссылку",
+      "share": "Поделиться",
+      "firstAssignmentTitle": "Создайте первое задание",
+      "firstAssignmentBody": "Ученики уже в списке. Назначьте практику, чтобы классу было чем заняться, когда вы не в эфире.",
+      "firstAssignmentCta": "Создать первое задание"
     },
     "playNow": {
       "recommended": "Рекомендуем",
