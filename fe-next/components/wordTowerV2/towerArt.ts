@@ -44,6 +44,8 @@ export interface BlockView {
   flash: number;
   /** 0..1 landing squash, decays in `tickBlock`. */
   squash: number;
+  /** Tenants living here — one lit window each along the bottom band. */
+  tenants: number;
 }
 
 const labelStyle = new TextStyle({
@@ -74,7 +76,7 @@ export function createBlockView(index: number, w: number, h: number, word: strin
   container.addChild(inner);
 
   const view: BlockView = {
-    container, inner, body, glow, label, colour: PALETTE[index % PALETTE.length], builtScale: 0, w, h, gold: false, flash: 0, squash: 0,
+    container, inner, body, glow, label, colour: PALETTE[index % PALETTE.length], builtScale: 0, w, h, gold: false, flash: 0, squash: 0, tenants: 0,
   };
   paintBlock(view, scale);
   return view;
@@ -110,6 +112,16 @@ export function paintBlock(view: BlockView, scale: number): void {
   for (const bx of [x + px(8), x + w - px(8)]) {
     body.circle(bx, 0, px(2.6)).fill({ color: INK, alpha: 0.55 });
   }
+  // Lit windows: one per tenant, centred along the bottom band.
+  if (view.tenants > 0) {
+    const pip = px(4);
+    const gap = px(3);
+    const fits = Math.max(1, Math.floor((w - px(28)) / (pip + gap)));
+    const n = Math.min(view.tenants, fits);
+    const startX = -((n * (pip + gap) - gap) / 2);
+    for (let i = 0; i < n; i += 1) body.rect(startX + i * (pip + gap), y + h - px(5.5), pip, pip);
+    body.fill(0xffe135);
+  }
   body.rect(x, y, w, h).stroke({ width: px(3), color: INK, alignment: 1 });
   view.glow.clear().rect(x, y, w, h).fill(0xffffff);
 
@@ -118,6 +130,13 @@ export function paintBlock(view: BlockView, scale: number): void {
     body.poly([x + w * 0.62, y, x + w * 0.7, y, x + w * 0.58, y + h, x + w * 0.5, y + h]).fill({ color: 0xffffff, alpha: 0.5 });
     body.poly([x + w * 0.76, y, x + w * 0.79, y, x + w * 0.67, y + h, x + w * 0.64, y + h]).fill({ color: 0xffffff, alpha: 0.4 });
   }
+}
+
+/** One more tenant moved in: light a window and give the slab a little pop. */
+export function addTenant(view: BlockView): void {
+  view.tenants += 1;
+  view.builtScale = 0;
+  view.squash = Math.max(view.squash, 0.35);
 }
 
 /** Per-frame decay of transient block effects. */

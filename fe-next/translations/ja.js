@@ -504,6 +504,7 @@ const ja = {
   },
   "wordTowerV2": {
     "unitM": "m",
+    "tenants": "住人 {n}人",
     "wreck": {
       "smash": "{name}のタワーを壊す",
       "smashOwn": "自分のタワーを壊す",

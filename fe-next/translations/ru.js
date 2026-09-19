@@ -3651,6 +3651,7 @@ const ru = {
   "forfeit": "Сдаться",
   "wordTowerV2": {
     "unitM": "м",
+    "tenants": "Жильцов: {n}",
     "wreck": {
       "smash": "Разнести башню: {name}",
       "smashOwn": "Разнести свою башню",

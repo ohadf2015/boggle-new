@@ -24,10 +24,12 @@ import {
   paintLandingMark,
   paintRuler,
   paintThrowArc,
+  addTenant,
   setBlockGold,
   tickBlock,
 } from './towerArt';
 import { createCity, paintCity, placeCity } from './skylineArt';
+import { TenantCrowd } from './tenantArt';
 
 /**
  * Pixi renderer + the rAF loop that drives the fixed-timestep world.
@@ -43,6 +45,7 @@ import { createCity, paintCity, placeCity } from './skylineArt';
 export type TowerFx =
   | { kind: 'land'; id: string; quality: LandingQuality }
   | { kind: 'gold'; id: string }
+  | { kind: 'tenants'; id: string; count: number }
   | { kind: 'collapse' };
 
 export interface FrameStats {
@@ -77,6 +80,8 @@ interface Props {
   onBeforeStep?: (nowMs: number) => void;
   /** First contact of a falling block (Matter speed), for the landing thunk. */
   onImpact?: (speed: number) => void;
+  /** One tenant just popped into a floor (fires once per tenant). */
+  onTenantArrive?: () => void;
   /** Settled height, quantized (m) — the far city sinks away with it. */
   getSceneM?: () => number;
   className?: string;
@@ -150,7 +155,8 @@ export default function TowerCanvas(props: Props) {
       const blocks = new Container();
       const ghost = createGhost();
       const ground = new Graphics();
-      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, guide, crane, blocks, landingMark, ghost.container, ground);
+      const crowd = new TenantCrowd();
+      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, guide, crane, blocks, crowd.layer, landingMark, ghost.container, ground);
 
       const shake = new ScreenShake();
       const particles = new ParticlePool(scene);
@@ -198,6 +204,12 @@ export default function TowerCanvas(props: Props) {
           }
           const block = byId.get(fx.id);
           const view = views.get(fx.id);
+          if (fx.kind === 'tenants') {
+            // Half the screen in world units, from last frame's zoom (it barely moves).
+            const halfScreen = created.renderer.width / created.renderer.resolution / 2 / scene.scale.x;
+            crowd.moveIn(fx.id, fx.count, block?.x ?? 0, halfScreen);
+            continue;
+          }
           if (!block) continue;
           if (fx.kind === 'gold') {
             if (view) setBlockGold(view);
@@ -218,6 +230,19 @@ export default function TowerCanvas(props: Props) {
 
         shake.update(dt);
         particles.update(dt);
+        crowd.update(
+          frameMs,
+          scene.scale.x,
+          (id) => {
+            const b = byId.get(id);
+            return b ? { x: b.x, y: b.y, halfW: b.widthPx / 2 } : null;
+          },
+          (id) => {
+            const v = views.get(id);
+            if (v) addTenant(v);
+            p.onTenantArrive?.();
+          },
+        );
 
         const w = created.renderer.width / created.renderer.resolution;
         const h = created.renderer.height / created.renderer.resolution;

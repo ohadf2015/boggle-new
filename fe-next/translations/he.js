@@ -504,6 +504,7 @@ const he = {
   },
   "wordTowerV2": {
     "unitM": "מ'",
+    "tenants": "{n} דיירים",
     "wreck": {
       "smash": "לרסק את המגדל של {name}",
       "smashOwn": "לרסק את המגדל שלך",

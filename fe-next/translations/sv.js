@@ -789,6 +789,7 @@ const sv = {
   },
   "wordTowerV2": {
     "unitM": "m",
+    "tenants": "{n} hyresgäster",
     "wreck": {
       "smash": "Krossa {name}s torn",
       "smashOwn": "Krossa ditt torn",

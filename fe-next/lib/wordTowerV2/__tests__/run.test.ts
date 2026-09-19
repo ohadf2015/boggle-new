@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PERFECT_BONUS, applyLanding, consumeWidthMult, createRun, spendScramble, totalScore } from '../run';
+import { PERFECT_BONUS, applyLanding, consumeWidthMult, createRun, spendScramble, tenantsFor, totalScore } from '../run';
 
 describe('applyLanding', () => {
   it('given consecutive perfect drops, when applied, then the combo climbs and pays more each time', () => {
@@ -86,5 +86,32 @@ describe('spendScramble', () => {
 describe('totalScore', () => {
   it('given height and bonus, when totalled, then both count', () => {
     expect(totalScore(2, 150)).toBe(350);
+  });
+});
+
+describe('tenants', () => {
+  it('given a longer (wider) word, when it lands well, then more tenants move in', () => {
+    expect(tenantsFor('good', 7)).toBeGreaterThan(tenantsFor('good', 4));
+  });
+
+  it('given a perfect landing, when scored, then a bonus tenant over a good one', () => {
+    expect(tenantsFor('perfect', 5)).toBe(tenantsFor('good', 5) + 1);
+  });
+
+  it('given a sloppy landing, when scored, then fewer tenants but never zero', () => {
+    expect(tenantsFor('sloppy', 6)).toBeLessThan(tenantsFor('good', 6));
+    expect(tenantsFor('sloppy', 3)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('given a miss, when scored, then nobody moves in', () => {
+    expect(tenantsFor('miss', 9)).toBe(0);
+  });
+
+  it('given landings, when applied, then the run counts every tenant and reports the new arrivals', () => {
+    const a = applyLanding(createRun(1), { quality: 'good', wordLen: 5 });
+    const b = applyLanding(a.run, { quality: 'miss', wordLen: 5 });
+    expect(a.tenants).toBe(tenantsFor('good', 5));
+    expect(b.tenants).toBe(0);
+    expect(b.run.tenants).toBe(a.tenants);
   });
 });

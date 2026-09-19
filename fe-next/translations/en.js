@@ -448,6 +448,7 @@ const en = {
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss","issueProbe":{"prompt":"What made it feel that way?","botsStrong":"Bots too strong","technical":"Technical issue"}},
   "wordTowerV2": {
     "unitM": "m",
+    "tenants": "{n} tenants",
     "wreck": {
       "smash": "Smash {name}'s tower",
       "smashOwn": "Smash your tower",

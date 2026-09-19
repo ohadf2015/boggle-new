@@ -142,6 +142,22 @@ export default function WordTowerV2() {
   const sceneMRef = useRef(heightM);
   sceneMRef.current = heightM;
   const getSceneM = useCallback(() => sceneMRef.current, []);
+  // Tenants: the run owns the total; the HUD counts up as each one actually
+  // arrives on screen, capped by the run so it can never run ahead of it.
+  const [arrived, setArrived] = useState(0);
+  const arrivedRef = useRef(0);
+  useEffect(() => {
+    if (run.tenants === 0) {
+      arrivedRef.current = 0;
+      setArrived(0);
+    }
+  }, [run.tenants]);
+  const onTenantArrive = useCallback(() => {
+    arrivedRef.current += 1;
+    setArrived(arrivedRef.current);
+    playSound('coinCollect', { volume: 0.3, rate: 1 + (arrivedRef.current % 6) * 0.08 });
+  }, [playSound]);
+
   // Brick-on-brick: a thunk on contact, heavier for a harder landing.
   const onImpact = useCallback(
     (speed: number) => {
@@ -267,6 +283,7 @@ export default function WordTowerV2() {
           onFrameStats={debug ? setStats : undefined}
           onBeforeStep={game.onBeforeStep}
           onImpact={onImpact}
+          onTenantArrive={onTenantArrive}
           getSceneM={getSceneM}
           className="absolute inset-0"
         />
@@ -284,6 +301,7 @@ export default function WordTowerV2() {
         surprise={game.surprise}
         newBest={game.newBest}
         balls={run.balls}
+        tenants={Math.min(arrived, run.tenants)}
       />
       {rival && phase === 'composing' && run.floors === 0 ? (
         <div className="pointer-events-none absolute inset-x-4 top-28 z-20 mx-auto max-w-sm rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-2 text-center font-neo-display text-base font-bold text-neo-navy shadow-hard animate-neo-pop">

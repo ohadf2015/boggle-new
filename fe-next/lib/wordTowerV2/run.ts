@@ -41,6 +41,8 @@ export interface RunState {
   nextWidthMult: number;
   /** Wrecking balls banked for the smash round. */
   balls: number;
+  /** Tenants moved in so far — a wider (longer) word houses more. */
+  tenants: number;
 }
 
 export interface SurprisePayout {
@@ -61,7 +63,22 @@ export function createRun(seed: number): RunState {
     wordsSinceSurprise: 0,
     nextWidthMult: 1,
     balls: 2,
+    tenants: 0,
   };
+}
+
+/**
+ * Who moves into a floor. Width is the word's reward, so a longer word houses
+ * more people; a perfect drop adds one; a sloppy floor half-fills; a miss is
+ * empty. ponytail: linear in letters, the ceiling is the arrival animation
+ * (one figure per tenant) — batch figures if words ever exceed ~12 letters.
+ */
+export function tenantsFor(quality: LandingQuality, wordLen: number): number {
+  if (quality === 'miss') return 0;
+  const base = Math.max(1, wordLen - 2);
+  if (quality === 'perfect') return base + 1;
+  if (quality === 'sloppy') return Math.max(1, Math.ceil(base / 2));
+  return base;
 }
 
 /** Width multiplier for the block about to spawn; the caller then clears it. */
@@ -72,8 +89,9 @@ export function consumeWidthMult(run: RunState): { run: RunState; mult: number }
 export function applyLanding(
   prev: RunState,
   landing: { quality: LandingQuality; wordLen: number },
-): { run: RunState; points: number; surprise: SurprisePayout | null } {
+): { run: RunState; points: number; surprise: SurprisePayout | null; tenants: number } {
   const perfect = landing.quality === 'perfect';
+  const tenants = tenantsFor(landing.quality, landing.wordLen);
   const combo = perfect ? prev.combo + 1 : 0;
   const points = perfect
     ? PERFECT_BONUS * Math.min(combo, COMBO_CAP)
@@ -117,9 +135,10 @@ export function applyLanding(
     wordsSinceSurprise: surprise ? 0 : prev.wordsSinceSurprise + 1,
     nextWidthMult: Math.min(MAX_WIDTH_MULT, surprise && surprise.widthMult > 1 ? surprise.widthMult : prev.nextWidthMult),
     balls: Math.min(MAX_BALLS, prev.balls + (perfect && combo % BALL_EVERY_COMBO === 0 ? 1 : 0)),
+    tenants: prev.tenants + tenants,
   };
 
-  return { run, points, surprise };
+  return { run, points, surprise, tenants };
 }
 
 export function spendScramble(run: RunState): RunState | null {

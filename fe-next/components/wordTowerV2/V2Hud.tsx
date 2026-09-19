@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Flame, Hammer, Send, Shuffle, Trophy } from 'lucide-react';
+import { Flame, Hammer, Send, Shuffle, Trophy, Users } from 'lucide-react';
 import { TOWER_SURPRISE_META } from '@/lib/wordTower/towerSurprise';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import type { LandingQuality } from '@/lib/wordTowerV2/landing';
@@ -39,9 +39,11 @@ interface Props {
   newBest: boolean;
   /** Wrecking balls banked for the smash round. */
   balls?: number;
+  /** Tenants who moved into the tower this run. */
+  tenants?: number;
 }
 
-export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landing, surprise, newBest, balls }: Props) {
+export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landing, surprise, newBest, balls, tenants }: Props) {
   const verdict = useFlash(landing, 1100);
   const pop = useFlash(surprise, 2200);
 
@@ -91,12 +93,22 @@ export function V2Hud({ t, heightM, score, bestM, combo, scrambles, biome, landi
           </div>
           {balls !== undefined ? (
             <div
-              key={balls}
+              key={`balls-${balls}`}
               className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-pink px-2 py-0.5 font-neo-display text-xs font-bold text-neo-navy shadow-hard-sm animate-neo-pop"
               aria-label={t('wordTowerV2.wreck.balls', { n: balls })}
             >
               <Hammer className="h-3.5 w-3.5" aria-hidden />
               {balls}
+            </div>
+          ) : null}
+          {tenants ? (
+            <div
+              key={`tenants-${tenants}`}
+              className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-lime px-2 py-0.5 font-neo-display text-xs font-bold text-neo-navy shadow-hard-sm animate-neo-pop"
+              aria-label={t('wordTowerV2.tenants', { n: tenants })}
+            >
+              <Users className="h-3.5 w-3.5" aria-hidden />
+              {tenants}
             </div>
           ) : null}
         </div>

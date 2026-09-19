@@ -141,6 +141,7 @@ export function useTowerRun() {
     runRef.current = out.run;
     setRun(out.run);
     fxRef.current.push({ kind: 'land', id: pending.id, quality });
+    if (out.tenants > 0) fxRef.current.push({ kind: 'tenants', id: pending.id, count: out.tenants });
     setLanding({ key: performance.now(), quality, points: out.points, combo: out.run.combo });
 
     if (quality === 'perfect') {

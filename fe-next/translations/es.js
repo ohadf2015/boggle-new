@@ -503,6 +503,7 @@ const es = {
   },
   "wordTowerV2": {
     "unitM": "m",
+    "tenants": "{n} inquilinos",
     "wreck": {
       "smash": "Derriba la torre de {name}",
       "smashOwn": "Derriba tu torre",
