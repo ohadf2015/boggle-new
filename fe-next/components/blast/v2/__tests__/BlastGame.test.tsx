@@ -19,8 +19,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
 // NavigationContext gates the global bottom-nav hide; BlastGame calls it on
 // mount/unmount. Tests don't ship a provider, so stub the hook.
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => vi.fn(),
   useNavigation: () => ({ isInGame: false, setIsInGame: vi.fn(), activeTab: 'home', setActiveTab: vi.fn() }),
+}));
+vi.mock('@/hooks/useMasterMute', () => ({
+  useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute audio', title: '' }),
 }));
 // Rewarded-ad infrastructure pulls in AdMob/Coin contexts that aren't
 // provided in this unit test harness. Stub the hook so BlastGame can mount.

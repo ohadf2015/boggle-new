@@ -119,10 +119,17 @@ const InGameAudioButton: React.FC = memo(() => {
     // mount-time probe races the game screen rendering beneath the layout FAB.
     const retry = win.setTimeout(compute, 350);
     const retryLate = win.setTimeout(compute, 1200);
+    // Late-loading chrome (e.g. the blast chest badge populates after the
+    // progress fetch resolves, ~1.5-2s in) lands after the probes above and
+    // used to leave the FAB parked on top of it. Two slow catches cover it.
+    const retrySlow = win.setTimeout(compute, 2500);
+    const retrySlowest = win.setTimeout(compute, 5000);
     win.addEventListener('resize', compute);
     return () => {
       win.clearTimeout(retry);
       win.clearTimeout(retryLate);
+      win.clearTimeout(retrySlow);
+      win.clearTimeout(retrySlowest);
       win.removeEventListener('resize', compute);
     };
   }, [visible]);

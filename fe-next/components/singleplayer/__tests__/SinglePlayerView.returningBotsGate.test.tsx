@@ -30,6 +30,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 const mockSetIsInGame = vi.fn();
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => mockSetIsInGame,
 }));
 
