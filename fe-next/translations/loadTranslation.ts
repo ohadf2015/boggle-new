@@ -91,13 +91,15 @@ export async function loadTranslation(lang: Language): Promise<TranslationData> 
  * Returns undefined only if loading fails.
  */
 export function getCachedTranslation(lang: Language): TranslationData | undefined {
+  const cached = cache.get(lang);
+  if (cached && !isPartialCatalogue(cached)) return cached;
+
   const fromGlobal = readGlobalMessages(lang);
   if (fromGlobal && !isPartialCatalogue(fromGlobal)) {
     cache.set(lang, fromGlobal);
     return fromGlobal;
   }
 
-  const cached = cache.get(lang);
   if (cached) return cached;
 
   if (fromGlobal) {
