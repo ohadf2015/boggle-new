@@ -22,6 +22,14 @@ vi.mock('@/lib/education/roundEndSound', () => ({
   CLASS_SWEEP_SOUND: '/sounds/education-class-sweep.mp3',
 }));
 
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    language: 'en',
+    t: (key: string, params?: Record<string, string | number>) =>
+      params ? `${key}:${JSON.stringify(params)}` : key,
+  }),
+}));
+
 import { ClassroomTvResults } from '../ClassroomTvResults';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -172,5 +180,44 @@ describe('ClassroomTvResults', () => {
   it('shows no team panel in a free-for-all', () => {
     render(<ClassroomTvResults summary={summary()} t={t} />);
     expect(screen.queryByTestId('team-battle-standings')).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * THE BUG: a classroom host never mounts ClassroomResultsCard (hostLeavesProjectorRecap
+ * keeps them on this wall). Reteach / share / assign lived only behind isTeacher on
+ * that card, so Teacher Pro follow-up was unreachable on the only screen the host
+ * actually sees. Same ReteachActions + useReteachLinks — no second copy of the CTAs.
+ */
+describe('ClassroomTvResults — host reteach / share / assign on the wall', () => {
+  it('surfaces ReteachActions when the class missed words', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    expect(screen.getByTestId('play-reteach-round')).toBeInTheDocument();
+    expect(screen.getByTestId('reteach-more-actions')).toBeInTheDocument();
+  });
+
+  it('keeps reteach off the coverage scroller so REMATCH and reteach stay on the wall', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    expect(screen.getByTestId('play-reteach-round').closest('[data-testid="coverage-words"]')).toBeNull();
+    expect(screen.getByTestId('classroom-tv-rematch').closest('[data-testid="coverage-words"]')).toBeNull();
+  });
+
+  it('hides reteach when the class found every word', () => {
+    render(
+      <ClassroomTvResults
+        summary={summary({ classFoundCount: 4, missedWords: [] })}
+        onRematch={vi.fn()}
+        t={t}
+      />
+    );
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('reteach-more-actions')).not.toBeInTheDocument();
+  });
+
+  it('offers share and assign from the same disclosure the phone card uses', () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    screen.getByTestId('reteach-more-actions').click();
+    expect(screen.getByTestId('share-miss-gap-practice')).toBeInTheDocument();
+    expect(screen.getByTestId('assign-miss-gap-async-homework')).toBeInTheDocument();
   });
 });

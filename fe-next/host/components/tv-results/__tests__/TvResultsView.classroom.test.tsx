@@ -34,6 +34,11 @@ vi.mock('lucide-react', () => ({
   RotateCcw: () => null,
 }));
 
+vi.mock('@/components/education/results/ReteachActions', () => ({
+  default: () => null,
+  ReteachActions: () => null,
+}));
+
 // Every heavy child is stubbed: this file is about WHICH results surface the
 // projector picks, not what each one draws.
 vi.mock('../TvResultsWinnersPodium', () => ({

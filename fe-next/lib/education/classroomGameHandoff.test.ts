@@ -19,6 +19,7 @@ import {
   classroomMultiplayerPath,
   shouldLoadLessonData,
   socketTeacherName,
+  stageReteachLessonData,
 } from './classroomGameHandoff';
 import { UsernameSchema } from '@/shared/schemas/socketSchemas';
 
@@ -108,6 +109,34 @@ describe('buildReteachLessonData', () => {
     expect(
       buildReteachLessonData(null, { missedWords: ['neutron'], lessonIds: [], lessonNames: [] })
     ).toBeNull();
+  });
+});
+
+describe('stageReteachLessonData — same staging the phone results page uses', () => {
+  const summary = {
+    missedWords: ['neutron', 'photon'],
+    lessonIds: ['lesson-1'],
+    lessonNames: ['Physics 101'],
+  };
+
+  it('writes the narrowed reteach payload into lessonGameData', () => {
+    sessionStorage.setItem(
+      'lessonGameData',
+      JSON.stringify({
+        lessonId: 'lesson-1',
+        lessonName: 'Physics 101',
+        vocabularyWords: ['neutron', 'photon', 'atom'],
+        gameMode: 'classic',
+      })
+    );
+    expect(stageReteachLessonData(summary)).toBe(true);
+    const stored = JSON.parse(sessionStorage.getItem('lessonGameData') ?? '{}');
+    expect(stored.vocabularyWords).toEqual(['neutron', 'photon']);
+    expect(stored.gameMode).toBe('classic');
+  });
+
+  it('returns false when there is nothing to reteach — never reload the full lesson', () => {
+    expect(stageReteachLessonData({ ...summary, missedWords: [] })).toBe(false);
   });
 });
 

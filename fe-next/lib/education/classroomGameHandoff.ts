@@ -102,6 +102,26 @@ export function buildReteachLessonData(
 }
 
 /**
+ * Stage a reteach round in sessionStorage. Both the phone results page and the
+ * projector recap call this — the host never mounts ClassroomResultsCard, so
+ * the TV recap must use the same writer or a second copy of the payload would
+ * drift. Returns false when there is nothing to reteach or storage is blocked;
+ * callers must not reload on false (that would restage the FULL lesson).
+ */
+export function stageReteachLessonData(summary: ReteachSource): boolean {
+  try {
+    const raw = sessionStorage.getItem('lessonGameData');
+    const previous = raw ? JSON.parse(raw) : null;
+    const reteach = buildReteachLessonData(previous, summary);
+    if (!reteach) return false;
+    sessionStorage.setItem('lessonGameData', JSON.stringify(reteach));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * teacherName on createClassroomGame is UsernameSchema (no `@`, max 30).
  * Magic-link teachers fall back to email; OAuth names can be longer than 30.
  * Either one is `Invalid payload` server-side and looks like a dead CREATE ROOM.

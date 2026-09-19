@@ -72,7 +72,7 @@ const ClassroomResultsCard = dynamic(() => import('@/components/education/Classr
 import { toStandings } from '@/components/education/results/resultsStandings';
 const TeamBattleStandings = dynamic(() => import('@/components/education/TeamBattleStandings').then(m => m.TeamBattleStandings), { ssr: false });
 
-import { buildReteachLessonData } from '@/lib/education/classroomGameHandoff';
+import { stageReteachLessonData } from '@/lib/education/classroomGameHandoff';
 import { modeSceneOwnsHeroSlot, playedGameMode } from '@/lib/education/roundEndResultsRoute';
 
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
@@ -577,18 +577,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // only the missed words. Kahoot can't copy a production game straight into
   // a reteach; this one-click loop is the wedge.
   const handleReteachRound = useCallback(() => {
-    if (!classroomSummary || classroomSummary.missedWords.length === 0) return;
-    try {
-      const raw = sessionStorage.getItem('lessonGameData');
-      const previous = raw ? JSON.parse(raw) : null;
-      const reteach = buildReteachLessonData(previous, classroomSummary);
-      if (!reteach) return;
-      sessionStorage.setItem('lessonGameData', JSON.stringify(reteach));
-    } catch (err) {
-      // Storage blocked/unreadable — a reload would rehydrate the ORIGINAL
-      // full lesson (or none), so stay on results instead of starting the
-      // wrong round.
-      logger.warn('[RESULTS] Could not stage reteach round:', err);
+    if (!classroomSummary) return;
+    if (!stageReteachLessonData(classroomSummary)) {
+      // Storage blocked/unreadable, or nothing to reteach — a reload would
+      // rehydrate the ORIGINAL full lesson (or none), so stay on results.
+      logger.warn('[RESULTS] Could not stage reteach round');
       return;
     }
     window.location.reload();
