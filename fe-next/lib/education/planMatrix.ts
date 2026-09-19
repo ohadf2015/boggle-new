@@ -37,12 +37,14 @@ export interface PlanMatrixRow {
  * in the middle — they are load-bearing, not filler, because a column of crosses reads as a
  * crippled free tier and ours genuinely is not. Analytics lands last, alone, as the one thing
  * the money buys.
+ *
+ * Duels is not listed: it has 0 student_duels rows ever and is a dead feature (usage data § 2).
+ * Advertising non-working/unused features wastes credibility on what is actually free.
  */
 export const PLAN_MATRIX_ROWS: readonly PlanMatrixRow[] = [
   { key: 'classes', free: FREE_TIER_LIMITS.classes, pro: null },
   { key: 'studentsPerClass', free: FREE_TIER_LIMITS.studentsPerClass, pro: null },
   { key: 'customLists', free: true, pro: true },
-  { key: 'duels', free: true, pro: true },
   { key: 'noAds', free: true, pro: true },
   { key: 'analytics', free: false, pro: true },
 ] as const;

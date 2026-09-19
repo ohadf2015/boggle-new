@@ -1,9 +1,9 @@
 /**
- * The two taps that matter at the end of a classroom round.
+ * The end-of-round actions: one loud, one quiet.
  *
  * Rematch restages the same list in the same room; "Full report" opens the
- * numbers. They sit side by side above every other follow-up because a teacher
- * standing in front of thirty children reads one row of buttons, not eight.
+ * numbers. Rematch is the one loud button; the report sits under it, quieter,
+ * because a teacher in front of thirty children reads one button, not eight.
  *
  * TEACHER-ONLY BY CONSTRUCTION. `useTeacherPro` fires a request on mount, and
  * ClassroomResultsCard renders for every student in the room too — so the hook
@@ -25,6 +25,7 @@ import Link from 'next/link';
 import { RotateCcw, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { trackResultsAction } from './trackResultsAction';
 
 export interface ResultsPrimaryActionsProps {
   /** Locale segment for the report href. */
@@ -34,29 +35,32 @@ export interface ResultsPrimaryActionsProps {
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
-const BUTTON =
-  'flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold ' +
-  'border-[3px] border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg ' +
-  'hover:-translate-y-0.5 transition-all';
-
 export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimaryActionsProps) {
   const { hasPro, loading } = useTeacherPro();
   const canOpenReport = hasPro && !loading;
 
   if (!onRematch && !canOpenReport) return null;
 
+  // Stacked, not side by side: ONE loud action (rematch, full width), and the
+  // report under it at half the weight. Two equal buttons in a row made the
+  // report as loud as playing again.
   return (
-    <div
-      className={cn('mb-4 grid grid-cols-1 gap-2', onRematch && canOpenReport && 'sm:grid-cols-2')}
-    >
+    <div className="mb-4 flex flex-col items-stretch gap-2">
       {onRematch && (
         <button
           type="button"
           data-testid="rematch-same-list"
-          onClick={onRematch}
-          className={cn(BUTTON, 'bg-neo-yellow text-neo-black')}
+          onClick={() => {
+            trackResultsAction('rematch', 'teacher_card');
+            onRematch();
+          }}
+          className={cn(
+            'flex items-center justify-center gap-2 px-4 py-4 font-neo-display font-bold text-lg',
+            'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
+            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+          )}
         >
-          <RotateCcw className="w-5 h-5 shrink-0" aria-hidden />
+          <RotateCcw className="w-6 h-6 shrink-0" aria-hidden />
           {t('education.results.rematch')}
         </button>
       )}
@@ -65,9 +69,14 @@ export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimary
         <Link
           href={`/${language}/teacher/reports`}
           data-testid="full-report-link"
-          className={cn(BUTTON, 'bg-neo-cyan text-neo-black')}
+          onClick={() => trackResultsAction('view_report', 'teacher_card')}
+          className={cn(
+            'self-center flex items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm',
+            'bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all'
+          )}
         >
-          <BarChart3 className="w-5 h-5 shrink-0" aria-hidden />
+          <BarChart3 className="w-4 h-4 shrink-0" aria-hidden />
           {t('education.results.fullReport')}
         </Link>
       )}

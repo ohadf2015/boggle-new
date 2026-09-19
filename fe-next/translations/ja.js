@@ -78,10 +78,32 @@ const ja = {
       "questionCount": "問題数",
       "cappedNotice": "この単語でつくれるのは{count}問なので、ラウンドはその長さになります。",
       "secondsPerQuestion": "1問あたりの時間",
-      "seconds": "{seconds}秒"
+      "seconds": "{seconds}秒",
+      "treasureChests": "宝箱",
+      "treasureChestsHint": "正解すると宝箱をひとつ開けられます。ボーナス、ポイント横取り、スコア交換のどれかが出ます。",
+      "on": "オン",
+      "off": "オフ"
     },
     "errors": {
       "noQuestions": "このレッスンには小テストに使える単語がまだありません。"
+    },
+    "treasure": {
+      "prompt": "宝箱をえらぼう！",
+      "hint": "中身は箱ごとにちがうよ。よく考えてえらんでね！",
+      "chestLabel": "宝箱 {number}",
+      "outcome": {
+        "gain": "+{amount}ポイント！",
+        "double": "ダブル！+{amount}ポイント！",
+        "steal": "{target}さんから{amount}ポイントゲット！",
+        "swap": "{target}さんとスコアを交換！",
+        "small-loss": "おっと、{amount}ポイント落としちゃった。すぐ取り返せるよ！"
+      },
+      "newTotal": "あなたのスコア：{score}",
+      "tapToContinue": "タップしてつづける",
+      "hitSteal": "{actor}さんに{amount}ポイント取られた！取り返そう！",
+      "hitSwap": "{actor}さんとスコアが入れかわった！この調子でいこう！",
+      "tickerSteal": "{actor}さんが{target}さんから{amount}ポイントゲット！",
+      "tickerSwap": "{actor}さんと{target}さんがスコア交換！"
     }
   },
   "pricing": {
@@ -1932,6 +1954,7 @@ const ja = {
   },
   "errors": {
     "unstableConnection": "接続がふらついてる - 戻すね...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "接続遅い - 対応中",
     "sessionExpired": "セッション終了。新しく始めよう！",
     "roomNoLongerExists": "ルーム閉鎖 - みんな退室したよ",
@@ -12817,13 +12840,14 @@ const ja = {
         "title": "進捗レポートはPro機能です",
         "body": "すべてのクラスとゲームでの生徒の様子を確認できます。習得した単語、レベル、XP、保護者面談向けの印刷可能なPDF。Teacher Proにアップグレードすると、クラスと生徒のレポートが使えるようになります。"
       },
-      "cta": "Pro で解除 — 月額 ${{price}}"
+      "cta": "Pro で解除 — 月額 {{price}}"
     },
     "subscription": {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",
       "giftedUntil": "無償 Pro の期限",
       "giftedBadge": "ギフト",
       "classLimitTitle": "クラスの上限に達しました",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
       "upgradeProDescription": "Proなら、クラス数も1クラスあたりの生徒数も無制限。指導の拡大に制限はありません。",
       "proFeatures": "Proに含まれるもの",
@@ -13442,6 +13466,12 @@ const ja = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "無料プランのクラス上限に達しました。Proにアップグレードすると、クラスを無制限に作成できます。",
+    },
+    "lobby": {
+      "joinTitle": "ゲームに参加しよう",
+    },
     "homework": {
       "takeHomeToggle": "持ち帰り練習カード",
       "backToDashboard": "ダッシュボードに戻る",
@@ -13630,6 +13660,20 @@ const ja = {
         "antonym": "このレッスンに対義語を追加して解除"
       }
     },
+    "wordcraftAssignment": {
+      "title": "ワードクラフト",
+      "intro": "ことばボードでボットに勝とう。レッスンの単語を作るとボーナスXP!",
+      "lessonWords": "レッスンの単語",
+      "play": "プレイ",
+      "score": "スコア",
+      "result": "結果",
+      "won": "勝ち!",
+      "lost": "ボットの勝ち",
+      "tie": "引き分け",
+      "recommended": "おすすめ",
+      "teacherHint": "やさしいボットと1対1。生徒はクラスのページから遊べます。",
+      "studentPlay": "ワードクラフトで遊ぶ"
+    },
     "vocabFocus": {
       "title": "語彙フォーカス",
       "desc": "スキルを1つずつ集中練習",
@@ -13782,6 +13826,9 @@ const ja = {
       "classCoverage": "クラスはレッスンの単語 {{total}} 個のうち {{found}} 個を発見",
       "reteach": "誰も見つけられなかった単語",
       "allFound": "クラスはすべての単語を見つけました。",
+      "waitingForTeacher": "先生が次のラウンドを始めるのを待っています…",
+      "stayInClass": "このまま待ってね。次のゲームはこの画面で始まります。",
+      "playAgain": "もう一度プレイ",
       "practiceMissed": "この単語を練習する",
       "playReteachRound": "復習ラウンドをプレイ — 見つからなかった単語だけ",
       "backToLobby": "ロビーに戻る",
@@ -14262,6 +14309,7 @@ const ja = {
       "yesterday": "昨日"
     },
     "classroomGame": {
+      "defaultClassroomName": "マイクラス",
       "questions": "問題数",
       "perQuestion": "1問あたり",
       "namePrompt": {
@@ -14311,6 +14359,7 @@ const ja = {
       "words": "{{count}}語"
     },
     "header": {
+      "exitEducation": "教育モードを終了",
       "breadcrumbs": {
         "analytics": "分析",
         "classroomGame": "クラスゲーム",
@@ -14797,6 +14846,22 @@ const ja = {
       "xpLabel": "XP"
     },
     "starterPacks": {
+      "beginnerRussian": {
+        "description": "初心者のための基本ロシア語単語",
+        "name": "初級ロシア語",
+      },
+      "beginnerJapanese": {
+        "description": "初心者のための基本日本語単語",
+        "name": "初級日本語",
+      },
+      "beginnerSwedish": {
+        "description": "初心者のための基本スウェーデン語単語",
+        "name": "初級スウェーデン語",
+      },
+      "beginnerSpanish": {
+        "description": "初心者のための基本スペイン語単語",
+        "name": "初級スペイン語",
+      },
       "academicVocab": {
         "name": "学術語彙",
         "description": "高度な学習者向けの学術語彙と分析用語"
@@ -14814,6 +14879,7 @@ const ja = {
       "useThisPack": "このパックを使う"
     },
     "lesson": {
+      "createdClassroom": "クラスを作成しました",
       "autoPronounce": "自動発音",
       "classicMode": "クラシックモード",
       "contextualExamples": "使用例",

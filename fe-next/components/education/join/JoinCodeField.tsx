@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useRef } from 'react';
+import { ClipboardPaste } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const JOIN_CODE_LENGTH = 6;
@@ -19,6 +20,8 @@ interface JoinCodeFieldProps {
   invalid?: boolean;
   autoFocus?: boolean;
   onComplete?: (code: string) => void;
+  /** Called when user clicks paste button. */
+  onPaste?: () => void;
 }
 
 /**
@@ -45,6 +48,7 @@ export function JoinCodeField({
   invalid = false,
   autoFocus = false,
   onComplete,
+  onPaste,
 }: JoinCodeFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const cells = Array.from({ length: JOIN_CODE_LENGTH }, (_, i) => value[i] ?? '');
@@ -67,32 +71,47 @@ export function JoinCodeField({
       dir="ltr"
       className="relative w-full select-none"
     >
-      <div className="grid grid-cols-6 gap-1.5 sm:gap-2.5">
-        {cells.map((char, i) => {
-          const filled = char !== '';
-          const isActive = !invalid && i === activeIndex && value.length < JOIN_CODE_LENGTH;
-          return (
-            <div
-              key={i}
-              aria-hidden="true"
-              className={cn(
-                'flex aspect-[4/5] items-center justify-center rounded-neo border-3 font-neo-display text-3xl font-black leading-none transition-colors duration-100 sm:text-5xl',
-                invalid
-                  ? 'border-neo-black bg-neo-red/90 text-neo-white shadow-hard'
-                  : filled
-                    ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard'
-                    : 'border-neo-cream bg-neo-navy-light text-neo-white/30 shadow-hard-sm',
-                isActive && 'bg-neo-cyan text-neo-navy shadow-hard'
-              )}
-            >
-              {filled ? (
-                <span className="animate-neo-pop">{char}</span>
-              ) : isActive ? (
-                <span className="h-7 w-1.5 rounded-full bg-neo-navy animate-pulse sm:h-10" />
-              ) : null}
-            </div>
-          );
-        })}
+      <div className="flex items-center gap-2">
+        <div className="flex-1 grid grid-cols-6 gap-1.5 sm:gap-2.5">
+          {cells.map((char, i) => {
+            const filled = char !== '';
+            const isActive = !invalid && i === activeIndex && value.length < JOIN_CODE_LENGTH;
+            return (
+              <div
+                key={i}
+                aria-hidden="true"
+                className={cn(
+                  'flex aspect-[4/5] items-center justify-center rounded-neo border-3 font-neo-display text-3xl font-black leading-none transition-colors duration-100 sm:text-5xl',
+                  invalid
+                    ? 'border-neo-black bg-neo-red/90 text-neo-white shadow-hard'
+                    : filled
+                      ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard'
+                      : 'border-neo-cream bg-neo-navy-light text-neo-white/30 shadow-hard-sm',
+                  isActive && 'bg-neo-cyan text-neo-navy shadow-hard'
+                )}
+              >
+                {filled ? (
+                  <span className="animate-neo-pop">{char}</span>
+                ) : isActive ? (
+                  <span className="h-7 w-1.5 rounded-full bg-neo-navy animate-pulse sm:h-10" />
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Paste button integrated into the field */}
+        {onPaste && (
+          <button
+            type="button"
+            onClick={onPaste}
+            className="flex shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light p-2.5 text-neo-cyan shadow-hard transition-transform active:translate-y-0.5 sm:p-3"
+            aria-label="Paste code"
+            title="Paste code from clipboard"
+          >
+            <ClipboardPaste className="h-5 w-5 sm:h-6 sm:w-6" />
+          </button>
+        )}
       </div>
 
       <input

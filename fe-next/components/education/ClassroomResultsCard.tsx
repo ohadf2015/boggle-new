@@ -42,6 +42,7 @@ import { classSwept as isClassSwept } from '@/lib/education/roundEndSweep';
 import { ClassNeedsHelp } from './results/ClassNeedsHelp';
 import { ReteachActions } from './results/ReteachActions';
 import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
+import { StudentNextActions } from './results/StudentNextActions';
 import { useReteachLinks } from './results/useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -55,6 +56,8 @@ export interface ClassroomResultsCardProps {
   onReteach?: () => void;
   /** Teacher-only: same list, same code — a new round without recreating the room. */
   onRematch?: () => void;
+  /** Student-only: re-launch the same game mode+settings (play again). */
+  onPlayAgain?: () => void;
   /**
    * Final standings, best first, exactly as the server sorted them. Present
    * only on the live results page; the card renders without it (an older
@@ -71,6 +74,7 @@ export function ClassroomResultsCard({
   onPractice,
   onReteach,
   onRematch,
+  onPlayAgain,
   standings,
 }: ClassroomResultsCardProps) {
   // Nothing may cover this. A "Make LexiClash yours" style picker opened
@@ -323,19 +327,11 @@ export function ClassroomResultsCard({
       </button>
       )}
 
-      {onPractice && (
-        <button
-          type="button"
-          onClick={onPractice}
-          className={cn(
-            'mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-            'bg-neo-cyan text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg transition-all'
-          )}
-        >
-          <RotateCcw className="w-5 h-5" aria-hidden />
-          {t('education.results.practiceMissed')}
-        </button>
+      {/* Student primary action: play again (if callback provided), wait for teacher, with practice as escape hatch */}
+      {!isTeacher && (
+        <div className="mt-4">
+          <StudentNextActions onPlayAgain={onPlayAgain} onPractice={onPractice} t={t} />
+        </div>
       )}
     </div>
   );

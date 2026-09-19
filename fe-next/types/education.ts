@@ -175,7 +175,7 @@ export interface LevelInfo {
 // PRACTICE SESSION TYPES
 // ============================================
 
-export type PracticeType = 'flashcard' | 'solo_board' | 'lesson_completion';
+export type PracticeType = 'flashcard' | 'solo_board' | 'warmup' | 'word_list' | 'matching' | 'spelling' | 'blitz' | 'vocab_focus' | 'wordcraft';
 
 export interface PracticeSession {
   id: string;

@@ -70,6 +70,8 @@ interface MultiplayerFlowProps {
   // admin Ranked button) — classroom users have a code via ClassroomModeBanner
   // and shouldn't see competing matchmaking CTAs while auto-join is in flight.
   isClassroomMode?: boolean;
+  /** An early classroom joiner held until the teacher opens the room. */
+  waitingForTeacher?: boolean;
 
   // Auto-create room on mount (e.g., from Word Hunt banner)
   autoCreate?: boolean;
@@ -109,6 +111,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   defaultLanguage,
   host,
   isClassroomMode,
+  waitingForTeacher,
   profileAvatar,
   setGameCode,
   setUsername,
@@ -598,7 +601,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       <div className="flex-1 flex items-center justify-center px-4 py-8" data-testid="classroom-waiting">
         <div className="flex flex-col items-center gap-3 text-neo-white font-neo-body">
           <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
-          <p className="text-sm sm:text-base">{t('education.classroomGame.waitingForPlayers')}</p>
+          <p className="text-sm sm:text-base">{t(waitingForTeacher ? 'education.studentPreview.waiting.title' : 'education.classroomGame.waitingForPlayers')}</p>
         </div>
       </div>
     );

@@ -5,7 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAssignments } from '@/hooks/useAssignments';
 import type { TeacherAssignment, AssignmentStatus } from '@/lib/supabase/education/types';
 import { cn } from '@/lib/utils';
-import { Plus, BookOpen, Swords, ChevronDown, ChevronUp, Crosshair } from 'lucide-react';
+import { Plus, BookOpen, Swords, ChevronDown, ChevronUp, Crosshair, Grid2x2 } from 'lucide-react';
+import { readAssignmentMode } from '@/lib/education/wordcraftAssignment';
 import { readAssignmentFocus } from '@/lib/education/vocabFocus';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -47,8 +48,12 @@ function AssignmentCard({
     duel: { label: t('teacher.tracking.duel'), icon: Swords, color: 'bg-neo-pink' },
   };
 
-  const fallback = { label: assignment.assignment_type ?? '?', icon: BookOpen, color: 'bg-neo-navy' };
-  const assignmentTypeConfig = typeConfig[assignment.assignment_type] ?? fallback;
+  // Live `lesson_assignments` rows carry no assignment_type — the mode rides on
+  // practice_focus ('wordcraft' = Word Craft, see lib/education/wordcraftAssignment).
+  const byMode = readAssignmentMode(assignment) === 'wordcraft'
+    ? { label: t('education.wordcraftAssignment.title'), icon: Grid2x2, color: 'bg-neo-lime' }
+    : typeConfig.practice;
+  const assignmentTypeConfig = typeConfig[assignment.assignment_type] ?? byMode;
   const TypeIcon = assignmentTypeConfig.icon;
   const practiceFocus = readAssignmentFocus(assignment);
 
@@ -63,6 +68,7 @@ function AssignmentCard({
           <div className="flex-1 text-start">
             <div className="flex items-center gap-2 mb-2">
               <div
+                data-testid="assignment-type-badge"
                 className={cn(
                   'px-2 py-1 rounded text-xs font-bold border-neo flex items-center gap-1',
                   assignmentTypeConfig.color,

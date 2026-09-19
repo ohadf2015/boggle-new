@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import { ChunkErrorBoundary } from '../ChunkErrorBoundary';
 
 const replaceSpy = vi.fn();
@@ -66,5 +66,45 @@ describe('ChunkErrorBoundary (t_9cc3561f)', () => {
     );
     expect(await screen.findByText(/Quick Timeout/i)).toBeTruthy();
     expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it('Home button routes to /{locale}/education for an education pathname', async () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        href: 'https://lexiclash.live/en/teacher',
+        pathname: '/en/teacher',
+        reload: reloadSpy,
+        replace: replaceSpy,
+      },
+    });
+    render(
+      <ChunkErrorBoundary>
+        <Boom name="TypeError" message="Cannot read properties of undefined" />
+      </ChunkErrorBoundary>,
+    );
+    const homeBtn = await screen.findByRole('button', { name: /Home/i });
+    fireEvent.click(homeBtn);
+    expect(window.location.href).toBe('/en/education');
+  });
+
+  it('Home button routes to bare /{locale} for a non-education pathname', async () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        href: 'https://lexiclash.live/en/multiplayer',
+        pathname: '/en/multiplayer',
+        reload: reloadSpy,
+        replace: replaceSpy,
+      },
+    });
+    render(
+      <ChunkErrorBoundary>
+        <Boom name="TypeError" message="Cannot read properties of undefined" />
+      </ChunkErrorBoundary>,
+    );
+    const homeBtn = await screen.findByRole('button', { name: /Home/i });
+    fireEvent.click(homeBtn);
+    expect(window.location.href).toBe('/en');
   });
 });

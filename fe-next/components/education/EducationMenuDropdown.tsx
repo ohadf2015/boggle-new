@@ -133,18 +133,6 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                 <GraduationCap className="w-4 h-4" />
                 {t('education.header.educationHome')}
               </Link>
-
-              <Link
-                href={`/${language}`}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors',
-                  'text-neo-black dark:text-white hover:bg-neo-pink/30'
-                )}
-              >
-                <Home className="w-4 h-4" />
-                {t('common.backToHome')}
-              </Link>
             </div>
 
             {isAuthenticated && (
@@ -165,6 +153,22 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                     <LogOut className="w-4 h-4" />
                     {t('auth.signOut')}
                   </button>
+                </div>
+
+                <div className="h-px bg-neo-black/20 dark:bg-neo-navy-light mx-2" />
+
+                <div className="p-2">
+                  <Link
+                    href={`/${language}`}
+                    onClick={() => setIsOpen(false)}
+                    className={cn(
+                      'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors w-full',
+                      'text-neo-black dark:text-white hover:bg-neo-pink/30'
+                    )}
+                  >
+                    <Home className="w-4 h-4" />
+                    {t('common.backToHome')}
+                  </Link>
                 </div>
               </>
             )}

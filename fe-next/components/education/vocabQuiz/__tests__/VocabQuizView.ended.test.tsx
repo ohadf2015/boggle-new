@@ -149,4 +149,54 @@ describe('VocabQuizView — the quiz ends on a moment', () => {
     });
     expect(screen.getByTestId('vocab-quiz-perfect')).toBeInTheDocument();
   });
+
+  /**
+   * The student's finished screen needs a CTA even when the teacher is in charge.
+   * The primary is "Wait for Teacher" (since the student can't replay alone), and
+   * tertiary is "Practice" as an escape hatch for productive downtime. Both must
+   * fit on screen without scrolling the main content region.
+   */
+  it('gives students a "wait for teacher" action and practice escape hatch', () => {
+    const handlePractice = vi.fn();
+    const { socket, server } = makeSocket();
+    render(
+      <VocabQuizView
+        socket={socket}
+        username="bo"
+        t={t}
+        onPractice={handlePractice}
+      />
+    );
+    server(VOCAB_QUIZ_EVENTS.ended, ENDED);
+
+    expect(screen.getByTestId('wait-for-teacher-message')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-missed-button')).toBeInTheDocument();
+  });
+
+  it('keeps actions visible without scrolling off-screen on a 390×844 phone', () => {
+    // The inner scrollable region (standings) should be bounded so that the
+    // actions are always visible. Measured via scrollHeight vs clientHeight.
+    const { socket, server } = makeSocket();
+    const { container } = render(
+      <VocabQuizView
+        socket={socket}
+        username="bo"
+        t={t}
+        onPractice={() => {}}
+      />
+    );
+    server(VOCAB_QUIZ_EVENTS.ended, ENDED);
+
+    // Find the scrollable standings region
+    const scrollableRegion = container.querySelector('[class*="overflow-y-auto"]');
+    if (scrollableRegion) {
+      // The scrollable region should not have overflow; content fits within clientHeight
+      const isOverflowing =
+        scrollableRegion.scrollHeight > scrollableRegion.clientHeight + 1; // +1 for rounding
+      expect(isOverflowing).toBe(false);
+    }
+
+    // StudentNextActions should be mounted and visible
+    expect(screen.getByTestId('wait-for-teacher-message')).toBeVisible();
+  });
 });

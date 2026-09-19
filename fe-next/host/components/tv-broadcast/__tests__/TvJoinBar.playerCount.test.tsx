@@ -101,3 +101,18 @@ describe('TvJoinBar player count animation', () => {
     expect(wrapper).toBeInTheDocument();
   });
 });
+
+describe('TvJoinBar on a phone', () => {
+  // A classroom room is TV mode even when the teacher runs it from a phone.
+  // At 375px the 5xl code plus the QR overran the row and squeezed the join
+  // address to nothing, so the row wraps below md and the code scales down.
+  it('wraps the join row below md and shrinks the code', () => {
+    render(<TvJoinBar gameCode="ABC123" playerCount={5} t={mockT} />);
+    const row = screen.getByTestId('tv-join-row').className.split(/\s+/);
+    expect(row).toContain('flex-wrap');
+    expect(row).toContain('md:flex-nowrap');
+    const code = screen.getByText('ABC123').className.split(/\s+/);
+    expect(code).toContain('text-4xl');
+    expect(code).toContain('md:text-6xl');
+  });
+});

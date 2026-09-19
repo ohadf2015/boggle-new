@@ -57,6 +57,8 @@ describe('AssignmentCreator — practice focus', () => {
 
   it('shows the focus picker only once a lesson is selected for a practice assignment', () => {
     renderIt();
+    // Word Craft is the default mode; the focus drill lives under Practice.
+    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
     expect(screen.queryByRole('radiogroup', { name: 'teacher.assignment.focus.label' })).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-rich' } });
@@ -70,6 +72,8 @@ describe('AssignmentCreator — practice focus', () => {
 
   it('enables only the focuses the lesson supports and explains the rest', () => {
     renderIt();
+    // Word Craft is the default mode; the focus drill lives under Practice.
+    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-rich' } });
     const group = screen.getByRole('radiogroup', { name: 'teacher.assignment.focus.label' });
 
@@ -82,6 +86,8 @@ describe('AssignmentCreator — practice focus', () => {
 
   it('submits the chosen focus as practice_focus', async () => {
     renderIt();
+    // Word Craft is the default mode; the focus drill lives under Practice.
+    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-rich' } });
     fireEvent.click(screen.getByRole('radio', { name: /education.vocabFocus.focus.synonym/ }));
     fireEvent.click(screen.getByText('teacher.assignment.selectDate'));
@@ -96,6 +102,8 @@ describe('AssignmentCreator — practice focus', () => {
 
   it('resets the focus to any when the lesson changes to one that cannot support it', async () => {
     renderIt();
+    // Word Craft is the default mode; the focus drill lives under Practice.
+    fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-rich' } });
     fireEvent.click(screen.getByRole('radio', { name: /education.vocabFocus.focus.synonym/ }));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-bare' } });

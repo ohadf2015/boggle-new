@@ -16,6 +16,7 @@ import {
   updateClassroomGameStatus,
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
+import { bindSocketToGame } from '../modules/gameStateManager.js';
 import {
   resolveClassroomTeacher,
   resolveClassroomRole,
@@ -68,6 +69,7 @@ const createClassroomGameSchema = z.object({
       .optional(),
     vocabQuizQuestionCount: z.number().int().min(4).max(30).optional(),
     vocabQuizSeconds: z.number().int().min(5).max(90).optional(),
+    treasureChestsEnabled: z.boolean().optional(),
     // Team battle (weekly teams / juegos en equipo).
     playStyle: z.enum(['ffa', 'teams']).optional(),
     teamCount: z.number().int().min(2).max(4).optional(),
@@ -157,6 +159,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz'; targetWord?: string;
         vocabQuizFocus?: PracticeFocusSetting;
         vocabQuizQuestionCount?: number; vocabQuizSeconds?: number;
+        treasureChestsEnabled?: boolean;
         playStyle?: 'ffa' | 'teams'; teamCount?: number;
         accessibility?: { largeText?: boolean; audioCues?: boolean; participationPoints?: boolean };
       };
@@ -210,6 +213,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           vocabQuizFocus: payload.settings?.vocabQuizFocus,
           vocabQuizQuestionCount: payload.settings?.vocabQuizQuestionCount,
           vocabQuizSeconds: payload.settings?.vocabQuizSeconds,
+          treasureChestsEnabled: payload.settings?.treasureChestsEnabled ?? true,
           playStyle: payload.settings?.playStyle,
           teamCount: payload.settings?.teamCount,
           accessibility: payload.settings?.accessibility,
@@ -378,6 +382,13 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         username: joinPayload.username,
         socketId: socket.id,
       });
+
+      // Bind the socket to the gameCode so that quiz recovery (requestState)
+      // can find the quiz session. This handles the reconnect case where a
+      // student's socket gets a new ID after a browser refresh. See pitfall
+      // class 3 (asymmetric paths): initial join must bind the socket,
+      // reconnect must rebind, and both must go through this same path.
+      bindSocketToGame(socket.id, joinPayload.gameCode);
 
       // Get updated game state
       const game = await getClassroomGame(joinPayload.gameCode);

@@ -42,7 +42,7 @@ export const WORD_TOWER_TILE_ID = 'word_tower';
 export const PRODUCE_TILE_PREFIX = 'produce:';
 
 /** Distinguishes tiles that share a `mode` but open different screens. */
-export type PracticeVariant = 'word_tower' | 'produce';
+export type PracticeVariant = 'word_tower' | 'produce' | 'wordcraft';
 
 /** Board and drill modes, in the order they appear in the grid. */
 export const BASE_PRACTICE_MODES: readonly BasePracticeMode[] = [

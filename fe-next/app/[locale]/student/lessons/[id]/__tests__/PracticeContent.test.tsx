@@ -62,8 +62,8 @@ vi.mock('@/components/education/practicePicker/PracticePicker', () => ({
 
 vi.mock('@/components/education/practice/PracticeModeStage', () => ({
   __esModule: true,
-  default: ({ mode, onBack }: { mode: string; onBack: () => void }) => (
-    <div data-testid="stage" data-mode={mode}>
+  default: ({ mode, variant, onBack }: { mode: string; variant: string | null; onBack: () => void }) => (
+    <div data-testid="stage" data-mode={mode} data-variant={variant ?? ''}>
       <button type="button" data-testid="stage-back" onClick={onBack}>leave</button>
     </div>
   ),
@@ -131,6 +131,31 @@ describe('PracticeContent', () => {
 
     expect(screen.getByTestId('picker')).toBeInTheDocument();
     expect(screen.queryByTestId('stage')).not.toBeInTheDocument();
+  });
+
+  it('GIVEN a Word Craft assignment link WHEN it opens THEN Word Craft starts as a solo_board session with the wordcraft variant', async () => {
+    renderContent({ initialMode: 'solo_board', initialVariant: 'wordcraft' });
+    const stage = await screen.findByTestId('stage');
+    expect(stage).toHaveAttribute('data-mode', 'solo_board');
+    expect(stage).toHaveAttribute('data-variant', 'wordcraft');
+    expect(mockStartSession).toHaveBeenCalledWith('solo_board', { variant: 'wordcraft' });
+  });
+
+  // Guard test. NOTE: under this vitest setup StrictMode does not replay mount
+  // effects (probed: 1 run), so the double-POST it guards against was proven in
+  // the dev browser (2 POSTs per deep link before the ref guard, 1 after).
+  it('GIVEN StrictMode (dev) WHEN a deep link auto-starts THEN exactly one session is created', async () => {
+    render(
+      <React.StrictMode>
+        <PracticeContent {...({
+          lesson: LESSON, language: 'en', isRTL: false, progress: {}, mastery: 'learning',
+          startSession: mockStartSession, router: { push: mockPush }, initialMode: 'solo_board',
+          initialFocus: null, initialVariant: 'wordcraft', onGuestResult: vi.fn(),
+        } as unknown as React.ComponentProps<typeof PracticeContent>)} />
+      </React.StrictMode>
+    );
+    await screen.findByTestId('stage');
+    expect(mockStartSession).toHaveBeenCalledTimes(1);
   });
 
   it('GIVEN a deep link WHEN it carries a mode THEN the round opens without a picker tap', async () => {

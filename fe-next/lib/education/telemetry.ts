@@ -51,10 +51,13 @@ const safeRegister: Register = (props) => {
 export type PracticeType =
   | 'flashcard'
   | 'solo_board'
+  | 'warmup'
+  | 'word_list'
   | 'matching'
   | 'spelling'
   | 'blitz'
   | 'vocab_focus'
+  | 'wordcraft'
   | 'lesson_completion';
 
 export interface EduPracticeCompleteArgs {
@@ -83,7 +86,7 @@ export function trackEduPracticeComplete(args: EduPracticeCompleteArgs): void {
   safeCapture('edu_practice_complete', props);
 }
 
-export type ClassroomJoinResult = 'success' | 'invalid_code' | 'not_found' | 'error';
+export type ClassroomJoinResult = 'success' | 'invalid_code' | 'already_member' | 'full' | 'name_taken' | 'server_error';
 
 /**
  * Which of the TWO six-character code systems actually resolved.

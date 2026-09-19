@@ -9,6 +9,8 @@ import { updateEducationChallengeProgress } from '@/lib/supabase/education/chall
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 import { canStudentPracticeLesson } from '@/lib/education/lessonAccess';
+import { WORDCRAFT_SESSION_MODE } from '@/lib/education/wordcraftAssignment';
+import { findSatisfiedAssignment, stampAssignmentCompletion } from '@/lib/education/assignmentCompletion';
 
 function tooManyRequests(retryAfter: number | undefined) {
   return NextResponse.json(
@@ -26,6 +28,8 @@ const startSessionSchema = z.object({
   practiceType: practiceTypeSchema,
   // vocab_focus only — which skill is drilled; persisted in `mode` + `results.focus`
   focus: vocabFocusSchema.optional(),
+  // solo_board only: Word Craft (no 'wordcraft' in the practice_type CHECK) → `mode`
+  variant: z.literal(WORDCRAFT_SESSION_MODE).optional(),
 });
 
 const updateSessionSchema = z.object({
@@ -220,7 +224,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { lessonId, practiceType, focus } = parseResult.data;
+    const { lessonId, practiceType, focus, variant } = parseResult.data;
 
     // Verify student has access to this lesson: owns it, or belongs to the
     // classroom it lives in. `lesson_assignments` is metadata (due date,
@@ -255,6 +259,7 @@ export async function POST(request: NextRequest) {
       insertData.mode = practiceType;
       insertData.results = { focus };
     }
+    if (practiceType === 'solo_board' && variant) insertData.mode = variant;
     const { data: session, error } = await supabase
       .from('practice_sessions')
       .insert(insertData)
@@ -359,6 +364,7 @@ export async function PATCH(request: NextRequest) {
     // the same UPDATE instead of costing a second write to the same row.
     let serverCalculatedXp = 0;
     let streakDays = 0;
+    let satisfiedAssignmentId: string | null = null;
 
     if (completed) {
       const merged = { ...existing, ...updateObj } as typeof existing & Record<string, unknown>;
@@ -387,13 +393,15 @@ export async function PATCH(request: NextRequest) {
         },
       };
 
-      // B1 fix: Fetch student's current streak for streak bonus calculation
-      const { data: progressData } = await supabase
-        .from('student_lesson_progress')
-        .select('current_streak')
-        .eq('student_id', existing.student_id)
-        .eq('lesson_id', existing.lesson_id)
-        .single();
+      // B1 fix: streak for the bonus. In the same wave: which assignment (if any)
+      // this round satisfies — the teacher's tracking reads the stamp below.
+      const [{ data: progressData }, foundAssignment] = await Promise.all([
+        supabase.from('student_lesson_progress').select('current_streak')
+          .eq('student_id', existing.student_id).eq('lesson_id', existing.lesson_id).single(),
+        findSatisfiedAssignment(supabase, { lessonId: existing.lesson_id, sessionMode: existing.mode })
+          .catch((err) => { logger.error('Assignment lookup failed:', err); return null; }),
+      ]);
+      satisfiedAssignmentId = foundAssignment;
 
       streakDays = progressData?.current_streak ?? 0;
       serverCalculatedXp = calculatePracticeXp({ ...xpSession, streakDays }).totalXp;
@@ -440,10 +448,15 @@ export async function PATCH(request: NextRequest) {
         )
       : Promise.resolve(null);
 
+    const stampAssignment = satisfiedAssignmentId ? stampAssignmentCompletion(supabase, { studentId: existing.student_id,
+      lessonId: existing.lesson_id, assignmentId: satisfiedAssignmentId }).catch((err) => { logger.error('Assignment stamp failed:', err); return false; })
+      : Promise.resolve(null);
+
     const [{ data: session, error }, xpResult, profileXpResult] = await Promise.all([
       sessionWrite,
       awardEducationXp,
       incrementProfileXp,
+      stampAssignment,
     ]);
 
     if (error) {

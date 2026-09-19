@@ -11,6 +11,7 @@ import {
   claimChunkRecoveryGuard,
   clearChunkRecoveryGuard,
 } from '@/lib/deploy/staleDeployReload';
+import { sectionHome } from '@/lib/navigation/sectionHome';
 
 function isChunkLoadError(error: Error): boolean {
   return isChunkLoadErrorNameMessage(error.name, error.message);
@@ -122,7 +123,13 @@ export default function Error({
           </button>
           <button
             type="button"
-            onClick={() => window.location.href = '/'}
+            onClick={() => {
+              const home = sectionHome({
+                pathname: typeof window !== 'undefined' ? window.location.pathname : '',
+                locale,
+              });
+              window.location.href = home;
+            }}
             className="btn-neo-secondary px-6 py-3 text-lg"
           >
             🏠 {t('common.back')}

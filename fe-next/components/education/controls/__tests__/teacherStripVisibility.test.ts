@@ -80,6 +80,22 @@ describe('teacherStripVisibility', () => {
       const quiz = reduceRoundSignal(IDLE_ROUND_STATE, { type: 'quizQuestion' });
       expect(isRoundLive(reduceRoundSignal(quiz, { type: 'quizEnded' }))).toBe(false);
     });
+
+    // The quiz server moves every client out of the lobby with a real (shell)
+    // `startGame` and ends with `vocabQuiz:ended` only — no `endGame`. Clearing
+    // just the quiz flag left `boardRound` stuck true, so the teacher sat on
+    // PAUSE / +30S / END ROUND over a finished quiz, with END ROUND a no-op.
+    it('closes on vocabQuiz:ended even though the quiz opened with a shell startGame', () => {
+      let s = reduceRoundSignal(IDLE_ROUND_STATE, { type: 'boardStart' });
+      s = reduceRoundSignal(s, { type: 'quizQuestion' });
+      expect(isRoundLive(reduceRoundSignal(s, { type: 'quizEnded' }))).toBe(false);
+    });
+
+    it('an ended-quiz snapshot also clears the shell startGame', () => {
+      const s = reduceRoundSignal(IDLE_ROUND_STATE, { type: 'boardStart' });
+      const ended = reduceRoundSignal(s, { type: 'quizSnapshot', phase: 'ended', paused: false });
+      expect(isRoundLive(ended)).toBe(false);
+    });
   });
 
   describe('paused state in a quiz round', () => {

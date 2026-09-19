@@ -29,6 +29,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
 import { socketTeacherName } from '@/lib/education/classroomGameHandoff';
+import { useClassrooms } from '@/hooks/useClassroom';
+import type { Language } from '@/lib/supabase/education/types';
 import {
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
@@ -47,6 +49,7 @@ import { LobbySetupPanel } from './lobby/LobbySetupPanel';
 import { LobbyRoundSettings } from './lobby/LobbyRoundSettings';
 import { LobbySetupDisclosure } from './lobby/LobbySetupDisclosure';
 import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
+import { ClassroomLiveLobby } from './lobby/ClassroomLiveLobby';
 import { useTeacherLobbyData } from './lobby/useTeacherLobbyData';
 import { useClassroomLaunchSocket } from './lobby/useClassroomLaunchSocket';
 import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
@@ -73,9 +76,33 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
     selectedClassroomId,
     setSelectedClassroomId,
     createLessonFromPack,
+    fetchTeacherData,
   } = useTeacherLobbyData(user?.id, t, initialLessonId);
 
-  const { gameCode, isStarting, startError, setStartError, launch } = useClassroomLaunchSocket(t, language);
+  const { createClassroom } = useClassrooms();
+
+  const { gameCode, isStarting, startError, setStartError, launch, socket, roomCreatedGameCode, startLiveGame } = useClassroomLaunchSocket(t, language);
+
+  // Create classroom from the empty-state button
+  const handleCreateClassroom = useCallback(async () => {
+    const defaultName = t('education.classroomGame.defaultClassroomName');
+    const classroomLanguage = language as Language;
+
+    const result = await createClassroom(defaultName, classroomLanguage);
+
+    if (!result.success) {
+      if (result.code === 'CLASS_LIMIT_REACHED') {
+        toast.error(t('education.subscription.classLimitReached'));
+      } else {
+        toast.error(result.error || t('errors.classroomCreateFailed'));
+      }
+      return;
+    }
+
+    toast.success(t('education.lesson.createdClassroom'));
+    // Refetch the lobby data so the new classroom appears
+    await fetchTeacherData();
+  }, [t, language, createClassroom, fetchTeacherData]);
 
   // The mode the teacher explicitly picked. `null` means untouched, and the
   // default below is derived at render from whether a lesson is attached — ONE
@@ -84,6 +111,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   const [vocabQuizFocus, setVocabQuizFocus] = useState<PracticeFocusSetting>('any');
   const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState(VOCAB_QUIZ_DEFAULT_QUESTION_COUNT);
   const [vocabQuizSeconds, setVocabQuizSeconds] = useState(VOCAB_QUIZ_DEFAULT_SECONDS);
+  const [treasureChestsEnabled, setTreasureChestsEnabled] = useState(true);
   const [targetWord, setTargetWord] = useState('');
   const [minWordLength, setMinWordLength] = useState(3);
   const [timerMinutes, setTimerMinutes] = useState(3);
@@ -238,7 +266,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
           gameMode: mode,
           targetWord: targetWord || undefined,
           ...(mode === VOCAB_QUIZ_MODE
-            ? { vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds }
+            ? { vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled }
             : {}),
           playStyle,
           teamCount: playStyle === 'teams' ? clampTeamCount(teamCount) : undefined,
@@ -253,7 +281,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
       user, profile, classrooms, selectedClassroomId, selectedLessonIds, selectedLessons,
       allPlayableWords, activePreset, gameCode, language, t, launch, saveConfig, setStartError,
       targetWord, minWordLength, timerMinutes, boardSize, playStyle, teamCount, accessibility,
-      vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds,
+      vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled,
     ]
   );
 
@@ -281,6 +309,11 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
    */
   const blockedKey = cannotStart ? 'education.modePicker.needsLesson' : null;
 
+  // After the room is created, show the live lobby instead of the setup screen
+  if (roomCreatedGameCode && socket) {
+    return <ClassroomLiveLobby gameCode={roomCreatedGameCode} socket={socket} onStart={startLiveGame} />;
+  }
+
   // `repeatPending` is part of the gate on purpose: the restored lesson decides
   // which poster leads, so painting before it lands shows Classic and then
   // jumps to the quiz (pitfall class 1).
@@ -290,7 +323,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
 
   if (classrooms.length === 0) {
     return (
-      <LobbyNoClassrooms onBack={onBack} onCreateClassroom={() => router.push(`/${language}/teacher`)} />
+      <LobbyNoClassrooms onBack={onBack} onCreateClassroom={handleCreateClassroom} />
     );
   }
 
@@ -369,6 +402,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
           vocabQuizFocus={vocabQuizFocus}
           vocabQuizQuestionCount={vocabQuizQuestionCount}
           vocabQuizSeconds={vocabQuizSeconds}
+          treasureChestsEnabled={treasureChestsEnabled}
           onTimerChange={setTimerMinutes}
           onBoardSizeChange={setBoardSize}
           onMinWordLengthChange={setMinWordLength}
@@ -376,6 +410,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
           onVocabQuizFocusChange={setVocabQuizFocus}
           onVocabQuizQuestionCountChange={setVocabQuizQuestionCount}
           onVocabQuizSecondsChange={setVocabQuizSeconds}
+          onTreasureChestsChange={setTreasureChestsEnabled}
         />
       </LobbySetupDisclosure>
     </ClassroomLobbyShell>

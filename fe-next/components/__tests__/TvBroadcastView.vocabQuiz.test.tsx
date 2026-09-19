@@ -13,7 +13,7 @@
  * 2026-09-06 in room MHFHM5 with a real teacher account and a real student.
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvBroadcastView from '@/host/components/TvBroadcastView';
 import type { Language } from '@/shared/types/game';
@@ -61,7 +61,12 @@ vi.mock('@/host/components/tv-broadcast/TvGameHeader', () => ({
 // The quiz projector itself is exercised by its own tests; here we only care
 // that the TV path reaches it at all.
 vi.mock('@/components/education/vocabQuiz/VocabQuizHostView', () => ({
-  VocabQuizHostView: () => <div data-testid="vocab-quiz-host-view">Quiz projector</div>,
+  VocabQuizHostView: ({ onPlayAgain }: { onPlayAgain?: () => void }) => (
+    <div data-testid="vocab-quiz-host-view">
+      Quiz projector
+      {onPlayAgain && <button data-testid="quiz-play-again" onClick={onPlayAgain}>again</button>}
+    </div>
+  ),
 }));
 
 // The room-type detector. Driven per test so both branches are covered.
@@ -101,6 +106,19 @@ describe('TvBroadcastView — live Vocab Quiz on the classroom projector', () =>
     // THEN the projector shows the quiz, not the board-game broadcast
     expect(screen.getByTestId('vocab-quiz-host-view')).toBeInTheDocument();
     expect(screen.queryByTestId('tv-leaderboard-mock')).not.toBeInTheDocument();
+  });
+
+  it('hands the teacher a one-tap rematch on the quiz finale (no stranded projector)', () => {
+    // GIVEN a finished quiz on the projector and a host rematch action
+    mockIsVocabQuizRoom.mockReturnValue(true);
+    const onQuizPlayAgain = vi.fn();
+
+    // WHEN the teacher taps Play Again on the finale
+    render(<TvBroadcastView {...defaultProps} onQuizPlayAgain={onQuizPlayAgain} />);
+    fireEvent.click(screen.getByTestId('quiz-play-again'));
+
+    // THEN the host's rematch runs
+    expect(onQuizPlayAgain).toHaveBeenCalledTimes(1);
   });
 
   it('still renders the normal broadcast for a board-game room', () => {

@@ -58,6 +58,15 @@ export const VOCAB_QUIZ_MAX_SECONDS = 90;
 
 /** The "answer reveal + standings" beat between questions. */
 export const VOCAB_QUIZ_REVEAL_MS = 3_000;
+/**
+ * Longest the reveal waits past VOCAB_QUIZ_REVEAL_MS for a student who got it
+ * right to open their chest. Without the hold, a fast class cut to the next
+ * question before anyone could tap; without the cap, one idle phone stalls
+ * the room.
+ */
+export const VOCAB_QUIZ_CHEST_HOLD_MS = 5_000;
+/** Once a chest opens during the reveal, the room lingers this long (never past the hold cap) so the reveal is seen. */
+export const VOCAB_QUIZ_CHEST_REVEAL_BEAT_MS = 2_500;
 
 export type VocabQuizPhase = 'question' | 'reveal' | 'ended';
 
@@ -153,6 +162,8 @@ export interface VocabQuizAnswerResult {
   streakBonus: number;
   streak: number;
   totalScore: number;
+  /** Whether this correct answer unlocks a treasure chest reveal. */
+  chestPending?: boolean;
 }
 
 /**
@@ -178,6 +189,8 @@ export interface VocabQuizStateSnapshot {
   myScore: number;
   myStreak: number;
   standings: VocabQuizStanding[];
+  /** The resolved chest outcome for this question, if the player picked a chest. */
+  myChest?: TreasureChestState;
 }
 
 export interface VocabQuizEnded {
@@ -215,6 +228,48 @@ export const VOCAB_QUIZ_DEFAULT_SETTINGS: VocabQuizSettings = {
   secondsPerQuestion: VOCAB_QUIZ_DEFAULT_SECONDS,
 };
 
+// ---------------------------------------------------------------------------
+// Treasure Chests (Gold-Quest-style rewards)
+// ---------------------------------------------------------------------------
+
+export type TreasureChestOutcome = 'gain' | 'double' | 'steal' | 'swap' | 'small-loss';
+
+export interface TreasureChestState {
+  /** Username of the player who opened this chest. */
+  actor: string;
+  /** Outcome seeded server-side for (gameCode, questionIndex, studentId). */
+  outcome: TreasureChestOutcome;
+  /** Amount of points gained or lost. */
+  amount: number;
+  /** Player the outcome affects (for steal/swap). */
+  targetUsername?: string;
+  /** Updated standings after chest reveal. */
+  standings: VocabQuizStanding[];
+  /** The actor's own total after the chest — only on the private result. */
+  myScore?: number;
+}
+
+/**
+ * Private notice to the student a steal or swap landed on. Carries their new
+ * total, because the victim's score changed without them doing anything and
+ * the client never recomputes a score on its own (Class 3).
+ */
+export interface TreasureChestHit {
+  actor: string;
+  outcome: 'steal' | 'swap';
+  /** Points the victim lost (always >= 0). */
+  amount: number;
+  /** The victim's total after the hit. */
+  score: number;
+}
+
+export interface TreasureChestRequest {
+  /** Question index the chest belongs to — a stale pick is dropped. */
+  index: number;
+  /** Which of the three chests was tapped (0..2). */
+  chest: number;
+}
+
 /** Socket event names, in one place so client and server cannot drift. */
 export const VOCAB_QUIZ_EVENTS = {
   question: 'vocabQuiz:question',
@@ -226,6 +281,13 @@ export const VOCAB_QUIZ_EVENTS = {
   lockIn: 'vocabQuiz:lockIn',
   answer: 'vocabQuiz:answer',
   requestState: 'vocabQuiz:requestState',
+  /** Private: the actor's own chest result. */
+  treasureChestResult: 'vocabQuiz:treasureChestResult',
+  /** Room-wide: every chest opened, for the projector ticker and standings. */
+  treasureChestEvent: 'vocabQuiz:treasureChestEvent',
+  /** Private: tells a student someone stole from / swapped with them. */
+  chestHit: 'vocabQuiz:chestHit',
+  openChest: 'vocabQuiz:openChest',
 } as const;
 
 /**

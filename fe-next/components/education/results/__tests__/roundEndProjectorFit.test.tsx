@@ -80,20 +80,24 @@ describe('the projector recap fits the wall', () => {
   beforeEach(() => window.sessionStorage.clear());
   afterEach(cleanup);
 
-  it('locks its own root — a wall has no scrollbar and nobody to drag one', () => {
+  it('locks its own root on the wall — a wall has no scrollbar and nobody to drag one', () => {
+    // Below lg the recap is one column on a teacher's phone (classroom rooms
+    // are always TV mode), so the root scrolls there; at lg it is the wall.
+    // See `classroomTvPhoneLayout.test.tsx`.
     render(<ClassroomTvResults summary={bigSummary(0)} onRematch={() => {}} t={t} />);
-    const root = screen.getByTestId('classroom-tv-results');
-    expect(root.className).toContain('overflow-hidden');
-    expect(root.className).not.toContain('overflow-y-auto');
+    const root = screen.getByTestId('classroom-tv-results').className.split(/\s+/);
+    expect(root).toContain('lg:overflow-hidden');
   });
 
   it('allows exactly one scrolling region, and it is the reteach list', () => {
     const { container } = render(
       <ClassroomTvResults summary={bigSummary(0)} onRematch={() => {}} t={t} />
     );
-    const scrollers = Array.from(container.querySelectorAll<HTMLElement>('[class]')).filter((el) =>
-      /overflow-y-auto/.test(el.getAttribute('class') ?? '')
-    );
+    // On the wall (lg+): a root that scrolls only below lg is not a scroller.
+    const scrollers = Array.from(container.querySelectorAll<HTMLElement>('[class]')).filter((el) => {
+      const cls = (el.getAttribute('class') ?? '').split(/\s+/);
+      return cls.includes('overflow-y-auto') && !cls.includes('lg:overflow-hidden');
+    });
     expect(scrollers).toHaveLength(1);
     expect(scrollers[0].getAttribute('data-testid')).toBe('coverage-words');
   });

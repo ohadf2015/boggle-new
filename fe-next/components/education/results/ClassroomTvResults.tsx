@@ -59,6 +59,7 @@ import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { ReteachActions } from './ReteachActions';
 import { useReteachLinks } from './useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import { trackResultsAction } from './trackResultsAction';
 
 export interface ClassroomTvResultsProps {
   summary: ClassroomSummary;
@@ -131,13 +132,13 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
       // the finished frame instead of catching the podium mid-beat and calling
       // it broken. Every stage is painted; `done` is simply the whole story.
       data-round-end-stage={stage}
-      className="h-full overflow-hidden flex flex-col gap-3 bg-neo-navy text-neo-white"
+      className="h-full overflow-y-auto lg:overflow-hidden flex flex-col gap-3 bg-neo-navy text-neo-white"
     >
       <header className="shrink-0 flex flex-wrap items-baseline justify-center gap-x-4">
-        <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-2xl">
+        <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-xl md:text-2xl">
           {t('education.results.podium.title')}
         </p>
-        <p className="font-neo-body font-bold text-neo-white/80 text-xl truncate">
+        <p className="font-neo-body font-bold text-neo-white/80 text-base md:text-xl truncate max-w-full">
           {summary.lessonNames.join(' · ')}
         </p>
       </header>
@@ -154,13 +155,13 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
         // the coverage list squeezed to a height of literally zero. Tailwind
         // emits arbitrary values only from class strings it can see, and a
         // results screen is the worst place to find out it could not.
-        className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-4"
+        className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:flex-1 lg:min-h-0"
       >
         {/* `relative` only so the celebration can be bounded to this column.
             It falls over the podium and the winner bar, never over the
             Rematch button in the next column and never over the whole page —
             a fullscreen animated layer is the Class-5 shape we do not ship. */}
-        <div className="relative lg:col-span-3 min-h-0 flex flex-col justify-end gap-3">
+        <div className="relative lg:col-span-3 lg:min-h-0 flex flex-col justify-end gap-3">
           {/* Starts on the winner's beat and never stops while the recap is
               up. `fireRankConfetti` still fires its one live burst for the
               people in the room; this is what a shutter that opens four
@@ -185,7 +186,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
           )}
         </div>
 
-        <div className="lg:col-span-2 min-h-0 flex flex-col gap-3">
+        <div className="lg:col-span-2 lg:min-h-0 flex flex-col gap-3">
           {/* The podium to the left is THIS round. From round two on, the room
               is asking a different question than the podium answers — see
               `ClassroomSessionStandings`. Absent on a single-round session,
@@ -209,7 +210,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
             />
           ) : null}
 
-          <section className="flex-1 min-h-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-4 shadow-hard">
+          <section className="lg:flex-1 lg:min-h-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-4 shadow-hard">
             {/* No username: `isTeacher` means class-wide coverage, so the
                 per-player mastery lookup is never consulted. Only the words
                 still to teach are printed, capped — the wall is for the next
@@ -234,10 +235,13 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
                 <button
                   type="button"
                   data-testid="classroom-tv-rematch"
-                  onClick={onRematch}
+                  onClick={() => {
+                    trackResultsAction('rematch', 'projector');
+                    onRematch();
+                  }}
                   className={cn(
-                    'w-full flex items-center justify-center gap-3 px-6 py-4',
-                    'font-neo-display font-bold text-3xl',
+                    'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4',
+                    'font-neo-display font-bold text-2xl md:text-3xl',
                     'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
                     'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
                   )}

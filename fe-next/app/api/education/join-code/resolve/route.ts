@@ -92,10 +92,26 @@ export async function GET(request: Request) {
   try {
     const game = await lookupLiveClassroomGame(code);
     if (game) {
+      // Query the classroom name to show students a friendly label.
+      let classroomName: string | undefined;
+      try {
+        const supabase = await createClient();
+        const { data } = await supabase
+          .from('classrooms')
+          .select('name')
+          .eq('id', game.classroomId)
+          .single();
+        classroomName = data?.name;
+      } catch (err) {
+        logger.error('join-code resolve: classroom name lookup failed:', err);
+        // Degrade to teacherName if classroom lookup fails
+      }
+
       return NextResponse.json({
         kind: 'game',
         gameCode: code,
         classroomId: game.classroomId,
+        classroomName: classroomName,
         teacherName: game.teacherName,
         lessonIds: game.lessonIds,
       });

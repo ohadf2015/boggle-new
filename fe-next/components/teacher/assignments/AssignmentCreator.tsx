@@ -13,7 +13,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Calendar, Swords, BookOpen, ChevronDown, Crosshair, Lock } from 'lucide-react';
+import { Calendar, Swords, BookOpen, ChevronDown, Crosshair, Lock, Grid2x2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import {
@@ -22,6 +22,7 @@ import {
   focusQuestionCounts,
   type PracticeFocusSetting,
 } from '@/lib/education/vocabFocus';
+import { WORDCRAFT_FOCUS } from '@/lib/education/wordcraftAssignment';
 
 interface AssignmentCreatorProps {
   classroomId: string;
@@ -30,7 +31,12 @@ interface AssignmentCreatorProps {
   onClose: () => void;
 }
 
-type AssignmentType = 'practice' | 'duel';
+/**
+ * 'wordcraft' is the recommended default: students play Word Craft solo vs the
+ * bot. `lesson_assignments` has no mode column, so it is saved as
+ * practice_focus 'wordcraft'; 'practice' saves a focus or 'any' (→ NULL).
+ */
+type AssignmentType = 'wordcraft' | 'practice' | 'duel';
 
 export default function AssignmentCreator({
   classroomId,
@@ -54,7 +60,7 @@ export default function AssignmentCreator({
     return new Map(labelled.map((l) => [l.id, l.label]));
   }, [lessons, classrooms]);
 
-  const [selectedType, setSelectedType] = useState<AssignmentType>('practice');
+  const [selectedType, setSelectedType] = useState<AssignmentType>('wordcraft');
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
   const [dueDate, setDueDate] = useState<string>('');
   const [instructions, setInstructions] = useState<string>('');
@@ -77,7 +83,7 @@ export default function AssignmentCreator({
   // Reset form when dialog opens
   useEffect(() => {
     if (isOpen) {
-      setSelectedType('practice');
+      setSelectedType('wordcraft');
       setSelectedLessonId('');
       setDueDate('');
       setInstructions('');
@@ -113,10 +119,10 @@ export default function AssignmentCreator({
       classroom_id: classroomId,
       lesson_id: selectedLessonId,
       teacher_id: user.id,
-      assignment_type: selectedType,
+      assignment_type: selectedType === 'duel' ? 'duel' : 'practice',
       due_date: dueDate,
       instructions: instructions || null,
-      practice_focus: selectedType === 'practice' ? focus : null,
+      practice_focus: selectedType === 'practice' ? focus : selectedType === 'wordcraft' ? WORDCRAFT_FOCUS : null,
     });
 
     setIsSubmitting(false);
@@ -150,6 +156,27 @@ export default function AssignmentCreator({
               <label className="block text-sm font-neo-body text-neo-white mb-2">
                 {t('teacher.assignment.typeLabel')}
               </label>
+              <button
+                type="button"
+                data-testid="assignment-mode-wordcraft"
+                aria-pressed={selectedType === 'wordcraft'}
+                onClick={() => setSelectedType('wordcraft')}
+                className={cn(
+                  'w-full mb-3 p-4 rounded-neo border-neo transition-all flex items-center gap-3 text-start',
+                  selectedType === 'wordcraft'
+                    ? 'bg-neo-lime border-neo-lime text-neo-black shadow-hard-sm'
+                    : 'bg-neo-navy/50 border-neo-cream/40 text-neo-white hover:bg-neo-navy/80'
+                )}
+              >
+                <Grid2x2 className="w-8 h-8 shrink-0" aria-hidden="true" />
+                <span className="flex-1 min-w-0">
+                  <span className="font-bold block">{t('education.wordcraftAssignment.title')}</span>
+                  <span className="text-xs opacity-80 block">{t('education.wordcraftAssignment.teacherHint')}</span>
+                </span>
+                <span className="shrink-0 rounded-neo border-2 border-black bg-neo-yellow px-2 py-0.5 text-xs font-black uppercase text-neo-black">
+                  {t('education.wordcraftAssignment.recommended')}
+                </span>
+              </button>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
