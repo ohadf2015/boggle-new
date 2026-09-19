@@ -11200,6 +11200,22 @@ const en = {
       },
       "cta": "Unlock this with Pro — {{price}}/month"
     },
+    "digest": {
+      "title": "Last lesson digest",
+      "subtitle": "What happened in the last class game. Full history and printable PDFs are Teacher Pro.",
+      "played": "Played",
+      "roster": "On the roster",
+      "accuracy": "Class accuracy",
+      "coverage": "Words found",
+      "missedWords": "Words to reteach",
+      "struggling": "Check in with {{names}}",
+      "emptyNeverPlayed": "Play a class game and this digest fills in.",
+      "emptyNoRoster": "Invite students first — then the digest has someone to report on.",
+      "loadError": "Couldn't load the last lesson.",
+      "retry": "Try again",
+      "proCtaHint": "Unlock every game, every student, and printable PDFs.",
+      "regionLabel": "Progress digest for {{classroom}}"
+    },
     "subscription": {
       "giftedNoCard": "No card on file, no renewal — it just ends, and you go back to Free.",
       "giftedUntil": "Complimentary Pro until",

@@ -15,6 +15,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
+import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -190,6 +191,7 @@ function TeacherReportsInner() {
     );
   } else if (selectedStudentId) {
     view = (
+      <ProGate feature="reports">
       <>
         <button
           type="button"
@@ -202,9 +204,22 @@ function TeacherReportsInner() {
         </button>
         <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
       </>
+      </ProGate>
     );
   } else {
-    view = <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />;
+    const selectedClassroom = classrooms?.find((c) => c.id === selectedClassroomId);
+    view = (
+      <div className="space-y-8">
+        <ProgressDigestDashboard
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+          rosterCount={selectedClassroom?.member_count ?? 0}
+        />
+        <ProGate feature="reports">
+          <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
+        </ProGate>
+      </div>
+    );
   }
 
   return (
@@ -234,17 +249,14 @@ function TeacherReportsInner() {
   );
 }
 
-// Reports are a Pro surface (planMatrix: analytics/reports are what the money
-// buys; last-game insights on the dashboard stay free). The gate swaps the
-// whole page for the upsell — same merchandising-boundary pattern as the
-// analytics dashboard.
+// Last-lesson digest is free (same last-game read as the dashboard pulse).
+// Full class/student reports stay behind ProGate, mounted inside Inner so a
+// free teacher still gets the picker + digest + Teacher Pro CTA.
 export default function TeacherReportsPage() {
   return (
     <ReportsShell>
       <TeacherGate>
-        <ProGate feature="reports">
-          <TeacherReportsInner />
-        </ProGate>
+        <TeacherReportsInner />
       </TeacherGate>
     </ReportsShell>
   );

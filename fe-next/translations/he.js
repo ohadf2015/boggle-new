@@ -11950,6 +11950,22 @@ const he = {
       },
       "cta": "לפתוח עם Pro — {{price}} לחודש"
     },
+    "digest": {
+      "title": "תקציר השיעור האחרון",
+      "subtitle": "מה קרה במשחק הכיתה האחרון. ההיסטוריה המלאה ו־PDF להדפסה הם Teacher Pro.",
+      "played": "שיחקו",
+      "roster": "ברשימה",
+      "accuracy": "דיוק הכיתה",
+      "coverage": "מילים שנמצאו",
+      "missedWords": "מילים לחזרה",
+      "struggling": "כדאי לבדוק עם {{names}}",
+      "emptyNeverPlayed": "שחקו משחק כיתה — והתקציר יתמלא.",
+      "emptyNoRoster": "הזמינו תלמידים קודם — אחר כך יש למי לדווח.",
+      "loadError": "לא הצלחנו לטעון את השיעור האחרון.",
+      "retry": "נסו שוב",
+      "proCtaHint": "פתחו כל משחק, כל תלמיד, ודוחות PDF להדפסה.",
+      "regionLabel": "תקציר התקדמות עבור {{classroom}}"
+    },
     "subscription": {
       "giftedNoCard": "אין כרטיס במערכת ואין חידוש — זה פשוט מסתיים וחוזרים לחינמי.",
       "giftedUntil": "Pro במתנה עד",

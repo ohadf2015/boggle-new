@@ -12095,6 +12095,22 @@ const ja = {
       },
       "cta": "Pro で解除 — 月額 {{price}}"
     },
+    "digest": {
+      "title": "前回の授業ダイジェスト",
+      "subtitle": "前回のクラスゲームの結果です。全履歴と印刷用PDFはTeacher Proです。",
+      "played": "参加",
+      "roster": "名簿",
+      "accuracy": "クラス正答率",
+      "coverage": "見つかった語",
+      "missedWords": "復習する語",
+      "struggling": "{{names}} をフォロー",
+      "emptyNeverPlayed": "クラスゲームをすると、ここにダイジェストが出ます。",
+      "emptyNoRoster": "先に生徒を招待してください。報告する相手が必要です。",
+      "loadError": "前回の授業を読み込めませんでした。",
+      "retry": "再試行",
+      "proCtaHint": "すべてのゲーム・生徒・印刷用PDFを解除します。",
+      "regionLabel": "{{classroom}} の進捗ダイジェスト"
+    },
     "subscription": {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",
       "giftedUntil": "無償 Pro の期限",
