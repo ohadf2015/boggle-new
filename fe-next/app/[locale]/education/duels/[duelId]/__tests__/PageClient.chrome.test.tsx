@@ -23,6 +23,7 @@ const mockGetDuelById = vi.fn();
 const mockGetProfile = vi.fn();
 
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => mockSetIsInGame,
 }));
 vi.mock('@/lib/supabase/education/duels', () => ({

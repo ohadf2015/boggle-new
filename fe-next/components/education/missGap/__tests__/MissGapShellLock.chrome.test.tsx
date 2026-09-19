@@ -23,6 +23,7 @@ import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
 
 const setIsInGame = vi.fn();
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => setIsInGame,
 }));
 

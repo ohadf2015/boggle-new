@@ -12,6 +12,7 @@ vi.mock('@/hooks/useTvFullscreenListener', () => ({
 }));
 
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useNavigation: () => ({ isInGame: mockIsInGame }),
 }));
 

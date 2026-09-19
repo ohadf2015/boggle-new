@@ -23,6 +23,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 const navState = { isInGame: false };
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useNavigation: () => ({ isInGame: navState.isInGame, setIsInGame: vi.fn(), activeTab: 'home', setActiveTab: vi.fn(), headerAudioControlActive: false, registerHeaderAudioControl: () => () => {} }),
 }));
 vi.mock('@/components/CrazyGamesSDK', () => ({

@@ -91,6 +91,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
     NavigationContext: {
         Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     },
