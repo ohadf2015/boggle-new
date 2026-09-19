@@ -7,18 +7,9 @@ import {
 } from 'lucide-react';
 
 // World images mapping (WebP for smaller file sizes)
-export const WORLD_IMAGES: Record<number, string> = {
-  1: '/images/adventure/world-meadows-3d.webp',
-  2: '/images/adventure/world-springs-3d.webp',
-  3: '/images/adventure/world-caverns-3d.webp',
-  4: '/images/adventure/world-archipelago-3d.webp',
-  5: '/images/adventure/world-canyon-3d.webp',
-  6: '/images/adventure/world-labyrinth-3d.webp',
-  7: '/images/adventure/world-palace-3d.webp',
-  8: '/images/adventure/world-nebula-3d.webp',
-  9: '/images/adventure/world-peaks-3d.webp',
-  10: '/images/adventure/world-throne-3d.webp',
-};
+export const WORLD_IMAGES: Record<number, string> = Object.fromEntries(
+  Array.from({ length: 10 }, (_, i) => [i + 1, `/images/adventure/play/world-${i + 1}.webp`]),
+);
 
 /**
  * World-specific parallax layer configuration

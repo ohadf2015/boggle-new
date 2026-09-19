@@ -9,9 +9,9 @@ import {
   Crown,
   Swords,
   Skull,
-  Coins,
-  Gem,
-  Zap,
+  ScrollText,
+  Trophy,
+  Palette,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -189,12 +189,13 @@ const RPGLevelCard = memo(function RPGLevelCard({
           data-testid="reward-tokens"
           className="flex items-center justify-center gap-2.5 py-1.5 border-t border-neo-white/5"
         >
-          <Coins className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-yellow/60')} />
-          {(levelNum % 3 === 0 || isBoss) && (
-            <Gem className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : isBoss ? 'text-neo-purple/80' : 'text-neo-cyan/60')} />
-          )}
+          {/* What clearing it grants: a lore scroll; the boss adds its trophy + world tile skin */}
+          <ScrollText className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-cyan/70')} />
           {isBoss && (
-            <Zap className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-lime/60')} />
+            <>
+              <Trophy className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-yellow/80')} />
+              <Palette className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-pink/80')} />
+            </>
           )}
         </div>
 

@@ -1,9 +1,11 @@
 /**
  * Phase 1b award-dispatch tests for POST /api/scores/sync.
  *
- * Verifies sync routes adventure + brain submissions through their
+ * Verifies sync routes brain/blast/connections submissions through their
  * processCompletion handlers, writes to offline_award_log for persistent
  * idempotency, and fires PostHog `offline_sync_award_granted` events.
+ * `adventure` submissions have no award handler (completions need a
+ * server-dealt board) — they are accepted and recorded but never credited.
  *
  * processCompletion modules are mocked so this file stays scoped to
  * sync-route dispatch logic; the handlers themselves are covered by
@@ -41,17 +43,6 @@ vi.mock('@/lib/wordValidation/serverDicts', () => ({
 }));
 
 // Mock processCompletion modules so this test scopes to dispatch logic.
-const mockProcessAdventure = vi.fn();
-vi.mock('@/app/api/adventure/complete/processCompletion', () => ({
-  processAdventureCompletion: (...args: unknown[]) => mockProcessAdventure(...args),
-}));
-vi.mock('@/app/api/adventure/complete/validation', () => ({
-  validateRequestBody: vi.fn((body: Record<string, unknown>) => ({
-    valid: true,
-    data: body as unknown,
-  })),
-}));
-
 const mockProcessBrain = vi.fn();
 vi.mock('@/app/api/drills/submit/processCompletion', () => ({
   processBrainDrillCompletion: (...args: unknown[]) => mockProcessBrain(...args),
@@ -214,10 +205,6 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
       ok: true,
       body: { isNewBestScore: true, xpAwarded: 40, percentile: 50 },
     });
-    mockProcessAdventure.mockResolvedValue({
-      ok: true,
-      body: { xpEarned: 50, goldEarned: 25, starsGained: 3, isReplay: false, leveledUp: false },
-    });
     mockProcessBrain.mockResolvedValue({
       ok: true,
       body: { xpAwarded: 30, brainScore: { overallScore: 72 }, levelPromoted: false, idempotent: false },
@@ -232,18 +219,6 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
     vi.clearAllMocks();
   });
 
-  it('dispatches adventure submission to processAdventureCompletion and returns awards', async () => {
-    const sub = adventureSubmission();
-    const res = await POST(makeRequest({ submissions: [sub] }) as never);
-    expect(res.status).toBe(200);
-    const json = (await res.json()) as { results: Array<{ accepted: boolean; awards: Record<string, unknown> | null }> };
-    expect(mockProcessAdventure).toHaveBeenCalledTimes(1);
-    expect(json.results[0].accepted).toBe(true);
-    expect(json.results[0].awards).toEqual({
-      xpEarned: 50, goldEarned: 25, starsGained: 3, isReplay: false, leveledUp: false,
-    });
-  });
-
   it('dispatches brain submission to processBrainDrillCompletion and returns awards', async () => {
     const sub = brainSubmission();
     const res = await POST(makeRequest({ submissions: [sub] }) as never);
@@ -254,13 +229,13 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
   });
 
   it('writes to offline_award_log with submission_id + user_id + mode + awards', async () => {
-    const sub = adventureSubmission();
+    const sub = brainSubmission();
     await POST(makeRequest({ submissions: [sub] }) as never);
     expect(mockAwardLogInsert).toHaveBeenCalledTimes(1);
     const row = mockAwardLogInsert.mock.calls[0][0] as Record<string, unknown>;
     expect(row.submission_id).toBe(sub.id);
     expect(row.user_id).toBe('u1');
-    expect(row.mode).toBe('adventure');
+    expect(row.mode).toBe('brain');
     expect(row.awards).toBeDefined();
   });
 
@@ -279,22 +254,22 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
   });
 
   it('fires PostHog offline_sync_award_granted on success', async () => {
-    const sub = adventureSubmission();
+    const sub = brainSubmission();
     await POST(makeRequest({ submissions: [sub] }) as never);
     expect(mockPosthogCapture).toHaveBeenCalledTimes(1);
     const evt = mockPosthogCapture.mock.calls[0][0] as Record<string, unknown>;
     expect(evt.event).toBe('offline_sync_award_granted');
     expect(evt.distinctId).toBe('u1');
-    expect((evt.properties as Record<string, unknown>).mode).toBe('adventure');
+    expect((evt.properties as Record<string, unknown>).mode).toBe('brain');
   });
 
   it('PERMANENT failure (4xx) flags awardError but keeps accepted=true (drop, do not retry)', async () => {
-    // "Level not unlocked" will never succeed on retry — dropping the row is
-    // correct, not a silent loss.
-    mockProcessAdventure.mockResolvedValue({
+    // A 4xx business rejection will never succeed on retry — dropping the
+    // row is correct, not a silent loss.
+    mockProcessBrain.mockResolvedValue({
       ok: false, status: 403, error: 'Level not unlocked — cannot skip ahead',
     });
-    const sub = adventureSubmission();
+    const sub = brainSubmission();
     const res = await POST(makeRequest({ submissions: [sub] }) as never);
     expect(res.status).toBe(200);
     const json = (await res.json()) as { results: Array<{ accepted: boolean; awards: unknown; awardError?: string }> };
@@ -305,10 +280,10 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
   });
 
   it('TRANSIENT failure (5xx) sets accepted=false so the client RETRIES (no silent loss)', async () => {
-    mockProcessAdventure.mockResolvedValue({
+    mockProcessBrain.mockResolvedValue({
       ok: false, status: 503, error: 'database temporarily unavailable',
     });
-    const sub = adventureSubmission();
+    const sub = brainSubmission();
     const res = await POST(makeRequest({ submissions: [sub] }) as never);
     const json = (await res.json()) as { results: Array<{ accepted: boolean; awardError?: string }> };
     expect(json.results[0].accepted).toBe(false);
@@ -317,8 +292,8 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
   });
 
   it('UNEXPECTED throw (e.g. DB exception) is treated as transient → accepted=false (retry)', async () => {
-    mockProcessAdventure.mockRejectedValue(new Error('connection reset'));
-    const sub = adventureSubmission();
+    mockProcessBrain.mockRejectedValue(new Error('connection reset'));
+    const sub = brainSubmission();
     const res = await POST(makeRequest({ submissions: [sub] }) as never);
     const json = (await res.json()) as { results: Array<{ accepted: boolean; awardError?: string }> };
     expect(json.results[0].accepted).toBe(false);
@@ -367,6 +342,19 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
     expect(json.results[0].accepted).toBe(false);
     expect(json.results[0].awardError).toMatch(/Failed to save submission/);
     expect(mockAwardLogInsert).not.toHaveBeenCalled();
+  });
+
+  it('adventure submission is accepted with no award handler run (awards: null)', async () => {
+    // adventure has no entry in awardHandlers — completions need a
+    // server-dealt board, so offline-queued runs are recorded, not credited.
+    const sub = adventureSubmission();
+    const res = await POST(makeRequest({ submissions: [sub] }) as never);
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as { results: Array<{ accepted: boolean; awards: unknown }> };
+    expect(json.results[0].accepted).toBe(true);
+    expect(json.results[0].awards).toBeNull();
+    expect(mockAwardLogInsert).not.toHaveBeenCalled();
+    expect(mockPosthogCapture).not.toHaveBeenCalled();
   });
 
   it('unhandled mode (sp) returns awards: null', async () => {

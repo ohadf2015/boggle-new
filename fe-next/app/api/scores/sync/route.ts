@@ -25,11 +25,6 @@ import {
 } from '@/lib/offline/serverRevalidate';
 import { validateWordOnServer } from '@/lib/wordValidation/serverDicts';
 import {
-  processAdventureCompletion,
-  type ProcessAdventureContext,
-} from '@/app/api/adventure/complete/processCompletion';
-import { validateRequestBody as validateAdventureBody } from '@/app/api/adventure/complete/validation';
-import {
   processBrainDrillCompletion,
   type ProcessDrillContext,
   type DrillSubmitBody,
@@ -96,24 +91,6 @@ function isPuzzleDateFresh(puzzleDate: string | undefined): boolean {
   return puzzleDate === todayUtcDateString() || puzzleDate === yesterdayUtcDateString();
 }
 
-async function dispatchAdventure({ sub, userId, supabase }: AwardHandlerArgs): Promise<Record<string, unknown>> {
-  const validation = validateAdventureBody(sub.payload as Record<string, unknown>);
-  if (!validation.valid || !validation.data) {
-    throw new AwardError(`adventure payload invalid: ${validation.error}`, false);
-  }
-  const ctx: ProcessAdventureContext = { supabase, source: 'offline-sync' };
-  const result = await processAdventureCompletion(validation.data, userId, ctx);
-  if (!result.ok) {
-    throw new AwardError(`adventure handler ${result.status}: ${result.error}`, result.status >= 500);
-  }
-  return {
-    xpEarned: result.body.xpEarned,
-    goldEarned: result.body.goldEarned,
-    starsGained: result.body.starsGained,
-    isReplay: result.body.isReplay,
-    leveledUp: result.body.leveledUp,
-  };
-}
 
 async function dispatchBrain({ sub, userId, supabase }: AwardHandlerArgs): Promise<Record<string, unknown>> {
   // Use the queue submission id as the idempotency key — it is already a
@@ -221,7 +198,8 @@ async function dispatchConnections({ sub, userId }: AwardHandlerArgs): Promise<R
 }
 
 const awardHandlers: Partial<Record<ServerSubmission['mode'], AwardHandler>> = {
-  adventure: dispatchAdventure,
+  // adventure: completions need a server-dealt board (/api/adventure/start), so
+  // offline-queued adventure runs can't be credited and are only recorded.
   brain: dispatchBrain,
   blast: dispatchBlast,
   connections: dispatchConnections,

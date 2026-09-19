@@ -243,4 +243,13 @@ describe('GridComponent', () => {
       expect(container.firstChild).toBeInTheDocument();
     });
   });
+  describe('tile skin override', () => {
+    it('given a tileSkinOverride, when rendered, then the board carries that skin regardless of the equipped one', () => {
+      localStorage.setItem('lexiclash_cosmetics_equipped', JSON.stringify({ tileSkin: 'tile-neon' }));
+      const { container } = render(<GridComponent grid={mockGrid} tileSkinOverride="tile-world-3" />, { wrapper: TestWrapper });
+      expect(container.querySelector('[data-tile-skin="world-3"]')).not.toBeNull();
+      expect(container.querySelector('[data-tile-skin="neon"]')).toBeNull();
+      localStorage.removeItem('lexiclash_cosmetics_equipped');
+    });
+  });
 });
