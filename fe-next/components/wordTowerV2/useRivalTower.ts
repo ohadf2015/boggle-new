@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { type RivalTower, decodeRival, encodeRival } from '@/lib/wordTowerV2/wreck';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 
 /**
  * Friend-vs-friend without a backend: your tower travels IN the link. Opening
@@ -28,7 +29,7 @@ export function useRivalTower(language: string) {
       const url = `${window.location.origin}/${language}/word-tower-v2?rival=${encodeRival({ name, words })}`;
       try {
         if (typeof navigator.share === 'function') {
-          await navigator.share({ text, url });
+          await navigator.share({ text: stripEmoji(text), url });
           return;
         }
         await navigator.clipboard.writeText(`${text} ${url}`);
