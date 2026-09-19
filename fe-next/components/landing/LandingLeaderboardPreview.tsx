@@ -163,6 +163,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               {i + 1}
             </span>
             <AvatarLite
+              userId={player.id}
               customAvatar={player.avatarConfig}
               size="sm"
             />

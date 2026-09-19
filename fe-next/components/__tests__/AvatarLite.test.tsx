@@ -20,3 +20,31 @@ describe('AvatarLite', () => {
     expect(el.style.backgroundColor).toBeTruthy();
   });
 });
+
+describe('AvatarLite real face', () => {
+  const uuid = '8f14e45f-ceea-467a-9a37-0a2b4c6d8e10';
+
+  it('overlays the server-rendered PNG for a player with a stored config', () => {
+    // Given a real player id and their avatar config
+    const { container } = render(
+      <AvatarLite userId={uuid} customAvatar={{ bgColor: '#FF6B35', skinColor: '#aa7755' }} />,
+    );
+    // Then the circle shows their actual avatar, not just a flat color
+    const img = container.querySelector('img');
+    expect(img).not.toBeNull();
+    expect(img!.getAttribute('src')).toMatch(new RegExp(`^/api/avatar/png/${uuid}\\?v=`));
+  });
+
+  it('cache-busts when the config changes', () => {
+    const a = render(<AvatarLite userId={uuid} customAvatar={{ bgColor: '#111111' }} />);
+    const b = render(<AvatarLite userId={uuid} customAvatar={{ bgColor: '#222222' }} />);
+    expect(a.container.querySelector('img')!.getAttribute('src')).not.toBe(
+      b.container.querySelector('img')!.getAttribute('src'),
+    );
+  });
+
+  it('keeps the flat circle for guests / seeds / missing config', () => {
+    expect(render(<AvatarLite userId="guest" customAvatar={{ bgColor: '#111' }} />).container.querySelector('img')).toBeNull();
+    expect(render(<AvatarLite userId={uuid} />).container.querySelector('img')).toBeNull();
+  });
+});

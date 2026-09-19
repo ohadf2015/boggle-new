@@ -56,6 +56,7 @@ import aiHintsRoutes from '../backend/routes/aiHints';
 import ugcPacksRoutes from '../backend/routes/ugcPacks';
 import ugcBoardsRoutes from '../backend/routes/ugcBoards';
 import playerProfileRoutes from '../backend/routes/playerProfile';
+import avatarPngRoutes from '../backend/routes/avatarPng';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from '../backend/trpc/root';
 
@@ -123,6 +124,7 @@ async function start(): Promise<void> {
   app.use('/api/ugc/packs', ugcPacksRoutes);
   app.use('/api/ugc/boards', ugcBoardsRoutes);
   app.use('/api/player-profile', playerProfileRoutes);
+  app.use('/api/avatar/png', avatarPngRoutes);
   app.use('/api', aiHintsRoutes);
 
   // tRPC API — type-safe endpoints (alongside existing Express routes)

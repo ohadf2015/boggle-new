@@ -8,7 +8,10 @@ import { cn } from '@/lib/utils';
  * behind next/dynamic. Landing / HomeHub must not touch that graph.
  *
  * This paints a sized circle from `customAvatar.bgColor` / `skinColor` (or a
- * seeded palette). No SVG parts, no AvatarRenderer, no builder.
+ * seeded palette), then overlays the player's real face as a server-rendered
+ * PNG (`/api/avatar/png/[id]`) when they have a stored config. Zero client
+ * JS for the face — no SVG parts, no AvatarRenderer, no builder. The route
+ * 404s without a DB config; `onError` hides the img and the circle remains.
  */
 const PALETTE = ['#FF6B35', '#8B5CF6', '#00897B', '#3B82F6', '#C62828', '#FFD700'] as const;
 
@@ -21,13 +24,17 @@ export interface AvatarLiteConfig {
   skinColor?: string | null;
 }
 
+const UUID_RE = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+
+function hash(s: string): string {
+  let h = 0;
+  for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+
 function seedColor(seed?: string | null): string {
   if (!seed) return PALETTE[0];
-  let h = 0;
-  for (let i = 0; i < seed.length; i += 1) {
-    h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  }
-  return PALETTE[h % PALETTE.length];
+  return PALETTE[parseInt(hash(seed), 36) % PALETTE.length];
 }
 
 export default function AvatarLite({
@@ -45,14 +52,35 @@ export default function AvatarLite({
 }) {
   const px = pixelSize ?? SIZE_PX[size];
   const bg = customAvatar?.bgColor || customAvatar?.skinColor || seedColor(userId);
+  // `v` busts the 1-day browser cache when the player edits their avatar.
+  const src =
+    customAvatar && userId && UUID_RE.test(userId)
+      ? `/api/avatar/png/${userId}?v=${hash(JSON.stringify(customAvatar))}`
+      : null;
   return (
     <div
       data-testid="avatar-lite"
       data-user-id={userId ?? ''}
       data-has-custom={customAvatar ? 'true' : 'false'}
-      className={cn('rounded-full border-2 border-neo-black shrink-0', className)}
+      className={cn('rounded-full border-2 border-neo-black shrink-0 overflow-hidden', className)}
       style={{ width: px, height: px, backgroundColor: bg }}
       aria-hidden
-    />
+    >
+      {src && (
+        // eslint-disable-next-line @next/next/no-img-element -- already a sized PNG; the optimizer would re-encode it
+        <img
+          src={src}
+          alt=""
+          width={px}
+          height={px}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      )}
+    </div>
   );
 }
