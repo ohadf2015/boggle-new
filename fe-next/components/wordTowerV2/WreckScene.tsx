@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Hammer, Send, X } from 'lucide-react';
 import type { WreckUpdate } from './WreckCanvas';
-import { V2Backdrop } from './V2Backdrop';
 
 const WreckCanvas = dynamic(() => import('./WreckCanvas'), { ssr: false });
 
@@ -60,16 +59,13 @@ export function WreckScene({
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const [groundInset, setGroundInset] = useState(160);
-  useEffect(() => setGroundInset(window.innerHeight * 0.2), []);
 
   const pct = state.total ? Math.round((state.wrecked / state.total) * 100) : 0;
 
   return (
     <div className="absolute inset-0 z-50 overflow-hidden bg-neo-navy" role="dialog" aria-modal="true">
-      {/* Ground sits at 80% height in the canvas; the city stands on it. */}
-      <V2Backdrop heightM={0} groundInsetPx={groundInset} accentHex="#FF4D9D" reducedMotion={reducedMotion} />
-      <WreckCanvas words={words} balls={balls} registerCut={registerCut} onUpdate={onUpdate} className="absolute inset-0" />
+      {/* Pixi paints sky, city and ground (80% down) itself. */}
+      <WreckCanvas words={words} balls={balls} reducedMotion={reducedMotion} registerCut={registerCut} onUpdate={onUpdate} className="absolute inset-0" />
 
       <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex flex-col items-center gap-2 px-4">
         <h2 className="rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-1 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard">

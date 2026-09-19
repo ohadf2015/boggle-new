@@ -28,12 +28,14 @@ interface CollectionPanelProps {
 // CONSTANTS
 // ==============================================
 
-const CATEGORIES: { key: CollectibleCategory; icon: typeof Trophy; color: string }[] = [
-  { key: 'trophy', icon: Trophy, color: 'neo-pink' },
-  { key: 'scroll', icon: ScrollText, color: 'neo-cyan' },
-  { key: 'rune', icon: Gem, color: 'neo-purple' },
-  { key: 'relic', icon: Sparkles, color: 'neo-yellow' },
+// Static class strings — Tailwind cannot see `bg-${color}` built at runtime.
+const CATEGORIES: { key: CollectibleCategory; icon: typeof Trophy; active: string; chip: string }[] = [
+  { key: 'trophy', icon: Trophy, active: 'bg-neo-yellow text-black', chip: 'bg-neo-yellow' },
+  { key: 'scroll', icon: ScrollText, active: 'bg-neo-cyan text-black', chip: 'bg-neo-cyan' },
+  { key: 'rune', icon: Gem, active: 'bg-neo-purple text-black', chip: 'bg-neo-purple' },
+  { key: 'relic', icon: Sparkles, active: 'bg-neo-pink text-black', chip: 'bg-neo-pink' },
 ];
+const CATEGORY_OF = Object.fromEntries(CATEGORIES.map((c) => [c.key, c])) as Record<CollectibleCategory, (typeof CATEGORIES)[number]>;
 
 const RARITY_BORDER: Record<CollectibleRarity, string> = {
   common: 'border-neo-white/20',
@@ -62,7 +64,11 @@ const RARITY_LABEL_COLOR: Record<CollectibleRarity, string> = {
 
 const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory }) => {
   const { t } = useLanguageSafe();
-  const [activeCategory, setActiveCategory] = useState<CollectibleCategory>('trophy');
+  const [picked, setActiveCategory] = useState<CollectibleCategory | null>(null);
+  // Open on the first tab the player actually owns something in — an empty trophies grid reads as "you have nothing".
+  const activeCategory: CollectibleCategory = picked
+    ?? CATEGORIES.find((c) => inventory.some((i) => i.category === c.key))?.key
+    ?? 'trophy';
 
   const ownedItemIds = useMemo(() => {
     return new Set(inventory.map(i => i.item_id));
@@ -121,20 +127,22 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
         </div>
 
         {/* Category Tabs */}
-        <div className="flex border-b-2 border-neo-white/10">
-          {CATEGORIES.map(({ key, icon: Icon, color }) => {
+        <div role="tablist" className="flex border-b-2 border-neo-white/10">
+          {CATEGORIES.map(({ key, icon: Icon, active }) => {
             const isActive = activeCategory === key;
             return (
               <button
                 type="button"
                 key={key}
                 data-testid={`collection-tab-${key}`}
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActiveCategory(key)}
                 className={cn(
                   'flex-1 py-3 flex flex-col items-center gap-1 transition-all',
                   isActive
-                    ? `bg-${color}/15 border-b-3 border-${color} text-${color}`
-                    : 'text-neo-white hover:text-neo-white hover:bg-neo-white/5'
+                    ? `${active} border-b-3 border-black`
+                    : 'text-neo-white hover:bg-neo-white/5'
                 )}
               >
                 <Icon className="w-5 h-5" />
@@ -186,9 +194,11 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
                       'w-10 h-10 flex items-center justify-center rounded-neo text-2xl mb-1.5',
                       owned ? '' : 'grayscale'
                     )}>
-                      {owned ? (
-                        <span>{item.icon}</span>
-                      ) : (
+                      {owned ? (() => {
+                        const cat = CATEGORY_OF[item.category];
+                        const Icon = cat.icon;
+                        return <span className={cn('grid h-10 w-10 place-items-center rounded-lg border-[3px] border-black shadow-[2px_2px_0_#000] text-black', cat.chip)}><Icon className="h-5 w-5" /></span>;
+                      })() : (
                         <Lock className="w-5 h-5 text-neo-white" />
                       )}
                     </div>

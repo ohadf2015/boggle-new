@@ -10,15 +10,15 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { WordTowerWheel } from '@/components/wordTower/WordTowerWheel';
-import { BIOME_THEME } from '@/components/wordTower/biomeTheme';
-import { biomeAtHeight } from '@/lib/wordTowerV2/altitude';
+import { biomeAt, floorsAt } from '@/lib/wordTowerV2/biomes';
 import { impactThunk } from '@/lib/wordTowerV2/juice';
 import { MIN_WORD_LEN, isAcceptedWord, spinWheel } from '@/lib/wordTowerV2/wheel';
 import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
 import { sanitizeWords } from '@/lib/wordTowerV2/wreck';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
-import { V2Backdrop } from './V2Backdrop';
-import { V2GameOver, V2Hud } from './V2Hud';
+import { V2Celebrations } from './V2Celebrations';
+import { V2Hud } from './V2Hud';
+import { V2Results } from './V2Results';
 import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
 import { WreckScene } from './WreckScene';
@@ -57,9 +57,6 @@ export default function WordTowerV2() {
 
   const dockRef = useRef<HTMLDivElement | null>(null);
   const dockPxRef = useRef(260);
-  // Also STATE: the DOM sky anchors to the dock too, and a ref read at render
-  // time kept the pre-measure 260 until something else happened to re-render.
-  const [dockPx, setDockPx] = useState(260);
 
   // The canvas frames the ground at the dock's real top edge.
   useEffect(() => {
@@ -67,7 +64,8 @@ export default function WordTowerV2() {
     if (!el) return;
     const ro = new ResizeObserver(() => {
       dockPxRef.current = el.getBoundingClientRect().height;
-      setDockPx(Math.round(dockPxRef.current));
+      // CSS var, not state: the first-floor hint sits above the dock without a re-render.
+      el.parentElement?.style.setProperty('--wt2-dock', `${dockPxRef.current}px`);
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -174,18 +172,33 @@ export default function WordTowerV2() {
     wasValid.current = valid;
   }, [valid, playSound]);
 
-  const selectTile = useCallback(
-    (i: number) => {
+  /**
+   * Take a wheel slot, resolved against the LATEST selection. Resolving outside
+   * the updater read a stale `selected` when keys arrived faster than renders,
+   * so a doubled letter ("aa") took the same slot twice and dropped one.
+   */
+  const takeSlot = useCallback(
+    (resolve: (sel: number[]) => number) => {
       if (phase !== 'composing') return;
       setSelected((sel) => {
-        if (sel.includes(i)) return sel;
-        const step = PENTATONIC[Math.min(sel.length, PENTATONIC.length - 1)];
-        playSound('tileSelect', { rate: 2 ** (step / 12), volume: 0.5 });
-        return [...sel, i];
+        const i = resolve(sel);
+        return i === -1 || sel.includes(i) ? sel : [...sel, i];
       });
     },
-    [phase, playSound],
+    [phase],
   );
+
+  // One pentatonic note per letter added — outside the updater (StrictMode runs those twice).
+  const prevLen = useRef(0);
+  useEffect(() => {
+    if (selected.length > prevLen.current) {
+      const step = PENTATONIC[Math.min(selected.length - 1, PENTATONIC.length - 1)];
+      playSound('tileSelect', { rate: 2 ** (step / 12), volume: 0.5 });
+    }
+    prevLen.current = selected.length;
+  }, [selected.length, playSound]);
+
+  const selectTile = useCallback((i: number) => takeSlot(() => i), [takeSlot]);
 
   const deselectTile = useCallback((i: number) => {
     setSelected((sel) => (sel.includes(i) ? sel.slice(0, sel.indexOf(i)) : sel));
@@ -226,13 +239,12 @@ export default function WordTowerV2() {
       else if (event.key === 'Enter') submit();
       else if (event.key.length === 1) {
         const letter = event.key.toLowerCase();
-        const slot = wheel.findIndex((l, i) => l === letter && !selected.includes(i));
-        if (slot !== -1) selectTile(slot);
+        takeSlot((sel) => wheel.findIndex((l, i) => l === letter && !sel.includes(i)));
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, drop, submit, wheel, selected, selectTile, smashing]);
+  }, [phase, drop, submit, wheel, takeSlot, smashing]);
 
   // Hold the results a beat so the player watches their tower come down.
   const [showOver, setShowOver] = useState(false);
@@ -256,18 +268,13 @@ export default function WordTowerV2() {
       text: t('wordTowerV2.wreck.shareText', { m: game.peakM.toFixed(1) }),
     });
 
-  const biome = biomeAtHeight(heightM);
+  const biomeNow = biomeAt(floorsAt(heightM));
   const score = totalScore(heightM, run.bonus);
-  const accentHex = `#${BIOME_THEME[biome].block.toString(16).padStart(6, '0')}`;
+  const accentHex = `#${biomeNow.accent.toString(16).padStart(6, '0')}`;
 
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-neo-navy" dir={dir}>
-      {/* The smash round covers everything: don't run a second Pixi loop and
-          backdrop tree underneath it. */}
-      {!smashing ? (
-        <V2Backdrop heightM={heightM} groundInsetPx={dockPx} accentHex={accentHex} reducedMotion={reducedMotion} />
-      ) : null}
-
+      {/* The smash round covers everything: don't run a second Pixi loop under it. */}
       {!smashing ? (
         <TowerCanvas
           world={game.worldRef.current}
@@ -285,24 +292,18 @@ export default function WordTowerV2() {
           onImpact={onImpact}
           onTenantArrive={onTenantArrive}
           getSceneM={getSceneM}
+          reducedMotion={reducedMotion}
           className="absolute inset-0"
         />
       ) : null}
 
-      <V2Hud
-        t={t}
-        heightM={heightM}
-        score={score}
-        bestM={game.bestM}
-        combo={run.combo}
-        scrambles={run.scrambles}
-        biome={biome}
-        landing={game.landing}
-        surprise={game.surprise}
-        newBest={game.newBest}
-        balls={run.balls}
-        tenants={Math.min(arrived, run.tenants)}
-      />
+      <V2Hud t={t} heightM={heightM} score={score} bestM={game.bestM} run={run} tenants={Math.min(arrived, run.tenants)} />
+      <V2Celebrations t={t} callout={game.callout} banners={game.banners} onBannerDone={game.shiftBanner} />
+      {phase !== 'over' && run.floors === 0 && heightM < 0.5 && !rival ? (
+        <div className="pointer-events-none absolute inset-x-4 bottom-[calc(var(--wt2-dock,17rem)+0.75rem)] z-20 mx-auto w-fit max-w-xs rounded-neo border-neo-thick border-black bg-neo-cream px-3 py-1.5 text-center font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-pop">
+          {t(phase === 'swinging' ? 'wordTowerV2.hint.drop' : 'wordTowerV2.hint.spell')}
+        </div>
+      ) : null}
       {rival && phase === 'composing' && run.floors === 0 ? (
         <div className="pointer-events-none absolute inset-x-4 top-28 z-20 mx-auto max-w-sm rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-2 text-center font-neo-display text-base font-bold text-neo-navy shadow-hard animate-neo-pop">
           {t('wordTowerV2.wreck.challenge', { name: rivalName })}
@@ -386,13 +387,16 @@ export default function WordTowerV2() {
       </div>
 
       {showOver ? (
-        <V2GameOver
+        <V2Results
           t={t}
           peakM={game.peakM}
           score={totalScore(game.peakM, run.bonus)}
           bestM={game.bestM}
-          bestCombo={run.bestCombo}
           isBest={game.newBest || game.peakM >= game.bestM - 0.01}
+          run={run}
+          badges={game.runBadges}
+          unlocked={game.unlockedRef.current}
+          stats={game.statsRef.current}
           onRestart={() => {
             restart();
             setRunSeed(`wt2-${Date.now()}`);

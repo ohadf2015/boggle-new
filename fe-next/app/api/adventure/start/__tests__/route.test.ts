@@ -29,6 +29,9 @@ vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 
 import { POST } from '../route';
 import { getPlayLevel } from '@/lib/adventure/play/levels';
+import { verifyAttempt } from '@/lib/adventure/play/attemptToken';
+import { freshRun, signRun, verifyRun, makeOffer } from '@/lib/adventure/play/runToken';
+import { isWordOnBoard } from '@/utils/clientWordValidator';
 
 function makeRequest(body?: unknown) {
   return {
@@ -167,5 +170,102 @@ describe('POST /api/adventure/start', () => {
 
     expect(res.status).toBe(200);
     expect(res.data.language).toBe('ru');
+  });
+
+  describe('roguelike run', () => {
+    const SECRET = 'test-key';
+    const cleared = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({ user_id: 'user-1', world: 1, level: i + 1, stars: 1 }));
+
+    beforeEach(() => {
+      mockGetAuthedUser.mockResolvedValue({ id: 'user-1' });
+    });
+
+    it('given no runToken, when a level starts, then a fresh run is issued with a public run, hints, and relic-free attempt', async () => {
+      const { db } = makeFakeDb({ level_completions: [] });
+      mockCreateAdminClient.mockReturnValue(db);
+
+      const res = await POST(makeRequest({ world: 1, level: 1, language: 'en' }));
+
+      expect(res.status).toBe(200);
+      expect(res.data.run).toMatchObject({ w: 1, step: 1, relics: [] });
+      expect(res.data.run).not.toHaveProperty('u');
+      expect(res.data.run).not.toHaveProperty('seed');
+      expect(verifyRun(res.data.runToken, SECRET)?.u).toBe('user-1');
+      expect(Array.isArray(res.data.hints)).toBe(true);
+      expect(res.data.hints.length).toBeGreaterThan(0);
+      expect(res.data.hints.length).toBeLessThanOrEqual(12);
+      const board = res.data.grid.map((r: string[]) => r.map((c) => c.toLowerCase()));
+      for (const h of res.data.hints) expect(isWordOnBoard(h, board, 'en')).toBe(true);
+      const attempt = verifyAttempt(res.data.token, SECRET);
+      expect(attempt).toMatchObject({ k: 'classic', r: [] });
+      expect(attempt?.run?.step).toBe(1);
+    }, 30_000);
+
+    it('given a hunt level, when started, then huntCount+1 targets are on the board and signed into the attempt', async () => {
+      const { db } = makeFakeDb({ level_completions: cleared(1) });
+      mockCreateAdminClient.mockReturnValue(db);
+
+      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en' }));
+
+      const lvl = getPlayLevel(1, 2);
+      expect(res.status).toBe(200);
+      expect(res.data.targets).toHaveLength(lvl.huntCount! + 1);
+      const board = res.data.grid.map((r: string[]) => r.map((c) => c.toLowerCase()));
+      for (const t of res.data.targets) expect(isWordOnBoard(t, board, 'en')).toBe(true);
+      expect(verifyAttempt(res.data.token, SECRET)).toMatchObject({ k: 'hunt', tg: res.data.targets });
+    }, 30_000);
+
+    it('given a runToken with an offer and a valid pick, when started, then the pick is applied and the attempt carries the relics', async () => {
+      const { db } = makeFakeDb({ level_completions: cleared(1) });
+      mockCreateAdminClient.mockReturnValue(db);
+      const run = { ...freshRun(1, 'user-1', 'seed-1'), step: 2, offer: [{ type: 'relic', id: 'magnet' }, { type: 'gold', amount: 10 }] };
+
+      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en', runToken: signRun(run, SECRET), pick: 0 }));
+
+      expect(res.status).toBe(200);
+      expect(res.data.run.relics).toEqual(['magnet']);
+      expect(res.data.run.offer).toBeUndefined();
+      expect(verifyAttempt(res.data.token, SECRET)?.r).toEqual(['magnet']);
+      expect(verifyRun(res.data.runToken, SECRET)?.relics).toEqual(['magnet']);
+    }, 30_000);
+
+    it('given a runToken with no pick, when started, then the offer is skipped', async () => {
+      const { db } = makeFakeDb({ level_completions: cleared(1) });
+      mockCreateAdminClient.mockReturnValue(db);
+      const run = { ...freshRun(1, 'user-1', 's'), step: 2, offer: makeOffer('s', 2, [], 3) };
+
+      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en', runToken: signRun(run, SECRET) }));
+
+      expect(res.status).toBe(200);
+      expect(res.data.run.relics).toEqual([]);
+    }, 30_000);
+
+    it.each([
+      ['step mismatch', { step: 3 }, { pick: 0 }],
+      ['pick outside the offer', {}, { pick: 5 }],
+      ['another user', { u: 'someone-else' }, { pick: 0 }],
+      ['another world', { w: 2 }, { pick: 0 }],
+    ])('given a runToken with %s, when started, then 400 Invalid run', async (_label, runOver, bodyOver) => {
+      const { db } = makeFakeDb({ level_completions: cleared(1) });
+      mockCreateAdminClient.mockReturnValue(db);
+      const run = { ...freshRun(1, 'user-1', 's'), step: 2, offer: [{ type: 'gold', amount: 10 }], ...runOver };
+
+      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en', runToken: signRun(run, SECRET), ...bodyOver }));
+
+      expect(res.status).toBe(400);
+      expect(res.data.error).toBe('Invalid run');
+    });
+
+    it('given a tampered runToken, when started, then 400 Invalid run', async () => {
+      const { db } = makeFakeDb({ level_completions: cleared(1) });
+      mockCreateAdminClient.mockReturnValue(db);
+      const tok = signRun({ ...freshRun(1, 'user-1', 's'), step: 2 }, SECRET);
+      const forged = Buffer.from(JSON.stringify({ ...freshRun(1, 'user-1', 's'), step: 2, relics: ['magnet'] })).toString('base64url');
+
+      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en', runToken: `${forged}.${tok.split('.')[1]}` }));
+
+      expect(res.status).toBe(400);
+    });
   });
 });

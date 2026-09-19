@@ -4,6 +4,9 @@
  * Replay is harmless — completions only ever keep the best result.
  */
 import { createHmac, timingSafeEqual } from 'crypto';
+import type { LevelKind } from './levels';
+import type { RelicId } from './relics';
+import type { RunPayload } from './runToken';
 
 export interface AttemptPayload {
   u: string;
@@ -13,28 +16,47 @@ export interface AttemptPayload {
   lang: string;
   /** Issued-at, epoch ms. */
   t: number;
+  /** Level kind at issue time (settle rules). Absent on legacy tokens → level table. */
+  k?: LevelKind;
+  /** Relics owned when the level started — the ONLY relics settle ever applies. */
+  r?: RelicId[];
+  /** Hunt only: the target words dealt onto the board. */
+  tg?: string[];
+  /** Time potions held at start (each may extend the clock). */
+  tp?: number;
+  /** The run this attempt belongs to (after the pick), advanced by /complete on a win. */
+  run?: RunPayload;
 }
 
-function sign(body: string, secret: string): string {
-  return createHmac('sha256', secret).update(body).digest('base64url');
+/** HMAC over `domain:body` — the domain keeps attempt and run tokens from being swapped. */
+function sign(body: string, secret: string, domain: string): string {
+  return createHmac('sha256', secret).update(domain ? `${domain}:${body}` : body).digest('base64url');
 }
 
-export function signAttempt(payload: AttemptPayload, secret: string): string {
-  if (!secret) throw new Error('adventure attempt secret missing');
+export function signPayload(payload: object, secret: string, domain = ''): string {
+  if (!secret) throw new Error('adventure token secret missing');
   const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  return `${body}.${sign(body, secret)}`;
+  return `${body}.${sign(body, secret, domain)}`;
 }
 
-export function verifyAttempt(token: string, secret: string): AttemptPayload | null {
+export function verifyPayload<T>(token: unknown, secret: string, domain = ''): T | null {
   if (!secret || typeof token !== 'string') return null;
   const [body, sig] = token.split('.');
   if (!body || !sig) return null;
-  const expected = Buffer.from(sign(body, secret));
+  const expected = Buffer.from(sign(body, secret, domain));
   const given = Buffer.from(sig);
   if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
   try {
-    return JSON.parse(Buffer.from(body, 'base64url').toString('utf8')) as AttemptPayload;
+    return JSON.parse(Buffer.from(body, 'base64url').toString('utf8')) as T;
   } catch {
     return null;
   }
+}
+
+export function signAttempt(payload: AttemptPayload, secret: string): string {
+  return signPayload(payload, secret, 'attempt');
+}
+
+export function verifyAttempt(token: unknown, secret: string): AttemptPayload | null {
+  return verifyPayload<AttemptPayload>(token, secret, 'attempt');
 }

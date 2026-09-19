@@ -6,12 +6,15 @@
  * drop. The reward stays on the screen and changes how the rest of the run plays.
  */
 
-/** 34 read as slivers, 46/56 still small next to the wheel (rounds 4-5). */
-export const BLOCK_HEIGHT_PX = 76;
+/**
+ * One apartment floor: 3m at PX_PER_M 40. 34/46/56/76 all read as "the game is
+ * so little" next to the wheel (rounds 3-6).
+ */
+export const BLOCK_HEIGHT_PX = 120;
 
-/** Round 5: 96+14/letter left half the screen empty beside the tower. */
-const MIN_BLOCK_WIDTH_PX = 150;
-const WIDTH_PER_LETTER_PX = 16;
+/** Round 6: ~70% of a phone's width for a 5-letter word (feel.test pins it). */
+const MIN_BLOCK_WIDTH_PX = 176;
+const WIDTH_PER_LETTER_PX = 14;
 /** Beyond this, extra letters stop widening the block (keeps the swing on screen). */
 const MAX_WORD_LETTERS = 8;
 

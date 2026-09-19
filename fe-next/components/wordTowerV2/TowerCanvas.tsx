@@ -5,38 +5,27 @@ import { useEffect, useRef } from 'react';
 import { PX_PER_M, type TowerWorld, snapshotWorld, stepWorld } from '@/lib/wordTowerV2/engine';
 import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc } from '@/lib/wordTowerV2/crane';
 import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
-import { buildSkyline, rulerTicks } from '@/lib/wordTowerV2/scenery';
+import { buildSkyline, rulerTicks, skyProps } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
 import { frameCamera } from '@/lib/wordTowerV2/camera';
+import { publishHeightM } from '@/lib/wordTowerV2/altitude';
+import { floorsAt, skyAt } from '@/lib/wordTowerV2/biomes';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { COMBO_FLASH, CONFETTI_BURST, GOLD_STARS, RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
-import {
-  type BlockView,
-  createBestLabel,
-  createBlockView,
-  createGhost,
-  paintBestLine,
-  paintBlock,
-  paintGhost,
-  paintGround,
-  paintLandingMark,
-  paintRuler,
-  paintThrowArc,
-  addTenant,
-  setBlockGold,
-  tickBlock,
-} from './towerArt';
+import { createBestLabel, paintBestLine, paintGround, paintLandingMark, paintRuler, paintThrowArc } from './towerArt';
+import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, paintGhost, setBlockGold, setBlockRebar, tickBlock } from './apartmentArt';
 import { createCity, paintCity, placeCity } from './skylineArt';
-import { paintCrane } from './craneArt';
+import { paintCraneFrame, paintCraneHook } from './craneArt';
+import { SkyLayer } from './skyArt';
 import { TenantCrowd } from './tenantArt';
 
 /**
  * Pixi renderer + the rAF loop that drives the fixed-timestep world.
  *
- * The canvas is TRANSPARENT: v1's DOM sky (gradient, parallax, sightings) sits
- * behind it. Pixi owns everything that must line up with the ground — blocks,
- * crane, ground, FX, and the city standing on that ground.
+ * Pixi owns the WHOLE picture — sky, city, street, crane, floors, FX — on one
+ * camera. The sky used to be a DOM stack behind a transparent canvas; it
+ * re-rendered on every height publish and flickered at each biome change.
  *
  * ponytail: no interpolation. Physics runs at 120Hz and displays run at 60-120Hz,
  * so there is always at least one fresh substep per frame.
@@ -46,6 +35,8 @@ export type TowerFx =
   | { kind: 'land'; id: string; quality: LandingQuality }
   | { kind: 'gold'; id: string }
   | { kind: 'tenants'; id: string; count: number }
+  /** Rebar crate: these floors were welded in place. */
+  | { kind: 'rebar'; ids: string[] }
   | { kind: 'collapse' };
 
 export interface FrameStats {
@@ -84,6 +75,7 @@ interface Props {
   onTenantArrive?: () => void;
   /** Settled height, quantized (m) — the far city sinks away with it. */
   getSceneM?: () => number;
+  reducedMotion?: boolean;
   className?: string;
 }
 
@@ -114,7 +106,13 @@ export default function TowerCanvas(props: Props) {
     const frameTimes: number[] = [];
     let lastStatsAt = 0;
     let cameraY = 0;
+    // The camera frames a FILTERED height: settled Matter stacks jitter in the
+    // 3rd decimal forever, so the raw value kept the ease from ever landing and
+    // the whole scene (and the sky) micro-drifted.
+    let camTopM = 0;
     let groundKey = '';
+    let rulerKey = '';
+    let craneKey = '';
     let flashAlpha = 0;
     let flashColour = 0xffffff;
 
@@ -145,9 +143,10 @@ export default function TowerCanvas(props: Props) {
 
       const scene = new Container();
       const flash = new Graphics();
+      const sky = new SkyLayer(skyProps(11));
       const farCity = createCity();
       const nearCity = createCity();
-      created.stage.addChild(farCity.container, nearCity.container, scene, flash);
+      created.stage.addChild(sky.container, farCity.container, nearCity.container, scene, flash);
 
       const ruler = new Graphics();
       const rulerLayer = new Container();
@@ -158,11 +157,12 @@ export default function TowerCanvas(props: Props) {
       const guide = new Graphics();
       const landingMark = new Graphics();
       const crane = new Graphics();
+      const hook = new Graphics();
       const blocks = new Container();
       const ghost = createGhost();
       const ground = new Graphics();
       const crowd = new TenantCrowd();
-      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, guide, crane, blocks, crowd.layer, landingMark, ghost.container, ground);
+      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, crane, guide, hook, blocks, crowd.layer, landingMark, ghost.container, ground);
 
       const shake = new ScreenShake();
       const particles = new ParticlePool(scene);
@@ -202,6 +202,17 @@ export default function TowerCanvas(props: Props) {
         if (hardest > 0) p.onImpact?.(hardest);
 
         for (const fx of p.fxQueue.splice(0)) {
+          if (fx.kind === 'rebar') {
+            for (const id of fx.ids) {
+              const v = views.get(id);
+              if (v) setBlockRebar(v);
+              const b = byId.get(id);
+              if (b) particles.burst(TOWER_DUST, b.x, b.y, 6);
+            }
+            flashColour = 0x37e0ff;
+            flashAlpha = 0.2;
+            continue;
+          }
           if (fx.kind === 'collapse') {
             shake.shake({ intensity: 16, duration: 0.6, decay: 'exponential' });
             flashColour = 0xff3366;
@@ -253,7 +264,8 @@ export default function TowerCanvas(props: Props) {
         const w = created.renderer.width / created.renderer.resolution;
         const h = created.renderer.height / created.renderer.resolution;
 
-        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: snap.towerHeightM });
+        camTopM = publishHeightM(camTopM, snap.towerHeightM);
+        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: camTopM });
         const { scale } = frame;
         // Frame-rate independent ease (a fixed 0.08/frame ran 2x faster at 120Hz).
         cameraY += (frame.cameraY - cameraY) * (1 - Math.exp(-dt * 5));
@@ -266,6 +278,24 @@ export default function TowerCanvas(props: Props) {
 
         // The near city stands exactly on the ground line; the far one trails
         // at half speed, so climbing reads as depth, not as the city sliding.
+        // Visible metres, from the screen's bottom to top edge.
+        const mAt = (screenY: number) => -((screenY - scene.y) / scale) / PX_PER_M;
+        // The sky follows what is ON SCREEN (the eased camera), so a biome change
+        // is a continuous blend as the view climbs — never a snap.
+        // Quantized to 1/20 floor: a blend then repaints the 14 bands ~40 times, not every frame.
+        const skyNow = skyAt(Math.round(floorsAt(mAt(h * 0.5)) * 20) / 20);
+        sky.update({
+          w,
+          h,
+          ts,
+          dt,
+          sky: skyNow,
+          groundY: scene.y,
+          scale,
+          floorPx: BLOCK_HEIGHT_PX,
+          reducedMotion: !!p.reducedMotion,
+        });
+
         const cityW = Math.ceil(w) + 120;
         paintCity(farCity, `f${cityW}`, () => buildSkyline(41, cityW, 70, 160), { fill: 0x2a2f5a, edge: 0x2a2f5a, windowAlpha: 0.22 });
         paintCity(nearCity, `n${cityW}`, () => buildSkyline(7, cityW, 36, 100), { fill: 0x141830, edge: 0x0b0e1c, windowAlpha: 0.85 });
@@ -287,10 +317,16 @@ export default function TowerCanvas(props: Props) {
           bestLabel.destroy({ children: true });
           bestLabel = next;
         }
-        // Visible metres, from the screen's bottom to top edge.
-        const mAt = (screenY: number) => -((screenY - scene.y) / scale) / PX_PER_M;
+        // Floor ruler: a tick per storey, a number every 5. Repainted only when
+        // the visible floor range, zoom or side changes.
         const edgeX = (p.rulerSide === 'left' ? -1 : 1) * (halfW - 10 / scale);
-        paintRuler(ruler, rulerLabels, rulerLayer, scale, edgeX, p.rulerSide, rulerTicks(mAt(h), mAt(0)), PX_PER_M);
+        const fromFloor = Math.floor(floorsAt(mAt(h)));
+        const toFloor = Math.ceil(floorsAt(mAt(0)));
+        const nextRulerKey = `${fromFloor}|${toFloor}|${scale.toFixed(3)}|${edgeX.toFixed(1)}`;
+        if (nextRulerKey !== rulerKey) {
+          rulerKey = nextRulerKey;
+          paintRuler(ruler, rulerLabels, rulerLayer, scale, edgeX, p.rulerSide, rulerTicks(fromFloor, toFloor), BLOCK_HEIGHT_PX);
+        }
 
         const bestM = p.getBestM();
         paintBestLine(bestLine, bestLabel, halfW, scale, bestM && bestM > 0.5 ? -bestM * PX_PER_M : null);
@@ -299,7 +335,9 @@ export default function TowerCanvas(props: Props) {
         for (const block of snap.blocks) {
           let view = views.get(block.id);
           if (!view) {
-            view = createBlockView(views.size, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale);
+            // Floor number from the id (`r0-b7` -> 7): colour cycle + lobby on floor 0.
+            const floorNo = Number(/(\d+)$/.exec(block.id)?.[1] ?? views.size);
+            view = createBlockView(floorNo, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale);
             blocks.addChild(view.container);
             views.set(block.id, view);
           }
@@ -327,16 +365,18 @@ export default function TowerCanvas(props: Props) {
         // the crane is always on screen and the player knows where words go.
         const idleY = hangY + Math.sin(ts / 420) * 2;
         const hookTarget = hanging ?? { x: 0, y: ghostPreview ? ghost.container.y : idleY, heightPx: BLOCK_HEIGHT_PX };
-        paintCrane(crane, {
+        const craneFrame = {
           scale,
           halfW,
           topY: -scene.y / scale,
           bottomY: (h - scene.y) / scale,
           // Mast on the HUD's side: the ruler owns the other edge.
-          side: p.rulerSide === 'left' ? 'right' : 'left',
+          side: (p.rulerSide === 'left' ? 'right' : 'left') as 'left' | 'right',
           pivot: { x: 0, y: pivotY },
           hook: { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 },
-        });
+        };
+        craneKey = paintCraneFrame(crane, craneFrame, craneKey);
+        paintCraneHook(hook, craneFrame);
         if (hanging) {
           // The WHOLE arc, and where it touches down. Round 2 drew only the first
           // 40% so as not to "solve the landing" — but the block keeps drifting
@@ -357,7 +397,7 @@ export default function TowerCanvas(props: Props) {
             null,
           );
           const supportX = top?.x ?? 0;
-          const supportHalfW = (top?.widthPx ?? 150) / 2;
+          const supportHalfW = (top?.widthPx ?? 200) / 2;
           paintLandingMark(landingMark, scale, landX, towerTopY, hanging.widthPx, Math.abs(landX - supportX) < PERFECT_RATIO * supportHalfW, {
             x: supportX,
             halfW: PERFECT_RATIO * supportHalfW,

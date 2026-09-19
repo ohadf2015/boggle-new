@@ -6,7 +6,7 @@ import {
   predictLandingX,
   releaseKinematics,
 } from '../crane';
-import { GRAVITY_PX_PER_MS2, createTowerWorld, releaseBlock, spawnBlock, stepWorld } from '../engine';
+import { GRAVITY_PX_PER_MS2, PX_PER_M, createTowerWorld, releaseBlock, spawnBlock, stepWorld } from '../engine';
 import { GOOD_RATIO, PERFECT_RATIO } from '../landing';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '../scoring';
 import { frameCamera } from '../camera';
@@ -83,14 +83,18 @@ describe('timing windows (5-letter word on a 5-letter tower)', () => {
 describe('block size on screen', () => {
   it('given a phone, when framed, then a 5-letter block is big and tappable-looking', () => {
     const { scale } = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 0 });
-    // Round 5: 60px / 38%-of-width slabs still left half the screen empty.
-    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(68);
-    expect(blockWidthForWord('tower') * scale).toBeGreaterThanOrEqual(390 * 0.55);
-    expect(blockWidthForWord('גדר') * scale).toBeGreaterThanOrEqual(390 * 0.48);
+    // Round 6: 75px / 58%-of-width slabs still read as "the game is so little".
+    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(130);
+    expect(blockWidthForWord('tower') * scale).toBeGreaterThanOrEqual(390 * 0.7);
+    expect(blockWidthForWord('גדר') * scale).toBeGreaterThanOrEqual(390 * 0.62);
   });
 
   it('given a desktop, when framed, then blocks grow to use the space', () => {
     const { scale } = frameCamera({ viewportW: 1440, viewportH: 900, dockPx: 230, towerTopM: 0 });
-    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(64);
+    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(150);
+  });
+
+  it('given one floor, when measured, then it is a real 3m storey', () => {
+    expect(BLOCK_HEIGHT_PX / PX_PER_M).toBe(3);
   });
 });

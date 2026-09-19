@@ -24,6 +24,12 @@ vi.mock('@/utils/supabase/server', () => ({
   }),
 }));
 
+// player_progression INSERT/UPDATE policies are service_role-only: writes must use the admin client.
+const mockAdminFrom = vi.fn();
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => ({ from: (...args: unknown[]) => mockAdminFrom(...args) }),
+}));
+
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 
 import { GET, POST } from '../route';
@@ -114,7 +120,8 @@ describe('POST /api/adventure/achievements', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
 
     const upsertMock = vi.fn().mockResolvedValue({ error: null });
-    mockFrom.mockReturnValue({ upsert: upsertMock });
+    mockAdminFrom.mockReturnValue({ upsert: upsertMock });
+    mockFrom.mockReturnValue({ upsert: vi.fn().mockResolvedValue({ error: { code: '42501' } }) });
 
     const counts = { BOSS_SLAYER: 2, FIRST_WORD: 1 };
     const res = await POST(makeRequest({ counts }));
@@ -133,7 +140,7 @@ describe('POST /api/adventure/achievements', () => {
   it('returns 500 on DB error', async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
 
-    mockFrom.mockReturnValue({
+    mockAdminFrom.mockReturnValue({
       upsert: vi.fn().mockResolvedValue({ error: { message: 'DB error' } }),
     });
 

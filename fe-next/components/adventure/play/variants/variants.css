@@ -1,0 +1,59 @@
+/* Level-variant presentation: hunt tray, chain prompt, fog + bomb board layers. */
+
+/* HUNT: found letters flip in one by one, then the stamp slams. */
+.hunt-found .hunt-slot { animation: hunt-flip 0.45s calc(var(--i) * 60ms) cubic-bezier(0.2, 1.5, 0.4, 1) both; }
+@keyframes hunt-flip { from { transform: rotateX(90deg); } to { transform: none; } }
+.hunt-stamp { animation: hunt-stamp 0.4s 0.3s cubic-bezier(0.2, 1.8, 0.4, 1) both; }
+@keyframes hunt-stamp { from { transform: scale(2.4) rotate(-30deg); } to { transform: rotate(-8deg); } }
+
+/* CHAIN: the letter glows; a broken chain shakes the whole prompt. */
+.chain-letter { box-shadow: 3px 3px 0 #000, 0 0 18px 4px rgba(255, 225, 53, 0.55); animation: chain-glow 1.6s ease-in-out infinite alternate; }
+@keyframes chain-glow { from { box-shadow: 3px 3px 0 #000, 0 0 10px 2px rgba(255, 225, 53, 0.35); } to { box-shadow: 3px 3px 0 #000, 0 0 22px 6px rgba(255, 225, 53, 0.7); } }
+.chain-broken { animation: chain-shake 0.45s ease-in-out; border-color: #ff3366; }
+@keyframes chain-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-7px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+
+/* FOG: a drifting cloud sits over every hidden tile. */
+.fog-tile {
+  position: absolute;
+  border-radius: 10px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(214, 206, 255, 0.95) 0 22%, transparent 48%),
+    radial-gradient(circle at 72% 62%, rgba(190, 180, 245, 0.95) 0 26%, transparent 55%),
+    radial-gradient(circle at 40% 80%, rgba(170, 160, 235, 0.9) 0 20%, transparent 46%),
+    #5b4a9e;
+  border: 2px solid rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 0 12px rgba(40, 20, 90, 0.8);
+  transition: opacity 260ms ease-out, transform 260ms ease-out;
+  animation: fog-drift 5s ease-in-out infinite alternate;
+  animation-delay: var(--d, 0s);
+}
+.fog-tile[data-clear="true"] { opacity: 0; transform: scale(1.25); }
+@keyframes fog-drift { from { background-position: 0 0, 0 0, 0 0; filter: brightness(1); } to { background-position: 6px -4px, -5px 3px, 3px 5px; filter: brightness(1.08); } }
+
+/* BOMB: fuse ring drains; last 5s it flashes red. */
+.bomb-tile { position: absolute; pointer-events: none; }
+.bomb-badge {
+  position: absolute; top: -8px; inset-inline-end: -8px; width: 30px; height: 30px;
+  display: grid; place-items: center; border-radius: 999px; border: 3px solid #000;
+  background: conic-gradient(#ffe135 calc(var(--fuse) * 360deg), #1a1a2e 0);
+  box-shadow: 2px 2px 0 #000;
+}
+.bomb-badge > svg { width: 16px; height: 16px; color: #000; background: #ff6b35; border-radius: 999px; padding: 1px; }
+.bomb-ring { position: absolute; inset: -1px; border-radius: 10px; border: 3px dashed #000; box-shadow: inset 0 0 0 3px #ffe135; background: rgba(15, 27, 61, 0.12); }
+.bomb-hot .bomb-ring { border: 3px solid #000; box-shadow: inset 0 0 0 4px #ff3366; background: rgba(255, 51, 102, 0.22); animation: bomb-hot 0.4s ease-in-out infinite alternate; }
+.bomb-hot .bomb-badge { animation: bomb-hot 0.4s ease-in-out infinite alternate; }
+@keyframes bomb-hot { from { transform: scale(1); } to { transform: scale(1.08); } }
+.bomb-pop {
+  position: absolute; display: grid; place-items: center; pointer-events: none;
+  font-family: var(--font-fredoka, inherit); font-weight: 800; font-size: 15px; color: #000;
+  animation: bomb-pop 1.1s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+.bomb-pop > span { border: 3px solid #000; border-radius: 10px; padding: 2px 6px; box-shadow: 2px 2px 0 #000; white-space: nowrap; }
+@keyframes bomb-pop { 0% { transform: scale(0.4); } 25% { transform: scale(1.2); } 70% { transform: scale(1) translateY(-6px); opacity: 1; } 100% { transform: translateY(-18px); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hunt-found .hunt-slot, .hunt-stamp, .chain-letter, .chain-broken, .fog-tile, .bomb-hot .bomb-ring, .bomb-hot .bomb-badge { animation: none; }
+  .hunt-stamp { transform: rotate(-8deg); }
+  .bomb-pop { animation-duration: 0.01s; animation-delay: 1s; }
+}

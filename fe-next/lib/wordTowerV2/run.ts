@@ -2,29 +2,20 @@
  * Per-run reward state for Word Tower v2. Pure — no React, no physics.
  *
  * Height stays whatever physics measures (see scoring.ts). This layer adds the
- * variable reward on top: perfect-drop streaks and v1's seeded surprise table,
- * re-paid in v2 currencies:
- *   bonusMeters     -> bonus points
- *   bonusScrambles  -> letter-wheel reshuffles
- *   nextWordHeightMult -> the NEXT block spawns wider (a better platform)
+ * variable reward on top: perfect-drop streaks and v2's reward crates
+ * (rewards.ts), whose effects are banked here and spent drop by drop.
  */
-import {
-  type TowerSurpriseEvent,
-  advanceTowerSeed,
-  rollTowerSurprise,
-  towerSeedUnit,
-  towerSurpriseReward,
-} from '@/lib/wordTower/towerSurprise';
 import { WORD_TOWER_SCRAMBLES_START } from '@/shared/constants/wordTowerConstants';
 import type { LandingQuality } from './landing';
+import { type RewardPayout, payoutFor, rollReward } from './rewards';
 import { scoreFromHeightM } from './scoring';
 
 export const PERFECT_BONUS = 50;
 const GOOD_BONUS = 10;
 /** Combo multiplier stops growing here so a long streak stays sane. */
 const COMBO_CAP = 8;
-const POINTS_PER_BONUS_M = 100;
 const MAX_WIDTH_MULT = 1.5;
+const MAX_BANKED_DROPS = 6;
 /** Wrecking balls: two to start, one per 3-perfect streak step, capped. */
 export const MAX_BALLS = 5;
 const BALL_EVERY_COMBO = 3;
@@ -43,13 +34,20 @@ export interface RunState {
   balls: number;
   /** Tenants moved in so far — a wider (longer) word houses more. */
   tenants: number;
+  /** Drops left with the slow, narrow "steady" swing. */
+  steadyDrops: number;
+  /** Drops left that fall dead straight. */
+  plumbDrops: number;
+  /** Crates opened this run (achievements read it). */
+  crates: number;
 }
 
-export interface SurprisePayout {
-  event: TowerSurpriseEvent;
-  points: number;
-  scrambles: number;
-  widthMult: number;
+/** A crate's payout as the run reports it (points already folded into bonus). */
+export type SurprisePayout = RewardPayout;
+
+/** Mulberry-style LCG step for the run's reward rolls; pure and replayable. */
+function nextSeed(seed: number): number {
+  return (Math.imul(seed, 1664525) + 1013904223) >>> 0;
 }
 
 export function createRun(seed: number): RunState {
@@ -64,6 +62,9 @@ export function createRun(seed: number): RunState {
     nextWidthMult: 1,
     balls: 2,
     tenants: 0,
+    steadyDrops: 0,
+    plumbDrops: 0,
+    crates: 0,
   };
 }
 
@@ -81,15 +82,25 @@ export function tenantsFor(quality: LandingQuality, wordLen: number): number {
   return base;
 }
 
-/** Width multiplier for the block about to spawn; the caller then clears it. */
-export function consumeWidthMult(run: RunState): { run: RunState; mult: number } {
-  return { run: { ...run, nextWidthMult: 1 }, mult: run.nextWidthMult };
+/** Effects for the floor about to be hoisted; each banked effect ticks down once. */
+export function consumeDrop(run: RunState): { run: RunState; widthMult: number; steady: boolean; plumb: boolean } {
+  return {
+    run: {
+      ...run,
+      nextWidthMult: 1,
+      steadyDrops: Math.max(0, run.steadyDrops - 1),
+      plumbDrops: Math.max(0, run.plumbDrops - 1),
+    },
+    widthMult: run.nextWidthMult,
+    steady: run.steadyDrops > 0,
+    plumb: run.plumbDrops > 0,
+  };
 }
 
 export function applyLanding(
   prev: RunState,
   landing: { quality: LandingQuality; wordLen: number },
-): { run: RunState; points: number; surprise: SurprisePayout | null; tenants: number } {
+): { run: RunState; points: number; reward: RewardPayout | null; tenants: number } {
   const perfect = landing.quality === 'perfect';
   const tenants = tenantsFor(landing.quality, landing.wordLen);
   const combo = perfect ? prev.combo + 1 : 0;
@@ -101,44 +112,31 @@ export function applyLanding(
 
   let seed = prev.seed;
   const rng = () => {
-    seed = advanceTowerSeed(seed);
-    return towerSeedUnit(seed);
+    seed = nextSeed(seed);
+    return seed / 4294967296;
   };
-  const ctx = {
-    floorCount: prev.floors + 1,
-    wordsSinceLast: prev.wordsSinceSurprise + 1,
-    wordLen: landing.wordLen,
-    combo,
-    baseMeters: 1 + landing.wordLen * 0.5,
-  };
-  // A miss (block slid off) never rolls — rewards follow good play.
-  const event = landing.quality === 'miss' ? null : rollTowerSurprise(rng, ctx);
-
-  let surprise: SurprisePayout | null = null;
-  if (event) {
-    const r = towerSurpriseReward(event, ctx);
-    surprise = {
-      event,
-      points: r.bonusMeters * POINTS_PER_BONUS_M,
-      scrambles: r.bonusScrambles,
-      widthMult: Math.min(MAX_WIDTH_MULT, r.nextWordHeightMult),
-    };
-  }
+  const floors = prev.floors + 1;
+  const id = rollReward(rng, { quality: landing.quality, combo, sinceLast: prev.wordsSinceSurprise, floors });
+  const reward = id ? payoutFor(id, floors) : null;
 
   const run: RunState = {
+    ...prev,
     seed,
-    floors: prev.floors + 1,
+    floors,
     combo,
     bestCombo: Math.max(prev.bestCombo, combo),
-    bonus: prev.bonus + points + (surprise?.points ?? 0),
-    scrambles: prev.scrambles + (surprise?.scrambles ?? 0),
-    wordsSinceSurprise: surprise ? 0 : prev.wordsSinceSurprise + 1,
-    nextWidthMult: Math.min(MAX_WIDTH_MULT, surprise && surprise.widthMult > 1 ? surprise.widthMult : prev.nextWidthMult),
+    bonus: prev.bonus + points + (reward?.points ?? 0),
+    scrambles: prev.scrambles + (reward?.scrambles ?? 0),
+    wordsSinceSurprise: reward ? 0 : prev.wordsSinceSurprise + 1,
+    nextWidthMult: Math.min(MAX_WIDTH_MULT, Math.max(prev.nextWidthMult, reward?.widthMult ?? 1)),
     balls: Math.min(MAX_BALLS, prev.balls + (perfect && combo % BALL_EVERY_COMBO === 0 ? 1 : 0)),
     tenants: prev.tenants + tenants,
+    steadyDrops: Math.min(MAX_BANKED_DROPS, prev.steadyDrops + (reward?.steadyDrops ?? 0)),
+    plumbDrops: Math.min(MAX_BANKED_DROPS, prev.plumbDrops + (reward?.plumbDrops ?? 0)),
+    crates: prev.crates + (reward ? 1 : 0),
   };
 
-  return { run, points, surprise, tenants };
+  return { run, points, reward, tenants };
 }
 
 export function spendScramble(run: RunState): RunState | null {

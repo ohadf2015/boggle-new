@@ -5644,3 +5644,432 @@ html.ads-free-route [id^='google_ads_iframe'],
 html.ads-free-route .google-auto-placed {
   display: none !important;
 }
+
+/* ── Adventure word-hit juice (components/adventure/play/fx) ── */
+.adv-cast-letter {
+  position: fixed;
+  display: grid;
+  place-items: center;
+  border: 3px solid #000;
+  border-radius: 10px;
+  background: #fff8e7;
+  color: #000;
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 #000, 0 0 0 3px var(--adv-glow, #a3e635), 0 0 var(--adv-glow-px, 24px) 6px var(--adv-glow, #a3e635);
+  /* flight is driven per letter by the Web Animations API (fx/castPath.ts flightKeyframes) */
+  will-change: transform, opacity;
+}
+.adv-tile-burst {
+  position: fixed;
+  border-radius: 12px;
+  border: 4px solid var(--adv-glow, #a3e635);
+  animation: adv-tile-burst 380ms ease-out both;
+  pointer-events: none;
+}
+@keyframes adv-tile-burst {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.adv-impact-ring {
+  position: fixed;
+  border-radius: 9999px;
+  border: 6px solid var(--adv-glow, #a3e635);
+  animation: adv-impact-ring 420ms ease-out both;
+}
+@keyframes adv-impact-ring {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+.adv-spark {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  background: var(--adv-glow, #facc15);
+  border: 2px solid #000;
+  transform: translate(-50%, -50%) rotate(45deg);
+  animation: adv-spark 560ms cubic-bezier(0.15, 0.85, 0.3, 1) both;
+}
+@keyframes adv-spark {
+  0% { transform: translate(-50%, -50%) rotate(45deg) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--adv-dx)), calc(-50% + var(--adv-dy))) rotate(225deg) scale(0.3); opacity: 0; }
+}
+.adv-dmg {
+  position: fixed;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-text-stroke: 3px #000;
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 #000;
+  animation: adv-dmg-pop 620ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes adv-dmg-pop {
+  0% { transform: translate(-50%, -50%) scale(0.2) rotate(-10deg); opacity: 0; }
+  12% { transform: translate(-50%, -50%) scale(0.9) rotate(-4deg); opacity: 1; }
+  26% { transform: translate(-50%, -54%) scale(1.5) rotate(4deg); opacity: 1; }
+  40% { transform: translate(-50%, -52%) scale(0.94) rotate(-1deg); opacity: 1; }
+  52% { transform: translate(-50%, -54%) scale(1.06) rotate(0deg); opacity: 1; }
+  78% { transform: translate(-50%, -66%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -92%) scale(0.85); opacity: 0; }
+}
+/* Hit flash: a white-hot comic starburst on the target, in the tier colour. */
+.adv-hit-flash {
+  position: fixed;
+  border-radius: 9999px;
+  /* Hollow star flash: the foe's own flash + recoil must stay visible THROUGH it. */
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 34%, var(--adv-glow, #a3e635) 52%, rgba(0, 0, 0, 0) 68%);
+  mix-blend-mode: screen;
+  /* comic POW starburst */
+  clip-path: polygon(50% 0%, 59% 17%, 75% 7%, 74% 26%, 93% 25%, 83% 41%, 100% 50%, 83% 59%, 93% 75%, 74% 74%, 75% 93%, 59% 83%, 50% 100%, 41% 83%, 25% 93%, 26% 74%, 7% 75%, 17% 59%, 0% 50%, 17% 41%, 7% 25%, 26% 26%, 25% 7%, 41% 17%);
+  animation: adv-hit-flash 420ms ease-out both;
+}
+@keyframes adv-hit-flash {
+  0% { transform: translate(-50%, -50%) scale(0.3) rotate(0deg); opacity: 1; }
+  25% { transform: translate(-50%, -50%) scale(1) rotate(10deg); opacity: 0.95; }
+  100% { transform: translate(-50%, -50%) scale(1.3) rotate(22deg); opacity: 0; }
+}
+/* Heavy hits (CRIT / 7+ letters): the whole screen blinks in the tier colour. */
+.adv-crit-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, var(--adv-glow, #ff4fa3) 120%);
+  box-shadow: inset 0 0 0 6px var(--adv-glow, #ff4fa3);
+  animation: adv-crit-flash 460ms ease-out both;
+}
+@keyframes adv-crit-flash {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+/* Praise speech bubble over the hanging cast word — on EVERY valid word. */
+.adv-banner {
+  position: fixed;
+  z-index: 3;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  padding: 4px 16px;
+  border: 3px solid #000;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0 #000;
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: #000;
+  animation: adv-banner 1000ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+.adv-banner::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -11px;
+  width: 16px;
+  height: 16px;
+  background: inherit;
+  border-right: 3px solid #000;
+  border-bottom: 3px solid #000;
+  transform: translateX(-50%) rotate(45deg);
+}
+@keyframes adv-banner {
+  0% { transform: translate(-50%, -50%) rotate(-16deg) scale(0); opacity: 0; }
+  14% { transform: translate(-50%, -50%) rotate(-2deg) scale(1.22); opacity: 1; }
+  24% { transform: translate(-50%, -50%) rotate(-5deg) scale(1); opacity: 1; }
+  88% { transform: translate(-50%, -54%) rotate(-4deg) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -70%) rotate(-4deg) scale(0.9); opacity: 0; }
+}
+/* CRIT / K.O. praise: a screen-wide tilted slab that SLAMS in (Bookworm's "Whomped!" stamp). */
+.adv-banner.adv-banner-slab {
+  width: min(calc(100vw - 24px), 460px);
+  text-align: center;
+  padding: 6px 12px 8px;
+  border-width: 4px;
+  border-radius: 10px;
+  box-shadow: 7px 7px 0 #000, 0 0 0 4px #fff, 0 0 40px 14px var(--adv-slab-glow, rgba(255, 79, 163, 0.75));
+  -webkit-text-stroke: 2px #000;
+  color: #fff;
+  paint-order: stroke fill;
+  text-shadow: 3px 3px 0 #000;
+  letter-spacing: 0.04em;
+  animation-name: adv-slab;
+  animation-timing-function: cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.adv-banner.adv-banner-slab::after { display: none; }
+@keyframes adv-slab {
+  0% { transform: translate(-50%, -50%) rotate(-18deg) scale(2.6); opacity: 0; }
+  10% { transform: translate(-50%, -50%) rotate(-5deg) scale(0.92); opacity: 1; }
+  18% { transform: translate(-50%, -50%) rotate(-7deg) scale(1.06); opacity: 1; }
+  26% { transform: translate(-50%, -50%) rotate(-6deg) scale(1); opacity: 1; }
+  88% { transform: translate(-50%, -50%) rotate(-6deg) scale(1.02); opacity: 1; }
+  100% { transform: translate(-50%, -60%) rotate(-6deg) scale(1.1); opacity: 0; }
+}
+/* Comic POW starburst behind the damage number. */
+.adv-pow {
+  position: fixed;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  background: var(--adv-glow, #facc15);
+  clip-path: polygon(50% 0%, 60% 22%, 82% 6%, 76% 32%, 100% 30%, 82% 50%, 100% 70%, 76% 68%, 84% 94%, 60% 78%, 50% 100%, 40% 78%, 16% 94%, 24% 68%, 0% 70%, 18% 50%, 0% 30%, 24% 32%, 18% 6%, 40% 22%);
+  filter: drop-shadow(4px 4px 0 #000);
+  animation: adv-pow 700ms cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  pointer-events: none;
+}
+@keyframes adv-pow {
+  0% { transform: translate(-50%, -50%) scale(0.2) rotate(-20deg); opacity: 1; }
+  18% { transform: translate(-50%, -50%) scale(1.15) rotate(6deg); opacity: 1; }
+  30% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  80% { transform: translate(-50%, -50%) scale(1.02) rotate(2deg); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1.1) rotate(4deg); opacity: 0; }
+}
+/* White afterimage of the foe sprite, knocked off along the hit direction as it fades. */
+.adv-foe-ghost {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  filter: brightness(0) invert(1) drop-shadow(0 0 10px #fff);
+  mix-blend-mode: screen;
+  animation: adv-foe-ghost 520ms ease-out both;
+}
+@keyframes adv-foe-ghost {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.95; }
+  35% { opacity: 0.75; }
+  100% { transform: translate(calc(var(--adv-dx, 0px) * 2.4), calc(var(--adv-dy, 0px) * 2.4)) scale(1.18); opacity: 0; }
+}
+/* Glowing copy of a cast letter that streaks into the target (WAAPI-driven, hidden until it fires). */
+.adv-cast-bolt {
+  position: fixed;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  border: 3px solid #000;
+  border-radius: 10px;
+  color: #000;
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: 0 0 0 3px var(--adv-glow, #a3e635), 0 0 26px 8px var(--adv-glow, #a3e635);
+  will-change: transform, opacity;
+}
+.adv-spark-src { animation-duration: 420ms; }
+/* Sunburst behind the hanging cast word: grows as the word assembles, spins, fades out. */
+.adv-cast-burst {
+  position: fixed;
+  z-index: -1;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle, rgba(255, 250, 220, 0.7) 0 16%, color-mix(in srgb, var(--adv-glow, #facc15) 45%, transparent) 30%, transparent 52%),
+    repeating-conic-gradient(from 0deg, rgba(255, 236, 140, 0.85) 0deg 8deg, transparent 8deg 20deg);
+  -webkit-mask: radial-gradient(circle, #000 22%, transparent 70%);
+  mask: radial-gradient(circle, #000 22%, transparent 70%);
+  animation: adv-cast-burst 1150ms ease-out both;
+}
+@keyframes adv-cast-burst {
+  0% { transform: translate(-50%, -50%) scale(0.2) rotate(0deg); opacity: 0; }
+  22% { transform: translate(-50%, -50%) scale(1) rotate(25deg); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1.12) rotate(70deg); opacity: 0.85; }
+  100% { transform: translate(-50%, -50%) scale(1.3) rotate(100deg); opacity: 0; }
+}
+/* Twinkling 4-point stars framing the cast word. */
+.adv-cast-star {
+  position: fixed;
+  background: var(--adv-glow, #fde047);
+  clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+  filter: drop-shadow(0 0 6px var(--adv-glow, #fde047));
+  animation: adv-cast-star 900ms ease-out both;
+}
+@keyframes adv-cast-star {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+  20% { transform: translate(-50%, -50%) scale(1.4) rotate(45deg); opacity: 1; }
+  45% { transform: translate(-50%, -50%) scale(0.8) rotate(90deg); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1.15) rotate(135deg); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(0.2) rotate(200deg); opacity: 0; }
+}
+/* Rare-letter gem (J Q X Z K): gold with a white inner sparkle rim. */
+.adv-cast-rare { outline: 3px solid #fff; outline-offset: -7px; }
+/* On impact the hanging word zaps white letter by letter, then its glow keeps breathing. */
+.adv-cast-letter[data-hit] { animation: adv-letter-zap 520ms ease-out both; }
+@keyframes adv-letter-zap {
+  0% { filter: brightness(1); }
+  18% { filter: brightness(1.9) saturate(1.3); }
+  45% { filter: brightness(1.05); }
+  65% { filter: brightness(1.35); }
+  100% { filter: brightness(1); }
+}
+.adv-impact-echo { border-width: 4px; animation-delay: 110ms; animation-timing-function: cubic-bezier(0.1, 0.6, 0.3, 1); }
+
+.adv-best-ribbon {
+  position: fixed;
+  z-index: 3;
+  transform: translate(-50%, 0);
+  padding: 3px 14px;
+  border: 3px solid #000;
+  border-radius: 8px;
+  background: #ff4fa3;
+  color: #000;
+  box-shadow: 3px 3px 0 #000;
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: adv-best-ribbon 900ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+@keyframes adv-best-ribbon {
+  0% { transform: translate(-50%, 10px) scale(0.4); opacity: 0; }
+  18% { transform: translate(-50%, 0) scale(1.15); opacity: 1; }
+  30% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translate(-50%, 0) scale(1); opacity: 0; }
+}
+.adv-fail-tile {
+  position: absolute;
+  border-radius: 12px;
+  border: 4px solid #ff3b5c;
+  background: rgba(255, 59, 92, 0.35);
+  animation: adv-fail-wobble 520ms ease-in-out both;
+  pointer-events: none;
+}
+@keyframes adv-fail-wobble {
+  0%, 100% { transform: translateX(0) rotate(0); opacity: 1; }
+  20% { transform: translateX(-4px) rotate(-4deg); }
+  40% { transform: translateX(4px) rotate(4deg); }
+  60% { transform: translateX(-3px) rotate(-2deg); }
+  80% { transform: translateX(2px) rotate(1deg); opacity: 1; }
+  100% { opacity: 0; }
+}
+.adv-fail-chip {
+  animation: adv-fail-chip 900ms ease-out both;
+}
+@keyframes adv-fail-chip {
+  0% { transform: translate(-50%, 6px) scale(0.8); opacity: 0; }
+  15% { transform: translate(-50%, 0) scale(1.05); opacity: 1; }
+  75% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -6px) scale(1); opacity: 0; }
+}
+/* Hint: GOLD marching-dash rings + a bulb badge + direction arrow. Deliberately NOT the
+   player's pink selection ring / numbered order badge, so a hint never reads as "I tapped these". */
+.adv-hint-tile {
+  position: absolute;
+  border-radius: 14px;
+  background: rgba(250, 204, 21, 0.14);
+  box-shadow: 0 0 0 3px #000, 0 0 34px 12px rgba(250, 204, 21, 0.8), inset 0 0 22px 6px rgba(255, 244, 170, 0.6);
+  animation: adv-hint-pulse 900ms ease-in-out infinite;
+  pointer-events: none;
+}
+/* The ring itself: rotating gold/black hazard stripes, masked to a 6px frame so the letter stays clear. */
+.adv-hint-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 6px;
+  background: repeating-conic-gradient(from var(--adv-hint-a, 0deg), #facc15 0 15deg, #000 15deg 30deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: adv-hint-march 1.6s linear infinite;
+}
+@property --adv-hint-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes adv-hint-march { to { --adv-hint-a: 360deg; } }
+@keyframes adv-hint-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+.adv-hint-bulb {
+  position: absolute;
+  top: -14px;
+  inset-inline-end: -14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  border: 3px solid #000;
+  background: #facc15;
+  color: #000;
+  box-shadow: 2px 2px 0 #000, 0 0 14px 4px rgba(250, 204, 21, 0.9);
+  display: grid;
+  place-items: center;
+  animation: adv-hint-bulb 900ms ease-in-out infinite;
+}
+@keyframes adv-hint-bulb {
+  0%, 100% { transform: rotate(-10deg) scale(1); }
+  50% { transform: rotate(10deg) scale(1.15); }
+}
+.adv-hint-arrow { animation: adv-hint-arrow 900ms ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.9)); }
+@keyframes adv-hint-arrow { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.adv-chip-in {
+  animation: adv-chip-in 360ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+@keyframes adv-chip-in {
+  0% { transform: translateY(12px) scale(0.3); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.adv-chip-latest {
+  box-shadow: 2px 2px 0 #000, 0 0 0 2px #a3e635, 0 0 14px 2px rgba(163, 230, 53, 0.7);
+}
+.adv-hint-btn-pop {
+  animation: adv-hint-btn-pop 320ms cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+@keyframes adv-hint-btn-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18) rotate(-6deg); }
+  100% { transform: scale(1); }
+}
+/* Last-hit sticker: the damage + praise stamp onto the target's corner and stay until the next word. */
+.adv-hit-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transform: translate(-50%, -50%) rotate(-7deg);
+  animation: adv-hit-mark-in 420ms cubic-bezier(0.2, 1.5, 0.4, 1) 360ms both, adv-hit-mark-settle 500ms ease-in-out 2800ms forwards;
+}
+.adv-hit-mark-num {
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-weight: 800;
+  line-height: 0.95;
+  -webkit-text-stroke: 3px #000;
+  paint-order: stroke fill;
+  text-shadow: 3px 3px 0 #000;
+  white-space: nowrap;
+}
+.adv-hit-mark-praise {
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 0 6px;
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: #000;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 #000;
+}
+@keyframes adv-hit-mark-in {
+  0% { transform: translate(-50%, -50%) scale(2.2) rotate(8deg); opacity: 0; }
+  45% { transform: translate(-50%, -50%) scale(0.88) rotate(-9deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1) rotate(-7deg); opacity: 1; }
+}
+@keyframes adv-hit-mark-settle {
+  to { transform: translate(-50%, -50%) scale(0.86) rotate(-7deg); opacity: 0.92; }
+}
+/* HP readout damage chip beside the numbers. */
+.adv-hp-chip {
+  animation: adv-hp-chip 1600ms ease-out both;
+}
+@keyframes adv-hp-chip {
+  0% { transform: translateY(4px) scale(0.6); opacity: 0; }
+  12% { transform: translateY(-2px) scale(1.25); opacity: 1; }
+  25% { transform: translateY(0) scale(1); opacity: 1; }
+  80% { transform: translateY(-3px); opacity: 1; }
+  100% { transform: translateY(-8px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .adv-cast-letter, .adv-tile-burst, .adv-impact-ring, .adv-spark, .adv-hit-flash, .adv-crit-flash, .adv-chip-in, .adv-hint-btn-pop, .adv-cast-burst, .adv-cast-star { animation: none !important; }
+  .adv-cast-letter, .adv-cast-bolt, .adv-tile-burst, .adv-impact-ring, .adv-spark, .adv-hit-flash, .adv-crit-flash, .adv-cast-burst, .adv-cast-star, .adv-foe-ghost { display: none; }
+  .adv-dmg, .adv-banner, .adv-pow, .adv-best-ribbon, .adv-fail-tile, .adv-fail-chip, .adv-hint-tile, .adv-hint-bulb, .adv-hint-arrow, .adv-hit-mark, .adv-hp-chip { animation-duration: 1ms !important; animation-name: none !important; }
+}

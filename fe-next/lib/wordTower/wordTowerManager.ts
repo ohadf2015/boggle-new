@@ -110,11 +110,15 @@ export function generateWheel(
   drawIndex = 0,
   count: number = WORD_TOWER_WHEEL_SIZE,
   minVowels: number = WORD_TOWER_WHEEL_MIN_VOWELS,
+  /** Ceiling on vowels (default none — v1 unchanged). A floor with no ceiling
+   *  let the frequency draw hand out 4-5 vowels of 7 (Word Tower v2 passes 3). */
+  maxVowels: number = Number.POSITIVE_INFINITY,
 ): string[] {
   const bag = [...(WORD_TOWER_LETTER_BAGS[language] || '')];
   if (bag.length === 0) return [];
   const vowelSet = WORD_TOWER_VOWELS[language] || '';
   const vowelBag = bag.filter((c) => vowelSet.includes(c));
+  const consonantBag = bag.filter((c) => !vowelSet.includes(c));
   const rng = mulberry32(fnv1aHash(`word-tower-wheel-${gameCode}-${playerId}-${drawIndex}`));
   const out: string[] = [];
   const counts = new Map<string, number>();
@@ -139,7 +143,14 @@ export function generateWheel(
   };
   const wantVowels = vowelBag.length > 0 ? Math.min(minVowels, count) : 0;
   for (let i = 0; i < wantVowels; i++) out.push(drawCapped(vowelBag, distinctVowels));
-  while (out.length < count) out.push(drawCapped(bag, distinctBag));
+  let vowels = wantVowels;
+  const distinctConsonants = new Set(consonantBag).size;
+  while (out.length < count) {
+    const full = vowels >= maxVowels && consonantBag.length > 0;
+    const c = full ? drawCapped(consonantBag, distinctConsonants) : drawCapped(bag, distinctBag);
+    if (vowelSet.includes(c)) vowels += 1;
+    out.push(c);
+  }
   // Fisher–Yates (seeded) so the guaranteed vowels land in varied positions.
   for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));

@@ -1,0 +1,109 @@
+/* Level intro: mechanic preview loops + card entrance. Loops are 2.8s. */
+.mech-preview {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 104px;
+  height: 104px;
+  padding: 5px;
+  border: 3px solid #000;
+  border-radius: 12px;
+  background: #fff8e7;
+  box-shadow: 3px 3px 0 #000;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.mech-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border: 2px solid #000;
+  border-radius: 6px;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-fredoka, inherit);
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 1;
+}
+.mech-on { animation: mech-light 2.8s calc(var(--step) * 0.28s) infinite steps(1, end); }
+@keyframes mech-light {
+  0% { background: #fff; }
+  8% { background: var(--mech-accent, #bfff00); transform: scale(1.08); }
+  70% { background: var(--mech-accent, #bfff00); transform: scale(1); }
+  100% { background: #fff; }
+}
+.mech-classic { --mech-accent: #00ffff; }
+.mech-hunt { --mech-accent: #bfff00; }
+.mech-chain { --mech-accent: #ffe135; }
+.mech-fog { --mech-accent: #8b5cf6; }
+.mech-bomb { --mech-accent: #ff6b35; }
+.mech-elite, .mech-boss { --mech-accent: #ff1493; }
+
+/* Chain: the last tile of the first word is the first tile of the next. */
+.mech-chain .mech-tile:nth-child(3) { box-shadow: 0 0 0 3px #ffe135; }
+.mech-link { position: absolute; top: -6px; inset-inline-end: -6px; width: 14px; height: 14px; color: #000; background: #ffe135; border: 2px solid #000; border-radius: 999px; padding: 1px; }
+
+/* Fog: far tiles hide under a drifting cloud, the word's neighbours stay clear. */
+.mech-far { color: transparent; background: #3b2a6b; }
+.mech-cloud {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(200,190,255,0.55) 0 18%, transparent 30%),
+    radial-gradient(circle at 80% 85%, rgba(200,190,255,0.5) 0 18%, transparent 32%),
+    radial-gradient(circle at 85% 12%, rgba(200,190,255,0.45) 0 14%, transparent 26%),
+    radial-gradient(circle at 12% 88%, rgba(200,190,255,0.45) 0 14%, transparent 26%);
+  animation: mech-drift 2.8s ease-in-out infinite alternate;
+}
+@keyframes mech-drift { from { transform: translateX(-4px); } to { transform: translateX(4px); } }
+
+/* Bomb: the fused tile flashes until the word runs through it. */
+.mech-bomb-icon { position: absolute; top: -5px; inset-inline-end: -5px; width: 16px; height: 16px; color: #000; background: #ff6b35; border: 2px solid #000; border-radius: 999px; padding: 1px; animation: mech-fuse 0.7s ease-in-out infinite alternate; }
+@keyframes mech-fuse { from { transform: scale(1); } to { transform: scale(1.25) rotate(-12deg); } }
+
+/* Hunt: a stamp slams onto the found word. */
+.mech-stamp {
+  position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px;
+  display: grid; place-items: center; border: 3px solid #000; border-radius: 999px;
+  background: #bfff00; color: #000; font-weight: 900; font-size: 24px;
+  animation: mech-stamp 2.8s infinite;
+}
+@keyframes mech-stamp {
+  0%, 38% { opacity: 0; transform: scale(2.2) rotate(-20deg); }
+  46% { opacity: 1; transform: scale(0.9) rotate(-8deg); }
+  52%, 80% { opacity: 1; transform: scale(1) rotate(-8deg); }
+  100% { opacity: 0; transform: scale(1) rotate(-8deg); }
+}
+
+/* Big demo board under the hero sentence. */
+.mech-preview-lg { width: 150px; height: 150px; gap: 6px; padding: 7px; box-shadow: 5px 5px 0 #000; }
+.mech-preview-lg .mech-tile { font-size: 22px; border-width: 3px; }
+.mech-preview-lg .mech-stamp { width: 64px; height: 64px; margin: -32px 0 0 -32px; }
+
+/* Beats: the sentence slams in first, the tag stamps on it, the numbers arrive after.
+   Transform-only on small elements (no opacity tween on the fullscreen layer). */
+.rule-hero { animation: rule-hero-slam 0.5s 0.1s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+@keyframes rule-hero-slam {
+  from { transform: scale(1.35) rotate(-2deg); opacity: 0; }
+  60% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+.rule-tag { animation: rule-tag-stamp 0.4s 0.5s cubic-bezier(0.2, 1.8, 0.4, 1) both; }
+@keyframes rule-tag-stamp { from { transform: scale(2.4) rotate(-14deg); opacity: 0; } to { transform: rotate(-3deg); opacity: 1; } }
+.intro-foot { animation: intro-foot-rise 0.45s 0.85s cubic-bezier(0.2, 1.2, 0.4, 1) both; }
+@keyframes intro-foot-rise { from { transform: translateY(110%); } to { transform: none; } }
+.chapter-title { animation: rule-hero-slam 0.55s 0.15s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.chapter-tag { animation: rule-tag-stamp 0.4s 0.05s cubic-bezier(0.2, 1.8, 0.4, 1) both; }
+.chapter-story { animation: intro-foot-rise 0.5s 0.5s cubic-bezier(0.2, 1.2, 0.4, 1) both; }
+.level-kind-banner { animation: level-kind-banner 0.5s 0.12s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes level-kind-banner { from { transform: scale(0.6) rotate(-6deg); } to { transform: rotate(-2deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .mech-on { animation: none; background: var(--mech-accent, #bfff00); }
+  .mech-cloud, .mech-bomb-icon, .level-kind-banner, .rule-hero, .rule-tag, .intro-foot,
+  .chapter-title, .chapter-tag, .chapter-story { animation: none; }
+  .rule-tag { transform: rotate(-3deg); }
+  .mech-stamp { animation: none; opacity: 1; transform: rotate(-8deg); }
+  .level-kind-banner { transform: rotate(-2deg); }
+}

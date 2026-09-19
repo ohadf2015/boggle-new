@@ -33,7 +33,7 @@ const PERFECT_TILT = 0.06;
 /** A block resting this far (px) below the old top slid off the tower. */
 const MISS_SLACK_PX = 12;
 /** First drop lands on the ground: judged against a notional pad this wide. */
-const GROUND_PAD_W = 150;
+const GROUND_PAD_W = 200;
 
 function offsetRatio(x: number, support: SupportTop | null): number {
   const cx = support?.x ?? 0;

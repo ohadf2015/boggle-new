@@ -1,0 +1,37 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { createRun } from '@/lib/wordTowerV2/run';
+import { V2Results } from '../V2Results';
+
+afterEach(cleanup);
+
+const t = (key: string, params?: Record<string, string | number>) =>
+  params ? `${key}:${Object.values(params).join(',')}` : key;
+
+const base = { t, peakM: 18, score: 2400, bestM: 18, isBest: true, run: { ...createRun(1), bestCombo: 4, tenants: 23, crates: 3 }, badges: [] as string[], unlocked: new Set<string>() };
+
+describe('V2Results', () => {
+  it('given a finished run, when play again is pressed, then the run restarts', () => {
+    const onRestart = vi.fn();
+    render(<V2Results {...base} onRestart={onRestart} />);
+    expect(screen.getByText('wordTowerV2.collapsed')).toBeTruthy();
+    fireEvent.click(screen.getByText('common.playAgain'));
+    expect(onRestart).toHaveBeenCalledOnce();
+  });
+
+  it('given a peak of 18m, when shown, then it is counted in floors (6)', () => {
+    render(<V2Results {...base} onRestart={() => {}} />);
+    expect(screen.getByLabelText('wordTowerV2.results.floorsA11y:6')).toBeTruthy();
+  });
+
+  it('given badges earned this run, when shown, then each is listed by name', () => {
+    render(<V2Results {...base} badges={['fiveStory', 'lucky']} onRestart={() => {}} />);
+    expect(screen.getByText('wordTowerV2.ach.fiveStory.name')).toBeTruthy();
+    expect(screen.getByText('wordTowerV2.ach.lucky.name')).toBeTruthy();
+  });
+
+  it('given badges still locked, when shown, then the closest one is offered as the next goal', () => {
+    render(<V2Results {...base} onRestart={() => {}} />);
+    expect(screen.getByText('wordTowerV2.results.nextGoal')).toBeTruthy();
+  });
+});

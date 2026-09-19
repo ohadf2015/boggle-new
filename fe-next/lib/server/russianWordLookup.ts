@@ -57,3 +57,21 @@ export function isRussianWord(raw: string): boolean {
   }
   return false;
 }
+
+/** True when some list word starts with `prefix` (lower-bound binary search; used by board solvers). */
+export function hasRussianPrefix(prefix: string): boolean {
+  if (!prefix) return false;
+  load();
+  const n = lineStarts!.length;
+  if (!n) return false;
+  const needle = Buffer.from(prefix, 'utf8');
+  let lo = 0;
+  let hi = n;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (Buffer.compare(lineAt(mid), needle) < 0) lo = mid + 1; else hi = mid;
+  }
+  if (lo >= n) return false;
+  const line = lineAt(lo);
+  return line.length >= needle.length && line.subarray(0, needle.length).equals(needle);
+}

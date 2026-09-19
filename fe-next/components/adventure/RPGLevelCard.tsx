@@ -1,230 +1,170 @@
 'use client';
 
 import { memo } from 'react';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import {
-  Star,
-  Lock,
-  Play,
-  Crown,
-  Swords,
-  Skull,
-  ScrollText,
-  Trophy,
-  Palette,
-} from 'lucide-react';
+import { Star, Lock, Play, Crown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { LevelKind } from '@/lib/adventure/play/levels';
+import { ThreatPips } from './play/variants/KindBadge';
+import { KIND_META } from './play/variants/levelKinds';
+import { NODE_SHAPE, LABEL, nodeSize, type NodeStatus } from './play/variants/trailLayout';
+import TrailNodeShape from './play/variants/TrailNodeShape';
 
 interface RPGLevelCardProps {
   levelNum: number;
   stars: number;
   maxStars: number;
-  isUnlocked: boolean;
+  kind: LevelKind;
+  status: NodeStatus;
   isPerfect: boolean;
-  isCurrent: boolean;
-  isBoss: boolean;
-  worldAccentColor: string;
-  glowColor: string;
+  /** 1-5 difficulty pips. */
+  threat: number;
+  /** Which side of the node has room for the label ('plate' = elite/boss nameplate). */
+  labelSide: 'left' | 'right' | 'plate';
   onClick: () => void;
+  /** Enemy portrait for elite/boss nodes. */
+  enemyArt?: string;
+  /** Enemy name on elite/boss labels. */
+  enemyName?: string;
 }
 
 /**
- * RPGLevelCard — Polished trading-card-style level node with world-colored accents
+ * RPGLevelCard — one node on the world trail. The silhouette + colour + icon say
+ * the level kind at a glance; elite/boss are big nodes wearing the enemy portrait.
+ * Fills its (absolutely positioned) parent; the label hangs off the open side.
  */
 const RPGLevelCard = memo(function RPGLevelCard({
-  levelNum,
-  stars,
-  maxStars,
-  isUnlocked,
-  isPerfect,
-  isCurrent,
-  isBoss,
-  glowColor,
-  onClick,
+  levelNum, stars, maxStars, kind, status, isPerfect, threat, labelSide, onClick, enemyArt, enemyName,
 }: RPGLevelCardProps) {
   const { t } = useLanguage();
-  const isLocked = !isUnlocked;
-  const isCompleted = stars > 0;
-
-  // Neo-brutalist hard shadow — solid offset, NO blur. Boss gets a hard red-tinted
-  // offset; current is differentiated by its lime border + pulse ring (below).
-  const cardShadow = isBoss
-    ? '5px 5px 0px rgba(255,51,102,0.65)'
-    : '4px 4px 0px black';
+  const meta = KIND_META[kind];
+  const Icon = meta.icon;
+  const shape = NODE_SHAPE[kind];
+  const big = kind === 'elite' || kind === 'boss';
+  const locked = status === 'locked';
+  const current = status === 'current';
+  const kindLabel = t(`adventurePlay.variety.kind.${kind}`);
+  const select = locked ? undefined : onClick;
+  const size = nodeSize(kind);
+  const plateW = kind === 'boss' ? LABEL.plateW.boss : LABEL.plateW.elite;
+  const plateOverlap = kind === 'boss' ? LABEL.plateOverlap.boss : LABEL.plateOverlap.elite;
 
   return (
-    <AdaptiveMotion.div
-      className={cn(
-        'relative rounded-neo-lg overflow-hidden',
-        'border-3',
-        isBoss && 'col-span-2 border-4',
-        isCurrent ? 'border-neo-lime' : isBoss ? 'border-neo-red/60' : 'border-neo-black',
-        isLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
-        isCurrent && 'level-grid-current-pulse',
-      )}
-      style={{ boxShadow: cardShadow }}
+    <div
       role="button"
-      tabIndex={isUnlocked ? 0 : -1}
-      aria-disabled={isLocked}
-      aria-label={isLocked
+      tabIndex={locked ? -1 : 0}
+      aria-disabled={locked}
+      aria-label={locked
         ? t('adventure.levelLocked', { level: levelNum })
-        : isBoss
+        : kind === 'boss'
           ? t('adventure.bossLevel', { level: levelNum })
-          : t('adventure.playLevel', { level: levelNum, stars, maxStars })
-      }
-      onKeyDown={isUnlocked ? (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); }
-      } : undefined}
-      whileHover={isUnlocked ? { scale: 1.04, y: -5 } : undefined}
-      whileTap={isUnlocked ? { scale: 0.96 } : undefined}
-      onClick={isUnlocked ? onClick : undefined}
+          : t('adventure.playLevel', { level: levelNum, stars, maxStars })}
+      onClick={select}
+      onKeyDown={select ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); } } : undefined}
       data-testid={`level-card-${levelNum}`}
+      data-kind-node={kind}
+      data-shape={shape}
+      data-status={status}
+      data-big={big}
+      className={cn('trail-node group relative h-full w-full select-none outline-none',
+        locked ? 'cursor-not-allowed' : 'cursor-pointer', current && 'trail-node--current')}
     >
-      {/* Grain texture overlay */}
-      <div className="absolute inset-0 pointer-events-none z-10 opacity-[0.03] card-grain" />
+      {current && <span aria-hidden className="trail-node-ring" style={{ borderColor: meta.hex }} />}
 
-      {/* Card background */}
-      <div className={cn(
-        'relative',
-        'bg-[#0f0f23]',
-        isBoss && 'min-h-[160px]',
-      )}>
-        {/* Top accent strip — world-colored gradient for unlocked, muted for locked */}
-        <div
-          data-testid="card-banner"
-          className="h-1.5 relative overflow-hidden"
-          style={{
-            background: isLocked
-              ? 'rgba(100,100,120,0.3)'
-              : isBoss
-                ? 'linear-gradient(90deg, #FF3366, #FF6699, #FF3366)'
-                : isPerfect
-                  ? 'linear-gradient(90deg, #FFE135, #FFA500, #FFE135)'
-                  : `linear-gradient(90deg, ${glowColor}, transparent)`,
-          }}
-        />
+      <div className="trail-node-body relative h-full w-full">
+        <TrailNodeShape shape={shape} fill={locked ? '#2a3150' : meta.hex} art={big ? enemyArt : undefined}
+          greyArt={locked} className="absolute inset-0 h-full w-full" />
 
-        {/* Card Body */}
-        <div className={cn('flex flex-col items-center py-4 px-3', isBoss && 'py-5')}>
-          {/* Boss label */}
-          {isBoss && (
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <Swords data-testid="swords-icon" className="w-3.5 h-3.5 text-neo-red" />
-              <span className="text-[10px] font-neo-display font-black text-neo-red uppercase tracking-widest">
-                {t('adventure.bossLabel')}
-              </span>
-            </div>
-          )}
+        {!big && (
+          <span className={cn('absolute inset-0 grid place-items-center', shape === 'bomb' && 'pt-[14%]', shape === 'cloud' && 'pt-[6%]')}>
+            {locked
+              ? <Lock data-testid="lock-icon" className="h-[36%] w-[36%] text-white/70" strokeWidth={3} />
+              : <Icon className="h-[42%] w-[42%] text-black" strokeWidth={2.75} aria-hidden />}
+          </span>
+        )}
+        {big && locked && (
+          <span className="absolute inset-0 grid place-items-center">
+            <Lock data-testid="lock-icon" className="h-[26%] w-[26%] text-white drop-shadow-[2px_2px_0_#000]" strokeWidth={3} />
+          </span>
+        )}
 
-          {/* Level Number or Lock */}
-          {isLocked ? (
-            <div className="flex flex-col items-center">
-              <Lock data-testid="lock-icon" className="w-7 h-7 text-neo-white mb-1" />
-              {levelNum > 1 && (
-                <span className="text-[9px] text-neo-white font-neo-body text-center leading-tight">
-                  {t('adventure.unlockRequirement', { level: String(levelNum - 1) })}
-                </span>
-              )}
-            </div>
-          ) : (
-            <span
-              data-testid="level-number"
-              className={cn(
-                'font-neo-display font-black leading-none mb-2',
-                isBoss ? 'text-5xl' : 'text-4xl sm:text-5xl',
-                isCurrent ? 'text-neo-white' : isCompleted ? 'text-neo-white' : 'text-neo-white',
-              )}
-              style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}
-            >
-              {levelNum}
-            </span>
-          )}
+        {/* level number plate (big nodes carry it in their ribbon) */}
+        {!big && (
+          <span data-testid="level-number"
+            className="absolute bottom-[-4%] start-[-4%] grid h-[40%] min-w-[40%] place-items-center rounded-md border-[3px] border-black bg-neo-cream font-neo-display text-[clamp(13px,4.2cqw,26px)] font-black leading-none text-black shadow-[2px_2px_0_#000]">
+            {levelNum}
+          </span>
+        )}
 
-          {/* Stars Row — with size variation for filled stars */}
-          <div className="flex items-center gap-1 mb-2">
-            {Array.from({ length: maxStars }).map((_, i) => {
-              const isFilled = i < stars;
-              return (
-                <Star
-                  key={`star-${i}`}
-                  data-testid={isFilled ? 'star-filled' : 'star-empty'}
-                  className={cn(
-                    'transition-all duration-300',
-                    isFilled
-                      ? 'w-5 h-5 text-neo-yellow fill-neo-yellow'
-                      : 'w-4 h-4 text-neo-white fill-neo-white/5'
-                  )}
-                  style={isFilled ? { filter: 'drop-shadow(1px 1px 0 rgba(0,0,0,0.9))' } : undefined}
-                />
-              );
-            })}
-          </div>
-
-          {/* Current level indicator */}
-          {isCurrent && isUnlocked && (
-            <div className="flex items-center gap-1.5">
-              <Play
-                data-testid="play-icon"
-                className="w-4 h-4 text-neo-lime fill-neo-lime animate-bounce motion-reduce:animate-none"
-              />
-              <span className="text-[10px] font-black text-neo-lime uppercase tracking-wide">
-                {t('adventure.next')}
-              </span>
-            </div>
-          )}
-
-          {/* Boss difficulty skulls */}
-          {isBoss && (
-            <div data-testid="difficulty-skulls" className="flex items-center gap-1 mt-1">
-              {[1, 2, 3].map((i) => (
-                <Skull key={`skull-${i}`} className="w-3 h-3 text-neo-red/60" />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Footer with reward tokens — cleaner separator */}
-        <div
-          data-testid="reward-tokens"
-          className="flex items-center justify-center gap-2.5 py-1.5 border-t border-neo-white/5"
-        >
-          {/* What clearing it grants: a lore scroll; the boss adds its trophy + world tile skin */}
-          <ScrollText className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-cyan/70')} />
-          {isBoss && (
-            <>
-              <Trophy className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-yellow/80')} />
-              <Palette className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-pink/80')} />
-            </>
-          )}
-        </div>
-
+        {status === 'cleared' && (
+          <span data-testid="path-cleared" title={t('adventurePlay.variety.pathCleared')}
+            className={cn('absolute top-[-6%] end-[-6%] grid place-items-center rounded-full border-[3px] border-black bg-neo-lime text-black shadow-[2px_2px_0_#000]',
+              big ? 'h-[24%] w-[24%]' : 'h-[38%] w-[38%]')}>
+            <Check className="h-[65%] w-[65%]" strokeWidth={4} />
+          </span>
+        )}
+        {isPerfect && !locked && (
+          <span data-testid="crown-badge"
+            className={cn('absolute top-[-8%] start-[-2%] grid place-items-center rounded-full border-[3px] border-black bg-neo-yellow text-black shadow-[2px_2px_0_#000]',
+              big ? 'h-[22%] w-[22%]' : 'h-[34%] w-[34%]')}>
+            <Crown className="h-[62%] w-[62%]" strokeWidth={3} />
+          </span>
+        )}
       </div>
 
-      {/* Perfect crown badge */}
-      {isPerfect && isUnlocked && (
-        <div
-          data-testid="crown-badge"
-          className="absolute -top-1 -inset-e-1 w-7 h-7 bg-neo-yellow rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm z-20"
-        >
-          <Crown className="w-4 h-4 text-neo-black" />
+      {current && (
+        <span className={cn('absolute left-1/2 z-20 -translate-x-1/2 whitespace-nowrap', big ? 'bottom-[calc(100%+16px)]' : 'bottom-[calc(100%+6px)]', 'rounded-md border-[3px] border-black bg-neo-lime px-1.5 py-0.5 text-black shadow-[2px_2px_0_#000]')}>
+          <span className="flex items-center gap-1 text-[clamp(10px,2.8cqw,16px)] font-black uppercase leading-none tracking-wide">
+            <Play data-testid="play-icon" className="h-[1.1em] w-[1.1em] fill-black" />
+            {t('adventurePlay.variety.youAreHere')}
+          </span>
+        </span>
+      )}
+
+      {big ? (
+        <>
+          {/* ribbon: kind + stars across the top edge (big nodes read as max threat by size) */}
+          <div className="absolute left-1/2 top-[-9%] z-10 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-md border-[3px] border-black px-1.5 py-0.5 shadow-[2px_2px_0_#000]"
+            style={{ backgroundColor: locked ? '#2a3150' : meta.hex }}>
+            <span data-testid="level-number" className="-my-0.5 -ms-1 grid min-w-[1.5em] place-items-center self-stretch rounded-[4px] bg-neo-cream px-1 font-neo-display text-[clamp(11px,3.2cqw,19px)] font-black leading-none text-black">{levelNum}</span>
+            <span className="font-neo-display text-[clamp(10px,2.9cqw,17px)] font-black uppercase leading-none tracking-wide text-black">{kindLabel}</span>
+            <Stars stars={stars} maxStars={maxStars} dark />
+          </div>
+          {/* nameplate across the foot */}
+          <div dir="auto" className="absolute left-1/2 z-10 -translate-x-1/2 rounded-lg border-[3px] border-black bg-[#0f1b3d] px-1.5 py-1 text-center shadow-[3px_3px_0_#000]"
+            style={{ top: `${((size - plateOverlap) / size) * 100}%`, width: `${(plateW / size) * 100}%` }}>
+            <div className="font-neo-display text-[clamp(12px,3.4cqw,20px)] font-black uppercase leading-[1.05] text-neo-cream line-clamp-2">
+              {enemyName ?? kindLabel}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div dir="auto" className={cn('absolute top-1/2 z-10 -translate-y-1/2 rounded-lg border-[3px] border-black bg-[#0f1b3d] px-1.5 py-1 shadow-[3px_3px_0_#000]', locked && 'opacity-75')}
+          style={{ width: `${(LABEL.w / size) * 100}%`, [labelSide === 'left' ? 'right' : 'left']: `calc(100% + ${(LABEL.gap / size) * 100}%)` }}>
+          <div className="font-neo-display text-[clamp(11px,3.4cqw,20px)] font-black uppercase leading-[1.05] tracking-wide"
+            style={{ color: locked ? '#9aa3c7' : meta.hex }}>
+            {kindLabel}
+          </div>
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-1 gap-y-0.5">
+            <Stars stars={stars} maxStars={maxStars} />
+            <ThreatPips threat={threat} label={t('adventurePlay.variety.threat', { threat })} />
+          </div>
         </div>
       )}
-
-      {/* Locked chain stripes overlay */}
-      {isLocked && (
-        <div className="absolute inset-0 pointer-events-none z-10 chain-stripes" />
-      )}
-
-      {/* Current level pulse ring — world-colored */}
-      {isCurrent && isUnlocked && (
-        <div
-          className="absolute -inset-1 rounded-neo-lg border-3 border-neo-lime pointer-events-none z-20"
-          style={{ animation: 'pulse-border 2s ease-in-out infinite' }}
-        />
-      )}
-    </AdaptiveMotion.div>
+    </div>
   );
 });
+
+function Stars({ stars, maxStars, dark }: { stars: number; maxStars: number; dark?: boolean }) {
+  return (
+    <span className="flex items-center">
+      {Array.from({ length: maxStars }).map((_, i) => (
+        <Star key={i} data-testid={i < stars ? 'star-filled' : 'star-empty'}
+          className={cn('h-[clamp(11px,3cqw,18px)] w-[clamp(11px,3cqw,18px)]',
+            i < stars ? 'text-black fill-neo-yellow' : dark ? 'text-black/60 fill-transparent' : 'text-white/40 fill-white/5')} strokeWidth={2.5} />
+      ))}
+    </span>
+  );
+}
 
 export default RPGLevelCard;

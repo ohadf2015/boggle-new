@@ -17,7 +17,13 @@ import {
   swingLeftPx,
   wreckedCount,
 } from '@/lib/wordTowerV2/wreck';
-import { type BlockView, createBlockView, paintBlock, paintGround, paintThrowArc, paintWreckRig } from './towerArt';
+import { type BlockView, createBlockView, paintBlock } from './apartmentArt';
+import { paintGround, paintThrowArc, paintWreckRig } from './towerArt';
+import { SkyLayer } from './skyArt';
+import { createCity, paintCity, placeCity } from './skylineArt';
+import { skyAt } from '@/lib/wordTowerV2/biomes';
+import { buildSkyline } from '@/lib/wordTowerV2/scenery';
+import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
 
 /**
  * Pixi view of the smash round. Owns the ball cycle: hang -> (player cuts) ->
@@ -39,6 +45,7 @@ export interface WreckUpdate {
 interface Props {
   words: string[];
   balls: number;
+  reducedMotion?: boolean;
   registerCut: (cut: () => void) => void;
   onUpdate: (u: WreckUpdate) => void;
   className?: string;
@@ -101,7 +108,13 @@ export default function WreckCanvas({ className, ...props }: Props) {
 
       const scene = new Container();
       const flash = new Graphics();
-      created.stage.addChild(scene, flash);
+      // Same v2 sky + city as the climb, pinned to a sunset: no DOM layers under Pixi.
+      const sky = new SkyLayer([]);
+      const city = createCity();
+      created.stage.addChild(sky.container, city.container, scene, flash);
+      const sunset = skyAt(4);
+      // Frame the widest floor, whatever the words were (was a fixed 130px).
+      const towerRight = Math.max(...world.ids.map((id) => world.tower.blocks.get(id)?.bounds.max.x ?? 0), 130) + 24;
       const ground = new Graphics();
       const blocks = new Container();
       const rig = new Graphics();
@@ -141,12 +154,16 @@ export default function WreckCanvas({ className, ...props }: Props) {
         const h = created.renderer.height / created.renderer.resolution;
         const groundY = h * 0.8;
         const left = swingLeftPx(world) - 8;
-        const right = 130;
+        const right = towerRight;
         const top = world.pivot.y - 60;
         const scale = Math.min(1.6, (w - 24) / (right - left), (groundY - 90) / -top);
         scene.scale.set(scale);
         scene.x = w / 2 - ((left + right) / 2) * scale + shake.offset.x;
         scene.y = groundY + shake.offset.y;
+        sky.update({ w, h, ts, dt, sky: sunset, groundY: scene.y, scale, floorPx: BLOCK_HEIGHT_PX, reducedMotion: !!propsRef.current.reducedMotion });
+        const cityW = Math.ceil(w) + 120;
+        paintCity(city, `n${cityW}`, () => buildSkyline(7, cityW, 36, 100), { fill: 0x3b1f4f, edge: 0x0b0e1c, windowAlpha: 0.85 });
+        placeCity(city, -60 + shake.offset.x, scene.y, h, ts);
 
         const halfW = w / scale;
         if (groundKey !== `${halfW}|${scale}`) {
