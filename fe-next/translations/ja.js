@@ -13457,6 +13457,12 @@ const ja = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "無料プランのクラス上限に達しました。Proにアップグレードすると、クラスを無制限に作成できます。",
+    },
+    "lobby": {
+      "joinTitle": "ゲームに参加しよう",
+    },
     "homework": {
       "takeHomeToggle": "持ち帰り練習カード",
       "backToDashboard": "ダッシュボードに戻る",
@@ -14294,6 +14300,7 @@ const ja = {
       "yesterday": "昨日"
     },
     "classroomGame": {
+      "defaultClassroomName": "マイクラス",
       "questions": "問題数",
       "perQuestion": "1問あたり",
       "namePrompt": {
@@ -14343,6 +14350,7 @@ const ja = {
       "words": "{{count}}語"
     },
     "header": {
+      "exitEducation": "教育モードを終了",
       "breadcrumbs": {
         "analytics": "分析",
         "classroomGame": "クラスゲーム",
@@ -14829,6 +14837,22 @@ const ja = {
       "xpLabel": "XP"
     },
     "starterPacks": {
+      "beginnerRussian": {
+        "description": "初心者のための基本ロシア語単語",
+        "name": "初級ロシア語",
+      },
+      "beginnerJapanese": {
+        "description": "初心者のための基本日本語単語",
+        "name": "初級日本語",
+      },
+      "beginnerSwedish": {
+        "description": "初心者のための基本スウェーデン語単語",
+        "name": "初級スウェーデン語",
+      },
+      "beginnerSpanish": {
+        "description": "初心者のための基本スペイン語単語",
+        "name": "初級スペイン語",
+      },
       "academicVocab": {
         "name": "学術語彙",
         "description": "高度な学習者向けの学術語彙と分析用語"
@@ -14846,6 +14870,7 @@ const ja = {
       "useThisPack": "このパックを使う"
     },
     "lesson": {
+      "createdClassroom": "クラスを作成しました",
       "autoPronounce": "自動発音",
       "classicMode": "クラシックモード",
       "contextualExamples": "使用例",

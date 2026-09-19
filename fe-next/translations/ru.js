@@ -1452,6 +1452,12 @@ const ru = {
   "forfeitTitle": "Сдать поединок?",
   "duelComplete": "Поединок завершен!",
   "education": {
+    "subscription": {
+      "classLimitReached": "Вы достигли лимита бесплатных классов. Перейдите на Pro, чтобы создавать классы без ограничений.",
+    },
+    "lobby": {
+      "joinTitle": "Присоединяйтесь к игре",
+    },
     "homework": {
       "takeHomeToggle": "Карточка для практики дома",
       "backToDashboard": "Назад в панель учителя",
@@ -2281,6 +2287,7 @@ const ru = {
       "yesterday": "Вчера"
     },
     "classroomGame": {
+      "defaultClassroomName": "Мой класс",
       "questions": "Вопросы",
       "perQuestion": "На вопрос",
       "namePrompt": {
@@ -2747,6 +2754,7 @@ const ru = {
       }
     },
     "lesson": {
+      "createdClassroom": "Класс создан",
       "autoPronounce": "Авто-произношение",
       "classicMode": "Классический режим",
       "contextualExamples": "Примеры",

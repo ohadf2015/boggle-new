@@ -67,6 +67,15 @@ describe('ClassroomLiveLobby', () => {
     expect(screen.getByTestId('classroom-lobby-code')).toBeInTheDocument();
   });
 
+  it('renders a real, scannable QR that encodes the join link — never a placeholder box', () => {
+    render(<ClassroomLiveLobby gameCode="XJXEFN" socket={mockSocket} onStart={() => {}} />);
+
+    const qr = screen.getByTestId('classroom-lobby-qr');
+    expect(qr.getAttribute('data-join-url')).toBe(`${window.location.origin}/en/join/XJXEFN`);
+    expect(qr.querySelector('svg')).not.toBeNull();
+    expect(screen.queryByText('education.lobby.qrPlaceholder')).toBeNull();
+  });
+
   it('renders roster from socket updateUsers event', async () => {
     const { rerender } = render(
       <ClassroomLiveLobby

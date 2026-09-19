@@ -120,12 +120,6 @@ export default function PracticeModeSelector({
       colorClass: 'text-neo-pink',
       bgClass: 'bg-neo-pink/10 hover:bg-neo-pink/20',
     },
-    {
-      type: 'vocab_focus',
-      icon: <Crosshair className="w-8 h-8" />,
-      colorClass: 'text-neo-lime',
-      bgClass: 'bg-neo-lime/10 hover:bg-neo-lime/20',
-    },
   ];
 
   const getMasteryColor = (level: MasteryLevel) => {

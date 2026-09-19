@@ -141,6 +141,16 @@ describe('ClassroomGameHandler', () => {
           boardSize: gameData.settings.boardSize,
           allowLateJoin: undefined,
           gameMode: 'classic',
+          // Treasure chests default ON when the teacher did not choose.
+          treasureChestsEnabled: true,
+          // Unset optional settings are forwarded as undefined.
+          targetWord: undefined,
+          vocabQuizFocus: undefined,
+          vocabQuizQuestionCount: undefined,
+          vocabQuizSeconds: undefined,
+          playStyle: undefined,
+          teamCount: undefined,
+          accessibility: undefined,
         },
       });
       expect(mockSocket.join).toHaveBeenCalledWith(`classroom:${gameData.classroomId}`);

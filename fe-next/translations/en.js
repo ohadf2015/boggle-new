@@ -11987,6 +11987,12 @@ const en = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "You've reached the free class limit. Upgrade to Pro for unlimited classes.",
+    },
+    "lobby": {
+      "joinTitle": "Join the game",
+    },
     "homework": {
       "takeHomeToggle": "Take-home practice card",
       "backToDashboard": "Back to dashboard",
@@ -13282,6 +13288,7 @@ const en = {
       }
     },
     "lesson": {
+      "createdClassroom": "Classroom created",
       "autoPronounce": "Auto-Pronounce",
       "classicMode": "Classic Mode",
       "contextualExamples": "Examples",

@@ -13449,6 +13449,12 @@ const es = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "Has alcanzado el límite de clases gratuitas. Pásate a Pro para tener clases ilimitadas.",
+    },
+    "lobby": {
+      "joinTitle": "Únete al juego",
+    },
     "homework": {
       "takeHomeToggle": "Tarjeta de práctica para casa",
       "backToDashboard": "Volver al panel",
@@ -14286,6 +14292,7 @@ const es = {
       "yesterday": "Ayer"
     },
     "classroomGame": {
+      "defaultClassroomName": "Mi aula",
       "questions": "Preguntas",
       "perQuestion": "Por pregunta",
       "namePrompt": {
@@ -14751,6 +14758,7 @@ const es = {
       }
     },
     "lesson": {
+      "createdClassroom": "Aula creada",
       "autoPronounce": "Auto-pronunciar",
       "classicMode": "Modo clásico",
       "contextualExamples": "Ejemplos",

@@ -13691,6 +13691,12 @@ const sv = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "Du har nått gränsen för gratisklasser. Uppgradera till Pro för obegränsat antal klasser.",
+    },
+    "lobby": {
+      "joinTitle": "Gå med i spelet",
+    },
     "homework": {
       "takeHomeToggle": "Övningskort att ta hem",
       "backToDashboard": "Tillbaka till panelen",
@@ -14528,6 +14534,7 @@ const sv = {
       "yesterday": "Igår"
     },
     "classroomGame": {
+      "defaultClassroomName": "Mitt klassrum",
       "questions": "Frågor",
       "perQuestion": "Per fråga",
       "namePrompt": {
@@ -14577,6 +14584,7 @@ const sv = {
       "words": "{{count}} ord"
     },
     "header": {
+      "exitEducation": "Lämna utbildningsläget",
       "breadcrumbs": {
         "analytics": "Statistik",
         "classroomGame": "Klassrumsspel",
@@ -14959,6 +14967,22 @@ const sv = {
       "wordsFound": "Hittade ord"
     },
     "starterPacks": {
+      "beginnerRussian": {
+        "description": "Viktiga ryska ord för nybörjare",
+        "name": "Ryska för nybörjare",
+      },
+      "beginnerJapanese": {
+        "description": "Viktiga japanska ord för nybörjare",
+        "name": "Japanska för nybörjare",
+      },
+      "beginnerSwedish": {
+        "description": "Viktiga svenska ord för nybörjare",
+        "name": "Svenska för nybörjare",
+      },
+      "beginnerSpanish": {
+        "description": "Viktiga spanska ord för nybörjare",
+        "name": "Spanska för nybörjare",
+      },
       "title": "Startpaket",
       "subtitle": "Färdiga ordsamlingar",
       "useThisPack": "Använd det här paketet",
@@ -14976,6 +15000,7 @@ const sv = {
       }
     },
     "lesson": {
+      "createdClassroom": "Klassrummet har skapats",
       "autoPronounce": "Automatisk uttal",
       "classicMode": "Klassiskt läge",
       "contextualExamples": "Exempel",

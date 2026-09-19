@@ -88,7 +88,7 @@ export function PricingCards({
 
         <Button
           disabled
-          className="w-full bg-neo-black/40 text-white font-black border-2 border-black cursor-not-allowed"
+          className="w-full bg-neo-cream text-neo-black/70 font-black border-2 border-black cursor-not-allowed"
         >
           {t('teacher.subscription.currentPlan')}
         </Button>

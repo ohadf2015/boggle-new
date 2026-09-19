@@ -13311,6 +13311,12 @@ const he = {
     }
   },
   "education": {
+    "subscription": {
+      "classLimitReached": "הגעתם למגבלת הכיתות בחינם. שדרגו ל-Pro לכיתות ללא הגבלה.",
+    },
+    "lobby": {
+      "joinTitle": "הצטרפו למשחק",
+    },
     "homework": {
       "takeHomeToggle": "כרטיס תרגול לקחת הביתה",
       "backToDashboard": "חזרה ללוח המורה",
@@ -14148,6 +14154,7 @@ const he = {
       "yesterday": "אתמול"
     },
     "classroomGame": {
+      "defaultClassroomName": "הכיתה שלי",
       "questions": "שאלות",
       "perQuestion": "לכל שאלה",
       "namePrompt": {
@@ -14197,6 +14204,7 @@ const he = {
       "words": "{{count}} מילים"
     },
     "header": {
+      "exitEducation": "יציאה מאזור החינוך",
       "breadcrumbs": {
         "analytics": "אנליטיקה",
         "classroomGame": "משחק כיתתי",
@@ -14579,6 +14587,22 @@ const he = {
       "wordsFound": "מילים שנמצאו"
     },
     "starterPacks": {
+      "beginnerRussian": {
+        "description": "מילים בסיסיות ברוסית למתחילים",
+        "name": "רוסית למתחילים",
+      },
+      "beginnerJapanese": {
+        "description": "מילים בסיסיות ביפנית למתחילים",
+        "name": "יפנית למתחילים",
+      },
+      "beginnerSwedish": {
+        "description": "מילים בסיסיות בשוודית למתחילים",
+        "name": "שוודית למתחילים",
+      },
+      "beginnerSpanish": {
+        "description": "מילים בסיסיות בספרדית למתחילים",
+        "name": "ספרדית למתחילים",
+      },
       "title": "חבילות התחלה",
       "subtitle": "סטים מוכנים של אוצר מילים",
       "useThisPack": "השתמש בחבילה",
@@ -14596,6 +14620,7 @@ const he = {
       }
     },
     "lesson": {
+      "createdClassroom": "הכיתה נוצרה",
       "autoPronounce": "הגייה אוטומטית",
       "classicMode": "מצב קלאסי",
       "contextualExamples": "דוגמאות",

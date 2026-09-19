@@ -13,6 +13,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Zap } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import type { Socket } from 'socket.io-client';
 import type { Avatar } from '@/shared/types/game';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -34,7 +35,8 @@ interface Player {
 }
 
 export function ClassroomLiveLobby({ gameCode, socket, onStart }: ClassroomLiveLobbyProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const joinUrl = typeof window === 'undefined' ? '' : `${window.location.origin}/${language}/join/${gameCode}`;
   const [playersInRoom, setPlayersInRoom] = useState<Player[]>([]);
 
   // Listen to socket updateUsers event to sync roster
@@ -81,11 +83,16 @@ export function ClassroomLiveLobby({ gameCode, socket, onStart }: ClassroomLiveL
           </div>
         </div>
 
-        {/* QR code placeholder - will be replaced with actual QR generation */}
-        <div className="mb-6 rounded-neo border-2 border-neo-cream bg-neo-cream p-4">
-          <div className="w-32 h-32 flex items-center justify-center text-xs text-black font-bold">
-            {t('education.lobby.qrPlaceholder', 'QR Code')}
-          </div>
+        {/* Scan-to-join QR — same link the projector panel encodes */}
+        <div
+          data-testid="classroom-lobby-qr"
+          data-join-url={joinUrl}
+          className="mb-6 flex flex-col items-center gap-2 rounded-neo border-4 border-neo-black bg-neo-cream p-3 shadow-hard-lg"
+        >
+          <QRCodeSVG value={joinUrl} size={256} level="M" bgColor="#ffffff" fgColor="#000000" title={t('education.projectorLobby.scanToJoin')} className="size-32 md:size-40" />
+          <span className="font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy">
+            {t('education.projectorLobby.scanToJoin')}
+          </span>
         </div>
       </div>
 
