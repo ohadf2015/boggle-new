@@ -1,6 +1,132 @@
 {
-  "generatedAt": "2026-09-19T09:00:41.976Z",
+  "generatedAt": "2026-09-19T13:32:18.800Z",
   "commits": [
+    {
+      "sha": "df4bcac65b0bff4124c583f60e71babfe4909d7a",
+      "shortSha": "df4bcac",
+      "subject": "grok: Fix two user-reported bugs on the LexiClash mobile home hub (repo bogg (#1087)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T17:11:12+04:00"
+    },
+    {
+      "sha": "808e07800c6dacb749daf0233c3920bc4d219d93",
+      "shortSha": "808e078",
+      "subject": "fix(adventure): Russian word checks, prune dead adventure keys and assets",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T15:59:13+03:00"
+    },
+    {
+      "sha": "743f71b6fcdec4d4f9095ae239593c0681e5b235",
+      "shortSha": "743f71b",
+      "subject": "fix(nightly): unblock the gate — OOM heap, baseline check, bisect, restore, retry, spend cap",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T14:47:25+03:00"
+    },
+    {
+      "sha": "0c6356be7ddb213fdc9209ec51f2b81c4a51bd9f",
+      "shortSha": "0c6356b",
+      "subject": "feat(education): close classroom gaps + teacher What's new",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T14:00:03+03:00"
+    },
+    {
+      "sha": "15628813515a24b87a2efc79fe16b729aa3158b6",
+      "shortSha": "1562881",
+      "subject": "feat: land nightly 2026-09-19 salvage (dropped by an OOM gate)",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T14:19:42+03:00"
+    },
+    {
+      "sha": "26f60b89aff0ef63a1b6aed9fa8af2104a5ea8b0",
+      "shortSha": "26f60b8",
+      "subject": "fix(i18n): landing first-paint subset drops mode-card and nav keys",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T14:16:49+03:00"
+    },
+    {
+      "sha": "cc6862cb479c06f38815bee88e001fbd950b17a4",
+      "shortSha": "cc6862c",
+      "subject": "fix(education): student report metrics read a table that never existed",
+      "author": "Ohad Fisher",
+      "date": "2026-09-17T11:14:34+03:00"
+    },
+    {
+      "sha": "bec7792862c3a4b97c06ec07e1588cf09cc6467c",
+      "shortSha": "bec7792",
+      "subject": "fix(sentry): stale howler listeners, unregistered NOT_IN_GAME code, pulse loading key",
+      "author": "Ohad Fisher",
+      "date": "2026-09-17T10:54:09+03:00"
+    },
+    {
+      "sha": "337893446488948af651d94415d144daed2c037a",
+      "shortSha": "3378934",
+      "subject": "feat(adventure): rebuild adventure on the classic board with world skins (#1086)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T15:07:44+04:00"
+    },
+    {
+      "sha": "3a8644e220cf01a29df41aef7e8e814578b79428",
+      "shortSha": "3a8644e",
+      "subject": "feat(edu): surface ReteachActions on TV recap for classroom hosts (#1080)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T15:00:11+04:00"
+    },
+    {
+      "sha": "ed1727c57d8b2aa4c66b7adba38cbd6ba5507741",
+      "shortSha": "ed1727c",
+      "subject": "fix(word-tower-v2): strip emoji from the rival-tower share text",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T13:32:42+03:00"
+    },
+    {
+      "sha": "b3200180f582e4a1902a07f26ec3f3a9f3703811",
+      "shortSha": "b320018",
+      "subject": "test(edu): give the TV phone-layout quiz fixture the treasure-chest fields",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T12:36:27+03:00"
+    },
+    {
+      "sha": "3ba74f62c9106349c349ead88ac64b648b7ac47e",
+      "shortSha": "3ba74f6",
+      "subject": "feat(word-tower-v2): truthful drop guide, bigger blocks, neon city backdrop, wrecking-ball smash round",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T12:16:40+03:00"
+    },
+    {
+      "sha": "d630dcb7adb9ad90cf3e65172ee834e40db87128",
+      "shortSha": "d630dcb",
+      "subject": "feat(education): edu-fun gauntlet — nav, join, juice, lobby, chests, results, word craft, content, pro (#1084)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T13:14:17+04:00"
+    },
+    {
+      "sha": "d537e943f34b04e704fef38d788b4bc33ad0bc3a",
+      "shortSha": "d537e94",
+      "subject": "fix(edu): make classroom TV mode usable on a phone",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T11:44:34+03:00"
+    },
+    {
+      "sha": "446a03c3be0885043ae3350f1bef5256339c07cb",
+      "shortSha": "446a03c",
+      "subject": "perf(landing): AvatarLite + 77KiB i18n subset off /en first paint (#1083)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T12:31:12+04:00"
+    },
+    {
+      "sha": "714f143014e45398b0f67f90cf6fa9800f05e68d",
+      "shortSha": "714f143",
+      "subject": "seo: daily meta tag improvements (2026-09-19) (#1081)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T11:33:07+04:00"
+    },
+    {
+      "sha": "a6baa8ea71015c3e85fe4f38bb7bd10e18459db7",
+      "shortSha": "a6baa8e",
+      "subject": "feat(edu): surface classroom join link and first-assignment nudge (#1082)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T11:33:04+04:00"
+    },
     {
       "sha": "243ab43ef47b9905be502b5c6a6198fb04fd4f2c",
       "shortSha": "243ab43",
@@ -14,132 +140,6 @@
       "subject": "chore(nightly): autonomous improvement loop 2026-09-19",
       "author": "Ohad Fisher",
       "date": "2026-09-19T04:37:55+03:00"
-    },
-    {
-      "sha": "a124c41cb18e64ae78df9f6edfca2896e1481460",
-      "shortSha": "a124c41",
-      "subject": "fix(word-tower-v2): make every sky reachable in a real run",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T01:29:32+03:00"
-    },
-    {
-      "sha": "2677c4095bbb3d3ac78392d46f49d99f9f510cb4",
-      "shortSha": "2677c40",
-      "subject": "feat(word-tower-v2): swipe wheel, throw arc, gold surprise blocks and solid dock",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T01:15:11+03:00"
-    },
-    {
-      "sha": "a6591403ebeedcd3d4c9ddfe78aeeb69f3d34d5b",
-      "shortSha": "a659140",
-      "subject": "feat(word-tower-v2): altitude, landing and run modules with new HUD and backdrop",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T01:01:13+03:00"
-    },
-    {
-      "sha": "cb58084693bf1e2fdda73abcabb9066a93a7b410",
-      "shortSha": "cb58084",
-      "subject": "fix(blast): readable tile letters",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T00:40:36+03:00"
-    },
-    {
-      "sha": "f5709f668f6d84dd024319d9b21fa3e60907f835",
-      "shortSha": "f5709f6",
-      "subject": "fix(word-tower-v2): make words hoistable and frame the tower at every viewport",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T23:40:26+03:00"
-    },
-    {
-      "sha": "2c125b149566fbd0d58f18d343d4867623d62afb",
-      "shortSha": "2c125b1",
-      "subject": "fix(share): strip emoji at every navigator.share call site",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T17:42:26+03:00"
-    },
-    {
-      "sha": "a247a9f68848e325b98c4100a6fea3813bc7b458",
-      "shortSha": "a247a9f",
-      "subject": "fix(word-tower): restore v1 as the /word-tower mode",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T17:32:55+03:00"
-    },
-    {
-      "sha": "b8e5aaaeb93c1f3d1537e54be1f56812cdcca546",
-      "shortSha": "b8e5aaa",
-      "subject": "fix(word-tower): fix camera panning making swinging block invisible and bouncing on drops",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T17:23:56+03:00"
-    },
-    {
-      "sha": "cce862d7776f7b87918b1feb2850d720b58e9b62",
-      "shortSha": "cce862d",
-      "subject": "fix(share): shares never carry emoji",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T17:13:58+03:00"
-    },
-    {
-      "sha": "e223398ea031976e3c1362927746b2032811d70a",
-      "shortSha": "e223398",
-      "subject": "chore(skills): add apple-design agent skill",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T17:01:17+03:00"
-    },
-    {
-      "sha": "cbdea4fd8efdcadb9574ab3b66226836f13925f8",
-      "shortSha": "cbdea4f",
-      "subject": "Merge remote-tracking branch 'origin/master' into feat/share-challenge-links",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T15:22:17+03:00"
-    },
-    {
-      "sha": "03a7da1a639ea92c965eac504b8a0c756d31e8f9",
-      "shortSha": "03a7da1",
-      "subject": "fix(word-tower): refine block visuals, tame screen shake, and stabilize camera",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T14:40:24+03:00"
-    },
-    {
-      "sha": "a314d5f694b340031fc9419a9b76c3e1e0f7b4bc",
-      "shortSha": "a314d5f",
-      "subject": "Merge remote-tracking branch 'origin/master' into feat/share-challenge-links",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T14:38:40+03:00"
-    },
-    {
-      "sha": "ffcd7dcf3621440c468b8374394764b73687b822",
-      "shortSha": "ffcd7dc",
-      "subject": "fix(connections): Hebrew keyboard layout, steady slot cursor, reactive mascot; guard game keydown handlers",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T14:12:30+03:00"
-    },
-    {
-      "sha": "9ecd5c6b36d95990f663208189880c385bd34ba8",
-      "shortSha": "9ecd5c6",
-      "subject": "fix(share): hand native share the challenge link as its url field",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T13:40:46+03:00"
-    },
-    {
-      "sha": "c098936c625f13b55639463c79a1b18f1fcc668c",
-      "shortSha": "c098936",
-      "subject": "feat(boards): weight English letters by frequency",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T13:37:29+03:00"
-    },
-    {
-      "sha": "11fa451f03a7caa8d04ed38d80bb7a1df0da392e",
-      "shortSha": "11fa451",
-      "subject": "fix(share): daily result share links to the same puzzle, not the homepage",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T13:33:15+03:00"
-    },
-    {
-      "sha": "eee2a69414dfbde50333886f383e9acc9a8a4e8b",
-      "shortSha": "eee2a69",
-      "subject": "test(word-tower): fix failing page client tests for v2 replacement",
-      "author": "Ohad Fisher",
-      "date": "2026-09-18T13:22:24+03:00"
     }
   ]
 }

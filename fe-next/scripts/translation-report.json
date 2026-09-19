@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6645,
+    "totalKeysInCode": 6646,
     "keyCountByLanguage": {
-      "en": 12778,
-      "es": 13066,
-      "he": 12988,
-      "ja": 13047,
-      "ru": 12820,
-      "sv": 13044
+      "en": 12779,
+      "es": 13067,
+      "he": 12989,
+      "ja": 13048,
+      "ru": 12821,
+      "sv": 13045
     },
     "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
@@ -1486,7 +1486,7 @@
         "pattern": "`landing.home.titles.${titleKey}`",
         "type": "template_literal",
         "file": "components/landing/home/HomeTopBar.tsx",
-        "line": 100,
+        "line": 103,
         "context": "const title = titleKey ? t(`landing.home.titles.${titleKey}`, humanizeTitleKey(titleKey)) : null;"
       },
       {
@@ -2270,28 +2270,28 @@
         "pattern": "`wordTower.crane.${verdict.quality}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Hud.tsx",
-        "line": 121,
+        "line": 133,
         "context": "{t(`wordTower.crane.${verdict.quality}`)}"
       },
       {
         "pattern": "`wordTower.surprise.${TOWER_SURPRISE_META[pop.event].key}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Hud.tsx",
-        "line": 133,
+        "line": 145,
         "context": "{t(`wordTower.surprise.${TOWER_SURPRISE_META[pop.event].key}`)}"
       },
       {
         "pattern": "`wordTower.biome.${zoneShown.id}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Hud.tsx",
-        "line": 153,
+        "line": 165,
         "context": "<span className=\"font-neo-display text-2xl font-black\">{t(`wordTower.biome.${zoneShown.id}`)}</span>"
       },
       {
         "pattern": "`wordTower.error.${rejected}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/WordTowerV2.tsx",
-        "line": 293,
+        "line": 332,
         "context": "{t(`wordTower.error.${rejected}`)}"
       },
       {
