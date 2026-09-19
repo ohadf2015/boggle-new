@@ -6,9 +6,10 @@
  * drop. The reward stays on the screen and changes how the rest of the run plays.
  */
 
-export const BLOCK_HEIGHT_PX = 34;
+/** Was 34 — blocks read as thin slivers on a phone. */
+export const BLOCK_HEIGHT_PX = 46;
 
-const MIN_BLOCK_WIDTH_PX = 64;
+const MIN_BLOCK_WIDTH_PX = 96;
 const WIDTH_PER_LETTER_PX = 14;
 /** Beyond this, extra letters stop widening the block. */
 const MAX_WORD_LETTERS = 12;

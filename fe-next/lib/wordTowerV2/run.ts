@@ -25,6 +25,9 @@ const GOOD_BONUS = 10;
 const COMBO_CAP = 8;
 const POINTS_PER_BONUS_M = 100;
 const MAX_WIDTH_MULT = 1.5;
+/** Wrecking balls: two to start, one per 3-perfect streak step, capped. */
+export const MAX_BALLS = 5;
+const BALL_EVERY_COMBO = 3;
 
 export interface RunState {
   seed: number;
@@ -36,6 +39,8 @@ export interface RunState {
   wordsSinceSurprise: number;
   /** Width multiplier waiting for the next spawned block. 1 = none. */
   nextWidthMult: number;
+  /** Wrecking balls banked for the smash round. */
+  balls: number;
 }
 
 export interface SurprisePayout {
@@ -55,6 +60,7 @@ export function createRun(seed: number): RunState {
     scrambles: WORD_TOWER_SCRAMBLES_START,
     wordsSinceSurprise: 0,
     nextWidthMult: 1,
+    balls: 2,
   };
 }
 
@@ -110,6 +116,7 @@ export function applyLanding(
     scrambles: prev.scrambles + (surprise?.scrambles ?? 0),
     wordsSinceSurprise: surprise ? 0 : prev.wordsSinceSurprise + 1,
     nextWidthMult: Math.min(MAX_WIDTH_MULT, surprise && surprise.widthMult > 1 ? surprise.widthMult : prev.nextWidthMult),
+    balls: Math.min(MAX_BALLS, prev.balls + (perfect && combo % BALL_EVERY_COMBO === 0 ? 1 : 0)),
   };
 
   return { run, points, surprise };

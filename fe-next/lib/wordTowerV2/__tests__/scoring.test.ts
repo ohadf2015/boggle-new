@@ -41,6 +41,6 @@ describe('scoreFromHeightM', () => {
 
 describe('BLOCK_HEIGHT_PX', () => {
   it('given the block height, when read, then it matches the physics tests', () => {
-    expect(BLOCK_HEIGHT_PX).toBe(34);
+    expect(BLOCK_HEIGHT_PX).toBe(46);
   });
 });

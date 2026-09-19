@@ -462,6 +462,23 @@ const ja = {
     "issueProbe": {"prompt": "なぜそう感じましたか？", "botsStrong": "ボットが強すぎる", "technical": "技術的な問題"}
   },
   "wordTowerV2": {
+    "unitM": "m",
+    "wreck": {
+      "smash": "{name}のタワーを壊す",
+      "smashOwn": "自分のタワーを壊す",
+      "title": "{name}のタワー",
+      "titleOwn": "あなたのタワー",
+      "cut": "発射！",
+      "balls": "鉄球 {n}個",
+      "crash": "ドカーン！",
+      "result": "{total}個中{n}個を崩した！",
+      "share": "友だちに挑戦",
+      "shareText": "ワードタワーが{m}mに到達！壊せるかな？",
+      "copied": "リンクをコピーしました！",
+      "challenge": "{name}からの挑戦状！パーフェクトで鉄球ゲット。最後にタワーを壊そう。",
+      "friend": "友だち",
+      "back": "もう一回",
+    },
     "cardTitle": "ワードタワー v2",
     "cardDesc": "本物の物理演算 — ベータ版",
     "collapsed": "タワー崩壊！",
