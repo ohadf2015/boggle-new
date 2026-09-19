@@ -4,7 +4,7 @@
  */
 
 import { STROKE_INNER } from './avatarDesignConstants';
-import { useAvatarUid } from '../AvatarUidContext';
+import { useAvatarUid } from '../avatarRenderValues';
 
 const S = STROKE_INNER;
 

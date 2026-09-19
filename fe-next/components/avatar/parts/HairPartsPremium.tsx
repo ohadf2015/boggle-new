@@ -5,7 +5,7 @@
  */
 
 import { HairPartProps, S } from './hairShared';
-import { useAvatarUid } from '../AvatarUidContext';
+import { useAvatarUid } from '../avatarRenderValues';
 
 function LongFlowBack({ fill }: HairPartProps) {
   const u = useAvatarUid();

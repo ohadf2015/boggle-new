@@ -4,7 +4,7 @@
  */
 
 import { STROKE_INNER, STROKE_OUTER } from './avatarDesignConstants';
-import { useAvatarUid } from '../AvatarUidContext';
+import { useAvatarUid } from '../avatarRenderValues';
 import { ACCESSORY_PARTS_PREMIUM } from './AccessoryPartsPremium';
 
 /** Most accessories use inner stroke; head accessories (hats, crowns) use outer */

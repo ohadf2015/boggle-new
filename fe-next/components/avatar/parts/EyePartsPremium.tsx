@@ -6,8 +6,7 @@
  */
 
 import { STROKE_INNER } from './avatarDesignConstants';
-import { useAvatarUid } from '../AvatarUidContext';
-import { useEyeColor, useEyeColorDark } from '../AvatarEyeColorContext';
+import { useAvatarUid, useEyeColor, useEyeColorDark } from '../avatarRenderValues';
 import { RimLight } from './sharedShading';
 
 const S = STROKE_INNER;

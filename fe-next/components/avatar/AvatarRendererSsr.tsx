@@ -1,7 +1,6 @@
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { darken } from './parts/avatarDesignConstants';
-import AvatarUidContext from './AvatarUidContext';
-import AvatarEyeColorContext from './AvatarEyeColorContext';
+import { setSsrAvatarValues } from './avatarRenderValues';
 import { BASE_PARTS } from './parts/BaseParts';
 import { EYE_PARTS } from './parts/EyeParts';
 import { MOUTH_PARTS } from './parts/MouthParts';
@@ -64,9 +63,11 @@ export default function AvatarRendererSsr({ config, size = 256, circular = true 
   const showDepth = !SKIP_BLUSH_BASES.has(config.base);
   const skinShadow = darken(config.skinColor, 0.3);
 
+  // No Providers: this renders in the react-server layer (the PNG route), where
+  // the 'use client' contexts are client references. See avatarRenderValues.
+  setSsrAvatarValues(uid, config.eyeColor || '#4A6FA5');
+
   return (
-    <AvatarUidContext.Provider value={uid}>
-    <AvatarEyeColorContext.Provider value={config.eyeColor || '#4A6FA5'}>
     <svg
       viewBox="0 0 100 100"
       width={size}
@@ -157,7 +158,5 @@ export default function AvatarRendererSsr({ config, size = 256, circular = true 
       {!isBackStyle && config.hair !== 'none' && <HairPart fill={config.hairColor} />}
       {!isBackAccessory && <AccessoryPart fill={config.accessoryColor} />}
     </svg>
-    </AvatarEyeColorContext.Provider>
-    </AvatarUidContext.Provider>
   );
 }

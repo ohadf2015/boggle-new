@@ -16,7 +16,7 @@
  */
 
 import { STROKE_OUTER } from './avatarDesignConstants';
-import { useAvatarUid } from '../AvatarUidContext';
+import { useAvatarUid } from '../avatarRenderValues';
 import { BASE_PARTS_PREMIUM } from './BasePartsPremium';
 
 const S = STROKE_OUTER;

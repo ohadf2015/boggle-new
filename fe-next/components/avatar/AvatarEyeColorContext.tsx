@@ -1,21 +1,11 @@
 'use client';
 
-import { createContext, useContext } from 'react';
-import { darken } from './parts/avatarDesignConstants';
+import { createContext } from 'react';
+import { DEFAULT_EYE_COLOR, registerAvatarEyeColorContext } from './avatarRenderValues';
 
-const DEFAULT_EYE_COLOR = '#4A6FA5';
-
+// Parts read it through avatarRenderValues — see AvatarUidContext.
 const AvatarEyeColorContext = createContext<string>(DEFAULT_EYE_COLOR);
+registerAvatarEyeColorContext(AvatarEyeColorContext);
 
-/** Get the current eye/iris color. Returns default blue if outside provider. */
-export function useEyeColor(): string {
-  return useContext(AvatarEyeColorContext);
-}
-
-/** Get a darker shade of the eye color for depth effect. */
-export function useEyeColorDark(): string {
-  const color = useContext(AvatarEyeColorContext);
-  return darken(color, 0.25);
-}
-
+export { useEyeColor, useEyeColorDark } from './avatarRenderValues';
 export default AvatarEyeColorContext;

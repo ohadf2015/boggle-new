@@ -4,7 +4,7 @@
  */
 
 import { STROKE_INNER } from './avatarDesignConstants';
-import { useEyeColor, useEyeColorDark } from '../AvatarEyeColorContext';
+import { useEyeColor, useEyeColorDark } from '../avatarRenderValues';
 
 const S = STROKE_INNER;
 

@@ -1,5 +1,5 @@
 /** Femme-only hair styles — bows, ribbons, clips, princess braids. See hairShared.tsx for props + helpers. */
-import { useAvatarUid } from '../AvatarUidContext';
+import { useAvatarUid } from '../avatarRenderValues';
 import { HairPartProps, HairPolishDefs, HairPolish, S } from './hairShared';
 
 const BOW = '#FF6FA5';

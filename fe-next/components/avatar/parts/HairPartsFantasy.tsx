@@ -1,5 +1,5 @@
 /** Back hair variants — see hairShared.tsx for props + helpers. */
-import { useAvatarUid } from '../AvatarUidContext';
+import { useAvatarUid } from '../avatarRenderValues';
 import { HairPartProps, HairPolishDefs, HairPolish, S, CrownHighlight } from './hairShared';
 
 function FlameHair({ fill }: HairPartProps) {

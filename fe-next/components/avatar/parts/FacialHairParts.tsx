@@ -6,7 +6,7 @@
  */
 
 import { STROKE_DETAIL } from './avatarDesignConstants';
-import { useAvatarUid } from '../AvatarUidContext';
+import { useAvatarUid } from '../avatarRenderValues';
 
 const S = STROKE_DETAIL;
 
