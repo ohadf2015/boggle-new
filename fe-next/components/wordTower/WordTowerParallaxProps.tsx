@@ -209,10 +209,12 @@ function BiomeEventEmitter({ heightM = 0, reducedMotion = false }: { heightM?: n
   const countRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
+  // Keyed on the BIOME, not raw height: height moves every landing, and each
+  // re-run tore down the interval and fired schedule() again.
+  const biome = biomeBlendAt(heightM).fromId;
   useEffect(() => {
     if (reducedMotion) return;
 
-    const biome = biomeBlendAt(heightM).fromId;
     const themeData = BIOME_THEME[biome];
     const eventTypes = themeData.eventTypes || [];
     const intervalMs = themeData.eventIntervalMs || 10000;
@@ -234,7 +236,7 @@ function BiomeEventEmitter({ heightM = 0, reducedMotion = false }: { heightM?: n
     intervalRef.current = setInterval(schedule, intervalMs);
 
     return () => { clearInterval(intervalRef.current); };
-  }, [heightM, reducedMotion]);
+  }, [biome, reducedMotion]);
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
@@ -257,14 +259,24 @@ function BiomeEventEmitter({ heightM = 0, reducedMotion = false }: { heightM?: n
  * plane flybys, etc). A pure DOM layer (NOT Pixi — avoids the v8 strict-mode
  * canvas race) sitting behind the transparent Pixi canvas. Inert + reduced-motion safe.
  */
-export function WordTowerParallaxProps({ heightM = 0, reducedMotion = false }: { heightM?: number; reducedMotion?: boolean }) {
+export function WordTowerParallaxProps({
+  heightM = 0,
+  reducedMotion = false,
+  themed = true,
+}: {
+  heightM?: number;
+  reducedMotion?: boolean;
+  /** False shows every prop in its altitude window. v2 runs cross a biome every
+   *  few blocks, so the per-biome whitelist hid most of the art. */
+  themed?: boolean;
+}) {
   const biome = biomeBlendAt(heightM).fromId;
   const themeData = BIOME_THEME[biome];
   const nativePropIds = new Set(themeData.nativePropIds || []);
 
   const allActive = visiblePropsAt(heightM);
   // Filter to keep native props (if specified) + generic props always visible
-  const active = nativePropIds.size > 0 ? allActive.filter((p) => nativePropIds.has(p.id)) : allActive;
+  const active = themed && nativePropIds.size > 0 ? allActive.filter((p) => nativePropIds.has(p.id)) : allActive;
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>

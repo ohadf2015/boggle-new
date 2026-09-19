@@ -86,6 +86,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
   groundInsetPx,
   band = 'sky',
   panning = false,
+  city = true,
 }: {
   biomeId: WordTowerBiomeId;
   heightM?: number;
@@ -100,6 +101,10 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
    *  during a drag, so a long transition just restarts forever and every depth
    *  chases a target it never reaches (reads as the backdrop tearing apart). */
   panning?: boolean;
+  /** False when the host draws its own ground-locked city (Word Tower v2 does,
+   *  in Pixi, on the same camera as the tower) — two cities on two cameras
+   *  never share a floor. */
+  city?: boolean;
 }) {
   const b = biomeBackdrop(biomeId);
   const theme = BIOME_THEME[biomeId];
@@ -288,7 +293,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
       </div>
       )}
 
-      {isFront && (
+      {isFront && city && (
         <>
           {/* Near city skyline — darker silhouette in front. Faster parallax. */}
           <svg
@@ -319,7 +324,11 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
               transition: flow,
             }}
           />
+        </>
+      )}
 
+      {isFront && (
+        <>
           {/* Edge vignette — stronger in deep biomes for graphic immersion.
               MUST stay screen-locked: a vignette whose centre pans away from the
               screen centre stops being a lens effect and reads as a dark blob

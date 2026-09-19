@@ -83,8 +83,9 @@ describe('timing windows (5-letter word on a 5-letter tower)', () => {
 describe('block size on screen', () => {
   it('given a phone, when framed, then a 5-letter block is big and tappable-looking', () => {
     const { scale } = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 0 });
-    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(40);
-    expect(blockWidthForWord('tower') * scale).toBeGreaterThanOrEqual(150);
+    // Round 4: 43px / 155px still read as small next to the wheel.
+    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(54);
+    expect(blockWidthForWord('tower') * scale).toBeGreaterThanOrEqual(175);
   });
 
   it('given a desktop, when framed, then blocks grow to use the space', () => {

@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 import { PX_PER_M, type TowerWorld, snapshotWorld, stepWorld } from '@/lib/wordTowerV2/engine';
 import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc } from '@/lib/wordTowerV2/crane';
 import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
-import { rulerTicks } from '@/lib/wordTowerV2/scenery';
+import { buildSkyline, rulerTicks } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
 import { frameCamera } from '@/lib/wordTowerV2/camera';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
@@ -27,12 +27,14 @@ import {
   setBlockGold,
   tickBlock,
 } from './towerArt';
+import { createCity, paintCity, placeCity } from './skylineArt';
 
 /**
  * Pixi renderer + the rAF loop that drives the fixed-timestep world.
  *
  * The canvas is TRANSPARENT: v1's DOM sky (gradient, parallax, sightings) sits
- * behind it. Pixi owns only what physics owns — blocks, crane, ground, FX.
+ * behind it. Pixi owns everything that must line up with the ground — blocks,
+ * crane, ground, FX, and the city standing on that ground.
  *
  * ponytail: no interpolation. Physics runs at 120Hz and displays run at 60-120Hz,
  * so there is always at least one fresh substep per frame.
@@ -73,6 +75,10 @@ interface Props {
   rulerSide: 'left' | 'right';
   onFrameStats?: (stats: FrameStats) => void;
   onBeforeStep?: (nowMs: number) => void;
+  /** First contact of a falling block (Matter speed), for the landing thunk. */
+  onImpact?: (speed: number) => void;
+  /** Settled height, quantized (m) — the far city sinks away with it. */
+  getSceneM?: () => number;
   className?: string;
 }
 
@@ -128,7 +134,9 @@ export default function TowerCanvas(props: Props) {
 
       const scene = new Container();
       const flash = new Graphics();
-      created.stage.addChild(scene, flash);
+      const farCity = createCity();
+      const nearCity = createCity();
+      created.stage.addChild(farCity.container, nearCity.container, scene, flash);
 
       const ruler = new Graphics();
       const rulerLayer = new Container();
@@ -164,9 +172,13 @@ export default function TowerCanvas(props: Props) {
         const snap = snapshotWorld(world);
         const byId = new Map(snap.blocks.map((b) => [b.id, b]));
 
+        let hardest = 0;
         for (const impact of world.pendingImpacts) {
           // Micro-vibrations (speed <= 4) are ignored; heavy impacts get juice.
           if (impact.speed <= 4) continue;
+          hardest = Math.max(hardest, impact.speed);
+          const hit = views.get(impact.id);
+          if (hit) hit.squash = Math.min(1, impact.speed / 12);
           shake.shake({ intensity: Math.min(12, impact.speed * 0.4), duration: 0.25, decay: 'exponential' });
           const block = byId.get(impact.id);
           if (!block) continue;
@@ -174,6 +186,8 @@ export default function TowerCanvas(props: Props) {
           particles.burst(TOWER_DUST, block.x, impactY, 8);
           if (impact.speed > 10) particles.burst(RUBBLE_BURST, block.x, impactY, 8);
         }
+
+        if (hardest > 0) p.onImpact?.(hardest);
 
         for (const fx of p.fxQueue.splice(0)) {
           if (fx.kind === 'collapse') {
@@ -210,13 +224,25 @@ export default function TowerCanvas(props: Props) {
 
         const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: snap.towerHeightM });
         const { scale } = frame;
-        cameraY += (frame.cameraY - cameraY) * 0.08;
+        // Frame-rate independent ease (a fixed 0.08/frame ran 2x faster at 120Hz).
+        cameraY += (frame.cameraY - cameraY) * (1 - Math.exp(-dt * 5));
 
         scene.scale.set(scale);
         scene.x = w / 2 + shake.offset.x;
         scene.y = frame.groundScreenY + cameraY + shake.offset.y;
 
         const halfW = w / 2 / scale;
+
+        // The near city stands exactly on the ground line; the far one trails
+        // at half speed, so climbing reads as depth, not as the city sliding.
+        const cityW = Math.ceil(w) + 120;
+        paintCity(farCity, `f${cityW}`, () => buildSkyline(41, cityW, 70, 160), { fill: 0x2a2f5a, edge: 0x2a2f5a, windowAlpha: 0.22 });
+        paintCity(nearCity, `n${cityW}`, () => buildSkyline(7, cityW, 36, 100), { fill: 0x141830, edge: 0x0b0e1c, windowAlpha: 0.85 });
+        // Beyond parallax the far city sinks as you climb, so by ~8m the skies
+        // own the screen instead of a skyline hanging in space.
+        const sink = Math.min(p.getSceneM?.() ?? 0, 8) * 22;
+        placeCity(farCity, -60, frame.groundScreenY + cameraY * 0.55 + sink + shake.offset.y * 0.5, h, ts);
+        placeCity(nearCity, -60 + shake.offset.x, scene.y, h, ts);
         if (groundKey !== `${halfW}|${scale}`) {
           groundKey = `${halfW}|${scale}`;
           paintGround(ground, halfW + 40, scale);
@@ -292,7 +318,11 @@ export default function TowerCanvas(props: Props) {
           );
           const supportX = top?.x ?? 0;
           const supportHalfW = (top?.widthPx ?? 150) / 2;
-          paintLandingMark(landingMark, scale, landX, towerTopY, hanging.widthPx, Math.abs(landX - supportX) < PERFECT_RATIO * supportHalfW);
+          paintLandingMark(landingMark, scale, landX, towerTopY, hanging.widthPx, Math.abs(landX - supportX) < PERFECT_RATIO * supportHalfW, {
+            x: supportX,
+            halfW: PERFECT_RATIO * supportHalfW,
+            pulse: 0.5 + 0.5 * Math.sin(ts / 160),
+          });
           landingMark.visible = true;
         } else {
           guide.clear();

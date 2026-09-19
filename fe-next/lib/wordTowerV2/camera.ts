@@ -13,6 +13,13 @@ import { BLOCK_HEIGHT_PX } from './scoring';
 /** Screen space the HUD (height badge + score) owns at the top. */
 export const HUD_TOP_PX = 96;
 
+/**
+ * Street visible between the ground line and the dock. The ground used to start
+ * exactly at the dock's top edge, so the base of the tower — and the floor the
+ * city stands on — was always hidden behind the controls.
+ */
+export const GROUND_STRIP_PX = 30;
+
 /** Widest the hanging block reaches from centre: full swing + a typical half-block. */
 const SWING_HALF_SPAN_PX = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad) + 90;
 const SIDE_GUTTER_PX = 12;
@@ -39,7 +46,7 @@ export interface CameraFrame {
 }
 
 export function frameCamera({ viewportW, viewportH, dockPx, towerTopM }: CameraInput): CameraFrame {
-  const groundScreenY = viewportH - dockPx;
+  const groundScreenY = viewportH - dockPx - GROUND_STRIP_PX;
   const playH = groundScreenY;
   const hangSpan = CRANE_CLEARANCE_PX + BLOCK_HEIGHT_PX / 2;
 

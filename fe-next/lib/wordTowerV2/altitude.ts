@@ -15,11 +15,12 @@ import { WORD_TOWER_BIOMES, type WordTowerBiomeId } from '@/shared/constants/wor
  * sky and 4 of 6 biomes were dead art. At x26 a ~6-block run reaches the
  * stratosphere and a great 30-block run the galaxy — a new sky every ~5 blocks.
  * Blocks grew 34 -> 46px (round 3), so a block is 1.44m not 1.06m; the
- * multiplier drops 26 -> 19 to keep the same sky-per-BLOCK pacing.
+ * multiplier drops 26 -> 19 to keep the same sky-per-BLOCK pacing; round 4's
+ * 46 -> 56px blocks drop it again, 19 -> 15.6.
  * ponytail: linear; the ceiling is parallax speed (v1 scrolls 5.2px per visual
  * m), so a bigger multiplier needs v1's scroll rate scaled down with it.
  */
-export const VISUAL_ALT_PER_M = 19;
+export const VISUAL_ALT_PER_M = 15.6;
 
 export function visualAltitudeM(heightM: number): number {
   return Math.max(0, heightM) * VISUAL_ALT_PER_M;
@@ -30,4 +31,16 @@ export function biomeAtHeight(heightM: number): WordTowerBiomeId {
   let id: WordTowerBiomeId = WORD_TOWER_BIOMES[0].id;
   for (const biome of WORD_TOWER_BIOMES) if (alt >= biome.minM) id = biome.id;
   return id;
+}
+
+/**
+ * Settling Matter bodies wobble the measured height in the 3rd decimal forever.
+ * Published raw at the 10Hz poll, that re-rendered the whole DOM sky 10x/s and
+ * restarted every 700-1000ms ease before it could finish — the v2 flicker.
+ * A block is ~1.4m, so ignoring moves under 5cm loses nothing real.
+ */
+const PUBLISH_EPS_M = 0.05;
+
+export function publishHeightM(shownM: number, rawM: number): number {
+  return Math.abs(rawM - shownM) < PUBLISH_EPS_M ? shownM : rawM;
 }

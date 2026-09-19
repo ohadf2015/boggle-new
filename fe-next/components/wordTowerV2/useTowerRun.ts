@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { SOUND_EFFECTS } from '@/lib/audio/soundEffectsConfig';
 import { TOWER_SURPRISE_META, type TowerSurpriseSound } from '@/lib/wordTower/towerSurprise';
+import { publishHeightM } from '@/lib/wordTowerV2/altitude';
 import { CRANE_CLEARANCE_PX, SWING, releaseKinematics } from '@/lib/wordTowerV2/crane';
 import {
   PX_PER_M,
@@ -28,6 +29,7 @@ import type { TowerFx } from './TowerCanvas';
  */
 
 const POLL_MS = 100;
+const DEMO_WORDS = ['tower', 'slab', 'anchor', 'crane', 'brick', 'ledge', 'beam', 'stack'];
 /** Stop waiting for a block to settle after this long and judge it anyway. */
 const SETTLE_TIMEOUT_MS = 2600;
 const BEST_KEY = 'wordTowerV2.bestM';
@@ -175,7 +177,7 @@ export function useTowerRun() {
     const id = window.setInterval(() => {
       const world = worldRef.current;
       const h = getTowerHeightM(world);
-      setHeightM(h);
+      setHeightM((shown) => publishHeightM(shown, h));
 
       if (phase === 'over') return;
       if (world.collapsed) {
@@ -286,10 +288,11 @@ export function useTowerRun() {
   }, []);
 
   /** `?demo=1`: pre-build a tower so the screen can be reviewed without playing. */
-  const seedDemo = useCallback(() => {
+  /** Review hook (`?demo=1`, optionally `&words=a,b,c` to see another script). */
+  const seedDemo = useCallback((words: string[] = DEMO_WORDS) => {
     if (dropCountRef.current > 0) return; // StrictMode double-invoke guard
     const world = worldRef.current;
-    ['tower', 'slab', 'anchor', 'crane', 'brick', 'ledge', 'beam', 'stack'].forEach((word, index) => {
+    words.forEach((word, index) => {
       const id = `r0-b${index}`;
       labelsRef.current.set(id, word);
       spawnBlock(world, {
@@ -302,7 +305,7 @@ export function useTowerRun() {
       });
       for (let t = 0; t < 900; t += 16.667) stepWorld(world, 16.667);
     });
-    dropCountRef.current = 8;
+    dropCountRef.current = words.length;
   }, []);
 
   return {

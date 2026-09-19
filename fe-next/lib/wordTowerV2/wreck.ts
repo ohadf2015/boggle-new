@@ -208,6 +208,15 @@ const UNSAFE = /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u20
 
 const clean = (s: string, max: number) => s.replace(UNSAFE, '').trim().slice(0, max);
 
+/** Untrusted word list (share link, review URL) -> safe, clamped labels. */
+export function sanitizeWords(raw: unknown[]): string[] {
+  return raw
+    .filter((x): x is string => typeof x === 'string')
+    .slice(0, MAX_WORDS)
+    .map((x) => clean(x, MAX_WORD))
+    .filter(Boolean);
+}
+
 export function encodeRival(r: RivalTower): string {
   const bytes = new TextEncoder().encode(JSON.stringify({ n: r.name, w: r.words }));
   let bin = '';
@@ -225,11 +234,7 @@ export function decodeRival(param: string): RivalTower | null {
     const rawName = typeof n === 'string' ? n : typeof name === 'string' ? name : null;
     const rawWords = Array.isArray(w) ? w : Array.isArray(words) ? words : null;
     if (rawName === null || !rawWords) return null;
-    const cleanWords = rawWords
-      .filter((x): x is string => typeof x === 'string')
-      .slice(0, MAX_WORDS)
-      .map((x) => clean(x, MAX_WORD))
-      .filter(Boolean);
+    const cleanWords = sanitizeWords(rawWords);
     return cleanWords.length > 0 ? { name: clean(rawName, MAX_NAME), words: cleanWords } : null;
   } catch {
     return null;

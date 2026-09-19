@@ -6,8 +6,8 @@
  * drop. The reward stays on the screen and changes how the rest of the run plays.
  */
 
-/** Was 34 — blocks read as thin slivers on a phone. */
-export const BLOCK_HEIGHT_PX = 46;
+/** 34 read as slivers, 46 still small next to the wheel (round 4). */
+export const BLOCK_HEIGHT_PX = 56;
 
 const MIN_BLOCK_WIDTH_PX = 96;
 const WIDTH_PER_LETTER_PX = 14;

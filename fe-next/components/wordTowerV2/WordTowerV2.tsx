@@ -12,8 +12,10 @@ import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { WordTowerWheel } from '@/components/wordTower/WordTowerWheel';
 import { BIOME_THEME } from '@/components/wordTower/biomeTheme';
 import { biomeAtHeight } from '@/lib/wordTowerV2/altitude';
+import { impactThunk } from '@/lib/wordTowerV2/juice';
 import { MIN_WORD_LEN, isAcceptedWord, spinWheel } from '@/lib/wordTowerV2/wheel';
 import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
+import { sanitizeWords } from '@/lib/wordTowerV2/wreck';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Backdrop } from './V2Backdrop';
 import { V2GameOver, V2Hud } from './V2Hud';
@@ -55,6 +57,9 @@ export default function WordTowerV2() {
 
   const dockRef = useRef<HTMLDivElement | null>(null);
   const dockPxRef = useRef(260);
+  // Also STATE: the DOM sky anchors to the dock too, and a ref read at render
+  // time kept the pre-measure 260 until something else happened to re-render.
+  const [dockPx, setDockPx] = useState(260);
 
   // The canvas frames the ground at the dock's real top edge.
   useEffect(() => {
@@ -62,6 +67,7 @@ export default function WordTowerV2() {
     if (!el) return;
     const ro = new ResizeObserver(() => {
       dockPxRef.current = el.getBoundingClientRect().height;
+      setDockPx(Math.round(dockPxRef.current));
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -70,7 +76,9 @@ export default function WordTowerV2() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setDebug(params.has('debug'));
-    if (params.has('demo')) seedDemo();
+    // Review words, sanitized like a share link: `?demo=1&words=מגדל,לבנה`.
+    const words = sanitizeWords(params.get('words')?.split(',') ?? []);
+    if (params.has('demo')) seedDemo(words.length ? words : undefined);
     // `?demo=1&smash=1`: jump straight into the smash round for review.
     if (params.has('demo') && params.has('smash')) setSmashing(true);
   }, [seedDemo]);
@@ -131,6 +139,17 @@ export default function WordTowerV2() {
   const bestRef = useRef(game.bestM);
   bestRef.current = game.bestM;
   const getBestM = useCallback(() => bestRef.current, []);
+  const sceneMRef = useRef(heightM);
+  sceneMRef.current = heightM;
+  const getSceneM = useCallback(() => sceneMRef.current, []);
+  // Brick-on-brick: a thunk on contact, heavier for a harder landing.
+  const onImpact = useCallback(
+    (speed: number) => {
+      const thunk = impactThunk(speed);
+      if (thunk) playSound('bossHit', thunk);
+    },
+    [playSound],
+  );
 
   // A distinct chime the moment the spelled letters become a real word.
   const wasValid = useRef(false);
@@ -230,7 +249,7 @@ export default function WordTowerV2() {
       {/* The smash round covers everything: don't run a second Pixi loop and
           backdrop tree underneath it. */}
       {!smashing ? (
-        <V2Backdrop heightM={heightM} groundInsetPx={dockPxRef.current} accentHex={accentHex} reducedMotion={reducedMotion} />
+        <V2Backdrop heightM={heightM} groundInsetPx={dockPx} accentHex={accentHex} reducedMotion={reducedMotion} />
       ) : null}
 
       {!smashing ? (
@@ -247,6 +266,8 @@ export default function WordTowerV2() {
           rulerSide={dir === 'rtl' ? 'left' : 'right'}
           onFrameStats={debug ? setStats : undefined}
           onBeforeStep={game.onBeforeStep}
+          onImpact={onImpact}
+          getSceneM={getSceneM}
           className="absolute inset-0"
         />
       ) : null}

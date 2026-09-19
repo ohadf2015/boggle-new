@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { CRANE_ARM_PX, CRANE_CLEARANCE_PX } from '../crane';
+import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, SWING } from '../crane';
 import { PX_PER_M } from '../engine';
 import { BLOCK_HEIGHT_PX } from '../scoring';
-import { HUD_TOP_PX, frameCamera } from '../camera';
+import { GROUND_STRIP_PX, HUD_TOP_PX, frameCamera } from '../camera';
 
 const VIEWPORTS = [
   { name: 'phone', w: 390, h: 844, dock: 260 },
@@ -39,8 +39,9 @@ describe('frameCamera', () => {
 
     it(`fits the full crane swing horizontally — ${vp.name}`, () => {
       const f = frameCamera({ viewportW: vp.w, viewportH: vp.h, dockPx: vp.dock, towerTopM: 0 });
-      const maxSwingX = CRANE_ARM_PX * Math.sin(0.62);
-      const halfSpan = (maxSwingX + 80) * f.scale;
+      // The real swing plus half a 5-letter block (83px) must stay on screen.
+      const maxSwingX = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad);
+      const halfSpan = (maxSwingX + 83) * f.scale;
       expect(halfSpan).toBeLessThanOrEqual(vp.w / 2);
     });
   }
@@ -48,7 +49,10 @@ describe('frameCamera', () => {
   it('shows the ground while the tower is short', () => {
     const f = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 0 });
     expect(f.cameraY).toBe(0);
-    expect(f.groundScreenY).toBe(844 - 260);
+    // The street sits ABOVE the dock, visible — it used to start exactly at the
+    // dock's top edge, so the whole base hid behind the controls.
+    expect(f.groundScreenY).toBe(844 - 260 - GROUND_STRIP_PX);
+    expect(GROUND_STRIP_PX).toBeGreaterThanOrEqual(24);
   });
 
   it('never shrinks blocks below readable size on a phone', () => {

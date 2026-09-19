@@ -104,6 +104,14 @@ export const WORD_TOWER_PROPS: ParallaxProp[] = [
   { id: 'skyMailbox',   src: '/images/word-tower/wt-sky-mailbox.png',   atM: 2950, topPct: 26, xPct: 30, width: 112, depth: 0.95, rangeM: 200 },
   { id: 'donutPlanet',  src: '/images/word-tower/wt-donut-planet.png',  atM: 3300, topPct: 22, xPct: 66, width: 146, depth: 0.65, rangeM: 240 },
   { id: 'starCat',      src: '/images/word-tower/wt-star-cat.png',      atM: 3700, topPct: 24, xPct: 30, width: 138, depth: 0.75, rangeM: 260 },
+  // Round-4 art. `blimp` and `weatherBalloon` were whitelisted by the city/sky/
+  // stratosphere themes but never drawn, so those bands showed nothing; the
+  // rest fill the first few blocks, where every run spends its time.
+  { id: 'hardhatPigeon',  src: '/images/word-tower/wt-hardhat-pigeon.png',  atM: 14,  topPct: 30, xPct: 22, width: 96,  depth: 1.1,  rangeM: 26 },
+  { id: 'blimp',          src: '/images/word-tower/wt-blimp.png',           atM: 70,  topPct: 20, xPct: 70, width: 140, depth: 0.85, rangeM: 34 },
+  { id: 'letterFlock',    src: '/images/word-tower/wt-letter-flock.png',    atM: 125, topPct: 26, xPct: 26, width: 118, depth: 1.05, rangeM: 38 },
+  { id: 'stormCloud',     src: '/images/word-tower/wt-storm-cloud.png',     atM: 165, topPct: 18, xPct: 68, width: 130, depth: 0.9,  rangeM: 40 },
+  { id: 'weatherBalloon', src: '/images/word-tower/wt-weather-balloon.png', atM: 200, topPct: 28, xPct: 28, width: 96,  depth: 1.0,  rangeM: 44 },
 ];
 
 /**

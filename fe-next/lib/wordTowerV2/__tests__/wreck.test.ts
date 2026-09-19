@@ -8,6 +8,7 @@ import {
   hangBall,
   stepWreck,
   wreckedCount,
+  sanitizeWords,
 } from '../wreck';
 import { applyLanding, createRun } from '../run';
 
@@ -87,5 +88,12 @@ describe('wrecking balls earned', () => {
     let r = createRun(1);
     for (let i = 0; i < 60; i += 1) r = applyLanding(r, { quality: 'perfect', wordLen: 4 }).run;
     expect(r.balls).toBe(MAX_BALLS);
+  });
+});
+
+describe('sanitizeWords', () => {
+  it('given untrusted words, when sanitized, then bidi overrides, controls and empties are dropped and lengths clamped', () => {
+    const out = sanitizeWords(['\u202Eevil', 'ok\u0000', '', 'x'.repeat(40), 42 as unknown as string]);
+    expect(out).toEqual(['evil', 'ok', 'x'.repeat(15)]);
   });
 });

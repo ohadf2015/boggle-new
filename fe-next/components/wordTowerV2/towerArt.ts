@@ -1,4 +1,6 @@
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
+import { blockLabel, labelTracking } from '@/lib/wordTowerV2/label';
+import { squashScale } from '@/lib/wordTowerV2/juice';
 
 /**
  * Pixi drawing for Word Tower v2. Every stroke width is divided by the scene
@@ -27,6 +29,8 @@ const PALETTE: Array<[number, number]> = [
 
 export interface BlockView {
   container: Container;
+  /** Everything visible; squashes about the block's BOTTOM edge on landing. */
+  inner: Container;
   body: Graphics;
   /** White overlay whose alpha is the landing flash (tint can only darken). */
   glow: Graphics;
@@ -38,14 +42,15 @@ export interface BlockView {
   gold: boolean;
   /** 0..1 white landing flash, decays in `tickBlock`. */
   flash: number;
+  /** 0..1 landing squash, decays in `tickBlock`. */
+  squash: number;
 }
 
 const labelStyle = new TextStyle({
   fontFamily: 'Fredoka, system-ui, sans-serif',
-  fontSize: 26,
+  fontSize: 32,
   fontWeight: '700',
   fill: INK,
-  letterSpacing: 2,
 });
 
 function fitLabel(label: Text, w: number): void {
@@ -59,13 +64,17 @@ export function createBlockView(index: number, w: number, h: number, word: strin
   const body = new Graphics();
   const glow = new Graphics();
   glow.alpha = 0;
-  const label = new Text({ text: word.toUpperCase(), style: labelStyle });
+  const text = blockLabel(word);
+  const label = new Text({ text, style: labelStyle.clone() });
+  label.style.letterSpacing = labelTracking(text);
   label.anchor.set(0.5);
   fitLabel(label, w);
-  container.addChild(body, glow, label);
+  const inner = new Container();
+  inner.addChild(body, glow, label);
+  container.addChild(inner);
 
   const view: BlockView = {
-    container, body, glow, label, colour: PALETTE[index % PALETTE.length], builtScale: 0, w, h, gold: false, flash: 0,
+    container, inner, body, glow, label, colour: PALETTE[index % PALETTE.length], builtScale: 0, w, h, gold: false, flash: 0, squash: 0,
   };
   paintBlock(view, scale);
   return view;
@@ -113,22 +122,43 @@ export function paintBlock(view: BlockView, scale: number): void {
 
 /** Per-frame decay of transient block effects. */
 export function tickBlock(view: BlockView, dt: number): void {
-  if (view.flash <= 0) return;
-  view.flash = Math.max(0, view.flash - dt * 3.5);
-  view.glow.alpha = view.flash * 0.85;
+  if (view.flash > 0) {
+    view.flash = Math.max(0, view.flash - dt * 3.5);
+    view.glow.alpha = view.flash * 0.85;
+  }
+  if (view.squash > 0) {
+    view.squash = Math.max(0, view.squash - dt * 6);
+    // Ease-out bounce: squash, then a small overshoot as it springs back.
+    const t = view.squash;
+    const { sx, sy } = squashScale(Math.sin(t * Math.PI * 1.5) * t);
+    view.inner.scale.set(sx, sy);
+    view.inner.y = (view.h / 2) * (1 - sy);
+  }
 }
 
-/** Ground slab: concrete footing with a lime lip, dark earth, hazard hatching. */
+/**
+ * Ground: a street strip (GROUND_STRIP_PX tall on screen) that sits visibly above
+ * the dock — lime curb the tower and the city both stand on, asphalt with lane
+ * dashes and a hazard-striped footing under the tower — then dark earth that
+ * slides behind the dock as the camera climbs.
+ */
 export function paintGround(g: Graphics, halfW: number, scale: number): void {
   const px = (n: number) => n / scale;
   g.clear();
   g.rect(-halfW, 0, halfW * 2, px(900)).fill(0x141424);
-  g.rect(-halfW, px(6), halfW * 2, px(26)).fill(0x2a2a40);
-  for (let x = -halfW; x < halfW; x += px(28)) {
-    g.poly([x, px(10), x + px(14), px(10), x + px(4), px(28), x - px(10), px(28)]).fill({ color: GOLD, alpha: 0.22 });
+  g.rect(-halfW, px(6), halfW * 2, px(24)).fill(0x262640);
+  for (let x = -halfW; x < halfW; x += px(34)) g.rect(x, px(17), px(16), px(3));
+  g.fill({ color: CREAM, alpha: 0.35 });
+  // Footing under the tower: hazard stripes, so the base reads as a build site.
+  const footW = px(130);
+  g.rect(-footW, px(9), footW * 2, px(21)).fill(0x1b1b2c);
+  for (let x = -footW; x < footW; x += px(20)) {
+    g.poly([x, px(9), x + px(10), px(9), x + px(1), px(30), x - px(9), px(30)]).fill({ color: GOLD, alpha: 0.55 });
   }
+  g.rect(-footW, px(9), footW * 2, px(21)).stroke({ width: px(2), color: INK, alignment: 1 });
   g.rect(-halfW, 0, halfW * 2, px(6)).fill(LIME);
   g.rect(-halfW, px(6), halfW * 2, px(3)).fill(INK);
+  g.rect(-halfW, px(30), halfW * 2, px(4)).fill(INK);
 }
 
 /**
@@ -254,13 +284,29 @@ export function paintThrowArc(g: Graphics, scale: number, pts: Array<{ x: number
  * as a hard bracket. Goes lime while a release now would land perfect, so the
  * player times a visible target instead of guessing physics.
  */
-export function paintLandingMark(g: Graphics, scale: number, x: number, y: number, w: number, hot: boolean): void {
+export function paintLandingMark(
+  g: Graphics,
+  scale: number,
+  x: number,
+  y: number,
+  w: number,
+  hot: boolean,
+  zone: { x: number; halfW: number; pulse: number },
+): void {
   const px = (n: number) => n / scale;
   const colour = hot ? LIME : CREAM;
   const l = x - w / 2;
   const tick = px(10);
   const t = px(4);
   g.clear();
+  // The PERFECT zone, fixed on the support: the moving footprint's centre notch
+  // has to meet it. Without it the target only appeared once you were already
+  // in it, so there was nothing to time against.
+  const zl = zone.x - zone.halfW;
+  const zw = zone.halfW * 2;
+  g.rect(zl, y - px(5), zw, px(5)).fill({ color: LIME, alpha: hot ? 0.9 : 0.35 + 0.25 * zone.pulse });
+  g.rect(zl - px(2), y - px(16), px(4), px(16)).rect(zl + zw - px(2), y - px(16), px(4), px(16));
+  g.fill({ color: LIME, alpha: 0.9 });
   g.rect(l, y - px(7), w, px(7)).fill({ color: colour, alpha: hot ? 0.55 : 0.25 });
   // Corner brackets rising from the surface.
   g.rect(l, y - tick, t, tick).rect(l, y - px(3), tick, px(3));
@@ -315,7 +361,8 @@ export function paintGhost(ghost: GhostView, scale: number, word: string, w: num
     body.rect(x + w - px(3), y, px(3), h);
     body.fill({ color: CREAM, alpha: 0.85 });
   }
-  label.text = word.toUpperCase();
+  label.text = blockLabel(word);
+  label.style.letterSpacing = labelTracking(label.text);
   label.style.fill = valid ? INK : CREAM;
   fitLabel(label, w);
 }

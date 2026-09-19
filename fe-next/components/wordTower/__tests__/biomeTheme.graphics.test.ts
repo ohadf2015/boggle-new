@@ -38,3 +38,12 @@ describe('BIOME_THEME graphic enrichment', () => {
     }
   });
 });
+
+describe('biome native props', () => {
+  it('given a biome whitelist, when resolved, then every id is a real prop — a dangling id silently shows nothing', async () => {
+    const { WORD_TOWER_PROPS } = await import('@/lib/wordTower/parallaxProps');
+    const known = new Set(WORD_TOWER_PROPS.map((p) => p.id));
+    const dangling = ids.flatMap((id) => (BIOME_THEME[id].nativePropIds ?? []).filter((p) => !known.has(p)));
+    expect(dangling).toEqual([]);
+  });
+});
