@@ -47,7 +47,7 @@ export const V2Backdrop = memo(function V2Backdrop({
       />
       <WordTowerBackdrop band="horizon" {...common} />
       <WordTowerBackdrop band="sky" {...common} />
-      <V2Scenery bottomPx={groundInsetPx + GROUND_STRIP_PX} accentHex={accentHex} />
+      <V2Scenery bottomPx={groundInsetPx + GROUND_STRIP_PX} accentHex={accentHex} reducedMotion={reducedMotion} />
       <WordTowerParallaxProps heightM={alt} reducedMotion={reducedMotion} themed={false} />
       <WordTowerSighting heightM={alt} reducedMotion={reducedMotion} />
       <WordTowerAmbient biomeId={fromId} heightM={alt} reducedMotion={reducedMotion} enableComplexAnimations={!reducedMotion} />
