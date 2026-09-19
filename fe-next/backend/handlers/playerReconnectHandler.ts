@@ -42,6 +42,7 @@ import logger from '../utils/logger.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 import { HUNT_INITIAL_LIFE } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { getOrInitPlayerBoard } from '../modules/blastModeManager.js';
+import { quizShellStartFor, seatLateQuizSocket } from '../services/vocabQuizShell.js';
 
 interface AuthConnectionResult {
   handled: boolean;
@@ -285,7 +286,11 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
       reconnectPayload.goldenLetters = game.goldenLetters;
     }
 
+    // A running Vocab Quiz has no room grid — ride the quiz's own shell start,
+    // exactly as the late-join path below does (pitfall 3).
+    Object.assign(reconnectPayload, quizShellStartFor(gameCode));
     socket.emit('startGame', reconnectPayload);
+    seatLateQuizSocket(socket, gameCode, username, game.users[username]);
 
     // Send current leaderboard and player's achievements so UI is fully restored
     const leaderboard = getLeaderboard(gameCode);
@@ -380,7 +385,12 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
     lateJoinPayload.goldenLetters = game.goldenLetters;
   }
 
+  // A running Vocab Quiz has no room grid: without its shell start the late
+  // joiner's client never leaves the READY UP lobby. Same builder as the quiz's
+  // own opening broadcast and the reconnect path above.
+  Object.assign(lateJoinPayload, quizShellStartFor(gameCode));
   socket.emit('startGame', lateJoinPayload);
+  seatLateQuizSocket(socket, gameCode, username, game.users[username] ?? { isHost: false });
 
   const leaderboard = getLeaderboard(gameCode);
   socket.emit('updateLeaderboard', { leaderboard });

@@ -54,6 +54,7 @@ import { podiumWithoutHost } from '@/lib/education/roundEndPodium';
 import { useSessionRoundHistory } from '@/hooks/useSessionRoundHistory';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import { trackResultsAction } from './trackResultsAction';
 
 export interface ClassroomTvResultsProps {
   summary: ClassroomSummary;
@@ -220,7 +221,10 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
               <button
                 type="button"
                 data-testid="classroom-tv-rematch"
-                onClick={onRematch}
+                onClick={() => {
+                  trackResultsAction('rematch', 'projector');
+                  onRematch();
+                }}
                 className={cn(
                   'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4',
                   'font-neo-display font-bold text-2xl md:text-3xl',

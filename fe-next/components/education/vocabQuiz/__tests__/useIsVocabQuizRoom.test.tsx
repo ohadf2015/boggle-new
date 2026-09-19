@@ -72,6 +72,22 @@ describe('useIsVocabQuizRoom', () => {
     expect(result.current).toBe(true);
   });
 
+  // A quiz REMATCH opens with the quiz's own shell `startGame`. A student whose
+  // latch let go on it and missed the re-claim sat on the placeholder A-P board
+  // for the whole first question (seen live 2026-09-19). Re-asking on every
+  // release lets a live quiz answer back; a board round has no session, so the
+  // server sends nothing and the release stands.
+  it('re-asks for the quiz snapshot when a startGame releases the claim', () => {
+    const socket = fakeSocket();
+    const { result } = renderHook(() => useIsVocabQuizRoom(socket as never));
+    act(() => socket.fire(VOCAB_QUIZ_EVENTS.question, {}));
+    socket.emit.mockClear();
+    act(() => socket.fire('startGame', {}));
+    expect(socket.emit).toHaveBeenCalledWith(VOCAB_QUIZ_EVENTS.requestState);
+    act(() => socket.fire(VOCAB_QUIZ_EVENTS.state, { phase: 'question' }));
+    expect(result.current).toBe(true);
+  });
+
   it('asks for a snapshot on mount, so a mid-round reload lands on the question', () => {
     const socket = fakeSocket();
     renderHook(() => useIsVocabQuizRoom(socket as never));

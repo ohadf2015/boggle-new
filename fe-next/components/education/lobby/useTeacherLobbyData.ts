@@ -137,5 +137,6 @@ export function useTeacherLobbyData(
     selectedClassroomId,
     setSelectedClassroomId,
     createLessonFromPack,
+    fetchTeacherData,
   };
 }

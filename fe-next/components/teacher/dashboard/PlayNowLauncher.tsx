@@ -206,54 +206,76 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
         </p>
 
         {/* Everything below the line exists to CHANGE the default, never to
-            reach it. Hence the label, and hence its place under the button. */}
-        <div data-testid="play-now-change" className="space-y-3 border-t-[3px] border-black/50 pt-3">
-          <p className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-white/70">
-            {t('teacher.playNow.changeWords')}
-          </p>
+            reach it. Collapsed by default so the only above-the-fold decision
+            is GO LIVE — the teacher taps to reveal source switch and items. */}
+        <details
+          data-testid="play-now-change-disclosure"
+          className="group border-t-[3px] border-black/50 pt-3"
+        >
+          <summary
+            data-testid="play-now-change-summary"
+            className="cursor-pointer list-none flex items-center gap-2 mb-3"
+          >
+            <span className="transition-transform group-open:rotate-180">
+              <svg
+                className="size-4 text-neo-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </span>
+            <p className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-white/70">
+              {t('teacher.playNow.changeWords')}
+            </p>
+          </summary>
 
-          <SourceSwitch active={source} available={available} onChange={setPickedSource} />
+          <div className="space-y-3">
+            <SourceSwitch active={source} available={available} onChange={setPickedSource} />
 
-          <div className="min-h-[5.5rem]">
-            {source === 'recent' && (
-              <ul className="grid gap-2 sm:grid-cols-2" data-testid="play-now-recent-list">
-                {recentLessons.map((l, i) => (
-                  <li key={l.id}>
-                    <PickRow
-                      testId={`play-now-lesson-${l.id}`}
-                      title={l.name}
-                      meta={t('teacher.lesson.words', { count: l.words?.length ?? 0 })}
-                      accent="bg-neo-cyan"
-                      recommendedLabel={i === 0 ? t('teacher.playNow.recommended') : undefined}
-                      selected={activeLesson?.id === l.id}
-                      onSelect={() => setPickedLessonId(l.id)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
+            <div className="min-h-[5.5rem]">
+              {source === 'recent' && (
+                <ul className="grid gap-2 sm:grid-cols-2" data-testid="play-now-recent-list">
+                  {recentLessons.map((l, i) => (
+                    <li key={l.id}>
+                      <PickRow
+                        testId={`play-now-lesson-${l.id}`}
+                        title={l.name}
+                        meta={t('teacher.lesson.words', { count: l.words?.length ?? 0 })}
+                        accent="bg-neo-cyan"
+                        recommendedLabel={i === 0 ? t('teacher.playNow.recommended') : undefined}
+                        selected={activeLesson?.id === l.id}
+                        onSelect={() => setPickedLessonId(l.id)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            {source === 'packs' && (
-              <ul className="grid gap-2 sm:grid-cols-3" data-testid="play-now-pack-list">
-                {STARTER_LESSON_PACKS.map((p, i) => (
-                  <li key={p.nameKey}>
-                    <PickRow
-                      testId={`play-now-pack-${p.category}`}
-                      title={t(p.nameKey)}
-                      meta={t('teacher.lesson.words', { count: p.words.length })}
-                      accent="bg-neo-lime"
-                      recommendedLabel={i === 0 ? t('teacher.playNow.recommended') : undefined}
-                      selected={activePack?.nameKey === p.nameKey}
-                      onSelect={() => setPickedPackKey(p.nameKey)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
+              {source === 'packs' && (
+                <ul className="grid gap-2 sm:grid-cols-3" data-testid="play-now-pack-list">
+                  {STARTER_LESSON_PACKS.map((p, i) => (
+                    <li key={p.nameKey}>
+                      <PickRow
+                        testId={`play-now-pack-${p.category}`}
+                        title={t(p.nameKey)}
+                        meta={t('teacher.lesson.words', { count: p.words.length })}
+                        accent="bg-neo-lime"
+                        recommendedLabel={i === 0 ? t('teacher.playNow.recommended') : undefined}
+                        selected={activePack?.nameKey === p.nameKey}
+                        onSelect={() => setPickedPackKey(p.nameKey)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            {source === 'paste' && <PastePanel value={pasted} words={pastedWords} onChange={setPasted} />}
+              {source === 'paste' && <PastePanel value={pasted} words={pastedWords} onChange={setPasted} />}
+            </div>
           </div>
-        </div>
+        </details>
       </div>
     </section>
   );

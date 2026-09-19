@@ -30,7 +30,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, dir: lang.dir, language: lang.language }),
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
-vi.mock('@/hooks/useClassroom', () => ({ useJoinClassroom: () => ({ joinClassroom: mockJoin }) }));
+vi.mock('@/hooks/useJoinClassroom', () => ({ useJoinClassroom: () => ({ joinClassroom: mockJoin }) }));
 vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
@@ -50,7 +50,9 @@ describe('<JoinFlow> in Hebrew', () => {
 
   it('flows right-to-left', () => {
     const { container } = render(<JoinFlow />);
-    expect(container.firstElementChild).toHaveAttribute('dir', 'rtl');
+    // BoundedConfettiBurst wraps the main div, so look for the child with dir attribute
+    const mainDiv = container.querySelector('div[dir="rtl"]');
+    expect(mainDiv).toHaveAttribute('dir', 'rtl');
   });
 
   it('keeps the six code cells left-to-right inside that RTL page', () => {
@@ -72,7 +74,9 @@ describe('<JoinFlow> in Hebrew', () => {
     lang.dir = 'ltr';
     lang.language = 'en';
     const { container } = render(<JoinFlow />);
-    expect(container.firstElementChild).toHaveAttribute('dir', 'ltr');
+    // BoundedConfettiBurst wraps the main div, so look for the child with dir attribute
+    const mainDiv = container.querySelector('div[dir="ltr"]');
+    expect(mainDiv).toHaveAttribute('dir', 'ltr');
     expect(codeInput().closest('[dir]')).toHaveAttribute('dir', 'ltr');
   });
 

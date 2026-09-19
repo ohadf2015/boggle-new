@@ -25,7 +25,7 @@ vi.mock('@/lib/supabase/education', () => ({
   joinClassroom: vi.fn(),
 }));
 
-import { useJoinClassroom } from '../useClassroom';
+import { useJoinClassroom } from '../useJoinClassroom';
 
 const JOIN_ROUTE = '/api/education/classroom/join';
 /**

@@ -26,17 +26,25 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Flame, Target, Trophy } from 'lucide-react';
+import { Flame, RotateCcw, Target, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import type { VocabQuizStanding, TranslateFn } from '@/shared/types/vocabQuiz';
 import { classFinaleStats } from './vocabQuizJuice';
 import { VocabQuizStandings } from './VocabQuizStandings';
+import { trackResultsAction } from '../results/trackResultsAction';
 
 export interface VocabQuizFinaleProps {
   standings: VocabQuizStanding[];
   totalQuestions: number;
+  /**
+   * Same room, same code, same quiz — the host's `handleStartNewGame`, exactly
+   * what the board rounds' projector rematch calls. Absent = no button: a quiz
+   * produces no `classroomSummary`, so without this the wall ends on controls
+   * that do nothing.
+   */
+  onPlayAgain?: () => void;
   t: TranslateFn;
 }
 
@@ -72,7 +80,7 @@ function StatTile({
   );
 }
 
-export function VocabQuizFinale({ standings, totalQuestions, t }: VocabQuizFinaleProps) {
+export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, t }: VocabQuizFinaleProps) {
   const stats = classFinaleStats(standings, totalQuestions);
 
   // One burst, on arrival. Latched in a ref rather than keyed on render, because
@@ -156,6 +164,26 @@ export function VocabQuizFinale({ standings, totalQuestions, t }: VocabQuizFinal
       >
         <VocabQuizStandings standings={standings} limit={5} size="projector" podium t={t} />
       </div>
+
+      {onPlayAgain && (
+        <button
+          type="button"
+          data-testid="quiz-finale-play-again"
+          onClick={() => {
+            trackResultsAction('rematch', 'projector');
+            onPlayAgain();
+          }}
+          className={cn(
+            'shrink-0 w-full flex items-center justify-center gap-3 px-6 py-4',
+            'font-neo-display font-bold text-3xl',
+            'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
+            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+          )}
+        >
+          <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />
+          {t('education.results.rematch')}
+        </button>
+      )}
     </section>
   );
 }

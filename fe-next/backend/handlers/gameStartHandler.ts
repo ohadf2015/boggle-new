@@ -600,7 +600,9 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     const users = getGameUsers(gameCode);
-    const playerUsernames = users.map(u => u.username);
+    // A projector/classroom host watches, they do not play (the quiz path skips them too).
+    const hostWatches = !!tvMode || !!classroomGame;
+    const playerUsernames = users.filter(u => !(hostWatches && u.isHost)).map(u => u.username);
     const humanUsernames = users.filter(u => !u.isBot).map(u => u.username);
 
     // Initialize blast mode state if needed

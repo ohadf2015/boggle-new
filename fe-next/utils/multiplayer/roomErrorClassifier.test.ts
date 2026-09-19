@@ -2,6 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { classifyRoomError } from './roomErrorClassifier';
 
 describe('classifyRoomError', () => {
+  describe('classroom room not open yet (early joiner — wait, never bounce)', () => {
+    it('classifies CLASSROOM_NOT_OPEN as notOpen, not gone', () => {
+      expect(classifyRoomError({ code: 'CLASSROOM_NOT_OPEN', message: 'Your teacher has not opened the game yet' })).toBe('notOpen');
+    });
+  });
+
   describe('room-gone (the dominant "room closed or inactive" complaint)', () => {
     it('classifies GAME_NOT_FOUND code as gone', () => {
       expect(classifyRoomError({ code: 'GAME_NOT_FOUND', message: 'Game not found' })).toBe('gone');

@@ -33,6 +33,7 @@ import { Loader2 } from 'lucide-react';
 
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
+import { usePublishGameActive } from './hooks/usePublishGameActive';
 import { resetComboState } from '@/shared/utils/comboUtils';
 import {
   sendCountdownComplete,
@@ -113,6 +114,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Game state
   const [gameActive, setGameActive] = useState<boolean>(false);
+  usePublishGameActive(gameActive); // the page's banner reads the store
   // Batch showModeReveal + showStartAnimation — sequential animation states
   type RevealState = { showModeReveal: boolean; showStartAnimation: boolean };
   type RevealAction = { type: 'startReveal' } | { type: 'endReveal' } | { type: 'reset' };
@@ -278,7 +280,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     intentionalExitRef,
     onExitToLobby,
   });
-
 
   // Navigation guard — intercept a phone back-gesture for the ENTIRE MP session,
   // not just active play. Since lobby auto-start was removed, players sit in the
@@ -459,7 +460,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       setShufflingGrid(null);
     }
   }, [gameActive, setShufflingGrid]);
-
 
 
   // Clear game state on mount and cleanup

@@ -28,16 +28,19 @@ import { useVocabQuizJuice } from './useVocabQuizJuice';
 import { VocabQuizFinale } from './VocabQuizFinale';
 import { VocabQuizChoiceBars } from './VocabQuizChoiceBars';
 import { VocabQuizNextUp } from './VocabQuizNextUp';
+import { TreasureChestTicker } from './TreasureChestTicker';
 
 export interface VocabQuizHostViewProps {
   socket: Socket | null;
   /** Shown large so students can join or rejoin at any moment. */
   joinCode: string;
   playerCount?: number;
+  /** Host restart (same room/code/quiz); renders the finale's one loud action. */
+  onPlayAgain?: () => void;
   t: TranslateFn;
 }
 
-export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQuizHostViewProps) {
+export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, t }: VocabQuizHostViewProps) {
   const quiz = useVocabQuiz(socket);
   const { question, reveal, phase } = quiz;
 
@@ -218,8 +221,16 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
           numbers, Lexi with the trophy, and the podium — not a list under a
           heading. See VocabQuizFinale. */}
       {phase === 'ended' && (
-        <VocabQuizFinale standings={quiz.standings} totalQuestions={quiz.totalQuestions} t={t} />
+        <VocabQuizFinale
+          standings={quiz.standings}
+          totalQuestions={quiz.totalQuestions}
+          onPlayAgain={onPlayAgain}
+          t={t}
+        />
       )}
+
+      {/* Treasure chest ticker — shows steals and swaps during the round */}
+      <TreasureChestTicker chestEvents={quiz.chestEvents} t={t} />
     </div>
   );
 }

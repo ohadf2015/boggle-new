@@ -18,8 +18,21 @@
 // 'ru' out here while other copies had it (Russian back nav dropped the prefix).
 import { locales as LOCALES } from '@/lib/i18n';
 
-/** Routes (locale-stripped) whose URL-drop-one parent has no page → explicit parent. */
-const PARENT_OVERRIDES: { test: RegExp; parent: string }[] = [];
+/** Routes (locale-stripped) whose URL-drop-one parent has no page → explicit parent.
+ *
+ * Education routes are top-level sections (like any other) but their parent
+ * is not the main app home; it's /{locale}/education. These overrides ensure
+ * Android back button + navigation fallbacks send users to the right place.
+ *
+ * Anchored with ^..$ so nested paths like /teacher/classroom/abc fall through
+ * to the default "drop one segment" rule instead of being collapsed to /education.
+ */
+const PARENT_OVERRIDES: { test: RegExp; parent: string }[] = [
+  { test: /^\/teacher\/?$/, parent: '/education' },
+  { test: /^\/student\/?$/, parent: '/education' },
+  { test: /^\/join\/?$/, parent: '/education' },
+  { test: /^\/classroom\/?$/, parent: '/education' },
+];
 
 export function parentRoute(pathname: string): string {
   if (!pathname) return '/';

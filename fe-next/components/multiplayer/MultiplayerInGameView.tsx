@@ -74,6 +74,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useTeacherPaused } from '@/hooks/useTeacherPause';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
+import { useQuizPracticeNav } from '@/components/education/vocabQuiz/useQuizPracticeNav';
 
 // ==================== Types ====================
 
@@ -283,6 +284,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Live Vocab Quiz rooms replace the board entirely. Detected from the
   // server's quiz traffic, since the quiz is not a `GameMode`.
   const isVocabQuizRoom = useIsVocabQuizRoom(socket);
+  const onQuizPractice = useQuizPracticeNav();
   const { remainingTime: syncedRemainingTime, setTime: setSyncedTime } = useGameTimer({
     initialTime: totalTime ?? remainingTime ?? 180,
     isPaused: !gameActive || remainingTime == null || teacherPaused,
@@ -419,7 +421,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         t={t}
       />
     ) : (
-      <VocabQuizView socket={socket} username={username} t={t} />
+      <VocabQuizView socket={socket} username={username} t={t} onPractice={onQuizPractice} />
     );
   }
 

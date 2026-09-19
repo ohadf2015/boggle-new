@@ -207,6 +207,7 @@ export async function POST(request: NextRequest) {
         {
           message: 'Already a member of this classroom',
           classroomId: classroom.id,
+          alreadyMember: true,
           ...(liveGameCode ? { gameCode: liveGameCode } : {}),
         },
         { status: 200 }

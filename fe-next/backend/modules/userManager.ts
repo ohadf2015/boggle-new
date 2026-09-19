@@ -253,6 +253,22 @@ export function getSocketIdByUsername(gameCode: string, username: string): strin
 }
 
 /**
+ * Bind a socket to a gameCode (for classroom games that may not have a full Game object).
+ * This enables quizForSocket to find the quiz session even when the socket hasn't
+ * been added to a Game via addUserToGame. Called from classroomGameHandler on join.
+ */
+export function bindSocketToGame(socketId: string, gameCode: string): void {
+  socketToGame.set(socketId, gameCode);
+}
+
+/**
+ * Unbind a socket from a gameCode mapping.
+ */
+export function unbindSocketFromGame(socketId: string): void {
+  socketToGame.delete(socketId);
+}
+
+/**
  * Get user by socket ID
  */
 export function getUserBySocketId(games: GamesMap, socketId: string): GameUserInfo | null {

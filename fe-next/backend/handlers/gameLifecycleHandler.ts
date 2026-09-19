@@ -40,6 +40,8 @@ import {
   LOBBY_ROOM
 } from '../utils/socketHelpers.js';
 
+import { announceClassroomRoomOpened } from './classroomMissingRoom.js';
+import { quizShellStartFor } from '../services/vocabQuizShell.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import {
   shouldTriggerAutoStart,
@@ -238,6 +240,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
         users: getGameUsers(gameCode)
       });
+      announceClassroomRoomOpened(io, gameCode); // students parked on "waiting for your teacher" walk in now
 
       try {
         await saveGameState(gameCode, game as unknown as Parameters<typeof saveGameState>[1]);
@@ -438,6 +441,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (isInProgress(game.gameState)) {
       logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);
       const recoveryGameMode = game.gameMode || 'classic';
+      // A running Vocab Quiz: same shell start as `join` (pitfall 3), and no board clock to "recover".
+      const quizShell = quizShellStartFor(gameCode);
 
       // Orphan-timer recovery: state says in-progress but no setInterval is
       // registered. Caused by a crash/race between `transitionGameState('START')`
@@ -446,7 +451,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       // and never restarts the clock. Defense-in-depth: idempotent, safe to
       // call when timer is already running (`startGameTimer` clears first).
       // A teacher-paused round has no interval BY DESIGN — never "recover" it.
-      if (!hasGameTimer(gameCode) && !game.isPaused) {
+      if (!hasGameTimer(gameCode) && !game.isPaused && !quizShell) {
         const recoverySeconds = game.remainingTime ?? game.timerSeconds;
         if (recoverySeconds && recoverySeconds > 0) {
           logger.info('SOCKET', `Orphan timer recovery: restarting interval for ${gameCode} at ${recoverySeconds}s`);
@@ -501,6 +506,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         // Carry the leaderboard in-payload so the score restores atomically with
         // the board (see updateLeaderboard belt below for the ordering rationale).
         leaderboard: getLeaderboard(gameCode),
+        ...quizShell,
       });
 
       // Restore the player's live score. The board/timer ride on `startGame`,

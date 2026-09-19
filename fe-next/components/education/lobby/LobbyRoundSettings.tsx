@@ -39,6 +39,7 @@ export interface LobbyRoundSettingsProps {
   vocabQuizFocus: PracticeFocusSetting;
   vocabQuizQuestionCount: number;
   vocabQuizSeconds: number;
+  treasureChestsEnabled?: boolean;
   onTimerChange: (minutes: number) => void;
   onBoardSizeChange: (size: 'small' | 'medium' | 'large') => void;
   onMinWordLengthChange: (length: number) => void;
@@ -46,6 +47,7 @@ export interface LobbyRoundSettingsProps {
   onVocabQuizFocusChange: (focus: PracticeFocusSetting) => void;
   onVocabQuizQuestionCountChange: (count: number) => void;
   onVocabQuizSecondsChange: (seconds: number) => void;
+  onTreasureChestsChange?: (enabled: boolean) => void;
 }
 
 export function LobbyRoundSettings({
@@ -60,6 +62,7 @@ export function LobbyRoundSettings({
   vocabQuizFocus,
   vocabQuizQuestionCount,
   vocabQuizSeconds,
+  treasureChestsEnabled,
   onTimerChange,
   onBoardSizeChange,
   onMinWordLengthChange,
@@ -67,6 +70,7 @@ export function LobbyRoundSettings({
   onVocabQuizFocusChange,
   onVocabQuizQuestionCountChange,
   onVocabQuizSecondsChange,
+  onTreasureChestsChange,
 }: LobbyRoundSettingsProps) {
   const { t } = useLanguage();
   const isQuiz = gameMode === VOCAB_QUIZ_MODE;
@@ -90,9 +94,11 @@ export function LobbyRoundSettings({
         focus={vocabQuizFocus}
         questionCount={vocabQuizQuestionCount}
         secondsPerQuestion={vocabQuizSeconds}
+        treasureChestsEnabled={treasureChestsEnabled}
         onFocusChange={onVocabQuizFocusChange}
         onQuestionCountChange={onVocabQuizQuestionCountChange}
         onSecondsChange={onVocabQuizSecondsChange}
+        onTreasureChestsChange={onTreasureChestsChange}
         t={t}
       />
     );

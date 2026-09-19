@@ -24,14 +24,24 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 /**
  * Every Pro surface this gate can stand in front of.
  *
+ * ENFORCEMENT TRUTH — This array defines what is actually locked in code.
+ * These are the ONLY features a Free teacher cannot access. Never advertise
+ * a feature in app/[locale]/teacher/upgrade/PageClient.tsx unless it appears here.
+ *
+ * Current enforcement:
+ * - `analytics`: /teacher/classroom/[id]/analytics (per-classroom progress dashboard)
+ * - `reports`: /teacher/reports (printable class reports + post-game details)
+ *
+ * NOT here (and never locked):
+ * - customLists: free teachers create vocab lessons (19 active in prod)
+ * - noAds: ad-free play is free
+ * - duels: dead feature (0 usage ever) — removed from all tier lists
+ *
  * A runtime array, not a bare type union, because the keys below are built
  * dynamically (`teacher.proGate.${feature}.title`) and a TYPE is erased before
  * any test can see it. A static key scan cannot find a template-literal key
- * either — which is exactly how `teacher.proGate.analytics.title` and `.body`
- * came to render as raw key paths on the live Assignments screen while every
- * i18n guard in the repo stayed green. `proGateCopy.contract.test.ts` iterates
- * THIS array, so adding a feature here fails that test until its copy exists in
- * all six locales.
+ * either. `proGateCopy.contract.test.ts` iterates THIS array, so adding a
+ * feature here fails that test until its copy exists in all six locales.
  */
 export const PRO_FEATURES = ['analytics', 'reports'] as const;
 
@@ -100,7 +110,7 @@ export function ProGate({ feature, children, active = true }: ProGateProps) {
         onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: `pro_gate_${feature}` })}
         className="inline-block rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg"
       >
-        {t('teacher.proGate.cta', { price: String(TEACHER_PRO_PRICE_USD) })}
+        {t('teacher.proGate.cta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
       </Link>
     </div>
   );

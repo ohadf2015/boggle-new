@@ -21,7 +21,8 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
-import { BookOpen, Award, Activity, Star, Crosshair, CalendarClock } from 'lucide-react';
+import { BookOpen, Award, Activity, Star, Crosshair, CalendarClock, Grid2x2 } from 'lucide-react';
+import { readAssignmentMode, wordCraftPracticeHref } from '@/lib/education/wordcraftAssignment';
 import type { PracticeType } from '@/hooks/usePracticeSession';
 import { readAssignmentFocus, focusPracticeHref } from '@/lib/education/vocabFocus';
 
@@ -222,6 +223,8 @@ export default function StudentLessonView() {
           lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
         // Teacher pinned one vocabulary skill on this assignment → offer it first
         const assignedFocus = readAssignmentFocus(studentLesson.assignment);
+        // Teacher assigned Word Craft (practice_focus 'wordcraft') → one tap into the game
+        const assignedWordCraft = readAssignmentMode(studentLesson.assignment) === 'wordcraft';
 
         // Homework has to LOOK like homework. Every card rendered identically,
         // so an assignment with a Friday deadline sat beside optional practice
@@ -352,6 +355,15 @@ export default function StudentLessonView() {
                           : t('student.lessons.assignment.due', { date: dueLabel })}
                       </span>
                     )}
+                    {assignedWordCraft && (
+                      <span
+                        data-testid="assignment-wordcraft-chip"
+                        className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-lime px-2 py-0.5 font-black text-black"
+                      >
+                        <Grid2x2 className="w-4 h-4" aria-hidden="true" />
+                        {t('education.wordcraftAssignment.title')}
+                      </span>
+                    )}
                     {assignedFocus && (
                       <span
                         data-testid="assignment-focus-chip"
@@ -394,6 +406,17 @@ export default function StudentLessonView() {
 
                 {/* Practice button */}
                 <div className="sm:shrink-0 w-full sm:w-auto flex flex-col gap-2">
+                  {assignedWordCraft && (
+                    <Button
+                      size="lg"
+                      data-testid="assigned-wordcraft-practice"
+                      onClick={() => router.push(wordCraftPracticeHref(language, studentLesson.lessonId))}
+                      className="w-full sm:w-auto font-neo-display bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-neo border-neo-black shadow-hard hover:shadow-hard-lg"
+                    >
+                      <Grid2x2 className="w-5 h-5 me-2" aria-hidden="true" />
+                      {t('education.wordcraftAssignment.studentPlay')}
+                    </Button>
+                  )}
                   {assignedFocus && (
                     <Button
                       size="lg"

@@ -32,15 +32,21 @@ import { VocabQuizStandings } from './VocabQuizStandings';
 import { VocabQuizStudentHeader } from './VocabQuizStudentHeader';
 import { VocabQuizRevealBanner } from './VocabQuizRevealBanner';
 import { VocabQuizOwnFinale } from './VocabQuizOwnFinale';
+import { VocabQuizChestFlow } from './VocabQuizChestFlow';
 import { StudentRoundOutcome } from '../results/StudentRoundOutcome';
+import { StudentNextActions } from '../results/StudentNextActions';
 
 export interface VocabQuizViewProps {
   socket: Socket | null;
   username: string;
   t: TranslateFn;
+  /** Callback to start practice mode on missed words. */
+  onPractice?: () => void;
+  /** Callback to re-launch the game (same mode+settings). */
+  onPlayAgain?: () => void;
 }
 
-export function VocabQuizView({ socket, username, t }: VocabQuizViewProps) {
+export function VocabQuizView({ socket, username, t, onPractice, onPlayAgain }: VocabQuizViewProps) {
   const quiz = useVocabQuiz(socket);
   const { question, reveal, myAnswer, pendingChoice, phase } = quiz;
 
@@ -174,57 +180,84 @@ export function VocabQuizView({ socket, username, t }: VocabQuizViewProps) {
       )}
 
       {/* Finished — the same shape a board round ends on: my own placing
-          first, then the room's top three on plinths. One inner region
-          scrolls; the shell stays locked. */}
+          first, then the room's top three on plinths. Layout is pinned to
+          prevent actions from scrolling off-screen: only standings scroll. */}
       {phase === 'ended' && (
-        <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4">
-          <h2 className="flex items-center gap-2 font-neo-display font-bold text-2xl">
+        <div className="flex-1 min-h-0 flex flex-col gap-4">
+          {/* Title — always visible */}
+          <h2 className="shrink-0 flex items-center gap-2 font-neo-display font-bold text-2xl">
             <Trophy className="w-7 h-7 text-neo-yellow" aria-hidden />
             {t('vocabQuiz.finished.title')}
           </h2>
-          {myStanding ? (
-            <StudentRoundOutcome
-              username={username}
-              standings={quiz.standings}
-              mastery={{ found: myStanding.correctCount, total: quiz.totalQuestions }}
+
+          {/* Outcome — always visible */}
+          <div className="shrink-0">
+            {myStanding ? (
+              <StudentRoundOutcome
+                username={username}
+                standings={quiz.standings}
+                mastery={{ found: myStanding.correctCount, total: quiz.totalQuestions }}
+                t={t}
+              />
+            ) : (
+              /*
+               * The standings row is the normal source of the recap, and
+               * `StudentRoundOutcome` renders NOTHING when it cannot find this
+               * player — correct for a spectator, catastrophic for a student who
+               * just watched their own score climb. A late joiner, a renamed
+               * player, or a room the server scored under a different display
+               * name all land here, and the round-2 critic's disqualifying
+               * finding was exactly this number going missing. So the score the
+               * server sent THIS socket is shown on its own: never a podium
+               * placing invented on the client (Class 3), never a zero.
+               */
+              <div
+                data-testid="vocab-quiz-own-score"
+                className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 shadow-hard"
+              >
+                <p className="font-neo-body font-bold text-sm uppercase tracking-widest text-neo-cream">
+                  {t('education.results.you.points')}
+                </p>
+                <p className="font-neo-display font-black text-5xl leading-none tabular-nums text-neo-white">
+                  {quiz.myScore}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Standings — the only scrollable region */}
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <VocabQuizStandings standings={quiz.standings} meUsername={username} limit={5} podium t={t} />
+          </div>
+
+          {/* Finale — always visible (badges/streak) */}
+          <div className="shrink-0">
+            <VocabQuizOwnFinale
+              correct={myStanding?.correctCount ?? 0}
+              total={quiz.totalQuestions}
+              bestStreak={myStanding?.bestStreak ?? quiz.myStreak}
               t={t}
             />
-          ) : (
-            /*
-             * The standings row is the normal source of the recap, and
-             * `StudentRoundOutcome` renders NOTHING when it cannot find this
-             * player — correct for a spectator, catastrophic for a student who
-             * just watched their own score climb. A late joiner, a renamed
-             * player, or a room the server scored under a different display
-             * name all land here, and the round-2 critic's disqualifying
-             * finding was exactly this number going missing. So the score the
-             * server sent THIS socket is shown on its own: never a podium
-             * placing invented on the client (Class 3), never a zero.
-             */
-            <div
-              data-testid="vocab-quiz-own-score"
-              className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 shadow-hard"
-            >
-              <p className="font-neo-body font-bold text-sm uppercase tracking-widest text-neo-cream">
-                {t('education.results.you.points')}
-              </p>
-              <p className="font-neo-display font-black text-5xl leading-none tabular-nums text-neo-white">
-                {quiz.myScore}
-              </p>
-            </div>
-          )}
-          <VocabQuizStandings standings={quiz.standings} meUsername={username} limit={10} podium t={t} />
+          </div>
 
-          {/* The bottom of the phone belongs to what the student earned — the
-              run they built and whether they went clean. See VocabQuizOwnFinale. */}
-          <VocabQuizOwnFinale
-            correct={myStanding?.correctCount ?? 0}
-            total={quiz.totalQuestions}
-            bestStreak={myStanding?.bestStreak ?? quiz.myStreak}
-            t={t}
-          />
+          {/* Primary actions — always visible (wait for teacher + practice escape hatch) */}
+          <div className="shrink-0">
+            <StudentNextActions onPlayAgain={onPlayAgain} onPractice={onPractice} t={t} />
+          </div>
         </div>
       )}
+
+      {/* Treasure chest flow — picker and reveal overlay */}
+      <VocabQuizChestFlow
+        socket={socket}
+        chestPending={quiz.chestPending}
+        myChest={quiz.myChest}
+        chestHit={quiz.chestHit}
+        questionIndex={quiz.question?.index ?? quiz.questionNumber - 1}
+        ended={quiz.phase === 'ended'}
+        username={username}
+        t={t}
+      />
     </div>
   );
 }

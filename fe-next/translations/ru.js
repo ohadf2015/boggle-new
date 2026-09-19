@@ -78,10 +78,32 @@ const ru = {
       "questionCount": "Сколько вопросов?",
       "cappedNotice": "Из этих слов получается {count} вопросов — столько и продлится раунд.",
       "secondsPerQuestion": "Время на вопрос",
-      "seconds": "{seconds} с"
+      "seconds": "{seconds} с",
+      "treasureChests": "Сундуки с сокровищами",
+      "treasureChestsHint": "После верного ответа ученик открывает сундук: бонус, кража очков или обмен.",
+      "on": "Вкл",
+      "off": "Выкл"
     },
     "errors": {
       "noQuestions": "В этом уроке пока нет слов, подходящих для викторины."
+    },
+    "treasure": {
+      "prompt": "Выбери сундук!",
+      "hint": "В каждом сундуке что-то своё. Выбирай с умом!",
+      "chestLabel": "Сундук {number}",
+      "outcome": {
+        "gain": "+{amount} очков!",
+        "double": "Удвоение! +{amount} очков!",
+        "steal": "{amount} очков от {target} теперь твои!",
+        "swap": "Обмен очками: {target}!",
+        "small-loss": "Ой, {amount} очков потерялись. Ты их вернёшь!"
+      },
+      "newTotal": "Твои очки: {score}",
+      "tapToContinue": "Нажми, чтобы продолжить",
+      "hitSteal": "{actor} забирает у тебя {amount} очков. Отыграйся!",
+      "hitSwap": "{actor} меняется с тобой очками. Не сдавайся!",
+      "tickerSteal": "{actor} забирает {amount} очков у {target}!",
+      "tickerSwap": "{actor} и {target} меняются очками!"
     }
   },
   "pricing": {
@@ -1430,6 +1452,12 @@ const ru = {
   "forfeitTitle": "Сдать поединок?",
   "duelComplete": "Поединок завершен!",
   "education": {
+    "subscription": {
+      "classLimitReached": "Вы достигли лимита бесплатных классов. Перейдите на Pro, чтобы создавать классы без ограничений.",
+    },
+    "lobby": {
+      "joinTitle": "Присоединяйтесь к игре",
+    },
     "homework": {
       "takeHomeToggle": "Карточка для практики дома",
       "backToDashboard": "Назад в панель учителя",
@@ -1542,6 +1570,7 @@ const ru = {
       "height": "{{height}} м · {{floors}} этажей",
       "hit": "Слово из списка! {{word}}"
     },
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "practicePicker": {
       "name": {
         "word_tower": "Башня слов"
@@ -1617,6 +1646,20 @@ const ru = {
         "synonym": "Добавьте синонимы к уроку, чтобы открыть",
         "antonym": "Добавьте антонимы к уроку, чтобы открыть"
       }
+    },
+    "wordcraftAssignment": {
+      "title": "WordCraft",
+      "intro": "Обыграй бота на поле слов. Составляй слова из урока — получишь бонусный XP.",
+      "lessonWords": "Слова урока",
+      "play": "Играть",
+      "score": "Очки",
+      "result": "Итог",
+      "won": "Ты победил!",
+      "lost": "Бот победил",
+      "tie": "Ничья",
+      "recommended": "Рекомендуем",
+      "teacherHint": "Один на один с дружелюбным ботом. Ученики играют со страницы класса.",
+      "studentPlay": "Играть в WordCraft"
     },
     "vocabFocus": {
       "title": "Фокус по лексике",
@@ -1770,10 +1813,13 @@ const ru = {
       "classCoverage": "Класс нашёл {{found}} из {{total}} слов урока",
       "reteach": "Эти слова не нашёл никто",
       "allFound": "Класс нашёл все слова урока.",
+      "waitingForTeacher": "Ждём, когда учитель запустит следующий раунд…",
+      "stayInClass": "Оставайтесь здесь — следующая игра начнётся на этом экране.",
       "practiceMissed": "Потренировать эти слова",
       "playReteachRound": "Сыграть раунд повторения — только пропущенные слова",
       "backToLobby": "Назад в лобби",
       "rematch": "Реванш — тот же список, тот же код",
+      "playAgain": "Играть снова",
       "teamBattle": {
         "title": "Командная битва",
         "teamName": "Команда {number}",
@@ -2241,6 +2287,7 @@ const ru = {
       "yesterday": "Вчера"
     },
     "classroomGame": {
+      "defaultClassroomName": "Мой класс",
       "questions": "Вопросы",
       "perQuestion": "На вопрос",
       "namePrompt": {
@@ -2306,6 +2353,7 @@ const ru = {
         "teacher": "Учитель"
       },
       "educationHome": "Главная образования",
+      "exitEducation": "Выйти из образования",
       "homeLink": "Главная",
       "menu": "Меню",
       "navigation": "Навигация образования",
@@ -2687,9 +2735,26 @@ const ru = {
       "commonEnglish": {
         "name": "Распространённый английский",
         "description": "Повседневные английские слова для всех уровней"
+      },
+      "beginnerSpanish": {
+        "name": "Испанский для начинающих",
+        "description": "Основные испанские слова для начинающих"
+      },
+      "beginnerSwedish": {
+        "name": "Шведский для начинающих",
+        "description": "Основные шведские слова для начинающих"
+      },
+      "beginnerJapanese": {
+        "name": "Японский для начинающих",
+        "description": "Основные японские слова для начинающих"
+      },
+      "beginnerRussian": {
+        "name": "Русский для начинающих",
+        "description": "Основные русские слова для начинающих"
       }
     },
     "lesson": {
+      "createdClassroom": "Класс создан",
       "autoPronounce": "Авто-произношение",
       "classicMode": "Классический режим",
       "contextualExamples": "Примеры",
@@ -5682,6 +5747,7 @@ const ru = {
   },
   "errors": {
     "unstableConnection": "Соединение шатается - возвращаем тебя...",
+    "classroomCreateFailed": "Failed to create classroom. Please try again.",
     "slowConnection": "Медленное соединение - мы на это смотрим",
     "sessionExpired": "Сеанс закончился. Пора начать заново!",
     "gameCodeNotExist": "Код не найден. Проверь и попробуй ещё!",
@@ -10470,13 +10536,14 @@ const ru = {
         "title": "Отчёты о прогрессе — функция Pro",
         "body": "Следите за успехами каждого ученика во всех классах и играх: выученные слова, уровни, XP и печатные PDF-отчёты для родительских собраний. Обновите до Teacher Pro, чтобы открыть отчёты по классам и ученикам."
       },
-      "cta": "Открыть с Pro — ${{price}}/месяц"
+      "cta": "Открыть с Pro — {{price}}/месяц"
     },
     "subscription": {
       "giftedNoCard": "Карта не привязана, продления нет — срок просто закончится, и вы вернётесь на бесплатный план.",
       "giftedUntil": "Бесплатный Pro до",
       "giftedBadge": "Подарок",
       "classLimitTitle": "Вы достигли лимита классов",
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
       "classLimitMessage": "Вы создали {{current}} из {{limit}} бесплатных классов. Перейдите на Pro для неограниченного числа классов и учеников.",
       "upgradeProDescription": "Pro даёт неограниченное число классов и учеников в каждом классе — никаких пределов для роста вашего преподавания.",
       "proFeatures": "В Pro входит",
@@ -11902,6 +11969,7 @@ const ru = {
     "streakAtRisk": "Серия заканчивается сегодня!",
     "level": "Ур {{level}}"
   },
+      "classLimitReached": "Classroom limit reached. Upgrade to Teacher Pro for unlimited classrooms.",
   "multiplayerWelcome": {
     "title": "Игра на. Найдите своих людей.",
     "tip": "Проведите буквы, чтобы составить слова — длинные слова дают больше очков!"
@@ -12783,6 +12851,7 @@ const ru = {
       "description": "Начни проводить и развлекайся. Удачи!"
     },
     "swipeHint": "← Проведи для навигации →",
+      "defaultClassroomName": "My Classroom",
     "stepLabel": "Шаг {current} из {total}",
     "callout": {
       "title": "Проведи по буквам!",

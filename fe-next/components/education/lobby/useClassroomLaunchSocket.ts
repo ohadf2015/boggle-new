@@ -59,6 +59,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
   const [isStarting, setIsStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
   const [gameCode] = useState<string>(() => randomGameCode());
+  const [roomCreatedGameCode, setRoomCreatedGameCode] = useState<string | null>(null);
 
   /** A launch asked for before the socket existed. Flushed on connect. */
   const pendingRef = useRef<ClassroomLaunchPayload | null>(null);
@@ -89,7 +90,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
       socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
         if (data.success) {
           toast.success(t('education.classroomGame.gameCreated'));
-          router.push(classroomMultiplayerPath(language, data.gameCode));
+          setRoomCreatedGameCode(data.gameCode);
         }
       });
       // The server's error text is internal English ("Invalid payload: …").
@@ -138,5 +139,21 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
     [socket]
   );
 
-  return { gameCode, isStarting, setIsStarting, startError, setStartError, launch };
+  const startLiveGame = useCallback(() => {
+    if (roomCreatedGameCode) {
+      router.push(classroomMultiplayerPath(language, roomCreatedGameCode));
+    }
+  }, [roomCreatedGameCode, router, language]);
+
+  return {
+    gameCode,
+    isStarting,
+    setIsStarting,
+    startError,
+    setStartError,
+    launch,
+    socket,
+    roomCreatedGameCode,
+    startLiveGame,
+  };
 }

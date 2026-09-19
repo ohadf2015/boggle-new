@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence } from 'framer-motion';
-import { ChevronUp, ChevronDown, Minus } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import LiveClassroomLeaderboard from '@/components/education/duels/LiveClassroomLeaderboard';
+import { ScoreSparkBurst } from '@/components/education/duels/ScoreSparkBurst';
+import { useModeSting } from '@/hooks/useModeSting';
+import { useGameMode } from '@/hooks/gameState/selectors';
+import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { getMascotImagePath, MASCOT_IMAGES } from '@/components/ui/mascotData';
 import { selectStudentRankFraming } from '@/lib/education/studentRankFraming';
 import { selectStudentMascotCue } from '@/lib/education/studentMascotCue';
@@ -19,10 +23,14 @@ import { cn } from '@/lib/utils';
  *
  *  1. My own score and word count. Not comparative to anybody, and the half a
  *     student in the bottom of the class can still move.
- *  2. ONE nearby classmate and the points between us. Relative/local rank is
- *     the documented alternative to an absolute board: it keeps the pull of a
- *     rival without publishing a position whose whole effect runs through
- *     competence frustration (research.md §1).
+ *  2. Me between the classmate just above and just below (the phone variant
+ *     of LiveClassroomLeaderboard, fed the server's board). Relative/local
+ *     rank is the documented alternative to an absolute board: it keeps the
+ *     pull of a rival without publishing a position whose whole effect runs
+ *     through competence frustration (research.md §1).
+ *
+ * A correct word lands on my own score instantly: a bounded spark burst, a
+ * "+N" pop and the mode sting, keyed on the accepted word's id.
  *
  * Deliberately absent, and each absence is the point:
  *  - No rank number and no class size. `selectStudentRankFraming` cannot even
@@ -49,7 +57,12 @@ import { cn } from '@/lib/utils';
 interface RankedEntry {
   username: string;
   score: number;
+  /** The projecting teacher — never one of my neighbours. */
+  isHost?: boolean;
 }
+
+/** How long the "+N" off my own score stays up. */
+const SCORE_POP_MS = 900;
 
 interface StudentRankRailProps {
   leaderboard: ReadonlyArray<RankedEntry>;
@@ -69,25 +82,6 @@ const PRELOADED_VARIANTS = [
   MASCOT_IMAGES.celebration,
   MASCOT_IMAGES.oops,
 ] as const;
-
-const RIVAL_CHIP_STYLE = {
-  // Bright fills carry BLACK text and a black border (~20:1 both ways).
-  ahead: 'bg-neo-cyan text-neo-black border-neo-black',
-  behind: 'bg-neo-lime text-neo-black border-neo-black',
-  tie: 'bg-neo-cream text-neo-black border-neo-black',
-} as const;
-
-const RIVAL_ICON = {
-  ahead: ChevronUp,
-  behind: ChevronDown,
-  tie: Minus,
-} as const;
-
-const RIVAL_LABEL_KEY = {
-  ahead: 'education.student.feel.rival.toCatch',
-  behind: 'education.student.feel.rival.ahead',
-  tie: 'education.student.feel.rival.tied',
-} as const;
 
 const MESSAGE_TONE = {
   ok: 'bg-neo-lime/15 border-neo-lime text-neo-lime',
@@ -116,7 +110,7 @@ export function StudentRankRail({
   }, []);
 
   const framing = useMemo(
-    () => selectStudentRankFraming(leaderboard, currentUsername),
+    () => selectStudentRankFraming(leaderboard.filter((e) => !e.isHost), currentUsername),
     [leaderboard, currentUsername],
   );
 
@@ -125,12 +119,81 @@ export function StudentRankRail({
     [feedback, roundOver],
   );
 
+  // A correct word lands on MY score the instant the server accepts it —
+  // before the (throttled) leaderboard broadcast moves the strip below.
+  const gameMode = useGameMode();
+  const { playModeSound } = useModeSting();
+  const lastAcceptedRef = useRef<string | null>(null);
+  const [scorePop, setScorePop] = useState<{ id: string; points: number } | null>(null);
+  useEffect(() => {
+    if (!feedback || feedback.type !== 'accepted' || roundOver) return;
+    if (lastAcceptedRef.current === feedback.id) return;
+    lastAcceptedRef.current = feedback.id;
+    setScorePop({ id: feedback.id, points: feedback.score ?? 0 });
+    if (gameMode && gameMode !== 'random') playModeSound(gameMode as ClassroomGameMode, 'start');
+  }, [feedback, roundOver, gameMode, playModeSound]);
+  useEffect(() => {
+    if (!scorePop) return;
+    const timer = setTimeout(() => setScorePop(null), SCORE_POP_MS);
+    return () => clearTimeout(timer);
+  }, [scorePop]);
+
+  const neighbours = useMemo(() => leaderboard.filter((e) => !e.isHost), [leaderboard]);
+
   // Not on the board yet (joined late, no score recorded). A zero here would
   // read as "you have nothing", which is the opposite of the intent.
   if (!framing) return null;
 
-  const { myScore, rival } = framing;
-  const RivalIcon = rival ? RIVAL_ICON[rival.direction] : null;
+  const { myScore } = framing;
+
+  // My own progress. Score first — it is the number that moves when I find a
+  // word, and it belongs to nobody else. It rides in MY slot of the strip.
+  const ownProgress = (
+    <div
+      data-testid="student-own-progress"
+      className={cn(
+        'relative flex items-center gap-1 rounded-neo border-neo border-neo-cream/40 px-2 py-1',
+        'bg-neo-navy-light font-neo-display text-neo-cream shadow-hard-sm select-none',
+      )}
+      role="status"
+      aria-live="polite"
+    >
+      {scorePop && <ScoreSparkBurst id={scorePop.id} testId="student-score-burst" />}
+      <AdaptiveMotion.span
+        animate={{ scale: scorePop ? [1, 1.5, 1] : 1 }}
+        transition={{ duration: 0.35 }}
+        className="relative text-base font-black tabular-nums leading-none"
+      >
+        {myScore}
+      </AdaptiveMotion.span>
+      <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
+        {t('education.student.feel.points')}
+      </span>
+      <span className="opacity-40" aria-hidden="true">
+        ·
+      </span>
+      <span className="text-sm font-black tabular-nums leading-none">{wordsFound}</span>
+      <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
+        {t('education.student.feel.words')}
+      </span>
+      {scorePop && scorePop.points > 0 && (
+        <AdaptiveMotion.span
+          key={scorePop.id}
+          data-testid="student-score-pop"
+          aria-hidden="true"
+          initial={{ y: 4, scale: 0.6 }}
+          animate={{ y: -14, scale: 1.1 }}
+          transition={{ type: 'spring', stiffness: 520, damping: 20 }}
+          className={cn(
+            'pointer-events-none absolute -top-2 start-1 z-10 rounded-neo border-2 border-neo-black',
+            'bg-neo-lime px-1 text-[11px] font-black leading-tight text-neo-black tabular-nums',
+          )}
+        >
+          {`+${scorePop.points}`}
+        </AdaptiveMotion.span>
+      )}
+    </div>
+  );
 
   return (
     <div className="block lg:hidden relative" dir={dir}>
@@ -155,53 +218,15 @@ export function StudentRankRail({
           />
         </span>
 
-        {/* My own progress. Score first — it is the number that moves when I
-            find a word, and it belongs to nobody else. */}
-        <div
-          data-testid="student-own-progress"
-          className={cn(
-            'flex items-center gap-1.5 rounded-neo border-neo border-neo-cream/40 px-3 py-1',
-            'bg-neo-navy-light font-neo-display text-neo-cream shadow-hard-sm select-none',
-          )}
-          role="status"
-          aria-live="polite"
-        >
-          <span className="text-base font-black tabular-nums leading-none">{myScore}</span>
-          <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
-            {t('education.student.feel.points')}
-          </span>
-          <span className="opacity-40" aria-hidden="true">
-            ·
-          </span>
-          <span className="text-sm font-black tabular-nums leading-none">{wordsFound}</span>
-          <span className="text-[10px] font-bold uppercase tracking-wide opacity-70">
-            {t('education.student.feel.words')}
-          </span>
-        </div>
-
-        {/* One classmate. Direction is carried by an icon AND a word, never by
-            the fill alone — colour-vision deficiency must not lose the meaning. */}
-        {rival && RivalIcon && (
-          <div
-            data-testid="student-rival-chip"
-            className={cn(
-              'flex max-w-[9rem] items-center gap-1 rounded-neo border-neo px-2 py-1',
-              'font-neo-display shadow-hard-sm select-none',
-              RIVAL_CHIP_STYLE[rival.direction],
-            )}
-            role="status"
-            aria-live="polite"
-          >
-            <RivalIcon className="h-3 w-3 shrink-0" aria-hidden="true" />
-            <span className="truncate text-xs font-black">{rival.name}</span>
-            {rival.direction !== 'tie' && (
-              <span className="text-xs font-black tabular-nums">{rival.gap}</span>
-            )}
-            <span className="text-[9px] font-bold uppercase tracking-wide opacity-80">
-              {t(RIVAL_LABEL_KEY[rival.direction])}
-            </span>
-          </div>
-        )}
+        {/* Me between the classmate just above and just below — the server's
+            board, re-sorted live; direction is an icon, never a place number.
+            MY slot is my own progress chip, so the whole HUD stays one row. */}
+        <LiveClassroomLeaderboard
+          variant="phone"
+          leaderboard={neighbours}
+          currentPlayer={currentUsername}
+          renderMe={() => ownProgress}
+        />
       </div>
 
       {/* The reaction line. Small, transient, and keyed on the feedback id so a

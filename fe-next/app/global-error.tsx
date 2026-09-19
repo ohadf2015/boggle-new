@@ -8,6 +8,8 @@ import {
   claimChunkRecoveryGuard,
   clearChunkRecoveryGuard,
 } from "@/lib/deploy/staleDeployReload";
+import { detectLocaleFromPath } from "@/lib/deploy/detectLocaleFromPath";
+import { sectionHome } from "@/lib/navigation/sectionHome";
 
 function isChunkLoadError(error: Error): boolean {
   return isChunkLoadErrorNameMessage(error.name, error.message);
@@ -23,8 +25,8 @@ export default function GlobalError({
   // Detect locale from URL path (e.g. /he/...) or fallback to 'en'
   const detectedLocale = (() => {
     try {
-      const match = window.location.pathname.match(/^\/(he|en|sv|ja|es)\b/);
-      return (match?.[1] as Language) || 'en';
+      const locale = detectLocaleFromPath(window.location.pathname);
+      return locale as Language;
     } catch {
       return 'en' as Language;
     }
@@ -129,7 +131,13 @@ export default function GlobalError({
               </button>
               <button
                 type="button"
-                onClick={() => (window.location.href = "/")}
+                onClick={() => {
+                  const home = sectionHome({
+                    pathname: typeof window !== 'undefined' ? window.location.pathname : '',
+                    locale: detectedLocale,
+                  });
+                  window.location.href = home;
+                }}
                 className="btn-neo-secondary px-6 py-3 text-lg"
               >
                 🏠 {t("errors.goHome")}

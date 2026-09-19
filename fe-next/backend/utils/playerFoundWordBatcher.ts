@@ -22,6 +22,9 @@
 
 import type { Server } from 'socket.io';
 import { broadcastToRoom, getGameRoom } from './socketHelpers';
+// Circular with gameStateManager (it imports clearPlayerFoundWords): safe, used
+// only at flush time, never while either module is initialising.
+import { getLeaderboard } from '../modules/gameStateManager';
 
 export interface PlayerFoundWordItem {
   username: string;
@@ -76,6 +79,17 @@ export function flushPlayerFoundWords(io: Server, gameCode: string): void {
   const words = buf.items;
   buf.items = [];
   broadcastToRoom(io, getGameRoom(gameCode), 'playerFoundWordBatch', { words });
+  // The standings, reliably, once per flush. wordHandler's per-word
+  // `updateLeaderboard` is VOLATILE and leaves in the same tick as the reliable
+  // `scoreUpdate`, and socket.io drops a volatile packet whenever the transport
+  // is mid-write — so no player ever received it, and every student's live rank
+  // and score stayed frozen until a refresh restored them from the reconnect
+  // payload. A flush is already coalesced (~1 per window per room), so a
+  // reliable leaderboard here costs no more than the batch it follows.
+  const leaderboard = getLeaderboard(gameCode);
+  if (leaderboard.length > 0) {
+    broadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
+  }
 }
 
 export function clearPlayerFoundWords(gameCode: string): void {

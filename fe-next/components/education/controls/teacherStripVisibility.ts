@@ -73,14 +73,16 @@ export function reduceRoundSignal(state: RoundSignalState, signal: RoundSignal):
     // taking it as proof of a live round would park the strip on the standings.
     case 'quizSnapshot':
       return signal.phase === 'ended'
-        ? { ...state, quizRound: false, quizPaused: false }
+        ? IDLE_ROUND_STATE
         : { ...state, quizRound: true, quizPaused: signal.paused };
 
     case 'quizPaused':
       return { ...state, quizPaused: signal.paused };
 
+    // The quiz opens with a shell `startGame` (boardRound) but never sends
+    // `endGame` — its end is this event alone, so it closes BOTH flags.
     case 'quizEnded':
-      return { ...state, quizRound: false, quizPaused: false };
+      return IDLE_ROUND_STATE;
 
     default:
       return state;

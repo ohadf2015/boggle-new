@@ -402,22 +402,6 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       </span>
                       <span>{t('education.header.educationHome')}</span>
                     </Link>
-
-                    {/* Back to Main App */}
-                    <Link
-                      href={`/${language}`}
-                      onClick={() => setShowMobileMenu(false)}
-                      className={cn(
-                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-neo-cream transition-all w-full',
-                        'bg-neo-cream dark:bg-neo-navy hover:bg-neo-pink/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
-                        'shadow-hard-sm hover:shadow-hard'
-                      )}
-                    >
-                      <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-cream/60 text-neo-black">
-                        <Home className="w-4 h-4" aria-hidden="true" />
-                      </span>
-                      <span>{t('common.backToHome')}</span>
-                    </Link>
                   </div>
 
                   {isAuthenticated && (
@@ -447,6 +431,35 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       </div>
                     </>
                   )}
+
+                  <div className="h-0.5 bg-neo-black/20 dark:bg-neo-navy-light rounded-full" />
+
+                  {/* Leave Education Section — rendered for EVERY user, including
+                      unauthenticated guest students, who have no other escape
+                      hatch from the education mobile menu. Kept below its own
+                      divider and styled as visually secondary (thinner border,
+                      no shadow-hard, transparent fill) so it never reads as the
+                      primary action next to "Education Home". */}
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
+                      {t('common.leave')}
+                    </span>
+
+                    {/* Exit Education */}
+                    <Link
+                      href={`/${language}`}
+                      onClick={() => setShowMobileMenu(false)}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black/40 dark:border-neo-cream/40 transition-all w-full',
+                        'bg-transparent dark:bg-transparent hover:bg-neo-black/5 dark:hover:bg-neo-cream/5 text-neo-black dark:text-white'
+                      )}
+                    >
+                      <span className="flex items-center justify-center w-6 h-6 text-neo-black/60 dark:text-neo-cream/60">
+                        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                      </span>
+                      <span>{t('education.header.exitEducation')}</span>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </>

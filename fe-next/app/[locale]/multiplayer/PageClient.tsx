@@ -59,6 +59,7 @@ import { trackInviteRoomDead, trackGrowthEvent, trackInviteConsumed } from '@/ut
 import type { Language, ActiveRoom, Avatar, GameMode, GameModeSelection } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
+import { useClassroomRoomWait } from './useClassroomRoomWait';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 
 // Dynamic imports for code splitting
@@ -277,6 +278,9 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });
     router.push(classroomStudentHomePath(language));
   }, [username, t, router, language, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
+  // Early classroom joiner: the teacher's code is up but her room is not open yet — wait, never bounce.
+  const roomWait = useClassroomRoomWait({ socketRef, isActive, onGiveUp: exitClassroomStudentToHub,
+    rejoin: (code) => handleJoin(false, null, code, undefined, username) });
 
   // Native-safe exit to the multiplayer lobby: reset MP state IN PLACE (no page
   // reload). Shared by the results "Exit" button and the host-left grace modal.
@@ -417,6 +421,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       // fallback). The old message-only matcher leaked raw English for the
       // GAME_CLOSED paths whose custom message lacked "closed"/"not found".
       const kind = classifyRoomError(data);
+      // Same code derivation as the 'gone' branch below: both state values can be empty on a cold invite load.
+      if (kind === 'notOpen') { setError(''); roomWait.hold(gameCode || prefilledRoomCode || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('room') ?? '' : '')); return; }
       if (kind === 'gone') {
         // Snapshot identity BEFORE the resets below clear it: the dead-invite
         // toast needs the room code, and `cameFromInvite` is derived from the
@@ -675,7 +681,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             onCrazyGamesLogin={isCrazyGames && !cgUser ? loginCrazyGames : undefined}
             prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}
             host={isClassroomHost}
-            isClassroomMode={isClassroomMode}
+            isClassroomMode={isClassroomMode} waitingForTeacher={!!roomWait.waitingCode}
             setGameCode={setGameCode} setUsername={setUsername}
             setRoomName={setRoomName} setHostUsername={setHostUsername}
           />

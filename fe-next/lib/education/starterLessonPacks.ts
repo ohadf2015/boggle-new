@@ -123,6 +123,94 @@ const beginnerHebrew: LessonWord[] = [
 ];
 
 // ============================================
+// PACK 4: Beginner Spanish (Beginner)
+// ============================================
+
+const beginnerSpanish: LessonWord[] = [
+  { word: 'sol', definition: 'Estrella que nos da luz de día', hint: 'Brilla en el cielo', difficulty: 'easy' },
+  { word: 'mar', definition: 'Gran masa de agua salada', hint: 'Donde nadan los peces', difficulty: 'easy' },
+  { word: 'pan', definition: 'Alimento hecho de harina', hint: 'Lo comes para desayunar', difficulty: 'easy' },
+  { word: 'gato', definition: 'Felino doméstico que maúlla', hint: 'Tiene bigotes y cola', difficulty: 'easy' },
+  { word: 'casa', definition: 'Lugar donde vivimos', hint: 'Tiene puerta y ventanas', difficulty: 'easy' },
+  { word: 'mesa', definition: 'Mueble con patas para comer', hint: 'Dónde pones los platos', difficulty: 'easy' },
+  { word: 'flor', definition: 'Parte colorida de una planta', hint: 'Bonita y perfumada', difficulty: 'easy' },
+  { word: 'agua', definition: 'Líquido que bebemos', hint: 'Lo necesitas para vivir', difficulty: 'easy' },
+  { word: 'ojo', definition: 'Órgano con el que vemos', hint: 'Tienes dos en la cara', difficulty: 'easy' },
+  { word: 'pie', definition: 'Parte del cuerpo para caminar', hint: 'Llevas zapatos en esto', difficulty: 'easy' },
+  { word: 'luna', definition: 'Brilla en el cielo de noche', hint: 'Sale cuando oscurece', difficulty: 'medium' },
+  { word: 'rosa', definition: 'Flor con espinas', hint: 'Bonita y roja', difficulty: 'medium' },
+  { word: 'nube', definition: 'Flota en el cielo y trae lluvia', hint: 'Blanca y esponjosa', difficulty: 'medium' },
+  { word: 'oso', definition: 'Animal grande y peludo del bosque', hint: 'Es muy fuerte', difficulty: 'medium' },
+  { word: 'ala', definition: 'Con ella vuela el pájaro', hint: 'Tienen los pájaros', difficulty: 'medium' },
+];
+
+// ============================================
+// PACK 5: Beginner Swedish (Beginner)
+// ============================================
+
+const beginnerSwedish: LessonWord[] = [
+  { word: 'sol', definition: 'Lyser på himlen om dagen', hint: 'Varm och ljus', difficulty: 'easy' },
+  { word: 'hus', definition: 'Byggnad där man bor', hint: 'Där du bor', difficulty: 'easy' },
+  { word: 'katt', definition: 'Husdjur som jamar', hint: 'Säger mjau', difficulty: 'easy' },
+  { word: 'hund', definition: 'Husdjur som skäller', hint: 'Säger vov', difficulty: 'easy' },
+  { word: 'bok', definition: 'Den läser man', hint: 'Har många sidor', difficulty: 'easy' },
+  { word: 'bil', definition: 'Fordon med fyra hjul', hint: 'Du kör den', difficulty: 'easy' },
+  { word: 'fisk', definition: 'Djur som lever i vatten', hint: 'Simmar i sjön', difficulty: 'easy' },
+  { word: 'barn', definition: 'En liten människa', hint: 'Du var detta som liten', difficulty: 'easy' },
+  { word: 'hand', definition: 'Kroppsdel med fem fingrar', hint: 'Du skriver med denna', difficulty: 'easy' },
+  { word: 'fot', definition: 'Kroppsdel man går på', hint: 'Längst ned på benet', difficulty: 'easy' },
+  { word: 'måne', definition: 'Lyser på himlen på natten', hint: 'Stor och gul på natten', difficulty: 'medium' },
+  { word: 'ros', definition: 'Blomma med taggar', hint: 'Fin och doftande', difficulty: 'medium' },
+  { word: 'träd', definition: 'Stor växt med stam och löv', hint: 'Växer från jorden', difficulty: 'medium' },
+  { word: 'näsa', definition: 'Med den luktar man', hint: 'Sitter mellan ögonen', difficulty: 'medium' },
+  { word: 'dörr', definition: 'Den öppnar man för att gå in', hint: 'Du öppnar denna', difficulty: 'medium' },
+];
+
+// ============================================
+// PACK 6: Beginner Japanese (Beginner)
+// ============================================
+
+const beginnerJapanese: LessonWord[] = [
+  { word: 'ねこ', definition: 'ニャーと鳴く動物', hint: 'かわいいペット', difficulty: 'easy' },
+  { word: 'いぬ', definition: 'ワンワンとほえる動物', hint: '人間の友達', difficulty: 'easy' },
+  { word: 'はな', definition: 'きれいに咲く植物', hint: 'いろとかおりがある', difficulty: 'easy' },
+  { word: 'そら', definition: 'あたまの上に広がる青いもの', hint: '昼間は青い', difficulty: 'easy' },
+  { word: 'うみ', definition: '塩水の広い場所', hint: 'クジラが住んでいる', difficulty: 'easy' },
+  { word: 'やま', definition: 'とても高い地形', hint: '上に登る', difficulty: 'easy' },
+  { word: 'かわ', definition: '水が流れる細い道', hint: 'うみに流れ込む', difficulty: 'easy' },
+  { word: 'つき', definition: '夜空に光る丸いもの', hint: 'よる見える', difficulty: 'easy' },
+  { word: 'ほし', definition: '夜空でキラキラ光る小さな光', hint: 'いくつもある', difficulty: 'easy' },
+  { word: 'みず', definition: 'のどがかわいたら飲むもの', hint: '透明で大事', difficulty: 'easy' },
+  { word: 'とり', definition: '空を飛ぶ動物', hint: 'はねがある', difficulty: 'medium' },
+  { word: 'あめ', definition: '空から降る水', hint: 'ぬれる', difficulty: 'medium' },
+  { word: 'ゆき', definition: '冬に降る白いもの', hint: 'つめたい', difficulty: 'medium' },
+  { word: 'ほん', definition: 'ページをめくって読むもの', hint: 'じをたくさん読む', difficulty: 'medium' },
+  { word: 'くち', definition: '食べたり話したりする体の部分', hint: '歯がある', difficulty: 'medium' },
+];
+
+// ============================================
+// PACK 7: Beginner Russian (Beginner)
+// ============================================
+
+const beginnerRussian: LessonWord[] = [
+  { word: 'кот', definition: 'Домашний питомец, который мяукает', hint: 'Маленький пушистый', difficulty: 'easy' },
+  { word: 'собака', definition: 'Домашний питомец, который лает', hint: 'Верный друг', difficulty: 'easy' },
+  { word: 'дом', definition: 'Строение где люди живут', hint: 'Там твоя семья', difficulty: 'easy' },
+  { word: 'вода', definition: 'Прозрачная жидкость для питья', hint: 'Пьешь каждый день', difficulty: 'easy' },
+  { word: 'солнце', definition: 'Яркое светило на небе днем', hint: 'Источник света и тепла', difficulty: 'easy' },
+  { word: 'луна', definition: 'Светит на небе ночью', hint: 'Видна ночью', difficulty: 'easy' },
+  { word: 'рыба', definition: 'Животное живущее в воде', hint: 'Плывет в море', difficulty: 'easy' },
+  { word: 'птица', definition: 'Животное с крыльями и перьями', hint: 'Летает в небе', difficulty: 'easy' },
+  { word: 'дерево', definition: 'Большое растение с стволом и листьями', hint: 'Растет из земли', difficulty: 'easy' },
+  { word: 'цветок', definition: 'Красивая часть растения', hint: 'Приятный запах', difficulty: 'easy' },
+  { word: 'глаз', definition: 'Орган зрения', hint: 'Видишь этим', difficulty: 'medium' },
+  { word: 'рука', definition: 'Конечность для работы и движения', hint: 'У тебя их две', difficulty: 'medium' },
+  { word: 'нога', definition: 'Конечность для ходьбы', hint: 'Ходишь на них', difficulty: 'medium' },
+  { word: 'озеро', definition: 'Большое количество воды на суше', hint: 'Вода пресная', difficulty: 'medium' },
+  { word: 'гора', definition: 'Высокий холм', hint: 'Надо подняться', difficulty: 'medium' },
+];
+
+// ============================================
 // EXPORTED PACKS
 // ============================================
 
@@ -165,6 +253,62 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     settings: {
       gridSize: 4,
       minWordLength: 2,
+      timeLimit: 180,
+      allowDiagonal: true,
+    },
+  },
+  {
+    nameKey: 'education.starterPacks.beginnerSpanish.name',
+    descriptionKey: 'education.starterPacks.beginnerSpanish.description',
+    category: 'general',
+    targetLevel: 'beginner',
+    language: 'es',
+    words: beginnerSpanish,
+    settings: {
+      gridSize: 4,
+      minWordLength: 3,
+      timeLimit: 180,
+      allowDiagonal: true,
+    },
+  },
+  {
+    nameKey: 'education.starterPacks.beginnerSwedish.name',
+    descriptionKey: 'education.starterPacks.beginnerSwedish.description',
+    category: 'general',
+    targetLevel: 'beginner',
+    language: 'sv',
+    words: beginnerSwedish,
+    settings: {
+      gridSize: 4,
+      minWordLength: 3,
+      timeLimit: 180,
+      allowDiagonal: true,
+    },
+  },
+  {
+    nameKey: 'education.starterPacks.beginnerJapanese.name',
+    descriptionKey: 'education.starterPacks.beginnerJapanese.description',
+    category: 'general',
+    targetLevel: 'beginner',
+    language: 'ja',
+    words: beginnerJapanese,
+    settings: {
+      gridSize: 4,
+      minWordLength: 1,
+      timeLimit: 180,
+      allowDiagonal: true,
+    },
+  },
+  {
+    nameKey: 'education.starterPacks.beginnerRussian.name',
+    descriptionKey: 'education.starterPacks.beginnerRussian.description',
+    category: 'general',
+    targetLevel: 'beginner',
+    language: 'ru',
+    words: beginnerRussian,
+    settings: {
+      gridSize: 4,
+      minWordLength: 3,
       timeLimit: 180,
       allowDiagonal: true,
     },

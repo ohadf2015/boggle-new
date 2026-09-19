@@ -57,7 +57,7 @@ export function PlanComparisonMatrix() {
   }
 
   return (
-    <section className="mb-12">
+    <section data-testid="plan-comparison-matrix" className="mb-12">
       <h2 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white text-center mb-6">
         {t('teacher.subscription.matrix.title')}
       </h2>

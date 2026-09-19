@@ -32,6 +32,7 @@ import {
   type VocabQuizStanding,
   type VocabQuizStateSnapshot,
   type VocabQuizAnswerResult,
+  type TreasureChestState,
 } from '@/shared/types/vocabQuiz';
 
 // ---------------------------------------------------------------------------
@@ -84,6 +85,12 @@ export interface VocabQuizSession {
   /** Answers for the CURRENT question only, keyed by username. */
   answers: Map<string, QuizAnswer>;
   startedAt: number;
+  /** Whether treasure chests are enabled for this quiz. */
+  treasureChestsEnabled: boolean;
+  /** Hard stop for the reveal's chest hold (absolute wall clock). */
+  chestHoldEndsAt: number;
+  /** Treasure chest results, keyed by `${questionIndex}:${username}`. */
+  chestResults: Map<string, TreasureChestState>;
 }
 
 export interface CreateQuizSessionInput {
@@ -97,6 +104,8 @@ export interface CreateQuizSessionInput {
   now: number;
   /** Lesson language — improves distractor quality for English lessons. */
   language?: string;
+  /** Whether to enable treasure chests for this quiz. */
+  treasureChestsEnabled?: boolean;
 }
 
 const clampInt = (n: number, min: number, max: number, fallback: number): number => {
@@ -151,6 +160,9 @@ export function createQuizSession(input: CreateQuizSessionInput): VocabQuizSessi
     players: new Map(),
     answers: new Map(),
     startedAt: input.now,
+    treasureChestsEnabled: input.treasureChestsEnabled ?? true,
+    chestResults: new Map(),
+    chestHoldEndsAt: 0,
   };
 }
 
@@ -287,7 +299,7 @@ export function submitQuizAnswer(
     player.correctWords.push(question.word);
   }
 
-  return {
+  const result: VocabQuizAnswerResult = {
     index: session.index,
     correct,
     choiceIndex,
@@ -297,6 +309,13 @@ export function submitQuizAnswer(
     streak: streakAfter,
     totalScore: player.score,
   };
+
+  // If chests are enabled and this answer is correct, mark chest as pending
+  if (session.treasureChestsEnabled && correct) {
+    result.chestPending = true;
+  }
+
+  return result;
 }
 
 /** True once every player in the room has answered — the cue to reveal early. */
@@ -408,6 +427,8 @@ export function snapshotFor(
   const ownAnswer = session.answers.get(username);
   const isQuestion = session.phase === 'question' && session.questions.length > 0;
   const isReveal = session.phase === 'reveal' && session.questions.length > 0;
+  const chestKey = `${session.index}:${username}`;
+  const myChest = session.chestResults.get(chestKey);
 
   return {
     gameCode: session.gameCode,
@@ -430,8 +451,10 @@ export function snapshotFor(
           streakBonus: ownAnswer.streakBonus,
           streak: player?.streak ?? 0,
           totalScore: player?.score ?? 0,
+          chestPending: session.treasureChestsEnabled && ownAnswer.correct && !myChest,
         }
       : undefined,
+    myChest,
     myScore: player?.score ?? 0,
     myStreak: player?.streak ?? 0,
     standings: quizStandings(session),

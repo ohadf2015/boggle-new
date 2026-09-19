@@ -36,10 +36,12 @@ export function useIsVocabQuizRoom(socket: Socket | null): boolean {
     // a latch that never released would take the code off screen for a board
     // round played after a quiz — which is the 2026-08-30 incident recorded in
     // lib/education/classroomLobbyChrome.ts, reintroduced by the back door.
-    const release = () => setIsQuizRoom(false);
+    // A quiz rematch opens with its own shell `startGame` too, so re-ask: a live
+    // quiz answers with `state` (re-claim); a board round has no session, no reply.
+    const ask = () => socket.emit(VOCAB_QUIZ_EVENTS.requestState);
+    const release = () => { setIsQuizRoom(false); ask(); };
     socket.on('startGame', release);
 
-    const ask = () => socket.emit(VOCAB_QUIZ_EVENTS.requestState);
     socket.on('connect', ask);
     ask();
 
