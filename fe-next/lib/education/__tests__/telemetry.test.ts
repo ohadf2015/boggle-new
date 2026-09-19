@@ -34,6 +34,7 @@ import {
   trackEduError,
   trackEduTeacherDashboardViewed,
   trackEduTeacherToolsOpened,
+  trackEduProgressDigestViewed,
   trackEduTeacherActionFailed,
   setEduClassroomContext,
   setEduTestAccountFlag,
@@ -241,6 +242,14 @@ describe('education telemetry', () => {
         classroom_count: 0,
         student_count: 0,
         has_pro: true,
+      });
+    });
+
+    it('Given the progress digest, When viewed, Then has_pro and pulse_state ride the event without student names', () => {
+      trackEduProgressDigestViewed({ hasPro: false, state: 'needsReview' });
+      expect(captureMock).toHaveBeenCalledWith('edu_progress_digest_viewed', {
+        has_pro: false,
+        pulse_state: 'needsReview',
       });
     });
   });
