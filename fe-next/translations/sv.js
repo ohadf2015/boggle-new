@@ -11982,6 +11982,22 @@ const sv = {
       },
       "cta": "Lås upp med Pro — {{price}}/månad"
     },
+    "digest": {
+      "title": "Sammandrag av senaste lektionen",
+      "subtitle": "Vad som hände i senaste klasspelet. Full historik och utskrivbara PDF:er är Teacher Pro.",
+      "played": "Spelade",
+      "roster": "På listan",
+      "accuracy": "Klassens träffsäkerhet",
+      "coverage": "Ord som hittades",
+      "missedWords": "Ord att öva om",
+      "struggling": "Kolla in med {{names}}",
+      "emptyNeverPlayed": "Spela ett klasspel så fylls sammandraget i.",
+      "emptyNoRoster": "Bjud in elever först — sen har sammandraget någon att rapportera om.",
+      "loadError": "Kunde inte läsa in senaste lektionen.",
+      "retry": "Försök igen",
+      "proCtaHint": "Lås upp varje spel, varje elev och utskrivbara PDF:er.",
+      "regionLabel": "Fortgångssammandrag för {{classroom}}"
+    },
     "subscription": {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",
       "giftedUntil": "Kostnadsfritt Pro till",

@@ -206,6 +206,19 @@ export function trackEduTeacherToolsOpened(s: EduTeacherSnapshot): void {
   safeCapture('edu_teacher_tools_opened', snapshotProps(s));
 }
 
+/**
+ * `edu_progress_digest_viewed` — free teachers used to open /teacher/reports
+ * and only see a ProGate. The digest is the edu-funnel impression: last-lesson
+ * numbers plus a Teacher Pro CTA. `pulse_state` tells empty vs real lesson
+ * without sending student names.
+ */
+export function trackEduProgressDigestViewed(args: { hasPro: boolean; state: string }): void {
+  safeCapture('edu_progress_digest_viewed', {
+    has_pro: args.hasPro,
+    pulse_state: args.state,
+  });
+}
+
 export type EduTeacherAction = 'create_classroom' | 'create_lesson' | 'create_assignment';
 
 export interface EduTeacherActionFailedArgs {

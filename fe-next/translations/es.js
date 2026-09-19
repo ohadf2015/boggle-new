@@ -11696,6 +11696,22 @@ const es = {
       },
       "cta": "Desbloquéalo con Pro: {{price}}/mes"
     },
+    "digest": {
+      "title": "Resumen de la última clase",
+      "subtitle": "Lo que pasó en el último juego de clase. El historial completo y los PDF imprimibles son Teacher Pro.",
+      "played": "Jugaron",
+      "roster": "En la lista",
+      "accuracy": "Precisión de la clase",
+      "coverage": "Palabras encontradas",
+      "missedWords": "Palabras a repasar",
+      "struggling": "Revisa con {{names}}",
+      "emptyNeverPlayed": "Juega una partida de clase y este resumen se llena.",
+      "emptyNoRoster": "Invita primero al alumnado: luego el resumen tiene a quién informar.",
+      "loadError": "No se pudo cargar la última clase.",
+      "retry": "Reintentar",
+      "proCtaHint": "Desbloquea cada partida, cada estudiante y PDF imprimibles.",
+      "regionLabel": "Resumen de progreso de {{classroom}}"
+    },
     "subscription": {
       "giftedNoCard": "Sin tarjeta ni renovación: simplemente termina y vuelves al plan gratuito.",
       "giftedUntil": "Pro de cortesía hasta",

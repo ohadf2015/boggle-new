@@ -34,6 +34,14 @@ vi.mock('@/components/teacher/reports/ClassProgressReport', () => ({
   ),
 }));
 
+vi.mock('@/components/teacher/digest/ProgressDigestDashboard', () => ({
+  ProgressDigestDashboard: ({ classroomId }: { classroomId: string }) => (
+    <div data-testid="progress-digest-dashboard" data-classroom-id={classroomId}>
+      Progress Digest Mock
+    </div>
+  ),
+}));
+
 // Mock useLanguage
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -192,25 +200,33 @@ describe('ReportsPageClient', () => {
       proState.loading = false;
     });
 
-    it('shows the Pro upsell instead of reports for a free teacher', () => {
+    it('lets a free teacher pick a class and see the last-lesson digest', () => {
       proState.hasPro = false;
       render(<ReportsPageClient />);
 
-      expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
-      expect(screen.queryByText('Progress Reports')).not.toBeInTheDocument();
+      expect(screen.getByText('Progress Reports')).toBeInTheDocument();
+      expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
     });
 
-    it('holds the loading state inside the shell, with no report content yet', () => {
-      // The shell is mounted ABOVE both gates, so the entitlement-loading frame
-      // is inside the locked, non-scrolling layout rather than a bare document
-      // that scrolls for a beat and then stops. What must NOT be there yet is
-      // any report content — see gatedShellOrder.test.ts.
+    it('keeps full reports behind Pro once a class is selected', () => {
+      proState.hasPro = false;
+      mockSearchParams.set('classroomId', 'classroom-1');
+      render(<ReportsPageClient />);
+
+      expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
+      expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
+      expect(screen.queryByTestId('class-progress-report')).not.toBeInTheDocument();
+    });
+
+    it('holds the loading ProGate inside the shell, with no full report yet', () => {
       proState.loading = true;
+      mockSearchParams.set('classroomId', 'classroom-1');
       const { container } = render(<ReportsPageClient />);
 
-      expect(screen.getByTestId('education-shell-scroll')).toBeEmptyDOMElement();
+      expect(screen.getByTestId('education-shell-scroll')).toBeInTheDocument();
       expect(container).not.toBeEmptyDOMElement();
-      expect(screen.queryByText('Progress Reports')).not.toBeInTheDocument();
+      expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
+      expect(screen.queryByTestId('class-progress-report')).not.toBeInTheDocument();
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
     });
 
