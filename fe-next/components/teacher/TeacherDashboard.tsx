@@ -1,21 +1,6 @@
 /**
- * TeacherDashboard — one screen, one button.
- *
- * It used to be three tabs (Play / Prepare / Review). Measured live at
- * 1440x900, the landing screen carried a Pro banner, a plan badge, a tab bar, a
- * students-present strip, a generic START GAME, a Duel Activity panel and a tip
- * card — and not a single lesson. The lessons a teacher came for were a tab
- * away, so hosting a specific word list cost three taps and a hunt.
- *
- * Now the screen leads with PLAY NOW: one dominant button, already armed with
- * the teacher's most recently played list, with starter packs and a paste box
- * behind it as ways to change the words rather than steps to pass through. A
- * tired teacher taps once and the express lobby has a join code on the
- * projector — no classroom, no roster, no lesson made first.
- *
- * Below it, the lesson builder for when there IS time to prepare, then two
- * small shortcuts (last game, reports), then one disclosure holding every
- * other surface (classrooms, assignments, analytics) shut until asked for.
+ * TeacherDashboard — one screen, one button (PLAY NOW), lesson builder
+ * below, everything else in a closed Tools disclosure.
  */
 
 'use client';
@@ -42,6 +27,7 @@ import PlayTabFirstRunCard from './PlayTabFirstRunCard';
 import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
 import { ClassPulseSection } from './dashboard/ClassPulseSection';
 import { ClassSwitcher } from './dashboard/ClassSwitcher';
+import { TeacherActivationNudgeLive } from './dashboard/TeacherActivationNudge';
 import {
   QUICK_LAUNCH_FLOW,
   writeQuickLaunchIntent,
@@ -339,16 +325,9 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
               </Link>
             </nav>
 
-            {/* The state of the class, and the one thing to do about it.
-                This slot used to hold `StudentsPresentStrip`, which rendered
-                `member_count` under the copy "{count} students are in
-                {classroom} right now" — the ENROLMENT count sold as presence.
-                A teacher with 28 on the roster and an empty room was told 28
-                students were waiting, in the loudest slab on the page. */}
-            {/* Which class the deck is pointed at. Out here, not inside the
-                collapsed tools drawer where changing it used to cost two taps
-                and a hunt. Each chip carries its own roster, so the row says
-                which class is empty before it is selected. */}
+            {/* Class switcher lives here, not in Tools: changing class used
+                to cost two taps. Pulse is last-game state; the activation
+                nudge is the join-link / first-assignment step. */}
             {!classroomsLoading && classrooms.length > 1 && (
               <ClassSwitcher
                 className="mb-3"
@@ -359,15 +338,24 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
             )}
 
             {!classroomsLoading && selectedClassroom && (
-              <ClassPulseSection
-                className="mb-6"
-                classroomId={selectedClassroom.id}
-                classroomName={selectedClassroom.name}
-                rosterCount={selectedClassroom.member_count || 0}
-                onInvite={() => router.push(`/${language}/teacher/classroom`)}
-                onPlay={focusLauncher}
-                onReviewWords={openReviewLesson}
-              />
+              <>
+                <TeacherActivationNudgeLive
+                  className="mb-3"
+                  classroomId={selectedClassroom.id}
+                  rosterCount={selectedClassroom.member_count || 0}
+                  joinCode={selectedClassroom.join_code}
+                  onCreateAssignment={() => setShowAssignmentCreator(true)}
+                />
+                <ClassPulseSection
+                  className="mb-6"
+                  classroomId={selectedClassroom.id}
+                  classroomName={selectedClassroom.name}
+                  rosterCount={selectedClassroom.member_count || 0}
+                  onInvite={() => router.push(`/${language}/teacher/classroom`)}
+                  onPlay={focusLauncher}
+                  onReviewWords={openReviewLesson}
+                />
+              </>
             )}
             </m.aside>
 

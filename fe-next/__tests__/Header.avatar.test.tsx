@@ -82,6 +82,10 @@ vi.mock('@/components/Avatar', () => ({
     </div>
   ),
 }));
+vi.mock('@/components/AvatarLite', () => ({
+  __esModule: true,
+  default: () => <div data-testid="header-avatar">AvatarLite</div>,
+}));
 
 const mockPush = vi.fn();
 const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;

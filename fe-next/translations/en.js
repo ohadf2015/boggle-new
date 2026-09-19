@@ -11170,6 +11170,15 @@ const en = {
       "regionLabel": "Class status for {{classroom}}",
       "switcherLabel": "Which class"
     },
+    "activation": {
+      "shareTitle": "Students join with this link",
+      "shareBody": "Share the code or the link. No account needed — they pick a name and land on the roster.",
+      "copyLink": "Copy join link",
+      "share": "Share",
+      "firstAssignmentTitle": "Create their first assignment",
+      "firstAssignmentBody": "Students are on the roster. Assign a practice so the class has something to do when you're not live.",
+      "firstAssignmentCta": "Create first assignment"
+    },
     "playNow": {
       "recommended": "Recommended",
       "title": "Play now",

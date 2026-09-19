@@ -12631,6 +12631,15 @@ const es = {
       "regionLabel": "Estado de la clase {{classroom}}",
       "switcherLabel": "Qué clase"
     },
+    "activation": {
+      "shareTitle": "El alumnado entra con este enlace",
+      "shareBody": "Comparte el código o el enlace. Sin cuenta: eligen un nombre y entran en la lista.",
+      "copyLink": "Copiar enlace de unión",
+      "share": "Compartir",
+      "firstAssignmentTitle": "Crea su primera tarea",
+      "firstAssignmentBody": "Ya hay estudiantes en la lista. Asigna una práctica para que la clase tenga algo que hacer cuando no estés en directo.",
+      "firstAssignmentCta": "Crear primera tarea"
+    },
     "playNow": {
       "recommended": "Recomendado",
       "title": "Jugar ya",
