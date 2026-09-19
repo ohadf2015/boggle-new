@@ -32,6 +32,10 @@ const ENDED = {
   questionNumber: 10,
   finished: true,
   lockIn: null,
+  chestPending: false,
+  myChest: null,
+  chestEvents: [],
+  chestHit: null,
   answer: vi.fn(),
   isQuizRoom: true,
 };
