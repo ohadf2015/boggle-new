@@ -11,14 +11,45 @@ function renderWithProviders(ui: React.ReactElement) {
   );
 }
 
-const WORD_HUNT_URL = '*/api/daily-challenge/word-hunt/leaderboard/*/*';
-const WORD_WHEEL_URL = '*/api/daily-challenge/word-wheel/leaderboard/*/*';
+/* The board used to fetch the Word Hunt and Word Wheel endpoints and sum them
+   in the browser — 2 of the 4 modes the hub shows. It now reads ONE endpoint
+   that merges all four server-side (the only way to include Connections, whose
+   public board exposes no player identity to join on). These tests moved to
+   that endpoint; the per-mode ones are no longer called. */
+const BOARD_URL = '*/api/daily/leaderboard*';
 
-function mockBothEndpoints(huntData: unknown[] = [], wheelData: unknown[] = []) {
-  server.use(
-    http.get(WORD_HUNT_URL, () => HttpResponse.json({ data: huntData })),
-    http.get(WORD_WHEEL_URL, () => HttpResponse.json({ data: wheelData })),
-  );
+const EMPTY_MODES = { 'word-hunt': 0, 'word-wheel': 0, 'word-tower': 0, connections: 0 };
+
+/** Build the merged shape the endpoint returns. */
+function entry(rank: number, name: string, byMode: Partial<typeof EMPTY_MODES>) {
+  const modes = { ...EMPTY_MODES, ...byMode };
+  return {
+    rank, name,
+    avatarEmoji: null, avatarColor: null, avatarImage: null, customAvatar: null,
+    total: Object.values(modes).reduce((a, b) => a + b, 0),
+    byMode: modes,
+    towerHeightM: modes['word-tower'] ? modes['word-tower'] / 5 : null,
+    playedModes: (Object.keys(modes) as (keyof typeof EMPTY_MODES)[]).filter((m) => modes[m] > 0),
+  };
+}
+
+function mockBoard(entries: unknown[] = []) {
+  server.use(http.get(BOARD_URL, () => HttpResponse.json({ data: entries })));
+}
+
+/** Back-compat shim so the unchanged tests below keep reading well. */
+function mockBothEndpoints(huntData: { display_name: string; score: number }[] = [], wheelData: { display_name: string; score: number }[] = []) {
+  const byName = new Map<string, { hunt: number; wheel: number }>();
+  for (const r of huntData) byName.set(r.display_name, { hunt: r.score, wheel: 0 });
+  for (const r of wheelData) {
+    const cur = byName.get(r.display_name) ?? { hunt: 0, wheel: 0 };
+    byName.set(r.display_name, { ...cur, wheel: r.score });
+  }
+  const entries = [...byName.entries()]
+    .map(([name, v]) => entry(0, name, { 'word-hunt': v.hunt, 'word-wheel': v.wheel }))
+    .sort((a, b) => b.total - a.total)
+    .map((e, i) => ({ ...e, rank: i + 1 }));
+  mockBoard(entries);
 }
 
 describe('LeaderboardTeaser', () => {
@@ -33,10 +64,7 @@ describe('LeaderboardTeaser', () => {
   });
 
   test('shows skeleton loading state initially', () => {
-    server.use(
-      http.get(WORD_HUNT_URL, () => new Promise(() => {})),
-      http.get(WORD_WHEEL_URL, () => new Promise(() => {})),
-    );
+    server.use(http.get(BOARD_URL, () => new Promise(() => {})));
 
     const { container } = renderWithProviders(
       <LeaderboardTeaser currentLanguage="en" />
@@ -46,7 +74,7 @@ describe('LeaderboardTeaser', () => {
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
-  test('renders top 3 players from word-hunt scores', async () => {
+  test('renders the top 3 players the endpoint returns', async () => {
     mockBothEndpoints([
       { player_id: 'p1', display_name: 'JellyDrifter', score: 12450 },
       { player_id: 'p2', display_name: 'ZenithX', score: 11920 },
@@ -62,7 +90,7 @@ describe('LeaderboardTeaser', () => {
     });
   });
 
-  test('sums scores from both word-hunt and word-wheel', async () => {
+  test('shows the combined total the endpoint computed across modes', async () => {
     mockBothEndpoints(
       [
         { player_id: 'p1', display_name: 'Alice', score: 5000 },
@@ -81,10 +109,8 @@ describe('LeaderboardTeaser', () => {
       expect(screen.getByText('Alice')).toBeInTheDocument();
       expect(screen.getByText('11,000')).toBeInTheDocument();
       expect(screen.getByText('Bob')).toBeInTheDocument();
-      // 8,000 appears twice: accumulated total + hunt breakdown line
       expect(screen.getAllByText('8,000').length).toBeGreaterThan(0);
       expect(screen.getByText('Charlie')).toBeInTheDocument();
-      // 3,000 appears twice: accumulated total + wheel breakdown line
       expect(screen.getAllByText('3,000').length).toBeGreaterThan(0);
     });
   });
@@ -100,10 +126,7 @@ describe('LeaderboardTeaser', () => {
   });
 
   test('handles fetch error gracefully', async () => {
-    server.use(
-      http.get(WORD_HUNT_URL, () => HttpResponse.error()),
-      http.get(WORD_WHEEL_URL, () => HttpResponse.error()),
-    );
+    server.use(http.get(BOARD_URL, () => HttpResponse.error()));
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
@@ -112,21 +135,16 @@ describe('LeaderboardTeaser', () => {
     });
   });
 
-  test('works when only one endpoint returns data', async () => {
-    server.use(
-      http.get(WORD_HUNT_URL, () => HttpResponse.error()),
-      http.get(WORD_WHEEL_URL, () => HttpResponse.json({
-        data: [
-          { player_id: 'p1', display_name: 'Solo', score: 7777 },
-        ],
-      })),
-    );
+  test('renders a player who has only played one mode', async () => {
+    // WAS 'works when only one endpoint returns data' — partial-failure
+    // resilience now lives server-side (the route uses allSettled per mode), so
+    // the client-visible case is simply a player with one mode scored.
+    mockBoard([entry(1, 'Solo', { 'word-wheel': 7777 })]);
 
     renderWithProviders(<LeaderboardTeaser currentLanguage="en" />);
 
     await waitFor(() => {
       expect(screen.getByText('Solo')).toBeInTheDocument();
-      // 7,777 appears twice: accumulated total + wheel breakdown line
       expect(screen.getAllByText('7,777').length).toBeGreaterThan(0);
     });
   });

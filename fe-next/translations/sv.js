@@ -8075,6 +8075,8 @@ const sv = {
     "relaxedQuest": "Lugnt uppdrag",
     "untimedQuest": "Utan Timer",
     "startQuest": "STARTA QUEST",
+    "aPlayer": "En spelare",
+    "modesPlayedCount": "{count} av 4 spel idag",
     "nextUp": "Härnäst",
     "allClearToday": "Klart för idag — vi ses i morgon",
     "adminBeta": "Beta",
