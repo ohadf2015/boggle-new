@@ -179,9 +179,12 @@ export default function TreasureScreen({ offers, taken, relic, gold, run, world,
       {/* Both answers are confirmed: the pick costs the rest of the chest, and
           the sealed-chest answer pays nothing at all. Neither is a mis-tap. */}
       <AnimatePresence>
+        {/* CSS entrance, not a framer-motion hidden initial: a backdrop whose
+            opacity is driven by the rAF loop paints black when that loop is
+            starved — popupRevealGuard enforces this. */}
         {confirm != null && (
-          <motion.div className="fixed inset-0 z-30 grid place-items-center bg-black/75 p-5"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setConfirm(null)}>
+          <div className="fixed inset-0 z-30 grid place-items-center bg-black/75 p-5 animate-in fade-in duration-200"
+            onClick={() => setConfirm(null)}>
             <motion.div role="dialog" aria-modal="true" data-testid="treasure-confirm"
               initial={reduce ? false : { scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} exit={reduce ? undefined : { scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 380, damping: 26 }}
@@ -230,7 +233,7 @@ export default function TreasureScreen({ offers, taken, relic, gold, run, world,
                 </button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </NodeShell>
