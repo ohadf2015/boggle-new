@@ -16,6 +16,7 @@ import {
   clearQuickLaunchIntent,
   readQuickLaunchIntent,
 } from '@/components/teacher/dashboard/quickLaunchIntent';
+import { CEFR_LEVELS, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import { cn } from '@/lib/utils';
 
 /**
@@ -42,6 +43,12 @@ function ClassroomGameInner() {
   const lessonId = searchParams?.get('lessonId') || '';
   // 'repeatLast' (dashboard Repeat-last hero) prefills the whole last setup.
   const flow = searchParams?.get('flow') || '';
+  // ?cefr=A1|A2|B1 — the ESL page demo's "Run this list with the class" CTA.
+  // Validated here so a junk param falls through to the plain lobby.
+  const cefrParam = searchParams?.get('cefr') || '';
+  const cefrLevel = (CEFR_LEVELS as readonly string[]).includes(cefrParam)
+    ? (cefrParam as CefrLevel)
+    : undefined;
 
   // 'quickLaunch' — the dashboard's one-tap PLAY NOW. The intent is read ONCE,
   // at mount, so a reload (or a second tab, or a five-minute-old intent) falls
@@ -124,6 +131,7 @@ function ClassroomGameInner() {
           <ClassroomGameLobby
             initialLessonId={lessonId}
             initialFlow={flow}
+            cefrLevel={cefrLevel}
             onBack={handleBack}
           />
         )}
