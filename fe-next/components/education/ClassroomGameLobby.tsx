@@ -21,7 +21,7 @@
 
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,6 +31,7 @@ import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
 import { socketTeacherName } from '@/lib/education/classroomGameHandoff';
 import { useClassrooms } from '@/hooks/useClassroom';
 import type { Language } from '@/lib/supabase/education/types';
+import { cefrLessonPack, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import {
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
@@ -59,10 +60,16 @@ export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
   /** 'repeatLast' → prefill classroom + lessons + settings from the last game. */
   initialFlow?: string;
+  /**
+   * `?cefr=` from the ESL page's "Run this list with the class" demo CTA.
+   * Pre-selects the matching starter lesson, materializing it first if the
+   * teacher does not have it yet.
+   */
+  cefrLevel?: CefrLevel;
   onBack: () => void;
 }
 
-export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: ClassroomGameLobbyProps) {
+export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, onBack }: ClassroomGameLobbyProps) {
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const router = useRouter();
@@ -81,6 +88,23 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   } = useTeacherLobbyData(user?.id, t, initialLessonId);
 
   const { createClassroom } = useClassrooms();
+
+  // ?cefr= deep link from the ESL page demo: once the teacher's lessons are
+  // loaded, select the matching CEFR starter lesson — or create it from the
+  // pack (createLessonFromPack selects the new lesson itself). Runs once per
+  // mount; the pack name is stable, so a repeat visit reuses the lesson.
+  const cefrApplied = useRef(false);
+  useEffect(() => {
+    if (!cefrLevel || cefrApplied.current || isLoading) return;
+    cefrApplied.current = true;
+    const pack = cefrLessonPack(cefrLevel);
+    const existing = lessons.find((l) => l.name === pack.name);
+    if (existing) {
+      setSelectedLessonIds([existing.id]);
+    } else {
+      void createLessonFromPack(pack);
+    }
+  }, [cefrLevel, isLoading, lessons, createLessonFromPack, setSelectedLessonIds]);
 
   const { gameCode, isStarting, startError, setStartError, launch, socket, roomCreatedGameCode, startLiveGame } = useClassroomLaunchSocket(t, language);
 
