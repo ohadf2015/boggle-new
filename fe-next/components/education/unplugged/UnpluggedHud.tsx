@@ -52,7 +52,7 @@ export function UnpluggedHud({
   return (
     <header
       data-testid="unplugged-hud"
-      className="shrink-0 flex items-center gap-2 sm:gap-4 px-2 sm:px-4 py-2 border-b-neo border-neo-black bg-neo-navy-light"
+      className="shrink-0 flex items-center gap-2 sm:gap-4 px-2 sm:px-4 py-2 border-b-neo border-neo-cream/40 bg-neo-navy-light"
     >
       <Link
         href={homeHref}

@@ -15,12 +15,15 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
+import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { ProGate } from '@/components/teacher/ProGate';
+import { trackEduReportsViewed } from '@/lib/education/telemetry';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 32;
@@ -75,6 +78,21 @@ function TeacherReportsInner() {
     [pathname, router],
   );
 
+  const { hasPro } = useTeacherPro();
+  // Reports telemetry is a Pro-funnel signal: the free surface (picker +
+  // digest + upsell) is tracked separately, so only fire for a teacher who
+  // actually has reports in front of them.
+  useEffect(() => {
+    if (!hasPro) return;
+    const payload: { classroomId?: string; studentId?: string } = {};
+    if (classroomIdFromUrl) payload.classroomId = classroomIdFromUrl;
+    if (studentIdFromUrl) payload.studentId = studentIdFromUrl;
+    trackEduReportsViewed(payload);
+    // Fire once per landing — classroom clicks are navigation, not a new view.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPro]);
+
+  // Handle classroom selection
   const handleClassroomSelect = useCallback(
     (classroomId: string) => {
       setSelectedClassroomId(classroomId);
@@ -190,6 +208,7 @@ function TeacherReportsInner() {
     );
   } else if (selectedStudentId) {
     view = (
+      <ProGate feature="reports">
       <>
         <button
           type="button"
@@ -202,9 +221,22 @@ function TeacherReportsInner() {
         </button>
         <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
       </>
+      </ProGate>
     );
   } else {
-    view = <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />;
+    const selectedClassroom = classrooms?.find((c) => c.id === selectedClassroomId);
+    view = (
+      <div className="space-y-8">
+        <ProgressDigestDashboard
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+          rosterCount={selectedClassroom?.member_count ?? 0}
+        />
+        <ProGate feature="reports">
+          <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
+        </ProGate>
+      </div>
+    );
   }
 
   return (
@@ -234,17 +266,14 @@ function TeacherReportsInner() {
   );
 }
 
-// Reports are a Pro surface (planMatrix: analytics/reports are what the money
-// buys; last-game insights on the dashboard stay free). The gate swaps the
-// whole page for the upsell — same merchandising-boundary pattern as the
-// analytics dashboard.
+// Last-lesson digest is free (same last-game read as the dashboard pulse).
+// Full class/student reports stay behind ProGate, mounted inside Inner so a
+// free teacher still gets the picker + digest + Teacher Pro CTA.
 export default function TeacherReportsPage() {
   return (
     <ReportsShell>
       <TeacherGate>
-        <ProGate feature="reports">
-          <TeacherReportsInner />
-        </ProGate>
+        <TeacherReportsInner />
       </TeacherGate>
     </ReportsShell>
   );

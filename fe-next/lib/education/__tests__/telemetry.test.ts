@@ -34,10 +34,13 @@ import {
   trackEduError,
   trackEduTeacherDashboardViewed,
   trackEduTeacherToolsOpened,
+  trackEduProgressDigestViewed,
   trackEduTeacherActionFailed,
   setEduClassroomContext,
   setEduTestAccountFlag,
   isTestAccountEmail,
+  trackEduLiveGameStarted,
+  trackEduReportsViewed,
 } from '../telemetry';
 
 describe('education telemetry', () => {
@@ -243,6 +246,14 @@ describe('education telemetry', () => {
         has_pro: true,
       });
     });
+
+    it('Given the progress digest, When viewed, Then has_pro and pulse_state ride the event without student names', () => {
+      trackEduProgressDigestViewed({ hasPro: false, state: 'needsReview' });
+      expect(captureMock).toHaveBeenCalledWith('edu_progress_digest_viewed', {
+        has_pro: false,
+        pulse_state: 'needsReview',
+      });
+    });
   });
 
   describe('teacher action failed', () => {
@@ -276,5 +287,38 @@ describe('education telemetry', () => {
       throw new Error('boom');
     });
     expect(() => setEduClassroomContext('cls-1')).not.toThrow();
+  });
+
+  it('classroom created event captures id + language so we can quote create vs join', () => {
+    trackEduClassroomCreated({ classroomId: 'cls-1', createdVia: 'dashboard', language: 'en' });
+    expect(captureMock).toHaveBeenCalledWith('edu_classroom_created', {
+      classroom_id: 'cls-1',
+      created_via: 'dashboard',
+      language: 'en',
+    });
+  });
+
+  it('live game started tags the teacher click source', () => {
+    trackEduLiveGameStarted({
+      classroomId: 'cls-1',
+      source: 'create_room',
+      lessonCount: 2,
+    });
+    expect(captureMock).toHaveBeenCalledWith('edu_live_game_started', {
+      classroom_id: 'cls-1',
+      source: 'create_room',
+      lesson_count: 2,
+    });
+  });
+
+  it('reports viewed fires with optional classroom scope', () => {
+    trackEduReportsViewed({});
+    expect(captureMock).toHaveBeenCalledWith('edu_reports_viewed', {});
+
+    trackEduReportsViewed({ classroomId: 'cls-1', studentId: 'stu-9' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_reports_viewed', {
+      classroom_id: 'cls-1',
+      student_id: 'stu-9',
+    });
   });
 });

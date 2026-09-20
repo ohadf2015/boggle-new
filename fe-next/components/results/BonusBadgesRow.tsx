@@ -114,13 +114,15 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
 
       {/* Level Up */}
       {levelUpData && (
+        // Multi-keyframe level-up pop must tween — springs accept two
+        // keyframes max (t_15ec0d7a, #893 recurrence).
         <m.span
           initial={{ scale: 0, rotate: 15, y: 10 }}
           // Springs support 2 keyframes max (t_15ec0d7a / #893). damping 10 overshoots hard.
           animate={{ scale: 1, rotate: 0, y: 0 }}
           whileHover={{ scale: 1.15, rotate: -3, y: -3 }}
           whileTap={{ scale: 0.9 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 10 }}
+          transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
           className={cn(
             'bg-neo-lime border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black cursor-default',
             sizeClasses

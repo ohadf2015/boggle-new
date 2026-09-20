@@ -179,7 +179,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
             </thead>
             <tbody>
               {data.studentRankings.map((student) => (
-                <tr key={student.studentId} className="border-t border-neo-cream/10 transition-colors hover:bg-neo-cream/5">
+                <tr key={student.studentId} className="border-t border-neo-cream/40 transition-colors hover:bg-neo-cream/5">
                   <td className="px-3 font-neo-display text-base font-black text-neo-cream/80 tabular-nums">{student.rank}</td>
                   <td className="px-3">{studentName(student.studentId, student.studentName)}</td>
                   <td className="hidden px-3 text-end text-neo-white tabular-nums sm:table-cell">{student.score}</td>

@@ -41,7 +41,7 @@ export function TrialUrgencyBanner({ trial, href }: Props) {
             money. Both strings already exist in every locale. */}
         <Link
           href={`/${language}/teacher/upgrade`}
-          className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+          className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
         >
           {t('teacher.subscription.upgradeNow')}
         </Link>
@@ -61,7 +61,7 @@ export function TrialUrgencyBanner({ trial, href }: Props) {
       className={`rounded-neo border-neo p-4 shadow-hard ${tone}`}
     >
       <div className="flex items-center gap-4">
-        <div className="shrink-0 rounded-neo border-neo bg-neo-navy px-3 py-2 text-center text-neo-white shadow-hard-sm">
+        <div className="shrink-0 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-2 text-center text-neo-white shadow-hard-sm">
           <div data-testid="trial-count" className="text-2xl font-black font-neo-display leading-none">
             {count}
           </div>
@@ -80,7 +80,7 @@ export function TrialUrgencyBanner({ trial, href }: Props) {
       </div>
       <Link
         href={target}
-        className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+        className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
       >
         {t('education.trial.cta')}
       </Link>

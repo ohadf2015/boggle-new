@@ -23,11 +23,11 @@ describe('BlastChestBadge', () => {
       <BlastChestBadge chestNumber={1} progress={0.4} contents={contents} onPreview={() => {}} />
     );
 
-    expect(screen.getByText(/Chest #1/i)).toBeDefined();
+    expect(screen.getByTestId('chest-badge').getAttribute('aria-label')).toMatch(/Chest #1/i);
     expect(screen.getByText(/40%/i)).toBeDefined();
   });
 
-  it('displays coins in contents summary', () => {
+  it('keeps the contents summary out of the collapsed badge (aria-label only)', () => {
     const contents = {
       tier: 'wood' as const,
       coins: 250,
@@ -40,10 +40,13 @@ describe('BlastChestBadge', () => {
       <BlastChestBadge chestNumber={1} progress={0} contents={contents} onPreview={() => {}} />
     );
 
-    expect(screen.getByText(/\+250 coins/i)).toBeDefined();
+    // The +N coins row would make the badge tower over the level box in
+    // band 1 — contents live in the tap-to-open preview modal instead.
+    expect(screen.queryByText(/\+250 coins/i)).toBeNull();
+    expect(screen.getByTestId('chest-badge').getAttribute('aria-label')).toMatch(/\+250 coins/i);
   });
 
-  it('displays boosts if present', () => {
+  it('announces boosts in the aria-label', () => {
     const contents = {
       tier: 'silver' as const,
       coins: 400,
@@ -56,10 +59,11 @@ describe('BlastChestBadge', () => {
       <BlastChestBadge chestNumber={2} progress={0.5} contents={contents} onPreview={() => {}} />
     );
 
-    expect(screen.getByText(/\+1 boost/i)).toBeDefined();
+    expect(screen.queryByText(/\+1 boost/i)).toBeNull();
+    expect(screen.getByTestId('chest-badge').getAttribute('aria-label')).toMatch(/\+1 boost/i);
   });
 
-  it('displays avatar part if present', () => {
+  it('announces avatar parts in the aria-label', () => {
     const contents = {
       tier: 'legendary' as const,
       coins: 2000,
@@ -72,6 +76,7 @@ describe('BlastChestBadge', () => {
       <BlastChestBadge chestNumber={3} progress={1} contents={contents} onPreview={() => {}} />
     );
 
-    expect(screen.getByText(/\+1 avatar part/i)).toBeDefined();
+    expect(screen.queryByText(/\+1 avatar part/i)).toBeNull();
+    expect(screen.getByTestId('chest-badge').getAttribute('aria-label')).toMatch(/\+1 avatar part/i);
   });
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type ReactNode } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Star, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,8 @@ interface LevelGridHeaderProps {
   totalLevels: number;
   glowColor: string;
   worldColors: { text: string; bg: string };
+  /** Chapter intro under the progress bar (the world's new rule). */
+  children?: ReactNode;
 }
 
 /**
@@ -26,6 +28,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
   completedLevels,
   totalLevels,
   glowColor,
+  children,
 }: LevelGridHeaderProps) {
   const { t } = useLanguage();
 
@@ -51,7 +54,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-      className="flex flex-col items-center mb-6"
+      className="flex flex-col items-center mb-1"
     >
       {/* Main banner card */}
       <div className={cn(
@@ -68,10 +71,10 @@ const LevelGridHeader = memo(function LevelGridHeader({
         />
 
         {/* Content row: shield + title + mastery ring */}
-        <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5">
+        <div className="flex items-center gap-3 sm:gap-4 px-3 py-2.5 sm:p-4">
           {/* Shield Emblem — larger, more detailed */}
           <div data-testid="shield-emblem" className="relative shrink-0">
-            <svg viewBox="0 0 52 58" width="52" height="58" className="drop-shadow-[2px_2px_0px_black]">
+            <svg viewBox="0 0 52 58" width="42" height="47" className="drop-shadow-[2px_2px_0px_black]">
               <path
                 d="M26 2 L48 14 L48 36 Q48 50 26 56 Q4 50 4 36 L4 14 Z"
                 fill="#1a1a2e"
@@ -103,7 +106,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
           {/* Title + stats */}
           <div className="flex-1 min-w-0">
             <h2
-              className="font-neo-display font-black text-neo-white leading-tight text-xl sm:text-2xl uppercase tracking-tight line-clamp-2"
+              className="font-neo-display font-black text-neo-white leading-tight text-lg sm:text-2xl uppercase tracking-tight line-clamp-2"
               style={{ textShadow: '3px 3px 0px rgba(0,0,0,0.9)' }}
             >
               {worldName}
@@ -126,8 +129,8 @@ const LevelGridHeader = memo(function LevelGridHeader({
           </div>
 
           {/* Mastery Ring — cleaner */}
-          <div data-testid="mastery-ring" className="relative shrink-0 w-16 h-16">
-            <svg viewBox="0 0 64 64" width="64" height="64" className="transform -rotate-90">
+          <div data-testid="mastery-ring" className="relative shrink-0 w-12 h-12">
+            <svg viewBox="0 0 64 64" width="48" height="48" className="transform -rotate-90">
               {/* Track */}
               <circle
                 cx="32" cy="32" r={ringRadius}
@@ -155,7 +158,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
         </div>
 
         {/* Star progress bar — full-width at bottom */}
-        <div className="px-4 pb-3 sm:px-5 sm:pb-4">
+        <div className="px-3 pb-2.5 sm:px-5 sm:pb-3">
           <div
             data-testid="star-progress-bar"
             className={cn(
@@ -175,6 +178,8 @@ const LevelGridHeader = memo(function LevelGridHeader({
           </div>
         </div>
 
+        {children && <div className="relative z-10 px-3 pb-3 sm:px-5">{children}</div>}
+
         {/* Subtle ambient glow at bottom */}
         <div
           className="absolute bottom-0 inset-x-0 h-16 pointer-events-none"
@@ -183,7 +188,7 @@ const LevelGridHeader = memo(function LevelGridHeader({
       </div>
 
       {/* Ornamental Divider */}
-      <div data-testid="ornamental-divider" className="flex items-center w-full max-w-md gap-2 mt-4">
+      <div data-testid="ornamental-divider" className="flex items-center w-full max-w-md gap-2 mt-2">
         <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${glowColor.replace(/[\d.]+\)$/, '0.2)')}, transparent)` }} />
         <svg viewBox="0 0 16 16" width="10" height="10" className="shrink-0">
           <rect

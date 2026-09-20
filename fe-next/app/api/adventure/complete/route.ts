@@ -1,10 +1,12 @@
 /**
- * POST /api/adventure/complete { token, words }
+ * POST /api/adventure/complete { token, words, hpLeft?, potionsUsed?, died?, reviveUsed? }
  * Scores a run from the signed board + word list + server clock (never client
  * score/stars), keeps the best result per level, grants collectibles.
  * Writes go through the service-role client: RLS on player_progression and
  * player_inventory only admits service_role (the old route wrote with the user
  * client and every progression/loot write silently failed).
+ * Roguelike: relics come from the signed token ONLY (never the body). A won,
+ * survived level returns the next signed run (step+1, gold, new offer).
  */
 import { NextRequest, NextResponse } from 'next/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -17,6 +19,9 @@ import { verifyAttempt } from '@/lib/adventure/play/attemptToken';
 import { settleRun } from '@/lib/adventure/play/settleRun';
 import { totalStarsOf, type Completion } from '@/lib/adventure/play/progress';
 import { attemptSecret, loadCompletions } from '@/lib/adventure/play/server';
+import { advanceRun, signRun, publicRun, type RunPayload } from '@/lib/adventure/play/runToken';
+import { BOSS_LEVEL } from '@/lib/adventure/play/levels';
+import { withEliteTrophy } from '@/lib/adventure/play/trophy';
 import { getCollectibleById } from '@/lib/adventure/collectibleConfig';
 
 export const runtime = 'nodejs';
@@ -54,6 +59,18 @@ async function grantItems(db: SupabaseClient, userId: string, world: number, lev
     );
     if (error) throw new Error(`player_inventory upsert ${id}: ${error.message}`);
   }
+}
+
+/** Next link of the run chain, or null when the run ends here (loss, death, boss down). */
+function nextRun(run: RunPayload | undefined, level: number, won: boolean, score: number, body: Record<string, unknown> | null, secret: string) {
+  if (!run || !won || body?.died === true || level >= BOSS_LEVEL) return null;
+  const hpLeft = typeof body?.hpLeft === 'number' ? body.hpLeft : run.hp;
+  const potionsUsed = body?.potionsUsed && typeof body.potionsUsed === 'object' ? body.potionsUsed as Record<string, number> : {};
+  const advanced = advanceRun(run, { hpLeft, potionsUsed, score, reviveUsed: body?.reviveUsed === true });
+  // An elite kill mints its trophy relic into the run (the kill banner names the same one).
+  const next = withEliteTrophy(advanced, level);
+  const trophy = next.relics.find((r) => !advanced.relics.includes(r));
+  return { nextRunToken: signRun(next, secret), nextRun: publicRun(next), offer: next.offer ?? [], ...(trophy ? { trophy } : {}) };
 }
 
 export async function POST(request: NextRequest) {
@@ -135,8 +152,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const chain = nextRun(payload.run, payload.l, result.won, result.score, body, secret);
     return NextResponse.json({
       success: true,
+      ...(chain ?? {}),
+      runOver: !chain,
+      runComplete: result.won && payload.l >= BOSS_LEVEL && body?.died !== true,
+      points: result.points,
+      ...(result.targetsFound ? { targetsFound: result.targetsFound } : {}),
       world: payload.w,
       level: payload.l,
       score: result.score,

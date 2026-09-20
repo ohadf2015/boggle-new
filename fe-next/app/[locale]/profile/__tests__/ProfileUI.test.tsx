@@ -210,6 +210,7 @@ vi.mock('next/navigation', () => ({
 
 // Mock NavigationContext - AutoHideHeader uses useNavigation
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useNavigation: () => ({
     isInGame: false,
     setIsInGame: vi.fn(),

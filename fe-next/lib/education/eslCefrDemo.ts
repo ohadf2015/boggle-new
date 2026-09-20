@@ -1,23 +1,71 @@
 export const CEFR_LEVELS = ['A1', 'A2', 'B1'] as const;
 export type CefrLevel = (typeof CEFR_LEVELS)[number];
 
-const LISTS: Record<CefrLevel, string[]> = {
+/**
+ * The starter wordlists with their glosses. `en` is a simple learner
+ * definition, `es` the Spanish gloss — both written natively, because the
+ * proven audience of /education/esl-word-games is Spanish-speaking teachers
+ * of English (GSC 28d). Other locales fall back to the English definition.
+ */
+export interface CefrGloss {
+  word: string;
+  en: string;
+  es: string;
+}
+
+const GLOSSES: Record<CefrLevel, CefrGloss[]> = {
   A1: [
-    'cat', 'dog', 'pen', 'run', 'open', 'ten', 'red', 'book', 'desk', 'map', 'sun', 'hat',
+    { word: 'cat', en: 'a small pet that says meow', es: 'el gato' },
+    { word: 'dog', en: 'a loyal pet that barks', es: 'el perro' },
+    { word: 'pen', en: 'you write with it', es: 'el bolígrafo' },
+    { word: 'run', en: 'to move fast on your feet', es: 'correr' },
+    { word: 'open', en: 'not closed', es: 'abrir' },
+    { word: 'ten', en: 'the number after nine', es: 'diez' },
+    { word: 'red', en: 'the colour of a tomato', es: 'rojo' },
+    { word: 'book', en: 'you read it', es: 'el libro' },
+    { word: 'desk', en: 'a table you study at', es: 'el escritorio' },
+    { word: 'map', en: 'a drawing that shows places', es: 'el mapa' },
+    { word: 'sun', en: 'the star that gives us light', es: 'el sol' },
+    { word: 'hat', en: 'you wear it on your head', es: 'el sombrero' },
   ],
   A2: [
-    'school', 'train', 'friend', 'family', 'people', 'water', 'city', 'music', 'always', 'because', 'weather', 'hungry',
+    { word: 'school', en: 'the place where children learn', es: 'la escuela' },
+    { word: 'train', en: 'it travels on rails', es: 'el tren' },
+    { word: 'friend', en: 'a person you like and trust', es: 'el amigo, la amiga' },
+    { word: 'family', en: 'your parents, brothers and sisters', es: 'la familia' },
+    { word: 'people', en: 'more than one person', es: 'la gente' },
+    { word: 'water', en: 'the clear drink every living thing needs', es: 'el agua' },
+    { word: 'city', en: 'a very large town', es: 'la ciudad' },
+    { word: 'music', en: 'sounds organised into songs', es: 'la música' },
+    { word: 'always', en: 'at all times; every time', es: 'siempre' },
+    { word: 'because', en: 'it gives a reason', es: 'porque' },
+    { word: 'weather', en: 'sun, rain, wind — what the sky is doing', es: 'el clima' },
+    { word: 'hungry', en: 'wanting to eat', es: 'hambriento' },
   ],
   B1: [
-    'problem', 'opinion', 'discuss', 'improve', 'decision', 'however', 'suggest', 'reason', 'result', 'important', 'although', 'environment',
+    { word: 'problem', en: 'something difficult that needs an answer', es: 'el problema' },
+    { word: 'opinion', en: 'what you think, not a fact', es: 'la opinión' },
+    { word: 'discuss', en: 'to talk about something seriously', es: 'debatir' },
+    { word: 'improve', en: 'to make better', es: 'mejorar' },
+    { word: 'decision', en: 'a choice you make after thinking', es: 'la decisión' },
+    { word: 'however', en: 'but; even so', es: 'sin embargo' },
+    { word: 'suggest', en: 'to offer an idea', es: 'sugerir' },
+    { word: 'reason', en: 'why something happens', es: 'la razón' },
+    { word: 'result', en: 'what happens at the end', es: 'el resultado' },
+    { word: 'important', en: 'mattering a lot', es: 'importante' },
+    { word: 'although', en: 'even though', es: 'aunque' },
+    { word: 'environment', en: 'the natural world around us', es: 'el medio ambiente' },
   ],
 };
 
-const PRACTICE_MODE: Record<CefrLevel, 'warmup' | 'spelling' | 'blitz'> = {
-  A1: 'warmup',
-  A2: 'spelling',
-  B1: 'blitz',
+const LISTS: Record<CefrLevel, string[]> = {
+  A1: GLOSSES.A1.map((g) => g.word),
+  A2: GLOSSES.A2.map((g) => g.word),
+  B1: GLOSSES.B1.map((g) => g.word),
 };
+
+/** How long the embedded demo round runs — the copy promises 60 seconds. */
+export const DEMO_ROUND_SECONDS = 60;
 
 /** 4x4 boards. Targets are words that `findWordOnBoard` can actually trace. */
 const BOARDS: Record<CefrLevel, { letters: string[]; targets: string[] }> = {
@@ -56,12 +104,52 @@ export function cefrList(level: CefrLevel): string[] {
   return LISTS[level];
 }
 
+/** The full wordlist with glosses, for the on-page starter lists. */
+export function cefrGlosses(level: CefrLevel): CefrGloss[] {
+  return GLOSSES[level];
+}
+
+const PACK_DIFFICULTY: Record<CefrLevel, 'easy' | 'medium' | 'hard'> = {
+  A1: 'easy',
+  A2: 'medium',
+  B1: 'hard',
+};
+
+/**
+ * The CEFR list as a lobby starter pack. The name is deliberately stable and
+ * NOT localized — `?cefr=` dedupes on it, so a teacher who clicks "Run this
+ * list with the class" twice gets one lesson, not two.
+ */
+export function cefrLessonPack(level: CefrLevel): {
+  name: string;
+  description: string;
+  language: string;
+  words: Array<{ word: string; definition: string; difficulty: 'easy' | 'medium' | 'hard' }>;
+} {
+  return {
+    name: `CEFR ${level} Starter (ESL)`,
+    description: `Twelve-word starter list for ${level} English learners, from the ESL Word Games page.`,
+    language: 'en',
+    words: GLOSSES[level].map((g) => ({
+      word: g.word,
+      definition: g.en,
+      difficulty: PACK_DIFFICULTY[level],
+    })),
+  };
+}
+
 export function demoBoard(level: CefrLevel): { letters: string[]; targets: string[] } {
   return BOARDS[level];
 }
 
+/**
+ * classroom-game honours `?cefr=` by pre-selecting (or materializing) the
+ * matching starter lesson. No `mode` param — the practice-drill mode names
+ * (warmup/spelling/blitz) are not classroom game modes, so the lobby keeps
+ * its own default instead of swallowing a param it cannot serve.
+ */
 export function practiceHref(level: CefrLevel, locale: string): string {
-  return `/${locale}/education/classroom-game?cefr=${level}&mode=${PRACTICE_MODE[level]}`;
+  return `/${locale}/education/classroom-game?cefr=${level}`;
 }
 
 export function isAdjacent(a: number, b: number): boolean {
@@ -115,6 +203,9 @@ export type PlayableCopy = {
   practice: string;
   listLabel: string;
   playThis: string;
+  time: string;
+  timesUp: string;
+  playAgain: string;
 };
 
 const PLAYABLE_COPY: Record<string, PlayableCopy> = {
@@ -129,6 +220,9 @@ const PLAYABLE_COPY: Record<string, PlayableCopy> = {
     practice: 'Run this list with the class',
     listLabel: 'Lesson list',
     playThis: 'Play this list',
+    time: 'Time',
+    timesUp: 'Time! Round over — nice work.',
+    playAgain: 'Play again',
   },
   es: {
     title: 'Prueba una ronda ESL de 60 segundos',
@@ -141,6 +235,9 @@ const PLAYABLE_COPY: Record<string, PlayableCopy> = {
     practice: 'Usar esta lista con la clase',
     listLabel: 'Lista de la lección',
     playThis: 'Jugar esta lista',
+    time: 'Tiempo',
+    timesUp: '¡Tiempo! Fin de la ronda, buen trabajo.',
+    playAgain: 'Jugar otra vez',
   },
   he: {
     title: 'נסו סיבוב ESL של 60 שניות',
@@ -153,6 +250,9 @@ const PLAYABLE_COPY: Record<string, PlayableCopy> = {
     practice: 'הריצו את הרשימה עם הכיתה',
     listLabel: 'רשימת השיעור',
     playThis: 'שחקו את הרשימה הזאת',
+    time: 'זמן',
+    timesUp: 'הזמן! הסיבוב נגמר — כל הכבוד.',
+    playAgain: 'שחקו שוב',
   },
   sv: {
     title: 'Testa en ESL-runda på 60 sekunder',
@@ -165,6 +265,9 @@ const PLAYABLE_COPY: Record<string, PlayableCopy> = {
     practice: 'Kör listan med klassen',
     listLabel: 'Lektionslista',
     playThis: 'Spela den här listan',
+    time: 'Tid',
+    timesUp: 'Tiden är ute! Rundan är slut — bra jobbat.',
+    playAgain: 'Spela igen',
   },
   ja: {
     title: '60秒のESLラウンドを試す',
@@ -177,6 +280,9 @@ const PLAYABLE_COPY: Record<string, PlayableCopy> = {
     practice: 'このリストで授業する',
     listLabel: '授業のリスト',
     playThis: 'このリストで遊ぶ',
+    time: '時間',
+    timesUp: '時間です！ラウンド終了。おつかれさまでした。',
+    playAgain: 'もう一度遊ぶ',
   },
   ru: {
     title: 'Попробуйте 60-секундный ESL-раунд',
@@ -189,6 +295,9 @@ const PLAYABLE_COPY: Record<string, PlayableCopy> = {
     practice: 'Запустить список с классом',
     listLabel: 'Список урока',
     playThis: 'Играть этот список',
+    time: 'Время',
+    timesUp: 'Время! Раунд окончен — отличная работа.',
+    playAgain: 'Играть снова',
   },
 };
 

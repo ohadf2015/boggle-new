@@ -83,6 +83,8 @@ export function ScoreCountUp({
     );
   }
 
+  // Multi-keyframe land-settle must tween — springs accept two keyframes
+  // max (t_15ec0d7a, #893 recurrence).
   return (
     <m.span
       className={className}
@@ -97,13 +99,7 @@ export function ScoreCountUp({
           'drop-shadow(0 0 0px rgba(191,255,0,0))',
         ],
       } : { scale: 1 }}
-      // Multi-keyframe land pulse must be a tween — spring only accepts 2 keyframes
-      // (t_15ec0d7a / #893 recurrence).
-      transition={{
-        type: 'tween',
-        duration: 0.5,
-        ease: 'easeOut',
-      }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
     >
       {display.toLocaleString()}
     </m.span>

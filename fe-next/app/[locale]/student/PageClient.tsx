@@ -22,6 +22,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
@@ -75,6 +76,14 @@ export default function StudentPageClient() {
     setProfileStalled(false);
     setIsChecking(false);
   }, [user, profile, loading, router, language]);
+
+  // Instrumentation gap: the play/learn zones only render once classroomId
+  // resolves, so we had zero visibility into how many students land here
+  // with none. Fires once per settled classroom state.
+  useEffect(() => {
+    if (isChecking || loading) return;
+    if (!classroomId) posthog.capture('student_no_classroom_prompt_viewed');
+  }, [isChecking, loading, classroomId]);
 
   // The wait above is correct but it had no floor. A profile read that fails any
   // way other than PGRST116 never resolves and never logs, and the guest join
@@ -223,6 +232,7 @@ export default function StudentPageClient() {
             />
             <Link
               href={`/${language}/student/join`}
+              onClick={() => posthog.capture('student_join_classroom_link_clicked')}
               className="inline-block px-6 py-3 bg-neo-black text-neo-lime font-neo-display font-bold rounded-neo border-3 border-black shadow-hard-sm hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
             >
               {t('student.joinClassroom')}

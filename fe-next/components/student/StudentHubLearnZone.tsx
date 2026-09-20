@@ -139,7 +139,7 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
         <div>
           <button
             onClick={() => setLeaderboardOpen(!leaderboardOpen)}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white font-neo-display font-bold shadow-hard-sm hover:bg-neo-navy transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light text-neo-white font-neo-display font-bold shadow-hard-sm hover:bg-neo-navy transition-colors"
           >
             <span>{t('student.dashboard.leaderboard')}</span>
             {leaderboardOpen ? (

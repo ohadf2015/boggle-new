@@ -15,6 +15,7 @@ import { craneSwingFactor } from '@/lib/wordTower/craneSweep';
 import { landFeedback } from '@/lib/wordTower/landFeedback';
 import { CraneFooter, CraneSparkBurst } from './WordTowerCraneBits';
 import { swayAngleAt, swayNormalizedOffset, effectiveDropError } from '@/lib/wordTower/towerSway';
+import { subscribeForegroundResume } from '@/lib/native/foregroundResume';
 import { craneBeamBricks, craneBeamTilePx } from '@/lib/wordTower/craneBeamDisplay';
 import {
   CRANE_CHROME_H_PX,
@@ -390,7 +391,16 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    // Chrome drops rAF while a native ad Activity hides the WebView, so this
+    // loop never reschedules. Kick it again when we come back to the foreground.
+    const stopResume = subscribeForegroundResume(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+    });
+    return () => {
+      stopResume();
+      cancelAnimationFrame(raf);
+    };
   }, [reducedMotion, periodMs, pushBand]);
 
   // Stop mirroring the aim once this crane goes away — the parent's DROP control

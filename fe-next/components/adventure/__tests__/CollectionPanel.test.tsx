@@ -93,4 +93,15 @@ describe('CollectionPanel', () => {
     expect(screen.getByText('adventure.collection.rarity.common')).toBeInTheDocument();
     expect(screen.getByText('adventure.collection.rarity.legendary')).toBeInTheDocument();
   });
+  it('given only a rune is owned, when the panel opens, then it lands on the runes tab, not an empty trophies tab', () => {
+    const runeOnly = mockInventory.filter((i) => i.category === 'rune');
+    render(<CollectionPanel {...defaultProps} inventory={runeOnly} />);
+    expect(screen.getByTestId('collection-tab-rune')).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('collection-tab-trophy')).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('given nothing is owned, when the panel opens, then trophies is the default tab', () => {
+    render(<CollectionPanel {...defaultProps} inventory={[]} />);
+    expect(screen.getByTestId('collection-tab-trophy')).toHaveAttribute('aria-selected', 'true');
+  });
 });

@@ -18,7 +18,7 @@ import type { TeacherLocale } from '@/lib/education/types';
 import { packageById, type EducationLeadPlan } from '@/lib/education/educationPackages';
 
 const FIELD_CLASS =
-  'mt-1 w-full rounded-neo border-neo bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
+  'mt-1 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
   'transition-all duration-150 outline-none ' +
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
 const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
@@ -148,7 +148,7 @@ export function SchoolLeadForm({ plan = 'school' }: { plan?: EducationLeadPlan }
         <legend className={LABEL_CLASS}>{t('education.forSchools.form.interests_legend')}</legend>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {SCHOOL_LEAD_INTERESTS.map((key) => (
-            <label key={key} htmlFor={`sl-int-${key}`} className="flex cursor-pointer items-center gap-2 rounded-neo border-neo bg-neo-navy p-2 text-sm text-neo-white">
+            <label key={key} htmlFor={`sl-int-${key}`} className="flex cursor-pointer items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy p-2 text-sm text-neo-white">
               <input
                 id={`sl-int-${key}`}
                 type="checkbox"

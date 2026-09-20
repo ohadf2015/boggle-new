@@ -95,7 +95,7 @@ export function AccessRequestGate() {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 rounded-neo border-neo bg-neo-navy px-4 py-3 font-bold text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+            className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 font-bold text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
           >
             {t('education.access.verify_email_refresh')}
           </button>

@@ -145,6 +145,8 @@ export interface EduClassroomCreatedArgs {
   classroomId: string;
   /** Which surface created it — the dashboard form or the express game lobby. */
   createdVia: 'dashboard' | 'express_lobby' | 'onboarding';
+  /** Classroom UI language, so create vs join can be quoted per language. */
+  language?: string;
 }
 
 /**
@@ -153,10 +155,12 @@ export interface EduClassroomCreatedArgs {
  * teacher who never created a classroom from one whose students never joined.
  */
 export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
-  safeCapture('edu_classroom_created', {
+  const props: Record<string, unknown> = {
     classroom_id: args.classroomId,
     created_via: args.createdVia,
-  });
+  };
+  if (args.language) props.language = args.language;
+  safeCapture('edu_classroom_created', props);
 }
 
 export interface EduTeacherOnboardingStepArgs {
@@ -204,6 +208,19 @@ export function trackEduTeacherDashboardViewed(s: EduTeacherSnapshot): void {
  */
 export function trackEduTeacherToolsOpened(s: EduTeacherSnapshot): void {
   safeCapture('edu_teacher_tools_opened', snapshotProps(s));
+}
+
+/**
+ * `edu_progress_digest_viewed` — free teachers used to open /teacher/reports
+ * and only see a ProGate. The digest is the edu-funnel impression: last-lesson
+ * numbers plus a Teacher Pro CTA. `pulse_state` tells empty vs real lesson
+ * without sending student names.
+ */
+export function trackEduProgressDigestViewed(args: { hasPro: boolean; state: string }): void {
+  safeCapture('edu_progress_digest_viewed', {
+    has_pro: args.hasPro,
+    pulse_state: args.state,
+  });
 }
 
 export type EduTeacherAction = 'create_classroom' | 'create_lesson' | 'create_assignment';
@@ -298,4 +315,33 @@ export function setEduTestAccountFlag(isTestAccount: boolean): void {
 export function isTestAccountEmail(email: string | null | undefined): boolean {
   if (!email) return false;
   return email.trim().toLowerCase().endsWith('@lexiclash.test');
+}
+
+export type LiveGameStartSource = 'create_room' | 'quick_start';
+
+export interface EduLiveGameStartedArgs {
+  classroomId: string;
+  source: LiveGameStartSource;
+  lessonCount?: number;
+}
+
+export function trackEduLiveGameStarted(args: EduLiveGameStartedArgs): void {
+  const props: Record<string, unknown> = {
+    classroom_id: args.classroomId,
+    source: args.source,
+  };
+  if (args.lessonCount !== undefined) props.lesson_count = args.lessonCount;
+  safeCapture('edu_live_game_started', props);
+}
+
+export interface EduReportsViewedArgs {
+  classroomId?: string;
+  studentId?: string;
+}
+
+export function trackEduReportsViewed(args: EduReportsViewedArgs = {}): void {
+  const props: Record<string, unknown> = {};
+  if (args.classroomId) props.classroom_id = args.classroomId;
+  if (args.studentId) props.student_id = args.studentId;
+  safeCapture('edu_reports_viewed', props);
 }

@@ -1,0 +1,3 @@
+status: partial
+files_touched: fe-next/app/[locale]/student/PageClient.tsx, docs/nightly/reports/2026-09-20.md, docs/nightly/impact-ledger.ndjson
+next_steps: flag hygiene sweep (decided-experiment check via posthog flags API) and a new typed experiment were skipped this run — impact-check investigation surfaced a bigger finding first (0% exposure on /student play zone, root-caused to the classroomId gate) and ate the time budget instrumenting it. Tomorrow: check student_no_classroom_prompt_viewed / student_join_classroom_link_clicked volume; if high, design a CTA experiment on the join-classroom card. Also still owed: flag hygiene sweep + posthog-experiment.sh ensure sweep on lib/experiments.ts.

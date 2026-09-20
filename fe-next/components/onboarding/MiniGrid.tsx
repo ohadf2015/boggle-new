@@ -400,6 +400,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
 
           {demoWord.split('').map((targetLetter, i) => {
             const filled = i < selected.length;
+            // Multi-keyframe letter pop must tween — springs accept two
+            // keyframes max (t_15ec0d7a, #893 recurrence).
             return (
               <m.span
                 key={`mini-letter-${i}-${targetLetter}`}
@@ -409,12 +411,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                     ? 'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm'
                     : 'bg-neo-white/20 text-neo-white border-2 border-neo-white/40'
                 )}
-                // Springs support 2 keyframes max — [0.7, 1.2, 1]/[0, -5, 0] + spring
-                // threw "Only two keyframes currently supported with spring..." for real
-                // visitors on /en FTUE (growth-radar t_15ec0d7a, recurrence of #893).
-                // Underdamped SPRING_BOUNCE (stiffness 600 / damping 18) overshoots ~1.2.
-                animate={filled ? { scale: 1, rotate: 0 } : { scale: 1 }}
-                transition={filled ? SPRING_BOUNCE : undefined}
+                animate={filled ? { scale: [0.7, 1.2, 1], rotate: [0, -5, 0] } : { scale: 1 }}
+                transition={filled ? { duration: 0.4, ease: 'easeOut' } : undefined}
               >
                 {filled ? selected[i].letter : targetLetter}
               </m.span>

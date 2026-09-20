@@ -10,6 +10,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if ('error' in auth) return auth.error;
-  const { supabase, userId } = auth;
+  const { userId } = auth;
 
   let body: unknown;
   try {
@@ -101,8 +102,12 @@ export async function POST(request: NextRequest) {
 
   const counts = (body as { counts: Record<string, number> }).counts;
 
+  // player_progression INSERT/UPDATE are service_role-only (RLS): the user client got 42501 on every save.
+  const admin = createAdminClient();
+  if (!admin) return NextResponse.json({ error: 'Server misconfigured' }, { status: 503 });
+
   try {
-    const { error } = await supabase.from('player_progression').upsert(
+    const { error } = await admin.from('player_progression').upsert(
       {
         user_id: userId,
         adventure_achievement_counts: counts,

@@ -277,6 +277,33 @@ describe('LevelGrid Scroll Behavior', () => {
     });
   });
 
+  describe('Auto-scroll when the page owns the scroll (phone layout)', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      Object.defineProperty(Element.prototype, 'scrollIntoView', { value: vi.fn(), writable: true, configurable: true });
+      Object.defineProperty(Element.prototype, 'scrollBy', { value: vi.fn(), writable: true, configurable: true });
+    });
+    afterEach(() => {
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
+    });
+
+    it('Given the current node is below the fold and the panel does not overflow, When mounted, Then the window scrolls just enough to center it', () => {
+      const winScroll = vi.spyOn(window, 'scrollBy').mockImplementation(() => {});
+      const rectSpy = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
+        const isNode = (this as HTMLElement).dataset?.testid?.startsWith('level-card-');
+        return { top: isNode ? 1200 : 0, bottom: isNode ? 1280 : 0, height: isNode ? 80 : 0, left: 0, right: 0, width: 80, x: 0, y: 0, toJSON: () => ({}) } as DOMRect;
+      });
+      render(<LevelGrid world={mockWorld} completions={mockCompletions} totalStars={6} onLevelSelect={vi.fn()} />);
+      act(() => { vi.advanceTimersByTime(700); });
+      expect(winScroll).toHaveBeenCalledTimes(1);
+      const arg = winScroll.mock.calls[0][0] as ScrollToOptions;
+      expect(arg.top).toBe(1200 - (window.innerHeight - 80) / 2);
+      rectSpy.mockRestore();
+      winScroll.mockRestore();
+    });
+  });
+
   describe('Level Grid Content', () => {
     it('should render all 7 levels for the world', () => {
       // GIVEN / WHEN

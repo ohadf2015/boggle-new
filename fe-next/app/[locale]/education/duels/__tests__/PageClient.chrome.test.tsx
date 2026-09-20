@@ -38,6 +38,7 @@ const mockAuthState: { user: { id: string } | null; loading: boolean } = {
 };
 
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => mockSetIsInGame,
 }));
 vi.mock('@/lib/supabase/education', () => ({
