@@ -73,7 +73,14 @@ export default function ConnectionsMascot({ status, className }: ConnectionsMasc
           transition={
             mood === 'wrong'
               ? { duration: 0.45, ease: 'easeOut' }
-              : { type: 'spring', stiffness: 380, damping: 20 }
+              : {
+                  type: 'spring',
+                  stiffness: 380,
+                  damping: 20,
+                  // Multi-keyframe scale pop must tween — springs accept two
+                  // keyframes max (t_15ec0d7a, #893 recurrence).
+                  scale: { type: 'tween', duration: 0.4, ease: 'easeOut' },
+                }
           }
           className="absolute inset-0"
         >
