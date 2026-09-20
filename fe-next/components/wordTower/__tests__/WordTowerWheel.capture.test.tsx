@@ -81,4 +81,18 @@ describe('WordTowerWheel — a tap with finger drift keeps its click', () => {
 
     expect(captured).not.toBeNull();
   });
+
+  it('releases a stuck pointer capture when the document becomes visible after a native overlay', () => {
+    const { container, letters } = renderWheel();
+    const release = HTMLElement.prototype.releasePointerCapture as ReturnType<typeof vi.fn>;
+
+    fireEvent.pointerDown(letters[0], { pointerType: 'touch', clientX: 100, clientY: 100, pointerId: 1, isPrimary: true });
+    fireEvent.pointerMove(container, { pointerType: 'touch', clientX: 130, clientY: 100, pointerId: 1 });
+    expect(captured).not.toBeNull();
+
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(release).toHaveBeenCalledWith(1);
+  });
 });

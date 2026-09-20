@@ -21,6 +21,7 @@ import { ScreenFlash } from './ScreenFlash';
 import { TimeDilation } from './TimeDilation';
 import type { GameCanvasConfig, PhysicsConfig } from './types';
 import logger from '@/utils/logger';
+import { subscribeForegroundResume } from '@/lib/native/foregroundResume';
 
 // ─── Context ──────────────────────────────────────────────────────────
 
@@ -194,7 +195,16 @@ export function GameCanvas({
 
     setup();
 
+    // AdMob rewarded is a native Activity over the WebView. Chrome drops rAF
+    // while hidden; Pixi's ticker stays stopped after dismiss — Word Tower
+    // then looks frozen until the player force-quits. Restart on foreground.
+    const stopResume = subscribeForegroundResume(() => {
+      if (destroyed) return;
+      try { app.ticker?.start(); } catch { /* ticker already gone */ }
+    });
+
     return () => {
+      stopResume();
       destroyed = true;
       // Stop Pixi's render ticker BEFORE tearing down subsystems. Otherwise the
       // internal render listener traverses a half-destroyed stage (flash/particle

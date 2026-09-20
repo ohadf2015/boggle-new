@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObjec
 import { ChevronsUp } from 'lucide-react';
 import { Container, Graphics } from 'pixi.js';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
+import { subscribeForegroundResume, releaseStuckPointers } from '@/lib/native/foregroundResume';
 import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS, TOWER_EMBERS, TOWER_DUST, AIR_STREAKS, RUBBLE_BURST } from '@/lib/gameEngine/presets/particles';
 import { biomeForHeight, type WordTowerFloor, type ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
@@ -970,6 +971,8 @@ export function WordTowerScene(props: SceneProps) {
   // restarts on each step — every depth then chases a target it never reaches
   // and the parallax visibly tears apart. Two renders per gesture, not per frame.
   const [panning, setPanning] = useState(false);
+  const catcherRef = useRef<HTMLDivElement>(null);
+  const capturedPointerIds = useRef<Set<number>>(new Set());
   // Wheel/trackpad has no "up" event — clear the flag after the scroll goes idle.
   const wheelIdleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const endPanSoon = useCallback(() => {
@@ -1067,6 +1070,16 @@ export function WordTowerScene(props: SceneProps) {
     if (momentumRaf.current != null) cancelAnimationFrame(momentumRaf.current);
     if (wheelIdleRef.current) clearTimeout(wheelIdleRef.current);
   }, []);
+
+  // Native rewarded ads hide the WebView without delivering pointerup. Captured
+  // pointers then steal every tap after the ad (player has to force-quit).
+  useEffect(() => subscribeForegroundResume(() => {
+    releaseStuckPointers(catcherRef.current, capturedPointerIds.current);
+    capturedPointerIds.current.clear();
+    pan.current.dragging = false;
+    drag.current = null;
+    setPanning(false);
+  }), []);
 
   // Glide the camera back to the build line (back-to-top button + minimap tap).
   const scrollToTop = useCallback(() => {
@@ -1210,12 +1223,15 @@ export function WordTowerScene(props: SceneProps) {
       {/* Pan catcher — owns the drag/wheel gesture over the sky. The control deck
           + header (z-10, above) keep their taps; this only catches the open area. */}
       <div
+        ref={catcherRef}
+        data-testid="wt-pan-catcher"
         className="absolute inset-0 touch-none"
         onPointerDown={(e) => {
           // Allow drag initiation; clampPan will enforce bounds. Avoids silently
           // swallowing the gesture if panMin is stale due to a viewport resize.
           stopMomentum(); // grabbing the tower halts any glide in progress
           try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* */ }
+          capturedPointerIds.current.add(e.pointerId);
           pan.current.dragging = true;
           setPanning(true);
           drag.current = { y: e.clientY, pan: pan.current.y, prevY: e.clientY, prevT: e.timeStamp, vel: 0 };
@@ -1228,7 +1244,8 @@ export function WordTowerScene(props: SceneProps) {
           const dt = e.timeStamp - d.prevT;
           if (dt > 0) { d.vel = (e.clientY - d.prevY) / dt; d.prevY = e.clientY; d.prevT = e.timeStamp; }
         }}
-        onPointerUp={() => {
+        onPointerUp={(e) => {
+          capturedPointerIds.current.delete(e.pointerId);
           const d = drag.current;
           pan.current.dragging = false;
           drag.current = null;
@@ -1240,7 +1257,12 @@ export function WordTowerScene(props: SceneProps) {
             endPanSoon();
           }
         }}
-        onPointerCancel={() => { pan.current.dragging = false; drag.current = null; endPanSoon(); }}
+        onPointerCancel={(e) => {
+          capturedPointerIds.current.delete(e.pointerId);
+          pan.current.dragging = false;
+          drag.current = null;
+          endPanSoon();
+        }}
         onWheel={(e) => { stopMomentum(); setPanning(true); applyPan(pan.current.y - e.deltaY * WHEEL_SCALE); endPanSoon(); }}
       />
     </div>

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { ChevronsDown, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
+import { subscribeForegroundResume, releaseStuckPointers } from '@/lib/native/foregroundResume';
 import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
 
 export interface WordTowerWheelProps {
@@ -176,6 +177,14 @@ export function WordTowerWheel({
     if (g) { try { g.el.releasePointerCapture(g.id); } catch { /* never claimed */ } }
     handlePointerUp();
   };
+
+  useEffect(() => subscribeForegroundResume(() => {
+    const g = gestureRef.current;
+    gestureRef.current = null;
+    pointerDownRef.current = null;
+    if (g) releaseStuckPointers(g.el, [g.id]);
+    handlePointerUp();
+  }), [handlePointerUp]);
 
   // Auto-build: tapping letters one-by-one used to need an EXTRA manual BUILD
   // tap before the DROP tap — a "two taps to place a word" flow. Once the
