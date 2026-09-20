@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useContext, useEffect, useRef, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, useState, useContext, useEffect, useReducer, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { locales, defaultLocale } from '../lib/i18n';
 import { matchLanguageList } from '../lib/localeResolution';
@@ -132,9 +132,12 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
     const translationsRef = useRef(currentTranslations);
     translationsRef.current = currentTranslations;
 
-    // Bump counter once when translations finish loading to update dir/flag in context.
-    // This triggers exactly ONE re-render per language switch, not per-state-update.
-    const [translationsReady, setTranslationsReady] = useState(() => !!currentTranslations);
+    // Identity signal for `t` and the context value: bumped once every time a
+    // catalogue lands. A boolean here silently bailed out on the landing
+    // subset → full upgrade — it was already `true`, so `t` kept its identity
+    // and memoized subtrees rendered raw key paths forever (Sentry
+    // JAVASCRIPT-NEXTJS-27*). A counter always changes.
+    const [translationsReady, bumpTranslations] = useReducer((n: number) => n + 1, 0);
 
     // Load translations when language changes or on first mount when no initialTranslations
     useEffect(() => {
@@ -142,21 +145,21 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         if (cached && !isPartialCatalogue(cached)) {
             if (cached !== currentTranslations) {
                 setCurrentTranslations(cached);
-                setTranslationsReady(true);
+                bumpTranslations();
             }
             return undefined;
         }
         if (cached && isPartialCatalogue(cached)) {
             if (cached !== currentTranslations) {
                 setCurrentTranslations(cached);
-                setTranslationsReady(true);
+                bumpTranslations();
             }
             let cancelled = false;
             const upgrade = () => {
                 loadTranslation(language).then((data) => {
                     if (cancelled) return;
                     setCurrentTranslations(data);
-                    setTranslationsReady(true);
+                    bumpTranslations();
                 }).catch((err) => {
                     logger.warn(`Failed to load translations for ${language}:`, err);
                 });
@@ -179,11 +182,11 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 if (timeoutId !== null) window.clearTimeout(timeoutId);
             };
         }
-        setTranslationsReady(false);
+        bumpTranslations();
         // Async load for language switch (or first mount without initialTranslations)
         loadTranslation(language).then((data) => {
             setCurrentTranslations(data);
-            setTranslationsReady(true);
+            bumpTranslations();
         }).catch((err) => {
             logger.warn(`Failed to load translations for ${language}:`, err);
         });
@@ -379,6 +382,19 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 if (fallback) {
                     return interpolate(fallback, params);
                 }
+                // The landing first-paint catalogue is a deliberate subset
+                // (lib/i18n/landingNamespaces.ts). A key outside it is not
+                // missing — the full catalogue is still upgrading in the
+                // background — so this is a load state, exactly like the
+                // `!current` branch above, not a bug to page on. Treating it as
+                // one filled Sentry with eight `multiplayerFlow.*` issues off
+                // /en/multiplayer reached by client-side nav from /en. The
+                // PostHog signal stays, tagged `partial`, so a key that really
+                // is absent is still queryable.
+                if (isPartialCatalogue(translationsRef.current as Record<string, unknown> | undefined)) {
+                    trackTelemetryEvent('translation_missing', { key: path, language, partial: true });
+                    return interpolate(path, params);
+                }
                 // DO NOT demote to debug. User mandate 2026-05-01: missing keys are real bugs and must page Sentry.
                 logger.warn(`Translation missing for key: ${path} in language: ${language}`);
                 // Dedicated, queryable PostHog signal so missing keys stay traceable
@@ -400,7 +416,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [language, translationsReady]);
 
-    // Memoize context value — depends on translationsReady (boolean) not currentTranslations (object).
+    // Memoize context value — depends on the translationsReady counter, not currentTranslations (object).
     // This means consumers re-render at most once per language switch (false→true), not on every
     // intermediate state update of the large translations object.
     const value = useMemo<LanguageContextValue>(() => ({
