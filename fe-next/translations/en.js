@@ -9097,6 +9097,8 @@ const en = {
     "bossLevel": "Boss Level {level}",
     "playLevel": "Level {level} — {stars} of {maxStars} stars",
     "unlockRequirement": "Complete Level {level}",
+    "lockedTitle": "Locked",
+    "lockedWorldHint": "Beat the World {world} boss to open this one",
     "combo": {
       "nice": "Nice!",
       "great": "Great!",

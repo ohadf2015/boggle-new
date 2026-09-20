@@ -274,7 +274,11 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
     const id = setInterval(() => {
       const now = Date.now();
       const left = Math.max(0, endAtRef.current - now);
-      setMsLeft(left);
+      // Commit only when the displayed second changes. At 5Hz this re-rendered
+      // the whole level screen — and every callback it hands the grid — right
+      // through the player's drag, rebinding the grid's global pointer
+      // listeners five times a second. Combat still ticks below at 200ms.
+      setMsLeft((prev) => (Math.ceil(prev / 1000) === Math.ceil(left / 1000) ? prev : left));
       if (combatRef.current) dispatchCombat({ type: 'tick', dt: now - lastTickRef.current });
       lastTickRef.current = now;
       if (left === 0) void finish();

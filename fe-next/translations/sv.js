@@ -10719,6 +10719,8 @@ const sv = {
     "bossLevel": "Bossnivå {level}",
     "playLevel": "Nivå {level} — {stars} av {maxStars} stjärnor",
     "unlockRequirement": "Klara nivå {level}",
+    "lockedTitle": "Låst",
+    "lockedWorldHint": "Besegra bossen i värld {world} för att öppna den här",
     "bossLabel": "Boss",
     "combo": {
       "nice": "Snyggt!",

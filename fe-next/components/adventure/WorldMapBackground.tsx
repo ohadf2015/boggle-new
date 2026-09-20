@@ -85,10 +85,10 @@ export function WorldMapBackground({
 
   // Nebula clouds — pre-blurred radial gradients replace blur(100-120px) filters
   const nebulaClouds = useMemo(() => [
-    { left: '10%', top: '10%', color: 'rgba(139, 92, 246, 0.08)', width: 700, height: 350, radius: '60% 40% 55% 45% / 45% 55% 40% 60%' },
-    { left: '65%', top: '35%', color: 'rgba(236, 72, 153, 0.06)', width: 650, height: 300, radius: '45% 55% 60% 40% / 50% 40% 55% 45%' },
-    { left: '0%',  top: '60%', color: 'rgba(34, 211, 238, 0.07)', width: 680, height: 320, radius: '55% 45% 40% 60% / 40% 60% 45% 55%' },
-    { left: '60%', top: '80%', color: 'rgba(251, 191, 36, 0.06)', width: 620, height: 280, radius: '40% 60% 50% 50% / 55% 45% 60% 40%' },
+    { left: '10%', top: '10%', color: 'rgba(139, 92, 246, 0.05)', width: 700, height: 350, radius: '60% 40% 55% 45% / 45% 55% 40% 60%' },
+    { left: '65%', top: '35%', color: 'rgba(236, 72, 153, 0.04)', width: 650, height: 300, radius: '45% 55% 60% 40% / 50% 40% 55% 45%' },
+    { left: '0%',  top: '60%', color: 'rgba(34, 211, 238, 0.045)', width: 680, height: 320, radius: '55% 45% 40% 60% / 40% 60% 45% 55%' },
+    { left: '60%', top: '80%', color: 'rgba(251, 191, 36, 0.04)', width: 620, height: 280, radius: '40% 60% 50% 50% / 55% 45% 60% 40%' },
   ], []);
 
   const shootingStars = useMemo(() => [
@@ -101,9 +101,11 @@ export function WorldMapBackground({
       {/* Deep space background gradient — static, no parallax (saves a MotionValue layer) */}
       <div className="fixed inset-0 bg-linear-to-b from-neo-abyss-deep via-neo-abyss-mid to-neo-abyss-light pointer-events-none" />
 
-      {/* Milky Way band + cosmic dust merged into one static layer */}
+      {/* Milky Way band + cosmic dust merged into one static layer.
+          Held at ~15%: above that it tints the whole sky and the world orbs
+          stop being the most saturated thing on screen. */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-30"
+        className="fixed inset-0 pointer-events-none opacity-[0.15]"
         style={{
           background: 'linear-gradient(135deg, transparent 20%, rgba(139,92,246,0.1) 35%, rgba(236,72,153,0.08) 50%, rgba(34,211,238,0.1) 65%, transparent 80%)',
         }}

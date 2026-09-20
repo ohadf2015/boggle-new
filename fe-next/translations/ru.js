@@ -16425,6 +16425,8 @@ const ru = {
     "bossLevel": "Уровень босса {level}",
     "playLevel": "Уровень {level} — {stars} из {maxStars} звёзд",
     "unlockRequirement": "Заверши уровень {level}",
+    "lockedTitle": "Закрыто",
+    "lockedWorldHint": "Победите босса мира {world}, чтобы открыть этот",
     "combo": {
       "nice": "Неплохо!",
       "great": "Отлично!",

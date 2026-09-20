@@ -10437,6 +10437,8 @@ const es = {
     "bossLevel": "Nivel jefe {level}",
     "playLevel": "Nivel {level} — {stars} de {maxStars} estrellas",
     "unlockRequirement": "Completa el nivel {level}",
+    "lockedTitle": "Bloqueado",
+    "lockedWorldHint": "Vence al jefe del Mundo {world} para abrir este",
     "combo": {
       "nice": "¡Bien!",
       "great": "¡Genial!",

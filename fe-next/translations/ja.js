@@ -10485,6 +10485,8 @@ const ja = {
     "bossLevel": "ボスレベル{level}",
     "playLevel": "レベル{level} — {stars}/{maxStars}スター",
     "unlockRequirement": "レベル{level}をクリア",
+    "lockedTitle": "ロック中",
+    "lockedWorldHint": "ワールド{world}のボスを倒すと解放されます",
     "combo": {
       "nice": "ナイス!",
       "great": "グレイト!",

@@ -28,11 +28,14 @@ interface Props {
   level: number;
   lvl: PlayLevel;
   onBegin: () => void;
+  /** Leave without playing. The intro covers the screen, so without this the
+   *  only way out of a level opened by mistake is to play it. */
+  onExit: () => void;
 }
 
 export const eliteArt = (world: number) => `/images/adventure/enemies/w${world}-idle.webp`;
 
-export default function LevelIntro({ world, level, lvl, onBegin }: Props) {
+export default function LevelIntro({ world, level, lvl, onBegin, onExit }: Props) {
   const beats = introBeats(lvl);
   const [beat, setBeat] = useState(0);
   const current = beats[beat] ?? 'rule';
@@ -41,12 +44,12 @@ export default function LevelIntro({ world, level, lvl, onBegin }: Props) {
       aria-labelledby="level-intro-title" data-testid="level-intro" data-kind={lvl.kind} data-beat={current}>
       {current === 'chapter'
         ? <ChapterBeat world={world} onNext={() => setBeat((b) => b + 1)} />
-        : <RuleBeat world={world} level={level} lvl={lvl} onBegin={onBegin} />}
+        : <RuleBeat world={world} level={level} lvl={lvl} onBegin={onBegin} onExit={onExit} />}
     </div>
   );
 }
 
-function RuleBeat({ world, level, lvl, onBegin }: Props) {
+function RuleBeat({ world, level, lvl, onBegin, onExit }: Props) {
   const { t } = useLanguageSafe();
   const reduced = usePrefersReducedMotion();
   const boss = lvl.isBoss ? getBossConfig(world) : null;
@@ -142,6 +145,10 @@ function RuleBeat({ world, level, lvl, onBegin }: Props) {
           className={cn('mt-4 w-full rounded-xl border-[3px] border-black py-3 font-neo-display text-xl font-bold text-black shadow-[4px_4px_0_#000] active:translate-y-0.5 active:shadow-none',
             combat ? 'bg-neo-pink' : 'bg-neo-lime')}>
           {combat ? t('adventurePlay.fight') : t('adventurePlay.start')}
+        </button>
+        <button type="button" onClick={onExit}
+          className="mt-3 w-full text-sm font-bold underline underline-offset-4 opacity-80 hover:opacity-100">
+          {t('adventurePlay.backToMap')}
         </button>
       </div>
     </div>

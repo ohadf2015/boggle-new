@@ -10343,6 +10343,8 @@ const he = {
     "bossLevel": "שלב בוס {level}",
     "playLevel": "שלב {level} — {stars} מתוך {maxStars} כוכבים",
     "unlockRequirement": "השלם שלב {level}",
+    "lockedTitle": "נעול",
+    "lockedWorldHint": "נצחו את הבוס של עולם {world} כדי לפתוח את העולם הזה",
     "next": "הבא",
     "hub": {
       "continue": "המשך"

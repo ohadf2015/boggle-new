@@ -99,13 +99,17 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     const r = await run.submitWord(word);
     if (r === 'idle') return;
     setHitPath(resolveHitPath(word, traced, run.grid, language));
-    const id = `${Date.now()}`;
+    // Monotonic, not Date.now(): GridComponent dedupes the submit burst by id
+    // and keys it by timestamp, so two submits in the same millisecond dropped
+    // the second one's feedback entirely.
+    const seq = hitSeq.current + 1;
+    const id = `adv-${seq}`;
     if (r === 'ok') {
       // Same relic/chain formula the server settles with (points of the word just added).
       const all = scoreWords([...run.words, word.toLowerCase().trim()], { relics: run.run?.relics ?? [], kind: lvl?.kind }).points;
       const pts = all[all.length - 1] ?? 0;
       sfx.playWordAcceptedSound?.();
-      setFeedback({ id, type: 'accepted', word, score: pts, timestamp: Date.now() });
+      setFeedback({ id, type: 'accepted', word, score: pts, timestamp: seq });
       let praiseKey: string | undefined;
       if (lvl) {
         // `run` is this render's (pre-hit) state: the fight's HP, or the score foe's bar.
@@ -135,7 +139,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       sfx.playWordRejectedSound?.();
       streakRef.current = 0;
       if (r === 'invalid') invalidRef.current += 1;
-      setFeedback({ id, type: r === 'dup' ? 'duplicate' : 'rejected', word, timestamp: Date.now() });
+      setFeedback({ id, type: r === 'dup' ? 'duplicate' : 'rejected', word, timestamp: seq });
       setLastHit({ id: ++hitSeq.current, word, pts: 0, result: r });
       if (r === 'chain') setChainBrokenAt(Date.now());
       variant.discard();
@@ -284,7 +288,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       </div>
 
       {/* The card shows the clock the level really starts with (hourglass relic etc.), not the table's base seconds. */}
-      {run.phase === 'ready' && lvl && <LevelIntro world={world} level={level} lvl={{ ...lvl, seconds: secs }} onBegin={begin} />}
+      {run.phase === 'ready' && lvl && <LevelIntro world={world} level={level} lvl={{ ...lvl, seconds: secs }} onBegin={begin} onExit={onExit} />}
 
       {run.phase === 'playing' && <DeedStamp event={deed} />}
 
