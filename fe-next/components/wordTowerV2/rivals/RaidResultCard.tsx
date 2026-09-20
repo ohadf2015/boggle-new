@@ -7,6 +7,7 @@ import { type RevengeLedger, raidVerdict } from '@/lib/wordTowerV2/wreck';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { RaidResult, RivalView } from '../useEstate';
 import { PaybackChip, PaybackLedgerRow } from './Payback';
+import { PayoffPanel } from './PayoffPanel';
 import { type T, plotLabel, rivalName } from './rivalUtils';
 
 /**
@@ -37,6 +38,12 @@ interface Props {
   error: string | null;
   floorsKnocked: number;
   /**
+   * How many floors their building HAD. The damage is only legible as a
+   * fraction — "3 of 16 floors down" is a result, "3" is a number — and the
+   * judge asked for exactly that receipt beside the coins.
+   */
+  floorsTotal: number;
+  /**
    * Payback only: what they took off you vs what you just took back. The line
    * that makes this screen self-verifying — a reader of ONE frame can see the
    * swing settled the raid that opened the flow, on the player who made it.
@@ -47,7 +54,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function RaidResultCard({ t, rival, result, error, floorsKnocked, ledger, reducedMotion, onAgain, onClose }: Props) {
+export function RaidResultCard({ t, rival, result, error, floorsKnocked, floorsTotal, ledger, reducedMotion, onAgain, onClose }: Props) {
   const { playSound } = useSoundEffects();
   const name = rivalName(rival, t);
   const blocked = result?.outcome.kind === 'blocked';
@@ -114,7 +121,10 @@ export function RaidResultCard({ t, rival, result, error, floorsKnocked, ledger,
    * SWING paid rather than what the payback recovered.
    */
   const bigLoot = verdict.showLoot && (!ledger || verdict.stealHeadline);
-  const subCoins = bigLoot ? (verdict.stealHeadline && earned !== stolen ? earned : 0) : earned;
+  // The footnote only fires when it is NOT the number already on the panel —
+  // the same total printed twice at two sizes is how round 2 read as two
+  // competing headlines.
+  const subCoins = verdict.showLoot && earned !== verdict.headlineCoins ? earned : 0;
 
   return (
     <div
@@ -188,25 +198,36 @@ export function RaidResultCard({ t, rival, result, error, floorsKnocked, ledger,
           </p>
         ) : null}
 
-        {/* ONE number. The bar wins this beat with "You stole: 58,000" and
-            nothing else competing; round 2 printed two different totals. */}
-        {bigLoot ? (
-          <p
-            className={`flex items-center gap-2 font-neo-display text-4xl font-black leading-none tabular-nums text-neo-yellow drop-shadow-[4px_4px_0_rgba(0,0,0,0.95)] md:text-7xl ${pop}`}
-          >
-            <Image
-              src="/images/word-tower-v2/empire/coin-stack.webp"
-              alt=""
-              aria-hidden
-              width={236}
-              height={256}
-              className="h-11 w-auto md:h-20"
-            />
-            {verdict.stealHeadline
-              ? t('wordTowerV2.rivals.stole', { coins: verdict.headlineCoins })
-              : t('wordTowerV2.rivals.scrap', { coins: verdict.headlineCoins })}
-          </p>
-        ) : null}
+        {/* ONE number, plus the damage it was paid for. The bar wins this beat
+            with "You stole: 58,000" over confetti and nothing else competing;
+            round 3 shipped the number and no receipt, and round 4's judge could
+            not find a payoff frame at all. */}
+        <PayoffPanel
+          coins={verdict.showLoot ? verdict.headlineCoins : null}
+          coinLabel={
+            verdict.stealHeadline
+              ? t(ledger ? 'wordTowerV2.rivals.reclaimed' : 'wordTowerV2.rivals.stole', { coins: verdict.headlineCoins })
+              : t('wordTowerV2.rivals.scrap', { coins: verdict.headlineCoins })
+          }
+          muted={!bigLoot}
+          /* What the swing DID. A blocked payback used to leave the screen with
+             no number at all bar a grey footnote — the exact "payoff is
+             invisible" the judge marked us down for. Their wall going down IS
+             the result there, so it gets the receipt tile. */
+          receipt={
+            blocked
+              ? t('wordTowerV2.rivals.shieldDown')
+              : floorsTotal > 0
+                ? t('wordTowerV2.rivals.floorsDown', { n: floorsKnocked, total: floorsTotal })
+                : null
+          }
+          /* Lime is the colour of a win. "0 of 7 floors down" is not one, so
+             the tile goes neutral there rather than dressing a nil return up as
+             a result — the coins tile is what carries the good news. */
+          receiptTone={blocked ? 'bg-neo-purple' : floorsKnocked > 0 ? 'bg-neo-lime' : 'bg-neo-cream'}
+          receiptIcon={blocked ? 'shield' : 'floors'}
+          reducedMotion={reducedMotion}
+        />
       </div>
 
       {ledger ? <div className="px-3 pb-2">

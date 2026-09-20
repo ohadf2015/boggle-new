@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChestRoll, RunSummary } from '@/lib/wordTowerV2/estate';
-import { type ChestTease, type RevealBeat, chestTease } from '@/lib/wordTowerV2/rewards';
+import { type ChestTease, type RevealBeat, chestTease, tierFx } from '@/lib/wordTowerV2/rewards';
 import type { SOUND_EFFECTS } from '@/lib/audio/soundEffectsConfig';
 import type { RunState } from '@/lib/wordTowerV2/run';
 import type { Phase, useTowerRun } from '../useTowerRun';
@@ -20,8 +20,6 @@ interface Args {
   heightM: number;
   phase: Phase;
   playSound: PlaySound;
-  /** For the guest sign-in nudge. */
-  language: string;
 }
 
 export interface ChestState {
@@ -40,7 +38,7 @@ export interface RewardsFlow {
   /** The results screen may take over. */
   resultsReady: boolean;
   onBeat: (beat: RevealBeat | 'open') => void;
-  onSignIn: () => void;
+  onCoinTick: (rate: number) => void;
   onDone: () => void;
 }
 
@@ -49,7 +47,7 @@ export interface RewardsFlow {
  * the in-run coins and streak, the single server report at the end of the run,
  * and the chest reveal that hands over to the results.
  */
-export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound, language }: Args): RewardsFlow {
+export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound }: Args): RewardsFlow {
   const fx = useLandingFx();
   // Arm the burst with the coins this landing paid; TowerCanvas reports WHERE
   // it paid them on its next frame and the two are drawn as one beat.
@@ -93,18 +91,54 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
     if (phase !== 'over') setDone(false);
   }, [phase]);
 
+  /**
+   * The reveal's soundtrack. Every beat has a voice — a beat that emitted
+   * nothing would be a silent no-op the moment a new kind is added.
+   */
   const onBeat = useCallback(
     (beat: RevealBeat | 'open') => {
-      if (beat === 'open') playSound('vaultUnlock');
-      else if (beat.kind === 'coins') playSound('coinCascade');
-      else if (beat.kind === 'item') playSound('giftReceived');
+      if (beat === 'open') {
+        playSound('vaultUnlock', { volume: 0.45 });
+        return;
+      }
+      switch (beat.kind) {
+        case 'anticipation':
+          // The rattle is the unlock already ringing out; a second cue muddies it.
+          break;
+        case 'burst': {
+          const fx = tierFx(beat.tier);
+          playSound('chestOpen', { volume: fx.volume });
+          // Rarity is heard as well as seen: the top tiers get a second layer.
+          if (beat.tier === 'epic') playSound('epicVictory', { volume: fx.volume * 0.7 });
+          else if (beat.tier === 'rare') playSound('crownSparkle', { volume: fx.volume * 0.7 });
+          break;
+        }
+        // The coins and the cards are payout sounds too, so they ride the same
+        // tier volume as the pop — an epic haul that counted up as quietly as a
+        // common would hand half the rarity signal back.
+        case 'coins':
+          playSound('coinCascade', { volume: tierFx(beat.tier).volume });
+          break;
+        case 'item':
+          playSound('giftReceived', { volume: 0.45 + tierFx(beat.tier).volume * 0.4 });
+          break;
+      }
     },
     [playSound],
   );
 
-  const onSignIn = useCallback(() => {
-    window.location.href = `/${language}/login`;
-  }, [language]);
+  /** The counter climbing, heard climbing. */
+  const onCoinTick = useCallback((rate: number) => playSound('coinCollect', { volume: 0.22, rate }), [playSound]);
+
+  /*
+   * No `onSignIn` here on purpose. It used to be
+   * `window.location.href = `/${language}/login``, and there IS no
+   * `/[locale]/login` route — a guest who took the chest's "sign in for rivals
+   * & raids" offer landed on the 404 page having lost the run, the reveal and
+   * the guest estate behind it. Signing in belongs in a modal over the reveal
+   * (the same `AuthModal` RivalBoard's guest teaser opens), so `RunRewards`
+   * owns it and this hook hands out no navigation at all.
+   */
 
   return {
     rewards,
@@ -116,7 +150,7 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
     // Nothing banked and nothing in flight: skip the reveal rather than stall the run.
     resultsReady: done || (!payout && !waiting),
     onBeat,
-    onSignIn,
+    onCoinTick,
     onDone: () => setDone(true),
   };
 }

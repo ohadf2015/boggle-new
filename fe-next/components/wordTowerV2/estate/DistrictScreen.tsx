@@ -147,7 +147,12 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
 
   return (
     <div className="absolute inset-0 z-[70] flex flex-col bg-neo-navy" role="dialog" aria-modal="true" aria-label={t('wordTowerV2.estate.title')}>
-      <header className="z-10 flex items-center gap-2 border-b-4 border-black bg-neo-navy px-3 py-2">
+      {/* `pe-14` reserves the corner the global in-game mute FAB is pinned to
+          (40px + its 8px inset). Without it the coin bank sat straight under
+          that FAB on a phone — on /en its last digits, on /he (where the FAB
+          mirrors to the start edge) the whole pill. Same reserve V2TopBar
+          makes, and it is logical-direction so one value covers both. */}
+      <header className="z-10 flex items-center gap-2 border-b-4 border-black bg-neo-navy px-3 py-2 pe-14">
         <button
           type="button"
           onClick={() => {
@@ -208,8 +213,14 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
           style={{ backgroundImage: `url(${backdropFor(estate.district)})`, backgroundSize: 'auto 100%' }}
           aria-hidden
         />
-        {/* Reads the plot labels against a bright backdrop. */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-neo-navy/75 via-neo-navy/15 to-transparent" aria-hidden />
+        {/* The skyline is a MOOD, the five plots are the subject. Without this
+            the sunset backdrop is the loudest thing on screen and both the
+            buildings and the cyan plan-ghosts wash out against it. */}
+        <div className="pointer-events-none absolute inset-0 bg-neo-navy/55" aria-hidden />
+        {/* On a 1920 screen the backdrop's own sky reaches the header as a flat
+            band; fading it into the chrome keeps the seam off the screen. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-neo-navy to-transparent" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-neo-navy/90 via-neo-navy/45 to-transparent" aria-hidden />
         {/* Both phone rows sit LOW: the back row on the skyline's roofline and
             the front row on the ground band, so nothing floats in the sky. */}
         <div className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-end px-2 pb-2">

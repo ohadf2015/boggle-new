@@ -49,10 +49,18 @@ export async function POST(request: NextRequest) {
     if (!db) return NextResponse.json({ error: 'db unavailable' }, { status: 503 });
 
     const attacker = await loadEstate(db, user.id);
-    if (!attacker || attacker.estate.raidCharges < 1) {
-      return NextResponse.json({ error: 'no raid charges', reason: 'no_charges' }, { status: 409 });
-    }
 
+    /**
+     * Payback is free, and it is looked up BEFORE the charge gate.
+     *
+     * A raid charge is banked by a run, so making revenge cost one means
+     * "someone wrecked you — now go play a round before you may answer".
+     * The bar (Coin Master) does the opposite: revenge is the one thing always
+     * actionable with nothing banked, which is exactly why it brings players
+     * back. The un-avenged raid row IS the charge here: the RPC flips its
+     * `avenged_at` in the same transaction that applies the hit, so one raid
+     * buys exactly one free swing and a client cannot mint them.
+     */
     let revengeRaidId: string | null = null;
     if (revenge) {
       const { data, error } = await db
@@ -67,6 +75,10 @@ export async function POST(request: NextRequest) {
       if (error) throw error;
       if (!data) return NextResponse.json({ error: 'nothing to avenge', reason: 'no_revenge' }, { status: 400 });
       revengeRaidId = String((data as { id: string }).id);
+    }
+
+    if (!attacker || (attacker.estate.raidCharges < 1 && !revengeRaidId)) {
+      return NextResponse.json({ error: 'no raid charges', reason: 'no_charges' }, { status: 409 });
     }
 
     // Two tries: a shield bought/consumed between our read and the RPC's lock flips the outcome.

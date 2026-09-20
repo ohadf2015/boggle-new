@@ -27,7 +27,11 @@ interface Props {
   /** ImpactBurst flies its coins into this exact rect. */
   coinsRef: RefObject<HTMLDivElement | null>;
   onOpenEstate: () => void;
-  /** Desktop/TV: the play column is narrower, so the bar is too. */
+  /**
+   * Desktop/TV. The bar no longer changes shape for it — the mute FAB owns the
+   * same corner at every width — but the game screen still passes it, so the
+   * prop stays rather than forcing an edit into a file other builders hold.
+   */
   wide?: boolean;
   reducedMotion?: boolean;
 }
@@ -145,7 +149,6 @@ export const V2TopBar = memo(function V2TopBar({
   raids,
   coinsRef,
   onOpenEstate,
-  wide,
   reducedMotion,
 }: Props) {
   const floors = Math.floor(floorsAt(heightM) + 0.05);
@@ -161,17 +164,26 @@ export const V2TopBar = memo(function V2TopBar({
   const secondary = run.balls > 0 || tenants > 0 || effects.length > 0;
 
   return (
+    // `pe-12` on BOTH layouts: the global mute FAB is pinned to the same corner
+    // at every width, and at 1920x1080 it sat exactly on top of the empire
+    // button — the district was unreachable from the game screen.
     <div
       data-wt2-topbar
-      className={`pointer-events-none absolute top-[max(0.5rem,env(safe-area-inset-top))] z-40 flex flex-col gap-1.5 ${
-        wide ? 'inset-x-3' : 'inset-x-3 pe-12'
-      }`}
+      className="pointer-events-none absolute inset-x-3 top-[max(0.5rem,env(safe-area-inset-top))] z-40 flex flex-col gap-1.5 pe-12"
       aria-live="polite"
     >
-      <div className="flex items-center gap-2">
+      {/* WRAPS. Six chips at a phone's 318px of usable width measured 437px
+          wide at floor 14 with a seven-figure bank: the row overflowed its own
+          padding and pushed the EMPIRE button clean off a 390px screen (x431
+          of 390), taking the coin count's last digits with it. A single line
+          is still what a wide screen gets — this only ever folds when the row
+          genuinely cannot fit, and folding is the one outcome that loses
+          nothing. `shrink-0` on both clusters keeps the numbers whole rather
+          than squeezing them into an ellipsis. */}
+      <div className="flex flex-wrap items-center gap-2">
         {/* Primary: how high am I. Floor leads — it is an apartment tower. */}
         <div
-          className="flex items-baseline gap-1.5 rounded-neo border-neo-thick border-black bg-neo-lime px-2.5 py-1 text-neo-navy shadow-hard lg:px-3.5 lg:py-1.5"
+          className="flex shrink-0 items-baseline gap-1.5 rounded-neo border-neo-thick border-black bg-neo-lime px-2.5 py-1 text-neo-navy shadow-hard lg:px-3.5 lg:py-1.5"
           aria-label={t('wordTowerV2.hud.floorA11y', { n: floors, m: heightM.toFixed(1) })}
         >
           <span className="font-neo-display text-2xl font-black leading-none tabular-nums lg:text-4xl" aria-hidden>
@@ -183,13 +195,13 @@ export const V2TopBar = memo(function V2TopBar({
           </span>
         </div>
 
-        <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-base font-bold tabular-nums text-neo-cream lg:text-2xl">
+        <div className="shrink-0 rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-base font-bold tabular-nums text-neo-cream lg:text-2xl">
           {score.toLocaleString()}
         </div>
 
         {bestM > 0.5 ? (
           <div
-            className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-1.5 py-0.5 font-neo-display text-[11px] font-bold text-neo-navy shadow-hard-sm lg:text-base"
+            className="flex shrink-0 items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-1.5 py-0.5 font-neo-display text-[11px] font-bold text-neo-navy shadow-hard-sm lg:text-base"
             aria-label={t('wordTower.hud.best', { m: bestM.toFixed(1) })}
           >
             <Trophy className="h-3 w-3 lg:h-5 lg:w-5" aria-hidden />
@@ -197,7 +209,7 @@ export const V2TopBar = memo(function V2TopBar({
           </div>
         ) : null}
 
-        <div className="ms-auto flex items-center gap-2">
+        <div className="ms-auto flex shrink-0 items-center gap-2">
           <StreakRing t={t} combo={run.combo} bestCombo={run.bestCombo} reducedMotion={reducedMotion} />
 
           {/* ONE coin number: the bank plus what this run has banked into it. */}

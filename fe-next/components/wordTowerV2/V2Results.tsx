@@ -107,15 +107,24 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
       <div className={`mx-auto flex min-h-full w-full max-w-sm items-center ${rivals ? 'md:max-w-5xl lg:max-w-6xl' : 'md:max-w-2xl'}`}>
       <div className={`relative w-full rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop md:p-6 ${rivals ? 'md:flex md:items-start md:gap-6' : ''}`}>
       <div className={rivals ? 'md:w-[22rem] md:shrink-0 lg:w-[26rem]' : 'contents'}>
+        {/* `end-14` on a phone: the global mute FAB is pinned to this exact
+            corner and probes for an obstruction only on mount and on resize,
+            so a card that opens ~1.3s after the collapse is never seen — it
+            sat ON this X (measured 342-382 over 327-359 at 390px). Widening
+            the card past the FAB is not an option here, so the X steps in by
+            the FAB's 56px instead. From md up the card is centred and nowhere
+            near the viewport edge, so it keeps the corner. */}
         <button
           type="button"
           onClick={onClose}
           aria-label={t('wordTowerV2.results.close')}
-          className="absolute end-3 top-3 flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+          className="absolute end-14 top-3 flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:end-3"
         >
           <X className="h-4 w-4" aria-hidden />
         </button>
-        <h2 className="font-neo-display text-3xl font-black uppercase">{t('wordTowerV2.collapsed')}</h2>
+        {/* `px-12` keeps the title clear of the close button parked at `end-14`
+            — at 390px "TOWER DOWN!" ran straight under the X. */}
+        <h2 className="px-12 font-neo-display text-3xl font-black uppercase">{t('wordTowerV2.collapsed')}</h2>
         {isBest ? (
           <div className="mx-auto mt-2 flex w-fit items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-3 py-0.5 font-neo-display text-sm font-bold">
             <Trophy className="h-4 w-4" aria-hidden />
@@ -132,11 +141,16 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
               {peakM.toFixed(1)}
               {t('wordTowerV2.unitM')}
             </span>
-            <span className="flex items-center gap-1 text-sm opacity-70">
-              <Trophy className="h-3.5 w-3.5" aria-hidden />
-              {bestM.toFixed(1)}
-              {t('wordTowerV2.unitM')}
-            </span>
+            {/* Only when the best is a DIFFERENT number. On a new best it is
+                the run's own height printed twice under a "New best!" pill
+                that already said so — three ways of saying one thing. */}
+            {bestM > peakM + 0.05 ? (
+              <span className="flex items-center gap-1 text-sm opacity-70">
+                <Trophy className="h-3.5 w-3.5" aria-hidden />
+                {bestM.toFixed(1)}
+                {t('wordTowerV2.unitM')}
+              </span>
+            ) : null}
           </div>
         </div>
         <dl className="mt-4 grid grid-cols-2 gap-2 font-neo-display">

@@ -29,11 +29,14 @@ export function EstateButton({ t, estate, raids, variant = 'hud', onOpen }: Prop
       <button
         type="button"
         onClick={onOpen}
-        className="relative mt-3 flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-6 py-2.5 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+        /* It shares a row with the SMASH button inside the results card, so it
+           must be able to SHRINK: at 390px the fixed `px-6`/`text-lg` content
+           was wider than its flex-1 box and the label clipped to "ISTRICT". */
+        className="relative flex w-full min-w-0 items-center justify-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-2.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
       >
-        <Building2 className="h-5 w-5" aria-hidden />
-        {t('wordTowerV2.estate.open')}
-        <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-cream px-2 py-0.5 text-sm tabular-nums">
+        <Building2 className="h-5 w-5 shrink-0" aria-hidden />
+        <span className="truncate">{t('wordTowerV2.estate.open')}</span>
+        <span className="flex shrink-0 items-center gap-1 rounded-neo border-neo border-black bg-neo-cream px-1.5 py-0.5 text-sm tabular-nums">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={ITEM.coin} alt="" aria-hidden className="h-4 w-4" />
           {estate.coins.toLocaleString()}

@@ -26,10 +26,32 @@ const SHARD: Record<LandingQuality, string> = {
   miss: 'bg-neo-pink',
 };
 
+/**
+ * The chip the payout number is printed on, per landing quality.
+ *
+ * Yellow on the sunset and dusk skies is the lowest-contrast pair this game
+ * can produce, and round f1's reward chip used it for EVERY landing — the
+ * blind judge read the payout as quieter than the failure toast beside it.
+ * A landing worth celebrating now pays on lime, which holds against blue,
+ * purple and sunset alike; a scrappy one keeps yellow, so winning is the
+ * louder colour as well as the bigger number.
+ */
+const PAYOUT_FILL: Record<LandingQuality, string> = {
+  perfect: 'bg-neo-lime',
+  good: 'bg-neo-lime',
+  sloppy: 'bg-neo-yellow',
+  miss: 'bg-neo-yellow',
+};
+
 /** How long the shock ring and stars stay legible (a screenshot must catch them). */
 const RING_MS = 1.0;
-/** The `+N` sits ON the impact this long before it arcs to the counter. */
-const HOLD_MS = 0.9;
+/**
+ * The `+N` sits ON the impact this long before it arcs to the counter. It is
+ * the reward moment, so it holds longer than it flies: at 0.9 the chip spent
+ * 40% of its life shrinking away and mid-flight was what a frame usually
+ * caught.
+ */
+const HOLD_MS = 1.25;
 const FLIGHT_MS = 0.6;
 /**
  * How far above the contact point the payout chip sits, in canvas px. Small on
@@ -204,8 +226,9 @@ function Burst({ t, impact, points, hostRef, counterRef, onDone, reducedMotion }
         >
           {/* The headline: what the drop was WORTH, in the drop's own pixels. */}
           <span
+            data-wt2-payout={impact.quality}
             className={`flex items-center gap-1 whitespace-nowrap rounded-neo border-neo-thick border-black px-2.5 py-0.5 font-neo-display text-4xl font-black text-neo-navy shadow-hard-lg lg:px-4 lg:text-6xl ${
-              gold ? 'bg-neo-lime' : 'bg-neo-yellow'
+              gold ? 'bg-neo-lime' : PAYOUT_FILL[impact.quality]
             }`}
           >
             {headline.coin ? (

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { plotLabel, rankStandings, rivalName, teaserTowers } from '../rivals/rivalUtils';
-import type { RivalView } from '../useEstate';
+import { greetingFor, plotLabel, rankStandings, rivalName, teaserTowers } from '../rivals/rivalUtils';
+import type { RevengeEntry, RivalView } from '../useEstate';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 
@@ -32,6 +32,43 @@ describe('rival labels', () => {
   it('given a raid that hit no plot, when labelled, then the empty-lot label is used', () => {
     expect(plotLabel(null, t)).toBe('wordTowerV2.rivals.plot.lot');
     expect(plotLabel('vault', t)).toBe('wordTowerV2.rivals.plot.vault');
+  });
+
+  it('given a plot the catalogue does not know, when labelled, then no raw key reaches the screen', () => {
+    // A row written before a slot was renamed would otherwise render
+    // "wordTowerV2.rivals.plot.cafe" verbatim in the grievance line.
+    expect(plotLabel('cafe' as never, t)).toBe('wordTowerV2.rivals.plot.lot');
+  });
+});
+
+const debt = (raidId: string): RevengeEntry =>
+  ({ raidId, coinsStolen: 10, blocked: false, plot: null, createdAt: '', rival: {} as RivalView }) as RevengeEntry;
+
+describe('payback greeting', () => {
+  it('given a raid you have not seen, when you open the game, then their tower opens straight away', () => {
+    expect(greetingFor([debt('r1')], 1, new Set())).toEqual({ kind: 'target', entry: debt('r1') });
+  });
+
+  it('given several attackers, when you open the game, then the list of who owes you opens', () => {
+    expect(greetingFor([debt('r1'), debt('r2')], 2, new Set()).kind).toBe('list');
+  });
+
+  it('given every raid already seen, when you open the game, then nothing takes over the screen', () => {
+    // The debt stays on the pill — glancing at the inbox must not shove you
+    // into a raid you already waved off.
+    expect(greetingFor([debt('r1')], 0, new Set()).kind).toBe('none');
+  });
+
+  it('given the greeting already fired for these raids, when it re-runs, then it stays quiet', () => {
+    expect(greetingFor([debt('r1')], 1, new Set(['r1'])).kind).toBe('none');
+  });
+
+  it('given a NEW raid on top of ones already greeted, when it re-runs, then it fires again', () => {
+    expect(greetingFor([debt('r1'), debt('r2')], 1, new Set(['r1'])).kind).toBe('list');
+  });
+
+  it('given nobody owes you anything, when you open the game, then nothing fires', () => {
+    expect(greetingFor([], 3, new Set()).kind).toBe('none');
   });
 });
 

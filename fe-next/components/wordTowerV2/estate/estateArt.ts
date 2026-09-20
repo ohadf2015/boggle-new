@@ -85,6 +85,88 @@ export function buildingNameKey(district: number, slot: PlotSlot): string {
   return `wordTowerV2.estate.art.${buildingType(district, slot)}`;
 }
 
+// ── Plot identity: what a player recognises a plot BY ────────────────────────
+
+/**
+ * All fifteen `bld-<type>-l0.webp` are the same grey foundation slab, and the
+ * `l2` scaffolds read as scaffolds first. So at build time the art alone can
+ * not tell five plots apart — the identity has to come from somewhere else:
+ *
+ *  - a GHOST of the finished building standing on the empty lot (Coin Master
+ *    shows unbuilt village items as a dim silhouette of the real thing), and
+ *  - a per-type ICON on the name plate, which survives phone-size and
+ *    colour-blindness where a silhouette alone might not.
+ *
+ * The ghost also fixes the second half of the problem: `plotStage` maps levels
+ * 0 and 1 to the same file, so buying level 1 used to change nothing at all.
+ * The ghost firms up instead — the plan is more real than it was.
+ */
+export type PlotIconId =
+  | 'croissant' | 'apartments' | 'book' | 'clock' | 'flower'
+  | 'fish' | 'lighthouse' | 'sailboat' | 'warehouse' | 'ship'
+  | 'arcade' | 'bed' | 'skytower' | 'radio' | 'music';
+
+/** One glyph per building type in the art pack. Keyed by the art id, not the slot. */
+export const PLOT_ICONS: Record<string, PlotIconId> = {
+  bakery: 'croissant',
+  apartments: 'apartments',
+  library: 'book',
+  clocktower: 'clock',
+  garden: 'flower',
+  fishmarket: 'fish',
+  lighthouse: 'lighthouse',
+  boathouse: 'sailboat',
+  warehouse: 'warehouse',
+  ferry: 'ship',
+  arcade: 'arcade',
+  hotel: 'bed',
+  skytower: 'skytower',
+  radiomast: 'radio',
+  club: 'music',
+};
+
+/** Damage first, then done, then "you can build this NOW", then "not yet". */
+export type PlotState = 'damaged' | 'maxed' | 'affordable' | 'locked';
+
+export interface PlotIdentity {
+  type: string;
+  /** The stage art actually on the ground. */
+  sprite: string;
+  /** The finished building, drawn faint above the lot — null once it is real. */
+  ghost: string | null;
+  ghostOpacity: number;
+  icon: PlotIconId;
+  state: PlotState;
+}
+
+export interface PlotIdentityInput {
+  district: number;
+  slot: PlotSlot;
+  level: number;
+  damaged: boolean;
+  affordable: boolean;
+}
+
+/**
+ * Ghost strength by level. Only the lot stage carries one: from level 2 the
+ * scaffold sprites are already five different shapes, and a ghost on top of a
+ * scaffold reads as mud rather than as a plan.
+ */
+const GHOST_OPACITY: Record<number, number> = { 0: 0.42, 1: 0.66 };
+
+export function plotIdentity({ district, slot, level, damaged, affordable }: PlotIdentityInput): PlotIdentity {
+  const type = buildingType(district, slot);
+  const ghostOpacity = GHOST_OPACITY[level] ?? 0;
+  return {
+    type,
+    sprite: buildingSprite(district, slot, level),
+    ghost: ghostOpacity > 0 ? buildingSprite(district, slot, 4) : null,
+    ghostOpacity,
+    icon: PLOT_ICONS[type],
+    state: damaged ? 'damaged' : level >= MAX_PLOT_LEVEL ? 'maxed' : affordable ? 'affordable' : 'locked',
+  };
+}
+
 // ── Perk copy ────────────────────────────────────────────────────────────────
 
 export interface PerkLine {

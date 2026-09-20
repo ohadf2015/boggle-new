@@ -177,6 +177,24 @@ describe('POST /api/word-tower/estate/raid', () => {
     expect(has(lookup.ops, 'eq', 'defender_id', ME)).toBe(true);
   });
 
+  it('given zero charges and a raid to avenge, when hitting back, then it lands for free and spends no charge', async () => {
+    // Coin Master's return hook: someone wrecked you, so the answer is waiting
+    // whether or not you have banked a swing. The un-avenged raid row IS the
+    // charge — the rpc flips `avenged_at` in the same transaction, so it can
+    // be spent exactly once and never by a client that just claims it.
+    const db = raidDb({ attacker: { raid_charges: 0 }, revengeRow: { id: 'their-raid' } });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true })))).toBe(200);
+    expect(db.rpc.mock.calls[0][1]).toMatchObject({ p_revenge_raid_id: 'their-raid' });
+  });
+
+  it('given zero charges and nothing to avenge, when raiding, then it is still refused', async () => {
+    const db = raidDb({ attacker: { raid_charges: 0 }, revengeRow: null });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true })))).toBe(400);
+    expect(db.rpc).not.toHaveBeenCalled();
+  });
+
   it('given the rpc reports no charges (race), when raiding, then 409', async () => {
     (getSupabaseAdmin as any).mockReturnValue(raidDb({ rpcError: 'no_charges' }).client);
     expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1 })))).toBe(409);

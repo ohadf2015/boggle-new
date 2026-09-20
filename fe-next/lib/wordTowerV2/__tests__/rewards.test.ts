@@ -1,18 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import {
+  COIN_TICKS,
   RARE_COMBOS,
+  REVEAL_BUDGET_MS,
   REWARDS,
   STREAK_PIPS,
   type RewardId,
   chestTease,
   chipAnchor,
   coinDelta,
+  coinTickRate,
   milestoneFor,
   payoutFor,
   revealBeats,
+  revealTotalMs,
   rollReward,
   steadySwing,
   streakMeter,
+  tierFx,
 } from '../rewards';
 import { SWING } from '../crane';
 import { type ChestRoll, type RunSummary, chestOdds, runCoins, runQuality } from '../estate';
@@ -237,11 +242,13 @@ describe('chestTease — the near miss that buys the next run', () => {
 
 describe('revealBeats — the chest opening, one beat at a time', () => {
   const chest = (over: Partial<ChestRoll>): ChestRoll => ({ tier: 'common', coins: 40, shields: 0, bricks: 0, blueprints: 0, ...over });
+  /** The longest possible reveal: the slowest tier carrying every item. */
+  const worst = (tier: ChestRoll['tier']) => revealBeats(chest({ tier, coins: 300, shields: 1, bricks: 1, blueprints: 1 }), 100);
 
-  it('given a plain chest, when the reveal is built, then it is chest then coins, nothing else', () => {
+  it('given a plain chest, when the reveal is built, then it rattles, pops, then pays', () => {
     const beats = revealBeats(chest({}), 200);
-    expect(beats.map((b) => b.kind)).toEqual(['chest', 'coins']);
-    expect(beats[1]).toMatchObject({ kind: 'coins', coins: 240 });
+    expect(beats.map((b) => b.kind)).toEqual(['anticipation', 'burst', 'coins']);
+    expect(beats[2]).toMatchObject({ kind: 'coins', coins: 240 });
   });
 
   it('given an epic chest, when the reveal is built, then every item gets its own card', () => {
@@ -256,10 +263,81 @@ describe('revealBeats — the chest opening, one beat at a time', () => {
     expect(beats.filter((b) => b.kind === 'item').map((b) => b.item)).toEqual(['brick']);
   });
 
-  it('given any chest, when the reveal is built, then it is short enough to sit through', () => {
-    const beats = revealBeats(chest({ tier: 'epic', coins: 300, shields: 1, blueprints: 1 }), 100);
-    expect(beats.length).toBeLessThanOrEqual(5);
-    for (const b of beats) expect(b.ms).toBeLessThanOrEqual(1500);
+  it('given the worst case of every tier, when timed, then the whole reveal fits the budget', () => {
+    // Epic is the longest anticipation AND the most cards — the sum is what bites.
+    for (const tier of ['common', 'rare', 'epic'] as const) {
+      expect(revealTotalMs(worst(tier))).toBeLessThanOrEqual(REVEAL_BUDGET_MS);
+    }
+  });
+
+  it('given the coins beat, when the count runs, then it finishes before the next beat starts', () => {
+    // Two clocks for one beat is how the final number gets cut off mid-count.
+    for (const tier of ['common', 'rare', 'epic'] as const) {
+      const coins = worst(tier).find((b) => b.kind === 'coins');
+      expect(coins).toBeDefined();
+      if (coins?.kind !== 'coins') throw new Error('no coins beat');
+      expect(coins.countMs).toBeLessThanOrEqual(coins.ms);
+      expect(coins.countMs).toBeGreaterThan(0);
+    }
+  });
+
+  it('given a louder tier, when the reveal plays, then it is louder in EVERY channel', () => {
+    const [c, r, e] = (['common', 'rare', 'epic'] as const).map(tierFx);
+    for (const k of [
+      'anticipationMs',
+      'rattles',
+      'burstMs',
+      'sparks',
+      'spread',
+      'flood',
+      'shakePx',
+      'volume',
+      'rays',
+      'coinBurst',
+    ] as const) {
+      expect(c[k]).toBeLessThan(r[k]);
+      expect(r[k]).toBeLessThan(e[k]);
+    }
+  });
+
+  it('given the plainest tier, when it pops, then it gets no god rays — the rays ARE the rarity', () => {
+    // A common that threw light beams would spend the signal the rare needs.
+    expect(tierFx('common').rays).toBe(0);
+    expect(tierFx('rare').rays).toBeGreaterThan(0);
+  });
+
+  it('given any tier, when it pops, then some coins are actually thrown', () => {
+    // "Coins were counted" is not a shower; every tier throws at least a handful.
+    for (const tier of ['common', 'rare', 'epic'] as const) {
+      expect(tierFx(tier).coinBurst).toBeGreaterThan(0);
+    }
+  });
+
+  it('given the beats that make a sound, when built, then each one still knows its tier', () => {
+    // The coins and the cards are payout sounds too — they must be able to get
+    // louder with the chest, so the tier travels WITH the beat, not beside it.
+    const beats = revealBeats(chest({ tier: 'epic', coins: 300, bricks: 1 }), 100);
+    for (const b of beats) expect(b.tier).toBe('epic');
+  });
+
+  it('given the top tier only, when it pops, then it gets the held frame and the banner', () => {
+    expect(tierFx('epic').slowmoMs).toBeGreaterThan(0);
+    expect(tierFx('common').slowmoMs).toBe(0);
+    expect(tierFx('common').banner).toBe(false);
+    expect(tierFx('rare').banner).toBe(true);
+    expect(tierFx('epic').banner).toBe(true);
+  });
+
+  it('given the count-up ticks, when played, then the pitch only ever rises', () => {
+    const rates = Array.from({ length: COIN_TICKS }, (_, i) => coinTickRate(i));
+    for (let i = 1; i < rates.length; i += 1) expect(rates[i]).toBeGreaterThan(rates[i - 1]);
+    expect(rates[0]).toBeLessThan(1);
+    expect(rates[rates.length - 1]).toBeGreaterThan(1);
+  });
+
+  it('given a stray tick index, when rated, then it stays inside the ladder', () => {
+    expect(coinTickRate(-5)).toBe(coinTickRate(0));
+    expect(coinTickRate(99)).toBe(coinTickRate(COIN_TICKS - 1));
   });
 });
 

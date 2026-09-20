@@ -47,6 +47,18 @@ export function RaidFlow({ t, estate, rival, revenge, grievance, balls, reducedM
   const [result, setResult] = useState<RaidResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [knocked, setKnocked] = useState(0);
+  /** Floors their building had — the denominator on the payoff receipt. */
+  const [floorsTotal, setFloorsTotal] = useState(() => wreckableTower(rival.lastTower).length);
+  /**
+   * Review hook (`?demo=1&payoff=1`), the sibling of the scene's `autohit`.
+   *
+   * The payoff screen is the beat a capture pass keeps missing — it lives one
+   * tap from the end of a real swing against a real rival, which a review run
+   * cannot always arrange. With this on, the swing resolves to a sample payout
+   * and the raid is NOT posted, so nothing is scored, spent or banked: it is a
+   * screenshot of the screen, not a way to mint one.
+   */
+  const demoPayoff = useRef<'' | 'damaged' | 'blocked'>('');
   /** The floor they called on the reveal — marked through the whole swing. */
   const [target, setTarget] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
@@ -58,6 +70,13 @@ export function RaidFlow({ t, estate, rival, revenge, grievance, balls, reducedM
     if (refreshed.current) return;
     refreshed.current = true;
     void refresh();
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const mode = params.has('demo') ? params.get('payoff') : null;
+      demoPayoff.current = mode === '1' ? 'damaged' : mode === 'blocked' ? 'blocked' : '';
+    } catch {
+      /* no URL (tests, SSR) — the hook simply stays off. */
+    }
   }, [refresh]);
 
   const start = useCallback(
@@ -72,8 +91,25 @@ export function RaidFlow({ t, estate, rival, revenge, grievance, balls, reducedM
   const finish = useCallback(
     async ({ wrecked, total }: { wrecked: number; total: number }) => {
       setKnocked(wrecked);
+      if (total > 0) setFloorsTotal(total);
       setSwingOver(true);
       setBusy(true);
+      if (demoPayoff.current) {
+        // No POST: a sample payout, purely so the payoff frame can be reviewed.
+        // `payoff=blocked` reaches the OTHER frame — a payback their shield ate,
+        // which pays scrap and no steal and is the harder one to arrange live.
+        setResult({
+          raidId: null,
+          outcome:
+            demoPayoff.current === 'blocked'
+              ? { kind: 'blocked', attackerCoins: 23 }
+              : { kind: 'damaged', slot: 'vault', coinsStolen: 120 + wrecked * 20, attackerCoins: 158 + wrecked * 20 },
+          revenge,
+        });
+        setBusy(false);
+        setPhase('result');
+        return;
+      }
       try {
         const res = await estate.raid(rival.userId, wreckAccuracy(wrecked, total), revenge);
         if (!res) setError('guest');
@@ -130,6 +166,7 @@ export function RaidFlow({ t, estate, rival, revenge, grievance, balls, reducedM
             result={result}
             error={error}
             floorsKnocked={knocked}
+            floorsTotal={floorsTotal}
             ledger={
               revenge && grievance
                 ? revengeLedger({

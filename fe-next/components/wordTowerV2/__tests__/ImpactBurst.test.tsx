@@ -43,3 +43,27 @@ describe('ImpactBurst payout chip', () => {
     expect(screen.queryByText(/^\+/)).toBeNull();
   });
 });
+
+/**
+ * The payout is the reward moment. On round f1 it was yellow-on-sunset and the
+ * blind judge read it as quieter than the failure toasts around it, so a good
+ * landing now pays in lime — the one neo fill that holds up against every sky
+ * this game climbs through.
+ */
+describe('ImpactBurst payout weight', () => {
+  const chip = (c: HTMLElement) => c.querySelector('[data-wt2-payout]');
+
+  it('given a good landing, when it bursts, then the number is on the high-contrast fill', () => {
+    const { container } = render(
+      <ImpactBurst t={t} fx={fxWith({ amount: 9, quality: 'perfect' })} counterRef={createRef<HTMLElement>()} canvasClass="" points={120} />,
+    );
+    expect(chip(container)?.className).toContain('bg-neo-lime');
+  });
+
+  it('given a miss, when it bursts, then it does not borrow the winning fill', () => {
+    const { container } = render(
+      <ImpactBurst t={t} fx={fxWith({ amount: 3, quality: 'miss' })} counterRef={createRef<HTMLElement>()} canvasClass="" points={0} />,
+    );
+    expect(chip(container)?.className).not.toContain('bg-neo-lime');
+  });
+});

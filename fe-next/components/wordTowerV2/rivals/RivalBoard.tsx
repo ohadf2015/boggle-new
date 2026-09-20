@@ -85,6 +85,29 @@ export function RivalBoard({ t, estate, myTower, myHeightM, onPick }: Props) {
             tower={wreckableTower(revenge[0].rival.lastTower)}
             onRevenge={() => onPick(revenge[0].rival, revenge[0])}
           />
+          {/* Everyone else with a debt outstanding, so the run does not end by
+              hiding four of the five people who hit you. */}
+          {revenge.length > 1 ? (
+            <ul className="mt-1.5 flex flex-wrap justify-center gap-1.5">
+              {revenge.slice(1).map((e) => (
+                <li key={e.raidId}>
+                  <button
+                    type="button"
+                    onClick={() => onPick(e.rival, e)}
+                    aria-label={t('wordTowerV2.rivals.revengeName', { name: rivalName(e.rival, t) })}
+                    className="flex max-w-[11rem] items-center gap-1.5 rounded-neo border-neo border-black bg-neo-pink px-1.5 py-1 font-neo-display text-[11px] font-black uppercase text-neo-navy shadow-hard-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none md:text-sm"
+                  >
+                    <Avatar userId={e.rival.userId} customAvatar={e.rival.avatar.avatarConfig as never} size="sm" disableEffects />
+                    <span className="truncate">{rivalName(e.rival, t)}</span>
+                    <Swords className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <p className="mt-1 text-center font-neo-display text-[11px] font-black uppercase tracking-wide text-neo-lime md:text-sm">
+            {t('wordTowerV2.rivals.revengeFree')}
+          </p>
         </div>
       ) : null}
       {rivals.length === 0 ? (
