@@ -31,10 +31,10 @@ export default function ChestOpen({ loot, onOpened }: Props) {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex max-h-full min-h-0 flex-col items-center pb-3">
       <button type="button" onClick={openIt} disabled={open} data-testid="loot-chest"
         aria-label={open ? t('adventurePlay.loot.chestTitle') : t('adventurePlay.loot.tapToOpen')}
-        className="relative grid h-40 w-40 place-items-center disabled:cursor-default">
+        className="relative grid h-40 max-h-full w-40 place-items-center disabled:cursor-default">
         {open && (
           <>
             {/* light spill: rotating rays + glow */}
@@ -52,7 +52,7 @@ export default function ChestOpen({ loot, onOpened }: Props) {
           src={open ? CHEST_OPEN_ART : CHEST_CLOSED_ART}
           alt=""
           draggable={false}
-          className="relative h-36 w-36 object-contain drop-shadow-[4px_4px_0_#000]"
+          className="relative h-36 max-h-full w-36 object-contain drop-shadow-[4px_4px_0_#000]"
           initial={open && !reduce ? { scale: 0.7, y: 10 } : false}
           animate={open || reduce ? { scale: 1, y: 0 } : { rotate: [0, -6, 6, -4, 4, 0], y: [0, -4, 0] }}
           transition={open ? { type: 'spring', stiffness: 500, damping: 14 } : { duration: 0.9, repeat: Infinity, repeatDelay: 0.8 }}

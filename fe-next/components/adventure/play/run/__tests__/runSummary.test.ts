@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { levelLoot, runSummary, resultScreen } from '../runSummary';
+import { levelLoot, runSummary, resultScreen, resultRunStep, runWordCount } from '../runSummary';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 
 const run = (over: Partial<PublicRun> = {}): PublicRun => ({
@@ -56,5 +56,35 @@ describe('runSummary', () => {
   });
   it('falls back to 0 cleared with no run', () => {
     expect(runSummary(null, { won: false, validWords: ['a'], points: undefined }).levelsCleared).toBe(0);
+  });
+});
+
+describe('resultRunStep — which banked levels the recap’s relic shelf may read', () => {
+  // `recordRunWords(world, run.step, …)` banks the level just won into slot
+  // `step - 1`, so a recap that asks for `step` would read every level EXCEPT
+  // the one the player just finished.
+  it('Given a cleared node, then the step counts the node just banked', () => {
+    expect(resultRunStep(run({ step: 7 }), true)).toBe(8);
+  });
+  it('Given a death, then the fatal node banks nothing and is not counted', () => {
+    expect(resultRunStep(run({ step: 7 }), false)).toBe(7);
+  });
+  it('Given no run at all, then it stays at the first step rather than going negative', () => {
+    expect(resultRunStep(null, false)).toBe(1);
+    expect(resultRunStep(null, true)).toBe(2);
+  });
+});
+
+describe('runWordCount', () => {
+  it('counts every word the run banked on the levels it cleared', () => {
+    expect(runWordCount([['a', 'b'], ['c']], { won: true, validWords: ['c'] })).toBe(3);
+  });
+
+  it('still counts the words found on the node the run DIED on — a death banks nothing', () => {
+    expect(runWordCount([['a', 'b']], { won: false, validWords: ['x', 'y'] })).toBe(4);
+  });
+
+  it('a first-node death counts the words it found rather than reporting zero', () => {
+    expect(runWordCount([], { won: false, validWords: ['toot'] })).toBe(1);
   });
 });

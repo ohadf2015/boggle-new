@@ -1,13 +1,12 @@
 'use client';
 
 /**
- * The arena for elite + boss levels: the enemy stands in the play area as a
- * full-body character (no HUD card) — idle bob, a visible WIND-UP while an
- * attack is telegraphed (leans back, a charge orb grows in its hand), a lunge
- * on release, knock-back when hit, slump when defeated. Beside it: name,
- * chunky segmented HP with phase breaks, the intent dial and the boss's
- * one-sentence rule (Balatro boss blind). The charge orb is the launch point
- * (`data-enemy-anchor`) that AttackFlight and BoardHazards fire from.
+ * The combat stage. The real fight is `ArenaStage` — a Pixi arena with the hero
+ * and the foe facing each other. This file is the single-column DOM stage it
+ * falls back to when the canvas must not run: prefers-reduced-motion, or a
+ * browser where WebGL / the Pixi chunk never came up. Same markers, same HUD,
+ * no animation budget: enemy portrait, name, chunky segmented HP with phase
+ * breaks, intent dial, and the fight's one rule.
  */
 import Image from 'next/image';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -17,6 +16,10 @@ import { getBossConfig } from '@/lib/adventure/bossConfig';
 import type { CombatState } from '@/lib/adventure/play/combat';
 import { cn } from '@/lib/utils';
 import IntentDial, { EFFECT_COLOR } from './IntentDial';
+import ArenaStage from './ArenaStage';
+import type { FxEntry } from '../arena/arenaCommands';
+import type { HitEvent } from '../events';
+import type { RelicId } from '@/lib/adventure/play/relics';
 import { PLAYER_STATUS } from './PlayerBar';
 import { enemyArt, hpSegments, ruleKey, type ArtState } from './combatView';
 import type { CombatJuice } from './useCombatJuice';
@@ -35,11 +38,34 @@ interface Props {
   combat: CombatState;
   juice: CombatJuice;
   taunt: string | null;
+  /** The word that just landed — the volley the arena throws at the foe. */
+  lastHit?: HitEvent | null;
+  /** RAW combat fx feed. The arena reads this, never the one stamped banner. */
+  fxFeed?: readonly FxEntry[];
+  gold?: number;
+  /** Relic this kill mints; it flies out of the corpse. */
+  trophy?: RelicId | null;
 }
 
-export default function EnemyStage({ world, isBoss, combat, juice, taunt }: Props) {
+export default function EnemyStage({ world, isBoss, combat, juice, taunt, lastHit = null, fxFeed = [], gold = 0, trophy = null }: Props) {
   const { t } = useLanguageSafe();
   const reduce = useReducedMotion();
+  // The arena canvas is the stage; this DOM column is the no-motion fallback.
+  if (!reduce) {
+    return <ArenaStage world={world} isBoss={isBoss} combat={combat} juice={juice} taunt={taunt}
+      lastHit={lastHit} fxFeed={fxFeed} gold={gold} trophy={trophy} />;
+  }
+  return <StaticEnemyStage world={world} isBoss={isBoss} combat={combat} juice={juice} taunt={taunt} t={t} reduce={reduce} />;
+}
+
+type Translate = ReturnType<typeof useLanguageSafe>['t'];
+
+interface StaticProps extends Omit<Props, 'lastHit' | 'fxFeed' | 'gold' | 'trophy'> {
+  t: Translate;
+  reduce: boolean | null;
+}
+
+function StaticEnemyStage({ world, isBoss, combat, juice, taunt, t, reduce }: StaticProps) {
   const boss = isBoss ? getBossConfig(world) : null;
   const name = boss ? t(boss.displayName) : t(`adventurePlay.combat.elite.w${world}`);
   const tele = combat.telegraph;

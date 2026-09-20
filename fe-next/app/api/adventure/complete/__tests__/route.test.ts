@@ -43,7 +43,8 @@ import { POST } from '../route';
 import { signAttempt } from '@/lib/adventure/play/attemptToken';
 import { eliteTrophy } from '@/lib/adventure/play/trophy';
 import { GRACE_MS } from '@/lib/adventure/play/settleRun';
-import { freshRun, verifyRun } from '@/lib/adventure/play/runToken';
+import { freshRun, verifyRun, enterNode } from '@/lib/adventure/play/runToken';
+import { buildRunMap } from '@/lib/adventure/play/runMap';
 import { wordPoints } from '@/lib/adventure/play/scoreRun';
 
 const USER_ID = 'user-1';
@@ -326,23 +327,30 @@ describe('POST /api/adventure/complete', () => {
   });
 
   describe('roguelike run', () => {
-    const run = () => ({ ...freshRun(1, USER_ID, 'seed-x'), potions: { heal: 1, time: 1, cleanse: 0, insight: 0 } });
+    // v2: a run in play is standing on a map node, so the chain keeps the node
+    // and only the draft/HP/gold move on.
+    const MAP_X = buildRunMap('seed-x', 1);
+    const FIRST_NODE = MAP_X.nodes.find((n) => n.row === 0)!.id;
+    const ELITE_NODE = MAP_X.nodes.find((n) => n.kind === 'elite')!.id;
+    const BOSS_NODE = MAP_X.nodes.find((n) => n.kind === 'boss')!.id;
+    const standing = (id: string) => ({ ...enterNode(freshRun(1, USER_ID, 'seed-x'), id), potions: { heal: 1, time: 1, cleanse: 0, insight: 0 } });
+    const run = () => ({ ...enterNode(freshRun(1, USER_ID, 'seed-x'), FIRST_NODE), potions: { heal: 1, time: 1, cleanse: 0, insight: 0 } });
 
     beforeEach(() => {
       mockGetAuthedUser.mockResolvedValue({ id: USER_ID });
       mockCreateAdminClient.mockReturnValue(makeFakeDb({ level_completions: [] }).db);
     });
 
-    it('given a won level in a run, when completed, then a signed next run (step+1, clamped hp, spent potions, offer) comes back', async () => {
+    it('given a won node in a run, when completed, then a signed next run (same node, clamped hp, spent potions, offer) comes back', async () => {
       const token = makeToken({ k: 'classic', r: [], run: run() });
       const res = await POST(makeRequest({ token, words: ['catser'], hpLeft: 3, potionsUsed: { heal: 1, time: 5 }, died: false }));
 
       expect(res.status).toBe(200);
       expect(res.data.won).toBe(true);
       const next = verifyRun(res.data.nextRunToken, SECRET);
-      expect(next).toMatchObject({ u: USER_ID, step: 2, hp: 3, potions: { heal: 0, time: 0 } });
+      expect(next).toMatchObject({ u: USER_ID, node: FIRST_NODE, hp: 3, potions: { heal: 0, time: 0 } });
       expect(next!.gold).toBeGreaterThan(0);
-      expect(res.data.nextRun).toMatchObject({ step: 2, hp: 3 });
+      expect(res.data.nextRun).toMatchObject({ node: FIRST_NODE, hp: 3 });
       expect(res.data.nextRun).not.toHaveProperty('seed');
       expect(res.data.offer).toHaveLength(3);
       expect(res.data.offer).toEqual(next!.offer);
@@ -384,7 +392,7 @@ describe('POST /api/adventure/complete', () => {
 
     it('given the elite (L4) falls, when completed, then its trophy relic is minted into the next signed run', async () => {
       const relics = ['twin-ink', 'sharp-quill', 'magnet'] as const;
-      const token = makeToken({ w: 1, l: 4, k: 'elite', r: [...relics], run: { ...run(), step: 4, relics: [...relics] } });
+      const token = makeToken({ w: 1, l: 4, k: 'elite', r: [...relics], run: { ...standing(ELITE_NODE), relics: [...relics] } });
       const res = await POST(makeRequest({ token, words: ['catser'], hpLeft: 2 }));
       expect(res.data.won).toBe(true);
       const trophy = eliteTrophy(1, [...relics]);
@@ -395,7 +403,7 @@ describe('POST /api/adventure/complete', () => {
 
     it('given the boss falls, when completed, then the run is complete with no further offer', async () => {
       const relics = ['twin-ink', 'sharp-quill', 'magnet'];
-      const token = makeToken({ w: 1, l: 7, k: 'boss', r: relics, run: { ...run(), step: 7, relics } });
+      const token = makeToken({ w: 1, l: 7, k: 'boss', r: relics, run: { ...standing(BOSS_NODE), relics } });
       const res = await POST(makeRequest({ token, words: ['catser'], hpLeft: 2 }));
       expect(res.data.won).toBe(true);
       expect(res.data.runComplete).toBe(true);

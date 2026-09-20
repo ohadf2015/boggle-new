@@ -8,8 +8,10 @@ import type { OfferItem } from '@/lib/adventure/play/runToken';
 /**
  * `index` = words already credited this level (same index `applyRelics` uses).
  * `inFight`: stat relics that act on words in combat (vampire-fang) count too.
+ * `canHeal`: combat only heals below max HP, so at full HP vampire-fang must
+ * stay quiet — a "+1" callout that heals nothing is what makes a relic look broken.
  */
-export function triggeredRelics(word: string, index: number, relics: readonly string[], opts: { inFight?: boolean } = {}): RelicId[] {
+export function triggeredRelics(word: string, index: number, relics: readonly string[], opts: { inFight?: boolean; canHeal?: boolean } = {}): RelicId[] {
   const len = Array.from(word).length;
   const ctx = { len, index };
   const out: RelicId[] = [];
@@ -18,7 +20,7 @@ export function triggeredRelics(word: string, index: number, relics: readonly st
     const e = RELICS[id].effect;
     if (e.type === 'flat' && e.bonus(ctx) > 0) out.push(id);
     else if (e.type === 'mult' && e.factor(ctx) !== 1) out.push(id);
-    else if (id === 'vampire-fang' && opts.inFight && healsOnLongWord([id]) && len >= 6) out.push(id);
+    else if (id === 'vampire-fang' && opts.inFight && opts.canHeal !== false && healsOnLongWord([id]) && len >= 6) out.push(id);
   }
   return out;
 }

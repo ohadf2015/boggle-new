@@ -3,7 +3,8 @@
 /**
  * The attack as a WATCHED EVENT: when the telegraph runs out, the charged shot
  * leaves the enemy's hand (`[data-enemy-anchor]`), arcs across the screen and
- * lands on its target — the hearts for strikes, the board for freeze / hex /
+ * lands on its target — the hero on stage (`[data-hero-anchor]`, the heart row
+ * when there is no arena) for strikes, the board for freeze / hex /
  * scramble — exactly on the reducer's beat. The impact bursts, and only then
  * the hit banner slams over the board ("FROZEN!" + what it cost you),
  * Bookworm's "Petrified! You lose two turns!".
@@ -74,7 +75,12 @@ export default function AttackFlight({ combat, status }: Props) {
     if (!target) return;
     const id = setTimeout(() => {
       const from = center(document.querySelector('[data-enemy-anchor]'));
-      const to = center(document.querySelector(target === 'hearts' ? '[data-player-hearts]' : '[data-testid="board-hazards"]'));
+      // Strikes land on the hero standing in the arena; without one (reduced
+      // motion / no canvas) they fall back to the heart row in the HUD.
+      const hit = target === 'hearts'
+        ? document.querySelector('[data-hero-anchor]') ?? document.querySelector('[data-player-hearts]')
+        : document.querySelector('[data-testid="board-hazards"]');
+      const to = center(hit);
       if (from && to) setFlight({ id: teleKey, effect, from, to });
     }, delayRef.current ?? 0);
     return () => clearTimeout(id);

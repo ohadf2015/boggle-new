@@ -2,12 +2,18 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguageSafe: () => ({ t: (k: string) => k, language: 'en' }),
+  useLanguageSafe: () => ({
+    // Interpolating, so a sentence key with a number in it still renders the number:
+    // the tooltip's one surviving figure lives INSIDE its sentence now, not beside it.
+    t: (k: string, p?: Record<string, unknown>) => (p ? `${k} ${Object.values(p).join(' ')}` : k),
+    language: 'en',
+  }),
 }));
 
 import RelicBar from '../run/RelicBar';
 import DraftOverlay from '../DraftOverlay';
-import { relicContributions, relicStack } from '@/lib/adventure/play/relicStack';
+import { relicContributions } from '@/lib/adventure/play/relicStack';
+import { relicRunContributions, runStackCtx } from '../run/relicRunTotals';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({}) }));
@@ -23,17 +29,46 @@ describe('RelicBar live numbers', () => {
     expect(screen.getByTestId('relic-contrib-magnet').textContent).toBe(`+${contrib.magnet}`);
   });
 
-  it('Given a tapped relic, then its tooltip shows this level + alone vs stacked numbers', () => {
+  /**
+   * ROUND 3 GAP. The tooltip gave the rule ("3-letter words +2 points") and then
+   * buried it under "This run +0 / Alone +0 / With your relics +0" — a stat
+   * ledger a cold player cannot parse ("Alone" vs "With your relics"?). The
+   * reference tooltips state the rule in one plain sentence and stop. So does
+   * this one; the only number left is what the relic has actually paid, and
+   * only once it has paid something.
+   */
+  it('Given a tapped relic, then its tooltip is the rule plus ONE earnings line — no stat ledger', () => {
     const contrib = relicContributions(words, [...relics]);
     const ctx = { levels: [{ words }], owned: [...relics] };
     render(<RelicBar relics={[...relics]} contrib={contrib} stackCtx={ctx} />);
     fireEvent.click(screen.getByRole('button', { name: 'adventurePlay.relic.storm-rune' }));
-    const s = relicStack('storm-rune', ctx)!;
-    expect(s.combined).toBeGreaterThan(s.alone);
-    expect(screen.getByTestId('relic-earned').textContent).toContain(`+${contrib['storm-rune']}`);
-    const stack = screen.getByTestId('relic-stack').textContent!;
-    expect(stack).toContain(`+${s.alone}`);
-    expect(stack).toContain(`+${s.combined}`);
+    const tip = screen.getByRole('tooltip');
+    expect(tip.textContent).toContain('adventurePlay.relicDesc.storm-rune');
+    expect(screen.getByTestId('relic-run').textContent).toContain(`${contrib['storm-rune']}`);
+    expect(screen.queryByTestId('relic-stack')).toBeNull();
+    expect(screen.queryByTestId('relic-earned')).toBeNull();
+  });
+
+  it('Given a relic that has paid nothing yet, then the tooltip is rule-only — never "+0"', () => {
+    // A ledger of zeros reads as a debug panel, which is what the judge saw.
+    render(<RelicBar relics={['heart-locket']} stackCtx={{ levels: [{ words: [] }], owned: ['heart-locket'] }} />);
+    fireEvent.click(screen.getByRole('button', { name: 'adventurePlay.relic.heart-locket' }));
+    expect(screen.getByRole('tooltip').textContent).toContain('adventurePlay.relicDesc.heart-locket');
+    expect(screen.queryByTestId('relic-run')).toBeNull();
+  });
+});
+
+describe('RelicBar on the map screen — no board, but the run still has numbers', () => {
+  it('Given a world + step instead of a board, then the tooltip still prints what the relic earned THIS RUN', () => {
+    const m = new Map<string, string>([['adv-run-words-w1', JSON.stringify([['house', 'tiger'], ['planet']])]]);
+    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+      getItem: (k: string) => m.get(k) ?? null, setItem: () => {}, removeItem: () => {},
+    };
+    const expected = relicRunContributions(runStackCtx(1, 3, ['magnet']).levels, ['magnet']).magnet!;
+    expect(expected).toBeGreaterThan(0);
+    render(<RelicBar relics={['magnet']} runCtx={{ world: 1, step: 3 }} />);
+    fireEvent.click(screen.getByRole('button', { name: 'adventurePlay.relic.magnet' }));
+    expect(screen.getByTestId('relic-run').textContent).toContain(`${expected}`);
   });
 });
 

@@ -32,7 +32,7 @@ interface Props {
 }
 
 /** Elite + boss: enemy stage, player hearts + shield, full-screen moments. */
-function CombatStage({ world, run, onFinaleDone }: { world: number; run: Run; onFinaleDone?: () => void }) {
+function CombatStage({ world, run, lastHit, onFinaleDone }: { world: number; run: Run; lastHit: HitEvent | null; onFinaleDone?: () => void }) {
   const reduce = useReducedMotion();
   const lvl = run.lvl!;
   const isBoss = lvl.kind === 'boss';
@@ -63,7 +63,8 @@ function CombatStage({ world, run, onFinaleDone }: { world: number; run: Run; on
 
   return (
     <motion.div className="w-full" animate={shake}>
-      <EnemyStage world={world} isBoss={isBoss} combat={combat} juice={juice} taunt={taunt} />
+      <EnemyStage world={world} isBoss={isBoss} combat={combat} juice={juice} taunt={taunt}
+        lastHit={lastHit} fxFeed={run.combatFx ?? []} gold={run.run?.gold ?? 0} trophy={run.trophy ?? null} />
       <PlayerBar combat={combat} dispatchCombat={run.dispatchCombat} playing={run.phase === 'playing' && !!run.combat} />
       {run.combat && <AttackFlight combat={run.combat} status={juice.status} />}
       {run.combat && (
@@ -76,13 +77,13 @@ function CombatStage({ world, run, onFinaleDone }: { world: number; run: Run; on
   );
 }
 
-export default function LevelStage({ world, run, popups, onFinaleDone }: Props) {
+export default function LevelStage({ world, run, lastHit, popups, onFinaleDone }: Props) {
   const { t } = useLanguageSafe();
   const lvl = run.lvl;
   if (!lvl) return null;
   const top = lvl.stars[2] || 1;
 
-  if (lvl.kind === 'elite' || lvl.kind === 'boss') return <CombatStage world={world} run={run} onFinaleDone={onFinaleDone} />;
+  if (lvl.kind === 'elite' || lvl.kind === 'boss') return <CombatStage world={world} run={run} lastHit={lastHit} onFinaleDone={onFinaleDone} />;
   return (
     <div className="w-full rounded-xl border-[3px] border-black bg-black/60 px-3 pt-1.5 pb-3 shadow-[3px_3px_0_#000]">
       <div className="flex justify-between items-baseline">

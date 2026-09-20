@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CUBE_BLUR_DATA_URL, type ModeCubeModel, type ModeCubeVariant } from '@/lib/landing/modeMeta';
 import { formatLiveShort } from '@/lib/landing/homeHubFormat';
+import ModeResumeChip from './ModeResumeChip';
 import { useExperiment } from '@/hooks/useExperiment';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -288,6 +289,9 @@ function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', w
       )}
 
       {model.badge && <Badge label={model.badge} chip={v.chip} chipInk={v.chipInk} />}
+      {/* A saved run this cube resumes — absolutely positioned, so resolving it
+          after hydration never resizes the tile or reflows the bento. */}
+      {model.resume && !locked && <ModeResumeChip resume={model.resume} anchor={anchor} />}
       {locked && <LockOverlay message={model.lockedMessage} />}
 
       {/* ---- content layer ---- */}

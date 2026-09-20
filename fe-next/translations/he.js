@@ -1,6 +1,160 @@
 // HE translations
 const he = {
   "adventurePlay": {
+    "eco": {
+      "heading": "מעבר לריצה",
+      "xp": "נק' ניסיון",
+      "coins": "מטבעות",
+      "points": "נק' עונה",
+      "streakDays": "רצף ימים",
+      "rank": "דרגה {level}",
+      "share": "שיתוף",
+      "shareCopied": "הועתק",
+      "shareText": "הפלתי את הבוס של עולם {world} ב-LexiClash."
+    },
+    "node": {
+      "shopGreeting": "קודם זהב. אחר כך שאלות.",
+      "shopGreetingBroke": "תחזור כשהארנק שלך יהיה כבד יותר.",
+      "shortBy": "חסר {amount} זהב",
+      "shopFull": "הלבבות מלאים",
+      "buy": "קונים",
+      "cancel": "ביטול",
+      "confirmCost": "{price} זהב · נשאר {left}",
+      "continue": "ממשיכים",
+      "restSub": "בוחרים אחת — אחר כך המדורה נכבית.",
+      "restFull": "הלבבות שלך כבר מלאים.",
+      "restUnit0": "לבבות",
+      "restUnit1": "לב מרבי",
+      "restUnit2": "רמזים",
+      "alreadyTaken": "כבר בחרת כאן.",
+      "outcomeTitle": "מה קרה",
+      "relicAdded": "נוסף לשרידים שלך",
+      "openChest": "לפתוח את התיבה",
+      "chestSub": "בחרו אחד. השאר נשאר בתיבה.",
+      "chestSkip": "להשאיר סגורה",
+      "chestSkipDesc": "תצאו מכאן בלי כלום.",
+      "chestGiveUp": "אתם מוותרים על {count} האחרים.",
+      "chestPassed": "ויתרתם",
+      "chestSkipped": "השארתם את התיבה סגורה.",
+      "shopSale": "מבצע",
+      "hintRelic": "שריד אקראי",
+      "hintFullHeal": "ריפוי מלא",
+      "hintOr": "או",
+      "hintRisk": "הימור"
+    },
+    "map": {
+      "kind": {
+        "fight": "קרב",
+        "elite": "עילית",
+        "treasure": "אוצר",
+        "shop": "סוחר",
+        "rest": "מדורה",
+        "event": "לא ידוע",
+        "boss": "בוס"
+      },
+      "pathTaken": "הדרך שעברתם",
+      "newRun": "ריצה חדשה",
+      "youAreHere": "אתם כאן",
+      "resumeFight": "חזרו לקרב",
+      "outOfReach": "מחוץ להישג יד",
+      "bossAhead": "בוס: {name}",
+      "floorOf": "קומה {step} מתוך {total}",
+      "legendClose": "סגירת המקרא",
+      "noRelics": "אין עדיין חפצים",
+      "runState": "המסע שלך",
+      "relics": "חפצים",
+      "cleared": "הושלם",
+      "chooseNext": "בחרו את הדרך",
+      "legend": "מקרא",
+      "leave": "יציאה",
+      "depth": "קומה {step}",
+      "eliteWarning": "יריב חזק. ניצחון עליו מזכה בשריד.",
+      "treasureTitle": "מה יש בפנים?",
+      "treasureRelic": "מצאתם את {name}.",
+      "treasureGold": "מצאתם {amount} זהב.",
+      "shopTitle": "סוחר",
+      "shopBuy": "{price} זהב",
+      "shopSold": "נמכר",
+      "shopPoor": "אין מספיק זהב",
+      "shopHeal": "ריפוי {amount} לב",
+      "restTitle": "האש דולקת",
+      "restHeal": "[מנוחה] ריפוי {amount} לב",
+      "restMaxHp": "[אימון] ‎+1 לב מרבי",
+      "restHint": "[לימוד] ‎+1 רמז",
+      "restTaken": "כבר נחתם כאן.",
+      "outGold": "{amount} זהב",
+      "outHp": "{amount} לב",
+      "outRelic": "שריד: {name}",
+      "outPotion": "שיקוי: {name}",
+      "outHint": "‎+{amount} רמז",
+      "outMaxHp": "‎+{amount} לב מרבי",
+      "outNothing": "לא קרה כלום.",
+      "event": {
+        "spilled-inkwell": {
+          "title": "קסת הדיו שנשפכה",
+          "body": "בקבוק דיו שחור נשפך על שולחן אבן. עדיין עולה ממנו ריח של מילים ישנות.",
+          "c0": "[שתייה] ‎+1 לב מרבי, אובדן לב",
+          "c1": "[מכירת הבקבוק] ‎+30 זהב"
+        },
+        "dusty-library": {
+          "title": "הספרייה המאובקת",
+          "body": "מדפים נוטים מעליכם, עמוסים בספרים שאיש לא פתח שנים.",
+          "c0": "[לימוד] קבלת שריד",
+          "c1": "[פירוק הכריכות] ‎+55 זהב",
+          "c2": "[קריאה בשקט] ‎+1 רמז"
+        },
+        "wandering-scribe": {
+          "title": "הלבלר הנודד",
+          "body": "לבלר מציע לטפל בכם תמורת קלף טרי.",
+          "c0": "[תשלום] 40 זהב: ריפוי 2 לבבות",
+          "c1": "[סירוב] ‎+25 זהב"
+        },
+        "stone-riddle": {
+          "title": "חידת האבן",
+          "body": "אותיות חרוטות עמוק בסלע. תשובה שגויה — והסלע עונה בחזרה.",
+          "c0": "[מענה] שריד, או 2 לבבות ו‑20 זהב",
+          "c1": "[הליכה] כלום"
+        },
+        "broken-cart": {
+          "title": "העגלה השבורה",
+          "body": "לעגלת סוחר אבד גלגל. ארגזי אותיות מפוזרים בבוץ.",
+          "c0": "[עזרה] ‎+60 זהב",
+          "c1": "[לקיחת ארגז] ‎+100 זהב, אובדן לב"
+        },
+        "word-fountain": {
+          "title": "מזרקת המילים",
+          "body": "מים זורמים על אותיות חרוטות ולוחשים אותן בחזרה.",
+          "c0": "[שתייה עמוקה] ריפוי מלא",
+          "c1": "[מילוי מימייה] שיקוי תובנה",
+          "c2": "[מילוי מימייה] שיקוי ריפוי"
+        },
+        "vowel-thief": {
+          "title": "גנב התנועות",
+          "body": "משהו קטן ומהיר ברח הרגע עם חופן מהתנועות שלכם.",
+          "c0": "[מרדף] 45‑80 זהב, אולי אובדן לב",
+          "c1": "[ויתור] שיקוי זמן"
+        },
+        "old-tome": {
+          "title": "הכרך העתיק",
+          "body": "ספר כבד, ודפיו חמים למגע.",
+          "c0": "[קריאה] ‎+1 רמז",
+          "c1": "[שריפה] ‎+35 זהב"
+        },
+        "crossroads-bard": {
+          "title": "פייטן פרשת הדרכים",
+          "body": "פייטן מחרז אל דרך ריקה, ולא עוצר בשביל איש.",
+          "c0": "[הקשבה] ריפוי 2 לבבות",
+          "c1": "[הצטרפות לנגינה] ‎+25 זהב",
+          "c2": "[בקשת קמע] שיקוי טיהור"
+        },
+        "cursed-quill": {
+          "title": "הנוצה המקוללת",
+          "body": "נוצה שחורה מרחפת מעל כנה וכותבת את שמכם שוב ושוב.",
+          "c0": "[לקיחה] קבלת שריד, אובדן 2 לבבות",
+          "c1": "[השארה] ‎+20 זהב"
+        }
+      }
+    },
     "deed": {
       "crushed": "ריסוק!",
       "obliterated": "השמדה!",
@@ -147,6 +301,9 @@ const he = {
       "windingUp": "תוקף בעוד {seconds} שנ׳",
       "stunned": "המום!",
       "moveList": "רשימת מהלכים",
+      "threatDamage": "{count} נזק מתקרב",
+      "threatTiles": "{count} אריחים ייפגעו",
+      "threatBlocked": "המגן שלך חוסם",
       "interruptHint": "{count}+ אותיות = עצירה!",
       "shieldLabel": "מגן",
       "shieldUp": "מגן מורם!",
@@ -187,6 +344,21 @@ const he = {
       "tap": "הקישו!",
       "deflect": "הסטת הקליע"
     },
+    "ledger": {
+        "title": "ניקוד המסע",
+        "nodes": "קומות",
+        "enemies": "אויבים",
+        "elites": "עילית",
+        "boss": "בוס",
+        "words": "מילים",
+        "bestWord": "הטובה",
+        "treasure": "תיבות",
+        "events": "לא נודע",
+        "gold": "זהב",
+        "relics": "שרידים",
+        "flawless": "ללא פגע",
+        "total": "ניקוד סופי"
+    },
     "loot": {
       "rarity": {
         "common": "רגיל",
@@ -195,6 +367,8 @@ const he = {
       },
       "relicsTitle": "שרידים",
       "emptySlot": "מקום פנוי לשריד",
+      "potionsTitle": "שיקויים",
+      "emptyPotion": "{name} — מקום ריק",
       "hearts": "{hp} מתוך {max} לבבות",
       "tapToOpen": "הקישו לפתיחה!",
       "chestTitle": "שלל",
@@ -205,7 +379,7 @@ const he = {
       "bestWord": "המילה הכי טובה",
       "noRelics": "אין שרידים בריצה הזאת",
       "runOver": "הריצה נגמרה",
-      "runOverSub": "העולם מתחיל מחדש משלב 1. הכוכבים והאוסף נשארים אצלכם.",
+      "runOverSub": "מפה חדשה, מסע חדש מהקומה הראשונה. הכוכבים והאוסף נשארים אצלכם.",
       "newRun": "ריצה חדשה",
       "runComplete": "הריצה הושלמה!",
       "runCompleteSub": "הבוס נפל והעולם הזה שלכם.",
@@ -226,6 +400,9 @@ const he = {
       "levelUpNext": "שלב {next} נפתח",
       "levelUpDone": "הבוס מחכה",
       "tapToContinue": "הקישו להמשך",
+      "andMoreRelics": "עוד {n} שרידים פעלו",
+      "earnedThisRun": "הרוויח לך {n} נקודות בריצה הזו",
+      "thisRun": "בריצה הזאת",
       "thisLevel": "בשלב הזה",
       "stackAlone": "לבד",
       "stackCombined": "עם השרידים שלך",
@@ -325,9 +502,9 @@ const he = {
       "lens-of-insight": "+1 רמז בכל שלב",
       "sage-scroll": "רמזים חושפים את כל המילה",
       "iron-bookmark": "כל קרב מתחיל עם מגן",
-      "frost-ward": "הקפאות וקללות נמשכות חצי זמן",
-      "vampire-fang": "בקרב, מילים של 6+ אותיות מרפאות חיים אחד",
-      "gold-tooth": "+50% זהב",
+      "frost-ward": "הקפאות, קללות וערבובים מתפוגגים פי שניים מהר",
+      "vampire-fang": "נפצעת בקרב? מילה של 6+ אותיות מחזירה לב",
+      "gold-tooth": "+50% זהב — מכל מקור",
       "lucky-clover": "בחירה מתוך 4 פרסים במקום 3",
       "phoenix-feather": "פעם אחת במסע: קמים לתחייה עם חיים אחד"
     },
@@ -6968,6 +7145,7 @@ const he = {
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "adventureMode": "הרפתקה",
     "adventureModeDesc": "100 שלבים ב-10 עולמות",
+    "adventureResumeA11y": "המשך את ריצת ההרפתקה — עולם {world}, צומת {step}, {hp} לבבות",
     "quickPlayMode": "משחק מהיר",
     "quickPlayModeDesc": "מסובבים את הגלגל ומנצחים את הלוח",
     "blastMode": "מצב פיצוץ",

@@ -7,7 +7,8 @@
 import { RELICS, draftSize, hintCharges, maxHpFor, secondsBonus, type RelicId } from '@/lib/adventure/play/relics';
 import { relicStack, type LevelWords } from '@/lib/adventure/play/relicStack';
 import { getPlayLevel } from '@/lib/adventure/play/levels';
-import type { OfferItem, PublicRun } from '@/lib/adventure/play/runToken';
+import { goldForScore, type OfferItem, type PublicRun } from '@/lib/adventure/play/runToken';
+import { scoreWords } from '@/lib/adventure/play/scoreRun';
 
 export interface OfferValueCtx {
   /** Words found in each cleared level of this run, in the order found. */
@@ -72,7 +73,6 @@ export function offerValue(item: OfferItem, ctx: OfferValueCtx): OfferValue {
   }
   const id = item.id;
   if (RELICS[id].effect.type !== 'stat' || id === 'hourglass') return scoringValue(id, ctx);
-  const cleared = Math.max(1, run.step - 1);
   switch (id) {
     case 'heart-locket': return v('maxHearts', { from: run.maxHp, to: maxHpFor([...run.relics, id]) });
     case 'lens-of-insight': return v('hints', { from: hintCharges(run.relics), to: hintCharges([...run.relics, id]) });
@@ -85,7 +85,17 @@ export function offerValue(item: OfferItem, ctx: OfferValueCtx): OfferValue {
       const hits = levels.reduce((s, l) => s + l.filter((w) => Array.from(w).length >= 6).length, 0);
       return v('longWords', { hits });
     }
-    case 'gold-tooth': return v('goldPerLevel', { n: Math.round((run.gold / cleared) * 0.5) });
+    case 'gold-tooth': {
+      // The bonus is half the level-clear payout, and that payout is set by the
+      // level's SCORE. Dividing the purse by levels cleared measured something
+      // else entirely — it shrank every time the run spent gold in a shop, so a
+      // relic paying +50% every level could advertise itself as "+0".
+      const played = levels.filter((l) => l.length);
+      const avgGold = played.length
+        ? played.reduce((sum, l) => sum + goldForScore(scoreWords(l, { relics: run.relics }).score), 0) / played.length
+        : goldForScore(0);
+      return v('goldPerLevel', { n: Math.max(1, Math.round(avgGold * 0.5)) });
+    }
     default: return v('noData');
   }
 }

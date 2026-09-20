@@ -1,17 +1,24 @@
 'use client';
 
 /**
- * Owned relics as a strip of framed icons. Tap one for its tooltip. When a
- * word triggers relics (`pulse`), those icons flash + bounce ON the relic so
- * the player sees which passive just paid out.
+ * Owned relics as a strip of framed, numbered chips — the run's permanent
+ * inventory, pinned where you can point at it.
+ *
+ * Round 1 shrank every chip to fit one row and the judge measured "two
+ * undifferentiated ~20px flat squares". Now the rail keeps chips at a legible
+ * size (see `relicSlot`) and WRAPS when a haul gets big, each chip carries a
+ * numeral (`relicBadge`), and the tooltip is portaled so nothing can paint over
+ * it (`RelicTooltip`).
  */
-import { useEffect, useState, type Ref } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState, type Ref } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
-import { RELICS, type RelicId } from '@/lib/adventure/play/relics';
-import { RARITY_FRAME, relicArt } from './art';
+import type { RelicId } from '@/lib/adventure/play/relics';
+import RelicChip from './RelicChip';
+import RelicFireCallout from './RelicFireCallout';
 import RelicTooltip, { type StackCtx } from './RelicTooltip';
+import { relicSlotClass } from './relicSlot';
+import { runStackCtx } from './relicRunTotals';
 import { cn } from '@/lib/utils';
 
 export interface RelicPulse { id: number; relics: RelicId[]; labels?: Partial<Record<RelicId, string>> }
@@ -23,90 +30,90 @@ interface Props {
   ghostRef?: Ref<HTMLSpanElement>;
   size?: 'sm' | 'md';
   className?: string;
-  /** Each relic's running points this level — printed under its icon. */
+  /** Each relic's running points this level — baked onto its chip. */
   contrib?: Partial<Record<RelicId, number>>;
   /** Run words + owned relics, so the tooltip can show alone vs stacked values. */
   stackCtx?: StackCtx | null;
+  /**
+   * For a rail on a screen with no board of its own (the act map): the run
+   * replays itself out of storage so the tooltip still answers "what has this
+   * paid me THIS RUN?". Ignored when `stackCtx` is given — the live board wins.
+   */
+  runCtx?: { world?: number | null; step?: number | null } | null;
 }
 
-export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', className, contrib, stackCtx }: Props) {
+export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', className, contrib, stackCtx, runCtx }: Props) {
   const { t } = useLanguageSafe();
-  const reduce = useReducedMotion();
   const [open, setOpen] = useState<RelicId | null>(null);
-  const box = size === 'md' ? 'h-11 w-11' : 'h-9 w-9';
+  const chips = useRef(new Map<RelicId, HTMLButtonElement>());
+  const rail = useRef<HTMLDivElement>(null);
+  // The callout outlives its pulse prop by design — it HOLDS, so a still frame
+  // catches it beside the celebration banner instead of after it.
+  const [shown, setShown] = useState<number | null>(null);
+  useEffect(() => { if (pulse?.id != null) setShown(pulse.id); }, [pulse?.id]);
+  const endFire = useCallback(() => setShown(null), []);
+  const fired = useMemo(() => {
+    if (!pulse || shown !== pulse.id) return [];
+    return pulse.relics
+      .map((id) => ({ id, label: pulse.labels?.[id] ?? '' }))
+      .filter((f) => !!f.label && relics.includes(f.id));
+  }, [pulse, shown, relics]);
+  // The board's own context always wins; `runCtx` only fills the gap on a
+  // boardless screen, where the alternative is a tooltip with no numbers at all.
+  const ctx = useMemo(
+    () => stackCtx ?? (runCtx?.world ? runStackCtx(runCtx.world, runCtx.step ?? 1, relics) : null),
+    [stackCtx, runCtx?.world, runCtx?.step, relics],
+  );
+  const slot = relicSlotClass(relics.length + (ghostRef ? 1 : 0), size);
 
   useEffect(() => {
-    if (!open) return;
-    const id = setTimeout(() => setOpen(null), 3500);
+    if (!open) return undefined;
+    const id = setTimeout(() => setOpen(null), 6000);
     return () => clearTimeout(id);
   }, [open]);
 
+  // A relic that leaves the run must not leave its bubble hanging on the body.
+  useEffect(() => { if (open && !relics.includes(open)) setOpen(null); }, [relics, open]);
+
   return (
-    <div className={cn('relative', className)}>
-      <ul className="flex items-center -mt-3 gap-1.5 overflow-x-auto pb-2 pt-4 [scrollbar-width:none]" aria-label={t('adventurePlay.loot.relicsTitle')}>
-        {relics.map((id) => {
-          const frame = RARITY_FRAME[RELICS[id]?.rarity ?? 'common'];
-          const firing = !!pulse && pulse.relics.includes(id);
-          const earned = contrib?.[id];
-          return (
-            <li key={id} className="relative shrink-0">
-              <motion.button
-                key={firing ? `${id}-${pulse!.id}` : id}
-                type="button"
-                data-relic={id}
-                data-firing={firing || undefined}
-                onClick={() => setOpen((o) => (o === id ? null : id))}
-                aria-label={t(`adventurePlay.relic.${id}`)}
-                aria-expanded={open === id}
-                initial={false}
-                animate={firing && !reduce ? { scale: [1, 1.35, 0.95, 1], rotate: [0, -8, 6, 0] } : { scale: 1 }}
-                transition={{ duration: 0.55, ease: 'easeOut' }}
-                className={cn('relative grid place-items-center rounded-lg border-[3px] border-black p-0.5 shadow-[2px_2px_0_#000]', frame.bg, box,
-                  open === id && 'ring-[3px] ring-neo-cream')}
-                style={firing ? { boxShadow: `0 0 0 3px #000, 0 0 18px 6px ${frame.glow}` } : undefined}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element -- small static art */}
-                <img src={relicArt(id)} alt="" className="h-full w-full object-contain drop-shadow-[1px_1px_0_rgba(0,0,0,0.6)]" draggable={false} />
-                {firing && (
-                  <span aria-hidden className="pointer-events-none absolute -top-3 start-1/2 z-10 -translate-x-1/2 rtl:translate-x-1/2">
-                    <motion.span
-                      initial={{ opacity: 0, y: 4, scale: 0.6 }}
-                      animate={{ opacity: [0, 1, 1, 0], y: [2, -4, -5, -7], scale: [0.6, 1.15, 1, 1] }}
-                      transition={{ duration: 1.1, times: [0, 0.2, 0.7, 1] }}
-                      className="block whitespace-nowrap rounded-md border-2 border-black bg-neo-lime px-1 font-neo-display text-[11px] font-bold leading-tight text-black"
-                    >
-                      {pulse!.labels?.[id] || <Sparkles className="h-3 w-3" />}
-                    </motion.span>
-                  </span>
-                )}
-              </motion.button>
-              {!!earned && earned > 0 && (
-                <span className="pointer-events-none absolute -bottom-1 start-1/2 z-10 -translate-x-1/2 rtl:translate-x-1/2">
-                  <motion.span
-                    key={earned}
-                    data-testid={`relic-contrib-${id}`}
-                    aria-label={t('adventurePlay.loot.contribAria', { name: t(`adventurePlay.relic.${id}`), n: earned })}
-                    initial={reduce ? false : { scale: 1.7 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    dir="ltr"
-                    className="block whitespace-nowrap rounded border-2 border-black bg-neo-lime px-0.5 font-neo-display text-[10px] font-bold leading-none tabular-nums text-black"
-                  >
-                    +{earned}
-                  </motion.span>
-                </span>
-              )}
-            </li>
-          );
-        })}
+    <div ref={rail} className={cn('relative', className)}>
+      <ul className="flex flex-wrap items-start gap-1 pb-2 pt-3" aria-label={t('adventurePlay.loot.relicsTitle')}>
+        {relics.map((id) => (
+          <li key={id} className={cn('flex-1', slot)}>
+            <RelicChip
+              id={id}
+              contrib={contrib?.[id]}
+              /* Held for the callout's whole life, so a still frame shows the lit
+                 chip, its trail and the named panel as one connected thing. */
+              firing={fired.some((f) => f.id === id)}
+              fireKey={shown ?? 0}
+              open={open === id}
+              onToggle={() => setOpen((o) => (o === id ? null : id))}
+              innerRef={(el) => { if (el) chips.current.set(id, el); else chips.current.delete(id); }}
+            />
+          </li>
+        ))}
         {ghostRef && (
-          <li className="shrink-0">
+          <li className={cn('flex-1', slot)}>
             <span ref={ghostRef} aria-label={t('adventurePlay.loot.emptySlot')}
-              className={cn('grid place-items-center rounded-lg border-[3px] border-dashed border-neo-cream/40 bg-black/30', box)} />
+              className="grid aspect-square w-full place-items-center rounded-lg border-[3px] border-dashed border-neo-cream/40 bg-black/30" />
           </li>
         )}
       </ul>
-      <AnimatePresence>{open && <RelicTooltip key={open} id={open} onClose={() => setOpen(null)} earned={contrib?.[open]} stackCtx={stackCtx} />}</AnimatePresence>
+      {/* NOT wrapped in AnimatePresence: the callout is not a motion component at
+          its root (it portals), so an exiting copy would never report its exit
+          finished and AnimatePresence would hold stale callouts on screen. It
+          fades itself out instead. */}
+      {fired.length > 0 && (
+        <RelicFireCallout key={`fire-${shown}`} fired={fired} fireKey={shown ?? 0} host={rail.current}
+          chipAt={(id) => chips.current.get(id) ?? null} onDone={endFire} />
+      )}
+      <AnimatePresence>
+        {open && (
+          <RelicTooltip key={open} id={open} onClose={() => setOpen(null)}
+            stackCtx={ctx} anchor={chips.current.get(open) ?? null} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

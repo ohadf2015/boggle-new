@@ -20,7 +20,9 @@ import { settleRun } from '@/lib/adventure/play/settleRun';
 import { totalStarsOf, type Completion } from '@/lib/adventure/play/progress';
 import { attemptSecret, loadCompletions } from '@/lib/adventure/play/server';
 import { advanceRun, signRun, publicRun, type RunPayload } from '@/lib/adventure/play/runToken';
-import { BOSS_LEVEL } from '@/lib/adventure/play/levels';
+import { nodeById, type NodeKind } from '@/lib/adventure/play/runMap';
+import { runMapOf } from '@/lib/adventure/play/runView';
+import { creditEcosystem, emptyEcosystem } from '@/lib/adventure/play/ecosystem';
 import { withEliteTrophy } from '@/lib/adventure/play/trophy';
 import { getCollectibleById } from '@/lib/adventure/collectibleConfig';
 
@@ -62,15 +64,33 @@ async function grantItems(db: SupabaseClient, userId: string, world: number, lev
 }
 
 /** Next link of the run chain, or null when the run ends here (loss, death, boss down). */
-function nextRun(run: RunPayload | undefined, level: number, won: boolean, score: number, body: Record<string, unknown> | null, secret: string) {
-  if (!run || !won || body?.died === true || level >= BOSS_LEVEL) return null;
+function nextRun(run: RunPayload | undefined, kind: NodeKind, won: boolean, score: number, body: Record<string, unknown> | null, secret: string) {
+  if (!run || !won || body?.died === true || kind === 'boss') return null;
   const hpLeft = typeof body?.hpLeft === 'number' ? body.hpLeft : run.hp;
   const potionsUsed = body?.potionsUsed && typeof body.potionsUsed === 'object' ? body.potionsUsed as Record<string, number> : {};
   const advanced = advanceRun(run, { hpLeft, potionsUsed, score, reviveUsed: body?.reviveUsed === true });
   // An elite kill mints its trophy relic into the run (the kill banner names the same one).
-  const next = withEliteTrophy(advanced, level);
+  const next = withEliteTrophy(advanced, kind);
   const trophy = next.relics.find((r) => !advanced.relics.includes(r));
   return { nextRunToken: signRun(next, secret), nextRun: publicRun(next), offer: next.offer ?? [], ...(trophy ? { trophy } : {}) };
+}
+
+/**
+ * In-process guard against the CONCURRENT replay (double tap, retry storm).
+ * The durable guard is `level_completions.completed_at`, which /complete stamps
+ * with the ATTEMPT's issue time — a replayed token carries the same `t`, so the
+ * second call sees its own stamp already on the row and credits nothing. A
+ * legitimate later replay of the node has a different `t` and still pays.
+ */
+const creditedAttempts = new Map<string, number>();
+const CREDIT_TTL_MS = 30 * 60_000;
+
+function claimAttempt(key: string): boolean {
+  const now = Date.now();
+  for (const [k, at] of creditedAttempts) if (now - at > CREDIT_TTL_MS) creditedAttempts.delete(k);
+  if (creditedAttempts.has(key)) return false;
+  creditedAttempts.set(key, now);
+  return true;
 }
 
 export async function POST(request: NextRequest) {
@@ -112,15 +132,20 @@ export async function POST(request: NextRequest) {
 
     let next: Completion[] = completions;
     const improved = result.stars > (prev?.stars ?? 0);
+    // The attempt's own issue time is the idempotency key: it is stamped onto
+    // the completion row, so a replay of the same token recognises its stamp.
+    const attemptStamp = new Date(payload.t).toISOString();
+    let alreadyCredited = false;
     if (result.stars > 0) {
       // Grants first: rewards are keyed off prevStars, so if the completion row
       // were written first and a grant then failed, the reward would be lost forever.
       await grantItems(db, user.id, payload.w, payload.l, result.rewards);
       const { data: row } = await db
         .from('level_completions')
-        .select('best_score, best_words')
+        .select('best_score, best_words, completed_at')
         .eq('user_id', user.id).eq('world', payload.w).eq('level', payload.l)
         .maybeSingle();
+      alreadyCredited = !!row?.completed_at && new Date(row.completed_at).getTime() === payload.t;
       const { error } = await db.from('level_completions').upsert(
         {
           user_id: user.id,
@@ -129,7 +154,7 @@ export async function POST(request: NextRequest) {
           stars: Math.max(result.stars, prev?.stars ?? 0),
           best_score: Math.max(result.score, row?.best_score ?? 0),
           best_words: Math.max(result.valid.length, row?.best_words ?? 0),
-          completed_at: new Date().toISOString(),
+          completed_at: attemptStamp,
         },
         { onConflict: 'user_id,world,level' },
       );
@@ -152,12 +177,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const chain = nextRun(payload.run, payload.l, result.won, result.score, body, secret);
+    // Which map node this attempt was: the run token knows, and the kind decides
+    // the chain (boss ends the run), the coin milestone and the celebration.
+    const nodeKind: NodeKind = (payload.run
+      ? nodeById(runMapOf(payload.run), payload.run.node)?.kind
+      : undefined) ?? (payload.k === 'boss' ? 'boss' : payload.k === 'elite' ? 'elite' : 'fight');
+    const worldCleared = nodeKind === 'boss' && result.won && body?.died !== true && (prev?.stars ?? 0) === 0;
+
+    // Ecosystem: only for a genuinely cleared node, only once per attempt.
+    const ecosystem = result.won && body?.died !== true && !alreadyCredited && claimAttempt(`${user.id}:${payload.t}:${payload.w}:${payload.l}`)
+      ? await creditEcosystem({
+        db, userId: user.id, score: result.score, wordCount: result.valid.length,
+        longestWord: result.valid.reduce<string | null>((best, w) => (!best || w.length > best.length ? w : best), null),
+        nodeKind, world: payload.w, level: payload.l, worldCleared, elapsedMs: result.elapsedMs,
+      })
+      : emptyEcosystem();
+
+    const chain = nextRun(payload.run, nodeKind, result.won, result.score, body, secret);
     return NextResponse.json({
       success: true,
       ...(chain ?? {}),
+      ...ecosystem,
+      nodeKind,
       runOver: !chain,
-      runComplete: result.won && payload.l >= BOSS_LEVEL && body?.died !== true,
+      runComplete: result.won && nodeKind === 'boss' && body?.died !== true,
       points: result.points,
       ...(result.targetsFound ? { targetsFound: result.targetsFound } : {}),
       world: payload.w,

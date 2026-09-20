@@ -1,6 +1,160 @@
 // Sv translations
 const sv = {
   "adventurePlay": {
+    "eco": {
+      "heading": "Utanför rundan",
+      "xp": "XP",
+      "coins": "Mynt",
+      "points": "Säsongspoäng",
+      "streakDays": "Dagssvit",
+      "rank": "Rang {level}",
+      "share": "Dela",
+      "shareCopied": "Kopierat",
+      "shareText": "Jag besegrade bossen i värld {world} i LexiClash."
+    },
+    "node": {
+      "shopGreeting": "Guld först. Frågor sen.",
+      "shopGreetingBroke": "Kom tillbaka när börsen väger mer.",
+      "shortBy": "{amount} guld för lite",
+      "shopFull": "Hjärtan fulla",
+      "buy": "Köp",
+      "cancel": "Avbryt",
+      "confirmCost": "{price} guld · {left} kvar",
+      "continue": "Fortsätt",
+      "restSub": "Välj en — sen slocknar elden.",
+      "restFull": "Dina hjärtan är redan fulla.",
+      "restUnit0": "HP",
+      "restUnit1": "Max HP",
+      "restUnit2": "Ledtrådar",
+      "alreadyTaken": "Du har redan valt här.",
+      "outcomeTitle": "Vad hände",
+      "relicAdded": "Tillagd bland dina reliker",
+      "openChest": "Öppna kistan",
+      "chestSub": "Ta en. Resten stannar i kistan.",
+      "chestSkip": "Låt den vara stängd",
+      "chestSkipDesc": "Du går härifrån tomhänt.",
+      "chestGiveUp": "Du avstår från de andra {count}.",
+      "chestPassed": "Avstådd",
+      "chestSkipped": "Du lämnade kistan stängd.",
+      "shopSale": "Rea",
+      "hintRelic": "En slumpmässig relik",
+      "hintFullHeal": "Läk till fullt",
+      "hintOr": "eller",
+      "hintRisk": "Chansning"
+    },
+    "map": {
+      "kind": {
+        "fight": "Strid",
+        "elite": "Elit",
+        "treasure": "Skatt",
+        "shop": "Handlare",
+        "rest": "Lägereld",
+        "event": "Okänt",
+        "boss": "Boss"
+      },
+      "pathTaken": "Vägen du gick",
+      "newRun": "Ny runda",
+      "youAreHere": "Du är här",
+      "resumeFight": "Återuppta striden",
+      "outOfReach": "Utom räckhåll",
+      "bossAhead": "Boss: {name}",
+      "floorOf": "Våning {step} av {total}",
+      "legendClose": "Stäng teckenförklaringen",
+      "noRelics": "Inga reliker än",
+      "runState": "Din runda",
+      "relics": "Reliker",
+      "cleared": "Avklarad",
+      "chooseNext": "Välj din väg",
+      "legend": "Teckenförklaring",
+      "leave": "Lämna",
+      "depth": "Våning {step}",
+      "eliteWarning": "En stark fiende. Besegra den och få en relik.",
+      "treasureTitle": "Vad finns inuti?",
+      "treasureRelic": "Du hittade {name}.",
+      "treasureGold": "Du hittade {amount} guld.",
+      "shopTitle": "Handlare",
+      "shopBuy": "{price} guld",
+      "shopSold": "Såld",
+      "shopPoor": "Inte tillräckligt med guld",
+      "shopHeal": "Läk {amount} HP",
+      "restTitle": "Elden brinner",
+      "restHeal": "[Vila] Läk {amount} HP",
+      "restMaxHp": "[Träna] +1 max HP",
+      "restHint": "[Studera] +1 ledtråd",
+      "restTaken": "Du har redan vilat här.",
+      "outGold": "{amount} guld",
+      "outHp": "{amount} HP",
+      "outRelic": "Relik: {name}",
+      "outPotion": "Dryck: {name}",
+      "outHint": "+{amount} ledtråd",
+      "outMaxHp": "+{amount} max HP",
+      "outNothing": "Inget händer.",
+      "event": {
+        "spilled-inkwell": {
+          "title": "Det spillda bläckhornet",
+          "body": "En flaska svart bläck har vält över ett stenbord. Det luktar fortfarande av gamla ord.",
+          "c0": "[Drick] +1 max HP, förlora 1 HP",
+          "c1": "[Sälj flaskan] +30 guld"
+        },
+        "dusty-library": {
+          "title": "Det dammiga biblioteket",
+          "body": "Hyllorna lutar sig över dig, tunga av böcker ingen öppnat på år.",
+          "c0": "[Studera] Få en relik",
+          "c1": "[Riv ut banden] +55 guld",
+          "c2": "[Läs i lugn och ro] +1 ledtråd"
+        },
+        "wandering-scribe": {
+          "title": "Den vandrande skrivaren",
+          "body": "En skrivare erbjuder sig att lappa ihop dig mot färskt pergament.",
+          "c0": "[Betala] 40 guld: läk 2 HP",
+          "c1": "[Tacka nej] +25 guld"
+        },
+        "stone-riddle": {
+          "title": "Stengåtan",
+          "body": "Bokstäver är djupt inristade i klippan. Svara fel och klippan svarar tillbaka.",
+          "c0": "[Svara] En relik, eller 2 HP och 20 guld",
+          "c1": "[Gå vidare] Inget"
+        },
+        "broken-cart": {
+          "title": "Den trasiga kärran",
+          "body": "En handlares kärra har tappat ett hjul. Lådor med bokstäver ligger utspridda i leran.",
+          "c0": "[Hjälp till] +60 guld",
+          "c1": "[Ta en låda] +100 guld, förlora 1 HP"
+        },
+        "word-fountain": {
+          "title": "Ordfontänen",
+          "body": "Vatten rinner över ingraverade bokstäver och viskar tillbaka dem.",
+          "c0": "[Drick djupt] Läk fullt",
+          "c1": "[Fyll en flaska] Insiktsdryck",
+          "c2": "[Fyll en flaska] Läkedryck"
+        },
+        "vowel-thief": {
+          "title": "Vokaltjuven",
+          "body": "Något litet och snabbt sprang just iväg med en handfull av dina vokaler.",
+          "c0": "[Jaga] 45–80 guld, kanske 1 HP",
+          "c1": "[Låt det gå] Tidsdryck"
+        },
+        "old-tome": {
+          "title": "Den gamla luntan",
+          "body": "En tung bok vars sidor är varma att ta på.",
+          "c0": "[Läs] +1 ledtråd",
+          "c1": "[Bränn den] +35 guld"
+        },
+        "crossroads-bard": {
+          "title": "Barden vid vägskälet",
+          "body": "En bard rimmar mot en tom väg och slutar inte för någon.",
+          "c0": "[Lyssna] Läk 2 HP",
+          "c1": "[Spela med] +25 guld",
+          "c2": "[Be om en amulett] Reningsdryck"
+        },
+        "cursed-quill": {
+          "title": "Den förbannade pennan",
+          "body": "En svart fjäderpenna svävar över sitt ställ och skriver ditt namn om och om igen.",
+          "c0": "[Ta den] Få en relik, förlora 2 HP",
+          "c1": "[Låt den vara] +20 guld"
+        }
+      }
+    },
     "deed": {
       "crushed": "KROSSAD!",
       "obliterated": "UTPLÅNAD!",
@@ -147,6 +301,9 @@ const sv = {
       "windingUp": "Anfaller om {seconds} s",
       "stunned": "Bedövad!",
       "moveList": "Draglista",
+      "threatDamage": "{count} skada på väg",
+      "threatTiles": "{count} brickor träffas",
+      "threatBlocked": "Din sköld tar smällen",
       "interruptHint": "{count}+ bokstäver = avbryt!",
       "shieldLabel": "Sköld",
       "shieldUp": "Sköld uppe!",
@@ -187,6 +344,21 @@ const sv = {
       "tap": "Tryck!",
       "deflect": "Avvärj projektilen"
     },
+    "ledger": {
+        "title": "Rundpoäng",
+        "nodes": "Våningar",
+        "enemies": "Fiender",
+        "elites": "Elit",
+        "boss": "Boss",
+        "words": "Ord",
+        "bestWord": "Bäst",
+        "treasure": "Kistor",
+        "events": "Okända",
+        "gold": "Guld",
+        "relics": "Reliker",
+        "flawless": "Felfri",
+        "total": "Slutpoäng"
+    },
     "loot": {
       "rarity": {
         "common": "Vanlig",
@@ -195,6 +367,8 @@ const sv = {
       },
       "relicsTitle": "Reliker",
       "emptySlot": "Tom relikplats",
+      "potionsTitle": "Trolldrycker",
+      "emptyPotion": "{name} — tom plats",
       "hearts": "{hp} av {max} hjärtan",
       "tapToOpen": "Tryck för att öppna!",
       "chestTitle": "Byte",
@@ -205,7 +379,7 @@ const sv = {
       "bestWord": "Bästa ordet",
       "noRelics": "Inga reliker den här rundan",
       "runOver": "Rundan är slut",
-      "runOverSub": "Världen börjar om från nivå 1. Dina stjärnor och din samling behåller du.",
+      "runOverSub": "En ny karta, en ny runda från första våningen. Dina stjärnor och din samling behåller du.",
       "newRun": "Ny runda",
       "runComplete": "Rundan klar!",
       "runCompleteSub": "Bossen har fallit och världen är din.",
@@ -226,6 +400,9 @@ const sv = {
       "levelUpNext": "Nivå {next} upplåst",
       "levelUpDone": "Bossen väntar",
       "tapToContinue": "Tryck för att fortsätta",
+      "andMoreRelics": "{n} reliker till slog till",
+      "earnedThisRun": "Gav dig {n} poäng den här rundan",
+      "thisRun": "Denna runda",
       "thisLevel": "Den här nivån",
       "stackAlone": "Ensam",
       "stackCombined": "Med dina reliker",
@@ -325,9 +502,9 @@ const sv = {
       "lens-of-insight": "+1 ledtråd per nivå",
       "sage-scroll": "Ledtrådar visar hela ordet",
       "iron-bookmark": "Börja varje strid med en sköld",
-      "frost-ward": "Frysningar och förbannelser varar hälften så länge",
-      "vampire-fang": "Ord med 6+ bokstäver läker 1 HP i strid",
-      "gold-tooth": "+50 % guld",
+      "frost-ward": "Frysningar, förbannelser och omblandningar släpper dubbelt så fort",
+      "vampire-fang": "Skadad i strid? Ett ord på 6+ bokstäver läker 1 HP",
+      "gold-tooth": "+50 % guld — oavsett var det kommer ifrån",
       "lucky-clover": "Välj bland 4 belöningar i stället för 3",
       "phoenix-feather": "En gång per resa: återuppstå med 1 HP"
     },
@@ -7210,6 +7387,7 @@ const sv = {
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "adventureMode": "Äventyr",
     "adventureModeDesc": "100 nivåer i 10 världar",
+    "adventureResumeA11y": "Fortsätt ditt äventyr — värld {world}, nod {step}, {hp} hjärtan kvar",
     "quickPlayMode": "Snabbspel",
     "quickPlayModeDesc": "Snurra hjulet, slå brädan",
     "blastMode": "Blast-läge",

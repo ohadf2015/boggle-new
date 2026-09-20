@@ -9,7 +9,11 @@ export function useWordChecker(language: string) {
   const { checkWord, isLoaded } = useDictionaryCache(language as Language);
   return useCallback(
     async (word: string) => {
-      if (isLoaded && checkWord(word)) return true;
+      // A loaded cache holds the WHOLE language, so it is authoritative both ways.
+      // Only confirming hits locally meant every rejected word — and every word
+      // while the cache was still cold — waited on a network round-trip before the
+      // board could show accept/reject.
+      if (isLoaded) return checkWord(word);
       try {
         const res = await fetch('/api/dictionary/check', {
           method: 'POST',

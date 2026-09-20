@@ -17,11 +17,23 @@ export type OfferItem =
   | { type: 'heal'; amount: number }
   | { type: 'gold'; amount: number };
 
+/**
+ * v2 = the run carries its position on the act map (`node` + `path`) instead of
+ * a bare level number. v1 tokens are rejected outright; the client answers the
+ * `run_version` code by dropping its stored run and starting a fresh one.
+ */
+export const RUN_VERSION = 2;
+
 export interface RunPayload {
+  v: number;
   u: string;
   w: number;
-  /** The level this run is about to play (1..7). */
+  /** Depth: how many map nodes this run has entered (1-based, for HUD copy). */
   step: number;
+  /** Current map node id, or null before the first row is chosen. */
+  node: string | null;
+  /** Node ids entered so far, in order. */
+  path: string[];
   hp: number;
   maxHp: number;
   relics: RelicId[];
@@ -29,6 +41,17 @@ export interface RunPayload {
   gold: number;
   seed: string;
   offer?: OfferItem[];
+  /** Rest-site upgrades: bonus max HP and bonus hint charges. */
+  bhp?: number;
+  bh?: number;
+  /** Shop offer indices already bought at the CURRENT node (cleared on move). */
+  bought?: number[];
+  /**
+   * How many relics the run held when it stepped onto the CURRENT node. A shop
+   * draws its stock from the relics the run does not own, so without this mark
+   * every purchase re-rolled the shelf the player was still standing at.
+   */
+  sr?: number;
 }
 
 export type PublicRun = Omit<RunPayload, 'u' | 'seed'>;
@@ -36,7 +59,43 @@ export type PublicRun = Omit<RunPayload, 'u' | 'seed'>;
 const DOMAIN = 'run';
 
 export const signRun = (run: RunPayload, secret: string) => signPayload(run, secret, DOMAIN);
-export const verifyRun = (token: unknown, secret: string) => verifyPayload<RunPayload>(token, secret, DOMAIN);
+
+export function verifyRun(token: unknown, secret: string): RunPayload | null {
+  const run = verifyPayload<RunPayload>(token, secret, DOMAIN);
+  if (!run || run.v !== RUN_VERSION || !Array.isArray(run.path)) return null;
+  return run;
+}
+
+/** Max HP = relic value + every rest-site upgrade taken. */
+export const maxHpOf = (run: Pick<RunPayload, 'relics' | 'bhp'>) => maxHpFor(run.relics) + (run.bhp ?? 0);
+export const hintBonusOf = (run: Pick<RunPayload, 'bh'>) => run.bh ?? 0;
+
+/** Re-derive max HP after relics or upgrades change, carrying current HP by the same delta. */
+function withMaxHp(run: RunPayload): RunPayload {
+  const maxHp = maxHpOf(run);
+  return { ...run, maxHp, hp: Math.max(0, Math.min(maxHp, run.hp + (maxHp - run.maxHp))) };
+}
+
+/** Rest site: +1 max HP (heals 1) or +1 hint charge. */
+export function restUpgrade(run: RunPayload, upgrade: 'maxHp' | 'hint'): RunPayload {
+  if (upgrade === 'hint') return { ...run, bh: hintBonusOf(run) + 1 };
+  return withMaxHp({ ...run, bhp: (run.bhp ?? 0) + 1 });
+}
+
+/** Deduct a price, or null when the run cannot afford it (gold never goes negative). */
+export function spendGold(run: RunPayload, price: number): RunPayload | null {
+  const cost = Math.max(0, Math.floor(Number(price) || 0));
+  if (run.gold < cost) return null;
+  return { ...run, gold: run.gold - cost };
+}
+
+/** Step onto a map node: it becomes current, joins the path, and clears shop purchases. */
+export function enterNode(run: RunPayload, id: string): RunPayload {
+  const path = [...run.path, id];
+  const next: RunPayload = { ...run, node: id, path, step: Math.max(1, path.length), sr: run.relics.length };
+  delete next.bought;
+  return next;
+}
 
 export function publicRun(run: RunPayload): PublicRun {
   const { u: _u, seed: _s, ...rest } = run;
@@ -47,11 +106,25 @@ const emptyPotions = (): Record<PotionId, number> => ({ heal: 0, time: 0, cleans
 
 export function freshRun(world: number, userId: string, seed: string): RunPayload {
   const maxHp = maxHpFor([]);
-  return { u: userId, w: world, step: 1, hp: maxHp, maxHp, relics: [], potions: { ...emptyPotions(), heal: 1 }, gold: 0, seed };
+  return {
+    v: RUN_VERSION, u: userId, w: world, step: 1, node: null, path: [],
+    hp: maxHp, maxHp, relics: [], potions: { ...emptyPotions(), heal: 1 }, gold: 0, seed,
+  };
 }
 
 /** Gold for a cleared level — before the gold-tooth multiplier. */
 export const goldForScore = (score: number) => 5 + Math.floor(Math.max(0, score) / 10);
+
+/**
+ * Every gold GAIN goes through here, so "+50% gold" means all of it — chest,
+ * event and draft-card gold included. It used to apply to level-clear rewards
+ * only, which is why a gold-tooth run could see no bonus at all. Losses (an
+ * event toll, a purchase) are never multiplied, and gold never goes negative.
+ */
+export function grantGold(run: RunPayload, amount: number): RunPayload {
+  const delta = amount > 0 ? Math.floor(amount * goldMult(run.relics)) : amount;
+  return { ...run, gold: Math.max(0, run.gold + delta) };
+}
 
 const RARITY_WEIGHT: Record<Rarity, number> = { common: 6, rare: 3, epic: 1 };
 const offerKey = (o: OfferItem) => `${o.type}:${'id' in o ? o.id : ''}`;
@@ -99,15 +172,13 @@ export function applyPick(run: RunPayload, pickIndex: number): RunPayload | null
   delete next.offer;
   if (item.type === 'relic') {
     if (!next.relics.includes(item.id)) next.relics.push(item.id);
-    const newMax = maxHpFor(next.relics);
-    next.hp += newMax - next.maxHp;
-    next.maxHp = newMax;
+    return withMaxHp(next);
   } else if (item.type === 'potion') {
     next.potions[item.id] = (next.potions[item.id] ?? 0) + 1;
   } else if (item.type === 'heal') {
     next.hp = Math.min(next.maxHp, next.hp + item.amount);
   } else {
-    next.gold += item.amount;
+    return grantGold(next, item.amount);
   }
   return next;
 }
@@ -127,7 +198,10 @@ export interface LevelOutcome {
   reviveUsed?: boolean;
 }
 
-/** After a won level: step+1, HP clamp, gold, potions spent, next offer. */
+/**
+ * After a won fight: HP clamp, gold, potions spent, next offer. The map
+ * position is NOT advanced — the player picks the next node off the map.
+ */
 export function advanceRun(run: RunPayload, { hpLeft, potionsUsed, score, reviveUsed }: LevelOutcome): RunPayload {
   const potions = { ...emptyPotions(), ...run.potions };
   for (const [id, n] of Object.entries(potionsUsed ?? {})) {
@@ -136,17 +210,17 @@ export function advanceRun(run: RunPayload, { hpLeft, potionsUsed, score, revive
     potions[id] = Math.max(0, potions[id] - used);
   }
   const relics = reviveUsed ? run.relics.filter((r) => r !== 'phoenix-feather') : [...run.relics];
-  const maxHp = maxHpFor(relics);
+  const maxHp = maxHpOf({ relics, bhp: run.bhp });
   const hp = Math.min(maxHp, Math.max(0, Math.round(Number(hpLeft) || 0)));
-  const step = run.step + 1;
+  // The offer is keyed on map DEPTH, so two nodes of a run never re-roll the same draft.
+  const depth = run.path.length;
   return {
     ...run,
-    step,
     hp,
     maxHp,
     relics,
     potions,
-    gold: run.gold + Math.floor(goldForScore(score) * goldMult(run.relics)),
-    offer: makeOffer(run.seed, step, relics, draftSize(relics)),
+    gold: grantGold(run, goldForScore(score)).gold,
+    offer: makeOffer(run.seed, depth, relics, draftSize(relics)),
   };
 }
