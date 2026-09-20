@@ -42,6 +42,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 const noop = vi.fn();
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => noop,
 }));
 

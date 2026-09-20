@@ -35,6 +35,7 @@ vi.mock('framer-motion', () => {
 
 // Mock contexts and hooks
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => vi.fn(),
 }));
 

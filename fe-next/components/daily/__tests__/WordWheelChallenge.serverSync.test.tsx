@@ -43,6 +43,7 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => vi.fn(),
 }));
 

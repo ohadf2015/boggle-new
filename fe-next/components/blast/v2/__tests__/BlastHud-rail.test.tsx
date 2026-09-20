@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render as rtlRender, screen } from '@testing-library/react';
+import type { ReactElement } from 'react';
+import { MusicProviderStub } from '@/contexts/MusicContext';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -8,6 +10,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 import { BlastHud } from '../BlastHud';
+
+// BlastHud mounts BlastHudMuteButton (useMasterMute -> useMusic), so every
+// bare render needs the music stub.
+const render = (ui: ReactElement) => rtlRender(<MusicProviderStub>{ui}</MusicProviderStub>);
 
 const base = {
   levelNumber: 12,

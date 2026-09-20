@@ -14,6 +14,7 @@ let mockPathname = '/en';
 const mockPush = vi.fn();
 
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useNavigation: () => ({ isInGame: mockIsInGame }),
 }));
 vi.mock('@/components/CrazyGamesSDK', () => ({

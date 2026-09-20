@@ -11,6 +11,7 @@ import { QuickModeAdapter } from '../QuickModeAdapter';
 import type { QuickRoundConfig } from '../../types';
 
 vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => undefined,
   useHideNavigation: () => vi.fn(),
 }));
 
