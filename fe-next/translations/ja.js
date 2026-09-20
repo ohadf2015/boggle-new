@@ -7811,6 +7811,8 @@ const ja = {
     "relaxedQuest": "のんびりクエスト",
     "untimedQuest": "フリークエスト",
     "startQuest": "クエスト開始",
+    "nextUp": "次はこれ",
+    "allClearToday": "今日はすべてクリア — また明日",
     "adminBeta": "ベータ",
     "replay": "もう一度",
     "cleared": "クリア！",

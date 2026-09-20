@@ -164,7 +164,11 @@ export const CURATED_OPENING: Partial<Record<PuzzleLocale, readonly string[]>> =
     'he-e-034', // כאב · ראש · ממשלה     — כאב ראש (headache) / ראש ממשלה (PM)
     'he-m-079', // פרח · בר · מצווה      — פרח בר (wildflower) / בר מצווה — meaning pivot
     'he-h-020', // בית · ספר · תורה      — בית ספר (school) / ספר תורה (scroll)
-    'he-o-002', // עץ · תפוח · אדום      — עץ תפוח / תפוח אדום
+    // Was he-o-002 (עץ · תפוח · אדום) until the 2026-09-20 Hebrew sweep culled
+    // it: עץ תפוח is real but תפוח אדום is a generic adjective pairing (ירוק,
+    // גדול, רקוב all fit), so it broke quality law 2. Replaced with a stronger
+    // meaning pivot at the same difficulty — ponytail → racehorse.
+    'he-e-024', // זנב · סוס · מרוץ      — זנב סוס (ponytail) / סוס מרוץ (racehorse)
     'he-h-022', // מי · ברז · מים        — מי ברז (tap water) / ברז מים
     'he-e-001', // עוגת · שוקולד · חם    — עוגת שוקולד / שוקולד חם
     'he-m-093', // חדר · שינה · עמוקה    — חדר שינה / שינה עמוקה

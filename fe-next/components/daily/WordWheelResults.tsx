@@ -21,6 +21,7 @@ import WordWheelSignupCta from './WordWheelSignupCta';
 import WordWheelReplayCta from './WordWheelReplayCta';
 import CatchUpSuggestion from './CatchUpSuggestion';
 import { STICKY_CTA_WORD_WHEEL } from './stickyCta';
+import { NextQuestCta } from './results/NextQuestCta';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import MpModeCrossPromo from './MpModeCrossPromo';
@@ -487,140 +488,29 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </m.div>
       )}
 
-      {/* PRIMARY CROSS-PROMO: Connections (Word Bridge) daily CTA — the results
-          follow-up now sends the player to today's Connections puzzle (Ohad
-          directive 2026-09-13; it used to point at Word Hunt, and before the
-          hub redesign at Word Tower). Shown while Connections is unplayed. */}
-      {!isPractice && !hasPlayedConnections && !isGuest && (
-        <m.div
-          data-testid="wordwheel-connections-cta"
-          className={`w-full ${STICKY_CTA_WORD_WHEEL}`}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
-        >
-          <div className="relative">
-            <span className="absolute -top-2 left-4 z-10 inline-block px-2 py-0.5 rounded-full bg-neo-pink text-neo-black text-[10px] font-neo-display font-black tracking-wider border-2 border-neo-black shadow-hard-sm">
-              {t('wordWheel.results.nextUpBadge', 'NEXT UP')}
-            </span>
-            <Link
-              href={`/${language}/connections/daily`}
-              data-testid="wordwheel-connections-link"
-              onClick={() => trackGrowthEvent('cross_promo_click', {
-                target: 'connections',
-                source: 'word_wheel_results',
-                placement: 'primary',
-                score: result.score,
-                language,
-              })}
-              className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0 font-neo-display font-black text-neo-white text-lg">
-                  ↔
-                </div>
-                <div>
-                  <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
-                    {t('wordWheel.results.playConnectionsTitle', 'Next up: Word Bridge')}
-                  </span>
-                  <p className="text-neo-black/70 text-xs mt-0.5">
-                    {t('wordWheel.results.playConnectionsDesc', "Solve today's Connections puzzle to finish your daily set")}
-                  </p>
-                </div>
-              </div>
-              <m.div
-                animate={{ x: [0, 4, 0] }}
-                transition={{ duration: 1.2, repeat: 3, repeatDelay: 0.4, ease: 'easeInOut' }}
-              >
-                <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
-              </m.div>
-            </Link>
-          </div>
-        </m.div>
-      )}
+      {/* ONE next step for the whole daily, for every mode.
+          This was three hand-rolled sticky CTAs chained by hand — Connections,
+          then Word Hunt, then "back to the hub" — which never mentioned Word
+          Tower at all, so a player who had finished the other three was told the
+          day was over with a mode still unplayed. NextQuestCta reads the same
+          server-backed play state the hub does and offers whatever is actually
+          next, keeping the `cross_promo_click` event these emitted.
 
-      {/* Word Hunt CTA — only once Connections is done, so it never competes
-          with the primary follow-up above. */}
-      {!isPractice && hasPlayedConnections && !hasPlayedWordHunt && !isGuest && (
-        <m.div
-          data-testid="wordwheel-hunt-cta"
-          className={`w-full ${STICKY_CTA_WORD_WHEEL}`}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
-        >
-          <div className="relative">
-            <span className="absolute -top-2 left-4 z-10 inline-block px-2 py-0.5 rounded-full bg-neo-lime text-neo-black text-[10px] font-neo-display font-black tracking-wider border-2 border-neo-black shadow-hard-sm">
-              {t('wordHunt.results.stepBadge', 'STEP 2 OF 2')}
-            </span>
-            <Link
-              href={`/${language}/daily/word-hunt`}
-              onClick={() => trackGrowthEvent('cross_promo_click', {
-                target: 'word_hunt',
-                source: 'word_wheel_results',
-                placement: 'primary',
-                score: result.score,
-                language,
-              })}
-              className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-lime shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-                  <Type className="w-7 h-7 text-neo-lime" />
-                </div>
-                <div>
-                  <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
-                    {t('wordHunt.results.completeDailyTitle', "Finish today's challenge")}
-                  </span>
-                  <p className="text-neo-black/70 text-xs mt-0.5">
-                    {t('wordHunt.results.completeDailyDesc', 'Play Word Hunt to complete your Daily Challenge')}
-                  </p>
-                </div>
-              </div>
-              <m.div
-                animate={{ x: [0, 4, 0] }}
-                transition={{ duration: 1.2, repeat: 3, repeatDelay: 0.4, ease: 'easeInOut' }}
-              >
-                <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
-              </m.div>
-            </Link>
-          </div>
-        </m.div>
-      )}
-
-      {/* Back to Daily Hub — all three dailies complete. Registered players only:
-          now that this pins to the bottom of the scrollport, showing it to a
-          guest would ride a second CTA over their signup card for the whole
-          scroll. The top-left Back link keeps them out of a dead end. */}
-      {!isPractice && hasPlayedWordHunt && hasPlayedConnections && !isGuest && (
-        <m.div
-          data-testid="wordwheel-back-to-daily-cta"
-          className={`w-full ${STICKY_CTA_WORD_WHEEL}`}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
-        >
-          <Link
-            href={`/${language}/daily`}
-            data-testid="back-to-daily-link"
-            className="flex items-center justify-between gap-3 w-full p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-sm hover:bg-neo-navy active:translate-x-px active:translate-y-px transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-9 h-9 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-                <Home className="w-5 h-5 text-neo-cyan" />
-              </div>
-              <div>
-                <span className="block font-neo-display font-black text-neo-white text-sm leading-tight">
-                  {t('wordWheel.results.backToDaily', 'Back to Daily Hub')}
-                </span>
-                <p className="text-neo-white/55 text-xs mt-0.5">
-                  {t('wordWheel.results.backToDailyDesc', "See today's leaderboard")}
-                </p>
-              </div>
-            </div>
-            <ArrowRight className="w-5 h-5 text-neo-white/40 shrink-0" />
-          </Link>
-        </m.div>
+          The original rule was "no CTA for a guest", but its stated reason was
+          specifically that this slot is PINNED and a guest's signup card already
+          lives there. So the rule is kept where it applies — a guest gets the
+          handoff in normal flow instead of pinned, so it cannot ride over the
+          signup card. Dropping it entirely would dead-end ~90% of players on a
+          screen whose whole job is "what next", and would leave Word Wheel
+          behaving differently from Word Hunt for the same player (rules/60
+          Class 3). */}
+      {!isPractice && (
+        <NextQuestCta
+          justFinished="word-wheel"
+          currentLanguage={language}
+          source={isGuest ? 'word_wheel_results_guest' : 'word_wheel_results'}
+          className={isGuest ? 'w-full' : STICKY_CTA_WORD_WHEEL}
+        />
       )}
 
       {/* Hint: tap a player row to see diff */}

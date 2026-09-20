@@ -15,6 +15,7 @@ import type { BridgeOutcome } from '@/lib/connections/shareGrid';
 import type { ConnectionPuzzle } from '@/lib/connections/types';
 import BridgeOutcomeTiles from './BridgeOutcomeTiles';
 import BridgeCountdown from './BridgeCountdown';
+import { NextQuestCta } from '@/components/daily/results/NextQuestCta';
 import DailyAnswerKey from './DailyAnswerKey';
 import ConnectionsLeaderboard from './ConnectionsLeaderboard';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
@@ -319,6 +320,17 @@ const ConnectionsDailyResults: React.FC<ConnectionsDailyResultsProps> = ({
             onShareClick={onShareClick}
             extra={<BridgeOutcomeTiles outcomes={outcomes} />}
           />
+          {/* What to play NOW, above the clock that says what to play tomorrow.
+              A countdown alone is the dead end this screen shared with the other
+              dailies: it answers "come back later" while three other modes may
+              still be unplayed today. */}
+          <div className="mt-3">
+            <NextQuestCta
+              justFinished="connections"
+              currentLanguage={language}
+              source="connections_daily_results"
+            />
+          </div>
           <div className="mt-2 text-center">
             <BridgeCountdown nextLabel={t('connections.daily.nextIn')} />
           </div>
@@ -326,6 +338,15 @@ const ConnectionsDailyResults: React.FC<ConnectionsDailyResultsProps> = ({
       )}
       {blanked && (
         <div className="text-center">
+          {/* Same handoff on the zero-solved branch — a player who cleared
+              nothing needs a next step more than anyone, not just a clock. */}
+          <div className="mb-3 text-start">
+            <NextQuestCta
+              justFinished="connections"
+              currentLanguage={language}
+              source="connections_daily_results_blanked"
+            />
+          </div>
           <BridgeCountdown nextLabel={t('connections.daily.nextIn')} />
         </div>
       )}

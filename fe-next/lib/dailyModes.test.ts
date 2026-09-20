@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickPrimaryMode, type DailyModePlayState } from './dailyModes';
+import { pickPrimaryMode, pickNextUnplayedMode, type DailyModePlayState } from './dailyModes';
 
 describe('pickPrimaryMode', () => {
   describe('all modes unplayed', () => {
@@ -99,5 +99,60 @@ describe('pickPrimaryMode', () => {
       // Lost → prioritize word-hunt (unfinished challenge)
       expect(pickPrimaryMode(stateLost)).toBe('word-hunt');
     });
+  });
+});
+
+/**
+ * Finishing one daily used to dead-end: the terminal screen offered a countdown
+ * to TOMORROW, so a player who had just won had no way to discover the other
+ * three modes without navigating back to the hub themselves. pickNextUnplayedMode
+ * answers "what is there to play right now", excluding the mode just finished.
+ */
+describe('pickNextUnplayedMode', () => {
+  const allNew: DailyModePlayState = {
+    wordHunt: 'new',
+    wordWheel: 'new',
+    wordTower: false,
+    connections: false,
+  };
+
+  it('suggests the next mode in priority order, never the one just finished', () => {
+    expect(pickNextUnplayedMode({ ...allNew, wordHunt: 'won' }, 'word-hunt')).toBe('word-wheel');
+  });
+
+  it('skips modes already played today', () => {
+    const state: DailyModePlayState = {
+      wordHunt: 'won',
+      wordWheel: 'played',
+      wordTower: true,
+      connections: false,
+    };
+    expect(pickNextUnplayedMode(state, 'word-hunt')).toBe('connections');
+  });
+
+  it('returns null when every mode is done, so the caller can say so instead of looping', () => {
+    const state: DailyModePlayState = {
+      wordHunt: 'won',
+      wordWheel: 'played',
+      wordTower: true,
+      connections: true,
+    };
+    expect(pickNextUnplayedMode(state, 'word-hunt')).toBeNull();
+  });
+
+  it('never suggests the just-finished mode even when it reads as unplayed', () => {
+    // A losing Word Hunt run still counts as "played today" for this purpose:
+    // re-offering the mode the player just failed is not a next step.
+    expect(pickNextUnplayedMode({ ...allNew, wordHunt: 'lost' }, 'word-hunt')).toBe('word-wheel');
+  });
+
+  it('works from any finished mode, not just word-hunt', () => {
+    const state: DailyModePlayState = {
+      wordHunt: 'won',
+      wordWheel: 'new',
+      wordTower: false,
+      connections: false,
+    };
+    expect(pickNextUnplayedMode(state, 'word-wheel')).toBe('word-tower');
   });
 });

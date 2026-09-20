@@ -127,13 +127,23 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
       className="bg-neo-navy/95 border-3 border-black shadow-hard rounded-xl overflow-hidden w-full"
       data-testid="leaderboard-teaser"
     >
-      {/* Header */}
+      {/* Header.
+          The scope line is not decoration: this board sums Word Hunt + Word
+          Wheel, the two modes with a per-player daily board, while the hub shows
+          four cards. Naming the two is the honest alternative to a title that
+          implies it ranks Word Tower and Connections too. Built from the modes'
+          own existing title keys, so it needs no new translation. */}
       <div className="flex items-center justify-between px-3 py-2.5 border-b-2 border-black/30 bg-white/[0.03]">
-        <div className="flex items-center gap-1.5">
-          <Crown className="w-4 h-4 text-neo-lime" />
-          <span className="font-neo-display font-black text-white text-xs uppercase tracking-wide">
-            {t('daily.todaysTopPlayers')}
-          </span>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Crown className="w-4 h-4 text-neo-lime shrink-0" />
+          <div className="min-w-0">
+            <span className="block font-neo-display font-black text-white text-xs uppercase tracking-wide truncate">
+              {t('daily.todaysTopPlayers')}
+            </span>
+            <span className="block text-[10px] text-slate-400 truncate" data-testid="leaderboard-scope">
+              {t('daily.wordHunt.title')} + {t('wordWheel.hub.wordWheelQuest')}
+            </span>
+          </div>
         </div>
         {onViewFull && (
           <button

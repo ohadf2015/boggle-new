@@ -3,17 +3,17 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
-import { Timer, CircleDot, Check, X, Eye, Sparkles, Building2 } from 'lucide-react';
+import { Timer, CircleDot, Building2, Link2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
+
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
-import { questCardModes, visibleDailyModes, pickPrimaryMode, type DailyModePlayState, type DailyModeId } from '@/lib/dailyModes';
+import { visibleDailyModes, pickPrimaryMode, type DailyModePlayState, type DailyModeId } from '@/lib/dailyModes';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
@@ -21,8 +21,8 @@ import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { DailyHubHeader } from './landing/DailyHubHeader';
 import { QuestCard } from './landing/QuestCard';
-import { DailyModeQuestCard } from './landing/DailyModeQuestCard';
 import { CompactModeRow } from './landing/CompactModeRow';
+import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
 import { PersistentStreakDisplay } from './streak/PersistentStreakDisplay';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
@@ -45,11 +45,10 @@ export function DailyChallengeLanding({
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
   const { user, canSeeInWorkModes } = useAuth();
-  // Registry-driven quest cards: the PUBLIC ones (Word Tower) for everybody, plus
-  // the still-gated ones (Connections) for admins + beta testers. Word Tower used
-  // to be drawn from `adminOnlyDailyModes()`, which meant ordinary players saw a
-  // two-card hub and the mode was effectively unshipped. See lib/dailyModes.ts.
-  const questModes = questCardModes(canSeeInWorkModes);
+  // All four modes are public now, so every one of them is drawn by the shared
+  // QuestCard/CompactModeRow pair — a first-class daily quest should not look
+  // different from its siblings. `canSeeInWorkModes` still gates VISIBILITY via
+  // visibleDailyModes below, for whatever lands next. See lib/dailyModes.ts.
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -202,55 +201,80 @@ export function DailyChallengeLanding({
   // Determine which mode should be the primary (hero) card
   const primaryModeId = pickPrimaryMode(playState);
 
-  // Helper to get mode properties for rendering
+  // Helper to get mode properties for rendering.
+  //
+  // Each mode owns a colour, an icon, a tagline AND its artwork. Art used to be
+  // derived inline with a chain of ternaries that had no Connections branch, so
+  // Connections rendered the WORD HUNT mascot; the secondary rows had no art at
+  // all and were told apart only by a 24px icon tint. Keeping all four on one
+  // record is what makes "is every card recognizable?" answerable by reading
+  // one list instead of auditing four call sites.
   type ModeInfo = {
     id: DailyModeId;
     title: string;
+    tagline: string;
     icon: ReactNode;
     color: 'orange' | 'yellow' | 'cyan' | 'purple';
+    /** Mascot shipped under public/daily — one per mode, no fallbacks. */
+    artUrl: string;
     played: boolean;
     onPlay: () => void;
     visible: boolean;
+    timeMode: 'timed' | 'relaxed';
   };
 
   const modesInfo: ModeInfo[] = [
     {
       id: 'word-hunt',
       title: t('daily.wordHunt.title'),
+      tagline: t('daily.wordHunt.desc'),
       icon: <Timer className="w-8 h-8" />,
       color: 'orange',
+      artUrl: '/daily/word-hunt-mascot.jpg',
       played: wordHuntPlayed,
       onPlay: onSelectWordHunt,
       visible: true,
+      timeMode: 'timed',
     },
     {
       id: 'word-wheel',
       title: t('wordWheel.hub.wordWheelQuest'),
+      tagline: t('wordWheel.hub.wordWheelDesc'),
       icon: <CircleDot className="w-8 h-8" />,
       color: 'yellow',
+      artUrl: '/daily/word-wheel-mascot.jpg',
       played: wordWheelPlayed,
       onPlay: onSelectWordWheel,
       visible: true,
+      timeMode: 'timed',
     },
     {
       id: 'word-tower',
       title: t('wordTower.daily.questTitle'),
+      tagline: t('wordTower.daily.questDesc'),
       icon: <Building2 className="w-8 h-8" />,
       color: 'cyan',
+      artUrl: '/daily/word-tower-mascot.jpg',
       played: wordTowerPlayed,
       onPlay: () => router.push(wordTowerHref),
       visible: showsWordTower,
+      timeMode: 'relaxed',
     },
     {
       id: 'connections',
       title: t('connections.daily.questTitle'),
-      icon: <CircleDot className="w-8 h-8" />,
+      tagline: t('connections.daily.questDesc'),
+      icon: <Link2 className="w-8 h-8" />,
       color: 'purple',
+      artUrl: '/daily/connections-mascot.jpg',
       played: connectionsPlayed,
       onPlay: () => router.push(`/${currentLanguage}/connections/daily`),
       visible: showsConnections,
+      timeMode: 'relaxed',
     },
   ];
+
+  const primaryMode = modesInfo.find((mode) => mode.id === primaryModeId && mode.visible);
 
   return (
     <m.div
@@ -277,39 +301,31 @@ export function DailyChallengeLanding({
       />
 
       {/* Primary hero card — the one mode to play right now, selected by pickPrimaryMode */}
-      {primaryModeId === 'connections' && showsConnections ? (
-        <DailyModeQuestCard
-          mode={questCardModes(canSeeInWorkModes).find((m) => m.id === 'connections')!}
-          locale={currentLanguage}
-          t={t}
-          played={connectionsPlayed}
-          delay={0.15}
-        />
-      ) : modesInfo.find((m) => m.id === primaryModeId && m.visible) ? (
+      {primaryMode && (
         <QuestCard
-          challengeId={primaryModeId}
-          icon={modesInfo.find((m) => m.id === primaryModeId)?.icon || <Timer className="w-8 h-8" />}
-          title={modesInfo.find((m) => m.id === primaryModeId)?.title || 'Quest'}
-          tagline={t(`${primaryModeId === 'word-hunt' ? 'daily.wordHunt.desc' : primaryModeId === 'word-wheel' ? 'wordWheel.hub.wordWheelDesc' : primaryModeId === 'word-tower' ? 'wordTower.daily.questDesc' : 'connections.daily.questDesc'}`)}
-          color={(modesInfo.find((m) => m.id === primaryModeId)?.color || 'orange') as 'orange' | 'yellow' | 'cyan'}
+          challengeId={primaryMode.id}
+          icon={primaryMode.icon}
+          title={primaryMode.title}
+          tagline={primaryMode.tagline}
+          color={primaryMode.color}
           status={
-            primaryModeId === 'word-hunt'
+            primaryMode.id === 'word-hunt'
               ? wordHuntStatus
-              : primaryModeId === 'word-wheel'
-                ? (wordWheelStatus === 'played' ? 'won' : 'new')
+              : primaryMode.played
+                ? 'won'
                 : 'new'
           }
-          isLoadingStatus={primaryModeId === 'word-hunt' ? dailyStatus.loading : false}
-          onPlay={modesInfo.find((m) => m.id === primaryModeId)?.onPlay || (() => {})}
-          timeMode={primaryModeId === 'word-hunt' || primaryModeId === 'word-wheel' ? 'timed' : 'relaxed'}
-          timeModeLabel={t(primaryModeId === 'word-hunt' || primaryModeId === 'word-wheel' ? 'daily.timedQuest' : 'daily.relaxedQuest')}
-          previewImageUrl={`/daily/${primaryModeId === 'word-hunt' ? 'word-hunt' : primaryModeId === 'word-wheel' ? 'word-wheel' : primaryModeId === 'word-tower' ? 'word-tower' : 'word-hunt'}-mascot.jpg`}
-          previewImageAlt={modesInfo.find((m) => m.id === primaryModeId)?.title || 'Quest'}
+          isLoadingStatus={primaryMode.id === 'word-hunt' ? dailyStatus.loading : false}
+          onPlay={primaryMode.onPlay}
+          timeMode={primaryMode.timeMode}
+          timeModeLabel={t(primaryMode.timeMode === 'timed' ? 'daily.timedQuest' : 'daily.relaxedQuest')}
+          previewImageUrl={primaryMode.artUrl}
+          previewImageAlt={primaryMode.title}
           currentLanguage={currentLanguage}
           buttonText={t('daily.startQuest')}
           delay={0.15}
         />
-      ) : null}
+      )}
 
       {/* Secondary modes — compact single-line cards for the modes not selected as primary */}
       <div className="w-full flex flex-col gap-2" data-testid="secondary-modes">
@@ -321,12 +337,20 @@ export function DailyChallengeLanding({
               icon={mode.icon}
               title={mode.title}
               color={mode.color}
+              artUrl={mode.artUrl}
               onPlay={mode.onPlay}
               played={mode.played}
               delay={0.25 + i * 0.05}
             />
           ))}
       </div>
+
+      {/* Today's board. Removed in the 2026-09-19 redesign on the grounds that a
+          three-name board reads as a dead product; restored because the hub is
+          where players look for it. It sums the two modes that expose a
+          per-player daily board and SAYS so, rather than implying it ranks all
+          four — Word Tower and Connections keep their own boards. */}
+      <LeaderboardTeaser currentLanguage={currentLanguage} />
 
       {/* Insights: surface "you improved" / "personal best" inline once any mode complete */}
       {user && todayIso && (wordHuntStatus === 'won' || wordWheelPlayed) && (

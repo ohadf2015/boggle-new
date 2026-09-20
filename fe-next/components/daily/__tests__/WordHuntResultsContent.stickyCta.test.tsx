@@ -162,27 +162,39 @@ describe('WordHuntResultsContent — sticky primary CTA', () => {
     mockIsGuest.mockReturnValue(false);
   });
 
-  it('pins the "finish today\'s challenge" CTA when the wheel is unplayed', () => {
+  it('pins the primary next-step CTA to the bottom of the scrollport', () => {
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(screen.getByTestId('wordhunt-wheel-cta').className).toContain('sticky');
+    // The CTA itself is the shared NextQuestCta; the sticky positioning lives on
+    // its wrapper, which is what this suite exists to protect.
+    const cta = screen.getByTestId('next-quest-cta');
+    expect(cta.className).toContain('sticky');
   });
 
-  it('pins the back-to-daily-hub CTA once the wheel is done', () => {
-    mockWheelPlayed.mockReturnValue(true);
+  it('renders exactly one primary CTA, whatever the state', () => {
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(screen.getByTestId('wordhunt-back-to-daily-cta').className).toContain('sticky');
+    expect(screen.getAllByTestId('next-quest-cta')).toHaveLength(1);
+    expect(screen.queryByTestId('next-quest-all-clear')).toBeNull();
   });
 
-  it('renders exactly one primary CTA per state', () => {
+  it('offers a real next mode rather than the one just finished', () => {
+    // Was two hardcoded nodes: a "STEP 2 OF 2 → Word Wheel" CTA and, once the
+    // wheel was done, "back to the hub". Both predate Word Tower and
+    // Connections going public, so a player with two modes still unplayed was
+    // told the day was over. The replacement never names word-hunt.
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(screen.getAllByTestId('wordhunt-wheel-cta')).toHaveLength(1);
-    expect(screen.queryByTestId('wordhunt-back-to-daily-cta')).toBeNull();
+    const next = screen.getByTestId('next-quest-cta').getAttribute('data-next-mode');
+    expect(next).not.toBe('word-hunt');
+    expect(next).toBeTruthy();
   });
 
-  it('gives a guest no sticky CTA — the signup card is their only one', () => {
+  it('gives a guest the handoff inline, never pinned over their signup card', () => {
+    // The original rule was "a guest gets no sticky CTA" — the pinned slot is
+    // where their signup card lives. That still holds: the guest branch renders
+    // the handoff in normal flow, so it cannot ride over the signup card, and
+    // guests (~90% of daily players) are not left without a next step.
     mockIsGuest.mockReturnValue(true);
     render(<WordHuntResultsContent {...baseProps} isAuthenticated={false} />);
-    expect(screen.queryByTestId('wordhunt-wheel-cta')).toBeNull();
-    expect(screen.queryByTestId('wordhunt-back-to-daily-cta')).toBeNull();
+    const cta = screen.getByTestId('next-quest-cta');
+    expect(cta.className).not.toContain('sticky');
   });
 });

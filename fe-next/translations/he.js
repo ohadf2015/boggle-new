@@ -7925,6 +7925,8 @@ const he = {
     "relaxedQuest": "משימה רגועה",
     "untimedQuest": "משימה חופשית",
     "startQuest": "התחילו משימה",
+    "nextUp": "הבא בתור",
+    "allClearToday": "סיימתם הכול להיום — נתראה מחר",
     "adminBeta": "ביתא",
     "replay": "שחקו שוב",
     "cleared": "הושלם!",

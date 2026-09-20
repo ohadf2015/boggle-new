@@ -8075,6 +8075,8 @@ const sv = {
     "relaxedQuest": "Lugnt uppdrag",
     "untimedQuest": "Utan Timer",
     "startQuest": "STARTA QUEST",
+    "nextUp": "Härnäst",
+    "allClearToday": "Klart för idag — vi ses i morgon",
     "adminBeta": "Beta",
     "replay": "Spela Igen",
     "cleared": "Klarat!",
@@ -8104,7 +8106,7 @@ const sv = {
     "solved": "Löst",
     "failed": "Misslyckades",
     "wordHunt": {
-      "title": "Word Hunt",
+      "title": "Ordjakt",
       "subtitle": "Överlevnadsläge",
       "desc": "Knäck ordet. 10 försök.",
       "feature1": "90 sekunder",
