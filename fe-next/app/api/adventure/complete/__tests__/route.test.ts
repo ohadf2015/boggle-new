@@ -368,12 +368,12 @@ describe('POST /api/adventure/complete', () => {
         token: makeToken({ r: [], run: run() }), words: ['cats', 'catser'], relics: ['magnet', 'twin-ink', 'long-bow'],
       }));
       expect(claimed.data.score).toBe(plain.data.score);
-      expect(plain.data.score).toBe(wordPoints('cats') + wordPoints('catser'));
+      expect(plain.data.score).toBe(wordPoints('cats', 'en') + wordPoints('catser', 'en'));
     });
 
     it('given relics in the token, when completed, then they modify damage', async () => {
       const res = await POST(makeRequest({ token: makeToken({ r: ['twin-ink'], run: { ...run(), relics: ['twin-ink'] } }), words: ['cats'] }));
-      expect(res.data.score).toBe(wordPoints('cats') * 2);
+      expect(res.data.score).toBe(wordPoints('cats', 'en') * 2);
     });
 
     it('given the player died, when completed, then no next run is issued (run over)', async () => {

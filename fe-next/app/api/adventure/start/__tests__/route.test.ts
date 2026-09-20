@@ -198,8 +198,26 @@ describe('POST /api/adventure/start', () => {
     expect(res.data.token.split('.').length).toBe(2);
     expect(res.data.grid).toHaveLength(expectedLevel.size);
     expect(res.data.grid[0]).toHaveLength(expectedLevel.size);
-    expect(res.data.level).toEqual(expectedLevel);
     expect(res.data.language).toBe('en');
+    // The level comes back with its thresholds tuned to the board just dealt, so
+    // the design (kind, size, clock) must match the table while `stars` need not.
+    const { stars, enemyHp, bossHp, ...design } = res.data.level;
+    const { stars: _s, enemyHp: _e, bossHp: _b, ...expectedDesign } = expectedLevel;
+    expect(design).toEqual(expectedDesign);
+    expect(stars[1] / stars[0]).toBeCloseTo(1.8, 1);
+    expect(stars[2] / stars[0]).toBeCloseTo(2.8, 1);
+  });
+
+  it('given a dealt board, when POST is called, then the tuned thresholds are signed into the token', async () => {
+    mockGetAuthedUser.mockResolvedValue({ id: 'user-1' });
+    const { db } = makeFakeDb({ level_completions: [] });
+    mockCreateAdminClient.mockReturnValue(db);
+
+    const res = await POST(makeRequest({ world: 1, level: 1, language: 'en' }));
+
+    // The client cannot lower its own bar: settle reads the bar from the payload.
+    const payload = JSON.parse(Buffer.from(res.data.token.split('.')[0], 'base64url').toString('utf8'));
+    expect(payload.st).toEqual(res.data.level.stars);
   });
 
   it('given Russian, when POST is called, then the board is dealt in Russian', async () => {

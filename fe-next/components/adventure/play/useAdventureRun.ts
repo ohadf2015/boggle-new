@@ -99,7 +99,7 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
 
   const relics = useMemo(() => run?.relics ?? [], [run]);
   const kind = lvl?.kind;
-  const scored = useMemo(() => scoreWords(words, { relics, kind }), [words, relics, kind]);
+  const scored = useMemo(() => scoreWords(words, { relics, kind, language }), [words, relics, kind, language]);
   const score = scored.score;
   const combatLevel = !!lvl && isCombatKind(lvl.kind);
   const bossHp = combatLevel && lvl ? Math.max(0, lvl.bossHp - score) : 0;
@@ -451,7 +451,7 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
       wordsRef.current = [...wordsRef.current, w];
       setWords(wordsRef.current);
       if (combatRef.current) {
-        const pts = scoreWords(wordsRef.current, { relics, kind: lvl.kind }).points;
+        const pts = scoreWords(wordsRef.current, { relics, kind: lvl.kind, language }).points;
         dispatchCombat({ type: 'word', word: w, points: pts[pts.length - 1] ?? 0 });
       }
       return 'ok';

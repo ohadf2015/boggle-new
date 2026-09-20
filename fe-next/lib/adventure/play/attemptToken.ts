@@ -24,6 +24,10 @@ export interface AttemptPayload {
   tg?: string[];
   /** Time potions held at start (each may extend the clock). */
   tp?: number;
+  /** Star thresholds tuned to the board dealt. Absent on legacy tokens -> level table. */
+  st?: [number, number, number];
+  /** Enemy HP tuned to the same board (combat kinds only). */
+  eh?: number;
   /** The run this attempt belongs to (after the pick), advanced by /complete on a win. */
   run?: RunPayload;
 }

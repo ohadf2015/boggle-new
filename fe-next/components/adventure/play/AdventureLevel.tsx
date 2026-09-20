@@ -148,7 +148,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     const id = `adv-${seq}`;
     if (r === 'ok') {
       // Same relic/chain formula the server settles with (points of the word just added).
-      const all = scoreWords([...run.words, word.toLowerCase().trim()], { relics: run.run?.relics ?? [], kind: lvl?.kind }).points;
+      const all = scoreWords([...run.words, word.toLowerCase().trim()], { relics: run.run?.relics ?? [], kind: lvl?.kind, language }).points;
       const pts = all[all.length - 1] ?? 0;
       sfx.playWordAcceptedSound?.();
       setFeedback({ id, type: 'accepted', word, score: pts, timestamp: seq });
