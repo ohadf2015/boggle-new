@@ -27,6 +27,7 @@ import PlayTabFirstRunCard from './PlayTabFirstRunCard';
 import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
 import { ClassPulseSection } from './dashboard/ClassPulseSection';
 import { ClassSwitcher } from './dashboard/ClassSwitcher';
+import { StudentCapMeter } from './StudentCapMeter';
 import { TeacherActivationNudgeLive } from './dashboard/TeacherActivationNudge';
 import {
   QUICK_LAUNCH_FLOW,
@@ -61,6 +62,7 @@ const SHORTCUT_CLASS = cn(
 );
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { trackEduTeacherDashboardViewed, trackEduTeacherToolsOpened } from '@/lib/education/telemetry';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 
 export interface TeacherDashboardProps {
   /**
@@ -334,11 +336,17 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
                 classrooms={classrooms}
                 selectedId={selectedClassroomId}
                 onSelect={setSelectedClassroomId}
+                studentLimit={hasPro ? undefined : FREE_TIER_LIMITS.studentsPerClass}
               />
             )}
 
             {!classroomsLoading && selectedClassroom && (
               <>
+                <StudentCapMeter
+                  className="mb-3"
+                  studentCount={selectedClassroom.member_count || 0}
+                  source="dashboard"
+                />
                 <TeacherActivationNudgeLive
                   className="mb-3"
                   classroomId={selectedClassroom.id}
