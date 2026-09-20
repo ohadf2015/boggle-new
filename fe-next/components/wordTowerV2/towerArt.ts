@@ -107,15 +107,23 @@ export function paintRuler(
 }
 
 /** Dashed gold line + flag at the player's best height — the thing to beat. */
-export function paintBestLine(g: Graphics, label: Container, halfW: number, scale: number, y: number | null): void {
+export function paintBestLine(
+  g: Graphics,
+  label: Container,
+  halfW: number,
+  scale: number,
+  y: number | null,
+  /** World x of the screen centre — the view pans sideways, the line follows. */
+  centerX = 0,
+): void {
   g.clear();
   label.visible = y !== null;
   if (y === null) return;
   const px = (n: number) => n / scale;
-  for (let x = -halfW; x < halfW; x += px(18)) g.rect(x, y - px(1.5), px(10), px(3));
+  for (let x = centerX - halfW; x < centerX + halfW; x += px(18)) g.rect(x, y - px(1.5), px(10), px(3));
   g.fill({ color: GOLD, alpha: 0.85 });
   label.scale.set(1 / scale);
-  label.position.set(halfW - px(10), y - px(4));
+  label.position.set(centerX + halfW - px(10), y - px(4));
 }
 
 /** Gold pill label, anchored bottom-right. Pixi v8 leaf nodes take no children, hence the wrapper. */

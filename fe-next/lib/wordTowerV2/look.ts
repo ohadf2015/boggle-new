@@ -24,3 +24,18 @@ export const LOOK_UP_PX = 200;
 export function clampLook(y: number, cameraY: number): number {
   return Math.max(-cameraY, Math.min(LOOK_UP_PX, y));
 }
+
+/**
+ * Sideways pan. The camera centres on the FIRST block, so a tower that walks
+ * sideways as it grows can put its top off the edge — this is how the player
+ * follows it, and how they look at the street beside their own building.
+ *
+ * Symmetric and caller-limited: the limit is a fraction of the viewport, which
+ * only TowerCanvas knows. ponytail: a clamp, not a spring — the view is pinned
+ * home on the next hoist, same as the vertical pan.
+ */
+export function clampLookX(x: number, limitPx: number): number {
+  const limit = Math.max(0, limitPx);
+
+  return Math.max(-limit, Math.min(limit, x));
+}

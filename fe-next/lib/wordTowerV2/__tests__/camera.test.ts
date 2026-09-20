@@ -59,7 +59,7 @@ describe('frameCamera', () => {
 
   it('never shrinks blocks below readable size on a phone', () => {
     const f = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 5 });
-    expect(f.scale).toBeGreaterThanOrEqual(0.8);
+    expect(f.scale).toBeGreaterThanOrEqual(0.6);
   });
 
   it('pulls the bottom-dock frame back so more of the tower is on screen', () => {
@@ -113,7 +113,7 @@ describe('frameCamera — side dock (desktop / TV)', () => {
     const bottom = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 4 });
     const explicit = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 4, dockSide: 'bottom' });
     expect(explicit).toEqual(bottom);
-    expect(bottom.scale).toBeGreaterThanOrEqual(0.8);
+    expect(bottom.scale).toBeGreaterThanOrEqual(0.6);
   });
 });
 

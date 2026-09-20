@@ -33,19 +33,22 @@ const SIDE_GUTTER_PX = 12;
 export const COMFORT_PLAY_HEIGHT_PX = 480;
 
 /**
- * Round 7: pull the BOTTOM-DOCK frame back a quarter.
+ * Round 8: pull the BOTTOM-DOCK frame back again — 0.75 -> 0.60.
  *
  * Rounds 3-6 answered "the game is so little" by growing the slabs until one
  * floor owned 70% of a phone's width and three floors filled the play area —
- * which stopped reading as a BUILDING. Zooming the camera instead of shrinking
- * the constants keeps a floor a real 3m storey and leaves every timing window
- * in feel.test untouched: only the framing moved.
+ * which stopped reading as a BUILDING. Round 7 backed off a quarter; on a phone
+ * it still read as "super close", with a five-letter slab owning 55% of the
+ * width and only 5.6 floors in the play area. Zooming the camera instead of
+ * shrinking the constants keeps a floor a real 3m storey and leaves every
+ * timing window in feel.test untouched — block width versus the landing sweep
+ * is the difficulty dial, and it is deliberately NOT what moved here.
  *
  * Deliberately NOT applied to `inline`: that layout already solves the same
  * problem better, by targeting `SIDE_DOCK_VISIBLE_FLOORS` of tower on screen.
  * Zooming it too would undercut the couch-readable size its tests pin.
  */
-export const ZOOM = 0.75;
+export const ZOOM = 0.6;
 
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 2;

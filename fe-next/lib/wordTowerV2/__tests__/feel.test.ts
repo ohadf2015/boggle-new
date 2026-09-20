@@ -84,21 +84,33 @@ describe('block size on screen', () => {
   /**
    * A RANGE, not a floor. Rounds 3-6 chased "bigger" until a slab owned 70% of a
    * phone's width and a three-floor tower filled the screen; round 7 pulled the
-   * frame back 25% so the building reads as a building. Pinning both ends means
-   * neither direction can drift back in unnoticed.
+   * frame back 25% and round 8 another 20% — on a phone it still read as "super
+   * close". Pinning both ends means neither direction can drift back in
+   * unnoticed.
+   *
+   * Only the CAMERA moved: the world constants (and so every timing window
+   * above) are untouched, which is why a slab is smaller on screen without the
+   * landing sweep getting one millisecond harder.
    */
   it('given a phone, when framed, then a 5-letter block is readable but not wall-sized', () => {
     const { scale } = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 0 });
-    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(95);
-    expect(BLOCK_HEIGHT_PX * scale).toBeLessThanOrEqual(115);
-    expect(blockWidthForWord('tower') * scale).toBeGreaterThanOrEqual(390 * 0.5);
-    expect(blockWidthForWord('tower') * scale).toBeLessThanOrEqual(390 * 0.62);
-    expect(blockWidthForWord('גדר') * scale).toBeGreaterThanOrEqual(390 * 0.42);
+    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(75);
+    expect(BLOCK_HEIGHT_PX * scale).toBeLessThanOrEqual(92);
+    expect(blockWidthForWord('tower') * scale).toBeGreaterThanOrEqual(390 * 0.4);
+    expect(blockWidthForWord('tower') * scale).toBeLessThanOrEqual(390 * 0.48);
+    expect(blockWidthForWord('גדר') * scale).toBeGreaterThanOrEqual(390 * 0.35);
+  });
+
+  it('given a phone, when framed, then at least six floors fit in the play area', () => {
+    // The point of round 8: a tower has to read as a BUILDING, which needs more
+    // than the ~5.6 floors round 7 left on screen.
+    const { scale, groundScreenY } = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 0 });
+    expect(groundScreenY / (BLOCK_HEIGHT_PX * scale)).toBeGreaterThanOrEqual(6);
   });
 
   it('given a desktop, when framed, then blocks grow to use the space', () => {
     const { scale } = frameCamera({ viewportW: 1440, viewportH: 900, dockPx: 230, towerTopM: 0 });
-    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(110);
+    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(90);
   });
 
   it('given one floor, when measured, then it is a real 3m storey', () => {

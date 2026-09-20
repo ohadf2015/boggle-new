@@ -7,7 +7,7 @@ import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc
 import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
 import { buildSkyline, rulerTicks, skyProps } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
-import { clampLook } from '@/lib/wordTowerV2/look';
+import { clampLook, clampLookX } from '@/lib/wordTowerV2/look';
 import { frameCamera, screenSize, towerSkirts, type DockSide } from '@/lib/wordTowerV2/camera';
 import { publishHeightM } from '@/lib/wordTowerV2/altitude';
 import { floorsAt, skyAt } from '@/lib/wordTowerV2/biomes';
@@ -97,6 +97,14 @@ interface Props {
   className?: string;
 }
 
+/** Floor number encoded in a block id (`r0-b7` -> 7). -1 when there is none. */
+function floorNo(id: string): number {
+  return Number(/(\d+)$/.exec(id)?.[1] ?? -1);
+}
+
+/** How far sideways the free look may pan, as a fraction of the viewport width. */
+const LOOK_X_VIEWPORTS = 0.6;
+
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
   return sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))];
@@ -124,15 +132,20 @@ export default function TowerCanvas(props: Props) {
     // is where the player put it; `lookY` chases it so the home snap eases.
     let lookTarget = 0;
     let lookY = 0;
+    let lookXTarget = 0;
+    let lookX = 0;
     let lookHome = propsRef.current.homeKey;
-    let dragFrom: { y: number; look: number } | null = null;
+    let dragFrom: { x: number; y: number; look: number; lookX: number } | null = null;
     const onPointerDown = (e: PointerEvent) => {
-      dragFrom = { y: e.clientY, look: lookTarget };
+      dragFrom = { x: e.clientX, y: e.clientY, look: lookTarget, lookX: lookXTarget };
       host.setPointerCapture(e.pointerId);
     };
     const onPointerMove = (e: PointerEvent) => {
-      // Content follows the finger: drag UP to walk down your own tower.
-      if (dragFrom) lookTarget = dragFrom.look + (e.clientY - dragFrom.y);
+      // Content follows the finger: drag UP to walk down your own tower, and
+      // sideways to follow a tower that walked off the centre line.
+      if (!dragFrom) return;
+      lookTarget = dragFrom.look + (e.clientY - dragFrom.y);
+      lookXTarget = dragFrom.lookX + (e.clientX - dragFrom.x);
     };
     const onPointerUp = (e: PointerEvent) => {
       dragFrom = null;
@@ -140,6 +153,8 @@ export default function TowerCanvas(props: Props) {
     };
     const onWheel = (e: WheelEvent) => {
       lookTarget -= e.deltaY;
+      // Trackpads and shift+wheel report sideways scroll here.
+      lookXTarget -= e.deltaX;
     };
     host.addEventListener('pointerdown', onPointerDown);
     host.addEventListener('pointermove', onPointerMove);
@@ -151,6 +166,12 @@ export default function TowerCanvas(props: Props) {
     const frameTimes: number[] = [];
     let lastStatsAt = 0;
     let cameraY = 0;
+    // The tower's centre line is wherever the FIRST floor was put down, not the
+    // crane's x=0. Latched once floor 0 settles, and released when the run is
+    // torn down (no floor 0 in the snapshot) so the next run re-anchors.
+    let anchorX = 0;
+    let anchorLatched = false;
+    let camX = 0;
     // The camera frames a FILTERED height: settled Matter stacks jitter in the
     // 3rd decimal forever, so the raw value kept the ease from ever landing and
     // the whole scene (and the sky) micro-drifted.
@@ -327,19 +348,42 @@ export default function TowerCanvas(props: Props) {
         // Frame-rate independent ease (a fixed 0.08/frame ran 2x faster at 120Hz).
         cameraY += (frame.cameraY - cameraY) * (1 - Math.exp(-dt * 5));
 
+        const base = snap.blocks.find((b) => floorNo(b.id) === 0);
+        if (!base) {
+          anchorLatched = false;
+          anchorX = 0;
+        } else if (!anchorLatched && world.landed.has(base.id) && base.resting) {
+          anchorX = base.x;
+          anchorLatched = true;
+        }
+        camX += (anchorX - camX) * (1 - Math.exp(-dt * 5));
+
         if (p.homeKey !== lookHome) {
           lookHome = p.homeKey;
           lookTarget = 0;
+          lookXTarget = 0;
         }
         // Re-clamped every frame: the reachable range grows as the tower does.
         lookTarget = clampLook(lookTarget, cameraY);
         lookY += (lookTarget - lookY) * (1 - Math.exp(-dt * 14));
+        lookXTarget = clampLookX(lookXTarget, w * LOOK_X_VIEWPORTS);
+        lookX += (lookXTarget - lookX) * (1 - Math.exp(-dt * 14));
 
         scene.scale.set(scale);
-        scene.x = w / 2 + shake.offset.x;
+        scene.x = w / 2 - camX * scale + lookX + shake.offset.x;
         scene.y = frame.groundScreenY + cameraY + lookY + shake.offset.y;
 
         const halfW = w / 2 / scale;
+        // World x under the middle of the screen. Screen-edge furniture (street,
+        // crane mast, ruler, best line) is drawn around this instead of around
+        // world 0, so it still spans the screen once the view pans sideways.
+        // Deliberately excludes the shake offset: the whole scene shakes on
+        // impact, and cancelling it here would freeze the street mid-quake.
+        const viewCenterX = camX - lookX / scale;
+        ground.x = viewCenterX;
+        crane.x = viewCenterX;
+        ruler.x = viewCenterX;
+        rulerLayer.x = viewCenterX;
 
         // The near city stands exactly on the ground line; the far one trails
         // at half speed, so climbing reads as depth, not as the city sliding.
@@ -394,7 +438,7 @@ export default function TowerCanvas(props: Props) {
         }
 
         const bestM = p.getBestM();
-        paintBestLine(bestLine, bestLabel, halfW, scale, bestM && bestM > 0.5 ? -bestM * PX_PER_M : null);
+        paintBestLine(bestLine, bestLabel, halfW, scale, bestM && bestM > 0.5 ? -bestM * PX_PER_M : null, viewCenterX);
 
         const hangingId = p.getHangingId();
         // Under every floor: fills the wedge of sky an overhang leaves, and
@@ -420,8 +464,8 @@ export default function TowerCanvas(props: Props) {
           let view = views.get(block.id);
           if (!view) {
             // Floor number from the id (`r0-b7` -> 7): colour cycle + lobby on floor 0.
-            const floorNo = Number(/(\d+)$/.exec(block.id)?.[1] ?? views.size);
-            view = createBlockView(floorNo, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale);
+            const floor = floorNo(block.id);
+            view = createBlockView(floor < 0 ? views.size : floor, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale);
             blocks.addChild(view.container);
             views.set(block.id, view);
           }
