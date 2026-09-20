@@ -10,7 +10,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Heart, Star } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { LEVELS_PER_WORLD } from '@/lib/adventure/play/levels';
+import { MAP_ROWS } from '@/lib/adventure/play/runMap';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 import { COIN_ART } from './art';
 
@@ -46,7 +46,7 @@ export default function LevelUpBurst({ run, stars, gold, onDone }: Props) {
   }), []);
 
   const step = run?.step ?? 1;
-  const next = Math.min(LEVELS_PER_WORLD, step + 1);
+  const next = Math.min(MAP_ROWS, step + 1);
 
   return (
     <button type="button" onClick={finish} data-testid="level-up"
@@ -83,10 +83,10 @@ export default function LevelUpBurst({ run, stars, gold, onDone }: Props) {
           transition={{ delay: reduce ? 0 : 0.35, type: 'spring', stiffness: 300, damping: 20 }}
           className="relative mt-6 block min-w-[17rem] rounded-xl border-[3px] border-black bg-neo-cream px-4 py-3 text-center text-black shadow-[5px_5px_0_#000]">
           <span className="block text-xs font-black uppercase tracking-widest opacity-70">
-            {t('adventurePlay.loot.levelUpCleared', { step, total: LEVELS_PER_WORLD })}
+            {t('adventurePlay.loot.levelUpCleared', { step, total: MAP_ROWS })}
           </span>
           <span className="mt-0.5 block font-neo-display text-xl font-bold leading-tight">
-            {step >= LEVELS_PER_WORLD ? t('adventurePlay.loot.levelUpDone') : t('adventurePlay.loot.levelUpNext', { next })}
+            {step >= MAP_ROWS ? t('adventurePlay.loot.levelUpDone') : t('adventurePlay.loot.levelUpNext', { next })}
           </span>
           <span className="mt-2 flex items-center justify-center gap-3 font-neo-display text-base font-bold tabular-nums">
             <span className="inline-flex items-center gap-1"><Star className="h-5 w-5 fill-neo-yellow stroke-black stroke-2" />{stars}/3</span>

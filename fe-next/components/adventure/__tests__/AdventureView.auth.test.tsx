@@ -14,11 +14,9 @@ vi.mock('../play/useAdventureProgress', () => ({
   useAdventureProgress: () => ({ completions: [], state: 'ready', refresh: vi.fn() }),
 }));
 vi.mock('../WorldMap', () => ({ default: () => <div data-testid="world-map" /> }));
-vi.mock('../LevelGrid', () => ({ default: () => null }));
 vi.mock('../CollectionPanel', () => ({ default: () => null }));
 vi.mock('../play/AdventureLevel', () => ({ default: () => null }));
 vi.mock('../play/SkinVault', () => ({ default: () => null }));
-vi.mock('../play/run/RunBanner', () => ({ default: () => null }));
 
 import AdventureView from '../AdventureView';
 

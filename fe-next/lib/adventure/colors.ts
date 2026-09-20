@@ -2,7 +2,7 @@
  * Adventure Mode - Centralized Color System
  *
  * Single source of truth for world color themes.
- * Used by WorldMap (glow effects) and LevelGrid (Tailwind classes).
+ * Used by WorldMap (glow effects) and the act map (Tailwind classes).
  */
 
 /**

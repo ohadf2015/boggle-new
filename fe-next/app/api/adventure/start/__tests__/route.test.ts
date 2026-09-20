@@ -30,7 +30,22 @@ vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 import { POST } from '../route';
 import { getPlayLevel } from '@/lib/adventure/play/levels';
 import { verifyAttempt } from '@/lib/adventure/play/attemptToken';
-import { freshRun, signRun, verifyRun, makeOffer } from '@/lib/adventure/play/runToken';
+import { freshRun, signRun, verifyRun, makeOffer, enterNode } from '@/lib/adventure/play/runToken';
+import { buildRunMap, nodeLevel } from '@/lib/adventure/play/runMap';
+
+/**
+ * v2 runs are addressed by MAP NODE, not level. These helpers pin a seed, then
+ * find a row-0 node and a reachable row-1 fight so a test can name the level
+ * it wants without hard-coding a node id the generator may move.
+ */
+const SEED_RUN = (over = {}) => ({ ...freshRun(1, 'user-1', 'seed-1'), ...over });
+function row0And1(seed = 'seed-1') {
+  const map = buildRunMap(seed, 1);
+  const first = map.nodes.find((n) => n.row === 0)!;
+  const nextIds = map.edges.filter((e) => e.from === first.id).map((e) => e.to);
+  const fight = map.nodes.find((n) => nextIds.includes(n.id) && n.kind === 'fight');
+  return { map, first, fight };
+}
 import { isWordOnBoard } from '@/utils/clientWordValidator';
 
 function makeRequest(body?: unknown) {
@@ -115,13 +130,24 @@ describe('POST /api/adventure/start', () => {
     expect(res.data.error).toBe('Invalid level');
   });
 
-  it('given level 8, when POST is called, then returns 400 Invalid level', async () => {
+  it('given world 11, when POST is called, then returns 400 Invalid level', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'user-1' });
 
-    const res = await POST(makeRequest({ world: 1, level: 8, language: 'en' }));
+    const res = await POST(makeRequest({ world: 11, language: 'en' }));
 
     expect(res.status).toBe(400);
     expect(res.data.error).toBe('Invalid level');
+  });
+
+  it('given a nodeId that is not on the map, when POST is called, then 400 Invalid run', async () => {
+    mockGetAuthedUser.mockResolvedValue({ id: 'user-1' });
+    const { db } = makeFakeDb({ level_completions: [] });
+    mockCreateAdminClient.mockReturnValue(db);
+
+    const res = await POST(makeRequest({ world: 1, language: 'en', nodeId: 'r9l9' }));
+
+    expect(res.status).toBe(400);
+    expect(res.data.code).toBe('node');
   });
 
   it('given createAdminClient returns null, when POST is called, then returns 503', async () => {
@@ -133,16 +159,31 @@ describe('POST /api/adventure/start', () => {
     expect(res.status).toBe(503);
   });
 
-  it('given level 2 requested with no level-1 completion, when POST is called, then returns 403 Locked', async () => {
+  it('given world 2 with no world-1 boss cleared, when POST is called, then returns 403 Locked', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'user-1' });
     const { db } = makeFakeDb({ level_completions: [] });
     mockCreateAdminClient.mockReturnValue(db);
 
-    const res = await POST(makeRequest({ world: 1, level: 2, language: 'en' }));
+    const res = await POST(makeRequest({ world: 2, language: 'en' }));
 
     expect(res.status).toBe(403);
     expect(res.data.error).toBe('Locked');
   });
+
+  it('given a run standing mid-map with NO completion rows, when the next node starts, then it is not locked', async () => {
+    // Regression: the old `step === level` gate ran canPlayLevel per level, so a
+    // map path that skipped a row 403'd mid-run. Only world unlock gates now.
+    mockGetAuthedUser.mockResolvedValue({ id: 'user-1' });
+    const { db } = makeFakeDb({ level_completions: [] });
+    mockCreateAdminClient.mockReturnValue(db);
+    const { first, fight } = row0And1();
+    if (!fight) return;
+    const run = enterNode(SEED_RUN(), first.id);
+
+    const res = await POST(makeRequest({ world: 1, language: 'en', runToken: signRun(run, 'test-key'), nodeId: fight.id }));
+
+    expect(res.status).toBe(200);
+  }, 30_000);
 
   it('given world1/level1, when POST is called, then returns 200 with token, grid and level', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'user-1' });
@@ -185,10 +226,12 @@ describe('POST /api/adventure/start', () => {
       const { db } = makeFakeDb({ level_completions: [] });
       mockCreateAdminClient.mockReturnValue(db);
 
-      const res = await POST(makeRequest({ world: 1, level: 1, language: 'en' }));
+      const res = await POST(makeRequest({ world: 1, language: 'en' }));
 
       expect(res.status).toBe(200);
       expect(res.data.run).toMatchObject({ w: 1, step: 1, relics: [] });
+      expect(res.data.map.nodes.length).toBeGreaterThan(0);
+      expect(Array.isArray(res.data.reachable)).toBe(true);
       expect(res.data.run).not.toHaveProperty('u');
       expect(res.data.run).not.toHaveProperty('seed');
       expect(verifyRun(res.data.runToken, SECRET)?.u).toBe('user-1');
@@ -202,14 +245,18 @@ describe('POST /api/adventure/start', () => {
       expect(attempt?.run?.step).toBe(1);
     }, 30_000);
 
-    it('given a hunt level, when started, then huntCount+1 targets are on the board and signed into the attempt', async () => {
+    it('given a row-1 fight node (a hunt level), when started, then huntCount+1 targets are on the board and signed into the attempt', async () => {
       const { db } = makeFakeDb({ level_completions: cleared(1) });
       mockCreateAdminClient.mockReturnValue(db);
+      const { first, fight } = row0And1();
+      if (!fight) return;
+      const run = enterNode(SEED_RUN(), first.id);
 
-      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en' }));
+      const res = await POST(makeRequest({ world: 1, language: 'en', runToken: signRun(run, SECRET), nodeId: fight.id }));
 
-      const lvl = getPlayLevel(1, 2);
+      const lvl = getPlayLevel(1, nodeLevel(fight)!);
       expect(res.status).toBe(200);
+      expect(lvl.kind).toBe('hunt');
       expect(res.data.targets).toHaveLength(lvl.huntCount! + 1);
       const board = res.data.grid.map((r: string[]) => r.map((c) => c.toLowerCase()));
       for (const t of res.data.targets) expect(isWordOnBoard(t, board, 'en')).toBe(true);
@@ -219,9 +266,9 @@ describe('POST /api/adventure/start', () => {
     it('given a runToken with an offer and a valid pick, when started, then the pick is applied and the attempt carries the relics', async () => {
       const { db } = makeFakeDb({ level_completions: cleared(1) });
       mockCreateAdminClient.mockReturnValue(db);
-      const run = { ...freshRun(1, 'user-1', 'seed-1'), step: 2, offer: [{ type: 'relic', id: 'magnet' }, { type: 'gold', amount: 10 }] };
+      const run = { ...enterNode(SEED_RUN(), row0And1().first.id), offer: [{ type: 'relic', id: 'magnet' }, { type: 'gold', amount: 10 }] };
 
-      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en', runToken: signRun(run, SECRET), pick: 0 }));
+      const res = await POST(makeRequest({ world: 1, language: 'en', runToken: signRun(run, SECRET), pick: 0 }));
 
       expect(res.status).toBe(200);
       expect(res.data.run.relics).toEqual(['magnet']);
@@ -233,25 +280,26 @@ describe('POST /api/adventure/start', () => {
     it('given a runToken with no pick, when started, then the offer is skipped', async () => {
       const { db } = makeFakeDb({ level_completions: cleared(1) });
       mockCreateAdminClient.mockReturnValue(db);
-      const run = { ...freshRun(1, 'user-1', 's'), step: 2, offer: makeOffer('s', 2, [], 3) };
+      const run = { ...enterNode(freshRun(1, 'user-1', 's'), buildRunMap('s', 1).nodes[0].id), offer: makeOffer('s', 1, [], 3) };
 
-      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en', runToken: signRun(run, SECRET) }));
+      const res = await POST(makeRequest({ world: 1, language: 'en', runToken: signRun(run, SECRET) }));
 
       expect(res.status).toBe(200);
       expect(res.data.run.relics).toEqual([]);
     }, 30_000);
 
     it.each([
-      ['step mismatch', { step: 3 }, { pick: 0 }],
       ['pick outside the offer', {}, { pick: 5 }],
       ['another user', { u: 'someone-else' }, { pick: 0 }],
       ['another world', { w: 2 }, { pick: 0 }],
+      ['a v1 payload (no version)', { v: undefined }, { pick: 0 }],
+      ['a node two rows away', {}, { pick: 0, nodeId: 'r5l0' }],
     ])('given a runToken with %s, when started, then 400 Invalid run', async (_label, runOver, bodyOver) => {
       const { db } = makeFakeDb({ level_completions: cleared(1) });
       mockCreateAdminClient.mockReturnValue(db);
-      const run = { ...freshRun(1, 'user-1', 's'), step: 2, offer: [{ type: 'gold', amount: 10 }], ...runOver };
+      const run = { ...enterNode(freshRun(1, 'user-1', 's'), buildRunMap('s', 1).nodes[0].id), offer: [{ type: 'gold', amount: 10 }], ...runOver };
 
-      const res = await POST(makeRequest({ world: 1, level: 2, language: 'en', runToken: signRun(run, SECRET), ...bodyOver }));
+      const res = await POST(makeRequest({ world: 1, language: 'en', runToken: signRun(run, SECRET), ...bodyOver }));
 
       expect(res.status).toBe(400);
       expect(res.data.error).toBe('Invalid run');
@@ -260,8 +308,8 @@ describe('POST /api/adventure/start', () => {
     it('given a tampered runToken, when started, then 400 Invalid run', async () => {
       const { db } = makeFakeDb({ level_completions: cleared(1) });
       mockCreateAdminClient.mockReturnValue(db);
-      const tok = signRun({ ...freshRun(1, 'user-1', 's'), step: 2 }, SECRET);
-      const forged = Buffer.from(JSON.stringify({ ...freshRun(1, 'user-1', 's'), step: 2, relics: ['magnet'] })).toString('base64url');
+      const tok = signRun(enterNode(freshRun(1, 'user-1', 's'), buildRunMap('s', 1).nodes[0].id), SECRET);
+      const forged = Buffer.from(JSON.stringify({ ...enterNode(freshRun(1, 'user-1', 's'), buildRunMap('s', 1).nodes[0].id), relics: ['magnet'] })).toString('base64url');
 
       const res = await POST(makeRequest({ world: 1, level: 2, language: 'en', runToken: `${forged}.${tok.split('.')[1]}` }));
 

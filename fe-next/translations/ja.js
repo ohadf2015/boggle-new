@@ -1,6 +1,160 @@
 // Ja translations
 const ja = {
   "adventurePlay": {
+    "eco": {
+      "heading": "冒険の外での成果",
+      "xp": "XP",
+      "coins": "コイン",
+      "points": "シーズンP",
+      "streakDays": "連続日数",
+      "rank": "ランク{level}",
+      "share": "シェア",
+      "shareCopied": "コピーしました",
+      "shareText": "LexiClashでワールド{world}のボスを倒しました。"
+    },
+    "node": {
+      "shopGreeting": "まずはゴールド。話はそれから。",
+      "shopGreetingBroke": "財布が重くなったらまた来な。",
+      "shortBy": "ゴールドが {amount} 足りない",
+      "shopFull": "ハート満タン",
+      "buy": "買う",
+      "cancel": "やめる",
+      "confirmCost": "{price} ゴールド · 残り {left}",
+      "continue": "つづける",
+      "restSub": "ひとつ選ぶと、焚き火は消える。",
+      "restFull": "ハートはすでに満タン。",
+      "restUnit0": "HP",
+      "restUnit1": "最大HP",
+      "restUnit2": "ヒント",
+      "alreadyTaken": "ここではもう選んだ。",
+      "outcomeTitle": "結果",
+      "relicAdded": "レリックに加わった",
+      "openChest": "宝箱を開ける",
+      "chestSub": "1つだけ選ぼう。残りは宝箱の中。",
+      "chestSkip": "閉じたままにする",
+      "chestSkipDesc": "何も手に入りません。",
+      "chestGiveUp": "ほかの{count}個をあきらめます。",
+      "chestPassed": "見送り",
+      "chestSkipped": "宝箱は閉じたままだ。",
+      "shopSale": "セール",
+      "hintRelic": "ランダムなレリック",
+      "hintFullHeal": "全回復",
+      "hintOr": "または",
+      "hintRisk": "かけ"
+    },
+    "map": {
+      "kind": {
+        "fight": "戦闘",
+        "elite": "エリート",
+        "treasure": "宝箱",
+        "shop": "商人",
+        "rest": "焚き火",
+        "event": "未知",
+        "boss": "ボス"
+      },
+      "pathTaken": "たどった道",
+      "newRun": "新しい冒険",
+      "youAreHere": "現在地",
+      "resumeFight": "戦いを再開",
+      "outOfReach": "まだ進めない",
+      "bossAhead": "ボス: {name}",
+      "floorOf": "{total}階中 {step}階",
+      "legendClose": "凡例を閉じる",
+      "noRelics": "まだレリックなし",
+      "runState": "あなたの冒険",
+      "relics": "レリック",
+      "cleared": "クリア済み",
+      "chooseNext": "進む道を選ぶ",
+      "legend": "凡例",
+      "leave": "立ち去る",
+      "depth": "{step}階",
+      "eliteWarning": "強敵です。倒せばレリックを獲得できます。",
+      "treasureTitle": "中身は？",
+      "treasureRelic": "{name} を見つけた。",
+      "treasureGold": "ゴールドを {amount} 見つけた。",
+      "shopTitle": "商人",
+      "shopBuy": "{price} ゴールド",
+      "shopSold": "売切",
+      "shopPoor": "ゴールドが足りません",
+      "shopHeal": "HPを {amount} 回復",
+      "restTitle": "焚き火の前で",
+      "restHeal": "[休む] HPを {amount} 回復",
+      "restMaxHp": "[鍛える] 最大HP +1",
+      "restHint": "[学ぶ] ヒント +1",
+      "restTaken": "ここではもう休みました。",
+      "outGold": "{amount} ゴールド",
+      "outHp": "{amount} HP",
+      "outRelic": "レリック：{name}",
+      "outPotion": "ポーション：{name}",
+      "outHint": "ヒント +{amount}",
+      "outMaxHp": "最大HP +{amount}",
+      "outNothing": "何も起こらない。",
+      "event": {
+        "spilled-inkwell": {
+          "title": "こぼれたインク壺",
+          "body": "黒いインクの瓶が石の机の上で倒れている。まだ古い言葉の匂いがする。",
+          "c0": "[飲む] 最大HP +1、HP −1",
+          "c1": "[瓶を売る] +30 ゴールド"
+        },
+        "dusty-library": {
+          "title": "埃まみれの書庫",
+          "body": "何年も誰も開いていない本で重くなった棚が、頭上に傾いている。",
+          "c0": "[学ぶ] レリックを得る",
+          "c1": "[装丁を剥がす] +55 ゴールド",
+          "c2": "[静かに読む] ヒント +1"
+        },
+        "wandering-scribe": {
+          "title": "旅の写字生",
+          "body": "新しい羊皮紙と引き換えに手当てをすると写字生が申し出る。",
+          "c0": "[払う] 40 ゴールド：HPを2回復",
+          "c1": "[断る] +25 ゴールド"
+        },
+        "stone-riddle": {
+          "title": "石の謎かけ",
+          "body": "岩に文字が深く刻まれている。間違えれば岩が答え返す。",
+          "c0": "[答える] レリック、または HP −2 と +20 ゴールド",
+          "c1": "[立ち去る] 何もなし"
+        },
+        "broken-cart": {
+          "title": "壊れた荷車",
+          "body": "商人の荷車が車輪を失っている。文字の詰まった木箱が泥に散らばる。",
+          "c0": "[手を貸す] +60 ゴールド",
+          "c1": "[木箱を取る] +100 ゴールド、HP −1"
+        },
+        "word-fountain": {
+          "title": "言葉の泉",
+          "body": "水が刻まれた文字の上を流れ、その文字を囁き返す。",
+          "c0": "[深く飲む] 全回復",
+          "c1": "[水筒に汲む] 洞察のポーション",
+          "c2": "[水筒に汲む] 回復のポーション"
+        },
+        "vowel-thief": {
+          "title": "母音泥棒",
+          "body": "小さく素早い何かが、母音をひとつかみ持って逃げていった。",
+          "c0": "[追う] 45〜80 ゴールド、HP −1 の可能性",
+          "c1": "[見逃す] 時間のポーション"
+        },
+        "old-tome": {
+          "title": "古い書物",
+          "body": "重い本。ページは手に温かい。",
+          "c0": "[読む] ヒント +1",
+          "c1": "[燃やす] +35 ゴールド"
+        },
+        "crossroads-bard": {
+          "title": "辻の吟遊詩人",
+          "body": "誰もいない道に向かって詩人が韻を踏み、誰のためにも止まらない。",
+          "c0": "[聴く] HPを2回復",
+          "c1": "[一緒に演奏する] +25 ゴールド",
+          "c2": "[護符を頼む] 浄化のポーション"
+        },
+        "cursed-quill": {
+          "title": "呪われた羽根ペン",
+          "body": "黒い羽根ペンが台の上に浮かび、あなたの名を何度も書き続けている。",
+          "c0": "[取る] レリックを得る、HP −2",
+          "c1": "[置いていく] +20 ゴールド"
+        }
+      }
+    },
     "deed": {
       "crushed": "粉砕！",
       "obliterated": "消滅！",
@@ -147,6 +301,9 @@ const ja = {
       "windingUp": "{seconds}秒後に攻撃",
       "stunned": "スタン！",
       "moveList": "行動リスト",
+      "threatDamage": "ダメージ{count}が来る",
+      "threatTiles": "タイル{count}枚に当たる",
+      "threatBlocked": "シールドが防ぐ",
       "interruptHint": "{count}文字以上で中断！",
       "shieldLabel": "シールド",
       "shieldUp": "シールド展開！",
@@ -187,6 +344,21 @@ const ja = {
       "tap": "タップ！",
       "deflect": "飛び道具をはじく"
     },
+    "ledger": {
+        "title": "ランスコア",
+        "nodes": "階層",
+        "enemies": "敵",
+        "elites": "エリート",
+        "boss": "ボス",
+        "words": "単語",
+        "bestWord": "最高",
+        "treasure": "宝箱",
+        "events": "未知",
+        "gold": "ゴールド",
+        "relics": "遺物",
+        "flawless": "無傷",
+        "total": "最終スコア"
+    },
     "loot": {
       "rarity": {
         "common": "ノーマル",
@@ -195,6 +367,8 @@ const ja = {
       },
       "relicsTitle": "レリック",
       "emptySlot": "空きレリック枠",
+      "potionsTitle": "ポーション",
+      "emptyPotion": "{name} — 空き枠",
       "hearts": "ハート {hp}/{max}",
       "tapToOpen": "タップして開ける！",
       "chestTitle": "戦利品",
@@ -205,7 +379,7 @@ const ja = {
       "bestWord": "ベストワード",
       "noRelics": "今回のランではレリックなし",
       "runOver": "ラン終了",
-      "runOverSub": "ワールドはレベル1からやり直し。星とコレクションはそのまま残ります。",
+      "runOverSub": "新しいマップ、1階からの新しい冒険。星とコレクションはそのまま残ります。",
       "newRun": "新しいラン",
       "runComplete": "ランクリア！",
       "runCompleteSub": "ボスを倒し、このワールドを制覇した！",
@@ -226,6 +400,9 @@ const ja = {
       "levelUpNext": "レベル {next} 解放",
       "levelUpDone": "ボスが待っている",
       "tapToContinue": "タップで続ける",
+      "andMoreRelics": "ほか {n} 個の遺物も発動",
+      "earnedThisRun": "このランで {n} ポイント稼いだ",
+      "thisRun": "この冒険で",
       "thisLevel": "このレベル",
       "stackAlone": "単体",
       "stackCombined": "手持ちのレリックと合わせて",
@@ -325,9 +502,9 @@ const ja = {
       "lens-of-insight": "毎レベルヒント+1",
       "sage-scroll": "ヒントで言葉全体がわかる",
       "iron-bookmark": "戦闘開始時にシールド1つ",
-      "frost-ward": "凍結とのろいの時間が半分",
-      "vampire-fang": "戦闘中、6文字以上の言葉でHPが1回復",
-      "gold-tooth": "ゴールド+50%",
+      "frost-ward": "凍結・のろい・シャッフルが半分の時間で解ける",
+      "vampire-fang": "戦闘でHPが減っていれば、6文字以上の言葉で1回復",
+      "gold-tooth": "ゴールド+50%（入手元は問わず）",
       "lucky-clover": "ごほうびが3つから4つに",
       "phoenix-feather": "冒険中1回だけ、HP1で復活"
     },
@@ -6924,6 +7101,7 @@ const ja = {
     "brainTrainingDesc": "認知成長を追跡",
     "adventureMode": "アドベンチャー",
     "adventureModeDesc": "10の世界で100レベル",
+    "adventureResumeA11y": "冒険の続きへ — ワールド{world}、ノード{step}、ハート{hp}",
     "quickPlayMode": "クイックプレイ",
     "quickPlayModeDesc": "ホイールを回してボードに挑め",
     "blastMode": "ブラストモード",

@@ -27,6 +27,7 @@ import { hintCells, resolveHitPath, type Cell } from './fx/hintPath';
 import type { HitEvent } from './events';
 import RunResult from './RunResult';
 import RunHud from './RunHud';
+import { currentNodeKind } from './run/nodeKind';
 import { foeScore } from './foeScore';
 import { resultHeld, FINALE_HOLD_MAX_MS } from './finaleHold';
 import DeedStamp, { type DeedEvent } from './deed/DeedStamp';
@@ -34,9 +35,14 @@ import { deedTier, DEED_DROPS_PER_LEVEL } from './deed/deedTier';
 import { castTiming } from './fx/castPath';
 import { hitTier } from './fx/hitTier';
 import DraftOverlay from './DraftOverlay';
+import RunMapScreen from '../map/RunMapScreen';
+import { readCleared, recordCleared, clearClearedNodes, isFreshRun } from '../map/clearedNodes';
+import NodeScreen from './nodes/NodeScreen';
+import { useNodeDemo } from './nodes/useNodeDemo';
 import { useLevelVariant } from './variants/useLevelVariant';
 import VariantPanel from './variants/VariantPanel';
 import BoardLayer from './variants/BoardLayer';
+import { runFloor } from './runFloor';
 import { cn } from '@/lib/utils';
 
 export const worldBackdrop = (world: number) => `/images/adventure/play/world-${world}.webp`;
@@ -56,13 +62,27 @@ interface Props {
   totalBossesBeaten: number;
   /** Levels already at 3 stars, not counting this one. */
   otherPerfectLevels: number;
+  /** Roguelike entry: open on the act map and let the player choose the node. */
+  mapFirst?: boolean;
 }
 
-export default function AdventureLevel({ world, level, hasNext, onExit, onNext, onRestartRun, onSaved, onEquipSkin, earnAchievement, totalBossesBeaten, otherPerfectLevels }: Props) {
+export default function AdventureLevel({ world, level, hasNext, onExit, onNext, onRestartRun, onSaved, onEquipSkin, earnAchievement, totalBossesBeaten, otherPerfectLevels, mapFirst }: Props) {
   const { t, language } = useLanguageSafe();
   const sfx = useSoundEffects();
   const isWord = useWordChecker(language);
-  const run = useAdventureRun({ world, level, language, isWord });
+  const run = useAdventureRun({ world, level, language, isWord, mapFirst });
+  // Which nodes of this run were actually played out — the map needs it to tell
+  // "mid-fight" from "cleared" (see clearedNodes).
+  const [cleared, setCleared] = useState<string[]>(() => (mapFirst ? readCleared(world) : []));
+  // The map is the surface a run sits on: it stays mounted through the 'loading'
+  // between two nodes, so a choice never flashes the empty level screen.
+  const [mapShown, setMapShown] = useState(false);
+  // Run over / run complete: the map comes back as a recap of the path walked.
+  const [recap, setRecap] = useState(false);
+  // A node screen (shop / campfire / chest / event) the player has left: it stays
+  // dismissed until the run moves on, revealing the act map underneath.
+  const [leftNode, setLeftNode] = useState<string | null>(null);
+  useNodeDemo({ phase: run.phase, map: run.map, currentNode: run.currentNode, openMap: run.openMap, chooseNode: run.chooseNode });
   const [feedback, setFeedback] = useState<WordFeedback | null>(null);
   const [popups] = useState<Array<{ id: number; pts: number }>>([]); // "+N" chip replaced by the WordCast damage number
   const streakRef = useRef(0);
@@ -70,6 +90,17 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
   const hitSeq = useRef(0); // monotonic hit id: two submits in one ms must not collide
   const worldCfg = getWorldConfig(world);
   const lvl = run.lvl;
+  // The board played is the MAP NODE's level, not the `level` prop the route came in with
+  // (/start derives it from the node and ignores `level`) — the header must not lie about it.
+  const shownLevel = lvl?.level ?? level;
+  // …and inside a run the number the PLAYER is told is the act floor, counted
+  // exactly as the map counts it. `shownLevel` is the LevelSpec slot the node
+  // borrows its board from, so it drifts from the floor (the map said FLOOR 3
+  // while the card said LEVEL 4) and can repeat across neighbouring fights.
+  const floor = useMemo(() => runFloor(run.map, run.run), [run.map, run.run]);
+  const whereLabel = floor
+    ? t('adventurePlay.map.floorOf', { step: floor.step, total: floor.total })
+    : t('adventurePlay.worldLevel', { world, level: shownLevel });
   const isElite = lvl?.kind === 'elite';
   const [hintWord, setHintWord] = useState<string | null>(null);
   const [lastHit, setLastHit] = useState<HitEvent | null>(null);
@@ -90,10 +121,21 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     onBoom: sfx.playBlastBombSound, onDefuse: sfx.playPowerUpSound,
   });
   const [chainBrokenAt, setChainBrokenAt] = useState<number | null>(null);
+  // `useAdventureRun` and `useLevelVariant` both return a fresh object every
+  // render, and the run clock re-renders this screen 5×/s (a bomb level adds its
+  // own fuse tick on top). Any callback that lists them as deps is therefore
+  // rebuilt on every tick — which changed GridComponent's `onWordSubmit` prop
+  // and blew past its memo, re-rendering all 25 tiles right through a drag.
+  // Read them through refs so the handlers stay identity-stable for a whole level.
+  const runRef = useRef(run);
+  const variantRef = useRef(variant);
+  useEffect(() => { runRef.current = run; variantRef.current = variant; });
   const variantOnPath = variant.onPath;
   const onPathSubmit = useCallback((cells: Cell[]) => { tracedRef.current = cells.map(({ row, col }) => ({ row, col })); variantOnPath(cells); }, [variantOnPath]);
 
   const onWordSubmit = useCallback(async (word: string) => {
+    const run = runRef.current;
+    const variant = variantRef.current;
     const traced = tracedRef.current;
     tracedRef.current = null;
     const r = await run.submitWord(word);
@@ -144,12 +186,12 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       if (r === 'chain') setChainBrokenAt(Date.now());
       variant.discard();
     }
-  }, [run, sfx, lvl, language, earnAchievement, variant]);
+  }, [sfx, lvl, language, earnAchievement]);
 
   const onHint = useCallback(() => {
-    const w = run.takeHint();
+    const w = runRef.current.takeHint();
     if (w) { setHintWord(w); sfx.playHintRevealSound?.(); }
-  }, [run, sfx]);
+  }, [sfx]);
   // The hint glows on the board until that word is found.
   const hintTiles = useMemo(
     () => (hintWord && run.phase === 'playing' && !run.words.includes(hintWord.toLowerCase()) ? hintCells(hintWord, run.grid, language, run.revealFullHint) : []),
@@ -169,6 +211,12 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     const res = run.result;
     if (!res || reported.current === res) return;
     reported.current = res;
+    // The node underfoot has now been played out, win or lose: the map must stop
+    // offering to resume it.
+    if (run.currentNode) {
+      recordCleared(world, run.currentNode);
+      setCleared(readCleared(world));
+    }
     onSaved();
     if (res.stars === 3) earnAchievement('PERFECT_LEVEL');
     if (otherPerfectLevels + (res.bestStars === 3 ? 1 : 0) >= 10) earnAchievement('LEVEL_MASTER');
@@ -181,7 +229,55 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       if (invalidRef.current === 0) earnAchievement('BOSS_NO_DAMAGE');
       if (totalBossesBeaten + (res.rewards.some((r) => r.startsWith('boss-trophy-')) ? 1 : 0) >= 10) earnAchievement('ALL_BOSSES');
     }
-  }, [run.result, lvl, onSaved, earnAchievement, totalBossesBeaten, otherPerfectLevels]);
+  }, [run.result, run.currentNode, world, lvl, onSaved, earnAchievement, totalBossesBeaten, otherPerfectLevels]);
+
+  const onMapSurface = run.phase === 'map' || run.phase === 'node';
+  // While the act map (or a node screen) owns the screen, the level underneath is
+  // UNMOUNTED, not just covered: a live board, its portalled hit sticker and the
+  // stage's canvas kept running under an opaque map for no one to see.
+  const mapOwnsScreen = !!mapFirst && (onMapSurface || (run.phase === 'loading' && mapShown));
+  useEffect(() => {
+    if (onMapSurface) setMapShown(true);
+    else if (run.phase !== 'loading') setMapShown(false);
+  }, [onMapSurface, run.phase]);
+
+  // A fresh run (nothing walked yet) forgets the previous run's cleared nodes —
+  // node ids repeat from run to run.
+  // `run.run` is null until the server answers, and "no run yet" must NOT read as
+  // "fresh run" — that wiped the history of a run in progress on every mount and
+  // made a node you had already cleared say "resume this fight".
+  const freshRun = isFreshRun(run.run);
+  useEffect(() => {
+    if (!mapFirst || !freshRun) return;
+    clearClearedNodes(world);
+    setCleared([]);
+    // Every piece of state keyed by a NODE ID dies with the run, for the same
+    // reason: a shop left at `r3l1` in the dead run would keep the new run's
+    // `r3l1` dismissed, so its shop / campfire / event screen never opened and
+    // the node was silently skipped.
+    setLeftNode(null);
+  }, [mapFirst, freshRun, world]);
+
+  /** Run over → a brand-new run. Inside a map run that is an in-place re-mint
+   *  (no remount, and the walked-node history is wiped with the token). */
+  const restartRun = mapFirst ? run.newRun : (onRestartRun ?? run.retry);
+  /**
+   * In a map run the level underneath is UNMOUNTED whenever it is not the thing
+   * being looked at — not merely covered. A board left mounted under the map, the
+   * draft or the loader kept its portalled hit sticker and its stage alive, and
+   * flashed the PREVIOUS node's board through every transition.
+   */
+  const showLevelBody = !mapFirst || (!recap
+    && (run.phase === 'ready' || run.phase === 'playing' || run.phase === 'saving' || run.phase === 'done'));
+  /** A node screen owns the foreground: the map below it goes inert. */
+  const nodeScreenUp = !!run.nodeState && !!run.run && run.run.node !== leftNode
+    && (run.phase === 'node' || run.phase === 'loading');
+  /**
+   * Same rule for the level: once the node is settled the result screen owns
+   * the foreground, so the board, its hint button and the exit behind it leave
+   * the tab order and the a11y tree instead of being merely painted over.
+   */
+  const levelSettled = run.phase === 'saving' || run.phase === 'done';
 
   const begin = () => {
     streakRef.current = 0;
@@ -207,12 +303,16 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
   const frozenFilter = useMemo(() => (r: number, c: number) => !run.frozen.has(`${r}-${c}`) && variantFilter(r, c), [run.frozen, variantFilter]);
 
   return (
-    <div ref={screenRef} className="fixed inset-0 z-50 overflow-hidden bg-[#0f1b3d] text-neo-cream">
+    /* select-none: a run is dragged, not read — tracing a word, panning the act map
+       or tapping a node otherwise paints the labels under the finger in selection blue,
+       and the highlight survives the next screen. */
+    <div ref={screenRef} className="fixed inset-0 z-50 select-none overflow-hidden bg-[#0f1b3d] text-neo-cream">
       {/* eslint-disable-next-line @next/next/no-img-element -- full-bleed decorative backdrop */}
       <img src={worldBackdrop(world)} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(10,16,40,0.55)_0%,rgba(10,16,40,0.15)_70%)]" />
 
-      <div className="relative z-10 mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]">
+      {showLevelBody && (
+      <div inert={levelSettled || undefined} className="relative z-10 mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]">
         {/* Top bar */}
         <div className="flex items-center gap-2 pe-11">
           <button type="button" onClick={onExit} aria-label={t('adventurePlay.backToMap')}
@@ -222,7 +322,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
           <div className="flex-1 min-w-0 rounded-xl border-[3px] border-black bg-black/60 px-3 py-1.5">
             <div className="text-[11px] uppercase tracking-wider opacity-80 truncate">{worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : ''}</div>
             <div className="font-neo-display font-bold leading-tight">
-              {lvl?.isBoss ? t('adventurePlay.bossLevel') : isElite ? t('adventurePlay.eliteLevel') : t('adventurePlay.worldLevel', { world, level })}
+              {lvl?.isBoss ? t('adventurePlay.bossLevel') : isElite ? t('adventurePlay.eliteLevel') : whereLabel}
             </div>
           </div>
           <div className={cn('rounded-xl border-[3px] border-black px-3 py-2 font-neo-display font-bold tabular-nums inline-flex items-center gap-1 shadow-[3px_3px_0_#000]',
@@ -231,6 +331,16 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
           </div>
         </div>
 
+        {/* Run bar — pinned under the title, above the stage: relics never leave the screen. */}
+        {lvl && (
+          <RunHud hp={run.hp} maxHp={run.maxHp} gold={run.run?.gold ?? 0} combat={run.combat} dispatchCombat={run.dispatchCombat}
+            potionsLeft={run.potionsLeft} onPotion={run.drinkPotion}
+            goal={goal} playing={run.phase === 'playing'}
+            relics={run.runShown?.relics ?? []} lastHit={lastHit} words={run.words}
+            world={world} level={shownLevel} kind={lvl.kind} seconds={lvl.seconds} combatControls={false}
+            nodeKind={currentNodeKind(run.map, run.currentNode, lvl)} step={run.run?.step} />
+        )}
+
         {/* Stage: enemy / boss / star track */}
         <div ref={stageRef} className="mt-3 min-h-[5.5rem] flex items-center">
           {lvl && !lvl.isBoss && !isElite
@@ -238,13 +348,6 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
             : <LevelStage world={world} run={run} lastHit={lastHit} popups={popups} onFinaleDone={onFinaleDone} />}
         </div>
 
-        {lvl && (
-          <RunHud hp={run.hp} maxHp={run.maxHp} gold={run.run?.gold ?? 0} combat={run.combat} dispatchCombat={run.dispatchCombat}
-            potionsLeft={run.potionsLeft} onPotion={run.drinkPotion}
-            goal={goal} playing={run.phase === 'playing'}
-            relics={run.runShown?.relics ?? []} lastHit={lastHit} words={run.words}
-            world={world} level={level} kind={lvl.kind} seconds={lvl.seconds} combatControls={false} />
-        )}
         {lvl && (
           <VariantPanel lvl={lvl} language={language} targets={run.targets} targetsFound={run.targetsFound}
             chainLetter={run.chainLetter} chainLinks={run.words.length} chainBrokenAt={chainBrokenAt}
@@ -286,13 +389,37 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         )}
         <FoundWords words={run.words} points={run.points} />
       </div>
+      )}
 
       {/* The card shows the clock the level really starts with (hourglass relic etc.), not the table's base seconds. */}
-      {run.phase === 'ready' && lvl && <LevelIntro world={world} level={level} lvl={{ ...lvl, seconds: secs }} onBegin={begin} onExit={onExit} />}
+      {run.phase === 'ready' && lvl && <LevelIntro world={world} level={shownLevel} floor={floor} lvl={{ ...lvl, seconds: secs }} onBegin={begin} onExit={onExit} />}
 
       {run.phase === 'playing' && <DeedStamp event={deed} />}
 
       {run.phase === 'draft' && run.offer && <DraftOverlay offer={run.offer} onPick={run.choosePick} run={run.run} />}
+
+      {/* The act map is the base surface of a run: the node screens (shop / rest /
+          treasure / event, phase 'node') sit ON TOP of it, so dismissing one reveals
+          the map with the next row already lit. */}
+      {mapFirst && run.map && (mapOwnsScreen || recap) && (
+        <RunMapScreen
+          world={world} map={run.map} run={run.runShown ?? run.run}
+          currentNode={run.currentNode} reachable={run.reachable} cleared={cleared}
+          onChoose={run.chooseNode} onLeave={onExit}
+          recap={recap} covered={nodeScreenUp}
+          onNewRun={recap ? () => { setRecap(false); restartRun(); } : undefined}
+        />
+      )}
+
+      {/* Shop / campfire / chest / event, over the map. It stays mounted through the
+          'loading' a choice puts the run into (`busy`), or every purchase would
+          unmount the shop mid-flight and flash the loader. */}
+      {nodeScreenUp && run.nodeState && run.run && (
+        <NodeScreen
+          state={run.nodeState} run={run.run} world={world} busy={run.phase === 'loading'}
+          onChoice={run.nodeChoice} onLeave={() => setLeftNode(run.run?.node ?? null)}
+        />
+      )}
 
       {(run.phase === 'loading' || (run.phase === 'saving' && !resultHeld(run.combat, false))) && (
         <div className="absolute inset-0 z-20 grid place-items-center bg-black/40" role="status">
@@ -314,9 +441,24 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         </div>
       )}
 
-      {run.phase === 'done' && run.result && lvl && !holdResult && (
-        <RunResult world={world} isBoss={lvl.isBoss} result={run.result} hasNext={hasNext}
-          run={run.runShown} onNext={onNext} onRestartRun={onRestartRun} onRetry={run.retry} onMap={onExit} onEquipSkin={onEquipSkin} />
+      {run.phase === 'done' && run.result && lvl && !holdResult && !recap && (
+        <RunResult world={world} isBoss={lvl.isBoss} result={run.result} hasNext={mapFirst && !run.result.runComplete ? true : hasNext}
+          run={run.runShown}
+          /* The act map, so the run recap can itemize the node kinds walked. */
+          map={run.map}
+          /* Hearts LEFT after this node. `/complete` returns no `nextRun` on a
+             boss win (the chain ends there), so the stored run's hp is the hp
+             the fight STARTED with — only this live value can say whether the
+             act was cleared without losing a heart. */
+          hpLeft={run.hp}
+          maxHp={run.maxHp}
+          /* In a run, "next" is the map: retry() re-reads the stored run token, so the
+             draft (if one is pending) comes first and the act map after it. */
+          onNext={mapFirst && !run.result.runComplete ? run.retry : onNext}
+          onRestartRun={restartRun} onRetry={run.retry}
+          /* A finished run leaves the map up as a recap of the path walked. */
+          onMap={mapFirst ? (run.result.runComplete || run.result.runOver ? () => setRecap(true) : run.retry) : onExit}
+          onEquipSkin={onEquipSkin} />
       )}
     </div>
   );

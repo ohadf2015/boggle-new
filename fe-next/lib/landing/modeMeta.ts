@@ -16,6 +16,7 @@ import {
   CloudRain, Zap,
   type LucideIcon,
 } from 'lucide-react';
+import type { AdventureResume } from './adventureResume';
 
 export const CUBE_VARIANTS = ['pink', 'cyan', 'purple', 'orange', 'lime', 'blue'] as const;
 export type ModeCubeVariant = (typeof CUBE_VARIANTS)[number];
@@ -169,6 +170,15 @@ export interface ModeCubeModel {
   readonly lockedMessage?: string;
   /** e.g. live "1.2k playing now" — only the arena anchor sets this */
   readonly livePill?: string;
+  /**
+   * A saved game this cube can drop the player straight back into — adventure
+   * sets it from the run in sessionStorage. DYNAMIC state, so it lives here on
+   * the runtime model and never on the static MODE_META table (whose `path` is
+   * read by lib/email/welcomeModes.ts and pinned by a parity test). The cube
+   * paints it as absolutely-positioned chrome so a late resolve cannot reflow
+   * the bento.
+   */
+  readonly resume?: AdventureResume;
   /** bento role: the anchor gets the 2×2 hero slot, the rest are 1×1 cubes */
   readonly role: 'anchor' | 'normal';
   readonly onClick: () => void;

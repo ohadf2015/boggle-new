@@ -22,6 +22,7 @@ import MechanicPreview from './MechanicPreview';
 import './intro.css';
 import ChapterBeat from './ChapterBeat';
 import { introBeats, worldBackdrop } from './introBeats';
+import type { RunFloor } from '../runFloor';
 
 interface Props {
   world: number;
@@ -31,11 +32,19 @@ interface Props {
   /** Leave without playing. The intro covers the screen, so without this the
    *  only way out of a level opened by mistake is to play it. */
   onExit: () => void;
+  /**
+   * Inside a run this is where the player actually stands, counted the way the
+   * act map counts it. `level` is only the LevelSpec slot the node borrows its
+   * board from, so it drifts from the floor and repeats across fights — with a
+   * floor in hand the card names the floor and draws the act's ladder instead
+   * of the old linear 7-level world path.
+   */
+  floor?: RunFloor | null;
 }
 
 export const eliteArt = (world: number) => `/images/adventure/enemies/w${world}-idle.webp`;
 
-export default function LevelIntro({ world, level, lvl, onBegin, onExit }: Props) {
+export default function LevelIntro({ world, level, lvl, onBegin, onExit, floor = null }: Props) {
   const beats = introBeats(lvl);
   const [beat, setBeat] = useState(0);
   const current = beats[beat] ?? 'rule';
@@ -44,12 +53,12 @@ export default function LevelIntro({ world, level, lvl, onBegin, onExit }: Props
       aria-labelledby="level-intro-title" data-testid="level-intro" data-kind={lvl.kind} data-beat={current}>
       {current === 'chapter'
         ? <ChapterBeat world={world} onNext={() => setBeat((b) => b + 1)} />
-        : <RuleBeat world={world} level={level} lvl={lvl} onBegin={onBegin} onExit={onExit} />}
+        : <RuleBeat world={world} level={level} lvl={lvl} floor={floor} onBegin={onBegin} onExit={onExit} />}
     </div>
   );
 }
 
-function RuleBeat({ world, level, lvl, onBegin, onExit }: Props) {
+function RuleBeat({ world, level, lvl, onBegin, onExit, floor = null }: Props) {
   const { t } = useLanguageSafe();
   const reduced = usePrefersReducedMotion();
   const boss = lvl.isBoss ? getBossConfig(world) : null;
@@ -82,7 +91,9 @@ function RuleBeat({ world, level, lvl, onBegin, onExit }: Props) {
       {/* pe-14: the global mute button sits in the end corner (both directions). */}
       <div className="relative flex items-center justify-between gap-2 ps-4 pe-14 pt-4 text-xs font-bold uppercase tracking-wider text-neo-cream/70">
         <span className="truncate">{worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : ''}</span>
-        <span className="shrink-0 tabular-nums">{t('adventurePlay.worldLevel', { world, level })}</span>
+        <span className="shrink-0 tabular-nums">
+          {floor ? t('adventurePlay.map.floorOf', { step: floor.step, total: floor.total }) : t('adventurePlay.worldLevel', { world, level })}
+        </span>
       </div>
 
       {/* Hero: kind, enemy (combat), and the one sentence. */}
@@ -140,7 +151,7 @@ function RuleBeat({ world, level, lvl, onBegin, onExit }: Props) {
           </span>
           <ThreatPips threat={threat} label={t('adventurePlay.variety.threat', { threat })} />
         </div>
-        <WorldPath world={world} level={level} />
+        {floor ? <FloorPath step={floor.step} total={floor.total} /> : <WorldPath world={world} level={level} />}
         <button type="button" onClick={onBegin} autoFocus
           className={cn('mt-4 w-full rounded-xl border-[3px] border-black py-3 font-neo-display text-xl font-bold text-black shadow-[4px_4px_0_#000] active:translate-y-0.5 active:shadow-none',
             combat ? 'bg-neo-pink' : 'bg-neo-lime')}>
@@ -152,6 +163,27 @@ function RuleBeat({ world, level, lvl, onBegin, onExit }: Props) {
         </button>
       </div>
     </div>
+  );
+}
+
+/**
+ * The act's floor ladder. The linear `WorldPath` below is the pre-map world and
+ * cannot describe a branching run: two neighbouring fights can share one
+ * LevelSpec slot, so its marker sits still while the run climbs.
+ */
+function FloorPath({ step, total }: { step: number; total: number }) {
+  const { t } = useLanguageSafe();
+  return (
+    <ol className="mt-3 flex items-center justify-between gap-1" data-testid="intro-floor-path"
+      aria-label={t('adventurePlay.map.floorOf', { step, total })}>
+      {Array.from({ length: total }, (_, i) => {
+        const n = i + 1;
+        return (
+          <li key={n} className={cn('h-2 flex-1 rounded-full border-2 border-black',
+            n === step ? 'bg-neo-cream' : n < step ? 'bg-neo-lime' : 'bg-white/20')} />
+        );
+      })}
+    </ol>
   );
 }
 

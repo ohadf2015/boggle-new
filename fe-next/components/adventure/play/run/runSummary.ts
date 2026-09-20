@@ -38,6 +38,15 @@ export function levelLoot(
   };
 }
 
+/**
+ * The step a RECAP screen should read the run's banked words at. `recordRunWords`
+ * banks the level just won into the slot for `step - 1`, so a win must ask for
+ * one step further or the relic shelf silently drops the node you just played;
+ * a death banked nothing on its node, so it asks for the step as it stands.
+ */
+export const resultRunStep = (run: PublicRun | null, won: boolean): number =>
+  Math.max(1, (run?.step ?? 1) + (won ? 1 : 0));
+
 export interface RunSummary {
   levelsCleared: number;
   relics: RelicId[];
@@ -56,4 +65,20 @@ export function runSummary(
     if (!bestWord || pts > bestWord.pts) bestWord = { word, pts };
   });
   return { levelsCleared, relics: run?.relics ?? [], gold: r.nextRun?.gold ?? run?.gold ?? 0, bestWord };
+}
+
+/**
+ * Words the WHOLE run found, for the ledger's words row.
+ *
+ * `recordRunWords` only banks a level the run CLEARED, so a death banked
+ * nothing on the node it died on — and the recap scored that run at zero words
+ * although the player had just found some. A win is already inside the banked
+ * slots; only a loss adds the node it fell on.
+ */
+export function runWordCount(
+  stored: readonly string[][],
+  r: { won: boolean; validWords: readonly string[] },
+): number {
+  const banked = stored.reduce((n, level) => n + level.length, 0);
+  return banked + (r.won ? 0 : r.validWords.length);
 }

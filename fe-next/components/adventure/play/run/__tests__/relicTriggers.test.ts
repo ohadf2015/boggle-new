@@ -76,3 +76,18 @@ describe('relicBonusLabel', () => {
     expect(relicBonusLabel('short-sword', 'dogs', 0)).toBe('');
   });
 });
+
+describe('vampire-fang only claims a heal it will actually get', () => {
+  it('given a fight below max HP, when a 6+ letter word lands, then the relic fires', () => {
+    expect(triggeredRelics('planets', 0, ['vampire-fang'], { inFight: true, canHeal: true })).toEqual(['vampire-fang']);
+  });
+
+  it('given full HP, when a 6+ letter word lands, then it does NOT fire', () => {
+    // combat.ts only heals when hp < maxHp, so a callout here is a lie.
+    expect(triggeredRelics('planets', 0, ['vampire-fang'], { inFight: true, canHeal: false })).toEqual([]);
+  });
+
+  it('given no fight, then it does not fire', () => {
+    expect(triggeredRelics('planets', 0, ['vampire-fang'], { inFight: false, canHeal: true })).toEqual([]);
+  });
+});

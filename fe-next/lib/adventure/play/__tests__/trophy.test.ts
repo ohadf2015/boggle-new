@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { eliteTrophy, withEliteTrophy } from '../trophy';
-import { freshRun, advanceRun } from '../runToken';
+import { freshRun, advanceRun, enterNode } from '../runToken';
 import { RELIC_IDS, RELICS } from '../relics';
 
 describe('eliteTrophy — the relic an elite kill mints', () => {
@@ -29,24 +29,24 @@ describe('eliteTrophy — the relic an elite kill mints', () => {
 });
 
 describe('withEliteTrophy — persisting it into the signed run', () => {
-  const base = () => advanceRun({ ...freshRun(2, 'u', 'seed'), step: 4 }, { hpLeft: 3, potionsUsed: {}, score: 80 });
+  const base = () => advanceRun(enterNode(freshRun(2, 'u', 'seed'), 'r3l1'), { hpLeft: 3, potionsUsed: {}, score: 80 });
 
-  it('given an elite level, then the trophy joins the relics and the next offer never repeats it', () => {
+  it('given an elite node, then the trophy joins the relics and the next offer never repeats it', () => {
     const before = base();
-    const after = withEliteTrophy(before, 4);
+    const after = withEliteTrophy(before, 'elite');
     const id = eliteTrophy(2, before.relics)!;
     expect(after.relics).toContain(id);
     expect(after.offer?.some((o) => o.type === 'relic' && o.id === id)).toBe(false);
   });
 
-  it('given a non-elite level, then the run is unchanged', () => {
+  it('given a non-elite node, then the run is unchanged', () => {
     const before = base();
-    expect(withEliteTrophy(before, 3)).toBe(before);
+    expect(withEliteTrophy(before, 'fight')).toBe(before);
   });
 
   it('given the trophy is the heart locket, then max HP and HP both rise by one', () => {
     const before = { ...base(), relics: RELIC_IDS.filter((r) => r !== 'heart-locket'), hp: 3, maxHp: 5 };
-    const after = withEliteTrophy(before, 4);
+    const after = withEliteTrophy(before, 'elite');
     expect(after.relics).toContain('heart-locket');
     expect(after.maxHp).toBe(6);
     expect(after.hp).toBe(4);

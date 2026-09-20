@@ -29,6 +29,9 @@ interface Options {
 const FOG_IDLE_MS = 20000;
 const FOG_STEP_MS = 12000;
 
+/** The fuse state a player can actually read: which bombs, whole seconds left. */
+const shownFuses = (s: BombState) => s.bombs.map((b) => `${b.key}:${Math.ceil(b.leftMs / 1000)}`).join(',');
+
 export function bombSetup(lvl: Pick<PlayLevel, 'world' | 'size' | 'twist'>) {
   const count = 2 + (lvl.size >= 6 ? 1 : 0) + (lvl.twist ? 1 : 0);
   const fuseMs = Math.max(14000, Math.min(22000, 22000 - (lvl.world - 4) * 1000)) - (lvl.twist ? 2000 : 0);
@@ -48,6 +51,12 @@ export function useLevelVariant({ lvl, playing, grid, onShiftClock, onBoom, onDe
   const lastWordAtRef = useRef(0);
   const [bombs, setBombs] = useState<BombState | null>(null);
   const bombsRef = useRef<BombState | null>(null);
+  // What the board actually SHOWS of a fuse: the whole seconds left on each
+  // live bomb. The fuse is ticked 4×/s for accuracy, but committing all four
+  // ticks re-rendered the level screen on top of the run clock's own 5×/s —
+  // two out-of-phase render drivers, which is why a bomb level felt heavier
+  // than every other kind. Commit only when that displayed state changes.
+  const shownRef = useRef('');
   const [pops, setPops] = useState<BoardPop[]>([]);
 
   // New board: reset everything, seed the fog opening + the bomb dealer.
@@ -58,6 +67,7 @@ export function useLevelVariant({ lvl, playing, grid, onShiftClock, onBoom, onDe
     setExpand(0);
     setPops([]);
     bombsRef.current = null;
+    shownRef.current = '';
     setBombs(null);
   }, [seed]);
 
@@ -73,6 +83,7 @@ export function useLevelVariant({ lvl, playing, grid, onShiftClock, onBoom, onDe
     if (!isBomb || !playing || !lvl || bombsRef.current || !size) return;
     const { count, fuseMs } = bombSetup(lvl);
     bombsRef.current = initBombs(size, count, randRef.current, fuseMs);
+    shownRef.current = shownFuses(bombsRef.current);
     setBombs(bombsRef.current);
   }, [isBomb, playing, lvl, size]);
 
@@ -91,7 +102,8 @@ export function useLevelVariant({ lvl, playing, grid, onShiftClock, onBoom, onDe
       const { state, exploded, penaltyMs } = tickBombs(cur, now - last, randRef.current);
       last = now;
       bombsRef.current = state;
-      setBombs(state);
+      const shown = shownFuses(state);
+      if (shown !== shownRef.current) { shownRef.current = shown; setBombs(state); }
       if (exploded.length) {
         exploded.forEach((k) => pop(k, 'boom', Math.round(penaltyMs / exploded.length / 1000)));
         onShiftClock?.(-penaltyMs);
@@ -130,6 +142,7 @@ export function useLevelVariant({ lvl, playing, grid, onShiftClock, onBoom, onDe
       const { state, defused } = defuseBombs(bombsRef.current, path, randRef.current);
       if (defused.length) {
         bombsRef.current = state;
+        shownRef.current = shownFuses(state);
         setBombs(state);
         defused.forEach((k) => pop(k, 'defused'));
         onDefuse?.();

@@ -1,10 +1,13 @@
 'use client';
 
 /**
- * Adventure — world map → world levels → classic-board level (AdventureLevel).
+ * Adventure — world map → RUN. Picking a world opens its act map (a branching
+ * roguelike run built from the run seed); every board is a node on that map, so
+ * there is no level grid any more: the map IS the level select.
  * Progress: GET /api/adventure/progress. Collection + skins: player_inventory.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { ArrowLeft, Star, Backpack, Trophy, Palette, Loader2 } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -12,21 +15,26 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useAdventureInventory } from '@/hooks/useAdventureInventory';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
-import { getWorldConfig } from '@/lib/adventure/worldConfig';
-import { LEVELS_PER_WORLD, WORLD_COUNT } from '@/lib/adventure/play/levels';
-import { canPlayLevel, totalStarsOf } from '@/lib/adventure/play/progress';
+import { WORLD_COUNT } from '@/lib/adventure/play/levels';
+import { totalStarsOf } from '@/lib/adventure/play/progress';
 import { unlockedWorldSkins } from '@/lib/adventure/play/worldSkins';
 import WorldMap from './WorldMap';
-import LevelGrid from './LevelGrid';
 import CollectionPanel from './CollectionPanel';
 import AdventureLevel from './play/AdventureLevel';
 import SkinVault from './play/SkinVault';
 import { useAdventureProgress } from './play/useAdventureProgress';
 import { equipWorldSkin, equippedWorld } from './play/equipWorldSkin';
-import { readRun } from './play/runStorage';
-import RunBanner from './play/run/RunBanner';
 
-type View = { kind: 'map' } | { kind: 'world'; world: number } | { kind: 'play'; world: number; level: number };
+/**
+ * QA-only: `?preview=win` / `?preview=over` mount the run-END screens with a
+ * fabricated result. Reaching the real victory screen means clearing eight map
+ * rows against the live API, so without this the win state cannot be
+ * screenshotted or reviewed at all. Lazily loaded: no flag, no bundle.
+ */
+const RunResultPreview = dynamic(() => import('./play/run/RunResultPreview'), { ssr: false });
+
+/** The world map, or one world's run (which opens on its act map). */
+type View = { kind: 'map' } | { kind: 'run'; world: number };
 
 export default function AdventureView() {
   const { t, language } = useLanguageSafe();
@@ -42,10 +50,24 @@ export default function AdventureView() {
   const [skinWorld, setSkinWorld] = useState<number | null>(null);
   // Bumped on a run restart so the same level remounts fresh.
   const [runNonce, setRunNonce] = useState(0);
+  const [preview, setPreview] = useState<'win' | 'over' | null>(null);
 
   useEffect(() => setSkinWorld(equippedWorld()), []);
+  // Deep link from the homepage "continue your run" cube: `?world=N` opens that
+  // world's run straight away (the act map resumes the stored run) instead of
+  // the world map. Read from `location` rather than `useSearchParams` so this
+  // page needs no Suspense boundary.
   useEffect(() => {
-    setInGame(view.kind === 'play');
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const w = Number(params.get('world'));
+      if (Number.isInteger(w) && w >= 1 && w <= WORLD_COUNT) setView({ kind: 'run', world: w });
+      const p = params.get('preview');
+      if (p === 'win' || p === 'over') setPreview(p);
+    } catch { /* no query string, no deep link */ }
+  }, []);
+  useEffect(() => {
+    setInGame(view.kind === 'run');
     return () => setInGame(false);
   }, [view.kind, setInGame]);
 
@@ -66,8 +88,13 @@ export default function AdventureView() {
     setSkinWorld(world);
   }, [user?.id]);
 
-  const nextOf = (world: number, level: number) =>
-    level < LEVELS_PER_WORLD ? { world, level: level + 1 } : world < WORLD_COUNT ? { world: world + 1, level: 1 } : null;
+  // QA preview: fabricated client-side data only, so it runs ahead of the auth
+  // wall — the win screen has to be reviewable without an eight-row live run.
+  if (preview) {
+    const world = view.kind === 'run' ? view.world : 1;
+    const hp = Number(new URLSearchParams(window.location.search).get('hp'));
+    return <RunResultPreview world={world} won={preview === 'win'} hp={Number.isFinite(hp) && hp > 0 ? hp : undefined} onExit={() => setPreview(null)} onEquipSkin={equip} />;
+  }
 
   // Auth resolves after first paint (loading → user). Hold a loader until it does,
   // or a signed-in player sees the sign-in wall flash (or stick) on a hard load.
@@ -92,48 +119,36 @@ export default function AdventureView() {
     );
   }
 
-  if (view.kind === 'play') {
-    // A win is what unlocks `next`, and /start re-checks it server-side.
-    const next = nextOf(view.world, view.level);
+  if (view.kind === 'run') {
+    // One run per world: the act map decides which board is played, so the level
+    // prop is only the fallback the map never uses.
     return (
       <AdventureLevel
-        key={`${view.world}-${view.level}-${runNonce}`}
+        key={`run-${view.world}-${runNonce}`}
+        mapFirst
         world={view.world}
-        level={view.level}
-        hasNext={!!next}
-        onExit={() => setView({ kind: 'world', world: view.world })}
-        onNext={() => next && setView({ kind: 'play', ...next })}
-        onRestartRun={() => { setRunNonce((n) => n + 1); setView({ kind: 'play', world: view.world, level: 1 }); }}
+        level={1}
+        hasNext={view.world < WORLD_COUNT}
+        onExit={() => setView({ kind: 'map' })}
+        onNext={() => setView({ kind: 'run', world: Math.min(WORLD_COUNT, view.world + 1) })}
+        onRestartRun={() => setRunNonce((n) => n + 1)}
         onSaved={onSaved}
         onEquipSkin={equip}
         earnAchievement={earnAchievement}
         totalBossesBeaten={bossesBeaten}
-        otherPerfectLevels={completions.filter((c) => c.stars === 3 && !(c.world === view.world && c.level === view.level)).length}
+        otherPerfectLevels={completions.filter((c) => c.stars === 3).length}
       />
     );
   }
 
-  const worldCfg = view.kind === 'world' ? getWorldConfig(view.world) : null;
-  // sessionStorage: read on render of the world view only (client component, guarded in readRun).
-  const activeRun = view.kind === 'world' ? readRun(view.world)?.run ?? null : null;
-
   return (
     <div className="min-h-dvh bg-[#0f1b3d] text-neo-cream">
       <header className="sticky top-0 z-40 flex items-center gap-1.5 px-3 py-2.5 bg-[#0f1b3d]/90 backdrop-blur-sm border-b-[3px] border-black">
-        {view.kind === 'world' ? (
-          <button type="button" onClick={() => setView({ kind: 'map' })} aria-label={t('adventurePlay.backToMap')}
-            className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000]">
-            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          </button>
-        ) : (
-          <Link href={`/${language}`} aria-label={t('adventurePlay.backHome')}
-            className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000]">
-            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          </Link>
-        )}
-        <h1 className="flex-1 min-w-0 font-neo-display text-lg font-bold truncate">
-          {worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : t('adventurePlay.title')}
-        </h1>
+        <Link href={`/${language}`} aria-label={t('adventurePlay.backHome')}
+          className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000]">
+          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
+        </Link>
+        <h1 className="flex-1 min-w-0 font-neo-display text-lg font-bold truncate">{t('adventurePlay.title')}</h1>
         <span className="inline-flex shrink-0 items-center gap-1 rounded-full border-2 border-black bg-neo-yellow text-black px-2 py-1 font-bold tabular-nums text-sm">
           <Star className="w-4 h-4 fill-black" /> {totalStars}
         </span>
@@ -159,24 +174,12 @@ export default function AdventureView() {
           <p className="font-bold">{t('adventurePlay.loadError')}</p>
           <button type="button" onClick={() => void refresh()} className="mt-3 rounded-xl border-[3px] border-black bg-neo-cyan text-black font-bold px-4 py-2">{t('adventurePlay.tryAgain')}</button>
         </div>
-      ) : view.kind === 'world' && worldCfg ? (
-        <>
-        {activeRun && activeRun.step > 1 && (
-          <RunBanner run={activeRun} onContinue={() => setView({ kind: 'play', world: view.world, level: activeRun.step })} />
-        )}
-        <LevelGrid
-          world={worldCfg}
-          completions={completions}
-          totalStars={totalStars}
-          onLevelSelect={(world, level) => canPlayLevel(completions, world, level) && setView({ kind: 'play', world, level })}
-        />
-        </>
       ) : (
         <WorldMap
           totalStars={totalStars}
           completions={completions}
-          onWorldSelect={(world) => setView({ kind: 'world', world })}
-          onContinue={(world, level) => setView({ kind: 'play', world, level })}
+          onWorldSelect={(world) => setView({ kind: 'run', world })}
+          onContinue={(world) => setView({ kind: 'run', world })}
         />
       )}
 

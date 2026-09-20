@@ -15,6 +15,7 @@ import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
 import { orderModesForNewcomer } from '@/lib/landing/newcomerModeOrder';
 import { LandingModeCubes } from './LandingModeCubes';
+import { useAdventureResume } from './useAdventureResume';
 import { MODE_META, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
 interface DailyChallengePreloadedStats {
@@ -131,6 +132,10 @@ export function LandingChallengeCards({
   const { canSeeInWorkModes } = useAuth();
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // An adventure run still going (sessionStorage, same truth as the world
+  // view's RunBanner). Resolves after hydration — the cube paints its resting
+  // state first and the resume chrome is absolutely positioned on top.
+  const adventureResume = useAdventureResume(mounted);
   const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
   const isVeteran = isVeteranRaw || isOnCrazyGamesPlatform || hasPlayedAnyGame;
   // One "Start Here" pill at a time. Practice wins for non-veterans (it's the
@@ -166,6 +171,12 @@ export function LandingChallengeCards({
     if (canSeeInWorkModes && !next.includes('wordTowerV2')) next.push('wordTowerV2');
     // Quick Play — beta-only solo arcade hub (wheel picker, /quick-play).
     if (canSeeInWorkModes && !next.includes('quickPlay')) next.push('quickPlay');
+    // Adventure is force-appended like the other non-ranked modes above. The
+    // server's `cardOrder` is a popularity ranking and carries adventure only
+    // when it happens to have stats, and `DEFAULT_ORDER` does not carry it at
+    // all — so the cube, and with it the "continue your run" state, appeared or
+    // vanished between loads depending on which source won (Class 1).
+    if (!next.includes('adventure')) next.push('adventure');
     // Adventure is a beta/admin-only preview for now — hide it from the public
     // hub (the route guard in adventure/PageClient blocks direct navigation too).
     const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure' && m !== 'quickPlay' && m !== 'wordTowerV2');
@@ -244,6 +255,16 @@ export function LandingChallengeCards({
         highlightLabel: arenaHighlight ? t('onboarding.welcome.startHere') : undefined,
         locked: isOffline && requiresNetworkToPlay('arena'),
         lockedMessage: t('landing.offlineLocked'),
+      };
+    }
+    // Adventure run in progress → the cube resumes it instead of restarting.
+    // `href` stays MODE_META's (static, read by the welcome email too); the
+    // world is carried as a query the adventure view opens on.
+    if (key === 'adventure' && adventureResume) {
+      return {
+        ...base,
+        href: `${href}?world=${adventureResume.world}`,
+        resume: adventureResume,
       };
     }
     if (key === 'practice') {

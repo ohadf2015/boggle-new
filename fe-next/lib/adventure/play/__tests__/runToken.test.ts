@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  freshRun, makeOffer, applyPick, advanceRun, signRun, verifyRun, publicRun, goldForScore, type RunPayload,
+  freshRun, makeOffer, applyPick, advanceRun, signRun, verifyRun, publicRun, goldForScore, type RunPayload, enterNode,
 } from '../runToken';
 import { BASE_HP, RELIC_IDS } from '../relics';
 
@@ -93,13 +93,15 @@ describe('applyPick', () => {
 describe('advanceRun', () => {
   const base = (): RunPayload => ({ ...freshRun(1, 'u', 'seed'), potions: { heal: 1, time: 1, cleanse: 0, insight: 0 } });
 
-  it('given a cleared level, when advanced, then step+1, hp clamped, gold earned, next offer dealt', () => {
-    const next = advanceRun(base(), { hpLeft: 99, potionsUsed: { heal: 1 }, score: 120 });
-    expect(next.step).toBe(2);
+  it('given a cleared node, when advanced, then hp is clamped, gold earned and the next offer dealt at this depth', () => {
+    const start = enterNode(base(), 'r0l0');
+    const next = advanceRun(start, { hpLeft: 99, potionsUsed: { heal: 1 }, score: 120 });
+    // v2: the map position is NOT advanced here — the player picks the next node.
+    expect(next.node).toBe('r0l0');
     expect(next.hp).toBe(BASE_HP);
     expect(next.gold).toBe(goldForScore(120));
     expect(next.potions.heal).toBe(0);
-    expect(next.offer).toEqual(makeOffer('seed', 2, [], 3));
+    expect(next.offer).toEqual(makeOffer('seed', 1, [], 3));
   });
 
   it('given lies about hp / potions, when advanced, then hp >= 0 and potions never go negative', () => {
@@ -131,5 +133,6 @@ describe('publicRun', () => {
     expect(pub).not.toHaveProperty('u');
     expect(pub).not.toHaveProperty('seed');
     expect(pub.step).toBe(1);
+    expect(pub.path).toEqual([]);
   });
 });

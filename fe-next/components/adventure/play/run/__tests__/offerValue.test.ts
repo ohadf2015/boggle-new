@@ -85,8 +85,13 @@ describe('offerValue — live-computed card value from this run', () => {
     expect(offerValue({ type: 'relic', id: 'lucky-clover' }, { levels, run: run() })).toMatchObject({ key: 'cards', params: { from: 3, to: 4 } });
     // 3 words of 6+ letters over 2 levels.
     expect(offerValue({ type: 'relic', id: 'vampire-fang' }, { levels, run: run() })).toMatchObject({ key: 'longWords', params: { hits: 3 } });
-    // 40 gold over 2 cleared levels → +10 gold per level at +50%.
-    expect(offerValue({ type: 'relic', id: 'gold-tooth' }, { levels, run: run({ gold: 40 }) })).toMatchObject({ key: 'goldPerLevel', params: { n: 10 } });
+    // Half the level-clear payout, which is set by the level's SCORE. It used to
+    // divide the purse by levels cleared, so buying anything in a shop shrank the
+    // advertised value of a relic that pays the same +50% either way.
+    const gold = offerValue({ type: 'relic', id: 'gold-tooth' }, { levels, run: run({ gold: 40 }) });
+    expect(gold.key).toBe('goldPerLevel');
+    expect(gold.params.n).toBeGreaterThan(0);
+    expect(offerValue({ type: 'relic', id: 'gold-tooth' }, { levels, run: run({ gold: 0 }) }).params.n).toBe(gold.params.n);
   });
 
   it('Given a potion offer, then it shows how many you would carry', () => {

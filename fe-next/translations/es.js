@@ -1,6 +1,160 @@
 // Es translations
 const es = {
   "adventurePlay": {
+    "eco": {
+      "heading": "Más allá de la partida",
+      "xp": "XP",
+      "coins": "Monedas",
+      "points": "Pts. temporada",
+      "streakDays": "Días seguidos",
+      "rank": "Rango {level}",
+      "share": "Compartir",
+      "shareCopied": "Copiado",
+      "shareText": "Derroté al jefe del mundo {world} en LexiClash."
+    },
+    "node": {
+      "shopGreeting": "Primero el oro. Luego las preguntas.",
+      "shopGreetingBroke": "Vuelve cuando tu bolsa pese más.",
+      "shortBy": "Te faltan {amount} de oro",
+      "shopFull": "Corazones llenos",
+      "buy": "Comprar",
+      "cancel": "Cancelar",
+      "confirmCost": "{price} de oro · te quedan {left}",
+      "continue": "Continuar",
+      "restSub": "Elige una: la hoguera se apaga después.",
+      "restFull": "Ya tienes los corazones llenos.",
+      "restUnit0": "PV",
+      "restUnit1": "PV máx.",
+      "restUnit2": "Pistas",
+      "alreadyTaken": "Ya elegiste aquí.",
+      "outcomeTitle": "Qué pasó",
+      "relicAdded": "Añadida a tus reliquias",
+      "openChest": "Abrir el cofre",
+      "chestSub": "Elige uno. El resto se queda en el cofre.",
+      "chestSkip": "Dejarlo cerrado",
+      "chestSkipDesc": "Te vas sin nada.",
+      "chestGiveUp": "Renuncias a los otros {count}.",
+      "chestPassed": "Descartado",
+      "chestSkipped": "Dejaste el cofre cerrado.",
+      "shopSale": "Oferta",
+      "hintRelic": "Una reliquia al azar",
+      "hintFullHeal": "Curación total",
+      "hintOr": "o",
+      "hintRisk": "Apuesta"
+    },
+    "map": {
+      "kind": {
+        "fight": "Combate",
+        "elite": "Élite",
+        "treasure": "Tesoro",
+        "shop": "Mercader",
+        "rest": "Hoguera",
+        "event": "Desconocido",
+        "boss": "Jefe"
+      },
+      "pathTaken": "El camino que recorriste",
+      "newRun": "Nueva partida",
+      "youAreHere": "Estás aquí",
+      "resumeFight": "Reanudar el combate",
+      "outOfReach": "Fuera de alcance",
+      "bossAhead": "Jefe: {name}",
+      "floorOf": "Piso {step} de {total}",
+      "legendClose": "Cerrar la leyenda",
+      "noRelics": "Aún sin reliquias",
+      "runState": "Tu partida",
+      "relics": "Reliquias",
+      "cleared": "Completado",
+      "chooseNext": "Elige tu camino",
+      "legend": "Leyenda",
+      "leave": "Salir",
+      "depth": "Planta {step}",
+      "eliteWarning": "Un enemigo poderoso. Vencerlo te dará una reliquia.",
+      "treasureTitle": "¿Qué hay dentro?",
+      "treasureRelic": "Has encontrado {name}.",
+      "treasureGold": "Has encontrado {amount} de oro.",
+      "shopTitle": "Mercader",
+      "shopBuy": "{price} de oro",
+      "shopSold": "Vendido",
+      "shopPoor": "No tienes oro suficiente",
+      "shopHeal": "Cura {amount} PV",
+      "restTitle": "La hoguera arde",
+      "restHeal": "[Descansar] Cura {amount} PV",
+      "restMaxHp": "[Entrenar] +1 PV máx.",
+      "restHint": "[Estudiar] +1 pista",
+      "restTaken": "Ya has descansado aquí.",
+      "outGold": "{amount} de oro",
+      "outHp": "{amount} PV",
+      "outRelic": "Reliquia: {name}",
+      "outPotion": "Poción: {name}",
+      "outHint": "+{amount} pista",
+      "outMaxHp": "+{amount} PV máx.",
+      "outNothing": "No ocurre nada.",
+      "event": {
+        "spilled-inkwell": {
+          "title": "El tintero derramado",
+          "body": "Un frasco de tinta negra se ha volcado sobre una mesa de piedra. Todavía huele a palabras antiguas.",
+          "c0": "[Beber] +1 PV máx., pierdes 1 PV",
+          "c1": "[Vender el frasco] +30 de oro"
+        },
+        "dusty-library": {
+          "title": "La biblioteca polvorienta",
+          "body": "Las estanterías se inclinan sobre ti, cargadas de libros que nadie abre desde hace años.",
+          "c0": "[Estudiar] Consigue una reliquia",
+          "c1": "[Arrancar las encuadernaciones] +55 de oro",
+          "c2": "[Leer en silencio] +1 pista"
+        },
+        "wandering-scribe": {
+          "title": "El escriba errante",
+          "body": "Un escriba se ofrece a curarte a cambio de pergamino nuevo.",
+          "c0": "[Pagar] 40 de oro: cura 2 PV",
+          "c1": "[Rechazar] +25 de oro"
+        },
+        "stone-riddle": {
+          "title": "El acertijo de piedra",
+          "body": "Hay letras talladas hondo en la roca. Falla la respuesta y la roca responde.",
+          "c0": "[Responder] Una reliquia, o 2 PV y 20 de oro",
+          "c1": "[Marcharse] Nada"
+        },
+        "broken-cart": {
+          "title": "El carro roto",
+          "body": "El carro de un mercader ha perdido una rueda. Hay cajas de letras esparcidas por el barro.",
+          "c0": "[Ayudar] +60 de oro",
+          "c1": "[Llevarte una caja] +100 de oro, pierdes 1 PV"
+        },
+        "word-fountain": {
+          "title": "La fuente de palabras",
+          "body": "El agua corre sobre letras grabadas y te las susurra de vuelta.",
+          "c0": "[Beber a fondo] Cura total",
+          "c1": "[Llenar un frasco] Poción de lucidez",
+          "c2": "[Llenar un frasco] Poción de curación"
+        },
+        "vowel-thief": {
+          "title": "El ladrón de vocales",
+          "body": "Algo pequeño y rápido acaba de huir con un puñado de tus vocales.",
+          "c0": "[Perseguir] 45-80 de oro, quizá 1 PV",
+          "c1": "[Dejarlo ir] Poción de tiempo"
+        },
+        "old-tome": {
+          "title": "El tomo antiguo",
+          "body": "Un libro pesado, con las páginas tibias al tacto.",
+          "c0": "[Leer] +1 pista",
+          "c1": "[Quemarlo] +35 de oro"
+        },
+        "crossroads-bard": {
+          "title": "El bardo del cruce",
+          "body": "Un bardo rima ante un camino vacío y no se detiene por nadie.",
+          "c0": "[Escuchar] Cura 2 PV",
+          "c1": "[Tocar con él] +25 de oro",
+          "c2": "[Pedir un amuleto] Poción purificadora"
+        },
+        "cursed-quill": {
+          "title": "La pluma maldita",
+          "body": "Una pluma negra flota sobre su soporte y escribe tu nombre una y otra vez.",
+          "c0": "[Cogerla] Consigue una reliquia, pierdes 2 PV",
+          "c1": "[Dejarla] +20 de oro"
+        }
+      }
+    },
     "deed": {
       "crushed": "¡APLASTADO!",
       "obliterated": "¡ANIQUILADO!",
@@ -147,6 +301,9 @@ const es = {
       "windingUp": "Ataca en {seconds} s",
       "stunned": "¡Aturdido!",
       "moveList": "Lista de movimientos",
+      "threatDamage": "{count} de daño en camino",
+      "threatTiles": "{count} fichas afectadas",
+      "threatBlocked": "Tu escudo lo bloquea",
       "interruptHint": "¡{count}+ letras = interrumpir!",
       "shieldLabel": "Escudo",
       "shieldUp": "¡Escudo arriba!",
@@ -187,6 +344,21 @@ const es = {
       "tap": "¡Toca!",
       "deflect": "Desviar el proyectil"
     },
+    "ledger": {
+        "title": "Puntos de partida",
+        "nodes": "Pisos",
+        "enemies": "Enemigos",
+        "elites": "Élites",
+        "boss": "Jefe",
+        "words": "Palabras",
+        "bestWord": "Mejor",
+        "treasure": "Cofres",
+        "events": "Incógnitas",
+        "gold": "Oro",
+        "relics": "Reliquias",
+        "flawless": "Impecable",
+        "total": "Puntos finales"
+    },
     "loot": {
       "rarity": {
         "common": "Común",
@@ -195,6 +367,8 @@ const es = {
       },
       "relicsTitle": "Reliquias",
       "emptySlot": "Hueco de reliquia libre",
+      "potionsTitle": "Pociones",
+      "emptyPotion": "{name}: hueco vacío",
       "hearts": "{hp} de {max} corazones",
       "tapToOpen": "¡Toca para abrir!",
       "chestTitle": "Botín",
@@ -205,7 +379,7 @@ const es = {
       "bestWord": "Mejor palabra",
       "noRelics": "Sin reliquias en esta partida",
       "runOver": "Partida terminada",
-      "runOverSub": "El mundo empieza de nuevo desde el nivel 1. Tus estrellas y tu colección se quedan contigo.",
+      "runOverSub": "Un mapa nuevo, una partida nueva desde la primera planta. Tus estrellas y tu colección se quedan contigo.",
       "newRun": "Nueva partida",
       "runComplete": "¡Partida completada!",
       "runCompleteSub": "El jefe ha caído y este mundo es tuyo.",
@@ -226,6 +400,9 @@ const es = {
       "levelUpNext": "Nivel {next} desbloqueado",
       "levelUpDone": "El jefe te espera",
       "tapToContinue": "Toca para seguir",
+      "andMoreRelics": "{n} reliquias más se activaron",
+      "earnedThisRun": "Te dio {n} puntos en esta partida",
+      "thisRun": "En esta partida",
       "thisLevel": "Este nivel",
       "stackAlone": "Sola",
       "stackCombined": "Con tus reliquias",
@@ -325,9 +502,9 @@ const es = {
       "lens-of-insight": "+1 pista por nivel",
       "sage-scroll": "Las pistas revelan la palabra entera",
       "iron-bookmark": "Empieza cada combate con un escudo",
-      "frost-ward": "Congelaciones y maldiciones duran la mitad",
-      "vampire-fang": "En combate, las palabras de 6+ letras curan 1 PV",
-      "gold-tooth": "+50 % de oro",
+      "frost-ward": "Congelaciones, maldiciones y mezclas duran la mitad",
+      "vampire-fang": "¿Herido en combate? Una palabra de 6+ letras te cura 1 PV",
+      "gold-tooth": "+50 % de oro, venga de donde venga",
       "lucky-clover": "Elige entre 4 recompensas en vez de 3",
       "phoenix-feather": "Una vez por aventura: revive con 1 PV"
     },
@@ -6907,6 +7084,7 @@ const es = {
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "adventureMode": "Aventura",
     "adventureModeDesc": "100 niveles en 10 mundos",
+    "adventureResumeA11y": "Continúa tu aventura: mundo {world}, nodo {step}, {hp} corazones",
     "quickPlayMode": "Partida rápida",
     "quickPlayModeDesc": "Gira la rueda y vence al tablero",
     "blastMode": "Modo Blast",

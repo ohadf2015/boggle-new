@@ -16,7 +16,8 @@ const grid = [
 const dict = new Set(['cat', 'cats', 'dog', 'toad']);
 const isWord = async (w: string) => dict.has(w);
 const pubRun = (over: Record<string, unknown> = {}) => ({
-  w: 1, step: 1, hp: 5, maxHp: 5, relics: [], potions: { heal: 1, time: 1, cleanse: 0, insight: 0 }, gold: 0, ...over,
+  v: 2, w: 1, step: 1, node: 'r0l0', path: ['r0l0'], hp: 5, maxHp: 5,
+  relics: [], potions: { heal: 1, time: 1, cleanse: 0, insight: 0 }, gold: 0, ...over,
 });
 
 interface MockOpts { level?: unknown; run?: unknown; complete?: Record<string, unknown>; hints?: string[]; targets?: string[] }
@@ -25,6 +26,14 @@ function mockApi(o: MockOpts = {}) {
   global.fetch = vi.fn(async (url: string, init?: RequestInit) => {
     const body = init?.body ? JSON.parse(init.body as string) : null;
     calls.push({ url, body });
+    if (url.includes('/node')) {
+      // v2: the map endpoint applies a pending draft pick and hands back the view.
+      return new Response(JSON.stringify({
+        runToken: 'rt-after-node', run: o.run ?? pubRun(), currentNode: 'r0l0', reachable: ['r1l0'],
+        map: { world: 1, rows: 8, nodes: [{ id: 'r0l0', row: 0, lane: 0, kind: 'fight', level: 1 }, { id: 'r1l0', row: 1, lane: 0, kind: 'fight', level: 2 }], edges: [{ from: 'r0l0', to: 'r1l0' }] },
+        node: null,
+      }));
+    }
     if (url.includes('/start')) {
       return new Response(JSON.stringify({
         token: 'tok', grid, language: 'en', level: o.level ?? getPlayLevel(1, 1),
@@ -54,16 +63,33 @@ describe('useAdventureRun — roguelike run', () => {
     expect(result.current.hintsLeft).toBe(2);
   });
 
-  it('given a stored run with an offer for this level, when mounted, then it drafts first and sends the pick', async () => {
+  it('given a stored run with a pending offer, when mounted, then it drafts first and sends the pick to the map', async () => {
     sessionStorage.setItem(runStorageKey(1), JSON.stringify({ runToken: 'rt-2', run: pubRun({ step: 2, offer: [{ type: 'gold', amount: 5 }, { type: 'relic', id: 'magnet' }] }) }));
     const calls = mockApi({ level: getPlayLevel(1, 2), run: pubRun({ step: 2, relics: ['magnet'] }), targets: ['cats', 'toad', 'dog'] });
     const { result } = hook(2);
     await waitFor(() => expect(result.current.phase).toBe('draft'));
     expect(result.current.offer).toHaveLength(2);
     expect(calls).toHaveLength(0);
+    // v2: the pick rides the MAP endpoint — the run is still standing on the node it cleared.
     act(() => result.current.choosePick(1));
+    await waitFor(() => expect(result.current.phase).toBe('map'));
+    expect(calls[0].url).toContain('/node');
+    expect(calls[0].body).toMatchObject({ runToken: 'rt-2', pick: 1, world: 1 });
+    expect(result.current.run?.relics).toEqual(['magnet']);
+    expect(result.current.reachable).toEqual(['r1l0']);
+  });
+
+  it('given the map is open, when a fight node is chosen, then /start is asked for that node', async () => {
+    sessionStorage.setItem(runStorageKey(1), JSON.stringify({ runToken: 'rt-2', run: pubRun({ offer: [{ type: 'gold', amount: 5 }] }) }));
+    const calls = mockApi({ level: getPlayLevel(1, 2), targets: ['cats', 'toad', 'dog'] });
+    const { result } = hook(2);
+    await waitFor(() => expect(result.current.phase).toBe('draft'));
+    act(() => result.current.choosePick(null));
+    await waitFor(() => expect(result.current.phase).toBe('map'));
+    act(() => { void result.current.chooseNode('r1l0'); });
     await waitFor(() => expect(result.current.phase).toBe('ready'));
-    expect(calls[0].body).toMatchObject({ runToken: 'rt-2', pick: 1, world: 1, level: 2 });
+    const start = calls.find((c) => c.url.includes('/start'))!;
+    expect(start.body).toMatchObject({ nodeId: 'r1l0', runToken: 'rt-after-node' });
     expect(result.current.targets).toEqual(['cats', 'toad', 'dog']);
   });
 
@@ -91,6 +117,11 @@ describe('useAdventureRun — roguelike run', () => {
 
     mockApi();
     act(() => result.current.retry());
+    // The stored run now carries a pending draft, so the remount offers it first.
+    await waitFor(() => expect(result.current.phase).toBe('draft'));
+    act(() => result.current.choosePick(null));
+    await waitFor(() => expect(result.current.phase).toBe('map'));
+    act(() => { void result.current.chooseNode('r1l0'); });
     await waitFor(() => expect(result.current.phase).toBe('ready'));
     act(() => result.current.begin());
     await act(async () => { await result.current.finish(); });

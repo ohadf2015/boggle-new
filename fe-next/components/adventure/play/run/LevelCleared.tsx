@@ -19,6 +19,7 @@ import CoinBurst from './CoinBurst';
 import ChestOpen from './ChestOpen';
 import RelicBar from './RelicBar';
 import LevelUpBurst from './LevelUpBurst';
+import EcosystemRewards from './EcosystemRewards';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -89,7 +90,17 @@ export default function LevelCleared({ result, run, onNext, onMap }: Props) {
         {t('adventurePlay.score')} {result.score} · {t('adventurePlay.words')} {result.validWords.length}
       </div>
 
-      <div className="flex flex-1 items-center justify-center">
+      {/* What the node moved OUTSIDE the run (xp / coins / season pts / streak).
+          `shrink-0` + the chest's `min-h-0` below: on the worst case (an elite
+          node that also levels the account — 4 chips plus the rank ribbon) the
+          squeeze lands on the decorative chest, never on the buttons, so the
+          screen still fits 390×844 with no page scroll. */}
+      <EcosystemRewards result={result} delay={1.1} className="mt-3 shrink-0" />
+
+      {/* The chest is the deliberate squeeze target, but its "tap to open" badge
+          is what ungates Continue — so it scales down here instead of being
+          clipped by the button row on a short viewport. */}
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden pb-1 [&>*]:max-h-full">
         {hasChest && counted && (
           <motion.div initial={reduce ? false : { y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
             <ChestOpen loot={loot} onOpened={() => setOpened(true)} />

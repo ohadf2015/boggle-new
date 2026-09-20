@@ -12,7 +12,9 @@ export function readRun(world: number): StoredRun | null {
   try {
     const raw = sessionStorage.getItem(runStorageKey(world));
     const v = raw ? (JSON.parse(raw) as StoredRun) : null;
-    return v && typeof v.runToken === 'string' && v.run && typeof v.run.step === 'number' ? v : null;
+    // `path` is the v2 marker: a v1 stored run is dropped here rather than
+    // sent to the server only to come back as `run_version`.
+    return v && typeof v.runToken === 'string' && v.run && Array.isArray(v.run.path) ? v : null;
   } catch {
     return null;
   }

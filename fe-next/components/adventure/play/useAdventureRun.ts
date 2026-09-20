@@ -16,55 +16,45 @@ import {
   BASE_HP, POTION_HEAL, POTION_HINTS, POTION_TIME_MS, hintCharges, revealsFullHint, type PotionId, type RelicId,
 } from '@/lib/adventure/play/relics';
 import type { OfferItem, PublicRun } from '@/lib/adventure/play/runToken';
+import { isPlayNode, type NodeKind, type RunMap } from '@/lib/adventure/play/runMap';
+import type { NodeState } from '@/lib/adventure/play/nodeResolve';
 import { eliteTrophy } from '@/lib/adventure/play/trophy';
 import { isWordOnBoard } from '@/utils/clientWordValidator';
 import { fetchWithAuth } from '@/utils/authFetch';
+import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
+import { tickClock } from '@/lib/adventure/play/runClock';
+import { clearClearedNodes } from '@/components/adventure/map/clearedNodes';
 import { readRun, writeRun } from './runStorage';
+import {
+  STALE_DEAL_MS, FOE_KO_FINISH_MS, ADVENTURE_MODE,
+  type RunPhase, type SubmitResult, type RunResult, type EcosystemGains, type CombatFxEntry,
+} from './runTypes';
 
-export type RunPhase = 'loading' | 'error' | 'draft' | 'ready' | 'playing' | 'saving' | 'done';
-export type SubmitResult = 'ok' | 'dup' | 'short' | 'invalid' | 'chain' | 'idle';
-
-export interface RunResult {
-  score: number;
-  stars: number;
-  bestStars: number;
-  won: boolean;
-  rewards: string[];
-  validWords: string[];
-  totalStars: number;
-  points?: number[];
-  targetsFound?: string[];
-  nextRunToken?: string;
-  nextRun?: PublicRun;
-  offer?: OfferItem[];
-  runOver?: boolean;
-  runComplete?: boolean;
-  /** Elite kill: the relic minted into the next run link. */
-  trophy?: RelicId;
-}
+export {
+  STALE_DEAL_MS, FOE_KO_FINISH_MS, ADVENTURE_MODE,
+  type RunPhase, type SubmitResult, type RunResult, type EcosystemGains, type CombatFxEntry,
+};
 
 interface Options {
   world: number;
   level: number;
   language: string;
   isWord: (word: string) => Promise<boolean>;
+  /** Roguelike: the act-map node to play. Omitted = the run's current node (or row 0). */
+  nodeId?: string;
+  /**
+   * Open on the ACT MAP instead of dealing a board: the player picks the node.
+   * Opt-in so the old level-driven entry (and its tests) keep working.
+   */
+  mapFirst?: boolean;
 }
 
 const NO_POTIONS: Record<PotionId, number> = { heal: 0, time: 0, cleanse: 0, insight: 0 };
 const ATTACK_FX = new Set(['hit', 'drain', 'freeze', 'curse', 'projectile', 'shuffle']);
-/**
- * The server's attempt clock starts at the deal (/start), the player's at Start. Lingering on
- * the chapter / rule cards longer than this re-deals on the same run token before playing,
- * so the save can't land outside the server window (409 'expired') and fight stars stay fair.
- */
-export const STALE_DEAL_MS = 8_000;
-/** Normal level: once the foe (HP = top-star score) is K.O.'d, the level ends after this beat (letters land, K.O. stamp). */
-export const FOE_KO_FINISH_MS = 1400;
 /** How many combat fx batches the stage can look back on. */
 const FX_FEED = 8;
-export interface CombatFxEntry { id: number; fx: CombatFx[] }
 
-export function useAdventureRun({ world, level, language, isWord }: Options) {
+export function useAdventureRun({ world, level, language, isWord, nodeId, mapFirst }: Options) {
   const [phase, setPhase] = useState<RunPhase>('loading');
   const [grid, setGrid] = useState<string[][]>([]);
   const [lvl, setLvl] = useState<PlayLevel | null>(null);
@@ -84,6 +74,11 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
   const [combat, setCombat] = useState<CombatState | null>(null);
   const [combatFx, setCombatFx] = useState<CombatFxEntry[]>([]);
   const fxSeqRef = useRef(0);
+  // --- Act map (server-derived from the run seed; never computed here).
+  const [map, setMap] = useState<RunMap | null>(null);
+  const [currentNode, setCurrentNode] = useState<string | null>(null);
+  const [reachable, setReachable] = useState<string[]>([]);
+  const [nodeState, setNodeState] = useState<NodeState | null>(null);
 
   const tokenRef = useRef('');
   const pendingRunTokenRef = useRef('');
@@ -98,6 +93,9 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
   const dealtAtRef = useRef(0);
   const dealtRunTokenRef = useRef('');
   const autoBeginRef = useRef(false);
+  const startedAtRef = useRef(0);
+  const nodeKindRef = useRef<NodeKind | undefined>(undefined);
+  const currentNodeRef = useRef<string | null>(null);
 
   const relics = useMemo(() => run?.relics ?? [], [run]);
   const kind = lvl?.kind;
@@ -106,7 +104,8 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
   const combatLevel = !!lvl && isCombatKind(lvl.kind);
   const bossHp = combatLevel && lvl ? Math.max(0, lvl.bossHp - score) : 0;
   const boss: BossPhase | null = lvl?.isBoss ? bossPhase(bossHp, lvl.bossHp) : null;
-  const hintsLeft = Math.max(0, hintCharges(relics) + extraHints - hintsGiven.length);
+  // Rest-site hint upgrades ride on the run (`bh`), on top of the relic charges.
+  const hintsLeft = Math.max(0, hintCharges(relics) + (run?.bh ?? 0) + extraHints - hintsGiven.length);
   const potionsLeft = useMemo(() => {
     const out = { ...NO_POTIONS };
     for (const id of Object.keys(out) as PotionId[]) out[id] = Math.max(0, (run?.potions?.[id] ?? 0) - potionsUsed[id]);
@@ -115,45 +114,12 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
   const targetsFound = useMemo(() => (targets ? words.filter((w) => targets.includes(w)) : []), [targets, words]);
   const chainLetter = kind === 'chain' && words.length ? Array.from(words[words.length - 1]).pop() ?? null : null;
 
-  const startLevel = useCallback(async (runToken?: string, pick?: number, retried = false) => {
-    const req = ++requestRef.current;
-    setPhase('loading');
-    try {
-      const res = await fetchWithAuth('/api/adventure/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ world, level, language, ...(runToken ? { runToken } : {}), ...(pick != null ? { pick } : {}) }),
-      });
-      if (res.status === 400 && runToken && !retried) {
-        // Stale / foreign run token: drop it and start a fresh run.
-        writeRun(world, null);
-        return startLevel(undefined, undefined, true);
-      }
-      if (!res.ok) throw new Error(`start ${res.status}`);
-      const data = await res.json();
-      if (req !== requestRef.current) return;
-      tokenRef.current = data.token;
-      dealtAtRef.current = Date.now();
-      if (data.runToken) dealtRunTokenRef.current = data.runToken;
-      const r: PublicRun | null = data.run ?? null;
-      setRun(r);
-      if (data.runToken && r) writeRun(world, { runToken: data.runToken, run: r });
-      hpRef.current = r?.hp ?? BASE_HP;
-      setHp(hpRef.current);
-      setHints(Array.isArray(data.hints) ? data.hints : []);
-      setTargets(Array.isArray(data.targets) ? data.targets : undefined);
-      setGrid(data.grid);
-      setLvl(data.level);
-      setMsLeft((data.seconds ?? data.level.seconds) * 1000);
-      setPhase('ready');
-    } catch (err) {
-      console.error('[adventure] start failed', err);
-      if (req === requestRef.current) setPhase('error');
-    }
-  }, [world, level, language]);
-
-  // New attempt: reset, then draft (stored offer for this level) or deal.
-  useEffect(() => {
+  /**
+   * Everything ONE board's attempt owns. Every fresh deal goes through this —
+   * the attempt effect and the in-place `newRun()` alike — so no path can reset
+   * half of it (the missing half was `finishingRef`, which latches `finish()`).
+   */
+  const resetAttempt = useCallback(() => {
     setWords([]);
     wordsRef.current = [];
     setResult(null);
@@ -168,25 +134,166 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
     setBossHits(0);
     finishingRef.current = false;
     autoBeginRef.current = false;
+  }, []);
+
+  /** Fold a `{ runToken, run, map, currentNode, reachable }` view from either endpoint into state. */
+  const applyView = useCallback((data: Record<string, unknown>) => {
+    const r = (data.run ?? null) as PublicRun | null;
+    setRun(r);
+    if (data.map) setMap(data.map as RunMap);
+    if ('currentNode' in data) setCurrentNode((data.currentNode ?? null) as string | null);
+    if (Array.isArray(data.reachable)) setReachable(data.reachable as string[]);
+    if (typeof data.runToken === 'string' && r) {
+      dealtRunTokenRef.current = data.runToken;
+      pendingRunTokenRef.current = data.runToken;
+      writeRun(world, { runToken: data.runToken, run: r });
+    }
+    return r;
+  }, [world]);
+
+  const startLevel = useCallback(async (runToken?: string, pick?: number, retried = false, node?: string) => {
+    const req = ++requestRef.current;
+    setPhase('loading');
+    try {
+      const res = await fetchWithAuth('/api/adventure/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          world, level, language,
+          ...(node ?? nodeId ? { nodeId: node ?? nodeId } : {}),
+          ...(runToken ? { runToken } : {}), ...(pick != null ? { pick } : {}),
+        }),
+      });
+      if (res.status === 400 && runToken && !retried) {
+        // Stale / foreign / v1 run token (`code: 'run_version'`): drop it, start fresh.
+        writeRun(world, null);
+        return startLevel(undefined, undefined, true, node);
+      }
+      if (!res.ok) throw new Error(`start ${res.status}`);
+      const data = await res.json();
+      if (req !== requestRef.current) return;
+      tokenRef.current = data.token;
+      dealtAtRef.current = Date.now();
+      nodeKindRef.current = data.nodeKind;
+      currentNodeRef.current = data.currentNode ?? null;
+      setNodeState(null);
+      const r = applyView(data);
+      hpRef.current = r?.hp ?? BASE_HP;
+      setHp(hpRef.current);
+      setHints(Array.isArray(data.hints) ? data.hints : []);
+      setTargets(Array.isArray(data.targets) ? data.targets : undefined);
+      setGrid(data.grid);
+      setLvl(data.level);
+      setMsLeft((data.seconds ?? data.level.seconds) * 1000);
+      setPhase('ready');
+    } catch (err) {
+      console.error('[adventure] start failed', err);
+      if (req === requestRef.current) setPhase('error');
+    }
+  }, [world, level, language, nodeId, applyView]);
+
+  /**
+   * The map half of a run: mint one, step onto a non-play node, or act on the
+   * node we stand on. Every reply carries the whole view, so the map on screen
+   * is always the server's map.
+   */
+  const callNode = useCallback(async (payload: Record<string, unknown>, retried = false): Promise<void> => {
+    const req = ++requestRef.current;
+    setPhase('loading');
+    try {
+      const runToken = pendingRunTokenRef.current || dealtRunTokenRef.current;
+      const res = await fetchWithAuth('/api/adventure/node', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ world, ...(runToken ? { runToken } : {}), ...payload }),
+      });
+      if (res.status === 400 && runToken && !retried) {
+        const code = await res.json().then((d) => d?.code).catch(() => null);
+        if (code === 'run_version') {
+          // v1 token: the run cannot be resumed, so open a fresh one on the map.
+          writeRun(world, null);
+          pendingRunTokenRef.current = '';
+          dealtRunTokenRef.current = '';
+          return callNode({}, true);
+        }
+      }
+      if (!res.ok) throw new Error(`node ${res.status}`);
+      const data = await res.json();
+      if (req !== requestRef.current) return;
+      const r = applyView(data);
+      hpRef.current = r?.hp ?? BASE_HP;
+      setHp(hpRef.current);
+      setOffer(r?.offer ?? null);
+      setNodeState((data.node ?? null) as NodeState | null);
+      setPhase(data.node ? 'node' : 'map');
+    } catch (err) {
+      console.error('[adventure] node failed', err);
+      if (req === requestRef.current) setPhase('error');
+    }
+  }, [world, applyView]);
+
+  /** Open the act map for this world (mints a run when there is none). */
+  const openMap = useCallback(() => callNode({}), [callNode]);
+  /**
+   * Abandon whatever run is stored and open a brand-new act map (the run-over
+   * restart). This happens IN PLACE (no remount), so it must run the SAME reset
+   * a fresh attempt does. Clearing a hand-picked subset here left the dead run's
+   * words and score on the next board, and left `finishingRef` latched — so that
+   * board's K.O. never settled: a dead end with no result screen and nothing to
+   * press but "back to map".
+   */
+  const newRun = useCallback(() => {
+    writeRun(world, null);
+    clearClearedNodes(world);
+    pendingRunTokenRef.current = '';
+    dealtRunTokenRef.current = '';
+    resetAttempt();
+    return callNode({});
+  }, [world, callNode, resetAttempt]);
+  /** Act on the node the run stands on (shop buy, rest choice, event answer). */
+  const nodeChoice = useCallback((choice: number) => callNode({ choice }), [callNode]);
+
+  /** Commit to a node: a fight deals a board, anything else resolves server-side. */
+  const chooseNode = useCallback((id: string) => {
+    const node = map?.nodes.find((n) => n.id === id);
+    if (node && !isPlayNode(node.kind)) return callNode({ nodeId: id });
+    setNodeState(null);
+    return startLevel(pendingRunTokenRef.current || dealtRunTokenRef.current || undefined, undefined, false, id);
+  }, [map, callNode, startLevel]);
+
+  // New attempt: reset, then draft (stored offer for this level) or deal.
+  useEffect(() => {
+    resetAttempt();
     const requests = requestRef;
     const stored = readRun(world);
-    if (stored && stored.run.step === level && stored.run.offer?.length) {
+    if (stored && stored.run.offer?.length) {
+      // A draft is pending from the last cleared node — take it before moving.
       pendingRunTokenRef.current = stored.runToken;
       setRun(stored.run);
       setOffer(stored.run.offer);
       setPhase('draft');
+    } else if (mapFirst) {
+      // The map is the entry point: prime the token FIRST — /node with no token
+      // mints a fresh run, which would silently throw away the run in progress.
+      pendingRunTokenRef.current = stored ? stored.runToken : '';
+      dealtRunTokenRef.current = '';
+      void callNode({});
     } else {
-      void startLevel(stored && stored.run.step === level ? stored.runToken : undefined);
+      void startLevel(stored ? stored.runToken : undefined);
     }
     // Drop any in-flight /start from the previous attempt.
     return () => { requests.current += 1; };
-  }, [world, level, language, attempt, startLevel]);
+  }, [world, level, language, attempt, startLevel, callNode, mapFirst, resetAttempt]);
 
-  /** Draft: take offer item `index`, or null to skip. */
+  /**
+   * Draft: take offer item `index`, or null to skip. The pick is applied on the
+   * MAP endpoint (not /start) because the run is still standing on the node it
+   * just cleared — the next board is dealt once the player picks their node.
+   */
   const choosePick = useCallback((index: number | null) => {
     setOffer(null);
-    void startLevel(pendingRunTokenRef.current, index ?? undefined);
-  }, [startLevel]);
+    void callNode({ pick: index ?? null });
+  }, [callNode]);
 
   const finish = useCallback(async (opts: { died?: boolean } = {}) => {
     if (finishingRef.current) return;
@@ -209,10 +316,25 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
       });
       if (!res.ok) throw new Error(`complete ${res.status}`);
       const data: RunResult = await res.json();
+      trackGameEnd(
+        ADVENTURE_MODE, data.score ?? 0, data.validWords?.length ?? 0, !!data.won,
+        startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : undefined,
+        { world, nodeKind: data.nodeKind ?? nodeKindRef.current, stars: data.stars ?? 0, runComplete: !!data.runComplete },
+      );
       if (data.nextRunToken && data.nextRun) {
         writeRun(world, { runToken: data.nextRunToken, run: { ...data.nextRun, offer: data.offer ?? data.nextRun.offer } });
+        // The run moved on: every later call (the draft pick, opening the map)
+        // must speak the NEW token. Only a remount used to pick this up from
+        // storage, so an in-place map → node → map flow replayed the old run
+        // and silently dropped this node's gold, offer and progress.
+        pendingRunTokenRef.current = data.nextRunToken;
+        dealtRunTokenRef.current = data.nextRunToken;
       } else {
+        // Run over (died or lost): the token is dead. Forget it, or the next
+        // "open the map" would resume a run the server will refuse.
         writeRun(world, null);
+        pendingRunTokenRef.current = '';
+        dealtRunTokenRef.current = '';
       }
       setResult(data);
       setPhase('done');
@@ -245,6 +367,9 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
     }
     endAtRef.current = Date.now() + msLeft;
     lastTickRef.current = Date.now();
+    startedAtRef.current = Date.now();
+    // Stable mode label across every adventure node — trackGameEnd dedupes on it.
+    trackGameStart(ADVENTURE_MODE, { world, level: lvl.level, levelKind: lvl.kind, nodeKind: nodeKindRef.current, nodeId: currentNodeRef.current });
     if (isCombatKind(lvl.kind)) {
       combatRef.current = initCombat({
         enemyId: lvl.enemyId ?? `${lvl.kind}-w${world}`,
@@ -268,20 +393,23 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
     begin();
   }, [phase, begin]);
 
-  // Clock + combat tick.
+  // Clock + combat tick. A backgrounded tab does not drain the level (or let the
+  // enemy keep swinging) — `tickClock` slides the deadline instead.
   useEffect(() => {
     if (phase !== 'playing') return;
     const id = setInterval(() => {
       const now = Date.now();
-      const left = Math.max(0, endAtRef.current - now);
-      // Commit only when the displayed second changes. At 5Hz this re-rendered
-      // the whole level screen — and every callback it hands the grid — right
-      // through the player's drag, rebinding the grid's global pointer
-      // listeners five times a second. Combat still ticks below at 200ms.
-      setMsLeft((prev) => (Math.ceil(prev / 1000) === Math.ceil(left / 1000) ? prev : left));
-      if (combatRef.current) dispatchCombat({ type: 'tick', dt: now - lastTickRef.current });
+      // `tickClock` slides the deadline for a backgrounded tab (and hands back the
+      // real dt for combat). The commit is still throttled to the displayed
+      // second: at 5Hz this re-rendered the whole level screen — and every
+      // callback it hands the grid — right through the player's drag.
+      const paused = typeof document !== 'undefined' && document.visibilityState === 'hidden';
+      const t = tickClock({ now, endAt: endAtRef.current, lastTick: lastTickRef.current, paused });
+      endAtRef.current = t.endAt;
+      setMsLeft((prev) => (Math.ceil(prev / 1000) === Math.ceil(t.msLeft / 1000) ? prev : t.msLeft));
+      if (combatRef.current && t.dt > 0) dispatchCombat({ type: 'tick', dt: t.dt });
       lastTickRef.current = now;
-      if (left === 0) void finish();
+      if (t.expired) void finish();
     }, 200);
     return () => clearInterval(id);
   }, [phase, finish, dispatchCombat]);
@@ -382,9 +510,26 @@ export function useAdventureRun({ world, level, language, isWord }: Options) {
     [run, trophy],
   );
 
+  /** What this node moved elsewhere in the game — zeroed until the server answers. */
+  const ecosystem = useMemo<EcosystemGains | null>(() => (result ? {
+    xpGained: result.xpGained ?? 0,
+    coinsGained: result.coinsGained ?? 0,
+    leaderboardPoints: result.leaderboardPoints ?? 0,
+    achievementsUnlocked: result.achievementsUnlocked ?? [],
+    ...(result.levelUp ? { levelUp: result.levelUp } : {}),
+    ...(result.streak ? { streak: result.streak } : {}),
+  } : null), [result]);
+
+  const nextNodes = useMemo(
+    () => (map ? reachable.map((id) => map.nodes.find((n) => n.id === id)).filter((n): n is NonNullable<typeof n> => !!n) : []),
+    [map, reachable],
+  );
+
   return {
     phase, grid, lvl, words, score, msLeft, frozen, bossHp, boss, bossHits, result,
     begin, submitWord, retry, finish, shiftClock,
+    // act map
+    map, currentNode, reachable, nextNodes, chooseNode, openMap, newRun, nodeState, nodeChoice, ecosystem,
     // roguelike
     run, offer, choosePick, points: scored.points,
     hints, hintsLeft, hintsGiven, takeHint, grantHint, revealFullHint: revealsFullHint(relics),

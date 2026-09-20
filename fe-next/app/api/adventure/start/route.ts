@@ -1,9 +1,16 @@
 /**
- * POST /api/adventure/start { world, level, language, runToken?, pick? }
+ * POST /api/adventure/start { world, nodeId, language, runToken?, pick? }
  * Deals the board server-side and returns it inside a signed attempt token.
- * Roguelike: no runToken → fresh run; with one → verify, step === level,
- * apply the draft pick (omitted = skip). Hunt levels get target words seeded
- * from what the solver finds; every level gets a hint pool.
+ *
+ * Roguelike v2: the run carries its position on the act map, so the gate is
+ * "`nodeId` is an edge out of the run's current node" (the old `step === level`
+ * check could not express a branching map). The level played is derived from
+ * the node — fights borrow the world's level specs by row, elites level 4,
+ * the boss level 7 — so stars / unlocks / collection keep their existing rows.
+ *
+ * Without a runToken a fresh run is minted and `nodeId` must be on row 0.
+ * A v1 token is rejected with `code: 'run_version'`; the client drops its
+ * stored run and starts over.
  */
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,10 +20,12 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { loadWordChecker } from '@/lib/server/dictionarySet';
-import { getPlayLevel } from '@/lib/adventure/play/levels';
+import { getPlayLevel, WORLD_COUNT } from '@/lib/adventure/play/levels';
 import { canPlayLevel } from '@/lib/adventure/play/progress';
 import { signAttempt } from '@/lib/adventure/play/attemptToken';
-import { freshRun, verifyRun, applyPick, skipPick, signRun, publicRun, type RunPayload } from '@/lib/adventure/play/runToken';
+import { freshRun, verifyRun, applyPick, skipPick, enterNode, type RunPayload } from '@/lib/adventure/play/runToken';
+import { buildRunMap, canEnter, isPlayNode, nodeById, nodeLevel } from '@/lib/adventure/play/runMap';
+import { runView } from '@/lib/adventure/play/runView';
 import { dealLevel, solveBoard } from '@/lib/adventure/play/deal';
 import { attemptSeconds } from '@/lib/adventure/play/settleRun';
 import { makeRng } from '@/lib/adventure/play/rng';
@@ -27,7 +36,7 @@ import type { Language } from '@/types';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const invalidRun = () => NextResponse.json({ error: 'Invalid run' }, { status: 400 });
+const invalidRun = (code: string) => NextResponse.json({ error: 'Invalid run', code }, { status: 400 });
 
 export async function POST(request: NextRequest) {
   const rl = checkApiRateLimit(request, 'adventure-start', { maxRequests: 30, windowMs: 60_000 });
@@ -38,11 +47,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => null);
   const world = Number(body?.world);
-  const level = Number(body?.level);
-  let lvl;
-  try {
-    lvl = getPlayLevel(world, level);
-  } catch {
+  if (!Number.isInteger(world) || world < 1 || world > WORLD_COUNT) {
     return NextResponse.json({ error: 'Invalid level' }, { status: 400 });
   }
 
@@ -53,30 +58,55 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Adventure unavailable' }, { status: 503 });
   }
 
-  // Run: fresh, or the chained token from the last cleared level (+ draft pick).
+  // Run: fresh (row 0 only), or the chained token from the last node (+ draft pick).
   let run: RunPayload;
+  let freshWorldGate = false;
   if (body?.runToken != null) {
     const prev = verifyRun(body.runToken, secret);
-    if (!prev || prev.u !== user.id || prev.w !== world || prev.step !== level) return invalidRun();
-    if (body.pick == null) {
+    if (!prev || prev.u !== user.id || prev.w !== world) return invalidRun('run_version');
+    if (body.pick === null || body.pick === undefined) {
       run = skipPick(prev);
     } else {
       const picked = applyPick(prev, Number(body.pick));
-      if (!picked) return invalidRun();
+      if (!picked) return invalidRun('pick');
       run = picked;
     }
   } else {
-    run = { ...freshRun(world, user.id, randomUUID()), step: level };
+    run = freshRun(world, user.id, randomUUID());
+    freshWorldGate = true;
   }
 
+  // The map edge is the in-run gate; `canPlayLevel` only guards world unlock.
+  // A missing nodeId means "the obvious one": the run's current node (a re-deal
+  // after the player lingered on the rule cards) or, on a fresh run, row 0 lane 0.
+  const map = buildRunMap(run.seed, run.w);
+  const requested = typeof body?.nodeId === 'string' ? body.nodeId : (run.node ?? map.nodes.find((n) => n.row === 0)?.id);
+  const target = nodeById(map, requested);
+  if (!target) return invalidRun('node');
+  // Re-dealing the node the run already stands on is a re-deal, not a move.
+  const reDeal = target.id === run.node;
+  if (!reDeal && !canEnter(map, run.node, target.id)) return invalidRun('unreachable');
+  if (!isPlayNode(target.kind)) return invalidRun('not_play_node');
+  const level = nodeLevel(target)!;
+
+  let lvl;
   try {
-    const completions = await loadCompletions(db, user.id);
-    if (!canPlayLevel(completions, world, level)) {
-      return NextResponse.json({ error: 'Locked' }, { status: 403 });
+    lvl = getPlayLevel(world, level);
+  } catch {
+    return NextResponse.json({ error: 'Invalid level' }, { status: 400 });
+  }
+  if (!reDeal) run = enterNode(run, target.id);
+
+  if (freshWorldGate) {
+    try {
+      const completions = await loadCompletions(db, user.id);
+      if (!canPlayLevel(completions, world, 1)) {
+        return NextResponse.json({ error: 'Locked' }, { status: 403 });
+      }
+    } catch (err) {
+      console.error('[ADVENTURE START]', err);
+      return NextResponse.json({ error: 'Adventure unavailable' }, { status: 503 });
     }
-  } catch (err) {
-    console.error('[ADVENTURE START]', err);
-    return NextResponse.json({ error: 'Adventure unavailable' }, { status: 503 });
   }
 
   const language = adventureLang(body?.language);
@@ -89,7 +119,7 @@ export async function POST(request: NextRequest) {
       lvl,
       language,
       isWord: isWord ?? (() => false),
-      rand: makeRng(`${run.seed}:deal:${level}:${Date.now()}`),
+      rand: makeRng(`${run.seed}:deal:${target.id}:${Date.now()}`),
       solve,
       common,
       generate: (targetWords) => (targetWords
@@ -115,8 +145,8 @@ export async function POST(request: NextRequest) {
     level: lvl,
     /** Level clock incl. relic bonus (time potions extend it client-side). */
     seconds: attemptSeconds({ w: world, l: level, r: run.relics, tp: 0 }),
-    run: publicRun(run),
-    runToken: signRun(run, secret),
+    ...runView(run, secret),
+    nodeKind: target.kind,
     hints: deal.hints,
     ...(deal.targets ? { targets: deal.targets } : {}),
   });
