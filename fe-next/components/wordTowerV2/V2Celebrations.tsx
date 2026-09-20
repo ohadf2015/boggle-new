@@ -51,15 +51,15 @@ export function V2Celebrations({ t, callout, banners, onBannerDone }: Props) {
 
   return (
     <>
-      {/* Callout just under the HUD column, over the drop gap the eye is on. */}
-      <div className="pointer-events-none absolute inset-x-0 top-[20%] z-20 flex justify-center px-4" aria-live="polite">
+      {/* Callout in the drop gap the eye is on — BELOW the streak meter (which
+          owns the top of the play area); at top-20% the two used to overlap. */}
+      <div className="pointer-events-none absolute inset-x-0 top-[27%] z-20 flex justify-center px-4" aria-live="polite">
         {shown ? (
           <div
             key={shown.key}
-            className={`flex items-baseline gap-2 rounded-neo border-neo-thick border-black px-5 py-1.5 font-neo-display text-3xl font-black uppercase shadow-hard-lg animate-neo-pop ${TONE_CLASS[shown.tone]}`}
+            className={`flex items-baseline gap-2 rounded-neo border-neo-thick border-black px-4 py-1 font-neo-display text-xl font-black uppercase shadow-hard animate-neo-pop lg:text-3xl ${TONE_CLASS[shown.tone]}`}
           >
             <span>{t(shown.textKey, shown.params)}</span>
-            {shown.points > 0 ? <span className="text-xl tabular-nums">+{shown.points}</span> : null}
           </div>
         ) : null}
       </div>

@@ -11,10 +11,15 @@ const t = (key: string, params?: Record<string, string | number>) =>
   params ? `${key}:${Object.values(params).join(',')}` : key;
 
 describe('V2Celebrations callout lane', () => {
-  it('given a landing callout with points, when rendered, then the copy and payout show', () => {
+  /**
+   * The callout is the VERDICT only. The payout number belongs on the block
+   * (`ImpactBurst`) — round 2 drew a bigger `+100` up here than the one at the
+   * landing, so the eye read the HUD instead of the drop it was paid for.
+   */
+  it('given a landing callout with points, when rendered, then only the verdict shows (the number is on the block)', () => {
     render(<V2Celebrations t={t} callout={{ key: 1, textKey: 'wordTowerV2.call.perfect.2', tone: 'lime', points: 100 }} banners={[]} onBannerDone={() => {}} />);
     expect(screen.getByText('wordTowerV2.call.perfect.2')).toBeTruthy();
-    expect(screen.getByText('+100')).toBeTruthy();
+    expect(screen.queryByText('+100')).toBeNull();
   });
 
   it('given a callout, when its time passes, then it clears (never sticks)', () => {

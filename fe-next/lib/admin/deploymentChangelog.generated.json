@@ -1,6 +1,132 @@
 {
-  "generatedAt": "2026-09-19T13:32:18.800Z",
+  "generatedAt": "2026-09-20T05:31:05.746Z",
   "commits": [
+    {
+      "sha": "dc883510a252d927d40df02a58c99c56857c91d4",
+      "shortSha": "dc88351",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-20",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T07:02:58+03:00"
+    },
+    {
+      "sha": "7870b03e4127556b2a80eefde39ca490bde8f2c4",
+      "shortSha": "7870b03",
+      "subject": "fix(motion): stop spring multi-keyframe console errors on /en (t_15ec0d7a) (#1054)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T05:36:33+04:00"
+    },
+    {
+      "sha": "73ec80f7c880ee34b43d81ae14bcbee87d92ab20",
+      "shortSha": "73ec80f",
+      "subject": "fix: unfreeze Word Tower after Android hint ads (#1077)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T05:35:47+04:00"
+    },
+    {
+      "sha": "e389b26336a48cc3047062b72d38a144e5b1c0a6",
+      "shortSha": "e389b26",
+      "subject": "fix(education): rerun design audit on master (contrast, dead neo-gray, reduced motion, SSR, RTL, i18n) (#1092)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T05:12:21+04:00"
+    },
+    {
+      "sha": "cfd181dbf63bffd34a0d773c5c111f64a0f4cad7",
+      "shortSha": "cfd181d",
+      "subject": "feat(edu): slice 4 moat — glossed CEFR lists, real 60s demo clock, live ?cefr= handoff (t_a663cb18) (#1043)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T04:51:01+04:00"
+    },
+    {
+      "sha": "b1b4f86c662dfe09a580470673a0b2b1b59dfd86",
+      "shortSha": "b1b4f86",
+      "subject": "feat(edu): funnel instrumentation, trial-expiry upsell, and Polar dunning guard (#1040)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T04:20:51+04:00"
+    },
+    {
+      "sha": "35209313a1497e763a0032ad8c2f68c3c5f41dc4",
+      "shortSha": "3520931",
+      "subject": "fix(blast): Wordfall HUD polish — mute control, RTL counter, frame seam, badge balance (#1091)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T02:43:27+04:00"
+    },
+    {
+      "sha": "5fb753f8951b3170d372c98078d5ae7e62320602",
+      "shortSha": "5fb753f",
+      "subject": "feat(teacher): last-lesson progress digest on reports (edu funnel) (#1090)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T00:52:46+04:00"
+    },
+    {
+      "sha": "d7154cd14cbc8d2ed261c32ab4b8087e9d729c19",
+      "shortSha": "d7154cd",
+      "subject": "feat(adventure): roguelike word RPG — combat, relics, draft, level variety, hints",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T23:26:45+03:00"
+    },
+    {
+      "sha": "9eb89760c97cac3b9c1e6e00f08f9f4578ff3bdd",
+      "shortSha": "9eb8976",
+      "subject": "feat(word-tower-v2): apartment floors, Pixi sky, gameplay crates, badges",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T21:50:47+03:00"
+    },
+    {
+      "sha": "066cb94933ce6ead1230a1d8f4e60c5b608cec9e",
+      "shortSha": "066cb94",
+      "subject": "fix(home): sync header/top-bar streak pills to the account, not the device (#1089)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T21:21:00+04:00"
+    },
+    {
+      "sha": "fc299aa9989e459f48a679cdfd4d27bebc53f2d5",
+      "shortSha": "fc299aa",
+      "subject": "feat(word-tower-v2): big full-width slabs, real tower crane, unstuck toasts, calmer sky",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T20:05:38+03:00"
+    },
+    {
+      "sha": "df2ca83b442fada5ea2cdd0d50d8401f9840cfcc",
+      "shortSha": "df2ca83",
+      "subject": "test(i18n): drop pruned adventure keys from the locale-parity list",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T17:58:46+03:00"
+    },
+    {
+      "sha": "a1e8b131a21e36f4ddae444824868158a4446be7",
+      "shortSha": "a1e8b13",
+      "subject": "chore: refresh generated changelog, i18n manifest, translation report, routes",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T17:25:15+03:00"
+    },
+    {
+      "sha": "a2cb11af748fe09f870847a8464718c581739379",
+      "shortSha": "a2cb11a",
+      "subject": "feat(word-tower-v2): tenants move into every good floor",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T17:24:33+03:00"
+    },
+    {
+      "sha": "7c5661afbbca3955ae3921a587f179acbaf900ce",
+      "shortSha": "7c5661a",
+      "subject": "feat(word-tower-v2): bring back the spinning sunburst, cheaply",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T16:52:12+03:00"
+    },
+    {
+      "sha": "831717c4dbafc9c1a6039a3875a1f6794bc2c160",
+      "shortSha": "831717c",
+      "subject": "feat(word-tower-v2): fix flicker + reversed Hebrew, bigger slabs, one floor, more props",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T16:50:50+03:00"
+    },
+    {
+      "sha": "eeb19240371bdc88d9c5c6da621936ee6fe0d813",
+      "shortSha": "eeb1924",
+      "subject": "fix(avatar): restore real faces on landing leaderboard + header",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T16:41:50+03:00"
+    },
     {
       "sha": "df4bcac65b0bff4124c583f60e71babfe4909d7a",
       "shortSha": "df4bcac",
@@ -14,132 +140,6 @@
       "subject": "fix(adventure): Russian word checks, prune dead adventure keys and assets",
       "author": "Ohad Fisher",
       "date": "2026-09-19T15:59:13+03:00"
-    },
-    {
-      "sha": "743f71b6fcdec4d4f9095ae239593c0681e5b235",
-      "shortSha": "743f71b",
-      "subject": "fix(nightly): unblock the gate — OOM heap, baseline check, bisect, restore, retry, spend cap",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T14:47:25+03:00"
-    },
-    {
-      "sha": "0c6356be7ddb213fdc9209ec51f2b81c4a51bd9f",
-      "shortSha": "0c6356b",
-      "subject": "feat(education): close classroom gaps + teacher What's new",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T14:00:03+03:00"
-    },
-    {
-      "sha": "15628813515a24b87a2efc79fe16b729aa3158b6",
-      "shortSha": "1562881",
-      "subject": "feat: land nightly 2026-09-19 salvage (dropped by an OOM gate)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T14:19:42+03:00"
-    },
-    {
-      "sha": "26f60b89aff0ef63a1b6aed9fa8af2104a5ea8b0",
-      "shortSha": "26f60b8",
-      "subject": "fix(i18n): landing first-paint subset drops mode-card and nav keys",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T14:16:49+03:00"
-    },
-    {
-      "sha": "cc6862cb479c06f38815bee88e001fbd950b17a4",
-      "shortSha": "cc6862c",
-      "subject": "fix(education): student report metrics read a table that never existed",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T11:14:34+03:00"
-    },
-    {
-      "sha": "bec7792862c3a4b97c06ec07e1588cf09cc6467c",
-      "shortSha": "bec7792",
-      "subject": "fix(sentry): stale howler listeners, unregistered NOT_IN_GAME code, pulse loading key",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T10:54:09+03:00"
-    },
-    {
-      "sha": "337893446488948af651d94415d144daed2c037a",
-      "shortSha": "3378934",
-      "subject": "feat(adventure): rebuild adventure on the classic board with world skins (#1086)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T15:07:44+04:00"
-    },
-    {
-      "sha": "3a8644e220cf01a29df41aef7e8e814578b79428",
-      "shortSha": "3a8644e",
-      "subject": "feat(edu): surface ReteachActions on TV recap for classroom hosts (#1080)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T15:00:11+04:00"
-    },
-    {
-      "sha": "ed1727c57d8b2aa4c66b7adba38cbd6ba5507741",
-      "shortSha": "ed1727c",
-      "subject": "fix(word-tower-v2): strip emoji from the rival-tower share text",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T13:32:42+03:00"
-    },
-    {
-      "sha": "b3200180f582e4a1902a07f26ec3f3a9f3703811",
-      "shortSha": "b320018",
-      "subject": "test(edu): give the TV phone-layout quiz fixture the treasure-chest fields",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T12:36:27+03:00"
-    },
-    {
-      "sha": "3ba74f62c9106349c349ead88ac64b648b7ac47e",
-      "shortSha": "3ba74f6",
-      "subject": "feat(word-tower-v2): truthful drop guide, bigger blocks, neon city backdrop, wrecking-ball smash round",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T12:16:40+03:00"
-    },
-    {
-      "sha": "d630dcb7adb9ad90cf3e65172ee834e40db87128",
-      "shortSha": "d630dcb",
-      "subject": "feat(education): edu-fun gauntlet — nav, join, juice, lobby, chests, results, word craft, content, pro (#1084)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T13:14:17+04:00"
-    },
-    {
-      "sha": "d537e943f34b04e704fef38d788b4bc33ad0bc3a",
-      "shortSha": "d537e94",
-      "subject": "fix(edu): make classroom TV mode usable on a phone",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T11:44:34+03:00"
-    },
-    {
-      "sha": "446a03c3be0885043ae3350f1bef5256339c07cb",
-      "shortSha": "446a03c",
-      "subject": "perf(landing): AvatarLite + 77KiB i18n subset off /en first paint (#1083)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T12:31:12+04:00"
-    },
-    {
-      "sha": "714f143014e45398b0f67f90cf6fa9800f05e68d",
-      "shortSha": "714f143",
-      "subject": "seo: daily meta tag improvements (2026-09-19) (#1081)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T11:33:07+04:00"
-    },
-    {
-      "sha": "a6baa8ea71015c3e85fe4f38bb7bd10e18459db7",
-      "shortSha": "a6baa8e",
-      "subject": "feat(edu): surface classroom join link and first-assignment nudge (#1082)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T11:33:04+04:00"
-    },
-    {
-      "sha": "243ab43ef47b9905be502b5c6a6198fb04fd4f2c",
-      "shortSha": "243ab43",
-      "subject": "chore(i18n): refresh translation report",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T10:19:54+03:00"
-    },
-    {
-      "sha": "5225f87892be2d672f7270d898eeb07781ee1c92",
-      "shortSha": "5225f87",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-19",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T04:37:55+03:00"
     }
   ]
 }

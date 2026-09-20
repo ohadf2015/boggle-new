@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Body } from 'matter-js';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { SOUND_EFFECTS } from '@/lib/audio/soundEffectsConfig';
 import { type RunStats, emptyStats, loadUnlocked, newlyUnlocked, saveUnlocked } from '@/lib/wordTowerV2/achievements';
@@ -12,6 +13,7 @@ import {
   PX_PER_M,
   type TowerWorld,
   createTowerWorld,
+  despawnBlock,
   getTowerHeightM,
   moveAttachedBlock,
   releaseBlock,
@@ -21,6 +23,7 @@ import {
   weldBelow,
 } from '@/lib/wordTowerV2/engine';
 import { type LandingQuality, type SupportTop, classifyLanding } from '@/lib/wordTowerV2/landing';
+import { NEUTRAL_PERKS, type Perks } from '@/lib/wordTowerV2/estate';
 import { type RewardId, steadySwing } from '@/lib/wordTowerV2/rewards';
 import { type RunState, type SurprisePayout, applyLanding, consumeDrop, createRun } from '@/lib/wordTowerV2/run';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
@@ -111,12 +114,23 @@ export function useTowerRun() {
   const dropCountRef = useRef(0);
   const hangingRef = useRef<Hanging | null>(null);
   const pendingRef = useRef<PendingLanding | null>(null);
+  /** Everything a hoist spent, so putting the word back costs the player nothing. */
+  const preHoistRef = useRef<{ run: RunState; longestWord: number } | null>(null);
   const bestRef = useRef(0);
   const beatBestRef = useRef(false);
   const statsRef = useRef<RunStats>(emptyStats());
   const unlockedRef = useRef<Set<string>>(new Set());
   const seenBiomesRef = useRef(new Set<string>(['downtown']));
   const bannerKeyRef = useRef(0);
+  /**
+   * Empire perks, fed in by the estate (NEUTRAL until it has loaded, so a run
+   * that starts before auth settles simply plays unperked rather than flipping
+   * mid-run). Every use multiplies through, so at level 0 this is identity.
+   */
+  const perksRef = useRef<Perks>(NEUTRAL_PERKS);
+  const setPerks = useCallback((next: Perks) => {
+    perksRef.current = next;
+  }, []);
 
   const [phase, setPhase] = useState<Phase>('composing');
   const [heightM, setHeightM] = useState(0);
@@ -188,6 +202,7 @@ export function useTowerRun() {
     const quality: LandingQuality = classifyLanding(
       { x: block.x, bottomY: block.y + block.heightPx / 2, angleRad: block.angleRad },
       pending.support,
+      perksRef.current.perfectWindowMult,
     );
     const out = applyLanding(runRef.current, { quality, wordLen: pending.wordLen });
     runRef.current = out.run;
@@ -273,9 +288,20 @@ export function useTowerRun() {
 
   /** Drives the crane: the hanging floor follows the swing until released. */
   const onBeforeStep = useCallback((nowMs: number) => {
+    const world = worldRef.current;
+    // Foundation perk: bleed off the settled tower's rocking. Pure damping —
+    // it can only make an existing wobble smaller, never add motion — and at
+    // swayMult 1 the loop is skipped entirely.
+    const sway = perksRef.current.swayMult;
+    if (sway < 1) {
+      const damp = 1 - (1 - sway) * 0.25;
+      for (const [id, body] of world.blocks) {
+        if (body.isStatic || !world.landed.has(id)) continue;
+        Body.setAngularVelocity(body, body.angularVelocity * damp);
+      }
+    }
     const hanging = hangingRef.current;
     if (!hanging) return;
-    const world = worldRef.current;
     const { x } = releaseKinematics(nowMs - hanging.startedAt, hanging.swing, 0);
     moveAttachedBlock(world, hanging.id, x, -(getTowerHeightM(world) * PX_PER_M + CRANE_CLEARANCE_PX));
   }, []);
@@ -287,9 +313,14 @@ export function useTowerRun() {
     return releaseKinematics(performance.now() - hanging.startedAt, hanging.swing, 0).vx;
   }, []);
 
-  /** Width the next floor would get for `word`, including a banked wide-load crate. */
+  /**
+   * Width the next floor would get for `word`: the banked wide-load crate AND
+   * the Foundation perk. The ghost slab and `hoist` must read the SAME numbers
+   * or the block that lands is not the one the player aimed with.
+   */
   const previewWidth = useCallback(
-    (word: string) => Math.round(blockWidthForWord(word) * runRef.current.nextWidthMult),
+    (word: string) =>
+      Math.round(blockWidthForWord(word) * runRef.current.nextWidthMult * (dropCountRef.current === 0 ? perksRef.current.baseWidthMult : 1)),
     [],
   );
 
@@ -297,27 +328,35 @@ export function useTowerRun() {
     (word: string) => {
       if (phase !== 'composing') return;
       const world = worldRef.current;
+      preHoistRef.current = { run: runRef.current, longestWord: statsRef.current.longestWord };
       const spent = consumeDrop(runRef.current);
       runRef.current = spent.run;
       setRun(spent.run);
 
       const id = `r${runNoRef.current}-b${dropCountRef.current}`;
+      // Foundation perk: the GROUND floor is wider, so the whole tower starts
+      // on a bigger footing. Later floors are untouched. Same predicate as
+      // previewWidth, read BEFORE the counter moves.
+      const perkWidth = dropCountRef.current === 0 ? perksRef.current.baseWidthMult : 1;
       dropCountRef.current += 1;
       labelsRef.current.set(id, word);
       spawnBlock(world, {
         id,
         x: 0,
         y: -(getTowerHeightM(world) * PX_PER_M + CRANE_CLEARANCE_PX),
-        widthPx: Math.round(blockWidthForWord(word) * spent.widthMult),
+        widthPx: Math.round(blockWidthForWord(word) * spent.widthMult * perkWidth),
         heightPx: BLOCK_HEIGHT_PX,
         vx: 0,
         attached: true,
       });
+      // Crane Yard perk: a longer period is a slower, easier swing. Never
+      // mutate the exported SWING — a copy per hoist.
+      const perkSwing = { ...SWING, periodMs: SWING.periodMs * perksRef.current.swingPeriodMult };
       hangingRef.current = {
         id,
         startedAt: performance.now(),
         wordLen: word.length,
-        swing: spent.steady ? steadySwing(SWING) : SWING,
+        swing: spent.steady ? steadySwing(perkSwing) : perkSwing,
         plumb: spent.plumb,
       };
       statsRef.current.longestWord = Math.max(statsRef.current.longestWord, word.length);
@@ -331,6 +370,34 @@ export function useTowerRun() {
     [phase, playWordLengthSound, playSound],
   );
 
+  /**
+   * Put the hanging word back on the wheel.
+   *
+   * Only legal while the slab still hangs: once it is released, physics owns it.
+   * The block leaves the world entirely (engine `despawnBlock` — no orphan body
+   * keeps colliding), the banked crate effects the hoist spent come back, and
+   * the label is dropped so a cancelled word never reaches the share list.
+   * Returns false when there is nothing to take back.
+   */
+  const cancelHoist = useCallback(() => {
+    const hanging = hangingRef.current;
+    if (!hanging || phase !== 'swinging') return false;
+    despawnBlock(worldRef.current, hanging.id);
+    labelsRef.current.delete(hanging.id);
+    hangingRef.current = null;
+    const before = preHoistRef.current;
+    if (before) {
+      runRef.current = before.run;
+      setRun(before.run);
+      statsRef.current.longestWord = before.longestWord;
+      preHoistRef.current = null;
+    }
+    setCallout(null);
+    playSound('buttonClick', { volume: 0.5 });
+    setPhase('composing');
+    return true;
+  }, [phase, playSound]);
+
   const drop = useCallback(() => {
     const hanging = hangingRef.current;
     if (!hanging) return;
@@ -339,7 +406,8 @@ export function useTowerRun() {
     const world = worldRef.current;
     const support = supportTop(world, hanging.id);
     const k = releaseKinematics(performance.now() - hanging.startedAt, hanging.swing, 0);
-    releaseBlock(world, hanging.id, hanging.plumb ? 0 : k.vx, hanging.plumb ? 0 : k.spin);
+    // Foundation perk: less spin off the hook is a floor that lands flatter.
+    releaseBlock(world, hanging.id, hanging.plumb ? 0 : k.vx, hanging.plumb ? 0 : k.spin * perksRef.current.swayMult);
     pendingRef.current = { id: hanging.id, wordLen: hanging.wordLen, support, releasedAt: performance.now() };
     hangingRef.current = null;
     playSound('swipeTransition', { volume: 0.4 });
@@ -394,6 +462,6 @@ export function useTowerRun() {
   return {
     worldRef, labelsRef, fxRef, hangingRef,
     phase, heightM, peakM, bestM, run, callout, banners, shiftBanner, newBest, runBadges, unlockedRef, statsRef,
-    onBeforeStep, getHangVx, previewWidth, hoist, drop, restart, setScrambles, seedDemo,
+    onBeforeStep, getHangVx, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, setPerks, perksRef,
   };
 }

@@ -32,10 +32,10 @@ describe('V2Hud', () => {
     expect(screen.queryByLabelText(/wordTowerV2\.hud\.effect/)).toBeNull();
   });
 
-  it('given a combo under two, when rendered, then no combo meter; at two, it shows', () => {
+  it('given any combo, when rendered, then the HUD draws no streak meter (StreakBar owns that channel)', () => {
     const { rerender } = render(hud({ run: { ...createRun(1), combo: 1 } }));
-    expect(screen.queryByLabelText('wordTower.a11y.combo:1')).toBeNull();
-    rerender(hud({ run: { ...createRun(1), combo: 2 } }));
-    expect(screen.getByLabelText('wordTower.a11y.combo:2')).toBeTruthy();
+    expect(screen.queryByLabelText(/a11y\.combo/)).toBeNull();
+    rerender(hud({ run: { ...createRun(1), combo: 4 } }));
+    expect(screen.queryByLabelText(/a11y\.combo/)).toBeNull();
   });
 });

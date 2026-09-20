@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Delete, Shuffle } from 'lucide-react';
+import { Delete, Shuffle, Undo2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -19,6 +19,14 @@ import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
 import { V2Hud } from './V2Hud';
 import { V2Results } from './V2Results';
+import { RevengeInbox } from './rivals/RevengeInbox';
+import { towerBlocksFrom } from './rewards/useRunPayout';
+import { RunRewards } from './rewards/RunRewards';
+import { useRewardsFlow } from './rewards/useRewardsFlow';
+import { useEstate } from './useEstate';
+import { DistrictScreen } from './estate/DistrictScreen';
+import { EstateButton } from './estate/EstateButton';
+import { PerkChips } from './estate/PerkChips';
 import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
 import { WreckScene } from './WreckScene';
@@ -43,7 +51,42 @@ export default function WordTowerV2() {
   const { profile } = useAuth();
   const { rival, share, copied } = useRivalTower(language);
   const [smashing, setSmashing] = useState(false);
-  const { phase, heightM, run, hoist, drop, restart, setScrambles, previewWidth, seedDemo } = game;
+  // A raid (rival board -> their tower) owns the whole screen like the smash round.
+  const [raiding, setRaiding] = useState(false);
+  /** Review hook only (`?demo=1&results=1`): show the end-of-run board now. */
+  const [forceResults, setForceResults] = useState(false);
+  /** The empire: one instance for the whole screen (perks, coins, district). */
+  const estateApi = useEstate();
+  const [district, setDistrict] = useState(false);
+  const { phase, heightM, run, hoist, cancelHoist, drop, restart, setScrambles, previewWidth, seedDemo } = game;
+
+  /**
+   * Desktop/TV: the wheel moves to a SIDE panel and the canvas becomes the play
+   * column, so the camera can spend the height on floors instead of sky (see
+   * camera.ts `dockSide`). Gated on aspect as well as width: a tall 1024px
+   * window keeps the phone framing, which is the one that is pinned by tests.
+   */
+  const [wide, setWide] = useState(false);
+  const wideRef = useRef(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px) and (min-aspect-ratio: 6/5)');
+    const apply = () => {
+      wideRef.current = mq.matches;
+      setWide(mq.matches);
+    };
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
+
+  // Perks reach the run through a ref, so they can never re-render mid-drop.
+  const setRunPerks = game.setPerks;
+  useEffect(() => {
+    setRunPerks(estateApi.perks);
+  }, [setRunPerks, estateApi.perks]);
+
+  // Variable rewards: coins per landing, the streak meter, the end-of-run chest.
+  const rewardsFlow = useRewardsFlow({ game, estateApi, run, heightM, phase, playSound, language });
 
   const dictRef = useRef<Set<string> | null>(null);
   const [dictReady, setDictReady] = useState(false);
@@ -58,18 +101,22 @@ export default function WordTowerV2() {
   const dockRef = useRef<HTMLDivElement | null>(null);
   const dockPxRef = useRef(260);
 
-  // The canvas frames the ground at the dock's real top edge.
+  // The canvas frames the ground at the dock's real top edge. A SIDE dock
+  // covers nothing at the bottom, so it contributes 0 — measuring its
+  // full-height panel there would collapse the whole play area.
   useEffect(() => {
     const el = dockRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => {
-      dockPxRef.current = el.getBoundingClientRect().height;
+    const measure = () => {
+      dockPxRef.current = wideRef.current ? 0 : el.getBoundingClientRect().height;
       // CSS var, not state: the first-floor hint sits above the dock without a re-render.
       el.parentElement?.style.setProperty('--wt2-dock', `${dockPxRef.current}px`);
-    });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [wide]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -77,6 +124,8 @@ export default function WordTowerV2() {
     // Review words, sanitized like a share link: `?demo=1&words=מגדל,לבנה`.
     const words = sanitizeWords(params.get('words')?.split(',') ?? []);
     if (params.has('demo')) seedDemo(words.length ? words : undefined);
+    // `?demo=1&results=1`: jump straight to the results board (rivals review).
+    if (params.has('demo') && params.has('results')) setForceResults(true);
     // `?demo=1&smash=1`: jump straight into the smash round for review.
     if (params.has('demo') && params.has('smash')) setSmashing(true);
   }, [seedDemo]);
@@ -204,8 +253,21 @@ export default function WordTowerV2() {
     setSelected((sel) => (sel.includes(i) ? sel.slice(0, sel.indexOf(i)) : sel));
   }, []);
 
+  /** The wheel exactly as it was before the last submit, for the undo. */
+  const preSubmitRef = useRef<{ wheel: string[]; selected: number[]; draw: number } | null>(null);
+  /**
+   * The wheel auto-builds a valid word 700ms after the last tile change
+   * (WordTowerWheel AUTO_BUILD_MS). A word restored by the undo looks exactly
+   * like "the player just finished spelling it", so the slab went straight back
+   * onto the hook and the undo undid itself. This swallows that one auto-fire:
+   * same selection, within a beat of the undo. A BUILD tap comes later and works.
+   */
+  const undoGuardRef = useRef<{ key: string; until: number } | null>(null);
+
   const submit = useCallback(() => {
     if (phase !== 'composing' || word.length === 0) return;
+    const guard = undoGuardRef.current;
+    if (guard && guard.key === selected.join(',') && performance.now() < guard.until) return;
     if (!isAcceptedWord(word, wheel, dictRef.current)) {
       setRejected(word.length < MIN_WORD_LEN ? 'too_short' : 'not_in_dictionary');
       playSound('wordRejected');
@@ -213,9 +275,37 @@ export default function WordTowerV2() {
       setSelected([]);
       return;
     }
+    preSubmitRef.current = { wheel, selected, draw: drawRef.current };
     hoist(word);
     deal(drawRef.current + 1);
-  }, [phase, word, wheel, hoist, playSound, deal]);
+  }, [phase, word, wheel, selected, hoist, playSound, deal]);
+
+  /**
+   * Put the hanging word back: the slab leaves the physics world and the wheel
+   * returns to the exact letters it was spelled from, still selected, ready to
+   * be edited. Legal only while it hangs — once dropped, physics owns it.
+   */
+  const putBack = useCallback(() => {
+    if (!cancelHoist()) return;
+    const prev = preSubmitRef.current;
+    if (!prev) return;
+    preSubmitRef.current = null;
+    undoGuardRef.current = { key: prev.selected.join(','), until: performance.now() + 1100 };
+    drawRef.current = prev.draw;
+    setWheel(prev.wheel);
+    setSelected(prev.selected);
+  }, [cancelHoist]);
+
+  /**
+   * Release the slab. The undo snapshot dies WITH the turn: once physics owns
+   * the floor there is nothing to put back, and a snapshot that outlived its
+   * turn would let the next slab's undo restore the previous turn's letters.
+   */
+  const dropFloor = useCallback(() => {
+    preSubmitRef.current = null;
+    undoGuardRef.current = null;
+    drop();
+  }, [drop]);
 
   const scramble = useCallback(() => {
     const next = spendScramble(run);
@@ -230,8 +320,15 @@ export default function WordTowerV2() {
       if (isTypingTarget(event) || phase === 'over' || smashing) return;
       if (event.code === 'Space') {
         event.preventDefault();
-        if (phase === 'swinging') drop();
+        if (phase === 'swinging') dropFloor();
         else submit();
+        return;
+      }
+      // Above the composing gate on purpose: taking the word back is the one
+      // thing the player can do while the slab is on the hook.
+      if (phase === 'swinging' && (event.key === 'Backspace' || event.key === 'Escape')) {
+        event.preventDefault();
+        putBack();
         return;
       }
       if (phase !== 'composing') return;
@@ -244,7 +341,7 @@ export default function WordTowerV2() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, drop, submit, wheel, takeSlot, smashing]);
+  }, [phase, dropFloor, submit, wheel, takeSlot, smashing, putBack]);
 
   // Hold the results a beat so the player watches their tower come down.
   const [showOver, setShowOver] = useState(false);
@@ -269,13 +366,19 @@ export default function WordTowerV2() {
     });
 
   const biomeNow = biomeAt(floorsAt(heightM));
-  const score = totalScore(heightM, run.bonus);
+  // Landmark perk: the district multiplies what the run is worth.
+  const scoreMult = estateApi.perks.scoreMult;
+  const score = Math.round(totalScore(heightM, run.bonus) * scoreMult);
   const accentHex = `#${biomeNow.accent.toString(16).padStart(6, '0')}`;
+  // ONE source for the play column's box: the reward layer's impact FX is
+  // positioned in canvas px, so its container must share this exact rect (on
+  // RTL desktop the two differ by the whole side panel).
+  const canvasClass = wide ? 'absolute bottom-0 start-0 top-0 end-[22rem] xl:end-[26rem]' : 'absolute inset-0';
 
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-neo-navy" dir={dir}>
       {/* The smash round covers everything: don't run a second Pixi loop under it. */}
-      {!smashing ? (
+      {!smashing && !raiding ? (
         <TowerCanvas
           world={game.worldRef.current}
           labels={game.labelsRef.current}
@@ -291,17 +394,46 @@ export default function WordTowerV2() {
           onBeforeStep={game.onBeforeStep}
           onImpact={onImpact}
           onTenantArrive={onTenantArrive}
+          onLandPoint={rewardsFlow.fx.report}
           getSceneM={getSceneM}
           reducedMotion={reducedMotion}
-          className="absolute inset-0"
+          dockSide={wide ? 'inline' : 'bottom'}
+          className={canvasClass}
         />
       ) : null}
 
+      {phase !== 'over' && !smashing && !district ? (
+        <EstateButton t={t} estate={estateApi.estate} raids={estateApi.inbox.length} onOpen={() => setDistrict(true)} />
+      ) : null}
+      {phase !== 'over' && !smashing && !district && run.floors === 0 && !rival ? (
+        <PerkChips t={t} perks={estateApi.perks} onOpen={() => setDistrict(true)} />
+      ) : null}
+
       <V2Hud t={t} heightM={heightM} score={score} bestM={game.bestM} run={run} tenants={Math.min(arrived, run.tenants)} />
+      <RunRewards
+        t={t}
+        flow={rewardsFlow}
+        combo={run.combo}
+        bestCombo={run.bestCombo}
+        points={game.callout?.points ?? 0}
+        canvasClass={canvasClass}
+        hideInRun={smashing || district || showOver}
+        showChest={showOver}
+        wide={wide}
+        reducedMotion={reducedMotion}
+      />
       <V2Celebrations t={t} callout={game.callout} banners={game.banners} onBannerDone={game.shiftBanner} />
+      {/* One hint at a time, only on the first floor: spell it, then edit it,
+          then drop it. It sits ABOVE the dock and never over the tower. */}
       {phase !== 'over' && run.floors === 0 && heightM < 0.5 && !rival ? (
-        <div className="pointer-events-none absolute inset-x-4 bottom-[calc(var(--wt2-dock,17rem)+0.75rem)] z-20 mx-auto w-fit max-w-xs rounded-neo border-neo-thick border-black bg-neo-cream px-3 py-1.5 text-center font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-pop">
-          {t(phase === 'swinging' ? 'wordTowerV2.hint.drop' : 'wordTowerV2.hint.spell')}
+        <div className="pointer-events-none absolute inset-x-4 bottom-[calc(var(--wt2-dock,17rem)+0.75rem)] z-20 mx-auto w-fit max-w-xs rounded-neo border-neo-thick border-black bg-neo-cream px-3 py-1.5 text-center font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-pop lg:max-w-sm lg:px-5 lg:py-2.5 lg:text-lg">
+          {t(
+            phase === 'swinging'
+              ? 'wordTowerV2.hint.drop'
+              : selected.length >= 2
+                ? 'wordTowerV2.editHint'
+                : 'wordTowerV2.hint.spell',
+          )}
         </div>
       ) : null}
       {rival && phase === 'composing' && run.floors === 0 ? (
@@ -326,20 +458,30 @@ export default function WordTowerV2() {
           phases — the wheel morphs in place into the drop dial. */}
       <div
         ref={dockRef}
-        className="absolute inset-x-0 bottom-0 z-30 border-t-4 border-black bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-7"
+        className={
+          wide
+            ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-center border-s-4 border-neo-cream/30 bg-neo-navy px-6 xl:w-[26rem]'
+            : 'absolute inset-x-0 bottom-0 z-30 border-t-4 border-black bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-7'
+        }
       >
         {rejected ? (
           <div className="absolute inset-x-0 top-1 z-40 mx-auto w-fit rounded-neo border-neo border-black bg-neo-red px-3 py-1 font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-shake">
             {t(`wordTower.error.${rejected}`)}
           </div>
         ) : null}
-        <div className="mx-auto grid max-w-md grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 md:max-w-4xl md:grid-cols-[5rem_1fr_5rem] md:px-6">
+        <div
+          className={
+            wide
+              ? 'mx-auto flex w-full flex-wrap items-center justify-center gap-6 [&>div]:order-first [&>div]:w-full [&>div]:max-w-none'
+              : 'mx-auto grid max-w-md grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 md:max-w-4xl md:grid-cols-[5rem_1fr_5rem] md:px-6'
+          }
+        >
           <button
             type="button"
             onClick={scramble}
             disabled={run.scrambles === 0 || phase !== 'composing'}
             aria-label={t('wordTower.hud.scramble')}
-            className="relative flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-purple text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none"
+            className="relative flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-purple text-neo-navy shadow-hard lg:h-16 lg:w-16 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none"
           >
             <Shuffle className="h-6 w-6" aria-hidden />
             <span className="absolute -end-2 -top-2 rounded-full border-neo border-black bg-neo-cream px-1.5 font-neo-display text-xs font-black">
@@ -370,27 +512,32 @@ export default function WordTowerV2() {
               onSelectTile={selectTile}
               onDeselectTile={deselectTile}
               onSubmit={submit}
-              onDrop={drop}
+              onDrop={dropFloor}
             />
           )}
 
+          {/* One slot, two jobs: rub out a letter while spelling, take the whole
+              word back off the hook while it hangs. A second button would have
+              been a third control competing for the same corner. */}
           <button
             type="button"
-            onClick={() => setSelected((s) => s.slice(0, -1))}
-            disabled={selected.length === 0 || phase !== 'composing'}
-            aria-label={t('wordTower.hud.backspace')}
-            className="flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none"
+            onClick={phase === 'swinging' ? putBack : () => setSelected((s) => s.slice(0, -1))}
+            disabled={phase === 'swinging' ? !preSubmitRef.current : selected.length === 0 || phase !== 'composing'}
+            aria-label={t(phase === 'swinging' ? 'wordTowerV2.changeWord' : 'wordTower.hud.backspace')}
+            className={`flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black text-neo-navy shadow-hard transition-colors lg:h-16 lg:w-16 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none ${
+              phase === 'swinging' ? 'bg-neo-pink' : 'bg-neo-cream'
+            }`}
           >
-            <Delete className="h-6 w-6" aria-hidden />
+            {phase === 'swinging' ? <Undo2 className="h-6 w-6" aria-hidden /> : <Delete className="h-6 w-6" aria-hidden />}
           </button>
         </div>
       </div>
 
-      {showOver ? (
+      {(showOver && rewardsFlow.resultsReady) || forceResults ? (
         <V2Results
           t={t}
           peakM={game.peakM}
-          score={totalScore(game.peakM, run.bonus)}
+          score={Math.round(totalScore(game.peakM, run.bonus) * scoreMult)}
           bestM={game.bestM}
           isBest={game.newBest || game.peakM >= game.bestM - 0.01}
           run={run}
@@ -398,13 +545,38 @@ export default function WordTowerV2() {
           unlocked={game.unlockedRef.current}
           stats={game.statsRef.current}
           onRestart={() => {
+            preSubmitRef.current = null;
+            undoGuardRef.current = null;
             restart();
             setRunSeed(`wt2-${Date.now()}`);
           }}
           smashLabel={rival ? t('wordTowerV2.wreck.smash', { name: rivalName }) : t('wordTowerV2.wreck.smashOwn')}
           onSmash={smashWords ? () => setSmashing(true) : undefined}
           onShare={myWords.length >= 3 ? shareMine : undefined}
+          rivals={{
+            estate: estateApi,
+            balls: run.balls,
+            reducedMotion,
+            myTower: towerBlocksFrom(game.worldRef.current, game.labelsRef.current),
+            onRaidOpen: setRaiding,
+          }}
+          extra={
+            <EstateButton
+              t={t}
+              estate={estateApi.estate}
+              raids={estateApi.inbox.length}
+              variant="panel"
+              onOpen={() => setDistrict(true)}
+            />
+          }
         />
+      ) : null}
+
+      {district ? <DistrictScreen t={t} estate={estateApi} onClose={() => setDistrict(false)} /> : null}
+
+      {/* Someone raided you while you were away: a face, a grievance, a REVENGE button. */}
+      {phase !== 'over' && !smashing && !district && !showOver && !forceResults && run.floors === 0 ? (
+        <RevengeInbox t={t} estate={estateApi} balls={run.balls} reducedMotion={reducedMotion} onRaidOpen={setRaiding} />
       ) : null}
 
       {smashing && smashWords ? (
@@ -417,6 +589,8 @@ export default function WordTowerV2() {
           onShare={shareMine}
           onClose={() => {
             setSmashing(false);
+            preSubmitRef.current = null;
+            undoGuardRef.current = null;
             restart();
             setRunSeed(`wt2-${Date.now()}`);
           }}

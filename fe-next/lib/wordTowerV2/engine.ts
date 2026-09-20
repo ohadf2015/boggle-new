@@ -261,6 +261,33 @@ export function releaseBlock(
 }
 
 /**
+ * Take a block back out of the world — the player changing their mind about the
+ * word hanging on the hook.
+ *
+ * Every map that holds the id is cleared, so a cancelled slab leaks nothing:
+ * `blocks`, `bodyToId`, `landed`, `restMs`, the queued impacts and the Matter
+ * composite itself. The peak is re-measured afterwards because a hanging static
+ * block that a swaying floor brushed counts as `landed`, and therefore counts
+ * toward height — removing it would otherwise read as the tower dropping a floor
+ * and end the run on a cancel.
+ */
+export function despawnBlock(world: TowerWorld, id: string): boolean {
+  const body = world.blocks.get(id);
+  if (!body) return false;
+
+  Composite.remove(world.engine.world, body);
+  world.blocks.delete(id);
+  world.bodyToId.delete(body.id);
+  world.landed.delete(id);
+  world.restMs.delete(id);
+  world.pendingImpacts = world.pendingImpacts.filter((impact) => impact.id !== id);
+  world.peakHeightPx = Math.min(world.peakHeightPx, towerHeightPx(world));
+  world.collapseHeldMs = 0;
+
+  return true;
+}
+
+/**
  * Rebar crate: weld every landed floor except the top `keepTop` in place. Welded
  * floors become static, so the base can no longer shear or topple — only the
  * live top of the tower still rocks. Returns the ids welded.
