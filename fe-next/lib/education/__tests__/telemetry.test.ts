@@ -39,6 +39,8 @@ import {
   setEduClassroomContext,
   setEduTestAccountFlag,
   isTestAccountEmail,
+  trackEduLiveGameStarted,
+  trackEduReportsViewed,
 } from '../telemetry';
 
 describe('education telemetry', () => {
@@ -285,5 +287,38 @@ describe('education telemetry', () => {
       throw new Error('boom');
     });
     expect(() => setEduClassroomContext('cls-1')).not.toThrow();
+  });
+
+  it('classroom created event captures id + language so we can quote create vs join', () => {
+    trackEduClassroomCreated({ classroomId: 'cls-1', createdVia: 'dashboard', language: 'en' });
+    expect(captureMock).toHaveBeenCalledWith('edu_classroom_created', {
+      classroom_id: 'cls-1',
+      created_via: 'dashboard',
+      language: 'en',
+    });
+  });
+
+  it('live game started tags the teacher click source', () => {
+    trackEduLiveGameStarted({
+      classroomId: 'cls-1',
+      source: 'create_room',
+      lessonCount: 2,
+    });
+    expect(captureMock).toHaveBeenCalledWith('edu_live_game_started', {
+      classroom_id: 'cls-1',
+      source: 'create_room',
+      lesson_count: 2,
+    });
+  });
+
+  it('reports viewed fires with optional classroom scope', () => {
+    trackEduReportsViewed({});
+    expect(captureMock).toHaveBeenCalledWith('edu_reports_viewed', {});
+
+    trackEduReportsViewed({ classroomId: 'cls-1', studentId: 'stu-9' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_reports_viewed', {
+      classroom_id: 'cls-1',
+      student_id: 'stu-9',
+    });
   });
 });
