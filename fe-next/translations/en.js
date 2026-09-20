@@ -10880,6 +10880,18 @@ const en = {
       "firstAssignmentBody": "Students are on the roster. Assign a practice so the class has something to do when you're not live.",
       "firstAssignmentCta": "Create first assignment"
     },
+    "onboardingChecklist": {
+      "title": "Activate your class",
+      "progress": "{{done}} of {{total}} done",
+      "createClassroom": "Create a classroom",
+      "createClassroomCta": "Create classroom",
+      "createAssignment": "Create first assignment",
+      "createAssignmentCta": "Create assignment",
+      "shareJoin": "Share the join link",
+      "shareJoinCta": "Copy join link",
+      "viewReport": "View first progress report",
+      "viewReportCta": "Open report"
+    },
     "playNow": {
       "recommended": "Recommended",
       "title": "Play now",

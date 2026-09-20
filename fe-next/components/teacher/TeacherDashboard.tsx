@@ -1,8 +1,4 @@
-/**
- * TeacherDashboard — one screen, one button (PLAY NOW), lesson builder
- * below, everything else in a closed Tools disclosure.
- */
-
+/** TeacherDashboard — one screen, PLAY NOW, lesson builder, Tools disclosure. */
 'use client';
 
 import { type ReactNode, useState, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -13,9 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
-// Measured as the biggest remaining first-load cost on this dashboard, and it
-// renders only for a first-time teacher. `ssr: false` because it is a modal
-// nobody sees on the server render anyway.
+// First-load cost: modal only for a first-time teacher. ssr:false — overlay.
 const TeacherOnboarding = dynamic(
   () => import('@/components/education/TeacherOnboarding').then((m) => m.TeacherOnboarding),
   { ssr: false }
@@ -28,7 +22,7 @@ import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
 import { ClassPulseSection } from './dashboard/ClassPulseSection';
 import { ClassSwitcher } from './dashboard/ClassSwitcher';
 import { StudentCapMeter } from './StudentCapMeter';
-import { TeacherActivationNudgeLive } from './dashboard/TeacherActivationNudge';
+import { TeacherOnboardingChecklistLive } from './dashboard/TeacherOnboardingChecklist';
 import {
   QUICK_LAUNCH_FLOW,
   writeQuickLaunchIntent,
@@ -49,11 +43,7 @@ import Link from 'next/link';
 
 import { stagger, slideUp } from './teacherDashboardTabs';
 
-/**
- * The secondary row. A `border-black` outline on a `bg-neo-navy-light` fill
- * separates from the navy page by about 1.3:1 — a shape you can only find by
- * hunting for it. A cream edge is ~15:1 and costs nothing.
- */
+/** Cream edge on navy-light — black-on-navy was ~1.3:1. */
 const SHORTCUT_CLASS = cn(
   'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-neo-cream',
   'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
@@ -165,6 +155,13 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
     if (!go) return;
     go.scrollIntoView({ block: 'center', behavior: 'smooth' });
     go.focus();
+  }, []);
+
+  const focusCreateClassroom = useCallback(() => {
+    const card = document.querySelector<HTMLElement>('[data-testid="play-tab-first-run-card"]');
+    const btn = document.querySelector<HTMLButtonElement>('[data-testid="first-run-create-class"]');
+    card?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    btn?.focus();
   }, []);
 
   // Land back here with the missed words in hand, straight into the lesson
@@ -328,8 +325,8 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
             </nav>
 
             {/* Class switcher lives here, not in Tools: changing class used
-                to cost two taps. Pulse is last-game state; the activation
-                nudge is the join-link / first-assignment step. */}
+                to cost two taps. The checklist is classroom → assignment →
+                join link → first report. */}
             {!classroomsLoading && classrooms.length > 1 && (
               <ClassSwitcher
                 className="mb-3"
@@ -340,19 +337,25 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
               />
             )}
 
+            {!classroomsLoading && (
+              <TeacherOnboardingChecklistLive
+                className="mb-3"
+                classroomCount={classrooms.length}
+                classroomId={selectedClassroom?.id ?? null}
+                rosterCount={selectedClassroom?.member_count || 0}
+                joinCode={selectedClassroom?.join_code}
+                reportsHref={reportsHref}
+                onCreateClassroom={focusCreateClassroom}
+                onCreateAssignment={() => setShowAssignmentCreator(true)}
+              />
+            )}
+
             {!classroomsLoading && selectedClassroom && (
               <>
                 <StudentCapMeter
                   className="mb-3"
                   studentCount={selectedClassroom.member_count || 0}
                   source="dashboard"
-                />
-                <TeacherActivationNudgeLive
-                  className="mb-3"
-                  classroomId={selectedClassroom.id}
-                  rosterCount={selectedClassroom.member_count || 0}
-                  joinCode={selectedClassroom.join_code}
-                  onCreateAssignment={() => setShowAssignmentCreator(true)}
                 />
                 <ClassPulseSection
                   className="mb-6"
