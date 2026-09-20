@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
+import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -88,9 +89,20 @@ export async function POST(request: NextRequest) {
         break
       case 'subscription.updated':
       case 'subscription.cycled':
-      case 'subscription.past_due':
       case 'subscription.paused':
         await handleSubscriptionUpdated(payload, userId)
+        break
+      case 'subscription.past_due':
+        await handleSubscriptionUpdated(payload, userId)
+        // Churn guard: the row flip alone tells nobody. Email the teacher a
+        // one-click card-update link; deduped per subscription per 72h inside.
+        // A failure here must not fail the webhook — the state write above
+        // already landed, and Polar will redeliver the event.
+        try {
+          await maybeSendPaymentFailedEmail({ payload, userId })
+        } catch (err) {
+          console.error('[Polar] dunning email threw:', err)
+        }
         break
       case 'subscription.canceled':
         await handleSubscriptionCanceled(payload, userId)

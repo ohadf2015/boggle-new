@@ -42,6 +42,7 @@ import {
 import { getPresetValues, applyVocabularyCap, type ClassroomPresetId } from '@/lib/education/classroomPresets';
 import { clampTeamCount, type PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility } from '@/shared/types/classroom';
+import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { configuredRoundMinutes, recommendedModeBadge } from '@/lib/education/gameModes';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
@@ -299,6 +300,12 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
               ? accessibility
               : undefined,
         },
+      });
+
+      trackEduLiveGameStarted({
+        classroomId: selectedClassroomId,
+        source: 'create_room',
+        lessonCount: selectedLessonIds.length,
       });
     },
     [

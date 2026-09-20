@@ -22,6 +22,8 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { ProGate } from '@/components/teacher/ProGate';
+import { trackEduReportsViewed } from '@/lib/education/telemetry';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 32;
@@ -76,6 +78,21 @@ function TeacherReportsInner() {
     [pathname, router],
   );
 
+  const { hasPro } = useTeacherPro();
+  // Reports telemetry is a Pro-funnel signal: the free surface (picker +
+  // digest + upsell) is tracked separately, so only fire for a teacher who
+  // actually has reports in front of them.
+  useEffect(() => {
+    if (!hasPro) return;
+    const payload: { classroomId?: string; studentId?: string } = {};
+    if (classroomIdFromUrl) payload.classroomId = classroomIdFromUrl;
+    if (studentIdFromUrl) payload.studentId = studentIdFromUrl;
+    trackEduReportsViewed(payload);
+    // Fire once per landing — classroom clicks are navigation, not a new view.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPro]);
+
+  // Handle classroom selection
   const handleClassroomSelect = useCallback(
     (classroomId: string) => {
       setSelectedClassroomId(classroomId);

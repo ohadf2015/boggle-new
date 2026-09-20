@@ -12,6 +12,10 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromOrder: (...args: unknown[]) => grantProFromOrder(...args),
   logSubscriptionEvent: vi.fn(),
 }))
+const maybeSendPaymentFailedEmail = vi.fn()
+vi.mock('@/lib/education/dunning', () => ({
+  maybeSendPaymentFailedEmail: (...args: unknown[]) => maybeSendPaymentFailedEmail(...args),
+}))
 
 // static import is safe: vitest hoists the vi.mock calls above it
 import { POST } from '../route'
@@ -98,6 +102,34 @@ describe('polar webhook', () => {
     expect(upsertSubscription).toHaveBeenCalledWith(
       expect.objectContaining({ userId: 'u1', tier: 'pro', status: 'past_due' })
     )
+  })
+
+  it('fires the dunning email on past_due — the churn guard on a paying teacher', async () => {
+    maybeSendPaymentFailedEmail.mockClear()
+    await POST(
+      polarEvent('subscription.past_due', {
+        ...subscriptionData,
+        status: 'past_due',
+        customer: { email: 'teacher@school.org' },
+      })
+    )
+    expect(maybeSendPaymentFailedEmail).toHaveBeenCalledWith({
+      payload: expect.objectContaining({ type: 'subscription.past_due' }),
+      userId: 'u1',
+    })
+  })
+
+  it('does NOT fire dunning on a routine subscription.updated', async () => {
+    maybeSendPaymentFailedEmail.mockClear()
+    await POST(polarEvent('subscription.updated', subscriptionData))
+    expect(maybeSendPaymentFailedEmail).not.toHaveBeenCalled()
+  })
+
+  it('a dunning failure still acks the webhook — state write already landed', async () => {
+    maybeSendPaymentFailedEmail.mockRejectedValueOnce(new Error('resend down'))
+    const res = await POST(polarEvent('subscription.past_due', { ...subscriptionData, status: 'past_due' }))
+    expect(res.status).toBe(200)
+    expect(await res.json()).toMatchObject({ received: true })
   })
 
   it('grants nothing when no user id is present', async () => {
