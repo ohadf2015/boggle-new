@@ -9,6 +9,8 @@ import { ACHIEVEMENTS } from '@/lib/wordTowerV2/achievements';
 import { BIOMES } from '@/lib/wordTowerV2/biomes';
 import { CALLOUT_VARIANTS } from '@/lib/wordTowerV2/celebrations';
 import { REWARDS } from '@/lib/wordTowerV2/rewards';
+import { DISTRICTS, MAX_DISTRICT, PLOT_SLOTS } from '@/lib/wordTowerV2/estateCatalog';
+import { buildingNameKey } from '../estate/estateArt';
 
 /**
  * Word Tower v2 builds most of its keys dynamically (`call.perfect.${i}`,
@@ -32,6 +34,16 @@ const keys: string[] = [
   'wordTowerV2.ach.unlocked',
   'wordTowerV2.hint.spell',
   'wordTowerV2.hint.drop',
+  'wordTowerV2.changeWord',
+  'wordTowerV2.editHint',
+  'wordTowerV2.coins.run',
+  'wordTowerV2.streak.a11y',
+  'wordTowerV2.milestone.floors',
+  'wordTowerV2.milestone.a11y',
+  ...['tap', 'skip', 'continue', 'guest'].map((k) => `wordTowerV2.chest.${k}`),
+  ...['common', 'rare', 'epic'].map((k) => `wordTowerV2.chest.tier.${k}`),
+  ...['shield', 'brick', 'blueprint'].map((k) => `wordTowerV2.chest.item.${k}`),
+  ...['perfects', 'floors'].map((k) => `wordTowerV2.chest.tease.${k}`),
   ...['floorsA11y', 'combo', 'tenants', 'crates', 'badges', 'nextGoal'].map((k) => `wordTowerV2.results.${k}`),
   ...['double', 'triple', 'quad', 'unstoppable', 'legendary'].map((k) => `wordTowerV2.call.combo.${k}`),
   'wordTowerV2.call.word.big',
@@ -40,6 +52,16 @@ const keys: string[] = [
   ...BIOMES.map((b) => `wordTowerV2.biome.${b.id}`),
   ...REWARDS.flatMap((r) => [`wordTowerV2.reward.${r.id}.name`, `wordTowerV2.reward.${r.id}.desc`]),
   ...ACHIEVEMENTS.flatMap((a) => [`wordTowerV2.ach.${a.id}.name`, `wordTowerV2.ach.${a.id}.desc`]),
+  // Empire: every district, every building in it, and both perk phrasings.
+  ...DISTRICTS.flatMap((d) => [`wordTowerV2.estate.district.${d.id}`, ...d.buildings.map((b) => `wordTowerV2.estate.building.${b.id}`)]),
+  ...PLOT_SLOTS.flatMap((slot) => [`wordTowerV2.estate.perkLine.${slot}`, `wordTowerV2.estate.chip.${slot}`]),
+  // The name under a plot follows the art pack, not the catalog.
+  ...Array.from({ length: MAX_DISTRICT }, (_, i) => PLOT_SLOTS.map((slot) => buildingNameKey(i + 1, slot))).flat(),
+  ...[
+    'open', 'title', 'back', 'level', 'maxed', 'upgrade', 'repair', 'free', 'need', 'damaged', 'progress',
+    'built', 'repaired', 'guest', 'perksTitle', 'perksNone', 'newsRaids', 'newsAffordable', 'newsDamaged',
+    'completeTitle', 'completeSub', 'completeNext', 'completeCta', 'reward',
+  ].map((k) => `wordTowerV2.estate.${k}`),
 ];
 
 describe('Word Tower v2 i18n', () => {

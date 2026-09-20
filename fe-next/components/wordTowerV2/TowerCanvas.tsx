@@ -7,13 +7,13 @@ import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc
 import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
 import { buildSkyline, rulerTicks, skyProps } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
-import { frameCamera } from '@/lib/wordTowerV2/camera';
+import { type DockSide, frameCamera, towerSkirts } from '@/lib/wordTowerV2/camera';
 import { publishHeightM } from '@/lib/wordTowerV2/altitude';
 import { floorsAt, skyAt } from '@/lib/wordTowerV2/biomes';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { COMBO_FLASH, CONFETTI_BURST, GOLD_STARS, RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
-import { createBestLabel, paintBestLine, paintGround, paintLandingMark, paintRuler, paintThrowArc } from './towerArt';
+import { createBestLabel, paintBestLine, paintGround, paintLandingMark, paintRuler, paintThrowArc, paintTowerShaft } from './towerArt';
 import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, paintGhost, setBlockGold, setBlockRebar, tickBlock } from './apartmentArt';
 import { createCity, paintCity, placeCity } from './skylineArt';
 import { paintCraneFrame, paintCraneHook } from './craneArt';
@@ -67,12 +67,23 @@ interface Props {
   bestLabel: string;
   /** Screen edge for the altitude ruler — the side the HUD is NOT on. */
   rulerSide: 'left' | 'right';
+  /**
+   * Where the controls are. On desktop/TV the wheel is a side panel and THIS
+   * canvas is the play column, so the camera can spend the height on floors.
+   */
+  dockSide?: DockSide;
   onFrameStats?: (stats: FrameStats) => void;
   onBeforeStep?: (nowMs: number) => void;
   /** First contact of a falling block (Matter speed), for the landing thunk. */
   onImpact?: (speed: number) => void;
   /** One tenant just popped into a floor (fires once per tenant). */
   onTenantArrive?: () => void;
+  /**
+   * Where a floor just landed, in canvas-local CSS px — the DOM reward layer
+   * draws the payout on that exact pixel. Read from LAST frame's camera (this
+   * runs before the camera is re-solved); one frame of drift is invisible.
+   */
+  onLandPoint?: (p: { x: number; y: number; quality: LandingQuality }) => void;
   /** Settled height, quantized (m) — the far city sinks away with it. */
   getSceneM?: () => number;
   reducedMotion?: boolean;
@@ -158,11 +169,12 @@ export default function TowerCanvas(props: Props) {
       const landingMark = new Graphics();
       const crane = new Graphics();
       const hook = new Graphics();
+      const shaft = new Graphics();
       const blocks = new Container();
       const ghost = createGhost();
       const ground = new Graphics();
       const crowd = new TenantCrowd();
-      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, crane, guide, hook, blocks, crowd.layer, landingMark, ghost.container, ground);
+      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, crane, guide, hook, shaft, blocks, crowd.layer, landingMark, ghost.container, ground);
 
       const shake = new ScreenShake();
       const particles = new ParticlePool(scene);
@@ -233,11 +245,23 @@ export default function TowerCanvas(props: Props) {
             particles.burst(GOLD_STARS, block.x, block.y, 20);
             continue;
           }
+          p.onLandPoint?.({
+            x: scene.x + block.x * scene.scale.x,
+            y: scene.y + (block.y - block.heightPx / 2) * scene.scale.x,
+            quality: fx.quality,
+          });
           if (fx.quality === 'perfect') {
             if (view) view.flash = 1;
             particles.burst(COMBO_FLASH, block.x, block.y, 14);
             particles.burst(CONFETTI_BURST, block.x, block.y - block.heightPx, 18);
+            // Camera kick + a dust ring along the seam: a perfect floor should
+            // LAND, not merely appear. Tower Bloxx sells the snap this way.
+            shake.shake({ intensity: 9, duration: 0.22, decay: 'exponential' });
+            particles.burst(TOWER_DUST, block.x - block.widthPx / 2, block.y + block.heightPx / 2, 6);
+            particles.burst(TOWER_DUST, block.x + block.widthPx / 2, block.y + block.heightPx / 2, 6);
           }
+          // Below the collapse kick (16) on purpose: a miss is a stumble, not the end.
+          if (fx.quality === 'miss') shake.shake({ intensity: 10, duration: 0.35, decay: 'exponential' });
           const colour = FLASH_COLOUR[fx.quality];
           if (colour !== undefined) {
             flashColour = colour;
@@ -265,7 +289,7 @@ export default function TowerCanvas(props: Props) {
         const h = created.renderer.height / created.renderer.resolution;
 
         camTopM = publishHeightM(camTopM, snap.towerHeightM);
-        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: camTopM });
+        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: camTopM, dockSide: p.dockSide });
         const { scale } = frame;
         // Frame-rate independent ease (a fixed 0.08/frame ran 2x faster at 120Hz).
         cameraY += (frame.cameraY - cameraY) * (1 - Math.exp(-dt * 5));
@@ -332,6 +356,25 @@ export default function TowerCanvas(props: Props) {
         paintBestLine(bestLine, bestLabel, halfW, scale, bestM && bestM > 0.5 ? -bestM * PX_PER_M : null);
 
         const hangingId = p.getHangingId();
+        // Under every floor: fills the wedge of sky an overhang leaves, and
+        // runs the lowest floors past the bottom edge so a panned camera never
+        // shows the tower ending in mid-air above the dock.
+        paintTowerShaft(
+          shaft,
+          towerSkirts(
+            // Only what is on screen (plus a floor of margin): a 40-floor run
+            // would otherwise redraw 40 shafts a frame for floors nobody sees.
+            snap.blocks.filter(
+              (b) =>
+                b.id !== hangingId &&
+                world.landed.has(b.id) &&
+                scene.y + (b.y - b.heightPx) * scale < h + 240 &&
+                scene.y + (b.y + b.heightPx) * scale > -120,
+            ),
+            (h - scene.y) / scale,
+          ),
+          scale,
+        );
         for (const block of snap.blocks) {
           let view = views.get(block.id);
           if (!view) {

@@ -1,7 +1,12 @@
+import { type ReactNode, useEffect, useState } from 'react';
 import { Hammer, Medal, Send, Target, Trophy } from 'lucide-react';
+import type { TowerBlock } from '@/lib/wordTowerV2/estateTower';
 import { ACHIEVEMENTS, type RunStats, emptyStats, progressOf } from '@/lib/wordTowerV2/achievements';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
 import type { RunState } from '@/lib/wordTowerV2/run';
+import type { RevengeEntry, RivalView, UseEstate } from './useEstate';
+import { RaidFlow } from './rivals/RaidFlow';
+import { RivalBoard } from './rivals/RivalBoard';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -22,6 +27,19 @@ interface Props {
   smashLabel?: string;
   onSmash?: () => void;
   onShare?: () => void;
+  /** Extra actions under the buttons (the empire entry lives here). */
+  extra?: ReactNode;
+  /** Everything the rival board + raid round need; absent = no board (tests, demo). */
+  rivals?: {
+    estate: UseEstate;
+    /** Wrecking balls this run banked — they carry into a raid. */
+    balls: number;
+    reducedMotion: boolean;
+    /** Your run's tower, so the comparison shows what you actually built. */
+    myTower: TowerBlock[];
+    /** A raid takes the whole screen: the parent pauses the game canvas. */
+    onRaidOpen: (open: boolean) => void;
+  };
 }
 
 /** The locked badge this run came closest to — a reason for one more go. */
@@ -40,7 +58,14 @@ function nextGoal(stats: RunStats, skip: Set<string>) {
   return best;
 }
 
-export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, onRestart, smashLabel, onSmash, onShare }: Props) {
+export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, onRestart, smashLabel, onSmash, onShare, extra, rivals }: Props) {
+  // `revenge` is the raid being answered, not a flag: its numbers ride the whole
+  // raid so the payout can name the debt it settled.
+  const [target, setTarget] = useState<{ rival: RivalView; revenge: RevengeEntry | null } | null>(null);
+  const onRaidOpen = rivals?.onRaidOpen;
+  useEffect(() => {
+    onRaidOpen?.(target !== null);
+  }, [target, onRaidOpen]);
   const floors = Math.floor(floorsAt(peakM) + 0.05);
   const stats: RunStats = { ...emptyStats(), ...runStats, floors: run.floors, peakFloors: floors, bestCombo: run.bestCombo, tenants: run.tenants, crates: run.crates };
   const goal = nextGoal(stats, new Set([...unlocked, ...badges]));
@@ -52,8 +77,16 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
   ];
 
   return (
-    <div className="absolute inset-0 z-40 flex items-center justify-center overflow-y-auto bg-neo-navy/75 p-4" role="dialog" aria-modal="true">
-      <div className="w-full max-w-sm rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop">
+    <>
+      {/* The scroller is the backdrop, and the raid is a SIBLING of it: a
+          full-screen raid rendered inside a scrolling card scrolls away. */}
+      <div className="absolute inset-0 z-40 overflow-y-auto bg-neo-navy/75 p-4" role="dialog" aria-modal="true">
+      {/* A centred phone-width modal on a 1920 screen is two dead columns of
+          navy — the rules count that against us. With a board to show, the card
+          goes wide and splits: scorecard one side, the rivals the other. */}
+      <div className={`mx-auto flex min-h-full w-full max-w-sm items-center ${rivals ? 'md:max-w-5xl lg:max-w-6xl' : 'md:max-w-2xl'}`}>
+      <div className={`w-full rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop md:p-6 ${rivals ? 'md:flex md:items-start md:gap-6' : ''}`}>
+      <div className={rivals ? 'md:w-[22rem] md:shrink-0 lg:w-[26rem]' : 'contents'}>
         <h2 className="font-neo-display text-3xl font-black uppercase">{t('wordTowerV2.collapsed')}</h2>
         {isBest ? (
           <div className="mx-auto mt-2 flex w-fit items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-3 py-0.5 font-neo-display text-sm font-bold">
@@ -111,6 +144,17 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
             </div>
           </div>
         ) : null}
+        </div>
+        <div className={rivals ? 'md:min-w-0 md:flex-1' : 'contents'}>
+        {rivals ? (
+          <RivalBoard
+            t={t}
+            estate={rivals.estate}
+            myTower={rivals.myTower}
+            myHeightM={peakM}
+            onPick={(rival, revenge) => setTarget({ rival, revenge })}
+          />
+        ) : null}
         {onSmash && smashLabel ? (
           <button
             type="button"
@@ -139,7 +183,23 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
         >
           {t('common.playAgain')}
         </button>
+        {extra}
+        </div>
       </div>
-    </div>
+      </div>
+      </div>
+      {rivals && target ? (
+        <RaidFlow
+          t={t}
+          estate={rivals.estate}
+          rival={target.rival}
+          revenge={!!target.revenge}
+          grievance={target.revenge}
+          balls={rivals.balls}
+          reducedMotion={rivals.reducedMotion}
+          onClose={() => setTarget(null)}
+        />
+      ) : null}
+    </>
   );
 }

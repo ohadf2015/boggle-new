@@ -41,11 +41,16 @@ function offsetRatio(x: number, support: SupportTop | null): number {
   return Math.abs(x - cx) / halfW;
 }
 
-export function classifyLanding(block: LandedBlock, support: SupportTop | null): LandingQuality {
+/**
+ * `windowMult` widens ONLY the perfect band (the Crane Yard perk). It defaults
+ * to 1, so every existing caller — and feel.test's measured window — is
+ * untouched.
+ */
+export function classifyLanding(block: LandedBlock, support: SupportTop | null, windowMult = 1): LandingQuality {
   if (support && block.bottomY > support.topY + MISS_SLACK_PX) return 'miss';
 
   const r = offsetRatio(block.x, support);
-  if (r < PERFECT_RATIO && Math.abs(block.angleRad) < PERFECT_TILT) return 'perfect';
+  if (r < PERFECT_RATIO * windowMult && Math.abs(block.angleRad) < PERFECT_TILT) return 'perfect';
   if (r < GOOD_RATIO) return 'good';
   return 'sloppy';
 }
