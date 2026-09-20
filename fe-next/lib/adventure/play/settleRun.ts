@@ -39,6 +39,11 @@ export function settleRun(input: {
   const elapsedMs = now - payload.t;
   if (elapsedMs > seconds * 1000 + GRACE_MS) return { ok: false, error: 'expired' };
 
+  // Thresholds tuned to the board this attempt was dealt. Signed at /start, so
+  // the client cannot lower its own bar; legacy tokens fall back to the table.
+  const stars3 = payload.st ?? lvl.stars;
+  const enemyHp = payload.eh ?? lvl.enemyHp ?? lvl.bossHp;
+
   const { valid, score, points } = scoreRun({
     grid: payload.g, words, language: payload.lang, minLength: lvl.minLength, isWord, pointsFor,
     relics: payload.r ?? [], kind,
@@ -48,16 +53,16 @@ export function settleRun(input: {
   let stars: number;
   let targetsFound: string[] | undefined;
   if (isCombatKind(kind)) {
-    won = score >= (lvl.enemyHp ?? lvl.bossHp);
+    won = score >= enemyHp;
     stars = won ? bossStarsForElapsed(elapsedMs, seconds) : 0;
   } else if (kind === 'hunt') {
     const targets = new Set((payload.tg ?? []).map((w) => w.toLowerCase()));
     targetsFound = valid.filter((w) => targets.has(w));
     won = targetsFound.length >= (lvl.huntCount ?? targets.size);
-    stars = won ? Math.max(1, starsForScore(score, lvl.stars)) : 0;
+    stars = won ? Math.max(1, starsForScore(score, stars3)) : 0;
   } else {
-    won = score >= lvl.stars[0];
-    stars = won ? starsForScore(score, lvl.stars) : 0;
+    won = score >= stars3[0];
+    stars = won ? starsForScore(score, stars3) : 0;
   }
   const rewards = rewardsFor({ world: payload.w, level: payload.l, prevStars, stars, isBoss: lvl.isBoss });
   return { ok: true, score, valid, points, stars, won, rewards, elapsedMs, ...(targetsFound ? { targetsFound } : {}) };

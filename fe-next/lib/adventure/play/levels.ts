@@ -66,7 +66,7 @@ const KIND_SECONDS: Record<LevelKind, number> = {
 
 const r5 = (n: number) => Math.max(5, Math.round(n / 5) * 5);
 
-function buildSpec(world: number, level: number, slot: Slot, worldTwist: LevelTwist): LevelSpec {
+function buildSpec(world: number, level: number, slot: Slot, worldTwist: LevelTwist, oneOverride?: number): LevelSpec {
   const twisted = slot.endsWith('+');
   const kind = slot.replace('+', '') as LevelKind;
   const twist = twisted ? worldTwist : undefined;
@@ -80,7 +80,7 @@ function buildSpec(world: number, level: number, slot: Slot, worldTwist: LevelTw
   if (twist === 'rush') seconds = 60;
   if (twist === 'finale') seconds = 75;
 
-  const one = (60 + (world - 1) * 12 + (level - 1) * 8) * sizeFactor;
+  const one = oneOverride ?? (60 + (world - 1) * 12 + (level - 1) * 8) * sizeFactor;
   let mult = KIND_STAR_MULT[kind];
   if (minLength > 3) mult *= 0.9;
   if (seconds < 90) mult *= seconds / 90;
@@ -117,6 +117,53 @@ export function getPlayLevel(world: number, level: number): PlayLevel {
     isBoss: spec.kind === 'boss',
     bossHp: isCombatKind(spec.kind) ? spec.enemyHp ?? 0 : 0,
   };
+}
+
+/**
+ * Par constant per board size — the basis every threshold is re-derived from.
+ * Bigger boards take a SMALLER constant: a 5x5 holds ~2.6x a 4x4's solvable score
+ * but a human cannot find proportionally more, because output is bounded by the
+ * clock, not by the board. Measured over 150 dealt boards per size.
+ * ponytail: re-measure with scripts/adventure-calibrate.ts if the word-score table
+ * or the letter distribution changes.
+ */
+const PAR_K: Record<number, number> = { 4: 20, 5: 10.5, 6: 8 };
+
+/** Share of par the FIRST star costs, at the start and end of the 70-level ladder. */
+const BASE_FRACTION_FIRST = 0.22;
+const BASE_FRACTION_LAST = 0.4;
+
+/**
+ * Score basis for one dealt board.
+ *
+ * The sqrt is load-bearing. Raw board totals spread 6.3x between a poor and a rich
+ * deal, which a fixed threshold turns into "trivial" or "impossible"; the square root
+ * compresses that to ~2.4x while still paying out on a genuinely rich board.
+ */
+export function parForBoard(totalSolvableScore: number, size: number): number {
+  const total = Math.max(0, Number.isFinite(totalSolvableScore) ? totalSolvableScore : 0);
+  const k = PAR_K[size] ?? PAR_K[5];
+  // Floor keeps a pathological board (or a language with no solver) playable.
+  return Math.max(120, Math.round(k * Math.sqrt(total)));
+}
+
+/**
+ * Re-derive a level's thresholds from the board actually dealt.
+ *
+ * The hand-authored design in WORLD_ROWS is untouched: this feeds the SAME
+ * buildSpec, so kind multipliers, twists, the rush/finale clocks and the 1.8/2.8
+ * star steps all still apply. Only the magnitude that used to come from the flat
+ * `60 + (world-1)*12` line is replaced by a board-derived one — which is also what
+ * fixes combat, since `enemyHp` is cut from `stars[1]`.
+ */
+export function tuneToBoard(world: number, level: number, par: number): { stars: [number, number, number]; enemyHp?: number } {
+  if (!Number.isInteger(world) || world < 1 || world > WORLD_COUNT) throw new Error(`bad world ${world}`);
+  if (!Number.isInteger(level) || level < 1 || level > LEVELS_PER_WORLD) throw new Error(`bad level ${level}`);
+  const row = WORLD_ROWS[world - 1];
+  const ramp = ((world - 1) * LEVELS_PER_WORLD + (level - 1)) / (WORLD_COUNT * LEVELS_PER_WORLD - 1);
+  const one = par * (BASE_FRACTION_FIRST + (BASE_FRACTION_LAST - BASE_FRACTION_FIRST) * ramp);
+  const spec = buildSpec(world, level, row.slots[level - 1], row.twist, one);
+  return { stars: spec.stars, ...(spec.enemyHp === undefined ? {} : { enemyHp: spec.enemyHp }) };
 }
 
 export function starsForScore(score: number, t: [number, number, number]): 0 | 1 | 2 | 3 {

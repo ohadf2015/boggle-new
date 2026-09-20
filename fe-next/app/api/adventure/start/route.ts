@@ -20,13 +20,14 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { loadWordChecker } from '@/lib/server/dictionarySet';
-import { getPlayLevel, WORLD_COUNT } from '@/lib/adventure/play/levels';
+import { getPlayLevel, WORLD_COUNT, parForBoard, tuneToBoard } from '@/lib/adventure/play/levels';
 import { canPlayLevel } from '@/lib/adventure/play/progress';
 import { signAttempt } from '@/lib/adventure/play/attemptToken';
 import { freshRun, verifyRun, applyPick, skipPick, enterNode, type RunPayload } from '@/lib/adventure/play/runToken';
 import { buildRunMap, canEnter, isPlayNode, nodeById, nodeLevel } from '@/lib/adventure/play/runMap';
 import { runView } from '@/lib/adventure/play/runView';
 import { dealLevel, solveBoard } from '@/lib/adventure/play/deal';
+import { boardTotalScore } from '@/lib/adventure/play/scoreRun';
 import { attemptSeconds } from '@/lib/adventure/play/settleRun';
 import { makeRng } from '@/lib/adventure/play/rng';
 import { attemptSecret, adventureLang, loadCompletions, loadPrefixDict } from '@/lib/adventure/play/server';
@@ -111,6 +112,10 @@ export async function POST(request: NextRequest) {
 
   const language = adventureLang(body?.language);
   let deal;
+  // Full solve of the grid that was finally chosen — the basis for this
+  // attempt's thresholds. dealLevel solves candidates internally but does not
+  // hand the winner back, and one more pass is cheaper than changing its contract.
+  let solved: string[] = [];
   try {
     const [isWord, dict, common] = await Promise.all([loadWordChecker(language), loadPrefixDict(language), loadCommonWords(language)]);
     // No dictionary = no hints; a hunt can't be dealt fairly, so dealLevel throws.
@@ -126,23 +131,34 @@ export async function POST(request: NextRequest) {
         ? generateRandomTable(lvl.size, lvl.size, language as Language, targetWords)
         : pickRichestBoardClient(() => generateRandomTable(lvl.size, lvl.size, language as Language), language)) as string[][],
     });
+    solved = solve(deal.grid);
     if (!deal.hints.length) console.warn(`[ADVENTURE START] empty hint pool (${language}, w${world}-l${level})`);
   } catch (err) {
     console.error('[ADVENTURE START] deal failed', err);
     return NextResponse.json({ error: 'Adventure unavailable' }, { status: 503 });
   }
 
+  // Tune the thresholds to the board actually dealt. The solver already ran for
+  // hints/targets, so this is one more pass over the final grid (~1-2.5ms warm):
+  // cheap enough to pay per attempt, and it is what stops a vowel-poor deal from
+  // walling the player while a rich one hands out free stars.
+  const tuned = solved.length
+    ? tuneToBoard(world, level, parForBoard(boardTotalScore(solved, language), lvl.size))
+    : null;
+  const playLevel = tuned ? { ...lvl, stars: tuned.stars, ...(tuned.enemyHp === undefined ? {} : { enemyHp: tuned.enemyHp, bossHp: tuned.enemyHp }) } : lvl;
+
   const attempt = {
     u: user.id, w: world, l: level, g: deal.grid, lang: language, t: Date.now(),
     k: lvl.kind, r: run.relics, tp: run.potions.time ?? 0, run,
     ...(deal.targets ? { tg: deal.targets } : {}),
+    ...(tuned ? { st: tuned.stars, ...(tuned.enemyHp === undefined ? {} : { eh: tuned.enemyHp }) } : {}),
   };
   const token = signAttempt(attempt, secret);
   return NextResponse.json({
     token,
     grid: deal.grid,
     language,
-    level: lvl,
+    level: playLevel,
     /** Level clock incl. relic bonus (time potions extend it client-side). */
     seconds: attemptSeconds({ w: world, l: level, r: run.relics, tp: 0 }),
     ...runView(run, secret),
