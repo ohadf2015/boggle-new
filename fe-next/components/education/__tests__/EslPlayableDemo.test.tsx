@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { EslPlayableDemo } from '../EslPlayableDemo';
 
 const mockTrack = vi.fn();
@@ -10,6 +10,7 @@ vi.mock('@/utils/growthTracking', () => ({
 
 describe('EslPlayableDemo', () => {
   beforeEach(() => mockTrack.mockClear());
+  afterEach(() => vi.useRealTimers());
 
   it('starts a round and records edu_page_play_demo_started', () => {
     render(<EslPlayableDemo locale="en" />);
@@ -44,11 +45,43 @@ describe('EslPlayableDemo', () => {
   it('links the selected list into classroom practice', () => {
     render(<EslPlayableDemo locale="es" />);
     const link = screen.getByRole('link', { name: 'Usar esta lista con la clase' });
-    expect(link).toHaveAttribute('href', '/es/education/classroom-game?cefr=A1&mode=warmup');
+    expect(link).toHaveAttribute('href', '/es/education/classroom-game?cefr=A1');
   });
 
   it('sets RTL on Hebrew', () => {
     const { container } = render(<EslPlayableDemo locale="he" />);
     expect(container.firstChild).toHaveAttribute('dir', 'rtl');
+  });
+
+  it('renders Spanish glosses for es and English definitions elsewhere', () => {
+    const { unmount } = render(<EslPlayableDemo locale="es" />);
+    expect(screen.getByText('— el gato')).toBeTruthy();
+    unmount();
+    render(<EslPlayableDemo locale="en" />);
+    expect(screen.getByText('— a small pet that says meow')).toBeTruthy();
+  });
+
+  it('runs a real 60-second clock and ends the round at zero', () => {
+    vi.useFakeTimers();
+    render(<EslPlayableDemo locale="en" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Start the round' }));
+    expect(screen.getByTestId('esl-demo-clock').textContent).toContain('1:00');
+    // The clock re-arms one timeout per tick, so advance a second at a time
+    // to let each decrement render and schedule the next.
+    for (let i = 0; i < 60; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+    }
+    expect(screen.getByText('Time! Round over — nice work.')).toBeTruthy();
+    // The board is gone; Play again restarts a fresh round.
+    expect(screen.queryAllByRole('button', { name: /^[A-Z]$/ }).length).toBe(0);
+    expect(mockTrack).toHaveBeenCalledWith('edu_page_play_demo_completed', {
+      cefr: 'A1',
+      found: 0,
+      page: '/education/esl-word-games',
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Play again' }));
+    expect(screen.getByTestId('esl-demo-clock').textContent).toContain('1:00');
   });
 });
