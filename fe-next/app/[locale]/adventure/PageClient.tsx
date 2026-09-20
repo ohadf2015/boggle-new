@@ -36,20 +36,26 @@ const AdventureView = nextDynamic(
  * mode pattern (e.g. Word Forge). Dev mode bypasses the gate for testing.
  */
 export default function AdventurePageClient(): React.JSX.Element {
-  const { canSeeInWorkModes } = useAuth();
+  const { canSeeInWorkModes, loading } = useAuth();
   const { language } = useLanguageSafe();
   const router = useRouter();
 
   // Beta/admin gate — allow in dev mode for testing. Redirect via effect to
   // avoid a router.replace-during-render hydration mismatch.
+  //
+  // `loading` matters: `canSeeInWorkModes` is derived from the profile row, so
+  // it starts false on every cold load and only flips once the profile lands.
+  // Without this guard a genuine admin opening /adventure directly was bounced
+  // to the home page before their own permissions had been read.
   const isDev = process.env.NODE_ENV === 'development';
+  const denied = !loading && !canSeeInWorkModes && !isDev;
   useEffect(() => {
-    if (!canSeeInWorkModes && !isDev) {
+    if (denied) {
       router.replace(`/${language}`);
     }
-  }, [canSeeInWorkModes, isDev, language, router]);
+  }, [denied, language, router]);
 
-  if (!canSeeInWorkModes && !isDev) {
+  if (loading || denied) {
     return <LoadingFallback />;
   }
 

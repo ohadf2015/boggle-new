@@ -190,11 +190,10 @@ export function useGridInteraction({
   }, [getCellNodeMap]);
 
   const clearAllDragClasses = useCallback(() => {
-    const map = cellNodeMapRef.current;
-    if (map) {
-      map.forEach((el) => el.classList.remove('blast-drag-selected'));
-      return;
-    }
+    // Runs once per gesture, not per frame — so sweep the live DOM as well as
+    // the cached node map. A remounted board (new level, new round) leaves the
+    // map pointing at detached nodes while the painted ones are still on screen.
+    cellNodeMapRef.current?.forEach((el) => el.classList.remove('blast-drag-selected'));
     gridRef.current?.querySelectorAll('.blast-drag-selected').forEach(el => {
       el.classList.remove('blast-drag-selected');
     });
@@ -269,6 +268,14 @@ export function useGridInteraction({
     }
     setIsClickSelectMode(false);
   }, [onWordSubmit, onPathSubmit, fireRoundActive, startSequentialFadeOut, setSelectedCells]);
+  // Backstop for every clear path (submit, click-outside, Escape, fade-out,
+  // external reset): an empty selection must never leave a painted tile.
+  // Gated on the gesture being over — mid-drag backtracking also empties
+  // selectedCells for a frame and must not wipe the live highlight.
+  useEffect(() => {
+    if (selectedCells.length === 0 && !isTouchingRef.current) clearAllDragClasses();
+  }, [selectedCells.length, clearAllDragClasses]);
+
   const undoLastCell = useCallback(() => {
     const current = selectedCellsRef.current;
     if (current.length > 0) {
@@ -479,9 +486,19 @@ export function useGridInteraction({
   }, [interactive, processTouchMove]);
 
   const handleTouchEnd = useCallback(() => {
-    if (!interactive || !isTouchingRef.current) return;
+    if (!isTouchingRef.current) return;
+    // Releasing the gesture is unconditional. `interactive` can flip off
+    // mid-drag (the clock hits 0 while a finger is still down); bailing before
+    // this left isTouchingRef stuck true forever, which both stranded the
+    // drag highlight and made every later submit skip its own 150ms clear.
     isTouchingRef.current = false;
     isDraggingRef.current = false;
+    if (!interactive) {
+      clearAllDragClasses();
+      dragSelectionRef.current = [];
+      hasMovedRef.current = false;
+      return;
+    }
     if (autoSubmitTimeoutRef.current) {
       clearTimeout(autoSubmitTimeoutRef.current);
       autoSubmitTimeoutRef.current = null;
@@ -650,6 +667,13 @@ export function useGridInteraction({
   useEffect(() => {
     const handleMouseUp = () => {
       if (isDraggingRef.current) { isDraggingRef.current = false; handleTouchEnd(); }
+      else if (isTouchingRef.current) {
+        // Click-select: handleMouseDown paints the tile but no drag ever began,
+        // so handleTouchEnd never runs. React `selectedCells` owns how a picked
+        // tile looks from here on — the drag class must not linger.
+        clearAllDragClasses();
+        dragSelectionRef.current = [];
+      }
       isTouchingRef.current = false;
     };
     const handleGlobalTouchEnd = () => {
@@ -663,7 +687,7 @@ export function useGridInteraction({
       window.removeEventListener('touchend', handleGlobalTouchEnd);
       window.removeEventListener('touchcancel', handleGlobalTouchEnd);
     };
-  }, [handleTouchEnd]);
+  }, [handleTouchEnd, clearAllDragClasses]);
 
   useEffect(() => {
     const handleFirstTouch = () => {
