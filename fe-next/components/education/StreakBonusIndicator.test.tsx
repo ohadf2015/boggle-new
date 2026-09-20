@@ -34,6 +34,7 @@ vi.mock('framer-motion', () => ({
       return <span className={className} {...props}>{children}</span>;
     },
   },
+  useReducedMotion: () => false,
 }));
 
 describe('StreakBonusIndicator', () => {

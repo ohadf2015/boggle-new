@@ -36,7 +36,7 @@ export function WordOfTheDay({ word, definition, className = '' }: WordOfTheDayP
   return (
     <div
       data-testid="wotd-card"
-      className={`border-neo shadow-hard-sm rounded-neo bg-neo-navy p-4 ${className}`}
+      className={`border-neo border-neo-cream/40 shadow-hard-sm rounded-neo bg-neo-navy p-4 ${className}`}
     >
       <div className="flex items-center gap-2 mb-2">
         <Star className="w-4 h-4 text-neo-lime" />

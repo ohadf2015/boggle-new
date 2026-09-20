@@ -179,7 +179,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
         <table className="w-full">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="bg-neo-navy/80 border-b-neo border-neo-black">
+              <tr key={headerGroup.id} className="bg-neo-navy/80 border-b-neo border-neo-cream/40">
                 {headerGroup.headers.map((header) => {
                   const meta = header.column.columnDef.meta as { className?: string } | undefined;
                   return (
@@ -208,7 +208,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
                 <tr
                   key={row.id}
                   className={`
-                    border-b border-neo-black/20 hover:bg-neo-cyan/10 cursor-pointer
+                    border-b border-neo-cream/40 hover:bg-neo-cyan/10 cursor-pointer
                     ${student.isStruggling ? 'struggling-row bg-neo-orange/20 border-s-4 border-neo-orange' : ''}
                   `}
                   onClick={() => onStudentClick?.(student.studentId)}

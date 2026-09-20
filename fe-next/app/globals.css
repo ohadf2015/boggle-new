@@ -6073,3 +6073,17 @@ html.ads-free-route .google-auto-placed {
   .adv-cast-letter, .adv-cast-bolt, .adv-tile-burst, .adv-impact-ring, .adv-spark, .adv-hit-flash, .adv-crit-flash, .adv-cast-burst, .adv-cast-star, .adv-foe-ghost { display: none; }
   .adv-dmg, .adv-banner, .adv-pow, .adv-best-ribbon, .adv-fail-tile, .adv-fail-chip, .adv-hint-tile, .adv-hint-bulb, .adv-hint-arrow, .adv-hit-mark, .adv-hp-chip { animation-duration: 1ms !important; animation-name: none !important; }
 }
+
+/* OS "reduce motion" must stop perpetual Tailwind loops too. Framer already
+   honours it via MotionConfigProvider; these CSS keyframes were only killed
+   under html[data-cosy], so a user with the OS setting (but not cosy mode) got
+   radar pings and pulsing chips for a whole class session. animate-spin stays:
+   it is a functional loading signal, not decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-bounce,
+  .animate-ping,
+  .animate-pulse-ring {
+    animation: none;
+  }
+}

@@ -2807,6 +2807,7 @@ const ru = {
         "subtext": "Сражайся с друзьями в реальном времени"
       },
       "freeAccess": "Бесплатно для всех",
+      "resourcesAriaLabel": "Образовательные ресурсы",
       "goToDashboard": "Перейти на панель",
       "premium": "Премиум",
       "roleGuest": "Гость",

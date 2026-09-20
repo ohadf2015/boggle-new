@@ -275,7 +275,7 @@ export default function UpgradePricingPageClient() {
             <div
               key={label}
               data-testid="trust-chip"
-              className="flex items-center justify-center lg:justify-start gap-2 bg-neo-navy-light border-2 border-black rounded-neo px-2.5 py-1 text-center lg:text-start"
+              className="flex items-center justify-center lg:justify-start gap-2 bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo px-2.5 py-1 text-center lg:text-start"
             >
               <Icon
                 className="w-3.5 h-3.5 text-neo-lime flex-shrink-0"
@@ -304,14 +304,14 @@ export default function UpgradePricingPageClient() {
 
         {/* FAQ Section — behind a disclosure (collapsed by default) — compact */}
         <details className="mb-0">
-          <summary className="cursor-pointer bg-neo-navy-light border-2 border-black rounded-neo p-2 hover:bg-neo-navy transition-colors">
+          <summary className="cursor-pointer bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo p-2 hover:bg-neo-navy transition-colors">
             <h2 className="text-sm lg:text-base font-neo-display font-black text-neo-white inline-flex items-center gap-2">
               {t('teacher.subscription.faqTitle')}
               <span className="text-xs text-neo-lime font-bold">▼</span>
             </h2>
           </summary>
 
-          <div className="bg-neo-navy-light border-2 border-t-0 border-black rounded-b-neo p-4 shadow-hard">
+          <div className="bg-neo-navy-light border-2 border-t-0 border-neo-cream/40 rounded-b-neo p-4 shadow-hard">
             <div className="space-y-3">
               {[
                 {

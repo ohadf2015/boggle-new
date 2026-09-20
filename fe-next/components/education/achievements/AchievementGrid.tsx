@@ -118,7 +118,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                 <AdaptiveMotion.div
                   key={key}
                   className={cn(
-                    'bg-neo-navy border-neo rounded-neo p-3 shadow-hard',
+                    'bg-neo-navy border-neo border-neo-cream/40 rounded-neo p-3 shadow-hard',
                     'relative overflow-hidden',
                     !isEarned && 'grayscale opacity-75'
                   )}

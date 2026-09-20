@@ -132,7 +132,7 @@ function AssignmentCard({
 
       {/* Expanded: Completion Tracker */}
       {isExpanded && (
-        <div className="border-t border-neo-black/30 p-4 bg-neo-black/10">
+        <div className="border-t border-neo-cream/40 p-4 bg-neo-black/10">
           <CompletionTracker
             assignmentId={assignment.id}
             totalStudents={assignment.student_count || 0}
