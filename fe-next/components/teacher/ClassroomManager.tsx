@@ -24,6 +24,7 @@ import { trackEduClassroomCreated } from '@/lib/education/telemetry';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { stagger, slideUp } from './teacherDashboardTabs';
+import { StudentCapMeter } from './StudentCapMeter';
 
 // Re-exported for the existing contract test; the map itself is shared with the
 // lobby language chips (lib/i18n/languageLabels.ts) so it can only drift once.
@@ -335,11 +336,6 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                     <span className="px-2 py-0.5 bg-black text-white text-xs font-black rounded-neo">
                       {classroom.language.toUpperCase()}
                     </span>
-                    <span className="text-sm text-black/70 font-bold">
-                      {classroom.member_count === 1
-                        ? t('teacher.classroom.member')
-                        : t('teacher.classroom.members', { count: classroom.member_count || 0 })}
-                    </span>
                   </div>
                 </div>
 
@@ -401,6 +397,11 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                       </a>
                     )}
                   </div>
+
+                  <StudentCapMeter
+                    studentCount={classroom.member_count || 0}
+                    source="classroom_card"
+                  />
 
                   {/* View Students Button */}
                   <button

@@ -30,6 +30,8 @@ export interface ClassSwitcherProps {
   selectedId: string;
   onSelect: (id: string) => void;
   className?: string;
+  /** Free-tier students-per-class cap. When set, each chip shows count/limit. */
+  studentLimit?: number;
 }
 
 export const ClassSwitcher = memo(function ClassSwitcher({
@@ -37,6 +39,7 @@ export const ClassSwitcher = memo(function ClassSwitcher({
   selectedId,
   onSelect,
   className,
+  studentLimit,
 }: ClassSwitcherProps) {
   const { t } = useLanguage();
 
@@ -80,7 +83,9 @@ export const ClassSwitcher = memo(function ClassSwitcher({
               )}
             >
               <Users className="size-3" strokeWidth={3} aria-hidden="true" />
-              {c.member_count || 0}
+              {studentLimit
+                ? `${c.member_count || 0}/${studentLimit}`
+                : (c.member_count || 0)}
             </span>
           </button>
         );

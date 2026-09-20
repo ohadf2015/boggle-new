@@ -1,28 +1,27 @@
 import type { Graphics } from 'pixi.js';
 
 /**
- * Tower crane: lattice mast standing on the street at one screen edge, cab on
- * top, a truss jib pinned to the top of the screen, counterweight past the
- * mast, and a trolley that rides the jib wherever the cable crosses it.
+ * Crane: a slim gantry rail along the TOP of the screen with a trolley running
+ * on it, a cable, and the hook.
  *
- * The physics pivot sits a full arm (220px) above the hook — off-screen — so the
- * old crane drew its jib off-screen too and players saw a bare line. The jib
- * now lives in SCREEN space; the cable still points at the real pivot, so the
- * swing reads exactly as it moves.
+ * Round 7 replaced a full tower crane — lattice mast standing on the street at
+ * one edge, truss jib across the whole top, counterweight, cab. It was accurate
+ * and it ate the screen: on a TV the mast ran the entire height of the play area
+ * and the jib was a yellow bar over the whole width, leaving the tower a small
+ * thing in the middle. The AIM contract is untouched (crane.ts owns the swing,
+ * the arc and the landing prediction) — this is only what the player sees, and
+ * what they should be looking at is their building.
  */
 
 const INK = 0x0b0e1c;
 const CREAM = 0xfffef0;
 const YELLOW = 0xffc629;
 const SHADE = 0xc98a00;
-const CONCRETE = 0x5b6078;
 
-/** Screen y of the jib's top chord. Below the notch, behind the HUD pills. */
-export const JIB_SCREEN_Y = 10;
-const JIB_H = 18;
-/** Mast centre, screen px in from the edge (the ruler owns the outer ~30px). */
-const MAST_INSET = 46;
-const MAST_W = 22;
+/** Screen y of the rail's top edge. Sits above the HUD pills' baseline. */
+export const JIB_SCREEN_Y = 6;
+/** Rail depth in screen px — a beam, not a truss. */
+const JIB_H = 10;
 
 /** Where the pivot->hook cable crosses the horizontal line `y`. */
 export function trolleyX(pivot: { x: number; y: number }, hook: { x: number; y: number }, y: number): number {
@@ -38,7 +37,7 @@ export interface CraneFrame {
   /** World y of the screen's top and bottom edges. */
   topY: number;
   bottomY: number;
-  /** Mast side: the screen edge the HUD is NOT on. */
+  /** Kept for the caller's contract; the rail spans the full width either way. */
   side: 'left' | 'right';
   /** Physics pivot (off-screen above) and the hook, world units. */
   pivot: { x: number; y: number };
@@ -46,59 +45,29 @@ export interface CraneFrame {
 }
 
 /**
- * Mast, jib, counterweight and cab: everything that does not follow the hook.
- * Repainted only when the camera or viewport moved (the key), not every frame —
- * this was ~60 path ops per frame at rest.
+ * The rail the trolley rides: one beam across the top edge with a hazard stripe.
+ * Repainted only when the camera or viewport moved (the key), not every frame.
  */
 export function paintCraneFrame(g: Graphics, f: CraneFrame, prevKey: string): string {
-  const key = `${f.scale.toFixed(3)}|${f.halfW.toFixed(1)}|${f.topY.toFixed(1)}|${Math.min(0, f.bottomY).toFixed(1)}|${f.side}`;
+  const key = `${f.scale.toFixed(3)}|${f.halfW.toFixed(1)}|${f.topY.toFixed(1)}`;
   if (key === prevKey) return key;
   const px = (n: number) => n / f.scale;
-  const dir = f.side === 'left' ? -1 : 1;
   g.clear();
 
-  const jibTop = f.topY + px(JIB_SCREEN_Y);
-  const jibH = px(JIB_H);
-  const jibBottom = jibTop + jibH;
-  const mastX = dir * (f.halfW - px(MAST_INSET));
-  const mastW = px(MAST_W);
-  // The street is world y=0; below the screen there is nothing to draw.
-  const mastBottom = Math.min(0, f.bottomY);
+  const top = f.topY + px(JIB_SCREEN_Y);
+  const h = px(JIB_H);
+  const from = -(f.halfW + px(20));
+  const w = (f.halfW + px(20)) * 2;
 
-  // Mast: two legs + X bracing, only over the visible span.
-  const l = mastX - mastW / 2;
-  const r = mastX + mastW / 2;
-  if (mastBottom > jibBottom) {
-    g.rect(l, jibBottom, mastW, mastBottom - jibBottom).fill({ color: YELLOW, alpha: 0.9 });
-    const step = mastW * 1.2;
-    for (let y = mastBottom; y > jibBottom + step; y -= step) {
-      g.moveTo(l, y).lineTo(r, y - step).moveTo(r, y).lineTo(l, y - step);
-    }
-    g.stroke({ width: px(2), color: SHADE });
-    g.rect(l, jibBottom, mastW, mastBottom - jibBottom).stroke({ width: px(2.5), color: INK });
+  g.rect(from, top, w, h).fill(YELLOW);
+  // Hazard chevrons: reads as site machinery at a glance, costs 1 stroke pass.
+  for (let x = from; x < from + w; x += px(26)) {
+    g.moveTo(x, top + h).lineTo(x + px(13), top);
   }
-
-  // Jib from beyond the far edge to past the mast; counter-jib + weight at the edge.
-  const jibFrom = -dir * (f.halfW + px(20));
-  const jibTo = dir * (f.halfW + px(20));
-  const jl = Math.min(jibFrom, jibTo);
-  g.rect(jl, jibTop, Math.abs(jibTo - jibFrom), jibH).fill(YELLOW);
-  for (let x = jl; x < jl + Math.abs(jibTo - jibFrom); x += px(24)) {
-    g.moveTo(x, jibBottom).lineTo(x + px(12), jibTop).lineTo(x + px(24), jibBottom);
-  }
-  g.stroke({ width: px(2.5), color: SHADE });
-  g.rect(jl, jibTop, Math.abs(jibTo - jibFrom), jibH).stroke({ width: px(3), color: INK, alignment: 1 });
-
-  const cw = px(30);
-  const cwX = dir > 0 ? f.halfW - cw + px(6) : -f.halfW - px(6);
-  g.rect(cwX, jibBottom, cw, px(26)).fill(CONCRETE).stroke({ width: px(2.5), color: INK });
-  g.moveTo(cwX, jibBottom + px(13)).lineTo(cwX + cw, jibBottom + px(13)).stroke({ width: px(1.5), color: INK, alpha: 0.5 });
-
-  // Operator cab hanging under the jib on the inner side of the mast.
-  const cabW = px(26);
-  const cabX = dir > 0 ? l - cabW : r;
-  g.roundRect(cabX, jibBottom, cabW, px(24), px(3)).fill(YELLOW).stroke({ width: px(2.5), color: INK });
-  g.rect(cabX + px(5), jibBottom + px(5), cabW - px(10), px(9)).fill({ color: 0x9fe7ff, alpha: 0.9 });
+  g.stroke({ width: px(5), color: SHADE, alpha: 0.55 });
+  g.rect(from, top, w, h).stroke({ width: px(3), color: INK, alignment: 1 });
+  // A thin lip under the beam so the trolley has something to hang from.
+  g.rect(from, top + h, w, px(3)).fill(INK);
 
   return key;
 }
@@ -108,13 +77,16 @@ export function paintCraneHook(g: Graphics, f: CraneFrame): void {
   g.clear();
   if (!f.hook) return;
   const px = (n: number) => n / f.scale;
-  const jibBottom = f.topY + px(JIB_SCREEN_Y) + px(JIB_H);
-  const cableTopY = jibBottom + px(8);
+  const railBottom = f.topY + px(JIB_SCREEN_Y) + px(JIB_H);
+  const cableTopY = railBottom + px(6);
   const tx = trolleyX(f.pivot, f.hook, cableTopY);
-  g.roundRect(tx - px(15), jibBottom - px(2), px(30), px(10), px(2)).fill(INK);
-  g.circle(tx - px(8), jibBottom + px(8), px(3)).fill(CREAM);
-  g.circle(tx + px(8), jibBottom + px(8), px(3)).fill(CREAM);
+
+  // Trolley: a compact carriage with two wheels on the rail.
+  g.roundRect(tx - px(14), railBottom - px(3), px(28), px(11), px(3)).fill(INK);
+  g.circle(tx - px(7), railBottom + px(6), px(3)).fill(CREAM);
+  g.circle(tx + px(7), railBottom + px(6), px(3)).fill(CREAM);
   g.moveTo(tx, cableTopY).lineTo(f.hook.x, f.hook.y - px(10)).stroke({ width: px(3), color: INK });
   g.moveTo(tx, cableTopY).lineTo(f.hook.x, f.hook.y - px(10)).stroke({ width: px(1.2), color: 0xcfd6e6 });
-  g.roundRect(f.hook.x - px(12), f.hook.y - px(12), px(24), px(9), px(2)).fill(YELLOW).stroke({ width: px(2), color: INK });
+  // Hook block: a small yellow pulley sitting on top of the slab.
+  g.roundRect(f.hook.x - px(11), f.hook.y - px(12), px(22), px(9), px(2)).fill(YELLOW).stroke({ width: px(2), color: INK });
 }

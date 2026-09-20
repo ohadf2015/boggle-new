@@ -34,6 +34,25 @@ const COMFORT_PLAY_HEIGHT_PX = 480;
 const MIN_SCALE = 0.6;
 const MAX_SCALE = 2;
 
+/**
+ * Floors of finished tower kept on screen under the hanging slab when the wheel
+ * sits in a SIDE panel (desktop/TV) and the canvas owns the full height.
+ *
+ * On a phone the play area is short enough that "comfort" already decides the
+ * zoom and a floor target would shrink the slabs below what reads as a game
+ * (feel.test pins 130px). With a full-height column the zoom is free, so it buys
+ * what a phone cannot afford: you see the building you are stacking.
+ */
+const SIDE_DOCK_VISIBLE_FLOORS = 2.4;
+
+/**
+ * Where the controls sit. `bottom` = the wheel dock covers the bottom of the
+ * canvas (phones, portrait). `inline` = the wheel is a side panel and the canvas
+ * IS the play column, so `viewportW` is already the narrowed width and the
+ * tower centres in it for free.
+ */
+export type DockSide = 'bottom' | 'inline';
+
 export interface CameraInput {
   viewportW: number;
   viewportH: number;
@@ -41,6 +60,7 @@ export interface CameraInput {
   dockPx: number;
   /** Settled tower height, metres. */
   towerTopM: number;
+  dockSide?: DockSide;
 }
 
 export interface CameraFrame {
@@ -51,7 +71,7 @@ export interface CameraFrame {
   cameraY: number;
 }
 
-export function frameCamera({ viewportW, viewportH, dockPx, towerTopM }: CameraInput): CameraFrame {
+export function frameCamera({ viewportW, viewportH, dockPx, towerTopM, dockSide = 'bottom' }: CameraInput): CameraFrame {
   const groundScreenY = viewportH - dockPx - GROUND_STRIP_PX;
   const playH = groundScreenY;
   const hangSpan = CRANE_CLEARANCE_PX + BLOCK_HEIGHT_PX / 2;
@@ -59,12 +79,65 @@ export function frameCamera({ viewportW, viewportH, dockPx, towerTopM }: CameraI
   const byWidth = (viewportW / 2 - SIDE_GUTTER_PX) / SWING_HALF_SPAN_PX;
   // Hanging block under the HUD AND the tower top above the dock, at once.
   const byHeight = (playH - HUD_TOP_PX) / hangSpan;
-  const byComfort = playH / COMFORT_PLAY_HEIGHT_PX;
-  const scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, byWidth, byHeight, byComfort));
+  // With a side panel the extra height buys floors on screen instead of sky:
+  // the slab AND `SIDE_DOCK_VISIBLE_FLOORS` of tower under it have to fit.
+  const byFloors =
+    dockSide === 'inline'
+      ? (playH - HUD_TOP_PX) / (hangSpan + SIDE_DOCK_VISIBLE_FLOORS * BLOCK_HEIGHT_PX)
+      : playH / COMFORT_PLAY_HEIGHT_PX;
+  const scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, byWidth, byHeight, byFloors));
 
   // Pan up only once the hanging block would slide under the HUD.
   const hangingTopFromGround = (towerTopM * PX_PER_M + hangSpan) * scale;
   const cameraY = Math.max(0, HUD_TOP_PX - groundScreenY + hangingTopFromGround);
 
   return { scale, groundScreenY, cameraY };
+}
+
+/** How far a floor's underside is shaded when it is nowhere near the dock. */
+const SKIRT_PX = BLOCK_HEIGHT_PX * 1.4;
+/** Extra depth a pinned skirt runs past the screen's bottom edge. */
+const PINNED_OVERSHOOT_PX = 240;
+
+export interface SkirtBlock {
+  x: number;
+  y: number;
+  widthPx: number;
+  heightPx: number;
+}
+
+export interface SkirtRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/**
+ * The structure drawn UNDER each floor so the tower never floats.
+ *
+ * Two symptoms, one shape. A floor wider than the one below it left a wedge of
+ * sky under its overhang, and once the camera panned the whole stack appeared to
+ * hover on the dock's top edge with nothing holding it up — the ground is a
+ * child of the scene at y=0, so it slides away behind the dock the moment the
+ * camera climbs. Each floor gets a core shaft under it: a short shadow high up,
+ * and — for anything within reach of the screen's bottom edge — a shaft that
+ * runs past that edge and into the dock, so the building always continues down
+ * out of frame instead of ending in mid-air.
+ */
+export function towerSkirts(blocks: SkirtBlock[], bottomWorldY: number): SkirtRect[] {
+  const reach = bottomWorldY + PINNED_OVERSHOOT_PX;
+
+  return blocks.map((b) => {
+    // Overlap the floor by 2px: a hairline of sky between slab and shaft reads
+    // as a render seam at TV zoom.
+    const top = b.y + b.heightPx / 2 - 2;
+
+    return {
+      x: b.x - b.widthPx / 2,
+      y: top,
+      w: b.widthPx,
+      h: top + SKIRT_PX >= bottomWorldY ? Math.max(SKIRT_PX, reach - top) : SKIRT_PX,
+    };
+  });
 }

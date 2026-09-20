@@ -1,6 +1,69 @@
 {
-  "generatedAt": "2026-09-20T04:02:05.344Z",
+  "generatedAt": "2026-09-20T05:31:05.746Z",
   "commits": [
+    {
+      "sha": "dc883510a252d927d40df02a58c99c56857c91d4",
+      "shortSha": "dc88351",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-20",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T07:02:58+03:00"
+    },
+    {
+      "sha": "7870b03e4127556b2a80eefde39ca490bde8f2c4",
+      "shortSha": "7870b03",
+      "subject": "fix(motion): stop spring multi-keyframe console errors on /en (t_15ec0d7a) (#1054)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T05:36:33+04:00"
+    },
+    {
+      "sha": "73ec80f7c880ee34b43d81ae14bcbee87d92ab20",
+      "shortSha": "73ec80f",
+      "subject": "fix: unfreeze Word Tower after Android hint ads (#1077)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T05:35:47+04:00"
+    },
+    {
+      "sha": "e389b26336a48cc3047062b72d38a144e5b1c0a6",
+      "shortSha": "e389b26",
+      "subject": "fix(education): rerun design audit on master (contrast, dead neo-gray, reduced motion, SSR, RTL, i18n) (#1092)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T05:12:21+04:00"
+    },
+    {
+      "sha": "cfd181dbf63bffd34a0d773c5c111f64a0f4cad7",
+      "shortSha": "cfd181d",
+      "subject": "feat(edu): slice 4 moat — glossed CEFR lists, real 60s demo clock, live ?cefr= handoff (t_a663cb18) (#1043)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T04:51:01+04:00"
+    },
+    {
+      "sha": "b1b4f86c662dfe09a580470673a0b2b1b59dfd86",
+      "shortSha": "b1b4f86",
+      "subject": "feat(edu): funnel instrumentation, trial-expiry upsell, and Polar dunning guard (#1040)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T04:20:51+04:00"
+    },
+    {
+      "sha": "35209313a1497e763a0032ad8c2f68c3c5f41dc4",
+      "shortSha": "3520931",
+      "subject": "fix(blast): Wordfall HUD polish — mute control, RTL counter, frame seam, badge balance (#1091)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T02:43:27+04:00"
+    },
+    {
+      "sha": "5fb753f8951b3170d372c98078d5ae7e62320602",
+      "shortSha": "5fb753f",
+      "subject": "feat(teacher): last-lesson progress digest on reports (edu funnel) (#1090)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T00:52:46+04:00"
+    },
+    {
+      "sha": "d7154cd14cbc8d2ed261c32ab4b8087e9d729c19",
+      "shortSha": "d7154cd",
+      "subject": "feat(adventure): roguelike word RPG — combat, relics, draft, level variety, hints",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T23:26:45+03:00"
+    },
     {
       "sha": "9eb89760c97cac3b9c1e6e00f08f9f4578ff3bdd",
       "shortSha": "9eb8976",
@@ -77,69 +140,6 @@
       "subject": "fix(adventure): Russian word checks, prune dead adventure keys and assets",
       "author": "Ohad Fisher",
       "date": "2026-09-19T15:59:13+03:00"
-    },
-    {
-      "sha": "743f71b6fcdec4d4f9095ae239593c0681e5b235",
-      "shortSha": "743f71b",
-      "subject": "fix(nightly): unblock the gate — OOM heap, baseline check, bisect, restore, retry, spend cap",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T14:47:25+03:00"
-    },
-    {
-      "sha": "0c6356be7ddb213fdc9209ec51f2b81c4a51bd9f",
-      "shortSha": "0c6356b",
-      "subject": "feat(education): close classroom gaps + teacher What's new",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T14:00:03+03:00"
-    },
-    {
-      "sha": "15628813515a24b87a2efc79fe16b729aa3158b6",
-      "shortSha": "1562881",
-      "subject": "feat: land nightly 2026-09-19 salvage (dropped by an OOM gate)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T14:19:42+03:00"
-    },
-    {
-      "sha": "26f60b89aff0ef63a1b6aed9fa8af2104a5ea8b0",
-      "shortSha": "26f60b8",
-      "subject": "fix(i18n): landing first-paint subset drops mode-card and nav keys",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T14:16:49+03:00"
-    },
-    {
-      "sha": "cc6862cb479c06f38815bee88e001fbd950b17a4",
-      "shortSha": "cc6862c",
-      "subject": "fix(education): student report metrics read a table that never existed",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T11:14:34+03:00"
-    },
-    {
-      "sha": "bec7792862c3a4b97c06ec07e1588cf09cc6467c",
-      "shortSha": "bec7792",
-      "subject": "fix(sentry): stale howler listeners, unregistered NOT_IN_GAME code, pulse loading key",
-      "author": "Ohad Fisher",
-      "date": "2026-09-17T10:54:09+03:00"
-    },
-    {
-      "sha": "337893446488948af651d94415d144daed2c037a",
-      "shortSha": "3378934",
-      "subject": "feat(adventure): rebuild adventure on the classic board with world skins (#1086)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T15:07:44+04:00"
-    },
-    {
-      "sha": "3a8644e220cf01a29df41aef7e8e814578b79428",
-      "shortSha": "3a8644e",
-      "subject": "feat(edu): surface ReteachActions on TV recap for classroom hosts (#1080)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T15:00:11+04:00"
-    },
-    {
-      "sha": "ed1727c57d8b2aa4c66b7adba38cbd6ba5507741",
-      "shortSha": "ed1727c",
-      "subject": "fix(word-tower-v2): strip emoji from the rival-tower share text",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T13:32:42+03:00"
     }
   ]
 }

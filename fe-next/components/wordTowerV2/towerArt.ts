@@ -12,6 +12,9 @@ const CREAM = 0xfffef0;
 const LIME = 0xbfff00;
 const GOLD = 0xffe135;
 const CRANE_YELLOW = 0xffc629;
+/** Core shaft under the floors: concrete, a shade darker than any slab. */
+const SHAFT = 0x2b3050;
+const SHAFT_LIT = 0x3a4068;
 
 /**
  * Ground: a street strip (GROUND_STRIP_PX tall on screen) visibly above the dock —
@@ -30,6 +33,33 @@ export function paintGround(g: Graphics, halfW: number, scale: number): void {
   g.rect(-halfW, 0, halfW * 2, px(6)).fill(LIME);
   g.rect(-halfW, px(6), halfW * 2, px(3)).fill(INK);
   g.rect(-halfW, px(30), halfW * 2, px(4)).fill(INK);
+}
+
+/**
+ * The building's core under every floor — what stops the tower floating.
+ *
+ * A floor wider than the one below it used to leave a wedge of SKY under its
+ * overhang, and once the camera panned up, the whole stack ended in mid-air on
+ * the dock's top edge (the street is a child of the scene at y=0, so it slides
+ * away behind the dock as soon as the camera climbs). Each rect from
+ * `towerSkirts` is drawn as a concrete shaft with the same black outline as the
+ * floors, so the building always reads as continuing down out of frame.
+ */
+export function paintTowerShaft(g: Graphics, skirts: Array<{ x: number; y: number; w: number; h: number }>, scale: number): void {
+  const px = (n: number) => n / scale;
+  g.clear();
+  for (const s of skirts) {
+    // Slightly narrower than the floor: the slab still reads as the wide part.
+    const inset = Math.min(px(10), s.w * 0.08);
+    g.rect(s.x + inset, s.y, s.w - inset * 2, s.h).fill(SHAFT);
+    // Lift shaft + service ladder, so the core reads as structure, not a slab.
+    g.rect(s.x + s.w / 2 - px(5), s.y, px(10), s.h).fill(SHAFT_LIT);
+    for (let y = s.y + px(14); y < s.y + s.h; y += px(18)) {
+      g.rect(s.x + inset + px(4), y, s.w - inset * 2 - px(8), px(2.5));
+    }
+    g.fill({ color: INK, alpha: 0.5 });
+    g.rect(s.x + inset, s.y, s.w - inset * 2, s.h).stroke({ width: px(3), color: INK, alignment: 1 });
+  }
 }
 
 /**

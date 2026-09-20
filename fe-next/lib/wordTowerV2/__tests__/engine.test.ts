@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { Composite } from 'matter-js';
 import { releaseKinematics } from '../crane';
 import {
   FIXED_DT_MS,
   PX_PER_M,
   createTowerWorld,
+  despawnBlock,
   getTowerHeightM,
   moveAttachedBlock,
   releaseBlock,
@@ -271,5 +273,57 @@ describe('weldBelow (rebar crate)', () => {
 
   it('given a short tower, when welded, then nothing is fixed', () => {
     expect(weldBelow(stack(2), 2)).toEqual([]);
+  });
+});
+
+describe('despawnBlock — putting a hoisted word back', () => {
+  /** A tower of `n` settled floors with a fresh slab hanging on the crane. */
+  const towerWithHanging = (n: number) => {
+    const world = createTowerWorld({ seed: 3 });
+    for (let i = 0; i < n; i += 1) {
+      spawnBlock(world, block(0, -34 * i - 17, `b${i}`));
+      advance(world, 400);
+    }
+    spawnBlock(world, { ...block(0, -400, 'hang'), attached: true });
+    advance(world, 200);
+    return world;
+  };
+
+  it('given a hanging slab, when despawned, then its body leaves the world entirely', () => {
+    // Given a slab on the hook
+    const world = towerWithHanging(3);
+    const bodies = Composite.allBodies(world.engine.world).length;
+
+    // When the player puts the word back
+    expect(despawnBlock(world, 'hang')).toBe(true);
+
+    // Then nothing of it is left — no body, no id map entry, no rest timer
+    expect(Composite.allBodies(world.engine.world).length).toBe(bodies - 1);
+    expect(world.blocks.has('hang')).toBe(false);
+    expect([...world.bodyToId.values()]).not.toContain('hang');
+    expect(world.landed.has('hang')).toBe(false);
+    expect(world.restMs.has('hang')).toBe(false);
+    expect(snapshotWorld(world).blocks.some((b) => b.id === 'hang')).toBe(false);
+  });
+
+  it('given a slab the tower brushed against, when despawned, then the run does not read as collapsed', () => {
+    // Given a hanging slab that a swaying floor touched, so it counts as landed
+    const world = towerWithHanging(3);
+    world.landed.add('hang');
+    advance(world, 300);
+
+    // When it is taken back off the hook
+    despawnBlock(world, 'hang');
+    advance(world, 1200);
+
+    // Then the height it inflated goes with it and the tower still stands
+    expect(world.collapsed).toBe(false);
+    expect(world.peakHeightPx).toBeLessThanOrEqual(getTowerHeightM(world) * PX_PER_M + 1);
+  });
+
+  it('given a settled floor, when despawn is asked for an unknown id, then nothing happens', () => {
+    const world = towerWithHanging(2);
+    expect(despawnBlock(world, 'nope')).toBe(false);
+    expect(world.blocks.size).toBe(3);
   });
 });
