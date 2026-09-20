@@ -12,9 +12,14 @@ import { Container, Graphics } from 'pixi.js';
 const INK = 0x0b0e1c;
 const CREAM = 0xfffef0;
 const SHIRTS = [0xbfff00, 0xff4d9d, 0x37e0ff, 0xb06cff, 0xffe135];
-/** Flight time, and the gap between consecutive tenants, ms. */
-const FLIGHT_MS = 900;
-const STAGGER_MS = 140;
+/**
+ * Flight time, and the gap between consecutive tenants, ms. Halved from 900/140:
+ * a 9-letter word queued ten tenants and the last one was still hopping in while
+ * the next floor was being spelled. The stagger holds at 90 because every
+ * arrival rings a chime — tighter than that machine-guns the audio.
+ */
+export const FLIGHT_MS = 520;
+export const STAGGER_MS = 90;
 const HOPS = 3;
 
 interface Flight {

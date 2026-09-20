@@ -8,8 +8,13 @@ import { REWARD_ICON, TONE_CLASS } from './v2Icons';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-const CALLOUT_MS = 1100;
-const BANNER_MS = 2200;
+/**
+ * Short on purpose. At 1100/2200 a good run kept a card on screen most of the
+ * time and the praise started reading as UI, not as a reaction — and the banner
+ * queue was still draining two drops later. Fast enough to feel like applause.
+ */
+const CALLOUT_MS = 780;
+const BANNER_MS = 1450;
 
 /**
  * Winning must read louder than losing.

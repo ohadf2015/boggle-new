@@ -30,8 +30,24 @@ export const GROUND_STRIP_PX = 30;
 const SWING_HALF_SPAN_PX = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad) + 37;
 const SIDE_GUTTER_PX = 12;
 /** Play-area height that maps to scale 1 — sets block size on big screens. */
-const COMFORT_PLAY_HEIGHT_PX = 480;
-const MIN_SCALE = 0.6;
+export const COMFORT_PLAY_HEIGHT_PX = 480;
+
+/**
+ * Round 7: pull the BOTTOM-DOCK frame back a quarter.
+ *
+ * Rounds 3-6 answered "the game is so little" by growing the slabs until one
+ * floor owned 70% of a phone's width and three floors filled the play area —
+ * which stopped reading as a BUILDING. Zooming the camera instead of shrinking
+ * the constants keeps a floor a real 3m storey and leaves every timing window
+ * in feel.test untouched: only the framing moved.
+ *
+ * Deliberately NOT applied to `inline`: that layout already solves the same
+ * problem better, by targeting `SIDE_DOCK_VISIBLE_FLOORS` of tower on screen.
+ * Zooming it too would undercut the couch-readable size its tests pin.
+ */
+export const ZOOM = 0.75;
+
+const MIN_SCALE = 0.5;
 const MAX_SCALE = 2;
 
 /**
@@ -85,7 +101,8 @@ export function frameCamera({ viewportW, viewportH, dockPx, towerTopM, dockSide 
     dockSide === 'inline'
       ? (playH - HUD_TOP_PX) / (hangSpan + SIDE_DOCK_VISIBLE_FLOORS * BLOCK_HEIGHT_PX)
       : playH / COMFORT_PLAY_HEIGHT_PX;
-  const scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, byWidth, byHeight, byFloors));
+  const fit = Math.min(byWidth, byHeight, byFloors);
+  const scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, dockSide === 'inline' ? fit : ZOOM * fit));
 
   // Pan up only once the hanging block would slide under the HUD.
   const hangingTopFromGround = (towerTopM * PX_PER_M + hangSpan) * scale;

@@ -61,6 +61,24 @@ describe('skyAt', () => {
   });
 });
 
+describe('sky effects', () => {
+  it('given the climb, when the backdrop effect is read, then it changes with altitude', () => {
+    // One rotating sunburst used to hang behind the whole climb, from the street
+    // to deep space. Each sky now owns a backdrop effect, and no two consecutive
+    // skies share one, so a new sky always LOOKS new.
+    for (let i = 1; i < BIOMES.length; i += 1) expect(BIOMES[i].fx).not.toBe(BIOMES[i - 1].fx);
+    expect(new Set(BIOMES.map((b) => b.fx)).size).toBeGreaterThanOrEqual(4);
+  });
+
+  it('given a boundary, when crossed, then the two effects cross-fade rather than swap', () => {
+    const mid = skyAt(BIOMES[1].fromFloor - 1);
+    expect(mid.from.fx).toBe(BIOMES[0].fx);
+    expect(mid.to.fx).toBe(BIOMES[1].fx);
+    expect(mid.t).toBeGreaterThan(0);
+    expect(mid.t).toBeLessThan(1);
+  });
+});
+
 describe('lerpColour', () => {
   it('given endpoints, when blended, then exact at 0 and 1 and midway between', () => {
     expect(lerpColour(0x000000, 0xffffff, 0)).toBe(0x000000);

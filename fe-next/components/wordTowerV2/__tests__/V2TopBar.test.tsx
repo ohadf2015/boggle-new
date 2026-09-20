@@ -72,6 +72,14 @@ describe('V2TopBar', () => {
     expect(container.querySelector('[data-wt2-topbar-secondary]')).toBeNull();
   });
 
+  it('given a live crate effect, when rendered, then the chip NAMES it, not just an icon', () => {
+    render(bar({ run: { ...createRun(1), steadyDrops: 2 } }));
+
+    // A lone glyph never said which effect the crate had bought.
+    expect(screen.getByText('wordTowerV2.reward.steady.name')).toBeTruthy();
+    expect(screen.getByLabelText('wordTowerV2.hud.effect:wordTowerV2.reward.steady.name,2')).toBeTruthy();
+  });
+
   it('given balls and tenants banked, when rendered, then they share the secondary row', () => {
     render(bar({ run: { ...createRun(1), balls: 2 }, tenants: 3 }));
 

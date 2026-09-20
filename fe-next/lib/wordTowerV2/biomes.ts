@@ -13,6 +13,15 @@ export type BiomeId = 'downtown' | 'sunset' | 'clouds' | 'jetstream' | 'aurora' 
 
 export type PropKind = 'cloud' | 'bird' | 'balloon' | 'jet' | 'aurora' | 'satellite' | 'planet' | 'comet';
 
+/**
+ * The backdrop effect behind a sky. One rotating sunburst used to hang behind
+ * the ENTIRE climb — street to deep space — so however far you got, the sky
+ * behind you was the same picture. Each sky now owns one, and no two
+ * consecutive skies share it (biomes.test pins that), so arriving somewhere new
+ * actually looks like arriving somewhere new.
+ */
+export type SkyFx = 'rays' | 'haze' | 'streaks' | 'curtain' | 'deep';
+
 export interface Biome {
   id: BiomeId;
   /** First floor fully inside this sky. */
@@ -26,16 +35,17 @@ export interface Biome {
   /** Tint for the far city silhouettes. */
   city: number;
   props: PropKind[];
+  fx: SkyFx;
 }
 
 export const BIOMES: Biome[] = [
-  { id: 'downtown', fromFloor: 0, skyTop: 0x2f7bff, skyBottom: 0x8fd8ff, accent: 0xbfff00, stars: 0, city: 0x2a2f5a, props: ['cloud', 'bird'] },
-  { id: 'sunset', fromFloor: 3, skyTop: 0x5b2a86, skyBottom: 0xff8a4c, accent: 0xff4d9d, stars: 0, city: 0x3b1f4f, props: ['bird', 'balloon', 'cloud'] },
-  { id: 'clouds', fromFloor: 6, skyTop: 0x7a5cff, skyBottom: 0xffb3d9, accent: 0x37e0ff, stars: 0, city: 0x4a3a8a, props: ['cloud', 'balloon'] },
-  { id: 'jetstream', fromFloor: 10, skyTop: 0x1b1f5e, skyBottom: 0x3f6fd8, accent: 0x37e0ff, stars: 0.25, city: 0x1b1f45, props: ['jet', 'cloud'] },
-  { id: 'aurora', fromFloor: 15, skyTop: 0x061233, skyBottom: 0x0f4d5c, accent: 0xbfff00, stars: 0.6, city: 0x0a1a2a, props: ['aurora', 'jet'] },
-  { id: 'orbit', fromFloor: 21, skyTop: 0x02030d, skyBottom: 0x141a45, accent: 0xb06cff, stars: 1, city: 0x05060f, props: ['satellite', 'planet'] },
-  { id: 'cosmos', fromFloor: 28, skyTop: 0x12002a, skyBottom: 0x3a0a5e, accent: 0xff4d9d, stars: 1, city: 0x05060f, props: ['comet', 'planet', 'satellite'] },
+  { id: 'downtown', fromFloor: 0, skyTop: 0x2f7bff, skyBottom: 0x8fd8ff, accent: 0xbfff00, stars: 0, city: 0x2a2f5a, props: ['cloud', 'bird'], fx: 'rays' },
+  { id: 'sunset', fromFloor: 3, skyTop: 0x5b2a86, skyBottom: 0xff8a4c, accent: 0xff4d9d, stars: 0, city: 0x3b1f4f, props: ['bird', 'balloon', 'cloud'], fx: 'haze' },
+  { id: 'clouds', fromFloor: 6, skyTop: 0x7a5cff, skyBottom: 0xffb3d9, accent: 0x37e0ff, stars: 0, city: 0x4a3a8a, props: ['cloud', 'balloon'], fx: 'rays' },
+  { id: 'jetstream', fromFloor: 10, skyTop: 0x1b1f5e, skyBottom: 0x3f6fd8, accent: 0x37e0ff, stars: 0.25, city: 0x1b1f45, props: ['jet', 'cloud'], fx: 'streaks' },
+  { id: 'aurora', fromFloor: 15, skyTop: 0x061233, skyBottom: 0x0f4d5c, accent: 0xbfff00, stars: 0.6, city: 0x0a1a2a, props: ['aurora', 'jet'], fx: 'curtain' },
+  { id: 'orbit', fromFloor: 21, skyTop: 0x02030d, skyBottom: 0x141a45, accent: 0xb06cff, stars: 1, city: 0x05060f, props: ['satellite', 'planet'], fx: 'deep' },
+  { id: 'cosmos', fromFloor: 28, skyTop: 0x12002a, skyBottom: 0x3a0a5e, accent: 0xff4d9d, stars: 1, city: 0x05060f, props: ['comet', 'planet', 'satellite'], fx: 'rays' },
 ];
 
 /** Floors over which one sky fades into the next, ending at the next's fromFloor. */
