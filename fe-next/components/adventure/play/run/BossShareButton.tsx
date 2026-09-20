@@ -13,6 +13,7 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { bossDefeatImageUrl, bossShareFilename, shareReady } from './bossShare';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -48,7 +49,10 @@ export default function BossShareButton({ world, word, stars, className }: Props
       stars,
     });
     const url = typeof window !== 'undefined' ? new URL(path, window.location.origin).toString() : path;
-    const text = t('adventurePlay.eco.shareText', { world });
+    // Shares never carry emoji — a stray one in a translation leaks straight
+    // into what the player pastes (lib/share/stripEmoji, guarded by
+    // shareSinksStripEmoji.test.ts).
+    const text = stripEmoji(t('adventurePlay.eco.shareText', { world }));
 
     try {
       const file = await fetch(url)
