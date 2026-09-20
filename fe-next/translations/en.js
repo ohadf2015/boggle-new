@@ -12264,6 +12264,7 @@ const en = {
         "subtext": "Battle friends in real-time"
       },
       "freeAccess": "Free for everyone",
+      "resourcesAriaLabel": "Education resources",
       "goToDashboard": "Go to Dashboard",
       "premium": "Premium",
       "roleGuest": "Guest",

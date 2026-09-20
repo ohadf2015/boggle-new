@@ -155,7 +155,7 @@ export function ComparisonStrip() {
                 data-compare-row
                 className={`${
                   fi % 2 === 0 ? 'bg-neo-cream/40' : 'bg-neo-cream'
-                } border-b border-neo-navy/20`}
+                } border-b border-neo-navy`}
               >
                 <td className="p-3 font-bold text-neo-navy text-sm">
                   {t(`education.landing.compare.row.${f}`)}

@@ -116,7 +116,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       <span
         className={cn(
           'ms-auto hidden shrink-0 items-center gap-1.5 sm:flex',
-          'rounded-neo border-neo bg-neo-navy px-3 py-2 text-sm font-bold text-neo-white shadow-hard-sm',
+          'rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-2 text-sm font-bold text-neo-white shadow-hard-sm',
           'transition-transform group-hover:translate-x-0.5'
         )}
       >

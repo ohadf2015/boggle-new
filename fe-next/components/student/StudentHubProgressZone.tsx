@@ -91,7 +91,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
   // Skeleton
   if (leaderboardLoading || !streakLoaded) {
     return (
-      <div className="p-6 rounded-neo border-neo border-neo-black bg-neo-navy shadow-hard animate-pulse">
+      <div className="p-6 rounded-neo border-neo border-neo-cream/40 bg-neo-navy shadow-hard animate-pulse">
         <div className="flex items-center gap-4 mb-4">
           <div className="w-14 h-14 rounded-neo bg-black/10" />
           <div className="flex-1">
@@ -99,7 +99,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
             <div className="h-3 w-full bg-black/10 rounded" />
           </div>
         </div>
-        <div className="border-t-2 border-black/10 pt-4 grid grid-cols-3 gap-4">
+        <div className="border-t-2 border-neo-cream/20 pt-4 grid grid-cols-3 gap-4">
           {[0, 1, 2].map((i) => (
             <div key={`stat-${i}`} className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-neo bg-black/10" />
@@ -185,7 +185,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
         <div className="bg-neo-navy-light px-6 py-4">
           <m.div variants={statsContainer} className="grid grid-cols-3 gap-3">
             {/* Rank */}
-            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-lime shadow-hard-sm text-center">
+            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy border-s-4 border-s-neo-lime shadow-hard-sm text-center">
               <m.div
                 className="w-9 h-9 rounded-neo bg-neo-lime border-2 border-black flex items-center justify-center shadow-hard-sm"
                 whileHover={{ scale: 1.2, rotate: -8 }}
@@ -204,7 +204,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
             </m.div>
 
             {/* Total XP */}
-            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-cyan shadow-hard-sm text-center">
+            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy border-s-4 border-s-neo-cyan shadow-hard-sm text-center">
               <m.div
                 className="w-9 h-9 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center shadow-hard-sm"
                 whileHover={{ scale: 1.2, rotate: 8 }}
@@ -217,7 +217,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
             </m.div>
 
             {/* Streak */}
-            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-black bg-neo-navy border-l-4 border-l-neo-pink shadow-hard-sm text-center">
+            <m.div variants={statItem} className="flex flex-col items-center gap-1 p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy border-s-4 border-s-neo-pink shadow-hard-sm text-center">
               <m.div
                 className="w-9 h-9 rounded-neo bg-neo-pink border-2 border-black flex items-center justify-center shadow-hard-sm"
                 whileHover={{ scale: 1.2, rotate: -8 }}
@@ -235,7 +235,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
             </m.div>
           </m.div>
 
-          <div className="border-t-2 border-black/10 pt-4 mt-4">
+          <div className="border-t-2 border-neo-cream/20 pt-4 mt-4">
             <MilestoneTracker totalXp={totalXP} />
           </div>
         </div>

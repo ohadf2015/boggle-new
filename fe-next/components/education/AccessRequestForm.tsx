@@ -19,7 +19,7 @@ const ROLE_OPTIONS: { value: TeacherAccessRole; emoji: string }[] = [
 const USE_CASE_EXAMPLE_KEYS = ['use_case_ex1', 'use_case_ex2', 'use_case_ex3'] as const;
 
 const FIELD_CLASS =
-  'mt-1 w-full rounded-neo border-neo bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
+  'mt-1 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
   'transition-all duration-150 outline-none ' +
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
 const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
@@ -165,7 +165,7 @@ export function AccessRequestForm({
         {knownEmail && (
           <div
             data-testid="applying-as"
-            className="mt-3 inline-flex items-center gap-2 rounded-neo border-neo bg-neo-navy px-3 py-1.5 text-sm text-neo-white/80 shadow-hard-sm"
+            className="mt-3 inline-flex items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-1.5 text-sm text-neo-white/80 shadow-hard-sm"
           >
             <span aria-hidden="true">📇</span>
             <span className="font-semibold text-neo-white/60">{t('education.access.applying_as')}</span>
@@ -186,7 +186,7 @@ export function AccessRequestForm({
             animate={{ scale: done && !shouldReduceMotion ? [1, 1.25, 1] : 1 }}
             transition={{ duration: 0.25 }}
             className={`h-2 flex-1 rounded-neo border-neo transition-colors duration-200 ${
-              done ? 'bg-neo-lime' : 'bg-neo-navy'
+              done ? 'border-neo-black bg-neo-lime' : 'border-neo-cream/40 bg-neo-navy'
             }`}
           />
         ))}
@@ -208,8 +208,8 @@ export function AccessRequestForm({
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
                 className={`flex items-center gap-2 rounded-neo border-neo p-3 text-start font-semibold font-neo-display shadow-hard-sm transition-all ${
                   selected
-                    ? 'bg-neo-lime text-neo-navy -translate-y-0.5 shadow-hard'
-                    : 'bg-neo-navy text-neo-white hover:-translate-y-0.5 hover:shadow-hard'
+                    ? 'border-neo-black bg-neo-lime text-neo-navy -translate-y-0.5 shadow-hard'
+                    : 'border-neo-cream/40 bg-neo-navy text-neo-white hover:-translate-y-0.5 hover:shadow-hard'
                 }`}
               >
                 <span className="text-xl" aria-hidden="true">{emoji}</span>
@@ -242,7 +242,7 @@ export function AccessRequestForm({
               key={k}
               type="button"
               onClick={() => setUseCase(t(`education.access.${k}`))}
-              className="rounded-neo border-neo bg-neo-navy px-2 py-1 text-xs text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:bg-neo-cyan hover:text-neo-navy"
+              className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-2 py-1 text-xs text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:bg-neo-cyan hover:text-neo-navy"
             >
               {t(`education.access.${k}`)}
             </button>

@@ -43,7 +43,7 @@ export default function PostGameWordReview({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 120, damping: 20 }}
-      className="bg-neo-navy border-neo shadow-hard-lg rounded-neo p-4 space-y-4"
+      className="bg-neo-navy border-neo border-neo-cream/40 shadow-hard-lg rounded-neo p-4 space-y-4"
     >
       {/* Header */}
       <div className="flex items-center gap-2">

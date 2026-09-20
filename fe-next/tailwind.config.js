@@ -96,7 +96,17 @@ module.exports = {
           cream: "var(--neo-cream)",
           black: "rgb(var(--neo-black) / <alpha-value>)",
           white: "rgb(var(--neo-white) / <alpha-value>)",
-          gray: "var(--neo-gray)",
+          // Muted text/border scale for the dark-only app (all uses sit on navy).
+          // 100-400 clear 4.5:1 text on navy; 500/600 are border-only strength.
+          gray: {
+            DEFAULT: "var(--neo-gray)",
+            100: "#eceef4",
+            200: "#d6d8e3",
+            300: "#b8bbcb",
+            400: "#8e91a8",
+            500: "#6f7290",
+            600: "#555873",
+          },
 
           // DEPRECATED - Keep for backward compatibility during migration
           yellow: "var(--neo-yellow)",
