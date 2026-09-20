@@ -11,7 +11,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
-import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen, Sparkles } from 'lucide-react';
+import { Eye, ArrowRight, CheckCircle2, BookOpen, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import DismissibleSignupLine, { isSignupLineDismissedLocally } from '@/components/daily/results/DismissibleSignupLine';
 import ResultsSignupModal from '@/components/daily/results/ResultsSignupModal';
@@ -19,13 +19,14 @@ import { useIsGuest } from '@/hooks/useIsGuest';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyInsightStack from './DailyInsightStack';
 import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
-import { STICKY_CTA_WORD_HUNT } from './stickyCta';
 import { SuggestWordCard } from './SuggestWordCard';
 import { RejectedWordAppeal } from '@/components/results/RejectedWordAppeal';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { NextQuestCta } from './results/NextQuestCta';
+import { STICKY_CTA_WORD_HUNT } from './stickyCta';
 import { useExperiment } from '@/hooks/useExperiment';
 import { getPastWordHuntPerformance } from '@/utils/dailyChallenge';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
@@ -193,87 +194,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   const shouldShowSignupLine = !isAuthenticated && !inlineSignupDismissed && !locallyDismissed;
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  const wheelCtaNode = !wordWheelPlayed && (
-    <m.div
-      data-testid="wordhunt-wheel-cta"
-      className={STICKY_CTA_WORD_HUNT}
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
-    >
-      <div className="relative">
-        <span className="absolute -top-2 left-4 z-10 inline-block px-2 py-0.5 rounded-full bg-neo-purple text-neo-white text-[10px] font-neo-display font-black tracking-wider border-2 border-neo-black shadow-hard-sm">
-          {t('wordWheel.results.stepBadge', 'STEP 2 OF 2')}
-        </span>
-        <Link
-          href={`/${language}/daily/word-wheel`}
-          onClick={() => trackGrowthEvent('cross_promo_click', {
-            target: 'word_wheel',
-            source: 'word_hunt_results',
-            placement: 'sticky',
-            solved: result.solved,
-            language,
-          })}
-          className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-purple shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-              <CircleDot className="w-7 h-7 text-neo-purple-light" />
-            </div>
-            <div>
-              <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
-                {t('wordWheel.results.completeDailyTitle', "Finish today's challenge")}
-              </span>
-              <p className="text-neo-white text-xs mt-0.5">
-                {t('wordWheel.results.completeDailyDesc', 'Play Word Wheel to complete your Daily Challenge')}
-              </p>
-            </div>
-          </div>
-          <m.div
-            animate={{ x: [0, 4, 0] }}
-            transition={{ duration: 1.2, repeat: 3, repeatDelay: 0.4, ease: 'easeInOut' }}
-          >
-            <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
-          </m.div>
-        </Link>
-      </div>
-    </m.div>
-  );
-
-  // When the other game is already done, the primary CTA goes back to the
-  // Daily Hub (which surfaces the combined leaderboard) instead of nagging
-  // the player to "complete the other challenge".
-  const backToDailyCtaNode = wordWheelPlayed && (
-    <m.div
-      data-testid="wordhunt-back-to-daily-cta"
-      className={STICKY_CTA_WORD_HUNT}
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
-    >
-      <Link
-        href={`/${language}/daily`}
-        data-testid="back-to-daily-link"
-        className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-cyan shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-            <Home className="w-7 h-7 text-neo-cyan" />
-          </div>
-          <div>
-            <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
-              {t('wordHunt.results.backToDaily', 'Back to Daily Hub')}
-            </span>
-            <p className="text-neo-black/70 text-xs mt-0.5">
-              {t('wordHunt.results.backToDailyDesc', "See today's leaderboard")}
-            </p>
-          </div>
-        </div>
-        <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
-      </Link>
-    </m.div>
-  );
-
   /* The three blocks a guest keeps. Hoisted so the guest branch below reuses
      them verbatim instead of a second copy that can drift.
 
@@ -414,6 +334,11 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         {heroNode}
         {masteryRatingNode}
 
+        {/* Guests never had a next step here at all — the wheel CTA lived only in
+            the full recap. With ~90% of daily players unregistered, that was the
+            branch that most needed one. */}
+        <NextQuestCta justFinished="word-hunt" currentLanguage={language} source="word_hunt_results_guest" />
+
         {/* The signup nudge must never cost the product its only viral loop.
             ~90% of daily players are guests, so the guest-simplified branch is
             where the emoji grid and its share action matter MOST, not where
@@ -461,14 +386,21 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     {heroNode}
     {masteryRatingNode}
 
-    {/* Primary CTA — one or the other, never both */}
-    {/* Exactly ONE primary CTA renders: these two are guarded by `!wordWheelPlayed`
-        and `wordWheelPlayed`, so they can never both be truthy. Dropping the wheel
-        CTA to satisfy "one CTA" left the majority branch — players who have not
-        played the wheel yet — with no next step at all, and took its
-        `cross_promo_click` with it. */}
-    {wheelCtaNode}
-    {backToDailyCtaNode}
+    {/* Primary CTA — exactly one next step.
+        This used to be a pair of hardcoded nodes: "STEP 2 OF 2 → Word Wheel"
+        when the wheel was unplayed, "back to daily" once it was. Both predate
+        Word Tower and Connections going public, so a player who finished Hunt
+        and Wheel was told the day was over while two modes sat unplayed — and
+        the step badge miscounted a four-mode day as two. NextQuestCta reads the
+        same server-backed play state the hub does, offers whatever is genuinely
+        next, and only says "all clear" when all four are done. It carries the
+        `cross_promo_click` event the old wheel CTA emitted. */}
+    <NextQuestCta
+      justFinished="word-hunt"
+      currentLanguage={language}
+      source="word_hunt_results"
+      className={STICKY_CTA_WORD_HUNT}
+    />
 
     {/* Share and retry sit with the emoji grid, NOT inside the recap. The grid
         is the shareable artifact and this is how it leaves the app — burying the

@@ -1,6 +1,76 @@
 {
-  "generatedAt": "2026-09-20T05:31:05.746Z",
+  "generatedAt": "2026-09-20T14:11:03.152Z",
   "commits": [
+    {
+      "sha": "ca4de9a4af0240b14b54545487beec10f2d0fdd6",
+      "shortSha": "ca4de9a",
+      "subject": "fix(grid): drag highlight must never outlive the gesture",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T15:58:17+03:00"
+    },
+    {
+      "sha": "6de0bc77bbb8d0579ae779911c879c82471ffd68",
+      "shortSha": "6de0bc7",
+      "subject": "fix(word-tower-v2): full-width canvas, one HUD row, and a way out of the results",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T12:28:03+03:00"
+    },
+    {
+      "sha": "888e3d18c87585db22a8964e271fc05400377e64",
+      "shortSha": "888e3d1",
+      "subject": "Merge remote-tracking branch 'origin/master' into gauntlet/daily-evolve-2026-09-19",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T12:59:31+03:00"
+    },
+    {
+      "sha": "a004e8cdb5248a7c41c601cbf0125cc3257c328e",
+      "shortSha": "a004e8c",
+      "subject": "fix(sentry): landing i18n subset reported real keys as missing; redlock contention logged as error",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T11:25:58+03:00"
+    },
+    {
+      "sha": "b1dc8c07734548d34fc9ecdcd85abe1da08a6d91",
+      "shortSha": "b1dc8c0",
+      "subject": "Merge remote-tracking branch 'origin/master' into gauntlet/daily-evolve-2026-09-19",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T11:23:09+03:00"
+    },
+    {
+      "sha": "bf7fb8b37c44d7d6a3627c8a854d782f4772e5a8",
+      "shortSha": "bf7fb8b",
+      "subject": "boggle-new #1093 (auto-merged by portfolio-manager)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T11:34:42+04:00"
+    },
+    {
+      "sha": "af39beaf8ed0f51632b77282f56173535068ef78",
+      "shortSha": "af39bea",
+      "subject": "boggle-new #1095 (auto-merged by portfolio-manager)",
+      "author": "ohadf2015",
+      "date": "2026-09-20T11:34:40+04:00"
+    },
+    {
+      "sha": "2d34d78a257b8cb994f249b1c5f194d3fad3c08d",
+      "shortSha": "2d34d78",
+      "subject": "feat(word-tower-v2): real-estate empire, variable rewards, rival raids and revenge",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T08:39:49+03:00"
+    },
+    {
+      "sha": "3ef824c95659597de55abd2b3e132f56b876b11e",
+      "shortSha": "3ef824c",
+      "subject": "Merge remote-tracking branch 'origin/master' into gauntlet/daily-evolve-2026-09-19",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T08:29:02+03:00"
+    },
+    {
+      "sha": "dae555ade9400ac86fb9ed55aa92c4e919ab3435",
+      "shortSha": "dae555a",
+      "subject": "feat(daily): evolve the daily challenge against the NYT Games bar",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T08:24:19+03:00"
+    },
     {
       "sha": "dc883510a252d927d40df02a58c99c56857c91d4",
       "shortSha": "dc88351",
@@ -70,76 +140,6 @@
       "subject": "feat(word-tower-v2): apartment floors, Pixi sky, gameplay crates, badges",
       "author": "Ohad Fisher",
       "date": "2026-09-19T21:50:47+03:00"
-    },
-    {
-      "sha": "066cb94933ce6ead1230a1d8f4e60c5b608cec9e",
-      "shortSha": "066cb94",
-      "subject": "fix(home): sync header/top-bar streak pills to the account, not the device (#1089)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T21:21:00+04:00"
-    },
-    {
-      "sha": "fc299aa9989e459f48a679cdfd4d27bebc53f2d5",
-      "shortSha": "fc299aa",
-      "subject": "feat(word-tower-v2): big full-width slabs, real tower crane, unstuck toasts, calmer sky",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T20:05:38+03:00"
-    },
-    {
-      "sha": "df2ca83b442fada5ea2cdd0d50d8401f9840cfcc",
-      "shortSha": "df2ca83",
-      "subject": "test(i18n): drop pruned adventure keys from the locale-parity list",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T17:58:46+03:00"
-    },
-    {
-      "sha": "a1e8b131a21e36f4ddae444824868158a4446be7",
-      "shortSha": "a1e8b13",
-      "subject": "chore: refresh generated changelog, i18n manifest, translation report, routes",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T17:25:15+03:00"
-    },
-    {
-      "sha": "a2cb11af748fe09f870847a8464718c581739379",
-      "shortSha": "a2cb11a",
-      "subject": "feat(word-tower-v2): tenants move into every good floor",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T17:24:33+03:00"
-    },
-    {
-      "sha": "7c5661afbbca3955ae3921a587f179acbaf900ce",
-      "shortSha": "7c5661a",
-      "subject": "feat(word-tower-v2): bring back the spinning sunburst, cheaply",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T16:52:12+03:00"
-    },
-    {
-      "sha": "831717c4dbafc9c1a6039a3875a1f6794bc2c160",
-      "shortSha": "831717c",
-      "subject": "feat(word-tower-v2): fix flicker + reversed Hebrew, bigger slabs, one floor, more props",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T16:50:50+03:00"
-    },
-    {
-      "sha": "eeb19240371bdc88d9c5c6da621936ee6fe0d813",
-      "shortSha": "eeb1924",
-      "subject": "fix(avatar): restore real faces on landing leaderboard + header",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T16:41:50+03:00"
-    },
-    {
-      "sha": "df4bcac65b0bff4124c583f60e71babfe4909d7a",
-      "shortSha": "df4bcac",
-      "subject": "grok: Fix two user-reported bugs on the LexiClash mobile home hub (repo bogg (#1087)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T17:11:12+04:00"
-    },
-    {
-      "sha": "808e07800c6dacb749daf0233c3920bc4d219d93",
-      "shortSha": "808e078",
-      "subject": "fix(adventure): Russian word checks, prune dead adventure keys and assets",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T15:59:13+03:00"
     }
   ]
 }

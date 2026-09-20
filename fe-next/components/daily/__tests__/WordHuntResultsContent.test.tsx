@@ -258,19 +258,24 @@ describe('WordHuntResultsContent', () => {
     });
   });
 
-  describe('back-to-daily CTA (both challenges complete)', () => {
-    it('shows back-to-daily link when word wheel already played', () => {
+  describe('end-of-game handoff', () => {
+    /* Was a "back to daily hub" link shown as soon as the WHEEL was played.
+       That answer predates Word Tower and Connections going public: with two
+       modes still unplayed, sending the player back to the hub was the closest
+       thing to a dead end. The handoff now names the next unplayed mode, and
+       only falls back to the hub once the whole day is cleared. */
+    it('offers the next unplayed mode rather than a bare hub link', () => {
       (hasPlayedWordWheelToday as ReturnType<typeof vi.fn>).mockReturnValue(true);
       render(<WordHuntResultsContent {...baseProps} onBackToLobby={vi.fn()} />);
-      const link = screen.getByTestId('back-to-daily-link');
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', '/en/daily');
+      expect(screen.queryByTestId('back-to-daily-link')).toBeNull();
+      const cta = screen.getByTestId('next-quest-cta');
+      expect(cta.getAttribute('data-next-mode')).not.toBe('word-hunt');
     });
 
-    it('does not show back-to-daily link when word wheel not yet played', () => {
+    it('never offers the mode that was just finished', () => {
       (hasPlayedWordWheelToday as ReturnType<typeof vi.fn>).mockReturnValue(false);
       render(<WordHuntResultsContent {...baseProps} onBackToLobby={vi.fn()} />);
-      expect(screen.queryByTestId('back-to-daily-link')).toBeNull();
+      expect(screen.getByTestId('next-quest-cta').getAttribute('data-next-mode')).not.toBe('word-hunt');
     });
   });
 });

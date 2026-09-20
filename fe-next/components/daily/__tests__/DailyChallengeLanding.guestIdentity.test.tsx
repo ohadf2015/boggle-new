@@ -88,12 +88,16 @@ describe('DailyChallengeLanding — guest identity', () => {
     captured.length = 0;
   });
 
-  // The hub no longer carries a leaderboard. That was a deliberate call, not an oversight: with 12
-  // unique daily players a week, a board showing three names reads as a dead product rather than a
-  // reason to come back, so the hub answers "what do I play now" instead. The daily RESULTS screen
-  // still shows the board — that is where standing against other players belongs, after a score
-  // exists. This test is inverted rather than deleted so a future re-add has to be deliberate too.
-  it('does not render a leaderboard on the hub', async () => {
+  // The hub carries a leaderboard again (owner call, 2026-09-20), reversing the
+  // 2026-09-19 redesign that cut it on the grounds that a three-name board reads
+  // as a dead product. It is the compact LeaderboardTeaser, NOT the heavyweight
+  // TabbedDailyLeaderboard — that one belongs on the results screen, after a
+  // score exists. Both halves are asserted so neither can drift back silently.
+  //
+  // The earlier version of this test queried only `tabbed-daily-leaderboard`,
+  // which the hub never rendered in either design, so it passed whether or not a
+  // board was present. An assertion that cannot fail is not a guard.
+  it('renders the compact leaderboard on the hub, not the tabbed one', async () => {
     render(
       <AuthProvider>
         <LanguageProvider initialLanguage="en">
@@ -103,6 +107,7 @@ describe('DailyChallengeLanding — guest identity', () => {
     );
     // Wait for the hub itself to settle, so this is not a race that passes before any render.
     await screen.findByTestId('secondary-modes');
+    expect(screen.getByTestId('leaderboard-teaser')).toBeInTheDocument();
     expect(screen.queryByTestId('tabbed-daily-leaderboard')).toBeNull();
   });
 

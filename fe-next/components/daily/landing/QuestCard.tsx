@@ -18,8 +18,10 @@ export interface QuestCardProps {
   tagline: string;
   details?: string;
   /** Each value renders its own accent, icon, glow and art scrim — one owned
-   *  colour per daily game, which is what makes the hub scannable. */
-  color: 'orange' | 'yellow' | 'cyan';
+   *  colour per daily game, which is what makes the hub scannable. `purple` is
+   *  Connections': without it the card fell through to `cyan` and rendered
+   *  identically to Word Tower whenever Connections was the hero. */
+  color: 'orange' | 'yellow' | 'cyan' | 'purple';
   status: 'new' | 'won' | 'lost' | 'unavailable';
   isLoadingStatus?: boolean;
   onPlay: () => void;
@@ -119,6 +121,16 @@ export function QuestCard({
       accent: 'bg-neo-cyan',
       glow: 'bg-neo-cyan/30',
       scrim: 'from-neo-navy via-neo-navy/85 to-neo-cyan/45',
+    },
+    purple: {
+      text: 'text-neo-purple',
+      bg: 'bg-neo-purple',
+      pill: 'bg-neo-purple/20 border-neo-purple text-neo-purple',
+      iconBg: 'bg-neo-purple',
+      gradient: 'from-neo-purple/15',
+      accent: 'bg-neo-purple',
+      glow: 'bg-neo-purple/30',
+      scrim: 'from-neo-navy via-neo-navy/85 to-neo-purple/45',
     },
   } as const;
 

@@ -144,12 +144,17 @@ describe('DailyChallengeLanding — Hub Redesign', () => {
     expect(connectors.length).toBe(0);
   });
 
-  it('should NOT render leaderboard component (redesigned out)', () => {
-    const { container } = renderComponent();
-    // The leaderboard was intentionally removed from the hub redesign.
-    // Assert it is absent so a future restore has to argue with a failing test.
-    const trophyIcon = container.querySelector('svg[class*="lucide-trophy"]');
-    expect(trophyIcon).not.toBeInTheDocument();
+  it('should render the leaderboard (restored 2026-09-20)', () => {
+    renderComponent();
+    // The 2026-09-19 redesign cut the hub board; the owner asked for it back, so
+    // the assertion is inverted rather than deleted — the next person to remove
+    // it has to argue with a failing test, exactly as before, in the other
+    // direction.
+    //
+    // The removed version looked for a `lucide-trophy` icon. The teaser uses
+    // Crown, so that assertion passed no matter what the hub rendered. Address
+    // the component by its test id instead of an icon class that can change.
+    expect(screen.getByTestId('leaderboard-teaser')).toBeInTheDocument();
   });
 
   it('should render mission header (kept for progression display)', () => {

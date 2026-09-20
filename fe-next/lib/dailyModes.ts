@@ -38,6 +38,14 @@ export interface DailyModeDef {
   descKey: string;
   /** Accent family for the card chrome. */
   accent: 'orange' | 'yellow' | 'cyan' | 'purple';
+  /**
+   * Mode artwork under `public/daily`. Lives here so the hub hero, the hub's
+   * compact rows and the end-of-game handoff all show the SAME picture for a
+   * mode. Previously each surface picked art with its own inline ternary, and
+   * the one that had no Connections branch silently rendered the Word Hunt
+   * mascot for Connections.
+   */
+  art: string;
 }
 
 export const DAILY_MODES: readonly DailyModeDef[] = [
@@ -48,6 +56,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'daily.wordHunt.title',
     descKey: 'daily.wordHunt.desc',
     accent: 'orange',
+    art: '/daily/word-hunt-mascot.jpg',
   },
   {
     id: 'word-wheel',
@@ -56,6 +65,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'wordWheel.hub.wordWheelQuest',
     descKey: 'wordWheel.hub.wordWheelDesc',
     accent: 'yellow',
+    art: '/daily/word-wheel-mascot.jpg',
   },
   {
     id: 'word-tower',
@@ -64,6 +74,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'wordTower.daily.questTitle',
     descKey: 'wordTower.daily.questDesc',
     accent: 'cyan',
+    art: '/daily/word-tower-mascot.jpg',
   },
   {
     id: 'connections',
@@ -72,6 +83,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'connections.daily.questTitle',
     descKey: 'connections.daily.questDesc',
     accent: 'purple',
+    art: '/daily/connections-mascot.jpg',
   },
 ];
 
@@ -142,4 +154,45 @@ export function pickPrimaryMode(state: DailyModePlayState): DailyModeId {
 
   // All played → default to Word Hunt (safe fallback)
   return 'word-hunt';
+}
+
+/** Priority order the hub and the end-of-game handoff both follow. */
+const MODE_PRIORITY: readonly DailyModeId[] = ['word-hunt', 'word-wheel', 'word-tower', 'connections'];
+
+/** Has this mode been played today, per the unified play state? */
+function isModePlayed(state: DailyModePlayState, id: DailyModeId): boolean {
+  switch (id) {
+    case 'word-hunt':
+      return state.wordHunt !== 'new';
+    case 'word-wheel':
+      return state.wordWheel === 'played';
+    case 'word-tower':
+      return state.wordTower;
+    case 'connections':
+      return state.connections;
+  }
+}
+
+/**
+ * What to play NEXT once `justFinished` is done — the same priority order as
+ * {@link pickPrimaryMode}, minus the mode just completed, and `null` when the
+ * whole day is cleared.
+ *
+ * Distinct from pickPrimaryMode on purpose: that one falls back to 'word-hunt'
+ * when everything is played, which is the right answer for a hub that must
+ * always render a hero, and the WRONG answer for an end-of-game handoff, where
+ * it would bounce the player back into a mode they already finished. Callers
+ * must render the "come back tomorrow" state on null rather than a stale CTA.
+ *
+ * Note a LOST Word Hunt counts as played here: re-offering the mode the player
+ * just failed is not a next step, and the retry affordance already exists on
+ * the results screen itself.
+ */
+export function pickNextUnplayedMode(
+  state: DailyModePlayState,
+  justFinished: DailyModeId,
+): DailyModeId | null {
+  return (
+    MODE_PRIORITY.find((id) => id !== justFinished && !isModePlayed(state, id)) ?? null
+  );
 }

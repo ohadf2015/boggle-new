@@ -7026,6 +7026,8 @@ const en = {
     "relaxedQuest": "Relaxed Quest",
     "untimedQuest": "Untimed Quest",
     "startQuest": "START QUEST",
+    "nextUp": "Next up",
+    "allClearToday": "Today's board is clear — see you tomorrow",
     "adminBeta": "Beta",
     "replay": "Replay",
     "cleared": "Cleared!",
