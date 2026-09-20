@@ -41,6 +41,20 @@ describe('LanguageContext t identity contract', () => {
     ).toBeGreaterThan(-1);
   });
 
+  it('keys it on a COUNTER, so the landing-subset → full upgrade also changes identity', () => {
+    // A boolean bailed out on the second load: `/en` boots on the landing
+    // first-paint subset, `translationsReady` flips true there, and the full
+    // catalogue arriving a moment later set it to `true` again — no change, so
+    // `t` kept its identity and memoized subtrees kept the raw key paths.
+    // Sentry JAVASCRIPT-NEXTJS-279/-27A/-27B/-27E/-27H/-27J/-27K/-27N.
+    expect(
+      source,
+      'translationsReady must be a monotonic counter, not a boolean — the ' +
+        'partial→full catalogue upgrade sets the same value twice.',
+    ).toMatch(/const \[translationsReady, bumpTranslations\] = useReducer\(\(n: number\) => n \+ 1, 0\);/);
+    expect(source).not.toMatch(/setTranslationsReady\(/);
+  });
+
   it('still reads translations from the ref, so the dep is identity-only', () => {
     // Guards the reason the dep looks unused: if `t` ever starts reading state
     // directly, this comment-and-contract pairing needs revisiting.
