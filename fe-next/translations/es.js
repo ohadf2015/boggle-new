@@ -878,6 +878,8 @@ const es = {
       "ledgerShort": "{name} todavía te saca {n}.",
       "ledgerBlocked": "El escudo de {name} aguantó. La cuenta sigue abierta.",
       "revengeBonus": "+50% de venganza",
+      "revengeFree": "Gratis: ellos empezaron",
+      "revengePill": "Venganza ×{n}",
       "blocked": "¡Escudo bloqueado!",
       "blockedBody": "El escudo de {name} se tragó el golpe. Aun así te llevas calderilla.",
       "smashed": "¡Demolida!",
@@ -914,6 +916,7 @@ const es = {
     "milestone": { "floors": "¡Pisos!", "a11y": "{n} pisos" },
     "chest": {
       "tier": { "common": "Común", "rare": "Rara", "epic": "Épica" },
+      "sealed": "Sellado",
       "tap": "Toca para abrir",
       "skip": "Saltar",
       "continue": "Recoger",
@@ -1078,7 +1081,9 @@ const es = {
     "call": {"perfect": {"0": "¡PERFECTO!", "1": "¡EN EL BLANCO!", "2": "¡EXACTO!", "3": "¡IMPECABLE!"}, "good": {"0": "¡BIEN!", "1": "¡SÓLIDO!", "2": "¡LIMPIO!", "3": "¡SUAVE!"}, "sloppy": {"0": "TAMBALEANTE…", "1": "¡POR POCO!", "2": "¡AGUANTA!"}, "miss": {"0": "¡UPS!", "1": "¡AY!", "2": "¡SE CAE!"}, "combo": {"double": "¡DOBLE!", "triple": "¡TRIPLE!", "quad": "¡CUÁDRUPLE!", "unstoppable": "¡IMPARABLE ×{n}!", "legendary": "¡LEGENDARIO ×{n}!"}, "word": {"big": "¡PALABRA GRANDE!", "mega": "¡MEGAPALABRA!"}},
     "reward": {"crate": "¡Caja!", "steady": {"name": "Grúa firme", "desc": "Los próximos 3 pisos se balancean más lento"}, "plumb": {"name": "Plomada", "desc": "Los próximos 2 pisos caen rectos"}, "wide": {"name": "Carga ancha", "desc": "Tu próximo piso será más ancho"}, "rebar": {"name": "Varilla", "desc": "Pisos inferiores soldados: ya no pueden caer"}, "scramble": {"name": "Letras nuevas", "desc": "+2 mezclas"}, "jackpot": {"name": "Premio gordo", "desc": "¡Puntos extra!"}},
     "ach": {"unlocked": "Insignia desbloqueada", "groundbreaker": {"name": "Primera piedra", "desc": "Coloca tu primer piso"}, "fiveStory": {"name": "Cinco plantas", "desc": "Apila 5 pisos en una partida"}, "highRise": {"name": "Edificio alto", "desc": "Apila 10 pisos en una partida"}, "skyscraper": {"name": "Rascacielos", "desc": "Apila 20 pisos en una partida"}, "megatower": {"name": "Megatorre", "desc": "Apila 30 pisos en una partida"}, "steadyHands": {"name": "Pulso firme", "desc": "3 caídas perfectas seguidas"}, "surgeon": {"name": "Cirujano", "desc": "6 caídas perfectas seguidas"}, "flawless": {"name": "Impecable", "desc": "10 caídas perfectas seguidas"}, "perfectionist": {"name": "Perfeccionista", "desc": "15 caídas perfectas en una partida"}, "wordsmith": {"name": "Artesano de palabras", "desc": "Sube una palabra de 6 letras"}, "lexicon": {"name": "Diccionario andante", "desc": "Sube una palabra de 8 letras"}, "fullHouse": {"name": "Casa llena", "desc": "50 inquilinos en una partida"}, "cityPlanner": {"name": "Urbanista", "desc": "150 inquilinos en una partida"}, "lucky": {"name": "Racha de suerte", "desc": "Abre 5 cajas en una partida"}, "welder": {"name": "Soldador", "desc": "Suelda tu torre con varilla"}, "sunsetView": {"name": "Vista al atardecer", "desc": "Sube hasta el cielo del atardecer"}, "aboveClouds": {"name": "Sobre las nubes", "desc": "Sube más allá de las nubes"}, "orbiter": {"name": "En órbita", "desc": "Construye hasta la órbita"}},
-    "results": {"floorsA11y": "Llegaste al piso {n}", "combo": "Mejor racha", "tenants": "Inquilinos", "crates": "Cajas", "badges": "Insignias ganadas", "nextGoal": "Próxima meta"},
+    "results": {
+        "home": "Inicio",
+        "close": "Cerrar","floorsA11y": "Llegaste al piso {n}", "combo": "Mejor racha", "tenants": "Inquilinos", "crates": "Cajas", "badges": "Insignias ganadas", "nextGoal": "Próxima meta"},
     "hint": {"spell": "Forma una palabra para construir el siguiente piso", "drop": "Toca SOLTAR cuando el piso esté sobre la torre"},
     "changeWord": "CAMBIAR PALABRA",
     "editHint": "Toca una letra usada para editar la palabra",

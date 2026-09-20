@@ -53,8 +53,12 @@ describe('empire entry points', () => {
     expect(screen.getByRole('button').textContent).toContain('% steadier');
   });
 
-  it('given a fresh estate, when the run chip row renders, then it invites the player to build', () => {
+  // Was: the empty row carried a "build your district" invitation. It stacked a
+  // second cream box on top of the gameplay hint, two boxes over the tower both
+  // asking for a tap. The invitation now rides the empire button's badge, which
+  // is on screen either way — so an estate with no perks states nothing.
+  it('given a fresh estate, when the run chip row renders, then it states nothing', () => {
     render(<PerkChips t={t} perks={perksFromEstate(emptyEstate())} onOpen={() => undefined} />);
-    expect(screen.getByRole('button').textContent).toBe(en.wordTowerV2.estate.perksNone);
+    expect(screen.getByRole('button').textContent).toBe('');
   });
 });

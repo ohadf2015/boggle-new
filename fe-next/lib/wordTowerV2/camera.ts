@@ -141,3 +141,28 @@ export function towerSkirts(blocks: SkirtBlock[], bottomWorldY: number): SkirtRe
     };
   });
 }
+
+/** Anything with a Pixi v8 `screen` rectangle (the renderer, in practice). */
+export interface ScreenSized {
+  screen: { width: number; height: number };
+  /**
+   * Present on a real renderer and deliberately NOT read. Declared so the trap
+   * is visible at the type: `width / resolution` is the v7 habit that painted
+   * the whole scene into 1/dpr of the canvas.
+   */
+  resolution?: number;
+  width?: number;
+  height?: number;
+}
+
+/**
+ * The viewport in CSS pixels.
+ *
+ * Pixi v8's `renderer.screen` is already CSS px. `renderer.width` is too — but
+ * it reads like v7's device-pixel value, and dividing it by `resolution` (as
+ * this file's callers used to) is a no-op at dpr 1 and shrinks the whole world
+ * to 1/dpr of the canvas on every real phone. Read `screen`, never `width`.
+ */
+export function screenSize(renderer: ScreenSized): { w: number; h: number } {
+  return { w: renderer.screen.width, h: renderer.screen.height };
+}

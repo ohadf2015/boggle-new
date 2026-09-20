@@ -7,7 +7,7 @@ import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc
 import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
 import { buildSkyline, rulerTicks, skyProps } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
-import { type DockSide, frameCamera, towerSkirts } from '@/lib/wordTowerV2/camera';
+import { frameCamera, screenSize, towerSkirts, type DockSide } from '@/lib/wordTowerV2/camera';
 import { publishHeightM } from '@/lib/wordTowerV2/altitude';
 import { floorsAt, skyAt } from '@/lib/wordTowerV2/biomes';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
@@ -235,7 +235,7 @@ export default function TowerCanvas(props: Props) {
           const view = views.get(fx.id);
           if (fx.kind === 'tenants') {
             // Half the screen in world units, from last frame's zoom (it barely moves).
-            const halfScreen = created.renderer.width / created.renderer.resolution / 2 / scene.scale.x;
+            const halfScreen = screenSize(created.renderer).w / 2 / scene.scale.x;
             crowd.moveIn(fx.id, fx.count, block?.x ?? 0, halfScreen);
             continue;
           }
@@ -285,8 +285,7 @@ export default function TowerCanvas(props: Props) {
           },
         );
 
-        const w = created.renderer.width / created.renderer.resolution;
-        const h = created.renderer.height / created.renderer.resolution;
+        const { w, h } = screenSize(created.renderer);
 
         camTopM = publishHeightM(camTopM, snap.towerHeightM);
         const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: camTopM, dockSide: p.dockSide });

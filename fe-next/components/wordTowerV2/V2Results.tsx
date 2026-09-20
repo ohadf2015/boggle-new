@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useState } from 'react';
-import { Hammer, Medal, Send, Target, Trophy } from 'lucide-react';
+import { Hammer, Home, Medal, Send, Target, Trophy, X } from 'lucide-react';
 import type { TowerBlock } from '@/lib/wordTowerV2/estateTower';
 import { ACHIEVEMENTS, type RunStats, emptyStats, progressOf } from '@/lib/wordTowerV2/achievements';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
@@ -24,6 +24,10 @@ interface Props {
   /** Full run stats (longest word, welds…) — the run state alone lacks them. */
   stats?: RunStats;
   onRestart: () => void;
+  /** Leave the game entirely. The run is over; trapping the player here is not a choice. */
+  onHome: () => void;
+  /** Dismiss the card and look at the tower that just fell. */
+  onClose: () => void;
   smashLabel?: string;
   onSmash?: () => void;
   onShare?: () => void;
@@ -58,7 +62,7 @@ function nextGoal(stats: RunStats, skip: Set<string>) {
   return best;
 }
 
-export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, onRestart, smashLabel, onSmash, onShare, extra, rivals }: Props) {
+export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals }: Props) {
   // `revenge` is the raid being answered, not a flag: its numbers ride the whole
   // raid so the payout can name the debt it settled.
   const [target, setTarget] = useState<{ rival: RivalView; revenge: RevengeEntry | null } | null>(null);
@@ -66,6 +70,14 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
   useEffect(() => {
     onRaidOpen?.(target !== null);
   }, [target, onRaidOpen]);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   const floors = Math.floor(floorsAt(peakM) + 0.05);
   const stats: RunStats = { ...emptyStats(), ...runStats, floors: run.floors, peakFloors: floors, bestCombo: run.bestCombo, tenants: run.tenants, crates: run.crates };
   const goal = nextGoal(stats, new Set([...unlocked, ...badges]));
@@ -80,13 +92,29 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
     <>
       {/* The scroller is the backdrop, and the raid is a SIBLING of it: a
           full-screen raid rendered inside a scrolling card scrolls away. */}
-      <div className="absolute inset-0 z-40 overflow-y-auto bg-neo-navy/75 p-4" role="dialog" aria-modal="true">
+      <div
+        data-wt2-results-backdrop
+        className="absolute inset-0 z-40 overflow-y-auto bg-neo-navy/75 p-4"
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      >
       {/* A centred phone-width modal on a 1920 screen is two dead columns of
           navy — the rules count that against us. With a board to show, the card
           goes wide and splits: scorecard one side, the rivals the other. */}
       <div className={`mx-auto flex min-h-full w-full max-w-sm items-center ${rivals ? 'md:max-w-5xl lg:max-w-6xl' : 'md:max-w-2xl'}`}>
-      <div className={`w-full rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop md:p-6 ${rivals ? 'md:flex md:items-start md:gap-6' : ''}`}>
+      <div className={`relative w-full rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop md:p-6 ${rivals ? 'md:flex md:items-start md:gap-6' : ''}`}>
       <div className={rivals ? 'md:w-[22rem] md:shrink-0 lg:w-[26rem]' : 'contents'}>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('wordTowerV2.results.close')}
+          className="absolute end-3 top-3 flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+        >
+          <X className="h-4 w-4" aria-hidden />
+        </button>
         <h2 className="font-neo-display text-3xl font-black uppercase">{t('wordTowerV2.collapsed')}</h2>
         {isBest ? (
           <div className="mx-auto mt-2 flex w-fit items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-3 py-0.5 font-neo-display text-sm font-bold">
@@ -155,35 +183,56 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
             onPick={(rival, revenge) => setTarget({ rival, revenge })}
           />
         ) : null}
-        {onSmash && smashLabel ? (
-          <button
-            type="button"
-            onClick={onSmash}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-          >
-            <Hammer className="h-5 w-5" aria-hidden />
-            {smashLabel}
-          </button>
-        ) : null}
-        {onShare ? (
-          <button
-            type="button"
-            onClick={onShare}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan px-6 py-2 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-          >
-            <Send className="h-5 w-5" aria-hidden />
-            {t('wordTowerV2.wreck.share')}
-          </button>
-        ) : null}
+        {/* ONE primary action. Everything else is smaller, and anything the
+            player cannot actually act on is not rendered at all. */}
         <button
           type="button"
           onClick={onRestart}
           autoFocus
-          className="mt-3 w-full rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          className="mt-5 w-full rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
         >
           {t('common.playAgain')}
         </button>
-        {extra}
+
+        {/* Secondary: the empire, and the smash round when there is a tower to
+            smash. Side by side so the card does not grow a button stack. */}
+        <div className="mt-3 flex gap-2">
+          {extra ? <div className="min-w-0 flex-1">{extra}</div> : null}
+          {onSmash && smashLabel ? (
+            <button
+              type="button"
+              onClick={onSmash}
+              className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-2.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+            >
+              <Hammer className="h-5 w-5 shrink-0" aria-hidden />
+              <span className="truncate">{smashLabel}</span>
+            </button>
+          ) : null}
+        </div>
+
+        {/* Tertiary: leaving, and sharing. Icon-sized — they are not the point
+            of this screen, but the player must never be stuck on it. */}
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={onHome}
+            aria-label={t('wordTowerV2.results.home')}
+            className="flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy px-3 py-1.5 font-neo-display text-sm font-bold text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+          >
+            <Home className="h-4 w-4" aria-hidden />
+            <span aria-hidden>{t('wordTowerV2.results.home')}</span>
+          </button>
+          {onShare ? (
+            <button
+              type="button"
+              onClick={onShare}
+              className="flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-cyan px-3 py-1.5 font-neo-display text-sm font-bold text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+            >
+              <Send className="h-4 w-4" aria-hidden />
+              {t('wordTowerV2.wreck.share')}
+            </button>
+          ) : null}
+        </div>
         </div>
       </div>
       </div>

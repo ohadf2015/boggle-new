@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Delete, Shuffle, Undo2 } from 'lucide-react';
+import { Delete, Home, Shuffle, Undo2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -17,7 +18,7 @@ import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
 import { sanitizeWords } from '@/lib/wordTowerV2/wreck';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
-import { V2Hud } from './V2Hud';
+import { V2TopBar } from './V2TopBar';
 import { V2Results } from './V2Results';
 import { RevengeInbox } from './rivals/RevengeInbox';
 import { towerBlocksFrom } from './rewards/useRunPayout';
@@ -25,6 +26,7 @@ import { RunRewards } from './rewards/RunRewards';
 import { useRewardsFlow } from './rewards/useRewardsFlow';
 import { useEstate } from './useEstate';
 import { DistrictScreen } from './estate/DistrictScreen';
+import { perkChips } from './estate/estateArt';
 import { EstateButton } from './estate/EstateButton';
 import { PerkChips } from './estate/PerkChips';
 import { useRivalTower } from './useRivalTower';
@@ -49,6 +51,7 @@ export default function WordTowerV2() {
   const reducedMotion = usePrefersReducedMotion();
   const game = useTowerRun();
   const { profile } = useAuth();
+  const router = useRouter();
   const { rival, share, copied } = useRivalTower(language);
   const [smashing, setSmashing] = useState(false);
   // A raid (rival board -> their tower) owns the whole screen like the smash round.
@@ -97,6 +100,10 @@ export default function WordTowerV2() {
   const [rejected, setRejected] = useState<string | null>(null);
   const [stats, setStats] = useState<FrameStats | null>(null);
   const [debug, setDebug] = useState(false);
+
+  // Shared by the top bar (which renders the coin chip) and ImpactBurst (which
+  // flies landing coins into its exact rect), so the number never changes off-screen.
+  const coinsRef = useRef<HTMLDivElement | null>(null);
 
   const dockRef = useRef<HTMLDivElement | null>(null);
   const dockPxRef = useRef(260);
@@ -344,10 +351,15 @@ export default function WordTowerV2() {
   }, [phase, dropFloor, submit, wheel, takeSlot, smashing, putBack]);
 
   // Hold the results a beat so the player watches their tower come down.
+  // The player closed the results card to look at the tower that fell. Cleared
+  // the moment the run leaves 'over', so a new run never opens pre-dismissed.
+  const [resultsDismissed, setResultsDismissed] = useState(false);
+
   const [showOver, setShowOver] = useState(false);
   useEffect(() => {
     if (phase !== 'over') {
       setShowOver(false);
+      setResultsDismissed(false);
       return;
     }
     const id = window.setTimeout(() => setShowOver(true), 1300);
@@ -402,21 +414,33 @@ export default function WordTowerV2() {
         />
       ) : null}
 
-      {phase !== 'over' && !smashing && !district ? (
-        <EstateButton t={t} estate={estateApi.estate} raids={estateApi.inbox.length} onOpen={() => setDistrict(true)} />
-      ) : null}
-      {phase !== 'over' && !smashing && !district && run.floors === 0 && !rival ? (
+      {phase !== 'over' && !smashing && !district && run.floors === 0 && !rival && perkChips(estateApi.perks).length > 0 ? (
         <PerkChips t={t} perks={estateApi.perks} onOpen={() => setDistrict(true)} />
       ) : null}
 
-      <V2Hud t={t} heightM={heightM} score={score} bestM={game.bestM} run={run} tenants={Math.min(arrived, run.tenants)} />
+      {phase !== 'over' && !smashing && !district ? (
+        <V2TopBar
+          t={t}
+          heightM={heightM}
+          score={score}
+          bestM={game.bestM}
+          run={run}
+          tenants={Math.min(arrived, run.tenants)}
+          estate={estateApi.estate}
+          runCoins={rewardsFlow.rewards.coins}
+          raids={estateApi.inbox.length}
+          coinsRef={coinsRef}
+          onOpenEstate={() => setDistrict(true)}
+          wide={wide}
+          reducedMotion={reducedMotion}
+        />
+      ) : null}
       <RunRewards
         t={t}
         flow={rewardsFlow}
-        combo={run.combo}
-        bestCombo={run.bestCombo}
         points={game.callout?.points ?? 0}
         canvasClass={canvasClass}
+        counterRef={coinsRef}
         hideInRun={smashing || district || showOver}
         showChest={showOver}
         wide={wide}
@@ -533,7 +557,7 @@ export default function WordTowerV2() {
         </div>
       </div>
 
-      {(showOver && rewardsFlow.resultsReady) || forceResults ? (
+      {((showOver && rewardsFlow.resultsReady) || forceResults) && !resultsDismissed ? (
         <V2Results
           t={t}
           peakM={game.peakM}
@@ -549,6 +573,11 @@ export default function WordTowerV2() {
             undoGuardRef.current = null;
             restart();
             setRunSeed(`wt2-${Date.now()}`);
+          }}
+          onHome={() => router.push(`/${language}`)}
+          onClose={() => {
+            setForceResults(false);
+            setResultsDismissed(true);
           }}
           smashLabel={rival ? t('wordTowerV2.wreck.smash', { name: rivalName }) : t('wordTowerV2.wreck.smashOwn')}
           onSmash={smashWords ? () => setSmashing(true) : undefined}
@@ -572,9 +601,42 @@ export default function WordTowerV2() {
         />
       ) : null}
 
+      {/* Closing the results card shows the fallen tower — but it must never be
+          a dead end, so the three ways on stay pinned above the dock. */}
+      {resultsDismissed && phase === 'over' && !smashing && !district ? (
+        <div className="absolute inset-x-0 bottom-[calc(var(--wt2-dock,17rem)+0.75rem)] z-40 mx-auto flex w-fit items-center gap-2 px-3">
+          <button
+            type="button"
+            onClick={() => setResultsDismissed(false)}
+            className="rounded-neo border-neo border-black bg-neo-cream px-3 py-1.5 font-neo-display text-sm font-bold text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+          >
+            {t('wordTowerV2.results.badges')}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              restart();
+              setRunSeed(`wt2-${Date.now()}`);
+            }}
+            className="rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-1.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          >
+            {t('common.playAgain')}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(`/${language}`)}
+            aria-label={t('wordTowerV2.results.home')}
+            className="flex h-9 w-9 items-center justify-center rounded-neo border-neo border-black bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+          >
+            <Home className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
+      ) : null}
+
       {district ? <DistrictScreen t={t} estate={estateApi} onClose={() => setDistrict(false)} /> : null}
 
-      {/* Someone raided you while you were away: a face, a grievance, a REVENGE button. */}
+      {/* Someone raided you while you were away: their tower, the grievance and
+          a free REVENGE — before any run, not after one. */}
       {phase !== 'over' && !smashing && !district && !showOver && !forceResults && run.floors === 0 ? (
         <RevengeInbox t={t} estate={estateApi} balls={run.balls} reducedMotion={reducedMotion} onRaidOpen={setRaiding} />
       ) : null}

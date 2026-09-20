@@ -31,7 +31,11 @@ const CHIP_CLASS: Record<PlotSlot, string> = {
 /**
  * What the district is doing for THIS run, shown once at the top of it. Perks
  * that are invisible are perks nobody upgrades for, so they are stated in the
- * run itself — and with nothing built yet the row is the invitation.
+ * run itself.
+ *
+ * With NOTHING built there is nothing to state, and the caller does not render
+ * this at all: the empty-state nudge used to stack a second cream box on top of
+ * the gameplay hint, two boxes over the tower both asking for a tap.
  */
 export function PerkChips({ t, perks, onOpen }: Props) {
   const chips = perkChips(perks);
@@ -42,12 +46,7 @@ export function PerkChips({ t, perks, onOpen }: Props) {
       onClick={onOpen}
       className="pointer-events-auto absolute inset-x-0 bottom-[calc(var(--wt2-dock,17rem)+3.5rem)] z-40 mx-auto flex w-fit max-w-[92vw] flex-wrap items-center justify-center gap-1.5 px-2 animate-neo-pop"
     >
-      {chips.length === 0 ? (
-        <span className="rounded-neo border-neo border-black bg-neo-cream/90 px-2.5 py-1 font-neo-display text-xs font-bold text-neo-navy shadow-hard-sm">
-          {t('wordTowerV2.estate.perksNone')}
-        </span>
-      ) : (
-        chips.map((chip) => {
+      {chips.map((chip) => {
           const Icon = ICON[chip.id];
           return (
             <span
@@ -58,8 +57,7 @@ export function PerkChips({ t, perks, onOpen }: Props) {
               {t(chip.key, chip.params)}
             </span>
           );
-        })
-      )}
+      })}
     </button>
   );
 }

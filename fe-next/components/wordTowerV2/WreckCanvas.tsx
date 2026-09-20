@@ -28,6 +28,7 @@ import { createCity, paintCity, placeCity } from './skylineArt';
 import { skyAt } from '@/lib/wordTowerV2/biomes';
 import { buildSkyline } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
+import { screenSize } from '@/lib/wordTowerV2/camera';
 
 /**
  * Pixi view of the smash round. Owns the ball cycle: hang -> (player cuts) ->
@@ -254,8 +255,7 @@ export default function WreckCanvas({ className, ...props }: Props) {
         shake.update(dt);
         particles.update(dt);
 
-        const w = created.renderer.width / created.renderer.resolution;
-        const h = created.renderer.height / created.renderer.resolution;
+        const { w, h } = screenSize(created.renderer);
         // The street sits low: at 0.8 a phone gave up a fifth of the screen to
         // empty navy under the pavement while the tower was cropped at the top.
         const groundY = h * 0.88;

@@ -108,10 +108,29 @@ export interface PublicProfile {
   avatar: { avatarConfig: unknown; avatarEmoji: string | null; avatarColor: string | null; avatarImage: string | null };
 }
 
+/**
+ * The signup trigger names a profile `Player_<first 8 of the uuid>`, so that
+ * username IS the id — 637 of 735 prod rows carry one. Falling back to it made
+ * the empire and raid screens print an id where a name belongs.
+ */
+const AUTO_USERNAME = /^(?:player|user)[_-][0-9a-f]{6,}$/i;
+
+function humanName(p: Row | undefined): string {
+  const display = String(p?.display_name ?? '').trim();
+  if (display) return display;
+  const username = String(p?.username ?? '').trim();
+  return username && !AUTO_USERNAME.test(username) ? username : '';
+}
+
+/**
+ * `displayName` is '' when the player has no human-readable name. The client
+ * fills that in with a translated stand-in (`rivalName`) — a server-side
+ * English 'Rival' would have been untranslatable in all five other locales.
+ */
 export function profileView(id: string, p: Row | undefined): PublicProfile {
   return {
     userId: id,
-    displayName: (p?.display_name as string) || (p?.username as string) || 'Rival',
+    displayName: humanName(p),
     avatar: {
       avatarConfig: p?.avatar_config ?? null,
       avatarEmoji: (p?.avatar_emoji as string | null) ?? null,
