@@ -55,7 +55,7 @@ export default function LessonPracticeError({
 
   return (
     <div className="flex min-h-dvh flex-1 items-center justify-center bg-neo-navy px-4 py-8">
-      <div className="w-full max-w-sm rounded-neo border-[3px] border-black bg-neo-navy-light p-5 text-center shadow-hard-lg">
+      <div className="w-full max-w-sm rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light p-5 text-center shadow-hard-lg">
         <Mascot variant="oops" size="sm" animated={false} className="mx-auto mb-3" />
         <h1 className="mb-2 font-neo-display text-xl font-black uppercase text-neo-white">
           {t('education.practice.lessonUnavailable')}

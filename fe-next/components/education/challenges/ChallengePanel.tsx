@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { m } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DailyChallengeCard } from './DailyChallengeCard';
 import { WeeklyChallengeCard } from './WeeklyChallengeCard';
@@ -48,6 +48,7 @@ interface ChallengePanelProps {
 export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps) {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
+  const shouldReduceMotion = useReducedMotion();
 
   const challengeKeys = ['education', 'challenges', playerId] as const;
 
@@ -127,8 +128,8 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
         >
           <m.div
             className="w-14 h-14 rounded-neo bg-neo-lime border-3 border-black flex items-center justify-center shadow-hard-sm"
-            animate={{ rotate: [0, -5, 5, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            animate={shouldReduceMotion ? undefined : { rotate: [0, -5, 5, 0] }}
+            transition={shouldReduceMotion ? undefined : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
             <Trophy className="w-7 h-7 text-black" />
           </m.div>

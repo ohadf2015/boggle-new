@@ -30,6 +30,14 @@ describe('<EducationFAQ>', () => {
     expect(answers[0].textContent).toContain('education.landing.faq.q1.a');
   });
 
+  it('omits its JSON-LD when the page already emits a server FAQPage node', () => {
+    // /education renders its own server FAQPage (page.tsx); a second FAQPage
+    // node on the same URL is duplicate structured data.
+    const { container } = render(<EducationFAQ jsonLd={false} />);
+    expect(container.querySelector('script[type="application/ld+json"]')).toBeNull();
+    expect(container.querySelectorAll('details summary')).toHaveLength(8);
+  });
+
   it('emits FAQPage JSON-LD script tag', () => {
     const { container } = render(<EducationFAQ />);
     const script = container.querySelector('script[type="application/ld+json"]');

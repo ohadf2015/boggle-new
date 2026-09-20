@@ -32,7 +32,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
 
   return (
     <div
-      className="bg-neo-navy border-neo border-3 rounded-neo shadow-hard p-4"
+      className="bg-neo-navy border-3 border-neo-cream/40 rounded-neo shadow-hard p-4"
       data-testid="daily-challenge-card"
     >
       {/* Tier Badge */}

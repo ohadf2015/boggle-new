@@ -13667,6 +13667,7 @@ const es = {
         "subtext": "Compite con amigos en tiempo real"
       },
       "freeAccess": "Gratis para todos",
+      "resourcesAriaLabel": "Recursos educativos",
       "goToDashboard": "Ir al panel",
       "premium": "Premium",
       "roleGuest": "Invitado",

@@ -453,8 +453,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       href={`/${language}`}
                       onClick={() => setShowMobileMenu(false)}
                       className={cn(
-                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black/40 dark:border-neo-cream/40 transition-all w-full',
-                        'bg-transparent dark:bg-transparent hover:bg-neo-black/5 dark:hover:bg-neo-cream/5 text-neo-black dark:text-white'
+                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-neo-cream/40 transition-all w-full',
+                        'bg-transparent dark:bg-transparent hover:bg-black/5 dark:hover:bg-white/10 text-neo-black dark:text-white'
                       )}
                     >
                       <span className="flex items-center justify-center w-6 h-6 text-neo-black/60 dark:text-neo-cream/60">

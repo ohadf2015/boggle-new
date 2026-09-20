@@ -13,7 +13,7 @@
  */
 
 import { memo, useMemo } from 'react';
-import { m } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -89,6 +89,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
   className,
 }) => {
   const { t } = useLanguage();
+  const shouldReduceMotion = useReducedMotion();
   const sizeConfig = SIZE_CONFIG[size];
   const bonus = useMemo(() => getStreakBonus(currentStreak), [currentStreak]);
 
@@ -110,9 +111,9 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
         data-testid="streak-indicator"
         role="img"
         aria-label={ariaLabel}
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.3, ease: 'easeOut' as const }}
+        initial={shouldReduceMotion ? false : { scale: 0.9, opacity: 0 }}
+        animate={shouldReduceMotion ? undefined : { scale: 1, opacity: 1 }}
+        transition={shouldReduceMotion ? undefined : { duration: 0.3, ease: 'easeOut' as const }}
         className={cn(
           // Base styles
           'inline-flex flex-col items-center',
@@ -125,8 +126,8 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
         {/* Top row: Fire emoji + streak count */}
         <div className={cn('flex items-center', sizeConfig.gap)}>
           <m.span
-            animate={{ rotate: [0, -5, 5, 0] }}
-            transition={{
+            animate={shouldReduceMotion ? undefined : { rotate: [0, -5, 5, 0] }}
+            transition={shouldReduceMotion ? undefined : {
               duration: 0.5,
               repeat: Infinity,
               repeatDelay: 3,
@@ -170,9 +171,9 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
       data-testid="streak-indicator"
       role="img"
       aria-label={ariaLabel}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2 }}
+      initial={shouldReduceMotion ? false : { opacity: 0 }}
+      animate={shouldReduceMotion ? undefined : { opacity: 1 }}
+      transition={shouldReduceMotion ? undefined : { duration: 0.2 }}
       className={cn(
         'inline-flex items-center',
         sizeConfig.gap,
@@ -181,8 +182,8 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
       )}
     >
       <m.span
-        animate={{ rotate: [0, -3, 3, 0] }}
-        transition={{
+        animate={shouldReduceMotion ? undefined : { rotate: [0, -3, 3, 0] }}
+        transition={shouldReduceMotion ? undefined : {
           duration: 0.5,
           repeat: Infinity,
           repeatDelay: 4,
