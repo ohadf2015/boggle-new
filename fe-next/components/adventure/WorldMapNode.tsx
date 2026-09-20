@@ -104,8 +104,11 @@ export const WorldNode = memo(function WorldNode({
   }, [isUnlocked]);
 
   // Flat hard-edged colored halo behind the orb — graphic backing, NOT a blurred glow.
+  // Held under half strength: ten of these at full saturation turned the map
+  // into a colour field and the orbs stopped reading as separate objects.
   const glowBgStyle = useMemo<CSSProperties>(() => ({
     background: glowColor,
+    opacity: 0.5,
     transform: 'scale(1.18)',
     zIndex: 0,
   }), [glowColor]);

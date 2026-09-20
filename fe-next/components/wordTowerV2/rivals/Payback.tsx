@@ -95,7 +95,7 @@ export function PaybackBanner({
               <span className="truncate">{t('wordTowerV2.rivals.revengeTitle')}</span>
             </span>
             {!grievance.blocked && grievance.coinsStolen > 0 ? (
-              <span className={`shrink-0 rounded-neo border-neo-thick border-black bg-neo-navy px-2 py-0.5 text-center font-neo-display font-black tabular-nums leading-none text-neo-yellow shadow-hard ${compact ? 'text-base' : 'text-xl md:text-3xl'}`}>
+              <span dir="ltr" className={`shrink-0 rounded-neo border-neo-thick border-black bg-neo-navy px-2 py-0.5 text-center font-neo-display font-black tabular-nums leading-none text-neo-yellow shadow-hard ${compact ? 'text-base' : 'text-xl md:text-3xl'}`}>
                 -{grievance.coinsStolen}
               </span>
             ) : null}
@@ -175,9 +175,12 @@ export function PaybackLedgerRow({ t, rival, ledger }: { t: T; rival: RivalView;
   }[ledger.tier];
   return (
     <div className="mx-auto w-fit max-w-full rounded-neo border-neo-thick border-black bg-neo-navy px-3 py-1.5 text-neo-cream shadow-hard">
-      <div className="flex items-center justify-center gap-2 font-neo-display text-xs font-black uppercase tabular-nums md:text-lg">
+      {/* Wraps rather than truncates: at 390px "TOWER-B-0919 TOOK 162" clipped to
+          "TOOK 1…", which turned the one line that proves the payback settled
+          THIS debt into a number you cannot read. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 font-neo-display text-xs font-black uppercase tabular-nums md:text-lg">
         <Avatar userId={rival.userId} customAvatar={rival.avatar.avatarConfig as never} size="sm" disableEffects />
-        <span className="truncate text-neo-pink">{t('wordTowerV2.rivals.ledgerThem', { name, n: ledger.theyTook })}</span>
+        <span className="text-neo-pink">{t('wordTowerV2.rivals.ledgerThem', { name, n: ledger.theyTook })}</span>
         <Swords className="h-4 w-4 shrink-0 text-neo-yellow md:h-5 md:w-5" aria-hidden />
         <span className="text-neo-lime">{t('wordTowerV2.rivals.ledgerYou', { n: ledger.youTook })}</span>
       </div>

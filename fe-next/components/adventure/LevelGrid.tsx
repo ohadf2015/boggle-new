@@ -3,7 +3,7 @@
 import React, { memo, useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import Image from 'next/image';
-import { Sparkles, Star } from 'lucide-react';
+import { Sparkles, Star, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useParallax } from '@/hooks/useParallax';
 import {
@@ -148,10 +148,28 @@ const LevelGrid = memo(function LevelGrid({
     return () => clearTimeout(timer);
   }, [world.id, currentLevelNum]);
 
-  // Stable click handler
+  // Tapping a locked level was a silent no-op — AdventureView guards the call
+  // with `canPlayLevel(...) && setView(...)`, so nothing happened and the map
+  // read as broken. Answer with what opens it instead; the notice clears itself.
+  const [lockedNotice, setLockedNotice] = useState<string | null>(null);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (noticeTimer.current) clearTimeout(noticeTimer.current); }, []);
+
   const handleLevelClick = useCallback(
-    (levelNum: number) => onLevelSelect(world.id, levelNum),
-    [world.id, onLevelSelect]
+    (levelNum: number) => {
+      if (canPlayLevel(completions, world.id, levelNum)) {
+        onLevelSelect(world.id, levelNum);
+        return;
+      }
+      setLockedNotice(
+        levelNum > 1
+          ? t('adventure.unlockRequirement', { level: String(levelNum - 1) })
+          : t('adventure.lockedWorldHint', { world: String(world.id - 1) }),
+      );
+      if (noticeTimer.current) clearTimeout(noticeTimer.current);
+      noticeTimer.current = setTimeout(() => setLockedNotice(null), 2600);
+    },
+    [world.id, onLevelSelect, completions, t]
   );
 
   // Generate particle positions (stable across renders)
@@ -353,6 +371,24 @@ const LevelGrid = memo(function LevelGrid({
         </div>
       </div>
       </div>
+
+      {/* Why that level didn't open. `fixed`, not `absolute`: this container is
+          taller than the viewport, so an absolute toast anchors to the bottom of
+          the CONTENT and never appears on screen. Sits above the bottom nav. */}
+      {lockedNotice && (
+        <div
+          role="status"
+          className="pointer-events-none fixed bottom-24 left-1/2 -translate-x-1/2 z-50 max-w-[90%]
+                     inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-neo-cream
+                     px-4 py-2 text-black font-bold shadow-[4px_4px_0_#000]"
+        >
+          <Lock className="w-4 h-4 shrink-0" />
+          <span className="text-sm">
+            <span className="uppercase tracking-wide opacity-60 me-1">{t('adventure.lockedTitle')}</span>
+            {lockedNotice}
+          </span>
+        </div>
+      )}
     </div>
   );
 });

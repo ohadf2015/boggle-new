@@ -68,3 +68,58 @@ describe('V2Celebrations banner lane', () => {
     expect(screen.getByText('wordTowerV2.biome.aurora')).toBeTruthy();
   });
 });
+
+/**
+ * One message per beat. Round f1 stacked "CLOSE ONE!" and a BADGE UNLOCKED
+ * card on the same frame, and the blind judge read the reference's
+ * one-thing-at-a-time discipline as the reason it won. The banner lane is a
+ * QUEUE, so it can simply wait its turn.
+ */
+describe('V2Celebrations one message at a time', () => {
+  it('given a verdict on screen, when a badge is queued, then the badge waits for the verdict to clear', () => {
+    vi.useFakeTimers();
+    const onDone = vi.fn();
+    render(
+      <V2Celebrations
+        t={t}
+        callout={{ key: 1, textKey: 'wordTowerV2.call.miss.0', tone: 'red', points: 0 }}
+        banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]}
+        onBannerDone={onDone}
+      />,
+    );
+    expect(screen.queryByText('wordTowerV2.ach.highRise.name')).toBeNull();
+    expect(onDone).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(1200));
+    expect(screen.getByText('wordTowerV2.ach.highRise.name')).toBeTruthy();
+  });
+
+  it('given no verdict, when a badge is queued, then it shows straight away (never starved)', () => {
+    render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'best', id: 'best', priority: 3 }]} onBannerDone={() => {}} />,
+    );
+    expect(screen.getByText('wordTowerV2.newBest')).toBeTruthy();
+  });
+});
+
+/**
+ * Winning must read louder than losing. A miss used to get the same wide
+ * centred pill as a perfect, so the failure out-shouted the payout it was
+ * sitting next to.
+ */
+describe('V2Celebrations verdict weight', () => {
+  const callout = (tone: 'lime' | 'red') => ({ key: 1, textKey: `wordTowerV2.call.${tone}`, tone, points: 0 }) as const;
+
+  it('given a good verdict, when shown, then it is the loudest type on screen', () => {
+    const { container } = render(<V2Celebrations t={t} callout={callout('lime')} banners={[]} onBannerDone={() => {}} />);
+    const el = container.querySelector('[data-wt2-callout]');
+    expect(el?.getAttribute('data-wt2-callout')).toBe('loud');
+    expect(el?.className).toContain('text-3xl');
+  });
+
+  it('given a miss, when shown, then it is quieter than a good verdict', () => {
+    const { container } = render(<V2Celebrations t={t} callout={callout('red')} banners={[]} onBannerDone={() => {}} />);
+    const el = container.querySelector('[data-wt2-callout]');
+    expect(el?.getAttribute('data-wt2-callout')).toBe('quiet');
+    expect(el?.className).not.toContain('text-3xl');
+  });
+});

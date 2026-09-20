@@ -223,32 +223,169 @@ export function chestTease(summary: RunSummary): ChestTease | null {
 
 export type ChestItem = 'blueprint' | 'brick' | 'shield';
 
+/**
+ * Every beat carries its `tier`. The coins and the cards are payout sounds as
+ * much as the pop is, so they have to be able to get louder with the chest —
+ * and a beat that had to be told its tier separately is exactly the two-sources
+ * split that drifts (Class 1 in the pitfalls list).
+ */
 export type RevealBeat =
-  | { kind: 'chest'; tier: ChestTier; ms: number }
-  | { kind: 'coins'; coins: number; ms: number }
-  | { kind: 'item'; item: ChestItem; n: number; ms: number };
-
-const CHEST_BEAT_MS = 1400;
-const COINS_BEAT_MS = 1400;
-const ITEM_BEAT_MS = 900;
+  /** Lid rattling, light seeping out — the held breath before the pop. */
+  | { kind: 'anticipation'; tier: ChestTier; ms: number }
+  /** The lid blows: colour flood, sparks, screen shake — all sized by tier. */
+  | { kind: 'burst'; tier: ChestTier; ms: number }
+  | { kind: 'coins'; tier: ChestTier; coins: number; ms: number; countMs: number }
+  | { kind: 'item'; tier: ChestTier; item: ChestItem; n: number; ms: number };
 
 /**
- * The end-of-run reveal, beat by beat: the chest, the coins counting up, then
- * one card per item. Rarest first, so the best news lands while the player is
- * still watching. `runCoins` is the server's number for the run itself.
+ * The whole reveal is seen EVERY run, so it is on a hard budget. 2.5s is the
+ * outside edge: past that the player is waiting rather than winning.
+ */
+export const REVEAL_BUDGET_MS = 2500;
+
+/**
+ * How loud each rarity gets. Every field rises with the tier, so the frame the
+ * lid pops on already says "rare" before a single word is drawn: more light,
+ * a wider burst, more sparks, a harder shake. The component maps these to
+ * Tailwind tokens; the magnitudes live here so they can be tested.
+ */
+export interface TierFx {
+  tier: ChestTier;
+  /** Lid-rattle beat, ms. */
+  anticipationMs: number;
+  /** Shake cycles packed into that beat — more shakes read as more tension. */
+  rattles: number;
+  /** The pop itself, ms. */
+  burstMs: number;
+  /** fx-star sparks thrown outward. */
+  sparks: number;
+  /** Burst radius as a fraction of the overlay's short side. */
+  spread: number;
+  /** A held, slowed first frame of the pop — epic only. */
+  slowmoMs: number;
+  /**
+   * Spokes in the god-ray fan that wheels out from behind the chest. Zero for
+   * a common: the rays ARE the rarity, and a common that threw them would
+   * spend the signal the rare needs.
+   */
+  rays: number;
+  /** Coin sprites thrown out of the lid — the "gold shower", sized by tier. */
+  coinBurst: number;
+  /** A rarity banner sweeps in (rare and up). */
+  banner: boolean;
+  /** Alpha of the tier-coloured flood behind the chest, 0..1. */
+  flood: number;
+  /** Screen shake amplitude, px. */
+  shakePx: number;
+  /** Pop volume, 0..1. */
+  volume: number;
+  /** How long the coins take to count up, ms. */
+  coinCountMs: number;
+}
+
+const TIER_FX: Record<ChestTier, TierFx> = {
+  common: {
+    tier: 'common',
+    anticipationMs: 380,
+    rattles: 2,
+    burstMs: 300,
+    sparks: 8,
+    spread: 0.34,
+    slowmoMs: 0,
+    rays: 0,
+    coinBurst: 5,
+    banner: false,
+    flood: 0.18,
+    shakePx: 4,
+    volume: 0.5,
+    coinCountMs: 520,
+  },
+  rare: {
+    tier: 'rare',
+    anticipationMs: 480,
+    rattles: 3,
+    burstMs: 400,
+    sparks: 18,
+    spread: 0.58,
+    slowmoMs: 0,
+    rays: 10,
+    coinBurst: 12,
+    banner: true,
+    flood: 0.38,
+    shakePx: 9,
+    volume: 0.75,
+    coinCountMs: 620,
+  },
+  epic: {
+    tier: 'epic',
+    anticipationMs: 560,
+    rattles: 4,
+    burstMs: 480,
+    sparks: 30,
+    spread: 0.86,
+    slowmoMs: 260,
+    rays: 16,
+    coinBurst: 18,
+    banner: true,
+    flood: 0.6,
+    shakePx: 15,
+    volume: 1,
+    coinCountMs: 700,
+  },
+};
+
+export function tierFx(tier: ChestTier): TierFx {
+  return TIER_FX[tier];
+}
+
+/** The coins chip holds for a moment after the number lands. */
+const COIN_HOLD_MS = 80;
+const ITEM_BEAT_MS = 180;
+
+/**
+ * The end-of-run reveal, beat by beat: the lid rattling, the pop, the coins
+ * counting up, then one card per item. Rarest first, so the best news lands
+ * while the player is still watching. `runCoinsPaid` is the server's number for
+ * the run itself. Every tier's whole sequence fits `REVEAL_BUDGET_MS`.
  */
 export function revealBeats(chest: ChestRoll, runCoinsPaid: number): RevealBeat[] {
+  const fx = tierFx(chest.tier);
   const beats: RevealBeat[] = [
-    { kind: 'chest', tier: chest.tier, ms: CHEST_BEAT_MS },
-    { kind: 'coins', coins: Math.max(0, Math.round(runCoinsPaid + chest.coins)), ms: COINS_BEAT_MS },
+    { kind: 'anticipation', tier: chest.tier, ms: fx.anticipationMs },
+    { kind: 'burst', tier: chest.tier, ms: fx.burstMs },
+    {
+      kind: 'coins',
+      tier: chest.tier,
+      coins: Math.max(0, Math.round(runCoinsPaid + chest.coins)),
+      ms: fx.coinCountMs + COIN_HOLD_MS,
+      countMs: fx.coinCountMs,
+    },
   ];
   const items: Array<[ChestItem, number]> = [
     ['blueprint', chest.blueprints],
     ['brick', chest.bricks],
     ['shield', chest.shields],
   ];
-  for (const [item, n] of items) if (n > 0) beats.push({ kind: 'item', item, n, ms: ITEM_BEAT_MS });
+  for (const [item, n] of items) if (n > 0) beats.push({ kind: 'item', tier: chest.tier, item, n, ms: ITEM_BEAT_MS });
   return beats;
+}
+
+/** How long the whole reveal runs if nobody taps to skip. */
+export function revealTotalMs(beats: RevealBeat[]): number {
+  return beats.reduce((s, b) => s + b.ms, 0);
+}
+
+/** Ticks played while the coins count up. */
+export const COIN_TICKS = 7;
+
+/**
+ * Playback rate for the i-th count-up tick — a rising ladder, so the number
+ * climbing is HEARD climbing. Clamped so a stray index can never detune.
+ */
+export function coinTickRate(i: number, ticks = COIN_TICKS): number {
+  const span = Math.max(1, ticks - 1);
+  const k = Math.min(1, Math.max(0, i / span));
+  return Number((0.92 + 0.62 * k).toFixed(3));
 }
 
 /** Keep-out from the play box's edges for the payout chip, in CSS px. */

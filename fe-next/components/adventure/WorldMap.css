@@ -98,8 +98,7 @@
 .world-map-cloud {
   position: absolute;
   pointer-events: none;
-  opacity: 0.35;
-  filter: blur(2px);
+  opacity: 0.22;
   animation: cloud-float var(--cloud-duration, 15s) ease-in-out infinite;
 }
 
@@ -230,58 +229,6 @@
   animation-delay: var(--orbit-delay, 0s);
 }
 
-/* Pulse ring animation for unlocked worlds */
-@keyframes pulse-ring {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 0;
-  }
-}
-
-.world-map-pulse-ring {
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 2px solid #ffe135;
-  pointer-events: none;
-  animation: pulse-ring 2s ease-in-out infinite;
-}
-
-/* Crown bob animation */
-@keyframes crown-bob {
-  0%, 100% {
-    transform: translateY(0) translateX(-50%);
-  }
-  50% {
-    transform: translateY(-3px) translateX(-50%);
-  }
-}
-
-.world-map-crown {
-  position: absolute;
-  top: -16px;
-  left: 50%;
-  animation: crown-bob 2s ease-in-out infinite;
-}
-
-/* Mascot bob animation */
-@keyframes mascot-bob {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.world-map-mascot {
-  animation: mascot-bob 2s ease-in-out infinite;
-}
-
 /* Scroll hint bob */
 @keyframes scroll-hint-bob {
   0%, 100% {
@@ -388,9 +335,6 @@
   .world-map-shooting-star,
   .world-map-cloud,
   .world-map-orbit-letter,
-  .world-map-pulse-ring,
-  .world-map-crown,
-  .world-map-mascot,
   .world-map-scroll-hint,
   .world-fog-shimmer::after,
   .world-map-trail-dot,

@@ -1,10 +1,14 @@
 'use client';
 
 import { useEffect, useState, type RefObject } from 'react';
+import dynamic from 'next/dynamic';
 import type { ChestRoll, ChestTier } from '@/lib/wordTowerV2/estate';
 import { ChestReveal } from './ChestReveal';
 import { RewardsLayer } from './RewardsLayer';
 import type { ChestState, RewardsFlow } from './useRewardsFlow';
+
+/** Same modal RivalBoard's guest teaser opens — signing in never leaves the run. */
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -58,6 +62,13 @@ function useDemoChest(): { demo: ChestState | null; dismiss: () => void } {
 export function RunRewards({ t, flow, points, canvasClass, counterRef, hideInRun, showChest, wide, reducedMotion }: Props) {
   const { demo, dismiss } = useDemoChest();
   const chest = demo ?? (showChest ? flow.chest : null);
+  /*
+   * The guest's sign-in offer opens HERE, over the reveal. It used to be a
+   * `window.location.href` to `/{locale}/login`, a route that does not exist:
+   * the one player most worth converting was sent to the 404 page and lost the
+   * run, the chest and the guest estate on the way.
+   */
+  const [signIn, setSignIn] = useState(false);
   return (
     <>
       {hideInRun ? null : (
@@ -79,12 +90,13 @@ export function RunRewards({ t, flow, points, canvasClass, counterRef, hideInRun
           chest={chest.chest}
           tease={chest.tease}
           guest={chest.guest}
-          onSignIn={flow.onSignIn}
+          onSignIn={() => setSignIn(true)}
           onBeat={flow.onBeat}
           onDone={demo ? dismiss : flow.onDone}
           reducedMotion={reducedMotion}
         />
       ) : null}
+      {signIn ? <AuthModal isOpen onClose={() => setSignIn(false)} initialMode="signin" /> : null}
     </>
   );
 }

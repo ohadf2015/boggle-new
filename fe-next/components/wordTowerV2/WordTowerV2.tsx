@@ -20,7 +20,7 @@ import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
 import { V2TopBar } from './V2TopBar';
 import { V2Results } from './V2Results';
-import { RevengeInbox } from './rivals/RevengeInbox';
+import { RevengeHome } from './rivals/RevengeHome';
 import { towerBlocksFrom } from './rewards/useRunPayout';
 import { RunRewards } from './rewards/RunRewards';
 import { useRewardsFlow } from './rewards/useRewardsFlow';
@@ -89,7 +89,7 @@ export default function WordTowerV2() {
   }, [setRunPerks, estateApi.perks]);
 
   // Variable rewards: coins per landing, the streak meter, the end-of-run chest.
-  const rewardsFlow = useRewardsFlow({ game, estateApi, run, heightM, phase, playSound, language });
+  const rewardsFlow = useRewardsFlow({ game, estateApi, run, heightM, phase, playSound });
 
   const dictRef = useRef<Set<string> | null>(null);
   const [dictReady, setDictReady] = useState(false);
@@ -638,7 +638,11 @@ export default function WordTowerV2() {
       {/* Someone raided you while you were away: their tower, the grievance and
           a free REVENGE — before any run, not after one. */}
       {phase !== 'over' && !smashing && !district && !showOver && !forceResults && run.floors === 0 ? (
-        <RevengeInbox t={t} estate={estateApi} balls={run.balls} reducedMotion={reducedMotion} onRaidOpen={setRaiding} />
+        /* Only with nothing standing. `raiding` unmounts TowerCanvas, so opening
+           a raid ON TOP of a live run would tear down the Pixi loop mid-tower —
+           an entry point this flow has never had. Surfacing the pill mid-run is
+           worth doing, but not on an unverified suspend. */
+        <RevengeHome t={t} estate={estateApi} balls={run.balls} reducedMotion={reducedMotion} onRaidOpen={setRaiding} />
       ) : null}
 
       {smashing && smashWords ? (

@@ -1,6 +1,13 @@
 {
-  "generatedAt": "2026-09-20T14:11:03.152Z",
+  "generatedAt": "2026-09-20T13:51:08.336Z",
   "commits": [
+    {
+      "sha": "8f587547a67fb97f471eab556448fe6bff8ec982",
+      "shortSha": "8f58754",
+      "subject": "fix(adventure): answer a locked tap, escape the intro, calm the map, cut dead paint",
+      "author": "Ohad Fisher",
+      "date": "2026-09-20T16:24:59+03:00"
+    },
     {
       "sha": "ca4de9a4af0240b14b54545487beec10f2d0fdd6",
       "shortSha": "ca4de9a",
@@ -133,13 +140,6 @@
       "subject": "feat(adventure): roguelike word RPG — combat, relics, draft, level variety, hints",
       "author": "Ohad Fisher",
       "date": "2026-09-19T23:26:45+03:00"
-    },
-    {
-      "sha": "9eb89760c97cac3b9c1e6e00f08f9f4578ff3bdd",
-      "shortSha": "9eb8976",
-      "subject": "feat(word-tower-v2): apartment floors, Pixi sky, gameplay crates, badges",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T21:50:47+03:00"
     }
   ]
 }
