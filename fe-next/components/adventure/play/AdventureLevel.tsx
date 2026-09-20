@@ -308,8 +308,13 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
        and the highlight survives the next screen. */
     <div ref={screenRef} className="fixed inset-0 z-50 select-none overflow-hidden bg-[#0f1b3d] text-neo-cream">
       {/* eslint-disable-next-line @next/next/no-img-element -- full-bleed decorative backdrop */}
-      <img src={worldBackdrop(world)} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(10,16,40,0.55)_0%,rgba(10,16,40,0.15)_70%)]" />
+      {/* The board is what's being read for the whole level, so the world art
+          sits well back: dimmed, then a flat scrim, then a radial that is
+          darkest behind the grid. At full strength the photo competed with the
+          tiles and the foe panel for the same attention. */}
+      <img src={worldBackdrop(world)} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover opacity-70" />
+      <div className="absolute inset-0 bg-[#0a1028]/35" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(10,16,40,0.7)_0%,rgba(10,16,40,0.2)_70%)]" />
 
       {showLevelBody && (
       <div inert={levelSettled || undefined} className="relative z-10 mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]">
