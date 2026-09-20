@@ -7954,6 +7954,8 @@ const es = {
     "relaxedQuest": "Misión relajada",
     "untimedQuest": "Misión Libre",
     "startQuest": "INICIAR MISIÓN",
+    "aPlayer": "Un jugador",
+    "modesPlayedCount": "{count} de 4 juegos hoy",
     "nextUp": "A continuación",
     "allClearToday": "Todo completado por hoy — hasta mañana",
     "adminBeta": "Beta",

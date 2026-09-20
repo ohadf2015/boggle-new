@@ -1,97 +1,54 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Crown } from 'lucide-react';
+import { Crown, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
+import { DAILY_MODES, type DailyModeId } from '@/lib/dailyModes';
+import type { MergedLeaderboardEntry } from '@/lib/daily/mergeDailyLeaderboard';
 import type { Language } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-
-interface LeaderboardEntry {
-  rank: number;
-  name: string;
-  score: number;
-  huntScore: number;
-  wheelScore: number;
-  playerId: string | null;
-  customAvatar: CustomAvatarConfig | null;
-  seed: string;
-}
 
 interface LeaderboardTeaserProps {
   currentLanguage: Language;
   onViewFull?: () => void;
 }
 
-interface RawLeaderboardRow {
-  player_id?: string | null;
-  guest_fingerprint?: string | null;
-  display_name?: string;
-  score?: number;
-  efficiency_score?: number;
-  custom_avatar?: CustomAvatarConfig | null;
-}
-
 const RANK_STYLES = [
-  { text: 'text-neo-lime', bg: 'bg-neo-lime/20', border: 'border-neo-lime/40', medal: '🥇' },
-  { text: 'text-slate-300', bg: 'bg-white/5', border: 'border-white/10', medal: '🥈' },
-  { text: 'text-neo-pink', bg: 'bg-neo-pink/10', border: 'border-neo-pink/30', medal: '🥉' },
+  { text: 'text-neo-lime', medal: '🥇' },
+  { text: 'text-slate-300', medal: '🥈' },
+  { text: 'text-neo-pink', medal: '🥉' },
 ];
 
-type Kind = 'hunt' | 'wheel';
+/* Per-mode dot colour in the breakdown, matching each card's accent on the hub
+   so a row reads as "the same four games". Full class strings — Tailwind emits
+   nothing for `bg-neo-${accent}`. */
+const MODE_DOT: Record<DailyModeId, string> = {
+  'word-hunt': 'bg-neo-orange',
+  'word-wheel': 'bg-neo-yellow',
+  'word-tower': 'bg-neo-cyan',
+  connections: 'bg-neo-purple',
+};
 
 /**
- * Merge word-hunt + word-wheel leaderboard rows by player_id or guest fingerprint,
- * summing scores, preserving avatar data, and returning the top 3.
- */
-function mergeLeaderboards(
-  wordHunt: RawLeaderboardRow[],
-  wordWheel: RawLeaderboardRow[]
-): LeaderboardEntry[] {
-  const map = new Map<string, Omit<LeaderboardEntry, 'rank'>>();
-
-  const ingest = (row: RawLeaderboardRow, kind: Kind) => {
-    const key = row.player_id ? `u:${row.player_id}` : row.guest_fingerprint ? `g:${row.guest_fingerprint}` : null;
-    if (!key) return;
-    const rowScore = kind === 'hunt' ? (row.efficiency_score ?? row.score ?? 0) : (row.score ?? 0);
-    const existing = map.get(key);
-    if (existing) {
-      existing.score += rowScore;
-      if (kind === 'hunt') existing.huntScore += rowScore;
-      else existing.wheelScore += rowScore;
-      if (row.display_name && existing.name === 'Player') existing.name = row.display_name;
-      existing.customAvatar = existing.customAvatar ?? row.custom_avatar ?? null;
-    } else {
-      map.set(key, {
-        name: row.display_name || 'Player',
-        score: rowScore,
-        huntScore: kind === 'hunt' ? rowScore : 0,
-        wheelScore: kind === 'wheel' ? rowScore : 0,
-        playerId: row.player_id ?? null,
-        customAvatar: row.custom_avatar ?? null,
-        seed: key,
-      });
-    }
-  };
-
-  for (const row of wordHunt) ingest(row, 'hunt');
-  for (const row of wordWheel) ingest(row, 'wheel');
-
-  return Array.from(map.values())
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
-    .map((p, i) => ({ rank: i + 1, ...p }));
-}
-
-/**
- * Mini top-3 unified daily leaderboard teaser.
- * Fetches word-hunt + word-wheel leaderboards, sums scores per player.
+ * Today's top players across the WHOLE daily challenge.
+ *
+ * Previously this fetched the Word Hunt and Word Wheel boards and summed them
+ * client-side — 2 of the 4 modes the hub shows, so Word Tower and Connections
+ * were silently missing and the header had to name its own scope to stay
+ * honest. It now reads one server-merged endpoint covering all four, which is
+ * also the only way to include Connections: its public board exposes no player
+ * identity, so a client cannot join it to anything.
+ *
+ * Tapping a row opens what that player scored in each mode. Word Tower scores
+ * in metres, so its points are shown with the real height beside them.
  */
 export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTeaserProps) {
   const { t } = useLanguage();
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [entries, setEntries] = useState<MergedLeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -100,19 +57,14 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
       setLoading(true);
       try {
         const today = new Date().toISOString().split('T')[0];
-        const [huntResult, wheelResult] = await Promise.allSettled([
-          fetch(`/api/daily-challenge/word-hunt/leaderboard/${today}/${currentLanguage}?limit=50`).then(r => r.ok ? r.json() : null),
-          fetch(`/api/daily-challenge/word-wheel/leaderboard/${today}/${currentLanguage}?limit=50`).then(r => r.ok ? r.json() : null),
-        ]);
-
+        const res = await fetch(
+          `/api/daily/leaderboard?date=${today}&lang=${currentLanguage}&limit=3`,
+        );
+        const json = res.ok ? await res.json() : null;
         if (cancelled) return;
-
-        const huntData: RawLeaderboardRow[] = huntResult.status === 'fulfilled' && huntResult.value?.data ? huntResult.value.data : [];
-        const wheelData: RawLeaderboardRow[] = wheelResult.status === 'fulfilled' && wheelResult.value?.data ? wheelResult.value.data : [];
-
-        setEntries(mergeLeaderboards(huntData, wheelData));
+        setEntries(Array.isArray(json?.data) ? json.data : []);
       } catch {
-        // Graceful fallback - show nothing
+        // Graceful fallback — an empty board, never a crashed hub.
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -127,23 +79,12 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
       className="bg-neo-navy/95 border-3 border-black shadow-hard rounded-xl overflow-hidden w-full"
       data-testid="leaderboard-teaser"
     >
-      {/* Header.
-          The scope line is not decoration: this board sums Word Hunt + Word
-          Wheel, the two modes with a per-player daily board, while the hub shows
-          four cards. Naming the two is the honest alternative to a title that
-          implies it ranks Word Tower and Connections too. Built from the modes'
-          own existing title keys, so it needs no new translation. */}
       <div className="flex items-center justify-between px-3 py-2.5 border-b-2 border-black/30 bg-white/[0.03]">
         <div className="flex items-center gap-1.5 min-w-0">
           <Crown className="w-4 h-4 text-neo-lime shrink-0" />
-          <div className="min-w-0">
-            <span className="block font-neo-display font-black text-white text-xs uppercase tracking-wide truncate">
-              {t('daily.todaysTopPlayers')}
-            </span>
-            <span className="block text-[10px] text-slate-400 truncate" data-testid="leaderboard-scope">
-              {t('daily.wordHunt.title')} + {t('wordWheel.hub.wordWheelQuest')}
-            </span>
-          </div>
+          <span className="font-neo-display font-black text-white text-xs uppercase tracking-wide truncate">
+            {t('daily.todaysTopPlayers')}
+          </span>
         </div>
         {onViewFull && (
           <button
@@ -156,7 +97,6 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
         )}
       </div>
 
-      {/* Entries */}
       <div className="flex flex-col">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
@@ -172,48 +112,88 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
           </div>
         ) : (
           entries.map((entry) => {
-            const style = RANK_STYLES[entry.rank - 1] || { text: 'text-white', bg: '', border: '', medal: '' };
+            const style = RANK_STYLES[entry.rank - 1] || { text: 'text-white', medal: '' };
+            const isOpen = expanded === entry.rank;
             return (
-              <div
-                key={entry.rank}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2.5',
-                  'border-b border-black/10 last:border-b-0',
-                  'hover:bg-white/5 transition-colors',
-                  entry.rank === 1 && 'bg-neo-lime/[0.04]'
+              <div key={entry.rank} className="border-b border-black/10 last:border-b-0">
+                <button
+                  type="button"
+                  data-testid={`leaderboard-row-${entry.rank}`}
+                  aria-expanded={isOpen}
+                  onClick={() => setExpanded(isOpen ? null : entry.rank)}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-2.5 text-start',
+                    'hover:bg-white/5 transition-colors cursor-pointer',
+                    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
+                    entry.rank === 1 && 'bg-neo-lime/[0.04]',
+                  )}
+                >
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-base leading-none" aria-hidden="true">{style.medal}</span>
+                    <div className={cn(
+                      'rounded-full border-2 border-black/40 shrink-0 overflow-hidden',
+                      entry.rank === 1 && 'ring-2 ring-neo-lime/60',
+                    )}>
+                      <Avatar
+                        size="sm"
+                        customAvatar={entry.customAvatar as CustomAvatarConfig | null}
+                        userId={String(entry.rank)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold text-white truncate">
+                      {entry.name || t('daily.aPlayer')}
+                    </div>
+                    <div className="text-[10px] text-slate-400">
+                      {t('daily.modesPlayedCount', { count: entry.playedModes.length })}
+                    </div>
+                  </div>
+
+                  <span className={cn('text-base font-black tabular-nums', style.text)}>
+                    {entry.total.toLocaleString()}
+                  </span>
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={cn(
+                      'w-4 h-4 shrink-0 text-slate-400 transition-transform',
+                      isOpen && 'rotate-180',
+                    )}
+                  />
+                </button>
+
+                {isOpen && (
+                  <div
+                    data-testid={`leaderboard-breakdown-${entry.rank}`}
+                    className="px-3 pb-3 pt-1 flex flex-col gap-1.5 bg-black/20"
+                  >
+                    {DAILY_MODES.map((mode) => {
+                      const points = entry.byMode?.[mode.id] ?? 0;
+                      const played = entry.playedModes?.includes(mode.id);
+                      return (
+                        <div key={mode.id} className="flex items-center gap-2 text-[11px]">
+                          <span className={cn('w-2 h-2 rounded-full shrink-0', MODE_DOT[mode.id])} aria-hidden="true" />
+                          <span className="flex-1 min-w-0 truncate text-slate-300">{t(mode.titleKey)}</span>
+                          {played ? (
+                            <span className="font-bold tabular-nums text-white">
+                              {points.toLocaleString()}
+                              {/* Tower scores in metres; show the real unit next to its points. */}
+                              {mode.id === 'word-tower' && entry.towerHeightM != null && (
+                                <span className="ms-1 font-normal text-slate-400">
+                                  ({Math.round(entry.towerHeightM)}m)
+                                </span>
+                              )}
+                            </span>
+                          ) : (
+                            // A bare 0 reads as "played it and scored nothing".
+                            <span data-unplayed="true" className="text-slate-600 tabular-nums">—</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
-              >
-                {/* Medal + Avatar */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-base leading-none" aria-hidden="true">{style.medal}</span>
-                  <div className={cn(
-                    'rounded-full border-2 border-black/40 shrink-0 overflow-hidden',
-                    entry.rank === 1 && 'ring-2 ring-neo-lime/60'
-                  )}>
-                    <Avatar
-                      size="sm"
-                      customAvatar={entry.customAvatar}
-                      userId={entry.playerId ?? entry.seed}
-                    />
-                  </div>
-                </div>
-
-                {/* Name + per-challenge breakdown */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-white truncate">
-                    {entry.name}
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-mono tabular-nums">
-                    <span className="text-neo-pink">{entry.huntScore.toLocaleString()}</span>
-                    <span className="mx-1 opacity-40">+</span>
-                    <span className="text-neo-cyan">{entry.wheelScore.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                {/* Accumulated score */}
-                <span className={cn('text-base font-black tabular-nums', style.text)}>
-                  {entry.score.toLocaleString()}
-                </span>
               </div>
             );
           })

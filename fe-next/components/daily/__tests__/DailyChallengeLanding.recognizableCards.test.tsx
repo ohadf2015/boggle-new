@@ -142,12 +142,14 @@ describe('DailyChallengeLanding — recognizable cards', () => {
     });
   });
 
-  it('names which modes the hub board actually sums, rather than implying all four', async () => {
+  it('no longer needs to name its scope, now that the board covers all four modes', async () => {
+    // WAS: 'names which modes the hub board actually sums, rather than implying
+    // all four'. That scope line existed because the board summed Word Hunt +
+    // Word Wheel while the hub showed four cards, so the header had to admit
+    // it. The board now merges all four server-side, which makes the caveat
+    // wrong rather than merely redundant.
     renderHub();
     const board = await screen.findByTestId('leaderboard-teaser');
-    // The board merges Word Hunt + Word Wheel only; saying so is the honest
-    // alternative to silently excluding Word Tower and Connections.
-    expect(board).toHaveTextContent(/word hunt/i);
-    expect(board).toHaveTextContent(/word wheel/i);
+    expect(board.querySelector('[data-testid="leaderboard-scope"]')).toBeNull();
   });
 });

@@ -7811,6 +7811,8 @@ const ja = {
     "relaxedQuest": "のんびりクエスト",
     "untimedQuest": "フリークエスト",
     "startQuest": "クエスト開始",
+    "aPlayer": "プレイヤー",
+    "modesPlayedCount": "本日 4 ゲーム中 {count}",
     "nextUp": "次はこれ",
     "allClearToday": "今日はすべてクリア — また明日",
     "adminBeta": "ベータ",

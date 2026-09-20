@@ -8414,6 +8414,8 @@ const ru = {
     "relaxedQuest": "Спокойный квест",
     "untimedQuest": "Квест без Времени",
     "startQuest": "НАЧАТЬ КВЕСТ",
+    "aPlayer": "Игрок",
+    "modesPlayedCount": "{count} из 4 игр сегодня",
     "nextUp": "Дальше",
     "allClearToday": "На сегодня всё — до завтра",
     "adminBeta": "Бета",

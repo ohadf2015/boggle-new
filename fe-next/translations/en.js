@@ -7210,6 +7210,8 @@ const en = {
     "relaxedQuest": "Relaxed Quest",
     "untimedQuest": "Untimed Quest",
     "startQuest": "START QUEST",
+    "aPlayer": "A player",
+    "modesPlayedCount": "{count} of 4 games today",
     "nextUp": "Next up",
     "allClearToday": "Today's board is clear — see you tomorrow",
     "adminBeta": "Beta",
