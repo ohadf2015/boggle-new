@@ -109,7 +109,7 @@ export default function AchievementProgressCard({
   return (
     <article
       className={`
-        relative rounded-neo border-neo border-neo-black
+        relative rounded-neo border-neo border-neo-cream/40
         ${isEarned ? 'bg-neo-navy/50 shadow-hard' : 'bg-neo-navy-light/70 opacity-80'}
         p-4 transition-all
       `}
@@ -122,9 +122,8 @@ export default function AchievementProgressCard({
         <div
           className={`
             shrink-0 w-16 h-16 rounded-full flex items-center justify-center
-            border-neo-thick border-neo-black
-            ${tierColors?.bg || 'bg-neo-navy-light'}
-            ${tierColors?.border || 'border-neo-black'}
+            border-neo-thick
+            ${tierColors ? `${tierColors.bg} border-neo-black` : 'bg-neo-navy-light border-neo-cream/40'}
             ${isLocked ? 'opacity-40' : ''}
           `}
         >
@@ -173,8 +172,8 @@ export default function AchievementProgressCard({
                 title={!isPinned && !canPin ? t('education.achievements.maxPinsReached') : ''}
                 className={`
                   w-8 h-8 rounded flex items-center justify-center
-                  border-neo border-neo-black transition-all
-                  ${isPinned ? 'bg-neo-lime text-neo-black shadow-hard-sm' : 'bg-neo-navy-light text-neo-white'}
+                  border-neo transition-all
+                  ${isPinned ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm' : 'bg-neo-navy-light text-neo-white border-neo-cream/40'}
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                 `}
               >

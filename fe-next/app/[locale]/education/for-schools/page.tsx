@@ -133,7 +133,7 @@ export default async function Page({ params }: PageProps) {
           <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{c.whyTitle}</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {c.why.map((w) => (
-              <div key={w.title} className="rounded-neo border-neo-thick bg-neo-navy-light p-5 shadow-hard">
+              <div key={w.title} className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard">
                 <h3 className="font-neo-display text-lg font-bold text-neo-cyan">{w.title}</h3>
                 <p className="mt-2 text-neo-gray-200">{w.body}</p>
               </div>
@@ -179,7 +179,7 @@ export default async function Page({ params }: PageProps) {
           <p className="mt-3 max-w-3xl text-neo-gray-200">{c.comingIntro}</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {c.coming.map((w) => (
-              <div key={w.title} className="rounded-neo border-neo bg-neo-navy-light p-5">
+              <div key={w.title} className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light p-5">
                 <h3 className="font-neo-display text-lg font-bold text-neo-purple">{w.title}</h3>
                 <p className="mt-2 text-neo-gray-200">{w.body}</p>
               </div>
@@ -194,7 +194,7 @@ export default async function Page({ params }: PageProps) {
           <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{c.faqTitle}</h2>
           <div className="mt-6 space-y-4">
             {c.faqs.map((f) => (
-              <details key={f.q} className="rounded-neo border-neo bg-neo-navy-light p-4">
+              <details key={f.q} className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light p-4">
                 <summary className="cursor-pointer font-neo-display font-bold text-neo-white">{f.q}</summary>
                 <p className="mt-2 text-neo-gray-200">{f.a}</p>
               </details>

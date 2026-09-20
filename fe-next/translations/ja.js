@@ -13715,6 +13715,7 @@ const ja = {
         "subtext": "リアルタイムで友達とバトル"
       },
       "freeAccess": "先生も生徒も無料",
+      "resourcesAriaLabel": "教育リソース",
       "goToDashboard": "ダッシュボードへ",
       "premium": "プレミアム",
       "roleGuest": "ゲスト",

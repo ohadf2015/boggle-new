@@ -13570,6 +13570,7 @@ const he = {
         "subtext": "התחרו מול חברים בזמן אמת"
       },
       "freeAccess": "חינם לכולם",
+      "resourcesAriaLabel": "משאבי לימוד",
       "goToDashboard": "עבור ללוח הבקרה",
       "premium": "פרימיום",
       "roleGuest": "אורח",

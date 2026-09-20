@@ -222,7 +222,13 @@ function resolveTransition(
   arrayEnd: number,
   side: 'truthy' | 'falsy' | null
 ): Record<string, string> | null {
-  const ahead = src.slice(arrayEnd, arrayEnd + 600);
+  // A keyframe array defined inside a top-level data const (`const WOBBLES =
+  // [ ... ];`) cannot see a transition past the const's close — a naive
+  // lookahead would walk into an unrelated motion element's spring below and
+  // false-positive (LandingAvatarTeaser). Bound the search window at `];`.
+  const rawWindow = src.slice(arrayEnd, arrayEnd + 600);
+  const constClose = rawWindow.search(/\n\];/);
+  const ahead = constClose === -1 ? rawWindow : rawWindow.slice(0, constClose);
   const m = /transition\s*[:=]\s*/.exec(ahead);
   if (!m) return null;
   const refStart = arrayEnd + m.index + m[0].length;

@@ -13950,6 +13950,7 @@ const sv = {
         "subtext": "Tävla live mot vänner"
       },
       "freeAccess": "Helt gratis",
+      "resourcesAriaLabel": "Utbildningsresurser",
       "goToDashboard": "Till panelen",
       "premium": "Premium",
       "roleGuest": "Gäst",

@@ -139,8 +139,8 @@ export function ClassroomGameBanner({
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
         className={cn(
-          'relative flex items-center gap-3 px-4 py-3 rounded-neo border-2 border-black shadow-hard-sm overflow-hidden',
-          isConnected ? 'bg-neo-cyan/20' : 'bg-neo-lime/20'
+          'relative flex items-center gap-3 px-4 py-3 rounded-neo border-2 shadow-hard-sm overflow-hidden',
+          isConnected ? 'border-neo-cyan bg-neo-cyan/20' : 'border-neo-lime bg-neo-lime/20'
         )}
       >
         {/* Radar pulse ring */}
@@ -302,7 +302,7 @@ export function ClassroomGameBanner({
           {joinError && (
             <p
               role="alert"
-              className="mt-3 text-sm font-neo-body font-bold text-neo-white bg-neo-pink/30 border-2 border-black rounded-neo px-3 py-2"
+              className="mt-3 text-sm font-neo-body font-bold text-neo-white bg-neo-pink/30 border-2 border-neo-pink rounded-neo px-3 py-2"
             >
               {joinError}
             </p>

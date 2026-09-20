@@ -6,7 +6,8 @@ import { educationFaqJsonLd } from '@/lib/seo/educationStructuredData';
 
 const KEYS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8'] as const;
 
-export function EducationFAQ() {
+/** `jsonLd={false}` when the page already emits a server-side FAQPage node. */
+export function EducationFAQ({ jsonLd = true }: { jsonLd?: boolean } = {}) {
   const { t } = useLanguage();
   const [open, setOpen] = useState<string | null>(null);
 
@@ -42,7 +43,7 @@ export function EducationFAQ() {
       </div>
       {/* Inline, not next/script: `afterInteractive` runs post-hydration and
           crawlers that only read the initial HTML never see the FAQPage node. */}
-      <JsonLd data={educationFaqJsonLd(qa)} />
+      {jsonLd && <JsonLd data={educationFaqJsonLd(qa)} />}
     </section>
   );
 }
