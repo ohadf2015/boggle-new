@@ -55,6 +55,15 @@ describe('ClassSwitcher', () => {
     expect(screen.getByTestId('class-switch-c2')).toHaveTextContent('0');
   });
 
+  it('shows count over the free-tier limit when studentLimit is set', () => {
+    render(
+      <ClassSwitcher classrooms={classes} selectedId="c1" onSelect={vi.fn()} studentLimit={50} />
+    );
+
+    expect(screen.getByTestId('class-switch-c1')).toHaveTextContent('3/50');
+    expect(screen.getByTestId('class-switch-c2')).toHaveTextContent('0/50');
+  });
+
   it('hands the chosen class id up', async () => {
     const onSelect = vi.fn();
     render(<ClassSwitcher classrooms={classes} selectedId="c1" onSelect={onSelect} />);
