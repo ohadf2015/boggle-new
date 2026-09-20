@@ -28,7 +28,7 @@ import type { LevelWords } from '@/lib/adventure/play/relicStack';
 import { RARITY_FRAME, relicArt } from './art';
 import { relicTag } from './relicBadge';
 import { relicRunContributions } from './relicRunTotals';
-import { clampX, clampY, OVERLAY_GUTTER } from './overlayPlace';
+import { clampX, tooltipTop } from './overlayPlace';
 import { cn } from '@/lib/utils';
 
 export interface StackCtx { levels: readonly LevelWords[]; owned: readonly RelicId[] }
@@ -39,23 +39,29 @@ interface Props {
   stackCtx?: StackCtx | null;
   /** The chip this bubble belongs to; the bubble anchors itself to its rect. */
   anchor?: HTMLElement | null;
+  /** A region the bubble must not cover — the fight stage (boss HP + countdown). */
+  avoid?: HTMLElement | null;
 }
 
-/** Park the bubble under its chip, flipping above when the chip sits low, and clamp to the screen. */
-function place(anchor: HTMLElement | null, box: HTMLElement | null) {
+/**
+ * Park the bubble under its chip and clamp it to the screen — and keep it CLEAR
+ * of `avoid` (the fight stage). Round 6 flagged the bubble burying the boss HP
+ * bar and the attack countdown mid-wind-up, which is the one thing the player
+ * has to be reading. `tooltipTop` owns that decision and is tested alone.
+ */
+function place(anchor: HTMLElement | null, box: HTMLElement | null, avoid?: HTMLElement | null) {
   if (!anchor || !box || typeof window === 'undefined') return null;
   const a = anchor.getBoundingClientRect();
-  const w = box.offsetWidth;
-  const h = box.offsetHeight;
-  const below = a.bottom + 8;
-  const flip = below + h > window.innerHeight - OVERLAY_GUTTER && a.top - 8 - h > OVERLAY_GUTTER;
+  const vp = { width: window.innerWidth, height: window.innerHeight };
+  const bx = { width: box.offsetWidth, height: box.offsetHeight };
+  const guard = avoid?.getBoundingClientRect();
   return {
-    left: clampX(a.left + a.width / 2, w, window.innerWidth),
-    top: flip ? a.top - 8 - h : clampY(below, h, window.innerHeight),
+    left: clampX(a.left + a.width / 2, bx.width, vp.width),
+    top: tooltipTop(a, bx, vp, guard && guard.height > 0 ? guard : null),
   };
 }
 
-export default function RelicTooltip({ id, onClose, stackCtx, anchor }: Props) {
+export default function RelicTooltip({ id, onClose, stackCtx, anchor, avoid }: Props) {
   const { t } = useLanguageSafe();
   const boxRef = useRef<HTMLDivElement>(null);
   const [at, setAt] = useState<{ left: number; top: number } | null>(null);
@@ -64,12 +70,12 @@ export default function RelicTooltip({ id, onClose, stackCtx, anchor }: Props) {
   useEffect(() => setMounted(true), []);
   useLayoutEffect(() => {
     if (!mounted) return undefined;
-    const sync = () => setAt(place(anchor ?? null, boxRef.current));
+    const sync = () => setAt(place(anchor ?? null, boxRef.current, avoid ?? null));
     sync();
     window.addEventListener('resize', sync);
     window.addEventListener('scroll', sync, true);
     return () => { window.removeEventListener('resize', sync); window.removeEventListener('scroll', sync, true); };
-  }, [anchor, mounted, id]);
+  }, [anchor, avoid, mounted, id]);
 
   // What it has actually paid out over the whole run. Zero means it has not paid
   // yet, and "+0" is noise — the rule sentence above already says what it will do.

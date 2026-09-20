@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { clampX, clampY, calloutSpot, trailRect, type Rect } from '../overlayPlace';
+import { clampX, clampY, calloutSpot, trailRect, tooltipTop, type Rect } from '../overlayPlace';
 
 const rect = (left: number, top: number, width = 40, height = 40): Rect => ({ left, top, width, height });
 const phone = { width: 390, height: 844 };
@@ -89,5 +89,47 @@ describe('trailRect — the line that says WHICH relic did it', () => {
 
   it('Given a callout that overlaps its chip, then there is no trail to draw', () => {
     expect(trailRect(rect(20, 70), { left: 8, top: 80, flipped: false }, box)).toBeNull();
+  });
+});
+
+/**
+ * ROUND 6 FLAG: "opening the relic tooltip fully covers the boss HP bar and the
+ * attack countdown while the boss is winding up — a real problem given the
+ * fight's mechanic is read the timer, spell the word before it lands."
+ * The bubble now slides CLEAR of whatever it was told to protect.
+ */
+describe('tooltipTop — the bubble never sits on the boss panel', () => {
+  const vp = { width: 390, height: 844 };
+  const box = { width: 272, height: 150 };
+  // A chip in the run bar, and the boss panel right under it.
+  const chip = { left: 20, top: 96, width: 44, height: 44 };
+  const boss = { left: 8, top: 150, width: 374, height: 190 };
+
+  it('Given no panel to protect, then it parks just under the chip', () => {
+    expect(tooltipTop(chip, box, vp)).toBe(chip.top + chip.height + 8);
+  });
+
+  it('Given the boss panel under the chip, then the bubble clears its bottom edge', () => {
+    const top = tooltipTop(chip, box, vp, boss);
+    expect(top).toBeGreaterThanOrEqual(boss.top + boss.height);
+  });
+
+  it('Given a protected panel it would not have touched anyway, then nothing moves', () => {
+    const farBelow = { left: 8, top: 700, width: 374, height: 120 };
+    expect(tooltipTop(chip, box, vp, farBelow)).toBe(tooltipTop(chip, box, vp));
+  });
+
+  it('Given a rail lower down and no room below the panel, then it goes ABOVE the chip', () => {
+    const lowChip = { left: 20, top: 520, width: 44, height: 44 };
+    const tall = { left: 8, top: 560, width: 374, height: 270 };
+    const top = tooltipTop(lowChip, box, vp, tall);
+    expect(top + box.height).toBeLessThanOrEqual(lowChip.top);
+  });
+
+  it('Given a bubble that fits nowhere clear, then it still stays on screen', () => {
+    const everything = { left: 0, top: 0, width: 390, height: 844 };
+    const top = tooltipTop(chip, box, vp, everything);
+    expect(top).toBeGreaterThanOrEqual(8);
+    expect(top + box.height).toBeLessThanOrEqual(vp.height - 8);
   });
 });

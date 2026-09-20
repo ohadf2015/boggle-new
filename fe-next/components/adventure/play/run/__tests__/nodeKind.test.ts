@@ -29,4 +29,9 @@ describe('currentNodeKind — what the HUD chip says we are standing on', () => 
   it('Given every node kind, then a chip style exists for it (no unstyled kind can reach the HUD)', () => {
     for (const n of map.nodes) expect(NODE_CHIP[n.kind]).toBeTruthy();
   });
+
+  it('Given the boss room, then its chip fill is used by no other room', () => {
+    const others = Object.entries(NODE_CHIP).filter(([k]) => k !== 'boss').map(([, v]) => v);
+    expect(others).not.toContain(NODE_CHIP.boss);
+  });
 });

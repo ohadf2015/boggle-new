@@ -45,16 +45,24 @@ describe('RunHud — the pinned run bar', () => {
     expect(screen.getByTestId('node-chip').textContent).toContain('adventurePlay.map.kind.elite');
   });
 
-  it('Given relics and gold, then they share the relic row; the room, hearts and potions get their own row', () => {
+  /**
+   * ROUND 5 CONTRACT CHANGE. Gold used to sit IN the relic row, costing the rail
+   * ~66px of a 336px band — enough that six relics already wrapped to two rows
+   * and twelve took three. Row one is now the relic strip and nothing else (the
+   * bar's own arrangement); gold joins the room, hearts and potions on the
+   * resource row.
+   */
+  it('Given relics and gold, then row one is the relic strip alone and gold sits with the resources', () => {
     render(
       <RunHud {...base} nodeKind="fight" relics={['storm-rune']} words={['house']}
         potionsLeft={{ ...noPotions, heal: 2 }} />,
     );
     const relicRow = screen.getByTestId('run-hud-relics');
     expect(within(relicRow).getByRole('button', { name: 'adventurePlay.relic.storm-rune' })).toBeTruthy();
-    expect(within(relicRow).getByText('42')).toBeTruthy();
+    expect(within(relicRow).queryByText('42')).toBeNull();
 
     const resRow = screen.getByTestId('run-hud-resources');
+    expect(within(resRow).getByText('42')).toBeTruthy();
     expect(within(resRow).getByLabelText(/adventurePlay\.loot\.hearts/)).toBeTruthy();
     expect(within(resRow).getByTestId('node-chip')).toBeTruthy();
     expect(resRow.querySelector('[data-potion="heal"]')).toBeTruthy();

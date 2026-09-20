@@ -4,11 +4,22 @@
  * The pinned run bar, Slay-the-Spire style: it sits above the stage so what you
  * own never leaves the screen.
  *
- * Row 1 is the relic rail — every owned relic as a framed icon (tap for name,
- * rarity, effect and what it has paid out this run; it flashes the moment a
- * word triggers it) — plus gold. Row 2 is the room you are standing in, your
- * hearts (hidden in fights: the combat stage owns those) and the potions you
- * can drink, with the fight's shield / telegraph controls when they are asked for.
+ * Row 1 is the relic rail and NOTHING else — every owned relic as a framed icon
+ * (tap for name, rarity, effect and what it has paid out this run; it flashes
+ * the moment a word triggers it). Row 2 is the resources: the room you are
+ * standing in, your hearts (hidden in fights: the combat stage owns those),
+ * your purse and the potions you can drink, with the fight's shield / telegraph
+ * controls when they are asked for.
+ *
+ * On a LANDSCAPE canvas (TV, desktop) the two rows become ONE strip that runs
+ * edge to edge — relics take the width, resources close it — and the shell puts
+ * the stage beside the board. That layout is pure CSS (`run/landscape.ts`), so
+ * it is right at first paint instead of snapping in after a measure.
+ *
+ * The purse used to share row 1. On a 390px phone that cost the rail ~66px of a
+ * 336px band, which is the difference between six relics on one row and six on
+ * two — and between twelve on two rows and twelve on three, over the boss board,
+ * where the grid can least afford it.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Heart, Shield } from 'lucide-react';
@@ -58,6 +69,8 @@ interface Props {
   nodeKind?: NodeKind | null;
   /** The run's step (`run.step`) — how many nodes have been cleared, which keys the banked words. */
   step?: number;
+  /** The fight stage, so an opened relic bubble never buries the boss HP bar or the attack countdown. */
+  stageEl?: HTMLElement | null;
 }
 
 const btn = 'rounded-lg border-[3px] border-black bg-neo-cream text-black px-2 py-1 text-xs font-bold shadow-[2px_2px_0_#000] disabled:opacity-40 active:translate-y-0.5 active:shadow-none';
@@ -85,6 +98,7 @@ export function Hearts({ hp, maxHp, bare = false }: { hp: number; maxHp: number;
 export default function RunHud({
   hp, maxHp, gold, combat, dispatchCombat, hintsLeft = 0, onHint, potionsLeft, onPotion, goal, playing,
   relics = [], lastHit = null, words = [], combatControls = true, world, level, kind, seconds, nodeKind = null, step,
+  stageEl = null,
 }: Props) {
   const { t } = useLanguageSafe();
   const tele = combat?.telegraph;
@@ -146,18 +160,27 @@ export default function RunHud({
   // whenever you held nothing, which reads as "this game has no potions".
   const showControls = combatControls && !!combat;
 
+  // The trigger callout parks below the WHOLE band, not below the relic rail:
+  // under the rail it landed squarely on the potion slots and the purse.
+  const band = useRef<HTMLDivElement>(null);
+  const [bandEl, setBandEl] = useState<HTMLDivElement | null>(null);
+  useEffect(() => setBandEl(band.current), []);
+
   return (
     /* ONE band, not five floating chips: the HUD used to sit straight on the
        world art, where a sunlit backdrop swallowed the potion sockets and the
        bar read as scattered stickers. A single dark panel with the house border
        is the Slay-the-Spire top bar — legible over any world, and on a TV it
        reads as one instrument cluster instead of confetti. */
-    <div className="mt-2 flex flex-col gap-1 rounded-2xl border-[3px] border-black bg-[#0f1b3d]/85 px-2 pb-1.5 shadow-[3px_3px_0_#000]" data-testid="run-hud">
-      {/* Relic row — the widest thing in the HUD: everything you own, plus your purse. */}
-      <div className="flex items-center gap-1.5" data-testid="run-hud-relics">
+    <div ref={band} data-adv-slot="hud" className="mt-2 flex flex-col gap-1 rounded-2xl border-[3px] border-black bg-[#0f1b3d]/85 px-2 pb-1.5 shadow-[3px_3px_0_#000]" data-testid="run-hud">
+      {/* Relic row — the strip and nothing else, so it owns the band's full
+          width. Sharing it with the purse cost ~66px and pushed a twelve-relic
+          haul onto a third row over the boss board. */}
+      <div className="flex items-center" data-testid="run-hud-relics">
         {/* The rail keeps its place even when it is empty: relics have a home you can point at. */}
         {relics.length > 0 ? (
-          <RelicBar relics={relics} pulse={pulse} contrib={contrib} stackCtx={stackCtx} className="min-w-0 flex-1" />
+          <RelicBar relics={relics} pulse={pulse} contrib={contrib} stackCtx={stackCtx} calloutHost={bandEl}
+            tooltipAvoid={stageEl} className="min-w-0 flex-1" />
         ) : (
           /* The band behind it supplies the contrast, so the empty rail is a
              dashed socket and nothing more. */
@@ -165,12 +188,12 @@ export default function RunHud({
             {t('adventurePlay.loot.noRelics')}
           </span>
         )}
-        <GoldCounter value={gold} />
       </div>
-      {/* Resource row: the room you are in, your hearts, and the potions you can drink right now. */}
+      {/* Resource row: the room you are in, your hearts, your purse, and the potions you can drink right now. */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5" data-testid="run-hud-resources">
           {nodeKind && <NodeChip kind={nodeKind} />}
           {!inFight && <Hearts hp={hp} maxHp={maxHp} bare />}
+          <GoldCounter value={gold} />
           <span className="flex items-center gap-1.5" data-testid="run-hud-potions" aria-label={t('adventurePlay.loot.potionsTitle')}>
             {POTION_IDS.map((id) => (
               <PotionButton key={id} id={id} count={potionsLeft[id] ?? 0} onDrink={onPotion}

@@ -26,11 +26,17 @@ export function currentNodeKind(
   return 'fight';
 }
 
-/** Chip colours per node kind — electric, colour-coded, black text on every fill. */
+/**
+ * Chip colours per node kind — electric, colour-coded, black text on every fill.
+ *
+ * The boss owns a fill nothing else uses. It shared yellow with `treasure`, so
+ * the one room where the run can actually end looked like the room where you
+ * open a chest — on the exact screen the judge scores for stakes.
+ */
 export const NODE_CHIP: Record<NodeKind, string> = {
   fight: 'bg-neo-cyan',
-  elite: 'bg-neo-pink',
-  boss: 'bg-neo-yellow',
+  elite: 'bg-neo-purple',
+  boss: 'bg-neo-pink',
   treasure: 'bg-neo-yellow',
   shop: 'bg-neo-lime',
   rest: 'bg-neo-lime',

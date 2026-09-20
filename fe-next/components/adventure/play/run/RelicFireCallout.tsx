@@ -49,8 +49,12 @@ const FADE_MS = 260;
  * The gap the trail is drawn in. It has to be big enough to READ as a line
  * joining the chip to the panel — park the panel flush under the rail and the
  * connector collapses to a few pixels hidden under the panel's own shadow.
+ *
+ * It also has to clear the row the stage puts its foe's NAME and HP BAR on,
+ * directly under the run bar: on the boss frame that bar is the stakes, and a
+ * callout sitting on it trades one piece of the HUD for another.
  */
-const GAP_PX = 18;
+const GAP_PX = 40;
 /**
  * How many relics get a NAMED row. Late in a run a 7-letter first word can fire
  * five at once; five rows is a ~190px wall hanging off the rail that swallows

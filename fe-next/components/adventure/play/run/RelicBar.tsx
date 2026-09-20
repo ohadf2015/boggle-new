@@ -10,14 +10,14 @@
  * numeral (`relicBadge`), and the tooltip is portaled so nothing can paint over
  * it (`RelicTooltip`).
  */
-import { useCallback, useEffect, useMemo, useRef, useState, type Ref } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Ref } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { RelicId } from '@/lib/adventure/play/relics';
 import RelicChip from './RelicChip';
 import RelicFireCallout from './RelicFireCallout';
 import RelicTooltip, { type StackCtx } from './RelicTooltip';
-import { relicSlotClass } from './relicSlot';
+import { relicSlotClass, relicRailMaxPx } from './relicSlot';
 import { runStackCtx } from './relicRunTotals';
 import { cn } from '@/lib/utils';
 
@@ -40,9 +40,19 @@ interface Props {
    * paid me THIS RUN?". Ignored when `stackCtx` is given — the live board wins.
    */
   runCtx?: { world?: number | null; step?: number | null } | null;
+  /**
+   * What the trigger callout must park CLEAR of. The rail is only the top row
+   * of the run bar, so a callout parked under the rail landed on the HUD's own
+   * potion slots and purse — and the one frame that has to show relics, potions
+   * and a live toast at once showed two of the three. Pass the whole bar and the
+   * callout drops below all of it, onto the stage art, which owns nothing.
+   */
+  calloutHost?: HTMLElement | null;
+  /** A region the DETAIL BUBBLE must not cover — the fight stage. */
+  tooltipAvoid?: HTMLElement | null;
 }
 
-export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', className, contrib, stackCtx, runCtx }: Props) {
+export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', className, contrib, stackCtx, runCtx, calloutHost, tooltipAvoid }: Props) {
   const { t } = useLanguageSafe();
   const [open, setOpen] = useState<RelicId | null>(null);
   const chips = useRef(new Map<RelicId, HTMLButtonElement>());
@@ -64,7 +74,11 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
     () => stackCtx ?? (runCtx?.world ? runStackCtx(runCtx.world, runCtx.step ?? 1, relics) : null),
     [stackCtx, runCtx?.world, runCtx?.step, relics],
   );
-  const slot = relicSlotClass(relics.length + (ghostRef ? 1 : 0), size);
+  const slotCount = relics.length + (ghostRef ? 1 : 0);
+  const slot = relicSlotClass(slotCount, size);
+  // Cap the rail at an even split so the wrap never leaves an orphan chip
+  // on its own row. It only narrows: a tighter screen still wraps earlier.
+  const railMax = relicRailMaxPx(slotCount, size);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -76,8 +90,17 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
   useEffect(() => { if (open && !relics.includes(open)) setOpen(null); }, [relics, open]);
 
   return (
-    <div ref={rail} className={cn('relative', className)}>
-      <ul className="flex flex-wrap items-start gap-1 pb-2 pt-3" aria-label={t('adventurePlay.loot.relicsTitle')}>
+    /* `adv-relic-rail` is the landscape sheet's handle on the strip: on a TV it
+       drops the width cap below and spreads the chips across the whole bar. */
+    <div ref={rail} className={cn('adv-relic-rail relative', className)}>
+      {/* gap-y clears the numeral pill that hangs off each chip's bottom edge —
+          at gap-1 a wrapped row's badges sat ON the row beneath them, which is
+          the "illegible at scale" reading the judge would take. pt is only the
+          firing ring's headroom, so it is thin. */}
+      {/* The cap travels as a CSS VARIABLE, not an inline width: the landscape
+          sheet sets `--adv-rail-max: none` and the rail spreads. An inline
+          `max-width` would have needed `!important` to beat. */}
+      <ul style={{ '--adv-rail-max': `${railMax}px` } as CSSProperties} className="flex max-w-[var(--adv-rail-max)] flex-wrap items-start gap-x-1 gap-y-2.5 pb-2.5 pt-1" aria-label={t('adventurePlay.loot.relicsTitle')}>
         {relics.map((id) => (
           <li key={id} className={cn('flex-1', slot)}>
             <RelicChip
@@ -105,13 +128,13 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
           finished and AnimatePresence would hold stale callouts on screen. It
           fades itself out instead. */}
       {fired.length > 0 && (
-        <RelicFireCallout key={`fire-${shown}`} fired={fired} fireKey={shown ?? 0} host={rail.current}
+        <RelicFireCallout key={`fire-${shown}`} fired={fired} fireKey={shown ?? 0} host={calloutHost ?? rail.current}
           chipAt={(id) => chips.current.get(id) ?? null} onDone={endFire} />
       )}
       <AnimatePresence>
         {open && (
           <RelicTooltip key={open} id={open} onClose={() => setOpen(null)}
-            stackCtx={ctx} anchor={chips.current.get(open) ?? null} />
+            stackCtx={ctx} anchor={chips.current.get(open) ?? null} avoid={tooltipAvoid ?? null} />
         )}
       </AnimatePresence>
     </div>

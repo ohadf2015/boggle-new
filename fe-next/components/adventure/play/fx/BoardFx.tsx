@@ -218,7 +218,8 @@ export default function BoardFx({ children, lastHit, hitPath = [], shaking, targ
   }, [hintKey]);
 
   return (
-    <div ref={boardRef} className={cn('relative w-full max-w-[420px]', shaking && 'animate-[adv-shake_0.35s_ease-in-out]')}>
+    <div ref={boardRef} /* The cap travels as a variable so the landscape shell can raise it (run/landscape.ts); 420px stays the phone default. */
+    className={cn('relative w-full max-w-[var(--adv-board-max,420px)]', shaking && 'animate-[adv-shake_0.35s_ease-in-out]')}>
       {children}
       <div className="pointer-events-none absolute inset-0 z-20" aria-hidden>
         {fail?.boxes.map((b, i) => (

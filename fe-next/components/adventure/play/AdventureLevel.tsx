@@ -27,6 +27,8 @@ import { hintCells, resolveHitPath, type Cell } from './fx/hintPath';
 import type { HitEvent } from './events';
 import RunResult from './RunResult';
 import RunHud from './RunHud';
+import RunShellStyles from './run/RunShellStyles';
+import { RUN_SHELL_CLASS } from './run/landscape';
 import { currentNodeKind } from './run/nodeKind';
 import { foeScore } from './foeScore';
 import { resultHeld, FINALE_HOLD_MAX_MS } from './finaleHold';
@@ -311,15 +313,21 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       {/* The board is what's being read for the whole level, so the world art
           sits well back: dimmed, then a flat scrim, then a radial that is
           darkest behind the grid. At full strength the photo competed with the
-          tiles and the foe panel for the same attention. */}
+          tiles and the foe panel for the same attention. The radial carries the
+          lighting slot so a landscape canvas can re-pool it across the width. */}
       <img src={worldBackdrop(world)} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover opacity-70" />
       <div className="absolute inset-0 bg-[#0a1028]/35" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(10,16,40,0.7)_0%,rgba(10,16,40,0.2)_70%)]" />
+      <div data-adv-slot="lighting" className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(10,16,40,0.7)_0%,rgba(10,16,40,0.2)_70%)]" />
 
       {showLevelBody && (
-      <div inert={levelSettled || undefined} className="relative z-10 mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]">
+      /* The phone layout is a column; on a TV `RUN_SHELL_CLASS` turns this same
+         tree into a three-lane grid (stage | board | word feed) under one
+         full-width run strip — see run/landscape.ts. Pure CSS, so it is right at
+         first paint and the children keep their DOM order. */
+      <div inert={levelSettled || undefined} className={cn(RUN_SHELL_CLASS, 'relative z-10 mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]')}>
+        <RunShellStyles />
         {/* Top bar */}
-        <div className="flex items-center gap-2 pe-11">
+        <div data-adv-slot="bar" className="flex items-center gap-2 pe-11">
           <button type="button" onClick={onExit} aria-label={t('adventurePlay.backToMap')}
             className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none">
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
@@ -343,27 +351,33 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
             goal={goal} playing={run.phase === 'playing'}
             relics={run.runShown?.relics ?? []} lastHit={lastHit} words={run.words}
             world={world} level={shownLevel} kind={lvl.kind} seconds={lvl.seconds} combatControls={false}
-            nodeKind={currentNodeKind(run.map, run.currentNode, lvl)} step={run.run?.step} />
+            nodeKind={currentNodeKind(run.map, run.currentNode, lvl)} step={run.run?.step}
+            /* The stage the relic bubble must not cover: its HP bar and attack
+               countdown are the fight's counterplay. The run clock re-renders
+               this screen 5x/s, so the ref is live long before a chip is tapped. */
+            stageEl={stageRef.current} />
         )}
 
         {/* Stage: enemy / boss / star track */}
-        <div ref={stageRef} className="mt-3 min-h-[5.5rem] flex items-center">
+        <div ref={stageRef} data-adv-slot="stage" className="mt-3 min-h-[5.5rem] flex items-center">
           {lvl && !lvl.isBoss && !isElite
             ? <FoeTarget world={world} score={shownScore} stars={lvl.stars} lastHit={lastHit} />
             : <LevelStage world={world} run={run} lastHit={lastHit} popups={popups} onFinaleDone={onFinaleDone} />}
         </div>
 
         {lvl && (
-          <VariantPanel lvl={lvl} language={language} targets={run.targets} targetsFound={run.targetsFound}
-            chainLetter={run.chainLetter} chainLinks={run.words.length} chainBrokenAt={chainBrokenAt}
-            bombs={variant.bombs} fogThinning={variant.fogThinning} />
+          <div data-adv-slot="panel">
+            <VariantPanel lvl={lvl} language={language} targets={run.targets} targetsFound={run.targetsFound}
+              chainLetter={run.chainLetter} chainLinks={run.words.length} chainBrokenAt={chainBrokenAt}
+              bombs={variant.bombs} fogThinning={variant.fogThinning} />
+          </div>
         )}
 
         {/* Board — sized to the slot's SHORT side so it never spills over the HUD / tray above. */}
-        <div className="relative flex-1 flex items-center justify-center min-h-0 [container-type:size] [&_.game-board-frame]:[--board-size:min(100cqw,100cqh,420px)]">
+        <div data-adv-slot="board" className="relative flex-1 flex items-center justify-center min-h-0 [--adv-board-max:420px] [container-type:size] [&_.game-board-frame]:[--board-size:min(100cqw,100cqh,var(--adv-board-max))]">
           {/* Unmounted once the result screen is up: the board's body-portaled hit sticker (z-65) sat on top of it. */}
           {run.grid.length > 0 && (run.phase !== 'done' || holdResult) && (
-            <div className="flex justify-center" style={{ width: 'min(100cqw, 100cqh, 420px)' }}>
+            <div className="flex justify-center" style={{ width: 'min(100cqw, 100cqh, var(--adv-board-max))' }}>
             <BoardFx lastHit={lastHit} hitPath={hitPath} active={run.phase === 'playing'} shaking={run.frozen.size > 0} targetRef={stageRef} screenRef={screenRef}
               targetHp={lvl?.isBoss || isElite ? run.bossHp : lvl ? Math.max(0, (lvl.stars[2] || 1) - shownScore) : null} hintCells={hintTiles}>
               <GridComponent
@@ -388,11 +402,11 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         </div>
 
         {lvl && (
-          <div className="mt-2 flex justify-center">
+          <div data-adv-slot="hint" className="mt-2 flex justify-center">
             <HintButton hintsLeft={run.hintsLeft} onHint={onHint} disabled={run.phase !== 'playing'} />
           </div>
         )}
-        <FoundWords words={run.words} points={run.points} />
+        <div data-adv-slot="words" className="shrink-0"><FoundWords words={run.words} points={run.points} /></div>
       </div>
       )}
 

@@ -87,3 +87,33 @@ export function trailRect(chip: Rect, spot: Spot, box: Box): { left: number; top
   const height = chip.top - boxBottom;
   return height > 0 ? { left, top: boxBottom, height } : null;
 }
+
+/**
+ * Where the relic bubble's TOP edge goes.
+ *
+ * It wants to sit just under its chip. `avoid` is a rect it must not cover —
+ * the boss panel, whose HP bar and attack countdown are the fight's entire
+ * counterplay ("read the timer, spell the word before it lands"). Round 6
+ * flagged a tooltip that buried exactly that. Order of preference: under the
+ * chip · under the protected panel · above the chip · clamped on screen.
+ */
+export function tooltipTop(
+  anchor: Rect,
+  box: Box,
+  vp: { width: number; height: number },
+  avoid?: Rect | null,
+  gap = OVERLAY_GUTTER,
+): number {
+  const below = anchor.top + anchor.height + gap;
+  const fits = (top: number) => top >= gap && top + box.height <= vp.height - gap;
+  const clear = (top: number) => !avoid || top + box.height <= avoid.top || top >= avoid.top + avoid.height;
+
+  if (fits(below) && clear(below)) return below;
+  if (avoid) {
+    const under = avoid.top + avoid.height + gap;
+    if (fits(under)) return under;
+  }
+  const above = anchor.top - gap - box.height;
+  if (fits(above) && clear(above)) return above;
+  return clampY(below, box.height, vp.height, gap);
+}
