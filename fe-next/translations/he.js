@@ -7742,6 +7742,7 @@ const he = {
     "almostAllLetters": "כמעט הכל!",
     "streakBadge": "{count} ברצף!",
     "onFireBadge": "{count} על האש!",
+    "closeRace": "מרוץ צמוד",
     "inputPlaceholder": "הקלד מילה...",
     "tapLetters": "הקש או גרור אותיות כדי לבנות מילה",
     "tapToRemove": "הקש שוב על אות שהוספת כדי להסיר",

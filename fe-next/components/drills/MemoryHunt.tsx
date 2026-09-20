@@ -90,15 +90,23 @@ export default function MemoryHunt({
       )}>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
-            {Array.from({ length: game.levelConfig.lives }).map((_, i) => (
-              <Heart
-                key={`life-${i}`}
-                className={cn(
-                  'w-5 h-5',
-                  i < game.lives ? 'text-neo-red fill-neo-red' : 'text-gray-300'
-                )}
-              />
-            ))}
+            {Array.from({ length: game.levelConfig.lives }).map((_, i) => {
+              const filled = i < game.lives;
+              // Last-life tension cue — a bare gray/red heart count gave no
+              // sense of danger; the final heart now pulses so a miss feels
+              // consequential before it costs the round.
+              const isLastLife = filled && game.lives === 1 && game.levelConfig.lives > 1;
+              return (
+                <Heart
+                  key={`life-${i}`}
+                  className={cn(
+                    'w-5 h-5',
+                    filled ? 'text-neo-red fill-neo-red' : 'text-gray-300',
+                    isLastLife && 'motion-safe:animate-pulse'
+                  )}
+                />
+              );
+            })}
           </div>
           <div className={cn(
             'px-2 py-1 rounded border-2 border-neo-black text-xs font-bold',

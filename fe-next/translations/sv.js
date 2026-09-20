@@ -8048,6 +8048,7 @@ const sv = {
     "almostAllLetters": "NÄSTAN ALLA!",
     "streakBadge": "{count} i rad!",
     "onFireBadge": "{count} i rad – glödhett!",
+    "closeRace": "Jämn kamp",
     "inputPlaceholder": "Skriv ett ord...",
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",

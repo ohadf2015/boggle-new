@@ -7218,6 +7218,7 @@ const en = {
     "almostAllLetters": "ALMOST ALL!",
     "streakBadge": "{count} in a row!",
     "onFireBadge": "{count} on fire!",
+    "closeRace": "Close race",
     "inputPlaceholder": "Type a word...",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",

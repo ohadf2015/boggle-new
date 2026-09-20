@@ -7813,6 +7813,7 @@ const ja = {
     "almostAllLetters": "あと一文字！",
     "streakBadge": "{count}連続！",
     "onFireBadge": "{count}連続、絶好調！",
+    "closeRace": "接戦中",
     "inputPlaceholder": "単語を入力...",
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",

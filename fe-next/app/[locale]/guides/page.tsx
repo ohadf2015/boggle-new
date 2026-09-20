@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import GuidesIndexPageClient from './PageClient';
 import { encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
+import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 
 export const revalidate = 86400;
 
@@ -189,6 +190,7 @@ export default async function GuidesIndexPage({ params }: PageProps) {
       <script type="application/ld+json">{encodeJsonLd(faqSchema)}</script>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
       <GuidesIndexPageClient />
+      <EducationCalloutLink locale={locale} />
     </>
   );
 }

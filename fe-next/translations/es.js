@@ -7774,6 +7774,7 @@ const es = {
     "almostAllLetters": "¡CASI TODAS!",
     "streakBadge": "¡{count} seguidas!",
     "onFireBadge": "¡{count} seguidas, en racha!",
+    "closeRace": "Carrera reñida",
     "inputPlaceholder": "Escribe una palabra...",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",

@@ -2393,3 +2393,11 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: shipped
   - why: next.config.mjs + translations/*.js (en/es/he/ja/ru/sv) + dictionary candidates/*.txt were NOT restored — all had later commits (09-17/09-19) and blind-copying the 09-15 backup would clobber newer shipped work
   - recommended owner: review-by-eod — if the 09-15 translation/dictionary additions are still wanted, a manual diff-merge (not blind copy) is needed against current translations/*.js
+
+## 2026-09-20
+- [Sentry|PostHog] TypeError reading 'duration'/'r.clear' — Howler stale Sound listener (JAVASCRIPT-NEXTJS-25R + PostHog 019e8e6b-6f6c-7372-8bfe-78c8523d383b)
+  - Sentry: first 2026-09-16, last 2026-09-17, 1849 occurrences, 1 user. PostHog: first 2026-06-03, last 2026-09-19T04:45, 28 occurrences, 1 user.
+  - link: https://lexiclash.sentry.io/issues/147446341/ , https://eu.posthog.com/project/151059/error_tracking/019e8e6b-6f6c-7372-8bfe-78c8523d383b
+  - status: shipped bec779286 (2026-09-19, already on master before tonight)
+  - why: both issues' last-seen events predate the 2026-09-19T14:14 fix commit — no code change needed tonight, verification only
+  - recommended owner: self (Sentry issue marked resolvedInNextRelease attempt failed — MCP token is read-only, needs manual resolve in Sentry UI)

@@ -13135,6 +13135,7 @@ const ru = {
     "almostAllLetters": "ПОЧТИ ВСЕ!",
     "streakBadge": "{count} подряд!",
     "onFireBadge": "{count} подряд, в ударе!",
+    "closeRace": "Плотная гонка",
     "inputPlaceholder": "Печатай слово...",
     "tapLetters": "Нажимай или тяни буквы, чтобы составить слово",
     "tapToRemove": "Нажми на добавленную букву снова, чтобы удалить",
