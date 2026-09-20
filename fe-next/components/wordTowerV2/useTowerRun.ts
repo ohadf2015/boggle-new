@@ -448,7 +448,10 @@ export function useTowerRun() {
       labelsRef.current.set(id, word);
       spawnBlock(world, {
         id,
-        x: (index % 2 === 0 ? 1 : -1) * index * 2.6,
+        // Lean cycles instead of growing: `index * 2.6` leant further every
+        // floor, so a 20-floor review tower always toppled before you could see
+        // the skies it was seeded to reach.
+        x: (index % 2 === 0 ? 1 : -1) * (index % 4) * 2.6,
         y: -(getTowerHeightM(world) * PX_PER_M + BLOCK_HEIGHT_PX + 20),
         widthPx: blockWidthForWord(word),
         heightPx: BLOCK_HEIGHT_PX,

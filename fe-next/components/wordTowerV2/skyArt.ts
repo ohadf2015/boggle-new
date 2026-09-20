@@ -1,5 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
-import { type PropKind, type Sky, lerpColour } from '@/lib/wordTowerV2/biomes';
+import { type PropKind, type Sky, type SkyFx, lerpColour } from '@/lib/wordTowerV2/biomes';
 import type { SkyProp } from '@/lib/wordTowerV2/scenery';
 
 /**
@@ -11,7 +11,9 @@ import type { SkyProp } from '@/lib/wordTowerV2/scenery';
  *
  * - the sky is 14 HARD bands (brand: no soft gradients), repainted only when its
  *   colours actually move, which is 14 rects;
- * - stars and the sunburst are painted once; per frame only alpha/rotation move;
+ * - stars are painted once, and so is each backdrop EFFECT — per frame only its
+ *   alpha, rotation and offset move (repainting a full-screen poly set every
+ *   frame is exactly the lag this file was written to kill);
  * - props are painted once each, lazily, the first time they come on screen.
  *
  * Everything is screen pixels: the sky does not zoom with the tower.
@@ -126,6 +128,124 @@ function drawProp(g: Graphics, prop: SkyProp, w: number): void {
   draw[prop.kind]();
 }
 
+
+/**
+ * Backdrop effects, one per sky (biomes.ts `fx`). Each is painted ONCE per
+ * kind+size into a white shape that is then tinted by the sky's accent, so a
+ * cross-fade between two skies is two alphas, not a repaint.
+ *
+ * Local origin: `rays` and `deep` are centred; `haze`, `streaks` and `curtain`
+ * start at the top-left and span the screen (see `placeFx`).
+ */
+function drawRays(g: Graphics, w: number, h: number): void {
+  const r = Math.hypot(w, h);
+  for (let i = 0; i < 18; i += 1) {
+    const a0 = (i / 18) * Math.PI * 2;
+    const a1 = a0 + (Math.PI * 2) / 18 / 2.4;
+    g.poly([0, 0, Math.cos(a0) * r, Math.sin(a0) * r, Math.cos(a1) * r, Math.sin(a1) * r]);
+  }
+  g.fill(0xffffff);
+}
+
+/** Sunset: flat stripes stacked toward the horizon — hard edges, brand-correct. */
+function drawHaze(g: Graphics, w: number, h: number): void {
+  for (let i = 0; i < 9; i += 1) {
+    const y = h * 0.28 + i * (h * 0.06);
+    g.rect(0, y, w, Math.max(3, h * 0.022 * (1 - i / 12))).fill({ color: 0xffffff, alpha: 1 - i / 11 });
+  }
+}
+
+/** Jet stream: long diagonal speed lines. Drawn twice so the scroll can wrap. */
+function drawStreaks(g: Graphics, w: number, h: number): void {
+  const span = w + 400;
+  const r = rng(91);
+  for (let i = 0; i < 26; i += 1) {
+    const y = r() * h;
+    const len = 90 + r() * 220;
+    const thick = 2 + r() * 3;
+    for (const dx of [0, span]) g.poly([dx, y, dx + len, y - len * 0.16, dx + len, y - len * 0.16 + thick, dx, y + thick]);
+  }
+  g.fill(0xffffff);
+}
+
+/** Aurora: vertical curtains with a ragged foot, hanging from the top edge. */
+function drawCurtain(g: Graphics, w: number, h: number): void {
+  const r = rng(23);
+  for (let i = 0; i < 7; i += 1) {
+    const x = (i / 7) * w + r() * (w / 12);
+    const cw = w * (0.05 + r() * 0.06);
+    const bottom = h * (0.3 + r() * 0.45);
+    const pts: number[] = [x, 0, x + cw, 0];
+    for (let k = 4; k >= 0; k -= 1) pts.push(x + (cw * k) / 4, bottom - r() * h * 0.12);
+    g.poly(pts).fill({ color: 0xffffff, alpha: 0.4 + r() * 0.6 });
+  }
+}
+
+/** Orbit: concentric rings with a scatter of dust — the view from up there. */
+function drawDeep(g: Graphics, w: number, h: number): void {
+  const r = Math.min(w, h);
+  for (let i = 1; i <= 4; i += 1) g.circle(0, 0, r * (0.18 + i * 0.16)).stroke({ width: 2 + i, color: 0xffffff, alpha: 0.5 / i });
+  const rand = rng(53);
+  for (let i = 0; i < 40; i += 1) {
+    const a = rand() * Math.PI * 2;
+    const d = r * (0.2 + rand() * 0.8);
+    g.circle(Math.cos(a) * d, Math.sin(a) * d, 1 + rand() * 2.5);
+  }
+  g.fill({ color: 0xffffff, alpha: 0.7 });
+}
+
+export const FX_DRAW: Record<SkyFx, (g: Graphics, w: number, h: number) => void> = {
+  rays: drawRays,
+  haze: drawHaze,
+  streaks: drawStreaks,
+  curtain: drawCurtain,
+  deep: drawDeep,
+};
+
+/** How loud each effect is allowed to be at full blend. */
+const FX_ALPHA: Record<SkyFx, number> = { rays: 0.1, haze: 0.2, streaks: 0.14, curtain: 0.26, deep: 0.16 };
+
+/** One painted effect. Repainted only when the KIND or the viewport changes. */
+class FxView {
+  readonly g = new Graphics();
+  private key = '';
+
+  paint(kind: SkyFx, w: number, h: number): void {
+    const key = `${kind}|${Math.round(w)}|${Math.round(h)}`;
+    if (key === this.key) return;
+    this.key = key;
+    this.g.clear();
+    // A layer is reused across kinds, so drop the previous kind's transform —
+    // a curtain's scale.y would otherwise stretch the rays that replace it.
+    this.g.scale.set(1);
+    this.g.rotation = 0;
+    this.g.position.set(0, 0);
+    FX_DRAW[kind](this.g, w, h);
+  }
+}
+
+/** Per-frame motion. Nothing here repaints — only transform and alpha move. */
+function placeFx(g: Graphics, kind: SkyFx, f: SkyFrame): void {
+  const { w, h, ts, dt, reducedMotion } = f;
+  const t = reducedMotion ? 0 : ts / 1000;
+  if (kind === 'rays' || kind === 'deep') {
+    g.position.set(w / 2, h * (kind === 'rays' ? 0.42 : 0.45));
+    if (!reducedMotion) g.rotation += dt * (kind === 'rays' ? 0.05 : 0.02);
+    return;
+  }
+  if (kind === 'streaks') {
+    // Wraps across the doubled draw, so the scroll never shows a seam.
+    g.position.set(-(((t * 190) % (w + 400)) + 400), 0);
+    return;
+  }
+  if (kind === 'haze') {
+    g.position.set(0, Math.sin(t * 0.35) * h * 0.03);
+    return;
+  }
+  g.position.set(Math.sin(t * 0.22) * w * 0.04, 0);
+  g.scale.y = 1 + Math.sin(t * 0.5) * 0.08;
+}
+
 interface PropView {
   prop: SkyProp;
   g: Graphics | null;
@@ -150,16 +270,16 @@ export class SkyLayer {
   readonly container = new Container();
   private readonly bands = new Graphics();
   private readonly stars = new Graphics();
-  private readonly burst = new Graphics();
+  /** Two effect layers cross-faded by the sky blend — never a swap. */
+  private readonly fxFrom = new FxView();
+  private readonly fxTo = new FxView();
   private readonly propLayer = new Container();
   private readonly views: PropView[];
   private bandKey = '';
   private starKey = '';
-  private burstKey = '';
 
   constructor(props: SkyProp[]) {
-    this.burst.alpha = 0.1;
-    this.container.addChild(this.bands, this.stars, this.burst, this.propLayer);
+    this.container.addChild(this.bands, this.stars, this.fxFrom.g, this.fxTo.g, this.propLayer);
     this.views = props.map((prop) => ({ prop, g: null }));
   }
 
@@ -195,21 +315,20 @@ export class SkyLayer {
       this.stars.y = (((lift * STAR_PARALLAX) % h) + h) % h;
     }
 
-    const burstKey = `${w}|${h}`;
-    if (burstKey !== this.burstKey) {
-      this.burstKey = burstKey;
-      const r = Math.hypot(w, h);
-      this.burst.clear();
-      for (let i = 0; i < 18; i += 1) {
-        const a0 = (i / 18) * Math.PI * 2;
-        const a1 = a0 + (Math.PI * 2) / 18 / 2.4;
-        this.burst.poly([0, 0, Math.cos(a0) * r, Math.sin(a0) * r, Math.cos(a1) * r, Math.sin(a1) * r]);
-      }
-      this.burst.fill(0xffffff);
+    // The backdrop effect belongs to the ALTITUDE: it fades out as the next sky
+    // fades in, so a climb changes what is behind you, not just its colour.
+    const pairs: Array<[FxView, SkyFx, number, number]> = [
+      [this.fxFrom, sky.from.fx, 1 - sky.t, sky.from.accent],
+      [this.fxTo, sky.to.fx, sky.t, sky.to.accent],
+    ];
+    for (const [view, kind, blend, tint] of pairs) {
+      view.g.visible = blend > 0.01;
+      if (!view.g.visible) continue;
+      view.paint(kind, w, h);
+      view.g.alpha = FX_ALPHA[kind] * blend;
+      view.g.tint = tint;
+      placeFx(view.g, kind, f);
     }
-    this.burst.tint = sky.accent;
-    this.burst.position.set(w / 2, h * 0.42);
-    if (!f.reducedMotion) this.burst.rotation += f.dt * 0.05;
 
     const floorScreen = f.floorPx * f.scale;
     for (const v of this.views) {

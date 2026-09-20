@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, SWING } from '../crane';
 import { PX_PER_M } from '../engine';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '../scoring';
-import { GROUND_STRIP_PX, HUD_TOP_PX, frameCamera, towerSkirts } from '../camera';
+import { COMFORT_PLAY_HEIGHT_PX, GROUND_STRIP_PX, HUD_TOP_PX, ZOOM, frameCamera, towerSkirts } from '../camera';
 
 const VIEWPORTS = [
   { name: 'phone', w: 390, h: 844, dock: 260 },
@@ -60,6 +60,20 @@ describe('frameCamera', () => {
   it('never shrinks blocks below readable size on a phone', () => {
     const f = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 5 });
     expect(f.scale).toBeGreaterThanOrEqual(0.8);
+  });
+
+  it('pulls the bottom-dock frame back so more of the tower is on screen', () => {
+    // Round 7 reversed the "make it bigger" pass. Pinned as a ratio so a later
+    // tweak to the width/height/comfort limits cannot silently undo it.
+    const f = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 0 });
+    const playH = 844 - 260 - GROUND_STRIP_PX;
+    expect(f.scale).toBeCloseTo(ZOOM * (playH / COMFORT_PLAY_HEIGHT_PX), 3);
+  });
+
+  it('leaves the side-panel frame un-zoomed — it already targets floors on screen', () => {
+    const inline = frameCamera({ viewportW: 1520, viewportH: 1080, dockPx: 0, towerTopM: 0, dockSide: 'inline' });
+    const zoomed = frameCamera({ viewportW: 1520, viewportH: 1080, dockPx: 0, towerTopM: 0 });
+    expect(inline.scale).toBeGreaterThan(zoomed.scale);
   });
 });
 

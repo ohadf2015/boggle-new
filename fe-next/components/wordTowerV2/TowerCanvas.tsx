@@ -7,6 +7,7 @@ import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc
 import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
 import { buildSkyline, rulerTicks, skyProps } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
+import { clampLook } from '@/lib/wordTowerV2/look';
 import { frameCamera, screenSize, towerSkirts, type DockSide } from '@/lib/wordTowerV2/camera';
 import { publishHeightM } from '@/lib/wordTowerV2/altitude';
 import { floorsAt, skyAt } from '@/lib/wordTowerV2/biomes';
@@ -86,6 +87,12 @@ interface Props {
   onLandPoint?: (p: { x: number; y: number; quality: LandingQuality }) => void;
   /** Settled height, quantized (m) — the far city sinks away with it. */
   getSceneM?: () => number;
+  /**
+   * Bump to send the free-look camera home. The parent bumps it on every hoist,
+   * so the view is always back on the crane before a swing has to be timed —
+   * no idle timer can yank it away mid-drop.
+   */
+  homeKey: number;
   reducedMotion?: boolean;
   className?: string;
 }
@@ -112,6 +119,33 @@ export default function TowerCanvas(props: Props) {
     let raf = 0;
     let app: Application | null = null;
     let resizeObserver: ResizeObserver | null = null;
+
+    // Free look: drag or wheel the canvas to walk the tower back down. `target`
+    // is where the player put it; `lookY` chases it so the home snap eases.
+    let lookTarget = 0;
+    let lookY = 0;
+    let lookHome = propsRef.current.homeKey;
+    let dragFrom: { y: number; look: number } | null = null;
+    const onPointerDown = (e: PointerEvent) => {
+      dragFrom = { y: e.clientY, look: lookTarget };
+      host.setPointerCapture(e.pointerId);
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      // Content follows the finger: drag UP to walk down your own tower.
+      if (dragFrom) lookTarget = dragFrom.look + (e.clientY - dragFrom.y);
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      dragFrom = null;
+      if (host.hasPointerCapture(e.pointerId)) host.releasePointerCapture(e.pointerId);
+    };
+    const onWheel = (e: WheelEvent) => {
+      lookTarget -= e.deltaY;
+    };
+    host.addEventListener('pointerdown', onPointerDown);
+    host.addEventListener('pointermove', onPointerMove);
+    host.addEventListener('pointerup', onPointerUp);
+    host.addEventListener('pointercancel', onPointerUp);
+    host.addEventListener('wheel', onWheel, { passive: true });
 
     const views = new Map<string, BlockView>();
     const frameTimes: number[] = [];
@@ -293,9 +327,17 @@ export default function TowerCanvas(props: Props) {
         // Frame-rate independent ease (a fixed 0.08/frame ran 2x faster at 120Hz).
         cameraY += (frame.cameraY - cameraY) * (1 - Math.exp(-dt * 5));
 
+        if (p.homeKey !== lookHome) {
+          lookHome = p.homeKey;
+          lookTarget = 0;
+        }
+        // Re-clamped every frame: the reachable range grows as the tower does.
+        lookTarget = clampLook(lookTarget, cameraY);
+        lookY += (lookTarget - lookY) * (1 - Math.exp(-dt * 14));
+
         scene.scale.set(scale);
         scene.x = w / 2 + shake.offset.x;
-        scene.y = frame.groundScreenY + cameraY + shake.offset.y;
+        scene.y = frame.groundScreenY + cameraY + lookY + shake.offset.y;
 
         const halfW = w / 2 / scale;
 
@@ -325,7 +367,7 @@ export default function TowerCanvas(props: Props) {
         // Beyond parallax the far city sinks as you climb, so by ~8m the skies
         // own the screen instead of a skyline hanging in space.
         const sink = Math.min(p.getSceneM?.() ?? 0, 8) * 22;
-        placeCity(farCity, -60, frame.groundScreenY + cameraY * 0.55 + sink + shake.offset.y * 0.5, h, ts);
+        placeCity(farCity, -60, frame.groundScreenY + (cameraY + lookY) * 0.55 + sink + shake.offset.y * 0.5, h, ts);
         placeCity(nearCity, -60 + shake.offset.x, scene.y, h, ts);
         if (groundKey !== `${halfW}|${scale}`) {
           groundKey = `${halfW}|${scale}`;
@@ -484,9 +526,15 @@ export default function TowerCanvas(props: Props) {
       disposed = true;
       cancelAnimationFrame(raf);
       resizeObserver?.disconnect();
+      host.removeEventListener('pointerdown', onPointerDown);
+      host.removeEventListener('pointermove', onPointerMove);
+      host.removeEventListener('pointerup', onPointerUp);
+      host.removeEventListener('pointercancel', onPointerUp);
+      host.removeEventListener('wheel', onWheel);
       app?.destroy(true, { children: true });
     };
   }, []);
 
-  return <div ref={hostRef} className={props.className} />;
+  // touch-action none: a vertical drag is the camera, never a pull-to-refresh.
+  return <div ref={hostRef} className={props.className} style={{ touchAction: 'none' }} />;
 }

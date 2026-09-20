@@ -81,17 +81,24 @@ describe('timing windows (5-letter word on a 5-letter tower)', () => {
 });
 
 describe('block size on screen', () => {
-  it('given a phone, when framed, then a 5-letter block is big and tappable-looking', () => {
+  /**
+   * A RANGE, not a floor. Rounds 3-6 chased "bigger" until a slab owned 70% of a
+   * phone's width and a three-floor tower filled the screen; round 7 pulled the
+   * frame back 25% so the building reads as a building. Pinning both ends means
+   * neither direction can drift back in unnoticed.
+   */
+  it('given a phone, when framed, then a 5-letter block is readable but not wall-sized', () => {
     const { scale } = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 0 });
-    // Round 6: 75px / 58%-of-width slabs still read as "the game is so little".
-    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(130);
-    expect(blockWidthForWord('tower') * scale).toBeGreaterThanOrEqual(390 * 0.7);
-    expect(blockWidthForWord('גדר') * scale).toBeGreaterThanOrEqual(390 * 0.62);
+    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(95);
+    expect(BLOCK_HEIGHT_PX * scale).toBeLessThanOrEqual(115);
+    expect(blockWidthForWord('tower') * scale).toBeGreaterThanOrEqual(390 * 0.5);
+    expect(blockWidthForWord('tower') * scale).toBeLessThanOrEqual(390 * 0.62);
+    expect(blockWidthForWord('גדר') * scale).toBeGreaterThanOrEqual(390 * 0.42);
   });
 
   it('given a desktop, when framed, then blocks grow to use the space', () => {
     const { scale } = frameCamera({ viewportW: 1440, viewportH: 900, dockPx: 230, towerTopM: 0 });
-    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(150);
+    expect(BLOCK_HEIGHT_PX * scale).toBeGreaterThanOrEqual(110);
   });
 
   it('given one floor, when measured, then it is a real 3m storey', () => {

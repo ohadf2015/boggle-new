@@ -100,6 +100,12 @@ export default function WordTowerV2() {
   const [rejected, setRejected] = useState<string | null>(null);
   const [stats, setStats] = useState<FrameStats | null>(null);
   const [debug, setDebug] = useState(false);
+  // Free look sends the camera home on every hoist, so the swing a player has to
+  // time is always framed — see TowerCanvas `homeKey`.
+  const [homeKey, setHomeKey] = useState(0);
+  useEffect(() => {
+    if (phase === 'swinging') setHomeKey((k) => k + 1);
+  }, [phase]);
 
   // Shared by the top bar (which renders the coin chip) and ImpactBurst (which
   // flies landing coins into its exact rect), so the number never changes off-screen.
@@ -408,6 +414,7 @@ export default function WordTowerV2() {
           onTenantArrive={onTenantArrive}
           onLandPoint={rewardsFlow.fx.report}
           getSceneM={getSceneM}
+          homeKey={homeKey}
           reducedMotion={reducedMotion}
           dockSide={wide ? 'inline' : 'bottom'}
           className={canvasClass}

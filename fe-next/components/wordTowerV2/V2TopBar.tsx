@@ -274,8 +274,18 @@ export const V2TopBar = memo(function V2TopBar({
                 className={`flex items-center gap-1 rounded-neo border-neo border-black px-1.5 py-0.5 font-neo-display text-[11px] font-black text-neo-navy shadow-hard-sm animate-neo-pop lg:text-base ${EFFECT_CLASS[id]}`}
                 aria-label={t('wordTowerV2.hud.effect', { name: t(`wordTowerV2.reward.${id}.name`), n })}
               >
-                <Icon className="h-3 w-3 lg:h-5 lg:w-5" aria-hidden />
-                {id === 'wide' ? null : <span className="tabular-nums">×{n}</span>}
+                <Icon className="h-3 w-3 shrink-0 lg:h-5 lg:w-5" aria-hidden />
+                {/* The crate's NAME, not just its glyph: players could see that
+                    a crate had fired and that something was banked, but a lone
+                    icon never said WHICH effect they had bought. */}
+                <span className="uppercase" aria-hidden>
+                  {t(`wordTowerV2.reward.${id}.name`)}
+                </span>
+                {id === 'wide' ? null : (
+                  <span className="tabular-nums" aria-hidden>
+                    ×{n}
+                  </span>
+                )}
               </div>
             );
           })}
