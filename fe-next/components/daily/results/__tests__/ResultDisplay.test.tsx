@@ -6,10 +6,11 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ResultDisplay } from '../ResultDisplay';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { RON_PRANK_USER_ID } from '@/utils/dailyChallenge/ronPrank';
+import { fireConfetti } from '@/utils/confettiUtils';
 
 // Mock framer-motion to render immediately
 vi.mock('framer-motion', () => ({
@@ -290,6 +291,83 @@ describe('ResultDisplay Component', () => {
     it('does not show eye toggle in fail state', () => {
       render(<ResultDisplay {...failProps} />);
       expect(screen.queryByTestId('word-visibility-toggle')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Auto-confetti on mount', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('fires confetti automatically on mount when puzzle is solved with score', () => {
+      render(<ResultDisplay {...solvedProps} lifeRemaining={60} />);
+      expect(fireConfetti).toHaveBeenCalled();
+    });
+
+    it('does not fire confetti on mount when puzzle is unsolved', () => {
+      render(<ResultDisplay {...solvedProps} solved={false} />);
+      expect(fireConfetti).not.toHaveBeenCalled();
+    });
+
+    it('confetti fires only once even with multiple condition changes', () => {
+      const { rerender } = render(
+        <ResultDisplay {...solvedProps} lifeRemaining={60} solved={true} />
+      );
+      expect(fireConfetti).toHaveBeenCalledTimes(1);
+
+      // Re-render with different lifeRemaining still should not re-fire
+      rerender(<ResultDisplay {...solvedProps} lifeRemaining={50} solved={true} />);
+      expect(fireConfetti).toHaveBeenCalledTimes(1);
+    });
+
+    it('fires confetti only once on mount, not on re-render', async () => {
+      const { rerender } = render(<ResultDisplay {...solvedProps} lifeRemaining={60} />);
+      expect(fireConfetti).toHaveBeenCalledTimes(1);
+
+      rerender(<ResultDisplay {...solvedProps} lifeRemaining={60} />);
+      expect(fireConfetti).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Tomorrow promise', () => {
+    it('renders tomorrow promise message in win state', () => {
+      render(<ResultDisplay {...solvedProps} streakDays={3} />);
+      // Should render a message about extending streak to 4 days
+      const content = screen.getByTestId('tomorrow-promise');
+      expect(content).toBeInTheDocument();
+      // Should contain the translation key (mockT returns keys as-is)
+      expect(content.textContent).toContain('wordHunt.results.extendStreak');
+    });
+
+    it('shows the start streak message when no current streak', () => {
+      render(<ResultDisplay {...solvedProps} streakDays={0} />);
+      const content = screen.getByTestId('tomorrow-promise');
+      expect(content.textContent).toContain('wordHunt.results.startStreak');
+    });
+
+    it('renders tomorrow promise in fail state with extend message when streak active', () => {
+      render(<ResultDisplay {...solvedProps} solved={false} streakDays={2} />);
+      const promise = screen.getByTestId('tomorrow-promise-loss');
+      expect(promise).toBeInTheDocument();
+      expect(promise.textContent).toContain('wordHunt.results.extendStreak');
+    });
+
+    it('renders tomorrow promise in fail state with start message when no streak', () => {
+      render(<ResultDisplay {...solvedProps} solved={false} streakDays={0} />);
+      const promise = screen.getByTestId('tomorrow-promise-loss');
+      expect(promise).toBeInTheDocument();
+      expect(promise.textContent).toContain('wordHunt.results.startStreak');
+    });
+  });
+
+  describe('Countdown placement', () => {
+    it('renders countdown in hero section but not as primary payoff', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      const countdown = screen.getByText('12:34:56');
+      expect(countdown).toBeInTheDocument();
+      // Countdown should be in a secondary/demoted position (smaller text, muted color)
+      const parent = countdown.closest('[data-testid="countdown-secondary"]');
+      expect(parent).toBeInTheDocument();
     });
   });
 });

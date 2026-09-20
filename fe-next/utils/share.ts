@@ -13,6 +13,7 @@ export type ShareMethod =
   | 'discord'
   | 'email'
   | 'sms'
+  | 'linkedin'
   | 'clipboard'
   | 'web_share_api'
   | 'fallback_clipboard';

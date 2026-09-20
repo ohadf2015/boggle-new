@@ -404,6 +404,8 @@ const ru = {
       "eliminated": "Выбыли",
       "gameOver": "Игра окончена",
       "tapToCelebrate": "Нажми, чтобы праздновать!",
+      "extendStreak": "Играйте завтра, чтобы достичь серии из {days} дней",
+      "startStreak": "Начните свою серию завтра",
       "scoreTierBudding": "Хороший старт!",
       "scoreTierRising": "Хорошая работа!",
       "scoreTierSolid": "Очень хорошо!",
@@ -464,7 +466,10 @@ const ru = {
       "playerWordsTitle": "Путь {{name}}",
       "youMissedWords": "Слова, которые ты пропустил",
       "tapPlayerHint": "Нажми на игрока, чтобы видеть его путь",
-      "wordsFound": "Найденные слова"
+      "wordsFound": "Найденные слова",
+      "masteryRatingLabel": "Рейтинг",
+      "masteryRatingChangeLabel": "Изменение",
+      "masteryRatingTeaser": "Играй сегодня, чтобы начать свой рейтинг"
     },
     "score": {
       "title": "Твой результат",
@@ -5669,6 +5674,9 @@ const ru = {
     }
   },
   "auth": {
+    "google": {
+      "signUp": "Регистрация через Google"
+    },
     "signIn": "Вход",
     "signOut": "Выход",
     "signUp": "Регистрация",
@@ -5736,6 +5744,7 @@ const ru = {
         "subtitle": "Зарегистрируйся, чтобы отслеживать ежедневный прогресс"
       },
       "dayStreak": "Дневная серия",
+      "streak_flame_icon": "Огонь серии",
       "atRiskWarning": "Твоя серия может не выжить без аккаунта!",
       "benefitsTitle": "Зарегистрируйся, чтобы:",
       "benefits": {
@@ -7640,10 +7649,19 @@ const ru = {
   "wordRejected": "Слово невалидно",
   "opponentReconnected": "Противник переподключился!",
   "daily": {
+    "qrWelcome": {
+      "badge": "Отсканировано",
+      "line": "Вы отсканировали — сегодняшняя головоломка готова."
+    },
     "todaysPuzzles": "Головоломки дня",
     "results": {
       "fullRecap": "Подробный итог",
-      "fullRecapSummary": "Твоё место, самое редкое слово, монеты — и кого ты обошёл"
+      "fullRecapSummary": "Твоё место, самое редкое слово, монеты — и кого ты обошёл",
+      "signup": {
+        "title": "Сохрани свою серию",
+        "shortPrompt": "Сохрани свою серию",
+        "shortSubtitle": "Зарегистрируйся, чтобы сохранить прогресс"
+      }
     },
     "title": "Ежедневный Вызов",
     "badge": "ДЕНЬ",
@@ -7978,6 +7996,9 @@ const ru = {
         "headline": "Становишься острее!",
         "sub": "Лучше чем вчера"
       }
+    },
+    "streak": {
+      "freeze_toast_no_remaining": "Использована заморозка серии — {day} сохранен · нет заморозок"
     },
     "flow": {
       "startLabel": "Пройти все испытания",
@@ -13893,7 +13914,8 @@ const ru = {
   "dailyStreak": {
     "badge": "Серия: {count} дн.",
     "freezeReady": "Заморозка серии готова — один пропущенный день не сломает серию",
-    "freezeUsed": "Заморозка спасла твою серию!"
+    "freezeUsed": "Заморозка спасла твою серию!",
+    "streak_freeze_toast_message": "Заморозка серии использована — {day} сохранена · осталось {remaining}"
   },
   "notifications": {
     "title": "Уведомления",

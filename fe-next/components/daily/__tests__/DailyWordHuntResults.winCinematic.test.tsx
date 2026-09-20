@@ -161,6 +161,7 @@ vi.mock('../results', () => ({
   SharePanel: () => <div data-testid="share-panel" />,
   EmojiShareCard: () => <div data-testid="emoji-share-card" />,
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
+  MasteryRatingSection: () => <div data-testid="mastery-rating-section" />,
 }));
 
 // ── Inline sub-components ─────────────────────────────────────────────────────

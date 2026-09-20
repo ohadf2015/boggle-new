@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { m } from 'framer-motion';
 import { Flame, Clock, Eye, EyeOff, Skull, Zap, Target, BookOpen, Sparkles, PartyPopper } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -86,6 +86,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   t,
 }) => {
   const [wordHidden, setWordHidden] = useState(false);
+  const confettiFiredRef = useRef(false);
 
   // Display-only easter egg: Ron sees a fake "jackpot" bonus chip. Real score,
   // streak, and leaderboard are untouched — see utils/dailyChallenge/ronPrank.
@@ -95,6 +96,20 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
     getScoreBreakdown(lifeRemaining, attemptsUsed, wordsDiscovered, solved),
     [lifeRemaining, attemptsUsed, wordsDiscovered, solved]
   );
+
+  // Auto-fire confetti on mount when solved with non-zero score
+  // Fire once per component lifetime (not on every state change)
+  useEffect(() => {
+    if (!confettiFiredRef.current && solved && scoreBreakdown.total > 0) {
+      confettiFiredRef.current = true;
+      fireConfetti({
+        particleCount: 50,
+        spread: 100,
+        origin: { y: 0.4 },
+        colors: ['#BFFF00', '#00FFFF', '#FF1493', '#FFE135'],
+      });
+    }
+  }, [solved, scoreBreakdown.total]);
 
   // Praise + color theme are keyed to the SHARE of the score earned
   // (score / MAX_SCORE), not how few attempts were used — so a 490/1000 run
@@ -354,21 +369,32 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 {t('wordHunt.results.tapToCelebrate')}
               </m.div>
 
-              {/* Countdown — slides up with glow */}
+              {/* Tomorrow Promise — primary hero payoff */}
               <m.div
+                data-testid="tomorrow-promise"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.0, type: 'spring', stiffness: 300, damping: 26 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-neo-navy-light/80 rounded-neo border-2 border-neo-black shadow-hard-sm"
+                className="text-center"
               >
-                <Clock className="w-4 h-4 text-neo-cyan" />
-                <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">
-                    {t('wordHunt.results.nextChallengeIn')}
-                  </div>
-                  <div className="text-lg font-black text-neo-cyan -mt-0.5">
-                    {countdown}
-                  </div>
+                <div className="text-sm font-bold text-neo-lime/90 uppercase tracking-widest leading-tight">
+                  {streakDays > 0
+                    ? t('wordHunt.results.extendStreak').replace('{days}', String(streakDays + 1))
+                    : t('wordHunt.results.startStreak')}
+                </div>
+              </m.div>
+
+              {/* Countdown — demoted to secondary (muted, small) */}
+              <m.div
+                data-testid="countdown-secondary"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.15, type: 'spring', stiffness: 300, damping: 26 }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neo-navy/50 rounded-neo border border-slate-700/50"
+              >
+                <Clock className="w-3 h-3 text-slate-500" />
+                <div className="text-[9px] text-slate-500 font-bold uppercase">
+                  {countdown}
                 </div>
               </m.div>
             </m.div>
@@ -454,21 +480,31 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 {t('wordHunt.results.betterLuckNextTime')}
               </m.div>
 
-              {/* Countdown */}
+              {/* Tomorrow Promise — same payoff as win state, since streaks increment on show-up */}
+              <m.div
+                data-testid="tomorrow-promise-loss"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
+                className="text-center"
+              >
+                <div className="text-sm font-bold text-neo-lime/90 uppercase tracking-widest leading-tight">
+                  {streakDays > 0
+                    ? t('wordHunt.results.extendStreak').replace('{days}', String(streakDays + 1))
+                    : t('wordHunt.results.startStreak')}
+                </div>
+              </m.div>
+
+              {/* Countdown — demoted to secondary (muted, small) */}
               <m.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, type: 'spring', stiffness: 300, damping: 26 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-neo-navy-light/80 rounded-neo border-2 border-neo-black shadow-hard-sm"
+                transition={{ delay: 1.0, type: 'spring', stiffness: 300, damping: 26 }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neo-navy/50 rounded-neo border border-slate-700/50"
               >
-                <Clock className="w-4 h-4 text-neo-cyan" />
-                <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold">
-                    {t('wordHunt.results.nextChallengeIn')}
-                  </div>
-                  <div className="text-lg font-black text-neo-cyan -mt-0.5">
-                    {countdown}
-                  </div>
+                <Clock className="w-3 h-3 text-slate-500" />
+                <div className="text-[9px] text-slate-500 font-bold uppercase">
+                  {countdown}
                 </div>
               </m.div>
             </m.div>

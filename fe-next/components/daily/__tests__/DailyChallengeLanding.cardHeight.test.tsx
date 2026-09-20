@@ -1,8 +1,8 @@
 /**
- * Test: Challenge quest cards should render properly with vertical layout
+ * Test: Challenge quest cards should render properly with new hero + compact layout
  *
- * Updated for new vertical quest path layout (was grid-based).
- * Cards are now QuestCard components in a vertical stack.
+ * After redesign: one primary hero card + three compact secondary rows.
+ * Layout is no longer grid-based with equal heights — each card type has its own sizing.
  */
 
 import { render, screen } from '@testing-library/react';
@@ -48,8 +48,8 @@ vi.mock('@/hooks/useTiltEffect', () => ({
 
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
-    enableComplexAnimations: true,
-    prefersReducedMotion: false,
+    enableComplexAnimations: false,
+    prefersReducedMotion: true,
   }),
 }));
 
@@ -58,29 +58,37 @@ vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
-vi.mock('@/utils/guestManager', () => ({
-  getGuestFingerprint: vi.fn(() => 'test-fingerprint'),
+vi.mock('@/utils/dailyChallenge/guestPlayer', () => ({
+  getGuestFingerprint: vi.fn(() => Promise.resolve('test-fingerprint')),
 }));
 
-vi.mock('@/hooks/useTiltEffect', () => ({
-  useTiltEffect: () => ({
-    ref: { current: null },
-    style: {},
-    handlers: {
-      onMouseEnter: vi.fn(),
-      onMouseLeave: vi.fn(),
-      onMouseMove: vi.fn(),
-      onTouchStart: vi.fn(),
-      onTouchMove: vi.fn(),
-      onTouchEnd: vi.fn(),
-    },
+vi.mock('@/lib/connections/dailyClient', () => ({
+  hasPlayedConnectionsToday: vi.fn(() => false),
+}));
+
+vi.mock('@/lib/wordTower/dailyBest', () => ({
+  isDailyTowerPlayed: vi.fn(() => false),
+}));
+
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
+  useDailyChallengeStatus: () => ({
+    loading: false,
+    hasPlayed: false,
+    hasSolved: false,
+    refresh: vi.fn(),
   }),
 }));
 
-vi.mock('@/hooks/useDevicePerformance', () => ({
-  useDevicePerformance: () => ({
-    enableComplexAnimations: false,
-    prefersReducedMotion: true,
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({
+    loading: false,
+    today: {
+      wordHunt: false,
+      wordWheel: false,
+      wordTower: false,
+      connections: false,
+    },
+    streak: { current: 0, best: 0 },
   }),
 }));
 
@@ -90,8 +98,8 @@ vi.mock('framer-motion', () => ({
     a: ({ children, className, style, ...props }: React.ComponentProps<'a'> & { animate?: unknown; initial?: unknown; transition?: unknown; whileHover?: unknown; whileTap?: unknown }) => (
       <a className={className} style={style} {...props}>{children}</a>
     ),
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+    div: ({ children, className, ...props }: any) => <div className={className} {...props}>{children}</div>,
+    span: ({ children, className, ...props }: any) => <span className={className} {...props}>{children}</span>,
     path: 'path',
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
@@ -125,26 +133,42 @@ describe('DailyChallengeLanding - Quest Card Layout', () => {
     currentLanguage: 'en' as const,
   };
 
-  it('should render word hunt quest card', () => {
+  it('should render primary hero quest card (word-hunt when unplayed)', () => {
     render(
       <Wrapper>
         <DailyChallengeLanding {...mockProps} />
       </Wrapper>
     );
 
-    expect(screen.getByTestId('quest-card-wordHunt')).toBeInTheDocument();
+    // With all modes unplayed, pickPrimaryMode selects word-hunt
+    expect(screen.getByTestId('quest-card-word-hunt')).toBeInTheDocument();
   });
 
-  it('should NOT have fixed min-height on quest card', () => {
+  it('should render three secondary compact rows', () => {
     render(
       <Wrapper>
         <DailyChallengeLanding {...mockProps} />
       </Wrapper>
     );
 
-    const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
+    // After redesign, the secondary modes render as compact rows
+    // There should be 3 secondary rows (all except the primary)
+    const compactRows = screen.getAllByTestId(/^compact-row-/);
+    expect(compactRows.length).toBe(3);
+  });
 
-    // Cards should not have fixed min-height
+  it('should NOT constrain primary card to a fixed height — sizing is flexible', () => {
+    render(
+      <Wrapper>
+        <DailyChallengeLanding {...mockProps} />
+      </Wrapper>
+    );
+
+    const wordHuntCard = screen.getByTestId('quest-card-word-hunt');
+
+    // Under the new design, the primary card is sized by its content + optional image,
+    // not by a fixed min-height rule that forces all cards equal.
+    // The old rule was a grid constraint; this checks it's not there.
     expect(wordHuntCard.className).not.toMatch(/\bmin-h-\[420px\]/);
   });
 });

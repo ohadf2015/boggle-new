@@ -1,6 +1,69 @@
 {
-  "generatedAt": "2026-09-19T13:32:18.800Z",
+  "generatedAt": "2026-09-20T04:02:05.344Z",
   "commits": [
+    {
+      "sha": "9eb89760c97cac3b9c1e6e00f08f9f4578ff3bdd",
+      "shortSha": "9eb8976",
+      "subject": "feat(word-tower-v2): apartment floors, Pixi sky, gameplay crates, badges",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T21:50:47+03:00"
+    },
+    {
+      "sha": "066cb94933ce6ead1230a1d8f4e60c5b608cec9e",
+      "shortSha": "066cb94",
+      "subject": "fix(home): sync header/top-bar streak pills to the account, not the device (#1089)",
+      "author": "ohadf2015",
+      "date": "2026-09-19T21:21:00+04:00"
+    },
+    {
+      "sha": "fc299aa9989e459f48a679cdfd4d27bebc53f2d5",
+      "shortSha": "fc299aa",
+      "subject": "feat(word-tower-v2): big full-width slabs, real tower crane, unstuck toasts, calmer sky",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T20:05:38+03:00"
+    },
+    {
+      "sha": "df2ca83b442fada5ea2cdd0d50d8401f9840cfcc",
+      "shortSha": "df2ca83",
+      "subject": "test(i18n): drop pruned adventure keys from the locale-parity list",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T17:58:46+03:00"
+    },
+    {
+      "sha": "a1e8b131a21e36f4ddae444824868158a4446be7",
+      "shortSha": "a1e8b13",
+      "subject": "chore: refresh generated changelog, i18n manifest, translation report, routes",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T17:25:15+03:00"
+    },
+    {
+      "sha": "a2cb11af748fe09f870847a8464718c581739379",
+      "shortSha": "a2cb11a",
+      "subject": "feat(word-tower-v2): tenants move into every good floor",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T17:24:33+03:00"
+    },
+    {
+      "sha": "7c5661afbbca3955ae3921a587f179acbaf900ce",
+      "shortSha": "7c5661a",
+      "subject": "feat(word-tower-v2): bring back the spinning sunburst, cheaply",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T16:52:12+03:00"
+    },
+    {
+      "sha": "831717c4dbafc9c1a6039a3875a1f6794bc2c160",
+      "shortSha": "831717c",
+      "subject": "feat(word-tower-v2): fix flicker + reversed Hebrew, bigger slabs, one floor, more props",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T16:50:50+03:00"
+    },
+    {
+      "sha": "eeb19240371bdc88d9c5c6da621936ee6fe0d813",
+      "shortSha": "eeb1924",
+      "subject": "fix(avatar): restore real faces on landing leaderboard + header",
+      "author": "Ohad Fisher",
+      "date": "2026-09-19T16:41:50+03:00"
+    },
     {
       "sha": "df4bcac65b0bff4124c583f60e71babfe4909d7a",
       "shortSha": "df4bcac",
@@ -77,69 +140,6 @@
       "subject": "fix(word-tower-v2): strip emoji from the rival-tower share text",
       "author": "Ohad Fisher",
       "date": "2026-09-19T13:32:42+03:00"
-    },
-    {
-      "sha": "b3200180f582e4a1902a07f26ec3f3a9f3703811",
-      "shortSha": "b320018",
-      "subject": "test(edu): give the TV phone-layout quiz fixture the treasure-chest fields",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T12:36:27+03:00"
-    },
-    {
-      "sha": "3ba74f62c9106349c349ead88ac64b648b7ac47e",
-      "shortSha": "3ba74f6",
-      "subject": "feat(word-tower-v2): truthful drop guide, bigger blocks, neon city backdrop, wrecking-ball smash round",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T12:16:40+03:00"
-    },
-    {
-      "sha": "d630dcb7adb9ad90cf3e65172ee834e40db87128",
-      "shortSha": "d630dcb",
-      "subject": "feat(education): edu-fun gauntlet — nav, join, juice, lobby, chests, results, word craft, content, pro (#1084)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T13:14:17+04:00"
-    },
-    {
-      "sha": "d537e943f34b04e704fef38d788b4bc33ad0bc3a",
-      "shortSha": "d537e94",
-      "subject": "fix(edu): make classroom TV mode usable on a phone",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T11:44:34+03:00"
-    },
-    {
-      "sha": "446a03c3be0885043ae3350f1bef5256339c07cb",
-      "shortSha": "446a03c",
-      "subject": "perf(landing): AvatarLite + 77KiB i18n subset off /en first paint (#1083)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T12:31:12+04:00"
-    },
-    {
-      "sha": "714f143014e45398b0f67f90cf6fa9800f05e68d",
-      "shortSha": "714f143",
-      "subject": "seo: daily meta tag improvements (2026-09-19) (#1081)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T11:33:07+04:00"
-    },
-    {
-      "sha": "a6baa8ea71015c3e85fe4f38bb7bd10e18459db7",
-      "shortSha": "a6baa8e",
-      "subject": "feat(edu): surface classroom join link and first-assignment nudge (#1082)",
-      "author": "ohadf2015",
-      "date": "2026-09-19T11:33:04+04:00"
-    },
-    {
-      "sha": "243ab43ef47b9905be502b5c6a6198fb04fd4f2c",
-      "shortSha": "243ab43",
-      "subject": "chore(i18n): refresh translation report",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T10:19:54+03:00"
-    },
-    {
-      "sha": "5225f87892be2d672f7270d898eeb07781ee1c92",
-      "shortSha": "5225f87",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-19",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T04:37:55+03:00"
     }
   ]
 }

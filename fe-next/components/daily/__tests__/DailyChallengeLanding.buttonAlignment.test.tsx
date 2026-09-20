@@ -1,8 +1,10 @@
 /**
- * Tests for Daily Challenge quest card button structure
+ * Tests for Daily Challenge hub button structure after redesign
  *
- * Verifies that quest cards render CTA buttons in proper layout,
- * consistent across different states (new, won, lost).
+ * Verifies that the hub renders CTA buttons properly after redesign:
+ * - One primary hero card (selected by pickPrimaryMode)
+ * - Three secondary compact rows
+ * Both must be clickable and have proper button states.
  */
 
 import { render, screen } from '@testing-library/react';
@@ -16,8 +18,16 @@ vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
-vi.mock('@/utils/guestManager', () => ({
-  getGuestFingerprint: vi.fn(() => 'test-fingerprint'),
+vi.mock('@/utils/dailyChallenge/guestPlayer', () => ({
+  getGuestFingerprint: vi.fn(() => Promise.resolve('test-fingerprint')),
+}));
+
+vi.mock('@/lib/connections/dailyClient', () => ({
+  hasPlayedConnectionsToday: vi.fn(() => false),
+}));
+
+vi.mock('@/lib/wordTower/dailyBest', () => ({
+  isDailyTowerPlayed: vi.fn(() => false),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -49,6 +59,28 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
     prefersReducedMotion: true,
+  }),
+}));
+
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
+  useDailyChallengeStatus: () => ({
+    loading: false,
+    hasPlayed: false,
+    hasSolved: false,
+    refresh: vi.fn(),
+  }),
+}));
+
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({
+    loading: false,
+    today: {
+      wordHunt: false,
+      wordWheel: false,
+      wordTower: false,
+      connections: false,
+    },
+    streak: { current: 0, best: 0 },
   }),
 }));
 
@@ -113,11 +145,12 @@ describe('DailyChallengeLanding - Button Layout', () => {
     vi.clearAllMocks();
   });
 
-  it('should render quest card with CTA button', () => {
+  it('should render primary hero card with CTA button', () => {
     renderComponent();
 
-    const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
-
+    // In new design, the primary mode is selected by pickPrimaryMode
+    // With all modes unplayed, word-hunt is the primary
+    const wordHuntCard = screen.getByTestId('quest-card-word-hunt');
     expect(wordHuntCard).toBeInTheDocument();
 
     // CTA buttons should be present (START QUEST for new cards)
@@ -125,11 +158,22 @@ describe('DailyChallengeLanding - Button Layout', () => {
     expect(startButtons.length).toBeGreaterThan(0);
   });
 
-  it('should render clickable quest card with role="button"', () => {
+  it('should render secondary compact rows with play buttons', () => {
     renderComponent();
 
-    const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
+    // Secondary modes should render as compact rows
+    const secondaryModes = screen.getByTestId('secondary-modes');
+    expect(secondaryModes).toBeInTheDocument();
 
+    // There should be 3 secondary rows (all modes except the primary)
+    const compactRows = screen.getAllByTestId(/^compact-row-/);
+    expect(compactRows.length).toBe(3);
+  });
+
+  it('should render clickable primary card with role="button"', () => {
+    renderComponent();
+
+    const wordHuntCard = screen.getByTestId('quest-card-word-hunt');
     // Quest card should be clickable (role="button")
     expect(wordHuntCard.querySelector('[role="button"]')).toBeTruthy();
   });

@@ -4353,6 +4353,9 @@ const es = {
     "achievementExplain": "¡Los logros traen recompensas!"
   },
   "auth": {
+    "google": {
+      "signUp": "Regístrate con Google"
+    },
     "signIn": "Iniciar Sesión",
     "signOut": "Cerrar Sesión",
     "signUp": "Registrarse",
@@ -4420,6 +4423,7 @@ const es = {
         "subtitle": "Crea una cuenta para seguir tu progreso diario"
       },
       "dayStreak": "Días de racha",
+      "streak_flame_icon": "Llama de racha",
       "atRiskWarning": "¡Sin una cuenta, podrías perder tu racha!",
       "benefitsTitle": "Regístrate para:",
       "benefits": {
@@ -6982,10 +6986,19 @@ const es = {
     "online": "en línea"
   },
   "daily": {
+    "qrWelcome": {
+      "badge": "Escaneado",
+      "line": "Has escaneado — el puzle de hoy está listo."
+    },
     "todaysPuzzles": "Los retos de hoy",
     "results": {
       "fullRecap": "Resumen completo",
-      "fullRecapSummary": "Tu puesto, tu palabra más rara, tus monedas — y a quién ganaste"
+      "fullRecapSummary": "Tu puesto, tu palabra más rara, tus monedas — y a quién ganaste",
+      "signup": {
+        "title": "Mantén tu racha",
+        "shortPrompt": "Mantén tu racha",
+        "shortSubtitle": "Regístrate para mantener tu progreso"
+      }
     },
     "title": "Desafío Diario",
     "badge": "DESAFÍO DIARIO",
@@ -7343,6 +7356,9 @@ const es = {
         "headline": "¡Cada vez mejor!",
         "sub": "Mejor que ayer"
       }
+    },
+    "streak": {
+      "freeze_toast_no_remaining": "Congelación de racha usada — {day} guardado · sin congelaciones"
     }
   },
   "dailyWordWheelLanding": {
@@ -7656,6 +7672,8 @@ const es = {
     "results": {
       "gameOver": "Fin del juego",
       "tapToCelebrate": "¡Toca para celebrar!",
+      "extendStreak": "Juega mañana para llegar a una racha de {days} días",
+      "startStreak": "Comienza tu racha mañana",
       "scoreTierBudding": "¡Buen comienzo!",
       "scoreTierRising": "¡Bien hecho!",
       "scoreTierSolid": "¡Muy bien!",
@@ -7718,7 +7736,10 @@ const es = {
       "playerWordsTitle": "El camino de {{name}}",
       "youMissedWords": "Palabras que te perdiste",
       "tapPlayerHint": "Toca un jugador para ver su camino",
-      "wordsFound": "Palabras encontradas"
+      "wordsFound": "Palabras encontradas",
+      "masteryRatingLabel": "Rating",
+      "masteryRatingChangeLabel": "Cambio",
+      "masteryRatingTeaser": "Juega hoy para empezar tu rating"
     },
     "score": {
       "title": "Tu Puntuación",
@@ -14045,7 +14066,8 @@ const es = {
   "dailyStreak": {
     "badge": "Racha de {count} días",
     "freezeReady": "Congelación de racha lista: un día perdido no romperá tu racha",
-    "freezeUsed": "¡La congelación salvó tu racha!"
+    "freezeUsed": "¡La congelación salvó tu racha!",
+    "streak_freeze_toast_message": "Congelación de racha utilizada — {day} guardada · quedan {remaining}"
   },
   "notifications": {
     "title": "Notificaciones",

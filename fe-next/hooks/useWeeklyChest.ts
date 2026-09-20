@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getWithAuth } from '@/utils/authFetch'
 import { useAuth } from '@/contexts/AuthContext'
+import posthog from '@/lib/analytics/lazyPosthog'
 
 export interface PendingChest {
   tier: 'bronze' | 'silver' | 'gold'
@@ -165,14 +166,43 @@ export function useWeeklyChest(): WeeklyChestState {
   }, [refresh, isAuthenticated, authLoading])
 
   const claim = useCallback(async (): Promise<PendingChest | null> => {
-    const res = await fetch('/api/daily/weekly-chest/claim', { method: 'POST' })
-    if (!res.ok) return null
-    const json = await res.json()
-    // Claiming changes chest state — invalidate the shared cache and force-refetch.
-    cachedStatus = null
-    refresh(true)
-    return json as PendingChest
-  }, [refresh])
+    // Claim attempt event
+    posthog.capture('growth:weekly_chest_claim_attempt', {
+      cycleNumber: data.cycleNumber,
+    })
+
+    try {
+      const res = await fetch('/api/daily/weekly-chest/claim', { method: 'POST' })
+
+      if (!res.ok) {
+        // Claim error event
+        posthog.capture('growth:weekly_chest_claim_error', {
+          status: res.status,
+        })
+        return null
+      }
+
+      const json = await res.json()
+
+      // Claim success event
+      posthog.capture('growth:weekly_chest_claim_success', {
+        tier: json.tier,
+        coins: json.coins,
+        cycleNumber: json.cycleNumber,
+      })
+
+      // Claiming changes chest state — invalidate the shared cache and force-refetch.
+      cachedStatus = null
+      refresh(true)
+      return json as PendingChest
+    } catch (error) {
+      // Claim error event
+      posthog.capture('growth:weekly_chest_claim_error', {
+        status: 0,
+      })
+      return null
+    }
+  }, [refresh, data.cycleNumber])
 
   return { loading, ...data, claim, refresh }
 }

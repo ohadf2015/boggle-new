@@ -5,6 +5,7 @@ import { Calendar, Sparkles, Info } from 'lucide-react'
 import { m, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useWeeklyChest, type PendingChest } from '@/hooks/useWeeklyChest'
+import posthog from '@/lib/analytics/lazyPosthog'
 import ChestProgressDots from './ChestProgressDots'
 import WeeklyChestInfoModal from './WeeklyChestInfoModal'
 import gsap from 'gsap'
@@ -106,6 +107,18 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
       tween.kill()
     }
   }, [isClaimable])
+
+  // Card seen (mount-time event, fire once per session)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const projectedTierStr = projectedTier ?? 'bronze'
+    posthog.capture('growth:weekly_chest_card_seen', {
+      daysCompleted: safeDays,
+      projectedTier: projectedTierStr,
+      isClaimable,
+      weekScore,
+    })
+  }, [])
 
   const handleClaim = async () => {
     const result = await claim()

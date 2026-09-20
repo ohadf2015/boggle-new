@@ -4733,6 +4733,9 @@ const ja = {
     "achievementExplain": "実績には特典がついてくる！"
   },
   "auth": {
+    "google": {
+      "signUp": "Googleで登録"
+    },
     "signIn": "ログイン",
     "signOut": "ログアウト",
     "signUp": "新規登録",
@@ -4800,6 +4803,7 @@ const ja = {
         "subtitle": "アカウントを作成して毎日の進捗を追跡"
       },
       "dayStreak": "日連続",
+      "streak_flame_icon": "連続記録の炎",
       "atRiskWarning": "アカウントがないと連続記録を失う可能性があります！",
       "benefitsTitle": "登録すると：",
       "benefits": {
@@ -7044,10 +7048,19 @@ const ja = {
     "online": "オンライン"
   },
   "daily": {
+    "qrWelcome": {
+      "badge": "スキャン済み",
+      "line": "スキャン完了 — 今日のパズルの準備ができました。"
+    },
     "todaysPuzzles": "今日のパズル",
     "results": {
       "fullRecap": "くわしい結果",
-      "fullRecapSummary": "順位、いちばん珍しかった単語、コイン、そして誰に勝ったか"
+      "fullRecapSummary": "順位、いちばん珍しかった単語、コイン、そして誰に勝ったか",
+      "signup": {
+        "title": "ストリークを守る",
+        "shortPrompt": "ストリークを守る",
+        "shortSubtitle": "進捗を保つためにサインアップ"
+      }
     },
     "title": "デイリーチャレンジ",
     "chooseQuest": "今日のクエストを選ぼう",
@@ -7382,6 +7395,9 @@ const ja = {
         "headline": "成長中！",
         "sub": "昨日より上達"
       }
+    },
+    "streak": {
+      "freeze_toast_no_remaining": "ストリーク凍結使用 — {day}保存 · 凍結なし"
     }
   },
   "dailyWordWheelLanding": {
@@ -7783,6 +7799,8 @@ const ja = {
       "eliminated": "脱落者",
       "gameOver": "ゲームオーバー",
       "tapToCelebrate": "タップしてお祝い！",
+      "extendStreak": "明日プレイして{days}日連続を目指そう",
+      "startStreak": "明日から連続を始めよう",
       "scoreTierBudding": "良いスタート！",
       "scoreTierRising": "いい感じ！",
       "scoreTierSolid": "なかなか！",
@@ -7843,7 +7861,10 @@ const ja = {
       "playerWordsTitle": "{{name}}のルート",
       "youMissedWords": "見逃した単語",
       "tapPlayerHint": "プレイヤーをタップしてルートを確認",
-      "wordsFound": "見つかった単語"
+      "wordsFound": "見つかった単語",
+      "masteryRatingLabel": "レーティング",
+      "masteryRatingChangeLabel": "変動",
+      "masteryRatingTeaser": "今日プレイしてレーティングを始めよう"
     },
     "score": {
       "title": "あなたのスコア",
@@ -14102,7 +14123,8 @@ const ja = {
   "dailyStreak": {
     "badge": "{count}日連続",
     "freezeReady": "ストリークフリーズ利用可能 — 1日休んでもストリークは継続します",
-    "freezeUsed": "ストリークフリーズがストリークを守りました！"
+    "freezeUsed": "ストリークフリーズがストリークを守りました！",
+    "streak_freeze_toast_message": "ストリークフリーズ使用 — {day}が保存されました · 残り{remaining}回"
   },
   "notifications": {
     "title": "通知",

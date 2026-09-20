@@ -69,11 +69,6 @@ vi.mock('framer-motion', () => ({
       <div {...props}>{children}</div>
     ),
   },
-  m: {
-    div: ({ children, ...props }: React.ComponentProps<'div'>) => (
-      <div {...props}>{children}</div>
-    ),
-  },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
@@ -158,6 +153,9 @@ vi.mock('../results', () => ({
     <div data-testid="emoji-share-card" data-word-count={words.length} />
   ),
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
+  StatsBlurb: () => <div data-testid="stats-blurb" />,
+  StreakFreezeIndicator: () => <div data-testid="streak-freeze-indicator" />,
+  MasteryRatingSection: () => <div data-testid="mastery-rating-section" />,
 }));
 
 // ── Inline sub-components ────────────────────────────────────────────────────
@@ -233,6 +231,90 @@ vi.mock('@/hooks/useInterstitialAd', () => ({
   useInterstitialAd: () => ({
     showInterstitial: vi.fn().mockResolvedValue(undefined),
   }),
+}));
+
+// ── GameFeedback ─────────────────────────────────────────────────────────────
+vi.mock('@/components/feedback/GameFeedback', () => ({
+  default: () => <div data-testid="game-feedback" />,
+}));
+
+// ── CrazyGames ──────────────────────────────────────────────────────────────
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ submitLeaderboardScore: vi.fn() }),
+}));
+
+vi.mock('@/components/CrazyGamesBanner', () => ({
+  default: () => <div data-testid="crazy-games-banner" />,
+}));
+
+// ── Navigation context ──────────────────────────────────────────────────────
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
+}));
+
+// ── Practice flag ──────────────────────────────────────────────────────────
+vi.mock('@/hooks/usePracticeFlag', () => ({
+  usePracticeFlag: () => false,
+}));
+
+// ── PracticeChainCta ──────────────────────────────────────────────────────
+vi.mock('@/components/practice/PracticeChainCta', () => ({
+  default: () => <div data-testid="practice-chain-cta" />,
+}));
+
+// ── StreakSavedCelebration ────────────────────────────────────────────────
+vi.mock('../StreakSavedCelebration', () => ({
+  default: () => <div data-testid="streak-saved-celebration" />,
+}));
+
+// ── Growth tracking ──────────────────────────────────────────────────────
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: vi.fn(),
+}));
+
+// ── CollapsibleSection ──────────────────────────────────────────────────────
+vi.mock('@/components/ui/CollapsibleSection', () => ({
+  default: ({ children, title }: { children: React.ReactNode; title?: string }) => (
+    <div data-testid="collapsible-section">{title && <div>{title}</div>}{children}</div>
+  ),
+}));
+
+// ── WordHunt utilities ──────────────────────────────────────────────────────
+vi.mock('@/components/results/WordHuntTipBadge', () => ({
+  default: () => <div data-testid="word-hunt-tip-badge" />,
+}));
+
+vi.mock('@/components/results/RejectedWordAppeal', () => ({
+  RejectedWordAppeal: () => <div data-testid="rejected-word-appeal" />,
+}));
+
+vi.mock('@/components/daily/SuggestWordCard', () => ({
+  SuggestWordCard: () => <div data-testid="suggest-word-card" />,
+}));
+
+vi.mock('@/components/daily/DailyInsightStack', () => ({
+  default: () => <div data-testid="daily-insight-stack" />,
+}));
+
+vi.mock('@/hooks/useDailyModePlayed', () => ({
+  useDailyModePlayed: () => ({ wordWheelPlayed: false }),
+}));
+
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({ variant: null, trackExposure: vi.fn() }),
+}));
+
+vi.mock('@/lib/connections/dailyClient', () => ({
+  hasPlayedConnectionsToday: () => false,
+}));
+
+vi.mock('@/hooks/useIsGuest', () => ({
+  useIsGuest: () => true,
+}));
+
+// ── Hint exposure tracking ──────────────────────────────────────────────────
+vi.mock('@/lib/experiments/trackHintExposure', () => ({
+  default: vi.fn(),
 }));
 
 // ── Import component AFTER all mocks ─────────────────────────────────────────

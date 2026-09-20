@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import { Timer, CircleDot, Check, X, Eye, Sparkles, Building2 } from 'lucide-react';
@@ -8,13 +8,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
-import { getDailyStreak } from '@/utils/dailyChallenge/streaks';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
-import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
+import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
-import { questCardModes, visibleDailyModes } from '@/lib/dailyModes';
+import { questCardModes, visibleDailyModes, pickPrimaryMode, type DailyModePlayState, type DailyModeId } from '@/lib/dailyModes';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
@@ -23,7 +22,8 @@ import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { DailyHubHeader } from './landing/DailyHubHeader';
 import { QuestCard } from './landing/QuestCard';
 import { DailyModeQuestCard } from './landing/DailyModeQuestCard';
-import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import { CompactModeRow } from './landing/CompactModeRow';
+import { PersistentStreakDisplay } from './streak/PersistentStreakDisplay';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
 import DailyInsightStack from './DailyInsightStack';
@@ -71,9 +71,11 @@ export function DailyChallengeLanding({
   // Use the centralized hook for Word Hunt status + streak (fetches from server for authed users)
   const dailyStatus = useDailyChallengeStatus(currentLanguage);
 
+  // Use the unified hook for played status and streak across all modes and devices
+  const dailyPlayedStatus = useDailyPlayedStatus();
+
   // Word Wheel status from localStorage (no server endpoint for it yet)
   const [wordWheelStatus, setWordWheelStatus] = useState<'new' | 'played'>('new');
-  const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   // Defer Date.now()-derived value to client to avoid hydration mismatch (React #418)
   const [todayIso, setTodayIso] = useState<string>('');
   const [claimedChest, setClaimedChest] = useState<PendingChest | null>(null);
@@ -85,14 +87,9 @@ export function DailyChallengeLanding({
   const [connectionsPlayed, setConnectionsPlayed] = useState(false);
 
   useEffect(() => {
-    // Daily guest identity — the fingerprint the daily games record guests
-    // under, so the hub board highlights a guest's own row after they play.
-    let cancelled = false;
-    getGuestFingerprint().then((fp) => {
-      if (!cancelled) setGuestFingerprint(fp || null);
-    });
+    // Deferred to the client so the Date.now()-derived value cannot cause a
+    // hydration mismatch (React #418).
     setTodayIso(new Date().toISOString().split('T')[0]);
-    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -123,16 +120,21 @@ export function DailyChallengeLanding({
         : 'lost';
 
   // Check Word Wheel status from localStorage
+  // Server truth wins: localStorage only knows what THIS device did, so a player who finished on
+  // their phone used to see a green "Play" on their laptop. dailyPlayedStatus is server-backed for
+  // an authed player (and localStorage-backed for a guest, where it is the only truth available).
   const checkWordWheelStatus = () => {
-    const wwPlayed = hasPlayedWordWheelToday(currentLanguage);
+    const wwPlayed =
+      dailyPlayedStatus.today.wordWheel || hasPlayedWordWheelToday(currentLanguage);
     setWordWheelStatus(wwPlayed ? 'played' : 'new');
   };
 
-  // Initial check
+  // Initial check, and again when the server answer lands — the authed status starts as a skeleton,
+  // so without these deps the row keeps the first (localStorage-only) answer forever.
   useEffect(() => {
     checkWordWheelStatus();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLanguage, user?.id]);
+  }, [currentLanguage, user?.id, dailyPlayedStatus.today.wordWheel, dailyPlayedStatus.loading]);
 
   // Refresh on visibility change (user returns from playing)
   useEffect(() => {
@@ -189,6 +191,67 @@ export function DailyChallengeLanding({
   const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
   const wordWheelPlayed = wordWheelStatus === 'played';
 
+  // Build play state for primary mode selection
+  const playState: DailyModePlayState = {
+    wordHunt: wordHuntStatus,
+    wordWheel: wordWheelStatus === 'played' ? 'played' : 'new',
+    wordTower: wordTowerPlayed,
+    connections: connectionsPlayed,
+  };
+
+  // Determine which mode should be the primary (hero) card
+  const primaryModeId = pickPrimaryMode(playState);
+
+  // Helper to get mode properties for rendering
+  type ModeInfo = {
+    id: DailyModeId;
+    title: string;
+    icon: ReactNode;
+    color: 'orange' | 'yellow' | 'cyan' | 'purple';
+    played: boolean;
+    onPlay: () => void;
+    visible: boolean;
+  };
+
+  const modesInfo: ModeInfo[] = [
+    {
+      id: 'word-hunt',
+      title: t('daily.wordHunt.title'),
+      icon: <Timer className="w-8 h-8" />,
+      color: 'orange',
+      played: wordHuntPlayed,
+      onPlay: onSelectWordHunt,
+      visible: true,
+    },
+    {
+      id: 'word-wheel',
+      title: t('wordWheel.hub.wordWheelQuest'),
+      icon: <CircleDot className="w-8 h-8" />,
+      color: 'yellow',
+      played: wordWheelPlayed,
+      onPlay: onSelectWordWheel,
+      visible: true,
+    },
+    {
+      id: 'word-tower',
+      title: t('wordTower.daily.questTitle'),
+      icon: <Building2 className="w-8 h-8" />,
+      color: 'cyan',
+      played: wordTowerPlayed,
+      onPlay: () => router.push(wordTowerHref),
+      visible: showsWordTower,
+    },
+    {
+      id: 'connections',
+      title: t('connections.daily.questTitle'),
+      icon: <CircleDot className="w-8 h-8" />,
+      color: 'purple',
+      played: connectionsPlayed,
+      onPlay: () => router.push(`/${currentLanguage}/connections/daily`),
+      visible: showsConnections,
+    },
+  ];
+
   return (
     <m.div
       initial={{ opacity: 0 }}
@@ -198,6 +261,9 @@ export function DailyChallengeLanding({
     >
       {/* Hub Header: Today's Puzzles + date */}
       <DailyHubHeader todayIso={todayIso} />
+
+      {/* Persistent Streak Display: shows current streak across all devices */}
+      <PersistentStreakDisplay />
 
       {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} total={totalQuests} />
@@ -210,265 +276,57 @@ export function DailyChallengeLanding({
         t={t}
       />
 
-      {/* Quest 1: Word Hunt */}
-      {wordHuntPlayed ? (
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 25 }}
-          className="w-full"
-          data-testid="word-hunt-hero"
-        >
-          <button
-            type="button"
-            onClick={onSelectWordHunt}
-            className={cn(
-              'relative w-full rounded-xl border-3 border-neo-black',
-              'shadow-hard overflow-hidden cursor-pointer p-4',
-              'flex items-center gap-4',
-              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
-              'transition-all duration-200 group',
-              wordHuntStatus === 'won'
-                ? 'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
-                : 'bg-neo-pink/[0.06] hover:bg-neo-pink/[0.1]'
-            )}
-          >
-            <div className={cn(
-              'absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg',
-              wordHuntStatus === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
-            )} />
-            <m.div
-              data-testid={wordHuntStatus === 'won' ? 'won-badge' : 'lost-badge'}
-              className={cn(
-                'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
-                'flex items-center justify-center shadow-hard-xs',
-                wordHuntStatus === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
-              )}
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.25, type: 'spring', stiffness: 200, damping: 15 }}
-            >
-              {wordHuntStatus === 'won'
-                ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
-                : <X className="w-6 h-6 text-neo-black" strokeWidth={3} />
-              }
-            </m.div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-neo-display font-black text-neo-white leading-none">
-                {t('daily.wordHunt.title')}
-              </h2>
-              <span className={cn(
-                'inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2',
-                wordHuntStatus === 'won'
-                  ? 'bg-neo-lime/20 text-neo-lime border-neo-lime/40'
-                  : 'bg-neo-pink/20 text-neo-pink border-neo-pink/40'
-              )}>
-                {wordHuntStatus === 'won' && <Sparkles className="w-2.5 h-2.5" strokeWidth={3} aria-hidden />}
-                {wordHuntStatus === 'won' ? t('daily.cleared') : t('daily.wordHunt.title')}
-              </span>
-            </div>
-            <div className={cn(
-              'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
-              'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm',
-              'active:translate-y-0.5 active:shadow-none transition-all',
-              'flex items-center gap-1.5 group-hover:scale-105'
-            )}>
-              <Eye className="w-4 h-4" />
-              {t('daily.viewResults')}
-            </div>
-          </button>
-        </m.div>
-      ) : (
+      {/* Primary hero card — the one mode to play right now, selected by pickPrimaryMode */}
+      {primaryModeId === 'connections' && showsConnections ? (
+        <DailyModeQuestCard
+          mode={questCardModes(canSeeInWorkModes).find((m) => m.id === 'connections')!}
+          locale={currentLanguage}
+          t={t}
+          played={connectionsPlayed}
+          delay={0.15}
+        />
+      ) : modesInfo.find((m) => m.id === primaryModeId && m.visible) ? (
         <QuestCard
-          challengeId="wordHunt"
-          icon={<Timer className="w-8 h-8" />}
-          title={t('daily.wordHunt.title')}
-          tagline={t('daily.wordHunt.desc')}
-          color="orange"
-          status={wordHuntStatus}
-          isLoadingStatus={dailyStatus.loading}
-          onPlay={onSelectWordHunt}
-          timeMode="timed"
-          timeModeLabel={t('daily.timedQuest')}
-          previewImageUrl="/daily/word-hunt-mascot.jpg"
-          previewImageAlt={t('daily.wordHunt.title')}
+          challengeId={primaryModeId}
+          icon={modesInfo.find((m) => m.id === primaryModeId)?.icon || <Timer className="w-8 h-8" />}
+          title={modesInfo.find((m) => m.id === primaryModeId)?.title || 'Quest'}
+          tagline={t(`${primaryModeId === 'word-hunt' ? 'daily.wordHunt.desc' : primaryModeId === 'word-wheel' ? 'wordWheel.hub.wordWheelDesc' : primaryModeId === 'word-tower' ? 'wordTower.daily.questDesc' : 'connections.daily.questDesc'}`)}
+          color={(modesInfo.find((m) => m.id === primaryModeId)?.color || 'orange') as 'orange' | 'yellow' | 'cyan'}
+          status={
+            primaryModeId === 'word-hunt'
+              ? wordHuntStatus
+              : primaryModeId === 'word-wheel'
+                ? (wordWheelStatus === 'played' ? 'won' : 'new')
+                : 'new'
+          }
+          isLoadingStatus={primaryModeId === 'word-hunt' ? dailyStatus.loading : false}
+          onPlay={modesInfo.find((m) => m.id === primaryModeId)?.onPlay || (() => {})}
+          timeMode={primaryModeId === 'word-hunt' || primaryModeId === 'word-wheel' ? 'timed' : 'relaxed'}
+          timeModeLabel={t(primaryModeId === 'word-hunt' || primaryModeId === 'word-wheel' ? 'daily.timedQuest' : 'daily.relaxedQuest')}
+          previewImageUrl={`/daily/${primaryModeId === 'word-hunt' ? 'word-hunt' : primaryModeId === 'word-wheel' ? 'word-wheel' : primaryModeId === 'word-tower' ? 'word-tower' : 'word-hunt'}-mascot.jpg`}
+          previewImageAlt={modesInfo.find((m) => m.id === primaryModeId)?.title || 'Quest'}
           currentLanguage={currentLanguage}
           buttonText={t('daily.startQuest')}
           delay={0.15}
         />
-      )}
+      ) : null}
 
-      {/* Quest 2: Word Wheel */}
-      {wordWheelPlayed ? (
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
-          className="w-full"
-          data-testid="word-wheel-hero"
-        >
-          <button
-            type="button"
-            onClick={onSelectWordWheel}
-            className={cn(
-              'relative w-full rounded-xl border-3 border-neo-black',
-              'shadow-hard overflow-hidden cursor-pointer p-4',
-              'flex items-center gap-4',
-              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
-              'transition-all duration-200 group',
-              'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
-            )}
-          >
-            <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-lime" />
-            <m.div
-              data-testid="wheel-cleared-badge"
-              className={cn(
-                'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
-                'flex items-center justify-center shadow-hard-xs',
-                'bg-neo-lime'
-              )}
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 15 }}
-            >
-              <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
-            </m.div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-neo-display font-black text-neo-white leading-none">
-                {t('wordWheel.hub.wordWheelQuest')}
-              </h2>
-              <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-lime/20 text-neo-lime border-neo-lime/40">
-                <Sparkles className="w-2.5 h-2.5" strokeWidth={3} aria-hidden />
-                {t('daily.cleared')}
-              </span>
-            </div>
-            <div className={cn(
-              'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
-              'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm',
-              'active:translate-y-0.5 active:shadow-none transition-all',
-              'flex items-center gap-1.5 group-hover:scale-105'
-            )}>
-              <Eye className="w-4 h-4" />
-              {t('daily.viewResults')}
-            </div>
-          </button>
-        </m.div>
-      ) : (
-        <QuestCard
-          challengeId="wordWheel"
-          icon={<CircleDot className="w-8 h-8" />}
-          title={t('wordWheel.hub.wordWheelQuest')}
-          tagline={t('wordWheel.hub.wordWheelDesc')}
-          color="yellow"
-          status="new"
-          onPlay={onSelectWordWheel}
-          timeMode="timed"
-          timeModeLabel={t('daily.timedQuest')}
-          previewImageUrl="/daily/word-wheel-mascot.jpg"
-          previewImageAlt={t('wordWheel.hub.wordWheelQuest')}
-          buttonText={t('daily.startQuest')}
-          delay={0.25}
-        />
-      )}
-
-      {/* Quest 3: Word Tower — same chain node, same box, same SPA nav as the two
-          quests above. It used to be drawn by the generic registry card (a hard-nav
-          `<a>`), which is why it read as a detached afterthought. */}
-      {showsWordTower && (
-        <>
-          {wordTowerPlayed ? (
-            <m.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 25 }}
-              className="w-full"
-              data-testid="word-tower-hero"
-            >
-              <button
-                type="button"
-                onClick={() => router.push(wordTowerHref)}
-                className={cn(
-                  'relative w-full rounded-xl border-3 border-neo-black',
-                  'shadow-hard overflow-hidden cursor-pointer p-4',
-                  'flex items-center gap-4',
-                  'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
-                  'transition-all duration-200 group',
-                  'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
-                )}
-              >
-                <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-lime" />
-                <m.div
-                  data-testid="tower-cleared-badge"
-                  className={cn(
-                    'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
-                    'flex items-center justify-center shadow-hard-xs',
-                    'bg-neo-lime'
-                  )}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 15 }}
-                >
-                  <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
-                </m.div>
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-neo-display font-black text-neo-white leading-none">
-                    {t('wordTower.daily.questTitle')}
-                  </h2>
-                  <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-lime/20 text-neo-lime border-neo-lime/40">
-                    <Sparkles className="w-2.5 h-2.5" strokeWidth={3} aria-hidden />
-                    {t('daily.cleared')}
-                  </span>
-                </div>
-                <div className={cn(
-                  'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
-                  'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm',
-                  'active:translate-y-0.5 active:shadow-none transition-all',
-                  'flex items-center gap-1.5 group-hover:scale-105'
-                )}>
-                  <Eye className="w-4 h-4" />
-                  {t('daily.viewResults')}
-                </div>
-              </button>
-            </m.div>
-          ) : (
-            <QuestCard
-              challengeId="wordTower"
-              icon={<Building2 className="w-8 h-8" />}
-              title={t('wordTower.daily.questTitle')}
-              tagline={t('wordTower.daily.questDesc')}
-              color="cyan"
-              status="new"
-              onPlay={() => router.push(wordTowerHref)}
-              timeMode="relaxed"
-              timeModeLabel={t('daily.relaxedQuest')}
-              previewImageUrl="/daily/word-tower-mascot.jpg"
-              previewImageAlt={t('wordTower.daily.questTitle')}
-              buttonText={t('daily.startQuest')}
-              delay={0.3}
+      {/* Secondary modes — compact single-line cards for the modes not selected as primary */}
+      <div className="w-full flex flex-col gap-2" data-testid="secondary-modes">
+        {modesInfo
+          .filter((m) => m.visible && m.id !== primaryModeId)
+          .map((mode, i) => (
+            <CompactModeRow
+              key={mode.id}
+              icon={mode.icon}
+              title={mode.title}
+              color={mode.color}
+              onPlay={mode.onPlay}
+              played={mode.played}
+              delay={0.25 + i * 0.05}
             />
-          )}
-        </>
-      )}
-
-      {/* Registry-driven quest cards — Connections (Word Bridge) is the daily
-          quest #4 now that it graduated from beta: public card, played-today
-          status fed from the same marker both daily flavors write. */}
-      {questModes.length > 0 && (
-        <>
-          <div className="w-full flex flex-col gap-2" data-testid="daily-quest-modes">
-            {questModes.map((mode, i) => (
-              <DailyModeQuestCard
-                key={mode.id}
-                mode={mode}
-                locale={currentLanguage}
-                t={t}
-                played={mode.id === 'connections' ? connectionsPlayed : false}
-                delay={0.35 + i * 0.05}
-              />
-            ))}
-          </div>
-        </>
-      )}
+          ))}
+      </div>
 
       {/* Insights: surface "you improved" / "personal best" inline once any mode complete */}
       {user && todayIso && (wordHuntStatus === 'won' || wordWheelPlayed) && (
@@ -496,37 +354,16 @@ export function DailyChallengeLanding({
       {claimedChest && (
         <WeeklyChestModal
           chest={claimedChest}
-          streak={getDailyStreak().currentStreak}
+          streak={dailyPlayedStatus.streak.current}
           onClose={() => setClaimedChest(null)}
         />
       )}
 
-      {/* Leaderboard Teaser — only render after client-side date hydration */}
-      {todayIso && (
-        <m.div
-          className="w-full"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 25 }}
-        >
-          <TabbedDailyLeaderboard
-            puzzleDate={todayIso}
-            language={currentLanguage}
-            currentPlayerId={user?.id ?? null}
-            currentGuestFingerprint={guestFingerprint}
-            scope="combined"
-            defaultTab="today"
-            t={t}
-            maxVisible={5}
-            compact
-          />
-        </m.div>
-      )}
       {/* The global bottom banner is the app-wide AnchoredNativeBanner, pinned to
           the viewport bottom on this hub via the admob-routes allowlist — NOT an
           in-flow slot (which scrolled with the content). This container's
           `pb-bottom-stack` reserves the fixed-bottom stack (nav + banner) so the
-          leaderboard rows, weekly chest, and quest cards stay clear of it. */}
+          quest cards and weekly chest stay clear of it. */}
     </m.div>
   );
 }

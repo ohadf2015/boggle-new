@@ -1,0 +1,147 @@
+/**
+ * useDailyPlayedStatus - Unified daily challenge status across all modes
+ *
+ * Single source of truth for:
+ * - Whether player has played each mode today (wordHunt, wordWheel, wordTower, connections)
+ * - Current streak (server-backed for authed, localStorage for guests)
+ * - All completed dates (for freeze bridge logic)
+ *
+ * Strategy:
+ * 1. Authed users: skeleton until server resolves (no localStorage flip)
+ * 2. Guests: localStorage immediately, never flips
+ * 3. Server is authoritative across all devices
+ */
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import type { DailyPlayedStatus } from '@/app/api/daily/status/route';
+import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
+import { getDailyStreak } from '@/utils/dailyChallenge/streaks';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
+
+/**
+ * Get guest's played state from localStorage
+ */
+function getGuestPlayedStatus(): DailyPlayedStatus {
+  const localStreak = getDailyStreak();
+  const today = getDailyChallengeDate();
+
+  // Guest: read localStorage played flags for each mode
+  const wordHuntPlayed = !!localStorage.getItem(`wh_played_${today}`);
+  const wordWheelPlayed = !!localStorage.getItem(`ww_played_${today}`);
+  const connectionsPlayed = !!localStorage.getItem(`connections_played_${today}`);
+
+  return {
+    today: {
+      wordHunt: wordHuntPlayed,
+      wordWheel: wordWheelPlayed,
+      wordTower: false, // Guests off-limits or localStorage unmarked
+      connections: connectionsPlayed,
+    },
+    streak: {
+      current: localStreak.currentStreak,
+      longest: localStreak.longestStreak,
+    },
+    allCompletedDates: [], // Guest dates not aggregated client-side
+    freezeCount: 0,
+    loading: false,
+    fromServer: false,
+  };
+}
+
+export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Promise<void> } {
+  const { user, isAuthenticated } = useAuth();
+  const playerId = user?.id ?? null;
+
+  // Initialize with guest status (fast, immediate)
+  const [status, setStatus] = useState<DailyPlayedStatus>(() => {
+    if (isAuthenticated && playerId) {
+      // Authed: skeleton until server resolves
+      return {
+        today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false },
+        streak: { current: 0, longest: 0 },
+        allCompletedDates: [],
+        freezeCount: 0,
+        loading: true,
+        fromServer: false,
+      };
+    }
+    // Guest: immediate localStorage
+    return getGuestPlayedStatus();
+  });
+
+  const isMounted = useRef(true);
+  const isFetching = useRef(false);
+
+  const fetchStatus = useCallback(async () => {
+    if (!playerId || isFetching.current) return;
+    isFetching.current = true;
+
+    try {
+      const response = await fetch(`/api/daily/status?userId=${playerId}`, {
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!response.ok) {
+        isFetching.current = false;
+        return;
+      }
+
+      const data = (await response.json()) as DailyPlayedStatus;
+
+      if (isMounted.current) {
+        setStatus(data);
+      }
+    } catch (error) {
+      console.error('[useDailyPlayedStatus] fetch error:', error);
+    } finally {
+      isFetching.current = false;
+    }
+  }, [playerId]);
+
+  // Initial load
+  useEffect(() => {
+    isMounted.current = true;
+
+    if (isAuthenticated && playerId) {
+      fetchStatus();
+    }
+
+    return () => {
+      isMounted.current = false;
+    };
+  }, [isAuthenticated, playerId, fetchStatus]);
+
+  // Auto-refresh on visibility change
+  useEffect(() => {
+    let debounceTimer: ReturnType<typeof setTimeout>;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isAuthenticated && playerId) {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          if (isMounted.current) {
+            fetchStatus();
+          }
+        }, 500);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearTimeout(debounceTimer);
+    };
+  }, [isAuthenticated, playerId, fetchStatus]);
+
+  const refresh = useCallback(async () => {
+    setStatus((prev) => ({ ...prev, loading: true }));
+    await fetchStatus();
+  }, [fetchStatus]);
+
+  return {
+    ...status,
+    refresh,
+  };
+}

@@ -440,7 +440,7 @@ export interface GrowthEventData {
   wordCount?: number;
   achievementId?: string;
   achievementTier?: string;
-  shareMethod?: 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram' | 'twitter' | 'discord' | 'email' | 'sms';
+  shareMethod?: 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram' | 'twitter' | 'discord' | 'email' | 'sms' | 'linkedin';
   referralSource?: string;
   streakDays?: number;
   position?: number; // Leaderboard position
@@ -739,7 +739,7 @@ const storeEventLocally = (event: GrowthEvent, data: GrowthEventData): void => {
 };
 
 /** Share method type for tracking */
-export type ShareMethod = 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram' | 'twitter' | 'discord' | 'email' | 'sms';
+export type ShareMethod = 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram' | 'twitter' | 'discord' | 'email' | 'sms' | 'linkedin';
 
 /**
  * Track share event with method

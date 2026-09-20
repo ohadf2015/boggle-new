@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { safeToLocaleString } from '@/utils/bcp47Locale'
 import { cn } from '@/lib/utils'
 import gsap from 'gsap'
+import posthog from '@/lib/analytics/lazyPosthog'
 import { triggerHaptic } from '@/utils/hapticFeedback'
 import { getAssetUrl } from '@/lib/assets/cdn'
 import type { PendingChest } from '@/hooks/useWeeklyChest'
@@ -145,6 +146,16 @@ export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) 
       if (counterInterval) clearInterval(counterInterval)
     }
   }, [chest.coins])
+
+  // Modal opened (mount-time event)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    posthog.capture('growth:weekly_chest_modal_open', {
+      tier: chest.tier,
+      coins: chest.coins,
+      streak,
+    })
+  }, [])
 
   // Close on Escape — only after the reveal is done.
   useEffect(() => {

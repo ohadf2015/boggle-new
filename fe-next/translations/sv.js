@@ -5018,6 +5018,9 @@ const sv = {
     "achievementExplain": "Prestationer ger bonus!"
   },
   "auth": {
+    "google": {
+      "signUp": "Registrera dig med Google"
+    },
     "signIn": "Logga in",
     "signOut": "Logga ut",
     "signUp": "Registrera",
@@ -5085,6 +5088,7 @@ const sv = {
         "subtitle": "Skapa ett konto för att följa din dagliga framsteg"
       },
       "dayStreak": "Dagars svit",
+      "streak_flame_icon": "Svit-låga",
       "atRiskWarning": "Utan ett konto kan du förlora din svit!",
       "benefitsTitle": "Registrera dig för att:",
       "benefits": {
@@ -7279,10 +7283,19 @@ const sv = {
     "online": "online"
   },
   "daily": {
+    "qrWelcome": {
+      "badge": "Skannad",
+      "line": "Du skannade in — dagens pussel är redo."
+    },
     "todaysPuzzles": "Dagens pussel",
     "results": {
       "fullRecap": "Hela sammanfattningen",
-      "fullRecapSummary": "Din placering, ditt ovanligaste ord, dina mynt — och vem du slog"
+      "fullRecapSummary": "Din placering, ditt ovanligaste ord, dina mynt — och vem du slog",
+      "signup": {
+        "title": "Spara din strik",
+        "shortPrompt": "Spara din strik",
+        "shortSubtitle": "Registrera dig för att spara dina framsteg"
+      }
     },
     "title": "Daglig utmaning",
     "badge": "DAGLIG UTMANING",
@@ -7617,6 +7630,9 @@ const sv = {
         "headline": "Blir skarpare!",
         "sub": "Bättre än igår"
       }
+    },
+    "streak": {
+      "freeze_toast_no_remaining": "Strälsäkerhet använd — {day} sparad · ingen is kvar"
     }
   },
   "dailyWordWheelLanding": {
@@ -8018,6 +8034,8 @@ const sv = {
       "eliminated": "Eliminerade",
       "gameOver": "Spelet är slut",
       "tapToCelebrate": "Tryck för att fira!",
+      "extendStreak": "Spela imorgon för att nå en svit om {days} dagar",
+      "startStreak": "Börja din svit imorgon",
       "scoreTierBudding": "Bra start!",
       "scoreTierRising": "Snyggt jobbat!",
       "scoreTierSolid": "Riktigt bra!",
@@ -8078,7 +8096,10 @@ const sv = {
       "playerWordsTitle": "{{name}}s väg",
       "youMissedWords": "Ord du missade",
       "tapPlayerHint": "Tryck på en spelare för att se deras väg",
-      "wordsFound": "Hittade ord"
+      "wordsFound": "Hittade ord",
+      "masteryRatingLabel": "Rating",
+      "masteryRatingChangeLabel": "Förändring",
+      "masteryRatingTeaser": "Spela idag för att starta din rating"
     },
     "score": {
       "title": "Din Poäng",
@@ -14337,7 +14358,8 @@ const sv = {
   "dailyStreak": {
     "badge": "{count} dagars svit",
     "freezeReady": "Svitskydd redo — en missad dag bryter inte din svit",
-    "freezeUsed": "Svitskyddet räddade din svit!"
+    "freezeUsed": "Svitskyddet räddade din svit!",
+    "streak_freeze_toast_message": "Seriefrysning använd — {day} sparad · {remaining} kvar"
   },
   "notifications": {
     "title": "Aviseringar",

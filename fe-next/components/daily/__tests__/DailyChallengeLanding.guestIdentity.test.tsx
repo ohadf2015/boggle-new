@@ -88,7 +88,12 @@ describe('DailyChallengeLanding — guest identity', () => {
     captured.length = 0;
   });
 
-  it('passes the daily guest fingerprint to the hub leaderboard', async () => {
+  // The hub no longer carries a leaderboard. That was a deliberate call, not an oversight: with 12
+  // unique daily players a week, a board showing three names reads as a dead product rather than a
+  // reason to come back, so the hub answers "what do I play now" instead. The daily RESULTS screen
+  // still shows the board — that is where standing against other players belongs, after a score
+  // exists. This test is inverted rather than deleted so a future re-add has to be deliberate too.
+  it('does not render a leaderboard on the hub', async () => {
     render(
       <AuthProvider>
         <LanguageProvider initialLanguage="en">
@@ -96,8 +101,22 @@ describe('DailyChallengeLanding — guest identity', () => {
         </LanguageProvider>
       </AuthProvider>,
     );
-    const lb = await screen.findByTestId('tabbed-daily-leaderboard');
-    await waitFor(() => expect(lb.getAttribute('data-fp')).toBe('daily-fp'));
-    expect(captured.some(p => p.currentGuestFingerprint === 'session-fp')).toBe(false);
+    // Wait for the hub itself to settle, so this is not a race that passes before any render.
+    await screen.findByTestId('secondary-modes');
+    expect(screen.queryByTestId('tabbed-daily-leaderboard')).toBeNull();
+  });
+
+  it('does not fetch a guest fingerprint the hub has nothing to do with', async () => {
+    render(
+      <AuthProvider>
+        <LanguageProvider initialLanguage="en">
+          <DailyChallengeLanding onSelectWordHunt={vi.fn()} onSelectWordWheel={vi.fn()} currentLanguage="en" />
+        </LanguageProvider>
+      </AuthProvider>,
+    );
+    await screen.findByTestId('secondary-modes');
+    // The fingerprint existed only to highlight a guest's own row on the hub board. With the board
+    // gone, resolving it was dead work on every hub visit.
+    expect(captured.some((p) => p.currentGuestFingerprint !== undefined)).toBe(false);
   });
 });

@@ -1,11 +1,18 @@
 /**
  * The catch-up nudge ("you still have 2 unplayed dailies from the last few
- * days") was filed inside the "Full recap" disclosure, collapsed by default —
- * so the one card on the results screen that offers ANOTHER GAME was the one
- * card nobody saw. It belongs on first paint, next to the primary CTA.
+ * days") used to live inside the "Full recap" disclosure on this screen.
+ *
+ * Post-gauntlet (2026-09-19): CatchUpSuggestion was removed from the Word
+ * Hunt results screen entirely — it is still mounted on Word Wheel's results
+ * (see WordWheelResults.tsx / WordWheelResults.fullRecap.test.tsx), just not
+ * here. The first test below is the regression guard for that subtraction:
+ * CatchUpSuggestion is mocked at its real import path, so if a future edit
+ * re-adds it to WordHuntResultsContent, this test starts finding the mock's
+ * testid and fails.
  *
  * This file deliberately does NOT stub out the disclosure: rendering it for
- * real is the only way the assertion can fail if the card slides back inside.
+ * real is the only way the second test's assertion can fail if a detail card
+ * moves out from behind it.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -62,6 +69,7 @@ vi.mock('../results', () => ({
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
   StreakFreezeIndicator: () => <div data-testid="streak-freeze" />,
+  MasteryRatingSection: () => <div data-testid="mastery-rating-section" />,
 }));
 
 vi.mock('../CatchUpSuggestion', () => ({
@@ -161,16 +169,16 @@ const baseProps: WordHuntResultsContentProps = {
     typeof fallback === 'string' ? fallback : k,
 };
 
-describe('WordHuntResultsContent — catch-up nudge placement', () => {
+describe('WordHuntResultsContent — catch-up nudge (removed from this screen)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockWheelPlayed.mockReturnValue(false);
     mockIsGuest.mockReturnValue(false);
   });
 
-  it('shows the catch-up nudge without opening the recap disclosure', () => {
+  it('does not show the catch-up nudge (removed from Word Hunt results; still used by Word Wheel)', () => {
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(screen.getByTestId('catch-up')).toBeInTheDocument();
+    expect(screen.queryByTestId('catch-up')).toBeNull();
   });
 
   it('keeps the analytics-heavy detail cards behind the disclosure', () => {

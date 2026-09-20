@@ -20,6 +20,18 @@ vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
+const mockUseDailyChallengeStatus = vi.fn(() => ({
+  hasPlayed: false,
+  hasSolved: false,
+  loading: false,
+  streak: 0,
+  refresh: vi.fn(),
+}));
+
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
+  useDailyChallengeStatus: () => mockUseDailyChallengeStatus(),
+}));
+
 vi.mock('@/utils/guestManager', () => ({
   getGuestFingerprint: vi.fn(() => 'test-fingerprint'),
 }));
@@ -122,87 +134,111 @@ describe('DailyChallengeLanding Solved Badge', () => {
     });
   });
 
-  test('won badge should have data-testid for easy selection', async () => {
-
-    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
+  test('won badge should have data-testid for easy selection when Word Hunt is primary', async () => {
+    // Set up: Word Hunt is won, Word Wheel is unplayed
+    // With this setup, pickPrimaryMode will select Word Wheel (first unplayed)
+    // So Word Hunt badge will appear as a secondary mode (CompactModeRow) with orange-done-badge
+    mockUseDailyChallengeStatus.mockReturnValue({
+      hasPlayed: true,
+      hasSolved: true,  // Won state
+      loading: false,
+      streak: 0,
+      refresh: vi.fn(),
+    });
 
     const mockProps = {
       onSelectWordHunt: vi.fn(),
-    onSelectWordWheel: vi.fn(),
+      onSelectWordWheel: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
     renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
-    // Wait for component to update status
+    // When Word Hunt is won and Word Wheel is unplayed, Word Wheel becomes primary
+    // and Word Hunt appears as a secondary CompactModeRow with orange-done-badge
     await waitFor(() => {
-      const wonBadge = screen.getByTestId('won-badge');
-      expect(wonBadge).toBeInTheDocument();
+      const doneBadge = screen.getByTestId('orange-done-badge');
+      expect(doneBadge).toBeInTheDocument();
     }, { timeout: 2000 });
-
-    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 
-  test('won badge should contain Check icon', async () => {
-
-    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
+  test('won badge should contain Check icon (rendered as CompactModeRow when secondary)', async () => {
+    mockUseDailyChallengeStatus.mockReturnValue({
+      hasPlayed: true,
+      hasSolved: true,  // Won state
+      loading: false,
+      streak: 0,
+      refresh: vi.fn(),
+    });
 
     const mockProps = {
       onSelectWordHunt: vi.fn(),
-    onSelectWordWheel: vi.fn(),
+      onSelectWordWheel: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
     renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
     await waitFor(() => {
-      const wonBadge = screen.getByTestId('won-badge');
+      // When Word Hunt is won and secondary, it renders as CompactModeRow with orange-done-badge
+      const doneBadge = screen.getByTestId('orange-done-badge');
       // Check icon is an SVG element inside the badge
-      const svgIcon = wonBadge.querySelector('svg');
+      const svgIcon = doneBadge.querySelector('svg');
       expect(svgIcon).toBeInTheDocument();
     }, { timeout: 2000 });
-
-    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 
-  test('won badge should have neo-brutalist styling (solid background, border)', async () => {
-
-    storage.getWordHuntStatusToday.mockReturnValue({ solved: true }); // Won state
+  test('won badge should have neo-brutalist styling when rendered as CompactModeRow', async () => {
+    mockUseDailyChallengeStatus.mockReturnValue({
+      hasPlayed: true,
+      hasSolved: true,  // Won state
+      loading: false,
+      streak: 0,
+      refresh: vi.fn(),
+    });
 
     const mockProps = {
       onSelectWordHunt: vi.fn(),
-    onSelectWordWheel: vi.fn(),
+      onSelectWordWheel: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
     renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
     await waitFor(() => {
-      const wonBadge = screen.getByTestId('won-badge');
-      // Should have solid background (bg-neo-lime), not transparent
-      expect(wonBadge).toHaveClass('bg-neo-lime');
-      // Should have border (border-2)
-      expect(wonBadge).toHaveClass('border-2');
+      // CompactModeRow done-badge styles
+      const doneBadge = screen.getByTestId('orange-done-badge');
+      // Should have solid background (bg-neo-lime)
+      expect(doneBadge).toHaveClass('bg-neo-lime');
+      // Should have border
+      expect(doneBadge).toHaveClass('border');
       // Should have hard shadow
-      expect(wonBadge).toHaveClass('shadow-hard-xs');
+      expect(doneBadge).toHaveClass('shadow-hard-xs');
     }, { timeout: 2000 });
-
-    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 
-  test('lost badge should show X icon and pink background', async () => {
-
-    storage.getWordHuntStatusToday.mockReturnValue({ solved: false }); // Lost state
+  test('lost badge should show X icon and pink background when Word Hunt is primary', async () => {
+    // Set up: Word Hunt is lost (played but not solved)
+    // With this setup, pickPrimaryMode will select Word Hunt (new or lost)
+    // So lost badge will appear on the primary QuestCard
+    mockUseDailyChallengeStatus.mockReturnValue({
+      hasPlayed: true,
+      hasSolved: false,  // Lost state
+      loading: false,
+      streak: 0,
+      refresh: vi.fn(),
+    });
 
     const mockProps = {
       onSelectWordHunt: vi.fn(),
-    onSelectWordWheel: vi.fn(),
+      onSelectWordWheel: vi.fn(),
       currentLanguage: 'en' as const,
     };
 
     renderWithProviders(<DailyChallengeLanding {...mockProps} />);
 
     await waitFor(() => {
+      // When Word Hunt is lost, it becomes the primary mode with lost-badge on QuestCard
       const lostBadge = screen.getByTestId('lost-badge');
       expect(lostBadge).toBeInTheDocument();
       // Should have pink background for loss
@@ -211,7 +247,5 @@ describe('DailyChallengeLanding Solved Badge', () => {
       const svgIcon = lostBadge.querySelector('svg');
       expect(svgIcon).toBeInTheDocument();
     }, { timeout: 2000 });
-
-    storage.getWordHuntStatusToday.mockReturnValue(null);
   });
 });

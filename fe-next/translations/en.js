@@ -4283,6 +4283,9 @@ const en = {
     "achievementExplain": "Achievements come with perks!"
   },
   "auth": {
+    "google": {
+      "signUp": "Sign up with Google"
+    },
     "signIn": "Sign In",
     "signOut": "Sign Out",
     "signUp": "Sign Up",
@@ -4350,6 +4353,7 @@ const en = {
         "subtitle": "Sign up to track your daily progress"
       },
       "dayStreak": "Day Streak",
+      "streak_flame_icon": "Streak flame",
       "atRiskWarning": "Your streak might not survive without an account!",
       "benefitsTitle": "Sign up to:",
       "benefits": {
@@ -6441,10 +6445,19 @@ const en = {
     "online": "online"
   },
   "daily": {
+    "qrWelcome": {
+      "badge": "Scanned",
+      "line": "You scanned in — today’s puzzle is ready."
+    },
     "todaysPuzzles": "Today's Puzzles",
     "results": {
       "fullRecap": "Full recap",
-      "fullRecapSummary": "Your rank, your rarest word, your coins — and who you beat"
+      "fullRecapSummary": "Your rank, your rarest word, your coins — and who you beat",
+      "signup": {
+        "title": "Save your streak",
+        "shortPrompt": "Save your streak",
+        "shortSubtitle": "Sign up to keep your progress"
+      }
     },
     "title": "Daily Challenge",
     "badge": "DAILY",
@@ -6779,6 +6792,9 @@ const en = {
         "headline": "Getting sharper!",
         "sub": "Better than yesterday"
       }
+    },
+    "streak": {
+      "freeze_toast_no_remaining": "Streak Freeze used — {day} saved · no freezes left"
     }
   },
   "dailyWordWheelLanding": {
@@ -7181,6 +7197,8 @@ const en = {
       "eliminated": "Eliminated",
       "gameOver": "Game Over",
       "tapToCelebrate": "Tap to celebrate!",
+      "extendStreak": "Play tomorrow to reach a {days}-day streak",
+      "startStreak": "Start your streak tomorrow",
       "scoreTierBudding": "Good start!",
       "scoreTierRising": "Nice work!",
       "scoreTierSolid": "Really good!",
@@ -7241,7 +7259,10 @@ const en = {
       "playerWordsTitle": "{{name}}'s path",
       "youMissedWords": "Words you missed",
       "tapPlayerHint": "Tap a player to see their path",
-      "wordsFound": "Words found"
+      "wordsFound": "Words found",
+      "masteryRatingLabel": "Rating",
+      "masteryRatingChangeLabel": "Change",
+      "masteryRatingTeaser": "Play today to start your rating"
     },
     "score": {
       "title": "Your Score",
@@ -12651,7 +12672,8 @@ const en = {
   "dailyStreak": {
     "badge": "{count}-day streak",
     "freezeReady": "Streak freeze ready — one missed day won't break your streak",
-    "freezeUsed": "Streak freeze saved your streak!"
+    "freezeUsed": "Streak freeze saved your streak!",
+    "streak_freeze_toast_message": "Streak Freeze used — {day} saved · {remaining} left"
   },
   "notifications": {
     "title": "Notifications",

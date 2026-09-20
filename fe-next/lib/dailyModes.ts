@@ -104,3 +104,42 @@ export function questCardModes(isAdmin: boolean): DailyModeDef[] {
 export function dailyModeHref(mode: DailyModeDef, locale: string): string {
   return `/${locale}${mode.path}`;
 }
+
+/** State of play for each daily mode. */
+export interface DailyModePlayState {
+  wordHunt: 'new' | 'won' | 'lost';
+  wordWheel: 'new' | 'played';
+  wordTower: boolean;
+  connections: boolean;
+}
+
+/**
+ * Determine which mode should be the primary action (most prominent on hub).
+ *
+ * Priority order: first unplayed mode in sequence, or word-hunt if all are played.
+ * This ensures "what do I do right now" is answered by a single card.
+ */
+export function pickPrimaryMode(state: DailyModePlayState): DailyModeId {
+  // Word Hunt unplayed (new or lost) → it's the primary
+  if (state.wordHunt === 'new' || state.wordHunt === 'lost') {
+    return 'word-hunt';
+  }
+
+  // Word Hunt played (won), Word Wheel unplayed → it's the primary
+  if (state.wordWheel === 'new') {
+    return 'word-wheel';
+  }
+
+  // First two played, Word Tower unplayed → it's the primary
+  if (!state.wordTower) {
+    return 'word-tower';
+  }
+
+  // First three played, Connections unplayed → it's the primary
+  if (!state.connections) {
+    return 'connections';
+  }
+
+  // All played → default to Word Hunt (safe fallback)
+  return 'word-hunt';
+}

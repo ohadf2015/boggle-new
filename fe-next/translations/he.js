@@ -4776,6 +4776,9 @@ const he = {
     "achievementExplain": "הישגים מגיעים עם בונוסים!"
   },
   "auth": {
+    "google": {
+      "signUp": "הרשמה עם Google"
+    },
     "signIn": "התחברות",
     "signOut": "התנתקות",
     "signUp": "הרשמה",
@@ -4843,6 +4846,7 @@ const he = {
         "subtitle": "צור חשבון כדי לעקוב אחר ההתקדמות היומית שלך"
       },
       "dayStreak": "ימי רצף",
+      "streak_flame_icon": "להבת הרצף",
       "atRiskWarning": "ללא חשבון, אתה עלול לאבד את הרצף!",
       "benefitsTitle": "הירשם כדי:",
       "benefits": {
@@ -6973,10 +6977,19 @@ const he = {
     "online": "מחוברים"
   },
   "daily": {
+    "qrWelcome": {
+      "badge": "נסרק",
+      "line": "סרקת בהצלחה — החידה של היום מוכנה."
+    },
     "todaysPuzzles": "החידות של היום",
     "results": {
       "fullRecap": "הסיכום המלא",
-      "fullRecapSummary": "הדירוג שלך, המילה הנדירה שמצאת, המטבעות — ואת מי ניצחת"
+      "fullRecapSummary": "הדירוג שלך, המילה הנדירה שמצאת, המטבעות — ואת מי ניצחת",
+      "signup": {
+        "title": "שמור על הרצף שלך",
+        "shortPrompt": "שמור על הרצף שלך",
+        "shortSubtitle": "הירשם כדי לשמור על ההתקדמות שלך"
+      }
     },
     "title": "אתגר יומי",
     "badge": "אתגר יומי",
@@ -7311,6 +7324,9 @@ const he = {
         "headline": "הולך ומשתפר!",
         "sub": "טוב יותר מאתמול"
       }
+    },
+    "streak": {
+      "freeze_toast_no_remaining": "נעשה שימוש בהקפאת הרצף — {day} נשמר · אין הקפאות נותרות"
     }
   },
   "dailyWordWheelLanding": {
@@ -7708,6 +7724,8 @@ const he = {
       "eliminated": "הודחו",
       "gameOver": "גמר המשחק",
       "tapToCelebrate": "לחץ לחגוג!",
+      "extendStreak": "שחקו מחר כדי להגיע לרצף של {days} ימים",
+      "startStreak": "התחילו את הרצף שלכם מחר",
       "scoreTierBudding": "התחלה טובה!",
       "scoreTierRising": "עבודה יפה!",
       "scoreTierSolid": "ממש טוב!",
@@ -7768,7 +7786,10 @@ const he = {
       "playerWordsTitle": "הנתיב של {{name}}",
       "youMissedWords": "מילים שהחמצת",
       "tapPlayerHint": "לחץ על שחקן כדי לראות את נתיבו",
-      "wordsFound": "מילים שנמצאו"
+      "wordsFound": "מילים שנמצאו",
+      "masteryRatingLabel": "דירוג",
+      "masteryRatingChangeLabel": "שינוי",
+      "masteryRatingTeaser": "שחקו היום כדי להתחיל את הדירוג שלכם"
     },
     "score": {
       "title": "הניקוד שלך",
@@ -13953,7 +13974,8 @@ const he = {
   "dailyStreak": {
     "badge": "רצף של {count} ימים",
     "freezeReady": "הקפאת רצף זמינה — יום אחד של החמצה לא ישבור את הרצף",
-    "freezeUsed": "הקפאת הרצף הצילה את הרצף שלך!"
+    "freezeUsed": "הקפאת הרצף הצילה את הרצף שלך!",
+    "streak_freeze_toast_message": "שימוש בהקפאת סדרה — {day} נשמר · נותרו {remaining}"
   },
   "notifications": {
     "title": "התראות",

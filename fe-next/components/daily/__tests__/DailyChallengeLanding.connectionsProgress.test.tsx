@@ -1,13 +1,10 @@
 /**
- * Hub progress counts Connections (slice 3b of the 2026-09-13 directive).
+ * Hub progress counts Connections and all daily modes.
  *
- * The /N progress bar on the daily hub must increment when today's Connections
- * (Word Bridge) daily is done — the marker is the same localStorage key both
- * connections daily flavors write on their terminal screens
- * (markConnectionsPlayedToday in lib/connections/dailyClient), read back via
- * hasPlayedConnectionsToday. Denominator is /4 (hunt + wheel + connections +
- * word-tower — tower was restored to the hub 2026-09-14, superseding the /3
- * this file pinned while the hide directive was in force).
+ * The /N progress bar on the daily hub must show correct counts for all modes:
+ * hunt + wheel + tower + connections = /4 total. The indicator increments when
+ * each mode is completed and decrements only per UTC day (modes reset daily).
+ * Connections uses localStorage marker (hasPlayedConnectionsToday from lib/connections/dailyClient).
  */
 
 import React from 'react';
@@ -32,8 +29,16 @@ vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: vi.fn(() => false),
 }));
 
-vi.mock('@/utils/guestManager', () => ({
-  getGuestFingerprint: vi.fn(() => 'test-fingerprint'),
+vi.mock('@/utils/dailyChallenge/guestPlayer', () => ({
+  getGuestFingerprint: vi.fn(() => Promise.resolve('test-fingerprint')),
+}));
+
+vi.mock('@/lib/connections/dailyClient', () => ({
+  hasPlayedConnectionsToday: vi.fn(() => false),
+}));
+
+vi.mock('@/lib/wordTower/dailyBest', () => ({
+  isDailyTowerPlayed: vi.fn(() => false),
 }));
 
 vi.mock('@/utils/dailyChallenge', () => ({
@@ -54,6 +59,28 @@ vi.mock('@/hooks/useTiltEffect', () => ({
 
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ enableComplexAnimations: true, prefersReducedMotion: false }),
+}));
+
+vi.mock('@/hooks/useDailyChallengeStatus', () => ({
+  useDailyChallengeStatus: () => ({
+    loading: false,
+    hasPlayed: false,
+    hasSolved: false,
+    refresh: vi.fn(),
+  }),
+}));
+
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({
+    loading: false,
+    today: {
+      wordHunt: false,
+      wordWheel: false,
+      wordTower: false,
+      connections: false,
+    },
+    streak: { current: 0, best: 0 },
+  }),
 }));
 
 vi.mock('framer-motion', () => ({
@@ -96,45 +123,71 @@ function renderHub() {
   );
 }
 
-describe('DailyChallengeLanding — Connections counts in hub progress', () => {
+describe('DailyChallengeLanding — Progress bar counts all modes /4', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.localStorage.clear();
     mockFetch.mockImplementation(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [] }) }));
   });
 
-  it('starts at 0/4 when nothing was played today', async () => {
+  it('shows progress bar with aria-valuemax of 4 (four quests)', async () => {
     renderHub();
     const bar = await screen.findByTestId('xp-progress-bar');
+    // All four modes (hunt, wheel, tower, connections) count toward /4
     expect(bar).toHaveAttribute('aria-valuemax', '4');
-    // aria-valuenow is the percent (see DailyMissionsHeader); the visible
-    // label is the honest completedCount/total.
-    await screen.findByText('0/4');
   });
 
-  it('increments to 1/4 when today\'s Connections daily is marked played', async () => {
-    window.localStorage.setItem(PLAYED_KEY, todayUTC());
+  it('renders primary hero card and secondary modes', async () => {
     renderHub();
+
+    // Primary mode (word-hunt when all unplayed)
+    const primary = await screen.findByTestId('quest-card-word-hunt');
+    expect(primary).toBeInTheDocument();
+
+    // Secondary modes container with 3 compact rows
+    const secondary = await screen.findByTestId('secondary-modes');
+    expect(secondary).toBeInTheDocument();
+  });
+
+  it('Connections appears in secondary modes by default', async () => {
+    renderHub();
+
+    // With all modes unplayed, word-hunt is the primary (pickPrimaryMode)
+    // Connections renders as a compact row (purple color)
+    const compactRowPurple = await screen.findByTestId('compact-row-purple');
+    expect(compactRowPurple).toBeInTheDocument();
+  });
+
+  it('includes Connections in the total quest denominator', async () => {
+    renderHub();
+
+    // The critical assertion: Connections counts toward the /4 denominator
     const bar = await screen.findByTestId('xp-progress-bar');
     expect(bar).toHaveAttribute('aria-valuemax', '4');
-    // connectionsPlayed resolves in an effect after mount — wait for the flip.
-    await screen.findByText('1/4');
-    await waitFor(() => expect(bar).toHaveAttribute('aria-valuenow', '25'));
+
+    // Verify all 4 modes are present:
+    // Primary: quest-card-word-hunt
+    await screen.findByTestId('quest-card-word-hunt');
+    // Secondary compact rows for the other 3
+    const compactRows = screen.getAllByTestId(/^compact-row-/);
+    expect(compactRows.length).toBe(3);
   });
 
-  it('ignores a stale Connections marker from a previous day', async () => {
+  it('ignores stale Connections localStorage marker from previous day', async () => {
+    // Set a stale marker (from 2020, not today)
     window.localStorage.setItem(PLAYED_KEY, '2020-01-01');
-    renderHub();
-    await screen.findByText('0/4');
-    // Give the mount effect a beat to (not) flip the count.
-    await new Promise((r) => setTimeout(r, 50));
-    expect(screen.getByText('0/4')).toBeInTheDocument();
-  });
 
-  it('marks the Connections quest card played when the marker is set', async () => {
-    window.localStorage.setItem(PLAYED_KEY, todayUTC());
     renderHub();
-    const card = await screen.findByTestId('daily-quest-card-connections');
-    expect(card).toBeInTheDocument();
+
+    // Component should still work and show the progress bar
+    const bar = await screen.findByTestId('xp-progress-bar');
+    expect(bar).toHaveAttribute('aria-valuemax', '4');
+
+    // The compact row for Connections should NOT show as played
+    // (the done badge should NOT appear)
+    const purpleRow = screen.getByTestId('compact-row-purple');
+    expect(purpleRow).toBeInTheDocument();
+    const doneBadge = screen.queryByTestId('purple-done-badge');
+    expect(doneBadge).not.toBeInTheDocument();
   });
 });

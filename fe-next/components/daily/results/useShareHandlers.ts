@@ -11,6 +11,7 @@ import {
 } from '@/utils/dailyChallenge';
 import { generateChallengeShareUrl } from '@/utils/dailyChallenge/shareUtils';
 import { stripEmoji } from '@/lib/share/stripEmoji';
+import { trackShareCompleted } from '@/utils/share';
 // dailyShareImage (620 LOC + canvas rendering) is dynamically imported inside the
 // share handler so it stays out of the results-screen chunk — it only runs on share-tap.
 import type { Language } from '@/types';
@@ -102,6 +103,7 @@ export function useShareHandlers({
   const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(stripEmoji(shareTextWithUrl));
+      trackShareCompleted('clipboard');
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -113,30 +115,35 @@ export function useShareHandlers({
   // Handle share to WhatsApp
   const handleWhatsApp = useCallback(() => {
     const url = `https://wa.me/?text=${encodeURIComponent(shareTextWithUrl)}`;
+    trackShareCompleted('whatsapp');
     window.open(url, '_blank');
   }, [shareTextWithUrl]);
 
   // Handle share to Twitter/X
   const handleTwitter = useCallback(() => {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTextWithUrl)}`;
+    trackShareCompleted('twitter');
     window.open(url, '_blank');
   }, [shareTextWithUrl]);
 
   // Handle share to Telegram
   const handleTelegram = useCallback(() => {
     const url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+    trackShareCompleted('telegram');
     window.open(url, '_blank');
   }, [shareText, shareUrl]);
 
   // Handle share to LinkedIn
   const handleLinkedIn = useCallback(() => {
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+    trackShareCompleted('linkedin');
     window.open(url, '_blank');
   }, [shareUrl]);
 
   // Handle share to Facebook
   const handleFacebook = useCallback(() => {
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+    trackShareCompleted('facebook');
     window.open(url, '_blank');
   }, [shareText, shareUrl]);
 
@@ -145,12 +152,14 @@ export function useShareHandlers({
     const subject = `LexiClash Word Hunt #${puzzleNumber}`;
     const body = shareTextWithUrl;
     const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    trackShareCompleted('email');
     window.location.href = url;
   }, [puzzleNumber, shareTextWithUrl]);
 
   // Handle share via SMS
   const handleSMS = useCallback(() => {
     const url = `sms:?body=${encodeURIComponent(shareTextWithUrl)}`;
+    trackShareCompleted('sms');
     window.location.href = url;
   }, [shareTextWithUrl]);
 
@@ -161,6 +170,7 @@ export function useShareHandlers({
         await navigator.share({
           text: stripEmoji(shareTextWithUrl),
         });
+        trackShareCompleted('web_share_api');
       } catch (err) {
         // AbortError means user cancelled the share dialog - this is normal behavior
         if (err instanceof DOMException && err.name === 'AbortError') {
@@ -202,8 +212,13 @@ export function useShareHandlers({
           text: stripEmoji(text),
           url: challengeUrl,
         });
-      } catch {
-        // User cancelled or share failed — no-op
+        trackShareCompleted('web_share_api');
+      } catch (err) {
+        // AbortError means user cancelled — don't track
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return;
+        }
+        // Other errors also shouldn't track as completed
       }
     } else {
       setShowSharePanel(true);

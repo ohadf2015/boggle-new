@@ -4,8 +4,8 @@
  * WordHuntResultsContent - Results tab content for DailyWordHuntResults.
  *
  * Extracted from DailyWordHuntResults to keep files under 500 lines.
- * Contains the main results view: mascot, result display, performance,
- * rank badge, facts, emoji share, share section, signup CTA, fail state,
+ * Contains the main results view: result display, performance,
+ * rank badge, facts, share section, signup CTA, fail state,
  * leaderboard, and more options.
  */
 
@@ -13,25 +13,20 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
 import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
+import DismissibleSignupLine, { isSignupLineDismissedLocally } from '@/components/daily/results/DismissibleSignupLine';
+import ResultsSignupModal from '@/components/daily/results/ResultsSignupModal';
 import { useIsGuest } from '@/hooks/useIsGuest';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyInsightStack from './DailyInsightStack';
 import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
-import CatchUpSuggestion from './CatchUpSuggestion';
 import { STICKY_CTA_WORD_HUNT } from './stickyCta';
 import { SuggestWordCard } from './SuggestWordCard';
 import { RejectedWordAppeal } from '@/components/results/RejectedWordAppeal';
-import MpModeCrossPromo from './MpModeCrossPromo';
-import WatchAdButton from './WatchAdButton';
-import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
-import RivalCompareCard from './RivalCompareCard';
-import { useDailyRivalCompare } from '@/hooks/useDailyRivalCompare';
 import { getPastWordHuntPerformance } from '@/utils/dailyChallenge';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
@@ -44,10 +39,10 @@ import {
   PastPerformanceCompare,
   DailyWordHuntFacts,
   ShareSection,
-  CoinUnlockCard,
-  MoreOptionsAccordion,
-  StreakFreezeIndicator,
   EmojiShareCard,
+  CoinUnlockCard,
+  StreakFreezeIndicator,
+  MasteryRatingSection,
   type WordHuntStats,
   type CoinReward,
 } from './results';
@@ -139,11 +134,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   isStreakProtected = false,
   t,
 }) => {
-  // Head-to-head rival captured from a friend's challenge share link (persisted
-  // to sessionStorage on the /daily landing). Compare on the same score axis the
-  // challenger sent — efficiencyScore — so the verdict is honest.
-  const rival = useDailyRivalCompare(puzzleNumber);
-
   // Resolution-aware: gating on the `isAuthenticated` prop alone would flash the
   // simplified screen at a logged-in player on first paint (rules/60 Class 1).
   const isGuest = useIsGuest(isAuthenticated);
@@ -197,6 +187,11 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     () => getPastWordHuntPerformance(language, puzzleDate),
     [language, puzzleDate],
   );
+
+  // Signup card state: check both session dismiss (prop) AND localStorage persistence
+  const locallyDismissed = isSignupLineDismissedLocally();
+  const shouldShowSignupLine = !isAuthenticated && !inlineSignupDismissed && !locallyDismissed;
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   const wheelCtaNode = !wordWheelPlayed && (
     <m.div
@@ -325,26 +320,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
               onSpendStart={(pos) => onSpendStart(pos, coinActions.revealCost)}
               t={t}
             />
-            {/* Paywall-softener: free reveal via rewarded ad when coin-poor */}
-            {!coinActions.canAffordReveal && (
-              <WatchAdForRevealButton
-                onReveal={coinActions.handleRevealTargetWordViaAd}
-                revealed={coinActions.targetWordRevealed}
-                placement="reveal_target_word"
-              />
-            )}
-          </div>
-        )}
-
-        {/* Watch Ad for Coins */}
-        {!coinActions.canAffordRetry && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <div className="flex-1 h-px bg-neo-navy-elevated" />
-              <span>{t('wordHunt.ad.needMoreCoins')}</span>
-              <div className="flex-1 h-px bg-neo-navy-elevated" />
-            </div>
-            <WatchAdButton onCoinsEarned={() => {}} t={t} language={language} surface="word_hunt_results" />
           </div>
         )}
       </div>
@@ -363,6 +338,20 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       wordsDiscovered={result.wordsDiscovered?.length || 0}
       currentUserId={profile?.id}
       meaning={result.meaning}
+      t={t}
+    />
+  );
+
+  /* "Am I getting better?" belongs at a glance, not behind a tap — it used to
+     sit inside the collapsed "Full recap" accordion (defaultExpanded=false),
+     which meant NOBODY saw it without expanding, and guests never even
+     mounted it until they dismissed the signup nudge. Rendered once, right
+     under the hero, for guests and authed players alike, win or lose. */
+  const masteryRatingNode = (
+    <MasteryRatingSection
+      playerId={profile?.id}
+      guestFingerprint={guestFingerprint}
+      language={language}
       t={t}
     />
   );
@@ -388,21 +377,48 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     </>
   );
 
-  const signupNode = !isAuthenticated && !inlineSignupDismissed ? (
-    <DailyChallengeInlineSignup
-      pendingResult={{ result, puzzleNumber, puzzleDate, language }}
+  // Minimal signup line for the default scroll path. The full heavy card is only
+  // shown in a modal if the player taps "Save your streak".
+  const signupLineNode = (
+    <DismissibleSignupLine
+      isVisible={shouldShowSignupLine}
       onDismiss={onInlineSignupDismiss}
+      onOpenSignup={() => {
+        setShowSignupModal(true);
+        trackGrowthEvent('signup_prompt_clicked', { source: 'word_hunt_results' });
+      }}
     />
+  );
+
+  // Simplified signup modal — shown only if tapped, not on default scroll path
+  const signupModalNode = showSignupModal && !isAuthenticated ? (
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+      <ResultsSignupModal
+        pendingResult={{ result, puzzleNumber, puzzleDate, language }}
+        onDismiss={() => {
+          setShowSignupModal(false);
+          onInlineSignupDismiss();
+        }}
+        className="fixed inset-0 z-40 flex items-center justify-center p-4"
+      />
+    </div>
   ) : null;
 
   /* An unregistered player has no streak, no coin balance, no past plays and no
      stats row — the full recap is mostly empty cards plus promos. Show the
      score, the answer, where they placed, and the one thing we want from them.
      Dismissing the CTA falls through to the full recap (no dead end). */
-  if (isGuest && !inlineSignupDismissed) {
+  if (isGuest && !inlineSignupDismissed && !locallyDismissed) {
     return (
       <div className="space-y-4">
         {heroNode}
+        {masteryRatingNode}
+
+        {/* The signup nudge must never cost the product its only viral loop.
+            ~90% of daily players are guests, so the guest-simplified branch is
+            where the emoji grid and its share action matter MOST, not where
+            they can be dropped. Keep it here even though the recap (and its
+            heavier ShareSection copy) is gone for this branch. */}
         <EmojiShareCard
           puzzleNumber={puzzleNumber}
           score={result.efficiencyScore ?? 0}
@@ -412,9 +428,30 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           t={t}
           shareUrl={shareHandlers.challengeUrl}
         />
+        <ShareSection
+          solved={result.solved}
+          onShare={shareHandlers.handleNativeShare}
+          onChallengeShare={shareHandlers.handleChallengeShare}
+          onRetry={coinActions.handleRetryChallenge}
+          onRetryFree={onRetryFree}
+          canAffordRetry={coinActions.canAffordRetry}
+          retryCost={coinActions.retryCost}
+          currentCoins={coinActions.currentCoins}
+          onWhatsApp={shareHandlers.handleWhatsApp}
+          onTwitter={shareHandlers.handleTwitter}
+          onTelegram={shareHandlers.handleTelegram}
+          onCopy={shareHandlers.handleCopy}
+          onDownloadImage={shareHandlers.handleDownloadShareImage}
+          copied={shareHandlers.copied}
+          isGeneratingImage={shareHandlers.isGeneratingImage}
+          onSpendStart={onSpendStart}
+          t={t}
+        />
+
         {failStateNode}
         {leaderboardNode}
-        {signupNode}
+        {signupLineNode}
+        {signupModalNode}
       </div>
     );
   }
@@ -422,16 +459,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   return (
   <div className="space-y-4">
     {heroNode}
-
-    <EmojiShareCard
-      puzzleNumber={puzzleNumber}
-      score={result.efficiencyScore ?? 0}
-      solved={result.solved}
-      words={emojiWords}
-      language={language}
-      t={t}
-      shareUrl={shareHandlers.challengeUrl}
-    />
+    {masteryRatingNode}
 
     {/* Primary CTA — one or the other, never both */}
     {/* Exactly ONE primary CTA renders: these two are guarded by `!wordWheelPlayed`
@@ -444,7 +472,22 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
     {/* Share and retry sit with the emoji grid, NOT inside the recap. The grid
         is the shareable artifact and this is how it leaves the app — burying the
-        share action behind a disclosure is the opposite of the goal. */}
+        share action behind a disclosure is the opposite of the goal.
+
+        The grid was dropped from this screen during the subtraction rounds and
+        restored here: it is the one growth mechanic that works with a population
+        of one (a spoiler-free result anyone can post), and the bar's own research
+        credits this exact format as the biggest driver of Wordle's spread. It was
+        never on the deliberate removal list. */}
+    <EmojiShareCard
+      puzzleNumber={puzzleNumber}
+      score={result.efficiencyScore ?? 0}
+      solved={result.solved}
+      words={emojiWords}
+      language={language}
+      t={t}
+      shareUrl={shareHandlers.challengeUrl}
+    />
     <ShareSection
       solved={result.solved}
       onShare={shareHandlers.handleNativeShare}
@@ -468,11 +511,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     {/* Leaderboard — who else played, and how you stack up. */}
     {leaderboardNode}
 
-    {/* Catch-up dailies — the one card here that offers ANOTHER GAME, so it
-        stays out of the recap disclosure. It self-hides when there is nothing
-        to catch up, so it costs no height on the screens it does not apply to. */}
-    <CatchUpSuggestion excludeDate={puzzleDate} />
-
     {/* Full recap — the long tail. `CollapsibleSection` (not `Collapsible`)
         because it takes a `summary`: a bare chevron labelled "Full recap" gives
         the player no reason to tap it. Same disclosure the wheel results use. */}
@@ -491,17 +529,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           past={pastPerformance}
           t={t}
         />
-
-        {/* Head-to-head rival */}
-        {rival && (
-          <RivalCompareCard
-            rivalName={rival.name}
-            rivalEmoji={rival.emoji}
-            rivalScore={rival.score}
-            myScore={result.efficiencyScore ?? 0}
-            t={t}
-          />
-        )}
 
         {/* Streak freeze shields */}
         {(freezesAvailable > 0 || isStreakProtected) && (
@@ -567,17 +594,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         {/* Daily Insights */}
         <DailyInsightStack mode="word_hunt" date={puzzleDate} />
 
-        {/* MP cross-promo */}
-        {wordWheelPlayed && (
-          <MpModeCrossPromo language={language} source="word_hunt_results" t={t} />
-        )}
-
         {/* Fail state (reveal target) */}
         {failStateNode}
 
 
-        {/* Inline signup */}
-        {signupNode}
+        {/* Minimal signup line — guests see this in the default scroll path */}
+        {signupLineNode}
 
         {/* Daily complete badge */}
         {wordWheelPlayed && (
@@ -642,19 +664,11 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
         {/* Suggest word */}
         <SuggestWordCard language={language} playerId={profile?.id} guestFingerprint={guestFingerprint} />
-
-        {/* More options */}
-        <MoreOptionsAccordion
-          isAuthenticated={isAuthenticated}
-          solved={result.solved}
-          currentLanguage={language}
-          onCreatePuzzle={onShowCreatePuzzle}
-          onGameLanguageChange={onGameLanguageChange}
-          t={t}
-        />
       </div>
     </CollapsibleSection>
 
+    {/* Signup modal — only shown if user tapped the minimal line */}
+    {signupModalNode}
   </div>
   );
 };

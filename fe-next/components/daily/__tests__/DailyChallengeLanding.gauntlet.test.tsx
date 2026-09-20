@@ -128,18 +128,20 @@ describe('DailyChallengeLanding - ScoreGauntletBanner integration', () => {
       expect(screen.getByText(/847/)).toBeInTheDocument();
     });
 
-    it('THEN banner appears above the Word Hunt quest card', () => {
+    it('THEN banner appears above the quest cards section', () => {
       const { container } = render(<DailyChallengeLanding {...defaultProps} />);
 
       const banner = container.querySelector('[data-testid="score-gauntlet-banner"]');
-      const wordHuntCard = container.querySelector('[data-testid="quest-card-wordHunt"]');
+      // The quest cards are rendered as a primary hero + secondary rows.
+      // Assert the banner precedes the secondary-modes container (where compact rows live).
+      const secondaryModes = container.querySelector('[data-testid="secondary-modes"]');
 
       expect(banner).toBeInTheDocument();
-      expect(wordHuntCard).toBeInTheDocument();
+      expect(secondaryModes).toBeInTheDocument();
 
-      // Banner should come before the wordHunt quest card in the DOM
+      // Banner should come before the secondary modes container in the DOM
       const position =
-        banner!.compareDocumentPosition(wordHuntCard!) &
+        banner!.compareDocumentPosition(secondaryModes!) &
         Node.DOCUMENT_POSITION_FOLLOWING;
       expect(position).toBeTruthy();
     });
