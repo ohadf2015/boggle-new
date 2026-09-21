@@ -39,3 +39,15 @@ Raw output: `/tmp/edu-gauntlet/teacher-ux/PLAN.raw.md`. This file keeps only the
 - Rename GO LIVE → Start Game (brand voice vs. teacher vocabulary).
 - Adoption tracking for Reports, Lessons and Classes once the items above ship.
 - A proper Hebrew RTL walkthrough of the teacher tabs (small sample, but worth a manual pass).
+
+## Decisions (2026-09-21, owner delegated)
+- **GO LIVE stays.** The teacher who complained never reached the dashboard, and nothing shows the label confusing anyone.
+  It is the one tested primary action; renaming it in six locales without evidence is churn. Revisit only if
+  dashboard sessions show teachers stalling before pressing it.
+- **Landing stays at ~12 screens at 390px** (down from 17.2). The actual complaint, a dead-end "PLAY NOW" button and
+  setup steps hidden behind sign-up, is fixed. Pricing and marketing sections stay until scroll-depth data
+  shows where visitors stop.
+- **No reply to the teacher who complained.** Her account, profile, identities and every email-keyed DB row are
+  erased (a hash-only audit row is in `gdpr_delete_backup_20260921`). Her **PostHog person record is kept on purpose**,
+  and it still holds her email as a person property. To honour the email half of her request without losing the
+  analytics, strip only that property: PostHog → person → properties → delete `email` (needs a key with `person:write`).
