@@ -6,11 +6,13 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { AchievementGrid } from '@/components/adventure/achievements';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
@@ -21,11 +23,24 @@ import {
 
 export function AchievementsPageClient() {
   const { t, language } = useLanguage();
+  const { canSeeInWorkModes, loading, user, profile } = useAuth();
+  const router = useRouter();
   const { achievementCounts } = useAdventureAchievements();
   const [selectedAchievement, setSelectedAchievement] = useState<{
     achievement: typeof ADVENTURE_ACHIEVEMENTS[AdventureAchievementId];
     count: number;
   } | null>(null);
+
+  // Same beta/admin gate as /adventure. The sub-route was public while the
+  // parent was gated, so a guessable URL skipped the work-mode wall.
+  const isDev = process.env.NODE_ENV === 'development';
+  const resolving = loading || (!!user && !profile);
+  const denied = !resolving && !canSeeInWorkModes && !isDev;
+  useEffect(() => {
+    if (denied) {
+      router.replace(`/${language}`);
+    }
+  }, [denied, language, router]);
 
   const handleSelectAchievement = useCallback((id: AdventureAchievementId) => {
     const achievement = ADVENTURE_ACHIEVEMENTS[id];
@@ -38,6 +53,8 @@ export function AchievementsPageClient() {
   const handleCloseModal = useCallback(() => {
     setSelectedAchievement(null);
   }, []);
+
+  if (resolving || denied) return null;
 
   return (
     <div

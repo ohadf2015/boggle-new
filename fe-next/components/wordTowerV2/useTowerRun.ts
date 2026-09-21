@@ -28,6 +28,7 @@ import { type RewardId, steadySwing } from '@/lib/wordTowerV2/rewards';
 import { type RunState, type SurprisePayout, applyLanding, consumeDrop, createRun } from '@/lib/wordTowerV2/run';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
 import { towerRisk } from '@/lib/wordTowerV2/stability';
+import { endV2Run, startV2Run } from '@/lib/wordTowerV2/telemetry';
 import type { TowerFx } from './TowerCanvas';
 
 /**
@@ -123,6 +124,7 @@ export function useTowerRun() {
   const unlockedRef = useRef<Set<string>>(new Set());
   const seenBiomesRef = useRef(new Set<string>(['downtown']));
   const bannerKeyRef = useRef(0);
+  const startedAtRef = useRef<number | null>(null);
   /**
    * Empire perks, fed in by the estate (NEUTRAL until it has loaded, so a run
    * that starts before auth settles simply plays unperked rather than flipping
@@ -245,6 +247,10 @@ export function useTowerRun() {
     fxRef.current.push({ kind: 'collapse' });
     playSound('defeatSting');
     setPhase('over');
+    endV2Run(startedAtRef, {
+      floors: statsRef.current.peakFloors,
+      heightM: peak,
+    });
   }, [playSound, resolveLanding]);
 
   // One poll drives the HUD height, verdicts, new skies and collapse.
@@ -335,6 +341,7 @@ export function useTowerRun() {
   const hoist = useCallback(
     (word: string) => {
       if (phase !== 'composing') return;
+      startV2Run(startedAtRef);
       const world = worldRef.current;
       preHoistRef.current = { run: runRef.current, longestWord: statsRef.current.longestWord };
       const spent = consumeDrop(runRef.current);
@@ -423,6 +430,7 @@ export function useTowerRun() {
   }, [playSound, resolveLanding]);
 
   const restart = useCallback(() => {
+    startedAtRef.current = null;
     runNoRef.current += 1;
     dropCountRef.current = 0;
     worldRef.current = createTowerWorld({ seed: runNoRef.current });
