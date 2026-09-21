@@ -47,4 +47,17 @@ describe('FREE_TIER_LIMITS', () => {
     // stay finite — a secondary teacher with five or six sections is the upsell.
     expect(FREE_TIER_LIMITS.classes).toBeLessThan(5);
   });
+
+  it('lets a free teacher run a real week of assignments before the cap binds', () => {
+    // Same reasoning as the class cap: a paywall that trips before the teacher has
+    // run the create-assign-play loop removes them instead of converting them.
+    expect(FREE_TIER_LIMITS.assignmentsPerClass).toBeGreaterThan(1);
+  });
+
+  it('keeps the assignment cap finite, so Pro has something to lift', () => {
+    // An infinite free cap makes the usage-triggered ask (teacherUsagePrompt.ts) a
+    // bluff: the prompt fires at 3+ created assignments and the cap must be there
+    // to make the copy honest.
+    expect(FREE_TIER_LIMITS.assignmentsPerClass).toBeLessThan(10);
+  });
 });

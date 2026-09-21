@@ -5,10 +5,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TeacherProAskBanner } from '@/components/teacher/TeacherProAskBanner';
+import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherProMilestone } from '@/hooks/useTeacherProMilestone';
+import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -29,6 +31,13 @@ function TeacherDashboardInner() {
     dismissed,
     dismiss,
   } = useTeacherProMilestone();
+  const {
+    reason: usageReason,
+    count: usageCount,
+    loading: usageLoading,
+    dismissed: usageDismissed,
+    dismiss: dismissUsagePrompt,
+  } = useTeacherUsagePrompt();
 
   // At most one banner above the dashboard. This page used to stack a trial
   // countdown, a district-pricing upsell and a Pro strip before the thing the
@@ -50,6 +59,20 @@ function TeacherDashboardInner() {
   });
   const banner = picked === 'trial' && !hasRecentConfig ? null : picked;
 
+  // The usage-triggered card sits in the dashboard rail, not the banner slot.
+  // It waits for a REAL limit hit (10+ students in a class, or 3+ assignments
+  // created in one) and stays down while the milestone banner is already up —
+  // two Pro asks on one screen is the stacked-prompt defect the banner
+  // priority picker exists to prevent. Pro teachers (paid or gifted) never
+  // see it.
+  const showUsagePrompt =
+    !hasPro &&
+    !proLoading &&
+    !usageLoading &&
+    usageReason !== null &&
+    !usageDismissed &&
+    banner !== 'pro';
+
   useEffect(() => {
     if (banner === 'pro') {
       trackGrowthEvent('iap_viewed', { product: 'teacher_pro', source: 'dashboard_banner', event_type: 'impression' });
@@ -66,6 +89,15 @@ function TeacherDashboardInner() {
           <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
         ) : banner === 'pro' ? (
           <TeacherProAskBanner onDismiss={dismiss} />
+        ) : undefined
+      }
+      usagePrompt={
+        showUsagePrompt && usageReason ? (
+          <TeacherProUsagePromptCard
+            reason={usageReason}
+            count={usageCount}
+            onDismiss={dismissUsagePrompt}
+          />
         ) : undefined
       }
     />
