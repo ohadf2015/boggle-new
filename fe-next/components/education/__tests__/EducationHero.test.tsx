@@ -14,13 +14,13 @@ vi.mock('@/utils/growthTracking', () => ({
 describe('EducationHero', () => {
   beforeEach(() => mockTrackLandingCtaClick.mockClear());
 
-  it('renders a primary Teacher Pro checkout CTA and a secondary free-access path', () => {
+  it('renders a primary free-access path and a secondary Teacher Pro checkout CTA', () => {
     render(<EducationHero />);
+    const free = screen.getByTestId('education-hero-free-cta');
+    expect(free).toHaveAttribute('href', '/en/education/access');
     const pro = screen.getByTestId('education-hero-pro-cta');
     expect(pro).toHaveAttribute('href', '/en/teacher/upgrade');
     expect(pro.textContent).toMatch(/\$9/);
-    const free = screen.getByTestId('education-hero-free-cta');
-    expect(free).toHaveAttribute('href', '/en/education/access');
   });
 
   it('no longer renders the secondary "see it in action" anchor', () => {
@@ -54,10 +54,26 @@ describe('EducationHero', () => {
     expect(mockTrackLandingCtaClick).toHaveBeenCalledWith('hero_for_schools');
   });
 
+  it('renders free CTA as primary (lime, large, pulsing) and Pro as secondary (outlined)', () => {
+    render(<EducationHero />);
+    const free = screen.getByTestId('education-hero-free-cta');
+    const pro = screen.getByTestId('education-hero-pro-cta');
+
+    // Free CTA should be primary: lime background, large text
+    expect(free.className).toMatch(/bg-neo-lime/);
+    expect(free.className).toMatch(/text-lg/);
+    expect(free.className).toMatch(/animate-pulse/);
+
+    // Pro CTA should be secondary: outlined style, no pulse
+    expect(pro.className).toMatch(/border-neo-cyan/);
+    expect(pro.className).not.toMatch(/bg-neo-lime/);
+    expect(pro.className).not.toMatch(/animate-pulse/);
+  });
+
   it('ensures h1 and primary CTA precede the product mock in source order (mobile-first)', () => {
     const { container } = render(<EducationHero />);
     const h1 = screen.getByRole('heading', { level: 1 });
-    const primaryCTA = screen.getByTestId('education-hero-pro-cta');
+    const primaryCTA = screen.getByTestId('education-hero-free-cta');
     const mockElement = screen.getByTestId('mock-join-code').closest('[data-hero-item]');
 
     // H1 should come before CTA (semantic order)
