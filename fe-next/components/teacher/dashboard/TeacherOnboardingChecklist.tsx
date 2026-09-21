@@ -70,6 +70,12 @@ export interface TeacherOnboardingChecklistProps {
   reportsHref: string;
   onCreateClassroom: () => void;
   onCreateAssignment: () => void;
+  /**
+   * When true, hides the create-classroom CTA button because the primary
+   * action is elsewhere (e.g., PlayTabFirstRunCard on the dashboard).
+   * @default false — button is shown when this is the current step
+   */
+  hideCreateClassroomCta?: boolean;
   className?: string;
 }
 
@@ -82,6 +88,7 @@ export function TeacherOnboardingChecklist({
   reportsHref,
   onCreateClassroom,
   onCreateAssignment,
+  hideCreateClassroomCta = false,
   className,
 }: TeacherOnboardingChecklistProps) {
   const { t, language } = useLanguage();
@@ -176,7 +183,7 @@ export function TeacherOnboardingChecklist({
                   >
                     {t(copy.ctaKey)}
                   </Link>
-                ) : isCurrent && !(step.id === 'create_classroom' && classroomCount === 0) ? (
+                ) : isCurrent && !(step.id === 'create_classroom' && hideCreateClassroomCta) ? (
                   <button
                     type="button"
                     data-testid={copy.testId}
@@ -214,6 +221,7 @@ export interface TeacherOnboardingChecklistLiveProps {
   reportsHref: string;
   onCreateClassroom: () => void;
   onCreateAssignment: () => void;
+  hideCreateClassroomCta?: boolean;
   className?: string;
 }
 
@@ -229,6 +237,7 @@ export function TeacherOnboardingChecklistLive({
   reportsHref,
   onCreateClassroom,
   onCreateAssignment,
+  hideCreateClassroomCta = false,
   className,
 }: TeacherOnboardingChecklistLiveProps) {
   const [assignmentCount, setAssignmentCount] = useState<number | null>(
@@ -274,6 +283,7 @@ export function TeacherOnboardingChecklistLive({
       reportsHref={reportsHref}
       onCreateClassroom={onCreateClassroom}
       onCreateAssignment={onCreateAssignment}
+      hideCreateClassroomCta={hideCreateClassroomCta}
       className={className}
     />
   );

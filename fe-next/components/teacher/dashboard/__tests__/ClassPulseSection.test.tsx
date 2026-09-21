@@ -88,24 +88,20 @@ describe('ClassPulseSection', () => {
     expect(onPlay).not.toHaveBeenCalled();
   });
 
-  it('suppresses play/playAgain button (primary action is GO LIVE)', async () => {
-    // CONSOLIDATION FIX: when the pulse card's action is 'play' or 'playAgain',
-    // the primary launch path is GO LIVE (PlayNowLauncher) on the dashboard.
-    // The pulse card's button is suppressed to avoid duplicate launch paths.
-
+  it('routes both play and playAgain to this screen\'s launch control', async () => {
     setPulse({ rosterCount: 3, lastGame: null });
-    renderSection();
-    // The 'play' action button should not be rendered
-    expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+    const first = renderSection();
+    await userEvent.click(screen.getByTestId('class-pulse-action'));
+    expect(first.onPlay).toHaveBeenCalledTimes(1);
 
     vi.clearAllMocks();
     setPulse({
       rosterCount: 3,
       lastGame: { ...reviewGame, players: [{ studentId: 's1', name: 'Ada', accuracyPct: 99 }], missedWords: [] },
     });
-    renderSection();
-    // The 'playAgain' action button should not be rendered
-    expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+    const second = renderSection();
+    await userEvent.click(screen.getAllByTestId('class-pulse-action').at(-1)!);
+    expect(second.onPlay).toHaveBeenCalledTimes(1);
   });
 
   it('opens exactly ONE review lesson, with the words the class missed', async () => {
@@ -151,5 +147,47 @@ describe('ClassPulseSection', () => {
 
     expect(screen.getByTestId('class-pulse')).toHaveAttribute('data-state', 'unknown');
     expect(screen.queryByTestId('class-pulse-loading')).not.toBeInTheDocument();
+  });
+
+  describe('hidePlayAction prop', () => {
+    it('shows play button by default when hidePlayAction is false', () => {
+      // ClassPulseSection defaults to showing the play button. The dashboard
+      // consumer can opt-in to hiding it via the hidePlayAction prop.
+      setPulse({ rosterCount: 3, lastGame: null });
+      renderSection();
+
+      // The play button should be rendered by default
+      expect(screen.getByTestId('class-pulse-action')).toBeInTheDocument();
+      expect(screen.getByTestId('class-pulse-action')).toHaveTextContent('teacher.pulse.action.play');
+    });
+
+    it('can suppress play button when hidePlayAction={true} is passed', () => {
+      // When the dashboard has GO LIVE as the primary launch path, it passes
+      // hidePlayAction={true} to avoid duplicate buttons.
+      setPulse({ rosterCount: 3, lastGame: null });
+
+      // Simulate passing hidePlayAction={true} from TeacherDashboard
+      mockUseClassPulse.mockReturnValue({
+        pulse: deriveClassPulse({ rosterCount: 3, lastGame: null, now: NOW }),
+        isLoading: false,
+        error: null,
+        refresh: vi.fn(),
+      });
+
+      const { container } = render(
+        <ClassPulseSection
+          classroomId="class1"
+          classroomName="Test Class"
+          rosterCount={3}
+          onInvite={vi.fn()}
+          onPlay={vi.fn()}
+          onReviewWords={vi.fn()}
+          hidePlayAction={true}
+        />
+      );
+
+      // The play button should be suppressed
+      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+    });
   });
 });

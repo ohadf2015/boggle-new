@@ -347,9 +347,9 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
                 reportsHref={reportsHref}
                 onCreateClassroom={focusCreateClassroom}
                 onCreateAssignment={() => setShowAssignmentCreator(true)}
+                hideCreateClassroomCta={classrooms.length === 0 || !!newlyCreatedJoinCode}
               />
             )}
-
             {!classroomsLoading && selectedClassroom && (
               <>
                 <StudentCapMeter
@@ -365,6 +365,8 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
                   onInvite={() => router.push(`/${language}/teacher/classroom`)}
                   onPlay={focusLauncher}
                   onReviewWords={openReviewLesson}
+                  // GO LIVE is the primary launch path; suppress duplicate button
+                  hidePlayAction
                 />
               </>
             )}

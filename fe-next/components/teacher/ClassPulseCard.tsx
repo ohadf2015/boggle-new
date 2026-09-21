@@ -108,6 +108,12 @@ export interface ClassPulseCardProps {
   onAction?: (action: ClassNextAction) => void;
   /** Review hands the missed words up so the parent can seed a lesson. */
   onReviewWords?: (words: string[]) => void;
+  /**
+   * When true, suppresses the play/playAgain button because the primary
+   * launch path is elsewhere (e.g., GO LIVE on the dashboard).
+   * @default false — button is shown for all actions
+   */
+  hidePlayAction?: boolean;
   className?: string;
 }
 
@@ -117,6 +123,7 @@ export function ClassPulseCard({
   isLoading = false,
   onAction,
   onReviewWords,
+  hidePlayAction = false,
   className,
 }: ClassPulseCardProps) {
   const { t } = useLanguage();
@@ -276,10 +283,10 @@ export function ClassPulseCard({
             {/* Exactly ONE next action. A class in one state has one obvious
                 move; a row of buttons is the teacher doing the triage.
 
-                CONSOLIDATION: when the action is 'play' or 'playAgain', the
-                primary action is GO LIVE (PlayNowLauncher) on this same page.
-                Suppress the duplicate button to avoid a second launch path. */}
-            {pulse.nextAction !== 'play' && pulse.nextAction !== 'playAgain' && (
+                When hidePlayAction is true and the action is 'play' or
+                'playAgain', suppress the button because the primary action is
+                elsewhere (e.g., GO LIVE on the dashboard). */}
+            {!(hidePlayAction && (pulse.nextAction === 'play' || pulse.nextAction === 'playAgain')) && (
               <button
                 type="button"
                 data-testid="class-pulse-action"

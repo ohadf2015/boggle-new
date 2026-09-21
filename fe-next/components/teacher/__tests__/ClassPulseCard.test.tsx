@@ -67,17 +67,14 @@ describe('ClassPulseCard', () => {
       expect(screen.queryByTestId('class-pulse-participation')).not.toBeInTheDocument();
     });
 
-    it('derives play state (button suppressed in dashboard context)', () => {
-      // CONSOLIDATION FIX: when nextAction is 'play', the button is
-      // suppressed because GO LIVE (PlayNowLauncher) is the primary path.
+    it('asks the teacher to play, as the single next action', () => {
       const pulse = deriveClassPulse({ rosterCount: 28, lastGame: null, now: NOW });
 
       render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} />);
 
-      // The pulse card correctly derives nextAction as 'play', but the
-      // button is not rendered (suppressed in the dashboard context).
-      expect(pulse.nextAction).toBe('play');
-      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+      const actions = screen.getAllByTestId(/^class-pulse-action/);
+      expect(actions).toHaveLength(1);
+      expect(actions[0]).toHaveTextContent('teacher.pulse.action.play');
     });
   });
 
@@ -199,10 +196,7 @@ describe('ClassPulseCard', () => {
   });
 
   describe('given a healthy class', () => {
-    it('shows playAgain state (button suppressed in dashboard context)', () => {
-      // CONSOLIDATION FIX: when nextAction is 'playAgain', the button is
-      // suppressed because GO LIVE (PlayNowLauncher) is the primary path.
-      // This test verifies the state is derived correctly, not clickability.
+    it('invites another game rather than inventing a problem', async () => {
       const onAction = vi.fn();
       const pulse = deriveClassPulse({
         rosterCount: 10,
@@ -216,11 +210,8 @@ describe('ClassPulseCard', () => {
       render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} onAction={onAction} />);
       expect(screen.queryByTestId('class-pulse-struggling')).not.toBeInTheDocument();
 
-      // The pulse card correctly derives nextAction as 'playAgain', but the
-      // button is not rendered (suppressed in the dashboard context).
-      expect(pulse.nextAction).toBe('playAgain');
-      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
-      expect(onAction).not.toHaveBeenCalled();
+      await userEvent.click(screen.getByTestId('class-pulse-action'));
+      expect(onAction).toHaveBeenCalledWith('playAgain');
     });
   });
 
@@ -253,6 +244,57 @@ describe('ClassPulseCard', () => {
       expect(screen.getByTestId('class-pulse')).toHaveAttribute('data-state', 'loading');
       expect(screen.getByTestId('class-pulse-stripe')).toHaveAttribute('data-state', 'loading');
       expect(screen.queryByText('teacher.pulse.state.neverPlayed')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('hidePlayAction prop', () => {
+    it('hides the play button when hidePlayAction is true and action is play', () => {
+      const pulse = deriveClassPulse({ rosterCount: 28, lastGame: null, now: NOW });
+      expect(pulse.nextAction).toBe('play');
+
+      render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} hidePlayAction />);
+
+      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+    });
+
+    it('hides the playAgain button when hidePlayAction is true and action is playAgain', () => {
+      const pulse = deriveClassPulse({
+        rosterCount: 10,
+        lastGame: playedGame({
+          players: [{ studentId: 's1', name: 'Ada', accuracyPct: 95 }],
+          missedWords: [],
+        }),
+        now: NOW,
+      });
+      expect(pulse.nextAction).toBe('playAgain');
+
+      render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} hidePlayAction />);
+
+      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+    });
+
+    it('shows the play button when hidePlayAction is false (default)', () => {
+      const pulse = deriveClassPulse({ rosterCount: 28, lastGame: null, now: NOW });
+
+      render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} hidePlayAction={false} />);
+
+      const actions = screen.getAllByTestId(/^class-pulse-action/);
+      expect(actions).toHaveLength(1);
+      expect(actions[0]).toHaveTextContent('teacher.pulse.action.play');
+    });
+
+    it('shows non-play actions even when hidePlayAction is true', () => {
+      const onAction = vi.fn();
+      const pulse = deriveClassPulse({ rosterCount: 10, lastGame: playedGame(), now: NOW });
+      expect(pulse.nextAction).toBe('review');
+
+      render(
+        <ClassPulseCard classroomName="3rd Grade" pulse={pulse} onAction={onAction} hidePlayAction />
+      );
+
+      // Review action should still show
+      expect(screen.getByTestId('class-pulse-action')).toBeInTheDocument();
+      expect(screen.getByTestId('class-pulse-action')).toHaveTextContent('teacher.pulse.action.review');
     });
   });
 });

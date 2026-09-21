@@ -49,7 +49,7 @@ describe('TeacherOnboardingChecklist', () => {
     });
   });
 
-  it('suppresses the create-classroom CTA for zero-classroom teachers but fires view event', () => {
+  it('routes the empty classroom step to the create-classroom CTA', () => {
     const onCreateClassroom = vi.fn();
     render(
       <TeacherOnboardingChecklist
@@ -65,16 +65,15 @@ describe('TeacherOnboardingChecklist', () => {
 
     const card = screen.getByTestId('teacher-onboarding-checklist');
     expect(card).toHaveAttribute('data-current', 'create_classroom');
-
-    // The create-classroom CTA button is hidden when classroomCount === 0
-    // because PlayTabFirstRunCard is the primary CTA (consolidation fix).
-    // The view event still fires, but the button is not clickable.
-    expect(screen.queryByTestId('teacher-onboarding-cta-create-classroom')).not.toBeInTheDocument();
-
-    // Verify the view event is fired even though the CTA is hidden.
+    fireEvent.click(screen.getByTestId('teacher-onboarding-cta-create-classroom'));
+    expect(onCreateClassroom).toHaveBeenCalledTimes(1);
     expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({
       step: 'create_classroom',
       action: 'view',
+    });
+    expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({
+      step: 'create_classroom',
+      action: 'cta',
     });
   });
 
@@ -161,5 +160,96 @@ describe('TeacherOnboardingChecklist', () => {
       />,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+
+  describe('hideCreateClassroomCta prop', () => {
+    it('hides the create-classroom CTA when hideCreateClassroomCta is true', () => {
+      const onCreateClassroom = vi.fn();
+      render(
+        <TeacherOnboardingChecklist
+          classroomCount={0}
+          assignmentCount={null}
+          rosterCount={0}
+          hasProgressReport={null}
+          joinCode={undefined}
+          reportsHref="/en/teacher/reports"
+          onCreateClassroom={onCreateClassroom}
+          onCreateAssignment={vi.fn()}
+          hideCreateClassroomCta={true}
+        />,
+      );
+
+      const card = screen.getByTestId('teacher-onboarding-checklist');
+      expect(card).toHaveAttribute('data-current', 'create_classroom');
+
+      // The create-classroom CTA button is hidden
+      expect(screen.queryByTestId('teacher-onboarding-cta-create-classroom')).not.toBeInTheDocument();
+
+      // But the view event should still fire
+      expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({
+        step: 'create_classroom',
+        action: 'view',
+      });
+    });
+
+    it('shows the create-classroom CTA when hideCreateClassroomCta is false (default)', () => {
+      const onCreateClassroom = vi.fn();
+      render(
+        <TeacherOnboardingChecklist
+          classroomCount={0}
+          assignmentCount={null}
+          rosterCount={0}
+          hasProgressReport={null}
+          joinCode={undefined}
+          reportsHref="/en/teacher/reports"
+          onCreateClassroom={onCreateClassroom}
+          onCreateAssignment={vi.fn()}
+          hideCreateClassroomCta={false}
+        />,
+      );
+
+      // The create-classroom CTA button should be visible
+      const button = screen.getByTestId('teacher-onboarding-cta-create-classroom');
+      expect(button).toBeInTheDocument();
+
+      // Clicking it should call the callback
+      fireEvent.click(button);
+      expect(onCreateClassroom).toHaveBeenCalledTimes(1);
+
+      // And fire the telemetry event
+      expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({
+        step: 'create_classroom',
+        action: 'cta',
+      });
+    });
+
+    it('preserves telemetry continuity when create CTA is hidden on the dashboard', () => {
+      // When hideCreateClassroomCta is true, the first-run card on the
+      // dashboard will fire the 'cta' event when the teacher creates a class.
+      // This test verifies the component still fires the 'view' event.
+      const onCreateClassroom = vi.fn();
+      render(
+        <TeacherOnboardingChecklist
+          classroomCount={0}
+          assignmentCount={null}
+          rosterCount={0}
+          hasProgressReport={null}
+          joinCode={undefined}
+          reportsHref="/en/teacher/reports"
+          onCreateClassroom={onCreateClassroom}
+          onCreateAssignment={vi.fn()}
+          hideCreateClassroomCta={true}
+        />,
+      );
+
+      // The view event fires even with the CTA hidden
+      expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({
+        step: 'create_classroom',
+        action: 'view',
+      });
+
+      // No 'cta' event is fired from this component (because the button is
+      // hidden), but PlayTabFirstRunCard will fire it when the teacher clicks there
+    });
   });
 });
