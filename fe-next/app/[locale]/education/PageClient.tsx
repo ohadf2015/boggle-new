@@ -15,6 +15,7 @@ import { MoatTrifectaSection } from '@/components/education/MoatTrifectaSection'
 import { ProFramingSection } from '@/components/education/ProFramingSection';
 import { SixModeTour } from '@/components/education/SixModeTour';
 import { ComparisonStrip } from '@/components/education/ComparisonStrip';
+import { TeacherSetupSection } from '@/components/education/TeacherSetupSection';
 import { EducationFAQ } from '@/components/education/EducationFAQ';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -256,6 +257,11 @@ export function PageClient() {
             <SixModeTour />
           </div>
           <ComparisonStrip />
+          {/* "…how it compares" used to hand straight over to "pick your role",
+              which asked a teacher to commit before anyone had shown them what
+              running a class actually involves. The steps were written, but
+              only ever rendered behind TeacherGate. */}
+          <TeacherSetupSection />
         </>
       )}
 

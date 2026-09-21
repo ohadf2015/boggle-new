@@ -149,6 +149,21 @@ describe('Education Landing — redesign (WU-9)', () => {
       expect(teacherAccessLink).toHaveAttribute('href', expect.stringContaining('/education/access'));
     });
 
+    /**
+     * A teacher emailed to say the classroom setup instructions were not
+     * accessible, and left. They were right: every explainer we had (the
+     * first-run TeacherOnboarding modal, the #1099 dashboard checklist) sat
+     * behind TeacherGate, and none of the eight landing FAQs answer "how do I
+     * run this with my class". This asserts the steps are readable BEFORE
+     * signing up — the one line that fixes it is otherwise unguarded.
+     */
+    it('shows the classroom setup steps to a visitor who has not signed up', () => {
+      render(<EducationPageClient />);
+      for (const id of ['create', 'share', 'join', 'play', 'results']) {
+        expect(screen.getByTestId(`onboarding-step-${id}`)).toBeInTheDocument();
+      }
+    });
+
     it('ships an above-fold Teacher Pro checkout CTA to teacher/upgrade with $9', () => {
       render(<EducationPageClient />);
       const pro = screen.getByTestId('teacher-pro-checkout-link');
