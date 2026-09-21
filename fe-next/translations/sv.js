@@ -13850,6 +13850,7 @@ const sv = {
       "coverageMeterLabel": "{{percent}} % av lektionens ord hittade",
       "moreWaysToReteach": "Fler sätt att repetera orden",
       "fullReport": "Fullständig rapport",
+      "unlockReport": "Lås upp fullständig rapport — {{price}}/mån",
       "neverPlaced": "Kom aldrig med på spelplanen",
       "neverPlacedHint": "Spelplanen fick inte plats med dem — klassen såg dem aldrig. Kör en returmatch så får de en ny chans.",
       "needsHelp": {

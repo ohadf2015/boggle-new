@@ -7,7 +7,7 @@ import posthog from '@/lib/analytics/lazyPosthog';
 
 export const RESULTS_ACTION_EVENT = 'results_primary_action_clicked';
 
-export type ResultsAction = 'rematch' | 'view_report' | 'play_again' | 'practice';
+export type ResultsAction = 'rematch' | 'view_report' | 'play_again' | 'practice' | 'unlock_report';
 export type ResultsSurface = 'teacher_card' | 'projector' | 'student';
 
 export function trackResultsAction(action: ResultsAction, surface: ResultsSurface): void {

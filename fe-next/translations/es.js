@@ -13564,6 +13564,7 @@ const es = {
       "coverageMeterLabel": "{{percent}} % de las palabras de la lección encontradas",
       "moreWaysToReteach": "Más formas de repasar estas palabras",
       "fullReport": "Informe completo",
+      "unlockReport": "Desbloquear informe completo — {{price}}/mes",
       "neverPlaced": "Nunca aparecieron en el tablero",
       "neverPlacedHint": "No cabían en el tablero: la clase nunca las vio. Juega una revancha para darles otra oportunidad.",
       "needsHelp": {

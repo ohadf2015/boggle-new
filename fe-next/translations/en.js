@@ -12170,6 +12170,7 @@ const en = {
       "coverageMeterLabel": "{{percent}}% of the lesson words found",
       "moreWaysToReteach": "More ways to reteach these words",
       "fullReport": "Full report",
+      "unlockReport": "Unlock full report — {{price}}/mo",
       "neverPlaced": "Never appeared on the board",
       "neverPlacedHint": "The board could not fit these — the class never saw them. Run a rematch to give them another chance.",
       "needsHelp": {

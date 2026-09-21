@@ -2449,6 +2449,7 @@ const ru = {
       "coverageMeterLabel": "Найдено {{percent}} % слов урока",
       "moreWaysToReteach": "Другие способы повторить эти слова",
       "fullReport": "Полный отчёт",
+      "unlockReport": "Открыть полный отчёт — {{price}}/мес",
       "neverPlaced": "Не попали на поле",
       "neverPlacedHint": "Они не поместились на поле — класс их не видел. Сыграйте реванш, чтобы дать им шанс.",
       "needsHelp": {

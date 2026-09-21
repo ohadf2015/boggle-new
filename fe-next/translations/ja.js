@@ -13615,6 +13615,7 @@ const ja = {
       "coverageMeterLabel": "レッスン単語の{{percent}}%を発見",
       "moreWaysToReteach": "この単語を復習する他の方法",
       "fullReport": "詳細レポート",
+      "unlockReport": "詳細レポートを解除 — 月{{price}}",
       "neverPlaced": "盤面に出なかった単語",
       "neverPlacedHint": "盤面に入りきらず、クラスは一度も見ていません。もう一度対戦すればチャンスがあります。",
       "needsHelp": {

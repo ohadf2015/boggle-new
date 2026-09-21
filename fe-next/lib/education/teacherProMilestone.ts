@@ -19,6 +19,8 @@ export const TEACHER_PRO_MILESTONE_MIN_STUDENTS = 3;
 export const TEACHER_PRO_MILESTONE_MIN_COMPLETED = 5;
 
 export const TEACHER_PRO_ASK_DISMISS_KEY = 'lexiclash.teacher_pro_ask_dismissed';
+/** After a "not now", stay quiet this long, then ask again if they are still free. */
+export const TEACHER_PRO_ASK_DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export type ClassroomEngagementSnapshot = {
   studentCount: number;
@@ -46,10 +48,21 @@ export function teacherHitsProUpgradeMilestone(
 }
 
 export function isTeacherProAskDismissed(
-  storage: { getItem(key: string): string | null } | null | undefined,
+  storage: { getItem(key: string): string | null; setItem?(key: string, value: string): void } | null | undefined,
+  now: number = Date.now(),
 ): boolean {
   try {
-    return storage?.getItem(TEACHER_PRO_ASK_DISMISS_KEY) === '1';
+    const raw = storage?.getItem(TEACHER_PRO_ASK_DISMISS_KEY);
+    if (!raw) return false;
+    // Legacy permanent flag from PR #1079 — start a TTL window so the 40 free
+    // teachers who tapped X are not silenced forever (1 paying of 41).
+    if (raw === '1') {
+      if (storage?.setItem) persistTeacherProAskDismissed(storage, now);
+      return true;
+    }
+    const ts = Number(raw);
+    if (!Number.isFinite(ts)) return false;
+    return now - ts < TEACHER_PRO_ASK_DISMISS_TTL_MS;
   } catch {
     return false;
   }
@@ -57,9 +70,10 @@ export function isTeacherProAskDismissed(
 
 export function persistTeacherProAskDismissed(
   storage: { setItem(key: string, value: string): void } | null | undefined,
+  now: number = Date.now(),
 ): void {
   try {
-    storage?.setItem(TEACHER_PRO_ASK_DISMISS_KEY, '1');
+    storage?.setItem(TEACHER_PRO_ASK_DISMISS_KEY, String(now));
   } catch {
     // Private mode / quota — the in-session hide still works.
   }
