@@ -1220,6 +1220,7 @@ const en = {
     "bestFlag": "BEST",
     "leaveConfirm": "Leave this climb? You can resume this tab, but a daily run is one per day.",
     "dailyPlayed": "Today's tower is done. Come back tomorrow.",
+    "dailyRank": "You're #{rank} today",
     "recapAlt": "Tower recap: {floors} floors, {m} metres"
   },
   "wordTower": {

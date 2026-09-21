@@ -1561,6 +1561,7 @@ const sv = {
     "bestFlag": "REKORD",
     "leaveConfirm": "Lämna klättringen? Du kan återuppta den i den här fliken, men dailyn är en gång per dag.",
     "dailyPlayed": "Dagens torn är klart. Kom tillbaka i morgon.",
+    "dailyRank": "Du är #{rank} idag",
     "recapAlt": "Sammanfattning: {floors} våningar, {m} meter"
   },
   "wordTower": {

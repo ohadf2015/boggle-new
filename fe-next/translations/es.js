@@ -1275,6 +1275,7 @@ const es = {
     "bestFlag": "RÉCORD",
     "leaveConfirm": "¿Salir de esta subida? Puedes reanudarla en esta pestaña, pero el daily es una vez al día.",
     "dailyPlayed": "La torre de hoy ya está. Vuelve mañana.",
+    "dailyRank": "Eres el #{rank} hoy",
     "recapAlt": "Resumen: {floors} pisos, {m} metros"
   },
   "wordTower": {

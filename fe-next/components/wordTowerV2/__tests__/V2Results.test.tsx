@@ -36,10 +36,11 @@ describe('V2Results', () => {
     expect(img.getAttribute('src')).toContain('/api/word-tower/share');
   });
 
-  it('given the daily lock, when shown, then play again is hidden', () => {
-    render(<V2Results {...base} dailyLocked onRestart={() => {}} />);
+  it('given the daily lock and a rank, when shown, then play again is hidden and the rank is shown', () => {
+    render(<V2Results {...base} dailyLocked dailyRank={4} onRestart={() => {}} />);
     expect(screen.queryByText('common.playAgain')).toBeNull();
     expect(screen.getByText('wordTowerV2.dailyPlayed')).toBeTruthy();
+    expect(screen.getByText('wordTowerV2.dailyRank:4')).toBeTruthy();
   });
 
   it('given badges still locked, when shown, then the closest one is offered as the next goal', () => {

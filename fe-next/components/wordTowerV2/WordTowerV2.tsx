@@ -14,7 +14,7 @@ import { biomeAt, floorsAt } from '@/lib/wordTowerV2/biomes';
 import { impactThunk } from '@/lib/wordTowerV2/juice';
 import { MIN_WORD_LEN, isAcceptedWord, spinWheel } from '@/lib/wordTowerV2/wheel';
 import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
-import { v2DailySeed } from '@/lib/wordTowerV2/daily';
+import { v2DailyNumericSeed, v2DailySeed } from '@/lib/wordTowerV2/daily';
 import { saveRunSnapshot } from '@/lib/wordTowerV2/runPersist';
 import { v2ShareCardPath } from '@/lib/wordTowerV2/shareCard';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
@@ -53,7 +53,10 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const { t, language, dir } = useLanguage();
   const { playSound } = useSoundEffects();
   const reducedMotion = usePrefersReducedMotion();
-  const game = useTowerRun();
+  const game = useTowerRun({
+    seed: daily ? v2DailyNumericSeed(undefined, language) : undefined,
+    scriptedSwing: daily,
+  });
   const { profile, canSeeInWorkModes, isAdmin } = useAuth();
   const router = useRouter();
   const { rival, share, copied } = useRivalTower(language);
@@ -221,7 +224,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   // Fresh letters per run AND after every hoisted word, so each turn is a new
   // little anagram rather than the same seven letters all run.
   const [runSeed, setRunSeed] = useState('');
-  useEffect(() => setRunSeed(daily ? v2DailySeed() : `wt2-${Date.now()}`), [daily]);
+  useEffect(() => setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`), [daily, language]);
   const deal = useCallback(
     (draw: number) => {
       if (!runSeed) return;
@@ -423,7 +426,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const longestWord = myWords.reduce((a, w) => (w.length > a.length ? w : a), '');
   const scoreMultEarly = estateApi.perks.scoreMult;
   const liveScore = Math.round(totalScore(heightM, run.bonus) * scoreMultEarly);
-  const { dailyLocked } = useV2Ready({
+  const { dailyLocked, dailyRank } = useV2Ready({
     daily,
     isAdmin: !!isAdmin,
     canSeeInWorkModes: !!canSeeInWorkModes,
@@ -605,7 +608,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
             preSubmitRef.current = null;
             undoGuardRef.current = null;
             restart();
-            setRunSeed(daily ? v2DailySeed() : `wt2-${Date.now()}`);
+            setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
           }}
           onHome={() => router.push(`/${language}`)}
           onClose={() => {
@@ -623,6 +626,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
             name: profile?.display_name ?? profile?.username ?? '',
           })}
           dailyLocked={dailyLocked}
+          dailyRank={dailyRank}
           rivals={{
             estate: estateApi,
             balls: run.balls,
@@ -653,16 +657,18 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           >
             {t('wordTowerV2.results.badges')}
           </button>
+          {!dailyLocked ? (
           <button
             type="button"
             onClick={() => {
               restart();
-              setRunSeed(daily ? v2DailySeed() : `wt2-${Date.now()}`);
+              setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
             }}
             className="rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-1.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
           >
             {t('common.playAgain')}
           </button>
+          ) : null}
           <button
             type="button"
             onClick={() => router.push(`/${language}`)}
@@ -699,7 +705,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
             preSubmitRef.current = null;
             undoGuardRef.current = null;
             restart();
-            setRunSeed(daily ? v2DailySeed() : `wt2-${Date.now()}`);
+            setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
           }}
         />
       ) : null}

@@ -1,12 +1,17 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
-import { postWithAuth } from '@/utils/authFetch';
+import { getWithAuth, postWithAuth } from '@/utils/authFetch';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/reviewHooks';
-import { hasPlayedV2DailyToday, recordV2DailyClimb } from '@/lib/wordTowerV2/daily';
+import {
+  hasPlayedV2DailyToday,
+  playedOnDailyBoard,
+  rankFromDailyBoard,
+  recordV2DailyClimb,
+} from '@/lib/wordTowerV2/daily';
 import { clearRunSnapshot, loadRunSnapshot, shouldConfirmLeave } from '@/lib/wordTowerV2/runPersist';
 
 interface Args {
@@ -26,6 +31,15 @@ interface Args {
   t: (key: string) => string;
 }
 
+function fetchDailyBoard(language: string) {
+  const params = new URLSearchParams({ language });
+  const fp = getGuestFingerprint();
+  if (fp) params.set('guestFingerprint', fp);
+  return getWithAuth(`/api/word-tower/daily/score?${params.toString()}`).then((r) =>
+    r.ok ? r.json() : null,
+  );
+}
+
 export function useV2Ready({
   daily,
   isAdmin,
@@ -41,8 +55,10 @@ export function useV2Ready({
   setForceResults,
   setSmashing,
   t,
-}: Args): { dailyLocked: boolean } {
-  const dailyLocked = daily && hasPlayedV2DailyToday();
+}: Args): { dailyLocked: boolean; dailyRank: number | null } {
+  const [serverPlayed, setServerPlayed] = useState(false);
+  const [dailyRank, setDailyRank] = useState<number | null>(null);
+  const dailyLocked = daily && (hasPlayedV2DailyToday() || serverPlayed);
 
   useEffect(() => {
     const hooks = v2ReviewHooksFromSearch(
@@ -53,6 +69,22 @@ export function useV2Ready({
     if (hooks.results) setForceResults(true);
     if (hooks.smash) setSmashing(true);
   }, [canSeeInWorkModes, isAdmin, seedDemo, setForceResults, setSmashing]);
+
+  useEffect(() => {
+    if (!daily) return;
+    let cancelled = false;
+    void fetchDailyBoard(language)
+      .then((d) => {
+        if (cancelled || !d) return;
+        const rows = d.leaderboard ?? [];
+        if (playedOnDailyBoard(rows)) setServerPlayed(true);
+        setDailyRank(rankFromDailyBoard(rows));
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [daily, language]);
 
   useEffect(() => {
     if (!daily) return;
@@ -87,7 +119,13 @@ export function useV2Ready({
     );
     clearRunSnapshot(true, window.sessionStorage);
     if (!body) return;
-    void postWithAuth('/api/word-tower/daily/score', body).catch(() => undefined);
+    void postWithAuth('/api/word-tower/daily/score', body)
+      .then(() => fetchDailyBoard(language))
+      .then((d) => {
+        if (!d) return;
+        setDailyRank(rankFromDailyBoard(d.leaderboard ?? []));
+      })
+      .catch(() => undefined);
   }, [daily, resultsShown, peakM, floors, longestWord, language]);
 
   useEffect(() => {
@@ -100,7 +138,7 @@ export function useV2Ready({
     return () => window.removeEventListener('beforeunload', onLeave);
   }, [phase, floors, t]);
 
-  return { dailyLocked };
+  return { dailyLocked, dailyRank };
 }
 
 export function confirmLeaveIfNeeded(phase: string, floors: number, t: (key: string) => string): boolean {

@@ -54,6 +54,7 @@ const keys: string[] = [
   ...['common', 'rare', 'epic'].map((k) => `wordTowerV2.chest.tier.${k}`),
   ...['shield', 'brick', 'blueprint'].map((k) => `wordTowerV2.chest.item.${k}`),
   ...['perfects', 'floors'].map((k) => `wordTowerV2.chest.tease.${k}`),
+  'wordTowerV2.dailyRank',
   ...['floorsA11y', 'combo', 'tenants', 'crates', 'badges', 'nextGoal'].map((k) => `wordTowerV2.results.${k}`),
   ...['double', 'triple', 'quad', 'unstoppable', 'legendary'].map((k) => `wordTowerV2.call.combo.${k}`),
   'wordTowerV2.call.word.big',

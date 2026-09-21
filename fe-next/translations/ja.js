@@ -1276,6 +1276,7 @@ const ja = {
     "bestFlag": "ベスト",
     "leaveConfirm": "この登りを離れますか？このタブなら再開できますが、デイリーは1日1回です。",
     "dailyPlayed": "今日のタワーは終了。また明日。",
+    "dailyRank": "今日の順位は #{rank}",
     "recapAlt": "タワー記録: {floors}階、{m}メートル"
   },
   "wordTower": {

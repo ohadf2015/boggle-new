@@ -1276,6 +1276,7 @@ const he = {
     "bestFlag": "שיא",
     "leaveConfirm": "לצאת מהטיפוס? אפשר להמשיך בטאב הזה, אבל היומי הוא פעם ביום.",
     "dailyPlayed": "מגדל היום הסתיים. נתראה מחר.",
+    "dailyRank": "אתה במקום #{rank} היום",
     "recapAlt": "סיכום מגדל: {floors} קומות, {m} מטרים"
   },
   "wordTower": {
