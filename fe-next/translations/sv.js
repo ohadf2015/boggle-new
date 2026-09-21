@@ -535,9 +535,7 @@ const sv = {
     "backToMap": "Tillbaka till kartan",
     "backHome": "Hem",
     "next": "Nästa",
-    "play": "Spela",
-    "pause": "Pause",
-    "replay": "Spela igen",
+    
     "retry": "Igen",
     "score": "Poäng",
     "words": "Ord",
@@ -14876,6 +14874,21 @@ const sv = {
       "welcome_banner_title": "Välkommen, lärare!",
       "welcome_banner_body": "Du är nu godkänd. Skapa ditt första klassrum, lägg till elever och starta ett spel.",
       "welcome_banner_dismiss": "Stäng"
+    },
+    "tour": {
+      "watchButton": "Se hur det fungerar",
+      "title": "Så här fungerar det",
+      "classroomNameLabel": "Klassrumsnivå",
+      "languageFocusLabel": "Språkfokus",
+      "englishLearnersOption": "Engelsktalande elever",
+      "createClassroomButton": "Skapa klassrum",
+      "shareCodeText": "Dela den här koden med dina elever",
+      "codeFormatLabel": "6-siffrig kod",
+      "enterCodeOnPhonesText": "Eleverna anger koden på sina telefoner",
+      "studentsJoinOneByOneText": "Eleverna ansluter en efter en",
+      "studentJoinedBadge": "anslöt",
+      "nStudentsJoinedText": "{count} av 3 elever anslöt",
+      "roundResultsHeading": "Resultat från omgång 1"
     },
     "wordOfTheDay": {
       "title": "Dagens ord",

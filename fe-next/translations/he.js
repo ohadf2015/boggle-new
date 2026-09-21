@@ -535,9 +535,7 @@ const he = {
     "backToMap": "חזרה למפה",
     "backHome": "בית",
     "next": "הבא",
-    "play": "הפעל",
-    "pause": "Pause",
-    "replay": "חזור",
+    
     "retry": "שוב",
     "score": "ניקוד",
     "words": "מילים",
@@ -14492,6 +14490,21 @@ const he = {
       "welcome_banner_title": "ברוכים הבאים! 🎉",
       "welcome_banner_body": "אושרתם! עכשיו אפשר לפתוח כיתות, להפעיל משחקים ולעקוב אחר ההתקדמות של התלמידים.",
       "welcome_banner_dismiss": "הבנתי"
+    },
+    "tour": {
+      "watchButton": "ראה איך זה עובד",
+      "title": "איך זה עובד",
+      "classroomNameLabel": "שם הכיתה",
+      "languageFocusLabel": "התמקדות בשפה",
+      "englishLearnersOption": "לומדי אנגלית",
+      "createClassroomButton": "צור כיתה",
+      "shareCodeText": "שתף את הקוד הזה עם התלמידים שלך",
+      "codeFormatLabel": "קוד בן 6 תווים",
+      "enterCodeOnPhonesText": "התלמידים מזינים את הקוד בטלפונים שלהם",
+      "studentsJoinOneByOneText": "התלמידים מצטרפים אחד אחרי שני",
+      "studentJoinedBadge": "הצטרף",
+      "nStudentsJoinedText": "{count} מתוך 3 תלמידים הצטרפו",
+      "roundResultsHeading": "תוצאות הסיבוב הראשון"
     },
     "wordOfTheDay": {
       "title": "המילה היומית",

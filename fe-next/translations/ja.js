@@ -535,9 +535,7 @@ const ja = {
     "backToMap": "マップへ戻る",
     "backHome": "ホーム",
     "next": "次へ",
-    "play": "再生",
-    "pause": "Pause",
-    "replay": "リプレイ",
+    
     "retry": "リトライ",
     "score": "スコア",
     "words": "単語",
@@ -14641,6 +14639,21 @@ const ja = {
       "welcome_banner_title": "認可完了！さあ始めよう 🎉",
       "welcome_banner_body": "これであなたのクラス用のレッスンを作ったり、ゲームを出題したり、生徒の成長をリアルタイムで見守ることができます。",
       "welcome_banner_dismiss": "わかりました"
+    },
+    "tour": {
+      "watchButton": "使い方を見る",
+      "title": "使い方",
+      "classroomNameLabel": "クラス名",
+      "languageFocusLabel": "言語フォーカス",
+      "englishLearnersOption": "英語学習者",
+      "createClassroomButton": "クラスを作成",
+      "shareCodeText": "このコードを生徒と共有します",
+      "codeFormatLabel": "6文字コード",
+      "enterCodeOnPhonesText": "生徒は携帯電話にコードを入力します",
+      "studentsJoinOneByOneText": "生徒が次々と参加します",
+      "studentJoinedBadge": "参加しました",
+      "nStudentsJoinedText": "{count}人中3人の生徒が参加しました",
+      "roundResultsHeading": "ラウンド1の結果"
     },
     "wordOfTheDay": {
       "title": "今日の単語",

@@ -535,9 +535,7 @@ const es = {
     "backToMap": "Volver al mapa",
     "backHome": "Inicio",
     "next": "Siguiente",
-    "play": "Jugar",
-    "pause": "Pause",
-    "replay": "Repetir",
+    
     "retry": "Otra vez",
     "score": "Puntos",
     "words": "Palabras",
@@ -14828,7 +14826,18 @@ const es = {
     },
     "tour": {
       "watchButton": "Ver cómo funciona",
-      "title": "Cómo funciona"
+      "title": "Cómo funciona",
+      "classroomNameLabel": "Nombre del aula",
+      "languageFocusLabel": "Enfoque del idioma",
+      "englishLearnersOption": "Estudiantes de inglés",
+      "createClassroomButton": "Crear aula",
+      "shareCodeText": "Comparte este código con tus estudiantes",
+      "codeFormatLabel": "Código de 6 caracteres",
+      "enterCodeOnPhonesText": "Los estudiantes ingresan el código en sus teléfonos",
+      "studentsJoinOneByOneText": "Los estudiantes se unen uno a uno",
+      "studentJoinedBadge": "se unió",
+      "nStudentsJoinedText": "{count} de 3 estudiantes se unieron",
+      "roundResultsHeading": "Resultados de la ronda 1"
     }
   },
   "crazygames": {

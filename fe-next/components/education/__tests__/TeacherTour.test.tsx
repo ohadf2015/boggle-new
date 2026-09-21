@@ -1,15 +1,19 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (key: string) => key, language: 'en', isRTL: false }),
-}));
+vi.mock('@/contexts/LanguageContext');
 
 import { TeacherTourDialog } from '../tour/TeacherTourDialog';
 
 describe('TeacherTourDialog', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    (useLanguage as any).mockReturnValue({
+      t: (key: string) => key,
+      language: 'en',
+      isRTL: false,
+    });
   });
 
   afterEach(() => {
@@ -130,5 +134,68 @@ describe('TeacherTourDialog', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('tour-dialog')).not.toBeInTheDocument();
     });
+  });
+});
+
+describe('TeacherTourDialog - Accessibility & i18n', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  });
+
+  it('dialog should have accessible title', async () => {
+    (useLanguage as any).mockReturnValue({
+      t: (key: string) => key,
+      language: 'en',
+      isRTL: false,
+    });
+
+    render(<TeacherTourDialog />);
+    // Use testid to open dialog
+    const button = screen.getByTestId('tour-button');
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveAttribute('aria-labelledby');
+    });
+  });
+
+  it('should not render hardcoded English strings in scenes', async () => {
+    (useLanguage as any).mockReturnValue({
+      t: (key: string) => key,
+      language: 'en',
+      isRTL: false,
+    });
+
+    render(<TeacherTourDialog />);
+    fireEvent.click(screen.getByTestId('tour-button'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('tour-scene-1')).toBeInTheDocument();
+    });
+
+    // Hardcoded English strings that should NOT appear
+    // (Decorative names like Alex, Jamie, Morgan are data, not UI text, so they're not checked)
+    const hardcodedStrings = [
+      'Classroom Name',
+      'Language Focus',
+      'English Learners',
+      'Create Classroom',
+      'Share this code with your students',
+      '6-character code',
+      'Students enter the code on their phones',
+      'Students join one by one',
+      'Round 1 Results',
+      'Full analytics dashboard',
+    ];
+
+    for (const str of hardcodedStrings) {
+      expect(screen.queryByText(new RegExp(str, 'i'))).not.toBeInTheDocument();
+    }
   });
 });

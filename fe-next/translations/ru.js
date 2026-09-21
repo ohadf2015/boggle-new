@@ -535,9 +535,7 @@ const ru = {
     "backToMap": "К карте",
     "backHome": "Домой",
     "next": "Дальше",
-    "play": "Воспроизведение",
-    "pause": "Pause",
-    "replay": "Повтор",
+    
     "retry": "Заново",
     "score": "Очки",
     "words": "Слова",
@@ -3723,7 +3721,18 @@ const ru = {
     },
     "tour": {
       "watchButton": "Посмотрите, как это работает",
-      "title": "Как это работает"
+      "title": "Как это работает",
+      "classroomNameLabel": "Имя класса",
+      "languageFocusLabel": "Языковой фокус",
+      "englishLearnersOption": "Изучающие английский",
+      "createClassroomButton": "Создать класс",
+      "shareCodeText": "Поделитесь этим кодом со своими студентами",
+      "codeFormatLabel": "6-значный код",
+      "enterCodeOnPhonesText": "Студенты вводят код на свои телефоны",
+      "studentsJoinOneByOneText": "Студенты присоединяются один за другим",
+      "studentJoinedBadge": "присоединился",
+      "nStudentsJoinedText": "{count} из 3 студентов присоединились",
+      "roundResultsHeading": "Результаты раунда 1"
     }
   },
   "leaderboard": {

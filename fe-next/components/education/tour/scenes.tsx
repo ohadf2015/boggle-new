@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
  * Scene 1: Create a classroom form with auto-typing name field
  */
 export function TourScene1() {
+  const { t } = useLanguage();
   const [displayedName, setDisplayedName] = useState('');
-  const targetName = 'Mrs. Chen';
+  const targetName = 'Alex'; // Decorative student name (data, not UI text)
 
   useEffect(() => {
     if (displayedName.length < targetName.length) {
@@ -24,7 +26,7 @@ export function TourScene1() {
     <div className="space-y-4" data-testid="tour-scene-1">
       <div className="space-y-2">
         <label className="block text-xs font-black uppercase text-neo-white/70">
-          Classroom Name
+          {t('education.tour.classroomNameLabel')}
         </label>
         <input
           type="text"
@@ -40,13 +42,13 @@ export function TourScene1() {
 
       <div className="space-y-2">
         <label className="block text-xs font-black uppercase text-neo-white/70">
-          Language Focus
+          {t('education.tour.languageFocusLabel')}
         </label>
         <select className={cn(
           'w-full px-3 py-2 rounded-neo border-2 border-neo-black',
           'bg-neo-white text-neo-black font-neo-body'
         )}>
-          <option>English Learners</option>
+          <option>{t('education.tour.englishLearnersOption')}</option>
         </select>
       </div>
 
@@ -55,7 +57,7 @@ export function TourScene1() {
         'bg-neo-lime text-neo-black font-neo-display font-black uppercase text-sm',
         'shadow-hard'
       )}>
-        Create Classroom
+        {t('education.tour.createClassroomButton')}
       </button>
     </div>
   );
@@ -65,6 +67,7 @@ export function TourScene1() {
  * Scene 2: Join code reveal with QR-ish visual
  */
 export function TourScene2() {
+  const { t } = useLanguage();
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
@@ -75,7 +78,7 @@ export function TourScene2() {
   return (
     <div className="space-y-6 text-center" data-testid="tour-scene-2">
       <p className="text-neo-white/80 text-sm">
-        Share this code with your students
+        {t('education.tour.shareCodeText')}
       </p>
 
       <div className={cn(
@@ -89,13 +92,13 @@ export function TourScene2() {
           </div>
         </div>
         <p className="mt-4 text-xs font-black uppercase text-neo-white/60">
-          6-character code
+          {t('education.tour.codeFormatLabel')}
         </p>
       </div>
 
-      <div className="bg-neo-white/10 border-2 border-neo-white/30 rounded-neo p-3">
+      <div className="bg-neo-white/10 border-2 border-neo-white/50 rounded-neo p-3">
         <p className="text-xs text-neo-white/80">
-          Students enter the code on their phones
+          {t('education.tour.enterCodeOnPhonesText')}
         </p>
       </div>
     </div>
@@ -106,6 +109,7 @@ export function TourScene2() {
  * Scene 3: Three student phones joining with names popping in
  */
 export function TourScene3() {
+  const { t } = useLanguage();
   const [joinedCount, setJoinedCount] = useState(0);
 
   useEffect(() => {
@@ -117,15 +121,15 @@ export function TourScene3() {
   }, [joinedCount]);
 
   const students = [
-    { id: 1, name: 'Alex', color: 'bg-neo-cyan' },
-    { id: 2, name: 'Jamie', color: 'bg-neo-pink' },
-    { id: 3, name: 'Morgan', color: 'bg-neo-lime' },
+    { id: 1, name: 'Alex', color: 'bg-neo-cyan' }, // Decorative student name (data)
+    { id: 2, name: 'Jamie', color: 'bg-neo-pink' }, // Decorative student name (data)
+    { id: 3, name: 'Morgan', color: 'bg-neo-lime' }, // Decorative student name (data)
   ];
 
   return (
     <div className="space-y-4" data-testid="tour-scene-3">
       <p className="text-center text-neo-white/80 text-sm mb-4">
-        Students join one by one
+        {t('education.tour.studentsJoinOneByOneText')}
       </p>
 
       <div className="space-y-2">
@@ -133,7 +137,7 @@ export function TourScene3() {
           <div
             key={student.id}
             className={cn(
-              'flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black',
+              'flex items-center gap-3 p-3 rounded-neo border-2 border-neo-white/60',
               'bg-neo-navy transition-all duration-300',
               i < joinedCount ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
             )}
@@ -144,14 +148,16 @@ export function TourScene3() {
             <div className={cn('w-8 h-8 rounded-full border-2 border-neo-black', student.color)} />
             <span className="font-neo-display font-black text-neo-white">{student.name}</span>
             {i < joinedCount && (
-              <span className="ml-auto text-xs font-black uppercase text-neo-lime">joined</span>
+              <span className="ms-auto text-xs font-black uppercase text-neo-lime">
+                {t('education.tour.studentJoinedBadge')}
+              </span>
             )}
           </div>
         ))}
       </div>
 
       <div className="pt-2 text-center text-xs text-neo-white/60">
-        {joinedCount} of 3 students joined
+        {t('education.tour.nStudentsJoinedText', '', { count: joinedCount })}
       </div>
     </div>
   );
@@ -161,6 +167,7 @@ export function TourScene3() {
  * Scene 4: Letter grid with word path lighting up and score ticking
  */
 export function TourScene4() {
+  const { t } = useLanguage();
   const [pathProgress, setPathProgress] = useState(0);
   const [scoreValue, setScoreValue] = useState(0);
 
@@ -182,7 +189,7 @@ export function TourScene4() {
     ['P', 'O', 'S', 'Q'],
   ];
 
-  const wordPath = [[0, 0], [1, 0], [1, 1], [1, 2]]; // H-E-L-L-O path
+  const wordPath = [[0, 0], [1, 0], [1, 1], [1, 2]]; // H-E-L-L-O path (data, not UI text)
 
   const isInPath = (row: number, col: number) => {
     return wordPath.some(([r, c]) => r === row && c === col);
@@ -206,11 +213,11 @@ export function TourScene4() {
                   key={`${rowIdx}-${colIdx}`}
                   className={cn(
                     'w-12 h-12 flex items-center justify-center',
-                    'rounded-neo border-2 border-neo-black font-neo-display font-black text-lg',
+                    'rounded-neo border-2 font-neo-display font-black text-lg',
                     'transition-all duration-300',
                     isHighlighted
-                      ? 'bg-neo-lime text-neo-black shadow-hard'
-                      : 'bg-neo-white/20 text-neo-white'
+                      ? 'bg-neo-lime text-neo-black shadow-hard border-neo-black'
+                      : 'bg-neo-white/20 text-neo-white border-neo-white/60'
                   )}
                 >
                   {letter}
@@ -223,12 +230,12 @@ export function TourScene4() {
 
       <div className="flex items-center justify-center gap-4">
         <div className="text-center">
-          <p className="text-xs text-neo-white/60 uppercase font-black">Word</p>
+          <p className="text-xs text-neo-white/60 uppercase font-black">{t('common.word')}</p>
           <p className="text-2xl font-neo-display font-black text-neo-lime">HERO</p>
         </div>
         <div className="h-12 w-0.5 bg-neo-white/30" />
         <div className="text-center">
-          <p className="text-xs text-neo-white/60 uppercase font-black">Score</p>
+          <p className="text-xs text-neo-white/60 uppercase font-black">{t('common.score')}</p>
           <p className="text-2xl font-neo-display font-black text-neo-cyan">{scoreValue}</p>
         </div>
       </div>
@@ -240,6 +247,7 @@ export function TourScene4() {
  * Scene 5: Results bar chart showing student performance
  */
 export function TourScene5() {
+  const { t } = useLanguage();
   const [barHeights, setBarHeights] = useState([0, 0, 0]);
 
   useEffect(() => {
@@ -266,9 +274,9 @@ export function TourScene5() {
   }, []);
 
   const students = [
-    { name: 'Alex', color: 'bg-neo-cyan' },
-    { name: 'Jamie', color: 'bg-neo-pink' },
-    { name: 'Morgan', color: 'bg-neo-lime' },
+    { name: 'Alex', color: 'bg-neo-cyan' }, // Decorative student name (data)
+    { name: 'Jamie', color: 'bg-neo-pink' }, // Decorative student name (data)
+    { name: 'Morgan', color: 'bg-neo-lime' }, // Decorative student name (data)
   ];
 
   const maxHeight = 80;
@@ -277,14 +285,14 @@ export function TourScene5() {
     <div className="space-y-6" data-testid="tour-scene-5">
       <div className="text-center">
         <h3 className="font-neo-display font-black text-neo-white text-lg">
-          Round 1 Results
+          {t('education.tour.roundResultsHeading')}
         </h3>
       </div>
 
       <div className="flex items-end justify-center gap-6 h-32">
         {students.map((student, idx) => (
           <div key={idx} className="flex flex-col items-center gap-2">
-            <div className="h-32 w-12 bg-neo-black/20 border-2 border-neo-black rounded-neo-sm flex items-end overflow-hidden">
+            <div className="h-32 w-12 bg-neo-black/20 border-2 border-neo-white/40 rounded-neo-sm flex items-end overflow-hidden">
               <div
                 className={cn(
                   'w-full transition-all duration-500 ease-out',
@@ -303,10 +311,6 @@ export function TourScene5() {
             </p>
           </div>
         ))}
-      </div>
-
-      <div className="text-center text-sm text-neo-white/80 bg-neo-white/10 border-2 border-neo-white/30 rounded-neo p-3">
-        <p>Full analytics dashboard available in Teacher Pro</p>
       </div>
     </div>
   );

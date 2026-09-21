@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogClose, DialogTitle } from '@/components/ui/dialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { ChevronLeft, ChevronRight, Play, Pause, X } from 'lucide-react';
@@ -95,17 +95,17 @@ export function TeacherTourDialog() {
           ref={dialogRef}
           data-testid="tour-dialog"
           className={cn(
-            'bg-neo-navy dark:bg-neo-navy border-3 border-neo-black shadow-hard-lg rounded-neo',
+            'bg-neo-navy dark:bg-neo-navy border-3 border-neo-white/60 shadow-hard-lg rounded-neo',
             'max-w-2xl w-full overflow-hidden p-0'
           )}
           hideCloseButton
           noDescription
         >
           {/* Header with close button */}
-          <div className="flex items-center justify-between gap-3 px-5 py-3 border-b-3 border-neo-black">
-            <h2 className="font-neo-display font-black text-white text-lg">
+          <div className="flex items-center justify-between gap-3 px-5 py-3 border-b-3 border-neo-white/60">
+            <DialogTitle className="font-neo-display font-black text-white text-lg">
               {t('education.tour.title')}
-            </h2>
+            </DialogTitle>
             <DialogClose asChild>
               <button
                 data-testid="tour-close"
@@ -123,7 +123,7 @@ export function TeacherTourDialog() {
           </div>
 
           {/* Progress bar */}
-          <div className="px-5 py-3 border-t-3 border-neo-black flex gap-1">
+          <div className="px-5 py-3 border-t-3 border-neo-white/60 flex gap-1">
             {SCENE_DURATIONS.map((_, i) => (
               <button
                 key={i}
@@ -142,7 +142,7 @@ export function TeacherTourDialog() {
           </div>
 
           {/* Captions and controls */}
-          <div className="px-5 py-4 bg-neo-navy border-t-3 border-neo-black">
+          <div className="px-5 py-4 bg-neo-navy border-t-3 border-neo-white/60">
             <div className="text-center mb-4">
               <p className="text-neo-white/70 text-sm">
                 {t(`education.onboarding.steps.${['create', 'share', 'join', 'play', 'results'][currentScene - 1]}.title`)}
@@ -159,10 +159,10 @@ export function TeacherTourDialog() {
                 onClick={previousScene}
                 disabled={currentScene === 1}
                 className={cn(
-                  'p-2 rounded border-2 border-neo-black transition-all',
+                  'p-2 rounded border-2 transition-all',
                   currentScene === 1
-                    ? 'bg-neo-white/20 text-neo-white/40 cursor-not-allowed'
-                    : 'bg-neo-cyan text-neo-black hover:-translate-y-0.5 active:translate-y-0.5'
+                    ? 'bg-neo-white/20 text-neo-white/40 cursor-not-allowed border-neo-white/50'
+                    : 'bg-neo-cyan text-neo-black border-neo-black hover:-translate-y-0.5 active:translate-y-0.5'
                 )}
                 aria-label={t('common.previous')}
               >
@@ -200,10 +200,10 @@ export function TeacherTourDialog() {
                 onClick={nextScene}
                 disabled={currentScene === 5}
                 className={cn(
-                  'p-2 rounded border-2 border-neo-black transition-all',
+                  'p-2 rounded border-2 transition-all',
                   currentScene === 5
-                    ? 'bg-neo-white/20 text-neo-white/40 cursor-not-allowed'
-                    : 'bg-neo-cyan text-neo-black hover:-translate-y-0.5 active:translate-y-0.5'
+                    ? 'bg-neo-white/20 text-neo-white/40 cursor-not-allowed border-neo-white/50'
+                    : 'bg-neo-cyan text-neo-black border-neo-black hover:-translate-y-0.5 active:translate-y-0.5'
                 )}
                 aria-label={t('common.next')}
               >
@@ -212,7 +212,7 @@ export function TeacherTourDialog() {
             </div>
 
             {isLastScene && (
-              <div className="mt-4 pt-4 border-t-2 border-neo-black/30">
+              <div className="mt-4 pt-4 border-t-2 border-neo-white/40">
                 <Link
                   href={`/${language}/education/access`}
                   data-testid="tour-final-cta"

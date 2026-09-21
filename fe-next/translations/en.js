@@ -535,9 +535,7 @@ const en = {
     "backToMap": "Back to map",
     "backHome": "Home",
     "next": "Next",
-    "play": "Play",
-    "pause": "Pause",
-    "replay": "Replay",
+    
     "retry": "Retry",
     "score": "Score",
     "words": "Words",
@@ -13436,8 +13434,18 @@ const en = {
     },
     "tour": {
       "watchButton": "Watch how it works",
-      "title": "How it works"
-    }
+      "title": "How it works",
+      "classroomNameLabel": "Classroom Name",
+      "languageFocusLabel": "Language Focus",
+      "englishLearnersOption": "English Learners",
+      "createClassroomButton": "Create Classroom",
+      "shareCodeText": "Share this code with your students",
+      "codeFormatLabel": "6-character code",
+      "enterCodeOnPhonesText": "Students enter the code on their phones",
+      "studentsJoinOneByOneText": "Students join one by one",
+      "studentJoinedBadge": "joined",
+      "nStudentsJoinedText": "{count} of 3 students joined",
+      "roundResultsHeading": "Round 1 Results"}
   },
   "crazygames": {
     "ads": {
