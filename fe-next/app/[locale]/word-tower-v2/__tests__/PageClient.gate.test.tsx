@@ -50,4 +50,21 @@ describe('WordTowerV2PageClient beta gate', () => {
 
     expect(replace).not.toHaveBeenCalled();
   });
+
+  it('given a signed-in player whose profile has not landed, when opened, then it waits instead of bouncing', () => {
+    // loading alone is not enough: TOKEN_REFRESHED / cross-tab sync set loading
+    // false with profile still null. canSeeInWorkModes is derived from the
+    // profile, so this is the documented production bounce of real beta testers.
+    useAuth.mockReturnValue({
+      canSeeInWorkModes: false,
+      loading: false,
+      user: { id: 'beta-1' },
+      profile: null,
+    });
+
+    render(<WordTowerV2PageClient />);
+
+    expect(replace).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('word-tower-v2')).not.toBeInTheDocument();
+  });
 });

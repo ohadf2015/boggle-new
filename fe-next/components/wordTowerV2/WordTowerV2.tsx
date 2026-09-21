@@ -14,7 +14,7 @@ import { biomeAt, floorsAt } from '@/lib/wordTowerV2/biomes';
 import { impactThunk } from '@/lib/wordTowerV2/juice';
 import { MIN_WORD_LEN, isAcceptedWord, spinWheel } from '@/lib/wordTowerV2/wheel';
 import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
-import { sanitizeWords } from '@/lib/wordTowerV2/wreck';
+import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/reviewHooks';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
 import { V2TopBar } from './V2TopBar';
@@ -50,7 +50,7 @@ export default function WordTowerV2() {
   const { playSound } = useSoundEffects();
   const reducedMotion = usePrefersReducedMotion();
   const game = useTowerRun();
-  const { profile } = useAuth();
+  const { profile, canSeeInWorkModes, isAdmin } = useAuth();
   const router = useRouter();
   const { rival, share, copied } = useRivalTower(language);
   const [smashing, setSmashing] = useState(false);
@@ -183,14 +183,14 @@ export default function WordTowerV2() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setDebug(params.has('debug'));
-    // Review words, sanitized like a share link: `?demo=1&words=מגדל,לבנה`.
-    const words = sanitizeWords(params.get('words')?.split(',') ?? []);
-    if (params.has('demo')) seedDemo(words.length ? words : undefined);
-    // `?demo=1&results=1`: jump straight to the results board (rivals review).
-    if (params.has('demo') && params.has('results')) setForceResults(true);
-    // `?demo=1&smash=1`: jump straight into the smash round for review.
-    if (params.has('demo') && params.has('smash')) setSmashing(true);
-  }, [seedDemo]);
+    const hooks = v2ReviewHooksFromSearch(
+      window.location.search,
+      canUseV2ReviewHooks({ canSeeInWorkModes, isAdmin }),
+    );
+    if (hooks.demo) seedDemo(hooks.words.length ? hooks.words : undefined);
+    if (hooks.results) setForceResults(true);
+    if (hooks.smash) setSmashing(true);
+  }, [seedDemo, canSeeInWorkModes, isAdmin]);
 
   // Gameplay owns the whole screen — the global bottom nav covered the dock.
   const setIsInGame = useHideNavigation();

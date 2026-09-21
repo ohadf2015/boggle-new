@@ -22,21 +22,32 @@ const WordTowerV2 = dynamic(() => import('@/components/wordTowerV2/WordTowerV2')
  * public Word Tower; this route is the in-work preview of the physics rebuild.
  */
 export function WordTowerV2PageClient() {
-  const { canSeeInWorkModes, loading } = useAuth();
+  const { canSeeInWorkModes, loading, user, profile } = useAuth();
   const { language } = useLanguageSafe();
   const router = useRouter();
+
+  // Beta/admin gate — allow in dev mode for testing. Redirect via effect to
+  // avoid a router.replace-during-render hydration mismatch.
+  //
+  // `canSeeInWorkModes` is derived from the profile row, so it starts false on
+  // every load and only flips once the profile lands. Redirecting before that
+  // bounced genuine admins and beta testers off their own page.
+  //
+  // `loading` alone is not enough: it is set false on paths that never fetch a
+  // profile (TOKEN_REFRESHED, cross-tab sync), so a signed-in user can sit at
+  // loading=false with profile still null and be redirected anyway — observed
+  // on a production build with a valid session. Treat "have a user, no profile
+  // yet" as still resolving; `isAuthenticated` is itself `!!user && !!profile`.
   const isDev = process.env.NODE_ENV === 'development';
-  const allowed = canSeeInWorkModes || isDev;
-
-  // Wait for auth before judging access. `canSeeInWorkModes` starts false and
-  // flips true once auth resolves, so redirecting on that transient false
-  // throws a real beta tester back to the home page before their access is
-  // even known. Redirect from an effect, never during render.
+  const resolving = loading || (!!user && !profile);
+  const denied = !resolving && !canSeeInWorkModes && !isDev;
   useEffect(() => {
-    if (!loading && !allowed) router.replace(`/${language}`);
-  }, [loading, allowed, language, router]);
+    if (denied) {
+      router.replace(`/${language}`);
+    }
+  }, [denied, language, router]);
 
-  if (!allowed) return null;
+  if (resolving || denied) return null;
 
   return <WordTowerV2 />;
 }
