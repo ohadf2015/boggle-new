@@ -1888,6 +1888,12 @@ const es = {
       "ogTitle": "Juego en Vivo para la Clase — Panel del Docente",
       "ogDescription": "Inicia un juego multijugador para tu clase en 60 segundos. Sin descargas. Desde teléfono o tablet."
     },
+    "lessons": {
+      "title": "Biblioteca - Crear y Gestionar Lecciones de Vocabulario | LexiClash",
+      "description": "Construye y gestiona lecciones de vocabulario para tus aulas. Crea listas de palabras, organiza por tema y asigna a estudiantes para práctica y dominio.",
+      "ogTitle": "Biblioteca de Lecciones de Vocabulario - LexiClash Education",
+      "ogDescription": "Crear y gestionar lecciones de vocabulario para tus aulas con LexiClash."
+    },
     "dailyArchive": {
       "title": "Archivo del Desafio Diario - Puzzles Pasados y Clasificaciones | LexiClash",
       "description": "Explora todos los desafios diarios de LexiClash. Revive tableros antiguos, compara tus puntajes y consulta las clasificaciones de cada puzzle publicado.",
@@ -12769,7 +12775,8 @@ const es = {
         "empty": "Sin estudiantes aún",
         "emptyHint": "Comparte el código {{code}} con tus estudiantes",
         "error": "Error al cargar estudiantes",
-        "unknown": "Estudiante Desconocido"
+        "unknown": "Estudiante Desconocido",
+        "noneYet": "Sin estudiantes aún — comparte el código de ingreso"
       }
     },
     "lesson": {

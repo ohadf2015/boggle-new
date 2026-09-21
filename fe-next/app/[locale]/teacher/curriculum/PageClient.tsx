@@ -84,7 +84,7 @@ function CurriculumShell({ children }: { children: React.ReactNode }) {
   return (
     <EducationShell
       header={<EducationHeader showBackButton />}
-      scrollRegionLabel={t('teacher.curriculum.title')}
+      scrollRegionLabel={t('teacher.nav.lessons')}
       contentClassName="p-4 sm:p-6 lg:p-8"
     >
       {children}

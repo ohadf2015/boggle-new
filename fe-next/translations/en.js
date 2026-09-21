@@ -1516,6 +1516,18 @@ const en = {
       "ogTitle": "Classroom Word Game Live - Teacher Dashboard",
       "ogDescription": "Start a live multiplayer word round for your class — join from any device, no signup."
     },
+    "lessons": {
+      "title": "Library - Create & Manage Vocabulary Lessons | LexiClash",
+      "description": "Build and manage vocabulary lessons for your classrooms. Create word lists, organize by topic, and assign to students for practice and mastery.",
+      "ogTitle": "Vocabulary Lesson Library - LexiClash Education",
+      "ogDescription": "Create and manage vocabulary lessons for your classrooms with LexiClash."
+    },
+    "lessons": {
+      "title": "Library - Create & Manage Vocabulary Lessons | LexiClash",
+      "description": "Build and manage vocabulary lessons for your classrooms. Create word lists, organize by topic, and assign to students for practice and mastery.",
+      "ogTitle": "Vocabulary Lesson Library - LexiClash Education",
+      "ogDescription": "Create and manage vocabulary lessons for your classrooms with LexiClash."
+    },
     "dailyArchive": {
       "title": "Daily Challenge Archive - Past Word Puzzles & Leaderboards | LexiClash",
       "description": "Browse every past LexiClash daily word puzzle. Replay old boards, compare your scores, and explore leaderboards from every challenge since launch.",
@@ -11291,7 +11303,8 @@ const en = {
         "empty": "No students yet",
         "emptyHint": "Share join code {{code}} with your students",
         "error": "Failed to load students",
-        "unknown": "Unknown Student"
+        "unknown": "Unknown Student",
+        "noneYet": "No students yet — share the join code"
       }
     },
     "lesson": {

@@ -297,4 +297,25 @@ describe('ClassroomManager invite + celebration UX', () => {
     expect(screen.queryByText('teacher.subscription.trialExpiredTitle')).not.toBeInTheDocument();
     expect(screen.getByPlaceholderText('teacher.classroom.namePlaceholder')).toBeInTheDocument();
   });
+
+  it('shouldShowHintWhenClassroomHasZeroStudents', () => {
+    // GIVEN — a classroom with no students
+    classroomsState.classrooms = [
+      {
+        id: 'cls-1',
+        name: 'Period 3',
+        language: 'en',
+        teacher_id: 'user1',
+        join_code: 'ABC123',
+        created_at: '2026-08-26',
+        member_count: 0,
+      },
+    ];
+
+    // WHEN
+    render(<ClassroomManager />);
+
+    // THEN — show the hint instead of bare "0 students"
+    expect(screen.getByText('teacher.classrooms.students.noneYet')).toBeInTheDocument();
+  });
 });

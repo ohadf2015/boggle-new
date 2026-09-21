@@ -2168,6 +2168,12 @@ const sv = {
       "ogTitle": "Klassrumsspel — Start nu",
       "ogDescription": "Starta ett live-ordspel för klassen på sekunder. Eleverna ansluter utan registrering."
     },
+    "lessons": {
+      "title": "Bibliotek - Skapa och hantera ordförrådslektion | LexiClash",
+      "description": "Bygg och hantera ordförrådslektion för dina klassrum. Skapa ordlistor, organisera efter ämne och tilldela elever för övning och behärskning.",
+      "ogTitle": "Ordförrådslektion Bibliotek - LexiClash Education",
+      "ogDescription": "Skapa och hantera ordförrådslektion för dina klassrum med LexiClash."
+    },
     "dailyArchive": {
       "title": "Dagliga Utmaningens Arkiv - Tidigare Ordpussel & Topplistor | LexiClash",
       "description": "Utforska alla tidigare dagliga ordpussel från LexiClash. Spela om gamla brädor, jämför dina poäng och se topplistor från varje utmaning sedan starten.",
@@ -13076,7 +13082,8 @@ const sv = {
         "empty": "Inga elever än",
         "emptyHint": "Dela kod {{code}} med dina elever",
         "error": "Kunde inte ladda elever",
-        "unknown": "Okänd elev"
+        "unknown": "Okänd elev",
+        "noneYet": "Inga elever ännu — dela koden för att gå med"
       }
     },
     "lesson": {
