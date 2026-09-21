@@ -72,7 +72,7 @@ describe('useAdventureRun', () => {
     await act(async () => { vi.advanceTimersByTime(getPlayLevel(1, 1).seconds * 1000 + 500); });
     await waitFor(() => expect(result.current.phase).toBe('done'));
     const complete = calls.find((c) => c.url.includes('/complete'));
-    expect(complete?.body).toEqual({ token: 'tok', words: ['dog'], hpLeft: 5, potionsUsed: {}, died: false, reviveUsed: false });
+    expect(complete?.body).toEqual({ token: 'tok', words: ['dog'], at: [expect.any(Number)], /* the fight's rival landed 2 undefended hits */ hpLeft: 3, potionsUsed: {}, died: false, reviveUsed: false });
     expect(result.current.result?.stars).toBe(1);
   });
 

@@ -11,7 +11,6 @@ import type { WordFeedback } from '@/components/game/WordFormingArea';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { getWorldConfig } from '@/lib/adventure/worldConfig';
-import { scoreWords } from '@/lib/adventure/play/scoreRun';
 import { worldSkinId } from '@/lib/adventure/play/worldSkins';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
 import { useAdventureRun } from './useAdventureRun';
@@ -45,6 +44,7 @@ import { useLevelVariant } from './variants/useLevelVariant';
 import VariantPanel from './variants/VariantPanel';
 import BoardLayer from './variants/BoardLayer';
 import { runFloor } from './runFloor';
+import { isCombatKind } from '@/lib/adventure/play/levels';
 import { cn } from '@/lib/utils';
 
 export const worldBackdrop = (world: number) => `/images/adventure/play/world-${world}.webp`;
@@ -149,17 +149,18 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     const seq = hitSeq.current + 1;
     const id = `adv-${seq}`;
     if (r === 'ok') {
-      // Same relic/chain formula the server settles with (points of the word just added).
-      const all = scoreWords([...run.words, word.toLowerCase().trim()], { relics: run.run?.relics ?? [], kind: lvl?.kind, language }).points;
-      const pts = all[all.length - 1] ?? 0;
+      // Same relic/chain/combo formula the server settles with (points of the word just added).
+      const pts = run.lastWordPoints();
       sfx.playWordAcceptedSound?.();
       setFeedback({ id, type: 'accepted', word, score: pts, timestamp: seq });
       let praiseKey: string | undefined;
       if (lvl) {
         // `run` is this render's (pre-hit) state: the fight's HP, or the score foe's bar.
         const huntDone = run.targetsFound.length >= (lvl.huntCount ?? run.targets?.length ?? 0);
-        const hpBefore = run.combat ? run.combat.enemyHp : Math.max(0, lvl.stars[2] - foeScore({ score: run.score, top: lvl.stars[2], kind: lvl.kind, huntMet: huntDone }));
-        const maxHp = run.combat ? run.combat.enemyMaxHp : lvl.stars[2];
+        // Fight nodes carry a rival too, but their stage is still the score foe.
+        const staged = isCombatKind(lvl.kind) ? run.combat : null;
+        const hpBefore = staged ? staged.enemyHp : Math.max(0, lvl.stars[2] - foeScore({ score: run.score, top: lvl.stars[2], kind: lvl.kind, huntMet: huntDone }));
+        const maxHp = staged ? staged.enemyMaxHp : lvl.stars[2];
         const tier = deedTier({ word, pts, hpBefore, maxHp, foe: lvl.isBoss ? 'boss' : lvl.kind === 'elite' ? 'elite' : 'foe' });
         if (tier) {
           const drop = deedDrops.current < DEED_DROPS_PER_LEVEL;
@@ -292,7 +293,9 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     run.begin();
   };
 
-  const holdResult = resultHeld(run.combat, finaleDone);
+  // Only elite/boss stages play a finale; a fight node's rival must not hold the result.
+  const stageCombat = lvl && isCombatKind(lvl.kind) ? run.combat : null;
+  const holdResult = resultHeld(stageCombat, finaleDone);
   useEffect(() => {
     if (!holdResult || run.phase !== 'done') return;
     const id = setTimeout(() => setFinaleDone(true), FINALE_HOLD_MAX_MS);
@@ -350,7 +353,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
             potionsLeft={run.potionsLeft} onPotion={run.drinkPotion}
             goal={goal} playing={run.phase === 'playing'}
             relics={run.runShown?.relics ?? []} lastHit={lastHit} words={run.words}
-            world={world} level={shownLevel} kind={lvl.kind} seconds={lvl.seconds} combatControls={false}
+            world={world} level={shownLevel} kind={lvl.kind} seconds={lvl.seconds} combatControls={!isCombatKind(lvl.kind)}
             nodeKind={currentNodeKind(run.map, run.currentNode, lvl)} step={run.run?.step}
             /* The stage the relic bubble must not cover: its HP bar and attack
                countdown are the fight's counterplay. The run clock re-renders
@@ -390,7 +393,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
                 frozenTiles={run.frozen}
                 cellFilter={frozenFilter}
                 submitFeedback={feedback}
-                hideComboIndicator
+                comboLevel={run.combo}
               />
               <BoardHazards world={world} combat={run.combat} dispatchCombat={run.dispatchCombat} playing={run.phase === 'playing'} />
             </BoardFx>
@@ -440,7 +443,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         />
       )}
 
-      {(run.phase === 'loading' || (run.phase === 'saving' && !resultHeld(run.combat, false))) && (
+      {(run.phase === 'loading' || (run.phase === 'saving' && !resultHeld(stageCombat, false))) && (
         <div className="absolute inset-0 z-20 grid place-items-center bg-black/40" role="status">
           <div className="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-[#1a1a2e] px-4 py-3 font-bold">
             <Loader2 className="w-5 h-5 animate-spin" /> {run.phase === 'saving' ? t('adventurePlay.saving') : t('adventurePlay.loading')}

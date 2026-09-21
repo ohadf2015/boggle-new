@@ -21,8 +21,10 @@ export type OfferItem =
  * v2 = the run carries its position on the act map (`node` + `path`) instead of
  * a bare level number. v1 tokens are rejected outright; the client answers the
  * `run_version` code by dropping its stored run and starting a fresh one.
+ * v3 = uniform map rows collapse to one node, so v2 node ids (`r0l2`) no longer
+ * exist on the map their seed rebuilds — reject them the same way.
  */
-export const RUN_VERSION = 2;
+export const RUN_VERSION = 3;
 
 export interface RunPayload {
   v: number;
@@ -190,6 +192,9 @@ export function skipPick(run: RunPayload): RunPayload {
   return next;
 }
 
+/** HP a won node gives back — rival chip damage is recoverable by playing well. */
+export const WIN_HEAL = 1;
+
 export interface LevelOutcome {
   hpLeft: number;
   potionsUsed: Partial<Record<PotionId, number>>;
@@ -211,7 +216,7 @@ export function advanceRun(run: RunPayload, { hpLeft, potionsUsed, score, revive
   }
   const relics = reviveUsed ? run.relics.filter((r) => r !== 'phoenix-feather') : [...run.relics];
   const maxHp = maxHpOf({ relics, bhp: run.bhp });
-  const hp = Math.min(maxHp, Math.max(0, Math.round(Number(hpLeft) || 0)));
+  const hp = Math.min(maxHp, Math.max(0, Math.round(Number(hpLeft) || 0)) + WIN_HEAL);
   // The offer is keyed on map DEPTH, so two nodes of a run never re-roll the same draft.
   const depth = run.path.length;
   return {

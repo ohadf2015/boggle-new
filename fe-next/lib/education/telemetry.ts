@@ -246,6 +246,22 @@ export function trackEduProgressDigestViewed(args: { hasPro: boolean; state: str
   });
 }
 
+/**
+ * `edu_reteach_live_scheduled` — one-click "schedule reteach Live in ~14 days"
+ * from miss-gap words on the last-lesson digest. Kahoot Teacher Takeover foil:
+ * rebuild hard Qs, replay ~2 weeks later. Counts words only — never student names.
+ */
+export function trackEduReteachLiveScheduled(args: {
+  wordCount: number;
+  delayDays: number;
+}): void {
+  safeCapture('edu_reteach_live_scheduled', {
+    word_count: args.wordCount,
+    delay_days: args.delayDays,
+  });
+}
+
+
 export type EduTeacherAction = 'create_classroom' | 'create_lesson' | 'create_assignment';
 
 export interface EduTeacherActionFailedArgs {

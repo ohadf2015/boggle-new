@@ -4,7 +4,7 @@ vi.mock('@/utils/authFetch', () => ({ fetchWithAuth: (url: string, init?: Reques
 
 import { useAdventureRun } from '../useAdventureRun';
 import { getPlayLevel } from '@/lib/adventure/play/levels';
-import { wordPoints } from '@/lib/adventure/play/scoreRun';
+import { wordPoints, SPEED_BONUS } from '@/lib/adventure/play/scoreRun';
 import { runStorageKey } from '../runStorage';
 
 const grid = [
@@ -100,8 +100,9 @@ describe('useAdventureRun — roguelike run', () => {
     act(() => result.current.begin());
     await act(async () => { await result.current.submitWord('dog'); });
     await act(async () => { await result.current.submitWord('cat'); });
-    expect(result.current.score).toBe(wordPoints('dog') * 2 + wordPoints('cat'));
-    expect(result.current.points).toEqual([wordPoints('dog') * 2, wordPoints('cat')]);
+    // cat follows dog instantly: the speed bonus (x1.1) lands on it, the relic on dog.
+    expect(result.current.points).toEqual([wordPoints('dog') * 2, Math.round(wordPoints('cat') * SPEED_BONUS)]);
+    expect(result.current.score).toBe(result.current.points[0] + result.current.points[1]);
   });
 
   it('given a win with a next run, when completed, then the next run + offer are stored; a run-over clears storage', async () => {

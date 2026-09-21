@@ -11651,7 +11651,10 @@ const en = {
       "loadError": "Couldn't load the last lesson.",
       "retry": "Try again",
       "proCtaHint": "Unlock every game, every student, and printable PDFs.",
-      "regionLabel": "Progress digest for {{classroom}}"
+      "regionLabel": "Progress digest for {{classroom}}",
+      "scheduleReteachCta": "Schedule reteach Live in ~{{days}} days",
+      "scheduleReteachConfirm": "Reteach Live scheduled for {{date}} (~{{days}} days). Calendar invite opened.",
+      "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks — Kahoot-style spaced reteach."
     },
     "subscription": {
       "giftedNoCard": "No card on file, no renewal — it just ends, and you go back to Free.",

@@ -36,6 +36,7 @@ import {
   trackEduTeacherDashboardViewed,
   trackEduTeacherToolsOpened,
   trackEduProgressDigestViewed,
+  trackEduReteachLiveScheduled,
   trackEduTeacherActionFailed,
   setEduClassroomContext,
   setEduTestAccountFlag,
@@ -261,6 +262,14 @@ describe('education telemetry', () => {
       expect(captureMock).toHaveBeenCalledWith('edu_progress_digest_viewed', {
         has_pro: false,
         pulse_state: 'needsReview',
+      });
+    });
+
+    it('Given a reteach schedule, When clicked, Then word_count and delay_days ride the event without student names', () => {
+      trackEduReteachLiveScheduled({ wordCount: 3, delayDays: 14 });
+      expect(captureMock).toHaveBeenCalledWith('edu_reteach_live_scheduled', {
+        word_count: 3,
+        delay_days: 14,
       });
     });
   });

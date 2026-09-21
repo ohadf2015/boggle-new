@@ -4,7 +4,7 @@
  */
 import type { AttemptPayload } from './attemptToken';
 import { getPlayLevel, starsForScore, bossStarsForElapsed, isCombatKind } from './levels';
-import { scoreRun } from './scoreRun';
+import { scoreRun, sanitizeTimes } from './scoreRun';
 import { rewardsFor } from './progress';
 import { secondsBonus, POTION_TIME_MS } from './relics';
 
@@ -31,6 +31,8 @@ export function settleRun(input: {
   isWord: (w: string) => boolean;
   prevStars: number;
   pointsFor?: (w: string) => number;
+  /** Client find time per word (ms from level start) — combo + speed bonus. Untrusted. */
+  times?: unknown;
 }): SettleResult {
   const { payload, words, now, isWord, prevStars, pointsFor } = input;
   const lvl = getPlayLevel(payload.w, payload.l);
@@ -47,6 +49,7 @@ export function settleRun(input: {
   const { valid, score, points } = scoreRun({
     grid: payload.g, words, language: payload.lang, minLength: lvl.minLength, isWord, pointsFor,
     relics: payload.r ?? [], kind,
+    times: sanitizeTimes(input.times, words.length, seconds * 1000 + GRACE_MS) ?? undefined,
   });
 
   let won: boolean;

@@ -44,6 +44,8 @@ export interface BossRules {
   shieldLen?: number;
   /** Min word length that interrupts a telegraph (default 5). */
   interruptLen?: number;
+  /** Ordinary fight rivals: hits wound but never drop the player below 1 HP. */
+  nonLethal?: boolean;
 }
 
 export interface EnemyScript {
@@ -125,9 +127,10 @@ const LONG_WORD = 5;
 const PHASE_SPEED = [1, 0.85, 0.7] as const;
 
 export function enemyScript(enemyId: string): EnemyScript {
-  const m = /^(boss|elite)-w(\d+)$/.exec(enemyId);
+  const m = /^(boss|elite|foe)-w(\d+)$/.exec(enemyId);
   const world = m ? Math.min(10, Math.max(1, Number(m[2]))) : 1;
   const w = WORLD_SCRIPTS[world - 1];
+  if (m?.[1] === 'foe') return { id: enemyId, cadenceMs: w.foe.cadenceMs, openingMs: w.foe.openingMs, phases: [w.foe.attacks, w.foe.attacks, w.foe.attacks], rules: { nonLethal: true } };
   if (m?.[1] === 'elite') {
     return { id: enemyId, cadenceMs: w.eliteCadenceMs, openingMs: Math.round(w.openingMs * 1.2), phases: [w.elite, w.elite, w.elite] };
   }
@@ -177,7 +180,7 @@ function hurt(s: CombatState, dmg: number, fx: CombatFx, source: string) {
     s.fx.push('blocked');
     return;
   }
-  s.hp = Math.max(0, s.hp - dmg);
+  s.hp = Math.max(s.script.rules?.nonLethal ? Math.min(1, s.hp) : 0, s.hp - dmg);
   s.fx.push(fx);
   if (s.hp > 0) return;
   if (s.canRevive && !s.revived) {

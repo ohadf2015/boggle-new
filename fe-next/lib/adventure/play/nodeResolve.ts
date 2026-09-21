@@ -17,7 +17,7 @@ import { shopStock, type ShopItem } from './shop';
 import { eventById, eventForNode, rollOutcome, type EventOutcome } from './events';
 
 /** Rest heals this share of max HP (rounded up, always at least 1). */
-export const REST_HEAL_FRACTION = 0.3;
+export const REST_HEAL_FRACTION = 0.5;
 export const TREASURE_GOLD = 45;
 /** How many unowned relics a chest puts on the lid beside its gold pile. */
 export const TREASURE_OFFER_RELICS = 2;

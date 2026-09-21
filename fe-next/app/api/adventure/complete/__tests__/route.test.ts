@@ -43,7 +43,7 @@ import { POST } from '../route';
 import { signAttempt } from '@/lib/adventure/play/attemptToken';
 import { eliteTrophy } from '@/lib/adventure/play/trophy';
 import { GRACE_MS } from '@/lib/adventure/play/settleRun';
-import { freshRun, verifyRun, enterNode } from '@/lib/adventure/play/runToken';
+import { freshRun, verifyRun, enterNode, WIN_HEAL } from '@/lib/adventure/play/runToken';
 import { buildRunMap } from '@/lib/adventure/play/runMap';
 import { wordPoints } from '@/lib/adventure/play/scoreRun';
 
@@ -348,18 +348,18 @@ describe('POST /api/adventure/complete', () => {
       expect(res.status).toBe(200);
       expect(res.data.won).toBe(true);
       const next = verifyRun(res.data.nextRunToken, SECRET);
-      expect(next).toMatchObject({ u: USER_ID, node: FIRST_NODE, hp: 3, potions: { heal: 0, time: 0 } });
+      expect(next).toMatchObject({ u: USER_ID, node: FIRST_NODE, hp: 3 + WIN_HEAL, potions: { heal: 0, time: 0 } });
       expect(next!.gold).toBeGreaterThan(0);
-      expect(res.data.nextRun).toMatchObject({ node: FIRST_NODE, hp: 3 });
+      expect(res.data.nextRun).toMatchObject({ node: FIRST_NODE, hp: 3 + WIN_HEAL });
       expect(res.data.nextRun).not.toHaveProperty('seed');
       expect(res.data.offer).toHaveLength(3);
       expect(res.data.offer).toEqual(next!.offer);
     });
 
-    it('given no hpLeft, when completed, then hp carries over unchanged rather than dropping to 0', async () => {
+    it('given no hpLeft, when completed, then hp carries over (plus the win heal) rather than dropping to 0', async () => {
       const token = makeToken({ run: { ...run(), hp: 4 } });
       const res = await POST(makeRequest({ token, words: ['catser'] }));
-      expect(verifyRun(res.data.nextRunToken, SECRET)?.hp).toBe(4);
+      expect(verifyRun(res.data.nextRunToken, SECRET)?.hp).toBe(4 + WIN_HEAL);
     });
 
     it('given a request claiming relics the token does not hold, when completed, then the score is unchanged', async () => {

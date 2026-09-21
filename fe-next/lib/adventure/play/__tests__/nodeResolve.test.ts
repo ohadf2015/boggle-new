@@ -209,11 +209,11 @@ describe('applyNodeChoice — treasure', () => {
 describe('applyNodeChoice — rest', () => {
   const rest = node('rest');
 
-  it('Given a wounded run, When rest heals, Then it restores about 30% of max HP', () => {
+  it('Given a wounded run, When rest heals, Then it restores about half of max HP', () => {
     const before = run({ hp: 1 });
     const after = applyNodeChoice(enterNodeState(before, rest).run, rest, 0, SEED);
     expect(after.ok).toBe(true);
-    if (after.ok) expect(after.run.hp).toBe(Math.min(maxHpOf(before), 1 + Math.max(1, Math.round(BASE_HP * 0.3))));
+    if (after.ok) expect(after.run.hp).toBe(Math.min(maxHpOf(before), 1 + Math.max(1, Math.ceil(BASE_HP * 0.5))));
   });
 
   it('Given a rest, When the HP upgrade is taken, Then max HP rises by one', () => {

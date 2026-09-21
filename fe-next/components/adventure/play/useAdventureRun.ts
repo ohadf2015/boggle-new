@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isCombatKind, type PlayLevel } from '@/lib/adventure/play/levels';
 import { scoreWords, chainsFrom } from '@/lib/adventure/play/scoreRun';
+import { calculateComboChainWindow } from '@/shared/utils/comboUtils';
 import { bossPhase, type BossPhase } from '@/lib/adventure/play/boss';
 import { initCombat, step as combatStep, blockedTiles, type CombatEvent, type CombatFx, type CombatState } from '@/lib/adventure/play/combat';
 import {
@@ -83,6 +84,9 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
   const tokenRef = useRef('');
   const pendingRunTokenRef = useRef('');
   const wordsRef = useRef<string[]>([]);
+  /** Find time of each word (ms since Start), aligned with wordsRef — combo + speed. */
+  const timesRef = useRef<number[]>([]);
+  const lastPointsRef = useRef(0);
   const endAtRef = useRef(0);
   const lastTickRef = useRef(0);
   const finishingRef = useRef(false);
@@ -99,8 +103,18 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
 
   const relics = useMemo(() => run?.relics ?? [], [run]);
   const kind = lvl?.kind;
-  const scored = useMemo(() => scoreWords(words, { relics, kind, language }), [words, relics, kind, language]);
+  // timesRef is written in the same step as `words`, so this memo sees them aligned.
+  const scored = useMemo(() => scoreWords(words, { relics, kind, language, times: timesRef.current }), [words, relics, kind, language]);
   const score = scored.score;
+  // The combo shown on the board lapses when its chain window runs out, like the classic game's.
+  const [liveCombo, setLiveCombo] = useState(0);
+  useEffect(() => {
+    const level = scored.combo[scored.combo.length - 1] ?? 0;
+    setLiveCombo(level);
+    if (!level) return;
+    const id = setTimeout(() => setLiveCombo(0), calculateComboChainWindow(level));
+    return () => clearTimeout(id);
+  }, [scored]);
   const combatLevel = !!lvl && isCombatKind(lvl.kind);
   const bossHp = combatLevel && lvl ? Math.max(0, lvl.bossHp - score) : 0;
   const boss: BossPhase | null = lvl?.isBoss ? bossPhase(bossHp, lvl.bossHp) : null;
@@ -122,6 +136,8 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
   const resetAttempt = useCallback(() => {
     setWords([]);
     wordsRef.current = [];
+    timesRef.current = [];
+    lastPointsRef.current = 0;
     setResult(null);
     setOffer(null);
     setHintsGiven([]);
@@ -308,6 +324,7 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
         body: JSON.stringify({
           token: tokenRef.current,
           words: wordsRef.current,
+          at: timesRef.current,
           hpLeft: c ? c.hp : hpRef.current,
           potionsUsed: used,
           died: opts.died === true || !!c?.dead,
@@ -370,19 +387,20 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
     startedAtRef.current = Date.now();
     // Stable mode label across every adventure node — trackGameEnd dedupes on it.
     trackGameStart(ADVENTURE_MODE, { world, level: lvl.level, levelKind: lvl.kind, nodeKind: nodeKindRef.current, nodeId: currentNodeRef.current });
-    if (isCombatKind(lvl.kind)) {
-      combatRef.current = initCombat({
-        enemyId: lvl.enemyId ?? `${lvl.kind}-w${world}`,
-        world,
-        enemyHp: lvl.bossHp,
-        hp: run?.hp ?? BASE_HP,
-        maxHp: run?.maxHp ?? BASE_HP,
-        relics,
-        size: grid.length,
-        seed: tokenRef.current,
-      });
-      setCombat(combatRef.current);
-    }
+    // Every node fights back: elite/boss with their full scripts, an ordinary
+    // fight with a slow, non-lethal rival whose HP is the top-star bar it draws.
+    const combatLvl = isCombatKind(lvl.kind);
+    combatRef.current = initCombat({
+      enemyId: combatLvl ? lvl.enemyId ?? `${lvl.kind}-w${world}` : `foe-w${world}`,
+      world,
+      enemyHp: combatLvl ? lvl.bossHp : Math.max(1, lvl.stars[2]),
+      hp: run?.hp ?? BASE_HP,
+      maxHp: run?.maxHp ?? BASE_HP,
+      relics,
+      size: grid.length,
+      seed: tokenRef.current,
+    });
+    setCombat(combatRef.current);
     setPhase('playing');
   }, [lvl, msLeft, world, run, relics, grid.length, startLevel]);
 
@@ -449,11 +467,11 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
       if (!(await isWord(w))) return 'invalid';
       if (wordsRef.current.includes(w)) return 'dup';
       wordsRef.current = [...wordsRef.current, w];
+      timesRef.current = [...timesRef.current, Math.max(0, Date.now() - startedAtRef.current)];
       setWords(wordsRef.current);
-      if (combatRef.current) {
-        const pts = scoreWords(wordsRef.current, { relics, kind: lvl.kind, language }).points;
-        dispatchCombat({ type: 'word', word: w, points: pts[pts.length - 1] ?? 0 });
-      }
+      const pts = scoreWords(wordsRef.current, { relics, kind: lvl.kind, language, times: timesRef.current }).points;
+      lastPointsRef.current = pts[pts.length - 1] ?? 0;
+      if (combatRef.current) dispatchCombat({ type: 'word', word: w, points: lastPointsRef.current });
       return 'ok';
     },
     [phase, lvl, grid, language, isWord, relics, dispatchCombat],
@@ -531,7 +549,9 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
     // act map
     map, currentNode, reachable, nextNodes, chooseNode, openMap, newRun, nodeState, nodeChoice, ecosystem,
     // roguelike
-    run, offer, choosePick, points: scored.points,
+    run, offer, choosePick, points: scored.points, combo: liveCombo,
+    /** Points the last accepted word scored (combo + speed + relics) — what the server credits. */
+    lastWordPoints: () => lastPointsRef.current,
     hints, hintsLeft, hintsGiven, takeHint, grantHint, revealFullHint: revealsFullHint(relics),
     targets, targetsFound, chainLetter,
     hp: combat ? combat.hp : hp, maxHp: combat ? combat.maxHp : run?.maxHp ?? BASE_HP,

@@ -66,13 +66,15 @@ describe('useAdventureRun — combat feed', () => {
     expect(feed.map((e) => e.id)).toEqual([...feed.map((e) => e.id)].sort((a, b) => a - b));
   });
 
-  it('given a non-combat level, when a word lands, then the feed stays empty', async () => {
+  it('given an ordinary fight, when a word lands, then it hits the rival (a non-lethal foe script)', async () => {
     mockApi({ level: getPlayLevel(1, 1) });
     const { result } = hook(1);
     await waitFor(() => expect(result.current.phase).toBe('ready'));
     act(() => result.current.begin());
+    expect(result.current.combat?.script.id).toBe('foe-w1');
+    expect(result.current.combat?.script.rules?.nonLethal).toBe(true);
     await act(async () => { await result.current.submitWord('cat'); });
-    expect(result.current.combatFx).toEqual([]);
+    expect(result.current.combatFx.flatMap((e) => e.fx)).toContain('damage');
   });
 });
 
