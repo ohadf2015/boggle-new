@@ -176,7 +176,7 @@ export function TeacherOnboardingChecklist({
                   >
                     {t(copy.ctaKey)}
                   </Link>
-                ) : isCurrent ? (
+                ) : isCurrent && !(step.id === 'create_classroom' && classroomCount === 0) ? (
                   <button
                     type="button"
                     data-testid={copy.testId}

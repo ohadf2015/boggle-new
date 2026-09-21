@@ -49,7 +49,7 @@ describe('TeacherOnboardingChecklist', () => {
     });
   });
 
-  it('routes the empty classroom step to the create-classroom CTA', () => {
+  it('suppresses the create-classroom CTA for zero-classroom teachers but fires view event', () => {
     const onCreateClassroom = vi.fn();
     render(
       <TeacherOnboardingChecklist
@@ -65,15 +65,16 @@ describe('TeacherOnboardingChecklist', () => {
 
     const card = screen.getByTestId('teacher-onboarding-checklist');
     expect(card).toHaveAttribute('data-current', 'create_classroom');
-    fireEvent.click(screen.getByTestId('teacher-onboarding-cta-create-classroom'));
-    expect(onCreateClassroom).toHaveBeenCalledTimes(1);
+
+    // The create-classroom CTA button is hidden when classroomCount === 0
+    // because PlayTabFirstRunCard is the primary CTA (consolidation fix).
+    // The view event still fires, but the button is not clickable.
+    expect(screen.queryByTestId('teacher-onboarding-cta-create-classroom')).not.toBeInTheDocument();
+
+    // Verify the view event is fired even though the CTA is hidden.
     expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({
       step: 'create_classroom',
       action: 'view',
-    });
-    expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({
-      step: 'create_classroom',
-      action: 'cta',
     });
   });
 

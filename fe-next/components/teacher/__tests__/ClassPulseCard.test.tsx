@@ -67,14 +67,17 @@ describe('ClassPulseCard', () => {
       expect(screen.queryByTestId('class-pulse-participation')).not.toBeInTheDocument();
     });
 
-    it('asks the teacher to play, as the single next action', () => {
+    it('derives play state (button suppressed in dashboard context)', () => {
+      // CONSOLIDATION FIX: when nextAction is 'play', the button is
+      // suppressed because GO LIVE (PlayNowLauncher) is the primary path.
       const pulse = deriveClassPulse({ rosterCount: 28, lastGame: null, now: NOW });
 
       render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} />);
 
-      const actions = screen.getAllByTestId(/^class-pulse-action/);
-      expect(actions).toHaveLength(1);
-      expect(actions[0]).toHaveTextContent('teacher.pulse.action.play');
+      // The pulse card correctly derives nextAction as 'play', but the
+      // button is not rendered (suppressed in the dashboard context).
+      expect(pulse.nextAction).toBe('play');
+      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
     });
   });
 
@@ -196,7 +199,10 @@ describe('ClassPulseCard', () => {
   });
 
   describe('given a healthy class', () => {
-    it('invites another game rather than inventing a problem', async () => {
+    it('shows playAgain state (button suppressed in dashboard context)', () => {
+      // CONSOLIDATION FIX: when nextAction is 'playAgain', the button is
+      // suppressed because GO LIVE (PlayNowLauncher) is the primary path.
+      // This test verifies the state is derived correctly, not clickability.
       const onAction = vi.fn();
       const pulse = deriveClassPulse({
         rosterCount: 10,
@@ -210,8 +216,11 @@ describe('ClassPulseCard', () => {
       render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} onAction={onAction} />);
       expect(screen.queryByTestId('class-pulse-struggling')).not.toBeInTheDocument();
 
-      await userEvent.click(screen.getByTestId('class-pulse-action'));
-      expect(onAction).toHaveBeenCalledWith('playAgain');
+      // The pulse card correctly derives nextAction as 'playAgain', but the
+      // button is not rendered (suppressed in the dashboard context).
+      expect(pulse.nextAction).toBe('playAgain');
+      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+      expect(onAction).not.toHaveBeenCalled();
     });
   });
 

@@ -88,20 +88,24 @@ describe('ClassPulseSection', () => {
     expect(onPlay).not.toHaveBeenCalled();
   });
 
-  it('routes both play and playAgain to this screen\'s launch control', async () => {
+  it('suppresses play/playAgain button (primary action is GO LIVE)', async () => {
+    // CONSOLIDATION FIX: when the pulse card's action is 'play' or 'playAgain',
+    // the primary launch path is GO LIVE (PlayNowLauncher) on the dashboard.
+    // The pulse card's button is suppressed to avoid duplicate launch paths.
+
     setPulse({ rosterCount: 3, lastGame: null });
-    const first = renderSection();
-    await userEvent.click(screen.getByTestId('class-pulse-action'));
-    expect(first.onPlay).toHaveBeenCalledTimes(1);
+    renderSection();
+    // The 'play' action button should not be rendered
+    expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
 
     vi.clearAllMocks();
     setPulse({
       rosterCount: 3,
       lastGame: { ...reviewGame, players: [{ studentId: 's1', name: 'Ada', accuracyPct: 99 }], missedWords: [] },
     });
-    const second = renderSection();
-    await userEvent.click(screen.getAllByTestId('class-pulse-action').at(-1)!);
-    expect(second.onPlay).toHaveBeenCalledTimes(1);
+    renderSection();
+    // The 'playAgain' action button should not be rendered
+    expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
   });
 
   it('opens exactly ONE review lesson, with the words the class missed', async () => {
