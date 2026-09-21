@@ -81,6 +81,7 @@ export function NoAccountCta({
   const c = copy ?? noAccountCopy(locale);
   return (
     <div
+      data-testid="no-account-cta"
       className={`max-w-xl rounded-neo border-2 border-s-4 border-neo-cream/40 border-s-neo-lime bg-neo-navy-light p-4 text-neo-white sm:p-5 ${className}`}
     >
       <p className="font-neo-display text-base font-bold leading-snug text-neo-lime sm:text-lg">
