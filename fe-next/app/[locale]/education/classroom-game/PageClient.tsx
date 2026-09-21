@@ -75,8 +75,10 @@ function ClassroomGameInner() {
     setIsChecking(false);
   }, [isAuthenticated, authLoading, router, language]);
 
+  // Only reachable inside <TeacherGate>, so the caller is always a teacher who
+  // came from the dashboard's GO LIVE. `/education` is the marketing landing.
   const handleBack = useCallback(() => {
-    router.push(`/${language}/education`);
+    router.push(`/${language}/teacher`);
   }, [router, language]);
 
   /**
