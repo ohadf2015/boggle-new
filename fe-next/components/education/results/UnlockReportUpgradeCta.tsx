@@ -1,0 +1,75 @@
+/**
+ * Quiet Teacher Pro ask on the teacher's own results card — never the projector.
+ *
+ * A free teacher who just ran a live class generated the report they cannot
+ * open. The dashboard milestone strip (PR #1079) only fires on the next
+ * /teacher visit; this is the same Polar checkout, at the moment of use.
+ * Rematch stays the one loud button. Do not POST /api/subscription/checkout
+ * from here — /teacher/upgrade owns that POST.
+ *
+ * Mount only behind `isTeacher` (ClassroomResultsCard already does). Thirty
+ * student phones must not hit /api/subscription/status.
+ */
+'use client';
+
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { BarChart3 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import { trackResultsAction, type ResultsSurface } from './trackResultsAction';
+
+export function shouldShowUnlockReportUpgradeCta(hasPro: boolean, loading: boolean): boolean {
+  return !loading && !hasPro;
+}
+
+export interface UnlockReportUpgradeCtaProps {
+  language: string;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  surface?: ResultsSurface;
+}
+
+export function UnlockReportUpgradeCta({
+  language,
+  t,
+  surface = 'teacher_card',
+}: UnlockReportUpgradeCtaProps) {
+  const { hasPro, loading } = useTeacherPro();
+  const show = shouldShowUnlockReportUpgradeCta(hasPro, loading);
+
+  useEffect(() => {
+    if (!show) return;
+    trackGrowthEvent('iap_viewed', {
+      product: 'teacher_pro',
+      source: `results_${surface}`,
+    });
+  }, [show, surface]);
+
+  if (!show) return null;
+
+  return (
+    <Link
+      href={`/${language}/teacher/upgrade`}
+      data-testid="unlock-report-upgrade-cta"
+      onClick={() => {
+        trackResultsAction('unlock_report', surface);
+        trackGrowthEvent('landing_cta_clicked', {
+          cta: 'teacher_pro',
+          source: `results_${surface}`,
+        });
+      }}
+      className={cn(
+        'self-center flex items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm',
+        'bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo',
+        'shadow-hard-sm hover:shadow-hard transition-all',
+      )}
+    >
+      <BarChart3 className="w-4 h-4 shrink-0" aria-hidden />
+      {t('education.results.unlockReport', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+    </Link>
+  );
+}
+
+export default UnlockReportUpgradeCta;

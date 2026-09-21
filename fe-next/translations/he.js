@@ -13464,6 +13464,7 @@ const he = {
       "coverageMeterLabel": "{{percent}}% ממילות השיעור נמצאו",
       "moreWaysToReteach": "עוד דרכים ללמד מחדש את המילים",
       "fullReport": "דוח מלא",
+      "unlockReport": "פתחו דוח מלא — {{price}} לחודש",
       "neverPlaced": "לא הופיעו על הלוח",
       "neverPlacedHint": "הלוח לא הצליח להכיל אותן — הכיתה מעולם לא ראתה אותן. התחילו סיבוב חוזר כדי לתת להן הזדמנות.",
       "needsHelp": {

@@ -26,6 +26,7 @@ import { RotateCcw, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { trackResultsAction } from './trackResultsAction';
+import { UnlockReportUpgradeCta } from './UnlockReportUpgradeCta';
 
 export interface ResultsPrimaryActionsProps {
   /** Locale segment for the report href. */
@@ -38,8 +39,9 @@ export interface ResultsPrimaryActionsProps {
 export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimaryActionsProps) {
   const { hasPro, loading } = useTeacherPro();
   const canOpenReport = hasPro && !loading;
+  const showUpgrade = !loading && !hasPro;
 
-  if (!onRematch && !canOpenReport) return null;
+  if (!onRematch && !canOpenReport && !showUpgrade) return null;
 
   // Stacked, not side by side: ONE loud action (rematch, full width), and the
   // report under it at half the weight. Two equal buttons in a row made the
@@ -80,6 +82,10 @@ export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimary
           {t('education.results.fullReport')}
         </Link>
       )}
+
+      {showUpgrade ? (
+        <UnlockReportUpgradeCta language={language} t={t} surface="teacher_card" />
+      ) : null}
     </div>
   );
 }

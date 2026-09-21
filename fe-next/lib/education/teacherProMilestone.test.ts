@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   TEACHER_PRO_MILESTONE_MIN_STUDENTS,
   TEACHER_PRO_MILESTONE_MIN_COMPLETED,
+  TEACHER_PRO_ASK_DISMISS_TTL_MS,
   classroomHitsTeacherProMilestone,
   teacherHitsProUpgradeMilestone,
   isTeacherProAskDismissed,
@@ -106,8 +107,37 @@ describe('Teacher Pro ask dismiss persistence', () => {
         mem.set(k, v);
       },
     };
-    persistTeacherProAskDismissed(storage);
-    expect(mem.get(TEACHER_PRO_ASK_DISMISS_KEY)).toBe('1');
-    expect(isTeacherProAskDismissed(storage)).toBe(true);
+    const now = 1_700_000_000_000;
+    persistTeacherProAskDismissed(storage, now);
+    expect(mem.get(TEACHER_PRO_ASK_DISMISS_KEY)).toBe(String(now));
+    expect(isTeacherProAskDismissed(storage, now)).toBe(true);
+  });
+
+  it('re-asks after the TTL so a "not now" is not forever', () => {
+    const mem = new Map<string, string>();
+    const storage = {
+      getItem: (k: string) => mem.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        mem.set(k, v);
+      },
+    };
+    const now = 1_700_000_000_000;
+    persistTeacherProAskDismissed(storage, now);
+    expect(isTeacherProAskDismissed(storage, now + TEACHER_PRO_ASK_DISMISS_TTL_MS - 1)).toBe(true);
+    expect(isTeacherProAskDismissed(storage, now + TEACHER_PRO_ASK_DISMISS_TTL_MS)).toBe(false);
+  });
+
+  it('migrates the legacy permanent flag into a TTL window', () => {
+    const mem = new Map<string, string>([[TEACHER_PRO_ASK_DISMISS_KEY, '1']]);
+    const storage = {
+      getItem: (k: string) => mem.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        mem.set(k, v);
+      },
+    };
+    const now = 1_700_000_000_000;
+    expect(isTeacherProAskDismissed(storage, now)).toBe(true);
+    expect(mem.get(TEACHER_PRO_ASK_DISMISS_KEY)).toBe(String(now));
+    expect(isTeacherProAskDismissed(storage, now + TEACHER_PRO_ASK_DISMISS_TTL_MS)).toBe(false);
   });
 });
