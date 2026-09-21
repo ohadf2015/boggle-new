@@ -9,8 +9,13 @@ import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherProMilestone } from '@/hooks/useTeacherProMilestone';
-import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
+import { isTrialUpgradeNudgeWindow } from '@/lib/education/trial';
+import { useTrialUpgradeNudge } from '@/lib/education/useTrialUpgradeNudge';
+import {
+  TEACHER_PRO_CHECKOUT_PATH,
+  teacherProUpgradeCtaLabel,
+} from '@/components/education/TeacherProCheckoutCta';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the
@@ -22,13 +27,14 @@ function TeacherDashboardInner() {
   const { isAdmin } = useAuth();
   const { trial } = useTeacherAccess();
   const { hasPro, loading: proLoading } = useTeacherPro();
-  const { hasRecentConfig } = useRecentGameSettings();
   const {
     hasMilestone,
     loading: milestoneLoading,
     dismissed,
     dismiss,
   } = useTeacherProMilestone();
+  const { dismissed: trialNudgeDismissed, dismiss: dismissTrialNudge } =
+    useTrialUpgradeNudge(trial);
 
   // At most one banner above the dashboard. This page used to stack a trial
   // countdown, a district-pricing upsell and a Pro strip before the thing the
@@ -37,10 +43,11 @@ function TeacherDashboardInner() {
   // (paid or gifted) gets no upsell at all.
   // The Pro strip waits for a classroom engagement milestone (3 students or
   // 5 completed games/assignments) instead of firing on first live game.
-  // Trial urgency still waits for a first live game so a brand-new teacher
-  // is not counting down a clock before they have hosted anyone.
+  // The trial banner is the 7-day upgrade nudge (or the expired renewal card),
+  // not a 14-day activation countdown — Polar checkout is the CTA.
+  const trialNudgeOpen = isTrialUpgradeNudgeWindow(trial) && !trialNudgeDismissed;
   const picked = pickTeacherBanner({
-    hasTrial: !!trial,
+    hasTrial: trialNudgeOpen || !!trial?.isExpired,
     isAdmin,
     hasPro,
     proLoading,
@@ -48,13 +55,12 @@ function TeacherDashboardInner() {
     milestoneLoading,
     proAskDismissed: dismissed,
   });
-  const banner = picked === 'trial' && !hasRecentConfig ? null : picked;
 
   useEffect(() => {
-    if (banner === 'pro') {
+    if (picked === 'pro') {
       trackGrowthEvent('iap_viewed', { product: 'teacher_pro', source: 'dashboard_banner', event_type: 'impression' });
     }
-  }, [banner]);
+  }, [picked]);
 
   // Handed to the dashboard, never rendered beside it: a sibling of an `h-dvh`
   // root grows the page past the viewport and the document starts scrolling
@@ -62,9 +68,14 @@ function TeacherDashboardInner() {
   return (
     <TeacherDashboard
       banner={
-        banner === 'trial' && trial ? (
-          <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
-        ) : banner === 'pro' ? (
+        picked === 'trial' && trial ? (
+          <TrialUrgencyBanner
+            trial={trial}
+            href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
+            onDismiss={trialNudgeOpen ? dismissTrialNudge : undefined}
+            ctaLabel={trialNudgeOpen ? teacherProUpgradeCtaLabel(language) : undefined}
+          />
+        ) : picked === 'pro' ? (
           <TeacherProAskBanner onDismiss={dismiss} />
         ) : undefined
       }

@@ -8,7 +8,15 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
-vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => ({ trial: null }) }));
+let accessState: { trial: {
+  expiresAt: string;
+  msLeft: number;
+  daysLeft: number;
+  hoursLeft: number;
+  isExpired: boolean;
+  isUrgent: boolean;
+} | null } = { trial: null };
+vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => accessState }));
 // The Pro entitlement decides whether the upgrade strip shows at all. Default: a
 // resolved free teacher; individual tests override.
 let proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
@@ -22,7 +30,31 @@ vi.mock('@/components/teacher/TeacherDashboard', () => ({
     <div data-testid="teacher-dashboard">{banner}</div>
   ),
 }));
-vi.mock('@/components/education/TrialUrgencyBanner', () => ({ TrialUrgencyBanner: () => null }));
+vi.mock('@/components/education/TrialUrgencyBanner', () => ({
+  TrialUrgencyBanner: ({
+    trial,
+    href,
+    onDismiss,
+    ctaLabel,
+  }: {
+    trial: unknown;
+    href?: string;
+    onDismiss?: () => void;
+    ctaLabel?: string;
+  }) =>
+    trial ? (
+      <div
+        data-testid="trial-urgency-banner"
+        data-href={href}
+        data-cta={ctaLabel ?? ''}
+        data-dismissible={onDismiss ? '1' : '0'}
+      />
+    ) : null,
+}));
+let trialNudgeState = { dismissed: false, dismiss: vi.fn() };
+vi.mock('@/lib/education/useTrialUpgradeNudge', () => ({
+  useTrialUpgradeNudge: () => trialNudgeState,
+}));
 vi.mock('@/components/education/TeacherGate', () => ({
   TeacherGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -59,6 +91,8 @@ const adminProfile  = { user_role: 'admin' as const,   is_admin: true  };
 describe('TeacherPage upgrade CTA', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    accessState = { trial: null };
+    trialNudgeState = { dismissed: false, dismiss: vi.fn() };
     proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
     recentState = { hasRecentConfig: true };
     milestoneState = { hasMilestone: true, loading: false, dismissed: false, dismiss: vi.fn() };
@@ -141,5 +175,66 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+  });
+});
+
+const mkTrial = (over: Partial<NonNullable<typeof accessState.trial>>): NonNullable<typeof accessState.trial> => ({
+  expiresAt: new Date(Date.now() + 5 * 86400000).toISOString(),
+  msLeft: 5 * 86400000,
+  daysLeft: 5,
+  hoursLeft: 120,
+  isExpired: false,
+  isUrgent: false,
+  ...over,
+});
+
+describe('TeacherPage 7-day trial upgrade nudge', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    accessState = { trial: null };
+    trialNudgeState = { dismissed: false, dismiss: vi.fn() };
+    proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
+    recentState = { hasRecentConfig: true };
+    milestoneState = { hasMilestone: true, loading: false, dismissed: false, dismiss: vi.fn() };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+  });
+
+  it('shows a dismissible days-remaining banner linked to Polar checkout inside 7 days', () => {
+    accessState = { trial: mkTrial({ daysLeft: 5 }) };
+    render(<TeacherPage />);
+    const banner = screen.getByTestId('trial-urgency-banner');
+    expect(banner).toHaveAttribute('data-href', '/en/teacher/upgrade');
+    expect(banner).toHaveAttribute('data-dismissible', '1');
+    expect(banner).toHaveAttribute('data-cta', 'Upgrade to Teacher Pro');
+    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+  });
+
+  it('does not show the trial banner with more than 7 days left', () => {
+    accessState = { trial: mkTrial({ daysLeft: 10, msLeft: 10 * 86400000, hoursLeft: 240 }) };
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
+  });
+
+  it('stays quiet after the teacher dismissed the 7-day nudge', () => {
+    accessState = { trial: mkTrial({ daysLeft: 2, isUrgent: true }) };
+    trialNudgeState = { dismissed: true, dismiss: vi.fn() };
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
+  });
+
+  it('never asks a Pro teacher to upgrade, even inside the 7-day window', () => {
+    accessState = { trial: mkTrial({ daysLeft: 3 }) };
+    proState = { ...proState, hasPro: true, source: 'admin_grant' };
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
+    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+  });
+
+  it('still shows the expired renewal card, without a dismiss control', () => {
+    accessState = { trial: mkTrial({ isExpired: true, daysLeft: 0, hoursLeft: 0, msLeft: 0 }) };
+    render(<TeacherPage />);
+    const banner = screen.getByTestId('trial-urgency-banner');
+    expect(banner).toHaveAttribute('data-href', '/en/teacher/upgrade');
+    expect(banner).toHaveAttribute('data-dismissible', '0');
   });
 });

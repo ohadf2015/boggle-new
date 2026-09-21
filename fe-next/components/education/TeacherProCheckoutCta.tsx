@@ -24,6 +24,20 @@ export type TeacherProCheckoutCopy = {
 
 export const TEACHER_PRO_CHECKOUT_PATH = '/teacher/upgrade';
 
+/** Compact in-product upgrade label (classrooms header, trial nudge CTA). */
+const UPGRADE_CTA: Record<string, string> = {
+  en: 'Upgrade to Teacher Pro',
+  he: 'שדרגו ל-Teacher Pro',
+  es: 'Mejora a Teacher Pro',
+  sv: 'Uppgradera till Teacher Pro',
+  ja: 'Teacher Proにアップグレード',
+  ru: 'Перейти на Teacher Pro',
+};
+
+export function teacherProUpgradeCtaLabel(locale: string): string {
+  return UPGRADE_CTA[locale.toLowerCase().split('-')[0]] ?? UPGRADE_CTA.en;
+}
+
 const COPY: Record<string, TeacherProCheckoutCopy> = {
   en: {
     heading: `Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mo`,

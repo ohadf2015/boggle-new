@@ -22,7 +22,13 @@ import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { trackEduClassroomCreated } from '@/lib/education/telemetry';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
+import { isEligibleForTeacherProUpgradeCta } from '@/lib/education/trial';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import {
+  TEACHER_PRO_CHECKOUT_PATH,
+  teacherProUpgradeCtaLabel,
+} from '@/components/education/TeacherProCheckoutCta';
+import Link from 'next/link';
 import { stagger, slideUp } from './teacherDashboardTabs';
 import { StudentCapMeter } from './StudentCapMeter';
 
@@ -226,7 +232,7 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
   return (
     <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Create Classroom Button */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-3">
         <Button
           onClick={openCreateDialog}
           className={cn(
@@ -238,6 +244,25 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
           <Plus className="w-5 h-5 me-2" />
           {t('teacher.classroom.create')}
         </Button>
+        {isEligibleForTeacherProUpgradeCta({
+          trial,
+          hasPro,
+          proLoading,
+          accessLoading,
+        }) ? (
+          <Link
+            href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
+            data-testid="classrooms-upgrade-teacher-pro"
+            className={cn(
+              'inline-flex min-h-11 items-center justify-center rounded-neo bg-neo-navy px-4 py-2',
+              'font-neo-body font-black text-neo-lime border-neo border-neo-cream/40 shadow-hard',
+              'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
+              'transition-all whitespace-nowrap',
+            )}
+          >
+            {teacherProUpgradeCtaLabel(language)}
+          </Link>
+        ) : null}
       </div>
 
       <AnimatePresence initial={false}>
