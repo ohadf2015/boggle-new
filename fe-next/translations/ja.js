@@ -13134,7 +13134,7 @@ const ja = {
       }
     },
     "curriculum": {
-      "title": "カリキュラム",
+      "title": "ライブラリ",
       "description": "カリキュラムからレッスンを閲覧・インポート",
       "browse": "閲覧",
       "import": "インポート",

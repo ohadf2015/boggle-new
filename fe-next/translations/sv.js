@@ -13369,7 +13369,7 @@ const sv = {
       }
     },
     "curriculum": {
-      "title": "Kursplan",
+      "title": "Bibliotek",
       "description": "Bläddra och importera lektioner från kursplanen",
       "browse": "Bläddra",
       "import": "Importera",

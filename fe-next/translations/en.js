@@ -1522,12 +1522,6 @@ const en = {
       "ogTitle": "Vocabulary Lesson Library - LexiClash Education",
       "ogDescription": "Create and manage vocabulary lessons for your classrooms with LexiClash."
     },
-    "lessons": {
-      "title": "Library - Create & Manage Vocabulary Lessons | LexiClash",
-      "description": "Build and manage vocabulary lessons for your classrooms. Create word lists, organize by topic, and assign to students for practice and mastery.",
-      "ogTitle": "Vocabulary Lesson Library - LexiClash Education",
-      "ogDescription": "Create and manage vocabulary lessons for your classrooms with LexiClash."
-    },
     "dailyArchive": {
       "title": "Daily Challenge Archive - Past Word Puzzles & Leaderboards | LexiClash",
       "description": "Browse every past LexiClash daily word puzzle. Replay old boards, compare your scores, and explore leaderboards from every challenge since launch.",
@@ -11590,7 +11584,7 @@ const en = {
       }
     },
     "curriculum": {
-      "title": "Curriculum Word Lists",
+      "title": "Library",
       "description": "Pre-built word lists aligned with Israeli educational standards",
       "browse": "Browse Curriculum Lists",
       "import": "Import to Lesson",

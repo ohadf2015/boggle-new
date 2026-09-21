@@ -13002,7 +13002,7 @@ const es = {
       "noActiveGames": "No hay juegos activos"
     },
     "curriculum": {
-      "title": "Plan de Estudios",
+      "title": "Biblioteca",
       "description": "Explora e importa lecciones del plan de estudios",
       "browse": "Explorar",
       "import": "Importar",

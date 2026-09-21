@@ -39,7 +39,7 @@ import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { useTeacherOnboardingState } from '@/hooks/useOnboardingState';
-import { BarChart3, FileText, ChevronDown, History, SlidersHorizontal } from 'lucide-react';
+import { BarChart3, FileText, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
 import { stagger, slideUp } from './teacherDashboardTabs';
