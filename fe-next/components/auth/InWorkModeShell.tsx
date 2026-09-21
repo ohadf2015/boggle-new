@@ -1,28 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { inWorkModeAccess } from '@/lib/auth/inWorkModeAccess';
 
 /**
- * Pixi touches `window` at import time, so the game must never be server
- * rendered. `ssr: false` is only legal inside a Client Component, which is what
- * this wrapper exists to provide — the same shape v1 uses.
+ * Beta/admin gate used by Adventure, Word Tower v2, and /adventure/achievements.
+ * Waits while a signed-in user has no profile yet (TOKEN_REFRESHED race).
  */
-const WordTowerV2 = dynamic(() => import('@/components/wordTowerV2/WordTowerV2'), {
-  ssr: false,
-});
-
-/**
- * Word Tower v2 — beta testers and admins only.
- *
- * Gated on canSeeInWorkModes, mirroring Adventure. v1 stays the public Word
- * Tower; this route is the in-work preview of the physics rebuild.
- */
-export function WordTowerV2PageClient({ daily = false }: { daily?: boolean } = {}) {
+export function InWorkModeShell({ children }: { children: React.ReactNode }) {
   const { canSeeInWorkModes, loading, user, profile } = useAuth();
   const { language } = useLanguageSafe();
   const router = useRouter();
@@ -40,6 +28,5 @@ export function WordTowerV2PageClient({ daily = false }: { daily?: boolean } = {
   }, [denied, language, router]);
 
   if (!allowed) return null;
-
-  return <WordTowerV2 daily={daily} />;
+  return <>{children}</>;
 }

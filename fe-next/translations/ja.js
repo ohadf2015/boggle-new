@@ -1273,7 +1273,10 @@ const ja = {
     "hint": {"spell": "単語をつくって次のフロアを建てよう", "drop": "タワーの真上に来たら「落とす」をタップ"},
     "changeWord": "ことばをかえる",
     "editHint": "使った文字をタップして単語を直せます",
-    "bestFlag": "ベスト"
+    "bestFlag": "ベスト",
+    "leaveConfirm": "この登りを離れますか？このタブなら再開できますが、デイリーは1日1回です。",
+    "dailyPlayed": "今日のタワーは終了。また明日。",
+    "recapAlt": "タワー記録: {floors}階、{m}メートル"
   },
   "wordTower": {
     "mutator": {
