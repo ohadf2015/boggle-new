@@ -217,25 +217,26 @@ export default function CookieConsent() {
         // No min-h-[280px]: that forced the fold-stealing ~350px band.
         showDetails ? 'max-h-[50vh] overflow-y-auto' : 'overflow-visible',
         'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-hard-lg',
-        'px-3 py-2.5 sm:px-4 sm:py-3 animate-slide-up pointer-events-auto'
+        'px-3 py-2 sm:px-4 sm:py-3 animate-slide-up pointer-events-auto'
       )}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
         <div className="flex min-w-0 flex-1 items-start gap-2.5 sm:items-center">
-          {/* Small inline mascot — brand personality without owning the fold */}
+          {/* Small inline mascot — brand personality without owning the fold.
+              Hidden on mobile to reduce reserved height; visible on tablet+ */}
           <Image
             src="/cookie-consent-mascot.png"
             alt={t('cookieConsent.mascotAlt')}
             width={40}
             height={40}
-            className="mt-0.5 h-10 w-10 shrink-0 object-contain sm:mt-0"
+            className="hidden sm:block mt-0.5 h-10 w-10 shrink-0 object-contain sm:mt-0"
           />
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-bold font-neo-display text-neo-white sm:text-base">
               {t('cookieConsent.title')}
             </h2>
-            <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 line-clamp-2 sm:text-[13px]">
+            <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 line-clamp-1 sm:line-clamp-2 sm:text-[13px]">
               {t('cookieConsent.message')}{' '}
               <a
                 href={`/${language}/legal/cookies`}
@@ -249,7 +250,8 @@ export default function CookieConsent() {
 
         {/* Actions stay one-tap reachable. Accept is cyan — NOT neo-lime — so the
             home Play CTA remains the only lime primary above the fold. Decline
-            and Customize stay equal-weight secondary. */}
+            is leveled up to equal weight with Accept (border-3, text-sm).
+            Customize stays lighter for hierarchy. */}
         <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
           <button
             type="button"
@@ -279,9 +281,9 @@ export default function CookieConsent() {
             type="button"
             onClick={handleDeclineAll}
             className={cn(
-              'min-h-[44px] flex-1 px-3 py-2 text-xs font-bold uppercase sm:flex-none',
+              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase sm:flex-none',
               'text-neo-white',
-              'border-2 border-neo-cream rounded-neo transition-colors duration-100'
+              'border-3 border-neo-cream rounded-neo transition-colors duration-100'
             )}
           >
             {t('cookieConsent.decline')}
