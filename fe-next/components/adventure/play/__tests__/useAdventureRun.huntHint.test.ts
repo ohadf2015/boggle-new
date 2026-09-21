@@ -28,7 +28,7 @@ function mockApi(targets: string[], hints: string[]) {
 }
 
 describe('useAdventureRun — hints on a hunt level', () => {
-  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); sessionStorage.clear(); });
+  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); localStorage.clear(); });
   afterEach(() => vi.useRealTimers());
 
   it('given unfound hunt targets, when a hint is taken, then it points at a target, not a side word', async () => {
@@ -57,7 +57,7 @@ describe('useAdventureRun — hints on a hunt level', () => {
 });
 
 describe('useAdventureRun — bonus hint (deed drop)', () => {
-  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); sessionStorage.clear(); });
+  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); localStorage.clear(); });
   afterEach(() => vi.useRealTimers());
 
   it('given a level in play, when a bonus hint is granted, then one more charge is available', async () => {

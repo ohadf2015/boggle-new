@@ -41,7 +41,7 @@ interface Args {
   ready: boolean;
   /** Built by the caller at the moment the run ends. */
   getSummary: () => RunSummary;
-  reportRun: (summary: RunSummary) => Promise<{ coins: number; chest: ChestRoll } | null>;
+  reportRun: (summary: RunSummary, opts?: { keepalive?: boolean }) => Promise<{ coins: number; chest: ChestRoll } | null>;
 }
 
 /**
@@ -52,7 +52,12 @@ interface Args {
  * or pay twice. `null` (guest offline, a failed POST, estate still loading)
  * means no reveal — the results screen shows instead of an empty chest.
  */
-export function useRunPayout({ over, ready, getSummary, reportRun }: Args): { payout: RunPayout | null; waiting: boolean; clear: () => void } {
+export function useRunPayout({ over, ready, getSummary, reportRun }: Args): {
+  payout: RunPayout | null;
+  waiting: boolean;
+  clear: () => void;
+  bank: (keepalive?: boolean) => Promise<void>;
+} {
   const [payout, setPayout] = useState<RunPayout | null>(null);
   const [waiting, setWaiting] = useState(false);
   const sentRef = useRef(false);
@@ -61,15 +66,24 @@ export function useRunPayout({ over, ready, getSummary, reportRun }: Args): { pa
   summaryRef.current = getSummary;
   const reportRef = useRef(reportRun);
   reportRef.current = reportRun;
+  const readyRef = useRef(ready);
+  readyRef.current = ready;
 
+  const wasOverRef = useRef(over);
   useEffect(() => {
     if (!over) {
-      // A new run: arm the report again.
-      sentRef.current = false;
-      setPayout(null);
-      setWaiting(false);
+      // A NEW run (over -> live): arm the report again. Only on that edge — a
+      // `ready` flicker re-runs this effect too, and re-arming then would pay
+      // a run that was already banked on the way out a second time.
+      if (wasOverRef.current) {
+        sentRef.current = false;
+        setPayout(null);
+        setWaiting(false);
+      }
+      wasOverRef.current = false;
       return;
     }
+    wasOverRef.current = true;
     if (!ready || sentRef.current) return;
     sentRef.current = true;
     setWaiting(true);
@@ -83,6 +97,21 @@ export function useRunPayout({ over, ready, getSummary, reportRun }: Args): { pa
       .finally(() => setWaiting(false));
   }, [over, ready]);
 
+  /**
+   * The player is LEAVING a run that is still standing (exit button, tab
+   * closed, route change). Until this, only a collapse banked anything: coins,
+   * floors, the best height and the rival copy of the tower were all lost the
+   * moment you walked away. Same once-per-run guard as the collapse, so the
+   * run is never credited twice. `keepalive` lets the POST outlive the page.
+   */
+  const bank = useCallback(async (keepalive = false) => {
+    if (sentRef.current || !readyRef.current) return;
+    const summary = summaryRef.current();
+    if (summary.floors <= 0) return;
+    sentRef.current = true;
+    await reportRef.current(summary, { keepalive }).catch(() => null);
+  }, []);
+
   const clear = useCallback(() => setPayout(null), []);
-  return { payout, waiting, clear };
+  return { payout, waiting, clear, bank };
 }

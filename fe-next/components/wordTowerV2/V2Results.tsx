@@ -94,7 +94,7 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
           full-screen raid rendered inside a scrolling card scrolls away. */}
       <div
         data-wt2-results-backdrop
-        className="absolute inset-0 z-40 overflow-y-auto bg-neo-navy/75 p-4"
+        className="absolute inset-0 z-40 overflow-y-auto bg-neo-navy/75 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
         role="dialog"
         aria-modal="true"
         onClick={(e) => {
@@ -118,7 +118,7 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
           type="button"
           onClick={onClose}
           aria-label={t('wordTowerV2.results.close')}
-          className="absolute end-14 top-3 flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:end-3"
+          className="absolute end-14 top-[max(0.75rem,env(safe-area-inset-top))] flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:end-3"
         >
           <X className="h-4 w-4" aria-hidden />
         </button>

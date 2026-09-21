@@ -45,7 +45,7 @@ function mockApi() {
 const hook = () => renderHook(() => useAdventureRun({ world: 1, level: 1, language: 'en', isWord, mapFirst: true }));
 
 describe('useAdventureRun — map-first entry', () => {
-  beforeEach(() => { sessionStorage.clear(); });
+  beforeEach(() => { localStorage.clear(); });
 
   it('Given no stored run, when the screen opens map-first, then it opens the MAP instead of dealing a board', async () => {
     const calls = mockApi();
@@ -57,7 +57,7 @@ describe('useAdventureRun — map-first entry', () => {
   });
 
   it('Given a run in progress, when the screen opens, then the STORED token is sent — a fresh run is never minted over it', async () => {
-    sessionStorage.setItem(runStorageKey(1), JSON.stringify({ runToken: 'rt-live', run: pubRun() }));
+    localStorage.setItem(runStorageKey(1), JSON.stringify({ runToken: 'rt-live', run: pubRun() }));
     const calls = mockApi();
     const { result } = hook();
     await waitFor(() => expect(result.current.phase).toBe('map'));
@@ -91,7 +91,7 @@ describe('useAdventureRun — map-first entry', () => {
     const { result } = hook();
     await waitFor(() => expect(result.current.phase).toBe('map'));
     // What /complete stored for the next node: a token plus a pending draft.
-    sessionStorage.setItem(runStorageKey(1), JSON.stringify({
+    localStorage.setItem(runStorageKey(1), JSON.stringify({
       runToken: 'rt-next', run: pubRun({ step: 2, offer: [{ type: 'gold', amount: 5 }] }),
     }));
     act(() => { result.current.retry(); });

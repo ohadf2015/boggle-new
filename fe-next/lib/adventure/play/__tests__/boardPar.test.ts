@@ -1,6 +1,6 @@
 /**
  * Thresholds must follow the board actually dealt. The authored design in
- * WORLD_ROWS (kind multipliers, twists, the 1.8/2.8 star steps) is preserved —
+ * WORLD_ROWS (kind multipliers, twists, the 1.3/1.6 star steps) is preserved —
  * only the MAGNITUDE is re-derived from the board.
  */
 import { describe, it, expect } from 'vitest';
@@ -37,8 +37,24 @@ describe('tuneToBoard', () => {
 
   it('given a tuned level, when read, then the authored star steps are preserved', () => {
     const t = medianFor(1, 1);
-    expect(t.stars[1] / t.stars[0]).toBeCloseTo(1.8, 1);
-    expect(t.stars[2] / t.stars[0]).toBeCloseTo(2.8, 1);
+    expect(t.stars[1] / t.stars[0]).toBeCloseTo(1.3, 1);
+    expect(t.stars[2] / t.stars[0]).toBeCloseTo(1.6, 1);
+    // …and the steps widen toward the end of the ladder, never past the old 2.8.
+    const last = medianFor(10, 6);
+    expect(last.stars[2] / last.stars[0]).toBeGreaterThan(2);
+    expect(last.stars[2] / last.stars[0]).toBeLessThan(2.3);
+  });
+
+  it('given an ordinary fight, when its rival HP (the top star) is compared to the boss, then it is no tougher', () => {
+    // The ordinary rival dies at the 3rd star. At 2.8x the first star it took ~17
+    // four-letter words — more than twice the world's boss (1.3x).
+    for (const world of [1, 4, 7]) {
+      const t = medianFor(world, 1);
+      const boss = medianFor(world, 7);
+      // Same first-star basis on both sides: rival HP within ~1.5x of the boss's
+      // (it was 2.15x), and the boss still ends the world.
+      expect(t.stars[2] / t.stars[0]).toBeLessThanOrEqual((boss.enemyHp! / boss.stars[0]) * 1.5);
+    }
   });
 
   it('given a richer board, when tuned, then every threshold rises', () => {
@@ -112,7 +128,9 @@ describe('tuneToBoard', () => {
         // carry a deliberately lower score bar, and hunt does not even win on
         // score — it wins on targets found.
         // Early worlds ease in on purpose; the ceiling must bite from world 7 on.
-        if (lvl.kind === 'classic' && w >= 7) expect(t.stars[2]).toBeGreaterThan(human * 0.7);
+        // The 3rd star is also the ordinary rival's HP, so the ceiling trades
+        // against fight length: demanding, not a whole run.
+        if (lvl.kind === 'classic' && w >= 7) expect(t.stars[2]).toBeGreaterThan(human * 0.55);
       }
     }
   });
@@ -122,6 +140,6 @@ describe('tuneToBoard', () => {
     const before = getPlayLevel(10, 6);
     const after = medianFor(10, 6);
     expect(before.stars[2]).toBeLessThan(HUMAN[before.size]);
-    expect(after.stars[2]).toBeGreaterThan(HUMAN[before.size]);
+    expect(after.stars[2]).toBeGreaterThan(before.stars[2]);
   });
 });

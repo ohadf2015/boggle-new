@@ -143,7 +143,7 @@ export default function AdventureView() {
 
   return (
     <div className="min-h-dvh bg-[#0f1b3d] text-neo-cream">
-      <header className="sticky top-0 z-40 flex items-center gap-1.5 px-3 py-2.5 bg-[#0f1b3d]/90 backdrop-blur-sm border-b-[3px] border-black">
+      <header className="sticky top-0 z-40 flex items-center gap-1.5 px-3 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] bg-[#0f1b3d]/90 backdrop-blur-sm border-b-[3px] border-black">
         <Link href={`/${language}`} aria-label={t('adventurePlay.backHome')}
           className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000]">
           <ArrowLeft className="w-5 h-5 rtl:rotate-180" />

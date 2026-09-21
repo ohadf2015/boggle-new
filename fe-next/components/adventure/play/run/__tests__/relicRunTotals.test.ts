@@ -54,7 +54,7 @@ describe('clearedRunWords — banked words are keyed by STEP, not by the level s
   const banked = [['planet'], ['stone'], ['river'], ['candle'], ['marble'], ['silver']];
   const seed = (levels: string[][]) => {
     const m = new Map<string, string>([['adv-run-words-w1', JSON.stringify(levels)]]);
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+    (globalThis as { localStorage?: unknown }).localStorage = {
       getItem: (k: string) => m.get(k) ?? null, setItem: () => {}, removeItem: () => {},
     };
   };
@@ -82,7 +82,7 @@ describe('runStackCtx — the map screen has no board, so the rail reads the run
   const banked = [['house', 'tiger'], ['planet']];
   const seed = (levels: string[][]) => {
     const m = new Map<string, string>([['adv-run-words-w1', JSON.stringify(levels)]]);
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+    (globalThis as { localStorage?: unknown }).localStorage = {
       getItem: (k: string) => m.get(k) ?? null, setItem: () => {}, removeItem: () => {},
     };
   };

@@ -36,6 +36,12 @@ const node = (id: string) => screen.getByTestId(`map-node-${id}`);
 const button = (id: string) => node(id).querySelector('button') as HTMLButtonElement;
 
 describe('RunMapScreen', () => {
+  it('Given a run in progress, then home is one tap away (the run is saved, so leaving loses nothing)', () => {
+    renderMap();
+    const home = screen.getByRole('link', { name: 'adventurePlay.backHome' });
+    expect(home.getAttribute('href')).toBe('/en');
+  });
+
   it('Given a fresh run, when the map opens, then row 0 is choosable and later rows are not', () => {
     renderMap();
     expect(node(first.id).dataset.status).toBe('next');

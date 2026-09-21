@@ -213,7 +213,8 @@ describe('POST /api/adventure/complete', () => {
     const { db, upserts } = makeFakeDb({ level_completions: [] });
     mockCreateAdminClient.mockReturnValue(db);
 
-    const token = makeToken();
+    // Thresholds pinned on the token: "catser" (100) is a partial clear, not a K.O.
+    const token = makeToken({ st: [60, 110, 170] });
     const res = await POST(makeRequest({ token, words: ['catser'] }));
 
     expect(res.status).toBe(200);
@@ -254,7 +255,7 @@ describe('POST /api/adventure/complete', () => {
     });
     mockCreateAdminClient.mockReturnValue(db);
 
-    const token = makeToken();
+    const token = makeToken({ st: [60, 110, 170] });
     // Only "catser" (100 pts, 1 star) this run — worse than the existing 3-star / 200-pt best.
     const res = await POST(makeRequest({ token, words: ['catser'] }));
 

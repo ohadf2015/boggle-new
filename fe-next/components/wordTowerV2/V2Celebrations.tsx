@@ -39,6 +39,12 @@ interface Props {
   /** Priority queue from the run; only the head is ever on screen. */
   banners: Banner[];
   onBannerDone: () => void;
+  /**
+   * A slab is on the hook. The hook hangs just under the HUD, so a callout in
+   * the upper lane (the big-word praise fires AT hoist) sat right over the slab
+   * the player had to time — it moves to the low lane above the dock instead.
+   */
+  swinging?: boolean;
 }
 
 /**
@@ -47,7 +53,7 @@ interface Props {
  * the queue's head for a beat, then asks for the next. Round 5 ran four
  * independent toasts in one column and they piled up over the tower.
  */
-export function V2Celebrations({ t, callout, banners, onBannerDone }: Props) {
+export function V2Celebrations({ t, callout, banners, onBannerDone, swinging = false }: Props) {
   /*
    * Adopted DURING render, not from an effect. The banner lane below is gated
    * on this being clear, and an effect-set value lags the prop by one commit —
@@ -87,9 +93,15 @@ export function V2Celebrations({ t, callout, banners, onBannerDone }: Props) {
 
   return (
     <>
-      {/* Callout in the drop gap the eye is on — BELOW the streak meter (which
-          owns the top of the play area); at top-20% the two used to overlap. */}
-      <div className="pointer-events-none absolute inset-x-0 top-[27%] z-20 flex justify-center px-4" aria-live="polite">
+      {/* Callout in the drop gap the eye is on — below the MEASURED HUD
+          (--wt2-hud) and the slab's hang room, never at a fixed %: a two-row
+          HUD reached past 27%. While a slab swings it drops to the low lane. */}
+      <div
+        className={`pointer-events-none absolute inset-x-0 z-20 flex justify-center px-4 ${
+          swinging ? 'bottom-[calc(var(--wt2-dock,17rem)+0.75rem)]' : 'top-[max(27%,calc(var(--wt2-hud,6rem)+5rem))]'
+        }`}
+        aria-live="polite"
+      >
         {shown ? (
           <div
             key={shown.key}

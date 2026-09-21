@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LOOK_UP_PX, clampLook, clampLookX } from '../look';
+import { LOOK_UP_PX, clampLook, clampLookX, focusX } from '../look';
 
 /**
  * Free look: the player drags the canvas to walk their own tower back down.
@@ -26,6 +26,26 @@ describe('clampLook', () => {
  * Sideways pan: the camera centres on the first block, so a tower that walks
  * sideways needs the player to be able to walk after it — and stop somewhere.
  */
+describe('focusX — the camera keeps the building framed (no sideways drag)', () => {
+  it('given no tower yet, when framed, then the camera sits on the crane line', () => {
+    expect(focusX(null, null)).toBe(0);
+  });
+
+  it('given a plumb tower, when framed, then it is centred on the tower', () => {
+    expect(focusX(12, 12)).toBe(12);
+  });
+
+  it('given a tower whose top walked sideways, when framed, then base and top share the screen', () => {
+    // Centring on the base alone put a leaning top off the edge; that is what
+    // the sideways drag used to exist for.
+    expect(focusX(0, 120)).toBe(60);
+    expect(focusX(-40, -160)).toBe(-100);
+  });
+
+  it('given only a base, when framed, then it is centred on the base', () => {
+    expect(focusX(30, null)).toBe(30);
+  });
+});
 describe('clampLookX', () => {
   it('given a pan inside the limit, when clamped, then it is untouched', () => {
     expect(clampLookX(120, 234)).toBe(120);

@@ -66,7 +66,7 @@ const play = async () => {
 };
 
 describe('useAdventureRun — level → map handover', () => {
-  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); sessionStorage.clear(); });
+  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); localStorage.clear(); });
   afterEach(() => vi.useRealTimers());
 
   it('given a cleared node, when the map is opened without a remount, then it carries the NEXT run token', async () => {
@@ -87,7 +87,7 @@ describe('useAdventureRun — level → map handover', () => {
     const result = await play();
     await act(async () => { await result.current.finish({ died: true }); });
     await waitFor(() => expect(result.current.phase).toBe('done'));
-    expect(sessionStorage.getItem(runStorageKey(1))).toBeNull();
+    expect(localStorage.getItem(runStorageKey(1))).toBeNull();
 
     calls.length = 0;
     await act(async () => { result.current.openMap(); });
@@ -98,7 +98,7 @@ describe('useAdventureRun — level → map handover', () => {
   it('given any run, when newRun() is called, then the stored run is dropped and a fresh one is minted', async () => {
     const calls = mockApi(won);
     const result = await play();
-    await waitFor(() => expect(sessionStorage.getItem(runStorageKey(1))).not.toBeNull());
+    await waitFor(() => expect(localStorage.getItem(runStorageKey(1))).not.toBeNull());
 
     calls.length = 0;
     await act(async () => { result.current.newRun(); });
@@ -116,7 +116,7 @@ describe('useAdventureRun — level → map handover', () => {
  * a live dead end with no result screen and no way forward.
  */
 describe('useAdventureRun — new run after a run over', () => {
-  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); sessionStorage.clear(); });
+  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); localStorage.clear(); });
   afterEach(() => vi.useRealTimers());
 
   it('given a settled run, when newRun() mints a fresh one, then the last level leaves no words or score behind', async () => {

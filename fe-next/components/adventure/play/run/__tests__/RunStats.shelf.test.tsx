@@ -16,7 +16,7 @@ import type { RunSummary } from '../runSummary';
 
 const seed = (levels: string[][]) => {
   const m = new Map<string, string>([['adv-run-words-w1', JSON.stringify(levels)]]);
-  (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+  (globalThis as { localStorage?: unknown }).localStorage = {
     getItem: (k: string) => m.get(k) ?? null, setItem: () => {}, removeItem: () => {},
   };
 };

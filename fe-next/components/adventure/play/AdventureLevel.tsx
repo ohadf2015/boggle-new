@@ -20,6 +20,7 @@ import BoardHazards from './stage/BoardHazards';
 import LevelIntro from './intro/LevelIntro';
 import BoardFx from './fx/BoardFx';
 import FoeTarget from './fx/FoeTarget';
+import RivalAttack from './stage/RivalAttack';
 import FoundWords from './fx/FoundWords';
 import HintButton from './fx/HintButton';
 import { hintCells, resolveHitPath, type Cell } from './fx/hintPath';
@@ -364,7 +365,8 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         {/* Stage: enemy / boss / star track */}
         <div ref={stageRef} data-adv-slot="stage" className="mt-3 min-h-[5.5rem] flex items-center">
           {lvl && !lvl.isBoss && !isElite
-            ? <FoeTarget world={world} score={shownScore} stars={lvl.stars} lastHit={lastHit} />
+            ? <FoeTarget world={world} score={shownScore} stars={lvl.stars} lastHit={lastHit}
+                combat={run.phase === 'playing' ? run.combat : null} dispatchCombat={run.dispatchCombat} />
             : <LevelStage world={world} run={run} lastHit={lastHit} popups={popups} onFinaleDone={onFinaleDone} />}
         </div>
 
@@ -417,6 +419,10 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       {run.phase === 'ready' && lvl && <LevelIntro world={world} level={shownLevel} floor={floor} lvl={{ ...lvl, seconds: secs }} onBegin={begin} onExit={onExit} />}
 
       {run.phase === 'playing' && <DeedStamp event={deed} />}
+      {/* Ordinary fights: the rival's swing as a watched shot, not a line of HUD text. */}
+      {run.phase === 'playing' && lvl && !isCombatKind(lvl.kind) && run.combat && (
+        <RivalAttack combat={run.combat} feed={run.combatFx ?? []} />
+      )}
 
       {run.phase === 'draft' && run.offer && <DraftOverlay offer={run.offer} onPick={run.choosePick} run={run.run} />}
 

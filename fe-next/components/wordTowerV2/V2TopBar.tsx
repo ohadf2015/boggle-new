@@ -1,13 +1,15 @@
 'use client';
 
 import { memo, type RefObject } from 'react';
-import { Building2, Hammer, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, Building2, Hammer, Trophy, Users } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
 import type { Estate } from '@/lib/wordTowerV2/estate';
 import { type RewardId, type StreakBand, streakMeter } from '@/lib/wordTowerV2/rewards';
 import type { RunState } from '@/lib/wordTowerV2/run';
 import { ITEM, whatsNew } from './estate/estateArt';
 import { REWARD_ICON } from './v2Icons';
+import { StabilityMeter } from './StabilityMeter';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -27,6 +29,12 @@ interface Props {
   /** ImpactBurst flies its coins into this exact rect. */
   coinsRef: RefObject<HTMLDivElement | null>;
   onOpenEstate: () => void;
+  /** 0..1 — how close the standing tower is to going over (StabilityMeter). */
+  risk?: number;
+  /** Leave the game mid-run. The caller banks the run before navigating. */
+  onExit?: () => void;
+  /** The band's element — the camera frames the hanging slab under its bottom edge. */
+  barRef?: (el: HTMLDivElement | null) => void;
   /**
    * Desktop/TV. The bar no longer changes shape for it — the mute FAB owns the
    * same corner at every width — but the game screen still passes it, so the
@@ -149,6 +157,9 @@ export const V2TopBar = memo(function V2TopBar({
   raids,
   coinsRef,
   onOpenEstate,
+  risk = 0,
+  onExit,
+  barRef,
   reducedMotion,
 }: Props) {
   const floors = Math.floor(floorsAt(heightM) + 0.05);
@@ -168,8 +179,9 @@ export const V2TopBar = memo(function V2TopBar({
     // at every width, and at 1920x1080 it sat exactly on top of the empire
     // button — the district was unreachable from the game screen.
     <div
+      ref={barRef}
       data-wt2-topbar
-      className="pointer-events-none absolute inset-x-3 top-[max(0.5rem,env(safe-area-inset-top))] z-40 flex flex-col gap-1.5 pe-12"
+      className="pointer-events-none absolute inset-x-3 top-[max(0.5rem,env(safe-area-inset-top))] z-40 flex flex-col gap-1.5"
       aria-live="polite"
     >
       {/* WRAPS. Six chips at a phone's 318px of usable width measured 437px
@@ -180,7 +192,23 @@ export const V2TopBar = memo(function V2TopBar({
           genuinely cannot fit, and folding is the one outcome that loses
           nothing. `shrink-0` on both clusters keeps the numbers whole rather
           than squeezing them into an ellipsis. */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Row 1 — where am I. `pe-12` here only: the global mute FAB owns this
+          row's end corner and nothing below it, so row 2 gets the full width.
+          At 360px the empire button no longer fits beside the coins; it
+          closes row 2 instead, which kept the bar at two lines. */}
+      <div className="flex flex-wrap items-center gap-2 pe-12">
+        {/* The exit leads the row. */}
+        {onExit ? (
+          <button
+            type="button"
+            onClick={onExit}
+            aria-label={t('wordTowerV2.hud.exit')}
+            className="pointer-events-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed lg:h-12 lg:w-12"
+          >
+            <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 lg:h-7 lg:w-7" />
+          </button>
+        ) : null}
+
         {/* Primary: how high am I. Floor leads — it is an apartment tower. */}
         <div
           className="flex shrink-0 items-baseline gap-1.5 rounded-neo border-neo-thick border-black bg-neo-lime px-2.5 py-1 text-neo-navy shadow-hard lg:px-3.5 lg:py-1.5"
@@ -195,23 +223,23 @@ export const V2TopBar = memo(function V2TopBar({
           </span>
         </div>
 
-        <div className="shrink-0 rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-base font-bold tabular-nums text-neo-cream lg:text-2xl">
-          {score.toLocaleString()}
+        {/* Best rides UNDER the score, not beside it: one less chip competing for 318px. */}
+        <div className="flex shrink-0 flex-col items-start gap-0.5">
+          <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-base font-bold leading-tight tabular-nums text-neo-cream lg:text-2xl">
+            {score.toLocaleString()}
+          </div>
+          {bestM > 0.5 ? (
+            <div
+              className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-1.5 font-neo-display text-[10px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-sm"
+              aria-label={t('wordTower.hud.best', { m: bestM.toFixed(1) })}
+            >
+              <Trophy className="h-2.5 w-2.5 lg:h-4 lg:w-4" aria-hidden />
+              <span aria-hidden>{bestM.toFixed(1)}</span>
+            </div>
+          ) : null}
         </div>
 
-        {bestM > 0.5 ? (
-          <div
-            className="flex shrink-0 items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-1.5 py-0.5 font-neo-display text-[11px] font-bold text-neo-navy shadow-hard-sm lg:text-base"
-            aria-label={t('wordTower.hud.best', { m: bestM.toFixed(1) })}
-          >
-            <Trophy className="h-3 w-3 lg:h-5 lg:w-5" aria-hidden />
-            <span aria-hidden>{bestM.toFixed(1)}</span>
-          </div>
-        ) : null}
-
         <div className="ms-auto flex shrink-0 items-center gap-2">
-          <StreakRing t={t} combo={run.combo} bestCombo={run.bestCombo} reducedMotion={reducedMotion} />
-
           {/* ONE coin number: the bank plus what this run has banked into it. */}
           <div
             ref={coinsRef}
@@ -225,27 +253,19 @@ export const V2TopBar = memo(function V2TopBar({
             </span>
           </div>
 
-          {/* Icon only: the coin count next to it already answered "how rich am I". */}
-          <button
-            type="button"
-            onClick={onOpenEstate}
-            aria-label={t('wordTowerV2.estate.open')}
-            className="pointer-events-auto relative flex h-9 w-9 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed lg:h-12 lg:w-12"
-          >
-            <Building2 className="h-5 w-5 lg:h-7 lg:w-7" aria-hidden />
-            {waiting > 0 ? (
-              <span className="absolute -end-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full border-neo border-black bg-neo-pink px-1 font-neo-display text-[11px] font-black shadow-hard-sm animate-neo-pop">
-                {waiting}
-              </span>
-            ) : null}
-          </button>
         </div>
       </div>
 
+      {/* Row 2 — how is the tower doing. ALWAYS present during a run, so the
+          band's height never jumps when the first crate or tenant lands (the
+          camera frames under its measured bottom edge). */}
+      <div data-wt2-topbar-status className="flex flex-wrap items-center gap-2">
+        <StabilityMeter t={t} risk={risk} reducedMotion={reducedMotion} />
+        <StreakRing t={t} combo={run.combo} bestCombo={run.bestCombo} reducedMotion={reducedMotion} />
       {/* Everything the run BANKED. Absent entirely when there is nothing in
           it — an empty row of chips is the clutter this bar exists to remove. */}
       {secondary ? (
-        <div data-wt2-topbar-secondary className="flex flex-wrap items-center gap-1.5">
+        <div data-wt2-topbar-secondary className="flex min-w-0 flex-wrap items-center gap-1.5">
           {run.balls > 0 ? (
             <div
               key={`balls-${run.balls}`}
@@ -291,6 +311,21 @@ export const V2TopBar = memo(function V2TopBar({
           })}
         </div>
       ) : null}
+      {/* Icon only: the coin count above already answered "how rich am I". */}
+        <button
+          type="button"
+          onClick={onOpenEstate}
+          aria-label={t('wordTowerV2.estate.open')}
+          className="pointer-events-auto relative ms-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed lg:h-12 lg:w-12"
+        >
+          <Building2 className="h-5 w-5 lg:h-7 lg:w-7" aria-hidden />
+          {waiting > 0 ? (
+            <span className="absolute -end-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full border-neo border-black bg-neo-pink px-1 font-neo-display text-[11px] font-black shadow-hard-sm animate-neo-pop">
+              {waiting}
+            </span>
+          ) : null}
+        </button>
+      </div>
     </div>
   );
 });

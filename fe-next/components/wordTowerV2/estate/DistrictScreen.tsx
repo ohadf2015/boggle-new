@@ -152,7 +152,7 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
           that FAB on a phone — on /en its last digits, on /he (where the FAB
           mirrors to the start edge) the whole pill. Same reserve V2TopBar
           makes, and it is logical-direction so one value covers both. */}
-      <header className="z-10 flex items-center gap-2 border-b-4 border-black bg-neo-navy px-3 py-2 pe-14">
+      <header className="z-10 flex items-center gap-2 border-b-4 border-black bg-neo-navy px-3 pb-2 pe-14 pt-[max(0.5rem,env(safe-area-inset-top))]">
         <button
           type="button"
           onClick={() => {

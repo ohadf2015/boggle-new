@@ -27,6 +27,7 @@ import { NEUTRAL_PERKS, type Perks } from '@/lib/wordTowerV2/estate';
 import { type RewardId, steadySwing } from '@/lib/wordTowerV2/rewards';
 import { type RunState, type SurprisePayout, applyLanding, consumeDrop, createRun } from '@/lib/wordTowerV2/run';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
+import { towerRisk } from '@/lib/wordTowerV2/stability';
 import type { TowerFx } from './TowerCanvas';
 
 /**
@@ -134,6 +135,8 @@ export function useTowerRun() {
 
   const [phase, setPhase] = useState<Phase>('composing');
   const [heightM, setHeightM] = useState(0);
+  /** 0..1, how close the standing tower is to going over (HUD meter only). */
+  const [risk, setRisk] = useState(0);
   const [peakM, setPeakM] = useState(0);
   const [run, setRun] = useState<RunState>(runRef.current);
   const [bestM, setBestM] = useState(0);
@@ -250,6 +253,11 @@ export function useTowerRun() {
       const world = worldRef.current;
       const h = getTowerHeightM(world);
       setHeightM((shown) => publishHeightM(shown, h));
+      // Only what has landed: the slab on the hook swings by design.
+      const standing = snapshotWorld(world).blocks.filter((b) => world.landed.has(b.id) && b.id !== hangingRef.current?.id);
+      const next = towerRisk(standing.map((b) => ({ ...b, fixed: world.blocks.get(b.id)?.isStatic })));
+      // Quantized: a settled stack jitters in the 3rd decimal and would re-render the HUD 10x/s.
+      setRisk((shown) => (Math.abs(shown - next) < 0.03 ? shown : Math.round(next * 100) / 100));
 
       if (phase === 'over') return;
       if (world.collapsed) {
@@ -427,11 +435,24 @@ export function useTowerRun() {
     runRef.current = createRun(Date.now());
     setRun(runRef.current);
     setHeightM(0);
+    setRisk(0);
     setNewBest(false);
     setCallout(null);
     setBanners([]);
     setRunBadges([]);
     setPhase('composing');
+  }, []);
+
+  /**
+   * The server's best (word_tower_estates.best_m) wins when it is higher: the
+   * device copy is lost with a cleared cache or a new phone, and the HUD then
+   * said 0 with no "new best" banner for a player whose record was 70m.
+   */
+  const adoptBest = useCallback((m: number) => {
+    if (!(m > bestRef.current)) return;
+    bestRef.current = m;
+    setBestM(m);
+    writeBest(m);
   }, []);
 
   const setScrambles = useCallback((next: RunState) => {
@@ -464,7 +485,7 @@ export function useTowerRun() {
 
   return {
     worldRef, labelsRef, fxRef, hangingRef,
-    phase, heightM, peakM, bestM, run, callout, banners, shiftBanner, newBest, runBadges, unlockedRef, statsRef,
-    onBeforeStep, getHangVx, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, setPerks, perksRef,
+    phase, heightM, risk, peakM, bestM, run, callout, banners, shiftBanner, newBest, runBadges, unlockedRef, statsRef,
+    onBeforeStep, getHangVx, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, setPerks, perksRef, adoptBest,
   };
 }

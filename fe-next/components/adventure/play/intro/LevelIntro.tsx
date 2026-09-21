@@ -49,7 +49,7 @@ export default function LevelIntro({ world, level, lvl, onBegin, onExit, floor =
   const [beat, setBeat] = useState(0);
   const current = beats[beat] ?? 'rule';
   return (
-    <div className="absolute inset-0 z-20 overflow-hidden bg-[#0f1b3d] text-neo-cream" role="dialog" aria-modal="true"
+    <div className="absolute inset-0 z-20 overflow-hidden bg-[#0f1b3d] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] text-neo-cream" role="dialog" aria-modal="true"
       aria-labelledby="level-intro-title" data-testid="level-intro" data-kind={lvl.kind} data-beat={current}>
       {current === 'chapter'
         ? <ChapterBeat world={world} onNext={() => setBeat((b) => b + 1)} />

@@ -194,7 +194,7 @@ export function RevengeHome({ t, estate, balls, reducedMotion, onRaidOpen }: Pro
          estate was unreachable from the game screen for anyone who owed a
          payback. Sitting under the real bar can't collide with it. */
       style={{ top: barBottom }}
-      className="pointer-events-auto absolute end-3 top-[3.4rem] z-40 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase tabular-nums text-neo-navy shadow-hard motion-safe:animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+      className="pointer-events-auto absolute end-3 top-[calc(3.4rem+env(safe-area-inset-top))] z-40 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase tabular-nums text-neo-navy shadow-hard motion-safe:animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
     >
       <Swords className="h-4 w-4" aria-hidden />
       {t('wordTowerV2.rivals.revengePill', { n: debts.length })}
@@ -217,7 +217,7 @@ function RevengeList({
   const towers = useMemo(() => debts.map((d) => wreckableTower(d.rival.lastTower)), [debts]);
   const viewH = useMemo(() => boardViewH(towers), [towers]);
   return (
-    <div className="absolute inset-0 z-50 flex flex-col overflow-hidden bg-neo-navy p-4 text-neo-cream" role="dialog" aria-modal="true">
+    <div className="absolute inset-0 z-50 flex flex-col overflow-hidden bg-neo-navy p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-neo-cream" role="dialog" aria-modal="true">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col overflow-hidden md:max-w-[84rem] md:justify-center md:gap-2">
         <div className="flex items-center gap-2">
           <h2 className="flex min-w-0 flex-1 items-center gap-2 font-neo-display text-2xl font-black uppercase leading-none text-neo-pink md:text-5xl">

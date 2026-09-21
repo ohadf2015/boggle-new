@@ -77,6 +77,27 @@ describe('frameCamera', () => {
   });
 });
 
+describe('frameCamera — measured HUD', () => {
+  // A phone with a notch and the HUD's second row (banked chips + the stability
+  // meter) is ~150px tall, not the 96 the constant assumed — the hanging slab
+  // slid under it.
+  for (const heightM of HEIGHTS_M) {
+    it(`keeps the hanging slab below a tall measured HUD — phone @ ${heightM}m`, () => {
+      const hudPx = 152;
+      const f = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: heightM, hudPx });
+      const hangingY = toScreenY(-(heightM * PX_PER_M + CRANE_CLEARANCE_PX), f);
+      expect(hangingY - (BLOCK_HEIGHT_PX / 2) * f.scale).toBeGreaterThanOrEqual(hudPx - 0.5);
+      expect(toScreenY(-heightM * PX_PER_M, f)).toBeLessThanOrEqual(844 - 260 + 0.5);
+    });
+  }
+
+  it('never reserves LESS than the default band, so a not-yet-measured HUD frames like before', () => {
+    const a = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 20 });
+    const b = frameCamera({ viewportW: 390, viewportH: 844, dockPx: 260, towerTopM: 20, hudPx: 10 });
+    expect(b).toEqual(a);
+  });
+});
+
 describe('frameCamera — side dock (desktop / TV)', () => {
   // The play column is the canvas: the wheel moves to a side panel, so the
   // canvas is `viewportW - panel` wide and owns the full height.

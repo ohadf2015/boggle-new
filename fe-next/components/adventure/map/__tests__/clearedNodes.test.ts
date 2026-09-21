@@ -4,7 +4,7 @@ import { readCleared, recordCleared, clearClearedNodes, isFreshRun } from '../cl
 describe('clearedNodes', () => {
   beforeEach(() => {
     const m = new Map<string, string>();
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+    (globalThis as { localStorage?: unknown }).localStorage = {
       getItem: (k: string) => m.get(k) ?? null,
       setItem: (k: string, v: string) => { m.set(k, v); },
       removeItem: (k: string) => { m.delete(k); },
@@ -30,7 +30,7 @@ describe('clearedNodes', () => {
   });
 
   it('Given storage throws, when the list is read, then it degrades to empty instead of crashing', () => {
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+    (globalThis as { localStorage?: unknown }).localStorage = {
       getItem: () => { throw new Error('blocked'); },
       setItem: () => { throw new Error('blocked'); },
       removeItem: () => { throw new Error('blocked'); },

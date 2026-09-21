@@ -36,6 +36,24 @@ describe('V2Celebrations callout lane', () => {
   });
 });
 
+describe('V2Celebrations never covers the hanging slab', () => {
+  it('given a slab on the hook, when a big-word callout fires, then it rides the low lane above the dock, not the hook lane', () => {
+    const { container } = render(
+      <V2Celebrations t={t} callout={{ key: 1, textKey: 'wordTowerV2.call.word.6', tone: 'purple', points: 0 }} banners={[]} onBannerDone={() => {}} swinging />,
+    );
+    const lane = container.querySelector('[data-wt2-callout]')!.parentElement!;
+    expect(lane.className).toContain('bottom-[calc(var(--wt2-dock');
+    expect(lane.className).not.toContain('top-[');
+  });
+
+  it('given nothing on the hook, when a landing verdict fires, then it sits below the measured HUD', () => {
+    const { container } = render(
+      <V2Celebrations t={t} callout={{ key: 1, textKey: 'wordTowerV2.call.good.0', tone: 'cyan', points: 0 }} banners={[]} onBannerDone={() => {}} />,
+    );
+    expect(container.querySelector('[data-wt2-callout]')!.parentElement!.className).toContain('var(--wt2-hud');
+  });
+});
+
 describe('V2Celebrations banner lane', () => {
   it('given a crate banner, when rendered, then its name and what it does are spelled out', () => {
     render(<V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'reward', id: 'plumb', priority: 2 }]} onBannerDone={() => {}} />);
