@@ -21,6 +21,7 @@ const Body = z.object({
   bestCombo: z.number().finite(),
   crates: z.number().finite(),
   heightM: z.number().finite(),
+  braces: z.number().finite().optional(),
   tower: z.array(z.unknown()).max(200).optional(),
 });
 

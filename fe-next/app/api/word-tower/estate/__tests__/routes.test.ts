@@ -18,6 +18,7 @@ import { POST as postRepair } from '../repair/route';
 import { POST as postSeen } from '../seen/route';
 import { GET as getRivals } from '../rivals/route';
 import { POST as postRaid } from '../raid/route';
+import { POST as postClaim } from '../claim/route';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getSupabaseAdmin } from '@/lib/email';
@@ -43,6 +44,7 @@ describe('every estate route', () => {
     ['POST /seen', () => postSeen(postReq({}))],
     ['GET /rivals', () => getRivals(getReq())],
     ['POST /raid', () => postRaid(postReq({ defenderId: THEM, accuracy: 1 }))],
+    ['POST /claim', () => postClaim(postReq({ estate: {} }))],
   ])('given no session, when %s is called, then 401 and the db is never touched', async (_name, call) => {
     (getAuthedUser as any).mockResolvedValueOnce(null);
     expect(status(await call())).toBe(401);
@@ -132,6 +134,35 @@ describe('POST /api/word-tower/estate/run', () => {
     const tower = [{ word: '\u202Etop', w: 300, x: 1, y: -60, angle: 0, color: 1 }];
     await postRun(postReq({ ...summary, tower }));
     expect(est.get()!.last_tower).toEqual([['top', 300, 1, -60, 0, 1]]);
+  });
+});
+
+describe('POST /api/word-tower/estate/run — braces', () => {
+  it('given paid braces, when banked, then the server charges them off the run coins', async () => {
+    const summary = { floors: 12, perfects: 4, bestCombo: 3, crates: 2, heightM: 36 };
+    const est = estatesTable(row());
+    (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: est.handler }).client);
+    const b = await body(await postRun(postReq({ ...summary, braces: 1 })));
+    expect(b.coins).toBe(runCoins(summary) - 40);
+  });
+});
+
+describe('POST /api/word-tower/estate/claim', () => {
+  it('given a guest estate and a fresh account, when claimed, then guest coins + upgrade value are credited (plots never adopted)', async () => {
+    const est = estatesTable(row());
+    (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: est.handler }).client);
+    const guest = { ...emptyEstate(), coins: 150, runs: 3, plots: PLOT_SLOTS.map((slot, i) => ({ slot, level: i === 0 ? 2 : 0, damaged: false })) };
+    const res = await postClaim(postReq({ estate: guest }));
+    expect(status(res)).toBe(200);
+    const b = await body(res);
+    expect(b.estate.coins).toBe(150 + upgradeCost(1, 'foundation', 0) + upgradeCost(1, 'foundation', 1));
+    expect(b.estate.plots[0].level).toBe(0);
+    expect(est.get()!.runs).toBe(3);
+  });
+
+  it('given no body estate, when claimed, then 400', async () => {
+    (getSupabaseAdmin as any).mockReturnValue(fakeDb({}).client);
+    expect(status(await postClaim(postReq({})))).toBe(400);
   });
 });
 

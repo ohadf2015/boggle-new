@@ -42,6 +42,8 @@ export interface CraneFrame {
   /** Physics pivot (off-screen above) and the hook, world units. */
   pivot: { x: number; y: number };
   hook: { x: number; y: number } | null;
+  /** Crane Yard upgrade: the rail's paint (main + stripe). Default site yellow. */
+  paint?: { main: number; shade: number };
 }
 
 /**
@@ -49,7 +51,9 @@ export interface CraneFrame {
  * Repainted only when the camera or viewport moved (the key), not every frame.
  */
 export function paintCraneFrame(g: Graphics, f: CraneFrame, prevKey: string): string {
-  const key = `${f.scale.toFixed(3)}|${f.halfW.toFixed(1)}|${f.topY.toFixed(1)}`;
+  const main = f.paint?.main ?? YELLOW;
+  const shade = f.paint?.shade ?? SHADE;
+  const key = `${f.scale.toFixed(3)}|${f.halfW.toFixed(1)}|${f.topY.toFixed(1)}|${main}`;
   if (key === prevKey) return key;
   const px = (n: number) => n / f.scale;
   g.clear();
@@ -59,12 +63,12 @@ export function paintCraneFrame(g: Graphics, f: CraneFrame, prevKey: string): st
   const from = -(f.halfW + px(20));
   const w = (f.halfW + px(20)) * 2;
 
-  g.rect(from, top, w, h).fill(YELLOW);
+  g.rect(from, top, w, h).fill(main);
   // Hazard chevrons: reads as site machinery at a glance, costs 1 stroke pass.
   for (let x = from; x < from + w; x += px(26)) {
     g.moveTo(x, top + h).lineTo(x + px(13), top);
   }
-  g.stroke({ width: px(5), color: SHADE, alpha: 0.55 });
+  g.stroke({ width: px(5), color: shade, alpha: 0.55 });
   g.rect(from, top, w, h).stroke({ width: px(3), color: INK, alignment: 1 });
   // A thin lip under the beam so the trolley has something to hang from.
   g.rect(from, top + h, w, px(3)).fill(INK);
@@ -88,5 +92,5 @@ export function paintCraneHook(g: Graphics, f: CraneFrame): void {
   g.moveTo(tx, cableTopY).lineTo(f.hook.x, f.hook.y - px(10)).stroke({ width: px(3), color: INK });
   g.moveTo(tx, cableTopY).lineTo(f.hook.x, f.hook.y - px(10)).stroke({ width: px(1.2), color: 0xcfd6e6 });
   // Hook block: a small yellow pulley sitting on top of the slab.
-  g.roundRect(f.hook.x - px(11), f.hook.y - px(12), px(22), px(9), px(2)).fill(YELLOW).stroke({ width: px(2), color: INK });
+  g.roundRect(f.hook.x - px(11), f.hook.y - px(12), px(22), px(9), px(2)).fill(f.paint?.main ?? YELLOW).stroke({ width: px(2), color: INK });
 }

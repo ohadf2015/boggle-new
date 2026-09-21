@@ -16,6 +16,7 @@ import { GRAVITY_PX_PER_MS2, type TowerWorld, createTowerWorld, spawnBlock, step
 import type { TowerBlock } from './estateTower';
 import { cleanUntrustedText } from './sanitizeText';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from './scoring';
+import { isBlockedWord } from './blocked';
 
 export { MAX_BALLS } from './run';
 
@@ -370,7 +371,7 @@ export function sanitizeWords(raw: unknown[]): string[] {
     .filter((x): x is string => typeof x === 'string')
     .slice(0, MAX_WORDS)
     .map((x) => clean(x, MAX_WORD))
-    .filter(Boolean);
+    .filter((w) => w && !isBlockedWord(w));
 }
 
 export function encodeRival(r: RivalTower): string {

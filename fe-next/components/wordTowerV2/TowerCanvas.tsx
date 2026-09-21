@@ -19,6 +19,9 @@ import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, pa
 import { createCity, paintCity, placeCity } from './skylineArt';
 import { paintCraneFrame, paintCraneHook } from './craneArt';
 import { SkyLayer } from './skyArt';
+import { paintGear } from './gearArt';
+import type { TowerGear } from '@/lib/wordTowerV2/gear';
+import { standingChain } from '@/lib/wordTowerV2/stability';
 import { TenantCrowd } from './tenantArt';
 
 /**
@@ -38,7 +41,9 @@ export type TowerFx =
   | { kind: 'tenants'; id: string; count: number }
   /** Rebar crate: these floors were welded in place. */
   | { kind: 'rebar'; ids: string[] }
-  | { kind: 'collapse' };
+  | { kind: 'collapse' }
+  /** A crash with floors left standing: the rubble that was cleared away. */
+  | { kind: 'crumble'; points: Array<{ x: number; y: number }> };
 
 export interface FrameStats {
   p95Ms: number;
@@ -96,6 +101,8 @@ interface Props {
    */
   homeKey: number;
   reducedMotion?: boolean;
+  /** Workshop upgrades to paint on the tower (plinth, braces, cornices, rooftop, crane paint). */
+  getGear?: () => TowerGear | null;
   className?: string;
 }
 
@@ -232,7 +239,9 @@ export default function TowerCanvas(props: Props) {
       const ghost = createGhost();
       const ground = new Graphics();
       const crowd = new TenantCrowd();
-      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, crane, guide, hook, shaft, blocks, crowd.layer, landingMark, ghost.container, ground);
+      // Last: the plinth is sunk into the street, so it must draw over the ground.
+      const gearLayer = new Graphics();
+      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, crane, guide, hook, shaft, blocks, crowd.layer, landingMark, ghost.container, ground, gearLayer);
 
       const shake = new ScreenShake();
       const particles = new ParticlePool(scene);
@@ -281,6 +290,16 @@ export default function TowerCanvas(props: Props) {
             }
             flashColour = 0x37e0ff;
             flashAlpha = 0.2;
+            continue;
+          }
+          if (fx.kind === 'crumble') {
+            for (const pt of fx.points) {
+              particles.burst(RUBBLE_BURST, pt.x, pt.y, 10);
+              particles.burst(TOWER_DUST, pt.x, pt.y, 8);
+            }
+            shake.shake({ intensity: 13, duration: 0.5, decay: 'exponential' });
+            flashColour = 0xff9f43;
+            flashAlpha = 0.25;
             continue;
           }
           if (fx.kind === 'collapse') {
@@ -522,8 +541,22 @@ export default function TowerCanvas(props: Props) {
           pivot: { x: 0, y: pivotY },
           hook: { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 },
         };
-        craneKey = paintCraneFrame(crane, craneFrame, craneKey);
-        paintCraneHook(hook, craneFrame);
+        const gear = p.getGear?.() ?? null;
+        if (gear) {
+          const base = snap.blocks.find((b) => floorNo(b.id) === 0);
+          const landed = snap.blocks.filter((b) => b.id !== hangingId && world.landed.has(b.id));
+          const ids = base ? standingChain(landed, base.id) : [];
+          paintGear(gearLayer, gear, ids.map((id) => byId.get(id)!).filter(Boolean), scale, ts, {
+            top: (-120 - scene.y) / scale,
+            bottom: (h + 240 - scene.y) / scale,
+          });
+        } else gearLayer.clear();
+        // Crane Yard upgrade: the rail and pulley wear the part's finish.
+        const craneGear = gear?.craneYard;
+        const paintedCrane =
+          craneGear && craneGear.level > 0 ? { ...craneFrame, paint: { main: craneGear.material.main, shade: craneGear.material.trim } } : craneFrame;
+        craneKey = paintCraneFrame(crane, paintedCrane, craneKey);
+        paintCraneHook(hook, paintedCrane);
         if (hanging) {
           // The WHOLE arc, and where it touches down. Round 2 drew only the first
           // 40% so as not to "solve the landing" — but the block keeps drifting

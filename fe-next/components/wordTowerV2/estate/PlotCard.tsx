@@ -1,11 +1,21 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Crown, Hammer, Lock, Wrench } from 'lucide-react';
+import { Coins, Construction, Crown, Hammer, Layers, type LucideIcon, Lock, Shield, Wrench } from 'lucide-react';
 import type { Plot } from '@/lib/wordTowerV2/estate';
-import { MAX_PLOT_LEVEL } from '@/lib/wordTowerV2/estateCatalog';
-import { DAMAGE_OVERLAY, type PlotState, plotIdentity } from './estateArt';
-import { PLOT_ICON_COMPONENTS } from './estateIcons';
+import { MAX_PLOT_LEVEL, type PlotSlot } from '@/lib/wordTowerV2/estateCatalog';
+import type { Material } from '@/lib/wordTowerV2/gear';
+import { type PlotState, plotIdentity } from './estateArt';
+import { PartArt } from './PartArt';
+
+/** One glyph per tower part, on the name plate. */
+export const PART_ICONS: Record<PlotSlot, LucideIcon> = {
+  foundation: Layers,
+  craneYard: Construction,
+  vault: Coins,
+  insurance: Shield,
+  landmark: Crown,
+};
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -13,6 +23,8 @@ interface Props {
   t: T;
   district: number;
   plot: Plot;
+  /** The part's finish (gear.ts) — the same one the tower wears in the run. */
+  material: Material;
   name: string;
   /** Coins for the next level (0 = free: a blueprint pays). */
   cost: number;
@@ -32,22 +44,6 @@ const SPRITE_H: Record<Props['size'], string> = {
   wide: 'h-[clamp(150px,28vh,340px)]',
 };
 
-
-/**
- * The finished building as a cyan-lit hologram standing on the empty lot.
- *
- * Deliberately NOT a flat silhouette: at phone size a black blob of the
- * warehouse and a black blob of the boathouse look alike, and it is the fish
- * on the fish market and the stripes on the lighthouse that a player actually
- * recognises. So the real colours stay, cooled towards cyan with a glow that
- * says "plan, not building". The mask erases the bottom quarter — otherwise
- * the ghost's own base tile would double the real lot's edge.
- */
-const GHOST_STYLE = {
-  filter: 'saturate(0.55) brightness(1.15) drop-shadow(0 0 5px rgba(34,225,255,0.95)) drop-shadow(0 0 14px rgba(34,225,255,0.55))',
-  WebkitMaskImage: 'linear-gradient(to top, transparent 11%, black 27%)',
-  maskImage: 'linear-gradient(to top, transparent 11%, black 27%)',
-} as const;
 
 /** The four states a player must tell apart WITHOUT reading a number. */
 const SPRITE_FX: Record<PlotState, string> = {
@@ -89,10 +85,10 @@ const LEVEL_CLS: Record<PlotState, string> = {
  *   locked plots do not have — so it survives colour-blindness and reduced
  *   motion, with a bob on top for anyone who gets motion.
  */
-export function PlotCard({ t, district, plot, name, cost, affordable, repairCost, selected, building, size, reducedMotion, onSelect }: Props) {
+export function PlotCard({ t, district, plot, material, name, cost, affordable, repairCost, selected, building, size, reducedMotion, onSelect }: Props) {
   const maxed = plot.level >= MAX_PLOT_LEVEL;
   const id = plotIdentity({ district, slot: plot.slot, level: plot.level, damaged: plot.damaged, affordable });
-  const TypeIcon = PLOT_ICON_COMPONENTS[id.icon];
+  const TypeIcon = PART_ICONS[plot.slot];
   const tag =
     id.state === 'damaged'
       ? { icon: Wrench, text: repairCost === 0 ? t('wordTowerV2.estate.free') : repairCost.toLocaleString() }
@@ -133,32 +129,13 @@ export function PlotCard({ t, district, plot, name, cost, affordable, repairCost
             />
           ) : null}
 
-          {id.ghost ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={id.ghost}
-              alt=""
-              aria-hidden
-              draggable={false}
-              className={`${SPRITE_H[size]} pointer-events-none absolute bottom-0 left-1/2 w-auto -translate-x-1/2 select-none`}
-              // A plot you cannot pay for dims as a whole — plan included.
-              style={{ ...GHOST_STYLE, opacity: id.ghostOpacity * (id.state === 'locked' ? 0.78 : 1) }}
-            />
-          ) : null}
-
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={id.sprite}
-            alt=""
-            aria-hidden
-            draggable={false}
-            className={`${SPRITE_H[size]} ${SPRITE_FX[id.state]} relative w-auto select-none drop-shadow-[3px_3px_0_rgba(0,0,0,0.55)] transition-transform ${selected ? 'scale-105' : ''}`}
+          <PartArt
+            slot={plot.slot}
+            level={plot.level}
+            material={material}
+            damaged={plot.damaged}
+            className={`${SPRITE_H[size]} ${SPRITE_FX[id.state]} relative aspect-square w-auto select-none drop-shadow-[3px_3px_0_rgba(0,0,0,0.55)] transition-transform ${selected ? 'scale-105' : ''}`}
           />
-
-          {plot.damaged ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={DAMAGE_OVERLAY} alt="" aria-hidden className="pointer-events-none absolute bottom-0 h-[70%] w-auto" />
-          ) : null}
 
           {/* Level pinned to the lot's corner: zero extra rows, so nothing
               scrolls, and it reads the same L0-L5 the panel above prints

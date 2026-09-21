@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, type RefObject } from 'react';
-import { ArrowLeft, Building2, Hammer, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, Building2, Flag, Hammer, Trophy, Users } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
 import type { Estate } from '@/lib/wordTowerV2/estate';
@@ -202,10 +202,11 @@ export const V2TopBar = memo(function V2TopBar({
           <button
             type="button"
             onClick={onExit}
-            aria-label={t('wordTowerV2.hud.exit')}
+            // A standing tower makes this the cash-out (the run ends, the chest follows).
+            aria-label={run.floors > 0 ? t('wordTowerV2.hud.exit') : t('wordTowerV2.results.home')}
             className="pointer-events-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed lg:h-12 lg:w-12"
           >
-            <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 lg:h-7 lg:w-7" />
+            {run.floors > 0 ? <Flag className="h-5 w-5 lg:h-7 lg:w-7" aria-hidden /> : <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 lg:h-7 lg:w-7" />}
           </button>
         ) : null}
 

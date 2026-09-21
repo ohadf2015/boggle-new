@@ -18,6 +18,7 @@ import { v2DailyNumericSeed, v2DailySeed } from '@/lib/wordTowerV2/daily';
 import { saveRunSnapshot } from '@/lib/wordTowerV2/runPersist';
 import { v2ShareCardPath } from '@/lib/wordTowerV2/shareCard';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
+import { type TowerGear, gearFromEstate } from '@/lib/wordTowerV2/gear';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
 import { V2TopBar } from './V2TopBar';
@@ -35,6 +36,8 @@ import { PerkChips } from './estate/PerkChips';
 import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
 import { confirmLeaveIfNeeded, useV2Ready } from './useV2Ready';
+import { BraceControl } from './rescue/BraceControl';
+import { type RescueReject, useBrace } from './rescue/useBrace';
 import { WreckScene } from './WreckScene';
 
 /**
@@ -98,6 +101,27 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   // Variable rewards: coins per landing, the streak meter, the end-of-run chest.
   const rewardsFlow = useRewardsFlow({ game, estateApi, run, heightM, phase, playSound });
 
+  // Emergency brace (coins off the run, a free one from upgrades, or a rescue word).
+  const [rejected, setRejected] = useState<string | null>(null);
+  const onRescueReject = useCallback(
+    (reason: RescueReject) => {
+      setRejected(reason === 'rescue_short' ? 'wordTowerV2.brace.short' : reason);
+      playSound('wordRejected');
+      window.setTimeout(() => setRejected(null), 900);
+    },
+    [playSound],
+  );
+  const braceApi = useBrace({
+    brace: game.brace,
+    freeBraces: estateApi.perks.freeBraces,
+    district: estateApi.estate.district,
+    runCoins: rewardsFlow.rewards.coins,
+    floors: run.floors,
+    risk: game.risk,
+    over: phase === 'over',
+    onReject: onRescueReject,
+  });
+
   // The server keeps the best height too (word_tower_estates.best_m); the device
   // copy alone forgot it on every new phone or cleared cache.
   const adoptBest = game.adoptBest;
@@ -120,12 +144,22 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       void bankRun(true);
     };
   }, [bankRun]);
+  /**
+   * A tower still standing is never "game over" any more — only a total
+   * collapse is. So the exit is the CASH OUT: it ends the run on purpose and
+   * the chest + results follow (they carry the way home). With nothing built
+   * it just leaves.
+   */
+  const { finish } = game;
   const exitGame = useCallback(async () => {
-    if (!confirmLeaveIfNeeded(phase, run.floors, t)) return;
-    // Never strand the player on a slow network: navigate after at most 1.5s.
+    if (phase !== 'over' && run.floors > 0) {
+      if (!confirmLeaveIfNeeded(phase, run.floors, t)) return;
+      finish();
+      return;
+    }
     await Promise.race([bankRun(), new Promise((r) => window.setTimeout(r, 1500))]);
     router.push(`/${language}`);
-  }, [bankRun, router, language, phase, run.floors, t]);
+  }, [phase, run.floors, finish, bankRun, router, language, t]);
 
   const dictRef = useRef<Set<string> | null>(null);
   const [dictReady, setDictReady] = useState(false);
@@ -133,7 +167,6 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const drawRef = useRef(0);
   const [wheel, setWheel] = useState<string[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
-  const [rejected, setRejected] = useState<string | null>(null);
   const [stats, setStats] = useState<FrameStats | null>(null);
   const [debug, setDebug] = useState(false);
   // Free look sends the camera home on every hoist, so the swing a player has to
@@ -252,6 +285,10 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const sceneMRef = useRef(heightM);
   sceneMRef.current = heightM;
   const getSceneM = useCallback(() => sceneMRef.current, []);
+  // The workshop's upgrades, painted on the tower. A ref so the canvas loop reads the latest.
+  const gearRef = useRef<TowerGear | null>(null);
+  gearRef.current = estateApi.status === 'loading' ? null : gearFromEstate(estateApi.estate);
+  const getGear = useCallback(() => gearRef.current, []);
   // Tenants: the run owns the total; the HUD counts up as each one actually
   // arrives on screen, capped by the run so it can never run ahead of it.
   const [arrived, setArrived] = useState(0);
@@ -331,7 +368,15 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     if (phase !== 'composing' || word.length === 0) return;
     const guard = undoGuardRef.current;
     if (guard && guard.key === selected.join(',') && performance.now() < guard.until) return;
-    if (!isAcceptedWord(word, wheel, dictRef.current)) {
+    // A rescue word is running: the word braces the tower instead of becoming a floor.
+    const accepted = isAcceptedWord(word, wheel, dictRef.current);
+    const rescueLen = braceApi.rescue?.minLen ?? Infinity;
+    if (braceApi.submitRescue(word, accepted)) {
+      setSelected([]);
+      if (accepted && word.length >= rescueLen) deal(drawRef.current + 1);
+      return;
+    }
+    if (!accepted) {
       setRejected(word.length < MIN_WORD_LEN ? 'too_short' : 'not_in_dictionary');
       playSound('wordRejected');
       window.setTimeout(() => setRejected(null), 900);
@@ -341,7 +386,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     preSubmitRef.current = { wheel, selected, draw: drawRef.current };
     hoist(word);
     deal(drawRef.current + 1);
-  }, [phase, word, wheel, selected, hoist, playSound, deal]);
+  }, [phase, word, wheel, selected, hoist, playSound, deal, braceApi]);
 
   /**
    * Put the hanging word back: the slab leaves the physics world and the wheel
@@ -451,8 +496,9 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     );
   }, [daily, phase, run.floors, game.peakM, myWords]);
 
-  // Smash round target: the friend who sent the link, else your own tower.
-  const smashWords = rival?.words ?? (myWords.length >= 3 ? myWords : null);
+  // Smash round target: only the friend who sent the link. Wrecking your OWN
+  // tower was removed — there is no reason to knock down what you just built.
+  const smashWords = rival?.words ?? null;
   const rivalName = rival?.name || t('wordTowerV2.wreck.friend');
   const shareMine = () =>
     share({
@@ -495,6 +541,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           getSceneM={getSceneM}
           homeKey={homeKey}
           reducedMotion={reducedMotion}
+          getGear={getGear}
           dockSide={wide ? 'inline' : 'bottom'}
           className={canvasClass}
         />
@@ -513,7 +560,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           run={run}
           tenants={Math.min(arrived, run.tenants)}
           estate={estateApi.estate}
-          runCoins={rewardsFlow.rewards.coins}
+          runCoins={rewardsFlow.rewards.coins - braceApi.spent}
           raids={estateApi.inbox.length}
           coinsRef={coinsRef}
           onOpenEstate={() => setDistrict(true)}
@@ -535,6 +582,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         wide={wide}
         reducedMotion={reducedMotion}
       />
+      {phase !== 'over' && !smashing && !district ? <BraceControl t={t} api={braceApi} reducedMotion={reducedMotion} /> : null}
       <V2Celebrations t={t} callout={game.callout} banners={game.banners} onBannerDone={game.shiftBanner} swinging={phase === 'swinging'} />
       {/* One hint at a time, only on the first floor: spell it, then edit it,
           then drop it. It sits ABOVE the dock and never over the tower. */}
@@ -615,7 +663,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
             setForceResults(false);
             setResultsDismissed(true);
           }}
-          smashLabel={rival ? t('wordTowerV2.wreck.smash', { name: rivalName }) : t('wordTowerV2.wreck.smashOwn')}
+          smashLabel={t('wordTowerV2.wreck.smash', { name: rivalName })}
           onSmash={smashWords ? () => setSmashing(true) : undefined}
           onShare={myWords.length >= 3 ? shareMine : undefined}
           recapSrc={v2ShareCardPath({
@@ -695,7 +743,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       {smashing && smashWords ? (
         <WreckScene
           t={t}
-          title={rival ? t('wordTowerV2.wreck.title', { name: rivalName }) : t('wordTowerV2.wreck.titleOwn')}
+          title={t('wordTowerV2.wreck.title', { name: rivalName })}
           words={smashWords}
           balls={run.balls}
           reducedMotion={reducedMotion}
