@@ -57,7 +57,9 @@ export function isTeacherProAskDismissed(
     // Legacy permanent flag from PR #1079 — start a TTL window so the 40 free
     // teachers who tapped X are not silenced forever (1 paying of 41).
     if (raw === '1') {
-      if (storage?.setItem) persistTeacherProAskDismissed(storage, now);
+      // Migrates legacy permanent "1" into a TTL timestamp. setItem is optional
+      // on the read-side storage shape (tests may pass getItem-only mocks).
+      persistTeacherProAskDismissed(storage, now);
       return true;
     }
     const ts = Number(raw);
@@ -69,11 +71,11 @@ export function isTeacherProAskDismissed(
 }
 
 export function persistTeacherProAskDismissed(
-  storage: { setItem(key: string, value: string): void } | null | undefined,
+  storage: { setItem?(key: string, value: string): void } | null | undefined,
   now: number = Date.now(),
 ): void {
   try {
-    storage?.setItem(TEACHER_PRO_ASK_DISMISS_KEY, String(now));
+    storage?.setItem?.(TEACHER_PRO_ASK_DISMISS_KEY, String(now));
   } catch {
     // Private mode / quota — the in-session hide still works.
   }
