@@ -69,11 +69,11 @@ export function isTeacherProAskDismissed(
 }
 
 export function persistTeacherProAskDismissed(
-  storage: { setItem(key: string, value: string): void } | null | undefined,
+  storage: { setItem?(key: string, value: string): void } | null | undefined,
   now: number = Date.now(),
 ): void {
   try {
-    storage?.setItem(TEACHER_PRO_ASK_DISMISS_KEY, String(now));
+    storage?.setItem?.(TEACHER_PRO_ASK_DISMISS_KEY, String(now));
   } catch {
     // Private mode / quota — the in-session hide still works.
   }
