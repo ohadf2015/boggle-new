@@ -18,6 +18,7 @@ import PlayTabFirstRunCard from '../PlayTabFirstRunCard';
 import * as useClassroomHook from '@/hooks/useClassroom';
 
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: vi.fn() }));
+vi.mock('@/lib/education/telemetry', () => ({ trackTeacherOnboardingStep: vi.fn() }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
@@ -106,5 +107,18 @@ describe('PlayTabFirstRunCard', () => {
     const card = screen.getByTestId('play-tab-first-run-card');
     expect(card.className).not.toContain('opacity-0');
     expect(container.querySelector('[style*="opacity: 0"]')).toBeNull();
+  });
+
+  /**
+   * #1099's funnel counts `create_classroom`/`cta` from the checklist button.
+   * On a first-run dashboard that button is hidden as a duplicate of THIS one,
+   * so this is the click that has to report it — or the funnel's first step
+   * goes dark for exactly the teachers it exists to measure.
+   */
+  it('reports the create-classroom click to the onboarding funnel', async () => {
+    const { trackTeacherOnboardingStep } = await import('@/lib/education/telemetry');
+    render(<PlayTabFirstRunCard />);
+    await userEvent.setup().click(screen.getByTestId('first-run-create-class'));
+    expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({ step: 'create_classroom', action: 'cta' });
   });
 });

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
+import { trackTeacherOnboardingStep } from '@/lib/education/telemetry';
 import { cn } from '@/lib/utils';
 import { Copy, Loader, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -42,6 +43,10 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
   const [createdJoinCode, setCreatedJoinCode] = useState<string | null>(initialJoinCode ?? null);
 
   const handleCreate = async () => {
+    // The #1099 checklist hides its own create CTA while this card is on
+    // screen, so this click reports the funnel step it would have (on click,
+    // like the checklist's runCta — not on success).
+    trackTeacherOnboardingStep({ step: 'create_classroom', action: 'cta' });
     setIsLoading(true);
     // The default name, applied without asking. A teacher renames a class once,
     // later, in the manager — never at the moment they are trying to start one.
