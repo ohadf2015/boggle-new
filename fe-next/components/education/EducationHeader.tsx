@@ -25,6 +25,7 @@ import { EducationBreadcrumbs } from './EducationBreadcrumbs';
 import { EducationMenuDropdown } from './EducationMenuDropdown';
 import { TeacherWhatsNew } from '@/components/teacher/TeacherWhatsNew';
 import { TeacherHelpButton } from '@/components/teacher/TeacherHelpButton';
+import { SearchIconButton } from './SearchIconButton';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
@@ -231,6 +232,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
         {/* Right Section: Controls */}
         <div className={cn('flex items-center gap-2 sm:gap-3', isRTL && 'flex-row-reverse')}>
           {isTeacher && <TeacherWhatsNew />}
+          {isTeacher && <SearchIconButton />}
           {isTeacher && <TeacherHelpButton />}
 
           {/* Desktop Controls */}
