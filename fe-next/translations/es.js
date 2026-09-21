@@ -535,6 +535,9 @@ const es = {
     "backToMap": "Volver al mapa",
     "backHome": "Inicio",
     "next": "Siguiente",
+    "play": "Jugar",
+    "pause": "Pause",
+    "replay": "Repetir",
     "retry": "Otra vez",
     "score": "Puntos",
     "words": "Palabras",
@@ -14822,6 +14825,10 @@ const es = {
       "welcome_banner_title": "¡Bienvenido, maestro! 🎉",
       "welcome_banner_body": "Tu cuenta está lista. Crea aulas, asigna juegos y monitorea el progreso en tiempo real.",
       "welcome_banner_dismiss": "Perfecto"
+    },
+    "tour": {
+      "watchButton": "Ver cómo funciona",
+      "title": "Cómo funciona"
     }
   },
   "crazygames": {

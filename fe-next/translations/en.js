@@ -535,6 +535,9 @@ const en = {
     "backToMap": "Back to map",
     "backHome": "Home",
     "next": "Next",
+    "play": "Play",
+    "pause": "Pause",
+    "replay": "Replay",
     "retry": "Retry",
     "score": "Score",
     "words": "Words",
@@ -1780,6 +1783,8 @@ const en = {
     "backToHome": "Back to Home",
     "backToMenu": "Back to Menu",
     "next": "Next",
+    "play": "Play",
+    "replay": "Replay",
     "stepOf": "Step {current} of {total}",
     "previous": "Previous",
     "confirm": "Confirm",
@@ -13428,6 +13433,10 @@ const en = {
       "welcome_banner_title": "You're approved! Welcome, teacher! 🎉",
       "welcome_banner_body": "Your teacher account is ready. You can now create classes, assign games, and track student progress.",
       "welcome_banner_dismiss": "Got it"
+    },
+    "tour": {
+      "watchButton": "Watch how it works",
+      "title": "How it works"
     }
   },
   "crazygames": {

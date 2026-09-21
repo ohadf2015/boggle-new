@@ -21,6 +21,7 @@ import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { TeacherSetupSteps } from './TeacherSetupSteps';
+import { TeacherTourDialog } from './tour/TeacherTourDialog';
 
 export function TeacherSetupSection() {
   const { t, language } = useLanguage();
@@ -37,6 +38,10 @@ export function TeacherSetupSection() {
       </div>
 
       <TeacherSetupSteps className="mt-8" />
+
+      <div className="mt-8 flex items-center justify-center gap-4">
+        <TeacherTourDialog />
+      </div>
 
       <div className="mt-8">
         <Link
