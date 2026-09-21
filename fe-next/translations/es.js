@@ -12275,6 +12275,18 @@ const es = {
       "firstAssignmentBody": "Ya hay estudiantes en la lista. Asigna una práctica para que la clase tenga algo que hacer cuando no estés en directo.",
       "firstAssignmentCta": "Crear primera tarea"
     },
+    "onboardingChecklist": {
+      "title": "Activa tu clase",
+      "progress": "{{done}} de {{total}} listos",
+      "createClassroom": "Crea una clase",
+      "createClassroomCta": "Crear clase",
+      "createAssignment": "Crea la primera tarea",
+      "createAssignmentCta": "Crear tarea",
+      "shareJoin": "Comparte el enlace de unirse",
+      "shareJoinCta": "Copiar enlace",
+      "viewReport": "Mira el primer informe",
+      "viewReportCta": "Abrir informe"
+    },
     "playNow": {
       "recommended": "Recomendado",
       "title": "Jugar ya",

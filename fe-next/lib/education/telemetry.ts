@@ -177,6 +177,29 @@ export function trackEduTeacherOnboardingStep(args: EduTeacherOnboardingStepArgs
   });
 }
 
+export type TeacherOnboardingChecklistAction = 'view' | 'cta';
+
+export interface TeacherOnboardingChecklistStepArgs {
+  step:
+    | 'create_classroom'
+    | 'create_first_assignment'
+    | 'share_join_link'
+    | 'view_first_progress_report';
+  action: TeacherOnboardingChecklistAction;
+}
+
+/**
+ * `teacher_onboarding_step` — dashboard checklist (classroom → assignment →
+ * join link → first report). Distinct from `edu_teacher_onboarding_step`,
+ * which is the first-run infographic modal.
+ */
+export function trackTeacherOnboardingStep(args: TeacherOnboardingChecklistStepArgs): void {
+  safeCapture('teacher_onboarding_step', {
+    step: args.step,
+    action: args.action,
+  });
+}
+
 export interface EduTeacherSnapshot {
   classroomCount: number;
   studentCount: number;

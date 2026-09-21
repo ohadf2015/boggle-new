@@ -12182,6 +12182,18 @@ const he = {
       "firstAssignmentBody": "יש תלמידים ברשימה. שייכו תרגול כדי שיהיה להם מה לעשות כשאתם לא בשידור חי.",
       "firstAssignmentCta": "צרו מטלה ראשונה"
     },
+    "onboardingChecklist": {
+      "title": "הפעילו את הכיתה",
+      "progress": "{{done}} מתוך {{total}} הושלמו",
+      "createClassroom": "צרו כיתה",
+      "createClassroomCta": "יצירת כיתה",
+      "createAssignment": "צרו מטלה ראשונה",
+      "createAssignmentCta": "יצירת מטלה",
+      "shareJoin": "שתפו את קישור ההצטרפות",
+      "shareJoinCta": "העתיקו קישור הצטרפות",
+      "viewReport": "צפו בדוח ההתקדמות הראשון",
+      "viewReportCta": "פתיחת דוח"
+    },
     "playNow": {
       "recommended": "מומלץ",
       "title": "משחקים עכשיו",

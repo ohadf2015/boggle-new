@@ -31,6 +31,7 @@ import {
   trackEduClassroomJoin,
   trackEduClassroomCreated,
   trackEduTeacherOnboardingStep,
+  trackTeacherOnboardingStep,
   trackEduError,
   trackEduTeacherDashboardViewed,
   trackEduTeacherToolsOpened,
@@ -76,6 +77,14 @@ describe('education telemetry', () => {
       step: 2,
       total_steps: 4,
       action: 'next',
+    });
+  });
+
+  it('dashboard checklist step uses teacher_onboarding_step', () => {
+    trackTeacherOnboardingStep({ step: 'create_first_assignment', action: 'view' });
+    expect(captureMock).toHaveBeenCalledWith('teacher_onboarding_step', {
+      step: 'create_first_assignment',
+      action: 'view',
     });
   });
 

@@ -12327,6 +12327,18 @@ const ja = {
       "firstAssignmentBody": "名簿に生徒がいます。ライブ中でないときも取り組める練習課題を出しましょう。",
       "firstAssignmentCta": "最初の課題を作成"
     },
+    "onboardingChecklist": {
+      "title": "クラスを始めましょう",
+      "progress": "{{done}} / {{total}} 完了",
+      "createClassroom": "クラスを作成",
+      "createClassroomCta": "クラスを作る",
+      "createAssignment": "最初の課題を作成",
+      "createAssignmentCta": "課題を作成",
+      "shareJoin": "参加リンクを共有",
+      "shareJoinCta": "リンクをコピー",
+      "viewReport": "最初の進捗レポートを見る",
+      "viewReportCta": "レポートを開く"
+    },
     "playNow": {
       "recommended": "おすすめ",
       "title": "いますぐプレイ",

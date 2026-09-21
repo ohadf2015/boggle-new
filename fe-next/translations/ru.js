@@ -11195,6 +11195,18 @@ const ru = {
       "firstAssignmentBody": "Ученики уже в списке. Назначьте практику, чтобы классу было чем заняться, когда вы не в эфире.",
       "firstAssignmentCta": "Создать первое задание"
     },
+    "onboardingChecklist": {
+      "title": "Запустите класс",
+      "progress": "{{done}} из {{total}} готово",
+      "createClassroom": "Создайте класс",
+      "createClassroomCta": "Создать класс",
+      "createAssignment": "Создайте первое задание",
+      "createAssignmentCta": "Создать задание",
+      "shareJoin": "Поделитесь ссылкой для входа",
+      "shareJoinCta": "Скопировать ссылку",
+      "viewReport": "Откройте первый отчёт",
+      "viewReportCta": "Открыть отчёт"
+    },
     "playNow": {
       "recommended": "Рекомендуем",
       "title": "Играть сейчас",

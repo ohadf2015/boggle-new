@@ -12562,6 +12562,18 @@ const sv = {
       "firstAssignmentBody": "Eleverna är på listan. Ge dem en övning så klassen har något att göra när du inte sänder live.",
       "firstAssignmentCta": "Skapa första uppgiften"
     },
+    "onboardingChecklist": {
+      "title": "Aktivera din klass",
+      "progress": "{{done}} av {{total}} klara",
+      "createClassroom": "Skapa ett klassrum",
+      "createClassroomCta": "Skapa klassrum",
+      "createAssignment": "Skapa första uppgiften",
+      "createAssignmentCta": "Skapa uppgift",
+      "shareJoin": "Dela join-länken",
+      "shareJoinCta": "Kopiera länk",
+      "viewReport": "Visa första progressrapporten",
+      "viewReportCta": "Öppna rapport"
+    },
     "playNow": {
       "recommended": "Rekommenderas",
       "title": "Spela nu",
