@@ -236,7 +236,7 @@ export default function CookieConsent() {
             <h2 className="text-sm font-bold font-neo-display text-neo-white sm:text-base">
               {t('cookieConsent.title')}
             </h2>
-            <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 line-clamp-1 sm:line-clamp-2 sm:text-[13px]">
+            <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 sm:text-[13px]">
               {t('cookieConsent.message')}{' '}
               <a
                 href={`/${language}/legal/cookies`}
@@ -249,9 +249,10 @@ export default function CookieConsent() {
         </div>
 
         {/* Actions stay one-tap reachable. Accept is cyan — NOT neo-lime — so the
-            home Play CTA remains the only lime primary above the fold. Decline
-            is leveled up to equal weight with Accept (border-3, text-sm).
-            Customize stays lighter for hierarchy. */}
+            home Play CTA remains the only lime primary above the fold. All three
+            (Accept, Decline, Customize) have equal weight (border-3, text-sm) so
+            users have a lawful choice. Customize uses cyan borders to distinguish
+            its affordance from the other two. */}
         <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
           <button
             type="button"
@@ -270,9 +271,9 @@ export default function CookieConsent() {
             type="button"
             onClick={() => setShowDetails(!showDetails)}
             className={cn(
-              'min-h-[44px] flex-1 px-3 py-2 text-xs font-bold uppercase sm:flex-none',
+              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase sm:flex-none',
               'text-neo-cyan hover:text-neo-white',
-              'border-2 border-neo-cyan rounded-neo transition-colors duration-100'
+              'border-3 border-neo-cyan rounded-neo transition-colors duration-100'
             )}
           >
             {t('cookieConsent.customize')}

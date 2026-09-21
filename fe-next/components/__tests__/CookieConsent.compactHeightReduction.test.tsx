@@ -3,9 +3,9 @@
  *
  * UX audit 2026-09-14 (lexiclash.live): the compact bar measured ~350px and covered
  * PLAY NOW + the lower grid. Height reduction goals:
- * - Line-clamp message to 1 line at xs (2+ lines on sm+)
+ * - Remove line-clamp on message to ensure policy link is always visible (informed consent)
  * - Reduce padding/gap on mobile
- * - Level Decline button up to Accept weight (border-3, text-sm) for lawful choice
+ * - Level all three buttons (Accept, Decline, Customize) to equal visual weight (border-3, text-sm)
  *
  * This test asserts the visual compaction changes without touching consent state machine.
  */
@@ -38,13 +38,13 @@ vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
 vi.stubGlobal('cancelIdleCallback', () => {});
 
 describe('CookieConsent — compact height reduction', () => {
-  it('clamps message to 1 line on mobile, expands on tablet+', () => {
+  it('does NOT clamp message so policy link remains visible for informed consent', () => {
     render(<CookieConsent />);
     // Find the message by looking for the learn more link's parent paragraph
     const learnMoreLink = screen.getByRole('link', { name: 'cookieConsent.learnMore' });
     const message = learnMoreLink.closest('p');
-    expect(message).toHaveClass('line-clamp-1');
-    expect(message).toHaveClass('sm:line-clamp-2');
+    expect(message).not.toHaveClass('line-clamp-1');
+    expect(message).not.toHaveClass('line-clamp-2');
   });
 
   it('levels Decline button to Accept weight (border-3, text-sm)', () => {
@@ -73,7 +73,7 @@ describe('CookieConsent — compact height reduction', () => {
     expect(mascot).toHaveClass('w-10');
   });
 
-  it('reduces all three choices to equal visual weight', () => {
+  it('gives all three choices equal visual weight (border-3, text-sm)', () => {
     render(<CookieConsent />);
     const accept = screen.getByRole('button', { name: 'cookieConsent.accept' });
     const customize = screen.getByRole('button', { name: 'cookieConsent.customize' });
@@ -84,12 +84,12 @@ describe('CookieConsent — compact height reduction', () => {
     expect(accept).toHaveClass('border-3');
     expect(accept).toHaveClass('text-sm');
 
-    // Decline: now border-3, text-sm (up from border-2, text-xs)
+    // Decline: border-3, text-sm (equal to Accept)
     expect(decline).toHaveClass('border-3');
     expect(decline).toHaveClass('text-sm');
 
-    // Customize: outline, smaller (stays as is for hierarchy)
-    expect(customize).toHaveClass('border-2');
-    expect(customize).toHaveClass('text-xs');
+    // Customize: now also border-3, text-sm (equal weight, but cyan outline for affordance)
+    expect(customize).toHaveClass('border-3');
+    expect(customize).toHaveClass('text-sm');
   });
 });
