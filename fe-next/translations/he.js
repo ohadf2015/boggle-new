@@ -12401,7 +12401,10 @@ const he = {
       "loadError": "לא הצלחנו לטעון את השיעור האחרון.",
       "retry": "נסו שוב",
       "proCtaHint": "פתחו כל משחק, כל תלמיד, ודוחות PDF להדפסה.",
-      "regionLabel": "תקציר התקדמות עבור {{classroom}}"
+      "regionLabel": "תקציר התקדמות עבור {{classroom}}",
+      "scheduleReteachCta": "לקבוע Live לחזרה בעוד ~{{days}} ימים",
+      "scheduleReteachConfirm": "Live לחזרה נקבע ל־{{date}} (~{{days}} ימים). הזמנה ליומן נפתחה.",
+      "scheduleReteachHint": "לבנות מחדש את המילים הקשות ולשחק שוב בעוד כשבועיים — חזרה מרווחת בסגנון Kahoot."
     },
     "subscription": {
       "giftedNoCard": "אין כרטיס במערכת ואין חידוש — זה פשוט מסתיים וחוזרים לחינמי.",

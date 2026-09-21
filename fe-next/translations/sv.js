@@ -12781,7 +12781,10 @@ const sv = {
       "loadError": "Kunde inte läsa in senaste lektionen.",
       "retry": "Försök igen",
       "proCtaHint": "Lås upp varje spel, varje elev och utskrivbara PDF:er.",
-      "regionLabel": "Fortgångssammandrag för {{classroom}}"
+      "regionLabel": "Fortgångssammandrag för {{classroom}}",
+      "scheduleReteachCta": "Schemalägg reteach-Live om ~{{days}} dagar",
+      "scheduleReteachConfirm": "Reteach-Live schemalagd till {{date}} (~{{days}} dagar). Kalenderinbjudan öppnades.",
+      "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor — mellanslagsrepetition à la Kahoot."
     },
     "subscription": {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",

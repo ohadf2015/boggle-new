@@ -12495,7 +12495,10 @@ const es = {
       "loadError": "No se pudo cargar la última clase.",
       "retry": "Reintentar",
       "proCtaHint": "Desbloquea cada partida, cada estudiante y PDF imprimibles.",
-      "regionLabel": "Resumen de progreso de {{classroom}}"
+      "regionLabel": "Resumen de progreso de {{classroom}}",
+      "scheduleReteachCta": "Programar Live de repaso en ~{{days}} días",
+      "scheduleReteachConfirm": "Live de repaso programado para {{date}} (~{{days}} días). Se abrió la invitación del calendario.",
+      "scheduleReteachHint": "Reconstruye las palabras difíciles y vuelve a jugar en unas dos semanas — repaso espaciado al estilo Kahoot."
     },
     "subscription": {
       "giftedNoCard": "Sin tarjeta ni renovación: simplemente termina y vuelves al plan gratuito.",
