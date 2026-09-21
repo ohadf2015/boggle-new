@@ -41,6 +41,15 @@
  * means the advertised promise ("your whole class plays free") is one the product can keep.
  *
  * `__tests__/freeTierLimits.test.ts` pins the intent so neither half drifts by accident.
+ *
+ * 2026-09-21  `assignmentsPerClass: 3` — the usage-triggered paywall's teeth.
+ *             The card (components/teacher/TeacherProUsagePromptCard.tsx) asks
+ *             at 3+ created assignments; the soft cap in AssignmentCreator is
+ *             what makes the ask honest. 3 keeps a real week of assignments
+ *             free — the same reasoning as the class cap: a paywall that
+ *             binds before the teacher has run the loop removes them instead
+ *             of converting them. Deleting an old assignment frees a slot, so
+ *             the free path stays fully playable.
  */
 export const FREE_TIER_LIMITS = {
   /** Classrooms a free teacher may own. Pro lifts this — the multi-section upsell. */
@@ -51,6 +60,13 @@ export const FREE_TIER_LIMITS = {
    * binds on an ordinary class blocks first use, and first use is the only use we get.
    */
   studentsPerClass: 50,
+  /**
+   * Assignments a free teacher may have active per classroom. Pro lifts this.
+   * Soft paywall, enforced in the AssignmentCreator UI — there is no assignment
+   * API route to enforce it server-side, and the task is a usage-triggered ask,
+   * not a hard wall. See the 2026-09-21 note above.
+   */
+  assignmentsPerClass: 3,
 } as const;
 
 /** Teacher Pro monthly price in USD. Used by client-side upgrade/landing pages. */

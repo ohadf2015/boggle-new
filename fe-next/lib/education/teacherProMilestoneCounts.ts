@@ -8,6 +8,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { TEACHER_PRO_MILESTONE_MIN_COMPLETED } from '@/lib/education/teacherProMilestone';
+import { TEACHER_USAGE_PROMPT_MIN_ASSIGNMENTS } from '@/lib/education/teacherUsagePrompt';
 
 const MAX_SESSION_ROWS = TEACHER_PRO_MILESTONE_MIN_COMPLETED * 60;
 
@@ -78,5 +79,32 @@ export async function countClassroomCompletedActivities(
     return { gameCount, assignmentCompletedCount: count ?? 0 };
   } catch {
     return empty;
+  }
+}
+
+/**
+ * How many assignments a classroom has (created, any status) — the input for
+ * the usage-triggered Pro prompt and the assignment-cap check. Counts, never
+ * rows: the caller only thresholds at TEACHER_USAGE_PROMPT_MIN_ASSIGNMENTS,
+ * so the count saturates there. Unknown reads fail closed to 0, same as the
+ * counts above — a late answer cannot retract an upsell (pitfall class 1).
+ */
+export async function countClassroomCreatedAssignments(
+  classroomId: string,
+  client?: typeof supabase,
+): Promise<number> {
+  const db = client ?? supabase;
+  if (!db || !classroomId) return 0;
+
+  try {
+    const { count, error } = await db
+      .from('lesson_assignments')
+      .select('id', { count: 'exact', head: true })
+      .eq('classroom_id', classroomId);
+
+    if (error) return 0;
+    return Math.min(count ?? 0, TEACHER_USAGE_PROMPT_MIN_ASSIGNMENTS);
+  } catch {
+    return 0;
   }
 }

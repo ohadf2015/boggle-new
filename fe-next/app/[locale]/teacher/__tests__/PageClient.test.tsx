@@ -18,8 +18,8 @@ vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div /> }));
 // `h-dvh` root it made the page taller than the viewport. The mock has to render
 // what it is handed, or these assertions would pass on a dropped banner.
 vi.mock('@/components/teacher/TeacherDashboard', () => ({
-  default: ({ banner }: { banner?: React.ReactNode }) => (
-    <div data-testid="teacher-dashboard">{banner}</div>
+  default: ({ banner, usagePrompt }: { banner?: React.ReactNode; usagePrompt?: React.ReactNode }) => (
+    <div data-testid="teacher-dashboard">{banner}{usagePrompt}</div>
   ),
 }));
 vi.mock('@/components/education/TrialUrgencyBanner', () => ({ TrialUrgencyBanner: () => null }));
@@ -43,6 +43,18 @@ let milestoneState = {
 vi.mock('@/hooks/useTeacherProMilestone', () => ({
   useTeacherProMilestone: () => milestoneState,
 }));
+// The usage-triggered card waits on the same inputs as the milestone ask.
+// Default: no limit hit, so the card stays down unless a test opts in.
+let usageState = {
+  reason: null as null | 'students' | 'assignments',
+  count: 0,
+  loading: false,
+  dismissed: false,
+  dismiss: vi.fn(),
+};
+vi.mock('@/hooks/useTeacherUsagePrompt', () => ({
+  useTeacherUsagePrompt: () => usageState,
+}));
 vi.mock('lucide-react', () => ({ Shield: () => null, ArrowLeft: () => null, X: () => null }));
 vi.mock('@/components/ui/button', () => ({ Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => <button onClick={onClick}>{children}</button> }));
 
@@ -62,6 +74,7 @@ describe('TeacherPage upgrade CTA', () => {
     proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
     recentState = { hasRecentConfig: true };
     milestoneState = { hasMilestone: true, loading: false, dismissed: false, dismiss: vi.fn() };
+    usageState = { reason: null, count: 0, loading: false, dismissed: false, dismiss: vi.fn() };
   });
 
   it('hides the upgrade strip for a Pro teacher (paid or gifted)', () => {
@@ -141,5 +154,47 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+  });
+
+  it('shows the usage prompt card when a free teacher hits a usage limit', () => {
+    milestoneState = { ...milestoneState, dismissed: true };
+    usageState = { reason: 'students', count: 12, loading: false, dismissed: false, dismiss: vi.fn() };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.getByTestId('teacher-pro-usage-prompt')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /teacher\.subscription\.upgradeNow/i })).toHaveAttribute(
+      'href',
+      '/en/teacher/upgrade',
+    );
+  });
+
+  it('does not stack the usage card on top of the milestone Pro banner', () => {
+    usageState = { reason: 'assignments', count: 3, loading: false, dismissed: false, dismiss: vi.fn() };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.getByTestId('teacher-pro-ask')).toBeInTheDocument();
+    expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
+  });
+
+  it('hides the usage prompt card for a Pro teacher and after dismiss', () => {
+    proState = { ...proState, hasPro: true, source: 'polar' };
+    usageState = { reason: 'students', count: 12, loading: false, dismissed: false, dismiss: vi.fn() };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    const { unmount } = render(<TeacherPage />);
+    expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
+    unmount();
+
+    proState = { ...proState, hasPro: false };
+    usageState = { ...usageState, dismissed: true };
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
+  });
+
+  it('shows no usage card while the usage read is still open', () => {
+    milestoneState = { ...milestoneState, dismissed: true };
+    usageState = { reason: 'students', count: 12, loading: true, dismissed: false, dismiss: vi.fn() };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
   });
 });

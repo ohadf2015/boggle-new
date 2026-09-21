@@ -27,6 +27,17 @@ vi.mock('@/contexts/LanguageContext', () => ({
     language: 'en',
   })),
 }));
+// Free by default in every test; the cap-gate describe block overrides.
+let proState = { hasPro: false, loading: false };
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => proState,
+}));
+vi.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
+}));
 vi.mock('react-hot-toast', () => ({
   __esModule: true,
   default: {
@@ -176,5 +187,88 @@ describe('AssignmentCreator', () => {
     // Should not call onComplete/onClose on error
     expect(mockOnComplete).not.toHaveBeenCalled();
     expect(mockOnClose).not.toHaveBeenCalled();
+  });
+});
+
+describe('AssignmentCreator — free-tier assignment cap', () => {
+  const threeAssignments = [
+    { id: 'a1', classroom_id: 'classroom-1', lesson_id: 'lesson-1' },
+    { id: 'a2', classroom_id: 'classroom-1', lesson_id: 'lesson-1' },
+    { id: 'a3', classroom_id: 'classroom-1', lesson_id: 'lesson-1' },
+  ];
+
+  beforeEach(() => {
+    proState = { hasPro: false, loading: false };
+    (useAssignments as jest.Mock).mockReturnValue({
+      createAssignment: mockCreateAssignment,
+      assignments: threeAssignments,
+    });
+  });
+
+  it('shows the upsell instead of the form when a free teacher is at the cap', () => {
+    render(
+      <AssignmentCreator
+        classroomId="classroom-1"
+        onComplete={mockOnComplete}
+        isOpen={true}
+        onClose={mockOnClose}
+      />
+    );
+
+    expect(screen.getByTestId('assignment-limit-upsell')).toBeInTheDocument();
+    expect(screen.queryByText('teacher.assignment.typeLabel')).toBeNull();
+    // The upgrade path is the live checkout page, not a second checkout POST.
+    expect(screen.getByRole('link', { name: 'teacher.subscription.upgradeNow' })).toHaveAttribute(
+      'href',
+      '/en/teacher/upgrade',
+    );
+    expect(mockCreateAssignment).not.toHaveBeenCalled();
+  });
+
+  it('lets a Pro teacher past the cap', () => {
+    proState = { hasPro: true, loading: false };
+    render(
+      <AssignmentCreator
+        classroomId="classroom-1"
+        onComplete={mockOnComplete}
+        isOpen={true}
+        onClose={mockOnClose}
+      />
+    );
+
+    expect(screen.queryByTestId('assignment-limit-upsell')).toBeNull();
+    expect(screen.getByText('teacher.assignment.typeLabel')).toBeInTheDocument();
+  });
+
+  it('keeps the form for a free teacher below the cap', () => {
+    (useAssignments as jest.Mock).mockReturnValue({
+      createAssignment: mockCreateAssignment,
+      assignments: threeAssignments.slice(0, 2),
+    });
+    render(
+      <AssignmentCreator
+        classroomId="classroom-1"
+        onComplete={mockOnComplete}
+        isOpen={true}
+        onClose={mockOnClose}
+      />
+    );
+
+    expect(screen.queryByTestId('assignment-limit-upsell')).toBeNull();
+    expect(screen.getByText('teacher.assignment.typeLabel')).toBeInTheDocument();
+  });
+
+  it('never gates while the entitlement is still loading', () => {
+    proState = { hasPro: false, loading: true };
+    render(
+      <AssignmentCreator
+        classroomId="classroom-1"
+        onComplete={mockOnComplete}
+        isOpen={true}
+        onClose={mockOnClose}
+      />
+    );
+
+    expect(screen.queryByTestId('assignment-limit-upsell')).toBeNull();
   });
 });

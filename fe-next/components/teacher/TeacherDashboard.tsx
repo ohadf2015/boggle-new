@@ -65,9 +65,16 @@ export interface TeacherDashboardProps {
    * action. Inside, below the hero, it is neither.
    */
   banner?: ReactNode;
+  /**
+   * The usage-triggered Pro card (10+ students in a class, or 3+ assignments
+   * created). Same slot reasoning as `banner`: the route client decides
+   * whether it exists, this component only places it — in the rail, below the
+   * banner, never above PLAY NOW.
+   */
+  usagePrompt?: ReactNode;
 }
 
-export default function TeacherDashboard({ banner }: TeacherDashboardProps = {}) {
+export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboardProps = {}) {
   const { t, language } = useLanguage();
   const { profile } = useAuth();
   const router = useRouter();
@@ -285,6 +292,14 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
             {banner ? (
               <div data-testid="teacher-dashboard-banner" className="mb-5">
                 {banner}
+              </div>
+            ) : null}
+
+            {/* The usage-triggered ask: after the banner, before shortcuts —
+                seen on the way down, never in front of the button. */}
+            {usagePrompt ? (
+              <div data-testid="teacher-dashboard-usage-prompt" className="mb-5">
+                {usagePrompt}
               </div>
             ) : null}
 

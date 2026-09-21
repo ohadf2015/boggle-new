@@ -4,6 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAssignments } from '@/hooks/useAssignments';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { AssignmentLimitUpsell } from './AssignmentLimitUpsell';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { labelLessonsForPicker } from '@/lib/education/lessonLabels';
@@ -46,7 +49,16 @@ export default function AssignmentCreator({
 }: AssignmentCreatorProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { createAssignment } = useAssignments(classroomId);
+  const { createAssignment, assignments } = useAssignments(classroomId);
+  const { hasPro, loading: proLoading } = useTeacherPro();
+  // Soft paywall: a free teacher at the per-class assignment cap gets the
+  // upsell instead of the form. Pro lifts the cap; the entitlement must be
+  // resolved first so we neither flash the gate at a paying teacher nor lock
+  // them out while loading. `assignments` is undefined in older hook mocks —
+  // treat a missing list as 0 rather than at-cap.
+  const assignmentCount = assignments?.length ?? 0;
+  const atAssignmentCap =
+    !proLoading && !hasPro && assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
   const { lessons, isLoading: isLoadingLessons } = useLessons();
   // `useLessons()` spans every class this teacher owns, and reusing one list
   // across periods is intended — so two rows can read "Week 3 Vocabulary" with
@@ -147,9 +159,14 @@ export default function AssignmentCreator({
         )}
       >
         <DialogTitle className="text-2xl font-neo-display text-neo-white mb-4 normal-case tracking-normal">
-          {t('teacher.assignment.createTitle')}
+          {atAssignmentCap
+            ? t('teacher.subscription.assignmentLimitTitle')
+            : t('teacher.assignment.createTitle')}
         </DialogTitle>
 
+        {atAssignmentCap ? (
+          <AssignmentLimitUpsell currentCount={assignmentCount} onClose={onClose} />
+        ) : (
         <div className="space-y-5">
             {/* Assignment Type Selector */}
             <div>
@@ -392,6 +409,7 @@ export default function AssignmentCreator({
               </Button>
             </div>
         </div>
+        )}
       </DialogContent>
     </Dialog>
   );
