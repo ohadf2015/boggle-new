@@ -11414,7 +11414,10 @@ const ru = {
       "loadError": "Не удалось загрузить последний урок.",
       "retry": "Повторить",
       "proCtaHint": "Откройте каждую игру, каждого ученика и PDF для печати.",
-      "regionLabel": "Сводка прогресса для {{classroom}}"
+      "regionLabel": "Сводка прогресса для {{classroom}}",
+      "scheduleReteachCta": "Запланировать reteach Live через ~{{days}} дн.",
+      "scheduleReteachConfirm": "Reteach Live запланирован на {{date}} (~{{days}} дн.). Приглашение в календарь открыто.",
+      "scheduleReteachHint": "Соберите снова сложные слова и сыграйте через ~две недели — интервальный повтор в стиле Kahoot."
     },
     "subscription": {
       "giftedNoCard": "Карта не привязана, продления нет — срок просто закончится, и вы вернётесь на бесплатный план.",

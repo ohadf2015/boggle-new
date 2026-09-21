@@ -12546,7 +12546,10 @@ const ja = {
       "loadError": "前回の授業を読み込めませんでした。",
       "retry": "再試行",
       "proCtaHint": "すべてのゲーム・生徒・印刷用PDFを解除します。",
-      "regionLabel": "{{classroom}} の進捗ダイジェスト"
+      "regionLabel": "{{classroom}} の進捗ダイジェスト",
+      "scheduleReteachCta": "約{{days}}日後に再指導Liveを予定",
+      "scheduleReteachConfirm": "{{date}}（約{{days}}日後）に再指導Liveを予定しました。カレンダー招待を開きました。",
+      "scheduleReteachHint": "苦手な語を組み直して約2週間後にもう一度 — Kahoot風の間隔再指導。"
     },
     "subscription": {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",

@@ -21,6 +21,7 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { Stat } from '@/components/ui/Stat';
 import { NeoPanel } from '@/components/ui/panel';
+import { ScheduleReteachLiveButton } from '@/components/teacher/digest/ScheduleReteachLiveButton';
 
 export interface ProgressDigestDashboardProps {
   classroomId: string;
@@ -142,6 +143,13 @@ export function ProgressDigestDashboard({
                   </li>
                 ))}
               </ul>
+              <div className="mt-3">
+                <ScheduleReteachLiveButton
+                  classroomId={classroomId}
+                  classroomName={classroomName}
+                  missedWords={digest.topMissedWords}
+                />
+              </div>
             </div>
           )}
 
