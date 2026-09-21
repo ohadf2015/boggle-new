@@ -7,6 +7,13 @@ import { captureApiError } from '@/utils/sentry';
  * DELETE /api/account/delete
  * Permanently deletes the authenticated user's account and all associated data.
  * Uses admin client to delete from auth.users — cascades to profiles and all FK'd tables.
+ *
+ * "All FK'd tables" is the catch: teacher access rows are keyed by the email
+ * STRING, not by a user id, so no cascade reaches them. A teacher who deleted
+ * her account on 2026-09-20 still had her address sitting in
+ * `teacher_access_requests` afterwards. Anything holding the address as text
+ * has to be cleared explicitly, here, before the auth row (and with it the
+ * only copy of the email) goes away.
  */
 export async function DELETE() {
   try {
@@ -39,7 +46,27 @@ export async function DELETE() {
       .eq('user_id', user.id)
       .then(() => {});
 
-    // 4. Delete the auth user — cascades to profiles and all FK'd tables
+    // 4. Clear rows keyed by the email STRING — no FK, so no cascade. Must run
+    //    BEFORE deleteUser, which is what destroys our copy of the address.
+    //    Signup lowercases the address while the request row keeps whatever the
+    //    teacher typed, so match lowercased on both sides.
+    const email = user.email?.toLowerCase();
+    if (email) {
+      for (const table of ['teacher_access_requests', 'teacher_access_allowlist'] as const) {
+        const { error: emailRowError } = await admin.from(table).delete().eq('email', email);
+        // Non-fatal: the account must still go. But it must not vanish
+        // silently — an un-erased address is the whole point of the request.
+        if (emailRowError) {
+          captureApiError(
+            new Error(`Failed to clear ${table} for deleted account: ${emailRowError.message}`),
+            '/api/account/delete',
+            { method: 'DELETE', userId: user.id, statusCode: 500 }
+          );
+        }
+      }
+    }
+
+    // 5. Delete the auth user — cascades to profiles and all FK'd tables
     const { error: deleteError } = await admin.auth.admin.deleteUser(user.id);
 
     if (deleteError) {

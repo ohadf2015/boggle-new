@@ -12,6 +12,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 const push = vi.fn();
 
+const classroomsState = { classrooms: [{ id: 'c1', name: 'Class 1' }] };
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
@@ -19,7 +21,7 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'u1' }, profile: { user_role: 'teacher' }, loading: false }),
 }));
 vi.mock('@/hooks/useClassroom', () => ({
-  useClassrooms: () => ({ classrooms: [{ id: 'c1', name: 'Class 1' }], isLoading: false, error: null, refresh: vi.fn() }),
+  useClassrooms: () => ({ classrooms: classroomsState.classrooms, isLoading: false, error: null, refresh: vi.fn() }),
 }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
@@ -61,6 +63,7 @@ describe('<TeacherDashboard> — play now in one tap', () => {
   beforeEach(() => {
     push.mockClear();
     sessionStorage.clear();
+    classroomsState.classrooms = [{ id: 'c1', name: 'Class 1' }];
   });
 
   it('leads with the PLAY NOW panel, above everything else on the page', () => {
@@ -110,5 +113,11 @@ describe('<TeacherDashboard> — play now in one tap', () => {
     render(<TeacherDashboard />);
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
     expect(screen.queryAllByRole('tab')).toHaveLength(0);
+  });
+
+  it('hides the last-game shortcut when there are no classrooms', () => {
+    classroomsState.classrooms = [];
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('shortcut-last-game')).not.toBeInTheDocument();
   });
 });

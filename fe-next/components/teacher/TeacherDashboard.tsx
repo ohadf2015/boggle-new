@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
 import PlayTabFirstRunCard from './PlayTabFirstRunCard';
+import { TeacherLastGameShortcut } from './TeacherLastGameShortcut';
 import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
 import { ClassPulseSection } from './dashboard/ClassPulseSection';
 import { ClassSwitcher } from './dashboard/ClassSwitcher';
@@ -38,7 +39,7 @@ import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { useTeacherOnboardingState } from '@/hooks/useOnboardingState';
-import { BarChart3, FileText, ChevronDown, History, SlidersHorizontal } from 'lucide-react';
+import { BarChart3, FileText, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
 import { stagger, slideUp } from './teacherDashboardTabs';
@@ -309,18 +310,14 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
               aria-label={t('teacher.playNow.shortcutsLabel')}
               className="mb-6 grid grid-cols-3 gap-3 lg:grid-cols-1"
             >
-              <button
-                type="button"
-                data-testid="shortcut-last-game"
-                onClick={() => {
+              <TeacherLastGameShortcut
+                classroomCount={classrooms.length}
+                onOpen={() => {
                   setToolsOpen(true);
                   requestAnimationFrame(() => toolsRef.current?.scrollIntoView({ block: 'start' }));
                 }}
                 className={SHORTCUT_CLASS}
-              >
-                <History className="size-4 shrink-0 text-neo-cyan" aria-hidden="true" />
-                {t('teacher.playNow.shortcutLastGame')}
-              </button>
+              />
               <Link
                 href={`/${language}/education/classroom-game`}
                 data-testid="shortcut-recent"
@@ -362,9 +359,9 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
                 reportsHref={reportsHref}
                 onCreateClassroom={focusCreateClassroom}
                 onCreateAssignment={() => setShowAssignmentCreator(true)}
+                hideCreateClassroomCta={classrooms.length === 0 || !!newlyCreatedJoinCode}
               />
             )}
-
             {!classroomsLoading && selectedClassroom && (
               <>
                 <StudentCapMeter
@@ -380,6 +377,8 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
                   onInvite={() => router.push(`/${language}/teacher/classroom`)}
                   onPlay={focusLauncher}
                   onReviewWords={openReviewLesson}
+                  // GO LIVE is the primary launch path; suppress duplicate button
+                  hidePlayAction
                 />
               </>
             )}

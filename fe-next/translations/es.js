@@ -535,6 +535,7 @@ const es = {
     "backToMap": "Volver al mapa",
     "backHome": "Inicio",
     "next": "Siguiente",
+    
     "retry": "Otra vez",
     "score": "Puntos",
     "words": "Palabras",
@@ -1888,6 +1889,12 @@ const es = {
       "ogTitle": "Juego en Vivo para la Clase — Panel del Docente",
       "ogDescription": "Inicia un juego multijugador para tu clase en 60 segundos. Sin descargas. Desde teléfono o tablet."
     },
+    "lessons": {
+      "title": "Biblioteca - Crear y Gestionar Lecciones de Vocabulario | LexiClash",
+      "description": "Construye y gestiona lecciones de vocabulario para tus aulas. Crea listas de palabras, organiza por tema y asigna a estudiantes para práctica y dominio.",
+      "ogTitle": "Biblioteca de Lecciones de Vocabulario - LexiClash Education",
+      "ogDescription": "Crear y gestionar lecciones de vocabulario para tus aulas con LexiClash."
+    },
     "dailyArchive": {
       "title": "Archivo del Desafio Diario - Puzzles Pasados y Clasificaciones | LexiClash",
       "description": "Explora todos los desafios diarios de LexiClash. Revive tableros antiguos, compara tus puntajes y consulta las clasificaciones de cada puzzle publicado.",
@@ -2256,6 +2263,8 @@ const es = {
     "roomFull": "Sala llena - eres espectador por ahora",
     "gotIt": "Entendido",
     "pause": "Pausar",
+    "play": "Reproducir",
+    "replay": "Volver a ver",
     "resume": "Seguir",
     "save": "Guardar",
     "edit": "Editar",
@@ -12772,7 +12781,8 @@ const es = {
         "empty": "Sin estudiantes aún",
         "emptyHint": "Comparte el código {{code}} con tus estudiantes",
         "error": "Error al cargar estudiantes",
-        "unknown": "Estudiante Desconocido"
+        "unknown": "Estudiante Desconocido",
+        "noneYet": "Sin estudiantes aún — comparte el código de ingreso"
       }
     },
     "lesson": {
@@ -12998,7 +13008,7 @@ const es = {
       "noActiveGames": "No hay juegos activos"
     },
     "curriculum": {
-      "title": "Plan de Estudios",
+      "title": "Biblioteca",
       "description": "Explora e importa lecciones del plan de estudios",
       "browse": "Explorar",
       "import": "Importar",
@@ -14829,6 +14839,22 @@ const es = {
       "welcome_banner_title": "¡Bienvenido, maestro! 🎉",
       "welcome_banner_body": "Tu cuenta está lista. Crea aulas, asigna juegos y monitorea el progreso en tiempo real.",
       "welcome_banner_dismiss": "Perfecto"
+    },
+    "tour": {
+      "watchButton": "Ver cómo funciona",
+      "goToStep": "Ir al paso {n}",
+      "title": "Cómo funciona",
+      "classroomNameLabel": "Nombre del aula",
+      "languageFocusLabel": "Enfoque del idioma",
+      "englishLearnersOption": "Estudiantes de inglés",
+      "createClassroomButton": "Crear aula",
+      "shareCodeText": "Comparte este código con tus estudiantes",
+      "codeFormatLabel": "Código de 6 caracteres",
+      "enterCodeOnPhonesText": "Los estudiantes ingresan el código en sus teléfonos",
+      "studentsJoinOneByOneText": "Los estudiantes se unen uno a uno",
+      "studentJoinedBadge": "se unió",
+      "nStudentsJoinedText": "{count} de 3 estudiantes se unieron",
+      "roundResultsHeading": "Resultados de la ronda 1"
     }
   },
   "crazygames": {

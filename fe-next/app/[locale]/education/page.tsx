@@ -61,6 +61,7 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
         description={content.description}
         features={content.features}
         faq={content.faq}
+        collapsible
       />
     </>
   );
@@ -211,9 +212,17 @@ function EducationResourceLinks({ locale }: { locale: string }) {
 
   return (
     <section aria-label={resourcesAriaLabel} className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-3 border-neo-black/30">
+      {/* ~19 SEO cards under three headings were 5-6 of the landing's 17+
+          screens at 390px, standing between a first-time teacher and the FAQ.
+          A native <details> collapses them to one row while every link still
+          ships in the server HTML for crawlers (the EducationFAQ precedent). */}
+      <details data-testid="education-resources" className="group">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
       <h2 className="font-neo-display text-2xl sm:text-3xl font-black uppercase text-neo-white">
         {t.heading}
       </h2>
+        <span aria-hidden className="shrink-0 text-3xl font-black text-neo-lime transition-transform duration-150 group-open:rotate-45 motion-reduce:transition-none">+</span>
+      </summary>
       <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">{t.subhead}</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -312,6 +321,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           );
         })()}
       </p>
+      </details>
     </section>
   );
 }

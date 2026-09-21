@@ -417,7 +417,9 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                   >
                     <span className="flex items-center gap-2">
                       <Users className="w-4 h-4" />
-                      {t('teacher.classrooms.students.count', { count: classroom.member_count || 0 })}
+                      {classroom.member_count === 0
+                        ? t('teacher.classrooms.students.noneYet')
+                        : t('teacher.classrooms.students.count', { count: classroom.member_count || 0 })}
                     </span>
                     <ChevronDown
                       className={cn(

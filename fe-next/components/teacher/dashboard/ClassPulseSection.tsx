@@ -36,6 +36,12 @@ export interface ClassPulseSectionProps {
   onPlay: () => void;
   /** Seed a review lesson from the words the class actually missed. */
   onReviewWords: (words: string[]) => void;
+  /**
+   * When true, suppresses the play/playAgain button because the primary
+   * launch path is elsewhere (e.g., GO LIVE on the dashboard).
+   * @default false — button is shown for all actions
+   */
+  hidePlayAction?: boolean;
   className?: string;
 }
 
@@ -46,6 +52,7 @@ export function ClassPulseSection({
   onInvite,
   onPlay,
   onReviewWords,
+  hidePlayAction = false,
   className,
 }: ClassPulseSectionProps) {
   const { t } = useLanguage();
@@ -75,6 +82,7 @@ export function ClassPulseSection({
         isLoading={isLoading && !error}
         onAction={handleAction}
         onReviewWords={onReviewWords}
+        hidePlayAction={hidePlayAction}
       />
     </section>
   );

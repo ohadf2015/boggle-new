@@ -535,6 +535,7 @@ const he = {
     "backToMap": "חזרה למפה",
     "backHome": "בית",
     "next": "הבא",
+    
     "retry": "שוב",
     "score": "ניקוד",
     "words": "מילים",
@@ -1883,6 +1884,12 @@ const he = {
       "ogTitle": "משחק מילים כיתתי בשידור חי — לוח בקרה למורה",
       "ogDescription": "פותחים סבב רב-משתתפים לכיתה — הצטרפות מכל מכשיר, בלי הרשמה."
     },
+    "lessons": {
+      "title": "ספרייה - יצירה וניהול שיעורי אוצר מילים | LexiClash",
+      "description": "בנה וניהול שיעורי אוצר מילים לכיתות שלך. צור רשימות מילים, ארגן לפי נושא והקצה לסטודנטים לתרגול ושליטה.",
+      "ogTitle": "ספרייה של שיעורי אוצר מילים - LexiClash Education",
+      "ogDescription": "יצירה וניהול שיעורי אוצר מילים לכיתות שלך עם LexiClash."
+    },
     "dailyArchive": {
       "title": "ארכיון האתגר היומי - פאזלי מילים קודמים ולוחות שיאים | לקסי קלאש",
       "description": "דפדפו בכל פאזלי המילים היומיים הקודמים של לקסי קלאש. שחקו מחדש לוחות ישנים, השוו ניקוד וצפו בלוחות השיאים מכל אתגר מאז ההשקה.",
@@ -2265,6 +2272,8 @@ const he = {
     "roomFull": "החדר מלא - צופים בינתיים",
     "gotIt": "הבנתי",
     "pause": "השהה",
+    "play": "הפעל",
+    "replay": "הפעל שוב",
     "resume": "המשך",
     "save": "שמור",
     "edit": "ערוך",
@@ -12699,7 +12708,8 @@ const he = {
         "empty": "אין תלמידים עדיין",
         "emptyHint": "שתפו את קוד ההצטרפות {{code}} עם התלמידים",
         "error": "שגיאה בטעינת התלמידים",
-        "unknown": "תלמיד לא ידוע"
+        "unknown": "תלמיד לא ידוע",
+        "noneYet": "אין עדיין תלמידים — שתף את קוד ההצטרפות"
       }
     },
     "lesson": {
@@ -12985,7 +12995,7 @@ const he = {
       }
     },
     "curriculum": {
-      "title": "רשימות מילים לפי תכנית לימודים",
+      "title": "ספרייה",
       "description": "רשימות מילים מובנות בהתאם לתקני משרד החינוך הישראלי",
       "browse": "עיין ברשימות",
       "import": "ייבוא לשיעור",
@@ -14496,6 +14506,22 @@ const he = {
       "welcome_banner_title": "ברוכים הבאים! 🎉",
       "welcome_banner_body": "אושרתם! עכשיו אפשר לפתוח כיתות, להפעיל משחקים ולעקוב אחר ההתקדמות של התלמידים.",
       "welcome_banner_dismiss": "הבנתי"
+    },
+    "tour": {
+      "watchButton": "ראה איך זה עובד",
+      "goToStep": "מעבר לשלב {n}",
+      "title": "איך זה עובד",
+      "classroomNameLabel": "שם הכיתה",
+      "languageFocusLabel": "התמקדות בשפה",
+      "englishLearnersOption": "לומדי אנגלית",
+      "createClassroomButton": "צור כיתה",
+      "shareCodeText": "שתף את הקוד הזה עם התלמידים שלך",
+      "codeFormatLabel": "קוד בן 6 תווים",
+      "enterCodeOnPhonesText": "התלמידים מזינים את הקוד בטלפונים שלהם",
+      "studentsJoinOneByOneText": "התלמידים מצטרפים אחד אחרי שני",
+      "studentJoinedBadge": "הצטרף",
+      "nStudentsJoinedText": "{count} מתוך 3 תלמידים הצטרפו",
+      "roundResultsHeading": "תוצאות הסיבוב הראשון"
     },
     "wordOfTheDay": {
       "title": "המילה היומית",

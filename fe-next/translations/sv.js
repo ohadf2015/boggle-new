@@ -535,6 +535,7 @@ const sv = {
     "backToMap": "Tillbaka till kartan",
     "backHome": "Hem",
     "next": "Nästa",
+    
     "retry": "Igen",
     "score": "Poäng",
     "words": "Ord",
@@ -2168,6 +2169,12 @@ const sv = {
       "ogTitle": "Klassrumsspel — Start nu",
       "ogDescription": "Starta ett live-ordspel för klassen på sekunder. Eleverna ansluter utan registrering."
     },
+    "lessons": {
+      "title": "Bibliotek - Skapa och hantera ordförrådslektion | LexiClash",
+      "description": "Bygg och hantera ordförrådslektion för dina klassrum. Skapa ordlistor, organisera efter ämne och tilldela elever för övning och behärskning.",
+      "ogTitle": "Ordförrådslektion Bibliotek - LexiClash Education",
+      "ogDescription": "Skapa och hantera ordförrådslektion för dina klassrum med LexiClash."
+    },
     "dailyArchive": {
       "title": "Dagliga Utmaningens Arkiv - Tidigare Ordpussel & Topplistor | LexiClash",
       "description": "Utforska alla tidigare dagliga ordpussel från LexiClash. Spela om gamla brädor, jämför dina poäng och se topplistor från varje utmaning sedan starten.",
@@ -2542,6 +2549,8 @@ const sv = {
     "roomFull": "Fullt rum - du tittar på nu",
     "gotIt": "Förstått",
     "pause": "Pausa",
+    "play": "Spela upp",
+    "replay": "Spela igen",
     "resume": "Fortsätt",
     "save": "Spara",
     "edit": "Redigera",
@@ -13079,7 +13088,8 @@ const sv = {
         "empty": "Inga elever än",
         "emptyHint": "Dela kod {{code}} med dina elever",
         "error": "Kunde inte ladda elever",
-        "unknown": "Okänd elev"
+        "unknown": "Okänd elev",
+        "noneYet": "Inga elever ännu — dela koden för att gå med"
       }
     },
     "lesson": {
@@ -13365,7 +13375,7 @@ const sv = {
       }
     },
     "curriculum": {
-      "title": "Kursplan",
+      "title": "Bibliotek",
       "description": "Bläddra och importera lektioner från kursplanen",
       "browse": "Bläddra",
       "import": "Importera",
@@ -14880,6 +14890,22 @@ const sv = {
       "welcome_banner_title": "Välkommen, lärare!",
       "welcome_banner_body": "Du är nu godkänd. Skapa ditt första klassrum, lägg till elever och starta ett spel.",
       "welcome_banner_dismiss": "Stäng"
+    },
+    "tour": {
+      "watchButton": "Se hur det fungerar",
+      "goToStep": "Gå till steg {n}",
+      "title": "Så här fungerar det",
+      "classroomNameLabel": "Klassrummets namn",
+      "languageFocusLabel": "Språkfokus",
+      "englishLearnersOption": "Engelsktalande elever",
+      "createClassroomButton": "Skapa klassrum",
+      "shareCodeText": "Dela den här koden med dina elever",
+      "codeFormatLabel": "6-siffrig kod",
+      "enterCodeOnPhonesText": "Eleverna anger koden på sina telefoner",
+      "studentsJoinOneByOneText": "Eleverna ansluter en efter en",
+      "studentJoinedBadge": "anslöt",
+      "nStudentsJoinedText": "{count} av 3 elever anslöt",
+      "roundResultsHeading": "Resultat från omgång 1"
     },
     "wordOfTheDay": {
       "title": "Dagens ord",

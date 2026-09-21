@@ -21,9 +21,13 @@ import { EducationHeader } from '../EducationHeader';
  */
 describe('EducationHeader teacher link', () => {
   function openMenu() {
-    const buttons = screen.getAllByRole('button').filter((b) => b.dataset.testid !== 'whats-new-button');
-    // The first menu toggle is enough — both menus gate on the same flag.
-    fireEvent.click(buttons[0]);
+    // Target the toggle by its label, not by position. This used to click
+    // `getAllByRole('button')[0]` after filtering out What's New, so ANY new
+    // header control rendered before the hamburger silently stole the click
+    // and the menu never opened — surfacing as "the teacher link is missing"
+    // rather than "the menu is shut". Both menus gate on the same flag, so
+    // the first toggle is enough.
+    fireEvent.click(screen.getAllByLabelText('common.openMenu')[0]);
   }
 
   it('shows the teacher dashboard link to a teacher who is not an admin', () => {

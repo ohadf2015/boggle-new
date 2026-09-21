@@ -5,9 +5,11 @@ import { Command } from 'cmdk';
 import { useRouter } from 'next/navigation';
 import {
   Home, Swords, ScrollText, Users, User, Settings, Trophy,
-  Gamepad2, BookOpen, ShieldCheck, Globe, Zap,
+  Gamepad2, BookOpen, ShieldCheck, Globe, Zap, HelpCircle,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { cn } from '@/lib/utils';
 
 interface CommandItem {
@@ -33,10 +35,20 @@ const NAV_ITEMS: CommandItem[] = [
   { id: 'admin', labelKey: 'nav.admin', icon: ShieldCheck, href: '/admin', group: 'admin' },
 ];
 
+const TEACHER_ITEMS: CommandItem[] = [
+  { id: 'teacher-play', labelKey: 'teacher.nav.play', icon: Gamepad2, href: '/teacher', group: 'teacher' },
+  { id: 'teacher-classes', labelKey: 'teacher.nav.classes', icon: Users, href: '/teacher/classroom', group: 'teacher' },
+  { id: 'teacher-lessons', labelKey: 'teacher.nav.lessons', icon: BookOpen, href: '/teacher/curriculum', group: 'teacher' },
+  { id: 'teacher-reports', labelKey: 'teacher.nav.reports', icon: ScrollText, href: '/teacher/reports', group: 'teacher' },
+  { id: 'teacher-help', labelKey: 'education.onboarding.showTutorial', icon: HelpCircle, href: '/education#how-it-works', group: 'teacher' },
+];
+
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { t, language } = useLanguage();
+  const { profile } = useAuth();
+  const isTeacher = isTeacherProfile(profile);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -45,8 +57,15 @@ export function CommandPalette() {
         setOpen((prev) => !prev);
       }
     }
+    function handleCustomEvent() {
+      setOpen(true);
+    }
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('openCommandPalette', handleCustomEvent);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('openCommandPalette', handleCustomEvent);
+    };
   }, []);
 
   const handleSelect = useCallback(
@@ -118,6 +137,25 @@ export function CommandPalette() {
                 </Command.Item>
               ))}
             </Command.Group>
+
+            {isTeacher && (
+              <Command.Group
+                heading={t('teacher.nav.sidebarLabel', 'Teacher')}
+                className="mb-1 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-black **:[[cmdk-group-heading]]:uppercase **:[[cmdk-group-heading]]:text-neo-black/50"
+              >
+                {TEACHER_ITEMS.map((item) => (
+                  <Command.Item
+                    key={item.id}
+                    value={`${item.id} ${t(item.labelKey)}`}
+                    onSelect={() => handleSelect(item.href)}
+                    className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    {t(item.labelKey)}
+                  </Command.Item>
+                ))}
+              </Command.Group>
+            )}
           </Command.List>
 
           <div className="border-t-2 border-neo-black/10 px-4 py-2 text-xs text-neo-black/40">

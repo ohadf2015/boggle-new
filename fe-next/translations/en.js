@@ -535,6 +535,7 @@ const en = {
     "backToMap": "Back to map",
     "backHome": "Home",
     "next": "Next",
+    
     "retry": "Retry",
     "score": "Score",
     "words": "Words",
@@ -1516,6 +1517,12 @@ const en = {
       "ogTitle": "Classroom Word Game Live - Teacher Dashboard",
       "ogDescription": "Start a live multiplayer word round for your class — join from any device, no signup."
     },
+    "lessons": {
+      "title": "Library - Create & Manage Vocabulary Lessons | LexiClash",
+      "description": "Build and manage vocabulary lessons for your classrooms. Create word lists, organize by topic, and assign to students for practice and mastery.",
+      "ogTitle": "Vocabulary Lesson Library - LexiClash Education",
+      "ogDescription": "Create and manage vocabulary lessons for your classrooms with LexiClash."
+    },
     "dailyArchive": {
       "title": "Daily Challenge Archive - Past Word Puzzles & Leaderboards | LexiClash",
       "description": "Browse every past LexiClash daily word puzzle. Replay old boards, compare your scores, and explore leaderboards from every challenge since launch.",
@@ -1781,6 +1788,8 @@ const en = {
     "backToHome": "Back to Home",
     "backToMenu": "Back to Menu",
     "next": "Next",
+    "play": "Play",
+    "replay": "Replay",
     "stepOf": "Step {current} of {total}",
     "previous": "Previous",
     "confirm": "Confirm",
@@ -11289,7 +11298,8 @@ const en = {
         "empty": "No students yet",
         "emptyHint": "Share join code {{code}} with your students",
         "error": "Failed to load students",
-        "unknown": "Unknown Student"
+        "unknown": "Unknown Student",
+        "noneYet": "No students yet — share the join code"
       }
     },
     "lesson": {
@@ -11575,7 +11585,7 @@ const en = {
       }
     },
     "curriculum": {
-      "title": "Curriculum Word Lists",
+      "title": "Library",
       "description": "Pre-built word lists aligned with Israeli educational standards",
       "browse": "Browse Curriculum Lists",
       "import": "Import to Lesson",
@@ -13435,7 +13445,22 @@ const en = {
       "welcome_banner_title": "You're approved! Welcome, teacher! 🎉",
       "welcome_banner_body": "Your teacher account is ready. You can now create classes, assign games, and track student progress.",
       "welcome_banner_dismiss": "Got it"
-    }
+    },
+    "tour": {
+      "watchButton": "Watch how it works",
+      "goToStep": "Go to step {n}",
+      "title": "How it works",
+      "classroomNameLabel": "Classroom Name",
+      "languageFocusLabel": "Language Focus",
+      "englishLearnersOption": "English Learners",
+      "createClassroomButton": "Create Classroom",
+      "shareCodeText": "Share this code with your students",
+      "codeFormatLabel": "6-character code",
+      "enterCodeOnPhonesText": "Students enter the code on their phones",
+      "studentsJoinOneByOneText": "Students join one by one",
+      "studentJoinedBadge": "joined",
+      "nStudentsJoinedText": "{count} of 3 students joined",
+      "roundResultsHeading": "Round 1 Results"}
   },
   "crazygames": {
     "ads": {

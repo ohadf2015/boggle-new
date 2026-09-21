@@ -108,6 +108,12 @@ export interface ClassPulseCardProps {
   onAction?: (action: ClassNextAction) => void;
   /** Review hands the missed words up so the parent can seed a lesson. */
   onReviewWords?: (words: string[]) => void;
+  /**
+   * When true, suppresses the play/playAgain button because the primary
+   * launch path is elsewhere (e.g., GO LIVE on the dashboard).
+   * @default false — button is shown for all actions
+   */
+  hidePlayAction?: boolean;
   className?: string;
 }
 
@@ -117,6 +123,7 @@ export function ClassPulseCard({
   isLoading = false,
   onAction,
   onReviewWords,
+  hidePlayAction = false,
   className,
 }: ClassPulseCardProps) {
   const { t } = useLanguage();
@@ -274,21 +281,27 @@ export function ClassPulseCard({
             )}
 
             {/* Exactly ONE next action. A class in one state has one obvious
-                move; a row of buttons is the teacher doing the triage. */}
-            <button
-              type="button"
-              data-testid="class-pulse-action"
-              onClick={handleAction}
-              className={cn(
-                'mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-3 border-black px-4 py-2',
-                'font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard-sm',
-                'transition-all hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-                'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-                ACTION_STYLE[pulse.nextAction]
-              )}
-            >
-              {t(`teacher.pulse.action.${pulse.nextAction}`)}
-            </button>
+                move; a row of buttons is the teacher doing the triage.
+
+                When hidePlayAction is true and the action is 'play' or
+                'playAgain', suppress the button because the primary action is
+                elsewhere (e.g., GO LIVE on the dashboard). */}
+            {!(hidePlayAction && (pulse.nextAction === 'play' || pulse.nextAction === 'playAgain')) && (
+              <button
+                type="button"
+                data-testid="class-pulse-action"
+                onClick={handleAction}
+                className={cn(
+                  'mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-3 border-black px-4 py-2',
+                  'font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard-sm',
+                  'transition-all hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+                  'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                  ACTION_STYLE[pulse.nextAction]
+                )}
+              >
+                {t(`teacher.pulse.action.${pulse.nextAction}`)}
+              </button>
+            )}
           </>
         )}
       </div>

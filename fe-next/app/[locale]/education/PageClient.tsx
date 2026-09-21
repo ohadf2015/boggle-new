@@ -15,6 +15,7 @@ import { MoatTrifectaSection } from '@/components/education/MoatTrifectaSection'
 import { ProFramingSection } from '@/components/education/ProFramingSection';
 import { SixModeTour } from '@/components/education/SixModeTour';
 import { ComparisonStrip } from '@/components/education/ComparisonStrip';
+import { TeacherSetupSection } from '@/components/education/TeacherSetupSection';
 import { EducationFAQ } from '@/components/education/EducationFAQ';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -31,7 +32,7 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 /**
  * Education Landing - Master page rebuilt with scroll reveals
  * Auth-aware: teachers see shortcut dashboard; students auto-redirect; anons see full marketing
- * Sections: Hero → Moat Trifecta → 6-Mode Tour → Comparison → Trust → FAQ → CTA
+ * Sections: Hero → Role Cards → Moat → Modes → Comparison → Setup → Pricing → FAQ
  * All scroll animations respect prefers-reduced-motion
  */
 
@@ -91,16 +92,12 @@ export function PageClient() {
     <main className="min-h-screen bg-neo-navy">
       <TopBackLink className="mb-4" />
 
-      {/*
-        The no-account path and the Teacher Pro checkout CTA, deliberately
-        OUTSIDE the marketing gate below. Both are auth-agnostic — they never
-        change based on `hasTeacherAccess` — so rendering them unconditionally
-        here means they can never flash regardless of how the marketing gate
-        is written below.
-      */}
-      <div className="mx-auto grid w-full max-w-6xl gap-4 px-4 pb-2 sm:grid-cols-2 sm:px-6 lg:px-8">
+      {/* SSR money path (#1057): the Pro checkout ships in the HTML
+          unconditionally, OUTSIDE the `hasTeacherAccess` gate, so a signed-in
+          free teacher — the upsell target — still sees it. Guarded by
+          TeacherProCheckoutCta.ssr.test.ts; do not move it into the gate. */}
+      <div className="mx-auto w-full max-w-6xl px-4 pb-2 sm:px-6 lg:px-8">
         <TeacherProCheckoutCta locale={language} />
-        <NoAccountCta locale={language} />
       </div>
 
       {/* Sign in. Every other CTA on this page is signup-flavoured ("Get Teacher
@@ -246,6 +243,61 @@ export function PageClient() {
       {!hasTeacherAccess && (
         <>
           <EducationHero />
+          
+          {/* Role cards: teacher host path is PRIMARY (lime), student join is secondary */}
+          <section className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Teacher card — PRIMARY path: hosts live games */}
+              <div className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-6 shadow-hard flex flex-col gap-4">
+                <div>
+                  <h3 className="text-2xl font-neo-display font-black text-neo-lime">
+                    {t('education.landing.teacher')}
+                  </h3>
+                  <p className="mt-3 text-neo-white">
+                    {t('education.landing.teacherCta')}
+                  </p>
+                </div>
+                <Link
+                  href={`/${language}/education/access`}
+                  data-testid="teacher-card-access-link"
+                  onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_card_access' })}
+                  className="self-start rounded-neo border-neo border-neo-lime bg-neo-lime px-5 py-2.5 font-bold text-neo-navy shadow-hard-sm transition-all hover:shadow-hard"
+                >
+                  {t('education.landing.teacherLeadCta.button')}
+                </Link>
+                <Link
+                  href={`/${language}/education/for-schools`}
+                  data-testid="district-role-card-link"
+                  onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'district_role_card' })}
+                  className="self-start inline-flex items-center gap-1 text-sm font-bold text-neo-purple underline underline-offset-2 hover:text-neo-purple/80 transition-colors"
+                >
+                  {t('education.landing.districtCta.title')}
+                  <DirectionalIcon icon={ArrowRight} className="inline size-3.5" />
+                </Link>
+              </div>
+              
+              {/* Student card — SECONDARY path: join with a class code */}
+              <div className="flex flex-col gap-4 rounded-neo border-neo border-neo-cyan bg-neo-navy-light p-6 shadow-hard">
+                <div>
+                  <h3 className="text-2xl font-neo-display font-black text-neo-cyan">
+                    {t('education.landing.student')}
+                  </h3>
+                  <p className="mt-3 text-neo-white">
+                    {t('education.landing.studentCta')}
+                  </p>
+                </div>
+                <Link
+                  href={`/${language}/student/join`}
+                  data-testid="student-card-join-link"
+                  onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'student_card_join' })}
+                  className="self-start rounded-neo border-neo border-neo-cyan bg-neo-cyan/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-cyan/30 hover:shadow-hard"
+                >
+                  {t('education.landing.studentJoinCta')}
+                </Link>
+              </div>
+            </div>
+          </section>
+
           <MoatTrifectaSection />
           {/* Pricing used to sit here, third, before a first-time visitor had seen
               what the product actually does — and it was the first of two upsells
@@ -256,65 +308,21 @@ export function PageClient() {
             <SixModeTour />
           </div>
           <ComparisonStrip />
-        </>
-      )}
+          {/* "…how it compares" used to hand straight over to "pick your role",
+              which asked a teacher to commit before anyone had shown them what
+              running a class actually involves. The steps were written, but
+              only ever rendered behind TeacherGate. */}
+          <TeacherSetupSection />
 
-      {/* Role cards for unauthenticated users only */}
-      {!hasTeacherAccess && (
-        <section className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Teacher card */}
-            <div className="rounded-neo border-neo border-neo-pink bg-neo-navy-light p-6 shadow-hard flex flex-col gap-4">
-              <div>
-                <h3 className="text-2xl font-neo-display font-black text-neo-pink">
-                  {t('education.landing.teacher')}
-                </h3>
-                <p className="mt-3 text-neo-white">
-                  {t('education.landing.teacherCta')}
-                </p>
-              </div>
-              <Link
-                href={`/${language}/education/access`}
-                data-testid="teacher-card-access-link"
-                onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_card_access' })}
-                className="self-start rounded-neo border-neo border-neo-pink bg-neo-pink/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-pink/30 hover:shadow-hard"
-              >
-                {t('education.landing.teacherLeadCta.button')}
-              </Link>
-              <Link
-                href={`/${language}/education/for-schools`}
-                data-testid="district-role-card-link"
-                onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'district_role_card' })}
-                className="self-start inline-flex items-center gap-1 text-sm font-bold text-neo-purple underline underline-offset-2 hover:text-neo-purple/80 transition-colors"
-              >
-                {t('education.landing.districtCta.title')}
-                <DirectionalIcon icon={ArrowRight} className="inline size-3.5" />
-              </Link>
-            </div>
-            {/* Student card. The teacher card has two routes out; this one had
-                none, so a student who read it had nowhere to go. /student/join
-                is the real entry point — it takes the class code the teacher
-                projects. */}
-            <div className="flex flex-col gap-4 rounded-neo border-neo border-neo-cyan bg-neo-navy-light p-6 shadow-hard">
-              <div>
-                <h3 className="text-2xl font-neo-display font-black text-neo-cyan">
-                  {t('education.landing.student')}
-                </h3>
-                <p className="mt-3 text-neo-white">
-                  {t('education.landing.studentCta')}
-                </p>
-              </div>
-              <Link
-                href={`/${language}/student/join`}
-                data-testid="student-card-join-link"
-                onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'student_card_join' })}
-                className="self-start rounded-neo border-neo border-neo-cyan bg-neo-cyan/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-cyan/30 hover:shadow-hard"
-              >
-                {t('education.landing.studentJoinCta')}
-              </Link>
-            </div>
+          {/* The guest "play now" path sent a teacher with no code to a
+              student JOIN screen from the biggest button above the fold — a
+              dead end, and a "no sign-up" promise contradicting the teacher
+              signup one card over. It now sits after the setup steps, where it
+              reads as what it is: the student side. */}
+          <div className="mx-auto w-full max-w-6xl px-4 pb-2 sm:px-6 lg:px-8">
+            <NoAccountCta locale={language} />
           </div>
-        </section>
+        </>
       )}
 
       {/* Social proof for unauthenticated users */}

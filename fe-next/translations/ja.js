@@ -535,6 +535,7 @@ const ja = {
     "backToMap": "マップへ戻る",
     "backHome": "ホーム",
     "next": "次へ",
+    
     "retry": "リトライ",
     "score": "スコア",
     "words": "単語",
@@ -1883,6 +1884,12 @@ const ja = {
       "ogTitle": "クラスゲーム — 教室全体でリアルタイム対戦",
       "ogDescription": "先生が操作、全生徒がどのデバイスからでも参加可能。すぐに始められます。"
     },
+    "lessons": {
+      "title": "ライブラリ - 語彙レッスンの作成と管理 | LexiClash",
+      "description": "クラスの語彙レッスンを作成・管理します。単語リストを作成し、トピック別に整理し、学生に練習と習得を割り当てます。",
+      "ogTitle": "語彙レッスン ライブラリ - LexiClash Education",
+      "ogDescription": "LexiClashを使用してクラスの語彙レッスンを作成・管理します。"
+    },
     "dailyArchive": {
       "title": "デイリーチャレンジアーカイブ - 過去のワードパズルとリーダーボード | LexiClash",
       "description": "LexiClashの過去のデイリーワードパズルをすべて閲覧。古いボードを再プレイし、スコアを比較し、リリース以来の全チャレンジのリーダーボードを確認できます。",
@@ -2265,6 +2272,8 @@ const ja = {
     "roomFull": "満員 - 今は観戦モード",
     "gotIt": "了解",
     "pause": "一時停止",
+    "play": "再生",
+    "replay": "もう一度再生",
     "resume": "再開",
     "save": "保存",
     "edit": "編集",
@@ -12844,7 +12853,8 @@ const ja = {
         "empty": "まだ生徒がいません",
         "emptyHint": "生徒に参加コード {{code}} を共有してください",
         "error": "生徒の読み込みに失敗しました",
-        "unknown": "不明な生徒"
+        "unknown": "不明な生徒",
+        "noneYet": "生徒はまだいません — 参加コードを共有してください"
       }
     },
     "lesson": {
@@ -13130,7 +13140,7 @@ const ja = {
       }
     },
     "curriculum": {
-      "title": "カリキュラム",
+      "title": "ライブラリ",
       "description": "カリキュラムからレッスンを閲覧・インポート",
       "browse": "閲覧",
       "import": "インポート",
@@ -14645,6 +14655,22 @@ const ja = {
       "welcome_banner_title": "認可完了！さあ始めよう 🎉",
       "welcome_banner_body": "これであなたのクラス用のレッスンを作ったり、ゲームを出題したり、生徒の成長をリアルタイムで見守ることができます。",
       "welcome_banner_dismiss": "わかりました"
+    },
+    "tour": {
+      "watchButton": "使い方を見る",
+      "goToStep": "ステップ{n}へ",
+      "title": "使い方",
+      "classroomNameLabel": "クラス名",
+      "languageFocusLabel": "言語フォーカス",
+      "englishLearnersOption": "英語学習者",
+      "createClassroomButton": "クラスを作成",
+      "shareCodeText": "このコードを生徒と共有します",
+      "codeFormatLabel": "6文字コード",
+      "enterCodeOnPhonesText": "生徒は携帯電話にコードを入力します",
+      "studentsJoinOneByOneText": "生徒が次々と参加します",
+      "studentJoinedBadge": "参加しました",
+      "nStudentsJoinedText": "{count}人中3人の生徒が参加しました",
+      "roundResultsHeading": "ラウンド1の結果"
     },
     "wordOfTheDay": {
       "title": "今日の単語",

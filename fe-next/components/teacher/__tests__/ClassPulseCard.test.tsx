@@ -246,4 +246,55 @@ describe('ClassPulseCard', () => {
       expect(screen.queryByText('teacher.pulse.state.neverPlayed')).not.toBeInTheDocument();
     });
   });
+
+  describe('hidePlayAction prop', () => {
+    it('hides the play button when hidePlayAction is true and action is play', () => {
+      const pulse = deriveClassPulse({ rosterCount: 28, lastGame: null, now: NOW });
+      expect(pulse.nextAction).toBe('play');
+
+      render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} hidePlayAction />);
+
+      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+    });
+
+    it('hides the playAgain button when hidePlayAction is true and action is playAgain', () => {
+      const pulse = deriveClassPulse({
+        rosterCount: 10,
+        lastGame: playedGame({
+          players: [{ studentId: 's1', name: 'Ada', accuracyPct: 95 }],
+          missedWords: [],
+        }),
+        now: NOW,
+      });
+      expect(pulse.nextAction).toBe('playAgain');
+
+      render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} hidePlayAction />);
+
+      expect(screen.queryByTestId('class-pulse-action')).not.toBeInTheDocument();
+    });
+
+    it('shows the play button when hidePlayAction is false (default)', () => {
+      const pulse = deriveClassPulse({ rosterCount: 28, lastGame: null, now: NOW });
+
+      render(<ClassPulseCard classroomName="3rd Grade" pulse={pulse} hidePlayAction={false} />);
+
+      const actions = screen.getAllByTestId(/^class-pulse-action/);
+      expect(actions).toHaveLength(1);
+      expect(actions[0]).toHaveTextContent('teacher.pulse.action.play');
+    });
+
+    it('shows non-play actions even when hidePlayAction is true', () => {
+      const onAction = vi.fn();
+      const pulse = deriveClassPulse({ rosterCount: 10, lastGame: playedGame(), now: NOW });
+      expect(pulse.nextAction).toBe('review');
+
+      render(
+        <ClassPulseCard classroomName="3rd Grade" pulse={pulse} onAction={onAction} hidePlayAction />
+      );
+
+      // Review action should still show
+      expect(screen.getByTestId('class-pulse-action')).toBeInTheDocument();
+      expect(screen.getByTestId('class-pulse-action')).toHaveTextContent('teacher.pulse.action.review');
+    });
+  });
 });
