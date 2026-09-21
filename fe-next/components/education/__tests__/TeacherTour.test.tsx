@@ -198,4 +198,29 @@ describe('TeacherTourDialog - Accessibility & i18n', () => {
       expect(screen.queryByText(new RegExp(str, 'i'))).not.toBeInTheDocument();
     }
   });
+
+  /**
+   * The progress dots' accessible names were a raw English template literal
+   * (`Go to scene ${n}`). The visible-text test above cannot see attributes,
+   * which is how it survived a fix round — so check the attribute itself.
+   */
+  it('names the progress segments through t(), not English literals', async () => {
+    (useLanguage as any).mockReturnValue({
+      t: (key: string, _fallback?: string, params?: Record<string, unknown>) =>
+        `X:${key}${params ? ':' + JSON.stringify(params) : ''}`,
+      language: 'he',
+      isRTL: true,
+    });
+    render(<TeacherTourDialog />);
+    fireEvent.click(screen.getByTestId('tour-button'));
+    await waitFor(() => screen.getByRole('dialog'));
+    const labels = [...document.querySelectorAll('[role="dialog"] [aria-label]')].map(
+      (el) => el.getAttribute('aria-label') ?? '',
+    );
+    expect(labels.length).toBeGreaterThan(0);
+    for (const label of labels) {
+      expect(label).toMatch(/^X:/);
+    }
+    expect(labels).toContain('X:education.tour.goToStep:{"n":1}');
+  });
 });

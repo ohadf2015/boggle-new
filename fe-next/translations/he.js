@@ -2265,6 +2265,8 @@ const he = {
     "roomFull": "החדר מלא - צופים בינתיים",
     "gotIt": "הבנתי",
     "pause": "השהה",
+    "play": "הפעל",
+    "replay": "הפעל שוב",
     "resume": "המשך",
     "save": "שמור",
     "edit": "ערוך",
@@ -14493,6 +14495,7 @@ const he = {
     },
     "tour": {
       "watchButton": "ראה איך זה עובד",
+      "goToStep": "מעבר לשלב {n}",
       "title": "איך זה עובד",
       "classroomNameLabel": "שם הכיתה",
       "languageFocusLabel": "התמקדות בשפה",

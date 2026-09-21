@@ -13434,6 +13434,7 @@ const en = {
     },
     "tour": {
       "watchButton": "Watch how it works",
+      "goToStep": "Go to step {n}",
       "title": "How it works",
       "classroomNameLabel": "Classroom Name",
       "languageFocusLabel": "Language Focus",

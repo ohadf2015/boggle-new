@@ -136,7 +136,7 @@ export function TeacherTourDialog() {
                 style={{
                   width: i + 1 === currentScene ? `${progress}%` : '100%',
                 }}
-                aria-label={`Go to scene ${i + 1}`}
+                aria-label={t('education.tour.goToStep', undefined, { n: i + 1 })}
               />
             ))}
           </div>

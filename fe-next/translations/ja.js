@@ -2265,6 +2265,8 @@ const ja = {
     "roomFull": "満員 - 今は観戦モード",
     "gotIt": "了解",
     "pause": "一時停止",
+    "play": "再生",
+    "replay": "もう一度再生",
     "resume": "再開",
     "save": "保存",
     "edit": "編集",
@@ -14642,6 +14644,7 @@ const ja = {
     },
     "tour": {
       "watchButton": "使い方を見る",
+      "goToStep": "ステップ{n}へ",
       "title": "使い方",
       "classroomNameLabel": "クラス名",
       "languageFocusLabel": "言語フォーカス",

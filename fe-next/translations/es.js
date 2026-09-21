@@ -2256,6 +2256,8 @@ const es = {
     "roomFull": "Sala llena - eres espectador por ahora",
     "gotIt": "Entendido",
     "pause": "Pausar",
+    "play": "Reproducir",
+    "replay": "Volver a ver",
     "resume": "Seguir",
     "save": "Guardar",
     "edit": "Editar",
@@ -14826,6 +14828,7 @@ const es = {
     },
     "tour": {
       "watchButton": "Ver cómo funciona",
+      "goToStep": "Ir al paso {n}",
       "title": "Cómo funciona",
       "classroomNameLabel": "Nombre del aula",
       "languageFocusLabel": "Enfoque del idioma",
