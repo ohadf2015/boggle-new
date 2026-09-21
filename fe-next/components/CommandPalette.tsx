@@ -40,7 +40,7 @@ const TEACHER_ITEMS: CommandItem[] = [
   { id: 'teacher-classes', labelKey: 'teacher.nav.classes', icon: Users, href: '/teacher/classroom', group: 'teacher' },
   { id: 'teacher-lessons', labelKey: 'teacher.nav.lessons', icon: BookOpen, href: '/teacher/curriculum', group: 'teacher' },
   { id: 'teacher-reports', labelKey: 'teacher.nav.reports', icon: ScrollText, href: '/teacher/reports', group: 'teacher' },
-  { id: 'teacher-help', labelKey: 'education.onboarding.showTutorial', icon: HelpCircle, href: '#', group: 'teacher' },
+  { id: 'teacher-help', labelKey: 'education.onboarding.showTutorial', icon: HelpCircle, href: '/education#how-it-works', group: 'teacher' },
 ];
 
 export function CommandPalette() {
@@ -71,12 +71,7 @@ export function CommandPalette() {
   const handleSelect = useCallback(
     (href: string) => {
       setOpen(false);
-      if (href === '#') {
-        // Help item - dispatch event to open help modal
-        window.dispatchEvent(new CustomEvent('openTeacherHelp'));
-      } else {
-        router.push(`/${language}${href}`);
-      }
+      router.push(`/${language}${href}`);
     },
     [router, language],
   );

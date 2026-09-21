@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+const { pushMock } = vi.hoisted(() => ({ pushMock: vi.fn() }));
+
 let authState: { isAuthenticated: boolean; profile: Record<string, unknown> | null };
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => authState }));
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -13,13 +15,17 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: pushMock }),
   usePathname: () => '/en',
 }));
 
 import { CommandPalette } from '../CommandPalette';
 
 describe('CommandPalette - Teacher Entries', () => {
+  beforeEach(() => {
+    pushMock.mockClear();
+  });
+
   it('shows teacher group and entries for a teacher', async () => {
     authState = {
       isAuthenticated: true,
@@ -115,5 +121,62 @@ describe('CommandPalette - Teacher Entries', () => {
     await waitFor(() => {
       expect(screen.getByText('teacher.nav.sidebarLabel')).toBeInTheDocument();
     });
+  });
+
+  it.each<[string, string]>([
+    ['teacher.nav.play', '/en/teacher'],
+    ['teacher.nav.classes', '/en/teacher/classroom'],
+    ['teacher.nav.lessons', '/en/teacher/curriculum'],
+    ['teacher.nav.reports', '/en/teacher/reports'],
+    ['education.onboarding.showTutorial', '/en/education#how-it-works'],
+  ])(
+    'clicking teacher palette item %s navigates to %s',
+    async (labelKey: string, expectedHref: string) => {
+      authState = {
+        isAuthenticated: true,
+        profile: { user_role: 'teacher', is_admin: false },
+      };
+      render(<CommandPalette />);
+
+      // Open palette via Cmd+K
+      await userEvent.keyboard('{Control>}k{/Control}');
+
+      // Wait for teacher group to appear
+      await waitFor(() => {
+        expect(screen.getByText('teacher.nav.sidebarLabel')).toBeInTheDocument();
+      });
+
+      // Find and click the item
+      const item = screen.getByText(labelKey);
+      await userEvent.click(item);
+
+      // Verify router.push was called with the correct href
+      await waitFor(() => {
+        expect(pushMock).toHaveBeenCalledWith(expectedHref);
+      });
+    },
+  );
+
+  it('student does not see teacher palette items', async () => {
+    authState = {
+      isAuthenticated: true,
+      profile: { user_role: 'student', is_admin: false },
+    };
+    render(<CommandPalette />);
+
+    // Open palette via Cmd+K
+    await userEvent.keyboard('{Control>}k{/Control}');
+
+    // Wait for the dialog to open
+    await waitFor(() => {
+      expect(screen.getByText('common.navigation')).toBeInTheDocument();
+    });
+
+    // Verify NO teacher items are visible
+    expect(screen.queryByText('teacher.nav.play')).not.toBeInTheDocument();
+    expect(screen.queryByText('teacher.nav.classes')).not.toBeInTheDocument();
+    expect(screen.queryByText('teacher.nav.lessons')).not.toBeInTheDocument();
+    expect(screen.queryByText('teacher.nav.reports')).not.toBeInTheDocument();
+    expect(screen.queryByText('education.onboarding.showTutorial')).not.toBeInTheDocument();
   });
 });
