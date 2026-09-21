@@ -89,11 +89,13 @@ function buildSpec(world: number, level: number, slot: Slot, worldTwist: LevelTw
 
   const spec: LevelSpec = { kind, size, seconds, minLength, stars };
   if (twist) spec.twist = twist;
+  // Combat HP sits just above a normal clear: the foe is ALSO attacking, so asking
+  // for the 2nd star's score on top (the old 1.8x) made every boss a wall.
   if (kind === 'boss') {
-    spec.enemyHp = stars[1];
+    spec.enemyHp = r5(s1 * 1.3);
     spec.enemyId = `boss-w${world}`;
   } else if (kind === 'elite') {
-    spec.enemyHp = r5(stars[1] * (twist === 'ambush' ? 0.6 : 0.8));
+    spec.enemyHp = r5(s1 * (twist === 'ambush' ? 0.9 : 1.1));
     spec.enemyId = `elite-w${world}`;
   } else if (kind === 'hunt') {
     spec.huntCount = 2 + Math.floor((world - 1) / 3) + (twist === 'grand-hunt' ? 1 : 0);
@@ -130,8 +132,13 @@ export function getPlayLevel(world: number, level: number): PlayLevel {
 const PAR_K: Record<number, number> = { 4: 20, 5: 10.5, 6: 8 };
 
 /** Share of par the FIRST star costs, at the start and end of the 70-level ladder. */
-const BASE_FRACTION_FIRST = 0.22;
+const BASE_FRACTION_FIRST = 0.08;
 const BASE_FRACTION_LAST = 0.4;
+/**
+ * Ease-in: >1 keeps the opening worlds gentle (~10 short words clears W1) and
+ * spends the climb late, where the ceiling must still bite.
+ */
+const RAMP_CURVE = 1.5;
 
 /**
  * Score basis for one dealt board.
@@ -161,7 +168,7 @@ export function tuneToBoard(world: number, level: number, par: number): { stars:
   if (!Number.isInteger(level) || level < 1 || level > LEVELS_PER_WORLD) throw new Error(`bad level ${level}`);
   const row = WORLD_ROWS[world - 1];
   const ramp = ((world - 1) * LEVELS_PER_WORLD + (level - 1)) / (WORLD_COUNT * LEVELS_PER_WORLD - 1);
-  const one = par * (BASE_FRACTION_FIRST + (BASE_FRACTION_LAST - BASE_FRACTION_FIRST) * ramp);
+  const one = par * (BASE_FRACTION_FIRST + (BASE_FRACTION_LAST - BASE_FRACTION_FIRST) * ramp ** RAMP_CURVE);
   const spec = buildSpec(world, level, row.slots[level - 1], row.twist, one);
   return { stars: spec.stars, ...(spec.enemyHp === undefined ? {} : { enemyHp: spec.enemyHp }) };
 }

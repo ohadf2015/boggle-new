@@ -192,7 +192,8 @@ export default function RunHud({
       {/* Resource row: the room you are in, your hearts, your purse, and the potions you can drink right now. */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5" data-testid="run-hud-resources">
           {nodeKind && <NodeChip kind={nodeKind} />}
-          {!inFight && <Hearts hp={hp} maxHp={maxHp} bare />}
+          {/* Elite/boss stages draw their own hearts; a fight node's rival leaves them here. */}
+          {(!inFight || combatControls) && <Hearts hp={hp} maxHp={maxHp} bare />}
           <GoldCounter value={gold} />
           <span className="flex items-center gap-1.5" data-testid="run-hud-potions" aria-label={t('adventurePlay.loot.potionsTitle')}>
             {POTION_IDS.map((id) => (

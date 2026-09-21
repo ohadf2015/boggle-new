@@ -64,14 +64,35 @@ describe('tuneToBoard', () => {
     }
   });
 
-  it('given a combat level, when tuned, then enemy HP is tuned with it and stays the 2nd star', () => {
+  it('given a combat level, when tuned, then enemy HP is tuned with it and sits just above the 1st star', () => {
     for (const [w, l] of [[3, ELITE_LEVEL], [10, BOSS_LEVEL]] as const) {
       const lvl = getPlayLevel(w, l);
       expect(isCombatKind(lvl.kind)).toBe(true);
       const tuned = tuneToBoard(w, l, parForBoard(MEDIAN_TOTAL[lvl.size], lvl.size));
       expect(tuned.enemyHp).toBeGreaterThan(0);
       expect(tuned.enemyHp).not.toBe(lvl.enemyHp);
-      if (lvl.kind === 'boss') expect(tuned.enemyHp).toBe(tuned.stars[1]);
+      // A boss used to demand the 2nd star (1.8x a normal clear) while attacking — the "impossible" wall.
+      expect(tuned.enemyHp!).toBeLessThanOrEqual(tuned.stars[0] * 1.35);
+      expect(tuned.enemyHp!).toBeLessThan(tuned.stars[1]);
+    }
+  });
+
+  it('given the first fights of world 1 on a median board, when tuned, then a casual handful of short words clears them', () => {
+    // ~10 three/four-letter words (10-20 pts each) in 90s.
+    for (const l of [1, 2, 3]) {
+      const t = medianFor(1, l);
+      expect(t.stars[0]).toBeLessThanOrEqual(150);
+      expect(t.stars[0]).toBeGreaterThanOrEqual(50);
+    }
+  });
+
+  it('given a fixed board, when walked world by world, then the clear bar only rises (difficulty grows)', () => {
+    const par = parForBoard(MEDIAN_TOTAL[5], 5);
+    let prev = 0;
+    for (let w = 1; w <= WORLD_COUNT; w++) {
+      const boss = tuneToBoard(w, BOSS_LEVEL, par).enemyHp!;
+      expect(boss).toBeGreaterThan(prev);
+      prev = boss;
     }
   });
 
@@ -90,7 +111,8 @@ describe('tuneToBoard', () => {
         // The ceiling is asserted on `classic` only: chain (0.6) and hunt (0.7)
         // carry a deliberately lower score bar, and hunt does not even win on
         // score — it wins on targets found.
-        if (lvl.kind === 'classic') expect(t.stars[2]).toBeGreaterThan(human * 0.7);
+        // Early worlds ease in on purpose; the ceiling must bite from world 7 on.
+        if (lvl.kind === 'classic' && w >= 7) expect(t.stars[2]).toBeGreaterThan(human * 0.7);
       }
     }
   });

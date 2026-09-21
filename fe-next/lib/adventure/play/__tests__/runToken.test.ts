@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  freshRun, makeOffer, applyPick, advanceRun, signRun, verifyRun, publicRun, goldForScore, type RunPayload, enterNode,
-} from '../runToken';
+  freshRun, makeOffer, applyPick, advanceRun, signRun, verifyRun, publicRun, goldForScore, type RunPayload, enterNode, WIN_HEAL } from '../runToken';
 import { BASE_HP, RELIC_IDS } from '../relics';
 
 const SECRET = 'run-secret';
@@ -104,9 +103,9 @@ describe('advanceRun', () => {
     expect(next.offer).toEqual(makeOffer('seed', 1, [], 3));
   });
 
-  it('given lies about hp / potions, when advanced, then hp >= 0 and potions never go negative', () => {
+  it('given lies about hp / potions, when advanced, then hp is clamped (plus the win heal) and potions never go negative', () => {
     const next = advanceRun(base(), { hpLeft: -5, potionsUsed: { heal: 7, time: -3, bogus: 2 } as never, score: 0 });
-    expect(next.hp).toBe(0);
+    expect(next.hp).toBe(WIN_HEAL);
     expect(next.potions.heal).toBe(0);
     expect(next.potions.time).toBe(1);
   });

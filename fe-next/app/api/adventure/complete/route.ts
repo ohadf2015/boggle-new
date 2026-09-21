@@ -1,5 +1,6 @@
 /**
- * POST /api/adventure/complete { token, words, hpLeft?, potionsUsed?, died?, reviveUsed? }
+ * POST /api/adventure/complete { token, words, at?, hpLeft?, potionsUsed?, died?, reviveUsed? }
+ * `at` = find time per word (ms) — feeds the combo + speed bonus, clamped server-side.
  * Scores a run from the signed board + word list + server clock (never client
  * score/stars), keeps the best result per level, grants collectibles.
  * Writes go through the service-role client: RLS on player_progression and
@@ -127,6 +128,7 @@ export async function POST(request: NextRequest) {
       now: Date.now(),
       isWord,
       prevStars: prev?.stars ?? 0,
+      times: body?.at,
     });
     if (!result.ok) return NextResponse.json({ error: result.error }, { status: 409 });
 

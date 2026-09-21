@@ -83,7 +83,8 @@ describe('POST /api/adventure/node', () => {
     const res = await POST(req({ world: 1 }));
     expect(res.status).toBe(200);
     expect(res.data.currentNode).toBeNull();
-    expect(res.data.reachable.length).toBeGreaterThanOrEqual(3);
+    // Row 0 is one fight (all its lanes were the same board) — no fake choice.
+    expect(res.data.reachable).toHaveLength(1);
     expect(res.data.map.nodes.length).toBeGreaterThan(0);
     expect(verifyRun(res.data.runToken, SECRET)?.u).toBe(USER_ID);
     expect(res.data.run).not.toHaveProperty('seed');

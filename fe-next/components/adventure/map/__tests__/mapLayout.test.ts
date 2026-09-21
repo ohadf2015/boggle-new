@@ -18,7 +18,8 @@ describe('mapLayout geometry', () => {
 
   it('Given lanes in a row, when laid out, then every x stays inside the gutters and lanes keep their order', () => {
     const laid = layoutMap(map);
-    const row0 = laid.filter((n) => n.node.row === 0).sort((a, b) => a.node.lane - b.node.lane);
+    // Row 0 is a single node now; row 1 is the first real choice.
+    const row0 = laid.filter((n) => n.node.row === 1).sort((a, b) => a.node.lane - b.node.lane);
     expect(row0.length).toBeGreaterThan(1);
     for (const n of laid) {
       expect(n.x).toBeGreaterThanOrEqual(8);

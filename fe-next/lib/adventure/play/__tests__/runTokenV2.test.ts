@@ -5,8 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   freshRun, enterNode, advanceRun, applyPick, signRun, verifyRun, publicRun,
-  maxHpOf, hintBonusOf, restUpgrade, spendGold, RUN_VERSION, type RunPayload,
-} from '../runToken';
+  maxHpOf, hintBonusOf, restUpgrade, spendGold, RUN_VERSION, type RunPayload, WIN_HEAL } from '../runToken';
 import { signPayload } from '../attemptToken';
 import { BASE_HP } from '../relics';
 
@@ -68,7 +67,7 @@ describe('advanceRun v2', () => {
     expect(next.path).toEqual(['r0l1']);
     expect(next.offer?.length).toBeGreaterThanOrEqual(3);
     expect(next.gold).toBeGreaterThan(0);
-    expect(next.hp).toBe(3);
+    expect(next.hp).toBe(3 + WIN_HEAL);
   });
 
   it('Given two different depths, When advanced, Then the offers differ somewhere', () => {

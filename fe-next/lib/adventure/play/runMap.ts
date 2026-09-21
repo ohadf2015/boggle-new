@@ -3,8 +3,9 @@
  * seeded from the run seed so client and server derive the SAME map and never
  * have to put it on the wire as state.
  *
- * Shape: 8 rows read bottom-to-top. Row 0 is always fights (the act opens on a
- * real choice of three-to-four boards, never a shop). Elites and rests are
+ * Shape: 8 rows read bottom-to-top. Row 0 is a single fight (the act opens on
+ * a board, never a shop). Any row whose lanes are all one kind collapses to a
+ * single node, so the player is only asked to choose when the options differ. Elites and rests are
  * barred from the first two rows, every node of the row below the boss is a
  * rest, and the boss is a single node on top.
  *
@@ -135,6 +136,13 @@ export function buildRunMap(seed: string, world: number): RunMap {
   };
   if (!has('shop')) forceInto('shop', REST_ROW - 1);
   if (!has('elite')) forceInto('elite', 3);
+
+  // A row whose every lane is the same kind is not a choice (row 0's fights all
+  // play the same spec, the rest row is all rests): keep ONE node. The lone node
+  // fans out to the whole next row via rowEdges' orphan repair.
+  for (let row = 0; row < MAP_ROWS; row++) {
+    if (new Set(kindsByRow[row]).size === 1) kindsByRow[row] = [kindsByRow[row][0]];
+  }
 
   const nodes: MapNode[] = [];
   for (let row = 0; row < MAP_ROWS; row++) {

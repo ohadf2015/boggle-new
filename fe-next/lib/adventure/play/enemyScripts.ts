@@ -21,6 +21,8 @@ interface WorldScript {
   eliteCadenceMs: number;
   elite: Attack[];
   boss: [Attack[], Attack[], Attack[]];
+  /** The rival on ordinary fight nodes: slower than the elite, plain 1-damage hits only. */
+  foe: { cadenceMs: number; openingMs: number; attacks: Attack[] };
   rules?: BossRules;
 }
 
@@ -68,10 +70,19 @@ function build(world: number): WorldScript {
   const heavy = attack('hit', world, tele + 600, true);
   const gentle = world <= 1;
   const cadenceMs = Math.max(4200, 10500 - (world - 1) * 700);
+  const eliteCadenceMs = Math.round(cadenceMs * (gentle ? 2 : 1.6));
+  const openingMs = Math.max(2500, 4500 - (world - 1) * 220);
   return {
     cadenceMs,
-    eliteCadenceMs: Math.round(cadenceMs * (gentle ? 2 : 1.6)),
-    openingMs: Math.max(2500, 4500 - (world - 1) * 220),
+    eliteCadenceMs,
+    openingMs,
+    // Long wind-up so a 5-letter word or a shield can always answer it.
+    // World 1's first fights land ~2 hits in 90s undefended; by world 10 it swings every ~8s.
+    foe: {
+      cadenceMs: Math.max(Math.round(eliteCadenceMs * 1.25), 30000 - (world - 1) * 2400),
+      openingMs: Math.max(openingMs * 2, 20000 - (world - 1) * 1500),
+      attacks: [{ id: 'hit', effect: 'hit', damage: 1, telegraphMs: tele + 800 }],
+    },
     elite: [hit, attack(sig[0], world, tele)],
     boss: [
       [hit, attack(sig[0], world, tele), ...(gentle ? [attack(sig[0], world, tele)] : [])],

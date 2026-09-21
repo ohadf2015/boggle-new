@@ -24,17 +24,33 @@ describe('buildRunMap', () => {
     expect(a).not.toBe(b);
   });
 
-  it('Given any map, When inspected, Then it has 8 rows with 3-4 lanes and a single boss on top', () => {
+  it('Given any map, When inspected, Then it has 8 rows, each a single node or 3-4 lanes, and a single boss on top', () => {
     for (const m of maps) {
       expect(MAP_ROWS).toBe(8);
       expect(m.rows).toBe(MAP_ROWS);
       const byRow = (r: number) => m.nodes.filter((n) => n.row === r);
       for (let r = 0; r < BOSS_ROW; r++) {
-        expect(byRow(r).length).toBeGreaterThanOrEqual(3);
-        expect(byRow(r).length).toBeLessThanOrEqual(4);
+        const n = byRow(r).length;
+        expect(n === 1 || (n >= 3 && n <= 4)).toBe(true);
       }
       expect(byRow(BOSS_ROW)).toHaveLength(1);
       expect(byRow(BOSS_ROW)[0].kind).toBe('boss');
+    }
+  });
+
+  it('Given any map, When a row offers only one kind of node, Then it is collapsed to a single node (no fake choice)', () => {
+    for (const m of maps) {
+      for (let r = 0; r < MAP_ROWS; r++) {
+        const row = m.nodes.filter((n) => n.row === r);
+        if (new Set(row.map((n) => n.kind)).size === 1) expect(row).toHaveLength(1);
+      }
+    }
+  });
+
+  it('Given any map, When row 0 and the rest row are read, Then each is a single node', () => {
+    for (const m of maps) {
+      expect(m.nodes.filter((n) => n.row === 0)).toHaveLength(1);
+      expect(m.nodes.filter((n) => n.row === REST_ROW)).toHaveLength(1);
     }
   });
 
@@ -67,13 +83,16 @@ describe('buildRunMap', () => {
     }
   });
 
-  it('Given any node below the boss, When its edges are read, Then it has 1-3 forward edges into the next row', () => {
+  it('Given any node below the boss, When its edges are read, Then it has 1-3 forward edges (a lone node fans out to the whole next row)', () => {
     for (const m of maps) {
       for (const n of m.nodes) {
         const out = m.edges.filter((e) => e.from === n.id);
         if (n.row === BOSS_ROW) { expect(out).toHaveLength(0); continue; }
+        const rowWidth = m.nodes.filter((x) => x.row === n.row).length;
+        const nextWidth = m.nodes.filter((x) => x.row === n.row + 1).length;
         expect(out.length).toBeGreaterThanOrEqual(1);
-        expect(out.length).toBeLessThanOrEqual(3);
+        if (rowWidth === 1) expect(out).toHaveLength(nextWidth);
+        else expect(out.length).toBeLessThanOrEqual(3);
         for (const e of out) expect(nodeById(m, e.to)?.row).toBe(n.row + 1);
       }
     }
@@ -91,7 +110,7 @@ describe('buildRunMap', () => {
   it('Given any node with a wide next row, When its edges are read, Then it offers at least two choices', () => {
     for (const m of maps) {
       for (const n of m.nodes) {
-        if (n.row >= REST_ROW) continue; // the rest row narrows into the single boss
+        if (m.nodes.filter((x) => x.row === n.row + 1).length < 2) continue; // narrowing into a lone node
         expect(m.edges.filter((e) => e.from === n.id).length).toBeGreaterThanOrEqual(2);
       }
     }
