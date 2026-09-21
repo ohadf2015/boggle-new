@@ -16,7 +16,7 @@ const run: PublicRun = { w: 1, step: 2, hp: 4, maxHp: 5, relics: [], potions: { 
 describe('DraftOverlay live card values', () => {
   beforeEach(() => {
     const m = new Map<string, string>();
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+    (globalThis as { localStorage?: unknown }).localStorage = {
       getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => { m.set(k, v); }, removeItem: (k: string) => { m.delete(k); },
     };
   });

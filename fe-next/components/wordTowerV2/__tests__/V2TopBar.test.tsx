@@ -86,4 +86,34 @@ describe('V2TopBar', () => {
     expect(screen.getByLabelText('wordTowerV2.wreck.balls:2')).toBeTruthy();
     expect(screen.getByLabelText('wordTowerV2.tenants:3')).toBeTruthy();
   });
+
+  it('given a tower close to going over, when rendered, then the stability meter reads DANGER with its risk', () => {
+    const { container } = render(bar({ risk: 0.82 }));
+
+    const meter = container.querySelector('[data-wt2-stability]')!;
+    expect(meter.getAttribute('data-band')).toBe('danger');
+    expect(meter.getAttribute('role')).toBe('meter');
+    expect(meter.getAttribute('aria-valuenow')).toBe('82');
+    expect(screen.getByText('wordTowerV2.stability.danger')).toBeTruthy();
+  });
+
+  it('given a plumb tower, when rendered, then the meter reads steady', () => {
+    const { container } = render(bar({ risk: 0.05 }));
+    expect(container.querySelector('[data-wt2-stability]')!.getAttribute('data-band')).toBe('steady');
+  });
+
+  it('given a run in progress, when the exit is tapped, then the game is asked to leave (the run banks on the way out)', () => {
+    const onExit = vi.fn();
+    render(bar({ onExit }));
+
+    fireEvent.click(screen.getByLabelText('wordTowerV2.hud.exit'));
+    expect(onExit).toHaveBeenCalledOnce();
+  });
+
+  it('given the bar, then the meter and the streak share a status row that never comes and goes', () => {
+    const { container } = render(bar({ run: { ...createRun(1), balls: 0 }, tenants: 0 }));
+    const status = container.querySelector('[data-wt2-topbar-status]')!;
+    expect(status.querySelector('[data-wt2-stability]')).toBeTruthy();
+    expect(status.querySelector('[data-wt2-streak-ring]')).toBeTruthy();
+  });
 });

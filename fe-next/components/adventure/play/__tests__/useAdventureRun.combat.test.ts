@@ -39,7 +39,7 @@ const hook = (level = 4) => renderHook(() => useAdventureRun({ world: 1, level, 
 describe('useAdventureRun — combat feed', () => {
   beforeEach(() => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    sessionStorage.clear();
+    localStorage.clear();
   });
   afterEach(() => vi.useRealTimers());
 
@@ -81,7 +81,7 @@ describe('useAdventureRun — combat feed', () => {
 describe('useAdventureRun — kill trophy', () => {
   beforeEach(() => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    sessionStorage.clear();
+    localStorage.clear();
   });
   afterEach(() => vi.useRealTimers());
 

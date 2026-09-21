@@ -5,7 +5,7 @@
  * clock (+ combat on elite/boss) → word list to /complete → next run link.
  * The HUD score uses the SAME `scoreWords` (relics, chain) the server settles
  * with, so what the player sees is what they get. The run token lives in state
- * + sessionStorage (`adv-run-w<N>`) so a reload resumes the run.
+ * + localStorage (`adv-run-w<N>`) so a reload resumes the run.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isCombatKind, type PlayLevel } from '@/lib/adventure/play/levels';

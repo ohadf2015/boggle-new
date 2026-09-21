@@ -64,6 +64,20 @@ const KIND_SECONDS: Record<LevelKind, number> = {
   classic: 90, hunt: 90, chain: 100, fog: 90, bomb: 90, elite: 100, boss: 120,
 };
 
+/**
+ * 3rd star as a multiple of the first, at the start and end of the ladder. The
+ * 2nd star sits halfway. The ordinary rival's HP IS the 3rd star, so this is
+ * also how long a fight lasts: short early, still demanding late.
+ */
+const TOP_STEP_FIRST = 1.6;
+const TOP_STEP_LAST = 2.2;
+
+/** Star steps for a ladder position (0 = W1L1 .. 1 = the last level). */
+export function starSteps(ladder: number): [number, number] {
+  const top = TOP_STEP_FIRST + (TOP_STEP_LAST - TOP_STEP_FIRST) * Math.max(0, Math.min(1, ladder)) ** 1.5;
+  return [1 + (top - 1) / 2, top];
+}
+
 const r5 = (n: number) => Math.max(5, Math.round(n / 5) * 5);
 
 function buildSpec(world: number, level: number, slot: Slot, worldTwist: LevelTwist, oneOverride?: number): LevelSpec {
@@ -85,7 +99,11 @@ function buildSpec(world: number, level: number, slot: Slot, worldTwist: LevelTw
   if (minLength > 3) mult *= 0.9;
   if (seconds < 90) mult *= seconds / 90;
   const s1 = r5(one * mult);
-  const stars: [number, number, number] = [s1, r5(s1 * 1.8), r5(s1 * 2.8)];
+  // The ordinary rival's HP IS the top star (it dies there and the level ends).
+  // At a flat 1.8/2.8 it outlasted the world's boss (1.3x) by more than 2x —
+  // ~17 words to kill a W1 opener.
+  const [mid, top] = starSteps(((world - 1) * LEVELS_PER_WORLD + (level - 1)) / (WORLD_COUNT * LEVELS_PER_WORLD - 1));
+  const stars: [number, number, number] = [s1, r5(s1 * mid), r5(s1 * top)];
 
   const spec: LevelSpec = { kind, size, seconds, minLength, stars };
   if (twist) spec.twist = twist;
@@ -158,8 +176,7 @@ export function parForBoard(totalSolvableScore: number, size: number): number {
  * Re-derive a level's thresholds from the board actually dealt.
  *
  * The hand-authored design in WORLD_ROWS is untouched: this feeds the SAME
- * buildSpec, so kind multipliers, twists, the rush/finale clocks and the 1.8/2.8
- * star steps all still apply. Only the magnitude that used to come from the flat
+ * buildSpec, so kind multipliers, twists, the rush/finale clocks and the starSteps all still apply. Only the magnitude that used to come from the flat
  * `60 + (world-1)*12` line is replaced by a board-derived one — which is also what
  * fixes combat, since `enemyHp` is cut from `stars[1]`.
  */

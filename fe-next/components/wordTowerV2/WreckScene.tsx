@@ -151,7 +151,7 @@ export function WreckScene({
         </div>
       ) : null}
 
-      <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex flex-col items-center gap-2 px-16">
+      <div className="pointer-events-none absolute inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-10 flex flex-col items-center gap-2 px-16">
         {/* The target's face and name never fade: between the last ball settling
             and the payout mounting there would otherwise be a stretch of screen
             where the building being smashed belongs to nobody. */}
@@ -185,7 +185,7 @@ export function WreckScene({
           type="button"
           onClick={onClose}
           aria-label={t('wordTowerV2.wreck.back')}
-          className="absolute end-3 top-3 z-30 flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] z-30 flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
         >
           <X className="h-5 w-5" aria-hidden />
         </button>

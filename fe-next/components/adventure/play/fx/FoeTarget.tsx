@@ -10,7 +10,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Star, Swords } from 'lucide-react';
+import { Star, Swords, Zap } from 'lucide-react';
+import type { CombatEvent, CombatState } from '@/lib/adventure/play/combat';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { HitEvent } from '../events';
@@ -50,9 +51,16 @@ interface Props {
   score: number;
   stars: readonly number[];
   lastHit: HitEvent | null;
+  /**
+   * The rival's fight (it swings back on every ordinary node). Its wind-up and
+   * any shot in the air are drawn ON this card — absolutely, so an attack never
+   * reflows the screen — and AttackFlight launches from `[data-enemy-anchor]`.
+   */
+  combat?: CombatState | null;
+  dispatchCombat?: (ev: CombatEvent) => void;
 }
 
-export default function FoeTarget({ world, score, stars, lastHit }: Props) {
+export default function FoeTarget({ world, score, stars, lastHit, combat = null, dispatchCombat }: Props) {
   const { t } = useLanguageSafe();
   const reduce = useReducedMotion();
   // What the bar shows lags the real score so HP drops when the letters land, not on submit.
@@ -86,15 +94,34 @@ export default function FoeTarget({ world, score, stars, lastHit }: Props) {
   const down = view.defeated;
   const hpNum = useCountDown(view.hp, reduce ? 0 : COUNT_MS);
   const name = t(`adventurePlay.combat.elite.w${world}`);
-  const frame = down || hurt ? 'hurt' : 'idle';
+  const tele = !down ? combat?.telegraph ?? null : null;
+  const windupSecs = tele ? Math.max(0, Math.ceil((tele.endsAt - combat!.now) / 1000)) : 0;
+  const frame = down || hurt ? 'hurt' : tele ? 'attack' : 'idle';
 
   return (
     <div className="relative w-full" data-testid="adv-foe">
+      {/* Shots in the air: tap to knock them away. Absolute, on the card's
+          corner — never a new row that would push the board down. */}
+      {!down && dispatchCombat && combat?.projectiles.length ? (
+        <div className="absolute -top-3 end-2 z-20 flex gap-1">
+          {combat.projectiles.map((p) => (
+            <button key={p.id} type="button" onClick={() => dispatchCombat({ type: 'swipeProjectile', id: p.id })}
+              className="rounded-lg border-[3px] border-black bg-neo-yellow px-2 py-0.5 text-xs font-black text-black shadow-[2px_2px_0_#000] active:translate-y-0.5 active:shadow-none">
+              {t('adventurePlay.deflect')}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div className="relative flex items-center gap-2.5 rounded-2xl border-[3px] border-black bg-[#0f1b3d]/90 p-2 shadow-[4px_4px_0_#000]">
         {/* Portrait — the hit target */}
         <div data-adv-hit-target className="relative shrink-0 w-[5.75rem] h-[5.75rem]">
           <div className={cn('absolute inset-0 rounded-xl border-[3px] border-black',
-            hurt ? 'bg-[radial-gradient(circle,#ff4d4d_0%,#3b0a1e_75%)]' : 'bg-[radial-gradient(circle,#3a5a2a_0%,#0b1330_75%)]')} />
+            hurt ? 'bg-[radial-gradient(circle,#ff4d4d_0%,#3b0a1e_75%)]'
+              : tele ? 'bg-[radial-gradient(circle,#ff2e88_0%,#3b0a1e_75%)] shadow-[0_0_0_3px_#ff2e88,0_0_22px_6px_rgba(255,46,136,0.7)]'
+                : 'bg-[radial-gradient(circle,#3a5a2a_0%,#0b1330_75%)]',
+            tele && !reduce && 'animate-pulse')} />
+          {/* The rival's hand: AttackFlight's shot leaves from here. */}
+          <span data-enemy-anchor aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2" />
           <motion.div
             className="absolute inset-1"
             animate={reduce ? undefined
@@ -106,6 +133,14 @@ export default function FoeTarget({ world, score, stars, lastHit }: Props) {
             <Image src={`/images/adventure/enemies/w${world}-${frame}.webp`} alt={name} fill sizes="92px" priority
               className={cn('object-contain drop-shadow-[3px_3px_0_#000]', hurt && !down && 'brightness-150 saturate-50', down && 'grayscale opacity-70')} />
           </motion.div>
+          {tele && (
+            /* The countdown rides the portrait's corner; the words live in the
+               name row's tag (below), so nothing here is wider than the art. */
+            <span data-testid="foe-windup" role="status" aria-label={`${t('adventurePlay.incoming')} ${windupSecs}`}
+              className="absolute -top-2 -start-2 z-10 grid h-8 w-8 place-items-center rounded-full border-[3px] border-black bg-neo-pink font-neo-display text-base font-black tabular-nums leading-none text-black shadow-[2px_2px_0_#000]">
+              {windupSecs}
+            </span>
+          )}
           {down && (
             <span role="status" className="absolute inset-x-[-6px] top-1/2 -translate-y-1/2 -rotate-[8deg] text-center rounded-lg border-[3px] border-black bg-neo-yellow px-1 py-0.5 font-neo-display font-black text-sm uppercase text-black shadow-[3px_3px_0_#000]">
               {t('adventurePlay.juice.foeDown')}
@@ -116,9 +151,15 @@ export default function FoeTarget({ world, score, stars, lastHit }: Props) {
         {/* Name + pip HP with the star thresholds on it */}
         <div className="min-w-0 flex-1 flex flex-col gap-1">
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="inline-flex items-center gap-1 rounded-md border-2 border-black bg-neo-lime px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-black">
-              <Swords className="w-3 h-3" /> {t('adventurePlay.juice.foeTag')}
-            </span>
+            {tele ? (
+              <span className={cn('inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-black bg-neo-pink px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-black', !reduce && 'animate-pulse')}>
+                <Zap className="w-3 h-3 fill-black" /> {t('adventurePlay.incoming')}
+              </span>
+            ) : (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-black bg-neo-lime px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-black">
+                <Swords className="w-3 h-3" /> {t('adventurePlay.juice.foeTag')}
+              </span>
+            )}
             <span className="font-neo-display font-bold text-neo-cream text-base truncate">{name}</span>
           </div>
           <div className="relative pb-3">

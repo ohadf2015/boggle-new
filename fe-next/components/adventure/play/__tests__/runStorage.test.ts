@@ -11,7 +11,7 @@ function memoryStorage() {
 }
 
 describe('run best word', () => {
-  beforeEach(() => { (globalThis as { sessionStorage?: unknown }).sessionStorage = memoryStorage(); });
+  beforeEach(() => { (globalThis as { localStorage?: unknown }).localStorage = memoryStorage(); });
 
   it('Given nothing stored, then there is no best word', () => {
     expect(readRunBest(1)).toBeNull();
@@ -38,14 +38,14 @@ describe('run best word', () => {
   });
 
   it('survives storage that throws', () => {
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = { getItem: () => { throw new Error('x'); }, setItem: () => { throw new Error('x'); }, removeItem: () => {} };
+    (globalThis as { localStorage?: unknown }).localStorage = { getItem: () => { throw new Error('x'); }, setItem: () => { throw new Error('x'); }, removeItem: () => {} };
     expect(() => recordRunBest(1, 1, { word: 'cat', pts: 3 })).not.toThrow();
     expect(readRunBest(1)).toBeNull();
   });
 });
 
 describe('run words per level (feeds the draft cards\' live values)', () => {
-  beforeEach(() => { (globalThis as { sessionStorage?: unknown }).sessionStorage = memoryStorage(); });
+  beforeEach(() => { (globalThis as { localStorage?: unknown }).localStorage = memoryStorage(); });
 
   it('Given levels of one run, then each level keeps its words in order', async () => {
     const { recordRunWords, readRunWords } = await import('../runStorage');
@@ -72,7 +72,20 @@ describe('run words per level (feeds the draft cards\' live values)', () => {
 
   it('Given storage that throws, then reads come back empty', async () => {
     const { readRunWords } = await import('../runStorage');
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = { getItem: () => { throw new Error('blocked'); } };
+    (globalThis as { localStorage?: unknown }).localStorage = { getItem: () => { throw new Error('blocked'); } };
     expect(readRunWords(1)).toEqual([]);
+  });
+});
+
+describe('run persistence lifetime', () => {
+  it('Given a run written in one tab, when the app is closed and reopened (a fresh sessionStorage), then the run is still there', async () => {
+    const { readRun, writeRun } = await import('../runStorage');
+    const g = globalThis as { sessionStorage?: unknown; localStorage?: unknown };
+    g.localStorage = memoryStorage();
+    g.sessionStorage = memoryStorage();
+    writeRun(2, { runToken: 'tok', run: { path: ['r0l0'] } as never });
+    // A closed tab / killed app takes sessionStorage with it; localStorage stays.
+    g.sessionStorage = memoryStorage();
+    expect(readRun(2)?.runToken).toBe('tok');
   });
 });

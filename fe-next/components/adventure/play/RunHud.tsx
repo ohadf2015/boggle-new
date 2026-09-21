@@ -85,7 +85,9 @@ export function Hearts({ hp, maxHp, bare = false }: { hp: number; maxHp: number;
   const label = t('adventurePlay.loot.hearts', { hp, max: maxHp });
   return (
     <span className={cn('inline-flex shrink-0 items-center gap-0.5',
-      !bare && 'rounded-full border-[3px] border-black bg-black/70 px-1.5 py-1 shadow-[2px_2px_0_#000]')} role="img" aria-label={label}>
+      !bare && 'rounded-full border-[3px] border-black bg-black/70 px-1.5 py-1 shadow-[2px_2px_0_#000]')} role="img" aria-label={label}
+      /* An ordinary rival's shot lands here (AttackFlight) when there is no arena hero. */
+      data-player-hearts="">
       {maxHp <= 7
         ? Array.from({ length: maxHp }, (_, i) => (
           <Heart key={i} className={cn('h-4 w-4 stroke-black stroke-[2.5] lg:h-5 lg:w-5', i < hp ? 'fill-neo-pink' : 'fill-white/15')} />
@@ -101,7 +103,6 @@ export default function RunHud({
   stageEl = null,
 }: Props) {
   const { t } = useLanguageSafe();
-  const tele = combat?.telegraph;
   const inFight = !!combat;
 
   const wordPulse = useMemo(() => {
@@ -213,16 +214,9 @@ export default function RunHud({
             </button>
           )}
       </div>
-      {combatControls && tele && (
-        <div role="alert" className="rounded-lg border-[3px] border-black bg-neo-pink px-2 py-1 text-xs font-bold text-black animate-pulse">
-          {t('adventurePlay.incoming')} {Math.max(0, Math.ceil((tele.endsAt - combat!.now) / 1000))}
-        </div>
-      )}
-      {combatControls && combat?.projectiles.map((p) => (
-        <button key={p.id} type="button" className={`${btn} bg-neo-yellow`} onClick={() => dispatchCombat({ type: 'swipeProjectile', id: p.id })}>
-          {t('adventurePlay.deflect')}
-        </button>
-      ))}
+      {/* No telegraph row here: the band's height is what the board is sized
+          from, so an alert appearing mid-fight shoved the stage down and shrank
+          the grid. The rival's wind-up and deflects live on its card (FoeTarget). */}
       {goal && <div className="text-xs font-bold opacity-90">{goal}</div>}
     </div>
   );

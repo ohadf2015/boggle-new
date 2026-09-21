@@ -28,7 +28,7 @@ function mockApi(level: unknown, targets?: string[]) {
 }
 
 describe('useAdventureRun — foe K.O. ends a normal level', () => {
-  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); sessionStorage.clear(); });
+  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); localStorage.clear(); });
   afterEach(() => vi.useRealTimers());
 
   it('given a classic level, when the score reaches the top star, then the level saves after the K.O. beat', async () => {

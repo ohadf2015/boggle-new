@@ -20,7 +20,7 @@ const noPotions: Record<PotionId, number> = { heal: 0, time: 0, cleanse: 0, insi
 /** Words the run has already banked, as `recordRunWords` stores them (one slot per cleared step). */
 function seedRunWords(levels: string[][]) {
   const m = new Map<string, string>([['adv-run-words-w1', JSON.stringify(levels)]]);
-  (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+  (globalThis as { localStorage?: unknown }).localStorage = {
     getItem: (k: string) => m.get(k) ?? null,
     setItem: (k: string, v: string) => { m.set(k, v); },
     removeItem: (k: string) => { m.delete(k); },

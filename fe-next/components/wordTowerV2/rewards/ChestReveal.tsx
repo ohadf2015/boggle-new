@@ -73,7 +73,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
   // dark-only surface hardcodes navy so it can never flash cream on a lazy mount.
   return (
     <div
-      className="absolute inset-0 z-40 flex flex-col items-center justify-center overflow-y-auto bg-neo-navy p-4"
+      className="absolute inset-0 z-40 flex flex-col items-center justify-center overflow-y-auto bg-neo-navy p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
       role="dialog"
       aria-modal="true"
       aria-label={t(`wordTowerV2.chest.tier.${chest.tier}`)}

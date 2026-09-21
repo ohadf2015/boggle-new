@@ -1,5 +1,5 @@
 /**
- * Free look: drag the canvas to walk your own tower back down.
+ * Free look: drag the canvas UP/DOWN to walk your own tower back down.
  *
  * The camera (camera.ts) always frames the CRANE — which is right while you are
  * timing a drop and wrong the moment you want to see what you built. This is a
@@ -26,9 +26,22 @@ export function clampLook(y: number, cameraY: number): number {
 }
 
 /**
- * Sideways pan. The camera centres on the FIRST block, so a tower that walks
- * sideways as it grows can put its top off the edge — this is how the player
- * follows it, and how they look at the street beside their own building.
+ * Where the camera centres sideways on its own. It used to sit on the FIRST
+ * floor, so a tower that walks sideways as it grows put its top off the edge
+ * and the player had to drag it back. Framing the midpoint of the base and the
+ * top floor keeps both on screen without anyone touching it.
+ */
+export function focusX(baseX: number | null, topX: number | null): number {
+  if (baseX === null) return topX ?? 0;
+  if (topX === null) return baseX;
+  return (baseX + topX) / 2;
+}
+
+/**
+ * Sideways free look. The camera already frames the tower (focusX); this is
+ * the player looking at the street beside it. It moves the WHOLE scene — the
+ * street, crane and skylines go with the tower (TowerCanvas) — so it reads as
+ * a camera pan, never as dragging the building across a frozen backdrop.
  *
  * Symmetric and caller-limited: the limit is a fraction of the viewport, which
  * only TowerCanvas knows. ponytail: a clamp, not a spring — the view is pinned

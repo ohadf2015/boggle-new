@@ -7,7 +7,7 @@ import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc
 import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
 import { buildSkyline, rulerTicks, skyProps } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
-import { clampLook, clampLookX } from '@/lib/wordTowerV2/look';
+import { clampLook, clampLookX, focusX } from '@/lib/wordTowerV2/look';
 import { frameCamera, screenSize, towerSkirts, type DockSide } from '@/lib/wordTowerV2/camera';
 import { publishHeightM } from '@/lib/wordTowerV2/altitude';
 import { floorsAt, skyAt } from '@/lib/wordTowerV2/biomes';
@@ -56,6 +56,8 @@ interface Props {
   world: TowerWorld;
   labels: Map<string, string>;
   getDockPx: () => number;
+  /** Measured bottom edge of the top HUD (px); the hanging slab is framed under it. */
+  getHudPx?: () => number;
   getHangingId: () => string | null;
   /** Sideways speed (px/ms) the hanging block would be released with now. */
   getHangVx: () => number;
@@ -130,6 +132,8 @@ export default function TowerCanvas(props: Props) {
 
     // Free look: drag or wheel the canvas to walk the tower back down. `target`
     // is where the player put it; `lookY` chases it so the home snap eases.
+    // Sideways it is a CAMERA pan: the street, crane and skylines move with
+    // the tower (below), never the building alone over a frozen backdrop.
     let lookTarget = 0;
     let lookY = 0;
     let lookXTarget = 0;
@@ -141,8 +145,7 @@ export default function TowerCanvas(props: Props) {
       host.setPointerCapture(e.pointerId);
     };
     const onPointerMove = (e: PointerEvent) => {
-      // Content follows the finger: drag UP to walk down your own tower, and
-      // sideways to follow a tower that walked off the centre line.
+      // Content follows the finger: drag UP to walk down your own tower.
       if (!dragFrom) return;
       lookTarget = dragFrom.look + (e.clientY - dragFrom.y);
       lookXTarget = dragFrom.lookX + (e.clientX - dragFrom.x);
@@ -343,7 +346,7 @@ export default function TowerCanvas(props: Props) {
         const { w, h } = screenSize(created.renderer);
 
         camTopM = publishHeightM(camTopM, snap.towerHeightM);
-        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: camTopM, dockSide: p.dockSide });
+        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: camTopM, dockSide: p.dockSide, hudPx: p.getHudPx?.() });
         const { scale } = frame;
         // Frame-rate independent ease (a fixed 0.08/frame ran 2x faster at 120Hz).
         cameraY += (frame.cameraY - cameraY) * (1 - Math.exp(-dt * 5));
@@ -356,7 +359,15 @@ export default function TowerCanvas(props: Props) {
           anchorX = base.x;
           anchorLatched = true;
         }
-        camX += (anchorX - camX) * (1 - Math.exp(-dt * 5));
+        // Frame the base AND the top floor: a tower that walks sideways as it
+        // grows stays on screen without the player dragging it back.
+        let top: (typeof snap.blocks)[number] | null = null;
+        const hangingNow = p.getHangingId();
+        for (const b of snap.blocks) {
+          if (b.id === hangingNow || !b.resting || !world.landed.has(b.id)) continue;
+          if (!top || b.y < top.y) top = b;
+        }
+        camX += (focusX(anchorLatched ? anchorX : null, top?.x ?? null) - camX) * (1 - Math.exp(-dt * 5));
 
         if (p.homeKey !== lookHome) {
           lookHome = p.homeKey;
@@ -376,11 +387,15 @@ export default function TowerCanvas(props: Props) {
         const halfW = w / 2 / scale;
         // World x under the middle of the screen. Screen-edge furniture (street,
         // crane mast, ruler, best line) is drawn around this instead of around
-        // world 0, so it still spans the screen once the view pans sideways.
+        // world 0, so it still spans the screen when the camera follows a
+        // tower that walked sideways (focusX).
         // Deliberately excludes the shake offset: the whole scene shakes on
         // impact, and cancelling it here would freeze the street mid-quake.
         const viewCenterX = camX - lookX / scale;
-        ground.x = viewCenterX;
+        // The street stays in the WORLD (with the tower), so a sideways pan
+        // moves it too; pinned to the screen, the pan read as dragging the
+        // building. The crane rail and the ruler are screen furniture.
+        ground.x = camX;
         crane.x = viewCenterX;
         ruler.x = viewCenterX;
         rulerLayer.x = viewCenterX;
@@ -405,17 +420,21 @@ export default function TowerCanvas(props: Props) {
           reducedMotion: !!p.reducedMotion,
         });
 
-        const cityW = Math.ceil(w) + 120;
+        // Wide enough to cover the whole free-look range on both sides.
+        const panW = w * LOOK_X_VIEWPORTS;
+        const cityW = Math.ceil(w + 2 * panW) + 120;
         paintCity(farCity, `f${cityW}`, () => buildSkyline(41, cityW, 70, 160), { fill: 0x2a2f5a, edge: 0x2a2f5a, windowAlpha: 0.22 });
         paintCity(nearCity, `n${cityW}`, () => buildSkyline(7, cityW, 36, 100), { fill: 0x141830, edge: 0x0b0e1c, windowAlpha: 0.85 });
         // Beyond parallax the far city sinks as you climb, so by ~8m the skies
         // own the screen instead of a skyline hanging in space.
         const sink = Math.min(p.getSceneM?.() ?? 0, 8) * 22;
-        placeCity(farCity, -60, frame.groundScreenY + (cameraY + lookY) * 0.55 + sink + shake.offset.y * 0.5, h, ts);
-        placeCity(nearCity, -60 + shake.offset.x, scene.y, h, ts);
-        if (groundKey !== `${halfW}|${scale}`) {
-          groundKey = `${halfW}|${scale}`;
-          paintGround(ground, halfW + 40, scale);
+        // Skylines trail the pan at parallax: the far one barely moves.
+        placeCity(farCity, -60 - panW + lookX * 0.35, frame.groundScreenY + (cameraY + lookY) * 0.55 + sink + shake.offset.y * 0.5, h, ts);
+        placeCity(nearCity, -60 - panW + lookX * 0.8 + shake.offset.x, scene.y, h, ts);
+        const groundHalfW = halfW + panW / scale + 40;
+        if (groundKey !== `${groundHalfW}|${scale}`) {
+          groundKey = `${groundHalfW}|${scale}`;
+          paintGround(ground, groundHalfW, scale);
         }
 
         // Translations can land after init; rebuild the flag when its text changes.

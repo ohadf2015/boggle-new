@@ -61,7 +61,7 @@ describe('RelicBar live numbers', () => {
 describe('RelicBar on the map screen — no board, but the run still has numbers', () => {
   it('Given a world + step instead of a board, then the tooltip still prints what the relic earned THIS RUN', () => {
     const m = new Map<string, string>([['adv-run-words-w1', JSON.stringify([['house', 'tiger'], ['planet']])]]);
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+    (globalThis as { localStorage?: unknown }).localStorage = {
       getItem: (k: string) => m.get(k) ?? null, setItem: () => {}, removeItem: () => {},
     };
     const expected = relicRunContributions(runStackCtx(1, 3, ['magnet']).levels, ['magnet']).magnet!;
@@ -75,7 +75,7 @@ describe('RelicBar on the map screen — no board, but the run still has numbers
 describe('DraftOverlay stacked card', () => {
   it('Given an owned magnet, when storm-rune is offered, then the card shows alone struck through → stacked', () => {
     const m = new Map<string, string>([['adv-run-words-w1', JSON.stringify([['house', 'tiger']])]]);
-    (globalThis as { sessionStorage?: unknown }).sessionStorage = {
+    (globalThis as { localStorage?: unknown }).localStorage = {
       getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => { m.set(k, v); }, removeItem: (k: string) => { m.delete(k); },
     };
     const run: PublicRun = { w: 1, step: 2, hp: 4, maxHp: 5, relics: ['magnet'], potions: { heal: 0, time: 0, cleanse: 0, insight: 0 }, gold: 0 };

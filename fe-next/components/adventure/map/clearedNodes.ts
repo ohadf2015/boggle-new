@@ -5,14 +5,14 @@
  * the board is played, so a run standing on a fight looks the same whether the
  * player is mid-fight, bailed out, or cleared it. The map needs the difference
  * — an uncleared fight underfoot must read "resume", not "walk on" — so the
- * client remembers the nodes it saw a result for, per world, in sessionStorage
+ * client remembers the nodes it saw a result for, per world, in localStorage
  * (same lifetime as the run itself).
  */
 const key = (world: number) => `adv-cleared-w${world}`;
 
 export function readCleared(world: number): string[] {
   try {
-    const raw = sessionStorage.getItem(key(world));
+    const raw = localStorage.getItem(key(world));
     const v: unknown = raw ? JSON.parse(raw) : null;
     return Array.isArray(v) ? v.filter((id): id is string => typeof id === 'string') : [];
   } catch {
@@ -24,7 +24,7 @@ export function recordCleared(world: number, nodeId: string): void {
   try {
     const list = readCleared(world);
     if (list.includes(nodeId)) return;
-    sessionStorage.setItem(key(world), JSON.stringify([...list, nodeId]));
+    localStorage.setItem(key(world), JSON.stringify([...list, nodeId]));
   } catch {
     /* storage unavailable — the map just offers to replay the node underfoot */
   }
@@ -41,7 +41,7 @@ export const isFreshRun = (run: { path?: readonly string[] } | null | undefined)
 /** A fresh run starts with an empty history (node ids repeat across runs). */
 export function clearClearedNodes(world: number): void {
   try {
-    sessionStorage.removeItem(key(world));
+    localStorage.removeItem(key(world));
   } catch {
     /* storage unavailable */
   }

@@ -80,6 +80,13 @@ export interface CameraInput {
   /** Settled tower height, metres. */
   towerTopM: number;
   dockSide?: DockSide;
+  /**
+   * Measured bottom edge of the top HUD, screen px. The bar wraps to a second
+   * row (banked chips, the stability meter) and sits under the notch, so the
+   * fixed HUD_TOP_PX let the hanging slab slide under it. Never less than
+   * HUD_TOP_PX, so an unmeasured first frame frames exactly as before.
+   */
+  hudPx?: number;
 }
 
 export interface CameraFrame {
@@ -90,26 +97,27 @@ export interface CameraFrame {
   cameraY: number;
 }
 
-export function frameCamera({ viewportW, viewportH, dockPx, towerTopM, dockSide = 'bottom' }: CameraInput): CameraFrame {
+export function frameCamera({ viewportW, viewportH, dockPx, towerTopM, dockSide = 'bottom', hudPx = 0 }: CameraInput): CameraFrame {
+  const hud = Math.max(HUD_TOP_PX, hudPx);
   const groundScreenY = viewportH - dockPx - GROUND_STRIP_PX;
   const playH = groundScreenY;
   const hangSpan = CRANE_CLEARANCE_PX + BLOCK_HEIGHT_PX / 2;
 
   const byWidth = (viewportW / 2 - SIDE_GUTTER_PX) / SWING_HALF_SPAN_PX;
   // Hanging block under the HUD AND the tower top above the dock, at once.
-  const byHeight = (playH - HUD_TOP_PX) / hangSpan;
+  const byHeight = (playH - hud) / hangSpan;
   // With a side panel the extra height buys floors on screen instead of sky:
   // the slab AND `SIDE_DOCK_VISIBLE_FLOORS` of tower under it have to fit.
   const byFloors =
     dockSide === 'inline'
-      ? (playH - HUD_TOP_PX) / (hangSpan + SIDE_DOCK_VISIBLE_FLOORS * BLOCK_HEIGHT_PX)
+      ? (playH - hud) / (hangSpan + SIDE_DOCK_VISIBLE_FLOORS * BLOCK_HEIGHT_PX)
       : playH / COMFORT_PLAY_HEIGHT_PX;
   const fit = Math.min(byWidth, byHeight, byFloors);
   const scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, dockSide === 'inline' ? fit : ZOOM * fit));
 
   // Pan up only once the hanging block would slide under the HUD.
   const hangingTopFromGround = (towerTopM * PX_PER_M + hangSpan) * scale;
-  const cameraY = Math.max(0, HUD_TOP_PX - groundScreenY + hangingTopFromGround);
+  const cameraY = Math.max(0, hud - groundScreenY + hangingTopFromGround);
 
   return { scale, groundScreenY, cameraY };
 }

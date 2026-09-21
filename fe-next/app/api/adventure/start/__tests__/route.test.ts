@@ -204,8 +204,8 @@ describe('POST /api/adventure/start', () => {
     const { stars, enemyHp, bossHp, ...design } = res.data.level;
     const { stars: _s, enemyHp: _e, bossHp: _b, ...expectedDesign } = expectedLevel;
     expect(design).toEqual(expectedDesign);
-    expect(stars[1] / stars[0]).toBeCloseTo(1.8, 1);
-    expect(stars[2] / stars[0]).toBeCloseTo(2.8, 1);
+    expect(stars[1] / stars[0]).toBeCloseTo(1.3, 1);
+    expect(stars[2] / stars[0]).toBeCloseTo(1.6, 1);
   });
 
   it('given a dealt board, when POST is called, then the tuned thresholds are signed into the token', async () => {

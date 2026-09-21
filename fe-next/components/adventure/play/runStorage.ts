@@ -1,5 +1,9 @@
 /**
- * Per-world run persistence (sessionStorage) so a reload resumes the run.
+ * Per-world run persistence (localStorage) so a reload, a closed tab or a
+ * killed app resumes the run. It was sessionStorage, which a closed tab or a
+ * restarted PWA wiped — the whole run (map, hearts, gold, relics) was lost.
+ * The run token is HMAC-signed with the user id, so a stale or foreign one is
+ * rejected by /start and dropped (useAdventureRun).
  * Guarded: private mode / blocked storage just means no resume.
  */
 import type { PublicRun } from '@/lib/adventure/play/runToken';
@@ -10,7 +14,7 @@ export const runStorageKey = (world: number) => `adv-run-w${world}`;
 
 export function readRun(world: number): StoredRun | null {
   try {
-    const raw = sessionStorage.getItem(runStorageKey(world));
+    const raw = localStorage.getItem(runStorageKey(world));
     const v = raw ? (JSON.parse(raw) as StoredRun) : null;
     // `path` is the v2 marker: a v1 stored run is dropped here rather than
     // sent to the server only to come back as `run_version`.
@@ -22,8 +26,8 @@ export function readRun(world: number): StoredRun | null {
 
 export function writeRun(world: number, value: StoredRun | null) {
   try {
-    if (value) sessionStorage.setItem(runStorageKey(world), JSON.stringify(value));
-    else sessionStorage.removeItem(runStorageKey(world));
+    if (value) localStorage.setItem(runStorageKey(world), JSON.stringify(value));
+    else localStorage.removeItem(runStorageKey(world));
   } catch {
     /* storage unavailable — run just won't survive a reload */
   }
@@ -36,7 +40,7 @@ const bestKey = (world: number) => `adv-run-best-w${world}`;
 
 export function readRunBest(world: number): RunBest | null {
   try {
-    const raw = sessionStorage.getItem(bestKey(world));
+    const raw = localStorage.getItem(bestKey(world));
     const v = raw ? (JSON.parse(raw) as RunBest) : null;
     return v && typeof v.word === 'string' && typeof v.pts === 'number' ? v : null;
   } catch {
@@ -49,8 +53,8 @@ export function recordRunBest(world: number, level: number, cand: RunBest | null
   try {
     const prev = level <= 1 ? null : readRunBest(world);
     const best = cand && (!prev || cand.pts > prev.pts) ? cand : prev;
-    if (best) sessionStorage.setItem(bestKey(world), JSON.stringify(best));
-    else sessionStorage.removeItem(bestKey(world));
+    if (best) localStorage.setItem(bestKey(world), JSON.stringify(best));
+    else localStorage.removeItem(bestKey(world));
   } catch {
     /* storage unavailable — the recap shows this level's best only */
   }
@@ -62,7 +66,7 @@ const MAX_WORDS_PER_LEVEL = 120;
 
 export function readRunWords(world: number): string[][] {
   try {
-    const raw = sessionStorage.getItem(wordsKey(world));
+    const raw = localStorage.getItem(wordsKey(world));
     const v: unknown = raw ? JSON.parse(raw) : null;
     return Array.isArray(v) ? v.filter((l): l is string[] => Array.isArray(l) && l.every((w) => typeof w === 'string')) : [];
   } catch {
@@ -76,7 +80,7 @@ export function recordRunWords(world: number, level: number, words: readonly str
     const levels = level <= 1 ? [] : readRunWords(world).slice(0, level - 1);
     while (levels.length < level - 1) levels.push([]);
     levels[level - 1] = words.slice(0, MAX_WORDS_PER_LEVEL);
-    sessionStorage.setItem(wordsKey(world), JSON.stringify(levels));
+    localStorage.setItem(wordsKey(world), JSON.stringify(levels));
   } catch {
     /* storage unavailable — draft cards fall back to their static line */
   }

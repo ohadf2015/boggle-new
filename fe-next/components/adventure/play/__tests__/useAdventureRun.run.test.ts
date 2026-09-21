@@ -49,7 +49,7 @@ const hook = (level = 1) => renderHook(() => useAdventureRun({ world: 1, level, 
 describe('useAdventureRun — roguelike run', () => {
   beforeEach(() => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    sessionStorage.clear();
+    localStorage.clear();
   });
   afterEach(() => vi.useRealTimers());
 
@@ -58,13 +58,13 @@ describe('useAdventureRun — roguelike run', () => {
     const { result } = hook();
     await waitFor(() => expect(result.current.phase).toBe('ready'));
     expect(calls[0].body.runToken).toBeUndefined();
-    expect(JSON.parse(sessionStorage.getItem(runStorageKey(1))!).runToken).toBe('rt-after-start');
+    expect(JSON.parse(localStorage.getItem(runStorageKey(1))!).runToken).toBe('rt-after-start');
     expect(result.current.run?.hp).toBe(5);
     expect(result.current.hintsLeft).toBe(2);
   });
 
   it('given a stored run with a pending offer, when mounted, then it drafts first and sends the pick to the map', async () => {
-    sessionStorage.setItem(runStorageKey(1), JSON.stringify({ runToken: 'rt-2', run: pubRun({ step: 2, offer: [{ type: 'gold', amount: 5 }, { type: 'relic', id: 'magnet' }] }) }));
+    localStorage.setItem(runStorageKey(1), JSON.stringify({ runToken: 'rt-2', run: pubRun({ step: 2, offer: [{ type: 'gold', amount: 5 }, { type: 'relic', id: 'magnet' }] }) }));
     const calls = mockApi({ level: getPlayLevel(1, 2), run: pubRun({ step: 2, relics: ['magnet'] }), targets: ['cats', 'toad', 'dog'] });
     const { result } = hook(2);
     await waitFor(() => expect(result.current.phase).toBe('draft'));
@@ -80,7 +80,7 @@ describe('useAdventureRun — roguelike run', () => {
   });
 
   it('given the map is open, when a fight node is chosen, then /start is asked for that node', async () => {
-    sessionStorage.setItem(runStorageKey(1), JSON.stringify({ runToken: 'rt-2', run: pubRun({ offer: [{ type: 'gold', amount: 5 }] }) }));
+    localStorage.setItem(runStorageKey(1), JSON.stringify({ runToken: 'rt-2', run: pubRun({ offer: [{ type: 'gold', amount: 5 }] }) }));
     const calls = mockApi({ level: getPlayLevel(1, 2), targets: ['cats', 'toad', 'dog'] });
     const { result } = hook(2);
     await waitFor(() => expect(result.current.phase).toBe('draft'));
@@ -113,7 +113,7 @@ describe('useAdventureRun — roguelike run', () => {
     act(() => result.current.begin());
     await act(async () => { await result.current.finish(); });
     await waitFor(() => expect(result.current.phase).toBe('done'));
-    const stored = JSON.parse(sessionStorage.getItem(runStorageKey(1))!);
+    const stored = JSON.parse(localStorage.getItem(runStorageKey(1))!);
     expect(stored).toMatchObject({ runToken: 'rt-next', run: { step: 2 } });
 
     mockApi();
@@ -127,7 +127,7 @@ describe('useAdventureRun — roguelike run', () => {
     act(() => result.current.begin());
     await act(async () => { await result.current.finish(); });
     await waitFor(() => expect(result.current.phase).toBe('done'));
-    expect(sessionStorage.getItem(runStorageKey(1))).toBeNull();
+    expect(localStorage.getItem(runStorageKey(1))).toBeNull();
   });
 
   it('given an elite fight, when the enemy lands a lethal hit, then the run reports died', async () => {

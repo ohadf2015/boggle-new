@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ChestRoll, RunSummary } from '@/lib/wordTowerV2/estate';
 import { type ChestTease, type RevealBeat, chestTease, tierFx } from '@/lib/wordTowerV2/rewards';
 import type { SOUND_EFFECTS } from '@/lib/audio/soundEffectsConfig';
@@ -9,6 +9,7 @@ import type { Phase, useTowerRun } from '../useTowerRun';
 import type { UseEstate } from '../useEstate';
 import { type LandingFx, useLandingFx } from './useLandingFx';
 import { type RunRewards, useRunRewards } from './useRunRewards';
+import { PX_PER_M } from '@/lib/wordTowerV2/engine';
 import { towerBlocksFrom, useRunPayout } from './useRunPayout';
 
 type PlaySound = (id: keyof typeof SOUND_EFFECTS, opts?: { volume?: number; rate?: number }) => void;
@@ -40,6 +41,8 @@ export interface RewardsFlow {
   onBeat: (beat: RevealBeat | 'open') => void;
   onCoinTick: (rate: number) => void;
   onDone: () => void;
+  /** Bank a run that is still standing (the player is leaving). Once per run. */
+  bank: (keepalive?: boolean) => Promise<void>;
 }
 
 /**
@@ -69,17 +72,19 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
     onMilestone,
   });
 
-  const { worldRef, labelsRef, peakM } = game;
-  // Read during render, spent inside the report effect: the peak is set in the
-  // same commit as the collapse.
-  const peakRef = useRef(peakM);
-  peakRef.current = peakM;
+  const { worldRef, labelsRef } = game;
+  // The live world's peak — the number endRun publishes as peakM. Read from the
+  // world, not from `peakM`: that is only set at collapse, so a run banked on
+  // the way OUT (bank) would have reported the previous run's height.
   const readSummary = rewards.getSummary;
   const getSummary = useCallback(
-    (): RunSummary => ({ ...readSummary(peakRef.current), tower: towerBlocksFrom(worldRef.current, labelsRef.current) }),
+    (): RunSummary => ({
+      ...readSummary(worldRef.current.peakHeightPx / PX_PER_M),
+      tower: towerBlocksFrom(worldRef.current, labelsRef.current),
+    }),
     [readSummary, worldRef, labelsRef],
   );
-  const { payout, waiting } = useRunPayout({
+  const { payout, waiting, bank } = useRunPayout({
     over: phase === 'over',
     ready: estateApi.status !== 'loading',
     getSummary,
@@ -152,5 +157,6 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
     onBeat,
     onCoinTick,
     onDone: () => setDone(true),
+    bank,
   };
 }

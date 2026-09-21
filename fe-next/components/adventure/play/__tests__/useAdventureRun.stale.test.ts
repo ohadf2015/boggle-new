@@ -28,7 +28,7 @@ function mockApi() {
 }
 
 describe('useAdventureRun — stale deal', () => {
-  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); sessionStorage.clear(); });
+  beforeEach(() => { vi.useFakeTimers({ shouldAdvanceTime: true }); localStorage.clear(); });
   afterEach(() => vi.useRealTimers());
 
   it('given the intro lingered past the stale window, when Start is tapped, then the level is re-dealt on the same run and then plays', async () => {

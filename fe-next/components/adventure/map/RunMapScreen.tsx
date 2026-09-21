@@ -11,7 +11,8 @@
  * attached to the badges in Hebrew too — a vertical map is never mirrored.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Play, ListTree } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowLeft, Home, Play, ListTree } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { getWorldConfig } from '@/lib/adventure/worldConfig';
@@ -58,7 +59,7 @@ interface Props {
 }
 
 export default function RunMapScreen({ world, map, run, currentNode, reachable, cleared, onChoose, onLeave, recap, onNewRun, covered }: Props) {
-  const { t } = useLanguageSafe();
+  const { t, language } = useLanguageSafe();
   const sfx = useSoundEffects();
   const [legend, setLegend] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -116,6 +117,11 @@ export default function RunMapScreen({ world, map, run, currentNode, reachable, 
             className="rounded-xl border-[3px] border-black bg-neo-cream p-2 text-black shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none">
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
+          {/* Straight home: the run is kept (localStorage run token), so this loses nothing. */}
+          <Link href={`/${language}`} aria-label={t('adventurePlay.backHome')}
+            className="rounded-xl border-[3px] border-black bg-neo-cream p-2 text-black shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none">
+            <Home className="w-5 h-5" />
+          </Link>
           <div className="min-w-0 flex-1">
             <div className="truncate font-neo-display text-base font-bold leading-tight">
               {worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : t('adventurePlay.title')}

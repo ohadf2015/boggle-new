@@ -93,7 +93,7 @@ export interface UseEstate {
   perks: Perks;
   /** Raids on me not yet marked seen (signed in only). */
   inbox: EstateRaid[];
-  reportRun: (summary: RunSummary) => Promise<{ coins: number; chest: ChestRoll } | null>;
+  reportRun: (summary: RunSummary, opts?: { keepalive?: boolean }) => Promise<{ coins: number; chest: ChestRoll } | null>;
   upgrade: (slot: PlotSlot) => Promise<SpendOutcome>;
   repair: (slot: PlotSlot) => Promise<SpendOutcome>;
   /** null for guests (show the sign-in CTA). */
@@ -169,7 +169,7 @@ export function useEstate(): UseEstate {
   }, [loading, refresh]);
 
   const reportRun = useCallback<UseEstate['reportRun']>(
-    async (summary) => {
+    async (summary, opts) => {
       if (loading) return null;
       if (!isAuthenticated) {
         const r = applyRun(estateRef.current, summary, (Math.random() * 2 ** 32) >>> 0);
@@ -177,7 +177,8 @@ export function useEstate(): UseEstate {
         writeLocal(r.estate);
         return { coins: r.coins, chest: r.chest };
       }
-      const res = await postWithAuth(`${API}/run`, summary, { requireSession: true });
+      // keepalive: a run banked on the way out (pagehide) must outlive the page.
+      const res = await postWithAuth(`${API}/run`, summary, { requireSession: true, keepalive: opts?.keepalive });
       const body = res.ok ? await readJson(res) : null;
       if (!body?.estate) return null;
       setEstate(sanitizeEstate(body.estate));
