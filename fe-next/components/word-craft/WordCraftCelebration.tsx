@@ -103,8 +103,8 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
       };
       const tiles: TileData[] = [];
 
-      const w = () => app.renderer.width / app.renderer.resolution;
-      const h = () => app.renderer.height / app.renderer.resolution;
+      const w = () => app.renderer.screen.width;
+      const h = () => app.renderer.screen.height;
       apiRef.current.width = w;
       apiRef.current.height = h;
 

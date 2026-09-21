@@ -17,7 +17,7 @@ import type { RelicId } from '@/lib/adventure/play/relics';
 import RelicChip from './RelicChip';
 import RelicFireCallout from './RelicFireCallout';
 import RelicTooltip, { type StackCtx } from './RelicTooltip';
-import { relicSlotClass, relicRailMaxPx } from './relicSlot';
+import { relicSlotClass, relicRailMaxPx, type RelicBarSize } from './relicSlot';
 import { runStackCtx } from './relicRunTotals';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ interface Props {
   pulse?: RelicPulse | null;
   /** Render an empty dashed slot at the end (draft fly-in target). */
   ghostRef?: Ref<HTMLSpanElement>;
-  size?: 'sm' | 'md';
+  size?: RelicBarSize;
   className?: string;
   /** Each relic's running points this level — baked onto its chip. */
   contrib?: Partial<Record<RelicId, number>>;
@@ -100,7 +100,7 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
       {/* The cap travels as a CSS VARIABLE, not an inline width: the landscape
           sheet sets `--adv-rail-max: none` and the rail spreads. An inline
           `max-width` would have needed `!important` to beat. */}
-      <ul style={{ '--adv-rail-max': `${railMax}px` } as CSSProperties} className="flex max-w-[var(--adv-rail-max)] flex-wrap items-start gap-x-1 gap-y-2.5 pb-2.5 pt-1" aria-label={t('adventurePlay.loot.relicsTitle')}>
+      <ul style={{ '--adv-rail-max': `${railMax}px` } as CSSProperties} className={cn('flex max-w-[var(--adv-rail-max)] flex-wrap items-start gap-x-1', size === 'xs' ? 'gap-y-1 py-0.5' : 'gap-y-2.5 pb-2.5 pt-1')} aria-label={t('adventurePlay.loot.relicsTitle')}>
         {relics.map((id) => (
           <li key={id} className={cn('flex-1', slot)}>
             <RelicChip
@@ -113,6 +113,7 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
               open={open === id}
               onToggle={() => setOpen((o) => (o === id ? null : id))}
               innerRef={(el) => { if (el) chips.current.set(id, el); else chips.current.delete(id); }}
+              bare={size === 'xs'}
             />
           </li>
         ))}

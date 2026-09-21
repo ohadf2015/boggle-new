@@ -29,7 +29,6 @@ import RunResult from './RunResult';
 import RunHud from './RunHud';
 import RunShellStyles from './run/RunShellStyles';
 import { RUN_SHELL_CLASS } from './run/landscape';
-import { currentNodeKind } from './run/nodeKind';
 import { foeScore } from './foeScore';
 import { resultHeld, FINALE_HOLD_MAX_MS } from './finaleHold';
 import DeedStamp, { type DeedEvent } from './deed/DeedStamp';
@@ -313,12 +312,12 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
        or tapping a node otherwise paints the labels under the finger in selection blue,
        and the highlight survives the next screen. */
     <div ref={screenRef} className="fixed inset-0 z-50 select-none overflow-hidden bg-[#0f1b3d] text-neo-cream">
-      {/* eslint-disable-next-line @next/next/no-img-element -- full-bleed decorative backdrop */}
       {/* The board is what's being read for the whole level, so the world art
           sits well back: dimmed, then a flat scrim, then a radial that is
           darkest behind the grid. At full strength the photo competed with the
           tiles and the foe panel for the same attention. The radial carries the
           lighting slot so a landscape canvas can re-pool it across the width. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- full-bleed decorative backdrop */}
       <img src={worldBackdrop(world)} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover opacity-70" />
       <div className="absolute inset-0 bg-[#0a1028]/35" />
       <div data-adv-slot="lighting" className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(10,16,40,0.7)_0%,rgba(10,16,40,0.2)_70%)]" />
@@ -350,12 +349,12 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
 
         {/* Run bar — pinned under the title, above the stage: relics never leave the screen. */}
         {lvl && (
-          <RunHud hp={run.hp} maxHp={run.maxHp} gold={run.run?.gold ?? 0} combat={run.combat} dispatchCombat={run.dispatchCombat}
+          <RunHud hp={run.hp} maxHp={run.maxHp} combat={run.combat} dispatchCombat={run.dispatchCombat}
             potionsLeft={run.potionsLeft} onPotion={run.drinkPotion}
             goal={goal} playing={run.phase === 'playing'}
             relics={run.runShown?.relics ?? []} lastHit={lastHit} words={run.words}
             world={world} level={shownLevel} kind={lvl.kind} seconds={lvl.seconds} combatControls={!isCombatKind(lvl.kind)}
-            nodeKind={currentNodeKind(run.map, run.currentNode, lvl)} step={run.run?.step}
+            step={run.run?.step}
             /* The stage the relic bubble must not cover: its HP bar and attack
                countdown are the fight's counterplay. The run clock re-renders
                this screen 5x/s, so the ref is live long before a chip is tapped. */
@@ -435,7 +434,9 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
           currentNode={run.currentNode} reachable={run.reachable} cleared={cleared}
           onChoose={run.chooseNode} onLeave={onExit}
           recap={recap} covered={nodeScreenUp}
-          onNewRun={recap ? () => { setRecap(false); restartRun(); } : undefined}
+          /* A cleared world opens the next one (the haul rides along via the carry
+             token); only a run that died starts this world over. */
+          onNewRun={recap ? () => { setRecap(false); if (run.result?.runComplete && hasNext) onNext(); else restartRun(); } : undefined}
         />
       )}
 

@@ -53,7 +53,10 @@ export async function POST(request: NextRequest) {
       // World unlock is the only completion gate a run ever checks; inside a run
       // the map edge is the gate, so a path that skips a row can't 403.
       if (!canPlayLevel(completions, world, 1)) return NextResponse.json({ error: 'Locked' }, { status: 403 });
-      return NextResponse.json({ ...runView(freshRun(world, user.id, randomUUID()), secret), node: null });
+      // The previous run's token (signed, so its relics are real) seeds the new one.
+      const carried = verifyRun(body?.carryToken, secret);
+      const carry = carried && carried.u === user.id ? carried : undefined;
+      return NextResponse.json({ ...runView(freshRun(world, user.id, randomUUID(), carry), secret), node: null });
     }
 
     // ---- Existing run.

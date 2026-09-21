@@ -15,7 +15,7 @@ const sv = {
     "node": {
       "shopGreeting": "Guld först. Frågor sen.",
       "shopGreetingBroke": "Kom tillbaka när börsen väger mer.",
-      "shortBy": "{amount} guld för lite",
+      "shortBy": "Saknar {amount} guld",
       "shopFull": "Hjärtan fulla",
       "buy": "Köp",
       "cancel": "Avbryt",
@@ -236,8 +236,8 @@ const sv = {
         "w9": "Glaciärjeti",
         "w10": "Gyllene lindorm"
       },
-      "enemyHp": "Fiendens liv",
-      "yourHp": "Ditt liv",
+      "enemyHp": "Fiendens HP",
+      "yourHp": "Ditt HP",
       "ruleTag": "Regel",
       "rule": {
         "w1": "Stava ett ord på 5+ bokstäver medan bossen laddar för att stoppa attacken.",
@@ -291,8 +291,8 @@ const sv = {
       "consequence": {
         "freeze": "{count} brickor frysta. Tryck för att tina!",
         "curse": "{count} brickor förhäxade. Tryck bort dem innan de biter!",
-        "hit": "-{count} liv! Höj skölden nästa gång.",
-        "drain": "-{count} liv och en sköldladdning stulen!",
+        "hit": "-{count} HP! Höj skölden nästa gång.",
+        "drain": "-{count} HP och en sköldladdning stulen!",
         "shuffle": "Brädet är omkastat. Stava ur minnet!",
         "blocked": "Skölden tog hela smällen!"
       },
@@ -311,7 +311,7 @@ const sv = {
       "shieldEarn": "{count}+ bokstäver = laddning",
       "shieldAria": "Höj skölden ({count} laddningar)",
       "skip": "Fortsätt",
-      "bossBattle": "Bossfight!",
+      "bossBattle": "Bosstrid!",
       "eliteFight": "Elitstrid!",
       "tapToFight": "Tryck för att slåss",
       "phaseTwo": "Fas två!",
@@ -367,7 +367,7 @@ const sv = {
       },
       "relicsTitle": "Reliker",
       "emptySlot": "Tom relikplats",
-      "potionsTitle": "Trolldrycker",
+      "potionsTitle": "Drycker",
       "emptyPotion": "{name} — tom plats",
       "hearts": "{hp} av {max} hjärtan",
       "tapToOpen": "Tryck för att öppna!",
@@ -388,16 +388,16 @@ const sv = {
       "kindPotion": "Dryck",
       "kindHeal": "Läk",
       "kindGold": "Guld",
-      "healDesc": "Laga dina hjärtan direkt",
+      "healDesc": "Läker dina hjärtan direkt",
       "goldDesc": "Guld till den här rundan",
       "tapCard": "Tryck på ett kort för att se mer",
       "take": "Ta den",
       "currentRun": "Pågående runda",
-      "runStep": "Nivå {step} av {total}",
+      "runStep": "Våning {step} av {total}",
       "continueRun": "Fortsätt",
       "levelUp": "Nivå upp!",
-      "levelUpCleared": "Nivå {step} av {total} klar",
-      "levelUpNext": "Nivå {next} upplåst",
+      "levelUpCleared": "Våning {step} av {total} klar",
+      "levelUpNext": "Våning {next} upplåst",
       "levelUpDone": "Bossen väntar",
       "tapToContinue": "Tryck för att fortsätta",
       "andMoreRelics": "{n} reliker till slog till",
@@ -467,7 +467,7 @@ const sv = {
     "chainGoal": "Nästa ord börjar på {letter}",
     "eliteLevel": "Elitstrid",
     "eliteGoal": "Gör {hp} skada på {seconds} s – den slår tillbaka!",
-    "runOver": "Resan är slut – världen börjar om.",
+    "runOver": "Rundan är slut – världen börjar om.",
     "offerHeal": "Läk {amount} HP",
     "offerGold": "+{amount} guld",
     "relic": {
@@ -506,7 +506,7 @@ const sv = {
       "vampire-fang": "Skadad i strid? Ett ord på 6+ bokstäver läker 1 HP",
       "gold-tooth": "+50 % guld — oavsett var det kommer ifrån",
       "lucky-clover": "Välj bland 4 belöningar i stället för 3",
-      "phoenix-feather": "En gång per resa: återuppstå med 1 HP"
+      "phoenix-feather": "En gång per runda: återuppstå med 1 HP"
     },
     "potion": {
       "heal": "Läkedryck",
@@ -10913,7 +10913,7 @@ const sv = {
     "hub": {
       "continue": "Fortsätt"
     },
-    "loading": "Laddar äventyr...",
+    "loading": "Laddar äventyr…",
     "levelLocked": "Nivå {level} — Låst",
     "bossLevel": "Bossnivå {level}",
     "playLevel": "Nivå {level} — {stars} av {maxStars} stjärnor",
@@ -10958,10 +10958,10 @@ const sv = {
       "longWords": "Långa ord (5+)",
       "timeBonus": "Tid kvar",
       "collectGems": "Samla juveler",
-      "defeatBoss": "Besegra Bossen",
-      "surviveBattle": "Överlev med {{target}}% Hälsa",
-      "mechanicTrigger": "Utlös Mekanism",
-      "noDamage": "Ta Ingen Skada"
+      "defeatBoss": "Besegra bossen",
+      "surviveBattle": "Överlev med {{target}}% hälsa",
+      "mechanicTrigger": "Utlös mekanism",
+      "noDamage": "Ta ingen skada"
     },
     "lexi": {
       "longWord": {
@@ -10971,7 +10971,7 @@ const sv = {
         "world3": "Kristallklar genialitet!"
       },
       "combo3x": {
-        "default": "Du ar pa gang!"
+        "default": "Du är på gång!"
       },
       "combo5x": {
         "default": "Ostoppbar!"
@@ -10980,22 +10980,22 @@ const sv = {
         "default": "LEGENDARISK KOMBO!"
       },
       "firstWord": {
-        "default": "Bra start! Fortsatt sa!"
+        "default": "Bra start! Fortsätt så!"
       },
       "timeBonus": {
-        "default": "Segervinst i sista sekunden!"
+        "default": "Seger i sista sekunden!"
       },
       "stuck": {
         "default": "Prova att hitta längre ord!"
       },
-      "stuckHint": "Behover du en ledtrad? Prova att hitta kortare ord forst!",
+      "stuckHint": "Behöver du en ledtråd? Prova att hitta kortare ord först!",
       "encourage": {
         "default": "Ge inte upp! Du klarar det!"
       },
       "levelComplete": {
-        "star1": "Nivan avklarad!",
-        "star2": "Utmarkt arbete!",
-        "star3": "Perfekt poang!"
+        "star1": "Nivån avklarad!",
+        "star2": "Utmärkt arbete!",
+        "star3": "Perfekt poäng!"
       },
       "tapToDismiss": "Tryck för att stänga",
       "tapToSpeedUp": "Tryck för att snabba på"
@@ -11003,15 +11003,15 @@ const sv = {
     "bosses": {
       "newMechanic": "Ny mekanik upplåst!",
       "tutorialGotIt": "Förstått!",
-      "fightBoss": "Bekampa bossen",
-      "bossIntro": "Bosskamp!",
+      "fightBoss": "Bekämpa bossen",
+      "bossIntro": "Bosstrid!",
       "bossDefeated": "Bossen besegrad!",
-      "bossWins": "Bossen vinner...",
+      "bossWins": "Bossen vinner…",
       "nearMiss": "SÅ NÄRA!",
       "nearMissDesc": "Bara {{hp}}% HP kvar! Du hade nästan!",
       "fragmentCollected": "LEXIKON-FRAGMENT ÅTERSTÄLLT!",
       "fragmentCount": "Fragment {{current}} av {{total}} insamlat",
-      "twistMechanic": "Boss-twist",
+      "twistMechanic": "Bossmekanik",
       "skipIntro": "Hoppa över",
       "readyToFight": "Kör igång!",
       "enraged": "RASANDE!",
@@ -11023,7 +11023,7 @@ const sv = {
         "phase2Banner": "FAS 2!"
       },
       "telegraph": {
-        "incoming": "Inkommande Attack!",
+        "incoming": "Inkommande attack!",
         "warning": "Akta dig!",
         "prepare": "Förbered dig!",
         "progress": "Attack laddas"
@@ -11035,14 +11035,14 @@ const sv = {
       },
       "cinematics": {
         "skip": "Hoppa över",
-        "skipIn": "Hoppa över om {seconds}...",
+        "skipIn": "Hoppa över om {seconds}…",
         "progress": "Filmsekvens pågår",
-        "loading": "Laddar...",
+        "loading": "Laddar…",
         "victory": "Seger!",
         "defeated": "{bossName} besegrad!",
-        "bossApproaches": "En utmanare narmar sig...",
-        "prepareForBattle": "Forebered dig for strid!",
-        "guardianOfWorld": "Väktare av Värld {worldNumber}",
+        "bossApproaches": "En utmanare närmar sig…",
+        "prepareForBattle": "Förbered dig för strid!",
+        "guardianOfWorld": "Väktare av värld {worldNumber}",
         "errorTitle": "Videofel",
         "errorDescription": "Något gick fel vid uppspelning. Försök igen eller hoppa över.",
         "errorTapToSkip": "Tryck på Hoppa för att fortsätta",
@@ -11086,7 +11086,7 @@ const sv = {
           "desc": "Rad blandad!"
         },
         "verboseCurse": {
-          "name": "Ordrik Förbannelse",
+          "name": "Ordrik förbannelse",
           "desc": "Behöver 6+ bokstavsord!"
         },
         "etymologyLock": {
@@ -11098,11 +11098,11 @@ const sv = {
           "desc": "Brickor isolerade!"
         },
         "figurativeStorm": {
-          "name": "Bildlig Storm",
+          "name": "Bildlig storm",
           "desc": "Brädet blandat!"
         },
         "assemblyLine": {
-          "name": "Löpande Band",
+          "name": "Löpande band",
           "desc": "Rad ändrad!"
         },
         "constructionZone": {
@@ -11154,7 +11154,7 @@ const sv = {
           "desc": "Ord spridda!"
         },
         "ultimateWord": {
-          "name": "Det Ultimata Ordet",
+          "name": "Det ultimata ordet",
           "desc": "Sista utmaningen!"
         }
       },

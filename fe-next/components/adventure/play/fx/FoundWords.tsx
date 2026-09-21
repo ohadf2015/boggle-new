@@ -4,6 +4,7 @@
  * Found-word chips: each new word pops in, coloured by how hard it hit (normal / BIG / CRIT).
  * The newest chip is bigger and glows; the level's longest word (6+ letters) keeps a crown.
  */
+import { memo } from 'react';
 import { Crown } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -18,7 +19,7 @@ const CHIP: Record<ReturnType<typeof hitTier>, string> = {
 const BEST_MIN = 6;
 const len = (w: string) => Array.from(w).length;
 
-export default function FoundWords({ words, points }: { words: string[]; points: number[] }) {
+function FoundWords({ words, points }: { words: string[]; points: number[] }) {
   const { t } = useLanguageSafe();
   // First word to reach the longest length wins the crown.
   const best = words.reduce<string | null>((b, w) => (len(w) >= BEST_MIN && len(w) > (b ? len(b) : 0) ? w : b), null);
@@ -41,3 +42,6 @@ export default function FoundWords({ words, points }: { words: string[]; points:
     </ul>
   );
 }
+
+// memo: the fight re-renders the level 5x/s; this only changes when a word lands.
+export default memo(FoundWords);

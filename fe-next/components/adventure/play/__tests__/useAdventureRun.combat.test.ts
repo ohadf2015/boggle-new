@@ -66,6 +66,18 @@ describe('useAdventureRun — combat feed', () => {
     expect(feed.map((e) => e.id)).toEqual([...feed.map((e) => e.id)].sort((a, b) => a - b));
   });
 
+  it('given a fight with no frozen tiles, when the clock ticks, then `frozen` keeps its identity (the board memo holds)', async () => {
+    mockApi({ level: getPlayLevel(1, 4), run: pubRun({ step: 4 }) });
+    const { result } = hook();
+    await waitFor(() => expect(result.current.phase).toBe('ready'));
+    act(() => result.current.begin());
+    const before = result.current.frozen;
+    const combatBefore = result.current.combat;
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(result.current.combat).not.toBe(combatBefore); // the fight did tick
+    expect(result.current.frozen).toBe(before);
+  });
+
   it('given an ordinary fight, when a word lands, then it hits the rival (a non-lethal foe script)', async () => {
     mockApi({ level: getPlayLevel(1, 1) });
     const { result } = hook(1);

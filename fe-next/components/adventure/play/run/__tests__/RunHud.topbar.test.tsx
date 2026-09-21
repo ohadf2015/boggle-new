@@ -30,7 +30,7 @@ function seedRunWords(levels: string[][]) {
 const base = {
   hp: 3,
   maxHp: 5,
-  gold: 42,
+  gold: 42, // not a prop any more: asserted absent below
   combat: null,
   dispatchCombat: () => {},
   potionsLeft: noPotions,
@@ -40,40 +40,38 @@ const base = {
 };
 
 describe('RunHud — the pinned run bar', () => {
-  it('Given a node kind, then the HUD names the room the player is standing in', () => {
-    render(<RunHud {...base} nodeKind="elite" relics={['storm-rune']} words={[]} />);
-    expect(screen.getByTestId('node-chip').textContent).toContain('adventurePlay.map.kind.elite');
-  });
-
   /**
-   * ROUND 5 CONTRACT CHANGE. Gold used to sit IN the relic row, costing the rail
-   * ~66px of a 336px band — enough that six relics already wrapped to two rows
-   * and twelve took three. Row one is now the relic strip and nothing else (the
-   * bar's own arrangement); gold joins the room, hearts and potions on the
-   * resource row.
+   * 09-21 DECLUTTER. The bar was two rows (relic strip, then room chip + hearts
+   * + purse + four potion sockets) over a stage that repeats the room, and it
+   * squeezed the board. In a level it is ONE row of what can be USED right now.
    */
-  it('Given relics and gold, then row one is the relic strip alone and gold sits with the resources', () => {
+  it('Given a level in play, then the HUD is one row: small relic icons, held potions, hearts — no room chip, no purse', () => {
     render(
-      <RunHud {...base} nodeKind="fight" relics={['storm-rune']} words={['house']}
+      <RunHud {...base} relics={['storm-rune']} words={['house']}
         potionsLeft={{ ...noPotions, heal: 2 }} />,
     );
-    const relicRow = screen.getByTestId('run-hud-relics');
-    expect(within(relicRow).getByRole('button', { name: 'adventurePlay.relic.storm-rune' })).toBeTruthy();
-    expect(within(relicRow).queryByText('42')).toBeNull();
-
-    const resRow = screen.getByTestId('run-hud-resources');
-    expect(within(resRow).getByText('42')).toBeTruthy();
-    expect(within(resRow).getByLabelText(/adventurePlay\.loot\.hearts/)).toBeTruthy();
-    expect(within(resRow).getByTestId('node-chip')).toBeTruthy();
-    expect(resRow.querySelector('[data-potion="heal"]')).toBeTruthy();
-    expect(relicRow.querySelector('[data-potion="heal"]')).toBeNull();
-    // The rail owns the full width of its row — the judge gap was relics you could not see.
-    expect(relicRow.querySelector('[data-testid="node-chip"]')).toBeNull();
+    const hud = screen.getByTestId('run-hud');
+    expect(within(hud).getByRole('button', { name: 'adventurePlay.relic.storm-rune' })).toBeTruthy();
+    expect(within(hud).getByLabelText(/adventurePlay\.loot\.hearts/)).toBeTruthy();
+    expect(hud.querySelector('[data-potion="heal"]')).toBeTruthy();
+    expect(screen.queryByTestId('node-chip')).toBeNull();
+    expect(within(hud).queryByText('42')).toBeNull();
+    // Numeral pills under every chip were the noisiest thing on the screen; the tap bubble has the detail.
+    expect(screen.queryByTestId('relic-tag-storm-rune')).toBeNull();
+    expect(screen.queryByTestId('relic-contrib-storm-rune')).toBeNull();
   });
 
-  it('Given an empty relic list, then the bar still holds its place and says so', () => {
-    render(<RunHud {...base} nodeKind="fight" relics={[]} words={[]} />);
-    expect(screen.getByTestId('run-hud-relics').textContent).toContain('adventurePlay.loot.noRelics');
+  it('Given potions, then only the ones held are shown', () => {
+    render(<RunHud {...base} relics={[]} words={[]} potionsLeft={{ ...noPotions, heal: 1 }} />);
+    const hud = screen.getByTestId('run-hud');
+    expect(hud.querySelector('[data-potion="heal"]')).toBeTruthy();
+    expect(hud.querySelector('[data-potion="time"]')).toBeNull();
+  });
+
+  it('Given no relics, then no empty rail is drawn', () => {
+    render(<RunHud {...base} relics={[]} words={[]} />);
+    expect(screen.queryByText('adventurePlay.loot.noRelics')).toBeNull();
+    expect(screen.queryByTestId('run-hud-relics')).toBeNull();
   });
 
   it('Given a cleared level earlier in the run, then the tooltip run total counts it, not just this board', () => {
@@ -82,7 +80,7 @@ describe('RunHud — the pinned run bar', () => {
     const banked = [['planet'], ['stone'], ['river'], ['candle'], ['marble'], ['silver']];
     const words = ['house', 'tiger'];
     seedRunWords(banked);
-    render(<RunHud {...base} nodeKind="fight" relics={['storm-rune']} words={words} world={1} level={6} step={7} />);
+    render(<RunHud {...base} relics={['storm-rune']} words={words} world={1} level={6} step={7} />);
     fireEvent.click(screen.getByRole('button', { name: 'adventurePlay.relic.storm-rune' }));
 
     const levelOnly = relicRunContributions([{ words }], ['storm-rune'])['storm-rune']!;
@@ -94,7 +92,7 @@ describe('RunHud — the pinned run bar', () => {
 
   it('Given the first node of a run, then the tooltip carries exactly one number line', () => {
     seedRunWords([]);
-    render(<RunHud {...base} nodeKind="fight" relics={['storm-rune']} words={['house', 'tiger']} world={1} level={1} step={1} />);
+    render(<RunHud {...base} relics={['storm-rune']} words={['house', 'tiger']} world={1} level={1} step={1} />);
     fireEvent.click(screen.getByRole('button', { name: 'adventurePlay.relic.storm-rune' }));
     expect(screen.getByTestId('relic-run')).toBeTruthy();
     expect(screen.queryByTestId('relic-earned')).toBeNull();
