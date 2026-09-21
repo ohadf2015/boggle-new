@@ -22,8 +22,10 @@
  * where the grid can least afford it.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Heart, Shield } from 'lucide-react';
+import { Heart, Shield, Volume2, VolumeX } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
+import { useMasterMute } from '@/hooks/useMasterMute';
 import type { CombatEvent, CombatState } from '@/lib/adventure/play/combat';
 import { POTION_IDS, type PotionId, type RelicId } from '@/lib/adventure/play/relics';
 import type { LevelKind } from '@/lib/adventure/play/levels';
@@ -97,12 +99,33 @@ export function Hearts({ hp, maxHp, bare = false }: { hp: number; maxHp: number;
   );
 }
 
+function RunHudMute() {
+  const { allMuted, toggle, label, title } = useMasterMute();
+  return (
+    <button
+      type="button"
+      data-testid="run-hud-mute"
+      onClick={toggle}
+      aria-label={label}
+      aria-pressed={!allMuted}
+      title={title}
+      className="ms-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-[3px] border-black bg-black/70 text-neo-cream shadow-[2px_2px_0_#000] active:translate-y-0.5 active:shadow-none"
+    >
+      {allMuted
+        ? <VolumeX className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+        : <Volume2 className="h-4 w-4" strokeWidth={2.5} aria-hidden />}
+    </button>
+  );
+}
+
 export default function RunHud({
   hp, maxHp, gold, combat, dispatchCombat, hintsLeft = 0, onHint, potionsLeft, onPotion, goal, playing,
   relics = [], lastHit = null, words = [], combatControls = true, world, level, kind, seconds, nodeKind = null, step,
   stageEl = null,
 }: Props) {
   const { t } = useLanguageSafe();
+  // Own mute in this bar → the global FAB stands down instead of covering hearts/potions.
+  useRegisterHeaderAudioControl();
   const inFight = !!combat;
 
   const wordPulse = useMemo(() => {
@@ -213,6 +236,7 @@ export default function RunHud({
               {t('adventurePlay.hint', { count: hintsLeft })}
             </button>
           )}
+          <RunHudMute />
       </div>
       {/* No telegraph row here: the band's height is what the board is sized
           from, so an alert appearing mid-fight shoved the stage down and shrank
