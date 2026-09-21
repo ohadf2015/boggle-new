@@ -118,8 +118,11 @@ describe.each(CATALOGUES)('%s translations — free-tier numbers', (locale, cata
   });
 
   it('never says the free plan is a single class in words', () => {
+    // usagePrompt* copy names the classroom that hit a usage trigger ("students
+    // in one class") — that is not a free-plan class-count claim. Exclude it so
+    // the guard stays pointed at pricing/FAQ strings (#1106).
     const bad = entries
-      .filter(([k, v]) => inCapContext(k, v) && SPELLED_ONE_CLASS.test(v))
+      .filter(([k, v]) => inCapContext(k, v) && SPELLED_ONE_CLASS.test(v) && !/usagePrompt/i.test(k))
       .map(([k, v]) => `${k}: "${v.slice(0, 110)}"`);
     expect(bad.join('\n') || null).toBeNull();
   });

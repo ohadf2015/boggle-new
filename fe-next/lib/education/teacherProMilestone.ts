@@ -57,7 +57,9 @@ export function isTeacherProAskDismissed(
     // Legacy permanent flag from PR #1079 — start a TTL window so the 40 free
     // teachers who tapped X are not silenced forever (1 paying of 41).
     if (raw === '1') {
-      if (storage?.setItem) persistTeacherProAskDismissed(storage, now);
+      // Migrates legacy permanent "1" into a TTL timestamp. setItem is optional
+      // on the read-side storage shape (tests may pass getItem-only mocks).
+      persistTeacherProAskDismissed(storage, now);
       return true;
     }
     const ts = Number(raw);
