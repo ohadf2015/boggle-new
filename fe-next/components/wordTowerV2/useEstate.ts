@@ -104,22 +104,32 @@ export interface UseEstate {
   refresh: () => Promise<void>;
 }
 
-function readLocal(): Estate {
+/** Last estate the SERVER returned, per account: shown when a later read fails. */
+const accountKey = (uid: string) => `${ESTATE_STORAGE_KEY}.account.${uid}`;
+/** Runs the server did not bank (429 / 5xx / offline), replayed on the next load. */
+const pendingKey = (uid: string) => `wordTowerV2.pendingRuns.${uid}`;
+const MAX_PENDING = 5;
+
+function readJsonKey<X>(key: string, fallback: X): X {
   try {
-    const raw = window.localStorage.getItem(ESTATE_STORAGE_KEY);
-    return raw ? sanitizeEstate(JSON.parse(raw)) : emptyEstate();
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as X) : fallback;
   } catch {
-    return emptyEstate();
+    return fallback;
   }
 }
 
-function writeLocal(e: Estate): void {
+function writeKey(key: string, value: unknown): void {
   try {
-    window.localStorage.setItem(ESTATE_STORAGE_KEY, JSON.stringify(e));
+    if (value === null) window.localStorage.removeItem(key);
+    else window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
     // Private mode / quota: the run still counts for this session.
   }
 }
+
+const readLocal = (): Estate => sanitizeEstate(readJsonKey<unknown>(ESTATE_STORAGE_KEY, null));
+const writeLocal = (e: Estate) => writeKey(ESTATE_STORAGE_KEY, e);
 
 async function readJson(res: Response): Promise<Record<string, unknown> | null> {
   try {
@@ -130,12 +140,15 @@ async function readJson(res: Response): Promise<Record<string, unknown> | null> 
 }
 
 export function useEstate(): UseEstate {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
+  const uid = user?.id ?? 'me';
   const authed = !loading && isAuthenticated;
   const [status, setStatus] = useState<UseEstate['status']>('loading');
   const [estate, setEstateState] = useState<Estate>(emptyEstate);
   const [inbox, setInbox] = useState<EstateRaid[]>([]);
   const estateRef = useRef(estate);
+  /** Claim + replay in flight (see refresh). */
+  const syncingRef = useRef(false);
 
   const setEstate = useCallback((e: Estate) => {
     estateRef.current = e;
@@ -149,16 +162,60 @@ export function useEstate(): UseEstate {
       setStatus('ready');
       return;
     }
-    const res = await getWithAuth(API, { requireSession: true });
-    const body = res.ok ? await readJson(res) : null;
+    const res = await getWithAuth(API, { requireSession: true }).catch(() => null);
+    const body = res?.ok ? await readJson(res) : null;
     if (!body) {
+      // A failed read must not look like a wiped bank: show the last copy.
+      const cached = readJsonKey<unknown>(accountKey(uid), null);
+      if (cached) setEstate(sanitizeEstate(cached));
       setStatus('error');
       return;
     }
-    setEstate(sanitizeEstate(body.estate));
+    const adopt = (raw: unknown) => {
+      const e = sanitizeEstate(raw);
+      setEstate(e);
+      writeKey(accountKey(uid), e);
+    };
+    adopt(body.estate);
     setInbox(Array.isArray(body.raids) ? (body.raids as EstateRaid[]) : []);
     setStatus('ready');
-  }, [loading, isAuthenticated, setEstate]);
+
+    // Both steps below CREDIT coins, and neither is idempotent server-side: a
+    // second refresh (the workshop re-reads on open) or a lost response must
+    // never pay twice. So one at a time, and each item leaves local storage
+    // BEFORE its POST — a lost response then costs that item, never doubles it.
+    if (syncingRef.current) return;
+    syncingRef.current = true;
+    try {
+      // Signed-out progress follows the player into the account (claim route merges).
+      const guest = readLocal();
+      if (guest.runs > 0) {
+        writeKey(ESTATE_STORAGE_KEY, null);
+        const claim = await postWithAuth(`${API}/claim`, { estate: guest }, { requireSession: true }).catch(() => null);
+        const claimed = claim?.ok ? await readJson(claim) : null;
+        if (claimed?.estate) adopt(claimed.estate);
+        // A definite refusal (not a lost response) is safe to try again next load.
+        else if (claim && claim.status !== 400) writeLocal(guest);
+      }
+
+      // Replay runs the server refused earlier, oldest first; stop at the first failure.
+      const queue = readJsonKey<RunSummary[]>(pendingKey(uid), []);
+      while (queue.length) {
+        const next = queue.shift()!;
+        writeKey(pendingKey(uid), queue.length ? queue : null);
+        const sent = await postWithAuth(`${API}/run`, next, { requireSession: true }).catch(() => null);
+        const banked = sent?.ok ? await readJson(sent) : null;
+        if (banked?.estate) {
+          adopt(banked.estate);
+          continue;
+        }
+        if (sent && sent.status !== 400) writeKey(pendingKey(uid), [next, ...queue]);
+        break;
+      }
+    } finally {
+      syncingRef.current = false;
+    }
+  }, [loading, isAuthenticated, uid, setEstate]);
 
   useEffect(() => {
     if (loading) {
@@ -178,13 +235,23 @@ export function useEstate(): UseEstate {
         return { coins: r.coins, chest: r.chest };
       }
       // keepalive: a run banked on the way out (pagehide) must outlive the page.
-      const res = await postWithAuth(`${API}/run`, summary, { requireSession: true, keepalive: opts?.keepalive });
-      const body = res.ok ? await readJson(res) : null;
-      if (!body?.estate) return null;
-      setEstate(sanitizeEstate(body.estate));
+      const res = await postWithAuth(`${API}/run`, summary, { requireSession: true, keepalive: opts?.keepalive }).catch(() => null);
+      const body = res?.ok ? await readJson(res) : null;
+      if (!body?.estate) {
+        // Not banked (rate limit, 5xx, offline): keep it for the next load
+        // rather than drop the coins on the floor. A 400 is a malformed run.
+        if (res?.status !== 400) {
+          const queue = readJsonKey<RunSummary[]>(pendingKey(uid), []);
+          writeKey(pendingKey(uid), [...queue, summary].slice(-MAX_PENDING));
+        }
+        return null;
+      }
+      const e = sanitizeEstate(body.estate);
+      setEstate(e);
+      writeKey(accountKey(uid), e);
       return { coins: Number(body.coins) || 0, chest: body.chest as ChestRoll };
     },
-    [loading, isAuthenticated, setEstate],
+    [loading, isAuthenticated, uid, setEstate],
   );
 
   /** Optimistic spend: apply the pure step now, then adopt the server's copy (or roll back to it). */

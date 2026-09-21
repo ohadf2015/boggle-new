@@ -12,11 +12,13 @@ import { CRANE_CLEARANCE_PX, type CraneSwing, SWING, releaseKinematics } from '@
 import {
   PX_PER_M,
   type TowerWorld,
+  braceTower,
   createTowerWorld,
   despawnBlock,
   getTowerHeightM,
   moveAttachedBlock,
   releaseBlock,
+  reviveWorld,
   snapshotWorld,
   spawnBlock,
   stepWorld,
@@ -27,21 +29,23 @@ import { NEUTRAL_PERKS, type Perks } from '@/lib/wordTowerV2/estate';
 import { type RewardId, steadySwing } from '@/lib/wordTowerV2/rewards';
 import { type RunState, type SurprisePayout, applyLanding, consumeDrop, createRun } from '@/lib/wordTowerV2/run';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
-import { towerRisk } from '@/lib/wordTowerV2/stability';
+import { isCounterweight, standingChain, towerLean, towerRisk } from '@/lib/wordTowerV2/stability';
 import { endV2Run, startV2Run } from '@/lib/wordTowerV2/telemetry';
 import type { TowerFx } from './TowerCanvas';
+import { REWARD_SOUND, readBest, standing, supportTop, writeBest } from './runHelpers';
 
 /**
  * Word Tower v2 run loop, outside the render tree's concerns: spawns and
  * releases floors, reads verdicts off the SETTLED simulation, opens crates,
- * awards badges, and ends the run when physics says the tower fell.
+ * awards badges. A crash that leaves floors standing clears the rubble and
+ * the run goes on from the stump; it only ends when nothing stands or the
+ * player cashes out (`finish`).
  */
 
 const POLL_MS = 100;
 const DEMO_WORDS = ['tower', 'slab', 'anchor', 'crane', 'brick', 'ledge', 'beam', 'stack'];
 /** Stop waiting for a floor to settle after this long and judge it anyway. */
 const SETTLE_TIMEOUT_MS = 2600;
-const BEST_KEY = 'wordTowerV2.bestM';
 /** Floors the rebar crate leaves live at the top. */
 const REBAR_KEEP_TOP = 2;
 
@@ -69,42 +73,6 @@ export interface CalloutEvent extends CalloutCopy {
 
 export type SurpriseEvent = SurprisePayout & { key: number };
 
-const REWARD_SOUND: Record<RewardId, keyof typeof SOUND_EFFECTS> = {
-  steady: 'powerUp',
-  plumb: 'powerUp',
-  wide: 'giftReceived',
-  rebar: 'vaultUnlock',
-  scramble: 'timeBonus',
-  jackpot: 'coinCascade',
-};
-
-function readBest(): number {
-  try {
-    return Number(window.localStorage.getItem(BEST_KEY)) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-function writeBest(m: number): void {
-  try {
-    window.localStorage.setItem(BEST_KEY, m.toFixed(2));
-  } catch {
-    // Private mode: the best line just resets next visit.
-  }
-}
-
-/** The settled floor the next drop should land on: highest top, excluding `skipId`. */
-function supportTop(world: TowerWorld, skipId: string | null): SupportTop | null {
-  let best: SupportTop | null = null;
-  for (const b of snapshotWorld(world).blocks) {
-    if (b.id === skipId || !world.landed.has(b.id)) continue;
-    const topY = b.y - b.heightPx / 2;
-    if (!best || topY < best.topY) best = { x: b.x, topY, widthPx: b.widthPx };
-  }
-  return best;
-}
-
 export function useTowerRun() {
   const { playSound, playComboSound, playWordLengthSound, setGameActive } = useSoundEffects();
 
@@ -125,6 +93,10 @@ export function useTowerRun() {
   const seenBiomesRef = useRef(new Set<string>(['downtown']));
   const bannerKeyRef = useRef(0);
   const startedAtRef = useRef<number | null>(null);
+  /** Emergency braces this run: `paid` ones are charged at the bank (RunSummary.braces). */
+  const bracesRef = useRef({ used: 0, paid: 0 });
+  /** The tower's lean just before the current drop, for the counterweight check. */
+  const leanRef = useRef<number | null>(null);
   /**
    * Empire perks, fed in by the estate (NEUTRAL until it has loaded, so a run
    * that starts before auth settles simply plays unperked rather than flipping
@@ -216,6 +188,23 @@ export function useTowerRun() {
     if (out.tenants > 0) fxRef.current.push({ kind: 'tenants', id: pending.id, count: out.tenants });
     setCallout({ ...landingCallout(quality, out.run.combo, Math.random()), key: performance.now(), points: out.points });
 
+    // Counterweight: this floor landed on the far side of a lean and pulled
+    // the load back over the base. Physics already moved the centre of mass;
+    // the reward is that the crew locks the steadier tower in (all but the
+    // top two floors are welded, like the rebar crate).
+    const leanBefore = leanRef.current;
+    leanRef.current = null;
+    const base = snapshotWorld(worldRef.current).blocks.find((b) => b.id === `r${runNoRef.current}-b0`);
+    if (leanBefore !== null && base && quality !== 'miss') {
+      const after = towerLean(standing(worldRef.current, null));
+      if (isCounterweight(leanBefore, after, block.x - base.x, base.widthPx / 2)) {
+        const ids = braceTower(worldRef.current, 2);
+        if (ids.length) fxRef.current.push({ kind: 'rebar', ids });
+        setCallout({ textKey: 'wordTowerV2.rescue.counterweight', tone: 'cyan', key: performance.now() + 1, points: out.points });
+        playSound('powerUp', { volume: 0.6 });
+      }
+    }
+
     if (quality === 'perfect') {
       if (out.run.combo > 1) playComboSound(out.run.combo);
       else playSound('perfectWord');
@@ -234,24 +223,78 @@ export function useTowerRun() {
     checkBadges();
   }, [playComboSound, playSound, openCrate, checkBadges]);
 
-  const endRun = useCallback(() => {
+  /** `cashedOut`: the player ended a standing run — a win, not a fall. */
+  const endRun = useCallback((cashedOut = false) => {
     resolveLanding();
     hangingRef.current = null;
-    const peak = worldRef.current.peakHeightPx / PX_PER_M;
+    const peak = worldRef.current.runPeakPx / PX_PER_M;
     setPeakM(peak);
     if (peak > bestRef.current) {
       bestRef.current = peak;
       setBestM(peak);
       writeBest(peak);
     }
-    fxRef.current.push({ kind: 'collapse' });
-    playSound('defeatSting');
+    if (cashedOut) playSound('questComplete');
+    else {
+      fxRef.current.push({ kind: 'collapse' });
+      playSound('defeatSting');
+    }
     setPhase('over');
     endV2Run(startedAtRef, {
       floors: statsRef.current.peakFloors,
       heightM: peak,
     });
   }, [playSound, resolveLanding]);
+
+  /**
+   * The tower came down — but if floors are still standing on the base, the
+   * run is NOT over: the rubble is cleared, the streak breaks, and you build on
+   * from what is left. Returns false when nothing stands (the run ends).
+   */
+  const recover = useCallback((): boolean => {
+    const world = worldRef.current;
+    const hangId = hangingRef.current?.id ?? null;
+    const keep = standingChain(standing(world, hangId), `r${runNoRef.current}-b0`);
+    if (keep.length === 0) return false;
+    // The slab on the hook and anything still in the air are not rubble.
+    for (const b of snapshotWorld(world).blocks) if (b.id === hangId || !world.landed.has(b.id)) keep.push(b.id);
+    const rubble = reviveWorld(world, new Set(keep));
+    for (const r of rubble) labelsRef.current.delete(r.id);
+    runRef.current = { ...runRef.current, combo: 0 };
+    setRun(runRef.current);
+    fxRef.current.push({ kind: 'crumble', points: rubble });
+    setCallout({ textKey: 'wordTowerV2.rescue.crumbled', tone: 'red', params: { n: rubble.length }, key: performance.now(), points: 0 });
+    playSound('comboBreak');
+    return true;
+  }, [playSound]);
+
+  /**
+   * Emergency brace: steel every floor but the top one in place, right now.
+   * Paying for it (coins off the run, or a free brace from the upgrades, or a
+   * rescue word) is decided by the caller; `paid` ones reach the bank.
+   */
+  const brace = useCallback(
+    (paid: boolean): boolean => {
+      if (phase === 'over') return false;
+      const ids = braceTower(worldRef.current, 1);
+      if (ids.length === 0) return false;
+      bracesRef.current = { used: bracesRef.current.used + 1, paid: bracesRef.current.paid + (paid ? 1 : 0) };
+      statsRef.current.welds += 1;
+      fxRef.current.push({ kind: 'rebar', ids });
+      setCallout({ textKey: 'wordTowerV2.rescue.braced', tone: 'cyan', key: performance.now(), points: 0 });
+      playSound('vaultUnlock', { volume: 0.6 });
+      return true;
+    },
+    [phase, playSound],
+  );
+
+  /** Cash out: end a standing run on purpose (the results + chest follow). */
+  const finish = useCallback(() => {
+    if (phase === 'over') return;
+    const hanging = hangingRef.current;
+    if (hanging) despawnBlock(worldRef.current, hanging.id);
+    endRun(true);
+  }, [phase, endRun]);
 
   // One poll drives the HUD height, verdicts, new skies and collapse.
   useEffect(() => {
@@ -267,7 +310,7 @@ export function useTowerRun() {
 
       if (phase === 'over') return;
       if (world.collapsed) {
-        endRun();
+        if (!recover()) endRun();
         return;
       }
 
@@ -298,7 +341,7 @@ export function useTowerRun() {
       }
     }, POLL_MS);
     return () => window.clearInterval(id);
-  }, [phase, endRun, resolveLanding, playSound, banner, checkBadges]);
+  }, [phase, endRun, recover, resolveLanding, playSound, banner, checkBadges]);
 
   /** Drives the crane: the hanging floor follows the swing until released. */
   const onBeforeStep = useCallback((nowMs: number) => {
@@ -420,6 +463,7 @@ export function useTowerRun() {
     resolveLanding();
     const world = worldRef.current;
     const support = supportTop(world, hanging.id);
+    leanRef.current = towerLean(standing(world, hanging.id));
     const k = releaseKinematics(performance.now() - hanging.startedAt, hanging.swing, 0);
     // Foundation perk: less spin off the hook is a floor that lands flatter.
     releaseBlock(world, hanging.id, hanging.plumb ? 0 : k.vx, hanging.plumb ? 0 : k.spin * perksRef.current.swayMult);
@@ -438,6 +482,8 @@ export function useTowerRun() {
     hangingRef.current = null;
     pendingRef.current = null;
     beatBestRef.current = false;
+    bracesRef.current = { used: 0, paid: 0 };
+    leanRef.current = null;
     statsRef.current = emptyStats();
     seenBiomesRef.current = new Set(['downtown']);
     runRef.current = createRun(Date.now());
@@ -495,5 +541,6 @@ export function useTowerRun() {
     worldRef, labelsRef, fxRef, hangingRef,
     phase, heightM, risk, peakM, bestM, run, callout, banners, shiftBanner, newBest, runBadges, unlockedRef, statsRef,
     onBeforeStep, getHangVx, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, setPerks, perksRef, adoptBest,
+    brace, finish, bracesRef,
   };
 }

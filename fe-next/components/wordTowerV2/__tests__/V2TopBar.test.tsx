@@ -104,10 +104,15 @@ describe('V2TopBar', () => {
 
   it('given a run in progress, when the exit is tapped, then the game is asked to leave (the run banks on the way out)', () => {
     const onExit = vi.fn();
-    render(bar({ onExit }));
+    render(bar({ onExit, run: { ...createRun(1), floors: 3 } }));
 
     fireEvent.click(screen.getByLabelText('wordTowerV2.hud.exit'));
     expect(onExit).toHaveBeenCalledOnce();
+  });
+
+  it('given nothing built yet, then the same button is a plain way home', () => {
+    render(bar({ onExit: vi.fn(), run: createRun(1) }));
+    expect(screen.getByLabelText('wordTowerV2.results.home')).toBeTruthy();
   });
 
   it('given the bar, then the meter and the streak share a status row that never comes and goes', () => {

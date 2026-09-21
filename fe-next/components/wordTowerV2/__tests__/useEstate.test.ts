@@ -163,3 +163,95 @@ describe('useEstate — signed in', () => {
     expect(mockPost).toHaveBeenCalledWith('/api/word-tower/estate/seen', { ids: ['r1'] }, expect.anything());
   });
 });
+
+describe('useEstate — nothing a player earned is silently dropped', () => {
+  const serverEstate = { ...emptyEstate(), coins: 500 };
+
+  beforeEach(() => {
+    auth.isAuthenticated = true;
+    mockGet.mockResolvedValue(ok({ estate: serverEstate, perks: perksFromEstate(serverEstate), raids: [] }));
+  });
+
+  it('given a guest empire in localStorage, when the player is signed in, then it is claimed into the account and the local copy cleared', async () => {
+    const guest = { ...emptyEstate(), coins: 90, runs: 2 };
+    window.localStorage.setItem(ESTATE_STORAGE_KEY, JSON.stringify(guest));
+    const merged = { ...serverEstate, coins: 590, runs: 2 };
+    mockPost.mockResolvedValueOnce(ok({ estate: merged, perks: perksFromEstate(merged) }));
+    const { result } = renderHook(() => useEstate());
+    await waitFor(() => expect(result.current.estate.coins).toBe(590));
+    expect(mockPost).toHaveBeenCalledWith('/api/word-tower/estate/claim', { estate: expect.objectContaining({ coins: 90, runs: 2 }) }, expect.anything());
+    expect(window.localStorage.getItem(ESTATE_STORAGE_KEY)).toBeNull();
+  });
+
+  it('given a guest who never played, when signed in, then nothing is claimed', async () => {
+    window.localStorage.setItem(ESTATE_STORAGE_KEY, JSON.stringify(emptyEstate()));
+    const { result } = renderHook(() => useEstate());
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    expect(mockPost).not.toHaveBeenCalled();
+  });
+
+  it('given the run POST is refused (429), when reported, then the run is queued and banked on the next load', async () => {
+    mockPost.mockResolvedValueOnce(ok({ error: 'Too many requests' }, 429));
+    const first = renderHook(() => useEstate());
+    await waitFor(() => expect(first.result.current.status).toBe('ready'));
+    await act(async () => {
+      expect(await first.result.current.reportRun(RUN)).toBeNull();
+    });
+    first.unmount();
+
+    const after = { ...serverEstate, coins: 900, runs: 1 };
+    mockPost.mockResolvedValueOnce(ok({ estate: after, perks: perksFromEstate(after), coins: 300, chest: { tier: 'common', coins: 100, shields: 0, bricks: 0, blueprints: 0 } }));
+    const second = renderHook(() => useEstate());
+    await waitFor(() => expect(second.result.current.estate.coins).toBe(900));
+    expect(mockPost).toHaveBeenLastCalledWith('/api/word-tower/estate/run', RUN, expect.anything());
+  });
+
+  it('given the claim response is lost, when the page loads again, then the guest estate is NOT claimed a second time', async () => {
+    window.localStorage.setItem(ESTATE_STORAGE_KEY, JSON.stringify({ ...emptyEstate(), coins: 90, runs: 2 }));
+    mockPost.mockRejectedValueOnce(new TypeError('network'));
+    const first = renderHook(() => useEstate());
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    first.unmount();
+    const second = renderHook(() => useEstate());
+    await waitFor(() => expect(second.result.current.status).toBe('ready'));
+    await act(async () => {
+      await second.result.current.refresh();
+    });
+    expect(mockPost).toHaveBeenCalledTimes(1);
+  });
+
+  it('given two refreshes at once, when a guest estate is waiting, then it is claimed exactly once', async () => {
+    window.localStorage.setItem(ESTATE_STORAGE_KEY, JSON.stringify({ ...emptyEstate(), coins: 90, runs: 2 }));
+    let release!: (r: Response) => void;
+    mockPost.mockReturnValueOnce(new Promise<Response>((r) => (release = r)));
+    const { result } = renderHook(() => useEstate());
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    await act(async () => {
+      const again = result.current.refresh();
+      release(ok({ estate: serverEstate, perks: perksFromEstate(serverEstate) }));
+      await again;
+    });
+    expect(mockPost.mock.calls.filter((c) => String(c[0]).endsWith('/claim'))).toHaveLength(1);
+  });
+
+  it('given a queued run whose replay response is lost, then it is not replayed again', async () => {
+    window.localStorage.setItem('wordTowerV2.pendingRuns.me', JSON.stringify([RUN]));
+    mockPost.mockRejectedValueOnce(new TypeError('network'));
+    const first = renderHook(() => useEstate());
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    first.unmount();
+    const second = renderHook(() => useEstate());
+    await waitFor(() => expect(second.result.current.status).toBe('ready'));
+    expect(mockPost).toHaveBeenCalledTimes(1);
+  });
+
+  it('given the estate read fails, when a copy was loaded before, then the last known bank is shown, not an empty one', async () => {
+    const first = renderHook(() => useEstate());
+    await waitFor(() => expect(first.result.current.estate.coins).toBe(500));
+    first.unmount();
+    mockGet.mockResolvedValue(ok({ error: 'boom' }, 500));
+    const second = renderHook(() => useEstate());
+    await waitFor(() => expect(second.result.current.status).toBe('error'));
+    expect(second.result.current.estate.coins).toBe(500);
+  });
+});

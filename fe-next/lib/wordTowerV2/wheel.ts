@@ -3,6 +3,7 @@
 import { generateWheel } from '@/lib/wordTower/wordTowerManager';
 import { WORD_TOWER_WHEEL_SIZE as WHEEL_SIZE } from '@/shared/constants/wordTowerConstants';
 import type { Language } from '@/shared/types/game';
+import { isBlockedWord } from './blocked';
 
 /** 2-3 vowels of 7: v1's floor-only rule dealt 4-5, leaving nothing to spell with. */
 const MAX_VOWELS = 3;
@@ -66,6 +67,7 @@ export function isAcceptedWord(word: string, wheel: string[], dict: Set<string> 
   return (
     word.length >= MIN_WORD_LEN &&
     canBuildFromWheel(word, wheel) &&
-    !!dict?.has(word.toUpperCase())
+    !!dict?.has(word.toUpperCase()) &&
+    !isBlockedWord(word)
   );
 }

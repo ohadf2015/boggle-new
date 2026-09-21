@@ -113,6 +113,8 @@ export interface TowerWorld {
   blocks: Map<string, Body>;
   accumulatorMs: number;
   peakHeightPx: number;
+  /** Tallest the tower has EVER stood this run — survives a reviveWorld. */
+  runPeakPx: number;
   collapsed: boolean;
   /** Time the tower has continuously been below its peak, ms. */
   collapseHeldMs: number;
@@ -160,6 +162,7 @@ export function createTowerWorld(_options: CreateWorldOptions): TowerWorld {
     blocks: new Map(),
     accumulatorMs: 0,
     peakHeightPx: 0,
+    runPeakPx: 0,
     collapsed: false,
     collapseHeldMs: 0,
     tallestBlockPx: 0,
@@ -307,6 +310,45 @@ export function weldBelow(world: TowerWorld, keepTop: number): string[] {
   return welded;
 }
 
+/**
+ * The player's emergency brace: steel every landed floor except the top
+ * `keepTop` in place NOW. Unlike weldBelow it does not wait for rest — a brace
+ * is bought exactly when the tower is rocking — so it stops the motion first
+ * and freezes the pose it is in.
+ */
+export function braceTower(world: TowerWorld, keepTop: number): string[] {
+  const live = [...world.blocks].filter(([id, body]) => world.landed.has(id) && !body.isStatic);
+  live.sort((a, b) => a[1].position.y - b[1].position.y);
+  const braced: string[] = [];
+  for (const [id, body] of live.slice(keepTop)) {
+    Body.setVelocity(body, { x: 0, y: 0 });
+    Body.setAngularVelocity(body, 0);
+    Body.setStatic(body, true);
+    braced.push(id);
+  }
+  return braced;
+}
+
+/**
+ * A crash that left part of the building up: clear the rubble (every block
+ * not in `keep` — pass the hanging slab too) and carry on from what stands.
+ * The collapse is disarmed and the running peak re-measured from the stump,
+ * so the NEXT crash is judged against the tower as it is now. `runPeakPx`
+ * keeps the record. Returns where the rubble was, for the dust.
+ */
+export function reviveWorld(world: TowerWorld, keep: Set<string>): Array<{ id: string; x: number; y: number }> {
+  const removed: Array<{ id: string; x: number; y: number }> = [];
+  for (const [id, body] of [...world.blocks]) {
+    if (keep.has(id)) continue;
+    removed.push({ id, x: body.position.x, y: body.position.y });
+    despawnBlock(world, id);
+  }
+  world.collapsed = false;
+  world.collapseHeldMs = 0;
+  world.peakHeightPx = towerHeightPx(world);
+  return removed;
+}
+
 function isSlow(body: Body): boolean {
   return body.speed < REST_SPEED && body.angularSpeed < REST_ANGULAR_SPEED;
 }
@@ -349,6 +391,7 @@ function updateCollapse(world: TowerWorld, simulatedMs: number): void {
 
   if (current > world.peakHeightPx) {
     world.peakHeightPx = current;
+    world.runPeakPx = Math.max(world.runPeakPx, current);
     world.collapseHeldMs = 0;
     return;
   }

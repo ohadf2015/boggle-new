@@ -11,7 +11,8 @@ import { BuildBurst } from './BuildBurst';
 import { DistrictComplete } from './DistrictComplete';
 import { PlotCard } from './PlotCard';
 import { PlotPanel } from './PlotPanel';
-import { ITEM, backdropFor, buildingNameKey, districtProgress, whatsNew } from './estateArt';
+import { ITEM, backdropFor, districtProgress, whatsNew } from './estateArt';
+import { gearFromEstate } from '@/lib/wordTowerV2/gear';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -74,7 +75,9 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
   }, []);
 
   const districtName = t(`wordTowerV2.estate.district.${districtDef(estate.district).id}`);
-  const nameOf = (s: PlotSlot) => t(buildingNameKey(estate.district, s));
+  // Plots are tower parts now: the name is the part, the same in every district.
+  const nameOf = (s: PlotSlot) => t(`wordTowerV2.gear.${s}`);
+  const gear = gearFromEstate(estate);
 
   const act = useCallback(
     async (kind: 'build' | 'repair') => {
@@ -116,6 +119,7 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
               t={t}
               district={estate.district}
               plot={plot}
+              material={gear[s].material}
               name={nameOf(s)}
               // A blueprint could pay for ANY plot, so the tile always quotes
               // coins; the panel is where the free build is offered.

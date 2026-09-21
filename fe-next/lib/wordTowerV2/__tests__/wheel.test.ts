@@ -109,3 +109,23 @@ describe('spinWheel rare letters', () => {
     }
   });
 });
+
+describe('isAcceptedWord — vulgar words never become a floor', () => {
+  it('given a Hebrew slur that IS in the dictionary, when spelled, then it is refused', () => {
+    const wheel = ['מ', 'ז', 'ו', 'י', 'ן', 'ג', 'ד'];
+    const dict = new Set(['מזוין', 'מגדל']);
+    expect(isAcceptedWord('מזוין', wheel, dict)).toBe(false);
+  });
+
+  it('given the same word with a non-final nun, then it is refused too', () => {
+    expect(isAcceptedWord('מזוינ', ['מ', 'ז', 'ו', 'י', 'נ'], new Set(['מזוינ']))).toBe(false);
+  });
+
+  it('given an English swear word in the dictionary, when spelled, then it is refused', () => {
+    expect(isAcceptedWord('shit', ['s', 'h', 'i', 't', 'a'], new Set(['SHIT']))).toBe(false);
+  });
+
+  it('given an ordinary word that contains a blocked one, then it is still accepted', () => {
+    expect(isAcceptedWord('shitake', ['s', 'h', 'i', 't', 'a', 'k', 'e'], new Set(['SHITAKE']))).toBe(true);
+  });
+});

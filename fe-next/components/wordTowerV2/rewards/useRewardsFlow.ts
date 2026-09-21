@@ -72,17 +72,19 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
     onMilestone,
   });
 
-  const { worldRef, labelsRef } = game;
-  // The live world's peak — the number endRun publishes as peakM. Read from the
-  // world, not from `peakM`: that is only set at collapse, so a run banked on
-  // the way OUT (bank) would have reported the previous run's height.
+  const { worldRef, labelsRef, bracesRef } = game;
+  // The run's record height — the number endRun publishes as peakM. Read from
+  // the world, not from `peakM`: that is only set at the end, so a run banked
+  // on the way OUT (bank) would have reported the previous run's height. And
+  // `runPeakPx`, not `peakHeightPx`: a crash re-measures the latter from the stump.
   const readSummary = rewards.getSummary;
   const getSummary = useCallback(
     (): RunSummary => ({
-      ...readSummary(worldRef.current.peakHeightPx / PX_PER_M),
+      ...readSummary(worldRef.current.runPeakPx / PX_PER_M),
+      braces: bracesRef.current.paid,
       tower: towerBlocksFrom(worldRef.current, labelsRef.current),
     }),
-    [readSummary, worldRef, labelsRef],
+    [readSummary, worldRef, labelsRef, bracesRef],
   );
   const { payout, waiting, bank } = useRunPayout({
     over: phase === 'over',

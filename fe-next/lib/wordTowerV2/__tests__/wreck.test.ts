@@ -397,3 +397,10 @@ describe('revengeLedger vs raidVerdict — one swing must not print two differen
     expect(v.headlineCoins).toBe(l.youTook);
   });
 });
+
+describe('sanitizeWords — blocked words', () => {
+  it('given a shared tower with a vulgar word, when sanitised, then it is dropped', async () => {
+    const { sanitizeWords } = await import('../wreck');
+    expect(sanitizeWords(['מגדל', 'מזוין', 'tower'])).toEqual(['מגדל', 'tower']);
+  });
+});

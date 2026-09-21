@@ -50,6 +50,8 @@ export interface RunSummary {
   bestCombo: number;
   crates: number;
   heightM: number;
+  /** Emergency braces BOUGHT this run (free ones are not counted); priced by `braceCost`. */
+  braces?: number;
   tower?: TowerBlock[];
 }
 
@@ -79,6 +81,8 @@ export interface Perks {
   shieldCap: number;
   /** Run score (Landmark). */
   scoreMult: number;
+  /** Emergency braces per run that cost nothing (Steel Braces / insurance). */
+  freeBraces: number;
 }
 
 export type RaidOutcome =
@@ -98,6 +102,10 @@ const MAX_RUN_COINS = 3000;
 const MAX_COINS = 1_000_000_000;
 export const MAX_RAID_CHARGES = 3;
 const MAX_TOKENS = 99;
+export const MAX_BRACES = 5;
+const BRACE_BASE = 40;
+/** A guest bank credited on sign-in is capped per guest run: localStorage is forgeable. */
+const GUEST_COINS_PER_RUN = 1000;
 
 const UPGRADE_BASE = 60;
 const LEVEL_GROWTH = 1.5;
@@ -114,6 +122,7 @@ export const NEUTRAL_PERKS: Perks = {
   coinMult: 1,
   shieldCap: 2,
   scoreMult: 1,
+  freeBraces: 0,
 };
 
 const clampInt = (v: unknown, lo: number, hi: number): number => {
@@ -152,15 +161,31 @@ export function clampRunSummary(raw: Partial<RunSummary>): RunSummary {
     bestCombo: clampInt(raw.bestCombo, 0, perfects),
     crates: clampInt(raw.crates, 0, Math.min(MAX_CRATES, floors)),
     heightM: Math.round(heightM * 10) / 10,
+    braces: clampInt(raw.braces, 0, MAX_BRACES),
     ...(raw.tower ? { tower: decodeTower(raw.tower) } : {}),
   };
 }
 
-export function runCoins(raw: RunSummary, opts: { district?: number; coinMult?: number } = {}): number {
+export function runCoins(raw: RunSummary, opts: { district?: number; coinMult?: number; freeBraces?: number } = {}): number {
   const s = clampRunSummary(raw);
+  const district = opts.district ?? 1;
   const base = 40 + 8 * s.floors + 6 * s.perfects + 5 * s.bestCombo + 10 * s.crates;
   const mult = Math.min(2, Math.max(1, opts.coinMult ?? 1));
-  return Math.min(Math.round(MAX_RUN_COINS * yieldScale(opts.district ?? 1)), Math.round(base * mult * yieldScale(opts.district ?? 1)));
+  const earned = Math.min(Math.round(MAX_RUN_COINS * yieldScale(district)), Math.round(base * mult * yieldScale(district)));
+  const paid = Math.max(0, (s.braces ?? 0) - Math.max(0, opts.freeBraces ?? 0));
+  let spent = 0;
+  for (let n = 1; n <= paid; n += 1) spent += braceCost(n, district);
+  return Math.max(0, earned - spent);
+}
+
+/** Price of the n-th PAID brace in one run (1-based): doubles each time. */
+export function braceCost(n: number, district = 1): number {
+  return Math.round(BRACE_BASE * 2 ** (clampInt(n, 1, MAX_BRACES) - 1) * yieldScale(district));
+}
+
+/** What the next brace costs after `used` this run: free ones first, then braceCost. */
+export function nextBracePrice(used: number, freeBraces: number, district = 1): number {
+  return used < freeBraces ? 0 : braceCost(used - freeBraces + 1, district);
 }
 
 /** 0..1: half height (16 floors = full), half perfect-rate. */
@@ -228,7 +253,7 @@ export function expectedChestCoins(quality: number, district = 1): number {
 export function applyRun(estate: Estate, raw: RunSummary, seed: number): { estate: Estate; coins: number; chest: ChestRoll } {
   const s = clampRunSummary(raw);
   const perks = perksFromEstate(estate);
-  const coins = runCoins(s, { district: estate.district, coinMult: perks.coinMult });
+  const coins = runCoins(s, { district: estate.district, coinMult: perks.coinMult, freeBraces: perks.freeBraces });
   const chest = rollChest(seed, runQuality(s), estate.district);
   const isBest = s.heightM >= estate.bestM;
   const next: Estate = {
@@ -337,7 +362,7 @@ export function advanceDistrict(e: Estate): Estate {
 // ── Perks ────────────────────────────────────────────────────────────────────
 
 /** Levels a slot has earned across the whole empire: finished districts count 5 each. */
-function slotLevels(e: Estate, slot: PlotSlot): number {
+export function slotLevels(e: Estate, slot: PlotSlot): number {
   const p = plotOf(e, slot);
   const here = p ? Math.max(0, p.level - (p.damaged ? 1 : 0)) : 0;
   return (clampDistrict(e.district) - 1) * MAX_PLOT_LEVEL + here;
@@ -359,6 +384,7 @@ export function perksFromEstate(e: Estate): Perks {
     coinMult: r3(1 + Math.min(1, 0.04 * v)),
     shieldCap: NEUTRAL_PERKS.shieldCap + Math.min(3, Math.floor(i / 4)),
     scoreMult: r3(1 + Math.min(0.5, 0.03 * l)),
+    freeBraces: Math.min(3, Math.floor((i + 1) / 2.5)),
   };
 }
 
@@ -426,4 +452,34 @@ export function sanitizeEstate(raw: unknown): Estate {
     lastTower: decodeTower(o.lastTower),
   };
   return { ...base, shields: clampInt(o.shields, 0, perksFromEstate(base).shieldCap) };
+}
+
+// ── Guest -> account ─────────────────────────────────────────────────────────
+
+/** Coins a guest plot's levels cost to build — refunded when the account keeps its own plots. */
+function builtValue(e: Estate): number {
+  let v = 0;
+  for (const p of e.plots) for (let l = 0; l < p.level; l += 1) v += upgradeCost(e.district, p.slot, l);
+  return v;
+}
+
+/**
+ * A guest signs in: what they built signed-out must not vanish. The account
+ * keeps its own plots and district and is credited the guest's coins plus
+ * what the guest's upgrades cost, so they can rebuild at once. Everything
+ * comes from localStorage (forgeable), so plots/district are NEVER adopted —
+ * only coins, capped per guest run.
+ */
+export function mergeGuestEstate(account: Estate, guest: Estate): Estate {
+  if (guest.runs <= 0) return account;
+  const cap = GUEST_COINS_PER_RUN * guest.runs;
+  return sanitizeEstate({
+    ...account,
+    coins: account.coins + Math.min(cap, guest.coins + builtValue(guest)),
+    runs: account.runs + guest.runs,
+    bestM: Math.max(account.bestM, guest.bestM),
+    bricks: account.bricks + guest.bricks,
+    blueprints: account.blueprints + guest.blueprints,
+    shields: account.shields + guest.shields,
+  });
 }

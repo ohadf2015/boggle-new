@@ -53,6 +53,9 @@ export function PlotPanel({ t, estate, slot, name, busy, onUpgrade, onRepair }: 
         )}
       </p>
 
+      {/* Every part is visible in the run — say where to look for it. */}
+      <p className="mt-1 font-neo-display text-xs font-bold leading-snug opacity-80 md:text-sm">{t(`wordTowerV2.gear.see.${slot}`)}</p>
+
       {plot.damaged ? (
         <button
           type="button"

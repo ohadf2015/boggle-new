@@ -27,13 +27,15 @@ export interface ArtSet {
 }
 
 /**
- * Ordered so district 1 (Dockside) gets the harbor theme and district 2 (Old
- * Town) the downtown one — the skyline should agree with the district's name.
+ * Downtown first, then neon, the harbour last: district 1 (Old Town) and 2
+ * (Neon Strip) match their skylines, and the harbour no longer greets every
+ * new player. Only the BACKDROP is read on the workshop screen now — the
+ * five plots are drawn as tower parts (PartArt).
  */
 export const ART_SETS: ArtSet[] = [
-  { id: 'harbor', backdrop: `${BASE}/bg-harbor.webp`, types: ['warehouse', 'boathouse', 'fishmarket', 'lighthouse', 'ferry'] },
   { id: 'downtown', backdrop: `${BASE}/bg-downtown.webp`, types: ['bakery', 'apartments', 'library', 'clocktower', 'garden'] },
   { id: 'neon', backdrop: `${BASE}/bg-neon.webp`, types: ['arcade', 'hotel', 'club', 'radiomast', 'skytower'] },
+  { id: 'harbor', backdrop: `${BASE}/bg-harbor.webp`, types: ['warehouse', 'boathouse', 'fishmarket', 'lighthouse', 'ferry'] },
 ];
 
 export const DAMAGE_OVERLAY = `${BASE}/fx-damaged.webp`;

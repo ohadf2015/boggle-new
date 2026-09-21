@@ -59,7 +59,7 @@ export function V2Dock(p: Props) {
     >
       {p.rejected ? (
         <div className="absolute inset-x-0 top-1 z-40 mx-auto w-fit rounded-neo border-neo border-black bg-neo-red px-3 py-1 font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-shake">
-          {t(`wordTower.error.${p.rejected}`)}
+          {t(p.rejected.includes('.') ? p.rejected : `wordTower.error.${p.rejected}`)}
         </div>
       ) : null}
       <div

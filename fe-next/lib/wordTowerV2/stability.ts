@@ -84,3 +84,66 @@ export function stabilityBand(risk: number): StabilityBand {
   if (risk >= 0.35) return 'wobbly';
   return 'steady';
 }
+
+// ── After a crash: what is still up ─────────────────────────────────────────
+
+export interface IdBlock extends RiskBlock {
+  id: string;
+}
+
+const upright = (b: RiskBlock) => tiltOf(b.angleRad) < TILT_FAIL_RAD;
+const bottomOf = (b: RiskBlock) => b.y + b.heightPx / 2;
+const topOf = (b: RiskBlock) => b.y - b.heightPx / 2;
+
+/**
+ * The floors still standing, ground floor first: an upright floor on the
+ * street, then each upright floor sitting ON the one below it (touching, and
+ * overlapping sideways). Slabs lying in the street next to the building and
+ * anything above a knocked-over floor are not part of it. With `baseId`, the
+ * chain must start from that floor (the run's real first floor), so a slab
+ * that fell flat on the street is never mistaken for the building.
+ */
+export function standingChain(blocks: IdBlock[], baseId?: string): string[] {
+  const sorted = [...blocks].filter(upright).sort((a, b) => b.y - a.y);
+  const grounded = sorted.filter((b) => Math.abs(bottomOf(b)) < b.heightPx * 0.6 && (!baseId || b.id === baseId));
+  let best: IdBlock[] = [];
+  for (const start of grounded) {
+    const chain = [start];
+    for (;;) {
+      const top = chain[chain.length - 1];
+      const next = sorted.find(
+        (b) =>
+          !chain.includes(b) &&
+          Math.abs(bottomOf(b) - topOf(top)) < top.heightPx * 0.5 &&
+          Math.abs(b.x - top.x) < (b.widthPx + top.widthPx) / 2,
+      );
+      if (!next) break;
+      chain.push(next);
+    }
+    if (chain.length > best.length) best = chain;
+  }
+  return best.map((b) => b.id);
+}
+
+/** Signed sideways lean: centre of the load above the ground floor minus the ground floor's centre (px). */
+export function towerLean(blocks: RiskBlock[]): number {
+  const stack = column(blocks);
+  if (stack.length < 2) return 0;
+  let mass = 0;
+  let moment = 0;
+  for (const f of stack.slice(1)) {
+    mass += f.widthPx;
+    moment += f.widthPx * f.x;
+  }
+  return moment / mass - stack[0].x;
+}
+
+/**
+ * A floor that landed on the far side of a lean and pulled the load back over
+ * the base. `offset` is where it landed relative to the ground floor's centre.
+ */
+export function isCounterweight(leanBefore: number, leanAfter: number, offset: number, baseHalfW: number): boolean {
+  if (Math.abs(leanBefore) < baseHalfW * 0.15) return false;
+  if (Math.sign(offset) !== -Math.sign(leanBefore)) return false;
+  return Math.abs(leanAfter) <= Math.abs(leanBefore) * 0.6;
+}

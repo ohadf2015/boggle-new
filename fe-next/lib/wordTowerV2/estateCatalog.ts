@@ -29,15 +29,18 @@ export interface DistrictDef {
 
 /** [district id, [foundation, craneYard, vault, insurance, landmark] building ids]. */
 const RAW: Array<[string, [string, string, string, string, string]]> = [
-  ['dockside', ['pier-footings', 'dock-crane', 'fish-market', 'lighthouse', 'ferry-terminal']],
+  // Harbour districts sit deep in the run on purpose: district 1 used to be
+  // Dockside, and since it takes ~15-20 runs to finish, every player's whole
+  // empire was a fishing port.
   ['old-town', ['stone-cellar', 'timber-hoist', 'guild-bank', 'watch-house', 'clock-tower']],
+  ['neon-strip', ['steel-piles', 'neon-rig', 'arcade-vault', 'security-hub', 'neon-tower']],
   ['market-row', ['brick-arcade', 'cargo-lift', 'bazaar', 'fire-station', 'grand-bazaar-dome']],
   ['garden-heights', ['terrace-walls', 'garden-crane', 'greenhouse-bank', 'rain-shelter', 'botanic-spire']],
   ['rail-yard', ['rail-bed', 'gantry-crane', 'freight-depot', 'signal-box', 'central-station']],
-  ['neon-strip', ['steel-piles', 'neon-rig', 'arcade-vault', 'security-hub', 'neon-tower']],
-  ['harbor-lights', ['sea-wall', 'container-crane', 'customs-house', 'coast-guard', 'harbor-bridge']],
   ['glass-quarter', ['deep-caissons', 'tower-crane', 'trading-floor', 'insurance-tower', 'glass-pyramid']],
+  ['dockside', ['pier-footings', 'dock-crane', 'fish-market', 'lighthouse', 'ferry-terminal']],
   ['sky-gardens', ['sky-anchors', 'sky-hoist', 'cloud-bank', 'storm-shield', 'hanging-gardens']],
+  ['harbor-lights', ['sea-wall', 'container-crane', 'customs-house', 'coast-guard', 'harbor-bridge']],
   ['summit', ['bedrock-core', 'summit-crane', 'golden-vault', 'aegis-dome', 'word-spire']],
 ];
 
