@@ -61,6 +61,7 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
         description={content.description}
         features={content.features}
         faq={content.faq}
+        collapsible
       />
     </>
   );

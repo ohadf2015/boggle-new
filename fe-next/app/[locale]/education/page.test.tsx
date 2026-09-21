@@ -46,4 +46,19 @@ describe('education main page', () => {
       expect(details?.querySelector('summary h2')?.textContent?.trim()).toBeTruthy();
     });
   });
+
+  /**
+   * The hub's SEO card (title, description, features, a second FAQ) rendered
+   * fully open at the very bottom — 2.2 screens at 390px, after the page's own
+   * FAQ. GamePageSeoContent already has a `collapsible` mode built for this;
+   * the content stays in the server HTML either way.
+   */
+  it('collapses the SEO card behind a closed <details>, content still in the HTML', async () => {
+    const { container } = render(await Page({ params: Promise.resolve({ locale: 'en' }) }));
+    const card = [...container.querySelectorAll('details')].find((d) =>
+      d.textContent?.includes('Free Vocabulary Games for the Classroom'),
+    );
+    expect(card).toBeDefined();
+    expect(card?.hasAttribute('open')).toBe(false);
+  });
 });
