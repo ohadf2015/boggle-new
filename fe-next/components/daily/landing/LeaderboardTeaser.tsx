@@ -9,6 +9,7 @@ import { DAILY_MODES, type DailyModeId } from '@/lib/dailyModes';
 import type { MergedLeaderboardEntry } from '@/lib/daily/mergeDailyLeaderboard';
 import type { Language } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 
 interface LeaderboardTeaserProps {
   currentLanguage: Language;
@@ -57,8 +58,13 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
       setLoading(true);
       try {
         const today = new Date().toISOString().split('T')[0];
+        // Every language: the hub is mounted in the UI locale, so a Hebrew solve
+        // was invisible from an English hub. `fp` lets the server find a guest
+        // viewer's own row (a signed-in viewer is found by their session).
+        const fp = await getGuestFingerprint().catch(() => '');
         const res = await fetch(
-          `/api/daily/leaderboard?date=${today}&lang=${currentLanguage}&limit=3`,
+          `/api/daily/leaderboard?date=${today}&lang=all&limit=3${fp ? `&fp=${encodeURIComponent(fp)}` : ''}`,
+          { cache: 'no-store' },
         );
         const json = res.ok ? await res.json() : null;
         if (cancelled) return;
@@ -72,7 +78,7 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
 
     fetchLeaderboard();
     return () => { cancelled = true; };
-  }, [currentLanguage]);
+  }, []);
 
   return (
     <div
@@ -119,6 +125,7 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
                 <button
                   type="button"
                   data-testid={`leaderboard-row-${entry.rank}`}
+                  data-you={entry.isYou ? 'true' : undefined}
                   aria-expanded={isOpen}
                   onClick={() => setExpanded(isOpen ? null : entry.rank)}
                   className={cn(
@@ -126,10 +133,16 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
                     'hover:bg-white/5 transition-colors cursor-pointer',
                     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
                     entry.rank === 1 && 'bg-neo-lime/[0.04]',
+                    entry.isYou && 'bg-neo-cyan/10 ring-2 ring-inset ring-neo-cyan',
                   )}
                 >
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-base leading-none" aria-hidden="true">{style.medal}</span>
+                    {style.medal ? (
+                      <span className="text-base leading-none" aria-hidden="true">{style.medal}</span>
+                    ) : (
+                      // Outside the podium (the viewer's own row): the real rank.
+                      <span className="min-w-5 text-xs font-black tabular-nums text-neo-cyan">#{entry.rank}</span>
+                    )}
                     <div className={cn(
                       'rounded-full border-2 border-black/40 shrink-0 overflow-hidden',
                       entry.rank === 1 && 'ring-2 ring-neo-lime/60',
@@ -146,8 +159,18 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
                     <div className="text-sm font-bold text-white truncate">
                       {entry.name || t('daily.aPlayer')}
                     </div>
-                    <div className="text-[10px] text-slate-400">
-                      {t('daily.modesPlayedCount', { count: entry.playedModes.length })}
+                    {/* Each game's REAL score, beside the combined total — the total
+                        alone (with tower metres converted to points) read as
+                        points nobody actually scored. */}
+                    <div className="flex flex-wrap items-center gap-x-2 text-[10px] text-slate-400 tabular-nums">
+                      {DAILY_MODES.filter((m) => entry.playedModes?.includes(m.id)).map((m) => (
+                        <span key={m.id} className="inline-flex items-center gap-1" title={t(m.titleKey)}>
+                          <span className={cn('w-1.5 h-1.5 rounded-full', MODE_DOT[m.id])} aria-hidden="true" />
+                          {m.id === 'word-tower' && entry.towerHeightM != null
+                            ? `${Math.round(entry.towerHeightM)}m`
+                            : (entry.byMode?.[m.id] ?? 0).toLocaleString()}
+                        </span>
+                      ))}
                     </div>
                   </div>
 

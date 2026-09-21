@@ -116,4 +116,31 @@ describe('mergeDailyLeaderboard', () => {
     expect(mergeDailyLeaderboard([])).toEqual([]);
     expect(mergeDailyLeaderboard([{ mode: 'word-hunt', rows: [] }])).toEqual([]);
   });
+
+  describe('the caller\'s own row', () => {
+    const board: MergeInput[] = [
+      { mode: 'word-hunt', rows: [hunt('p1', 900), hunt('p2', 800), hunt('p3', 700), hunt('zz-me-uuid', 100)] },
+    ];
+
+    it('appends the caller with their TRUE rank when they are outside the limit', () => {
+      const rows = mergeDailyLeaderboard(board, 2, { you: 'u:zz-me-uuid' });
+      expect(rows.map((r) => r.rank)).toEqual([1, 2, 4]);
+      expect(rows[2].isYou).toBe(true);
+      expect(rows.slice(0, 2).every((r) => !r.isYou)).toBe(true);
+    });
+
+    it('flags the caller in place, without a duplicate, when they are inside the limit', () => {
+      const rows = mergeDailyLeaderboard(board, 10, { you: 'g:none' });
+      expect(rows).toHaveLength(4);
+      expect(rows.some((r) => r.isYou)).toBe(false);
+      const withMe = mergeDailyLeaderboard(board, 10, { you: 'u:zz-me-uuid' });
+      expect(withMe.filter((r) => r.isYou)).toHaveLength(1);
+      expect(withMe).toHaveLength(4);
+    });
+
+    it('still returns no identifier for the caller\'s row', () => {
+      const [, , mine] = mergeDailyLeaderboard(board, 2, { you: 'u:zz-me-uuid' });
+      expect(JSON.stringify(mine)).not.toContain('zz-me-uuid');
+    });
+  });
 });

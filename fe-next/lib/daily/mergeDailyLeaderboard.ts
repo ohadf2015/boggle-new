@@ -42,6 +42,8 @@ export interface MergedLeaderboardEntry {
   towerHeightM: number | null;
   /** Modes actually played today (byMode is 0 for both "unplayed" and "scored 0"). */
   playedModes: DailyModeId[];
+  /** The caller's own row — set only when `opts.you` matched. */
+  isYou?: boolean;
 }
 
 /* No `key` field on purpose. An earlier draft carried the group key (`u:<uuid>`
@@ -84,7 +86,7 @@ const EMPTY_BY_MODE = (): Record<DailyModeId, number> => ({
 });
 
 /** Group key: a real account first, else the guest fingerprint. */
-function identityOf(row: ModeResultRow): string | null {
+export function identityOf(row: ModeResultRow): string | null {
   if (row.player_id) return `u:${row.player_id}`;
   if (row.guest_fingerprint) return `g:${row.guest_fingerprint}`;
   return null;
@@ -99,7 +101,11 @@ export interface MergeInput {
  * @param inputs one entry per mode; a mode with no rows may be omitted.
  * @param limit  how many entries to return, highest total first.
  */
-export function mergeDailyLeaderboard(inputs: MergeInput[], limit = 10): MergedLeaderboardEntry[] {
+export function mergeDailyLeaderboard(
+  inputs: MergeInput[],
+  limit = 10,
+  opts: { you?: string | null } = {},
+): MergedLeaderboardEntry[] {
   const byIdentity = new Map<string, Omit<MergedLeaderboardEntry, 'rank'>>();
 
   for (const { mode, rows } of inputs) {
@@ -147,8 +153,18 @@ export function mergeDailyLeaderboard(inputs: MergeInput[], limit = 10): MergedL
     }
   }
 
-  return Array.from(byIdentity.values())
-    .sort((a, b) => b.total - a.total || b.playedModes.length - a.playedModes.length)
-    .slice(0, Math.max(0, limit))
-    .map((entry, i) => ({ ...entry, rank: i + 1 }));
+  const ranked = Array.from(byIdentity.entries())
+    .sort(([, a], [, b]) => b.total - a.total || b.playedModes.length - a.playedModes.length)
+    .map(([identity, entry], i) => ({
+      ...entry,
+      rank: i + 1,
+      ...(opts.you && identity === opts.you ? { isYou: true } : {}),
+    }));
+
+  // A top-N board never shows a player ranked below N — so the one person
+  // looking at it could finish today and not find themselves. Their own row
+  // rides along with its TRUE rank; the identity used to find it is not echoed.
+  const top = ranked.slice(0, Math.max(0, limit));
+  const mine = ranked.find((e) => e.isYou);
+  return mine && mine.rank > top.length ? [...top, mine] : top;
 }

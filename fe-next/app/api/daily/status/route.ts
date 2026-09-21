@@ -9,7 +9,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createRequestClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 import { computeCurrentStreak } from '@/lib/daily/weeklyChest';
 import { freezeDateToBridge } from '@/lib/daily/chestFreezeBridge';
@@ -47,10 +48,6 @@ const DEFAULT_STATUS: DailyPlayedStatus = {
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    if (!supabase) {
-      return NextResponse.json({ ...DEFAULT_STATUS }, { status: 500 });
-    }
-
     const today = getDailyChallengeDate();
     const userId = request.nextUrl.searchParams.get('userId');
     const guestFingerprint = request.nextUrl.searchParams.get('fingerprint');
@@ -61,17 +58,26 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Authed user
     if (userId) {
+      // Request-scoped client: the browser client (`@/lib/supabase`) has no
+      // cookies on the server, so it saw every caller as anonymous and 401'd
+      // every logged-in player — the results CTA then sat on its skeleton.
+      const { supabase: requestClient, token } = await createRequestClient(request);
       const {
         data: { user },
         error: authError,
-      } = await supabase.auth.getUser();
+      } = await requestClient.auth.getUser(token ?? undefined);
 
       if (authError || !user || user.id !== userId) {
-        return NextResponse.json({ ...DEFAULT_STATUS }, { status: 401 });
+        return NextResponse.json({ ...DEFAULT_STATUS, loading: false }, { status: 401 });
       }
 
+      // Reads go through the admin client, filtered by the VERIFIED id:
+      // `daily_puzzle_streaks` has no SELECT policy, so a user-scoped read
+      // returns 0 rows with error:null and the longest streak reads as 0.
+      const supabase = createAdminClient() ?? requestClient;
+
       // Fetch all attempts across modes (NO is_catchup)
-      const [huntRows, wheelRows, connectionRows, freezeCount] = await Promise.all([
+      const [huntRows, wheelRows, towerRows, connectionRows, freezeCount] = await Promise.all([
         supabase
           .from('daily_word_hunt_attempts')
           .select('puzzle_date')
@@ -83,6 +89,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           .select('puzzle_date')
           .eq('player_id', userId)
           .eq('is_catchup', false)
+          .then(({ data }) => data?.map((r) => r.puzzle_date) ?? []),
+        supabase
+          .from('daily_word_tower_attempts')
+          .select('puzzle_date')
+          .eq('player_id', userId)
           .then(({ data }) => data?.map((r) => r.puzzle_date) ?? []),
         supabase
           .from('connections_daily_scores')
@@ -129,7 +140,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         today: {
           wordHunt: huntRows.includes(today),
           wordWheel: wheelRows.includes(today),
-          wordTower: false, // Word Tower is off-limits, but queried for completeness
+          wordTower: towerRows.includes(today),
           connections: connectionRows.includes(today),
         },
         streak: {

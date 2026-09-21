@@ -73,6 +73,25 @@ export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Pro
   const isMounted = useRef(true);
   const isFetching = useRef(false);
 
+  // Server unreachable/refused: stop the skeleton (it used to wait forever) and
+  // fall back to this device's played flags, so the CTA never points at a mode
+  // the player just finished.
+  const settleFromLocal = useCallback(() => {
+    if (!isMounted.current) return;
+    let local: DailyPlayedStatus['today'] | null = null;
+    try { local = getGuestPlayedStatus().today; } catch { /* storage disabled */ }
+    setStatus((prev) => ({
+      ...prev,
+      today: {
+        wordHunt: prev.today.wordHunt || !!local?.wordHunt,
+        wordWheel: prev.today.wordWheel || !!local?.wordWheel,
+        wordTower: prev.today.wordTower || !!local?.wordTower,
+        connections: prev.today.connections || !!local?.connections,
+      },
+      loading: false,
+    }));
+  }, []);
+
   const fetchStatus = useCallback(async () => {
     if (!playerId || isFetching.current) return;
     isFetching.current = true;
@@ -83,7 +102,8 @@ export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Pro
       });
 
       if (!response.ok) {
-        isFetching.current = false;
+        console.warn('[useDailyPlayedStatus] status', response.status);
+        settleFromLocal();
         return;
       }
 
@@ -94,10 +114,11 @@ export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Pro
       }
     } catch (error) {
       console.error('[useDailyPlayedStatus] fetch error:', error);
+      settleFromLocal();
     } finally {
       isFetching.current = false;
     }
-  }, [playerId]);
+  }, [playerId, settleFromLocal]);
 
   // Initial load
   useEffect(() => {

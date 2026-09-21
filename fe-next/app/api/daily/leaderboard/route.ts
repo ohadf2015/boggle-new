@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { createRequestClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 import { mergeDailyLeaderboard, type MergeInput } from '@/lib/daily/mergeDailyLeaderboard';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
- * GET /api/daily/leaderboard?date=YYYY-MM-DD&lang=en&limit=10
+ * GET /api/daily/leaderboard?date=YYYY-MM-DD&lang=en|all&limit=10[&fp=<guest fingerprint>]
+ *
+ * `lang=all` merges every language's puzzle — the hub is mounted in the UI
+ * locale, so a player who solved today's Hebrew puzzle from an English hub was
+ * otherwise missing from it. The caller (session user, or guest `fp`) gets their
+ * own row flagged `isYou`, appended with its true rank when outside the top N.
  *
  * One board for the whole daily challenge: every mode's result for that day,
  * merged per player, with a per-mode breakdown.
@@ -45,19 +51,17 @@ export async function GET(request: NextRequest) {
     // not carry. Connections is the exception — `connections_daily_leaderboard`
     // strips identity entirely, so its rows can only be attributed to a player
     // via the base table.
-    const [hunt, wheel, tower, connections] = await Promise.allSettled([
-      admin.from('daily_word_hunt_leaderboard')
-        .select(`${identity}, avatar_image, efficiency_score`)
-        .eq('puzzle_date', date).eq('language', lang).limit(PER_MODE_CAP),
-      admin.from('daily_word_wheel_leaderboard')
-        .select(`${identity}, avatar_image, score`)
-        .eq('puzzle_date', date).eq('language', lang).limit(PER_MODE_CAP),
-      admin.from('daily_word_tower_leaderboard')
-        .select(`${identity}, best_height_m`)
-        .eq('puzzle_date', date).eq('language', lang).limit(PER_MODE_CAP),
-      admin.from('connections_daily_scores')
-        .select('player_id, guest_fingerprint, display_name, avatar_emoji, avatar_color, avatar_image, score')
-        .eq('puzzle_date', date).eq('language', lang).limit(PER_MODE_CAP),
+    const read = (table: string, columns: string) => {
+      const q = admin.from(table).select(columns).eq('puzzle_date', date);
+      return (lang === 'all' ? q : q.eq('language', lang)).limit(PER_MODE_CAP);
+    };
+
+    const [hunt, wheel, tower, connections, you] = await Promise.allSettled([
+      read('daily_word_hunt_leaderboard', `${identity}, avatar_image, efficiency_score`),
+      read('daily_word_wheel_leaderboard', `${identity}, avatar_image, score`),
+      read('daily_word_tower_leaderboard', `${identity}, best_height_m`),
+      read('connections_daily_scores', 'player_id, guest_fingerprint, display_name, avatar_emoji, avatar_color, avatar_image, score'),
+      callerIdentity(request, url.searchParams.get('fp')),
     ]);
 
     // One mode failing must not blank the whole board — the others still stand.
@@ -76,14 +80,25 @@ export async function GET(request: NextRequest) {
       { mode: 'connections', rows: withValue(rowsOf(connections), 'score') },
     ];
 
-    const entries = mergeDailyLeaderboard(inputs, limit);
+    const entries = mergeDailyLeaderboard(inputs, limit, {
+      you: you.status === 'fulfilled' ? you.value : null,
+    });
 
-    return NextResponse.json(
-      { data: entries },
-      { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } },
-    );
+    // Personalised (isYou) and read right after a player finishes — a shared
+    // 60s cache showed the board from before their result landed.
+    return NextResponse.json({ data: entries }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/daily/leaderboard');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
+}
+
+/** The caller's group key (see `identityOf`): the session user, else the guest fingerprint. */
+async function callerIdentity(request: NextRequest, fp: string | null): Promise<string | null> {
+  try {
+    const { supabase, token } = await createRequestClient(request);
+    const { data } = await supabase.auth.getUser(token ?? undefined);
+    if (data?.user?.id) return `u:${data.user.id}`;
+  } catch { /* anonymous */ }
+  return fp ? `g:${fp}` : null;
 }
