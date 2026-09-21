@@ -59,4 +59,31 @@ describe('TrialUrgencyBanner', () => {
     const cta = screen.getByRole('link');
     expect(cta).toHaveAttribute('href', expect.stringContaining('/teacher/upgrade'));
   });
+
+  it('does not render a dismiss control unless the caller provided one', () => {
+    render(<TrialUrgencyBanner trial={mk({ daysLeft: 5 })} />);
+    expect(screen.queryByTestId('trial-urgency-banner-dismiss')).toBeNull();
+  });
+
+  it('keeps the activation CTA on /teacher when this is not the upgrade nudge', () => {
+    render(<TrialUrgencyBanner trial={mk({ daysLeft: 10 })} />);
+    expect(screen.getByTestId('trial-urgency-banner-cta')).toHaveAttribute('href', '/en/teacher');
+    expect(screen.getByTestId('trial-urgency-banner-cta')).toHaveTextContent('education.trial.cta');
+  });
+
+  it('is dismissible and sends the 7-day nudge CTA to Polar checkout', () => {
+    const onDismiss = vi.fn();
+    render(
+      <TrialUrgencyBanner
+        trial={mk({ daysLeft: 5, isUrgent: false })}
+        onDismiss={onDismiss}
+        ctaLabel="Upgrade to Teacher Pro"
+      />,
+    );
+    const cta = screen.getByTestId('trial-urgency-banner-cta');
+    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(cta).toHaveTextContent('Upgrade to Teacher Pro');
+    screen.getByTestId('trial-urgency-banner-dismiss').click();
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
 });

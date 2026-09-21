@@ -4,6 +4,7 @@ import {
   TeacherProCheckoutCta,
   TEACHER_PRO_CHECKOUT_PATH,
   teacherProCheckoutCtaLabel,
+  teacherProUpgradeCtaLabel,
 } from '../TeacherProCheckoutCta';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 
@@ -29,5 +30,12 @@ describe('TeacherProCheckoutCta', () => {
       'href',
       `/he${TEACHER_PRO_CHECKOUT_PATH}`,
     );
+  });
+
+  it('names the in-product upgrade CTA "Upgrade to Teacher Pro"', () => {
+    expect(teacherProUpgradeCtaLabel('en')).toBe('Upgrade to Teacher Pro');
+    expect(teacherProUpgradeCtaLabel('he')).not.toBe('Upgrade to Teacher Pro');
+    expect(teacherProUpgradeCtaLabel('HE-IL')).toBe(teacherProUpgradeCtaLabel('he'));
+    expect(teacherProUpgradeCtaLabel('xx')).toBe('Upgrade to Teacher Pro');
   });
 });
