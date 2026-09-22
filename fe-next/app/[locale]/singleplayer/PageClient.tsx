@@ -3,6 +3,7 @@
 import React, { Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { retryImport } from '@/utils/retryImport';
 
 // Dynamic — PlayfulBackground pulls in framer-motion, which otherwise blocks
 // first paint before the SinglePlayerView chunk even starts downloading.
@@ -21,11 +22,16 @@ function LoadingFallback(): React.JSX.Element {
   );
 }
 
-// Dynamic import for code splitting
-const SinglePlayerView = nextDynamic(() => import('@/components/singleplayer/SinglePlayerView'), {
-  loading: LoadingFallback,
-  ssr: false,
-});
+// Dynamic import for code splitting. retryImport so a stale-deploy / flaky
+// network ChunkLoadError retries then cache-busts instead of freezing
+// "Loading single player..." (the board is ssr:false — it cannot SSR).
+const SinglePlayerView = nextDynamic(
+  retryImport(() => import('@/components/singleplayer/SinglePlayerView')),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  },
+);
 
 /**
  * Single Player page route

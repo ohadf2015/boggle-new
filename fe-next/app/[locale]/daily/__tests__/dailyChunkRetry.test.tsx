@@ -22,7 +22,8 @@ describe('daily-mode pages harden their lazy game-chunk load', () => {
   it.each([
     ['word-wheel', () => import('../word-wheel/page')],
     ['word-hunt', () => import('../word-hunt/page')],
-    ['daily hub', () => import('../page')],
+    // Hub is a static DailyRedirect import (SSR quest cards). Lazy+loader
+    // made /en/daily SSR "Loading Daily Challenge..." and React #419.
   ])('%s routes its game chunk through retryImport', async (_name, load) => {
     await load();
 
