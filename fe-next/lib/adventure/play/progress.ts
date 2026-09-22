@@ -2,7 +2,7 @@
  * Adventure progression rules — pure, the single source for BOTH the world map
  * (what looks unlocked) and the server (what may be played / what is granted).
  */
-import { BOSS_LEVEL } from './levels';
+import { BOSS_LEVEL, WORLD_COUNT } from './levels';
 
 export interface Completion {
   world: number;
@@ -18,6 +18,17 @@ export function canPlayLevel(completions: Completion[], world: number, level: nu
   if (level > 1) return starsAt(completions, world, level - 1) > 0;
   if (world === 1) return true;
   return starsAt(completions, world - 1, BOSS_LEVEL) > 0;
+}
+
+/**
+ * The world a run should open in: the furthest one whose boss still stands.
+ * A branching run clears only the LevelSpec slots its path touched, so "every
+ * slot cleared" is never how a world ends — the boss falling is.
+ */
+export function nextRunWorld(completions: Completion[]): number {
+  let w = 1;
+  while (w < WORLD_COUNT && starsAt(completions, w, BOSS_LEVEL) > 0) w += 1;
+  return w;
 }
 
 export const WORLD_SKIN_ITEM = (world: number) => `boss-trophy-w${world}`;

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo, useCallback, memo } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback, useState, memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css';
-import { canPlayLevel } from '@/lib/adventure/play/progress';
+import { canPlayLevel, nextRunWorld } from '@/lib/adventure/play/progress';
+import { readRun } from './play/runStorage';
 import { Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,7 +17,6 @@ import {
   getWorldUnlockRequirement,
   WORLD_CONFIGS,
 } from '@/lib/adventure';
-import { getNextUnlockedLevel } from '@/lib/adventure/constants';
 import { WorldMapBackground } from './WorldMapBackground';
 import { TrailPath } from './WorldMapDecorations';
 import { WorldNode } from './WorldMapNode';
@@ -147,32 +147,23 @@ const WorldMap = memo(function WorldMap({
     return max;
   }, [worldsData]);
 
-  // Derive next world to play: first unlocked but not fully completed
-  const nextWorldId = useMemo(() => {
-    for (let i = worldsData.length - 1; i >= 0; i--) {
-      const d = worldsData[i];
-      if (d.isUnlocked && d.completedLevels < LEVELS_PER_WORLD) {
-        return d.world.id;
-      }
-    }
-    return null;
-  }, [worldsData]);
-
-  // Next level for the continue button
-  const nextLevel = useMemo(() => {
-    if (!nextWorldId) return null;
-    return getNextUnlockedLevel(nextWorldId, completions);
+  // The world the next run opens in: the furthest one whose boss still stands.
+  // It used to be the first world with a LevelSpec slot un-cleared, which a
+  // branching run never fills — so beating world 1's boss kept "Continue" on world 1.
+  const nextWorldId = useMemo(() => nextRunWorld(completions), [completions]);
+  const nextWorldConfig = WORLD_CONFIGS.find(w => w.id === nextWorldId) ?? null;
+  // A run in progress there says which floor it stands on; otherwise it is a new run.
+  // Read after mount (localStorage), and again whenever the hub re-renders with new progress.
+  const [runFloorStep, setRunFloorStep] = useState<number | null>(null);
+  useEffect(() => {
+    const steps = readRun(nextWorldId)?.run.path.length ?? 0;
+    setRunFloorStep(steps > 0 ? steps : null);
   }, [nextWorldId, completions]);
 
-  const nextWorldConfig = nextLevel ? WORLD_CONFIGS.find(w => w.id === nextLevel.world) : null;
-
   const handleContinue = useCallback(() => {
-    if (nextLevel && onContinue) {
-      onContinue(nextLevel.world, nextLevel.level);
-    } else if (nextLevel) {
-      onWorldSelect(nextLevel.world);
-    }
-  }, [nextLevel, onContinue, onWorldSelect]);
+    if (onContinue) onContinue(nextWorldId, 1);
+    else onWorldSelect(nextWorldId);
+  }, [nextWorldId, onContinue, onWorldSelect]);
 
   return (
     <div
@@ -238,7 +229,7 @@ const WorldMap = memo(function WorldMap({
       </div>
 
       {/* Floating Continue Button */}
-      {nextLevel && nextWorldConfig && (
+      {nextWorldConfig && (
         <div className="sticky bottom-4 z-30 w-[90%] max-w-xs mx-auto">
           <AdaptiveMotion.button
             initial={{ opacity: 0, y: 20 }}
@@ -258,7 +249,7 @@ const WorldMap = memo(function WorldMap({
             <div className="flex flex-col items-start">
               <span>{t('adventure.hub.continue')}</span>
               <span className="text-[11px] font-bold opacity-70 normal-case">
-                {t(`adventure.worlds.${nextWorldConfig.name}`)} — {t('adventure.level')} {nextLevel.level}
+                {t(`adventure.worlds.${nextWorldConfig.name}`)} — {runFloorStep ? t('adventurePlay.map.depth', { step: runFloorStep }) : t('adventurePlay.map.newRun')}
               </span>
             </div>
             <Play className="w-5 h-5 fill-neo-black" />

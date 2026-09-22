@@ -35,6 +35,19 @@ describe('V2Results', () => {
     expect(screen.getByText('wordTowerV2.ach.lucky.name')).toBeTruthy();
   });
 
+  it('given a recap image, when shown, then it is a graphic not an emoji row', () => {
+    render(<V2Results {...base} recapSrc="/api/word-tower/share?h=18&f=6" onRestart={() => {}} />);
+    const img = screen.getByRole('img');
+    expect(img.getAttribute('src')).toContain('/api/word-tower/share');
+  });
+
+  it('given the daily lock and a rank, when shown, then play again is hidden and the rank is shown', () => {
+    render(<V2Results {...base} dailyLocked dailyRank={4} onRestart={() => {}} />);
+    expect(screen.queryByText('common.playAgain')).toBeNull();
+    expect(screen.getByText('wordTowerV2.dailyPlayed')).toBeTruthy();
+    expect(screen.getByText('wordTowerV2.dailyRank:4')).toBeTruthy();
+  });
+
   it('given badges still locked, when shown, then the closest one is offered as the next goal', () => {
     render(<V2Results {...base} onRestart={() => {}} />);
     expect(screen.getByText('wordTowerV2.results.nextGoal')).toBeTruthy();

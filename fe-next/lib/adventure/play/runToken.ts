@@ -106,11 +106,19 @@ export function publicRun(run: RunPayload): PublicRun {
 
 const emptyPotions = (): Record<PotionId, number> => ({ heal: 0, time: 0, cleanse: 0, insight: 0 });
 
-export function freshRun(world: number, userId: string, seed: string): RunPayload {
-  const maxHp = maxHpFor([]);
+/**
+ * A new run. `carry` is the previous run (already verified): its relics and
+ * potions come along so a new run — after a death, or into the next world —
+ * does not throw the haul away. Hearts, map, gold and rest upgrades start over.
+ */
+export function freshRun(world: number, userId: string, seed: string, carry?: Pick<RunPayload, 'relics' | 'potions'>): RunPayload {
+  const relics = carry ? [...carry.relics] : [];
+  const potions = { ...emptyPotions(), ...carry?.potions };
+  potions.heal = Math.max(1, potions.heal);
+  const maxHp = maxHpFor(relics);
   return {
     v: RUN_VERSION, u: userId, w: world, step: 1, node: null, path: [],
-    hp: maxHp, maxHp, relics: [], potions: { ...emptyPotions(), heal: 1 }, gold: 0, seed,
+    hp: maxHp, maxHp, relics, potions, gold: 0, seed,
   };
 }
 

@@ -28,7 +28,7 @@ describe('RunHud — a rival winding up never reflows the screen', () => {
   it('Given an ordinary fight whose rival is telegraphing, then the band grows no alert row or deflect button', () => {
     // The board below is sized to what the band leaves over: a row appearing
     // here pushed the stage down and SHRANK the grid mid-attack.
-    render(<RunHud hp={5} maxHp={5} gold={0} combat={telegraphing()} dispatchCombat={() => {}}
+    render(<RunHud hp={5} maxHp={5} combat={telegraphing()} dispatchCombat={() => {}}
       potionsLeft={noPotions} onPotion={() => true} goal={null} playing combatControls />);
     expect(screen.queryByRole('alert')).toBeNull();
     expect(screen.queryByText('adventurePlay.incoming')).toBeNull();
@@ -36,7 +36,7 @@ describe('RunHud — a rival winding up never reflows the screen', () => {
   });
 
   it('Given the run bar, then the hearts are the landing spot for the rival\'s shot', () => {
-    const { container } = render(<RunHud hp={3} maxHp={5} gold={0} combat={null} dispatchCombat={() => {}}
+    const { container } = render(<RunHud hp={3} maxHp={5} combat={null} dispatchCombat={() => {}}
       potionsLeft={noPotions} onPotion={() => true} goal={null} playing />);
     expect(container.querySelector('[data-player-hearts]')).not.toBeNull();
   });

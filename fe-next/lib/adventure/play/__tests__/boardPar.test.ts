@@ -94,12 +94,16 @@ describe('tuneToBoard', () => {
   });
 
   it('given the first fights of world 1 on a median board, when tuned, then a casual handful of short words clears them', () => {
-    // ~10 three/four-letter words (10-20 pts each) in 90s.
+    // A casual phone player finds ~6-8 three/four-letter words (10-20 pts each) in 90s.
+    // At 145 to pass / 230 to K.O. (the 09-21 curve on a Hebrew board) the opener walled them.
     for (const l of [1, 2, 3]) {
       const t = medianFor(1, l);
-      expect(t.stars[0]).toBeLessThanOrEqual(150);
-      expect(t.stars[0]).toBeGreaterThanOrEqual(50);
+      expect(t.stars[0]).toBeLessThanOrEqual(80);
+      expect(t.stars[0]).toBeGreaterThanOrEqual(40);
+      expect(t.stars[2]).toBeLessThanOrEqual(130); // the rival's HP
     }
+    expect(medianFor(1, ELITE_LEVEL).enemyHp!).toBeLessThanOrEqual(90);
+    expect(medianFor(1, BOSS_LEVEL).enemyHp!).toBeLessThanOrEqual(110);
   });
 
   it('given a fixed board, when walked world by world, then the clear bar only rises (difficulty grows)', () => {

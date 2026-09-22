@@ -14,7 +14,10 @@ import { biomeAt, floorsAt } from '@/lib/wordTowerV2/biomes';
 import { impactThunk } from '@/lib/wordTowerV2/juice';
 import { MIN_WORD_LEN, isAcceptedWord, spinWheel } from '@/lib/wordTowerV2/wheel';
 import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
-import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/reviewHooks';
+import { v2DailyNumericSeed, v2DailySeed } from '@/lib/wordTowerV2/daily';
+import { saveRunSnapshot } from '@/lib/wordTowerV2/runPersist';
+import { v2ShareCardPath } from '@/lib/wordTowerV2/shareCard';
+import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { type TowerGear, gearFromEstate } from '@/lib/wordTowerV2/gear';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
@@ -32,6 +35,7 @@ import { EstateButton } from './estate/EstateButton';
 import { PerkChips } from './estate/PerkChips';
 import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
+import { confirmLeaveIfNeeded, useV2Ready } from './useV2Ready';
 import { BraceControl } from './rescue/BraceControl';
 import { type RescueReject, useBrace } from './rescue/useBrace';
 import { WreckScene } from './WreckScene';
@@ -48,11 +52,14 @@ import { WreckScene } from './WreckScene';
 /** Pentatonic steps: every letter rings a higher note and no pair clashes. */
 const PENTATONIC = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
 
-export default function WordTowerV2() {
+export default function WordTowerV2({ daily = false }: { daily?: boolean } = {}) {
   const { t, language, dir } = useLanguage();
   const { playSound } = useSoundEffects();
   const reducedMotion = usePrefersReducedMotion();
-  const game = useTowerRun();
+  const game = useTowerRun({
+    seed: daily ? v2DailyNumericSeed(undefined, language) : undefined,
+    scriptedSwing: daily,
+  });
   const { profile, canSeeInWorkModes, isAdmin } = useAuth();
   const router = useRouter();
   const { rival, share, copied } = useRivalTower(language);
@@ -146,13 +153,13 @@ export default function WordTowerV2() {
   const { finish } = game;
   const exitGame = useCallback(async () => {
     if (phase !== 'over' && run.floors > 0) {
+      if (!confirmLeaveIfNeeded(phase, run.floors, t)) return;
       finish();
       return;
     }
-    // Never strand the player on a slow network: navigate after at most 1.5s.
     await Promise.race([bankRun(), new Promise((r) => window.setTimeout(r, 1500))]);
     router.push(`/${language}`);
-  }, [phase, run.floors, finish, bankRun, router, language]);
+  }, [phase, run.floors, finish, bankRun, router, language, t]);
 
   const dictRef = useRef<Set<string> | null>(null);
   const [dictReady, setDictReady] = useState(false);
@@ -217,14 +224,7 @@ export default function WordTowerV2() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setDebug(params.has('debug'));
-    const hooks = v2ReviewHooksFromSearch(
-      window.location.search,
-      canUseV2ReviewHooks({ canSeeInWorkModes, isAdmin }),
-    );
-    if (hooks.demo) seedDemo(hooks.words.length ? hooks.words : undefined);
-    if (hooks.results) setForceResults(true);
-    if (hooks.smash) setSmashing(true);
-  }, [seedDemo, canSeeInWorkModes, isAdmin]);
+  }, []);
 
   // Gameplay owns the whole screen — the global bottom nav covered the dock.
   const setIsInGame = useHideNavigation();
@@ -257,7 +257,7 @@ export default function WordTowerV2() {
   // Fresh letters per run AND after every hoisted word, so each turn is a new
   // little anagram rather than the same seven letters all run.
   const [runSeed, setRunSeed] = useState('');
-  useEffect(() => setRunSeed(`wt2-${Date.now()}`), []);
+  useEffect(() => setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`), [daily, language]);
   const deal = useCallback(
     (draw: number) => {
       if (!runSeed) return;
@@ -467,9 +467,37 @@ export default function WordTowerV2() {
     return () => window.clearTimeout(id);
   }, [phase]);
 
+  const myWords = Array.from(game.labelsRef.current.values()).slice(0, 30);
+  const longestWord = myWords.reduce((a, w) => (w.length > a.length ? w : a), '');
+  const scoreMultEarly = estateApi.perks.scoreMult;
+  const liveScore = Math.round(totalScore(heightM, run.bonus) * scoreMultEarly);
+  const { dailyLocked, dailyRank } = useV2Ready({
+    daily,
+    isAdmin: !!isAdmin,
+    canSeeInWorkModes: !!canSeeInWorkModes,
+    language,
+    phase,
+    floors: run.floors,
+    peakM: game.peakM,
+    score: liveScore,
+    longestWord,
+    resultsShown: showOver || forceResults,
+    seedDemo,
+    setForceResults,
+    setSmashing,
+    t,
+  });
+
+  useEffect(() => {
+    if (phase === 'over' || run.floors <= 0) return;
+    saveRunSnapshot(
+      { daily, date: utcDateKey(), words: myWords, peakM: game.peakM, floors: run.floors },
+      window.sessionStorage,
+    );
+  }, [daily, phase, run.floors, game.peakM, myWords]);
+
   // Smash round target: only the friend who sent the link. Wrecking your OWN
   // tower was removed — there is no reason to knock down what you just built.
-  const myWords = Array.from(game.labelsRef.current.values()).slice(0, 30);
   const smashWords = rival?.words ?? null;
   const rivalName = rival?.name || t('wordTowerV2.wreck.friend');
   const shareMine = () =>
@@ -624,10 +652,11 @@ export default function WordTowerV2() {
           unlocked={game.unlockedRef.current}
           stats={game.statsRef.current}
           onRestart={() => {
+            if (dailyLocked) return;
             preSubmitRef.current = null;
             undoGuardRef.current = null;
             restart();
-            setRunSeed(`wt2-${Date.now()}`);
+            setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
           }}
           onHome={() => router.push(`/${language}`)}
           onClose={() => {
@@ -637,6 +666,15 @@ export default function WordTowerV2() {
           smashLabel={t('wordTowerV2.wreck.smash', { name: rivalName })}
           onSmash={smashWords ? () => setSmashing(true) : undefined}
           onShare={myWords.length >= 3 ? shareMine : undefined}
+          recapSrc={v2ShareCardPath({
+            heightM: game.peakM,
+            floors: run.floors,
+            biome: biomeNow.id,
+            topWord: longestWord,
+            name: profile?.display_name ?? profile?.username ?? '',
+          })}
+          dailyLocked={dailyLocked}
+          dailyRank={dailyRank}
           rivals={{
             estate: estateApi,
             balls: run.balls,
@@ -667,16 +705,18 @@ export default function WordTowerV2() {
           >
             {t('wordTowerV2.results.badges')}
           </button>
+          {!dailyLocked ? (
           <button
             type="button"
             onClick={() => {
               restart();
-              setRunSeed(`wt2-${Date.now()}`);
+              setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
             }}
             className="rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-1.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
           >
             {t('common.playAgain')}
           </button>
+          ) : null}
           <button
             type="button"
             onClick={() => router.push(`/${language}`)}
@@ -713,7 +753,7 @@ export default function WordTowerV2() {
             preSubmitRef.current = null;
             undoGuardRef.current = null;
             restart();
-            setRunSeed(`wt2-${Date.now()}`);
+            setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
           }}
         />
       ) : null}

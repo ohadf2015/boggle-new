@@ -67,7 +67,7 @@ const es = {
       "chooseNext": "Elige tu camino",
       "legend": "Leyenda",
       "leave": "Salir",
-      "depth": "Planta {step}",
+      "depth": "Piso {step}",
       "eliteWarning": "Un enemigo poderoso. Vencerlo te dará una reliquia.",
       "treasureTitle": "¿Qué hay dentro?",
       "treasureRelic": "Has encontrado {name}.",
@@ -379,7 +379,7 @@ const es = {
       "bestWord": "Mejor palabra",
       "noRelics": "Sin reliquias en esta partida",
       "runOver": "Partida terminada",
-      "runOverSub": "Un mapa nuevo, una partida nueva desde la primera planta. Tus estrellas y tu colección se quedan contigo.",
+      "runOverSub": "Un mapa nuevo, una partida nueva desde el primer piso. Tus estrellas y tu colección se quedan contigo.",
       "newRun": "Nueva partida",
       "runComplete": "¡Partida completada!",
       "runCompleteSub": "El jefe ha caído y este mundo es tuyo.",
@@ -1273,7 +1273,11 @@ const es = {
     "hint": {"spell": "Forma una palabra para construir el siguiente piso", "drop": "Toca SOLTAR cuando el piso esté sobre la torre"},
     "changeWord": "CAMBIAR PALABRA",
     "editHint": "Toca una letra usada para editar la palabra",
-    "bestFlag": "RÉCORD"
+    "bestFlag": "RÉCORD",
+    "leaveConfirm": "¿Salir de esta subida? Puedes reanudarla en esta pestaña, pero el daily es una vez al día.",
+    "dailyPlayed": "La torre de hoy ya está. Vuelve mañana.",
+    "dailyRank": "Eres el #{rank} hoy",
+    "recapAlt": "Resumen: {floors} pisos, {m} metros"
   },
   "wordTower": {
     "mutator": {
@@ -10574,7 +10578,7 @@ const es = {
         "progression": "Progresión"
       },
       "firstWord": {
-        "name": "Primera Palabra",
+        "name": "Primera palabra",
         "desc": "Encuentra tu primera palabra"
       },
       "wordStreak5": {
@@ -10586,15 +10590,15 @@ const es = {
         "desc": "Encuentra 10 palabras seguidas"
       },
       "longWord6": {
-        "name": "Palabra Larga",
+        "name": "Palabra larga",
         "desc": "Encuentra una palabra de 6+ letras"
       },
       "longWord8": {
-        "name": "Palabra Épica",
+        "name": "Palabra épica",
         "desc": "Encuentra una palabra de 8+ letras"
       },
       "perfectLevel": {
-        "name": "Nivel Perfecto",
+        "name": "Nivel perfecto",
         "desc": "Completa un nivel sin recibir daño"
       },
       "bossSlayer": {
@@ -10602,31 +10606,31 @@ const es = {
         "desc": "Derrota tu primer jefe"
       },
       "bossSpeedrun": {
-        "name": "Speedrun de Jefe",
+        "name": "Speedrun de jefe",
         "desc": "Derrota un jefe en menos de 60s"
       },
       "bossNoDamage": {
-        "name": "Jefe sin Daño",
+        "name": "Jefe sin daño",
         "desc": "Derrota un jefe sin recibir daño"
       },
       "allBosses": {
-        "name": "Maestro de Jefes",
+        "name": "Maestro de jefes",
         "desc": "Derrota a todos los jefes"
       },
       "worldComplete": {
-        "name": "Mundo Completo",
+        "name": "Mundo completo",
         "desc": "Completa todos los niveles de un mundo"
       },
       "starCollector50": {
-        "name": "Coleccionista de Estrellas",
+        "name": "Coleccionista de estrellas",
         "desc": "Gana 50 estrellas"
       },
       "starCollector100": {
-        "name": "Maestro Estelar",
+        "name": "Maestro estelar",
         "desc": "Gana 100 estrellas"
       },
       "levelMaster": {
-        "name": "Maestro de Niveles",
+        "name": "Maestro de niveles",
         "desc": "Completa 20 niveles"
       }
     },
@@ -10644,7 +10648,7 @@ const es = {
       "amazing": "¡Increíble!",
       "legendary": "¡LEGENDARIO!",
       "incredible": "¡INCREÍBLE!",
-      "mythic": "¡MITICO!",
+      "mythic": "¡MÍTICO!",
       "transcendent": "¡TRASCENDENTE!"
     },
     "worlds": {
@@ -10674,7 +10678,7 @@ const es = {
       "bossDefeated": "¡Jefe derrotado!",
       "bossWins": "El jefe gana...",
       "nearMiss": "¡TAN CERCA!",
-      "nearMissDesc": "¡Solo {{hp}}% HP restante! ¡Casi lo tenías!",
+      "nearMissDesc": "¡Solo te queda {{hp}}% de PV! ¡Casi lo tenías!",
       "fragmentCollected": "¡FRAGMENTO DEL LÉXICO RECUPERADO!",
       "fragmentCount": "Fragmento {{current}} de {{total}} recolectado",
       "twistMechanic": "Giro del jefe",
@@ -10704,17 +10708,17 @@ const es = {
           "finalExam": "Examen Final"
         },
         "taunts": {
-          "start1": "¡La clase ha comenzado! Veamos si han estudiado...",
-          "start2": "¡Examen sorpresa! ¡Espero que estén preparados!",
-          "goodWord1": "Aceptable. Pero no esperen puntos extra por lo mínimo.",
-          "goodWord2": "Hmm, no está terrible. Quizás aprueben después de todo.",
-          "badWord1": "¡Eso no es una palabra! Esto va a su expediente permanente.",
-          "badWord2": "¿Han ESTUDIADO siquiera? Descuento puntos.",
-          "mechanic1": "¿Han LEÍDO la tarea siquiera? ¡Pedí {requirement}!",
-          "mechanic2": "¡Sigan los requisitos! ¡Esto no es tiempo libre!",
+          "start1": "¡La clase ha comenzado! Veamos si has estudiado...",
+          "start2": "¡Examen sorpresa! ¡Espero que estés preparado!",
+          "goodWord1": "Aceptable. Pero no esperes puntos extra por lo mínimo.",
+          "goodWord2": "Hmm, no está terrible. Quizás apruebes después de todo.",
+          "badWord1": "¡Eso no es una palabra! Esto va a tu expediente permanente.",
+          "badWord2": "¿Has ESTUDIADO siquiera? Te descuento puntos.",
+          "mechanic1": "¿Has LEÍDO la tarea siquiera? ¡Pedí {requirement}!",
+          "mechanic2": "¡Sigue los requisitos! ¡Esto no es tiempo libre!",
           "lowTime1": "¡El tiempo casi se acaba! Como un estudiante que no estudió...",
-          "victory": "Vaya, vaya... parece que SÍ pueden seguir instrucciones. ¡Una estrella dorada!",
-          "defeat": "Vengan a verme después de clase... para vocabulario de refuerzo."
+          "victory": "Vaya, vaya... parece que SÍ puedes seguir instrucciones. ¡Una estrella dorada!",
+          "defeat": "Ven a verme después de clase... para vocabulario de refuerzo."
         }
       },
       "spellingBee": {
@@ -10722,16 +10726,16 @@ const es = {
         "mechanic": "Caos de la colmena - ¡Fichas pegajosas y desafíos de sinónimos!",
         "storyline": "Con el primer fragmento recuperado, los susurros del poder del Léxico llegan al Archivo de Miel. La Reina Abeja Ortográfica custodia el segundo fragmento — tejido en las pegajosas redes de palabras de su colmena.",
         "taunts": {
-          "start1": "Bienvenidos a MI colmena. Espero que les guste la miel... y el FRACASO.",
-          "start2": "¡Buzz buzz! Ese es el sonido de su destino. Además soy una abeja.",
+          "start1": "Bienvenido a MI colmena. Espero que te guste la miel... y el FRACASO.",
+          "start2": "¡Buzz buzz! Ese es el sonido de tu destino. Además, soy una abeja.",
           "goodWord1": "No está mal para un no-abeja. Lo permito.",
-          "goodWord2": "Oh, ¿encontraron un sinónimo? Qué increíble-abeja-mente adecuado.",
+          "goodWord2": "Oh, ¿encontraste un sinónimo? Qué increíble-abeja-mente adecuado.",
           "badWord1": "¿Esa palabra? Cariño, por favor.",
           "badWord2": "Mis obreras encontraron mejores palabras, y tienen cerebros diminutos.",
-          "mechanic1": "¡Encuentren sinónimos para despegar las fichas, cariño!",
+          "mechanic1": "¡Encuentra sinónimos para despegar las fichas, cariño!",
           "mechanic2": "¡La colmena exige SINÓNIMOS! ¡Palabras grandes que SIGNIFIQUEN algo!",
           "lowTime1": "¡Tic tac! ¡Ni mi miel tarda tanto en cuajar!",
-          "victory": "¿Me... vencieron? ¿A la REINA? Volveré. (¿Lo pillan? Abeja? Soy una abeja.)",
+          "victory": "¿Me... venciste? ¿A la REINA? Volveré. (¿Lo pillas? ¿Abeja? Soy una abeja.)",
           "defeat": "¡Otro picado! Mi récord de colmena sigue INVICTO."
         }
       },
@@ -10741,16 +10745,16 @@ const es = {
         "storyline": "Dos fragmentos resuenan juntos y revelan un mapa antiguo hacia las Cuevas de Cristal. El Profesor Tesauro ha estudiado el tercer fragmento durante siglos — enterrado en lo más profundo de las raíces del lenguaje.",
         "taunts": {
           "start1": "Ah, ¡un retador se acerca! ¿O debería decir, un adversario avanza?",
-          "start2": "He olvidado más palabras de las que jamás aprenderán. Literalmente. Soy muy viejo.",
+          "start2": "He olvidado más palabras de las que jamás aprenderás. Literalmente. Soy muy viejo.",
           "goodWord1": "Adecuado. O debería decir, satisfactorio, aceptable, suficiente...",
           "goodWord2": "Esa palabra es del siglo XII. Un poco moderna, pero la acepto.",
-          "badWord1": "Su léxico parece... limitado. Restringido. Circunscrito.",
-          "badWord2": "Encontraron 'andar.' ¡Pedestre! ¿Quizás probar 'deambular'?",
-          "mechanic1": "¡Busquen raíces compartidas! Bio, graf, tele - ¡la etimología es CLAVE!",
-          "mechanic2": "¡Las letras comunes se entierran! ¡Caven más profundo, jóvenes eruditos!",
+          "badWord1": "Tu léxico parece... limitado. Restringido. Circunscrito.",
+          "badWord2": "Encontraste 'andar'. ¡Pedestre! ¿Por qué no probar 'deambular'?",
+          "mechanic1": "¡Busca raíces compartidas! Bio, graf, tele: ¡la etimología es CLAVE!",
+          "mechanic2": "¡Las letras comunes se entierran! ¡Cava más profundo, joven erudito!",
           "lowTime1": "El tiempo mengua, expira, disminuye... ¿entienden, verdad?",
-          "victory": "¡Lo admito! Han demostrado considerable... ugh... 'habilidad.'",
-          "defeat": "Vuelvan cuando su vocabulario haya... madurado. Desarrollado. Florecido."
+          "victory": "¡Lo admito! Has demostrado considerable... ugh... 'habilidad'.",
+          "defeat": "Vuelve cuando tu vocabulario haya... madurado. Desarrollado. Florecido."
         }
       },
       "captainMetaphor": {
@@ -10758,17 +10762,17 @@ const es = {
         "mechanic": "Batalla de la flota figurativa - ¡Encuentren las palabras literales de mis modismos!",
         "storyline": "Los tres fragmentos forman una brújula que apunta a los Mares Figurativos. El Capitán Metáfora navega estas aguas hablando solo en modismos. No entregará el cuarto fragmento — tendrás que hablar su idioma.",
         "taunts": {
-          "start1": "¡Alto! ¡Están ladrando al árbol equivocado! ¡Lo cual es raro porque estamos en el MAR!",
-          "start2": "¡Tiemblen ante mis metáforas! ¡Un nuevo retador camina por la tabla del destino!",
+          "start1": "¡Alto! ¡Estás ladrando al árbol equivocado! ¡Lo cual es raro porque estamos en el MAR!",
+          "start2": "¡Tiembla ante mis metáforas! ¡Un nuevo retador camina por la tabla del destino!",
           "goodWord1": "¡Por mis barbas! ¡Esa palabra dio en el clavo!",
-          "goodWord2": "¡Un diamante en bruto! ¡A propósito, encuentren DIAMANTE!",
+          "goodWord2": "¡Un diamante en bruto! Por cierto, ¡encuentra DIAMANTE!",
           "badWord1": "¡Eso es una caza de gansos salvajes! ¡Pájaro totalmente equivocado!",
-          "badWord2": "¡No cuenten los pollos antes de nacer! ¡Necesito POLLO, CONTAR y ANTES!",
-          "mechanic1": "¡Están lloviendo gatos y perros! ¡Encuentren LLUVIA, GATOS y PERROS!",
-          "mechanic2": "¡Rómpanse una pierna! ¡No literalmente! ¡Encuentren las PALABRAS del modismo!",
+          "badWord2": "¡No cuentes los pollos antes de nacer! ¡Necesito POLLO, CONTAR y ANTES!",
+          "mechanic1": "¡Están lloviendo gatos y perros! ¡Encuentra LLUVIA, GATOS y PERROS!",
+          "mechanic2": "¡Rómpete una pierna! ¡No literalmente! ¡Encuentra las PALABRAS del modismo!",
           "lowTime1": "¡El tiempo vuela! ¡A diferencia de mi barco! ¡Que también vuela! ¡Es una metáfora!",
-          "victory": "¡Hundieron mi barco! Espera, juego equivocado. ¡Vencieron mis modismos!",
-          "defeat": "¡El que madruga atrapa el gusano, y USTEDES son el gusano! ¡Arr!"
+          "victory": "¡Hundiste mi barco! Espera, juego equivocado. ¡Venciste mis modismos!",
+          "defeat": "¡El que madruga atrapa el gusano, y TÚ eres el gusano! ¡Arr!"
         }
       },
       "baronBuildaword": {
@@ -10776,16 +10780,16 @@ const es = {
         "mechanic": "Asalto de la línea de ensamblaje - ¡Construyan palabras compuestas para bonos enormes!",
         "storyline": "La brújula del Léxico conduce a la Fundición de Vapor. El Barón Construyepalabras ha soldado el quinto fragmento a su Ensamblador de Palabras 3000. Solo superándolo como ingeniero podrás arrancarlo.",
         "taunts": {
-          "start1": "¡INEFICIENTE! ¡Podrían estar COMPONIENDO! ¡Piensen MARIPOSA, no 'mari'!",
-          "start2": "¡Mi Ensambla-Palabras 3000 está lista! ¡Veamos su ingeniería!",
+          "start1": "¡INEFICIENTE! ¡Podrías estar COMPONIENDO! ¡Piensa en MARIPOSA, no en 'mari'!",
+          "start2": "¡Mi Ensambla-Palabras 3000 está lista! ¡Veamos tu ingeniería!",
           "goodWord1": "¡No está mal! ¿Pero es COMPUESTA? ¡Todo debería ser compuesto!",
           "goodWord2": "¡Producción aceptable! Mis máquinas aprueban. Marginalmente.",
           "badWord1": "¡Eso no es compuesto! Es simplemente... una palabra. ¡Qué poco ingenieril!",
-          "badWord2": "¡Mi Ensambla-Palabras 3000 RECHAZA esto! ¡Intenten más!",
-          "mechanic1": "¡La cinta transportadora se mueve! ¡Atrapen las letras antes de que pasen!",
-          "mechanic2": "¡COMPONGAN! ¡COMPONGAN! ¡GIRASOL! ¡MARIPOSA! ¡RASCACIELOS!",
+          "badWord2": "¡Mi Ensambla-Palabras 3000 RECHAZA esto! ¡Inténtalo de nuevo!",
+          "mechanic1": "¡La cinta transportadora se mueve! ¡Atrapa las letras antes de que pasen!",
+          "mechanic2": "¡COMPÓN! ¡COMPÓN! ¡GIRASOL! ¡MARIPOSA! ¡RASCACIELOS!",
           "lowTime1": "¡La línea de ensamblaje no espera a nadie! ¡MÁS RÁPIDO!",
-          "victory": "¿Han... superado mi ingeniería? ¡IMPOSIBLE! ¡Construiré mejor!",
+          "victory": "¿Has... superado mi ingeniería? ¡IMPOSIBLE! ¡Construiré mejor!",
           "defeat": "¡Otro retador ineficiente derrotado! ¡La máquina gana de nuevo!"
         }
       },
@@ -10794,17 +10798,17 @@ const es = {
         "mechanic": "Realidad revuelta - ¡Las letras se mezclan! ¡Encuentren anagramas para bonos!",
         "storyline": "Cinco fragmentos pulsan al unísono y revelan un laberinto que cambia como un anagrama. El Maestro del Puzzle escondió el sexto fragmento dentro de un acertijo envuelto en un enigma — naturalmente.",
         "taunts": {
-          "start1": "Reordenen 'NOTAS' y díganme qué encuentran. Esperaré. Tengo nueve vidas.",
+          "start1": "Reordena 'NOTAS' y dime qué encuentras. Esperaré. Tengo nueve vidas.",
           "start2": "Todo es un puzzle. Incluso esta frase. Especialmente esta frase.",
-          "goodWord1": "Encontraron una palabra. ¿Pero vieron su ANAGRAMA escondido?",
-          "goodWord2": "Listo. Pero 'ARCO' tiene amigos: ROCA, CARO. ¿Los encontraron todos?",
+          "goodWord1": "Encontraste una palabra. ¿Pero viste su ANAGRAMA escondido?",
+          "goodWord2": "Listo. Pero 'ARCO' tiene amigos: ROCA, CARO. ¿Los encontraste todos?",
           "badWord1": "¿Una respuesta directa? Qué ABURRIDO.",
-          "badWord2": "Eso no es una palabra en NINGÚN orden. Confíen en mí, los comprobé todos.",
-          "mechanic1": "¡La realidad se mezcla! ¡Las letras cambian! ¿Pueden seguir el ritmo?",
-          "mechanic2": "¡Encuentren el par de anagramas! ¡Están esperando!",
+          "badWord2": "Eso no es una palabra en NINGÚN orden. Confía en mí, los comprobé todos.",
+          "mechanic1": "¡La realidad se mezcla! ¡Las letras cambian! ¿Puedes seguir el ritmo?",
+          "mechanic2": "¡Encuentra el par de anagramas! Te están esperando.",
           "lowTime1": "El tiempo se acaba... ¿o empieza? Depende del anagrama.",
-          "victory": "¿Resolvieron mi puzzle?! Estoy... genuinamente impresionado. No se lo digan a nadie.",
-          "defeat": "¡El puzzle sigue sin resolver! Vuelvan cuando puedan pensar lateralmente."
+          "victory": "¿Resolviste mi puzzle?! Estoy... genuinamente impresionado. No se lo digas a nadie.",
+          "defeat": "¡El puzzle sigue sin resolver! Vuelve cuando puedas pensar lateralmente."
         }
       },
       "reflectionKing": {
@@ -10812,17 +10816,17 @@ const es = {
         "mechanic": "Caos del combate espejo - ¡La cuadrícula se refleja! ¡Encuentren palíndromos para poder!",
         "storyline": "Seis fragmentos crean un espejo — y en su reflejo se ve el Palacio de Hielo. El Rey del Reflejo ha congelado el séptimo fragmento en su corona. Solo palabras de simetría perfecta pueden romper el hielo.",
         "taunts": {
-          "start1": "¡Contemplen mi perfección! También busquen palíndromos - ¡las únicas palabras bastante hermosas!",
+          "start1": "¡Contempla mi perfección! También busca palíndromos: ¡las únicas palabras lo bastante hermosas!",
           "start2": "¡Esta batalla será LEGENDARIA! Escribirán EPOPEYAS sobre... principalmente yo.",
           "goodWord1": "¡Una palabra digna! ¡Casi tan magnífica como mi reflejo!",
           "goodWord2": "¡No está mal! ¿Pero es un palíndromo? ¡Solo la PERFECCIÓN se lee en ambos sentidos!",
-          "badWord1": "¿Agrietan mi hielo? ¡La TRAGEDIA! ...De hecho, háganlo otra vez.",
-          "badWord2": "¡Esa palabra no es digna de mi palacio de espejos! ¡Intenten más!",
-          "mechanic1": "¡El espejo refleja! ¡Sus movimientos afectan AMBOS lados!",
-          "mechanic2": "¡Encuentren palíndromos para Reflejos Perfectos!",
-          "lowTime1": "¡Ni mi belleza puede detener el tiempo! ¡Dense prisa!",
-          "victory": "¿Han... empañado mi reflejo?! Necesito un momento. Y un espejo.",
-          "defeat": "¡POR SUPUESTO que gané! ¿Me han VISTO? ¡La perfección es inevitable!"
+          "badWord1": "¿Agrietas mi hielo? ¡La TRAGEDIA! ...De hecho, hazlo otra vez.",
+          "badWord2": "¡Esa palabra no es digna de mi palacio de espejos! ¡Inténtalo de nuevo!",
+          "mechanic1": "¡El espejo refleja! ¡Tus movimientos afectan AMBOS lados!",
+          "mechanic2": "¡Encuentra palíndromos para Reflejos Perfectos!",
+          "lowTime1": "¡Ni mi belleza puede detener el tiempo! ¡Date prisa!",
+          "victory": "¿Has... empañado mi reflejo?! Necesito un momento. Y un espejo.",
+          "defeat": "¡POR SUPUESTO que gané! ¿Me has VISTO? ¡La perfección es inevitable!"
         }
       },
       "cosmicWordsmith": {
@@ -10830,8 +10834,8 @@ const es = {
         "mechanic": "Forja estelar de palabras - ¡Las letras evolucionan! ¡Letras raras crean supernovas!",
         "storyline": "Siete fragmentos brillan lo suficiente para atravesar el vacío. En la Nebulosa Estelar, el Forjador Cósmico de Palabras — antiguo inventor del lenguaje — custodia el octavo fragmento entre estrellas en evolución.",
         "taunts": {
-          "start1": "Estuve PRESENTE cuando sus ancestros gruñeron sus primeras palabras. Esperaba más.",
-          "start2": "Usan 'literalmente' para decir 'figuradamente.' Inventé ambas. La ironía es CÓSMICA.",
+          "start1": "Estuve PRESENTE cuando tus ancestros gruñeron sus primeras palabras. Esperaba más.",
+          "start2": "Usas 'literalmente' para decir 'figuradamente'. Inventé ambas. La ironía es CÓSMICA.",
           "goodWord1": "¿Esa palabra? Trabajé diecisiete versiones. De nada.",
           "goodWord2": "Uso aceptable de MI creación. Permito que exista.",
           "badWord1": "He visto estrellas morir con más elocuencia que ese intento de palabra.",
@@ -10839,8 +10843,8 @@ const es = {
           "mechanic1": "¡Las letras evolucionan! ¡A se convierte en E se convierte en I! ¡El cosmos exige adaptación!",
           "mechanic2": "¡Usen Q, X o Z para una SUPERNOVA! ¡Las letras raras tienen poder cósmico!",
           "lowTime1": "Ni yo puedo frenar el tiempo. Y soy literalmente cósmico. Literalmente literalmente.",
-          "victory": "¿Han... dominado MIS palabras?! Quizás los mortales no son completamente inútiles.",
-          "defeat": "Vuelvan en un milenio. Necesitan más... práctica. Eones de ella."
+          "victory": "¿Has... dominado MIS palabras?! Quizás los mortales no son completamente inútiles.",
+          "defeat": "Vuelve en un milenio. Necesitas más... práctica. Eones de ella."
         }
       },
       "linguistSage": {
@@ -10854,11 +10858,11 @@ const es = {
           "goodWord2": "¡Magnifique! ¡Wunderbar! ¡Subarashii! ...Quizás mezclo idiomas otra vez.",
           "badWord1": "Esa palabra existe en CERO idiomas. Lo comprobé. Todos.",
           "badWord2": "Incluso mis amigos cabras encuentran mejores palabras. Y comen latas.",
-          "mechanic1": "¡El idioma cambia! ¡Adapten su vocabulario!",
-          "mechanic2": "¡Encuentren palabras que funcionen en MÚLTIPLES idiomas para Comprensión Universal!",
+          "mechanic1": "¡El idioma cambia! ¡Adapta tu vocabulario!",
+          "mechanic2": "¡Encuentren palabras que funcionen en MÚLTIPLES idiomas para lograr Comprensión Universal!",
           "lowTime1": "¡El tiempo se acaba en TODOS los idiomas! ¡Schnell! ¡Hayaku! ¡Rapido!",
-          "victory": "¡Hablan el idioma universal de la victoria! Qué... iluminador.",
-          "defeat": "La cumbre permanece sin escalar. Vuelvan cuando hayan estudiado más idiomas."
+          "victory": "¡Hablas el idioma universal de la victoria! Qué... iluminador.",
+          "defeat": "La cumbre permanece sin escalar. Vuelve cuando hayas estudiado más idiomas."
         }
       },
       "lexiconDragon": {
@@ -10866,17 +10870,17 @@ const es = {
         "mechanic": "La Última Palabra - ¡TODAS las mecánicas combinadas! ¡Construyan el GOLPE LÉXICO!",
         "storyline": "Nueve fragmentos se ensamblan en una llave que abre la Biblioteca del Dragón — donde se guarda cada palabra jamás escrita. El Dragón del Léxico custodia el fragmento final: la portada del Léxico original. Derrótalo y restaura el libro que mantiene unido todo el lenguaje.",
         "taunts": {
-          "start1": "¡GUAU UN RETADOR! ¿Quieren ver mi diario de palabras? ¡Son solo 47 tomos!",
-          "start2": "¡He estado ESPERANDO a alguien con quien jugar! O sea... ¡TÉMANME! ¡Rawr!",
-          "goodWord1": "¡Encontraron 'DRAGÓN'! ¡ESE SOY YO! ¡Ahora encuentren 'MAGNÍFICO' porque ESO TAMBIÉN soy yo!",
+          "start1": "¡GUAU, UN RETADOR! ¿Quieres ver mi diario de palabras? ¡Son solo 47 tomos!",
+          "start2": "¡He estado ESPERANDO a alguien con quien jugar! O sea... ¡TÉMEME! ¡Rawr!",
+          "goodWord1": "¡Encontraste 'DRAGÓN'! ¡ESE SOY YO! ¡Ahora encuentra 'MAGNÍFICO' porque ESO TAMBIÉN soy yo!",
           "goodWord2": "¡INCREÍBLE palabra! ¡La escribo en mi diario! ¡Tomo 48!",
-          "badWord1": "¡Eso no es una palabra! ...¿O SÍ? Déjenme revisar tomos 1 al 47...",
+          "badWord1": "¡Eso no es una palabra! ...¿O SÍ? Déjame revisar tomos 1 al 47...",
           "badWord2": "¡De verdad quiero aceptar eso pero mi nerd interior de palabras dice NO!",
-          "mechanic1": "¡Cambio de fase! ¡Una nueva mecánica emerge! ¿Pueden con TODAS?",
-          "mechanic2": "¡El GOLPE LÉXICO se carga! ¡Sigan encontrando grandes palabras!",
+          "mechanic1": "¡Cambio de fase! ¡Una nueva mecánica emerge! ¿Puedes con TODAS?",
+          "mechanic2": "¡El GOLPE LÉXICO se carga! ¡Sigue encontrando grandes palabras!",
           "lowTime1": "¡OH NO se acaba el tiempo! ¡Pero me estaba divirtiendo TANTO!",
-          "victory": "¡GANARON! ¿Eso significa que ahora somos AMIGOS?! ¡Mejor día de TODOS!",
-          "defeat": "Gané pero... ¿me siento mal? ¿Quieren revancha? ¡Por favor digan que sí!"
+          "victory": "¡GANASTE! ¿Eso significa que ahora somos AMIGOS?! ¡El mejor día de TODOS!",
+          "defeat": "Gané pero... ¿me siento mal? ¿Quieres revancha? ¡Por favor di que sí!"
         }
       },
       "mechanicProgress": "Progreso de mecánica",
@@ -10889,14 +10893,14 @@ const es = {
       "cinematics": {
         "skip": "Saltar",
         "skipIn": "Saltar en {seconds}...",
-        "progress": "Progreso cinemática",
+        "progress": "Progreso de la cinemática",
         "loading": "Cargando...",
         "victory": "¡Victoria!",
         "defeated": "¡{bossName} derrotado!",
         "bossApproaches": "Un retador se acerca...",
         "prepareForBattle": "¡Prepárate para la batalla!",
         "guardianOfWorld": "Guardián del Mundo {worldNumber}",
-        "errorTitle": "Error de Video",
+        "errorTitle": "Error de video",
         "errorDescription": "Algo falló al reproducir la cinemática. Puedes reintentar o saltar para continuar.",
         "errorTapToSkip": "Toca Saltar para continuar",
         "errorPressEscToSkip": "La cinemática falló. Presiona ESC o espera para saltar.",
@@ -10904,22 +10908,22 @@ const es = {
         "fallbackTitle": {
           "victory": "¡VICTORIA!",
           "defeat": "¡Se acabó el tiempo!",
-          "bossEntrance": "¡Se acerca el Jefe!",
-          "bossDefeat": "¡Jefe Derrotado!",
-          "worldUnlock": "¡Mundo Desbloqueado!"
+          "bossEntrance": "¡Se acerca el jefe!",
+          "bossDefeat": "¡Jefe derrotado!",
+          "worldUnlock": "¡Mundo desbloqueado!"
         },
         "fallbackStats": {
-          "score": "Puntaje",
-          "wordsFound": "Palabras Encontradas"
+          "score": "Puntos",
+          "wordsFound": "Palabras encontradas"
         }
       },
       "abilities": {
         "popQuiz": {
-          "name": "Examen Sorpresa",
+          "name": "Examen sorpresa",
           "desc": "¡Usa palabras de 5+ letras!"
         },
         "redPen": {
-          "name": "Lápiz Rojo",
+          "name": "Lápiz rojo",
           "desc": "¡Algunas fichas están bloqueadas!"
         },
         "detention": {
@@ -10931,63 +10935,63 @@ const es = {
           "desc": "¡Aparecieron fichas pegajosas!"
         },
         "spellingSting": {
-          "name": "Pinchazo Ortográfico",
+          "name": "Pinchazo ortográfico",
           "desc": "¡Las letras cambiaron!"
         },
         "synonymShuffle": {
-          "name": "Barajeo de Sinónimos",
+          "name": "Barajeo de sinónimos",
           "desc": "¡Fila revuelta!"
         },
         "verboseCurse": {
-          "name": "Maldición Verbosa",
+          "name": "Maldición verbosa",
           "desc": "¡Necesitas palabras de 6+ letras!"
         },
         "etymologyLock": {
-          "name": "Candado Etimológico",
+          "name": "Candado etimológico",
           "desc": "¡Columna bloqueada!"
         },
         "islandLock": {
-          "name": "Bloqueo Isleño",
+          "name": "Bloqueo isleño",
           "desc": "¡Fichas aisladas!"
         },
         "figurativeStorm": {
-          "name": "Tormenta Figurativa",
+          "name": "Tormenta figurativa",
           "desc": "¡Tablero revuelto!"
         },
         "assemblyLine": {
-          "name": "Línea de Ensamblaje",
+          "name": "Línea de ensamblaje",
           "desc": "¡Fila cambiada!"
         },
         "constructionZone": {
-          "name": "Zona de Construcción",
+          "name": "Zona de construcción",
           "desc": "¡Diagonal bloqueada!"
         },
         "puzzleScramble": {
-          "name": "Revoltijo de Puzzle",
+          "name": "Revoltijo de puzzle",
           "desc": "¡Fichas barajadas!"
         },
         "anagramCurse": {
-          "name": "Maldición Anagrama",
+          "name": "Maldición anagrama",
           "desc": "¡Encuentra anagramas!"
         },
         "puzzleChaos": {
-          "name": "Caos de Puzzle",
+          "name": "Caos de puzzle",
           "desc": "¡Caos total!"
         },
         "mirrorFlip": {
-          "name": "Espejo Invertido",
+          "name": "Espejo invertido",
           "desc": "¡Filas volteadas!"
         },
         "palindromePower": {
-          "name": "Poder Palíndromo",
+          "name": "Poder palíndromo",
           "desc": "¡Encuentra palíndromos!"
         },
         "starScatter": {
-          "name": "Lluvia de Estrellas",
+          "name": "Lluvia de estrellas",
           "desc": "¡Letras raras aparecieron!"
         },
         "novaBurst": {
-          "name": "Estallido Nova",
+          "name": "Estallido nova",
           "desc": "¡Explosión cósmica!"
         },
         "babelCurse": {
@@ -10995,11 +10999,11 @@ const es = {
           "desc": "¡Letras confundidas!"
         },
         "polyglotLock": {
-          "name": "Candado Políglota",
+          "name": "Candado políglota",
           "desc": "¡Fichas selladas!"
         },
         "wordFlame": {
-          "name": "Llama de Palabras",
+          "name": "Llama de palabras",
           "desc": "¡Letras ardiendo!"
         },
         "lexiconStorm": {
@@ -11007,22 +11011,22 @@ const es = {
           "desc": "¡Palabras dispersas!"
         },
         "ultimateWord": {
-          "name": "Palabra Definitiva",
+          "name": "Palabra definitiva",
           "desc": "¡Desafío final!"
         }
       }
     },
     "objectives": {
       "wordCount": "Encuentra palabras",
-      "scoreTarget": "Alcanza puntuación",
+      "scoreTarget": "Consigue puntos",
       "clearIce": "Despeja hielo",
       "longWords": "Palabras largas (5+)",
       "timeBonus": "Tiempo restante",
       "collectGems": "Colecciona gemas",
-      "defeatBoss": "Derrota al Jefe",
-      "surviveBattle": "Sobrevive con {{target}}% de Salud",
-      "mechanicTrigger": "Activa Mecánica",
-      "noDamage": "Sin Recibir Daño"
+      "defeatBoss": "Derrota al jefe",
+      "surviveBattle": "Sobrevive con {{target}}% de vida",
+      "mechanicTrigger": "Activa mecánica",
+      "noDamage": "Sin recibir daño"
     },
     "lexi": {
       "longWord": {

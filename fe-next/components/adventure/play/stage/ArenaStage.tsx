@@ -29,9 +29,9 @@ import { getBossConfig } from '@/lib/adventure/bossConfig';
 import type { CombatState } from '@/lib/adventure/play/combat';
 import type { RelicId } from '@/lib/adventure/play/relics';
 import { cn } from '@/lib/utils';
-import IntentDial, { EFFECT_COLOR, ThreatPlate } from './IntentDial';
+import { ThreatPlate } from './IntentDial';
 import { PLAYER_STATUS } from './PlayerBar';
-import { enemyArt, hpSegments, ruleKey } from './combatView';
+import { enemyArt, hpSegments } from './combatView';
 import type { CombatJuice } from './useCombatJuice';
 import LootFlight from './LootFlight';
 import type { ArenaLayout } from '../arena/arenaLayout';
@@ -152,7 +152,7 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
   };
 
   return (
-    <div className="relative w-full h-[12.5rem]" data-testid="enemy-stage">
+    <div className="relative w-full h-[11rem]" data-testid="enemy-stage">
       {/* The arena itself. */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl border-[3px] border-black bg-[#0b132f] shadow-[4px_4px_0_#000]">
         <div aria-hidden className={cn('absolute inset-x-0 bottom-0 h-2/3 blur-2xl opacity-60 transition-colors', enraged ? 'bg-neo-pink/40' : 'bg-[#3b5bdb]/30')} />
@@ -195,19 +195,9 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
         </div>
       </div>
 
-      {/* Intent: floating above the foe's head, the way Slay the Spire reads. */}
-      {/* Pinned to the reading-start edge rather than hung off the foe: at 358px
-          the panel is wider than the gap between the fighters, and chasing the
-          foe parked it across the hero's chest. Words on this side, the number
-          on the foe's side — the two never fight for the same pixels. */}
-      <div className="absolute z-10 rounded-xl border-[3px] border-black bg-[#0f1b3d]/95 px-1.5 py-1 shadow-[3px_3px_0_#000] max-w-[54%]"
-        style={{ insetInlineStart: 4, top: 27 }}>
-        <IntentDial combat={combat} compact />
-      </div>
-
-      {/* …and the number itself, directly over the foe. The chip above carries
-          the ring, the name and the move list; this is the one thing the player
-          must be able to read without looking for it. */}
+      {/* The incoming hit, directly over the foe — the one thing the player must
+          read mid-word. The move-list panel that sat beside it (09-21 declutter)
+          restated it; the charge orb in the canvas carries the countdown. */}
       {!combat.defeated && (
         <div className="pointer-events-none absolute z-20"
           style={foeBox
@@ -216,12 +206,6 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
           <ThreatPlate combat={combat} />
         </div>
       )}
-
-      {/* The fight's one rule, along the floor. */}
-      <div className="absolute inset-x-1 bottom-1 flex items-center gap-1 rounded-lg border-2 border-black bg-neo-purple/95 px-1.5 py-px text-[10px] font-bold text-neo-cream leading-snug">
-        <span className="shrink-0 rounded bg-black px-1 text-[8px] font-black uppercase tracking-wider text-neo-yellow">{t('adventurePlay.combat.ruleTag')}</span>
-        <span className="min-w-0 truncate">{t(ruleKey(world, isBoss))}</span>
-      </div>
 
       {/* Taunt, over the hero's side of the sky. */}
       <AnimatePresence>

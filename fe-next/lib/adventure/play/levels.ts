@@ -150,10 +150,12 @@ export function getPlayLevel(world: number, level: number): PlayLevel {
 const PAR_K: Record<number, number> = { 4: 20, 5: 10.5, 6: 8 };
 
 /** Share of par the FIRST star costs, at the start and end of the 70-level ladder. */
-const BASE_FRACTION_FIRST = 0.08;
-const BASE_FRACTION_LAST = 0.4;
+// 0.08 still asked ~145 to pass / ~230 to K.O. a W1 rival on a Hebrew board (09-21).
+const BASE_FRACTION_FIRST = 0.04;
+// 0.45 (was 0.4) keeps the late-world ceiling where it was after the first star eased.
+const BASE_FRACTION_LAST = 0.45;
 /**
- * Ease-in: >1 keeps the opening worlds gentle (~10 short words clears W1) and
+ * Ease-in: >1 keeps the opening worlds gentle (~6 short words clears W1) and
  * spends the climb late, where the ceiling must still bite.
  */
 const RAMP_CURVE = 1.5;

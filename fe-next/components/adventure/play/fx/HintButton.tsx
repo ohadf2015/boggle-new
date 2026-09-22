@@ -1,7 +1,7 @@
 'use client';
 
 /** Hint button with its charge count. Each press lights real tiles on the board (see BoardFx). */
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Lightbulb } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,7 @@ interface Props {
   className?: string;
 }
 
-export default function HintButton({ hintsLeft, onHint, disabled, className }: Props) {
+function HintButton({ hintsLeft, onHint, disabled, className }: Props) {
   const { t } = useLanguageSafe();
   const [pop, setPop] = useState(0);
   const empty = hintsLeft <= 0;
@@ -40,3 +40,6 @@ export default function HintButton({ hintsLeft, onHint, disabled, className }: P
     </button>
   );
 }
+
+// memo: the fight re-renders the level 5x/s; this only changes when a word lands.
+export default memo(HintButton);

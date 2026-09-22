@@ -21,6 +21,7 @@ import { signPayload } from '@/lib/adventure/play/attemptToken';
 import { freshRun, verifyRun, signRun, enterNode } from '@/lib/adventure/play/runToken';
 import { buildRunMap, reachableFrom } from '@/lib/adventure/play/runMap';
 import { shopStock } from '@/lib/adventure/play/shop';
+import { RELIC_IDS } from '@/lib/adventure/play/relics';
 
 const USER_ID = 'node-user';
 const SECRET = 'test-key';
@@ -88,6 +89,32 @@ describe('POST /api/adventure/node', () => {
     expect(res.data.map.nodes.length).toBeGreaterThan(0);
     expect(verifyRun(res.data.runToken, SECRET)?.u).toBe(USER_ID);
     expect(res.data.run).not.toHaveProperty('seed');
+  });
+
+  it('Given the last run\'s token as carryToken, When a new run is minted, Then its relics and potions come along (fresh hearts, map and gold)', async () => {
+    const [a, b] = RELIC_IDS;
+    const old = standing({ relics: [a, b], potions: { heal: 2, time: 1, cleanse: 0, insight: 1 }, hp: 1, gold: 90 });
+    const res = await POST(req({ world: 1, carryToken: tokenFor(old) }));
+    expect(res.status).toBe(200);
+    const minted = verifyRun(res.data.runToken, SECRET)!;
+    expect(minted.relics).toEqual([a, b]);
+    expect(minted.potions).toEqual({ heal: 2, time: 1, cleanse: 0, insight: 1 });
+    expect(minted.path).toEqual([]);
+    expect(minted.gold).toBe(0);
+    expect(minted.hp).toBe(minted.maxHp);
+  });
+
+  it('Given a carryToken with no heal potion, When minted, Then the run still gets its starter heal', async () => {
+    const res = await POST(req({ world: 1, carryToken: tokenFor(standing({ potions: { heal: 0, time: 2, cleanse: 0, insight: 0 } })) }));
+    expect(verifyRun(res.data.runToken, SECRET)!.potions).toEqual({ heal: 1, time: 2, cleanse: 0, insight: 0 });
+  });
+
+  it("Given another user's carryToken (or garbage), When minted, Then the run starts empty-handed", async () => {
+    for (const carryToken of [tokenFor(standing({ u: 'someone-else', relics: [RELIC_IDS[0]] })), 'garbage']) {
+      const res = await POST(req({ world: 1, carryToken }));
+      expect(res.status).toBe(200);
+      expect(verifyRun(res.data.runToken, SECRET)!.relics).toEqual([]);
+    }
   });
 
   it('Given world 2 with no world-1 boss cleared, When a run is minted, Then 403 Locked', async () => {

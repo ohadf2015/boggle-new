@@ -21,7 +21,7 @@ beforeEach(() => {
 
 describe('WordTowerV2PageClient beta gate', () => {
   it('given a beta tester or admin, when opened, then the game renders', async () => {
-    useAuth.mockReturnValue({ canSeeInWorkModes: true, loading: false });
+    useAuth.mockReturnValue({ canSeeInWorkModes: true, loading: false, user: { id: 'u' }, profile: { id: 'p' } });
 
     render(<WordTowerV2PageClient />);
 
@@ -32,7 +32,7 @@ describe('WordTowerV2PageClient beta gate', () => {
   });
 
   it('given an ordinary player, when opened, then they are sent home and see no game', () => {
-    useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: false });
+    useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: false, user: null, profile: null });
 
     render(<WordTowerV2PageClient />);
 
@@ -44,7 +44,7 @@ describe('WordTowerV2PageClient beta gate', () => {
     // canSeeInWorkModes starts false and flips true once auth resolves. Redirecting
     // on that transient false throws a real beta tester back to the home page
     // before their access is even known.
-    useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: true });
+    useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: true, user: null, profile: null });
 
     render(<WordTowerV2PageClient />);
 

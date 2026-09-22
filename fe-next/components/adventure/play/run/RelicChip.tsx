@@ -29,9 +29,11 @@ interface Props {
   open: boolean;
   onToggle: () => void;
   innerRef?: (el: HTMLButtonElement | null) => void;
+  /** Icon only: no numeral pill (the in-level HUD; the tap bubble carries the detail). */
+  bare?: boolean;
 }
 
-export default function RelicChip({ id, contrib, firing, fireKey = 0, open, onToggle, innerRef }: Props) {
+export default function RelicChip({ id, contrib, firing, fireKey = 0, open, onToggle, innerRef, bare = false }: Props) {
   const { t } = useLanguageSafe();
   const reduce = useReducedMotion();
   const frame = RARITY_FRAME[RELICS[id]?.rarity ?? 'common'];
@@ -65,8 +67,8 @@ export default function RelicChip({ id, contrib, firing, fireKey = 0, open, onTo
           className="h-full w-full object-contain drop-shadow-[1px_1px_0_rgba(0,0,0,0.65)]" />
       </motion.button>
 
-      {/* The numeral, baked onto the chip's bottom edge — never absent, so no chip is anonymous. */}
-      <motion.span
+      {/* The numeral, baked onto the chip's bottom edge (off on the in-level HUD). */}
+      {!bare && <motion.span
         key={`${badge.tone}-${badge.text}`}
         data-testid={badge.tone === 'points' ? `relic-contrib-${id}` : `relic-tag-${id}`}
         role="img"
@@ -83,7 +85,7 @@ export default function RelicChip({ id, contrib, firing, fireKey = 0, open, onTo
         )}
       >
         {badge.text}
-      </motion.span>
+      </motion.span>}
 
     </span>
   );

@@ -388,9 +388,9 @@ const en = {
       "kindPotion": "Potion",
       "kindHeal": "Heal",
       "kindGold": "Gold",
-      "healDesc": "Patch up your hearts now",
+      "healDesc": "Patch up your hearts",
       "goldDesc": "Gold for this run",
-      "tapCard": "Tap a card to look closer",
+      "tapCard": "Tap a card for a closer look",
       "take": "Take it",
       "currentRun": "Run in progress",
       "runStep": "Level {step} of {total}",
@@ -401,12 +401,12 @@ const en = {
       "levelUpDone": "The boss awaits",
       "tapToContinue": "Tap to continue",
       "andMoreRelics": "+{n} more relics fired",
-      "earnedThisRun": "Earned you {n} points this run",
+      "earnedThisRun": "Earned {n} points this run",
       "thisRun": "This run",
       "thisLevel": "This level",
       "stackAlone": "Alone",
       "stackCombined": "With your relics",
-      "stackPerLevel": "points a level, counted off the words you actually found",
+      "stackPerLevel": "points a level, counted off the words you found",
       "contribAria": "{name}: +{n} points this level",
       "value": {
         "label": "This run",
@@ -1218,7 +1218,11 @@ const en = {
     "hint": {"spell": "Spell a word to build the next floor", "drop": "Tap DROP when the floor is over the tower"},
     "changeWord": "CHANGE WORD",
     "editHint": "Tap a letter you used to edit the word",
-    "bestFlag": "BEST"
+    "bestFlag": "BEST",
+    "leaveConfirm": "Leave this climb? You can resume this tab, but a daily run is one per day.",
+    "dailyPlayed": "Today's tower is done. Come back tomorrow.",
+    "dailyRank": "You're #{rank} today",
+    "recapAlt": "Tower recap: {floors} floors, {m} metres"
   },
   "wordTower": {
     "mutator": {
@@ -9335,10 +9339,10 @@ const en = {
       "longWords": "Long words (5+)",
       "timeBonus": "Time remaining",
       "collectGems": "Collect gems",
-      "defeatBoss": "Defeat the Boss",
-      "surviveBattle": "Survive with {{target}}% Health",
-      "mechanicTrigger": "Trigger Mechanic",
-      "noDamage": "Take No Damage"
+      "defeatBoss": "Defeat the boss",
+      "surviveBattle": "Survive with {{target}}% health",
+      "mechanicTrigger": "Trigger mechanic",
+      "noDamage": "Take no damage"
     },
     "next": "NEXT",
     "hub": {
