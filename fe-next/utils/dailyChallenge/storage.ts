@@ -1,9 +1,4 @@
-/**
- * Daily Challenge Local Storage Utilities
- *
- * All localStorage operations for daily challenges
- */
-
+/** Daily challenge localStorage helpers. */
 import type { Language } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type {
@@ -31,6 +26,7 @@ import {
   removeFromLocalStorage,
   getFromLocalStorage,
 } from '@/utils/storageHelpers';
+import { markDailyDoneEver } from '@/lib/soloRotation';
 
 // ==========================================
 // Legacy Daily Challenge Storage
@@ -168,12 +164,7 @@ export function getTodaysWordHuntResult(language: Language): StoredWordHuntResul
   return stored;
 }
 
-/**
- * Save the result of today's Word Hunt
- * Also updates the daily streak for Word Hunt completions (only for authenticated users)
- * @param result - The word hunt result to save
- * @param isAuthenticated - Whether the user is authenticated. Streak only updates for authenticated users.
- */
+/** Save today's Word Hunt result. Streak updates only for authenticated users. */
 export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: boolean = true): DailyStreak {
   if (typeof window === 'undefined') {
     return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
@@ -200,6 +191,7 @@ export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: bool
   };
 
   saveJsonToLocalStorage(key, storedResult);
+  markDailyDoneEver();
 
   // Update the daily streak only for authenticated users
   // Anonymous users don't get streak tracking - incentive to sign up
@@ -394,6 +386,7 @@ export function saveWordWheelResult(result: WordWheelResult): void {
   };
 
   saveJsonToLocalStorage(key, storedResult);
+  markDailyDoneEver();
 }
 
 /**

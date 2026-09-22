@@ -4,11 +4,12 @@
  * Tests for localStorage operations, specifically win/loss status tracking
  */
 
-import { getWordHuntStatusToday, getTodaysWordHuntResult, saveWordHuntResult, hasPlayedWordWheel, getWordWheelResultForDate } from '../storage';
+import { getWordHuntStatusToday, getTodaysWordHuntResult, saveWordHuntResult, saveWordWheelResult, hasPlayedWordWheel, getWordWheelResultForDate } from '../storage';
 import { getDailyChallengeDate } from '../dateUtils';
 import { WORD_HUNT_STORAGE_KEY } from '../constants';
-import type { WordHuntResult } from '../types';
+import type { WordHuntResult, WordWheelResult } from '../types';
 import type { Language } from '@/types';
+import { buildSoloRotation, DAILY_DONE_EVER_KEY, getDailyDoneEver } from '@/lib/soloRotation';
 
 // Mock the storage helpers
 vi.mock('@/utils/storageHelpers', () => ({
@@ -281,5 +282,73 @@ describe('getWordWheelResultForDate', () => {
     const stored = { date: '2025-01-18', puzzleNumber: 20, result: { score: 42 } };
     (getJsonFromLocalStorage as ReturnType<typeof vi.fn>).mockReturnValue(stored);
     expect(getWordWheelResultForDate('en' as Language, '2025-01-18')).toEqual(stored);
+  });
+});
+
+const huntResult: WordHuntResult = {
+  puzzleNumber: 1,
+  puzzleDate: '2025-01-20',
+  language: 'en',
+  solved: true,
+  attemptsUsed: 3,
+  targetWord: 'HELLO',
+  attempts: [],
+  streakDays: 0,
+  completedAt: '2025-01-20T10:00:00Z',
+};
+
+const wheelResult: WordWheelResult = {
+  puzzleNumber: 1,
+  puzzleDate: '2025-01-20',
+  language: 'en',
+  centerLetter: 'A',
+  wordsFound: ['AT'],
+  totalPossible: 10,
+  score: 5,
+  timeSeconds: 30,
+  streakDays: 0,
+  completedAt: '2025-01-20T10:00:00Z',
+};
+
+describe('daily completion marks dailyDoneEver', () => {
+  const store: Record<string, string> = {};
+  const storage = {
+    getItem: (k: string) => (k in store ? store[k] : null),
+    setItem: (k: string, v: string) => { store[k] = String(v); },
+    removeItem: (k: string) => { delete store[k]; },
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    for (const k of Object.keys(store)) delete store[k];
+    vi.stubGlobal('window', { localStorage: storage });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('saveWordHuntResult sets the never-expiring flag and stops FIRST DAILY rotation', () => {
+    saveWordHuntResult(huntResult, false);
+    expect(storage.getItem(DAILY_DONE_EVER_KEY)).toBe('1');
+    expect(getDailyDoneEver()).toBe(true);
+    expect(buildSoloRotation({ gamesPlayed: 0, dailyDoneEver: getDailyDoneEver() })).toEqual({
+      rematchPresetId: '', promote: null,
+    });
+  });
+
+  it('saveWordWheelResult sets the never-expiring flag and stops FIRST DAILY rotation', () => {
+    saveWordWheelResult(wheelResult);
+    expect(storage.getItem(DAILY_DONE_EVER_KEY)).toBe('1');
+    expect(getDailyDoneEver()).toBe(true);
+    expect(buildSoloRotation({ gamesPlayed: 0, dailyDoneEver: getDailyDoneEver() })).toEqual({
+      rematchPresetId: '', promote: null,
+    });
+  });
+
+  it('does not mark dailyDoneEver when Word Hunt result is invalid', () => {
+    saveWordHuntResult({ ...huntResult, attemptsUsed: 0 }, false);
+    expect(storage.getItem(DAILY_DONE_EVER_KEY)).toBeNull();
+    expect(getDailyDoneEver()).toBe(false);
   });
 });

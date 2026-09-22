@@ -68,5 +68,8 @@ describe('dailyDoneEver storage', () => {
     markDailyDoneEver();
     expect(storage.getItem(DAILY_DONE_EVER_KEY)).toBe('1');
     expect(getDailyDoneEver()).toBe(true);
+    expect(buildSoloRotation({ gamesPlayed: 0, dailyDoneEver: getDailyDoneEver() })).toEqual({
+      rematchPresetId: '', promote: null,
+    });
   });
 });
