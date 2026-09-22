@@ -833,6 +833,52 @@ export const trackGameCompletion = (
  */
 const SIGNUP_FUNNEL_PENDING_KEY = 'lexiclash_signup_funnel_pending';
 
+function latchSignupFunnelPending(variant: string | null): void {
+  if (typeof window === 'undefined') return;
+  if (variant) {
+    sessionStorage.setItem(SIGNUP_FUNNEL_PENDING_KEY, variant);
+    // localStorage backup: OAuth redirect (Discord / Edge GSI fallback) can
+    // land in a tab where sessionStorage was partitioned or cleared; the
+    // host-filtered prompt→completed join then looks disjoint (t_c75cbe59).
+    try {
+      localStorage.setItem(SIGNUP_FUNNEL_PENDING_KEY, variant);
+    } catch {
+      // private mode / quota — sessionStorage alone is best-effort
+    }
+  } else {
+    sessionStorage.removeItem(SIGNUP_FUNNEL_PENDING_KEY);
+    try {
+      localStorage.removeItem(SIGNUP_FUNNEL_PENDING_KEY);
+    } catch {
+      // ignore
+    }
+  }
+}
+
+function readSignupFunnelPending(): string | null {
+  if (typeof window === 'undefined') return null;
+  const fromSession = sessionStorage.getItem(SIGNUP_FUNNEL_PENDING_KEY);
+  if (fromSession) return fromSession;
+  try {
+    return localStorage.getItem(SIGNUP_FUNNEL_PENDING_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Track signup funnel.
+ *
+ * t_c75cbe59: ALWAYS emit the canonical pair `signup_prompt_shown` /
+ * `signup_completed` / `signup_dismissed` that UR host-filters on. First-win
+ * used to emit only `first_win_signup_*`, so ordered
+ * signup_prompt_shown→signup_completed was structurally 0% while raw
+ * completions (from maybeTrackSignupCompleted) looked fine — populations
+ * disjoint. Soft-sheet/#1051 did not reconnect those event names.
+ *
+ * When `isFirstWin`, also emit the legacy `first_win_signup_*` companions
+ * (existing events — not a new taxonomy) so older dashboards keep working.
+ */
 export const trackSignupFunnel = (
   step: 'prompt_shown' | 'completed' | 'dismissed',
   isFirstWin: boolean,
@@ -840,19 +886,25 @@ export const trackSignupFunnel = (
   props?: Record<string, unknown>
 ): void => {
   const variant = isFirstWin ? 'first_win' : 'multi_game';
-  if (typeof window !== 'undefined') {
-    if (step === 'prompt_shown') {
-      sessionStorage.setItem(SIGNUP_FUNNEL_PENDING_KEY, variant);
-    } else {
-      sessionStorage.removeItem(SIGNUP_FUNNEL_PENDING_KEY);
-    }
+  const merged: Record<string, unknown> = {
+    ...props,
+    is_first_win: isFirstWin,
+    funnel_variant: variant,
+  };
+  if (step === 'prompt_shown') {
+    latchSignupFunnelPending(variant);
+  } else {
+    latchSignupFunnelPending(null);
   }
   if (step === 'prompt_shown') {
-    trackGrowthEvent(isFirstWin ? 'first_win_signup_shown' : 'signup_prompt_shown', props);
+    trackGrowthEvent('signup_prompt_shown', merged);
+    if (isFirstWin) trackGrowthEvent('first_win_signup_shown', merged);
   } else if (step === 'completed') {
-    trackGrowthEvent(isFirstWin ? 'first_win_signup_completed' : 'signup_completed', props);
+    trackGrowthEvent('signup_completed', merged);
+    if (isFirstWin) trackGrowthEvent('first_win_signup_completed', merged);
   } else {
-    trackGrowthEvent(isFirstWin ? 'first_win_signup_dismissed' : 'signup_dismissed', props);
+    trackGrowthEvent('signup_dismissed', merged);
+    if (isFirstWin) trackGrowthEvent('first_win_signup_dismissed', merged);
   }
 };
 
@@ -875,9 +927,9 @@ export const trackSignupPromptClicked = (source: string): void => {
  */
 export const consumePendingSignupCompletion = (): void => {
   if (typeof window === 'undefined') return;
-  const pending = sessionStorage.getItem(SIGNUP_FUNNEL_PENDING_KEY);
+  const pending = readSignupFunnelPending();
   if (!pending) return;
-  sessionStorage.removeItem(SIGNUP_FUNNEL_PENDING_KEY);
+  latchSignupFunnelPending(null);
   trackSignupFunnel('completed', pending === 'first_win');
 };
 

@@ -8,11 +8,15 @@ function code(src: string): string {
 
 const v2 = code(readFileSync(resolve(__dirname, '../WordTowerV2.tsx'), 'utf8'));
 const run = code(readFileSync(resolve(__dirname, '../useTowerRun.ts'), 'utf8'));
+// The ?demo=1 staff gate lives in useV2Ready since the daily/leave-confirm
+// refactor; WordTowerV2 must route its search-params handling through it.
+const ready = code(readFileSync(resolve(__dirname, '../useV2Ready.ts'), 'utf8'));
 
 describe('v2 P0 wiring', () => {
   it('staff-gates the ?demo=1 review hooks instead of seeding on any visitor', () => {
-    expect(v2).toMatch(/canUseV2ReviewHooks/);
-    expect(v2).toMatch(/v2ReviewHooksFromSearch/);
+    expect(ready).toMatch(/canUseV2ReviewHooks/);
+    expect(ready).toMatch(/v2ReviewHooksFromSearch/);
+    expect(v2).toMatch(/useV2Ready/);
     expect(v2).not.toMatch(/if \(params\.has\('demo'\)\) seedDemo/);
   });
 

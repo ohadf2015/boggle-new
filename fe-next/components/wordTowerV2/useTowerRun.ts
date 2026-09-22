@@ -26,7 +26,8 @@ import {
 } from '@/lib/wordTowerV2/engine';
 import { type LandingQuality, type SupportTop, classifyLanding } from '@/lib/wordTowerV2/landing';
 import { NEUTRAL_PERKS, type Perks } from '@/lib/wordTowerV2/estate';
-import { type RewardId, steadySwing } from '@/lib/wordTowerV2/rewards';
+import { steadySwing } from '@/lib/wordTowerV2/rewards';
+import { v2DailySwing } from '@/lib/wordTowerV2/daily';
 import { type RunState, type SurprisePayout, applyLanding, consumeDrop, createRun } from '@/lib/wordTowerV2/run';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
 import { isCounterweight, standingChain, towerLean, towerRisk } from '@/lib/wordTowerV2/stability';
@@ -73,7 +74,9 @@ export interface CalloutEvent extends CalloutCopy {
 
 export type SurpriseEvent = SurprisePayout & { key: number };
 
-export function useTowerRun() {
+export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
+  const dailySeed = opts?.seed;
+  const scriptedSwing = !!opts?.scriptedSwing;
   const { playSound, playComboSound, playWordLengthSound, setGameActive } = useSoundEffects();
 
   const worldRef = useRef<TowerWorld>(createTowerWorld({ seed: 1 }));
@@ -123,10 +126,10 @@ export function useTowerRun() {
     bestRef.current = readBest();
     setBestM(bestRef.current);
     unlockedRef.current = loadUnlocked();
-    // Fresh crate seed per visit; render must stay pure, so not in useRef().
-    runRef.current = createRun(Date.now());
+    runRef.current = createRun(dailySeed ?? Date.now());
+    if (dailySeed) worldRef.current = createTowerWorld({ seed: dailySeed });
     setRun(runRef.current);
-  }, []);
+  }, [dailySeed]);
 
   // Without this every playSound() silently no-ops: the context gates on it.
   useEffect(() => {
@@ -396,6 +399,7 @@ export function useTowerRun() {
       // on a bigger footing. Later floors are untouched. Same predicate as
       // previewWidth, read BEFORE the counter moves.
       const perkWidth = dropCountRef.current === 0 ? perksRef.current.baseWidthMult : 1;
+      const dropIndex = dropCountRef.current;
       dropCountRef.current += 1;
       labelsRef.current.set(id, word);
       spawnBlock(world, {
@@ -407,14 +411,13 @@ export function useTowerRun() {
         vx: 0,
         attached: true,
       });
-      // Crane Yard perk: a longer period is a slower, easier swing. Never
-      // mutate the exported SWING — a copy per hoist.
       const perkSwing = { ...SWING, periodMs: SWING.periodMs * perksRef.current.swingPeriodMult };
+      const scripted = scriptedSwing && dailySeed ? v2DailySwing(dailySeed, dropIndex) : perkSwing;
       hangingRef.current = {
         id,
         startedAt: performance.now(),
         wordLen: word.length,
-        swing: spent.steady ? steadySwing(perkSwing) : perkSwing,
+        swing: spent.steady ? steadySwing(scripted) : scripted,
         plumb: spent.plumb,
       };
       statsRef.current.longestWord = Math.max(statsRef.current.longestWord, word.length);
@@ -425,7 +428,7 @@ export function useTowerRun() {
       } else playWordLengthSound(word.length);
       setPhase('swinging');
     },
-    [phase, playWordLengthSound, playSound],
+    [phase, playWordLengthSound, playSound, dailySeed, scriptedSwing],
   );
 
   /**
@@ -477,7 +480,7 @@ export function useTowerRun() {
     startedAtRef.current = null;
     runNoRef.current += 1;
     dropCountRef.current = 0;
-    worldRef.current = createTowerWorld({ seed: runNoRef.current });
+    worldRef.current = createTowerWorld({ seed: dailySeed ?? runNoRef.current });
     labelsRef.current = new Map();
     hangingRef.current = null;
     pendingRef.current = null;
@@ -486,7 +489,7 @@ export function useTowerRun() {
     leanRef.current = null;
     statsRef.current = emptyStats();
     seenBiomesRef.current = new Set(['downtown']);
-    runRef.current = createRun(Date.now());
+    runRef.current = createRun(dailySeed ?? Date.now());
     setRun(runRef.current);
     setHeightM(0);
     setRisk(0);
@@ -495,7 +498,7 @@ export function useTowerRun() {
     setBanners([]);
     setRunBadges([]);
     setPhase('composing');
-  }, []);
+  }, [dailySeed]);
 
   /**
    * The server's best (word_tower_estates.best_m) wins when it is higher: the

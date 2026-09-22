@@ -1273,7 +1273,11 @@ const es = {
     "hint": {"spell": "Forma una palabra para construir el siguiente piso", "drop": "Toca SOLTAR cuando el piso esté sobre la torre"},
     "changeWord": "CAMBIAR PALABRA",
     "editHint": "Toca una letra usada para editar la palabra",
-    "bestFlag": "RÉCORD"
+    "bestFlag": "RÉCORD",
+    "leaveConfirm": "¿Salir de esta subida? Puedes reanudarla en esta pestaña, pero el daily es una vez al día.",
+    "dailyPlayed": "La torre de hoy ya está. Vuelve mañana.",
+    "dailyRank": "Eres el #{rank} hoy",
+    "recapAlt": "Resumen: {floors} pisos, {m} metros"
   },
   "wordTower": {
     "mutator": {

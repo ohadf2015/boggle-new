@@ -24,6 +24,11 @@ function get(obj: Record<string, unknown>, path: string): unknown {
 }
 
 const keys: string[] = [
+  'wordTowerV2.bestFlag',
+  'wordTowerV2.leaveConfirm',
+  'wordTowerV2.dailyPlayed',
+  'wordTowerV2.dailyRank',
+  'wordTowerV2.recapAlt',
   'wordTowerV2.rescue.crumbled',
   'wordTowerV2.rescue.counterweight',
   'wordTowerV2.rescue.braced',
