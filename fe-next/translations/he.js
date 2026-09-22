@@ -12419,7 +12419,10 @@ const he = {
       "regionLabel": "תקציר התקדמות עבור {{classroom}}",
       "scheduleReteachCta": "לקבוע Live לחזרה בעוד ~{{days}} ימים",
       "scheduleReteachConfirm": "Live לחזרה נקבע ל־{{date}} (~{{days}} ימים). הזמנה ליומן נפתחה.",
-      "scheduleReteachHint": "לבנות מחדש את המילים הקשות ולשחק שוב בעוד כשבועיים — חזרה מרווחת בסגנון Kahoot."
+      "scheduleReteachHint": "לבנות מחדש את המילים הקשות ולשחק שוב בעוד כשבועיים — חזרה מרווחת בסגנון Kahoot.",
+      "unpluggedReteachLiveCta": "התחלת Unplugged Live לחיזוק",
+      "reteachLiveCta": "התחלת Live חיזוק ל־3 דקות",
+      "unpluggedReteachLiveFoil": "מול Kahoot Unplugged — מקרינים את המילים החסרות; התלמידים עונים על נייר, בלי מכשירים."
     },
     "subscription": {
       "giftedNoCard": "אין כרטיס במערכת ואין חידוש — זה פשוט מסתיים וחוזרים לחינמי.",

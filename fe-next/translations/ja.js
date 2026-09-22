@@ -12564,7 +12564,10 @@ const ja = {
       "regionLabel": "{{classroom}} の進捗ダイジェスト",
       "scheduleReteachCta": "約{{days}}日後に再指導Liveを予定",
       "scheduleReteachConfirm": "{{date}}（約{{days}}日後）に再指導Liveを予定しました。カレンダー招待を開きました。",
-      "scheduleReteachHint": "苦手な語を組み直して約2週間後にもう一度 — Kahoot風の間隔再指導。"
+      "scheduleReteachHint": "苦手な語を組み直して約2週間後にもう一度 — Kahoot風の間隔再指導。",
+      "unpluggedReteachLiveCta": "アンプラグドリティーチLiveを開始",
+      "reteachLiveCta": "3分リティーチLiveを開始",
+      "unpluggedReteachLiveFoil": "Kahoot Unplugged対抗 — 抜けた語を投影し、生徒は紙で解答（端末不要）。"
     },
     "subscription": {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",

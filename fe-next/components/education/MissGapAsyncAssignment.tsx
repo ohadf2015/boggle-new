@@ -259,7 +259,7 @@ export function MissGapAsyncAssignment({
       </section>
 
       {isTeacher ? (
-        <MissGapTeacherProgress data={progress.data} failed={progress.failed} />
+        <MissGapTeacherProgress data={progress.data} failed={progress.failed} payload={payload} />
       ) : null}
 
       {isTeacher || completed ? <MissGapTakeHomeDisclosure payload={payload} /> : null}

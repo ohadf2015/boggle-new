@@ -11683,7 +11683,10 @@ const en = {
       "regionLabel": "Progress digest for {{classroom}}",
       "scheduleReteachCta": "Schedule reteach Live in ~{{days}} days",
       "scheduleReteachConfirm": "Reteach Live scheduled for {{date}} (~{{days}} days). Calendar invite opened.",
-      "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks — Kahoot-style spaced reteach."
+      "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks — Kahoot-style spaced reteach.",
+      "unpluggedReteachLiveCta": "Start Unplugged reteach Live",
+      "reteachLiveCta": "Start 3-min reteach Live",
+      "unpluggedReteachLiveFoil": "Kahoot Unplugged foil — project the misses; students answer on paper, no devices."
     },
     "subscription": {
       "giftedNoCard": "No card on file, no renewal — it just ends, and you go back to Free.",

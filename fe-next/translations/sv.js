@@ -12799,7 +12799,10 @@ const sv = {
       "regionLabel": "Fortgångssammandrag för {{classroom}}",
       "scheduleReteachCta": "Schemalägg reteach-Live om ~{{days}} dagar",
       "scheduleReteachConfirm": "Reteach-Live schemalagd till {{date}} (~{{days}} dagar). Kalenderinbjudan öppnades.",
-      "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor — mellanslagsrepetition à la Kahoot."
+      "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor — mellanslagsrepetition à la Kahoot.",
+      "unpluggedReteachLiveCta": "Starta Unplugged reteach Live",
+      "reteachLiveCta": "Starta 3-minuters reteach Live",
+      "unpluggedReteachLiveFoil": "Kahoot Unplugged-foil — projicera missarna; eleverna svarar på papper, utan enheter."
     },
     "subscription": {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",

@@ -16,12 +16,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { MissGapStreakFlame } from './MissGapStreakFlame';
 import type { MissGapProgressState } from './useMissGapProgress';
+import { MissGapUnpluggedReteachLiveCta } from '@/components/teacher/digest/MissGapUnpluggedReteachLiveCta';
+import type { MissGapAssignmentPayload } from '@/lib/education/missGapAsyncAssignment';
 
 export type { MissGapProgressRun, MissGapProgressData } from './useMissGapProgress';
 
-export interface MissGapTeacherProgressProps extends MissGapProgressState {}
+export interface MissGapTeacherProgressProps extends MissGapProgressState {
+  /** Miss-gap words + lesson for Unplugged / reteach Live deep-link. */
+  payload?: MissGapAssignmentPayload | null;
+}
 
-export function MissGapTeacherProgress({ data, failed }: MissGapTeacherProgressProps) {
+export function MissGapTeacherProgress({ data, failed, payload }: MissGapTeacherProgressProps) {
   const { t } = useLanguage();
 
   const runs = data?.runs ?? [];
@@ -114,6 +119,12 @@ export function MissGapTeacherProgress({ data, failed }: MissGapTeacherProgressP
           ))}
         </ul>
       )}
+
+      {payload && payload.missedWords.length > 0 ? (
+        <div className="mt-4">
+          <MissGapUnpluggedReteachLiveCta payload={payload} layout="stack" />
+        </div>
+      ) : null}
     </section>
   );
 }
