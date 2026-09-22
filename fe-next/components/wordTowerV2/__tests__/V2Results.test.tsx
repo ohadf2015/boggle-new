@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { createRun } from '@/lib/wordTowerV2/run';
+
+vi.mock('@/hooks/useMasterMute', () => ({
+  useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Sound on' }),
+}));
+
 import { V2Results } from '../V2Results';
 
 afterEach(cleanup);

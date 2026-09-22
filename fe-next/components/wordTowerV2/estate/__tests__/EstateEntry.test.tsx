@@ -9,6 +9,9 @@ import { EstateButton } from '../EstateButton';
 import { PerkChips } from '../PerkChips';
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playSound: vi.fn() }) }));
+vi.mock('@/hooks/useMasterMute', () => ({
+  useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Sound on' }),
+}));
 
 const t = (key: string, params?: Record<string, string | number>) => {
   const raw = key.split('.').reduce<unknown>((o, k) => (o && typeof o === 'object' ? (o as Record<string, unknown>)[k] : undefined), en);

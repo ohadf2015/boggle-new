@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
+vi.mock('@/hooks/useMasterMute', () => ({
+  useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Sound on' }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({ t: (k: string) => k, language: 'en' }),
 }));

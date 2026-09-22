@@ -1,5 +1,7 @@
 import { type ReactNode, useEffect, useState } from 'react';
-import { Hammer, Home, Medal, Send, Target, Trophy, X } from 'lucide-react';
+import { Hammer, Home, Medal, Send, Target, Trophy, Volume2, VolumeX, X } from 'lucide-react';
+import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
+import { useMasterMute } from '@/hooks/useMasterMute';
 import type { TowerBlock } from '@/lib/wordTowerV2/estateTower';
 import { ACHIEVEMENTS, type RunStats, emptyStats, progressOf } from '@/lib/wordTowerV2/achievements';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
@@ -68,7 +70,29 @@ function nextGoal(stats: RunStats, skip: Set<string>) {
   return best;
 }
 
+function ResultsMute() {
+  const { allMuted, toggle, label, title } = useMasterMute();
+  return (
+    <button
+      type="button"
+      data-testid="v2-results-mute"
+      onClick={toggle}
+      aria-label={label}
+      aria-pressed={!allMuted}
+      title={title}
+      className="absolute start-3 top-[max(0.75rem,env(safe-area-inset-top))] flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+    >
+      {allMuted
+        ? <VolumeX className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+        : <Volume2 className="h-4 w-4" strokeWidth={2.5} aria-hidden />}
+    </button>
+  );
+}
+
 export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals, recapSrc, dailyLocked, dailyRank }: Props) {
+  // Own mute in the card header → the global FAB stands down (no end-14 race
+  // against the FAB's 2.5s/5s re-probes).
+  useRegisterHeaderAudioControl();
   // `revenge` is the raid being answered, not a flag: its numbers ride the whole
   // raid so the payout can name the debt it settled.
   const [target, setTarget] = useState<{ rival: RivalView; revenge: RevengeEntry | null } | null>(null);
@@ -113,23 +137,16 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
       <div className={`mx-auto flex min-h-full w-full max-w-sm items-center ${rivals ? 'md:max-w-5xl lg:max-w-6xl' : 'md:max-w-2xl'}`}>
       <div className={`relative w-full rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop md:p-6 ${rivals ? 'md:flex md:items-start md:gap-6' : ''}`}>
       <div className={rivals ? 'md:w-[22rem] md:shrink-0 lg:w-[26rem]' : 'contents'}>
-        {/* `end-14` on a phone: the global mute FAB is pinned to this exact
-            corner and probes for an obstruction only on mount and on resize,
-            so a card that opens ~1.3s after the collapse is never seen — it
-            sat ON this X (measured 342-382 over 327-359 at 390px). Widening
-            the card past the FAB is not an option here, so the X steps in by
-            the FAB's 56px instead. From md up the card is centred and nowhere
-            near the viewport edge, so it keeps the corner. */}
+        <ResultsMute />
         <button
           type="button"
           onClick={onClose}
           aria-label={t('wordTowerV2.results.close')}
-          className="absolute end-14 top-[max(0.75rem,env(safe-area-inset-top))] flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none md:end-3"
+          className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
         >
           <X className="h-4 w-4" aria-hidden />
         </button>
-        {/* `px-12` keeps the title clear of the close button parked at `end-14`
-            — at 390px "TOWER DOWN!" ran straight under the X. */}
+        {/* `px-12` keeps the title clear of the close (end-3) and mute (start-3). */}
         <h2 className="px-12 font-neo-display text-3xl font-black uppercase">{t('wordTowerV2.collapsed')}</h2>
         {recapSrc ? (
           <img

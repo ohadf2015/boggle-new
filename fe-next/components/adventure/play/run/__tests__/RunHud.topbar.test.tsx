@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
+vi.mock('@/hooks/useMasterMute', () => ({
+  useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Sound on' }),
+}));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({
     // Interpolating, so a sentence key with a number in it still renders the number:

@@ -22,8 +22,10 @@
  * where the grid can least afford it.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Heart, Shield } from 'lucide-react';
+import { Heart, Shield, Volume2, VolumeX } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
+import { useMasterMute } from '@/hooks/useMasterMute';
 import type { CombatEvent, CombatState } from '@/lib/adventure/play/combat';
 import { POTION_IDS, type PotionId, type RelicId } from '@/lib/adventure/play/relics';
 import type { LevelKind } from '@/lib/adventure/play/levels';
@@ -91,12 +93,33 @@ export function Hearts({ hp, maxHp, bare = false }: { hp: number; maxHp: number;
   );
 }
 
+function RunHudMute() {
+  const { allMuted, toggle, label, title } = useMasterMute();
+  return (
+    <button
+      type="button"
+      data-testid="run-hud-mute"
+      onClick={toggle}
+      aria-label={label}
+      aria-pressed={!allMuted}
+      title={title}
+      className="ms-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-[3px] border-black bg-black/70 text-neo-cream shadow-[2px_2px_0_#000] active:translate-y-0.5 active:shadow-none"
+    >
+      {allMuted
+        ? <VolumeX className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+        : <Volume2 className="h-4 w-4" strokeWidth={2.5} aria-hidden />}
+    </button>
+  );
+}
+
 export default function RunHud({
   hp, maxHp, combat, dispatchCombat, hintsLeft = 0, onHint, potionsLeft, onPotion, goal, playing,
   relics = [], lastHit = null, words = [], combatControls = true, world, level, kind, seconds, step,
   stageEl = null,
 }: Props) {
   const { t } = useLanguageSafe();
+  // Own mute in this bar → the global FAB stands down instead of covering hearts/potions.
+  useRegisterHeaderAudioControl();
   const inFight = !!combat;
 
   const wordPulse = useMemo(() => {
@@ -164,7 +187,8 @@ export default function RunHud({
     /* 09-21 declutter: ONE row of what the level can use — relic icons, held
        potions, hearts, and the ordinary fight's shield. The room chip (the
        header names it), the purse (spent on the map) and empty sockets left:
-       every row here is height taken from the board. Relic detail is a tap. */
+       every row here is height taken from the board. Relic detail is a tap.
+       The in-HUD mute keeps the global audio FAB from parking over the band. */
     <div ref={band} data-adv-slot="hud" className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border-[3px] border-black bg-[#0f1b3d]/85 px-2 py-1 shadow-[3px_3px_0_#000]" data-testid="run-hud">
       {relics.length > 0 && (
         <div className="min-w-0" data-testid="run-hud-relics">
@@ -193,6 +217,7 @@ export default function RunHud({
           {t('adventurePlay.hint', { count: hintsLeft })}
         </button>
       )}
+      <RunHudMute />
       {goal && <div className="w-full text-xs font-bold opacity-90">{goal}</div>}
     </div>
   );
