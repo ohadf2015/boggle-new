@@ -12,7 +12,7 @@
  * 3. Server is authoritative across all devices
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { DailyPlayedStatus } from '@/app/api/daily/status/route';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
@@ -53,22 +53,23 @@ export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Pro
   const { user, isAuthenticated } = useAuth();
   const playerId = user?.id ?? null;
 
-  // Initialize with guest status (fast, immediate)
-  const [status, setStatus] = useState<DailyPlayedStatus>(() => {
-    if (isAuthenticated && playerId) {
-      // Authed: skeleton until server resolves
-      return {
-        today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false },
-        streak: { current: 0, longest: 0 },
-        allCompletedDates: [],
-        freezeCount: 0,
-        loading: true,
-        fromServer: false,
-      };
-    }
-    // Guest: immediate localStorage
-    return getGuestPlayedStatus();
-  });
+  // Authed: skeleton until the server resolves. Guest: nothing played, then the
+  // layout effect below reads this device's flags before first paint. The init
+  // must not touch localStorage — the daily hub SSRs (Sentry JAVASCRIPT-NEXTJS-29G),
+  // and reading it during hydration would mismatch the server HTML.
+  const [status, setStatus] = useState<DailyPlayedStatus>(() => ({
+    today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false },
+    streak: { current: 0, longest: 0 },
+    allCompletedDates: [],
+    freezeCount: 0,
+    loading: Boolean(isAuthenticated && playerId),
+    fromServer: false,
+  }));
+
+  useLayoutEffect(() => {
+    if (isAuthenticated && playerId) return;
+    try { setStatus(getGuestPlayedStatus()); } catch { /* storage disabled */ }
+  }, [isAuthenticated, playerId]);
 
   const isMounted = useRef(true);
   const isFetching = useRef(false);

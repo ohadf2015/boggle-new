@@ -18,6 +18,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 // Mock hooks before importing the component
 const mockUnlockAudio = vi.fn();
 const mockFadeToTrack = vi.fn();
+const mockStopMusic = vi.fn();
 
 // Mock framer-motion to avoid matchMedia issues
 vi.mock('framer-motion', () => ({
@@ -45,7 +46,7 @@ vi.mock('@/contexts/MusicContext', () => ({
     toggleMute: vi.fn(),
     setVolume: vi.fn(),
     playTrack: vi.fn(),
-    stopMusic: vi.fn(),
+    stopMusic: mockStopMusic,
     TRACKS: {
       LOBBY: 'lobby',
       IN_GAME: 'inGame',
@@ -284,5 +285,37 @@ describe('DailyChallenge - Audio Unlock on Game Start', () => {
     vi.clearAllMocks();
     fireEvent.click(playButton);
     expect(mockUnlockAudio).toHaveBeenCalled();
+  });
+});
+
+/*
+ * Word Hunt survival fades in BOSSA_ARCADE, then BOSSA at game over — and nothing
+ * in the live daily tree ever stopped it (the only stopMusic sat in the dead
+ * DailyChallengeGame), so it kept looping on the hub and every page after.
+ */
+describe('DailyChallenge - music stops when leaving the daily flow', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Storage.prototype.getItem = vi.fn(() => null);
+    Storage.prototype.setItem = vi.fn();
+  });
+
+  it('given the player leaves the word-hunt route, stops the music', async () => {
+    const { unmount } = render(<DailyChallenge />);
+    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
+    expect(mockStopMusic).not.toHaveBeenCalled();
+
+    unmount();
+
+    expect(mockStopMusic).toHaveBeenCalled();
+  });
+
+  it('given a re-render mid-flow, keeps the music playing', async () => {
+    const { rerender } = render(<DailyChallenge />);
+    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
+
+    rerender(<DailyChallenge />);
+
+    expect(mockStopMusic).not.toHaveBeenCalled();
   });
 });

@@ -62,7 +62,11 @@ export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' 
 const DailyChallenge: React.FC = () => {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
-  const { unlockAudio } = useMusic();
+  const { unlockAudio, stopMusic } = useMusic();
+  // Survival starts the game music and fades to BOSSA at game over; the results
+  // screen keeps it. Leaving the route is the only stop — without it the track
+  // looped on the hub and every page after.
+  useEffect(() => () => stopMusic(500), [stopMusic]);
   const { recordWin: recordStreak } = useWinStreak();
   const isPractice = usePracticeFlag();
   const { online } = useNetworkState();
