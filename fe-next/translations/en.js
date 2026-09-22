@@ -1218,7 +1218,11 @@ const en = {
     "hint": {"spell": "Spell a word to build the next floor", "drop": "Tap DROP when the floor is over the tower"},
     "changeWord": "CHANGE WORD",
     "editHint": "Tap a letter you used to edit the word",
-    "bestFlag": "BEST"
+    "bestFlag": "BEST",
+    "leaveConfirm": "Leave this climb? You can resume this tab, but a daily run is one per day.",
+    "dailyPlayed": "Today's tower is done. Come back tomorrow.",
+    "dailyRank": "You're #{rank} today",
+    "recapAlt": "Tower recap: {floors} floors, {m} metres"
   },
   "wordTower": {
     "mutator": {

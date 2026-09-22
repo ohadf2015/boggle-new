@@ -50,6 +50,12 @@ describe('rival share link', () => {
     expect(r.words.every((w) => w.length <= 15)).toBe(true);
   });
 
+  it('given a tall tower, when encoded, then the link stays under messenger URL limits', () => {
+    const encoded = encodeRival({ name: 'Dana', words: Array.from({ length: 80 }, (_, i) => `floor${i}`) });
+    expect(encoded.length).toBeLessThan(2000);
+    expect(decodeRival(encoded)!.words.length).toBeLessThanOrEqual(30);
+  });
+
   it('given control characters, when decoded, then stripped', () => {
     expect(decodeRival(encodeRival({ name: 'a\u0000b\u202Ec', words: ['ok\u0007'] }))).toEqual({ name: 'abc', words: ['ok'] });
   });

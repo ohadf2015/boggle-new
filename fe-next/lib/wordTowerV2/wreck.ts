@@ -375,7 +375,11 @@ export function sanitizeWords(raw: unknown[]): string[] {
 }
 
 export function encodeRival(r: RivalTower): string {
-  const bytes = new TextEncoder().encode(JSON.stringify({ n: r.name, w: r.words }));
+  // Encode the same clamp decode applies — a 200-floor word list blows past
+  // messenger URL limits and the link arrives truncated / unloadable.
+  const words = sanitizeWords(r.words);
+  const name = clean(r.name, MAX_NAME);
+  const bytes = new TextEncoder().encode(JSON.stringify({ n: name, w: words }));
   let bin = '';
   for (const b of bytes) bin += String.fromCharCode(b);
   return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');

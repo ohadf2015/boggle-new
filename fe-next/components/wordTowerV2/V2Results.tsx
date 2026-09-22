@@ -33,6 +33,12 @@ interface Props {
   onShare?: () => void;
   /** Extra actions under the buttons (the empire entry lives here). */
   extra?: ReactNode;
+  /** Graphic recap PNG (doctrine: recap is a picture, not emoji text). */
+  recapSrc?: string;
+  /** Daily one-run lock — hide play-again. */
+  dailyLocked?: boolean;
+  /** Rank on today's daily board after the one attempt. */
+  dailyRank?: number | null;
   /** Everything the rival board + raid round need; absent = no board (tests, demo). */
   rivals?: {
     estate: UseEstate;
@@ -62,7 +68,7 @@ function nextGoal(stats: RunStats, skip: Set<string>) {
   return best;
 }
 
-export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals }: Props) {
+export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals, recapSrc, dailyLocked, dailyRank }: Props) {
   // `revenge` is the raid being answered, not a flag: its numbers ride the whole
   // raid so the payout can name the debt it settled.
   const [target, setTarget] = useState<{ rival: RivalView; revenge: RevengeEntry | null } | null>(null);
@@ -125,6 +131,15 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
         {/* `px-12` keeps the title clear of the close button parked at `end-14`
             — at 390px "TOWER DOWN!" ran straight under the X. */}
         <h2 className="px-12 font-neo-display text-3xl font-black uppercase">{t('wordTowerV2.collapsed')}</h2>
+        {recapSrc ? (
+          <img
+            src={recapSrc}
+            alt={t('wordTowerV2.recapAlt', { floors, m: peakM.toFixed(1) })}
+            className="mx-auto mt-3 w-full max-w-sm rounded-neo border-neo border-black shadow-hard-sm"
+            width={1200}
+            height={630}
+          />
+        ) : null}
         {isBest ? (
           <div className="mx-auto mt-2 flex w-fit items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-3 py-0.5 font-neo-display text-sm font-bold">
             <Trophy className="h-4 w-4" aria-hidden />
@@ -197,16 +212,24 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
             onPick={(rival, revenge) => setTarget({ rival, revenge })}
           />
         ) : null}
-        {/* ONE primary action. Everything else is smaller, and anything the
-            player cannot actually act on is not rendered at all. */}
-        <button
-          type="button"
-          onClick={onRestart}
-          autoFocus
-          className="mt-5 w-full rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-        >
-          {t('common.playAgain')}
-        </button>
+        {/* ONE primary action. Daily one-run: the replay button is the cheat. */}
+        {dailyLocked ? (
+          <>
+            <p className="mt-5 font-neo-display text-sm font-bold">{t('wordTowerV2.dailyPlayed')}</p>
+            {dailyRank ? (
+              <p className="mt-1 font-neo-display text-base font-black">{t('wordTowerV2.dailyRank', { rank: dailyRank })}</p>
+            ) : null}
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={onRestart}
+            autoFocus
+            className="mt-5 w-full rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          >
+            {t('common.playAgain')}
+          </button>
+        )}
 
         {/* Secondary: the empire, and the smash round when there is a tower to
             smash. Side by side so the card does not grow a button stack. */}
