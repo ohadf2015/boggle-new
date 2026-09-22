@@ -51,7 +51,7 @@ export default function NodeShell({ kind, world, title, subtitle, gold, hp, maxH
   }, [measure, children]);
 
   return (
-    <div data-testid={`node-screen-${kind}`} className="fixed inset-0 z-[60] overflow-hidden bg-[#0f1b3d] text-neo-cream">
+    <div data-testid={`node-screen-${kind}`} className="fixed inset-0 z-60 overflow-hidden bg-[#0f1b3d] text-neo-cream" data-adv-overlay="NodeShell">
       {/* eslint-disable-next-line @next/next/no-img-element -- full-bleed decorative backdrop */}
       <img src={nodeScene(kind, world)} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-70" />
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(15,27,61,0.35)_0%,rgba(9,14,34,0.92)_75%)]" />

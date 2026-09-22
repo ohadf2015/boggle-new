@@ -51,7 +51,7 @@ export default function CoinBurst({ fromRef, toRef, count, onLand, onDone }: Pro
 
   if (!flights?.length) return null;
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-[70]">
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-70">
       {flights.map((f, i) => (
         <motion.img
           key={i}

@@ -126,7 +126,7 @@ export default function WordCast({ cast, impacted }: { cast: CastData; impacted:
   const decay = Math.max(300, cast.holdMs - cast.impactMs);
 
   return createPortal(
-    <div className="pointer-events-none fixed inset-0 z-[70]" aria-hidden data-testid="adv-word-cast" data-tier={cast.tier}>
+    <div className="pointer-events-none fixed inset-0 z-70" aria-hidden data-testid="adv-word-cast" data-tier={cast.tier}>
       {/* Sunburst behind the hanging word: grows as it assembles, spins, fades with the decay. */}
       <span className="adv-cast-burst" data-testid="adv-cast-burst"
         style={{ left: rowX, top: rowY, width: rowW + 120 + cast.power * 60, height: rowW + 120 + cast.power * 60, '--adv-glow': gems[0]?.glow ?? style.banner, animationDuration: `${cast.holdMs}ms` } as Vars} />
