@@ -27,13 +27,10 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { CombatEvent, CombatState } from '@/lib/adventure/play/combat';
 import { POTION_IDS, type PotionId, type RelicId } from '@/lib/adventure/play/relics';
 import type { LevelKind } from '@/lib/adventure/play/levels';
-import type { NodeKind } from '@/lib/adventure/play/runMap';
 import { relicContributions } from '@/lib/adventure/play/relicStack';
 import type { HitEvent } from './events';
 import { runLevels } from './run/offerValue';
 import RelicBar, { type RelicPulse } from './run/RelicBar';
-import NodeChip from './run/NodeChip';
-import GoldCounter from './run/GoldCounter';
 import PotionButton from './run/PotionButton';
 import { triggeredRelics, relicBonusLabel } from './run/relicTriggers';
 import { levelStartFire, fightStartFire, combatFxFire } from './run/relicEvents';
@@ -44,7 +41,6 @@ import { cn } from '@/lib/utils';
 interface Props {
   hp: number;
   maxHp: number;
-  gold: number;
   combat: CombatState | null;
   dispatchCombat: (ev: CombatEvent) => void;
   /** Omit both to leave hints to fx/HintButton. */
@@ -65,8 +61,6 @@ interface Props {
   level?: number;
   kind?: LevelKind;
   seconds?: number;
-  /** Which map room this is — derive with `currentNodeKind(map, currentNode, lvl)`. */
-  nodeKind?: NodeKind | null;
   /** The run's step (`run.step`) — how many nodes have been cleared, which keys the banked words. */
   step?: number;
   /** The fight stage, so an opened relic bubble never buries the boss HP bar or the attack countdown. */
@@ -98,8 +92,8 @@ export function Hearts({ hp, maxHp, bare = false }: { hp: number; maxHp: number;
 }
 
 export default function RunHud({
-  hp, maxHp, gold, combat, dispatchCombat, hintsLeft = 0, onHint, potionsLeft, onPotion, goal, playing,
-  relics = [], lastHit = null, words = [], combatControls = true, world, level, kind, seconds, nodeKind = null, step,
+  hp, maxHp, combat, dispatchCombat, hintsLeft = 0, onHint, potionsLeft, onPotion, goal, playing,
+  relics = [], lastHit = null, words = [], combatControls = true, world, level, kind, seconds, step,
   stageEl = null,
 }: Props) {
   const { t } = useLanguageSafe();
@@ -157,67 +151,49 @@ export default function RunHud({
     [prior, words, kind, seconds, relics],
   );
 
-  // Every potion slot, held or not. Filtering empties out made the rail vanish
-  // whenever you held nothing, which reads as "this game has no potions".
   const showControls = combatControls && !!combat;
+  // Only what can be used right now: a potion you do not hold is not a button.
+  const held = POTION_IDS.filter((id) => (potionsLeft[id] ?? 0) > 0);
 
-  // The trigger callout parks below the WHOLE band, not below the relic rail:
-  // under the rail it landed squarely on the potion slots and the purse.
+  // The trigger callout parks below the WHOLE band, not below the relic rail.
   const band = useRef<HTMLDivElement>(null);
   const [bandEl, setBandEl] = useState<HTMLDivElement | null>(null);
   useEffect(() => setBandEl(band.current), []);
 
   return (
-    /* ONE band, not five floating chips: the HUD used to sit straight on the
-       world art, where a sunlit backdrop swallowed the potion sockets and the
-       bar read as scattered stickers. A single dark panel with the house border
-       is the Slay-the-Spire top bar — legible over any world, and on a TV it
-       reads as one instrument cluster instead of confetti. */
-    <div ref={band} data-adv-slot="hud" className="mt-2 flex flex-col gap-1 rounded-2xl border-[3px] border-black bg-[#0f1b3d]/85 px-2 pb-1.5 shadow-[3px_3px_0_#000]" data-testid="run-hud">
-      {/* Relic row — the strip and nothing else, so it owns the band's full
-          width. Sharing it with the purse cost ~66px and pushed a twelve-relic
-          haul onto a third row over the boss board. */}
-      <div className="flex items-center" data-testid="run-hud-relics">
-        {/* The rail keeps its place even when it is empty: relics have a home you can point at. */}
-        {relics.length > 0 ? (
-          <RelicBar relics={relics} pulse={pulse} contrib={contrib} stackCtx={stackCtx} calloutHost={bandEl}
-            tooltipAvoid={stageEl} className="min-w-0 flex-1" />
-        ) : (
-          /* The band behind it supplies the contrast, so the empty rail is a
-             dashed socket and nothing more. */
-          <span className="my-2 flex h-9 min-w-0 flex-1 items-center truncate rounded-lg border-[3px] border-dashed border-neo-cream/35 px-2 text-[11px] font-bold text-neo-cream/80">
-            {t('adventurePlay.loot.noRelics')}
-          </span>
-        )}
-      </div>
-      {/* Resource row: the room you are in, your hearts, your purse, and the potions you can drink right now. */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5" data-testid="run-hud-resources">
-          {nodeKind && <NodeChip kind={nodeKind} />}
-          {/* Elite/boss stages draw their own hearts; a fight node's rival leaves them here. */}
-          {(!inFight || combatControls) && <Hearts hp={hp} maxHp={maxHp} bare />}
-          <GoldCounter value={gold} />
-          <span className="flex items-center gap-1.5" data-testid="run-hud-potions" aria-label={t('adventurePlay.loot.potionsTitle')}>
-            {POTION_IDS.map((id) => (
-              <PotionButton key={id} id={id} count={potionsLeft[id] ?? 0} onDrink={onPotion}
-                disabled={!potionUsable(id, { playing, inFight, hp, maxHp, fightHp: combat?.hp, fightMaxHp: combat?.maxHp })} />
-            ))}
-          </span>
-          {showControls && (
-            <button type="button" className={btn} disabled={!playing || combat!.shields <= 0 || combat!.guard}
-              onClick={() => dispatchCombat({ type: 'tapShield' })}>
-              <Shield className="inline h-3.5 w-3.5" /> {t('adventurePlay.shield', { count: combat!.shields })}
-            </button>
-          )}
-          {onHint && (
-            <button type="button" className={btn} disabled={!playing || hintsLeft <= 0} onClick={onHint}>
-              {t('adventurePlay.hint', { count: hintsLeft })}
-            </button>
-          )}
-      </div>
-      {/* No telegraph row here: the band's height is what the board is sized
-          from, so an alert appearing mid-fight shoved the stage down and shrank
-          the grid. The rival's wind-up and deflects live on its card (FoeTarget). */}
-      {goal && <div className="text-xs font-bold opacity-90">{goal}</div>}
+    /* 09-21 declutter: ONE row of what the level can use — relic icons, held
+       potions, hearts, and the ordinary fight's shield. The room chip (the
+       header names it), the purse (spent on the map) and empty sockets left:
+       every row here is height taken from the board. Relic detail is a tap. */
+    <div ref={band} data-adv-slot="hud" className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border-[3px] border-black bg-[#0f1b3d]/85 px-2 py-1 shadow-[3px_3px_0_#000]" data-testid="run-hud">
+      {relics.length > 0 && (
+        <div className="min-w-0" data-testid="run-hud-relics">
+          <RelicBar relics={relics} size="xs" pulse={pulse} contrib={contrib} stackCtx={stackCtx} calloutHost={bandEl}
+            tooltipAvoid={stageEl} />
+        </div>
+      )}
+      {held.length > 0 && (
+        <span className="flex items-center gap-1.5" data-testid="run-hud-potions" aria-label={t('adventurePlay.loot.potionsTitle')}>
+          {held.map((id) => (
+            <PotionButton key={id} id={id} count={potionsLeft[id] ?? 0} onDrink={onPotion}
+              disabled={!potionUsable(id, { playing, inFight, hp, maxHp, fightHp: combat?.hp, fightMaxHp: combat?.maxHp })} />
+          ))}
+        </span>
+      )}
+      {/* Elite/boss stages draw their own hearts; a fight node's rival leaves them here. */}
+      {(!inFight || combatControls) && <span className="ms-auto"><Hearts hp={hp} maxHp={maxHp} bare /></span>}
+      {showControls && (
+        <button type="button" className={btn} disabled={!playing || combat!.shields <= 0 || combat!.guard}
+          onClick={() => dispatchCombat({ type: 'tapShield' })}>
+          <Shield className="inline h-3.5 w-3.5" /> {t('adventurePlay.shield', { count: combat!.shields })}
+        </button>
+      )}
+      {onHint && (
+        <button type="button" className={btn} disabled={!playing || hintsLeft <= 0} onClick={onHint}>
+          {t('adventurePlay.hint', { count: hintsLeft })}
+        </button>
+      )}
+      {goal && <div className="w-full text-xs font-bold opacity-90">{goal}</div>}
     </div>
   );
 }

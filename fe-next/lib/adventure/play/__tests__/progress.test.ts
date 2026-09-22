@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { canPlayLevel, rewardsFor, totalStarsOf, WORLD_SKIN_ITEM } from '../progress';
+import { canPlayLevel, nextRunWorld, rewardsFor, totalStarsOf, WORLD_SKIN_ITEM } from '../progress';
 import { getCollectibleById } from '@/lib/adventure/collectibleConfig';
 
 const done = (world: number, level: number, stars: number) => ({ world, level, stars });
@@ -53,5 +53,25 @@ describe('rewardsFor', () => {
 describe('totalStarsOf', () => {
   it('sums stars', () => {
     expect(totalStarsOf([done(1, 1, 3), done(1, 2, 2)])).toBe(5);
+  });
+});
+
+describe('nextRunWorld', () => {
+  it('given nothing played, then the run starts in world 1', () => {
+    expect(nextRunWorld([])).toBe(1);
+  });
+
+  it('given world 1 half walked, then it stays in world 1', () => {
+    expect(nextRunWorld([done(1, 1, 2), done(1, 3, 1)])).toBe(1);
+  });
+
+  it('given world 1\'s boss beaten on a path that skipped slots, then the next run is world 2', () => {
+    // A branching run clears a few LevelSpec slots, never all seven.
+    expect(nextRunWorld([done(1, 1, 1), done(1, 4, 1), done(1, 7, 1)])).toBe(2);
+  });
+
+  it('given every boss beaten, then it stays on the last world', () => {
+    const all = Array.from({ length: 10 }, (_, i) => done(i + 1, 7, 1));
+    expect(nextRunWorld(all)).toBe(10);
   });
 });

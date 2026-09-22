@@ -25,7 +25,7 @@ import { fetchWithAuth } from '@/utils/authFetch';
 import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 import { tickClock } from '@/lib/adventure/play/runClock';
 import { clearClearedNodes } from '@/components/adventure/map/clearedNodes';
-import { readRun, writeRun } from './runStorage';
+import { readRun, writeRun, readCarry, writeCarry } from './runStorage';
 import {
   STALE_DEAL_MS, FOE_KO_FINISH_MS, ADVENTURE_MODE,
   type RunPhase, type SubmitResult, type RunResult, type EcosystemGains, type CombatFxEntry,
@@ -218,10 +218,12 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
     setPhase('loading');
     try {
       const runToken = pendingRunTokenRef.current || dealtRunTokenRef.current;
+      // A mint (no run yet) brings the last run's relics + potions along.
+      const carryToken = runToken ? null : readCarry();
       const res = await fetchWithAuth('/api/adventure/node', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ world, ...(runToken ? { runToken } : {}), ...payload }),
+        body: JSON.stringify({ world, ...(runToken ? { runToken } : {}), ...(carryToken ? { carryToken } : {}), ...payload }),
       });
       if (res.status === 400 && runToken && !retried) {
         const code = await res.json().then((d) => d?.code).catch(() => null);
@@ -236,6 +238,7 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
       if (!res.ok) throw new Error(`node ${res.status}`);
       const data = await res.json();
       if (req !== requestRef.current) return;
+      if (carryToken) writeCarry(null); // spent: the new run holds the haul now
       const r = applyView(data);
       hpRef.current = r?.hp ?? BASE_HP;
       setHp(hpRef.current);
@@ -259,7 +262,12 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
    * press but "back to map".
    */
   const newRun = useCallback(() => {
+    // Abandoning a live run still keeps its haul for the next one.
+    const live = pendingRunTokenRef.current || dealtRunTokenRef.current;
+    if (live) writeCarry(live);
     writeRun(world, null);
+    // The dead run's board spec: left in place, the header fell back to its level number.
+    setLvl(null);
     clearClearedNodes(world);
     pendingRunTokenRef.current = '';
     dealtRunTokenRef.current = '';
@@ -348,7 +356,9 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
         dealtRunTokenRef.current = data.nextRunToken;
       } else {
         // Run over (died or lost): the token is dead. Forget it, or the next
-        // "open the map" would resume a run the server will refuse.
+        // "open the map" would resume a run the server will refuse — but keep
+        // it as the carry, so the next run starts with this one's relics.
+        writeCarry(dealtRunTokenRef.current || pendingRunTokenRef.current || null);
         writeRun(world, null);
         pendingRunTokenRef.current = '';
         dealtRunTokenRef.current = '';
@@ -514,7 +524,11 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
   const shiftClock = useCallback((ms: number) => {
     if (phase === 'playing') endAtRef.current = Math.max(Date.now(), endAtRef.current + ms);
   }, [phase]);
-  const frozen = useMemo(() => blockedTiles(combat), [combat]);
+  // Keyed on the tiles, not `combat`: the fight ticks 5x/s and a fresh Set every
+  // tick broke GridComponent's memo, re-rendering every tile right through a drag.
+  const frozenKey = combat?.tiles.map((t) => t.key).sort().join() ?? '';
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- frozenKey IS the tile set
+  const frozen = useMemo(() => blockedTiles(combat), [frozenKey]);
   // Elite kill mints a relic (the server grants the same one in the next run link).
   const defeated = !!combat?.defeated;
   const trophy = useMemo<RelicId | null>(

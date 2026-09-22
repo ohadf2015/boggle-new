@@ -33,6 +33,30 @@ export function writeRun(world: number, value: StoredRun | null) {
   }
 }
 
+/**
+ * The last run's token, kept after that run ends (died, won, or abandoned) so
+ * the NEXT run — in this world or the next — starts with its relics and
+ * potions. World-agnostic on purpose: clearing world 1 opens world 2.
+ */
+const CARRY_KEY = 'adv-run-carry';
+
+export function readCarry(): string | null {
+  try {
+    return localStorage.getItem(CARRY_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function writeCarry(token: string | null) {
+  try {
+    if (token) localStorage.setItem(CARRY_KEY, token);
+    else localStorage.removeItem(CARRY_KEY);
+  } catch {
+    /* storage unavailable — the next run starts empty-handed */
+  }
+}
+
 /** Best word across the levels of the current run (for the run-over / run-complete recap). */
 export interface RunBest { word: string; pts: number }
 

@@ -130,6 +130,28 @@ describe('useAdventureRun — roguelike run', () => {
     expect(localStorage.getItem(runStorageKey(1))).toBeNull();
   });
 
+  it('given a run that just ended, when a new run is opened, then the dead run\'s token is sent as carryToken once, and the old level is forgotten', async () => {
+    const calls = mockApi(); // /complete answers runOver with no next run
+    const { result } = hook();
+    await waitFor(() => expect(result.current.phase).toBe('ready'));
+    act(() => result.current.begin());
+    await act(async () => { await result.current.finish(); });
+    await waitFor(() => expect(result.current.phase).toBe('done'));
+
+    act(() => { void result.current.newRun(); });
+    expect(result.current.lvl).toBeNull(); // no "level 3" header left over from the dead run
+    await waitFor(() => expect(result.current.phase).toBe('map'));
+    const mint = calls.filter((c) => c.url.includes('/node')).pop()!;
+    expect(mint.body.runToken).toBeUndefined();
+    expect(mint.body.carryToken).toBe('rt-after-start');
+
+    // Carried once: the next mint does not replay it.
+    act(() => { void result.current.newRun(); });
+    await waitFor(() => expect(result.current.phase).toBe('map'));
+    const again = calls.filter((c) => c.url.includes('/node')).pop()!;
+    expect(again.body.carryToken).toBe('rt-after-node'); // the run just minted, abandoned
+  });
+
   it('given an elite fight, when the enemy lands a lethal hit, then the run reports died', async () => {
     const calls = mockApi({ level: getPlayLevel(1, 4), run: pubRun({ step: 4, hp: 1 }) });
     const { result } = hook(4);

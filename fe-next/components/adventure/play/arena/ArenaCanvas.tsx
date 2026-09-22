@@ -86,6 +86,9 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
       await created.init({
         backgroundAlpha: 0,
         antialias: true,
+        // One loop: `tick` below renders, and only while the stage is on screen.
+        // Pixi's own ticker drew 60fps on top of it, visible or not.
+        autoStart: false,
         resizeTo: host,
         resolution: Math.min(window.devicePixelRatio || 1, 2),
         autoDensity: true,
@@ -145,9 +148,10 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
       let seen = queued.length ? queued[queued.length - 1].id : -1;
       let lastTs = performance.now();
 
+      // v8: `screen` is CSS px. `renderer.width / resolution` shrank the scene to 1/dpr on phones.
       const view = () => ({
-        w: created.renderer.width / created.renderer.resolution,
-        h: created.renderer.height / created.renderer.resolution,
+        w: created.renderer.screen.width,
+        h: created.renderer.screen.height,
       });
 
       const toViewport = (x: number, y: number) => {
@@ -315,7 +319,6 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         raf = requestAnimationFrame(tick);
         const rawMs = Math.min(ts - lastTs, 90);
         lastTs = ts;
-        if (!visible) return;
 
         const { w, h } = view();
         const key = `${Math.round(w)}x${Math.round(h)}|${rtl}`;
@@ -411,6 +414,8 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         flashAlpha = Math.max(0, flashAlpha - dt * 2.6);
         vignette.alpha = flashAlpha;
         vignette.tint = flashColor;
+        // The scene keeps stepping (cheap); only the GPU draw waits for the stage to be seen.
+        if (visible) created.render();
       };
       raf = requestAnimationFrame(tick);
     })();

@@ -306,38 +306,6 @@ export function isLevelUnlocked(
   );
 }
 
-/**
- * Get the next locked level for a player
- *
- * @param currentWorld - Current world
- * @param completions - Array of completed levels
- * @returns { world, level } of next locked level, or null if all complete
- */
-export function getNextUnlockedLevel(
-  currentWorld: number,
-  completions: Array<{ world: number; level: number; stars: number }>
-): { world: number; level: number } | null {
-  // Find highest completed level in current world
-  const worldCompletions = completions.filter((c) => c.world === currentWorld);
-  const maxLevel = worldCompletions.reduce(
-    (max, c) => Math.max(max, c.level),
-    0
-  );
-
-  // If not all levels complete in current world
-  if (maxLevel < LEVELS_PER_WORLD) {
-    return { world: currentWorld, level: maxLevel + 1 };
-  }
-
-  // Move to next world
-  if (currentWorld < WORLDS_COUNT) {
-    return { world: currentWorld + 1, level: 1 };
-  }
-
-  // All complete
-  return null;
-}
-
 // ==============================================
 // DIFFICULTY HELPERS
 // ==============================================

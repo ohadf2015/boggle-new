@@ -14,7 +14,8 @@
  * Budget on a 390px phone: the rail gets ~278px next to the gold pill, with a
  * 4px gap, so a row holds `floor((278 + 4) / (w + 4))` slots.
  */
-export type RelicBarSize = 'sm' | 'md';
+/** `xs`: the in-level HUD — icon-only at the 32px floor, sharing its row with the potions. */
+export type RelicBarSize = 'xs' | 'sm' | 'md';
 
 /** No relic icon is ever painted smaller than this. The round-2 judge gap, as a number. */
 export const RELIC_ICON_FLOOR_PX = 32;
@@ -31,6 +32,7 @@ export const RELIC_ICON_FLOOR_PX = 32;
  */
 export function relicSlotClass(count: number, size: RelicBarSize = 'sm'): string {
   const floor = 'min-w-8';
+  if (size === 'xs') return `${floor} max-w-8 basis-8`;
   if (size === 'md') {
     // The map rail and the run-recap card are calmer rooms with more width, so
     // they hold the fat size longer before stepping down.

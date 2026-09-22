@@ -40,7 +40,7 @@ const ja = {
       "hintRelic": "ランダムなレリック",
       "hintFullHeal": "全回復",
       "hintOr": "または",
-      "hintRisk": "かけ"
+      "hintRisk": "賭け"
     },
     "map": {
       "kind": {
@@ -355,7 +355,7 @@ const ja = {
         "treasure": "宝箱",
         "events": "未知",
         "gold": "ゴールド",
-        "relics": "遺物",
+        "relics": "レリック",
         "flawless": "無傷",
         "total": "最終スコア"
     },
@@ -10689,12 +10689,12 @@ const ja = {
     "playLevel": "レベル{level} — {stars}/{maxStars}スター",
     "unlockRequirement": "レベル{level}をクリア",
     "lockedTitle": "ロック中",
-    "lockedWorldHint": "ワールド{world}のボスを倒すと解放されます",
+    "lockedWorldHint": "ワールド{world}のボスを倒せば解放！",
     "combo": {
       "nice": "ナイス!",
       "great": "グレイト!",
       "amazing": "すごい!",
-      "incredible": "すごい!",
+      "incredible": "驚異的!",
       "legendary": "伝説級!",
       "mythic": "神話級!",
       "transcendent": "超越!"
@@ -10779,7 +10779,7 @@ const ja = {
       "fragmentCollected": "レキシコンの欠片を回収！",
       "fragmentCount": "欠片 {{current}}/{{total}} 収集済み",
       "tutorialGotIt": "了解！",
-      "newMechanic": "新しい仕掛けが解放されました！",
+      "newMechanic": "新しい仕掛けが解放された！",
       "twistMechanic": "ボスツイスト",
       "skipIntro": "スキップ",
       "readyToFight": "いくぞ！",
@@ -10815,7 +10815,7 @@ const ja = {
         "errorTitle": "動画エラー",
         "errorDescription": "ムービーの再生中に問題が発生しました。再試行するかスキップしてください。",
         "errorTapToSkip": "スキップをタップして続行",
-        "errorPressEscToSkip": "ムービーの読み込みに失敗しました。ESCキーまたは待機してスキップ。",
+        "errorPressEscToSkip": "ムービーの読み込みに失敗しました。タップするか、そのまま待てばスキップされます。",
         "retry": "再試行",
         "fallbackTitle": {
           "victory": "勝利！",
@@ -10988,20 +10988,20 @@ const ja = {
       },
       "captainMetaphor": {
         "name": "キャプテン・メタファー",
-        "mechanic": "比喩艦隊戦 - 私の慣用句から文字通りの単語を見つけろ！",
-        "storyline": "3つの欠片が比喩の海を指すコンパスを形成する。キャプテン・メタファーはこの海域を航海し、慣用句でしか話さない。第4の欠片は渡さない——彼の言語で語りかけるしかない。",
+        "mechanic": "比喩の荒波 - ことわざに隠れた言葉を見つけ出せ！",
+        "storyline": "3つの欠片が比喩の海を指すコンパスとなる。キャプテン・メタファーはこの海域を統べ、たとえ話でしか喋らない。第4の欠片が欲しければ、やつの流儀――比喩で語りかけるしかない。",
         "taunts": {
-          "start1": "おーい！見当違いの木に吠えてるぞ！海の上なのに変だな！",
-          "start2": "震えろ我がメタファー！新しい挑戦者が運命の板を歩く！",
-          "goodWord1": "驚いた！その単語はまさに的中だ！",
-          "goodWord2": "原石のダイヤモンド！ちなみに、ダイヤモンドを見つけろ！",
-          "badWord1": "そりゃ野生のガチョウ追いだ！まったく間違った鳥だ！",
-          "badWord2": "卵が孵る前に数えるな！チキン、カウント、ビフォアが必要だ！",
-          "mechanic1": "猫と犬が降ってるぞ！レイン、キャッツ、ドッグズを見つけろ！",
-          "mechanic2": "足を折れ！文字通りじゃない！慣用句の中の単語を見つけろ！",
-          "lowTime1": "時間が飛ぶ！俺の船と違って！船も飛ぶ！比喩だ！",
-          "victory": "俺の戦艦を沈めたな！待て、違うゲームだ。俺の慣用句を破った！",
-          "defeat": "早起きの鳥は虫を捕まえる、お前が虫だ！アール！"
+          "start1": "おいおい、見当違いの海図を追ってるようだな！",
+          "start2": "震えあがれ！新入りに板の上を歩かせてやろうか！",
+          "goodWord1": "やるな、小僧！その一言、見事に的を射たぞ！",
+          "goodWord2": "光るものを見つけたな！だが海千山千にはまだ早いぞ！",
+          "badWord1": "そいつは的外れも甚だしいぞ！",
+          "badWord2": "取らぬ狸の皮算用ってやつだ！",
+          "mechanic1": "嵐が来るぞ！比喩の裏に隠れた言葉を見つけ出せ！",
+          "mechanic2": "回りくどいのはなしだ！ことわざの中身を見つけろ！",
+          "lowTime1": "光陰矢の如し！時は待っちゃくれんぞ！",
+          "victory": "見事、わしの化けの皮を剥いだな！",
+          "defeat": "元も子もない挑戦だったな！出直してこい！"
         }
       },
       "baronBuildaword": {
@@ -11120,7 +11120,7 @@ const ja = {
         "trophy": "トロフィー",
         "scroll": "巻物",
         "rune": "ルーン",
-        "relic": "遺物"
+        "relic": "レリック"
       },
       "rarity": {
         "common": "コモン",
@@ -11211,7 +11211,7 @@ const ja = {
         "w10": "星々の間の道を示す地図"
       }
     },
-    "chapterComplete": "チャプター{{chapter}}クリア!",
+    "chapterComplete": "第{{chapter}}章クリア！",
     "lvl": "LV",
     "leaveGame": "ゲームを離れる"
   },

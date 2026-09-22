@@ -204,8 +204,10 @@ describe('POST /api/adventure/start', () => {
     const { stars, enemyHp, bossHp, ...design } = res.data.level;
     const { stars: _s, enemyHp: _e, bossHp: _b, ...expectedDesign } = expectedLevel;
     expect(design).toEqual(expectedDesign);
-    expect(stars[1] / stars[0]).toBeCloseTo(1.3, 1);
-    expect(stars[2] / stars[0]).toBeCloseTo(1.6, 1);
+    // Thresholds round to 5, so the steps hold to within that rounding — a ratio
+    // tolerance broke once W1's first star dropped to ~40-60 (09-21 ease-in).
+    expect(Math.abs(stars[1] - stars[0] * 1.3)).toBeLessThanOrEqual(2.5);
+    expect(Math.abs(stars[2] - stars[0] * 1.6)).toBeLessThanOrEqual(2.5);
   });
 
   it('given a dealt board, when POST is called, then the tuned thresholds are signed into the token', async () => {
