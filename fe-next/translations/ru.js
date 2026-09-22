@@ -11452,7 +11452,7 @@ const ru = {
       "scheduleReteachHint": "Соберите снова сложные слова и сыграйте через ~две недели — интервальный повтор в стиле Kahoot.",
       "unpluggedReteachLiveCta": "Начать Unplugged reteach Live",
       "reteachLiveCta": "Начать 3-мин reteach Live",
-      "unpluggedReteachLiveFoil": "Альтернатива Kahoot Unplugged — проецируйте пропуски; ученики отвечают на бумаге, без устройств."
+      "unpluggedReteachLiveFoil": "Альтернатива Kahoot Unplugged (Teacher Takeover, 21 сен 2026 — когда нет устройств учеников) — проецируйте пропуски; ученики отвечают на бумаге, без устройств."
     },
     "subscription": {
       "giftedNoCard": "Карта не привязана, продления нет — срок просто закончится, и вы вернётесь на бесплатный план.",

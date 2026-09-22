@@ -12516,7 +12516,7 @@ const es = {
       "scheduleReteachHint": "Reconstruye las palabras difíciles y vuelve a jugar en unas dos semanas — repaso espaciado al estilo Kahoot.",
       "unpluggedReteachLiveCta": "Empezar Unplugged reteach Live",
       "reteachLiveCta": "Empezar reteach Live de 3 min",
-      "unpluggedReteachLiveFoil": "Alternativa a Kahoot Unplugged: proyecta las fallas; el alumnado responde en papel, sin dispositivos."
+      "unpluggedReteachLiveFoil": "Alternativa a Kahoot Unplugged (Teacher Takeover, 21 sep 2026 — cuando no hay dispositivos de alumnado) — proyecta las fallas; el alumnado responde en papel, sin dispositivos."
     },
     "subscription": {
       "giftedNoCard": "Sin tarjeta ni renovación: simplemente termina y vuelves al plan gratuito.",

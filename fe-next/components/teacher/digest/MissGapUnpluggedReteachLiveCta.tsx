@@ -2,8 +2,12 @@
  * Deep-link CTAs: miss-gap words → Unplugged reteach Live / 3-min reteach Live.
  *
  * Sits under last-lesson digest chips (#1090/#1120 reports) and on the miss-gap
- * teacher progress card. Kahoot Unplugged foil: teacher screen + paper, no
- * student devices. Class-level words only — never student names.
+ * teacher progress card. Kahoot Unplugged / device-free foil — reinforces
+ * Kahoot blog Sep 21, 2026 「Teacher Takeover: When student devices aren’t an
+ * option, take Kahoot!」
+ * https://kahoot.com/blog/2026/09/21/teacher-takeover-unplugged-offline/
+ * Teacher screen + paper, no student devices. Class-level words only — never
+ * student names.
  */
 'use client';
 

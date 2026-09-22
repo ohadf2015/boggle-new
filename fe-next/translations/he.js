@@ -12422,7 +12422,7 @@ const he = {
       "scheduleReteachHint": "לבנות מחדש את המילים הקשות ולשחק שוב בעוד כשבועיים — חזרה מרווחת בסגנון Kahoot.",
       "unpluggedReteachLiveCta": "התחלת Unplugged Live לחיזוק",
       "reteachLiveCta": "התחלת Live חיזוק ל־3 דקות",
-      "unpluggedReteachLiveFoil": "מול Kahoot Unplugged — מקרינים את המילים החסרות; התלמידים עונים על נייר, בלי מכשירים."
+      "unpluggedReteachLiveFoil": "מול Kahoot Unplugged (Teacher Takeover, 21 בספט׳ 2026 — כשאין מכשירי תלמידים) — מקרינים את המילים החסרות; התלמידים עונים על נייר, בלי מכשירים."
     },
     "subscription": {
       "giftedNoCard": "אין כרטיס במערכת ואין חידוש — זה פשוט מסתיים וחוזרים לחינמי.",

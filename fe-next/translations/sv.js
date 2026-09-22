@@ -12802,7 +12802,7 @@ const sv = {
       "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor — mellanslagsrepetition à la Kahoot.",
       "unpluggedReteachLiveCta": "Starta Unplugged reteach Live",
       "reteachLiveCta": "Starta 3-minuters reteach Live",
-      "unpluggedReteachLiveFoil": "Kahoot Unplugged-foil — projicera missarna; eleverna svarar på papper, utan enheter."
+      "unpluggedReteachLiveFoil": "Kahoot Unplugged-foil (Teacher Takeover, 21 sep 2026 — när elevernas enheter inte är ett alternativ) — projicera missarna; eleverna svarar på papper, utan enheter."
     },
     "subscription": {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",

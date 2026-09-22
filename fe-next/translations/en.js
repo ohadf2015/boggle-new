@@ -11686,7 +11686,7 @@ const en = {
       "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks — Kahoot-style spaced reteach.",
       "unpluggedReteachLiveCta": "Start Unplugged reteach Live",
       "reteachLiveCta": "Start 3-min reteach Live",
-      "unpluggedReteachLiveFoil": "Kahoot Unplugged foil — project the misses; students answer on paper, no devices."
+      "unpluggedReteachLiveFoil": "Kahoot Unplugged foil (Teacher Takeover, Sep 21 2026 — when student devices aren’t an option) — project the misses; students answer on paper, no devices."
     },
     "subscription": {
       "giftedNoCard": "No card on file, no renewal — it just ends, and you go back to Free.",

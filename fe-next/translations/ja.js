@@ -12567,7 +12567,7 @@ const ja = {
       "scheduleReteachHint": "苦手な語を組み直して約2週間後にもう一度 — Kahoot風の間隔再指導。",
       "unpluggedReteachLiveCta": "アンプラグドリティーチLiveを開始",
       "reteachLiveCta": "3分リティーチLiveを開始",
-      "unpluggedReteachLiveFoil": "Kahoot Unplugged対抗 — 抜けた語を投影し、生徒は紙で解答（端末不要）。"
+      "unpluggedReteachLiveFoil": "Kahoot Unplugged対抗（Teacher Takeover, 2026-09-21 — 生徒端末がないとき）— 抜けた語を投影し、生徒は紙で解答（端末不要）。"
     },
     "subscription": {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",
