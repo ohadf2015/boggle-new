@@ -60,10 +60,13 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
   const isMultiGamesVariant = variant === 'multiGames';
   const useSheet = surface === 'sheet';
 
+  // t_da22db9a / t_c75cbe59: surface id for mid-funnel click. Threaded into
+  // both useOAuthSignIn (Discord / redirect) AND OAuthButtonGroup → GSI button
+  // (in-page ID token), which previously bypassed prompt_clicked entirely.
+  const analyticsSource = `${isMultiGamesVariant ? 'multi_games' : 'first_win'}_${useSheet ? 'sheet' : 'dialog'}`;
+
   const { signIn, loadingProvider, error } = useOAuthSignIn({
-    // t_da22db9a: which prompt surface served the OAuth tap — feeds the
-    // `signup_prompt_clicked` mid-funnel event.
-    analyticsSource: `${isMultiGamesVariant ? 'multi_games' : 'first_win'}_${useSheet ? 'sheet' : 'dialog'}`,
+    analyticsSource,
   });
 
   const guestStats: GuestStats = getGuestStatsSummary();
@@ -159,7 +162,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
 
   const oauthBlock = (
     <>
-      <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} />
+      <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} analyticsSource={analyticsSource} />
       {error && <AuthErrorMessage message={error} className="mt-3" />}
     </>
   );
