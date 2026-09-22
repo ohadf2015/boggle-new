@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { BlooketGapsSetHonestyStrip } from '@/components/education/BlooketGapsSetHonestyStrip';
 
 export const revalidate = 86400;
 
@@ -53,6 +54,7 @@ const faqs = [
   { q: 'Can I use Blooket for vocabulary practice?', a: 'You can, but you have to author every term-definition question yourself, and the gameplay rewards fast clicking on multiple-choice answers rather than actually producing words. LexiClash drills spelling, recall, and letter patterns directly through word-formation gameplay — closer to the skill you are teaching.' },
   { q: 'Does LexiClash work for ESL and multilingual classrooms?', a: 'Yes. LexiClash has native dictionaries for English, Hebrew (RTL), Spanish, Swedish, Japanese, and Russian, with difficulty the teacher sets. Blooket content is whatever you type in — it has no built-in multilingual word validation.' },
   { q: 'How fast can I start a game compared to Blooket?', a: 'LexiClash is under 60 seconds: pick a built-in or custom word list, project the join code, students play. Blooket requires you to find or build a question set first, which can take 5–15 minutes per topic unless you reuse the community library.' },
+  { q: 'How do Blooket and LexiClash differ after a knowledge-gap report?', a: 'Blooket teachers sort Incorrect% (and Plus Opportunities for Growth), then manually rebuild a 「Gaps Set」 for homework — the documented Workflow 2 on blooketapp.com. LexiClash already deep-links class-level miss gaps into Unplugged / 3-min reteach Live (#1124), so the reteach starts without a new set rebuild.' },
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
@@ -65,6 +67,7 @@ const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['1v1 duels with student pairing', '✓', '✗'],
   ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'No built-in language validation'],
   ['Class analytics dashboard', '✓ Free', 'Reports (some gated on Plus)'],
+  ['After-report reteach from misses', '✓ Auto miss-gap → Live deep-link (#1124)', 'Manual 「Gaps Set」 rebuild (Incorrect% / Opportunities for Growth)'],
   ['Best for', 'Word + vocabulary review games', 'Any-subject quiz review shows'],
   ['Setup time', 'Under 60 seconds', '5–15 minutes (build a set)'],
 ];
@@ -146,6 +149,8 @@ export default async function Page({ params }: PageProps) {
           <p className="mt-3 text-xs text-neo-gray-300">Blooket plan features and pricing as of 2026 — check blooket.com for current Blooket Plus tiers.</p>
         </section>
 
+        <BlooketGapsSetHonestyStrip locale={locale} />
+
         <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When LexiClash beats Blooket</h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -156,6 +161,7 @@ export default async function Page({ params }: PageProps) {
               { title: '6 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash validates real words in EN/HE/ES/SV/JA/RU. Blooket only knows the answers you typed.' },
               { title: 'Whole class free', desc: 'Blooket caps players and gates some modes/reports on Blooket Plus. LexiClash classroom features are free and full, up to 30 students.' },
               { title: 'Faster to live', desc: 'Reuse-a-set still means finding the right Blooket set. LexiClash goes from idea to join code in under a minute.' },
+              { title: 'Miss gaps → Live without a 「Gaps Set」', desc: 'Blooket’s Incorrect% / Opportunities for Growth path still asks you to rebuild a 「Gaps Set」 for homework. LexiClash deep-links the same class misses into reteach Live (#1124) — no Question Bank hop.' },
             ].map((item) => (
               <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
                 <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>

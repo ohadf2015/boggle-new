@@ -14670,6 +14670,21 @@ const sv = {
       "gotIt": "Fattat — kör igång!",
       "showTutorial": "Så funkar det"
     },
+    "vsBlooket": {
+      "gapsSet": {
+        "eyebrow": "Efter rapporten — ärlig jämförelse",
+        "title": "Blooket: sortera Incorrect%, bygg om en 「Gaps Set」. LexiClash: miss → Live-djuplänk.",
+        "lede": "Blookets Opportunities for Growth / Incorrect%-flöde slutar fortfarande i manuellt läxbygge. LexiClash gör samma misslista till en automatisk reteach Live-djuplänk (#1124) — utan ny frågeset att skriva.",
+        "blooketTitle": "Blooket — manuell 「Gaps Set」",
+        "blooketBody": "Sortera Questions-rapporten efter Incorrect%, skumma Opportunities for Growth (Plus), notera toppluckorna och öppna Edit / Question Bank för att bygga en 「Gaps Set」 som läxa eller fokuserad repetition. Diagnosen är snabb; reteach-setet byggs fortfarande för hand.",
+        "lexiTitle": "LexiClash — automatisk miss-gap-djuplänk (#1124)",
+        "lexiBody": "Miss-chip från senaste lektionen och lärarens progress visar redan Unplugged / 3-min reteach Live-djuplänkar. Ett klick seedar missade ord till Live — ingen 「Gaps Set」, ingen Question Bank.",
+        "citePrefix": "Blookets lärarguide:",
+        "citeLabel": "Identify knowledge gaps in Blooket reports",
+        "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
+        "cta": "Testa miss-gap → Live utan att bygga om ett set"
+      }
+    },
     "practice": {
       "allVocabFound": "Alla ord hittade!",
       "back": "Tillbaka",

@@ -12981,6 +12981,21 @@ const en = {
       "gotIt": "Got it — let's teach!",
       "showTutorial": "How it works"
     },
+    "vsBlooket": {
+      "gapsSet": {
+        "eyebrow": "After the report — honesty foil",
+        "title": "Blooket: sort Incorrect%, rebuild a 「Gaps Set」. LexiClash: miss → Live deep-link.",
+        "lede": "Blooket’s Opportunities for Growth / Incorrect% workflow still ends in manual homework rebuild. LexiClash turns the same miss list into an auto reteach Live deep-link (#1124) — no new set to author.",
+        "blooketTitle": "Blooket — manual 「Gaps Set」",
+        "blooketBody": "Sort the Questions report by Incorrect%, skim Opportunities for Growth (Plus), note the top misses, then open Edit / Question Bank and rebuild a 「Gaps Set」 to assign as homework or a focused review. Diagnosis is fast; the reteach set is still hand-built.",
+        "lexiTitle": "LexiClash — auto miss-gap deep-link (#1124)",
+        "lexiBody": "Last-lesson miss chips and miss-gap teacher progress already carry Unplugged / 3-min reteach Live deep-links. One click seeds the missed words into Live — no 「Gaps Set」 rebuild, no Question Bank hop.",
+        "citePrefix": "Blooket teacher guide:",
+        "citeLabel": "Identify knowledge gaps in Blooket reports",
+        "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
+        "cta": "Try miss-gap → Live without rebuilding a set"
+      }
+    },
     "practice": {
       "allVocabFound": "All words found!",
       "back": "Back",
