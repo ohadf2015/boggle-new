@@ -154,7 +154,14 @@ const SkillCheckpoint = memo<{
         <m.div
           initial={isJustUnlocked ? { scale: 0 } : false}
           animate={isJustUnlocked ? { scale: [0, 1.3, 1] } : undefined}
-          transition={{ delay: 0.3 }}
+          // Multi-kf scale with delay-only transition inherits Motion's default
+          // spring → "You must provide 2 keyframes max for springs" on /en
+          // training surfaces (t_3eaf4342 leftovers after #1052).
+          transition={
+            isJustUnlocked
+              ? { delay: 0.3, scale: { type: 'tween', duration: 0.35, ease: 'easeOut' } }
+              : undefined
+          }
         >
           <Check className="w-4 h-4 text-neo-lime" />
         </m.div>
