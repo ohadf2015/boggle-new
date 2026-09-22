@@ -374,7 +374,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         scoreIsRecord={!!recordFlags?.scoreIsRecord}
         wordIsRecord={!!recordFlags?.wordIsRecord}
         score={results.playerScore}
-        longestWord={longestWordOf(results.playerWords || [])}
+        longestWord={longestWordOf(results.playerWords || []) ?? ''}
       />
       <MissionsCompletedNote count={results.missionsCompleted} />
     </>
