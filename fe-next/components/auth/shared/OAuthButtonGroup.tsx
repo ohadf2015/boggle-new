@@ -17,6 +17,12 @@ interface OAuthButtonGroupProps {
   loadingProvider: string | null;
   disabled?: boolean;
   className?: string;
+  /**
+   * Soft-sheet / dialog surface id (t_c75cbe59). GSI renderButton bypasses
+   * `onSignIn`, so the mid-funnel `signup_prompt_clicked` would never fire
+   * for the primary Google CTA without threading this into GoogleSignInButton.
+   */
+  analyticsSource?: string;
 }
 
 /**
@@ -28,6 +34,7 @@ export function OAuthButtonGroup({
   loadingProvider,
   disabled = false,
   className,
+  analyticsSource,
 }: OAuthButtonGroupProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
@@ -85,7 +92,7 @@ export function OAuthButtonGroup({
       {providers.map((provider) => (
         <Reveal key={provider.id}>
           {provider.id === 'google' && useGsiGoogleButton ? (
-            <GoogleSignInButton />
+            <GoogleSignInButton analyticsSource={analyticsSource} />
           ) : (
           <Button
             onClick={() => onSignIn(provider.id)}

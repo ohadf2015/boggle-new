@@ -188,7 +188,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
             </div>
 
             {/* OAuth buttons */}
-            <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} />
+            <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} analyticsSource="mp_sheet" />
 
             {error && (
               <p className="text-neo-red text-xs mt-2 text-center">{error}</p>

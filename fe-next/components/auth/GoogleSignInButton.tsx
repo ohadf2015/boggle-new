@@ -7,6 +7,7 @@ import { supabase, signInWithGoogle } from '@/lib/supabase';
 import { ensureGoogleIdInitialized, type GoogleIdServices } from '@/lib/auth/googleOneTap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { trackSignupPromptClicked } from '@/utils/growthTracking';
 import { GoogleIcon } from '@/components/auth/shared/icons/BrandIcons';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
@@ -16,6 +17,12 @@ interface GoogleSignInButtonProps {
   className?: string;
   /** Force a pixel width. If omitted, the button fills its container (≤400px). */
   width?: number;
+  /**
+   * Signup-prompt surface (e.g. first_win_sheet). GSI iframe clicks never hit
+   * useOAuthSignIn — fire prompt_clicked on pointerdown so the mid-funnel
+   * stays wired for soft-sheet Google (t_c75cbe59).
+   */
+  analyticsSource?: string;
 }
 
 /**
@@ -36,7 +43,7 @@ interface GoogleSignInButtonProps {
  * Shares the single global GIS init with the One Tap initializer; success
  * propagates via Supabase `SIGNED_IN`. Web-only (native uses the SDK).
  */
-export default function GoogleSignInButton({ className, width }: GoogleSignInButtonProps) {
+export default function GoogleSignInButton({ className, width, analyticsSource }: GoogleSignInButtonProps) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const { language } = useLanguage();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -44,6 +51,12 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
   const renderedRef = useRef(false);
 
   const enabled = !isNative() && !!clientId && !!supabase;
+
+  // GSI iframe swallows clicks — pointerdown on our chrome is the last
+  // reliable signal that the soft-sheet Google CTA was engaged.
+  const handlePromptClickIntent = () => {
+    if (analyticsSource) trackSignupPromptClicked(analyticsSource);
+  };
 
   const renderButton = useCallback(async () => {
     if (renderedRef.current || !clientId || !containerRef.current) return;
@@ -96,7 +109,7 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
         <button
           type="button"
           data-testid="google-signin-edge-fallback"
-          onClick={() => { void signInWithGoogle(); }}
+          onClick={() => { handlePromptClickIntent(); void signInWithGoogle(); }}
           className={cn(
             'w-full flex items-center justify-center gap-2 py-3 rounded-xl',
             'border-3 border-neo-black bg-white text-neo-black font-black text-sm',
@@ -132,6 +145,7 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
           one end. */}
       <div
         data-testid="gsi-frame"
+        onPointerDown={handlePromptClickIntent}
         className="flex w-full min-h-[48px] items-center justify-center overflow-hidden rounded-xl border-3 border-neo-black bg-white shadow-hard"
       >
         <div ref={containerRef} data-testid="gsi-button-container" />

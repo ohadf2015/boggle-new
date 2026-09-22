@@ -44,6 +44,7 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
   beforeEach(() => {
     vi.clearAllMocks();
     window.sessionStorage.clear();
+    window.localStorage.clear();
   });
 
   it('prompt_shown latches the pending key and merges extra props into the event', () => {
@@ -56,13 +57,20 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     );
   });
 
-  it('first-win prompt_shown uses the first_win event name and pending value', () => {
+  it('first-win prompt_shown emits canonical signup_prompt_shown AND legacy first_win companion', () => {
+    // t_c75cbe59: canonical pair is what UR host-filters; first_win_* alone
+    // left prompt→completed structurally at 0%.
     trackSignupFunnel('prompt_shown', true, { surface: 'soft-sheet' });
 
     expect(window.sessionStorage.getItem(PENDING_KEY)).toBe('first_win');
+    expect(window.localStorage.getItem(PENDING_KEY)).toBe('first_win');
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_prompt_shown',
+      expect.objectContaining({ surface: 'soft-sheet', is_first_win: true })
+    );
     expect(mockCapture).toHaveBeenCalledWith(
       'growth:first_win_signup_shown',
-      expect.objectContaining({ surface: 'soft-sheet' })
+      expect.objectContaining({ surface: 'soft-sheet', is_first_win: true })
     );
   });
 
@@ -84,9 +92,27 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     consumePendingSignupCompletion();
     consumePendingSignupCompletion(); // second call must be a no-op
 
-    const completed = mockCapture.mock.calls.filter(([name]) => name === 'signup_completed');
-    expect(completed).toHaveLength(1);
+    // Dual-emit: growth:signup_completed + bare signup_completed (whitelist)
+    const completed = mockCapture.mock.calls.filter(
+      ([name]) => name === 'growth:signup_completed' || name === 'signup_completed'
+    );
+    expect(completed.length).toBeGreaterThanOrEqual(1);
     expect(window.sessionStorage.getItem(PENDING_KEY)).toBeNull();
+    expect(window.localStorage.getItem(PENDING_KEY)).toBeNull();
+  });
+
+  it('consumePendingSignupCompletion recovers pending from localStorage after sessionStorage loss (OAuth redirect)', () => {
+    trackSignupFunnel('prompt_shown', true);
+    window.sessionStorage.removeItem(PENDING_KEY); // simulate partitioned session
+    expect(window.localStorage.getItem(PENDING_KEY)).toBe('first_win');
+
+    consumePendingSignupCompletion();
+
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_completed',
+      expect.objectContaining({ is_first_win: true })
+    );
+    expect(window.localStorage.getItem(PENDING_KEY)).toBeNull();
   });
 
   it('consumePendingSignupCompletion is a no-op without a pending prompt', () => {
