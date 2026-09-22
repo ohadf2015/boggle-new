@@ -31,7 +31,7 @@ export async function ensureHowl(): Promise<(typeof import('howler'))['Howl']> {
     _howlPromise = import('howler').then((mod) => {
       _HowlCtor = mod.Howl;
       patchHowlerRemoveEventListenerRace();
-      patchHowlerStaleSoundListeners();
+      patchHowlerStaleSoundListeners(_HowlCtor);
       return _HowlCtor;
     });
   }
@@ -71,9 +71,43 @@ function patchHowlerRemoveEventListenerRace(): void {
  * these listeners at construction, so this must run before the first Howl —
  * createLazyHowl guarantees that via ensureHowl().
  */
-function patchHowlerStaleSoundListeners(): void {
+/**
+ * Resolve Howler's internal Sound prototype. UMD sets globalThis.Sound when
+ * `global`/`window` is available, but some bundlers evaluate the CJS branch
+ * without assigning to globalThis — then the stale-listener patch is a no-op
+ * and production keeps throwing on `duration` / `removeEventListener`.
+ * Fall back to probing a disposable Howl's `_sounds[0]`.
+ */
+function resolveHowlerSoundPrototype(
+  Howl: (typeof import('howler'))['Howl']
+): Record<string, (this: { _node?: unknown }, ...args: unknown[]) => unknown> | null {
   type Listener = (this: { _node?: unknown }, ...args: unknown[]) => unknown;
-  const proto = (globalThis as { Sound?: { prototype: Record<string, Listener> } }).Sound?.prototype;
+  type SoundProto = Record<string, Listener>;
+  const fromGlobal = (globalThis as { Sound?: { prototype: SoundProto } }).Sound?.prototype;
+  if (fromGlobal) return fromGlobal;
+  try {
+    // Tiny silent wav — never plays; html5 so a Sound gets a real _node pool slot.
+    const probe = new Howl({
+      src: [
+        'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=',
+      ],
+      html5: true,
+      preload: false,
+      volume: 0,
+    });
+    const sound = (probe as unknown as { _sounds?: { constructor?: { prototype: SoundProto } }[] })
+      ._sounds?.[0];
+    const proto = sound?.constructor?.prototype ?? null;
+    probe.unload();
+    return proto;
+  } catch {
+    return null;
+  }
+}
+
+function patchHowlerStaleSoundListeners(Howl: (typeof import('howler'))['Howl']): void {
+  type Listener = (this: { _node?: unknown }, ...args: unknown[]) => unknown;
+  const proto = resolveHowlerSoundPrototype(Howl);
   if (!proto) return;
   for (const name of ['_loadListener', '_endListener', '_errorListener']) {
     const original = proto[name];
@@ -83,6 +117,40 @@ function patchHowlerStaleSoundListeners(): void {
       return original.apply(this, args);
     };
   }
+
+  // Howl.unload() calls sound._node.removeEventListener without a null check.
+  // After a prior unload/`_node` wipe this becomes
+  // "Cannot read properties of undefined (reading 'removeEventListener')".
+  type HowlProto = {
+    unload?: (this: { _sounds?: { _node?: { removeEventListener?: unknown } | null }[] }) => unknown;
+  };
+  const howlProto = Howl.prototype as HowlProto;
+  const origUnload = howlProto.unload;
+  if (typeof origUnload !== 'function' || (origUnload as { __urPatched?: boolean }).__urPatched) {
+    return;
+  }
+  const guarded = function (
+    this: { _sounds?: { _node?: { removeEventListener?: unknown } | null }[] }
+  ) {
+    const sounds = this._sounds;
+    if (Array.isArray(sounds)) {
+      for (const s of sounds) {
+        if (s && !s._node) {
+          // Leave a inert stub so howler's removeEventListener calls no-op.
+          s._node = {
+            removeEventListener() {},
+            // howler also touches pause/load/currentTime during teardown in html5 mode
+            pause() {},
+            load() {},
+            currentTime: 0,
+          } as unknown as { removeEventListener?: unknown };
+        }
+      }
+    }
+    return origUnload.call(this);
+  };
+  (guarded as { __urPatched?: boolean }).__urPatched = true;
+  howlProto.unload = guarded;
 }
 
 /**

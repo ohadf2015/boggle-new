@@ -93,7 +93,7 @@ export default function CombatOverlay({ world, isBoss, combat, hurtPulse, phaseP
   if (!mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] pointer-events-none overflow-hidden" dir="auto">
+    <div className="fixed inset-0 z-60 pointer-events-none overflow-hidden" dir="auto" data-adv-overlay="CombatOverlay">
       {/* Damage vignette */}
       <AnimatePresence>
         {hurtPulse > 0 && (
