@@ -13,6 +13,12 @@ import { useTeacherProMilestone } from '@/hooks/useTeacherProMilestone';
 import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
+import { isTrialUpgradeNudgeWindow } from '@/lib/education/trial';
+import { useTrialUpgradeNudge } from '@/lib/education/useTrialUpgradeNudge';
+import {
+  TEACHER_PRO_CHECKOUT_PATH,
+  teacherProUpgradeCtaLabel,
+} from '@/components/education/TeacherProCheckoutCta';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the
@@ -38,6 +44,8 @@ function TeacherDashboardInner() {
     dismissed: usageDismissed,
     dismiss: dismissUsagePrompt,
   } = useTeacherUsagePrompt();
+  const { dismissed: trialNudgeDismissed, dismiss: dismissTrialNudge } =
+    useTrialUpgradeNudge(trial);
 
   // At most one banner above the dashboard. This page used to stack a trial
   // countdown, a district-pricing upsell and a Pro strip before the thing the
@@ -46,10 +54,13 @@ function TeacherDashboardInner() {
   // (paid or gifted) gets no upsell at all.
   // The Pro strip waits for a classroom engagement milestone (3 students or
   // 5 completed games/assignments) instead of firing on first live game.
-  // Trial urgency still waits for a first live game so a brand-new teacher
-  // is not counting down a clock before they have hosted anyone.
+  // The trial banner is the 7-day upgrade nudge (or the expired renewal card),
+  // not a 14-day activation countdown — Polar checkout is the CTA. Brand-new
+  // teachers still wait for a first live game before the countdown, but an
+  // expired trial always gets the renewal card.
+  const trialNudgeOpen = isTrialUpgradeNudgeWindow(trial) && !trialNudgeDismissed;
   const picked = pickTeacherBanner({
-    hasTrial: !!trial,
+    hasTrial: trialNudgeOpen || !!trial?.isExpired,
     isAdmin,
     hasPro,
     proLoading,
@@ -57,7 +68,8 @@ function TeacherDashboardInner() {
     milestoneLoading,
     proAskDismissed: dismissed,
   });
-  const banner = picked === 'trial' && !hasRecentConfig ? null : picked;
+  const banner =
+    picked === 'trial' && !hasRecentConfig && !trial?.isExpired ? null : picked;
 
   // The usage-triggered card sits in the dashboard rail, not the banner slot.
   // It waits for a REAL limit hit (10+ students in a class, or 3+ assignments
@@ -86,7 +98,12 @@ function TeacherDashboardInner() {
     <TeacherDashboard
       banner={
         banner === 'trial' && trial ? (
-          <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
+          <TrialUrgencyBanner
+            trial={trial}
+            href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
+            onDismiss={trialNudgeOpen ? dismissTrialNudge : undefined}
+            ctaLabel={trialNudgeOpen ? teacherProUpgradeCtaLabel(language) : undefined}
+          />
         ) : banner === 'pro' ? (
           <TeacherProAskBanner onDismiss={dismiss} />
         ) : undefined
