@@ -127,10 +127,15 @@ export function useSignupPrompt({
 
     // Post-first-game threshold: based on variant and emotional peak strategy.
     // after-third-game: fires at 3+ games (consistent, predictable)
-    // after-first-win (default): fires at 1+ win, or 5+ games as fallback for non-winners
+    // after-first-win (default): fires at the FIRST completed game in this
+    //   session — the #978 post-game emotional peak. The old
+    //   wins>=1 || games>=5 gate meant a first-time guest who lost games 1–4
+    //   never qualified (t_c75cbe59: solo impressions collapsed to ~0.5/day,
+    //   host-filtered prompt→completed funnel at 0%). Celebration copy still
+    //   keys off qualifiesAsFirstWin (an actual win).
     const qualifies = signupVariant === 'after-third-game'
       ? games >= 3
-      : wins >= 1 || games >= 5;
+      : games >= 1;
 
     if (!qualifies) return;
 
