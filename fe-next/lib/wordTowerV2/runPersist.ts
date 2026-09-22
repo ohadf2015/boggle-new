@@ -22,7 +22,13 @@ export function saveRunSnapshot(
 ): void {
   if (!storage) return;
   try {
-    storage.setItem(snapshotKey(snap.daily), JSON.stringify(snap));
+    // Daily keys must follow snap.date (UTC YYYY-MM-DD), not wall-clock "now",
+    // so save/load round-trips across midnight and for frozen test dates.
+    const keyDate =
+      snap.daily && /^\d{4}-\d{2}-\d{2}$/.test(snap.date)
+        ? new Date(`${snap.date}T12:00:00Z`)
+        : new Date();
+    storage.setItem(snapshotKey(snap.daily, keyDate), JSON.stringify(snap));
   } catch {
     /* quota / private mode */
   }
