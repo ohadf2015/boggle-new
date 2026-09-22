@@ -13124,7 +13124,9 @@ const ja = {
         "word": "単語",
         "status": "ステータス",
         "accuracy": "正確さ",
-        "attempts": "試行回数"
+        "attempts": "試行回数",
+        "assignment": "課題",
+        "completedAt": "完了日時"
       },
       "viewStudentProgress": "{{name}}の進捗を見る",
       "issue": {
@@ -13142,6 +13144,17 @@ const ja = {
         "lowAccuracyFocus": "正解率の低い単語の復習に集中しましょう",
         "practiceFrequency": "練習頻度を上げて定着を高めましょう",
         "masteryWork": "より多くの語彙の習得に取り組みましょう"
+      },
+      "assignmentProgress": {
+        "title": "課題の進捗",
+        "empty": "このクラスにはまだ課題がありません",
+        "statusCompleted": "完了",
+        "statusMissing": "未提出",
+        "exportCsv": "CSVを書き出す",
+        "exportCsvPro": "Teacher Pro {{price}} で CSV を書き出す",
+        "fileName": "{{name}} – 課題の進捗",
+        "untitled": "無題のレッスン",
+        "anonymousStudent": "生徒 {{id}}"
       }
     },
     "curriculum": {

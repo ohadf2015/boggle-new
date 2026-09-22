@@ -42,6 +42,14 @@ vi.mock('@/components/teacher/digest/ProgressDigestDashboard', () => ({
   ),
 }));
 
+vi.mock('@/components/teacher/reports/AssignmentProgressReport', () => ({
+  AssignmentProgressReport: ({ classroomId }: { classroomId: string }) => (
+    <div data-testid="assignment-progress-report" data-classroom-id={classroomId}>
+      Assignment Progress Mock
+    </div>
+  ),
+}));
+
 // Mock useLanguage
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -219,6 +227,7 @@ describe('ReportsPageClient', () => {
       render(<ReportsPageClient />);
 
       expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
+      expect(screen.getByTestId('assignment-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
       expect(screen.queryByTestId('class-progress-report')).not.toBeInTheDocument();
     });

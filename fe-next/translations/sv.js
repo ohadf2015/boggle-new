@@ -13359,7 +13359,9 @@ const sv = {
         "word": "Ord",
         "status": "Status",
         "accuracy": "Precision",
-        "attempts": "Försök"
+        "attempts": "Försök",
+        "assignment": "Uppgift",
+        "completedAt": "Slutförd"
       },
       "viewStudentProgress": "Visa {{name}}s framsteg",
       "issue": {
@@ -13377,6 +13379,17 @@ const sv = {
         "lowAccuracyFocus": "Fokusera på att repetera ord med låg träffsäkerhet",
         "practiceFrequency": "Öva oftare för bättre inlärning",
         "masteryWork": "Arbeta med att bemästra fler ord"
+      },
+      "assignmentProgress": {
+        "title": "Uppgiftsprogress",
+        "empty": "Inga uppgifter i den här klassen ännu",
+        "statusCompleted": "Klar",
+        "statusMissing": "Saknas",
+        "exportCsv": "Exportera CSV",
+        "exportCsvPro": "Exportera CSV med Teacher Pro {{price}}",
+        "fileName": "{{name}} – uppgiftsprogress",
+        "untitled": "Namnlös lektion",
+        "anonymousStudent": "Elev {{id}}"
       }
     },
     "curriculum": {

@@ -11569,7 +11569,9 @@ const en = {
         "word": "Word",
         "status": "Status",
         "accuracy": "Accuracy",
-        "attempts": "Attempts"
+        "attempts": "Attempts",
+        "assignment": "Assignment",
+        "completedAt": "Completed at"
       },
       "viewStudentProgress": "View {{name}}'s progress",
       "issue": {
@@ -11587,6 +11589,17 @@ const en = {
         "lowAccuracyFocus": "Focus on reviewing words with low accuracy",
         "practiceFrequency": "Increase practice frequency to improve retention",
         "masteryWork": "Work on mastering more vocabulary words"
+      },
+      "assignmentProgress": {
+        "title": "Assignment progress",
+        "empty": "No assignments in this classroom yet",
+        "statusCompleted": "Completed",
+        "statusMissing": "Missing",
+        "exportCsv": "Export CSV",
+        "exportCsvPro": "Export CSV with Teacher Pro {{price}}",
+        "fileName": "{{name}} – assignment progress",
+        "untitled": "Untitled lesson",
+        "anonymousStudent": "Student {{id}}"
       }
     },
     "curriculum": {
