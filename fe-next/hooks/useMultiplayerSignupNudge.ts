@@ -186,12 +186,19 @@ export function useMultiplayerSignupNudge({
     // re-ran on every game >= threshold and re-fired the toast (~5.8x/user, one
     // user 22x in a day; PostHog 45d). Marked at SHOW time, not dismiss time, so
     // a reload-without-dismiss can't re-pop it (recurring-pitfalls Class 1).
+    // t_c75cbe59: the toast renders NO auth CTA (SignupToast is a message-only
+    // nag that auto-dismisses), so it must NOT log signup_prompt_shown nor arm
+    // the pending-completion latch — post-merge PostHog showed mp_toast
+    // impressions were 21% of the host-filtered funnel denominator and could
+    // never convert, and the latch mis-attributed later header signups as
+    // multi_game_prompt. It stays a nag, outside the signup funnel.
     if (toastEnabled && mpGames >= toastThreshold && wasSheetShown() && !wasToastShown()) {
       const timer = setTimeout(() => {
         if (wasToastShown()) return;
         markToastShown();
         setActiveNudge('toast');
-        trackSignupFunnel('prompt_shown', false, { trigger: 'mp_toast', mpSessionGame: mpGames });
+        // Intentionally no trackSignupFunnel here — a CTA-less surface is not
+        // a signup prompt.
       }, 1500);
       return () => clearTimeout(timer);
     }

@@ -468,5 +468,37 @@ describe('useMultiplayerSignupNudge', () => {
       );
       expect(promptCalls).toHaveLength(0);
     });
+
+    it('t_c75cbe59: toast never emits signup_prompt_shown nor latches the pending funnel key — it has no auth CTA', () => {
+      // SignupToast.tsx renders a message-only nag (auto-dismiss, no buttons).
+      // 6/6.5d post-merge mp_toast impressions were 21% of the host-filtered
+      // funnel denominator and could not convert by construction; latching the
+      // pending key here also mis-attributed later header signups as
+      // multi_game_prompt. The toast stays a nag, outside the signup funnel.
+      mockCopyVariant = 'control';
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      // Reach + dismiss the sheet at game 2
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+      expect(result.current.activeNudge).toBe('sheet');
+      act(() => { result.current.dismissNudge(); });
+
+      // Game 3 → toast appears as a nag, but emits NO funnel step
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+      expect(result.current.activeNudge).toBe('toast');
+
+      const toastEmits = mockTrackGrowthEvent.mock.calls.filter(
+        ([name, props]) => name === 'signup_prompt_shown' && (props as { trigger?: string })?.trigger === 'mp_toast',
+      );
+      expect(toastEmits).toHaveLength(0);
+      // The completion-attribution latch must stay unarmed: a later header
+      // signup by this guest is genuinely header_or_menu, not multi_game_prompt.
+      expect(window.sessionStorage.getItem(PENDING_KEY)).toBeNull();
+    });
   });
 });

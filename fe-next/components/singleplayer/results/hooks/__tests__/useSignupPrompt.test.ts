@@ -1,9 +1,17 @@
 /**
- * useSignupPrompt tests — gate semantics for first-win variant.
+ * useSignupPrompt tests — gate semantics for the prompt variants.
  *
  * Prior bug: 'after-first-win' variant gated on games count (2), not actual win.
+ * t_c75cbe59 (UR P0): the default arm now fires at the FIRST completed game
+ * in-session. The old wins>=1 || games>=5 gate meant a first-time guest who
+ * lost games 1–4 never qualified — solo impressions collapsed to ~0.5/day
+ * post-#1053 and the host-filtered prompt→completed funnel sat at 0%. #978
+ * designed the sheet for the post-first-GAME emotional peak; firstWin
+ * celebration copy still requires an actual win (isFirstWin = wins >= 1).
+ *
  * Correct semantics:
- *   - 'after-first-win': show once guest has ≥1 win (fallback after 5 games without win)
+ *   - 'after-first-win' (default): show once a game completes in-session (peak
+ *     moment); firstWin copy only when the guest actually has a win
  *   - 'after-third-game': show after 3 games regardless of win
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -93,13 +101,21 @@ describe('useSignupPrompt — after-first-win variant', () => {
     expect(result.current.showSignupModal).toBe(false);
   });
 
-  it('does NOT show after 2 games with 0 wins', async () => {
-    mockStats.mockReturnValue({ games: 2, wins: 0 });
+  it('shows after the first completed game even with 0 wins (t_c75cbe59 first-game peak)', async () => {
+    // A first-time guest losing game 1 never reached wins>=1 or games>=5, so
+    // the prompt never fired at the #978 peak. Fresh in-session stats gate
+    // (qualifyWithFreshGame) keeps the boot-misfire fix intact.
+    mockStats.mockReturnValue({ games: 1, wins: 0 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
     await flushTimer();
     expect(result.current.showSignupModal).toBe(false);
+
+    await qualifyWithFreshGame({ games: 1, wins: 0 });
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+    expect(result.current.isFirstWin).toBe(false);
   });
 
   it('shows after first win (wins=1, games=1)', async () => {
@@ -301,9 +317,9 @@ describe('useSignupPrompt — impression telemetry', () => {
     });
   });
 
-  it('does NOT emit when user does not qualify', async () => {
+  it('does NOT emit when user does not qualify (games=0)', async () => {
     mockFlag.mockReturnValue('after-first-win');
-    mockStats.mockReturnValue({ games: 2, wins: 0 });
+    mockStats.mockReturnValue({ games: 0, wins: 0 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
