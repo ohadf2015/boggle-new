@@ -119,6 +119,33 @@ describe('AutoHideFooter - hydration + behavior', () => {
     expect(screen.queryByTestId('full-footer')).toBeNull();
   });
 
+  // /pricing mounts the same EducationShell checkout client as /teacher/upgrade.
+  // A full marketing footer beside an h-dvh + edu-shell-locked body collapses
+  // <main> to zero height on desktop (QA 2026-09-22). Treat it like teacher.
+  it('hides the full footer on /pricing (mobile) — EducationShell checkout', () => {
+    mockUseIsDesktop.mockReturnValue(false);
+    mockUsePathname.mockReturnValue('/he/pricing');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer')).toBeNull();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
+  it('renders only the compact legal strip on /pricing (desktop)', () => {
+    mockUseIsDesktop.mockReturnValue(true);
+    mockUsePathname.mockReturnValue('/he/pricing');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer[role="contentinfo"]')).toBeTruthy();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
+  it('keeps /teacher/upgrade on the game-route footer path (desktop compact)', () => {
+    mockUseIsDesktop.mockReturnValue(true);
+    mockUsePathname.mockReturnValue('/he/teacher/upgrade');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer[role="contentinfo"]')).toBeTruthy();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
   // Hydration contract: server render (no effects → mounted=false) must NOT
   // depend on isDesktop, otherwise server (mobile) and desktop-client first
   // render diverge → React #418. renderToString reflects exactly the !mounted

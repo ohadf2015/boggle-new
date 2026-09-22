@@ -28,6 +28,12 @@ const GAME_ROUTES = new Set([
   'education',
   'student',
   'teacher',
+  // Public Teacher Pro checkout URL shares EducationShell (h-dvh + body
+  // edu-shell-locked) with /teacher/upgrade. Without this entry the full
+  // marketing footer stays shrink-0 beside the shell; on desktop that footer
+  // is taller than the locked viewport, main flex-1 min-h-0 collapses to 0,
+  // and only the footer is visible (exploratory QA 2026-09-22 /en/pricing).
+  'pricing',
   'blast',
   'word-of-the-day',
   'challenge',
