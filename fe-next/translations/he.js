@@ -12979,7 +12979,9 @@ const he = {
         "word": "מילה",
         "status": "סטטוס",
         "accuracy": "דיוק",
-        "attempts": "ניסיונות"
+        "attempts": "ניסיונות",
+        "assignment": "משימה",
+        "completedAt": "הושלם ב"
       },
       "viewStudentProgress": "צפה בהתקדמות של {{name}}",
       "issue": {
@@ -12997,6 +12999,17 @@ const he = {
         "lowAccuracyFocus": "התמקדו בחזרה על מילים עם דיוק נמוך",
         "practiceFrequency": "הגבירו את תדירות התרגול כדי לשפר את הזכירה",
         "masteryWork": "עבדו על שליטה בעוד מילים"
+      },
+      "assignmentProgress": {
+        "title": "התקדמות במשימות",
+        "empty": "אין משימות בכיתה הזו עדיין",
+        "statusCompleted": "הושלם",
+        "statusMissing": "חסר",
+        "exportCsv": "ייצוא CSV",
+        "exportCsvPro": "ייצוא CSV עם Teacher Pro {{price}}",
+        "fileName": "{{name}} – התקדמות במשימות",
+        "untitled": "שיעור ללא שם",
+        "anonymousStudent": "תלמיד {{id}}"
       }
     },
     "curriculum": {

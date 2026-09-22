@@ -12988,7 +12988,9 @@ const es = {
         "word": "Palabra",
         "status": "Estado",
         "accuracy": "Precisión",
-        "attempts": "Intentos"
+        "attempts": "Intentos",
+        "assignment": "Tarea",
+        "completedAt": "Completado"
       },
       "viewStudentProgress": "Ver el progreso de {{name}}",
       "issue": {
@@ -13006,6 +13008,17 @@ const es = {
         "lowAccuracyFocus": "Enfócate en repasar las palabras con baja precisión",
         "practiceFrequency": "Aumenta la frecuencia de práctica para mejorar la retención",
         "masteryWork": "Trabaja en dominar más palabras de vocabulario"
+      },
+      "assignmentProgress": {
+        "title": "Progreso de tareas",
+        "empty": "Aún no hay tareas en esta clase",
+        "statusCompleted": "Completada",
+        "statusMissing": "Falta",
+        "exportCsv": "Exportar CSV",
+        "exportCsvPro": "Exportar CSV con Teacher Pro {{price}}",
+        "fileName": "{{name}} – progreso de tareas",
+        "untitled": "Lección sin título",
+        "anonymousStudent": "Alumno {{id}}"
       }
     },
     "teacher": {

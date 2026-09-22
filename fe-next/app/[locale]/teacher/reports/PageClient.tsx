@@ -15,6 +15,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
+import { AssignmentProgressReport } from '@/components/teacher/reports/AssignmentProgressReport';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { EducationHeader } from '@/components/education/EducationHeader';
@@ -232,6 +233,10 @@ function TeacherReportsInner() {
           classroomName={selectedClassroom?.name ?? ''}
           rosterCount={selectedClassroom?.member_count ?? 0}
         />
+        <AssignmentProgressReport
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+        />
         <ProGate feature="reports">
           <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
         </ProGate>
@@ -266,9 +271,9 @@ function TeacherReportsInner() {
   );
 }
 
-// Last-lesson digest is free (same last-game read as the dashboard pulse).
-// Full class/student reports stay behind ProGate, mounted inside Inner so a
-// free teacher still gets the picker + digest + Teacher Pro CTA.
+// Last-lesson digest and assignment progress are free (CSV export is Pro).
+// Full class/student analytics reports stay behind ProGate, mounted inside Inner
+// so a free teacher still gets the picker + digest + assignment table + Teacher Pro CTA.
 export default function TeacherReportsPage() {
   return (
     <ReportsShell>

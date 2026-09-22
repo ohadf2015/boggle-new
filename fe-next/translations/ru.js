@@ -12009,7 +12009,9 @@ const ru = {
         "word": "Слово",
         "status": "Статус",
         "accuracy": "Точность",
-        "attempts": "Попытки"
+        "attempts": "Попытки",
+        "assignment": "Задание",
+        "completedAt": "Выполнено"
       },
       "viewStudentProgress": "Прогресс ученика: {{name}}",
       "issue": {
@@ -12027,6 +12029,17 @@ const ru = {
         "lowAccuracyFocus": "Сосредоточьтесь на повторении слов с низкой точностью",
         "practiceFrequency": "Увеличьте частоту практики для лучшего запоминания",
         "masteryWork": "Поработайте над освоением большего количества слов"
+      },
+      "assignmentProgress": {
+        "title": "Прогресс по заданиям",
+        "empty": "В этом классе пока нет заданий",
+        "statusCompleted": "Выполнено",
+        "statusMissing": "Не сдано",
+        "exportCsv": "Экспорт CSV",
+        "exportCsvPro": "Экспорт CSV с Teacher Pro {{price}}",
+        "fileName": "{{name}} – прогресс по заданиям",
+        "untitled": "Урок без названия",
+        "anonymousStudent": "Ученик {{id}}"
       }
     },
     "curriculum": {
