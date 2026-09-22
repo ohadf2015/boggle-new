@@ -32,6 +32,7 @@ vi.mock('lucide-react', () => ({
   X: () => null,
   EyeOff: () => null,
   RotateCcw: () => null,
+  BarChart3: () => null,
 }));
 
 vi.mock('@/components/education/results/ReteachActions', () => ({

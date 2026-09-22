@@ -71,6 +71,33 @@ export function hostLeavesProjectorRecap({
 }
 
 /**
+ * True when THIS device is the classroom projector the host is kept on, so
+ * teacher follow-up has to be painted here.
+ *
+ * `hostLeavesProjectorRecap` is the reason. A classroom host is not playing
+ * and the room has a summary, so the predicate returns false and HostView
+ * stays up. `ClassroomResultsCard` — the phone mount of `ReteachActions` and
+ * of the Pro progress-report ask — never mounts on that device. Follow-up
+ * links, share, reteach, and the report ask are therefore this wall's, or
+ * the host never sees them. #1080 moved `ReteachActions` onto the wall.
+ * #1120 put the report back on the card alone. One predicate so the next
+ * teacher action cannot land on the card and call it done.
+ *
+ * False for everyone else, on purpose:
+ *  - a host who is PLAYING leaves for ResultsPage and gets the card;
+ *  - an arcade broadcast room has no lesson and no teacher follow-up;
+ *  - a student phone is not this function's caller. The card still gates
+ *    the same components on `isTeacher`.
+ */
+export function projectorRecapShowsTeacherFollowUp(input: HostResultsRouteInput): boolean {
+  if (input.hostPlaying) return false;
+  if (!input.hasClassroomSummary) return false;
+  // If the leave rule ever sends a classroom host to ResultsPage, the card
+  // owns these actions and the wall must not grow a second set.
+  return !hostLeavesProjectorRecap(input);
+}
+
+/**
  * True when a game mode's own results hero (Wheel Rush's radial scene, Blast's
  * ranked list) may take the top slot on ResultsPage.
  *

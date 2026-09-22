@@ -25,7 +25,7 @@ import Link from 'next/link';
 import { RotateCcw, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { trackResultsAction } from './trackResultsAction';
+import { trackResultsAction, type ResultsSurface } from './trackResultsAction';
 import { UnlockReportUpgradeCta } from './UnlockReportUpgradeCta';
 
 export interface ResultsPrimaryActionsProps {
@@ -34,9 +34,20 @@ export interface ResultsPrimaryActionsProps {
   /** Teacher-only: same list, same code — a new round without a new room. */
   onRematch?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  /**
+   * Where the tap is counted. The phone card is the default. The projector
+   * recap passes `projector` and omits `onRematch` — that wall already has
+   * its own Rematch button.
+   */
+  surface?: ResultsSurface;
 }
 
-export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimaryActionsProps) {
+export function ResultsPrimaryActions({
+  language,
+  onRematch,
+  t,
+  surface = 'teacher_card',
+}: ResultsPrimaryActionsProps) {
   const { hasPro, loading } = useTeacherPro();
   const canOpenReport = hasPro && !loading;
   const showUpgrade = !loading && !hasPro;
@@ -53,7 +64,7 @@ export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimary
           type="button"
           data-testid="rematch-same-list"
           onClick={() => {
-            trackResultsAction('rematch', 'teacher_card');
+            trackResultsAction('rematch', surface);
             onRematch();
           }}
           className={cn(
@@ -71,7 +82,7 @@ export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimary
         <Link
           href={`/${language}/teacher/reports`}
           data-testid="full-report-link"
-          onClick={() => trackResultsAction('view_report', 'teacher_card')}
+          onClick={() => trackResultsAction('view_report', surface)}
           className={cn(
             'self-center flex items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm',
             'bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo',
@@ -84,7 +95,7 @@ export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimary
       )}
 
       {showUpgrade ? (
-        <UnlockReportUpgradeCta language={language} t={t} surface="teacher_card" />
+        <UnlockReportUpgradeCta language={language} t={t} surface={surface} />
       ) : null}
     </div>
   );
