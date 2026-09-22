@@ -14290,6 +14290,21 @@ const he = {
       "gotIt": "הבנתי — יאללה מלמדים!",
       "showTutorial": "איך זה עובד"
     },
+    "vsBlooket": {
+      "gapsSet": {
+        "eyebrow": "אחרי הדוח — השוואה כנה",
+        "title": "Blooket: ממיינים Incorrect% ובונים 「Gaps Set」. LexiClash: miss → קישור עמוק ל-Live.",
+        "lede": "זרימת Opportunities for Growth / Incorrect% ב-Blooket עדיין מסתיימת בבניית שיעורי בית ידנית. ב-LexiClash אותה רשימת misses הופכת לקישור עמוק אוטומטי ל-reteach Live (#1124) — בלי סט חדש לכתוב.",
+        "blooketTitle": "Blooket — 「Gaps Set」 ידני",
+        "blooketBody": "ממיינים את דוח השאלות לפי Incorrect%, בודקים Opportunities for Growth (Plus), רושמים את הפערים, ואז פותחים Edit / Question Bank ובונים 「Gaps Set」 לשיעורי בית או חזרה ממוקדת. האבחון מהיר; סט ה-reteach עדיין נבנה ביד.",
+        "lexiTitle": "LexiClash — קישור עמוק אוטומטי מ-miss-gap (#1124)",
+        "lexiBody": "שבבי misses מהשיעור האחרון וכרטיס התקדמות המורה כבר נושאים קישורי Unplugged / 3-דק׳ reteach Live. לחיצה אחת זורעת את המילים החסרות ל-Live — בלי 「Gaps Set」, בלי Question Bank.",
+        "citePrefix": "מדריך מורים של Blooket:",
+        "citeLabel": "Identify knowledge gaps in Blooket reports",
+        "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
+        "cta": "נסו miss-gap → Live בלי לבנות סט מחדש"
+      }
+    },
     "practice": {
       "allVocabFound": "כל המילים נמצאו! 🎉",
       "back": "חזרה",

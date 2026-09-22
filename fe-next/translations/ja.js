@@ -14435,6 +14435,21 @@ const ja = {
       "gotIt": "OK、さっそく始めよう！",
       "showTutorial": "使い方"
     },
+    "vsBlooket": {
+      "gapsSet": {
+        "eyebrow": "レポートのあと — 正直な比較",
+        "title": "Blooket: Incorrect%で並べ替え、「Gaps Set」を手作業で再構築。LexiClash: miss → Liveディープリンク。",
+        "lede": "Blooketの Opportunities for Growth / Incorrect% フローは、結局宿題セットの手作業再構築で終わります。LexiClashは同じmissリストを reteach Live への自動ディープリンク（#1124）にします — 新しいセットを書く必要はありません。",
+        "blooketTitle": "Blooket — 手動の「Gaps Set」",
+        "blooketBody": "Questionsレポートを Incorrect% で並べ替え、Opportunities for Growth（Plus）を確認し、上位のmissをメモしてから Edit / Question Bank で「Gaps Set」を作り、宿題や集中復習として出します。診断は速いですが、reteachセットは手作業です。",
+        "lexiTitle": "LexiClash — miss-gapからの自動ディープリンク（#1124）",
+        "lexiBody": "前回レッスンのmissチップと教師の進捗には、すでに Unplugged / 3分 reteach Live のディープリンクがあります。ワンクリックでmiss単語をLiveにシード — 「Gaps Set」も Question Bank も不要です。",
+        "citePrefix": "Blooket教師ガイド:",
+        "citeLabel": "Identify knowledge gaps in Blooket reports",
+        "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
+        "cta": "セットを作り直さずに miss-gap → Live を試す"
+      }
+    },
     "practice": {
       "allVocabFound": "全単語コンプリート！",
       "back": "戻る",

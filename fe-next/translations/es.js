@@ -14384,6 +14384,21 @@ const es = {
       "gotIt": "¡Entendido, a enseñar!",
       "showTutorial": "Cómo funciona"
     },
+    "vsBlooket": {
+      "gapsSet": {
+        "eyebrow": "Después del informe — comparación honesta",
+        "title": "Blooket: ordenar Incorrect%, reconstruir un 「Gaps Set」. LexiClash: miss → deep-link a Live.",
+        "lede": "El flujo Opportunities for Growth / Incorrect% de Blooket sigue terminando en un set de deberes hecho a mano. LexiClash convierte la misma lista de misses en un deep-link automático a reteach Live (#1124) — sin escribir un set nuevo.",
+        "blooketTitle": "Blooket — 「Gaps Set」 manual",
+        "blooketBody": "Ordena el informe de Questions por Incorrect%, revisa Opportunities for Growth (Plus), anota los misses y abre Edit / Question Bank para reconstruir un 「Gaps Set」 de deberes o repaso. El diagnóstico es rápido; el set de reteach se sigue armando a mano.",
+        "lexiTitle": "LexiClash — deep-link automático desde miss-gap (#1124)",
+        "lexiBody": "Los chips de misses de la última lección y el progreso del profesor ya llevan deep-links a Unplugged / reteach Live de 3 min. Un clic siembra las palabras falladas en Live — sin 「Gaps Set」, sin Question Bank.",
+        "citePrefix": "Guía docente de Blooket:",
+        "citeLabel": "Identify knowledge gaps in Blooket reports",
+        "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
+        "cta": "Probar miss-gap → Live sin reconstruir un set"
+      }
+    },
     "practice": {
       "allVocabFound": "¡Encontraste todas las palabras!",
       "back": "Volver",
