@@ -1,9 +1,8 @@
 import React, { Suspense } from 'react';
-import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { retryImport } from '@/utils/retryImport';
+import DailyRedirect from '@/components/daily/DailyRedirect';
 
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
@@ -32,12 +31,12 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Dynamic import for redirect component (client component).
-// retryImport hardens the lazy chunk load so a stale-deploy or flaky-network
-// ChunkLoadError retries and then recovers instead of freezing the fallback.
-const DailyRedirect = dynamicImport(retryImport(() => import('@/components/daily/DailyRedirect')), {
-  loading: LoadingFallback,
-});
+// Static client import — NOT next/dynamic. The hub is the page. A lazy+loader
+// SSR'd only "Loading Daily Challenge..." then React #419 ("server could not
+// finish this Suspense boundary") and the quest cards painted on the client
+// ~1.7s later. Crawlers and short qa-smoke waits saw a dead loader; a chunk
+// miss left the spinner forever. Same lesson as multiplayer lobby ssr:true.
+// Word-hunt / word-wheel stay lazy+retryImport — those ARE heavy game chunks.
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
