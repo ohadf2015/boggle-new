@@ -1,11 +1,22 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { DailyChallengeLanding } from './DailyChallengeLanding';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyRivalChallenge } from '@/hooks/useDailyRivalChallenge';
 import type { Language } from '@/types';
+
+/**
+ * Isolated so useSearchParams (inside useDailyRivalChallenge) cannot suspend
+ * the hub. Nested fallback is empty — never PageLoader — or Next SSRs
+ * "Loading Daily Challenge..." and throws React #419.
+ */
+function DailyRivalChallengeCapture() {
+  useDailyRivalChallenge();
+  return null;
+}
 
 /**
  * DailyRedirect - The /daily hub. Renders the quest-selection landing for
@@ -25,9 +36,6 @@ export default function DailyRedirect() {
   const { language } = useLanguage();
   const router = useRouter();
 
-  // Capture rival challenge from URL if present
-  useDailyRivalChallenge();
-
   return (
     <div className="flex-1 flex flex-col bg-neo-navy min-h-screen page-content-safe">
       <Header />
@@ -36,6 +44,9 @@ export default function DailyRedirect() {
         onSelectWordWheel={() => router.push(`/${language}/daily/word-wheel`)}
         currentLanguage={language as Language}
       />
+      <Suspense fallback={null}>
+        <DailyRivalChallengeCapture />
+      </Suspense>
     </div>
   );
 }

@@ -1,7 +1,6 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
-import { PageLoader } from '@/components/ui/PageLoader';
 import DailyRedirect from '@/components/daily/DailyRedirect';
 
 
@@ -24,19 +23,18 @@ interface PageParams {
   }>;
 }
 
-// Loading fallback - flex-1 fills parent flex-col, centers loader vertically
-const LoadingFallback = () => (
-  <div className="flex-1 flex items-center justify-center bg-neo-navy">
-    <PageLoader size="lg" text="Loading Daily Challenge..." />
-  </div>
-);
-
 // Static client import — NOT next/dynamic. The hub is the page. A lazy+loader
 // SSR'd only "Loading Daily Challenge..." then React #419 ("server could not
 // finish this Suspense boundary") and the quest cards painted on the client
 // ~1.7s later. Crawlers and short qa-smoke waits saw a dead loader; a chunk
 // miss left the spinner forever. Same lesson as multiplayer lobby ssr:true.
 // Word-hunt / word-wheel stay lazy+retryImport — those ARE heavy game chunks.
+//
+// Do NOT wrap DailyRedirect in <Suspense fallback={<PageLoader />}> either.
+// DailyRedirect / DailyChallengeLanding consume useSearchParams; a page-level
+// loader fallback SSRs the spinner and still throws #419. Those hooks live
+// behind nested <Suspense fallback={null}> inside the client tree so the
+// quest cards (START QUEST) emit in the HTML.
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -290,8 +288,10 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
  * Same puzzle for everyone worldwide each day
  * Shareable emoji results like Wordle
  *
- * Wrapped in Suspense boundary to properly handle useSearchParams
- * which can cause "Rendered fewer hooks than expected" errors without it.
+ * useSearchParams is isolated behind nested empty Suspense inside the client
+ * hub (DailyRedirect / DailyChallengeLanding). A page-level PageLoader
+ * fallback around those consumers SSRs "Loading Daily Challenge..." and
+ * React #419 — do not put it back.
  */
 export default async function DailyChallengePage(_props: PageParams): Promise<React.JSX.Element> {
   // No HomepageContentSection here. It rendered dailySeo.data.ts copy visibly below the hub
@@ -301,9 +301,5 @@ export default async function DailyChallengePage(_props: PageParams): Promise<Re
   // /multiplayer and /brain: "not show the faq in any game related screen". The copy is
   // untouched in dailySeo.data.ts and still feeds <meta> + JSON-LD via layout.tsx.
   // Pinned by app/[locale]/__tests__/appShellSeoContent.test.tsx.
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <DailyRedirect />
-    </Suspense>
-  );
+  return <DailyRedirect />;
 }
