@@ -7348,7 +7348,32 @@ const he = {
       "practice": "אימון",
       "practiceDesc": "בלי טיימר, בלי לחץ",
       "daily": "האתגר היומי",
-      "dailyDesc": "אותו פאזל לכולם"
+      "dailyDesc": "אותו פאזל לכולם",
+      "firstDaily": "היומי הראשון",
+      "firstDailyDesc": "פאזל אחד, זהה לכולם",
+      "firstDailyBadge": "יומי ראשון",
+      "multiplayer": "מולטיפלייר",
+      "multiplayerDesc": "חדר חי מול שחקנים"
+    },
+    "praise": {
+      "warm": "מתחמם",
+      "hot": "על האש",
+      "rampage": "השתוללות",
+      "legendary": "אגדי"
+    },
+    "missions": {
+      "longWord": "מילה בת 6 אותיות ומעלה",
+      "volume": "מצא 10 מילים",
+      "letter": "מילה עם האות {letter}",
+      "sprint": "120 נקודות ב-60 שניות",
+      "giant": "מילה בת 7 אותיות ומעלה",
+      "done": "הושלם"
+    },
+    "combo": {
+      "multiplier": "קומבו x{mult}"
+    },
+    "records": {
+      "newRecord": "שיא חדש"
     },
     "play": "שחק",
     "playDesc": "קפוץ למשחק",

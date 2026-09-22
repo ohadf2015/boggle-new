@@ -89,6 +89,9 @@ export interface SinglePlayerResultsData {
   gameSessionId?: string; // Unique session ID for vote tracking
   language?: Language; // Game language
   maxCombo?: number; // Highest combo reached in this game
+  /** Missions cleared this round. Absent on older results payloads. */
+  missionsCompleted?: number;
+  missionBonusPts?: number;
 }
 
 /**

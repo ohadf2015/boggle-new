@@ -7590,7 +7590,32 @@ const sv = {
       "practice": "Träning",
       "practiceDesc": "Ingen timer, ingen press",
       "daily": "Dagens utmaning",
-      "dailyDesc": "Samma pussel som alla andra"
+      "dailyDesc": "Samma pussel som alla andra",
+      "firstDaily": "Första dagliga",
+      "firstDailyDesc": "Ett pussel, samma för alla",
+      "firstDailyBadge": "FÖRSTA DAGLIGA",
+      "multiplayer": "Multiplayer",
+      "multiplayerDesc": "Ett liverum med andra spelare"
+    },
+    "praise": {
+      "warm": "Värmer upp",
+      "hot": "Het",
+      "rampage": "Raseri",
+      "legendary": "Legendarisk"
+    },
+    "missions": {
+      "longWord": "Ord med 6+ bokstäver",
+      "volume": "Hitta 10 ord",
+      "letter": "Använd bokstaven {letter}",
+      "sprint": "120 poäng på 60 s",
+      "giant": "Ord med 7+ bokstäver",
+      "done": "Klar"
+    },
+    "combo": {
+      "multiplier": "Kombo x{mult}"
+    },
+    "records": {
+      "newRecord": "NYTT REKORD"
     },
     "play": "Spela",
     "playDesc": "Hoppa in i ett spel",

@@ -36,6 +36,27 @@ describe('NextGamePicker — choose the next game without leaving single player'
     expect(onReplaySame).toHaveBeenCalledTimes(1);
   });
 
+  it('Given a brand-new player, When rendered, Then the first daily leads and the rematch preset varies', () => {
+    const onStartPreset = vi.fn();
+    render(
+      <NextGamePicker
+        mode="solo-bots"
+        difficulty="EASY"
+        isWinner
+        gamesPlayed={0}
+        dailyDoneEver={false}
+        onStartPreset={onStartPreset}
+        onReplaySame={vi.fn()}
+      />,
+    );
+    const options = screen.getAllByTestId(/^next-game-/);
+    expect(options[0]).toHaveAttribute('data-testid', 'next-game-daily');
+    expect(options[0]).toHaveAttribute('href', '/daily/word-hunt?from=solo_results');
+    expect(screen.getByTestId('next-game-badge-daily')).toHaveTextContent('singlePlayer.nextGame.firstDailyBadge');
+    fireEvent.click(screen.getByTestId('next-game-rematch-same'));
+    expect(onStartPreset).toHaveBeenCalledWith('quick');
+  });
+
   it('Given a link option is tapped, When handled, Then the pick is tracked with its destination', () => {
     render(<NextGamePicker mode="solo-bots" difficulty="EASY" isWinner onStartPreset={vi.fn()} onReplaySame={vi.fn()} />);
     fireEvent.click(screen.getByTestId('next-game-daily'));

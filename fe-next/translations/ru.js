@@ -5240,7 +5240,32 @@ const ru = {
       "practice": "Тренировка",
       "practiceDesc": "Без таймера, без давления",
       "daily": "Ежедневный вызов",
-      "dailyDesc": "Одна головоломка для всех"
+      "dailyDesc": "Одна головоломка для всех",
+      "firstDaily": "Первый ежедневный",
+      "firstDailyDesc": "Одна головоломка, одна и та же для всех",
+      "firstDailyBadge": "ПЕРВЫЙ ДНЕВНОЙ",
+      "multiplayer": "Мультиплеер",
+      "multiplayerDesc": "Живая комната с другими игроками"
+    },
+    "praise": {
+      "warm": "Разогрев",
+      "hot": "В ударе",
+      "rampage": "Буйство",
+      "legendary": "Легенда"
+    },
+    "missions": {
+      "longWord": "Слово из 6+ букв",
+      "volume": "Найди 10 слов",
+      "letter": "Слово с буквой {letter}",
+      "sprint": "120 очков за 60 с",
+      "giant": "Слово из 7+ букв",
+      "done": "Готово"
+    },
+    "combo": {
+      "multiplier": "Комбо x{mult}"
+    },
+    "records": {
+      "newRecord": "НОВЫЙ РЕКОРД"
     },
     "play": "Играть",
     "playDesc": "Прыгни в игру",

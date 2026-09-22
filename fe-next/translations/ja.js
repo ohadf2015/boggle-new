@@ -7304,7 +7304,32 @@ const ja = {
       "practice": "練習",
       "practiceDesc": "タイマーなし、プレッシャーなし",
       "daily": "デイリーチャレンジ",
-      "dailyDesc": "みんな同じパズル"
+      "dailyDesc": "みんな同じパズル",
+      "firstDaily": "初めてのデイリー",
+      "firstDailyDesc": "みんな同じパズル、ひとつだけ",
+      "firstDailyBadge": "初デイリー",
+      "multiplayer": "マルチプレイ",
+      "multiplayerDesc": "ほかのプレイヤーとライブ対戦"
+    },
+    "praise": {
+      "warm": "ウォームアップ",
+      "hot": "ヒート",
+      "rampage": "暴走",
+      "legendary": "レジェンド"
+    },
+    "missions": {
+      "longWord": "6文字以上の単語",
+      "volume": "単語を10個見つける",
+      "letter": "文字 {letter} を含む",
+      "sprint": "60秒で120点",
+      "giant": "7文字以上の単語",
+      "done": "達成"
+    },
+    "combo": {
+      "multiplier": "コンボ x{mult}"
+    },
+    "records": {
+      "newRecord": "新記録"
     },
     "play": "プレイ",
     "playDesc": "ゲームに参加",

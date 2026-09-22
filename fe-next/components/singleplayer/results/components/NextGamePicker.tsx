@@ -2,7 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
-import { Bot, RotateCcw, BookOpen, Trophy, Swords } from 'lucide-react';
+import { Bot, RotateCcw, BookOpen, Trophy, Swords, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,9 @@ interface NextGamePickerProps {
   /** Replay the current setup in-page. */
   onReplaySame: () => void;
   className?: string;
+  /** Rounds finished before this screen. Omit to keep the old ladder. */
+  gamesPlayed?: number;
+  dailyDoneEver?: boolean;
 }
 
 const ACCENT: Record<NextGameOption['accent'], string> = {
@@ -34,6 +37,7 @@ const ICON: Record<string, React.ElementType> = {
   bots: Bot,
   practice: BookOpen,
   daily: Trophy,
+  multiplayer: Users,
 };
 
 const TILE =
@@ -49,11 +53,20 @@ const TILE =
  */
 export const NextGamePicker: React.FC<NextGamePickerProps> = memo(({
   mode, difficulty, isWinner, onStartPreset, onReplaySame, className,
+  gamesPlayed, dailyDoneEver,
 }) => {
   const { t, language } = useLanguage();
   const options = useMemo(
-    () => buildNextGameOptions({ mode, difficulty, isWinner, language }),
-    [mode, difficulty, isWinner, language],
+    () => buildNextGameOptions({
+      mode,
+      difficulty,
+      isWinner,
+      language,
+      ...(typeof gamesPlayed === 'number' && typeof dailyDoneEver === 'boolean'
+        ? { gamesPlayed, dailyDoneEver }
+        : {}),
+    }),
+    [mode, difficulty, isWinner, language, gamesPlayed, dailyDoneEver],
   );
 
   const pick = (opt: NextGameOption) => {
@@ -86,6 +99,14 @@ export const NextGamePicker: React.FC<NextGamePickerProps> = memo(({
                   {t(opt.labelKey)}
                 </span>
                 <span className="block text-[11px] text-neo-white/70 leading-tight">{t(opt.descKey)}</span>
+                {opt.badgeKey ? (
+                  <span
+                    data-testid={`next-game-badge-${opt.id}`}
+                    className="mt-1 inline-flex rounded-neo border-2 border-neo-black bg-neo-lime px-1 py-0.5 text-[9px] font-black uppercase text-neo-black"
+                  >
+                    {t(opt.badgeKey)}
+                  </span>
+                ) : null}
               </span>
             </>
           );

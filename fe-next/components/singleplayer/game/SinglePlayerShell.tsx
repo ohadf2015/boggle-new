@@ -17,6 +17,9 @@ import React, { useMemo, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PortraitLayout } from '@/components/game/in-game/components/PortraitLayout';
 import { toShellProps } from './toShellProps';
+import { SoloComboMeter } from './components/SoloComboMeter';
+import { MissionChips } from './components/MissionChips';
+import type { SoloMission } from '@/lib/soloMissions';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { FoundWord as SpFoundWord } from './types';
 import type { FoundWord as ShellFoundWord, ExtendedLeaderboardPlayer } from '@/shared/types/view';
@@ -59,6 +62,11 @@ export interface SinglePlayerShellProps {
 
   /** Coins badge, 0/N progress, practice training bar — solo-only chrome. */
   soloChrome?: React.ReactNode;
+  /** Solo combo chain. Meter hides itself below streak 2. */
+  soloStreak?: number;
+  soloMultiplier?: number;
+  soloPraiseKey?: string | null;
+  soloMissions?: readonly SoloMission[];
   children?: React.ReactNode;
 }
 
@@ -71,7 +79,7 @@ export function SinglePlayerShell(props: SinglePlayerShellProps) {
     earthquakeState, currentFeedback, highlightedPath, lastWordFoundTime,
     totalBoardWords, isDesktop, onWordSubmit, onWordChange, onPathSubmit,
     onSingleTapDetected = NOOP_TAP, onExit, onPauseToggle, gameStatsRef, t, dir: dirProp,
-    soloChrome, children,
+    soloChrome, soloStreak = 0, soloMultiplier = 1, soloPraiseKey = null, soloMissions, children,
   } = props;
 
   const { dir: contextDir } = useLanguage();
@@ -79,6 +87,14 @@ export function SinglePlayerShell(props: SinglePlayerShellProps) {
   const dir = dirProp ?? (contextDir as 'rtl' | 'ltr');
 
   const helpRef = useRef(false);
+
+  const roundHud = (soloStreak >= 2 || (soloMissions && soloMissions.length > 0) || soloChrome) ? (
+    <>
+      <SoloComboMeter streak={soloStreak} multiplier={soloMultiplier} praiseKey={soloPraiseKey} />
+      {soloMissions && soloMissions.length > 0 ? <MissionChips missions={soloMissions} /> : null}
+      {soloChrome}
+    </>
+  ) : undefined;
 
   // `bots` is mutated in place by the bot simulation, so this must depend on the
   // live scores, not just the array identity — see the stale-mutable-bot-state
@@ -123,7 +139,7 @@ export function SinglePlayerShell(props: SinglePlayerShellProps) {
       onExitRoom={onExit}
       onPauseToggle={onPauseToggle}
       isPaused={isPaused}
-      soloChrome={soloChrome}
+      soloChrome={roundHud}
       gameStatsRef={gameStatsRef}
     >
       {children}

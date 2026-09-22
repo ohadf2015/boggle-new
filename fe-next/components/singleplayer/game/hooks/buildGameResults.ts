@@ -34,6 +34,10 @@ interface BuildResultsParams {
   mode: string;
   language: Language;
   availableWords?: AvailableWords | null;
+  /** Bonus points from missions completed this round. Omitted → 0. */
+  missionBonusPts?: number;
+  /** How many of the three missions were completed. Omitted → field left off. */
+  missionsCompleted?: number;
 }
 
 /**
@@ -43,7 +47,7 @@ export function buildGameResults(params: BuildResultsParams): SinglePlayerResult
   const {
     foundWords, grid, bots, botScores, botWords,
     gameStartTime, timerSeconds, maxCombo, mode, language,
-    availableWords,
+    availableWords, missionBonusPts = 0, missionsCompleted,
   } = params;
 
   // Treat pending words (isValid: null) as invalid
@@ -53,7 +57,7 @@ export function buildGameResults(params: BuildResultsParams): SinglePlayerResult
   }));
 
   const validWords = finalWords.filter(w => w.isValid === true);
-  const finalScore = validWords.reduce((sum, w) => sum + w.score, 0);
+  const finalScore = validWords.reduce((sum, w) => sum + w.score, 0) + missionBonusPts;
   const actualGameDuration = mode === 'practice'
     ? Math.max(1, Math.floor((Date.now() - gameStartTime) / 1000))
     : timerSeconds;
@@ -111,6 +115,7 @@ export function buildGameResults(params: BuildResultsParams): SinglePlayerResult
     gameSessionId,
     language: language as Language,
     maxCombo,
+    ...(missionsCompleted != null ? { missionsCompleted, missionBonusPts } : {}),
   };
 }
 
@@ -121,10 +126,11 @@ export function buildFallbackResults(params: BuildResultsParams): SinglePlayerRe
   const {
     foundWords, grid, bots, botScores, botWords,
     gameStartTime, timerSeconds, mode, language,
+    missionBonusPts = 0, missionsCompleted,
   } = params;
 
   const validWords = foundWords.filter(w => w.isValid === true);
-  const fallbackScore = validWords.reduce((sum, w) => sum + w.score, 0);
+  const fallbackScore = validWords.reduce((sum, w) => sum + w.score, 0) + missionBonusPts;
   const fallbackDuration = mode === 'practice'
     ? Math.max(1, Math.floor((Date.now() - gameStartTime) / 1000))
     : timerSeconds;
@@ -158,6 +164,7 @@ export function buildFallbackResults(params: BuildResultsParams): SinglePlayerRe
     botWordsForValidation: fallbackBotWords,
     gameSessionId: fallbackSessionId,
     language: language as Language,
+    ...(missionsCompleted != null ? { missionsCompleted, missionBonusPts } : {}),
   };
 }
 

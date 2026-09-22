@@ -6819,7 +6819,32 @@ const en = {
       "practice": "Practice",
       "practiceDesc": "No timer, no pressure",
       "daily": "Daily Challenge",
-      "dailyDesc": "Same puzzle as everyone"
+      "dailyDesc": "Same puzzle as everyone",
+      "firstDaily": "First daily",
+      "firstDailyDesc": "One puzzle, the same for everyone",
+      "firstDailyBadge": "FIRST DAILY",
+      "multiplayer": "Multiplayer",
+      "multiplayerDesc": "A live room with other players"
+    },
+    "praise": {
+      "warm": "Warming up",
+      "hot": "On fire",
+      "rampage": "Rampage",
+      "legendary": "Legendary"
+    },
+    "missions": {
+      "longWord": "Word of 6+ letters",
+      "volume": "Find 10 words",
+      "letter": "Use {letter}",
+      "sprint": "120 points in 60s",
+      "giant": "Word of 7+ letters",
+      "done": "Done"
+    },
+    "combo": {
+      "multiplier": "Combo x{mult}"
+    },
+    "records": {
+      "newRecord": "NEW RECORD"
     },
     "play": "Play",
     "playDesc": "Jump into a game",
