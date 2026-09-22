@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { Suspense, useEffect, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import { Timer, CircleDot, Building2, Link2 } from 'lucide-react';
@@ -35,6 +35,29 @@ interface DailyChallengeLandingProps {
 }
 
 /**
+ * Isolated so useSearchParams cannot suspend the quest cards. Nested fallback
+ * is empty — never PageLoader — or the hub SSRs "Loading Daily Challenge..."
+ * and React throws minified #419.
+ */
+function DailyShareDecorations({ t }: { t: (key: string) => string }) {
+  const searchParams = useSearchParams();
+  const challengerName = searchParams?.get('whName') || null;
+  const challengerScore = searchParams?.get('whScore')
+    ? Number(searchParams.get('whScore'))
+    : null;
+  const challengerEmoji = searchParams?.get('whEmoji') || null;
+
+  return (
+    <ScoreGauntletBanner
+      challengerName={challengerName}
+      challengerScore={challengerScore}
+      challengerEmoji={challengerEmoji}
+      t={t}
+    />
+  );
+}
+
+/**
  * DailyChallengeLanding - Arcade Quest Enhanced layout
  * Vertical quest path with XP header, streak counter, and leaderboard teaser.
  */
@@ -51,21 +74,6 @@ export function DailyChallengeLanding({
   // visibleDailyModes below, for whatever lands next. See lib/dailyModes.ts.
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Pre-game gauntlet banner. Reads the same rival contract the share link emits
-  // (whName/whScore/whEmoji) and the results head-to-head card consumes — one
-  // contract end to end. The validated verdict lives on the results screen
-  // (useDailyRivalChallenge → sessionStorage); this banner is just the hype.
-  const challengerName = searchParams?.get('whName') || null;
-  const challengerScore = searchParams?.get('whScore')
-    ? Number(searchParams.get('whScore'))
-    : null;
-  const challengerEmoji = searchParams?.get('whEmoji') || null;
-
-  // Witty welcome for players warped here by scanning a printed QR / barcode.
-  // Set by the homepage redirect (utmCapture.isQrScanArrival → /daily?from=qr).
-  const cameFromQrScan = searchParams?.get('from') === 'qr';
 
   // Use the centralized hook for Word Hunt status + streak (fetches from server for authed users)
   const dailyStatus = useDailyChallengeStatus(currentLanguage);
@@ -292,13 +300,11 @@ export function DailyChallengeLanding({
       {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} total={totalQuests} />
 
-      {/* Score Gauntlet Banner: shown when arriving via a challenge share link */}
-      <ScoreGauntletBanner
-        challengerName={challengerName}
-        challengerScore={challengerScore}
-        challengerEmoji={challengerEmoji}
-        t={t}
-      />
+      {/* Score Gauntlet Banner: shown when arriving via a challenge share link.
+          Nested empty Suspense so useSearchParams does not deopt the hub SSR. */}
+      <Suspense fallback={null}>
+        <DailyShareDecorations t={t} />
+      </Suspense>
 
       {/* Primary hero card — the one mode to play right now, selected by pickPrimaryMode */}
       {primaryMode && (
