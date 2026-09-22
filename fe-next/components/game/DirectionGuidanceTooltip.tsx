@@ -290,6 +290,11 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                     ${showSuccess ? 'bg-neo-lime text-neo-black' : 'bg-white text-neo-black'}
                   `}
                   animate={showSuccess ? { scale: [1, 1.1, 1] } : {}}
+                  transition={
+                    showSuccess
+                      ? { scale: { type: 'tween', duration: 0.35, ease: 'easeOut' } }
+                      : undefined
+                  }
                 >
                   {selectedCells.length > 0
                     ? selectedCells

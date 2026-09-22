@@ -6,6 +6,12 @@
  *   "Only two keyframes currently supported with spring and inertia animations"
  *
  * See growth-radar t_15ec0d7a (#3597 on /en) and prior fix #893.
+ *
+ * t_3eaf4342: Motion defaults *transform* animations to spring when no
+ * transition is set (or only `delay` is set). Multi-keyframe transforms
+ * without an explicit tween therefore throw at runtime even though the
+ * old guard required an explicit `type:'spring'` to flag. We now also
+ * flag that default-spring risk.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -133,6 +139,44 @@ export type SpringKeyframeHit = {
   lit: string;
 };
 
+
+const TRANSFORM_PROPS = new Set(['scale', 'x', 'y', 'rotate', 'width', 'height']);
+
+/**
+ * True when this multi-kf transform is clearly tweened (safe with 3+ frames).
+ * Inline `transition:` inside the animate object counts.
+ */
+function isExplicitTween(trans: string, prop: string, animBody: string): boolean {
+  const blob = `${trans}\n${animBody}`;
+  const propRe = new RegExp(`\\b${prop}\\s*:\\s*\\{`);
+  const pm = propRe.exec(blob);
+  if (pm) {
+    const body = extractBalanced(blob, pm.index + pm[0].length - 1) ?? '';
+    if (/type:\s*['"]spring['"]/.test(body)) return false;
+    if (
+      /\b(duration|ease|times|type:\s*['"]tween['"]|type:\s*['"]keyframes['"])/.test(
+        body,
+      )
+    ) {
+      return true;
+    }
+  }
+  if (
+    /transition\s*:\s*\{[^}]*(duration|ease|times|type:\s*['"]tween['"])/.test(
+      animBody,
+    )
+  ) {
+    return true;
+  }
+  if (/type:\s*['"]spring['"]/.test(trans) && !/\b(duration|ease|times)\s*:/.test(trans)) {
+    return false;
+  }
+  if (/type:\s*['"]tween['"]/.test(trans) || /\b(duration|ease|times)\s*:/.test(trans)) {
+    return true;
+  }
+  return false;
+}
+
 export function findSpringKeyframeViolations(
   rootDir: string,
 ): SpringKeyframeHit[] {
@@ -200,8 +244,8 @@ export function findSpringKeyframeViolations(
       ] as const) {
         const animExpr = extractJsxProp(tag, animateProp);
         if (!animExpr) continue;
-        const transExpr = extractJsxProp(tag, 'transition');
-        if (!transExpr) continue;
+        // Missing transition is itself a signal: Motion defaults transforms to spring.
+        const transExpr = extractJsxProp(tag, 'transition') ?? '';
 
         const animBranches = ternaryBranches(animExpr) ?? [animExpr];
         const transBranches = ternaryBranches(transExpr) ?? [transExpr];
@@ -257,8 +301,11 @@ export function findSpringKeyframeViolations(
               continue;
             }
             const t = pair.trans;
-            if (!/type:\s*['"]spring['"]/.test(t)) continue;
-            if (springAppliesToProp(t, prop)) {
+            const explicitSpring =
+              /type:\s*['"]spring['"]/.test(t) && springAppliesToProp(t, prop);
+            const defaultSpringRisk =
+              TRANSFORM_PROPS.has(prop) && !isExplicitTween(t, prop, pair.anim);
+            if (explicitSpring || defaultSpringRisk) {
               hits.push({
                 file: path.relative(rootDir, file),
                 line,
