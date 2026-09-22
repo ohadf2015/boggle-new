@@ -29,6 +29,8 @@ export interface ChallengeHighScores {
   // Statistics for competitive display
   totalGamesPlayed: number;
   totalHighScoreBeats: number; // How many times player beat their high score
+  /** Longest word ever, even on a round that did not beat the high score. */
+  longestEver?: string;
 }
 
 /**
@@ -89,6 +91,19 @@ export function getHighScore(
   const scores = getHighScores();
   const key = getScoreKey(difficulty, durationSeconds);
   return scores.scores[key] || null;
+}
+
+/**
+ * Remember a longer word even when the score was not a high score.
+ * The high-score entry only stores the word from the record-score game.
+ */
+export function rememberLongestWord(word: string): void {
+  if (typeof window === 'undefined' || !word) return;
+  const scores = getHighScores();
+  const prev = scores.longestEver ?? '';
+  if (word.length <= prev.length) return;
+  scores.longestEver = word;
+  saveHighScores(scores);
 }
 
 /**

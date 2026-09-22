@@ -37,3 +37,54 @@ describe('buildNextGameOptions — a way to choose the next game inside single p
     expect(opts.find((o) => o.id === 'bots')).toMatchObject({ kind: 'action', presetId: 'friendly' });
   });
 });
+
+describe('buildNextGameOptions — new-player rotation', () => {
+  it('puts the first daily on top and varies the rematch preset on an even count', () => {
+    const opts = buildNextGameOptions({
+      mode: 'solo-bots', difficulty: 'EASY', isWinner: true, language: 'he',
+      gamesPlayed: 0, dailyDoneEver: false,
+    });
+    expect(opts[0]).toMatchObject({
+      id: 'daily',
+      kind: 'link',
+      href: '/daily/word-hunt?from=solo_results',
+      labelKey: 'singlePlayer.nextGame.firstDaily',
+      descKey: 'singlePlayer.nextGame.firstDailyDesc',
+      badgeKey: 'singlePlayer.nextGame.firstDailyBadge',
+    });
+    expect(opts.find((o) => o.id === 'rematch-same')).toMatchObject({
+      kind: 'action',
+      presetId: 'quick',
+      labelKey: 'singlePlayer.nextGame.rematchSame',
+    });
+  });
+
+  it('puts multiplayer on top and uses the next rematch preset on an odd count', () => {
+    const opts = buildNextGameOptions({
+      mode: 'solo-bots', difficulty: 'MEDIUM', isWinner: false, language: 'es',
+      gamesPlayed: 1, dailyDoneEver: false,
+    });
+    expect(opts[0]).toMatchObject({
+      id: 'multiplayer',
+      kind: 'link',
+      href: '/es/multiplayer',
+      labelKey: 'singlePlayer.nextGame.multiplayer',
+      descKey: 'singlePlayer.nextGame.multiplayerDesc',
+      accent: 'pink',
+    });
+    expect(opts.find((o) => o.id === 'rematch-same')).toMatchObject({ presetId: 'standard' });
+  });
+
+  it('leaves the ladder alone once rotation is off, and when the fields are omitted', () => {
+    const veteran = buildNextGameOptions({
+      mode: 'solo-bots', difficulty: 'EASY', isWinner: true, language: 'en',
+      gamesPlayed: 4, dailyDoneEver: false,
+    });
+    const omitted = buildNextGameOptions({
+      mode: 'solo-bots', difficulty: 'EASY', isWinner: true, language: 'en',
+    });
+    expect(veteran.map((o) => o.id)).toEqual(omitted.map((o) => o.id));
+    expect(veteran.find((o) => o.id === 'rematch-same')).toMatchObject({ presetId: '' });
+    expect(veteran.find((o) => o.id === 'daily')).toMatchObject({ href: '/en/daily' });
+  });
+});

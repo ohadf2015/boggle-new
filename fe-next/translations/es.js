@@ -7287,7 +7287,32 @@ const es = {
       "practice": "Práctica",
       "practiceDesc": "Sin tiempo, sin presión",
       "daily": "Reto diario",
-      "dailyDesc": "El mismo puzle para todos"
+      "dailyDesc": "El mismo puzle para todos",
+      "firstDaily": "Primer diario",
+      "firstDailyDesc": "Un puzle, el mismo para todos",
+      "firstDailyBadge": "PRIMER DIARIO",
+      "multiplayer": "Multijugador",
+      "multiplayerDesc": "Una sala en vivo con otros jugadores"
+    },
+    "praise": {
+      "warm": "Calentando",
+      "hot": "En racha",
+      "rampage": "Desatado",
+      "legendary": "Legendario"
+    },
+    "missions": {
+      "longWord": "Palabra de 6+ letras",
+      "volume": "Encuentra 10 palabras",
+      "letter": "Usa la letra {letter}",
+      "sprint": "120 puntos en 60 s",
+      "giant": "Palabra de 7+ letras",
+      "done": "Hecho"
+    },
+    "combo": {
+      "multiplier": "Combo x{mult}"
+    },
+    "records": {
+      "newRecord": "NUEVO RÉCORD"
     },
     "play": "Jugar",
     "playDesc": "Entra al juego",

@@ -72,6 +72,7 @@ import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { useProgressSnapshot } from './results/hooks/useProgressSnapshot';
 import { ProgressPulseCard } from './results/components/ProgressPulseCard';
 import { NextGamePicker } from './results/components/NextGamePicker';
+import { MissionsCompletedNote, RecordBadges } from './results/components/RecordBadges';
 import type { DifficultyLevel } from '@/shared/types/game';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
@@ -210,7 +211,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     wordsByPoints, sortedPointGroups, invalidWords,
     totalComboBonus, totalFireRoundBonus, botWordDetails,
     playerArchetype, missedWords,
-  } = useResultsData(results, t, playerAvatar);
+    soloGamesPlayed, dailyDoneEver, recordFlags,
+  } = useResultsData(results, t, playerAvatar, {
+    difficulty,
+    trackSoloRound: mode === 'solo-bots',
+  });
 
   const { hasUpdatedStats } = useGuestStatsSync({
     isAuthenticated, results, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype,
@@ -342,24 +347,37 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       isWinner={isWinner}
       onStartPreset={handleStartPresetGated}
       onReplaySame={handlePlayAgainGated}
+      gamesPlayed={mode === 'solo-bots' && typeof soloGamesPlayed === 'number' ? soloGamesPlayed : undefined}
+      dailyDoneEver={mode === 'solo-bots' && typeof dailyDoneEver === 'boolean' ? dailyDoneEver : undefined}
     />
   ) : null;
 
-  const heroBlock = mode === 'solo-bots' ? (
-    <PlacementHero
-      rank={playerRank} score={displayScore(results.playerScore)} totalPlayers={allParticipants.length}
-      username={profileDisplayName} avatar={playerAvatar}
-      gapToWinner={playerRank > 1 ? (allParticipants[0]?.score || 0) - results.playerScore : 0}
-    />
-  ) : (
-    <ResultsWinnerBanner
-      winner={{ username: profileDisplayName, score: results.playerScore, avatar: playerAvatar }}
-      isCurrentUserWinner={true}
-      variant="completion"
-      customMessage={bannerConfig.message || t('results.finalScore')}
-      customAnnouncement={bannerConfig.announcement}
-      compact={true}
-    />
+  const heroBlock = (
+    <>
+      {mode === 'solo-bots' ? (
+        <PlacementHero
+          rank={playerRank} score={displayScore(results.playerScore)} totalPlayers={allParticipants.length}
+          username={profileDisplayName} avatar={playerAvatar}
+          gapToWinner={playerRank > 1 ? (allParticipants[0]?.score || 0) - results.playerScore : 0}
+        />
+      ) : (
+        <ResultsWinnerBanner
+          winner={{ username: profileDisplayName, score: results.playerScore, avatar: playerAvatar }}
+          isCurrentUserWinner={true}
+          variant="completion"
+          customMessage={bannerConfig.message || t('results.finalScore')}
+          customAnnouncement={bannerConfig.announcement}
+          compact={true}
+        />
+      )}
+      <RecordBadges
+        scoreIsRecord={!!recordFlags?.scoreIsRecord}
+        wordIsRecord={!!recordFlags?.wordIsRecord}
+        score={results.playerScore}
+        longestWord={longestWordOf(results.playerWords || [])}
+      />
+      <MissionsCompletedNote count={results.missionsCompleted} />
+    </>
   );
 
   const leaderboardParticipants = useMemo(() =>

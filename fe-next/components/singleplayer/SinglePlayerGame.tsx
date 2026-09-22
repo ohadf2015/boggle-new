@@ -522,6 +522,10 @@ function SinglePlayerGame({
         onPauseToggle={core.handlePauseToggle}
         gameStatsRef={core.gameStatsRef}
         t={commonProps.t}
+        soloStreak={core.soloCombo?.streak ?? 0}
+        soloMultiplier={core.soloCombo?.multiplier ?? 1}
+        soloPraiseKey={core.soloCombo?.praiseKey ?? null}
+        soloMissions={core.soloMissions}
       />
     </div>
   );

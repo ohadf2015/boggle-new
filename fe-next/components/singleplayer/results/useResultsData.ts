@@ -5,13 +5,15 @@
  * to maintain consistency with multiplayer results display.
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { calculatePlayerInsights, type PlayerInsights, type WordData } from '@/utils/gameInsights';
 import { categorizeWords, calculateWordStats } from '@/components/results/utils';
 import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
 import { calculateWordScore } from '@/shared/utils/scoring';
 import type { WordObject } from '@/components/results/types';
+import type { DifficultyLevel } from '@/shared/types/game';
 import type { SinglePlayerResultsData, PlayerWordData } from '../SinglePlayerView';
+import { commitSoloRound, longestPlayerWord, readSoloResultsSnapshot } from './soloResultsSnapshot';
 
 // Re-export types for consumers
 export type { PlayerInsights };
@@ -80,8 +82,27 @@ export interface Participant {
 export function useResultsData(
   results: SinglePlayerResultsData,
   t: (key: string, fallback?: string) => string,
-  playerAvatar?: ParticipantAvatar
+  playerAvatar?: ParticipantAvatar,
+  recordContext?: { difficulty?: DifficultyLevel; trackSoloRound?: boolean },
 ) {
+  const sessionId = results.gameSessionId ?? 'solo-round';
+  const longestWord = longestPlayerWord(results.playerWords);
+  const snapshotRef = useRef<ReturnType<typeof readSoloResultsSnapshot> | null>(null);
+  if (snapshotRef.current === null) {
+    snapshotRef.current = readSoloResultsSnapshot(sessionId, results.playerScore, longestWord);
+  }
+  const snapshot = snapshotRef.current;
+
+  useEffect(() => {
+    commitSoloRound(sessionId, {
+      score: results.playerScore,
+      wordCount: results.playerWords?.length ?? 0,
+      longestWord,
+      difficulty: recordContext?.difficulty ?? 'MEDIUM',
+      durationSeconds: results.gameDuration || 0,
+      trackSoloRound: recordContext?.trackSoloRound,
+    });
+  }, [sessionId, results.playerScore, results.playerWords, results.gameDuration, longestWord, recordContext?.difficulty, recordContext?.trackSoloRound]);
   // Calculate rankings for solo-bots mode
   const allParticipants = useMemo((): Participant[] => {
     return [
@@ -285,5 +306,8 @@ export function useResultsData(
     playerArchetypes,
     playerArchetype,
     missedWords,
+    soloGamesPlayed: snapshot.gamesPlayed,
+    dailyDoneEver: snapshot.dailyDoneEver,
+    recordFlags: snapshot.records,
   };
 }

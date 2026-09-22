@@ -43,6 +43,7 @@ import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
 import { useSinglePlayerEffects } from './useSinglePlayerEffects';
 import { buildGameResults, buildFallbackResults, emitSinglePlayerGameEnd } from './buildGameResults';
+import { soloResultFromErrorKey, useSoloJuice } from './useSoloJuice';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
@@ -275,6 +276,11 @@ export function useSinglePlayerCore({
     return canonicalWordScore(word, currentComboLevel, getScoreMultiplier());
   }, [getScoreMultiplier]);
 
+  // Solo combo + missions. Ref so the submit callback stays stable.
+  const soloJuice = useSoloJuice();
+  const soloJuiceRef = useRef(soloJuice);
+  soloJuiceRef.current = soloJuice;
+
   // Client-side dictionary cache for instant validation
   const { checkWord: checkWordInCache, isLoaded: isDictionaryCacheLoaded } = useDictionaryCache(settings.language);
 
@@ -291,6 +297,7 @@ export function useSinglePlayerCore({
           : t('playerView.tooFast', 'Too fast! 3s cooldown');
         wordErrorToast(msg, { duration: spamResult.remainingCooldown ? 1500 : 2000 });
         if (!spamResult.remainingCooldown) combo.resetCombo();
+        soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
       }
       return;
     }
@@ -307,6 +314,9 @@ export function useSinglePlayerCore({
       const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: msg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, msg); combo.resetCombo();
+      soloJuiceRef.current.onResult({
+        result: soloResultFromErrorKey(localValidation.errorKey), word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now,
+      });
       return;
     }
 
@@ -315,6 +325,7 @@ export function useSinglePlayerCore({
       const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Word not on board');
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: notOnBoardMsg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, notOnBoardMsg); combo.resetCombo();
+      soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
       return;
     }
 
@@ -322,6 +333,7 @@ export function useSinglePlayerCore({
       const alreadyFoundMsg = t('playerView.wordAlreadyFound', 'Already found!');
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: alreadyFoundMsg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg); combo.resetCombo();
+      soloJuiceRef.current.onResult({ result: 'dup', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
       return;
     }
 
@@ -342,13 +354,17 @@ export function useSinglePlayerCore({
       const scoreWithoutMultiplier = canonicalWordScore(normalizedWord, currentCombo, 1);
       const multiplier = getScoreMultiplier();
       const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
+      // Solo combo multiplies the player's points. Bots never reach this path.
+      const juice = soloJuiceRef.current.onResult({
+        result: 'ok', word: normalizedWord, basePts: fullScore, elapsedSec: timeSinceStart, nowMs: now,
+      });
 
       foundWordsRef.current = foundWordsRef.current.map(fw =>
-        fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus } : fw
+        fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: true, score: juice.wordPts, comboBonus, fireRoundBonus } : fw
       );
       setFoundWords(foundWordsRef.current);
       wordPace.recordWord();
-      setScore(prev => prev + fullScore);
+      setScore(prev => prev + juice.wordPts + juice.bonusPts);
       playWordAcceptedSound(); hapticForWordScore(normalizedWord.length);
       effects.lastWordFoundTimeRef.current = Date.now(); setShowHintPrompt(false);
       combo.incrementCombo(true);
@@ -357,9 +373,9 @@ export function useSinglePlayerCore({
       if (combo.validWordCount > 1) playComboSound(currentCombo + 1);
       setCurrentFeedback({
         id: `accept-${now}`, type: 'accepted', word: normalizedWord.toUpperCase(),
-        score: fullScore, fireRoundActive, fireRoundBonus, timestamp: now,
+        score: juice.wordPts, fireRoundActive, fireRoundBonus, timestamp: now,
       });
-      announceWordResult(normalizedWord, true, fullScore);
+      announceWordResult(normalizedWord, true, juice.wordPts);
       announceCombo(currentCombo + 1);
 
       const validatedWords = foundWordsRef.current
@@ -374,6 +390,7 @@ export function useSinglePlayerCore({
     // Helper: Handle invalid word (not in dictionary)
     const handleInvalidWord = () => {
       combo.resetCombo();
+      soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: timeSinceStart, nowMs: now });
       foundWordsRef.current = foundWordsRef.current.map(fw =>
         fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
       );
@@ -409,6 +426,7 @@ export function useSinglePlayerCore({
       .catch(() => {
         // Treat network errors as invalid
         combo.resetCombo();
+        soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: Date.now() });
         foundWordsRef.current = foundWordsRef.current.map(fw =>
           fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
         );
@@ -488,12 +506,15 @@ export function useSinglePlayerCore({
   useEffect(() => {
     if (!isGameOver || gameOverCalledRef.current || !grid) return;
     gameOverCalledRef.current = true;
+    const juiceSnap = soloJuiceRef.current.snapshot();
     const resultParams = {
       foundWords: foundWordsRef.current, grid: grid!, bots: settings.bots,
       botScores: botScoresRef.current, botWords: botWordsRef.current,
       gameStartTime: effects.gameStartTimeRef.current, timerSeconds: settings.timerSeconds,
       maxCombo: combo.maxCombo, mode: settings.mode, language: settings.language,
       availableWords: availableWordsRef.current,
+      missionBonusPts: juiceSnap.missionBonusPts,
+      missionsCompleted: juiceSnap.missionsCompleted,
     };
     try {
       const results = buildGameResults(resultParams);
@@ -590,5 +611,7 @@ export function useSinglePlayerCore({
     handleWordSubmit, handlePathSubmit, handleWordChange,
     handlePauseToggle, handleFinishPractice, handleQuitRequest, onQuit, confirmQuit, t,
     wordPace,
+    soloCombo: soloJuice.combo,
+    soloMissions: soloJuice.missions,
   };
 }
