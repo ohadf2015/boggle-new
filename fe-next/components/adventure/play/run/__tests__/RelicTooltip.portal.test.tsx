@@ -33,7 +33,7 @@ describe('RelicTooltip — nothing can paint over it', () => {
   it('Given the bubble is open, then it is fixed and stacked above every game surface', () => {
     const tip = open();
     expect(tip.className).toContain('fixed');
-    // The play screen is z-50 and the word-cast FX layer is z-[70]; the bubble clears both.
+    // The play screen is z-50 and the word-cast FX layer is z-70; the bubble clears both.
     expect(tip.className).toContain('z-[120]');
   });
 

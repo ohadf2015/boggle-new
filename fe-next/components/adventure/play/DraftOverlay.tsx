@@ -154,7 +154,7 @@ export default function DraftOverlay({ offer, onPick, run }: Props) {
       </div>
 
       {flight && (
-        <motion.div aria-hidden className="pointer-events-none fixed z-[70]"
+        <motion.div aria-hidden className="pointer-events-none fixed z-70"
           style={{ left: flight.from.left, top: flight.from.top, width: flight.from.width, height: flight.from.height }}
           initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
           animate={flight.to

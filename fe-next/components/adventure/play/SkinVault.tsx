@@ -22,7 +22,7 @@ export default function SkinVault({ isOpen, onClose, unlocked, equippedWorld, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="skin-vault-title">
+    <div className="fixed inset-0 z-60 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="skin-vault-title" data-adv-overlay="SkinVault">
       <div className="w-full sm:max-w-lg max-h-[88vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border-[3px] border-black bg-[#1a1a2e] text-neo-cream shadow-[6px_6px_0_#000] p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
         <div className="flex items-start justify-between gap-3">
           <div>

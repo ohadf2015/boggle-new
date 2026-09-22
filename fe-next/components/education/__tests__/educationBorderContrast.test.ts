@@ -89,6 +89,10 @@ const ROOTS = [
   // Education surfaces living outside the education folders.
   'components/ui/EducationSkeletons.tsx',
   'components/multiplayer/ClassroomJoinNamePrompt.tsx',
+  'components/adventure',
+  'components/wordTowerV2',
+  'app/[locale]/adventure',
+  'app/[locale]/word-tower-v2',
 ];
 const REPO = path.resolve(__dirname, '../../..');
 
@@ -198,13 +202,72 @@ function scan(): Violation[] {
   return violations;
 }
 
+const EXTRA_ROOTS = [
+  'components/adventure',
+  'components/wordTowerV2',
+  'app/[locale]/adventure',
+  'app/[locale]/word-tower-v2',
+];
+
+function isExtra(file: string): boolean {
+  return EXTRA_ROOTS.some((p) => file === p || file.startsWith(`${p}/`));
+}
+
+/** Pre-existing adventure + v2 pairs. Ratchet: must not grow. Visual rewrite = flip PR. */
+const FROZEN_EXTRA = [
+  'components/adventure/CollectionPanel.tsx|neo-navy|neo-black',
+  'components/adventure/CollectionPanel.tsx|neo-navy-light|neo-black',
+  'components/adventure/CollectionPanel.tsx|neo-white/10|neo-white/20',
+  'components/adventure/CollectionPanel.tsx|neo-navy-light|neo-white/10',
+  'components/adventure/MasteryBadge.tsx|neo-black/30|neo-black',
+  'components/adventure/WorldMapNode.tsx|neo-navy-light|neo-black',
+  'components/adventure/WorldMapNode.tsx|neo-black/50|neo-black/30',
+  'components/adventure/achievements/AchievementCard.tsx|neo-black/30|neo-black',
+  'components/adventure/achievements/AchievementCard.tsx|neo-black|neo-white/30',
+  'components/adventure/boss/cinematics/CinematicFallback.tsx|neo-navy|neo-black',
+  'components/adventure/map/MapNodeButton.tsx|neo-navy-light|neo-black',
+  'components/adventure/play/intro/ChapterBeat.tsx|neo-pink/30|neo-black',
+  'components/wordTowerV2/StabilityMeter.tsx|neo-navy/90|neo-black',
+  'components/wordTowerV2/StabilityMeter.tsx|neo-cream/15|neo-black',
+  'components/wordTowerV2/V2Dock.tsx|neo-navy|neo-cream/30',
+  'components/wordTowerV2/V2Results.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/V2Results.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/V2TopBar.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/WordTowerV2.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/estate/DistrictComplete.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/estate/DistrictComplete.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/estate/DistrictScreen.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/estate/DistrictScreen.tsx|neo-navy-light|neo-black',
+  'components/wordTowerV2/estate/DistrictScreen.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/estate/PlotPanel.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/estate/PlotPanel.tsx|neo-navy-light|neo-black',
+  'components/wordTowerV2/rescue/BraceControl.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/rewards/ChestReveal.tsx|neo-navy-light|neo-black',
+  'components/wordTowerV2/rivals/Payback.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/rivals/Payback.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/rivals/PayoffPanel.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/rivals/RaidResultCard.tsx|neo-navy/90|neo-black',
+  'components/wordTowerV2/rivals/RevengeHome.tsx|neo-navy-light|neo-black',
+  'components/wordTowerV2/rivals/RivalBoard.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/rivals/RivalBoard.tsx|neo-navy-light|neo-black',
+  'components/wordTowerV2/rivals/RivalBoard.tsx|neo-navy-light|neo-black',
+  'components/wordTowerV2/rivals/RivalBuilding.tsx|neo-navy|neo-black',
+  'components/wordTowerV2/rivals/RivalBuilding.tsx|neo-navy-light|neo-black',
+];
+
 describe('education + teacher card borders', () => {
-  it('every border is visible against its own fill (>= 3:1)', () => {
-    const violations = scan();
+  it('every education-root border is visible against its own fill (>= 3:1)', () => {
+    const violations = scan().filter((v) => !isExtra(v.file));
     const report = violations
       .map((v) => `  ${v.file}: border-${v.border} on bg-${v.bg} = ${v.ratio}:1`)
       .join('\n');
     expect(violations, `Invisible borders:\n${report}`).toEqual([]);
+  });
+
+  it('adventure + wordTowerV2 roots are scanned and do not grow invisible-border debt', () => {
+    const extra = scan().filter((v) => isExtra(v.file));
+    expect(extra.length).toBeGreaterThan(0);
+    expect(extra.map((v) => `${v.file}|${v.bg}|${v.border}`)).toEqual(FROZEN_EXTRA);
   });
 
   it('scans a non-trivial number of files (guard against a vacuous pass)', () => {
