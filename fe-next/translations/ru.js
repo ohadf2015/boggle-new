@@ -11449,7 +11449,10 @@ const ru = {
       "regionLabel": "Сводка прогресса для {{classroom}}",
       "scheduleReteachCta": "Запланировать reteach Live через ~{{days}} дн.",
       "scheduleReteachConfirm": "Reteach Live запланирован на {{date}} (~{{days}} дн.). Приглашение в календарь открыто.",
-      "scheduleReteachHint": "Соберите снова сложные слова и сыграйте через ~две недели — интервальный повтор в стиле Kahoot."
+      "scheduleReteachHint": "Соберите снова сложные слова и сыграйте через ~две недели — интервальный повтор в стиле Kahoot.",
+      "unpluggedReteachLiveCta": "Начать Unplugged reteach Live",
+      "reteachLiveCta": "Начать 3-мин reteach Live",
+      "unpluggedReteachLiveFoil": "Альтернатива Kahoot Unplugged (Teacher Takeover, 21 сен 2026 — когда нет устройств учеников) — проецируйте пропуски; ученики отвечают на бумаге, без устройств."
     },
     "subscription": {
       "giftedNoCard": "Карта не привязана, продления нет — срок просто закончится, и вы вернётесь на бесплатный план.",

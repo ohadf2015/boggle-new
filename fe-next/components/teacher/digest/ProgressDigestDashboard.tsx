@@ -22,6 +22,7 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { Stat } from '@/components/ui/Stat';
 import { NeoPanel } from '@/components/ui/panel';
 import { ScheduleReteachLiveButton } from '@/components/teacher/digest/ScheduleReteachLiveButton';
+import { MissGapUnpluggedReteachLiveCta } from '@/components/teacher/digest/MissGapUnpluggedReteachLiveCta';
 
 export interface ProgressDigestDashboardProps {
   classroomId: string;
@@ -143,7 +144,13 @@ export function ProgressDigestDashboard({
                   </li>
                 ))}
               </ul>
-              <div className="mt-3">
+              <div className="mt-3 space-y-3">
+                <MissGapUnpluggedReteachLiveCta
+                  locale={language}
+                  missedWords={digest.topMissedWords}
+                  lesson={classroomName}
+                  layout="row"
+                />
                 <ScheduleReteachLiveButton
                   classroomId={classroomId}
                   classroomName={classroomName}
