@@ -75,7 +75,10 @@ export class ChunkErrorBoundary extends Component<Props, State> {
             <button
               type="button"
               onClick={() => {
-                const home = sectionHome({ pathname: typeof window !== 'undefined' ? window.location.pathname : '' });
+                const home = sectionHome({
+                  pathname: typeof window !== 'undefined' ? window.location.pathname : '',
+                  search: typeof window !== 'undefined' ? window.location.search : undefined,
+                });
                 window.location.href = home;
               }}
               className="btn-neo-secondary px-6 py-3 text-lg"

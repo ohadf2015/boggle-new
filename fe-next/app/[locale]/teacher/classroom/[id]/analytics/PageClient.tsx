@@ -96,7 +96,12 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   // ==================== NAVIGATION HANDLERS ====================
 
   const handleBackToClassroom = () => {
-    router.push(`/${locale}/teacher/classroom/${classroomId}`);
+    // `/teacher/classroom/{id}` has no page of its own (only its `/analytics`
+    // child does) — it 404s, and the 404 boundary used to bounce the teacher
+    // to the main app homepage. `ClassroomManager` (mounted at the list route)
+    // doesn't support selecting a classroom by id, so the list itself is the
+    // real destination.
+    router.push(`/${locale}/teacher/classroom`);
   };
 
   const handleViewStudents = (_filter: 'struggling') => {

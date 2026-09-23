@@ -37,11 +37,11 @@ describe('StudentPageClient — guard race (fresh guest session)', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('redirects a truly logged-out visitor to home', async () => {
+  it('redirects a truly logged-out visitor to the student join entry, not the main app home', async () => {
     mockUseAuth.mockReturnValue({ user: null, profile: null, loading: false });
     render(<StudentPageClient />);
 
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en'));
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en/student/join'));
   });
 
   it('renders the hub once the guest user + profile are both present', async () => {

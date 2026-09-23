@@ -77,10 +77,14 @@ describe('student sub-page auth guard — the profile lands after the session', 
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('still sends a visitor with no session at all home', async () => {
+  it('sends a visitor with no session at all to the student join entry, not the main app home', async () => {
+    // The education homepage-bounce audit: a true no-session visitor on an
+    // education sub-page used to land on the marketing home ('/en'). That is
+    // one of the measured causes of the 31% education→home-within-60s metric.
+    // `/student/join` is the real, auth-free entry point for a student.
     mockUseAuth.mockReturnValue({ user: null, profile: null, loading: false, isAuthenticated: false });
     render(<StudentAchievementsPageClient />);
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en'));
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en/student/join'));
   });
 
   it('waits while the session itself is still loading', async () => {

@@ -21,6 +21,30 @@ describe('sectionHome', () => {
       expect(isEducationPath('/multiplayer')).toBe(false);
     });
 
+    it('returns true for functional /education/* flow sub-routes (not marketing)', () => {
+      // These are real gameplay/tool flows nested under /education, not SEO
+      // landing pages. A teacher/student mid-flow here must stay in education
+      // on error, not bounce to the main app home.
+      expect(isEducationPath('/en/education/classroom-game')).toBe(true);
+      expect(isEducationPath('/en/education/duels')).toBe(true);
+      expect(isEducationPath('/en/education/duels/abc123')).toBe(true);
+      expect(isEducationPath('/en/education/access')).toBe(true);
+      expect(isEducationPath('/en/education/miss-gap-assignment')).toBe(true);
+      expect(isEducationPath('/en/education/miss-gap-grade-passback')).toBe(true);
+      expect(isEducationPath('/en/education/miss-gap-practice')).toBe(true);
+      expect(isEducationPath('/en/education/miss-gap-whatsapp')).toBe(true);
+      expect(isEducationPath('/en/education/unplugged-grade-passback')).toBe(true);
+      expect(isEducationPath('/en/education/unplugged-reteach')).toBe(true);
+    });
+
+    it('returns false for /education marketing/SEO landing pages', () => {
+      // The bare /education landing and its SEO content siblings stay outside
+      // isEducationPath — they're marketing pages, not a stateful flow.
+      expect(isEducationPath('/en/education')).toBe(false);
+      expect(isEducationPath('/en/education/esl-word-games')).toBe(false);
+      expect(isEducationPath('/en/education/vocabulary-games-classroom')).toBe(false);
+    });
+
     it('returns false for empty or invalid paths', () => {
       expect(isEducationPath('')).toBe(false);
       expect(isEducationPath('/')).toBe(false);
@@ -68,6 +92,14 @@ describe('sectionHome', () => {
 
       it('returns /locale/education for classroom routes', () => {
         expect(sectionHome({ pathname: '/en/classroom' })).toBe('/en/education');
+      });
+
+      it('returns /locale/education for functional /education/* flow sub-routes', () => {
+        expect(sectionHome({ pathname: '/en/education/classroom-game' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/education/duels/abc123' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/education/access' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/education/miss-gap-whatsapp' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/education/unplugged-reteach' })).toBe('/en/education');
       });
 
       it('preserves locale for education routes', () => {
@@ -129,6 +161,40 @@ describe('sectionHome', () => {
       it('handles trailing slashes', () => {
         expect(sectionHome({ pathname: '/en/teacher/' })).toBe('/en/education');
         expect(sectionHome({ pathname: '/en/multiplayer/' })).toBe('/en');
+      });
+    });
+
+    describe('multiplayer classroom rooms (via explicit `search`)', () => {
+      it('sends the host to the teacher hub, not home, on a classroom multiplayer error', () => {
+        expect(
+          sectionHome({ pathname: '/en/multiplayer', search: '?room=ABCD&classroom=true&host=true' }),
+        ).toBe('/en/teacher');
+      });
+
+      it('sends a classroom student to the student hub, not home', () => {
+        expect(
+          sectionHome({ pathname: '/en/multiplayer', search: '?room=ABCD&classroom=true' }),
+        ).toBe('/en/student');
+      });
+
+      it('ignores `search` for an ordinary (non-classroom) multiplayer room', () => {
+        expect(sectionHome({ pathname: '/en/multiplayer', search: '?room=ABCD' })).toBe('/en');
+      });
+
+      it('ignores classroom `search` on a non-multiplayer path', () => {
+        expect(sectionHome({ pathname: '/en/daily', search: '?classroom=true&host=true' })).toBe('/en');
+      });
+
+      it('preserves locale for RTL classroom rooms via `search`', () => {
+        expect(
+          sectionHome({ pathname: '/he/multiplayer', search: '?classroom=true&host=true' }),
+        ).toBe('/he/teacher');
+      });
+
+      it('does NOT read classroom context out of the pathname query string itself', () => {
+        // Backward compatible: without an explicit `search`, a `?classroom=true`
+        // embedded in `pathname` is still ignored, same as before this fix.
+        expect(sectionHome({ pathname: '/en/multiplayer?classroom=true&host=true' })).toBe('/en');
       });
     });
   });

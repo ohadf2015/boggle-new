@@ -101,7 +101,9 @@ describe('Navigation Fixes — All 4 Causes', () => {
       expect(isEducationPath('/en/teacher')).toBe(true);
       expect(isEducationPath('/en/student')).toBe(true);
       expect(isEducationPath('/en/join/CODE')).toBe(true);
-      expect(isEducationPath('/en/education/classroom-game')).toBe(false); // /education itself is not in EDUCATION_ROUTES
+      // /education/classroom-game is a functional flow sub-route, not the bare
+      // /education marketing landing page — it IS an education route.
+      expect(isEducationPath('/en/education/classroom-game')).toBe(true);
       expect(isEducationPath('/en/multiplayer')).toBe(false);
     });
   });

@@ -32,18 +32,15 @@ function TeacherCurriculumInner() {
 
   // Handle successful import - navigate to lesson or show success
   const handleImportSuccess = useCallback(
-    (lesson: VocabularyLesson) => {
-      // Navigate to the new lesson
-      if (classroomId) {
-        router.push(
-          `/${language}/teacher/classroom/${classroomId}/lesson/${lesson.id}`
-        );
-      } else {
-        // Just show success - lesson is created without classroom association
-        // User can access it from their lessons list
-      }
+    (_lesson: VocabularyLesson) => {
+      // There is no `/teacher/classroom/{id}/lesson/{id}` route — that 404s,
+      // and the 404 boundary used to bounce the teacher to the main app
+      // homepage (education homepage-bounce audit). The teacher dashboard is
+      // the real place lessons are viewed/edited: LessonBuilder renders there
+      // and already shows the lesson that was just imported.
+      router.push(`/${language}/teacher`);
     },
-    [classroomId, language, router]
+    [language, router]
   );
 
   // The browser is a long filtered list — exactly the content the shell's one

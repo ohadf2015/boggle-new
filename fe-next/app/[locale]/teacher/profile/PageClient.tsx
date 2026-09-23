@@ -46,7 +46,11 @@ function TeacherProfileInner() {
     // lose its state on every token refresh. Deciding a role here during that
     // window threw a working teacher to the marketing home mid-lesson.
     if (!user) {
-      router.push(`/${language}`);
+      // Not the main app home. TeacherGate normally intercepts a settled
+      // signed-out visitor before this component mounts at all and sends
+      // them to /education/access — this branch matches that destination
+      // for defense-in-depth (education homepage-bounce audit).
+      router.push(`/${language}/education/access`);
       return;
     }
     // Nothing else is decided here on purpose. While `profile` is in flight the

@@ -330,14 +330,18 @@ describe('AnalyticsPageClient', () => {
   // NAVIGATION HANDLER TESTS
   // ============================================
 
-  it('should navigate back to classroom when back button clicked', async () => {
+  it('should navigate back to the classroom list, never a nonexistent per-classroom route', async () => {
+    // `/teacher/classroom/{id}` has no page (only `/teacher/classroom/{id}/analytics`
+    // does) — it 404s, and the 404 boundary used to bounce the teacher to the
+    // homepage (education homepage-bounce audit). `/teacher/classroom` (the list,
+    // via ClassroomManager) is the real route.
     const user = userEvent.setup();
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
     const backButton = screen.getByText('education.analytics.backToClassroom');
     await user.click(backButton);
 
-    expect(mockPush).toHaveBeenCalledWith('/en/teacher/classroom/classroom-1');
+    expect(mockPush).toHaveBeenCalledWith('/en/teacher/classroom');
   });
 
   // ============================================

@@ -135,6 +135,7 @@ export default function GlobalError({
                   const home = sectionHome({
                     pathname: typeof window !== 'undefined' ? window.location.pathname : '',
                     locale: detectedLocale,
+                    search: typeof window !== 'undefined' ? window.location.search : undefined,
                   });
                   window.location.href = home;
                 }}

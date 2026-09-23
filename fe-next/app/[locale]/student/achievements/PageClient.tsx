@@ -47,7 +47,10 @@ export default function StudentAchievementsPageClient() {
     }
 
     if (!user) {
-      router.push(`/${language}`);
+      // Not the main app home — a no-session visitor on an education
+      // sub-page belongs at the auth-free student entry, not the marketing
+      // homepage (education homepage-bounce audit).
+      router.push(`/${language}/student/join`);
       return;
     }
 

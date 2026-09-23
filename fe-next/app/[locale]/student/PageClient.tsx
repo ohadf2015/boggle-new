@@ -66,7 +66,13 @@ export default function StudentPageClient() {
     // resolving (e.g. a freshly minted guest/anonymous session) must NOT be
     // bounced — wait for the profile before deciding (avoids the same redirect
     // race as the teacher-access admin guard).
-    if (!user) { router.push(`/${language}`); return; }
+    if (!user) {
+      // Not the main app home — a no-session visitor on the student hub
+      // belongs at the auth-free student entry, not the marketing homepage
+      // (education homepage-bounce audit).
+      router.push(`/${language}/student/join`);
+      return;
+    }
     if (!profile) return;
     const isTeacherOrAdmin =
       profile?.user_role === 'teacher' ||

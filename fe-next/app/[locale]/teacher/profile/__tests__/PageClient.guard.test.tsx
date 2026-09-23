@@ -195,4 +195,21 @@ describe('the teacher profile redirect does not decide on a profile-dependent fl
     // ...and it must not reach the effect's dep array by any route.
     expect(src).not.toMatch(/\}, \[[^\]]*\bisAuthenticated\b[^\]]*\]\)/);
   });
+
+  /**
+   * Defense-in-depth: TeacherGate normally intercepts a settled signed-out
+   * visitor before this inner component ever mounts (see the test above), so
+   * this `if (!user)` branch is not reachable through the exported component
+   * today. But it must never regress to the bare homepage if that invariant
+   * ever changes — education homepage-bounce audit.
+   */
+  it('never pushes the bare main-app home on the !user branch', async () => {
+    const { readFileSync } = await import('node:fs');
+    const path = await import('node:path');
+    const src = readFileSync(
+      path.resolve(__dirname, '..', 'PageClient.tsx'),
+      'utf8',
+    );
+    expect(src).not.toMatch(/if \(!user\) \{\s*router\.push\(`\/\$\{language\}`\)/);
+  });
 });

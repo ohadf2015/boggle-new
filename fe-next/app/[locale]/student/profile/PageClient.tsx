@@ -62,7 +62,10 @@ export default function StudentProfilePageClient() {
 
     // On `user`, not `isAuthenticated` (= user && profile, lands later) — see subpageGuard.
     if (!user) {
-      router.push(`/${language}`);
+      // Not the main app home — a no-session visitor on an education
+      // sub-page belongs at the auth-free student entry, not the marketing
+      // homepage (education homepage-bounce audit).
+      router.push(`/${language}/student/join`);
       return;
     }
 

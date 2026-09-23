@@ -127,7 +127,7 @@ describe('TeacherProfilePageClient', () => {
     expect(screen.getByTestId('user-role-status')).toBeInTheDocument();
   });
 
-  test('redirects to home when not authenticated', () => {
+  test('redirects to the education access page when not authenticated', () => {
     mockUseAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,
@@ -138,7 +138,9 @@ describe('TeacherProfilePageClient', () => {
     } as any);
 
     render(<TeacherProfilePageClient />);
-    expect(mockPush).toHaveBeenCalledWith('/en');
+    // Not the main app home — matches the destination TeacherGate itself uses
+    // for a signed-out teacher surface (education homepage-bounce audit).
+    expect(mockPush).toHaveBeenCalledWith('/en/education/access');
   });
 
   test('shows loading state while auth is loading', () => {

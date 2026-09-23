@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import {
@@ -9,9 +10,15 @@ import {
   clearCachesAndReload,
   CHUNK_RECOVERY_GUARD_KEY,
 } from '@/lib/deploy/staleDeployReload';
+import { sectionHome } from '@/lib/navigation/sectionHome';
 
 export default function NotFoundClient() {
   const { t, language } = useLanguage();
+  const pathname = usePathname();
+  // A missing path under /teacher, /student, /education (flow sub-route) or
+  // /join belongs back in education, not the main app homepage (education
+  // homepage-bounce audit).
+  const homeHref = sectionHome({ pathname: pathname || `/${language}`, locale: language });
 
   useEffect(() => {
     document.title = '404 - ' + (t('notFound.heading', 'Page Not Found')) + ' | LexiClash';
@@ -96,7 +103,7 @@ export default function NotFoundClient() {
 
         {/* Action Button */}
         <Link
-          href={`/${language}`}
+          href={homeHref}
           className="inline-flex items-center justify-center px-8 py-4 bg-neo-cyan text-neo-black font-black uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all duration-150 text-lg font-neo-display"
         >
           {t('notFound.button')}

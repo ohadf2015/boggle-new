@@ -6,7 +6,7 @@ import { vi, type Mock, } from 'vitest';
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import CurriculumPageClient from '../PageClient';
 
 // Mock the CurriculumWordListBrowser component
@@ -32,6 +32,15 @@ vi.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({
       data-classroom-id={classroomId}
     >
       Curriculum Word List Browser Mock
+      {onImportSuccess && (
+        <button
+          type="button"
+          data-testid="trigger-import-success"
+          onClick={() => onImportSuccess({ id: 'lesson-789' })}
+        >
+          Trigger Import
+        </button>
+      )}
     </div>
   ),
 }));
@@ -131,6 +140,22 @@ describe('CurriculumPageClient', () => {
       expect(wrapper).toHaveClass('h-dvh');
       expect(wrapper).toHaveClass('overflow-hidden');
       expect(wrapper).toHaveClass('bg-neo-navy');
+    });
+  });
+
+  describe('Import Success Navigation', () => {
+    it('navigates to the teacher dashboard, never a nonexistent classroom lesson route, after a classroom import', () => {
+      mockSearchParams.set('classroomId', 'classroom-456');
+      render(<CurriculumPageClient />);
+
+      fireEvent.click(screen.getByTestId('trigger-import-success'));
+
+      // The route `/teacher/classroom/{id}/lesson/{id}` does not exist — it
+      // 404s, and the 404 boundary used to bounce the teacher to the
+      // homepage. The dashboard (`/teacher`) is real: LessonBuilder there
+      // shows the lesson that was just imported.
+      expect(mockPush).toHaveBeenCalledWith('/en/teacher');
+      expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/lesson/'));
     });
   });
 

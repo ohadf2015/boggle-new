@@ -788,7 +788,22 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             // the join code exactly when the teacher needed it on a projector.
             hideClassroomChrome({ gameActive: gameActive || quizOwnsScreen, showResults }) ? null : (
               <>
-                <EducationHeader showBackButton title={t('education.classroomGame.title')} />
+                <EducationHeader
+                  showBackButton
+                  title={t('education.classroomGame.title')}
+                  // The default `/education` landing is wrong mid-game — send
+                  // the host back to the teacher hub and a student back to
+                  // their own hub, same decision every other exit path here
+                  // makes via multiplayerExitDestination (education
+                  // homepage-bounce audit).
+                  backHref={
+                    multiplayerExitDestination({
+                      isClassroomMode,
+                      isHost: isHost || isClassroomHost,
+                      locale: language,
+                    }) || `/${language}/education`
+                  }
+                />
                 <ClassroomModeBanner
                   lessonData={lessonDataState}
                   gameCode={gameCode || prefilledRoomCode}

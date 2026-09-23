@@ -247,6 +247,7 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
   handleGoHome = (): void => {
     const home = sectionHome({
       pathname: typeof window !== 'undefined' ? window.location.pathname : '',
+      search: typeof window !== 'undefined' ? window.location.search : undefined,
     });
     window.location.href = home;
   };
