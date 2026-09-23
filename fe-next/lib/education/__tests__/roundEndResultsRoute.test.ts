@@ -21,11 +21,14 @@
  * Routing and rendering now key on the same value — `classroomSummary` — so
  * they cannot disagree (recurring-pitfalls Class 3, asymmetric paths).
  */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 import {
   hostLeavesProjectorRecap,
   modeSceneOwnsHeroSlot,
   playedGameMode,
+  projectorRecapShowsTeacherFollowUp,
   NEXT_ROUND_MODES,
 } from '../roundEndResultsRoute';
 
@@ -95,6 +98,99 @@ describe('hostLeavesProjectorRecap — classroom rounds keep their projector rec
     expect(
       hostLeavesProjectorRecap({ hostPlaying: true, gameMode: 'wheel-rush', hasClassroomSummary: true }),
     ).toBe(true);
+  });
+});
+
+/**
+ * The host who stays on the projector never mounts ClassroomResultsCard.
+ * Follow-up (ReteachActions) and the Pro progress-report ask
+ * (ResultsPrimaryActions, #1120) have to be decided with the leave rule,
+ * or they keep shipping on a card this device does not render.
+ */
+describe('projectorRecapShowsTeacherFollowUp — the wall the host actually presents', () => {
+  it('THE GAP: a classroom host kept on the projector is the teacher follow-up surface', () => {
+    expect(
+      projectorRecapShowsTeacherFollowUp({
+        hostPlaying: false,
+        gameMode: 'wheel-rush',
+        hasClassroomSummary: true,
+      }),
+    ).toBe(true);
+    expect(
+      hostLeavesProjectorRecap({
+        hostPlaying: false,
+        gameMode: 'wheel-rush',
+        hasClassroomSummary: true,
+      }),
+    ).toBe(false);
+  });
+
+  it.each(NEXT_ROUND_MODES)(
+    'a classroom round in %s mode still shows teacher follow-up on the projector',
+    (gameMode) => {
+      expect(
+        projectorRecapShowsTeacherFollowUp({
+          hostPlaying: false,
+          gameMode,
+          hasClassroomSummary: true,
+        }),
+      ).toBe(true);
+    },
+  );
+
+  it('a playing host does not — they leave for the card, which already has the actions', () => {
+    expect(
+      projectorRecapShowsTeacherFollowUp({
+        hostPlaying: true,
+        gameMode: 'classic',
+        hasClassroomSummary: true,
+      }),
+    ).toBe(false);
+  });
+
+  it('an arcade room does not — no lesson, no teacher follow-up, student view untouched', () => {
+    expect(
+      projectorRecapShowsTeacherFollowUp({
+        hostPlaying: false,
+        gameMode: 'classic',
+        hasClassroomSummary: false,
+      }),
+    ).toBe(false);
+    expect(
+      projectorRecapShowsTeacherFollowUp({
+        hostPlaying: false,
+        gameMode: 'wheel-rush',
+        hasClassroomSummary: false,
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('the projector file mounts the shared actions, and the student card does not change', () => {
+  const wall = readFileSync(
+    join(__dirname, '../../../components/education/results/ClassroomTvResults.tsx'),
+    'utf8',
+  );
+  const card = readFileSync(
+    join(__dirname, '../../../components/education/ClassroomResultsCard.tsx'),
+    'utf8',
+  );
+
+  it('reuses ReteachActions and ResultsPrimaryActions on the wall — no second copy', () => {
+    expect(wall).toContain('projectorRecapShowsTeacherFollowUp');
+    expect(wall).toContain('<ReteachActions');
+    expect(wall).toContain('<ResultsPrimaryActions');
+    expect(wall).toContain('surface="projector"');
+    expect(wall).not.toMatch(/function ReteachActions/);
+    // Rematch already has its own button on this wall.
+    expect(wall).not.toMatch(/<ResultsPrimaryActions[^>]*onRematch/);
+  });
+
+  it('still gates the phone card on isTeacher, so a student phone does not grow the ask', () => {
+    expect(card).toContain('{isTeacher && (\n        <ResultsPrimaryActions');
+    expect(card).toContain('<ReteachActions links={links} onReteach={onReteach} t={t} />');
+    expect(card).toContain('{!isTeacher && (');
+    expect(card).toContain('<StudentNextActions');
   });
 });
 

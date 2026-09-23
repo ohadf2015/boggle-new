@@ -23,6 +23,10 @@
  *     and never mounts ClassroomResultsCard, so re-teach / share / assign live
  *     here too. Same `useReteachLinks` + `stageReteachLessonData` as the phone
  *     card; the disclosure stays collapsed so the wall still fits.
+ *  5. The Pro progress-report ask — the same `ResultsPrimaryActions` the card
+ *     mounts, without a second Rematch. #1120 landed that ask on the card
+ *     alone. `projectorRecapShowsTeacherFollowUp` is the gate, so a student
+ *     phone (which never mounts this screen) cannot grow it.
  *
  * Everything is server-built (`ClassroomSummary`), so the projector, the
  * teacher's laptop and every student phone celebrate the same three names.
@@ -41,6 +45,7 @@
 'use client';
 
 import { Flame, RotateCcw } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { ResultsPodium, type PodiumEntry } from './ResultsPodium';
 import ClassroomSessionStandings from './ClassroomSessionStandings';
@@ -54,9 +59,11 @@ import { classSwept } from '@/lib/education/roundEndSweep';
 import { sessionKeyFor } from '@/lib/education/roundEndHistory';
 import { podiumWithoutHost } from '@/lib/education/roundEndPodium';
 import { stageReteachLessonData } from '@/lib/education/classroomGameHandoff';
+import { projectorRecapShowsTeacherFollowUp } from '@/lib/education/roundEndResultsRoute';
 import { useSessionRoundHistory } from '@/hooks/useSessionRoundHistory';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { ReteachActions } from './ReteachActions';
+import { ResultsPrimaryActions } from './ResultsPrimaryActions';
 import { useReteachLinks } from './useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { trackResultsAction } from './trackResultsAction';
@@ -69,8 +76,17 @@ export interface ClassroomTvResultsProps {
 }
 
 export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResultsProps) {
-  // This screen IS the teacher's results page. `isTeacher: true` so the same
-  // link builders the phone card uses actually produce hrefs (they gate on it).
+  // This screen only mounts for the non-playing classroom host. The inputs
+  // are that fact. The predicate still calls hostLeavesProjectorRecap, so if
+  // that rule starts sending this host to ResultsPage the wall drops the
+  // actions instead of showing them next to the card.
+  const showTeacherFollowUp = projectorRecapShowsTeacherFollowUp({
+    hostPlaying: false,
+    hasClassroomSummary: true,
+  });
+  const { language } = useLanguage();
+  // `isTeacher: true` so the same link builders the phone card uses actually
+  // produce hrefs (they gate on it).
   const links = useReteachLinks(summary, true);
   const handleReteach = () => {
     if (!stageReteachLessonData(summary)) return;
@@ -229,7 +245,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
             />
           </section>
 
-          {onRematch || summary.missedWords.length > 0 ? (
+          {onRematch || summary.missedWords.length > 0 || showTeacherFollowUp ? (
             <div className="shrink-0 flex flex-col gap-2">
               {onRematch && (
                 <button
@@ -251,7 +267,15 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
                 </button>
               )}
 
-              {summary.missedWords.length > 0 && (
+              {/* No onRematch: this wall already has the loud Rematch above.
+                  The shared component still owns the Pro check, so a free
+                  teacher gets the upgrade ask and a Pro teacher gets the
+                  report — the same branch the phone card uses. */}
+              {showTeacherFollowUp && (
+                <ResultsPrimaryActions language={language} t={t} surface="projector" />
+              )}
+
+              {showTeacherFollowUp && summary.missedWords.length > 0 && (
                 <div data-testid="classroom-tv-reteach">
                   <ReteachActions links={links} onReteach={handleReteach} t={t} />
                 </div>

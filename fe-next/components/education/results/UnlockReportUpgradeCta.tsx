@@ -1,5 +1,7 @@
 /**
- * Quiet Teacher Pro ask on the teacher's own results card — never the projector.
+ * Quiet Teacher Pro ask on a teacher surface only: the results card, or the
+ * projector recap a classroom host is kept on (`projectorRecapShowsTeacherFollowUp`).
+ * Never a student phone.
  *
  * A free teacher who just ran a live class generated the report they cannot
  * open. The dashboard milestone strip (PR #1079) only fires on the next
@@ -7,8 +9,8 @@
  * Rematch stays the one loud button. Do not POST /api/subscription/checkout
  * from here — /teacher/upgrade owns that POST.
  *
- * Mount only behind `isTeacher` (ClassroomResultsCard already does). Thirty
- * student phones must not hit /api/subscription/status.
+ * Mount only behind a teacher gate (the card's `isTeacher`, or the projector
+ * predicate). Thirty student phones must not hit /api/subscription/status.
  */
 'use client';
 

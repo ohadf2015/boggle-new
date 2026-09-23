@@ -30,6 +30,16 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+const { proState } = vi.hoisted(() => ({
+  proState: { hasPro: false, loading: true },
+}));
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => proState,
+}));
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: vi.fn(),
+}));
+
 import { ClassroomTvResults } from '../ClassroomTvResults';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -60,6 +70,8 @@ const summary = (over: Partial<ClassroomSummary> = {}): ClassroomSummary => ({
 describe('ClassroomTvResults', () => {
   beforeEach(() => {
     window.sessionStorage.clear();
+    proState.hasPro = false;
+    proState.loading = true;
   });
 
   afterEach(cleanup);
@@ -219,5 +231,60 @@ describe('ClassroomTvResults — host reteach / share / assign on the wall', () 
     screen.getByTestId('reteach-more-actions').click();
     expect(screen.getByTestId('share-miss-gap-practice')).toBeInTheDocument();
     expect(screen.getByTestId('assign-miss-gap-async-homework')).toBeInTheDocument();
+  });
+});
+
+/**
+ * #1120's Pro progress report lived on ClassroomResultsCard. A classroom host
+ * never mounts that card (hostLeavesProjectorRecap). The wall reuses
+ * ResultsPrimaryActions — no second paywall, no second Rematch.
+ */
+describe('ClassroomTvResults — Pro progress report on the host wall', () => {
+  beforeEach(() => {
+    proState.hasPro = false;
+    proState.loading = true;
+  });
+
+  it('offers a free teacher the unlock ask, not a report they cannot open', () => {
+    proState.hasPro = false;
+    proState.loading = false;
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const cta = screen.getByTestId('unlock-report-upgrade-cta');
+    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(cta.textContent).toContain('$9');
+    expect(screen.queryByTestId('full-report-link')).not.toBeInTheDocument();
+    // The wall's own Rematch stays the one loud button.
+    expect(screen.getByTestId('classroom-tv-rematch')).toBeInTheDocument();
+    expect(screen.queryByTestId('rematch-same-list')).not.toBeInTheDocument();
+    expect(screen.getByTestId('play-reteach-round')).toBeInTheDocument();
+  });
+
+  it('offers a Pro teacher the report', () => {
+    proState.hasPro = true;
+    proState.loading = false;
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.getByTestId('full-report-link')).toHaveAttribute('href', '/en/teacher/reports');
+    expect(screen.queryByTestId('unlock-report-upgrade-cta')).not.toBeInTheDocument();
+  });
+
+  it('paints neither link while entitlement is still loading', () => {
+    proState.loading = true;
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.queryByTestId('full-report-link')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('unlock-report-upgrade-cta')).not.toBeInTheDocument();
+  });
+
+  it('still offers the report when the class found every word', () => {
+    proState.hasPro = true;
+    proState.loading = false;
+    render(
+      <ClassroomTvResults
+        summary={summary({ classFoundCount: 4, missedWords: [] })}
+        onRematch={vi.fn()}
+        t={t}
+      />,
+    );
+    expect(screen.getByTestId('full-report-link')).toBeInTheDocument();
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
   });
 });
