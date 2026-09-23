@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { retryImport } from './retryImport';
+import { IMPORT_HANG_ERROR_NAME, retryImport } from './retryImport';
 
 describe('retryImport', () => {
   beforeEach(() => {
@@ -134,5 +134,37 @@ describe('retryImport', () => {
     expect(mockCachesDelete).toHaveBeenCalledTimes(2);
     expect(mockSWUnregister).toHaveBeenCalledTimes(2);
     expect(mockLocationReload).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects with ImportHangError when the factory never settles', async () => {
+    const factory = vi.fn(() => new Promise(() => {}));
+    const wrapped = retryImport(factory, { retries: 0, timeoutMs: 1000 });
+    const promise = wrapped();
+    const assertion = expect(promise).rejects.toMatchObject({
+      name: IMPORT_HANG_ERROR_NAME,
+      message: 'Import hung after 1000ms',
+    });
+    await vi.advanceTimersByTimeAsync(1000);
+    await assertion;
+    expect(factory).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not hang-timeout when the factory resolves in time', async () => {
+    const mod = { default: 'Component' };
+    const factory = vi.fn().mockResolvedValue(mod);
+    const wrapped = retryImport(factory, { timeoutMs: 1000 });
+    await expect(wrapped()).resolves.toBe(mod);
+    await vi.advanceTimersByTimeAsync(1000);
+  });
+
+  it('does not auto-reload on hang timeout', async () => {
+    const factory = vi.fn(() => new Promise(() => {}));
+    const reload = vi.fn();
+    const wrapped = retryImport(factory, { retries: 0, timeoutMs: 500, reload });
+    const promise = wrapped();
+    const assertion = expect(promise).rejects.toMatchObject({ name: IMPORT_HANG_ERROR_NAME });
+    await vi.advanceTimersByTimeAsync(500);
+    await assertion;
+    expect(reload).not.toHaveBeenCalled();
   });
 });

@@ -11,6 +11,10 @@ vi.mock('@/utils/retryImport', () => ({ retryImport }));
 const dynamicDefault = vi.fn(() => () => null);
 vi.mock('next/dynamic', () => ({ default: dynamicDefault }));
 
+vi.mock('@/components/ChunkErrorBoundary', () => ({
+  ChunkErrorBoundary: ({ children }: { children: unknown }) => children,
+}));
+
 beforeEach(() => {
   retryImport.mockClear();
   dynamicDefault.mockClear();
@@ -31,5 +35,11 @@ describe('singleplayer page hardens its lazy game-chunk load', () => {
     });
     expect(viewCall, 'SinglePlayerView next/dynamic(ssr:false, loading)').toBeTruthy();
     expect(viewCall![0]).toBe(retryImport.mock.results[0].value);
+
+    const hangOpts = retryImport.mock.calls.find((c) => {
+      const opts = c[1] as { timeoutMs?: number } | undefined;
+      return opts && opts.timeoutMs === 10_000;
+    });
+    expect(hangOpts, 'retryImport hang-timeout 10s on SinglePlayerView').toBeTruthy();
   });
 });
