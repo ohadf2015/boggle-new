@@ -3230,6 +3230,21 @@ const ru = {
       "gotIt": "Понятно — начинаем!",
       "showTutorial": "Как это работает"
     },
+    "vsKahoot": {
+      "goLimit": {
+        "eyebrow": "Места бесплатного тарифа — честное сравнение",
+        "title": "Kahoot! Go Free: в таблице 40. В FAQ на той же странице 10. LexiClash: ясные 50.",
+        "lede": "На kahoot.com/schools/plans колонка Go Free указывает Participant limit 40, а FAQ “What are the participant limits per game?” отвечает Go up to 10. LexiClash публикует один бесплатный потолок класса — 50 учеников — поэтому код входа совпадает со страницей планов.",
+        "kahootTitle": "Kahoot! Go Free — таблица 40 против FAQ 10",
+        "kahootBody": "Таблица планов: Participant limit 40. FAQ на той же странице: Go up to 10 participants per game. Учитель не знает, какой бесплатный потолок действует до старта.",
+        "lexiTitle": "LexiClash — ясный бесплатный лимит класса",
+        "lexiBody": "Бесплатный тариф: до 50 учеников в классе (3 класса). Одно опубликованное число — без расхождения таблицы и FAQ.",
+        "citePrefix": "Школьные планы Kahoot:",
+        "citeLabel": "kahoot.com/schools/plans",
+        "citeSuffix": " — таблица Participant limit 40; FAQ “What are the participant limits per game?” Go up to 10.",
+        "cta": "Провести весь класс с ясным бесплатным лимитом 50"
+      }
+    },
     "vsBlooket": {
       "gapsSet": {
         "eyebrow": "После отчёта — честное сравнение",

@@ -14695,6 +14695,21 @@ const sv = {
       "gotIt": "Fattat — kör igång!",
       "showTutorial": "Så funkar det"
     },
+    "vsKahoot": {
+      "goLimit": {
+        "eyebrow": "Platser i gratisplanen — ärlig jämförelse",
+        "title": "Kahoot! Go Free: tabellen säger 40. FAQ på samma sida säger 10. LexiClash: tydliga 50.",
+        "lede": "På kahoot.com/schools/plans listar Go Free-kolumnen Participant limit 40, medan FAQ “What are the participant limits per game?” svarar Go up to 10. LexiClash publicerar ett gratis klasstak — 50 elever — så join-koden stämmer med plansidan.",
+        "kahootTitle": "Kahoot! Go Free — tabell 40 vs FAQ 10",
+        "kahootBody": "Plan-tabell: Participant limit 40. FAQ på samma sida: Go up to 10 participants per game. Läraren vet inte vilket gratis-tak som gäller före host.",
+        "lexiTitle": "LexiClash — tydlig gratis klassgräns",
+        "lexiBody": "Gratisplan: upp till 50 elever per klass (3 klasser). Ett publicerat tal — ingen tabell/FAQ-krock.",
+        "citePrefix": "Kahoots skolplaner:",
+        "citeLabel": "kahoot.com/schools/plans",
+        "citeSuffix": " — tabell Participant limit 40; FAQ “What are the participant limits per game?” Go up to 10.",
+        "cta": "Hosta en hel klass med tydlig gratisgräns på 50"
+      }
+    },
     "vsBlooket": {
       "gapsSet": {
         "eyebrow": "Efter rapporten — ärlig jämförelse",

@@ -14409,6 +14409,21 @@ const es = {
       "gotIt": "¡Entendido, a enseñar!",
       "showTutorial": "Cómo funciona"
     },
+    "vsKahoot": {
+      "goLimit": {
+        "eyebrow": "Plazas del plan gratis — comparación honesta",
+        "title": "Kahoot! Go Free: la tabla dice 40. El FAQ de la misma página dice 10. LexiClash: 50 claro.",
+        "lede": "En kahoot.com/schools/plans la columna Go Free lista Participant limit 40, mientras el FAQ “What are the participant limits per game?” responde Go up to 10. LexiClash publica un solo tope gratis — 50 estudiantes — para que el código de unión coincida con la página de planes.",
+        "kahootTitle": "Kahoot! Go Free — tabla 40 vs FAQ 10",
+        "kahootBody": "Tabla de planes: Participant limit 40. FAQ de la misma página: Go up to 10 participants per game. El profesor no sabe qué techo gratis aplica antes de hostear.",
+        "lexiTitle": "LexiClash — límite gratis claro",
+        "lexiBody": "Plan gratis: hasta 50 estudiantes por clase (3 clases). Un solo número publicado — sin desacuerdo tabla/FAQ.",
+        "citePrefix": "Planes escolares de Kahoot:",
+        "citeLabel": "kahoot.com/schools/plans",
+        "citeSuffix": " — tabla Participant limit 40; FAQ “What are the participant limits per game?” Go up to 10.",
+        "cta": "Hostear el aula entera con un tope gratis claro de 50"
+      }
+    },
     "vsBlooket": {
       "gapsSet": {
         "eyebrow": "Después del informe — comparación honesta",

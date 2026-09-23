@@ -14315,6 +14315,21 @@ const he = {
       "gotIt": "הבנתי — יאללה מלמדים!",
       "showTutorial": "איך זה עובד"
     },
+    "vsKahoot": {
+      "goLimit": {
+        "eyebrow": "מקומות בתוכנית החינמית — השוואה כנה",
+        "title": "Kahoot! Go Free: בטבלה 40. ב-FAQ באותו עמוד 10. LexiClash: 50 ברור.",
+        "lede": "ב-kahoot.com/schools/plans עמודת Go Free מציגה Participant limit 40, בעוד ה-FAQ “What are the participant limits per game?” עונה Go up to 10. ב-LexiClash יש תקרת כיתה חינמית אחת — 50 תלמידים — כך שקוד ההצטרפות תואם את דף התוכניות.",
+        "kahootTitle": "Kahoot! Go Free — טבלה 40 מול FAQ 10",
+        "kahootBody": "טבלת תוכניות: Participant limit 40. FAQ באותו עמוד: Go up to 10 participants per game. המורה לא יודע איזו תקרה חינמית חלה לפני האירוח.",
+        "lexiTitle": "LexiClash — מגבלת כיתה חינמית ברורה",
+        "lexiBody": "תוכנית חינמית: עד 50 תלמידים בכיתה (3 כיתות). מספר מפורסם אחד — בלי סתירה בין טבלה ל-FAQ.",
+        "citePrefix": "תוכניות בתי ספר של Kahoot:",
+        "citeLabel": "kahoot.com/schools/plans",
+        "citeSuffix": " — טבלה Participant limit 40; FAQ “What are the participant limits per game?” Go up to 10.",
+        "cta": "ארחו כיתה שלמה עם תקרת חינם ברורה של 50"
+      }
+    },
     "vsBlooket": {
       "gapsSet": {
         "eyebrow": "אחרי הדוח — השוואה כנה",
