@@ -111,7 +111,7 @@ export default async function Page({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <TopBackLink locale={locale} href={`/${locale}/education`} label="Education" />
+      <TopBackLink className="mb-4" />
 
       <header className="mb-8">
         <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-cyan">
