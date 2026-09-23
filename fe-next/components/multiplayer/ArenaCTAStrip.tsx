@@ -7,13 +7,15 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader } from '@/components/ui/Loader';
 import { useNetworkState } from '@/hooks/useNetworkState';
 
+// No opacity:0 entrance. Same lesson as the arena hero LCP block in
+// RoomListView: an above-fold CTA that starts invisible waits on hydration
+// to fade in, so mobile first paint shows a hero with no actionable button
+// (field bounce on /en/multiplayer). Keep whileHover/whileTap juice only.
 const stripVariants = {
-  hidden: { y: -15, opacity: 0, scale: 0.95 },
   visible: {
     y: 0,
     opacity: 1,
     scale: 1,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 22, delay: 0.1 },
   },
 };
 
@@ -29,7 +31,9 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({
   onQuickPlay,
   onCreateRoom,
   isQuickPlayLoading = false,
-  skipEnterAnimation = false,
+  // Kept for RoomListView API compat; entrance is always static now so SSR
+  // HTML matches first paint (no opacity:0 wait on hydration).
+  skipEnterAnimation: _skipEnterAnimation = false,
 }) => {
   const { t } = useLanguage();
   const { online } = useNetworkState();
@@ -53,9 +57,10 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({
     <m.section
       data-testid="arena-cta-strip"
       variants={stripVariants}
-      initial={skipEnterAnimation ? false : 'hidden'}
+      initial={false}
       animate="visible"
       className="flex flex-col sm:flex-row gap-2.5"
+      data-skip-enter={_skipEnterAnimation ? '1' : undefined}
     >
       {/* Primary action — instant matchmaking. Bumped to the clear hero:
           larger min-height, an icon chip for weight, and a lift-on-hover so it

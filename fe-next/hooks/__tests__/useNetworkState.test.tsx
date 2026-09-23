@@ -88,6 +88,15 @@ describe('useNetworkState', () => {
     expect(result.current.rttMs).toBeNull();
     expect(result.current.type).toBe('unknown');
   });
+
+  it('treats missing/undefined navigator.onLine as online (SSR honesty)', () => {
+    // Next/Node SSR exposes a bare navigator with onLine === undefined.
+    // Falsy-coercion previously disabled /en/multiplayer Quick Start as
+    // "Reconnecting…" in the first HTML (t_0d9276d6 bounce spike).
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: undefined });
+    const { result } = renderHook(() => useNetworkState());
+    expect(result.current.online).toBe(true);
+  });
 });
 
 describe('useNetworkState — native plugin missing fallback', () => {

@@ -30,7 +30,17 @@ function isSlowEffectiveType(effectiveType: string | undefined): boolean {
 }
 
 function snapshotWeb(): NetworkState {
-  const online = typeof navigator === 'undefined' ? true : navigator.onLine;
+  // Optimistic online unless we *know* we are offline.
+  // Next/Node SSR (and some runtimes) expose a bare `navigator` object with
+  // `onLine === undefined`. Treating that as falsy painted /en/multiplayer's
+  // Quick Start as disabled "Reconnecting…" in the first HTML — a bounce
+  // spike (17.9%→36.4%, 74 vis, host-filtered 14d). Only `onLine === false`
+  // means offline; missing/undefined stays online until an offline event or
+  // a failed reachability probe proves otherwise.
+  const online =
+    typeof navigator === 'undefined' || typeof navigator.onLine !== 'boolean'
+      ? true
+      : navigator.onLine;
   const conn = getNavigatorConnection();
   const effectiveType = conn?.effectiveType;
   const rttMs = conn?.rtt ?? null;
