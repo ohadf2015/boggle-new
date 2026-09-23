@@ -14460,6 +14460,21 @@ const ja = {
       "gotIt": "OK、さっそく始めよう！",
       "showTutorial": "使い方"
     },
+    "vsKahoot": {
+      "goLimit": {
+        "eyebrow": "無料枠の人数 — 正直な比較",
+        "title": "Kahoot! Go Free: 表は40。同じページのFAQは10。LexiClash: 明確な50。",
+        "lede": "kahoot.com/schools/plans の Go Free 列は Participant limit 40 と書き、同じページの FAQ “What are the participant limits per game?” は Go up to 10 と答えます。LexiClash は無料クラス上限を1つだけ公開 — 50人 — なので参加コードとプランページが一致します。",
+        "kahootTitle": "Kahoot! Go Free — 表40 vs FAQ 10",
+        "kahootBody": "プラン表: Participant limit 40。同じページのFAQ: Go up to 10 participants per game。ホスト前にどちらの無料上限が効くか分かりません。",
+        "lexiTitle": "LexiClash — 明確な無料クラス上限",
+        "lexiBody": "無料枠: クラスあたり最大50人（3クラス）。公開数字は1つ — 表とFAQの食い違いなし。",
+        "citePrefix": "Kahoot学校向けプラン:",
+        "citeLabel": "kahoot.com/schools/plans",
+        "citeSuffix": " — 表 Participant limit 40; FAQ “What are the participant limits per game?” Go up to 10.",
+        "cta": "明確な無料50席でクラス全体をホスト"
+      }
+    },
     "vsBlooket": {
       "gapsSet": {
         "eyebrow": "レポートのあと — 正直な比較",

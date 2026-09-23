@@ -13006,6 +13006,21 @@ const en = {
       "gotIt": "Got it — let's teach!",
       "showTutorial": "How it works"
     },
+    "vsKahoot": {
+      "goLimit": {
+        "eyebrow": "Free-tier seats — honesty foil",
+        "title": "Kahoot! Go Free: plans table says 40. Same-page FAQ says 10. LexiClash: clear 50.",
+        "lede": "On kahoot.com/schools/plans the Go Free column lists Participant limit 40, while the FAQ “What are the participant limits per game?” answers Go up to 10. LexiClash publishes one free classroom cap — 50 students — so the join code matches the plan page.",
+        "kahootTitle": "Kahoot! Go Free — table 40 vs FAQ 10",
+        "kahootBody": "Plans table: Participant limit 40. Same-page FAQ: Go up to 10 participants per game. Teachers cannot tell which free-tier ceiling applies before hosting.",
+        "lexiTitle": "LexiClash — clear free classroom limit",
+        "lexiBody": "Free tier: up to 50 students per class (3 classes). One published number — no table/FAQ mismatch.",
+        "citePrefix": "Kahoot schools plans:",
+        "citeLabel": "kahoot.com/schools/plans",
+        "citeSuffix": " — table Participant limit 40; FAQ “What are the participant limits per game?” Go up to 10.",
+        "cta": "Host a whole class with a clear 50-seat free limit"
+      }
+    },
     "vsBlooket": {
       "gapsSet": {
         "eyebrow": "After the report — honesty foil",
