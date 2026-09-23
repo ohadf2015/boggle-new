@@ -14504,7 +14504,7 @@ const ja = {
         "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
         "citeProFaqLabel": "Gimkit Pro FAQ",
         "citeSuffix": " — Pro Exclusive modes limited to 5 players for Gimkit Basic members.",
-        "cta": "Pro Exclusive の5人上限なしでクラス全体の無料ボキャブをホスト"
+        "cta": "明確な無料50席でクラス全体のボキャブをホスト"
       }
     },
 "vsBlooket": {

@@ -13050,7 +13050,7 @@ const en = {
         "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
         "citeProFaqLabel": "Gimkit Pro FAQ",
         "citeSuffix": " — Pro Exclusive modes limited to 5 players for Gimkit Basic members.",
-        "cta": "Host whole-class free vocab without a 5-player Pro Exclusive cap"
+        "cta": "Host whole-class free vocab with a clear 50-seat free limit"
       }
     },
 "vsBlooket": {

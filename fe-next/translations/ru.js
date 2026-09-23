@@ -3274,7 +3274,7 @@ const ru = {
         "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
         "citeProFaqLabel": "Gimkit Pro FAQ",
         "citeSuffix": " — Pro Exclusive modes limited to 5 players for Gimkit Basic members.",
-        "cta": "Провести бесплатный vocab на весь класс без лимита Pro Exclusive в 5 игроков"
+        "cta": "Провести бесплатный vocab на весь класс с ясным бесплатным лимитом 50"
       }
     },
 "vsBlooket": {
