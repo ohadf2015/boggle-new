@@ -12449,6 +12449,23 @@ const he = {
       "reteachLiveCta": "התחלת Live חיזוק ל־3 דקות",
       "unpluggedReteachLiveFoil": "מול Kahoot Unplugged (Teacher Takeover, 21 בספט׳ 2026 — כשאין מכשירי תלמידים) — מקרינים את המילים החסרות; התלמידים עונים על נייר, בלי מכשירים."
     },
+    "windowProgress": {
+      "title": "הכיתה השבוע",
+      "windowLabel": "חלון זמן",
+      "days7": "7 ימים",
+      "days30": "30 ימים",
+      "completion": "השלמה",
+      "accuracy": "דיוק",
+      "activeLine": "{{active}} מתוך {{roster}} תלמידים שיחקו",
+      "studentStat": "{{sessions}} משחקים · {{accuracy}}",
+      "noPlay": "עדיין אין משחקים",
+      "loading": "טוען התקדמות כיתה…",
+      "loadError": "לא ניתן לטעון את התקדמות הכיתה.",
+      "retry": "לנסות שוב",
+      "emptyNoRoster": "הזמינו תלמידים קודם — ואז יש למי לדווח על 7 ו-30 ימים.",
+      "proCtaHint": "פתחו היסטוריה להדפסה וכל כיתה ב-Teacher Pro.",
+      "regionLabel": "התקדמות 7 ו-30 ימים עבור {{classroom}}"
+    },
     "subscription": {
       "giftedNoCard": "אין כרטיס במערכת ואין חידוש — זה פשוט מסתיים וחוזרים לחינמי.",
       "giftedUntil": "Pro במתנה עד",

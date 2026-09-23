@@ -12829,6 +12829,23 @@ const sv = {
       "reteachLiveCta": "Starta 3-minuters reteach Live",
       "unpluggedReteachLiveFoil": "Kahoot Unplugged-foil (Teacher Takeover, 21 sep 2026 — när elevernas enheter inte är ett alternativ) — projicera missarna; eleverna svarar på papper, utan enheter."
     },
+    "windowProgress": {
+      "title": "Klassen den här veckan",
+      "windowLabel": "Tidsfönster",
+      "days7": "7 dagar",
+      "days30": "30 dagar",
+      "completion": "Slutförande",
+      "accuracy": "Träffsäkerhet",
+      "activeLine": "{{active}} av {{roster}} elever spelade",
+      "studentStat": "{{sessions}} matcher · {{accuracy}}",
+      "noPlay": "Inga matcher än",
+      "loading": "Laddar klassens framsteg…",
+      "loadError": "Kunde inte ladda klassens framsteg.",
+      "retry": "Försök igen",
+      "emptyNoRoster": "Bjud in elever först — då har 7- och 30-dagarsrapporten någon att visa.",
+      "proCtaHint": "Lås upp utskrivbar historik och varje klassrum med Teacher Pro.",
+      "regionLabel": "7- och 30-dagarsframsteg för {{classroom}}"
+    },
     "subscription": {
       "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",
       "giftedUntil": "Kostnadsfritt Pro till",

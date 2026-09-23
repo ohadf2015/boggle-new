@@ -12594,6 +12594,23 @@ const ja = {
       "reteachLiveCta": "3分リティーチLiveを開始",
       "unpluggedReteachLiveFoil": "Kahoot Unplugged対抗（Teacher Takeover, 2026-09-21 — 生徒端末がないとき）— 抜けた語を投影し、生徒は紙で解答（端末不要）。"
     },
+    "windowProgress": {
+      "title": "今週のクラス",
+      "windowLabel": "期間",
+      "days7": "7日間",
+      "days30": "30日間",
+      "completion": "完了率",
+      "accuracy": "正答率",
+      "activeLine": "{{roster}}人中{{active}}人がプレイ",
+      "studentStat": "{{sessions}}回 · {{accuracy}}",
+      "noPlay": "まだプレイなし",
+      "loading": "クラスの進捗を読み込み中…",
+      "loadError": "クラスの進捗を読み込めませんでした。",
+      "retry": "再試行",
+      "emptyNoRoster": "先に生徒を招待してください。7日・30日の進捗の相手ができます。",
+      "proCtaHint": "Teacher Proで印刷できる履歴と全クラスを解放。",
+      "regionLabel": "{{classroom}}の7日・30日進捗"
+    },
     "subscription": {
       "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",
       "giftedUntil": "無償 Pro の期限",
