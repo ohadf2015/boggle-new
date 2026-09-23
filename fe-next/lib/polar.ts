@@ -107,6 +107,26 @@ export class PolarClient {
   }
 
   /**
+   * List subscriptions. Used by the Teacher Pro churn-watch cron so a missed
+   * webhook cannot silently drop the only paying teacher.
+   *
+   * Polar's `active` filter is a tri-state: omit it and the API still tends to
+   * return live rows only, so callers that need canceled/past_due must pass
+   * `active: false` as a second page and merge.
+   */
+  async listSubscriptions(opts: {
+    productId?: string
+    active?: boolean
+    limit?: number
+  } = {}): Promise<{ items: Array<Record<string, unknown>> }> {
+    const q = new URLSearchParams()
+    if (opts.productId) q.set('product_id', opts.productId)
+    if (opts.active !== undefined) q.set('active', String(opts.active))
+    q.set('limit', String(opts.limit ?? 100))
+    return this.request(`/v1/subscriptions/?${q.toString()}`)
+  }
+
+  /**
    * Create a customer portal session for a customer by their external id
    * (our user id, set at checkout time). Returns the portal URL.
    */
