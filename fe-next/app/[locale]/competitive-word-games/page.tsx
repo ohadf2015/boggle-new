@@ -17,13 +17,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/competitive-word-games`;
 
   return {
-    title: 'Competitive Word Games with Leaderboards — Free | LexiClash',
-    description: 'Compete in real-time word games with global leaderboards — free, no download. Ranked daily challenges, worldwide rankings, no signup. Start now →',
+    title: 'Play Competitive Word Games — Live Ranked Matches | LexiClash',
+    description: 'Play competitive word games vs real opponents — live grid battles, ranked daily puzzles, global leaderboard. Free in-browser, no download or signup.',
     keywords: 'best competitive word games with global leaderboards, competitive word games, word games with leaderboards, ranked word games, multiplayer word game leaderboard, real-time word game competition, free competitive word games online',
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
-      title: 'Best Competitive Word Games with Global Leaderboards | LexiClash',
-      description: 'Real-time multiplayer word battles, ranked daily challenges, a worldwide leaderboard — free, no download.',
+      title: 'Play Competitive Word Games — Live Ranked Matches | LexiClash',
+      description: 'Play competitive word games vs real opponents — live grid battles, ranked daily puzzles, global leaderboard. Free in-browser, no download or signup.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -31,8 +31,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Best Competitive Word Games with Global Leaderboards | LexiClash',
-      description: 'Real-time word battles + global leaderboard. Free, no download.',
+      title: 'Play Competitive Word Games — Live Ranked Matches | LexiClash',
+      description: 'Play competitive word games vs real opponents — live grid battles, ranked daily puzzles, global leaderboard. Free in-browser, no download or signup.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {

@@ -12,11 +12,11 @@ interface PageProps {
 
 const SLUG = 'hebrew-word-games-guide';
 const DATE_PUBLISHED = '2025-10-24';
-const DATE_MODIFIED = '2026-05-19';
+const DATE_MODIFIED = '2026-09-23';
 
 const metaTitles: Record<string, string> = {
   en: 'Hebrew Word Games Guide - Free Online משחק מילים בעברית',
-  he: 'סקריבל בעברית חינם אונליין — מדריך מלא למשחקי מילים | LexiClash',
+  he: 'משחקי מילים בעברית חינם — מדריך שורשים ו-RTL | LexiClash',
   sv: 'Hebreiska Ordspel Guide - Spela Höger till Vänster Online',
   ja: 'ヘブライ語ワードゲームガイド - 右から左へのプレイ',
   es: 'Guía de Juegos de Palabras en Hebreo - Jugando de Derecha a Izquierda',
@@ -24,7 +24,7 @@ const metaTitles: Record<string, string> = {
 
 const metaDescriptions: Record<string, string> = {
   en: 'The complete guide to Hebrew word games online free. Discover the shoresh root system, vowel-less reading, RTL word finding, and Israeli word game culture. Play משחק מילים בעברית חינם — no download needed.',
-  he: 'שחק סקריבל ובוגל בעברית חינם אונליין — ללא הורדה, ללא הרשמה. המדריך המלא לחוויית משחקי מילים בעברית: שורשים, ניקוד ואתגרי RTL. התחל עכשיו.',
+  he: 'משחקי מילים בעברית חינם אונליין: שורשים, ניקוד ואתגרי RTL — בלי הורדה ובלי הרשמה. המדריך המלא לסקריבל ובוגל בעברית.',
   sv: 'Upptäck de unika utmaningarna med hebreiska ordspel: rotsystemet, vokallös läsning, RTL-design och israelisk ordspelskultur. Gratis online.',
   ja: 'ヘブライ語ワードゲームのユニークな挑戦を発見：ショレシュルートシステム、母音なしの読み、RTLデザイン、イスラエルのワードゲーム文化。',
   es: 'Descubre los desafíos únicos de los juegos de palabras en hebreo: el sistema de raíces, lectura sin vocales, diseño RTL y cultura israelí.',

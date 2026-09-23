@@ -16,12 +16,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Scrabble Svenska Gratis Online — Alfapet | LexiClash',
-    description: 'Spela Scrabble svenska online gratis — ingen app, inget konto, inga väntetider. Upp till 50 vänner i realtid. Starta direkt →',
+    title: 'Multiplayer ordspel på svenska — realtid, gratis | LexiClash',
+    description: 'Spela multiplayer ordspel på svenska i realtid — ingen app, inget konto. Alfapet-känsla med vänner, 10 000+ svenska ord. Starta ett rum nu.',
     keywords: 'alfapet spel online, ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
-      title: 'Scrabble & Alfapet på Svenska — Gratis med Vänner | LexiClash',
-      description: 'Spela Scrabble och Alfapet på svenska gratis med vänner i realtid. Ingen app, inget konto — starta ett rum på 10 sekunder. 10 000+ svenska ord.',
+      title: 'Multiplayer ordspel på svenska — realtid, gratis | LexiClash',
+      description: 'Spela multiplayer ordspel på svenska i realtid — ingen app, inget konto. Alfapet-känsla med vänner, 10 000+ svenska ord. Starta ett rum nu.',
       locale: 'sv_SE',
       type: 'website',
       url: pageUrl,
@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Scrabble & Alfapet på Svenska — Gratis med Vänner | LexiClash',
-      description: 'Spela Scrabble och Alfapet på svenska gratis med vänner i realtid. Ingen app, inget konto — starta ett rum på 10 sekunder. 10 000+ svenska ord.',
+      title: 'Multiplayer ordspel på svenska — realtid, gratis | LexiClash',
+      description: 'Spela multiplayer ordspel på svenska i realtid — ingen app, inget konto. Alfapet-känsla med vänner, 10 000+ svenska ord. Starta ett rum nu.',
       images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {
