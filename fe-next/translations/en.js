@@ -13021,7 +13021,23 @@ const en = {
         "cta": "Host a whole class with a clear 50-seat free limit"
       }
     },
-    "vsBlooket": {
+    
+    "vsWayground": {
+      "starterLimit": {
+        "eyebrow": "Free-tier library — honesty foil",
+        "title": "Wayground Starter: 20 activity library limit. LexiClash: reteach Live, no 20-resource ceiling.",
+        "lede": "Wayground (Quizizz) Starter help — Updated 12 May 2026 — lists “20 activity limit: Store up to 20 resources.” LexiClash classroom reteach / Live deep-links miss gaps without a 20-resource library cap.",
+        "waygroundTitle": "Wayground Starter — 20 activity limit",
+        "waygroundBody": "Starter (Basic) plan: Store up to 20 resources on your account. Hit 20 and you archive or upgrade before creating more — even when the class still needs reteach sets.",
+        "lexiTitle": "LexiClash — classroom reteach / Live",
+        "lexiBody": "Miss gaps become a reteach Live deep-link — no 20-activity library ceiling on the free classroom loop.",
+        "citePrefix": "Wayground Starter plan:",
+        "citeLabel": "help.wayground.com Starter (Updated 12 May 2026)",
+        "citeSuffix": " — “20 activity limit: Store up to 20 resources”.",
+        "cta": "Launch classroom reteach Live without a 20-resource cap"
+      }
+    },
+"vsBlooket": {
       "gapsSet": {
         "eyebrow": "After the report — honesty foil",
         "title": "Blooket: sort Incorrect%, rebuild a 「Gaps Set」. LexiClash: miss → Live deep-link.",
