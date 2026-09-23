@@ -11,6 +11,10 @@ vi.mock('@/components/ui/Loader', () => ({
   Loader: () => <span data-testid="loader" />,
 }));
 
+vi.mock('@/hooks/useNetworkState', () => ({
+  useNetworkState: () => ({ online: true, slow: false, type: 'wifi', rttMs: 20 }),
+}));
+
 import ArenaCTAStrip from '../ArenaCTAStrip';
 
 describe('ArenaCTAStrip', () => {
@@ -70,5 +74,15 @@ describe('ArenaCTAStrip', () => {
     const strip = screen.getByTestId('arena-cta-strip');
     expect(strip.className).toMatch(/sm:flex-row/);
     expect(strip.className).not.toMatch(/min-\[720px\]:flex-col/);
+  });
+  // t_0d9276d6: above-fold CTAs must paint visible in the first HTML. An
+  // opacity:0 framer entrance hid Quick Start until hydration on mobile.
+  it('paints the CTA strip statically (no opacity:0 entrance)', () => {
+    render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
+    const strip = screen.getByTestId('arena-cta-strip');
+    expect(strip).toBeInTheDocument();
+    // Enabled Quick Start label — SSR must not regress to "Reconnecting…".
+    expect(screen.getByTestId('arena-quick-start')).not.toBeDisabled();
+    expect(screen.getByTestId('arena-quick-start').textContent).toContain('roomList.quickStart');
   });
 });

@@ -8,12 +8,13 @@ import { Zap, Calendar } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
+// Static appear — empty-lobby Quick Play / Daily CTAs are the only actions
+// when no rooms exist. An opacity:0 entrance hid them until hydration and
+// compounded the /en/multiplayer bounce when the lobby was quiet.
 const containerVariants = {
-  hidden: { opacity: 0, scale: 0.92 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { type: 'spring' as const, stiffness: 250, damping: 20, delay: 0.2 },
   },
 };
 
@@ -38,7 +39,7 @@ const ArenaEmptyState: React.FC<ArenaEmptyStateProps> = ({
     <m.div
       data-testid="arena-empty-state"
       variants={containerVariants}
-      initial="hidden"
+      initial={false}
       animate="visible"
       className="flex flex-col items-center text-center gap-4 px-5 py-6 short:py-3 medium-short:py-4"
     >
