@@ -14421,7 +14421,7 @@ const es = {
         "citePrefix": "Planes escolares de Kahoot:",
         "citeLabel": "kahoot.com/schools/plans",
         "citeSuffix": " — tabla Participant limit 40; FAQ “What are the participant limits per game?” Go up to 10.",
-        "cta": "Hostear una clase entera con un tope gratis claro de 50"
+        "cta": "Hostear el aula entera con un tope gratis claro de 50"
       }
     },
     "vsBlooket": {
