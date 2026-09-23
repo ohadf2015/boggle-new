@@ -2,8 +2,8 @@
   "@context": "https://schema.org",
   "@type": "WebPage",
   "@id": "https://www.lexiclash.live/es/education/esl-word-games#page",
-  "name": "Juegos de palabras en inglés gratis — para el aula | LexiClash",
-  "description": "Juegos de palabras en inglés gratis y sin descarga: la clase entra desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.",
+  "name": "Juegos ESL de palabras para el aula — sin cuentas | LexiClash",
+  "description": "Juegos ESL de vocabulario en inglés para el aula: código de 6 caracteres, proyector, y un nivel por alumno. Gratis y sin cuentas.",
   "url": "https://www.lexiclash.live/es/education/esl-word-games",
   "inLanguage": "es",
   "isPartOf": {
@@ -42,8 +42,8 @@
   "@context": "https://schema.org",
   "@type": "LearningResource",
   "@id": "https://www.lexiclash.live/es/education/esl-word-games#resource",
-  "name": "Juegos de palabras en inglés gratis — para el aula | LexiClash",
-  "description": "Juegos de palabras en inglés gratis y sin descarga: la clase entra desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.",
+  "name": "Juegos ESL de palabras para el aula — sin cuentas | LexiClash",
+  "description": "Juegos ESL de vocabulario en inglés para el aula: código de 6 caracteres, proyector, y un nivel por alumno. Gratis y sin cuentas.",
   "url": "https://www.lexiclash.live/es/education/esl-word-games",
   "inLanguage": "es",
   "learningResourceType": "Game",
@@ -175,8 +175,8 @@
 {
   "@context": "https://schema.org",
   "@type": "Course",
-  "name": "Juegos de palabras en inglés gratis — para el aula | LexiClash",
-  "description": "Juegos de palabras en inglés gratis y sin descarga: la clase entra desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.",
+  "name": "Juegos ESL de palabras para el aula — sin cuentas | LexiClash",
+  "description": "Juegos ESL de vocabulario en inglés para el aula: código de 6 caracteres, proyector, y un nivel por alumno. Gratis y sin cuentas.",
   "url": "https://www.lexiclash.live/es/education/esl-word-games",
   "provider": {
     "@type": "Organization",
