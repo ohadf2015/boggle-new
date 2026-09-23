@@ -3,8 +3,8 @@
 import { Application, Container, Graphics, type Text } from 'pixi.js';
 import { useEffect, useRef } from 'react';
 import { PX_PER_M, type TowerWorld, snapshotWorld, stepWorld } from '@/lib/wordTowerV2/engine';
-import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, fallTimeMs, predictLandingX, throwArc } from '@/lib/wordTowerV2/crane';
-import { type LandingQuality, PERFECT_RATIO } from '@/lib/wordTowerV2/landing';
+import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, SWING, fallTimeMs, predictLandingX, throwArc } from '@/lib/wordTowerV2/crane';
+import { type LandingQuality, perfectHalfWidth } from '@/lib/wordTowerV2/landing';
 import { buildSkyline, rulerTicks, skyProps } from '@/lib/wordTowerV2/scenery';
 import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
 import { clampLook, clampLookX, focusX } from '@/lib/wordTowerV2/look';
@@ -66,6 +66,10 @@ interface Props {
   getHangingId: () => string | null;
   /** Sideways speed (px/ms) the hanging block would be released with now. */
   getHangVx: () => number;
+  /** The crane's pivot x while a floor hangs (latched over the top floor at hoist); null between hoists. */
+  getCraneX?: () => number | null;
+  /** Crane Yard perk: widens the perfect band — drawn with the SAME maths the judge uses. */
+  getPerfectWindowMult?: () => number;
   /** The slab being spelled (composing phase), or null. */
   getGhost: () => GhostPreview | null;
   /** Best height so far (metres) for the goal line, or null. */
@@ -378,15 +382,21 @@ export default function TowerCanvas(props: Props) {
           anchorX = base.x;
           anchorLatched = true;
         }
-        // Frame the base AND the top floor: a tower that walks sideways as it
-        // grows stays on screen without the player dragging it back.
+        // The crane line: where the swing is centred. While a floor hangs it is
+        // the pivot latched at hoist; between hoists, the settled top floor —
+        // exactly where the next hoist will latch it, so nothing jumps.
         let top: (typeof snap.blocks)[number] | null = null;
         const hangingNow = p.getHangingId();
         for (const b of snap.blocks) {
           if (b.id === hangingNow || !b.resting || !world.landed.has(b.id)) continue;
           if (!top || b.y < top.y) top = b;
         }
-        camX += (focusX(anchorLatched ? anchorX : null, top?.x ?? null) - camX) * (1 - Math.exp(-dt * 5));
+        const craneX = p.getCraneX?.() ?? top?.x ?? (anchorLatched ? anchorX : 0);
+        // The swing's far end must stay on screen: arm sweep + half the slab
+        // (the widest the hook ever carries) + a little air.
+        const hangHalfW = (hangingNow ? byId.get(hangingNow)?.widthPx : p.getGhost()?.widthPx) ?? 200;
+        const reach = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad) + hangHalfW / 2 + 24 / scale;
+        camX += (focusX(anchorLatched ? anchorX : null, craneX, w / 2 / scale - reach) - camX) * (1 - Math.exp(-dt * 5));
 
         if (p.homeKey !== lookHome) {
           lookHome = p.homeKey;
@@ -524,13 +534,13 @@ export default function TowerCanvas(props: Props) {
         if (ghostPreview) {
           paintGhost(ghost, scale, ghostPreview.word, ghostPreview.widthPx, BLOCK_HEIGHT_PX, ghostPreview.valid);
           // A gentle idle bob so the waiting slab reads as hanging, not pasted.
-          ghost.container.position.set(0, hangY + Math.sin(ts / 420) * 2);
+          ghost.container.position.set(craneX, hangY + Math.sin(ts / 420) * 2);
         }
 
         // Idle: an empty hook still hangs where the next slab will appear, so
         // the crane is always on screen and the player knows where words go.
         const idleY = hangY + Math.sin(ts / 420) * 2;
-        const hookTarget = hanging ?? { x: 0, y: ghostPreview ? ghost.container.y : idleY, heightPx: BLOCK_HEIGHT_PX };
+        const hookTarget = hanging ?? { x: craneX, y: ghostPreview ? ghost.container.y : idleY, heightPx: BLOCK_HEIGHT_PX };
         const craneFrame = {
           scale,
           halfW,
@@ -538,7 +548,7 @@ export default function TowerCanvas(props: Props) {
           bottomY: (h - scene.y) / scale,
           // Mast on the HUD's side: the ruler owns the other edge.
           side: (p.rulerSide === 'left' ? 'right' : 'left') as 'left' | 'right',
-          pivot: { x: 0, y: pivotY },
+          pivot: { x: craneX, y: pivotY },
           hook: { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 },
         };
         const gear = p.getGear?.() ?? null;
@@ -577,10 +587,10 @@ export default function TowerCanvas(props: Props) {
             null,
           );
           const supportX = top?.x ?? 0;
-          const supportHalfW = (top?.widthPx ?? 200) / 2;
-          paintLandingMark(landingMark, scale, landX, towerTopY, hanging.widthPx, Math.abs(landX - supportX) < PERFECT_RATIO * supportHalfW, {
+          const perfectHalfW = perfectHalfWidth(top?.widthPx ?? 200, p.getPerfectWindowMult?.() ?? 1);
+          paintLandingMark(landingMark, scale, landX, towerTopY, hanging.widthPx, Math.abs(landX - supportX) < perfectHalfW, {
             x: supportX,
-            halfW: PERFECT_RATIO * supportHalfW,
+            halfW: perfectHalfW,
             pulse: 0.5 + 0.5 * Math.sin(ts / 160),
           });
           landingMark.visible = true;

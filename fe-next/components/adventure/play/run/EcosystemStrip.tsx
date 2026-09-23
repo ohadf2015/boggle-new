@@ -10,7 +10,7 @@
  * "nothing moved" is the common case, not an edge.
  */
 import { motion, useReducedMotion } from 'framer-motion';
-import { Zap, Flame, Medal, Coins, type LucideIcon } from 'lucide-react';
+import { Zap, Flame, Medal, Coins, PiggyBank, type LucideIcon } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { ecosystemGains, type Gain, type GainKind } from './ecosystemGains';
 import { useCountUp } from './GoldCounter';
@@ -34,6 +34,7 @@ interface Props {
 const STYLE: Record<GainKind, { fill: string; label: string }> = {
   xp: { fill: 'bg-neo-lime', label: 'adventurePlay.eco.xp' },
   coins: { fill: 'bg-neo-yellow', label: 'adventurePlay.eco.coins' },
+  purse: { fill: 'bg-neo-yellow', label: 'adventurePlay.eco.purse' },
   points: { fill: 'bg-neo-cyan', label: 'adventurePlay.eco.points' },
   streak: { fill: 'bg-neo-pink', label: 'adventurePlay.eco.streakDays' },
 };
@@ -44,7 +45,7 @@ const STYLE: Record<GainKind, { fill: string; label: string }> = {
  * `bg-neo-yellow` fill: gold-on-yellow collapses to its outline at 20px. A
  * glyph inherits the chip's black ink and stays legible on every fill.
  */
-const ICON: Record<GainKind, LucideIcon> = { xp: Zap, coins: Coins, points: Medal, streak: Flame };
+const ICON: Record<GainKind, LucideIcon> = { xp: Zap, coins: Coins, purse: PiggyBank, points: Medal, streak: Flame };
 
 function GainIcon({ kind }: { kind: GainKind }) {
   const Icon = ICON[kind];

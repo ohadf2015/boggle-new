@@ -215,7 +215,8 @@ export interface LevelOutcome {
  * After a won fight: HP clamp, gold, potions spent, next offer. The map
  * position is NOT advanced — the player picks the next node off the map.
  */
-export function advanceRun(run: RunPayload, { hpLeft, potionsUsed, score, reviveUsed }: LevelOutcome): RunPayload {
+/** What a fight used up: potions drunk, and the phoenix feather if it fired. */
+function spendRun(run: RunPayload, potionsUsed: LevelOutcome['potionsUsed'], reviveUsed?: boolean): RunPayload {
   const potions = { ...emptyPotions(), ...run.potions };
   for (const [id, n] of Object.entries(potionsUsed ?? {})) {
     if (!isPotionId(id)) continue;
@@ -223,6 +224,11 @@ export function advanceRun(run: RunPayload, { hpLeft, potionsUsed, score, revive
     potions[id] = Math.max(0, potions[id] - used);
   }
   const relics = reviveUsed ? run.relics.filter((r) => r !== 'phoenix-feather') : [...run.relics];
+  return { ...run, potions, relics };
+}
+
+export function advanceRun(run: RunPayload, { hpLeft, potionsUsed, score, reviveUsed }: LevelOutcome): RunPayload {
+  const { potions, relics } = spendRun(run, potionsUsed, reviveUsed);
   const maxHp = maxHpOf({ relics, bhp: run.bhp });
   const hp = Math.min(maxHp, Math.max(0, Math.round(Number(hpLeft) || 0)) + WIN_HEAL);
   // The offer is keyed on map DEPTH, so two nodes of a run never re-roll the same draft.
@@ -236,4 +242,29 @@ export function advanceRun(run: RunPayload, { hpLeft, potionsUsed, score, revive
     gold: grantGold(run, goldForScore(score)).gold,
     offer: makeOffer(run.seed, depth, relics, draftSize(relics)),
   };
+}
+
+/** Share of a run's leftover gold that banks into the app wallet as coins. */
+export const PURSE_BANK_RATE = 0.5;
+/** Most coins one run's purse can bank — the purse is a bonus, not a faucet. */
+export const PURSE_BANK_CAP = 150;
+
+export function purseCoins(gold: number): number {
+  return Math.min(PURSE_BANK_CAP, Math.max(0, Math.floor((Number(gold) || 0) * PURSE_BANK_RATE)));
+}
+
+/**
+ * The run is over (death, lost node, or the boss is down). `carry` is the run
+ * AFTER this last fight — what the next run inherits (relics + potions), with
+ * whatever the fatal fight burned already spent. Carrying the pre-fight token
+ * refunded those. `coins` is the leftover purse banked into the wallet; a
+ * beaten boss pays its gold into the purse first.
+ */
+export function settleRunEnd(
+  run: RunPayload,
+  end: { won: boolean; boss: boolean; score: number; potionsUsed: LevelOutcome['potionsUsed']; reviveUsed?: boolean },
+): { carry: RunPayload; coins: number } {
+  const spent = spendRun(run, end.potionsUsed, end.reviveUsed);
+  const carry = end.won && end.boss ? grantGold(spent, goldForScore(end.score)) : spent;
+  return { carry, coins: purseCoins(carry.gold) };
 }

@@ -98,6 +98,9 @@ describe('GET /api/word-tower/estate/rivals', () => {
   });
 });
 
+/** The raid rpc call (a legacy-coin fold may run sync_coins before it). */
+const raidRpc = (db: { rpc: { mock: { calls: unknown[][] } } }) => db.rpc.mock.calls.find(([n]) => n === 'word_tower_apply_raid') as [string, Record<string, unknown>];
+
 describe('POST /api/word-tower/estate/raid', () => {
   const built = PLOT_SLOTS.map((slot) => ({ slot, level: slot === 'vault' ? 3 : 1, damaged: false }));
 
@@ -107,7 +110,7 @@ describe('POST /api/word-tower/estate/raid', () => {
         word_tower_estates: (ops: Op[]) => {
           if (has(ops, 'eq', 'player_id', ME)) return { data: row({ raid_charges: 1, ...opts.attacker }), error: null };
           if (has(ops, 'eq', 'player_id', THEM)) {
-            return { data: opts.defender === null ? null : row({ player_id: THEM, coins: 1000, plots: built, ...opts.defender }), error: null };
+            return { data: opts.defender === null ? null : row({ player_id: THEM, plots: built, ...opts.defender }), error: null };
           }
           return { data: null, error: null };
         },
@@ -118,6 +121,8 @@ describe('POST /api/word-tower/estate/raid', () => {
         opts.rpcError
           ? { data: null, error: { message: opts.rpcError } }
           : { data: [{ out_raid_id: 'new-raid', out_coins_stolen: 150, out_attacker_coins: 225 }], error: null },
+      // The defender's coins are their app wallet, which is what a raid skims.
+      { [THEM]: 1000 },
     );
   }
 
@@ -143,7 +148,7 @@ describe('POST /api/word-tower/estate/raid', () => {
     (getSupabaseAdmin as any).mockReturnValue(db.client);
     const res = await postRaid(postReq({ defenderId: THEM, accuracy: 5, coinsStolen: 99999 }));
     expect(status(res)).toBe(200);
-    const [name, args] = db.rpc.mock.calls[0];
+    const [name, args] = raidRpc(db);
     expect(name).toBe('word_tower_apply_raid');
     // accuracy clamped to 1: 8% + 12% of 1000 = 200, capped at 120 per district-1 raid.
     expect(args).toMatchObject({ p_attacker: ME, p_defender: THEM, p_blocked: false, p_slot: 'vault', p_coins_stolen: 120, p_revenge_raid_id: null });
@@ -156,7 +161,7 @@ describe('POST /api/word-tower/estate/raid', () => {
     (getSupabaseAdmin as any).mockReturnValue(db.client);
     const b = await body(await postRaid(postReq({ defenderId: THEM, accuracy: 1 })));
     expect(b.outcome.kind).toBe('blocked');
-    expect(db.rpc.mock.calls[0][1]).toMatchObject({ p_blocked: true, p_coins_stolen: 0 });
+    expect(raidRpc(db)[1]).toMatchObject({ p_blocked: true, p_coins_stolen: 0 });
     expect(notifyWordTowerWreck).not.toHaveBeenCalled();
   });
 
@@ -171,7 +176,7 @@ describe('POST /api/word-tower/estate/raid', () => {
     const db = raidDb({ revengeRow: { id: 'their-raid' } });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
     expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true })))).toBe(200);
-    expect(db.rpc.mock.calls[0][1]).toMatchObject({ p_revenge_raid_id: 'their-raid' });
+    expect(raidRpc(db)[1]).toMatchObject({ p_revenge_raid_id: 'their-raid' });
     const lookup = db.calls.find((c) => c.table === 'word_tower_raids')!;
     expect(has(lookup.ops, 'eq', 'attacker_id', THEM)).toBe(true);
     expect(has(lookup.ops, 'eq', 'defender_id', ME)).toBe(true);
@@ -185,7 +190,7 @@ describe('POST /api/word-tower/estate/raid', () => {
     const db = raidDb({ attacker: { raid_charges: 0 }, revengeRow: { id: 'their-raid' } });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
     expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true })))).toBe(200);
-    expect(db.rpc.mock.calls[0][1]).toMatchObject({ p_revenge_raid_id: 'their-raid' });
+    expect(raidRpc(db)[1]).toMatchObject({ p_revenge_raid_id: 'their-raid' });
   });
 
   it('given zero charges and nothing to avenge, when raiding, then it is still refused', async () => {

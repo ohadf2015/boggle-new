@@ -42,6 +42,15 @@ function offsetRatio(x: number, support: SupportTop | null): number {
 }
 
 /**
+ * Half-width of the perfect band over a support `widthPx` wide — what the
+ * landing mark draws. Same maths as classifyLanding, so a Crane Yard upgrade
+ * widens the band the player SEES by exactly what the judge accepts.
+ */
+export function perfectHalfWidth(widthPx: number, windowMult = 1): number {
+  return PERFECT_RATIO * windowMult * (widthPx / 2);
+}
+
+/**
  * `windowMult` widens ONLY the perfect band (the Crane Yard perk). It defaults
  * to 1, so every existing caller — and feel.test's measured window — is
  * untouched.
@@ -53,4 +62,9 @@ export function classifyLanding(block: LandedBlock, support: SupportTop | null, 
   if (r < PERFECT_RATIO * windowMult && Math.abs(block.angleRad) < PERFECT_TILT) return 'perfect';
   if (r < GOOD_RATIO) return 'good';
   return 'sloppy';
+}
+
+/** Perfect ONLY because the Crane Yard widened the band — the moment the upgrade gets named on screen. */
+export function perkMadePerfect(block: LandedBlock, support: SupportTop | null, windowMult: number): boolean {
+  return windowMult > 1 && classifyLanding(block, support, windowMult) === 'perfect' && classifyLanding(block, support, 1) !== 'perfect';
 }

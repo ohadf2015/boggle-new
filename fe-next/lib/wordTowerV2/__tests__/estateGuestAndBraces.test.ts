@@ -7,6 +7,8 @@ import {
   braceCost,
   clampRunSummary,
   emptyEstate,
+  MAX_GUEST_CLAIM_COINS,
+  MAX_GUEST_CLAIM_RUNS,
   mergeGuestEstate,
   nextBracePrice,
   perksFromEstate,
@@ -35,6 +37,14 @@ describe('mergeGuestEstate — progress made signed-out survives signing in', ()
     expect(merged.coins).toBe(120 + upgradeCost(1, 'foundation', 0) + upgradeCost(1, 'foundation', 1));
     expect(merged.runs).toBe(5);
     expect(merged.bestM).toBe(40);
+  });
+
+  it('given a forged guest bank with a huge run count, when merged, then the coins it adds are capped outright', () => {
+    // runs is client state (localStorage): a per-run cap alone let a forged
+    // `runs: 1e9` mint app-wide coins, which daily retries and reveals spend.
+    const merged = mergeGuestEstate(emptyEstate(), { ...emptyEstate(), coins: 1e9, runs: 1e9 });
+    expect(merged.coins).toBe(MAX_GUEST_CLAIM_COINS);
+    expect(merged.runs).toBeLessThanOrEqual(MAX_GUEST_CLAIM_RUNS);
   });
 
   it('given a forged maxed guest empire in district 10, when merged into a fresh account, then no district or plot is adopted', () => {

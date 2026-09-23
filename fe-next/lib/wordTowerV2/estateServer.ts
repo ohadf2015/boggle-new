@@ -3,10 +3,17 @@
  * row <-> Estate mapping, load-or-create, and a compare-and-swap mutate so two
  * tabs banking runs at once can't double-spend. Raids are applied by the
  * `word_tower_apply_raid` RPC instead (two rows + a log row, one transaction).
+ *
+ * COINS are not stored here: `Estate.coins` is the player's app-wide wallet
+ * (profiles.total_coins, estateWallet), read at load and moved by a signed
+ * delta in mutateEstate. The row's `coins` column is legacy — anything found
+ * in it (old balances, a raid gain credited by the RPC) is folded into the
+ * wallet on the next load.
  */
 import type { getSupabaseAdmin } from '@/lib/email';
 import { type Estate, emptyEstate, sanitizeEstate } from './estate';
 import { encodeTower } from './estateTower';
+import { type Wallet, dbWallet } from './estateWallet';
 
 export type Db = NonNullable<ReturnType<typeof getSupabaseAdmin>>;
 
@@ -36,7 +43,9 @@ export function rowToEstate(r: Row): Estate {
 
 export function estateToRow(e: Estate): Row {
   return {
-    coins: e.coins,
+    // Never a balance: the wallet owns coins (see header). Writing it here would
+    // be folded back in on the next load and pay the player twice.
+    coins: 0,
     district: e.district,
     plots: e.plots,
     shields: e.shields,
@@ -54,22 +63,48 @@ export interface Loaded {
   updatedAt: string;
 }
 
-export async function loadEstate(db: Db, playerId: string): Promise<Loaded | null> {
+/**
+ * Move coins left in the legacy column into the wallet. Zero FIRST (guarded on
+ * the exact amount, so two loads can't both claim it), then credit; a failed
+ * credit puts the coins back rather than losing them.
+ */
+async function foldLegacyCoins(db: Db, wallet: Wallet, playerId: string, coins: number): Promise<string | null> {
+  const { data, error } = await db
+    .from(ESTATES)
+    .update({ coins: 0, updated_at: new Date().toISOString() })
+    .eq('player_id', playerId)
+    .eq('coins', coins)
+    .select('updated_at');
+  if (error) throw error;
+  const won = Array.isArray(data) && data.length === 1 ? String((data[0] as Row).updated_at) : null;
+  if (!won) return null;
+  const credited = await wallet.apply(playerId, coins, 'word_tower_estate_merge');
+  if (!credited.ok) {
+    await db.from(ESTATES).update({ coins }).eq('player_id', playerId).eq('coins', 0);
+    throw new Error(`estate coin merge failed: ${credited.reason}`);
+  }
+  return won;
+}
+
+export async function loadEstate(db: Db, playerId: string, wallet: Wallet = dbWallet(db)): Promise<Loaded | null> {
   const { data, error } = await db.from(ESTATES).select(ESTATE_COLS).eq('player_id', playerId).maybeSingle();
   if (error) throw error;
   if (!data) return null;
   const r = data as Row;
-  return { estate: rowToEstate(r), updatedAt: String(r.updated_at) };
+  let updatedAt = String(r.updated_at);
+  const legacy = Math.max(0, Math.floor(Number(r.coins) || 0));
+  if (legacy > 0) updatedAt = (await foldLegacyCoins(db, wallet, playerId, legacy)) ?? updatedAt;
+  return { estate: { ...rowToEstate(r), coins: await wallet.balance(playerId) }, updatedAt };
 }
 
-export async function loadOrCreateEstate(db: Db, playerId: string): Promise<Loaded> {
-  const found = await loadEstate(db, playerId);
+export async function loadOrCreateEstate(db: Db, playerId: string, wallet: Wallet = dbWallet(db)): Promise<Loaded> {
+  const found = await loadEstate(db, playerId, wallet);
   if (found) return found;
   const { error } = await db
     .from(ESTATES)
     .upsert({ player_id: playerId, ...estateToRow(emptyEstate()) }, { onConflict: 'player_id', ignoreDuplicates: true });
   if (error) throw error;
-  const created = await loadEstate(db, playerId);
+  const created = await loadEstate(db, playerId, wallet);
   if (!created) throw new Error('estate row missing after create');
   return created;
 }
@@ -79,25 +114,48 @@ export type MutateStep<X> = { ok: true; estate: Estate; extra: X } | { ok: false
 /**
  * Read -> pure step -> write only if nobody wrote in between (updated_at CAS).
  * Retries on a lost race; a refused step (`ok: false`) writes nothing.
+ *
+ * The step's coin change is applied to the wallet BEFORE the CAS: a debit the
+ * wallet refuses (spent elsewhere since the read) refuses the whole step, and
+ * a lost CAS hands the delta back before retrying. A credit that fails throws —
+ * callers queue and replay runs, so a failed payout is never silently dropped.
  */
 export async function mutateEstate<X>(
   db: Db,
   playerId: string,
   step: (e: Estate) => MutateStep<X>,
   attempts = 3,
-): Promise<MutateStep<X> | { ok: false; reason: 'conflict' }> {
+  wallet: Wallet = dbWallet(db),
+): Promise<MutateStep<X> | { ok: false; reason: 'conflict' | 'coins' }> {
   for (let i = 0; i < attempts; i += 1) {
-    const cur = await loadOrCreateEstate(db, playerId);
+    const cur = await loadOrCreateEstate(db, playerId, wallet);
     const res = step(cur.estate);
     if (!res.ok) return res;
+    const delta = res.estate.coins - cur.estate.coins;
+    let balance = cur.estate.coins;
+    if (delta !== 0) {
+      const moved = await wallet.apply(playerId, delta, delta > 0 ? 'word_tower_earn' : 'word_tower_spend');
+      if (!moved.ok) {
+        if (delta < 0) return { ok: false, reason: 'coins' };
+        throw new Error(`word tower payout failed: ${moved.reason}`);
+      }
+      balance = moved.balance;
+    }
     const { data, error } = await db
       .from(ESTATES)
       .update({ ...estateToRow(res.estate), updated_at: new Date().toISOString() })
       .eq('player_id', playerId)
       .eq('updated_at', cur.updatedAt)
       .select('updated_at');
-    if (error) throw error;
-    if (Array.isArray(data) && data.length === 1) return res;
+    if (error || !(Array.isArray(data) && data.length === 1)) {
+      if (delta !== 0) {
+        const back = await wallet.apply(playerId, -delta, 'word_tower_estate_revert');
+        if (!back.ok) throw new Error(`word tower revert failed (delta ${delta}): ${back.reason}`);
+      }
+      if (error) throw error;
+      continue;
+    }
+    return { ...res, estate: { ...res.estate, coins: balance } };
   }
   return { ok: false, reason: 'conflict' };
 }

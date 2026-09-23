@@ -5,6 +5,9 @@ import { NEUTRAL_PERKS, applyUpgrade, emptyEstate, perksFromEstate, runCoins } f
 const auth = { isAuthenticated: false, loading: false };
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
 vi.mock('@/utils/authFetch', () => ({ getWithAuth: vi.fn(), postWithAuth: vi.fn() }));
+// Word Tower coins ARE the app wallet: every server answer re-syncs the shared balance.
+const refreshCoins = vi.fn(async () => 0);
+vi.mock('@/contexts/CoinContext', () => ({ useCoinActions: () => ({ refreshCoins }) }));
 
 import { getWithAuth, postWithAuth } from '@/utils/authFetch';
 import { ESTATE_STORAGE_KEY, useEstate } from '../useEstate';
@@ -105,6 +108,18 @@ describe('useEstate — signed in', () => {
     expect(mockPost).toHaveBeenCalledWith('/api/word-tower/estate/run', RUN, expect.anything());
     expect(paid).toMatchObject({ coins: 250, chest: { tier: 'rare' } });
     expect(result.current.estate.coins).toBe(800);
+    // The header / other modes show the same wallet, so they must hear about the payout.
+    expect(refreshCoins).toHaveBeenCalled();
+  });
+
+  it('given a guest, when a run is banked locally, then the app wallet is not touched', async () => {
+    auth.isAuthenticated = false;
+    const { result } = renderHook(() => useEstate());
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    await act(async () => {
+      await result.current.reportRun(RUN);
+    });
+    expect(refreshCoins).not.toHaveBeenCalled();
   });
 
   it('given an upgrade, when sent, then it shows optimistically and the server copy replaces it', async () => {

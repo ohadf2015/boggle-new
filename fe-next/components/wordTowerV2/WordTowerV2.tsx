@@ -285,6 +285,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const sceneMRef = useRef(heightM);
   sceneMRef.current = heightM;
   const getSceneM = useCallback(() => sceneMRef.current, []);
+  const getPerfectWindowMult = useCallback(() => game.perksRef.current.perfectWindowMult, [game.perksRef]);
   // The workshop's upgrades, painted on the tower. A ref so the canvas loop reads the latest.
   const gearRef = useRef<TowerGear | null>(null);
   gearRef.current = estateApi.status === 'loading' ? null : gearFromEstate(estateApi.estate);
@@ -529,6 +530,8 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           getHudPx={getHudPx}
           getHangingId={getHangingId}
           getHangVx={game.getHangVx}
+          getCraneX={game.getCraneX}
+          getPerfectWindowMult={getPerfectWindowMult}
           getGhost={getGhost}
           getBestM={getBestM}
           bestLabel={t('wordTowerV2.bestFlag')}
