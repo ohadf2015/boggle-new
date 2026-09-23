@@ -49,6 +49,8 @@ function shouldReloadOnce(): boolean {
   }
 }
 
+export const IMPORT_HANG_ERROR_NAME = 'ImportHangError';
+
 export interface RetryImportOptions {
   /** Number of retries after the first attempt (default 2). */
   retries?: number;
@@ -56,6 +58,14 @@ export interface RetryImportOptions {
   interval?: number;
   /** Injectable reload hook (defaults to cache-clear + reload). For tests. */
   reload?: () => void | Promise<void>;
+  /**
+   * If the import (including retries) has not settled after this many ms,
+   * reject with ImportHangError. Opt-in — a hanging `import()` never hits
+   * `.catch()`, so retry/reload never run and next/dynamic freezes on
+   * `loading`. Do NOT auto-reload on hang: the guard window equals a typical
+   * timeout and would loop. Leave recovery to an error boundary.
+   */
+  timeoutMs?: number;
 }
 
 /**
@@ -81,8 +91,8 @@ export function retryImport<T>(
       }
     });
 
-  return () =>
-    new Promise<T>((resolve, reject) => {
+  return () => {
+    const work = new Promise<T>((resolve, reject) => {
       const attempt = (remaining: number, delay: number): void => {
         factory()
           .then(resolve)
@@ -103,4 +113,27 @@ export function retryImport<T>(
       };
       attempt(retries, interval);
     });
+
+    const timeoutMs = options.timeoutMs;
+    if (!timeoutMs || timeoutMs <= 0) return work;
+
+    return new Promise<T>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        const err = new Error(`Import hung after ${timeoutMs}ms`);
+        err.name = IMPORT_HANG_ERROR_NAME;
+        logger.warn('retryImport: import hung, surfacing to error boundary', err);
+        reject(err);
+      }, timeoutMs);
+      work.then(
+        (value) => {
+          clearTimeout(timer);
+          resolve(value);
+        },
+        (err: unknown) => {
+          clearTimeout(timer);
+          reject(err);
+        },
+      );
+    });
+  };
 }
