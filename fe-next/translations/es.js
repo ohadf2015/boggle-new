@@ -14440,6 +14440,22 @@ const es = {
         "cta": "Lanza reteach Live en clase sin tope de 20 recursos"
       }
     },
+    "vsGimkit": {
+      "proExclusiveModes": {
+        "eyebrow": "Pro Exclusive del plan gratis — foil de honestidad",
+        "title": "Gimkit Basic: Pro-Exclusive modes limited to 5 players. LexiClash: whole-class free vocab.",
+        "lede": "Gimkit help “Player maximums” states Pro Exclusive modes are limited to 5 players for Gimkit Basic members. LexiClash free classroom vocab covers a whole class (up to 50) without a 5-seat Pro-Exclusive mode.",
+        "gimkitTitle": "Gimkit Basic — Pro Exclusive modes → 5 players",
+        "gimkitBody": "Featured modes: unlimited on Basic. Pro Exclusive modes: limited to 5 players until you upgrade — even when the whole class needs that mode.",
+        "lexiTitle": "LexiClash — whole-class free vocab",
+        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games. One published classroom cap — no Pro-Exclusive mode that shrinks to five seats.",
+        "citePrefix": "Gimkit help:",
+        "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
+        "citeProFaqLabel": "Gimkit Pro FAQ",
+        "citeSuffix": " — Pro Exclusive modes limited to 5 players for Gimkit Basic members.",
+        "cta": "Organiza vocabulario gratis para toda la clase con un tope gratis claro de 50"
+      }
+    },
 "vsBlooket": {
       "gapsSet": {
         "eyebrow": "Después del informe — comparación honesta",
