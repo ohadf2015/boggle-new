@@ -3,6 +3,9 @@
  *
  * Pure fold used by the Monday cron. Polar CTA is appended by the email
  * template, not here, so a Pro teacher can get the numbers without an upsell.
+ *
+ * Polar Teacher Pro trial expiry is a KEY, not a sentence, so the email can
+ * render it in the teacher's locale. Distinct from the access trial.
  */
 
 import {
@@ -12,6 +15,8 @@ import {
   type WindowSession,
   type WindowedClassroomProgress,
 } from './windowedClassroomProgress';
+
+export const POLAR_TRIAL_EXPIRED_DIGEST_KEY = 'teacher.digest.polarTrialExpiredLine' as const;
 
 export interface WeeklyClassroomInput {
   classroomId: string;
@@ -32,6 +37,10 @@ export interface WeeklyTeacherDigest {
   fullName: string;
   locale: string;
   hasPro: boolean;
+  /** Polar Teacher Pro trial ended and was not converted. */
+  polarTrialExpired: boolean;
+  /** Set only when polarTrialExpired && !hasPro. */
+  polarTrialExpiredLineKey: typeof POLAR_TRIAL_EXPIRED_DIGEST_KEY | null;
   classrooms: WeeklyTeacherDigestClassroom[];
 }
 
@@ -52,6 +61,7 @@ export function buildWeeklyTeacherDigest({
   fullName,
   locale,
   hasPro,
+  polarTrialExpired = false,
   classrooms,
   windowDays = 7,
   now = Date.now(),
@@ -61,16 +71,20 @@ export function buildWeeklyTeacherDigest({
   fullName: string;
   locale: string;
   hasPro: boolean;
+  polarTrialExpired?: boolean;
   classrooms: WeeklyClassroomInput[];
   windowDays?: ProgressWindowDays;
   now?: number;
 }): WeeklyTeacherDigest {
+  const expiredUpsell = polarTrialExpired && !hasPro;
   return {
     teacherId,
     email,
     fullName,
     locale,
     hasPro,
+    polarTrialExpired: expiredUpsell,
+    polarTrialExpiredLineKey: expiredUpsell ? POLAR_TRIAL_EXPIRED_DIGEST_KEY : null,
     classrooms: classrooms.map((c) => ({
       classroomId: c.classroomId,
       classroomName: c.classroomName,
@@ -122,6 +136,7 @@ export function assembleWeeklyDigests({
   memberships,
   sessions,
   proUserIds,
+  expiredTrialUserIds = new Set<string>(),
   now = Date.now(),
 }: {
   teachers: WeeklyTeacherRow[];
@@ -129,6 +144,7 @@ export function assembleWeeklyDigests({
   memberships: WeeklyMembershipRow[];
   sessions: WeeklySessionRow[];
   proUserIds: Set<string>;
+  expiredTrialUserIds?: Set<string>;
   now?: number;
 }): WeeklyTeacherDigest[] {
   const seenEmail = new Set<string>();
@@ -163,6 +179,7 @@ export function assembleWeeklyDigests({
       fullName: teacher.fullName,
       locale: teacher.locale,
       hasPro: proUserIds.has(teacher.userId),
+      polarTrialExpired: expiredTrialUserIds.has(teacher.userId),
       now,
       classrooms: rooms.map((room) => ({
         classroomId: room.id,

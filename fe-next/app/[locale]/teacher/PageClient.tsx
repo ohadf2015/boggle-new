@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TeacherProAskBanner } from '@/components/teacher/TeacherProAskBanner';
+import { TeacherProTrialEndedBanner } from '@/components/teacher/TeacherProTrialEndedBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
@@ -13,6 +14,7 @@ import { useTeacherProMilestone } from '@/hooks/useTeacherProMilestone';
 import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
+import { polarTrialUx } from '@/lib/education/polarTrial';
 import { isTrialUpgradeNudgeWindow } from '@/lib/education/trial';
 import { useTrialUpgradeNudge } from '@/lib/education/useTrialUpgradeNudge';
 import {
@@ -29,7 +31,13 @@ function TeacherDashboardInner() {
   const { language } = useLanguage();
   const { isAdmin } = useAuth();
   const { trial } = useTeacherAccess();
-  const { hasPro, loading: proLoading } = useTeacherPro();
+  const { hasPro, loading: proLoading, status, source, trialUsed } = useTeacherPro();
+  const polarTrial = polarTrialUx({
+    hasPro,
+    status: status ?? 'active',
+    source,
+    trialUsed: trialUsed === true,
+  });
   const { hasRecentConfig } = useRecentGameSettings();
   const {
     hasMilestone,
@@ -67,6 +75,10 @@ function TeacherDashboardInner() {
     hasMilestone,
     milestoneLoading,
     proAskDismissed: dismissed,
+    // Expired Polar Pro trial replaces the access banner and the milestone
+    // ask. A live Polar trial is hasPro, so the picker returns none and the
+    // days-left chip on TeacherPlanBadge is the only trial UI.
+    polarTrialExpired: polarTrial.showReactivation,
   });
   const banner =
     picked === 'trial' && !hasRecentConfig && !trial?.isExpired ? null : picked;
@@ -83,11 +95,16 @@ function TeacherDashboardInner() {
     !usageLoading &&
     usageReason !== null &&
     !usageDismissed &&
-    banner !== 'pro';
+    banner !== 'pro' &&
+    banner !== 'reactivate';
 
   useEffect(() => {
-    if (banner === 'pro') {
-      trackGrowthEvent('iap_viewed', { product: 'teacher_pro', source: 'dashboard_banner', event_type: 'impression' });
+    if (banner === 'pro' || banner === 'reactivate') {
+      trackGrowthEvent('iap_viewed', {
+        product: 'teacher_pro',
+        source: banner === 'reactivate' ? 'dashboard_trial_ended' : 'dashboard_banner',
+        event_type: 'impression',
+      });
     }
   }, [banner]);
 
@@ -106,6 +123,8 @@ function TeacherDashboardInner() {
           />
         ) : banner === 'pro' ? (
           <TeacherProAskBanner onDismiss={dismiss} />
+        ) : banner === 'reactivate' ? (
+          <TeacherProTrialEndedBanner />
         ) : undefined
       }
       usagePrompt={

@@ -73,6 +73,10 @@ describe('isPaidProviderSubscription', () => {
     expect(isPaidProviderSubscription({ tier: 'pro', status: 'active', source: 'polar', current_period_end: null })).toBe(true);
   });
 
+  it('is true for a Polar trial — a grant must not overwrite it', () => {
+    expect(isPaidProviderSubscription({ tier: 'pro', status: 'trialing', source: 'polar', current_period_end: null })).toBe(true);
+  });
+
   it('is false for an admin grant, a free row, or a canceled paid row', () => {
     expect(isPaidProviderSubscription({ tier: 'pro', status: 'active', source: 'admin_grant', current_period_end: null })).toBe(false);
     expect(isPaidProviderSubscription({ tier: 'free', status: 'active', source: 'polar', current_period_end: null })).toBe(false);
@@ -114,5 +118,30 @@ describe('resolveProEntitlement', () => {
   it('a free row or no row is not Pro', () => {
     expect(resolveProEntitlement({ tier: 'free', status: 'active', current_period_end: null }, NOW).hasPro).toBe(false);
     expect(resolveProEntitlement(null, NOW).hasPro).toBe(false);
+  });
+
+  it('a Polar trial (status trialing, tier pro) is Pro — the webhook owns the end date', () => {
+    const r = resolveProEntitlement({
+      tier: 'pro', status: 'trialing', source: 'polar',
+      current_period_end: new Date(NOW - DAY).toISOString(),
+    }, NOW);
+    expect(r.hasPro).toBe(true);
+    expect(r.source).toBe('polar');
+    expect(r.expired).toBe(false);
+  });
+
+  it('a canceled or past-due Polar row is not Pro', () => {
+    expect(resolveProEntitlement({ tier: 'pro', status: 'canceled', source: 'polar', current_period_end: new Date(NOW + DAY).toISOString() }, NOW).hasPro).toBe(false);
+    expect(resolveProEntitlement({ tier: 'pro', status: 'past_due', source: 'polar', current_period_end: new Date(NOW + DAY).toISOString() }, NOW).hasPro).toBe(false);
+    expect(resolveProEntitlement({ tier: 'pro', status: 'paused', source: 'polar', current_period_end: null }, NOW).hasPro).toBe(false);
+  });
+
+  it('a trialing grant is still deadline-based, not a Polar trial', () => {
+    const r = resolveProEntitlement({
+      tier: 'pro', status: 'trialing', source: 'admin_grant',
+      current_period_end: new Date(NOW + DAY).toISOString(),
+    }, NOW);
+    expect(r.hasPro).toBe(false);
+    expect(r.source).toBe('admin_grant');
   });
 });
