@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { isPremiumPart, getPartPrice } from '@/shared/types/customAvatar';
 import { captureApiError } from '@/utils/sentry';
+import { lockOnPartsSnapshot } from '@/lib/avatar/partsSnapshotLock';
 
 export async function POST(request: NextRequest) {
   const rateLimitResult = checkApiRateLimit(request, 'avatar-purchase', {
@@ -130,14 +131,16 @@ export async function POST(request: NextRequest) {
     // Update premium parts separately (coins already deducted atomically).
     // Optimistic lock on the pre-purchase snapshot: if a concurrent request already
     // changed premium_avatar_parts, this matches 0 rows instead of clobbering that write.
-    const { data: updatedProfile, error: partsError } = await supabase
-      .from('profiles')
-      .update({
-        premium_avatar_parts: newParts,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', user.id)
-      .eq('premium_avatar_parts', currentParts)
+    const { data: updatedProfile, error: partsError } = await lockOnPartsSnapshot(
+      supabase
+        .from('profiles')
+        .update({
+          premium_avatar_parts: newParts,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id),
+      currentParts,
+    )
       .select('premium_avatar_parts')
       .maybeSingle();
 

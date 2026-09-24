@@ -117,17 +117,15 @@ export function HomeTopBar({
           }}
           aria-hidden="true"
         >
-          <div className="h-full w-full overflow-hidden rounded-full border-2 border-black bg-neo-navy-light">
-            {/* The real face without the client art library: AvatarLite overlays
-                the versioned server PNG (same compositor as Avatar). A raw
-                unversioned /api/avatar/png url here served the pre-redraw face
-                from device cache. Pre-mount frame has no seed → plain disc. */}
-            <AvatarLite
-              customAvatar={p?.avatar_config ?? null}
-              userId={avatarSeed}
-              pixelSize={44}
-            />
-          </div>
+          {/* The real face without the client art library: AvatarLite overlays
+              the versioned server PNG (same compositor as Avatar), face-cropped,
+              with its own black edge — no second bordered disc around it.
+              Pre-mount frame has no seed → plain disc. */}
+          <AvatarLite
+            customAvatar={p?.avatar_config ?? null}
+            userId={avatarSeed}
+            pixelSize={44}
+          />
           {/* Level badge — skeleton dot while the profile loads, never empty. */}
           {showProfileSkeleton ? (
             <NeoSkeleton variant="circular" width={19} height={19} className="absolute -bottom-[3px] -end-[3px] border-2 border-black" />

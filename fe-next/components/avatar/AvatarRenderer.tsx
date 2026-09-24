@@ -29,6 +29,8 @@ interface AvatarRendererProps {
   overlay?: AvatarOverlay | null;
   /** Static epic/legendary gem baked into the SVG (opt-in, for rosters/leaderboards). */
   tierMarker?: boolean;
+  /** 'face' frames the head for small tiles (see AvatarArt FACE_CROP). */
+  crop?: 'full' | 'face';
 }
 
 /**
@@ -36,7 +38,7 @@ interface AvatarRendererProps {
  * per-instance id, idle life and the mood CSS. The Express PNG route renders
  * the same AvatarArt through AvatarRendererSsr, so client and PNG never drift.
  */
-const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood, overlay, tierMarker }) => {
+const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood, overlay, tierMarker, crop }) => {
   const uid = useId();
   const svg = (
     <AvatarArt
@@ -51,6 +53,7 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       tierMarker={tierMarker}
       forceTier={forceTier}
       animated={!disableEffects}
+      crop={crop}
     />
   );
   if (disableEffects) return svg;

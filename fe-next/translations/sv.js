@@ -16619,7 +16619,7 @@ const sv = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Nv {level}", "unlocksAtLevel": "Låses upp på nivå {level}", "youAreLevel": "Du är nivå {level}", "goldOnly": "Bara för guld", "buyFor": "Lås upp · {price}", "needMoreGold": "{amount} guld kvar", "orKeepPlaying": "eller spela vidare, helt gratis", "takeOff": "Ta av", "tryingOn": "Provar", "collection": "{owned} av {total} samlade" },
+    "editor": { "levelChip": "Nv {level}", "unlocksAtLevel": "Låses upp på nivå {level}", "youAreLevel": "Du är nivå {level}", "goldOnly": "Bara för guld", "buyFor": "Lås upp · {price}", "needMoreGold": "{amount} guld kvar", "orKeepPlaying": "eller spela vidare, helt gratis", "takeOff": "Ta av", "tryingOn": "Provar", "collection": "{owned} av {total} samlade", "signInToBuy": "Logga in för att köpa med guld", "unlocked": "Upplåst!", "purchaseFailed": "Kunde inte låsa upp. Inget guld drogs.", "doneSkipsTryOn": "Spara behåller din look utan den" },
     "glowUp": {
       "button": "Glow-up",
       "loading": "Skapar…",

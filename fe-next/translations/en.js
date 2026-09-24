@@ -14972,7 +14972,7 @@ const en = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Lv {level}", "unlocksAtLevel": "Unlocks at Lv {level}", "youAreLevel": "You're Lv {level}", "goldOnly": "Gold exclusive", "buyFor": "Unlock · {price}", "needMoreGold": "{amount} more gold to go", "orKeepPlaying": "or keep playing, it's free", "takeOff": "Take it off", "tryingOn": "Trying on", "collection": "{owned} of {total} collected" },
+    "editor": { "levelChip": "Lv {level}", "unlocksAtLevel": "Unlocks at Lv {level}", "youAreLevel": "You're Lv {level}", "goldOnly": "Gold exclusive", "buyFor": "Unlock · {price}", "needMoreGold": "{amount} more gold to go", "orKeepPlaying": "or keep playing, it's free", "takeOff": "Take it off", "tryingOn": "Trying on", "collection": "{owned} of {total} collected", "signInToBuy": "Sign in to buy with gold", "unlocked": "Unlocked!", "purchaseFailed": "Couldn't unlock it. No gold was spent.", "doneSkipsTryOn": "Save keeps your look without it" },
     "glowUp": { "button": "Glow Up", "loading": "Glowing up…", "adminTag": "Admin", "resultTitle": "Your glow-up" },
     "title": "Avatar Builder",
     "base": "Shape",

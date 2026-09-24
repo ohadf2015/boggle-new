@@ -15634,7 +15634,7 @@ const ru = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Ур. {level}", "unlocksAtLevel": "Откроется на ур. {level}", "youAreLevel": "Сейчас у тебя ур. {level}", "goldOnly": "Только за золото", "buyFor": "Открыть · {price}", "needMoreGold": "Не хватает {amount} золота", "orKeepPlaying": "или просто играй дальше, бесплатно", "takeOff": "Снять", "tryingOn": "Примерка", "collection": "Собрано {owned} из {total}" },
+    "editor": { "levelChip": "Ур. {level}", "unlocksAtLevel": "Откроется на ур. {level}", "youAreLevel": "Сейчас у тебя ур. {level}", "goldOnly": "Только за золото", "buyFor": "Открыть · {price}", "needMoreGold": "Не хватает {amount} золота", "orKeepPlaying": "или просто играй дальше, бесплатно", "takeOff": "Снять", "tryingOn": "Примерка", "collection": "Собрано {owned} из {total}", "signInToBuy": "Войдите, чтобы купить за золото", "unlocked": "Открыто!", "purchaseFailed": "Не удалось открыть. Золото не списано.", "doneSkipsTryOn": "«Сохранить» сохранит образ без этого" },
     "glowUp": {
       "button": "Сияние",
       "loading": "Сияю…",

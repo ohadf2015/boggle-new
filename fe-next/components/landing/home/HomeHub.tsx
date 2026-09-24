@@ -31,8 +31,6 @@ interface HomeHubProps {
   liveRoomStats: { activePlayers: number; openRooms: number; totalPlayers: number; isLoading: boolean };
   /** landing-stats feed for the social strip */
   gamesToday: number;
-  gameModes: number;
-  languages: number;
   playerAllTimeBest: { score: number } | null;
   dailyChallengeStats: DailyChallengePreloadedStats;
   cardOrder?: LandingGameMode[];
@@ -44,7 +42,7 @@ interface HomeHubProps {
  * HomeHub — the focused mobile arcade home (CSS-gated `md:hidden`; the desktop
  * landing renders the classic tree unchanged). Composes the redesign top-to-bottom:
  * top bar → promoted Daily hero + mode bento (via `LandingChallengeCards layout="hub"`,
- * reusing the SAME gated model list) → 4-stat social strip → Your Rank card →
+ * reusing the SAME gated model list) → live social strip → Your Rank card →
  * compact leaderboard. Bottom padding clears the app-wide `GlobalBottomNav`
  * (consumes `--bottom-nav-height`).
  */
@@ -56,8 +54,6 @@ export function HomeHub({
   isAdmin,
   liveRoomStats,
   gamesToday,
-  gameModes,
-  languages,
   playerAllTimeBest,
   dailyChallengeStats,
   cardOrder,
@@ -95,8 +91,6 @@ export function HomeHub({
       <HomeSocialStrip
         activePlayers={liveRoomStats.activePlayers}
         gamesToday={gamesToday}
-        gameModes={gameModes}
-        languages={languages}
         liveStatsLoading={liveRoomStats.isLoading}
         t={t}
       />

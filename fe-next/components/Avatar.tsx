@@ -21,6 +21,7 @@ import type { AvatarMood } from '@/lib/avatar/avatarMood';
 import type { AvatarOverlay } from '@/lib/avatar/avatarOverlay';
 import { cn } from '@/lib/utils';
 import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
+import { FACE_CROP_MAX_PX } from '@/lib/avatar/faceCrop';
 
 /** If the lazy renderer never commits (stale WebView chunk), swap to a letter disc. */
 const AVATAR_RENDERER_LOAD_TIMEOUT_MS = 8000;
@@ -210,6 +211,8 @@ const Avatar = memo<AvatarProps>((props) => {
     ? { container: '', px: pixelSize }
     : baseConfig;
   const containerSizeClass = pixelSize != null ? '' : config.container;
+  // Header/row/chip sizes: fill the tile with the face, the container owns the ring.
+  const crop = config.px <= FACE_CROP_MAX_PX ? 'face' : 'full';
   const containerStyle = pixelSize != null
     ? { width: pixelSize, height: pixelSize }
     : undefined;
@@ -245,7 +248,7 @@ const Avatar = memo<AvatarProps>((props) => {
         {...frameAttr}
       >
         <AvatarRendererGuard seed={fallbackSeed}>
-          <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
+          <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} crop={crop} />
         </AvatarRendererGuard>
       </div>
     );
@@ -261,7 +264,7 @@ const Avatar = memo<AvatarProps>((props) => {
       {...frameAttr}
     >
       <AvatarRendererGuard seed={fallbackSeed}>
-        <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
+        <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} crop={crop} />
       </AvatarRendererGuard>
     </div>
   );

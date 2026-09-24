@@ -16352,7 +16352,7 @@ const es = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Nv {level}", "unlocksAtLevel": "Se desbloquea en Nv {level}", "youAreLevel": "Estás en Nv {level}", "goldOnly": "Exclusivo con oro", "buyFor": "Desbloquear · {price}", "needMoreGold": "Te faltan {amount} de oro", "orKeepPlaying": "o sigue jugando: es gratis", "takeOff": "Quitar", "tryingOn": "Probando", "collection": "{owned} de {total} coleccionados" },
+    "editor": { "levelChip": "Nv {level}", "unlocksAtLevel": "Se desbloquea en Nv {level}", "youAreLevel": "Estás en Nv {level}", "goldOnly": "Exclusivo con oro", "buyFor": "Desbloquear · {price}", "needMoreGold": "Te faltan {amount} de oro", "orKeepPlaying": "o sigue jugando: es gratis", "takeOff": "Quitar", "tryingOn": "Probando", "collection": "{owned} de {total} coleccionados", "signInToBuy": "Inicia sesión para comprar con oro", "unlocked": "¡Desbloqueado!", "purchaseFailed": "No se pudo desbloquear. No se gastó oro.", "doneSkipsTryOn": "Guardar mantiene tu look sin esto" },
     "glowUp": {
       "button": "Mejorar",
       "loading": "Mejorando…",

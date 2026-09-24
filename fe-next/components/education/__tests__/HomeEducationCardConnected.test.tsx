@@ -73,6 +73,15 @@ describe('HomeEducationCardConnected', () => {
     expect(screen.getByTestId('home-education-card').closest('.md\\:hidden')).not.toBeNull();
   });
 
+  // On a player's phone home the promo led the page, above their own greeting.
+  // It drops to the end of the hub (CSS order: no JS branch, and the late ssr:false
+  // mount no longer shoves the hub down).
+  it('puts the promo after the player hub, not above it', () => {
+    useAuthMock.mockReturnValue(auth({ isAuthenticated: false }));
+    render(<HomeEducationCardConnected />);
+    expect(screen.getByTestId('home-education-card').closest('.order-last')).not.toBeNull();
+  });
+
   it('promotes education to an authed user with no classroom membership', () => {
     useAuthMock.mockReturnValue(auth());
     useStudentClassroomMock.mockReturnValue(studentClassroom());

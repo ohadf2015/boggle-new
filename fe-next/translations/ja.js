@@ -16333,7 +16333,7 @@ const ja = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Lv{level}", "unlocksAtLevel": "Lv{level}で解放", "youAreLevel": "いまLv{level}", "goldOnly": "ゴールド限定", "buyFor": "解放 · {price}", "needMoreGold": "あと{amount}ゴールド", "orKeepPlaying": "プレイを続ければ無料で手に入る", "takeOff": "外す", "tryingOn": "試着中", "collection": "コレクション {owned}/{total}" },
+    "editor": { "levelChip": "Lv{level}", "unlocksAtLevel": "Lv{level}で解放", "youAreLevel": "いまLv{level}", "goldOnly": "ゴールド限定", "buyFor": "解放 · {price}", "needMoreGold": "あと{amount}ゴールド", "orKeepPlaying": "プレイを続ければ無料で手に入る", "takeOff": "外す", "tryingOn": "試着中", "collection": "コレクション {owned}/{total}", "signInToBuy": "ゴールドで買うにはログイン", "unlocked": "解放！", "purchaseFailed": "解放できませんでした。ゴールドは減っていません。", "doneSkipsTryOn": "保存すると、これを外した見た目になります" },
     "glowUp": {
       "button": "グロウアップ",
       "loading": "生成中…",

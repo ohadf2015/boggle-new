@@ -16314,7 +16314,7 @@ const he = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "רמה {level}", "unlocksAtLevel": "נפתח ברמה {level}", "youAreLevel": "הרמה שלך: {level}", "goldOnly": "בלעדי בזהב", "buyFor": "לפתוח · {price}", "needMoreGold": "חסרים עוד {amount} זהב", "orKeepPlaying": "או פשוט להמשיך לשחק, בחינם", "takeOff": "להוריד", "tryingOn": "מודדים", "collection": "{owned} מתוך {total} בקולקציה" },
+    "editor": { "levelChip": "רמה {level}", "unlocksAtLevel": "נפתח ברמה {level}", "youAreLevel": "הרמה שלך: {level}", "goldOnly": "בלעדי בזהב", "buyFor": "לפתוח · {price}", "needMoreGold": "חסרים עוד {amount} זהב", "orKeepPlaying": "או פשוט להמשיך לשחק, בחינם", "takeOff": "להוריד", "tryingOn": "מודדים", "collection": "{owned} מתוך {total} בקולקציה", "signInToBuy": "התחברו כדי לקנות בזהב", "unlocked": "נפתח!", "purchaseFailed": "לא הצלחנו לפתוח. לא ירד לך זהב.", "doneSkipsTryOn": "שמירה תשמור את המראה בלי זה" },
     "glowUp": {
       "button": "שדרוג זוהר",
       "loading": "משדרג…",

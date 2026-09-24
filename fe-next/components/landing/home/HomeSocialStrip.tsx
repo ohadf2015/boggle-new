@@ -8,8 +8,6 @@ import { formatLiveShort } from '@/lib/landing/homeHubFormat';
 interface HomeSocialStripProps {
   activePlayers: number;
   gamesToday: number;
-  gameModes: number;
-  languages: number;
   /**
    * Live-room stats arrive over a WebSocket, so `activePlayers` is 0 until the
    * socket replies. Skeleton the "online" cell while loading instead of flashing
@@ -28,18 +26,15 @@ interface StatCell {
 }
 
 /**
- * HomeSocialStrip — a tight stat bar (Online · Games today · Modes · Languages).
- * Condenses `LandingSocialProofBar` into the hub grammar: one navy card, hairline
- * dividers, each stat number in a cycling brand hue.
+ * HomeSocialStrip — live pulse only (Online · Games today), hub grammar: one
+ * navy card, hairline divider.
  *
- * The two live cells (Online, Games today) are credibility-gated like the desktop
- * proof bar: while live stats resolve the Online cell skeletons (never a stale
- * "0"), and once resolved each live cell only renders when it has genuine
- * activity. A bald "0 online / 0 games today" reads as broken, so we drop those
- * cells and let the always-true trust stats (Modes, Languages) carry the strip.
- * The grid tracks the visible cell count so the layout stays balanced.
+ * Credibility-gated like the desktop proof bar: while live stats resolve the
+ * Online cell skeletons (never a stale "0"); once resolved each cell renders
+ * only with genuine activity. A quiet moment renders nothing — no static
+ * "N modes / N languages" filler on a returning player's home.
  */
-export function HomeSocialStrip({ activePlayers, gamesToday, gameModes, languages, liveStatsLoading, t }: HomeSocialStripProps) {
+export function HomeSocialStrip({ activePlayers, gamesToday, liveStatsLoading, t }: HomeSocialStripProps) {
   const cells: StatCell[] = [];
 
   // Online — live over WebSocket. Skeleton while loading; otherwise show only
@@ -56,18 +51,11 @@ export function HomeSocialStrip({ activePlayers, gamesToday, gameModes, language
   }
 
   // Always-credible trust stats.
-  if (gameModes > 0) {
-    cells.push({ key: 'modes', label: t('landing.home.modes'), color: 'text-neo-pink', value: String(gameModes) });
-  }
-  if (languages > 0) {
-    cells.push({ key: 'languages', label: t('landing.home.languages'), color: 'text-neo-purple', value: String(languages) });
-  }
 
   if (cells.length === 0) return null;
 
   // Static class names (no interpolation) so Tailwind's JIT keeps them.
-  const colsClass =
-    cells.length >= 4 ? 'grid-cols-4' : cells.length === 3 ? 'grid-cols-3' : 'grid-cols-2';
+  const colsClass = cells.length === 2 ? 'grid-cols-2' : 'grid-cols-1';
 
   return (
     <div className={cn('grid overflow-hidden rounded-neo-lg border-2 border-black bg-neo-navy-light shadow-hard', colsClass)}>

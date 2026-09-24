@@ -13,9 +13,10 @@
  * cooldown itself. Before that it re-appeared on every page load after a "no
  * thanks" (desktop, 7 days: 2.58 impressions/session vs the popup's 1.07).
  *
- * Anchored to the inline-end EDGE, vertically centred — deliberately clear of
- * the header (top) and the AdMob banner band (bottom) that rides on these same
- * routes. `end-*` auto-flips for RTL.
+ * Anchored to the inline-end EDGE. Phones: just above the bottom nav + ad stack
+ * (`--bottom-stack-height`), since mid-screen it sat on the home hub's mode
+ * tiles. From md: vertically centred, clear of header and banner band.
+ * `end-*` auto-flips for RTL.
  */
 
 import { useEffect, useState } from 'react';
@@ -129,7 +130,7 @@ export default function AndroidInstallPill() {
   };
 
   return (
-    <div className="fixed end-0 top-1/2 z-[55] flex -translate-y-1/2 items-stretch">
+    <div className="fixed end-0 bottom-[calc(var(--bottom-stack-height)+0.75rem)] z-[55] flex items-stretch md:bottom-auto md:top-1/2 md:-translate-y-1/2">
       <button
         type="button"
         onClick={handleOpen}
