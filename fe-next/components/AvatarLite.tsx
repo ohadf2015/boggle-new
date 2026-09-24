@@ -4,15 +4,14 @@ import { cn } from '@/lib/utils';
 import { AVATAR_RENDER_VERSION } from '@/lib/avatar/renderVersion';
 
 /**
- * First-paint stand-in for `Avatar`. The real renderer drags in ~477 KiB of
- * inline SVG parts (chunk 65990) onto every route that import()s it — even
- * behind next/dynamic. Landing / HomeHub must not touch that graph.
+ * First-paint stand-in for `Avatar`: keeps the art library off the landing /
+ * HomeHub first-paint graph.
  *
  * This paints a sized circle from `customAvatar.bgColor` / `skinColor` (or a
- * seeded palette), then overlays the player's real face as a server-rendered
- * PNG (`/api/avatar/png/[id]`) when they have a stored config. Zero client
- * JS for the face — no SVG parts, no AvatarRenderer, no builder. The route
- * 404s without a DB config; `onError` hides the img and the circle remains.
+ * seeded palette), then overlays the face as a server-rendered PNG
+ * (`/api/avatar/png/[id]`) drawn by the same compositor as `Avatar`. The
+ * route falls back to the seeded face `Avatar` uses, so guests and players
+ * without a config match too. `onError` hides the img and the circle remains.
  */
 const PALETTE = ['#FF6B35', '#8B5CF6', '#00897B', '#3B82F6', '#C62828', '#FFD700'] as const;
 
@@ -25,7 +24,8 @@ export interface AvatarLiteConfig {
   skinColor?: string | null;
 }
 
-const UUID_RE = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+// Mirrors backend/routes/avatarPng.ts SEED_RE.
+const SEED_RE = /^[A-Za-z0-9_-]{1,64}$/;
 
 function hash(s: string): string {
   let h = 0;
@@ -39,17 +39,17 @@ function seedColor(seed?: string | null): string {
 }
 
 /**
- * PNG URL for a stored config. `v` busts the 1-day browser cache when the
- * player edits their avatar AND the 7-day CDN cache when the art changes
- * (AVATAR_RENDER_VERSION). Null for guests / seeds / missing config.
+ * PNG URL for a player id or guest seed. `v` busts the 1-day browser cache
+ * when the player edits their avatar AND the 7-day CDN cache when the art
+ * changes (AVATAR_RENDER_VERSION). Null only without a usable id.
  */
 export function avatarPngSrc(
   userId: string | null | undefined,
   customAvatar: AvatarLiteConfig | null | undefined,
   renderVersion: string = AVATAR_RENDER_VERSION,
 ): string | null {
-  if (!customAvatar || !userId || !UUID_RE.test(userId)) return null;
-  return `/api/avatar/png/${userId}?v=${hash(`${renderVersion}|${JSON.stringify(customAvatar)}`)}`;
+  if (!userId || !SEED_RE.test(userId)) return null;
+  return `/api/avatar/png/${userId}?v=${hash(`${renderVersion}|${JSON.stringify(customAvatar ?? null)}`)}`;
 }
 
 export default function AvatarLite({

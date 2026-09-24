@@ -22,9 +22,10 @@ describe('AvatarLite PNG cache-bust includes the renderer version', () => {
     expect(avatarPngSrc(uuid, cfg)).toBe(avatarPngSrc(uuid, cfg, AVATAR_RENDER_VERSION));
   });
 
-  it('returns null for guests / missing config', () => {
-    expect(avatarPngSrc('guest', cfg)).toBeNull();
-    expect(avatarPngSrc(uuid, null)).toBeNull();
+  it('serves the seeded face for guests / missing config, null only without a usable id', () => {
+    expect(avatarPngSrc('guest', cfg)).toMatch(/^\/api\/avatar\/png\/guest\?v=/);
+    expect(avatarPngSrc(uuid, null)).toMatch(new RegExp(`^/api/avatar/png/${uuid}\\?v=`));
     expect(avatarPngSrc(undefined, cfg)).toBeNull();
+    expect(avatarPngSrc('../etc', cfg)).toBeNull();
   });
 });

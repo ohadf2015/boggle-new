@@ -43,8 +43,16 @@ describe('AvatarLite real face', () => {
     );
   });
 
-  it('keeps the flat circle for guests / seeds / missing config', () => {
-    expect(render(<AvatarLite userId="guest" customAvatar={{ bgColor: '#111' }} />).container.querySelector('img')).toBeNull();
-    expect(render(<AvatarLite userId={uuid} />).container.querySelector('img')).toBeNull();
+  it('shows the same seeded face Avatar uses for guests, seeds and players without a config', () => {
+    // Given no stored config, the full Avatar draws getSeededAvatarConfig(userId) —
+    // AvatarLite must show that face too, never a bare disc.
+    const guest = render(<AvatarLite userId="guest-seed" customAvatar={{ bgColor: '#111' }} />).container.querySelector('img');
+    expect(guest!.getAttribute('src')).toMatch(/^\/api\/avatar\/png\/guest-seed\?v=/);
+    expect(render(<AvatarLite userId={uuid} />).container.querySelector('img')).not.toBeNull();
+  });
+
+  it('keeps the flat circle when there is no id or an unsafe one', () => {
+    expect(render(<AvatarLite />).container.querySelector('img')).toBeNull();
+    expect(render(<AvatarLite userId="has space" />).container.querySelector('img')).toBeNull();
   });
 });

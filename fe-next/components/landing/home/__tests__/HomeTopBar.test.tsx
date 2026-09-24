@@ -133,7 +133,7 @@ describe('HomeTopBar', () => {
   it('uses the real profile id as the avatar source when a profile is present', () => {
     const profile = { id: 'real-id', username: 'x', total_xp: 0, total_coins: 0 } as unknown as ProfileData;
     render(<HomeTopBar profile={profile} language="en" t={t} />);
-    expect(screen.getByTestId('home-avatar-png')).toHaveAttribute('src', '/api/avatar/png/real-id');
+    expect(screen.getByTestId('avatar-lite-stub')).toHaveAttribute('data-user-id', 'real-id');
   });
 
   it('shows loading skeletons (not values) for name/coins while the profile is loading', () => {
@@ -153,9 +153,9 @@ describe('HomeTopBar', () => {
     expect(screen.getByText('12')).toBeInTheDocument();
     // Skeleton placeholders are present (NeoSkeleton uses role="status").
     expect(screen.getAllByRole('status').length).toBeGreaterThanOrEqual(1);
-    // The avatar still renders (never skeletoned) — the real face via PNG even
+    // The avatar still renders (never skeletoned) — the real face even
     // while the profile values sit behind skeletons.
-    expect(screen.getByTestId('home-avatar-png')).toHaveAttribute('src', '/api/avatar/png/u1');
+    expect(screen.getByTestId('avatar-lite-stub')).toHaveAttribute('data-user-id', 'u1');
   });
 
   it('streak pill renders the account streak from useAccountStreak', () => {
@@ -195,40 +195,23 @@ describe('HomeTopBar', () => {
     expect(badge).toMatch(/from '@\/hooks\/useAccountStreak'/);
   });
 
-  it('renders the real avatar face via the server-rendered PNG once mounted', () => {
-    const profile = { id: 'u1', username: 'm', total_xp: 0, total_coins: 0 } as unknown as ProfileData;
+  it('renders the real face through AvatarLite (versioned PNG) once mounted', () => {
+    const profile = { id: 'u1', username: 'm', total_xp: 0, total_coins: 0, avatar_config: { bgColor: '#111' } } as unknown as ProfileData;
     render(<HomeTopBar profile={profile} language="en" t={t} />);
-
-    // Post-mount an authed player gets their actual face from /api/avatar/png…
-    expect(screen.getByTestId('home-avatar-png')).toHaveAttribute('src', '/api/avatar/png/u1');
-    // …not the permanent empty disc (user-reported: avatar invisible).
-    expect(screen.queryByTestId('avatar-lite-stub')).toBeNull();
+    const avatar = screen.getByTestId('avatar-lite-stub');
+    expect(avatar).toHaveAttribute('data-user-id', 'u1');
+    expect(avatar).toHaveAttribute('data-has-custom', 'true');
   });
 
-  it('falls back to the AvatarLite disc when the PNG fails to load', () => {
-    const profile = { id: 'u1', username: 'm', total_xp: 0, total_coins: 0 } as unknown as ProfileData;
-    render(<HomeTopBar profile={profile} language="en" t={t} />);
-
-    fireEvent.error(screen.getByTestId('home-avatar-png'));
-    expect(screen.getByTestId('avatar-lite-stub')).toBeInTheDocument();
-  });
-
-  it('keeps guests on the AvatarLite disc (no UUID to render server-side)', () => {
-    render(<HomeTopBar profile={null} language="en" t={t} />);
-    expect(screen.getByTestId('avatar-lite-stub').getAttribute('data-user-id')).not.toBe('');
-    expect(screen.queryByRole('img')).toBeNull();
-  });
-
-  it('stays off the client avatar part library — server PNG only (source)', () => {
+  it('stays off the client art library and never builds an unversioned PNG url (source)', () => {
     const src = readFileSync(path.resolve(__dirname, '../HomeTopBar.tsx'), 'utf8');
-    // The face comes from the server-rendered PNG route…
-    expect(src).toMatch(/\/api\/avatar\/png\/\$\{p\.id\}/);
-    // …never from Avatar.tsx / AvatarRenderer — those pull the 477 KiB part
-    // library onto the landing first-paint graph (LandingView.bundleGraph guard).
+    // A raw `/api/avatar/png/${id}` has no `?v=` → served the pre-redraw face
+    // from device cache after the art changed. AvatarLite owns the url.
+    expect(src).not.toMatch(/src=\{`\/api\/avatar\/png/);
+    // Avatar.tsx / AvatarRenderer would put the art library on the landing
+    // first-paint graph (LandingView.bundleGraph guard).
     expect(src).not.toMatch(/from '@\/components\/Avatar'/);
     expect(src).not.toMatch(/from '@\/components\/avatar\//);
-    // Cheap disc remains for the pre-mount / guest / error frame.
-    expect(src).toMatch(/\{mounted && p\?\.id && !avatarImgErrored \? \(/);
     expect(src).toMatch(/<AvatarLite/);
   });
 });

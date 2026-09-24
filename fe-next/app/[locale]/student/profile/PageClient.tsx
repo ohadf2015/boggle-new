@@ -9,7 +9,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
@@ -28,6 +27,7 @@ import { transformAchievementRow } from './achievementTransform';
 import { m } from 'framer-motion';
 import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
 import { getStudentClassroom, getClassroomStudents, getLessons as getStudentLessons, type Classroom, type ClassroomStudent, type VocabularyLesson } from '@/lib/supabase/education';
+import Avatar from '@/components/Avatar';
 
 export default function StudentProfilePageClient() {
   const { user, profile, loading } = useAuth();
@@ -209,20 +209,12 @@ export default function StudentProfilePageClient() {
           {/* Avatar + Name Row */}
           <div className="flex items-center gap-6">
             {/* Avatar */}
-            {profile?.avatar_image ? (
-              <Image
-                src={profile.avatar_image}
-                alt={`${profile.display_name || profile.username}'s avatar`}
-                width={96}
-                height={96}
-                priority
-                className="w-24 h-24 rounded-full border-4 border-neo-black shadow-hard"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-neo-cyan border-4 border-neo-black shadow-hard flex items-center justify-center">
-                <span className="text-5xl text-neo-black">{profile?.avatar_emoji || '👤'}</span>
-              </div>
-            )}
+            <Avatar
+              customAvatar={profile?.avatar_config ?? null}
+              userId={user?.id}
+              pixelSize={96}
+              className="rounded-full border-4 border-neo-black shadow-hard"
+            />
 
             {/* Name + Level */}
             <div>

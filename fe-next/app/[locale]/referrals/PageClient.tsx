@@ -20,6 +20,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
+import AvatarLite from '@/components/AvatarLite';
 import { Loader } from '@/components/ui/Loader';
 import { trackShare } from '@/utils/growthTracking';
 import { stripEmoji } from '@/lib/share/stripEmoji';
@@ -213,12 +214,7 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
         {referrals.map(r => (
           <li key={r.id} className="flex items-center gap-3 px-4 py-3">
             {/* Avatar */}
-            <div
-              className="w-9 h-9 rounded-neo border-2 border-neo-black flex items-center justify-center text-lg shrink-0"
-              style={{ backgroundColor: r.avatarColor || 'var(--neo-gray)' }}
-            >
-              {r.avatarEmoji || (r.displayName?.[0] ?? r.username?.[0] ?? '?')}
-            </div>
+            <AvatarLite userId={r.referredId} pixelSize={36} />
             {/* Name + date */}
             <div className="flex-1 min-w-0">
               <div className="font-bold text-sm text-neo-white truncate">

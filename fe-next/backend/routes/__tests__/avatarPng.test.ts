@@ -29,19 +29,35 @@ const CONFIG = { base: 'diamond', eyes: 'dizzy', hair: 'pigtails', mouth: 'flat'
 describe('GET /api/avatar/png/:playerId', () => {
   it('renders the stored avatar_config to a cacheable PNG', async () => {
     maybeSingle.mockResolvedValueOnce({ data: { avatar_config: CONFIG } });
-    const res = await request(app).get(`/avatar-png/${ID}`).buffer(true);
+    const res = await request(app).get(`/avatar-png/${ID}?v=abc`).buffer(true);
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toBe('image/png');
     expect(res.headers['cache-control']).toContain('s-maxage');
     expect((res.body as Buffer).subarray(1, 4).toString()).toBe('PNG');
   }, 30000);
 
-  it('404s when the player has no config', async () => {
+  it('renders the same seeded face Avatar uses when the player has no config', async () => {
     maybeSingle.mockResolvedValueOnce({ data: { avatar_config: null } });
-    expect((await request(app).get(`/avatar-png/${ID}`)).status).toBe(404);
+    const res = await request(app).get(`/avatar-png/${ID}`).buffer(true);
+    expect(res.status).toBe(200);
+    expect((res.body as Buffer).subarray(1, 4).toString()).toBe('PNG');
+  }, 30000);
+
+  it('renders a seeded face for a non-uuid seed without touching the db', async () => {
+    mockSupabase.from.mockClear();
+    const res = await request(app).get('/avatar-png/guest-seed_1').buffer(true);
+    expect(res.status).toBe(200);
+    expect(mockSupabase.from).not.toHaveBeenCalled();
+  }, 30000);
+
+  it('400s on an unsafe seed', async () => {
+    expect((await request(app).get(`/avatar-png/${'x'.repeat(65)}`)).status).toBe(400);
+    expect((await request(app).get('/avatar-png/a.b')).status).toBe(400);
   });
 
-  it('400s on a non-uuid id', async () => {
-    expect((await request(app).get('/avatar-png/guest')).status).toBe(400);
-  });
+  it('caches unversioned urls briefly so art changes reach old links', async () => {
+    const res = await request(app).get('/avatar-png/guest-seed_1').buffer(true);
+    expect(res.headers['cache-control']).not.toContain('s-maxage');
+    expect(res.headers['cache-control']).toContain('max-age=300');
+  }, 30000);
 });

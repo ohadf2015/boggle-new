@@ -80,11 +80,12 @@ function TeacherProfileInner() {
         <NeoPanel tone="cream" className="mb-8 p-6">
           <div className="flex items-center gap-4">
             {/* Avatar */}
-            <div className="w-20 h-20 rounded-neo bg-neo-cyan border-3 border-neo-black shadow-hard-sm flex items-center justify-center shrink-0">
-              <span className="text-4xl text-neo-black" role="img" aria-label={t('teacher.profile.avatar')}>
-                {profile?.avatar_emoji || '👩‍🏫'}
-              </span>
-            </div>
+            <Avatar
+              customAvatar={profile?.avatar_config ?? null}
+              userId={user?.id}
+              size="xl"
+              className="shrink-0"
+            />
 
             {/* Name + role */}
             <div>
@@ -208,6 +209,7 @@ function TeacherProfileInner() {
 }
 
 import { TeacherGate } from '@/components/education/TeacherGate';
+import Avatar from '@/components/Avatar';
 
 /**
  * Shell above gate. `TeacherGate`'s loader and its denial are not this file's
