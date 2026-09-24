@@ -15,7 +15,7 @@
  * is still loading we show nothing rather than an upsell a later answer retracts
  * (recurring pitfall class 1).
  */
-export type TeacherBanner = 'trial' | 'pro' | 'none';
+export type TeacherBanner = 'trial' | 'pro' | 'reactivate' | 'none';
 
 export function pickTeacherBanner({
   hasTrial,
@@ -25,6 +25,7 @@ export function pickTeacherBanner({
   hasMilestone = true,
   milestoneLoading = false,
   proAskDismissed = false,
+  polarTrialExpired = false,
 }: {
   hasTrial: boolean;
   isAdmin: boolean;
@@ -35,12 +36,21 @@ export function pickTeacherBanner({
   hasMilestone?: boolean;
   milestoneLoading?: boolean;
   proAskDismissed?: boolean;
+  /**
+   * Polar Teacher Pro trial ended and they are not Pro. One reactivation
+   * ask — it replaces the access-trial banner and the milestone Pro strip
+   * so the dashboard never stacks three Pro asks.
+   */
+  polarTrialExpired?: boolean;
 }): TeacherBanner {
   // Pro is checked FIRST, and so is "Pro has not answered yet". A gifted-Pro
   // teacher keeps the trial deadline she was granted Pro to replace; checking
   // `hasTrial` first put a trial countdown over a Pro dashboard, and turned it
   // into an "Upgrade to Pro" card the day that dead deadline passed.
+  // A live Polar trial is Pro, so it also lands here (the days-left badge is
+  // not a banner). An expired Polar trial is the single ask below.
   if (proLoading || hasPro) return 'none';
+  if (polarTrialExpired) return 'reactivate';
   if (hasTrial) return 'trial';
   if (isAdmin) return 'none';
   // The Pro strip is a milestone ask, not a first-visit billboard. Hide it

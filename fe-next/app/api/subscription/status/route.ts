@@ -1,9 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
+import { polarTrialExpires } from '@/lib/education/polarTrial';
 import { getPolarClient } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
 import logger from '@/utils/logger';
+
+/**
+ * True once any webhook for this teacher was marked as a Polar trial.
+ * No trial column — the event payload is the record that blocks a second trial.
+ * A lookup failure is "not used": the live `trialing` row still hides the CTA.
+ */
+async function hasPolarTrialEvent(userId: string): Promise<boolean> {
+  try {
+    const admin = createAdminClient();
+    if (!admin) return false;
+    const { data, error } = await admin
+      .from('subscription_events')
+      .select('id')
+      .eq('user_id', userId)
+      .contains('payload', { trial: true })
+      .limit(1);
+    if (error) return false;
+    return Array.isArray(data) && data.length > 0;
+  } catch (err) {
+    logger.warn('Polar trial marker lookup failed:', err);
+    return false;
+  }
+}
 
 /**
  * GET /api/subscription/status
@@ -11,7 +35,10 @@ import logger from '@/utils/logger';
  *
  * Response:
  * - 200: { has_pro, tier, status, source, grant_expired, portal_url, current_period_end,
- *          cancel_at_period_end, grant: { id, expires_at, days, note, welcomed } | null }
+ *          cancel_at_period_end, trial_expires, trial_used,
+ *          grant: { id, expires_at, days, note, welcomed } | null }
+ *   trial_expires is the ISO trial end while status is trialing, else null.
+ *   trial_used is true once a Polar trial has started (no second free trial).
  * - 401: Unauthorized
  * - 500: Server error
  */
@@ -59,6 +86,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    const trialExpires = polarTrialExpires(subscription);
+    const onPolarTrial = trialExpires !== null || (
+      subscription.status === 'trialing' &&
+      subscription.tier === 'pro' &&
+      subscription.source !== 'admin_grant'
+    );
+    const trialUsed = onPolarTrial || await hasPolarTrialEvent(user.id);
+
     return NextResponse.json({
       has_pro: subscription.has_pro,
       tier: subscription.tier,
@@ -68,6 +103,8 @@ export async function GET(request: NextRequest) {
       portal_url: portalUrl,
       current_period_end: subscription.current_period_end,
       cancel_at_period_end: subscription.cancel_at_period_end,
+      trial_expires: trialExpires,
+      trial_used: trialUsed,
       grant,
     });
   } catch (err) {

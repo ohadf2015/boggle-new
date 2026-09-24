@@ -36,10 +36,22 @@ describe('TeacherPlanBadge', () => {
   });
 
   it('a paying Pro teacher sees PRO and the renewal date', () => {
-    mockUseTeacherPro.mockReturnValue({ hasPro: true, loading: false, source: 'polar', periodEnd: '2026-10-05T12:00:00Z', grant: null, grantExpired: false });
+    mockUseTeacherPro.mockReturnValue({ hasPro: true, loading: false, source: 'polar', status: 'active', periodEnd: '2026-10-05T12:00:00Z', trialExpires: null, trialUsed: true, grant: null, grantExpired: false });
     render(<TeacherPlanBadge />);
     expect(screen.getByTestId('teacher-plan-badge')).toHaveAttribute('data-plan', 'pro');
     expect(screen.getByText(/teacher.plan.renewsOn:/)).toBeInTheDocument();
+    expect(screen.queryByTestId('teacher-pro-trial-badge')).not.toBeInTheDocument();
+  });
+
+  it('a live Polar trial shows days left, not a renewal date', () => {
+    const trialExpires = new Date(Date.now() + 3 * 86400000).toISOString();
+    mockUseTeacherPro.mockReturnValue({
+      hasPro: true, loading: false, source: 'polar', status: 'trialing',
+      periodEnd: trialExpires, trialExpires, trialUsed: true, grant: null, grantExpired: false,
+    });
+    render(<TeacherPlanBadge />);
+    expect(screen.getByTestId('teacher-pro-trial-badge')).toHaveTextContent('teacher.plan.trialDaysLeft');
+    expect(screen.queryByText(/teacher.plan.renewsOn/)).not.toBeInTheDocument();
   });
 
   it('a free teacher sees "Free plan" and a link to upgrade', () => {

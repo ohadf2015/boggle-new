@@ -36,6 +36,9 @@ export function getProProductId(): string {
   return productId
 }
 
+/** Teacher Pro introductory trial. Paid checkouts send `allow_trial: false`. */
+export const POLAR_PRO_TRIAL_DAYS = 14
+
 // ---- API Client ----
 
 export function getPolarClient() {
@@ -79,18 +82,25 @@ export class PolarClient {
    * user to. `external_customer_id` + `metadata.user_id` both carry our user
    * id; Polar copies checkout metadata onto the resulting subscription, which
    * is how the webhook maps events back to a teacher.
+   *
+   * `allowTrial` defaults off. A paid checkout must send `allow_trial: false`
+   * so it does not inherit a product-level Polar trial. The trial path sends
+   * a 14-day day-interval and `metadata.trial: true`.
    */
   async createCheckout({
     userId,
     productId,
     email,
     redirectUrl,
+    allowTrial = false,
   }: {
     userId: string
     productId: string
     email?: string
     redirectUrl?: string
+    allowTrial?: boolean
   }): Promise<string> {
+    const trial = allowTrial === true
     const response = await this.request<{ url: string }>('/v1/checkouts/', {
       method: 'POST',
       body: JSON.stringify({
@@ -99,7 +109,12 @@ export class PolarClient {
           redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/teacher?checkout=success`,
         ...(email ? { customer_email: email } : {}),
         external_customer_id: userId,
-        metadata: { user_id: userId },
+        metadata: { user_id: userId, trial },
+        // Paid path must not inherit a trial configured on the Polar product.
+        allow_trial: trial,
+        ...(trial
+          ? { trial_interval: 'day', trial_interval_count: POLAR_PRO_TRIAL_DAYS }
+          : {}),
       }),
     })
 

@@ -1,11 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
+import { resolveProEntitlement } from '@/lib/education/proGrant';
 import { getPolarClient, getProProductId } from '@/lib/polar';
+import { createAdminClient } from '@/utils/supabase/admin';
 import logger from '@/utils/logger';
 
 /**
+ * A second free trial, or a trial on top of Pro, is a paid checkout instead.
+ * Lookup failure does not flip a first trial into a charge — it allows the trial.
+ */
+async function polarTrialBlocked(userId: string): Promise<boolean> {
+  const admin = createAdminClient();
+  if (!admin) return false;
+  try {
+    const { data: sub } = await admin
+      .from('subscriptions')
+      .select('tier,status,source,current_period_end')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (sub && resolveProEntitlement(sub, Date.now()).hasPro) return true;
+    const { data: events, error } = await admin
+      .from('subscription_events')
+      .select('id')
+      .eq('user_id', userId)
+      .contains('payload', { trial: true })
+      .limit(1);
+    if (error) return false;
+    return Array.isArray(events) && events.length > 0;
+  } catch (err) {
+    logger.warn('Polar trial eligibility lookup failed:', err);
+    return false;
+  }
+}
+
+/**
+ * `{ trial: true }` starts the 14-day Teacher Pro trial. Empty body, malformed
+ * JSON, and any other value stay on the paid checkout — older clients post
+ * with no body at all.
+ */
+async function wantsTrial(request: NextRequest): Promise<boolean> {
+  const raw = await request.text();
+  if (!raw.trim()) return false;
+  try {
+    const parsed = JSON.parse(raw) as { trial?: unknown };
+    return parsed?.trial === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * POST /api/subscription/checkout
- * Create a Polar checkout URL for the Pro subscription
+ * Create a Polar checkout URL for the Pro subscription.
+ * Body `{ trial: true }` opts into the 14-day free trial. No body = pay $9/mo.
  *
  * Response:
  * - 200: { url: string } — redirect to this URL
@@ -32,11 +79,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const requestedTrial = await wantsTrial(request);
+    const trial = requestedTrial && !(await polarTrialBlocked(user.id));
     const client = getPolarClient();
     const checkoutUrl = await client.createCheckout({
       userId: user.id,
       productId: getProProductId(),
       email: user.email ?? undefined,
+      allowTrial: trial,
     });
 
     return NextResponse.json({ url: checkoutUrl });

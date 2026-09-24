@@ -12,13 +12,23 @@ export interface TeacherProGrant {
   welcomed: boolean;
 }
 
+export type TeacherProStatus = 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing';
+
 export interface TeacherProState {
   hasPro: boolean;
   loading: boolean;
   /** Where Pro comes from: the payment provider or a complimentary admin grant. */
   source: SubscriptionSource;
+  /** Provider status. `trialing` is the Polar Teacher Pro trial, not access. */
+  status: TeacherProStatus;
   /** Renewal date (provider) or hard end date (grant). */
   periodEnd: string | null;
+  /** ISO Polar trial end while status is trialing, else null. */
+  trialExpires: string | null;
+  /** A Polar trial was started. Hides the free-trial CTA after it ends. */
+  trialUsed: boolean;
+  /** True only after a successful status read. A failure must not look like "never trialed". */
+  known: boolean;
   /** The complimentary grant record, when Pro is (or was) a gift. */
   grant: TeacherProGrant | null;
   /** A gift that has run out — the teacher is free again and should be told why. */
@@ -28,7 +38,7 @@ export interface TeacherProState {
 }
 
 const FREE: Omit<TeacherProState, 'loading' | 'refresh'> = {
-  hasPro: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false,
+  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, trialUsed: false, known: false, grant: null, grantExpired: false,
 };
 
 // The dashboard mounts several consumers at once (plan badge, ProGate, the
@@ -71,10 +81,15 @@ export function useTeacherPro(): TeacherProState {
       if (!response.ok) return;
       const data = await response.json();
       if (isCancelled()) return;
+      const status = (data?.status as TeacherProStatus) || 'active';
       setState({
         hasPro: data?.has_pro === true,
         source: (data?.source as SubscriptionSource) || 'polar',
+        status,
         periodEnd: (data?.current_period_end as string | null) ?? null,
+        trialExpires: typeof data?.trial_expires === 'string' ? data.trial_expires : null,
+        trialUsed: data?.trial_used === true || status === 'trialing',
+        known: true,
         grant: (data?.grant as TeacherProGrant | null) ?? null,
         grantExpired: data?.grant_expired === true,
       });

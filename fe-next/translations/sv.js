@@ -12794,7 +12794,11 @@ const sv = {
       "upgrade": "Uppgradera",
       "giftedUntil": "Gåva · till {date}",
       "renewsOn": "Förnyas {date}",
-      "giftEnded": "Pro-gåvan har tagit slut"
+      "giftEnded": "Pro-gåvan har tagit slut",
+      "trialActive": "Pro-provperiod",
+      "trialDayLeft": "1 dag kvar",
+      "trialDaysLeft": "{count} dagar kvar",
+      "trialEndsToday": "Slutar idag"
     },
     "proGate": {
       "analytics": {
@@ -12821,6 +12825,8 @@ const sv = {
       "loadError": "Kunde inte läsa in senaste lektionen.",
       "retry": "Försök igen",
       "proCtaHint": "Lås upp varje spel, varje elev och utskrivbara PDF:er.",
+      "weeklySubject": "Den här veckan i din klass",
+      "polarTrialExpiredLine": "Din provperiod på Teacher Pro är slut. Aktivera igen för att behålla klassrapporterna.",
       "regionLabel": "Fortgångssammandrag för {{classroom}}",
       "scheduleReteachCta": "Schemalägg reteach-Live om ~{{days}} dagar",
       "scheduleReteachConfirm": "Reteach-Live schemalagd till {{date}} (~{{days}} dagar). Kalenderinbjudan öppnades.",
@@ -12852,6 +12858,11 @@ const sv = {
       "perMonth": "/månad",
       "autoRenew": "Förnyas automatiskt varje månad. Avsluta när du vill.",
       "upgradeNow": "Uppgradera till Pro nu",
+      "startTrial": "Starta 14 dagars gratis provperiod",
+      "trialCtaSubtext": "Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
+      "trialEndedTitle": "Din provperiod på Teacher Pro är slut",
+      "trialEndedBody": "Aktivera igen för 9 $/månad. Det här är inte en ny gratis provperiod.",
+      "trialEndedCta": "Behåll Pro — 9 $/mån",
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",

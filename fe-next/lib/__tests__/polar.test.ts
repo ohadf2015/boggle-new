@@ -109,11 +109,30 @@ describe('PolarClient.createCheckout', () => {
     expect(endpoint).toBe('https://sandbox-api.polar.sh/v1/checkouts/')
     expect(init.method).toBe('POST')
     expect(init.headers.Authorization).toBe('Bearer token-123')
-    expect(JSON.parse(init.body)).toMatchObject({
+    const body = JSON.parse(init.body)
+    expect(body).toMatchObject({
       products: ['prod-1'],
       customer_email: 'teacher@example.com',
       external_customer_id: 'user-1',
-      metadata: { user_id: 'user-1' },
+      metadata: { user_id: 'user-1', trial: false },
+      allow_trial: false,
+    })
+    expect(body.trial_interval).toBeUndefined()
+  })
+
+  it('a trial checkout asks Polar for 14 days and marks metadata.trial', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/trial' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    const client = new PolarClient('token-123', 'sandbox')
+    await client.createCheckout({ userId: 'user-1', productId: 'prod-1', allowTrial: true })
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
+      allow_trial: true,
+      trial_interval: 'day',
+      trial_interval_count: 14,
+      metadata: { user_id: 'user-1', trial: true },
     })
   })
 

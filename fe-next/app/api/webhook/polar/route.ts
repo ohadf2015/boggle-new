@@ -61,6 +61,27 @@ function getUserId(p: WebhookPayload): string | undefined {
   return undefined
 }
 
+/**
+ * While Polar says `trialing`, the row's period end is the trial end
+ * (`trial_end`, else the period end Polar sent). After the trial converts,
+ * the renewal date is `current_period_end` again.
+ */
+function subscriptionPeriodEnd(data: WebhookPayload): string | null {
+  if (String(data?.status ?? '') === 'trialing') {
+    if (typeof data?.trial_end === 'string' && data.trial_end) return data.trial_end
+  }
+  return typeof data?.current_period_end === 'string' ? data.current_period_end : null
+}
+
+/** So a later status read can tell a trial checkout from a paid one. */
+function trialMarker(data: WebhookPayload): { trial: boolean; trial_end: string | null } {
+  const meta = data?.metadata?.trial
+  const metaTrial = meta === true || meta === 'true'
+  const trialEnd = typeof data?.trial_end === 'string' && data.trial_end ? data.trial_end : null
+  const trialing = String(data?.status ?? '') === 'trialing'
+  return { trial: trialing || metaTrial || trialEnd !== null, trial_end: trialEnd }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text()
@@ -118,11 +139,12 @@ export async function POST(request: NextRequest) {
         console.log(`[Polar] Unhandled event: ${eventType}`)
     }
 
+    const marker = trialMarker(payload?.data)
     await logSubscriptionEvent({
       userId,
       eventType,
       subscriptionId: String(payload?.data?.id ?? ''),
-      payload: { event_type: eventType, user_id: userId },
+      payload: { event_type: eventType, user_id: userId, trial: marker.trial, trial_end: marker.trial_end },
     })
 
     return NextResponse.json({ received: true })
@@ -144,7 +166,7 @@ async function handleSubscriptionActive(payload: WebhookPayload, userId?: string
     status: mapStatus(data.status),
     providerSubscriptionId: String(data.id ?? ''),
     providerProductId: getProductId(payload),
-    currentPeriodEnd: (data.current_period_end as string | null) ?? null,
+    currentPeriodEnd: subscriptionPeriodEnd(data),
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end ?? false),
   })
 }
@@ -158,7 +180,7 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
     status: mapStatus(data.status),
     providerSubscriptionId: String(data.id ?? ''),
     providerProductId: getProductId(payload),
-    currentPeriodEnd: (data.current_period_end as string | null) ?? null,
+    currentPeriodEnd: subscriptionPeriodEnd(data),
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end ?? false),
   })
 }
@@ -177,7 +199,7 @@ async function handleSubscriptionCanceled(payload: WebhookPayload, userId?: stri
     status: mapStatus(data.status),
     providerSubscriptionId: String(data.id ?? ''),
     providerProductId: getProductId(payload),
-    currentPeriodEnd: (data.current_period_end as string | null) ?? null,
+    currentPeriodEnd: subscriptionPeriodEnd(data),
     cancelAtPeriodEnd: true,
   })
 }

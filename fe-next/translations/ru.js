@@ -11506,7 +11506,11 @@ const ru = {
       "upgrade": "Улучшить",
       "giftedUntil": "Подарок · до {date}",
       "renewsOn": "Продление {date}",
-      "giftEnded": "Подарочный Pro закончился"
+      "giftEnded": "Подарочный Pro закончился",
+      "trialActive": "Пробный Pro",
+      "trialDayLeft": "Остался 1 день",
+      "trialDaysLeft": "Осталось {count} дн.",
+      "trialEndsToday": "Заканчивается сегодня"
     },
     "proGate": {
       "analytics": {
@@ -11533,6 +11537,8 @@ const ru = {
       "loadError": "Не удалось загрузить последний урок.",
       "retry": "Повторить",
       "proCtaHint": "Откройте каждую игру, каждого ученика и PDF для печати.",
+      "weeklySubject": "Эта неделя в вашем классе",
+      "polarTrialExpiredLine": "Пробный Teacher Pro закончился. Возобновите его, чтобы сохранить отчёты класса.",
       "regionLabel": "Сводка прогресса для {{classroom}}",
       "scheduleReteachCta": "Запланировать reteach Live через ~{{days}} дн.",
       "scheduleReteachConfirm": "Reteach Live запланирован на {{date}} (~{{days}} дн.). Приглашение в календарь открыто.",
@@ -11564,6 +11570,11 @@ const ru = {
       "perMonth": "/месяц",
       "autoRenew": "Продлевается автоматически каждый месяц. Отмена в любой момент.",
       "upgradeNow": "Перейти на Pro",
+      "startTrial": "Начать 14 дней бесплатно",
+      "trialCtaSubtext": "14 дней бесплатно, затем 9 $ в месяц. Отмена в любой момент.",
+      "trialEndedTitle": "Пробный Teacher Pro закончился",
+      "trialEndedBody": "Верните Pro за 9 $ в месяц. Это не ещё одна бесплатная пробная версия.",
+      "trialEndedCta": "Оставить Pro — 9 $/мес",
       "checkoutError": "Не удалось начать оплату. Попробуйте ещё раз.",
       "signInRequired": "Пожалуйста, войдите для перехода на Teacher Pro.",
       "currentPlan": "Ваш текущий план",

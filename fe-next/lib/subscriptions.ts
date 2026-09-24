@@ -65,8 +65,8 @@ export async function checkTeacherSubscription(
     }
   }
 
-  // One rule for "is this teacher Pro": provider rows on tier+status, admin grants
-  // also on their deadline (nothing renews a grant). See lib/education/proGrant.ts.
+  // One rule for "is this teacher Pro": provider rows on tier + active or
+  // trialing, admin grants also on their deadline. See lib/education/proGrant.ts.
   const entitlement = resolveProEntitlement(data, Date.now())
   const freeConfig = getTierConfig('free')
 
