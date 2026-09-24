@@ -37,8 +37,10 @@ const SCREENS: readonly [string, string][] = [
 describe.each(SCREENS)('%s', (_route, file) => {
   const src = readFileSync(path.join(ROOT, file), 'utf8');
 
-  it('mounts the shared EducationShell', () => {
-    expect(src).toContain('EducationShell');
+  it('mounts the shared EducationShell (or the Academy frame that honours the same contract)', () => {
+    // Student Academy pages (2026-09-24) mount AcademyPageFrame; the frame itself is held to the
+    // same one-scroller / no-min-h-screen contract below.
+    expect(src).toMatch(/EducationShell|AcademyPageFrame/);
   });
 
   it('has no min-h-screen / min-h-dvh / h-screen root left, on any branch', () => {
@@ -49,5 +51,19 @@ describe.each(SCREENS)('%s', (_route, file) => {
 
   it('adds no scroller of its own — the shell owns the only one', () => {
     expect(src).not.toMatch(/overflow-y-auto/);
+  });
+});
+
+describe('AcademyPageFrame (the Academy pages\' shell)', () => {
+  const src = readFileSync(path.join(ROOT, 'components/student/pages/AcademyPageFrame.tsx'), 'utf8');
+
+  it('never grows past the viewport', () => {
+    expect(src).not.toMatch(/min-h-screen/);
+    expect(src).not.toMatch(/min-h-dvh/);
+    expect(src).not.toMatch(/\bh-screen\b/);
+  });
+
+  it('owns exactly one scrolling region', () => {
+    expect(src.match(/overflow-y-auto/g) ?? []).toHaveLength(1);
   });
 });

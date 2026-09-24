@@ -93,14 +93,12 @@ export const HqModeCard = memo(function HqModeCard({
           !selected && HQ_ACCENT_STAGE[mode.accent],
         )}
       >
-        <m.span
-          className="absolute inset-[5%]"
-          animate={selected && !reduced ? { y: [0, -6, 0] } : { y: 0 }}
-          transition={
-            selected && !reduced
-              ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
-              : { duration: 0.15 }
-          }
+        <span
+          className={cn(
+            "absolute inset-[5%]",
+            // ponytail: CSS bob (not framer keyframes) — a y:[0,-6,0] under the card's spring threw in motion
+            selected && !reduced && "motion-safe:animate-float",
+          )}
         >
           {/* A hard-edged pedestal under the island — a stage, not a glow. */}
           <span
@@ -120,7 +118,7 @@ export const HqModeCard = memo(function HqModeCard({
             draggable={false}
             className="absolute inset-0 m-auto size-full select-none object-contain drop-shadow-[0_4px_0_rgba(0,0,0,0.55)] transition-transform duration-200 group-hover:scale-105"
           />
-        </m.span>
+        </span>
       </span>
 
       {/* Name plate. */}
