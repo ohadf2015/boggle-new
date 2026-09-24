@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
-import { createBoard, getCell, isFirstMove, type Board, type BoardSize } from './board';
+import { createBoard, getCell, isFirstMove, placeTiles, type Board, type BoardSize } from './board';
 import { createBag, draw, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { seedOpeningRack, drawTowardTarget, nextLessonTarget } from './lessonBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
@@ -85,7 +85,7 @@ export interface WordCraftState {
    */
   seed: number;
   /** Classroom homework: lesson words the deal steers toward (lib/word-craft/lessonBag.ts). */
-  lesson?: { targets: readonly string[]; locale: SupportedLocale };
+  lesson?: { targets: readonly string[]; locale: SupportedLocale; initialTiles?: readonly PlacedTile[] };
   /**
    * The game's very first tile-select auto-places that tile on the center cell
    * (recallable) to remove the blank-board "where do I start?" decision. This
@@ -116,7 +116,7 @@ type Action =
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean; modifierOverride?: WordCraftModifier; lessonTargets?: readonly string[] }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean; modifierOverride?: WordCraftModifier; lessonTargets?: readonly string[]; initialTiles?: readonly PlacedTile[] }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
@@ -125,6 +125,8 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
   const hotseat = typeof init === 'number' ? false : (init.hotseat ?? false);
   const modifierOverride = typeof init === 'number' ? undefined : init.modifierOverride;
   const lessonTargets = typeof init === 'number' ? undefined : init.lessonTargets;
+  // Academy Word Workshop opener: pre-placed, unclaimed tiles (never from the bag). Absent = stock empty board.
+  const initialTiles = typeof init === 'number' ? undefined : init.initialTiles;
 
   const finalBoardSize = viewportDims?.size ?? boardSize;
   const bag = createBag({ seed, locale, bagSize: viewportDims?.bagSize });
@@ -137,10 +139,12 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
   if (lessonTargets?.length) bag.tiles = seedOpeningRack(bag.tiles, lessonTargets[0], locale);
   const playerRack = draw(bag, rackSize);
   const botRack = draw(bag, rackSize);
+  const board = createBoard(finalBoardSize, { premiums: false });
+  if (initialTiles?.length) placeTiles(board, initialTiles.map((t) => ({ ...t })));
   return {
     // Conquest mode: a neutral grid with no premium squares and no center
     // star. Every cell is plain until a player claims it.
-    board: createBoard(finalBoardSize, { premiums: false }),
+    board,
     bag,
     player: { id: 'player', name: 'You', score: 0, rack: playerRack, isBot: false },
     bot: { id: 'bot', name: BOT_NAME, score: 0, rack: botRack, isBot: true },
@@ -164,7 +168,9 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
     modifier,
     rackSize,
     seed,
-    ...(lessonTargets?.length ? { lesson: { targets: lessonTargets, locale } } : {}),
+    ...(lessonTargets?.length || initialTiles?.length
+      ? { lesson: { targets: lessonTargets ?? [], locale, ...(initialTiles?.length ? { initialTiles } : {}) } }
+      : {}),
     autoCenterDone: false,
   };
 }
@@ -385,7 +391,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       // viewportDims carries the locked board size + solo bag size so a
       // play-again (or locale switch) keeps the same tight bag instead of
       // silently falling back to the full default 100-tile bag.
-      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims, modifierOverride: action.modifierOverride, lessonTargets: state.lesson?.targets });
+      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims, modifierOverride: action.modifierOverride, lessonTargets: state.lesson?.targets, initialTiles: state.lesson?.initialTiles });
     default:
       return state;
   }
@@ -429,11 +435,13 @@ export interface UseWordCraftGameOptions {
   modifierOverride?: WordCraftModifier;
   /** Classroom homework: canonical lesson targets (`lessonTargetsFor`) — seeded into the deal and always valid words. */
   lessonTargets?: readonly string[];
+  /** Academy Word Workshop: tiles already on the board at the start (unclaimed). Omit for the stock empty board. */
+  initialTiles?: readonly PlacedTile[];
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride, lessonTargets }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride, lessonTargets, initialTiles }: UseWordCraftGameOptions) {
   const tuning = botTuning(difficulty);
   const effectiveVariance = botSkillVariance ?? tuning.skillVariance;
   // Capture dims at initialization and lock them for the game lifetime. A duel
@@ -444,7 +452,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   );
   const initialDims = initialDimsRef.current;
 
-  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat, modifierOverride, lessonTargets }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat, modifierOverride, lessonTargets]);
+  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat, modifierOverride, lessonTargets, initialTiles }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat, modifierOverride, lessonTargets, initialTiles]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
 
   // Active per-game scoring modifier, applied symmetrically to player commits,

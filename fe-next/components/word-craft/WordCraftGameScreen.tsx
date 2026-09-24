@@ -67,6 +67,7 @@ import {
   trackWordCraftGameStarted,
   trackWordCraftDictRetryClicked,
   emitWordCraftGameEnd,
+  emitWordCraftMove,
   type WordCraftInputMethod,
 } from '@/components/word-craft/wordCraftTelemetry';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -75,7 +76,8 @@ import { countClaimed } from '@/lib/word-craft/territory';
 import { cellsGainedThisTurn } from '@/lib/word-craft/territoryFeedback';
 import { cn } from '@/lib/utils';
 import { parseDuel, compareDuel } from '@/lib/word-craft/duel';
-import { PHONE_DIMS } from '@/lib/word-craft/boardDimensions';
+import { PHONE_DIMS, type BoardDims } from '@/lib/word-craft/boardDimensions';
+import type { PlacedTile } from '@/lib/word-craft/types';
 import { resolveChallengerIdentity } from '@/lib/word-craft/challengerIdentity';
 import { WordCraftDuelTargetStrip } from '@/components/word-craft/WordCraftDuelTargetStrip';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -118,7 +120,20 @@ interface GameViewProps {
   /** Player-picked twist from the setup screen; undefined = seeded surprise roll. */
   modifierOverride?: WordCraftModifier;
   /** Classroom homework: dealt in the lesson's locale with its words seeded; Back/Home return to the lesson. */
-  lesson?: { locale: SupportedLocale; targets: readonly string[]; onExit: () => void };
+  lesson?: {
+    locale: SupportedLocale;
+    targets: readonly string[];
+    onExit: () => void;
+    dims?: BoardDims;
+    /** Academy Word Workshop: no site header — the game's own Back is the only exit (never home). */
+    bare?: boolean;
+    /** Academy Word Workshop: tiles already on the board at the start (the rival's unclaimed opener). */
+    initialTiles?: readonly PlacedTile[];
+    /** false = hide the first-move 1-2-3 guide, the axis hint text and the live step pill (the host shows its own one-time coach). */
+    guide?: boolean;
+    /** false = no achievement toasts (academy lessons do not award public-game achievements). */
+    achievements?: boolean;
+  };
 }
 
 export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, difficulty, modifierOverride, lesson }: GameViewProps) {
@@ -171,7 +186,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // difficulty so both players play the *identical* game and the bot
   // contributes equally to each side's Territory score.
   const effectiveDifficulty = duel?.difficulty ?? difficulty;
-  const forcedDims = duel ? (duel.dims ?? PHONE_DIMS) : undefined;
+  // `lesson.dims` (opt-in, academy Word Workshop): a shorter board/bag for a 4-6 min match.
+  const forcedDims = duel ? (duel.dims ?? PHONE_DIMS) : lesson?.dims;
   const game = useWordCraftGame({
     seed,
     dict,
@@ -184,6 +200,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
     modifierOverride: duel ? undefined : modifierOverride,
     forcedDims,
     lessonTargets: lesson?.targets,
+    initialTiles: lesson?.initialTiles,
   });
   const { cosyMode } = useAccessibility();
   const prefersReducedMotion = useReducedMotion();
@@ -234,6 +251,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   }, [hotseat, game.state.turn, playHandoff]);
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
+  // Academy lessons (lesson.achievements === false) never toast public-game achievements.
+  const achievementsOn = lesson?.achievements !== false;
   const [sceneCtx, setSceneCtx] = useState<SceneCtx | null>(null);
 
   // --- Telemetry plumbing ---
@@ -682,7 +701,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
       }
 
       // Achievement: first word
-      if (!firstWordAchievedRef.current) {
+      if (!firstWordAchievedRef.current && achievementsOn) {
         firstWordAchievedRef.current = true;
         queueAchievement({ key: 'wordcraft_first_word', icon: '🎉' });
       }
@@ -715,11 +734,11 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
       }
 
       // Achievement: bingo
-      if (isBingo) {
+      if (isBingo && achievementsOn) {
         queueAchievement({ key: 'wordcraft_bingo', icon: '⭐' });
       }
     }
-  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game, cosyMode, playCommitSound, playOpponentScored]);
+  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, achievementsOn, sceneCtx, game, cosyMode, playCommitSound, playOpponentScored]);
 
   // (Conquest removed the heat / overdrive / burnout systems and the
   // premium-cell ambient sparkles — territory captures are the only momentum.)
@@ -737,6 +756,19 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // authoritative "score" for the win condition, personal best, duel
   // comparison, and the end-game scene — the internal point total stays a
   // hidden bot-ranking signal only.
+  // Committed moves → listeners (academy Word Workshop callouts). Cursor resets
+  // when history shrinks (new game); no listeners = no-op.
+  const emittedMovesRef = useRef(0);
+  useEffect(() => {
+    const history = game.state.history;
+    if (history.length < emittedMovesRef.current) emittedMovesRef.current = 0;
+    for (let i = emittedMovesRef.current; i < history.length; i++) {
+      const { who, words, score } = history[i];
+      emitWordCraftMove({ who, words, score }, { hotseat });
+    }
+    emittedMovesRef.current = history.length;
+  }, [game.state.history, hotseat]);
+
   const playerTerritory = useMemo(() => countClaimed(game.state.board, 'player'), [game.state.board]);
   const botTerritory = useMemo(() => countClaimed(game.state.board, 'bot'), [game.state.board]);
 
@@ -832,6 +864,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
 
   // First-move flag drives the rack glow (no center star to ping anymore).
   const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
+  const showGuide = lesson?.guide !== false;
 
   const showPendingStrip = game.state.pendingPlacements.length > 0;
   // Whether the on-screen human may act now. Bot-mode: only on the player's
@@ -884,7 +917,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[220px] bg-gradient-to-b from-neo-purple/20 via-neo-pink/8 to-transparent"
       />
-      <Header />
+      {!lesson?.bare && <Header />}
       <WordCraftCelebration kind={celebration.kind} burstId={celebration.burstId} origin={celebration.origin} />
       <WordCraftLiveRegion
         pending={game.state.pendingPlacements}
@@ -1030,7 +1063,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
               onRecallPending={recallFromBoard}
               onSceneCtx={setSceneCtx}
               isDisabled={!canInteract}
-              isFirstMove={isFirstMove}
+              // An opener on the board (academy) = no empty-board centre-star zoom.
+              isFirstMove={isFirstMove && !lesson?.initialTiles?.length}
               dragHoverCell={drag?.active ? drag.hoverCell : null}
               locale={locale}
               reticle={reticle}
@@ -1077,7 +1111,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           // On the very first move we also surface the place→submit steps inline
           // so new players know how to put letters down without opening the tutor.
           <div className="flex flex-col items-center gap-1 py-0.5 shrink-0">
-            {isFirstMove ? (
+            {isFirstMove && showGuide ? (
               <WordCraftPlacementGuide
                 labels={{
                   step1: t('wordcraft.place.step1', 'Tap a letter'),
@@ -1094,7 +1128,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
                 labelVertical={t('wordcraft.axis.vertical')}
                 ariaLabel={t('wordcraft.axis.flipAria')}
               />
-              <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>
+              {showGuide && <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>}
             </div>
           </div>
         ) : null}
@@ -1106,7 +1140,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
             the first few turns so veterans aren't nagged. */}
         <WordCraftStepHint
           step={
-            game.state.history.length < hintTurnLimit && game.state.turn !== 'over'
+            showGuide && game.state.history.length < hintTurnLimit && game.state.turn !== 'over'
               ? resolveWordCraftStep({
                   turn: game.state.turn,
                   selectedTileId: game.state.selectedRackTileId,
@@ -1137,7 +1171,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           draggingTileId={drag?.active ? drag.tileId : null}
           disabled={!canInteract || !dict}
           ariaLabel={t('wordcraft.yourRack')}
-          hintPick={wantsPick && isFirstMove}
+          hintPick={wantsPick && isFirstMove && showGuide}
           locale={locale}
           isGolden={goldenLookup}
         />

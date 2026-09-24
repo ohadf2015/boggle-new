@@ -187,6 +187,32 @@ export function onWordCraftGameEnd(listener: WordCraftGameEndListener): () => vo
   };
 }
 
+/**
+ * Subscribe to committed moves (player AND bot, passes included — filter on
+ * `who`). The academy Word Workshop uses it for its lesson-word callout.
+ * Returns an unsubscribe. With no listeners this is a no-op.
+ */
+export interface WordCraftMoveEvent { who: 'player' | 'bot'; words: readonly string[]; score: number }
+type WordCraftMoveListener = (move: WordCraftMoveEvent, opts: { hotseat: boolean }) => void;
+const moveListeners = new Set<WordCraftMoveListener>();
+
+export function onWordCraftMove(listener: WordCraftMoveListener): () => void {
+  moveListeners.add(listener);
+  return () => {
+    moveListeners.delete(listener);
+  };
+}
+
+export function emitWordCraftMove(move: WordCraftMoveEvent, opts: { hotseat: boolean }): void {
+  for (const listener of moveListeners) {
+    try {
+      listener(move, opts);
+    } catch {
+      // a host's bug must not break the turn loop
+    }
+  }
+}
+
 export function emitWordCraftGameEnd(
   state: WordCraftState,
   opts: { hotseat: boolean },

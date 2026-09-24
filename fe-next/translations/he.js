@@ -5334,6 +5334,18 @@ const he = {
     "viewProgress": "צפה בהתקדמות"
   },
   "achievements": {
+    "wordcraft_first_word": {
+      "name": "מילה ראשונה על הלוח",
+      "description": "הניחו את המילה הראשונה ב-Word Craft"
+    },
+    "wordcraft_bingo": {
+      "name": "בינגו!",
+      "description": "השתמשו בכל שבע האותיות במילה אחת"
+    },
+    "wordcraft_linguist": {
+      "name": "בלשן",
+      "description": "שחקו Word Craft בשלוש שפות"
+    },
     "first_lesson": {
       "name": "שיעור ראשון",
       "description": "לסיים את השיעור הראשון"

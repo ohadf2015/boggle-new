@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 7185,
+    "totalKeysInCode": 7197,
     "keyCountByLanguage": {
-      "en": 13854,
-      "es": 14142,
-      "he": 14064,
-      "ja": 14123,
-      "ru": 13896,
-      "sv": 14120
+      "en": 13917,
+      "es": 14205,
+      "he": 14127,
+      "ja": 14186,
+      "ru": 13959,
+      "sv": 14183
     },
-    "missingFromEnglish": 117,
+    "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 397,
+      "templateLiterals": 399,
       "fallbackUsages": 1,
       "variableKeys": 116
     }
@@ -1479,7 +1479,7 @@
         "pattern": "`teacher.playNow.failure.${failure.code}`",
         "type": "template_literal",
         "file": "components/education/ClassroomGameLobbyExpress.tsx",
-        "line": 333,
+        "line": 347,
         "context": "{t(`teacher.playNow.failure.${failure.code}`)}"
       },
       {
@@ -2214,7 +2214,7 @@
         "pattern": "`teacher.proWelcome.perk.${key}`",
         "type": "template_literal",
         "file": "components/teacher/ProWelcomeCelebration.tsx",
-        "line": 122,
+        "line": 137,
         "context": "<span className=\"text-sm font-bold text-black\">{t(`teacher.proWelcome.perk.${key}`)}</span>"
       },
       {
@@ -2288,6 +2288,20 @@
         "context": "{t(`teacher.curriculum.subjects.${list.subject}`)}"
       },
       {
+        "pattern": "`teacher.pulse.state.${pulse.state}`",
+        "type": "template_literal",
+        "file": "components/teacher/hq/ClassroomCardActivity.tsx",
+        "line": 18,
+        "context": "if (pulse.daysSinceLastGame === null) return t(`teacher.pulse.state.${pulse.state}`);"
+      },
+      {
+        "pattern": "`teacher.pulse.action.${pulse.nextAction}`",
+        "type": "template_literal",
+        "file": "components/teacher/hq/ClassroomCardActivity.tsx",
+        "line": 55,
+        "context": "{isLoading ? \"…\" : t(`teacher.pulse.action.${pulse.nextAction}`)}"
+      },
+      {
         "pattern": "`teacher.classReport.practice.${drill.practiceKey}`",
         "type": "template_literal",
         "file": "components/teacher/report/StudentDrillDownPanel.tsx",
@@ -2326,7 +2340,7 @@
         "pattern": "`wordcraft.encouragement.${encIdx}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftGameScreen.tsx",
-        "line": 640,
+        "line": 650,
         "context": "const encouragement = t(`wordcraft.encouragement.${encIdx}`);"
       },
       {
@@ -3160,7 +3174,7 @@
         "variable": "startError",
         "type": "variable_key",
         "file": "components/education/ClassroomGameLobby.tsx",
-        "line": 394,
+        "line": 395,
         "context": "{t(startError)}"
       },
       {
@@ -3750,163 +3764,6 @@
     "sv": []
   },
   "missingFromEnglish": [
-    {
-      "key": "academy.modes.openForXp",
-      "usages": [
-        {
-          "file": "components/education/academyModes/AcademyReward.tsx",
-          "line": 216
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.review.chest.bronze",
-      "usages": [
-        {
-          "file": "components/education/academyModes/MissedWordsReview.tsx",
-          "line": 114
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.review.chest.gold",
-      "usages": [
-        {
-          "file": "components/education/academyModes/MissedWordsReview.tsx",
-          "line": 114
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.review.chest.silver",
-      "usages": [
-        {
-          "file": "components/education/academyModes/MissedWordsReview.tsx",
-          "line": 114
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.review.perfect",
-      "usages": [
-        {
-          "file": "components/education/academyModes/MissedWordsReview.tsx",
-          "line": 226
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.review.runDone",
-      "usages": [
-        {
-          "file": "components/education/academyModes/MissedWordsReview.tsx",
-          "line": 226
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.review.statCorrect",
-      "usages": [
-        {
-          "file": "components/education/academyModes/MissedWordsReview.tsx",
-          "line": 243
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.review.statPoints",
-      "usages": [
-        {
-          "file": "components/education/academyModes/MissedWordsReview.tsx",
-          "line": 245
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.review.statStreak",
-      "usages": [
-        {
-          "file": "components/education/academyModes/MissedWordsReview.tsx",
-          "line": 244
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.workshop.lessonWords",
-      "usages": [
-        {
-          "file": "components/education/academyModes/WorkshopPanels.tsx",
-          "line": 138
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.workshop.panelHint",
-      "usages": [
-        {
-          "file": "components/education/academyModes/WorkshopPanels.tsx",
-          "line": 148
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.workshop.rival.name",
-      "usages": [
-        {
-          "file": "components/education/academyModes/WordWorkshop.tsx",
-          "line": 236
-        },
-        {
-          "file": "components/education/academyModes/WorkshopRival.tsx",
-          "line": 44
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.workshop.starsValue",
-      "usages": [
-        {
-          "file": "components/education/academyModes/WordWorkshop.tsx",
-          "line": 351
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.workshop.statLessonWords",
-      "usages": [
-        {
-          "file": "components/education/academyModes/WordWorkshop.tsx",
-          "line": 350
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.workshop.statStars",
-      "usages": [
-        {
-          "file": "components/education/academyModes/WordWorkshop.tsx",
-          "line": 351
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.workshop.statWords",
-      "usages": [
-        {
-          "file": "components/education/academyModes/WordWorkshop.tsx",
-          "line": 352
-        }
-      ]
-    },
-    {
-      "key": "academy.modes.workshop.you",
-      "usages": [
-        {
-          "file": "components/education/academyModes/WordWorkshop.tsx",
-          "line": 237
-        }
-      ]
-    },
     {
       "key": "admin.teacherAccess.col.use_case",
       "usages": [

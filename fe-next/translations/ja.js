@@ -5291,6 +5291,18 @@ const ja = {
     "viewProgress": "進捗を見る"
   },
   "achievements": {
+    "wordcraft_first_word": {
+      "name": "はじめの一語",
+      "description": "Word Craftで最初の単語を置こう"
+    },
+    "wordcraft_bingo": {
+      "name": "ビンゴ！",
+      "description": "7枚のタイルを全部使って1語を作ろう"
+    },
+    "wordcraft_linguist": {
+      "name": "言語マスター",
+      "description": "3つの言語でWord Craftを遊ぼう"
+    },
     "first_lesson": {
       "name": "はじめの一歩",
       "description": "最初のレッスンをクリアする"

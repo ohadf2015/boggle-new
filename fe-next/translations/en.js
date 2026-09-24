@@ -4841,6 +4841,18 @@ const en = {
     "viewProgress": "View Progress"
   },
   "achievements": {
+    "wordcraft_first_word": {
+      "name": "First Word Down",
+      "description": "Play your first word in Word Craft"
+    },
+    "wordcraft_bingo": {
+      "name": "Bingo!",
+      "description": "Use all seven tiles in one word"
+    },
+    "wordcraft_linguist": {
+      "name": "Linguist",
+      "description": "Play Word Craft in three languages"
+    },
     "first_lesson": {
       "name": "First Lesson",
       "description": "Finish your very first lesson"

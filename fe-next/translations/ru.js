@@ -10667,6 +10667,18 @@ const ru = {
     }
   },
   "achievements": {
+    "wordcraft_first_word": {
+      "name": "Первое слово",
+      "description": "Выложи первое слово в Word Craft"
+    },
+    "wordcraft_bingo": {
+      "name": "Бинго!",
+      "description": "Используй все семь фишек в одном слове"
+    },
+    "wordcraft_linguist": {
+      "name": "Лингвист",
+      "description": "Сыграй в Word Craft на трёх языках"
+    },
     "first_lesson": {
       "name": "Первый урок",
       "description": "Пройди свой первый урок"

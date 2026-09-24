@@ -5576,6 +5576,18 @@ const sv = {
     "viewProgress": "Se Framsteg"
   },
   "achievements": {
+    "wordcraft_first_word": {
+      "name": "Första ordet",
+      "description": "Lägg ditt första ord i Word Craft"
+    },
+    "wordcraft_bingo": {
+      "name": "Bingo!",
+      "description": "Använd alla sju brickor i ett ord"
+    },
+    "wordcraft_linguist": {
+      "name": "Lingvist",
+      "description": "Spela Word Craft på tre språk"
+    },
     "first_lesson": {
       "name": "Första lektionen",
       "description": "Klara din allra första lektion"

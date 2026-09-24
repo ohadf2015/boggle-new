@@ -4911,6 +4911,18 @@ const es = {
     }
   },
   "achievements": {
+    "wordcraft_first_word": {
+      "name": "Primera palabra",
+      "description": "Juega tu primera palabra en Word Craft"
+    },
+    "wordcraft_bingo": {
+      "name": "¡Bingo!",
+      "description": "Usa las siete fichas en una sola palabra"
+    },
+    "wordcraft_linguist": {
+      "name": "Lingüista",
+      "description": "Juega Word Craft en tres idiomas"
+    },
     "first_lesson": {
       "name": "Primera lección",
       "description": "Termina tu primera lección"
