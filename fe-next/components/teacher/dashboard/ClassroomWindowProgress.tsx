@@ -120,7 +120,7 @@ export function ClassroomWindowProgress({
             {progress.students.slice(0, 12).map((s) => (
               <li
                 key={s.studentId}
-                className="flex items-center justify-between gap-2 rounded-neo border border-neo-cream/20 bg-neo-navy-light px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-2 rounded-neo border border-neo-cream/50 bg-neo-navy-light px-3 py-2 text-sm"
               >
                 <span className="truncate font-bold text-neo-white">{s.name}</span>
                 <span className="shrink-0 tabular-nums text-neo-cream/80">
