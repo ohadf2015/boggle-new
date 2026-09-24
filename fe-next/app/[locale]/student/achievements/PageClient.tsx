@@ -1,161 +1,102 @@
 /**
- * Student Achievements Page
+ * Student Achievements ("Awards") — education achievements with tier progress,
+ * in the Academy frame (map backdrop, back-to-map plaque, the map's dock). The
+ * page never scrolls; the badge wall scrolls inside its panel.
  *
- * Displays all education achievements (duel/practice) with tier progress
- * using the AchievementGrid component.
+ * Guard: on the session (`user`), never on the profile — see
+ * `useStudentSubpageGuard` and app/[locale]/student/__tests__/subpageGuard.test.tsx.
  */
 
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { EducationHeader } from '@/components/education/EducationHeader';
-import { EducationShell } from '@/components/education/shell/EducationShell';
-import { PageLoader } from '@/components/ui/PageLoader';
-import { AchievementGrid, type Achievement } from '@/components/education/achievements/AchievementGrid';
+import type { Achievement } from '@/components/education/achievements/AchievementGrid';
+import { AcademyPageFrame, FrameSkeleton } from '@/components/student/pages/AcademyPageFrame';
+import { AwardsFilterBar, AwardsGrid, type AwardsFilter } from '@/components/student/pages/AwardsWall';
+import { useStudentSubpageGuard } from '@/components/student/pages/useStudentSubpageGuard';
+import { toneStyle } from '@/components/student/academy/chrome';
 import { STUDENT_PROGRESS_SELECT, buildAchievementsRecord } from '@/lib/education/achievementProgress';
-import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import Image from 'next/image';
+
+type T = (k: string, fallback?: string, params?: Record<string, unknown>) => string;
 
 export default function StudentAchievementsPageClient() {
-  const { user, loading } = useAuth();
-  const { t, language } = useLanguage();
-  const router = useRouter();
-  const isRTL = language === 'he';
-  const [isChecking, setIsChecking] = useState(true);
+  const { t: rawT, language } = useLanguage();
+  const t = rawT as unknown as T;
+  const { status, user } = useStudentSubpageGuard(language);
+  const userId = user?.id ?? null;
   const [achievements, setAchievements] = useState<Record<string, Achievement>>({});
   const [isLoadingAchievements, setIsLoadingAchievements] = useState(true);
+  const [filter, setFilter] = useState<AwardsFilter>('all');
 
-  // Auth guard.
-  //
-  // On `user`, never on `isAuthenticated` — that flag is `!!user && !!profile`,
-  // and the profile row is a second round-trip that lands AFTER `loading` goes
-  // false. Reading it here turned a cold load of this page into a redirect to
-  // the marketing home for a student who was signed in the whole time (four
-  // loads out of four, measured). `user` is the only value that actually says
-  // "no session"; see app/[locale]/student/__tests__/subpageGuard.test.tsx.
   useEffect(() => {
-    if (loading) {
-      return; // Still loading, don't make any decisions yet
-    }
+    if (!userId) return;
+    let cancelled = false;
+    const done = () => { if (!cancelled) setIsLoadingAchievements(false); };
 
-    if (!user) {
-      // Not the main app home — a no-session visitor on an education
-      // sub-page belongs at the auth-free student entry, not the marketing
-      // homepage (education homepage-bounce audit).
-      router.push(`/${language}/student/join`);
-      return;
-    }
-
-    setIsChecking(false);
-  }, [user, loading, router, language]);
-
-  // Fetch education achievements
-  useEffect(() => {
-    async function fetchAchievements() {
-      if (!user || !supabase) {
-        setIsLoadingAchievements(false);
-        return;
-      }
-
+    async function fetchAchievements(id: string) {
+      if (!supabase) return done();
       try {
-        // Fetch all education achievement definitions
         const { data: definitions, error: defError } = await supabase
           .from('achievement_definitions')
           .select('key, category, icon, is_secret, base_name_key, base_description_key');
-
         if (defError) {
           logger.error('Error fetching achievement definitions:', defError);
-          setIsLoadingAchievements(false);
-          return;
+          return done();
         }
-
-        // Fetch student's progress for each achievement
         const { data: progress, error: progressError } = await supabase
           .from('student_achievements_progress')
           .select(STUDENT_PROGRESS_SELECT)
-          .eq('student_id', user.id);
-
+          .eq('student_id', id);
         if (progressError) {
           logger.error('Error fetching student achievements progress:', progressError);
-          setIsLoadingAchievements(false);
-          return;
+          return done();
         }
-
-        setAchievements(buildAchievementsRecord(definitions || [], progress || []));
-        setIsLoadingAchievements(false);
+        if (!cancelled) setAchievements(buildAchievementsRecord(definitions || [], progress || []));
       } catch (error) {
         logger.error('Error in fetchAchievements:', error);
-        setIsLoadingAchievements(false);
       }
+      done();
     }
 
-    if (user) {
-      fetchAchievements();
-    }
-  }, [user]);
+    fetchAchievements(userId);
+    return () => { cancelled = true; };
+  }, [userId]);
 
-  // Show loader while checking auth
-  if (loading || isChecking) {
-    return (
-      <EducationShell header={<EducationHeader showBackButton />} contentClassName="flex items-center justify-center">
-        <PageLoader size="lg" text={t('common.loading')} />
-      </EducationShell>
-    );
-  }
+  const ready = status === 'ready';
+  const all = Object.values(achievements);
+  const earned = all.filter((a) => a.count > 0).length;
+
+  const badge =
+    ready && all.length > 0 ? (
+      <span
+        dir="auto"
+        className="inline-flex h-9 items-center rounded-full border-2 border-neo-black px-3 font-neo-display text-sm font-black text-neo-black"
+        style={toneStyle('gold', { shadow: 2, trim: 1 })}
+      >
+        {t('academy.pages.awardsEarned', '{earned}/{total} earned', { earned, total: all.length })}
+      </span>
+    ) : undefined;
 
   return (
-    <EducationShell
-      className={cn(isRTL && 'rtl')}
-      header={<EducationHeader showBackButton />}
-      scrollRegionLabel={t('student.dashboard.achievements')}
-      contentClassName="px-4 py-6 sm:px-6 lg:px-8"
+    <AcademyPageFrame
+      title={t('teacher.nav.studentAchievements', 'Awards')}
+      art="/images/education/chest-books.webp"
+      badge={badge}
+      toolbar={ready ? <AwardsFilterBar active={filter} onChange={setFilter} /> : undefined}
+      regionLabel={t('student.dashboard.achievements')}
+      pending={!ready}
+      busy={ready && isLoadingAchievements}
     >
-      <div className="w-full max-w-5xl mx-auto">
-        {/* Back Navigation */}
-        <Link
-          href={`/${language}/student`}
-          className="inline-flex items-center gap-2 text-neo-white hover:text-neo-white mb-6 transition-colors"
-        >
-          <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
-          <span className="font-neo-body">{t('common.back')}</span>
-        </Link>
-
-        {/* Page Title */}
-        <div className="flex items-center justify-between gap-4 mb-6">
-          <h1 className="text-3xl font-neo-display font-black text-neo-white">
-            {t('student.dashboard.achievements')}
-          </h1>
-          {/* Decorative only. */}
-          <Image
-            src="/images/education/words-mastered.webp"
-            alt=""
-            aria-hidden="true"
-            width={200}
-            height={112}
-            className="hidden sm:block w-40 h-auto shrink-0 select-none"
-          />
+      {!ready || isLoadingAchievements ? (
+        <FrameSkeleton rows={8} grid />
+      ) : (
+        <div data-testid="student-awards-content">
+          <AwardsGrid achievements={achievements} filter={filter} />
         </div>
-
-        {/* Achievement Grid */}
-        {isLoadingAchievements ? (
-          <div className="flex items-center justify-center p-12">
-            <PageLoader size="md" text={t('common.loading')} />
-          </div>
-        ) : (
-          <AchievementGrid
-            studentId={user!.id}
-            achievements={achievements}
-          />
-        )}
-      </div>
-    </EducationShell>
+      )}
+    </AcademyPageFrame>
   );
 }

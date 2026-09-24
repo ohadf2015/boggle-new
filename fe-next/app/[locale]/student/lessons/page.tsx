@@ -1,15 +1,14 @@
 /**
- * Student Lessons Index Page
+ * Student Lessons Index Page — the full lesson list in the Academy frame.
  *
- * This page handles direct navigation to /student/lessons (without a lesson ID).
- * It redirects to the student dashboard where the lessons list is displayed.
- *
- * The actual lesson practice is at /student/lessons/[id].
+ * It used to redirect to `/student`, which made the Academy dock's "Lessons"
+ * button a round trip back to the map. The list lives here now; a single
+ * lesson is still `/student/lessons/[id]`.
  */
 
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { redirect } from 'next/navigation';
+import StudentLessonsPageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,13 +17,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return generatePageMetadata({ seoKey: 'education', path: '/student/lessons', locale, noIndex: true });
 }
 
-interface PageProps {
-  params: Promise<{ locale: string }>;
-}
-
-export default async function StudentLessonsPage({ params }: PageProps) {
-  const { locale } = await params;
-
-  // Redirect to student dashboard where lessons are displayed
-  redirect(`/${locale}/student`);
+export default function StudentLessonsPage() {
+  return <StudentLessonsPageClient />;
 }
