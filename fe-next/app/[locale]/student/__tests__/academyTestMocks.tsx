@@ -12,6 +12,8 @@ const knobs = vi.hoisted(() => ({
   activeGame: null as null | { gameCode: string; teacherName: string; lessonNames: string[] },
   classroom: { classroomId: 'c1' as string | null, classroom: { id: 'c1', name: 'ELA (7th)' } as { id: string; name: string } | null, level: 'core' },
   landscape: false,
+  /** Exact viewport for layout tests; null = the landscape knob decides. */
+  view: null as null | { width: number; height: number },
   lessons: [] as unknown[],
   reviewLessonId: '',
   reviewCount: 0,
@@ -78,12 +80,17 @@ export function resetKnobs() {
   knobs.reviewLessonId = '';
   knobs.reviewCount = 0;
   knobs.landscape = false;
+  knobs.view = null;
   window.matchMedia = ((q: string) => ({
     matches: knobs.landscape && q.includes('aspect-ratio'),
     media: q,
     addEventListener: () => {},
     removeEventListener: () => {},
   })) as never;
+  // The hub picks its layout from the viewport's size (aspect AND height), so
+  // the landscape knob turns the window, not only the media query.
+  Object.defineProperty(window, 'innerWidth', { configurable: true, get: () => knobs.view?.width ?? (knobs.landscape ? 1920 : 390) });
+  Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => knobs.view?.height ?? (knobs.landscape ? 1080 : 844) });
   asStudent();
 }
 export { knobs };

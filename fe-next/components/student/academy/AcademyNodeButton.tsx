@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import type { IslandPoint, NodeType } from './academyNodes';
 import type { AcademyIsland } from './academyIslands';
 import { Medallion, INK_TEXT, toneStyle, type Tone } from './chrome';
+import { nodeSize, showBossChip, showTag } from './nodeExtents';
 
 const ART: Record<NodeType, string> = {
   lesson: '/images/education/node-lesson.webp',
@@ -45,6 +46,10 @@ interface Props {
   tone?: Tone;
   onOpen: (node: AcademyIsland) => void;
   reducedMotion: boolean;
+  /** Crowding level (see nodeExtents): sheds the boss chip, then size, then the tag word. */
+  compact?: number;
+  /** UI scale (TV): the whole button is zoomed by it. */
+  scale?: number;
 }
 
 /** Sparkles that twinkle around the spotlit island (fixed spots, CSS loop). */
@@ -70,8 +75,10 @@ function Chains() {
   );
 }
 
-export function useNodeLabel(node: AcademyIsland): string {
-  const { t } = useLanguage();
+type T = ReturnType<typeof useLanguage>['t'];
+
+/** The island's plaque text (pure — the map also needs it to size the island's box). */
+export function nodeLabel(node: Pick<AcademyIsland, 'kind' | 'name'>, t: T): string {
   switch (node.kind) {
     case 'workshop':
       return t('academy.student.workshop', 'Word Workshop');
@@ -84,6 +91,19 @@ export function useNodeLabel(node: AcademyIsland): string {
     default:
       return node.name ?? t('student.lessons.lesson', 'Lesson');
   }
+}
+
+/** The boss plaque's requirement chip ("Master 0/4 words" / "Unlocked"). */
+export function bossChip(node: Pick<AcademyIsland, 'state' | 'progress'>, t: T): string | null {
+  if (!node.progress) return null;
+  return node.state === 'locked'
+    ? t('academy.student.bossNeed', 'Master {have}/{need} words', { have: node.progress.have, need: node.progress.need })
+    : t('academy.student.bossReady', 'Unlocked');
+}
+
+export function useNodeLabel(node: AcademyIsland): string {
+  const { t } = useLanguage();
+  return nodeLabel(node, t);
 }
 
 function BossRing({ have, need, size }: { have: number; need: number; size: number }) {
@@ -108,7 +128,7 @@ function BossRing({ have, need, size }: { have: number; need: number; size: numb
   );
 }
 
-export function AcademyNodeButton({ node, at, index, big, recommended, tag, tone = 'gold', onOpen, reducedMotion }: Props) {
+export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagWord, tone = 'gold', onOpen, reducedMotion, compact = 0, scale = 1 }: Props) {
   const { t } = useLanguage();
   const sfx = useSoundEffects();
   const osReduced = useReducedMotion();
@@ -117,7 +137,9 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag, tone
   const label = useNodeLabel(node);
   const isBoss = node.kind === 'boss';
   const locked = node.state === 'locked';
-  const size = isBoss ? (big ? 132 : 78) : big ? (recommended ? 196 : 140) : recommended ? 104 : 74;
+  const size = nodeSize(isBoss, { big, recommended, tag: !!tagWord, compact });
+  const tag = showTag(compact) ? tagWord : undefined;
+  const chip = isBoss && showBossChip(compact) ? bossChip(node, t) : null;
   // Everything that is not the spotlit island (or a live game) stays calm.
   const calm = !recommended && node.state !== 'live' && !locked;
 
@@ -148,19 +170,33 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag, tone
   const dark = plaqueTone === 'night';
 
   return (
-    <m.button
-      type="button"
+    // A zero-size anchor at the island's point (in % of the art); the button
+    // hangs off it, so the UI zoom scales the button and never its position.
+    <span className="absolute z-10 h-0 w-0" style={{ left: `${at.x}%`, top: `${at.y}%` }}>
+    {/* A div with the button role, not a <button>: a global landscape-phone rule
+        forces every `button svg` to 20px (!important) and pads every button,
+        which would crush the pointer, the boss ring and the chains. */}
+    <m.div
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          press();
+        }
+      }}
       data-testid={`academy-node-${node.key}`}
+      data-compact={compact}
       data-state={node.state}
       data-recommended={recommended ? 'true' : 'false'}
       aria-label={aria}
       onClick={press}
       className={cn(
-        'absolute z-10 flex -translate-x-1/2 flex-col items-center outline-none',
+        'absolute left-0 top-0 flex -translate-x-1/2 flex-col items-center outline-none',
         isBoss ? '-translate-y-1/2' : '-translate-y-[82%]',
         'focus-visible:[&>div]:ring-4 focus-visible:[&>div]:ring-neo-cyan focus-visible:[&>div]:rounded-full',
       )}
-      style={{ left: `${at.x}%`, top: `${at.y}%` }}
+      style={{ maxWidth: 'none', cursor: 'pointer', ...(scale !== 1 ? { zoom: scale } : {}) }}
       initial={still ? false : { scale: 0, y: 24 }}
       animate={{ scale: 1, y: 0 }}
       whileHover={still ? undefined : { scale: 1.06, y: -3 }}
@@ -364,14 +400,13 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag, tone
         style={toneStyle(plaqueTone, { shadow: 2, trim: 1.5 })}
       >
         <span className={isBoss ? 'shrink-0' : 'truncate'}>{label}</span>
-        {isBoss && node.progress && (
+        {chip && (
           <span className={cn('rounded-full px-1.5 tabular-nums', locked ? 'bg-neo-black/60 text-neo-yellow' : 'bg-neo-black text-neo-lime')}>
-            {locked
-              ? t('academy.student.bossNeed', 'Master {have}/{need} words', { have: node.progress.have, need: node.progress.need })
-              : t('academy.student.bossReady', 'Unlocked')}
+            {chip}
           </span>
         )}
       </span>
-    </m.button>
+    </m.div>
+    </span>
   );
 }

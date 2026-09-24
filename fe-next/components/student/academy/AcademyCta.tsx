@@ -31,8 +31,8 @@ interface Props {
   joinError: string | null;
   onPress: () => void;
   reducedMotion: boolean;
-  /** Desktop: a taller hero, centred under the map. */
-  big?: boolean;
+  /** big: desktop hero, centred under the map · compact: a phone on its side (one short row). */
+  size?: 'compact' | 'normal' | 'big';
 }
 
 const ART: Partial<Record<CtaKind, string>> = {
@@ -66,7 +66,9 @@ export function useCtaOverline(kind: CtaKind): string {
               : t('academy.student.ctaPlay', 'Play');
 }
 
-export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, joinError, onPress, reducedMotion, big = false }: Props) {
+export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, joinError, onPress, reducedMotion, size = 'normal' }: Props) {
+  const big = size === 'big';
+  const compact = size === 'compact';
   const { t } = useLanguage();
   const sfx = useSoundEffects();
   const osReduced = useReducedMotion();
@@ -119,8 +121,8 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         }}
         disabled={isJoining}
         className={cn(
-          'relative flex w-full items-center gap-3 overflow-hidden rounded-[20px] border-3 border-neo-black ps-2 pe-2 text-start text-neo-black disabled:cursor-wait',
-          big ? 'h-[92px] gap-4 ps-3 pe-3' : 'h-[68px] sm:h-[76px]',
+          'icon-only relative flex w-full items-center gap-3 overflow-hidden rounded-[20px] border-3 border-neo-black ps-2 pe-2 text-start text-neo-black disabled:cursor-wait',
+          big ? 'h-[92px] gap-4 ps-3 pe-3' : compact ? 'h-14 gap-2' : 'h-[68px] sm:h-[76px]',
         )}
         style={toneStyle(tone, { shadow: 5, trim: 2.5 })}
         animate={still ? undefined : { scale: [1, 1.025, 1] }}
@@ -137,7 +139,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
             transition={{ duration: 1.4, repeat: Infinity, repeatDelay: kind === 'live' ? 0.5 : 2.2, ease: 'easeInOut' }}
           />
         )}
-        <span className={cn('relative flex shrink-0 items-center justify-center', big ? 'h-20 w-20' : 'h-14 w-14 sm:h-16 sm:w-16')}>
+        <span className={cn('relative flex shrink-0 items-center justify-center', big ? 'h-20 w-20' : compact ? 'h-11 w-11' : 'h-14 w-14 sm:h-16 sm:w-16')}>
           {art ? (
             <>
               <Image src={art} alt="" aria-hidden="true" fill priority unoptimized sizes="64px" className="object-contain drop-shadow-[2px_3px_0_#000]" />
@@ -153,7 +155,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
               )}
             </>
           ) : (
-            <Medallion tone="night" size={48}>
+            <Medallion tone="night" size={compact ? 40 : 48}>
               {kind === 'join-class' ? (
                 <UserPlus className="h-6 w-6 text-neo-yellow" strokeWidth={2.5} />
               ) : (
@@ -173,17 +175,17 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
             {kind === 'live' && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-neo-red" aria-hidden="true" />}
             {overline}
           </span>
-          <span dir="auto" className={cn('block truncate font-neo-display font-black uppercase leading-none tracking-tight', big ? 'text-3xl' : 'text-xl sm:text-2xl')}>
+          <span dir="auto" className={cn('block truncate font-neo-display font-black uppercase leading-none tracking-tight', big ? 'text-3xl' : compact ? 'text-lg' : 'text-xl sm:text-2xl')}>
             {title}
           </span>
-          {sub && (
+          {sub && !compact && (
             <span dir="auto" className="mt-0.5 block truncate font-neo-body text-xs font-bold text-neo-black/75">
               {sub}
             </span>
           )}
         </span>
         <span className="relative flex shrink-0">
-          <Medallion tone="night" size={big ? 58 : 46} shadow={2}>
+          <Medallion tone="night" size={big ? 58 : compact ? 38 : 46} shadow={2}>
             {isJoining ? (
               <Loader2 className="h-5 w-5 animate-spin text-neo-yellow" aria-hidden="true" />
             ) : (

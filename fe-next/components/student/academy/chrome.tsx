@@ -100,7 +100,7 @@ export function Medallion({
     <span
       aria-hidden="true"
       className={cn('relative inline-flex shrink-0 items-center justify-center rounded-full border-3 border-neo-black', className)}
-      style={{ width: size, height: size, ...toneStyle(tone, { shadow, trim: 2 }) }}
+      style={{ width: size, height: size, maxWidth: 'none', ...toneStyle(tone, { shadow, trim: 2 }) }}
     >
       {/* Glossy crescent — the lacquered look of the node art. */}
       <span

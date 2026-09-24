@@ -83,7 +83,7 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
         aria-label={label}
         title={label}
         disabled={!available}
-        className={cn('relative flex flex-col items-center', size === 'md' ? 'h-[72px] w-[72px]' : 'h-12 w-12', !available && 'cursor-default')}
+        className={cn('icon-only relative flex flex-col items-center', size === 'md' ? 'h-[72px] w-[72px]' : 'h-12 w-12', !available && 'cursor-default')}
         // Idle wiggle: a small, rare shake — it asks, it does not shout.
         animate={available && !reducedMotion ? { rotate: [0, -6, 6, -3, 0] } : undefined}
         transition={available && !reducedMotion ? { duration: 0.8, repeat: Infinity, repeatDelay: 3.2 } : undefined}

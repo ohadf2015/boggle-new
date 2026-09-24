@@ -28,8 +28,8 @@ interface Props {
   reducedMotion: boolean;
   /** The class (or the Academy's name) — the page title, worn as a tag beside the name. */
   title?: string | null;
-  /** Wide screens get a taller plaque. */
-  wide?: boolean;
+  /** Wide screens get a taller plaque; a phone on its side a slim one. */
+  size?: 'compact' | 'normal' | 'wide';
 }
 
 /** Recessed "coin tray" the totals sit in — one object, not two floating pills. */
@@ -38,7 +38,9 @@ const TRAY_STYLE = {
   boxShadow: 'inset 0 0 0 1.5px #f5c542, inset 0 3px 5px rgba(0,0,0,0.6)',
 } as const;
 
-export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars, isGuest, onSignOut, reducedMotion, title, wide = false }: Props) {
+export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars, isGuest, onSignOut, reducedMotion, title, size = 'normal' }: Props) {
+  const wide = size === 'wide';
+  const compact = size === 'compact';
   const { t } = useLanguage();
   const osReduced = useReducedMotion();
   const still = reducedMotion || !!osReduced;
@@ -49,16 +51,22 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
 
   return (
     <InkPanel
-      as="header"
+      // Not <header>: a global landscape-phone rule repositions every header and forces its svgs to 20px.
+      role="banner"
       tone="night"
       data-testid="academy-hud"
-      className={`mx-auto flex w-full items-center gap-2 p-1.5 pe-1.5 sm:gap-3 sm:p-2 ${wide ? 'max-w-5xl' : 'max-w-3xl'}`}
+      data-size={size}
+      className={
+        compact
+          ? 'flex w-full items-center gap-2 p-1 pe-1'
+          : `mx-auto flex w-full items-center gap-2 p-1.5 pe-1.5 sm:gap-3 sm:p-2 ${wide ? 'max-w-5xl' : 'max-w-xl'}`
+      }
     >
       {/* Avatar in a gold frame, level medallion on its corner. */}
       <div className="relative shrink-0">
         <span className="block rounded-full border-3 border-neo-black p-[3px]" style={toneStyle('gold', { shadow: 2, trim: 1 })}>
           <span className="block overflow-hidden rounded-full border-2 border-neo-black bg-neo-cyan">
-            <Avatar customAvatar={avatarConfig ?? null} userId={userId} pixelSize={wide ? 52 : 38} disableEffects />
+            <Avatar customAvatar={avatarConfig ?? null} userId={userId} pixelSize={wide ? 52 : compact ? 26 : 38} disableEffects />
           </span>
         </span>
         <span
@@ -66,7 +74,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
           aria-label={t('academy.student.level', 'Level {level}', { level: xp.currentLevel })}
           className="absolute -bottom-1.5 -end-2"
         >
-          <Medallion tone="lime" size={24} shadow={1}>
+          <Medallion tone="lime" size={compact ? 20 : 24} shadow={1}>
             <span className="font-neo-display text-[11px] font-black leading-none text-neo-black">{xp.currentLevel}</span>
           </Medallion>
         </span>
@@ -74,7 +82,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
 
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-1.5">
-          <p dir="auto" className={`min-w-0 shrink truncate font-neo-display text-base font-black leading-tight text-neo-white ${wide ? 'text-xl' : 'sm:text-lg'} ${INK_TEXT}`}>
+          <p dir="auto" className={`min-w-0 shrink truncate font-neo-display font-black leading-tight text-neo-white ${wide ? 'text-xl' : compact ? 'text-sm' : 'text-base sm:text-lg'} ${INK_TEXT}`}>
             {name}
           </p>
           {title && (
@@ -94,7 +102,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={xp.progressPercent}
-          className={`relative mt-1 w-full overflow-hidden rounded-full border-2 border-neo-black ${wide ? 'h-5' : 'h-4'}`}
+          className={`relative mt-1 w-full overflow-hidden rounded-full border-2 border-neo-black ${wide ? 'h-5' : compact ? 'h-3' : 'h-4'}`}
           style={{ background: 'linear-gradient(180deg,#120d33,#261d63)', boxShadow: 'inset 0 0 0 1.5px #f5c542, inset 0 3px 4px rgba(0,0,0,0.55)' }}
         >
           <div
@@ -117,7 +125,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
             )}
           </div>
         </div>
-        <p dir="ltr" className={`mt-0.5 text-start font-neo-display ${wide ? 'text-xs' : 'text-[10px]'} font-black uppercase tracking-wider text-neo-yellow tabular-nums rtl:text-end`}>
+        <p dir="ltr" className={`mt-0.5 text-start ${compact ? 'sr-only' : ''} font-neo-display ${wide ? 'text-xs' : 'text-[10px]'} font-black uppercase tracking-wider text-neo-yellow tabular-nums rtl:text-end`}>
           {t('academy.student.xpLine', '{xp} / {need} XP', { xp: shownXp, need: xp.xpNeededForNextLevel })}
         </p>
       </div>
@@ -128,19 +136,19 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
         style={TRAY_STYLE}
       >
       <span className="flex items-center gap-1" title={t('education.xp.streak', 'Day Streak')}>
-        <Medallion tone="ember" size={wide ? 36 : 28} shadow={1}>
+        <Medallion tone="ember" size={wide ? 36 : compact ? 22 : 28} shadow={1}>
           <Flame className="h-4 w-4 fill-neo-yellow text-neo-black" strokeWidth={2.5} />
         </Medallion>
         <span className="sr-only">{t('education.xp.streak', 'Day Streak')}</span>
-        <span className={`min-w-[1ch] font-neo-display text-lg font-black tabular-nums text-neo-white ${INK_TEXT}`}>{streak}</span>
+        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-neo-white ${INK_TEXT}`}>{streak}</span>
       </span>
       <span aria-hidden="true" className="h-5 w-[2px] rounded-full bg-neo-yellow/40" />
       <span className="flex items-center gap-1" title={t('academy.student.stars', 'Stars')}>
-        <span className={`relative drop-shadow-[2px_2px_0_#000] ${wide ? 'h-9 w-9' : 'h-7 w-7'}`}>
+        <span className={`relative drop-shadow-[2px_2px_0_#000] ${wide ? 'h-9 w-9' : compact ? 'h-[22px] w-[22px]' : 'h-7 w-7'}`}>
           <Image src="/images/adventure/loot/gold-coin.webp" alt="" aria-hidden="true" fill unoptimized sizes="32px" className="object-contain" />
         </span>
         <span className="sr-only">{t('academy.student.stars', 'Stars')}</span>
-        <span className={`min-w-[1ch] font-neo-display text-lg font-black tabular-nums text-neo-white ${INK_TEXT}`}>{shownStars}</span>
+        <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-neo-white ${INK_TEXT}`}>{shownStars}</span>
       </span>
       </span>
 
@@ -148,7 +156,7 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
         <button
           type="button"
           onClick={onSignOut}
-          className="flex h-8 shrink-0 items-center gap-1 rounded-full border-2 border-neo-cream px-2 font-neo-body text-xs font-bold text-neo-white hover:border-neo-pink"
+          className="icon-only flex h-8 shrink-0 items-center gap-1 rounded-full border-2 border-neo-cream px-2 font-neo-body text-xs font-bold text-neo-white hover:border-neo-pink"
         >
           <UserX className="h-4 w-4" aria-hidden="true" />
           <span className="sr-only sm:not-sr-only">{t('student.notYou', 'Not you?')}</span>
