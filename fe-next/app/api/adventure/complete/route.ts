@@ -20,7 +20,9 @@ import { verifyAttempt } from '@/lib/adventure/play/attemptToken';
 import { settleRun } from '@/lib/adventure/play/settleRun';
 import { totalStarsOf, type Completion } from '@/lib/adventure/play/progress';
 import { attemptSecret, loadCompletions } from '@/lib/adventure/play/server';
-import { advanceRun, signRun, publicRun, type RunPayload } from '@/lib/adventure/play/runToken';
+import { advanceRun, settleRunEnd, signRun, publicRun, type RunPayload } from '@/lib/adventure/play/runToken';
+import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
+import { claimOnce } from '@/lib/server/claimOnce';
 import { nodeById, type NodeKind } from '@/lib/adventure/play/runMap';
 import { runMapOf } from '@/lib/adventure/play/runView';
 import { creditEcosystem, emptyEcosystem } from '@/lib/adventure/play/ecosystem';
@@ -196,9 +198,39 @@ export async function POST(request: NextRequest) {
       : emptyEcosystem();
 
     const chain = nextRun(payload.run, nodeKind, result.won, result.score, body, secret);
+
+    // Run over: sign the carry AFTER this fight (potions drunk / feather burned
+    // stay spent) and bank the leftover purse into the app wallet.
+    let runEnd: { carryToken: string; purseCoins: number } | null = null;
+    if (!chain && payload.run) {
+      const end = settleRunEnd(payload.run, {
+        won: result.won && body?.died !== true,
+        boss: nodeKind === 'boss',
+        score: result.score,
+        potionsUsed: body?.potionsUsed && typeof body.potionsUsed === 'object' ? body.potionsUsed : {},
+        reviveUsed: body?.reviveUsed === true,
+      });
+      let purseCoins = 0;
+      // Once per RUN, not per attempt: a run token can be re-dealt (/start) and
+      // lost on purpose, so an attempt-keyed guard would bank the same purse
+      // again and again. The seed names the run; the claim is durable (Redis).
+      if (end.coins > 0) {
+        const claim = await claimOnce(`adv-purse:${user.id}:${payload.run.seed}`);
+        if (claim === 'claimed') {
+          const paid = await awardCoinsServer(user.id, end.coins, 'adventure_purse', { world: payload.w });
+          if (paid.success) purseCoins = end.coins;
+          else captureApiError(new Error(`adventure purse bank failed: ${paid.error}`), '/api/adventure/complete');
+        } else if (claim === 'unavailable') {
+          captureApiError(new Error('adventure purse withheld: claim store unavailable'), '/api/adventure/complete');
+        }
+      }
+      runEnd = { carryToken: signRun(end.carry, secret), purseCoins };
+    }
+
     return NextResponse.json({
       success: true,
       ...(chain ?? {}),
+      ...(runEnd ?? {}),
       ...ecosystem,
       nodeKind,
       runOver: !chain,

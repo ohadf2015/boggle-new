@@ -11,7 +11,7 @@
  */
 import type { RunResult } from '../runTypes';
 
-export type GainKind = 'xp' | 'coins' | 'points' | 'streak';
+export type GainKind = 'xp' | 'coins' | 'purse' | 'points' | 'streak';
 export interface Gain {
   kind: GainKind;
   value: number;
@@ -23,14 +23,16 @@ export const STREAK_MIN = 2;
 /** Only trust a positive, finite number from the wire. */
 const pos = (n: unknown): number => (typeof n === 'number' && Number.isFinite(n) && n > 0 ? n : 0);
 
-type Source = Partial<Pick<RunResult, 'xpGained' | 'coinsGained' | 'leaderboardPoints' | 'streak' | 'levelUp' | 'achievementsUnlocked'>>;
+type Source = Partial<Pick<RunResult, 'xpGained' | 'coinsGained' | 'purseCoins' | 'leaderboardPoints' | 'streak' | 'levelUp' | 'achievementsUnlocked'>>;
 
-/** Ordered ledger lines, zeros removed. Order is fixed: xp → coins → points → streak. */
+/** Ordered ledger lines, zeros removed. Order is fixed: xp → coins → purse → points → streak. */
 export function ecosystemGains(r: Source): Gain[] {
   const streak = pos(r.streak?.current);
   const out: Gain[] = [
     { kind: 'xp', value: pos(r.xpGained) },
     { kind: 'coins', value: pos(r.coinsGained) },
+    // Run over: the leftover gold that banked into the wallet (settleRunEnd).
+    { kind: 'purse', value: pos(r.purseCoins) },
     { kind: 'points', value: pos(r.leaderboardPoints) },
     { kind: 'streak', value: streak >= STREAK_MIN ? streak : 0 },
   ];

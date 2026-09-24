@@ -26,24 +26,39 @@ describe('clampLook', () => {
  * Sideways pan: the camera centres on the first block, so a tower that walks
  * sideways needs the player to be able to walk after it — and stop somewhere.
  */
-describe('focusX — the camera keeps the building framed (no sideways drag)', () => {
+describe('focusX — the whole swing stays on screen; the base shares it when it can', () => {
+  // leanPx = how far the camera may sit from the crane line and still show the
+  // swing's far end: half the view minus the swing's reach.
   it('given no tower yet, when framed, then the camera sits on the crane line', () => {
-    expect(focusX(null, null)).toBe(0);
+    expect(focusX(null, null, 200)).toBe(0);
   });
 
   it('given a plumb tower, when framed, then it is centred on the tower', () => {
-    expect(focusX(12, 12)).toBe(12);
+    expect(focusX(12, 12, 200)).toBe(12);
   });
 
-  it('given a tower whose top walked sideways, when framed, then base and top share the screen', () => {
-    // Centring on the base alone put a leaning top off the edge; that is what
-    // the sideways drag used to exist for.
-    expect(focusX(0, 120)).toBe(60);
-    expect(focusX(-40, -160)).toBe(-100);
+  it('given a small sideways walk, when framed, then base and top share the screen (midpoint)', () => {
+    expect(focusX(0, 120, 200)).toBe(60);
+    expect(focusX(-40, -160, 200)).toBe(-100);
+  });
+
+  it('given a top that walked far, when framed, then the swing wins and the base slides toward the edge', () => {
+    const reach = 150;
+    const halfW = 350; // leanPx = halfW - reach = 200
+    for (const top of [500, -500, 900]) {
+      const cam = focusX(0, top, halfW - reach);
+      // Both ends of the swing are inside the view.
+      expect(top + reach).toBeLessThanOrEqual(cam + halfW);
+      expect(top - reach).toBeGreaterThanOrEqual(cam - halfW);
+    }
+  });
+
+  it('given a swing wider than the view, when framed, then the camera stays on the crane line', () => {
+    expect(focusX(0, 300, -50)).toBe(300);
   });
 
   it('given only a base, when framed, then it is centred on the base', () => {
-    expect(focusX(30, null)).toBe(30);
+    expect(focusX(30, null, 200)).toBe(30);
   });
 });
 describe('clampLookX', () => {

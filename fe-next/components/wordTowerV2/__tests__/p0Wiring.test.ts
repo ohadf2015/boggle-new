@@ -24,4 +24,12 @@ describe('v2 P0 wiring', () => {
     expect(run).toMatch(/startV2Run/);
     expect(run).toMatch(/endV2Run/);
   });
+
+  it('swings the crane over the top floor, never around world x=0', () => {
+    // The swing used to be centred on world 0 while the tower walked sideways,
+    // so after a few offset floors the hook hung beside the building.
+    expect(run).not.toMatch(/releaseKinematics\([^)]*,\s*0\)/);
+    expect(run).toMatch(/pivotX = supportTop\(world, null\)\?\.x \?\? 0/);
+    expect(v2).toMatch(/getCraneX=\{game\.getCraneX\}/);
+  });
 });

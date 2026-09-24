@@ -31,6 +31,10 @@ export interface RunResult {
   trophy?: RelicId;
   /** Which map node this attempt was. */
   nodeKind?: NodeKind;
+  /** Run over: the next run's carry, signed AFTER this fight (spent potions stay spent). */
+  carryToken?: string;
+  /** Run over: leftover gold banked into the app wallet as coins. */
+  purseCoins?: number;
   // --- Ecosystem payload (see lib/adventure/play/ecosystem.ts). Always present, may be zero.
   xpGained?: number;
   levelUp?: { newLevel: number; levelsGained: number; newTitles: string[] };

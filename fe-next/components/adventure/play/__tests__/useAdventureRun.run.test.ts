@@ -152,6 +152,20 @@ describe('useAdventureRun — roguelike run', () => {
     expect(again.body.carryToken).toBe('rt-after-node'); // the run just minted, abandoned
   });
 
+  it('given the server signs a post-fight carry, when the run ends, then THAT carry is sent (spent potions stay spent)', async () => {
+    // The pre-fight token still held the potions drunk in the fatal fight, so they came back next run.
+    const calls = mockApi({ complete: { success: true, won: false, stars: 0, rewards: [], score: 1, validWords: [], bestStars: 0, totalStars: 0, runOver: true, carryToken: 'rt-carry-spent', purseCoins: 12 } });
+    const { result } = hook();
+    await waitFor(() => expect(result.current.phase).toBe('ready'));
+    act(() => result.current.begin());
+    await act(async () => { await result.current.finish(); });
+    await waitFor(() => expect(result.current.phase).toBe('done'));
+    expect(result.current.result?.purseCoins).toBe(12);
+    act(() => { void result.current.newRun(); });
+    await waitFor(() => expect(result.current.phase).toBe('map'));
+    expect(calls.filter((c) => c.url.includes('/node')).pop()!.body.carryToken).toBe('rt-carry-spent');
+  });
+
   it('given an elite fight, when the enemy lands a lethal hit, then the run reports died', async () => {
     const calls = mockApi({ level: getPlayLevel(1, 4), run: pubRun({ step: 4, hp: 1 }) });
     const { result } = hook(4);

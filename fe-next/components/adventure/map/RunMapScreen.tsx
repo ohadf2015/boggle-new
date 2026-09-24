@@ -24,6 +24,7 @@ import RelicBar from '../play/run/RelicBar';
 import GoldCounter from '../play/run/GoldCounter';
 import MapNodeButton from './MapNodeButton';
 import MapLegend from './MapLegend';
+import { takeRunPrimer } from './runPrimer';
 import MapRunRail from './MapRunRail';
 import MapGoalRail from './MapGoalRail';
 import { useSurfaceWidth } from './useSurfaceWidth';
@@ -62,6 +63,10 @@ export default function RunMapScreen({ world, map, run, currentNode, reachable, 
   const { t, language } = useLanguageSafe();
   const sfx = useSoundEffects();
   const [legend, setLegend] = useState(false);
+  // First map ever: open the sheet that explains the run (marker written at show time).
+  useEffect(() => {
+    if (takeRunPrimer()) setLegend(true);
+  }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
   const worldCfg = getWorldConfig(world);
   const boss = getBossConfig(world);

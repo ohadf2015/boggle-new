@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCoinActions } from '@/contexts/CoinContext';
 import { getWithAuth, postWithAuth } from '@/utils/authFetch';
 import {
   type ChestRoll,
@@ -155,6 +156,24 @@ export function useEstate(): UseEstate {
     setEstateState(e);
   }, []);
 
+  // Estate coins ARE the app wallet (profiles.total_coins): every server answer
+  // re-syncs the shared balance so the header and other modes agree. A ref,
+  // because refreshCoins changes identity when the profile reloads and
+  // `refresh` below is an effect dependency — keying on it would loop.
+  const { refreshCoins } = useCoinActions();
+  const refreshCoinsRef = useRef(refreshCoins);
+  refreshCoinsRef.current = refreshCoins;
+  const fromServer = useCallback(
+    (raw: unknown): Estate => {
+      const e = sanitizeEstate(raw);
+      setEstate(e);
+      writeKey(accountKey(uid), e);
+      void refreshCoinsRef.current().catch(() => undefined);
+      return e;
+    },
+    [uid, setEstate],
+  );
+
   const refresh = useCallback(async () => {
     if (loading) return;
     if (!isAuthenticated) {
@@ -171,11 +190,7 @@ export function useEstate(): UseEstate {
       setStatus('error');
       return;
     }
-    const adopt = (raw: unknown) => {
-      const e = sanitizeEstate(raw);
-      setEstate(e);
-      writeKey(accountKey(uid), e);
-    };
+    const adopt = fromServer;
     adopt(body.estate);
     setInbox(Array.isArray(body.raids) ? (body.raids as EstateRaid[]) : []);
     setStatus('ready');
@@ -215,7 +230,7 @@ export function useEstate(): UseEstate {
     } finally {
       syncingRef.current = false;
     }
-  }, [loading, isAuthenticated, uid, setEstate]);
+  }, [loading, isAuthenticated, uid, setEstate, fromServer]);
 
   useEffect(() => {
     if (loading) {
@@ -246,12 +261,10 @@ export function useEstate(): UseEstate {
         }
         return null;
       }
-      const e = sanitizeEstate(body.estate);
-      setEstate(e);
-      writeKey(accountKey(uid), e);
+      fromServer(body.estate);
       return { coins: Number(body.coins) || 0, chest: body.chest as ChestRoll };
     },
-    [loading, isAuthenticated, uid, setEstate],
+    [loading, isAuthenticated, uid, setEstate, fromServer],
   );
 
   /** Optimistic spend: apply the pure step now, then adopt the server's copy (or roll back to it). */
@@ -273,10 +286,10 @@ export function useEstate(): UseEstate {
         await refresh();
         return { ok: false, reason: String(body?.reason ?? 'error') };
       }
-      setEstate(sanitizeEstate(body.estate));
+      fromServer(body.estate);
       return { ok: true, districtCompleted: body.districtCompleted === true };
     },
-    [loading, isAuthenticated, refresh, setEstate],
+    [loading, isAuthenticated, refresh, setEstate, fromServer],
   );
 
   const upgrade = useCallback((slot: PlotSlot) => spend('upgrade', slot), [spend]);
@@ -299,10 +312,10 @@ export function useEstate(): UseEstate {
       const res = await postWithAuth(`${API}/raid`, { defenderId, accuracy, revenge }, { requireSession: true });
       const body = await readJson(res);
       if (!res.ok || !body?.outcome) return { error: String(body?.reason ?? 'error') };
-      if (body.estate) setEstate(sanitizeEstate(body.estate));
+      if (body.estate) fromServer(body.estate);
       return { raidId: (body.raidId as string | null) ?? null, outcome: body.outcome as RaidResultOutcome, revenge };
     },
-    [authed, setEstate],
+    [authed, fromServer],
   );
 
   const markSeen = useCallback<UseEstate['markSeen']>(
