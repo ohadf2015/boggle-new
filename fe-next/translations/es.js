@@ -1642,7 +1642,7 @@ const es = {
       "inferno": "¡Infierno!"
     },
     "cardTitle": "Torre de Palabras",
-    "cardDesc": "Apila palabras hasta el cielo — vista de admin",
+    "cardDesc": "Apila palabras hasta el cielo",
     "howTo": {
       "title": "Cómo jugar",
       "cta": "¡Entendido!",

@@ -1564,7 +1564,7 @@ const en = {
     },
     "combo": { "roll": "On a roll", "fire": "On fire", "blaze": "Blazing", "inferno": "Inferno" },
     "cardTitle": "Word Tower",
-    "cardDesc": "Stack words sky-high — admin preview",
+    "cardDesc": "Stack words sky-high",
     "howTo": {
       "title": "How to play",
       "cta": "Got it!",

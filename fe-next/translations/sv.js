@@ -1937,7 +1937,7 @@ const sv = {
       ]
     },
     "cardTitle": "Ordtorn",
-    "cardDesc": "Stapla ord mot skyn — adminförhandsvisning",
+    "cardDesc": "Stapla ord mot skyn",
     "loading": "Laddar ordlista…",
     "loadError": "Det gick inte att ladda ordlistan — tryck för att försöka igen",
     "retry": "Försök igen",
