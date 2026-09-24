@@ -146,6 +146,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/lexiclash-vs-cabanagrams",
   "/lexiclash-vs-flocabulary",
   "/lexiclash-vs-freerice",
+  "/lexiclash-vs-gimkit",
   "/lexiclash-vs-kahoot",
   "/lexiclash-vs-kahoot-gimkit-vocabulary",
   "/lexiclash-vs-popple",
@@ -153,6 +154,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/lexiclash-vs-quizlet",
   "/lexiclash-vs-scrabble",
   "/lexiclash-vs-vocabularyspellingcity",
+  "/lexiclash-vs-wayground",
   "/lexiclash-vs-wordfeud",
   "/lexiclash-vs-wordle",
   "/lexiclash-vs-wordwall",
@@ -202,6 +204,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/word-of-the-day",
   "/word-tower",
   "/word-tower-v2",
+  "/word-tower-v2/daily",
   "/words",
   "/words-with-friends-alternative"
 ];

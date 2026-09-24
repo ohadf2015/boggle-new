@@ -60,4 +60,22 @@ describe('ImprovementPanel', () => {
     );
     expect(screen.queryByTestId('improvement-streak')).not.toBeInTheDocument();
   });
+
+  // Track C (avatar unlock reveal): the XP row teases the next avatar unlock
+  // and, after a level-up that granted parts, offers a "New unlock!" chip.
+  it('shows the next avatar unlock level near XP', () => {
+    render(<ImprovementPanel xp={{ ...xp, newLevel: 3 }} levelUp={null} streak={null} t={t} reducedMotion={false} />);
+    expect(screen.getByTestId('post-game-next-unlock')).toHaveTextContent('4');
+  });
+
+  it('shows a New unlock chip when the level-up granted avatar parts', () => {
+    const up: LevelUpData = { oldLevel: 1, newLevel: 2, levelsGained: 1, newTitles: [] };
+    render(<ImprovementPanel xp={{ ...xp, newLevel: 2 }} levelUp={up} streak={null} t={t} reducedMotion={false} />);
+    expect(screen.getByTestId('post-game-unlock-chip')).toBeInTheDocument();
+  });
+
+  it('no unlock row for a streak-only panel (no level known)', () => {
+    render(<ImprovementPanel xp={null} levelUp={null} streak={streak} t={t} reducedMotion={false} />);
+    expect(screen.queryByTestId('post-game-unlocks')).not.toBeInTheDocument();
+  });
 });

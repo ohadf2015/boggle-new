@@ -4,10 +4,11 @@
  * Renders a player's `avatar_config` to a PNG — the face behind AvatarLite
  * (landing leaderboard, header) and FCM/Web Push imageUrl.
  *
- * Lives on Express, NOT app/api: Next compiles route handlers under the
- * `react-server` condition, where the avatar parts' React contexts are
- * client references (`<Ctx.Provider>` is undefined) and every render threw
- * "Element type is invalid". Plain Node React here renders them fine.
+ * Lives on Express, NOT app/api (historically Next's `react-server`
+ * condition broke the old parts' client Contexts). Since the 2026-09 redraw
+ * AvatarRendererSsr IS the browser compositor (components/avatar/art/
+ * AvatarArt) — context-free and CSS-free — so the PNG is the same drawing
+ * players see, frozen on its static hero frame.
  *
  * Failure mode: any render/db error → 404 (never 500), so push delivery and
  * AvatarLite's onError fallback both degrade to no image.
@@ -48,7 +49,7 @@ router.get('/:playerId', async (req: Request<{ playerId: string }>, res: Respons
       return;
     }
 
-    // Lazy: keeps React SSR + the part library + sharp off server boot.
+    // Lazy: keeps React SSR + the art library + sharp off server boot.
     const [{ createElement }, { renderToStaticMarkup }, { default: AvatarRendererSsr }, { default: sharp }] =
       await Promise.all([
         import('react'),

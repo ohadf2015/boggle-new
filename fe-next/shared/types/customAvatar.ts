@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { HIDDEN_PARTS } from './avatarHiddenParts';
 
 // ==================== Gender ====================
 export const AVATAR_GENDERS = ['male', 'female'] as const;
@@ -47,6 +48,8 @@ export const FEMALE_HAIR_STYLES = [
   'curly', 'afro', 'dreads', 'cornrows', 'straight',
   /* New epic/cool hair (unisex) */
   'lightning', 'rainbowMohawk', 'iceSpikes', 'cottonCandy', 'vaporwave',
+  /* 2026-09 redraw: unisex staples + showpieces */
+  'ponytail', 'bun', 'elvis', 'flame', 'galaxy', 'trumpSwoop',
 ] as const;
 
 /** Styles that look masculine — shown when gender is male. */
@@ -62,6 +65,8 @@ export const MALE_HAIR_STYLES = [
   'lightning', 'rainbowMohawk', 'iceSpikes', 'cottonCandy', 'vaporwave',
   /* Premium overhaul hair */
   'pompadour', 'slickBack',
+  /* 2026-09 redraw: unisex staples + showpieces */
+  'wavy', 'flame', 'galaxy',
 ] as const;
 
 /** Default hair when switching to female */
@@ -509,17 +514,9 @@ export const NEW_PART_KEYS: readonly string[] = Object.entries(NEW_PARTS_MAP).fl
 export const PREMIUM_CATEGORIES = Object.keys(PREMIUM_MAP) as readonly string[];
 
 // ==================== Hidden Parts ====================
-// Parts that look broken or read wrong — hidden from picker + random generation,
-// but kept in the schema enum so existing saved configs still validate and render.
-// Bar for hiding: clearly looks bad AND isn't stylized/funny enough to redeem.
-// Stylized-but-unusual parts (cyclops, hypno, geometric bases) stay visible.
-export const HIDDEN_PARTS = {
-  base: [],
-  eyes: [],
-  mouth: ['pipe', 'drool', 'mustache'],
-  hair: ['frizzle'],
-  accessory: ['plunger'],
-} as const;
+// Data lives in ./avatarHiddenParts (retired + hidden ids, kept in the enums so
+// old saves still validate; never offered by pickers or the randomizer).
+export { HIDDEN_PARTS };
 
 type HiddenCategory = keyof typeof HIDDEN_PARTS;
 
@@ -538,12 +535,13 @@ const FREE_BASES = AVATAR_BASES.filter(v => !PREMIUM_MAP.base.includes(v) && !is
 const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.eyes.includes(v) && !isHidden('eyes', v));
 const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.mouth.includes(v) && !isHidden('mouth', v));
 const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v) && !isHidden('accessory', v));
-const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v));
+const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v) && !isHidden('facialHair', v));
 // "Real" (non-empty) variants — used so accessories/beards are an opt-IN highlight,
 // not a coin-flip that fills every slot (the generated-slop tell).
 const FREE_REAL_ACCESSORIES = FREE_ACCESSORIES.filter(v => v !== 'none');
 const FREE_REAL_FACIAL_HAIR = FREE_FACIAL_HAIR_STYLES.filter(v => v !== 'none');
-const FREE_EYEBROW_STYLES = AVATAR_EYEBROW_STYLES.filter(v => !PREMIUM_MAP.eyebrows.includes(v));
+const FREE_EYEBROW_STYLES = AVATAR_EYEBROW_STYLES.filter(v => !PREMIUM_MAP.eyebrows.includes(v) && !isHidden('eyebrows', v));
+const FREE_NOSE_STYLES = AVATAR_NOSE_STYLES.filter(v => !isHidden('noseStyle', v));
 // Gender-specific free hair lists prevent cross-gender style mismatch in random generation
 const FREE_FEMALE_HAIR_STYLES = FEMALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v));
 const FREE_MALE_HAIR_STYLES = MALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v));
@@ -661,7 +659,7 @@ function buildConfig(
     hairColor: pick(vibe.hair),
     eyes: pick(FREE_EYE_STYLES),
     eyeColor: pick(vibe.eyes),
-    noseStyle: pick(AVATAR_NOSE_STYLES),
+    noseStyle: pick(FREE_NOSE_STYLES),
     eyebrows: pick(FREE_EYEBROW_STYLES),
     facialHair,
     mouth: pick(FREE_MOUTH_STYLES),

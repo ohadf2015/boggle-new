@@ -7,7 +7,8 @@
  * Modals included:
  * - WordFeedbackModal: Self-healing dictionary validation
  * - ReferralMilestonePopup: Friend milestone notifications
- * - LevelUpCelebration: Epic full-screen GSAP animation
+ * - Avatar unlock reveal: fullscreen "you unlocked X" when the level-up granted
+ *   avatar parts (takes the levelUp slot; the old GSAP LevelUpCelebration stays retired)
  * - AuthModal: Guest signup prompt
  * - FirstWinSignupModal: Celebratory first win signup
  */
@@ -22,11 +23,12 @@ import { trackModalDismissed } from '@/utils/posthogEngagement';
 import type { WordToVote } from '@/types/components';
 import type { ReferralMilestone, LevelUpPayload } from '@/shared/types/socket';
 import type { GameResultForShare } from '@/utils/share';
+import { buildUnlockReveal } from '@/lib/avatar/revealTrigger';
 
 // Dynamic imports for modals (loaded after initial render)
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
 const ReferralMilestonePopup = dynamic(() => import('@/components/engagement/ReferralMilestonePopup'), { ssr: false });
-const LevelUpCelebration = dynamic(() => import('@/components/animations/LevelUpCelebration'), { ssr: false });
+const UnlockReveal = dynamic(() => import('@/components/avatar/reveal/ConnectedUnlockReveal'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 const GameFeedbackCard = dynamic(() => import('@/components/results/GameFeedbackCard'), { ssr: false });
@@ -157,9 +159,13 @@ export function ResultsModals({
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hideExternal = isOnCrazyGamesPlatform;
 
+  // Avatar parts this level-up granted (null = nothing to reveal). In memory
+  // only: the payload IS the trigger, there is no stored seen-marker.
+  const unlockReveal = useMemo(() => buildUnlockReveal(levelUp.levelUpData), [levelUp.levelUpData]);
+
   const modals = useMemo(() => {
     // Modal priority order (lower number = higher priority, shows first):
-    // 1. levelUp: Celebration peaks (epic full-screen GSAP, auto-dismisses after 5s)
+    // 1. levelUp: avatar unlock reveal, only when the level-up granted parts
     // 2. referralMilestone: Friend milestone notifications (quick, non-intrusive)
     // 3. firstWin: Guest signup after first win (high-priority conversion moment)
     // 4. share: Post-win share prompt (auto-opens exactly once)
@@ -171,7 +177,8 @@ export function ResultsModals({
     //    For SP: eligible after first game. For MP: eligible after 3rd game in session.
 
     const baseModals: Array<{ id: string; priority: number; isReady: boolean }> = [
-      { id: 'levelUp', priority: 1, isReady: false },
+      // Readiness must drop once closed, or the queue's reset never fires.
+      { id: 'levelUp', priority: 1, isReady: unlockReveal !== null && levelUp.showLevelUpCelebration },
       { id: 'referralMilestone', priority: 2, isReady: referralMilestone.showReferralMilestone },
       { id: 'firstWin', priority: 3, isReady: !hideExternal && firstWinModal.showFirstWinModal },
       { id: 'share', priority: 4, isReady: shareModal?.showShareModal ?? false },
@@ -189,6 +196,8 @@ export function ResultsModals({
 
     return baseModals;
   }, [
+    unlockReveal,
+    levelUp.showLevelUpCelebration,
     referralMilestone.showReferralMilestone,
     firstWinModal.showFirstWinModal,
     authModal.showAuthModal,
@@ -227,16 +236,12 @@ export function ResultsModals({
         onClose={() => { dismiss('referralMilestone'); referralMilestone.onClose(); }}
       />
 
-      {/* Epic Level Up Celebration - Full-screen GSAP animation */}
-      {levelUp.levelUpData && (
-        <LevelUpCelebration
-          level={levelUp.levelUpData.newLevel}
-          show={activeModalId === 'levelUp'}
-          onDismiss={() => { dismiss('levelUp'); levelUp.setShowLevelUpCelebration(false); levelUp.setLevelUpData?.(null); }}
-          autoDismissAfter={5000}
-          rewards={{
-            unlocks: levelUp.levelUpData.newTitles,
-          }}
+      {/* Avatar unlock reveal. Dismiss keeps levelUpData: ImprovementPanel's
+          level-up flourish and "New unlock!" chip still read it. */}
+      {unlockReveal && activeModalId === 'levelUp' && (
+        <UnlockReveal
+          reveal={unlockReveal}
+          onClose={() => { dismiss('levelUp'); levelUp.setShowLevelUpCelebration(false); }}
         />
       )}
 

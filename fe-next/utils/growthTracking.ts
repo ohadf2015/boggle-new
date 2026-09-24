@@ -142,6 +142,11 @@ export type GrowthEvent =
   | 'avatar_nudge_shown'
   | 'avatar_nudge_clicked'
   | 'avatar_nudge_dismissed'
+  // Avatar editor + unlock loop (typed helpers: lib/avatar/avatarTelemetry.ts)
+  | 'avatar_editor_opened'
+  | 'avatar_part_changed'
+  | 'avatar_saved'
+  | 'avatar_unlock_revealed'
   | 'hint_used'
   | 'wordwheel_drag_hint_shown'
   | 'wordwheel_drag_hint_dismissed'

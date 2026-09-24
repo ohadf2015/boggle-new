@@ -1,61 +1,22 @@
 'use client';
 
 import { memo } from 'react';
-import { type CustomAvatarConfig, isEpicPart, isLegendaryPart, isPremiumPart } from '@/shared/types/customAvatar';
-import '@/styles/avatar-tier-animations.css';
+import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { getConfigTier, tierToVisual, type Tier, type VisualTier } from '@/lib/avatar/rarity';
 
-export type Tier = 'free' | 'vip' | 'epic' | 'legendary';
-export type VisualTier = 'common' | 'rare' | 'epic' | 'legendary';
+// The rarity scheme lives in lib/avatar/rarity.ts (one scheme for every surface);
+// these re-exports keep existing imports working.
+export type { Tier, VisualTier };
 
 /** Map the internal economy tier to the player-facing visual tier. */
 export function getAvatarVisualTier(config: CustomAvatarConfig): VisualTier {
-  const tier = getAvatarTier(config);
-  switch (tier) {
-    case 'legendary': return 'legendary';
-    case 'epic': return 'epic';
-    case 'vip': return 'rare';
-    default: return 'common';
-  }
+  return tierToVisual(getAvatarTier(config));
 }
 
 /** Determine the highest tier across all equipped parts */
 function getAvatarTier(config: CustomAvatarConfig): Tier {
-  const parts: [string, string][] = [
-    ['eyes', config.eyes],
-    ['mouth', config.mouth],
-    ['accessory', config.accessory],
-    ['hair', config.hair],
-    ['base', config.base],
-    ['eyebrows', config.eyebrows ?? 'none'],
-    ['facialHair', config.facialHair ?? 'none'],
-  ];
-
-  let hasEpic = false;
-  let hasVip = false;
-  for (const [cat, val] of parts) {
-    if (val === 'none') continue;
-    if (isLegendaryPart(cat, val)) return 'legendary';
-    if (isEpicPart(cat, val)) hasEpic = true;
-    else if (isPremiumPart(cat, val)) hasVip = true;
-  }
-  if (hasEpic) return 'epic';
-  if (hasVip) return 'vip';
-  return 'free';
+  return getConfigTier(config);
 }
-
-const TIER_CLASS: Record<Tier, string> = {
-  free: 'avatar-tier-common',
-  vip: 'avatar-tier-rare',
-  epic: 'avatar-tier-epic',
-  legendary: 'avatar-tier-legendary',
-};
-
-const SPARKLE_COUNTS: Record<Tier, number> = {
-  free: 0,
-  vip: 0,
-  epic: 6,
-  legendary: 8,
-};
 
 interface AvatarTierEffectsProps {
   config: CustomAvatarConfig;
@@ -63,56 +24,23 @@ interface AvatarTierEffectsProps {
   className?: string;
   /** Override auto-detected tier (useful for previews) */
   forceTier?: Tier;
-  /** Disable animations (e.g. in builder grid thumbnails) */
+  /** No wrapper at all (e.g. builder grid thumbnails) */
   static?: boolean;
 }
 
 /**
- * Wraps an avatar with tier-appropriate visual effects.
- * The avatar SVG itself stays pure — effects are CSS-only overlays.
+ * Wrapper that tags an avatar with its rarity (`data-avatar-tier`) for
+ * surrounding UI. Since the 2026-09 redraw the rarity presentation itself —
+ * rays, frame, gems, sparkles, sheen — lives INSIDE the avatar SVG
+ * (art/rarityFx), so it also reaches the static PNG and every low-JS surface;
+ * this wrapper no longer stacks CSS sparkles on top.
  */
-const AvatarTierEffects = memo<AvatarTierEffectsProps>(({
-  config,
-  children,
-  className = '',
-  forceTier,
-  static: isStatic,
-}) => {
+const AvatarTierEffects = memo<AvatarTierEffectsProps>(({ config, children, className = '', forceTier, static: isStatic }) => {
+  if (isStatic) return <>{children}</>;
   const tier = forceTier ?? getAvatarTier(config);
-
-  if (isStatic) {
-    return <>{children}</>;
-  }
-
-  if (tier === 'free') {
-    // Free tier: idle breathing only — no sparkles or glow
-    return (
-      <div className={`avatar-idle-breathe ${className}`}>
-        {children}
-      </div>
-    );
-  }
-
-  const tierClass = TIER_CLASS[tier];
-  const sparkleCount = SPARKLE_COUNTS[tier];
-
   return (
-    <div className={`relative avatar-idle-breathe ${tierClass} ${className}`}>
-      {/* Rotating conic-gradient ring (legendary only) */}
-      {tier === 'legendary' && <div className="avatar-ring" />}
-
-      {/* The actual avatar */}
+    <div className={className} data-avatar-tier={tierToVisual(tier)}>
       {children}
-
-      {/* Shimmer sweep overlay */}
-      <div className="avatar-shimmer-overlay" />
-
-      {/* Sparkle particles */}
-      {sparkleCount > 0 && (
-        Array.from({ length: sparkleCount }, (_, i) => (
-          <div key={`sparkle-${i}`} className="avatar-sparkle" />
-        ))
-      )}
     </div>
   );
 });

@@ -1,72 +1,72 @@
 'use client';
 
-import { Lock } from 'lucide-react';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import {
-  AVATAR_GENDERS,
-  isPremiumPart,
-  getPartPrice,
-} from '@/shared/types/customAvatar';
-import type { AvatarPremium } from './AvatarBuilderModal';
+/**
+ * Editor color + body-type controls: a single-row swatch strip (scrolls
+ * sideways, never grows the page) and a compact body-type toggle.
+ */
+import { Check, Lock } from 'lucide-react';
+import { AVATAR_GENDERS, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import type { CatalogColor } from '@/lib/avatar/catalog';
+import { RARITY_TOKENS } from '@/lib/avatar/rarity';
+import { getPartLockInfo, type LockPremium } from './editor/partLock';
 
-// Bounce button spring (from animate-ai: playful-spring-bounce-button)
-const BUTTON_SPRING = { type: 'spring' as const, stiffness: 400, damping: 17 };
-
-// ==================== Color Strip (with spring feedback) ====================
-
-export interface ColorStripProps<T extends string> {
+export interface SwatchRowProps {
   label: string;
-  colors: readonly T[];
-  selected: T;
-  onSelect: (value: T) => void;
-  large?: boolean;
-  premiumCategory?: string;
-  premium?: AvatarPremium | undefined;
+  colors: readonly CatalogColor[];
+  selected: string | undefined;
+  /** Hex being tried on (locked premium color), if any. */
+  tryOnHex: string | null;
+  premium: LockPremium | null;
+  onPick: (color: CatalogColor) => void;
+  /** Wrap onto several lines (scroll-area rows) instead of one sideways strip. */
+  wrap?: boolean;
 }
 
-export function ColorStrip<T extends string>({ label, colors, selected, onSelect, large, premiumCategory, premium }: ColorStripProps<T>) {
-  const size = large ? 'w-9 h-9 sm:w-11 sm:h-11' : 'w-7 h-7 sm:w-8 sm:h-8';
-  // Hide premium colors when no premium context (e.g. onboarding)
-  const visibleColors = premiumCategory && !premium
-    ? colors.filter(c => !isPremiumPart(premiumCategory, c))
-    : colors;
-  return (
-    <div>
-      <p className="text-neo-white text-xs font-bold uppercase mb-2">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {visibleColors.map(color => {
-          const isLocked = premiumCategory && premium
-            && isPremiumPart(premiumCategory, color)
-            && !premium.isPartUnlocked(premiumCategory, color);
+/** Relative luminance → pick a check color that reads on the swatch. */
+function isLight(hex: string): boolean {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex);
+  if (!m) return false;
+  const n = parseInt(m[1], 16);
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 150;
+}
 
+export function SwatchRow({ label, colors, selected, tryOnHex, premium, onPick, wrap }: SwatchRowProps) {
+  return (
+    <div role="group" aria-label={label} className="min-w-0">
+      <p className="text-neo-white/80 text-[11px] font-black uppercase tracking-wider mb-1">{label}</p>
+      <div className={`flex gap-2 ${wrap ? 'flex-wrap' : 'overflow-x-auto avatar-editor-noscrollbar py-1 -my-1 px-1 -mx-1'}`}>
+        {colors.map(c => {
+          const info = getPartLockInfo(c.palette, c.hex, premium);
+          const isSel = selected?.toLowerCase() === c.hex.toLowerCase();
+          const isTry = tryOnHex === c.hex;
+          const special = info.rarity !== 'common';
           return (
-            <AdaptiveMotion.button
-              key={color}
-              onClick={() => onSelect(color)}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.85 }}
-              transition={BUTTON_SPRING}
-              className={`${size} rounded-full border-3 transition-shadow relative ${
-                selected === color
-                  ? 'border-neo-lime shadow-hard-sm ring-2 ring-neo-lime/40'
-                  : isLocked
-                    ? 'border-neo-yellow/40 opacity-50'
-                    : 'border-black hover:border-neo-white/50'
+            <button
+              key={c.hex}
+              type="button"
+              aria-label={c.hex}
+              aria-pressed={isSel}
+              data-locked={info.locked ? 'true' : 'false'}
+              onClick={() => onPick(c)}
+              className={`relative shrink-0 w-9 h-9 rounded-full border-[3px] transition-transform duration-150 active:scale-90 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan ${
+                isSel
+                  ? 'border-neo-lime ring-2 ring-neo-lime/50 ring-offset-2 ring-offset-neo-navy'
+                  : isTry
+                    ? 'border-dashed border-neo-cyan'
+                    : 'border-black'
               }`}
-              style={{ backgroundColor: color }}
-              aria-label={color}
+              style={{ backgroundColor: c.hex, ...(special && !isSel && !isTry ? { borderColor: RARITY_TOKENS[info.rarity].hex } : null) }}
             >
-              {isLocked && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <Lock className="w-3 h-3 text-white drop-shadow-md" />
-                  {premiumCategory && (
-                    <span className="text-[7px] font-black text-neo-yellow drop-shadow-md leading-none mt-0.5">
-                      {getPartPrice(premiumCategory, color)}
-                    </span>
-                  )}
-                </div>
+              {isSel && (
+                <Check size={16} strokeWidth={4} aria-hidden="true" className={`absolute inset-0 m-auto ${isLight(c.hex) ? 'text-neo-black' : 'text-neo-white'}`} />
               )}
-            </AdaptiveMotion.button>
+              {!isSel && info.locked && (
+                <span className="absolute -top-1 -end-1 w-4 h-4 rounded-full bg-neo-navy border-2 border-black flex items-center justify-center">
+                  <Lock size={8} strokeWidth={3} aria-hidden="true" className="text-neo-white" />
+                </span>
+              )}
+            </button>
           );
         })}
       </div>
@@ -74,37 +74,31 @@ export function ColorStrip<T extends string>({ label, colors, selected, onSelect
   );
 }
 
-// ==================== Gender Toggle ====================
-
 export interface GenderToggleProps {
-  selected: (typeof AVATAR_GENDERS)[number];
-  onSelect: (value: (typeof AVATAR_GENDERS)[number]) => void;
+  label: string;
+  selected: CustomAvatarConfig['gender'];
+  onSelect: (value: CustomAvatarConfig['gender']) => void;
   t: (key: string) => string;
 }
 
-export function GenderToggle({ selected, onSelect, t }: GenderToggleProps) {
+export function GenderToggle({ label, selected, onSelect, t }: GenderToggleProps) {
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <p className="text-neo-white text-[11px] font-bold uppercase tracking-wide shrink-0">{t('avatarBuilder.gender')}</p>
-      <div className="inline-flex gap-1 p-1 rounded-neo bg-neo-navy-light/60 border border-neo-white/10">
-        {AVATAR_GENDERS.map(gender => (
-          <AdaptiveMotion.button
-            key={gender}
-            onClick={() => onSelect(gender)}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.92 }}
-            transition={BUTTON_SPRING}
-            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-[6px] transition-colors ${
-              selected === gender
-                ? 'bg-neo-lime text-neo-black shadow-hard-sm'
-                : 'text-neo-white hover:text-neo-white'
-            }`}
-          >
-            <span className="text-base leading-none">{gender === 'male' ? '\u2642' : '\u2640'}</span>
-            <span>{t(`avatarBuilder.${gender}`)}</span>
-          </AdaptiveMotion.button>
-        ))}
-      </div>
+    <div role="radiogroup" aria-label={label} className="inline-flex shrink-0 gap-1 p-1 rounded-neo bg-neo-navy-light border-2 border-black self-end">
+      {AVATAR_GENDERS.map(gender => (
+        <button
+          key={gender}
+          type="button"
+          role="radio"
+          aria-checked={selected === gender}
+          onClick={() => onSelect(gender)}
+          className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-black rounded-[6px] transition-colors ${
+            selected === gender ? 'bg-neo-lime text-neo-black shadow-hard-sm' : 'text-neo-white/80 hover:text-neo-white'
+          }`}
+        >
+          <span aria-hidden="true" className="text-sm leading-none">{gender === 'male' ? '♂' : '♀'}</span>
+          <span>{t(`avatarBuilder.${gender}`)}</span>
+        </button>
+      ))}
     </div>
   );
 }

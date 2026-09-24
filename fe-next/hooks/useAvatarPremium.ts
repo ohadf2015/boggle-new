@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { queryKeys } from '@/lib/queryKeys';
-import { isPremiumPart } from '@/shared/types/customAvatar';
+import { isPartUsable, normalizeLevel, partKey } from '@/lib/avatar/unlocks';
 import { getWithAuth } from '@/utils/authFetch';
 import toast from 'react-hot-toast';
 
@@ -35,7 +35,9 @@ function saveTempUnlocks(unlocks: TempUnlocks): void {
 export function useAvatarPremium() {
   const queryClient = useQueryClient();
   const { coins, refreshCoins } = useCoinsFromContext();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, profile } = useAuth();
+  // Guests / unknown profile → level 1 (the ladder grants nothing at level 1).
+  const level = normalizeLevel(profile?.current_level);
   const [tempUnlocks, setTempUnlocks] = useState<TempUnlocks>({});
 
   // Load temp unlocks from localStorage after hydration (avoid SSR mismatch)
@@ -86,24 +88,18 @@ export function useAvatarPremium() {
     },
   });
 
+  // Free OR owned (bought / claimed) OR level-unlocked OR temp-unlocked (ad).
   const isPartUnlocked = useCallback((category: string, value: string): boolean => {
-    if (!isPremiumPart(category, value)) return true;
-
-    const partKey = `${category}:${value}`;
-
-    if (permanentUnlocks.includes(partKey)) return true;
-
-    const expiry = tempUnlocks[partKey];
-    if (expiry && expiry > Date.now()) return true;
-
-    return false;
-  }, [permanentUnlocks, tempUnlocks]);
+    if (isPartUsable(category, value, { ownedKeys: permanentUnlocks, level })) return true;
+    const expiry = tempUnlocks[partKey(category, value)];
+    return !!expiry && expiry > Date.now();
+  }, [permanentUnlocks, tempUnlocks, level]);
 
   const unlockTemporarily = useCallback((category: string, value: string) => {
-    const partKey = `${category}:${value}`;
+    const key = partKey(category, value);
     const expiry = Date.now() + TEMP_UNLOCK_DURATION;
     setTempUnlocks(prev => {
-      const next = { ...prev, [partKey]: expiry };
+      const next = { ...prev, [key]: expiry };
       saveTempUnlocks(next);
       return next;
     });
@@ -125,5 +121,6 @@ export function useAvatarPremium() {
     isPurchasing: purchaseMutation.isPending,
     permanentUnlocks,
     coins,
+    level,
   };
 }

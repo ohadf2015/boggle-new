@@ -30,6 +30,8 @@ import { useAchievementQueue } from '@/components/achievements';
 import { useSinglePlayerConfig } from './useSinglePlayerConfig';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
+import SessionRevealHost from '@/components/avatar/reveal/SessionRevealHost';
+import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 // Off the LCP-critical path (phase 'playing' renders SinglePlayerGame only) —
 // deferred so results/tutorial JS (framer-motion, ads, confetti) doesn't block first paint.
@@ -253,6 +255,8 @@ const SinglePlayerView: React.FC = () => {
         })
           .then(r => r.json())
           .then(data => {
+            // Level-up → avatar unlock reveal (in memory; SessionRevealHost shows it).
+            publishLevelUp(levelUpFromRecordGame(data));
             if (Array.isArray(data.lifetimeAchievements)) {
               for (const achievement of data.lifetimeAchievements) {
                 if (achievement?.key) queueAchievement(achievement);
@@ -351,6 +355,7 @@ const SinglePlayerView: React.FC = () => {
                 onStartPreset={handleStartPreset}
               />
             )}
+            <SessionRevealHost />
           </>
         )}
       </div>

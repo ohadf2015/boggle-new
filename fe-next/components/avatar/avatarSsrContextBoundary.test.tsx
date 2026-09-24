@@ -21,21 +21,38 @@ function firstMeaningfulLine(src: string): string {
 }
 
 describe('avatar PNG render — JAVASCRIPT-NEXTJS-1HW / 1DV', () => {
-  // These context modules call createContext. Turbopack forbids createContext
-  // from entering a server-graph module, and the avatar PNG route handler
-  // (app/api/avatar/png/[playerId]/route.ts) imports them via AvatarRendererSsr
-  // — so they MUST stay behind 'use client' or the PRODUCTION BUILD FAILS:
-  //   "You're importing a module that depends on `createContext` into a React
-  //    Server Component module."
-  // Removing 'use client' has been attempted and reverted twice. Do NOT remove
-  // it. The server-render failure it causes is suppressed via sentry.server
-  // .config.ts ignoreErrors and the route degrades gracefully (404 → mascot).
-  it.each(['AvatarUidContext.tsx', 'AvatarEyeColorContext.tsx'])(
-    '%s keeps "use client" (Turbopack requires it; removing breaks the prod build)',
-    (file) => {
-      expect(firstMeaningfulLine(readSource(`./${file}`))).toMatch(/^['"]use client['"]/);
-    },
-  );
+  // 2026-09 redraw: the PNG route renders the SAME compositor as the browser
+  // (art/AvatarArt). The old failure — part files reading client Contexts that
+  // are undefined under the react-server condition — is designed out: nothing
+  // in the compositor's static import graph may create a Context or be a
+  // 'use client' module.
+  it('the server compositor graph has no createContext and no "use client" module', () => {
+    const seen = new Set<string>();
+    const queue = ['./art/AvatarArt.tsx'];
+    const offenders: string[] = [];
+    while (queue.length) {
+      const rel = queue.shift()!;
+      if (seen.has(rel)) continue;
+      seen.add(rel);
+      const src = readSource(rel);
+      if (/createContext\(/.test(src) || /^['"]use client['"]/.test(firstMeaningfulLine(src))) offenders.push(rel);
+      for (const m of src.matchAll(/^import\s+(?!type\b)[^;]*?from\s+['"](\.\/[^'"]+)['"]/gm)) {
+        const dir = rel.slice(0, rel.lastIndexOf('/') + 1);
+        const spec = m[1].slice(2);
+        for (const ext of ['.tsx', '.ts']) {
+          try {
+            readSource(`${dir}${spec}${ext}`);
+            queue.push(`${dir}${spec}${ext}`);
+            break;
+          } catch {
+            /* try next extension */
+          }
+        }
+      }
+    }
+    expect(seen.size).toBeGreaterThan(8);
+    expect(offenders).toEqual([]);
+  });
 
   it('avatar PNG render failures are filtered from Sentry (handled gracefully)', () => {
     const sentryConfig = readSource('../../sentry.server.config.ts');

@@ -20,6 +20,8 @@ const StreakBadge = dynamic(() => import('@/components/StreakBadge'), { ssr: fal
 // Dynamic — DesktopGameNav uses navigation/CrazyGames/veteran hooks; matches the
 // pattern of other sub-components above and keeps Header unit tests insulated.
 const DesktopGameNav = dynamic(() => import('./DesktopGameNav'), { ssr: false });
+// Dynamic — authed-only avatar → /profile entry (never SSR-visible, keeps it off first paint).
+const HeaderProfileEntry = dynamic(() => import('./avatar/reveal/HeaderProfileEntry'), { ssr: false });
 
 interface HeaderProps {
     className?: string;
@@ -121,6 +123,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         onSignIn={openSignIn}
                         onSignUp={openSignUp}
                     />
+
+                    <HeaderProfileEntry />
 
                     <HeaderMobileMenu
                         unclaimedCount={unclaimedCount}
