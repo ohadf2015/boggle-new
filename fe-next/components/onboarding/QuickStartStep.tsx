@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useRef, useState } from 'react';
-import { m } from 'framer-motion';
 import { Play, Shuffle, Pencil } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SUPPORTED_GAME_LANGUAGES, LANGUAGE_CONFIG } from '@/lib/languageConfig';
@@ -16,6 +15,7 @@ import { NeoPanel } from '@/components/ui/panel';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/types';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import styles from './QuickStartStep.module.css';
 
 export interface QuickStartStepProps {
   /** Start the game. Called with whatever identity the player happens to have. */
@@ -106,15 +106,12 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-4 lg:max-w-md" dir={dir}>
       {/* Brand hero */}
-      <m.h1
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-        className="font-neo-display text-4xl font-black tracking-tight text-neo-lime lg:text-5xl"
+      <h1
+        className={cn('font-neo-display text-4xl font-black tracking-tight text-neo-lime lg:text-5xl', styles.brandDrop)}
         style={{ WebkitTextStroke: '1.5px rgba(0,0,0,0.3)' }}
       >
         LexiClash
-      </m.h1>
+      </h1>
 
       {/* The game, first. Self-tracing so it demonstrates the one mechanic
           (drag to link letters) without asking the player to do anything. */}
@@ -225,21 +222,21 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
 
         {/* The one thing the screen is for. Never disabled — an empty name falls
             back to the suggestion rather than blocking the tap. */}
-        <m.button
+        <button
           type="button"
           data-testid="quick-start-play"
           onClick={handlePlay}
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98, y: 2 }}
           className={cn(
             'mt-5 flex w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black',
             'bg-neo-lime py-4 font-neo-display text-2xl font-black uppercase tracking-wide text-neo-navy',
-            'shadow-hard active:translate-y-[2px] active:shadow-hard-pressed'
+            'shadow-hard active:translate-y-[2px] active:shadow-hard-pressed',
+            // CSS hover lift + press (was framer whileHover/whileTap); transform only.
+            'transition-transform duration-150 motion-safe:hover:-translate-y-0.5 motion-safe:hover:scale-[1.02] motion-safe:active:scale-[0.98]'
           )}
         >
           <Play className="h-6 w-6" fill="currentColor" />
           {t('onboarding.quickStart.play')}
-        </m.button>
+        </button>
 
         {/* Expectation-setter (Streak Ignition, t_89663cfc): tapping PLAY is
             safe and instant — quick game, no account wall. */}

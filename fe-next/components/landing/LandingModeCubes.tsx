@@ -237,10 +237,12 @@ function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', w
             src={model.genIcon as string}
             alt=""
             fill
-            // The anchor (arena) is above the fold → eager-preload it; the rest of
-            // the bento stays lazy. A shared navy LQIP blurs up seamlessly (same
-            // navy as the tile) so cubes never pop in from blank.
-            priority={anchor}
+            // Every cube stays lazy, the anchor included: this bento lives in the
+            // returning tree, which the server also renders (display:none) for
+            // fresh visitors, so `priority` preloaded arena.png for people who
+            // never see it (fresh.perf.returningImages.test.tsx). A shared navy
+            // LQIP blurs up seamlessly (same navy as the tile) so cubes never
+            // pop in from blank.
             placeholder="blur"
             blurDataURL={CUBE_BLUR_DATA_URL}
             sizes={

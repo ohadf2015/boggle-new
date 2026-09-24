@@ -107,7 +107,10 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
           src={DAILY_ART}
           alt=""
           fill
-          priority
+          // Not `priority`: this hero lives in the returning tree, which the
+          // server renders (display:none) for fresh visitors too; a priority
+          // image would preload daily.png for someone who never sees it.
+          // Guarded by components/landing/__tests__/fresh.perf.returningImages.test.tsx.
           placeholder="blur"
           blurDataURL={CUBE_BLUR_DATA_URL}
           sizes="150px"

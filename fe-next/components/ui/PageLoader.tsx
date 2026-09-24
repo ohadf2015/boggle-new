@@ -20,6 +20,13 @@ interface PageLoaderProps {
   nested?: boolean;
   /** Optional className for the wrapper */
   className?: string;
+  /**
+   * Preload the mascot image at high priority (default true). The generic
+   * `[locale]/loading.tsx` route boundary passes false: its loader is on screen
+   * for a moment, so a high-priority image fetch only competes with the page's
+   * real first paint.
+   */
+  priority?: boolean;
 }
 
 const MASCOT_SIZES = {
@@ -48,6 +55,7 @@ export const PageLoader = memo(function PageLoader({
   mascotVariant = 'happy',
   nested = false,
   className,
+  priority = true,
 }: PageLoaderProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -86,7 +94,7 @@ export const PageLoader = memo(function PageLoader({
             variant={mascotVariant}
             size={mascotSize}
             animated={true}
-            priority={true}
+            priority={priority}
             clipShape="none"
             clipBorder="none"
           />

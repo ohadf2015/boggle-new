@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
@@ -102,7 +103,25 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <ul className="space-y-2">
               <li><Link prefetch={false} href={`/${language}/education`} className={footerLinkClass}>{t('footer.educationHub', 'Education Hub')}</Link></li>
             </ul>
-            <ul className="mt-2 grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2">
+            {/*
+              Phones only (<md): the registry below runs ~1,860px of link lines
+              at 390px, so it folds behind ONE native disclosure (homepage
+              gauntlet, SPEC §12). The <details> is only the toggle (`peer`);
+              the list stays its SIBLING, so every link is in the server HTML
+              and in the accessibility tree whether folded or not, and at md
+              the toggle disappears and the list is always shown: the desktop
+              footer is unchanged.
+            */}
+            <details className="peer group/teachers mt-1 md:hidden">
+              <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 py-2 text-sm text-neo-white transition-colors duration-100 marker:hidden hover:text-neo-cyan focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan [&::-webkit-details-marker]:hidden">
+                {t('homeFresh.close.teacherPages', 'All teacher pages')}
+                <ChevronDown
+                  aria-hidden="true"
+                  className="h-4 w-4 motion-safe:transition-transform motion-safe:duration-200 group-open/teachers:rotate-180"
+                />
+              </summary>
+            </details>
+            <ul className="mt-2 hidden grid-cols-1 gap-x-4 gap-y-2 peer-open:grid sm:grid-cols-2 md:grid">
               {EDUCATION_PAGES.map((page) => (
                 <li key={page.slug}>
                   <Link

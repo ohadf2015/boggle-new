@@ -59,6 +59,9 @@ function interpolate(template: string, params: Record<string, string | number>):
     return result;
 }
 
+/** Engagement signals that start the landing-subset → full-catalogue upgrade. */
+const SUBSET_UPGRADE_EVENTS = ['pointerdown', 'keydown', 'touchstart', 'scroll'] as const;
+
 const parseLocaleFromPath = (pathname: string): Language | null => {
     if (!pathname) return null;
     const segments = pathname.split('/');
@@ -139,6 +142,9 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
     // JAVASCRIPT-NEXTJS-27*). A counter always changes.
     const [translationsReady, bumpTranslations] = useReducer((n: number) => n + 1, 0);
 
+    // Pending landing-subset → full-catalogue upgrade (null once started/unneeded).
+    const subsetUpgradeRef = useRef<(() => void) | null>(null);
+
     // Load translations when language changes or on first mount when no initialTranslations
     useEffect(() => {
         const cached = getCachedTranslation(language);
@@ -155,7 +161,11 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 bumpTranslations();
             }
             let cancelled = false;
+            let started = false;
             const upgrade = () => {
+                if (started) return;
+                started = true;
+                detach();
                 loadTranslation(language).then((data) => {
                     if (cancelled) return;
                     setCurrentTranslations(data);
@@ -164,22 +174,21 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                     logger.warn(`Failed to load translations for ${language}:`, err);
                 });
             };
-            const onInteract = () => upgrade();
-            window.addEventListener('pointerdown', onInteract, { once: true });
-            window.addEventListener('keydown', onInteract, { once: true });
-            const idleId =
-                typeof window.requestIdleCallback === 'function'
-                    ? window.requestIdleCallback(() => upgrade(), { timeout: 4000 })
-                    : null;
-            const timeoutId = idleId === null ? window.setTimeout(upgrade, 4000) : null;
+            // First engagement or first client navigation, never on idle: an idle
+            // upgrade always landed inside the first load, spending ~150KB br on
+            // a catalogue the landing page does not use (it renders only the
+            // subset namespaces). Guarded by fresh.perf.LanguageContext.deferredUpgrade.test.
+            const onEngage = () => upgrade();
+            const opts = { capture: true, passive: true } as const;
+            const detach = () => {
+                for (const type of SUBSET_UPGRADE_EVENTS) window.removeEventListener(type, onEngage, opts);
+            };
+            for (const type of SUBSET_UPGRADE_EVENTS) window.addEventListener(type, onEngage, opts);
+            subsetUpgradeRef.current = upgrade;
             return () => {
                 cancelled = true;
-                window.removeEventListener('pointerdown', onInteract);
-                window.removeEventListener('keydown', onInteract);
-                if (idleId !== null && typeof window.cancelIdleCallback === 'function') {
-                    window.cancelIdleCallback(idleId);
-                }
-                if (timeoutId !== null) window.clearTimeout(timeoutId);
+                detach();
+                subsetUpgradeRef.current = null;
             };
         }
         bumpTranslations();
@@ -198,6 +207,13 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
     useEffect(() => {
         languageRef.current = language;
     }, [language]);
+
+    // First client navigation off the landing subset: upgrade now, so the next
+    // route (e.g. /multiplayer) does not render against the subset.
+    const bootPathRef = useRef(pathname);
+    useEffect(() => {
+        if (pathname !== bootPathRef.current) subsetUpgradeRef.current?.();
+    }, [pathname]);
 
     // After mount, reconcile URL locale with user's explicit saved preference.
     // Android WebView cold-starts at `/` → server falls back to Accept-Language

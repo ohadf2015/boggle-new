@@ -9,8 +9,13 @@ import { PageLoader } from '@/components/ui/PageLoader';
  * page-agnostic: the mascot PageLoader, the same loader leaderboard/profile/
  * multiplayer already use.
  *
- * The homepage has its own (home)/loading.tsx (a random dancing mascot), scoped
- * to the (home) route group so it doesn't leak down to these siblings.
+ * The homepage inherits this boundary too (its own (home)/loading.tsx was
+ * removed: the fresh page streams its h1 in the shell, and a homepage-only
+ * fallback only added a hidden segment + an image fetch in front of it).
+ *
+ * `priority={false}`: the loader is on screen for a moment, so its mascot must
+ * not be a high-priority preload competing with the real first paint.
+ * Guarded by components/landing/__tests__/fresh.perf.loadingBoundary.test.tsx.
  */
 export default function Loading() {
   return (
@@ -21,7 +26,7 @@ export default function Loading() {
     // viewport-tall loader keeps the footer below the fold during load, so the
     // content swap happens off-screen and counts ~zero CLS.
     <div className="flex-1 flex flex-col bg-neo-navy page-content-safe min-h-[100svh]">
-      <PageLoader />
+      <PageLoader priority={false} />
     </div>
   );
 }

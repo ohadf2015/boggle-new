@@ -7,7 +7,7 @@
  * CG portal traffic = high intent to play immediately, not browse marketing.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import HomePageClient from '@/app/[locale]/PageClient';
 
 vi.mock('@/components/landing', () => ({
@@ -53,9 +53,14 @@ describe('HomePageClient — CG auto-onboarding', () => {
     expect(screen.getByTestId('landing-view')).toBeInTheDocument();
   });
 
-  it('mounts OnboardingFlow for non-CG new users too (first-visit auto-onboard)', () => {
+  // INTENT CHANGE (homepage gauntlet SPEC §8, lead override 2026-09-23): only
+  // CG portal traffic keeps the first-paint auto-onboard; plain web new users
+  // land on the fresh page and open the FTUE from its PLAY CTA.
+  it('does NOT auto-mount OnboardingFlow for non-CG new users; the PLAY CTA opens it', () => {
     mockCgDetected = false;
     render(<HomePageClient />);
+    expect(screen.queryByTestId('onboarding-flow')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('play-cta'));
     expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
     expect(screen.getByTestId('landing-view')).toBeInTheDocument();
   });

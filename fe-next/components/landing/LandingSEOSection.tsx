@@ -1,55 +1,47 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useParams } from 'next/navigation';
-import { type Variants } from 'framer-motion';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { MousePointerClick, Layers, Trophy, Target } from 'lucide-react';
-import { Mascot } from '@/components/ui/Mascot';
+import { Spline, Trophy, Users, Zap, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FreshCrossLink } from './fresh/FreshCrossLink';
 import { contentByLocale, type LandingSEOContent } from './landingSEOContent';
-import { ModeShowcase } from './seo/ModeShowcase';
-import { WhoPlays } from './seo/WhoPlays';
-import { CommunityBand } from './seo/CommunityBand';
+import s from './fresh/FreshMotion.module.css';
 
-/* ── Animation variants (visible-by-default — must never gate SSR content) ─── */
+/**
+ * How to Play: the homepage's authored SEO copy as a real section (homepage
+ * gauntlet, round 6). Rounds 2-5 set it as ever-quieter fine print and the
+ * critic kept reading the tail as an "SEO content dump", so it now speaks the
+ * page's own language instead:
+ *
+ * - A section-scale headline (sections 2-6), and the what-is answer as the
+ *   section's line. "What is LexiClash?" stays in the HTML as an sr-only
+ *   heading (SPEC §9): set as a bold question over a paragraph it read as a
+ *   second FAQ. The locale's cross-link (en/es/sv) closes the line.
+ * - The four steps are the hero's tiles (colored fill, black border, hard
+ *   shadow) strung on a lime trace path: a column on phones, a row at md.
+ *   The tiles pop along the path in order (FreshMotion, after the page's 9s
+ *   hold, motion-safe); hover/press only straighten and lift them.
+ * - Nothing folds: the FAQ keeps the page's one accordion.
+ *
+ * Plain markup on purpose: SSR'd (crawlers read it, LandingView.ssr.test) and
+ * visible at rest. ModeShowcase / WhoPlays / community stay folded into the
+ * fresh page's Modes and Languages sections.
+ */
 
-const easeOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+interface StepArt {
+  accent: 'lime' | 'pink' | 'cyan' | 'purple';
+  icon: LucideIcon;
+  /** Literal class strings (Tailwind v4 only generates what it can read). */
+  tile: string;
+}
 
-const sectionReveal: Variants = {
-  hidden: { opacity: 1, y: 0 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } },
-};
-
-const staggerContainer: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-};
-
-const staggerItem: Variants = {
-  hidden: { opacity: 1, y: 0, scale: 1 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: easeOut } },
-};
-
-const STEP_ICONS = [MousePointerClick, Layers, Target, Trophy];
-const STEP_BG = ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-purple'] as const;
-const STEP_COLORS = ['text-neo-pink', 'text-neo-cyan', 'text-neo-lime', 'text-neo-purple'] as const;
-const STEP_GLOW = [
-  'shadow-[0_0_20px_rgba(255,20,147,0.3)]',
-  'shadow-[0_0_20px_rgba(0,255,255,0.3)]',
-  'shadow-[0_0_20px_rgba(191,255,0,0.3)]',
-  'shadow-[0_0_20px_rgba(139,92,246,0.3)]',
-] as const;
-
-/* "Play free now" CTA label — static per-locale (button copy, not SEO prose). */
-const PLAY_LABEL: Record<string, string> = {
-  en: 'Play free now',
-  he: 'שחקו בחינם',
-  sv: 'Spela gratis nu',
-  ja: '今すぐ無料でプレイ',
-  es: 'Juega gratis ya',
-};
-
-/* ── Main component ────────────────────────────────────────────────────────── */
+const STEP_ART: StepArt[] = [
+  { accent: 'lime', icon: Users, tile: 'bg-neo-lime -rotate-3' },
+  { accent: 'pink', icon: Spline, tile: 'bg-neo-pink rotate-2' },
+  { accent: 'cyan', icon: Zap, tile: 'bg-neo-cyan -rotate-2' },
+  { accent: 'purple', icon: Trophy, tile: 'bg-neo-purple rotate-3' },
+];
 
 interface LandingSEOSectionProps {
   className?: string;
@@ -62,90 +54,72 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
 
   return (
     <section
-      className={cn(
-        'w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 sm:pb-16 relative z-20',
-        'space-y-16 sm:space-y-24',
-        'content-visibility-auto',
-        className
-      )}
+      data-home-tail="seo"
+      aria-labelledby="home-how-title"
+      className={cn('relative z-20 flex w-full flex-col gap-10 md:gap-14', className)}
     >
-      {/* ── §1 · What is LexiClash — identity hook with the mascot ───────────── */}
-      <AdaptiveMotion.div
-        className="flex flex-col items-center text-center gap-4"
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <Mascot variant="waving" size="xl" animated priority={false} />
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-white neo-title">
-          {c.whatIsTitle}
-        </h2>
-        <p className="text-base sm:text-xl text-neo-cream font-semibold leading-snug max-w-2xl text-balance">
-          {c.whatIsShort}
-        </p>
-      </AdaptiveMotion.div>
-
-      {/* ── §2 · How to Play — connected timeline flow ───────────────────────── */}
-      <AdaptiveMotion.div
-        variants={sectionReveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-white text-center mb-10 neo-title">
+      <div className="flex max-w-2xl flex-col gap-4">
+        <h2
+          id="home-how-title"
+          className="font-neo-display text-3xl font-bold leading-[1.08] text-neo-cream text-balance sm:text-4xl md:text-5xl"
+        >
           {c.howToPlayTitle}
         </h2>
-        <AdaptiveMotion.div
-          className="relative grid grid-cols-2 sm:grid-cols-4 gap-y-8 gap-x-4 sm:gap-x-2"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-30px' }}
-        >
-          <div className="hidden sm:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-linear-to-r from-neo-pink/40 via-neo-cyan/40 via-50% to-neo-purple/40" aria-hidden="true" />
+        {/* The what-is answer is the section line; its question heading is
+            for screen readers and crawlers only (fresh.shell.r6.howToPlay). */}
+        <div data-home-whatis className="max-w-[46ch] leading-relaxed">
+          <h3 className="sr-only">{c.whatIsTitle}</h3>
+          <p className="inline font-neo-body text-base leading-relaxed text-neo-cream/80 md:text-lg">
+            {c.whatIsShort}
+          </p>{' '}
+          <FreshCrossLink
+            locale={locale}
+            className="whitespace-nowrap font-neo-body text-base font-bold text-neo-cream underline decoration-neo-lime decoration-2 underline-offset-4 transition-colors hover:text-neo-lime focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-lime md:text-lg"
+          />
+        </div>
+      </div>
+
+      <div data-step-path className="relative">
+        {/* The lime trace through the tile centers: down a column on phones
+            (tiles are 56px, so centers sit 28px in), across a row at md. */}
+        <span
+          data-step-rail
+          aria-hidden="true"
+          className="absolute bottom-7 start-[25px] top-7 w-1.5 rounded-full bg-neo-lime md:bottom-auto md:end-[12.5%] md:start-[12.5%] md:top-[29px] md:h-1.5 md:w-auto"
+        />
+        <ol className="relative grid grid-cols-1 gap-5 md:grid-cols-4 md:gap-6">
           {c.steps.map((step, i) => {
-            const StepIcon = STEP_ICONS[i];
+            const art = STEP_ART[i % STEP_ART.length];
+            const Icon = art.icon;
             return (
-              <AdaptiveMotion.div
+              <li
                 key={step}
-                variants={staggerItem}
-                className="flex flex-col items-center text-center gap-3 relative"
+                className="group flex items-center gap-4 md:flex-col md:gap-5 md:text-center"
               >
-                <div className={cn(
-                  'relative z-10 w-14 h-14 sm:w-16 sm:h-16 rounded-full',
-                  'flex items-center justify-center border-3 border-neo-black',
-                  STEP_BG[i], STEP_GLOW[i], 'transition-shadow duration-300'
-                )}>
-                  <span className="font-black text-neo-black text-xl sm:text-2xl">{i + 1}</span>
-                </div>
-                <div className={cn('p-2', STEP_COLORS[i])}>
-                  <StepIcon className="w-5 h-5" aria-hidden="true" />
-                </div>
-                <span className="text-xs sm:text-sm font-bold text-neo-white leading-tight max-w-[140px]">
+                <span
+                  data-step-art={art.accent}
+                  aria-hidden="true"
+                  style={{ '--step': i } as CSSProperties}
+                  className={cn(
+                    'relative flex h-14 w-14 shrink-0 items-center justify-center rounded-neo-lg border-3 border-neo-black text-neo-black shadow-hard-lg md:h-16 md:w-16',
+                    'motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-0 motion-safe:group-active:translate-y-0.5',
+                    art.tile,
+                    s.stepPop
+                  )}
+                >
+                  <Icon className="h-7 w-7 md:h-8 md:w-8" strokeWidth={2.5} />
+                  <span className="absolute -end-2.5 -top-2.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cream font-neo-display text-xs font-bold tabular-nums text-neo-black">
+                    {i + 1}
+                  </span>
+                </span>
+                <span className="font-neo-body text-base font-bold leading-snug text-neo-cream text-balance md:max-w-[16ch]">
                   {step}
                 </span>
-              </AdaptiveMotion.div>
+              </li>
             );
           })}
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-
-      {/* ── §3 · Mode Showcase — what you can actually play ──────────────────── */}
-      <ModeShowcase modes={c.gameModes} heading={c.featuresTitle} />
-
-      {/* ── §4 · Who Plays — made for whoever's in the room ──────────────────── */}
-      <WhoPlays cards={c.whoCanPlayCards} heading={c.whoCanPlayTitle} />
-
-      {/* ── §5 · Community — you're joining thousands ────────────────────────── */}
-      <CommunityBand
-        heading={c.communityTitle}
-        body={c.communityContent}
-        stats={c.communityStats}
-        ctaLabel={PLAY_LABEL[locale] || PLAY_LABEL.en}
-        ctaHref={`/${locale}`}
-        instagramHandle="@lexi.clash"
-      />
+        </ol>
+      </div>
     </section>
   );
 }

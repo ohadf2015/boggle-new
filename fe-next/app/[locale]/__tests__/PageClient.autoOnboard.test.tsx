@@ -8,7 +8,7 @@
  * Returning users still see LandingView alone.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import HomePageClient from '@/app/[locale]/PageClient';
 
 // Mock LandingView to expose the onStartOnboarding callback
@@ -44,8 +44,14 @@ describe('HomePageClient — auto-onboarding for new users', () => {
     });
   });
 
-  it('renders OnboardingFlow as an overlay ON TOP of LandingView for new users on first visit', () => {
+  // INTENT CHANGE (homepage gauntlet SPEC §8, lead override 2026-09-23): a plain
+  // fresh visitor is no longer auto-dropped into the FTUE overlay (it trapped
+  // them: scroll p50 0%). They land on the fresh page and PLAY opens the FTUE.
+  // The overlay-not-replace invariant below is unchanged.
+  it('opens OnboardingFlow as an overlay ON TOP of LandingView when a new user presses PLAY', () => {
     render(<HomePageClient />);
+    expect(screen.queryByTestId('onboarding-flow')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('play-cta'));
     expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
     // LandingView STAYS mounted underneath the opaque FTUE overlay — unmounting
     // it post-hydration reflowed the SEO section and was the CLS 1.0 source.

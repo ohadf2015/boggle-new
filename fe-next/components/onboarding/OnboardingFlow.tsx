@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite, getPendingRoomInvite } from '@/utils/onboardingStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import {
+  trackGrowthEvent,
   trackOnboardingStart,
   trackOnboardingStep,
   trackOnboardingCompleted,
@@ -16,7 +17,8 @@ import {
   trackInviteTutorialSkipped,
   trackInviteConsumed,
 } from '@/utils/growthTracking';
-import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
+import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 import { useInviteOnboardingMode, type FlowStep } from '@/hooks/useInviteOnboardingMode';
 import { getGuestStats } from '@/utils/guestManager';
 import LanguageSelect from './LanguageSelect';
@@ -38,6 +40,13 @@ import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
 
 interface OnboardingFlowProps {
   onComplete: () => void;
+  /**
+   * 'quickPlay': opened by the homepage hero PLAY. The visitor already traced
+   * the demo word there, so skip QuickStartStep (its CAT demo would repeat)
+   * and run the quick-start exit at once with a suggested name and a random
+   * avatar. A pending room invite and CrazyGames keep their own flows.
+   */
+  entry?: 'quickPlay';
 }
 
 /**
@@ -56,7 +65,7 @@ interface OnboardingFlowProps {
  * The invite flow (language -> profile -> inviteTutorial) and the CrazyGames
  * flow are deliberately unchanged.
  */
-const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
+const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, entry }) => {
   const { language, dir, t } = useLanguage();
   const { isAuthenticated, isAdmin } = useAuth();
   const { updateSetting } = useAccessibility();
@@ -73,6 +82,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // Resolved once at mount (same discipline as `step`): the hero quick-play
+  // entry never renders a step, not even for one frame, so QuickStartStep's
+  // demo and events never fire underneath it.
+  const [quickEntry] = useState(() => entry === 'quickPlay' && !getPendingRoomInvite());
+  const quickEntryFiredRef = useRef(false);
   // CG portal substep: tutorial first, then welcome with mode CTAs.
   const [cgTutorialDone, setCgTutorialDone] = useState(false);
   const [playerName, setPlayerName] = useState('');
@@ -364,12 +378,28 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           ? `/${language}/multiplayer?room=${pendingRoom}`
           : firstGameRoute(language),
       );
-      if (!pendingRoom) trackOnboardingQuickPlay({ source: 'quick_start' });
+      if (!pendingRoom) {
+        trackOnboardingQuickPlay(
+          quickEntry ? { source: 'quick_start', entry: 'home_hero' } : { source: 'quick_start' },
+        );
+      }
       emitCompleted({ via: 'quick_start' });
       onComplete();
     },
-    [isNavigating, recordStep, language, router, onComplete, emitCompleted],
+    [isNavigating, recordStep, language, router, onComplete, emitCompleted, quickEntry],
   );
+
+  // Hero quick-play entry: the SAME exit as QuickStartStep's PLAY (identical
+  // markOnboardingComplete payload and destination, Class 3), with the name and
+  // avatar QuickStartStep would have pre-filled. The ref stops StrictMode's
+  // double effect from navigating twice. CrazyGames keeps its welcome flow.
+  useEffect(() => {
+    if (!quickEntry || isOnCrazyGamesPlatform || quickEntryFiredRef.current) return;
+    quickEntryFiredRef.current = true;
+    // Same funnel step QuickStartStep's PLAY fires, so before/after compare.
+    trackGrowthEvent('quickstart_play_clicked', { entry: 'home_hero' });
+    handleQuickStartPlay(suggestPlayerName(language), getRandomAvatarConfig(), false);
+  }, [quickEntry, isOnCrazyGamesPlatform, handleQuickStartPlay, language]);
 
   // Step 0: Language selected — proceed to returningUser prompt OR straight to profile.
   // POLICY: Brand-new users (0 games) skip ReturningUserStep — they go straight to play.
@@ -420,6 +450,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   );
 
   const renderStep = () => {
+    if (quickEntry) return null;
     switch (step) {
       case 'returningUser':
         return (
@@ -567,7 +598,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           because the step content scrolls: the old link lived in the tertiary
           row at the bottom of the step and measured below the fold at
           1440x900, which is how "there is no way to sign in" happened. */}
-      {!isOnCrazyGamesPlatform && step !== 'returningUser' && (
+      {!isOnCrazyGamesPlatform && !quickEntry && step !== 'returningUser' && (
         <button
           type="button"
           data-testid="onboarding-sign-in"
@@ -604,7 +635,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           page hydrates. Blocks pointer events so duplicate taps cannot reach
           the underlying mode buttons. */}
       <AnimatePresence>
-        {isNavigating && (
+        {(isNavigating || quickEntry) && (
           <m.div
             key="onboarding-loading"
             data-testid="onboarding-loading"

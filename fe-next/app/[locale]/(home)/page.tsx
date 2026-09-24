@@ -3,9 +3,6 @@ import HomePageClient from '../PageClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 import { HomepageContentSection } from '@/components/seo/HomepageContentSection';
 import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
-import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
-import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
-import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
 import { SUPPORTED_LOCALES } from '@/lib/localeResolution';
 import { seoContent } from './seoContent';
 
@@ -80,39 +77,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HomePage({ params }: PageProps) {
   const { locale } = await params;
-  // Fetch non-realtime landing data server-side to eliminate client waterfall.
-  // fetchLandingData is cached per-locale (see LANDING_CACHE_TTL_MS), so this is
-  // a ~0ms memory read for all but the first request per TTL window. The race
-  // below is a cold-miss safety net only: if the underlying DB fetch stalls we
-  // ship HTML immediately and client hooks hydrate the data (they already
-  // fall back gracefully when initialData is absent), rather than blocking TTFB.
-  const SSR_LANDING_DATA_BUDGET_MS = 1500;
+  // Landing data (top players, games today, card order) only feeds the
+  // returning-user tree; fresh visitors never read it. It is cached per locale
+  // for 30s (LANDING_CACHE_TTL_MS), so a warm hit resolves within microtasks and
+  // is passed through. A cold miss (5 DB round-trips) used to hold the whole page
+  // behind the [locale]/loading.tsx fallback for up to 1.5s; now the HTML ships
+  // immediately, the fetch keeps running to warm the cache for the next request,
+  // and returning users' hooks fetch client-side as they already do whenever
+  // initialData is absent. Guarded by fresh.perf.pageDataBudget.test.tsx.
+  const landing = fetchLandingData(locale).catch(() => undefined);
   const initialData = await Promise.race([
-    fetchLandingData(locale),
-    new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), SSR_LANDING_DATA_BUDGET_MS)),
-  ]).catch(() => undefined);
+    landing,
+    new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 0)),
+  ]);
 
   const content = seoContent[locale] ?? seoContent.en;
   return (
     <>
-      {/* Preload hero mascot from first server HTML byte — fires before the client
-          component subtree emits its own <Image priority> preload, giving the
-          browser a head-start on the 402 KB animated WebP that is the LCP element.
-          Mirrors the same pattern used on the multiplayer page (/mascot/play.webp). */}
-      <link rel="preload" as="image" href="/mascot/winner.webp" type="image/webp" fetchPriority="high" />
-      {/* Preload the LCP element (anchor mode-cube image) from the very first
-          HTML bytes. next/image's own priority preload is emitted where the
-          client subtree renders — ~78% through the 900KB streamed document —
-          so discovery was delayed by ~3s (Lighthouse "LCP load delay 34%").
-          imageSrcSet/imageSizes must match the anchor <Image> exactly so the
-          browser reuses this preload instead of double-fetching. */}
-      <link
-        rel="preload"
-        as="image"
-        imageSrcSet="/_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=640&amp;q=75 640w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=750&amp;q=75 750w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=828&amp;q=75 828w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=1080&amp;q=75 1080w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=1200&amp;q=75 1200w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=1920&amp;q=75 1920w"
-        imageSizes="(max-width: 640px) min(100vw, 640px), (max-width: 768px) min(50vw, 384px), 50vw"
-        fetchPriority="high"
-      />
+      {/* No image preloads here. The winner.webp mascot and arena.png cube
+          preloads served the returning-user tree; fresh visitors (and
+          crawlers) get the fresh page, whose LCP is the h1 + CSS HeroGrid, so
+          those two high-priority fetches only competed with first paint.
+          Guarded by components/landing/__tests__/fresh.perf.pagePreloads.test.tsx. */}
       {/* FAQPage must appear on exactly ONE url per locale (this homepage). Do not
           hoist it into the root layout: landing pages such as
           /es/juego-de-palabras-multijugador emit their own FAQPage, and two on one
@@ -122,9 +108,11 @@ export default async function HomePage({ params }: PageProps) {
           actually on the page. */}
       <FaqPageJsonLd faqs={content.faq.map(({ question, answer }) => ({ q: question, a: answer }))} />
       <HomePageClient initialData={initialData} />
-      <EsScrabbleCrossLink locale={locale} anchorVariant="home" />
-      <SvScrabbleCrossLink locale={locale} anchorVariant="home" />
-      <EnBoggleCrossLink locale={locale} anchorVariant="home" />
+      {/* No cross-link banner boxes here (homepage gauntlet, SPEC §12): the
+          /en /es /sv "play free online" landing links are carried inline by the
+          How to Play line (LandingSEOSection, in the server HTML), so the three
+          <aside> promo boxes that sat between the page and its FAQ are gone.
+          Guarded by fresh.shell.r6.chrome.test. */}
       {/* Visible publisher content (was sr-only GamePageSeoContent until 2026-06-04).
           A human AdSense reviewer landing here now sees a real About/FAQ section and
           links into the editorial surface. See docs/2026-06-04-adsense-approval-plan.md. */}
