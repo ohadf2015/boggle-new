@@ -31,7 +31,8 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
   const dir = card.language === 'he' ? 'rtl' : 'ltr';
 
   // A parchment "library card" from the vault, inked like the map art.
-  const panel = cn('w-full rounded-neo border-[3px] border-black bg-neo-cream p-4 text-black shadow-hard-lg sm:p-8 lg:p-10');
+  // The panel is a size container: tiles are sized from ITS width (it is ~58vw on a laptop, not the viewport).
+  const panel = cn('w-full [container-type:inline-size] rounded-neo border-[3px] border-black bg-neo-cream p-4 text-black shadow-hard-lg sm:p-8 [@media(orientation:landscape)_and_(max-height:520px)]:p-3! lg:p-[clamp(1.5rem,3.5vh,2.5rem)]');
   const panelStyle = {
     backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.9), transparent 60%), linear-gradient(180deg, #fffaf0 0%, #f2e2c0 100%)',
     boxShadow: answered
@@ -43,10 +44,10 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
   if (card.kind === 'meaning') {
     return (
       <div className={panel} style={panelStyle}>
-        <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-neo-purple lg:mb-3 lg:text-lg">
+        <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-neo-purple lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
           {t('academy.modes.review.pickMeaning', 'What does it mean?')}
         </p>
-        <p data-testid="review-meaning-prompt" dir={dir} translate="no" className="mb-4 text-center font-neo-display text-4xl font-black text-black sm:text-6xl lg:text-7xl">
+        <p data-testid="review-meaning-prompt" dir={dir} translate="no" className="mb-4 text-center font-neo-display text-4xl font-black text-black sm:text-6xl [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-3xl! lg:text-[clamp(3rem,min(5vw,8vh),4.5rem)]">
           {card.word}
         </p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
@@ -62,7 +63,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
                   onAnswer(isAnswer);
                 }}
                 className={cn(
-                  'min-h-12 rounded-neo border-[3px] border-black px-3 py-2 text-start font-neo-body text-sm font-bold leading-snug text-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none sm:min-h-16 sm:text-base lg:min-h-20 lg:text-xl',
+                  'min-h-12 rounded-neo border-[3px] border-black px-3 py-2 text-start font-neo-body text-sm font-bold leading-snug text-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none sm:min-h-16 sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:min-h-11! [@media(orientation:landscape)_and_(max-height:520px)]:py-1! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:min-h-[clamp(4rem,8vh,5rem)] lg:text-xl',
                   answered && isAnswer ? 'bg-neo-lime' : answered && chosen === opt ? 'bg-neo-pink' : 'bg-neo-white',
                   'line-clamp-3',
                 )}
@@ -79,9 +80,9 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
   const letters = graphemes(card.word);
   const n = card.tiles.length;
   // Long words split into two balanced rows (10 letters = 5 + 5) so phone tiles stay thumb-sized;
-  // frame + panel padding ≈ 4.5rem at 390px, capped at 5.5rem per tile on desktop.
+  // Width comes from the card itself (cqw), capped at 5.5rem per tile on desktop (a little more on a TV) and by height on a phone on its side.
   const cols = n <= 7 ? n : Math.ceil(n / 2);
-  const tileWidth = `min(5.5rem, calc((100vw - 4.5rem) / ${Math.max(cols, 5)} - 0.4rem))`;
+  const tileWidth = `min(max(5.5rem, 4.3vw), calc(100cqw / ${Math.max(cols, 5)} - 0.4rem), ${n <= 7 ? '13dvh' : '10dvh'})`;
   const rowStyle = { gridTemplateColumns: `repeat(${cols}, ${tileWidth})` };
   const tileFont = `calc(${tileWidth} * 0.55)`;
   // Answer slots run a size smaller than the tiles so a two-row word still fits a phone card.
@@ -107,14 +108,14 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
 
   return (
     <div className={panel} style={panelStyle}>
-      <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-neo-purple lg:mb-3 lg:text-lg">
+      <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-neo-purple lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
         {t('academy.modes.review.unscramble', 'Unscramble the word')}
       </p>
       {card.definition && (
-        <p className="mb-2 line-clamp-2 text-center font-neo-body text-sm font-bold text-black lg:mb-4 lg:text-xl">{card.definition}</p>
+        <p className="mb-2 line-clamp-2 text-center font-neo-body text-sm font-bold text-black lg:mb-4 lg:text-xl min-[2200px]:text-3xl">{card.definition}</p>
       )}
       {/* Answer slots */}
-      <div dir={dir} translate="no" style={slotRowStyle} className="mb-4 grid justify-center gap-1.5 sm:mb-6">
+      <div dir={dir} translate="no" style={slotRowStyle} className="mb-4 grid justify-center gap-1.5 sm:mb-6 [@media(orientation:landscape)_and_(max-height:520px)]:mb-2!">
         {letters.map((ch, i) => {
           const filled = i < picked.length ? card.tiles[picked[i]] : answered ? ch : '';
           const wrong = answered && correct === false && i === picked.length - 1;

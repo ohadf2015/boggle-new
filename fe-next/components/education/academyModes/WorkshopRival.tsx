@@ -14,7 +14,8 @@ import { RIVAL_ART, type RivalMood, type Taunt } from '@/lib/education/academyRe
 import { cn } from '@/lib/utils';
 
 /** game = bubble only below 2xl (the scoreboard avatar is his face), full portrait in the 2xl side gutter. */
-type Size = 'game' | 'hero';
+/** `arena` sizes itself from the VS arena's container (cq units): it must scale with the card, not the viewport. */
+type Size = 'game' | 'hero' | 'arena';
 
 const MOOD_MOTION: Record<RivalMood, { x?: number[]; rotate?: number[]; y?: number[]; scale?: number[] }> = {
   idle: {},
@@ -45,6 +46,7 @@ export function WorkshopRival({
   const art = {
     game: 'hidden 2xl:block 2xl:h-64 2xl:w-64',
     hero: 'h-40 w-40 sm:h-52 sm:w-52 lg:h-80 lg:w-80',
+    arena: 'h-[min(52cqw,52cqh)] w-[min(52cqw,52cqh)]',
   }[size];
 
   return (
@@ -77,7 +79,11 @@ export function WorkshopRival({
         <span
           className={cn(
             'z-10 -rotate-2 whitespace-nowrap rounded-neo border-[3px] border-black bg-neo-pink px-2 py-0.5 font-neo-display font-black uppercase text-black shadow-hard',
-            size === 'game' ? 'sr-only 2xl:not-sr-only 2xl:-mt-4 2xl:text-xl' : '-mt-4 text-sm lg:text-xl',
+            size === 'game'
+              ? 'sr-only 2xl:not-sr-only 2xl:-mt-4 2xl:text-xl'
+              : size === 'arena'
+                ? '-mt-[3cqmin] px-[1.6cqmin] text-[clamp(0.7rem,3.6cqmin,1.6rem)]'
+                : '-mt-4 text-sm lg:text-xl',
           )}
         >
           {name}

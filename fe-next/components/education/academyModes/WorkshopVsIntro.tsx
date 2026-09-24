@@ -14,10 +14,12 @@ import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { claimIntroEntrance } from '@/lib/education/introEntrance';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
+import { useIsHydrating } from './useIsHydrating';
 import type { Taunt } from '@/lib/education/academyReactions';
 import { cn } from '@/lib/utils';
 import type { AcademyPlayer } from './AcademyChrome';
 import { WorkshopRival } from './WorkshopRival';
+import { INTRO_COPY, INTRO_CTA, INTRO_HERO, INTRO_KICKER, INTRO_LAYOUT, INTRO_TITLE } from './introLayout';
 
 const INTRO_TAUNT: Taunt = { key: 'academy.modes.workshop.rival.intro', en: 'Think you can out-build me?' };
 
@@ -27,25 +29,23 @@ function useReduce(): boolean {
   return Boolean(prefers) || reducedEffects;
 }
 
-/** The student's portrait: a big medallion. The initial sits underneath so the frame is never empty while the avatar loads. */
+/** The student's portrait: a big medallion sized from the arena (cq units). The initial sits underneath so the frame is never empty while the avatar loads. */
 function PlayerMedallion({ player, fallbackName }: { player?: AcademyPlayer; fallbackName: string }) {
   const name = player?.name ?? fallbackName;
   return (
     <div className="flex flex-col items-center">
       <div
-        className="relative grid place-items-center overflow-hidden rounded-full border-[5px] border-neo-cyan bg-neo-navy-elevated"
-        style={{ width: 'min(42vw, 23vh, 22rem)', height: 'min(42vw, 23vh, 22rem)', boxShadow: '6px 6px 0 #000, 0 0 36px rgba(0,255,255,0.55)' }}
+        className="relative grid h-[min(40cqw,34cqh)] w-[min(40cqw,34cqh)] place-items-center overflow-hidden rounded-full border-[clamp(3px,1cqmin,6px)] border-neo-cyan bg-neo-navy-elevated"
+        style={{ boxShadow: '6px 6px 0 #000, 0 0 36px rgba(0,255,255,0.55)' }}
       >
-        <span aria-hidden className="absolute font-neo-display text-6xl font-black uppercase text-neo-cyan/50 lg:text-9xl">
+        <span aria-hidden className="absolute font-neo-display text-[min(24cqw,20cqh)] font-black uppercase leading-none text-neo-cyan/50">
           {name.slice(0, 1)}
         </span>
-        <span className="relative lg:scale-[1.9]">
-          <Avatar customAvatar={player?.avatarConfig ?? null} userId={player?.userId ?? name} pixelSize={150} disableEffects />
-        </span>
+        <Avatar customAvatar={player?.avatarConfig ?? null} userId={player?.userId ?? name} pixelSize={256} disableEffects className="relative !h-full !w-full" />
       </div>
       <span
         data-testid="academy-player"
-        className="z-10 -mt-4 max-w-[40vw] truncate rounded-neo border-[3px] border-black bg-neo-cyan px-3 py-0.5 font-neo-display text-base font-black uppercase text-black shadow-hard lg:max-w-none lg:text-2xl"
+        className="z-10 -mt-[3cqmin] max-w-[40cqw] truncate rounded-neo border-[3px] border-black bg-neo-cyan px-[1.6cqmin] py-0.5 font-neo-display text-[clamp(0.75rem,4cqmin,1.75rem)] font-black uppercase text-black shadow-hard"
       >
         {name}
       </span>
@@ -76,13 +76,15 @@ export function WorkshopVsIntro({
   // Loader → loaded intro is a remount: play the entrance once, never a half-built replay.
   const mountId = useId();
   const [entrance] = useState(() => claimIntroEntrance('workshop', Date.now(), mountId));
-  const still = reduce || !entrance;
+  // The server/hydration frame is the finished scene: framer bakes `initial` into SSR HTML, and a slow phone shows it for seconds.
+  const hydrating = useIsHydrating();
+  const still = reduce || !entrance || hydrating;
   const spring = (delay: number) => ({ type: 'spring' as const, stiffness: 260, damping: 17, delay: reduce ? 0 : delay });
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col items-center gap-2 lg:grid lg:max-w-[110rem] lg:grid-cols-2 lg:items-center lg:gap-12">
+    <div className={INTRO_LAYOUT}>
       {/* The arena: student top-start, Baron bottom-end, split by a lightning seam. */}
-      <div data-testid="workshop-hero" className="relative min-h-0 w-full flex-1 overflow-hidden rounded-[22px] border-[3px] border-neo-yellow lg:h-[80vh] lg:flex-none" style={{ boxShadow: '6px 6px 0 #000' }}>
+      <div data-testid="workshop-hero" className={cn(INTRO_HERO, 'overflow-hidden rounded-[22px] border-[3px] border-neo-yellow lg:max-h-[80rem]')} style={{ boxShadow: '6px 6px 0 #000' }}>
         {/* Backdrop mirrors in RTL so the student's (start) corner always gets the deep half. */}
         <div aria-hidden className="absolute inset-0 rtl:-scale-x-100">
         <div className="absolute inset-0" style={{ background: 'linear-gradient(160deg, #0b5a6e 0%, #103a5c 45%, #3a1040 55%, #6b1238 100%)' }} />
@@ -114,7 +116,7 @@ export function WorkshopVsIntro({
         </div>
 
         <motion.div
-          className="absolute start-[5%] top-[5%] lg:start-[8%] lg:top-[7%]"
+          className="absolute start-[5cqw] top-[5cqh]"
           initial={still ? false : { x: -120, rotate: -10 }}
           animate={{ x: 0, rotate: 0 }}
           transition={spring(0.05)}
@@ -123,18 +125,18 @@ export function WorkshopVsIntro({
         </motion.div>
 
         <motion.div
-          className="absolute bottom-[2%] end-[1%] origin-bottom-right rtl:origin-bottom-left max-lg:scale-[1.12] lg:bottom-[4%] lg:end-[6%] lg:scale-[1.15]"
+          className="absolute bottom-[3cqh] end-[3cqw]"
           initial={still ? false : { x: 140 }}
           animate={{ x: 0 }}
           transition={spring(0.2)}
         >
-          <WorkshopRival mood="idle" taunt={null} size="hero" />
+          <WorkshopRival mood="idle" taunt={null} size="arena" />
         </motion.div>
 
         {/* The Baron's taunt, pointing at him across the pink half. */}
         <motion.p
           data-testid="workshop-rival-taunt"
-          className="absolute bottom-[24%] start-[5%] max-w-[46%] rounded-2xl border-[3px] border-black bg-neo-cream px-3 py-2 font-neo-display text-base font-black leading-tight text-black lg:bottom-[30%] lg:start-[8%] lg:max-w-[40%] lg:px-5 lg:text-3xl"
+          className="absolute bottom-[8cqh] start-[4cqw] max-w-[42cqw] rounded-2xl border-[3px] border-black bg-neo-cream px-[2.4cqmin] py-[1.6cqmin] font-neo-display text-[clamp(0.75rem,4.4cqmin,2.25rem)] font-black leading-tight text-black"
           style={{ boxShadow: '4px 4px 0 #000' }}
           initial={still ? false : { scale: 0.6, rotate: -12 }}
           animate={{ scale: 1, rotate: -3 }}
@@ -153,14 +155,14 @@ export function WorkshopVsIntro({
           transition={{ type: 'spring', stiffness: 520, damping: 22, delay: reduce ? 0 : 0.2 }}
         >
           <span
-            className="grid h-24 w-24 place-items-center bg-neo-pink lg:h-44 lg:w-44"
+            className="grid h-[24cqmin] w-[24cqmin] place-items-center bg-neo-pink"
             style={{
               clipPath: 'polygon(50% 0, 61% 30%, 95% 20%, 72% 48%, 100% 72%, 64% 70%, 55% 100%, 42% 72%, 6% 86%, 28% 55%, 0 30%, 36% 32%)',
               filter: 'drop-shadow(0 0 18px rgba(255,20,147,0.9))',
             }}
           />
           <span
-            className="absolute font-neo-display text-5xl font-black italic text-neo-yellow lg:text-8xl"
+            className="absolute font-neo-display text-[11cqmin] font-black italic leading-none text-neo-yellow"
             style={{ WebkitTextStroke: '3px #000', textShadow: '4px 4px 0 #000' }}
           >
             {t('academy.modes.workshop.vs', 'VS')}
@@ -173,28 +175,29 @@ export function WorkshopVsIntro({
         initial={still ? false : { y: 30 }}
         animate={{ y: 0 }}
         transition={spring(0.15)}
-        className="flex w-full max-w-md shrink-0 flex-col items-center text-center sm:max-w-xl lg:max-w-none lg:items-start lg:text-start"
+        className={INTRO_COPY}
       >
-        <p className="min-h-4 font-neo-display text-xs font-black uppercase tracking-widest text-neo-yellow lg:min-h-8 lg:text-2xl">{lessonName}</p>
-        <h2 className="mb-2 font-neo-display text-3xl font-black uppercase leading-none text-neo-white sm:text-5xl lg:mb-5 lg:text-8xl" style={{ textShadow: '3px 3px 0 #000' }}>
+        <p className={cn(INTRO_KICKER, 'text-neo-yellow')}>{lessonName}</p>
+        <h2 className={cn(INTRO_TITLE, 'lg:text-[clamp(2.5rem,min(5vw,8.5vh),8rem)]')} style={{ textShadow: '3px 3px 0 #000' }}>
           {t('academy.modes.workshop.introTitleBaron', 'Out-build the Baron')}
         </h2>
         {chips.length > 0 && (
-          <div className="mb-3 flex w-full flex-col items-center gap-1.5 lg:mb-8 lg:items-start lg:gap-3">
-            <span className="flex shrink-0 items-center gap-1 rounded-full border-[3px] border-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black uppercase text-black shadow-hard lg:px-4 lg:py-1 lg:text-xl">
-              <Coins className="h-4 w-4 lg:h-6 lg:w-6" aria-hidden />
+          <div className="mb-3 flex w-full flex-col items-center gap-1.5 [--chip-fs:0.875rem] [--chip-gap:6px] [@media(orientation:landscape)_and_(max-height:520px)]:mb-2 [@media(orientation:landscape)_and_(max-height:520px)]:items-start [@media(orientation:landscape)_and_(max-height:520px)]:[--chip-fs:0.8rem] lg:mb-[clamp(0.75rem,3vh,2rem)] lg:items-start lg:gap-[clamp(0.4rem,1.2vh,0.75rem)] lg:[--chip-fs:clamp(0.95rem,min(1.6vw,2.6vh),2.4rem)] lg:[--chip-gap:clamp(8px,1.2vh,12px)]">
+            <span className="flex shrink-0 items-center gap-1 rounded-full border-[3px] border-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black uppercase text-black shadow-hard lg:px-[0.8em] lg:text-[clamp(0.85rem,min(1.4vw,2.3vh),2rem)]">
+              <Coins className="h-[1.25em] w-[1.25em]" aria-hidden />
               {t('academy.modes.workshop.stakes', 'Lesson words = gold')}
             </span>
-            <ul className="flex max-h-[4.1rem] w-full flex-wrap justify-center gap-1.5 overflow-hidden lg:max-h-28 lg:justify-start lg:gap-3" translate="no">
+            {/* Exactly two rows of coins: the box is sized from the pill height, so a third row is hidden whole, never sliced. */}
+            <ul className="flex max-h-[calc((var(--chip-fs)*1.25+10px)*2+var(--chip-gap)+4px)] w-full flex-wrap justify-center gap-[var(--chip-gap)] overflow-hidden [@media(orientation:landscape)_and_(max-height:520px)]:justify-start lg:justify-start" translate="no">
               {chips.slice(0, 12).map((w) => (
                 <li
                   key={w}
                   data-testid="workshop-lesson-word"
-                  className="flex items-center gap-1 rounded-md border-[3px] border-black py-0.5 pe-2 ps-1 font-neo-display text-sm font-black text-black lg:gap-2 lg:pe-3 lg:ps-2 lg:text-2xl"
+                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-md border-[3px] border-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-black"
                   style={{ background: 'linear-gradient(180deg, #fff6c4 0%, #ffd23a 60%, #d9a400 100%)', boxShadow: 'inset 0 2px 0 #fff, inset 0 -3px 0 #a87b00, 2px 3px 0 #000' }}
                 >
                   {/* Each word is literally a gold coin: the stakes read on the pill itself, not only in the label. */}
-                  <Coins aria-hidden className="h-4 w-4 shrink-0 lg:h-6 lg:w-6" strokeWidth={2.75} />
+                  <Coins aria-hidden className="h-[1.1em] w-[1.1em] shrink-0" strokeWidth={2.75} />
                   {w}
                 </li>
               ))}
@@ -202,7 +205,7 @@ export function WorkshopVsIntro({
           </div>
         )}
         {startFailed && (
-          <p className="mb-2 font-neo-body text-sm text-neo-pink lg:text-xl">{t('academy.modes.startFailed', "Couldn't start. Check your connection and try again.")}</p>
+          <p className="mb-2 font-neo-body text-sm text-neo-pink lg:text-[clamp(1rem,1.4vw,1.25rem)]">{t('academy.modes.startFailed', "Couldn't start. Check your connection and try again.")}</p>
         )}
         <motion.button
           type="button"
@@ -223,8 +226,8 @@ export function WorkshopVsIntro({
           }
           transition={reduce ? undefined : { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
           className={cn(
-            'relative flex min-h-[4.25rem] w-full items-center justify-center gap-3 overflow-hidden rounded-neo border-[3px] border-black px-4',
-            'font-neo-display text-3xl font-black uppercase tracking-wide text-black disabled:opacity-60 lg:min-h-28 lg:max-w-xl lg:text-5xl',
+            INTRO_CTA,
+            'text-3xl [@media(orientation:landscape)_and_(max-height:520px)]:text-2xl! lg:text-[clamp(1.75rem,min(3.4vw,5.5vh),4.5rem)]',
           )}
           style={{
             background: 'linear-gradient(180deg, #fff27a 0%, #ffc21a 45%, #ff8a00 100%)',
@@ -232,7 +235,7 @@ export function WorkshopVsIntro({
           }}
         >
           <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-white/60" />
-          <Swords className="relative h-8 w-8 lg:h-12 lg:w-12" aria-hidden />
+          <Swords className="relative h-[1.1em] w-[1.1em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.workshop.battle', 'Battle!')}</span>
         </motion.button>
       </motion.div>

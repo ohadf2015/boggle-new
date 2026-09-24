@@ -216,7 +216,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 500, damping: 12 }}
           className={cn(
-            'flex items-center gap-1 rounded-neo border-[3px] px-2.5 py-1 font-neo-display text-lg font-black shadow-hard lg:px-4 lg:text-3xl',
+            'flex items-center gap-1 rounded-neo border-[3px] px-2.5 py-1 font-neo-display text-lg font-black shadow-hard lg:px-4 lg:text-3xl min-[2200px]:px-6 min-[2200px]:text-5xl',
             streak >= 3 ? 'border-black bg-neo-orange text-black' : streak > 0 ? 'border-black bg-neo-yellow text-black' : 'border-neo-cream bg-neo-navy-elevated text-neo-cream',
           )}
           style={streak >= 3 ? { boxShadow: '3px 3px 0 #000, 0 0 22px rgba(255,107,53,0.8)' } : undefined}
@@ -227,9 +227,9 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
         </motion.div>
       }
     >
-      <div className="flex min-h-0 w-full flex-1 flex-col lg:grid lg:max-w-[110rem] lg:grid-cols-[minmax(0,1fr)_minmax(0,52rem)_minmax(0,1fr)] lg:items-center lg:gap-10">
+      <div className="flex min-h-0 w-full flex-1 flex-col [@media(orientation:landscape)_and_(max-height:520px)]:flex-row [@media(orientation:landscape)_and_(max-height:520px)]:items-center [@media(orientation:landscape)_and_(max-height:520px)]:gap-4 lg:grid lg:max-w-[150rem] lg:grid-cols-[minmax(0,1fr)_minmax(0,min(52rem,58vw))_minmax(0,1fr)] lg:items-center lg:gap-[clamp(1rem,2vw,2.5rem)] min-[2200px]:grid-cols-[minmax(0,1fr)_minmax(0,72rem)_minmax(0,1fr)]">
         {/* Upper stage (phones) / side columns (desktop): mascot + the run ring around the chest. */}
-        <div className="flex min-h-0 flex-1 items-end justify-center gap-2 pb-3 lg:contents">
+        <div className="flex min-h-0 flex-1 items-end justify-center gap-2 pb-3 [@media(orientation:landscape)_and_(max-height:520px)]:flex-none [@media(orientation:landscape)_and_(max-height:520px)]:items-center [@media(orientation:landscape)_and_(max-height:520px)]:pb-0 lg:contents">
           <ReviewMascot mood={mood} big className="shrink-0 lg:order-1 lg:justify-self-end" />
           <div className="flex min-h-0 flex-col items-center justify-end gap-1 lg:order-3 lg:justify-self-start">
             <ReviewRing
@@ -240,12 +240,12 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
               chestLabel={chestName(projected)}
               progressLabel={progressText}
             />
-            <span data-testid="review-progress" dir="ltr" className="mt-2 font-neo-display text-base font-black text-neo-cream lg:text-3xl">
+            <span data-testid="review-progress" dir="ltr" className="mt-2 font-neo-display text-base font-black text-neo-cream lg:text-[clamp(1.25rem,2vw,2.5rem)]">
               {progressText}
             </span>
           </div>
         </div>
-        <div className="relative flex w-full shrink-0 items-center justify-center pb-1 lg:order-2">
+        <div className="relative flex w-full shrink-0 items-center justify-center pb-1 [@media(orientation:landscape)_and_(max-height:520px)]:min-w-0 [@media(orientation:landscape)_and_(max-height:520px)]:flex-1 lg:order-2">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={card.id}
