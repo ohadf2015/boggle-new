@@ -166,10 +166,10 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
       className="h-full overflow-y-auto lg:overflow-hidden flex flex-col gap-2 lg:gap-3 bg-neo-navy text-neo-white"
     >
       <header className="shrink-0 max-lg:mt-auto flex flex-wrap items-baseline justify-center gap-x-4">
-        <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-lg md:text-2xl">
+        <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-lg md:text-2xl min-[2200px]:text-5xl">
           {t('education.results.podium.title')}
         </p>
-        <p className="font-neo-body font-bold text-neo-white/80 text-sm md:text-xl truncate max-w-full">
+        <p className="font-neo-body font-bold text-neo-white/80 text-sm md:text-xl min-[2200px]:text-4xl truncate max-w-full">
           {summary.lessonNames.join(' · ')}
         </p>
       </header>
@@ -287,16 +287,16 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
                     onRematch();
                   }}
                   className={cn(
-                    'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4',
-                    'font-neo-display font-black text-2xl md:text-4xl',
+                    'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4 min-[2200px]:gap-6 min-[2200px]:py-7',
+                    'font-neo-display font-black text-2xl md:text-4xl min-[2200px]:text-7xl',
                     'bg-neo-lime text-neo-black border-4 border-neo-black rounded-neo-lg',
                     'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 transition-all'
                   )}
                 >
-                  <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />
+                  <RotateCcw className="w-8 h-8 shrink-0 min-[2200px]:w-14 min-[2200px]:h-14" aria-hidden />
                   <span className="flex flex-col items-start leading-none">
                     <span className="uppercase">{tr(t, 'academy.results.playAgain', 'Play again')}</span>
-                    <span className="mt-1 font-neo-body text-sm font-bold normal-case md:text-base">
+                    <span className="mt-1 font-neo-body text-sm font-bold normal-case md:text-base min-[2200px]:mt-3 min-[2200px]:text-3xl">
                       {tr(t, 'academy.results.playAgainHint', 'Same words, same code. Nobody rejoins.')}
                     </span>
                   </span>
@@ -308,7 +308,8 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
                   chips, and the quiet Pro ask — never a second loud button. */}
               <div
                 data-testid="tv-secondary-row"
-                className="flex flex-wrap items-center justify-center gap-2 lg:gap-3"
+                // `relative`: the "More" panel anchors here, spanning the row.
+                className="relative flex flex-wrap items-center justify-center gap-2 lg:gap-3"
               >
                 {showTeacherFollowUp && summary.missedWords.length > 0 && (
                   <div data-testid="classroom-tv-reteach">
@@ -321,7 +322,7 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
                 {roundNumber > 1 && (
                   <span
                     data-testid="classroom-tv-round"
-                    className="px-3 py-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream font-neo-display font-bold text-sm lg:px-4 lg:py-2 lg:text-xl shadow-hard-sm"
+                    className="px-3 py-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream font-neo-display font-bold text-sm lg:px-4 lg:py-2 lg:text-xl min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl shadow-hard-sm"
                   >
                     {t('education.results.moment.roundOfSession', { round: roundNumber })}
                   </span>
@@ -329,7 +330,7 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
                 {sweepStreak > 1 && (
                   <span
                     data-testid="classroom-tv-sweep-streak"
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-neo border-[2px] border-neo-black bg-neo-orange text-neo-black font-neo-display font-black text-sm lg:px-4 lg:py-2 lg:text-xl shadow-hard-sm"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-neo border-[2px] border-neo-black bg-neo-orange text-neo-black font-neo-display font-black text-sm lg:px-4 lg:py-2 lg:text-xl min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl shadow-hard-sm"
                   >
                     <Flame className="w-5 h-5 shrink-0 lg:w-6 lg:h-6" aria-hidden />
                     {t('education.results.moment.sweepStreak', { count: sweepStreak })}

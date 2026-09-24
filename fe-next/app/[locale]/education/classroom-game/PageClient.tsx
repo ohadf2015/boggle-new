@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { TV_STAGE_ZOOM_CLASS } from '@/components/education/lobby/tvStageScale';
 import { LaunchStageBackdrop } from '@/components/education/lobby/LaunchStageBackdrop';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
@@ -142,7 +143,10 @@ function ClassroomGameInner() {
       <LaunchStageBackdrop />
       <EducationHeader showBackButton title={t('education.classroomGame.title')} />
 
-      <main className="relative flex min-h-0 flex-1 w-full max-w-5xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6">
+      {/* TV_STAGE_ZOOM_CLASS: on a 1920/2560 wall the whole launch column
+          scales up together (CSS zoom), instead of an 880px card lost in the
+          arena art. Laptops are untouched — see tvStageScale. */}
+      <main className={cn('relative flex min-h-0 flex-1 w-full max-w-5xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6', TV_STAGE_ZOOM_CLASS)}>
         {runExpress ? (
           <ClassroomGameLobbyExpress
             intent={quickLaunchIntent}

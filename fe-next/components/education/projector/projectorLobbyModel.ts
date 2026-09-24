@@ -45,6 +45,12 @@ export interface RosterDensityTier {
   readonly chip: string;
   /** Whole literal gap class for the chip list itself. */
   readonly gap: string;
+  /**
+   * Whole literal type step for a PORTRAIT tablet/screen at md+. A portrait
+   * screen is height-rich and width-poor, so the landscape `md:` size (tuned
+   * for a 16:9 wall) left 13px chips and a dead band at 768x1024.
+   */
+  readonly portrait: string;
 }
 
 /**
@@ -76,21 +82,25 @@ export const ROSTER_DENSITY_TIERS: readonly RosterDensityTier[] = [
     upTo: 8,
     chip: 'gap-[0.6vw] border-4 px-[1.3vw] py-[0.6vw] text-[4.2vw] md:text-[2.2vw]',
     gap: 'gap-[1.1vw]',
+    portrait: 'md:portrait:text-[5.5vw]',
   },
   {
     upTo: 16,
     chip: 'gap-[0.5vw] border-4 px-[1.1vw] py-[0.5vw] text-[3.6vw] md:text-[1.7vw]',
     gap: 'gap-[0.9vw]',
+    portrait: 'md:portrait:text-[4.6vw]',
   },
   {
     upTo: 26,
     chip: 'gap-[0.4vw] border-[3px] px-[0.9vw] py-[0.38vw] text-[3vw] md:text-[1.28vw]',
     gap: 'gap-[0.65vw]',
+    portrait: 'md:portrait:text-[3.6vw]',
   },
   {
     upTo: Number.POSITIVE_INFINITY,
     chip: 'gap-[0.35vw] border-[3px] px-[0.7vw] py-[0.28vw] text-[2.5vw] md:text-[0.98vw]',
     gap: 'gap-[0.45vw]',
+    portrait: 'md:portrait:text-[2.9vw]',
   },
 ] as const;
 

@@ -25,6 +25,7 @@ import { ClassroomTvResults } from '@/components/education/results/ClassroomTvRe
 import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
 import Avatar from '@/components/Avatar';
 import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
+import { EducationHeader } from '@/components/education/EducationHeader';
 import { sampleClassroomSummary, sampleProjectorStudents } from '@/components/education/results/previewFixtures';
 
 export type LiveSurfacePreviewKind = 'podium' | 'projector' | 'waiting';
@@ -89,8 +90,13 @@ function WaitingPreview() {
     return () => window.clearTimeout(id);
   }, [arrived, roster.length]);
   const classmates = roster.slice(0, arrived);
+  // Mirrors the real room (/multiplayer, classroom mode): EducationHeader sits
+  // above the stage and hosts MusicControls — the student's mute. Without it
+  // this z-[80] surface buried the global mute FAB and the preview showed a
+  // waiting room with no way to mute that the real one does not have.
   return (
     <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy">
+      <EducationHeader showBackButton title={t('education.classroomGame.title')} />
       <ClassroomWaitingStage
         username="Maya"
         avatar={<Avatar userId="Maya" size="2xl" className="!h-full !w-full" />}

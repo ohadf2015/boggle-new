@@ -52,23 +52,27 @@ export interface ReteachActionsProps {
 export function ReteachActions({ links, onReteach, t, variant = 'stack' }: ReteachActionsProps) {
   if (variant === 'more') {
     return (
-      <details data-testid="reteach-more" className="group relative">
+      // `static`, not `relative`: the panel anchors to the ROW that holds
+      // "More" (the caller makes that row `relative`), never to this small
+      // button. Anchored to the button, a 40rem panel hung off the right edge
+      // of a 1024–1366px wall and took the reteach round with it.
+      <details data-testid="reteach-more" className="group static">
         <summary
           data-testid="reteach-more-actions"
           className={cn(
             'flex cursor-pointer list-none items-center gap-2 rounded-neo px-4 py-2 [&::-webkit-details-marker]:hidden',
             'border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream shadow-hard-sm',
-            'font-neo-display text-base font-black uppercase tracking-wide lg:text-xl',
+            'font-neo-display text-base font-black uppercase tracking-wide lg:text-xl min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl',
             'hover:bg-neo-purple/30 transition-colors'
           )}
         >
-          <MoreHorizontal className="size-5 shrink-0 lg:size-6" aria-hidden />
+          <MoreHorizontal className="size-5 shrink-0 lg:size-6 min-[2200px]:size-9" aria-hidden />
           {t('common.more')}
           <ChevronUp className="size-4 shrink-0 transition-transform group-open:rotate-180 lg:size-5" aria-hidden />
         </summary>
         <div
           data-testid="reteach-more-panel"
-          className="absolute bottom-full start-0 z-30 mb-2 w-[min(40rem,calc(100vw-2rem))] rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard-lg"
+          className="absolute inset-x-0 bottom-full z-30 mb-2 max-h-[min(60dvh,34rem)] overflow-y-auto overscroll-contain rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard-lg"
         >
           <p className="mb-2 font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream lg:text-base">
             {t('education.results.moreWaysToReteach')}

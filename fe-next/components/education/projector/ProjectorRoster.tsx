@@ -56,7 +56,9 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
   }, [names, playPlayerJoinedSound]);
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col gap-[0.6vw]">
+    // md:portrait — a portrait wall (768x1024) centres the roster in the band
+    // it owns instead of top-pinning it over ~600px of empty arena.
+    <section className="flex min-h-0 flex-1 flex-col gap-[0.6vw] md:portrait:justify-center md:portrait:gap-[2vw]">
       <header className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1">
         <span className="inline-flex items-center gap-[0.6vw] rounded-neo-lg border-3 border-neo-cream bg-neo-navy/90 px-[1.2vw] py-[0.2vw] shadow-hard">
           <Users className="h-[min(7vw,5vh)] w-[min(7vw,5vh)] shrink-0 text-neo-lime md:h-[min(3vw,5vh)] md:w-[min(3vw,5vh)]" aria-hidden="true" />
@@ -137,7 +139,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
           data-testid="projector-roster-list"
           className={cn(
             // Top/end padding so a ready tile's corner check is never clipped by the list.
-            'flex min-h-0 flex-1 flex-wrap content-start overflow-y-auto pe-3 pt-3',
+            'flex min-h-0 flex-1 flex-wrap content-start overflow-y-auto pe-3 pt-3 md:portrait:flex-none md:portrait:overflow-visible md:portrait:pb-3',
             density.gap
           )}
         >
@@ -172,6 +174,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                       : 'shadow-hard',
                     dim && 'brightness-[0.62] saturate-[0.55]',
                     density.chip,
+                    density.portrait,
                     chipAccent(student.username, index)
                   )}
                 >
