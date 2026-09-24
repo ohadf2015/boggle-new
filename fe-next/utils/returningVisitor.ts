@@ -50,16 +50,37 @@ export function readReturningSignals(
     }
   }
 
-  // @supabase/ssr keeps the session in a cookie rather than localStorage.
+  // @supabase/ssr keeps the session in a cookie rather than localStorage, as
+  // `base64-<base64url(JSON)>`, split into `<name>.0`, `<name>.1`... when long.
   if (cookie) {
+    const whole: Record<string, string> = {};
+    const chunks: Record<string, string[]> = {};
     const parts = cookie.split(';');
     for (let j = 0; j < parts.length; j++) {
       const eq = parts[j].indexOf('=');
       if (eq < 0) continue;
       const name = parts[j].slice(0, eq).trim();
-      if (!isAuthKey(name)) continue;
+      const value = parts[j].slice(eq + 1).trim();
+      const dot = name.lastIndexOf('.');
+      const base = dot > 0 ? name.slice(0, dot) : name;
+      const idx = dot > 0 ? name.slice(dot + 1) : '';
+      if (isAuthKey(name)) whole[name] = value;
+      else if (isAuthKey(base) && /^\d+$/.test(idx)) {
+        if (!chunks[base]) chunks[base] = [];
+        chunks[base][Number(idx)] = value;
+      }
+    }
+    for (const base in chunks) {
+      if (!whole[base]) whole[base] = chunks[base].join('');
+    }
+    for (const key in whole) {
       try {
-        if (looksLive(decodeURIComponent(parts[j].slice(eq + 1).trim()))) return true;
+        let raw = decodeURIComponent(whole[key]);
+        if (raw.indexOf('base64-') === 0) {
+          const b = raw.slice(7).replace(/-/g, '+').replace(/_/g, '/');
+          raw = atob(b + '===='.slice(0, (4 - (b.length % 4)) % 4));
+        }
+        if (looksLive(raw)) return true;
       } catch (err) {
         // malformed cookie value
       }

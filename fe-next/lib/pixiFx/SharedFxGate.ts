@@ -16,7 +16,10 @@
 const FIRST_USE_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const;
 const MAX_HELD_CALLS = 16;
 // A celebration replayed long after its trigger reads as a glitch; skip it.
-const HELD_CALL_TTL_MS = 2500;
+// ponytail: fixed window sized for the pixi chunk (~195KB br) on a slow mobile
+// link; gesture-free triggers (NewYearFireworks) open the gate on their first
+// call, so 2.5s dropped them whenever the download ran long.
+const HELD_CALL_TTL_MS = 6000;
 
 interface HeldCall {
   at: number;
