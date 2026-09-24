@@ -55,6 +55,7 @@ export function ClassChest({ found, total, open, t }: ClassChestProps) {
               : { duration: 0.8, repeat: Infinity, repeatDelay: 1.1 }
         }
       >
+        {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
         <img
           src="/images/education/chest-books.webp"
           alt=""

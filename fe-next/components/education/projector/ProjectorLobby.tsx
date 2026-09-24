@@ -184,6 +184,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           fullscreen opacity tween is the Class-5 flash), decorative, and
           under a navy scrim so every line of copy keeps its contrast. Every
           content row below is `relative`, so it paints above these two. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
       <img
         data-testid="projector-arena-art"
         src="/images/education/arena-lobby-bg.webp"

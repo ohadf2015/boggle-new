@@ -88,6 +88,7 @@ export function ClassroomWaitingStage({
       data-testid="classroom-waiting-stage"
       className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy"
     >
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
       <img
         data-testid="waiting-stage-art"
         src="/images/education/arena-lobby-bg.webp"
@@ -156,6 +157,7 @@ export function ClassroomWaitingStage({
               <Pencil className="size-4 text-neo-black" aria-hidden="true" />
             </span>
           </button>
+          {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
           <img
             data-testid="classroom-lobby-mascot"
             src="/images/education/waiting-for-teacher.webp"

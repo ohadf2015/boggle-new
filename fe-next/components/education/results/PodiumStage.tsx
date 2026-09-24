@@ -249,6 +249,7 @@ export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, classNa
         className
       )}
     >
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
       <img
         data-testid="podium-stage-art"
         src="/images/education/podium-bg.webp"

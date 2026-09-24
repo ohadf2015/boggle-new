@@ -9,6 +9,7 @@
 export function LaunchStageBackdrop() {
   return (
     <>
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
       <img
         data-testid="lobby-arena-art"
         src="/images/education/arena-lobby-bg.webp"

@@ -113,6 +113,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
           // spilling, and the `vh` ceilings shrink the words first.
           className="flex min-h-0 flex-1 items-center justify-center gap-[2vw] overflow-hidden rounded-neo-lg border-4 border-dashed border-neo-cream/50 bg-neo-navy/70 px-4 py-[1vh] text-center"
         >
+          {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
           <img
             src="/images/education/share-code.webp"
             alt=""
