@@ -173,7 +173,7 @@ export function useSinglePlayerCore({
     return () => { if (feedbackClearTimerRef.current) clearTimeout(feedbackClearTimerRef.current); };
   }, [currentFeedback]);
 
-  const { botScores, botWords, resetBots, initializeBotUsedWords } = useBotSimulation({
+  const { botScores, botWords, liveBots, resetBots, initializeBotUsedWords } = useBotSimulation({
     mode: settings.mode, bots: settings.bots, isPaused: held, isGameOver, availableWords,
     calmPacing: cosyMode,
   });
@@ -624,6 +624,7 @@ export function useSinglePlayerCore({
     handleWordSubmit, handlePathSubmit, handleWordChange,
     handlePauseToggle, handleFinishPractice, handleQuitRequest, onQuit, confirmQuit, t,
     wordPace,
+    liveBots,
     soloCombo: soloJuice.combo,
     soloMissions: soloJuice.missions,
     awaitingStart, handleStart,

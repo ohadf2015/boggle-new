@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { calculateWordScoreByLength as canonicalWordScoreByLength } from '@/shared/utils/scoring';
 import { applyCalmBotPacing } from '@/lib/cosy/cosyGameplay';
 import type { BotOpponent } from '../../../singleplayer/SinglePlayerView';
@@ -36,6 +36,11 @@ interface UseBotSimulationReturn {
   botScores: Record<string, number>;
   /** Words found by each bot */
   botWords: Record<string, string[]>;
+  /**
+   * The bot configs with their LIVE score. BotOpponent.score is 0 at creation
+   * and never mutated, so render bots from here, never from settings.bots.
+   */
+  liveBots: BotOpponent[];
   /** Reset bot state for new game */
   resetBots: () => void;
   /** Initialize bot used words (for game start) */
@@ -212,9 +217,15 @@ export function useBotSimulation({
     };
   }, [mode, bots, isPaused, isGameOver, availableWords, getBotInterval, simulateBotFindWord]);
 
+  const liveBots = useMemo(
+    () => bots.map((bot) => ({ ...bot, score: botScores[bot.id] ?? 0 })),
+    [bots, botScores],
+  );
+
   return {
     botScores,
     botWords,
+    liveBots,
     resetBots,
     initializeBotUsedWords,
   };
