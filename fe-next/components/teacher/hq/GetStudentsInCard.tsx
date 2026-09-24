@@ -29,8 +29,13 @@ export interface GetStudentsInCardProps {
 }
 
 /** A secondary join affordance: quiet navy, cream edge (contrast on navy), coloured icon. */
+/**
+ * Sized by the CARD's width (the frame is an `@container`), never the
+ * viewport's: beside the 240px sidebar a 1280px screen gives this card ~360px,
+ * where viewport-sized labels clipped to "OPEN PROJECTC".
+ */
 const SECONDARY =
-  "inline-flex min-h-12 min-w-0 flex-col items-center justify-center gap-0.5 rounded-neo border-2 border-neo-cream/70 bg-neo-navy px-1 py-1 text-center font-neo-display text-[0.65rem] font-black uppercase leading-none tracking-wide text-neo-white shadow-hard-sm sm:flex-row sm:gap-1.5 transition-all hover:-translate-y-0.5 hover:border-neo-cream active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan sm:text-xs lg:min-h-12 lg:text-sm";
+  "inline-flex min-h-12 min-w-0 flex-col items-center justify-center gap-0.5 rounded-neo border-2 border-neo-cream/70 bg-neo-navy px-1 py-1 text-center font-neo-display text-[0.65rem] font-black uppercase leading-none tracking-wide text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:border-neo-cream active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan @[20rem]:text-xs @[30rem]:flex-row @[30rem]:gap-1.5 @[34rem]:text-sm [@media(orientation:landscape)_and_(max-height:500px)]:min-h-9 [@media(orientation:landscape)_and_(max-height:600px)]:px-1! [@media(orientation:landscape)_and_(max-height:600px)]:py-0.5! [@media(orientation:landscape)_and_(max-height:500px)]:[&>svg]:hidden max-sm:[@media(max-height:700px)]:min-h-9 max-sm:[@media(max-height:700px)]:[&>svg]:hidden";
 
 /**
  * The second hero: getting the class IN. The code is the biggest type on the
@@ -66,6 +71,10 @@ export function GetStudentsInCard({
   const shownCount = useRisingCount(count, !reduced && arrivals.length > 0);
   // Seat size is a visual choice only; SSR/first paint uses the phone size.
   const wide = useMediaQuery("(min-width: 1024px)");
+  // lg beside the 240px sidebar leaves this column ~280px: 64px named seats
+  // wrapped to a clipped second row after two students, and at 1280x720 the
+  // names fell off the panel's bottom. Full size only when wide AND tall.
+  const roomy = useMediaQuery("(min-width: 1280px) and (min-height: 800px)");
 
   // Ding once per arrival batch, never on the first read (the hook guarantees
   // arrivals are empty then).
@@ -111,6 +120,7 @@ export function GetStudentsInCard({
       status={
         <span
           data-testid="hq-join-status"
+          title={t("academy.hq.codeReady", "Code ready")}
           className="ms-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border-2 border-neo-lime/70 px-2 py-0.5 font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-neo-lime sm:text-xs"
         >
           <span className="relative flex size-2">
@@ -124,20 +134,23 @@ export function GetStudentsInCard({
             )}
             <span className="relative size-2 rounded-full bg-neo-lime" />
           </span>
-          {t("academy.hq.codeReady", "Code ready")}
+          <span className="hidden @[20rem]:inline">{t("academy.hq.codeReady", "Code ready")}</span>
         </span>
       }
     >
       <div className="flex min-h-0 flex-1 flex-col gap-2 p-2 sm:gap-3 sm:p-3 lg:p-4">
         {/* THE hero of this card: the code, read from the back row. */}
-        <div className="flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-yellow bg-neo-navy px-2 py-1 shadow-hard-sm lg:py-2">
-          <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-yellow/75 lg:text-sm">
+        {/* `@container`: the code is sized by THIS box's width (~4.2em for six
+            mono glyphs + tracking, so 20cqi always fits), capped per
+            breakpoint. A viewport size overflowed the ~280px column at 1024. */}
+        <div className="@container flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-yellow bg-neo-navy px-2 py-1 shadow-hard-sm lg:py-2">
+          <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-yellow/75 lg:text-sm [@media(orientation:landscape)_and_(max-height:500px)]:sr-only">
             {t("academy.hq.classCode", "Class code")}
           </span>
           <span
             data-testid="hq-join-code"
             dir="ltr"
-            className="select-all whitespace-nowrap font-mono text-5xl font-black leading-none tracking-[0.1em] text-neo-yellow sm:text-6xl lg:text-7xl 2xl:text-8xl"
+            className="select-all whitespace-nowrap font-mono text-[min(20cqi,3rem)] font-black leading-none tracking-[0.1em] text-neo-yellow sm:text-[min(20cqi,3.75rem)] lg:text-[min(20cqi,4.5rem)] 2xl:text-[min(20cqi,6rem)] [@media(orientation:landscape)_and_(max-height:500px)]:text-[min(20cqi,2.25rem)] max-sm:[@media(max-height:700px)]:text-[min(20cqi,2.5rem)]"
           >
             {classroom.join_code}
           </span>
@@ -176,7 +189,7 @@ export function GetStudentsInCard({
             className={SECONDARY}
           >
             {joinUrl ? (
-              <span className="hidden size-9 shrink-0 rounded-sm bg-neo-white p-0.5 lg:block">
+              <span className="hidden size-9 shrink-0 rounded-sm bg-neo-white p-0.5 lg:@[30rem]:block">
                 <QRCodeSVG
                   value={joinUrl}
                   size={64}
@@ -187,7 +200,7 @@ export function GetStudentsInCard({
               </span>
             ) : null}
             <QrCode
-              className={cn("size-4 shrink-0 text-neo-cyan", joinUrl && "lg:hidden")}
+              className={cn("size-4 shrink-0 text-neo-cyan", joinUrl && "lg:@[30rem]:hidden")}
               strokeWidth={2.5}
               aria-hidden="true"
             />
@@ -255,12 +268,14 @@ export function GetStudentsInCard({
                 // Phone: one row with a few empty chairs. Desktop: every
                 // student, named — no empty chairs at all.
                 seats={wide ? Math.min(Math.max(count, 1), 15) : 5}
-                size={wide ? 64 : 34}
+                size={wide ? (roomy ? 64 : 48) : 34}
                 showNames={wide}
-                className="lg:order-2 lg:min-h-0 lg:overflow-hidden lg:gap-3"
+                // Seats never shrink: at 1280x720 a shrinkable row collapsed
+                // to 0px and "3 joined" sat over an empty panel.
+                className="lg:order-2 lg:my-auto lg:shrink-0 lg:justify-center lg:gap-2 xl:gap-3 [@media(orientation:landscape)_and_(max-height:500px)]:[&>[data-testid=hq-roster-ghost]]:hidden"
               />
               {/* Desktop: the rest of the panel says where newcomers appear. */}
-              <p className="hidden font-neo-body text-sm font-bold text-neo-white/60 lg:order-3 lg:mt-auto lg:block">
+              <p className="hidden font-neo-body text-sm font-bold text-neo-white/60 lg:order-3 lg:mt-auto lg:block lg:[@media(max-height:800px)]:hidden">
                 {t("teacher.activation.shareBody")}
               </p>
               <JoinedCount

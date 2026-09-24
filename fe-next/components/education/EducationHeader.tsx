@@ -162,7 +162,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
         )}
       >
         {/* Left Section: Back button + Logo */}
-        <div className={cn('flex items-center gap-2 sm:gap-3', isRTL && 'flex-row-reverse')}>
+        <div className={cn('flex min-w-0 items-center gap-2 sm:gap-3', isRTL && 'flex-row-reverse')}>
           {/* Back Button (optional) */}
           {showBackButton && (
             <button
@@ -232,8 +232,11 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           </Link>
         </div>
 
-        {/* Center Section: Breadcrumbs (desktop only) */}
-        <div className="hidden lg:flex flex-1 justify-center px-4">
+        {/* Center Section: Breadcrumbs (wide desktop only). From lg the
+            240px sidebar already names the page, and at 1024 the crumbs'
+            min-content pushed the shrink-0 controls ~13px off-screen, clipping
+            the menu button. `min-w-0` lets them yield before the controls do. */}
+        <div className="hidden xl:flex min-w-0 flex-1 justify-center px-4">
           <EducationBreadcrumbs />
         </div>
 

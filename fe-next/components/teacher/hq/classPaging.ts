@@ -3,8 +3,22 @@
  * classes than fit pages through them instead of scrolling a long column.
  */
 
-/** Classes per page for the viewport: phone 1, tablet 2, desktop row 3. */
-export function classPageSize(bp: { sm: boolean; lg: boolean }): number {
+/**
+ * The media queries the Classes grid pages by. They MUST match the grid's
+ * column classes (`sm:grid-cols-2 xl:grid-cols-3`). Three-up waits for xl:
+ * the education sidebar is 240px wide from lg, so a 1024px screen leaves a
+ * ~720px column and three cards there crushed to ~220px each.
+ */
+export const CLASS_GRID_QUERIES = {
+  sm: '(min-width: 640px)',
+  lg: '(min-width: 1280px)',
+  /** A phone turned sideways: one wide card, laid out in two columns. */
+  short: '(orientation: landscape) and (max-height: 500px)',
+} as const;
+
+/** Classes per page for the viewport: phone 1, tablet 2, desktop row 3, sideways phone 1. */
+export function classPageSize(bp: { sm: boolean; lg: boolean; short?: boolean }): number {
+  if (bp.short) return 1;
   if (bp.lg) return 3;
   if (bp.sm) return 2;
   return 1;

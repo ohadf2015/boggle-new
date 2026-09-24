@@ -173,6 +173,23 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       expect(aside.contains(screen.getByTestId('teacher-shortcuts'))).toBe(false);
     });
 
+    it('Given a landscape phone (844x390), Then the deck is two columns side by side, not a stacked scroll', () => {
+      render(<TeacherDashboard />);
+      // Below lg the deck stacks; on a phone turned sideways that column is
+      // ~2x the 390px height. A short landscape screen gets the desktop split.
+      const LS = '[@media(orientation:landscape)_and_(max-height:500px)]:';
+      expect(screen.getByTestId('teacher-dashboard-grid').className).toContain(`${LS}grid-cols-5`);
+      expect(screen.getByTestId('teacher-dashboard-main').className).toContain(`${LS}col-span-3`);
+      expect(screen.getByTestId('teacher-dashboard-aside').className).toContain(`${LS}col-span-2`);
+    });
+
+    it('Given a 2560x1440 TV, Then the whole shell scales up instead of floating a 1920 island', () => {
+      render(<TeacherDashboard />);
+      expect(screen.getByTestId('education-shell').className).toContain(
+        '[@media(min-width:2200px)_and_(min-height:1200px)]:[zoom:1.3333]',
+      );
+    });
+
     it('gives the phone a bottom tab bar and every wider screen a sidebar', () => {
       render(<TeacherDashboard />);
       // The handover is at `md`, not `lg`: a tablet gets the sidebar collapsed

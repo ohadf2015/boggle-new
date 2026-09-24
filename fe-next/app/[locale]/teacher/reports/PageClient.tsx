@@ -8,6 +8,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ChevronRight, Users } from 'lucide-react';
@@ -18,6 +19,7 @@ import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressR
 import { AssignmentProgressReport } from '@/components/teacher/reports/AssignmentProgressReport';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { EducationShell } from '@/components/education/shell/EducationShell';
+import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
@@ -152,7 +154,7 @@ function TeacherReportsInner() {
     view = (
       <>
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-neo-display text-3xl font-bold text-neo-white sm:text-4xl">
+          <h1 className="font-neo-display text-2xl font-black uppercase leading-none tracking-tight text-neo-white [text-shadow:3px_3px_0_#000] sm:text-4xl">
             {t('teacher.reports.title')}
           </h1>
           <TeacherPlanBadge />
@@ -296,11 +298,24 @@ function ReportsShell({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <EducationShell
+      className={TEACHER_TV_SCALE}
       header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('teacher.reports.title')}
-      contentClassName="p-4 sm:p-6 lg:p-8"
+      contentClassName="relative p-4 sm:p-6 lg:p-8"
     >
-      {children}
+      {/* Same observatory as HQ and Classes: Reports is a room of the same
+          building, not a bare admin page. Dark-only surface (pitfall 5). */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <Image
+          src="/images/education/teacher-hq-bg.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="select-none object-cover"
+        />
+        <div className="absolute inset-0 bg-neo-navy/75" />
+      </div>
+      <div className="relative">{children}</div>
     </EducationShell>
   );
 }

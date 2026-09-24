@@ -50,11 +50,18 @@ export const HqModeCard = memo(function HqModeCard({
       transition={{ type: "spring", stiffness: 520, damping: 22 }}
       className={cn(
         "group relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-neo-lg border-3 text-center",
+        // globals.css pads every landscape-phone <button> (unlayered, so it
+        // beats utilities) — that padding squeezed the plate to "VOCA…".
+        "[@media(orientation:landscape)_and_(max-height:600px)]:p-0!",
         // Phone/tablet: a fixed card shape in EVERY data state — never
         // stretched to whatever height the grid row happens to have (the r3
         // loading capture turned four cards into tall empty columns). Desktop
         // is a fixed 2x2 board that fills its column by design.
         "aspect-[2/3] w-full self-start justify-self-stretch lg:aspect-auto lg:self-stretch",
+        // Short screens can't afford 2:3 portraits AND the join card: under
+        // 700px tall (375x667) or sideways the cards become a row of name
+        // plates; 700-760px (360x740) keeps the art in a square.
+        "[@media(orientation:landscape)_and_(max-height:500px)]:aspect-auto [@media(orientation:landscape)_and_(max-height:500px)]:self-stretch max-sm:[@media(max-height:700px)]:aspect-auto max-sm:[@media(max-height:700px)]:self-stretch max-sm:[@media(min-height:701px)_and_(max-height:760px)]:aspect-square",
         "transition-[box-shadow,border-color,background-color] duration-150",
         "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
         selected
@@ -67,7 +74,7 @@ export const HqModeCard = memo(function HqModeCard({
       )}
     >
       {selected ? (
-        <span className="absolute end-1.5 top-1.5 z-10 flex size-5 items-center justify-center rounded-full border-2 border-neo-black bg-neo-white text-black shadow-hard-sm lg:end-3 lg:top-3 lg:size-8">
+        <span className="absolute end-1.5 top-1.5 z-10 flex size-5 items-center max-sm:[@media(max-height:700px)]:hidden [@media(orientation:landscape)_and_(max-height:500px)]:hidden justify-center rounded-full border-2 border-neo-black bg-neo-white text-black shadow-hard-sm lg:end-3 lg:top-3 lg:size-8">
           <Check
             className="size-3 lg:size-5"
             strokeWidth={4}
@@ -81,6 +88,8 @@ export const HqModeCard = memo(function HqModeCard({
       <span
         className={cn(
           "relative flex min-h-0 w-full flex-1 items-center justify-center",
+          // Short screens: no height for art — name plates only.
+          "[@media(orientation:landscape)_and_(max-height:500px)]:hidden max-sm:[@media(max-height:700px)]:hidden",
           !selected && HQ_ACCENT_STAGE[mode.accent],
         )}
       >
@@ -118,17 +127,20 @@ export const HqModeCard = memo(function HqModeCard({
       <span
         className={cn(
           "flex w-full shrink-0 flex-col gap-0.5 border-t-3 px-1 py-1 lg:px-3 lg:py-2",
+          "[@media(orientation:landscape)_and_(max-height:500px)]:min-h-10 [@media(orientation:landscape)_and_(max-height:500px)]:flex-1 [@media(orientation:landscape)_and_(max-height:500px)]:justify-center [@media(orientation:landscape)_and_(max-height:500px)]:border-t-0 max-sm:[@media(max-height:700px)]:min-h-11 max-sm:[@media(max-height:700px)]:flex-1 max-sm:[@media(max-height:700px)]:justify-center max-sm:[@media(max-height:700px)]:border-t-0",
           selected
             ? "border-neo-black bg-black/10"
             : "border-neo-cream/25 bg-neo-navy",
         )}
       >
-        <span className="line-clamp-2 w-full break-normal font-neo-display text-[0.65rem] font-black uppercase leading-[1.05] tracking-tight [hyphens:none] sm:text-sm lg:line-clamp-1 lg:text-2xl xl:text-[1.7rem]">
+        <span className="line-clamp-2 w-full break-normal font-neo-display text-[0.65rem] font-black uppercase leading-[1.05] tracking-tight [hyphens:none] sm:text-sm lg:line-clamp-1 [@media(orientation:landscape)_and_(max-height:500px)]:text-xs lg:text-2xl xl:text-[1.7rem]">
           {label}
         </span>
         <span
           className={cn(
-            "hidden w-full truncate font-neo-body text-sm font-bold lg:block",
+            // Only when the 2x2 board has height to spare: below 800px tall
+            // the one-liner ate the island art down to a 30px sliver.
+            "hidden w-full truncate font-neo-body text-sm font-bold lg:[@media(min-height:800px)]:block",
             selected ? "text-black/75" : "text-neo-white/75",
           )}
         >

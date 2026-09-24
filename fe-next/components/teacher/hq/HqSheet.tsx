@@ -98,11 +98,13 @@ export function HqSheet({
           if (e.target === e.currentTarget) onOpenChange(false);
         }}
       >
+        {/* On a TV the teacher shell is zoomed 4/3 (tvScale.ts), which also
+            scales dvh: 66dvh there is the same 88% of the screen. */}
         <div
           role={open ? "dialog" : undefined}
           aria-modal={open ? true : undefined}
           aria-label={title}
-          className="flex max-h-[88dvh] w-full max-w-4xl flex-col overflow-hidden rounded-t-neo-xl border-3 border-neo-cream bg-neo-navy shadow-hard-2xl md:rounded-neo-xl"
+          className="flex max-h-[88dvh] w-full [@media(min-width:2200px)_and_(min-height:1200px)]:max-h-[66dvh] max-w-4xl flex-col overflow-hidden rounded-t-neo-xl border-3 border-neo-cream bg-neo-navy shadow-hard-2xl md:rounded-neo-xl"
         >
           <div className="flex shrink-0 items-center gap-3 border-b-3 border-neo-cream bg-neo-navy-light px-4 py-3">
             <h2 className="min-w-0 flex-1 truncate font-neo-display text-lg font-black uppercase tracking-tight text-neo-white">

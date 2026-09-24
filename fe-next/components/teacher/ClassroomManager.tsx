@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
@@ -14,7 +14,7 @@ import { type Language } from '@/lib/supabase/education/types';
 import { ClassroomCard } from './hq/ClassroomCard';
 import { ClassPager } from './hq/ClassPager';
 import { ClassroomCardActivity } from './hq/ClassroomCardActivity';
-import { classPageSize, pageOf, pageSlice } from './hq/classPaging';
+import { CLASS_GRID_QUERIES, classPageSize, pageOf, pageSlice } from './hq/classPaging';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import ClassLimitUpsellModal from './ClassLimitUpsellModal';
 import CreateClassroomWizard from './CreateClassroomWizard';
@@ -43,9 +43,11 @@ interface ClassroomManagerProps {
   autoOpenCreate?: boolean;
   /** Classes tab: cards carry recent activity, next step and "Start a game". */
   richCards?: boolean;
+  /** The page title; shares the Create row so a phone doesn't spend two rows on chrome. */
+  heading?: ReactNode;
 }
 
-export default function ClassroomManager({ autoOpenCreate, richCards = false }: ClassroomManagerProps = {}) {
+export default function ClassroomManager({ autoOpenCreate, richCards = false, heading }: ClassroomManagerProps = {}) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
   const { classrooms, isLoading, createClassroom, updateClassroom, deleteClassroom } =
@@ -70,10 +72,11 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false }: 
 
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId);
 
-  // Paged, not scrolled. The breakpoints mirror the grid's sm/lg columns.
-  const isSm = useMediaQuery('(min-width: 640px)');
-  const isLg = useMediaQuery('(min-width: 1024px)');
-  const pageSize = classPageSize({ sm: isSm, lg: isLg });
+  // Paged, not scrolled. CLASS_GRID_QUERIES mirror the grid's sm/xl columns.
+  const isSm = useMediaQuery(CLASS_GRID_QUERIES.sm);
+  const isLg = useMediaQuery(CLASS_GRID_QUERIES.lg);
+  const isShort = useMediaQuery(CLASS_GRID_QUERIES.short);
+  const pageSize = classPageSize({ sm: isSm, lg: isLg, short: isShort });
   const [page, setPage] = useState(0);
   const paged = pageSlice(classrooms, page, pageSize);
   // A class the teacher just created jumps into view on whatever page it is.
@@ -248,40 +251,50 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false }: 
     );
   }
 
-  return (
-    <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Create Classroom Button */}
-      <div className="flex justify-between items-center gap-3">
-        <Button
-          onClick={openCreateDialog}
+  const topActions = (
+    <>
+      <Button
+        onClick={openCreateDialog}
+        className={cn(
+          'bg-neo-cyan text-black font-neo-body font-black',
+          'border-3 border-black shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
+          'transition-all',
+          heading && 'whitespace-nowrap max-sm:h-10 max-sm:px-2.5 max-sm:text-sm [@media(orientation:landscape)_and_(max-height:500px)]:h-9 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-9! [@media(orientation:landscape)_and_(max-height:500px)]:py-1!',
+        )}
+      >
+        <Plus className={cn('w-5 h-5 me-2', heading && 'max-sm:me-1 max-sm:size-4 max-[399px]:me-0 max-[399px]:size-5')} />
+        {/* Under 400px the title and a full label can't share a row: the
+            button becomes a "+" (its label stays for screen readers). */}
+        <span className={cn(heading && 'max-[399px]:sr-only')}>{t('teacher.classroom.create')}</span>
+      </Button>
+      {isEligibleForTeacherProUpgradeCta({
+        trial,
+        hasPro,
+        proLoading,
+        accessLoading,
+      }) ? (
+        <Link
+          href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
+          data-testid="classrooms-upgrade-teacher-pro"
           className={cn(
-            'bg-neo-cyan text-black font-neo-body font-black',
-            'border-3 border-black shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
-            'transition-all'
+            'inline-flex min-h-11 items-center justify-center rounded-neo bg-neo-navy px-4 py-2',
+            'font-neo-body font-black text-neo-lime border-neo border-neo-cream/40 shadow-hard',
+            'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
+            'transition-all whitespace-nowrap',
           )}
         >
-          <Plus className="w-5 h-5 me-2" />
-          {t('teacher.classroom.create')}
-        </Button>
-        {isEligibleForTeacherProUpgradeCta({
-          trial,
-          hasPro,
-          proLoading,
-          accessLoading,
-        }) ? (
-          <Link
-            href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
-            data-testid="classrooms-upgrade-teacher-pro"
-            className={cn(
-              'inline-flex min-h-11 items-center justify-center rounded-neo bg-neo-navy px-4 py-2',
-              'font-neo-body font-black text-neo-lime border-neo border-neo-cream/40 shadow-hard',
-              'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
-              'transition-all whitespace-nowrap',
-            )}
-          >
-            {teacherProUpgradeCtaLabel(language)}
-          </Link>
-        ) : null}
+          {teacherProUpgradeCtaLabel(language)}
+        </Link>
+      ) : null}
+    </>
+  );
+
+  return (
+    <div className="space-y-4 [@media(orientation:landscape)_and_(max-height:500px)]:space-y-1.5" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Create Classroom Button — beside the page title when one is given. */}
+      <div data-testid="classroom-manager-toprow" className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        {heading}
+        {heading ? <div className="flex shrink-0 items-center gap-3">{topActions}</div> : topActions}
       </div>
 
       <AnimatePresence initial={false}>
@@ -357,7 +370,7 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false }: 
         <>
           <m.div
             key={paged.page}
-            className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6"
+            className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:gap-6 xl:grid-cols-3 [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-1"
             variants={stagger}
             initial="hidden"
             animate="visible"

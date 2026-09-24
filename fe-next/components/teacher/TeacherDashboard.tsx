@@ -11,6 +11,7 @@
 'use client';
 
 import { type ReactNode, useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -201,7 +202,7 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
 
   return (
     <EducationShell
-      className={cn(isRTL && 'rtl')}
+      className={cn(TEACHER_TV_SCALE, isRTL && 'rtl')}
       scrollRegionLabel={t('teacher.dashboard.title')}
       header={<EducationHeader />}
       statusRow={<TeacherStatusRow />}
@@ -241,13 +242,16 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
           'relative mx-auto flex h-full min-h-0 w-full max-w-[1640px] flex-col gap-2 px-3 py-2',
           'sm:gap-3 sm:px-5 sm:py-3',
           'lg:grid lg:grid-cols-5 lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-4 lg:px-8 lg:py-4',
+          // A phone turned sideways (844x390) is short, not narrow: the stacked
+          // column would be ~2x its height. It gets the desktop split instead.
+          '[@media(orientation:landscape)_and_(max-height:500px)]:grid [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-5 [@media(orientation:landscape)_and_(max-height:500px)]:grid-rows-[auto_minmax(0,1fr)] [@media(orientation:landscape)_and_(max-height:500px)]:gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:py-1.5',
         )}
       >
         {/* Top row: which class, and the ONE Tools entry (+ Go Pro chip).
             The shell's tab bar is the nav; nothing else competes with it. The
             dock sits in this row's end but is rendered LAST, so keyboard and
             screen-reader order still meet START before any secondary surface. */}
-        <div className="flex min-h-9 shrink-0 items-center gap-2 lg:col-span-5 lg:min-h-10">
+        <div className="flex min-h-9 shrink-0 items-center gap-2 lg:col-span-5 lg:min-h-10 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-5">
           {/* `contain: inline-size` — a long class name must truncate here, not
               widen the whole shell column past a 390px phone. */}
           <div className="min-w-0 flex-1 [contain:inline-size]">
@@ -290,7 +294,7 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
           // Pessimistic: never an empty deck while the classroom read is broken.
           <div
             data-testid="play-tab-error-card"
-            className="rounded-neo border-3 border-neo-red bg-neo-cream px-6 py-8 text-center shadow-hard lg:col-span-5"
+            className="rounded-neo border-3 border-neo-red bg-neo-cream px-6 py-8 text-center shadow-hard lg:col-span-5 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-5"
           >
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-2 border-neo-red bg-neo-red/10 shadow-hard-sm">
               <BarChart3 className="h-8 w-8 text-neo-red" />
@@ -322,14 +326,14 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
                 may stretch into space the other hasn't claimed yet. */}
             <div
               data-testid="teacher-dashboard-main"
-              className="shrink-0 lg:col-span-3 lg:min-h-0"
+              className="shrink-0 lg:col-span-3 lg:min-h-0 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-3 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-0"
             >
               <PlayNowLauncher onLaunch={handleQuickLaunch} />
             </div>
 
             <div
               data-testid="teacher-dashboard-aside"
-              className="flex min-h-0 flex-1 flex-col lg:col-span-2"
+              className="flex min-h-0 flex-1 flex-col lg:col-span-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2"
             >
               {/* Step 2 is ALWAYS mounted, in one frame: skeleton while the
                   class read is open (or the default class is a render away),

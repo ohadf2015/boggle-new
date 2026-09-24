@@ -34,25 +34,25 @@ export function JoinCardFrame({ status, busy = false, testId, className, childre
       aria-labelledby={headingId}
       aria-busy={busy || undefined}
       className={cn(
-        "flex min-h-0 flex-col overflow-hidden rounded-neo-lg border-3 border-neo-cream/70 bg-neo-navy-light/95 shadow-hard-lg",
+        "@container flex min-h-0 flex-col overflow-hidden rounded-neo-lg border-3 border-neo-cream/70 bg-neo-navy-light/95 shadow-hard-lg",
         className,
       )}
     >
-      <div className="flex shrink-0 items-center gap-2 border-b-3 border-neo-cream/60 bg-neo-navy px-2.5 py-1.5 sm:px-4 sm:py-2">
+      <div className="flex shrink-0 items-center gap-2 border-b-3 border-neo-cream/60 bg-neo-navy px-2.5 py-1.5 sm:px-4 sm:py-2 [@media(orientation:landscape)_and_(max-height:500px)]:py-1">
         <span
           data-testid="hq-step-badge-2"
           aria-hidden="true"
-          className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan font-neo-display text-base font-black leading-none text-black sm:size-8 sm:text-lg"
+          className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan font-neo-display text-base font-black leading-none text-black sm:size-8 sm:text-lg [@media(orientation:landscape)_and_(max-height:500px)]:size-6 [@media(orientation:landscape)_and_(max-height:500px)]:text-sm"
         >
           2
         </span>
         <h2
           id={headingId}
-          className="min-w-0 truncate font-neo-display text-base font-black uppercase leading-none tracking-tight text-neo-cyan sm:text-xl"
+          className="min-w-0 truncate font-neo-display text-base font-black uppercase leading-none tracking-tight text-neo-cyan @[18rem]:text-lg @[24rem]:text-xl"
         >
           {t("academy.hq.getStudentsIn", "Get students in")}
         </h2>
-        <UsersRound className="size-5 shrink-0 text-neo-cyan" strokeWidth={3} aria-hidden="true" />
+        <UsersRound className="hidden size-5 shrink-0 text-neo-cyan @[24rem]:block" strokeWidth={3} aria-hidden="true" />
         {status}
       </div>
       {children}

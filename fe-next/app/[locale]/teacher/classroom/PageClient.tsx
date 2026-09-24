@@ -20,6 +20,7 @@ import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import ClassroomManager from '@/components/teacher/ClassroomManager';
+import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 
 /** The shell wraps the gate, not the other way round — see curriculum's PageClient
  *  for why: the gate's own loading/denial states need the lock too. */
@@ -28,8 +29,7 @@ export default function TeacherClassroomsPage() {
     <ClassesShell>
       <TeacherGate>
         <main className="relative mx-auto max-w-6xl">
-          <ClassesTitle />
-          <ClassroomManager richCards />
+          <ClassroomManager richCards heading={<ClassesTitle />} />
         </main>
       </TeacherGate>
     </ClassesShell>
@@ -39,7 +39,7 @@ export default function TeacherClassroomsPage() {
 function ClassesTitle() {
   const { t } = useLanguage();
   return (
-    <h1 className="mb-3 font-neo-display text-2xl font-black uppercase leading-none tracking-tight text-neo-white [text-shadow:3px_3px_0_#000] sm:mb-4 sm:text-4xl">
+    <h1 className="min-w-0 truncate font-neo-display text-lg font-black uppercase leading-none tracking-tight text-neo-white [text-shadow:3px_3px_0_#000] min-[400px]:text-xl sm:text-4xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
       {t('academy.teacher.classesTitle', 'Your classes')}
     </h1>
   );
@@ -51,9 +51,10 @@ function ClassesShell({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <EducationShell
+      className={TEACHER_TV_SCALE}
       header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('teacher.nav.classes')}
-      contentClassName="relative p-4 sm:p-6 lg:p-8"
+      contentClassName="relative p-4 sm:p-6 lg:px-8 lg:py-5 [@media(orientation:landscape)_and_(max-height:500px)]:px-3 [@media(orientation:landscape)_and_(max-height:500px)]:py-2"
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <Image
