@@ -11,8 +11,9 @@ interface MissionChipsProps {
 }
 
 /**
- * Three slim mission chips. Progress numbers stay LTR so Hebrew doesn't
- * scramble `3/10`. Completion pops once, then sits lime.
+ * Three mission chips. Labels wrap to two lines (a truncated goal is not a
+ * goal), progress is a bar plus an LTR `3/10` so Hebrew doesn't scramble it.
+ * Completion pops once, then sits lime.
  */
 export function MissionChips({ missions }: MissionChipsProps) {
   const { t } = useLanguage();
@@ -34,22 +35,29 @@ export function MissionChips({ missions }: MissionChipsProps) {
           animate={mission.done && !reduce ? 'done' : 'idle'}
           transition={{ duration: 0.35 }}
           className={cn(
-            'min-w-0 flex-1 rounded-neo border-2 px-1.5 py-1',
-            mission.done
-              ? 'border-neo-black bg-neo-lime text-neo-black'
-              : 'border-neo-white bg-neo-navy-light text-neo-white',
+            'relative min-w-0 flex-1 overflow-hidden rounded-lg border-[3px] border-neo-black px-2 pb-2 pt-1 shadow-[2px_2px_0_#000]',
+            mission.done ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-white',
           )}
         >
-          <span className="block truncate text-[10px] font-black uppercase leading-tight">
-            {t(mission.labelKey, mission.letter ? { letter: mission.letter } : undefined)}
-          </span>
-          <span className="mt-0.5 flex items-center gap-1">
-            <span dir="ltr" className="text-[10px] font-bold">
-              {mission.progress}/{mission.target}
+          <span className="flex items-start justify-between gap-1">
+            <span data-part="label" className="line-clamp-2 text-[11px] font-black uppercase leading-[1.15]">
+              {t(mission.labelKey, mission.letter ? { letter: mission.letter } : undefined)}
             </span>
             {mission.done ? (
-              <Check className="h-3 w-3 shrink-0" aria-label={t('singlePlayer.missions.done')} />
-            ) : null}
+              <Check className="mt-px h-3.5 w-3.5 shrink-0" strokeWidth={3.5} aria-label={t('singlePlayer.missions.done')} />
+            ) : (
+              <span dir="ltr" className="shrink-0 text-[11px] font-bold tabular-nums text-neo-cyan">
+                {mission.progress}/{mission.target}
+              </span>
+            )}
+          </span>
+          {/* Progress bar along the chip's foot. */}
+          <span aria-hidden className="absolute inset-x-0 bottom-0 h-1 bg-black/40">
+            <span
+              data-part="bar"
+              className={cn('block h-full transition-[width] duration-300', mission.done ? 'bg-neo-black/30' : 'bg-neo-cyan')}
+              style={{ width: `${Math.min(100, Math.round((mission.progress / Math.max(1, mission.target)) * 100))}%` }}
+            />
           </span>
         </motion.div>
       ))}

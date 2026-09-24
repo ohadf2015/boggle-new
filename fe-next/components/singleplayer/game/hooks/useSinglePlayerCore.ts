@@ -49,6 +49,8 @@ import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../Singl
 import type { LetterGrid } from '@/shared/types/game';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { FoundWord, TrainingState, DirectionGuidanceState, KeyboardInputState } from '../types';
+import { roundEventsEnabled, startsBehindGate } from './roundGates';
+import { isFirstSessionPlayer } from '@/lib/retention/firstWin';
 
 interface UseSinglePlayerCoreOptions {
   settings: SinglePlayerGameState;
@@ -107,6 +109,17 @@ export function useSinglePlayerCore({
   const [score, setScore] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+  // The board is dealt, then waits for the player's Start tap: nothing that
+  // spends round time (clock, bots, input) runs while this is true.
+  // Derived every render, not frozen in useState: the core first mounts with
+  // the default settings and `mode` resolves a render later (autoStart=practice
+  // briefly looked like solo-bots and got a Start card it should never have).
+  const [started, setStarted] = useState(false);
+  const awaitingStart = startsBehindGate(settings.mode) && !started;
+  const handleStart = useCallback(() => setStarted(true), []);
+  const held = isPaused || awaitingStart;
+  // Read once: the "first game played" flag is written at game END.
+  const [isFirstGame] = useState(isFirstSessionPlayer);
   const [isValidatingWords, setIsValidatingWords] = useState(false);
   const [availableWords, setAvailableWords] = useState<AvailableWords | null>(null);
 
@@ -161,7 +174,7 @@ export function useSinglePlayerCore({
   }, [currentFeedback]);
 
   const { botScores, botWords, resetBots, initializeBotUsedWords } = useBotSimulation({
-    mode: settings.mode, bots: settings.bots, isPaused, isGameOver, availableWords,
+    mode: settings.mode, bots: settings.bots, isPaused: held, isGameOver, availableWords,
     calmPacing: cosyMode,
   });
   const { checkSubmission, resetSpamDetection } = useSpamDetection();
@@ -178,7 +191,7 @@ export function useSinglePlayerCore({
   const directionGuidance = useDirectionPatternGuidance();
   const firstPlayTutorial = useFirstPlayTutorial({
     grid, availableWords, language: settings.language,
-    isGameActive: !!grid && !isPaused && !isGameOver,
+    isGameActive: !!grid && !held && !isGameOver,
   });
 
   const trainingGridSize = useMemo(() => ({ rows: 4, cols: 4 }), []);
@@ -216,7 +229,7 @@ export function useSinglePlayerCore({
   const timer = useGameTimer({
     initialTime: settings.timerSeconds,
     isPaused: isPaused || settings.mode === 'practice',
-    isExternallyPaused: !grid || isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
+    isExternallyPaused: !grid || awaitingStart || isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
     autoStart: settings.mode !== 'practice',
     onTimeUp: () => { if (!gameOverCalledRef.current) setIsGameOver(true); },
   });
@@ -231,7 +244,7 @@ export function useSinglePlayerCore({
     onNavigationAttempt: () => { setShowQuitConfirm(true); return false; },
   });
 
-  const gameActive = !!grid && !isPaused && !isGameOver && timer.remainingTime > 0;
+  const gameActive = !!grid && !held && !isGameOver && timer.remainingTime > 0;
 
   // Countdown beep in last 10 seconds — silenced under cosy (no panic cue).
   useEffect(() => {
@@ -253,7 +266,7 @@ export function useSinglePlayerCore({
   });
 
   const { earthquakeState, fireRoundActive, fireRoundRemaining, getScoreMultiplier } = useEarthquakeFireRound({
-    enabled: settings.mode !== 'practice', gameDurationSeconds: settings.timerSeconds,
+    enabled: roundEventsEnabled(settings.mode, isFirstGame), gameDurationSeconds: settings.timerSeconds,
     currentTimeSeconds: timer.remainingTime, language: settings.language,
     difficulty: settings.difficulty, mode: 'singleplayer',
     onGridRegenerate: (newGrid) => { setGrid(newGrid); foundWordsSetRef.current.clear(); },
@@ -440,7 +453,7 @@ export function useSinglePlayerCore({
 
   const keyboardInput = useKeyboardWordInput({
     grid: grid || ([] as LetterGrid), language: settings.language, gameLanguage: settings.language,
-    enabled: !!grid && !isPaused && !isGameOver, onWordSubmit: handleWordSubmit,
+    enabled: !!grid && !held && !isGameOver, onWordSubmit: handleWordSubmit,
     minWordLength: settings.minWordLength ?? 2,
   });
 
@@ -613,5 +626,6 @@ export function useSinglePlayerCore({
     wordPace,
     soloCombo: soloJuice.combo,
     soloMissions: soloJuice.missions,
+    awaitingStart, handleStart,
   };
 }

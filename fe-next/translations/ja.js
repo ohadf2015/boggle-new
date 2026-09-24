@@ -7433,6 +7433,16 @@ const ja = {
     "maybeLater": "また今度"
   },
   "singlePlayer": {
+    "startCard": {
+      "demo": "さくら",
+      "titleOne": "{bot}に勝とう！",
+      "titleMany": "ボットに勝とう！",
+      "titleSolo": "いくつ見つけられる？",
+      "clock": "制限時間 {seconds} 秒",
+      "goalOne": "{bot}より多く得点しよう",
+      "goalMany": "1位でフィニッシュ",
+      "goalSolo": "長い単語ほど高得点"
+    },
     "nextGame": {
       "title": "次は？",
       "rematchHarder": "再戦 · もっと難しく",

@@ -7719,6 +7719,16 @@ const sv = {
     "maybeLater": "Kanske senare"
   },
   "singlePlayer": {
+    "startCard": {
+      "demo": "SOL",
+      "titleOne": "Slå {bot}!",
+      "titleMany": "Slå botarna!",
+      "titleSolo": "Hur många hittar du?",
+      "clock": "{seconds} sekunder på klockan",
+      "goalOne": "Få fler poäng än {bot}",
+      "goalMany": "Sluta överst",
+      "goalSolo": "Längre ord ger mycket mer poäng"
+    },
     "nextGame": {
       "title": "Vad händer nu?",
       "rematchHarder": "Returmatch · svårare",

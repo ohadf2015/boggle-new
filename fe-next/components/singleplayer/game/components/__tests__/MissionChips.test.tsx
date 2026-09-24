@@ -41,4 +41,17 @@ describe('MissionChips', () => {
     expect(screen.getByLabelText('singlePlayer.missions.done')).toBeInTheDocument();
     expect(screen.getByTestId('mission-volume')).toHaveAttribute('data-done', 'false');
   });
+  it('wraps labels to two lines instead of truncating them on a phone', () => {
+    // "WORD OF 6+ LETTE..." at 390px: a mission you cannot read is not a goal.
+    render(<MissionChips missions={missions} />);
+    const label = screen.getByTestId('mission-volume').querySelector('[data-part="label"]');
+    expect(label?.className).toContain('line-clamp-2');
+    expect(label?.className).not.toContain('truncate');
+  });
+
+  it('shows progress as a bar, not only a fraction', () => {
+    render(<MissionChips missions={missions} />);
+    const bar = screen.getByTestId('mission-volume').querySelector('[data-part="bar"]') as HTMLElement | null;
+    expect(bar?.style.width).toBe('30%');
+  });
 });

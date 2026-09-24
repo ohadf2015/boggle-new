@@ -284,8 +284,8 @@ describe('useSinglePlayerCore — timer gated on board load', () => {
     expect(lastCall.isExternallyPaused).toBe(true);
   });
 
-  it('clears the gate once the grid has loaded (no other external pause active)', async () => {
-    const { rerender } = renderHook(
+  it('holds the clock after the grid loads until the player taps Start, then clears', async () => {
+    const { result, rerender } = renderHook(
       (props: { settings: SinglePlayerGameState }) =>
         useSinglePlayerCore({
           settings: props.settings,
@@ -304,9 +304,29 @@ describe('useSinglePlayerCore — timer gated on board load', () => {
 
     rerender({ settings: { ...defaultSettings, grid: mockGrid } });
 
-    const lastCall = mockUseGameTimer.mock.calls[mockUseGameTimer.mock.calls.length - 1][0] as {
+    const last = () => mockUseGameTimer.mock.calls[mockUseGameTimer.mock.calls.length - 1][0] as {
       isExternallyPaused: boolean;
     };
-    expect(lastCall.isExternallyPaused).toBe(false);
+    // Board is dealt, but a timed round waits for the Start tap (SoloStartCard).
+    expect(result.current.awaitingStart).toBe(true);
+    expect(last().isExternallyPaused).toBe(true);
+
+    await act(async () => { result.current.handleStart(); });
+
+    expect(result.current.awaitingStart).toBe(false);
+    expect(last().isExternallyPaused).toBe(false);
+  });
+  it('drops the Start gate when settings resolve to practice after the first render', () => {
+    // GIVEN the core mounted with default (timed) settings
+    const { result, rerender } = renderHook(
+      (props: { settings: SinglePlayerGameState }) =>
+        useSinglePlayerCore({ settings: props.settings, targetHighScore: null, onGameEnd: vi.fn(), onQuit: vi.fn() }),
+      { initialProps: { settings: { ...defaultSettings, grid: mockGrid } } }
+    );
+    expect(result.current.awaitingStart).toBe(true);
+    // WHEN autoStart=practice lands a render later
+    rerender({ settings: { ...defaultSettings, grid: mockGrid, mode: 'practice' } as SinglePlayerGameState });
+    // THEN untimed practice never shows a Start card
+    expect(result.current.awaitingStart).toBe(false);
   });
 });

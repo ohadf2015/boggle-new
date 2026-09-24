@@ -6948,6 +6948,16 @@ const en = {
     "maybeLater": "Not now"
   },
   "singlePlayer": {
+    "startCard": {
+      "demo": "CAT",
+      "titleOne": "Beat {bot}!",
+      "titleMany": "Beat the bots!",
+      "titleSolo": "How many can you find?",
+      "clock": "{seconds} seconds on the clock",
+      "goalOne": "Score more points than {bot}",
+      "goalMany": "Finish on top",
+      "goalSolo": "Longer words score way more"
+    },
     "nextGame": {
       "title": "What's next?",
       "rematchHarder": "Rematch · harder",

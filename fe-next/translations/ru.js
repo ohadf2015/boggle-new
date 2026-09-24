@@ -5368,6 +5368,16 @@ const ru = {
     }
   },
   "singlePlayer": {
+    "startCard": {
+      "demo": "КОТ",
+      "titleOne": "Обыграй {bot}!",
+      "titleMany": "Обыграй ботов!",
+      "titleSolo": "Сколько слов найдёшь?",
+      "clock": "{seconds} секунд на часах",
+      "goalOne": "Набери больше очков, чем {bot}",
+      "goalMany": "Займи первое место",
+      "goalSolo": "Длинные слова приносят гораздо больше очков"
+    },
     "nextGame": {
       "title": "Что дальше?",
       "rematchHarder": "Реванш · сложнее",

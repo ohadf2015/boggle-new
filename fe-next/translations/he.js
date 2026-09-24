@@ -7477,6 +7477,16 @@ const he = {
     "maybeLater": "אולי אחר כך"
   },
   "singlePlayer": {
+    "startCard": {
+      "demo": "שיר",
+      "titleOne": "נצחו את {bot}!",
+      "titleMany": "נצחו את הבוטים!",
+      "titleSolo": "כמה מילים תמצאו?",
+      "clock": "{seconds} שניות על השעון",
+      "goalOne": "צברו יותר נקודות מ־{bot}",
+      "goalMany": "סיימו במקום הראשון",
+      "goalSolo": "מילים ארוכות שוות הרבה יותר"
+    },
     "nextGame": {
       "title": "מה הלאה?",
       "rematchHarder": "משחק חוזר · קשה יותר",

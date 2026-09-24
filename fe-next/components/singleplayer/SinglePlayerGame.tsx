@@ -415,8 +415,11 @@ function SinglePlayerGame({
     );
   }
 
-  const encouragementBanner = encouragement.currentTrigger ? (
-    <div className="absolute top-2 left-0 right-0 z-50 flex justify-center pointer-events-none">
+  // Above the word feed, and only once the round is running — at the top it
+  // covered the exit button and the race, and over the start card it said
+  // "Let's go!" before anything had gone.
+  const encouragementBanner = encouragement.currentTrigger && !core.awaitingStart ? (
+    <div className="absolute bottom-[calc(max(0.75rem,env(safe-area-inset-bottom))+4.5rem)] left-0 right-0 z-50 flex justify-center pointer-events-none">
       <div className="pointer-events-auto">
         <FirstTimeEncouragement
           trigger={encouragement.currentTrigger}
@@ -448,15 +451,15 @@ function SinglePlayerGame({
 
   // In-game coaching strip for practice mode — auto-hides after first word found.
   // hideModeCoach (Quick Play) suppresses both ModeCoach and practice tip.
+  // Rendered in the layout's chrome slot (in flow) — floated at the top it
+  // covered the HUD.
   const practiceCoachElement =
     settings.mode === 'practice' && !hideModeCoach ? (
-      <div className="absolute top-2 inset-x-0 z-30 px-3 pointer-events-auto">
-        <PracticeCoachTip mode="classic" wordsFound={core.foundWords.length} />
-      </div>
+      <PracticeCoachTip mode="classic" wordsFound={core.foundWords.length} />
     ) : null;
 
   const modeCoachElement =
-    settings.mode !== 'practice' && !hideModeCoach ? (
+    settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart ? (
       <ModeCoach mode="classic" />
     ) : null;
 
@@ -488,23 +491,21 @@ function SinglePlayerGame({
   // the top of the shell's side rails on desktop and stole 80px from the board on
   // every surface. Modals stay above (AuthModal z-100, WinnerOnboarding z-110).
   return (
-    <div className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy pt-[env(safe-area-inset-top,0px)]" translate="no">
+    <div className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy" translate="no">
       {encouragementBanner}
       {scorePopupElement}
       {practicePromptElement}
-      {practiceCoachElement}
       {modeCoachElement}
       {stuckCoachElement}
       <SinglePlayerShell
         grid={core.grid as LetterGrid}
         language={settings.language}
         score={core.score}
-        remainingTime={core.timer.remainingTime}
+        remainingTime={settings.mode === 'practice' ? null : core.timer.remainingTime}
+        totalSeconds={settings.timerSeconds}
         isPaused={core.isPaused}
         isGameOver={core.isGameOver}
-        minWordLength={settings.minWordLength}
         bots={settings.bots}
-        playerName={commonProps.t('common.you')}
         foundWords={core.foundWords}
         comboLevel={core.combo.comboLevel}
         fireRoundActive={core.fireRoundActive}
@@ -513,8 +514,9 @@ function SinglePlayerGame({
         currentFeedback={core.currentFeedback}
         highlightedPath={core.revealState.highlightedPath ?? []}
         lastWordFoundTime={core.lastWordFoundTimeRef.current ?? 0}
-        totalBoardWords={core.totalBoardWords}
         isDesktop={core.isDesktop || core.isTv}
+        awaitingStart={core.awaitingStart}
+        onStart={core.handleStart}
         onWordSubmit={wrappedWordSubmit}
         onWordChange={wrappedWordChange}
         onPathSubmit={wrappedPathSubmit}
@@ -526,6 +528,7 @@ function SinglePlayerGame({
         soloMultiplier={core.soloCombo?.multiplier ?? 1}
         soloPraiseKey={core.soloCombo?.praiseKey ?? null}
         soloMissions={core.soloMissions}
+        soloChrome={practiceCoachElement}
       />
     </div>
   );

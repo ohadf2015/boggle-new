@@ -1,5 +1,6 @@
 'use client';
 
+import { PageLoader } from '@/components/ui/PageLoader';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
@@ -35,8 +36,11 @@ import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigge
 
 // Off the LCP-critical path (phase 'playing' renders SinglePlayerGame only) —
 // deferred so results/tutorial JS (framer-motion, ads, confetti) doesn't block first paint.
-const SinglePlayerResults = nextDynamic(() => import('./SinglePlayerResults'), { ssr: false });
-const PracticeResults = nextDynamic(() => import('./results/PracticeResults'), { ssr: false });
+// A loader, not nothing: without one the round ended on a blank navy screen
+// until the results chunk arrived (seconds on a slow phone).
+const ResultsLoading = () => <div className="flex min-h-[60vh] items-center justify-center"><PageLoader size="lg" /></div>;
+const SinglePlayerResults = nextDynamic(() => import('./SinglePlayerResults'), { ssr: false, loading: ResultsLoading });
+const PracticeResults = nextDynamic(() => import('./results/PracticeResults'), { ssr: false, loading: ResultsLoading });
 const PreGameTutorial = nextDynamic(() => import('./PreGameTutorial'), { ssr: false });
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
@@ -127,28 +131,14 @@ const SinglePlayerView: React.FC = () => {
   // Show feature unlock notifications when user reaches milestones
   useFeatureUnlockNotifications();
 
-  // Track the current isInGame value to prevent redundant updates
-  const isInGameRef = useRef(false);
-  const isMountedRef = useRef(true);
-
-  // Hide bottom navigation during gameplay and pre-game tutorial
+  // Hide bottom navigation during gameplay and pre-game tutorial. The cleanup
+  // lives in the SAME effect: with a separate "on unmount" effect guarded by
+  // refs, a StrictMode/remount cycle ended on the cleanup's `false` and drew the
+  // bottom nav over the board. setIsInGame is a state setter, so repeats are free.
   useEffect(() => {
-    const shouldBeInGame = phase === 'pre-game' || phase === 'playing' || phase === 'results';
-    if (isMountedRef.current && isInGameRef.current !== shouldBeInGame) {
-      isInGameRef.current = shouldBeInGame;
-      setIsInGame(shouldBeInGame);
-    }
+    setIsInGame(phase === 'pre-game' || phase === 'playing' || phase === 'results');
+    return () => setIsInGame(false);
   }, [phase, setIsInGame]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-      setIsInGame(false);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Map SinglePlayerPhase to GamePhase for the music hook
   const musicPhase: GamePhase = (phase === 'playing' || phase === 'pre-game') ? 'waiting' : phase;
@@ -296,6 +286,7 @@ const SinglePlayerView: React.FC = () => {
 
   return (
     <div
+      data-phase={phase}
       className={`flex flex-col bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative ${phase === 'playing' ? `h-full overflow-hidden ${seasonSkin}` : 'min-h-full'}`}
       {...pullToRefreshHandlers}
     >

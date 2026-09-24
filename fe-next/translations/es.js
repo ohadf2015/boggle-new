@@ -7416,6 +7416,16 @@ const es = {
     "maybeLater": "Quizás después"
   },
   "singlePlayer": {
+    "startCard": {
+      "demo": "SOL",
+      "titleOne": "¡Gánale a {bot}!",
+      "titleMany": "¡Gánales a los bots!",
+      "titleSolo": "¿Cuántas puedes encontrar?",
+      "clock": "{seconds} segundos en el reloj",
+      "goalOne": "Consigue más puntos que {bot}",
+      "goalMany": "Termina en primer lugar",
+      "goalSolo": "Las palabras largas valen mucho más"
+    },
     "nextGame": {
       "title": "¿Y ahora qué?",
       "rematchHarder": "Revancha · más difícil",

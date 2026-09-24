@@ -47,8 +47,10 @@ export function KeyboardHintTooltip({
 
     // Check if desktop only mode
     if (desktopOnly) {
+      // UA alone misses iPadOS (it reports a Mac); the primary pointer does not.
       const isMobile = typeof window !== 'undefined'
         ? /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+          || (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches)
         : false;
 
       if (isMobile) {

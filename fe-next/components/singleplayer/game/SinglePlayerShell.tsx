@@ -1,68 +1,57 @@
 'use client';
 
 /**
- * Renders single player through the multiplayer in-game shell.
+ * Single player's play screen: plumbs the solo core into SoloGameLayout.
  *
- * This is the "no separate UI" step: solo used to own PortraitGameLayout (593
- * lines) which duplicated the MP shell's board, timer, combo and word-forming
- * chrome. The shell is transport-free — its only two `socket` mentions are
- * comments, and the `*Connected` children read `useSelectionStore` /
- * `useComboTimer`, both local UI stores — so solo renders it directly and keeps
- * its own local game loop. No Socket.IO in offline or native play.
- *
- * Prop plumbing lives in `toShellProps` (pure, unit-tested). This file only
- * wires refs, handlers and the solo-only chrome slot.
+ * Solo used to render through the multiplayer PortraitLayout. That shell is
+ * built for rooms (chat, host, tournament, word-hunt, blast) and squashed the
+ * board on phones — see SoloGameLayout's header for the measurements. The board,
+ * word strip, overlays and feedback are still the shared components; only the
+ * frame around them is solo's own, modelled on the Adventure run shell.
  */
-import React, { useMemo, useRef } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { PortraitLayout } from '@/components/game/in-game/components/PortraitLayout';
-import { toShellProps } from './toShellProps';
-import { SoloComboMeter } from './components/SoloComboMeter';
-import { MissionChips } from './components/MissionChips';
-import type { SoloMission } from '@/lib/soloMissions';
+import React from 'react';
+import { SoloGameLayout } from './SoloGameLayout';
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { FoundWord as SpFoundWord } from './types';
-import type { FoundWord as ShellFoundWord, ExtendedLeaderboardPlayer } from '@/shared/types/view';
-import type { EarthquakeState } from '@/components/game/in-game/types';
+import type { FoundWord } from './types';
+import type { EarthquakeState, TranslationFn } from '@/components/game/in-game/types';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
+import type { SoloMission } from '@/lib/soloMissions';
 
 export interface SinglePlayerShellProps {
   grid: LetterGrid;
   language: Language;
   score: number;
   remainingTime: number | null;
+  /** Round length in seconds (the start card and clock read it). */
+  totalSeconds: number;
   isPaused: boolean;
   isGameOver: boolean;
-  minWordLength: number;
+  /** Mutated in place by the bot simulation — read fresh every render. */
   bots: Array<{ name: string; score: number }>;
-  playerName: string;
 
-  foundWords: SpFoundWord[];
+  foundWords: FoundWord[];
   comboLevel: number;
   fireRoundActive: boolean;
   fireRoundRemaining: number;
   earthquakeState: EarthquakeState;
-  currentFeedback: React.ComponentProps<typeof PortraitLayout>['currentFeedback'];
+  currentFeedback: WordFeedback | null;
   highlightedPath: Array<{ row: number; col: number }>;
   lastWordFoundTime: number;
-  totalBoardWords: number | null;
   isDesktop: boolean;
+  awaitingStart: boolean;
+  onStart: () => void;
 
   onWordSubmit: (word: string) => void;
   onWordChange: (word: string, count: number) => void;
   onPathSubmit?: (cells: Array<{ row: number; col: number; letter: string }>) => void;
-  /** MP tap-to-select. Solo spells by drag/keyboard, so this defaults to a no-op. */
-  onSingleTapDetected?: React.ComponentProps<typeof PortraitLayout>['onSingleTapDetected'];
   onExit: () => void;
   onPauseToggle?: () => void;
 
   gameStatsRef: React.RefObject<HTMLDivElement | null>;
-  t: React.ComponentProps<typeof PortraitLayout>['t'];
-  /** Defaults to the app language direction. */
-  dir?: 'rtl' | 'ltr';
+  t: TranslationFn;
 
-  /** Coins badge, 0/N progress, practice training bar — solo-only chrome. */
+  /** Coins badge, practice training bar — solo-only chrome. */
   soloChrome?: React.ReactNode;
-  /** Solo combo chain. Meter hides itself below streak 2. */
   soloStreak?: number;
   soloMultiplier?: number;
   soloPraiseKey?: string | null;
@@ -70,81 +59,11 @@ export interface SinglePlayerShellProps {
   children?: React.ReactNode;
 }
 
-const NOOP_TAP = () => {};
-
 export function SinglePlayerShell(props: SinglePlayerShellProps) {
-  const {
-    grid, language, score, remainingTime, isPaused, isGameOver, minWordLength,
-    bots, playerName, foundWords, comboLevel, fireRoundActive, fireRoundRemaining,
-    earthquakeState, currentFeedback, highlightedPath, lastWordFoundTime,
-    totalBoardWords, isDesktop, onWordSubmit, onWordChange, onPathSubmit,
-    onSingleTapDetected = NOOP_TAP, onExit, onPauseToggle, gameStatsRef, t, dir: dirProp,
-    soloChrome, soloStreak = 0, soloMultiplier = 1, soloPraiseKey = null, soloMissions, children,
-  } = props;
-
-  const { dir: contextDir } = useLanguage();
-
-  const dir = dirProp ?? (contextDir as 'rtl' | 'ltr');
-
-  const helpRef = useRef(false);
-
-  const roundHud = (soloStreak >= 2 || (soloMissions && soloMissions.length > 0) || soloChrome) ? (
-    <>
-      <SoloComboMeter streak={soloStreak} multiplier={soloMultiplier} praiseKey={soloPraiseKey} />
-      {soloMissions && soloMissions.length > 0 ? <MissionChips missions={soloMissions} /> : null}
-      {soloChrome}
-    </>
-  ) : undefined;
-
-  // `bots` is mutated in place by the bot simulation, so this must depend on the
-  // live scores, not just the array identity — see the stale-mutable-bot-state
-  // pitfall in .claude/rules/60-recurring-pitfalls.md.
-  const botScoreKey = bots.map((b) => `${b.name}:${b.score}`).join('|');
-  const core = useMemo(
-    () => toShellProps({
-      grid, language, score, remainingTime, isPaused, isGameOver,
-      minWordLength, bots, playerName,
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [grid, language, score, remainingTime, isPaused, isGameOver, minWordLength, playerName, botScoreKey],
-  );
-
-  return (
-    <PortraitLayout
-      {...core}
-      deferredLeaderboard={core.deferredLeaderboard as unknown as ExtendedLeaderboardPlayer[]}
-      username={playerName}
-      t={t}
-      dir={dir}
-      foundWords={foundWords as unknown as ShellFoundWord[]}
-      comboLevel={comboLevel}
-      lastWordTime={lastWordFoundTime || null}
-      fireRoundActive={fireRoundActive}
-      fireRoundRemaining={fireRoundRemaining}
-      earthquakeState={earthquakeState}
-      currentFeedback={currentFeedback}
-      highlightedCells={highlightedPath}
-      lastWordFoundTime={lastWordFoundTime}
-      totalBoardWords={totalBoardWords}
-      hasAnimated
-      isTypingMode={false}
-      typedWord=""
-      isDesktop={isDesktop}
-      isHelpOpen={helpRef.current}
-      onCloseHelp={() => { helpRef.current = false; }}
-      onWordSubmit={onWordSubmit}
-      onWordChange={onWordChange}
-      onPathSubmit={onPathSubmit}
-      onSingleTapDetected={onSingleTapDetected}
-      onExitRoom={onExit}
-      onPauseToggle={onPauseToggle}
-      isPaused={isPaused}
-      soloChrome={roundHud}
-      gameStatsRef={gameStatsRef}
-    >
-      {children}
-    </PortraitLayout>
-  );
+  // Copy the bots each render: the simulation mutates the array in place, so a
+  // memoised child would otherwise keep showing the old scores (Class 2 pitfall).
+  const bots = props.bots.map((b) => ({ name: b.name, score: b.score }));
+  return <SoloGameLayout {...props} bots={bots} />;
 }
 
 export default SinglePlayerShell;

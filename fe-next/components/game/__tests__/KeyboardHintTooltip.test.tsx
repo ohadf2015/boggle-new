@@ -42,4 +42,15 @@ describe('KeyboardHintTooltip', () => {
     await act(async () => { vi.advanceTimersByTime(2000); });
     expect(screen.queryByRole('tooltip')).toBeNull();
   });
+  it('stays hidden on a touch-only device that reports a desktop user agent (iPadOS)', async () => {
+    // GIVEN iPadOS: Mac UA, but the primary pointer is a finger
+    const mm = vi.fn((q: string) => ({ matches: q.includes('coarse'), media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    vi.stubGlobal('matchMedia', mm);
+    // WHEN the hint's delay passes
+    render(<KeyboardHintTooltip delaySeconds={1} t={t} />);
+    await act(async () => { vi.advanceTimersByTime(2000); });
+    // THEN no "type on your keyboard" tip
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    vi.unstubAllGlobals();
+  });
 });
