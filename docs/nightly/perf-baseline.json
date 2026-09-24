@@ -1,29 +1,27 @@
 {
-  "date": "2026-09-20",
-  "note": "Supabase MCP connected fine tonight (unlike 09-14..09-19). Re-checked vocabulary_lessons_classroom_id_fkey: idx_vocabulary_lessons_classroom_id ALREADY EXISTS (confirmed via pg_indexes) -- brief's advisor item was stale, no action needed, not just a trivial-table skip anymore. pg_stat_statements top entries are realtime.list_changes WAL parsing (3.79M + 0.78M calls, same systemic finding as every prior night since 07-20) and PostgREST schema-cache introspection queries (pg_timezone_names, recursive pk/fk lookup) -- both infra-level, not app queries, nothing to fix. Frontend: re-queried PostHog filtered to $host LIKE '%lexiclash%' -- max n=15 (/es/multiplayer), every route still far below the mandatory 50-sample floor, same noise pattern as every night this week. Brief's headline LCP items (imposketch.io x3, tryshopli.com) are cross-tenant noise on the shared PostHog project -- not lexiclash, excluded. The one lexiclash-domain brief item (multiplayer?room=FJUKEC, 4310ms) rolls up into the /en/multiplayer bucket (n=10, p75=5729ms this run) -- still below floor, single-sample-driven, no regression verdict issued. Checked the /multiplayer lobby route code: LCP hero (arena-hub-hero.jpg) already has a ReactDOM.preload + priority srcset fix from a prior night (page.tsx:67-81) -- no further win available without real sample data. Net: no code shipped -- backend item was stale-advisor noise (index already exists), frontend is sample-floor noise again. Third+ consecutive night of this exact outcome; the underlying blocker is real-site traffic volume, not lane effort.",
+  "date": "2026-09-24",
+  "note": "Supabase MCP never connected this run (ToolSearch found no mcp__supabase__* after repeated checks) -- brief marked supabase/sentry/search/restore/impact STALE tonight, consistent. Backend brief items (auth_db_connections_absolute, vocabulary_lessons_classroom_id_fkey unindexed) are the same two items already CLOSED/DEFERRED on 09-20 (FK index confirmed existing via pg_indexes; auth conn is a dashboard toggle) -- carried forward unverified since MCP was down, no new action. Frontend: queried PostHog filtered to $host LIKE '%lexiclash%', HAVING n>10 -- only /es/multiplayer cleared even that relaxed floor (n=22, p75_lcp=1973ms, healthy). Brief's two lexiclash-domain items (/ru/daily 5160ms, /es/juego-de-palabras-multijugador 3316ms) did not appear at n>10 -- single/near-single-sample noise, same pattern as every night this week. imposketch.io / vercel preview items are cross-tenant PostHog noise, excluded. Checked /daily/page.tsx for a SPEED win: page has extensive prior-night tuning around Suspense boundaries (force-dynamic, no page-level loader fallback, documented React #419 regression risk in comments) -- too fragile to touch without a full build+test verification that doesn't fit budget. Checked framer-motion usage repo-wide: already on the lazy `m` + LazyMotion(domMax) pattern everywhere, no easy win. No fresh .next build present (BUILD_ID from 09-20, empty chunks dir) -- bundle not re-measured, carrying prior numbers forward. Net: no code shipped -- backend unverifiable (no MCP), frontend is sample-floor noise again, no safe/verifiable SPEED win found in budget.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
     "closed": {
-      "vocabulary_lessons_classroom_id_fkey_unindexed": "RE-CLOSED WITH NEW EVIDENCE 09-20: idx_vocabulary_lessons_classroom_id already exists (btree, confirmed via pg_indexes). The nightly brief's advisor scan is reporting a stale/already-fixed warning, not a trivial-table skip. No migration needed.",
+      "vocabulary_lessons_classroom_id_fkey_unindexed": "carried from 09-20: idx_vocabulary_lessons_classroom_id confirmed existing via pg_indexes. Brief repeats this as a live warning -- advisor scan is stale, not re-verified tonight (no MCP).",
       "word_pacts_player2_id_unused_index": "unchanged since 09-19 -- table has 1 row, not worth a DDL migration for undetectable benefit."
     },
     "deferred": {
       "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
-      "realtime_wal_json_parser_cpu": "confirmed still #1 in pg_stat_statements (3.79M+0.78M calls) -- systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- founder-scope publication-membership call, not this lane's fix"
+      "realtime_wal_json_parser_cpu": "systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- founder-scope publication-membership call, not this lane's fix"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/es/multiplayer", "n": 15, "window": "24h", "p75_lcp": 1460, "status": "DEFERRED -- n=15, below 50-sample floor" },
-      { "route": "/en/multiplayer", "n": 10, "window": "24h", "p75_lcp": 5729.75, "status": "DEFERRED -- n=10, below 50-sample floor; includes brief's ?room=FJUKEC item" },
-      { "route": "/he", "n": 11, "window": "24h", "p75_lcp": 652, "status": "DEFERRED -- n=11, below 50-sample floor" }
+      { "route": "/es/multiplayer", "n": 22, "window": "24h", "p75_lcp": 1973, "p75_inp": 176, "p75_cls": 0.2696, "status": "healthy, n=22 (still below 50-floor for a regression verdict but no red flag)" }
     ],
     "shipped": [],
-    "note": "brief's headline LCP items (imposketch.io x3, tryshopli.com) are cross-tenant PostHog noise from other domains sharing the project -- not lexiclash, excluded entirely rather than deferred. /multiplayer lobby LCP hero already has a preload+priority fix from a prior night (page.tsx:67-81)."
+    "note": "brief's /ru/daily and /es/juego-de-palabras-multijugador LCP items did not surface at n>10 -- excluded as single-sample noise, not deferred with a fabricated n."
   },
   "bundle": {
-    "note": "not re-measured tonight -- no fresh .next build present, building one is out of lane time budget; carrying 09-16 baseline numbers unchanged",
+    "note": "not re-measured tonight -- .next present but chunks dir empty (stale/partial build from 09-20), building one is out of lane time budget; carrying 09-16 baseline numbers unchanged",
     "total_kb": 34104,
     "top_chunks": [
       { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },
