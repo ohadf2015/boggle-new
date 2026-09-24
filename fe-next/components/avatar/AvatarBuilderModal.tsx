@@ -18,6 +18,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Coins, X } from 'lucide-react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { acquireModalOpen, releaseModalOpen } from '@/lib/native/modalOpenSignal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
@@ -77,6 +78,15 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
 
   useEffect(() => {
     if (isOpen) setActiveTab('face');
+  }, [isOpen]);
+
+  // Custom portal, not the shared DialogContent — raise html.modal-open ourselves so the bottom
+  // banner (native AdMob via BannerCoordinatorMount, web AdSense anchor via globals.css) stands
+  // down instead of painting over the Save/Cancel row.
+  useEffect(() => {
+    if (!isOpen) return;
+    acquireModalOpen();
+    return releaseModalOpen;
   }, [isOpen]);
 
   // Equip burst on each visible change (bigger when the tier goes up). Keyed on

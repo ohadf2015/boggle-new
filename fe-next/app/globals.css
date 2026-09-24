@@ -5646,6 +5646,14 @@ html.ads-free-route .google-auto-placed {
   display: none !important;
 }
 
+/* A modal is open (html.modal-open, ref-counted by DialogContent and the avatar builder): stand
+   the web AdSense ANCHOR down so it doesn't cover the modal's bottom CTAs. The native banner is
+   handled by BannerCoordinatorMount off the same class. In-content ad units are untouched. */
+html.modal-open ins.adsbygoogle-noablate,
+html.modal-open ins.adsbygoogle[data-anchor-status] {
+  display: none !important;
+}
+
 /* ── Adventure word-hit juice (components/adventure/play/fx) ── */
 .adv-cast-letter {
   position: fixed;
