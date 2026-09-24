@@ -12695,6 +12695,23 @@ const es = {
       "reteachLiveCta": "Empezar reteach Live de 3 min",
       "unpluggedReteachLiveFoil": "Alternativa a Kahoot Unplugged (Teacher Takeover, 21 sep 2026 — cuando no hay dispositivos de alumnado) — proyecta las fallas; el alumnado responde en papel, sin dispositivos."
     },
+    "windowProgress": {
+      "title": "La clase esta semana",
+      "windowLabel": "Periodo",
+      "days7": "7 días",
+      "days30": "30 días",
+      "completion": "Finalización",
+      "accuracy": "Precisión",
+      "activeLine": "{{active}} de {{roster}} estudiantes jugaron",
+      "studentStat": "{{sessions}} partidas · {{accuracy}}",
+      "noPlay": "Aún no hay partidas",
+      "loading": "Cargando el progreso de la clase…",
+      "loadError": "No se pudo cargar el progreso de la clase.",
+      "retry": "Reintentar",
+      "emptyNoRoster": "Invita estudiantes primero — así el progreso de 7 y 30 días tiene a quién informar.",
+      "proCtaHint": "Desbloquea el historial imprimible y cada aula con Teacher Pro.",
+      "regionLabel": "Progreso de 7 y 30 días de {{classroom}}"
+    },
     "subscription": {
       "giftedNoCard": "Sin tarjeta ni renovación: simplemente termina y vuelves al plan gratuito.",
       "giftedUntil": "Pro de cortesía hasta",

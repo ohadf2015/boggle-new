@@ -11865,6 +11865,23 @@ const en = {
       "reteachLiveCta": "Start 3-min reteach Live",
       "unpluggedReteachLiveFoil": "Kahoot Unplugged foil (Teacher Takeover, Sep 21 2026 — when student devices aren’t an option) — project the misses; students answer on paper, no devices."
     },
+    "windowProgress": {
+      "title": "This week's class",
+      "windowLabel": "Time window",
+      "days7": "7 days",
+      "days30": "30 days",
+      "completion": "Completion",
+      "accuracy": "Accuracy",
+      "activeLine": "{{active}} of {{roster}} students played",
+      "studentStat": "{{sessions}} games · {{accuracy}}",
+      "noPlay": "No games yet",
+      "loading": "Loading class progress…",
+      "loadError": "Couldn't load class progress.",
+      "retry": "Try again",
+      "emptyNoRoster": "Invite students first — then 7- and 30-day progress has someone to report on.",
+      "proCtaHint": "Unlock printable history and every classroom on Teacher Pro.",
+      "regionLabel": "7- and 30-day progress for {{classroom}}"
+    },
     "subscription": {
       "giftedNoCard": "No card on file, no renewal — it just ends, and you go back to Free.",
       "giftedUntil": "Complimentary Pro until",

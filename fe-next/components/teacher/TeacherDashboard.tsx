@@ -21,6 +21,7 @@ import PlayTabFirstRunCard from './PlayTabFirstRunCard';
 import { TeacherLastGameShortcut } from './TeacherLastGameShortcut';
 import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
 import { ClassPulseSection } from './dashboard/ClassPulseSection';
+import { ClassroomWindowProgress } from './dashboard/ClassroomWindowProgress';
 import { ClassSwitcher } from './dashboard/ClassSwitcher';
 import { StudentCapMeter } from './StudentCapMeter';
 import { TeacherOnboardingChecklistLive } from './dashboard/TeacherOnboardingChecklist';
@@ -379,6 +380,11 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
                   onReviewWords={openReviewLesson}
                   // GO LIVE is the primary launch path; suppress duplicate button
                   hidePlayAction
+                />
+                <ClassroomWindowProgress
+                  className="mb-6"
+                  classroomId={selectedClassroom.id}
+                  classroomName={selectedClassroom.name}
                 />
               </>
             )}
