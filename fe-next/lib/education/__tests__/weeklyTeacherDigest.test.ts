@@ -45,7 +45,44 @@ describe('buildWeeklyTeacherDigest', () => {
     expect(digest.classrooms).toHaveLength(1);
     expect(digest.classrooms[0].progress.completionPct).toBe(50);
     expect(digest.classrooms[0].progress.accuracyPct).toBe(80);
+    expect(digest.polarTrialExpiredLineKey).toBeNull();
     expect(shouldSendWeeklyDigest(digest)).toBe(true);
+  });
+
+  it('adds the Polar trial-expired key only for a free teacher whose trial ended', () => {
+    const expired = buildWeeklyTeacherDigest({
+      teacherId: 't1',
+      email: 'ada@school.edu',
+      fullName: 'Ada',
+      locale: 'en',
+      hasPro: false,
+      polarTrialExpired: true,
+      classrooms: [
+        {
+          classroomId: 'c1',
+          classroomName: 'Year 7',
+          roster: [{ studentId: 's1', name: 'Sam' }],
+          sessions: [],
+        },
+      ],
+    });
+    expect(expired.polarTrialExpired).toBe(true);
+    expect(expired.polarTrialExpiredLineKey).toBe('teacher.digest.polarTrialExpiredLine');
+    const converted = buildWeeklyTeacherDigest({
+      teacherId: 't1',
+      email: 'ada@school.edu',
+      fullName: 'Ada',
+      locale: 'en',
+      hasPro: true,
+      polarTrialExpired: true,
+      classrooms: expired.classrooms.map((c) => ({
+        classroomId: c.classroomId,
+        classroomName: c.classroomName,
+        roster: [{ studentId: 's1', name: 'Sam' }],
+        sessions: [],
+      })),
+    });
+    expect(converted.polarTrialExpiredLineKey).toBeNull();
   });
 
   it('does not send when the teacher has no classrooms', () => {

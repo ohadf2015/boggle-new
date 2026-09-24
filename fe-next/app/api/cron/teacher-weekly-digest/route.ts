@@ -137,12 +137,24 @@ export async function POST(request: NextRequest) {
           .map((s) => s.user_id),
       );
 
+      const { data: trialEventRows } = await supabase
+        .from('subscription_events')
+        .select('user_id')
+        .in('user_id', teacherIds)
+        .contains('payload', { trial: true });
+      const expiredTrialUserIds = new Set(
+        ((trialEventRows ?? []) as Array<{ user_id: string }>)
+          .map((r) => r.user_id)
+          .filter((id) => id && !proUserIds.has(id)),
+      );
+
       const digests = assembleWeeklyDigests({
         teachers,
         classrooms,
         memberships,
         sessions,
         proUserIds,
+        expiredTrialUserIds,
         now,
       });
 

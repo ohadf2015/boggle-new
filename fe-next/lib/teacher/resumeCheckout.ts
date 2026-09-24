@@ -12,19 +12,34 @@
  */
 
 const RESUME_CHECKOUT_KEY = 'lc_resume_checkout_after_auth';
+const RESUME_TRIAL_KEY = 'lc_resume_checkout_trial';
 const RESUME_CHECKOUT_TTL_MS = 15 * 60 * 1000;
 
-export function markResumeCheckoutIntent(): void {
+export function markResumeCheckoutIntent(opts?: { trial?: boolean }): void {
   try {
     localStorage.setItem(RESUME_CHECKOUT_KEY, String(Date.now()));
+    if (opts?.trial) localStorage.setItem(RESUME_TRIAL_KEY, '1');
+    else localStorage.removeItem(RESUME_TRIAL_KEY);
   } catch {
     // localStorage unavailable (private mode, etc.) — the teacher just clicks twice.
+  }
+}
+
+/** Which checkout to resume. Call only after `consumeResumeCheckoutIntent` is true. */
+export function consumeResumeTrialFlag(): boolean {
+  try {
+    const trial = localStorage.getItem(RESUME_TRIAL_KEY) === '1';
+    localStorage.removeItem(RESUME_TRIAL_KEY);
+    return trial;
+  } catch {
+    return false;
   }
 }
 
 export function clearResumeCheckoutIntent(): void {
   try {
     localStorage.removeItem(RESUME_CHECKOUT_KEY);
+    localStorage.removeItem(RESUME_TRIAL_KEY);
   } catch {
     // no-op
   }
