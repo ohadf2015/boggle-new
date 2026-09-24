@@ -1,10 +1,20 @@
-/** TeacherDashboard — one screen, PLAY NOW, lesson builder, Tools disclosure. */
+/**
+ * TeacherDashboard — "Teacher HQ", the one-screen command deck.
+ *
+ * Zero scroll at phone and desktop, on the observatory art. Class chips pick
+ * the class; the hero is START A GAME (mode cards → the express lobby, so a
+ * teacher reaches a joinable room in ≤3 taps with the class preselected); the
+ * second hero is GET STUDENTS IN (70% of classes never get a student — the join
+ * code, link and projector are the product). Lessons, class tools and the Pro
+ * ask open as sheets from the dock; nothing stacks into a long column.
+ */
 'use client';
 
 import { type ReactNode, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { m } from 'framer-motion';
+import { BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
@@ -12,67 +22,44 @@ import { EducationShell } from '@/components/education/shell/EducationShell';
 // First-load cost: modal only for a first-time teacher. ssr:false — overlay.
 const TeacherOnboarding = dynamic(
   () => import('@/components/education/TeacherOnboarding').then((m) => m.TeacherOnboarding),
-  { ssr: false }
+  { ssr: false },
 );
 import { cn } from '@/lib/utils';
-import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
 import PlayTabFirstRunCard from './PlayTabFirstRunCard';
-import { TeacherLastGameShortcut } from './TeacherLastGameShortcut';
 import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
-import { ClassPulseSection } from './dashboard/ClassPulseSection';
-import { ClassroomWindowProgress } from './dashboard/ClassroomWindowProgress';
 import { ClassSwitcher } from './dashboard/ClassSwitcher';
-import { StudentCapMeter } from './StudentCapMeter';
-import { TeacherOnboardingChecklistLive } from './dashboard/TeacherOnboardingChecklist';
 import {
   QUICK_LAUNCH_FLOW,
   writeQuickLaunchIntent,
   type QuickLaunchIntent,
 } from './dashboard/quickLaunchIntent';
 import { useClassrooms } from '@/hooks/useClassroom';
-import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
-import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
-import { LastGameInsights } from './analytics/LastGameInsights';
-import { ProGate } from './ProGate';
+import { AssignmentCreator } from './assignments';
 import { TeacherStatusRow } from './dashboard/TeacherStatusRow';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { useTeacherOnboardingState } from '@/hooks/useOnboardingState';
-import { BarChart3, FileText, ChevronDown, SlidersHorizontal } from 'lucide-react';
-import Link from 'next/link';
-
-import { stagger, slideUp } from './teacherDashboardTabs';
-
-/** Cream edge on navy-light — black-on-navy was ~1.3:1. */
-const SHORTCUT_CLASS = cn(
-  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-neo-cream',
-  'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
-  'shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard',
-  'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan'
-);
 import { isTeacherProfile } from '@/lib/education/teacherRole';
-import { trackEduTeacherDashboardViewed, trackEduTeacherToolsOpened } from '@/lib/education/telemetry';
+import {
+  trackEduTeacherDashboardViewed,
+  trackEduTeacherToolsOpened,
+} from '@/lib/education/telemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { GetStudentsInCard } from './hq/GetStudentsInCard';
+import { HqProjectorSheet } from './hq/HqProjectorSheet';
+import { HqDock } from './hq/HqDock';
+import { HqToolsContent } from './hq/HqToolsContent';
 
 export interface TeacherDashboardProps {
   /**
-   * The trial / Pro strip, when the route client has one to show.
-   *
-   * A slot rather than a sibling: rendered next to this component it sat
-   * outside an `h-dvh` root and made the page taller than the viewport, so the
-   * document scrolled again for exactly the teachers who see a banner. And it
-   * landed above PLAY NOW, which is a stacked prompt in front of the primary
-   * action. Inside, below the hero, it is neither.
+   * The trial / Pro strip, when the route client has one to show. A slot, not
+   * a sibling: next to an `h-dvh` root it grew the page past the viewport.
+   * On HQ it lives behind the "Go Pro" dock chip, after the hero.
    */
   banner?: ReactNode;
-  /**
-   * The usage-triggered Pro card (10+ students in a class, or 3+ assignments
-   * created). Same slot reasoning as `banner`: the route client decides
-   * whether it exists, this component only places it — in the rail, below the
-   * banner, never above PLAY NOW.
-   */
+  /** The usage-triggered Pro card (10+ students / 3+ assignments). Same chip. */
   usagePrompt?: ReactNode;
 }
 
@@ -85,29 +72,34 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
   // after-game insights card and read here, once, on first render.
   const deepLink = useTeacherDashboardDeepLink();
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
-  // The tools drawer is controlled so the "last game" shortcut can open it —
-  // one tap to the thing a teacher wants right after the bell, and shut again
-  // the moment they are done with it.
   const [toolsOpen, setToolsOpen] = useState(false);
-  const toolsRef = useRef<HTMLDetailsElement>(null);
+  const [lessonsOpen, setLessonsOpen] = useState(() => deepLink.reviewWords.length > 0);
+  const [proOpen, setProOpen] = useState(false);
+  const [projectorOpen, setProjectorOpen] = useState(false);
   const [newlyCreatedJoinCode, setNewlyCreatedJoinCode] = useState<string | null>(null);
-  // Two fixed overlays used to be able to own the screen at once: the first-run
-  // walkthrough at z-[100] and the Pro welcome at z-[90] under it. Read
-  // PESSIMISTICALLY — `shouldShowOnboarding` is false until localStorage has
-  // been read, so gating on it directly would flash the welcome dialog for a
-  // frame and then bury it (pitfall class 1). `completed || skipped` is only
-  // ever true once the flag has actually resolved.
-  const { isCompleted: onboardingCompleted, isSkipped: onboardingSkipped } = useTeacherOnboardingState();
+  // Only ONE fixed overlay at a time: the Pro welcome waits for the first-run
+  // walkthrough. Read pessimistically — `completed || skipped` is only true once
+  // the flag has actually resolved (pitfall class 1).
+  const { isCompleted: onboardingCompleted, isSkipped: onboardingSkipped } =
+    useTeacherOnboardingState();
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   const onboardingClear = onboardingCompleted || onboardingSkipped || onboardingDismissed;
-  const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
+  const {
+    classrooms,
+    isLoading: classroomsLoading,
+    error: classroomsError,
+    refresh: refreshClassrooms,
+  } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
-  // Only for the one-time gifted-Pro celebration; the header chip reads the
-  // entitlement itself. The hook de-duplicates the request across consumers.
-  const { grant: proGrant, loading: proLoading, hasPro, source: proSource, refresh: refreshPro } = useTeacherPro();
-  // Back from Polar checkout. The webhook that flips the subscriptions row can
-  // land seconds after the redirect — keep re-reading rather than greet a
-  // teacher who just paid with "Upgrade to Pro".
+  const {
+    grant: proGrant,
+    loading: proLoading,
+    hasPro,
+    source: proSource,
+    refresh: refreshPro,
+  } = useTeacherPro();
+  // Back from Polar checkout: the webhook can land seconds after the redirect —
+  // keep re-reading rather than greet a teacher who just paid with "Upgrade".
   const checkoutSuccess = useSearchParams()?.get('checkout') === 'success';
   useEffect(() => {
     if (!checkoutSuccess || proLoading || hasPro) return;
@@ -122,9 +114,7 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
 
   const hasTeacherAccess = isTeacherProfile(profile);
 
-  // What the teacher had in front of them — sent on view and on opening Tools.
-  // Only once both sources resolve: a "0 classrooms" sent mid-load would be a
-  // false zero indistinguishable from a real empty dashboard (pitfall class 1).
+  // Sent once both sources resolve: a "0 classrooms" mid-load is a false zero.
   const snapshotReady = !classroomsLoading && !proLoading;
   const snapshot = useMemo(
     () => ({
@@ -132,7 +122,7 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
       studentCount: classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0),
       hasPro,
     }),
-    [classrooms, hasPro]
+    [classrooms, hasPro],
   );
   const viewTracked = useRef(false);
   useEffect(() => {
@@ -147,50 +137,59 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
     }
   }, [classrooms, selectedClassroomId]);
 
-  // The class the pulse card and the tools drawer both describe. Derived, not
-  // a second piece of state: two sources for "which class am I looking at" is
-  // exactly how the drawer and the card come to disagree (pitfall class 1).
+  // Derived, not a second piece of state (pitfall class 1).
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId) ?? null;
-  // Reports open on the class this dashboard is already showing; the bare page is a picker.
   const reportsHref = selectedClassroomId
     ? `/${language}/teacher/reports?classroomId=${selectedClassroomId}`
     : `/${language}/teacher/reports`;
 
-  // The pulse's "play" action puts the teacher on the launch control that is
-  // already on this page rather than opening a second route to the same room.
-  // A duplicate launch path is a second thing to keep armed and correct.
-  const focusLauncher = useCallback(() => {
-    const go = document.querySelector<HTMLButtonElement>('[data-testid="play-now-go"]');
-    if (!go) return;
-    go.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    go.focus();
+  const openTools = useCallback(
+    (open: boolean) => {
+      if (open && !toolsOpen) trackEduTeacherToolsOpened(snapshot);
+      setToolsOpen(open);
+    },
+    [toolsOpen, snapshot],
+  );
+
+  /** Close the sheet and put the teacher on a control that is already on the deck. */
+  const focusDeck = useCallback((testId: string) => {
+    setToolsOpen(false);
+    requestAnimationFrame(() =>
+      document.querySelector<HTMLElement>(`[data-testid="${testId}"]`)?.focus(),
+    );
   }, []);
 
   const focusCreateClassroom = useCallback(() => {
-    const card = document.querySelector<HTMLElement>('[data-testid="play-tab-first-run-card"]');
-    const btn = document.querySelector<HTMLButtonElement>('[data-testid="first-run-create-class"]');
-    card?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    btn?.focus();
+    setToolsOpen(false);
+    requestAnimationFrame(() =>
+      document.querySelector<HTMLButtonElement>('[data-testid="first-run-create-class"]')?.focus(),
+    );
   }, []);
 
-  // Land back here with the missed words in hand, straight into the lesson
-  // creator — there is no tab to route to any more.
+  // Land back here with the missed words in hand, straight into the lessons.
   const openReviewLesson = useCallback(
     (words: string[]) => {
       router.push(`/${language}/teacher?reviewWords=${encodeURIComponent(words.join(','))}`);
     },
-    [router, language]
+    [router, language],
   );
 
-  // The whole hand-off: stash what to play, then navigate. The express lobby
-  // does the rest — classroom, lesson and room — without another screen.
+  // The whole hand-off: stash what to play (and for which class), then go.
+  // The express lobby does the rest — room and code — without another screen.
   const handleQuickLaunch = useCallback(
     (intent: Omit<QuickLaunchIntent, 'createdAt'>) => {
-      writeQuickLaunchIntent(intent);
+      writeQuickLaunchIntent({
+        ...intent,
+        ...(selectedClassroomId ? { classroomId: selectedClassroomId } : {}),
+      });
       router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`);
     },
-    [router, language]
+    [router, language, selectedClassroomId],
   );
+
+  const closeProjector = useCallback(() => setProjectorOpen(false), []);
+
+  const firstRun = !classroomsLoading && (classrooms.length === 0 || !!newlyCreatedJoinCode);
 
   return (
     <EducationShell
@@ -198,60 +197,70 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
       scrollRegionLabel={t('teacher.dashboard.title')}
       header={<EducationHeader />}
       statusRow={<TeacherStatusRow />}
-      contentClassName="px-4 py-4 sm:px-6 lg:px-8"
+      contentClassName="relative"
     >
-      {/* Both are fixed overlays, and only ever ONE at a time: the welcome
-          dialog waits until the first-run walkthrough is finished, or it would
-          land at z-[90] under an onboarding modal at z-[100] and be missed.
-
-          The walkthrough is gated on having NO classroom. Measured live at
-          1440x900: it rendered `fixed inset-0 z-[100]`, opaque and clickable,
-          over an armed GO LIVE — `elementFromPoint` at the button's centre
-          returned the modal. A fullscreen prompt above the primary action is
-          the same defect the addendum spells out for consent and install
-          prompts. A teacher who already has a class is not a first-run
-          teacher, and that is every visit where GO LIVE has words to launch.
-
-          Read pessimistically: `classroomsLoading` gates it too, so the modal
-          never flashes over the hero for the frame before the read lands
-          (pitfall class 1 — the late source overriding the early render). */}
+      {/* The walkthrough is gated on having NO classroom: a teacher who has one
+          is not first-run, and a fullscreen modal over START is the defect the
+          addendum names. Read pessimistically (never while loading). */}
       {!classroomsLoading && classrooms.length === 0 && (
         <TeacherOnboarding onDismiss={() => setOnboardingDismissed(true)} />
       )}
       {!proLoading && onboardingClear && (
-        <ProWelcomeCelebration grant={proGrant} paid={checkoutSuccess && hasPro && proSource === 'polar'} />
+        <ProWelcomeCelebration
+          grant={proGrant}
+          paid={checkoutSuccess && hasPro && proSource === 'polar'}
+        />
       )}
 
-      <m.div
+      {/* Observatory art behind the deck. Dark-only surface: navy ground,
+          never a cream/dark pair (pitfall class 5). No transform anywhere on
+          this subtree — the sheets below are `position: fixed`. */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <Image
+          src="/images/education/teacher-hq-bg.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="select-none object-cover"
+        />
+        <div className="absolute inset-0 bg-neo-navy/55" />
+      </div>
+
+      <div
         data-testid="teacher-dashboard-grid"
-        // Desktop is a layout, not a stretched phone: the hero takes two of
-        // three columns and the secondary rail sits beside it instead of
-        // pushing the lesson builder a screen further down. Phone keeps the
-        // same DOM order — hero, the one-tap rail, then the prep work — so no
-        // JS viewport branch is needed and nothing reflows after first paint.
-        className="w-full max-w-[1280px] mx-auto lg:grid lg:grid-cols-3 lg:gap-x-6 lg:items-start"
-        variants={stagger}
-        // Class-5: an opacity tween on a column this wide promotes a
-        // page-sized GPU layer and flashes on the Chromium mobile renderer.
-        // `false` paints the resting state on frame one; the variants stay so
-        // a child can still animate on a state change later.
-        initial={false}
-        animate="visible"
+        className={cn(
+          'relative mx-auto flex h-full min-h-0 w-full max-w-[1640px] flex-col gap-2 px-3 py-2',
+          'sm:gap-3 sm:px-5 sm:py-3',
+          'lg:grid lg:grid-cols-5 lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:gap-4 lg:px-8 lg:py-4',
+        )}
       >
+        <div className="flex min-h-9 shrink-0 items-center gap-2 lg:col-span-5">
+          {!classroomsLoading && classrooms.length > 1 ? (
+            <ClassSwitcher
+              className="flex-nowrap overflow-x-auto pb-1 [scrollbar-width:none]"
+              classrooms={classrooms}
+              selectedId={selectedClassroomId}
+              onSelect={setSelectedClassroomId}
+              studentLimit={hasPro ? undefined : FREE_TIER_LIMITS.studentsPerClass}
+            />
+          ) : selectedClassroom ? (
+            <span className="inline-flex min-h-9 max-w-full items-center rounded-neo border-3 border-black bg-neo-cyan px-3 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm">
+              <span className="truncate">{selectedClassroom.name}</span>
+            </span>
+          ) : null}
+        </div>
+
         {classroomsError ? (
-          // Pessimistic: never show the lessons or an empty card while the
-          // classroom read is broken. Solid cream card — the dashboard root is
-          // bg-neo-navy, so a translucent red stays dark and text-black would
-          // sit at ~1.3:1 against it. The red border carries the semantic.
-          <m.div
-            variants={slideUp}
+          // Pessimistic: never an empty deck while the classroom read is broken.
+          <div
             data-testid="play-tab-error-card"
-            className="lg:col-span-3 rounded-neo border-3 border-neo-red bg-neo-cream shadow-hard px-6 py-8 text-center"
+            className="rounded-neo border-3 border-neo-red bg-neo-cream px-6 py-8 text-center shadow-hard lg:col-span-5"
           >
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-2 border-neo-red bg-neo-red/10 shadow-hard-sm">
               <BarChart3 className="h-8 w-8 text-neo-red" />
             </div>
-            <p className="text-black font-neo-body font-black text-lg text-balance">
+            <p className="font-neo-body text-lg font-black text-black text-balance">
               {t('teacher.dashboard.classroomLoadError')}
             </p>
             <p className="mt-1 text-sm font-bold text-black/60 text-pretty">
@@ -264,246 +273,96 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
               className={cn(
                 'mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-neo px-6 py-2.5',
                 'border-3 border-black bg-neo-cyan font-neo-display font-black text-black shadow-hard',
-                'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all',
-                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
+                'transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
+                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
               )}
             >
               {t('teacher.dashboard.retry')}
             </button>
-          </m.div>
+          </div>
         ) : (
           <>
-            {/* The one button. First on the page, armed on arrival. */}
-            <m.div
-              variants={slideUp}
+            <div
               data-testid="teacher-dashboard-main"
-              className="mb-5 lg:col-span-2"
+              className="min-h-[13rem] flex-1 lg:col-span-3 lg:min-h-0"
             >
               <PlayNowLauncher onLaunch={handleQuickLaunch} />
-            </m.div>
+            </div>
 
-            {/* The 1/3 rail: what happened, who is waiting, where to go next.
-                On phone it falls directly under the button, which is where it
-                was before — one compact row, never a wall of cards. */}
-            <m.aside
-              variants={slideUp}
+            <div
               data-testid="teacher-dashboard-aside"
-              className="lg:col-span-1 lg:row-span-2"
+              className="shrink-0 lg:col-span-2 lg:min-h-0"
             >
-            {/* Seen on the way down, never in front of the button. */}
-            {banner ? (
-              <div data-testid="teacher-dashboard-banner" className="mb-5">
-                {banner}
-              </div>
-            ) : null}
-
-            {/* The usage-triggered ask: after the banner, before shortcuts —
-                seen on the way down, never in front of the button. */}
-            {usagePrompt ? (
-              <div data-testid="teacher-dashboard-usage-prompt" className="mb-5">
-                {usagePrompt}
-              </div>
-            ) : null}
-
-            {/* One tap away, never in the way. */}
-            <nav
-              data-testid="teacher-shortcuts"
-              aria-label={t('teacher.playNow.shortcutsLabel')}
-              className="mb-6 grid grid-cols-3 gap-3 lg:grid-cols-1"
-            >
-              <TeacherLastGameShortcut
-                classroomCount={classrooms.length}
-                onOpen={() => {
-                  setToolsOpen(true);
-                  requestAnimationFrame(() => toolsRef.current?.scrollIntoView({ block: 'start' }));
-                }}
-                className={SHORTCUT_CLASS}
-              />
-              <Link
-                href={`/${language}/education/classroom-game`}
-                data-testid="shortcut-recent"
-                className={SHORTCUT_CLASS}
-              >
-                <SlidersHorizontal className="size-4 shrink-0 text-neo-lime" aria-hidden="true" />
-                {t('teacher.playNow.shortcutSetup')}
-              </Link>
-              <Link
-                href={reportsHref}
-                data-testid="shortcut-reports"
-                className={SHORTCUT_CLASS}
-              >
-                <FileText className="size-4 shrink-0 text-neo-pink" aria-hidden="true" />
-                {t('teacher.playNow.shortcutReports')}
-              </Link>
-            </nav>
-
-            {/* Class switcher lives here, not in Tools: changing class used
-                to cost two taps. The checklist is classroom → assignment →
-                join link → first report. */}
-            {!classroomsLoading && classrooms.length > 1 && (
-              <ClassSwitcher
-                className="mb-3"
-                classrooms={classrooms}
-                selectedId={selectedClassroomId}
-                onSelect={setSelectedClassroomId}
-                studentLimit={hasPro ? undefined : FREE_TIER_LIMITS.studentsPerClass}
-              />
-            )}
-
-            {!classroomsLoading && (
-              <TeacherOnboardingChecklistLive
-                className="mb-3"
-                classroomCount={classrooms.length}
-                classroomId={selectedClassroom?.id ?? null}
-                rosterCount={selectedClassroom?.member_count || 0}
-                joinCode={selectedClassroom?.join_code}
-                reportsHref={reportsHref}
-                onCreateClassroom={focusCreateClassroom}
-                onCreateAssignment={() => setShowAssignmentCreator(true)}
-                hideCreateClassroomCta={classrooms.length === 0 || !!newlyCreatedJoinCode}
-              />
-            )}
-            {!classroomsLoading && selectedClassroom && (
-              <>
-                <StudentCapMeter
-                  className="mb-3"
-                  studentCount={selectedClassroom.member_count || 0}
-                  source="dashboard"
+              {firstRun ? (
+                // A teacher with no class yet needs a join code before anything.
+                <PlayTabFirstRunCard
+                  onJoinCodeCreated={setNewlyCreatedJoinCode}
+                  initialJoinCode={newlyCreatedJoinCode}
                 />
-                <ClassPulseSection
-                  className="mb-6"
-                  classroomId={selectedClassroom.id}
-                  classroomName={selectedClassroom.name}
-                  rosterCount={selectedClassroom.member_count || 0}
-                  onInvite={() => router.push(`/${language}/teacher/classroom`)}
-                  onPlay={focusLauncher}
-                  onReviewWords={openReviewLesson}
-                  // GO LIVE is the primary launch path; suppress duplicate button
-                  hidePlayAction
+              ) : selectedClassroom ? (
+                <GetStudentsInCard
+                  className="h-full"
+                  classroom={{
+                    ...selectedClassroom,
+                    join_code: selectedClassroom.join_code || '',
+                  }}
+                  onOpenProjector={() => setProjectorOpen(true)}
                 />
-                <ClassroomWindowProgress
-                  className="mb-6"
-                  classroomId={selectedClassroom.id}
-                  classroomName={selectedClassroom.name}
-                />
-              </>
-            )}
-            </m.aside>
-
-            <m.div variants={slideUp} data-testid="teacher-dashboard-prep" className="lg:col-span-2">
-              {/* A teacher with no classroom yet needs a join code before a
-                  lesson is worth anything, so the first run keeps its card. */}
-              {!classroomsLoading && (classrooms.length === 0 || newlyCreatedJoinCode) && (
-                <div className="mb-6">
-                  <PlayTabFirstRunCard
-                    onJoinCodeCreated={setNewlyCreatedJoinCode}
-                    initialJoinCode={newlyCreatedJoinCode}
-                  />
-                </div>
-              )}
-
-              {/* Below the fold of the one button: the place to prepare, for the
-                  teacher who has a free period rather than a class in the room. */}
-              <div className="mt-2 lg:mt-0">
-                <LessonBuilder initialReviewWords={deepLink.reviewWords} />
-              </div>
-            </m.div>
+              ) : null}
+            </div>
           </>
         )}
 
-        {/* Everything that is not "host my words": open only when asked. */}
-        {hasTeacherAccess && (
-          <details
-            ref={toolsRef}
-            data-testid="teacher-tools"
-            open={toolsOpen}
-            onToggle={(e) => {
-              const open = (e.currentTarget as HTMLDetailsElement).open;
-              if (open && !toolsOpen) trackEduTeacherToolsOpened(snapshot);
-              setToolsOpen(open);
-            }}
-            className="group mt-10 lg:col-span-3"
-          >
-            {/* The border lives on the summary, not the wrapper: the summary is
-                the tappable thing, and the contrast rule is about controls. */}
-            <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-white shadow-hard-sm marker:content-none group-open:rounded-b-none">
-              <ChevronDown
-                className="size-4 shrink-0 transition-transform group-open:rotate-180"
-                aria-hidden="true"
-              />
-              {t('teacher.dashboard.tools')}
-            </summary>
-
-            <div className="space-y-8 rounded-b-neo border-3 border-t-0 border-neo-cream bg-neo-navy-light px-5 py-6">
-              {/* One classroom picker for every surface below it — it used to be
-                  rendered three times, once per section. */}
-              {classrooms.length > 1 && (
-                <div className="flex items-center gap-3">
-                  <label
-                    htmlFor="teacher-tools-classroom"
-                    className="text-neo-white font-neo-body font-bold text-sm"
-                  >
-                    {t('teacher.dashboard.selectClassroom')}
-                  </label>
-                  <select
-                    id="teacher-tools-classroom"
-                    value={selectedClassroomId}
-                    onChange={(e) => setSelectedClassroomId(e.target.value)}
-                    className="px-3 py-1.5 bg-neo-cream border-2 border-black text-black font-neo-body font-bold text-sm shadow-hard-sm rounded-neo focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
-                  >
-                    {classrooms.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              <ClassroomManager />
-
-              {selectedClassroomId && (
+        <div className="shrink-0 lg:col-span-5">
+          <HqDock
+            classroomCount={classrooms.length}
+            reportsHref={reportsHref}
+            lessonsOpen={lessonsOpen}
+            onLessonsOpenChange={setLessonsOpen}
+            lessons={<LessonBuilder initialReviewWords={deepLink.reviewWords} />}
+            toolsOpen={toolsOpen}
+            onToolsOpenChange={openTools}
+            tools={
+              hasTeacherAccess ? (
+                <HqToolsContent
+                  open={toolsOpen}
+                  classroomCount={classrooms.length}
+                  selectedClassroom={selectedClassroom}
+                  reportsHref={reportsHref}
+                  hideCreateClassroomCta={classrooms.length === 0 || !!newlyCreatedJoinCode}
+                  onCreateClassroom={focusCreateClassroom}
+                  onCreateAssignment={() => setShowAssignmentCreator(true)}
+                  onInvite={() => focusDeck('hq-copy-link')}
+                  onPlay={() => focusDeck('play-now-go')}
+                  onReviewWords={openReviewLesson}
+                />
+              ) : undefined
+            }
+            pro={
+              banner || usagePrompt ? (
                 <>
-                  {/* "Which words did we miss in the round we just played" is the
-                      question a teacher has at the bell — free for everyone. The
-                      cross-game trend view below is what Pro sells. */}
-                  <LastGameInsights
-                    classroomId={selectedClassroomId}
-                    onCreateReviewLesson={openReviewLesson}
-                  />
-
-                  <AssignmentTrackingPanel
-                    classroomId={selectedClassroomId}
-                    onCreateAssignment={() => setShowAssignmentCreator(true)}
-                  />
-
-                  <ProGate feature="analytics" active={toolsOpen}>
-                    <AnalyticsDashboard
-                      classroomId={selectedClassroomId}
-                      onCreateReviewLesson={openReviewLesson}
-                    />
-                  </ProGate>
-
-                  <Link
-                    href={reportsHref}
-                    className={cn(
-                      'flex items-center gap-3 p-4 rounded-neo border-2 border-black',
-                      'bg-neo-cream shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all',
-                      'text-black font-neo-body font-bold'
-                    )}
-                  >
-                    <div className="w-10 h-10 rounded-neo bg-neo-lime border-2 border-black flex items-center justify-center shadow-hard-sm shrink-0">
-                      <FileText className="w-5 h-5 text-black" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-black uppercase">{t('teacher.dashboard.viewReports')}</p>
-                      <p className="text-xs text-black/60">{t('teacher.dashboard.viewReportsDesc')}</p>
-                    </div>
-                  </Link>
+                  {banner}
+                  {usagePrompt ? (
+                    <div data-testid="teacher-dashboard-usage-prompt">{usagePrompt}</div>
+                  ) : null}
                 </>
-              )}
-            </div>
-          </details>
-        )}
-      </m.div>
+              ) : undefined
+            }
+            proOpen={proOpen}
+            onProOpenChange={setProOpen}
+          />
+        </div>
+      </div>
+
+      {projectorOpen && selectedClassroom ? (
+        <HqProjectorSheet
+          classroom={{
+            ...selectedClassroom,
+            join_code: selectedClassroom.join_code || '',
+          }}
+          onClose={closeProjector}
+        />
+      ) : null}
 
       {selectedClassroomId && (
         <AssignmentCreator

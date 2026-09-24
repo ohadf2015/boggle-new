@@ -52,6 +52,32 @@ describe('<StudentJoinPageClient>', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
+  it('dresses the shared flow in the Academy arena art, behind the code field', () => {
+    const { container } = render(<StudentJoinPageClient />);
+    const backdrop = screen.getByTestId('student-join-backdrop');
+    expect(backdrop).toHaveAttribute('aria-hidden', 'true');
+    // Never intercepts a tap meant for the code boxes.
+    expect(backdrop.className).toContain('pointer-events-none');
+    expect(container.querySelector('img[src*="arena-lobby-bg"]')).not.toBeNull();
+  });
+
+  it("stretches the flow's fixed 390x844 confetti anchor to the viewport width", () => {
+    const { container } = render(<StudentJoinPageClient />);
+    const wrapper = container.firstElementChild as HTMLElement;
+    expect(wrapper.className).toContain('[&>[data-testid=bounded-confetti-anchor]]:!w-full');
+    expect(wrapper.className).toContain('[&>[data-testid=bounded-confetti-anchor]]:!h-auto');
+    // The flow's own navy is cleared so the arena shows through it.
+    expect(wrapper.className).toContain('[&>[data-testid=bounded-confetti-anchor]>div]:!bg-transparent');
+  });
+
+  it('paints the backdrop BEFORE the flow, so the flow and its confetti sit above it', () => {
+    render(<StudentJoinPageClient />);
+    const backdrop = screen.getByTestId('student-join-backdrop');
+    const flow = screen.getByTestId('join-flow');
+    expect(backdrop.compareDocumentPosition(flow) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(backdrop.className).not.toMatch(/(^|\s)z-/);
+  });
+
   it('never redirects a signed-in student either', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'u1' },

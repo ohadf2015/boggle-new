@@ -56,7 +56,9 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
   return (
     <section
       data-testid="projector-join-panel"
-      className="grid items-center gap-[2vw] md:grid-cols-[minmax(0,1fr)_auto]"
+      // A billboard on the arena floor: a solid navy card with an ink edge, so
+      // the address and the code read against the stage art from the back row.
+      className="grid items-center gap-[2vw] rounded-neo-lg border-4 border-neo-cream bg-neo-navy/90 p-[2.5vw] shadow-hard-lg md:grid-cols-[minmax(0,1fr)_auto] md:px-[1.3vw] md:py-[0.8vw]"
     >
       <div className="min-w-0">
         {/* Step 1 — where to go. */}
@@ -88,7 +90,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
         </div>
 
         {/* Step 2 — the code, the single loudest thing in the room. */}
-        <p className="mt-[1.5vw] font-neo-body text-[3vw] font-black uppercase tracking-[0.2em] text-neo-pink md:text-[1.1vw]">
+        <p className="mt-[1.5vw] md:mt-[0.7vw] font-neo-body text-[3vw] font-black uppercase tracking-[0.2em] text-neo-pink md:text-[1.1vw]">
           {t('education.projectorLobby.gameCode')}
         </p>
         <div
@@ -101,7 +103,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
           // handset must scroll the sixth character into view rather than clip it
           // off-screen where nobody knows it exists. The `py` keeps the hard
           // shadow and the ±1.4° tilt inside the scroller instead of shaving them.
-          className="mt-[0.5vw] flex max-w-full flex-nowrap items-center gap-[0.06em] overflow-x-auto py-[0.1em] font-neo-display text-[min(16vw,11vh)] font-black leading-none md:text-[min(12vw,22vh)]"
+          className="mt-[0.5vw] flex max-w-full flex-nowrap items-center gap-[0.06em] overflow-x-auto py-[0.1em] font-neo-display text-[min(16vw,11vh)] font-black leading-none md:text-[min(12vw,18vh)]"
         >
           {chars.map((char, index) => (
             <span
@@ -137,7 +139,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
           bgColor="#ffffff"
           fgColor="#000000"
           title={t('education.projectorLobby.scanToJoin')}
-          className="h-auto w-[min(26vw,22vh)] min-w-[104px] max-w-[260px] md:w-[min(15vw,26vh)] md:max-w-none"
+          className="h-auto w-[min(26vw,22vh)] min-w-[104px] max-w-[260px] md:w-[min(15vw,22vh)] md:max-w-none"
         />
         <span className="font-neo-display text-[2.6vw] font-black uppercase tracking-widest text-neo-navy md:text-[0.95vw]">
           {t('education.projectorLobby.scanToJoin')}

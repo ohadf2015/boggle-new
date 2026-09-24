@@ -136,7 +136,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
       filteredPlayers.map((player) =>
         typeof player === 'string'
           ? { username: player }
-          : { username: player.username, isBot: player.isBot }
+          : { username: player.username, isBot: player.isBot, avatar: player.avatar }
       ),
     [filteredPlayers]
   );

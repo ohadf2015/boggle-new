@@ -80,7 +80,8 @@ vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
 describe('<TeacherDashboard>', () => {
   it('renders teacher dashboard with greeting', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByText('teacher.dashboard.title')).toBeInTheDocument();
+    // Titled "Teacher HQ" (short enough never to truncate on a phone).
+    expect(screen.getByRole('heading', { level: 1, name: 'academy.teacher.hqTitle' })).toBeInTheDocument();
   });
 
   // The welcome banner left the dashboard with the rest of the landing-screen

@@ -28,6 +28,16 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { trackResultsAction, type ResultsSurface } from './trackResultsAction';
 import { UnlockReportUpgradeCta } from './UnlockReportUpgradeCta';
 
+/**
+ * Two whole class strings (one per tone), held apart so neither can inherit the
+ * other's fill: quiet = unfilled cream edge on the dark wall; loud = the
+ * original cyan chip with a black edge.
+ */
+const QUIET_LINK =
+  'self-center flex items-center justify-center gap-1.5 px-2.5 py-1 font-neo-body font-bold text-xs text-neo-cream/85 rounded-neo border-[2px] border-neo-cream/50 hover:text-neo-cream hover:border-neo-cream transition-colors';
+const LOUD_LINK =
+  'self-center flex items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all';
+
 export interface ResultsPrimaryActionsProps {
   /** Locale segment for the report href. */
   language: string;
@@ -40,6 +50,8 @@ export interface ResultsPrimaryActionsProps {
    * its own Rematch button.
    */
   surface?: ResultsSurface;
+  /** Presentation only — see `UnlockReportUpgradeCta`'s `tone`. */
+  tone?: 'default' | 'quiet';
 }
 
 export function ResultsPrimaryActions({
@@ -47,6 +59,7 @@ export function ResultsPrimaryActions({
   onRematch,
   t,
   surface = 'teacher_card',
+  tone = 'default',
 }: ResultsPrimaryActionsProps) {
   const { hasPro, loading } = useTeacherPro();
   const canOpenReport = hasPro && !loading;
@@ -58,7 +71,7 @@ export function ResultsPrimaryActions({
   // report under it at half the weight. Two equal buttons in a row made the
   // report as loud as playing again.
   return (
-    <div className="mb-4 flex flex-col items-stretch gap-2">
+    <div className={tone === 'quiet' ? 'flex flex-col items-stretch gap-2' : 'mb-4 flex flex-col items-stretch gap-2'}>
       {onRematch && (
         <button
           type="button"
@@ -84,9 +97,9 @@ export function ResultsPrimaryActions({
           data-testid="full-report-link"
           onClick={() => trackResultsAction('view_report', surface)}
           className={cn(
-            'self-center flex items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm',
-            'bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo',
-            'shadow-hard-sm hover:shadow-hard transition-all'
+            tone === 'quiet'
+              ? QUIET_LINK
+              : LOUD_LINK
           )}
         >
           <BarChart3 className="w-4 h-4 shrink-0" aria-hidden />
@@ -95,7 +108,7 @@ export function ResultsPrimaryActions({
       )}
 
       {showUpgrade ? (
-        <UnlockReportUpgradeCta language={language} t={t} surface={surface} />
+        <UnlockReportUpgradeCta language={language} t={t} surface={surface} tone={tone} />
       ) : null}
     </div>
   );

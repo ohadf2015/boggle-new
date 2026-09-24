@@ -28,7 +28,7 @@ export function TeacherStatusRow({ className }: { className?: string }) {
     <div
       data-testid="teacher-status-row"
       className={cn(
-        'flex items-center gap-3 border-b-3 border-black/40 bg-neo-navy px-4 py-2 sm:px-6',
+        'flex items-center gap-3 border-b-3 border-black/40 bg-neo-navy px-3 py-1.5 sm:px-6 sm:py-2',
         className,
       )}
     >
@@ -36,7 +36,7 @@ export function TeacherStatusRow({ className }: { className?: string }) {
           The cyan chip is not decoration for its own sake — the art is a
           pale sticker, and at 40px on navy it reads as a smudge without
           something solid behind it. */}
-      <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-neo border-2 border-black bg-neo-cyan shadow-hard-sm sm:size-12">
+      <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-neo border-2 border-black bg-neo-cyan shadow-hard-sm sm:size-12">
         <Image
           src="/mascot/teacher/teacher-hero.webp"
           data-testid="teacher-greeting-mascot"
@@ -50,8 +50,10 @@ export function TeacherStatusRow({ className }: { className?: string }) {
       </span>
 
       <div className="min-w-0 flex-1">
-        <h1 className="truncate font-neo-display text-base font-black uppercase tracking-tight text-neo-white sm:text-xl">
-          {t('teacher.dashboard.title')}
+        {/* "Teacher HQ", not "Teacher Dashboard": the long title truncated to
+            "TEACHER DASH…" beside the plan badge on every phone. */}
+        <h1 className="truncate font-neo-display text-lg font-black uppercase leading-none tracking-tight text-neo-white sm:text-2xl">
+          {t('academy.teacher.hqTitle', 'Teacher HQ')}
         </h1>
         <p className="hidden truncate font-neo-body text-xs font-bold text-neo-white/60 sm:block">
           {t('teacher.dashboard.subtitle')}

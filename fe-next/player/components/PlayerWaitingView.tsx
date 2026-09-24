@@ -35,6 +35,7 @@ import { LANGUAGE_FLAGS, getLanguageName } from '@/lib/languageConfig';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
 
 // ==================== Types ====================
 
@@ -167,6 +168,90 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     setIsEditingName(false);
   }, [editNameValue, username, onNameChange]);
 
+  // ==================== Name (+ guest rename) ====================
+  const renderNameEditor = (): React.ReactElement => (
+    <>
+      {isEditingName ? (
+        <div className="flex items-center gap-2">
+          <input
+            data-testid="name-edit-input"
+            type="text"
+            value={editNameValue}
+            onChange={(e) => setEditNameValue(e.target.value)}
+            maxLength={20}
+            className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSaveName();
+              if (e.key === 'Escape') setIsEditingName(false);
+            }}
+          />
+          <button
+            type="button"
+            data-testid="name-save-button"
+            onClick={handleSaveName}
+            className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
+          >
+            <Check className="w-4 h-4 text-neo-black" />
+          </button>
+          <button
+            type="button"
+            onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
+            className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
+          >
+            <X className="w-4 h-4 text-neo-cream" />
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-black text-neo-cream truncate">
+            {username}
+          </h2>
+          {!isAuthenticated && (
+            <button
+              type="button"
+              data-testid="edit-name-button"
+              onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
+              className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border-[2px] border-neo-cream text-neo-cream flex items-center justify-center transition-colors"
+              aria-label={t('playerView.editName')}
+            >
+              <Pencil className="w-3.5 h-3.5 text-neo-cream" />
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  );
+
+  // ==================== Ready toggle ====================
+  const renderReadyButton = (): React.ReactElement | null => (
+    <>
+      {/* Ready toggle — advisory: the host can start whenever they like. */}
+      {onToggleReady ? (
+        <m.button
+          type="button"
+          data-testid="ready-button"
+          onClick={onToggleReady}
+          disabled={readyInFlight}
+          whileTap={{ scale: 0.96 }}
+          aria-pressed={isReady}
+          className={cn(
+            'mt-3 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-neo border-3 font-black uppercase tracking-wide shadow-hard transition-colors',
+            readyInFlight && 'opacity-50 cursor-not-allowed',
+            !readyInFlight && (isReady
+              // Confirmed: solid lime fill + check — unmistakable "you're ready".
+              ? 'bg-neo-lime text-neo-black border-neo-black'
+              // Resting CTA: lime-outlined on navy — clearly a ready button asking for the tap.
+              : 'bg-neo-navy border-neo-lime text-neo-lime hover:bg-neo-lime/10'),
+          )}
+        >
+          {isReady ? <Check className="w-5 h-5 stroke-[3]" /> : <Zap className="w-5 h-5" />}
+          <span>{isReady ? t('playerView.readyConfirmed') : t('playerView.readyUp')}</span>
+        </m.button>
+      ) : null}
+    </>
+  );
+
   // ==================== Hero Card ====================
   const renderHeroCard = (): React.ReactElement => (
     <m.div
@@ -207,79 +292,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
         {/* Name + status */}
         <div className="flex-1 min-w-0">
-          {isEditingName ? (
-            <div className="flex items-center gap-2">
-              <input
-                data-testid="name-edit-input"
-                type="text"
-                value={editNameValue}
-                onChange={(e) => setEditNameValue(e.target.value)}
-                maxLength={20}
-                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSaveName();
-                  if (e.key === 'Escape') setIsEditingName(false);
-                }}
-              />
-              <button
-                type="button"
-                data-testid="name-save-button"
-                onClick={handleSaveName}
-                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
-              >
-                <Check className="w-4 h-4 text-neo-black" />
-              </button>
-              <button
-                type="button"
-                onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
-              >
-                <X className="w-4 h-4 text-neo-cream" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black text-neo-cream truncate">
-                {username}
-              </h2>
-              {!isAuthenticated && (
-                <button
-                  type="button"
-                  data-testid="edit-name-button"
-                  onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                  className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border-[2px] border-neo-cream text-neo-cream flex items-center justify-center transition-colors"
-                  aria-label={t('playerView.editName')}
-                >
-                  <Pencil className="w-3.5 h-3.5 text-neo-cream" />
-                </button>
-              )}
-            </div>
-          )}
+          {renderNameEditor()}
 
-          {/* Ready toggle — advisory: the host can start whenever they like. */}
-          {onToggleReady ? (
-            <m.button
-              type="button"
-              data-testid="ready-button"
-              onClick={onToggleReady}
-              disabled={readyInFlight}
-              whileTap={{ scale: 0.96 }}
-              aria-pressed={isReady}
-              className={cn(
-                'mt-3 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-neo border-3 font-black uppercase tracking-wide shadow-hard transition-colors',
-                readyInFlight && 'opacity-50 cursor-not-allowed',
-                !readyInFlight && (isReady
-                  // Confirmed: solid lime fill + check — unmistakable "you're ready".
-                  ? 'bg-neo-lime text-neo-black border-neo-black'
-                  // Resting CTA: lime-outlined on navy — clearly a ready button asking for the tap.
-                  : 'bg-neo-navy border-neo-lime text-neo-lime hover:bg-neo-lime/10'),
-              )}
-            >
-              {isReady ? <Check className="w-5 h-5 stroke-[3]" /> : <Zap className="w-5 h-5" />}
-              <span>{isReady ? t('playerView.readyConfirmed') : t('playerView.readyUp')}</span>
-            </m.button>
-          ) : null}
+          {renderReadyButton()}
 
           <LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />
 
@@ -287,8 +302,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               swaps the hero avatar above, and your roster tile, for the room. */}
           <div className="mt-3 flex items-end gap-2">
             <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
-            {/* Fixed height inside an already-sized card: never a layout hazard. */}
-            {isClassroomMode && classroomArt('ms-auto h-12 w-auto')}
           </div>
         </div>
       </div>
@@ -422,13 +435,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     );
   };
 
-  // Lexi waits with the class. Decorative: the status line above already says
-  // what is happening, so the art has no copy and no accessible name.
-  const classroomArt = (sizing: string): React.ReactElement => (
-    <img data-testid="classroom-lobby-mascot" src="/images/education/waiting-for-teacher.webp"
-      alt="" aria-hidden="true" className={cn('object-contain select-none pointer-events-none', sizing)} />
-  );
-
   // ==================== Mobile Content ====================
   // Non-scrolling flex column: fixed-size sections stack at their natural height
   // and the chat panel (flex-1, min-h-0) absorbs whatever is left, so the screen
@@ -438,11 +444,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       <section className="shrink-0">{renderHeroCard()}</section>
       <div className="shrink-0">{renderPlayerRoster()}</div>
       <div className="shrink-0">{renderModeTips()}</div>
-      {/* No chat in a class, and so no age gate: "Tell us your age to use chat"
-          + ADD MY AGE was ~300px of column below the fold at 390x844, clipped
-          and untappable, because this slot pins a 38vh floor in every room.
-          Public rooms keep it — chat is the tallest thing they have. */}
-      {isClassroomMode ? null : (
+      {/* Public rooms only — a classroom renders ClassroomWaitingStage (no
+          chat, no age gate) and never reaches this column. */}
       <section className="flex-1 min-h-[38vh] pb-1">
         {/* overflow-y-auto, not -hidden: the squeezed flex-fill scrolls WITHIN
             the panel. The page itself never scrolls. */}
@@ -461,9 +464,77 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           )}
         </div>
       </section>
-      )}
     </div>
   );
+
+  // Shared by the public lobby and the classroom stage.
+  const dialogs = (
+    <>
+      {/* Avatar Builder Modal */}
+      <AvatarBuilderModal
+        isOpen={isAvatarBuilderOpen}
+        onClose={() => setIsAvatarBuilderOpen(false)}
+        onSave={handleAvatarSave}
+        initialConfig={currentAvatar}
+        premium={avatarPremium}
+      />
+
+      {/* Exit Confirmation Dialog */}
+      <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-black">{t('playerView.exitConfirmation')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-neo-black/70 font-bold">
+              {t('playerView.exitWarning')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirmExit} className="bg-neo-red text-neo-white border-3 border-neo-black shadow-hard-sm font-bold">
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+
+  // A classroom student waits ON the stage the projector shows — their face in
+  // the spotlight, Lexi, classmates arriving — not in the public party lobby
+  // (see ClassroomWaitingStage). No share code, invite card, chat, ad slot or
+  // second mute control: the teacher fills the room, EducationHeader owns
+  // navigation and music.
+  if (isClassroomMode) {
+    return (
+      <>
+        <ClassroomWaitingStage
+          username={username}
+          avatar={
+            <Avatar
+              customAvatar={currentAvatar}
+              size="2xl"
+              className="!w-full !h-full"
+              mood={emotesByUsername[username]?.emote}
+            />
+          }
+          onEditAvatar={() => setIsAvatarBuilderOpen(true)}
+          nameSlot={renderNameEditor()}
+          readySlot={renderReadyButton()}
+          statusSlot={<LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />}
+          emoteSlot={<EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />}
+          instructionsSlot={renderModeTips()}
+          classmates={nonHostPlayers
+            .map((p) => (typeof p === 'string' ? { username: p } : p))
+            .filter((p) => !('isHost' in p && p.isHost))}
+          onExit={onExitRoom}
+          t={t}
+        />
+        {dialogs}
+      </>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
@@ -471,38 +542,27 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            {/* Host control: a classroom student got into this room by scanning
-                the teacher's code, and has nobody to hand it on to. */}
-            {!isClassroomMode && <MobileShareSection gameCode={gameCode} t={t} compact />}
+            <MobileShareSection gameCode={gameCode} t={t} compact />
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {/* Classroom rooms sit under EducationHeader + ClassroomModeBanner,
-                which already carry navigation and UI language. Keep only the
-                live counter, the mute control, and the exit. */}
-            {!isClassroomMode && (
-              <>
-                {gameLanguage && (
-                  <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
-                    <span className="text-sm">{LANGUAGE_FLAGS[gameLanguage] || '🌐'}</span>
-                    <span className="text-xs font-black text-neo-cream uppercase">
-                      {getLanguageName(gameLanguage, true)}
-                    </span>
-                  </div>
-                )}
-                {/* UI-language pill — distinct from the board-language chip above; one tap. */}
-                <QuickLanguageSwitcher compact />
-              </>
+            {gameLanguage && (
+              <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
+                <span className="text-sm">{LANGUAGE_FLAGS[gameLanguage] || '🌐'}</span>
+                <span className="text-xs font-black text-neo-cream uppercase">
+                  {getLanguageName(gameLanguage, true)}
+                </span>
+              </div>
             )}
+            {/* UI-language pill — distinct from the board-language chip above; one tap. */}
+            <QuickLanguageSwitcher compact />
             <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
               <Users className="w-4 h-4 text-neo-cyan" />
               <span className="text-xs font-black text-neo-cream">
                 {nonHostPlayers.length}/{MAX_PLAYERS}
               </span>
             </div>
-            {/* Mute control for the public lobby — in classroom rooms the visible
-                EducationHeader already hosts MusicControls (registered, so the
-                global FAB stands down); a second speaker here would duplicate it. */}
-            {!isClassroomMode && <LobbyAudioButton />}
+            {/* Public-lobby mute (a classroom's EducationHeader hosts MusicControls). */}
+            <LobbyAudioButton />
             <button
               type="button"
               onClick={onExitRoom}
@@ -532,14 +592,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             }
             rightContent={
               <>
-                {!isClassroomMode && <InviteCard gameCode={gameCode} t={t} desktop />}
+                <InviteCard gameCode={gameCode} t={t} desktop />
                 <div
                   data-testid="desktop-chat-area"
                   className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden"
                 >
-                  {isClassroomMode ? (
-                    classroomArt('h-full w-auto mx-auto')
-                  ) : isOnCrazyGamesPlatform ? (
+                  {isOnCrazyGamesPlatform ? (
                     <LobbyTutorialPanel t={t} />
                   ) : (
                     <RoomChat
@@ -563,41 +621,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         </div>
       </main>
 
-      {/* B4 — CrazyGames banner. Never in a classroom: the wrapper costs ~66px. */}
-      {!isClassroomMode && (
-        <div data-testid="lobby-ad-slot" className="w-full shrink-0 flex justify-center py-2">
-          <CrazyGamesBanner size="320x50" />
-        </div>
-      )}
+      {/* B4 — CrazyGames banner (public rooms; a classroom returned above). */}
+      <div data-testid="lobby-ad-slot" className="w-full shrink-0 flex justify-center py-2">
+        <CrazyGamesBanner size="320x50" />
+      </div>
 
-      {/* Avatar Builder Modal */}
-      <AvatarBuilderModal
-        isOpen={isAvatarBuilderOpen}
-        onClose={() => setIsAvatarBuilderOpen(false)}
-        onSave={handleAvatarSave}
-        initialConfig={currentAvatar}
-        premium={avatarPremium}
-      />
-
-      {/* Exit Confirmation Dialog */}
-      <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-        <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-black">{t('playerView.exitConfirmation')}</AlertDialogTitle>
-            <AlertDialogDescription className="text-neo-black/70 font-bold">
-              {t('playerView.exitWarning')}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
-              {t('common.cancel')}
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirmExit} className="bg-neo-red text-neo-white border-3 border-neo-black shadow-hard-sm font-bold">
-              {t('common.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {dialogs}
     </div>
   );
 };

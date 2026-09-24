@@ -1,96 +1,40 @@
-/**
- * The student hub on a real screen, and what the shell made redundant.
- *
- * Two things changed the moment the hub started mounting `EducationShell`:
- *
- * 1. Navigation moved into the shell — bottom tabs on a phone, a sidebar from
- *    tablet up — and both carry Practice, Awards and Me. The page's own
- *    "My Profile / Achievements" link pair became a second copy of two tabs
- *    that are already on screen, which is exactly the duplicate-choice the
- *    decision-fatigue rule is about. It goes; the tabs stay. The guest
- *    "not you?" escape is NOT navigation and stays with it.
- *
- * 2. A 1440px window stopped being a stretched phone. Measured at 1440x900 the
- *    hub was one column of full-width cards with ~300px of dead margin either
- *    side, which the addendum calls a disqualifying gap. The lessons and the
- *    ways to play — the things a student acts on — take two thirds; their
- *    standing, which is a reward for work already done, takes the last third.
- *    Phone is untouched: the grid only exists from `lg`.
- *
- * Asserted on classes rather than on measured geometry because jsdom has no
- * layout engine — it computes no grid tracks, so a width assertion here would
- * pass whatever the markup said.
- */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { knobs, resetKnobs, asStudent } from './academyTestMocks';
 
-const { mockUseAuth, mockPush } = vi.hoisted(() => ({ mockUseAuth: vi.fn(), mockPush: vi.fn() }));
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockPush }),
-  usePathname: () => '/en/student',
-}));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
-}));
-vi.mock('@/hooks/useStudentClassroom', () => ({
-  useStudentClassroom: () => ({ classroomId: 'c1', classroom: { id: 'c1', name: 'ELA (7th)' } }),
-}));
-vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
-vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loader" /> }));
-vi.mock('@/components/student/StudentHubPlayZone', () => ({
-  StudentHubPlayZone: () => <div data-testid="play-zone" />,
-}));
-vi.mock('@/components/student/ClassroomGameBanner', () => ({
-  ClassroomGameBanner: () => <div data-testid="live-banner" />,
-}));
-vi.mock('@/components/student/StudentHubProgressZone', () => ({
-  StudentHubProgressZone: () => <div data-testid="progress-zone" />,
-}));
-vi.mock('@/components/student/StudentHubLearnZone', () => ({
-  StudentHubLearnZone: () => <div data-testid="learn-zone" />,
-}));
-vi.mock('@/lib/education/studentDisplayName', () => ({ resolveStudentDisplayName: () => 'Maya' }));
-vi.mock('@/lib/supabase', () => ({ signOut: vi.fn() }));
-vi.mock('framer-motion', () => ({
-  m: new Proxy({}, {
-    get: () => ({ children, ...p }: { children?: React.ReactNode; [k: string]: unknown }) =>
-      React.createElement('div', p, children as React.ReactNode),
-  }),
-  AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-}));
+/**
+ * The student hub on a real screen — rewritten for the Academy Map (2026-09-23).
+ *
+ * The previous version asserted a 2/3 + 1/3 `lg:grid` inside the shell's scroll
+ * region. That layout scrolled 2100px on a phone and 1070px on a 1080p screen;
+ * the Academy replaces it with one fixed, non-scrolling surface whose art
+ * switches between a portrait and a landscape map. What survives, in intent:
+ *  - lessons / awards / me stay ONE tap away (now the dock, not shell tabs);
+ *  - the guest "not you?" escape stays — it is a sign-out, not navigation;
+ *  - a wide window is laid out for width (landscape map), not a stretched phone.
+ * Asserted on markup, because jsdom has no layout engine.
+ */
 
 import StudentPageClient from '../PageClient';
 
-const asStudent = (extra: Record<string, unknown> = {}) =>
-  mockUseAuth.mockReturnValue({
-    user: { id: 's1', ...extra },
-    profile: { id: 's1', user_role: null },
-    loading: false,
+beforeEach(() => resetKnobs());
+
+describe('StudentPageClient — one screen, nothing to scroll', () => {
+  it('owns the viewport itself: no shell scroll region to overflow', async () => {
+    const { container } = render(<StudentPageClient />);
+    const hub = await screen.findByTestId('academy-hub');
+    expect(hub.className).toContain('fixed');
+    expect(hub.className).toContain('overflow-hidden');
+    expect(hub.className).toContain('bg-neo-navy');
+    expect(container.querySelector('[data-testid="education-shell-scroll"]')).toBeNull();
   });
 
-beforeEach(() => {
-  vi.clearAllMocks();
-  asStudent();
-});
-
-describe('StudentPageClient — the shell owns navigation now', () => {
-  it('does not repeat the Me and Awards tabs as in-page links', async () => {
-    const { container } = render(<StudentPageClient />);
-    await waitFor(() => expect(screen.getByTestId('learn-zone')).toBeInTheDocument());
-
-    // Scoped to the page's own content: the shell is real in this render and
-    // its tabs legitimately link to both — that is the point. The duplicate
-    // being asserted away is the pair the PAGE used to draw above its content.
-    const content = container.querySelector('[data-testid="education-shell-scroll"]')!;
-    expect(content.querySelector('a[href="/en/student/profile"]')).toBeNull();
-    expect(content.querySelector('a[href="/en/student/achievements"]')).toBeNull();
-    // …and the tabs really are still there, so this is a de-duplication and not
-    // a student losing the way to their own profile.
-    expect(screen.getByTestId('education-tab-me')).toBeInTheDocument();
-    expect(screen.getByTestId('education-tab-achievements')).toBeInTheDocument();
+  it('keeps lessons, awards and profile one tap away in the dock', async () => {
+    render(<StudentPageClient />);
+    await waitFor(() => expect(screen.getByTestId('academy-dock-lessons')).toBeInTheDocument());
+    expect(screen.getByTestId('academy-dock-lessons')).toHaveAttribute('href', '/en/student/lessons');
+    expect(screen.getByTestId('academy-dock-awards')).toHaveAttribute('href', '/en/student/achievements');
+    expect(screen.getByTestId('academy-dock-me')).toHaveAttribute('href', '/en/student/profile');
   });
 
   it('keeps the guest "not you?" escape — that is a sign-out, not a tab', async () => {
@@ -98,30 +42,60 @@ describe('StudentPageClient — the shell owns navigation now', () => {
     render(<StudentPageClient />);
     await waitFor(() => expect(screen.getByText('student.notYou')).toBeInTheDocument());
   });
-});
 
-describe('StudentPageClient — a desktop window is not a tall phone', () => {
-  it('uses the width in columns from lg, and stays one column below it', async () => {
-    const { container } = render(<StudentPageClient />);
-    await waitFor(() => expect(screen.getByTestId('learn-zone')).toBeInTheDocument());
-
-    const grid = container.querySelector('[data-testid="student-hub-grid"]');
-    expect(grid).not.toBeNull();
-    expect(grid!.className).toContain('lg:grid');
-    expect(grid!.className).toContain('lg:grid-cols-3');
-    // No `grid` without the `lg:` prefix — the phone stays a plain stack.
-    expect(grid!.className).not.toMatch(/(^|\s)grid(\s|$)/);
+  it('draws the portrait map on a tall screen and the landscape map on a wide one', async () => {
+    const { unmount } = render(<StudentPageClient />);
+    expect((await screen.findByTestId('academy-map')).getAttribute('data-layout')).toBe('portrait');
+    unmount();
+    knobs.landscape = true;
+    render(<StudentPageClient />);
+    expect((await screen.findByTestId('academy-map')).getAttribute('data-layout')).toBe('landscape');
   });
 
-  it('gives the two columns to what a student acts on and one to their standing', async () => {
-    const { container } = render(<StudentPageClient />);
-    await waitFor(() => expect(screen.getByTestId('learn-zone')).toBeInTheDocument());
+  // Rewritten r2 (2026-09-24): this case used to assert 4 locked "Coming soon"
+  // placeholders and a castle that opened the class duel. The r2 spec forbids
+  // dead islands and makes the castle the lesson-mastery boss; the surviving
+  // intent (lessons are playable islands, the castle does something real) is
+  // asserted below.
+  it('every island is a real destination — no locked placeholders — and the castle is the mastery boss', async () => {
+    knobs.lessons = [{ lessonId: 'L1', status: 'assigned', lesson: { id: 'L1', name: 'Week 1', words: [{ word: 'a', level: 'core' }, { word: 'b', level: 'core' }] } }];
+    knobs.reviewLessonId = 'L1';
+    render(<StudentPageClient />);
+    await screen.findByTestId('academy-map');
+    expect(screen.getByTestId('academy-node-lesson-L1')).toHaveAttribute('data-state', 'next');
+    expect(screen.getByTestId('academy-node-workshop')).toBeInTheDocument();
+    expect(screen.getByTestId('academy-node-review')).toBeInTheDocument();
+    expect(screen.getByTestId('academy-node-arena')).toHaveAttribute('data-state', 'waiting');
+    expect(screen.queryByText(/nodeSoon|Coming soon/)).toBeNull();
+    // Boss: locked behind real mastery, progress shown
+    const boss = screen.getByTestId('academy-node-boss');
+    expect(boss).toHaveAttribute('data-state', 'locked');
+    expect(boss.textContent).toContain('academy.student.bossNeed');
+  });
 
-    const main = container.querySelector('[data-testid="student-hub-main"]');
-    const side = container.querySelector('[data-testid="student-hub-side"]');
-    expect(main!.className).toContain('lg:col-span-2');
-    expect(side!.className).toContain('lg:col-span-1');
-    expect(main!.contains(screen.getByTestId('learn-zone'))).toBe(true);
-    expect(side!.contains(screen.getByTestId('progress-zone'))).toBe(true);
+  it('island taps navigate: workshop → /student/craft, review → /student/review', async () => {
+    knobs.lessons = [{ lessonId: 'L1', status: 'assigned', lesson: { id: 'L1', name: 'Week 1', words: [{ word: 'a', level: 'core' }] } }];
+    knobs.reviewLessonId = 'L1';
+    render(<StudentPageClient />);
+    (await screen.findByTestId('academy-node-workshop')).click();
+    expect(knobs.push).toHaveBeenCalledWith('/en/student/craft?lesson=L1');
+    screen.getByTestId('academy-node-review').click();
+    expect(knobs.push).toHaveBeenCalledWith('/en/student/review?lesson=L1');
+  });
+
+  it('the Class Arena says the teacher is not live yet instead of going nowhere', async () => {
+    render(<StudentPageClient />);
+    (await screen.findByTestId('academy-node-arena')).click();
+    expect(await screen.findByRole('status')).toHaveTextContent('academy.student.arenaWaiting');
+    expect(knobs.push).not.toHaveBeenCalled();
+  });
+
+  it('solo practice is a secondary control, not the hero', async () => {
+    knobs.lessons = [{ lessonId: 'L1', status: 'assigned', lesson: { id: 'L1', name: 'Week 1', words: [] } }];
+    render(<StudentPageClient />);
+    const solo = await screen.findByTestId('academy-solo');
+    expect(screen.getByTestId('academy-cta')).toHaveAttribute('data-kind', 'next');
+    solo.click();
+    expect(knobs.push).toHaveBeenCalledWith('/en/quick-play');
   });
 });

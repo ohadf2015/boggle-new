@@ -146,21 +146,30 @@ describe('<TeacherDashboard> — fits the viewport', () => {
     it('uses the width instead of a narrow centred column', () => {
       render(<TeacherDashboard />);
       const grid = screen.getByTestId('teacher-dashboard-grid');
-      // max-w-5xl (1024) left a 1440 screen two-thirds empty.
-      expect(grid.className).toContain('max-w-[1280px]');
+      // max-w-5xl (1024) left a 1440 screen two-thirds empty; 1280 still left
+      // a 1920 projector with wide dead bands and a cramped join-code column.
+      expect(grid.className).toContain('max-w-[1640px]');
     });
 
     it('puts the hero in the wide column and the secondary row beside it', () => {
       render(<TeacherDashboard />);
       const grid = screen.getByTestId('teacher-dashboard-grid');
-      expect(grid.className).toMatch(/lg:grid-cols-3/);
+      // 3/5 hero + 2/5 "Get students in": the join code must read from the
+      // back row, so the rail is wider than a third — the hero still wider.
+      expect(grid.className).toMatch(/lg:grid-cols-5/);
 
       const main = screen.getByTestId('teacher-dashboard-main');
       const aside = screen.getByTestId('teacher-dashboard-aside');
-      expect(main.className).toContain('lg:col-span-2');
+      expect(main.className).toContain('lg:col-span-3');
+      expect(aside.className).toContain('lg:col-span-2');
       expect(main.contains(screen.getByTestId('play-now-launcher'))).toBe(true);
-      // Recent games / setup / reports live in the 1/3 rail, never as a wall.
-      expect(aside.contains(screen.getByTestId('teacher-shortcuts'))).toBe(true);
+      // Teacher HQ: the 1/3 rail is the "Get students in" hero; recent games /
+      // setup / reports moved to the one-row dock under both heroes — still
+      // one tap away, still never a wall, and never inside the hero column.
+      const dock = screen.getByTestId('teacher-dashboard-dock');
+      expect(dock.contains(screen.getByTestId('teacher-shortcuts'))).toBe(true);
+      expect(main.contains(screen.getByTestId('teacher-shortcuts'))).toBe(false);
+      expect(aside.contains(screen.getByTestId('teacher-shortcuts'))).toBe(false);
     });
 
     it('gives the phone a bottom tab bar and every wider screen a sidebar', () => {

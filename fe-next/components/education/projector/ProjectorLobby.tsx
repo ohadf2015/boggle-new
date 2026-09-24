@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useMemo, useState } from 'react';
+import { m, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Clock, GraduationCap, Grid3x3, Play, UserPlus, Zap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
@@ -95,6 +96,8 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const liveGame = useLiveClassroomGameInfo(gameCode, true);
 
   const canStart = canStartProjectorRound(students.length);
+  const reduceMotion = useReducedMotion();
+  const startReady = canStart && !starting;
   /**
    * A mode the teacher switched to from THIS surface outranks both sources
    * below. `classroomGameMode` is derived from `lessonGameData`, which the
@@ -177,10 +180,25 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         'bg-neo-navy px-[2.5vw] py-[1.2vw]'
       )}
     >
+      {/* The arena. Painted from the first frame (eager, no fade — a
+          fullscreen opacity tween is the Class-5 flash), decorative, and
+          under a navy scrim so every line of copy keeps its contrast. Every
+          content row below is `relative`, so it paints above these two. */}
+      <img
+        data-testid="projector-arena-art"
+        src="/images/education/arena-lobby-bg.webp"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        decoding="async"
+        className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover"
+      />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-neo-navy/45" />
+
       {/* Who this room belongs to. Replaces the banner strip for the host. */}
       <header
         data-testid="projector-session"
-        className="flex shrink-0 flex-wrap items-center gap-x-[1.2vw] gap-y-2 font-neo-body"
+        className="relative flex shrink-0 flex-wrap items-center gap-x-[1.2vw] gap-y-2 font-neo-body"
       >
         {onExitRoom && (
           <button
@@ -188,48 +206,50 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             data-testid="projector-exit"
             onClick={onExitRoom}
             aria-label={t('common.back')}
-            className="shrink-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-2 text-neo-cream transition-colors hover:bg-neo-navy"
+            className="shrink-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-2 text-neo-cream shadow-hard-sm transition-colors hover:bg-neo-navy"
           >
             <DirectionalIcon icon={ArrowLeft} className="h-5 w-5" />
           </button>
         )}
-        <span className="inline-flex items-center gap-2 rounded-full border-3 border-neo-cyan bg-neo-cyan/15 px-[1.2vw] py-[0.4vw] text-[3vw] font-black uppercase tracking-wider text-neo-cyan md:text-[1.15vw]">
+        <span className="inline-flex items-center gap-2 rounded-full border-3 border-neo-black bg-neo-cyan px-[1.2vw] shadow-hard-sm text-neo-black py-[0.4vw] text-[3vw] font-black uppercase tracking-wider md:text-[1.15vw]">
           <GraduationCap className="h-[1em] w-[1em]" aria-hidden="true" />
           {sessionName}
         </span>
         {resolvedLessonName && (
-          <span className="inline-flex min-w-0 items-center gap-2 text-[3vw] font-bold text-neo-cream md:text-[1.15vw]">
+          <span className="inline-flex min-w-0 items-center gap-2 rounded-full border-3 border-neo-cream bg-neo-navy/90 px-[1vw] py-[0.3vw] text-[3vw] font-bold text-neo-cream shadow-hard-sm md:text-[1.15vw]">
             <BookOpen className="h-[1em] w-[1em] shrink-0" aria-hidden="true" />
             <span className="truncate">{resolvedLessonName}</span>
           </span>
         )}
         {wordCount > 0 && (
-          <span className="text-[2.6vw] text-neo-cream/70 md:text-[1vw]">
+          <span className="rounded-full bg-neo-navy/80 px-[0.8vw] py-[0.2vw] text-[2.6vw] font-bold text-neo-cream md:text-[1vw]">
             {t('education.classroomGame.words', { count: wordCount })}
           </span>
         )}
       </header>
 
-      <div className="shrink-0">
+      <div className="relative shrink-0">
         <ProjectorJoinPanel gameCode={gameCode} language={language} baseUrl={baseUrl} t={t} />
       </div>
 
-      <ProjectorRoster students={students} readyUsernames={readyUsernames} t={t} />
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <ProjectorRoster students={students} readyUsernames={readyUsernames} t={t} />
+      </div>
 
       {autoStartSecondsLeft !== null && (
         <div
           role="status"
           aria-live="polite"
-          className="flex shrink-0 items-center justify-between gap-3 rounded-neo border-3 border-neo-lime bg-neo-lime/20 px-4 py-3 shadow-hard"
+          className="relative flex shrink-0 items-center justify-between gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-3 shadow-hard"
         >
-          <span className="font-neo-display text-[3vw] font-bold text-neo-lime md:text-[1.2vw]">
+          <span className="font-neo-display text-[3vw] font-bold text-neo-black md:text-[1.2vw]">
             {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
           </span>
           {onCancelAutoStart && (
             <button
               type="button"
               onClick={onCancelAutoStart}
-              className="shrink-0 rounded-lg border-2 border-neo-lime/60 px-4 py-1.5 font-bold uppercase text-neo-lime transition-colors hover:bg-neo-lime/10"
+              className="shrink-0 rounded-lg border-2 border-neo-black bg-neo-cream px-4 py-1.5 font-bold uppercase text-neo-black transition-colors hover:bg-neo-white"
             >
               {t('common.cancel')}
             </button>
@@ -239,7 +259,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
 
       {/* Settings ticker + the one Start control. Stacks on a phone — the
           teacher's own screen is often the projector, mirrored. */}
-      <footer className="flex shrink-0 flex-col gap-[1.5vw] border-t-4 border-neo-cream/15 pt-[1.5vw] md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-[1vw] md:pt-[1vw]">
+      <footer className="relative flex shrink-0 flex-col gap-[1.5vw] rounded-neo-lg border-4 border-neo-cream bg-neo-navy/90 p-[2vw] shadow-hard-lg md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-[1vw] md:px-[0.8vw] md:py-[0.5vw]">
         <ul className="flex flex-wrap items-center gap-[0.8vw] font-neo-body">
           {facts.map((fact) =>
             // The chip that NAMES the game is the control that changes it.
@@ -304,15 +324,24 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               {practiceRoundPending ? t('common.loading') : t('tvLobby.tryPracticeRound')}
             </button>
           )}
+          {/* Once someone is in, Start breathes — a transform-only scale loop,
+              still under reduced motion. It is the one thing the teacher has
+              to find from across the room. */}
+          <m.div
+            className="w-full md:w-auto"
+            animate={startReady && !reduceMotion ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+            transition={startReady && !reduceMotion ? { duration: 1.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
+          >
           <button
             type="button"
             data-testid="projector-start"
+            data-ready={startReady ? 'true' : 'false'}
             onClick={onStartGame}
             disabled={!canStart || starting}
             className={cn(
               'flex w-full items-center justify-center gap-[0.6vw] rounded-neo border-4 md:w-auto',
               'px-4 py-3 font-neo-display text-[5vw] font-black uppercase tracking-tight',
-              'md:px-[2.4vw] md:py-[0.9vw] md:text-[2vw]',
+              'md:px-[2.4vw] md:py-[0.7vw] md:text-[2vw]',
               'transition-all active:translate-y-1 active:shadow-hard',
               'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
               // Locked, not muddy: a 40%-opacity lime on navy reads as a dead
@@ -327,7 +356,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               // stating one colour per state leaves nothing to beat.
               !canStart || starting
                 ? 'cursor-not-allowed border-neo-cream bg-neo-navy-light text-neo-cream opacity-80 shadow-none'
-                : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl'
+                : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl hover:-translate-y-0.5'
             )}
           >
             <Play className="h-[0.8em] w-[0.8em] shrink-0" aria-hidden="true" />
@@ -338,6 +367,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               ? t('hostView.creatingTournament')
               : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
           </button>
+          </m.div>
         </div>
       </footer>
     </div>

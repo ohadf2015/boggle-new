@@ -113,19 +113,22 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     expect(screen.getByTestId('lobby-go-live')).not.toBeDisabled();
   });
 
-  it('shows exactly ONE mode tile until the teacher asks for more', async () => {
+  // Round 2 (2026-09-24, lead's spec change): the launch screen shows the three
+  // most-played modes as big selectable cards; only the less-played two fold.
+  it('shows the three most-played modes as cards, the quiz selected, the rest folded', async () => {
     await renderLobby();
-    expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(1);
-    for (const id of ALTERNATES) {
-      expect(screen.queryByTestId(`mode-tile-${id}`)).not.toBeInTheDocument();
-    }
-    expect(screen.getByTestId('mode-tile-vocab-quiz')).toBeInTheDocument();
+    expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(3);
+    expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByTestId('mode-tile-classic')).toHaveAttribute('data-selected', 'false');
+    expect(screen.getByTestId('mode-tile-blast')).toHaveAttribute('data-selected', 'false');
+    expect(screen.queryByTestId('mode-tile-word-hunt')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('mode-tile-wheel-rush')).not.toBeInTheDocument();
   });
 
-  it('keeps the four alternatives one tap away and names how many', async () => {
+  it('keeps the folded modes one tap away and names how many', async () => {
     await renderLobby();
     const more = screen.getByTestId('more-modes-toggle');
-    expect(more).toHaveTextContent('4');
+    expect(more).toHaveTextContent('2');
 
     fireEvent.click(more);
 
@@ -134,18 +137,17 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     }
   });
 
-  /** Picking an alternate promotes it and folds the rest away again. */
-  it('promotes the chosen alternate to the hero and closes the fold', async () => {
+  /** Picking a folded mode selects it, keeps it on screen, and folds the rest. */
+  it('selects a folded mode, keeps it visible, and closes the fold', async () => {
     await renderLobby();
     fireEvent.click(screen.getByTestId('more-modes-toggle'));
-    fireEvent.click(screen.getByTestId('mode-tile-blast'));
+    fireEvent.click(screen.getByTestId('mode-tile-wheel-rush'));
 
-    await waitFor(() => expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(1));
-    // The hero is not a radio — it IS the choice — so it says so with
-    // `data-selected` and leaves `aria-checked` to the tiles in the fold.
-    expect(screen.getByTestId('mode-tile-blast')).toHaveAttribute('data-selected', 'true');
-    expect(screen.getByTestId('lobby-go-live')).toHaveTextContent('blast');
-    // Still nothing on the wire — the poster chooses, GO LIVE commits.
+    await waitFor(() => expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(3));
+    expect(screen.getByTestId('mode-tile-wheel-rush')).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-selected', 'false');
+    expect(screen.getByTestId('lobby-go-live')).toHaveTextContent(/wheel/i);
+    // Still nothing on the wire — the card chooses, GO LIVE commits.
     expect(emitted()).toBeUndefined();
   });
 

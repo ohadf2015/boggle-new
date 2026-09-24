@@ -148,7 +148,8 @@ describe('free tier limits', () => {
     // Two render sites, and a gate on only one of them is the asymmetric-path bug this repo
     // keeps shipping: the dashboard tab would paywall while the direct URL stayed open.
     const sites = [
-      '../../../components/teacher/TeacherDashboard.tsx',
+      // Teacher HQ (2026-09-24) moved the dashboard's analytics into the Class tools sheet.
+      '../../../components/teacher/hq/HqToolsContent.tsx',
       '../../../app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx',
     ];
     for (const site of sites) {

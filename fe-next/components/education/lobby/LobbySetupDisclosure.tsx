@@ -61,12 +61,15 @@ export function LobbySetupDisclosure({
         aria-expanded={open}
         onClick={onToggle}
         className={cn(
-          'flex w-full items-center gap-2 rounded-neo border-[2px] px-3 py-2.5 text-start',
-          'font-neo-body text-sm font-bold transition-colors',
+          // Secondary to GO LIVE: thin, small, a half-lit edge. Only the
+          // blocked state gets a full-strength (pink) edge, because then it IS
+          // the one thing to do.
+          'flex w-full items-center gap-2 rounded-neo border-[2px] px-3 py-1.5 text-start',
+          'font-neo-body text-xs font-bold transition-colors lg:text-sm',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
           incomplete
             ? 'border-neo-pink bg-neo-navy-light text-neo-white hover:bg-neo-navy'
-            : 'border-neo-cream bg-neo-navy-light text-neo-cream hover:bg-neo-navy'
+            : 'border-neo-cream/45 bg-neo-navy/80 text-neo-cream/85 hover:bg-neo-navy hover:text-neo-cream'
         )}
       >
         {incomplete ? (

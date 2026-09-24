@@ -1,23 +1,15 @@
 /**
- * The whole decision, pinned: one poster, one button.
+ * The launch decision, pinned: a row of big illustrated mode cards, one lit
+ * GO LIVE.
  *
- * Round 1 pinned FIVE posters and left GO LIVE greyed until the teacher chose a
- * word list — five choices before a class could play, on a page that scrolled
- * 1640px at 1440×900 to hold them. The bar (design card
- * `education/03-mode-tiles`) is one large recommended tile, one primary action,
- * and the four alternatives folded away behind "More modes".
- *
- * ONE ACCENT. The hero carries the mode's colour; the fold's tiles are neutral
- * and GO LIVE is lime, so at most two colours are ever lit. Nothing here is
- * tone-on-tone: GO LIVE is a solid lime fill with black label and black edge,
- * "More modes" is cream text on a 2px cream edge, and the blocked sentence sits
- * on a solid navy-light card with a pink edge — never a 20% tint.
- *
- * ONE STATUS LINE. The old subtitle, the "PLAYING NOW <mode>" chip and the
- * recommendation hint all said the same thing three times, and the hint was
- * computed from the RECOMMENDED mode while the poster showed the SELECTED one —
- * the stale line a blind critic caught. Everything this panel says now comes
- * off `selected`, so the two cannot disagree.
+ * Round 2 (2026-09-24): the single poster left the top 40% of a phone as empty
+ * starfield and hid four of five games. Now the three most-played modes
+ * (vocab-quiz 15 plays, classic 10, blast 3 — PostHog 60d) are big selectable
+ * cards with their storybook node art; the other two fold behind a quiet
+ * "More games" link. A card tap only SELECTS; GO LIVE is still the screen's
+ * one primary action and names the selected mode, so the two can never
+ * disagree (Pitfall Class 3). One status line — the selected mode's mechanic —
+ * sits between them.
  */
 
 'use client';
@@ -26,8 +18,8 @@ import { Radio, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { TEACHER_GAME_MODES, teacherGameMode, type TeacherGameMode } from '@/lib/education/gameModes';
-import { ModePickerStrip } from '../modePicker/ModePickerStrip';
-import { ModePosterTile } from '../modePicker/ModePosterTile';
+import { LobbyModeCard } from './LobbyModeCard';
+import { visibleModeIds } from './lobbyModeCards';
 
 export interface LobbyModeHeroProps {
   selected: TeacherGameMode['id'];
@@ -65,63 +57,81 @@ export function LobbyModeHero({
 }: LobbyModeHeroProps) {
   const { t } = useLanguage();
   const live = teacherGameMode(selected) ?? TEACHER_GAME_MODES[0];
-  const alternateCount = TEACHER_GAME_MODES.length - 1;
+  const catalog = TEACHER_GAME_MODES.map((m) => m.id);
+  const shown = visibleModeIds(catalog, live.id, expanded)
+    .map((id) => teacherGameMode(id))
+    .filter((m): m is TeacherGameMode => !!m);
+  const foldedCount = TEACHER_GAME_MODES.length - visibleModeIds(catalog, live.id, false).length;
 
   return (
     <section
       data-testid="lobby-go-live-panel"
-      className="border-b-[3px] border-neo-cream bg-neo-navy px-1 pb-2.5 pt-1"
+      className="rounded-neo-lg border-4 border-neo-cream bg-neo-navy/90 p-2.5 shadow-hard-lg lg:p-4"
     >
-      <ModePosterTile
-        mode={live}
-        size="hero"
-        selected
-        recommended={recommended === live.id}
-        busy={busy}
-        minutes={minutes}
-        expanded={expanded}
-        onPick={onPick}
-        onOpenPicker={onToggleExpanded}
-      />
+      <div
+        role="radiogroup"
+        aria-label={t('education.modePicker.change')}
+        className={cn(
+          'grid gap-2.5 pt-2 lg:gap-4',
+          shown.length > 3 ? 'grid-cols-3 lg:grid-cols-5' : 'grid-cols-3'
+        )}
+      >
+        {shown.map((mode) => (
+          <LobbyModeCard
+            key={mode.id}
+            mode={mode}
+            selected={mode.id === live.id}
+            recommended={recommended === mode.id}
+            minutes={mode.id === live.id ? (minutes ?? mode.minutes) : mode.minutes}
+            busy={busy}
+            onPick={onPick}
+          />
+        ))}
+      </div>
 
-      {/* Stacked on a phone so GO LIVE gets the full width and stays one line;
-          side by side from `sm`, where there is room for both. */}
-      <div className="mt-2.5 flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-        {/* The screen's ONE primary action. It names the game it is about to
-            start, so the poster above can be swapped without ever re-reading
-            this button. Black label on lime: cream on lime measures 1.2:1. */}
-        <button
-          type="button"
-          data-testid="lobby-go-live"
-          onClick={onGoLive}
-          disabled={!!blockedKey || busy}
-          className={cn(
-            'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-neo border-[3px] border-black px-4 py-2 lg:min-h-16',
-            'bg-neo-lime font-neo-display text-base font-black uppercase tracking-tight text-black shadow-hard lg:text-2xl',
-            'transition-all motion-safe:hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-            'disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-hard'
-          )}
-        >
-          <Radio className="size-5 shrink-0 lg:size-7" strokeWidth={3} aria-hidden="true" />
-          {t('education.modePicker.launch', { mode: t(live.nameKey) })}
-        </button>
+      {/* The ONE status line: what the selected game is, off the same prop the
+          card and GO LIVE read. */}
+      <p
+        data-testid="lobby-selected-how"
+        className="mt-2 line-clamp-2 text-center font-neo-body text-xs font-bold leading-snug text-neo-cream/90 lg:mt-3 lg:text-lg"
+      >
+        {t(live.howKey)}
+      </p>
 
-        {/* Secondary: the 2px cream edge carries the contrast on navy, so this
-            is a control at a glance without being a second loud fill. */}
+      {/* The screen's ONE primary action. It names the game it is about to
+          start. Black label on lime: cream on lime measures 1.2:1. */}
+      <button
+        type="button"
+        data-testid="lobby-go-live"
+        onClick={onGoLive}
+        disabled={!!blockedKey || busy}
+        className={cn(
+          'mt-2 flex min-h-16 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-black px-4 py-2 lg:mt-3 lg:min-h-20',
+          'bg-neo-lime font-neo-display text-xl font-black uppercase tracking-tight text-black shadow-hard-lg lg:text-4xl',
+          'transition-all motion-safe:hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5',
+          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+          'disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-hard'
+        )}
+      >
+        <Radio className="size-6 shrink-0 lg:size-8" strokeWidth={3} aria-hidden="true" />
+        <span className="truncate">{t('education.modePicker.launch', { mode: t(live.nameKey) })}</span>
+      </button>
+
+      {/* Secondary: a quiet text link, never a second button-sized fill. */}
+      {foldedCount > 0 && (
         <button
           type="button"
           data-testid="more-modes-toggle"
           aria-expanded={expanded}
           onClick={onToggleExpanded}
           className={cn(
-            'flex min-h-12 shrink-0 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy-light px-3 py-2 lg:min-h-16 lg:px-5',
-            'font-neo-display text-xs font-black uppercase leading-tight text-neo-cream lg:text-base',
-            'transition-colors hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+            'mx-auto mt-1.5 flex items-center justify-center gap-1 rounded-neo px-2 py-1 lg:mt-2',
+            'font-neo-display text-xs font-black uppercase leading-tight text-neo-cream/85 underline decoration-2 underline-offset-4 lg:text-sm',
+            'hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream'
           )}
         >
           {t(expanded ? 'education.modePicker.fewerModes' : 'education.modePicker.moreModes', {
-            count: alternateCount,
+            count: foldedCount,
           })}
           {expanded ? (
             <ChevronUp className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
@@ -129,18 +139,7 @@ export function LobbyModeHero({
             <ChevronDown className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
           )}
         </button>
-      </div>
-
-      {expanded && (
-        <ModePickerStrip
-          className="mt-2"
-          selected={selected}
-          recommended={recommended}
-          busy={busy}
-          onPick={onPick}
-        />
       )}
-
     </section>
   );
 }

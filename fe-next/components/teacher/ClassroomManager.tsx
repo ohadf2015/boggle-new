@@ -7,11 +7,14 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { Plus, Copy, Share2, Edit2, Trash2, Users, ChevronDown, ChevronUp, GraduationCap } from 'lucide-react';
+import { Plus, Copy, Share2, GraduationCap } from 'lucide-react';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import toast from 'react-hot-toast';
 import { type Language } from '@/lib/supabase/education/types';
-import ClassroomStudentList from './ClassroomStudentList';
+import { ClassroomCard } from './hq/ClassroomCard';
+import { ClassPager } from './hq/ClassPager';
+import { classPageSize, pageOf, pageSlice } from './hq/classPaging';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import ClassLimitUpsellModal from './ClassLimitUpsellModal';
 import CreateClassroomWizard from './CreateClassroomWizard';
 import { ClassroomFormDialog } from './ClassroomFormDialog';
@@ -30,7 +33,6 @@ import {
 } from '@/components/education/TeacherProCheckoutCta';
 import Link from 'next/link';
 import { stagger, slideUp } from './teacherDashboardTabs';
-import { StudentCapMeter } from './StudentCapMeter';
 
 // Re-exported for the existing contract test; the map itself is shared with the
 // lobby language chips (lib/i18n/languageLabels.ts) so it can only drift once.
@@ -64,6 +66,20 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
   } | null>(null);
 
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId);
+
+  // Paged, not scrolled. The breakpoints mirror the grid's sm/lg columns.
+  const isSm = useMediaQuery('(min-width: 640px)');
+  const isLg = useMediaQuery('(min-width: 1024px)');
+  const pageSize = classPageSize({ sm: isSm, lg: isLg });
+  const [page, setPage] = useState(0);
+  const paged = pageSlice(classrooms, page, pageSize);
+  // A class the teacher just created jumps into view on whatever page it is.
+  const createdId = createdClassroom?.id;
+  useEffect(() => {
+    if (!createdId) return;
+    const idx = classrooms.findIndex((c) => c.id === createdId);
+    if (idx >= 0) setPage(pageOf(idx, pageSize));
+  }, [createdId, classrooms, pageSize]);
 
   // If the parent asks us to open the create dialog (e.g. from the dashboard header
   // shortcut or a deep-link), open it once on mount.
@@ -230,7 +246,7 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
   }
 
   return (
-    <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Create Classroom Button */}
       <div className="flex justify-between items-center gap-3">
         <Button
@@ -329,177 +345,45 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
         )}
       </AnimatePresence>
 
-      {/* Classroom Grid — one column on phones, two on tablets, three on desktop.
-          Previously 1 -> 3 at lg, which left the most common tablet layout
-          (a teacher holding the class iPad portrait) with a single mile-wide card. */}
+      {/* Classroom grid — one column on phones, two on tablets, three on a
+          desktop row — and PAGED, never a long column: the Classes tab fits
+          the screen without the page scrolling (Teacher HQ contract). */}
       {classrooms.length === 0 ? (
         <CreateClassroomWizard onCreateClassroom={openCreateDialog} />
       ) : (
-        <m.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          variants={stagger}
-          initial="hidden"
-          animate="visible"
-        >
-          {classrooms.map((classroom, idx) => {
-            // Alternate card accent colors
-            const headerColors = ['bg-neo-cyan', 'bg-neo-lime', 'bg-neo-pink'];
-            const headerBg = headerColors[idx % headerColors.length];
-
-            return (
-              <m.div
+        <>
+          <m.div
+            key={paged.page}
+            className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6"
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
+          >
+            {paged.items.map((classroom) => (
+              <ClassroomCard
                 key={classroom.id}
-                variants={slideUp}
-                className="border-3 border-black rounded-neo shadow-hard bg-neo-cream overflow-hidden hover:-translate-y-0.5 hover:shadow-hard-lg transition-all"
-              >
-                {/* Colored header */}
-                <div className={cn('px-5 py-4', headerBg)}>
-                  <h3 className="text-xl font-neo-display font-black text-black text-balance truncate">
-                    {classroom.name}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="px-2 py-0.5 bg-black text-white text-xs font-black rounded-neo">
-                      {classroom.language.toUpperCase()}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card body — join code is the hero */}
-                <div className="p-4 space-y-3">
-                  <div className="bg-neo-yellow border-3 border-black p-4 rounded-neo shadow-hard-sm">
-                    <p
-                      data-testid="invite-students-label"
-                      className="text-xs font-neo-body font-black uppercase tracking-wide text-black mb-2"
-                    >
-                      {t('teacher.classroom.inviteStudents', 'Invite students')}
-                    </p>
-                    <code
-                      data-testid="classroom-join-code"
-                      className="block text-4xl sm:text-5xl font-neo-display font-black text-black tracking-wider tabular-nums text-center"
-                    >
-                      {classroom.join_code}
-                    </code>
-                    {/* Wraps, and each button may shrink. Measured at 1280x800
-                        with three classes: the shell's sidebar leaves each card
-                        ~300px, and a non-wrapping row of two `flex-1` buttons
-                        stayed wider than the card — which carries
-                        `overflow-hidden`, so SHARE rendered as "SHAR" with its
-                        right edge sliced off. `flex-1` alone cannot shrink past
-                        its content's min-content width; `min-w-0` is what
-                        actually permits it. */}
-                    <div className="mt-3 flex flex-col gap-2">
-                      <Button
-                        type="button"
-                        data-testid="copy-join-code"
-                        onClick={() => copyJoinCode(classroom.join_code)}
-                        className="flex-1 min-w-0 min-h-11 bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
-                        aria-label={t('teacher.classroom.copyCode')}
-                      >
-                        <Copy className="w-4 h-4 me-2 shrink-0" />
-                        <span className="truncate">{t('teacher.classroom.copyCode')}</span>
-                      </Button>
-                      <Button
-                        type="button"
-                        data-testid="share-join-code"
-                        onClick={() => shareInvite(classroom.name, classroom.join_code)}
-                        className="flex-1 min-w-0 min-h-11 bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
-                        aria-label={t('teacher.classroom.share')}
-                      >
-                        <Share2 className="w-4 h-4 me-2 shrink-0" />
-                        <span className="truncate">{t('teacher.classroom.share')}</span>
-                      </Button>
-                    </div>
-                    {googleClassroomHref(classroom.name, classroom.join_code) && (
-                      <a
-                        href={googleClassroomHref(classroom.name, classroom.join_code)!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-testid="share-to-google-classroom"
-                        className="mt-2 flex min-h-11 items-center justify-center gap-2 rounded-neo border-2 border-black bg-neo-white px-3 text-sm font-black text-black shadow-hard-sm transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
-                      >
-                        <GraduationCap className="w-4 h-4" />
-                        {t('teacher.classroom.googleClassroom', 'Post to Google Classroom')}
-                      </a>
-                    )}
-                  </div>
-
-                  <StudentCapMeter
-                    studentCount={classroom.member_count || 0}
-                    source="classroom_card"
-                  />
-
-                  {/* View Students Button */}
-                  <button
-                    type="button"
-                    onClick={() => setExpandedClassroomId(expandedClassroomId === classroom.id ? null : classroom.id)}
-                    aria-expanded={expandedClassroomId === classroom.id}
-                    className={cn(
-                      'w-full flex items-center justify-between px-3 py-2 rounded-neo border-2 border-black font-bold text-sm transition-all shadow-hard-sm',
-                      expandedClassroomId === classroom.id
-                        ? 'bg-black text-white'
-                        : 'bg-neo-cream text-black hover:bg-black/5'
-                    )}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      {classroom.member_count === 0
-                        ? t('teacher.classrooms.students.noneYet')
-                        : t('teacher.classrooms.students.count', { count: classroom.member_count || 0 })}
-                    </span>
-                    <ChevronDown
-                      className={cn(
-                        'w-4 h-4 shrink-0 transition-transform',
-                        expandedClassroomId === classroom.id && 'rotate-180'
-                      )}
-                    />
-                  </button>
-
-                  {/* Student List (Expanded) — AnimatePresence so the roster
-                      slides in and out instead of popping the layout. */}
-                  <AnimatePresence initial={false}>
-                    {expandedClassroomId === classroom.id && (
-                      <m.div
-                        key="student-list"
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      >
-                        <ClassroomStudentList classroomId={classroom.id} joinCode={classroom.join_code} />
-                      </m.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setSelectedClassroomId(classroom.id);
-                        setIsEditDialogOpen(true);
-                      }}
-                      className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
-                    >
-                      <Edit2 className="w-4 h-4 me-2" />
-                      {t('teacher.classroom.edit')}
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setSelectedClassroomId(classroom.id);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                      className="bg-neo-pink text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
-                      aria-label={t('teacher.classroom.delete')}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </m.div>
-            );
-          })}
-        </m.div>
+                classroom={classroom}
+                index={classrooms.indexOf(classroom)}
+                expanded={expandedClassroomId === classroom.id}
+                onToggleExpanded={() =>
+                  setExpandedClassroomId(expandedClassroomId === classroom.id ? null : classroom.id)
+                }
+                onCopy={() => copyJoinCode(classroom.join_code)}
+                onShare={() => shareInvite(classroom.name, classroom.join_code)}
+                googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
+                onEdit={() => {
+                  setSelectedClassroomId(classroom.id);
+                  setIsEditDialogOpen(true);
+                }}
+                onDelete={() => {
+                  setSelectedClassroomId(classroom.id);
+                  setIsDeleteDialogOpen(true);
+                }}
+              />
+            ))}
+          </m.div>
+          <ClassPager page={paged.page} pages={paged.pages} onChange={setPage} />
+        </>
       )}
 
       {/* Create/Edit Dialog — one skinned dialog for both modes. */}

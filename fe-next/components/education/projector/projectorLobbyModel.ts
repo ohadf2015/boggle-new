@@ -123,3 +123,14 @@ export function codeCharacters(gameCode: string): string[] {
 export function canStartProjectorRound(studentCount: number): boolean {
   return studentCount > 0;
 }
+
+/**
+ * Names present now that were not present on the previous render. `null` for
+ * the previous list means "first paint": a reconnecting projector must not
+ * play a fanfare for thirty students who were already sitting there.
+ */
+export function arrivalsSince(previous: readonly string[] | null, current: readonly string[]): string[] {
+  if (previous === null) return [];
+  const seen = new Set(previous);
+  return current.filter((name) => !seen.has(name));
+}

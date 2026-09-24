@@ -15,7 +15,7 @@
  *    one would start a room with no words and no error (pitfalls class 4).
  */
 
-import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import { CLASSROOM_GAME_MODES, VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { MIN_WORDS_PER_FOCUS } from '@/lib/education/vocabFocus';
 
 export const QUICK_LAUNCH_KEY = 'lexiclash_teacher_quick_launch';
@@ -41,6 +41,16 @@ export interface QuickLaunchIntent {
   packKey?: string;
   /** `source: 'paste'` — the words themselves, parsed and deduped. */
   words?: string[];
+  /**
+   * Teacher HQ: the class chip that was selected when Start was tapped.
+   * Advisory — the runner only honours it for a class the teacher still owns.
+   */
+  classroomId?: string;
+  /**
+   * Teacher HQ: the mode card that was selected. Advisory — see
+   * `resolveIntentMode`, which the runner and the cards both go through.
+   */
+  mode?: ClassroomGameMode;
   createdAt: number;
 }
 
@@ -130,4 +140,25 @@ export function pickQuickLaunchMode(
 ): ClassroomGameMode {
   const defined = words.filter((w) => (w.definition || '').trim().length > 0).length;
   return defined >= MIN_WORDS_PER_FOCUS ? 'vocab-quiz' : 'classic';
+}
+
+/**
+ * The mode a launch will actually run, given what the teacher asked for.
+ *
+ * One function for both sides: the HQ mode cards use it to decide whether the
+ * quiz is on offer, the express runner uses it to decide what to send. Two
+ * copies of the "enough definitions" rule would drift (pitfall class 3).
+ *  - an unknown string never reaches the server's enum (class 4: the room
+ *    would silently never appear) — it falls back to the derived mode;
+ *  - the quiz on words without definitions has nothing to ask — it falls back
+ *    to the derived board mode.
+ */
+export function resolveIntentMode(
+  requested: string | undefined | null,
+  words: ReadonlyArray<{ word?: string; definition?: string | null }>
+): ClassroomGameMode {
+  const derived = pickQuickLaunchMode(words);
+  if (!requested || !(CLASSROOM_GAME_MODES as readonly string[]).includes(requested)) return derived;
+  if (requested === VOCAB_QUIZ_MODE && derived !== VOCAB_QUIZ_MODE) return derived;
+  return requested as ClassroomGameMode;
 }

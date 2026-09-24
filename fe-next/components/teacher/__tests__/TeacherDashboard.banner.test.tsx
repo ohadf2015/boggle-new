@@ -14,7 +14,7 @@
  * region, after PLAY NOW: still seen, never in the way.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -66,19 +66,38 @@ import TeacherDashboard from '../TeacherDashboard';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
+/**
+ * Teacher HQ: the banner lives behind the small "Go Pro" dock chip and mounts
+ * only once that chip is opened (the Pro cards record `iap_viewed` on mount, so
+ * a closed sheet must not mount them). Open it the way a teacher would.
+ */
+const openProChip = () =>
+  fireEvent.click(
+    screen.getByTestId('teacher-dashboard-banner').querySelector('summary') as HTMLElement,
+  );
+
 const order = (a: Element, b: Element) =>
   a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
 
 describe('<TeacherDashboard> — the banner slot', () => {
   it('renders a passed banner inside the ONE scrolling region', () => {
     render(<TeacherDashboard banner={<div data-testid="a-banner">trial ends soon</div>} />);
+    openProChip();
     const region = screen.getByTestId('education-shell-scroll');
     expect(region.contains(screen.getByTestId('a-banner'))).toBe(true);
   });
 
   it('puts it BELOW the hero, never stacked above it', () => {
     render(<TeacherDashboard banner={<div data-testid="a-banner">trial ends soon</div>} />);
+    openProChip();
     expect(order(screen.getByTestId('play-now-launcher'), screen.getByTestId('a-banner'))).toBe(-1);
+  });
+
+  it('does not mount the banner (and its impression) until the chip is opened', () => {
+    render(<TeacherDashboard banner={<div data-testid="a-banner">trial ends soon</div>} />);
+    expect(screen.queryByTestId('a-banner')).toBeNull();
+    openProChip();
+    expect(screen.getByTestId('a-banner')).toBeInTheDocument();
   });
 
   it('renders nothing extra when there is no banner', () => {

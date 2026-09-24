@@ -30,7 +30,8 @@ vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () =
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loader" /> }));
 vi.mock('@/components/student/StudentHubPlayZone', () => ({ StudentHubPlayZone: () => null }));
 vi.mock('@/components/student/StudentHubProgressZone', () => ({ StudentHubProgressZone: () => null }));
-vi.mock('@/components/student/StudentHubLearnZone', () => ({ StudentHubLearnZone: () => <div data-testid="hub" /> }));
+// The hub itself is the Academy Map now; the guard only cares that it renders.
+vi.mock('@/components/student/academy/AcademyHub', () => ({ AcademyHub: () => <div data-testid="hub" /> }));
 vi.mock('@/components/student/ClassroomGameBanner', () => ({ ClassroomGameBanner: () => null }));
 vi.mock('@/lib/education/studentDisplayName', () => ({ resolveStudentDisplayName: () => 'Maya' }));
 vi.mock('@/lib/supabase', () => ({ signOut: vi.fn() }));

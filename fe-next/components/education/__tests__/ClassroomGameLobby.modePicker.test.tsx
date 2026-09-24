@@ -94,7 +94,7 @@ async function renderLobby(lessonId = '') {
   await screen.findByTestId('lobby-go-live');
 }
 
-/** Open the fold. Round 2 shows ONE poster until the teacher asks for more. */
+/** Open the fold (the less-played modes live behind it). */
 function openModes() {
   fireEvent.click(screen.getByTestId('more-modes-toggle'));
 }
@@ -110,10 +110,11 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     (educationApi.getClassrooms as ReturnType<typeof vi.fn>).mockResolvedValue({ data: CLASSROOMS });
   });
 
-  it('leads with ONE poster and keeps the rest one tap away', async () => {
+  it('leads with the recommended game selected and keeps the rest one tap away', async () => {
     await renderLobby('lesson-defs');
-    // The hero is the recommended game; the other four live behind the fold.
-    expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-size', 'hero');
+    // Round 2: the recommended game is the selected card; the less-played
+    // modes live behind the fold.
+    expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-selected', 'true');
     openModes();
     for (const id of ['classic', 'word-hunt', 'blast', 'wheel-rush']) {
       expect(screen.getByTestId(`mode-tile-${id}`)).toBeInTheDocument();

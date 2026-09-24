@@ -181,7 +181,7 @@ describe('ClassroomGameLobby — posters choose, GO LIVE launches', () => {
     // The FIRST painted hero is already the restored lesson's mode — it never
     // shows Classic and then jumps.
     const hero = await screen.findByTestId('mode-tile-vocab-quiz');
-    expect(hero).toHaveAttribute('data-size', 'hero');
     expect(hero).toHaveAttribute('data-selected', 'true');
+    expect(screen.getAllByTestId(/^mode-tile-/).filter((el) => el.dataset.selected === 'true')).toHaveLength(1);
   });
 });

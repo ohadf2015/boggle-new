@@ -1,113 +1,94 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { knobs, resetKnobs } from './academyTestMocks';
 
 /**
- * The student hub is the screen a class of thirty lands on. What it must answer, in order:
+ * The student hub is the screen a class of thirty lands on. It is now the
+ * Academy Map, and it still has to answer, in order:
  *
- *   1. Is my class playing RIGHT NOW?   → go there, nothing else matters
- *   2. What did my teacher give me?     → the lesson words
- *   3. Everything else                  → below the fold
+ *   1. Is my class playing RIGHT NOW?   → the ONE big button joins it
+ *   2. What did my teacher give me?     → the lessons, as islands; the button plays the next one
+ *   3. Everything else                  → one tap away in the dock, never a scroll
  *
- * It used to answer none of those first. The top of the page was a permanently-mounted
- * gradient "welcome" card (`isNewJoin` was hardcoded `true`, so it never went away) whose
- * only button routed to `/daily` — OUT of the classroom. Below it came a Play zone, then an
- * XP/streak/rank hero, and only then, seventh, the teacher's actual lesson.
- *
- * These tests pin the order and the absence of the interruptions.
+ * Rewritten for the Academy Map (2026-09-23). The previous version pinned the
+ * DOM ORDER of stacked zones (banner above lessons above XP). There are no
+ * stacked zones now; the same intent is asserted as "the single primary action
+ * is the live game when one is running, else the next lesson". The
+ * never-route-to-/daily and greeting/class-name checks are unchanged in intent.
  */
-
-const { mockUseAuth, mockPush } = vi.hoisted(() => ({ mockUseAuth: vi.fn(), mockPush: vi.fn() }));
-
-// usePathname is what EducationShell reads to decide whether this screen has
-// tabs. A bare factory mock without it does not return undefined — vitest
-// throws on the unknown export — so every partial mock of this module must
-// name it.
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }), usePathname: () => '/en/student' }));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    // Echo the params so a call that passes them in the WRONG argument position is
-    // visible. `t` is `t(path, fallbackOrParams?, paramsWhenFallback?)` and type-sniffs
-    // arg 2, so `t(k, undefined, params)` and `t(k, params)` both work — but a plain
-    // `t: (k) => k` mock returns the key either way and proves nothing.
-    t: (k: string, a?: unknown, b?: unknown) => {
-      const params = (a && typeof a === 'object' ? a : b) as Record<string, unknown> | undefined;
-      return params ? `${k}|${JSON.stringify(params)}` : k;
-    },
-    language: 'en',
-  }),
-}));
-vi.mock('@/hooks/useStudentClassroom', () => ({
-  useStudentClassroom: () => ({ classroomId: 'c1', classroom: { id: 'c1', name: 'ELA (7th)' } }),
-}));
-vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
-vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loader" /> }));
-vi.mock('@/components/student/StudentHubPlayZone', () => ({
-  StudentHubPlayZone: () => <div data-testid="play-zone" />,
-}));
-vi.mock('@/components/student/ClassroomGameBanner', () => ({
-  ClassroomGameBanner: () => <div data-testid="live-banner" />,
-}));
-vi.mock('@/components/student/StudentHubProgressZone', () => ({
-  StudentHubProgressZone: () => <div data-testid="progress-zone" />,
-}));
-vi.mock('@/components/student/StudentHubLearnZone', () => ({
-  StudentHubLearnZone: () => <div data-testid="learn-zone" />,
-}));
-vi.mock('@/lib/education/studentDisplayName', () => ({ resolveStudentDisplayName: () => 'Maya' }));
-vi.mock('@/lib/supabase', () => ({ signOut: vi.fn() }));
-vi.mock('framer-motion', () => ({
-  m: new Proxy({}, { get: () => ({ children, ...p }: { children?: React.ReactNode; [k: string]: unknown }) => React.createElement('div', p, children as React.ReactNode) }),
-  AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-}));
 
 import StudentPageClient from '../PageClient';
 
-const asStudent = () =>
-  mockUseAuth.mockReturnValue({
-    user: { id: 's1' },
-    profile: { id: 's1', user_role: null },
-    loading: false,
-  });
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  asStudent();
+const lesson = (id: string, status = 'assigned') => ({
+  lessonId: id,
+  status,
+  lesson: { id, name: `Week ${id}`, words: [{ word: 'a', level: 'core' }] },
 });
 
-describe('StudentPageClient — focused on what the teacher gave them', () => {
+beforeEach(() => resetKnobs());
+
+describe('StudentPageClient — Academy Map puts the one thing that matters first', () => {
   it('does not mount the always-on welcome card that routed students out to /daily', async () => {
     const { container } = render(<StudentPageClient />);
-    await waitFor(() => expect(screen.getByTestId('learn-zone')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('academy-hub')).toBeInTheDocument());
     expect(container.querySelector('[data-surface-type="welcome"]')).toBeNull();
+    expect(container.querySelector('a[href*="/daily"]')).toBeNull();
   });
 
-  it("puts the teacher's material above the XP/streak block", async () => {
-    const { container } = render(<StudentPageClient />);
-    await waitFor(() => expect(screen.getByTestId('learn-zone')).toBeInTheDocument());
-
-    const learn = screen.getByTestId('learn-zone');
-    const progress = screen.getByTestId('progress-zone');
-    // Node.compareDocumentPosition: FOLLOWING means `progress` comes after `learn`.
-    expect(learn.compareDocumentPosition(progress) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(container).toBeTruthy();
-  });
-
-  it('puts "your class is playing right now" above everything else', async () => {
+  it('makes "join the live game" THE button when the teacher is running one', async () => {
+    knobs.lessons = [lesson('1')];
+    knobs.activeGame = { gameCode: 'ABC123', teacherName: 'Ms. Rivera', lessonNames: ['Week 1'] };
     render(<StudentPageClient />);
-    await waitFor(() => expect(screen.getByTestId('live-banner')).toBeInTheDocument());
-    const banner = screen.getByTestId('live-banner');
-    const learn = screen.getByTestId('learn-zone');
-    expect(banner.compareDocumentPosition(learn) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const cta = await screen.findByTestId('academy-cta');
+    expect(cta).toHaveAttribute('data-kind', 'live');
+    expect(cta).toHaveTextContent('Ms. Rivera');
+  });
+
+  it('otherwise plays the next lesson from the same button', async () => {
+    knobs.lessons = [lesson('1', 'completed'), lesson('2')];
+    render(<StudentPageClient />);
+    const cta = await screen.findByTestId('academy-cta');
+    expect(cta).toHaveAttribute('data-kind', 'next');
+    expect(cta).toHaveTextContent('Week 2');
+    cta.click();
+    expect(knobs.push).toHaveBeenCalledWith('/en/student/lessons/2');
+  });
+
+  it('sends a student with no class to the join screen, never home', async () => {
+    knobs.classroom = { classroomId: null, classroom: null, level: 'core' };
+    render(<StudentPageClient />);
+    const cta = await screen.findByTestId('academy-cta');
+    expect(cta).toHaveAttribute('data-kind', 'join-class');
+    cta.click();
+    expect(knobs.push).toHaveBeenCalledWith('/en/student/join');
+  });
+
+  it('never flashes "join a classroom" while the classroom lookup is still running', async () => {
+    knobs.classroom = { classroomId: null, classroom: null, level: 'core', isLoading: true } as never;
+    render(<StudentPageClient />);
+    await screen.findByTestId('academy-cta-pending');
+    expect(screen.queryByTestId('academy-cta')).toBeNull();
+    // No islands at all yet — any node drawn now could flip once lessons arrive.
+    expect(document.querySelectorAll('[data-testid^="academy-node-"]')).toHaveLength(0);
+  });
+
+  it('with every lesson done, the one button reviews the missed words that are due', async () => {
+    knobs.lessons = [lesson('1', 'completed')];
+    knobs.reviewLessonId = '1';
+    knobs.reviewCount = 5;
+    render(<StudentPageClient />);
+    const cta = await screen.findByTestId('academy-cta');
+    expect(cta).toHaveAttribute('data-kind', 'review');
+    // The recommended island is the one that pulses
+    expect(screen.getByTestId('academy-node-review')).toHaveAttribute('data-recommended', 'true');
+    cta.click();
+    expect(knobs.push).toHaveBeenCalledWith('/en/student/review?lesson=1');
   });
 
   it('greets the student by name — the params must reach t()', async () => {
     render(<StudentPageClient />);
     await waitFor(() =>
-      expect(
-        screen.getByText('student.dashboard.greeting|{"name":"Maya"}')
-      ).toBeInTheDocument()
+      expect(screen.getByText('student.dashboard.greeting|{"name":"Maya"}')).toBeInTheDocument(),
     );
   });
 

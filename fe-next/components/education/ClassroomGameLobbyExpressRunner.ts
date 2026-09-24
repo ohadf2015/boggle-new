@@ -29,7 +29,7 @@ import {
   type ClassroomGameMode,
 } from '@/shared/types/vocabQuiz';
 import {
-  pickQuickLaunchMode,
+  resolveIntentMode,
   type QuickLaunchIntent,
 } from '@/components/teacher/dashboard/quickLaunchIntent';
 
@@ -113,7 +113,8 @@ function asLanguage(value: string | undefined, fallback: string): Language {
 /** The classroom the room hangs off — the teacher's first, or a fresh one. */
 async function ensureClassroom(
   deps: QuickLaunchDeps,
-  language: Language
+  language: Language,
+  preferredId?: string
 ): Promise<{ ok: true; classroom: Classroom } | { ok: false; failure: QuickLaunchFailure }> {
   let existing: Classroom[] = [];
   try {
@@ -126,7 +127,12 @@ async function ensureClassroom(
   // a live round is a four-hour Redis key, not an enrolment — the class a game
   // hangs off only decides whose roster the scores land against. A teacher who
   // needs a specific class uses Full setup.
-  if (existing.length > 0) return { ok: true, classroom: existing[0] };
+  // Teacher HQ passes the class chip that was selected; honoured only when the
+  // teacher still owns it, otherwise the newest class as before.
+  if (existing.length > 0) {
+    const preferred = preferredId ? existing.find((c) => c.id === preferredId) : undefined;
+    return { ok: true, classroom: preferred ?? existing[0] };
+  }
 
   const created = await deps.createClassroom(deps.defaultClassName, language);
   if (!created.success || !created.data) {
@@ -183,7 +189,7 @@ export async function prepareQuickLaunch(
   const language = asLanguage(intent.language, deps.uiLanguage);
 
   deps.onStage('classroom');
-  const classroomStep = await ensureClassroom(deps, language);
+  const classroomStep = await ensureClassroom(deps, language, intent.classroomId);
   if (!classroomStep.ok) return classroomStep;
 
   deps.onStage('lesson');
@@ -200,7 +206,7 @@ export async function prepareQuickLaunch(
     return { ok: false, failure: { code: 'lesson', reason: 'EMPTY' } };
   }
 
-  const gameMode = deps.modeOverride ?? pickQuickLaunchMode(lessonWords);
+  const gameMode = deps.modeOverride ?? resolveIntentMode(intent.mode, lessonWords);
   const isQuiz = gameMode === 'vocab-quiz';
 
   return {

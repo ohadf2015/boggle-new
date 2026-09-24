@@ -14,7 +14,7 @@
  * After fix: assertions should pass; this test documents expected behaviour.
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 
@@ -343,6 +343,13 @@ describe('TeacherDashboard — Duplicate CTA Consolidation', () => {
       });
 
       render(<TeacherDashboard />);
+
+      // Teacher HQ: the checklist lives in the Class tools sheet and mounts
+      // only once the teacher opens it (a view event for a closed sheet would
+      // be a phantom impression). Open it, then the view event must fire.
+      fireEvent.click(
+        screen.getByTestId('teacher-tools').querySelector('summary') as HTMLElement,
+      );
 
       await waitFor(() => {
         expect(screen.queryByTestId('teacher-onboarding-checklist')).toBeInTheDocument();

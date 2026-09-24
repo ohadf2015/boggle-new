@@ -288,3 +288,58 @@ describe('ClassroomTvResults — Pro progress report on the host wall', () => {
     expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
   });
 });
+
+describe('ClassroomTvResults — the Pro ask never competes with the celebration', () => {
+  beforeEach(() => {
+    window.sessionStorage.clear();
+    proState.hasPro = false;
+    proState.loading = false;
+  });
+  afterEach(cleanup);
+
+  it('Given a free teacher, Then the unlock ask sits AFTER Play again and reteach, not beside them', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const cta = screen.getByTestId('unlock-report-upgrade-cta');
+    const rematch = screen.getByTestId('classroom-tv-rematch');
+    const reteach = screen.getByTestId('play-reteach-round');
+    const follows = (a: Element, b: Element) =>
+      !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(follows(rematch, cta)).toBe(true);
+    expect(follows(reteach, cta)).toBe(true);
+  });
+
+  it('Given a free teacher, Then the ask is small and unfilled — secondary, not a second button', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const cls = screen.getByTestId('unlock-report-upgrade-cta').className.split(/\s+/);
+    expect(cls).not.toContain('bg-neo-cyan');
+    expect(cls).toContain('text-xs');
+  });
+
+  it('arrives only after the celebration beat (a delayed, transform-only pop; static under reduced motion)', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const slot = screen.getByTestId('tv-followup-after-celebration');
+    expect(slot).toContainElement(screen.getByTestId('unlock-report-upgrade-cta'));
+    expect(slot.className).toMatch(/motion-safe:animate-\[lc-quiet-arrive_\S+_5\.8s_both\]/);
+    expect(slot.className).not.toContain('opacity-0');
+  });
+
+  it('crowns the highest SCORE even when the payload ranks contradict it', async () => {
+    render(
+      <ClassroomTvResults
+        summary={summary({
+          podium: [
+            { username: 'Maya', score: 60, rank: 1 },
+            { username: 'Noa', score: 95, rank: 2 },
+          ],
+        })}
+        t={t}
+      />
+    );
+    await waitFor(
+      () => expect(screen.getByTestId('winner-spotlight')).toHaveAttribute('data-active', 'true'),
+      { timeout: 7000 }
+    );
+    expect(screen.getByTestId('winner-spotlight')).toHaveTextContent('Noa');
+    expect(screen.getByTestId('podium-place-1')).toHaveTextContent('Noa');
+  });
+});

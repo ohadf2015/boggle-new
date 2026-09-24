@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { LaunchStageBackdrop } from '@/components/education/lobby/LaunchStageBackdrop';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
 import { ClassroomGameLobbyExpress } from '@/components/education/ClassroomGameLobbyExpress';
@@ -18,6 +20,21 @@ import {
 } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { CEFR_LEVELS, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import { cn } from '@/lib/utils';
+import type { LiveSurfacePreviewKind } from './LiveSurfacePreview';
+
+/**
+ * DEV-ONLY: `?preview=podium|projector|waiting` renders the live classroom surfaces
+ * with fabricated data (see LiveSurfacePreview). `null` in production, so the
+ * lazy chunk is never referenced there.
+ */
+const LiveSurfacePreview =
+  process.env.NODE_ENV !== 'production'
+    ? dynamic(() => import('./LiveSurfacePreview'), { ssr: false })
+    : null;
+
+function previewKind(value: string | null | undefined): LiveSurfacePreviewKind | null {
+  return value === 'podium' || value === 'projector' || value === 'waiting' ? value : null;
+}
 
 /**
  * ClassroomGameInner
@@ -120,10 +137,12 @@ function ClassroomGameInner() {
        `flex-1 flex flex-col min-h-0` column, and a flex child defaults to
        shrink:1 — so `h-dvh` alone collapsed the whole lobby to 160px and
        `overflow-hidden` clipped the mode picker to a two-pixel sliver. */
-    <div className={cn('flex h-dvh shrink-0 flex-col overflow-hidden bg-neo-navy w-full', isRTL && 'rtl')}>
+    <div className={cn('relative flex h-dvh shrink-0 flex-col overflow-hidden bg-neo-navy w-full', isRTL && 'rtl')}>
+      {/* The arena the class is about to play in — behind header and picker. */}
+      <LaunchStageBackdrop />
       <EducationHeader showBackButton title={t('education.classroomGame.title')} />
 
-      <main className="flex min-h-0 flex-1 w-full max-w-5xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6">
+      <main className="relative flex min-h-0 flex-1 w-full max-w-5xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6">
         {runExpress ? (
           <ClassroomGameLobbyExpress
             intent={quickLaunchIntent}
@@ -151,6 +170,13 @@ function ClassroomGameInner() {
 export default function ClassroomGamePage() {
   const { isAuthenticated, loading } = useAuth();
   const { t } = useLanguage();
+  const searchParams = useSearchParams();
+  const preview = previewKind(searchParams?.get('preview'));
+
+  // Fabricated data only, so it runs ahead of the auth wall (dev builds only).
+  if (LiveSurfacePreview && preview) {
+    return <LiveSurfacePreview kind={preview} />;
+  }
 
   if (loading) {
     return (

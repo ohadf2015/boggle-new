@@ -14,6 +14,7 @@
 
 'use client';
 
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
@@ -26,7 +27,8 @@ export default function TeacherClassroomsPage() {
   return (
     <ClassesShell>
       <TeacherGate>
-        <main className="max-w-6xl mx-auto">
+        <main className="relative mx-auto max-w-6xl">
+          <ClassesTitle />
           <ClassroomManager />
         </main>
       </TeacherGate>
@@ -34,14 +36,35 @@ export default function TeacherClassroomsPage() {
   );
 }
 
+function ClassesTitle() {
+  const { t } = useLanguage();
+  return (
+    <h1 className="mb-3 font-neo-display text-2xl font-black uppercase leading-none tracking-tight text-neo-white [text-shadow:3px_3px_0_#000] sm:mb-4 sm:text-4xl">
+      {t('academy.teacher.classesTitle', 'Your classes')}
+    </h1>
+  );
+}
+
+/** Same observatory art as Teacher HQ, so Classes reads as a room of the same
+ *  building, not a bare admin page. Dark-only surface (pitfall class 5). */
 function ClassesShell({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <EducationShell
       header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('teacher.nav.classes')}
-      contentClassName="p-4 sm:p-6 lg:p-8"
+      contentClassName="relative p-4 sm:p-6 lg:p-8"
     >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <Image
+          src="/images/education/teacher-hq-bg.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="select-none object-cover"
+        />
+        <div className="absolute inset-0 bg-neo-navy/70" />
+      </div>
       {children}
     </EducationShell>
   );

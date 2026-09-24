@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Play, X, Users, Radio } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useActiveClassroomGame } from '@/hooks/useActiveClassroomGame';
+import { useClassroomGameJoin } from './useClassroomGameJoin';
 
 export interface ClassroomGameBannerProps {
   /** The classroom ID to listen for games */
@@ -37,85 +37,18 @@ export function ClassroomGameBanner({
   userId,
   username,
 }: ClassroomGameBannerProps) {
-  const { t, language } = useLanguage();
-  const router = useRouter();
+  const { t } = useLanguage();
   const { activeGame, isConnected, socket } = useActiveClassroomGame(classroomId);
-  const [isJoining, setIsJoining] = useState(false);
+  const { join: handleJoinGame, isJoining, joinError } = useClassroomGameJoin({
+    activeGame,
+    socket,
+    userId,
+    username,
+  });
   // Keyed on the game, not a boolean. A boolean plus a 15s poll meant the poll
   // re-set the game while `dismissed` was still true and the dismissed branch
   // returned null — the whole strip disappeared 15 seconds after the tap.
   const [dismissedGameCode, setDismissedGameCode] = useState<string | null>(null);
-  const [joinError, setJoinError] = useState<string | null>(null);
-  /** Torn down when a join settles, so listeners never stack up on the socket. */
-  const cleanupJoinRef = useRef<(() => void) | null>(null);
-
-  useEffect(() => () => cleanupJoinRef.current?.(), []);
-
-  /** Long enough for a slow phone on school wifi, short enough to not be a hang. */
-  const JOIN_TIMEOUT_MS = 12_000;
-
-  const handleJoinGame = () => {
-    // A room code is the whole point of this button. Without one the push lands
-    // on the bare multiplayer hub — "No battles in progress" — which reads as
-    // the app losing the game the student was just invited to. Do nothing
-    // visible rather than navigate somewhere wrong.
-    if (!activeGame?.gameCode || !socket) return;
-
-    const gameCode = activeGame.gameCode;
-    setJoinError(null);
-    setIsJoining(true);
-
-    // Navigating in the same tick as the emit is what produced the dead end the
-    // critic saw: the server's rejection ('Game not found' for a room that has
-    // since ended, 'You are not a member of this classroom', a server-side
-    // lookup failure) could only ever land AFTER the student had been pushed
-    // away, so it rendered nowhere and the hub's "No battles in progress" was
-    // the only thing they were told (recurring pitfall class 4). Wait for the
-    // answer, and treat silence as a failure too.
-    const settle = () => {
-      clearTimeout(timer);
-      socket.off('joinedClassroomGame', onJoined);
-      socket.off('classroomGameError', onError);
-      cleanupJoinRef.current = null;
-    };
-
-    const onJoined = (data: { gameCode?: string }) => {
-      // A shared socket can carry another game's ack; only ours releases us.
-      if (data?.gameCode && data.gameCode !== gameCode) return;
-      settle();
-      setIsJoining(false);
-      // `room`, not `code` — see PlayWithClassButton. Nothing reads `?code=`.
-      router.push(`/${language}/multiplayer?room=${gameCode}&classroom=true`);
-    };
-
-    const onError = (data: { gameCode?: string }) => {
-      // Only a rejection of THIS join. `classroomGameError` is a shared channel:
-      // `useActiveClassroomGame`'s 15-second poll emits it too (a Supabase
-      // hiccup gives LOOKUP_UNAVAILABLE), and one of those landing inside the
-      // join window would otherwise tear down both listeners and tell a student
-      // their perfectly good join had failed. The join handler now names the
-      // game on every rejection it sends, so the match is the filter; anything
-      // unnamed is somebody else's problem and the timeout still covers us.
-      if (data?.gameCode !== gameCode) return;
-      settle();
-      setIsJoining(false);
-      // Our own copy, not the server's raw English: the student needs to know
-      // what to do next, and the specific reason is for our logs.
-      setJoinError(t('student.activeGame.joinFailed'));
-    };
-
-    const timer = setTimeout(() => {
-      settle();
-      setIsJoining(false);
-      setJoinError(t('student.activeGame.joinFailed'));
-    }, JOIN_TIMEOUT_MS);
-
-    socket.on('joinedClassroomGame', onJoined);
-    socket.on('classroomGameError', onError);
-    cleanupJoinRef.current = settle;
-
-    socket.emit('joinClassroomGame', { gameCode, userId, username });
-  };
 
   const handleDismiss = () => {
     if (activeGame) setDismissedGameCode(activeGame.gameCode);

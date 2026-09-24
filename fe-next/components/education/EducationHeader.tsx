@@ -238,9 +238,14 @@ export const EducationHeader = memo<EducationHeaderProps>(({
         </div>
 
         {/* Right Section: Controls */}
-        <div className={cn('flex items-center gap-2 sm:gap-3', isRTL && 'flex-row-reverse')}>
-          {isTeacher && <TeacherWhatsNew />}
-          {isTeacher && <SearchIconButton />}
+        <div className={cn('flex shrink-0 items-center gap-2 sm:gap-3', isRTL && 'flex-row-reverse')}>
+          {/* ponytail: What's new + Search are desktop conveniences; at 390px they pushed the hamburger off-screen */}
+          {isTeacher && (
+            <div className="hidden sm:flex items-center gap-3">
+              <TeacherWhatsNew />
+              <SearchIconButton />
+            </div>
+          )}
           {isTeacher && <TeacherHelpButton />}
 
           {/* Desktop Controls */}

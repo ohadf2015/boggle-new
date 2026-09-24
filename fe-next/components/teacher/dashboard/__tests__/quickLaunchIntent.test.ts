@@ -17,6 +17,7 @@ import {
   clearQuickLaunchIntent,
   parsePastedWords,
   pickQuickLaunchMode,
+  resolveIntentMode,
   type QuickLaunchIntent,
 } from '../quickLaunchIntent';
 
@@ -103,5 +104,39 @@ describe('pickQuickLaunchMode', () => {
         { word: 'd' },
       ])
     ).toBe('classic');
+  });
+});
+
+describe('resolveIntentMode — the mode Teacher HQ asked for, made safe', () => {
+  const defined = Array.from({ length: 6 }, (_, i) => ({ word: `w${i}`, definition: `d${i}` }));
+  const bare = [{ word: 'a' }, { word: 'b' }, { word: 'c' }];
+
+  it('keeps a known board mode', () => {
+    expect(resolveIntentMode('blast', bare)).toBe('blast');
+  });
+
+  it('keeps the quiz when the words can carry it', () => {
+    expect(resolveIntentMode('vocab-quiz', defined)).toBe('vocab-quiz');
+  });
+
+  it('downgrades the quiz to the derived mode when the words carry no definitions', () => {
+    expect(resolveIntentMode('vocab-quiz', bare)).toBe('classic');
+  });
+
+  it('ignores an unknown or absent mode and derives one', () => {
+    expect(resolveIntentMode('nope', defined)).toBe('vocab-quiz');
+    expect(resolveIntentMode(undefined, bare)).toBe('classic');
+  });
+});
+
+describe('quickLaunchIntent — optional HQ fields', () => {
+  beforeEach(() => sessionStorage.clear());
+
+  it('round-trips the chosen class and mode', () => {
+    writeQuickLaunchIntent(
+      { source: 'pack', packKey: 'p', title: 'T', language: 'en', classroomId: 'c1', mode: 'blast' },
+      1000
+    );
+    expect(readQuickLaunchIntent(1000)).toMatchObject({ classroomId: 'c1', mode: 'blast' });
   });
 });

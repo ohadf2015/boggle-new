@@ -117,8 +117,11 @@ describe('PlayerWaitingView — classroom students get no host controls', () => 
 
   it('trims duplicate language chrome in a classroom room (EducationHeader owns it)', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
-    // What survives: the live counter and the exit.
-    expect(screen.getByText('1/8')).toBeInTheDocument();
+    // What survives: the live counter and the exit. The classroom counter is
+    // the class head-count on the waiting stage (ClassroomWaitingStage), not
+    // the public room's "N/8" seat cap — a class is not capped at eight.
+    expect(screen.getByTestId('classroom-waiting-count')).toHaveTextContent('1');
+    expect(screen.queryByText('1/8')).not.toBeInTheDocument();
     expect(screen.getByLabelText('common.exit')).toBeInTheDocument();
     // What goes: the board-language pill, the UI-language switcher, AND the
     // in-header mute — the classroom route's visible EducationHeader already

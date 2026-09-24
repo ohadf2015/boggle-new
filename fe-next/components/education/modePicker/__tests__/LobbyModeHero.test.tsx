@@ -1,5 +1,10 @@
 /**
- * One poster leads; the other four are folded away.
+ * Round 2 (2026-09-24): the lead replaced "one poster, the rest folded" with a
+ * row of big illustrated cards — the three most-played modes, selectable, the
+ * other two behind a quiet "More games". What stayed pinned: GO LIVE is the one
+ * primary action and names the selected mode; a card tap only selects.
+ *
+ * (Round 1: one poster leads; the other four are folded away.)
  *
  * Blooket's picker (bar/gameplay/27_host_currenthostingscreen.webp) shows
  * eighteen identically sized logos on one wall — every tile shouts equally, so
@@ -52,23 +57,24 @@ function setup(overrides: Partial<Props> = {}) {
 }
 
 describe('<LobbyModeHero> — one poster, one button', () => {
-  it('makes exactly one tile the hero, and it is the mode that will start', () => {
+  it('shows the most-played modes as big cards, exactly one selected — the mode GO LIVE starts', () => {
     setup({ selected: 'blast', recommended: null });
-    const heroes = screen
-      .getAllByTestId(/^mode-tile-/)
-      .filter((el) => el.dataset.size === 'hero');
-    expect(heroes).toHaveLength(1);
-    expect(heroes[0]).toBe(screen.getByTestId('mode-tile-blast'));
+    const cards = screen.getAllByTestId(/^mode-tile-/);
+    expect(cards).toHaveLength(3);
+    const selected = cards.filter((el) => el.dataset.selected === 'true');
+    expect(selected).toHaveLength(1);
+    expect(selected[0]).toBe(screen.getByTestId('mode-tile-blast'));
+    expect(selected[0]).toHaveAttribute('aria-checked', 'true');
   });
 
-  it('puts the mechanic, the minute chip and the fit flag on the hero face', () => {
+  it('puts the mechanic, the minute chip and the fit flag on screen for the selected mode', () => {
     setup({ selected: VOCAB_QUIZ_MODE, recommended: VOCAB_QUIZ_MODE });
     const quiz = TEACHER_GAME_MODES.find((m) => m.id === VOCAB_QUIZ_MODE)!;
-    const hero = screen.getByTestId(`mode-tile-${VOCAB_QUIZ_MODE}`);
-    expect(hero).toHaveTextContent(quiz.nameKey);
-    expect(hero).toHaveTextContent(quiz.howKey);
-    expect(hero).toHaveTextContent(`education.modePicker.minutes|{"count":${quiz.minutes}}`);
-    expect(screen.getByTestId('mode-recommended')).toBeInTheDocument();
+    const card = screen.getByTestId(`mode-tile-${VOCAB_QUIZ_MODE}`);
+    expect(card).toHaveTextContent(quiz.nameKey);
+    expect(card).toHaveTextContent(`education.modePicker.minutes|{"count":${quiz.minutes}}`);
+    expect(screen.getByTestId('lobby-selected-how')).toHaveTextContent(quiz.howKey);
+    expect(card).toContainElement(screen.getByTestId('mode-recommended'));
   });
 
   /**
@@ -104,27 +110,32 @@ describe('<LobbyModeHero> — one poster, one button', () => {
     );
   });
 
-  it('hides every alternate until the teacher asks for them', () => {
+  it('hides the less-played modes until the teacher asks for them', () => {
     setup({ expanded: false });
-    expect(screen.queryByTestId('mode-picker-track')).not.toBeInTheDocument();
-    for (const mode of TEACHER_GAME_MODES.filter((m) => m.id !== VOCAB_QUIZ_MODE)) {
-      expect(screen.queryByTestId(`mode-tile-${mode.id}`)).not.toBeInTheDocument();
-    }
+    expect(screen.queryByTestId('mode-tile-word-hunt')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('mode-tile-wheel-rush')).not.toBeInTheDocument();
   });
 
-  it('shows the four alternates once the fold is open', () => {
+  it('shows every mode as a card once the fold is open', () => {
     setup({ expanded: true });
-    expect(screen.getByTestId('mode-picker-track')).toBeInTheDocument();
-    expect(
-      screen.getAllByTestId(/^mode-tile-/).filter((el) => el.dataset.size === 'compact')
-    ).toHaveLength(TEACHER_GAME_MODES.length - 1);
+    expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(TEACHER_GAME_MODES.length);
   });
 
-  it('opens the fold from the poster as well as from the More button', () => {
-    const { onToggleExpanded } = setup({ selected: 'blast' });
-    fireEvent.click(screen.getByTestId('more-modes-toggle'));
+  it('selects on a card tap without launching; More games only toggles the fold', () => {
+    const { onPick, onGoLive, onToggleExpanded } = setup({ selected: VOCAB_QUIZ_MODE });
     fireEvent.click(screen.getByTestId('mode-tile-blast'));
-    expect(onToggleExpanded).toHaveBeenCalledTimes(2);
+    expect(onPick).toHaveBeenCalledWith('blast');
+    expect(onGoLive).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId('more-modes-toggle'));
+    expect(onToggleExpanded).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps GO LIVE the one loud control — More games is a quiet, unfilled link', () => {
+    setup();
+    const more = screen.getByTestId('more-modes-toggle').className.split(/\s+/);
+    expect(more.some((c) => /^bg-neo-/.test(c))).toBe(false);
+    expect(more).toContain('text-xs');
+    expect(screen.getByTestId('lobby-go-live').className).toContain('bg-neo-lime');
   });
 
   it('launches on one tap of GO LIVE', () => {

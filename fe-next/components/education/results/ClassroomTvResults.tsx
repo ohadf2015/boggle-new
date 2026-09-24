@@ -47,7 +47,10 @@
 import { Flame, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { ResultsPodium, type PodiumEntry } from './ResultsPodium';
+import type { PodiumEntry } from './ResultsPodium';
+import { PodiumStage } from './PodiumStage';
+import { ClassChest } from './ClassChest';
+import { tr } from '@/components/education/lobby/eduText';
 import ClassroomSessionStandings from './ClassroomSessionStandings';
 import { TeamBattleStandings } from '../TeamBattleStandings';
 import { WordCoverageGlance } from './WordCoverageGlance';
@@ -67,6 +70,8 @@ import { ResultsPrimaryActions } from './ResultsPrimaryActions';
 import { useReteachLinks } from './useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { trackResultsAction } from './trackResultsAction';
+import { orderPodiumByScore } from './podiumOrder';
+import { useIsPhoneRecap } from './useIsPhoneRecap';
 
 export interface ClassroomTvResultsProps {
   summary: ClassroomSummary;
@@ -131,7 +136,11 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
   // mode but still sits in the room's socket list, so the server's sort put a
   // zero-scoring adult on the top plinth of a real projector — see
   // `lib/education/roundEndPodium`. One helper, shared with the phone card.
-  const podium: PodiumEntry[] = podiumWithoutHost(summary.podium, summary.teacherName).map((p) => ({
+  // Rank follows SCORE, once, here — and the pedestals AND the winner bar read
+  // this same array, so gold and "winner" can never name two different
+  // children (Pitfall Class 3). PodiumStage re-sorts defensively as well.
+  const phone = useIsPhoneRecap();
+  const podium: PodiumEntry[] = orderPodiumByScore(podiumWithoutHost(summary.podium, summary.teacherName).map((p) => ({
     username: p.username,
     score: p.score,
     rank: p.rank,
@@ -139,7 +148,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
       typeof p.wordsFound === 'number' && typeof p.totalWords === 'number'
         ? t('education.results.podium.wordsFound', { found: p.wordsFound, total: p.totalWords })
         : undefined,
-  }));
+  })));
 
   return (
     <div
@@ -148,13 +157,13 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
       // the finished frame instead of catching the podium mid-beat and calling
       // it broken. Every stage is painted; `done` is simply the whole story.
       data-round-end-stage={stage}
-      className="h-full overflow-y-auto lg:overflow-hidden flex flex-col gap-3 bg-neo-navy text-neo-white"
+      className="h-full overflow-y-auto lg:overflow-hidden flex flex-col gap-2 lg:gap-3 bg-neo-navy text-neo-white"
     >
       <header className="shrink-0 flex flex-wrap items-baseline justify-center gap-x-4">
-        <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-xl md:text-2xl">
+        <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-lg md:text-2xl">
           {t('education.results.podium.title')}
         </p>
-        <p className="font-neo-body font-bold text-neo-white/80 text-base md:text-xl truncate max-w-full">
+        <p className="font-neo-body font-bold text-neo-white/80 text-sm md:text-xl truncate max-w-full">
           {summary.lessonNames.join(' · ')}
         </p>
       </header>
@@ -171,20 +180,36 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
         // the coverage list squeezed to a height of literally zero. Tailwind
         // emits arbitrary values only from class strings it can see, and a
         // results screen is the worst place to find out it could not.
-        className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:flex-1 lg:min-h-0"
+        className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-4 lg:flex-1 lg:min-h-0"
       >
         {/* `relative` only so the celebration can be bounded to this column.
             It falls over the podium and the winner bar, never over the
             Rematch button in the next column and never over the whole page —
             a fullscreen animated layer is the Class-5 shape we do not ship. */}
-        <div className="relative lg:col-span-3 lg:min-h-0 flex flex-col justify-end gap-3">
+        <div className="relative lg:col-span-3 lg:min-h-0 flex flex-col justify-center gap-2 lg:gap-3">
           {/* Starts on the winner's beat and never stops while the recap is
               up. `fireRankConfetti` still fires its one live burst for the
               people in the room; this is what a shutter that opens four
               seconds later actually photographs. */}
           <CelebrationLoop active={isRevealed(1, stage)} />
+          {/* The podium stands on the painted pedestals of podium-bg, with the
+              CLASS's chest on the same stage. Width is capped by the viewport
+              height so the art, the spotlight and the header all fit a 16:9
+              wall without the column growing a scrollbar. */}
           {podium.length > 0 && (
-            <ResultsPodium entries={podium} size="projector" stage={stage} t={t} />
+            <PodiumStage
+              entries={podium}
+              stage={stage}
+              t={t}
+              className="lg:w-[min(100%,calc((100dvh_-_19rem)*1.768))]"
+            >
+              <ClassChest
+                found={summary.classFoundCount}
+                total={summary.totalWords}
+                open={isRevealed(1, stage)}
+                t={t}
+              />
+            </PodiumStage>
           )}
 
           {podium[0] && (
@@ -196,13 +221,13 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
               // moment; a class that found every word did something together.
               // Two stings half a second apart is the "it screamed at us" bug.
               cue={!swept}
-              size="projector"
+              size={phone ? 'card' : 'projector'}
               t={t}
             />
           )}
         </div>
 
-        <div className="lg:col-span-2 lg:min-h-0 flex flex-col gap-3">
+        <div className="lg:col-span-2 lg:min-h-0 flex flex-col gap-2 lg:gap-3">
           {/* The podium to the left is THIS round. From round two on, the room
               is asking a different question than the podium answers — see
               `ClassroomSessionStandings`. Absent on a single-round session,
@@ -226,7 +251,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
             />
           ) : null}
 
-          <section className="lg:flex-1 lg:min-h-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-4 shadow-hard">
+          <section className="lg:flex-1 lg:min-h-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-3 pt-3 pb-0 lg:p-4 shadow-hard">
             {/* No username: `isTeacher` means class-wide coverage, so the
                 per-player mastery lookup is never consulted. Only the words
                 still to teach are printed, capped — the wall is for the next
@@ -236,11 +261,11 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
               username=""
               isTeacher
               neverPlaced={neverPlaced}
-              size="projector"
+              size={phone ? 'card' : 'projector'}
               fill={sweepReached(stage)}
               celebrate={sweepReached(stage)}
               missedOnly
-              maxChips={12}
+              maxChips={phone ? 6 : 12}
               t={t}
             />
           </section>
@@ -257,22 +282,19 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
                   }}
                   className={cn(
                     'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4',
-                    'font-neo-display font-bold text-2xl md:text-3xl',
-                    'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
-                    'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                    'font-neo-display font-black text-2xl md:text-4xl',
+                    'bg-neo-lime text-neo-black border-4 border-neo-black rounded-neo-lg',
+                    'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 transition-all'
                   )}
                 >
                   <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />
-                  {t('education.results.rematch')}
+                  <span className="flex flex-col items-start leading-none">
+                    <span className="uppercase">{tr(t, 'academy.results.playAgain', 'Play again')}</span>
+                    <span className="mt-1 font-neo-body text-sm font-bold normal-case md:text-base">
+                      {tr(t, 'academy.results.playAgainHint', 'Same words, same code. Nobody rejoins.')}
+                    </span>
+                  </span>
                 </button>
-              )}
-
-              {/* No onRematch: this wall already has the loud Rematch above.
-                  The shared component still owns the Pro check, so a free
-                  teacher gets the upgrade ask and a Pro teacher gets the
-                  report — the same branch the phone card uses. */}
-              {showTeacherFollowUp && (
-                <ResultsPrimaryActions language={language} t={t} surface="projector" />
               )}
 
               {showTeacherFollowUp && summary.missedWords.length > 0 && (
@@ -302,6 +324,26 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
                       {t('education.results.moment.sweepStreak', { count: sweepStreak })}
                     </span>
                   )}
+                </div>
+              )}
+
+              {/* No onRematch: this wall already has the loud Rematch above.
+                  The shared component still owns the Pro check, so a free
+                  teacher gets the upgrade ask and a Pro teacher gets the
+                  report — the same branch the phone card uses.
+                  LAST, small and unfilled, and it pops in only after the
+                  celebration beat (5.8s = the reveal's `done`): the room's
+                  moment is the winner and Play again, never a price tag.
+                  Transform-only arrival on a small element (never an
+                  opacity fade, Class 5); static under reduced motion. The
+                  mount — and so the impression — is unchanged. */}
+              {showTeacherFollowUp && (
+                <div
+                  data-testid="tv-followup-after-celebration"
+                  className="flex justify-center motion-safe:animate-[lc-quiet-arrive_360ms_ease-out_5.8s_both]"
+                >
+                  <style>{`@keyframes lc-quiet-arrive{0%{transform:scale(0)}70%{transform:scale(1.06)}100%{transform:scale(1)}}`}</style>
+                  <ResultsPrimaryActions language={language} t={t} surface="projector" tone="quiet" />
                 </div>
               )}
             </div>
