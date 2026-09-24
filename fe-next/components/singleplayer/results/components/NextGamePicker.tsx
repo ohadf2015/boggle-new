@@ -2,6 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
+import { MODE_META } from '@/lib/landing/modeMeta';
 import { Bot, RotateCcw, BookOpen, Trophy, Swords, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -22,6 +23,8 @@ interface NextGamePickerProps {
   /** Rounds finished before this screen. Omit to keep the old ladder. */
   gamesPlayed?: number;
   dailyDoneEver?: boolean;
+  /** Options rendered elsewhere (results' main "Run it back" button). */
+  hideIds?: readonly string[];
 }
 
 const ACCENT: Record<NextGameOption['accent'], string> = {
@@ -53,7 +56,7 @@ const TILE =
  */
 export const NextGamePicker: React.FC<NextGamePickerProps> = memo(({
   mode, difficulty, isWinner, onStartPreset, onReplaySame, className,
-  gamesPlayed, dailyDoneEver,
+  gamesPlayed, dailyDoneEver, hideIds,
 }) => {
   const { t, language } = useLanguage();
   const options = useMemo(
@@ -65,8 +68,8 @@ export const NextGamePicker: React.FC<NextGamePickerProps> = memo(({
       ...(typeof gamesPlayed === 'number' && typeof dailyDoneEver === 'boolean'
         ? { gamesPlayed, dailyDoneEver }
         : {}),
-    }),
-    [mode, difficulty, isWinner, language, gamesPlayed, dailyDoneEver],
+    }).filter((opt) => !hideIds?.includes(opt.id)),
+    [mode, difficulty, isWinner, language, gamesPlayed, dailyDoneEver, hideIds],
   );
 
   const pick = (opt: NextGameOption) => {
@@ -88,14 +91,15 @@ export const NextGamePicker: React.FC<NextGamePickerProps> = memo(({
       </h3>
       <div className="grid grid-cols-2 gap-2">
         {options.map((opt) => {
-          const Icon = ICON[opt.id] ?? Bot;
+          const modeIcon = opt.kind === 'link' && opt.modeKey ? MODE_META[opt.modeKey]?.Icon : undefined;
+          const Icon = ICON[opt.id] ?? modeIcon ?? Bot;
           const body = (
             <>
               <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black', ACCENT[opt.accent])}>
                 <Icon className="h-5 w-5" aria-hidden />
               </span>
               <span className="min-w-0">
-                <span className="block font-neo-display font-black text-sm uppercase text-neo-white leading-tight truncate">
+                <span className="block font-neo-display font-black text-sm uppercase text-neo-white leading-tight line-clamp-2">
                   {t(opt.labelKey)}
                 </span>
                 <span className="block text-[11px] text-neo-white/70 leading-tight">{t(opt.descKey)}</span>

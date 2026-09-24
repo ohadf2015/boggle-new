@@ -5,7 +5,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import GameFeedback from '@/components/feedback/GameFeedback';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
-import { TrendingUp, ArrowLeft, RotateCcw } from 'lucide-react';
+import { TrendingUp, RotateCcw } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { longestWordOf } from '@/components/results/utils';
@@ -21,7 +21,6 @@ import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
-import AutoPlayCountdown from '@/components/results/AutoPlayCountdown';
 import TomorrowPreview from '@/components/results/TomorrowPreview';
 
 const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip'), { ssr: false });
@@ -39,7 +38,6 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
 import { useUnfinishedBoard } from '@/hooks/useUnfinishedBoard';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
-import { useExperiment } from '@/hooks/useExperiment';
 import { Button } from '@/components/ui/button';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import {
@@ -72,6 +70,9 @@ import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { useProgressSnapshot } from './results/hooks/useProgressSnapshot';
 import { ProgressPulseCard } from './results/components/ProgressPulseCard';
 import { NextGamePicker } from './results/components/NextGamePicker';
+import { buildNextGameOptions } from './results/nextGame';
+
+const HIDE_SAME = ['rematch-same'] as const;
 import { MissionsCompletedNote, RecordBadges } from './results/components/RecordBadges';
 import type { DifficultyLevel } from '@/shared/types/game';
 
@@ -111,7 +112,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   difficulty = 'MEDIUM',
   onStartPreset,
 }) => {
-  const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
   const [showTomorrowPreview, setShowTomorrowPreview] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
@@ -146,11 +146,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const handlePlayAgainGated = useCallback(() => {
     void gateWithInterstitial().then(onPlayAgain);
   }, [gateWithInterstitial, onPlayAgain]);
-
-  const handleQuickReplay = useCallback(() => {
-    trackGrowthEvent('results_cta_clicked', { cta: 'quick_replay', mode });
-    handlePlayAgainGated();
-  }, [handlePlayAgainGated, mode]);
 
   const handleStartPresetGated = useCallback((presetId: string) => {
     if (!onStartPreset) return;
@@ -243,9 +238,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   useWinStreakTracking({ isGameComplete: true });
 
-  // exp-results-replay-cta-v1: prominent "Run it back?" button above NextStepPrompt
-  const { variant: replayCTAVariant, trackExposure: trackReplayCTAExposure } =
-    useExperiment('exp-results-replay-cta-v1');
 
   // Funnel anchor: fire once on mount so PostHog can measure results-page drop-off
   useEffect(() => {
@@ -340,15 +332,36 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const progressBlock = <ProgressPulseCard snapshot={progressSnapshot} />;
 
   // "What's next?" — the mode choice single player lost with its lobby.
+  // "Run it back" IS the picker's same-setup option (incl. the new-player
+  // rotation preset), so the picker hides that tile instead of duplicating it.
+  const pickerGamesPlayed = mode === 'solo-bots' && typeof soloGamesPlayed === 'number' ? soloGamesPlayed : undefined;
+  const pickerDailyDoneEver = mode === 'solo-bots' && typeof dailyDoneEver === 'boolean' ? dailyDoneEver : undefined;
+  const replayPresetId = useMemo(() => {
+    if (!onStartPreset) return '';
+    const same = buildNextGameOptions({
+      mode, difficulty, isWinner, language,
+      ...(pickerGamesPlayed !== undefined && pickerDailyDoneEver !== undefined
+        ? { gamesPlayed: pickerGamesPlayed, dailyDoneEver: pickerDailyDoneEver } : {}),
+    }).find((opt) => opt.id === 'rematch-same');
+    return same?.kind === 'action' ? same.presetId : '';
+  }, [onStartPreset, mode, difficulty, isWinner, language, pickerGamesPlayed, pickerDailyDoneEver]);
+
+  const handleQuickReplay = useCallback(() => {
+    trackGrowthEvent('results_cta_clicked', { cta: 'quick_replay', mode });
+    if (replayPresetId && onStartPreset) void gateWithInterstitial().then(() => onStartPreset(replayPresetId));
+    else handlePlayAgainGated();
+  }, [handlePlayAgainGated, mode, replayPresetId, onStartPreset, gateWithInterstitial]);
+
   const pickerBlock = onStartPreset ? (
     <NextGamePicker
+      hideIds={HIDE_SAME}
       mode={mode}
       difficulty={difficulty}
       isWinner={isWinner}
       onStartPreset={handleStartPresetGated}
       onReplaySame={handlePlayAgainGated}
-      gamesPlayed={mode === 'solo-bots' && typeof soloGamesPlayed === 'number' ? soloGamesPlayed : undefined}
-      dailyDoneEver={mode === 'solo-bots' && typeof dailyDoneEver === 'boolean' ? dailyDoneEver : undefined}
+      gamesPlayed={pickerGamesPlayed}
+      dailyDoneEver={pickerDailyDoneEver}
     />
   ) : null;
 
@@ -389,7 +402,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <MobileCompactLeaderboard participants={leaderboardParticipants} />
   ) : null;
 
-  const statsBlock = (
+  // Zero words + no coins = three empty tiles; the hero already says 0.
+  const statsBlock = validWordCount === 0 && !coinReward?.awarded ? null : (
     <StatsCardGrid cards={[
       { label: t('results.words'), value: validWordCount, icon: '📝' },
       {
@@ -458,51 +472,41 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     ) : null
   );
 
+  // The next game is always the player's choice — nothing auto-starts (an
+  // auto-play countdown used to launch the next round after 5s). On phones the
+  // fixed bottom bar already carries "play real opponents" + back, so the
+  // inline copies render on desktop only.
   const ctaBlock = (
     <div className="space-y-3">
-      {/* Auto-play only after a game the player actually played — an idle tab must not loop forever */}
-      {!autoPlayCancelled && (results.playerWords?.length ?? 0) > 0 ? (
-        <AutoPlayCountdown
-          onComplete={handlePlayAgainGated}
-          onCancel={() => {
-            trackGrowthEvent('results_autoplay_cancelled', { mode });
-            setAutoPlayCancelled(true);
-          }}
-          duration={5}
-        />
-      ) : (
-        <>
-          {replayCTAVariant === 'quick-replay' && (
-            <Button
-              className="w-full border-neo border-neo-black bg-neo-cyan text-neo-black font-bold shadow-hard hover:bg-neo-cyan/90 active:shadow-hard-pressed active:translate-y-px"
-              onClick={() => { trackReplayCTAExposure(); handleQuickReplay(); }}
-              data-testid="quick-replay-btn"
-            >
-              <RotateCcw className="me-2 w-4 h-4" />
-              {t('results.playAgainQuestion')}
-            </Button>
-          )}
-          {pickerBlock}
-          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} beforeNavigate={gateWithInterstitial} />
-          {results.grid && (
-            <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}
-              gameLanguage={gameLanguage} gameDuration={results.gameDuration}
-              variant={isDesktop ? 'default' : 'compact'} isWinner={isWinner} />
-          )}
-          <UGCFeaturedStrip
-            titleKey="ugc.strip.tryCustom"
-            sort="popular"
-            limit={3}
-            variant="compact"
-            showCreateCTA
-            minToShow={1}
-          />
-          <Button variant="ghost" className="w-full border-2 border-white/20 text-white hover:text-white hover:border-white/40" onClick={handleBackToLobby}>
-            <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />{t('nextStep.backToLobby')}
-          </Button>
-        </>
+      <Button
+        className="w-full h-14 text-lg font-black uppercase border-neo-thick border-neo-black bg-neo-yellow text-neo-black shadow-hard-lg hover:bg-neo-yellow hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all duration-150"
+        onClick={handleQuickReplay}
+        data-testid="quick-replay-btn"
+      >
+        <RotateCcw className="me-2 w-5 h-5" />
+        {t('results.playAgainQuestion')}
+      </Button>
+      {pickerBlock}
+      {isDesktop && (
+        <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="desktop" beforeNavigate={gateWithInterstitial} />
+      )}
+      {results.grid && (
+        <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}
+          gameLanguage={gameLanguage} gameDuration={results.gameDuration}
+          variant={isDesktop ? 'default' : 'compact'} isWinner={isWinner} />
       )}
     </div>
+  );
+
+  const ugcBlock = (
+    <UGCFeaturedStrip
+      titleKey="ugc.strip.tryCustom"
+      sort="popular"
+      limit={3}
+      variant="compact"
+      showCreateCTA
+      minToShow={1}
+    />
   );
 
   const analysisBlock = (
@@ -554,9 +558,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         {isDesktop ? (
           <>
             <div className="grid grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-6 items-start">
-              <div className="space-y-4">{heroBlock}{progressBlock}{showShareImmediate && shareBlock}{leaderboardBlock}</div>
+              <div className="space-y-4">{heroBlock}{leaderboardBlock}{progressBlock}{showShareImmediate && shareBlock}</div>
               <div className="space-y-4">
                 {statsBlock}
+                {ctaBlock}
                 <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
                 {/* Endowment/anchoring: double the exact amount they just earned */}
                 {isAuthenticated && coinReward?.awarded ? (
@@ -567,7 +572,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
-                {ctaBlock}
                 {/* Signup is demoted below the return CTAs and reframed as
                     streak insurance (t_89663cfc) — the screen asks for a
                     RETURN first, an account second. */}
@@ -576,48 +580,47 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             </div>
             <div className="mt-6">{retentionBlock}</div>
             <div className="mt-8">{analysisBlock}</div>
+            <div className="mt-6">{ugcBlock}</div>
             {/* Inline banner ad (web iframe; native shows no inline banner) */}
             <CrazyGamesBanner size="728x90" className="mt-6" />
           </>
         ) : (
           <div className="space-y-4">
+            {/* Focused order: result → standings → numbers → NEXT GAME, then
+                everything else (retention, rewards, ads, details) below it. */}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</m.div>
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.13 }}>{progressBlock}</m.div>
-            {/* Streak Ignition: the payoff directly below the hero (t_89663cfc) */}
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>{retentionBlock}</m.div>
-            {showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>{shareBlock}</m.div>}
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>{leaderboardBlock}</m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>{statsBlock}</m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>{ctaBlock}</m.div>
+            {showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 }}>{shareBlock}</m.div>}
             <ResultsBannerSlot placement="singleplayer-complete" className="my-3" />
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{statsBlock}</m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>{progressBlock}</m.div>
+            {/* Streak Ignition (t_89663cfc) — the return hook, right after the next-game choice */}
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.34 }}>{retentionBlock}</m.div>
             {isAuthenticated && coinReward?.awarded ? (
-              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}>
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38 }}>
                 <DoubleGoldAdButton earnedAmount={coinReward.awarded} surface="sp_results_double" />
               </m.div>
             ) : null}
             {/* R7 — Rewarded gold top-up */}
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42 }}>
-              <SinglePlayerGoldTopUp t={t} />
-            </m.div>
-            {!showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</m.div>}
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}><SinglePlayerGoldTopUp t={t} /></m.div>
+            {!showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42 }}>{shareBlock}</m.div>}
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.44 }}>{achievementsBlock}</m.div>
             {globalRank && (
-              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.43 }}>
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.46 }}>
                 <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
               </m.div>
             )}
-            {/* Inline banner ad (web iframe; native shows no inline banner) */}
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}>
-              <CrazyGamesBanner size="320x50" />
-            </m.div>
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.52 }}>{ctaBlock}</m.div>
-            {/* Signup demoted below the return CTAs, reframed as streak
-                insurance (t_89663cfc): ask for the RETURN first. */}
+            {/* Signup reframed as streak insurance (t_89663cfc): ask for the RETURN first. */}
             {signupBlock && (
-              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.54 }}>
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}>
                 {signupBlock}
               </m.div>
             )}
-            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.58 }}>{analysisBlock}</m.div>
+            {/* Inline banner ad (web iframe; native shows no inline banner) */}
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}><CrazyGamesBanner size="320x50" /></m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.54 }}>{analysisBlock}</m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.58 }}>{ugcBlock}</m.div>
           </div>
         )}
         {/* End-of-game sentiment (game_feedback, surface=singleplayer). Shared

@@ -8,13 +8,14 @@
  */
 import type { DifficultyLevel } from '@/shared/types/game';
 import { buildSoloRotation } from '@/lib/soloRotation';
+import { MODE_META, modeRoute, type ModeCubeVariant } from '@/lib/landing/modeMeta';
 import type { SinglePlayerMode } from '../SinglePlayerView';
 
 export type NextGameAccent = 'lime' | 'cyan' | 'pink' | 'amber';
 
 export type NextGameOption =
   | { id: string; kind: 'action'; presetId: string; labelKey: string; descKey: string; accent: NextGameAccent; badgeKey?: string }
-  | { id: string; kind: 'link'; href: string; labelKey: string; descKey: string; accent: NextGameAccent; badgeKey?: string };
+  | { id: string; kind: 'link'; href: string; labelKey: string; descKey: string; accent: NextGameAccent; badgeKey?: string; modeKey?: string };
 
 /** The bots ladder: EASY (friendly) → MEDIUM (competitive) → HARD (battle). */
 export function nextHarderPresetId(difficulty: DifficultyLevel): 'competitive' | 'battle' {
@@ -34,7 +35,6 @@ export interface NextGameContext {
   dailyDoneEver?: boolean;
 }
 
-const FIRST_DAILY_HREF = '/daily/word-hunt?from=solo_results';
 
 function promoteToFront(options: NextGameOption[], id: string): NextGameOption[] {
   const index = options.findIndex((option) => option.id === id);
@@ -59,7 +59,8 @@ function applyNewPlayerRotation(
     if (option.kind === 'link' && option.id === 'daily' && rotation.promote === 'daily') {
       return {
         ...option,
-        href: FIRST_DAILY_HREF,
+        // Locale-prefixed: the bare path 308s to /en regardless of NEXT_LOCALE.
+        href: `/${language}/daily/word-hunt?from=solo_results`,
         labelKey: 'singlePlayer.nextGame.firstDaily',
         descKey: 'singlePlayer.nextGame.firstDailyDesc',
         badgeKey: 'singlePlayer.nextGame.firstDailyBadge',
@@ -82,7 +83,45 @@ function applyNewPlayerRotation(
   return next;
 }
 
-export function buildNextGameOptions({
+/**
+ * Public modes a solo player has likely never seen, one per results screen,
+ * rotating with rounds played. Labels come from the landing table, so no new
+ * copy. Only modes the landing hub shows EVERY player — admin/beta previews
+ * (adventure, quickPlay, crossword, wordTowerV2…) stay out.
+ */
+export const DISCOVERY_MODES = ['wordTower', 'connections', 'blast', 'wordCraft'] as const;
+
+const VARIANT_ACCENT: Partial<Record<ModeCubeVariant, NextGameAccent>> = {
+  lime: 'lime', cyan: 'cyan', blue: 'cyan', orange: 'amber', pink: 'pink', purple: 'pink',
+};
+
+function discoveryOption(gamesPlayed: number, language: string): NextGameOption | null {
+  const modeKey = DISCOVERY_MODES[gamesPlayed % DISCOVERY_MODES.length];
+  const meta = MODE_META[modeKey];
+  const href = modeRoute(modeKey, language);
+  if (!meta || !href) return null;
+  return {
+    id: 'discover', kind: 'link', href, modeKey,
+    labelKey: meta.titleKey, descKey: meta.descKey,
+    accent: VARIANT_ACCENT[meta.variant] ?? 'cyan',
+  };
+}
+
+/**
+ * Every screen ends on one mode the player hasn't been shown yet. Multiplayer
+ * is NOT added here: NextStepPrompt's "Play real opponents" card + sticky bar
+ * already push it on every result.
+ */
+function withDiscovery(options: NextGameOption[], { language, gamesPlayed }: NextGameContext): NextGameOption[] {
+  const discover = discoveryOption(gamesPlayed ?? 0, language);
+  return discover ? [...options, discover] : options;
+}
+
+export function buildNextGameOptions(ctx: NextGameContext): NextGameOption[] {
+  return withDiscovery(buildLadder(ctx), ctx);
+}
+
+function buildLadder({
   mode, difficulty, isWinner, language, gamesPlayed, dailyDoneEver,
 }: NextGameContext): NextGameOption[] {
   const practice: NextGameOption = {

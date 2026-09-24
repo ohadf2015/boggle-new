@@ -133,17 +133,6 @@ vi.mock('@/hooks/useSaveCognitiveScore', () => ({
   }),
 }));
 
-// Mock AutoPlayCountdown — immediately call onCancel so NextStepPrompt renders
-vi.mock('@/components/results/AutoPlayCountdown', () => {
-  const MockAutoPlay = ({ onCancel }: { onCancel: () => void }) => {
-    // Simulate cancelled state so tests see NextStepPrompt
-    const React = require('react');
-    React.useEffect(() => { onCancel(); }, [onCancel]);
-    return null;
-  };
-  MockAutoPlay.displayName = 'MockAutoPlayCountdown';
-  return { default: MockAutoPlay };
-});
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
