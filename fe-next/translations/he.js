@@ -231,6 +231,26 @@ const he = {
       "due": "להגשה עד {date}",
       "failed": "לא הצלחנו להקצות. נסו שוב.",
       "title": "שיעורי בית: מילים שפוספסו"
+    },
+    "pages": {
+      "backToMap": "חזרה לאקדמיה",
+      "lessonDone": "הושלם",
+      "lessonKeepGoing": "ממשיכים",
+      "lessonNew": "חדש",
+      "starsAria": "{count} מתוך 3 כוכבים",
+      "untitledLesson": "שיעור",
+      "wordCount": "מילים: {count}",
+      "mastered": "נלמד {pct}%",
+      "due": "עד {date}",
+      "noLessonsTitle": "עוד אין שיעורים",
+      "noLessonsBody": "ברגע שיגיע שיעור מהמורה, הוא ינחת כאן.",
+      "moreLessons": "שיעורים חדשים מהמורה יופיעו כאן.",
+      "maxTier": "מקס",
+      "noAwards": "שחקו שיעור כדי להתחיל לאסוף פרסים.",
+      "firstAward": "סיימו שיעור וזכו בפרס הראשון!",
+      "awardsEarned": "הושגו: {earned}/{total}",
+      "lessonsDone": "הושלמו: {done}/{total}",
+      "lessonsRegion": "השיעורים שלכם"
     }
   },
   // @academy:end
@@ -2487,7 +2507,6 @@ const he = {
     "creating": "יוצר...",
     "guest": "אורח",
     "unknown": "לא ידוע",
-    "loading": "בודקים…",
     "back": "חזור",
     "backHome": "חזרה הביתה",
     "backToHome": "חזרה לדף הבית",

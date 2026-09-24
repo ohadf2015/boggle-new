@@ -231,6 +231,26 @@ const en = {
       "due": "Due {date}",
       "failed": "Couldn’t assign it. Try again.",
       "title": "Missed-words homework"
+    },
+    "pages": {
+      "backToMap": "Back to the Academy",
+      "lessonDone": "Done",
+      "lessonKeepGoing": "Keep going",
+      "lessonNew": "New",
+      "starsAria": "{count} of 3 stars",
+      "untitledLesson": "Lesson",
+      "wordCount": "{count} words",
+      "mastered": "{pct}% mastered",
+      "due": "Due {date}",
+      "noLessonsTitle": "No lessons yet",
+      "noLessonsBody": "When your teacher shares a lesson, it lands here.",
+      "moreLessons": "New lessons from your teacher show up here.",
+      "maxTier": "MAX",
+      "noAwards": "Play a lesson to start earning awards.",
+      "firstAward": "Finish a lesson to win your first award!",
+      "awardsEarned": "{earned}/{total} earned",
+      "lessonsDone": "{done}/{total} done",
+      "lessonsRegion": "Your lessons"
     }
   },
   // @academy:end
@@ -2115,7 +2135,6 @@ const en = {
     "creating": "Creating...",
     "guest": "Guest",
     "unknown": "Unknown",
-    "loading": "Checking…",
     "back": "Back",
     "backHome": "Back Home",
     "backToHome": "Back to Home",

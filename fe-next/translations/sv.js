@@ -231,6 +231,26 @@ const sv = {
       "due": "Senast {date}",
       "failed": "Kunde inte dela ut. Försök igen.",
       "title": "Läxa: missade ord"
+    },
+    "pages": {
+      "backToMap": "Tillbaka till Akademin",
+      "lessonDone": "Klar",
+      "lessonKeepGoing": "Fortsätt",
+      "lessonNew": "Ny",
+      "starsAria": "{count} av 3 stjärnor",
+      "untitledLesson": "Lektion",
+      "wordCount": "Ord: {count}",
+      "mastered": "{pct}% bemästrat",
+      "due": "Senast {date}",
+      "noLessonsTitle": "Inga lektioner än",
+      "noLessonsBody": "När din lärare delar en lektion hamnar den här.",
+      "moreLessons": "Nya lektioner från din lärare dyker upp här.",
+      "maxTier": "MAX",
+      "noAwards": "Spela en lektion för att börja vinna utmärkelser.",
+      "firstAward": "Klara en lektion och vinn din första utmärkelse!",
+      "awardsEarned": "Vunna: {earned}/{total}",
+      "lessonsDone": "Klara: {done}/{total}",
+      "lessonsRegion": "Dina lektioner"
     }
   },
   // @academy:end
@@ -2772,7 +2792,6 @@ const sv = {
     "creating": "Skapar...",
     "guest": "Gäst",
     "unknown": "Okänd",
-    "loading": "Kollar…",
     "back": "Tillbaka",
     "backHome": "Tillbaka hem",
     "backToHome": "Tillbaka till startsidan",

@@ -231,6 +231,26 @@ const es = {
       "due": "Entrega: {date}",
       "failed": "No se pudo asignar. Inténtalo de nuevo.",
       "title": "Tarea: palabras falladas"
+    },
+    "pages": {
+      "backToMap": "Volver a la Academia",
+      "lessonDone": "Hecha",
+      "lessonKeepGoing": "Continúa",
+      "lessonNew": "Nueva",
+      "starsAria": "{count} de 3 estrellas",
+      "untitledLesson": "Lección",
+      "wordCount": "Palabras: {count}",
+      "mastered": "{pct}% dominado",
+      "due": "Entrega: {date}",
+      "noLessonsTitle": "Aún no hay lecciones",
+      "noLessonsBody": "Cuando tu profe comparta una lección, aparecerá aquí.",
+      "moreLessons": "Las nuevas lecciones de tu profe aparecerán aquí.",
+      "maxTier": "MÁX",
+      "noAwards": "Juega una lección para empezar a ganar premios.",
+      "firstAward": "¡Termina una lección y gana tu primer premio!",
+      "awardsEarned": "Ganados: {earned}/{total}",
+      "lessonsDone": "Hechas: {done}/{total}",
+      "lessonsRegion": "Tus lecciones"
     }
   },
   // @academy:end
@@ -2485,7 +2505,6 @@ const es = {
     "creating": "Creando...",
     "guest": "Invitado",
     "unknown": "Desconocido",
-    "loading": "Comprobando…",
     "back": "Atrás",
     "backHome": "Volver a Inicio",
     "backToHome": "Volver al Inicio",

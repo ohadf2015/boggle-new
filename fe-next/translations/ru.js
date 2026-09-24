@@ -231,6 +231,26 @@ const ru = {
       "due": "Срок: {date}",
       "failed": "Не удалось задать. Попробуйте ещё раз.",
       "title": "ДЗ: работа над ошибками"
+    },
+    "pages": {
+      "backToMap": "В Академию",
+      "lessonDone": "Пройден",
+      "lessonKeepGoing": "Продолжай",
+      "lessonNew": "Новый",
+      "starsAria": "{count} из 3 звёзд",
+      "untitledLesson": "Урок",
+      "wordCount": "Слов: {count}",
+      "mastered": "Выучено {pct}%",
+      "due": "Срок: {date}",
+      "noLessonsTitle": "Уроков пока нет",
+      "noLessonsBody": "Когда учитель поделится уроком, он появится здесь.",
+      "moreLessons": "Новые уроки от учителя появятся здесь.",
+      "maxTier": "МАКС",
+      "noAwards": "Пройди урок, чтобы начать получать награды.",
+      "firstAward": "Пройди урок — и получи первую награду!",
+      "awardsEarned": "Получено: {earned}/{total}",
+      "lessonsDone": "Пройдено: {done}/{total}",
+      "lessonsRegion": "Твои уроки"
     }
   },
   // @academy:end

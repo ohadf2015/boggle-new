@@ -231,6 +231,26 @@ const ja = {
       "due": "期限：{date}",
       "failed": "出題できませんでした。もう一度お試しください。",
       "title": "ミスした単語の宿題"
+    },
+    "pages": {
+      "backToMap": "アカデミーに戻る",
+      "lessonDone": "クリア",
+      "lessonKeepGoing": "続きから",
+      "lessonNew": "NEW",
+      "starsAria": "スター3個中{count}個",
+      "untitledLesson": "レッスン",
+      "wordCount": "{count}語",
+      "mastered": "{pct}%マスター",
+      "due": "期限：{date}",
+      "noLessonsTitle": "レッスンはまだないよ",
+      "noLessonsBody": "先生がレッスンをシェアすると、ここに届くよ。",
+      "moreLessons": "先生からの新しいレッスンはここに届くよ。",
+      "maxTier": "MAX",
+      "noAwards": "レッスンで遊んでアワードを集めよう。",
+      "firstAward": "レッスンをクリアして、最初のアワードをゲットしよう！",
+      "awardsEarned": "{earned}/{total} 獲得",
+      "lessonsDone": "{done}/{total} クリア",
+      "lessonsRegion": "マイレッスン"
     }
   },
   // @academy:end
@@ -2487,7 +2507,6 @@ const ja = {
     "creating": "作成中...",
     "guest": "ゲスト",
     "unknown": "不明",
-    "loading": "確認中…",
     "back": "戻る",
     "backHome": "ホームへ",
     "backToHome": "ホームに戻る",
