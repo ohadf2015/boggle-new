@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import sitemap from '../sitemap';
+import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
 
 describe('sitemap', () => {
   // Regression: previously used generateSitemaps() which made Next.js serve
@@ -46,33 +47,25 @@ describe('sitemap', () => {
   });
 
   /**
-   * The education landing pages set `robots: index` and self-referencing
-   * hreflang for all six locales in their own generateMetadata. The sitemap
-   * used to list only /en and point he/sv/ja/es hreflang at *different* URLs —
-   * conflicting annotations Google discards, plus 30 indexable non-English URLs
-   * that appeared in no sitemap at all. These two tests pin them together.
+   * EDUCATION_PAGES is the only list of education landings. Sitemap.ts used to
+   * restate these 17 slugs; a new registry entry would then ship in the footer
+   * and hub but not /sitemap.xml. These tests import the registry so they fail
+   * if sitemap.ts and educationPageLinks.ts drift.
    */
-  const EDUCATION_LANDINGS = [
-    '/education/vocabulary-games-classroom',
-    '/education/esl-word-games',
-    '/education/games-for-teachers',
-    '/education/spelling-bee-practice',
-    '/education/sight-words-practice',
-    '/education/for-schools',
-    // Teacher-moment landings
-    '/education/brain-breaks-word-games',
-    '/education/indoor-recess-games',
-    '/education/end-of-year-classroom-activities',
-    '/education/first-day-of-school-icebreakers',
-    '/education/early-finishers-activities',
-    '/education/middle-school-word-games',
-    '/education/english-games-elementary',
-    '/education/english-games-middle-school',
-    '/education/english-games-adults',
-    '/education/irregular-verbs-games',
-    '/education/english-vocabulary-topics',
-  ];
+  const EDUCATION_LANDINGS = EDUCATION_PAGES.map((p) => `/education/${p.slug}`);
   const ALL_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
+
+  it('emits every EDUCATION_PAGES slug for all six locales (17×6)', () => {
+    expect(EDUCATION_PAGES).toHaveLength(17);
+    const urls = new Set(sitemap().map((e) => e.url));
+    let present = 0;
+    for (const path of EDUCATION_LANDINGS) {
+      for (const locale of ALL_LOCALES) {
+        if (urls.has(`https://www.lexiclash.live/${locale}${path}`)) present += 1;
+      }
+    }
+    expect(present).toBe(EDUCATION_PAGES.length * ALL_LOCALES.length);
+  });
 
   it('lists every education landing in every locale the page itself indexes', () => {
     const urls = new Set(sitemap().map((e) => e.url));

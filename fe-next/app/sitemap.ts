@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { hreflangAlternates } from '@/lib/seo/hreflang';
+import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
 import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 
 const BASE_URL = 'https://www.lexiclash.live';
@@ -168,37 +169,14 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/pricing', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
 
   // ─── Education SEO landings ───
-  // These pages ship fully localized copy and set `robots: { index: true }` for
-  // all six locales in their own generateMetadata, with self-referencing
-  // hreflang. This block used to emit /en only and point he/sv/ja/es hreflang at
-  // *different* pages — annotations that contradicted the page's own <link
-  // rel="alternate">, so Google discarded the cluster, and 30 indexable
-  // non-English URLs were in no sitemap at all. addForAllLocales emits exactly
-  // what the pages declare.
-  const educationLandings = [
-    '/education/vocabulary-games-classroom',
-    '/education/esl-word-games',
-    '/education/games-for-teachers',
-    '/education/spelling-bee-practice',
-    '/education/sight-words-practice',
-    '/education/for-schools',
-    // Teacher-moment landings: each targets a specific moment in the school day
-    // rather than a product feature, and each carries its own artifact (a word
-    // list, a timed plan, a comparison table) so the set is not near-duplicate.
-    '/education/brain-breaks-word-games',
-    '/education/indoor-recess-games',
-    '/education/end-of-year-classroom-activities',
-    '/education/first-day-of-school-icebreakers',
-    '/education/early-finishers-activities',
-    '/education/middle-school-word-games',
-    '/education/english-games-elementary',
-    '/education/english-games-middle-school',
-    '/education/english-games-adults',
-    '/education/irregular-verbs-games',
-    '/education/english-vocabulary-topics',
-  ];
-  educationLandings.forEach((path) => {
-    addForAllLocales(routes, path, {
+  // Single source of truth: EDUCATION_PAGES in lib/seo/educationPageLinks.ts
+  // (same registry as the footer, /education hub, and llms.txt). Restating the
+  // 17 slugs here is how a new landing would ship linked internally but absent
+  // from /sitemap.xml. addForAllLocales emits all six locales because these
+  // pages set robots: { index: true } + self-referencing hreflang in
+  // generateMetadata. Priority stays 0.85 (teacher-intent; do not demote).
+  EDUCATION_PAGES.forEach((page) => {
+    addForAllLocales(routes, `/education/${page.slug}`, {
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'weekly',
       priority: 0.85,
