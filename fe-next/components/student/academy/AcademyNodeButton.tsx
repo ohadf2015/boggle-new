@@ -18,7 +18,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import type { IslandPoint, NodeType } from './academyNodes';
 import type { AcademyIsland } from './academyIslands';
-import { Medallion, INK_TEXT, toneStyle } from './chrome';
+import { Medallion, INK_TEXT, toneStyle, type Tone } from './chrome';
 
 const ART: Record<NodeType, string> = {
   lesson: '/images/education/node-lesson.webp',
@@ -29,6 +29,8 @@ const ART: Record<NodeType, string> = {
   locked: '/images/education/node-locked.webp',
 };
 
+const POINTER_FILL: Partial<Record<Tone, string>> = { gold: '#ffd23a', pink: '#ff3d9a', teal: '#1fc9c0' };
+
 const SPARKS = [0, 45, 90, 135, 180, 225, 270, 315];
 
 interface Props {
@@ -37,8 +39,35 @@ interface Props {
   index: number;
   big: boolean;
   recommended: boolean;
+  /** Word on the spotlight pointer — the same word the hero button leads with. */
+  tag?: string;
+  /** Spotlight colour (the hero button's) — used only when recommended. */
+  tone?: Tone;
   onOpen: (node: AcademyIsland) => void;
   reducedMotion: boolean;
+}
+
+/** Sparkles that twinkle around the spotlit island (fixed spots, CSS loop). */
+const TWINKLES = [
+  { x: -8, y: 18, s: 14, d: 0 },
+  { x: 104, y: 30, s: 11, d: 0.6 },
+  { x: 96, y: 78, s: 9, d: 1.1 },
+  { x: -2, y: 70, s: 10, d: 1.6 },
+];
+
+/** Two crossed chains over a locked node — ink under-stroke, steel links on top. */
+function Chains() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 100 100" className="pointer-events-none absolute inset-[6%] h-[88%] w-[88%]">
+      {['M14 14 L86 86', 'M86 14 L14 86'].map((d) => (
+        <g key={d}>
+          <path d={d} stroke="#000" strokeWidth={11} strokeLinecap="round" />
+          <path d={d} stroke="#b8bdd6" strokeWidth={6.5} strokeLinecap="round" strokeDasharray="9 5" />
+          <path d={d} stroke="#eef0ff" strokeWidth={2} strokeLinecap="round" strokeDasharray="4 10" opacity={0.8} />
+        </g>
+      ))}
+    </svg>
+  );
 }
 
 export function useNodeLabel(node: AcademyIsland): string {
@@ -79,7 +108,7 @@ function BossRing({ have, need, size }: { have: number; need: number; size: numb
   );
 }
 
-export function AcademyNodeButton({ node, at, index, big, recommended, onOpen, reducedMotion }: Props) {
+export function AcademyNodeButton({ node, at, index, big, recommended, tag, tone = 'gold', onOpen, reducedMotion }: Props) {
   const { t } = useLanguage();
   const sfx = useSoundEffects();
   const osReduced = useReducedMotion();
@@ -88,7 +117,9 @@ export function AcademyNodeButton({ node, at, index, big, recommended, onOpen, r
   const label = useNodeLabel(node);
   const isBoss = node.kind === 'boss';
   const locked = node.state === 'locked';
-  const size = isBoss ? (big ? 124 : 72) : big ? (recommended ? 176 : 150) : recommended ? 92 : 80;
+  const size = isBoss ? (big ? 132 : 78) : big ? (recommended ? 196 : 140) : recommended ? 104 : 74;
+  // Everything that is not the spotlit island (or a live game) stays calm.
+  const calm = !recommended && node.state !== 'live' && !locked;
 
   const aria = isBoss
     ? locked
@@ -110,7 +141,10 @@ export function AcademyNodeButton({ node, at, index, big, recommended, onOpen, r
     onOpen(node);
   };
 
-  const plaqueTone = recommended ? 'gold' : node.state === 'live' ? 'pink' : node.state === 'done' ? 'teal' : 'night';
+  const plaqueTone: Tone = recommended ? tone : node.state === 'live' ? 'pink' : node.state === 'done' ? 'teal' : 'night';
+  const plaqueSize = isBoss
+    ? big ? 'text-sm' : 'text-[11px]'
+    : recommended ? (big ? 'max-w-[20rem] text-lg' : 'max-w-[12rem] text-[13px]') : big ? 'max-w-[16rem] text-sm' : 'max-w-[10rem] text-[11px]';
   const dark = plaqueTone === 'night';
 
   return (
@@ -137,12 +171,23 @@ export function AcademyNodeButton({ node, at, index, big, recommended, onOpen, r
       {recommended && (
         <m.span
           aria-hidden="true"
-          className="absolute -top-9 left-1/2 z-20 -translate-x-1/2 sm:-top-11"
+          data-testid="academy-spotlight-pointer"
+          data-tone={tone}
+          className={cn('absolute left-1/2 z-20 flex -translate-x-1/2 flex-col items-center', tag ? '-top-[3.75rem] sm:-top-16' : '-top-9 sm:-top-11')}
           animate={still ? undefined : { y: [0, -9, 0] }}
           transition={still ? undefined : { duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
         >
+          {tag && (
+            <span
+              dir="auto"
+              className="-mb-1 whitespace-nowrap rounded-full border-2 border-neo-black px-2.5 font-neo-display text-xs font-black uppercase leading-5 tracking-wider text-neo-black sm:text-sm"
+              style={toneStyle(tone, { shadow: 2, trim: 1.5 })}
+            >
+              {tag}
+            </span>
+          )}
           <svg width="34" height="30" viewBox="0 0 34 30" className="drop-shadow-[2px_3px_0_#000]">
-            <path d="M3 3 H31 L17 27 Z" fill="#ffd23a" stroke="#000" strokeWidth="3.5" strokeLinejoin="round" />
+            <path d="M3 3 H31 L17 27 Z" fill={POINTER_FILL[tone] ?? '#ffd23a'} stroke="#000" strokeWidth="3.5" strokeLinejoin="round" />
             <path d="M9 7 H22 L16 17 Z" fill="#fff6b8" opacity="0.8" />
           </svg>
         </m.span>
@@ -179,13 +224,30 @@ export function AcademyNodeButton({ node, at, index, big, recommended, onOpen, r
             className="absolute -inset-[22%] rounded-full"
             style={{
               background:
-                node.state === 'live'
+                node.state === 'live' || tone === 'pink'
                   ? 'radial-gradient(circle, rgba(255,61,154,0.75) 0%, rgba(255,61,154,0.25) 45%, transparent 70%)'
                   : 'radial-gradient(circle, rgba(255,226,90,0.8) 0%, rgba(255,190,40,0.28) 45%, transparent 70%)',
             }}
             animate={still ? undefined : { scale: [0.9, 1.12, 0.9], opacity: [0.75, 1, 0.75] }}
             transition={still ? undefined : { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           />
+        )}
+        {recommended && !still && (
+          <>
+            <style>{'@keyframes academy-twinkle { 0%,100% { transform: scale(.3) rotate(0deg); opacity: 0; } 50% { transform: scale(1) rotate(90deg); opacity: 1; } }'}</style>
+            {TWINKLES.map((tw, i) => (
+              <span
+                key={i}
+                aria-hidden="true"
+                className="pointer-events-none absolute z-10"
+                style={{ left: `${tw.x}%`, top: `${tw.y}%`, width: tw.s * (big ? 1.5 : 1), height: tw.s * (big ? 1.5 : 1), animation: `academy-twinkle 1.8s ease-in-out ${tw.d}s infinite` }}
+              >
+                <svg viewBox="0 0 12 12" className="h-full w-full drop-shadow-[0_0_4px_rgba(255,230,120,0.95)]">
+                  <path d="M6 0 L7.2 4.8 L12 6 L7.2 7.2 L6 12 L4.8 7.2 L0 6 L4.8 4.8 Z" fill="#fff6c2" />
+                </svg>
+              </span>
+            ))}
+          </>
         )}
         {isBoss && node.progress && locked && <BossRing have={node.progress.have} need={node.progress.need} size={size} />}
         <m.div
@@ -203,8 +265,9 @@ export function AcademyNodeButton({ node, at, index, big, recommended, onOpen, r
               sizes={`${size}px`}
               className={cn(
                 'select-none object-contain drop-shadow-[3px_4px_0_rgba(0,0,0,0.75)]',
-                locked && 'brightness-95 saturate-75',
-                node.state === 'waiting' && 'brightness-90 saturate-[.7]',
+                locked && 'brightness-[.55] grayscale-[.85]',
+                calm && 'brightness-[.92] saturate-[.8]',
+                node.state === 'waiting' && 'brightness-[.8] saturate-[.55]',
               )}
               draggable={false}
             />
@@ -233,11 +296,26 @@ export function AcademyNodeButton({ node, at, index, big, recommended, onOpen, r
           </span>
         )}
         {isBoss && locked && (
-          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-            <Medallion tone="night" size={24} shadow={1}>
-              <Lock className="h-3 w-3 text-neo-yellow" strokeWidth={3} />
-            </Medallion>
-          </span>
+          <>
+            <Chains />
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2" data-testid="academy-boss-lock">
+              <Medallion tone="gold" size={big ? 44 : 32} shadow={2}>
+                <Lock className={big ? 'h-5 w-5 text-neo-black' : 'h-4 w-4 text-neo-black'} strokeWidth={3} />
+              </Medallion>
+            </span>
+            {node.progress && (
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-neo-yellow bg-neo-black/80 px-1.5 font-neo-display font-black leading-tight tabular-nums text-neo-yellow',
+                  big ? 'text-xl' : 'text-sm',
+                )}
+                dir="ltr"
+              >
+                {node.progress.have}/{node.progress.need}
+              </span>
+            )}
+          </>
         )}
         {node.state === 'live' && (
           <span
@@ -278,13 +356,14 @@ export function AcademyNodeButton({ node, at, index, big, recommended, onOpen, r
       <span
         dir="auto"
         className={cn(
-          'relative -mt-1 flex max-w-[11rem] items-center gap-1.5 whitespace-nowrap rounded-[10px] border-2 border-neo-black px-2 py-0.5 font-neo-display font-black leading-tight',
-          big ? 'max-w-[18rem] text-sm' : 'text-[11px]',
+          'relative -mt-1 flex items-center gap-1.5 whitespace-nowrap rounded-[10px] border-2 border-neo-black px-2 py-0.5 font-neo-display font-black leading-tight',
+          plaqueSize,
+          locked && 'opacity-90',
           dark ? `text-neo-white ${INK_TEXT}` : 'text-neo-black',
         )}
         style={toneStyle(plaqueTone, { shadow: 2, trim: 1.5 })}
       >
-        <span className="truncate">{label}</span>
+        <span className={isBoss ? 'shrink-0' : 'truncate'}>{label}</span>
         {isBoss && node.progress && (
           <span className={cn('rounded-full px-1.5 tabular-nums', locked ? 'bg-neo-black/60 text-neo-yellow' : 'bg-neo-black text-neo-lime')}>
             {locked

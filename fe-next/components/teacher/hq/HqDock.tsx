@@ -5,9 +5,9 @@ import Link from "next/link";
 import {
   BookOpen,
   FileText,
+  LayoutGrid,
   SlidersHorizontal,
   Sparkles,
-  Wrench,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -15,17 +15,28 @@ import { TeacherLastGameShortcut } from "../TeacherLastGameShortcut";
 import { HqSheet } from "./HqSheet";
 
 /**
- * One dock tile. Cream edge on navy — a black border on navy is ~1.3:1 and
- * reads as no control at all (the dashboard contrast test pins this).
- * Stacked icon-over-label on a phone so six tiles fit one row; a row on desktop.
+ * A compact top-row control on the navy deck. Cream edge — a black border on
+ * navy is ~1.3:1 and reads as no control at all (the contrast test pins this).
  */
-export const DOCK_TILE = cn(
-  "flex h-full min-h-12 w-full min-w-0 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-cream",
-  "bg-neo-navy-light px-1 py-1 text-center font-neo-display text-[0.6rem] font-black uppercase leading-tight text-neo-white",
-  "shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard sm:text-xs lg:min-h-14 lg:flex-row lg:gap-2 lg:px-3 lg:text-sm",
+const TOP_CHIP = cn(
+  "inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-neo border-3 border-neo-cream",
+  "bg-neo-navy-light px-2.5 font-neo-display text-xs font-black uppercase leading-none text-neo-white",
+  "shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard sm:px-3 sm:text-sm lg:min-h-10",
   "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
 );
 
+/**
+ * One tile in the Tools sheet: big, icon over label, cream edge on navy.
+ * Exported so the sheet's four shortcuts share one shape.
+ */
+export const DOCK_TILE = cn(
+  "flex h-full min-h-20 w-full min-w-0 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-neo border-3 border-neo-cream",
+  "bg-neo-navy-light px-2 py-2 text-center font-neo-display text-xs font-black uppercase leading-tight text-neo-white",
+  "shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard sm:text-sm",
+  "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
+);
+
+const TILE_ICON = "size-6 shrink-0";
 const LABEL = "line-clamp-2 min-w-0 break-words";
 
 export interface HqDockProps {
@@ -36,19 +47,26 @@ export interface HqDockProps {
   lessons: ReactNode;
   toolsOpen: boolean;
   onToolsOpenChange: (open: boolean) => void;
-  /** Absent for a profile without teacher access — no tools sheet at all. */
+  /** Class tools body. Absent for a profile without teacher access — the sheet then holds only the shortcuts. */
   tools?: ReactNode;
   /** The Pro ask(s) the route client decided to show; absent = no chip at all. */
   pro?: ReactNode;
   proOpen: boolean;
   onProOpenChange: (open: boolean) => void;
+  className?: string;
 }
 
 /**
- * The bottom rail of Teacher HQ: every secondary surface one tap away, none of
- * them stacked under the hero. Lessons and class tools open as sheets; last
- * game / full setup / reports are the three quick shortcuts; the Pro ask is a
- * small chip, never a block in front of the work.
+ * Teacher HQ's ONE secondary entry point. The shell's tab bar is the nav
+ * (Play · Classes · Library · Reports · Me); a second row of pills beside it
+ * was a duplicate nav. So the deck carries a single "Tools" button (plus the
+ * small Go Pro chip — the Pro impression stays a visible, opt-in ask), and the
+ * Tools sheet opens on four big shortcuts — word lists, last game, full setup,
+ * reports — above the class tools. Every destination: ≤2 taps.
+ *
+ * The lessons sheet has no pill of its own: it is opened from the Tools sheet
+ * or by the `?reviewWords=` deep link. It stays a SIBLING of the Tools sheet —
+ * a closed `<details>` hides its descendants, fixed overlay included.
  */
 export function HqDock({
   classroomCount,
@@ -62,107 +80,120 @@ export function HqDock({
   pro,
   proOpen,
   onProOpenChange,
+  className,
 }: HqDockProps) {
   const { t, language } = useLanguage();
+
+  const openLessons = () => {
+    onToolsOpenChange(false);
+    onLessonsOpenChange(true);
+  };
+
+  // Inside the open sheet, "Last game" jumps to the last-game card below.
+  const openLastGame = () => {
+    onToolsOpenChange(true);
+    requestAnimationFrame(() =>
+      document
+        .querySelector<HTMLElement>('[data-hq-sheet="tools"] [data-testid="last-game-insights"]')
+        ?.scrollIntoView({ block: "start" }),
+    );
+  };
 
   return (
     <div
       data-testid="teacher-dashboard-dock"
-      className="flex shrink-0 items-stretch gap-1.5 sm:gap-2 lg:gap-3"
+      className={cn("flex shrink-0 items-center gap-1.5 sm:gap-2", className)}
     >
       <HqSheet
         testId="teacher-lessons"
         sheetId="lessons"
-        className="flex-1"
+        hideSummary
         open={lessonsOpen}
         onOpenChange={onLessonsOpenChange}
         title={t("teacher.nav.lessons")}
         closeLabel={t("common.close")}
-        summaryClassName={DOCK_TILE}
-        summary={
-          <>
-            <BookOpen
-              className="size-4 shrink-0 text-neo-lime"
-              aria-hidden="true"
-            />
-            <span className={LABEL}>{t("teacher.nav.lessons")}</span>
-          </>
-        }
+        summary={null}
       >
         {lessons}
       </HqSheet>
 
-      {tools ? (
-        <HqSheet
-          testId="teacher-tools"
-          sheetId="tools"
-          className="flex-1"
-          open={toolsOpen}
-          onOpenChange={onToolsOpenChange}
-          title={t("teacher.dashboard.tools")}
-          closeLabel={t("common.close")}
-          summaryClassName={DOCK_TILE}
-          summary={
-            <>
-              <Wrench
-                className="size-4 shrink-0 text-neo-cyan"
-                aria-hidden="true"
-              />
-              <span className={LABEL}>{t("teacher.dashboard.tools")}</span>
-            </>
-          }
-        >
-          {tools}
-        </HqSheet>
-      ) : null}
-
-      <nav
-        data-testid="teacher-shortcuts"
-        aria-label={t("teacher.playNow.shortcutsLabel")}
-        className="contents"
+      <HqSheet
+        testId="teacher-tools"
+        sheetId="tools"
+        open={toolsOpen}
+        onOpenChange={onToolsOpenChange}
+        title={t("teacher.dashboard.tools")}
+        closeLabel={t("common.close")}
+        summaryClassName={TOP_CHIP}
+        summary={
+          <>
+            <LayoutGrid
+              className="size-4 shrink-0 text-neo-cyan"
+              strokeWidth={2.5}
+              aria-hidden="true"
+            />
+            <span className="whitespace-nowrap">
+              {t("teacher.dashboard.tools")}
+            </span>
+          </>
+        }
       >
-        <div className="min-w-0 flex-1 empty:hidden">
-          <TeacherLastGameShortcut
-            classroomCount={classroomCount}
-            onOpen={() => onToolsOpenChange(true)}
+        <nav
+          data-testid="teacher-shortcuts"
+          aria-label={t("teacher.playNow.shortcutsLabel")}
+          className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3"
+        >
+          <button
+            type="button"
+            data-testid="hq-tool-lessons"
+            onClick={openLessons}
             className={DOCK_TILE}
-          />
-        </div>
-        <div className="min-w-0 flex-1">
+          >
+            <BookOpen
+              className={cn(TILE_ICON, "text-neo-lime")}
+              aria-hidden="true"
+            />
+            <span className={LABEL}>{t("teacher.nav.lessons")}</span>
+          </button>
+          {classroomCount > 0 ? (
+            <TeacherLastGameShortcut
+              classroomCount={classroomCount}
+              onOpen={openLastGame}
+              className={cn(DOCK_TILE, "[&>svg]:size-6")}
+            />
+          ) : null}
           <Link
             href={`/${language}/education/classroom-game`}
             data-testid="shortcut-recent"
             className={DOCK_TILE}
           >
             <SlidersHorizontal
-              className="size-4 shrink-0 text-neo-lime"
+              className={cn(TILE_ICON, "text-neo-lime")}
               aria-hidden="true"
             />
             <span className={LABEL}>{t("teacher.playNow.shortcutSetup")}</span>
           </Link>
-        </div>
-        <div className="min-w-0 flex-1">
           <Link
             href={reportsHref}
             data-testid="shortcut-reports"
             className={DOCK_TILE}
           >
             <FileText
-              className="size-4 shrink-0 text-neo-pink"
+              className={cn(TILE_ICON, "text-neo-pink")}
               aria-hidden="true"
             />
             <span className={LABEL}>
               {t("teacher.playNow.shortcutReports")}
             </span>
           </Link>
-        </div>
-      </nav>
+        </nav>
+        {tools}
+      </HqSheet>
 
       {pro ? (
         <HqSheet
           testId="teacher-dashboard-banner"
           sheetId="pro"
-          className="flex-1"
           // The Pro cards fire `iap_viewed` on mount: only a sheet the teacher
           // actually opened may count as an impression.
           mountWhenOpen
@@ -172,14 +203,13 @@ export function HqDock({
           closeLabel={t("common.close")}
           // A visible upgrade ask in its own right (lime, "Go Pro") — the
           // dashboard_banner impression stays a true impression.
-          summaryClassName={cn(
-            DOCK_TILE,
-            "border-neo-black bg-neo-lime text-black",
-          )}
+          summaryClassName={cn(TOP_CHIP, "border-neo-black bg-neo-lime text-black")}
           summary={
             <>
               <Sparkles className="size-4 shrink-0" aria-hidden="true" />
-              <span className={LABEL}>{t("academy.hq.proChip", "Go Pro")}</span>
+              <span className="whitespace-nowrap">
+                {t("academy.hq.proChip", "Go Pro")}
+              </span>
             </>
           }
         >

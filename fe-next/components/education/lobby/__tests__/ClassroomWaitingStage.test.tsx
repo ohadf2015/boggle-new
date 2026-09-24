@@ -111,3 +111,23 @@ describe('ClassroomWaitingStage — the wait is a game, not blank sky', () => {
     expect(screen.getByTestId('classroom-lobby-mascot').className).toMatch(/motion-safe:animate-/);
   });
 });
+
+describe('ClassroomWaitingStage — the crowd fills the stage (round 3)', () => {
+  it('Given classmates, Then a crowd panel counts them beside their faces', () => {
+    render(<ClassroomWaitingStage {...base} classmates={[{ username: 'Maya' }, { username: 'Leo' }, { username: 'Noa' }]} />);
+    const crowd = screen.getByTestId('waiting-crowd');
+    expect(screen.getByTestId('waiting-crowd-count')).toHaveTextContent('2');
+    expect(crowd.querySelectorAll('[data-testid="classmate-face"]')).toHaveLength(2);
+  });
+
+  it('Given nobody else yet, Then the crowd panel still invites them instead of leaving a hole', () => {
+    render(<ClassroomWaitingStage {...base} classmates={[{ username: 'Maya' }]} />);
+    expect(screen.getByTestId('waiting-crowd')).toBeInTheDocument();
+    expect(screen.getByTestId('waiting-crowd-count')).toHaveTextContent('0');
+  });
+
+  it('spreads the stage evenly instead of parking one gap in the middle', () => {
+    render(<ClassroomWaitingStage {...base} />);
+    expect(screen.getByTestId('waiting-spotlight').className).toContain('justify-evenly');
+  });
+});

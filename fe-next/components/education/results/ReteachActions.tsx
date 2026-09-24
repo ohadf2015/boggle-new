@@ -25,6 +25,8 @@ import {
   QrCode,
   Share2,
   ChevronDown,
+  ChevronUp,
+  MoreHorizontal,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ReteachLinks } from './useReteachLinks';
@@ -38,9 +40,60 @@ export interface ReteachActionsProps {
   links: ReteachLinks;
   onReteach?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  /**
+   * `stack` (default, the phone card): the pink reteach round is its own
+   * button and the rest fold below it. `more` (the projector wall): Play again
+   * is the wall's ONE loud action, so the reteach round folds in too, behind a
+   * single quiet "More" control whose panel opens upward over the recap.
+   */
+  variant?: 'stack' | 'more';
 }
 
-export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
+export function ReteachActions({ links, onReteach, t, variant = 'stack' }: ReteachActionsProps) {
+  if (variant === 'more') {
+    return (
+      <details data-testid="reteach-more" className="group relative">
+        <summary
+          data-testid="reteach-more-actions"
+          className={cn(
+            'flex cursor-pointer list-none items-center gap-2 rounded-neo px-4 py-2 [&::-webkit-details-marker]:hidden',
+            'border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream shadow-hard-sm',
+            'font-neo-display text-base font-black uppercase tracking-wide lg:text-xl',
+            'hover:bg-neo-purple/30 transition-colors'
+          )}
+        >
+          <MoreHorizontal className="size-5 shrink-0 lg:size-6" aria-hidden />
+          {t('common.more')}
+          <ChevronUp className="size-4 shrink-0 transition-transform group-open:rotate-180 lg:size-5" aria-hidden />
+        </summary>
+        <div
+          data-testid="reteach-more-panel"
+          className="absolute bottom-full start-0 z-30 mb-2 w-[min(40rem,calc(100vw-2rem))] rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard-lg"
+        >
+          <p className="mb-2 font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream lg:text-base">
+            {t('education.results.moreWaysToReteach')}
+          </p>
+          {onReteach && (
+            <button
+              type="button"
+              data-testid="play-reteach-round"
+              onClick={onReteach}
+              className={cn(
+                'mb-2 w-full flex items-center justify-center gap-2 px-4 py-3 font-neo-display font-bold text-base',
+                'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
+                'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+              )}
+            >
+              <Play className="w-5 h-5" aria-hidden />
+              {t('education.results.playReteachRound')}
+            </button>
+          )}
+          <ReteachOptionGrid links={links} t={t} />
+        </div>
+      </details>
+    );
+  }
+
   return (
     <div className="mt-3">
       {onReteach && (
@@ -76,144 +129,154 @@ export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
           <ChevronDown className="w-5 h-5 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
         </summary>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3">
-          {links.canLaunchMissGapQuestionPack && (
-            <button
-              type="button"
-              data-testid="launch-miss-gap-question-pack-live"
-              onClick={links.onLaunchMissGapQuestionPack}
-              className={cn(ACTION, 'bg-neo-lime sm:col-span-2')}
-            >
-              <ListChecks className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.launchMissGapQuestionPackLive')}
-            </button>
-          )}
-          {links.unpluggedReteachHref && (
-            <Link
-              href={links.unpluggedReteachHref}
-              data-testid="start-unplugged-reteach-live"
-              className={cn(ACTION, 'bg-neo-pink/90')}
-            >
-              <Play className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.startUnpluggedReteachLive')}
-            </Link>
-          )}
-          {links.classicUnpluggedHref && (
-            <Link
-              href={links.classicUnpluggedHref}
-              data-testid="start-classic-unplugged"
-              className={cn(ACTION, 'bg-neo-cyan')}
-            >
-              <MonitorPlay className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.startClassicUnplugged')}
-            </Link>
-          )}
-          {links.teamTilesUnpluggedHref && (
-            <Link
-              href={links.teamTilesUnpluggedHref}
-              data-testid="start-team-tiles-unplugged"
-              className={cn(ACTION, 'bg-neo-yellow')}
-            >
-              <LayoutGrid className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.startTeamTilesUnplugged')}
-            </Link>
-          )}
-          {links.missGapAsyncAssignHref && (
-            <Link
-              href={links.missGapAsyncAssignHref}
-              data-testid="assign-miss-gap-async-homework"
-              className={cn(ACTION, 'bg-neo-pink')}
-            >
-              <ClipboardList className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.assignMissGapAsyncHomework')}
-            </Link>
-          )}
-          {links.googleClassroomReteachHref && (
-            <a
-              href={links.googleClassroomReteachHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="post-reteach-google-classroom"
-              className={cn(ACTION, 'bg-neo-white')}
-            >
-              <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.postReteachGoogleClassroom')}
-            </a>
-          )}
-          {links.googleClassroomAssignHref && (
-            <a
-              href={links.googleClassroomAssignHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="assign-practice-google-classroom"
-              className={cn(ACTION, 'bg-neo-cyan')}
-            >
-              <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.assignPracticeGoogleClassroom')}
-            </a>
-          )}
-          {links.googleClassroomLiveAssignHref && (
-            <a
-              href={links.googleClassroomLiveAssignHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="assign-miss-gap-live-google-classroom"
-              className={cn(ACTION, 'bg-neo-lime')}
-            >
-              <Play className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.assignMissGapLiveGoogleClassroom')}
-            </a>
-          )}
-          {links.googleClassroomUnpluggedAssignHref && (
-            <a
-              href={links.googleClassroomUnpluggedAssignHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="assign-unplugged-google-classroom"
-              className={cn(ACTION, 'bg-neo-yellow')}
-            >
-              <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.assignUnpluggedGoogleClassroom')}
-            </a>
-          )}
-          <button
-            type="button"
-            data-testid="print-missed-words-practice-sheet"
-            onClick={links.onPrintPracticeSheet}
-            className={cn(ACTION, 'bg-neo-cream')}
-          >
-            <Printer className="w-4 h-4 shrink-0" aria-hidden />
-            {t('education.results.printPracticeSheet')}
-          </button>
-          <button
-            type="button"
-            data-testid="print-unplugged-reteach-pack"
-            onClick={links.onPrintUnpluggedPack}
-            className={cn(ACTION, 'bg-neo-cyan')}
-          >
-            <QrCode className="w-4 h-4 shrink-0" aria-hidden />
-            {t('education.results.printUnpluggedReteachPack')}
-          </button>
-          <button
-            type="button"
-            data-testid="share-miss-gap-practice"
-            onClick={links.onShareMissGapPractice}
-            className={cn(ACTION, 'bg-neo-white')}
-          >
-            {links.missGapShareState === 'idle' ? (
-              <>
-                <Share2 className="w-4 h-4 shrink-0" aria-hidden />
-                {t('education.results.shareMissGapPractice')}
-              </>
-            ) : (
-              <>
-                <Check className="w-4 h-4 shrink-0" aria-hidden />
-                {t('education.results.shareMissGapPracticeCopied')}
-              </>
-            )}
-          </button>
-        </div>
+        <ReteachOptionGrid links={links} t={t} className="p-3" />
       </details>
+    </div>
+  );
+}
+
+function ReteachOptionGrid({
+  links,
+  t,
+  className,
+}: Pick<ReteachActionsProps, 'links' | 't'> & { className?: string }) {
+  return (
+    <div className={cn('grid grid-cols-1 sm:grid-cols-2 gap-2', className)}>
+      {links.canLaunchMissGapQuestionPack && (
+        <button
+          type="button"
+          data-testid="launch-miss-gap-question-pack-live"
+          onClick={links.onLaunchMissGapQuestionPack}
+          className={cn(ACTION, 'bg-neo-lime sm:col-span-2')}
+        >
+          <ListChecks className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.launchMissGapQuestionPackLive')}
+        </button>
+      )}
+      {links.unpluggedReteachHref && (
+        <Link
+          href={links.unpluggedReteachHref}
+          data-testid="start-unplugged-reteach-live"
+          className={cn(ACTION, 'bg-neo-pink/90')}
+        >
+          <Play className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.startUnpluggedReteachLive')}
+        </Link>
+      )}
+      {links.classicUnpluggedHref && (
+        <Link
+          href={links.classicUnpluggedHref}
+          data-testid="start-classic-unplugged"
+          className={cn(ACTION, 'bg-neo-cyan')}
+        >
+          <MonitorPlay className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.startClassicUnplugged')}
+        </Link>
+      )}
+      {links.teamTilesUnpluggedHref && (
+        <Link
+          href={links.teamTilesUnpluggedHref}
+          data-testid="start-team-tiles-unplugged"
+          className={cn(ACTION, 'bg-neo-yellow')}
+        >
+          <LayoutGrid className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.startTeamTilesUnplugged')}
+        </Link>
+      )}
+      {links.missGapAsyncAssignHref && (
+        <Link
+          href={links.missGapAsyncAssignHref}
+          data-testid="assign-miss-gap-async-homework"
+          className={cn(ACTION, 'bg-neo-pink')}
+        >
+          <ClipboardList className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.assignMissGapAsyncHomework')}
+        </Link>
+      )}
+      {links.googleClassroomReteachHref && (
+        <a
+          href={links.googleClassroomReteachHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="post-reteach-google-classroom"
+          className={cn(ACTION, 'bg-neo-white')}
+        >
+          <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.postReteachGoogleClassroom')}
+        </a>
+      )}
+      {links.googleClassroomAssignHref && (
+        <a
+          href={links.googleClassroomAssignHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="assign-practice-google-classroom"
+          className={cn(ACTION, 'bg-neo-cyan')}
+        >
+          <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.assignPracticeGoogleClassroom')}
+        </a>
+      )}
+      {links.googleClassroomLiveAssignHref && (
+        <a
+          href={links.googleClassroomLiveAssignHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="assign-miss-gap-live-google-classroom"
+          className={cn(ACTION, 'bg-neo-lime')}
+        >
+          <Play className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.assignMissGapLiveGoogleClassroom')}
+        </a>
+      )}
+      {links.googleClassroomUnpluggedAssignHref && (
+        <a
+          href={links.googleClassroomUnpluggedAssignHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="assign-unplugged-google-classroom"
+          className={cn(ACTION, 'bg-neo-yellow')}
+        >
+          <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.assignUnpluggedGoogleClassroom')}
+        </a>
+      )}
+      <button
+        type="button"
+        data-testid="print-missed-words-practice-sheet"
+        onClick={links.onPrintPracticeSheet}
+        className={cn(ACTION, 'bg-neo-cream')}
+      >
+        <Printer className="w-4 h-4 shrink-0" aria-hidden />
+        {t('education.results.printPracticeSheet')}
+      </button>
+      <button
+        type="button"
+        data-testid="print-unplugged-reteach-pack"
+        onClick={links.onPrintUnpluggedPack}
+        className={cn(ACTION, 'bg-neo-cyan')}
+      >
+        <QrCode className="w-4 h-4 shrink-0" aria-hidden />
+        {t('education.results.printUnpluggedReteachPack')}
+      </button>
+      <button
+        type="button"
+        data-testid="share-miss-gap-practice"
+        onClick={links.onShareMissGapPractice}
+        className={cn(ACTION, 'bg-neo-white')}
+      >
+        {links.missGapShareState === 'idle' ? (
+          <>
+            <Share2 className="w-4 h-4 shrink-0" aria-hidden />
+            {t('education.results.shareMissGapPractice')}
+          </>
+        ) : (
+          <>
+            <Check className="w-4 h-4 shrink-0" aria-hidden />
+            {t('education.results.shareMissGapPracticeCopied')}
+          </>
+        )}
+      </button>
     </div>
   );
 }

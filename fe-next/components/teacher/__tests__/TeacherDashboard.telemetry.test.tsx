@@ -89,11 +89,14 @@ describe('<TeacherDashboard> telemetry', () => {
     classroomState = { classrooms: twoClasses, isLoading: false, error: null, refresh: vi.fn() };
     proState = freePro;
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('pro-gate')).toHaveAttribute('data-active', 'false');
+    // Every paywall on the sheet (analytics + missed-words homework) — none may count a closed sheet.
+    const closedGates = screen.getAllByTestId('pro-gate');
+    expect(closedGates.length).toBeGreaterThan(0);
+    closedGates.forEach((g) => expect(g).toHaveAttribute('data-active', 'false'));
 
     openTools();
 
     expect(toolsOpened).toHaveBeenCalledWith({ classroomCount: 2, studentCount: 7, hasPro: false });
-    expect(screen.getByTestId('pro-gate')).toHaveAttribute('data-active', 'true');
+    screen.getAllByTestId('pro-gate').forEach((g) => expect(g).toHaveAttribute('data-active', 'true'));
   });
 });

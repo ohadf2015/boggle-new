@@ -78,9 +78,15 @@ export interface ClassroomTvResultsProps {
   /** Restages the same list in the same room. Hidden when the host has none. */
   onRematch?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  /**
+   * Paint the finished reveal at once (no drumroll). Only the dev preview's
+   * `&settled=1` sets it, so a static capture shows the winner on #1; a real
+   * round always plays the reveal.
+   */
+  revealSettled?: boolean;
 }
 
-export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResultsProps) {
+export function ClassroomTvResults({ summary, onRematch, t, revealSettled = false }: ClassroomTvResultsProps) {
   // This screen only mounts for the non-playing classroom host. The inputs
   // are that fact. The predicate still calls hostLeavesProjectorRecap, so if
   // that rule starts sending this host to ResultsPage the wall drops the
@@ -109,7 +115,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
   // in-game body class ever protected it. It raises the quiet zone itself.
   useOverlayQuietZoneClaim(true, 'classroom-tv-results');
 
-  const stage = useRoundEndReveal(true);
+  const stage = useRoundEndReveal(!revealSettled);
   // Discounts the lesson words the board never carried. Without that, a sweep
   // was arithmetically impossible on any partial board — see lib/education/
   // roundEndSweep — which is why this burst has never been seen.
@@ -159,7 +165,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
       data-round-end-stage={stage}
       className="h-full overflow-y-auto lg:overflow-hidden flex flex-col gap-2 lg:gap-3 bg-neo-navy text-neo-white"
     >
-      <header className="shrink-0 flex flex-wrap items-baseline justify-center gap-x-4">
+      <header className="shrink-0 max-lg:mt-auto flex flex-wrap items-baseline justify-center gap-x-4">
         <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-lg md:text-2xl">
           {t('education.results.podium.title')}
         </p>
@@ -180,7 +186,7 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
         // the coverage list squeezed to a height of literally zero. Tailwind
         // emits arbitrary values only from class strings it can see, and a
         // results screen is the worst place to find out it could not.
-        className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-4 lg:flex-1 lg:min-h-0"
+        className="grid grid-cols-1 lg:grid-cols-5 gap-2 lg:gap-4 lg:flex-1 lg:min-h-0 max-lg:mb-auto"
       >
         {/* `relative` only so the celebration can be bounded to this column.
             It falls over the podium and the winner bar, never over the
@@ -297,55 +303,63 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
                 </button>
               )}
 
-              {showTeacherFollowUp && summary.missedWords.length > 0 && (
-                <div data-testid="classroom-tv-reteach">
-                  <ReteachActions links={links} onReteach={handleReteach} t={t} />
-                </div>
-              )}
+              {/* Everything after Play again is SECONDARY and shares one row:
+                  every reteach option behind a single "More", the momentum
+                  chips, and the quiet Pro ask — never a second loud button. */}
+              <div
+                data-testid="tv-secondary-row"
+                className="flex flex-wrap items-center justify-center gap-2 lg:gap-3"
+              >
+                {showTeacherFollowUp && summary.missedWords.length > 0 && (
+                  <div data-testid="classroom-tv-reteach">
+                    <ReteachActions links={links} onReteach={handleReteach} t={t} variant="more" />
+                  </div>
+                )}
 
-              {/* Momentum, not decoration: a room that can see it is on round
-                  three plays round four. Both chips are silent in round one. */}
-              {(roundNumber > 1 || sweepStreak > 1) && (
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  {roundNumber > 1 && (
-                    <span
-                      data-testid="classroom-tv-round"
-                      className="px-4 py-2 rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream font-neo-display font-bold text-xl shadow-hard-sm"
-                    >
-                      {t('education.results.moment.roundOfSession', { round: roundNumber })}
-                    </span>
-                  )}
-                  {sweepStreak > 1 && (
-                    <span
-                      data-testid="classroom-tv-sweep-streak"
-                      className="flex items-center gap-2 px-4 py-2 rounded-neo border-[2px] border-neo-black bg-neo-orange text-neo-black font-neo-display font-black text-xl shadow-hard-sm"
-                    >
-                      <Flame className="w-6 h-6 shrink-0" aria-hidden />
-                      {t('education.results.moment.sweepStreak', { count: sweepStreak })}
-                    </span>
-                  )}
-                </div>
-              )}
+                {/* Momentum, not decoration: a room that can see it is on round
+                    three plays round four. Both chips are silent in round one. */}
+                {roundNumber > 1 && (
+                  <span
+                    data-testid="classroom-tv-round"
+                    className="px-3 py-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream font-neo-display font-bold text-sm lg:px-4 lg:py-2 lg:text-xl shadow-hard-sm"
+                  >
+                    {t('education.results.moment.roundOfSession', { round: roundNumber })}
+                  </span>
+                )}
+                {sweepStreak > 1 && (
+                  <span
+                    data-testid="classroom-tv-sweep-streak"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-neo border-[2px] border-neo-black bg-neo-orange text-neo-black font-neo-display font-black text-sm lg:px-4 lg:py-2 lg:text-xl shadow-hard-sm"
+                  >
+                    <Flame className="w-5 h-5 shrink-0 lg:w-6 lg:h-6" aria-hidden />
+                    {t('education.results.moment.sweepStreak', { count: sweepStreak })}
+                  </span>
+                )}
 
-              {/* No onRematch: this wall already has the loud Rematch above.
-                  The shared component still owns the Pro check, so a free
-                  teacher gets the upgrade ask and a Pro teacher gets the
-                  report — the same branch the phone card uses.
-                  LAST, small and unfilled, and it pops in only after the
-                  celebration beat (5.8s = the reveal's `done`): the room's
-                  moment is the winner and Play again, never a price tag.
-                  Transform-only arrival on a small element (never an
-                  opacity fade, Class 5); static under reduced motion. The
-                  mount — and so the impression — is unchanged. */}
-              {showTeacherFollowUp && (
-                <div
-                  data-testid="tv-followup-after-celebration"
-                  className="flex justify-center motion-safe:animate-[lc-quiet-arrive_360ms_ease-out_5.8s_both]"
-                >
-                  <style>{`@keyframes lc-quiet-arrive{0%{transform:scale(0)}70%{transform:scale(1.06)}100%{transform:scale(1)}}`}</style>
-                  <ResultsPrimaryActions language={language} t={t} surface="projector" tone="quiet" />
-                </div>
-              )}
+                {/* No onRematch: this wall already has the loud Rematch above.
+                    The shared component still owns the Pro check, so a free
+                    teacher gets the upgrade ask and a Pro teacher gets the
+                    report — the same branch the phone card uses.
+                    LAST, small and unfilled, and it pops in only after the
+                    celebration beat (5.8s = the reveal's `done`): the room's
+                    moment is the winner and Play again, never a price tag.
+                    Transform-only arrival on a small element (never an
+                    opacity fade, Class 5); static under reduced motion or a
+                    settled reveal. The mount — and so the impression — is
+                    unchanged. */}
+                {showTeacherFollowUp && (
+                  <div
+                    data-testid="tv-followup-after-celebration"
+                    className={cn(
+                      'flex justify-center',
+                      !revealSettled && 'motion-safe:animate-[lc-quiet-arrive_360ms_ease-out_5.8s_both]'
+                    )}
+                  >
+                    <style>{`@keyframes lc-quiet-arrive{0%{transform:scale(0)}70%{transform:scale(1.06)}100%{transform:scale(1)}}`}</style>
+                    <ResultsPrimaryActions language={language} t={t} surface="projector" tone="quiet" />
+                  </div>
+                )}
+              </div>
             </div>
           ) : null}
         </div>

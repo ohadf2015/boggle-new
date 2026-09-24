@@ -11,6 +11,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 const push = vi.fn();
 const deepLink = { reviewWords: [] as string[] };
+let search = new URLSearchParams();
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -32,7 +33,7 @@ vi.mock('@/hooks/useClassroom', () => ({
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
   usePathname: () => '/en/teacher',
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => search,
 }));
 vi.mock('@/hooks/useTeacherDashboardDeepLink', () => ({ useTeacherDashboardDeepLink: () => deepLink }));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => <div /> }));
@@ -78,6 +79,7 @@ describe('<TeacherDashboard> — Teacher HQ deck', () => {
     push.mockClear();
     sessionStorage.clear();
     deepLink.reviewWords = [];
+    search = new URLSearchParams();
   });
 
   it('Given two classes, Then the first class is preselected and its code is on the deck', () => {
@@ -106,7 +108,7 @@ describe('<TeacherDashboard> — Teacher HQ deck', () => {
     expect(screen.getByRole('dialog', { name: 'academy.hq.projectorTitle' })).toBeInTheDocument();
   });
 
-  it('Given no review deep link, Then lessons sit behind a closed sheet, one tap away', () => {
+  it('Given no review deep link, Then lessons sit behind a closed sheet, two taps away (Tools → Word lists)', () => {
     render(<TeacherDashboard />);
     const lessons = screen.getByTestId('teacher-lessons');
     expect(lessons.tagName).toBe('DETAILS');
@@ -133,5 +135,38 @@ describe('<TeacherDashboard> — Teacher HQ deck', () => {
     expect(dock.contains(screen.getByTestId('teacher-lessons'))).toBe(true);
     expect(dock.contains(screen.getByTestId('teacher-tools'))).toBe(true);
     expect(dock.contains(screen.getByTestId('teacher-shortcuts'))).toBe(true);
+  });
+
+  // Round 2 (critic cp1): a row of tool pills (Library / Class tools / Last
+  // game / Full setup / Reports) sat right above the shell's tab bar, which
+  // already carries Library and Reports — two nav systems. The tab bar stays
+  // the one nav; everything else sits behind ONE Tools sheet (≤2 taps).
+  it('Given the shell tab bar, Then the tool shortcuts sit behind one Tools sheet, not a visible row', () => {
+    render(<TeacherDashboard />);
+    const tools = screen.getByTestId('teacher-tools');
+    expect(tools.contains(screen.getByTestId('teacher-shortcuts'))).toBe(true);
+    // The lessons sheet keeps its deep link, but has no pill of its own.
+    expect(screen.getByTestId('teacher-lessons').querySelector('summary')).toHaveAttribute('hidden');
+  });
+
+  it('When Tools → Word lists is tapped, Then the lessons sheet opens (2 taps)', () => {
+    render(<TeacherDashboard />);
+    fireEvent.click(screen.getByTestId('teacher-tools').querySelector('summary') as HTMLElement);
+    fireEvent.click(screen.getByTestId('hq-tool-lessons'));
+    expect(screen.getByTestId('teacher-lessons')).toHaveAttribute('open');
+    expect(screen.getByTestId('teacher-tools')).not.toHaveAttribute('open');
+  });
+
+  it('Given ?classroomId= from a class card, Then that class is preselected', () => {
+    search = new URLSearchParams('classroomId=c2');
+    render(<TeacherDashboard />);
+    expect(screen.getByTestId('class-switch-c2')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('hq-join-code')).toHaveTextContent('BBB222');
+  });
+
+  it('Given ?classroomId= for a class that is not theirs, Then it falls back to the first class', () => {
+    search = new URLSearchParams('classroomId=nope');
+    render(<TeacherDashboard />);
+    expect(screen.getByTestId('class-switch-c1')).toHaveAttribute('aria-pressed', 'true');
   });
 });

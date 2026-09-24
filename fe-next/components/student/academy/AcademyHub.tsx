@@ -34,11 +34,12 @@ import { buildAcademyIslands, pickNextAction, type AcademyIsland } from './acade
 import { useAcademyData } from './useAcademyData';
 import { AcademyHud } from './AcademyHud';
 import { AcademyMap, useMapLayout } from './AcademyMap';
-import { AcademyCta } from './AcademyCta';
+import { AcademyCta, ctaTone, useCtaOverline } from './AcademyCta';
+import { AcademySidePanel } from './AcademySidePanel';
 import { AcademyDock } from './AcademyDock';
 import { DailyChest } from './DailyChest';
 import { ClassSheet } from './ClassSheet';
-import { InkPanel, Ribbon, INK_TEXT } from './chrome';
+import { InkPanel } from './chrome';
 import { useNodeLabel } from './AcademyNodeButton';
 
 export interface AcademyHubProps {
@@ -72,6 +73,22 @@ function LiveGameBridge({ classroomId, onChange }: { classroomId: string; onChan
 
 type Note = { kind: 'arena' } | { kind: 'boss'; left: number } | null;
 
+/** A real desktop: wide AND tall enough for the side card (a phone on its side is not). */
+const WIDE_QUERY = '(min-width: 1024px) and (min-height: 600px) and (min-aspect-ratio: 1/1)';
+
+function useWideScreen(): boolean {
+  const read = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(WIDE_QUERY).matches;
+  const [wide, setWide] = useState<boolean>(read);
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia(WIDE_QUERY);
+    const onChange = () => setWide(mq.matches);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
+  }, []);
+  return wide;
+}
+
 export function AcademyHub(props: AcademyHubProps) {
   const { userId, studentName, classroomId, classroomName, level, avatarConfig, profileXp, isGuest, onSignOut, classroomLoading } = props;
   const { t, language, dir } = useLanguage();
@@ -80,6 +97,7 @@ export function AcademyHub(props: AcademyHubProps) {
   const prefersReduced = useReducedMotion();
   const reducedMotion = reducedEffects || !!prefersReduced;
   const layout = useMapLayout();
+  const wide = useWideScreen();
   const [classOpen, setClassOpen] = useState(false);
   const [grantedXp, setGrantedXp] = useState<number | null>(null);
   const [live, setLive] = useState<LiveState>(NO_LIVE);
@@ -129,6 +147,7 @@ export function AcademyHub(props: AcademyHubProps) {
   );
   const action = pickNextAction({ hasClass: !!classroomId, live: isLive, islands, boss });
   const target = [...islands, ...(boss ? [boss] : [])].find((n) => n.key === action.nodeKey);
+  const spotlightTag = useCtaOverline(action.kind);
   const targetLabel = useNodeLabel(target ?? { key: 'none', kind: 'lesson', type: 'lesson', state: 'open', stars: 0, mastery: 0 });
 
   // Pessimistic until every source answers: a student with a class must never
@@ -156,6 +175,16 @@ export function AcademyHub(props: AcademyHubProps) {
     [join, router],
   );
 
+  const pageTitle = classroomName ?? (ready ? t('academy.student.title', 'Word Academy') : null);
+  const chest = (
+    <DailyChest
+      userId={userId}
+      reducedMotion={reducedMotion}
+      size={wide ? 'md' : 'sm'}
+      onGranted={(xp) => xp != null && setGrantedXp(xp)}
+    />
+  );
+
   const goSolo = () => router.push(`/${language}/quick-play`);
 
   const pressCta = () => {
@@ -180,12 +209,14 @@ export function AcademyHub(props: AcademyHubProps) {
           islands={ready ? islands : []}
           boss={ready ? boss : null}
           recommendedKey={ready ? action.nodeKey : null}
+          spotlightTag={spotlightTag}
+          spotlightTone={ctaTone(action.kind)}
           onOpen={openNode}
           reducedMotion={reducedMotion}
         />
       </main>
 
-      {/* Top: HUD plaque, then the class pennant and the daily chest. */}
+      {/* Top: ONE integrated HUD (who, class, level/XP, streak + stars in one tray). */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] sm:px-6 sm:pt-4">
         <div className="pointer-events-auto">
           <AcademyHud
@@ -198,19 +229,17 @@ export function AcademyHub(props: AcademyHubProps) {
             isGuest={isGuest}
             onSignOut={onSignOut}
             reducedMotion={reducedMotion}
+            title={pageTitle}
+            wide={wide}
           />
         </div>
-        <div className="mx-auto mt-2 flex w-full max-w-3xl items-start justify-between gap-2 lg:max-w-none">
-          <Ribbon tone="pink" className="pointer-events-auto min-w-0 max-w-[70%]">
-            <h1 dir="auto" className={`truncate font-neo-display text-sm font-black uppercase tracking-wide text-neo-white sm:text-lg ${INK_TEXT}`}>
-              {classroomName ?? (ready ? t('academy.student.title', 'Word Academy') : '\u00a0')}
-            </h1>
-          </Ribbon>
-          <p className="sr-only">{t('student.dashboard.greeting', { name: studentName })}</p>
-          <div className="pointer-events-auto shrink-0">
-            <DailyChest userId={userId} reducedMotion={reducedMotion} onGranted={(xp) => xp != null && setGrantedXp(xp)} />
+        <p className="sr-only">{t('student.dashboard.greeting', { name: studentName })}</p>
+        {/* Phone: the chest is a small badge on the START side, away from the totals (end). */}
+        {!wide && (
+          <div className="pointer-events-auto mt-3 flex">
+            <div className="ms-1">{chest}</div>
           </div>
-        </div>
+        )}
       </div>
 
       <AnimatePresence>
@@ -223,7 +252,7 @@ export function AcademyHub(props: AcademyHubProps) {
             animate={{ y: 0, scale: 1 }}
             exit={{ y: -8, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-            className="absolute inset-x-3 top-[9.5rem] z-30 mx-auto max-w-sm sm:top-40"
+            className="absolute inset-x-3 top-[8.5rem] z-30 mx-auto max-w-sm sm:top-36"
           >
             {reward ? (
               <InkPanel tone="lime" className="flex items-center justify-center gap-2 px-4 py-2 font-neo-display font-black text-neo-black">
@@ -257,10 +286,26 @@ export function AcademyHub(props: AcademyHubProps) {
         )}
       </AnimatePresence>
 
-      {/* Bottom: the ONE hero action, then the dock. */}
+      {/* Bottom. Phone: the ONE hero action over the dock. Desktop: side card
+          (start) · hero centred · dock (end), all over the cloud band. */}
       <div className="absolute inset-x-0 bottom-0 z-20 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] sm:px-6 sm:pb-5">
-        <div className="mx-auto flex w-full max-w-xl flex-col gap-2.5 lg:max-w-5xl lg:flex-row lg:items-end lg:gap-4">
-          <div className="lg:flex-[3]">
+        <div
+          className={
+            wide
+              ? 'grid w-full grid-cols-[minmax(0,1fr)_minmax(0,40rem)_minmax(0,1fr)] items-end gap-5'
+              : 'mx-auto flex w-full max-w-xl flex-col gap-2.5'
+          }
+        >
+          {wide && (
+            <div className="justify-self-start">
+              {ready && pageTitle ? (
+                <AcademySidePanel title={pageTitle} streak={data.streak} boss={boss} chest={chest} />
+              ) : (
+                chest
+              )}
+            </div>
+          )}
+          <div className={wide ? 'w-full' : undefined}>
             {ready ? (
               <AcademyCta
                 kind={action.kind}
@@ -271,6 +316,7 @@ export function AcademyHub(props: AcademyHubProps) {
                 joinError={joinError}
                 onPress={pressCta}
                 reducedMotion={reducedMotion}
+                big={wide}
               />
             ) : (
               <div
@@ -280,12 +326,13 @@ export function AcademyHub(props: AcademyHubProps) {
               />
             )}
           </div>
-          <div className="lg:flex-[2]">
+          <div className={wide ? 'w-full max-w-[30rem] justify-self-end' : undefined}>
             <AcademyDock
               locale={language}
               reviewCount={data.reviewCount}
               onOpenClass={classroomId ? () => setClassOpen(true) : undefined}
               onSolo={ready && action.kind !== 'solo' ? goSolo : undefined}
+              big={wide}
             />
           </div>
         </div>

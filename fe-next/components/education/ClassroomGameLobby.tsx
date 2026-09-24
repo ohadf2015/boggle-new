@@ -376,6 +376,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
           selected={gameMode}
           recommended={recommended}
           minutes={roundMinutes}
+          roundFacts={{ vocabQuizQuestionCount, vocabQuizSeconds, boardSize, minWordLength }}
           busy={isStarting}
           blockedKey={blockedKey}
           expanded={modesExpanded}

@@ -48,6 +48,7 @@ import {
 } from '@/lib/education/telemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { GetStudentsInCard } from './hq/GetStudentsInCard';
+import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
 import { HqDock } from './hq/HqDock';
 import { HqToolsContent } from './hq/HqToolsContent';
@@ -100,7 +101,10 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
   } = useTeacherPro();
   // Back from Polar checkout: the webhook can land seconds after the redirect —
   // keep re-reading rather than greet a teacher who just paid with "Upgrade".
-  const checkoutSuccess = useSearchParams()?.get('checkout') === 'success';
+  const searchParams = useSearchParams();
+  const checkoutSuccess = searchParams?.get('checkout') === 'success';
+  // "Start game" on a Classes card lands here with its class preselected.
+  const requestedClassroomId = searchParams?.get('classroomId') ?? null;
   useEffect(() => {
     if (!checkoutSuccess || proLoading || hasPro) return;
     let tries = 0;
@@ -133,9 +137,12 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
 
   useEffect(() => {
     if (classrooms.length >= 1 && !selectedClassroomId) {
-      setSelectedClassroomId(classrooms[0].id);
+      // Resolved in the same step as the default, never as a second pick that
+      // lands later (pitfall class 1). A foreign/stale id falls back.
+      const requested = classrooms.find((c) => c.id === requestedClassroomId);
+      setSelectedClassroomId((requested ?? classrooms[0]).id);
     }
-  }, [classrooms, selectedClassroomId]);
+  }, [classrooms, selectedClassroomId, requestedClassroomId]);
 
   // Derived, not a second piece of state (pitfall class 1).
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId) ?? null;
@@ -189,6 +196,7 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
 
   const closeProjector = useCallback(() => setProjectorOpen(false), []);
 
+  const hasProChip = !!(banner || usagePrompt);
   const firstRun = !classroomsLoading && (classrooms.length === 0 || !!newlyCreatedJoinCode);
 
   return (
@@ -232,23 +240,50 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
         className={cn(
           'relative mx-auto flex h-full min-h-0 w-full max-w-[1640px] flex-col gap-2 px-3 py-2',
           'sm:gap-3 sm:px-5 sm:py-3',
-          'lg:grid lg:grid-cols-5 lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:gap-4 lg:px-8 lg:py-4',
+          'lg:grid lg:grid-cols-5 lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-4 lg:px-8 lg:py-4',
         )}
       >
-        <div className="flex min-h-9 shrink-0 items-center gap-2 lg:col-span-5">
-          {!classroomsLoading && classrooms.length > 1 ? (
-            <ClassSwitcher
-              className="flex-nowrap overflow-x-auto pb-1 [scrollbar-width:none]"
-              classrooms={classrooms}
-              selectedId={selectedClassroomId}
-              onSelect={setSelectedClassroomId}
-              studentLimit={hasPro ? undefined : FREE_TIER_LIMITS.studentsPerClass}
-            />
-          ) : selectedClassroom ? (
-            <span className="inline-flex min-h-9 max-w-full items-center rounded-neo border-3 border-black bg-neo-cyan px-3 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm">
-              <span className="truncate">{selectedClassroom.name}</span>
-            </span>
-          ) : null}
+        {/* Top row: which class, and the ONE Tools entry (+ Go Pro chip).
+            The shell's tab bar is the nav; nothing else competes with it. The
+            dock sits in this row's end but is rendered LAST, so keyboard and
+            screen-reader order still meet START before any secondary surface. */}
+        <div className="flex min-h-9 shrink-0 items-center gap-2 lg:col-span-5 lg:min-h-10">
+          {/* `contain: inline-size` — a long class name must truncate here, not
+              widen the whole shell column past a 390px phone. */}
+          <div className="min-w-0 flex-1 [contain:inline-size]">
+            {classroomsLoading ? (
+              // The chip's slot while the class read is open — the row keeps
+              // its height and the name lands in place, never pushes in.
+              <span
+                data-testid="hq-class-chip-skeleton"
+                aria-hidden="true"
+                className="block h-9 w-28 animate-pulse rounded-neo border-3 border-neo-cyan/60 bg-neo-navy motion-reduce:animate-none"
+              />
+            ) : classrooms.length > 1 ? (
+              <ClassSwitcher
+                className="flex-nowrap overflow-x-auto pb-1 [scrollbar-width:none]"
+                classrooms={classrooms}
+                selectedId={selectedClassroomId}
+                onSelect={setSelectedClassroomId}
+                studentLimit={hasPro ? undefined : FREE_TIER_LIMITS.studentsPerClass}
+              />
+            ) : selectedClassroom ? (
+              <span
+                data-testid="hq-class-chip"
+                className="inline-flex min-h-9 max-w-full items-center rounded-neo border-3 border-black bg-neo-cyan px-3 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm"
+              >
+                {/* Class names are DATA, often in the other script (a Latin
+                    name under Hebrew UI): `dir="auto"` isolates it and makes
+                    the ellipsis land at the name's own end, never a leading
+                    "…ERA'S CLASS". `text-start` follows that resolved dir. */}
+                <span dir="auto" className="min-w-0 truncate text-start">
+                  {selectedClassroom.name}
+                </span>
+              </span>
+            ) : null}
+          </div>
+          {/* Room for the dock that sits over this row's end (rendered last). */}
+          <div aria-hidden="true" className={cn('shrink-0', hasProChip ? 'w-60 sm:w-72' : 'w-36 sm:w-44')} />
         </div>
 
         {classroomsError ? (
@@ -282,76 +317,84 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
           </div>
         ) : (
           <>
+            {/* Phone: the hero sizes to its CONTENT (mode cards hold a fixed
+                aspect) and the join slot takes what is left — neither column
+                may stretch into space the other hasn't claimed yet. */}
             <div
               data-testid="teacher-dashboard-main"
-              className="min-h-[13rem] flex-1 lg:col-span-3 lg:min-h-0"
+              className="shrink-0 lg:col-span-3 lg:min-h-0"
             >
               <PlayNowLauncher onLaunch={handleQuickLaunch} />
             </div>
 
             <div
               data-testid="teacher-dashboard-aside"
-              className="shrink-0 lg:col-span-2 lg:min-h-0"
+              className="flex min-h-0 flex-1 flex-col lg:col-span-2"
             >
+              {/* Step 2 is ALWAYS mounted, in one frame: skeleton while the
+                  class read is open (or the default class is a render away),
+                  "create your class" for a teacher with none, else the card. */}
               {firstRun ? (
                 // A teacher with no class yet needs a join code before anything.
                 <PlayTabFirstRunCard
+                  className="flex-1"
                   onJoinCodeCreated={setNewlyCreatedJoinCode}
                   initialJoinCode={newlyCreatedJoinCode}
                 />
               ) : selectedClassroom ? (
                 <GetStudentsInCard
-                  className="h-full"
+                  className="flex-1"
                   classroom={{
                     ...selectedClassroom,
                     join_code: selectedClassroom.join_code || '',
                   }}
                   onOpenProjector={() => setProjectorOpen(true)}
                 />
-              ) : null}
+              ) : (
+                <GetStudentsInSkeleton className="flex-1" />
+              )}
             </div>
           </>
         )}
 
-        <div className="shrink-0 lg:col-span-5">
-          <HqDock
-            classroomCount={classrooms.length}
-            reportsHref={reportsHref}
-            lessonsOpen={lessonsOpen}
-            onLessonsOpenChange={setLessonsOpen}
-            lessons={<LessonBuilder initialReviewWords={deepLink.reviewWords} />}
-            toolsOpen={toolsOpen}
-            onToolsOpenChange={openTools}
-            tools={
-              hasTeacherAccess ? (
-                <HqToolsContent
-                  open={toolsOpen}
-                  classroomCount={classrooms.length}
-                  selectedClassroom={selectedClassroom}
-                  reportsHref={reportsHref}
-                  hideCreateClassroomCta={classrooms.length === 0 || !!newlyCreatedJoinCode}
-                  onCreateClassroom={focusCreateClassroom}
-                  onCreateAssignment={() => setShowAssignmentCreator(true)}
-                  onInvite={() => focusDeck('hq-copy-link')}
-                  onPlay={() => focusDeck('play-now-go')}
-                  onReviewWords={openReviewLesson}
-                />
-              ) : undefined
-            }
-            pro={
-              banner || usagePrompt ? (
-                <>
-                  {banner}
-                  {usagePrompt ? (
-                    <div data-testid="teacher-dashboard-usage-prompt">{usagePrompt}</div>
-                  ) : null}
-                </>
-              ) : undefined
-            }
-            proOpen={proOpen}
-            onProOpenChange={setProOpen}
-          />
-        </div>
+        <HqDock
+          className="absolute end-3 top-2 z-10 sm:end-5 sm:top-3 lg:end-8 lg:top-4"
+          classroomCount={classrooms.length}
+          reportsHref={reportsHref}
+          lessonsOpen={lessonsOpen}
+          onLessonsOpenChange={setLessonsOpen}
+          lessons={<LessonBuilder initialReviewWords={deepLink.reviewWords} />}
+          toolsOpen={toolsOpen}
+          onToolsOpenChange={openTools}
+          tools={
+            hasTeacherAccess ? (
+              <HqToolsContent
+                open={toolsOpen}
+                classroomCount={classrooms.length}
+                selectedClassroom={selectedClassroom}
+                reportsHref={reportsHref}
+                hideCreateClassroomCta={classrooms.length === 0 || !!newlyCreatedJoinCode}
+                onCreateClassroom={focusCreateClassroom}
+                onCreateAssignment={() => setShowAssignmentCreator(true)}
+                onInvite={() => focusDeck('hq-copy-link')}
+                onPlay={() => focusDeck('play-now-go')}
+                onReviewWords={openReviewLesson}
+              />
+            ) : undefined
+          }
+          pro={
+            banner || usagePrompt ? (
+              <>
+                {banner}
+                {usagePrompt ? (
+                  <div data-testid="teacher-dashboard-usage-prompt">{usagePrompt}</div>
+                ) : null}
+              </>
+            ) : undefined
+          }
+          proOpen={proOpen}
+          onProOpenChange={setProOpen}
+        />
       </div>
 
       {projectorOpen && selectedClassroom ? (

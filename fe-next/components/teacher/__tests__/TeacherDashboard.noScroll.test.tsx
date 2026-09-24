@@ -105,7 +105,7 @@ describe('<TeacherDashboard> — fits the viewport', () => {
     expect(loud).toHaveLength(1);
   });
 
-  it('keeps recent games, setup and reports one tap away in a compact row', () => {
+  it('keeps last game, setup and reports in ONE Tools sheet — ≤2 taps, no second nav row beside the tab bar', () => {
     render(<TeacherDashboard />);
     const shortcuts = screen.getByTestId('teacher-shortcuts');
     expect(shortcuts.querySelectorAll('[data-testid^="shortcut-"]')).toHaveLength(3);
@@ -163,9 +163,10 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       expect(main.className).toContain('lg:col-span-3');
       expect(aside.className).toContain('lg:col-span-2');
       expect(main.contains(screen.getByTestId('play-now-launcher'))).toBe(true);
-      // Teacher HQ: the 1/3 rail is the "Get students in" hero; recent games /
-      // setup / reports moved to the one-row dock under both heroes — still
-      // one tap away, still never a wall, and never inside the hero column.
+      // Teacher HQ: the 1/3 rail is the "Get students in" hero; last game /
+      // setup / reports live in the Tools sheet opened from the dock (round 2:
+      // the old pill row duplicated the shell tab bar) — ≤2 taps, never a
+      // wall, and never inside either hero column.
       const dock = screen.getByTestId('teacher-dashboard-dock');
       expect(dock.contains(screen.getByTestId('teacher-shortcuts'))).toBe(true);
       expect(main.contains(screen.getByTestId('teacher-shortcuts'))).toBe(false);

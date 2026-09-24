@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getPolarClient, getProProductId } from '@/lib/polar';
 import logger from '@/utils/logger';
+import { buildProCheckoutStartedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 
 /**
  * POST /api/subscription/checkout
@@ -38,6 +39,13 @@ export async function POST(request: NextRequest) {
       productId: getProProductId(),
       email: user.email ?? undefined,
     });
+
+    // Analytics only, after the checkout exists; never able to change the answer.
+    try {
+      captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id));
+    } catch {
+      /* the teacher's checkout url matters more than the funnel */
+    }
 
     return NextResponse.json({ url: checkoutUrl });
   } catch (err) {

@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { fireConfetti } from '@/utils/confettiUtils';
 import type { TeacherProGrant } from '@/hooks/useTeacherPro';
 import { cn } from '@/lib/utils';
+import { trackEduProCheckoutSuccessSeen } from '@/lib/education/proFunnelTelemetry';
 
 const DATE_LOCALE: Record<string, string> = {
   en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES', ru: 'ru-RU',
@@ -47,6 +48,20 @@ export function ProWelcomeCelebration({ grant, paid = false }: { grant: TeacherP
       });
     }
   }, [open, paid]);
+
+  // Funnel: the teacher saw a PAID checkout land. Its own ref — `marked` can
+  // already be spent by a grant that opened before `paid` flipped. A comp grant
+  // is a gift, not a conversion, so it never counts. The tracker dedupes reloads.
+  const successTracked = useRef(false);
+  useEffect(() => {
+    if (!paid || successTracked.current) return;
+    successTracked.current = true;
+    try {
+      trackEduProCheckoutSuccessSeen();
+    } catch {
+      /* analytics must never block the celebration */
+    }
+  }, [paid]);
 
   const close = () => {
     setOpen(false);

@@ -169,18 +169,18 @@ export function WordCoverageGlance({
             // Gold is reserved for celebration, and a full sweep is the only
             // thing on this card that earns it.
             swept ? 'text-neo-yellow' : 'text-neo-lime',
-            projector ? 'text-7xl' : 'text-4xl'
+            projector ? 'text-7xl 2xl:text-9xl' : 'text-4xl'
           )}
         >
           {found}
-          <span className={cn('text-neo-white/50', projector ? 'text-4xl' : 'text-2xl')}>
+          <span className={cn('text-neo-white/50', projector ? 'text-4xl 2xl:text-6xl' : 'text-2xl')}>
             /{total}
           </span>
         </span>
         <p
           className={cn(
             'flex-1 text-neo-white font-neo-body font-bold leading-tight pb-1',
-            projector ? 'text-2xl' : 'text-sm'
+            projector ? 'text-2xl 2xl:text-4xl' : 'text-sm'
           )}
         >
           {isTeacher
@@ -232,7 +232,7 @@ export function WordCoverageGlance({
         aria-label={t('education.results.coverageMeterLabel', { percent: pct })}
         className={cn(
           'w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden mb-3',
-          projector ? 'h-8' : 'h-4'
+          projector ? 'h-8 2xl:h-10' : 'h-4'
         )}
       >
         <div
@@ -252,7 +252,7 @@ export function WordCoverageGlance({
           // The ONE region on the projector that may overflow, and it is the
           // least important one. Everything a teacher acts on — the meter, the
           // podium, the button — is outside it and always on the wall.
-          projector && 'min-h-0 flex-1 overflow-y-auto'
+          projector && 'min-h-0 flex-1 overflow-y-auto 2xl:gap-4'
         )}
       >
         {shown.map((entry) => {
@@ -266,7 +266,7 @@ export function WordCoverageGlance({
               data-placed={unplaced ? 'false' : 'true'}
               className={cn(
                 'flex items-center gap-1.5 rounded-neo font-bold',
-                projector ? 'px-4 py-2.5 text-2xl' : 'px-3 py-1.5 text-sm',
+                projector ? 'px-4 py-2.5 text-2xl 2xl:px-6 2xl:py-4 2xl:text-5xl' : 'px-3 py-1.5 text-sm',
                 hit && 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
                 !hit && !unplaced && 'border-[2px] border-neo-cream bg-neo-navy-light text-neo-white/60',
                 // A word the board never carried is still a word a teacher
@@ -277,15 +277,15 @@ export function WordCoverageGlance({
               )}
             >
               {hit ? (
-                <Check className={projector ? 'w-6 h-6' : 'w-4 h-4'} aria-hidden />
+                <Check className={projector ? 'w-6 h-6 2xl:w-11 2xl:h-11' : 'w-4 h-4'} aria-hidden />
               ) : unplaced ? (
-                <EyeOff className={projector ? 'w-6 h-6' : 'w-4 h-4'} aria-hidden />
+                <EyeOff className={projector ? 'w-6 h-6 2xl:w-11 2xl:h-11' : 'w-4 h-4'} aria-hidden />
               ) : (
-                <X className={projector ? 'w-6 h-6' : 'w-4 h-4'} aria-hidden />
+                <X className={projector ? 'w-6 h-6 2xl:w-11 2xl:h-11' : 'w-4 h-4'} aria-hidden />
               )}
               <span>{entry.word}</span>
               {isTeacher && entry.foundBy.length > 0 && (
-                <span className={cn('ms-1 opacity-70', projector ? 'text-lg' : 'text-xs')}>
+                <span className={cn('ms-1 opacity-70', projector ? 'text-lg 2xl:text-2xl' : 'text-xs')}>
                   {entry.foundBy.length}
                 </span>
               )}

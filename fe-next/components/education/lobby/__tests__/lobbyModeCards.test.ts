@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FEATURED_MODE_COUNT, modeCardArt, visibleModeIds } from '../lobbyModeCards';
+import { FEATURED_MODE_COUNT, modeCardArt, modeCardFacts, visibleModeIds } from '../lobbyModeCards';
 
 const ALL = ['classic', 'blast', 'word-hunt', 'wheel-rush', 'vocab-quiz'] as const;
 
@@ -53,5 +53,32 @@ describe('modeCardArt — storybook node art per mode', () => {
   it('uses the wordcraft node only for a wordcraft classroom mode', () => {
     expect(modeCardArt('wordcraft')).toBe('/images/education/node-wordcraft.webp');
     expect(modeCardArt('word-craft')).toBe('/images/education/node-wordcraft.webp');
+  });
+});
+
+describe('modeCardFacts — a teacher picks in two seconds', () => {
+  const lobby = { vocabQuizQuestionCount: 10, vocabQuizSeconds: 20, boardSize: 'medium' as const, minWordLength: 3 };
+
+  it('Given the quiz, Then it states the configured question count and per-question pace', () => {
+    expect(modeCardFacts('vocab-quiz', lobby)).toEqual([
+      { kind: 'questions', count: 10 },
+      { kind: 'pace', seconds: 20 },
+    ]);
+  });
+
+  it('Given a board mode, Then it states the configured board and the minimum word length (difficulty)', () => {
+    expect(modeCardFacts('classic', lobby)).toEqual([
+      { kind: 'board', label: '6×6' },
+      { kind: 'letters', min: 3 },
+    ]);
+    expect(modeCardFacts('blast', { ...lobby, boardSize: 'large', minWordLength: 4 })).toEqual([
+      { kind: 'board', label: '7×7' },
+      { kind: 'letters', min: 4 },
+    ]);
+  });
+
+  it('Given nothing configured, Then it invents nothing', () => {
+    expect(modeCardFacts('vocab-quiz', {})).toEqual([]);
+    expect(modeCardFacts('classic', {})).toEqual([]);
   });
 });

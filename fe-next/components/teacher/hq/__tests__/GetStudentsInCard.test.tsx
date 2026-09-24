@@ -106,4 +106,41 @@ describe('<GetStudentsInCard>', () => {
     expect(count).not.toHaveTextContent('academy.hq.nobodyYet');
     expect(count).not.toHaveTextContent('academy.hq.joinedLabel');
   });
+
+  // Round 2 (critic cp1): dashed empty circles at 0 read as broken, and four
+  // equal join affordances competed with the code.
+  it('Given nobody yet, Then a friendly waiting state replaces the dashed ghost seats', () => {
+    roster.mockReturnValue({ students: [], loading: false, arrivals: [] });
+    render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 0 }} onOpenProjector={vi.fn()} />);
+    expect(screen.getByTestId('hq-roster-waiting')).toBeInTheDocument();
+    expect(screen.queryAllByTestId('hq-roster-ghost')).toHaveLength(0);
+  });
+
+  it('Given the roster is still loading, Then no dashed ghost seats paint either', () => {
+    roster.mockReturnValue({ students: [], loading: true, arrivals: [] });
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    expect(screen.queryAllByTestId('hq-roster-ghost')).toHaveLength(0);
+  });
+
+  it('Given the join card, Then the code is the one hero and link / QR / projector are one secondary row', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    const row = screen.getByTestId('hq-join-actions');
+    for (const id of ['hq-copy-link', 'hq-open-qr', 'hq-open-projector']) {
+      expect(row.contains(screen.getByTestId(id)), id).toBe(true);
+    }
+    expect(row.contains(screen.getByTestId('hq-join-code'))).toBe(false);
+  });
+
+  it('Given HQ sequencing, Then this card is step 2 and says the code is ready', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    expect(screen.getByTestId('hq-step-badge-2')).toHaveTextContent('2');
+    expect(screen.getByTestId('hq-join-status')).toHaveTextContent('academy.hq.codeReady');
+  });
+
+  it('When the QR button is tapped, Then the projector (big QR) opens', () => {
+    const onOpen = vi.fn();
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={onOpen} />);
+    fireEvent.click(screen.getByTestId('hq-open-qr'));
+    expect(onOpen).toHaveBeenCalledTimes(1);
+  });
 });

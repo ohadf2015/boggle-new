@@ -17,30 +17,44 @@ interface Props {
   onOpenClass?: () => void;
   /** Secondary solo practice — only when the hero is not already solo. */
   onSolo?: () => void;
+  /** Desktop: bigger medallions and labels. */
+  big?: boolean;
 }
 
+// Icon over a short label. Labels are never uppercased (Hebrew/Japanese have no
+// case, and "UTMÄRKELSER" is a third wider than "Utmärkelser") and may wrap to
+// two lines instead of being clipped — every locale fits at 390px.
 const ITEM =
-  'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-[12px] px-0.5 py-1 font-neo-display text-[10px] leading-none font-black uppercase tracking-wide text-neo-white outline-none transition-transform active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow sm:text-[11px]';
+  'relative flex min-w-0 flex-1 flex-col items-center justify-start gap-0.5 rounded-[12px] px-0.5 pt-1 font-neo-display text-[11px] leading-[1.05] font-black text-neo-white outline-none transition-transform active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow';
 
-function Item({ tone, icon, label, badge }: { tone: Tone; icon: ReactNode; label: string; badge?: ReactNode }) {
+function Item({ tone, icon, label, badge, big }: { tone: Tone; icon: ReactNode; label: string; badge?: ReactNode; big?: boolean }) {
   return (
     <>
-      <Medallion tone={tone} size={30} shadow={2}>
+      <Medallion tone={tone} size={big ? 42 : 30} shadow={2}>
         {icon}
       </Medallion>
-      <span dir="auto" className={`max-w-full truncate ${INK_TEXT}`}>{label}</span>
+      <span
+        dir="auto"
+        data-testid="academy-dock-label"
+        // Auto-shrink: a long single word (sv "Utmärkelser", es "Lecciones")
+        // steps down a size rather than breaking mid-word.
+        className={`line-clamp-2 max-w-full break-words text-center ${big ? 'text-sm' : label.length > 9 ? 'text-[9.5px] tracking-tight' : ''} ${INK_TEXT}`}
+      >
+        {label}
+      </span>
       {badge}
     </>
   );
 }
 
-export function AcademyDock({ locale, reviewCount, onOpenClass, onSolo }: Props) {
+export function AcademyDock({ locale, reviewCount, onOpenClass, onSolo, big = false }: Props) {
   const { t } = useLanguage();
-  const icon = 'h-4 w-4 text-neo-black';
+  const icon = big ? 'h-5 w-5 text-neo-black' : 'h-4 w-4 text-neo-black';
   return (
-    <InkPanel as="nav" tone="night" aria-label={t('academy.student.dockLabel', 'Academy')} className="flex h-[70px] items-stretch gap-0.5 px-1 py-1">
+    <InkPanel as="nav" tone="night" aria-label={t('academy.student.dockLabel', 'Academy')} className={`flex items-stretch gap-0.5 px-1 py-1 ${big ? 'h-[92px] px-2 py-2' : 'h-[72px]'}`}>
       <Link href={`/${locale}/student/lessons`} data-testid="academy-dock-lessons" className={ITEM}>
         <Item
+          big={big}
           tone="teal"
           icon={<BookOpen className={`${icon} fill-neo-cream`} strokeWidth={2.5} />}
           label={t('academy.student.dockLessons', 'Lessons')}
@@ -57,7 +71,7 @@ export function AcademyDock({ locale, reviewCount, onOpenClass, onSolo }: Props)
       </Link>
       {onOpenClass && (
         <button type="button" onClick={onOpenClass} data-testid="academy-dock-class" className={ITEM}>
-          <Item tone="lime" icon={<Users className={`${icon} fill-neo-cream`} strokeWidth={2.5} />} label={t('academy.student.dockClass', 'Class')} />
+          <Item big={big} tone="lime" icon={<Users className={`${icon} fill-neo-cream`} strokeWidth={2.5} />} label={t('academy.student.dockClass', 'Class')} />
         </button>
       )}
       {onSolo && (
@@ -68,14 +82,14 @@ export function AcademyDock({ locale, reviewCount, onOpenClass, onSolo }: Props)
           aria-label={t('student.dashboard.soloPractice', 'Solo Practice')}
           className={ITEM}
         >
-          <Item tone="plum" icon={<Sparkles className={`${icon} fill-neo-yellow`} strokeWidth={2.5} />} label={t('academy.student.solo', 'Solo')} />
+          <Item big={big} tone="plum" icon={<Sparkles className={`${icon} fill-neo-yellow`} strokeWidth={2.5} />} label={t('academy.student.solo', 'Solo')} />
         </button>
       )}
       <Link href={`/${locale}/student/achievements`} data-testid="academy-dock-awards" className={ITEM}>
-        <Item tone="gold" icon={<Trophy className={`${icon} fill-neo-yellow`} strokeWidth={2.5} />} label={t('teacher.nav.studentAchievements', 'Awards')} />
+        <Item big={big} tone="gold" icon={<Trophy className={`${icon} fill-neo-yellow`} strokeWidth={2.5} />} label={t('teacher.nav.studentAchievements', 'Awards')} />
       </Link>
       <Link href={`/${locale}/student/profile`} data-testid="academy-dock-me" className={ITEM}>
-        <Item tone="pink" icon={<User className={`${icon} fill-neo-cream`} strokeWidth={2.5} />} label={t('teacher.nav.me', 'Me')} />
+        <Item big={big} tone="pink" icon={<User className={`${icon} fill-neo-cream`} strokeWidth={2.5} />} label={t('teacher.nav.me', 'Me')} />
       </Link>
     </InkPanel>
   );

@@ -4,7 +4,8 @@
  * DEV-ONLY preview of the live classroom surfaces, fed with fabricated data so
  * they can be reviewed and captured without running a real round:
  *
- *   /en/education/classroom-game?preview=podium     — the projector results podium
+ *   /en/education/classroom-game?preview=podium     — the projector results podium (animated reveal)
+ *   /en/education/classroom-game?preview=podium&settled=1 — the same podium, reveal already finished
  *   /en/education/classroom-game?preview=projector  — the projector lobby, students popping in
  *   /en/education/classroom-game?preview=waiting    — a student's waiting-for-teacher stage
  *   (&count=N sets the projector roster size, default 12)
@@ -30,10 +31,18 @@ export type LiveSurfacePreviewKind = 'podium' | 'projector' | 'waiting';
 
 function PodiumPreview() {
   const { t } = useLanguage();
+  const params = useSearchParams();
+  // `&settled=1` skips the drumroll so a static capture shows the winner on #1.
+  const settled = params?.get('settled') === '1';
   const summary = useMemo(() => sampleClassroomSummary(), []);
   return (
     <div className="fixed inset-0 z-[80] overflow-hidden bg-neo-navy p-3 md:p-6">
-      <ClassroomTvResults summary={summary} onRematch={() => toast('Preview: rematch')} t={t} />
+      <ClassroomTvResults
+        summary={summary}
+        onRematch={() => toast('Preview: rematch')}
+        t={t}
+        revealSettled={settled}
+      />
     </div>
   );
 }

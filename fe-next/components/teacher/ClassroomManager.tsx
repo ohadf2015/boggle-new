@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { type Language } from '@/lib/supabase/education/types';
 import { ClassroomCard } from './hq/ClassroomCard';
 import { ClassPager } from './hq/ClassPager';
+import { ClassroomCardActivity } from './hq/ClassroomCardActivity';
 import { classPageSize, pageOf, pageSlice } from './hq/classPaging';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import ClassLimitUpsellModal from './ClassLimitUpsellModal';
@@ -40,9 +41,11 @@ export { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
 
 interface ClassroomManagerProps {
   autoOpenCreate?: boolean;
+  /** Classes tab: cards carry recent activity, next step and "Start a game". */
+  richCards?: boolean;
 }
 
-export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerProps = {}) {
+export default function ClassroomManager({ autoOpenCreate, richCards = false }: ClassroomManagerProps = {}) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
   const { classrooms, isLoading, createClassroom, updateClassroom, deleteClassroom } =
@@ -379,8 +382,39 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                   setSelectedClassroomId(classroom.id);
                   setIsDeleteDialogOpen(true);
                 }}
+                activity={
+                  richCards ? (
+                    <ClassroomCardActivity
+                      classroomId={classroom.id}
+                      rosterCount={classroom.member_count || 0}
+                    />
+                  ) : undefined
+                }
+                startGameHref={
+                  richCards ? `/${language}/teacher?classroomId=${classroom.id}` : undefined
+                }
               />
             ))}
+            {/* Classes tab on a wide screen with a free slot on the last page:
+                a "new class" seat instead of a void. Compact and content-sized
+                — beside one class a card-sized slab took half the row and
+                shouted louder than the class itself. Phones keep one card. */}
+            {richCards && paged.page === paged.pages - 1 && paged.items.length < pageSize ? (
+              <m.button
+                type="button"
+                variants={slideUp}
+                data-testid="classroom-add-tile"
+                onClick={openCreateDialog}
+                className="hidden items-center gap-3 self-start justify-self-start rounded-neo border-[3px] border-dashed border-neo-cream/60 bg-neo-navy/80 py-3 pe-5 ps-3 text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:border-neo-cream focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan sm:inline-flex"
+              >
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-cyan text-black shadow-hard-sm">
+                  <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
+                </span>
+                <span className="font-neo-display text-base font-black uppercase tracking-tight">
+                  {t('teacher.classroom.create')}
+                </span>
+              </m.button>
+            ) : null}
           </m.div>
           <ClassPager page={paged.page} pages={paged.pages} onChange={setPage} />
         </>

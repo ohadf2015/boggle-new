@@ -66,22 +66,33 @@ export function StudentCapMeter({
             })}
       </p>
       {showCta ? (
-        <Link
-          href={`/${language}/teacher/upgrade`}
-          data-testid="student-cap-upgrade-cta"
-          className="mt-2 inline-flex min-h-11 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
-          onClick={() =>
-            trackGrowthEvent('landing_cta_clicked', {
-              cta: 'teacher_pro',
-              source: `student_cap_${source}`,
-              studentCount: count,
-              limit,
-              atCap,
-            })
-          }
-        >
-          {t('teacher.proGate.cta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
-        </Link>
+        // Free and Pro are BOTH capped per class — so the ask never sits as if
+        // it lifted the number above. It names what Pro adds (round 2, critic
+        // cp1). Link, tracking and when it shows are unchanged.
+        <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-t-2 border-dashed border-black/20 pt-1.5">
+          <p
+            data-testid="student-cap-pro-unlocks"
+            className="min-w-0 flex-1 font-neo-body text-xs font-bold text-black/70"
+          >
+            {t('academy.classes.proUnlocks', 'Pro adds class analytics + printable reports')}
+          </p>
+          <Link
+            href={`/${language}/teacher/upgrade`}
+            data-testid="student-cap-upgrade-cta"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
+            onClick={() =>
+              trackGrowthEvent('landing_cta_clicked', {
+                cta: 'teacher_pro',
+                source: `student_cap_${source}`,
+                studentCount: count,
+                limit,
+                atCap,
+              })
+            }
+          >
+            {t('academy.classes.proCta', 'Get Pro — {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+          </Link>
+        </div>
       ) : null}
     </div>
   );

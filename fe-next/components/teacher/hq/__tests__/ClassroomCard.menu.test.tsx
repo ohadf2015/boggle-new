@@ -78,3 +78,20 @@ describe('ClassroomCard actions menu', () => {
     expect(link).toHaveAttribute('target', '_blank');
   });
 });
+
+describe('ClassroomCard — a class you can act on (round 2)', () => {
+  it('Given a start-game href, Then the card offers Start game straight into HQ for this class', () => {
+    renderCard({ startGameHref: '/en/teacher?classroomId=c1' });
+    expect(screen.getByTestId('classroom-card-start-game')).toHaveAttribute('href', '/en/teacher?classroomId=c1');
+  });
+
+  it('Given an activity slot, Then the card shows it (recent activity + next step)', () => {
+    renderCard({ activity: <div data-testid="the-activity" /> });
+    expect(screen.getByTestId('the-activity')).toBeInTheDocument();
+  });
+
+  it('Given neither (the HQ Tools sheet), Then the card stays as it was', () => {
+    renderCard();
+    expect(screen.queryByTestId('classroom-card-start-game')).toBeNull();
+  });
+});

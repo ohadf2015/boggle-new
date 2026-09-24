@@ -221,3 +221,42 @@ export function mapFraming(points: IslandPoint[], safe: SafeRect): { scale: numb
   if (scale < 1.05) scale = 1;
   return { scale, originX, originY };
 }
+
+/** Largest lean the camera takes toward the recommended island, in % of the art. */
+const MAX_LEAN = 8;
+/** Share of the way to the centre the camera leans — subtle, never a snap. */
+const LEAN_PULL = 0.5;
+
+/**
+ * Camera lean: after `mapFraming`'s zoom, translate the art (in % of the art)
+ * so the recommended island drifts toward the centre of the view — clamped so
+ * every island stays inside `safe`, the art never uncovers its edge, and
+ * capped so it stays a nudge.
+ */
+export function focusShift(
+  points: IslandPoint[],
+  frame: { scale: number; originX: number; originY: number },
+  focus: IslandPoint | null,
+  safe: SafeRect,
+): { dx: number; dy: number } {
+  if (!focus || points.length === 0) return { dx: 0, dy: 0 };
+  const sx = (x: number) => frame.originX + (x - frame.originX) * frame.scale;
+  const sy = (y: number) => frame.originY + (y - frame.originY) * frame.scale;
+  const axis = (vals: number[], f: number, lo: number, hi: number, origin: number) => {
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    // Islands stay in the safe area AND the art keeps covering the view: the
+    // zoom about `origin` overhangs by origin*(s-1) on the low side and
+    // (100-origin)*(s-1) on the high side — that overhang is all the slack.
+    const low = Math.max(lo - min, -(100 - origin) * (frame.scale - 1)); // most negative shift allowed
+    const high = Math.min(hi - max, origin * (frame.scale - 1)); // most positive shift allowed
+    if (low > 0 || high < 0) return 0;
+    const want = Math.max(-MAX_LEAN, Math.min(MAX_LEAN, (50 - f) * LEAN_PULL));
+    const d = Math.max(low, Math.min(high, want));
+    return Math.round(d * 100) / 100 || 0;
+  };
+  return {
+    dx: axis(points.map((p) => sx(p.x)), sx(focus.x), safe.x0, safe.x1, frame.originX),
+    dy: axis(points.map((p) => sy(p.y)), sy(focus.y), safe.y0, safe.y1, frame.originY),
+  };
+}

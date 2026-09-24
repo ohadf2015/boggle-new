@@ -17,6 +17,7 @@
 'use client';
 
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { m } from 'framer-motion';
 import { Rocket, Zap, X, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -185,14 +186,22 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
       aria-labelledby="play-now-heading"
       className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-neo-lg border-3 border-neo-cream bg-neo-navy-light/95 shadow-hard-xl"
     >
-      <div className="flex shrink-0 items-center gap-2 border-b-3 border-neo-black bg-neo-lime px-3 py-1.5 sm:px-4 sm:py-2">
-        <Zap className="size-5 shrink-0 text-black" strokeWidth={3} aria-hidden="true" />
+      <div className="flex shrink-0 items-center gap-2 border-b-3 border-neo-black bg-neo-lime px-2.5 py-1.5 sm:px-4 sm:py-2">
+        {/* Step 1 of 2 — HQ reads as a sequence: pick + GO LIVE, then get them in. */}
+        <span
+          data-testid="hq-step-badge-1"
+          aria-hidden="true"
+          className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-black font-neo-display text-base font-black leading-none text-neo-lime sm:size-8 sm:text-lg"
+        >
+          1
+        </span>
         <h2
           id="play-now-heading"
           className="font-neo-display text-lg font-black uppercase leading-none tracking-tight text-black sm:text-2xl"
         >
           {t('academy.hq.startTitle', 'Start a game')}
         </h2>
+        <Zap className="size-5 shrink-0 text-black" strokeWidth={3} aria-hidden="true" />
         <p className="ms-auto hidden truncate font-neo-body text-sm font-bold text-black/70 md:block">
           {t('teacher.playNow.subtitle')}
         </p>
@@ -228,23 +237,38 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
             : t('teacher.playNow.pickSomething')}
         </p>
 
-        <button
-          type="button"
-          data-testid="play-now-go"
-          disabled={!armed}
-          onClick={handleGo}
-          className={cn(
-            'flex min-h-14 w-full shrink-0 items-center justify-center gap-3 rounded-neo border-3 border-black px-6 py-2',
-            'font-neo-display text-2xl font-black uppercase tracking-tight sm:min-h-16 sm:text-3xl',
-            'transition-all duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-            armed
-              ? 'bg-neo-lime text-black shadow-hard-lg hover:-translate-y-1 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed'
-              : 'cursor-not-allowed bg-neo-cream text-neo-gray shadow-hard-sm'
-          )}
-        >
-          <Rocket className="size-7 shrink-0" strokeWidth={3} aria-hidden="true" />
-          {t('teacher.playNow.goLive')}
-        </button>
+        {/* The loudest thing on HQ: solid lime, the biggest type, a hard
+            shadow and — once armed — a slow beacon ring (static when motion
+            is reduced). Nothing on the deck may out-shout it. */}
+        <div className="relative shrink-0">
+          {armed && !reduced ? (
+            <m.span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 rounded-neo border-4 border-neo-lime"
+              // A pulse that leaves: mostly invisible, so a still frame never
+              // reads as a stray double border.
+              animate={{ scale: [1, 1.05], opacity: [0.75, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 0.6, ease: 'easeOut' }}
+            />
+          ) : null}
+          <button
+            type="button"
+            data-testid="play-now-go"
+            disabled={!armed}
+            onClick={handleGo}
+            className={cn(
+              'relative flex min-h-16 w-full items-center justify-center gap-3 rounded-neo border-3 border-black px-6 py-2',
+              'font-neo-display text-3xl font-black uppercase tracking-tight sm:min-h-20 sm:text-4xl lg:text-5xl',
+              'transition-all duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              armed
+                ? 'bg-neo-lime text-black shadow-hard-xl hover:-translate-y-1 hover:shadow-hard-2xl active:translate-y-0.5 active:shadow-hard-pressed'
+                : 'cursor-not-allowed bg-neo-cream text-neo-gray shadow-hard-sm'
+            )}
+          >
+            <Rocket className="size-8 shrink-0 sm:size-10" strokeWidth={3} aria-hidden="true" />
+            {t('teacher.playNow.goLive')}
+          </button>
+        </div>
 
         {/* Everything in here exists to CHANGE the default words, never to
             reach it. Opens as a sheet over this card, so it never grows the

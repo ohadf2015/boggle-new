@@ -77,13 +77,29 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
             {tr(t, 'academy.projector.joined', 'joined')}
           </span>
         </span>
-        {readyCount > 0 && (
-          <span
+        {/* Readiness sits WITH the faces it counts: "N / M ready" as a bar
+            that fills as tiles light up below it. */}
+        {students.length > 0 && (
+          <div
             data-testid="projector-ready-count"
-            className="rounded-full border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-body text-[2.4vw] font-black uppercase tracking-wider text-neo-black shadow-hard-sm md:text-[0.95vw]"
+            role="progressbar"
+            aria-valuenow={readyCount}
+            aria-valuemin={0}
+            aria-valuemax={students.length}
+            aria-label={t('education.projectorLobby.readyCount', { ready: readyCount, total: students.length })}
+            className="flex min-w-0 flex-1 items-center gap-[1vw] rounded-neo-lg border-3 border-neo-cream bg-neo-navy/90 px-[1vw] py-[0.5vw] shadow-hard md:max-w-[36vw]"
           >
-            {t('education.projectorLobby.readyCount', { ready: readyCount, total: students.length })}
-          </span>
+            <span className="shrink-0 font-neo-display text-[3.4vw] font-black uppercase leading-none tracking-wide text-neo-lime tabular-nums md:text-[min(1.6vw,3vh)]">
+              {t('education.projectorLobby.readyCount', { ready: readyCount, total: students.length })}
+            </span>
+            <span className="relative h-[2.2vw] min-w-0 flex-1 overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy md:h-[min(1.4vw,2.6vh)]">
+              <span
+                data-testid="projector-ready-fill"
+                className="absolute inset-y-0 start-0 rounded-full bg-neo-lime transition-[width] duration-500 ease-out motion-reduce:transition-none"
+                style={{ width: `${Math.round((readyCount / students.length) * 100)}%` }}
+              />
+            </span>
+          </div>
         )}
       </header>
 
@@ -119,18 +135,25 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
         <ul
           data-testid="projector-roster-list"
           className={cn(
-            'flex min-h-0 flex-1 flex-wrap content-start overflow-y-auto',
+            // Top/end padding so a ready tile's corner check is never clipped by the list.
+            'flex min-h-0 flex-1 flex-wrap content-start overflow-y-auto pe-3 pt-3',
             density.gap
           )}
         >
           <AnimatePresence initial={false}>
             {students.map((student, index) => {
               const isReady = readySet.has(student.username);
+              // Once anyone is ready, the tiles still waiting step back so the
+              // room's holdouts read at a glance. Before that, nobody is dimmed:
+              // an arrival is still the reward for typing the code.
+              const dim = readyCount > 0 && !isReady;
               return (
                 <m.li
                   key={student.username}
                   data-testid="projector-student"
                   data-ready={isReady ? 'true' : 'false'}
+                  data-glow={isReady ? 'true' : 'false'}
+                  data-dim={dim ? 'true' : 'false'}
                   initial={reduceMotion ? { scale: 1, rotate: 0, y: 0 } : { scale: 0.2, rotate: -14, y: -40 }}
                   animate={{ scale: 1, rotate: chipTilt(student.username, index), y: 0 }}
                   exit={reduceMotion ? undefined : { scale: 0.4 }}
@@ -140,8 +163,13 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                       : { type: 'spring', stiffness: 520, damping: 14, mass: 0.7 }
                   }
                   className={cn(
-                    'flex max-w-full items-center rounded-neo shadow-hard',
+                    'relative flex max-w-full items-center rounded-neo',
                     'font-neo-display font-black leading-none',
+                    'transition-[filter,box-shadow] duration-300 motion-reduce:transition-none',
+                    isReady
+                      ? 'shadow-[0_0_0_3px_#bfff00,0_0_1.4em_0.2em_rgba(191,255,0,0.75),4px_4px_0_#000]'
+                      : 'shadow-hard',
+                    dim && 'brightness-[0.62] saturate-[0.55]',
                     density.chip,
                     chipAccent(student.username, index)
                   )}
@@ -160,7 +188,16 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                     />
                   </span>
                   <span className="truncate">{student.username}</span>
-                  {isReady && <Check className="h-[1em] w-[1em] shrink-0" strokeWidth={4} aria-hidden="true" />}
+                  {isReady && (
+                    <span
+                      data-testid="projector-ready-check"
+                      aria-hidden="true"
+                      className="absolute -end-[0.45em] -top-[0.45em] grid h-[0.95em] w-[0.95em] place-items-center rounded-full border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm"
+                    >
+                      <Check className="h-[0.6em] w-[0.6em]" strokeWidth={5} />
+                    </span>
+                  )}
+                  {isReady && <span className="sr-only">{tr(t, 'academy.projector.ready', 'ready')}</span>}
                 </m.li>
               );
             })}

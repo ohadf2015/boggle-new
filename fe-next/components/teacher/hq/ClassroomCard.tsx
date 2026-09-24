@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { m, AnimatePresence } from "framer-motion";
 import {
   Copy,
@@ -11,6 +12,7 @@ import {
   ChevronDown,
   GraduationCap,
   MoreHorizontal,
+  Rocket,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -39,6 +41,13 @@ export interface ClassroomCardProps {
   googleHref: string | null;
   onEdit: () => void;
   onDelete: () => void;
+  /**
+   * Recent activity + next step (the Classes tab passes it). Absent inside
+   * the HQ Tools sheet, where the class pulse already sits above the list.
+   */
+  activity?: ReactNode;
+  /** "Start game" → Teacher HQ with this class preselected (one more tap: GO LIVE). */
+  startGameHref?: string;
 }
 
 const HEADER_BG = ["bg-neo-cyan", "bg-neo-lime", "bg-neo-pink"] as const;
@@ -66,6 +75,8 @@ export function ClassroomCard({
   googleHref,
   onEdit,
   onDelete,
+  activity,
+  startGameHref,
 }: ClassroomCardProps) {
   const { t } = useLanguage();
   const count = classroom.member_count || 0;
@@ -248,10 +259,12 @@ export function ClassroomCard({
           </div>
         </div>
 
+        {activity}
+
         <StudentCapMeter
           studentCount={count}
           source="classroom_card"
-          className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 py-1.5 [&_[data-testid=student-cap-upgrade-cta]]:mt-0"
+          className="py-1.5"
         />
 
         <button
@@ -296,6 +309,22 @@ export function ClassroomCard({
             </m.div>
           )}
         </AnimatePresence>
+
+        {startGameHref ? (
+          <Link
+            href={startGameHref}
+            data-testid="classroom-card-start-game"
+            className={cn(
+              "flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-4 py-2",
+              "font-neo-display text-lg font-black uppercase tracking-tight text-black",
+              PRESS,
+              "hover:shadow-hard focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
+            )}
+          >
+            <Rocket className="size-5 shrink-0" strokeWidth={3} aria-hidden="true" />
+            {t("academy.hq.startTitle", "Start a game")}
+          </Link>
+        ) : null}
       </div>
     </m.div>
   );

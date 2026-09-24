@@ -25,11 +25,13 @@ interface Props {
   reducedMotion: boolean;
   /** New lifetime XP from the server, when it says so. */
   onGranted: (newTotalXp: number | null) => void;
+  /** Badge size: small on a phone (a badge, not a billboard), a touch larger on desktop. */
+  size?: 'sm' | 'md';
 }
 
 type Phase = 'idle' | 'rattle' | 'open';
 
-export function DailyChest({ userId, reducedMotion, onGranted }: Props) {
+export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Props) {
   const { t, dir } = useLanguage();
   const sfx = useSoundEffects();
   const [available, setAvailable] = useState(() => canOpenChest(userId, new Date()));
@@ -81,9 +83,10 @@ export function DailyChest({ userId, reducedMotion, onGranted }: Props) {
         aria-label={label}
         title={label}
         disabled={!available}
-        className={cn('relative flex h-16 w-16 flex-col items-center sm:h-24 sm:w-24', !available && 'cursor-default')}
-        animate={available && !reducedMotion ? { rotate: [0, -8, 8, -5, 0], y: [0, -4, 0] } : undefined}
-        transition={available ? { duration: 1.2, repeat: Infinity, repeatDelay: 1.8 } : undefined}
+        className={cn('relative flex flex-col items-center', size === 'md' ? 'h-[72px] w-[72px]' : 'h-12 w-12', !available && 'cursor-default')}
+        // Idle wiggle: a small, rare shake — it asks, it does not shout.
+        animate={available && !reducedMotion ? { rotate: [0, -6, 6, -3, 0] } : undefined}
+        transition={available && !reducedMotion ? { duration: 0.8, repeat: Infinity, repeatDelay: 3.2 } : undefined}
         whileTap={available ? { scale: 0.9 } : undefined}
       >
         <Image
@@ -98,7 +101,7 @@ export function DailyChest({ userId, reducedMotion, onGranted }: Props) {
         <span
           dir="auto"
           className={cn(
-            'absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 px-2 font-neo-display text-[10px] font-black uppercase leading-4 tracking-wider',
+            'absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 px-1.5 font-neo-display text-[9px] font-black uppercase leading-[14px] tracking-wider',
             available ? 'border-neo-black bg-neo-yellow text-neo-black' : 'border-neo-cream bg-neo-navy text-neo-white/80',
           )}
           style={available ? toneStyle('gold', { shadow: 2, trim: 1 }) : undefined}

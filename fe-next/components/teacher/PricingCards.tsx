@@ -5,6 +5,7 @@ import { Check, X, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { trackEduProUpgradeClicked } from '@/lib/education/proFunnelTelemetry';
 
 interface PricingCardsProps {
   freeFeatures: Array<{ label: string; included: boolean }>;
@@ -154,7 +155,15 @@ export function PricingCards({
         <div className="flex-1" />
 
         <Button
-          onClick={onUpgradeClick}
+          onClick={() => {
+            // Funnel step 1 — analytics only, and never in checkout's way.
+            try {
+              trackEduProUpgradeClicked({ source: 'pricing_page' });
+            } catch {
+              /* ignore */
+            }
+            onUpgradeClick();
+          }}
           disabled={isLoading}
           className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
         >

@@ -44,11 +44,20 @@ vi.mock('@/hooks/useClassroom', () => ({
   }),
 }));
 
+const mq = { wide: false };
+vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: () => mq.wide, default: () => mq.wide }));
+vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
+  ClassroomCardActivity: ({ classroomId }: { classroomId: string }) => (
+    <div data-testid="card-activity">{classroomId}</div>
+  ),
+}));
+
 import ClassroomManager from '../ClassroomManager';
 
 describe('ClassroomManager — paging instead of page scroll', () => {
   beforeEach(() => {
     state.classrooms = [mk(1), mk(2), mk(3)];
+    mq.wide = false;
   });
 
   it('Given three classes on a phone, Then one card shows with a 1 of 3 pager', () => {
@@ -71,5 +80,46 @@ describe('ClassroomManager — paging instead of page scroll', () => {
     state.classrooms = [mk(1)];
     render(<ClassroomManager />);
     expect(screen.queryByTestId('class-pager')).toBeNull();
+  });
+
+  // Round 2: on the Classes tab the card carries recent activity, the next
+  // step and a Start-game shortcut into HQ; inside the HQ Tools sheet it does not.
+  it('Given the Classes tab (richCards), Then each card has activity and a Start game into HQ for that class', () => {
+    state.classrooms = [mk(1)];
+    render(<ClassroomManager richCards />);
+    expect(screen.getByTestId('card-activity')).toHaveTextContent('cls-1');
+    expect(screen.getByTestId('classroom-card-start-game')).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
+  });
+
+  it('Given the default (HQ Tools sheet), Then cards stay lean', () => {
+    state.classrooms = [mk(1)];
+    render(<ClassroomManager />);
+    expect(screen.queryByTestId('card-activity')).toBeNull();
+    expect(screen.queryByTestId('classroom-card-start-game')).toBeNull();
+  });
+
+  it('Given one class on a wide Classes tab, Then the free slot is a "new class" seat, not a void', () => {
+    state.classrooms = [mk(1)];
+    mq.wide = true;
+    render(<ClassroomManager richCards />);
+    expect(screen.getByTestId('classroom-add-tile')).toBeInTheDocument();
+  });
+
+  // r3 critic: beside ONE class the seat took half the desktop row — a second
+  // card-sized slab that says less than the class card next to it.
+  it('Given one class on a wide Classes tab, Then the add seat is compact — content-sized, not a card-sized slab', () => {
+    state.classrooms = [mk(1)];
+    mq.wide = true;
+    render(<ClassroomManager richCards />);
+    const cls = screen.getByTestId('classroom-add-tile').className.toString();
+    expect(cls).toMatch(/(^|\s)self-start(\s|$)/);
+    expect(cls).toMatch(/(^|\s)justify-self-start(\s|$)/);
+    expect(cls).not.toMatch(/self-stretch|min-h-64/);
+  });
+
+  it('Given a full page, Then there is no add seat', () => {
+    state.classrooms = [mk(1)];
+    render(<ClassroomManager richCards />);
+    expect(screen.queryByTestId('classroom-add-tile')).toBeNull();
   });
 });

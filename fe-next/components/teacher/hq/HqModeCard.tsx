@@ -23,8 +23,8 @@ export interface HqModeCardProps {
  * A radio, not a launch button: selecting a card changes what START will run;
  * START stays the one launch control on the deck.
  *
- * Same shape at every size: an art stage on top that takes every pixel the
- * deck gives it (the island IS the card), a name plate underneath. The name
+ * Same shape at every size: an art stage on top that fills the card (the
+ * island IS the card), a name plate underneath; a 2:3 card below `lg`. The name
  * only ever wraps between words — never "VOCA/B QUIZ".
  */
 export const HqModeCard = memo(function HqModeCard({
@@ -50,6 +50,11 @@ export const HqModeCard = memo(function HqModeCard({
       transition={{ type: "spring", stiffness: 520, damping: 22 }}
       className={cn(
         "group relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-neo-lg border-3 text-center",
+        // Phone/tablet: a fixed card shape in EVERY data state — never
+        // stretched to whatever height the grid row happens to have (the r3
+        // loading capture turned four cards into tall empty columns). Desktop
+        // is a fixed 2x2 board that fills its column by design.
+        "aspect-[2/3] w-full self-start justify-self-stretch lg:aspect-auto lg:self-stretch",
         "transition-[box-shadow,border-color,background-color] duration-150",
         "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
         selected

@@ -16,6 +16,8 @@ export interface RosterSeatsProps {
   /** Seat size in px. */
   size?: number;
   reduced?: boolean;
+  /** Caption each seat with the student's name (the desktop roster). */
+  showNames?: boolean;
   className?: string;
 }
 
@@ -45,6 +47,7 @@ export const RosterSeats = memo(function RosterSeats({
   seats = 7,
   size = 36,
   reduced = false,
+  showNames = false,
   className,
 }: RosterSeatsProps) {
   const plan = seatPlan(students.length, seats);
@@ -54,7 +57,7 @@ export const RosterSeats = memo(function RosterSeats({
   return (
     <ul
       data-testid="hq-roster-seats"
-      className={cn("flex items-center gap-1.5", className)}
+      className={cn("flex items-center gap-1.5", showNames && "flex-wrap items-start gap-2", className)}
     >
       {shown.map((s) => {
         const isNew = fresh.has(s.id);
@@ -67,12 +70,16 @@ export const RosterSeats = memo(function RosterSeats({
             initial={isNew && !reduced ? { scale: 0, rotate: -20 } : false}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 520, damping: 16 }}
-            className={cn(
-              "shrink-0 overflow-hidden rounded-full border-2 border-neo-black bg-neo-cream shadow-hard-sm",
-              isNew && "ring-4 ring-neo-lime",
-            )}
-            style={{ width: size, height: size }}
+            className="flex min-w-0 shrink-0 flex-col items-center gap-1"
+            style={showNames ? { width: size + 16 } : undefined}
           >
+            <span
+              className={cn(
+                "block shrink-0 overflow-hidden rounded-full border-2 border-neo-black bg-neo-cream shadow-hard-sm",
+                isNew && "ring-4 ring-neo-lime",
+              )}
+              style={{ width: size, height: size }}
+            >
             {s.avatar ? (
               // The avatar renderer is a lazy chunk whose loading placeholder
               // is a dark pulsing disc — on navy that reads as an EMPTY seat.
@@ -113,6 +120,12 @@ export const RosterSeats = memo(function RosterSeats({
                 {initialOf(s.name)}
               </span>
             )}
+            </span>
+            {showNames ? (
+              <span className="w-full truncate text-center font-neo-body text-xs font-bold text-neo-white">
+                {s.name}
+              </span>
+            ) : null}
           </m.li>
         );
       })}
@@ -121,7 +134,9 @@ export const RosterSeats = memo(function RosterSeats({
           key={`ghost-${i}`}
           data-testid="hq-roster-ghost"
           aria-hidden="true"
-          className="flex shrink-0 items-center justify-center rounded-full border-2 border-dashed border-neo-cream/45 text-neo-cream/40"
+          // An empty chair, not a broken image: solid and faint. (Dashed rings
+          // read as "failed to load" — critic, cp1.)
+          className="flex shrink-0 items-center justify-center rounded-full bg-neo-cream/10 text-neo-cream/30"
           style={{ width: size, height: size }}
         >
           <UserRound className="size-1/2" aria-hidden="true" />

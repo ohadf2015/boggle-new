@@ -22,6 +22,12 @@ export interface HqSheetProps {
    * `<details>` still mounts its children, which would be a phantom impression.
    */
   mountWhenOpen?: boolean;
+  /**
+   * No visible trigger of its own — the sheet is opened from elsewhere (the
+   * Tools sheet's "Word lists" tile, a deep link). The `<details>` stays so the
+   * open state, deep links and tests keep one shape.
+   */
+  hideSummary?: boolean;
   children: ReactNode;
 }
 
@@ -53,6 +59,7 @@ export function HqSheet({
   closeLabel,
   className,
   mountWhenOpen = false,
+  hideSummary = false,
   children,
 }: HqSheetProps) {
   useEffect(() => {
@@ -75,6 +82,7 @@ export function HqSheet({
       className={cn("group min-w-0", className)}
     >
       <summary
+        hidden={hideSummary || undefined}
         className={cn(
           "list-none marker:content-none [&::-webkit-details-marker]:hidden",
           summaryClassName,

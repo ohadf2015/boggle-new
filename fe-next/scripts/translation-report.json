@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 7062,
+    "totalKeysInCode": 7185,
     "keyCountByLanguage": {
-      "en": 13721,
-      "es": 14009,
-      "he": 13931,
-      "ja": 13990,
-      "ru": 13763,
-      "sv": 13987
+      "en": 13854,
+      "es": 14142,
+      "he": 14064,
+      "ja": 14123,
+      "ru": 13896,
+      "sv": 14120
     },
-    "missingFromEnglish": 100,
+    "missingFromEnglish": 117,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 397,
@@ -2326,7 +2326,7 @@
         "pattern": "`wordcraft.encouragement.${encIdx}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftGameScreen.tsx",
-        "line": 631,
+        "line": 640,
         "context": "const encouragement = t(`wordcraft.encouragement.${encIdx}`);"
       },
       {
@@ -3750,6 +3750,163 @@
     "sv": []
   },
   "missingFromEnglish": [
+    {
+      "key": "academy.modes.openForXp",
+      "usages": [
+        {
+          "file": "components/education/academyModes/AcademyReward.tsx",
+          "line": 216
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.review.chest.bronze",
+      "usages": [
+        {
+          "file": "components/education/academyModes/MissedWordsReview.tsx",
+          "line": 114
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.review.chest.gold",
+      "usages": [
+        {
+          "file": "components/education/academyModes/MissedWordsReview.tsx",
+          "line": 114
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.review.chest.silver",
+      "usages": [
+        {
+          "file": "components/education/academyModes/MissedWordsReview.tsx",
+          "line": 114
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.review.perfect",
+      "usages": [
+        {
+          "file": "components/education/academyModes/MissedWordsReview.tsx",
+          "line": 226
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.review.runDone",
+      "usages": [
+        {
+          "file": "components/education/academyModes/MissedWordsReview.tsx",
+          "line": 226
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.review.statCorrect",
+      "usages": [
+        {
+          "file": "components/education/academyModes/MissedWordsReview.tsx",
+          "line": 243
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.review.statPoints",
+      "usages": [
+        {
+          "file": "components/education/academyModes/MissedWordsReview.tsx",
+          "line": 245
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.review.statStreak",
+      "usages": [
+        {
+          "file": "components/education/academyModes/MissedWordsReview.tsx",
+          "line": 244
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.workshop.lessonWords",
+      "usages": [
+        {
+          "file": "components/education/academyModes/WorkshopPanels.tsx",
+          "line": 138
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.workshop.panelHint",
+      "usages": [
+        {
+          "file": "components/education/academyModes/WorkshopPanels.tsx",
+          "line": 148
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.workshop.rival.name",
+      "usages": [
+        {
+          "file": "components/education/academyModes/WordWorkshop.tsx",
+          "line": 236
+        },
+        {
+          "file": "components/education/academyModes/WorkshopRival.tsx",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.workshop.starsValue",
+      "usages": [
+        {
+          "file": "components/education/academyModes/WordWorkshop.tsx",
+          "line": 351
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.workshop.statLessonWords",
+      "usages": [
+        {
+          "file": "components/education/academyModes/WordWorkshop.tsx",
+          "line": 350
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.workshop.statStars",
+      "usages": [
+        {
+          "file": "components/education/academyModes/WordWorkshop.tsx",
+          "line": 351
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.workshop.statWords",
+      "usages": [
+        {
+          "file": "components/education/academyModes/WordWorkshop.tsx",
+          "line": 352
+        }
+      ]
+    },
+    {
+      "key": "academy.modes.workshop.you",
+      "usages": [
+        {
+          "file": "components/education/academyModes/WordWorkshop.tsx",
+          "line": 237
+        }
+      ]
+    },
     {
       "key": "admin.teacherAccess.col.use_case",
       "usages": [

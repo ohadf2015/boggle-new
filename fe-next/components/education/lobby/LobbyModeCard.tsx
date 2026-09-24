@@ -10,11 +10,12 @@
 
 'use client';
 
-import { Check, Clock, Sparkles } from 'lucide-react';
+import { Check, Clock, Gauge, Grid3x3, HelpCircle, Type, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { ModeAccent, TeacherGameMode } from '@/lib/education/gameModes';
-import { modeCardArt } from './lobbyModeCards';
+import { modeCardArt, type ModeFactChip } from './lobbyModeCards';
+import { tr } from './eduText';
 
 /** Whole literal classes — Tailwind v4 only emits what it can read verbatim. */
 const SELECTED_FILL: Record<ModeAccent, string> = {
@@ -46,11 +47,24 @@ export interface LobbyModeCardProps {
   /** Minutes to print: the configured round for the selected card, else the catalog's. */
   minutes: number;
   busy?: boolean;
+  /** Question count / pace, or grid / min letters — from the lobby's settings. */
+  facts?: ModeFactChip[];
   onPick: (id: TeacherGameMode['id']) => void;
 }
 
-export function LobbyModeCard({ mode, selected, recommended, minutes, busy, onPick }: LobbyModeCardProps) {
+const FACT_ICON = {
+  questions: HelpCircle,
+  pace: Gauge,
+  board: Grid3x3,
+  letters: Type,
+} as const;
+
+export function LobbyModeCard({ mode, selected, recommended, minutes, busy, facts = [], onPick }: LobbyModeCardProps) {
   const { t } = useLanguage();
+  const chip = cn(
+    'inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2px] px-1.5 py-0.5 font-neo-display text-[0.62rem] font-black uppercase leading-none lg:px-2 lg:text-sm',
+    selected ? 'border-neo-black bg-neo-cream text-neo-black' : 'border-neo-cream text-neo-cream'
+  );
   return (
     <button
       type="button"
@@ -102,14 +116,22 @@ export function LobbyModeCard({ mode, selected, recommended, minutes, busy, onPi
         {t(mode.nameKey)}
       </span>
 
-      <span
-        className={cn(
-          'inline-flex items-center gap-1 rounded-full border-[2px] px-1.5 py-0.5 font-neo-display text-[0.62rem] font-black uppercase leading-none lg:text-xs',
-          selected ? 'border-neo-black bg-neo-cream text-neo-black' : 'border-neo-cream text-neo-cream'
-        )}
-      >
-        <Clock className="size-3 shrink-0" strokeWidth={3} aria-hidden="true" />
-        {t('education.modePicker.minutes', { count: minutes })}
+      {/* The facts a teacher picks by, in one glance: length, then the
+          quiz's size + pace or the board's grid + difficulty. */}
+      <span data-testid="mode-facts" className="flex w-full flex-wrap items-center justify-center gap-1 lg:gap-1.5">
+        <span className={chip}>
+          <Clock className="size-3 shrink-0 lg:size-4" strokeWidth={3} aria-hidden="true" />
+          {t('education.modePicker.minutes', { count: minutes })}
+        </span>
+        {facts.map((fact) => {
+          const Icon = FACT_ICON[fact.kind];
+          return (
+            <span key={fact.kind} data-testid={`mode-fact-${fact.kind}`} className={chip}>
+              <Icon className="hidden size-3 shrink-0 sm:block lg:size-4" strokeWidth={3} aria-hidden="true" />
+              {factLabel(fact, t)}
+            </span>
+          );
+        })}
       </span>
 
       {recommended && (
@@ -123,6 +145,19 @@ export function LobbyModeCard({ mode, selected, recommended, minutes, busy, onPi
       )}
     </button>
   );
+}
+
+function factLabel(fact: ModeFactChip, t: (key: string, params?: Record<string, string | number>) => string): string {
+  switch (fact.kind) {
+    case 'questions':
+      return tr(t, 'academy.launch.questions', '{{count}} Qs', { count: fact.count });
+    case 'pace':
+      return tr(t, 'academy.launch.pace', '{{seconds}}s each', { seconds: fact.seconds });
+    case 'board':
+      return fact.label;
+    case 'letters':
+      return tr(t, 'academy.launch.minLetters', '{{count}}+ letters', { count: fact.min });
+  }
 }
 
 export default LobbyModeCard;

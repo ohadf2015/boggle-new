@@ -5,6 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import toast from "react-hot-toast";
 import { AnimatePresence, m } from "framer-motion";
 import { Check, Link2, MonitorUp, QrCode, UsersRound } from "lucide-react";
+import { JoinCardFrame } from "./JoinCardFrame";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
@@ -27,8 +28,9 @@ export interface GetStudentsInCardProps {
   className?: string;
 }
 
-const ACTION =
-  "inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-neo border-3 border-neo-black px-2 py-1.5 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan sm:text-sm lg:min-h-12 lg:text-base";
+/** A secondary join affordance: quiet navy, cream edge (contrast on navy), coloured icon. */
+const SECONDARY =
+  "inline-flex min-h-12 min-w-0 flex-col items-center justify-center gap-0.5 rounded-neo border-2 border-neo-cream/70 bg-neo-navy px-1 py-1 text-center font-neo-display text-[0.65rem] font-black uppercase leading-none tracking-wide text-neo-white shadow-hard-sm sm:flex-row sm:gap-1.5 transition-all hover:-translate-y-0.5 hover:border-neo-cream active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan sm:text-xs lg:min-h-12 lg:text-sm";
 
 /**
  * The second hero: getting the class IN. The code is the biggest type on the
@@ -98,174 +100,228 @@ export function GetStudentsInCard({
   }, [onOpenProjector, sfx]);
 
   const shortUrl = joinUrl.replace(/^https?:\/\//, "");
+  const waiting = rosterLoading || count === 0;
 
   return (
-    <section
-      data-testid="hq-get-students-in"
-      aria-labelledby="hq-get-students-heading"
-      className={cn(
-        "flex min-h-0 flex-col overflow-hidden rounded-neo-lg border-3 border-neo-cream bg-neo-navy-light/95 shadow-hard-xl",
-        className,
-      )}
-    >
-      <div className="flex shrink-0 items-center gap-2 border-b-3 border-neo-black bg-neo-cyan px-3 py-1.5 sm:px-4 sm:py-2">
-        <UsersRound
-          className="size-5 shrink-0 text-black lg:size-6"
-          strokeWidth={3}
-          aria-hidden="true"
-        />
-        <h2
-          id="hq-get-students-heading"
-          className="min-w-0 truncate font-neo-display text-lg font-black uppercase leading-none tracking-tight text-black sm:text-2xl"
+    <JoinCardFrame
+      testId="hq-get-students-in"
+      className={className}
+      // HQ never hosts the game itself: GO LIVE opens the room. Until then
+      // the class code is ready and working — say exactly that.
+      status={
+        <span
+          data-testid="hq-join-status"
+          className="ms-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border-2 border-neo-lime/70 px-2 py-0.5 font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-neo-lime sm:text-xs"
         >
-          {t("academy.hq.getStudentsIn", "Get students in")}
-        </h2>
-        <span className="ms-auto min-w-0 max-w-[40%] truncate font-neo-body text-xs font-bold text-black/70 lg:text-sm">
-          {classroom.name}
+          <span className="relative flex size-2">
+            {reduced ? null : (
+              <m.span
+                aria-hidden="true"
+                className="absolute inset-0 rounded-full bg-neo-lime"
+                animate={{ scale: [1, 2.2], opacity: [0.7, 0] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
+              />
+            )}
+            <span className="relative size-2 rounded-full bg-neo-lime" />
+          </span>
+          {t("academy.hq.codeReady", "Code ready")}
         </span>
-      </div>
-
+      }
+    >
       <div className="flex min-h-0 flex-1 flex-col gap-2 p-2 sm:gap-3 sm:p-3 lg:p-4">
-        {/* The code: the one thing the back row has to read. */}
-        <div className="flex shrink-0 items-stretch gap-2">
-          <div className="flex min-w-0 flex-1 flex-col items-center justify-center rounded-neo border-3 border-neo-black bg-neo-yellow px-2 py-1 shadow-hard lg:py-3">
-            <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-black/70 lg:text-sm">
-              {t("academy.hq.classCode", "Class code")}
-            </span>
+        {/* THE hero of this card: the code, read from the back row. */}
+        <div className="flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-yellow bg-neo-navy px-2 py-1 shadow-hard-sm lg:py-2">
+          <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-yellow/75 lg:text-sm">
+            {t("academy.hq.classCode", "Class code")}
+          </span>
+          <span
+            data-testid="hq-join-code"
+            dir="ltr"
+            className="select-all whitespace-nowrap font-mono text-5xl font-black leading-none tracking-[0.1em] text-neo-yellow sm:text-6xl lg:text-7xl 2xl:text-8xl"
+          >
+            {classroom.join_code}
+          </span>
+          {shortUrl ? (
             <span
-              data-testid="hq-join-code"
               dir="ltr"
-              className="select-all whitespace-nowrap font-mono text-5xl font-black leading-none tracking-[0.1em] text-black sm:text-6xl lg:text-7xl 2xl:text-8xl"
+              className="mt-1 hidden max-w-full truncate font-mono text-sm font-bold text-neo-white/70 lg:block"
             >
-              {classroom.join_code}
+              {shortUrl}
             </span>
-          </div>
-          {/* A phone teacher opens the projector for the QR; desktop shows it below. */}
+          ) : null}
+        </div>
+
+        {/* Everything else is secondary, one quiet row of equals. */}
+        <div data-testid="hq-join-actions" className="grid shrink-0 grid-cols-3 gap-2">
+          <button
+            type="button"
+            data-testid="hq-copy-link"
+            onClick={copyLink}
+            className={SECONDARY}
+          >
+            {copied ? (
+              <Check className="size-4 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
+            ) : (
+              <Link2 className="size-4 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
+            )}
+            <span className="line-clamp-2 min-w-0">{t("academy.hq.copyLink", "Copy link")}</span>
+          </button>
+          {/* The QR a phone in the room scans lives on the projector; here it
+              is a small thumbnail (desktop) or an icon (phone) that opens it. */}
           <button
             type="button"
             data-testid="hq-open-qr"
             onClick={openProjector}
             aria-label={t("academy.hq.showQr", "Show QR code")}
-            className="flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-black bg-neo-white font-neo-display text-[0.6rem] font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 active:translate-y-0.5 lg:hidden"
+            className={SECONDARY}
           >
-            <QrCode className="size-8" strokeWidth={2.5} aria-hidden="true" />
-            {t("academy.hq.qr", "QR")}
-          </button>
-        </div>
-
-        {/* Desktop: the QR beside the link, sized by the height the deck
-            leaves — it grows into the card instead of floating in a gap. */}
-        <div className="hidden min-h-0 flex-1 items-center gap-4 lg:flex">
-          {joinUrl ? (
-            <div className="aspect-square h-full max-h-full min-h-0 shrink-0 rounded-neo border-3 border-neo-black bg-neo-white p-2 shadow-hard">
-              <QRCodeSVG
-                value={joinUrl}
-                size={320}
-                level="M"
-                style={{ width: "100%", height: "100%" }}
-                aria-label={t("academy.hq.qrLabel", "QR code to join")}
-              />
-            </div>
-          ) : null}
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <span className="font-neo-display text-xl font-black uppercase leading-none tracking-tight text-neo-white xl:text-2xl">
-              {t("academy.hq.scanToJoin", "Scan to join")}
-            </span>
-            <span className="font-neo-body text-sm font-bold text-neo-white/70">
-              {t(
-                "academy.teacher.orTypeCode",
-                "or open the link and type the code",
-              )}
-            </span>
-            <p
-              dir="ltr"
-              className="break-all font-mono text-sm font-bold text-neo-lime xl:text-base"
-            >
-              {shortUrl}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex shrink-0 gap-2">
-          <button
-            type="button"
-            data-testid="hq-copy-link"
-            onClick={copyLink}
-            className={cn(ACTION, "bg-neo-lime")}
-          >
-            {copied ? (
-              <Check
-                className="size-4 shrink-0"
-                strokeWidth={3}
-                aria-hidden="true"
-              />
-            ) : (
-              <Link2
-                className="size-4 shrink-0"
-                strokeWidth={3}
-                aria-hidden="true"
-              />
-            )}
-            <span className="truncate">
-              {t("academy.hq.copyLink", "Copy link")}
-            </span>
+            {joinUrl ? (
+              <span className="hidden size-9 shrink-0 rounded-sm bg-neo-white p-0.5 lg:block">
+                <QRCodeSVG
+                  value={joinUrl}
+                  size={64}
+                  level="L"
+                  style={{ width: "100%", height: "100%" }}
+                  aria-hidden="true"
+                />
+              </span>
+            ) : null}
+            <QrCode
+              className={cn("size-4 shrink-0 text-neo-cyan", joinUrl && "lg:hidden")}
+              strokeWidth={2.5}
+              aria-hidden="true"
+            />
+            <span className="line-clamp-2 min-w-0">{t("academy.hq.qr", "QR")}</span>
           </button>
           <button
             type="button"
             data-testid="hq-open-projector"
             onClick={openProjector}
-            className={cn(ACTION, "bg-neo-pink")}
+            className={SECONDARY}
           >
-            <MonitorUp
-              className="size-4 shrink-0"
-              strokeWidth={3}
-              aria-hidden="true"
-            />
-            <span className="truncate">
-              {t("academy.hq.openProjector", "Open projector")}
-            </span>
+            <MonitorUp className="size-4 shrink-0 text-neo-pink" strokeWidth={3} aria-hidden="true" />
+            <span className="line-clamp-2 min-w-0">{t("academy.hq.openProjector", "Open projector")}</span>
           </button>
         </div>
 
-        <div className="flex shrink-0 items-center justify-between gap-2 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-1.5">
-          <RosterSeats
-            students={students}
-            arrivals={arrivals}
-            reduced={reduced}
-            seats={wide ? 6 : 5}
-            size={wide ? 44 : 34}
-          />
-          <p
-            data-testid="hq-joined-count"
-            aria-live="polite"
-            className="min-w-0 text-end font-neo-display text-xs font-black uppercase leading-tight text-neo-white sm:text-sm"
-          >
-            {rosterLoading ? (
-              // Pessimistic: neither "nobody yet" nor a number until the
-              // first read settles (pitfall class 1).
-              <span className="text-neo-white/50">…</span>
-            ) : count > 0 ? (
-              <>
-                <AnimatePresence initial={false} mode="popLayout">
-                  <m.span
-                    key={shownCount}
-                    initial={reduced ? false : { scale: 1.8, y: -4 }}
-                    animate={{ scale: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 600, damping: 18 }}
-                    className="inline-block text-2xl text-neo-lime tabular-nums lg:text-3xl"
-                  >
-                    {shownCount}
-                  </m.span>
-                </AnimatePresence>{" "}
-                {t("academy.hq.joinedLabel", "joined")}
-              </>
-            ) : (
-              t("academy.hq.nobodyYet", "No one yet — share the code")
-            )}
-          </p>
+        {/* Who is in. Desktop spends the QR's old space on a real roster. */}
+        <div
+          className={cn(
+            "flex shrink-0 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-1.5",
+            "lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-3 lg:overflow-hidden lg:p-3",
+            waiting ? "items-center" : "items-center justify-between gap-2 lg:items-stretch lg:justify-start",
+          )}
+        >
+          {waiting ? (
+            <div
+              data-testid="hq-roster-waiting"
+              className="flex w-full min-w-0 items-center gap-3 lg:h-full lg:flex-col lg:justify-center lg:gap-4"
+            >
+              <span className="relative flex size-10 shrink-0 items-center justify-center lg:size-20">
+                {reduced
+                  ? null
+                  : [0, 0.8].map((delay) => (
+                      <m.span
+                        key={delay}
+                        aria-hidden="true"
+                        className="absolute inset-0 rounded-full border-2 border-neo-cyan"
+                        animate={{ scale: [1, 1.9], opacity: [0.8, 0] }}
+                        transition={{ duration: 1.6, delay, repeat: Infinity, ease: "easeOut" }}
+                      />
+                    ))}
+                <span className="relative flex size-full items-center justify-center rounded-full border-3 border-neo-black bg-neo-cyan shadow-hard-sm">
+                  <UsersRound className="size-5 text-black lg:size-10" strokeWidth={3} aria-hidden="true" />
+                </span>
+              </span>
+              <JoinedCount
+                loading={rosterLoading}
+                count={count}
+                shown={shownCount}
+                reduced={reduced}
+                label={t("academy.hq.joinedLabel", "joined")}
+                empty={t("academy.hq.nobodyYet", "No one yet — share the code")}
+              />
+              {/* Claims no count, so it is honest while the read is open too. */}
+              <p className="hidden max-w-sm text-center font-neo-body text-sm font-bold text-neo-white/60 lg:block">
+                {t("teacher.activation.shareBody")}
+              </p>
+            </div>
+          ) : (
+            <>
+              <RosterSeats
+                students={students}
+                arrivals={arrivals}
+                reduced={reduced}
+                // Phone: one row with a few empty chairs. Desktop: every
+                // student, named — no empty chairs at all.
+                seats={wide ? Math.min(Math.max(count, 1), 15) : 5}
+                size={wide ? 64 : 34}
+                showNames={wide}
+                className="lg:order-2 lg:min-h-0 lg:overflow-hidden lg:gap-3"
+              />
+              {/* Desktop: the rest of the panel says where newcomers appear. */}
+              <p className="hidden font-neo-body text-sm font-bold text-neo-white/60 lg:order-3 lg:mt-auto lg:block">
+                {t("teacher.activation.shareBody")}
+              </p>
+              <JoinedCount
+                loading={false}
+                count={count}
+                shown={shownCount}
+                reduced={reduced}
+                label={t("academy.hq.joinedLabel", "joined")}
+                empty={t("academy.hq.nobodyYet", "No one yet — share the code")}
+              />
+            </>
+          )}
         </div>
       </div>
-    </section>
+    </JoinCardFrame>
+  );
+}
+
+interface JoinedCountProps {
+  loading: boolean;
+  count: number;
+  shown: number;
+  reduced: boolean;
+  label: string;
+  empty: string;
+}
+
+/**
+ * The one count on the card. Pessimistic while the first read is open
+ * (pitfall class 1); a big "0" plus the nudge when empty; springs up a step
+ * per arrival otherwise.
+ */
+function JoinedCount({ loading, count, shown, reduced, label, empty }: JoinedCountProps) {
+  return (
+    <p
+      data-testid="hq-joined-count"
+      aria-live="polite"
+      className="flex min-w-0 items-baseline gap-1.5 font-neo-display text-xs font-black uppercase leading-tight text-neo-white sm:text-sm lg:text-base"
+    >
+      {loading ? (
+        <span className="text-2xl text-neo-white/50 lg:text-4xl">…</span>
+      ) : (
+        <>
+          <AnimatePresence initial={false} mode="popLayout">
+            <m.span
+              key={shown}
+              initial={reduced ? false : { scale: 1.8, y: -4 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 600, damping: 18 }}
+              className={cn(
+                "inline-block shrink-0 text-2xl tabular-nums lg:text-4xl",
+                count > 0 ? "text-neo-lime" : "text-neo-white/60",
+              )}
+            >
+              {shown}
+            </m.span>
+          </AnimatePresence>
+          <span className="min-w-0">{count > 0 ? label : empty}</span>
+        </>
+      )}
+    </p>
   );
 }
 

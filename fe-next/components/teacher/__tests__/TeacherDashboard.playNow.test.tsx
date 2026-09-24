@@ -91,7 +91,7 @@ describe('<TeacherDashboard> — play now in one tap', () => {
     expect(screen.queryByText('teacher.dashboard.repeatLastGame')).not.toBeInTheDocument();
   });
 
-  it('keeps recent games and reports one tap away, outside the panel', () => {
+  it('keeps recent games and reports reachable from the Tools sheet (≤2 taps), outside the panel', () => {
     render(<TeacherDashboard />);
     const shortcuts = screen.getByTestId('teacher-shortcuts');
     expect(shortcuts.contains(screen.getByTestId('play-now-launcher'))).toBe(false);
@@ -99,7 +99,7 @@ describe('<TeacherDashboard> — play now in one tap', () => {
     expect(screen.getByTestId('shortcut-reports')).toHaveAttribute('href', '/en/teacher/reports?classroomId=c1');
   });
 
-  it('opens the last-game panel in one tap without it ever being in the way', () => {
+  it('opens the last-game panel from its Tools shortcut without it ever being in the way', () => {
     render(<TeacherDashboard />);
     const tools = screen.getByTestId('teacher-tools');
     expect(tools).not.toHaveAttribute('open');

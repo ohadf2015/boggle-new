@@ -19,7 +19,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { TEACHER_GAME_MODES, teacherGameMode, type TeacherGameMode } from '@/lib/education/gameModes';
 import { LobbyModeCard } from './LobbyModeCard';
-import { visibleModeIds } from './lobbyModeCards';
+import { modeCardFacts, visibleModeIds, type LaunchRoundFacts } from './lobbyModeCards';
 
 export interface LobbyModeHeroProps {
   selected: TeacherGameMode['id'];
@@ -31,6 +31,8 @@ export interface LobbyModeHeroProps {
    * the catalog number is only a fallback for a mode nobody has tuned yet.
    */
   minutes?: number;
+  /** The lobby's live settings, for each card's fact chips (never a per-mode guess). */
+  roundFacts?: LaunchRoundFacts;
   /**
    * Set while GO LIVE cannot fire. It only DISABLES here — the sentence saying
    * why is the setup row's own label, so the screen never stacks a banner over
@@ -49,6 +51,7 @@ export function LobbyModeHero({
   recommended,
   busy,
   minutes,
+  roundFacts,
   blockedKey,
   expanded,
   onToggleExpanded,
@@ -84,6 +87,7 @@ export function LobbyModeHero({
             recommended={recommended === mode.id}
             minutes={mode.id === live.id ? (minutes ?? mode.minutes) : mode.minutes}
             busy={busy}
+            facts={roundFacts ? modeCardFacts(mode.id, roundFacts) : undefined}
             onPick={onPick}
           />
         ))}

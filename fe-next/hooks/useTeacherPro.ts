@@ -34,10 +34,16 @@ const FREE: Omit<TeacherProState, 'loading' | 'refresh'> = {
 // The dashboard mounts several consumers at once (plan badge, ProGate, the
 // celebration, the banner). One in-flight request serves all of them; `refresh`
 // drops it so the next read is fresh.
-let inflight: Promise<Response> | null = null;
-function fetchStatus(force: boolean): Promise<Response> {
+// Share the PARSED body, never the Response: a body reads once, so every consumer after the
+// first threw "body already used", fell back to FREE, and showed a paying teacher a paywall.
+// null = a non-OK response (stays free).
+type StatusBody = Record<string, unknown> | null;
+let inflight: Promise<StatusBody> | null = null;
+function fetchStatus(force: boolean): Promise<StatusBody> {
   if (force || !inflight) {
-    inflight = fetch('/api/subscription/status').finally(() => {
+    inflight = fetch('/api/subscription/status')
+      .then((r) => (r.ok ? (r.json() as Promise<StatusBody>) : null))
+      .finally(() => {
       // Keep the settled promise only for the current tick so concurrent mounts
       // share it, but a later mount re-reads.
       setTimeout(() => { inflight = null; }, 0);
@@ -67,9 +73,8 @@ export function useTeacherPro(): TeacherProState {
 
   const load = useCallback(async (isCancelled: () => boolean, force = false) => {
     try {
-      const response = await fetchStatus(force);
-      if (!response.ok) return;
-      const data = await response.json();
+      const data = await fetchStatus(force);
+      if (!data) return;
       if (isCancelled()) return;
       setState({
         hasPro: data?.has_pro === true,

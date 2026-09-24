@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import ClassroomManager from "../ClassroomManager";
 import { AssignmentTrackingPanel } from "../assignments";
+import { MissedWordsHomeworkCard } from "../assignments/MissedWordsHomeworkCard";
 import { AnalyticsDashboard } from "../analytics/AnalyticsDashboard";
 import { LastGameInsights } from "../analytics/LastGameInsights";
 import { ProGate } from "../ProGate";
@@ -109,6 +110,11 @@ export function HqToolsContent({
             classroomId={id}
             onCreateReviewLesson={onReviewWords}
           />
+          {/* Pro: the last game's misses become each student's OWN homework
+              in one tap (lib/education/missedWordsHomework.ts). */}
+          <ProGate feature="reports" active={open}>
+            <MissedWordsHomeworkCard classroomId={id} />
+          </ProGate>
           <AssignmentTrackingPanel
             classroomId={id}
             onCreateAssignment={onCreateAssignment}

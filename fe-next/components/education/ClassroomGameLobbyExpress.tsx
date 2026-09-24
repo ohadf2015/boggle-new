@@ -29,7 +29,7 @@ import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
 import type { Classroom, Language } from '@/lib/supabase/education/types';
-import { trackEduClassroomCreated } from '@/lib/education/telemetry';
+import { trackEduClassroomCreated, trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import {
   abandonLaunch,
   ensureLaunch,
@@ -120,6 +120,9 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
     ensureLaunch(launchKey, (control) => {
       const gameCode = randomGameCode();
       let socket: Socket | null = null;
+      // Set just before the room is asked for; read when the server confirms.
+      let startedMeta: { classroomId: string; lessonCount: number } | null = null;
+      let startedTracked = false;
       const watchdog = setTimeout(
         () => {
           logger.error('Quick launch timed out before the room was confirmed');
@@ -163,6 +166,13 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
           live.on('classroomGameCreated', (data: { success?: boolean; gameCode?: string }) => {
             if (data?.success !== true || !data.gameCode) return;
             clearTimeout(watchdog);
+            // The primary launch path's activation event — on the server's
+            // confirmation, once. Until 2026-09-24 this path fired nothing, so
+            // the funnel only saw games started from the full lobby.
+            if (startedMeta && !startedTracked) {
+              startedTracked = true;
+              trackEduLiveGameStarted({ ...startedMeta, source: 'hq_express' });
+            }
             control.succeed(data.gameCode);
           });
           // The server's error text is internal English ("You are not the
@@ -253,6 +263,10 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             /* storage off — the socket payload still carries the words */
           }
 
+          startedMeta = {
+            classroomId: result.payload.classroomId,
+            lessonCount: result.payload.lessonIds.length,
+          };
           live.emit('createClassroomGame', result.payload);
 
           // Bookkeeping only, and AFTER the room is asked for: a throw in the

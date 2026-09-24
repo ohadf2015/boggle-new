@@ -99,4 +99,12 @@ describe('<PlayNowLauncher> — mode cards', () => {
     fireEvent.click(screen.getByTestId('play-now-go'));
     expect(onLaunch).toHaveBeenCalledWith(expect.objectContaining({ source: 'pack', mode: 'vocab-quiz' }));
   });
+
+  it('Given HQ sequencing, Then this hero is step 1 and GO LIVE is its launch control', () => {
+    render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    expect(screen.getByTestId('hq-step-badge-1')).toHaveTextContent('1');
+    // The badge is decoration beside the heading, never part of its name.
+    expect(screen.getByRole('heading', { name: 'Start a game' })).toBeInTheDocument();
+    expect(screen.getByTestId('play-now-go').className).toMatch(/shadow-hard-(lg|xl)/);
+  });
 });

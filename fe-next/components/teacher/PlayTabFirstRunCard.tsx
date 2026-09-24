@@ -7,13 +7,15 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { trackTeacherOnboardingStep } from '@/lib/education/telemetry';
 import { cn } from '@/lib/utils';
-import { Copy, Loader, Users } from 'lucide-react';
+import { Copy, Loader, Plus } from 'lucide-react';
+import { JoinCardFrame } from './hq/JoinCardFrame';
 import toast from 'react-hot-toast';
 import type { Language } from '@/lib/supabase/education/types';
 
 interface PlayTabFirstRunCardProps {
   onJoinCodeCreated?: (code: string) => void;
   initialJoinCode?: string | null;
+  className?: string;
 }
 
 /**
@@ -31,11 +33,15 @@ interface PlayTabFirstRunCardProps {
  * gets it in one tap — no field to fill, the default name applied silently and
  * editable later in the classroom manager.
  *
+ * Round 3: it wears the "Get students in" frame (step 2) so the slot keeps its
+ * shape across loading → no class → live card; the six empty code slots show
+ * what the one tap will produce.
+ *
  * Motion: none. The card's resting state paints in full on the first frame —
  * an opacity tween on a card this size is the mobile-web flash of pitfall
  * class 5, and it used to have one.
  */
-export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode }: PlayTabFirstRunCardProps) {
+export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode, className }: PlayTabFirstRunCardProps) {
   const { t, language } = useLanguage();
   const { createClassroom } = useClassrooms();
 
@@ -85,44 +91,34 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
   };
 
   return (
-    <section
-      data-testid="play-tab-first-run-card"
-      className="flex items-center gap-4 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-4 py-4 shadow-hard sm:gap-5 sm:px-5"
-    >
-      {/* Lexi minding an empty room. Decorative — the copy carries the meaning. */}
-      <Image
-        src="/mascot/teacher/hero-empty-classroom.webp"
-        data-testid="teacher-empty-classroom-art"
-        alt=""
-        aria-hidden="true"
-        width={160}
-        height={160}
-        className="hidden size-24 shrink-0 select-none object-contain sm:block sm:size-28"
-      />
-
-      <div className="min-w-0 flex-1">
+    <JoinCardFrame testId="play-tab-first-run-card" className={className}>
+      <div className="flex min-h-0 flex-1 flex-col gap-2 p-2 sm:gap-3 sm:p-3 lg:p-4">
         {createdJoinCode ? (
           <>
-            <p className="font-neo-display text-base font-black text-neo-white sm:text-lg">
-              {t('teacher.classroom.createdBannerTitle')}
-            </p>
-            <p className="mt-0.5 font-neo-body text-xs font-bold text-neo-white/70 text-pretty">
-              {t('teacher.classroom.createdBannerBody')}
-            </p>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
+            {/* The code, same plate as the live card: read from the back row. */}
+            <div className="flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-yellow bg-neo-navy px-2 py-1 shadow-hard-sm lg:py-2">
+              <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-yellow/75 lg:text-sm">
+                {t('teacher.classroom.createdBannerTitle')}
+              </span>
               <code
                 data-testid="first-run-join-code"
-                className="rounded-neo border-3 border-black bg-neo-lime px-4 py-2 font-mono text-lg font-black tracking-widest text-black shadow-hard-sm"
+                dir="ltr"
+                className="select-all whitespace-nowrap font-mono text-5xl font-black leading-none tracking-[0.1em] text-neo-yellow sm:text-6xl lg:text-7xl"
               >
                 {createdJoinCode}
               </code>
+            </div>
+            <div className="flex shrink-0 items-center gap-3 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-1.5 lg:min-h-0 lg:flex-1 lg:flex-col lg:justify-center lg:p-4">
+              <p className="min-w-0 flex-1 font-neo-body text-xs font-bold text-neo-white/80 text-pretty lg:flex-none lg:text-center lg:text-sm">
+                {t('teacher.classroom.createdBannerBody')}
+              </p>
               <button
                 type="button"
                 onClick={copyJoinCode}
                 aria-label={t('teacher.classroom.copyCode')}
                 className={cn(
-                  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-black px-3 py-2',
-                  'font-neo-body text-sm font-bold text-neo-lime shadow-hard-sm transition-all',
+                  'inline-flex min-h-11 shrink-0 items-center gap-2 rounded-neo border-[2px] border-black bg-neo-lime px-3 py-2',
+                  'font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm transition-all',
                   'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
                   'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
                 )}
@@ -134,42 +130,70 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
           </>
         ) : (
           <>
-            <p className="font-neo-display text-base font-black text-neo-white sm:text-lg text-balance">
-              {t('teacher.emptyClassroom.title')}
-            </p>
-            <p className="mt-0.5 font-neo-body text-xs font-bold text-neo-white/70 text-pretty">
-              {t('teacher.emptyClassroom.body')}
-            </p>
-            <button
-              type="button"
-              onClick={handleCreate}
-              disabled={isLoading}
-              data-testid="first-run-create-class"
-              className={cn(
-                // Was `bg-neo-navy` + `border-black/40` on this card's own
-                // navy-light fill: ~1.2:1 both ways, i.e. a button you find by
-                // guessing where it is. A solid cyan chip is ~9:1 against the
-                // card and carries its own edge.
-                // Widths are literal: cn()'s tailwind-merge files `border-neo`
-                // in the same group as `border-neo-<colour>`, so the width is
-                // silently dropped and preflight renders no border at all.
-                'mt-3 inline-flex min-h-11 items-center gap-2 rounded-neo border-[2px] border-black px-4 py-2',
-                'bg-neo-cyan font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm',
-                'transition-all hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
-                isLoading && 'cursor-not-allowed opacity-60',
-              )}
+            {/* Where the code will be: six empty slots, so the promise is visible. */}
+            <div
+              aria-hidden="true"
+              className="flex shrink-0 flex-col items-center justify-center gap-1 rounded-neo border-3 border-dashed border-neo-yellow/60 bg-neo-navy px-2 py-1.5 lg:gap-2 lg:py-3"
             >
-              {isLoading ? (
-                <Loader className="size-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <Users className="size-4" aria-hidden="true" />
-              )}
-              {t('teacher.emptyClassroom.getCode')}
-            </button>
+              <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-yellow/75 lg:text-sm">
+                {t('academy.hq.classCode', 'Class code')}
+              </span>
+              <span dir="ltr" className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
+                {Array.from({ length: 6 }, (_, i) => (
+                  <span
+                    key={i}
+                    className="flex h-10 w-8 items-center justify-center rounded-md border-2 border-dashed border-neo-yellow/45 font-mono text-2xl font-black text-neo-yellow/40 sm:h-12 sm:w-10 lg:h-16 lg:w-14 lg:text-4xl"
+                  >
+                    ?
+                  </span>
+                ))}
+              </span>
+            </div>
+
+            <div className="flex min-h-0 shrink-0 items-center gap-3 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-2 lg:flex-1 lg:flex-col lg:justify-center lg:gap-4 lg:p-4">
+              {/* Lexi minding an empty room. Decorative — the copy carries the meaning. */}
+              <Image
+                src="/mascot/teacher/hero-empty-classroom.webp"
+                data-testid="teacher-empty-classroom-art"
+                alt=""
+                aria-hidden="true"
+                width={160}
+                height={160}
+                className="size-14 shrink-0 select-none object-contain sm:size-16 lg:size-32"
+              />
+              <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5 lg:flex-none lg:items-center lg:text-center">
+                <p className="font-neo-display text-sm font-black uppercase leading-tight tracking-tight text-neo-white text-balance sm:text-base lg:text-2xl">
+                  {t('academy.hq.noClassTitle', 'Create your class, get a code in 5 seconds')}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleCreate}
+                  disabled={isLoading}
+                  data-testid="first-run-create-class"
+                  className={cn(
+                    // A solid cyan chip (~9:1 on the navy card) with its own
+                    // black edge. Widths are literal: cn()'s tailwind-merge files
+                    // `border-neo` in the same group as `border-neo-<colour>`, so
+                    // the width would be silently dropped.
+                    'inline-flex min-h-11 items-center gap-2 rounded-neo border-[3px] border-black px-4 py-2',
+                    'bg-neo-cyan font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm lg:text-base',
+                    'transition-all hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+                    'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
+                    isLoading && 'cursor-not-allowed opacity-60',
+                  )}
+                >
+                  {isLoading ? (
+                    <Loader className="size-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Plus className="size-4" strokeWidth={3} aria-hidden="true" />
+                  )}
+                  {t('academy.hq.createClassCta', 'Create my class')}
+                </button>
+              </div>
+            </div>
           </>
         )}
       </div>
-    </section>
+    </JoinCardFrame>
   );
 }

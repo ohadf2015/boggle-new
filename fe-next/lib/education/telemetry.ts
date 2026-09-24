@@ -356,7 +356,7 @@ export function isTestAccountEmail(email: string | null | undefined): boolean {
   return email.trim().toLowerCase().endsWith('@lexiclash.test');
 }
 
-export type LiveGameStartSource = 'create_room' | 'quick_start';
+export type LiveGameStartSource = 'create_room' | 'quick_start' | 'hq_express';
 
 export interface EduLiveGameStartedArgs {
   classroomId: string;

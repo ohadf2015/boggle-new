@@ -62,18 +62,21 @@ export function ClassChest({ found, total, open, t }: ClassChestProps) {
           className="w-full select-none drop-shadow-[0.4cqw_0.4cqw_0_#000]"
         />
       </m.div>
+      {/* Read from the back row: black on lime (16:1), a thick edge, and
+          type that never drops below phone-legible even on a small stage. */}
       <div
-        className="-mt-[1cqw] flex flex-col items-center rounded-neo border-[3px] border-neo-black bg-neo-lime px-[1cqw] py-[0.3cqw] text-neo-black shadow-[0.35cqw_0.35cqw_0_#000]"
+        data-testid="class-chest-label"
+        className="-mt-[1cqw] flex flex-col items-center whitespace-nowrap rounded-neo border-[3px] border-neo-black bg-neo-lime px-[1.2cqw] py-[0.4cqw] text-neo-black shadow-[0.4cqw_0.4cqw_0_#000]"
       >
-        <span className="font-neo-display font-black uppercase leading-none" style={{ fontSize: '1.2cqw' }}>
+        <span className="font-neo-display font-black uppercase leading-none tracking-wide" style={{ fontSize: 'max(9px, 1.9cqw)' }}>
           {tr(t, 'academy.results.classChest', 'Class chest')}
         </span>
-        <span className="font-neo-display font-black tabular-nums leading-tight" style={{ fontSize: '2.2cqw' }}>
+        <span className="font-neo-display font-black tabular-nums leading-tight" style={{ fontSize: 'max(15px, 3.8cqw)' }}>
           <span aria-hidden="true">{open ? `+${shown}` : '?'}</span>
           <span className="sr-only">{open ? found : ''}</span>
         </span>
         {open && total > 0 && (
-          <span className="font-neo-body font-bold leading-tight" style={{ fontSize: '1cqw' }}>
+          <span className="hidden font-neo-body font-black leading-tight lg:block" style={{ fontSize: '1.35cqw' }}>
             {tr(t, 'academy.results.classChestWords', 'words found of {{total}}', { total })}
           </span>
         )}

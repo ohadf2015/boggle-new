@@ -114,4 +114,22 @@ describe('StudentCapMeter', () => {
     render(<StudentCapMeter studentCount={8} />);
     expect(screen.queryByTestId('student-cap-upgrade-cta')).toBeNull();
   });
+
+  // Round 2 (critic cp1): "Unlock this with Pro — $9/month" right under
+  // "3 / 50 students" read as "Pro raises the cap" — it does not (free and Pro
+  // are both 50 per class). The ask names what Pro actually unlocks; the link,
+  // its tracking and when it shows are unchanged (tests above).
+  it('names what Pro actually unlocks instead of implying a bigger student cap', () => {
+    render(<StudentCapMeter studentCount={3} />);
+    expect(screen.getByTestId('student-cap-pro-unlocks')).toHaveTextContent('academy.classes.proUnlocks');
+    const cta = screen.getByTestId('student-cap-upgrade-cta');
+    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(cta.textContent).not.toContain('teacher.proGate.cta');
+    expect(cta.textContent).toContain('academy.classes.proCta');
+  });
+
+  it('keeps the Pro line out of the meter when there is no ask', () => {
+    render(<StudentCapMeter studentCount={2} />);
+    expect(screen.queryByTestId('student-cap-pro-unlocks')).toBeNull();
+  });
 });

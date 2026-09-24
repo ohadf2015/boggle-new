@@ -64,7 +64,7 @@ export interface ClassroomWaitingStageProps {
   t: EduT;
 }
 
-const MAX_FACES = 7;
+const MAX_FACES = 10;
 
 export function ClassroomWaitingStage({
   username,
@@ -134,7 +134,13 @@ export function ClassroomWaitingStage({
       </div>
 
       {/* The spotlight: me, on the arena floor, with Lexi. */}
-      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-3 pb-2 lg:gap-4">
+      {/* justify-evenly, not center: the room's height is SHARED between the
+          student, the line and the crowd instead of parked as one dead gap. */}
+      <div
+        data-testid="waiting-spotlight"
+        className="relative flex min-h-0 flex-1 flex-col items-center justify-evenly gap-2 px-3 pb-2 lg:gap-4"
+      >
+        <div className="flex flex-col items-center gap-2">
         <div className="relative flex items-end justify-center gap-2">
           <button
             type="button"
@@ -143,7 +149,7 @@ export function ClassroomWaitingStage({
             aria-label={tr(t, 'academy.waiting.editAvatar', 'Change your avatar')}
             className="group relative shrink-0 rounded-full border-[3px] border-neo-lime bg-neo-navy p-1 shadow-hard-lg motion-safe:animate-avatar-float"
           >
-            <span className="block size-28 overflow-hidden rounded-full border-[3px] border-neo-cream sm:size-36 lg:size-48 [&_svg]:h-full [&_svg]:w-full">
+            <span className="block size-28 overflow-hidden rounded-full border-[3px] border-neo-cream [@media(min-height:700px)]:size-36 [@media(min-height:800px)]:size-40 lg:size-48 [&_svg]:h-full [&_svg]:w-full">
               {avatar}
             </span>
             <span className="absolute -bottom-1 end-1 flex size-8 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan shadow-hard-sm">
@@ -155,12 +161,13 @@ export function ClassroomWaitingStage({
             src="/images/education/waiting-for-teacher.webp"
             alt=""
             aria-hidden="true"
-            className="pointer-events-none h-20 w-auto select-none rounded-neo border-[3px] border-neo-cream object-contain shadow-hard sm:h-24 lg:h-36 motion-safe:animate-[lc-lexi-idle_2.4s_ease-in-out_infinite]"
+            className="pointer-events-none h-20 w-auto select-none rounded-neo border-[3px] border-neo-cream object-contain shadow-hard [@media(min-height:700px)]:h-24 [@media(min-height:800px)]:h-28 lg:h-36 motion-safe:animate-[lc-lexi-idle_2.4s_ease-in-out_infinite]"
           />
         </div>
 
         <div className="max-w-full rounded-neo border-[3px] border-neo-cream bg-neo-navy/90 px-3 py-1 text-center shadow-hard">
           {nameSlot}
+        </div>
         </div>
 
         <p
@@ -177,36 +184,61 @@ export function ClassroomWaitingStage({
         </p>
         {statusSlot}
 
-        {/* Classmates along the rail — their faces, not a list. */}
-        {shownFaces.length > 0 && (
-          <ul
-            aria-label={tr(t, 'academy.waiting.classmates', 'Classmates here')}
-            className="flex max-w-full items-center justify-center -space-x-2"
-          >
-            {shownFaces.map((mate) => (
-              <li
-                key={mate.username}
-                title={mate.username}
-                // Each face POPS in as the classmate arrives (keyed by name, so
-                // only the newcomer animates). Transform-only, motion-safe.
-                className="size-10 overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy shadow-hard-sm motion-safe:animate-[lc-mate-pop_420ms_cubic-bezier(.34,1.56,.64,1)] lg:size-12 [&_svg]:h-full [&_svg]:w-full"
-              >
-                <Avatar
-                  userId={mate.username}
-                  customAvatar={mate.avatar?.customAvatar ?? undefined}
-                  size="lg"
-                  disableEffects
-                  className="!h-full !w-full"
-                />
-              </li>
-            ))}
-            {hiddenCount > 0 && (
-              <li className="flex size-10 items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-cyan font-neo-display text-sm font-black text-neo-black shadow-hard-sm lg:size-12">
-                +{hiddenCount}
-              </li>
-            )}
-          </ul>
-        )}
+        {/* The crowd: everyone else in the room, counted, their faces popping
+            in as they arrive. Present even when the student is first in, so
+            the stage never has a hole where the class will be. */}
+        <div
+          data-testid="waiting-crowd"
+          className="w-full max-w-md rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/85 px-3 py-2 shadow-hard lg:max-w-2xl lg:px-5 lg:py-4"
+        >
+          <p className="flex items-baseline justify-center gap-2 text-center font-neo-display font-black uppercase leading-none text-neo-cream">
+            <span
+              key={others.length}
+              data-testid="waiting-crowd-count"
+              className="inline-block text-3xl tabular-nums text-neo-lime motion-safe:animate-[lc-mate-pop_420ms_cubic-bezier(.34,1.56,.64,1)] lg:text-5xl"
+            >
+              {others.length}
+            </span>
+            <span className="text-sm tracking-wide lg:text-2xl">
+              {others.length === 1
+                ? tr(t, 'academy.waiting.classmateHere', 'classmate is here')
+                : tr(t, 'academy.waiting.classmatesHere', 'classmates are here')}
+            </span>
+          </p>
+          {shownFaces.length > 0 ? (
+            <ul
+              aria-label={tr(t, 'academy.waiting.classmates', 'Classmates here')}
+              className="mt-2 flex max-w-full flex-wrap items-center justify-center gap-1.5 lg:gap-2.5"
+            >
+              {shownFaces.map((mate) => (
+                <li
+                  key={mate.username}
+                  title={mate.username}
+                  // Each face POPS in as the classmate arrives (keyed by name, so
+                  // only the newcomer animates). Transform-only, motion-safe.
+                  className="size-11 overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy shadow-hard-sm motion-safe:animate-[lc-mate-pop_420ms_cubic-bezier(.34,1.56,.64,1)] lg:size-16 [&_svg]:h-full [&_svg]:w-full"
+                >
+                  <Avatar
+                    userId={mate.username}
+                    customAvatar={mate.avatar?.customAvatar ?? undefined}
+                    size="lg"
+                    disableEffects
+                    className="!h-full !w-full"
+                  />
+                </li>
+              ))}
+              {hiddenCount > 0 && (
+                <li className="flex size-11 items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-cyan font-neo-display text-sm font-black text-neo-black shadow-hard-sm lg:size-16 lg:text-lg">
+                  +{hiddenCount}
+                </li>
+              )}
+            </ul>
+          ) : (
+            <p className="mt-1.5 text-center font-neo-body text-xs font-bold text-neo-cream/85 lg:text-lg">
+              {tr(t, 'academy.waiting.firstIn', "You're first in! Classmates pop in here.")}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Bottom dock: the things a waiting student can DO. */}

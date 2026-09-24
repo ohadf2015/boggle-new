@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
+import { buildProCheckoutSucceededEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest) {
       case 'subscription.uncanceled':
       case 'subscription.resumed':
         await handleSubscriptionActive(payload, userId)
+        if (eventType === 'subscription.active') trackProConversion(payload, userId)
         break
       case 'subscription.updated':
       case 'subscription.cycled':
@@ -129,6 +131,21 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[Polar] Webhook error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+/**
+ * `edu_pro_checkout_succeeded` — analytics only, after the entitlement write
+ * landed. Only `subscription.active` counts (created/uncanceled/resumed are not
+ * new conversions), only for the Pro product. Never throws: a 500 here would
+ * make Polar redeliver and re-run the state writes.
+ */
+function trackProConversion(payload: WebhookPayload, userId?: string) {
+  try {
+    if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    captureProFunnelServerEvent(buildProCheckoutSucceededEvent(userId, String(payload?.data?.id ?? '')))
+  } catch (err) {
+    console.error('[Polar] conversion telemetry threw:', err)
   }
 }
 

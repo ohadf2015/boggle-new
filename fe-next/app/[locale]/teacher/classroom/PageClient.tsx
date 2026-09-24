@@ -29,7 +29,7 @@ export default function TeacherClassroomsPage() {
       <TeacherGate>
         <main className="relative mx-auto max-w-6xl">
           <ClassesTitle />
-          <ClassroomManager />
+          <ClassroomManager richCards />
         </main>
       </TeacherGate>
     </ClassesShell>

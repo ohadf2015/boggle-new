@@ -75,7 +75,9 @@ export const ClassSwitcher = memo(function ClassSwitcher({
                 : 'border-neo-cream/40 bg-neo-navy-light text-neo-white hover:-translate-y-0.5'
             )}
           >
-            <span className="truncate">{c.name}</span>
+            {/* Data, often in the other script: isolate it so a Latin name
+                under Hebrew UI truncates at its own end. */}
+            <span dir="auto" className="min-w-0 truncate text-start">{c.name}</span>
             <span
               className={cn(
                 'inline-flex shrink-0 items-center gap-1 rounded-neo px-1.5 py-0.5 tabular-nums',
