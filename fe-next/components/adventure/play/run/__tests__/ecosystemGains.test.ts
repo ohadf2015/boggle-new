@@ -26,6 +26,15 @@ describe('ecosystemGains', () => {
     expect(gains.map((g) => g.kind)).toEqual(['xp', 'coins', 'points', 'streak']);
   });
 
+  it('given a run that ended with gold left, when the ledger is built, then the banked purse is its own coin line after coins', () => {
+    // The purse is WHY gold mattered past the run — it must say so, not vanish into the coin total.
+    expect(ecosystemGains({ ...base, coinsGained: 40, purseCoins: 35 }).map((g) => [g.kind, g.value])).toEqual([
+      ['coins', 40],
+      ['purse', 35],
+    ]);
+    expect(hasEcosystemGains({ ...base, purseCoins: 5 })).toBe(true);
+  });
+
   it('carries the streak as its own value, not a delta', () => {
     expect(ecosystemGains({ ...base, streak: { current: 6, longest: 9 } })).toEqual([{ kind: 'streak', value: 6 }]);
   });

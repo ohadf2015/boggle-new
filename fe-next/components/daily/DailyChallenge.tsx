@@ -56,6 +56,8 @@ import { getCachedDailyPuzzle } from '@/lib/offline/prefetchDaily';
 import { usePrefetchDailyContent } from '@/hooks/usePrefetchDailyContent';
 import DailyOfflineFallback from '@/components/offline/DailyOfflineFallback';
 import type { LetterGrid, Language } from '@/types';
+import SessionRevealHost from '@/components/avatar/reveal/SessionRevealHost';
+import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played' | 'offline-miss';
 
@@ -549,6 +551,8 @@ const DailyChallenge: React.FC = () => {
       })
         .then(r => r.json())
         .then(data => {
+          // Level-up → avatar unlock reveal (in memory; SessionRevealHost shows it).
+          publishLevelUp(levelUpFromRecordGame(data));
           if (data.questUpdate?.completed) {
             import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
               showQuestCompletionToast({
@@ -595,6 +599,7 @@ const DailyChallenge: React.FC = () => {
       {/* Collapse the in-game header spacer so the focused Word Hunt screen has no
           empty band at the top (the header is hidden during play anyway). */}
       <AutoHideHeader collapseSpacerWhenHidden />
+      <SessionRevealHost />
 
       <AnimatePresence mode="wait">
         {phase === 'loading' && (

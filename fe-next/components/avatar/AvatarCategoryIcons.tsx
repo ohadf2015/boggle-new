@@ -21,6 +21,7 @@ export type AvatarCategoryKey =
   | 'mouth'
   | 'facialHair'
   | 'accessories'
+  | 'outfit'
   | 'background';
 
 interface IconProps {
@@ -58,12 +59,12 @@ function BaseIcon(props: IconProps) {
   );
 }
 
-/** hair — a head with a wavy fringe swept across the forehead (a hairstyle). */
+/** hair — a comb (the universal "hairstyle" glyph; a head outline read as the face tab). */
 function HairIcon(props: IconProps) {
   return (
     <Svg {...props}>
-      <circle cx="12" cy="12" r="8" />
-      <path d="M5 10q3.5 3 7 0t7 0" />
+      <path d="M4 10.5 15.5 4.5a2 2 0 0 1 2.7.9l.4.8a2 2 0 0 1-.9 2.7L6.2 14.8" />
+      <path d="m6.2 14.8 1.8 4m1.3-5.7 1.8 4m1.3-5.7 1.8 4m1.3-5.7 1.8 4" />
     </Svg>
   );
 }
@@ -111,6 +112,15 @@ function AccessoriesIcon(props: IconProps) {
   );
 }
 
+/** outfit — a t-shirt (body style + shirt color). */
+function OutfitIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M9 4c.5 1.5 1.6 2.3 3 2.3S14.5 5.5 15 4l5 2.5-1.8 4-2.2-1V20H8V9.5l-2.2 1L4 6.5Z" />
+    </Svg>
+  );
+}
+
 /** background — a framed scene (hill + sun) standing in for the backdrop. */
 function BackgroundIcon(props: IconProps) {
   return (
@@ -129,5 +139,6 @@ export const AVATAR_CATEGORY_ICONS: Record<AvatarCategoryKey, (props: IconProps)
   mouth: MouthIcon,
   facialHair: FacialHairIcon,
   accessories: AccessoriesIcon,
+  outfit: OutfitIcon,
   background: BackgroundIcon,
 };

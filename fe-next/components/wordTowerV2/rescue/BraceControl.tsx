@@ -13,7 +13,7 @@ interface Props {
 }
 
 /**
- * The brace offer, pinned under the HUD on the stability meter's side. Only
+ * The brace offer, pinned above the dock beside DROP. Only
  * there while the tower wobbles; one tap opens the two ways to pay for it.
  * While a rescue word is running it becomes the countdown instead.
  */
@@ -59,7 +59,9 @@ export function BraceControl({ t, api, reducedMotion }: Props) {
 
   const priceLabel = api.price === 0 ? t('wordTowerV2.brace.freeTag') : api.price.toLocaleString();
   return (
-    <div className="absolute end-3 top-[calc(var(--wt2-hud,7rem)+0.5rem)] z-30 flex flex-col items-end gap-1.5">
+    // By the dock, not under the HUD: up there it sat in the crane's swing lane
+    // and covered the slab being aimed. The menu opens upward (column-reverse).
+    <div className="absolute bottom-[calc(var(--wt2-dock,17rem)+0.75rem)] end-3 z-30 flex flex-col-reverse items-end gap-1.5">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

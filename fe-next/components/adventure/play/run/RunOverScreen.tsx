@@ -12,6 +12,7 @@ import { resultRunStep, runSummary, type RunSummary } from './runSummary';
 import { ResultShell, Stamp, primaryBtn, squareBtn } from './ResultShell';
 import RunStats from './RunStats';
 import RunLedger from './RunLedger';
+import EcosystemRewards from './EcosystemRewards';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -63,6 +64,8 @@ export default function RunOverScreen({ result, run, runBest, map = null, runWor
           />
           <div className="mt-2.5"><RunStats summary={summary} fell variant="relics"
             runCtx={{ world: run?.w, step: resultRunStep(run, false) }} /></div>
+          {/* A death still pays: milestone coins + the banked purse land in the wallet. */}
+          <EcosystemRewards result={result} delay={0.9} className="mt-2.5" />
         </div>
       </div>
       <div className="mt-3 flex gap-2">

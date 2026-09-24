@@ -1,4 +1,10 @@
-import Link from 'next/link';
+import { Plus } from 'lucide-react';
+import { FreshClose } from '@/components/landing/fresh/FreshClose';
+import { FreshFaqMore } from '@/components/landing/fresh/FreshFaqMore';
+import { FreshFaqAll, FreshReadMore } from '@/components/landing/fresh/FreshFaqLinks';
+import { FAQ_ANSWER, FAQ_ROW, FAQ_SUMMARY, FAQ_TOGGLE } from '@/components/landing/fresh/FreshFaqRow';
+import s from '@/components/landing/fresh/FreshMotion.module.css';
+import { cn } from '@/lib/utils';
 
 /**
  * Visible homepage content section (AdSense low-value-content remediation, 2026-06-04).
@@ -29,7 +35,7 @@ interface HomepageContentSectionProps {
   locale: string;
 }
 
-// Localized labels for the section chrome + editorial links. The body copy
+// Localized labels for the section chrome. The body copy
 // (title/description/features/faq) is already localized by the caller; only the
 // surrounding labels live here. Mirrors the server-component i18n pattern used
 // by app/[locale]/page.tsx (static per-locale maps, no client t()).
@@ -37,123 +43,134 @@ const labels: Record<string, {
   about: string;
   features: string;
   faq: string;
-  learnMore: string;
-  links: { howToPlay: string; guides: string; blog: string; about: string; daily: string };
 }> = {
   en: {
     about: 'About LexiClash',
     features: 'What you can play',
     faq: 'Frequently asked questions',
-    learnMore: 'Learn more',
-    links: { howToPlay: 'How to play', guides: 'Strategy guides', blog: 'From the blog', about: 'About us', daily: 'Daily challenge' },
   },
   he: {
     about: 'אודות LexiClash',
     features: 'מה אפשר לשחק',
     faq: 'שאלות נפוצות',
-    learnMore: 'מידע נוסף',
-    links: { howToPlay: 'איך משחקים', guides: 'מדריכי אסטרטגיה', blog: 'מהבלוג', about: 'עלינו', daily: 'המילה היומית' },
   },
   sv: {
     about: 'Om LexiClash',
     features: 'Vad du kan spela',
     faq: 'Vanliga frågor',
-    learnMore: 'Läs mer',
-    links: { howToPlay: 'Hur man spelar', guides: 'Strategiguider', blog: 'Från bloggen', about: 'Om oss', daily: 'Daglig utmaning' },
   },
   ja: {
     about: 'LexiClashについて',
     features: '遊べるモード',
     faq: 'よくある質問',
-    learnMore: '詳しく見る',
-    links: { howToPlay: '遊び方', guides: '攻略ガイド', blog: 'ブログ', about: '私たちについて', daily: 'デイリーチャレンジ' },
   },
   es: {
     about: 'Acerca de LexiClash',
     features: 'A qué puedes jugar',
     faq: 'Preguntas frecuentes',
-    learnMore: 'Más información',
-    links: { howToPlay: 'Cómo jugar', guides: 'Guías de estrategia', blog: 'Del blog', about: 'Sobre nosotros', daily: 'Desafío diario' },
+  },
+  ru: {
+    about: 'О LexiClash',
+    features: 'Во что можно играть',
+    faq: 'Частые вопросы',
   },
 };
 
+const FAQ_VISIBLE = 3;
+
+function FaqCard({ question, answer }: { question: string; answer: string }) {
+  return (
+    <details className={cn('group/faq', FAQ_ROW)}>
+      <summary className={FAQ_SUMMARY}>
+        <span>{question}</span>
+        <span data-faq-toggle aria-hidden="true" className={FAQ_TOGGLE}>
+          <Plus
+            className="h-4 w-4 motion-safe:transition-transform motion-safe:duration-200 group-open/faq:rotate-45"
+            strokeWidth={3}
+          />
+        </span>
+      </summary>
+      <p className={FAQ_ANSWER}>{answer}</p>
+    </details>
+  );
+}
+
 export function HomepageContentSection({ content, locale }: HomepageContentSectionProps) {
   const l = labels[locale] ?? labels.en;
-  const p = `/${locale}`;
+  const shown = content.faq.slice(0, FAQ_VISIBLE);
+  const folded = content.faq.slice(FAQ_VISIBLE);
 
-  // Deliberate "reference footer": after the lively sections above, this is the
-  // calm, readable deep-dive — the About prose + the single canonical FAQ +
-  // links into the editorial surface. Zero client JS (native <details>), which
-  // keeps it crawler- and AdSense-reviewer-friendly. "What you can play" now
-  // lives in the Mode Showcase above, so the redundant features grid is gone.
+  // Homepage gauntlet, round 6: the FAQ is ONE card, the page's one
+  // accordion, in the page's own language. Rounds 2-5 set it as fine print
+  // (small heading, a paragraph, outline rows, a differently styled "N more"
+  // toggle, a link sentence) and the critic read that as a content dump with
+  // "a second FAQ accordion". Now everything sits in one card that rhymes
+  // with the hero board (black border, pink hard shadow), the thinking mascot
+  // riding its corner: a section-scale headline, the About prose as a
+  // two-line lead (AdSense reviewer copy, one element, visible at rest), three
+  // question rows plus the fold in one row shell (FreshFaqRow), then the
+  // full-FAQ link and the one sentence carrying the editorial links. Every
+  // answer stays in the HTML (the FAQPage JSON-LD in page.tsx must match
+  // on-page copy). The finale PLAY band is still the last thing rendered,
+  // straight above the site footer (fresh.shell.ending.test).
   return (
-    <section
-      aria-label={l.about}
-      className="mx-auto mt-4 w-full max-w-4xl px-4 pb-12 pt-10 font-neo-body text-neo-white"
-    >
-      <div className="rounded-neo border-3 border-neo-black bg-neo-navy-light/60 p-6 shadow-hard sm:p-8">
-        {/* About */}
-        <p className="mb-2 text-xs font-black uppercase tracking-widest text-neo-lime">
-          {l.about}
-        </p>
-        <h2 className="mb-3 font-neo-display text-2xl font-black text-neo-white sm:text-3xl text-balance">
-          {content.title}
-        </h2>
-        <p className="mb-8 max-w-prose text-sm leading-relaxed text-neo-cream/90 sm:text-base">
-          {content.description}
-        </p>
-
-        {/* FAQ — native disclosure, no client JS */}
-        <h3 className="mb-3 font-neo-display text-lg font-black text-neo-pink sm:text-xl">
-          {l.faq}
-        </h3>
-        <div className="mb-8 space-y-2">
-          {content.faq.map((item) => (
-            <details
-              key={item.question}
-              className="group rounded-neo border-2 border-neo-black bg-neo-navy shadow-hard-sm"
+    <div className="w-full">
+      <section
+        aria-label={l.about}
+        className="mx-auto w-full max-w-3xl px-4 pb-24 pt-24 font-neo-body text-neo-cream sm:px-6 md:pb-40 md:pt-32"
+      >
+        <section aria-labelledby="home-faq-title">
+          <div
+            data-faq-card
+            className="relative rounded-neo-xl border-3 border-neo-black bg-neo-navy-light p-4 shadow-[7px_7px_0_0_var(--neo-pink)] rtl:shadow-[-7px_7px_0_0_var(--neo-pink)] sm:p-6 md:p-8"
+          >
+            {/* Decorative, painted as CSS: it paints without scrolling, and a
+                background is never fetched while its tree is display:none. */}
+            <span
+              data-faq-mascot
+              aria-hidden="true"
+              className={cn(
+                'pointer-events-none absolute -top-[76px] end-3 h-20 w-20 bg-[url(/mascot/bridge-think-nobg.webp)] bg-contain bg-bottom bg-no-repeat drop-shadow-[3px_3px_0_rgb(0_0_0)] md:-top-[108px] md:end-8 md:h-28 md:w-28',
+                s.bob
+              )}
+            />
+            <h2
+              id="home-faq-title"
+              className="font-neo-display text-3xl font-bold leading-[1.08] text-neo-cream text-balance sm:text-4xl md:text-5xl"
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 font-neo-display font-bold text-neo-white marker:hidden sm:p-4">
-                <span>{item.question}</span>
-                <span
-                  aria-hidden
-                  className="shrink-0 font-black text-neo-pink transition-transform duration-200 group-open:rotate-45"
-                >
-                  +
-                </span>
-              </summary>
-              <p className="px-3 pb-3 text-sm leading-relaxed text-neo-cream/90 sm:px-4 sm:pb-4">
-                {item.answer}
-              </p>
-            </details>
-          ))}
-        </div>
+              {l.faq}
+            </h2>
+            {/* About: the full copy stays in one element (AdSense reviewer prose), clamped to two lines */}
+            <p className="mt-3 line-clamp-2 max-w-[56ch] font-neo-body text-base leading-relaxed text-neo-cream/80 md:text-lg">
+              {content.description}
+            </p>
+            <div className="mt-6 flex flex-col gap-2 md:mt-8">
+              {shown.map((item) => (
+                <FaqCard key={item.question} {...item} />
+              ))}
+              {folded.length > 0 && (
+                <FreshFaqMore count={folded.length}>
+                  {folded.map((item) => (
+                    <FaqCard key={item.question} {...item} />
+                  ))}
+                </FreshFaqMore>
+              )}
+            </div>
+            <div className="mt-4 flex flex-col items-start gap-1 md:mt-6">
+              <FreshFaqAll locale={locale} />
+              <FreshReadMore locale={locale} />
+            </div>
+          </div>
+        </section>
+      </section>
 
-        {/* Editorial internal links — surfaces the publisher content to reviewers + users */}
-        <nav aria-label={l.learnMore} className="border-t-2 border-neo-black/40 pt-5">
-          <h3 className="mb-3 font-neo-display text-base font-black text-neo-purple">
-            {l.learnMore}
-          </h3>
-          <ul className="flex flex-wrap gap-2">
-            {[
-              { href: `${p}/daily`, label: l.links.daily },
-              { href: `${p}/how-to-play`, label: l.links.howToPlay },
-              { href: `${p}/guides`, label: l.links.guides },
-              { href: `${p}/blog`, label: l.links.blog },
-              { href: `${p}/about`, label: l.links.about },
-            ].map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="inline-block rounded-neo border-2 border-neo-black bg-neo-lime px-4 py-2 text-sm font-bold text-neo-black shadow-hard-sm transition-transform hover:-translate-y-0.5"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-    </section>
+      {/* The mobile-tab-bar reserve ends RETURNING visitors' page (they keep
+          the tab bar; the finale is hidden for them). Fresh visitors have no tab
+          bar on the homepage (homeTree CSS), so nothing pads their ending: a
+          reserve there opened a navy strip, or empty lime, above the footer. */}
+      <div data-home-only="returning" aria-hidden="true" className="page-content-safe" />
+
+      <FreshClose locale={locale} />
+    </div>
   );
 }

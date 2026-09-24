@@ -7,7 +7,19 @@
 
 import { render } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WordCraftCelebration, shouldIdleParticleTicker } from '../WordCraftCelebration';
+import { WordCraftCelebration, shouldIdleParticleTicker, getStreakBurstScale } from '../WordCraftCelebration';
+
+describe('getStreakBurstScale (variable reward: back-to-back "great" bursts escalate)', () => {
+  it('is 1x on the first hit of a streak', () => {
+    expect(getStreakBurstScale(1)).toBe(1);
+  });
+  it('grows with consecutive streak count', () => {
+    expect(getStreakBurstScale(3)).toBeGreaterThan(getStreakBurstScale(1));
+  });
+  it('caps out instead of growing unbounded', () => {
+    expect(getStreakBurstScale(50)).toBe(getStreakBurstScale(5));
+  });
+});
 
 describe('shouldIdleParticleTicker (perf: stop the 60fps Pixi loop when idle)', () => {
   it('idles only when no particles are alive AND no rain is spawning', () => {

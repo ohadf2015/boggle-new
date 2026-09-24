@@ -20,8 +20,37 @@ export const has = (ops: Op[], method: string, ...args: unknown[]) =>
 
 export const argOf = (ops: Op[], method: string, i = 0) => ops.find(([m]) => m === method)?.[i + 1];
 
-export function fakeDb(handlers: Record<string, Handler>, rpc?: (name: string, args: Record<string, unknown>) => Result) {
+/**
+ * Word Tower coins live in the app wallet (profiles.total_coins via sync_coins).
+ * The fake keeps one balance per player: `profiles` reads of `total_coins` and
+ * `sync_coins` rpc calls go here; every other profiles/rpc call still reaches
+ * the test's own handler.
+ */
+export function fakeDb(
+  handlers: Record<string, Handler>,
+  rpc?: (name: string, args: Record<string, unknown>) => Result,
+  walletStart: Record<string, number> = {},
+) {
   const calls: Call[] = [];
+  const wallet = new Map<string, number>(Object.entries(walletStart));
+  const walletLog: { id: string; delta: number; reason: string }[] = [];
+  const profiles = handlers.profiles;
+  handlers = {
+    ...handlers,
+    profiles: (ops, call) => {
+      if (has(ops, 'select', 'total_coins')) return { data: { total_coins: wallet.get(String(argOf(ops, 'eq', 1))) ?? 0 }, error: null };
+      return profiles ? profiles(ops, call) : { data: null, error: null };
+    },
+  };
+  const syncCoins = (args: Record<string, unknown>): Result => {
+    const id = String(args.p_user_id);
+    const delta = Number(args.p_amount);
+    const bal = wallet.get(id) ?? 0;
+    if (bal + delta < 0) return { data: [{ success: false, new_balance: bal, error_message: 'Insufficient coins' }], error: null };
+    wallet.set(id, bal + delta);
+    walletLog.push({ id, delta, reason: String(args.p_reason) });
+    return { data: [{ success: true, new_balance: bal + delta, error_message: null }], error: null };
+  };
   const from = vi.fn((table: string) => {
     const call: Call = { table, ops: [] };
     calls.push(call);
@@ -45,9 +74,9 @@ export function fakeDb(handlers: Record<string, Handler>, rpc?: (name: string, a
     return chain;
   });
   const rpcFn = vi.fn((name: string, args: Record<string, unknown>) =>
-    Promise.resolve(rpc ? rpc(name, args) : { data: null, error: null }),
+    Promise.resolve(name === 'sync_coins' ? syncCoins(args) : rpc ? rpc(name, args) : { data: null, error: null }),
   );
-  return { client: { from, rpc: rpcFn }, calls, from, rpc: rpcFn };
+  return { client: { from, rpc: rpcFn }, calls, from, rpc: rpcFn, wallet, walletLog };
 }
 
 /** Standard next/server mock body (same shape as the other word-tower route tests). */
@@ -89,7 +118,9 @@ export function estatesTable(initial: Record<string, unknown> | null) {
       return { data: null, error: null };
     }
     if (has(ops, 'update')) {
-      if (!current || !has(ops, 'eq', 'updated_at', current.updated_at)) return { data: [], error: null };
+      // Compare-and-swap: every .eq() must match (updated_at, and `coins` for the legacy fold).
+      const cur = current;
+      if (!cur || !ops.every(([m, k, v]) => m !== 'eq' || cur[k as string] === v)) return { data: [], error: null };
       version += 1;
       current = { ...current, ...(argOf(ops, 'update') as object), updated_at: `${TS}#${version}` };
       return { data: [{ updated_at: current.updated_at }], error: null };

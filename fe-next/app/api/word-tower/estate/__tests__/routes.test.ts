@@ -9,6 +9,17 @@ vi.mock('@/lib/apiRateLimit', () => ({ checkApiRateLimit: vi.fn(() => ({ success
 vi.mock('@/lib/auth/getAuthedUser', () => ({ getAuthedUser: vi.fn() }));
 vi.mock('@/lib/email', () => ({ getSupabaseAdmin: vi.fn() }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
+// Guest claims are once per account (the guest estate is replayable client state).
+const claimed = new Set<string>();
+let claimStore: 'up' | 'down' = 'up';
+vi.mock('@/lib/server/claimOnce', () => ({
+  claimOnce: vi.fn(async (key: string) => {
+    if (claimStore === 'down') return 'unavailable';
+    if (claimed.has(key)) return 'taken';
+    claimed.add(key);
+    return 'claimed';
+  }),
+}));
 vi.mock('@/backend/modules/pushNotificationTriggers', () => ({ notifyWordTowerWreck: vi.fn(() => Promise.resolve()) }));
 
 import { GET as getEstate } from '../route';
@@ -105,7 +116,9 @@ describe('POST /api/word-tower/estate/run', () => {
     const chest = rollChest(chestSeed(ME, 0), runQuality(summary), 1);
     expect(b.coins).toBe(runCoins(summary));
     expect(b.chest).toEqual(chest);
-    expect(Number(est.get()!.coins)).toBe(runCoins(summary) + chest.coins);
+    // Paid into the app-wide wallet; the estate row never holds a balance.
+    expect(db.wallet.get(ME)).toBe(runCoins(summary) + chest.coins);
+    expect(Number(est.get()!.coins)).toBe(0);
     expect(est.get()!.runs).toBe(1);
     expect(est.get()!.raid_charges).toBe(1);
   });
@@ -148,6 +161,32 @@ describe('POST /api/word-tower/estate/run — braces', () => {
 });
 
 describe('POST /api/word-tower/estate/claim', () => {
+  beforeEach(() => {
+    claimed.clear();
+    claimStore = 'up';
+  });
+
+  it('given an account that already claimed a guest bank, when a second (forged) one arrives, then 400 and no coins move', async () => {
+    const est = estatesTable(row());
+    const db = fakeDb({ word_tower_estates: est.handler });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    const guest = { ...emptyEstate(), coins: 150, runs: 3 };
+    expect(status(await postClaim(postReq({ estate: guest })))).toBe(200);
+    const after = db.wallet.get(ME);
+    const again = await postClaim(postReq({ estate: guest }));
+    expect(status(again)).toBe(400);
+    expect((await body(again)).reason).toBe('already_claimed');
+    expect(db.wallet.get(ME)).toBe(after);
+  });
+
+  it('given the claim store is down, when claimed, then 503 (the client keeps the guest bank and retries)', async () => {
+    claimStore = 'down';
+    const db = fakeDb({ word_tower_estates: estatesTable(row()).handler });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    expect(status(await postClaim(postReq({ estate: { ...emptyEstate(), coins: 150, runs: 3 } })))).toBe(503);
+    expect(db.walletLog).toEqual([]);
+  });
+
   it('given a guest estate and a fresh account, when claimed, then guest coins + upgrade value are credited (plots never adopted)', async () => {
     const est = estatesTable(row());
     (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: est.handler }).client);
@@ -168,13 +207,25 @@ describe('POST /api/word-tower/estate/claim', () => {
 
 describe('POST /api/word-tower/estate/upgrade', () => {
   it('given coins, when upgrading, then the level rises and the cost is spent server-side', async () => {
-    const est = estatesTable(row({ coins: 500 }));
-    (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: est.handler }).client);
+    const est = estatesTable(row());
+    const db = fakeDb({ word_tower_estates: est.handler }, undefined, { [ME]: 500 });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
     const res = await postUpgrade(postReq({ plot: 'vault' }));
     expect(status(res)).toBe(200);
     const saved = est.get()!;
     expect((saved.plots as Array<{ slot: string; level: number }>).find((p) => p.slot === 'vault')!.level).toBe(1);
-    expect(Number(saved.coins)).toBe(500 - upgradeCost(1, 'vault', 0));
+    expect(db.wallet.get(ME)).toBe(500 - upgradeCost(1, 'vault', 0));
+    expect((await body(res)).estate.coins).toBe(500 - upgradeCost(1, 'vault', 0));
+  });
+
+  it('given legacy coins left in the estate row, when upgrading, then they are folded into the wallet first and spendable', async () => {
+    const est = estatesTable(row({ coins: 500 }));
+    const db = fakeDb({ word_tower_estates: est.handler }, undefined, { [ME]: 40 });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    expect(status(await postUpgrade(postReq({ plot: 'vault' })))).toBe(200);
+    expect(db.wallet.get(ME)).toBe(540 - upgradeCost(1, 'vault', 0));
+    expect(Number(est.get()!.coins)).toBe(0);
+    expect(db.walletLog.map((l) => l.reason)).toEqual(['word_tower_estate_merge', 'word_tower_spend']);
   });
 
   it('given too few coins, when upgrading, then 400 with the reason and nothing is written', async () => {
@@ -203,7 +254,7 @@ describe('POST /api/word-tower/estate/upgrade', () => {
   });
 
   it('given a concurrent write, when the first compare-and-swap loses, then it retries on fresh state', async () => {
-    const est = estatesTable(row({ coins: 500 }));
+    const est = estatesTable(row());
     let first = true;
     const db = fakeDb({
       word_tower_estates: (ops) => {
@@ -213,10 +264,12 @@ describe('POST /api/word-tower/estate/upgrade', () => {
         }
         return est.handler(ops);
       },
-    });
+    }, undefined, { [ME]: 500 });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
     expect(status(await postUpgrade(postReq({ plot: 'vault' })))).toBe(200);
     expect(db.calls.filter((c) => has(c.ops, 'update'))).toHaveLength(2);
+    // The losing attempt's debit was handed back: exactly one cost is spent.
+    expect(db.wallet.get(ME)).toBe(500 - upgradeCost(1, 'vault', 0));
   });
 });
 

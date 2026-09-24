@@ -2,7 +2,8 @@
  * Avatar parts coverage — the sync-guard spine.
  *
  * Catches the entire "added an enum value but forgot to wire it" bug class:
- *  - every enum value has a renderer in its *_PARTS map
+ *  - every enum value resolves (directly, or via lib/avatar/legacyMap for ids
+ *    retired in the 2026-09 redraw) to a part the new art actually draws
  *  - every part renders to non-empty SVG via the SSR renderer without throwing
  *  - every intended-premium part is gated (priced + tier-classified), so it
  *    can never leak free into the random generator (FREE_* is derived).
@@ -33,41 +34,33 @@ import {
   NEW_PART_KEYS,
   type CustomAvatarConfig,
 } from '@/shared/types/customAvatar';
-import { BASE_PARTS } from '../parts/BaseParts';
-import { EYE_PARTS } from '../parts/EyeParts';
-import { MOUTH_PARTS } from '../parts/MouthParts';
-import { HAIR_PARTS } from '../parts/HairParts';
-import { ACCESSORY_PARTS } from '../parts/AccessoryParts';
-import { EYEBROW_PARTS } from '../parts/EyebrowParts';
-import { FACIAL_HAIR_PARTS } from '../parts/FacialHairParts';
-import { NOSE_PARTS } from '../parts/NoseParts';
-import { BODY_PARTS } from '../parts/BodyParts';
+import { DRAWN_IDS } from '../art/registry';
+import { mapLegacyPart } from '@/lib/avatar/legacyMap';
 
 type Cat = {
   name: string;
   enumVals: readonly string[];
-  map: Record<string, unknown>;
   field: keyof CustomAvatarConfig;
 };
 
-// BODY_PARTS is keyed by gender/bodyStyle; map check skips the gender-keyed extras.
 const CATEGORIES: Cat[] = [
-  { name: 'base', enumVals: AVATAR_BASES, map: BASE_PARTS, field: 'base' },
-  { name: 'hair', enumVals: AVATAR_HAIR_STYLES, map: HAIR_PARTS, field: 'hair' },
-  { name: 'eyes', enumVals: AVATAR_EYE_STYLES, map: EYE_PARTS, field: 'eyes' },
-  { name: 'eyebrows', enumVals: AVATAR_EYEBROW_STYLES, map: EYEBROW_PARTS, field: 'eyebrows' },
-  { name: 'facialHair', enumVals: AVATAR_FACIAL_HAIR_STYLES, map: FACIAL_HAIR_PARTS, field: 'facialHair' },
-  { name: 'nose', enumVals: AVATAR_NOSE_STYLES, map: NOSE_PARTS, field: 'noseStyle' },
-  { name: 'mouth', enumVals: AVATAR_MOUTH_STYLES, map: MOUTH_PARTS, field: 'mouth' },
-  { name: 'accessory', enumVals: AVATAR_ACCESSORIES, map: ACCESSORY_PARTS, field: 'accessory' },
+  { name: 'base', enumVals: AVATAR_BASES, field: 'base' },
+  { name: 'hair', enumVals: AVATAR_HAIR_STYLES, field: 'hair' },
+  { name: 'eyes', enumVals: AVATAR_EYE_STYLES, field: 'eyes' },
+  { name: 'eyebrows', enumVals: AVATAR_EYEBROW_STYLES, field: 'eyebrows' },
+  { name: 'facialHair', enumVals: AVATAR_FACIAL_HAIR_STYLES, field: 'facialHair' },
+  { name: 'nose', enumVals: AVATAR_NOSE_STYLES, field: 'noseStyle' },
+  { name: 'mouth', enumVals: AVATAR_MOUTH_STYLES, field: 'mouth' },
+  { name: 'accessory', enumVals: AVATAR_ACCESSORIES, field: 'accessory' },
 ];
 
 describe('avatar parts coverage (sync guard)', () => {
   for (const cat of CATEGORIES) {
     describe(cat.name, () => {
-      it('every enum value has a renderer in its parts map', () => {
-        const missing = cat.enumVals.filter((v) => !(v in cat.map));
-        expect(missing, `${cat.name} enum values missing a *_PARTS entry`).toEqual([]);
+      it('every enum value resolves to a part the art draws', () => {
+        const drawn = DRAWN_IDS[cat.field as string];
+        const missing = cat.enumVals.filter((v) => !drawn.includes(mapLegacyPart(cat.field as string, v)));
+        expect(missing, `${cat.name} enum values with no drawing`).toEqual([]);
       });
 
       it.each([...cat.enumVals])('renders %s to non-empty SVG without throwing', (val) => {
@@ -86,10 +79,8 @@ describe('avatar parts coverage (sync guard)', () => {
     });
   }
 
-  it('BODY_PARTS covers every body style', () => {
-    // 'default' is a sentinel that resolves to the gender-keyed body (male/female),
-    // so it is intentionally not a BODY_PARTS key.
-    const missing = AVATAR_BODY_STYLES.filter((v) => v !== 'default' && !(v in BODY_PARTS));
+  it('the art draws every body style', () => {
+    const missing = AVATAR_BODY_STYLES.filter((v) => !DRAWN_IDS.bodyStyle.includes(v));
     expect(missing).toEqual([]);
   });
 });

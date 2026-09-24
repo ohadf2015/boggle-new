@@ -28,6 +28,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
+import { holdFxUntilFirstUse } from '@/lib/pixiFx/SharedFxGate';
 // Season claim/announcement are home-only, interaction-gated popups (never SSR/SEO
 // content) — lazy-load so their ~35KB stays out of the synchronous initial parse on
 // every route. ssr:false: they render nothing visible when there's nothing to claim,
@@ -144,6 +145,11 @@ const initResizeObserverErrorHandler = () => {
 
 if (typeof window !== 'undefined') {
     initResizeObserverErrorHandler();
+    // pixi.js (~195KB br) waits for the visitor's first interaction or first
+    // FX spawn instead of loading with the page. SharedFxMount still requests
+    // the layer after hydration; SharedFxApp.mount() waits on this gate.
+    // See lib/pixiFx/SharedFxGate.ts and its fresh.perf test.
+    holdFxUntilFirstUse();
 }
 
 // Lazy load LogRocket — requires analytics consent (GDPR compliance).

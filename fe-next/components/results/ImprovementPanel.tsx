@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { m } from 'framer-motion';
 import { Flame, ArrowUpRight, Star } from 'lucide-react';
 import { selectImprovementSummary } from '@/lib/results/selectImprovementSummary';
+import PostGameUnlocks from '@/components/avatar/reveal/PostGameUnlocks';
 import type { XpGainedData, LevelUpData } from '@/types/components';
 
 interface StreakLike {
@@ -121,6 +122,8 @@ const ImprovementPanel: React.FC<ImprovementPanelProps> = ({ xp, levelUp, streak
               style={{ width: `${summary.levelProgressPct ?? 0}%` }}
             />
           </div>
+          {/* Avatar unlocks: "New unlock!" chip + next-unlock tease (Track C). */}
+          <PostGameUnlocks levelUp={levelUp} level={summary.level} />
         </div>
       )}
     </m.section>

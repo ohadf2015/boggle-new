@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -8,6 +8,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({}) }));
 
 import RunMapScreen from '../RunMapScreen';
+import { RUN_PRIMER_KEY } from '../runPrimer';
 import { buildRunMap, isPlayNode } from '@/lib/adventure/play/runMap';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 
@@ -36,6 +37,18 @@ const node = (id: string) => screen.getByTestId(`map-node-${id}`);
 const button = (id: string) => node(id).querySelector('button') as HTMLButtonElement;
 
 describe('RunMapScreen', () => {
+  // A returning player: the first-visit primer sheet is already behind them.
+  beforeEach(() => window.localStorage.setItem(RUN_PRIMER_KEY, '1'));
+
+  it('Given a first-ever map, when it opens, then the run primer explains the loop before any choice', () => {
+    window.localStorage.clear();
+    renderMap();
+    const dialog = screen.getByRole('dialog');
+    for (const key of ['primerTitle', 'primerMap', 'primerFight', 'primerKeep']) {
+      expect(dialog.textContent).toContain(`adventurePlay.map.${key}`);
+    }
+  });
+
   it('Given a run in progress, then home is one tap away (the run is saved, so leaving loses nothing)', () => {
     renderMap();
     const home = screen.getByRole('link', { name: 'adventurePlay.backHome' });

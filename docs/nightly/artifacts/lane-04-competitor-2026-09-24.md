@@ -1,0 +1,4 @@
+status: shipped
+attempted: research competitor mechanics + reddit reply candidates, education competitor angle, write ideas + reddit md files, append report
+files_touched: docs/nightly/ideas/2026-09-24.md, docs/nightly/ideas/2026-09-24-reddit.md, docs/nightly/reports/2026-09-24.md (appended)
+next_steps: reddit-fetch.sh degraded tonight (jq parse failed on feed dailygames/Anagrams/search; feed wordgames returned score:null/num_comments:null) — investigate whether the OAuth-backed helper's JSON schema changed upstream before assuming credential expiry. Founder snapshot docs/nightly/intel/reddit-latest.json is stale since Jun 1, needs a refresh via pull-reddit-snapshot.sh. No reddit drafts shipped this run as a result. 2 game-mode improvement ideas + 1 concept backlog delivered for lane 5 to pick up (sealed-bid modifier, brain-drill adaptive difficulty, wheel-rush seasonal skins).

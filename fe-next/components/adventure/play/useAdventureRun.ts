@@ -25,6 +25,7 @@ import { fetchWithAuth } from '@/utils/authFetch';
 import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 import { tickClock } from '@/lib/adventure/play/runClock';
 import { clearClearedNodes } from '@/components/adventure/map/clearedNodes';
+import { useCoinActions } from '@/contexts/CoinContext';
 import { readRun, writeRun, readCarry, writeCarry } from './runStorage';
 import {
   STALE_DEAL_MS, FOE_KO_FINISH_MS, ADVENTURE_MODE,
@@ -82,6 +83,10 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
   const [nodeState, setNodeState] = useState<NodeState | null>(null);
 
   const tokenRef = useRef('');
+  // Ref: refreshCoins changes identity when the profile reloads; finish() must stay stable.
+  const { refreshCoins } = useCoinActions();
+  const refreshCoinsRef = useRef(refreshCoins);
+  refreshCoinsRef.current = refreshCoins;
   const pendingRunTokenRef = useRef('');
   const wordsRef = useRef<string[]>([]);
   /** Find time of each word (ms since Start), aligned with wordsRef — combo + speed. */
@@ -358,11 +363,13 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
         // Run over (died or lost): the token is dead. Forget it, or the next
         // "open the map" would resume a run the server will refuse — but keep
         // it as the carry, so the next run starts with this one's relics.
-        writeCarry(dealtRunTokenRef.current || pendingRunTokenRef.current || null);
+        writeCarry(data.carryToken || dealtRunTokenRef.current || pendingRunTokenRef.current || null);
         writeRun(world, null);
         pendingRunTokenRef.current = '';
         dealtRunTokenRef.current = '';
       }
+      // Milestone coins and the banked purse land in the app-wide wallet.
+      if ((data.coinsGained ?? 0) > 0 || (data.purseCoins ?? 0) > 0) void refreshCoinsRef.current().catch(() => undefined);
       setResult(data);
       setPhase('done');
     } catch (err) {

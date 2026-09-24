@@ -14,6 +14,15 @@ export function shouldIdleParticleTicker(tileCount: number, rainActive: boolean)
   return tileCount === 0 && !rainActive;
 }
 
+/** Streak length -> burst size multiplier. Escalates then caps at streak 5,
+ * so back-to-back "great" hits feel bigger without runaway particle counts. */
+export function getStreakBurstScale(streakCount: number): number {
+  const capped = Math.min(streakCount, 5);
+  return 1 + (capped - 1) * 0.2;
+}
+
+const GREAT_STREAK_WINDOW_MS = 4000;
+
 export interface WordCraftCelebrationProps {
   kind: CelebrationKind;
   burstId: number;
@@ -260,6 +269,7 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
   }, [reducedMotion]);
 
   const lastBurstId = useRef(-1);
+  const greatStreak = useRef({ count: 0, at: 0 });
   useEffect(() => {
     if (reducedMotion) return;
     if (kind === null) return;
@@ -281,9 +291,15 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
       } else if (kind === 'great') {
         // Lighter mid-game pop for big words / steals / streaks — half the
         // particles of a bingo so it rewards without stealing the bingo's thunder.
+        // Consecutive "great" hits within the streak window escalate the burst
+        // (variable reward: a hot streak visibly pays off more than a lone hit).
+        const now = performance.now();
+        const streak = greatStreak.current;
+        streak.count = now - streak.at < GREAT_STREAK_WINDOW_MS ? streak.count + 1 : 1;
+        streak.at = now;
         const x = origin?.x ?? api.width() / 2;
         const y = origin?.y ?? api.height() / 2;
-        api.spawnBurst(x, y, 40);
+        api.spawnBurst(x, y, Math.round(40 * getStreakBurstScale(streak.count)));
       } else if (kind === 'gameOver') {
         api.spawnBurst(api.width() / 2, api.height() / 3, 60);
         api.spawnRain(2800);

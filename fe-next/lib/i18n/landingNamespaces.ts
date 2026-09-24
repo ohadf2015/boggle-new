@@ -14,6 +14,9 @@ export const LANDING_NAMESPACES = [
   'flag',
   'logo',
   'landing',
+  // Fresh-visitor homepage copy (components/landing/fresh/*), generated into
+  // translations/*.js by the homepage gauntlet merge.
+  'homeFresh',
   'nav',
   'common',
   'footer',

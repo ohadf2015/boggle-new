@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { AVATAR_RENDER_VERSION } from '@/lib/avatar/renderVersion';
 
 /**
  * First-paint stand-in for `Avatar`. The real renderer drags in ~477 KiB of
@@ -37,6 +38,20 @@ function seedColor(seed?: string | null): string {
   return PALETTE[parseInt(hash(seed), 36) % PALETTE.length];
 }
 
+/**
+ * PNG URL for a stored config. `v` busts the 1-day browser cache when the
+ * player edits their avatar AND the 7-day CDN cache when the art changes
+ * (AVATAR_RENDER_VERSION). Null for guests / seeds / missing config.
+ */
+export function avatarPngSrc(
+  userId: string | null | undefined,
+  customAvatar: AvatarLiteConfig | null | undefined,
+  renderVersion: string = AVATAR_RENDER_VERSION,
+): string | null {
+  if (!customAvatar || !userId || !UUID_RE.test(userId)) return null;
+  return `/api/avatar/png/${userId}?v=${hash(`${renderVersion}|${JSON.stringify(customAvatar)}`)}`;
+}
+
 export default function AvatarLite({
   userId,
   customAvatar,
@@ -52,11 +67,7 @@ export default function AvatarLite({
 }) {
   const px = pixelSize ?? SIZE_PX[size];
   const bg = customAvatar?.bgColor || customAvatar?.skinColor || seedColor(userId);
-  // `v` busts the 1-day browser cache when the player edits their avatar.
-  const src =
-    customAvatar && userId && UUID_RE.test(userId)
-      ? `/api/avatar/png/${userId}?v=${hash(JSON.stringify(customAvatar))}`
-      : null;
+  const src = avatarPngSrc(userId, customAvatar);
   return (
     <div
       data-testid="avatar-lite"
@@ -76,6 +87,10 @@ export default function AvatarLite({
           loading="lazy"
           decoding="async"
           className="h-full w-full object-cover"
+          // A 404 can land before hydration, when onError isn't attached yet — catch it on mount.
+          ref={(el) => {
+            if (el && el.complete && el.naturalWidth === 0) el.style.display = 'none';
+          }}
           onError={(e) => {
             e.currentTarget.style.display = 'none';
           }}

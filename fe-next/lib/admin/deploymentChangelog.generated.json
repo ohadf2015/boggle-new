@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-20T13:51:08.336Z",
+  "generatedAt": "2026-09-24T01:21:41.023Z",
   "commits": [
     {
-      "sha": "8f587547a67fb97f471eab556448fe6bff8ec982",
-      "shortSha": "8f58754",
-      "subject": "fix(adventure): answer a locked tap, escape the intro, calm the map, cut dead paint",
-      "author": "Ohad Fisher",
-      "date": "2026-09-20T16:24:59+03:00"
-    },
-    {
-      "sha": "ca4de9a4af0240b14b54545487beec10f2d0fdd6",
-      "shortSha": "ca4de9a",
-      "subject": "fix(grid): drag highlight must never outlive the gesture",
-      "author": "Ohad Fisher",
-      "date": "2026-09-20T15:58:17+03:00"
-    },
-    {
-      "sha": "6de0bc77bbb8d0579ae779911c879c82471ffd68",
-      "shortSha": "6de0bc7",
-      "subject": "fix(word-tower-v2): full-width canvas, one HUD row, and a way out of the results",
-      "author": "Ohad Fisher",
-      "date": "2026-09-20T12:28:03+03:00"
-    },
-    {
-      "sha": "888e3d18c87585db22a8964e271fc05400377e64",
-      "shortSha": "888e3d1",
-      "subject": "Merge remote-tracking branch 'origin/master' into gauntlet/daily-evolve-2026-09-19",
-      "author": "Ohad Fisher",
-      "date": "2026-09-20T12:59:31+03:00"
-    },
-    {
-      "sha": "a004e8cdb5248a7c41c601cbf0125cc3257c328e",
-      "shortSha": "a004e8c",
-      "subject": "fix(sentry): landing i18n subset reported real keys as missing; redlock contention logged as error",
-      "author": "Ohad Fisher",
-      "date": "2026-09-20T11:25:58+03:00"
-    },
-    {
-      "sha": "b1dc8c07734548d34fc9ecdcd85abe1da08a6d91",
-      "shortSha": "b1dc8c0",
-      "subject": "Merge remote-tracking branch 'origin/master' into gauntlet/daily-evolve-2026-09-19",
-      "author": "Ohad Fisher",
-      "date": "2026-09-20T11:23:09+03:00"
-    },
-    {
-      "sha": "bf7fb8b37c44d7d6a3627c8a854d782f4772e5a8",
-      "shortSha": "bf7fb8b",
-      "subject": "boggle-new #1093 (auto-merged by portfolio-manager)",
+      "sha": "8394e1daa38d8ed603b03345ea216f336fd24348",
+      "shortSha": "8394e1d",
+      "subject": "feat(education): Gimkit Basic Pro-Exclusive 5-player honesty foil (#1137)",
       "author": "ohadf2015",
-      "date": "2026-09-20T11:34:42+04:00"
+      "date": "2026-09-23T15:38:06+03:00"
     },
     {
-      "sha": "af39beaf8ed0f51632b77282f56173535068ef78",
-      "shortSha": "af39bea",
-      "subject": "boggle-new #1095 (auto-merged by portfolio-manager)",
+      "sha": "15fdd63e09dd1a0e56bc3b943292ebfadeee697b",
+      "shortSha": "15fdd63",
+      "subject": "feat(education): Wayground Starter 20-activity library honesty foil (#1136)",
       "author": "ohadf2015",
-      "date": "2026-09-20T11:34:40+04:00"
+      "date": "2026-09-23T13:31:14+03:00"
     },
     {
-      "sha": "2d34d78a257b8cb994f249b1c5f194d3fad3c08d",
-      "shortSha": "2d34d78",
-      "subject": "feat(word-tower-v2): real-estate empire, variable rewards, rival raids and revenge",
+      "sha": "fd1cc05740fbb257c49db6a844ac9a5adb6a273f",
+      "shortSha": "fd1cc05",
+      "subject": "seo: rewrite titles on 4 high-impression CTR bleed pages (#1135)",
+      "author": "ohadf2015",
+      "date": "2026-09-23T11:43:40+03:00"
+    },
+    {
+      "sha": "a976a16ce545e8681c59ea9f6635110b1683378d",
+      "shortSha": "a976a16",
+      "subject": "feat(edu): daily Polar Teacher Pro churn-watch cron (#1133)",
+      "author": "ohadf2015",
+      "date": "2026-09-23T11:30:47+03:00"
+    },
+    {
+      "sha": "938720ec8889f4eaa12cabd6ed41f281118af494",
+      "shortSha": "938720e",
+      "subject": "feat(education): show the Pro report ask on the classroom projector (#1126)",
+      "author": "ohadf2015",
+      "date": "2026-09-23T10:33:09+03:00"
+    },
+    {
+      "sha": "9a03cc73e057c89d1738b9746a9c181461dfcdc5",
+      "shortSha": "9a03cc7",
+      "subject": "fix(singleplayer): hang-timeout + error boundary on lazy import (#1134)",
+      "author": "ohadf2015",
+      "date": "2026-09-23T10:31:53+03:00"
+    },
+    {
+      "sha": "80f26b291c0eb2a264a6bf7853052913d040543e",
+      "shortSha": "80f26b2",
+      "subject": "feat(education): Kahoot Go Free participant-limit honesty foil (table 40 vs FAQ 10) (#1132)",
+      "author": "ohadf2015",
+      "date": "2026-09-23T10:28:12+03:00"
+    },
+    {
+      "sha": "655509cdd505c0bed1ecff95660d32e42180de43",
+      "shortSha": "655509c",
+      "subject": "Merge pull request #1131 from ohadf2015/boggle-new/t_0d9276d6-ur-high-lexiclash-en-multiplayer-bounce",
+      "author": "ohadf2015",
+      "date": "2026-09-23T08:16:07+03:00"
+    },
+    {
+      "sha": "be6bcd2baea2b7e40f94c5f5f9483584fb78672b",
+      "shortSha": "be6bcd2",
+      "subject": "fix(mp): stop /en/multiplayer first-paint from hiding CTAs (t_0d9276d6)",
+      "author": "ohadf2015",
+      "date": "2026-09-23T03:31:42+03:00"
+    },
+    {
+      "sha": "4fb9cb58a24faa4b0a67420749222411cdc1a0d4",
+      "shortSha": "4fb9cb5",
+      "subject": "fix(daily): mark dailyDoneEver on Word Hunt and Word Wheel completion (#1130)",
+      "author": "ohadf2015",
+      "date": "2026-09-22T23:10:01+03:00"
+    },
+    {
+      "sha": "b3753dc25c4aa93e742eb4660fd8a1a6dab5079c",
+      "shortSha": "b3753dc",
+      "subject": "grok: # LexiClash solo mode: adventure-grade juice + new-player mode rotatio (#1128)",
+      "author": "ohadf2015",
+      "date": "2026-09-22T22:38:49+03:00"
+    },
+    {
+      "sha": "8a396bbc98db7558389e0d2c3a22d1cb623b5eee",
+      "shortSha": "8a396bb",
+      "subject": "feat(education): vs-Blooket Gaps Set honesty foil vs miss-gap Live deep-link (#1125)",
+      "author": "ohadf2015",
+      "date": "2026-09-22T19:25:52+03:00"
+    },
+    {
+      "sha": "7e3947017b36c750fded90a548a803fad0783f19",
+      "shortSha": "7e39470",
+      "subject": "fix(daily): stop Word Hunt music on route leave; SSR-safe played status",
       "author": "Ohad Fisher",
-      "date": "2026-09-20T08:39:49+03:00"
+      "date": "2026-09-22T18:12:38+03:00"
     },
     {
-      "sha": "3ef824c95659597de55abd2b3e132f56b876b11e",
-      "shortSha": "3ef824c",
-      "subject": "Merge remote-tracking branch 'origin/master' into gauntlet/daily-evolve-2026-09-19",
+      "sha": "9988c0ef0f0d51c68c58a3a2a32a4c4e9abda34e",
+      "shortSha": "9988c0e",
+      "subject": "feat(education): Unplugged/reteach Live deep-link from teacher assignment miss gaps (#1124)",
+      "author": "ohadf2015",
+      "date": "2026-09-22T17:33:21+03:00"
+    },
+    {
+      "sha": "f1759e19270430ee1c10b05b0c660a88e55e00fd",
+      "shortSha": "f1759e1",
+      "subject": "Merge fix/daily-hub-nested-suspense (approved via company-brain)",
       "author": "Ohad Fisher",
-      "date": "2026-09-20T08:29:02+03:00"
+      "date": "2026-09-22T13:32:43+03:00"
     },
     {
-      "sha": "dae555ade9400ac86fb9ed55aa92c4e919ab3435",
-      "shortSha": "dae555a",
-      "subject": "feat(daily): evolve the daily challenge against the NYT Games bar",
+      "sha": "c362e2dad2a79eef6740708f3ed2181ea5411056",
+      "shortSha": "c362e2d",
+      "subject": "Merge fix/daily-hub-ssr-singleplayer-retry (approved via company-brain)",
       "author": "Ohad Fisher",
-      "date": "2026-09-20T08:24:19+03:00"
+      "date": "2026-09-22T12:40:43+03:00"
     },
     {
-      "sha": "dc883510a252d927d40df02a58c99c56857c91d4",
-      "shortSha": "dc88351",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-20",
+      "sha": "1643965427507635e87471e5814f1ffe3ec6306d",
+      "shortSha": "1643965",
+      "subject": "fix(daily): nest useSearchParams so /en/daily SSRs the hub",
       "author": "Ohad Fisher",
-      "date": "2026-09-20T07:02:58+03:00"
+      "date": "2026-09-22T09:26:46Z"
     },
     {
-      "sha": "7870b03e4127556b2a80eefde39ca490bde8f2c4",
-      "shortSha": "7870b03",
-      "subject": "fix(motion): stop spring multi-keyframe console errors on /en (t_15ec0d7a) (#1054)",
+      "sha": "ecd101c5f4b5dbca7ad498be4e134bed6d26ca7b",
+      "shortSha": "ecd101c",
+      "subject": "fix(pricing): stop EducationShell + full footer collapsing main to zero (#1122)",
       "author": "ohadf2015",
-      "date": "2026-09-20T05:36:33+04:00"
+      "date": "2026-09-22T12:11:31+03:00"
     },
     {
-      "sha": "73ec80f7c880ee34b43d81ae14bcbee87d92ab20",
-      "shortSha": "73ec80f",
-      "subject": "fix: unfreeze Word Tower after Android hint ads (#1077)",
+      "sha": "81ba2f297fd27e07ad27759afc0e36e2b0086670",
+      "shortSha": "81ba2f2",
+      "subject": "fix(daily,singleplayer): SSR daily hub instead of loader; retryImport on SP (#1121)",
       "author": "ohadf2015",
-      "date": "2026-09-20T05:35:47+04:00"
+      "date": "2026-09-22T11:30:33+03:00"
     },
     {
-      "sha": "e389b26336a48cc3047062b72d38a144e5b1c0a6",
-      "shortSha": "e389b26",
-      "subject": "fix(education): rerun design audit on master (contrast, dead neo-gray, reduced motion, SSR, RTL, i18n) (#1092)",
+      "sha": "693008399685b43d4d4b91ffa3a0b770c2d958c8",
+      "shortSha": "6930083",
+      "subject": "feat(education): trial upgrade nudge to Teacher Pro Polar checkout (#1102)",
       "author": "ohadf2015",
-      "date": "2026-09-20T05:12:21+04:00"
-    },
-    {
-      "sha": "cfd181dbf63bffd34a0d773c5c111f64a0f4cad7",
-      "shortSha": "cfd181d",
-      "subject": "feat(edu): slice 4 moat — glossed CEFR lists, real 60s demo clock, live ?cefr= handoff (t_a663cb18) (#1043)",
-      "author": "ohadf2015",
-      "date": "2026-09-20T04:51:01+04:00"
-    },
-    {
-      "sha": "b1b4f86c662dfe09a580470673a0b2b1b59dfd86",
-      "shortSha": "b1b4f86",
-      "subject": "feat(edu): funnel instrumentation, trial-expiry upsell, and Polar dunning guard (#1040)",
-      "author": "ohadf2015",
-      "date": "2026-09-20T04:20:51+04:00"
-    },
-    {
-      "sha": "35209313a1497e763a0032ad8c2f68c3c5f41dc4",
-      "shortSha": "3520931",
-      "subject": "fix(blast): Wordfall HUD polish — mute control, RTL counter, frame seam, badge balance (#1091)",
-      "author": "ohadf2015",
-      "date": "2026-09-20T02:43:27+04:00"
-    },
-    {
-      "sha": "5fb753f8951b3170d372c98078d5ae7e62320602",
-      "shortSha": "5fb753f",
-      "subject": "feat(teacher): last-lesson progress digest on reports (edu funnel) (#1090)",
-      "author": "ohadf2015",
-      "date": "2026-09-20T00:52:46+04:00"
-    },
-    {
-      "sha": "d7154cd14cbc8d2ed261c32ab4b8087e9d729c19",
-      "shortSha": "d7154cd",
-      "subject": "feat(adventure): roguelike word RPG — combat, relics, draft, level variety, hints",
-      "author": "Ohad Fisher",
-      "date": "2026-09-19T23:26:45+03:00"
+      "date": "2026-09-22T11:27:49+03:00"
     }
   ]
 }

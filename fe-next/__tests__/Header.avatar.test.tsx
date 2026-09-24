@@ -51,6 +51,7 @@ vi.mock('framer-motion', () => {
     AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
     LazyMotion: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
     domAnimation: {},
+    useAnimationControls: () => ({ start: () => Promise.resolve(), stop: () => {}, set: () => {} }),
     m: {
       div: ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => <div {...stripFramerProps(props)}>{children}</div>,
       span: ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => <span {...stripFramerProps(props)}>{children}</span>,
@@ -235,6 +236,41 @@ describe('Header - Avatar Display', () => {
 
       const avatars = screen.getAllByTestId('header-avatar');
       expect(avatars.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  // Track C: the header bar itself (not the drawer) carries the player's face
+  // as a one-tap profile entry — only 0.17% of players ever found a profile.
+  describe('Header bar profile entry', () => {
+    it('links the authed player avatar straight to their profile', async () => {
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: true,
+        profile: { id: 'user-123', username: 'testuser', current_level: 4 } as ProfileData,
+        user: { id: 'user-123' },
+        isSupabaseEnabled: true,
+        loading: false,
+        isAdmin: false,
+      } as unknown as ReturnType<typeof useAuth>);
+
+      render(<Header />);
+
+      // cold next/dynamic import of the entry; generous per-test timeout below
+      const entry = await screen.findByTestId('header-profile-entry', {}, { timeout: 8000 });
+      expect(entry).toHaveAttribute('href', '/en/profile?from=header');
+    }, 20000);
+
+    it('is absent for guests', async () => {
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: false,
+        profile: null,
+        isSupabaseEnabled: true,
+        loading: false,
+        isAdmin: false,
+      } as ReturnType<typeof useAuth>);
+
+      render(<Header />);
+      await screen.findAllByLabelText(/menu/i);
+      expect(screen.queryByTestId('header-profile-entry')).not.toBeInTheDocument();
     });
   });
 });

@@ -5,7 +5,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { retryImport } from '@/utils/retryImport';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
-import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
+import { isReturningVisitor, savePendingRoomInvite } from '@/utils/onboardingStorage';
+import { detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
 import { trackInviteLanded, trackInviteRedirectFired, trackGrowthEvent } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { isQrScanArrival } from '@/utils/utmCapture';
@@ -50,11 +51,9 @@ interface HomePageClientProps {
 
 /**
  * Gate: returning users → LandingView (no CTA). New users → LandingView with
- * onStartOnboarding CTA; OnboardingFlow mounts only after they click play.
- *
- * Detection is purely localStorage-based (`hasCompletedOnboarding`) — there is
- * no viewport branching, both form factors run the same FTUE. New users see the
- * landing page first so they can browse before committing to signup.
+ * onStartOnboarding (PLAY); OnboardingFlow mounts in quick play only after they
+ * click it. Detection is localStorage-based (`isReturningVisitor`), no viewport
+ * branching.
  */
 export default function HomePageClient({ initialData }: HomePageClientProps): React.JSX.Element {
   // Synchronous check: determine if user is new and parse URL invite params.
@@ -66,7 +65,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // from sessionStorage and routes after profile completion.
   const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null; inviteRoomCode: string | null; qrRedirectUrl: string | null }>(() => {
     if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null, inviteRoomCode: null, qrRedirectUrl: null };
-    const returning = hasCompletedOnboarding() || hasSupabaseSession();
+    const returning = isReturningVisitor();
     const params = new URLSearchParams(window.location.search);
     const roomCode = params.get('room');
     let inviteRedirectUrl: string | null = null;
@@ -127,34 +126,37 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     trackGrowthEvent('ftue_redirect_landed', { destination: pendingNext });
   }, [pendingNext]);
 
-  // First-time visitors drop STRAIGHT into the short onboarding (language →
-  // name/avatar → style), not the marketing LandingView. This reverses the
-  // 2026-05-08 "landing-first" experiment: new users want to set up and play,
-  // not browse a landing page first. Returning users (completed onboarding or a
-  // live Supabase session) still get LandingView. This single rule subsumes the
-  // older special cases — ?next= redirects, ?room= invites, and CrazyGames
-  // portal traffic are all brand-new users, so they auto-open the FTUE too.
+  // Fresh visitors land on the scrollable fresh homepage; OnboardingFlow opens
+  // when they press PLAY (homepage gauntlet SPEC §8 — the auto-opened overlay
+  // trapped them: scroll p50 0%). Only HIGH-INTENT arrivals still auto-open:
+  //   - ?room= invite: FTUE owns the invite hand-off (useInviteOnboardingMode)
+  //   - ?next= bounce from a play surface: finish FTUE, then route back
+  //   - CrazyGames portal traffic: intends to play immediately
+  // Returning users (same predicate as the pre-paint tree script) never do.
   //
   // Seeded in an EFFECT, not a useState initializer: this page is statically
-  // rendered (SSG), so the server has no localStorage and always emits
-  // LandingView. Reading localStorage in the initializer would make the first
-  // CLIENT render (OnboardingFlow) diverge from that server HTML — a guaranteed
-  // hydration mismatch. Starting false keeps the first render matching SSR, then
-  // the effect flips new users to the FTUE post-hydration.
+  // rendered (SSG), so the server has no localStorage. Reading it in the
+  // initializer would make the first CLIENT render diverge from the server HTML.
   //
-  // CRAWLERS: do NOT assume "no JS". Googlebot/Bingbot render with an evergreen
-  // Chromium that runs this effect with a fresh, empty localStorage — so without
-  // the isCrawler() guard they'd flip to the FTUE and index the onboarding
-  // interstitial instead of the marketing LandingView (the SSR'd content). The
-  // guard keeps the crawler's RENDERED snapshot equal to the LandingView every
-  // human also reaches. See lib/seo/isCrawler.ts for the not-cloaking rationale.
+  // CRAWLERS: Googlebot/Bingbot run this effect with empty localStorage; the
+  // isCrawler() guard keeps their rendered snapshot equal to the page every
+  // human reaches. See lib/seo/isCrawler.ts for the not-cloaking rationale.
   const [showFTUE, setShowFTUE] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (isCrawler()) return;
-    if (hasCompletedOnboarding() || hasSupabaseSession()) return;
-    setShowFTUE(true);
-  }, []);
+    if (isReturningVisitor()) return;
+    let isCrazyGames = false;
+    try {
+      isCrazyGames = detectCrazyGamesSync();
+    } catch {
+      isCrazyGames = false;
+    }
+    // Any ?next= means a bounce from a play surface, even one whose value is
+    // rejected as unsafe (it is then simply not followed after FTUE).
+    const bounced = new URLSearchParams(window.location.search).has('next');
+    if (inviteRoomCode || bounced || isCrazyGames) setShowFTUE(true);
+  }, [inviteRoomCode]); // frozen initial state → runs once
 
   // Hydration gate for the render-affecting, window-derived branches below
   // (invite spinner, isNewUser CTA). The server (SSG, no window) emits LandingView;
@@ -190,17 +192,41 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   const router = useRouter();
   const routeAllowsOnboarding = isOnboardingAllowedRoute(pathname);
 
+  // Fresh-page PLAY → quick play (hero taught the board); auto-opens keep the
+  // full flow. CrazyGames via the sync detector, not the late hook (Class 1).
+  const [ftueEntry, setFtueEntry] = useState<'quickPlay' | undefined>(undefined);
+  // Quick play ends by navigating; a cover stops the homepage flashing back.
+  const [leavingForGame, setLeavingForGame] = useState(false);
+  useEffect(() => {
+    if (!leavingForGame) return; // never strand it: bfcache restore or a dead nav clears it
+    const clear = (e: PageTransitionEvent) => e.persisted && setLeavingForGame(false);
+    window.addEventListener('pageshow', clear);
+    const id = setTimeout(() => setLeavingForGame(false), 30000);
+    return () => {
+      clearTimeout(id);
+      window.removeEventListener('pageshow', clear);
+    };
+  }, [leavingForGame]);
+
   const handleStartOnboarding = useCallback(() => {
     if (!routeAllowsOnboarding) return;
+    let isCrazyGames = false;
+    try {
+      isCrazyGames = detectCrazyGamesSync();
+    } catch {
+      isCrazyGames = false;
+    }
+    setFtueEntry(isCrazyGames ? undefined : 'quickPlay');
     setShowFTUE(true);
   }, [routeAllowsOnboarding]);
   const handleFTUEComplete = useCallback(() => {
     setShowFTUE(false);
+    if (ftueEntry === 'quickPlay') setLeavingForGame(true);
     if (pendingNext) {
       trackGrowthEvent('ftue_redirect_resumed', { destination: pendingNext });
       router.push(pendingNext);
     }
-  }, [pendingNext, router]);
+  }, [pendingNext, router, ftueEntry]);
 
   useEffect(() => {
     if (inviteRedirectUrl && inviteRoomCode) {
@@ -219,20 +245,10 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     }
   }, [qrRedirectUrl, router]);
 
+  // Both clarity variants ('status-card' and control) show the SAME connecting
+  // spinner: never a contentless dark screen (reads as a "black screen" bug while
+  // the redirect resolves), so the invite hop always has visible, alive feedback.
   if (mounted && inviteRedirectUrl) {
-    if (clarityVariant === 'status-card') {
-      return (
-        <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 rounded-full border-4 border-neo-lime border-t-transparent animate-spin" />
-            <span className="font-neo-body text-neo-cream text-sm">{t('joinView.connectingToRoom')}</span>
-          </div>
-        </div>
-      );
-    }
-    // Never render a contentless dark screen (reads as a "black screen" bug while
-    // the redirect resolves) — show the same connecting spinner as the status-card
-    // branch so the invite hop always has visible, alive feedback.
     return (
       <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -256,13 +272,8 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     );
   }
 
-  // FTUE renders ON TOP of LandingView (opaque fixed inset-0 z-[100] overlay),
-  // NOT instead of it. Previously `showFTUE` replaced LandingView entirely:
-  // the SSR'd hero unmounted post-hydration, the SEO section reflowed to the
-  // top of the viewport, and Chrome logged the swap as a ~0.98 layout shift —
-  // THE landing-page CLS regression (field p75 CLS 0.98). Keeping LandingView
-  // mounted is pixel-identical for the user (the overlay is opaque) and leaves
-  // layout untouched underneath.
+  // FTUE renders ON TOP of LandingView (opaque z-[100] overlay), NOT instead of
+  // it: swapping LandingView out was THE landing CLS regression (field p75 0.98).
   return (
     <>
       <LandingView
@@ -270,7 +281,18 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
         onStartOnboarding={mounted && isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
       />
       {showFTUE && routeAllowsOnboarding && (
-        <OnboardingFlow onComplete={handleFTUEComplete} />
+        <OnboardingFlow onComplete={handleFTUEComplete} entry={ftueEntry} />
+      )}
+      {leavingForGame && !showFTUE && (
+        <div
+          data-testid="home-quickplay-cover"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-neo-navy"
+          role="status"
+          aria-live="polite"
+        >
+          <LoadingDancer styleKey="arcade" className="h-28 w-28 sm:h-32 sm:w-32" />
+          <span className="sr-only">{t('onboarding.loading')}</span>
+        </div>
       )}
     </>
   );

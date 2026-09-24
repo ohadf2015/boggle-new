@@ -10,6 +10,7 @@ const ALL_KEYS: AvatarCategoryKey[] = [
   'mouth',
   'facialHair',
   'accessories',
+  'outfit',
   'background',
 ];
 
@@ -18,7 +19,7 @@ describe('AvatarCategoryIcons', () => {
     for (const key of ALL_KEYS) {
       expect(AVATAR_CATEGORY_ICONS[key]).toBeTypeOf('function');
     }
-    // No stray keys beyond the 7 categories.
+    // No stray keys beyond the 8 editor tab glyphs (catalog added an Outfit tab).
     expect(Object.keys(AVATAR_CATEGORY_ICONS).sort()).toEqual([...ALL_KEYS].sort());
   });
 

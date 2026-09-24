@@ -208,7 +208,7 @@ export async function creditEcosystem(input: EcosystemInput): Promise<EcosystemR
     if (error) throw new Error(`achievement_counts update: ${error.message}`);
   });
 
-  // --- Coins: milestones only (elite / boss / world clear). Run gold stays in-run.
+  // --- Coins: milestones (elite / boss / world clear). The run-end purse banks in /complete.
   await isolate('coins', undefined, async () => {
     const amount = (COINS_FOR[nodeKind] ?? 0) + (input.worldCleared ? COINS_WORLD_CLEAR : 0);
     if (amount <= 0) return;

@@ -11,9 +11,14 @@ import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
 } from '@/utils/storageHelpers';
+import {
+  ONBOARDING_FLAG_KEY,
+  ONBOARDING_FLAG_VALUES,
+  readReturningSignals,
+} from '@/utils/returningVisitor';
 
 const STORAGE_KEYS = {
-  ONBOARDING_COMPLETED: 'lexiclash_onboarding_completed',
+  ONBOARDING_COMPLETED: ONBOARDING_FLAG_KEY,
   ONBOARDING_DATA: 'lexiclash_onboarding_data',
   BOTS_GAME_PLAYED: 'lexiclash_bots_game_played',
 } as const;
@@ -33,7 +38,7 @@ export interface OnboardingData {
  */
 export const hasCompletedOnboarding = (): boolean => {
   const value = getFromLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED);
-  return value === 'true' || value === 'skipped';
+  return value !== null && ONBOARDING_FLAG_VALUES.includes(value);
 };
 
 /**
@@ -202,41 +207,22 @@ export const clearBotsGamePlayed = (): void => {
 export const hasSupabaseSession = (): boolean => {
   if (typeof window === 'undefined') return false;
   // @supabase/ssr stores the session in a cookie, while older `@supabase/supabase-js`
-  // browser clients used localStorage. We check both, but only count a *live* session:
-  // Supabase v2 commonly leaves the literal string "null" or an object with no
-  // access_token after signOut, which would false-positive a `!!getItem(key)` check
-  // and cause new visitors to skip the FTUE flow entirely.
-  const looksLive = (raw: string | null | undefined): boolean => {
-    if (!raw) return false;
-    try {
-      const parsed = JSON.parse(raw);
-      return !!(parsed && typeof parsed === 'object' && parsed.access_token);
-    } catch {
-      return false;
-    }
-  };
-
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
-      if (looksLive(localStorage.getItem(key))) return true;
-    }
+  // browser clients used localStorage. Both are checked, and only a *live* session
+  // counts (see readReturningSignals — the same code the homepage pre-paint script runs).
+  let storage: Storage | null = null;
+  try {
+    storage = window.localStorage;
+  } catch {
+    storage = null;
   }
-
-  if (typeof document !== 'undefined' && document.cookie) {
-    for (const part of document.cookie.split(';')) {
-      const eq = part.indexOf('=');
-      if (eq < 0) continue;
-      const name = part.slice(0, eq).trim();
-      if (name.startsWith('sb-') && name.endsWith('-auth-token')) {
-        try {
-          const value = decodeURIComponent(part.slice(eq + 1).trim());
-          if (looksLive(value)) return true;
-        } catch {
-          // ignore malformed cookie value
-        }
-      }
-    }
-  }
-  return false;
+  const cookie = typeof document !== 'undefined' ? document.cookie : '';
+  return readReturningSignals(storage, cookie, ONBOARDING_FLAG_KEY, ONBOARDING_FLAG_VALUES, true);
 };
+
+/**
+ * THE returning-visitor predicate (completed/skipped onboarding, or a live
+ * Supabase session). PageClient uses it to decide onboarding; the homepage
+ * pre-paint script (utils/returningVisitor.ts HOME_TREE_SCRIPT) runs the same
+ * logic before paint to pick the fresh vs returning tree.
+ */
+export const isReturningVisitor = (): boolean => hasCompletedOnboarding() || hasSupabaseSession();

@@ -15,6 +15,7 @@ import type { Application, Graphics } from 'pixi.js';
 import type { ParticlePool } from '../gameEngine/ParticleSystem';
 import type { ParticleConfig } from '../gameEngine/types';
 import { PRESETS, type PresetName } from './presets';
+import { dropHeldFxCalls, flushHeldFxCalls, holdFxCall, waitForFxGate } from './SharedFxGate';
 
 // Runtime pixi.Graphics constructor, resolved during mount(). The spawn helpers
 // that use it all early-return unless `app` is set (i.e. post-mount), so it is
@@ -145,6 +146,11 @@ async function mount(
   mountPromise = (async () => {
     deviceConfig = { ...DEFAULT_DEVICE, ...device };
 
+    // First-load gate (./SharedFxGate): while held, pixi waits for the visitor's
+    // first interaction or first spawn instead of loading with the page.
+    await waitForFxGate();
+    if (myGeneration !== generation) return; // unmounted while waiting
+
     // Lazy-load the GPU stack here, off the first-load critical path. Both the
     // pixi runtime and ParticlePool (which itself statically imports pixi) are
     // pulled in only now, when a real mount is happening.
@@ -211,6 +217,7 @@ async function mount(
 
     app = instance;
     live = true;
+    flushHeldFxCalls();
   })();
 
   await mountPromise;
@@ -224,6 +231,7 @@ function unmount(): void {
   generation++;
   mountPromise = null;
   live = false;
+  dropHeldFxCalls();
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler);
     resizeHandler = null;
@@ -250,8 +258,14 @@ function computeControlPoint(source: Point, target: Point): Point {
   };
 }
 
+// Mount pending (first-use gate or GPU init): hold the spawn for replay.
+function holdIfMounting(replay: () => void): void {
+  if (mountPromise) holdFxCall(replay);
+}
+
 function spawnCoinStream(req: CoinStreamRequest): void {
-  if (isSSR() || !app) return;
+  if (isSSR()) return;
+  if (!app) return holdIfMounting(() => spawnCoinStream(req));
   if (deviceConfig.prefersReducedMotion) return;
 
   const capped = Math.min(req.count, deviceConfig.maxParticles);
@@ -343,7 +357,8 @@ function getActiveCoinStreamCount(): number {
 }
 
 function spawnFirework(req: FireworkRequest): void {
-  if (isSSR() || !app) return;
+  if (isSSR()) return;
+  if (!app) return holdIfMounting(() => spawnFirework(req));
   if (deviceConfig.prefersReducedMotion) return;
 
   const cap = deviceConfig.maxParticles;
@@ -459,7 +474,8 @@ function spawnBurst(
   y: number,
   overrides: SpawnOverrides = {},
 ): void {
-  if (isSSR() || !pool) return;
+  if (isSSR()) return;
+  if (!pool) return holdIfMounting(() => spawnBurst(preset, x, y, overrides));
   if (deviceConfig.prefersReducedMotion) return;
 
   const config = PRESETS[preset as PresetName];

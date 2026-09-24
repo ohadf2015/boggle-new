@@ -1,51 +1,43 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { useFocusTrap } from '@/hooks/useFocusTrap';
+/**
+ * Avatar editor (rebuilt 2026-09). One screen, no page scroll:
+ *   header (cancel · title · gold)
+ *   big live stage (pop on every change; nothing floats over the avatar)
+ *   icon tabs → pinned palette row → the ONLY scrolling area (part grid)
+ *   → try-on unlock panel (only while a locked part is on) → action bar
+ *   (undo · randomize · DONE).
+ * Desktop: centered modal, stage on the start side, controls on the end side.
+ *
+ * Contract kept for the 11 callers: default export, `AvatarPremium`,
+ * `onSave(config)` (persistence stays with the caller), `premium=null` hides
+ * premium parts, `previousConfig` enables restore. Locked parts are TRIED ON,
+ * never saved: DONE always saves the committed draft.
+ */
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Shuffle, Undo2, Download, Coins, History, Eye, EyeOff } from 'lucide-react';
-import { AVATAR_CATEGORY_ICONS } from './AvatarCategoryIcons';
+import { Coins, X } from 'lucide-react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Reveal } from '@/components/ui/Reveal';
-import AvatarRenderer from './AvatarRenderer';
-import AvatarTierEffects, { getAvatarTier, getAvatarVisualTier, type Tier } from './AvatarTierEffects';
-import AvatarEquipBurst from './AvatarEquipBurst';
+import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
+import type { CatalogColor } from '@/lib/avatar/catalog';
+import { COLLECTIBLE_PART_KEYS, getCollectionProgress } from '@/lib/avatar/unlocks';
+import { planEquipBurst, type EquipBurst } from '@/lib/avatar/equipBurst';
+import { getAvatarTier, type Tier } from './AvatarTierEffects';
 import GlowUpButton from './GlowUpButton';
 import { LobbyAvatarRewardButton } from './LobbyAvatarRewardButton';
-import { planEquipBurst, type EquipBurst } from '@/lib/avatar/equipBurst';
 import FloatingCoinAnimation from '@/components/game/FloatingCoinAnimation';
-import CategoryOptions from './AvatarBuilderCategoryOptions';
-import {
-  type CustomAvatarConfig,
-  DEFAULT_AVATAR_CONFIG,
-  getRandomAvatarConfig,
-  FEMALE_HAIR_STYLES,
-  MALE_HAIR_STYLES,
-  DEFAULT_FEMALE_HAIR,
-  DEFAULT_MALE_HAIR,
-} from '@/shared/types/customAvatar';
-import { AVATAR_SETS, getSetProgress } from '@/lib/avatar/avatarSets';
-
-type Category = 'base' | 'hair' | 'eyes' | 'mouth' | 'facialHair' | 'accessories' | 'background';
-
-
-const ALL_CATEGORIES: { key: Category; labelKey: string; maleOnly?: boolean }[] = [
-  { key: 'base', labelKey: 'avatarBuilder.base' },
-  { key: 'hair', labelKey: 'avatarBuilder.hair' },
-  { key: 'eyes', labelKey: 'avatarBuilder.eyes' },
-  { key: 'mouth', labelKey: 'avatarBuilder.mouth' },
-  { key: 'facialHair', labelKey: 'avatarBuilder.facialHair', maleOnly: true },
-  { key: 'accessories', labelKey: 'avatarBuilder.accessories' },
-  { key: 'background', labelKey: 'avatarBuilder.background' },
-];
-
-// Jelly wobble for avatar preview (from animate-ai: playful-wobble-jelly)
-const JELLY_SPRING = { type: 'spring' as const, stiffness: 200, damping: 8 };
-
-// Bounce button spring (from animate-ai: playful-spring-bounce-button)
-const BUTTON_SPRING = { type: 'spring' as const, stiffness: 400, damping: 17 };
+import EditorStage from './editor/EditorStage';
+import EditorTabBar from './editor/EditorTabBar';
+import EditorPanel from './editor/EditorPanel';
+import UnlockPanel from './editor/UnlockPanel';
+import EditorActionBar from './editor/EditorActionBar';
+import { useAvatarEditor } from './editor/useAvatarEditor';
+import { getEditorTabs, describeSlot, type ColorSection, type PartsSection, type EditorTab } from './editor/editorTabs';
+import { getPartLockInfo } from './editor/partLock';
+import { downloadAvatarPng } from './editor/downloadAvatar';
+import './editor/avatarEditor.css';
 
 export interface AvatarPremium {
   isPartUnlocked: (category: string, value: string) => boolean;
@@ -54,6 +46,8 @@ export interface AvatarPremium {
   isPurchasing: boolean;
   permanentUnlocks: string[];
   coins: number;
+  /** Player level (drives "Lv N" progress copy + collection count). Optional for older callers. */
+  level?: number;
 }
 
 interface AvatarBuilderModalProps {
@@ -67,421 +61,214 @@ interface AvatarBuilderModalProps {
   previousConfig?: CustomAvatarConfig | null;
 }
 
-export default function AvatarBuilderModal({
-  isOpen,
-  onClose,
-  onSave,
-  initialConfig,
-  premium,
-  previousConfig,
-}: AvatarBuilderModalProps) {
+export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialConfig, premium, previousConfig }: AvatarBuilderModalProps) {
   const { t, language } = useLanguage();
-  const [config, setConfig] = useState<CustomAvatarConfig>(initialConfig ?? DEFAULT_AVATAR_CONFIG);
-  const [activeCategory, setActiveCategory] = useState<Category>('base');
-  const [previewKey, setPreviewKey] = useState(0);
-  // Spins the shuffle glyph ONLY on randomize — keyed off previewKey would
-  // re-spin it on every part tweak, which both looks odd and re-runs the spring.
-  const [randomizeKey, setRandomizeKey] = useState(0);
+  const editor = useAvatarEditor(isOpen, initialConfig);
+  const { committed, preview, state, set, setMany, tryOn: tryOnPart, replace, saved } = editor;
+  const [activeTab, setActiveTab] = useState<EditorTab['id']>('face');
   const [coinSpendAmount, setCoinSpendAmount] = useState<number | null>(null);
-  const historyRef = useRef<CustomAvatarConfig[]>([]);
-  // Equip "snap" burst — fires over the preview when an equip changes the tier.
-  const [equipBurst, setEquipBurst] = useState<EquipBurst | null>(null);
-  const [previewMode, setPreviewMode] = useState(false);
-  const lastTierRef = useRef<Tier>('free');
+  const [burst, setBurst] = useState<EquipBurst | null>(null);
+  const lastTierRef = useRef<Tier>(getAvatarTier(preview));
+  const stageRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  const tabs = useMemo(() => getEditorTabs(committed, { showPremium: !!premium }), [committed, premium]);
+  const tab = tabs.find(x => x.id === activeTab) ?? tabs[0];
 
   useEffect(() => {
-    if (!isOpen) return;
-    const start = initialConfig ?? DEFAULT_AVATAR_CONFIG;
-    setConfig(start);
-    historyRef.current = [];
-    lastTierRef.current = getAvatarTier(start);
-    setEquipBurst(null);
-    setPreviewKey(k => k + 1);
-  }, [isOpen, initialConfig]);
+    if (isOpen) setActiveTab('face');
+  }, [isOpen]);
 
-  // Re-plan the burst whenever the equipped config changes tier-relevant parts.
+  // Equip burst on each visible change (bigger when the tier goes up). Keyed on
+  // changeCount, never on object identity, so it can't feed back into itself.
+  const changeCount = state.changeCount;
   useEffect(() => {
     if (!isOpen) return;
-    const newTier = getAvatarTier(config);
-    const plan = planEquipBurst(lastTierRef.current, newTier);
-    lastTierRef.current = newTier;
-    if (plan.particles > 0) setEquipBurst(plan);
-  }, [config, isOpen]);
+    const next = getAvatarTier(preview);
+    const plan = planEquipBurst(lastTierRef.current, next);
+    lastTierRef.current = next;
+    setBurst(plan.particles > 0 ? plan : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- preview changes exactly when changeCount does
+  }, [changeCount, isOpen]);
 
-  const pushHistory = useCallback((current: CustomAvatarConfig) => {
-    historyRef.current = [...historyRef.current.slice(-19), current];
-  }, []);
+  const pick = useCallback((key: keyof CustomAvatarConfig, rarityCategory: string, id: string) => {
+    const info = getPartLockInfo(rarityCategory, id, premium);
+    if (!info.locked) set(key, id);
+    else if (premium) tryOnPart(key, id);
+  }, [premium, set, tryOnPart]);
 
-  const updateConfig = useCallback(<K extends keyof CustomAvatarConfig>(key: K, value: CustomAvatarConfig[K]) => {
-    setConfig(prev => {
-      pushHistory(prev);
-      const next = { ...prev, [key]: value };
-      // Auto-switch hair when changing gender if current hair isn't available
-      if (key === 'gender') {
-        const hairList = value === 'female' ? FEMALE_HAIR_STYLES : MALE_HAIR_STYLES;
-        if (!(hairList as readonly string[]).includes(prev.hair)) {
-          next.hair = value === 'female' ? DEFAULT_FEMALE_HAIR : DEFAULT_MALE_HAIR;
-        }
-        if (value === 'female') {
-          next.facialHair = 'none';
-        }
-      }
-      return next;
-    });
-    setPreviewKey(k => k + 1);
-  }, [pushHistory]);
-
-  const handleRandomize = useCallback(() => {
-    setConfig(prev => {
-      pushHistory(prev);
-      return getRandomAvatarConfig();
-    });
-    setPreviewKey(k => k + 1);
-    setRandomizeKey(k => k + 1);
-  }, [pushHistory]);
-
-  const handleUndo = useCallback(() => {
-    if (historyRef.current.length === 0) return;
-    const prev = historyRef.current.pop()!;
-    setConfig(prev);
-    setPreviewKey(k => k + 1);
-  }, []);
+  const onPickPart = useCallback((s: PartsSection, id: string) => pick(s.configKey, s.rarityCategory, id), [pick]);
+  const onPickColor = useCallback((s: ColorSection, c: CatalogColor) => pick(s.configKey, c.palette, c.hex), [pick]);
+  const onGender = useCallback((g: CustomAvatarConfig['gender']) => set('gender', g), [set]);
+  const onPatch = useCallback((patch: Partial<CustomAvatarConfig>) => setMany(patch, committed), [setMany, committed]);
+  const onRandomize = useCallback(() => replace(getRandomAvatarConfig()), [replace]);
+  const onRestorePrevious = useCallback(() => {
+    if (previousConfig) replace(previousConfig);
+  }, [replace, previousConfig]);
+  const onDownload = useCallback(() => downloadAvatarPng(stageRef.current), []);
 
   const handleSave = useCallback(() => {
-    onSave(config);
+    saved(committed);
+    onSave(committed);
     onClose();
-  }, [config, onSave, onClose]);
+  }, [saved, committed, onSave, onClose]);
 
-  const handleRestorePrevious = useCallback(() => {
-    if (!previousConfig) return;
-    setConfig(prev => {
-      pushHistory(prev);
-      return previousConfig;
+  const tryOn = state.tryOn;
+  const slot = tryOn ? describeSlot(tryOn.key) : null;
+  const tryInfo = tryOn && slot ? getPartLockInfo(slot.rarityCategory, tryOn.value, premium) : null;
+
+  const handleBuy = useCallback(async () => {
+    if (!premium || !tryOn || !slot || !tryInfo) return;
+    const ok = await premium.purchaseWithGold(slot.rarityCategory, tryOn.value);
+    if (!ok) return;
+    setCoinSpendAmount(tryInfo.price);
+    set(tryOn.key, tryOn.value);
+  }, [premium, tryOn, slot, tryInfo, set]);
+
+  // Count from the SAME predicate the grid uses (isPartUnlocked), so the chip can
+  // never say 0 while the grid shows level unlocks as owned.
+  const collection = useMemo(() => {
+    if (!premium) return null;
+    const owned = COLLECTIBLE_PART_KEYS.filter(k => {
+      const i = k.indexOf(':');
+      return premium.isPartUnlocked(k.slice(0, i), k.slice(i + 1));
     });
-    setPreviewKey(k => k + 1);
-  }, [previousConfig, pushHistory]);
+    return getCollectionProgress(owned, premium.level);
+  }, [premium]);
 
-  const previewRef = useRef<HTMLDivElement>(null);
-  const handleDownload = useCallback(() => {
-    const svgEl = previewRef.current?.querySelector('svg');
-    if (!svgEl) return;
-    const clone = svgEl.cloneNode(true) as SVGElement;
-    clone.setAttribute('width', '512');
-    clone.setAttribute('height', '512');
-    const xml = new XMLSerializer().serializeToString(clone);
-    const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d')!;
-      ctx.drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-      const link = document.createElement('a');
-      link.download = 'my-avatar.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    };
-    img.src = url;
-  }, []);
+  // Portal only after mount: the server (and hydration pass) render nothing, so an
+  // editor that starts open can't cause a hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  const dialogRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(dialogRef, isOpen, onClose);
+  useFocusTrap(dialogRef, isOpen && mounted, onClose);
+
+  // Land initial focus on the title (announced by screen readers), not on the X:
+  // the trap's first-focusable pick would draw a focus ring on "close" at open.
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (!isOpen || !mounted) return;
+    const id = setTimeout(() => titleRef.current?.focus({ preventScroll: true }), 140);
+    return () => clearTimeout(id);
+  }, [isOpen, mounted]);
 
   useEffect(() => {
     if (!isOpen) return;
+    // Lock <html> too: iOS Safari ignores overflow on <body> alone.
+    const html = document.documentElement;
+    const prevBody = document.body.style.overflow;
+    const prevHtml = html.style.overflow;
     document.body.style.overflow = 'hidden';
+    html.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = prevBody;
+      html.style.overflow = prevHtml;
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
+
+  const tryOnTab = tryOn ? tabs.find(x => [...x.pinned, ...x.sections].some(s => 'configKey' in s && s.configKey === tryOn.key))?.id ?? null : null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 pb-[calc(1rem+min(var(--admob-banner-height,0px),120px)+min(var(--web-anchor-ad-height,0px),120px))] overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
-      <Reveal
-        ref={dialogRef as React.Ref<HTMLElement>}
+    <div
+      role="presentation"
+      onClick={onClose}
+      className="fixed inset-0 z-[110] flex items-stretch md:items-center justify-center bg-black/70 md:bg-black/85 md:p-6 pb-[calc(min(var(--admob-banner-height,0px),120px)+min(var(--web-anchor-ad-height,0px),120px))] md:pb-[calc(1.5rem+min(var(--web-anchor-ad-height,0px),120px))]"
+    >
+      <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="avatar-builder-title"
-        className="bg-neo-navy border-3 border-black shadow-hard-lg rounded-neo-lg w-full max-w-[95vw] sm:max-w-xl md:max-w-2xl max-h-full flex flex-col min-h-0 [container-type:inline-size]"
-        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        className="relative w-full h-full md:h-[min(700px,100%)] md:max-w-[900px] flex flex-col overflow-hidden bg-neo-navy md:border-[3px] md:border-black md:rounded-neo-xl md:shadow-hard-2xl motion-safe:animate-in motion-safe:slide-in-from-bottom-6 duration-200"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 sm:p-4 border-b-3 border-black">
-          <h2 id="avatar-builder-title" className="font-neo-display text-neo-white text-xl font-bold">
-            {t('avatarBuilder.title')}
-          </h2>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setPreviewMode(v => !v)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-neo border-2 text-xs font-black transition-colors ${
-                previewMode
-                  ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
-                  : 'bg-neo-navy-light border-neo-white/20 text-neo-white hover:border-neo-white/40'
-              }`}
-              title={t('avatarBuilder.previewMode')}
-            >
-              {previewMode ? <Eye size={14} /> : <EyeOff size={14} />}
-              <span className="hidden @[28rem]:inline">{t('avatarBuilder.previewMode')}</span>
-            </button>
-            {premium && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-neo bg-neo-navy-light border-2 border-neo-yellow/30">
-                <Coins size={14} className="text-neo-yellow" />
-                <span className="text-neo-yellow font-black text-sm tabular-nums">{safeToLocaleString(premium.coins, language)}</span>
-              </div>
-            )}
-            <button type="button" onClick={onClose} className="text-neo-white hover:text-neo-white p-2.5 transition-colors" aria-label={t('common.close')}>
-              <X size={20} />
-            </button>
-          </div>
-        </div>
-
-        {/* Preview — jelly wobble on every change + equip "snap" burst */}
-        <div ref={previewRef} className="flex justify-center py-2 sm:py-3 desktop-tall:sm:py-5 shrink-0">
-          <div className="relative">
-            <AdaptiveMotion.div
-              key={previewKey}
-              initial={{ scaleX: 1.06, scaleY: 0.94, rotate: -1.5 }}
-              animate={{ scaleX: 1, scaleY: 1, rotate: 0 }}
-              transition={JELLY_SPRING}
-              className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] @[24rem]:w-[112px] @[24rem]:h-[112px] @[32rem]:w-[140px] @[32rem]:h-[140px] desktop-tall:@[32rem]:w-[160px] desktop-tall:@[32rem]:h-[160px]"
-            >
-              {previewMode ? (
-                <AvatarTierEffects config={config} className="w-full h-full">
-                  <AvatarRenderer config={config} size={160} className="w-full h-full" />
-                </AvatarTierEffects>
-              ) : (
-                <AvatarRenderer config={config} size={160} className="w-full h-full" />
-              )}
-            </AdaptiveMotion.div>
-            <AvatarEquipBurst burst={equipBurst} fireKey={previewKey} />
-            {previewMode && (
-              <div className="absolute -bottom-6 inset-x-0 text-center">
-                <span className={`text-[10px] font-black uppercase tracking-wider ${
-                  getAvatarVisualTier(config) === 'legendary' ? 'text-amber-300'
-                  : getAvatarVisualTier(config) === 'epic' ? 'text-neo-yellow'
-                  : getAvatarVisualTier(config) === 'rare' ? 'text-neo-white'
-                  : 'text-neo-white/60'
-                }`}>
-                  {t(`avatarBuilder.tiers.${getAvatarVisualTier(config)}`)}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Admin-only: AI Glow-Up of the built avatar (Track B) */}
-        <GlowUpButton previewRef={previewRef} config={config} />
-
-        {/* Optional reward: watch a short ad to unlock a random premium avatar
-            part (1/day). This is where the old lobby "watch ad" CTA now lives —
-            in-context, right where you're browsing parts, and purely opt-in.
-            Self-hides when unavailable (no ad provider / anon / all owned), so
-            the row collapses cleanly. */}
-        <div className="flex justify-center px-3 pb-1 shrink-0 empty:hidden" data-testid="avatar-builder-reward-slot">
-          <LobbyAvatarRewardButton />
-        </div>
-
-        {/* Set completion progress */}
-        {premium && (
-          <div className="px-3 sm:px-4 pb-2 shrink-0">
-            <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              {AVATAR_SETS.map(set => {
-                const ownedKeys = set.parts.filter(k => {
-                  const [c, i] = k.split(':');
-                  return premium.isPartUnlocked(c, i);
-                });
-                const prog = getSetProgress(set, ownedKeys);
-                return (
-                  <div
-                    key={set.id}
-                    className="shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-neo bg-neo-navy-light border border-neo-white/10"
-                    title={t(`avatarBuilder.sets.${set.id}`)}
-                  >
-                    <span className="text-[10px] font-black uppercase" style={{ color: set.color }}>
-                      {t(`avatarBuilder.sets.${set.id}`)}
-                    </span>
-                    <span className="flex gap-0.5">
-                      {Array.from({ length: prog.total }, (_, i) => (
-                        <span
-                          key={i}
-                          className="w-1.5 h-1.5 rotate-45 border rounded-[1px]"
-                          style={{
-                            borderColor: set.color,
-                            background: i < prog.owned ? set.color : 'transparent',
-                          }}
-                        />
-                      ))}
-                    </span>
-                    <span className="text-[9px] font-black tabular-nums text-neo-white/70">
-                      {prog.owned}/{prog.total}
-                    </span>
-                    {prog.complete && (
-                      <span className="text-[9px]" aria-label={t('avatarBuilder.completeSet')}>★</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Category Tabs — scroll-snap row, icon-only on narrow, icon+label when room */}
-        <div className="relative shrink-0">
-          <div
-            className="flex gap-1 overflow-x-auto px-3 sm:px-4 py-1 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-            role="tablist"
-            aria-label={t('avatarBuilder.title')}
-          >
-            {ALL_CATEGORIES.filter(c => !c.maleOnly || config.gender === 'male').map(cat => {
-              const isActive = activeCategory === cat.key;
-              return (
-                <AdaptiveMotion.button
-                  key={cat.key}
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => setActiveCategory(cat.key)}
-                  whileTap={{ scale: 0.92 }}
-                  transition={BUTTON_SPRING}
-                  className={`shrink-0 snap-start min-h-[40px] flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs @[38rem]:text-sm font-bold rounded-neo whitespace-nowrap border-2 transition-colors ${
-                    isActive
-                      ? 'bg-neo-lime text-neo-black border-black shadow-hard-sm'
-                      : 'bg-neo-navy-light text-neo-white border-transparent hover:border-neo-white/30 hover:bg-neo-navy-light/80'
-                  }`}
-                  title={t(cat.labelKey)}
-                >
-                  <CategoryIcon category={cat.key} />
-                  {/* Active tab always shows its name — the glyph alone is ambiguous on phones
-                      where inactive labels stay hidden. The row scrolls, so this costs no layout. */}
-                  <span className={isActive ? 'inline' : 'hidden @[38rem]:inline'}>{t(cat.labelKey)}</span>
-                </AdaptiveMotion.button>
-              );
-            })}
-          </div>
-          {/* Right fade to signal scrollable tabs */}
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-neo-navy to-transparent @[38rem]:hidden" aria-hidden="true" />
-        </div>
-
-        {/* Options Grid — animated category transition.
-            onMouseDown guard: stop a pointer click from focusing a part/colour
-            button and scroll-jumping the list to reveal it (worst on short
-            viewports). Click + keyboard Tab focus are unaffected. */}
-        <div
-          className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0"
-          onMouseDown={(e) => { if (shouldSuppressPointerFocus(e.target)) e.preventDefault(); }}
-        >
-          {/* Keyed CSS entrance (animate-in) instead of framer: a starved JS
-              loop would leave the options grid pinned at its invisible `initial`
-              state. Re-mounting on `key={activeCategory}` replays the CSS slide;
-              CSS runs off the main thread and always settles visible. */}
-          <div
-            key={activeCategory}
-            className="animate-in fade-in-0 slide-in-from-bottom-1 duration-200"
-          >
-            <CategoryOptions
-              category={activeCategory}
-              config={config}
-              updateConfig={updateConfig}
-              t={t}
-              premium={premium ?? undefined}
-              onCoinSpend={setCoinSpendAmount}
-            />
-          </div>
-        </div>
-
-        {/* Actions — single row, secondary icon-only on narrow */}
-        <div className="flex items-center gap-1.5 sm:gap-2 p-3 sm:p-4 border-t-3 border-black shrink-0 bg-neo-navy">
-          <AdaptiveMotion.button
-            onClick={handleRandomize}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.92 }}
-            transition={BUTTON_SPRING}
-            className="inline-flex items-center gap-1.5 px-2.5 @[24rem]:px-3 py-2 bg-neo-purple text-neo-white font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow shrink-0"
-            title={t('avatarBuilder.randomize')}
-            aria-label={t('avatarBuilder.randomize')}
-          >
-            <AdaptiveMotion.span
-              key={randomizeKey}
-              initial={{ rotate: 180 }}
-              animate={{ rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              className="inline-flex"
-            >
-              <Shuffle size={16} />
-            </AdaptiveMotion.span>
-            <span className="hidden @[26rem]:inline text-sm">{t('avatarBuilder.randomize')}</span>
-          </AdaptiveMotion.button>
-          <AdaptiveMotion.button
-            onClick={handleUndo}
-            whileTap={{ scale: 0.88, rotate: -20 }}
-            transition={BUTTON_SPRING}
-            disabled={historyRef.current.length === 0}
-            className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shrink-0"
-            title={t('avatarBuilder.undo')}
-            aria-label={t('avatarBuilder.undo')}
-          >
-            <Undo2 size={16} />
-          </AdaptiveMotion.button>
-          {previousConfig && (
-            <AdaptiveMotion.button
-              onClick={handleRestorePrevious}
-              whileTap={{ scale: 0.88 }}
-              transition={BUTTON_SPRING}
-              className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all shrink-0"
-              title={t('avatarBuilder.restorePrevious')}
-              aria-label={t('avatarBuilder.restorePrevious')}
-            >
-              <History size={16} />
-            </AdaptiveMotion.button>
-          )}
-          <AdaptiveMotion.button
-            onClick={handleDownload}
-            whileTap={{ scale: 0.88 }}
-            transition={BUTTON_SPRING}
-            className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all shrink-0"
-            title={t('avatarBuilder.download', 'Download')}
-            aria-label={t('avatarBuilder.download', 'Download')}
-          >
-            <Download size={16} />
-          </AdaptiveMotion.button>
-          <div className="flex-1 min-w-0" />
+        <header className="shrink-0 flex items-center gap-2 h-14 px-2 border-b-[3px] border-black bg-neo-navy pt-[env(safe-area-inset-top)] box-content">
           <button
             type="button"
             onClick={onClose}
-            className="px-3 @[24rem]:px-4 py-2 text-sm text-neo-white font-bold hover:text-neo-white transition-colors shrink-0"
+            className="w-10 h-10 shrink-0 rounded-neo flex items-center justify-center text-neo-white hover:bg-neo-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
-            {t('avatarBuilder.cancel')}
+            <X size={22} strokeWidth={3} aria-hidden="true" />
+            <span className="sr-only">{t('avatarBuilder.cancel')}</span>
           </button>
-          <AdaptiveMotion.button
-            onClick={handleSave}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.92 }}
-            transition={BUTTON_SPRING}
-            className="px-4 @[24rem]:px-6 py-2 bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-black shadow-hard-sm transition-shadow shrink-0"
-          >
-            {t('avatarBuilder.save')}
-          </AdaptiveMotion.button>
+          <h2 ref={titleRef} tabIndex={-1} id="avatar-builder-title" style={{ outline: 'none' }} className="flex-1 min-w-0 truncate font-neo-display text-neo-white text-lg font-bold">
+            {t('avatarBuilder.title')}
+          </h2>
+          {premium && (
+            <div
+              className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-neo-navy-light border-2 border-black"
+              title={t('avatarBuilder.balance')}
+            >
+              <Coins size={14} className="text-neo-yellow" aria-hidden="true" />
+              <span className="text-neo-yellow font-black text-sm tabular-nums">{safeToLocaleString(premium.coins, language)}</span>
+            </div>
+          )}
+        </header>
+
+        <div className="flex-1 min-h-0 flex flex-col md:flex-row">
+          <div className="shrink-0 h-[clamp(190px,36dvh,360px)] md:h-auto md:w-[44%] border-b-[3px] md:border-b-0 md:border-e-[3px] border-black">
+            <EditorStage
+              ref={stageRef}
+              config={preview}
+              changeCount={state.changeCount}
+              isTryOn={!!tryOn}
+              burst={burst}
+              onDownload={onDownload}
+              onRestorePrevious={previousConfig ? onRestorePrevious : undefined}
+              collection={collection}
+              reward={<LobbyAvatarRewardButton />}
+              t={t}
+            />
+          </div>
+
+          <div className="flex-1 min-h-0 min-w-0 flex flex-col">
+            <EditorTabBar tabs={tabs} active={tab.id} onSelect={setActiveTab} t={t} dotTab={tryOnTab} />
+            <EditorPanel
+              key={tab.id}
+              tab={tab}
+              committed={committed}
+              tryOn={tryOn}
+              premium={premium}
+              onPickPart={onPickPart}
+              onPickColor={onPickColor}
+              onGender={onGender}
+              onPatch={onPatch}
+              onScrollMouseDown={e => { if (shouldSuppressPointerFocus(e.target)) e.preventDefault(); }}
+              t={t}
+              language={language}
+              footer={
+                <div className="flex justify-center pt-2 empty:hidden">
+                  <GlowUpButton previewRef={stageRef} config={committed} />
+                </div>
+              }
+            />
+            {premium && tryOn && slot && tryInfo && (
+              <div className="shrink-0 px-2 pb-2 pt-1">
+                <UnlockPanel
+                  rarityCategory={slot.rarityCategory}
+                  partId={tryOn.value}
+                  categoryLabel={t(slot.labelKey)}
+                  info={tryInfo}
+                  premium={premium}
+                  ownedKeys={premium.permanentUnlocks ?? []}
+                  onBuy={handleBuy}
+                  onTakeOff={editor.clearTryOn}
+                  t={t}
+                  language={language}
+                />
+              </div>
+            )}
+            <EditorActionBar canUndo={editor.canUndo} onUndo={editor.undo} onRandomize={onRandomize} onSave={handleSave} t={t} />
+          </div>
         </div>
 
-        {/* Coin spend animation when purchasing premium parts */}
-        <FloatingCoinAnimation
-          coinAmount={coinSpendAmount}
-          onAnimationComplete={() => setCoinSpendAmount(null)}
-        />
-      </Reveal>
+        <FloatingCoinAnimation coinAmount={coinSpendAmount} onAnimationComplete={() => setCoinSpendAmount(null)} />
+      </div>
     </div>,
-    document.body
+    document.body,
   );
-}
-
-function CategoryIcon({ category }: { category: Category }) {
-  const Icon = AVATAR_CATEGORY_ICONS[category];
-  return <Icon size={20} />;
 }
 
 /**

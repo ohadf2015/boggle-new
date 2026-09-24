@@ -32,6 +32,7 @@ const keys: string[] = [
   'wordTowerV2.rescue.crumbled',
   'wordTowerV2.rescue.counterweight',
   'wordTowerV2.rescue.braced',
+  'wordTowerV2.rescue.craneSaved',
   'wordTowerV2.brace.button',
   'wordTowerV2.brace.freeTag',
   'wordTowerV2.brace.explain',

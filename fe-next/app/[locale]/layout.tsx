@@ -12,6 +12,7 @@ import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
 import InGameAudioButton from '@/components/InGameAudioButton';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import { EngagementScript } from '@/components/EngagementScript';
 import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import FeedbackDevtoolsWidget from '@/components/feedback/FeedbackDevtoolsWidget';
@@ -715,10 +716,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
-        {/* GA4 G-7VLG16BJQH — deferred to lazyOnload so it never competes with
-            the hero/LCP paint. Google Consent Mode v2 defaults are already set
-            above, so tags respect the stored consent decision when this fires. */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7VLG16BJQH" strategy="lazyOnload" />
+        {/* GA4 G-7VLG16BJQH — gtag.js loads on the visitor's first engagement
+            (EngagementScript), not with the page: even lazyOnload landed inside
+            the first-load window. Google Consent Mode v2 defines window.gtag +
+            dataLayer inline, so earlier gtag() calls queue and replay, and tags
+            respect the stored consent decision when the script arrives. */}
+        <EngagementScript src="https://www.googletagmanager.com/gtag/js?id=G-7VLG16BJQH" />
         <Script id="ga4-init" strategy="lazyOnload">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7VLG16BJQH');`}</Script>
                 {/* Dark-only theme — static string literal, no user input, safe from XSS */}
                 <script

@@ -106,6 +106,13 @@ export const MAX_BRACES = 5;
 const BRACE_BASE = 40;
 /** A guest bank credited on sign-in is capped per guest run: localStorage is forgeable. */
 const GUEST_COINS_PER_RUN = 1000;
+/**
+ * ...and outright, because `runs` is forgeable too. Guest coins land in the
+ * app-wide wallet (estateWallet), so an uncapped claim would mint coins that
+ * every mode spends. The claim route also allows it once per account.
+ */
+export const MAX_GUEST_CLAIM_COINS = 3000;
+export const MAX_GUEST_CLAIM_RUNS = 50;
 
 const UPGRADE_BASE = 60;
 const LEVEL_GROWTH = 1.5;
@@ -472,11 +479,12 @@ function builtValue(e: Estate): number {
  */
 export function mergeGuestEstate(account: Estate, guest: Estate): Estate {
   if (guest.runs <= 0) return account;
-  const cap = GUEST_COINS_PER_RUN * guest.runs;
+  const runs = Math.min(MAX_GUEST_CLAIM_RUNS, guest.runs);
+  const cap = Math.min(MAX_GUEST_CLAIM_COINS, GUEST_COINS_PER_RUN * runs);
   return sanitizeEstate({
     ...account,
     coins: account.coins + Math.min(cap, guest.coins + builtValue(guest)),
-    runs: account.runs + guest.runs,
+    runs: account.runs + runs,
     bestM: Math.max(account.bestM, guest.bestM),
     bricks: account.bricks + guest.bricks,
     blueprints: account.blueprints + guest.blueprints,

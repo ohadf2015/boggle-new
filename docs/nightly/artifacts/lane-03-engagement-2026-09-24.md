@@ -1,0 +1,3 @@
+status: partial
+files_touched: docs/nightly/impact-ledger.ndjson, docs/nightly/reports/2026-09-24.md (no fe-next code changes — zero gate risk this run)
+next_steps: exp-practice-wheel-cta-v1 confirmed 0 call sites (unwired) — wire variant-B or delete. exp-game-abandon-confirm-v1 needs a real useExperiment() call-site check (only found lib/experiments/quitConfirmDescription.ts, may be description-only not full gating). No new experiment shipped this run — brief-first IMPACT CHECK work (3 verdicts, none regressed) consumed the safe time window; pick up STEP 3 (new experiment on rage-click surfaces /he/daily, /he/daily/word-wheel, /sv/swedish-multiplayer-word-game) fresh next run with full budget.

@@ -1,14 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Body } from 'matter-js';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { SOUND_EFFECTS } from '@/lib/audio/soundEffectsConfig';
 import { type RunStats, emptyStats, loadUnlocked, newlyUnlocked, saveUnlocked } from '@/lib/wordTowerV2/achievements';
 import { publishHeightM } from '@/lib/wordTowerV2/altitude';
 import { biomeAt, floorsAt } from '@/lib/wordTowerV2/biomes';
 import { BANNER_PRIORITY, type Banner, type BannerKind, type CalloutCopy, landingCallout, pushBanner, wordCallout } from '@/lib/wordTowerV2/celebrations';
-import { CRANE_CLEARANCE_PX, type CraneSwing, SWING, releaseKinematics } from '@/lib/wordTowerV2/crane';
+import { CRANE_CLEARANCE_PX, SWING, releaseKinematics } from '@/lib/wordTowerV2/crane';
 import {
   PX_PER_M,
   type TowerWorld,
@@ -21,10 +20,9 @@ import {
   reviveWorld,
   snapshotWorld,
   spawnBlock,
-  stepWorld,
   weldBelow,
 } from '@/lib/wordTowerV2/engine';
-import { type LandingQuality, type SupportTop, classifyLanding } from '@/lib/wordTowerV2/landing';
+import { type LandingQuality, classifyLanding, perkMadePerfect } from '@/lib/wordTowerV2/landing';
 import { NEUTRAL_PERKS, type Perks } from '@/lib/wordTowerV2/estate';
 import { steadySwing } from '@/lib/wordTowerV2/rewards';
 import { v2DailySwing } from '@/lib/wordTowerV2/daily';
@@ -33,39 +31,21 @@ import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
 import { isCounterweight, standingChain, towerLean, towerRisk } from '@/lib/wordTowerV2/stability';
 import { endV2Run, startV2Run } from '@/lib/wordTowerV2/telemetry';
 import type { TowerFx } from './TowerCanvas';
-import { REWARD_SOUND, readBest, standing, supportTop, writeBest } from './runHelpers';
+import { type Hanging, LANDING_SOUND, type PendingLanding, REWARD_SOUND, dampSway, recordLanding, readBest, seedDemoTower, standing, supportTop, writeBest } from './runHelpers';
 
 /**
- * Word Tower v2 run loop, outside the render tree's concerns: spawns and
- * releases floors, reads verdicts off the SETTLED simulation, opens crates,
- * awards badges. A crash that leaves floors standing clears the rubble and
- * the run goes on from the stump; it only ends when nothing stands or the
- * player cashes out (`finish`).
+ * Word Tower v2 run loop: spawns/releases floors, judges the SETTLED sim, opens
+ * crates, awards badges. A crash that leaves floors standing clears the rubble
+ * and the run goes on; it ends when nothing stands or the player cashes out.
  */
 
 const POLL_MS = 100;
-const DEMO_WORDS = ['tower', 'slab', 'anchor', 'crane', 'brick', 'ledge', 'beam', 'stack'];
 /** Stop waiting for a floor to settle after this long and judge it anyway. */
 const SETTLE_TIMEOUT_MS = 2600;
 /** Floors the rebar crate leaves live at the top. */
 const REBAR_KEEP_TOP = 2;
 
 export type Phase = 'composing' | 'swinging' | 'over';
-
-interface Hanging {
-  id: string;
-  startedAt: number;
-  wordLen: number;
-  swing: CraneSwing;
-  plumb: boolean;
-}
-
-interface PendingLanding {
-  id: string;
-  wordLen: number;
-  support: SupportTop | null;
-  releasedAt: number;
-}
 
 export interface CalloutEvent extends CalloutCopy {
   key: number;
@@ -179,17 +159,17 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     const block = snapshotWorld(worldRef.current).blocks.find((b) => b.id === pending.id);
     if (!block) return;
 
-    const quality: LandingQuality = classifyLanding(
-      { x: block.x, bottomY: block.y + block.heightPx / 2, angleRad: block.angleRad },
-      pending.support,
-      perksRef.current.perfectWindowMult,
-    );
+    const landed = { x: block.x, bottomY: block.y + block.heightPx / 2, angleRad: block.angleRad };
+    const quality: LandingQuality = classifyLanding(landed, pending.support, perksRef.current.perfectWindowMult);
     const out = applyLanding(runRef.current, { quality, wordLen: pending.wordLen });
     runRef.current = out.run;
     setRun(out.run);
     fxRef.current.push({ kind: 'land', id: pending.id, quality });
     if (out.tenants > 0) fxRef.current.push({ kind: 'tenants', id: pending.id, count: out.tenants });
-    setCallout({ ...landingCallout(quality, out.run.combo, Math.random()), key: performance.now(), points: out.points });
+    // Crane Yard: name the upgrade when its wider band is what made this perfect.
+    const copy = perkMadePerfect(landed, pending.support, perksRef.current.perfectWindowMult)
+      ? { textKey: 'wordTowerV2.rescue.craneSaved', tone: 'cyan' as const } : landingCallout(quality, out.run.combo, Math.random());
+    setCallout({ ...copy, key: performance.now(), points: out.points });
 
     // Counterweight: this floor landed on the far side of a lean and pulled
     // the load back over the base. Physics already moved the centre of mass;
@@ -208,21 +188,12 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
       }
     }
 
-    if (quality === 'perfect') {
-      if (out.run.combo > 1) playComboSound(out.run.combo);
-      else playSound('perfectWord');
-    } else if (quality === 'good') playSound('pathConnect');
-    else if (quality === 'sloppy') playSound('tileAppear');
-    else playSound('comboBreak');
+    if (quality === 'perfect' && out.run.combo > 1) playComboSound(out.run.combo);
+    else playSound(LANDING_SOUND[quality]);
 
     if (out.reward) openCrate(out.reward, pending.id);
 
-    const s = statsRef.current;
-    s.floors = out.run.floors;
-    s.bestCombo = out.run.bestCombo;
-    s.perfects += quality === 'perfect' ? 1 : 0;
-    s.tenants = out.run.tenants;
-    s.crates = out.run.crates;
+    recordLanding(statsRef.current, out.run, quality);
     checkBadges();
   }, [playComboSound, playSound, openCrate, checkBadges]);
 
@@ -349,20 +320,10 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
   /** Drives the crane: the hanging floor follows the swing until released. */
   const onBeforeStep = useCallback((nowMs: number) => {
     const world = worldRef.current;
-    // Foundation perk: bleed off the settled tower's rocking. Pure damping —
-    // it can only make an existing wobble smaller, never add motion — and at
-    // swayMult 1 the loop is skipped entirely.
-    const sway = perksRef.current.swayMult;
-    if (sway < 1) {
-      const damp = 1 - (1 - sway) * 0.25;
-      for (const [id, body] of world.blocks) {
-        if (body.isStatic || !world.landed.has(id)) continue;
-        Body.setAngularVelocity(body, body.angularVelocity * damp);
-      }
-    }
+    dampSway(world, perksRef.current.swayMult);
     const hanging = hangingRef.current;
     if (!hanging) return;
-    const { x } = releaseKinematics(nowMs - hanging.startedAt, hanging.swing, 0);
+    const { x } = releaseKinematics(nowMs - hanging.startedAt, hanging.swing, hanging.pivotX);
     moveAttachedBlock(world, hanging.id, x, -(getTowerHeightM(world) * PX_PER_M + CRANE_CLEARANCE_PX));
   }, []);
 
@@ -370,8 +331,11 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
   const getHangVx = useCallback(() => {
     const hanging = hangingRef.current;
     if (!hanging || hanging.plumb) return 0;
-    return releaseKinematics(performance.now() - hanging.startedAt, hanging.swing, 0).vx;
+    return releaseKinematics(performance.now() - hanging.startedAt, hanging.swing, hanging.pivotX).vx;
   }, []);
+
+  /** Crane pivot while a floor hangs; null between hoists (the canvas uses the top floor). */
+  const getCraneX = useCallback(() => hangingRef.current?.pivotX ?? null, []);
 
   /**
    * Width the next floor would get for `word`: the banked wide-load crate AND
@@ -401,10 +365,13 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
       const perkWidth = dropCountRef.current === 0 ? perksRef.current.baseWidthMult : 1;
       const dropIndex = dropCountRef.current;
       dropCountRef.current += 1;
+      // The crane swings over the tower as it stands NOW. Latched for the whole
+      // swing: a pivot that tracked a still-rocking top would wander mid-aim.
+      const pivotX = supportTop(world, null)?.x ?? 0;
       labelsRef.current.set(id, word);
       spawnBlock(world, {
         id,
-        x: 0,
+        x: pivotX,
         y: -(getTowerHeightM(world) * PX_PER_M + CRANE_CLEARANCE_PX),
         widthPx: Math.round(blockWidthForWord(word) * spent.widthMult * perkWidth),
         heightPx: BLOCK_HEIGHT_PX,
@@ -419,6 +386,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
         wordLen: word.length,
         swing: spent.steady ? steadySwing(scripted) : scripted,
         plumb: spent.plumb,
+        pivotX,
       };
       statsRef.current.longestWord = Math.max(statsRef.current.longestWord, word.length);
       const big = wordCallout(word.length);
@@ -467,7 +435,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     const world = worldRef.current;
     const support = supportTop(world, hanging.id);
     leanRef.current = towerLean(standing(world, hanging.id));
-    const k = releaseKinematics(performance.now() - hanging.startedAt, hanging.swing, 0);
+    const k = releaseKinematics(performance.now() - hanging.startedAt, hanging.swing, hanging.pivotX);
     // Foundation perk: less spin off the hook is a floor that lands flatter.
     releaseBlock(world, hanging.id, hanging.plumb ? 0 : k.vx, hanging.plumb ? 0 : k.spin * perksRef.current.swayMult);
     pendingRef.current = { id: hanging.id, wordLen: hanging.wordLen, support, releasedAt: performance.now() };
@@ -518,32 +486,15 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
   }, []);
 
   /** Review hook (`?demo=1`, optionally `&words=a,b,c` to see another script). */
-  const seedDemo = useCallback((words: string[] = DEMO_WORDS) => {
+  const seedDemo = useCallback((words?: string[]) => {
     if (dropCountRef.current > 0) return; // StrictMode double-invoke guard
-    const world = worldRef.current;
-    words.forEach((word, index) => {
-      const id = `r0-b${index}`;
-      labelsRef.current.set(id, word);
-      spawnBlock(world, {
-        id,
-        // Lean cycles instead of growing: `index * 2.6` leant further every
-        // floor, so a 20-floor review tower always toppled before you could see
-        // the skies it was seeded to reach.
-        x: (index % 2 === 0 ? 1 : -1) * (index % 4) * 2.6,
-        y: -(getTowerHeightM(world) * PX_PER_M + BLOCK_HEIGHT_PX + 20),
-        widthPx: blockWidthForWord(word),
-        heightPx: BLOCK_HEIGHT_PX,
-        vx: 0,
-      });
-      for (let t = 0; t < 900; t += 16.667) stepWorld(world, 16.667);
-    });
-    dropCountRef.current = words.length;
+    dropCountRef.current = seedDemoTower(worldRef.current, labelsRef.current, words);
   }, []);
 
   return {
     worldRef, labelsRef, fxRef, hangingRef,
     phase, heightM, risk, peakM, bestM, run, callout, banners, shiftBanner, newBest, runBadges, unlockedRef, statsRef,
-    onBeforeStep, getHangVx, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, setPerks, perksRef, adoptBest,
+    onBeforeStep, getHangVx, getCraneX, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, setPerks, perksRef, adoptBest,
     brace, finish, bracesRef,
   };
 }

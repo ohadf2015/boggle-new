@@ -1,5 +1,6 @@
 @import '../styles/combo-flash.css' layer(base);
 @import './cosmetics.css';
+@import './avatar-art.css';
 
 @import 'tailwindcss';
 

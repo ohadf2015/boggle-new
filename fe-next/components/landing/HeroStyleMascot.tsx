@@ -17,6 +17,14 @@ interface HeroStyleMascotProps {
   energetic?: boolean;
 }
 
+/**
+ * No `priority` on either image: this mascot sits in the returning-user tree,
+ * which the server renders for every visitor and hides with CSS for fresh ones.
+ * A priority image there preloads (winner.webp is 148KB) for a visitor who
+ * never sees it; a lazy one inside a display:none tree is never fetched.
+ * Guarded by __tests__/fresh.perf.HeroStyleMascot.test.tsx.
+ */
+
 /** The original lively mascot (transparent GIF) — used for `default` + on hover. */
 function AnimatedHeroMascot({ isMobilePortrait, energetic }: HeroStyleMascotProps) {
   return (
@@ -31,8 +39,6 @@ function AnimatedHeroMascot({ isMobilePortrait, energetic }: HeroStyleMascotProp
       hoverVariant="excited"
       clickVariant="celebrating"
       clickAnimation="bounce"
-      priority
-      fetchPriority="high"
       delay={0.1}
     />
   );
@@ -79,7 +85,6 @@ export const HeroStyleMascot = memo(function HeroStyleMascot({
         sizes="(min-width: 1024px) 192px, (min-width: 768px) 160px, (min-width: 640px) 144px, 100px"
         className="object-contain select-none"
         draggable={false}
-        priority
         // GIFs must bypass the image optimizer or they freeze on frame 1.
         unoptimized={!!animated}
         data-testid="hero-style-mascot"

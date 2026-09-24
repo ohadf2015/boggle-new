@@ -2401,3 +2401,26 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: shipped bec779286 (2026-09-19, already on master before tonight)
   - why: both issues' last-seen events predate the 2026-09-19T14:14 fix commit — no code change needed tonight, verification only
   - recommended owner: self (Sentry issue marked resolvedInNextRelease attempt failed — MCP token is read-only, needs manual resolve in Sentry UI)
+
+## 2026-09-24
+- [PostHog] Two of tonight's top-3 brief issues are cross-app noise
+  - TypeError: Load failed (01a0cf9a-4402-7be3-9fba-e41140d89760), TypeError: Failed to fetch (01a0cfc7-f985-7031-af98-fef250bac9c8)
+  - Pulled `$current_url` on both: `https://imposketch.io/r/WOLF7` and `https://imposketch.io/r/OWL3` — NOT lexiclash.live. Shared PostHog project (memory: PostHog shared by ~12 apps).
+  - status: deferred (no LexiClash code involved)
+  - why: brief's phase-0 PostHog query isn't filtering by $host; nothing to fix in this repo
+  - recommended owner: self (lane 7 — add a $host=lexiclash.live filter to the phase-0 PostHog issue query so future briefs don't rank other tenants' errors)
+- [PostHog] ChunkLoadError: Loading chunk 94991 failed (019f3f1a-f3ef-7bb1-b4e9-4275bf7448e1) — verified already handled
+  - lexiclash.live/ru, Chrome iOS. Event URL already carries `lc_retry=...` (one webpack-level retry already fired and failed again).
+  - Traced the recovery chain: `ChunkErrorRecovery` (mounted app-wide in `app/[locale]/layout.tsx:784`) listens on `window` `error` (capture) + `unhandledrejection`, calls `isChunkLoadError` → `recoverFromStaleChunk` with `forceOnChunkFailure: true` (`lib/deploy/staleDeployReload.ts`) → always does one guarded cache-busting hard reload. `handled:false` in PostHog just means React's error boundary didn't catch it (it's a promise rejection, not a render throw) — the global listener still fires independently and recovers.
+  - status: no code change — already correctly mitigated; single low-reach occurrence is expected residual (documented in code comments as ~1/week trickle)
+  - why: nothing to fix; recovery infra confirmed working as designed
+  - recommended owner: none (closed finding)
+- [Restore] Attempted `scripts/nightly/restore-salvaged-code.sh 20260904-020001` (19-nights-stale, 20 files)
+  - 10/20 files CONFLICTED (master diverged too far in 19 days: education access PageClient, play-boggle-online-free page, translations x5, WheelRushCelebration, useSinglePlayerConfig, growthTracking.ts) — left untouched per script default.
+  - 7 files merged cleanly but on inspection were unsafe or unverifiable, reverted all:
+    - `lib/experiments.ts` — merge DELETED `word-mastery-v1` and `exp-wordcraft-quick-resume-v1` experiment definitions that are still live-called in `app/[locale]/profile/words/PageClient.tsx`, `components/profile/WordMasteryCard.tsx`, `lib/wordMastery/access.ts`, `app/[locale]/word-craft/PageClient.tsx` — would have broken `useExperiment()` typing. This matches the nightly-learnings #1 failure mode (lane code that doesn't type-check).
+    - `backend/dictionary/candidates/{en,es,he,ja,sv}.txt` — merge REMOVED valid words (gotten/burnt/learnt/spelt/dreamt/…) not present in any promoted dictionary; couldn't confirm intent (promotion vs accidental), reverted rather than ship unverified content deletion.
+    - `scripts/nightly/lib/posthog-coverage.sh` — the awk exit-condition was widened from "exit only when a matched union-member line ends in `;`" to "exit on ANY semicolon inside the union block", which could truncate `GrowthEvent` extraction early on an unrelated doc-comment semicolon. No test coverage found to confirm safe; reverted.
+  - status: reverted all (working tree clean); tag left un-resolved in restore queue
+  - why: net-negative to ship — the only conflict-free hunks were unsafe/unverifiable; genuinely valuable content in this tag (education/translations/growthTracking) is all in the CONFLICTED set, which needs a human/careful pass, not a blind restore
+  - recommended owner: review-by-eod (consider this tag effectively stale enough that a fresh re-diagnosis from current master beats a 19-day-old backup; do not re-attempt raw restore without re-reading each conflicted file's current master version first)
