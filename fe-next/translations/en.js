@@ -11957,7 +11957,16 @@ const en = {
       "nextMonth": "Next Month",
       "customDate": "Custom Date",
       "instructionsLabel": "Instructions",
-      "instructionsPlaceholder": "Add optional instructions for students..."
+      "instructionsPlaceholder": "Add optional instructions for students...",
+      "starterPacksTitle": "Start from a starter pack",
+      "starterPacksHint": "No lesson yet? One tap creates the word list and assigns Word Craft, due tomorrow.",
+      "starterPackDue": "Due tomorrow",
+      "starterAnimals": "Animals",
+      "starterAnimalsDesc": "10 short animal words — playable tonight",
+      "starterColors": "Colors & shapes",
+      "starterColorsDesc": "Colors and basic shapes for early learners",
+      "starterFood": "Food",
+      "starterFoodDesc": "Everyday food words for a first homework"
     },
     "completion": {
       "overallProgress": "Overall Progress",

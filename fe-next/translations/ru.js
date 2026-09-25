@@ -12468,7 +12468,16 @@ const ru = {
       "nextMonth": "В следующем месяце",
       "customDate": "Пользовательская дата",
       "instructionsLabel": "Инструкции",
-      "instructionsPlaceholder": "Добавьте опциональные инструкции для учеников..."
+      "instructionsPlaceholder": "Добавьте опциональные инструкции для учеников...",
+      "starterPacksTitle": "Начать с готового набора",
+      "starterPacksHint": "Ещё нет урока? Один тап создаёт список слов и назначает Word Craft на завтра.",
+      "starterPackDue": "До завтра",
+      "starterAnimals": "Животные",
+      "starterAnimalsDesc": "10 коротких слов про животных — можно играть сегодня",
+      "starterColors": "Цвета и формы",
+      "starterColorsDesc": "Цвета и простые формы для начинающих",
+      "starterFood": "Еда",
+      "starterFoodDesc": "Повседневные слова про еду для первого задания"
     },
     "completion": {
       "overallProgress": "Общий прогресс",

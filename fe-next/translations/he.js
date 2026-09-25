@@ -13393,7 +13393,16 @@ const he = {
       "nextMonth": "חודש הבא",
       "customDate": "תאריך מותאם",
       "instructionsLabel": "הוראות",
-      "instructionsPlaceholder": "הוסף הוראות אופציונליות לתלמידים..."
+      "instructionsPlaceholder": "הוסף הוראות אופציונליות לתלמידים...",
+      "starterPacksTitle": "התחילו מחבילת פתיחה",
+      "starterPacksHint": "עדיין אין שיעור? לחיצה אחת יוצרת את רשימת המילים ומשבצת Word Craft למחר.",
+      "starterPackDue": "להגשה מחר",
+      "starterAnimals": "חיות",
+      "starterAnimalsDesc": "10 מילות חיות קצרות — אפשר לשחק הערב",
+      "starterColors": "צבעים וצורות",
+      "starterColorsDesc": "צבעים וצורות בסיסיות לתלמידים צעירים",
+      "starterFood": "אוכל",
+      "starterFoodDesc": "מילות אוכל יומיומיות לשיעורי בית ראשונים"
     },
     "completion": {
       "overallProgress": "התקדמות כללית",

@@ -13741,7 +13741,16 @@ const es = {
       "nextMonth": "Próximo Mes",
       "customDate": "Fecha Personalizada",
       "instructionsLabel": "Instrucciones",
-      "instructionsPlaceholder": "Agrega instrucciones opcionales para los estudiantes..."
+      "instructionsPlaceholder": "Agrega instrucciones opcionales para los estudiantes...",
+      "starterPacksTitle": "Empieza con un paquete inicial",
+      "starterPacksHint": "¿Aún no hay lección? Un toque crea la lista y asigna Word Craft para mañana.",
+      "starterPackDue": "Para mañana",
+      "starterAnimals": "Animales",
+      "starterAnimalsDesc": "10 palabras cortas de animales — jugable esta noche",
+      "starterColors": "Colores y formas",
+      "starterColorsDesc": "Colores y formas básicas para principiantes",
+      "starterFood": "Comida",
+      "starterFoodDesc": "Palabras de comida cotidiana para la primera tarea"
     },
     "completion": {
       "overallProgress": "Progreso General",

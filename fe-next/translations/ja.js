@@ -13538,7 +13538,16 @@ const ja = {
       "nextMonth": "来月",
       "customDate": "カスタム日付",
       "instructionsLabel": "指示",
-      "instructionsPlaceholder": "生徒への指示を追加（任意）..."
+      "instructionsPlaceholder": "生徒への指示を追加（任意）...",
+      "starterPacksTitle": "スターターパックから始める",
+      "starterPacksHint": "まだレッスンがありません。1タップで単語リストを作り、Word Craft を明日締切で出します。",
+      "starterPackDue": "明日まで",
+      "starterAnimals": "動物",
+      "starterAnimalsDesc": "短い動物の単語10個 — 今夜遊べます",
+      "starterColors": "色と形",
+      "starterColorsDesc": "初級向けの色と基本の形",
+      "starterFood": "食べ物",
+      "starterFoodDesc": "最初の宿題向けの日常の食べ物"
     },
     "completion": {
       "overallProgress": "全体的な進捗",
