@@ -9,6 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return generatePageMetadata({ seoKey: 'brainComboMaster', path: '/brain/drills/combo-master', locale, noIndex: true });
 }
 
-export default async function ComboMasterPage() {
-  return <ComboMasterPageClient />;
+export default async function ComboMasterPage({ searchParams }: { searchParams: Promise<{ check?: string }> }) {
+  const { check } = await searchParams;
+  return <ComboMasterPageClient isCheck={check === '1'} />;
 }

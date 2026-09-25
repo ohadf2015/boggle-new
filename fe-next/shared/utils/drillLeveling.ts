@@ -72,9 +72,13 @@ export interface DrillProgressUpdate extends DrillProgressSnapshot {
  * scores still count as a play (so abandon-rate ≠ skipped XP loophole)
  * but contribute zero to totals and never promote level.
  */
+/** Below this fraction of a level's target a run counts as "struggling". */
+export const DRILL_STRUGGLE_FRACTION = 0.4;
+
 export function computeDrillProgressUpdate(
   prior: DrillProgressSnapshot | null,
-  score: number
+  score: number,
+  lastRun: { score: number; level: number } | null = null
 ): DrillProgressUpdate {
   const safeScore = Number.isFinite(score) && score >= 0 ? score : 0;
   const base: DrillProgressSnapshot = prior ?? {
@@ -88,9 +92,17 @@ export function computeDrillProgressUpdate(
   const totalScore = base.totalScore + safeScore;
   const highScore = Math.max(base.highScore, safeScore);
   const avgScore = Math.round(totalScore / totalPlays);
-  const level = safeScore > 0 || base.totalPlays === 0
-    ? getNextDrillLevel(base.level, safeScore)
-    : clampLevel(base.level);
+  const current = clampLevel(base.level);
+  // Adaptive staircase: two consecutive struggling runs at the same level step
+  // difficulty down one, so a player who over-climbed lands back in flow.
+  const struggle = getDrillTargetScore(current) * DRILL_STRUGGLE_FRACTION;
+  const demote = prior !== null && current > MIN_DRILL_LEVEL && lastRun !== null
+    && clampLevel(lastRun.level) === current && lastRun.score < struggle && safeScore < struggle;
+  const level = demote
+    ? current - 1
+    : safeScore > 0 || base.totalPlays === 0
+      ? getNextDrillLevel(base.level, safeScore)
+      : current;
 
   return { level, highScore, totalPlays, totalScore, avgScore };
 }

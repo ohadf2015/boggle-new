@@ -169,3 +169,31 @@ describe('drillLeveling', () => {
     });
   });
 });
+
+describe('adaptive staircase — demotion', () => {
+  const prior = { level: 3, highScore: 300, totalPlays: 10, totalScore: 1500 };
+  // level 3 target = 200 → struggle threshold = 80
+
+  it('Given two consecutive struggling runs at the same level, Then level drops by one', () => {
+    const next = computeDrillProgressUpdate(prior, 40, { score: 60, level: 3 });
+    expect(next.level).toBe(2);
+  });
+
+  it('Given only one struggling run, Then level holds', () => {
+    expect(computeDrillProgressUpdate(prior, 40, { score: 150, level: 3 }).level).toBe(3);
+    expect(computeDrillProgressUpdate(prior, 40, null).level).toBe(3);
+  });
+
+  it('Given the previous struggle was at a different level, Then level holds', () => {
+    expect(computeDrillProgressUpdate(prior, 40, { score: 10, level: 4 }).level).toBe(3);
+  });
+
+  it('Given level 1, Then it never demotes below the floor', () => {
+    const p1 = { ...prior, level: 1 };
+    expect(computeDrillProgressUpdate(p1, 0, { score: 0, level: 1 }).level).toBe(1);
+  });
+
+  it('Given a zero-score abandon twice, Then demotion still applies (flow over punishment)', () => {
+    expect(computeDrillProgressUpdate(prior, 0, { score: 0, level: 3 }).level).toBe(2);
+  });
+});

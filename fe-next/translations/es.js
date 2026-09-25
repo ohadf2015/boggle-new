@@ -9651,6 +9651,31 @@ const es = {
     "connection": "Red"
   },
   "brain": {
+    "check": {
+      "title": "Chequeo mental",
+      "subtitle": "Una prueba de un minuto en condiciones fijas, una vez al día por ejercicio. Siempre las mismas reglas, así que tu tendencia es real, no solo un nivel más difícil.",
+      "start": "Hacer",
+      "nextIn": "Próximo en {h} h",
+      "howItWorks": "Cómo medimos",
+      "method": {
+        "fixed": "Cada chequeo usa exactamente las mismas reglas y dificultad, para todos y siempre. Los niveles de entrenamiento no lo afectan.",
+        "warmup": "Tu primer chequeo es de calentamiento: te enseña la tarea y no cuenta para tu línea base.",
+        "noise": "Tu línea base son los chequeos 2 y 3. Solo hablamos de cambio cuando tus últimos chequeos se mueven más que tu propia variación de un día a otro (Índice de Cambio Fiable), durante al menos una semana.",
+        "transfer": "Límite honesto: esto mide tu rendimiento en estas tareas de palabras. No demuestra que tu memoria o tu CI en general hayan cambiado; ninguna app de entrenamiento mental puede afirmarlo."
+      },
+      "loadFailed": "No pudimos cargar tus chequeos. Toca para reintentar.",
+      "guestPitch": "Inicia sesión para seguir tus chequeos mentales: pruebas cortas y fijas que muestran si de verdad estás más ágil, con una prueba estadística real detrás de cada resultado.",
+      "rejected": "Ya hiciste el chequeo de este ejercicio hoy, así que esta partida contó como práctica. Vuelve mañana para el siguiente.",
+      "fixedConditions": "Condiciones fijas: comparable entre días.",
+      "warmupDone": "Calentamiento hecho",
+      "needMoreRuns": "{n} más para ver tu tendencia",
+      "needMoreDays": "Tendencia en {n} días",
+      "verdict": {
+        "improved": "Mejora fiable",
+        "stable": "Estable",
+        "declined": "Por debajo de tu base"
+      }
+    },
     "title": "Gimnasio Mental",
     "score": "Puntos de Cerebro",
     "points": "Puntos de Cerebro",
@@ -9749,6 +9774,8 @@ const es = {
       "bonusLabel": "Bonificación"
     },
     "drills": {
+      "levelEased": "Bajamos un nivel: de vuelta al ritmo",
+      "levelLabel": "Nivel {level}",
       "title": "Ejercicios Mentales",
       "brainTraining": "Entrena tu Mente",
       "levelUp": "¡Sube de nivel! Ahora nivel {level}",

@@ -79,10 +79,10 @@ describe('DrillCompleteActions', () => {
     expect(push).toHaveBeenCalledWith('/en/daily');
   });
 
-  it('skips locked drills when picking the next suggestion', () => {
-    totalGames = 0; // pattern-switcher (5) and rare-gems (10) locked
+  it('suggests rare-gems after combo-master even with zero games (no unlock gates in v2)', () => {
+    totalGames = 0;
     render(<DrillCompleteActions currentDrillId="combo-master" onPlayAgain={vi.fn()} onExit={vi.fn()} />);
     fireEvent.click(screen.getByTestId('drill-next'));
-    expect(push).toHaveBeenCalledWith('/en/brain/drills/lightning-round');
+    expect(push).toHaveBeenCalledWith('/en/brain/drills/rare-gems');
   });
 });

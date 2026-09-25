@@ -8,21 +8,20 @@ export const DRILL_ORDER: DrillType[] = [
   'lightning-round',
   'memory-hunt',
   'combo-master',
-  'pattern-switcher',
   'rare-gems',
 ];
 
 /**
- * Games-played thresholds that unlock each drill. Mirrors the values in
- * QuickDrillsSection.DRILLS and PersonalizedDrillRecommendation.DRILL_CONFIG.
- * (Consolidating those two into this single source is a noted follow-up.)
+ * Games-played thresholds that unlock each drill. v2: every live drill is
+ * open from the first visit. pattern-switcher is retired (not in DRILL_ORDER);
+ * its key stays only because DrillType still covers historical rows.
  */
 export const DRILL_UNLOCK_GAMES: Record<DrillType, number> = {
   'lightning-round': 0,
   'memory-hunt': 0,
   'combo-master': 0,
-  'pattern-switcher': 5,
-  'rare-gems': 10,
+  'pattern-switcher': 0,
+  'rare-gems': 0,
 };
 
 /**

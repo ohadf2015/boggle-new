@@ -2,7 +2,7 @@
  * Drill smoke tests — locks the four previously-untested drill components.
  *
  * Audit item D1 (2026-04-26): only ComboMaster had direct unit tests; the
- * other 4 drills (LightningRound, MemoryHunt, PatternSwitcher, RareGems)
+ * other 4 drills (LightningRound, MemoryHunt, RareGems)
  * had zero coverage despite handling auth'd score submissions to the
  * brain-score pipeline. This file establishes a regression baseline before
  * the file-size split refactor (P2) so behavior changes get caught.
@@ -108,7 +108,6 @@ vi.mock('@/utils/utils', () => ({
 
 import LightningRound from '../LightningRound';
 import MemoryHunt from '../MemoryHunt';
-import PatternSwitcher from '../PatternSwitcher';
 import RareGems from '../RareGems';
 
 const mockGrid = [
@@ -237,37 +236,6 @@ describe('MemoryHunt (working memory drill)', () => {
     clickBriefingStart();
     // MemoryHunt has memorize → recall flow; we only assert no crash on phase advance.
     expect(document.body.textContent).toBeTruthy();
-  });
-});
-
-describe('PatternSwitcher (cognitive flexibility drill)', () => {
-  it('renders the intro screen', () => {
-    render(
-      <PatternSwitcher
-        {...baseProps}
-        onComplete={vi.fn()}
-        onExit={vi.fn()}
-        onPlayAgain={vi.fn()}
-      />,
-    );
-    expect(screen.getByText('brain.drills.pattern-switcher.name')).toBeInTheDocument();
-    expect(screen.getByText('brain.briefing.letsTrain')).toBeInTheDocument();
-  });
-
-  it('renders the grid after start and reacts to word submission', () => {
-    render(
-      <PatternSwitcher
-        {...baseProps}
-        onComplete={vi.fn()}
-        onExit={vi.fn()}
-        onPlayAgain={vi.fn()}
-      />,
-    );
-    clickStart();
-    expect(screen.getByTestId('grid-component')).toBeInTheDocument();
-    act(() => {
-      fireEvent.click(screen.getByTestId('submit-cat'));
-    });
   });
 });
 

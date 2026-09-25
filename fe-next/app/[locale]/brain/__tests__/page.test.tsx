@@ -219,7 +219,7 @@ describe('BrainTrainingPage - Loading States', () => {
 
       // Should show "Sign in" message
       await waitFor(() => {
-        expect(screen.getByText('brain.guestView.title')).toBeInTheDocument();
+        expect(screen.getByText('brain.check.guestPitch')).toBeInTheDocument();
       });
 
       expect(screen.getByText('auth.signIn')).toBeInTheDocument();
@@ -315,7 +315,8 @@ describe('BrainTrainingPage - Loading States', () => {
       },
     });
 
-    it('renders the drill picker ABOVE the brain-score stats (play-first)', async () => {
+    it('renders the drill picker ABOVE the Brain Check panel (play-first)', async () => {
+      global.fetch = vi.fn().mockResolvedValue({ ok: false }) as never;
       mockUseAuth.mockReturnValue(authedUser);
       mockUseBrainScore.mockReturnValue({
         brainScore: makeBrainScore(8) as any,
@@ -331,7 +332,7 @@ describe('BrainTrainingPage - Loading States', () => {
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
       const picker = await screen.findByText('brain.quickDrills');
-      const heroLabel = screen.getByText('brain.score');
+      const heroLabel = screen.getByText('brain.check.title');
 
       // The picker node must appear before the hero node in document order.
       // Node.compareDocumentPosition returns DOCUMENT_POSITION_FOLLOWING (4)
@@ -398,14 +399,15 @@ describe('BrainTrainingPage - Loading States', () => {
         initializeBrainScore: vi.fn(),
       });
 
+      global.fetch = vi.fn().mockRejectedValue(new Error('offline')) as never;
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
       // Drills reachable despite the error.
       await waitFor(() => {
         expect(screen.getByText('brain.quickDrills')).toBeInTheDocument();
       });
-      // Retry affordance is still there for when connectivity returns.
-      expect(screen.getByText('brain.errors.retry')).toBeInTheDocument();
+      // Brain Check panel offers a retry for when connectivity returns.
+      expect(await screen.findByText('brain.check.loadFailed')).toBeInTheDocument();
     });
   });
 });

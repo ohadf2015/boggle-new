@@ -44,6 +44,8 @@ interface SaveDrillResultResponse {
   needsAuth?: boolean;
   /** "You got better" signals for the results screen (personal best, vs average, vs last). */
   improvement?: DrillImprovement;
+  /** Brain Check outcome — only set when the run was submitted as a check. */
+  brainCheck?: 'recorded' | 'rejected';
 }
 
 interface UseSaveDrillResultReturn {
@@ -131,6 +133,7 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
         previousLevel: data.previousLevel,
         idempotent: data.idempotent ?? false,
         improvement: data.improvement,
+        brainCheck: data.brainCheck,
       };
     } catch (error) {
       const err = error as Error;

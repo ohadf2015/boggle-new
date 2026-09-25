@@ -26,7 +26,6 @@ const DRILLS = [
   'LightningRound',
   'MemoryHunt',
   'ComboMaster',
-  'PatternSwitcher',
 ] as const;
 
 const PAGE_CLIENTS = [
@@ -34,7 +33,6 @@ const PAGE_CLIENTS = [
   'lightning-round',
   'memory-hunt',
   'combo-master',
-  'pattern-switcher',
 ] as const;
 
 const drillsDir = join(__dirname, '..');
@@ -59,14 +57,19 @@ describe('drill scroll-safety (CTA reachable under screen-fit-locked)', () => {
     });
   }
 
+  it('DrillPageShell propagates min-h-0 down to the drill', () => {
+    const src = readFileSync(join(__dirname, '../../brain/DrillPageShell.tsx'), 'utf8');
+    // Root flex column must be able to shrink (min-h-0) so the locked-body
+    // height reaches the drill instead of being absorbed by intrinsic height.
+    expect(src).toContain("'flex-1 flex flex-col min-h-0'");
+    // The drill wrapper must also shrink so the drill's h-full resolves.
+    expect(src).toContain('className="flex-1 min-h-0"');
+  });
+
   for (const slug of PAGE_CLIENTS) {
-    it(`${slug}: page shell propagates min-h-0 down to the drill`, () => {
+    it(`${slug}: page renders through DrillPageShell`, () => {
       const src = readFileSync(join(drillPagesDir, slug, 'PageClient.tsx'), 'utf8');
-      // Root flex column must be able to shrink (min-h-0) so the locked-body
-      // height reaches the drill instead of being absorbed by intrinsic height.
-      expect(src, `${slug} root`).toContain("'flex-1 flex flex-col min-h-0'");
-      // The "Drill Content" wrapper must also shrink so the drill's h-full resolves.
-      expect(src, `${slug} drill wrapper`).toContain('className="flex-1 min-h-0"');
+      expect(src).toContain('<DrillPageShell');
     });
   }
 });

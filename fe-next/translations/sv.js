@@ -9929,6 +9929,31 @@ const sv = {
     "connection": "Nätverk"
   },
   "brain": {
+    "check": {
+      "title": "Hjärnkoll",
+      "subtitle": "Ett enminutstest under fasta villkor, en gång per dag och övning. Samma regler varje gång – så din trend är äkta, inte bara en svårare nivå.",
+      "start": "Testa",
+      "nextIn": "Nästa om {h} h",
+      "howItWorks": "Så mäter vi",
+      "method": {
+        "fixed": "Varje koll har exakt samma regler och svårighet, för alla, alltid. Träningsnivåerna påverkar den aldrig.",
+        "warmup": "Din första koll är en uppvärmning: den lär dig uppgiften och räknas inte in i din baslinje.",
+        "noise": "Din baslinje är koll 2–3. Vi kallar det en förändring först när dina senaste kollar rör sig mer än din egen variation från dag till dag (Reliable Change Index), över minst en vecka.",
+        "transfer": "Ärlig gräns: det här följer din förmåga i just de här ordövningarna. Det bevisar inte att ditt allmänna minne eller IQ har förändrats – det kan ingen hjärnträningsapp påstå."
+      },
+      "loadFailed": "Kunde inte ladda dina kollar. Tryck för att försöka igen.",
+      "guestPitch": "Logga in för att följa Hjärnkoll – korta, fasta test som visar om du verkligen blir skarpare, med ett riktigt statistiskt test bakom varje besked.",
+      "rejected": "Du har redan testat den här övningen i dag, så rundan räknades som träning. Kom tillbaka i morgon för nästa koll.",
+      "fixedConditions": "Fasta villkor – jämförbart mellan dagar.",
+      "warmupDone": "Uppvärmning klar",
+      "needMoreRuns": "{n} till för att se din trend",
+      "needMoreDays": "Trend om {n} dagar",
+      "verdict": {
+        "improved": "Säkert bättre",
+        "stable": "Stabil",
+        "declined": "Under baslinjen"
+      }
+    },
     "title": "Hjärngym",
     "score": "Hjärnpoäng",
     "points": "Hjärnpoäng",
@@ -10028,6 +10053,8 @@ const sv = {
       "bonusLabel": "Bonus"
     },
     "drills": {
+      "levelEased": "En nivå lättare – tillbaka i flytet",
+      "levelLabel": "Nivå {level}",
       "title": "Hjärnövningar",
       "brainTraining": "Hjärnträning",
       "levelUp": "Nivå upp! Nu nivå {level}",

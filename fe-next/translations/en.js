@@ -9089,6 +9089,31 @@ const en = {
     "connection": "Network"
   },
   "brain": {
+    "check": {
+      "title": "Brain Check",
+      "subtitle": "A 1-minute test under fixed conditions, once a day per drill. Same rules every time, so your trend is real — not just a harder level.",
+      "start": "Check",
+      "nextIn": "Next in {h}h",
+      "howItWorks": "How we measure",
+      "method": {
+        "fixed": "Every check uses the exact same rules and difficulty, for everyone, forever. Training levels never touch it.",
+        "warmup": "Your first check is a warm-up: it teaches you the task and is left out of your baseline.",
+        "noise": "Your baseline is checks 2–3. We only call it a change when your latest checks move further than your own day-to-day wobble (Reliable Change Index), over at least a week.",
+        "transfer": "Honest limit: this tracks your skill at these word tasks. It doesn't prove your general memory or IQ changed — no brain-training app can claim that."
+      },
+      "loadFailed": "Couldn't load your checks. Tap to retry.",
+      "guestPitch": "Sign in to track Brain Checks — short fixed tests that show whether you're really getting sharper, with a real statistical test behind every verdict.",
+      "rejected": "You already checked this drill today, so this run counted as practice. Come back tomorrow for your next check.",
+      "fixedConditions": "Fixed conditions — comparable across days.",
+      "warmupDone": "Warm-up done",
+      "needMoreRuns": "{n} more to see your trend",
+      "needMoreDays": "Trend in {n} more days",
+      "verdict": {
+        "improved": "Reliably better",
+        "stable": "Holding steady",
+        "declined": "Below baseline"
+      }
+    },
     "title": "Brain Gym",
     "score": "Brain Score",
     "points": "Brain Points",
@@ -9196,6 +9221,8 @@ const en = {
       "bonusLabel": "Bonus"
     },
     "drills": {
+      "levelEased": "Eased a level — back in the zone",
+      "levelLabel": "Level {level}",
       "title": "Brain Drills",
       "brainTraining": "Brain Training",
       "levelUp": "Level Up! Now Level {level}",
