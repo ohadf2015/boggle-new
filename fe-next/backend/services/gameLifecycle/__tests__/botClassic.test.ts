@@ -14,9 +14,11 @@ vi.mock('../../../modules/communityWordManager', () => ({
   isWordCommunityValid: vi.fn(() => false),
   isWordValidForScoring: vi.fn((w: string) => w === 'slang'),
 }));
+const gsm = vi.hoisted(() => ({ addPlayerWord: vi.fn(), trackBotWord: vi.fn() }));
+vi.mock('../../../modules/gameStateManager', () => ({ ...gsm, getGame: vi.fn() }));
 vi.mock('../../../utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() } }));
 
-import { quoteBoardWord, isScoringWord } from '../botClassic';
+import { quoteBoardWord, isScoringWord, classicBotRules } from '../botClassic';
 import { calculateWordScore } from '@/shared/utils/scoring';
 import type { BotRoundContext } from '../botEngine';
 import type { Bot } from '../../../modules/botBehavior';
@@ -39,5 +41,11 @@ describe('board-word bot pricing', () => {
   it('community/scoring-valid words count, as they do at results', () => {
     expect(isScoringWord('slang', 'en')).toBe(true);
     expect(quoteBoardWord(ctx, bot, 'slang')).not.toBeNull();
+  });
+
+  it('a missed (wrong) word is still recorded at 0 — visible in results and in the peer-validation pool, never credited', () => {
+    classicBotRules.onMiss!(ctx, { ...bot, username: 'Botty' } as Bot, 'crnae');
+    expect(gsm.addPlayerWord).toHaveBeenCalledWith('G', 'Botty', 'crnae', expect.objectContaining({ score: 0, isBot: true }));
+    expect(gsm.trackBotWord).toHaveBeenCalledWith('G', 'crnae', 'Botty', 0);
   });
 });

@@ -11,7 +11,7 @@
 import type { LetterGrid, Language } from '@/shared/types';
 import { prepareBotWords, calculateNextDelay, type Bot } from '../../modules/botBehavior';
 import { BOT_CONFIG } from '../../modules/botConfig';
-import { getGame } from '../../modules/gameStateManager';
+import { addPlayerWord, getGame, trackBotWord } from '../../modules/gameStateManager';
 import { isDictionaryWord } from '../../dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../modules/communityWordManager';
 import { scoreAcceptedWord } from '../../modules/wordScore';
@@ -42,7 +42,19 @@ export function quoteBoardWord(ctx: BotRoundContext, bot: Bot, word: string): Bo
   return { wordScore: scoreAcceptedWord({ word, comboLevel: bot.comboLevel }).total };
 }
 
-export const classicBotRules: BotPlayRules = { quote: quoteBoardWord };
+/**
+ * A bot's deliberate wrong word (prepareBotWords mixes real player mistakes in)
+ * is recorded at 0 points: it still shows as a rejected word in the bot's
+ * results and still reaches the peer-validation pool (trackBotWord, where a
+ * rejection blacklists it), but it is never credited — the live total and the
+ * results total stay equal.
+ */
+export function recordMissedBoardWord(ctx: BotRoundContext, bot: Bot, word: string): void {
+  addPlayerWord(ctx.gameCode, bot.username, word, { score: 0, comboBonus: 0, comboLevel: bot.comboLevel, isBot: true });
+  trackBotWord(ctx.gameCode, word, bot.username, 0);
+}
+
+export const classicBotRules: BotPlayRules = { quote: quoteBoardWord, onMiss: recordMissedBoardWord };
 
 /**
  * Build the bot's word pool for this grid. Words the bot already banked this

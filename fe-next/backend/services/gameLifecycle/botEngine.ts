@@ -57,6 +57,8 @@ export interface BotPlayRules {
   tuning?: BotScoreTuning;
   /** Price a word for this bot, or null if it cannot be played right now. */
   quote(ctx: BotRoundContext, bot: Bot, word: string): BotQuote | null;
+  /** A word the rules refused to price (e.g. a bot's deliberate wrong word). Never credited. */
+  onMiss?(ctx: BotRoundContext, bot: Bot, word: string): void;
 }
 
 /** One bot loop: when to act, and what to do. `step` returns false to stop. */
@@ -139,6 +141,7 @@ export function playBotWord(ctx: BotRoundContext, bot: Bot, rules: BotPlayRules,
   if (bot.wordsFound.includes(word) || playerHasWord(gameCode, bot.username, word)) return false;
 
   const quote = rules.quote(ctx, bot, word);
+  if (!quote) rules.onMiss?.(ctx, bot, word);
   const liveScore = game.playerScores?.[bot.username] ?? 0;
   const eventBonus = quote?.eventBonus ?? 0;
   if (!quote || !shouldBotScore(gameCode, bot.username, liveScore, quote.wordScore + eventBonus, bot.difficulty, rules.tuning)) {

@@ -104,6 +104,18 @@ describe('playBotWord (engine play path)', () => {
     expect(mocks.incrementBotWordUsage).not.toHaveBeenCalled();
   });
 
+  it('an unplayable word goes to the rules\' onMiss hook (a gate rejection does not)', () => {
+    const onMiss = vi.fn();
+    expect(playBotWord(ctx, makeBot(), { quote: () => null, onMiss }, 'hipe')).toBe(false);
+    expect(onMiss).toHaveBeenCalledWith(ctx, expect.objectContaining({ username: 'TestBot' }), 'hipe');
+
+    (getLeaderboard as Mock).mockReturnValue([{ username: 'Human', score: 100, isBot: false }]);
+    const gatedMiss = vi.fn();
+    expect(playBotWord(ctx, makeBot(), { quote: () => ({ wordScore: 10_000 }), onMiss: gatedMiss }, 'hello')).toBe(false);
+    expect(gatedMiss).not.toHaveBeenCalled();
+    (getLeaderboard as Mock).mockReturnValue([]);
+  });
+
   it('never commits side effects for a word over the score gate', () => {
     const commit = vi.fn();
     // A human scored 100 → medium cap max(95±10%, floor 150) < 10_000.

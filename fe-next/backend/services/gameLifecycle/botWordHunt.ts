@@ -27,7 +27,7 @@ import { setBotTimeout } from '../../modules/botLifecycle';
 import { ensureLanguageLoaded } from '../../dictionary';
 import logger from '../../utils/logger';
 import { creditBotBonus, runBotLoop, type BotPlayRules, type BotRoundContext } from './botEngine';
-import { quoteBoardWord } from './botClassic';
+import { quoteBoardWord, recordMissedBoardWord } from './botClassic';
 
 /** Delay before ending game after bot finds target (ms) */
 const TARGET_FOUND_END_DELAY_MS = 3000;
@@ -169,6 +169,7 @@ function broadcastLives(io: Server, gameCode: string, huntState: WordHuntModeSta
  */
 export function wordHuntBoardRules(huntState: WordHuntModeState): BotPlayRules {
   return {
+    onMiss: recordMissedBoardWord,
     quote(ctx: BotRoundContext, bot: Bot, word: string) {
       const base = quoteBoardWord(ctx, bot, word);
       if (!base) return null;
