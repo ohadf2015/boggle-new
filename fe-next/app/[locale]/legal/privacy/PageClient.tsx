@@ -20,7 +20,7 @@ export default function PrivacyPolicyPageClient(): React.ReactElement {
   const subheadingClass = cn('text-lg font-semibold mb-2 mt-4', isDarkMode ? 'text-white' : 'text-gray-900');
 
   return (
-    <LegalPageLayout title={c.title}>
+    <LegalPageLayout title={c.title} lastUpdated="2026-09-25">
       {/* Introduction */}
       <p className={cn('text-lg mb-6', textClass)}>{c.intro}</p>
 
