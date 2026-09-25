@@ -55,7 +55,7 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
       {/* Same shell + HowTo-mismatch fix as /education/duels: 17 visible words to a crawler
           (measured 2026-08-21) under a HowTo that described three unseen steps. This route
           matters more than its traffic suggests — it is the PRIMARY hero CTA of
-          /education/for-schools ("Play a class game free"), which is the $149/year schools
+          /education/for-schools ("Play a class game free"), which is the $39/term Classroom-plan schools
           funnel, i.e. the one revenue path that needs no payment processor. Copy is
           CLASSROOM_CONTENT, already authored in all 6 locales.
           asH1 IS safe here, and is NOT on the sibling /education/duels: this page's client
