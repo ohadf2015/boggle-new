@@ -183,9 +183,15 @@ export default function DrillPageShell({ drillType, Drill, isCheck = false }: Pr
 
         {isCheck ? (
           // Boosts would contaminate a measurement — none in check mode.
-          <span className="inline-flex items-center gap-1 rounded-neo border-3 border-neo-black bg-neo-yellow px-2 py-1 text-xs font-black uppercase text-neo-black shadow-hard-sm">
+          <span
+            role="img"
+            aria-label={t('brain.check.title')}
+            title={t('brain.check.title')}
+            className="inline-flex shrink-0 items-center gap-1 rounded-neo border-3 border-neo-black bg-neo-yellow px-2 py-1 text-xs font-black uppercase text-neo-black shadow-hard-sm"
+          >
             <FlaskConical className="h-4 w-4" aria-hidden="true" />
-            {t('brain.check.title')}
+            {/* Label only where there's room — phones keep the header clear of the global mute button. */}
+            <span className="hidden whitespace-nowrap sm:inline" aria-hidden="true">{t('brain.check.title')}</span>
           </span>
         ) : (
           <BoostButton mode="drill" sessionId={sessionId} />

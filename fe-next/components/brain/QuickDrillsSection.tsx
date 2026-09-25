@@ -56,7 +56,7 @@ export default function QuickDrillsSection({ drillProgress = EMPTY_DRILL_PROGRES
                   <Image src={getDrillTheme(drillId).emblem} alt="" fill sizes="56px" className="object-cover" />
                 </div>
                 <div className="flex flex-col items-start min-w-0 flex-1">
-                  <p className={cn('text-sm md:text-base font-bold text-start line-clamp-1', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                  <p className={cn('text-sm md:text-base font-bold text-start leading-tight line-clamp-2 break-words', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
                     {t(`brain.drills.${drillId}.name`)}
                   </p>
                   <p className={cn('text-[10px] md:text-sm uppercase', isDarkMode ? 'text-neo-white' : 'text-neo-black/50')}>

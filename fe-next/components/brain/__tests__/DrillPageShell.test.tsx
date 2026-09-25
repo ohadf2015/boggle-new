@@ -50,7 +50,7 @@ describe('DrillPageShell', () => {
     render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" isCheck />);
     expect(drillProps[0].level).toBe(2);
     expect(screen.queryByTestId('boost')).not.toBeInTheDocument();
-    expect(screen.getByText('brain.check.title')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'brain.check.title' })).toBeInTheDocument();
   });
 
   it('Given a check completes, Then it is submitted flagged and the verdict overlay opens', async () => {
