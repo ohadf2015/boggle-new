@@ -883,7 +883,16 @@ const he = {
       "bullet1": "תקפו הרבה מהלומות קשות יותר ויותר",
       "bullet2": "פתחו עיצובי עולם נדירים וחפצים חזקים",
       "bullet3": "קחו את מקומכם בלוח המובילים",
-      "signIn": "התחברו כדי לשחק"
+      "playBattle": "שחקו קרב חינם",
+      "signIn": "התחברו כדי לשחק",
+      "back": "חזרה",
+      "backToGate": "חזרה לבחירת קרב",
+      "demoResult": "הקרב הסתיים",
+      "demoWon": "ניצחתם!",
+      "demoLost": "הפסדתם!",
+      "demoScore": "ניקוד: {score}",
+      "saveProgress": "התחברו כדי לשמור את ההתקדמות שלכם וקבלו מטבעות",
+      "playAgain": "שחקו שוב"
     },
     "title": "הרפתקה",
     "start": "מתחילים",
@@ -1464,7 +1473,7 @@ const he = {
       }
     },
     "coins": { "run": "{n} מטבעות במשחק" },
-    "streak": { "a11y": "רצף מושלם ×{n}", "toRare": "עוד {n} מושלמים לארגז נדיר", "crate": "ארגז", "meterA11y": "רצף מושלם {n}, כפל ×{mult}. עוד {rare} לארגז נדיר." },
+    "streak": { "a11y": "רצף מושלם ×{n}", "toRare": "עוד {n} מושלמים לארגז נדיר", "crate": "ארגז", "meterA11y": "רצף מושלם {n}, כפל ×{mult}. עוד {rare} לארגז נדיר." , "label": "פס" },
     "milestone": { "floors": "עוד קומות!", "a11y": "{n} קומות" },
     "chest": {
       "tier": { "common": "רגיל", "rare": "נדיר", "epic": "אפי" },
@@ -1625,7 +1634,7 @@ const he = {
     "cardDesc": "פיזיקה אמיתית — גרסת בטא",
     "collapsed": "המגדל קרס!",
     "newBest": "שיא חדש!",
-    "hud": {"floor": "קומה", "floorA11y": "קומה {n}, {m} מטר", "effect": "{name}: נשארו {n}", "exit": "לסיים ולאסוף", "daily": "יומי", "dailyBadge": "יומי {date}"},
+    "hud": {"floor": "קומה", "floorA11y": "קומה {n}, {m} מטר", "effect": "{name}: נשארו {n}", "exit": "לסיים ולאסוף", "daily": "יומי", "dailyBadge": "יומי {date}", "menu": "תפריט", "banked": "צבור"},
     "stability": {"label": "יציבות", "a11y": "יציבות: {band}, סיכון {pct}%", "steady": "יציב", "wobbly": "מתנדנד", "danger": "סכנה!"},
     "biome": {"downtown": "מרכז העיר", "sunset": "גגות בשקיעה", "clouds": "ים של עננים", "jetstream": "זרם סילון", "aurora": "זוהר קוטבי", "orbit": "מסלול", "cosmos": "חלל עמוק"},
     "newSky": "שמיים חדשים",

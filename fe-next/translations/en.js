@@ -883,7 +883,16 @@ const en = {
       "bullet1": "Battle through increasingly difficult encounters",
       "bullet2": "Unlock rare world skins and powerful relics",
       "bullet3": "Claim your rank on the leaderboard",
-      "signIn": "Sign in to play"
+      "playBattle": "Play a free battle",
+      "signIn": "Sign in to play",
+      "back": "Back",
+      "backToGate": "Back to battle selection",
+      "demoResult": "Battle complete",
+      "demoWon": "You won!",
+      "demoLost": "You lost!",
+      "demoScore": "Score: {score}",
+      "saveProgress": "Sign in to save your progress and earn coins",
+      "playAgain": "Play again"
     },
     "title": "Adventure",
     "start": "Start",
@@ -1408,7 +1417,7 @@ const en = {
       }
     },
     "coins": { "run": "{n} coins this run" },
-    "streak": { "a11y": "Perfect streak ×{n}", "toRare": "{n} perfect → rare crate", "crate": "CRATE", "meterA11y": "Perfect streak {n}, paying ×{mult}. {rare} more for a rare crate." },
+    "streak": { "a11y": "Perfect streak ×{n}", "toRare": "{n} perfect → rare crate", "crate": "CRATE", "meterA11y": "Perfect streak {n}, paying ×{mult}. {rare} more for a rare crate.", "label": "Streak" },
     "milestone": { "floors": "Floors up!", "a11y": "{n} floors" },
     "chest": {
       "tier": { "common": "Common", "rare": "Rare", "epic": "Epic" },
@@ -1569,7 +1578,7 @@ const en = {
     "cardDesc": "Real physics — beta preview",
     "collapsed": "Tower down!",
     "newBest": "New best!",
-    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}"},
+    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}", "menu": "Menu", "banked": "Banked"},
     "stability": {"label": "Stability", "a11y": "Stability: {band}, {pct}% risk", "steady": "Steady", "wobbly": "Wobbly", "danger": "Danger!"},
     "biome": {"downtown": "Downtown", "sunset": "Sunset Rooftops", "clouds": "Cloud Deck", "jetstream": "Jet Stream", "aurora": "Aurora", "orbit": "Orbit", "cosmos": "Deep Cosmos"},
     "newSky": "New sky",

@@ -116,7 +116,9 @@ export type GrowthEvent =
   | 'daily_last_chance_clicked'
   // Adventure
   | 'adventure_guest_gate_viewed' // guest gate shown; props { surface: 'map'|'achievements' }
-  | 'adventure_guest_signin_clicked' // guest clicked sign-in on gate; props { surface: 'map'|'achievements' }
+  | 'adventure_guest_signin_clicked' // guest clicked sign-in on gate; props { surface: 'map'|'achievements'|'demo' }
+  | 'adventure_demo_started' // guest clicked "Play a free battle"; props {}
+  | 'adventure_demo_finished' // demo fight ended; props { won: boolean, score: number }
   | 'adventure_level_start'
   | 'adventure_level_pass'
   | 'adventure_level_fail'

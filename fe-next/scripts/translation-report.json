@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 7288,
+    "totalKeysInCode": 7349,
     "keyCountByLanguage": {
-      "en": 14218,
-      "es": 14506,
-      "he": 14428,
-      "ja": 14487,
-      "ru": 14260,
-      "sv": 14484
+      "en": 14294,
+      "es": 14582,
+      "he": 14504,
+      "ja": 14563,
+      "ru": 14336,
+      "sv": 14560
     },
     "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
@@ -1108,7 +1108,7 @@
         "pattern": "`brain.drills.${drillType}.name`",
         "type": "template_literal",
         "file": "components/brain/DrillPageShell.tsx",
-        "line": 183,
+        "line": 245,
         "context": "{t(`brain.drills.${drillType}.name`)}"
       },
       {
@@ -2557,14 +2557,14 @@
         "pattern": "`wordTowerV2.ach.${id}.name`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Results.tsx",
-        "line": 203,
+        "line": 232,
         "context": "{t(`wordTowerV2.ach.${id}.name`)}"
       },
       {
         "pattern": "`wordTowerV2.ach.${goal.id}.desc`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Results.tsx",
-        "line": 215,
+        "line": 244,
         "context": "<div className=\"mt-0.5 font-neo-display text-sm font-bold\">{t(`wordTowerV2.ach.${goal.id}.desc`)}</d"
       },
       {

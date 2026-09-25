@@ -883,7 +883,16 @@ const es = {
       "bullet1": "Batalla contra encuentros cada vez más difíciles",
       "bullet2": "Desbloquea diseños de mundos raros y reliquias poderosas",
       "bullet3": "Reclama tu puesto en la tabla de clasificación",
-      "signIn": "Inicia sesión para jugar"
+      "playBattle": "Juega una batalla gratis",
+      "signIn": "Inicia sesión para jugar",
+      "back": "Atrás",
+      "backToGate": "Volver a la selección de batalla",
+      "demoResult": "Batalla completada",
+      "demoWon": "¡Ganaste!",
+      "demoLost": "¡Perdiste!",
+      "demoScore": "Puntuación: {score}",
+      "saveProgress": "Inicia sesión para guardar tu progreso y ganar monedas",
+      "playAgain": "Jugar de nuevo"
     },
     "title": "Aventura",
     "start": "Empezar",
@@ -1463,7 +1472,7 @@ const es = {
       }
     },
     "coins": { "run": "{n} monedas esta ronda" },
-    "streak": { "a11y": "Racha perfecta ×{n}", "toRare": "{n} perfectos → caja rara", "crate": "CAJA", "meterA11y": "Racha perfecta {n}, paga ×{mult}. Faltan {rare} para una caja rara." },
+    "streak": { "a11y": "Racha perfecta ×{n}", "toRare": "{n} perfectos → caja rara", "crate": "CAJA", "meterA11y": "Racha perfecta {n}, paga ×{mult}. Faltan {rare} para una caja rara.", "label": "Racha" },
     "milestone": { "floors": "¡Pisos!", "a11y": "{n} pisos" },
     "chest": {
       "tier": { "common": "Común", "rare": "Rara", "epic": "Épica" },
@@ -1624,7 +1633,7 @@ const es = {
     "cardDesc": "Física real: versión beta",
     "collapsed": "¡Se cayó la torre!",
     "newBest": "¡Nuevo récord!",
-    "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar", "daily": "DIARIO", "dailyBadge": "Diario {date}"},
+    "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar", "daily": "DIARIO", "dailyBadge": "Diario {date}", "menu": "Menú", "banked": "Acumulado"},
     "stability": {"label": "Estabilidad", "a11y": "Estabilidad: {band}, {pct}% de riesgo", "steady": "Firme", "wobbly": "Tambaleante", "danger": "¡Peligro!"},
     "biome": {"downtown": "Centro", "sunset": "Azoteas al atardecer", "clouds": "Mar de nubes", "jetstream": "Corriente en chorro", "aurora": "Aurora", "orbit": "Órbita", "cosmos": "Cosmos profundo"},
     "newSky": "Cielo nuevo",

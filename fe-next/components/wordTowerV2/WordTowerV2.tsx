@@ -22,7 +22,7 @@ import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { type TowerGear, gearFromEstate } from '@/lib/wordTowerV2/gear';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
-import { V2TopBar } from './V2TopBar';
+import { V2Hud } from './V2Hud';
 import { V2Dock } from './V2Dock';
 import { V2Results } from './V2Results';
 import { RevengeHome } from './rivals/RevengeHome';
@@ -600,7 +600,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       ) : null}
 
       {phase !== 'over' && !smashing && !district ? (
-        <V2TopBar
+        <V2Hud
           t={t}
           heightM={heightM}
           score={score}
@@ -634,7 +634,14 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         reducedMotion={reducedMotion}
       />
       {phase !== 'over' && !smashing && !district ? <BraceControl t={t} api={braceApi} reducedMotion={reducedMotion} /> : null}
-      <V2Celebrations t={t} callout={game.callout} banners={game.banners} onBannerDone={game.shiftBanner} swinging={phase === 'swinging'} />
+      <V2Celebrations
+        t={t}
+        callout={game.callout}
+        banners={game.banners}
+        onBannerDone={game.shiftBanner}
+        swinging={phase === 'swinging'}
+        rivalChallenge={!!rival && phase === 'composing' && run.floors === 0}
+      />
       {/* One hint at a time, only on the first floor: spell it, then edit it,
           then drop it. It sits ABOVE the dock and never over the tower. */}
       {phase !== 'over' && run.floors === 0 && heightM < 0.5 && !rival ? (

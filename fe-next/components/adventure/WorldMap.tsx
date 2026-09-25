@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo, useCallback, useState, memo } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useMemo, useCallback, useState, memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useTransform, useMotionValue } from 'framer-motion';
 import './WorldMap.css';
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { MasteryTier } from '@/types/adventure';
 import { useParallax } from '@/hooks/useParallax';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import {
   LEVELS_PER_WORLD,
   MAX_STARS_PER_LEVEL,
@@ -58,6 +59,7 @@ const WorldMap = memo(function WorldMap({
 }: WorldMapProps): React.JSX.Element {
   const { t, dir } = useLanguage();
   const isRtl = dir === 'rtl';
+  const prefersReducedMotion = usePrefersReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
 
@@ -77,16 +79,8 @@ const WorldMap = memo(function WorldMap({
     });
   }, [scrollProgress]);
 
-  // Scroll to bottom on mount (shows World 1 first).
-  // Scroll the container directly — Element.scrollIntoView() bubbles to every
-  // scrollable ancestor incl. the document, dragging the whole page to the footer.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const c = containerRef.current;
-      if (c) c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+  // Track which world we've already focused on to prevent re-focus races
+  const focusedWorldRef = useRef<number | null>(null);
 
   // Add scroll listener with passive option
   useEffect(() => {
@@ -152,6 +146,46 @@ const WorldMap = memo(function WorldMap({
   // branching run never fills — so beating world 1's boss kept "Continue" on world 1.
   const nextWorldId = useMemo(() => nextRunWorld(completions), [completions]);
   const nextWorldConfig = WORLD_CONFIGS.find(w => w.id === nextWorldId) ?? null;
+
+  // Compute scroll position for a given world ID
+  const scrollToWorld = useCallback((worldId: number, behavior: 'auto' | 'smooth') => {
+    const c = containerRef.current;
+    if (!c) return;
+
+    const nextWorldNode = c.querySelector(`[data-world-id="${worldId}"]`);
+    if (!nextWorldNode) return;
+
+    const containerRect = c.getBoundingClientRect();
+    const nodeRect = (nextWorldNode as HTMLElement).getBoundingClientRect();
+
+    // Relative position within the scrollable container
+    const nodeTopRelative = nodeRect.top - containerRect.top + c.scrollTop;
+    const nodeHeight = nodeRect.height;
+
+    // Center the node in the viewport
+    const scrollTarget = nodeTopRelative - (c.clientHeight - nodeHeight) / 2;
+
+    // Clamp to valid scroll range [0, scrollHeight - clientHeight]
+    const maxScroll = Math.max(0, c.scrollHeight - c.clientHeight);
+    const clampedTop = Math.max(0, Math.min(scrollTarget, maxScroll));
+
+    c.scrollTo({ top: clampedTop, behavior });
+  }, []);
+
+  // Focus on the player's next world (first mount = auto/instant, updates = smooth if motion allowed).
+  // Uses a ref guard to prevent StrictMode double-invoke from creating a race.
+  useLayoutEffect(() => {
+    // If we've already focused on this world, nothing to do
+    if (focusedWorldRef.current === nextWorldId) return;
+
+    // Determine scroll behavior: instant on first focus, smooth on updates (if motion allowed)
+    const isFirstFocus = focusedWorldRef.current === null;
+    const behavior = isFirstFocus || prefersReducedMotion ? 'auto' : 'smooth';
+
+    focusedWorldRef.current = nextWorldId;
+    scrollToWorld(nextWorldId, behavior);
+  }, [nextWorldId, prefersReducedMotion, scrollToWorld]);
+
   // A run in progress there says which floor it stands on; otherwise it is a new run.
   // Read after mount (localStorage), and again whenever the hub re-renders with new progress.
   const [runFloorStep, setRunFloorStep] = useState<number | null>(null);
@@ -186,7 +220,7 @@ const WorldMap = memo(function WorldMap({
 
           return (
             <React.Fragment key={data.world.id}>
-              <div className="world-node-container">
+              <div className="world-node-container" data-world-id={data.world.id}>
               <WorldNode
                 world={data.world}
                 isUnlocked={data.isUnlocked}

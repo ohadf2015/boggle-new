@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Medal, Sparkles, Trophy } from 'lucide-react';
 import { ACHIEVEMENTS, type Tier } from '@/lib/wordTowerV2/achievements';
 import type { Banner, Tone } from '@/lib/wordTowerV2/celebrations';
@@ -45,6 +45,11 @@ interface Props {
    * the player had to time — it moves to the low lane above the dock instead.
    */
   swinging?: boolean;
+  /**
+   * A rival challenge message is showing at hud+0.5rem. If true, the banner
+   * queue pauses until it clears to avoid stacking at the same z-level.
+   */
+  rivalChallenge?: boolean;
 }
 
 /**
@@ -53,7 +58,7 @@ interface Props {
  * the queue's head for a beat, then asks for the next. Round 5 ran four
  * independent toasts in one column and they piled up over the tower.
  */
-export function V2Celebrations({ t, callout, banners, onBannerDone, swinging = false }: Props) {
+export function V2Celebrations({ t, callout, banners, onBannerDone, swinging = false, rivalChallenge = false }: Props) {
   /*
    * Adopted DURING render, not from an effect. The banner lane below is gated
    * on this being clear, and an effect-set value lags the prop by one commit —
@@ -81,15 +86,21 @@ export function V2Celebrations({ t, callout, banners, onBannerDone, swinging = f
    * starve: a verdict lives 1.1s and the next one cannot fire until the player
    * has spelled a whole word, so every turn leaves the lane clear. The gate is
    * the TIMED `shown`, never the prop — `callout` stays set between landings.
+   *
+   * The banner lane also hides while a slab swings to avoid covering the drop zone,
+   * and while a rival challenge message is showing to avoid stacking at hud+0.5rem.
    */
   const calloutUp = shown !== null;
   const head = banners[0] ?? null;
   const headKey = head?.key;
+  const bannerBlocked = calloutUp || swinging || rivalChallenge;
+  const dismissedRef = useRef<number | null>(null);
+
   useEffect(() => {
-    if (headKey === undefined || calloutUp) return;
+    if (headKey === undefined || bannerBlocked) return;
     const id = window.setTimeout(onBannerDone, BANNER_MS);
     return () => window.clearTimeout(id);
-  }, [headKey, calloutUp, onBannerDone]);
+  }, [headKey, bannerBlocked, onBannerDone]);
 
   return (
     <>
@@ -100,6 +111,7 @@ export function V2Celebrations({ t, callout, banners, onBannerDone, swinging = f
         className={`pointer-events-none absolute inset-x-0 z-20 flex justify-center px-4 ${
           swinging ? 'bottom-[calc(var(--wt2-dock,17rem)+0.75rem)]' : 'top-[max(27%,calc(var(--wt2-hud,6rem)+5rem))]'
         }`}
+        data-wt2-lane="callout"
         aria-live="polite"
       >
         {shown ? (
@@ -116,61 +128,104 @@ export function V2Celebrations({ t, callout, banners, onBannerDone, swinging = f
           </div>
         ) : null}
       </div>
-      {/* Banners sit just above the dock, over the tower's base — never over
-          the HUD, the hook or the tower top where the next drop lands. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-[calc(var(--wt2-dock,17rem)+0.75rem)] z-20 flex justify-center px-4" aria-live="polite">
-        {head && !calloutUp ? <BannerCard key={head.key} t={t} banner={head} /> : null}
+      {/* Badge toasts sit just below the HUD (hud+0.5rem), not at the drop gap (hud+5rem),
+          so they don't cover the drop zone when blocks are falling. Hidden while a slab
+          swings from the hook (drop zone is active) or while a rival challenge message
+          shows. One at a time while waiting for callout to clear. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-[calc(var(--wt2-hud,7rem)+0.5rem)] z-20 flex justify-center px-4"
+        data-wt2-lane="banner"
+        aria-live="polite"
+      >
+        {head && !bannerBlocked ? (
+          <BannerCard
+            key={head.key}
+            t={t}
+            banner={head}
+            onDismiss={() => {
+              dismissedRef.current = head.key;
+              onBannerDone();
+            }}
+          />
+        ) : null}
       </div>
     </>
   );
 }
 
-function BannerCard({ t, banner }: { t: T; banner: Banner }) {
+function BannerCard({ t, banner, onDismiss }: { t: T; banner: Banner; onDismiss: () => void }) {
+  const dismissedRef = useRef(false);
+  const handleDismiss = () => {
+    if (dismissedRef.current) return;
+    dismissedRef.current = true;
+    onDismiss();
+  };
+
   if (banner.kind === 'reward') {
     const Icon = REWARD_ICON[banner.id as RewardId];
     return (
-      <div className="flex max-w-sm items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-neo-navy shadow-hard-lg animate-neo-pop">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream">
-          <Icon className="h-6 w-6" aria-hidden />
+      <button
+        type="button"
+        onClick={handleDismiss}
+        data-testid="banner-card"
+        className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+      >
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream">
+          <Icon className="h-5 w-5" aria-hidden />
         </span>
-        <span className="flex flex-col text-start">
+        <span className="flex min-w-0 flex-col text-start">
           <span className="font-neo-display text-[10px] font-black uppercase tracking-widest">{t('wordTowerV2.reward.crate')}</span>
-          <span className="font-neo-display text-xl font-black leading-tight">{t(`wordTowerV2.reward.${banner.id}.name`)}</span>
-          <span className="font-neo-body text-xs font-semibold leading-snug">{t(`wordTowerV2.reward.${banner.id}.desc`)}</span>
+          <span className="font-neo-display text-base font-black leading-tight">{t(`wordTowerV2.reward.${banner.id}.name`)}</span>
+          <span className="font-neo-body text-xs font-semibold leading-snug break-words">{t(`wordTowerV2.reward.${banner.id}.desc`)}</span>
         </span>
-      </div>
+      </button>
     );
   }
   if (banner.kind === 'achievement') {
     const tier = ACHIEVEMENTS.find((a) => a.id === banner.id)?.tier ?? 'bronze';
     return (
-      <div className="flex max-w-sm items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-purple px-4 py-2 text-neo-navy shadow-hard-lg animate-neo-pop">
-        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-neo-thick border-black ${TIER_CLASS[tier]}`}>
-          <Medal className="h-6 w-6" aria-hidden />
+      <button
+        type="button"
+        onClick={handleDismiss}
+        data-testid="banner-card"
+        className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-purple px-4 py-2 text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+      >
+        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-neo-thick border-black ${TIER_CLASS[tier]}`}>
+          <Medal className="h-5 w-5" aria-hidden />
         </span>
-        <span className="flex flex-col text-start">
+        <span className="flex min-w-0 flex-col text-start">
           <span className="font-neo-display text-[10px] font-black uppercase tracking-widest">{t('wordTowerV2.ach.unlocked')}</span>
-          <span className="font-neo-display text-xl font-black leading-tight">{t(`wordTowerV2.ach.${banner.id}.name`)}</span>
-          <span className="font-neo-body text-xs font-semibold leading-snug">{t(`wordTowerV2.ach.${banner.id}.desc`)}</span>
+          <span className="font-neo-display text-base font-black leading-tight">{t(`wordTowerV2.ach.${banner.id}.name`)}</span>
+          <span className="font-neo-body text-xs font-semibold leading-snug break-words">{t(`wordTowerV2.ach.${banner.id}.desc`)}</span>
         </span>
-      </div>
+      </button>
     );
   }
   if (banner.kind === 'best') {
     return (
-      <div className="flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-1.5 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard-lg animate-neo-pop">
+      <button
+        type="button"
+        onClick={handleDismiss}
+        data-testid="banner-card"
+        className="pointer-events-auto flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-1.5 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+      >
         <Trophy className="h-6 w-6" aria-hidden />
         {t('wordTowerV2.newBest')}
-      </div>
+      </button>
     );
   }
   return (
-    <div className="flex flex-col items-center rounded-neo border-neo-thick border-black bg-neo-cyan px-5 py-1.5 text-neo-navy shadow-hard-lg animate-neo-pop">
+    <button
+      type="button"
+      onClick={handleDismiss}
+      data-testid="banner-card"
+      className="pointer-events-auto flex flex-col items-center rounded-neo border-neo-thick border-black bg-neo-cyan px-5 py-1.5 text-neo-navy shadow-hard-lg animate-neo-pop active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+    >
       <span className="flex items-center gap-1 font-neo-display text-[10px] font-black uppercase tracking-widest">
         <Sparkles className="h-3 w-3" aria-hidden />
         {t('wordTowerV2.newSky')}
       </span>
       <span className="font-neo-display text-2xl font-black">{t(`wordTowerV2.biome.${banner.id}`)}</span>
-    </div>
+    </button>
   );
 }

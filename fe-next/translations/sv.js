@@ -883,7 +883,16 @@ const sv = {
       "bullet1": "Strida mot allt svårare motståndare",
       "bullet2": "Lås upp sällsynta världsutseenden och kraftfulla relikvier",
       "bullet3": "Säkra din plats på topplistorna",
-      "signIn": "Logga in för att spela"
+      "playBattle": "Spela ett gratis slag",
+      "signIn": "Logga in för att spela",
+      "back": "Tillbaka",
+      "backToGate": "Tillbaka till slag-urval",
+      "demoResult": "Slag slutfört",
+      "demoWon": "Du vann!",
+      "demoLost": "Du förlorade!",
+      "demoScore": "Poäng: {score}",
+      "saveProgress": "Logga in för att spara dina framsteg och tjäna mynt",
+      "playAgain": "Spela igen"
     },
     "title": "Äventyr",
     "start": "Starta",
@@ -1749,7 +1758,7 @@ const sv = {
       }
     },
     "coins": { "run": "{n} mynt denna runda" },
-    "streak": { "a11y": "Perfekt svit ×{n}", "toRare": "{n} perfekta → sällsynt låda", "crate": "LÅDA", "meterA11y": "Perfekt svit {n}, ger ×{mult}. {rare} till för en sällsynt låda." },
+    "streak": { "a11y": "Perfekt svit ×{n}", "toRare": "{n} perfekta → sällsynt låda", "crate": "LÅDA", "meterA11y": "Perfekt svit {n}, ger ×{mult}. {rare} till för en sällsynt låda.", "label": "Svit" },
     "milestone": { "floors": "Våningar!", "a11y": "{n} våningar" },
     "chest": {
       "tier": { "common": "Vanlig", "rare": "Sällsynt", "epic": "Episk" },
@@ -1910,7 +1919,7 @@ const sv = {
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",
     "newBest": "Nytt rekord!",
-    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}"},
+    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}", "menu": "Meny", "banked": "Insamlat"},
     "stability": {"label": "Stabilitet", "a11y": "Stabilitet: {band}, {pct} % risk", "steady": "Stadig", "wobbly": "Vinglig", "danger": "Fara!"},
     "biome": {"downtown": "Centrum", "sunset": "Tak i solnedgång", "clouds": "Molnhavet", "jetstream": "Jetströmmen", "aurora": "Norrsken", "orbit": "Omloppsbana", "cosmos": "Djupa rymden"},
     "newSky": "Ny himmel",

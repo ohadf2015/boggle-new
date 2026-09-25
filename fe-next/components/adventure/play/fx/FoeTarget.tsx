@@ -68,6 +68,8 @@ export default function FoeTarget({ world, score, stars, lastHit, combat = null,
   const [ghost, setGhost] = useState(score);
   const [hurt, setHurt] = useState(false);
   const [chip, setChip] = useState<{ id: number; dmg: number } | null>(null);
+  // After defeat, collapse the card after ~1.2s (respecting prefers-reduced-motion)
+  const [defeatCollapsed, setDefeatCollapsed] = useState(false);
   const seen = useRef<number | null>(lastHit?.id ?? null);
   const impactMs = reduce || !lastHit ? 0 : castTiming(Array.from(lastHit.word).length, false).impactMs;
 
@@ -89,6 +91,19 @@ export default function FoeTarget({ world, score, stars, lastHit, combat = null,
     return () => { clearTimeout(a); clearTimeout(b); };
   }, [lastHit, impactMs]);
 
+  // Collapse the defeated card after brief display (~1.2s)
+  // Key off `shown` (the HP value) to detect defeat, NOT the stars array which is new every render.
+  // Intentionally exclude stars from deps to prevent timer reset on re-render with new array.
+  useEffect(() => {
+    const view = foeView(shown, stars);
+    const defeated = view.defeated;
+    if (!defeated) { setDefeatCollapsed(false); return; }
+    const delay = reduce ? 0 : 1200; // Instant collapse with prefers-reduced-motion
+    const timeout = setTimeout(() => setDefeatCollapsed(true), delay);
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown, reduce]);
+
   const view = foeView(shown, stars);
   const trail = foeView(ghost, stars);
   const down = view.defeated;
@@ -97,6 +112,11 @@ export default function FoeTarget({ world, score, stars, lastHit, combat = null,
   const tele = !down ? combat?.telegraph ?? null : null;
   const windupSecs = tele ? Math.max(0, Math.ceil((tele.endsAt - combat!.now) / 1000)) : 0;
   const frame = down || hurt ? 'hurt' : tele ? 'attack' : 'idle';
+
+  // When defeated and collapsed, unmount the card entirely (true zero height, not max-h-0 with padding).
+  if (defeatCollapsed && down) {
+    return null;
+  }
 
   return (
     <div className="relative w-full" data-testid="adv-foe">

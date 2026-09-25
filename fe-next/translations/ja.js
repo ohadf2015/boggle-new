@@ -883,7 +883,16 @@ const ja = {
       "bullet1": "難度が上がる敵との戦い",
       "bullet2": "レアなワールドスキンと強力な遺物を獲得",
       "bullet3": "ランキングボードで順位を獲得しよう",
-      "signIn": "ログインして遊ぶ"
+      "playBattle": "無料バトルで遊ぶ",
+      "signIn": "ログインして遊ぶ",
+      "back": "戻る",
+      "backToGate": "バトル選択に戻る",
+      "demoResult": "バトル完了",
+      "demoWon": "勝利！",
+      "demoLost": "敗北…",
+      "demoScore": "スコア: {score}",
+      "saveProgress": "ログインして進捗を保存してコインを獲得",
+      "playAgain": "もう一度遊ぶ"
     },
     "title": "アドベンチャー",
     "start": "スタート",
@@ -1464,7 +1473,7 @@ const ja = {
       }
     },
     "coins": { "run": "今回のコイン {n}" },
-    "streak": { "a11y": "パーフェクト連続 ×{n}", "toRare": "パーフェクト{n}回 → レアの箱", "crate": "箱", "meterA11y": "パーフェクト連続{n}、×{mult}。レアの箱まであと{rare}。" },
+    "streak": { "a11y": "パーフェクト連続 ×{n}", "toRare": "パーフェクト{n}回 → レアの箱", "crate": "箱", "meterA11y": "パーフェクト連続{n}、×{mult}。レアの箱まであと{rare}。" , "label": "ストリーク" },
     "milestone": { "floors": "階、達成!", "a11y": "{n}階" },
     "chest": {
       "tier": { "common": "ノーマル", "rare": "レア", "epic": "エピック" },
@@ -1625,7 +1634,7 @@ const ja = {
     "cardDesc": "本物の物理演算 — ベータ版",
     "collapsed": "タワー崩壊！",
     "newBest": "自己ベスト更新！",
-    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "effect": "{name}：残り{n}", "exit": "終了して受け取る", "daily": "デイリー", "dailyBadge": "デイリー {date}"},
+    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "effect": "{name}：残り{n}", "exit": "終了して受け取る", "daily": "デイリー", "dailyBadge": "デイリー {date}", "menu": "メニュー", "banked": "獲得済み"},
     "stability": {"label": "安定度", "a11y": "安定度：{band}、リスク{pct}%", "steady": "安定", "wobbly": "グラグラ", "danger": "危険！"},
     "biome": {"downtown": "ダウンタウン", "sunset": "夕焼けの屋上", "clouds": "雲海", "jetstream": "ジェット気流", "aurora": "オーロラ", "orbit": "軌道", "cosmos": "深宇宙"},
     "newSky": "新しい空",

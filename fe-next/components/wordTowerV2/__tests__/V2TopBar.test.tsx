@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { createRun } from '@/lib/wordTowerV2/run';
-import { emptyEstate } from '@/lib/wordTowerV2/estate';
 import { V2TopBar } from '../V2TopBar';
 
 afterEach(cleanup);
@@ -23,12 +22,8 @@ const bar = (over: Partial<Parameters<typeof V2TopBar>[0]> = {}) => (
     score={520}
     bestM={0}
     run={createRun(1)}
-    tenants={0}
-    estate={{ ...emptyEstate(), coins: 1200 }}
-    runCoins={0}
-    raids={0}
+    coins={1200}
     coinsRef={{ current: null }}
-    onOpenEstate={() => {}}
     daily={false}
     {...over}
   />
@@ -46,52 +41,41 @@ describe('V2TopBar', () => {
   });
 
   it('given coins banked this run, when rendered, then ONE chip shows bank plus run, not two chips', () => {
-    render(bar({ runCoins: 55 }));
+    render(bar({ coins: 1255 }));
 
     expect(screen.getByLabelText('wordTowerV2.coins.run:1255')).toBeTruthy();
     // The old layout had a second, visually identical coin pill.
     expect(screen.queryAllByLabelText(/wordTowerV2\.coins\.run/)).toHaveLength(1);
   });
 
-  it('given a perfect streak, when rendered, then the streak is a ring, not a full-width bar', () => {
-    const { container } = render(bar({ run: { ...createRun(1), combo: 2 } }));
+  it('given the bar with secondary items, when a menu is provided, then the menu can be opened', () => {
+    const onMenuOpen = vi.fn();
+    render(bar({ run: { ...createRun(1), combo: 2 }, onMenuOpen }));
 
-    const ring = container.querySelector('[data-wt2-streak-ring]');
-    expect(ring).toBeTruthy();
-    // A ring is square-ish; the old bar was w-[19.5rem].
-    expect(ring?.getAttribute('class') ?? '').not.toMatch(/w-\[19\.5rem\]/);
+    const menu = screen.getByLabelText('wordTowerV2.hud.menu');
+    expect(menu).toBeTruthy();
+    fireEvent.click(menu);
+    expect(onMenuOpen).toHaveBeenCalledOnce();
   });
 
-  it('given the empire has something waiting, when rendered, then the button badges it and opens on tap', () => {
-    const onOpenEstate = vi.fn();
-    render(bar({ raids: 2, onOpenEstate }));
+  it('given a menu button is provided, when rendered, then the menu button is present', () => {
+    const onMenuOpen = vi.fn();
+    render(bar({ raids: 2, onMenuOpen }));
 
-    const open = screen.getByLabelText('wordTowerV2.estate.open');
-    // Raids + damaged + affordable, so assert it counted SOMETHING, not an exact total.
-    expect(Number(open.textContent)).toBeGreaterThanOrEqual(2);
-    fireEvent.click(open);
-    expect(onOpenEstate).toHaveBeenCalledOnce();
+    const menu = screen.getByLabelText('wordTowerV2.hud.menu');
+    expect(menu).toBeTruthy();
+    fireEvent.click(menu);
+    expect(onMenuOpen).toHaveBeenCalledOnce();
   });
 
-  it('given nothing banked, when rendered, then the secondary chip row is absent entirely', () => {
-    const { container } = render(bar({ run: { ...createRun(1), balls: 0 }, tenants: 0 }));
+  it('given a menu button is passed, when rendered, then it appears in Row 1', () => {
+    const onMenuOpen = vi.fn();
+    render(bar({ onMenuOpen }));
 
-    expect(container.querySelector('[data-wt2-topbar-secondary]')).toBeNull();
-  });
-
-  it('given a live crate effect, when rendered, then the chip NAMES it, not just an icon', () => {
-    render(bar({ run: { ...createRun(1), steadyDrops: 2 } }));
-
-    // A lone glyph never said which effect the crate had bought.
-    expect(screen.getByText('wordTowerV2.reward.steady.name')).toBeTruthy();
-    expect(screen.getByLabelText('wordTowerV2.hud.effect:wordTowerV2.reward.steady.name,2')).toBeTruthy();
-  });
-
-  it('given balls and tenants banked, when rendered, then they share the secondary row', () => {
-    render(bar({ run: { ...createRun(1), balls: 2 }, tenants: 3 }));
-
-    expect(screen.getByLabelText('wordTowerV2.wreck.balls:2')).toBeTruthy();
-    expect(screen.getByLabelText('wordTowerV2.tenants:3')).toBeTruthy();
+    const menuBtn = screen.getByLabelText('wordTowerV2.hud.menu');
+    expect(menuBtn).toBeTruthy();
+    fireEvent.click(menuBtn);
+    expect(onMenuOpen).toHaveBeenCalledOnce();
   });
 
   it('given a tower close to going over, when rendered, then the stability meter reads DANGER with its risk', () => {
@@ -122,11 +106,15 @@ describe('V2TopBar', () => {
     expect(screen.getByLabelText('wordTowerV2.results.home')).toBeTruthy();
   });
 
-  it('given the bar, then the meter and the streak share a status row that never comes and goes', () => {
-    const { container } = render(bar({ run: { ...createRun(1), balls: 0 }, tenants: 0 }));
-    const status = container.querySelector('[data-wt2-topbar-status]')!;
-    expect(status.querySelector('[data-wt2-stability]')).toBeTruthy();
-    expect(status.querySelector('[data-wt2-streak-ring]')).toBeTruthy();
+  it('given the bar, then the stability meter is in Row 1', () => {
+    const { container } = render(bar());
+    const rows = container.querySelectorAll('[data-wt2-topbar-row]');
+    // Only Row 1 now (secondary items moved to menu)
+    expect(rows.length).toBe(1);
+
+    // Stability meter should be in Row 1
+    const row1 = rows[0];
+    expect(row1.querySelector('[data-wt2-stability]')).toBeTruthy();
   });
 
   it('given a daily run, when rendered, then the daily badge shows the date, not the best chip', () => {

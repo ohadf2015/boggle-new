@@ -42,9 +42,9 @@ export default function RunStatusOverlay({ phase, onExit, onRetry }: Props) {
 
   if (phase === 'saving') {
     return (
-      <div className="absolute inset-0 z-20 grid place-items-center bg-black/40" role="status">
-        <div className="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-[#1a1a2e] px-4 py-3 font-bold">
-          <Loader2 className="w-5 h-5 animate-spin" /> {t('adventurePlay.saving')}
+      <div className="pointer-events-none absolute inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-20 flex justify-center" role="status" aria-live="polite">
+        <div className="inline-flex items-center gap-1.5 rounded-lg border-[2px] border-black bg-[#1a1a2e] px-3 py-1 text-sm font-bold shadow-[2px_2px_0_#000]">
+          <Loader2 className="w-4 h-4 animate-spin" /> {t('adventurePlay.saving')}
         </div>
       </div>
     );

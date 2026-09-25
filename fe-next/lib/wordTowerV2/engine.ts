@@ -10,6 +10,8 @@
  * There is no topple counter anywhere in this file, by design.
  */
 import { Bodies, Body, Composite, Engine, Events } from 'matter-js';
+import { standingChain } from './stability';
+import { removeBlockBody, cleanupDebris } from './debris';
 
 /**
  * Physics runs at a fixed 120Hz regardless of display refresh. 240Hz was tried
@@ -75,6 +77,12 @@ const COLLAPSE_CONFIRM_MS = 350;
 const GROUND_THICKNESS_PX = 120;
 const GROUND_WIDTH_PX = 4000;
 
+/**
+ * Margin beyond the playfield bounds; blocks fully outside this region are despawned.
+ * Prevents debris from accumulating just barely off-screen for extended periods.
+ */
+const DESPAWN_MARGIN_PX = 100;
+
 export interface SpawnSpec {
   id: string;
   x: number;
@@ -128,10 +136,14 @@ export interface TowerWorld {
   restMs: Map<string, number>;
   /** Contacts observed since the last read — drives impact audio/particles. */
   pendingImpacts: Array<{ id: string; speed: number }>;
+  /** Half-width of the playfield for despawn calculations. */
+  despawnHalfWidthPx: number;
 }
 
 export interface CreateWorldOptions {
   seed: number;
+  /** Test override: narrower despawn region. Defaults to GROUND_WIDTH_PX/2. */
+  despawnHalfWidthPx?: number;
 }
 
 /**
@@ -170,6 +182,7 @@ export function createTowerWorld(_options: CreateWorldOptions): TowerWorld {
     landed: new Set(),
     restMs: new Map(),
     pendingImpacts: [],
+    despawnHalfWidthPx: _options.despawnHalfWidthPx ?? GROUND_WIDTH_PX / 2,
   };
 
   Composite.add(engine.world, createGround());
@@ -275,15 +288,9 @@ export function releaseBlock(
  * and end the run on a cancel.
  */
 export function despawnBlock(world: TowerWorld, id: string): boolean {
-  const body = world.blocks.get(id);
-  if (!body) return false;
+  if (!removeBlockBody(world, id)) return false;
 
-  Composite.remove(world.engine.world, body);
-  world.blocks.delete(id);
-  world.bodyToId.delete(body.id);
-  world.landed.delete(id);
-  world.restMs.delete(id);
-  world.pendingImpacts = world.pendingImpacts.filter((impact) => impact.id !== id);
+  // Only despawnBlock resets collapse state; cleanup does not.
   world.peakHeightPx = Math.min(world.peakHeightPx, towerHeightPx(world));
   world.collapseHeldMs = 0;
 
@@ -407,6 +414,7 @@ function updateCollapse(world: TowerWorld, simulatedMs: number): void {
   world.collapseHeldMs = 0;
 }
 
+
 /**
  * Advance the world by real elapsed milliseconds.
  * Returns the number of fixed substeps actually simulated.
@@ -439,6 +447,8 @@ export function stepWorld(world: TowerWorld, elapsedMs: number): number {
     }
 
     updateCollapse(world, simulatedMs);
+    const chainIds = new Set(standingChain(snapshotWorld(world).blocks));
+    cleanupDebris(world, chainIds);
   }
 
   return substeps;
