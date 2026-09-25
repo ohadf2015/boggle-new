@@ -17,3 +17,13 @@ describe('build never migrates a database', () => {
     expect(scripts.build).not.toMatch(/db:migrate|run-migrations/);
   });
 });
+
+describe('container start never migrates by accident', () => {
+  it('runs docker-migrate (supabase db push) only on explicit opt-in', async () => {
+    const { readFileSync } = await import('fs');
+    const { join } = await import('path');
+    const entry = readFileSync(join(__dirname, '../../scripts/docker-entrypoint.sh'), 'utf8');
+    // Credentials alone must not be enough — a stray token would `db push` prod on every boot.
+    expect(entry).toMatch(/RUN_MIGRATIONS_ON_START.*=.*"?true"?/);
+  });
+});
