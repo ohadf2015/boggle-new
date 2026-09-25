@@ -9,15 +9,15 @@
       "name": "Är LexiClash gratis för lärare?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Varje lärare får en fullständig 14-dagars provperiod: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir det grundläggande klassrumsspelet gratis för enskilda lärare. Skolplaner — som lägger till administratörsöversikter, statistik, läroplansbibliotek och en annonsfri miljö — börjar på $39/termin."
+        "text": "Ja. Varje lärare får en 14-dagars gratis provperiod av Teacher Pro: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till 3 klasser med 50 elever vardera. Teacher Pro kostar $9/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser."
       }
     },
     {
       "@type": "Question",
-      "name": "Vad inkluderar en skol- eller distriktsplan?",
+      "name": "Vad ingår i en skol- eller distriktsplan?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Skolplaner ($39/termin) lägger till funktioner som skalar: en distriktsadministratörs instrumentpanel, tvärklassanalys och rapportering, kurerade läroplansbibliotek, en annonsfri skolmiljö och SSO (Clever / ClassLink / Google). Det grundläggande klassrumsspelet förblir gratis — planerna byggs ovanpå, aldrig som en spärr."
+        "text": "Klassplanen ($39/termin, via formuläret på den här sidan) täcker en hel klass med alla Teacher Pro-funktioner — statistik, rapporter, läxverktyg — plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO för skol- eller distriktsutrullning finns på vår färdplan och är inte lanserade än — berätta vad ni behöver så hör vi av oss, med pris på begäran."
       }
     },
     {
@@ -41,7 +41,7 @@
       "name": "Hur börjar vi vår provperiod eller får en skolplan?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Fyll i formuläret på den här sidan med din roll, skola eller distrikt och ungefärligt antal elever. Vi bekräftar din provåtkomst och delar information om skolplanen — $39/termin, distriktspriser på begäran."
+        "text": "Registrera dig som lärare för att starta din egen 14-dagars Teacher Pro-provperiod. Ska ni istället rulla ut till en hel klass eller skola? Fyll i formuläret på den här sidan med din roll, skola och ungefärligt antal elever, så hör vi av oss om Klassplanen eller en offert för skola/distrikt."
       }
     },
     {
@@ -49,7 +49,7 @@
       "name": "Hur skiljer sig detta från Kahoot, Gimkit eller Quizlet?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Det är quiz-/flashcardverktyg som begränsar sina gratisversioner och är engelskfokuserade. LexiClash är ett ordbyggande spel (inte flervalsfrågor), stöder sex språk inklusive hebreiska RTL, har ingen spelargräns under provperioden och erbjuder riktiga 1v1-dueller."
+        "text": "Det är quiz-/flashcardverktyg som är engelskfokuserade. LexiClash är ett ordbyggande spel (inte flervalsfrågor), stöder sex språk inklusive hebreiska RTL, får plats för en hel klass på upp till 50 elever gratis, och erbjuder riktiga 1v1-dueller."
       }
     },
     {
@@ -73,7 +73,7 @@
       "name": "Fungerar LexiClash på Chromebooks och skolenheter?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Ja. LexiClash körs helt i webbläsaren — ingen app att installera, inga elevkonton att skapa. Det fungerar på Chromebooks, iPads, stationära datorer och telefoner. Eleverna ansluter med en spelkod. Skolplaner stöder Clever, ClassLink och Google Sign-In SSO för lärarkonton."
+        "text": "Ja. LexiClash körs helt i webbläsaren — ingen app att installera, inga elevkonton att skapa. Det fungerar på Chromebooks, iPads, stationära datorer och telefoner. Eleverna ansluter med en spelkod, och lärare kan dela uppgifter direkt till Google Classroom. Distrikts-SSO (Clever, ClassLink) finns på vår färdplan."
       }
     }
   ]

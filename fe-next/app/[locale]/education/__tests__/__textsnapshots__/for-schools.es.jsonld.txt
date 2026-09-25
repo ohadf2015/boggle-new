@@ -9,7 +9,7 @@
       "name": "¿Es LexiClash gratis para maestros?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Cada maestro obtiene una prueba completa de 14 días: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares — que agregan paneles de administración, análisis, bibliotecas de contenido curricular y un entorno sin anuncios — comienzan en $39/trimestre."
+        "text": "Sí. Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — hasta 3 clases de 50 estudiantes cada una. Teacher Pro cuesta $9/mes y agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas."
       }
     },
     {
@@ -17,7 +17,7 @@
       "name": "¿Qué incluyen los planes escolares o de distrito?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Los planes escolares ($39/trimestre) agregan las funciones que escalan: un panel de administración de distrito, análisis y reportes entre clases, bibliotecas de contenido curricular curadas, un entorno escolar sin anuncios y SSO (Clever / ClassLink / Google). El juego básico de aula sigue siendo gratis — los planes se superponen, nunca lo limitan."
+        "text": "El plan de clase ($39/trimestre, a través del formulario de esta página) cubre una clase completa con todas las funciones de Teacher Pro — análisis, informes, herramientas de tareas — más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO para implementación escolar o de distrito están en nuestra hoja de ruta y aún no están disponibles — cuéntanos qué necesitas y te contactaremos, con precio a solicitud."
       }
     },
     {
@@ -41,7 +41,7 @@
       "name": "¿Cómo iniciamos nuestra prueba u obtenemos un plan escolar?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Completa el formulario en esta página con tu rol, escuela o distrito y cuántos estudiantes tienes aproximadamente. Confirmaremos tu acceso de prueba y compartiremos los detalles del plan escolar — $39/trimestre, precio de distrito bajo solicitud."
+        "text": "Regístrate como maestro para iniciar tu propia prueba gratuita de Teacher Pro de 14 días. ¿Vas a implementarlo en toda una clase o escuela? Completa el formulario en esta página con tu rol, escuela y número aproximado de estudiantes, y te contactaremos sobre el plan de clase o una cotización para tu escuela o distrito."
       }
     },
     {
@@ -49,7 +49,7 @@
       "name": "¿En qué se diferencia de Kahoot, Gimkit o Quizlet?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Esas son herramientas de cuestionarios/tarjetas que limitan sus niveles gratuitos y priorizan el inglés. LexiClash es un juego de construcción de palabras (no opción múltiple), admite seis idiomas incluido hebreo RTL, no tiene límite de jugadores durante la prueba y ofrece verdaderos duelos 1v1."
+        "text": "Esas son herramientas de cuestionarios/tarjetas que priorizan el inglés. LexiClash es un juego de construcción de palabras (no opción múltiple), admite seis idiomas incluido hebreo RTL, permite que una clase completa de hasta 50 estudiantes juegue gratis, y ofrece verdaderos duelos 1v1."
       }
     },
     {
@@ -73,7 +73,7 @@
       "name": "¿Funciona LexiClash en Chromebooks y dispositivos escolares?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sí. LexiClash se ejecuta completamente en el navegador — sin aplicación que instalar, sin cuentas de estudiante que crear. Funciona en Chromebooks, iPads, computadoras de escritorio y teléfonos. Los estudiantes se unen con un código de juego. Los planes escolares admiten Clever, ClassLink e inicio de sesión con Google (SSO) para cuentas de maestro."
+        "text": "Sí. LexiClash se ejecuta completamente en el navegador — sin aplicación que instalar, sin cuentas de estudiante que crear. Funciona en Chromebooks, iPads, computadoras de escritorio y teléfonos. Los estudiantes se unen con un código de juego, y los maestros pueden compartir tareas directamente en Google Classroom. El SSO de distrito (Clever, ClassLink) está en nuestra hoja de ruta."
       }
     }
   ]
