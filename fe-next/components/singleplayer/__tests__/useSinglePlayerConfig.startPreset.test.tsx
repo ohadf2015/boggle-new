@@ -16,7 +16,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 vi.mock('@/contexts/MusicContext', () => ({
-  useMusic: () => ({ unlockAudio: vi.fn() }),
+  useMusic: () => ({ unlockAudio: vi.fn(), stopMusic: vi.fn() }),
 }));
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: false, profile: null }),
