@@ -16,23 +16,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          version: latest
-
-      - name: Link Supabase Project
-        working-directory: fe-next/supabase
-        run: supabase link --project-ref hdtmpkicuxvtmvrmtybx
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          node-version: 22
 
       - name: Run Database Migrations
-        working-directory: fe-next/supabase
-        run: supabase db push
+        # Management-API migrator (forward-only watermark over
+        # supabase_migrations.schema_migrations). Replaces `supabase db push`,
+        # which hard-fails on the remote/local ledger drift and needs
+        # SUPABASE_DB_PASSWORD. See fe-next/scripts/apply-supabase-migrations.mjs.
+        run: node fe-next/scripts/apply-supabase-migrations.mjs
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
 
       - name: Migration Summary
         if: always()
