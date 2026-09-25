@@ -47,9 +47,19 @@ describe('Privacy policy content', () => {
     // The required verbatim disclosure + link, unmodified, in every locale.
     expect(flat).toContain(GOOGLE_CLAUSE);
     expect(flat).toContain(GOOGLE_CLAUSE_URL);
-    // Roster/email handling, token lifetime, and revoke instructions must all be covered.
-    expect(flat).toContain('myaccount.google.com/permissions');
+    // Roster/email handling, token lifetime, and revoke instructions must all be covered,
+    // and the revoke link must be a real, linkifiable https:// URL (not a bare domain).
+    expect(flat).toContain('https://myaccount.google.com/permissions');
     expect(flat.toLowerCase()).toContain('aes-256-gcm');
+  });
+
+  it.each(LOCALES)('%s describes the actual self-declared age gate, not an unused parental-consent record', (locale) => {
+    const flat = JSON.stringify(contentByLocale[locale]);
+    // hooks/useParentalConsent.ts is never mounted anywhere in the app (confirmed by grep) —
+    // the policy must not claim it as an active practice. See lib/families/socialPolicy.ts /
+    // components/families/AgeGateModal.tsx for the mechanism that IS live.
+    expect(flat.toLowerCase()).not.toContain('parental-consent record');
+    expect(flat).toContain('lexiclash.game@gmail.com');
   });
 
   it.each(LOCALES)('%s mentions the real support contact address', (locale) => {
