@@ -59,7 +59,7 @@ describe('dailyModes registry', () => {
   // onto the SPA daily route, so the href is a plain locale-prefixed path now.
   it('prefixes the locale on the daily route href', () => {
     const tower = DAILY_MODES.find((m) => m.id === 'word-tower')!;
-    expect(dailyModeHref(tower, 'he')).toBe('/he/daily/word-tower');
+    expect(dailyModeHref(tower, 'he')).toBe('/he/word-tower/daily');
   });
 
   it('every mode carries i18n title + desc keys', () => {

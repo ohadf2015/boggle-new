@@ -20,8 +20,8 @@ const cases: Array<{ name: string; load: () => Promise<any>; params: Record<stri
   { name: '/brain/drills/memory-hunt', load: () => import('../[locale]/brain/drills/memory-hunt/page'), params: { locale: 'en' } },
   { name: '/brain/drills/rare-gems', load: () => import('../[locale]/brain/drills/rare-gems/page'), params: { locale: 'en' } },
   { name: '/word-of-the-day/[date]', load: () => import('../[locale]/word-of-the-day/[date]/page'), params: { locale: 'en', date: '2026-03-05' } },
-  // BETA-gated: PageClient redirects non-beta users → wall for reviewer/crawler.
-  { name: '/adventure', load: () => import('../[locale]/adventure/page'), params: { locale: 'en' } },
+  // /adventure left this list at GA (2026-09-25): public, with per-locale crawlable
+  // content + VideoGame/Breadcrumb JSON-LD server-rendered (app/[locale]/adventure/page.test.tsx).
 ];
 
 describe('thin game-shell pages are noindexed (AdSense remediation)', () => {
