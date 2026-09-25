@@ -14428,6 +14428,18 @@ const he = {
       "viewStudents": "צפה בתלמידים",
       "viewVocabulary": "צפה באוצר מילים",
       "vocabularyMastery": "שליטה באוצר מילים",
+      "wordMastery": {
+        "title": "מגמות שליטה במילים",
+        "subtitle": "אילו מילים נקלטות ואילו דורשות חזרה נוספת",
+        "mastered": "נשלט",
+        "improving": "משתפר",
+        "stuck": "תקוע",
+        "reteachTitle": "כדאי לחזור על אלה",
+        "reteachEmpty": "אין כרגע מילים שדורשות חזרה",
+        "studentsStuck": "{{stuck}}/{{total}} תלמידים",
+        "emptyTitle": "עדיין אין מספיק נתונים",
+        "emptyHint": "שחקו עוד כמה משחקי שיעור כדי שמגמות השליטה יופיעו"
+      },
       "yesterday": "אתמול"
     },
     "classroomGame": {

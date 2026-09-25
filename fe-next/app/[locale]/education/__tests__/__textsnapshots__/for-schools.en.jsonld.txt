@@ -9,7 +9,7 @@
       "name": "Is LexiClash free for teachers?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Every teacher gets a full 30-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $39/term."
+        "text": "Every teacher gets a full 14-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $39/term."
       }
     },
     {

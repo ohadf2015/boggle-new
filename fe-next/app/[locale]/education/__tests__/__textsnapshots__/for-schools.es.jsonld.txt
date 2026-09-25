@@ -9,7 +9,7 @@
       "name": "¿Es LexiClash gratis para maestros?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Cada maestro obtiene una prueba completa de 30 días: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares — que agregan paneles de administración, análisis, bibliotecas de contenido curricular y un entorno sin anuncios — comienzan en $39/trimestre."
+        "text": "Cada maestro obtiene una prueba completa de 14 días: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares — que agregan paneles de administración, análisis, bibliotecas de contenido curricular y un entorno sin anuncios — comienzan en $39/trimestre."
       }
     },
     {

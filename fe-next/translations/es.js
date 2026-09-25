@@ -14522,6 +14522,18 @@ const es = {
       "viewStudents": "Estudiantes",
       "viewVocabulary": "Vocabulario",
       "vocabularyMastery": "Dominio de vocabulario",
+      "wordMastery": {
+        "title": "Tendencias de dominio de palabras",
+        "subtitle": "Qué palabras se están afianzando y cuáles necesitan repaso",
+        "mastered": "Dominada",
+        "improving": "Mejorando",
+        "stuck": "Estancada",
+        "reteachTitle": "Repasar estas",
+        "reteachEmpty": "No hay palabras que necesiten repaso ahora mismo",
+        "studentsStuck": "{{stuck}}/{{total}} estudiantes",
+        "emptyTitle": "Aún no hay suficientes datos",
+        "emptyHint": "Jueguen algunas partidas de lección más para que aparezcan las tendencias de dominio"
+      },
       "yesterday": "Ayer"
     },
     "classroomGame": {

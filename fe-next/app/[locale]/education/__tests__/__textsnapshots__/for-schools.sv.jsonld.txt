@@ -9,7 +9,7 @@
       "name": "Är LexiClash gratis för lärare?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Varje lärare får en fullständig 30-dagars provperiod: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir det grundläggande klassrumsspelet gratis för enskilda lärare. Skolplaner — som lägger till administratörsöversikter, statistik, läroplansbibliotek och en annonsfri miljö — börjar på $39/termin."
+        "text": "Varje lärare får en fullständig 14-dagars provperiod: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir det grundläggande klassrumsspelet gratis för enskilda lärare. Skolplaner — som lägger till administratörsöversikter, statistik, läroplansbibliotek och en annonsfri miljö — börjar på $39/termin."
       }
     },
     {

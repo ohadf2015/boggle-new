@@ -3,6 +3,7 @@
 import React, { useCallback, useRef } from 'react';
 import { ClipboardPaste } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const JOIN_CODE_LENGTH = 6;
 
@@ -50,6 +51,7 @@ export function JoinCodeField({
   onComplete,
   onPaste,
 }: JoinCodeFieldProps) {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const cells = Array.from({ length: JOIN_CODE_LENGTH }, (_, i) => value[i] ?? '');
   const activeIndex = Math.min(value.length, JOIN_CODE_LENGTH - 1);
@@ -106,8 +108,8 @@ export function JoinCodeField({
             type="button"
             onClick={onPaste}
             className="flex shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light p-2.5 text-neo-cyan shadow-hard transition-transform active:translate-y-0.5 sm:p-3"
-            aria-label="Paste code"
-            title="Paste code from clipboard"
+            aria-label={t('joinView.pasteCode')}
+            title={t('joinView.pasteCode')}
           >
             <ClipboardPaste className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>

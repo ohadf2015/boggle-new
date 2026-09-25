@@ -50,18 +50,18 @@ export interface ForSchoolsContent {
 const EN: ForSchoolsContent = {
   metaTitle: 'Free Vocabulary & ESL Word Games for Schools — LexiClash',
   metaDescription:
-    'Vocabulary games and ESL spelling practice for K-12 classrooms — no student logins, 6 languages (English, Hebrew, Spanish, Swedish, Japanese, Russian), 1v1 word duels and whole-class play. Free 30-day trial for teachers. School plans from $39/term.',
+    'Vocabulary games and ESL spelling practice for K-12 classrooms — no student logins, 6 languages (English, Hebrew, Spanish, Swedish, Japanese, Russian), 1v1 word duels and whole-class play. Free 14-day trial for teachers. School plans from $39/term.',
   ogTitle: 'LexiClash for Schools — Vocabulary & ESL Word Games',
   ogDescription:
-    'Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels. Free 30-day trial. School plans from $39/term.',
+    'Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels. Free 14-day trial. School plans from $39/term.',
   heroTag: 'For Schools & Districts',
   heroH1: 'Vocabulary games your whole school can',
   heroHighlight: 'actually use',
   heroSubtitle:
-    'Try LexiClash free for 30 days -- no student logins, no credit card, no ads in class. 6 languages including Hebrew RTL, live whole-class play, and 1v1 word duels. Individual teachers keep basic access free after trial; school and district plans scale from there.',
+    'Try LexiClash free for 14 days -- no student logins, no credit card, no ads in class. 6 languages including Hebrew RTL, live whole-class play, and 1v1 word duels. Individual teachers keep basic access free after trial; school and district plans scale from there.',
   freeForeverTitle: 'Start free -- school plans from $39/term',
   freeForeverBody:
-    'Every teacher gets a full 30-day trial: no student logins, no player cap, no credit card. After your trial, the basic classroom game stays free for individual teachers. School plans add admin dashboards, cross-class analytics, curriculum libraries, an ad-free environment, and SSO -- starting at $39/term.',
+    'Every teacher gets a full 14-day trial: no student logins, no player cap, no credit card. After your trial, the basic classroom game stays free for individual teachers. School plans add admin dashboards, cross-class analytics, curriculum libraries, an ad-free environment, and SSO -- starting at $39/term.',
   whyTitle: 'Why schools choose LexiClash',
   why: [
     { title: 'No student logins', body: 'Students join a class game with a code -- no accounts to provision, no rostering before you can play, no student data to manage.' },
@@ -93,7 +93,7 @@ const EN: ForSchoolsContent = {
     "Using LexiClash with your class, or thinking about rolling it out wider? Tell us about your school or district and what you need -- we'll be in touch about your trial, school plan pricing ($39/term), or early access to district features.",
   faqTitle: 'Schools & districts -- frequently asked',
   faqs: [
-    { q: 'Is LexiClash free for teachers?', a: 'Every teacher gets a full 30-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $39/term.' },
+    { q: 'Is LexiClash free for teachers?', a: 'Every teacher gets a full 14-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $39/term.' },
     { q: 'What does a school or district plan include?', a: 'School plans ($39/term) add the features that scale: a district admin dashboard, cross-class analytics and reporting, curated curriculum content libraries, an ad-free school environment, and SSO (Clever / ClassLink / Google). The basic classroom game stays free -- plans layer on top, never gate it.' },
     { q: 'Do students need accounts or logins?', a: 'No. Students join a class game with a code -- nothing to provision, no student data to manage. That makes a school-wide rollout far simpler than tools that require rostering or SSO before play.' },
     { q: 'Which languages are supported?', a: 'English, Hebrew (full right-to-left support), Spanish, Swedish, Japanese and Russian, each with a native dictionary -- built for ESL, bilingual and immersion classrooms.' },
@@ -112,7 +112,7 @@ const EN: ForSchoolsContent = {
 const RU: ForSchoolsContent = {
   metaTitle: 'Бесплатные игры на словарный запас для школ — LexiClash',
   metaDescription:
-    'Игры для изучения лексики и английского языка в школах — без входа ученика, 6 языков (английский, иврит, испанский, шведский, японский, русский), словесные поединки 1 на 1 и командные игры. Бесплатный пробный период 30 дней для учителей. Школьные планы от $39 за семестр.',
+    'Игры для изучения лексики и английского языка в школах — без входа ученика, 6 языков (английский, иврит, испанский, шведский, японский, русский), словесные поединки 1 на 1 и командные игры. Бесплатный пробный период 14 дней для учителей. Школьные планы от $39 за семестр.',
   ogTitle: 'LexiClash для школ — игры на словарный запас',
   ogDescription:
     'Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1. Бесплатный пробный период. Школьные планы от $39 за семестр.',
@@ -120,10 +120,10 @@ const RU: ForSchoolsContent = {
   heroH1: 'Словесные игры, которые ваша школа действительно может',
   heroHighlight: 'использовать',
   heroSubtitle:
-    'Попробуйте LexiClash бесплатно 30 дней — без входа для учеников, без кредитной карты, без рекламы на уроках. 6 языков, включая иврит с поддержкой RTL, командные игры в реальном времени и поединки 1 на 1. Учителя сохраняют базовый доступ бесплатно после пробного периода; школьные и районные планы начинаются отсюда.',
+    'Попробуйте LexiClash бесплатно 14 дней — без входа для учеников, без кредитной карты, без рекламы на уроках. 6 языков, включая иврит с поддержкой RTL, командные игры в реальном времени и поединки 1 на 1. Учителя сохраняют базовый доступ бесплатно после пробного периода; школьные и районные планы начинаются отсюда.',
   freeForeverTitle: 'Начните бесплатно — школьные планы от $39 за семестр',
   freeForeverBody:
-    'Каждый учитель получает полный пробный период на 30 дней: без входа для учеников, без ограничения количества игроков, без кредитной карты. После пробного периода базовая командная игра остается бесплатной для учителей. Школьные планы добавляют панель администратора, аналитику по классам, библиотеки учебных материалов, среду без рекламы и SSO — начиная с $39 за семестр.',
+    'Каждый учитель получает полный пробный период на 14 дней: без входа для учеников, без ограничения количества игроков, без кредитной карты. После пробного периода базовая командная игра остается бесплатной для учителей. Школьные планы добавляют панель администратора, аналитику по классам, библиотеки учебных материалов, среду без рекламы и SSO — начиная с $39 за семестр.',
   whyTitle: 'Почему школы выбирают LexiClash',
   why: [
     { title: 'Без входа для учеников', body: 'Ученики присоединяются к командной игре по коду — не нужно создавать аккаунты, не нужна регистрация класса перед началом игры, не нужно управлять данными учеников.' },
@@ -155,7 +155,7 @@ const RU: ForSchoolsContent = {
     'Используете LexiClash в вашем классе или планируете расширить использование? Расскажите нам о своей школе или районе и о том, что вам нужно — мы свяжемся с вами по поводу вашего пробного периода, школьного плана ($39 за семестр) или раннего доступа к функциям района.',
   faqTitle: 'Часто задаваемые вопросы школ и районов',
   faqs: [
-    { q: 'LexiClash бесплатен для учителей?', a: 'Каждый учитель получает полный пробный период на 30 дней: командные игры, поединки 1 на 1, все шесть языков, без рекламы, без входа для учеников, без кредитной карты. После пробного периода базовая командная игра остается бесплатной для отдельных учителей. Школьные планы — которые добавляют панели администратора, аналитику, библиотеки материалов и среду без рекламы — начинаются с $39 за семестр.' },
+    { q: 'LexiClash бесплатен для учителей?', a: 'Каждый учитель получает полный пробный период на 14 дней: командные игры, поединки 1 на 1, все шесть языков, без рекламы, без входа для учеников, без кредитной карты. После пробного периода базовая командная игра остается бесплатной для отдельных учителей. Школьные планы — которые добавляют панели администратора, аналитику, библиотеки материалов и среду без рекламы — начинаются с $39 за семестр.' },
     { q: 'Что включают школьный или районный план?', a: 'Школьные планы ($39 за семестр) добавляют функции, которые масштабируются: панель администратора района, аналитика и отчеты между классами, библиотеки отобранных учебных материалов, безрекламную школьную среду и SSO (Clever / ClassLink / Google). Базовая командная игра остается бесплатной — планы надстраиваются, никогда не блокируя.' },
     { q: 'Нужны ли учащимся аккаунты или вход?', a: 'Нет. Ученики присоединяются к командной игре по коду — не нужно ничего настраивать, не нужно управлять данными учеников. Это делает развертывание по всей школе намного проще, чем инструменты, которые требуют регистрации или SSO перед игрой.' },
     { q: 'Какие языки поддерживаются?', a: 'Английский, иврит (с полной поддержкой справа налево), испанский, шведский, японский и русский, каждый со встроенным словарем — разработано для ESL, двуязычных и погруженных в языковую среду классов.' },
@@ -174,18 +174,18 @@ const RU: ForSchoolsContent = {
 const HE: ForSchoolsContent = {
   metaTitle: 'משחקי אוצר מילים ואנגלית לבתי ספר — חינם | LexiClash',
   metaDescription:
-    'משחקי אוצר מילים ותרגול איות לכיתות — בלי חשבונות תלמידים, 6 שפות (אנגלית, עברית, ספרדית, שוודית, יפנית, רוסית), דו-קרבות מילים 1 על 1 ומשחק כיתתי. ניסיון חינם ל-30 יום למורים. תוכניות בית ספר החל מ-$39 לסמסטר.',
+    'משחקי אוצר מילים ותרגול איות לכיתות — בלי חשבונות תלמידים, 6 שפות (אנגלית, עברית, ספרדית, שוודית, יפנית, רוסית), דו-קרבות מילים 1 על 1 ומשחק כיתתי. ניסיון חינם ל-14 יום למורים. תוכניות בית ספר החל מ-$39 לסמסטר.',
   ogTitle: 'LexiClash לבתי ספר — משחקי אוצר מילים ואנגלית',
   ogDescription:
-    'משחקי מילים חינם לכל כיתה — בלי חשבונות תלמידים, 6 שפות, דו-קרבות 1 על 1. ניסיון חינם ל-30 יום. תוכניות בית ספר החל מ-$39 לסמסטר.',
+    'משחקי מילים חינם לכל כיתה — בלי חשבונות תלמידים, 6 שפות, דו-קרבות 1 על 1. ניסיון חינם ל-14 יום. תוכניות בית ספר החל מ-$39 לסמסטר.',
   heroTag: 'לבתי ספר ורשויות חינוך',
   heroH1: 'משחקי אוצר מילים שכל בית הספר שלכם',
   heroHighlight: 'באמת ישתמש בהם',
   heroSubtitle:
-    'נסו את LexiClash חינם ל-30 יום — בלי חשבונות תלמידים, בלי כרטיס אשראי, בלי פרסומות בכיתה. 6 שפות כולל עברית מימין לשמאל, משחק כיתתי חי ודו-קרבות מילים 1 על 1. מורים בודדים ממשיכים עם גישה בסיסית חינם גם אחרי הניסיון; תוכניות בית ספר ורשות מתרחבות משם.',
+    'נסו את LexiClash חינם ל-14 יום — בלי חשבונות תלמידים, בלי כרטיס אשראי, בלי פרסומות בכיתה. 6 שפות כולל עברית מימין לשמאל, משחק כיתתי חי ודו-קרבות מילים 1 על 1. מורים בודדים ממשיכים עם גישה בסיסית חינם גם אחרי הניסיון; תוכניות בית ספר ורשות מתרחבות משם.',
   freeForeverTitle: 'מתחילים חינם — תוכניות בית ספר החל מ-$39 לסמסטר',
   freeForeverBody:
-    'כל מורה מקבל ניסיון מלא של 30 יום: בלי חשבונות תלמידים, בלי הגבלת מספר שחקנים, בלי כרטיס אשראי. בתום הניסיון, המשחק הכיתתי הבסיסי נשאר חינם למורים בודדים. תוכניות בית ספר מוסיפות לוחות ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי, סביבה נטולת פרסומות והתחברות מאוחדת (SSO) — החל מ-$39 לסמסטר.',
+    'כל מורה מקבל ניסיון מלא של 14 יום: בלי חשבונות תלמידים, בלי הגבלת מספר שחקנים, בלי כרטיס אשראי. בתום הניסיון, המשחק הכיתתי הבסיסי נשאר חינם למורים בודדים. תוכניות בית ספר מוסיפות לוחות ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי, סביבה נטולת פרסומות והתחברות מאוחדת (SSO) — החל מ-$39 לסמסטר.',
   whyTitle: 'למה בתי ספר בוחרים ב-LexiClash',
   why: [
     { title: 'בלי חשבונות תלמידים', body: 'התלמידים מצטרפים למשחק כיתתי עם קוד — אין חשבונות להקים, אין רישום כיתה לפני שמתחילים לשחק, אין נתוני תלמידים לנהל.' },
@@ -217,7 +217,7 @@ const HE: ForSchoolsContent = {
     'כבר משתמשים ב-LexiClash בכיתה, או שוקלים להרחיב את זה? ספרו לנו על בית הספר או הרשות שלכם ומה אתם צריכים — נחזור אליכם בנוגע לניסיון, למחיר תוכנית בית הספר ($39 לסמסטר) או לגישה מוקדמת ליכולות הרשות.',
   faqTitle: 'בתי ספר ורשויות — שאלות נפוצות',
   faqs: [
-    { q: 'האם LexiClash חינם למורים?', a: 'כל מורה מקבל ניסיון מלא של 30 יום: משחק כיתתי, דו-קרבות 1 על 1, כל חמש השפות, בלי פרסומות, בלי חשבונות תלמידים, בלי כרטיס אשראי. בתום הניסיון, המשחק הכיתתי הבסיסי נשאר חינם למורים בודדים. תוכניות בית ספר — שמוסיפות לוחות ניהול, ניתוח נתונים, ספריות תוכן לימודי וסביבה נטולת פרסומות — מתחילות ב-$39 לסמסטר.' },
+    { q: 'האם LexiClash חינם למורים?', a: 'כל מורה מקבל ניסיון מלא של 14 יום: משחק כיתתי, דו-קרבות 1 על 1, כל חמש השפות, בלי פרסומות, בלי חשבונות תלמידים, בלי כרטיס אשראי. בתום הניסיון, המשחק הכיתתי הבסיסי נשאר חינם למורים בודדים. תוכניות בית ספר — שמוסיפות לוחות ניהול, ניתוח נתונים, ספריות תוכן לימודי וסביבה נטולת פרסומות — מתחילות ב-$39 לסמסטר.' },
     { q: 'מה כוללת תוכנית בית ספר או רשות?', a: 'תוכניות בית ספר ($39 לסמסטר) מוסיפות את היכולות שמתרחבות: לוח ניהול לרשות, ניתוח נתונים ודוחות בין כיתות, ספריות תוכן לימודי אצורות, סביבת בית ספר נטולת פרסומות ו-SSO (Clever / ClassLink / Google). המשחק הכיתתי הבסיסי נשאר חינם — התוכניות נבנות מעליו, לעולם לא חוסמות אותו.' },
     { q: 'האם תלמידים צריכים חשבונות או התחברות?', a: 'לא. התלמידים מצטרפים למשחק כיתתי עם קוד — אין מה להקים, אין נתוני תלמידים לנהל. זה הופך הטמעה בכל בית הספר להרבה יותר פשוטה מכלים שדורשים רישום או SSO לפני שמשחקים.' },
     { q: 'אילו שפות נתמכות?', a: 'אנגלית, עברית (תמיכה מלאה מימין לשמאל), ספרדית, שוודית, יפנית ורוסית, כל אחת עם מילון מובנה — בנוי לכיתות ESL, דו-לשוניות וטבילה לשונית.' },
@@ -236,7 +236,7 @@ const HE: ForSchoolsContent = {
 const SV: ForSchoolsContent = {
   metaTitle: 'Gratis ordförråds- och ESL-ordspel för skolor — LexiClash',
   metaDescription:
-    'Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel. Gratis 30-dagars provperiod för lärare. Skolplaner från $39/termin.',
+    'Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel. Gratis 14-dagars provperiod för lärare. Skolplaner från $39/termin.',
   ogTitle: 'LexiClash för skolor — Ordförråds- och ESL-ordspel',
   ogDescription:
     'Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 6 språk, 1v1-dueller. Gratis provperiod. Skolplaner från $39/termin.',
@@ -244,10 +244,10 @@ const SV: ForSchoolsContent = {
   heroH1: 'Ordspel som din skola faktiskt kan',
   heroHighlight: 'använda',
   heroSubtitle:
-    'Prova LexiClash gratis i 30 dagar — utan inloggning för elever, utan kreditkort, utan annonser i klassrummet. 6 språk inklusive hebreiska RTL, direktsänt klassomfattande spel och 1v1-orddueller. Enskilda lärare behåller gratis basåtkomst efter provperioden; skol- och distriktsplaner skalar därifrån.',
+    'Prova LexiClash gratis i 14 dagar — utan inloggning för elever, utan kreditkort, utan annonser i klassrummet. 6 språk inklusive hebreiska RTL, direktsänt klassomfattande spel och 1v1-orddueller. Enskilda lärare behåller gratis basåtkomst efter provperioden; skol- och distriktsplaner skalar därifrån.',
   freeForeverTitle: 'Börja gratis — skolplaner från $39/termin',
   freeForeverBody:
-    'Varje lärare får en fullständig 30-dagars provperiod: ingen inloggning för elever, ingen spelargräns, inget kreditkort. Efter provperioden förblir det grundläggande klassrumsspelet gratis för enskilda lärare. Skolplaner lägger till administratörsöversikter, statistik över klasser, läroplansbibliotek, en annonsfri miljö och SSO — från $39/termin.',
+    'Varje lärare får en fullständig 14-dagars provperiod: ingen inloggning för elever, ingen spelargräns, inget kreditkort. Efter provperioden förblir det grundläggande klassrumsspelet gratis för enskilda lärare. Skolplaner lägger till administratörsöversikter, statistik över klasser, läroplansbibliotek, en annonsfri miljö och SSO — från $39/termin.',
   whyTitle: 'Varför skolor väljer LexiClash',
   why: [
     { title: 'Ingen inloggning för elever', body: 'Eleverna ansluter till ett klassrumsspel med en kod — inga konton att skapa, ingen klasslista innan ni kan spela, inga elevdata att hantera.' },
@@ -279,7 +279,7 @@ const SV: ForSchoolsContent = {
     'Använder du LexiClash med din klass eller tänker du på att rulla ut det bredare? Berätta om din skola eller ditt distrikt och vad du behöver — vi hör av oss om din provperiod, skolplanspriser ($39/termin) eller tidig åtkomst till distriktsfunktioner.',
   faqTitle: 'Skolor och distrikt — vanliga frågor',
   faqs: [
-    { q: 'Är LexiClash gratis för lärare?', a: 'Varje lärare får en fullständig 30-dagars provperiod: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir det grundläggande klassrumsspelet gratis för enskilda lärare. Skolplaner — som lägger till administratörsöversikter, statistik, läroplansbibliotek och en annonsfri miljö — börjar på $39/termin.' },
+    { q: 'Är LexiClash gratis för lärare?', a: 'Varje lärare får en fullständig 14-dagars provperiod: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir det grundläggande klassrumsspelet gratis för enskilda lärare. Skolplaner — som lägger till administratörsöversikter, statistik, läroplansbibliotek och en annonsfri miljö — börjar på $39/termin.' },
     { q: 'Vad inkluderar en skol- eller distriktsplan?', a: 'Skolplaner ($39/termin) lägger till funktioner som skalar: en distriktsadministratörs instrumentpanel, tvärklassanalys och rapportering, kurerade läroplansbibliotek, en annonsfri skolmiljö och SSO (Clever / ClassLink / Google). Det grundläggande klassrumsspelet förblir gratis — planerna byggs ovanpå, aldrig som en spärr.' },
     { q: 'Behöver eleverna konton eller inloggning?', a: 'Nej. Eleverna ansluter till ett klassrumsspel med en kod — inget att skapa, inga elevdata att hantera. Det gör en skolövergripande lansering mycket enklare än verktyg som kräver klasslistor eller SSO innan man kan spela.' },
     { q: 'Vilka språk stöds?', a: 'Engelska, hebreiska (fullt höger-till-vänster-stöd), spanska, svenska, japanska och ryska, var och en med en inbyggd ordbok — byggd för ESL, tvåspråkiga och immersionsklassrum.' },
@@ -298,18 +298,18 @@ const SV: ForSchoolsContent = {
 const JA: ForSchoolsContent = {
   metaTitle: '学校向け無料語彙・ESL単語ゲーム — LexiClash',
   metaDescription:
-    'K-12クラス向けの語彙とESLスペリング練習 — 学生ログイン不要、6言語（英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語）、1v1単語決闘とクラス全体プレイ。教師向け30日間無料トライアル。学校プランは学期$39から。',
+    'K-12クラス向けの語彙とESLスペリング練習 — 学生ログイン不要、6言語（英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語）、1v1単語決闘とクラス全体プレイ。教師向け14日間無料トライアル。学校プランは学期$39から。',
   ogTitle: '学校向けLexiClash — 語彙とESL単語ゲーム',
   ogDescription:
-    'すべてのクラスルーム向け無料語彙・ESL単語ゲーム — 学生ログイン不要、6言語、1v1決闘。30日間無料トライアル。学校プランは学期$39から。',
+    'すべてのクラスルーム向け無料語彙・ESL単語ゲーム — 学生ログイン不要、6言語、1v1決闘。14日間無料トライアル。学校プランは学期$39から。',
   heroTag: '学校・学区向け',
   heroH1: 'あなたの学校が実際に',
   heroHighlight: '使える語彙ゲーム',
   heroSubtitle:
-    'LexiClashを30日間無料でお試しください — 学生ログイン不要、クレジットカード不要、授業内の広告なし。ヘブライ語RTL対応を含む6言語、ライブのクラス全体プレイ、1v1単語決闘に対応しています。トライアル後も、基本的なクラスルームゲームは個人の教師向けに無料のまま。学校・学区プランはそこから拡張できます。',
+    'LexiClashを14日間無料でお試しください — 学生ログイン不要、クレジットカード不要、授業内の広告なし。ヘブライ語RTL対応を含む6言語、ライブのクラス全体プレイ、1v1単語決闘に対応しています。トライアル後も、基本的なクラスルームゲームは個人の教師向けに無料のまま。学校・学区プランはそこから拡張できます。',
   freeForeverTitle: '無料でスタート — 学校プランは学期$39から',
   freeForeverBody:
-    'すべての教師が完全な30日間トライアルを利用できます：学生ログイン不要、プレイヤー数制限なし、クレジットカード不要。トライアル後も、基本的なクラスルームゲームは個人の教師向けに無料のままです。学校プランは管理ダッシュボード、クラス間分析、カリキュラムライブラリ、広告なし環境、SSO を追加 — 学期$39から。',
+    'すべての教師が完全な14日間トライアルを利用できます：学生ログイン不要、プレイヤー数制限なし、クレジットカード不要。トライアル後も、基本的なクラスルームゲームは個人の教師向けに無料のままです。学校プランは管理ダッシュボード、クラス間分析、カリキュラムライブラリ、広告なし環境、SSO を追加 — 学期$39から。',
   whyTitle: 'なぜ学校がLexiClashを選ぶのか',
   why: [
     { title: '学生ログイン不要', body: '学生はコードでクラスゲームに参加 — アカウント作成不要、プレイ前の名簿登録不要、学生データの管理も不要です。' },
@@ -341,7 +341,7 @@ const JA: ForSchoolsContent = {
     'すでにクラスでLexiClashを使っていますか、それとももっと広く導入することを検討していますか？あなたの学校または学区と、必要なことについて教えてください — トライアル、学校プラン（学期$39）、または学区向け機能の早期アクセスについてご連絡します。',
   faqTitle: '学校・学区 — よくある質問',
   faqs: [
-    { q: 'LexiClashは教師にとって無料ですか？', a: 'すべての教師が完全な30日間トライアルを利用できます：クラス全体プレイ、1v1決闘、6言語すべて、広告なし、学生ログイン不要、クレジットカード不要。トライアル後も、基本的なクラスルームゲームは個人の教師向けに無料のままです。学校プラン — 管理ダッシュボード、分析、カリキュラムライブラリ、広告なし環境を追加 — は学期$39から。' },
+    { q: 'LexiClashは教師にとって無料ですか？', a: 'すべての教師が完全な14日間トライアルを利用できます：クラス全体プレイ、1v1決闘、6言語すべて、広告なし、学生ログイン不要、クレジットカード不要。トライアル後も、基本的なクラスルームゲームは個人の教師向けに無料のままです。学校プラン — 管理ダッシュボード、分析、カリキュラムライブラリ、広告なし環境を追加 — は学期$39から。' },
     { q: '学校または学区プランには何が含まれますか？', a: '学校プラン（学期$39）は、規模を拡大するための機能を追加します：学区管理ダッシュボード、クラス間の分析とレポート、厳選されたカリキュラムコンテンツライブラリ、広告のない学校環境、SSO（Clever / ClassLink / Google）。基本的なクラスルームゲームは無料のまま — プランは上に積み重ねられ、決して制限しません。' },
     { q: '学生にアカウントやログインは必要ですか？', a: 'いいえ。学生はコードでクラスゲームに参加します — 何も用意する必要がなく、学生データを管理する必要もありません。これにより、名簿登録やプレイ前のSSOを必要とするツールよりも、学校全体への展開がはるかに簡単になります。' },
     { q: 'どの言語に対応していますか？', a: '英語、ヘブライ語（完全なRTLサポート）、スペイン語、スウェーデン語、日本語、ロシア語 — それぞれネイティブ辞書を完備し、ESL、バイリンガル、イマージョンのクラスルーム向けです。' },
@@ -360,18 +360,18 @@ const JA: ForSchoolsContent = {
 const ES: ForSchoolsContent = {
   metaTitle: 'Juegos de vocabulario y ESL gratis para escuelas — LexiClash',
   metaDescription:
-    'Juegos de vocabulario y práctica de ortografía en inglés para aulas K-12 — sin inicios de sesión de estudiantes, 6 idiomas (inglés, hebreo, español, sueco, japonés, ruso), duelos de palabras 1v1 y juego en clase completo. Prueba gratis por 30 días para maestros. Planes escolares desde $39/trimestre.',
+    'Juegos de vocabulario y práctica de ortografía en inglés para aulas K-12 — sin inicios de sesión de estudiantes, 6 idiomas (inglés, hebreo, español, sueco, japonés, ruso), duelos de palabras 1v1 y juego en clase completo. Prueba gratis por 14 días para maestros. Planes escolares desde $39/trimestre.',
   ogTitle: 'LexiClash para escuelas — Juegos de vocabulario y ESL',
   ogDescription:
-    'Juegos de vocabulario y ESL gratis para cada aula — sin inicios de sesión de estudiantes, 6 idiomas, duelos 1v1. Prueba gratis por 30 días. Planes escolares desde $39/trimestre.',
+    'Juegos de vocabulario y ESL gratis para cada aula — sin inicios de sesión de estudiantes, 6 idiomas, duelos 1v1. Prueba gratis por 14 días. Planes escolares desde $39/trimestre.',
   heroTag: 'Para escuelas y distritos',
   heroH1: 'Juegos de vocabulario que toda tu escuela puede',
   heroHighlight: 'usar de verdad',
   heroSubtitle:
-    'Prueba LexiClash gratis por 30 días — sin inicios de sesión de estudiantes, sin tarjeta de crédito, sin anuncios en clase. 6 idiomas incluido hebreo RTL, juego en vivo con toda la clase y duelos de palabras 1v1. Los maestros individuales mantienen el acceso básico gratis después de la prueba; los planes de escuela y distrito escalan desde ahí.',
+    'Prueba LexiClash gratis por 14 días — sin inicios de sesión de estudiantes, sin tarjeta de crédito, sin anuncios en clase. 6 idiomas incluido hebreo RTL, juego en vivo con toda la clase y duelos de palabras 1v1. Los maestros individuales mantienen el acceso básico gratis después de la prueba; los planes de escuela y distrito escalan desde ahí.',
   freeForeverTitle: 'Empieza gratis — planes escolares desde $39/trimestre',
   freeForeverBody:
-    'Cada maestro obtiene una prueba completa de 30 días: sin inicios de sesión de estudiantes, sin límite de jugadores, sin tarjeta de crédito. Después de tu prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares agregan paneles de administración, análisis entre clases, bibliotecas de currículo, un entorno sin anuncios y SSO — desde $39/trimestre.',
+    'Cada maestro obtiene una prueba completa de 14 días: sin inicios de sesión de estudiantes, sin límite de jugadores, sin tarjeta de crédito. Después de tu prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares agregan paneles de administración, análisis entre clases, bibliotecas de currículo, un entorno sin anuncios y SSO — desde $39/trimestre.',
   whyTitle: 'Por qué las escuelas eligen LexiClash',
   why: [
     { title: 'Sin inicios de sesión de estudiantes', body: 'Los estudiantes se unen a un juego de clase con un código — sin cuentas que crear, sin registro de clase antes de jugar, sin datos de estudiantes que gestionar.' },
@@ -403,7 +403,7 @@ const ES: ForSchoolsContent = {
     '¿Ya usas LexiClash con tu clase o estás pensando en implementarlo a mayor escala? Cuéntanos sobre tu escuela o distrito y qué necesitas — nos pondremos en contacto sobre tu prueba, el precio del plan escolar ($39/trimestre) o el acceso anticipado a funciones de distrito.',
   faqTitle: 'Escuelas y distritos — preguntas frecuentes',
   faqs: [
-    { q: '¿Es LexiClash gratis para maestros?', a: 'Cada maestro obtiene una prueba completa de 30 días: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares — que agregan paneles de administración, análisis, bibliotecas de contenido curricular y un entorno sin anuncios — comienzan en $39/trimestre.' },
+    { q: '¿Es LexiClash gratis para maestros?', a: 'Cada maestro obtiene una prueba completa de 14 días: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares — que agregan paneles de administración, análisis, bibliotecas de contenido curricular y un entorno sin anuncios — comienzan en $39/trimestre.' },
     { q: '¿Qué incluyen los planes escolares o de distrito?', a: 'Los planes escolares ($39/trimestre) agregan las funciones que escalan: un panel de administración de distrito, análisis y reportes entre clases, bibliotecas de contenido curricular curadas, un entorno escolar sin anuncios y SSO (Clever / ClassLink / Google). El juego básico de aula sigue siendo gratis — los planes se superponen, nunca lo limitan.' },
     { q: '¿Los estudiantes necesitan cuentas o inicios de sesión?', a: 'No. Los estudiantes se unen a un juego de clase con un código — nada que crear, sin datos de estudiantes que gestionar. Eso hace que una implementación en toda la escuela sea mucho más simple que las herramientas que requieren registro o SSO antes de jugar.' },
     { q: '¿Qué idiomas son compatibles?', a: 'Inglés, hebreo (compatibilidad completa de derecha a izquierda), español, sueco, japonés y ruso, cada uno con un diccionario nativo — diseñado para aulas ESL, bilingües e inmersión de idiomas.' },

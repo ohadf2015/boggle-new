@@ -167,6 +167,12 @@ describe('AnalyticsPageClient', () => {
       render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
       expect(screen.queryByTestId('analytics-dashboard')).not.toBeInTheDocument();
+      // The per-student / lesson / vocabulary tabs ARE the analytics being sold — a free
+      // teacher reached them all by scrolling past the locked summary card.
+      expect(screen.queryByTestId('student-progress-table')).not.toBeInTheDocument();
+      expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+      // One upsell, not one per locked panel.
+      expect(screen.getAllByText('teacher.proGate.analytics.title')).toHaveLength(1);
       // The gate must SELL, not just refuse — a bare "not available" is the version of this
       // paywall that loses the sale it exists to make.
       expect(screen.getByText('teacher.proGate.analytics.title')).toBeInTheDocument();

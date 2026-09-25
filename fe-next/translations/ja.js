@@ -14573,6 +14573,18 @@ const ja = {
       "viewStudents": "生徒を見る",
       "viewVocabulary": "語彙を見る",
       "vocabularyMastery": "語彙の習熟度",
+      "wordMastery": {
+        "title": "単語習熟度の傾向",
+        "subtitle": "定着している単語と、再指導が必要な単語",
+        "mastered": "習得済み",
+        "improving": "上達中",
+        "stuck": "停滞中",
+        "reteachTitle": "再指導すべき単語",
+        "reteachEmpty": "現在、再指導が必要な単語はありません",
+        "studentsStuck": "{{stuck}}/{{total}} 人の生徒",
+        "emptyTitle": "まだデータが十分ではありません",
+        "emptyHint": "レッスンゲームをもう少しプレイすると習熟度の傾向が表示されます"
+      },
       "yesterday": "昨日"
     },
     "classroomGame": {

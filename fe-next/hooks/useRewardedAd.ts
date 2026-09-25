@@ -17,6 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { celebrateAdReward } from '@/lib/ads/rewardCelebration';
 import { trackRewardedAdOffered, trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 import type { RewardedSurface } from '@/lib/admob-config';
+import { isAdFreeRoute } from '@/lib/admob-routes';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
 
@@ -174,6 +175,11 @@ interface UseRewardedAdOptions {
   warm?: boolean;
 }
 
+function isOnAdFreeRoute(): boolean {
+  if (typeof window === 'undefined') return false;
+  return isAdFreeRoute(window.location.pathname, new URLSearchParams(window.location.search));
+}
+
 interface UseRewardedAdReturn {
   /** Current status of the ad */
   status: AdStatus;
@@ -247,7 +253,11 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(false);
   const [dailyViewCount, setDailyViewCount] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
+  // Teacher / education / student / classroom surfaces carry no ads of any kind.
+  // Read after mount (the classroom flag lives in the query) to keep hydration stable.
+  const [adFreeRoute, setAdFreeRoute] = useState(false);
   useEffect(() => {
+    setAdFreeRoute(isOnAdFreeRoute());
     setPlaceholderCooldownFlag(isPlaceholderCapped());
     setDailyViewCount(getDailyViewCount());
     setHasMounted(true);
@@ -363,6 +373,13 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       : shouldUseH5 ? 'h5-games'
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
+
+    // Live read — never fire during the pre-mount window on an ad-free surface.
+    if (isOnAdFreeRoute()) {
+      trackRewardedAdDeclined('ad_free_route', platformForDecline, telemetrySurface);
+      onAdError?.('Ads are disabled here');
+      return;
+    }
 
     // Enforce daily limit across all platforms
     if (isDailyLimitReached(rewardKind)) {
@@ -624,7 +641,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     prepareAd,
     error,
     rewardAmount,
-    canShowAd: !dailyLimitReached && !(isPlaceholder && !isDev),
+    canShowAd: !adFreeRoute && !dailyLimitReached && !(isPlaceholder && !isDev),
     viewsToday: dailyViewCount,
     maxViews: MAX_DAILY_AD_VIEWS,
     isDailyLimitReached: dailyLimitReached,

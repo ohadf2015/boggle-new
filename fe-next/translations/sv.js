@@ -14808,6 +14808,18 @@ const sv = {
       "viewStudents": "Se elever",
       "viewVocabulary": "Se ordförråd",
       "vocabularyMastery": "Ordförrådsbehärskning",
+      "wordMastery": {
+        "title": "Trender för ordbehärskning",
+        "subtitle": "Vilka ord fastnar och vilka behöver repeteras",
+        "mastered": "Behärskat",
+        "improving": "Förbättras",
+        "stuck": "Fastnat",
+        "reteachTitle": "Repetera dessa",
+        "reteachEmpty": "Inga ord behöver repeteras just nu",
+        "studentsStuck": "{{stuck}}/{{total}} elever",
+        "emptyTitle": "Inte tillräckligt med data än",
+        "emptyHint": "Spela några fler lektionsspel så visas behärskningstrender"
+      },
       "yesterday": "Igår"
     },
     "classroomGame": {

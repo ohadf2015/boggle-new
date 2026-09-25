@@ -9,6 +9,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { AlertTriangle, TrendingUp, Users, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VocabularyHeatmap } from './VocabularyHeatmap';
+import { WordMasteryCard } from './WordMasteryCard';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 
@@ -292,6 +293,12 @@ export function AnalyticsDashboard({
         <Suspense fallback={<div className="animate-pulse h-48 bg-neo-white/5 rounded-neo" />}>
           <LessonEffectivenessChart classroomId={classroomId} />
         </Suspense>
+      </div>
+
+      {/* Word Mastery Trends (Pro) — cross-session mastered/improving/stuck,
+          the trend the flat accuracy table above can't show. */}
+      <div className="mt-6">
+        <WordMasteryCard classroomId={classroomId} onCreateReviewLesson={onCreateReviewLesson} />
       </div>
 
       {/* Vocabulary Mastery Heatmap */}

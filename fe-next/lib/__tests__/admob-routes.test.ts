@@ -136,3 +136,18 @@ describe('isAdFreeRoute', () => {
     expect(isAdFreeRoute(null)).toBe(false);
   });
 });
+
+describe('teacher module is ad-free in every format', () => {
+  it('treats the class-code join (/join, /join/<code>) as ad-free', () => {
+    expect(isAdFreeRoute('/en/join')).toBe(true);
+    expect(isAdFreeRoute('/he/join/AB3K9Z')).toBe(true);
+    expect(isAdFreeRoute('/en/joinery')).toBe(false);
+  });
+
+  it('never allows the banner on any ad-free surface', () => {
+    const adFree = ['/en/teacher', '/he/education/lessons', '/student', '/en/join/X1', '/admin'];
+    for (const p of adFree) expect(isAllowedAdBannerRoute(p)).toBe(false);
+    const classroom = new URLSearchParams('room=ABC&classroom=true');
+    expect(isAllowedAdBannerRoute('/en/multiplayer', classroom)).toBe(false);
+  });
+});

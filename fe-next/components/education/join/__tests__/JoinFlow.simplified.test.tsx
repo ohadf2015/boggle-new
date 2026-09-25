@@ -57,8 +57,8 @@ describe('<JoinFlow> — simplified for Blooket parity', () => {
     const nextButtons = buttons.filter((b) => b.textContent?.includes('education.student.join.flow.next'));
     expect(nextButtons).toHaveLength(1);
 
-    // Paste button should have aria-label "Paste code"
-    const pasteButtons = buttons.filter((b) => b.getAttribute('aria-label')?.includes('Paste'));
+    // Paste button is named via t('joinView.pasteCode') (mock t returns the key)
+    const pasteButtons = buttons.filter((b) => b.getAttribute('aria-label') === 'joinView.pasteCode');
     expect(pasteButtons).toHaveLength(1);
   });
 

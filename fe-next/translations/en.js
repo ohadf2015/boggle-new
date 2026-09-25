@@ -13119,6 +13119,18 @@ const en = {
       "viewStudents": "View Students",
       "viewVocabulary": "View Vocabulary",
       "vocabularyMastery": "Vocabulary Mastery",
+      "wordMastery": {
+        "title": "Word Mastery Trends",
+        "subtitle": "Which words are sticking, and which need reteaching",
+        "mastered": "Mastered",
+        "improving": "Improving",
+        "stuck": "Stuck",
+        "reteachTitle": "Reteach these",
+        "reteachEmpty": "No words need reteaching right now",
+        "studentsStuck": "{{stuck}}/{{total}} students",
+        "emptyTitle": "Not enough data yet",
+        "emptyHint": "Play a few more lesson games for mastery trends to appear"
+      },
       "yesterday": "Yesterday"
     },
     "classroomGame": {

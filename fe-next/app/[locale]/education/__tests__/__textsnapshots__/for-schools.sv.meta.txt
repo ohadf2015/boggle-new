@@ -1,6 +1,6 @@
 {
   "title": "Gratis ordförråds- och ESL-ordspel för skolor — LexiClash",
-  "description": "Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel. Gratis 30-dagars provperiod för lärare. Skolplaner från $39/termin.",
+  "description": "Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel. Gratis 14-dagars provperiod för lärare. Skolplaner från $39/termin.",
   "keywords": "vocabulary game for schools, word game for schools, classroom word game district, free word game school license, multiplayer vocabulary game classroom, 1v1 word game classroom, word game no student login, Kahoot alternative vocabulary, Gimkit alternative word game, ESL word game school",
   "robots": {
     "index": true,

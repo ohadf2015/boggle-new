@@ -165,126 +165,128 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           </div>
         </div>
 
-        {/* Metrics Dashboard */}
-        <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-          <ProGate feature="analytics">
+        {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
+            being sold; gating only the summary card left them open to free teachers. */}
+        <ProGate feature="analytics">
+          {/* Metrics Dashboard */}
+          <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
             <AnalyticsDashboard
               classroomId={classroomId}
               onViewStudents={handleViewStudents}
               onCreateReviewLesson={handleCreateReviewLesson}
             />
-          </ProGate>
-        </div>
+          </div>
 
-        {/* Detailed Views Tabs */}
-        <Tabs defaultValue="students" className="space-y-4">
-          <TabsList
-            className={cn(
-              'grid w-full grid-cols-4 gap-2',
-              'bg-neo-navy/50 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-2'
-            )}
-          >
-            <TabsTrigger
-              value="students"
+          {/* Detailed Views Tabs */}
+          <Tabs defaultValue="students" className="space-y-4">
+            <TabsList
               className={cn(
-                // Selected differs by FILL, not only by text colour; unselected
-                // still carries a 2px cream edge so it reads as tappable at all
-                // (it used to be bare text on navy — `edge<3`).
-                'font-neo-body font-bold rounded-neo border-[2px]',
-                'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                'transition-all duration-200'
+                'grid w-full grid-cols-4 gap-2',
+                'bg-neo-navy/50 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-2'
               )}
             >
-              {t('education.analytics.viewStudents')}
-            </TabsTrigger>
-            <TabsTrigger
-              value="lessons"
-              className={cn(
-                // Selected differs by FILL, not only by text colour; unselected
-                // still carries a 2px cream edge so it reads as tappable at all
-                // (it used to be bare text on navy — `edge<3`).
-                'font-neo-body font-bold rounded-neo border-[2px]',
-                'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white data-[state=active]:border-neo-black',
-                'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                'transition-all duration-200'
-              )}
-            >
-              {t('education.analytics.viewLessons')}
-            </TabsTrigger>
-            <TabsTrigger
-              value="vocabulary"
-              className={cn(
-                // Selected differs by FILL, not only by text colour; unselected
-                // still carries a 2px cream edge so it reads as tappable at all
-                // (it used to be bare text on navy — `edge<3`).
-                'font-neo-body font-bold rounded-neo border-[2px]',
-                'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                'transition-all duration-200'
-              )}
-            >
-              {t('education.analytics.viewVocabulary')}
-            </TabsTrigger>
-            <TabsTrigger
-              value="assignments"
-              className={cn(
-                // Selected differs by FILL, not only by text colour; unselected
-                // still carries a 2px cream edge so it reads as tappable at all
-                // (it used to be bare text on navy — `edge<3`).
-                'font-neo-body font-bold rounded-neo border-[2px]',
-                'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                'transition-all duration-200'
-              )}
-            >
-              {t('education.analytics.viewAssignments')}
-            </TabsTrigger>
-          </TabsList>
+              <TabsTrigger
+                value="students"
+                className={cn(
+                  // Selected differs by FILL, not only by text colour; unselected
+                  // still carries a 2px cream edge so it reads as tappable at all
+                  // (it used to be bare text on navy — `edge<3`).
+                  'font-neo-body font-bold rounded-neo border-[2px]',
+                  'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
+                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
+                  'transition-all duration-200'
+                )}
+              >
+                {t('education.analytics.viewStudents')}
+              </TabsTrigger>
+              <TabsTrigger
+                value="lessons"
+                className={cn(
+                  // Selected differs by FILL, not only by text colour; unselected
+                  // still carries a 2px cream edge so it reads as tappable at all
+                  // (it used to be bare text on navy — `edge<3`).
+                  'font-neo-body font-bold rounded-neo border-[2px]',
+                  'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white data-[state=active]:border-neo-black',
+                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
+                  'transition-all duration-200'
+                )}
+              >
+                {t('education.analytics.viewLessons')}
+              </TabsTrigger>
+              <TabsTrigger
+                value="vocabulary"
+                className={cn(
+                  // Selected differs by FILL, not only by text colour; unselected
+                  // still carries a 2px cream edge so it reads as tappable at all
+                  // (it used to be bare text on navy — `edge<3`).
+                  'font-neo-body font-bold rounded-neo border-[2px]',
+                  'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
+                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
+                  'transition-all duration-200'
+                )}
+              >
+                {t('education.analytics.viewVocabulary')}
+              </TabsTrigger>
+              <TabsTrigger
+                value="assignments"
+                className={cn(
+                  // Selected differs by FILL, not only by text colour; unselected
+                  // still carries a 2px cream edge so it reads as tappable at all
+                  // (it used to be bare text on navy — `edge<3`).
+                  'font-neo-body font-bold rounded-neo border-[2px]',
+                  'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
+                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
+                  'transition-all duration-200'
+                )}
+              >
+                {t('education.analytics.viewAssignments')}
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Student Progress Tab */}
-          <TabsContent value="students" className="space-y-4">
-            <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-              <h2 className="text-2xl font-neo-display text-neo-white mb-4">
-                {t('education.analytics.studentProgress')}
-              </h2>
-              <StudentProgressTable
-                classroomId={classroomId}
-                onStudentClick={handleStudentClick}
-              />
-            </div>
-          </TabsContent>
+            {/* Student Progress Tab */}
+            <TabsContent value="students" className="space-y-4">
+              <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
+                <h2 className="text-2xl font-neo-display text-neo-white mb-4">
+                  {t('education.analytics.studentProgress')}
+                </h2>
+                <StudentProgressTable
+                  classroomId={classroomId}
+                  onStudentClick={handleStudentClick}
+                />
+              </div>
+            </TabsContent>
 
-          {/* Lesson Effectiveness Tab */}
-          <TabsContent value="lessons" className="space-y-4">
-            <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-              <LessonEffectivenessChart classroomId={classroomId} />
-            </div>
-          </TabsContent>
+            {/* Lesson Effectiveness Tab */}
+            <TabsContent value="lessons" className="space-y-4">
+              <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
+                <LessonEffectivenessChart classroomId={classroomId} />
+              </div>
+            </TabsContent>
 
-          {/* Vocabulary Mastery Tab */}
-          <TabsContent value="vocabulary" className="space-y-4">
-            <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-              <h2 className="text-2xl font-neo-display text-neo-white mb-4">
-                {t('education.analytics.vocabularyMastery')}
-              </h2>
-              <VocabularyHeatmap classroomId={classroomId} />
-            </div>
-          </TabsContent>
+            {/* Vocabulary Mastery Tab */}
+            <TabsContent value="vocabulary" className="space-y-4">
+              <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
+                <h2 className="text-2xl font-neo-display text-neo-white mb-4">
+                  {t('education.analytics.vocabularyMastery')}
+                </h2>
+                <VocabularyHeatmap classroomId={classroomId} />
+              </div>
+            </TabsContent>
 
-          {/* Assignments Tab */}
-          <TabsContent value="assignments" className="space-y-4">
-            <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
-              <AssignmentTrackingPanel
-                classroomId={classroomId}
-                onCreateAssignment={() => {
-                  // Navigate to dashboard with assignment creator open
-                  router.push(`/${locale}/teacher`);
-                }}
-              />
-            </div>
-          </TabsContent>
-        </Tabs>
+            {/* Assignments Tab */}
+            <TabsContent value="assignments" className="space-y-4">
+              <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
+                <AssignmentTrackingPanel
+                  classroomId={classroomId}
+                  onCreateAssignment={() => {
+                    // Navigate to dashboard with assignment creator open
+                    router.push(`/${locale}/teacher`);
+                  }}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </ProGate>
 
         {/* Recent Activity Feed (if any) */}
         {recentActivity.length > 0 && (
