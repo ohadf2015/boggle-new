@@ -121,8 +121,12 @@ export async function initializeServer(io: Server): Promise<void> {
     lifecycleLogger.warn({ err: error }, 'Failed to warm up worker pool');
   }
 
-  // Start cron schedulers — BullMQ (durable, with retries) or node-cron (legacy)
-  if (process.env.USE_BULLMQ === 'true') {
+  // Start cron schedulers — BullMQ (durable, with retries) or node-cron (legacy).
+  // DISABLE_CRONS=1: local QA servers (dev or `npm start` in a worktree) share the
+  // production DB + service key; they must not run prod jobs (emails, promotions).
+  if (process.env.DISABLE_CRONS === '1') {
+    lifecycleLogger.warn('Cron schedulers disabled (DISABLE_CRONS=1)');
+  } else if (process.env.USE_BULLMQ === 'true') {
     try {
       initCronQueue();
       await registerAllCronJobs();

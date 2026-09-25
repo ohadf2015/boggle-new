@@ -564,7 +564,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const canvasClass = wide ? 'absolute bottom-0 start-0 top-0 end-[22rem] xl:end-[26rem]' : 'absolute inset-0';
 
   return (
-    <div ref={rootRef} className="relative h-dvh w-full overflow-hidden bg-neo-navy" dir={dir}>
+    <div ref={rootRef} className="relative h-dvh w-full shrink-0 overflow-hidden bg-neo-navy" dir={dir}>
       {/* The smash round covers everything: don't run a second Pixi loop under it. */}
       {!smashing && !raiding ? (
         <TowerCanvas
