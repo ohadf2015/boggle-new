@@ -30,6 +30,11 @@ export type SupportedLocale = 'en' | 'sv' | 'he' | 'es' | 'ja';
 type BagData = { values: Record<string, number>; distribution: Record<string, number> };
 const BAGS: Record<SupportedLocale, BagData> = { en, sv, he, es, ja };
 
+/** Word Craft has no bag for other app languages (ru): they play the en bag. */
+export function toWordCraftLocale(language: string): SupportedLocale {
+  return language in BAGS ? (language as SupportedLocale) : 'en';
+}
+
 export function getTileBag(locale: SupportedLocale): BagData {
   return BAGS[locale] ?? BAGS['en'];
 }

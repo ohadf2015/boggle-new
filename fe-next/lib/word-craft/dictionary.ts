@@ -1,4 +1,4 @@
-import type { SupportedLocale } from './tileBag'
+import { toWordCraftLocale, type SupportedLocale } from './tileBag'
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization'
 
 export function isValidWord(word: string, dict: Set<string> | null): boolean {
@@ -122,9 +122,11 @@ const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
  * dictionary system.
  */
 export async function loadServerWordList(
-  locale: SupportedLocale,
+  requested: SupportedLocale,
   deps: WordListDeps = {},
 ): Promise<string[]> {
+  // Callers cast the app language in; the route 400s anything but a bag locale (2A8).
+  const locale = toWordCraftLocale(requested)
   const fetchFn = deps.fetchFn ?? (typeof fetch !== 'undefined' ? fetch : undefined)
   const storage = deps.storage ?? defaultStorage()
 
@@ -173,9 +175,10 @@ export async function loadServerWordList(
 }
 
 export async function loadWordCraftDictionary(
-  locale: SupportedLocale,
+  requested: SupportedLocale,
   deps: WordListDeps = {},
 ): Promise<Set<string>> {
+  const locale = toWordCraftLocale(requested)
   const out = new Set<string>()
   const words = await loadServerWordList(locale, deps)
   for (const w of words) addDictKeys(out, w, locale)

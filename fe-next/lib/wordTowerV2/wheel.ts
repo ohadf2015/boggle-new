@@ -4,6 +4,7 @@ import { generateWheel } from '@/lib/wordTower/wordTowerManager';
 import { WORD_TOWER_WHEEL_SIZE as WHEEL_SIZE } from '@/shared/constants/wordTowerConstants';
 import type { Language } from '@/shared/types/game';
 import { isBlockedWord } from './blocked';
+import { toWordCraftLocale } from '@/lib/word-craft/tileBag';
 
 /** 2-3 vowels of 7: v1's floor-only rule dealt 4-5, leaving nothing to spell with. */
 const MAX_VOWELS = 3;
@@ -27,7 +28,10 @@ function playable(wheel: string[], language: Language): boolean {
   return !(wheel.includes('q') && !wheel.includes('u') && (language === 'en' || language === 'es'));
 }
 
-export function spinWheel(language: Language, drawIndex = 0, runSeed = 'word-tower-v2'): string[] {
+export function spinWheel(appLanguage: Language, drawIndex = 0, runSeed = 'word-tower-v2'): string[] {
+  // Deal from the same locale loadWordCraftDictionary serves: a Cyrillic ru wheel
+  // against the en fallback dictionary would reject every word (2A8).
+  const language = toWordCraftLocale(appLanguage);
   // runSeed varies per run: a constant opened every run on the same letters.
   // Deterministic re-deals: candidate k of draw d is sub-draw d*DEAL_TRIES+k.
   let wheel: string[] = [];
