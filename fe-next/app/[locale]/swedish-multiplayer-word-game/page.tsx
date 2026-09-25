@@ -16,12 +16,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Multiplayer ordspel på svenska — realtid, gratis | LexiClash',
-    description: 'Spela multiplayer ordspel på svenska i realtid — ingen app, inget konto. Alfapet-känsla med vänner, 10 000+ svenska ord. Starta ett rum nu.',
+    title: 'Scrabble på Svenska Gratis Online — Inget Konto | LexiClash',
+    description: 'Spela Scrabble på svenska gratis online — ingen app, inget konto. Realtidsmultiplayer som Alfapet med vänner, 10 000+ svenska ord. Starta direkt!',
     keywords: 'alfapet spel online, ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
-      title: 'Multiplayer ordspel på svenska — realtid, gratis | LexiClash',
-      description: 'Spela multiplayer ordspel på svenska i realtid — ingen app, inget konto. Alfapet-känsla med vänner, 10 000+ svenska ord. Starta ett rum nu.',
+      title: 'Scrabble på Svenska Gratis Online — Inget Konto | LexiClash',
+      description: 'Spela Scrabble på svenska gratis online — ingen app, inget konto. Realtidsmultiplayer som Alfapet med vänner, 10 000+ svenska ord. Starta direkt!',
       locale: 'sv_SE',
       type: 'website',
       url: pageUrl,
@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Multiplayer ordspel på svenska — realtid, gratis | LexiClash',
-      description: 'Spela multiplayer ordspel på svenska i realtid — ingen app, inget konto. Alfapet-känsla med vänner, 10 000+ svenska ord. Starta ett rum nu.',
+      title: 'Scrabble på Svenska Gratis Online — Inget Konto | LexiClash',
+      description: 'Spela Scrabble på svenska gratis online — ingen app, inget konto. Realtidsmultiplayer som Alfapet med vänner, 10 000+ svenska ord. Starta direkt!',
       images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {

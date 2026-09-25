@@ -8,7 +8,7 @@ describe('/es/juego-de-palabras-multijugador metadata', () => {
     // Title is kept under 60 chars so Google does not truncate it in the SERP
     // (#1071 shortened it from 74). Update BOTH this expectation and page.tsx
     // together — that PR changed only page.tsx and turned master red.
-    expect(meta.title).toBe('Scrabble Online en Español — Sin Registro | LexiClash');
+    expect(meta.title).toBe('Scrabble Online Gratis en Español — Sin Registro | LexiClash');
     expect(meta.title.length).toBeLessThanOrEqual(60);
     expect(meta.description).toBe(
       'Juega Scrabble online en español ahora — sin app, sin registro, sin esperar. Hasta 50 jugadores en tiempo real. ¡Empieza ya! →',
