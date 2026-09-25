@@ -129,7 +129,12 @@ describe('mapProgressRowToCompletion', () => {
     });
   });
 
-  it('gives 100 for a completed row with no per-word attempts (completion credit)', () => {
+  it('gives a 100 score (completion credit) but a null accuracy when a completed row has no per-word attempts', () => {
+    // stampAssignmentCompletion upserts completed_at alone, so this is the
+    // common shape for a freshly stamped row: score matches what the
+    // passback would grade (100), but accuracy — "how correct were the
+    // words you attempted" — has nothing to measure and must stay null/"—",
+    // not silently inherit the completion credit.
     const row = {
       id: 'row2',
       student_id: 's2',
@@ -147,7 +152,7 @@ describe('mapProgressRowToCompletion', () => {
       total_practice_sessions: 0,
     };
 
-    expect(mapProgressRowToCompletion('a1', row)).toMatchObject({ score: 100, accuracy: 100 });
+    expect(mapProgressRowToCompletion('a1', row)).toMatchObject({ score: 100, accuracy: null });
   });
 
   it('is null (not 0) when there is no completion and no attempts at all', () => {

@@ -211,7 +211,13 @@ export async function getAssignmentCompletions(
   try {
     const { data: completions, error } = await supabase
       .from('student_lesson_progress')
-      .select('*')
+      // Named, not `*`: every caller (CompletionTracker, AssignmentProgressReport)
+      // is listed here so this select can never silently drop a column one of
+      // them starts reading. `score`/`accuracy` don't exist on this table —
+      // the score/accuracy shown to teachers is derived from `words_attempted`
+      // + `completed_at` (see assignmentProgressReport.ts's
+      // mapProgressRowToCompletion / lib/education/googleClassroomGrades.ts).
+      .select('id, student_id, assignment_id, completed_at, words_attempted, words_mastered')
       .eq('assignment_id', assignmentId)
       .not('completed_at', 'is', null)
       .order('completed_at', { ascending: false });

@@ -49,21 +49,26 @@ export interface AssignmentProgressSourceRow extends ProgressRowLike {
  * (it queried `.eq('assignment_id', assignmentId)`), so trusting that over an
  * echoed column keeps a null/mismatched `assignment_id` from ever mattering.
  *
- * There is only one derivable number for a single assignment completion —
- * Σcorrect/Σattempts from `words_attempted`, or 100 for a bare completion —
- * so `score` and `accuracy` both carry that same percentage. No data at all
- * (row not completed / nothing attempted) → `null`, rendered as "—", never 0.
+ * `score` is the SAME grade the Google Classroom passback would push:
+ * Σcorrect/Σattempts from `words_attempted`, or 100 completion credit when an
+ * assignment was finished with no per-word data (`stampAssignmentCompletion`
+ * upserts `completed_at` alone, so this is the common case for a fresh row).
+ *
+ * `accuracy` is a stricter, distinct number — "how correct were the words you
+ * actually attempted" — so it must NOT take that same completion credit: a
+ * completed row with no word-level data has no measurable accuracy and reads
+ * `null` ("—"), even though its score is 100. Reusing `gradePercentFromProgress`
+ * with `completed_at` left out is what suppresses that fallback.
  */
 export function mapProgressRowToCompletion(
   assignmentId: string,
   row: AssignmentProgressSourceRow,
 ): AssignmentProgressCompletion {
-  const percent = gradePercentFromProgress(row);
   return {
     assignmentId,
     studentId: row.student_id,
-    score: percent,
-    accuracy: percent,
+    score: gradePercentFromProgress(row),
+    accuracy: gradePercentFromProgress({ words_attempted: row.words_attempted }),
     completedAt: row.completed_at ?? null,
   };
 }
