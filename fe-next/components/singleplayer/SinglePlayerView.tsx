@@ -108,6 +108,12 @@ const SinglePlayerView: React.FC = () => {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const isPractice = usePracticeFlag();
+  const { stopMusic } = useMusic();
+  // useGameMusic fades BOSSA in for the results phase but never stops it —
+  // leaving /singleplayer (browser back, header nav) left the bed looping on
+  // the hub and every page after (same class as the Word Hunt fix in
+  // DailyChallenge, 7e3947017b).
+  useEffect(() => () => stopMusic(500), [stopMusic]);
 
   const {
     phase, setPhase,

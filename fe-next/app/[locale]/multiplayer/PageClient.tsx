@@ -213,7 +213,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
   // CrazyGames requires displaying their usernames in multiplayer (Full Launch requirement)
   const { user: cgUser, isCrazyGames, login: loginCrazyGames } = useCrazyGamesAuth();
-  const { playTrack, TRACKS } = useMusic();
+  const { playTrack, stopMusic, TRACKS } = useMusic();
+  // Lobby / countdown / in-game beds start on phase changes but nothing in the
+  // live MP tree ever stopped them — browser-back or nav to another route left
+  // the bed looping on the hub and every page after (same class as the Word Hunt
+  // fix in DailyChallenge, 7e3947017b). This component stays mounted across
+  // lobby → game → results, so unmount == leaving the multiplayer route.
+  useEffect(() => () => stopMusic(500), [stopMusic]);
   // Countdown overlay flag — flips beforeGame → inGame music once play begins.
   const showStartAnimation = useShowStartAnimation();
 
