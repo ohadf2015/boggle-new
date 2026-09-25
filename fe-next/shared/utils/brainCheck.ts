@@ -204,3 +204,14 @@ export function summarizeBrainChecks(
   }
   return out;
 }
+
+/**
+ * Check boards: generate a few and keep the one with the MEDIAN number of
+ * findable words. Median-of-3 narrows board-difficulty spread (a big share of
+ * run-to-run noise) without hand-tuned per-language constants.
+ */
+export function pickMedianBoard<T extends { words: unknown[] }>(boards: T[]): T | null {
+  if (boards.length === 0) return null;
+  const sorted = [...boards].sort((a, b) => a.words.length - b.words.length);
+  return sorted[Math.floor((sorted.length - 1) / 2)];
+}

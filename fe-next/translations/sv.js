@@ -9930,6 +9930,8 @@ const sv = {
   },
   "brain": {
     "check": {
+      "cooldownGate": "Du har redan gjort dagens koll för den här övningen. Nästa om {h} h – träna under tiden, träning påverkar aldrig din trend.",
+      "trainInstead": "Träna i stället",
       "title": "Hjärnkoll",
       "subtitle": "Ett enminutstest under fasta villkor, en gång per dag och övning. Samma regler varje gång – så din trend är äkta, inte bara en svårare nivå.",
       "start": "Testa",

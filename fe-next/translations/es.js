@@ -9652,6 +9652,8 @@ const es = {
   },
   "brain": {
     "check": {
+      "cooldownGate": "Ya hiciste el chequeo de hoy de este ejercicio. El próximo en {h} h; mientras tanto entrena, la práctica nunca afecta tu tendencia.",
+      "trainInstead": "Entrenar",
       "title": "Chequeo mental",
       "subtitle": "Una prueba de un minuto en condiciones fijas, una vez al día por ejercicio. Siempre las mismas reglas, así que tu tendencia es real, no solo un nivel más difícil.",
       "start": "Hacer",

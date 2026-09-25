@@ -12,7 +12,7 @@ import { ru } from '@/translations/ru.js';
 
 const KEYS = [
   'title', 'subtitle', 'start', 'nextIn', 'howItWorks', 'loadFailed', 'guestPitch', 'rejected',
-  'fixedConditions', 'warmupDone', 'needMoreRuns', 'needMoreDays',
+  'fixedConditions', 'warmupDone', 'needMoreRuns', 'needMoreDays', 'cooldownGate', 'trainInstead',
   'method.fixed', 'method.warmup', 'method.noise', 'method.transfer',
   'verdict.improved', 'verdict.stable', 'verdict.declined',
 ];

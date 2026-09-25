@@ -9090,6 +9090,8 @@ const en = {
   },
   "brain": {
     "check": {
+      "cooldownGate": "You've done today's check for this drill. Next one in {h}h — train in the meantime; practice never touches your trend.",
+      "trainInstead": "Train instead",
       "title": "Brain Check",
       "subtitle": "A 1-minute test under fixed conditions, once a day per drill. Same rules every time, so your trend is real — not just a harder level.",
       "start": "Check",

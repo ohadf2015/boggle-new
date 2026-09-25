@@ -172,3 +172,13 @@ describe('measurement resolution floor', () => {
     expect(a.verdict).toBe('improved');
   });
 });
+
+describe('pickMedianBoard (check boards: median-of-3 findable-word count)', () => {
+  it('picks the board whose word count is the median', async () => {
+    const { pickMedianBoard } = await import('../brainCheck');
+    const b = (n: number) => ({ id: n, words: Array.from({ length: n }, (_, i) => `W${i}`) });
+    expect(pickMedianBoard([b(80), b(12), b(40)])?.id).toBe(40);
+    expect(pickMedianBoard([b(5)])?.id).toBe(5);
+    expect(pickMedianBoard([])).toBeNull();
+  });
+});

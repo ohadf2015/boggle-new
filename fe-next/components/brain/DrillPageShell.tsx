@@ -2,7 +2,8 @@
 
 import React, { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, FlaskConical } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowLeft, FlaskConical, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { safeRandomUUID } from '@/lib/safeRandomUUID';
 import { useTheme } from '@/utils/ThemeContext';
@@ -67,6 +68,18 @@ interface OverlayState {
   brainCheck?: { status: 'recorded' | 'rejected'; analysis: BrainCheckAnalysis | null };
 }
 
+/** Brain Check cooldown for this drill: null = playable (incl. guests / offline). */
+async function fetchCheckCooldown(drill: DrillType): Promise<string | null> {
+  try {
+    const res = await fetch('/api/brain/checks', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const c = (await res.json())?.checks?.[drill];
+    return c && c.available === false && c.nextAvailableAt ? c.nextAvailableAt : null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchCheckAnalysis(drill: DrillType): Promise<BrainCheckAnalysis | null> {
   try {
     const res = await fetch('/api/brain/checks', { cache: 'no-store' });
@@ -95,7 +108,23 @@ export default function DrillPageShell({ drillType, Drill, isCheck = false }: Pr
   const level = isCheck ? BRAIN_CHECK_PROTOCOL[drillType].level : trainingLevel;
   const [overlay, setOverlay] = useState<OverlayState | null>(null);
   const [sessionId] = useState(() => `drill_${drillType}_${safeRandomUUID()}`);
-  const { grid, availableWords, isLoading, regenerate } = useDrillGrid(5, language);
+  // Checks use the median-of-3 board so board difficulty stays steadier across days.
+  const { grid, availableWords, isLoading, regenerate } = useDrillGrid(5, language, isCheck ? 3 : 1);
+
+  // A check link opened during cooldown shows the gate BEFORE any play — the
+  // server would only store the run as practice anyway.
+  const [cooldownHours, setCooldownHours] = useState<number | null>(null);
+  const [gateResolved, setGateResolved] = useState(!isCheck);
+  useEffect(() => {
+    if (!isCheck) return;
+    let alive = true;
+    void fetchCheckCooldown(drillType).then((until) => {
+      if (!alive) return;
+      setCooldownHours(until ? Math.max(1, Math.ceil((Date.parse(until) - Date.now()) / 3_600_000)) : null);
+      setGateResolved(true);
+    });
+    return () => { alive = false; };
+  }, [isCheck, drillType]);
 
   useEffect(() => {
     setIsInGame(true);
@@ -118,7 +147,7 @@ export default function DrillPageShell({ drillType, Drill, isCheck = false }: Pr
       score: result.score,
       durationSeconds: result.timeSpent,
       wordsFound,
-      extraData: isCheck ? { ...extraData, benchmark: true } : extraData,
+      extraData: isCheck ? { ...extraData, benchmark: true, boardWords: availableWords.length } : extraData,
     });
 
     // Guest played but the score could not be saved (401) — nudge sign-up.
@@ -144,11 +173,44 @@ export default function DrillPageShell({ drillType, Drill, isCheck = false }: Pr
     });
     const rewards = await awardDrillRewards({ level: result.level, score: result.score, xpAwarded: saveResult.xpAwarded ?? 0 });
     setOverlay((o) => (o ? { ...o, ...rewards } : o));
-  }, [drillType, isCheck, saveDrillResult, awardDrillRewards, promptSignup]);
+  }, [drillType, isCheck, saveDrillResult, awardDrillRewards, promptSignup, availableWords.length]);
 
   const goHub = useCallback(() => router.push(`/${language}/brain`), [router, language]);
 
-  if (isLoading || grid.length === 0) {
+  if (isCheck && gateResolved && cooldownHours !== null) {
+    return (
+      <div className={cn('flex-1 flex items-center justify-center p-4', isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream')}>
+        <div
+          data-testid="brain-check-cooldown"
+          className={cn(
+            'w-full max-w-sm rounded-neo border-4 border-neo-black p-6 text-center shadow-hard-lg',
+            isDarkMode ? 'bg-neo-navy-light text-neo-white' : 'bg-white text-neo-black'
+          )}
+        >
+          <Clock className="mx-auto mb-3 h-10 w-10 text-neo-yellow" aria-hidden="true" />
+          <h1 className="mb-2 text-xl font-black uppercase">{t('brain.check.title')}</h1>
+          <p className="mb-5 text-sm">{t('brain.check.cooldownGate', { h: cooldownHours })}</p>
+          <div className="flex flex-col gap-3">
+            <Link
+              href={`/${language}/brain/drills/${drillType}`}
+              className="rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 font-black uppercase text-neo-black shadow-hard"
+            >
+              {t('brain.check.trainInstead')}
+            </Link>
+            <button
+              type="button"
+              onClick={goHub}
+              className="rounded-neo border-3 border-neo-black px-6 py-3 font-bold shadow-hard-sm"
+            >
+              {t('common.back')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!gateResolved || isLoading || grid.length === 0) {
     return (
       <div className={cn('flex-1 flex items-center justify-center', isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream')}>
         <div

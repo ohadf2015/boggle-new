@@ -47,8 +47,9 @@ describe('DrillPageShell', () => {
     expect(screen.getByTestId('boost')).toBeInTheDocument();
   });
 
-  it('Given check mode, Then the drill runs at the fixed protocol level, no boosts', () => {
+  it('Given check mode, Then the drill runs at the fixed protocol level, no boosts', async () => {
     render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" isCheck />);
+    await screen.findByTestId('drill');
     expect(drillProps[0].level).toBe(1);
     expect(drillProps[0].assists).toBe(false);
     expect(screen.queryByTestId('boost')).not.toBeInTheDocument();
@@ -58,6 +59,7 @@ describe('DrillPageShell', () => {
   it('Given a check completes, Then it is submitted flagged and the verdict overlay opens', async () => {
     saveDrillResult.mockResolvedValue({ success: true, brainCheck: 'recorded', xpAwarded: 10, newLevel: 4, previousLevel: 4 });
     render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" isCheck />);
+    await screen.findByTestId('drill');
     await act(async () => { await complete(); });
     expect(saveDrillResult.mock.calls[0][0]).toMatchObject({ drillType: 'lightning-round', level: 1, extraData: { benchmark: true, wordsPerMinute: 9 } });
     await waitFor(() => expect(screen.getByTestId('overlay')).toHaveTextContent('check'));
@@ -69,5 +71,33 @@ describe('DrillPageShell', () => {
     await act(async () => { await complete(); });
     expect(saveDrillResult.mock.calls[0][0].extraData.benchmark).toBeUndefined();
     await waitFor(() => expect(screen.getByTestId('overlay')).toHaveTextContent('train'));
+  });
+});
+
+describe('DrillPageShell cooldown gate', () => {
+  it('Given a check link during cooldown, Then it shows the gate (no drill) with a train-instead link', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ checks: { 'lightning-round': { available: false, nextAvailableAt: new Date(Date.now() + 5 * 3600_000).toISOString(), analysis: null } } }),
+    }) as never;
+    render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" isCheck />);
+    expect(await screen.findByTestId('brain-check-cooldown')).toBeInTheDocument();
+    expect(screen.queryByTestId('drill')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'brain.check.trainInstead' })).toHaveAttribute('href', '/en/brain/drills/lightning-round');
+  });
+
+  it('Given a guest (401), Then the check still plays (the save step nudges sign-up)', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401 }) as never;
+    render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" isCheck />);
+    expect(await screen.findByTestId('drill')).toBeInTheDocument();
+  });
+
+  it('Given a check, Then the board size is recorded with the submission', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ checks: { 'lightning-round': { available: true, nextAvailableAt: null, analysis: null } } }) }) as never;
+    saveDrillResult.mockResolvedValue({ success: true, brainCheck: 'recorded', newLevel: 1, previousLevel: 1 });
+    render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" isCheck />);
+    await screen.findByTestId('drill');
+    await act(async () => { await complete(); });
+    expect(saveDrillResult.mock.calls[0][0].extraData.boardWords).toBe(0);
   });
 });
