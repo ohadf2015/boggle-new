@@ -13688,6 +13688,46 @@ const ja = {
           "lastActive": "最終アクティブ日",
           "gamesPlayed": "プレイ回数"
         }
+      },
+      "googleClassroom": {
+        "scopesMissing": "Google の権限の一部にチェックが入っていませんでした。LexiClash が生徒を照合して成績を送信できるよう、もう一度接続してすべて許可してください。",
+        "errorForbidden": "Google Classroom がこのリクエストを拒否しました。学校の管理者が外部アプリのアクセスをブロックしているか、このクラスの教師として登録されていない可能性があります。",
+        "button": "Google Classroom に成績を送信",
+        "loading": "Google Classroom のクラスを読み込んでいます…",
+        "sending": "成績を送信しています…",
+        "connected": "Google Classroom に接続しました。成績を送信できます。",
+        "denied": "Google Classroom に接続されませんでした。いつでもやり直せます。",
+        "connectTitle": "Google Classroom に接続",
+        "connectBody": "授業で使っている Google アカウントでログインしてください。LexiClash はメールアドレスで生徒を照合するためにクラス名簿を読み取り、送信した成績だけを書き込みます。",
+        "connectCta": "Google Classroom に接続",
+        "lessonLabel": "LexiClash のレッスン",
+        "courseLabel": "Google Classroom のクラス",
+        "courseWorkLabel": "Classroom の課題",
+        "choose": "選択してください…",
+        "noCourses": "このアカウントには有効な Google Classroom のクラスがありません。",
+        "notLinkableHint": "LexiClash 以外で作成されたため採点できません",
+        "createCourseWork": "このレッスン用に Classroom の課題を新規作成",
+        "returnGrades": "生徒にも成績を返却する（チェックしない場合は、先生だけに見える下書きのままです）",
+        "confirmHint": "スコアはこの課題の {{points}} 点満点に換算されます。",
+        "confirm": "成績を送信",
+        "cancel": "キャンセル",
+        "done": "完了",
+        "resultTitle": "成績を送信しました",
+        "updated": "{{count}} 人の生徒を採点しました",
+        "skipped": "{{count}} 人はスキップ：このレッスンをまだ練習していません",
+        "unmatchedTitle": "Classroom の生徒と照合できませんでした",
+        "failedTitle": "次の生徒は更新できませんでした",
+        "reason": {
+          "no_email": "学校のメールアドレスなし（ゲストアカウント）",
+          "not_in_course": "このクラスにないメールアドレス",
+          "duplicate_email": "別の生徒が同じメールアドレスを使用しています"
+        },
+        "errorNotLinkable": "Google の仕様上、LexiClash が採点できるのは LexiClash で作成した課題だけです。このレッスン用に Classroom の課題を新規作成してください。",
+        "errorRateLimited": "Google Classroom が混み合っています。{{seconds}} 秒後にもう一度お試しください。",
+        "errorNotFound": "クラスまたは課題が見つかりません。削除された可能性があります。",
+        "errorUngraded": "この Classroom の課題には配点がないため、成績を付けられません。",
+        "errorNotPro": "Google Classroom への成績送信は Teacher Pro の機能です。",
+        "errorGeneric": "Google Classroom との通信で問題が発生しました。もう一度お試しください。"
       }
     },
     "curriculum": {

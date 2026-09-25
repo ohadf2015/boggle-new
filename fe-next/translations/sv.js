@@ -13923,6 +13923,46 @@ const sv = {
           "lastActive": "Senast aktiv",
           "gamesPlayed": "Spelade spel"
         }
+      },
+      "googleClassroom": {
+        "scopesMissing": "Några Google-behörigheter lämnades omarkerade. Anslut igen och tillåt alla så att LexiClash kan matcha elever och skicka betyg.",
+        "errorForbidden": "Google Classroom nekade begäran. Skolans administratör kan ha spärrat åtkomst för tredjepartsappar, eller så är du inte lärare i den här klassen.",
+        "button": "Skicka betyg till Google Classroom",
+        "loading": "Hämtar dina klasser i Google Classroom…",
+        "sending": "Skickar betyg…",
+        "connected": "Google Classroom är anslutet. Nu kan du skicka betyg.",
+        "denied": "Google Classroom anslöts inte. Du kan försöka igen när du vill.",
+        "connectTitle": "Anslut Google Classroom",
+        "connectBody": "Logga in med Google-kontot du undervisar med. LexiClash läser bara klasslistan för att matcha elever via e-post och skriver bara de betyg du skickar.",
+        "connectCta": "Anslut Google Classroom",
+        "lessonLabel": "Lektion i LexiClash",
+        "courseLabel": "Klass i Google Classroom",
+        "courseWorkLabel": "Uppgift i Classroom",
+        "choose": "Välj…",
+        "noCourses": "Inga aktiva klasser i Google Classroom hittades för det här kontot.",
+        "notLinkableHint": "skapad utanför LexiClash, kan inte betygsättas",
+        "createCourseWork": "Skapa en ny Classroom-uppgift för den här lektionen",
+        "returnGrades": "Lämna också tillbaka betygen till eleverna (annars förblir de utkast som bara du ser)",
+        "confirmHint": "Resultaten räknas om till uppgiftens {{points}} poäng.",
+        "confirm": "Skicka betyg",
+        "cancel": "Avbryt",
+        "done": "Klar",
+        "resultTitle": "Betygen är skickade",
+        "updated": "{{count}} elever fick betyg",
+        "skipped": "{{count}} elever hoppades över: har inte övat på lektionen än",
+        "unmatchedTitle": "Kunde inte matchas mot en elev i Classroom",
+        "failedTitle": "De här eleverna kunde inte uppdateras",
+        "reason": {
+          "no_email": "ingen skol-e-post (gästkonto)",
+          "not_in_course": "e-postadressen finns inte i den här Classroom-klassen",
+          "duplicate_email": "en annan elev använder redan den här e-postadressen"
+        },
+        "errorNotLinkable": "Google låter bara LexiClash betygsätta uppgifter som LexiClash har skapat. Skapa en ny Classroom-uppgift för lektionen.",
+        "errorRateLimited": "Google Classroom har mycket att göra just nu. Försök igen om {{seconds}} sekunder.",
+        "errorNotFound": "Klassen eller uppgiften hittades inte. Den kan ha tagits bort.",
+        "errorUngraded": "Den här Classroom-uppgiften har inga poäng och kan därför inte betygsättas.",
+        "errorNotPro": "Att skicka betyg till Google Classroom ingår i Teacher Pro.",
+        "errorGeneric": "Något gick fel i kontakten med Google Classroom. Försök igen."
       }
     },
     "curriculum": {

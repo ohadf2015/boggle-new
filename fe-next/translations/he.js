@@ -13543,6 +13543,46 @@ const he = {
           "lastActive": "פעילות אחרונה",
           "gamesPlayed": "משחקים ששוחקו"
         }
+      },
+      "googleClassroom": {
+        "scopesMissing": "חלק מההרשאות של Google לא סומנו. התחברו שוב ואשרו את כולן כדי ש-LexiClash תוכל להתאים תלמידים ולשלוח ציונים.",
+        "errorForbidden": "Google Classroom דחה את הבקשה. ייתכן שמנהל המערכת בבית הספר חסם גישה של אפליקציות חיצוניות, או שאינכם מורים בכיתה הזו.",
+        "button": "שליחת ציונים ל-Google Classroom",
+        "loading": "טוען את הכיתות שלך ב-Google Classroom…",
+        "sending": "שולח ציונים…",
+        "connected": "Google Classroom מחובר. אפשר לשלוח ציונים.",
+        "denied": "Google Classroom לא חובר. אפשר לנסות שוב בכל זמן.",
+        "connectTitle": "חיבור Google Classroom",
+        "connectBody": "התחברו עם חשבון Google שאיתו אתם מלמדים. LexiClash קוראת רק את רשימת הכיתה כדי להתאים תלמידים לפי מייל, וכותבת רק את הציונים שתשלחו.",
+        "connectCta": "חיבור Google Classroom",
+        "lessonLabel": "שיעור ב-LexiClash",
+        "courseLabel": "כיתה ב-Google Classroom",
+        "courseWorkLabel": "מטלה ב-Classroom",
+        "choose": "בחירה…",
+        "noCourses": "לא נמצאו כיתות פעילות ב-Google Classroom בחשבון הזה.",
+        "notLinkableHint": "נוצרה מחוץ ל-LexiClash, אי אפשר לתת בה ציון",
+        "createCourseWork": "יצירת מטלה חדשה ב-Classroom לשיעור הזה",
+        "returnGrades": "להחזיר את הציונים גם לתלמידים (אחרת הם נשארים כטיוטה שרק אתם רואים)",
+        "confirmHint": "הציונים מותאמים ל-{{points}} הנקודות של המטלה.",
+        "confirm": "שליחת ציונים",
+        "cancel": "ביטול",
+        "done": "סיום",
+        "resultTitle": "הציונים נשלחו",
+        "updated": "{{count}} תלמידים קיבלו ציון",
+        "skipped": "{{count}} תלמידים דולגו: עוד לא תרגלו את השיעור",
+        "unmatchedTitle": "לא הותאמו לתלמיד ב-Classroom",
+        "failedTitle": "לא הצלחנו לעדכן את התלמידים האלה",
+        "reason": {
+          "no_email": "אין מייל בית ספרי (חשבון אורח)",
+          "not_in_course": "המייל לא נמצא בכיתה הזו ב-Classroom",
+          "duplicate_email": "תלמיד אחר כבר משתמש במייל הזה"
+        },
+        "errorNotLinkable": "Google מאפשרת ל-LexiClash לתת ציון רק במטלות שהיא יצרה. צרו מטלה חדשה ב-Classroom לשיעור הזה.",
+        "errorRateLimited": "Google Classroom עמוס כרגע. נסו שוב בעוד {{seconds}} שניות.",
+        "errorNotFound": "הכיתה או המטלה לא נמצאו. ייתכן שנמחקו.",
+        "errorUngraded": "למטלה הזו ב-Classroom אין ניקוד, ולכן אי אפשר לתת בה ציון.",
+        "errorNotPro": "שליחת ציונים ל-Google Classroom היא חלק מ-Teacher Pro.",
+        "errorGeneric": "משהו השתבש בתקשורת עם Google Classroom. נסו שוב."
       }
     },
     "curriculum": {

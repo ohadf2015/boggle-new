@@ -13552,6 +13552,46 @@ const es = {
           "lastActive": "Última actividad",
           "gamesPlayed": "Partidas jugadas"
         }
+      },
+      "googleClassroom": {
+        "scopesMissing": "Quedaron permisos de Google sin marcar. Vuelve a conectar y acéptalos todos para que LexiClash pueda emparejar alumnos y enviar notas.",
+        "errorForbidden": "Google Classroom rechazó la solicitud. Puede que el administrador del centro haya bloqueado el acceso de apps externas o que no seas docente de esta clase.",
+        "button": "Enviar notas a Google Classroom",
+        "loading": "Cargando tus clases de Google Classroom…",
+        "sending": "Enviando notas…",
+        "connected": "Google Classroom está conectado. Ya puedes enviar notas.",
+        "denied": "No se conectó Google Classroom. Puedes volver a intentarlo cuando quieras.",
+        "connectTitle": "Conectar Google Classroom",
+        "connectBody": "Inicia sesión con la cuenta de Google con la que das clase. LexiClash solo lee la lista de la clase para emparejar alumnos por correo y solo escribe las notas que envíes.",
+        "connectCta": "Conectar Google Classroom",
+        "lessonLabel": "Lección de LexiClash",
+        "courseLabel": "Clase de Google Classroom",
+        "courseWorkLabel": "Tarea de Classroom",
+        "choose": "Elige…",
+        "noCourses": "No se encontraron clases activas de Google Classroom en esta cuenta.",
+        "notLinkableHint": "creada fuera de LexiClash, no se puede calificar",
+        "createCourseWork": "Crear una tarea nueva en Classroom para esta lección",
+        "returnGrades": "Devolver también las notas a los alumnos (si no, quedan como borrador que solo ves tú)",
+        "confirmHint": "Las puntuaciones se ajustan a los {{points}} puntos de esta tarea.",
+        "confirm": "Enviar notas",
+        "cancel": "Cancelar",
+        "done": "Listo",
+        "resultTitle": "Notas enviadas",
+        "updated": "{{count}} alumnos calificados",
+        "skipped": "{{count}} alumnos omitidos: aún no han practicado esta lección",
+        "unmatchedTitle": "Sin coincidencia con un alumno de Classroom",
+        "failedTitle": "No se pudo actualizar a estos alumnos",
+        "reason": {
+          "no_email": "sin correo del centro (cuenta de invitado)",
+          "not_in_course": "el correo no está en esta clase de Classroom",
+          "duplicate_email": "otro alumno ya usa este correo"
+        },
+        "errorNotLinkable": "Google solo permite que LexiClash califique tareas creadas por LexiClash. Crea una tarea nueva en Classroom para esta lección.",
+        "errorRateLimited": "Google Classroom está saturado. Vuelve a intentarlo en {{seconds}} segundos.",
+        "errorNotFound": "No se encontró la clase o la tarea. Puede que se haya eliminado.",
+        "errorUngraded": "Esta tarea de Classroom no tiene puntos, así que no admite nota.",
+        "errorNotPro": "Enviar notas a Google Classroom es parte de Teacher Pro.",
+        "errorGeneric": "Algo falló al comunicarse con Google Classroom. Inténtalo de nuevo."
       }
     },
     "teacher": {

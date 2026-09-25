@@ -17,6 +17,7 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
 import { AssignmentProgressReport } from '@/components/teacher/reports/AssignmentProgressReport';
+import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
@@ -247,6 +248,7 @@ function TeacherReportsInner() {
                 free teacher never sees two upsell cards stacked here. */}
             <ExportAllClassesButton />
           </div>
+          <GoogleClassroomGradePassback classroomId={selectedClassroomId} />
           <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
         </ProGate>
       </div>

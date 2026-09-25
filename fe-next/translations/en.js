@@ -12106,6 +12106,46 @@ const en = {
           "lastActive": "Last active",
           "gamesPlayed": "Games played"
         }
+      },
+      "googleClassroom": {
+        "scopesMissing": "Some Google permissions were left unticked. Connect again and allow all of them so LexiClash can match students and send grades.",
+        "errorForbidden": "Google Classroom refused this request. Your school admin may have blocked third-party access, or you are not a teacher of this class.",
+        "button": "Send grades to Google Classroom",
+        "loading": "Loading your Google Classroom courses…",
+        "sending": "Sending grades…",
+        "connected": "Google Classroom connected. You can send grades now.",
+        "denied": "Google Classroom was not connected. You can try again anytime.",
+        "connectTitle": "Connect Google Classroom",
+        "connectBody": "Sign in with the Google account you teach with. LexiClash only reads your class list to match students by email, and only writes the grades you send.",
+        "connectCta": "Connect Google Classroom",
+        "lessonLabel": "LexiClash lesson",
+        "courseLabel": "Google Classroom class",
+        "courseWorkLabel": "Classroom assignment",
+        "choose": "Choose…",
+        "noCourses": "No active Google Classroom classes found for this account.",
+        "notLinkableHint": "created outside LexiClash, can’t be graded",
+        "createCourseWork": "Create a new Classroom assignment for this lesson",
+        "returnGrades": "Also return grades to students (otherwise they stay as drafts only you can see)",
+        "confirmHint": "Scores are scaled to this assignment’s {{points}} points.",
+        "confirm": "Send grades",
+        "cancel": "Cancel",
+        "done": "Done",
+        "resultTitle": "Grades sent",
+        "updated": "{{count}} students graded",
+        "skipped": "{{count}} students skipped: no practice on this lesson yet",
+        "unmatchedTitle": "Not matched to a Classroom student",
+        "failedTitle": "Couldn’t update these students",
+        "reason": {
+          "no_email": "no school email (guest account)",
+          "not_in_course": "email not in this Classroom class",
+          "duplicate_email": "another student already uses this email"
+        },
+        "errorNotLinkable": "Google only lets LexiClash grade assignments it created. Create a new Classroom assignment for this lesson.",
+        "errorRateLimited": "Google Classroom is busy. Try again in {{seconds}} seconds.",
+        "errorNotFound": "That class or assignment wasn’t found. It may have been deleted.",
+        "errorUngraded": "This Classroom assignment has no points, so it can’t take a grade.",
+        "errorNotPro": "Sending grades to Google Classroom is part of Teacher Pro.",
+        "errorGeneric": "Something went wrong talking to Google Classroom. Please try again."
       }
     },
     "curriculum": {

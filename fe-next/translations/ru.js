@@ -12621,6 +12621,46 @@ const ru = {
           "lastActive": "Последняя активность",
           "gamesPlayed": "Сыграно игр"
         }
+      },
+      "googleClassroom": {
+        "scopesMissing": "Некоторые разрешения Google не были отмечены. Подключитесь снова и разрешите всё, чтобы LexiClash могла сопоставить учеников и отправить оценки.",
+        "errorForbidden": "Google Classroom отклонил запрос. Возможно, администратор школы запретил доступ сторонним приложениям или вы не учитель этого класса.",
+        "button": "Отправить оценки в Google Classroom",
+        "loading": "Загружаем ваши классы Google Classroom…",
+        "sending": "Отправляем оценки…",
+        "connected": "Google Classroom подключён. Можно отправлять оценки.",
+        "denied": "Google Classroom не подключён. Попробовать снова можно в любой момент.",
+        "connectTitle": "Подключите Google Classroom",
+        "connectBody": "Войдите в аккаунт Google, с которым вы ведёте уроки. LexiClash только читает список класса, чтобы сопоставить учеников по почте, и записывает только те оценки, которые вы отправите.",
+        "connectCta": "Подключить Google Classroom",
+        "lessonLabel": "Урок в LexiClash",
+        "courseLabel": "Класс в Google Classroom",
+        "courseWorkLabel": "Задание в Classroom",
+        "choose": "Выберите…",
+        "noCourses": "В этом аккаунте нет активных классов Google Classroom.",
+        "notLinkableHint": "создано вне LexiClash, оценить нельзя",
+        "createCourseWork": "Создать новое задание в Classroom для этого урока",
+        "returnGrades": "Сразу вернуть оценки ученикам (иначе они останутся черновиком, который видите только вы)",
+        "confirmHint": "Баллы пересчитываются в {{points}} баллов этого задания.",
+        "confirm": "Отправить оценки",
+        "cancel": "Отмена",
+        "done": "Готово",
+        "resultTitle": "Оценки отправлены",
+        "updated": "Оценено учеников: {{count}}",
+        "skipped": "Пропущено учеников: {{count}} — ещё не занимались этим уроком",
+        "unmatchedTitle": "Не найдены среди учеников Classroom",
+        "failedTitle": "Не удалось обновить этих учеников",
+        "reason": {
+          "no_email": "нет школьной почты (гостевой аккаунт)",
+          "not_in_course": "этой почты нет в классе Classroom",
+          "duplicate_email": "эту почту уже использует другой ученик"
+        },
+        "errorNotLinkable": "Google разрешает LexiClash оценивать только задания, созданные в LexiClash. Создайте новое задание в Classroom для этого урока.",
+        "errorRateLimited": "Google Classroom перегружен. Повторите через {{seconds}} с.",
+        "errorNotFound": "Класс или задание не найдены. Возможно, они удалены.",
+        "errorUngraded": "У этого задания в Classroom нет баллов, поэтому оценку поставить нельзя.",
+        "errorNotPro": "Отправка оценок в Google Classroom входит в Teacher Pro.",
+        "errorGeneric": "Не удалось связаться с Google Classroom. Попробуйте ещё раз."
       }
     },
     "curriculum": {
