@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-24T01:21:41.023Z",
+  "generatedAt": "2026-09-25T08:17:12.848Z",
   "commits": [
     {
-      "sha": "8394e1daa38d8ed603b03345ea216f336fd24348",
-      "shortSha": "8394e1d",
-      "subject": "feat(education): Gimkit Basic Pro-Exclusive 5-player honesty foil (#1137)",
-      "author": "ohadf2015",
-      "date": "2026-09-23T15:38:06+03:00"
-    },
-    {
-      "sha": "15fdd63e09dd1a0e56bc3b943292ebfadeee697b",
-      "shortSha": "15fdd63",
-      "subject": "feat(education): Wayground Starter 20-activity library honesty foil (#1136)",
-      "author": "ohadf2015",
-      "date": "2026-09-23T13:31:14+03:00"
-    },
-    {
-      "sha": "fd1cc05740fbb257c49db6a844ac9a5adb6a273f",
-      "shortSha": "fd1cc05",
-      "subject": "seo: rewrite titles on 4 high-impression CTR bleed pages (#1135)",
-      "author": "ohadf2015",
-      "date": "2026-09-23T11:43:40+03:00"
-    },
-    {
-      "sha": "a976a16ce545e8681c59ea9f6635110b1683378d",
-      "shortSha": "a976a16",
-      "subject": "feat(edu): daily Polar Teacher Pro churn-watch cron (#1133)",
-      "author": "ohadf2015",
-      "date": "2026-09-23T11:30:47+03:00"
-    },
-    {
-      "sha": "938720ec8889f4eaa12cabd6ed41f281118af494",
-      "shortSha": "938720e",
-      "subject": "feat(education): show the Pro report ask on the classroom projector (#1126)",
-      "author": "ohadf2015",
-      "date": "2026-09-23T10:33:09+03:00"
-    },
-    {
-      "sha": "9a03cc73e057c89d1738b9746a9c181461dfcdc5",
-      "shortSha": "9a03cc7",
-      "subject": "fix(singleplayer): hang-timeout + error boundary on lazy import (#1134)",
-      "author": "ohadf2015",
-      "date": "2026-09-23T10:31:53+03:00"
-    },
-    {
-      "sha": "80f26b291c0eb2a264a6bf7853052913d040543e",
-      "shortSha": "80f26b2",
-      "subject": "feat(education): Kahoot Go Free participant-limit honesty foil (table 40 vs FAQ 10) (#1132)",
-      "author": "ohadf2015",
-      "date": "2026-09-23T10:28:12+03:00"
-    },
-    {
-      "sha": "655509cdd505c0bed1ecff95660d32e42180de43",
-      "shortSha": "655509c",
-      "subject": "Merge pull request #1131 from ohadf2015/boggle-new/t_0d9276d6-ur-high-lexiclash-en-multiplayer-bounce",
-      "author": "ohadf2015",
-      "date": "2026-09-23T08:16:07+03:00"
-    },
-    {
-      "sha": "be6bcd2baea2b7e40f94c5f5f9483584fb78672b",
-      "shortSha": "be6bcd2",
-      "subject": "fix(mp): stop /en/multiplayer first-paint from hiding CTAs (t_0d9276d6)",
-      "author": "ohadf2015",
-      "date": "2026-09-23T03:31:42+03:00"
-    },
-    {
-      "sha": "4fb9cb58a24faa4b0a67420749222411cdc1a0d4",
-      "shortSha": "4fb9cb5",
-      "subject": "fix(daily): mark dailyDoneEver on Word Hunt and Word Wheel completion (#1130)",
-      "author": "ohadf2015",
-      "date": "2026-09-22T23:10:01+03:00"
-    },
-    {
-      "sha": "b3753dc25c4aa93e742eb4660fd8a1a6dab5079c",
-      "shortSha": "b3753dc",
-      "subject": "grok: # LexiClash solo mode: adventure-grade juice + new-player mode rotatio (#1128)",
-      "author": "ohadf2015",
-      "date": "2026-09-22T22:38:49+03:00"
-    },
-    {
-      "sha": "8a396bbc98db7558389e0d2c3a22d1cb623b5eee",
-      "shortSha": "8a396bb",
-      "subject": "feat(education): vs-Blooket Gaps Set honesty foil vs miss-gap Live deep-link (#1125)",
-      "author": "ohadf2015",
-      "date": "2026-09-22T19:25:52+03:00"
-    },
-    {
-      "sha": "7e3947017b36c750fded90a548a803fad0783f19",
-      "shortSha": "7e39470",
-      "subject": "fix(daily): stop Word Hunt music on route leave; SSR-safe played status",
+      "sha": "46f7bead77a0cedb2a78bb9162499f6e033dc98f",
+      "shortSha": "46f7bea",
+      "subject": "test(drills): mock daily-quest fire-and-forget in processCompletion test",
       "author": "Ohad Fisher",
-      "date": "2026-09-22T18:12:38+03:00"
+      "date": "2026-09-25T11:16:46+03:00"
     },
     {
-      "sha": "9988c0ef0f0d51c68c58a3a2a32a4c4e9abda34e",
-      "shortSha": "9988c0e",
-      "subject": "feat(education): Unplugged/reteach Live deep-link from teacher assignment miss gaps (#1124)",
-      "author": "ohadf2015",
-      "date": "2026-09-22T17:33:21+03:00"
-    },
-    {
-      "sha": "f1759e19270430ee1c10b05b0c660a88e55e00fd",
-      "shortSha": "f1759e1",
-      "subject": "Merge fix/daily-hub-nested-suspense (approved via company-brain)",
+      "sha": "c7efd579d873b0f4d30ce89d8000645f7044a768",
+      "shortSha": "c7efd57",
+      "subject": "wip(seo): brain landing copy — 4 drills, Brain Check, honest claims",
       "author": "Ohad Fisher",
-      "date": "2026-09-22T13:32:43+03:00"
+      "date": "2026-09-25T11:10:25+03:00"
     },
     {
-      "sha": "c362e2dad2a79eef6740708f3ed2181ea5411056",
-      "shortSha": "c362e2d",
-      "subject": "Merge fix/daily-hub-ssr-singleplayer-retry (approved via company-brain)",
+      "sha": "b2ac5b37bd851ec2348dc0a0302438c0c37507a0",
+      "shortSha": "b2ac5b3",
+      "subject": "wip(brain): unified drill shell, brain check UI, hub rewrite, removals, i18n",
       "author": "Ohad Fisher",
-      "date": "2026-09-22T12:40:43+03:00"
+      "date": "2026-09-25T10:48:57+03:00"
     },
     {
-      "sha": "1643965427507635e87471e5814f1ffe3ec6306d",
-      "shortSha": "1643965",
-      "subject": "fix(daily): nest useSearchParams so /en/daily SSRs the hub",
+      "sha": "96f735139bde83c1ed761f3cc4340f2bfdb4f837",
+      "shortSha": "96f7351",
+      "subject": "wip(brain): brain check stats core, staircase, server pipeline",
       "author": "Ohad Fisher",
-      "date": "2026-09-22T09:26:46Z"
+      "date": "2026-09-25T10:43:58+03:00"
     },
     {
-      "sha": "ecd101c5f4b5dbca7ad498be4e134bed6d26ca7b",
-      "shortSha": "ecd101c",
-      "subject": "fix(pricing): stop EducationShell + full footer collapsing main to zero (#1122)",
+      "sha": "46d892797551a3c9f0ce96563bd712990003c33d",
+      "shortSha": "46d8927",
+      "subject": "SEO: daily meta tag improvements (2026-09-25) (#1145)",
       "author": "ohadf2015",
-      "date": "2026-09-22T12:11:31+03:00"
+      "date": "2026-09-25T10:31:54+03:00"
     },
     {
-      "sha": "81ba2f297fd27e07ad27759afc0e36e2b0086670",
-      "shortSha": "81ba2f2",
-      "subject": "fix(daily,singleplayer): SSR daily hub instead of loader; retryImport on SP (#1121)",
-      "author": "ohadf2015",
-      "date": "2026-09-22T11:30:33+03:00"
+      "sha": "00b87e64d4e15c934e9e1c89da691dedb3c5faea",
+      "shortSha": "00b87e6",
+      "subject": "fix(avatar): mirror signed-in profile avatar to local storage",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T23:46:39+03:00"
     },
     {
-      "sha": "693008399685b43d4d4b91ffa3a0b770c2d958c8",
-      "shortSha": "6930083",
-      "subject": "feat(education): trial upgrade nudge to Teacher Pro Polar checkout (#1102)",
-      "author": "ohadf2015",
-      "date": "2026-09-22T11:27:49+03:00"
+      "sha": "8927dbc70a7778339877a3a5929e6b5ee511c1d7",
+      "shortSha": "8927dbc",
+      "subject": "fix(education): satisfy repo guards — CSS island bob, Academy frame shell contract",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T23:06:03+03:00"
+    },
+    {
+      "sha": "a1088ab7afbde3a62dd737b660c5b3fd933a6e2d",
+      "shortSha": "a1088ab",
+      "subject": "fix(teacher): Teacher HQ, classes and reports fit every screen; GO LIVE holds still",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T22:45:05+03:00"
+    },
+    {
+      "sha": "9ef0c23aedd94fc94b7057f0ce65a001a29a19d1",
+      "shortSha": "9ef0c23",
+      "subject": "fix(education): live stage fits every screen — TV-scale launch, reachable reteach, waiting stage",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T22:05:08+03:00"
+    },
+    {
+      "sha": "9db5bf82a24d13180e951dbe322f39ebb5e0020c",
+      "shortSha": "9db5bf8",
+      "subject": "fix(student): lessons, awards and join fit every screen in the Academy frame",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T21:33:01+03:00"
+    },
+    {
+      "sha": "3bdbb8f0e8afdc6f4e70f06d804e912260da7a6a",
+      "shortSha": "3bdbb8f",
+      "subject": "fix(i18n): common.loading shadowed by a stray \"Checking…\" in five locales",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T21:13:53+03:00"
+    },
+    {
+      "sha": "722f3ce011de2f831cc278fe756cc850d6803829",
+      "shortSha": "722f3ce",
+      "subject": "fix(education): Word Workshop + Missed Words Review fit every screen",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T20:40:32+03:00"
+    },
+    {
+      "sha": "640296f36eb5c3bda0c76e937fadf5d1de0fd676",
+      "shortSha": "640296f",
+      "subject": "fix(student): Academy Map fits every screen — landscape phones, tablets, TV",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T19:17:26+03:00"
+    },
+    {
+      "sha": "0ebd05756f872237b7bdbf56c8d332485d48992c",
+      "shortSha": "0ebd057",
+      "subject": "fix(avatar): gold purchases, avatar save, face-cropped small avatars; tidy home hub top",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T20:55:48+03:00"
+    },
+    {
+      "sha": "c9cf0042d435b616d4a9c52f45202b907a4c9f64",
+      "shortSha": "c9cf004",
+      "subject": "feat(singleplayer): focused solo results — no auto-start, next game above the fold",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T22:18:03+03:00"
+    },
+    {
+      "sha": "c2c7ca9279e362b2b44a8020387b8118f0f8b3e4",
+      "shortSha": "c2c7ca9",
+      "subject": "fix(i18n): drop stale \"admin preview\" from public Word Tower card",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T22:18:03+03:00"
+    },
+    {
+      "sha": "e43cb12b7182c5de6b3fe091326ce41bc9e5fc18",
+      "shortSha": "e43cb12",
+      "subject": "fix(singleplayer): race bar reads live bot scores (bot looked idle)",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T22:18:02+03:00"
+    },
+    {
+      "sha": "31e145fffbc667dfcb3d4c81c58a0177b51da194",
+      "shortSha": "31e145f",
+      "subject": "fix(avatar): hide the bottom ad while the avatar builder is open",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T13:48:24+03:00"
+    },
+    {
+      "sha": "b50fc41a0ea2ddad2ba96df6950f53a69f7b8ff5",
+      "shortSha": "b50fc41",
+      "subject": "chore(education): mark decorative academy art <img> as intentional (pre-push lint is --max-warnings=0)",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T13:40:09+03:00"
+    },
+    {
+      "sha": "5daa12ed6930803322aab69085e48e4d3464de7d",
+      "shortSha": "5daa12e",
+      "subject": "feat(education): Word Workshop + Missed Words Review academy modes",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T13:10:30+03:00"
     }
   ]
 }

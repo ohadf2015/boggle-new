@@ -136,3 +136,31 @@ describe('isAdFreeRoute', () => {
     expect(isAdFreeRoute(null)).toBe(false);
   });
 });
+
+describe('teacher module is ad-free in every format', () => {
+  it('treats the class-code join (/join, /join/<code>) as ad-free', () => {
+    expect(isAdFreeRoute('/en/join')).toBe(true);
+    expect(isAdFreeRoute('/he/join/AB3K9Z')).toBe(true);
+    expect(isAdFreeRoute('/en/joinery')).toBe(false);
+  });
+
+  it('never allows the banner on any ad-free surface', () => {
+    const adFree = ['/en/teacher', '/he/education/lessons', '/student', '/en/join/X1', '/admin'];
+    for (const p of adFree) expect(isAllowedAdBannerRoute(p)).toBe(false);
+    const classroom = new URLSearchParams('room=ABC&classroom=true');
+    expect(isAllowedAdBannerRoute('/en/multiplayer', classroom)).toBe(false);
+  });
+});
+
+describe('Academy solo play stays ad-free', () => {
+  it('treats quick-play launched from the student Academy as ad-free', () => {
+    const fromAcademy = new URLSearchParams('academy=1');
+    expect(isAdFreeRoute('/en/quick-play', fromAcademy)).toBe(true);
+    expect(isAllowedAdBannerRoute('/he/quick-play', fromAcademy)).toBe(false);
+  });
+
+  it('leaves consumer quick-play monetized', () => {
+    expect(isAdFreeRoute('/en/quick-play', new URLSearchParams())).toBe(false);
+    expect(isAdFreeRoute('/en/quick-play', null)).toBe(false);
+  });
+});

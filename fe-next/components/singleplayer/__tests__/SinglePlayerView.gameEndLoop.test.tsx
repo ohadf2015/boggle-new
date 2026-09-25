@@ -73,6 +73,7 @@ vi.mock('@/contexts/MusicContext', () => ({
     unlockAudio: vi.fn(),
     playBackgroundMusic: vi.fn(),
     stopBackgroundMusic: vi.fn(),
+    stopMusic: vi.fn(),
     isPlaying: false,
   }),
 }));

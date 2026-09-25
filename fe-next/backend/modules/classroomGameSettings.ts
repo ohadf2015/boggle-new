@@ -16,6 +16,7 @@ import logger from '../utils/logger';
 import {
   CLASSROOM_GAME_TTL,
   getClassroomGame,
+  withClassroomGameLock,
   type ClassroomGameSettings,
 } from './classroomGameManager';
 
@@ -34,7 +35,15 @@ export type SwitchableClassroomMode = NonNullable<ClassroomGameSettings['gameMod
  * Returns false — and logs — rather than throwing, so a caller can tell the
  * teacher something true instead of the switch failing in silence.
  */
-export async function setClassroomGameMode(
+export function setClassroomGameMode(
+  gameCode: string,
+  gameMode: SwitchableClassroomMode
+): Promise<boolean> {
+  // Same queue as the roster writers — a join mid-switch must not drop the new mode.
+  return withClassroomGameLock(gameCode, () => setClassroomGameModeUnlocked(gameCode, gameMode));
+}
+
+async function setClassroomGameModeUnlocked(
   gameCode: string,
   gameMode: SwitchableClassroomMode
 ): Promise<boolean> {

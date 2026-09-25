@@ -5,7 +5,7 @@
  *
  * This route server-renders a `GamePageSeoContent` block and a for-schools CTA
  * BELOW the client tree. That copy is not decoration: this page is the primary
- * hero CTA of `/education/for-schools`, the $149/year funnel, and the block
+ * hero CTA of `/education/for-schools`, the Classroom-plan ($39/term) funnel, and the block
  * exists because a crawler previously saw 17 words here under a HowTo that
  * described three unseen steps.
  *

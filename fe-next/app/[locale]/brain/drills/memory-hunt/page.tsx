@@ -9,6 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return generatePageMetadata({ seoKey: 'brainMemoryHunt', path: '/brain/drills/memory-hunt', locale, noIndex: true });
 }
 
-export default async function MemoryHuntPage() {
-  return <MemoryHuntPageClient />;
+export default async function MemoryHuntPage({ searchParams }: { searchParams: Promise<{ check?: string }> }) {
+  const { check } = await searchParams;
+  return <MemoryHuntPageClient isCheck={check === '1'} />;
 }

@@ -51,9 +51,13 @@ interface UseMemoryHuntGameProps {
     score: number;
     wordsFound: number;
     totalWords: number;
+    /** Words recalled across ALL rounds (wordsFound/totalWords cover the last round only). */
+    recalled: number;
     timeSpent: number;
     level: number;
   }) => void;
+  /** false = Brain Check: no free clue, ad clue grants ignored (clues reveal targets). */
+  assists?: boolean;
 }
 
 export function useMemoryHuntGame({
@@ -62,6 +66,7 @@ export function useMemoryHuntGame({
   level,
   language,
   onComplete,
+  assists = true,
 }: UseMemoryHuntGameProps) {
   const { playErrorSound, playWordAcceptedSound, playComboMilestoneSound } = useSoundEffects();
 
@@ -88,7 +93,9 @@ export function useMemoryHuntGame({
   const [currentHighlight, setCurrentHighlight] = useState<HighlightedCell[]>([]);
   const [excludedWords, setExcludedWords] = useState<Set<string>>(new Set());
   const [showStudyModal, setShowStudyModal] = useState(false);
-  const [hintsRemaining, setHintsRemaining] = useState(FREE_CLUES);
+  const freeClues = assists ? FREE_CLUES : 0;
+  const [hintsRemaining, setHintsRemaining] = useState(freeClues);
+  const [recalled, setRecalled] = useState(0);
   const [isHintActive, setIsHintActive] = useState(false);
   // Forgiveness: each round grants one free warm-up miss before lives drop.
   const [firstMissUsedThisRound, setFirstMissUsedThisRound] = useState(false);
@@ -221,17 +228,19 @@ export function useMemoryHuntGame({
     setLives(levelConfig.lives);
     setScore(0);
     setRound(1);
-    setHintsRemaining(FREE_CLUES);
+    setHintsRemaining(freeClues);
+    setRecalled(0);
     setStartTime(Date.now());
     combo.resetAll();
     startRound();
-  }, [levelConfig.lives, startRound, combo]);
+  }, [levelConfig.lives, startRound, combo, freeClues]);
 
   // Grant extra clues (from a rewarded ad, or the free fallback when no ad is
   // available). Marks the unlock used so the UI shows the offer once per game.
   const grantClues = useCallback((amount: number) => {
+    if (!assists) return;
     setHintsRemaining(prev => prev + amount);
-  }, []);
+  }, [assists]);
 
   // Use a clue to reveal one unfound word's path long enough to trace it.
   const useHint = useCallback(() => {
@@ -275,6 +284,7 @@ export function useMemoryHuntGame({
       const updatedTargets = [...targetWords];
       updatedTargets[targetIndex].found = true;
       setTargetWords(updatedTargets);
+      setRecalled(prev => prev + 1);
 
       const newComboLevel = combo.incrementCombo();
       const streakBonus = newComboLevel >= 2 ? (newComboLevel - 1) * STREAK_BONUS_PER_LEVEL : 0;
@@ -346,10 +356,11 @@ export function useMemoryHuntGame({
       score,
       wordsFound,
       totalWords,
+      recalled,
       timeSpent,
       level,
     };
-  }, [targetWords, score, startTime, endTime, level]);
+  }, [targetWords, score, startTime, endTime, level, recalled]);
 
   // Handle completion (idempotent: ref guard prevents reward loop when parent
   // recreates `onComplete` after coin-state updates).

@@ -27,7 +27,7 @@ const OG_LOCALE: Record<string, string> = {
   es: 'es_ES',
 };
 
-const DRILL_IDS = ['lightning-round', 'memory-hunt', 'combo-master', 'pattern-switcher', 'rare-gems'] as const;
+const DRILL_IDS = ['lightning-round', 'memory-hunt', 'combo-master', 'rare-gems'] as const;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
@@ -71,8 +71,7 @@ const DRILL_VISUALS = [
   { icon: '⚡', accentBg: 'bg-neo-lime', accentText: 'text-neo-lime' },
   { icon: '🧠', accentBg: 'bg-neo-purple', accentText: 'text-neo-purple' },
   { icon: '🎯', accentBg: 'bg-neo-orange', accentText: 'text-neo-orange' },
-  { icon: '🔄', accentBg: 'bg-neo-cyan', accentText: 'text-neo-cyan' },
-  { icon: '💎', accentBg: 'bg-neo-lime', accentText: 'text-neo-lime' },
+  { icon: '💎', accentBg: 'bg-neo-cyan', accentText: 'text-neo-cyan' },
 ];
 
 export default async function BrainTrainingWordGamesPage({ params }: PageProps) {
@@ -111,7 +110,7 @@ export default async function BrainTrainingWordGamesPage({ params }: PageProps) 
     '@type': 'ItemList',
     name: copy.itemListName,
     description: copy.itemListDescription,
-    numberOfItems: 5,
+    numberOfItems: copy.drills.length,
     itemListOrder: 'https://schema.org/ItemListOrderAscending',
     itemListElement: copy.drills.map((drill, i) => ({
       '@type': 'ListItem',

@@ -9694,6 +9694,33 @@ const ja = {
     "connection": "ネットワーク"
   },
   "brain": {
+    "check": {
+      "cooldownGate": "このドリルの今日のチェックは完了しています。次は{h}時間後。それまでトレーニングしよう（練習は傾向に影響しません）。",
+      "trainInstead": "トレーニングする",
+      "title": "ブレインチェック",
+      "subtitle": "条件を固定した1分間のテスト。各ドリル1日1回。毎回同じルールだから、レベルが上がったせいではない本当の変化がわかります。",
+      "start": "チェック",
+      "nextIn": "あと{h}時間",
+      "howItWorks": "測定方法",
+      "method": {
+        "fixed": "チェックは毎回、全員まったく同じルールと難易度で行います。トレーニングのレベルは影響しません。",
+        "warmup": "最初のチェックはウォームアップです。課題に慣れるためのもので、基準値には含めません。",
+        "noise": "基準値は2〜3回目のチェックです。直近のチェックがあなた自身の日ごとのばらつきを超えて変化し、しかも1週間以上経ったときだけ「変化あり」と判定します（信頼性変化指数）。",
+        "transfer": "正直な限界：これはこの単語課題での成績を追跡するものです。記憶力やIQ全般が変わった証明にはなりません。そう言える脳トレアプリはありません。"
+      },
+      "loadFailed": "チェックを読み込めませんでした。タップして再試行。",
+      "guestPitch": "ログインしてブレインチェックを記録しよう。条件を固定した短いテストで、本当に頭が冴えてきたかを統計的に判定します。",
+      "rejected": "このドリルは今日すでにチェック済みなので、今回は練習としてカウントしました。次のチェックはまた明日。",
+      "fixedConditions": "固定条件なので日ごとに比較できます。",
+      "warmupDone": "ウォームアップ完了",
+      "needMoreRuns": "あと{n}回で傾向がわかります",
+      "needMoreDays": "あと{n}日で傾向がわかります",
+      "verdict": {
+        "improved": "確かに向上",
+        "stable": "安定",
+        "declined": "基準値を下回る"
+      }
+    },
     "title": "ブレインジム",
     "score": "ブレインスコア",
     "points": "ブレインポイント",
@@ -9792,6 +9819,8 @@ const ja = {
       "bonusLabel": "ボーナス"
     },
     "drills": {
+      "levelEased": "レベルを1つ下げました。いい流れに戻ろう",
+      "levelLabel": "レベル{level}",
       "title": "脳トレドリル",
       "brainTraining": "脳トレ",
       "levelUp": "レベルアップ! レベル{level}",
@@ -13628,6 +13657,23 @@ const ja = {
         "fileName": "{{name}} – 課題の進捗",
         "untitled": "無題のレッスン",
         "anonymousStudent": "生徒 {{id}}"
+      },
+      "exportAllClasses": {
+        "button": "全クラスを書き出す",
+        "downloading": "書き出し中…",
+        "failed": "クラスを書き出せませんでした。もう一度お試しください。",
+        "empty": "書き出す内容がまだありません",
+        "fileName": "全クラス – 進捗エクスポート",
+        "anonymousStudent": "生徒 {{id}}",
+        "columns": {
+          "classroom": "クラス",
+          "student": "生徒",
+          "lessonsCompleted": "完了したレッスン数",
+          "wordsMastered": "習得した単語数",
+          "totalXp": "合計XP",
+          "lastActive": "最終アクティブ日",
+          "gamesPlayed": "プレイ回数"
+        }
       }
     },
     "curriculum": {
@@ -14546,6 +14592,18 @@ const ja = {
       "viewStudents": "生徒を見る",
       "viewVocabulary": "語彙を見る",
       "vocabularyMastery": "語彙の習熟度",
+      "wordMastery": {
+        "title": "単語習熟度の傾向",
+        "subtitle": "定着している単語と、再指導が必要な単語",
+        "mastered": "習得済み",
+        "improving": "上達中",
+        "stuck": "停滞中",
+        "reteachTitle": "再指導すべき単語",
+        "reteachEmpty": "現在、再指導が必要な単語はありません",
+        "studentsStuck": "{{stuck}}/{{total}} 人の生徒",
+        "emptyTitle": "まだデータが十分ではありません",
+        "emptyHint": "レッスンゲームをもう少しプレイすると習熟度の傾向が表示されます"
+      },
       "yesterday": "昨日"
     },
     "classroomGame": {

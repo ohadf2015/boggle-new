@@ -6,6 +6,7 @@ import { useSafeArea } from '@/hooks/useSafeArea';
 import { AdPlaceholder } from './AdPlaceholder';
 import { bannerController, BANNER_OWNER } from '@/lib/native/bannerController';
 import type { BannerVariant } from '@/lib/admob-config';
+import { isAdFreeRoute } from '@/lib/admob-routes';
 
 interface InlineBannerAdProps {
   /** Zone label used for the dev-only web placeholder. */
@@ -34,6 +35,8 @@ export default function InlineBannerAd({
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
+    // Shared results/lobby screens also mount inside classroom games — no ads there.
+    if (isAdFreeRoute(window.location.pathname, new URLSearchParams(window.location.search))) return;
     const el = slotRef.current;
     if (!el) return;
 

@@ -18,7 +18,6 @@ const cases: Array<{ name: string; load: () => Promise<any>; params: Record<stri
   { name: '/brain/drills/combo-master', load: () => import('../[locale]/brain/drills/combo-master/page'), params: { locale: 'en' } },
   { name: '/brain/drills/lightning-round', load: () => import('../[locale]/brain/drills/lightning-round/page'), params: { locale: 'en' } },
   { name: '/brain/drills/memory-hunt', load: () => import('../[locale]/brain/drills/memory-hunt/page'), params: { locale: 'en' } },
-  { name: '/brain/drills/pattern-switcher', load: () => import('../[locale]/brain/drills/pattern-switcher/page'), params: { locale: 'en' } },
   { name: '/brain/drills/rare-gems', load: () => import('../[locale]/brain/drills/rare-gems/page'), params: { locale: 'en' } },
   { name: '/word-of-the-day/[date]', load: () => import('../[locale]/word-of-the-day/[date]/page'), params: { locale: 'en', date: '2026-03-05' } },
   // BETA-gated: PageClient redirects non-beta users → wall for reviewer/crawler.

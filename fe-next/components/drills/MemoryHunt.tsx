@@ -26,10 +26,13 @@ interface MemoryHuntProps {
     score: number;
     wordsFound: number;
     totalWords: number;
+    recalled: number;
     timeSpent: number;
     level: number;
   }) => void;
   onExit?: () => void;
+  /** false during a Brain Check: clues would reveal the targets being measured. */
+  assists?: boolean;
   onPlayAgain?: () => void;
 }
 
@@ -41,6 +44,7 @@ export default function MemoryHunt({
   onComplete,
   onExit,
   onPlayAgain,
+  assists = true,
 }: MemoryHuntProps) {
   const { t, dir } = useLanguage();
   const { playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
@@ -52,6 +56,7 @@ export default function MemoryHunt({
     level,
     language,
     onComplete,
+    assists,
   });
 
   useFocusTrap(studyModalRef, game.phase === 'study' && game.showStudyModal);
@@ -347,13 +352,15 @@ export default function MemoryHunt({
               </div>
 
               <div className="flex gap-2">
-                <MemoryHuntCluePanel
-                  hintsRemaining={game.hintsRemaining}
-                  isHintActive={game.isHintActive}
-                  onUseClue={game.useHint}
-                  onGrantClues={game.grantClues}
-                  t={t}
-                />
+                {assists && (
+                  <MemoryHuntCluePanel
+                    hintsRemaining={game.hintsRemaining}
+                    isHintActive={game.isHintActive}
+                    onUseClue={game.useHint}
+                    onGrantClues={game.grantClues}
+                    t={t}
+                  />
+                )}
                 <button
                   type="button"
                   onClick={game.finishGame}

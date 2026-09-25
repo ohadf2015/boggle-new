@@ -20,6 +20,12 @@ import {
 import { computeDrillProgressUpdate } from '@/shared/utils/drillLeveling';
 import { validateDrillSubmission } from '@/shared/utils/drillSubmissionValidation';
 import { computeDrillImprovement, type DrillImprovement } from '@/shared/utils/drillImprovement';
+import {
+  BRAIN_CHECK_COOLDOWN_MS,
+  BRAIN_CHECK_PROTOCOL,
+  isBrainCheckDrill,
+  splitRecentSessions,
+} from '@/shared/utils/brainCheck';
 
 export type SupabaseLike = any;
 
@@ -55,6 +61,8 @@ export interface DrillCompletionResponseBody {
   previousLevel?: number;
   /** "You got better" signals for the results screen (best-effort). */
   improvement?: DrillImprovement;
+  /** Set only when the client asked for a Brain Check. */
+  brainCheck?: 'recorded' | 'rejected';
 }
 
 export type DrillProcessResult =
@@ -129,6 +137,44 @@ export async function processBrainDrillCompletion(
     }
   }
 
+  // Newest-first recent runs: adaptive-staircase input. Read BEFORE the insert
+  // so this run is never its own "previous run".
+  const { data: recentRows } = await supabase
+    .from('drill_sessions')
+    .select('score, level, created_at, extra_data')
+    .eq('user_id', userId)
+    .eq('drill_type', drillType)
+    .order('created_at', { ascending: false })
+    .limit(20);
+  const { lastTraining } = splitRecentSessions(recentRows);
+
+  // A Brain Check only counts when it is on-protocol AND outside the cooldown.
+  // The cooldown uses its own lookup: the 20-row feed above can be flooded by
+  // training runs, which would hide a recent check and let a second one in.
+  // Either way a check was played at the protocol level, not the player's
+  // training level, so it never feeds training progress.
+  const checkRequested = extraData?.benchmark === true;
+  let checkInCooldown = false;
+  if (checkRequested) {
+    const { data: recentCheck } = await supabase
+      .from('drill_sessions')
+      .select('created_at')
+      .eq('user_id', userId)
+      .eq('drill_type', drillType)
+      .gte('created_at', new Date(Date.now() - BRAIN_CHECK_COOLDOWN_MS).toISOString())
+      .filter('extra_data->>benchmark', 'eq', 'true')
+      .limit(1)
+      .maybeSingle();
+    checkInCooldown = !!recentCheck;
+  }
+  const checkAccepted = checkRequested
+    && isBrainCheckDrill(drillType)
+    && level === BRAIN_CHECK_PROTOCOL[drillType].level
+    && !checkInCooldown;
+  const storedExtra = checkRequested
+    ? { ...extraData, benchmark: checkAccepted, ...(checkAccepted ? {} : { benchmarkRejected: true }) }
+    : extraData || null;
+
   const { data: sessionData, error: sessionError } = await supabase
     .from('drill_sessions')
     .insert({
@@ -139,7 +185,7 @@ export async function processBrainDrillCompletion(
       duration_seconds: durationSeconds,
       words_found: wordsFound,
       domain_score_earned: domainScoreEarned || null,
-      extra_data: extraData || null,
+      extra_data: storedExtra,
     })
     .select()
     .single();
@@ -173,10 +219,14 @@ export async function processBrainDrillCompletion(
         totalScore: progressData.total_score ?? 0,
       }
     : null;
-  const nextProgress = computeDrillProgressUpdate(priorSnapshot, score);
+  // Written below for training runs only — a Brain Check leaves progress as-is.
+  const nextProgress = computeDrillProgressUpdate(priorSnapshot, score, lastTraining);
+  const newLevel = checkRequested ? (priorSnapshot?.level ?? 1) : nextProgress.level;
   const nowIso = new Date().toISOString();
 
-  if (progressData) {
+  if (checkRequested) {
+    // Brain Check: training progress untouched.
+  } else if (progressData) {
     const { error: updateError } = await supabase
       .from('drill_progress')
       .update({
@@ -393,32 +443,18 @@ export async function processBrainDrillCompletion(
       words_found: wordsFound,
       xp_awarded: xpAwarded,
       cognitive_domain: targetDomain,
+      brain_check: checkRequested ? (checkAccepted ? 'recorded' : 'rejected') : undefined,
       source: ctx.source,
     },
   });
 
   const previousLevel = priorSnapshot?.level ?? 1;
-  const levelPromoted = nextProgress.level > previousLevel;
+  const levelPromoted = newLevel > previousLevel;
 
   // "You got better" signals for the results screen. priorSnapshot is the
   // progress BEFORE this run; the current run's session row is already inserted
   // above, so exclude it by id when reading the immediately-previous score.
-  let lastSessionScore: number | null = null;
-  try {
-    const { data: priorSessions } = await supabase
-      .from('drill_sessions')
-      .select('score')
-      .eq('user_id', userId)
-      .eq('drill_type', drillType)
-      .neq('id', sessionData.id)
-      .order('created_at', { ascending: false })
-      .limit(1);
-    if (Array.isArray(priorSessions) && priorSessions.length > 0) {
-      lastSessionScore = priorSessions[0]?.score ?? null;
-    }
-  } catch {
-    /* non-fatal — improvement just omits the vs-last signal */
-  }
+  const lastSessionScore = lastTraining?.score ?? null;
   const improvement = computeDrillImprovement(
     priorSnapshot
       ? {
@@ -452,9 +488,10 @@ export async function processBrainDrillCompletion(
       brainScore: updatedBrainScore,
       xpAwarded,
       levelPromoted,
-      newLevel: nextProgress.level,
+      newLevel,
       previousLevel,
-      improvement,
+      improvement: checkRequested ? undefined : improvement,
+      ...(checkRequested ? { brainCheck: checkAccepted ? 'recorded' as const : 'rejected' as const } : {}),
     },
   };
 }

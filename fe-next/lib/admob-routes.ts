@@ -58,6 +58,8 @@ export function isAllowedAdBannerRoute(
   search?: URLSearchParams | null,
 ): boolean {
   if (!pathname) return false;
+  // Ad-free surfaces (teacher / education / student / class join) win over everything.
+  if (isAdFreeRoute(pathname, search)) return false;
   const path = pathname.replace(LOCALE_PREFIX, '') || '/';
   // Normalise a single trailing slash so '/daily/' matches the hub exactly.
   const normalized = path.length > 1 ? path.replace(/\/$/, '') : path;
@@ -79,7 +81,8 @@ export function isAllowedAdBannerRoute(
 // above only gates the native banner; this is the cross-format gate consumed
 // by AdSenseLoader (web auto-ads) and useInterstitialAd.
 // ------------------------------------------------------------------
-const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/admin'];
+// `/join` is the class-code join (JoinFlow) — the student's first step into a classroom.
+const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/join', '/admin'];
 
 /**
  * Whether NO ad of any kind may run on this route.
@@ -95,5 +98,7 @@ export function isAdFreeRoute(
   if (!pathname) return false;
   const path = pathname.replace(LOCALE_PREFIX, '') || '/';
   if (path.startsWith('/multiplayer') && search?.get('classroom') === 'true') return true;
+  // Solo play launched from the student Academy (`?academy=1`) — a student surface.
+  if (search?.get('academy') === '1') return true;
   return AD_FREE_ROUTES.some((r) => path === r || path.startsWith(`${r}/`));
 }

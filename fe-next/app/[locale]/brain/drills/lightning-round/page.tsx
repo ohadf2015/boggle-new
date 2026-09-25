@@ -9,6 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return generatePageMetadata({ seoKey: 'brainLightningRound', path: '/brain/drills/lightning-round', locale, noIndex: true });
 }
 
-export default async function LightningRoundPage() {
-  return <LightningRoundPageClient />;
+export default async function LightningRoundPage({ searchParams }: { searchParams: Promise<{ check?: string }> }) {
+  const { check } = await searchParams;
+  return <LightningRoundPageClient isCheck={check === '1'} />;
 }

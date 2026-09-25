@@ -9,6 +9,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return generatePageMetadata({ seoKey: 'brainRareGems', path: '/brain/drills/rare-gems', locale, noIndex: true });
 }
 
-export default async function RareGemsPage() {
-  return <RareGemsPageClient />;
+export default async function RareGemsPage({ searchParams }: { searchParams: Promise<{ check?: string }> }) {
+  const { check } = await searchParams;
+  return <RareGemsPageClient isCheck={check === '1'} />;
 }

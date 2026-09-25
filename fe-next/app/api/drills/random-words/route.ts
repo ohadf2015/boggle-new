@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const maxLength = parseInt(searchParams.get('maxLength') || '6');
 
     // Validate inputs
-    const validLanguages: Language[] = ['en', 'he', 'sv', 'es', 'ja'];
+    const validLanguages: Language[] = ['en', 'he', 'sv', 'es', 'ja', 'ru'];
     if (!validLanguages.includes(language)) {
       return NextResponse.json(
         { error: 'Invalid language' },

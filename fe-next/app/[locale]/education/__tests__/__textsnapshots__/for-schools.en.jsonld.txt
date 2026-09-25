@@ -9,7 +9,7 @@
       "name": "Is LexiClash free for teachers?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Every teacher gets a full 30-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $39/term."
+        "text": "Yes. Every teacher gets a 14-day free trial of Teacher Pro: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the classroom game stays free for individual teachers -- up to 3 classes of 50 students each. Teacher Pro is $9/month and adds per-class analytics, PDF/CSV progress reports and unlimited classes."
       }
     },
     {
@@ -17,7 +17,7 @@
       "name": "What does a school or district plan include?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "School plans ($39/term) add the features that scale: a district admin dashboard, cross-class analytics and reporting, curated curriculum content libraries, an ad-free school environment, and SSO (Clever / ClassLink / Google). The basic classroom game stays free -- plans layer on top, never gate it."
+        "text": "The Classroom plan ($39/term, through the form on this page) covers a whole class with every Teacher Pro feature -- analytics, reports, homework tools -- plus class streaks and priority support. Admin dashboards, cross-class analytics, curriculum libraries and SSO for school or district rollout are on our roadmap, not shipped yet -- tell us what you need and we will follow up, with pricing on request."
       }
     },
     {
@@ -41,7 +41,7 @@
       "name": "How do we start our trial or get a school plan?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Fill in the form on this page with your role, school or district, and rough student count. We'll confirm your trial access and share school plan details -- $39/term, district pricing on request."
+        "text": "Sign up as a teacher to start your own 14-day Teacher Pro trial. Rolling out to a whole class or school instead? Fill in the form on this page with your role, school and rough student count, and we'll follow up about the Classroom plan or a school/district quote."
       }
     },
     {
@@ -49,7 +49,7 @@
       "name": "How is this different from Kahoot, Gimkit or Quizlet?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Those are quiz/flashcard tools that cap their free tiers and are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, has no player cap during the trial, and offers true 1v1 duels."
+        "text": "Those are quiz/flashcard tools that are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, fits a whole class of up to 50 students for free, and offers true 1v1 duels."
       }
     },
     {
@@ -73,7 +73,7 @@
       "name": "Does LexiClash work on Chromebooks and school devices?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. LexiClash runs entirely in the browser — no app to install, no student accounts to provision. It works on Chromebooks, iPads, desktops and phones. Students join with a game code. School plans support Clever, ClassLink and Google Sign-In SSO for teacher accounts."
+        "text": "Yes. LexiClash runs entirely in the browser — no app to install, no student accounts to provision. It works on Chromebooks, iPads, desktops and phones. Students join with a game code, and teachers can share assignments straight to Google Classroom. District SSO (Clever, ClassLink) is on our roadmap."
       }
     }
   ]

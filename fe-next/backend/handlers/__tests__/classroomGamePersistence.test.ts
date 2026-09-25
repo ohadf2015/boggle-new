@@ -344,6 +344,18 @@ describe('persistClassroomGameScores', () => {
       });
     });
 
+    it('never zeroes a scoring student when the game spans many lessons', async () => {
+      // 12 lessons (schema allows 20), score 50 → totalXp 10 → floor(10/12) = 0.
+      // The student scored and must still earn XP on every lesson.
+      const lessonIds = Array.from({ length: 12 }, (_, i) => `lesson-${i}`);
+      const game = makeGame({ lessonIds });
+      const rewards = await persistClassroomGameScores(game, [{ userId: 'stu-1', score: 50 }]);
+
+      expect(mockRpc).toHaveBeenCalledTimes(12);
+      for (const call of mockRpc.mock.calls) expect(call[1].p_xp_amount).toBeGreaterThan(0);
+      expect(rewards.find((r) => r.userId === 'stu-1')?.xpEarned).toBeGreaterThan(0);
+    });
+
     it('skips XP when player score is zero', async () => {
       const game = makeGame();
       await persistClassroomGameScores(game, [{ userId: 'stu-1', score: 0 }]);

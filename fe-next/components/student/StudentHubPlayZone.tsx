@@ -58,7 +58,7 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
         <m.button
           onClick={() => {
             posthog.capture('student_play_zone_card_clicked', { card: 'solo_practice' });
-            router.push(`/${language}/quick-play`);
+            router.push(`/${language}/quick-play?academy=1`);
           }}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

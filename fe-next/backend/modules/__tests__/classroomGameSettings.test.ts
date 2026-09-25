@@ -20,6 +20,7 @@ vi.mock('../../redisClient', () => ({
 vi.mock('../classroomGameManager', () => ({
   CLASSROOM_GAME_TTL: 14400,
   getClassroomGame: mockGetClassroomGame,
+  withClassroomGameLock: (_code: string, fn: () => Promise<unknown>) => fn(),
 }));
 vi.mock('../../utils/logger', () => ({
   default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },

@@ -23,6 +23,26 @@ function getRedis() {
   return client;
 }
 
+/**
+ * Serialise every read-modify-write of one `classroom_game:<code>` blob.
+ * Each mutator GETs the whole record, changes one field and SETEXes it back, so
+ * a class of 25 joining in the same second kept only the last writer (and a join
+ * racing the teacher's START could flip `playing` back to `waiting`).
+ * ponytail: per-process queue — same precedent as gameStartHandler's mutex; move
+ * to WATCH/MULTI or a Lua script if classroom sockets ever span instances.
+ */
+const gameLocks = new Map<string, Promise<unknown>>();
+export function withClassroomGameLock<T>(gameCode: string, fn: () => Promise<T>): Promise<T> {
+  const prev = gameLocks.get(gameCode) ?? Promise.resolve();
+  const run = prev.then(fn, fn);
+  const tail = run.catch(() => undefined);
+  gameLocks.set(gameCode, tail);
+  void tail.then(() => {
+    if (gameLocks.get(gameCode) === tail) gameLocks.delete(gameCode);
+  });
+  return run;
+}
+
 export interface ClassroomGamePlayer {
   userId: string;
   username: string;
@@ -242,7 +262,7 @@ export async function getActiveClassroomGames(classroomId: string): Promise<Clas
 /**
  * Delete a classroom game
  */
-export async function deleteClassroomGame(gameCode: string): Promise<void> {
+async function deleteClassroomGameUnlocked(gameCode: string): Promise<void> {
   try {
     const redis = getRedis();
     const game = await getClassroomGame(gameCode);
@@ -260,7 +280,7 @@ export async function deleteClassroomGame(gameCode: string): Promise<void> {
 /**
  * Add a player to a classroom game
  */
-export async function addPlayerToClassroomGame(
+async function addPlayerToClassroomGameUnlocked(
   gameCode: string,
   player: ClassroomGamePlayer
 ): Promise<void> {
@@ -305,7 +325,7 @@ export async function addPlayerToClassroomGame(
 /**
  * Remove a player from a classroom game
  */
-export async function removePlayerFromClassroomGame(
+async function removePlayerFromClassroomGameUnlocked(
   gameCode: string,
   userId: string
 ): Promise<void> {
@@ -331,7 +351,7 @@ export async function removePlayerFromClassroomGame(
 /**
  * Update classroom game status
  */
-export async function updateClassroomGameStatus(
+async function updateClassroomGameStatusUnlocked(
   gameCode: string,
   status: 'waiting' | 'playing' | 'finished' | 'ended'
 ): Promise<void> {
@@ -396,7 +416,7 @@ export async function updateClassroomGameStatus(
  * to do (one Redis read, no write) and must never throw: a round has to start
  * even when Redis is unreachable.
  */
-export async function reopenClassroomGameForRound(
+async function reopenClassroomGameForRoundUnlocked(
   gameCode: string,
   /**
    * The record when the caller already read it this tick (the vocab-quiz start
@@ -429,7 +449,7 @@ export async function reopenClassroomGameForRound(
  * Redis refuses the write the code may stay shut, but the game still starts and
  * the failure is logged rather than swallowed.
  */
-export async function beginClassroomRound(gameCode: string): Promise<ClassroomGame | null> {
+async function beginClassroomRoundUnlocked(gameCode: string): Promise<ClassroomGame | null> {
   try {
     const game = await getClassroomGame(gameCode);
     if (!game) return null;
@@ -482,7 +502,7 @@ async function markRoundLive(game: ClassroomGame): Promise<void> {
  * that are not on the board. Best-effort: a failure here degrades the bank back
  * to the whole lesson, which is the old behaviour, so it never blocks the game.
  */
-export async function setClassroomGamePlacedVocabulary(
+async function setClassroomGamePlacedVocabularyUnlocked(
   gameCode: string,
   placedVocabulary: string[]
 ): Promise<void> {
@@ -515,7 +535,7 @@ export async function setClassroomGamePlacedVocabulary(
  * Failure is logged and swallowed: a lost cumulative total must never take the
  * round's own results down with it.
  */
-export async function saveClassroomSessionScores(
+async function saveClassroomSessionScoresUnlocked(
   gameCode: string,
   sessionScores: ClassroomSessionScores,
   roundsPlayed: number
@@ -544,7 +564,7 @@ export async function saveClassroomSessionScores(
  * Swallows its errors on purpose: losing the stored deal costs a re-deal next
  * round, and must never stop a round from starting.
  */
-export async function saveClassroomTeams(
+async function saveClassroomTeamsUnlocked(
   gameCode: string,
   teams: ClassroomTeam[]
 ): Promise<void> {
@@ -559,3 +579,29 @@ export async function saveClassroomTeams(
     logger.error('CLASSROOM_GAME', `Failed to record team assignment: ${error}`);
   }
 }
+
+// Locked public surface — every mutator of the game blob goes through the queue.
+export const deleteClassroomGame = (gameCode: string): Promise<void> =>
+  withClassroomGameLock(gameCode, () => deleteClassroomGameUnlocked(gameCode));
+export const addPlayerToClassroomGame = (gameCode: string, player: ClassroomGamePlayer): Promise<void> =>
+  withClassroomGameLock(gameCode, () => addPlayerToClassroomGameUnlocked(gameCode, player));
+export const removePlayerFromClassroomGame = (gameCode: string, userId: string): Promise<void> =>
+  withClassroomGameLock(gameCode, () => removePlayerFromClassroomGameUnlocked(gameCode, userId));
+export const updateClassroomGameStatus = (
+  gameCode: string,
+  status: 'waiting' | 'playing' | 'finished' | 'ended'
+): Promise<void> => withClassroomGameLock(gameCode, () => updateClassroomGameStatusUnlocked(gameCode, status));
+export const reopenClassroomGameForRound = (gameCode: string, preloaded?: ClassroomGame | null): Promise<void> =>
+  withClassroomGameLock(gameCode, () => reopenClassroomGameForRoundUnlocked(gameCode, preloaded));
+export const beginClassroomRound = (gameCode: string): Promise<ClassroomGame | null> =>
+  withClassroomGameLock(gameCode, () => beginClassroomRoundUnlocked(gameCode));
+export const setClassroomGamePlacedVocabulary = (gameCode: string, placedVocabulary: string[]): Promise<void> =>
+  withClassroomGameLock(gameCode, () => setClassroomGamePlacedVocabularyUnlocked(gameCode, placedVocabulary));
+export const saveClassroomSessionScores = (
+  gameCode: string,
+  sessionScores: ClassroomSessionScores,
+  roundsPlayed: number
+): Promise<void> =>
+  withClassroomGameLock(gameCode, () => saveClassroomSessionScoresUnlocked(gameCode, sessionScores, roundsPlayed));
+export const saveClassroomTeams = (gameCode: string, teams: ClassroomTeam[]): Promise<void> =>
+  withClassroomGameLock(gameCode, () => saveClassroomTeamsUnlocked(gameCode, teams));

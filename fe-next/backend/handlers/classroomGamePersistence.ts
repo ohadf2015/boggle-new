@@ -544,12 +544,11 @@ export async function persistClassroomGameScores(
       // F-05: Split XP across all lessons covered by this game.
       if (score > 0) {
         const totalXp = Math.max(10, Math.floor(score / 10));
-        const perLessonXp = Math.floor(totalXp / lessonIds.length);
-        if (perLessonXp === 0) {
-          rewards.push({ userId: player.userId, xpEarned: 0, lessonIds });
-          continue;
-        }
-        xpEarned = totalXp;
+        // At least 1 per lesson: a game may span up to 20 lessons, and flooring
+        // 10 XP across 11+ of them paid a scoring student nothing (and the early
+        // `continue` also dropped their edu_classroom_game_completed outcome).
+        const perLessonXp = Math.max(1, Math.floor(totalXp / lessonIds.length));
+        xpEarned = perLessonXp * lessonIds.length;
 
         for (const lessonId of lessonIds) {
           const { error: xpError } = await supabase.rpc('award_education_xp', {

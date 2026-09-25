@@ -10,6 +10,7 @@ import {
   kanjiCompounds,
 } from '@/utils/consts';
 import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import { pickMedianBoard } from '@/shared/utils/brainCheck';
 
 // Letter frequency weights by language
 const LETTER_WEIGHTS: Record<Language, Record<string, number>> = {
@@ -428,8 +429,10 @@ interface UseDrillGridReturn {
  * Hook for generating and managing drill grids
  * @param gridSize - Size of the grid (default 5x5)
  * @param language - Language for word list and letter frequencies (default 'en')
+ * @param candidates - Brain Check: generate this many boards and keep the one
+ *   with the median findable-word count (steadier difficulty across checks)
  */
-export function useDrillGrid(gridSize: number = 5, language: Language = 'en'): UseDrillGridReturn {
+export function useDrillGrid(gridSize: number = 5, language: Language = 'en', candidates: number = 1): UseDrillGridReturn {
   const [grid, setGrid] = useState<LetterGrid>([]);
   const [availableWords, setAvailableWords] = useState<WordWithPath[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -438,17 +441,19 @@ export function useDrillGrid(gridSize: number = 5, language: Language = 'en'): U
     setIsLoading(true);
     const MAX_RETRIES = 3;
     try {
-      let newGrid: LetterGrid = [];
-      let words: WordWithPath[] = [];
-      let attempts = 0;
-      do {
-        const result = await generateDrillGrid(gridSize, language);
-        newGrid = result.grid;
-        words = result.words;
-        attempts++;
-      } while (!hasSufficientWordDiversity(words) && attempts < MAX_RETRIES);
-      setGrid(newGrid);
-      setAvailableWords(words);
+      const generateOne = async () => {
+        let result = await generateDrillGrid(gridSize, language);
+        let attempts = 1;
+        while (!hasSufficientWordDiversity(result.words) && attempts < MAX_RETRIES) {
+          result = await generateDrillGrid(gridSize, language);
+          attempts++;
+        }
+        return result;
+      };
+      const boards = await Promise.all(Array.from({ length: Math.max(1, candidates) }, generateOne));
+      const chosen = pickMedianBoard(boards) ?? boards[0];
+      setGrid(chosen.grid);
+      setAvailableWords(chosen.words);
     } catch (error) {
       console.error('Error generating drill grid:', error);
       setGrid(Array(gridSize).fill(null).map(() => Array(gridSize).fill('')));
@@ -456,7 +461,7 @@ export function useDrillGrid(gridSize: number = 5, language: Language = 'en'): U
     } finally {
       setIsLoading(false);
     }
-  }, [gridSize, language]);
+  }, [gridSize, language, candidates]);
 
   // Generate initial grid
   useEffect(() => {

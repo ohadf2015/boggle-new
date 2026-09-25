@@ -1,14 +1,8 @@
-import type { Metadata } from 'next';
-import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import PatternSwitcherPageClient from './PageClient';
+import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+// Pattern Switcher was retired in Brain Drills v2 (19 lifetime runs, almost
+// no return plays). Old links land on the hub instead of a 404.
+export default async function PatternSwitcherPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'brainPatternSwitcher', path: '/brain/drills/pattern-switcher', locale, noIndex: true });
-}
-
-export default async function PatternSwitcherPage() {
-  return <PatternSwitcherPageClient />;
+  redirect(`/${locale}/brain`);
 }

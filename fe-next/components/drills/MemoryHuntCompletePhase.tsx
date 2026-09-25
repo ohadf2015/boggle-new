@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import DrillCompleteActions from './DrillCompleteActions';
 import DrillEarningsBreakdown from '@/components/brain/DrillEarningsBreakdown';
-import { MemoryInsightsCard } from '@/components/brain/MemoryInsightsCard';
 import { calculateForgivingDrillScore } from '@/shared/utils/drillScoring';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
@@ -104,9 +103,6 @@ export function MemoryHuntCompletePhase({
           </p>
         </AdaptiveMotion.div>
       </div>
-
-      {/* Real week-over-week memory progress (signed-in players only). */}
-      <MemoryInsightsCard t={t} />
 
       {results.wordsFound > 0 && (
         <AdaptiveMotion.div

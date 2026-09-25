@@ -115,7 +115,7 @@ describe('QuickDrillsSection', () => {
 
       const buttons = container.querySelectorAll('button');
       // Should have 5 drills
-      expect(buttons.length).toBe(5);
+      expect(buttons.length).toBe(4);
     });
 
     it('renders drill names', () => {
@@ -125,6 +125,20 @@ describe('QuickDrillsSection', () => {
       expect(screen.getByText('brain.drills.lightning-round.name')).toBeInTheDocument();
       expect(screen.getByText('brain.drills.memory-hunt.name')).toBeInTheDocument();
       expect(screen.getByText('brain.drills.combo-master.name')).toBeInTheDocument();
+    });
+  });
+
+  describe('v2', () => {
+    it('Given a guest with zero games, Then every drill is playable (no unlock gates)', () => {
+      render(<QuickDrillsSection />);
+      screen.getAllByRole('button').forEach((b) => expect(b).not.toBeDisabled());
+      expect(screen.queryByText('brain.drills.pattern-switcher.name')).not.toBeInTheDocument();
+    });
+
+    it('Given training progress, Then each drill shows the adaptive level it will start at', () => {
+      render(<QuickDrillsSection drillProgress={[{ drillType: 'memory-hunt', level: 3 } as never]} />);
+      expect(screen.getByTestId('drill-level-memory-hunt')).toHaveTextContent('3');
+      expect(screen.getByTestId('drill-level-rare-gems')).toHaveTextContent('1');
     });
   });
 });

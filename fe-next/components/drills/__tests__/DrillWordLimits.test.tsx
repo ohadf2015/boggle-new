@@ -71,7 +71,6 @@ vi.mock('@/utils/utils', () => ({
 }));
 
 // Import components after mocks
-import PatternSwitcher from '../PatternSwitcher';
 import RareGems from '../RareGems';
 import MemoryHunt from '../MemoryHunt';
 
@@ -93,43 +92,6 @@ const mockAvailableWords = [
   { word: 'PLAYING', path: [{ row: 4, col: 0 }, { row: 4, col: 1 }, { row: 4, col: 2 }, { row: 4, col: 3 }, { row: 4, col: 4 }, { row: 3, col: 4 }, { row: 2, col: 4 }] },
   { word: 'COWBOYS', path: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }, { row: 3, col: 0 }, { row: 3, col: 1 }, { row: 4, col: 4 }, { row: 0, col: 3 }] },
 ];
-
-describe('PatternSwitcher', () => {
-  describe('word length limits', () => {
-    it('should cap available word lengths at 5 letters', () => {
-      const onComplete = vi.fn();
-
-      // Filter logic test - simulating what the component does
-      const MAX_WORD_LENGTH = 5;
-      const availableLengths = [...new Set(mockAvailableWords.map(w => w.word.length))]
-        .filter(len => len <= MAX_WORD_LENGTH)
-        .sort();
-
-      // Should not include 7-letter words (PLAYING, COWBOYS)
-      expect(availableLengths).not.toContain(7);
-      expect(availableLengths).toContain(3); // CAT, DOG
-      expect(availableLengths).toContain(4); // CATS, BATS
-      expect(availableLengths).toContain(5); // WINDS
-      expect(Math.max(...availableLengths)).toBe(5);
-    });
-
-    it('should render without crashing', () => {
-      const onComplete = vi.fn();
-
-      render(
-        <PatternSwitcher
-          grid={mockGrid}
-          availableWords={mockAvailableWords}
-          level={1}
-          language="en"
-          onComplete={onComplete}
-        />
-      );
-
-      expect(screen.getByText('brain.drills.pattern-switcher.name')).toBeInTheDocument();
-    });
-  });
-});
 
 describe('RareGems', () => {
   describe('rarity thresholds', () => {
