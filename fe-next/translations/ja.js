@@ -13717,12 +13717,22 @@ const ja = {
         "skipped": "{{count}} 人はスキップ：このレッスンをまだ練習していません",
         "unmatchedTitle": "Classroom の生徒と照合できませんでした",
         "notReturnedTitle": "採点済み・未返却",
-        "notReturnedNote": "まだ課題を提出していないため、成績は下書きとして保存されています",
+        "notReturnedNote": "まだ課題を提出していないため、返却されるまで成績は生徒に表示されません",
         "failedTitle": "次の生徒は更新できませんでした",
         "reason": {
           "no_email": "学校のメールアドレスなし（ゲストアカウント）",
           "not_in_course": "このクラスにないメールアドレス",
           "duplicate_email": "別の生徒が同じメールアドレスを使用しています"
+        },
+        "failedReason": {
+          "no_submission": "この課題の提出物がまだ見つかりません",
+          "rate_limited": "Google Classroom が混み合っています。しばらくしてから再送信してください",
+          "reauth": "Google の接続が切れました。再接続してもう一度お試しください",
+          "forbidden": "Google Classroom がこのリクエストを拒否しました",
+          "not_linkable": "この課題は LexiClash が作成したものではありません",
+          "not_found": "クラスまたは課題が見つかりませんでした",
+          "unknown": "予期しないエラーです。もう一度お試しいただき、解決しない場合はサポートにご連絡ください",
+          "googleError": "Google Classroom からの応答: {{message}}"
         },
         "errorNotLinkable": "Google の仕様上、LexiClash が採点できるのは LexiClash で作成した課題だけです。このレッスン用に Classroom の課題を新規作成してください。",
         "errorRateLimited": "Google Classroom が混み合っています。{{seconds}} 秒後にもう一度お試しください。",

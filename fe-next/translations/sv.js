@@ -13952,12 +13952,22 @@ const sv = {
         "skipped": "{{count}} elever hoppades över: har inte övat på lektionen än",
         "unmatchedTitle": "Kunde inte matchas mot en elev i Classroom",
         "notReturnedTitle": "Betygsatt, men ännu inte returnerat",
-        "notReturnedNote": "har inte lämnat in uppgiften än, så betyget sparas bara som utkast",
+        "notReturnedNote": "har inte lämnat in uppgiften än, så betyget syns inte för eleven förrän det returneras",
         "failedTitle": "De här eleverna kunde inte uppdateras",
         "reason": {
           "no_email": "ingen skol-e-post (gästkonto)",
           "not_in_course": "e-postadressen finns inte i den här Classroom-klassen",
           "duplicate_email": "en annan elev använder redan den här e-postadressen"
+        },
+        "failedReason": {
+          "no_submission": "ingen inlämning hittades för den här uppgiften än",
+          "rate_limited": "Google Classroom var upptaget — försök skicka igen strax",
+          "reauth": "Google-åtkomsten har gått ut — anslut igen och försök på nytt",
+          "forbidden": "Google Classroom nekade den här begäran",
+          "not_linkable": "den här uppgiften skapades inte av LexiClash",
+          "not_found": "klassen eller uppgiften hittades inte",
+          "unknown": "oväntat fel — försök igen, eller kontakta supporten om det upprepas",
+          "googleError": "Google Classroom svarade: {{message}}"
         },
         "errorNotLinkable": "Google låter bara LexiClash betygsätta uppgifter som LexiClash har skapat. Skapa en ny Classroom-uppgift för lektionen.",
         "errorRateLimited": "Google Classroom har mycket att göra just nu. Försök igen om {{seconds}} sekunder.",

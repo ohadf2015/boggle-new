@@ -12650,12 +12650,22 @@ const ru = {
         "skipped": "Пропущено учеников: {{count}} — ещё не занимались этим уроком",
         "unmatchedTitle": "Не найдены среди учеников Classroom",
         "notReturnedTitle": "Оценено, но не возвращено",
-        "notReturnedNote": "ещё не сдал(а) эту работу, поэтому оценка сохранена только как черновик",
+        "notReturnedNote": "ещё не сдал(а) эту работу, поэтому оценка не будет видна ученику до её возврата",
         "failedTitle": "Не удалось обновить этих учеников",
         "reason": {
           "no_email": "нет школьной почты (гостевой аккаунт)",
           "not_in_course": "этой почты нет в классе Classroom",
           "duplicate_email": "эту почту уже использует другой ученик"
+        },
+        "failedReason": {
+          "no_submission": "работа по этому заданию пока не найдена",
+          "rate_limited": "Google Classroom был перегружен — попробуйте отправить снова через минуту",
+          "reauth": "Доступ к Google истёк — переподключитесь и попробуйте снова",
+          "forbidden": "Google Classroom отклонил этот запрос",
+          "not_linkable": "это задание не было создано в LexiClash",
+          "not_found": "класс или задание не найдены",
+          "unknown": "непредвиденная ошибка — попробуйте снова, а если повторится — обратитесь в поддержку",
+          "googleError": "Google Classroom ответил: {{message}}"
         },
         "errorNotLinkable": "Google разрешает LexiClash оценивать только задания, созданные в LexiClash. Создайте новое задание в Classroom для этого урока.",
         "errorRateLimited": "Google Classroom перегружен. Повторите через {{seconds}} с.",

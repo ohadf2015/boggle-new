@@ -13581,12 +13581,22 @@ const es = {
         "skipped": "{{count}} alumnos omitidos: aún no han practicado esta lección",
         "unmatchedTitle": "Sin coincidencia con un alumno de Classroom",
         "notReturnedTitle": "Calificado, aún no devuelto",
-        "notReturnedNote": "todavía no ha entregado la tarea, así que la nota queda guardada como borrador",
+        "notReturnedNote": "todavía no ha entregado la tarea, así que no verá la nota hasta que se devuelva",
         "failedTitle": "No se pudo actualizar a estos alumnos",
         "reason": {
           "no_email": "sin correo del centro (cuenta de invitado)",
           "not_in_course": "el correo no está en esta clase de Classroom",
           "duplicate_email": "otro alumno ya usa este correo"
+        },
+        "failedReason": {
+          "no_submission": "todavía no se encontró ninguna entrega para esta tarea",
+          "rate_limited": "Google Classroom estaba saturado — inténtalo de nuevo en un momento",
+          "reauth": "El acceso a Google caducó — vuelve a conectarlo e inténtalo de nuevo",
+          "forbidden": "Google Classroom rechazó esta solicitud",
+          "not_linkable": "esta tarea no fue creada por LexiClash",
+          "not_found": "no se encontró la clase o la tarea",
+          "unknown": "error inesperado — inténtalo de nuevo, o contacta con soporte si persiste",
+          "googleError": "Google Classroom respondió: {{message}}"
         },
         "errorNotLinkable": "Google solo permite que LexiClash califique tareas creadas por LexiClash. Crea una tarea nueva en Classroom para esta lección.",
         "errorRateLimited": "Google Classroom está saturado. Vuelve a intentarlo en {{seconds}} segundos.",

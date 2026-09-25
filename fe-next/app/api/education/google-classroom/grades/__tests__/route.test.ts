@@ -333,6 +333,49 @@ describe('POST /api/education/google-classroom/grades', () => {
     expect(body.failed[0].reason).toContain('Precondition check failed');
   });
 
+  it('a :return failure after the grade was already saved must not be reported as failed — the grade still landed', async () => {
+    fetchMock = googleFetch({
+      submissions: () =>
+        json({
+          studentSubmissions: [
+            { id: 'sub-dana', userId: 'g-dana', state: 'TURNED_IN' },
+            { id: 'sub-ido', userId: 'g-ido', state: 'TURNED_IN' },
+          ],
+        }),
+    });
+    const base = fetchMock;
+    fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (String(url).endsWith(':return')) return json({ error: { message: 'boom' } }, 500);
+      return base(url, init);
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const res = await POST(await req({ ...BODY, returnGrades: true }));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.updated).toBe(1);
+    expect(body.failed).toEqual([]);
+    expect(body.notReturned).toEqual([{ studentId: S_DANA, name: 'Dana' }]);
+  });
+
+  it('a submission already RETURNED is not relisted as not-returned', async () => {
+    fetchMock = googleFetch({
+      submissions: () =>
+        json({
+          studentSubmissions: [
+            { id: 'sub-dana', userId: 'g-dana', state: 'RETURNED' },
+            { id: 'sub-ido', userId: 'g-ido', state: 'RETURNED' },
+          ],
+        }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const res = await POST(await req({ ...BODY, returnGrades: true }));
+    const body = await res.json();
+    expect(body.updated).toBe(1);
+    expect(body.notReturned).toEqual([]);
+    // Already-returned submissions must not be re-POSTed to :return.
+    expect(fetchMock.mock.calls.some(([u]) => String(u).endsWith(':return'))).toBe(false);
+  });
+
   it('never leaks a bearer/access token from a Google error message into the failed[] reason', async () => {
     fetchMock = googleFetch({
       patch: () => json({ error: { message: 'Invalid credentials: Bearer ya29.a0Af-secret-should-not-leak' } }, 400),

@@ -30,6 +30,18 @@ const REASON_KEY: Record<string, string> = {
   not_in_course: 'teacher.reports.googleClassroom.reason.not_in_course',
   duplicate_email: 'teacher.reports.googleClassroom.reason.duplicate_email',
 };
+/** Stable, translatable failure reasons. `google_error: <message>` is a dynamic
+ *  prefix (see lib/education/googleClassroomPush.ts) resolved separately below. */
+const FAILED_REASON_KEY: Record<string, string> = {
+  no_submission: 'teacher.reports.googleClassroom.failedReason.no_submission',
+  rate_limited: 'teacher.reports.googleClassroom.failedReason.rate_limited',
+  reauth: 'teacher.reports.googleClassroom.failedReason.reauth',
+  forbidden: 'teacher.reports.googleClassroom.failedReason.forbidden',
+  not_linkable: 'teacher.reports.googleClassroom.failedReason.not_linkable',
+  not_found: 'teacher.reports.googleClassroom.failedReason.not_found',
+  unknown: 'teacher.reports.googleClassroom.failedReason.unknown',
+};
+const GOOGLE_ERROR_PREFIX = 'google_error: ';
 
 async function callApi(url: string, init?: RequestInit): Promise<{ status: number; body: Record<string, unknown> }> {
   const res = await fetch(url, { credentials: 'same-origin', ...init });
@@ -201,6 +213,13 @@ export function GoogleClassroomGradePassback({ classroomId }: { classroomId: str
   if (!enabled) return null;
 
   const nameOf = (s: Named) => s.name || t('teacher.reports.assignmentProgress.anonymousStudent', { id: s.studentId.slice(0, 8) });
+  const failedReasonOf = (s: Named) => {
+    const reason = s.reason ?? '';
+    if (reason.startsWith(GOOGLE_ERROR_PREFIX)) {
+      return t('teacher.reports.googleClassroom.failedReason.googleError', { message: reason.slice(GOOGLE_ERROR_PREFIX.length) });
+    }
+    return t(FAILED_REASON_KEY[reason] ?? FAILED_REASON_KEY.unknown);
+  };
   const returnTo = typeof window === 'undefined' ? '' : window.location.pathname + window.location.search.replace(/([?&])gc=[^&]*&?/, '$1');
   const selectedCw = courseWork.find((w) => w.id === courseWorkId);
 
@@ -330,7 +349,9 @@ export function GoogleClassroomGradePassback({ classroomId }: { classroomId: str
             <div>
               <p className="font-bold">{t('teacher.reports.googleClassroom.failedTitle')}</p>
               <ul className="list-disc ps-5">
-                {summary.failed.map((s) => <li key={s.studentId}>{nameOf(s)}</li>)}
+                {summary.failed.map((s) => (
+                  <li key={s.studentId}>{nameOf(s)} — {failedReasonOf(s)}</li>
+                ))}
               </ul>
             </div>
           )}

@@ -136,6 +136,32 @@ describe('GoogleClassroomGradePassback', () => {
     window.history.replaceState({}, '', '/');
   });
 
+  it('shows the actual failure reason next to each failed student, not just their name', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))
+      .mockResolvedValueOnce(json({ ok: true, courseWork: [{ id: 'w1', title: 'A', maxPoints: 100, associatedWithDeveloper: true }] }))
+      .mockResolvedValueOnce(
+        json({
+          ok: true,
+          updated: 0,
+          unmatched: [],
+          skipped: [],
+          failed: [
+            { studentId: 's1', name: 'Noa', reason: 'no_submission' },
+            { studentId: 's2', name: 'Ben', reason: 'google_error: Precondition check failed.' },
+          ],
+        }),
+      );
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
+    await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
+    await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseWorkLabel`), 'w1');
+    await userEvent.click(screen.getByRole('button', { name: `${K}.confirm` }));
+
+    expect(await screen.findByText(new RegExp(`Noa.*${K}\\.failedReason\\.no_submission`))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`Ben.*${K}\\.failedReason\\.googleError`))).toBeInTheDocument();
+  });
+
   it('lists grades that were saved but not returned because the student has not turned the work in', async () => {
     fetchMock
       .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))

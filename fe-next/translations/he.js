@@ -13572,12 +13572,22 @@ const he = {
         "skipped": "{{count}} תלמידים דולגו: עוד לא תרגלו את השיעור",
         "unmatchedTitle": "לא הותאמו לתלמיד ב-Classroom",
         "notReturnedTitle": "צוין ציון, טרם הוחזר",
-        "notReturnedNote": "עדיין לא הגיש/ה את המטלה, לכן הציון נשמר כטיוטה בלבד",
+        "notReturnedNote": "עדיין לא הגיש/ה את המטלה, ולכן הציון לא יוצג לו/לה עד שהמטלה תוחזר",
         "failedTitle": "לא הצלחנו לעדכן את התלמידים האלה",
         "reason": {
           "no_email": "אין מייל בית ספרי (חשבון אורח)",
           "not_in_course": "המייל לא נמצא בכיתה הזו ב-Classroom",
           "duplicate_email": "תלמיד אחר כבר משתמש במייל הזה"
+        },
+        "failedReason": {
+          "no_submission": "עדיין לא נמצאה הגשה למטלה הזו",
+          "rate_limited": "Google Classroom היה עמוס — נסו לשלוח שוב בעוד רגע",
+          "reauth": "החיבור ל-Google פג — התחברו מחדש ונסו שוב",
+          "forbidden": "Google Classroom דחה את הבקשה הזו",
+          "not_linkable": "המטלה הזו לא נוצרה על ידי LexiClash",
+          "not_found": "הכיתה או המטלה לא נמצאו",
+          "unknown": "שגיאה בלתי צפויה — נסו שוב, ואם זה חוזר פנו לתמיכה",
+          "googleError": "Google Classroom השיבה: {{message}}"
         },
         "errorNotLinkable": "Google מאפשרת ל-LexiClash לתת ציון רק במטלות שהיא יצרה. צרו מטלה חדשה ב-Classroom לשיעור הזה.",
         "errorRateLimited": "Google Classroom עמוס כרגע. נסו שוב בעוד {{seconds}} שניות.",

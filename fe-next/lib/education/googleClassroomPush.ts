@@ -171,11 +171,21 @@ export async function pushGrades(input: PushInput): Promise<PushResult> {
       const grade = scaleToMaxPoints(pct, maxPoints);
       // assignedGrade can be written regardless of turn-in state — it just stays invisible to
       // the student until returned. Only :return itself requires TURNED_IN (Google 400s
-      // FAILED_PRECONDITION otherwise), so gate that call on the submission's own state.
+      // FAILED_PRECONDITION otherwise), so gate that call on the submission's own state. A
+      // failure of :return itself must NOT undo the grade credit above — the grade already
+      // landed on Google's side, so it is a separate, non-fatal try/catch of its own.
       await patchSubmissionGrade(token, courseId, courseWorkId, submission.id, grade, returnGrades);
-      if (returnGrades) {
+      if (returnGrades && submission.state !== 'RETURNED') {
         if (submission.state === 'TURNED_IN') {
-          await returnSubmission(token, courseId, courseWorkId, submission.id);
+          try {
+            await returnSubmission(token, courseId, courseWorkId, submission.id);
+          } catch (returnErr) {
+            logger.warn('[gc-grades] grade saved but :return failed', {
+              studentId: m.studentId,
+              message: returnErr instanceof Error ? returnErr.message : String(returnErr),
+            });
+            result.notReturned.push(named);
+          }
         } else {
           result.notReturned.push(named);
         }

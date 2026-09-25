@@ -12135,12 +12135,22 @@ const en = {
         "skipped": "{{count}} students skipped: no practice on this lesson yet",
         "unmatchedTitle": "Not matched to a Classroom student",
         "notReturnedTitle": "Graded, not returned yet",
-        "notReturnedNote": "hasn’t turned in the assignment yet, so the grade is saved as a draft",
+        "notReturnedNote": "hasn’t turned in the assignment yet, so the grade won’t be visible to them until it’s returned",
         "failedTitle": "Couldn’t update these students",
         "reason": {
           "no_email": "no school email (guest account)",
           "not_in_course": "email not in this Classroom class",
           "duplicate_email": "another student already uses this email"
+        },
+        "failedReason": {
+          "no_submission": "no submission found for this assignment yet",
+          "rate_limited": "Google Classroom was busy — try sending again shortly",
+          "reauth": "Google access expired — reconnect and try again",
+          "forbidden": "Google Classroom refused this request",
+          "not_linkable": "this assignment wasn’t created by LexiClash",
+          "not_found": "the class or assignment wasn’t found",
+          "unknown": "unexpected error — try again, or contact support if it keeps happening",
+          "googleError": "Google Classroom said: {{message}}"
         },
         "errorNotLinkable": "Google only lets LexiClash grade assignments it created. Create a new Classroom assignment for this lesson.",
         "errorRateLimited": "Google Classroom is busy. Try again in {{seconds}} seconds.",
