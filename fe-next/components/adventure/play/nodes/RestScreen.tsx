@@ -14,6 +14,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { BedDouble, BookOpen, Dumbbell } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { hintCharges } from '@/lib/adventure/play/relics';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 import DeltaChips, { useLineText } from './DeltaChips';
@@ -73,7 +74,10 @@ export default function RestScreen({ heal, taken, run, before, world, busy, onCh
     <NodeShell kind="rest" world={world} title={t('adventurePlay.map.restTitle')}
       subtitle={resolved ? t('adventurePlay.map.restTaken') : t('adventurePlay.node.restSub')}
       gold={run.gold} hp={run.hp} maxHp={run.maxHp} busy={busy}
-      footer={<NodeButton testId="node-leave" onClick={onLeave} tone={resolved ? 'lime' : 'cream'} disabled={busy}>
+      footer={<NodeButton testId="node-leave" onClick={() => {
+        trackGrowthEvent('adventure_exit', { from: 'campfire' });
+        onLeave();
+      }} tone={resolved ? 'lime' : 'cream'} disabled={busy}>
         {resolved ? t('adventurePlay.node.continue') : t('adventurePlay.map.leave')}
       </NodeButton>}>
 

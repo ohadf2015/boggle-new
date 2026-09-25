@@ -52,4 +52,36 @@ describe('V2Results', () => {
     render(<V2Results {...base} onRestart={() => {}} />);
     expect(screen.getByText('wordTowerV2.results.nextGoal')).toBeTruthy();
   });
+
+  it('given coins payout is pending, when shown, then coins cell displays loading state with opacity', () => {
+    const payoutStatus = { status: 'pending' as const, coins: 0 };
+    const { container } = render(<V2Results {...base} payoutStatus={payoutStatus} onRestart={() => {}} />);
+
+    // Find the coins cell by looking for the common.coins label
+    const coinsCells = container.querySelectorAll('dl > div');
+    const coinsCell = Array.from(coinsCells).find((cell) => cell.textContent?.includes('common.coins'));
+
+    expect(coinsCell).toBeTruthy();
+    expect(coinsCell?.textContent).toContain('wordTowerV2.results.coinsLoading');
+    expect(coinsCell).toHaveClass('opacity-60');
+  });
+
+  it('given coins payout is confirmed, when shown, then coins cell displays the paid amount with lime background', () => {
+    const payoutStatus = { status: 'paid' as const, coins: 42 };
+    const { container } = render(<V2Results {...base} payoutStatus={payoutStatus} onRestart={() => {}} />);
+
+    // Find the coins cell by looking for the common.coins label
+    const coinsCells = container.querySelectorAll('dl > div');
+    const coinsCell = Array.from(coinsCells).find((cell) => cell.textContent?.includes('common.coins'));
+
+    expect(coinsCell).toBeTruthy();
+    expect(coinsCell?.textContent).toContain('42');
+    expect(coinsCell).toHaveClass('bg-neo-lime');
+  });
+
+  it('given no payout status, when shown, then coins cell is not rendered', () => {
+    render(<V2Results {...base} onRestart={() => {}} />);
+    const coinsLabel = screen.queryByText('common.coins');
+    expect(coinsLabel).toBeNull();
+  });
 });

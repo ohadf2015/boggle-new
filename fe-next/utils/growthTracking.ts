@@ -115,10 +115,16 @@ export type GrowthEvent =
   // Player tapped the last-chance ChaseBanner CTA (routes into the day's puzzle).
   | 'daily_last_chance_clicked'
   // Adventure
+  | 'adventure_guest_gate_viewed' // guest gate shown; props { surface: 'map'|'achievements' }
+  | 'adventure_guest_signin_clicked' // guest clicked sign-in on gate; props { surface: 'map'|'achievements' }
   | 'adventure_level_start'
   | 'adventure_level_pass'
   | 'adventure_level_fail'
   | 'adventure_quit'
+  | 'adventure_node_entered' // entered shop/chest/campfire/event; props { world, nodeKind }
+  | 'adventure_run_ended' // run complete/abandoned; props { world, outcome, nodesCleared, purseCoins }
+  | 'adventure_shop_purchase' // purchased item; props { item, cost }
+  | 'adventure_exit' // exited from a screen; props { from: 'level'|'map'|'cinematic'|'shop'|'campfire'|'chest'|'event'|'results'|'error' }
   // Social
   | 'share_link_copied'
   | 'share_whatsapp_clicked'
@@ -407,6 +413,22 @@ export type GrowthEvent =
   // 50msg/10s socket limiter, quantifying the rage-click-into-lockout path the
   // Join button's loading spinner is meant to reduce.
   | 'mp_room_join_rate_limited'
+  // Word Tower V2 engagement events — measure economy, gameplay, and lifecycle.
+  //   wt2_run_ended: fires at end of run (crash/cashout/quit).
+  //     Props: { daily: boolean, heightM: number, floors: number, cause: 'crash'|'cashout'|'quit' }.
+  //   wt2_upgrade_bought: fires when player buys an upgrade.
+  //     Props: { upgrade: string, cost: number }.
+  //   wt2_continue_used: fires when player uses a continue (rescue brace).
+  //     Props: { cost: number }.
+  //   wt2_raid_played: fires when player raids a rival.
+  //     Props: { won: boolean, coins: number }.
+  //   wt2_exit: fires when player leaves any WT2 screen.
+  //     Props: { from: 'home'|'run'|'crash'|'results'|'rivals'|'raid'|'upgrades'|'loading'|'error' }.
+  | 'wt2_run_ended'
+  | 'wt2_upgrade_bought'
+  | 'wt2_continue_used'
+  | 'wt2_raid_played'
+  | 'wt2_exit'
   // Word Craft Run card-pick funnel — was fully uninstrumented (rageclicks on
   // /word-craft had no signal to attribute). Also verifies the 2026-08-24
   // rarity-weighted draw change actually shifted the served rarity mix.
@@ -416,7 +438,21 @@ export type GrowthEvent =
   //   wordcraft_card_picked: fires when player selects a card.
   //     Props: { cardId: string, rarity: string }. Numerator for pick-rate by rarity.
   | 'wordcraft_card_pick_shown'
-  | 'wordcraft_card_picked';
+  | 'wordcraft_card_picked'
+  // New game modes GA announcement — one-time dismissible card on homepage for
+  // returning visitors (not new players on first visit). Instruments awareness & engagement.
+  //   new_modes_announcement_shown: announcement card rendered. Props: none.
+  //   new_modes_announcement_clicked: player tapped a play button. Props: { mode: 'adventure'|'wordTowerV2' }.
+  //   new_modes_announcement_dismissed: player closed the announcement. Props: none.
+  | 'new_modes_announcement_shown'
+  | 'new_modes_announcement_clicked'
+  | 'new_modes_announcement_dismissed'
+  // Featured mode card engagement (homepage + daily hub).
+  //   featured_mode_card_clicked: player clicked a promoted mode card. Props: { mode: string, surface: 'hub'|'desktop' }.
+  | 'featured_mode_card_clicked'
+  // SEO landing page CTAs (measure mode discoverability via organic search).
+  //   mode_landing_play_clicked: player clicked "Play" from an SEO landing page. Props: { mode: string }.
+  | 'mode_landing_play_clicked';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

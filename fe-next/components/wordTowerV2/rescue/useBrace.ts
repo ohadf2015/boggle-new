@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { braceCost, nextBracePrice } from '@/lib/wordTowerV2/estate';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 /**
  * The emergency brace: when the tower starts to wobble the player can steel
@@ -83,7 +84,10 @@ export function useBrace({ brace, freeBraces, district, runCoins, floors, risk, 
     const charged = price > 0;
     if (!brace(charged)) return;
     setUsed((u) => u + 1);
-    if (charged) setPaid((p) => p + 1);
+    if (charged) {
+      setPaid((p) => p + 1);
+      trackGrowthEvent('wt2_continue_used', { cost: price });
+    }
   }, [affordable, over, price, brace]);
 
   const startRescue = useCallback(() => {

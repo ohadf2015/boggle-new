@@ -10,11 +10,12 @@
  * effect before it takes the gold, and the purchase's real ledger is shown
  * after, read from the run the server handed back.
  */
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Heart, X } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { RELICS, type Rarity } from '@/lib/adventure/play/relics';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 import type { ShopItem } from '@/lib/adventure/play/shop';
@@ -71,19 +72,47 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
   const [receipt, setReceipt] = useState<Line[] | null>(null);
   // The run as it stood on the last render — a receipt is a real diff, never the promise on the tag.
   const seenRef = useRef<PublicRun>(run);
+  // Guard against double-tap (two onClick in the same event loop before re-render).
+  // The disabled button stops clicks, but a handler receiving two events in parallel still fires twice.
+  const buyInFlightRef = useRef(false);
+  // Track pending purchase for growth event
+  const pendingPurchaseRef = useRef<{ itemIndex: number; item: ShopItem } | null>(null);
 
   // A purchase landed (the server handed back a changed run): print what it really did.
   if (seenRef.current !== run) {
     const before = seenRef.current;
     seenRef.current = run;
     if (before.gold !== run.gold || before.relics.length !== run.relics.length) setReceipt(runDelta(before, run));
+    // Reset the in-flight guard when the run changes (purchase complete).
+    buyInFlightRef.current = false;
   }
 
+  // Fire adventure_shop_purchase event when a purchase succeeds
+  useEffect(() => {
+    if (!pendingPurchaseRef.current) return;
+    const { item } = pendingPurchaseRef.current;
+    pendingPurchaseRef.current = null;
+    trackGrowthEvent('adventure_shop_purchase', {
+      item: item.type,
+      cost: item.price,
+      world,
+    });
+  }, [run, world]);
+
   const open = (index: number) => {
+    // Reset the in-flight guard when opening a new item — a failed purchase on the
+    // previous item should not block a fresh attempt. The button is disabled while
+    // busy, so this is safe.
+    buyInFlightRef.current = false;
     setConfirm(index);
     sfx.playMenuOpenSound?.();
   };
   const buy = (index: number) => {
+    // Double-tap guard: only fire onBuy once per confirm click.
+    if (buyInFlightRef.current) return;
+    buyInFlightRef.current = true;
+    // Track the pending purchase so we can fire the growth event when it succeeds
+    pendingPurchaseRef.current = { itemIndex: index, item: items[index] };
     setConfirm(null);
     sfx.playUpgradePurchaseSound?.();
     sfx.playCoinCollectSound?.();
@@ -109,7 +138,10 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
               </motion.div>
             )}
           </AnimatePresence>
-          <NodeButton testId="node-leave" onClick={onLeave} tone="cream" disabled={busy}>{t('adventurePlay.map.leave')}</NodeButton>
+          <NodeButton testId="node-leave" onClick={() => {
+            trackGrowthEvent('adventure_exit', { from: 'shop' });
+            onLeave();
+          }} tone="cream" disabled={busy}>{t('adventurePlay.map.leave')}</NodeButton>
         </div>
       )}>
 
@@ -227,7 +259,8 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
                   <X className="mx-auto h-5 w-5" aria-hidden />
                   <span className="sr-only">{t('adventurePlay.node.cancel')}</span>
                 </button>
-                <button type="button" data-testid="shop-confirm-buy" onClick={() => buy(confirm as number)} disabled={busy}
+                <button type="button" data-testid="shop-confirm-buy" onClick={() => buy(confirm as number)}
+                  disabled={busy || confirm === null || (item && shopRowState(item, run, bought, confirm) !== 'buyable')}
                   className="flex-[2] rounded-xl border-[3px] border-black bg-neo-lime px-2 py-2 font-neo-display text-lg font-bold text-black shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none disabled:opacity-50">
                   {t('adventurePlay.node.buy')}
                 </button>

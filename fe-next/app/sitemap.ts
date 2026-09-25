@@ -100,9 +100,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // at page level after the AdSense "low value content" rejection. Search
   // intent is covered by /word-craft-game, /daily-word-wheel and /guides/*.
   addForAllLocales(routes, '/word-craft-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  // /adventure dropped while BETA-gated (PageClient redirects non-beta users —
-  // crawlers and the AdSense reviewer land on a wall). Restore at GA together
-  // with the noindex in adventure/page.tsx + layout.tsx.
+  // Adventure is beta-gated: guests see a teaser gate, signed-in non-beta users are redirected.
+  // Included in sitemap but noindexed at page level (see app/[locale]/adventure/layout.tsx).
+  addForAllLocales(routes, '/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 });
+  // Word Tower canonical URL is /word-tower (clean, no -v2 suffix).
+  addForAllLocales(routes, '/word-tower', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
   addForAllLocales(routes, '/daily/archive', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.7 });
 
   // Connections emits exactly the locales that have native landing copy —

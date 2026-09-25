@@ -17,6 +17,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { RELICS, type RelicId } from '@/lib/adventure/play/relics';
 import type { TreasureOffer } from '@/lib/adventure/play/nodeResolve';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
@@ -160,7 +161,10 @@ export default function TreasureScreen({ offers, taken, relic, gold, run, world,
                 <bdi>{t(ledger.key, ledger.params)}</bdi>
               </motion.p>
             )}
-            <NodeButton testId="node-leave" onClick={onLeave} tone="lime" disabled={busy}>{t('adventurePlay.node.continue')}</NodeButton>
+            <NodeButton testId="node-leave" onClick={() => {
+              trackGrowthEvent('adventure_exit', { from: 'chest' });
+              onLeave();
+            }} tone="lime" disabled={busy}>{t('adventurePlay.node.continue')}</NodeButton>
           </div>
         ) : (
           <NodeButton testId="treasure-skip" onClick={() => ask(skipIndex)} tone="cream" disabled={busy}>

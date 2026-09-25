@@ -55,6 +55,7 @@ export const LANDING_NAMESPACES = [
   'bugReport',
   'languages',
   'share',
+  'newModes',
 ] as const;
 
 export const LANDING_EXTRA_KEYS = [

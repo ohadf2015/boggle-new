@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { markPromoShown } from '@/lib/landing/promoOverlaySession';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -89,6 +90,9 @@ export default function CookieConsent() {
       // One source of truth, read at the moment it is acted on (pitfalls class 1).
       const showIfStillUndecided = () => {
         if (hasConsentDecision()) return;
+        // One promo overlay per session: the consent sheet counts, so the
+        // install promo must not stack on top of it.
+        markPromoShown();
         setVisible(true);
       };
       if (typeof window.requestIdleCallback === 'function') {

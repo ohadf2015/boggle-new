@@ -248,6 +248,30 @@ const nextConfig = {
         destination: '/:locale/free-multiplayer-word-game',
         permanent: true,
       },
+      // Word Tower v2 old paths → canonical paths: redirect legacy /word-tower-v2 URLs
+      // to the canonical /word-tower (clean, no version suffix). Permanent redirects
+      // tell browsers and crawlers this is the new canonical URL for indexing.
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/word-tower-v2',
+        destination: '/:locale/word-tower',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/word-tower-v2/daily',
+        destination: '/:locale/word-tower/daily',
+        permanent: true,
+      },
+      // Redirect old /daily/word-tower to the new /word-tower/daily path (permanent).
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/daily/word-tower',
+        destination: '/:locale/word-tower/daily',
+        permanent: true,
+      },
+      {
+        source: '/daily/word-tower',
+        destination: '/en/word-tower/daily',
+        permanent: true,
+      },
       // Redirect non-www to www (handled by hosting platform like Vercel/Railway)
       // This is a fallback for any requests that slip through.
       // Exempt assetlinks.json + ad-network verification file (verifiers refuse redirects).

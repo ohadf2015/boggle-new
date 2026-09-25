@@ -128,7 +128,19 @@ export function runShellCss(): string {
   /* max-width, NOT the variable: the rail carries --adv-rail-max as an inline
      custom property (its phone cap) and inline wins over any sheet, so the
      release has to be the max-width declaration itself. */
-  .${RUN_SHELL_CLASS} .adv-relic-rail > ul { max-width: none; justify-content: flex-start; }
+  .${RUN_SHELL_CLASS} .adv-relic-rail > ul {
+    max-width: none;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  /* Overflow relics (hidden on phone) become visible on TV/landscape. */
+  .${RUN_SHELL_CLASS} .adv-relic-rail [data-adv-overflow="true"] {
+    display: flex;
+  }
+  /* The +N button (shown on phone) hides on TV/landscape. */
+  .${RUN_SHELL_CLASS} .adv-relic-rail [data-adv-more-chip] {
+    display: none;
+  }
   .${RUN_SHELL_CLASS} .adv-relic-rail > ul > li {
     flex: 0 1 var(--adv-relic-slot);
     max-width: var(--adv-relic-slot);

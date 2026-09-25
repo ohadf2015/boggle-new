@@ -24,7 +24,7 @@ describe('useRivalTower', () => {
     await act(() => result.current.share({ name: 'Ohad', words: ['tower', 'beam'], text: 'beat me' }));
 
     const url = new URL(writeText.mock.calls[0][0].split(' ').pop());
-    expect(url.pathname).toBe('/en/word-tower-v2');
+    expect(url.pathname).toBe('/en/word-tower');
     expect(decodeRival(url.searchParams.get('rival')!)).toEqual({ name: 'Ohad', words: ['tower', 'beam'] });
     expect(result.current.copied).toBe(true);
   });

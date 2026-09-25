@@ -99,12 +99,14 @@ describe('LandingChallengeCards — adventure survives the ranked order', () => 
     expect(container.querySelector('[data-cube-key="adventure"]')).toBeInTheDocument();
   });
 
-  it('Given a public player, then adventure stays hidden — it is still a beta preview', () => {
+  it('Given a public player, then adventure is shown — it is now public (GA)', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
     const { container } = render(
       <LandingChallengeCards {...baseProps} cardOrder={[...RANKED] as never} />,
     );
-    expect(container.querySelector('[data-cube-key="adventure"]')).toBeNull();
+    const adventureCube = container.querySelector('[data-cube-key="adventure"]');
+    expect(adventureCube).not.toBeNull();
+    expect(adventureCube?.getAttribute('href')).toBe('/en/adventure');
   });
 });

@@ -36,10 +36,12 @@ export interface WelcomeEmailMode {
 
 /**
  * The promoted public set, in email order. Mirrors the landing FEATURED_MODES
- * minus admin-gated modes, minus `adventure`, and minus `crossword` (not yet
- * public to all players). `daily` leads after arena as the habit hook.
+ * minus admin-gated modes and minus `crossword` (not yet public to all players).
+ * `adventure` and `wordTowerV2` lead (now GA); `daily` follows as the habit hook.
  */
 export const PUBLIC_WELCOME_MODE_ORDER = [
+  'adventure',
+  'wordTowerV2',
   'arena',
   'daily',
   'blast',
@@ -59,6 +61,8 @@ const DAILY = {
 /** Curated, tile-sized taglines per language. Falls back to the registry desc. */
 const TAGLINES: Record<string, Record<string, string>> = {
   en: {
+    adventure: 'Explore the world, solve words',
+    wordTowerV2: 'Build your tower sky-high',
     arena: 'Live brawls, real people',
     daily: 'One puzzle. Everyone.',
     blast: 'Combo till it pops',
@@ -69,6 +73,8 @@ const TAGLINES: Record<string, Record<string, string>> = {
     practice: 'No clock, just words',
   },
   he: {
+    adventure: 'חקור את העולם, פתור מילים',
+    wordTowerV2: 'בנה את המגדל לשמיים',
     arena: 'קרבות חיים מול אנשים',
     daily: 'חידה אחת. כולם.',
     blast: 'קומבו עד שמתפוצץ',
@@ -79,6 +85,8 @@ const TAGLINES: Record<string, Record<string, string>> = {
     practice: 'בלי שעון, רק מילים',
   },
   sv: {
+    adventure: 'Utforska världen, lösa ord',
+    wordTowerV2: 'Bygg ditt torn mot himlen',
     arena: 'Live mot riktiga spelare',
     daily: 'Ett pussel. Alla.',
     blast: 'Kedja tills det smäller',
@@ -89,6 +97,8 @@ const TAGLINES: Record<string, Record<string, string>> = {
     practice: 'Ingen klocka, bara ord',
   },
   ja: {
+    adventure: '世界を冒険、謎を解こう',
+    wordTowerV2: 'タワーを空へ積み上げろ',
     arena: '生バトル、相手は本物',
     daily: '一つの問題、みんなで',
     blast: '連鎖で大爆発',
@@ -99,6 +109,8 @@ const TAGLINES: Record<string, Record<string, string>> = {
     practice: '時間制限なし、言葉だけ',
   },
   es: {
+    adventure: 'Explora el mundo, resuelve palabras',
+    wordTowerV2: 'Construye tu torre al cielo',
     arena: 'Duelos en vivo, gente real',
     daily: 'Un reto. Todos.',
     blast: 'Combos hasta reventar',
@@ -109,6 +121,8 @@ const TAGLINES: Record<string, Record<string, string>> = {
     practice: 'Sin reloj, solo palabras',
   },
   ru: {
+    adventure: 'Исследуй мир, решай головоломки',
+    wordTowerV2: 'Строй свою башню к небу',
     arena: 'Живые поединки с реальными игроками',
     daily: 'Одна загадка. Для всех.',
     blast: 'Комбо до взрыва',

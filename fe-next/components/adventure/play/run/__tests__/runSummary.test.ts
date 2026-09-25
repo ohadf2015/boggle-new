@@ -54,6 +54,16 @@ describe('runSummary', () => {
     expect(s.bestWord).toBeNull();
     expect(s.gold).toBe(80);
   });
+  it('Given a run-over with no nextRun and purseCoins=0 (Redis down), then gold must be 0 not run.gold', () => {
+    // When the server fails to credit purse (Redis unavailable), it returns purseCoins=0.
+    // The client must display what the server credited (0), not what the run had (50).
+    const s = runSummary(run({ gold: 50 }), { won: false, validWords: [], purseCoins: 0 });
+    expect(s.gold).toBe(0);
+  });
+  it('Given a run-over with purseCoins, then gold comes from purseCoins', () => {
+    const s = runSummary(run({ gold: 50 }), { won: true, validWords: [], purseCoins: 30 });
+    expect(s.gold).toBe(30);
+  });
   it('falls back to 0 cleared with no run', () => {
     expect(runSummary(null, { won: false, validWords: ['a'], points: undefined }).levelsCleared).toBe(0);
   });

@@ -94,7 +94,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   adventure: {
     titleKey: 'landing.adventureMode', descKey: 'landing.adventureModeDesc', path: '/adventure',
-    Icon: Map, variant: 'lime', badge: 'BETA', modeImage: '/modes/adventure.png', genIcon: '/modes/cubes/adventure.png',
+    Icon: Map, variant: 'lime', badge: 'NEW', modeImage: '/modes/adventure.png', genIcon: '/modes/cubes/adventure.png',
   },
   quickPlay: {
     titleKey: 'landing.quickPlayMode', descKey: 'landing.quickPlayModeDesc', path: '/quick-play',
@@ -132,11 +132,10 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
     Icon: Gavel, variant: 'cyan', badge: 'ADMIN', category: 'calm', genIcon: '/modes/cubes/sealedbid.png',
   },
   // Word Tower v2 — the physics rebuild (matter-js rigid bodies, emergent
-  // collapse). Beta preview; v1 stays the public Word Tower until this replaces
-  // it, so both cubes can be on the hub at once for a tester.
+  // collapse). Now public (GA) and replaces v1 on the hub.
   wordTowerV2: {
-    titleKey: 'wordTowerV2.cardTitle', descKey: 'wordTowerV2.cardDesc', path: '/word-tower-v2',
-    Icon: Building2, variant: 'purple', badge: 'BETA', genIcon: '/modes/cubes/wordtower.png',
+    titleKey: 'wordTowerV2.cardTitle', descKey: 'wordTowerV2.cardDesc', path: '/word-tower',
+    Icon: Building2, variant: 'purple', badge: 'NEW', genIcon: '/modes/cubes/wordtower.png',
   },
   // Wordfall = Blast V2 (falling-tile blast). Admin/beta dev preview. Shares the
   // blast cube art (same game family) until a bespoke Wordfall sticker exists.

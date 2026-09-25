@@ -184,16 +184,20 @@ export default function RunHud({
   useEffect(() => setBandEl(band.current), []);
 
   return (
-    /* 09-21 declutter: ONE row of what the level can use — relic icons, held
+    <div ref={band} data-adv-slot="hud" className="mt-2 flex flex-col gap-y-1" data-testid="run-hud-container">
+    {/* 09-21 declutter: ONE row of what the level can use — relic icons, held
        potions, hearts, and the ordinary fight's shield. The room chip (the
        header names it), the purse (spent on the map) and empty sockets left:
        every row here is height taken from the board. Relic detail is a tap.
-       The in-HUD mute keeps the global audio FAB from parking over the band. */
-    <div ref={band} data-adv-slot="hud" className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border-[3px] border-black bg-[#0f1b3d]/85 px-2 py-1 shadow-[3px_3px_0_#000]" data-testid="run-hud">
+       The in-HUD mute keeps the global audio FAB from parking over the band.
+       At 390px (phone width), RelicBar wraps within its own cap (relicRailMaxPx),
+       and items are ordered so the mute button (shrink-0) stays right-pinned
+       in the same row: Hearts (ms-auto), then mute. */}
+    <div className="flex flex-nowrap items-center gap-x-2 gap-y-1 rounded-2xl border-[3px] border-black bg-[#0f1b3d]/85 px-2 py-1 shadow-[3px_3px_0_#000]" data-testid="run-hud">
       {relics.length > 0 && (
-        <div className="min-w-0" data-testid="run-hud-relics">
+        <div className="flex-1 min-w-0 relative" data-testid="run-hud-relics">
           <RelicBar relics={relics} size="xs" pulse={pulse} contrib={contrib} stackCtx={stackCtx} calloutHost={bandEl}
-            tooltipAvoid={stageEl} />
+            tooltipAvoid={stageEl} maxVisible={4} />
         </div>
       )}
       {held.length > 0 && (
@@ -218,7 +222,8 @@ export default function RunHud({
         </button>
       )}
       <RunHudMute />
-      {goal && <div className="w-full text-xs font-bold opacity-90">{goal}</div>}
+    </div>
+    {goal && <div className="text-xs font-bold opacity-90 text-center">{goal}</div>}
     </div>
   );
 }

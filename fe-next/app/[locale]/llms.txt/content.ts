@@ -13,6 +13,7 @@ const COMMON_URLS = (locale: Locale) => ({
     singleplayer: `${BASE}/${locale}/singleplayer`,
     daily: `${BASE}/${locale}/daily`,
     adventure: `${BASE}/${locale}/adventure`,
+    wordTower: `${BASE}/${locale}/word-tower`,
     brainDrills: `${BASE}/${locale}/brain`,
     education: `${BASE}/${locale}/education`,
     blog: `${BASE}/${locale}/blog`,
@@ -51,7 +52,8 @@ Full reference: ${BASE}/llms-full.txt
 - Multiplayer (2–20+ players, real-time): ${u.multiplayer}
 - Single Player vs AI: ${u.singleplayer}
 - Daily Challenge (Wordle-style + Daily Buzz): ${u.daily}
-- Adventure Mode: ${u.adventure}
+- Word Tower (physics-based word stacking): ${u.wordTower}
+- Adventure Mode (RPG word puzzle): ${u.adventure}
 - Brain Drills (6 mini-games): ${u.brainDrills}
 - Education (free classroom toolkit): ${u.education}
 
@@ -104,6 +106,7 @@ Hebrew brand keywords: משחק מילים, אנגרמה, תפזורת, וורד
 - Single Player (יחיד נגד AI): ${u.singleplayer}
 - Daily Challenge / אתגר יומי — "המילה היומית" (מילת היום): ${u.daily}
 - The Daily Word / המילה היומית — dedicated Hebrew page: ${BASE}/he/hamila-hayomit
+- Word Tower (מגדל מילים, physics-based stacking): ${u.wordTower}
 - Adventure Mode (הרפתקה): ${u.adventure}
 - Brain Drills (תרגילי חשיבה): ${u.brainDrills}
 - Education (חינוך, כיתות): ${u.education}

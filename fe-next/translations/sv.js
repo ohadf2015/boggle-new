@@ -273,6 +273,14 @@ const sv = {
       "prev": "Föregående spel",
       "next": "Fler spel",
       "items": {
+        "adventure": {
+          "title": "Äventyr",
+          "line": "100 nivåer i 10 världar. Klättra och erövra."
+        },
+        "wordTowerV2": {
+          "title": "Ordtornet V2",
+          "line": "Stapla ord och se fysiken verka."
+        },
         "arena": {
           "title": "Multiplayer",
           "line": "Samma bokstäver, riktiga motståndare. Snabbast vinner."
@@ -749,6 +757,7 @@ const sv = {
       "levelUpDone": "Bossen väntar",
       "tapToContinue": "Tryck för att fortsätta",
       "andMoreRelics": "{n} reliker till slog till",
+      "showMoreRelics": "Visa {n} reliker till",
       "earnedThisRun": "Gav dig {n} poäng den här rundan",
       "thisRun": "Denna runda",
       "thisLevel": "Den här nivån",
@@ -869,6 +878,13 @@ const sv = {
       "insight": "+2 ledtrådar"
     },
     "longerWords": "längre ord",
+    "guest": {
+      "pitch": "Erövra 10 världar av roguelike-äventyr",
+      "bullet1": "Strida mot allt svårare motståndare",
+      "bullet2": "Lås upp sällsynta världsutseenden och kraftfulla relikvier",
+      "bullet3": "Säkra din plats på topplistorna",
+      "signIn": "Logga in för att spela"
+    },
     "title": "Äventyr",
     "start": "Starta",
     "fight": "Slåss!",
@@ -1894,7 +1910,7 @@ const sv = {
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",
     "newBest": "Nytt rekord!",
-    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta"},
+    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}"},
     "stability": {"label": "Stabilitet", "a11y": "Stabilitet: {band}, {pct} % risk", "steady": "Stadig", "wobbly": "Vinglig", "danger": "Fara!"},
     "biome": {"downtown": "Centrum", "sunset": "Tak i solnedgång", "clouds": "Molnhavet", "jetstream": "Jetströmmen", "aurora": "Norrsken", "orbit": "Omloppsbana", "cosmos": "Djupa rymden"},
     "newSky": "Ny himmel",
@@ -1903,12 +1919,16 @@ const sv = {
     "ach": {"unlocked": "Märke upplåst", "groundbreaker": {"name": "Första spadtaget", "desc": "Landa din första våning"}, "fiveStory": {"name": "Femvåningshus", "desc": "Stapla 5 våningar i en omgång"}, "highRise": {"name": "Höghus", "desc": "Stapla 10 våningar i en omgång"}, "skyscraper": {"name": "Skyskrapa", "desc": "Stapla 20 våningar i en omgång"}, "megatower": {"name": "Megatorn", "desc": "Stapla 30 våningar i en omgång"}, "steadyHands": {"name": "Stadiga händer", "desc": "3 perfekta släpp i rad"}, "surgeon": {"name": "Kirurg", "desc": "6 perfekta släpp i rad"}, "flawless": {"name": "Felfri", "desc": "10 perfekta släpp i rad"}, "perfectionist": {"name": "Perfektionist", "desc": "15 perfekta släpp i en omgång"}, "wordsmith": {"name": "Ordsmed", "desc": "Lyft ett ord på 6 bokstäver"}, "lexicon": {"name": "Levande lexikon", "desc": "Lyft ett ord på 8 bokstäver"}, "fullHouse": {"name": "Fullt hus", "desc": "50 hyresgäster i en omgång"}, "cityPlanner": {"name": "Stadsplanerare", "desc": "150 hyresgäster i en omgång"}, "lucky": {"name": "Tur i serie", "desc": "Öppna 5 lådor i en omgång"}, "welder": {"name": "Svetsare", "desc": "Svetsa ditt torn med armering"}, "sunsetView": {"name": "Solnedgångsutsikt", "desc": "Klättra upp i solnedgångshimlen"}, "aboveClouds": {"name": "Ovanför molnen", "desc": "Klättra förbi molnen"}, "orbiter": {"name": "I omloppsbana", "desc": "Bygg ända upp i omloppsbana"}},
     "results": {
         "home": "Hem",
-        "close": "Stäng","floorsA11y": "Nådde våning {n}", "combo": "Bästa serie", "tenants": "Hyresgäster", "crates": "Lådor", "badges": "Märken du tog", "nextGoal": "Nästa mål"},
+        "close": "Stäng","floorsA11y": "Nådde våning {n}", "combo": "Bästa serie", "tenants": "Hyresgäster", "crates": "Lådor", "badges": "Märken du tog", "nextGoal": "Nästa mål", "coinsLoading": "Mynt på väg…"},
     "hint": {"spell": "Stava ett ord för att bygga nästa våning", "drop": "Tryck SLÄPP när våningen är över tornet"},
     "changeWord": "BYT ORD",
     "editHint": "Tryck på en använd bokstav för att ändra ordet",
     "bestFlag": "REKORD",
     "leaveConfirm": "Lämna klättringen? Du kan återuppta den i den här fliken, men dailyn är en gång per dag.",
+"leaveDaily": {"title": "Lämna dagens klättring?", "desc": "Dagens klättring avslutas. Din höjd räknas på dagens bästa resultat. Nästa dagliga klättring öppnas i morgon."},
+"leaveFree": {"title": "Lämna klättringen?", "desc": "Klättringen avslutas och dina mynt betalas ut. Du kan starta en ny klättring när som helst."},
+    "leaveKeep": "Fortsätt klättra",
+    "leaveGo": "Lämna",
     "dailyPlayed": "Dagens torn är klart. Kom tillbaka i morgon.",
     "dailyRank": "Du är #{rank} idag",
     "recapAlt": "Sammanfattning: {floors} våningar, {m} meter"
@@ -2430,7 +2450,15 @@ const sv = {
       "title": "Ordäventyrsspel - RPG Ordpussel Gratis",
       "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 100 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
       "ogTitle": "LexiClash Äventyr - RPG Ordpussel",
-      "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!"
+      "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!",
+      "playLabel": "Spela"
+    },
+    "wordTowerV2": {
+      "title": "Word Tower - Stapla Ord, Bygg Ett Torn | Gratis Spel",
+      "description": "Stapla ord för att bygga det högsta tornet! Word Tower är ett fysikbaserat ordpussel. Kedja kombos, lås upp power-ups och klättra på leaderboarden. Gratis, ingen nedladdning.",
+      "ogTitle": "Word Tower - Fysik Ordpussel Spel",
+      "ogDescription": "Stapla ord för att bygga ditt torn! Kedja kombos, lås upp power-ups och tävla. Gratis spel!",
+      "playLabel": "Spela"
     },
     "blast": {
       "title": "Blast-läge - Kedja Ord Till Explosiva Kombos | LexiClash",
@@ -7803,6 +7831,10 @@ const sv = {
     "badgeChallenges": "Utmaningar",
     "badgeRooms": "Rum",
     "badgeHost": "Värd",
+    "badge": {
+      "new": "Nytt",
+      "beta": "Beta"
+    },
     "multiPlayer": "Flerspelarläge",
     "multiplayer": "Flerspelarläge",
     "multiplayerDesc": "Tävla med vänner i realtid!",
@@ -18339,6 +18371,12 @@ const sv = {
       "cta": "Jag är intresserad",
       "thanks": "Du är på listan! Vi meddelar dig när supporterplanerna lanseras."
     }
+  },
+  "newModes": {
+    "title": "Nya spellägen",
+    "description": "Äventyr väntar. Prova det dagliga tornet.",
+    "playAdventure": "Spela äventyr",
+    "playWordTower": "Spela ordtorn"
   }
 };
 

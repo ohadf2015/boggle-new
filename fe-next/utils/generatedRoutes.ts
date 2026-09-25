@@ -73,7 +73,6 @@ export const PUBLIC_ROUTES: string[] = [
   "/daily-word-wheel",
   "/daily/archive",
   "/daily/word-hunt",
-  "/daily/word-tower",
   "/daily/word-wheel",
   "/dev/results",
   "/download-word-game-android",
@@ -205,8 +204,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/word-games-online-free",
   "/word-of-the-day",
   "/word-tower",
-  "/word-tower-v2",
-  "/word-tower-v2/daily",
+  "/word-tower/daily",
   "/words",
   "/words-with-friends-alternative"
 ];

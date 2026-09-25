@@ -3,19 +3,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NEUTRAL_PERKS, applyUpgrade, emptyEstate, perksFromEstate, runCoins } from '@/lib/wordTowerV2/estate';
 
 const auth = { isAuthenticated: false, loading: false };
+const refreshCoins = vi.fn(async () => 0);
+
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
 vi.mock('@/utils/authFetch', () => ({ getWithAuth: vi.fn(), postWithAuth: vi.fn() }));
 // Word Tower coins ARE the app wallet: every server answer re-syncs the shared balance.
-const refreshCoins = vi.fn(async () => 0);
 vi.mock('@/contexts/CoinContext', () => ({ useCoinActions: () => ({ refreshCoins }) }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
 import { getWithAuth, postWithAuth } from '@/utils/authFetch';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { ESTATE_STORAGE_KEY, useEstate } from '../useEstate';
 
 const RUN = { floors: 12, perfects: 4, bestCombo: 3, crates: 2, heightM: 36 };
 const ok = (body: unknown, status = 200) => ({ ok: status < 400, status, json: async () => body }) as Response;
 const mockGet = getWithAuth as unknown as ReturnType<typeof vi.fn>;
 const mockPost = postWithAuth as unknown as ReturnType<typeof vi.fn>;
+const mockTrackEvent = trackGrowthEvent as unknown as ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -153,6 +157,26 @@ describe('useEstate — signed in', () => {
     expect(mockGet).toHaveBeenCalledTimes(2); // re-read after the refusal
   });
 
+  it('should track wt2_upgrade_bought event when upgrade succeeds', async () => {
+    const server = applyUpgrade(serverEstate, 'vault');
+    expect(server.ok).toBe(true);
+    mockPost.mockResolvedValueOnce(ok({ estate: server.estate, districtCompleted: false }));
+    const { result } = renderHook(() => useEstate());
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    await act(async () => {
+      await result.current.upgrade('vault');
+    });
+    expect(mockTrackEvent).toHaveBeenCalledWith(
+      'wt2_upgrade_bought',
+      {
+        upgrade: 'vault',
+        cost: server.cost,
+      }
+    );
+    // Verify the cost is positive (not a placeholder 0)
+    expect(server.cost).toBeGreaterThan(0);
+  });
+
   it('given a raid, when sent, then the attacker estate updates from the server', async () => {
     const after = { ...serverEstate, coins: 700 };
     mockPost.mockResolvedValueOnce(ok({ outcome: { kind: 'blocked', attackerCoins: 30 }, estate: after, perks: NEUTRAL_PERKS }));
@@ -162,9 +186,37 @@ describe('useEstate — signed in', () => {
     await act(async () => {
       out = await result.current.raid('b', 0.7, true);
     });
-    expect(mockPost).toHaveBeenCalledWith('/api/word-tower/estate/raid', { defenderId: 'b', accuracy: 0.7, revenge: true }, expect.anything());
+    expect(mockPost).toHaveBeenCalledWith(
+      '/api/word-tower/estate/raid',
+      expect.objectContaining({ defenderId: 'b', accuracy: 0.7, revenge: true, nonce: expect.any(String) }),
+      expect.anything()
+    );
     expect(out).toMatchObject({ outcome: { kind: 'blocked' } });
     expect(result.current.estate.coins).toBe(700);
+    // Track engagement: raid result (blocked = no coins won)
+    expect(mockTrackEvent).toHaveBeenCalledWith('wt2_raid_played', { won: false, coins: 0 });
+  });
+
+  it('given a raid that damages, when sent, then wt2_raid_played is emitted with coins', async () => {
+    const after = { ...serverEstate, coins: 550 };
+    mockPost.mockResolvedValueOnce(ok({ outcome: { kind: 'damaged', slot: 'vault', coinsStolen: 50, attackerCoins: 120 }, estate: after, perks: NEUTRAL_PERKS }));
+    const { result } = renderHook(() => useEstate());
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    await act(async () => {
+      await result.current.raid('b', 1, false);
+    });
+    expect(mockTrackEvent).toHaveBeenCalledWith('wt2_raid_played', { won: true, coins: 120 });
+  });
+
+  it('given a duplicate raid (409), when sent, then wt2_raid_played is NOT emitted', async () => {
+    mockPost.mockResolvedValueOnce(ok({ reason: 'duplicate' }, 409));
+    const { result } = renderHook(() => useEstate());
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    mockTrackEvent.mockClear();
+    await act(async () => {
+      await result.current.raid('b', 1, false);
+    });
+    expect(mockTrackEvent).not.toHaveBeenCalled();
   });
 
   it('given unseen raids, when marked seen, then they leave the inbox', async () => {

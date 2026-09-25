@@ -6,6 +6,8 @@ interface GamePageSeoContentProps {
   description: string;
   features?: string[];
   faq?: Array<{ question: string; answer: string }>;
+  /** Optional CTA button to render after the description */
+  cta?: React.ReactNode;
   /** When true, render an h1 instead of h2 (only for pages without their own visible h1) */
   asH1?: boolean;
   /** When true, wrap the whole card in a native <details> collapsed by default.
@@ -41,6 +43,7 @@ export function GamePageSeoContent({
   description,
   features = [],
   faq = [],
+  cta,
   asH1 = false,
   collapsible = false,
   srOnly = false,
@@ -78,6 +81,8 @@ export function GamePageSeoContent({
       <p className="mb-8 max-w-prose text-sm leading-relaxed text-neo-cream/90 sm:text-base">
         {description}
       </p>
+
+      {cta && <div className="mb-8">{cta}</div>}
 
       {features.length > 0 && (
         <ul className="mb-8 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">

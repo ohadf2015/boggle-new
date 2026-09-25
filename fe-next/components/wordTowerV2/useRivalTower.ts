@@ -26,7 +26,7 @@ export function useRivalTower(language: string) {
 
   const share = useCallback(
     async ({ name, words, text }: RivalTower & { text: string }) => {
-      const url = `${window.location.origin}/${language}/word-tower-v2?rival=${encodeRival({ name, words })}`;
+      const url = `${window.location.origin}/${language}/word-tower?rival=${encodeRival({ name, words })}`;
       try {
         if (typeof navigator.share === 'function') {
           await navigator.share({ text: stripEmoji(text), url });

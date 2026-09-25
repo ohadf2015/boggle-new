@@ -185,7 +185,7 @@ export function DailyChallengeLanding({
   const visibleModes = visibleDailyModes(canSeeInWorkModes);
   const showsWordTower = visibleModes.some((mode) => mode.id === 'word-tower');
   const showsConnections = visibleModes.some((mode) => mode.id === 'connections');
-  const wordTowerHref = `/${currentLanguage}/daily/word-tower`;
+  const wordTowerHref = `/${currentLanguage}/word-tower/daily`;
   const totalQuests = 2 + (showsWordTower ? 1 : 0) + (showsConnections ? 1 : 0);
 
   // Completion count for progress bar

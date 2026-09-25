@@ -7,7 +7,6 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { AchievementsPageClient } from './AchievementsPageClient';
-import { InWorkModeShell } from '@/components/auth/InWorkModeShell';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,9 +16,5 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function AchievementsPage() {
-  return (
-    <InWorkModeShell>
-      <AchievementsPageClient />
-    </InWorkModeShell>
-  );
+  return <AchievementsPageClient />;
 }

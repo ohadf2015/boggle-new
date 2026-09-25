@@ -92,7 +92,7 @@ const ROOTS = [
   'components/adventure',
   'components/wordTowerV2',
   'app/[locale]/adventure',
-  'app/[locale]/word-tower-v2',
+  'app/[locale]/word-tower',
 ];
 const REPO = path.resolve(__dirname, '../../..');
 
@@ -206,7 +206,7 @@ const EXTRA_ROOTS = [
   'components/adventure',
   'components/wordTowerV2',
   'app/[locale]/adventure',
-  'app/[locale]/word-tower-v2',
+  'app/[locale]/word-tower',
 ];
 
 function isExtra(file: string): boolean {

@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 const FOLLOW_UP_ROOTS = [
   'components/wordTowerV2',
   'components/adventure',
-  'app/[locale]/word-tower-v2',
+  'app/[locale]/word-tower',
   'app/[locale]/adventure',
 ];
 

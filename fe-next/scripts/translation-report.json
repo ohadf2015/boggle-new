@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 7308,
+    "totalKeysInCode": 7288,
     "keyCountByLanguage": {
-      "en": 14128,
-      "es": 14416,
-      "he": 14338,
-      "ja": 14397,
-      "ru": 14170,
-      "sv": 14394
+      "en": 14218,
+      "es": 14506,
+      "he": 14428,
+      "ja": 14487,
+      "ru": 14260,
+      "sv": 14484
     },
     "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 405,
+      "templateLiterals": 389,
       "fallbackUsages": 1,
-      "variableKeys": 116
+      "variableKeys": 117
     }
   },
   "runtimeRisks": {
@@ -464,8 +464,8 @@
         "pattern": "`adventure.worlds.${worldCfg.name}`",
         "type": "template_literal",
         "file": "components/adventure/play/AdventureLevel.tsx",
-        "line": 339,
-        "context": "<div className=\"text-[11px] uppercase tracking-wider opacity-80 truncate\">{worldCfg ? t(`adventure.w"
+        "line": 364,
+        "context": "worldName={worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : ''}"
       },
       {
         "pattern": "`adventurePlay.loot.rarity.${offerRarity(chosen)}`",
@@ -541,7 +541,7 @@
         "pattern": "`adventurePlay.node.restUnit${c.index}`",
         "type": "template_literal",
         "file": "components/adventure/play/nodes/RestScreen.tsx",
-        "line": 122,
+        "line": 126,
         "context": "<span className=\"text-xs font-extrabold uppercase tracking-wide opacity-70\">{t(`adventurePlay.node.r"
       },
       {
@@ -555,14 +555,14 @@
         "pattern": "`adventurePlay.loot.rarity.${RELICS[relic].rarity}`",
         "type": "template_literal",
         "file": "components/adventure/play/nodes/TreasureScreen.tsx",
-        "line": 76,
+        "line": 77,
         "context": "{t(`adventurePlay.loot.rarity.${RELICS[relic].rarity}`)}"
       },
       {
         "pattern": "`adventurePlay.loot.rarity.${RELICS[pending.id].rarity}`",
         "type": "template_literal",
         "file": "components/adventure/play/nodes/TreasureScreen.tsx",
-        "line": 201,
+        "line": 205,
         "context": "{pending.kind === 'relic' ? t(`adventurePlay.loot.rarity.${RELICS[pending.id].rarity}`) : t('adventu"
       },
       {
@@ -1063,60 +1063,25 @@
         "context": "{t(`${BOOST_CONFIGS[boostType].i18nKey}.description`)}"
       },
       {
-        "pattern": "`brain.tiers.${tier}`",
+        "pattern": "`brain.drills.${drill}.name`",
         "type": "template_literal",
-        "file": "components/brain/BrainScoreHero.tsx",
-        "line": 187,
-        "context": "{t(`brain.tiers.${tier}`)}"
+        "file": "components/brain/BrainCheckPanel.tsx",
+        "line": 79,
+        "context": "<span className=\"min-w-0 flex-1 truncate font-black\">{t(`brain.drills.${drill}.name`)}</span>"
       },
       {
-        "pattern": "`brain.tiers.${nextTier}`",
+        "pattern": "`brain.drills.${drill}.name`",
         "type": "template_literal",
-        "file": "components/brain/BrainScoreHero.tsx",
-        "line": 197,
-        "context": "{t(`brain.tiers.${nextTier}`)}"
+        "file": "components/brain/BrainCheckPanel.tsx",
+        "line": 83,
+        "context": "aria-label={`${t('brain.check.start')} — ${t(`brain.drills.${drill}.name`)}`}"
       },
       {
-        "pattern": "`brain.tiers.${tier}`",
+        "pattern": "`brain.check.verdict.${verdict}`",
         "type": "template_literal",
-        "file": "components/brain/BrainScoreShareCard.tsx",
-        "line": 103,
-        "context": "${t('brain.share.tier')}: ${t(`brain.tiers.${tier}`)}"
-      },
-      {
-        "pattern": "`brain.tiers.${tier}`",
-        "type": "template_literal",
-        "file": "components/brain/BrainScoreShareCard.tsx",
-        "line": 206,
-        "context": "{t(`brain.tiers.${tier}`)}"
-      },
-      {
-        "pattern": "`brain.domains.${domainKey}`",
-        "type": "template_literal",
-        "file": "components/brain/CognitiveDomainGrid.tsx",
-        "line": 182,
-        "context": "{t(`brain.domains.${domainKey}`)}"
-      },
-      {
-        "pattern": "`brain.domains.${domainKey}`",
-        "type": "template_literal",
-        "file": "components/brain/CognitiveDomainGrid.tsx",
-        "line": 229,
-        "context": "<p className=\"font-bold\">{t(`brain.domains.${domainKey}`)}</p>"
-      },
-      {
-        "pattern": "`brain.domains.${domainKey}Desc`",
-        "type": "template_literal",
-        "file": "components/brain/CognitiveDomainGrid.tsx",
-        "line": 231,
-        "context": "<p className=\"text-xs leading-relaxed\">{t(`brain.domains.${domainKey}Desc`)}</p>"
-      },
-      {
-        "pattern": "`brain.progress.${domainData.trend}`",
-        "type": "template_literal",
-        "file": "components/brain/CognitiveDomainGrid.tsx",
-        "line": 242,
-        "context": "{t(`brain.progress.${domainData.trend}`)}"
+        "file": "components/brain/BrainCheckVerdict.tsx",
+        "line": 48,
+        "context": "if (verdict !== 'need-more') label = t(`brain.check.verdict.${verdict}`);"
       },
       {
         "pattern": "`brain.drills.${drillId}.name`",
@@ -1140,116 +1105,32 @@
         "context": "{t(`brain.drills.badge.${badge}.name`)}"
       },
       {
+        "pattern": "`brain.drills.${drillType}.name`",
+        "type": "template_literal",
+        "file": "components/brain/DrillPageShell.tsx",
+        "line": 183,
+        "context": "{t(`brain.drills.${drillType}.name`)}"
+      },
+      {
         "pattern": "`brain.domains.${targetDomain}`",
         "type": "template_literal",
         "file": "components/brain/DrillProgressionOverlay.tsx",
-        "line": 289,
+        "line": 215,
         "context": "{t(`brain.domains.${targetDomain}`)}"
       },
       {
-        "pattern": "`brain.tiers.${tier}`",
-        "type": "template_literal",
-        "file": "components/brain/DrillProgressionOverlay.tsx",
-        "line": 411,
-        "context": "{t(`brain.tiers.${tier}`)}"
-      },
-      {
-        "pattern": "`brain.drills.${drill.drillType}.name`",
-        "type": "template_literal",
-        "file": "components/brain/DrillUnlockProgress.tsx",
-        "line": 110,
-        "context": "{t(`brain.drills.${drill.drillType}.name`)} {t('brain.unlock.nowAvailable')}"
-      },
-      {
-        "pattern": "`brain.drills.${drill.drillType}.name`",
-        "type": "template_literal",
-        "file": "components/brain/DrillUnlockProgress.tsx",
-        "line": 159,
-        "context": "{t(`brain.drills.${drill.drillType}.name`)}"
-      },
-      {
-        "pattern": "`brain.tiers.${tier}`",
-        "type": "template_literal",
-        "file": "components/brain/FirstGameCelebration.tsx",
-        "line": 207,
-        "context": "{t(`brain.tiers.${tier}`)}"
-      },
-      {
-        "pattern": "`brain.domains.${key}`",
-        "type": "template_literal",
-        "file": "components/brain/FirstGameCelebration.tsx",
-        "line": 229,
-        "context": "{t(`brain.domains.${key}`)}"
-      },
-      {
-        "pattern": "`brain.domains.${recommendedDomain}`",
-        "type": "template_literal",
-        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
-        "line": 142,
-        "context": "return t('brain.recommendation.declining', { domain: t(`brain.domains.${recommendedDomain}`) });"
-      },
-      {
-        "pattern": "`brain.domains.${recommendedDomain}`",
-        "type": "template_literal",
-        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
-        "line": 145,
-        "context": "return t('brain.recommendation.low', { domain: t(`brain.domains.${recommendedDomain}`) });"
-      },
-      {
-        "pattern": "`brain.domains.${recommendedDomain}`",
-        "type": "template_literal",
-        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
-        "line": 147,
-        "context": "return t('brain.recommendation.improve', { domain: t(`brain.domains.${recommendedDomain}`) });"
-      },
-      {
-        "pattern": "`brain.drills.${recommendedDrill}.name`",
-        "type": "template_literal",
-        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
-        "line": 207,
-        "context": "{t(`brain.drills.${recommendedDrill}.name`)}"
-      },
-      {
-        "pattern": "`brain.domains.${recommendedDomain}`",
-        "type": "template_literal",
-        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
-        "line": 213,
-        "context": "{t(`brain.domains.${recommendedDomain}`)} • {domainData.score}/100"
-      },
-      {
-        "pattern": "`brain.drills.${drill.id}.name`",
+        "pattern": "`brain.drills.${drillId}.name`",
         "type": "template_literal",
         "file": "components/brain/QuickDrillsSection.tsx",
-        "line": 151,
-        "context": "{t(`brain.drills.${drill.id}.name`)}"
+        "line": 60,
+        "context": "{t(`brain.drills.${drillId}.name`)}"
       },
       {
-        "pattern": "`brain.domains.${drill.domain}`",
+        "pattern": "`brain.domains.${DRILL_DOMAINS[drillId]}`",
         "type": "template_literal",
         "file": "components/brain/QuickDrillsSection.tsx",
-        "line": 158,
-        "context": "{t(`brain.domains.${drill.domain}`)}"
-      },
-      {
-        "pattern": "`brain.tips.${activeTip.id}`",
-        "type": "template_literal",
-        "file": "components/brain/ScientificTipsCarousel.tsx",
-        "line": 212,
-        "context": "{t(`brain.tips.${activeTip.id}`)}"
-      },
-      {
-        "pattern": "`brain.tips.${activeTip.sourceKey}`",
-        "type": "template_literal",
-        "file": "components/brain/ScientificTipsCarousel.tsx",
-        "line": 240,
-        "context": "{t(`brain.tips.${activeTip.sourceKey}`)}"
-      },
-      {
-        "pattern": "`brain.tiers.${highestTier}`",
-        "type": "template_literal",
-        "file": "components/brain/WelcomeBackCard.tsx",
-        "line": 111,
-        "context": "return t('brain.welcomeBack.reachTier', { tier: t(`brain.tiers.${highestTier}`) });"
+        "line": 63,
+        "context": "{t(`brain.domains.${DRILL_DOMAINS[drillId]}`)}"
       },
       {
         "pattern": "`connections.daily.shareCallout.${gridCallout(outcomes)}`",
@@ -1775,6 +1656,13 @@
         "file": "components/landing/fresh/FreshFaqLinks.tsx",
         "line": 56,
         "context": "{t(`homeFresh.close.readMoreLinks.${key}`)}"
+      },
+      {
+        "pattern": "`landing.badge.${meta.badge.toLowerCase()}`",
+        "type": "template_literal",
+        "file": "components/landing/fresh/ModeRow.tsx",
+        "line": 139,
+        "context": "{t(`landing.badge.${meta.badge.toLowerCase()}`)}"
       },
       {
         "pattern": "`landing.home.tier.${tier.toLowerCase()}`",
@@ -2683,14 +2571,14 @@
         "pattern": "`wordTowerV2.reward.${id}.name`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2TopBar.tsx",
-        "line": 296,
+        "line": 314,
         "context": "aria-label={t('wordTowerV2.hud.effect', { name: t(`wordTowerV2.reward.${id}.name`), n })}"
       },
       {
         "pattern": "`wordTowerV2.reward.${id}.name`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2TopBar.tsx",
-        "line": 303,
+        "line": 321,
         "context": "{t(`wordTowerV2.reward.${id}.name`)}"
       },
       {
@@ -2912,7 +2800,7 @@
         "variable": "CLASSROOM_ROOM_GONE_KEY",
         "type": "variable_key",
         "file": "app/[locale]/multiplayer/PageClient.tsx",
-        "line": 278,
+        "line": 284,
         "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });"
       },
       {
@@ -2944,7 +2832,7 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 331,
+        "line": 353,
         "context": "<h3 className=\"text-sm font-bold text-neo-cyan mb-1\">{t(q)}</h3>"
       },
       {
@@ -2952,7 +2840,7 @@
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 333,
+        "line": 355,
         "context": "{t(a)}"
       },
       {
@@ -2992,7 +2880,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/adventure/play/nodes/EventScreen.tsx",
-        "line": 136,
+        "line": 140,
         "context": "<span className=\"block leading-tight\">{t(key)}</span>"
       },
       {
@@ -3288,7 +3176,7 @@
         "variable": "pasteNoteKey",
         "type": "variable_key",
         "file": "components/education/join/JoinFlow.tsx",
-        "line": 176,
+        "line": 206,
         "context": "<p className=\"font-neo-body text-sm font-bold text-neo-lime\">{t(pasteNoteKey)}</p>"
       },
       {
@@ -3626,6 +3514,14 @@
         "file": "components/singleplayer/results/components/YourWordsSection.tsx",
         "line": 37,
         "context": "const result = t(key);"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/student/pages/AwardsWall.tsx",
+        "line": 55,
+        "context": "{t(labelKey)}"
       },
       {
         "pattern": "t(labelKey)",

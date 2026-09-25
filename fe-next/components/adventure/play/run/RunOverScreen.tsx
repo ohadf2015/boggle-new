@@ -1,10 +1,11 @@
 'use client';
 
 /** Death / failed level: the run ends. Recap, then a fresh run on a fresh act map (stars + collection kept). */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { RotateCcw, Map as MapIcon } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 import type { RunMap } from '@/lib/adventure/play/runMap';
 import type { RunResult } from '../useAdventureRun';
@@ -31,7 +32,23 @@ interface Props {
 export default function RunOverScreen({ result, run, runBest, map = null, runWords = 0, onRestartRun, onMap }: Props) {
   const { t } = useLanguageSafe();
   const { playDefeatSound } = useSoundEffects();
+  const firedRef = useRef(false);
+
   useEffect(() => { playDefeatSound?.(); }, [playDefeatSound]);
+
+  // Fire adventure_run_ended once per screen mount
+  useEffect(() => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    const base = runSummary(run, result);
+    trackGrowthEvent('adventure_run_ended', {
+      world: run?.w,
+      outcome: 'lost',
+      nodesCleared: base.levelsCleared,
+      purseCoins: result.purseCoins ?? 0,
+    });
+  }, [run, result]);
+
   const base = runSummary(run, result);
   const summary = { ...base, bestWord: runBest ?? base.bestWord };
 
@@ -69,7 +86,10 @@ export default function RunOverScreen({ result, run, runBest, map = null, runWor
         </div>
       </div>
       <div className="mt-3 flex gap-2">
-        <button type="button" onClick={onMap} aria-label={t('adventurePlay.backToMap')} className={squareBtn}>
+        <button type="button" onClick={() => {
+          trackGrowthEvent('adventure_exit', { from: 'results' });
+          onMap();
+        }} aria-label={t('adventurePlay.backToMap')} className={squareBtn}>
           <MapIcon className="h-5 w-5" />
         </button>
         <button type="button" onClick={onRestartRun} data-testid="run-restart" className={cn(primaryBtn, 'bg-neo-cyan')}>

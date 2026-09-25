@@ -24,7 +24,7 @@ vi.mock('@/utils/growthTracking', () => ({
 import { ModeRow, FRESH_MODE_KEYS } from '../fresh/ModeRow';
 
 const PUBLIC_HREFS = [
-  '/en/multiplayer',
+  '/en/adventure',
   '/en/word-tower',
   '/en/word-craft',
   '/en/connections/pyramid',
@@ -59,16 +59,17 @@ describe('ModeRow (fresh section 4)', () => {
   it('never links a fresh visitor to a beta-gated route', () => {
     const { container } = render(<ModeRow />);
     for (const a of cards(container)) {
-      expect(a.getAttribute('href')).not.toMatch(/adventure|crossword|quick-play|sealed-bid|word-tower-v2|blast\/v2/);
+      expect(a.getAttribute('href')).not.toMatch(/crossword|quick-play|sealed-bid|blast\/v2/);
     }
-    expect(FRESH_MODE_KEYS).not.toContain('adventure');
+    // Adventure is now public (GA) and should appear for guests
+    expect(FRESH_MODE_KEYS).toContain('adventure');
     expect(FRESH_MODE_KEYS).not.toContain('crossword');
   });
 
   it('localises links by the current language', () => {
     lang.language = 'he';
     const { container } = render(<ModeRow />);
-    expect(cards(container)[0].getAttribute('href')).toBe('/he/multiplayer');
+    expect(cards(container)[0].getAttribute('href')).toBe('/he/adventure');
   });
 
   it('each card carries its own homeFresh title and one line', () => {
@@ -83,8 +84,8 @@ describe('ModeRow (fresh section 4)', () => {
   it('a card click keeps the hub instrumentation (mode_card + mode_selected)', () => {
     const { container } = render(<ModeRow />);
     fireEvent.click(cards(container)[1]);
-    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'wordTower' }));
-    expect(trackModeSelected).toHaveBeenCalledWith('wordTower', 'home');
+    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'wordTowerV2' }));
+    expect(trackModeSelected).toHaveBeenCalledWith('wordTowerV2', 'home');
   });
 
   it('is a scroll-snap row whose first card clears the gutter', () => {
@@ -104,6 +105,37 @@ describe('ModeRow (fresh section 4)', () => {
   it('card art is decorative (the title names the card)', () => {
     const { container } = render(<ModeRow />);
     for (const img of container.querySelectorAll('li img')) expect(img.getAttribute('alt')).toBe('');
+  });
+
+  it('each card renders its art image with valid src', () => {
+    const { container } = render(<ModeRow />);
+    const images = [...container.querySelectorAll<HTMLImageElement>('[data-fresh-section="modes"] img')];
+    expect(images.length).toBeGreaterThan(0);
+    // All images should have src attribute set
+    for (const img of images) {
+      expect(img.getAttribute('src')).toBeTruthy();
+      // Verify it's a next/image wrapped URL with the cubes path
+      const src = img.getAttribute('src') || '';
+      expect(src).toMatch(/modes.*cubes/);
+    }
+  });
+
+  it('wordCraft, connections, brainGym all render with art', () => {
+    const { container } = render(<ModeRow />);
+    const cardsByMode = new Map<string, HTMLElement>();
+    for (const link of container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')) {
+      const mode = link.getAttribute('data-mode');
+      if (mode) cardsByMode.set(mode, link);
+    }
+    for (const mode of ['wordCraft', 'connections', 'brainGym']) {
+      const card = cardsByMode.get(mode);
+      expect(card).toBeTruthy();
+      const img = card?.querySelector('img');
+      expect(img).toBeTruthy();
+      const src = img?.getAttribute('src');
+      expect(src).toBeTruthy();
+      expect(src).toMatch(/cubes/);
+    }
   });
 
   describe('prev / next buttons', () => {

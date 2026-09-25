@@ -23,6 +23,14 @@ vi.mock('@/components/achievements/UnifiedAchievementModal', () => ({
 vi.mock('@/hooks/useAdventureAchievements', () => ({
   useAdventureAchievements: () => ({ achievementCounts: {} }),
 }));
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: vi.fn(),
+}));
+vi.mock('@/components/adventure/AdventureGuestGate', () => ({
+  AdventureGuestGate: ({ surface }: any) => (
+    <div data-testid={`guest-gate-${surface}`} />
+  ),
+}));
 
 import { AchievementsPageClient } from '../AchievementsPageClient';
 
@@ -30,9 +38,59 @@ beforeEach(() => {
   replace.mockClear();
 });
 
-describe('AchievementsPageClient beta gate', () => {
-  it('given a beta tester or admin, when opened, then the grid renders', () => {
-    useAuth.mockReturnValue({ canSeeInWorkModes: true, loading: false, user: { id: 'a' }, profile: { id: 'a' } });
+describe('AchievementsPageClient gate', () => {
+  it('given an ordinary guest player, when opened, then the guest gate renders for achievements', () => {
+    useAuth.mockReturnValue({
+      loading: false,
+      user: null,
+      profile: null,
+      isAuthenticated: false,
+      canSeeInWorkModes: false,
+    });
+
+    render(<AchievementsPageClient />);
+
+    expect(screen.getByTestId('guest-gate-achievements')).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it('given auth still resolving, when opened, then it waits instead of rendering', () => {
+    useAuth.mockReturnValue({
+      loading: true,
+      user: null,
+      profile: null,
+      canSeeInWorkModes: false,
+    });
+
+    render(<AchievementsPageClient />);
+
+    expect(screen.queryByTestId('achievement-grid')).not.toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it('given a signed-in player whose profile has not landed, when opened, then it waits instead of rendering', () => {
+    useAuth.mockReturnValue({
+      loading: false,
+      user: { id: 'player-1' },
+      profile: null,
+      canSeeInWorkModes: false,
+      isAuthenticated: false,
+    });
+
+    render(<AchievementsPageClient />);
+
+    expect(screen.queryByTestId('achievement-grid')).not.toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it('given a signed-in beta tester, when opened, then the achievement grid is displayed', () => {
+    useAuth.mockReturnValue({
+      canSeeInWorkModes: true,
+      loading: false,
+      user: { id: 'u1' },
+      profile: { id: 'p1', is_beta_tester: true },
+      isAuthenticated: true,
+    });
 
     render(<AchievementsPageClient />);
 
@@ -40,26 +98,38 @@ describe('AchievementsPageClient beta gate', () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('given an ordinary player, when opened, then they are sent home and see no grid', () => {
-    useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: false, user: null, profile: null });
-
-    render(<AchievementsPageClient />);
-
-    expect(screen.queryByTestId('achievement-grid')).not.toBeInTheDocument();
-    expect(replace).toHaveBeenCalledWith('/en');
-  });
-
-  it('given a signed-in player whose profile has not landed, when opened, then it waits instead of bouncing', () => {
+  it('given a signed-in ordinary player who is not beta/admin, when opened, then they see the achievement grid (Adventure is public)', () => {
     useAuth.mockReturnValue({
       canSeeInWorkModes: false,
       loading: false,
-      user: { id: 'beta-1' },
-      profile: null,
+      user: { id: 'u1' },
+      profile: { id: 'p1', is_beta_tester: false },
+      isAuthenticated: true,
     });
 
     render(<AchievementsPageClient />);
 
     expect(replace).not.toHaveBeenCalled();
-    expect(screen.queryByTestId('achievement-grid')).not.toBeInTheDocument();
+    expect(screen.getByTestId('achievement-grid')).toBeInTheDocument();
+  });
+
+  it('given dev mode with a non-beta player, when opened, then the achievement grid is displayed (dev bypass)', () => {
+    const origEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+
+    useAuth.mockReturnValue({
+      canSeeInWorkModes: false,
+      loading: false,
+      user: { id: 'u1' },
+      profile: { id: 'p1', is_beta_tester: false },
+      isAuthenticated: true,
+    });
+
+    render(<AchievementsPageClient />);
+
+    expect(screen.getByTestId('achievement-grid')).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+
+    process.env.NODE_ENV = origEnv;
   });
 });

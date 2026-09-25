@@ -7,8 +7,14 @@ import { V2TopBar } from '../V2TopBar';
 afterEach(cleanup);
 
 // Echo the key (plus params) so assertions read which copy was chosen.
-const t = (key: string, params?: Record<string, string | number>) =>
-  params ? `${key}:${Object.values(params).join(',')}` : key;
+const t = (key: string, params?: Record<string, string | number>) => {
+  if (!params) return key;
+  // For dailyBadge, format with the date
+  if (key === 'wordTowerV2.hud.dailyBadge' && params.date) {
+    return `DAILY ${params.date}`;
+  }
+  return `${key}:${Object.values(params).join(',')}`;
+};
 
 const bar = (over: Partial<Parameters<typeof V2TopBar>[0]> = {}) => (
   <V2TopBar
@@ -23,6 +29,7 @@ const bar = (over: Partial<Parameters<typeof V2TopBar>[0]> = {}) => (
     raids={0}
     coinsRef={{ current: null }}
     onOpenEstate={() => {}}
+    daily={false}
     {...over}
   />
 );
@@ -120,5 +127,33 @@ describe('V2TopBar', () => {
     const status = container.querySelector('[data-wt2-topbar-status]')!;
     expect(status.querySelector('[data-wt2-stability]')).toBeTruthy();
     expect(status.querySelector('[data-wt2-streak-ring]')).toBeTruthy();
+  });
+
+  it('given a daily run, when rendered, then the daily badge shows the date, not the best chip', () => {
+    const { container } = render(
+      bar({
+        daily: true,
+        dailyDateKey: '2026-09-25',
+        dailyDateFormatted: '25 Sep',
+        bestM: 15.5, // This best should not appear
+      })
+    );
+
+    // Daily badge is present with date
+    const dailyBadge = screen.getByLabelText(/DAILY 25 Sep/);
+    expect(dailyBadge).toBeTruthy();
+
+    // Best chip is absent
+    expect(screen.queryByText(/15\.5/)).toBeNull();
+  });
+
+  it('given a non-daily run with a best, when rendered, then the best chip appears (not daily badge)', () => {
+    const { container } = render(bar({ daily: false, bestM: 15.5 }));
+
+    // Best chip appears
+    expect(screen.getByText(/15\.5/)).toBeTruthy();
+
+    // Daily badge is absent
+    expect(screen.queryByLabelText(/dailyBadge/)).toBeNull();
   });
 });

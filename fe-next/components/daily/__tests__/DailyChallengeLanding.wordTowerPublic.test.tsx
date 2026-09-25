@@ -143,7 +143,7 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
     const button = card?.querySelector('button');
     expect(button).toBeInTheDocument();
     await user.click(button!);
-    expect(mockPush).toHaveBeenCalledWith('/en/daily/word-tower');
+    expect(mockPush).toHaveBeenCalledWith('/en/word-tower/daily');
   });
 
   it('counts all four public quests in the progress bar', async () => {

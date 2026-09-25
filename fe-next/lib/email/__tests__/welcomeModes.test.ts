@@ -7,9 +7,11 @@ const BASE = 'https://www.lexiclash.live';
 describe('getWelcomeEmailModes — dynamic public mode list for the welcome email', () => {
   it('includes only public modes available to all players', () => {
     const keys = getWelcomeEmailModes('en', BASE).map((m) => m.key);
-    // Exactly the promoted public set (matches landing FEATURED_MODES minus
-    // admin/adventure, and minus crossword — not yet public to all players).
+    // Exactly the promoted public set (adventure and wordTowerV2 are now GA).
+    // Excludes crossword (not yet public to all players) and admin modes.
     expect(keys).toEqual([
+      'adventure',
+      'wordTowerV2',
       'arena',
       'daily',
       'blast',
@@ -32,9 +34,10 @@ describe('getWelcomeEmailModes — dynamic public mode list for the welcome emai
     }
   });
 
-  it('excludes adventure (hidden from landing FEATURED_MODES)', () => {
+  it('includes adventure and wordTowerV2 (now GA)', () => {
     const keys = new Set(getWelcomeEmailModes('en', BASE).map((m) => m.key));
-    expect(keys.has('adventure')).toBe(false);
+    expect(keys.has('adventure')).toBe(true);
+    expect(keys.has('wordTowerV2')).toBe(true);
   });
 
   it('attaches an absolute cube image URL under /modes/cubes for every mode', () => {
@@ -79,14 +82,18 @@ describe('getWelcomeEmailModes — dynamic public mode list for the welcome emai
   });
 
   it('exposes a stable public order constant', () => {
-    expect(PUBLIC_WELCOME_MODE_ORDER.length).toBe(7);
+    expect(PUBLIC_WELCOME_MODE_ORDER.length).toBe(9);
     expect(PUBLIC_WELCOME_MODE_ORDER).not.toContain('crossword');
+    expect(PUBLIC_WELCOME_MODE_ORDER).toContain('adventure');
+    expect(PUBLIC_WELCOME_MODE_ORDER).toContain('wordTowerV2');
   });
 });
 
 /** Maps a mode key to its cube PNG basename (registry uses lowercased names). */
 function cubeFile(key: string): string {
   const map: Record<string, string> = {
+    adventure: 'adventure',
+    wordTowerV2: 'wordtower',
     arena: 'arena',
     daily: 'daily',
     blast: 'blast',

@@ -50,12 +50,16 @@ interface Props {
   calloutHost?: HTMLElement | null;
   /** A region the DETAIL BUBBLE must not cover — the fight stage. */
   tooltipAvoid?: HTMLElement | null;
+  /** Cap visible relics at this count; show a +N button for the rest (HUD only). */
+  maxVisible?: number | null;
 }
 
-export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', className, contrib, stackCtx, runCtx, calloutHost, tooltipAvoid }: Props) {
+export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', className, contrib, stackCtx, runCtx, calloutHost, tooltipAvoid, maxVisible = null }: Props) {
   const { t } = useLanguageSafe();
   const [open, setOpen] = useState<RelicId | null>(null);
+  const [showMore, setShowMore] = useState(false);
   const chips = useRef(new Map<RelicId, HTMLButtonElement>());
+  const moreRef = useRef<HTMLButtonElement>(null);
   const rail = useRef<HTMLDivElement>(null);
   // The callout outlives its pulse prop by design — it HOLDS, so a still frame
   // catches it beside the celebration banner instead of after it.
@@ -74,11 +78,14 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
     () => stackCtx ?? (runCtx?.world ? runStackCtx(runCtx.world, runCtx.step ?? 1, relics) : null),
     [stackCtx, runCtx?.world, runCtx?.step, relics],
   );
-  const slotCount = relics.length + (ghostRef ? 1 : 0);
-  const slot = relicSlotClass(slotCount, size);
+  // Always render all relics, but mark overflow ones for CSS hiding on phone
+  const hiddenCount = maxVisible ? Math.max(0, relics.length - maxVisible) : 0;
+  // For layout calculation, count visible chips + the +N button (if any) + ghost
+  const visibleSlotCount = (maxVisible ?? relics.length) + (hiddenCount > 0 ? 1 : 0) + (ghostRef ? 1 : 0);
+  const slot = relicSlotClass(visibleSlotCount, size);
   // Cap the rail at an even split so the wrap never leaves an orphan chip
   // on its own row. It only narrows: a tighter screen still wraps earlier.
-  const railMax = relicRailMaxPx(slotCount, size);
+  const railMax = relicRailMaxPx(visibleSlotCount, size);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -100,9 +107,9 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
       {/* The cap travels as a CSS VARIABLE, not an inline width: the landscape
           sheet sets `--adv-rail-max: none` and the rail spreads. An inline
           `max-width` would have needed `!important` to beat. */}
-      <ul style={{ '--adv-rail-max': `${railMax}px` } as CSSProperties} className={cn('flex max-w-[var(--adv-rail-max)] flex-wrap items-start gap-x-1', size === 'xs' ? 'gap-y-1 py-0.5' : 'gap-y-2.5 pb-2.5 pt-1')} aria-label={t('adventurePlay.loot.relicsTitle')}>
-        {relics.map((id) => (
-          <li key={id} className={cn('flex-1', slot)}>
+      <ul style={{ '--adv-rail-max': `${railMax}px` } as CSSProperties} className={cn('flex max-w-[var(--adv-rail-max)]', maxVisible ? 'flex-nowrap' : 'flex-wrap', 'items-start gap-x-1', size === 'xs' ? 'gap-y-1 py-0.5' : 'gap-y-2.5 pb-2.5 pt-1')} aria-label={t('adventurePlay.loot.relicsTitle')}>
+        {relics.map((id, idx) => (
+          <li key={id} className={cn('flex-1', slot, maxVisible && idx >= maxVisible && 'hidden')} data-adv-overflow={maxVisible && idx >= maxVisible ? 'true' : undefined}>
             <RelicChip
               id={id}
               contrib={contrib?.[id]}
@@ -117,6 +124,21 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
             />
           </li>
         ))}
+        {hiddenCount > 0 && (
+          <li className={cn('flex-1', slot)} data-adv-more-chip="">
+            <button
+              ref={moreRef}
+              type="button"
+              onClick={() => setShowMore(!showMore)}
+              aria-expanded={showMore}
+              aria-label={t('adventurePlay.loot.showMoreRelics', { n: hiddenCount })}
+              data-testid="run-hud-more-relics"
+              className="grid aspect-square w-full place-items-center rounded-lg border-[3px] border-black bg-black/70 text-neo-cream font-bold text-sm shadow-[2px_2px_0_#000] active:translate-y-0.5 active:shadow-none"
+            >
+              <bdi dir="ltr">+{hiddenCount}</bdi>
+            </button>
+          </li>
+        )}
         {ghostRef && (
           <li className={cn('flex-1', slot)}>
             <span ref={ghostRef} aria-label={t('adventurePlay.loot.emptySlot')}
@@ -131,6 +153,27 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
       {fired.length > 0 && (
         <RelicFireCallout key={`fire-${shown}`} fired={fired} fireKey={shown ?? 0} host={calloutHost ?? rail.current}
           chipAt={(id) => chips.current.get(id) ?? null} onDone={endFire} />
+      )}
+      {showMore && hiddenCount > 0 && (
+        <div data-testid="run-hud-relic-popover" className="absolute top-full mt-2 start-0 max-w-xs rounded-lg border-[3px] border-black bg-black/95 p-2 z-50 flex flex-wrap gap-1.5">
+          {relics.slice(maxVisible ?? 0).map((id) => (
+            <div
+              key={id}
+              className="relative"
+            >
+              <RelicChip
+                id={id}
+                contrib={contrib?.[id]}
+                firing={fired.some((f) => f.id === id)}
+                fireKey={shown ?? 0}
+                open={open === id}
+                onToggle={() => { setOpen((o) => (o === id ? null : id)); }}
+                innerRef={(el) => { if (el) chips.current.set(id, el); else chips.current.delete(id); }}
+                bare={size === 'xs'}
+              />
+            </div>
+          ))}
+        </div>
       )}
       <AnimatePresence>
         {open && (

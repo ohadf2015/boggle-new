@@ -228,7 +228,7 @@ describe('WordWheelResults — Connections daily follow-up CTA', () => {
       expect(screen.queryByTestId('next-quest-all-clear')).not.toBeInTheDocument();
       const cta = screen.getByTestId('next-quest-cta');
       expect(cta).toHaveAttribute('data-next-mode', 'word-tower');
-      expect(cta).toHaveAttribute('href', '/en/daily/word-tower');
+      expect(cta).toHaveAttribute('href', '/en/word-tower/daily');
     });
   });
 });

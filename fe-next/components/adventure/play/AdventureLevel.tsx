@@ -5,11 +5,11 @@
  * world's tile skin, over the world backdrop, with a star meter or boss fight.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Timer, Loader2 } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { getWorldConfig } from '@/lib/adventure/worldConfig';
 import { worldSkinId } from '@/lib/adventure/play/worldSkins';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
@@ -30,6 +30,8 @@ import RunHud from './RunHud';
 import RunShellStyles from './run/RunShellStyles';
 import { RUN_SHELL_CLASS } from './run/landscape';
 import { foeScore } from './foeScore';
+import RunStatusOverlay from './RunStatusOverlay';
+import LevelTopBar from './LevelTopBar';
 import { resultHeld, FINALE_HOLD_MAX_MS } from './finaleHold';
 import DeedStamp, { type DeedEvent } from './deed/DeedStamp';
 import { deedTier, DEED_DROPS_PER_LEVEL } from './deed/deedTier';
@@ -48,6 +50,9 @@ import { isCombatKind } from '@/lib/adventure/play/levels';
 import { cn } from '@/lib/utils';
 
 export const worldBackdrop = (world: number) => `/images/adventure/play/world-${world}.webp`;
+
+// Module-level constant for empty hint array — never changes identity.
+const NO_HINT_CELLS: Cell[] = [];
 
 interface Props {
   world: number;
@@ -197,8 +202,30 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
   }, [sfx]);
   // The hint glows on the board until that word is found.
   const hintTiles = useMemo(
-    () => (hintWord && run.phase === 'playing' && !run.words.includes(hintWord.toLowerCase()) ? hintCells(hintWord, run.grid, language, run.revealFullHint) : []),
+    () => (hintWord && run.phase === 'playing' && !run.words.includes(hintWord.toLowerCase()) ? hintCells(hintWord, run.grid, language, run.revealFullHint) : NO_HINT_CELLS),
     [hintWord, run.phase, run.words, run.grid, language, run.revealFullHint],
+  );
+
+  const variantFilter = variant.cellFilter;
+  const frozenFilter = useMemo(() => (r: number, c: number) => !run.frozen.has(`${r}-${c}`) && variantFilter(r, c), [run.frozen, variantFilter]);
+
+  // Memoize GridComponent element so BoardFx.memo gets stable children
+  const gridElement = useMemo(
+    () => (
+      <GridComponent
+        grid={run.grid}
+        interactive={run.phase === 'playing'}
+        onWordSubmit={onWordSubmit}
+        onPathSubmit={onPathSubmit}
+        language={language}
+        tileSkinOverride={worldSkinId(world)}
+        frozenTiles={run.frozen}
+        cellFilter={frozenFilter}
+        submitFeedback={feedback}
+        comboLevel={run.combo}
+      />
+    ),
+    [run.grid, run.phase, onWordSubmit, onPathSubmit, language, world, run.frozen, frozenFilter, feedback, run.combo],
   );
   // Hunt + chain goals live in the VariantPanel (tray / big letter) below the HUD.
   // Hunt: the foe cannot read K.O. before the hidden words are found (that is the real win).
@@ -293,6 +320,11 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     run.begin();
   };
 
+  const onMapExit = useCallback(() => {
+    trackGrowthEvent('adventure_exit', { from: 'level', world });
+    onExit();
+  }, [world, onExit]);
+
   // Only elite/boss stages play a finale; a fight node's rival must not hold the result.
   const stageCombat = lvl && isCombatKind(lvl.kind) ? run.combat : null;
   const holdResult = resultHeld(stageCombat, finaleDone);
@@ -304,8 +336,6 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
 
   const secs = Math.ceil(run.msLeft / 1000);
   const urgent = run.phase === 'playing' && secs <= 10;
-  const variantFilter = variant.cellFilter;
-  const frozenFilter = useMemo(() => (r: number, c: number) => !run.frozen.has(`${r}-${c}`) && variantFilter(r, c), [run.frozen, variantFilter]);
 
   return (
     /* select-none: a run is dragged, not read — tracing a word, panning the act map
@@ -330,22 +360,14 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       <div inert={levelSettled || undefined} className={cn(RUN_SHELL_CLASS, 'relative z-10 mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))]')}>
         <RunShellStyles />
         {/* Top bar */}
-        <div data-adv-slot="bar" className="flex items-center gap-2 pe-11">
-          <button type="button" onClick={onExit} aria-label={t('adventurePlay.backToMap')}
-            className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none">
-            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          </button>
-          <div className="flex-1 min-w-0 rounded-xl border-[3px] border-black bg-black/60 px-3 py-1.5">
-            <div className="text-[11px] uppercase tracking-wider opacity-80 truncate">{worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : ''}</div>
-            <div className="font-neo-display font-bold leading-tight">
-              {lvl?.isBoss ? t('adventurePlay.bossLevel') : isElite ? t('adventurePlay.eliteLevel') : whereLabel}
-            </div>
-          </div>
-          <div className={cn('rounded-xl border-[3px] border-black px-3 py-2 font-neo-display font-bold tabular-nums inline-flex items-center gap-1 shadow-[3px_3px_0_#000]',
-            urgent ? 'bg-neo-pink text-black animate-pulse' : 'bg-neo-yellow text-black')}>
-            <Timer className="w-4 h-4" /> {secs}
-          </div>
-        </div>
+        <LevelTopBar
+          worldName={worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : ''}
+          levelLabel={lvl?.isBoss ? t('adventurePlay.bossLevel') : isElite ? t('adventurePlay.eliteLevel') : whereLabel}
+          secs={secs}
+          urgent={urgent}
+          onExit={onExit}
+          world={world}
+        />
 
         {/* Run bar — pinned under the title, above the stage: relics never leave the screen. */}
         {lvl && (
@@ -381,23 +403,12 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         <div data-adv-slot="board" className="relative flex-1 flex items-center justify-center min-h-0 [--adv-board-max:420px] [container-type:size] [&_.game-board-frame]:[--board-size:min(100cqw,100cqh,var(--adv-board-max))]">
           {/* Unmounted once the result screen is up: the board's body-portaled hit sticker (z-65) sat on top of it. */}
           {run.grid.length > 0 && (run.phase !== 'done' || holdResult) && (
-            <div className="flex justify-center" style={{ width: 'min(100cqw, 100cqh, var(--adv-board-max))' }}>
+            <div className="relative flex justify-center" style={{ width: 'min(100cqw, 100cqh, var(--adv-board-max))' }}>
             <BoardFx lastHit={lastHit} hitPath={hitPath} active={run.phase === 'playing'} shaking={run.frozen.size > 0} targetRef={stageRef} screenRef={screenRef}
               targetHp={lvl?.isBoss || isElite ? run.bossHp : lvl ? Math.max(0, (lvl.stars[2] || 1) - shownScore) : null} hintCells={hintTiles}>
-              <GridComponent
-                grid={run.grid}
-                interactive={run.phase === 'playing'}
-                onWordSubmit={onWordSubmit}
-                onPathSubmit={onPathSubmit}
-                language={language}
-                tileSkinOverride={worldSkinId(world)}
-                frozenTiles={run.frozen}
-                cellFilter={frozenFilter}
-                submitFeedback={feedback}
-                comboLevel={run.combo}
-              />
-              <BoardHazards world={world} combat={run.combat} dispatchCombat={run.dispatchCombat} playing={run.phase === 'playing'} />
+              {gridElement}
             </BoardFx>
+            <BoardHazards world={world} combat={run.combat} dispatchCombat={run.dispatchCombat} playing={run.phase === 'playing'} />
             </div>
           )}
           {run.grid.length > 0 && variant.active && (
@@ -432,7 +443,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         <RunMapScreen
           world={world} map={run.map} run={run.runShown ?? run.run}
           currentNode={run.currentNode} reachable={run.reachable} cleared={cleared}
-          onChoose={run.chooseNode} onLeave={onExit}
+          onChoose={run.chooseNode} onLeave={onMapExit}
           recap={recap} covered={nodeScreenUp}
           /* A cleared world opens the next one (the haul rides along via the carry
              token); only a run that died starts this world over. */
@@ -450,24 +461,8 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         />
       )}
 
-      {(run.phase === 'loading' || (run.phase === 'saving' && !resultHeld(stageCombat, false))) && (
-        <div className="absolute inset-0 z-20 grid place-items-center bg-black/40" role="status">
-          <div className="inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-[#1a1a2e] px-4 py-3 font-bold">
-            <Loader2 className="w-5 h-5 animate-spin" /> {run.phase === 'saving' ? t('adventurePlay.saving') : t('adventurePlay.loading')}
-          </div>
-        </div>
-      )}
-
-      {run.phase === 'error' && (
-        <div className="absolute inset-0 z-20 grid place-items-center bg-black/60 p-4">
-          <div className="max-w-xs rounded-2xl border-[3px] border-black bg-[#1a1a2e] p-5 text-center">
-            <p className="font-bold">{t('adventurePlay.loadError')}</p>
-            <div className="mt-4 flex gap-2">
-              <button type="button" onClick={onExit} className="flex-1 rounded-xl border-[3px] border-black bg-neo-cream text-black font-bold py-2">{t('adventurePlay.backToMap')}</button>
-              <button type="button" onClick={run.retry} className="flex-1 rounded-xl border-[3px] border-black bg-neo-cyan text-black font-bold py-2">{t('adventurePlay.tryAgain')}</button>
-            </div>
-          </div>
-        </div>
+      {(run.phase === 'loading' || (run.phase === 'saving' && !resultHeld(stageCombat, false)) || run.phase === 'error') && (
+        <RunStatusOverlay phase={run.phase} onExit={onExit} onRetry={run.retry} />
       )}
 
       {run.phase === 'done' && run.result && lvl && !holdResult && !recap && (

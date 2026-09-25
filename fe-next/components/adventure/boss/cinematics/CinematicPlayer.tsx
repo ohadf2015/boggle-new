@@ -19,6 +19,7 @@
 import React, { useEffect, useRef, ComponentType, useCallback } from 'react';
 import { Player, PlayerRef } from '@remotion/player';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   useCinematic,
   SKIP_DELAY_MS,
@@ -350,7 +351,10 @@ function CinematicPlayerInner({
         >
           <button
             type="button"
-            onClick={skip}
+            onClick={() => {
+              trackGrowthEvent('adventure_exit', { from: 'cinematic' });
+              skip();
+            }}
             disabled={!canSkip}
             className={`
               px-6 py-3 rounded-neo border-neo border-black

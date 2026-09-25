@@ -105,19 +105,30 @@ describe('LandingChallengeCards — Word Craft consolidated to ONE public card',
   });
 });
 
-describe('LandingChallengeCards — Word Tower is public', () => {
-  it('renders the Word Tower card for a NON-admin user (mode shipped 2026-08-14)', () => {
+describe('LandingChallengeCards — Word Tower v2 is public', () => {
+  // Word Tower v1 was retired and replaced by v2 on GA launch.
+  // v1 no longer appears on the hub for any user.
+  it('does NOT render the old Word Tower v1 card for a NON-admin user', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="wordTower"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-cube-key="wordTower"]')).toBeNull();
   });
 
-  it('renders the Word Tower SOLO card for an admin with /word-tower href', () => {
+  it('renders Word Tower v2 for a NON-admin user with /word-tower href', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="wordTowerV2"]');
+    expect(card).toBeInTheDocument();
+    expect(card?.getAttribute('href')).toBe('/en/word-tower');
+  });
+
+  it('renders Word Tower v2 for an admin with /word-tower href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const card = container.querySelector('[data-cube-key="wordTower"]');
+    const card = container.querySelector('[data-cube-key="wordTowerV2"]');
     expect(card).toBeInTheDocument();
     expect(card?.getAttribute('href')).toBe('/en/word-tower');
   });
@@ -137,7 +148,7 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       // WordCraft consolidated to ONE public card; Cards/Gems are URL sub-modes
       // (gateWordCraftMode), not hub cards — so none appear in this admin roster.
       // Party, Word Alchemy, Word Forge and Word Vault modes were removed.
-      'wordTower',          // Word Tower
+      // Word Tower v1 is retired and replaced by Word Tower v2 (now public).
       'sealedBid',          // Sealed Bid
       'wordfall',           // Wordfall (Blast V2)
     ];
@@ -220,20 +231,21 @@ describe('LandingChallengeCards — Crossword admin dev-preview gate', () => {
   });
 });
 
-describe('LandingChallengeCards — Adventure beta/admin gate', () => {
-  // Adventure ships in the server card order; the client gate hides it unless
-  // the user can see in-work modes (admin OR beta tester).
+describe('LandingChallengeCards — Adventure public gate', () => {
+  // Adventure is now public (GA) — all users see it.
   const withAdventure = { ...baseProps, cardOrder: ['daily', 'arena', 'blast', 'adventure', 'practice'] as const };
 
-  it('does NOT render the Adventure card for a non-beta/non-admin user', () => {
+  it('renders the Adventure card for a non-admin user', () => {
     mockIsAdmin.mockReturnValue(false);
     mockIsNewPlayer.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
     const { container } = render(<LandingChallengeCards {...withAdventure} />);
-    expect(container.querySelector('[data-cube-key="adventure"]')).toBeNull();
+    const card = container.querySelector('[data-cube-key="adventure"]');
+    expect(card).toBeInTheDocument();
+    expect(card?.getAttribute('href')).toBe('/en/adventure');
   });
 
-  it('renders the Adventure card for a beta tester / admin with /adventure href', () => {
+  it('renders the Adventure card for an admin with /adventure href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockIsNewPlayer.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
@@ -241,6 +253,48 @@ describe('LandingChallengeCards — Adventure beta/admin gate', () => {
     const card = container.querySelector('[data-cube-key="adventure"]');
     expect(card).toBeInTheDocument();
     expect(card?.getAttribute('href')).toBe('/en/adventure');
+  });
+});
+
+describe('LandingChallengeCards — Word Tower v2 public gate', () => {
+  // Word Tower v2 is now public (GA) — all users see it. v1 is removed from the hub.
+  const withWordTowerV2 = { ...baseProps, cardOrder: ['daily', 'arena', 'blast', 'practice'] as const };
+
+  it('renders the Word Tower v2 card for a non-admin user', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockIsNewPlayer.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...withWordTowerV2} />);
+    const card = container.querySelector('[data-cube-key="wordTowerV2"]');
+    expect(card).toBeInTheDocument();
+    expect(card?.getAttribute('href')).toBe('/en/word-tower');
+  });
+
+  it('does NOT render the old Word Tower v1 card', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockIsNewPlayer.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...withWordTowerV2} />);
+    const card = container.querySelector('[data-cube-key="wordTower"]');
+    expect(card).toBeNull();
+  });
+
+  it('still hides quickPlay for non-beta users', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockIsNewPlayer.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...withWordTowerV2} />);
+    const card = container.querySelector('[data-cube-key="quickPlay"]');
+    expect(card).toBeNull();
+  });
+
+  it('shows quickPlay for beta/admin users', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockIsNewPlayer.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...withWordTowerV2} />);
+    const card = container.querySelector('[data-cube-key="quickPlay"]');
+    expect(card).toBeInTheDocument();
   });
 });
 

@@ -5,7 +5,7 @@ import { HomeDailyHero } from './home/HomeDailyHero';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
-import { trackModeSelected, trackLandingCtaClick } from '@/utils/growthTracking';
+import { trackModeSelected, trackLandingCtaClick, trackGrowthEvent } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAuth } from '@/contexts/AuthContext';
@@ -74,10 +74,9 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
-  'connections', 'brainGym', 'wordCraft', 'wordTower',
+  'connections', 'brainGym', 'wordCraft', 'wordTowerV2',
   'sealedBid', 'crossword', 'wordfall',
-  'wordTowerV2', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
-  'adventure', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
+  'adventure',
   'quickPlay', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
 ]);
 
@@ -158,28 +157,25 @@ export function LandingChallengeCards({
     if (!next.includes('brainGym')) next.push('brainGym');
     // WordCraft is public — territory surfaces on the hub for everyone.
     if (!next.includes('wordCraft')) next.push('wordCraft');
-    // Word Tower is public (shipped 2026-08-14 alongside its daily quest card).
-    if (!next.includes('wordTower')) next.push('wordTower');
     // Standalone-route preview modes — admins + beta testers get one hub entry
     // each so previews stay reachable without flipping dashboard flags.
     if (canSeeInWorkModes && !next.includes('sealedBid')) next.push('sealedBid');
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
     // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
     if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
-    // Word Tower v2 — beta preview of the physics rebuild, routes to
-    // /word-tower-v2. v1 stays public alongside it.
-    if (canSeeInWorkModes && !next.includes('wordTowerV2')) next.push('wordTowerV2');
+    // Word Tower v2 — now public (GA), routes to /word-tower.
+    // v1 has been retired from the hub and replaced by v2.
+    if (!next.includes('wordTowerV2')) next.push('wordTowerV2');
     // Quick Play — beta-only solo arcade hub (wheel picker, /quick-play).
     if (canSeeInWorkModes && !next.includes('quickPlay')) next.push('quickPlay');
-    // Adventure is force-appended like the other non-ranked modes above. The
-    // server's `cardOrder` is a popularity ranking and carries adventure only
+    // Adventure is now public (GA) — force-appended like the other non-ranked modes above.
+    // The server's `cardOrder` is a popularity ranking and carries adventure only
     // when it happens to have stats, and `DEFAULT_ORDER` does not carry it at
-    // all — so the cube, and with it the "continue your run" state, appeared or
-    // vanished between loads depending on which source won (Class 1).
+    // all — so the cube, and with it the "continue your run" state, would be
+    // inconsistent without this append.
     if (!next.includes('adventure')) next.push('adventure');
-    // Adventure is a beta/admin-only preview for now — hide it from the public
-    // hub (the route guard in adventure/PageClient blocks direct navigation too).
-    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure' && m !== 'quickPlay' && m !== 'wordTowerV2');
+    // Hide only beta-only modes (quickPlay) from non-beta users.
+    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'quickPlay');
     return gated;
   })();
   // Bump Blast up the hub: it sits directly after the multiplayer ('arena')
@@ -222,17 +218,28 @@ export function LandingChallengeCards({
   // so it stops looking like just another card. Locked siblings (blast/adventure/etc.)
   // already de-emphasize the rest.
   const featurePractice = !isVeteran && cardOrder.includes('practice');
-  const spCards = cardOrder
-    .filter((m) => SP_MODES.has(m))
-    .filter((m) => !(featurePractice && m === 'practice'));
+  const spCards = (() => {
+    const filtered = cardOrder
+      .filter((m) => SP_MODES.has(m))
+      .filter((m) => !(featurePractice && m === 'practice'));
+    // Feature Adventure and Word Tower V2 prominently (first in the solo section).
+    const featured: LandingCardKey[] = [];
+    const other: LandingCardKey[] = [];
+    for (const mode of filtered) {
+      if (mode === 'adventure' || mode === 'wordTowerV2') {
+        featured.push(mode);
+      } else {
+        other.push(mode);
+      }
+    }
+    return [...featured, ...other];
+  })();
 
 
   // Modes that fire `mode_selected` in the control switch — preserve so the
   // A/B compares layout, not instrumentation.
-  // `wordTower` was omitted when it went public (2026-08-14), so the hub → mode
-  // step of its funnel emitted nothing and the mode looked like it had no intake.
   const TRACK_SELECTED = new Set<LandingCardKey>([
-    'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower',
+    'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTowerV2',
   ]);
   const buildCubeModel = (key: LandingCardKey, role: 'anchor' | 'normal'): ModeCubeModel | null => {
     const meta = MODE_META[key];
@@ -241,6 +248,13 @@ export function LandingChallengeCards({
     const onClick = () => {
       if (TRACK_SELECTED.has(key)) trackModeSelected(key as never, 'home');
       trackLandingCtaClick('mode_card', { mode: key, variant: meta.variant });
+      // Track featured mode card engagement for promoted modes.
+      if (key === 'adventure' || key === 'wordTowerV2') {
+        trackGrowthEvent('featured_mode_card_clicked', {
+          mode: key,
+          surface: layout === 'hub' ? 'hub' : 'desktop',
+        });
+      }
     };
     const base: ModeCubeModel = {
       key, title: t(meta.titleKey), href, variant: meta.variant, Icon: meta.Icon,

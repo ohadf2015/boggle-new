@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useDailyStreak } from '@/lib/wordTower/useDailyStreak';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { biomeAt, floorsAt } from '@/lib/wordTowerV2/biomes';
@@ -35,10 +36,13 @@ import { EstateButton } from './estate/EstateButton';
 import { PerkChips } from './estate/PerkChips';
 import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
-import { confirmLeaveIfNeeded, useV2Ready } from './useV2Ready';
+import { useV2Ready } from './useV2Ready';
 import { BraceControl } from './rescue/BraceControl';
 import { type RescueReject, useBrace } from './rescue/useBrace';
 import { WreckScene } from './WreckScene';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import { useV2Exit } from './useV2Exit';
+import { resolveWt2Screen } from '@/lib/wordTowerV2/exitTracking';
 
 /**
  * Word Tower v2.
@@ -56,6 +60,22 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const { t, language, dir } = useLanguage();
   const { playSound } = useSoundEffects();
   const reducedMotion = usePrefersReducedMotion();
+  const { recordPlay } = useDailyStreak();
+
+  // Format today's date for the daily badge
+  const dailyDateFormatted = useMemo(() => {
+    if (!daily) return undefined;
+    const key = utcDateKey();
+    const [y, m, d] = key.split('-').map(Number);
+    const formatter = new Intl.DateTimeFormat(language === 'he' ? 'he-IL' : `${language}-${language.toUpperCase()}`, {
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    });
+    const date = new Date(Date.UTC(y, m - 1, d));
+    return formatter.format(date);
+  }, [daily, language]);
+  const dailyEngagedRef = useRef(false);
   const game = useTowerRun({
     seed: daily ? v2DailyNumericSeed(undefined, language) : undefined,
     scriptedSwing: daily,
@@ -100,6 +120,11 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
 
   // Variable rewards: coins per landing, the streak meter, the end-of-run chest.
   const rewardsFlow = useRewardsFlow({ game, estateApi, run, heightM, phase, playSound });
+
+  // Dictionary loading state (used before phase tracking)
+  const dictRef = useRef<Set<string> | null>(null);
+  const [dictReady, setDictReady] = useState(false);
+  const [dictError, setDictError] = useState(false);
 
   // Emergency brace (coins off the run, a free one from upgrades, or a rescue word).
   const [rejected, setRejected] = useState<string | null>(null);
@@ -151,19 +176,35 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
    * it just leaves.
    */
   const { finish } = game;
-  const exitGame = useCallback(async () => {
-    if (phase !== 'over' && run.floors > 0) {
-      if (!confirmLeaveIfNeeded(phase, run.floors, t)) return;
-      finish();
-      return;
-    }
-    await Promise.race([bankRun(), new Promise((r) => window.setTimeout(r, 1500))]);
-    router.push(`/${language}`);
-  }, [phase, run.floors, finish, bankRun, router, language, t]);
 
-  const dictRef = useRef<Set<string> | null>(null);
-  const [dictReady, setDictReady] = useState(false);
-  const [dictError, setDictError] = useState(false);
+  const getScreen = useCallback(() => {
+    return resolveWt2Screen({
+      dictError,
+      dictReady,
+      phase,
+      showOver: phase === 'over',
+      resultsReady: rewardsFlow.resultsReady,
+      forceResults,
+      district,
+      raiding,
+      smashing,
+      floors: run.floors,
+    });
+  }, [dictError, dictReady, phase, rewardsFlow.resultsReady, forceResults, district, raiding, smashing, run.floors]);
+
+  const exitFlow = useV2Exit({
+    phase,
+    floors: run.floors,
+    daily,
+    finish,
+    bankRun,
+    router,
+    language,
+    getScreen,
+    t,
+  });
+
+
   const drawRef = useRef(0);
   const [wheel, setWheel] = useState<string[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
@@ -387,7 +428,12 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     preSubmitRef.current = { wheel, selected, draw: drawRef.current };
     hoist(word);
     deal(drawRef.current + 1);
-  }, [phase, word, wheel, selected, hoist, playSound, deal, braceApi]);
+    // Daily mode: record the first engagement on the first accepted word
+    if (daily && !dailyEngagedRef.current) {
+      dailyEngagedRef.current = true;
+      recordPlay();
+    }
+  }, [phase, word, wheel, selected, hoist, playSound, deal, braceApi, daily, recordPlay]);
 
   /**
    * Put the hanging word back: the slab leaves the physics world and the wheel
@@ -486,7 +532,6 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     seedDemo,
     setForceResults,
     setSmashing,
-    t,
   });
 
   useEffect(() => {
@@ -568,10 +613,13 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           coinsRef={coinsRef}
           onOpenEstate={() => setDistrict(true)}
           risk={game.risk}
-          onExit={exitGame}
+          onExit={exitFlow.goHome}
           barRef={setBarEl}
           wide={wide}
           reducedMotion={reducedMotion}
+          daily={daily}
+          dailyDateKey={daily ? utcDateKey() : undefined}
+          dailyDateFormatted={dailyDateFormatted}
         />
       ) : null}
       <RunRewards
@@ -654,6 +702,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           badges={game.runBadges}
           unlocked={game.unlockedRef.current}
           stats={game.statsRef.current}
+          payoutStatus={rewardsFlow.payoutStatus}
           onRestart={() => {
             if (dailyLocked) return;
             preSubmitRef.current = null;
@@ -661,7 +710,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
             restart();
             setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
           }}
-          onHome={() => router.push(`/${language}`)}
+          onHome={exitFlow.goHome}
           onClose={() => {
             setForceResults(false);
             setResultsDismissed(true);
@@ -722,7 +771,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           ) : null}
           <button
             type="button"
-            onClick={() => router.push(`/${language}`)}
+            onClick={exitFlow.goHome}
             aria-label={t('wordTowerV2.results.home')}
             className="flex h-9 w-9 items-center justify-center rounded-neo border-neo border-black bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
           >
@@ -732,6 +781,8 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       ) : null}
 
       {district ? <DistrictScreen t={t} estate={estateApi} onClose={() => setDistrict(false)} /> : null}
+
+      <ConfirmationDialog {...exitFlow.leaveDialog} />
 
       {/* Someone raided you while you were away: their tower, the grievance and
           a free REVENGE — before any run, not after one. */}

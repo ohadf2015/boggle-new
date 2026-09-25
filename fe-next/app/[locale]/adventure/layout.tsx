@@ -82,10 +82,9 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         'es-CO': 'https://www.lexiclash.live/es/adventure',
       },
     },
-    // BETA-gated mode — noindex all /adventure/* children too (boss-rush,
-    // endless, achievements, skills). Restore index:true at GA.
+    // Adventure is now GA — publicly indexed.
     robots: {
-      index: false,
+      index: true,
       follow: true,
     },
   };

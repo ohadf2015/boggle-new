@@ -2,16 +2,18 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { ModeLandingPlayButton } from '@/components/seo/ModeLandingPlayButton';
+import { loadTranslation } from '@/translations/loadTranslation';
 import AdventurePageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  // BETA-gated (PageClient redirects non-beta users) — noindexed 2026-07-02
-  // so search/AdSense reviewers don't land on a wall. Restore index (here,
-  // in layout.tsx and in app/sitemap.ts) when Adventure goes GA.
-  return generatePageMetadata({ seoKey: 'adventure', path: '/adventure', locale, noIndex: true });
+  // Adventure is now GA — publicly indexed for search and AdSense review.
+  return generatePageMetadata({ seoKey: 'adventure', path: '/adventure', locale, noIndex: false });
 }
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
@@ -215,6 +217,11 @@ export default async function AdventurePage({ params }: { params: Promise<{ loca
   const { locale } = await params;
   const content = seoContent[locale] || seoContent.en;
   const origin = 'https://www.lexiclash.live';
+
+  // Load localized playLabel
+  const t = (await loadTranslation(locale as 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru')) as Record<string, any>;
+  const playLabel = t?.seo?.adventure?.playLabel || 'Play';
+
   return (
     <>
       <VideoGameJsonLd
@@ -231,7 +238,15 @@ export default async function AdventurePage({ params }: { params: Promise<{ loca
           { name: content.title, url: `${origin}/${locale}/adventure` },
         ]}
       />
+      <FaqPageJsonLd faqs={content.faq.map(faq => ({ q: faq.question, a: faq.answer }))} />
       <AdventurePageClient />
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        features={content.features}
+        faq={content.faq}
+        cta={<ModeLandingPlayButton mode="adventure" href={`/${locale}/adventure`} label={playLabel} />}
+      />
     </>
   );
 }

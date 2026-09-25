@@ -1,10 +1,11 @@
 'use client';
 
 /** Boss down, run won: celebration, the world's trophy skin, run recap. */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { ChevronRight, Map as MapIcon } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { WORLD_SKIN_ITEM } from '@/lib/adventure/play/progress';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 import type { RunMap } from '@/lib/adventure/play/runMap';
@@ -43,10 +44,26 @@ interface Props {
 export default function RunCompleteScreen({ world, result, run, runBest, map = null, runWords = 0, hpLeft, maxHp, hasNext, onNext, onMap, onEquipSkin }: Props) {
   const { t } = useLanguageSafe();
   const { playBossDefeatSound } = useSoundEffects();
+  const firedRef = useRef(false);
+
   useEffect(() => {
     playBossDefeatSound?.();
     fireVictoryConfetti();
   }, [playBossDefeatSound]);
+
+  // Fire adventure_run_ended once per screen mount
+  useEffect(() => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    const base = runSummary(run, result);
+    trackGrowthEvent('adventure_run_ended', {
+      world,
+      outcome: 'won',
+      nodesCleared: base.levelsCleared,
+      purseCoins: result.purseCoins ?? 0,
+    });
+  }, [run, result, world]);
+
   const base = runSummary(run, result);
   const summary = { ...base, bestWord: runBest ?? base.bestWord };
   const loot = levelLoot(run, result, WORLD_SKIN_ITEM(world));
@@ -106,7 +123,10 @@ export default function RunCompleteScreen({ world, result, run, runBest, map = n
       </div>
 
       <div className="relative mt-3 flex gap-2">
-        <button type="button" onClick={onMap} aria-label={t('adventurePlay.backToMap')} className={squareBtn}>
+        <button type="button" onClick={() => {
+          trackGrowthEvent('adventure_exit', { from: 'results' });
+          onMap();
+        }} aria-label={t('adventurePlay.backToMap')} className={squareBtn}>
           <MapIcon className="h-5 w-5" />
         </button>
         <BossShareButton world={world} word={summary.bestWord?.word} stars={result.stars} />
@@ -115,7 +135,10 @@ export default function RunCompleteScreen({ world, result, run, runBest, map = n
             {t('adventurePlay.loot.nextWorld')} <ChevronRight className="h-5 w-5 rtl:rotate-180" />
           </button>
         ) : (
-          <button type="button" onClick={onMap} className={cn(primaryBtn, 'bg-neo-lime')}>{t('adventurePlay.backToMap')}</button>
+          <button type="button" onClick={() => {
+            trackGrowthEvent('adventure_exit', { from: 'results' });
+            onMap();
+          }} className={cn(primaryBtn, 'bg-neo-lime')}>{t('adventurePlay.backToMap')}</button>
         )}
       </div>
     </ResultShell>

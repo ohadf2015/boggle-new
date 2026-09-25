@@ -273,6 +273,14 @@ const ja = {
       "prev": "前のゲーム",
       "next": "ほかのゲーム",
       "items": {
+        "adventure": {
+          "title": "アドベンチャー",
+          "line": "10つの世界で100ステージ。登って征服しよう。"
+        },
+        "wordTowerV2": {
+          "title": "ワードタワーV2",
+          "line": "言葉を積み上げて、物理演算を楽しもう。"
+        },
         "arena": {
           "title": "マルチプレイヤー",
           "line": "同じ文字でライバルと対決。早い者勝ち！"
@@ -749,6 +757,7 @@ const ja = {
       "levelUpDone": "ボスが待っている",
       "tapToContinue": "タップで続ける",
       "andMoreRelics": "ほか {n} 個の遺物も発動",
+      "showMoreRelics": "ほか {n} 個の遺物を表示",
       "earnedThisRun": "このランで {n} ポイント稼いだ",
       "thisRun": "この冒険で",
       "thisLevel": "このレベル",
@@ -869,6 +878,13 @@ const ja = {
       "insight": "ヒント+2"
     },
     "longerWords": "もっと長い単語",
+    "guest": {
+      "pitch": "10ワールドのローグライク栄光を征服しよう",
+      "bullet1": "難度が上がる敵との戦い",
+      "bullet2": "レアなワールドスキンと強力な遺物を獲得",
+      "bullet3": "ランキングボードで順位を獲得しよう",
+      "signIn": "ログインして遊ぶ"
+    },
     "title": "アドベンチャー",
     "start": "スタート",
     "fight": "バトル開始！",
@@ -1609,7 +1625,7 @@ const ja = {
     "cardDesc": "本物の物理演算 — ベータ版",
     "collapsed": "タワー崩壊！",
     "newBest": "自己ベスト更新！",
-    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "effect": "{name}：残り{n}", "exit": "終了して受け取る"},
+    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "effect": "{name}：残り{n}", "exit": "終了して受け取る", "daily": "デイリー", "dailyBadge": "デイリー {date}"},
     "stability": {"label": "安定度", "a11y": "安定度：{band}、リスク{pct}%", "steady": "安定", "wobbly": "グラグラ", "danger": "危険！"},
     "biome": {"downtown": "ダウンタウン", "sunset": "夕焼けの屋上", "clouds": "雲海", "jetstream": "ジェット気流", "aurora": "オーロラ", "orbit": "軌道", "cosmos": "深宇宙"},
     "newSky": "新しい空",
@@ -1618,12 +1634,16 @@ const ja = {
     "ach": {"unlocked": "バッジ獲得", "groundbreaker": {"name": "着工", "desc": "最初のフロアを置く"}, "fiveStory": {"name": "5階建て", "desc": "1回で5フロア積む"}, "highRise": {"name": "高層ビル", "desc": "1回で10フロア積む"}, "skyscraper": {"name": "摩天楼", "desc": "1回で20フロア積む"}, "megatower": {"name": "メガタワー", "desc": "1回で30フロア積む"}, "steadyHands": {"name": "ブレない手", "desc": "3回連続パーフェクト"}, "surgeon": {"name": "外科医", "desc": "6回連続パーフェクト"}, "flawless": {"name": "完全無欠", "desc": "10回連続パーフェクト"}, "perfectionist": {"name": "完璧主義者", "desc": "1回で15回パーフェクト"}, "wordsmith": {"name": "言葉の職人", "desc": "6文字の単語を吊り上げる"}, "lexicon": {"name": "歩く辞書", "desc": "8文字の単語を吊り上げる"}, "fullHouse": {"name": "満室", "desc": "1回で住人50人"}, "cityPlanner": {"name": "都市計画家", "desc": "1回で住人150人"}, "lucky": {"name": "ラッキー続き", "desc": "1回でボックスを5個開ける"}, "welder": {"name": "溶接工", "desc": "鉄筋でタワーを溶接する"}, "sunsetView": {"name": "夕焼けの眺め", "desc": "夕焼けの空まで登る"}, "aboveClouds": {"name": "雲の上", "desc": "雲を突き抜ける"}, "orbiter": {"name": "軌道到達", "desc": "軌道まで建てる"}},
     "results": {
         "home": "ホーム",
-        "close": "閉じる","floorsA11y": "{n}階に到達", "combo": "最高連続", "tenants": "住人", "crates": "ボックス", "badges": "獲得バッジ", "nextGoal": "次の目標"},
+        "close": "閉じる","floorsA11y": "{n}階に到達", "combo": "最高連続", "tenants": "住人", "crates": "ボックス", "badges": "獲得バッジ", "nextGoal": "次の目標", "coinsLoading": "コインを受け取り中…"},
     "hint": {"spell": "単語をつくって次のフロアを建てよう", "drop": "タワーの真上に来たら「落とす」をタップ"},
     "changeWord": "ことばをかえる",
     "editHint": "使った文字をタップして単語を直せます",
     "bestFlag": "ベスト",
     "leaveConfirm": "この登りを離れますか？このタブなら再開できますが、デイリーは1日1回です。",
+"leaveDaily": {"title": "今日の登りを離れますか？", "desc": "今日の登りが終わります。あなたの高さは今日のスコアボードに記録されます。明日、新しいデイリーが始まります。"},
+"leaveFree": {"title": "この登りを離れますか？", "desc": "この登りが終わり、あなたが集めたコインが保存されます。いつでも新しい登りを始められます。"},
+    "leaveKeep": "登り続ける",
+    "leaveGo": "離れる",
     "dailyPlayed": "今日のタワーは終了。また明日。",
     "dailyRank": "今日の順位は #{rank}",
     "recapAlt": "タワー記録: {floors}階、{m}メートル"
@@ -2145,7 +2165,15 @@ const ja = {
       "title": "ワードアドベンチャーゲーム - RPGワードパズル無料",
       "description": "壮大なワードアドベンチャーに出発！ボスと戦い、10のテーマワールドで100レベルを征服。特殊タイルとパワーアップ付きの無料RPGワードパズルゲーム。",
       "ogTitle": "LexiClash アドベンチャー - RPGワードパズル",
-      "ogDescription": "壮大なワードアドベンチャーでボスと戦おう！100レベル、10ワールド。無料でプレイ！"
+      "ogDescription": "壮大なワードアドベンチャーでボスと戦おう！100レベル、10ワールド。無料でプレイ！",
+      "playLabel": "プレイ"
+    },
+    "wordTowerV2": {
+      "title": "ワードタワー - 単語を積んでタワーを構築 | 無料ゲーム",
+      "description": "単語を積み重ねて最高のタワーを構築！ワードタワーはフィジックスベースのワードパズルゲーム。コンボを連鎖させ、パワーアップをアンロック、ランキングを登ろう。無料、ダウンロード不要。",
+      "ogTitle": "ワードタワー - フィジックスワードパズルゲーム",
+      "ogDescription": "単語を積み重ねてタワーを構築！コンボを連鎖させ、パワーアップをアンロック、競争しよう。無料ゲーム！",
+      "playLabel": "プレイ"
     },
     "blast": {
       "title": "ブラストモード - 言葉を連鎖して爆発コンボ | LexiClash",
@@ -7517,6 +7545,10 @@ const ja = {
     "badgeChallenges": "チャレンジ",
     "badgeRooms": "ルーム",
     "badgeHost": "ホスト",
+    "badge": {
+      "new": "新作",
+      "beta": "ベータ版"
+    },
     "multiPlayer": "マルチプレイヤー",
     "multiplayer": "マルチプレイヤー",
     "multiplayerDesc": "リアルタイムで友達と対戦！",
@@ -18339,6 +18371,12 @@ const ja = {
       "cta": "興味があります",
       "thanks": "リストに追加しました！サポータープランが開始されたらお知らせします。"
     }
+  },
+  "newModes": {
+    "title": "新しいゲームモード",
+    "description": "冒険があなたを待っています。毎日のタワーを試してください。",
+    "playAdventure": "冒険をプレイ",
+    "playWordTower": "ワードタワーをプレイ"
   }
 };
 

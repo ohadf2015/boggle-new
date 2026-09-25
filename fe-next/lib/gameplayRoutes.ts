@@ -24,7 +24,7 @@ const GAMEPLAY_SEGMENTS = new Set<string>([
   'practice',
   'daily', // daily challenge hub + word-wheel/word-hunt live under here
   'party',
-  'word-tower',
+  'word-tower', // Word Tower (v2 physics build lives here; /word-tower-v2 308s in)
   'sealed-bid',
 ]);
 

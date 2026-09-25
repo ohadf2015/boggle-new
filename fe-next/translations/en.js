@@ -273,6 +273,14 @@ const en = {
       "prev": "Previous games",
       "next": "More games",
       "items": {
+        "adventure": {
+          "title": "Adventure",
+          "line": "100 levels across 10 worlds. Climb and conquer."
+        },
+        "wordTowerV2": {
+          "title": "Word Tower V2",
+          "line": "Stack words, watch physics unfold."
+        },
         "arena": {
           "title": "Multiplayer",
           "line": "Same letters, live rivals. Fastest finder wins."
@@ -749,6 +757,7 @@ const en = {
       "levelUpDone": "The boss awaits",
       "tapToContinue": "Tap to continue",
       "andMoreRelics": "+{n} more relics fired",
+      "showMoreRelics": "Show {n} more relics",
       "earnedThisRun": "Earned {n} points this run",
       "thisRun": "This run",
       "thisLevel": "This level",
@@ -869,6 +878,13 @@ const en = {
       "insight": "+2 hints"
     },
     "longerWords": "longer words",
+    "guest": {
+      "pitch": "Take on 10 worlds of roguelike glory",
+      "bullet1": "Battle through increasingly difficult encounters",
+      "bullet2": "Unlock rare world skins and powerful relics",
+      "bullet3": "Claim your rank on the leaderboard",
+      "signIn": "Sign in to play"
+    },
     "title": "Adventure",
     "start": "Start",
     "fight": "Fight!",
@@ -1553,7 +1569,7 @@ const en = {
     "cardDesc": "Real physics — beta preview",
     "collapsed": "Tower down!",
     "newBest": "New best!",
-    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect"},
+    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}"},
     "stability": {"label": "Stability", "a11y": "Stability: {band}, {pct}% risk", "steady": "Steady", "wobbly": "Wobbly", "danger": "Danger!"},
     "biome": {"downtown": "Downtown", "sunset": "Sunset Rooftops", "clouds": "Cloud Deck", "jetstream": "Jet Stream", "aurora": "Aurora", "orbit": "Orbit", "cosmos": "Deep Cosmos"},
     "newSky": "New sky",
@@ -1562,12 +1578,16 @@ const en = {
     "ach": {"unlocked": "Badge unlocked", "groundbreaker": {"name": "Groundbreaker", "desc": "Land your first floor"}, "fiveStory": {"name": "Five-Story Walk-Up", "desc": "Stack 5 floors in one run"}, "highRise": {"name": "High-Rise", "desc": "Stack 10 floors in one run"}, "skyscraper": {"name": "Skyscraper", "desc": "Stack 20 floors in one run"}, "megatower": {"name": "Megatower", "desc": "Stack 30 floors in one run"}, "steadyHands": {"name": "Steady Hands", "desc": "3 perfect drops in a row"}, "surgeon": {"name": "Surgeon", "desc": "6 perfect drops in a row"}, "flawless": {"name": "Flawless", "desc": "10 perfect drops in a row"}, "perfectionist": {"name": "Perfectionist", "desc": "15 perfect drops in one run"}, "wordsmith": {"name": "Wordsmith", "desc": "Hoist a 6-letter word"}, "lexicon": {"name": "Walking Lexicon", "desc": "Hoist an 8-letter word"}, "fullHouse": {"name": "Full House", "desc": "50 tenants in one run"}, "cityPlanner": {"name": "City Planner", "desc": "150 tenants in one run"}, "lucky": {"name": "Lucky Streak", "desc": "Open 5 crates in one run"}, "welder": {"name": "Welder", "desc": "Weld your tower with rebar"}, "sunsetView": {"name": "Sunset View", "desc": "Climb into the sunset sky"}, "aboveClouds": {"name": "Above the Clouds", "desc": "Climb past the clouds"}, "orbiter": {"name": "Orbiter", "desc": "Build all the way to orbit"}},
     "results": {
         "home": "Home",
-        "close": "Close","floorsA11y": "Reached floor {n}", "combo": "Best streak", "tenants": "Tenants", "crates": "Crates", "badges": "Badges earned", "nextGoal": "Next goal"},
+        "close": "Close","floorsA11y": "Reached floor {n}", "combo": "Best streak", "tenants": "Tenants", "crates": "Crates", "badges": "Badges earned", "nextGoal": "Next goal", "coinsLoading": "Coins incoming…"},
     "hint": {"spell": "Spell a word to build the next floor", "drop": "Tap DROP when the floor is over the tower"},
     "changeWord": "CHANGE WORD",
     "editHint": "Tap a letter you used to edit the word",
     "bestFlag": "BEST",
     "leaveConfirm": "Leave this climb? You can resume this tab, but a daily run is one per day.",
+    "leaveDaily": {"title": "Leave today's climb?", "desc": "Leaving ends today's climb. Your height counts on today's board. The next daily opens tomorrow."},
+    "leaveFree": {"title": "Leave this climb?", "desc": "Leaving ends this run and cashes out your coins. Start a new one anytime."},
+    "leaveKeep": "Keep climbing",
+    "leaveGo": "Leave",
     "dailyPlayed": "Today's tower is done. Come back tomorrow.",
     "dailyRank": "You're #{rank} today",
     "recapAlt": "Tower recap: {floors} floors, {m} metres"
@@ -1772,8 +1792,17 @@ const en = {
       "title": "Word Adventure Game - RPG Word Puzzle Free",
       "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
       "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
-      "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
+      "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!",
+      "playLabel": "Play"
     },
+    "wordTowerV2": {
+      "title": "Word Tower - Stack Words, Build a Tower | Free Game",
+      "description": "Stack words to build the tallest tower! Word Tower is a physics-based word puzzle game. Chain combos, unlock power-ups, and climb the leaderboard. Free, no download required.",
+      "ogTitle": "Word Tower - Physics Word Puzzle Game",
+      "ogDescription": "Stack words to build your tower! Chain combos, unlock power-ups, and compete. Free game!",
+      "playLabel": "Play"
+    },
+
     "wordCraft": {
       "title": "WordCraft - Free Word Strategy Grid Game Online",
       "description": "Play WordCraft free online — build words on a grid, claim territory, and capture rivals. Card runs, Gem Hunt, and pass-and-play with friends. No download, no signup.",
@@ -7030,6 +7059,10 @@ const en = {
     "badgeChallenges": "Challenges",
     "badgeRooms": "Rooms",
     "badgeHost": "Host",
+    "badge": {
+      "new": "New",
+      "beta": "Beta"
+    },
     "multiPlayer": "Multiplayer",
     "multiplayer": "Multiplayer",
     "multiplayerDesc": "Live word battles!",
@@ -17416,6 +17449,12 @@ const en = {
     "sign_up_free": "Sign Up Free",
     "subscribe": "Subscribe Now",
     "error": "Something went wrong. Please try again."
+  },
+  "newModes": {
+    "title": "New Game Modes",
+    "description": "Adventure awaits. Try the daily tower.",
+    "playAdventure": "Play Adventure",
+    "playWordTower": "Play Word Tower"
   }
 };
 

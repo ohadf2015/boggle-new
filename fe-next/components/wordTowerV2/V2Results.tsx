@@ -6,6 +6,7 @@ import type { TowerBlock } from '@/lib/wordTowerV2/estateTower';
 import { ACHIEVEMENTS, type RunStats, emptyStats, progressOf } from '@/lib/wordTowerV2/achievements';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
 import type { RunState } from '@/lib/wordTowerV2/run';
+import type { PayoutStatus } from './rewards/useRunPayout';
 import type { RevengeEntry, RivalView, UseEstate } from './useEstate';
 import { RaidFlow } from './rivals/RaidFlow';
 import { RivalBoard } from './rivals/RivalBoard';
@@ -25,6 +26,8 @@ interface Props {
   unlocked: Set<string>;
   /** Full run stats (longest word, welds…) — the run state alone lacks them. */
   stats?: RunStats;
+  /** Server payout status (pending/paid/none coins). */
+  payoutStatus?: PayoutStatus;
   onRestart: () => void;
   /** Leave the game entirely. The run is over; trapping the player here is not a choice. */
   onHome: () => void;
@@ -89,7 +92,7 @@ function ResultsMute() {
   );
 }
 
-export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals, recapSrc, dailyLocked, dailyRank }: Props) {
+export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, payoutStatus, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals, recapSrc, dailyLocked, dailyRank }: Props) {
   // Own mute in the card header → the global FAB stands down (no end-14 race
   // against the FAB's 2.5s/5s re-probes).
   useRegisterHeaderAudioControl();
@@ -111,30 +114,54 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
   const floors = Math.floor(floorsAt(peakM) + 0.05);
   const stats: RunStats = { ...emptyStats(), ...runStats, floors: run.floors, peakFloors: floors, bestCombo: run.bestCombo, tenants: run.tenants, crates: run.crates };
   const goal = nextGoal(stats, new Set([...unlocked, ...badges]));
-  const cells = [
+
+  const cells: Array<{ label: string; value: string | React.ReactNode; cls: string }> = [
     { label: t('common.score'), value: score.toLocaleString(), cls: 'bg-neo-lime' },
     { label: t('wordTowerV2.results.combo'), value: `×${run.bestCombo}`, cls: 'bg-neo-orange' },
     { label: t('wordTowerV2.results.tenants'), value: String(run.tenants), cls: 'bg-neo-cyan' },
     { label: t('wordTowerV2.results.crates'), value: String(run.crates), cls: 'bg-neo-yellow' },
   ];
 
+  // Add coins cell based on payout status
+  if (payoutStatus) {
+    let coinsValue: string | React.ReactNode = '—';
+    let coinsCls = 'bg-neo-cream';
+    if (payoutStatus.status === 'pending') {
+      coinsValue = <span title={t('wordTowerV2.results.coinsLoading')}>{t('wordTowerV2.results.coinsLoading')}</span>;
+      coinsCls = 'bg-neo-cream opacity-60';
+    } else if (payoutStatus.status === 'paid') {
+      coinsValue = payoutStatus.coins.toLocaleString();
+      coinsCls = 'bg-neo-lime';
+    }
+    cells.push({ label: t('common.coins'), value: coinsValue, cls: coinsCls });
+  }
+
   return (
     <>
-      {/* The scroller is the backdrop, and the raid is a SIBLING of it: a
-          full-screen raid rendered inside a scrolling card scrolls away. */}
+      {/* The backdrop is flex flex-col: scroller (holds card) and bar (holds CTAs).
+          The raid is a SIBLING of the backdrop: a full-screen raid sits on top. */}
       <div
         data-wt2-results-backdrop
-        className="absolute inset-0 z-40 overflow-y-auto bg-neo-navy/75 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
+        className="absolute inset-0 z-40 flex flex-col bg-neo-navy/75"
         role="dialog"
         aria-modal="true"
         onClick={(e) => {
-          if (e.target === e.currentTarget) onClose();
+          const target = e.target as HTMLElement;
+          // Close if clicking the backdrop itself or the scroller padding (outside card)
+          if (target === e.currentTarget || target.hasAttribute('data-wt2-results-scroll')) {
+            onClose();
+          }
         }}
+      >
+      {/* Scroller: card content scrolls here, click-outside closes. */}
+      <div
+        data-wt2-results-scroll
+        className="min-h-0 flex-1 overflow-y-auto p-4 pt-[max(1rem,env(safe-area-inset-top))]"
       >
       {/* A centred phone-width modal on a 1920 screen is two dead columns of
           navy — the rules count that against us. With a board to show, the card
           goes wide and splits: scorecard one side, the rivals the other. */}
-      <div className={`mx-auto flex min-h-full w-full max-w-sm items-center ${rivals ? 'md:max-w-5xl lg:max-w-6xl' : 'md:max-w-2xl'}`}>
+      <div data-wt2-results-center className={`mx-auto flex min-h-full w-full max-w-sm items-center ${rivals ? 'md:max-w-5xl lg:max-w-6xl' : 'md:max-w-2xl'}`}>
       <div className={`relative w-full rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop md:p-6 ${rivals ? 'md:flex md:items-start md:gap-6' : ''}`}>
       <div className={rivals ? 'md:w-[22rem] md:shrink-0 lg:w-[26rem]' : 'contents'}>
         <ResultsMute />
@@ -229,25 +256,6 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
             onPick={(rival, revenge) => setTarget({ rival, revenge })}
           />
         ) : null}
-        {/* ONE primary action. Daily one-run: the replay button is the cheat. */}
-        {dailyLocked ? (
-          <>
-            <p className="mt-5 font-neo-display text-sm font-bold">{t('wordTowerV2.dailyPlayed')}</p>
-            {dailyRank ? (
-              <p className="mt-1 font-neo-display text-base font-black">{t('wordTowerV2.dailyRank', { rank: dailyRank })}</p>
-            ) : null}
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={onRestart}
-            autoFocus
-            className="mt-5 w-full rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-          >
-            {t('common.playAgain')}
-          </button>
-        )}
-
         {/* Secondary: the empire, and the smash round when there is a tower to
             smash. Side by side so the card does not grow a button stack. */}
         <div className="mt-3 flex gap-2">
@@ -263,32 +271,62 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
             </button>
           ) : null}
         </div>
+        </div>
+      </div>
+      </div>
+      </div>
 
-        {/* Tertiary: leaving, and sharing. Icon-sized — they are not the point
-            of this screen, but the player must never be stuck on it. */}
-        <div className="mt-3 flex items-center justify-center gap-2">
+      {/* Sticky bottom bar: Home and Play Again buttons never scroll away. */}
+      <div data-wt2-results-actions className="shrink-0 border-t border-neo-navy bg-neo-navy/75 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
+        <div className="mx-auto flex max-w-sm items-center justify-between gap-2">
+          {dailyLocked ? (
+            <>
+              <div className="flex-1">
+                <p className="font-neo-display text-sm font-bold text-neo-cream">{t('wordTowerV2.dailyPlayed')}</p>
+                {dailyRank ? (
+                  <p className="font-neo-display text-base font-black text-neo-cream">{t('wordTowerV2.dailyRank', { rank: dailyRank })}</p>
+                ) : null}
+              </div>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRestart();
+              }}
+              autoFocus
+              className="flex-1 rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+            >
+              {t('common.playAgain')}
+            </button>
+          )}
           <button
             type="button"
-            onClick={onHome}
+            onClick={(e) => {
+              e.stopPropagation();
+              onHome();
+            }}
             aria-label={t('wordTowerV2.results.home')}
-            className="flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy px-3 py-1.5 font-neo-display text-sm font-bold text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+            className="flex h-14 w-14 items-center justify-center rounded-neo border-neo border-black bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
           >
-            <Home className="h-4 w-4" aria-hidden />
-            <span aria-hidden>{t('wordTowerV2.results.home')}</span>
+            <Home className="h-5 w-5" aria-hidden />
           </button>
           {onShare ? (
             <button
               type="button"
-              onClick={onShare}
-              className="flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-cyan px-3 py-1.5 font-neo-display text-sm font-bold text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare();
+              }}
+              aria-label={t('wordTowerV2.wreck.share')}
+              title={t('wordTowerV2.wreck.share')}
+              className="flex h-14 w-14 items-center justify-center rounded-neo border-neo border-black bg-neo-cyan text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
             >
-              <Send className="h-4 w-4" aria-hidden />
-              {t('wordTowerV2.wreck.share')}
+              <Send className="h-5 w-5" aria-hidden />
             </button>
           ) : null}
         </div>
-        </div>
-      </div>
       </div>
       </div>
       {rivals && target ? (

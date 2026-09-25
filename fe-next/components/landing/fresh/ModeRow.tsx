@@ -3,13 +3,15 @@
 /**
  * Section 4 of the fresh homepage: a swipeable scroll-snap row of game modes.
  *
- * - Only modes a logged-out visitor can open. adventure / crossword / quick
- *   play / sealed bid are beta-gated in LandingChallengeCards (and adventure
- *   route-guards), so listing them would drop a fresh visitor on a wall.
- * - Order is newcomer-first: blast completes worst for first-day players
- *   (lib/landing/newcomerModeOrder.ts), so it goes last.
+ * - Only modes a logged-out visitor can open. Adventure is now public (GA);
+ *   crossword / quick-play / sealed-bid remain beta-gated in
+ *   LandingChallengeCards (and route-guards), so they don't appear here.
+ * - Order is newcomer-first: blast ranks lowest for first-day players
+ *   (lib/landing/newcomerModeOrder.ts), so it goes last. Arena removed to avoid
+ *   clutter — the returning-visitor hub surfaces it prominently.
  * - A card click fires the same `mode_card` + `mode_selected` events the hub
  *   cubes fire, so before/after funnels still compare.
+ * - Featured cards (adventure, wordTowerV2) display a NEW badge.
  * - Visible at rest. Motion is CSS only (hover lift + art zoom, press tilt),
  *   all behind motion-safe. Prev/next buttons scroll by direction (RTL-safe).
  */
@@ -23,7 +25,7 @@ import { MODE_META, modeRoute } from '@/lib/landing/modeMeta';
 import { trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
-export const FRESH_MODE_KEYS = ['arena', 'wordTower', 'wordCraft', 'connections', 'brainGym', 'blast'] as const;
+export const FRESH_MODE_KEYS = ['adventure', 'wordTowerV2', 'wordCraft', 'connections', 'brainGym', 'blast'] as const;
 type FreshModeKey = (typeof FRESH_MODE_KEYS)[number];
 
 /** Literal class strings (Tailwind v4 only sees literals). Neighbours never share a colour. */
@@ -38,7 +40,7 @@ const CARD_TILT = ['-rotate-1', 'rotate-1'] as const;
  * bleeds its FX to the edge and brainGym is already tall, so they stay at 1.
  */
 const ART_ZOOM: Record<FreshModeKey, number> = {
-  arena: 1.25, wordTower: 1, wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
+  adventure: 1.1, wordTowerV2: 1, wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
 };
 
 function prefersReducedMotion(): boolean {
@@ -101,6 +103,7 @@ export function ModeRow() {
           if (!meta?.genIcon || !href) return null;
           const artScale: CSSProperties | undefined =
             ART_ZOOM[key] > 1 ? { transform: `scale(${ART_ZOOM[key]})` } : undefined;
+          const isFeatured = key === 'adventure' || key === 'wordTowerV2';
           return (
             <li key={key} className="flex snap-start">
               <Link
@@ -108,7 +111,7 @@ export function ModeRow() {
                 data-mode={key}
                 onClick={() => onCardClick(key)}
                 className={cn(
-                  'group flex w-full flex-col rounded-neo border-3 border-neo-black p-3 text-neo-black shadow-hard-xl',
+                  'group relative flex w-full flex-col rounded-neo border-3 border-neo-black p-3 text-neo-black shadow-hard-xl',
                   CARD_TONE[i % CARD_TONE.length],
                   CARD_TILT[i % CARD_TILT.length],
                   'motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out',
@@ -128,6 +131,14 @@ export function ModeRow() {
                       className="select-none object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:scale-[1.08] motion-safe:group-active:scale-95"
                     />
                   </div>
+                  {isFeatured && meta.badge && (
+                    <span
+                      data-testid="mode-badge"
+                      className="absolute top-1 end-1 z-10 rounded-full border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[0.6rem] font-black uppercase leading-none tracking-wide text-neo-navy shadow-hard-sm"
+                    >
+                      {t(`landing.badge.${meta.badge.toLowerCase()}`)}
+                    </span>
+                  )}
                 </div>
                 <div className="mt-3 flex flex-1 items-end justify-between gap-3">
                   <div className="min-w-0">

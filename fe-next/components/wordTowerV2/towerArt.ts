@@ -1,4 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
+import { labelTracking, blockLabel } from '@/lib/wordTowerV2/label';
 
 /**
  * Pixi drawing for Word Tower v2's world furniture: street, ruler, best line,
@@ -128,9 +129,10 @@ export function paintBestLine(
 
 /** Gold pill label, anchored bottom-right. Pixi v8 leaf nodes take no children, hence the wrapper. */
 export function createBestLabel(text: string): Container {
+  const displayText = blockLabel(text.toUpperCase());
   const t = new Text({
-    text,
-    style: { fontFamily: 'Fredoka, system-ui, sans-serif', fontSize: 13, fontWeight: '700', fill: INK, letterSpacing: 1 },
+    text: displayText,
+    style: { fontFamily: 'Fredoka, system-ui, sans-serif', fontSize: 13, fontWeight: '700', fill: INK, letterSpacing: labelTracking(displayText) },
   });
   t.anchor.set(1, 1);
   const pill = new Graphics();

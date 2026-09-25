@@ -7,6 +7,7 @@ import { captureApiError } from '@/utils/sentry';
 import { notifyWordTowerWreck } from '@/backend/modules/pushNotificationTriggers';
 import { perksFromEstate, raidOutcome } from '@/lib/wordTowerV2/estate';
 import { type Db, RAIDS, loadEstate } from '@/lib/wordTowerV2/estateServer';
+import { claimOnce } from '@/lib/server/claimOnce';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +22,8 @@ export const runtime = 'nodejs';
 const Body = z.object({
   defenderId: z.string().uuid(),
   accuracy: z.number().finite(),
+  // Optional: bundles cached from before the nonce shipped omit it and must still raid.
+  nonce: z.string().min(8).max(128).optional(),
   revenge: z.boolean().optional(),
 });
 
@@ -41,8 +44,9 @@ export async function POST(request: NextRequest) {
 
     const parsed = Body.safeParse(await request.json().catch(() => null));
     if (!parsed.success) return NextResponse.json({ error: 'invalid body' }, { status: 400 });
-    const { defenderId, revenge = false } = parsed.data;
-    const accuracy = Math.min(1, Math.max(0, parsed.data.accuracy));
+    const { defenderId, nonce, revenge = false } = parsed.data;
+    // Clamp accuracy to [0, 1], with NaN safety
+    const accuracy = Number.isFinite(parsed.data.accuracy) ? Math.min(1, Math.max(0, parsed.data.accuracy)) : 0;
     if (defenderId === user.id) return NextResponse.json({ error: 'cannot raid yourself' }, { status: 400 });
 
     const db = getSupabaseAdmin();
@@ -79,6 +83,14 @@ export async function POST(request: NextRequest) {
 
     if (!attacker || (attacker.estate.raidCharges < 1 && !revengeRaidId)) {
       return NextResponse.json({ error: 'no raid charges', reason: 'no_charges' }, { status: 409 });
+    }
+
+    // Guard against retried raids crediting coins twice via claimOnce idempotency.
+    // Key: user + nonce (one attempt per unique nonce). 24-hour TTL. Fails closed on Redis unavailable.
+    if (nonce) {
+      const claimed = await claimOnce(`wt2-raid:${user.id}:${nonce}`, 60 * 60 * 24);
+      if (claimed === 'taken') return NextResponse.json({ error: 'raid already claimed', reason: 'duplicate' }, { status: 409 });
+      if (claimed === 'unavailable') return NextResponse.json({ error: 'system unavailable', reason: 'idempotency' }, { status: 503 });
     }
 
     // Two tries: a shield bought/consumed between our read and the RPC's lock flips the outcome.

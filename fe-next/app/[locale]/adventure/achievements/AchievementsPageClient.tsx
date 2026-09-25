@@ -2,13 +2,13 @@
  * AchievementsPageClient Component
  *
  * Client-side achievements page with grid and detail modal.
+ * Public: guests see the adventure guest gate, signed-in players the grid.
  */
 
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AchievementGrid } from '@/components/adventure/achievements';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
+import { AdventureGuestGate } from '@/components/adventure/AdventureGuestGate';
 import {
   ADVENTURE_ACHIEVEMENTS,
   type AdventureAchievementId,
@@ -23,24 +24,17 @@ import {
 
 export function AchievementsPageClient() {
   const { t, language } = useLanguage();
-  const { canSeeInWorkModes, loading, user, profile } = useAuth();
-  const router = useRouter();
+  const { loading, user, profile, isAuthenticated } = useAuth();
   const { achievementCounts } = useAdventureAchievements();
   const [selectedAchievement, setSelectedAchievement] = useState<{
     achievement: typeof ADVENTURE_ACHIEVEMENTS[AdventureAchievementId];
     count: number;
   } | null>(null);
 
-  // Same beta/admin gate as /adventure. The sub-route was public while the
-  // parent was gated, so a guessable URL skipped the work-mode wall.
-  const isDev = process.env.NODE_ENV === 'development';
-  const resolving = loading || (!!user && !profile);
-  const denied = !resolving && !canSeeInWorkModes && !isDev;
-  useEffect(() => {
-    if (denied) {
-      router.replace(`/${language}`);
-    }
-  }, [denied, language, router]);
+  // A session user is enough; the profile row can land later (or fail).
+  const signedIn = isAuthenticated || !!user;
+  // Hold until auth resolves so a signed-in player never flashes the guest gate.
+  const isResolving = loading || (!!user && !profile);
 
   const handleSelectAchievement = useCallback((id: AdventureAchievementId) => {
     const achievement = ADVENTURE_ACHIEVEMENTS[id];
@@ -54,7 +48,12 @@ export function AchievementsPageClient() {
     setSelectedAchievement(null);
   }, []);
 
-  if (resolving || denied) return null;
+  if (isResolving) return null;
+
+  // Show guest gate for unauthenticated users
+  if (!signedIn) {
+    return <AdventureGuestGate surface="achievements" />;
+  }
 
   return (
     <div

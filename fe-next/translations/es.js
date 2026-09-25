@@ -273,6 +273,14 @@ const es = {
       "prev": "Juegos anteriores",
       "next": "Más juegos",
       "items": {
+        "adventure": {
+          "title": "Aventura",
+          "line": "100 niveles en 10 mundos. Sube y conquista."
+        },
+        "wordTowerV2": {
+          "title": "Torre de Palabras V2",
+          "line": "Apila palabras, observa la física."
+        },
         "arena": {
           "title": "Multijugador",
           "line": "Mismas letras, rivales en vivo. Gana el más rápido."
@@ -749,6 +757,7 @@ const es = {
       "levelUpDone": "El jefe te espera",
       "tapToContinue": "Toca para seguir",
       "andMoreRelics": "{n} reliquias más se activaron",
+      "showMoreRelics": "Ver {n} reliquias más",
       "earnedThisRun": "Te dio {n} puntos en esta partida",
       "thisRun": "En esta partida",
       "thisLevel": "Este nivel",
@@ -869,6 +878,13 @@ const es = {
       "insight": "+2 pistas"
     },
     "longerWords": "palabras más largas",
+    "guest": {
+      "pitch": "Conquista 10 mundos de gloria roguelike",
+      "bullet1": "Batalla contra encuentros cada vez más difíciles",
+      "bullet2": "Desbloquea diseños de mundos raros y reliquias poderosas",
+      "bullet3": "Reclama tu puesto en la tabla de clasificación",
+      "signIn": "Inicia sesión para jugar"
+    },
     "title": "Aventura",
     "start": "Empezar",
     "fight": "¡A pelear!",
@@ -1608,7 +1624,7 @@ const es = {
     "cardDesc": "Física real: versión beta",
     "collapsed": "¡Se cayó la torre!",
     "newBest": "¡Nuevo récord!",
-    "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar"},
+    "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar", "daily": "DIARIO", "dailyBadge": "Diario {date}"},
     "stability": {"label": "Estabilidad", "a11y": "Estabilidad: {band}, {pct}% de riesgo", "steady": "Firme", "wobbly": "Tambaleante", "danger": "¡Peligro!"},
     "biome": {"downtown": "Centro", "sunset": "Azoteas al atardecer", "clouds": "Mar de nubes", "jetstream": "Corriente en chorro", "aurora": "Aurora", "orbit": "Órbita", "cosmos": "Cosmos profundo"},
     "newSky": "Cielo nuevo",
@@ -1617,12 +1633,16 @@ const es = {
     "ach": {"unlocked": "Insignia desbloqueada", "groundbreaker": {"name": "Primera piedra", "desc": "Coloca tu primer piso"}, "fiveStory": {"name": "Cinco plantas", "desc": "Apila 5 pisos en una partida"}, "highRise": {"name": "Edificio alto", "desc": "Apila 10 pisos en una partida"}, "skyscraper": {"name": "Rascacielos", "desc": "Apila 20 pisos en una partida"}, "megatower": {"name": "Megatorre", "desc": "Apila 30 pisos en una partida"}, "steadyHands": {"name": "Pulso firme", "desc": "3 caídas perfectas seguidas"}, "surgeon": {"name": "Cirujano", "desc": "6 caídas perfectas seguidas"}, "flawless": {"name": "Impecable", "desc": "10 caídas perfectas seguidas"}, "perfectionist": {"name": "Perfeccionista", "desc": "15 caídas perfectas en una partida"}, "wordsmith": {"name": "Artesano de palabras", "desc": "Sube una palabra de 6 letras"}, "lexicon": {"name": "Diccionario andante", "desc": "Sube una palabra de 8 letras"}, "fullHouse": {"name": "Casa llena", "desc": "50 inquilinos en una partida"}, "cityPlanner": {"name": "Urbanista", "desc": "150 inquilinos en una partida"}, "lucky": {"name": "Racha de suerte", "desc": "Abre 5 cajas en una partida"}, "welder": {"name": "Soldador", "desc": "Suelda tu torre con varilla"}, "sunsetView": {"name": "Vista al atardecer", "desc": "Sube hasta el cielo del atardecer"}, "aboveClouds": {"name": "Sobre las nubes", "desc": "Sube más allá de las nubes"}, "orbiter": {"name": "En órbita", "desc": "Construye hasta la órbita"}},
     "results": {
         "home": "Inicio",
-        "close": "Cerrar","floorsA11y": "Llegaste al piso {n}", "combo": "Mejor racha", "tenants": "Inquilinos", "crates": "Cajas", "badges": "Insignias ganadas", "nextGoal": "Próxima meta"},
+        "close": "Cerrar","floorsA11y": "Llegaste al piso {n}", "combo": "Mejor racha", "tenants": "Inquilinos", "crates": "Cajas", "badges": "Insignias ganadas", "nextGoal": "Próxima meta", "coinsLoading": "Monedas en camino…"},
     "hint": {"spell": "Forma una palabra para construir el siguiente piso", "drop": "Toca SOLTAR cuando el piso esté sobre la torre"},
     "changeWord": "CAMBIAR PALABRA",
     "editHint": "Toca una letra usada para editar la palabra",
     "bestFlag": "RÉCORD",
     "leaveConfirm": "¿Salir de esta subida? Puedes reanudarla en esta pestaña, pero el daily es una vez al día.",
+"leaveDaily": {"title": "¿Dejar la subida de hoy?", "desc": "Dejar termina tu subida. Tu altura se cuenta en la tabla de hoy. La próxima subida diaria abre mañana."},
+"leaveFree": {"title": "¿Dejar esta subida?", "desc": "Dejar termina esta subida y cobra tus monedas. Comienza una nueva en cualquier momento."},
+    "leaveKeep": "Seguir subiendo",
+    "leaveGo": "Salir",
     "dailyPlayed": "La torre de hoy ya está. Vuelve mañana.",
     "dailyRank": "Eres el #{rank} hoy",
     "recapAlt": "Resumen: {floors} pisos, {m} metros"
@@ -2150,7 +2170,15 @@ const es = {
       "title": "Juego de Palabras Aventura - RPG de Palabras Gratis",
       "description": "¡Embárcate en una aventura épica de palabras! Batalla contra jefes, conquista 100 niveles en 10 mundos temáticos. Juego RPG de palabras gratis con fichas especiales y power-ups.",
       "ogTitle": "LexiClash Aventura - Juego RPG de Palabras",
-      "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 100 niveles, 10 mundos. ¡Juega gratis!"
+      "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 100 niveles, 10 mundos. ¡Juega gratis!",
+      "playLabel": "Juega"
+    },
+    "wordTowerV2": {
+      "title": "Word Tower - Apila Palabras, Construye una Torre | Juego Gratis",
+      "description": "¡Apila palabras para construir la torre más alta! Word Tower es un juego de palabras basado en física. Encadena combos, desbloquea power-ups y sube en la clasificación. Gratis, sin descarga requerida.",
+      "ogTitle": "Word Tower - Juego de Palabras con Física",
+      "ogDescription": "¡Apila palabras para construir tu torre! Encadena combos, desbloquea power-ups y compite. ¡Juego gratis!",
+      "playLabel": "Juega"
     },
     "blast": {
       "title": "Modo Blast - Encadena Palabras en Combos Explosivos | LexiClash",
@@ -7500,6 +7528,10 @@ const es = {
     "badgeChallenges": "Desafíos",
     "badgeRooms": "Salas",
     "badgeHost": "Anfitrión",
+    "badge": {
+      "new": "Nuevo",
+      "beta": "Beta"
+    },
     "multiPlayer": "Multijugador",
     "multiplayer": "Multijugador",
     "multiplayerDesc": "¡Compite con amigos en tiempo real!",
@@ -18357,6 +18389,12 @@ const es = {
       "cta": "Me interesa",
       "thanks": "¡Estás en la lista! Te avisaremos cuando lancemos los planes de apoyo."
     }
+  },
+  "newModes": {
+    "title": "Nuevos modos de juego",
+    "description": "La aventura te espera. Prueba la torre diaria.",
+    "playAdventure": "Jugar aventura",
+    "playWordTower": "Jugar torre de palabras"
   }
 };
 

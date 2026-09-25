@@ -24,6 +24,7 @@ import AdventureLevel from './play/AdventureLevel';
 import SkinVault from './play/SkinVault';
 import { useAdventureProgress } from './play/useAdventureProgress';
 import { equipWorldSkin, equippedWorld } from './play/equipWorldSkin';
+import { AdventureGuestGate } from './AdventureGuestGate';
 
 /**
  * QA-only: `?preview=win` / `?preview=over` mount the run-END screens with a
@@ -100,23 +101,18 @@ export default function AdventureView() {
   // or a signed-in player sees the sign-in wall flash (or stick) on a hard load.
   if (!signedIn && authLoading) {
     return (
-      <div data-testid="adventure-auth-pending" className="min-h-dvh grid place-items-center bg-[#0f1b3d] text-neo-cream">
+      <div data-testid="adventure-auth-pending" className="min-h-dvh flex flex-col items-center justify-center gap-4 bg-[#0f1b3d] text-neo-cream px-4">
         <Loader2 className="w-8 h-8 animate-spin" aria-hidden />
+        <Link href={`/${language}`} data-testid="adventure-auth-pending-home" aria-label={t('adventurePlay.backHome')}
+          className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000]">
+          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
+        </Link>
       </div>
     );
   }
 
   if (!signedIn) {
-    return (
-      <div className="min-h-dvh grid place-items-center p-6 bg-[#0f1b3d] text-neo-cream text-center">
-        <div className="max-w-sm">
-          <p className="font-neo-display text-2xl font-bold">{t('adventurePlay.signInRequired')}</p>
-          <Link href={`/${language}`} className="mt-4 inline-block rounded-xl border-[3px] border-black bg-neo-lime text-black font-bold px-5 py-2.5 shadow-[3px_3px_0_#000]">
-            {t('adventurePlay.backHome')}
-          </Link>
-        </div>
-      </div>
-    );
+    return <AdventureGuestGate surface="map" />;
   }
 
   if (view.kind === 'run') {

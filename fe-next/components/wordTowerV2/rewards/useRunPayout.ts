@@ -52,14 +52,21 @@ interface Args {
  * or pay twice. `null` (guest offline, a failed POST, estate still loading)
  * means no reveal — the results screen shows instead of an empty chest.
  */
+export interface PayoutStatus {
+  status: 'idle' | 'pending' | 'paid' | 'none';
+  coins: number;
+}
+
 export function useRunPayout({ over, ready, getSummary, reportRun }: Args): {
   payout: RunPayout | null;
   waiting: boolean;
+  payoutStatus: PayoutStatus;
   clear: () => void;
   bank: (keepalive?: boolean) => Promise<void>;
 } {
   const [payout, setPayout] = useState<RunPayout | null>(null);
   const [waiting, setWaiting] = useState(false);
+  const [payoutStatus, setPayoutStatus] = useState<PayoutStatus>({ status: 'idle', coins: 0 });
   const sentRef = useRef(false);
   // Held in refs so a re-render can never re-run (and cancel) the report.
   const summaryRef = useRef(getSummary);
@@ -79,6 +86,7 @@ export function useRunPayout({ over, ready, getSummary, reportRun }: Args): {
         sentRef.current = false;
         setPayout(null);
         setWaiting(false);
+        setPayoutStatus({ status: 'idle', coins: 0 });
       }
       wasOverRef.current = false;
       return;
@@ -87,13 +95,25 @@ export function useRunPayout({ over, ready, getSummary, reportRun }: Args): {
     if (!ready || sentRef.current) return;
     sentRef.current = true;
     setWaiting(true);
+    setPayoutStatus({ status: 'pending', coins: 0 });
     const summary = summaryRef.current();
     // Deliberately NOT cancelled on cleanup: StrictMode tears the first effect
     // down and the guard then blocks the retry, so a cancel would lose the only
     // report of the run.
     void reportRef.current(summary)
-      .then((res) => setPayout(res ? { coins: res.coins, chest: res.chest, summary } : null))
-      .catch(() => setPayout(null))
+      .then((res) => {
+        if (res) {
+          setPayout({ coins: res.coins, chest: res.chest, summary });
+          setPayoutStatus({ status: 'paid', coins: res.coins });
+        } else {
+          setPayout(null);
+          setPayoutStatus({ status: 'none', coins: 0 });
+        }
+      })
+      .catch(() => {
+        setPayout(null);
+        setPayoutStatus({ status: 'none', coins: 0 });
+      })
       .finally(() => setWaiting(false));
   }, [over, ready]);
 
@@ -113,5 +133,5 @@ export function useRunPayout({ over, ready, getSummary, reportRun }: Args): {
   }, []);
 
   const clear = useCallback(() => setPayout(null), []);
-  return { payout, waiting, clear, bank };
+  return { payout, waiting, payoutStatus, clear, bank };
 }

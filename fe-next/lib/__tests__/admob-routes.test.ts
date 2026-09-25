@@ -25,10 +25,18 @@ describe('isAllowedAdBannerRoute', () => {
     expect(isAllowedAdBannerRoute('/daily/')).toBe(true);
   });
 
-  it('blocks /word-tower — it is gameplay, and the promo/banner covered the tower', () => {
+  it('blocks /word-tower (canonical path) — it is gameplay, and the promo/banner covered the tower', () => {
+    // Test both canonical path and the internal -v2 path
     expect(isAllowedAdBannerRoute('/word-tower')).toBe(false);
     expect(isAllowedAdBannerRoute('/en/word-tower')).toBe(false);
     expect(isAllowedAdBannerRoute('/he/word-tower/')).toBe(false);
+    expect(isAllowedAdBannerRoute('/word-tower-v2')).toBe(false);
+    expect(isAllowedAdBannerRoute('/en/word-tower-v2')).toBe(false);
+    // Also test the daily sub-routes
+    expect(isAllowedAdBannerRoute('/word-tower/daily')).toBe(false);
+    expect(isAllowedAdBannerRoute('/en/word-tower/daily')).toBe(false);
+    expect(isAllowedAdBannerRoute('/word-tower-v2/daily')).toBe(false);
+    expect(isAllowedAdBannerRoute('/en/word-tower-v2/daily')).toBe(false);
   });
 
   it('allows the /connections landing (SEO hub) but blocks its gameplay sub-routes', () => {

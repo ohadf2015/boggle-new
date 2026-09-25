@@ -42,6 +42,11 @@ interface Props {
    */
   wide?: boolean;
   reducedMotion?: boolean;
+  /** Daily mode: show the daily badge with this date key (YYYY-MM-DD format). */
+  daily?: boolean;
+  dailyDateKey?: string;
+  /** Formatted date string to display in daily badge (e.g., "25 Sep" or "25 9月"). */
+  dailyDateFormatted?: string;
 }
 
 const EFFECT_CLASS: Record<'steady' | 'plumb' | 'wide', string> = {
@@ -161,6 +166,9 @@ export const V2TopBar = memo(function V2TopBar({
   onExit,
   barRef,
   reducedMotion,
+  daily = false,
+  dailyDateKey,
+  dailyDateFormatted,
 }: Props) {
   const floors = Math.floor(floorsAt(heightM) + 0.05);
   const coins = estate.coins + runCoins;
@@ -229,7 +237,17 @@ export const V2TopBar = memo(function V2TopBar({
           <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-base font-bold leading-tight tabular-nums text-neo-cream lg:text-2xl">
             {score.toLocaleString()}
           </div>
-          {bestM > 0.5 ? (
+          {daily && dailyDateKey ? (
+            <div
+              className="rounded-neo border-neo border-black bg-neo-cyan px-1.5 py-0.5 font-neo-display text-[10px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-sm"
+              aria-label={t('wordTowerV2.hud.dailyBadge', { date: dailyDateFormatted || '' })}
+            >
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="uppercase text-[9px] lg:text-[11px]">{t('wordTowerV2.hud.daily')}</span>
+                <span className="font-neo-display text-[11px] font-black lg:text-sm">{dailyDateFormatted || ''}</span>
+              </div>
+            </div>
+          ) : bestM > 0.5 ? (
             <div
               className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-1.5 font-neo-display text-[10px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-sm"
               aria-label={t('wordTower.hud.best', { m: bestM.toFixed(1) })}

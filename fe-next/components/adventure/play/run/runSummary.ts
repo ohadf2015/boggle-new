@@ -56,7 +56,7 @@ export interface RunSummary {
 
 export function runSummary(
   run: PublicRun | null,
-  r: { won: boolean; validWords: string[]; points?: number[]; nextRun?: PublicRun },
+  r: { won: boolean; validWords: string[]; points?: number[]; nextRun?: PublicRun; purseCoins?: number },
 ): RunSummary {
   const levelsCleared = run ? Math.max(0, run.step - 1 + (r.won ? 1 : 0)) : r.won ? 1 : 0;
   let bestWord: RunSummary['bestWord'] = null;
@@ -64,7 +64,11 @@ export function runSummary(
     const pts = r.points?.[i] ?? 0;
     if (!bestWord || pts > bestWord.pts) bestWord = { word, pts };
   });
-  return { levelsCleared, relics: run?.relics ?? [], gold: r.nextRun?.gold ?? run?.gold ?? 0, bestWord };
+  // When there's a nextRun, use its gold. Otherwise, use purseCoins (the server-credited amount
+  // from run-over), falling back to the current run's gold. This ensures that on Redis failure
+  // (purseCoins = 0), we display 0 not the client's in-run gold amount.
+  const gold = r.nextRun?.gold ?? (typeof r.purseCoins === 'number' ? r.purseCoins : run?.gold ?? 0);
+  return { levelsCleared, relics: run?.relics ?? [], gold, bestWord };
 }
 
 /**

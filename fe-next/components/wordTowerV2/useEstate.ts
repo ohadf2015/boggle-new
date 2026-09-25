@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoinActions } from '@/contexts/CoinContext';
 import { getWithAuth, postWithAuth } from '@/utils/authFetch';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   type ChestRoll,
   type Estate,
@@ -278,6 +279,13 @@ export function useEstate(): UseEstate {
       setEstate(optimistic);
       if (!isAuthenticated) {
         writeLocal(optimistic);
+        // Track upgrade for guests too
+        if (kind === 'upgrade') {
+          trackGrowthEvent('wt2_upgrade_bought', {
+            upgrade: slot,
+            cost: local.cost ?? 0,
+          });
+        }
         return { ok: true, districtCompleted: completed };
       }
       const res = await postWithAuth(`${API}/${kind}`, { plot: slot }, { requireSession: true });
@@ -287,6 +295,13 @@ export function useEstate(): UseEstate {
         return { ok: false, reason: String(body?.reason ?? 'error') };
       }
       fromServer(body.estate);
+      // Track upgrade on server success
+      if (kind === 'upgrade') {
+        trackGrowthEvent('wt2_upgrade_bought', {
+          upgrade: slot,
+          cost: local.cost ?? 0,
+        });
+      }
       return { ok: true, districtCompleted: body.districtCompleted === true };
     },
     [loading, isAuthenticated, refresh, setEstate, fromServer],
@@ -309,13 +324,27 @@ export function useEstate(): UseEstate {
   const raid = useCallback<UseEstate['raid']>(
     async (defenderId, accuracy, revenge = false) => {
       if (!authed) return null;
-      const res = await postWithAuth(`${API}/raid`, { defenderId, accuracy, revenge }, { requireSession: true });
+      // Generate a nonce for retry idempotency (same raid attempt across network retries)
+      const nonce = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `raid-${Date.now()}-${Math.random()}`;
+      const res = await postWithAuth(`${API}/raid`, { defenderId, accuracy, nonce, revenge }, { requireSession: true });
       const body = await readJson(res);
-      if (!res.ok || !body?.outcome) return { error: String(body?.reason ?? 'error') };
+      if (!res.ok || !body?.outcome) {
+        // On 409 'duplicate', reload the estate in case coins were already awarded but response was lost
+        if (res.status === 409 && body?.reason === 'duplicate') {
+          await refresh();
+        }
+        return { error: String(body?.reason ?? 'error') };
+      }
       if (body.estate) fromServer(body.estate);
-      return { raidId: (body.raidId as string | null) ?? null, outcome: body.outcome as RaidResultOutcome, revenge };
+      // Track engagement: raid played (won = damage dealt, coins awarded)
+      const outcome = body.outcome as RaidResultOutcome;
+      trackGrowthEvent('wt2_raid_played', {
+        won: outcome.kind === 'damaged',
+        coins: outcome.kind === 'damaged' ? (outcome.attackerCoins ?? 0) : 0,
+      });
+      return { raidId: (body.raidId as string | null) ?? null, outcome, revenge };
     },
-    [authed, fromServer],
+    [authed, fromServer, refresh],
   );
 
   const markSeen = useCallback<UseEstate['markSeen']>(

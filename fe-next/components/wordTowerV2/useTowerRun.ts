@@ -30,6 +30,7 @@ import { type RunState, type SurprisePayout, applyLanding, consumeDrop, createRu
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
 import { isCounterweight, standingChain, towerLean, towerRisk } from '@/lib/wordTowerV2/stability';
 import { endV2Run, startV2Run } from '@/lib/wordTowerV2/telemetry';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { TowerFx } from './TowerCanvas';
 import { type Hanging, LANDING_SOUND, type PendingLanding, REWARD_SOUND, dampSway, recordLanding, readBest, seedDemoTower, standing, supportTop, writeBest } from './runHelpers';
 
@@ -80,6 +81,8 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
   const bracesRef = useRef({ used: 0, paid: 0 });
   /** The tower's lean just before the current drop, for the counterweight check. */
   const leanRef = useRef<number | null>(null);
+  /** Guard: endRun already fired the event for this run. */
+  const endedRef = useRef(false);
   /**
    * Empire perks, fed in by the estate (NEUTRAL until it has loaded, so a run
    * that starts before auth settles simply plays unperked rather than flipping
@@ -199,6 +202,9 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
 
   /** `cashedOut`: the player ended a standing run — a win, not a fall. */
   const endRun = useCallback((cashedOut = false) => {
+    // Guard: already ended, don't fire event twice
+    if (endedRef.current) return;
+
     resolveLanding();
     hangingRef.current = null;
     const peak = worldRef.current.runPeakPx / PX_PER_M;
@@ -218,7 +224,16 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
       floors: statsRef.current.peakFloors,
       heightM: peak,
     });
-  }, [playSound, resolveLanding]);
+    // Mark run as ended to prevent double-firing the event
+    endedRef.current = true;
+    // Track engagement: run ended with cause (crash or cashout)
+    trackGrowthEvent('wt2_run_ended', {
+      daily: !!dailySeed,
+      heightM: peak,
+      floors: statsRef.current.peakFloors,
+      cause: cashedOut ? 'cashout' : 'crash',
+    });
+  }, [playSound, resolveLanding, dailySeed]);
 
   /**
    * The tower came down — but if floors are still standing on the base, the
@@ -455,6 +470,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     beatBestRef.current = false;
     bracesRef.current = { used: 0, paid: 0 };
     leanRef.current = null;
+    endedRef.current = false;
     statsRef.current = emptyStats();
     seenBiomesRef.current = new Set(['downtown']);
     runRef.current = createRun(dailySeed ?? Date.now());

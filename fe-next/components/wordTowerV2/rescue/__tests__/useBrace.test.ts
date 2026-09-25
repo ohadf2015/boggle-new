@@ -1,6 +1,9 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RESCUE_MS, bracesSpent, rescueMinLen, useBrace } from '../useBrace';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+
+vi.mock('@/utils/growthTracking');
 
 const base = () => ({
   brace: vi.fn(() => true),
@@ -104,5 +107,75 @@ describe('useBrace', () => {
     act(() => vi.advanceTimersByTime(RESCUE_MS + 50));
     expect(result.current.rescue).toBeNull();
     expect(args.brace).not.toHaveBeenCalled();
+  });
+
+  describe('wt2_continue_used tracking', () => {
+    it('should track paid brace with actual cost (not 0), and costs should differ on consecutive braces', () => {
+      const mockTrack = vi.mocked(trackGrowthEvent);
+      const args = base();
+      const { result } = renderHook(() => useBrace(args));
+
+      // First brace purchase
+      expect(result.current.price).toBe(40);
+      act(() => result.current.buy());
+      expect(args.brace).toHaveBeenCalledWith(true);
+
+      // Second brace purchase
+      expect(result.current.price).toBe(80);
+      act(() => result.current.buy());
+
+      // Verify that wt2_continue_used was fired twice with correct costs
+      const continuedUsedCalls = mockTrack.mock.calls.filter(([name]) => name === 'wt2_continue_used');
+      expect(continuedUsedCalls.length).toBe(2);
+
+      // First cost must be 40
+      expect(continuedUsedCalls[0]?.[1]).toEqual({ cost: 40 });
+      // Second cost must be 80
+      expect(continuedUsedCalls[1]?.[1]).toEqual({ cost: 80 });
+
+      // Verify they're different (not placeholder values)
+      expect(continuedUsedCalls[0]?.[1]?.cost).not.toBe(0);
+      expect(continuedUsedCalls[1]?.[1]?.cost).not.toBe(0);
+      expect(continuedUsedCalls[0]?.[1]?.cost).not.toBe(continuedUsedCalls[1]?.[1]?.cost);
+    });
+
+    it('should not track when free braces are used', () => {
+      const mockTrack = vi.mocked(trackGrowthEvent);
+      const args = { ...base(), freeBraces: 1 };
+      const { result } = renderHook(() => useBrace(args));
+
+      expect(result.current.price).toBe(0);
+      act(() => result.current.buy());
+      expect(args.brace).toHaveBeenCalledWith(false);
+
+      const continuedUsedCalls = mockTrack.mock.calls.filter(([name]) => name === 'wt2_continue_used');
+      expect(continuedUsedCalls.length).toBe(0);
+    });
+
+    it('should not track when brace fails (brace returns false)', () => {
+      const mockTrack = vi.mocked(trackGrowthEvent);
+      const args = { ...base(), brace: vi.fn(() => false) };
+      const { result } = renderHook(() => useBrace(args));
+
+      act(() => result.current.buy());
+
+      const continuedUsedCalls = mockTrack.mock.calls.filter(([name]) => name === 'wt2_continue_used');
+      expect(continuedUsedCalls.length).toBe(0);
+    });
+
+    it('should not track rescue word brace (free)', () => {
+      const mockTrack = vi.mocked(trackGrowthEvent);
+      const args = base();
+      const { result } = renderHook(() => useBrace(args));
+
+      act(() => result.current.startRescue());
+      act(() => {
+        result.current.submitRescue('tower', true);
+      });
+      expect(args.brace).toHaveBeenCalledWith(false);
+
+      const continuedUsedCalls = mockTrack.mock.calls.filter(([name]) => name === 'wt2_continue_used');
+      expect(continuedUsedCalls.length).toBe(0);
+    });
   });
 });

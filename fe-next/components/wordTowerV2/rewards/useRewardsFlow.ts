@@ -10,7 +10,7 @@ import type { UseEstate } from '../useEstate';
 import { type LandingFx, useLandingFx } from './useLandingFx';
 import { type RunRewards, useRunRewards } from './useRunRewards';
 import { PX_PER_M } from '@/lib/wordTowerV2/engine';
-import { towerBlocksFrom, useRunPayout } from './useRunPayout';
+import { type PayoutStatus, towerBlocksFrom, useRunPayout } from './useRunPayout';
 
 type PlaySound = (id: keyof typeof SOUND_EFFECTS, opts?: { volume?: number; rate?: number }) => void;
 
@@ -38,6 +38,8 @@ export interface RewardsFlow {
   chest: ChestState | null;
   /** The results screen may take over. */
   resultsReady: boolean;
+  /** Server payout status for display on results (pending/paid/none). */
+  payoutStatus: PayoutStatus;
   onBeat: (beat: RevealBeat | 'open') => void;
   onCoinTick: (rate: number) => void;
   onDone: () => void;
@@ -86,7 +88,7 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
     }),
     [readSummary, worldRef, labelsRef, bracesRef],
   );
-  const { payout, waiting, bank } = useRunPayout({
+  const { payout, waiting, payoutStatus, bank } = useRunPayout({
     over: phase === 'over',
     ready: estateApi.status !== 'loading',
     getSummary,
@@ -156,6 +158,7 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
         : null,
     // Nothing banked and nothing in flight: skip the reveal rather than stall the run.
     resultsReady: done || (!payout && !waiting),
+    payoutStatus,
     onBeat,
     onCoinTick,
     onDone: () => setDone(true),

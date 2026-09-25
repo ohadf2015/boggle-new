@@ -19,9 +19,9 @@ beforeEach(() => {
   replace.mockClear();
 });
 
-describe('WordTowerV2PageClient beta gate', () => {
-  it('given a beta tester or admin, when opened, then the game renders', async () => {
-    useAuth.mockReturnValue({ canSeeInWorkModes: true, loading: false, user: { id: 'u' }, profile: { id: 'p' } });
+describe('WordTowerV2PageClient public access', () => {
+  it('given an ordinary player, when opened, then the game renders without redirect', async () => {
+    useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: false, user: null, profile: null });
 
     render(<WordTowerV2PageClient />);
 
@@ -31,40 +31,27 @@ describe('WordTowerV2PageClient beta gate', () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('given an ordinary player, when opened, then they are sent home and see no game', () => {
-    useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: false, user: null, profile: null });
+  it('given auth still resolving, when opened, then it waits instead of rendering', () => {
+    useAuth.mockReturnValue({ loading: true, user: null, profile: null });
 
     render(<WordTowerV2PageClient />);
 
     expect(screen.queryByTestId('word-tower-v2')).not.toBeInTheDocument();
-    expect(replace).toHaveBeenCalledWith('/en');
-  });
-
-  it('given auth still resolving, when opened, then it waits instead of bouncing', () => {
-    // canSeeInWorkModes starts false and flips true once auth resolves. Redirecting
-    // on that transient false throws a real beta tester back to the home page
-    // before their access is even known.
-    useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: true, user: null, profile: null });
-
-    render(<WordTowerV2PageClient />);
-
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('given a signed-in player whose profile has not landed, when opened, then it waits instead of bouncing', () => {
+  it('given a signed-in player whose profile has not landed, when opened, then it waits instead of rendering', () => {
     // loading alone is not enough: TOKEN_REFRESHED / cross-tab sync set loading
-    // false with profile still null. canSeeInWorkModes is derived from the
-    // profile, so this is the documented production bounce of real beta testers.
+    // false with profile still null. The game waits for profile to land.
     useAuth.mockReturnValue({
-      canSeeInWorkModes: false,
       loading: false,
-      user: { id: 'beta-1' },
+      user: { id: 'player-1' },
       profile: null,
     });
 
     render(<WordTowerV2PageClient />);
 
-    expect(replace).not.toHaveBeenCalled();
     expect(screen.queryByTestId('word-tower-v2')).not.toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
   });
 });

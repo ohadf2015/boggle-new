@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ME, THEM, type Op, argOf, fakeDb, getReq, has, jsonResponse, postReq, row } from './fakeDb';
+import { claimOnce } from '@/lib/server/claimOnce';
 
 vi.mock('next/server', () => ({
   NextRequest: vi.fn(),
@@ -10,6 +11,16 @@ vi.mock('@/lib/auth/getAuthedUser', () => ({ getAuthedUser: vi.fn() }));
 vi.mock('@/lib/email', () => ({ getSupabaseAdmin: vi.fn() }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 vi.mock('@/backend/modules/pushNotificationTriggers', () => ({ notifyWordTowerWreck: vi.fn(() => Promise.resolve()) }));
+
+// Stateful claimOnce mock: tracks seen keys within a test
+let claimedKeys: Set<string>;
+vi.mock('@/lib/server/claimOnce', () => ({
+  claimOnce: vi.fn(async (key: string) => {
+    if (claimedKeys.has(key)) return 'taken';
+    claimedKeys.add(key);
+    return 'claimed';
+  }),
+}));
 
 import { GET as getRivals } from '../rivals/route';
 import { POST as postRaid } from '../raid/route';
@@ -36,6 +47,7 @@ const profile = (id: string, name: string) => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  claimedKeys = new Set();
   (getAuthedUser as any).mockResolvedValue({ id: ME });
 });
 
@@ -128,25 +140,25 @@ describe('POST /api/word-tower/estate/raid', () => {
 
   it('given myself as the target, when raiding, then 400', async () => {
     (getSupabaseAdmin as any).mockReturnValue(raidDb().client);
-    expect(status(await postRaid(postReq({ defenderId: ME, accuracy: 1 })))).toBe(400);
+    expect(status(await postRaid(postReq({ defenderId: ME, accuracy: 1, nonce: 'nonce-test-1' })))).toBe(400);
   });
 
   it('given no raid charges, when raiding, then 409 and no rpc', async () => {
     const db = raidDb({ attacker: { raid_charges: 0 } });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
-    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1 })))).toBe(409);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-test-1' })))).toBe(409);
     expect(db.rpc).not.toHaveBeenCalled();
   });
 
   it('given an unknown defender, when raiding, then 404', async () => {
     (getSupabaseAdmin as any).mockReturnValue(raidDb({ defender: null }).client);
-    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1 })))).toBe(404);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-test-1' })))).toBe(404);
   });
 
   it('given an unshielded defender, when raiding, then the SERVER outcome is applied via the atomic rpc and they are notified', async () => {
     const db = raidDb();
     (getSupabaseAdmin as any).mockReturnValue(db.client);
-    const res = await postRaid(postReq({ defenderId: THEM, accuracy: 5, coinsStolen: 99999 }));
+    const res = await postRaid(postReq({ defenderId: THEM, accuracy: 5, coinsStolen: 99999, nonce: 'nonce-test-1' }));
     expect(status(res)).toBe(200);
     const [name, args] = raidRpc(db);
     expect(name).toBe('word_tower_apply_raid');
@@ -159,7 +171,7 @@ describe('POST /api/word-tower/estate/raid', () => {
   it('given a shielded defender, when raiding, then it is blocked and nobody is pushed', async () => {
     const db = raidDb({ defender: { shields: 1 } });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
-    const b = await body(await postRaid(postReq({ defenderId: THEM, accuracy: 1 })));
+    const b = await body(await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-test-1' })));
     expect(b.outcome.kind).toBe('blocked');
     expect(raidRpc(db)[1]).toMatchObject({ p_blocked: true, p_coins_stolen: 0 });
     expect(notifyWordTowerWreck).not.toHaveBeenCalled();
@@ -168,14 +180,14 @@ describe('POST /api/word-tower/estate/raid', () => {
   it('given revenge without a raid on me from them, when raiding, then 400 and no rpc', async () => {
     const db = raidDb({ revengeRow: null });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
-    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true })))).toBe(400);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true, nonce: 'nonce-test-1' })))).toBe(400);
     expect(db.rpc).not.toHaveBeenCalled();
   });
 
   it('given a real revenge, when raiding, then the raid id is passed so it is avenged atomically', async () => {
     const db = raidDb({ revengeRow: { id: 'their-raid' } });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
-    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true })))).toBe(200);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true, nonce: 'nonce-test-1' })))).toBe(200);
     expect(raidRpc(db)[1]).toMatchObject({ p_revenge_raid_id: 'their-raid' });
     const lookup = db.calls.find((c) => c.table === 'word_tower_raids')!;
     expect(has(lookup.ops, 'eq', 'attacker_id', THEM)).toBe(true);
@@ -189,19 +201,85 @@ describe('POST /api/word-tower/estate/raid', () => {
     // be spent exactly once and never by a client that just claims it.
     const db = raidDb({ attacker: { raid_charges: 0 }, revengeRow: { id: 'their-raid' } });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
-    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true })))).toBe(200);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true, nonce: 'nonce-test-1' })))).toBe(200);
     expect(raidRpc(db)[1]).toMatchObject({ p_revenge_raid_id: 'their-raid' });
   });
 
   it('given zero charges and nothing to avenge, when raiding, then it is still refused', async () => {
     const db = raidDb({ attacker: { raid_charges: 0 }, revengeRow: null });
     (getSupabaseAdmin as any).mockReturnValue(db.client);
-    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true })))).toBe(400);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, revenge: true, nonce: 'nonce-test-1' })))).toBe(400);
     expect(db.rpc).not.toHaveBeenCalled();
   });
 
   it('given the rpc reports no charges (race), when raiding, then 409', async () => {
     (getSupabaseAdmin as any).mockReturnValue(raidDb({ rpcError: 'no_charges' }).client);
-    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1 })))).toBe(409);
+    expect(status(await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-test-1' })))).toBe(409);
+  });
+
+  it('given two different nonces against the same defender, when raiding, then both succeed and the RPC runs twice (no permanent lock)', async () => {
+    const db = raidDb();
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    // First raid with nonce 'nonce-abc'
+    const res1 = await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-abc' }));
+    expect(status(res1)).toBe(200);
+    // Second raid with different nonce 'nonce-xyz' against same opponent
+    const res2 = await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-xyz' }));
+    expect(status(res2)).toBe(200);
+    // RPC should have been called twice, not blocked by defender key
+    expect(db.rpc.mock.calls.filter(([n]) => n === 'word_tower_apply_raid')).toHaveLength(2);
+  });
+
+  it('given same nonce twice, when raiding, then the second returns 409 (idempotency)', async () => {
+    const db = raidDb();
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    // First raid with nonce 'nonce-idem'
+    const res1 = await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-idem' }));
+    expect(status(res1)).toBe(200);
+    // Same nonce again
+    const res2 = await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-idem' }));
+    expect(status(res2)).toBe(409);
+    expect((await body(res2)).reason).toBe('duplicate');
+    // RPC should have been called only once
+    expect(db.rpc.mock.calls.filter(([n]) => n === 'word_tower_apply_raid')).toHaveLength(1);
+  });
+
+  it('given Redis unavailable on claimOnce, when raiding, then 503 and no RPC', async () => {
+    const db = raidDb();
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    const mockClaim = vi.mocked(claimOnce as any);
+    try {
+      mockClaim.mockImplementation(async () => 'unavailable');
+      const res = await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-unavail' }));
+      expect(status(res)).toBe(503);
+      expect(db.rpc).not.toHaveBeenCalled();
+    } finally {
+      claimedKeys.clear();
+      // Restore original implementation
+      mockClaim.mockImplementation(async (key: string) => {
+        if (claimedKeys.has(key)) return 'taken';
+        claimedKeys.add(key);
+        return 'claimed';
+      });
+    }
+  });
+
+  it('given a cached pre-nonce client (no nonce), when raiding, then the raid still lands (no silent 400 mid-deploy)', async () => {
+    const db = raidDb();
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    const res = await postRaid(postReq({ defenderId: THEM, accuracy: 1 }));
+    expect(status(res)).toBe(200);
+    expect(db.rpc).toHaveBeenCalledTimes(1);
+  });
+
+  it('given no raid charges and no revenge, when checking charges, then claimOnce is not called and 409 returns early', async () => {
+    const db = raidDb({ attacker: { raid_charges: 0 } });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    claimedKeys.clear();
+    const res = await postRaid(postReq({ defenderId: THEM, accuracy: 1, nonce: 'nonce-nochg' }));
+    expect(status(res)).toBe(409);
+    // claimOnce should NOT have been called (it happens AFTER the charge gate)
+    // The mock implementation increments claimedKeys, so we verify via the Set
+    expect(claimedKeys.size).toBe(0);
   });
 });

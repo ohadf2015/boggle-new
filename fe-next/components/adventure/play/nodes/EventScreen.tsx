@@ -14,6 +14,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Dices } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 import DeltaChips, { useLineText } from './DeltaChips';
 import NodeShell, { NodeButton } from './NodeShell';
@@ -92,7 +93,10 @@ export default function EventScreen({ id, choices, taken, run, before, world, bu
   return (
     <NodeShell kind="event" world={world} title={t(eventKey(id, 'title'))}
       gold={run.gold} hp={run.hp} maxHp={run.maxHp} busy={busy}
-      footer={<NodeButton testId="node-leave" onClick={onLeave} tone={resolved ? 'lime' : 'cream'} disabled={busy}>
+      footer={<NodeButton testId="node-leave" onClick={() => {
+        trackGrowthEvent('adventure_exit', { from: 'event' });
+        onLeave();
+      }} tone={resolved ? 'lime' : 'cream'} disabled={busy}>
         {resolved ? t('adventurePlay.node.continue') : t('adventurePlay.map.leave')}
       </NodeButton>}>
 

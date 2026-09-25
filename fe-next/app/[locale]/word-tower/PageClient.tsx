@@ -1,31 +1,29 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useExperiment } from '@/hooks/useExperiment';
-import { WordTowerGame } from '@/components/wordTower/WordTowerGame';
-import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import dynamic from 'next/dynamic';
+import { useAuth } from '@/contexts/AuthContext';
 
 /**
- * Word Tower is PUBLIC — the route no longer gates anyone.
- *
- * It used to redirect non-admins home unless the `word-tower` PostHog flag was
- * on. That flag is a MULTIVARIATE experiment ('on'/'off' 50/50), and
- * `usePostHogFlag<boolean>` hands back the variant STRING — so the gate read
- * `"off"` as truthy and let everyone through anyway. A gate that only pretends
- * to gate is worse than none: it made the mode look shipped while the real
- * blocker (the daily hub only drew the card for admins) went unnoticed. Deleted
- * rather than repaired — the mode is meant to be live. `trackExposure` stays for
- * usage analytics.
+ * Pixi touches `window` at import time, so the game must never be server
+ * rendered. `ssr: false` is only legal inside a Client Component, which is what
+ * this wrapper exists to provide — the same shape v1 uses.
  */
-export function WordTowerPageClient() {
-  const { trackExposure } = useExperiment('word-tower');
+const WordTowerV2 = dynamic(() => import('@/components/wordTowerV2/WordTowerV2'), {
+  ssr: false,
+});
 
-  useEffect(() => { trackExposure(); }, [trackExposure]);
+/**
+ * Word Tower v2 — now public (GA).
+ * The physics rebuild is now the default Word Tower for all players.
+ */
+export function WordTowerV2PageClient({ daily = false }: { daily?: boolean } = {}) {
+  const { loading, user, profile } = useAuth();
 
-  return (
-    <>
-      <ModeCoach mode="wordTower" />
-      <WordTowerGame />
-    </>
-  );
+  // No gate — Word Tower v2 is now public for all players.
+  // Still wait for auth to resolve so the UI state is consistent.
+  const resolving = loading || (!!user && !profile);
+
+  if (resolving) return null;
+
+  return <WordTowerV2 daily={daily} />;
 }

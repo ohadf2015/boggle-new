@@ -28,7 +28,6 @@ interface Args {
   seedDemo: (words?: string[]) => void;
   setForceResults: (v: boolean) => void;
   setSmashing: (v: boolean) => void;
-  t: (key: string) => string;
 }
 
 function fetchDailyBoard(language: string) {
@@ -54,7 +53,6 @@ export function useV2Ready({
   seedDemo,
   setForceResults,
   setSmashing,
-  t,
 }: Args): { dailyLocked: boolean; dailyRank: number | null } {
   const [serverPlayed, setServerPlayed] = useState(false);
   const [dailyRank, setDailyRank] = useState<number | null>(null);
@@ -132,16 +130,11 @@ export function useV2Ready({
     const onLeave = (e: BeforeUnloadEvent) => {
       if (!shouldConfirmLeave(phase, floors)) return;
       e.preventDefault();
-      e.returnValue = t('wordTowerV2.leaveConfirm');
+      e.returnValue = '';
     };
     window.addEventListener('beforeunload', onLeave);
     return () => window.removeEventListener('beforeunload', onLeave);
-  }, [phase, floors, t]);
+  }, [phase, floors]);
 
   return { dailyLocked, dailyRank };
-}
-
-export function confirmLeaveIfNeeded(phase: string, floors: number, t: (key: string) => string): boolean {
-  if (!shouldConfirmLeave(phase, floors)) return true;
-  return window.confirm(t('wordTowerV2.leaveConfirm'));
 }

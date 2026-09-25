@@ -5,7 +5,7 @@ import sitemap from './sitemap';
 import { RU_LANDINGS } from '../components/landing/RuLandingLinks';
 import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 
-const LOCALES = ['he', 'en', 'sv', 'ja', 'es'] as const;
+const LOCALES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
 const BASE_URL = 'https://www.lexiclash.live';
 
 describe('sitemap', () => {
@@ -110,12 +110,32 @@ describe('sitemap', () => {
     }
   });
 
-  // Adventure is BETA-gated (PageClient redirects non-beta users away) —
-  // public visitors and the AdSense reviewer hit a wall. Out of the sitemap
-  // and noindexed until GA. Restore both when the BETA badge drops.
-  it('does NOT list /adventure while it is beta-gated', () => {
-    const adventureUrls = routes.filter((r) => /\/adventure$/.test(r.url));
-    expect(adventureUrls.map((r) => r.url)).toEqual([]);
+  // Adventure is now GA — publicly listed in the sitemap for all locales.
+  // Word Tower canonical URL is /word-tower (no -v2 suffix in sitemap).
+  it('lists /adventure and /word-tower for all locales (GA)', () => {
+    for (const locale of LOCALES) {
+      const adventureUrl = `${BASE_URL}/${locale}/adventure`;
+      expect(
+        routes.find((r) => r.url === adventureUrl),
+        `missing /adventure for ${locale}`
+      ).toBeDefined();
+
+      const wtUrl = `${BASE_URL}/${locale}/word-tower`;
+      expect(
+        routes.find((r) => r.url === wtUrl),
+        `missing /word-tower for ${locale}`
+      ).toBeDefined();
+    }
+  });
+
+  // /word-tower/daily is a daily run URL — not indexed, stays noindex.
+  // The old -v2 paths must not appear in the sitemap at all.
+  it('does NOT list /word-tower/daily or /word-tower-v2 paths (daily runs are noindex)', () => {
+    const dailyUrls = routes.filter((r) => /\/word-tower\/daily$/.test(r.url));
+    expect(dailyUrls, 'daily runs must not be in sitemap').toEqual([]);
+
+    const v2Urls = routes.filter((r) => /\/word-tower-v2/.test(r.url));
+    expect(v2Urls, 'no -v2 paths in sitemap — use canonical /word-tower').toEqual([]);
   });
 
   // Connections is LIVE with a real content hub (en+he landing copy in

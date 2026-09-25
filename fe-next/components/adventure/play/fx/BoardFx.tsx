@@ -8,7 +8,7 @@
  *  - Hint: the hinted tiles glow and pulse until the word is found.
  * Everything finishes within 1.2s so play never stalls.
  */
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import type { HitEvent } from '../events';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -85,7 +85,7 @@ function targetEl(ref: RefObject<HTMLElement | null> | undefined, combat: boolea
     ?? slot;
 }
 
-export default function BoardFx({ children, lastHit, hitPath = [], shaking, targetRef, screenRef, targetHp = null, hintCells = [], active = true }: Props) {
+function BoardFxComponent({ children, lastHit, hitPath = [], shaking, targetRef, screenRef, targetHp = null, hintCells = [], active = true }: Props) {
   const { t } = useLanguageSafe();
   const sfx = useSoundEffects();
   const boardRef = useRef<HTMLDivElement>(null);
@@ -266,3 +266,5 @@ export default function BoardFx({ children, lastHit, hitPath = [], shaking, targ
     </div>
   );
 }
+
+export default React.memo(BoardFxComponent);

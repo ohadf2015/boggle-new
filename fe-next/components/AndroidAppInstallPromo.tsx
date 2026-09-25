@@ -43,6 +43,10 @@ import {
   persistInstallDismissal,
 } from '@/lib/androidInstall/installCooldown';
 import {
+  markPromoShown,
+  wasPromoShownThisSession,
+} from '@/lib/landing/promoOverlaySession';
+import {
   trackInstallClick,
   trackInstallDismissed,
   trackInstallPromoShown,
@@ -107,7 +111,9 @@ export default function AndroidAppInstallPromo() {
     // Cheap synchronous gates first — never probe for the installed app on
     // iOS / native / PWA / disallowed routes / already-dismissed. (Desktop IS
     // eligible now — it's a deliberate promo target.)
+    // Also gate on shared promo session flag: don't stack if another promo showed.
     if (!shouldShowAndroidInstallPromo(baseInput)) return;
+    if (wasPromoShownThisSession()) return;
 
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -127,6 +133,10 @@ export default function AndroidAppInstallPromo() {
           // was captured), so the bridge may only register during this delay.
           // Without this, the app would flash the popup. (Class 1 / Class 3.)
           if (isCapacitorNative()) return;
+          // Shared promo session flag re-check at fire time: if another overlay
+          // (NewModesAnnouncement, etc.) showed between mount and this timer,
+          // don't stack. (Class 1 — dual source of truth + async resolution.)
+          if (wasPromoShownThisSession()) return;
           // Variant gate, evaluated at FIRE time and re-armed — not once at mount.
           // A one-shot check here would turn "hasn't played yet after 12s" into
           // "never sees the promo at all", which reads as a variant win while
@@ -158,6 +168,7 @@ export default function AndroidAppInstallPromo() {
             return;
           }
           sessionStorage.setItem(SESSION_FLAG, '1');
+          markPromoShown(); // Gate other promos from auto-opening
           openPromo('auto_popup');
           trackInstallPromoShown('auto_popup');
           // Exposure fires HERE, not at mount: only visitors who genuinely reached a

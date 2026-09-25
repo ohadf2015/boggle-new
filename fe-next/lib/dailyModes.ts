@@ -69,7 +69,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
   },
   {
     id: 'word-tower',
-    path: '/daily/word-tower',
+    path: '/word-tower/daily',
     adminOnly: false,
     titleKey: 'wordTower.daily.questTitle',
     descKey: 'wordTower.daily.questDesc',
