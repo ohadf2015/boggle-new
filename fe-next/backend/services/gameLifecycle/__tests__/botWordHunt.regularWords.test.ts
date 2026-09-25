@@ -1,13 +1,12 @@
 /**
- * TDD RED: Bot Word Hunt - Regular Word Finding
+ * Bot Word Hunt - Regular Word Finding
  *
- * Verifies that bots in Word Hunt mode find regular board words
- * in addition to making target guesses.
+ * Verifies that bots in Word Hunt mode find regular board words (through the
+ * shared board-word bot + engine) in addition to making target guesses.
  */
 
 import { vi, type Mock, type MockInstance } from 'vitest';
 import type { Bot } from '../../../modules/botBehavior';
-import type { BotSubmission } from '../types';
 
 // Mock dependencies
 vi.mock('../../../utils/logger', () => ({ default: {
@@ -34,6 +33,8 @@ vi.mock('../../../modules/gameStateManager', () => ({
     },
   })),
   recordFirstFinder: vi.fn(() => true),
+  playerHasWord: vi.fn(() => false),
+  addPlayerEventBonus: vi.fn(),
 }));
 
 vi.mock('../../../modules/blastModeManager', () => ({
@@ -62,44 +63,24 @@ vi.mock('../../../modules/boggleSolver', () => ({
   getCachedTrie: vi.fn(() => ({})),
 }));
 
-vi.mock('../../../modules/botManager', () => {
-  return {
-    getGameBots: vi.fn(() => []),
-    startBot: vi.fn(async (bot: Bot, _grid: any, _language: any, onWordSubmit: any, _duration: number, _startTime: number) => {
-      // Simulate bot finding words
-      bot.isActive = true;
-      bot.wordsToFind = ['cat', 'run', 'rug'];
-      bot.wordsFound = [];
-      bot.currentWordIndex = 0;
+vi.mock('../../../modules/botManager', () => ({
+  getGameBots: vi.fn(() => []),
+  restoreBotFromUser: vi.fn(() => null),
+}));
 
-      // Simulate submitting first word after short delay
-      setTimeout(() => {
-        if (bot.isActive && onWordSubmit) {
-          onWordSubmit({
-            botId: bot.id,
-            username: bot.username,
-            word: 'cat',
-            score: 3,
-            comboLevel: 0,
-          } as BotSubmission);
-        }
-      }, 50);
-
-      setTimeout(() => {
-        if (bot.isActive && onWordSubmit) {
-          onWordSubmit({
-            botId: bot.id,
-            username: bot.username,
-            word: 'run',
-            score: 3,
-            comboLevel: 1,
-          } as BotSubmission);
-        }
-      }, 100);
-    }),
-    stopBot: vi.fn(),
-  };
-});
+// Board-word pool: the real prepareBotWords over the mocked solver; no caches/network.
+vi.mock('../../../modules/botBehaviorCache', () => ({
+  cleanupPlayerWordsCache: vi.fn(), clearBehaviorCaches: vi.fn(), getCacheStats: vi.fn(), addWordToBlacklist: vi.fn(),
+  getCachedPlayerWords: vi.fn(async () => []),
+  getCachedBlacklist: vi.fn(async () => new Set()),
+  getCachedDifficultyParams: vi.fn(async () => null),
+  getCachedWrongWords: vi.fn(async () => []),
+}));
+vi.mock('../../../modules/supabaseServer', () => ({ incrementBotWordUsage: vi.fn(async () => {}) }));
+vi.mock('../../../modules/communityWordManager', () => ({
+  isWordCommunityValid: vi.fn(() => false),
+  isWordValidForScoring: vi.fn(() => false),
+}));
 
 vi.mock('../gameEnd', () => ({
   endGame: vi.fn(),
@@ -120,18 +101,21 @@ vi.mock('../../../../shared/constants/wordHuntMultiplayerConstants', () => ({
 }));
 
 vi.mock('../../../dictionary', () => ({
-  ensureLanguageLoaded: vi.fn(),
+  ensureLanguageLoaded: vi.fn(async () => {}),
+  isDictionaryWord: vi.fn(() => true),
 }));
 
 vi.mock('../../../modules/botConfig', () => ({
   BOT_CONFIG: {
-    TIMING: { medium: { minDelay: 2000, maxDelay: 5000, startDelay: 1000 } },
+    TIMING: { medium: { minDelay: 2000, maxDelay: 5000, startDelay: 1000, typingSpeed: 0 } },
     WORDS: { medium: { maxWordLength: 7, wordsPerMinute: 4, focusOnShort: false, missChance: 0, wrongWordChance: 0 } },
   },
 }));
 
 import { startBotsForGame } from '../botGame';
-import { addPlayerWord, updatePlayerScore } from '../../../modules/gameStateManager';
+import { addPlayerWord, updatePlayerScore, addPlayerEventBonus } from '../../../modules/gameStateManager';
+import { validateTargetGuess } from '../../../modules/wordHuntManager';
+import { calculateWordScore } from '@/shared/utils/scoring';
 import { broadcastToRoom, volatileBroadcastToRoom } from '../../../utils/socketHelpers';
 import { queuePlayerFoundWord } from '../../../utils/playerFoundWordBatcher';
 import * as botManager from '../../../modules/botManager';
@@ -186,121 +170,56 @@ describe('Bot Word Hunt - Regular Word Finding', () => {
     vi.useRealTimers();
   });
 
-  it('should call startBot for regular word finding in word-hunt mode', () => {
-    const grid = [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']];
+  const grid = [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']];
+  // First board word lands after startDelay (1000) + up to 2000 jitter.
+  const FIRST_WORD_MS = 3100;
 
+  it('word-hunt bots play board words: stored word score + per-letter board bonus as an event bonus', async () => {
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
+    await vi.advanceTimersByTimeAsync(FIRST_WORD_MS);
 
-    expect(botManager.startBot).toHaveBeenCalledWith(
-      mockBot,
-      grid,
-      'en',
-      expect.any(Function),
-      60,
-      expect.any(Number)
-    );
+    const [, , word, opts] = (addPlayerWord as Mock).mock.calls[0];
+    expect(opts).toEqual(expect.objectContaining({ autoValidated: true, isBot: true }));
+    const base = calculateWordScore(word, 0);
+    const boardBonus = word.length * 2; // BOARD_WORD_SCORE_PER_LETTER (mocked 2)
+    expect(opts.score).toBe(base);
+    expect(updatePlayerScore).toHaveBeenCalledWith('TEST1', 'BotPlayer', base + boardBonus, true);
+    // Same shape as the human path: the bonus survives into results via the accumulator.
+    expect(addPlayerEventBonus).toHaveBeenCalledWith('TEST1', 'BotPlayer', boardBonus);
   });
 
-  it('should process regular word submissions from bots in word-hunt mode', async () => {
-    const grid = [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']];
-
+  it('should broadcast botWordFound + queue playerFoundWord for regular words in word-hunt mode', async () => {
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
+    await vi.advanceTimersByTimeAsync(FIRST_WORD_MS);
 
-    // Advance past the simulated bot word submissions
-    vi.advanceTimersByTime(150);
-
-    // Bot should have submitted regular words via addPlayerWord
-    expect(addPlayerWord).toHaveBeenCalledWith(
-      'TEST1',
-      'BotPlayer',
-      'cat',
-      expect.objectContaining({
-        autoValidated: true,
-        isBot: true,
-      })
-    );
-
-    // Score should include BOARD_WORD_SCORE_PER_LETTER bonus (3 letters * 2 = 6 + base 3 = 9)
-    expect(updatePlayerScore).toHaveBeenCalledWith('TEST1', 'BotPlayer', 9, true);
-  });
-
-  it('should broadcast botWordFound for regular words in word-hunt mode', async () => {
-    const grid = [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']];
-
-    startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
-
-    vi.advanceTimersByTime(150);
-
+    const word = (addPlayerWord as Mock).mock.calls[0][2];
     expect(volatileBroadcastToRoom).toHaveBeenCalledWith(
-      mockIo,
-      'game:TEST1',
-      'botWordFound',
-      expect.objectContaining({
-        username: 'BotPlayer',
-        word: 'cat',
-      })
+      mockIo, 'game:TEST1', 'botWordFound',
+      expect.objectContaining({ username: 'BotPlayer', word, isFirstFinder: true }),
     );
-  });
-
-  it('should emit playerFoundWord so frontend shows bot word activity', async () => {
-    const grid = [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']];
-
-    startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
-
-    vi.advanceTimersByTime(150);
-
-    // playerFoundWord is now batched via queuePlayerFoundWord (not direct broadcast)
     expect(queuePlayerFoundWord).toHaveBeenCalledWith(
-      mockIo,
-      'TEST1',
-      expect.objectContaining({
-        username: 'BotPlayer',
-        word: 'cat',
-        comboLevel: 0,
-        isFirstFinder: true,
-      })
-    );
-
-    // Also verify botWordFound is broadcast (the direct event for bot activity visibility)
-    expect(volatileBroadcastToRoom).toHaveBeenCalledWith(
-      mockIo,
-      'game:TEST1',
-      'botWordFound',
-      expect.objectContaining({
-        username: 'BotPlayer',
-        word: 'cat',
-        isFirstFinder: true,
-      })
+      mockIo, 'TEST1',
+      expect.objectContaining({ username: 'BotPlayer', word, comboLevel: 0, isFirstFinder: true }),
     );
   });
 
   it('should broadcast wordHuntLifeUpdate after bot finds a regular word', async () => {
-    const grid = [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']];
-
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
-
-    vi.advanceTimersByTime(150);
+    await vi.advanceTimersByTimeAsync(FIRST_WORD_MS);
 
     expect(broadcastToRoom).toHaveBeenCalledWith(
-      mockIo,
-      'game:TEST1',
-      'wordHuntLifeUpdate',
-      expect.objectContaining({
-        playerLives: expect.any(Object),
-        eliminatedPlayers: expect.any(Array),
-      })
+      mockIo, 'game:TEST1', 'wordHuntLifeUpdate',
+      expect.objectContaining({ playerLives: expect.any(Object), eliminatedPlayers: expect.any(Array) }),
     );
   });
 
-  it('should also start word-hunt target guessing loop', () => {
-    const grid = [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']];
-
+  it('should also run the word-hunt target guessing loop alongside board words', async () => {
     startBotsForGame(mockIo, 'TEST1', grid, 'en', 60);
+    // Medium hunt start delay is 22s (+ up to 2s jitter).
+    await vi.advanceTimersByTimeAsync(24_500);
 
-    // Advance past the 100ms setTimeout for word hunt loop
-    vi.advanceTimersByTime(200);
-
-    // getGameBots should be called again for the word hunt loop
-    expect(botManager.getGameBots).toHaveBeenCalledTimes(2);
+    expect(addPlayerWord).toHaveBeenCalled();         // board words
+    expect(validateTargetGuess).toHaveBeenCalled();   // target guesses
+    expect(broadcastToRoom).toHaveBeenCalledWith(mockIo, 'game:TEST1', 'wordHuntBotGuess', expect.any(Object));
   });
 });

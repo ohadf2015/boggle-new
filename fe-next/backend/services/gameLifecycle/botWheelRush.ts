@@ -12,34 +12,37 @@
  *     (best available) word — otherwise it misses (skips the turn) or downgrades
  *     to a shorter, lower-scoring word. Medium sits at ~65%.
  *
- * Scoring mirrors the human wheelRushHandler path (validateWheelSubmission →
- * applyWheelWord → score gate → updatePlayerScore) under the parallel-discovery
- * model — no locks, steals, or reaping.
+ * What is Wheel-Rush-specific lives here: the word pool (trie walk over the
+ * wheel letters, frequency-banded per difficulty), the think-delay + per-turn
+ * success pacing, and pricing/claiming a word through the same wheelRushManager
+ * calls as the human handler (validateWheelSubmission → applyWheelWord), with
+ * the wheel's own activity event. Scheduling, gating and crediting are the
+ * shared bot engine (botEngine.ts).
  */
 
 import type { Server } from 'socket.io';
 import type { Language, WheelPuzzle, WheelRushModeState } from '@/shared/types/game';
 import type { Bot } from '../../modules/botBehavior';
-import { getGame, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
-import { incrementBotWordUsage } from '../../modules/supabaseServer';
 import { getCachedPlayerWords } from '../../modules/botBehaviorCache';
 import { orderWordPoolByFrequencyBand, MIN_CORPUS_FOR_BANDING } from '../../modules/wordFrequencyBanding';
-import {
-  getLeaderboardThrottled,
-  type LeaderboardPlayer,
-  type ScoreGameBase,
-} from '../../modules/scoreManager';
 import { getCachedTrie, type TrieNode } from '../../modules/boggleSolver';
 import {
   applyWheelWord,
+  scoreWheelWord,
   validateWheelSubmission,
 } from '../../modules/wheelRushManager';
-import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
-import { setBotTimeout } from '../../modules/botLifecycle';
+import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { ensureLanguageLoaded } from '../../dictionary';
-import { shouldBotScore, type BotScoreTuning } from './botGame';
+import type { BotScoreTuning } from './botScoreGate';
+import {
+  activateBot,
+  runWordBot,
+  type BotPlayRules,
+  type BotRoundContext,
+} from './botEngine';
 import {
   WHEEL_RUSH_MIN_WORD_LEN,
+  WHEEL_RUSH_FIRST_FINDER_BONUS,
   WHEEL_RUSH_BOT_THINK_MIN_MS,
   WHEEL_RUSH_BOT_THINK_MAX_MS,
   WHEEL_RUSH_BOT_SUCCESS_RATE,
@@ -111,15 +114,6 @@ function shuffle<T>(arr: T[]): T[] {
   return out;
 }
 
-function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
-  const game = getGame(gameCode);
-  if (!game) return;
-  const lbThrottleMs = parseInt(process.env.LEADERBOARD_THROTTLE_MS || '500');
-  getLeaderboardThrottled(game as unknown as ScoreGameBase, gameCode, (leaderboard: LeaderboardPlayer[]) => {
-    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
-  }, lbThrottleMs);
-}
-
 /** Random artificial think delay (ms) for a bot's next move. */
 export function botThinkDelay(rng: () => number = Math.random): number {
   const span = WHEEL_RUSH_BOT_THINK_MAX_MS - WHEEL_RUSH_BOT_THINK_MIN_MS;
@@ -159,76 +153,30 @@ export function decideBotWheelMove(
   return { action: 'submit', word };
 }
 
-function submitOneWord(
-  io: Server,
-  gameCode: string,
-  bot: Bot,
-  state: WheelRushModeState,
-  word: string,
-  language: Language,
-): void {
-  if (!bot.isActive) return;
-
-  const validation = validateWheelSubmission(state, word, language);
-  if (!validation.valid) {
-    logger.debug('BOT_WHEEL', `[${bot.username}] reject "${word}" — ${validation.error}`);
-    return;
-  }
-
-  const outcome = applyWheelWord(state, bot.username, word, Date.now());
-  const total = outcome.score;
-  if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty, WHEEL_RUSH_BOT_TUNING)) return;
-  bot.score += total;
-  updatePlayerScore(gameCode, bot.username, total, true);
-  addPlayerWord(gameCode, bot.username, word, {
-    score: total,
-    validated: true,
-    autoValidated: true,
-    isBot: true,
-  });
-  void incrementBotWordUsage(word, language);
-  // Opponent-activity ping — parallel discovery, no locking side effects.
-  broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordFound', {
-    word, by: bot.username, firstFinder: outcome.firstFinder,
-  });
-  broadcastWheelLeaderboard(io, gameCode);
-  logger.info('BOT_WHEEL', `${bot.username} found "${word}" (+${total}${outcome.firstFinder ? ' first-find' : ''})`);
-}
-
-function scheduleBot(
-  io: Server,
-  gameCode: string,
-  bot: Bot,
-  state: WheelRushModeState,
-  words: string[],
-  language: Language,
-  gameEndTime: number,
-): void {
-  if (!bot.isActive || words.length === 0) return;
-  const successRate = WHEEL_RUSH_BOT_SUCCESS_RATE[bot.difficulty] ?? WHEEL_RUSH_BOT_SUCCESS_RATE.medium;
-
-  // First move waits a full think-delay too — no more near-instant opening word.
-  const firstDelay = botThinkDelay();
-
-  const tick = (idx: number): void => {
-    if (!bot.isActive || idx >= words.length) return;
-    const remaining = gameEndTime - Date.now();
-    if (remaining <= 500) return;
-
-    // Per-turn success gate: land the intended word, miss (skip), or downgrade.
-    const move = decideBotWheelMove(words[idx], words.slice(idx + 1), successRate);
-    if (move.action === 'submit') {
-      submitOneWord(io, gameCode, bot, state, move.word, language);
-    } else {
-      logger.debug('BOT_WHEEL', `[${bot.username}] missed turn (skipped "${words[idx]}")`);
-    }
-
-    const delay = botThinkDelay();
-    if (delay >= remaining - 500) return;
-    setBotTimeout(bot, () => tick(idx + 1), delay);
+function wheelRules(state: WheelRushModeState): BotPlayRules {
+  return {
+    tuning: WHEEL_RUSH_BOT_TUNING,
+    quote(ctx: BotRoundContext, bot: Bot, word: string) {
+      if (!validateWheelSubmission(state, word, ctx.language).valid) return null;
+      const upper = word.toUpperCase();
+      // Preview for the gate only; applyWheelWord in commit is authoritative.
+      const firstFinderBonus = state.firstFinders && upper in state.firstFinders ? 0 : WHEEL_RUSH_FIRST_FINDER_BONUS;
+      let firstFinder = false;
+      return {
+        wordScore: scoreWheelWord(upper, state.puzzle.allLetters) + firstFinderBonus,
+        commit: () => {
+          const outcome = applyWheelWord(state, bot.username, upper, Date.now());
+          firstFinder = outcome.firstFinder;
+          return outcome.score;
+        },
+        // Wheel's own opponent-activity ping (parallel discovery: no lock/steal events).
+        announce: (credited: number) => {
+          broadcastToRoom(ctx.io, getGameRoom(ctx.gameCode), 'wheelWordFound', { word: upper, by: bot.username, firstFinder });
+          logger.info('BOT_WHEEL', `${bot.username} found "${upper}" (+${credited}${firstFinder ? ' first-find' : ''})`);
+        },
+      };
+    },
   };
-
-  setBotTimeout(bot, () => tick(0), firstDelay);
 }
 
 /**
@@ -244,13 +192,9 @@ export async function startBotsForWheelRush(
 ): Promise<void> {
   if (!bots || bots.length === 0) return;
 
-  // Recovery paths (server restart/redeploy → resumeGameTimerIfMissing, reconnect,
-  // late-join) relaunch bots WITHOUT the gameStartHandler dictionary pre-load. On a
-  // cold singleton getCachedTrie returns null and we'd bail below — bots flatline at
-  // 0 and the leaderboard freezes for everyone. Warm the dict first, like the classic
-  // bot driver (botBehavior). No-op when already loaded.
+  // Recovery paths relaunch bots WITHOUT the start handler's dictionary load;
+  // a cold trie would bail below and bots would flatline at 0.
   await ensureLanguageLoaded(language);
-
   const trie = getCachedTrie(language);
   if (!trie) {
     logger.warn('BOT_WHEEL', `No trie for language ${language}; skipping`);
@@ -262,31 +206,39 @@ export async function startBotsForWheelRush(
     logger.warn('BOT_WHEEL', `No wheel candidates for ${gameCode}`);
     return;
   }
-
-  const gameEndTime = Date.now() + timerSeconds * 1000;
-
   logger.info('BOT_WHEEL', `Game ${gameCode} (${language}): ${allCandidates.length} candidate wheel words for ${bots.length} bots`);
 
-  // Rank candidates by real player frequency so bots pick human-plausible words
-  // (easy → common first, hard → reach into rare real words) instead of a blind
-  // shuffle. Enumerated wheel words are UPPERCASE; player_words are lowercase, so
-  // key the rank map by uppercase. Falls back to shuffle when the corpus is thin.
+  // Rank by real player frequency so bots pick human-plausible words (easy →
+  // common first, hard → rare real words). Enumerated words are UPPERCASE;
+  // player_words are lowercase. Falls back to shuffle on a thin corpus.
   const playerWords = await getCachedPlayerWords(language);
   const rankByWord = playerWords.length >= MIN_CORPUS_FOR_BANDING
     ? new Map(playerWords.map((w, i) => [w.toUpperCase(), i]))
     : null;
 
+  const ctx: BotRoundContext = { io, gameCode, language, gameEndTime: Date.now() + timerSeconds * 1000 };
+  const rules = wheelRules(state);
   for (const bot of bots) {
-    bot.isActive = true;
-    // Banded (or shuffled) slice so bots diverge — also acts as a soft per-bot cap.
-    // Trimmed for the short 60s round so bots can't out-volume a focused human (see
-    // WHEEL_RUSH_BOT_TUNING for the matching score-ceiling softening).
+    // Trimmed per-bot slice for the short round (soft cap; see WHEEL_RUSH_BOT_TUNING).
     const perBotCap = bot.difficulty === 'hard' ? 14 : bot.difficulty === 'medium' ? 9 : 6;
     const ordered = rankByWord
       ? orderWordPoolByFrequencyBand(allCandidates, rankByWord, playerWords.length, bot.difficulty)
       : shuffle(allCandidates);
     const words = ordered.slice(0, perBotCap);
-    scheduleBot(io, gameCode, bot, state, words, language, gameEndTime);
+    const successRate = WHEEL_RUSH_BOT_SUCCESS_RATE[bot.difficulty] ?? WHEEL_RUSH_BOT_SUCCESS_RATE.medium;
+    let idx = 0;
+    activateBot(bot);
+    runWordBot(ctx, bot, rules, {
+      // Every move — the first one too — waits a full think-delay.
+      firstDelay: () => botThinkDelay(),
+      nextDelay: () => botThinkDelay(),
+      pick: () => {
+        if (idx >= words.length) return undefined;
+        const intended = words[idx++];
+        const move = decideBotWheelMove(intended, words.slice(idx), successRate);
+        return move.action === 'submit' ? move.word : null;
+      },
+    });
     logger.info('BOT_WHEEL', `Bot "${bot.username}" queued ${words.length} wheel words for ${gameCode}`);
   }
 }

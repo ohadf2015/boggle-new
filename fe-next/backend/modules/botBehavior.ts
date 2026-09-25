@@ -1,6 +1,7 @@
 /**
  * Bot Behavior Module
- * Handles bot word preparation, timing calculations, and submission logic
+ * Handles bot word preparation and personality timing (the play path is
+ * services/gameLifecycle/botEngine.ts)
  *
  * Extracted from botManager.ts for better separation of concerns
  */
@@ -8,7 +9,6 @@
 import type { LetterGrid, Language } from '@/shared/types/game';
 
 const { findWordsForBots } = require('./boggleSolver');
-const { calculateWordScore } = require('./scoringEngine');
 const { BOT_CONFIG } = require('./botConfig');
 const { ensureLanguageLoaded } = require('../dictionary');
 import logger from '../utils/logger';
@@ -31,7 +31,6 @@ import {
   getCachedDifficultyParams,
   getCachedWrongWords,
 } from './botBehaviorCache';
-import { incrementBotWordUsage } from './supabaseServer';
 
 // Bot interface
 export interface Bot {
@@ -373,64 +372,3 @@ export function calculateNextDelay(bot: Bot): number {
 
   return Math.round(delay);
 }
-
-// ==========================================
-// Word Submission
-// ==========================================
-
-/**
- * Submit a word from the bot
- */
-export async function submitBotWord(
-  bot: Bot,
-  onWordSubmit: ((data: WordSubmissionData) => number | boolean | void | Promise<number | boolean | void>) | null
-): Promise<void> {
-  if (!bot.isActive || bot.currentWordIndex >= bot.wordsToFind.length) {
-    return;
-  }
-
-  const word = bot.wordsToFind[bot.currentWordIndex];
-  bot.currentWordIndex++;
-
-  if (bot.wordsFound.includes(word)) {
-    return;
-  }
-
-  const score = calculateWordScore(word, bot.comboLevel);
-
-  let accepted = true;
-  let credited = score;
-  if (onWordSubmit && typeof onWordSubmit === 'function') {
-    const result = await onWordSubmit({
-      botId: bot.id,
-      username: bot.username,
-      word,
-      score,
-      comboLevel: bot.comboLevel,
-    });
-    if (result === false) accepted = false;
-    // Numeric return = the actual credited total (base + blast/wordHunt bonus).
-    // Must use typeof === 'number' rather than truthy check so a legitimate 0
-    // doesn't collapse to the reject path.
-    else if (typeof result === 'number') credited = result;
-  }
-
-  if (!accepted) {
-    bot.comboLevel = 0;
-    return;
-  }
-
-  bot.wordsFound.push(word);
-  bot.score += credited;
-  bot.comboLevel++;
-
-  // Credit the word the bot actually found so the player_words corpus knows
-  // which words bots use (times_found_by_bots). Fire-and-forget: never block
-  // the bot loop or fail a game on a DB hiccup.
-  if (bot.language) {
-    void incrementBotWordUsage(word, bot.language);
-  }
-
-  logger.debug('BOT', `Bot "${bot.username}" submitted "${word}" (score: ${score}, combo: ${bot.comboLevel})`);
-}
-

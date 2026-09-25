@@ -17,7 +17,7 @@ import {
 import { broadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../../utils/socketHelpers';
 import timerManager, { clearGameTimer } from '../../utils/timerManager';
 import * as botManager from '../../modules/botManager';
-import { clearBotScoringStart, clearBotVariance } from './botGame';
+import { clearBotRoundState } from '../../modules/botRoundState';
 import { gameCleanupEmitter } from '../../events/gameCleanup';
 import { calculateAndBroadcastFinalScores } from './gameScores';
 import { recordGameResultsToSupabase } from './gameResults';
@@ -74,8 +74,7 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
 
   // Stop all bots
   botManager.stopAllBots(gameCode);
-  clearBotScoringStart(gameCode);
-  clearBotVariance(gameCode);
+  clearBotRoundState(gameCode);
 
   // Clean up AI validation tracking
   cleanupGameTracking(gameCode);

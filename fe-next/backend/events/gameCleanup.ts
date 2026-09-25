@@ -59,6 +59,27 @@ class GameCleanupEmitter extends EventEmitter {
   }
 
   /**
+   * Emit game DELETED — the room itself is gone (not just a round ending).
+   * `gameEnd` fires at every round end AND on deletion; state that must live
+   * for the whole room (e.g. the bot roster) releases on this event only.
+   */
+  emitGameDeleted(gameCode: string): void {
+    logger.debug('CLEANUP', `Emitting gameDeleted cleanup for ${gameCode}`);
+    for (const listener of this.listeners('gameDeleted')) {
+      try {
+        listener({ gameCode });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('CLEANUP', `gameDeleted listener threw for ${gameCode}: ${err.message}`);
+      }
+    }
+  }
+
+  onGameDeleted(handler: (data: { gameCode: string }) => void): void {
+    this.on('gameDeleted', handler);
+  }
+
+  /**
    * Subscribe to game end cleanup
    * Handlers should call this to register their cleanup functions
    */

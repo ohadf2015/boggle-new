@@ -33,6 +33,8 @@ vi.mock('../../../modules/gameStateManager', () => ({
   getGame: mocks.getGame,
   getLeaderboard: mocks.getLeaderboard,
   getLeaderboardThrottled: mocks.getLeaderboardThrottled,
+  playerHasWord: () => false,
+  addPlayerEventBonus: vi.fn(),
 }));
 vi.mock('../../../utils/socketHelpers', () => ({
   broadcastToRoom: mocks.broadcastToRoom,

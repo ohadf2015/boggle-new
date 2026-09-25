@@ -54,14 +54,12 @@ import {
   clearBotManagerCaches,
   generateRandomPlayerName,
   getRandomGenericAvatar,
-  startBot,
   BOT_CONFIG,
 } from '../modules/botManager';
 
 import {
   calculateNextDelay,
   generateWrongWords,
-  submitBotWord,
   prepareBotWords,
   clearBehaviorCaches,
   getCacheStats,
@@ -464,171 +462,8 @@ describe('Bot Behavior', () => {
     });
   });
 
-  describe('Word Submission', () => {
-
-    function createMockBot(overrides: Partial<Bot> = {}): Bot {
-      return {
-        id: 'bot-test',
-        gameCode: 'TEST',
-        username: 'TestBot',
-        avatar: { avatarImage: 'test', emoji: '⚙️', color: '#000' },
-        difficulty: 'medium',
-        personality: 'steady',
-        isBot: true,
-        wordsToFind: ['hello', 'world', 'testing'],
-        wordsFound: [],
-        currentWordIndex: 0,
-        score: 0,
-        comboLevel: 0,
-        inBurstMode: false,
-        burstWordsRemaining: 0,
-        nextWordTime: null,
-        activeTimers: new Set(),
-        isActive: true,
-        avgThinkingTime: 3000,
-        typingSpeed: 250,
-        burstChance: 0.15,
-        pauseChance: 0,
-        comboFocus: false,
-        ...overrides
-      };
-    }
-
-    test('submitBotWord increments word index', async () => {
-      const bot = createMockBot();
-      const callback = vi.fn();
-
-      await submitBotWord(bot, callback);
-
-      expect(bot.currentWordIndex).toBe(1);
-    });
-
-    test('submitBotWord adds word to wordsFound', async () => {
-      const bot = createMockBot();
-      const callback = vi.fn();
-
-      await submitBotWord(bot, callback);
-
-      expect(bot.wordsFound).toContain('hello');
-    });
-
-    test('submitBotWord updates score', async () => {
-      const bot = createMockBot();
-      const callback = vi.fn();
-
-      await submitBotWord(bot, callback);
-
-      expect(bot.score).toBeGreaterThan(0);
-    });
-
-    test('submitBotWord increments combo level', async () => {
-      const bot = createMockBot();
-      const callback = vi.fn();
-
-      await submitBotWord(bot, callback);
-
-      expect(bot.comboLevel).toBe(1);
-    });
-
-    test('submitBotWord calls callback with correct data', async () => {
-      const bot = createMockBot();
-      const callback = vi.fn();
-
-      await submitBotWord(bot, callback);
-
-      expect(callback).toHaveBeenCalledWith({
-        botId: 'bot-test',
-        username: 'TestBot',
-        word: 'hello',
-        score: expect.any(Number),
-        comboLevel: 0, // Combo level when submitted (before increment)
-      });
-    });
-
-    test('submitBotWord does nothing when inactive', async () => {
-      const bot = createMockBot({ isActive: false });
-      const callback = vi.fn();
-
-      await submitBotWord(bot, callback);
-
-      expect(callback).not.toHaveBeenCalled();
-      expect(bot.currentWordIndex).toBe(0);
-    });
-
-    test('submitBotWord credits times_found_by_bots for accepted words', async () => {
-      const bot = createMockBot({ language: 'en' });
-      const callback = vi.fn(); // undefined return = accepted
-
-      await submitBotWord(bot, callback);
-
-      expect(incrementBotWordUsage).toHaveBeenCalledWith('hello', 'en');
-    });
-
-    test('submitBotWord does NOT credit bot usage when the word is rejected', async () => {
-      const bot = createMockBot({ language: 'en' });
-      const callback = vi.fn().mockReturnValue(false); // rejected
-
-      await submitBotWord(bot, callback);
-
-      expect(incrementBotWordUsage).not.toHaveBeenCalled();
-    });
-
-    test('submitBotWord does nothing when all words submitted', async () => {
-      const bot = createMockBot({ currentWordIndex: 3 });
-      const callback = vi.fn();
-
-      await submitBotWord(bot, callback);
-
-      expect(callback).not.toHaveBeenCalled();
-    });
-
-    test('submitBotWord skips duplicate words', async () => {
-      const bot = createMockBot({ wordsFound: ['hello'] });
-      const callback = vi.fn();
-
-      await submitBotWord(bot, callback);
-
-      expect(callback).not.toHaveBeenCalled();
-      expect(bot.currentWordIndex).toBe(1);
-    });
-
-    test('submitBotWord does not inflate score when callback returns false', async () => {
-      const bot = createMockBot();
-      const rejectingCallback = vi.fn().mockReturnValue(false);
-
-      await submitBotWord(bot, rejectingCallback);
-
-      expect(rejectingCallback).toHaveBeenCalled();
-      expect(bot.score).toBe(0);
-      expect(bot.comboLevel).toBe(0);
-      expect(bot.wordsFound).not.toContain('hello');
-      expect(bot.currentWordIndex).toBe(1);
-    });
-
-    test('submitBotWord does not inflate score when async callback resolves false', async () => {
-      const bot = createMockBot();
-      const rejectingCallback = vi.fn().mockResolvedValue(false);
-
-      await submitBotWord(bot, rejectingCallback);
-
-      expect(bot.score).toBe(0);
-      expect(bot.comboLevel).toBe(0);
-      expect(bot.wordsFound).not.toContain('hello');
-    });
-
-    test('submitBotWord credits numeric callback return as bot score (H1)', async () => {
-      const bot = createMockBot();
-      // botGame callback returns totalScore = base + blast/wordHunt bonuses.
-      // bot.score must accumulate that total so shouldBotScore cap is honoured.
-      const numericCallback = vi.fn().mockResolvedValue(42);
-
-      await submitBotWord(bot, numericCallback);
-
-      expect(bot.score).toBe(42);
-      expect(bot.comboLevel).toBe(1);
-      expect(bot.wordsFound).toContain('hello');
-    });
-  });
+  // 'Word Submission' (submitBotWord) moved: the play path is now the shared bot
+  // engine for every mode — see services/gameLifecycle/__tests__/botEngine.test.ts.
 
   describe('Frequency-banded sampling', () => {
     // Corpus ordered by frequency DESC: common=rank0, mid=rank1, rare=rank2

@@ -244,6 +244,9 @@ function deleteGame(gameCode: string): void {
   // their map entries and pending timers. Idempotent: a game that already
   // ended normally just re-runs no-op deletes.
   gameCleanupEmitter.emitGameEnd(gameCode);
+  // Room-lifetime state (the bot roster) releases on deletion only — a round
+  // ending emits gameEnd too and must not drop the room's bots.
+  gameCleanupEmitter.emitGameDeleted(gameCode);
   // A classroom code outlives its room by up to four hours in Redis, so the
   // room going away is what has to kill it — every genuine teardown (closeRoom,
   // host-left, grace expiry, the empty-room and stale sweeps) converges here,
@@ -336,20 +339,6 @@ function resetGameForNewRound(gameCode: string): boolean {
   peerValidationManager.resetPeerValidation(asBase<PeerValidationGameBase>(game));
   readyStateManager.clearPlayersReadyForNextGame(asBase<ReadyStateGameBase>(game));
 
-  // Stop all bots for this game — they'll be re-added when the next round starts.
-  // Without this, bot timers accumulate across rounds.
-  // Also zero each bot's per-round score/combo: bots are REUSED across rounds, and
-  // the dedicated blast/wheel-rush drivers never re-zero bot.score (only the classic
-  // word-pool prep does). Without this, a reused bot kept a stale-high score and
-  // shouldBotScore rejected every word, freezing the bot at 0 on repeat blast rounds.
-  try {
-    const { stopAllBots, resetBotsForNewRound } = require('../modules/botManager');
-    stopAllBots(gameCode);
-    resetBotsForNewRound(gameCode);
-  } catch {
-    // botManager may not be loaded in test environments
-  }
-
   // Clear all player reconnection timeouts to prevent orphaned timeouts
   // from removing players from the NEW game after reset
   for (const [username] of Object.entries(game.users)) {
@@ -363,6 +352,10 @@ function resetGameForNewRound(gameCode: string): boolean {
   // handler that nothing had ever emitted, so their timers and maps only ever
   // got swept by `emitGameEnd` — leaving them live whenever a reset arrived
   // from a state that never reached `endGame` (see the defensive branch above).
+  // This also runs THE per-round bot reset (botManager subscribes: stops bot
+  // timers, zeroes score/combo/found words, drops per-round bot bookkeeping) —
+  // unconditionally, for every mode. Bots are REUSED across rounds; a
+  // mode-specific reset path is how blast bots once froze at 0 (pitfall 2).
   gameCleanupEmitter.emitGameReset(gameCode);
 
   game.earthquakeTriggered = false;

@@ -97,6 +97,8 @@ vi.mock('../../../modules/gameStateManager', () => ({
   trackBotWord: mocks.trackBotWord,
   getLeaderboard: mocks.getLeaderboard,
   getLeaderboardThrottled: mocks.getLeaderboardThrottled,
+  playerHasWord: () => false,
+  addPlayerEventBonus: vi.fn(),
 }));
 
 vi.mock('../../../utils/socketHelpers', () => ({
@@ -153,6 +155,7 @@ vi.mock('../../../modules/botManager', () => ({
 
 vi.mock('../../../modules/botLifecycle', () => ({
   setBotTimeout: mocks.setBotTimeout,
+  stopBot: (bot: Bot) => { bot.isActive = false; bot.activeTimers.clear(); },
 }));
 
 vi.mock('./botGame', () => ({

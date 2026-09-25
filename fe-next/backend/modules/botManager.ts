@@ -4,9 +4,10 @@
  *
  * REFACTORED: Core functionality extracted into focused modules:
  * - botConfig.ts        - Configuration constants (TIMING, WORDS, AVATARS, NAMES, PERSONALITIES)
- * - botBehavior.ts      - Word preparation, timing calculations, submission logic
+ * - botBehavior.ts      - Word preparation, personality timing
  * - botCreation.ts      - Bot ID/name/avatar generation, bot object creation
- * - botLifecycle.ts     - Timer management, startBot/stopBot, word scheduling
+ * - botLifecycle.ts     - Per-bot timers (setBotTimeout/stopBot)
+ * The per-round play path for every mode is services/gameLifecycle/botEngine.ts.
  *
  * This file acts as a facade for bot CRUD management and re-exports all functionality.
  */
@@ -19,7 +20,7 @@ import {
   resetBotIdCounter,
   type GameUser,
 } from './botCreation';
-import { startBot as _startBot, stopBot as _stopBot } from './botLifecycle';
+import { stopBot as _stopBot } from './botLifecycle';
 import { BOT_CONFIG } from './botConfig';
 import {
   prepareBotWords,
@@ -34,6 +35,7 @@ import { getRecentGames } from '../services/playerGameHistory';
 import { calculatePlayerLevel, selectBotDifficulty } from '../services/adaptiveDifficulty';
 import logger from '../utils/logger';
 import { gameCleanupEmitter } from '../events/gameCleanup';
+import { clearBotRoundState } from './botRoundState';
 
 // Re-export types
 export type { Bot, WordSubmissionData };
@@ -51,7 +53,7 @@ export {
 } from './botCreation';
 
 // Re-export lifecycle
-export { startBot, stopBot, resyncBotsForNewGrid } from './botLifecycle';
+export { stopBot } from './botLifecycle';
 
 // Re-export blacklist management
 export { addWordToBlacklist };
@@ -232,14 +234,18 @@ export function cleanupGameBots(gameCode: string): void {
   logger.info('BOT', `Cleaned up bots for game ${gameCode}`);
 }
 
-// Games can be deleted WITHOUT a normal endGame (abandonment sweep, empty-room
-// cleanup, host-left pre-start) — deleteGame emits gameEnd on every deletion
-// path, so subscribing here guarantees the bot map entry (and the bots' live
-// scheduling timeouts, which retain their closures) are always released.
-// Handler paths that already call cleanupGameBots explicitly stay correct:
-// cleanup is idempotent.
+// A round ending (gameEnd) only STOPS the bots — they are room members and play
+// the next round. The roster is released when the room itself is deleted
+// (abandonment sweep, empty-room cleanup, host-left): deleteGame emits
+// gameDeleted on every deletion path. Idempotent with explicit cleanups.
 gameCleanupEmitter.onGameEnd(({ gameCode }) => {
+  if (gameBots.has(gameCode)) stopAllBots(gameCode);
+});
+// THE per-round reset, for every mode (resetGameForNewRound emits gameReset).
+gameCleanupEmitter.onGameReset(({ gameCode }) => resetBotsForNewRound(gameCode));
+gameCleanupEmitter.onGameDeleted(({ gameCode }) => {
   if (gameBots.has(gameCode)) cleanupGameBots(gameCode);
+  clearBotRoundState(gameCode);
 });
 
 // ==========================================
@@ -254,22 +260,26 @@ export function resetBotCombo(gameCode: string, username: string): void {
 }
 
 /**
- * Reset every bot's per-round in-memory state at the start of a new round.
- *
- * Bots are created once per room and REUSED across rounds. The classic driver
- * re-zeroes a bot via prepareBotWords, but the dedicated blast/wheel-rush drivers
- * never call it — so a reused bot kept a stale-high `bot.score`, which made
- * `shouldBotScore` reject every word and freeze the bot at 0. This is the bot-side
- * mirror of scoreManager.resetScoresForNewRound (which zeroes game.playerScores),
- * and is invoked together with it from resetGameForNewRound.
+ * THE per-round bot reset — runs on every gameReset (resetGameForNewRound),
+ * unconditionally, for every mode. Bots are created once per room and REUSED across rounds, so
+ * everything a round accumulates must be cleared here, in one place: timers,
+ * score, combo, word pools, found words, and the per-round bookkeeping kept
+ * outside the Bot objects (grace window, variance, anti-grief windows).
+ * A mode-specific reset path is how blast bots once froze at 0.
  */
 export function resetBotsForNewRound(gameCode: string): void {
   for (const bot of getGameBots(gameCode)) {
+    _stopBot(bot);
     bot.score = 0;
     bot.comboLevel = 0;
+    bot.wordsToFind = [];
     bot.wordsFound = [];
     bot.currentWordIndex = 0;
+    bot.inBurstMode = false;
+    bot.burstWordsRemaining = 0;
+    bot.nextWordTime = null;
   }
+  clearBotRoundState(gameCode);
 }
 
 export function getBotStats(gameCode: string, username: string): BotStats | null {
