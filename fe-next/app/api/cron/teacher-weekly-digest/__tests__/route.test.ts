@@ -25,6 +25,7 @@ function chainFor(name: string) {
   chain.not = self;
   chain.in = self;
   chain.gte = self;
+  chain.contains = self;
   chain.limit = self;
   chain.then = (resolve: unknown, reject: unknown) => Promise.resolve(result).then(resolve as never, reject as never);
   return chain;
@@ -71,6 +72,7 @@ describe('/api/cron/teacher-weekly-digest', () => {
       classroom_memberships: { data: [], error: null },
       practice_sessions: { data: [], error: null },
       subscriptions: { data: [], error: null },
+      subscription_events: { data: [], error: null },
     };
   });
 

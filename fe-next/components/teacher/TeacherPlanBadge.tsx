@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,6 +32,8 @@ function formatDate(iso: string | null, language: string): string {
 export function TeacherPlanBadge({ className }: { className?: string }) {
   const { t, language } = useLanguage();
   const { hasPro, loading, source, status, periodEnd, trialExpires, trialUsed, grant, grantExpired } = useTeacherPro();
+  // Capture once — React Compiler treats Date.now() during render as impure.
+  const [nowMs] = useState(() => Date.now());
 
   if (loading) return null;
 
@@ -45,7 +48,7 @@ export function TeacherPlanBadge({ className }: { className?: string }) {
     const isGift = source === 'admin_grant';
     const until = formatDate(grant?.expires_at ?? periodEnd, language);
     const daysLeft = trialUx.showBadge
-      ? polarTrialDaysLeft(trialExpires ?? periodEnd, Date.now())
+      ? polarTrialDaysLeft(trialExpires ?? periodEnd, nowMs)
       : null;
     const trialLabel = !trialUx.showBadge
       ? null
