@@ -19,8 +19,14 @@
   Check runs never touch training level / drill_progress.
 - Cooldown: one check per drill per 20h (server-enforced; a too-early or off-protocol check is
   stored as `benchmark:false, benchmarkRejected:true`, never as a measurement).
-- Metric per drill (higher = better): lightning = words/min, memory = recall accuracy,
-  combo = best chain, rare-gems = gem points.
+- Metric per drill (higher = better): lightning = words/min, memory = words recalled across
+  ALL rounds (the old words_found only covered the last round), combo = best chain,
+  rare-gems = rare-gem COUNT (score includes the random 12% Lucky Gem doubling).
+- Protocol levels from prod data (all runs so far at L1; memory recall 44%, ~1 rare gem/run):
+  lightning L1, memory L2, combo L1, rare-gems L1 — chosen to avoid floor effects.
+- Check mode = no assists: no boosts, no Memory Hunt clues (clues reveal the targets).
+- Noise is also floored at the metric's resolution (`unit`), so a single-word / single-link
+  wobble can never read as "reliable" change.
 - Analysis (pure, `analyzeBrainChecks`):
   - run #1 = **familiarisation**, excluded (largest practice jump is run 1→2).
   - baseline = mean of runs #2–#3; current = mean of latest 2 runs (disjoint → ≥5 runs).

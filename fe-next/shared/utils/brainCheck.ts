@@ -14,12 +14,19 @@
  */
 import type { DrillType } from '@/shared/types/cognitive';
 
-/** Fixed level per measured drill. NEVER change a value — it breaks every existing trend. */
+/**
+ * Fixed level per measured drill. NEVER change a level — it breaks every
+ * existing trend. `unit` is the metric's measurement resolution at that level
+ * (one word / one recalled word / one chain link / one rare gem): the noise
+ * estimate is floored at it so a single-unit wobble can never be "reliable".
+ */
+// Levels chosen from prod data (2026-09-25: every drill run so far was level 1;
+// Memory Hunt recall 44%, ~1 rare gem per run) — low levels avoid floor effects.
 export const BRAIN_CHECK_PROTOCOL = {
-  'lightning-round': { level: 2 },
-  'memory-hunt': { level: 3 },
-  'combo-master': { level: 2 },
-  'rare-gems': { level: 2 },
+  'lightning-round': { level: 1, unit: 1 }, // 60s round → 1 word = 1 wpm
+  'memory-hunt': { level: 2, unit: 1 },     // words recalled over up to 5 rounds × 3
+  'combo-master': { level: 1, unit: 1 },    // best chain, 8s link timeout
+  'rare-gems': { level: 1, unit: 1 },       // rare gems found in 90s
 } as const;
 
 export type BrainCheckDrill = keyof typeof BRAIN_CHECK_PROTOCOL;
@@ -53,14 +60,14 @@ export function brainCheckValue(drill: DrillType, row: BrainCheckRow): number | 
   switch (drill) {
     case 'lightning-round':
       return row.duration_seconds > 0 ? (row.words_found / row.duration_seconds) * 60 : null;
-    case 'memory-hunt': {
-      const total = num(extra.totalWords);
-      return total && total > 0 ? row.words_found / total : null;
-    }
+    case 'memory-hunt':
+      // Words recalled across every round (words_found only covers the last round).
+      return num(extra.recalled);
     case 'combo-master':
       return num(extra.maxCombo);
     case 'rare-gems':
-      return num(row.score);
+      // Rare-gem COUNT, not score: score includes the random Lucky Gem doubling.
+      return num(extra.rareWordsFound);
     default:
       return null;
   }
@@ -109,7 +116,7 @@ function successiveDiffSd(xs: number[]): number {
   return Math.sqrt(sum / (xs.length - 1) / 2);
 }
 
-export function analyzeBrainChecks(input: BrainCheckPoint[]): BrainCheckAnalysis {
+export function analyzeBrainChecks(input: BrainCheckPoint[], unit = 0): BrainCheckAnalysis {
   const points = [...input].sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
   const measured = points.slice(FAMILIARISATION_RUNS).map((p) => p.value);
   const baselineVals = measured.slice(0, BASELINE_RUNS);
@@ -124,7 +131,7 @@ export function analyzeBrainChecks(input: BrainCheckPoint[]): BrainCheckAnalysis
   const lastBaselineAt = Date.parse(points[FAMILIARISATION_RUNS + BASELINE_RUNS - 1].at);
   const spanDays = (Date.parse(points[points.length - 1].at) - lastBaselineAt) / DAY_MS;
   const b = baseline as number;
-  const sd = Math.max(successiveDiffSd(measured), Math.abs(b) * NOISE_FLOOR_FRACTION, 1e-6);
+  const sd = Math.max(successiveDiffSd(measured), Math.abs(b) * NOISE_FLOOR_FRACTION, unit, 1e-6);
   const seDiff = sd * Math.sqrt(1 / BASELINE_RUNS + 1 / CURRENT_RUNS);
   const rci = (current - b) / seDiff;
   const changePct = b !== 0 ? ((current - b) / Math.abs(b)) * 100 : null;
@@ -187,7 +194,7 @@ export function summarizeBrainChecks(
     }
     const available = isBrainCheckAvailable(lastCheckAt, now);
     out[drill] = {
-      analysis: analyzeBrainChecks(points),
+      analysis: analyzeBrainChecks(points, BRAIN_CHECK_PROTOCOL[drill].unit),
       lastCheckAt,
       available,
       nextAvailableAt: available || !lastCheckAt

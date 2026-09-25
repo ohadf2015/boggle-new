@@ -259,7 +259,7 @@ describe('processBrainDrillCompletion', () => {
   });
 
   describe('Brain Check (fixed-protocol benchmark)', () => {
-    const checkBody = { drillType: 'lightning-round', level: 2, score: 120, durationSeconds: 45, wordsFound: 9, extraData: { benchmark: true } };
+    const checkBody = { drillType: 'lightning-round', level: 1, score: 120, durationSeconds: 60, wordsFound: 9, extraData: { benchmark: true } };
     const run = (supabase, body = checkBody) =>
       processBrainDrillCompletion(body, 'user-1', 'sub-check', { supabase, source: 'live' });
 

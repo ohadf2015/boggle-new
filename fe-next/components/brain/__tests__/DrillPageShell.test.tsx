@@ -36,19 +36,21 @@ beforeEach(() => {
   global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ checks: { 'lightning-round': { analysis: { verdict: 'need-more', runs: 1, runsNeeded: 4, daysNeeded: 0, baseline: null, current: null, changePct: null, rci: null, points: [] } } } }) }) as never;
 });
 
-const result = { score: 90, wordsFound: 9, timeSpent: 45, level: 2, wordsPerMinute: 12 };
+const result = { score: 90, wordsFound: 9, timeSpent: 60, level: 1, wordsPerMinute: 9 };
 const complete = () => (drillProps[drillProps.length - 1].onComplete as (r: typeof result) => Promise<void>)(result);
 
 describe('DrillPageShell', () => {
   it('Given training mode, Then the drill runs at the player level with boosts available', () => {
     render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" />);
     expect(drillProps[0].level).toBe(4);
+    expect(drillProps[0].assists).toBe(true);
     expect(screen.getByTestId('boost')).toBeInTheDocument();
   });
 
   it('Given check mode, Then the drill runs at the fixed protocol level, no boosts', () => {
     render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" isCheck />);
-    expect(drillProps[0].level).toBe(2);
+    expect(drillProps[0].level).toBe(1);
+    expect(drillProps[0].assists).toBe(false);
     expect(screen.queryByTestId('boost')).not.toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'brain.check.title' })).toBeInTheDocument();
   });
@@ -57,7 +59,7 @@ describe('DrillPageShell', () => {
     saveDrillResult.mockResolvedValue({ success: true, brainCheck: 'recorded', xpAwarded: 10, newLevel: 4, previousLevel: 4 });
     render(<DrillPageShell Drill={FakeDrill as never} drillType="lightning-round" isCheck />);
     await act(async () => { await complete(); });
-    expect(saveDrillResult.mock.calls[0][0]).toMatchObject({ drillType: 'lightning-round', level: 2, extraData: { benchmark: true, wordsPerMinute: 12 } });
+    expect(saveDrillResult.mock.calls[0][0]).toMatchObject({ drillType: 'lightning-round', level: 1, extraData: { benchmark: true, wordsPerMinute: 9 } });
     await waitFor(() => expect(screen.getByTestId('overlay')).toHaveTextContent('check'));
   });
 

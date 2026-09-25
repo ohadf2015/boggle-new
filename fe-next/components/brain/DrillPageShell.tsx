@@ -33,12 +33,14 @@ export interface DrillComponentProps {
   onComplete: (result: never) => void;
   onExit: () => void;
   onPlayAgain: () => void;
+  /** false during a Brain Check — drills with helpers (Memory Hunt clues) turn them off. */
+  assists: boolean;
 }
 
 /** Per-drill mapping from the component's result to the submit payload. */
 const TO_SUBMISSION: Record<BrainCheckDrill, (r: DrillRunResult) => { wordsFound: number; extraData: Record<string, unknown> }> = {
   'lightning-round': (r) => ({ wordsFound: r.wordsFound, extraData: { wordsPerMinute: r.wordsPerMinute } }),
-  'memory-hunt': (r) => ({ wordsFound: r.wordsFound, extraData: { totalWords: r.totalWords } }),
+  'memory-hunt': (r) => ({ wordsFound: r.wordsFound, extraData: { totalWords: r.totalWords, recalled: r.recalled } }),
   'combo-master': (r) => ({ wordsFound: r.wordsFound, extraData: { maxCombo: r.maxCombo } }),
   'rare-gems': (r) => ({ wordsFound: r.totalWordsFound, extraData: { rareWordsFound: r.rareWordsFound } }),
 };
@@ -208,6 +210,7 @@ export default function DrillPageShell({ drillType, Drill, isCheck = false }: Pr
             onComplete={handleComplete as (r: never) => void}
             onExit={goHub}
             onPlayAgain={isCheck ? goHub : regenerate}
+            assists={!isCheck}
           />
         </FeatureErrorBoundary>
       </div>

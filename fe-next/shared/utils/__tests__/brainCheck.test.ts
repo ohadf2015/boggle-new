@@ -85,18 +85,19 @@ describe('brainCheckValue', () => {
   it('lightning-round = words per minute', () => {
     expect(brainCheckValue('lightning-round', row({ words_found: 9, duration_seconds: 45 }))).toBe(12);
   });
-  it('memory-hunt = recall accuracy', () => {
-    expect(brainCheckValue('memory-hunt', row({ words_found: 3, extra_data: { benchmark: true, totalWords: 4 } }))).toBe(0.75);
+  it('memory-hunt = words recalled across all rounds', () => {
+    expect(brainCheckValue('memory-hunt', row({ words_found: 1, extra_data: { benchmark: true, totalWords: 3, recalled: 9 } }))).toBe(9);
   });
   it('combo-master = best chain', () => {
     expect(brainCheckValue('combo-master', row({ extra_data: { benchmark: true, maxCombo: 7 } }))).toBe(7);
   });
-  it('rare-gems = gem points', () => {
-    expect(brainCheckValue('rare-gems', row({ score: 140 }))).toBe(140);
+  it('rare-gems = rare gems found (not score, which includes random Lucky Gem doubling)', () => {
+    expect(brainCheckValue('rare-gems', row({ score: 140, extra_data: { benchmark: true, rareWordsFound: 3 } }))).toBe(3);
+    expect(brainCheckValue('rare-gems', row({ score: 140 }))).toBeNull();
   });
   it('returns null for unusable rows (zero duration, missing totals)', () => {
     expect(brainCheckValue('lightning-round', row({ duration_seconds: 0 }))).toBeNull();
-    expect(brainCheckValue('memory-hunt', row({ extra_data: { benchmark: true } }))).toBeNull();
+    expect(brainCheckValue('memory-hunt', row({ extra_data: { benchmark: true, totalWords: 3 } }))).toBeNull();
   });
 });
 
@@ -152,5 +153,22 @@ describe('summarizeBrainChecks', () => {
     expect(s['lightning-round'].nextAvailableAt).toBe(new Date(now - 3600_000 + CD).toISOString());
     expect(s['memory-hunt'].available).toBe(true);
     expect(s['memory-hunt'].nextAvailableAt).toBeNull();
+  });
+});
+
+describe('measurement resolution floor', () => {
+  it('Given flat perfect recall then ONE missed word, Then no verdict flips (memory, unit 0.25)', () => {
+    const a = analyzeBrainChecks(pts([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.75]), 0.25);
+    expect(a.verdict).toBe('stable');
+  });
+
+  it('Given a steady combo of 5 then a single 6, Then it is not "reliably better" (combo, unit 1)', () => {
+    const a = analyzeBrainChecks(pts([5, 5, 5, 5, 5, 5, 5, 5, 5, 6]), 1);
+    expect(a.verdict).toBe('stable');
+  });
+
+  it('Given a sustained multi-unit gain, Then improvement is still detected with the unit floor', () => {
+    const a = analyzeBrainChecks(pts([3, 5, 5, 6, 7, 8, 9, 9]), 1);
+    expect(a.verdict).toBe('improved');
   });
 });

@@ -90,4 +90,36 @@ describe('useMemoryHuntGame — clue economy', () => {
       expect(tw.path.length, `${tw.word} must have a path`).toBeGreaterThan(0);
     }
   });
+
+  it('Brain Check (assists=false): no free clue and ad clue grants are ignored', () => {
+    const { result } = renderHook(() =>
+      useMemoryHuntGame({ grid, availableWords, level: 1, language: 'en', onComplete: vi.fn(), assists: false }),
+    );
+    act(() => result.current.startGame());
+    expect(result.current.hintsRemaining).toBe(0);
+    act(() => result.current.grantClues(3));
+    expect(result.current.hintsRemaining).toBe(0);
+  });
+
+  it('results.recalled counts recalled words across ALL rounds, not just the last', () => {
+    const { result } = renderHook(() =>
+      useMemoryHuntGame({ grid, availableWords, level: 1, language: 'en', onComplete: vi.fn() }),
+    );
+    act(() => result.current.startGame());
+    act(() => result.current.skipStudyPhase());
+    const recallAll = () => {
+      for (const tw of [...result.current.targetWords]) {
+        act(() => result.current.handleWordSubmit(tw.word));
+        act(() => { vi.advanceTimersByTime(900); });
+      }
+    };
+    recallAll(); // round 1: both words
+    expect(result.current.round).toBe(2);
+    act(() => { vi.advanceTimersByTime(10_000); }); // study phase of round 2
+    act(() => result.current.skipStudyPhase());
+    act(() => result.current.handleWordSubmit(result.current.targetWords[0].word));
+    act(() => { vi.advanceTimersByTime(900); });
+    expect(result.current.results.recalled).toBe(3);
+    expect(result.current.results.totalWords).toBe(2); // last-round only — why `recalled` exists
+  });
 });
