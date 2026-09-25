@@ -12134,6 +12134,8 @@ const en = {
         "updated": "{{count}} students graded",
         "skipped": "{{count}} students skipped: no practice on this lesson yet",
         "unmatchedTitle": "Not matched to a Classroom student",
+        "notReturnedTitle": "Graded, not returned yet",
+        "notReturnedNote": "hasn’t turned in the assignment yet, so the grade is saved as a draft",
         "failedTitle": "Couldn’t update these students",
         "reason": {
           "no_email": "no school email (guest account)",

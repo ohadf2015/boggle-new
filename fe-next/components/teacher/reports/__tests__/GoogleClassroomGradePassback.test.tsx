@@ -136,6 +136,46 @@ describe('GoogleClassroomGradePassback', () => {
     window.history.replaceState({}, '', '/');
   });
 
+  it('lists grades that were saved but not returned because the student has not turned the work in', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))
+      .mockResolvedValueOnce(json({ ok: true, courseWork: [{ id: 'w1', title: 'A', maxPoints: 100, associatedWithDeveloper: true }] }))
+      .mockResolvedValueOnce(
+        json({ ok: true, updated: 1, unmatched: [], failed: [], skipped: [], notReturned: [{ studentId: 's5', name: 'Ben' }] }),
+      );
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
+    await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
+    await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseWorkLabel`), 'w1');
+    await userEvent.click(screen.getByRole('button', { name: `${K}.confirm` }));
+
+    expect(await screen.findByText(`${K}.notReturnedTitle`)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`Ben.*${K}.notReturnedNote`))).toBeInTheDocument();
+  });
+
+  it('resets the "return grades" checkbox after Done, so the next run defaults to drafts-only again', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))
+      .mockResolvedValueOnce(json({ ok: true, courseWork: [{ id: 'w1', title: 'A', maxPoints: 100, associatedWithDeveloper: true }] }))
+      .mockResolvedValueOnce(json({ ok: true, updated: 1, unmatched: [], failed: [], skipped: [] }))
+      .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))
+      .mockResolvedValueOnce(json({ ok: true, courseWork: [{ id: 'w1', title: 'A', maxPoints: 100, associatedWithDeveloper: true }] }));
+
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
+    await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
+    await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseWorkLabel`), 'w1');
+    await userEvent.click(screen.getByRole('checkbox'));
+    expect(screen.getByRole('checkbox')).toBeChecked();
+    await userEvent.click(screen.getByRole('button', { name: `${K}.confirm` }));
+
+    await userEvent.click(await screen.findByRole('button', { name: `${K}.done` }));
+    await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
+    await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
+    await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseWorkLabel`), 'w1');
+    expect(screen.getByRole('checkbox')).not.toBeChecked();
+  });
+
   it('creates a LexiClash-owned Classroom assignment and selects it', async () => {
     fetchMock
       .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))

@@ -13580,6 +13580,8 @@ const es = {
         "updated": "{{count}} alumnos calificados",
         "skipped": "{{count}} alumnos omitidos: aún no han practicado esta lección",
         "unmatchedTitle": "Sin coincidencia con un alumno de Classroom",
+        "notReturnedTitle": "Calificado, aún no devuelto",
+        "notReturnedNote": "todavía no ha entregado la tarea, así que la nota queda guardada como borrador",
         "failedTitle": "No se pudo actualizar a estos alumnos",
         "reason": {
           "no_email": "sin correo del centro (cuenta de invitado)",

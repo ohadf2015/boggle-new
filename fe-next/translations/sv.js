@@ -13951,6 +13951,8 @@ const sv = {
         "updated": "{{count}} elever fick betyg",
         "skipped": "{{count}} elever hoppades över: har inte övat på lektionen än",
         "unmatchedTitle": "Kunde inte matchas mot en elev i Classroom",
+        "notReturnedTitle": "Betygsatt, men ännu inte returnerat",
+        "notReturnedNote": "har inte lämnat in uppgiften än, så betyget sparas bara som utkast",
         "failedTitle": "De här eleverna kunde inte uppdateras",
         "reason": {
           "no_email": "ingen skol-e-post (gästkonto)",

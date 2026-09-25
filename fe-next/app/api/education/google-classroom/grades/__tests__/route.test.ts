@@ -87,12 +87,19 @@ const json = (body: unknown, status = 200, headers: Record<string, string> = {})
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', ...headers } });
 
 /** Routes Google calls by URL so order of roster/submission reads does not matter. */
-function googleFetch(overrides: { patch?: () => Response; courseWork?: () => Response } = {}) {
+function googleFetch(overrides: { patch?: () => Response; courseWork?: () => Response; submissions?: () => Response } = {}) {
   return vi.fn(async (url: string, init?: RequestInit) => {
     const u = String(url);
     if (init?.method === 'PATCH') return overrides.patch ? overrides.patch() : json({ id: 'sub' });
     if (u.includes('/studentSubmissions')) {
-      return json({ studentSubmissions: [{ id: 'sub-dana', userId: 'g-dana' }, { id: 'sub-ido', userId: 'g-ido' }] });
+      return overrides.submissions
+        ? overrides.submissions()
+        : json({
+            studentSubmissions: [
+              { id: 'sub-dana', userId: 'g-dana', state: 'TURNED_IN' },
+              { id: 'sub-ido', userId: 'g-ido', state: 'TURNED_IN' },
+            ],
+          });
     }
     if (u.includes('/students')) {
       return json({
@@ -284,5 +291,55 @@ describe('POST /api/education/google-classroom/grades', () => {
     const res = await POST(await req(BODY));
     expect(res.status).toBe(429);
     expect(await res.json()).toMatchObject({ error: 'rate_limited', retryAfter: 5 });
+  });
+
+  it('returnGrades=true on a submission that has not been turned in still writes the grade, skips :return, and lists it as not-returned', async () => {
+    fetchMock = googleFetch({
+      submissions: () =>
+        json({
+          studentSubmissions: [
+            { id: 'sub-dana', userId: 'g-dana', state: 'CREATED' },
+            { id: 'sub-ido', userId: 'g-ido', state: 'CREATED' },
+          ],
+        }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const res = await POST(await req({ ...BODY, returnGrades: true }));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    // Grade still counts as updated — assignedGrade was written.
+    expect(body.updated).toBe(1);
+    expect(body.failed).toEqual([]);
+    expect(body.notReturned).toEqual([{ studentId: S_DANA, name: 'Dana' }]);
+
+    const calls = fetchMock.mock.calls;
+    const patch = calls.find(([, init]) => init?.method === 'PATCH');
+    expect(patch).toBeDefined();
+    expect(String(patch![0])).toContain('updateMask=draftGrade%2CassignedGrade');
+    // :return must never be called for a submission that isn't TURNED_IN (Google 400s on it).
+    expect(calls.some(([u]) => String(u).endsWith(':return'))).toBe(false);
+  });
+
+  it('maps an unmapped Google error status into a readable failed[] reason instead of the literal string "unknown"', async () => {
+    fetchMock = googleFetch({
+      patch: () => json({ error: { message: 'Precondition check failed.' } }, 400),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const res = await POST(await req(BODY));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.failed).toHaveLength(1);
+    expect(body.failed[0].reason).not.toBe('unknown');
+    expect(body.failed[0].reason).toContain('Precondition check failed');
+  });
+
+  it('never leaks a bearer/access token from a Google error message into the failed[] reason', async () => {
+    fetchMock = googleFetch({
+      patch: () => json({ error: { message: 'Invalid credentials: Bearer ya29.a0Af-secret-should-not-leak' } }, 400),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const res = await POST(await req(BODY));
+    const body = await res.json();
+    expect(body.failed[0].reason).not.toContain('ya29.a0Af-secret-should-not-leak');
   });
 });

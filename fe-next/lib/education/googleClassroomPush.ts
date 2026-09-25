@@ -41,7 +41,19 @@ export interface PushResult {
   unmatched: Array<Named & { reason: UnmatchedReason }>;
   failed: Array<Named & { reason: string }>;
   skipped: Named[];
+  /** Grade written (assignedGrade), but not returned: the student hasn't turned the work in yet
+   *  (Google's studentSubmissions.return rejects any state other than TURNED_IN with 400). */
+  notReturned: Named[];
   retryAfter?: number;
+}
+
+/** Google error messages sometimes get here (e.g. an unmapped 400). Keep them readable for
+ *  logs/UI without ever forwarding a bearer token or access-token-shaped string. */
+function sanitizeGoogleErrorMessage(message: string): string {
+  return message
+    .replace(/Bearer\s+\S+/gi, 'Bearer [redacted]')
+    .replace(/ya29\.[\w-]+/g, '[redacted]')
+    .slice(0, 200);
 }
 
 /** Thrown for LexiClash-side problems the route maps to 4xx/5xx. */
@@ -127,7 +139,7 @@ export async function pushGrades(input: PushInput): Promise<PushResult> {
   if (roster.length > 0 && !roster.some((r) => r.profile?.emailAddress)) {
     throw new GoogleClassroomError('reauth', 403, 'classroom.profile.emails not granted: roster has no emails');
   }
-  const subByUser = new Map(submissions.map((s) => [s.userId, s.id]));
+  const subByUser = new Map(submissions.map((s) => [s.userId, s]));
   const match = matchStudentsByEmail(students, roster);
 
   const result: PushResult = {
@@ -135,6 +147,7 @@ export async function pushGrades(input: PushInput): Promise<PushResult> {
     unmatched: match.unmatched.map((u) => ({ studentId: u.studentId, name: nameOf(u.studentId), reason: u.reason })),
     failed: [],
     skipped: [],
+    notReturned: [],
   };
 
   let stopped = false;
@@ -149,15 +162,24 @@ export async function pushGrades(input: PushInput): Promise<PushResult> {
       result.failed.push({ ...named, reason: 'rate_limited' });
       continue;
     }
-    const submissionId = subByUser.get(m.googleUserId);
-    if (!submissionId) {
+    const submission = subByUser.get(m.googleUserId);
+    if (!submission) {
       result.failed.push({ ...named, reason: 'no_submission' });
       continue;
     }
     try {
       const grade = scaleToMaxPoints(pct, maxPoints);
-      await patchSubmissionGrade(token, courseId, courseWorkId, submissionId, grade, returnGrades);
-      if (returnGrades) await returnSubmission(token, courseId, courseWorkId, submissionId);
+      // assignedGrade can be written regardless of turn-in state — it just stays invisible to
+      // the student until returned. Only :return itself requires TURNED_IN (Google 400s
+      // FAILED_PRECONDITION otherwise), so gate that call on the submission's own state.
+      await patchSubmissionGrade(token, courseId, courseWorkId, submission.id, grade, returnGrades);
+      if (returnGrades) {
+        if (submission.state === 'TURNED_IN') {
+          await returnSubmission(token, courseId, courseWorkId, submission.id);
+        } else {
+          result.notReturned.push(named);
+        }
+      }
       result.updated += 1;
     } catch (err) {
       if (err instanceof GoogleClassroomError) {
@@ -166,7 +188,11 @@ export async function pushGrades(input: PushInput): Promise<PushResult> {
           stopped = true;
           result.retryAfter = err.retryAfter;
         }
-        result.failed.push({ ...named, reason: err.kind });
+        // A known kind is already a stable, translatable reason. An unmapped ('unknown') status
+        // is more useful to a teacher/support as Google's own (sanitized) message than the bare
+        // word "unknown" — never forward a bearer/access token if one somehow ended up in it.
+        const reason = err.kind === 'unknown' ? `google_error: ${sanitizeGoogleErrorMessage(err.message)}` : err.kind;
+        result.failed.push({ ...named, reason });
       } else {
         logger.error('[gc-grades] patch failed unexpectedly', err);
         result.failed.push({ ...named, reason: 'unknown' });

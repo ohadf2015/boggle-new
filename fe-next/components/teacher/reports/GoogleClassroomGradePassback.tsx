@@ -19,7 +19,7 @@ interface Course { id: string; name: string }
 interface CourseWork { id: string; title: string; maxPoints?: number; associatedWithDeveloper?: boolean }
 interface Lesson { id: string; title: string }
 interface Named { studentId: string; name: string | null; reason?: string }
-interface PushSummary { updated: number; unmatched: Named[]; failed: Named[]; skipped: Named[]; retryAfter?: number }
+interface PushSummary { updated: number; unmatched: Named[]; failed: Named[]; skipped: Named[]; notReturned?: Named[]; retryAfter?: number }
 
 type Phase = 'idle' | 'loading' | 'connect' | 'pick' | 'sending' | 'done';
 
@@ -306,6 +306,16 @@ export function GoogleClassroomGradePassback({ classroomId }: { classroomId: str
           <h3 className="font-bold">{t('teacher.reports.googleClassroom.resultTitle')}</h3>
           <p>{t('teacher.reports.googleClassroom.updated', { count: summary.updated })}</p>
           {summary.skipped.length > 0 && <p>{t('teacher.reports.googleClassroom.skipped', { count: summary.skipped.length })}</p>}
+          {summary.notReturned && summary.notReturned.length > 0 && (
+            <div>
+              <p className="font-bold">{t('teacher.reports.googleClassroom.notReturnedTitle')}</p>
+              <ul className="list-disc ps-5">
+                {summary.notReturned.map((s) => (
+                  <li key={s.studentId}>{nameOf(s)} — {t('teacher.reports.googleClassroom.notReturnedNote')}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           {summary.unmatched.length > 0 && (
             <div>
               <p className="font-bold">{t('teacher.reports.googleClassroom.unmatchedTitle')}</p>
@@ -325,7 +335,15 @@ export function GoogleClassroomGradePassback({ classroomId }: { classroomId: str
             </div>
           )}
           {summary.retryAfter ? <p>{t('teacher.reports.googleClassroom.errorRateLimited', { seconds: summary.retryAfter })}</p> : null}
-          <button type="button" onClick={() => setPhase('idle')} className={`${btn} bg-neo-navy text-neo-white`}>
+          <button
+            type="button"
+            onClick={() => {
+              setPhase('idle');
+              // Returning grades is a deliberate, per-run choice — never carry it into the next run silently.
+              setReturnGrades(false);
+            }}
+            className={`${btn} bg-neo-navy text-neo-white`}
+          >
             {t('teacher.reports.googleClassroom.done')}
           </button>
         </div>

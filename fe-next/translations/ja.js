@@ -13716,6 +13716,8 @@ const ja = {
         "updated": "{{count}} 人の生徒を採点しました",
         "skipped": "{{count}} 人はスキップ：このレッスンをまだ練習していません",
         "unmatchedTitle": "Classroom の生徒と照合できませんでした",
+        "notReturnedTitle": "採点済み・未返却",
+        "notReturnedNote": "まだ課題を提出していないため、成績は下書きとして保存されています",
         "failedTitle": "次の生徒は更新できませんでした",
         "reason": {
           "no_email": "学校のメールアドレスなし（ゲストアカウント）",
