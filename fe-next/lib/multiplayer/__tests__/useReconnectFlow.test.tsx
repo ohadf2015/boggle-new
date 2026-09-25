@@ -4,8 +4,8 @@
  *
  * - Shows overlay when isReconnecting + gameActive
  * - Sets showAbortModal on reconnect_failed
- * - Emits resume on socket connect after prior in-game disconnect
- * - Tracks lastServerSeq from scoreUpdate
+ * - Never emits the dead `resume` event: no server handler exists; reconnect
+ *   restores state via the `join` re-emit in useMultiplayerSocket.onConnect.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -112,7 +112,7 @@ describe('useReconnectFlow', () => {
     expect(result.current.showAbortModal).toBe(true);
   });
 
-  it('emits resume on socket connect when game was active before disconnect', () => {
+  it('does NOT emit the dead `resume` event on reconnect (server has no listener; `join` re-emit restores state)', () => {
     const handlers: Record<string, ((...args: unknown[]) => void)[]> = {};
     mockSocket.on.mockImplementation((event: string, handler: (...args: unknown[]) => void) => {
       handlers[event] = handlers[event] || [];
@@ -127,11 +127,7 @@ describe('useReconnectFlow', () => {
     act(() => { handlers['disconnect']?.forEach(h => h('transport error')); });
     act(() => { handlers['connect']?.forEach(h => h()); });
 
-    expect(mockSocket.emit).toHaveBeenCalledWith('resume', expect.objectContaining({
-      gameCode: 'GAME1',
-      username: 'bob',
-      lastServerSeq: expect.any(Number),
-    }));
+    expect(mockSocket.emit).not.toHaveBeenCalledWith('resume', expect.anything());
   });
 
   it('does NOT emit resume on first connect (not a reconnect)', () => {
@@ -149,26 +145,6 @@ describe('useReconnectFlow', () => {
     act(() => { handlers['connect']?.forEach(h => h()); });
 
     expect(mockSocket.emit).not.toHaveBeenCalledWith('resume', expect.anything());
-  });
-
-  it('updates lastServerSeq from scoreUpdate events', () => {
-    const handlers: Record<string, ((...args: unknown[]) => void)[]> = {};
-    mockSocket.on.mockImplementation((event: string, handler: (...args: unknown[]) => void) => {
-      handlers[event] = handlers[event] || [];
-      handlers[event].push(handler);
-    });
-
-    const { result } = renderHook(() =>
-      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
-    );
-
-    expect(result.current.lastServerSeq).toBe(0);
-
-    act(() => {
-      handlers['scoreUpdate']?.forEach(h => h({ serverSeq: 5, username: 'alice', deltaScore: 3, totalScore: 23 }));
-    });
-
-    expect(result.current.lastServerSeq).toBe(5);
   });
 
   it('forwards maxReconnectAttempts from socket context', () => {

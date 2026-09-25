@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSocket } from '@/utils/SocketContext';
 
 export interface ReconnectFlowOptions {
@@ -17,60 +17,30 @@ export interface ReconnectFlowApi {
    *  reconnect banner instead of the full-screen "you went offline" modal. */
   isServerUpdating: boolean;
   showAbortModal: boolean;
-  lastServerSeq: number;
   triggerAbort: () => void;
   dismissAbortModal: () => void;
 }
 
-export function useReconnectFlow({
-  gameCode,
-  username,
-  gameActive,
-}: ReconnectFlowOptions): ReconnectFlowApi {
+/**
+ * In-game reconnect UI state. State restoration itself is NOT done here: the
+ * socket's `connect` handler (hooks/useMultiplayerSocket.ts onConnect) re-emits
+ * `join`, and the server answers with `joined{reconnected}` + `startGame{reconnect}`
+ * + `updateLeaderboard`. (A `resume` emit used to live here; no server ever
+ * listened to it.)
+ */
+export function useReconnectFlow(_options: ReconnectFlowOptions): ReconnectFlowApi {
   const { socket, isReconnecting, getReconnectAttempt, maxReconnectAttempts, isServerUpdating } =
     useSocket();
   const [showAbortModal, setShowAbortModal] = useState(false);
-  const [lastServerSeq, setLastServerSeq] = useState(0);
-  const wasDisconnectedWhileActive = useRef(false);
 
   useEffect(() => {
     if (!socket) return;
-
-    const handleDisconnect = () => {
-      if (gameActive) {
-        wasDisconnectedWhileActive.current = true;
-      }
-    };
-
-    const handleConnect = () => {
-      if (wasDisconnectedWhileActive.current) {
-        wasDisconnectedWhileActive.current = false;
-        socket.emit('resume', { gameCode, username, lastServerSeq });
-      }
-    };
-
-    const handleReconnectFailed = () => {
-      setShowAbortModal(true);
-    };
-
-    const handleScoreUpdate = (data: { serverSeq?: number }) => {
-      if (typeof data.serverSeq === 'number') {
-        setLastServerSeq(data.serverSeq);
-      }
-    };
-
-    socket.on('disconnect', handleDisconnect);
-    socket.on('connect', handleConnect);
+    const handleReconnectFailed = () => setShowAbortModal(true);
     socket.on('reconnect_failed', handleReconnectFailed);
-    socket.on('scoreUpdate', handleScoreUpdate);
-
     return () => {
-      socket.off('disconnect', handleDisconnect);
-      socket.off('connect', handleConnect);
       socket.off('reconnect_failed', handleReconnectFailed);
-      socket.off('scoreUpdate', handleScoreUpdate);
     };
-  }, [socket, gameCode, username, gameActive, lastServerSeq]);
+  }, [socket]);
 
   const triggerAbort = () => setShowAbortModal(true);
   const dismissAbortModal = () => setShowAbortModal(false);
@@ -81,7 +51,6 @@ export function useReconnectFlow({
     maxReconnectAttempts,
     isServerUpdating: isServerUpdating ?? false,
     showAbortModal,
-    lastServerSeq,
     triggerAbort,
     dismissAbortModal,
   };
