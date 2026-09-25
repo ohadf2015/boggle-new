@@ -213,7 +213,7 @@ export function AcademyHub(props: AcademyHubProps) {
     />
   );
 
-  const goSolo = () => router.push(`/${language}/quick-play`);
+  const goSolo = () => router.push(`/${language}/quick-play?academy=1`);
 
   const pressCta = () => {
     posthog.capture('student_academy_cta_clicked', { kind: action.kind });

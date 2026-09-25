@@ -108,7 +108,7 @@ describe('StudentHubPlayZone', () => {
     const soloPracticeCard = soloPracticeText.closest('div[class*="rounded-neo"]');
     expect(soloPracticeCard).toBeInTheDocument();
     fireEvent.click(soloPracticeCard!);
-    expect(mockPush).toHaveBeenCalledWith('/en/quick-play');
+    expect(mockPush).toHaveBeenCalledWith('/en/quick-play?academy=1');
   });
 
   it('renders three cards: Play with Class, Solo Practice, and Quick Duel', () => {

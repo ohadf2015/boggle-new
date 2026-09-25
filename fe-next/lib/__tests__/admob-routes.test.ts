@@ -151,3 +151,16 @@ describe('teacher module is ad-free in every format', () => {
     expect(isAllowedAdBannerRoute('/en/multiplayer', classroom)).toBe(false);
   });
 });
+
+describe('Academy solo play stays ad-free', () => {
+  it('treats quick-play launched from the student Academy as ad-free', () => {
+    const fromAcademy = new URLSearchParams('academy=1');
+    expect(isAdFreeRoute('/en/quick-play', fromAcademy)).toBe(true);
+    expect(isAllowedAdBannerRoute('/he/quick-play', fromAcademy)).toBe(false);
+  });
+
+  it('leaves consumer quick-play monetized', () => {
+    expect(isAdFreeRoute('/en/quick-play', new URLSearchParams())).toBe(false);
+    expect(isAdFreeRoute('/en/quick-play', null)).toBe(false);
+  });
+});

@@ -98,5 +98,7 @@ export function isAdFreeRoute(
   if (!pathname) return false;
   const path = pathname.replace(LOCALE_PREFIX, '') || '/';
   if (path.startsWith('/multiplayer') && search?.get('classroom') === 'true') return true;
+  // Solo play launched from the student Academy (`?academy=1`) — a student surface.
+  if (search?.get('academy') === '1') return true;
   return AD_FREE_ROUTES.some((r) => path === r || path.startsWith(`${r}/`));
 }
