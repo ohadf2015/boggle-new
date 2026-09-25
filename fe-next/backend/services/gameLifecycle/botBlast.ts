@@ -16,8 +16,8 @@ import type { Server } from 'socket.io';
 import type { Language, BlastModeState } from '@/shared/types/game';
 import type { Bot } from '../../modules/botBehavior';
 import { getGame, updatePlayerScore, addPlayerWord, recordFirstFinder, trackBotWord } from '../../modules/gameStateManager';
+import { scoreAcceptedWord } from '../../modules/wordScore';
 import {
-  calculateBlastTileBonus,
   getTilesOnPath,
   recordBlastMove,
   getWordPath,
@@ -138,10 +138,12 @@ export function submitBlastWord(
 
     // Calculate blast tile bonus against the bot's board
     const tilesOnPath = getTilesOnPath(word, boardPositions, board.overlay, board.overlayMap);
-    const blastTileBonus = calculateBlastTileBonus(tilesOnPath);
+    // Same per-word scorer as a human submitting this word (integer total).
+    const scored = scoreAcceptedWord({ word, comboLevel: bot.comboLevel || 0, blastTiles: tilesOnPath });
+    const blastTileBonus = scored.blastTileBonus;
     const gemCount = tilesOnPath.filter((t: string) => t === 'gem').length;
 
-    const totalScore = word.length - 1 + blastTileBonus;
+    const totalScore = scored.total;
 
     // Score cap: prevent bots from dominating
     if (!shouldBotScore(gameCode, bot.username, bot.score, totalScore, bot.difficulty)) {

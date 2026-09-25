@@ -20,19 +20,19 @@ import {
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
 import { queueOpponentWord } from '../utils/opponentWordFeedBatcher.js';
 import { queuePlayerFoundWord } from '../utils/playerFoundWordBatcher.js';
-import { calculateWordScore } from '../modules/scoringEngine.js';
 import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
 import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, getTilesOnResolvedPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord, validateBlastWordPath } from '../modules/blastModeManager.js';
+import { getTilesOnPath, getTilesOnResolvedPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord, validateBlastWordPath } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { isLessonWord } from '../utils/lessonVocabulary.js';
 import { computeRushBonus } from '../modules/rushTiles/rushTilesLogic.js';
-import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
+import { scoreAcceptedWord, blastTileBonusFor } from '../modules/wordScore.js';
+import type { BlastTileType } from '@/shared/types/blast';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { lessonWordBonus } from '@/shared/constants/lessonScoring';
@@ -58,14 +58,6 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Derive combo and fire round from server state (never trust client)
   const safeComboLevel = game.playerCombos?.[username] || 0;
   const fireRoundActive = game.fireRoundActive === true;
-  const fireRoundMultiplier = fireRoundActive ? 2 : 1;
-  const baseScore = normalizedWord.length - 1;
-  const wordScore = calculateWordScore(normalizedWord, safeComboLevel, fireRoundMultiplier, 1, { inputMethod });
-  // Calculate combo bonus without fire round multiplier for display purposes
-  const scoreWithoutMultiplier = calculateWordScore(normalizedWord, safeComboLevel, 1, 1, { inputMethod });
-  const comboBonus = scoreWithoutMultiplier - baseScore;
-  // Fire round bonus is the additional points from the 2x multiplier
-  const fireRoundBonus = fireRoundActive ? scoreWithoutMultiplier : 0;
 
   // Increment server-side combo on each accepted word
   if (!game.playerCombos) game.playerCombos = {};
@@ -98,15 +90,9 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // socket that path does not currently hold.
   const lessonBonus = lessonWordBonus(fromLesson);
 
-  // Calculate blast mode tile bonus BEFORE storing word details so the stored
-  // score includes tile bonuses (used by scoringEngine for final results).
-  let blastTileBonus = 0;
-  // Deterministic per-word letter-value bonus — organic, non-round totals that
-  // reward rare letters. MUST match the client's optimistic fly (same pure fn,
-  // lib/blast/blastLetterBonus) so the "+N" popup and the authoritative total
-  // never disagree.
-  const blastLetterValueBonus = game.gameMode === 'blast' ? blastLetterBonus(normalizedWord) : 0;
-  let blastTilesCleared: string[] = [];
+  // Blast: the special tiles on this word's path. Non-null marks a Blast word
+  // (which also earns the letter-value bonus); tiles stay [] if the lookup fails.
+  let blastTiles: BlastTileType[] | null = game.gameMode === 'blast' ? [] : null;
   let blastMoveResult: { movesUsed: number; bonusMove: boolean } | null = null;
 
   if (game.gameMode === 'blast' && game.blastModeState) {
@@ -134,10 +120,9 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
       const tilesOnPath = validatedClientPath
         ? getTilesOnResolvedPath(resolvedPath, board.overlayMap)
         : getTilesOnPath(normalizedWord, boardPositions, board.overlay, board.overlayMap);
-      blastTileBonus = calculateBlastTileBonus(tilesOnPath);
-      blastTilesCleared = tilesOnPath;
       const gemCount = tilesOnPath.filter(t => t === 'gem').length;
-      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount, blastTileBonus);
+      blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount, blastTileBonusFor(tilesOnPath));
+      blastTiles = tilesOnPath;
     } catch (err: unknown) {
       const error = err as Error;
       logger.error('BLAST', `Blast bonus calculation error: ${error.message}`, {
@@ -147,7 +132,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         wave: blastState.wave ?? null,
         stack: error.stack,
       });
-      blastTileBonus = 0;
+      blastTiles = [];
     }
 
     // 2) Cascade on THIS player's board with crash isolation. safeCascadeBlastWord
@@ -199,9 +184,21 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     }
   }
 
+  // THE per-word score: computed once, integer, and every number below (stored
+  // detail for results, live total, wordAccepted, feeds) reads it verbatim.
+  const scored = scoreAcceptedWord({
+    word: normalizedWord,
+    comboLevel: safeComboLevel,
+    fireRoundActive,
+    inputMethod,
+    blastTiles,
+  });
+  const { baseScore, wordScore, comboBonus, fireRoundMultiplier, fireRoundBonus, blastTileBonus } = scored;
+  const blastTilesCleared = blastTiles ?? [];
+
   addPlayerWord(gameCode, username, normalizedWord, {
     autoValidated: true,
-    score: wordScore + blastTileBonus + blastLetterValueBonus,
+    score: scored.total,
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,
     fireRoundMultiplier: fireRoundMultiplier,
@@ -294,7 +291,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Single atomic score update: word score + blast tile bonus + blast letter-value
   // bonus + word-hunt board bonus + bonuses
   const preScore = game.playerScores?.[username] ?? 0;
-  const totalDelta = wordScore + blastTileBonus + blastLetterValueBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus;
+  const totalDelta = scored.total + wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus;
   updatePlayerScore(gameCode, username, totalDelta, true);
   // Mirror the bonuses that are NOT baked into the stored per-word score
   // (wordScore + blast bonuses are; golden/lightning/special/word-hunt-board are not)
@@ -314,7 +311,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     // Full per-word delta the player earned, so their live total (which the
     // server credits with the tile + letter-value bonus too) reconciles with the
     // sum of their per-word chips. Both blast bonuses are 0 outside Blast mode.
-    score: wordScore + blastTileBonus + blastLetterValueBonus,
+    score: scored.total,
     baseScore: baseScore,
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,
@@ -425,7 +422,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     wordLength: normalizedWord.length,
     firstLetter: normalizedWord[0]?.toUpperCase() ?? '',
     lastLetter: normalizedWord[normalizedWord.length - 1]?.toUpperCase() ?? '',
-    score: wordScore + blastTileBonus + blastLetterValueBonus,
+    score: scored.total,
   });
 
   // Check achievements
@@ -449,7 +446,7 @@ function handleWordBecameValid(io: Server, _socket: Socket, game: GameState, gam
     const wordDetails = game.playerWordDetails[submitter] as WordDetail[];
     const wordDetail = wordDetails.find((wd: WordDetail) => wd.word === word);
     if (wordDetail && wordDetail.validated !== true) {
-      const potentialScore = wordDetail.score || calculateWordScore(word, wordDetail.comboLevel || 0);
+      const potentialScore = wordDetail.score || scoreAcceptedWord({ word, comboLevel: wordDetail.comboLevel || 0 }).total;
 
       wordDetail.validated = true;
       wordDetail.validatedByCommunity = true;
