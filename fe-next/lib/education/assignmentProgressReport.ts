@@ -5,7 +5,17 @@
  * score/accuracy when the completion row actually has them. Nothing here
  * fetches or translates — callers pass names and CSV column labels so a
  * Hebrew export is Hebrew end to end.
+ *
+ * `student_lesson_progress` has NO `score`/`accuracy` column (see
+ * fe-next/supabase/migrations/056_teacher_vocabulary_builder.sql +
+ * 062_education_xp_tracking.sql) — it only has `words_attempted` (jsonb) and
+ * `completed_at`. `mapProgressRowToCompletion` below derives the percentage
+ * from those real columns via `gradePercentFromProgress`, the SAME function
+ * the Google Classroom grade passback uses, so the on-screen/CSV score and
+ * the pushed passback grade can never disagree.
  */
+
+import { gradePercentFromProgress, type ProgressRowLike } from './googleClassroomGrades';
 
 export type AssignmentProgressStatus = 'completed' | 'missing';
 
@@ -25,6 +35,37 @@ export interface AssignmentProgressCompletion {
   score?: number | null;
   accuracy?: number | null;
   completedAt?: string | null;
+}
+
+/** Shape of a real `student_lesson_progress` row, as returned by `getAssignmentCompletions`. */
+export interface AssignmentProgressSourceRow extends ProgressRowLike {
+  student_id: string;
+}
+
+/**
+ * Turn one raw `student_lesson_progress` row into a completion the pure model
+ * above understands. `assignmentId` is passed explicitly rather than read off
+ * the row: the caller already knows which assignment this batch belongs to
+ * (it queried `.eq('assignment_id', assignmentId)`), so trusting that over an
+ * echoed column keeps a null/mismatched `assignment_id` from ever mattering.
+ *
+ * There is only one derivable number for a single assignment completion —
+ * Σcorrect/Σattempts from `words_attempted`, or 100 for a bare completion —
+ * so `score` and `accuracy` both carry that same percentage. No data at all
+ * (row not completed / nothing attempted) → `null`, rendered as "—", never 0.
+ */
+export function mapProgressRowToCompletion(
+  assignmentId: string,
+  row: AssignmentProgressSourceRow,
+): AssignmentProgressCompletion {
+  const percent = gradePercentFromProgress(row);
+  return {
+    assignmentId,
+    studentId: row.student_id,
+    score: percent,
+    accuracy: percent,
+    completedAt: row.completed_at ?? null,
+  };
 }
 
 export interface AssignmentProgressRow {

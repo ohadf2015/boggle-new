@@ -19,7 +19,9 @@ import {
   assignmentProgressToCsv,
   buildAssignmentProgressRows,
   downloadCsvFile,
+  mapProgressRowToCompletion,
   type AssignmentProgressRow,
+  type AssignmentProgressSourceRow,
 } from '@/lib/education/assignmentProgressReport';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
@@ -70,14 +72,14 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
         id: a.id,
         title: a.title || a.vocabulary_lessons?.name || untitled,
       })),
+      // `student_lesson_progress` has no score/accuracy column — derive the
+      // percentage from the real columns (words_attempted / completed_at) via
+      // the same helper the Google Classroom grade passback uses, so this
+      // on-screen number and the pushed grade never disagree.
       completions: batches.flatMap((batch, i) =>
-        (batch.data ?? []).map((c: { student_id: string; score?: number | null; accuracy?: number | null; completed_at?: string | null }) => ({
-          assignmentId: assignments[i].id,
-          studentId: c.student_id,
-          score: c.score ?? null,
-          accuracy: c.accuracy ?? null,
-          completedAt: c.completed_at ?? null,
-        })),
+        (batch.data ?? []).map((c: AssignmentProgressSourceRow) =>
+          mapProgressRowToCompletion(assignments[i].id, c),
+        ),
       ),
     });
 

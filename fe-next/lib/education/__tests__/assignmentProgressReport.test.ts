@@ -3,6 +3,7 @@ import {
   buildAssignmentProgressRows,
   assignmentProgressToCsv,
   csvEscape,
+  mapProgressRowToCompletion,
 } from '../assignmentProgressReport';
 
 const students = [
@@ -87,6 +88,87 @@ describe('assignmentProgressToCsv', () => {
     });
     const csv = assignmentProgressToCsv(rows, CSV_LABELS);
     expect(csv.split('\n')[1]).toBe('Ada,Drill,Missing,,,');
+  });
+});
+
+describe('mapProgressRowToCompletion', () => {
+  // Realistic `student_lesson_progress` rows (056_teacher_vocabulary_builder.sql +
+  // 062_education_xp_tracking.sql): id, student_id, lesson_id, assignment_id,
+  // words_attempted (jsonb), words_mastered (text[]), started_at, completed_at,
+  // total_xp, current_level, current_streak, longest_streak,
+  // last_practice_date, total_practice_sessions. No `score`/`accuracy` column.
+  it('derives score/accuracy as correct/attempts percent from words_attempted, not a nonexistent score column', () => {
+    const row = {
+      id: 'row1',
+      student_id: 's1',
+      lesson_id: 'l1',
+      assignment_id: 'a1',
+      words_attempted: {
+        cat: { attempts: 3, correct: 2, lastAttemptAt: '2026-09-01T00:00:00.000Z' },
+        dog: { attempts: 1, correct: 1, lastAttemptAt: '2026-09-01T00:00:00.000Z' },
+      },
+      words_mastered: ['dog'],
+      started_at: '2026-08-31T00:00:00.000Z',
+      completed_at: '2026-09-01T00:00:00.000Z',
+      total_xp: 40,
+      current_level: 2,
+      current_streak: 1,
+      longest_streak: 3,
+      last_practice_date: '2026-09-01',
+      total_practice_sessions: 5,
+    };
+
+    const completion = mapProgressRowToCompletion('a1', row);
+
+    expect(completion).toEqual({
+      assignmentId: 'a1',
+      studentId: 's1',
+      score: 75,
+      accuracy: 75,
+      completedAt: '2026-09-01T00:00:00.000Z',
+    });
+  });
+
+  it('gives 100 for a completed row with no per-word attempts (completion credit)', () => {
+    const row = {
+      id: 'row2',
+      student_id: 's2',
+      lesson_id: 'l1',
+      assignment_id: 'a1',
+      words_attempted: {},
+      words_mastered: [],
+      started_at: '2026-08-31T00:00:00.000Z',
+      completed_at: '2026-09-01T00:00:00.000Z',
+      total_xp: 0,
+      current_level: 1,
+      current_streak: 0,
+      longest_streak: 0,
+      last_practice_date: null,
+      total_practice_sessions: 0,
+    };
+
+    expect(mapProgressRowToCompletion('a1', row)).toMatchObject({ score: 100, accuracy: 100 });
+  });
+
+  it('is null (not 0) when there is no completion and no attempts at all', () => {
+    const row = {
+      id: 'row3',
+      student_id: 's3',
+      lesson_id: 'l1',
+      assignment_id: 'a1',
+      words_attempted: null,
+      words_mastered: [],
+      started_at: '2026-08-31T00:00:00.000Z',
+      completed_at: null,
+      total_xp: 0,
+      current_level: 1,
+      current_streak: 0,
+      longest_streak: 0,
+      last_practice_date: null,
+      total_practice_sessions: 0,
+    };
+
+    expect(mapProgressRowToCompletion('a1', row)).toMatchObject({ score: null, accuracy: null });
   });
 });
 
