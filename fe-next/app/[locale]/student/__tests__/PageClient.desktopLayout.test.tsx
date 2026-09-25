@@ -96,6 +96,6 @@ describe('StudentPageClient — one screen, nothing to scroll', () => {
     const solo = await screen.findByTestId('academy-solo');
     expect(screen.getByTestId('academy-cta')).toHaveAttribute('data-kind', 'next');
     solo.click();
-    expect(knobs.push).toHaveBeenCalledWith('/en/quick-play');
+    expect(knobs.push).toHaveBeenCalledWith('/en/quick-play?academy=1');
   });
 });
