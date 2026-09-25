@@ -45,7 +45,12 @@ vi.mock('@/hooks/useClassroom', () => ({
 }));
 
 const mq = { wide: false };
-vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: () => mq.wide, default: () => mq.wide }));
+// `wide` is a desktop: every width query matches, the sideways-phone
+// (orientation) query does not.
+vi.mock('@/hooks/useMediaQuery', () => {
+  const mqFor = (q: string) => (q.includes('orientation') ? false : mq.wide);
+  return { useMediaQuery: mqFor, default: mqFor };
+});
 vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
   ClassroomCardActivity: ({ classroomId }: { classroomId: string }) => (
     <div data-testid="card-activity">{classroomId}</div>
@@ -89,6 +94,16 @@ describe('ClassroomManager — paging instead of page scroll', () => {
     render(<ClassroomManager richCards />);
     expect(screen.getByTestId('card-activity')).toHaveTextContent('cls-1');
     expect(screen.getByTestId('classroom-card-start-game')).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
+  });
+
+  // A 375x667 phone spent ~70px on a title row AND a separate create row
+  // above the one card; the title now shares the create button's row.
+  it('Given a heading, Then it shares one row with the Create classroom button', () => {
+    state.classrooms = [mk(1)];
+    render(<ClassroomManager richCards heading={<h1 data-testid="classes-title">Your classes</h1>} />);
+    const row = screen.getByTestId('classroom-manager-toprow');
+    expect(row.contains(screen.getByTestId('classes-title'))).toBe(true);
+    expect(row.contains(screen.getByRole('button', { name: /teacher.classroom.create/ }))).toBe(true);
   });
 
   it('Given the default (HQ Tools sheet), Then cards stay lean', () => {

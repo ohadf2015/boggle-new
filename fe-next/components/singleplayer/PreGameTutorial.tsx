@@ -9,6 +9,9 @@ import { Mascot } from '@/components/ui/Mascot';
 import { NeoPanel } from '@/components/ui/panel';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { useAuth } from '@/contexts/AuthContext';
+import toast from 'react-hot-toast';
+import { getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { BoostButton } from '@/components/boosts/BoostButton';
 
 interface PreGameTutorialProps {
@@ -30,7 +33,19 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
   const { t } = useLanguage();
   const isDesktop = useIsDesktop();
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
-  const { profile } = useAuth();
+  const { profile, isAuthenticated, updateProfile } = useAuth();
+
+  // Signed in → profile (flags the avatar as customized); guest → local store,
+  // same as the join-screen builder.
+  const handleAvatarSave = async (config: CustomAvatarConfig): Promise<void> => {
+    setIsAvatarBuilderOpen(false);
+    if (!isAuthenticated) {
+      setStoredCustomAvatar(config);
+      return;
+    }
+    const { error } = await updateProfile({ avatar_config: config });
+    if (error) toast.error(t('profile.saveError'));
+  };
 
   const tips = [
     { icon: isDesktop ? Mouse : Pointer, titleKey: isDesktop ? 'onboarding.quickTips.tip1TitleDesktop' : 'onboarding.quickTips.tip1Title', textKey: isDesktop ? 'onboarding.quickTips.tip1TextDesktop' : 'onboarding.quickTips.tip1Text' },
@@ -113,8 +128,8 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
           <AvatarBuilderModal
             isOpen={isAvatarBuilderOpen}
             onClose={() => setIsAvatarBuilderOpen(false)}
-            onSave={() => setIsAvatarBuilderOpen(false)}
-            initialConfig={profile?.avatar_config ?? undefined}
+            onSave={handleAvatarSave}
+            initialConfig={profile?.avatar_config ?? (isAuthenticated ? undefined : getStoredCustomAvatar() ?? undefined)}
             premium={null}
           />
 

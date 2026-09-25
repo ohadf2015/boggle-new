@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { JoinCodeField, JOIN_CODE_LENGTH, sanitizeJoinCode } from './JoinCodeField';
 import { useJoinFlow } from './useJoinFlow';
+import { useFitStage } from './fitStage';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { PopPressButton } from '@/components/motion/PopPressButton';
 
@@ -39,12 +40,25 @@ interface JoinFlowProps {
    * to delay navigation (e.g. for celebration animations).
    */
   onSuccessBeforeNavigation?: () => Promise<void> | void;
+  /**
+   * Own the whole viewport and never scroll: the column is sized and zoomed to
+   * fit (two columns on a phone on its side, bigger on desktops/TVs). Used by
+   * the in-app `/student/join`; `/join` keeps its document flow.
+   */
+  fit?: boolean;
 }
 
 const K = 'education.student.join';
 
-export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: externalCallback }: JoinFlowProps) {
+export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: externalCallback, fit = false }: JoinFlowProps) {
   const { t, dir } = useLanguage();
+  const { ref: stageRef, stage } = useFitStage(fit);
+  const rail = fit && stage.rail;
+  // PopPressButton wraps its <button> in an inline-block motion div that
+  // shrinks it to its label. In fit mode, give it a full-width cell (column 2 on
+  // the rail); `/join` keeps its markup untouched.
+  const inColumn2 = (node: React.ReactNode) =>
+    fit ? <div className={cn('[&>div]:!block [&_button]:w-full', rail && 'col-start-2')}>{node}</div> : node;
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
 
   // Create a callback that shows confetti and waits for animation
@@ -108,7 +122,10 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
     >
       <div
         dir={dir}
-        className="relative flex min-h-dvh flex-col overflow-hidden bg-neo-navy text-neo-white"
+        className={cn(
+          'flex flex-col overflow-hidden bg-neo-navy text-neo-white',
+          fit ? 'fixed inset-0 items-center justify-center' : 'relative min-h-dvh'
+        )}
       >
         {/* Loud, cheap, and behind everything — no layout cost, no tween. */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -117,8 +134,19 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
           <div className="absolute -bottom-24 start-1/4 h-52 w-52 rotate-6 rounded-neo border-3 border-neo-cyan bg-neo-cyan/15" />
         </div>
 
-        <main className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-6">
-        <header className="mb-5 flex items-center justify-between gap-3">
+        <main
+          ref={stageRef as React.RefObject<HTMLElement>}
+          data-testid="join-stage"
+          data-rail={rail || undefined}
+          className={cn(
+            'relative z-10 flex flex-col',
+            fit ? (rail ? 'px-2 py-2' : 'px-0 py-4') : 'mx-auto w-full max-w-md flex-1 justify-center px-4 py-6'
+          )}
+          // Inline: a global landscape-phone rule forces every <main> to relative
+          // and caps widths; the fit column must be exactly this wide.
+          style={fit ? { width: stage.width, maxWidth: 'none', ...(stage.zoom !== 1 ? { zoom: stage.zoom } : {}) } : undefined}
+        >
+        <header className={cn('flex items-center justify-between gap-3', rail ? 'mb-2' : 'mb-5')}>
           <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-navy shadow-hard">
             LexiClash
           </span>
@@ -142,9 +170,9 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
               e.preventDefault();
               flow.advance();
             }}
-            className="flex flex-col gap-4"
+            className={cn(rail ? 'grid grid-flow-row-dense grid-cols-2 items-start gap-x-6 gap-y-2' : 'flex flex-col gap-4')}
           >
-            <div>
+            <div className={cn(rail && 'col-start-1 row-span-3 self-center')}>
               <h1 className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white sm:text-5xl">
                 {t(`${K}.flow.codeHeadline`)}
               </h1>
@@ -153,18 +181,20 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
               </p>
             </div>
 
-            <JoinCodeField
-              value={flow.code}
-              onChange={flow.setCode}
-              onComplete={(next) => flow.advance(next)}
-              onPaste={handlePaste}
-              label={t(`${K}.codeLabel`)}
-              describedBy="join-code-note"
-              invalid={!!flow.codeErrorKey || flow.codeRejected}
-              autoFocus
-            />
+            <div className={cn(rail && 'col-start-2')}>
+              <JoinCodeField
+                value={flow.code}
+                onChange={flow.setCode}
+                onComplete={(next) => flow.advance(next)}
+                onPaste={handlePaste}
+                label={t(`${K}.codeLabel`)}
+                describedBy="join-code-note"
+                invalid={!!flow.codeErrorKey || flow.codeRejected}
+                autoFocus
+              />
+            </div>
 
-            <div id="join-code-note" className="min-h-[44px]">
+            <div id="join-code-note" className={cn('min-h-[44px]', rail && 'col-start-2')}>
               {flow.codeErrorKey || flow.codeRejected ? (
                 <p
                   role="alert"
@@ -179,12 +209,14 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
               )}
             </div>
 
-            <PopPressButton
-              type="submit"
-              className="font-neo-display text-xl font-black uppercase tracking-wide"
-            >
-              {t(`${K}.flow.next`)}
-            </PopPressButton>
+            {inColumn2(
+              <PopPressButton
+                type="submit"
+                className="font-neo-display text-xl font-black uppercase tracking-wide"
+              >
+                {t(`${K}.flow.next`)}
+              </PopPressButton>
+            )}
           </form>
         ) : (
           <form
@@ -192,7 +224,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
               e.preventDefault();
               flow.submit();
             }}
-            className="flex flex-col gap-4"
+            className={cn(rail ? 'grid grid-flow-row-dense grid-cols-2 items-start gap-x-6 gap-y-2' : 'flex flex-col gap-4')}
           >
             {/* The code, and the way back to it. One control, so there is no
                 second "change code" affordance to diverge from this one. */}
@@ -202,7 +234,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
               aria-label={t(`${K}.flow.changeCode`)}
               /* Cream edge, not black: black on navy measures 1.23:1 and the
                  audit reads this control as borderless. */
-              className="flex items-center gap-3 self-start rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard"
+              className={cn('flex items-center gap-3 self-start justify-self-start rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard', rail && 'col-start-1')}
             >
               <DirectionalIcon icon={ArrowLeft} className="h-4 w-4 text-neo-cyan" />
               <span
@@ -215,7 +247,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
 
             {/* Reserved height: the confirmation resolves over the network and
                 must never move the button underneath it. */}
-            <div data-testid="join-confirm-slot" className="min-h-[76px]">
+            <div data-testid="join-confirm-slot" className={cn('min-h-[76px]', rail && 'col-start-1')}>
               {flow.codeRejected ? (
                 <div
                   role="alert"
@@ -242,12 +274,12 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
               ) : null}
             </div>
 
-            <h1 className="font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-neo-white sm:text-4xl">
+            <h1 className={cn('font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-neo-white sm:text-4xl', rail && 'col-start-1')}>
               {t(flow.showNameField ? `${K}.flow.nameHeadline` : `${K}.flow.readyHeadline`)}
             </h1>
 
             {flow.showNameField ? (
-              <div className="flex flex-col gap-2">
+              <div className={cn('flex flex-col gap-2', rail && 'col-start-2 row-start-1 row-span-2')}>
                 <label
                   htmlFor="join-nickname"
                   className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-cyan"
@@ -272,7 +304,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
                 <p className="font-neo-body text-sm text-neo-white/70">{t(`${K}.nameHint`)}</p>
               </div>
             ) : (
-              <p className="font-neo-body text-base font-bold text-neo-white/80">
+              <p className={cn('font-neo-body text-base font-bold text-neo-white/80', rail && 'col-start-2 row-start-1')}>
                 {t(`${K}.flow.readySub`)}
               </p>
             )}
@@ -280,7 +312,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
             {flow.suggestedName && (
               <div
                 role="alert"
-                className="flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow p-3 shadow-hard"
+                className={cn('flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow p-3 shadow-hard', rail && 'col-start-2')}
               >
                 <p className="font-neo-body text-sm font-bold text-neo-navy">
                   {t(`${K}.nameTaken`, { suggestedName: flow.suggestedName })}
@@ -298,28 +330,30 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
             {flow.formErrorKey && !flow.suggestedName && (
               <p
                 role="alert"
-                className="animate-neo-shake rounded-neo border-3 border-neo-black bg-neo-red px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard"
+                className={cn('animate-neo-shake rounded-neo border-3 border-neo-black bg-neo-red px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard', rail && 'col-start-2')}
               >
                 {t(flow.formErrorKey)}
               </p>
             )}
 
-            <PopPressButton
-              type="submit"
-              disabled={!flow.canSubmit}
-              variant="primary"
-              className="flex items-center justify-center gap-2 font-neo-display text-2xl font-black uppercase tracking-wide disabled:opacity-45"
-            >
-              <Sparkles aria-hidden="true" className="h-6 w-6" />
-              {flow.isSubmitting ? t(`${K}.joining`) : t(`${K}.flow.go`)}
-            </PopPressButton>
+            {inColumn2(
+              <PopPressButton
+                type="submit"
+                disabled={!flow.canSubmit}
+                variant="primary"
+                className="flex items-center justify-center gap-2 font-neo-display text-2xl font-black uppercase tracking-wide disabled:opacity-45"
+              >
+                <Sparkles aria-hidden="true" className="h-6 w-6" />
+                {flow.isSubmitting ? t(`${K}.joining`) : t(`${K}.flow.go`)}
+              </PopPressButton>
+            )}
 
             {/* A held or in-flight tap says what it is waiting on. A button that
                 just sits there is the silent no-op with a spinner painted on. */}
             {(flow.isHolding || flow.isSubmitting) && (
               <p
                 role="status"
-                className="text-center font-neo-body text-sm font-bold text-neo-lime"
+                className={cn('text-center font-neo-body text-sm font-bold text-neo-lime', rail && 'col-start-2')}
               >
                 {t(flow.isSubmitting ? `${K}.flow.entering` : `${K}.preparing`)}
               </p>

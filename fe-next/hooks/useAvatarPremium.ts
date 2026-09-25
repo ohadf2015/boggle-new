@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { queryKeys } from '@/lib/queryKeys';
 import { isPartUsable, normalizeLevel, partKey } from '@/lib/avatar/unlocks';
 import { getWithAuth } from '@/utils/authFetch';
@@ -36,6 +37,7 @@ export function useAvatarPremium() {
   const queryClient = useQueryClient();
   const { coins, refreshCoins } = useCoinsFromContext();
   const { user, isAuthenticated, profile } = useAuth();
+  const { t } = useLanguage();
   // Guests / unknown profile → level 1 (the ladder grants nothing at level 1).
   const level = normalizeLevel(profile?.current_level);
   const [tempUnlocks, setTempUnlocks] = useState<TempUnlocks>({});
@@ -81,10 +83,11 @@ export function useAvatarPremium() {
         queryClient.invalidateQueries({ queryKey: queryKeys.avatar.premiumParts() });
       }
       await refreshCoins();
-      toast('🎉 Unlocked!', { duration: 1500 });
+      toast(t('avatarBuilder.editor.unlocked'), { duration: 1500 });
     },
-    onError: (err) => {
-      toast.error(err instanceof Error ? err.message : 'Purchase failed \u2014 try again', { duration: 2000 });
+    onError: () => {
+      // Server text is English and internal ("Failed to save purchase"); every failure refunds.
+      toast.error(t('avatarBuilder.editor.purchaseFailed'), { duration: 2500 });
     },
   });
 
@@ -106,13 +109,18 @@ export function useAvatarPremium() {
   }, []);
 
   const purchaseWithGold = useCallback(async (category: string, partId: string): Promise<boolean> => {
+    // Guests hold local gold, but purchases are account-bound (the route 401s).
+    if (!isAuthenticated || !user) {
+      toast.error(t('avatarBuilder.editor.signInToBuy'), { duration: 2500 });
+      return false;
+    }
     try {
       await purchaseMutation.mutateAsync({ category, partId });
       return true;
     } catch {
       return false;
     }
-  }, [purchaseMutation]);
+  }, [purchaseMutation, isAuthenticated, user, t]);
 
   return {
     isPartUnlocked,

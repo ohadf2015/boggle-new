@@ -231,6 +231,26 @@ const he = {
       "due": "להגשה עד {date}",
       "failed": "לא הצלחנו להקצות. נסו שוב.",
       "title": "שיעורי בית: מילים שפוספסו"
+    },
+    "pages": {
+      "backToMap": "חזרה לאקדמיה",
+      "lessonDone": "הושלם",
+      "lessonKeepGoing": "ממשיכים",
+      "lessonNew": "חדש",
+      "starsAria": "{count} מתוך 3 כוכבים",
+      "untitledLesson": "שיעור",
+      "wordCount": "מילים: {count}",
+      "mastered": "נלמד {pct}%",
+      "due": "עד {date}",
+      "noLessonsTitle": "עוד אין שיעורים",
+      "noLessonsBody": "ברגע שיגיע שיעור מהמורה, הוא ינחת כאן.",
+      "moreLessons": "שיעורים חדשים מהמורה יופיעו כאן.",
+      "maxTier": "מקס",
+      "noAwards": "שחקו שיעור כדי להתחיל לאסוף פרסים.",
+      "firstAward": "סיימו שיעור וזכו בפרס הראשון!",
+      "awardsEarned": "הושגו: {earned}/{total}",
+      "lessonsDone": "הושלמו: {done}/{total}",
+      "lessonsRegion": "השיעורים שלכם"
     }
   },
   // @academy:end
@@ -1652,7 +1672,7 @@ const he = {
       ]
     },
     "cardTitle": "מגדל מילים",
-    "cardDesc": "בנו מגדל מילים עד השמיים — תצוגת אדמין",
+    "cardDesc": "בנו מגדל מילים עד השמיים",
     "loading": "טוען מילון…",
     "loadError": "לא ניתן לטעון את המילון — הקש לנסות שוב",
     "retry": "נסה שוב",
@@ -2487,7 +2507,6 @@ const he = {
     "creating": "יוצר...",
     "guest": "אורח",
     "unknown": "לא ידוע",
-    "loading": "בודקים…",
     "back": "חזור",
     "backHome": "חזרה הביתה",
     "backToHome": "חזרה לדף הבית",
@@ -16325,7 +16344,7 @@ const he = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "רמה {level}", "unlocksAtLevel": "נפתח ברמה {level}", "youAreLevel": "הרמה שלך: {level}", "goldOnly": "בלעדי בזהב", "buyFor": "לפתוח · {price}", "needMoreGold": "חסרים עוד {amount} זהב", "orKeepPlaying": "או פשוט להמשיך לשחק, בחינם", "takeOff": "להוריד", "tryingOn": "מודדים", "collection": "{owned} מתוך {total} בקולקציה" },
+    "editor": { "levelChip": "רמה {level}", "unlocksAtLevel": "נפתח ברמה {level}", "youAreLevel": "הרמה שלך: {level}", "goldOnly": "בלעדי בזהב", "buyFor": "לפתוח · {price}", "needMoreGold": "חסרים עוד {amount} זהב", "orKeepPlaying": "או פשוט להמשיך לשחק, בחינם", "takeOff": "להוריד", "tryingOn": "מודדים", "collection": "{owned} מתוך {total} בקולקציה", "signInToBuy": "התחברו כדי לקנות בזהב", "unlocked": "נפתח!", "purchaseFailed": "לא הצלחנו לפתוח. לא ירד לך זהב.", "doneSkipsTryOn": "שמירה תשמור את המראה בלי זה" },
     "glowUp": {
       "button": "שדרוג זוהר",
       "loading": "משדרג…",

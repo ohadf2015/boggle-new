@@ -1,58 +1,35 @@
-import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
+import { vi } from 'vitest';
 /**
- * Tests for /student/lessons redirect page
+ * /student/lessons is the lesson list, not a redirect.
  *
- * This page exists only to handle direct navigation to /student/lessons
- * (without a lesson ID) by redirecting to the student dashboard.
+ * It used to `redirect()` to `/student`. The Academy map's dock links "Lessons"
+ * here, so the redirect turned that button into a round trip back to the map
+ * (and a second pass through the hub's profile wait). The page now renders the
+ * list client (`./PageClient`); the list's behaviour is covered in
+ * app/[locale]/student/__tests__/subpageRenders.test.tsx.
  */
 
-import { redirect } from 'next/navigation';
-
-// Mock next/navigation
-vi.mock('next/navigation', () => ({
-  redirect: vi.fn(),
-}));
+const redirect = vi.fn();
+vi.mock('next/navigation', () => ({ redirect: (...a: unknown[]) => redirect(...a) }));
+vi.mock('../PageClient', () => ({ default: function StudentLessonsPageClient() { return null; } }));
+vi.mock('@/lib/seo/generatePageMetadata', () => ({ generatePageMetadata: vi.fn(() => ({})) }));
 
 describe('StudentLessonsPage', () => {
-  const mockRedirect = redirect as MockedFunction<typeof redirect>;
-
   beforeEach(() => {
-    vi.clearAllMocks();
+    redirect.mockClear();
   });
 
-  test('should redirect to student dashboard with Hebrew locale', async () => {
-    // GIVEN
-    const params = Promise.resolve({ locale: 'he' });
-
-    // WHEN
+  test.each(['he', 'en', 'sv'])('does not redirect away (%s) — it renders the lessons list', async () => {
     const { default: StudentLessonsPage } = await import('../page');
-    await StudentLessonsPage({ params });
-
-    // THEN
-    expect(mockRedirect).toHaveBeenCalledWith('/he/student');
+    const el = StudentLessonsPage() as { type: { name?: string } };
+    expect(redirect).not.toHaveBeenCalled();
+    expect(el.type.name).toBe('StudentLessonsPageClient');
   });
 
-  test('should redirect to student dashboard with English locale', async () => {
-    // GIVEN
-    const params = Promise.resolve({ locale: 'en' });
-
-    // WHEN
-    const { default: StudentLessonsPage } = await import('../page');
-    await StudentLessonsPage({ params });
-
-    // THEN
-    expect(mockRedirect).toHaveBeenCalledWith('/en/student');
-  });
-
-  test('should redirect to student dashboard with Swedish locale', async () => {
-    // GIVEN
-    const params = Promise.resolve({ locale: 'sv' });
-
-    // WHEN
-    const { default: StudentLessonsPage } = await import('../page');
-    await StudentLessonsPage({ params });
-
-    // THEN
-    expect(mockRedirect).toHaveBeenCalledWith('/sv/student');
+  test('stays out of the index', async () => {
+    const { generatePageMetadata } = await import('@/lib/seo/generatePageMetadata');
+    const { generateMetadata } = await import('../page');
+    await generateMetadata({ params: Promise.resolve({ locale: 'en' }) });
+    expect(generatePageMetadata).toHaveBeenCalledWith(expect.objectContaining({ path: '/student/lessons', noIndex: true }));
   });
 });

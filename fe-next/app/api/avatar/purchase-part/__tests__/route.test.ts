@@ -84,7 +84,7 @@ function setupDbMocks({
   partsUpdateError = null as { message?: string } | null,
   lockConflict = false,
 } = {}) {
-  // Captures the second .eq() call on the parts update — the optimistic lock predicate
+  // Captures the .filter() on the parts update — the optimistic lock predicate (jsonb literal)
   const mockUpdateLockEq = vi.fn();
 
   // Mock profiles.select for initial fetch
@@ -101,7 +101,7 @@ function setupDbMocks({
         }),
         update: vi.fn((updateData: Record<string, unknown>) => ({
           eq: vi.fn().mockReturnValue({
-            eq: mockUpdateLockEq.mockReturnValue({
+            filter: mockUpdateLockEq.mockReturnValue({
               select: vi.fn().mockReturnValue({
                 maybeSingle: vi.fn().mockResolvedValue({
                   data: partsUpdateError || lockConflict
@@ -234,7 +234,7 @@ describe('POST /api/avatar/purchase-part', () => {
   it('locks the parts update on the pre-purchase premium_avatar_parts snapshot', async () => {
     const { mockUpdateLockEq } = setupDbMocks({ gold: 200, premiumParts: ['accessory:crown'] });
     await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
-    expect(mockUpdateLockEq).toHaveBeenCalledWith('premium_avatar_parts', ['accessory:crown']);
+    expect(mockUpdateLockEq).toHaveBeenCalledWith('premium_avatar_parts', 'eq', '["accessory:crown"]');
   });
 
   it('returns 409 and refunds coins when a concurrent purchase wins the optimistic lock', async () => {

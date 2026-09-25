@@ -505,7 +505,7 @@ function SinglePlayerGame({
         totalSeconds={settings.timerSeconds}
         isPaused={core.isPaused}
         isGameOver={core.isGameOver}
-        bots={settings.bots}
+        bots={core.liveBots}
         foundWords={core.foundWords}
         comboLevel={core.combo.comboLevel}
         fireRoundActive={core.fireRoundActive}

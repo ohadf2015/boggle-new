@@ -61,10 +61,10 @@ export function AcademyPlayerChip({ player, className }: { player: AcademyPlayer
         className,
       )}
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-[3px] border-black bg-neo-orange lg:h-14 lg:w-14">
-        <Avatar customAvatar={player.avatarConfig ?? null} userId={player.userId ?? player.name} pixelSize={34} disableEffects />
+      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-[3px] border-black bg-neo-orange lg:h-14 lg:w-14 min-[2200px]:h-20 min-[2200px]:w-20">
+        <Avatar customAvatar={player.avatarConfig ?? null} userId={player.userId ?? player.name} pixelSize={80} disableEffects className="!h-full !w-full" />
       </span>
-      <span className="truncate font-neo-display text-base font-black text-neo-white lg:text-2xl">{player.name}</span>
+      <span className="truncate font-neo-display text-base font-black text-neo-white lg:text-2xl min-[2200px]:text-4xl">{player.name}</span>
     </div>
   );
 }
@@ -91,21 +91,22 @@ export function AcademyModeFrame({
   return (
     <div data-testid={testId} className="fixed inset-0 z-40 h-[100dvh] overflow-hidden bg-neo-navy text-neo-white">
       <AcademyScene theme={theme}>
-        <header className="flex shrink-0 items-center gap-2 px-3 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 lg:px-10 lg:pt-6">
+        <header className="flex shrink-0 items-center gap-2 px-3 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 lg:px-10 lg:pt-6 min-[2200px]:gap-4 min-[2200px]:px-14 min-[2200px]:pt-10">
           <button
             type="button"
             onClick={onBack}
             data-testid="academy-back"
             aria-label={t('academy.modes.backToAcademy', 'Back to Academy')}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-neo border-[3px] border-black bg-neo-cream text-black shadow-hard active:translate-y-0.5 active:shadow-none lg:h-14 lg:w-14"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-neo border-[3px] border-black bg-neo-cream text-black shadow-hard active:translate-y-0.5 active:shadow-none lg:h-14 lg:w-14 min-[2200px]:h-20 min-[2200px]:w-20"
           >
-            <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 lg:h-7 lg:w-7" />
+            <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 lg:h-7 lg:w-7 min-[2200px]:h-10 min-[2200px]:w-10" />
           </button>
-          <div className="flex min-w-0 flex-1 justify-start">
+          {/* !border-0 !p-0: legacy animations.css gives every `header>div` a 2px border + padding on short landscape screens. */}
+          <div className="flex min-w-0 flex-1 justify-start !border-0 !p-0">
             <h1
               className={cn(
                 // Never an ellipsis: long locale titles wrap to two tight lines on phones (e.g. "Repaso de palabras falladas").
-                'line-clamp-2 min-w-0 -rotate-1 break-words rounded-neo border-[3px] border-black px-2 py-0.5 font-neo-display text-[14px] font-black uppercase leading-[1.1] text-black shadow-hard [overflow-wrap:anywhere] sm:px-3 sm:py-1 sm:text-2xl sm:leading-tight sm:tracking-wide lg:px-5 lg:text-3xl',
+                'line-clamp-2 min-w-0 -rotate-1 break-words rounded-neo border-[3px] border-black px-2 py-0.5 font-neo-display text-[14px] font-black uppercase leading-[1.1] text-black shadow-hard [overflow-wrap:anywhere] sm:px-3 sm:py-1 sm:text-2xl sm:leading-tight sm:tracking-wide lg:px-5 lg:text-3xl min-[2200px]:px-7 min-[2200px]:py-2 min-[2200px]:text-5xl',
                 ribbon,
               )}
             >

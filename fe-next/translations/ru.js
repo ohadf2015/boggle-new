@@ -231,6 +231,26 @@ const ru = {
       "due": "Срок: {date}",
       "failed": "Не удалось задать. Попробуйте ещё раз.",
       "title": "ДЗ: работа над ошибками"
+    },
+    "pages": {
+      "backToMap": "В Академию",
+      "lessonDone": "Пройден",
+      "lessonKeepGoing": "Продолжай",
+      "lessonNew": "Новый",
+      "starsAria": "{count} из 3 звёзд",
+      "untitledLesson": "Урок",
+      "wordCount": "Слов: {count}",
+      "mastered": "Выучено {pct}%",
+      "due": "Срок: {date}",
+      "noLessonsTitle": "Уроков пока нет",
+      "noLessonsBody": "Когда учитель поделится уроком, он появится здесь.",
+      "moreLessons": "Новые уроки от учителя появятся здесь.",
+      "maxTier": "МАКС",
+      "noAwards": "Пройди урок, чтобы начать получать награды.",
+      "firstAward": "Пройди урок — и получи первую награду!",
+      "awardsEarned": "Получено: {earned}/{total}",
+      "lessonsDone": "Пройдено: {done}/{total}",
+      "lessonsRegion": "Твои уроки"
     }
   },
   // @academy:end
@@ -15645,7 +15665,7 @@ const ru = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Ур. {level}", "unlocksAtLevel": "Откроется на ур. {level}", "youAreLevel": "Сейчас у тебя ур. {level}", "goldOnly": "Только за золото", "buyFor": "Открыть · {price}", "needMoreGold": "Не хватает {amount} золота", "orKeepPlaying": "или просто играй дальше, бесплатно", "takeOff": "Снять", "tryingOn": "Примерка", "collection": "Собрано {owned} из {total}" },
+    "editor": { "levelChip": "Ур. {level}", "unlocksAtLevel": "Откроется на ур. {level}", "youAreLevel": "Сейчас у тебя ур. {level}", "goldOnly": "Только за золото", "buyFor": "Открыть · {price}", "needMoreGold": "Не хватает {amount} золота", "orKeepPlaying": "или просто играй дальше, бесплатно", "takeOff": "Снять", "tryingOn": "Примерка", "collection": "Собрано {owned} из {total}", "signInToBuy": "Войдите, чтобы купить за золото", "unlocked": "Открыто!", "purchaseFailed": "Не удалось открыть. Золото не списано.", "doneSkipsTryOn": "«Сохранить» сохранит образ без этого" },
     "glowUp": {
       "button": "Сияние",
       "loading": "Сияю…",

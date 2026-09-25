@@ -231,6 +231,26 @@ const ja = {
       "due": "期限：{date}",
       "failed": "出題できませんでした。もう一度お試しください。",
       "title": "ミスした単語の宿題"
+    },
+    "pages": {
+      "backToMap": "アカデミーに戻る",
+      "lessonDone": "クリア",
+      "lessonKeepGoing": "続きから",
+      "lessonNew": "NEW",
+      "starsAria": "スター3個中{count}個",
+      "untitledLesson": "レッスン",
+      "wordCount": "{count}語",
+      "mastered": "{pct}%マスター",
+      "due": "期限：{date}",
+      "noLessonsTitle": "レッスンはまだないよ",
+      "noLessonsBody": "先生がレッスンをシェアすると、ここに届くよ。",
+      "moreLessons": "先生からの新しいレッスンはここに届くよ。",
+      "maxTier": "MAX",
+      "noAwards": "レッスンで遊んでアワードを集めよう。",
+      "firstAward": "レッスンをクリアして、最初のアワードをゲットしよう！",
+      "awardsEarned": "{earned}/{total} 獲得",
+      "lessonsDone": "{done}/{total} クリア",
+      "lessonsRegion": "マイレッスン"
     }
   },
   // @academy:end
@@ -1652,7 +1672,7 @@ const ja = {
       ]
     },
     "cardTitle": "ワードタワー",
-    "cardDesc": "言葉を積んで空へ — 管理者プレビュー",
+    "cardDesc": "言葉を積んで空へ",
     "loading": "辞書を読み込み中…",
     "loadError": "辞書を読み込めませんでした — タップして再試行",
     "retry": "もう一度",
@@ -2487,7 +2507,6 @@ const ja = {
     "creating": "作成中...",
     "guest": "ゲスト",
     "unknown": "不明",
-    "loading": "確認中…",
     "back": "戻る",
     "backHome": "ホームへ",
     "backToHome": "ホームに戻る",
@@ -16344,7 +16363,7 @@ const ja = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Lv{level}", "unlocksAtLevel": "Lv{level}で解放", "youAreLevel": "いまLv{level}", "goldOnly": "ゴールド限定", "buyFor": "解放 · {price}", "needMoreGold": "あと{amount}ゴールド", "orKeepPlaying": "プレイを続ければ無料で手に入る", "takeOff": "外す", "tryingOn": "試着中", "collection": "コレクション {owned}/{total}" },
+    "editor": { "levelChip": "Lv{level}", "unlocksAtLevel": "Lv{level}で解放", "youAreLevel": "いまLv{level}", "goldOnly": "ゴールド限定", "buyFor": "解放 · {price}", "needMoreGold": "あと{amount}ゴールド", "orKeepPlaying": "プレイを続ければ無料で手に入る", "takeOff": "外す", "tryingOn": "試着中", "collection": "コレクション {owned}/{total}", "signInToBuy": "ゴールドで買うにはログイン", "unlocked": "解放！", "purchaseFailed": "解放できませんでした。ゴールドは減っていません。", "doneSkipsTryOn": "保存すると、これを外した見た目になります" },
     "glowUp": {
       "button": "グロウアップ",
       "loading": "生成中…",

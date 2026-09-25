@@ -69,6 +69,9 @@ export function ProfileHeader({
   const [isEditingCountry, setIsEditingCountry] = useState(false);
   const [isSavingCountry, setIsSavingCountry] = useState(false);
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  // One random look per mount: a fresh one per render reads to the editor as
+  // "different avatar handed in" and wipes the draft (e.g. after a purchase).
+  const [fallbackAvatar] = useState(getRandomAvatarConfig);
   const avatarPremium = useAvatarPremium();
   const equippedFrame = useEquippedCosmetic('profileFrame');
   // Personal accent ring: only when the player picked a non-default style.
@@ -82,6 +85,12 @@ export function ProfileHeader({
 
   const { name, isPlaceholder } = friendlyDisplayName(profile?.display_name, profile?.username);
   const share = useShareProfile({ username: profile?.username, name, isOwn: true });
+
+  // updateProfile RETURNS { error } (never throws); surface it so the catch runs.
+  const saveProfile = useCallback(async (updates: Partial<ProfileData>): Promise<void> => {
+    const { error } = await updateProfile(updates);
+    if (error) throw new Error(error.message);
+  }, [updateProfile]);
 
   const startEditingName = (): void => {
     setEditDisplayName(isPlaceholder ? '' : name);
@@ -99,7 +108,7 @@ export function ProfileHeader({
     }
     setIsSaving(true);
     try {
-      await updateProfile({ display_name: editDisplayName.trim() });
+      await saveProfile({ display_name: editDisplayName.trim() });
       await refreshProfile();
       setIsEditingName(false);
       toast.success(t('profile.saved'));
@@ -118,7 +127,7 @@ export function ProfileHeader({
       if (outgoing && JSON.stringify(outgoing) !== JSON.stringify(config)) {
         stashPreviousAvatar(outgoing);
       }
-      await updateProfile({ avatar_config: config });
+      await saveProfile({ avatar_config: config });
       await refreshProfile();
       setIsAvatarBuilderOpen(false);
       toast.success(t('profile.saved'));
@@ -131,7 +140,7 @@ export function ProfileHeader({
   const handleCountryChange = useCallback(async (countryCode: string | null): Promise<void> => {
     setIsSavingCountry(true);
     try {
-      await updateProfile({ country_code: countryCode });
+      await saveProfile({ country_code: countryCode });
       await refreshProfile();
       setIsEditingCountry(false);
       toast.success(t('profile.countrySaved'));
@@ -141,7 +150,7 @@ export function ProfileHeader({
     } finally {
       setIsSavingCountry(false);
     }
-  }, [updateProfile, refreshProfile, t]);
+  }, [saveProfile, refreshProfile, t]);
 
   const openBuilder = useCallback(() => setIsAvatarBuilderOpen(true), []);
 
@@ -269,7 +278,7 @@ export function ProfileHeader({
         isOpen={isAvatarBuilderOpen}
         onClose={() => setIsAvatarBuilderOpen(false)}
         onSave={handleAvatarSave}
-        initialConfig={profile?.avatar_config ?? getRandomAvatarConfig()}
+        initialConfig={profile?.avatar_config ?? fallbackAvatar}
         premium={avatarPremium}
         previousConfig={previousAvatar}
       />

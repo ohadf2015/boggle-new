@@ -16,6 +16,8 @@ import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { REVIEW_MASCOT_ART } from '@/lib/education/academyReactions';
 import { cn } from '@/lib/utils';
 import { ACADEMY_ART } from './AcademyChrome';
+import { INTRO_COPY, INTRO_CTA, INTRO_HERO, INTRO_KICKER, INTRO_LAYOUT, INTRO_TITLE } from './introLayout';
+import { useIsHydrating } from './useIsHydrating';
 
 const GEMS = ['#00ffff', '#c084fc', '#ff4fb0', '#bfff00', '#ffe135'] as const;
 const GEM_SHAPE = 'polygon(50% 0, 100% 32%, 82% 100%, 18% 100%, 0 32%)';
@@ -31,7 +33,7 @@ function Gem({ word, color }: { word: string; color: string }) {
     <span className="flex flex-col items-center gap-0.5">
       <span
         aria-hidden
-        className="block h-7 w-8 lg:h-12 lg:w-14"
+        className="block h-[min(1.75rem+2cqmin,4.5rem)] w-[min(2rem+2.4cqmin,5.25rem)]"
         style={{
           clipPath: GEM_SHAPE,
           background: `linear-gradient(135deg, #fff 0%, ${color} 35%, ${color} 60%, rgba(0,0,0,0.55) 100%)`,
@@ -39,7 +41,7 @@ function Gem({ word, color }: { word: string; color: string }) {
         }}
       />
       <span
-        className="whitespace-nowrap rounded-full border-2 border-black px-2 font-neo-display text-xs font-black text-black lg:px-3 lg:text-xl"
+        className="whitespace-nowrap rounded-full border-2 border-black px-[0.6em] font-neo-display text-[clamp(0.7rem,3.2cqmin,2.1rem)] font-black text-black"
         style={{ background: color, boxShadow: '2px 2px 0 #000' }}
       >
         {word}
@@ -65,16 +67,18 @@ export function ReviewVaultIntro({
   // Loader → loaded intro is a remount: play the entrance once, never a half-built replay.
   const mountId = useId();
   const [entrance] = useState(() => claimIntroEntrance('vault', Date.now(), mountId));
-  const still = reduce || !entrance;
+  // The server/hydration frame is the finished scene (chest drawn, door still): framer bakes `initial` into SSR HTML.
+  const hydrating = useIsHydrating();
+  const still = reduce || !entrance || hydrating;
   const gems = words.slice(0, 5);
   const sockets = loading ? 5 : gems.length;
   const bolts = Array.from({ length: 12 }, (_, i) => (i / 12) * Math.PI * 2);
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col items-center gap-2 lg:grid lg:max-w-[110rem] lg:grid-cols-2 lg:items-center lg:gap-12">
-      <div data-testid="review-hero" className="relative grid min-h-0 w-full flex-1 place-items-center lg:h-[80vh] lg:flex-none">
+    <div className={INTRO_LAYOUT}>
+      <div data-testid="review-hero" className={cn(INTRO_HERO, 'grid place-items-center')}>
         <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 48%, rgba(0,255,255,0.28), rgba(139,92,246,0.18) 35%, transparent 65%)' }} />
-        <div className="relative [--door:min(70vw,33vh,40rem)] lg:[--door:min(40vw,64vh)]" style={{ width: 'var(--door)', height: 'var(--door)' }}>
+        <div className="relative [--door:min(72cqw,68cqh,62rem)]" style={{ width: 'var(--door)', height: 'var(--door)' }}>
           {/* The vault door: steel rim, 12 bolts, a recessed dial well holding the chest. */}
           <motion.div
             aria-hidden
@@ -135,7 +139,7 @@ export function ReviewVaultIntro({
                     {w ? (
                       <Gem word={w} color={GEMS[i % GEMS.length]} />
                     ) : (
-                      <span aria-hidden className="block h-7 w-8 opacity-50 lg:h-12 lg:w-14" style={{ clipPath: GEM_SHAPE, background: 'linear-gradient(135deg, #9fb0cc, #2c3650)' }} />
+                      <span aria-hidden className="block h-[min(1.75rem+2cqmin,4.5rem)] w-[min(2rem+2.4cqmin,5.25rem)] opacity-50" style={{ clipPath: GEM_SHAPE, background: 'linear-gradient(135deg, #9fb0cc, #2c3650)' }} />
                     )}
                   </motion.span>
                 </li>
@@ -149,7 +153,7 @@ export function ReviewVaultIntro({
           alt=""
           draggable={false}
           className="absolute bottom-0 start-0 object-contain drop-shadow-[4px_4px_0_#000]"
-          style={{ width: 'min(22vw, 12vh, 14rem)', height: 'min(22vw, 12vh, 14rem)' }}
+          style={{ width: 'min(20cqw, 24cqh, 14rem)', height: 'min(20cqw, 24cqh, 14rem)' }}
         />
       </div>
 
@@ -157,13 +161,13 @@ export function ReviewVaultIntro({
         initial={still ? false : { y: 30 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22, delay: reduce ? 0 : 0.15 }}
-        className="flex w-full max-w-md shrink-0 flex-col items-center text-center sm:max-w-xl lg:max-w-none lg:items-start lg:text-start"
+        className={INTRO_COPY}
       >
-        <p className="min-h-4 font-neo-display text-xs font-black uppercase tracking-widest text-neo-cyan lg:min-h-8 lg:text-2xl">{lessonName}</p>
-        <h2 className="mb-1 font-neo-display text-3xl font-black uppercase leading-none text-neo-white sm:text-5xl lg:mb-4 lg:text-8xl" style={{ textShadow: '3px 3px 0 #000' }}>
+        <p className={cn(INTRO_KICKER, 'text-neo-cyan')}>{lessonName}</p>
+        <h2 className={cn(INTRO_TITLE, 'mb-1 lg:text-[clamp(2.25rem,min(4.4vw,7.5vh),7rem)]')} style={{ textShadow: '3px 3px 0 #000' }}>
           {loading ? t('common.loading', 'Loading…') : t('academy.modes.review.vaultTitle', '{count} words locked in the vault', { count: words.length })}
         </h2>
-        <p className="mb-3 font-neo-body text-sm text-neo-cream sm:text-base lg:mb-8 lg:text-2xl">
+        <p className="mb-3 font-neo-body text-sm text-neo-cream sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:mb-[clamp(1rem,3.5vh,2rem)] lg:text-[clamp(1rem,min(1.6vw,2.6vh),1.75rem)]">
           {t('academy.modes.review.introBody', '10 quick cards. Keep the streak alive, open the chest.')}
         </p>
         <motion.button
@@ -185,13 +189,13 @@ export function ReviewVaultIntro({
           }
           transition={reduce ? undefined : { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           className={cn(
-            'relative flex min-h-[4.25rem] w-full items-center justify-center gap-3 overflow-hidden rounded-neo border-[3px] border-black px-4',
-            'font-neo-display text-2xl font-black uppercase tracking-wide text-black disabled:opacity-60 lg:min-h-28 lg:max-w-xl lg:text-5xl',
+            INTRO_CTA,
+            'text-2xl [@media(orientation:landscape)_and_(max-height:520px)]:text-xl! lg:text-[clamp(1.5rem,min(3vw,5vh),4.25rem)]',
           )}
           style={{ background: 'linear-gradient(180deg, #b8ffff 0%, #00e5ff 45%, #8b5cf6 120%)', boxShadow: '6px 6px 0 #000, 0 0 28px rgba(0,255,255,0.7)' }}
         >
           <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-white/60" />
-          <KeyRound className="relative h-8 w-8 lg:h-12 lg:w-12" aria-hidden />
+          <KeyRound className="relative h-[1.2em] w-[1.2em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.review.crack', 'Crack the vault')}</span>
         </motion.button>
       </motion.div>

@@ -164,20 +164,6 @@ vi.mock('@/utils/gameLogger', () => ({
 vi.mock('@/utils/gameHistoryManager', () => ({ addGameToHistory: vi.fn() }));
 
 // ---------------------------------------------------------------------------
-// AutoPlayCountdown immediately cancels so ctaBlock is visible
-// ---------------------------------------------------------------------------
-
-vi.mock('@/components/results/AutoPlayCountdown', () => {
-  const MockAutoPlay = ({ onCancel }: { onCancel: () => void }) => {
-    const ReactLib = require('react');
-    ReactLib.useEffect(() => { onCancel(); }, [onCancel]);
-    return null;
-  };
-  MockAutoPlay.displayName = 'MockAutoPlayCountdown';
-  return { default: MockAutoPlay };
-});
-
-// ---------------------------------------------------------------------------
 // Component mocks (all UI leaf components not under test)
 // ---------------------------------------------------------------------------
 
@@ -288,7 +274,7 @@ const renderResults = () =>
 // Tests
 // ---------------------------------------------------------------------------
 
-describe('exp-results-replay-cta-v1', () => {
+describe('SinglePlayerResults — replay CTA', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     experimentVariant = 'control';
@@ -304,80 +290,41 @@ describe('exp-results-replay-cta-v1', () => {
     });
   });
 
-  describe('results_autoplay_cancelled instrumentation', () => {
-    it('tracks results_autoplay_cancelled when the auto-play countdown is cancelled', async () => {
-      await act(async () => { renderResults(); });
-      expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
-        'results_autoplay_cancelled',
-        expect.objectContaining({ mode: 'practice' }),
-      );
-    });
-  });
-
-  describe('auto-play gating on engagement', () => {
-    it('does NOT mount the auto-play countdown when the player found no words', async () => {
-      // Given a game where the player never played (idle tab / bot)
-      await act(async () => {
-        render(
-          <SinglePlayerResults
-            results={{ ...baseResults, playerScore: 0, playerWords: [], playerWordData: [] }}
-            mode="practice"
-            onPlayAgain={mockOnPlayAgain}
-            onBackToLobby={mockOnBackToLobby}
-          />,
-        );
-      });
-
-      // Then no countdown mounted (the mock would have tracked a cancel), manual CTAs show
-      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('results_autoplay_cancelled', expect.anything());
-      expect(screen.getByTestId('next-step-prompt')).toBeDefined();
-      expect(mockOnPlayAgain).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('control variant', () => {
-    it('does NOT render quick-replay button', async () => {
-      experimentVariant = 'control';
-      await act(async () => { renderResults(); });
-      expect(screen.queryByTestId('quick-replay-btn')).toBeNull();
+  describe('no auto-start — the player always chooses the next game', () => {
+    it('Given a played round, When the results sit for 15s, Then no new game starts on its own', async () => {
+      vi.useFakeTimers();
+      try {
+        await act(async () => { renderResults(); });
+        await act(async () => { vi.advanceTimersByTime(15_000); });
+        expect(mockOnPlayAgain).not.toHaveBeenCalled();
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
-    it('still renders NextStepPrompt', async () => {
-      experimentVariant = 'control';
-      await act(async () => { renderResults(); });
-      expect(screen.getByTestId('next-step-prompt')).toBeDefined();
-    });
-  });
-
-  describe('quick-replay variant', () => {
-    beforeEach(() => { experimentVariant = 'quick-replay'; });
-
-    it('renders "Run it back?" button', async () => {
+    it('shows the next-game choices immediately, with no cancel step', async () => {
       await act(async () => { renderResults(); });
       expect(screen.getByTestId('quick-replay-btn')).toBeDefined();
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('results_autoplay_cancelled', expect.anything());
+    });
+  });
+
+  describe('play-again button (every player, no experiment arm)', () => {
+    it.each(['control', 'quick-replay'])('renders "Run it back?" for variant %s', async (variant) => {
+      experimentVariant = variant;
+      await act(async () => { renderResults(); });
       expect(screen.getByText('Run it back?')).toBeDefined();
     });
 
-    it('calls onPlayAgain when button is clicked', async () => {
+    it('calls onPlayAgain only when clicked, and tracks results_cta_clicked', async () => {
       const user = userEvent.setup();
       await act(async () => { renderResults(); });
       await user.click(screen.getByTestId('quick-replay-btn'));
       expect(mockOnPlayAgain).toHaveBeenCalledOnce();
-    });
-
-    it('tracks results_cta_clicked with cta=quick_replay on click', async () => {
-      const user = userEvent.setup();
-      await act(async () => { renderResults(); });
-      await user.click(screen.getByTestId('quick-replay-btn'));
       expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
         'results_cta_clicked',
         expect.objectContaining({ cta: 'quick_replay' }),
       );
-    });
-
-    it('still renders NextStepPrompt below the quick-replay button', async () => {
-      await act(async () => { renderResults(); });
-      expect(screen.getByTestId('next-step-prompt')).toBeDefined();
     });
   });
 });

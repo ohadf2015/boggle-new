@@ -1,24 +1,45 @@
 {
   "summary": {
-    "totalKeysInCode": 7197,
+    "totalKeysInCode": 7308,
     "keyCountByLanguage": {
-      "en": 13917,
-      "es": 14205,
-      "he": 14127,
-      "ja": 14186,
-      "ru": 13959,
-      "sv": 14183
+      "en": 14128,
+      "es": 14416,
+      "he": 14338,
+      "ja": 14397,
+      "ru": 14170,
+      "sv": 14394
     },
     "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 399,
+      "templateLiterals": 405,
       "fallbackUsages": 1,
       "variableKeys": 116
     }
   },
   "runtimeRisks": {
     "templateLiterals": [
+      {
+        "pattern": "`avatarLab.views.${v}`",
+        "type": "template_literal",
+        "file": "app/[locale]/avatar-test/PageClient.tsx",
+        "line": 37,
+        "context": "{t(`avatarLab.views.${v}`)}"
+      },
+      {
+        "pattern": "`profile.sections.${s.id}`",
+        "type": "template_literal",
+        "file": "app/[locale]/avatar-test/ProfileLabView.tsx",
+        "line": 83,
+        "context": "const tabs: ShowcaseTab[] = SECTIONS.map(s => ({ id: s.id, Icon: s.Icon, label: t(`profile.sections."
+      },
+      {
+        "pattern": "`avatarLab.placeholder.${id}`",
+        "type": "template_literal",
+        "file": "app/[locale]/avatar-test/labShared.tsx",
+        "line": 22,
+        "context": "<p className=\"text-neo-white/80 text-sm mt-1\">{t(`avatarLab.placeholder.${id}`)}</p>"
+      },
       {
         "pattern": "`education.access.${key}`",
         "type": "template_literal",
@@ -436,7 +457,7 @@
         "pattern": "`adventure.worlds.${worldCfg.name}`",
         "type": "template_literal",
         "file": "components/adventure/map/RunMapScreen.tsx",
-        "line": 127,
+        "line": 132,
         "context": "{worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : t('adventurePlay.title')}"
       },
       {
@@ -734,60 +755,39 @@
         "context": "{t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}"
       },
       {
-        "pattern": "`avatarBuilder.bodyStyles.${style}`",
-        "type": "template_literal",
-        "file": "components/avatar/AvatarBuilderCategoryOptions.tsx",
-        "line": 345,
-        "context": "{t(`avatarBuilder.bodyStyles.${style}`) || style}"
-      },
-      {
         "pattern": "`avatarBuilder.${gender}`",
         "type": "template_literal",
         "file": "components/avatar/AvatarBuilderColorControls.tsx",
-        "line": 104,
+        "line": 99,
         "context": "<span>{t(`avatarBuilder.${gender}`)}</span>"
       },
       {
-        "pattern": "`avatarBuilder.tiers.${getAvatarVisualTier(config)}`",
-        "type": "template_literal",
-        "file": "components/avatar/AvatarBuilderModal.tsx",
-        "line": 271,
-        "context": "{t(`avatarBuilder.tiers.${getAvatarVisualTier(config)}`)}"
-      },
-      {
-        "pattern": "`avatarBuilder.sets.${set.id}`",
-        "type": "template_literal",
-        "file": "components/avatar/AvatarBuilderModal.tsx",
-        "line": 304,
-        "context": "title={t(`avatarBuilder.sets.${set.id}`)}"
-      },
-      {
-        "pattern": "`avatarBuilder.sets.${set.id}`",
-        "type": "template_literal",
-        "file": "components/avatar/AvatarBuilderModal.tsx",
-        "line": 307,
-        "context": "{t(`avatarBuilder.sets.${set.id}`)}"
-      },
-      {
-        "pattern": "`avatarBuilder.tiers.${visualTier}`",
-        "type": "template_literal",
-        "file": "components/avatar/AvatarBuilderPartGrid.tsx",
-        "line": 201,
-        "context": "? `${displayName} · ${t(`avatarBuilder.tiers.${visualTier}`)}`"
+        "pattern": "avatarBuilder.${gender}",
+        "file": "components/avatar/AvatarBuilderColorControls.tsx",
+        "line": 99,
+        "context": "<span>{t(`avatarBuilder.${gender}`)}</span>",
+        "type": "template_literal"
       },
       {
         "pattern": "`avatarBuilder.tiers.${tier}`",
         "type": "template_literal",
         "file": "components/avatar/AvatarTierBadge.tsx",
-        "line": 70,
+        "line": 35,
         "context": "{t(`avatarBuilder.tiers.${tier}`)}"
       },
       {
         "pattern": "avatarBuilder.tiers.${tier}",
         "file": "components/avatar/AvatarTierBadge.tsx",
-        "line": 70,
+        "line": 35,
         "context": "{t(`avatarBuilder.tiers.${tier}`)}",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`avatarBuilder.sets.${set.id}`",
+        "type": "template_literal",
+        "file": "components/avatar/editor/UnlockPanel.tsx",
+        "line": 93,
+        "context": "<span className=\"min-w-0 truncate font-black uppercase tracking-wider\">{t(`avatarBuilder.sets.${set."
       },
       {
         "pattern": "`blast.results.brag.${tier.key}`",
@@ -1770,6 +1770,13 @@
         "context": "{t(`asyncChallenge.mode.${challenge.gameMode}`)}"
       },
       {
+        "pattern": "`homeFresh.close.readMoreLinks.${key}`",
+        "type": "template_literal",
+        "file": "components/landing/fresh/FreshFaqLinks.tsx",
+        "line": 56,
+        "context": "{t(`homeFresh.close.readMoreLinks.${key}`)}"
+      },
+      {
         "pattern": "`landing.home.tier.${tier.toLowerCase()}`",
         "type": "template_literal",
         "file": "components/landing/home/HomeRankCard.tsx",
@@ -1780,7 +1787,7 @@
         "pattern": "`landing.home.titles.${titleKey}`",
         "type": "template_literal",
         "file": "components/landing/home/HomeTopBar.tsx",
-        "line": 104,
+        "line": 100,
         "context": "const title = titleKey ? t(`landing.home.titles.${titleKey}`, humanizeTitleKey(titleKey)) : null;"
       },
       {
@@ -2006,6 +2013,41 @@
         "file": "components/profile/ProfileAchievementsPublic.tsx",
         "line": 53,
         "context": "description: t(`achievements.${key}.description`),"
+      },
+      {
+        "pattern": "`achievements.${key}.name`",
+        "type": "template_literal",
+        "file": "components/profile/showcase/PinnedHighlights.tsx",
+        "line": 65,
+        "context": "{t(`achievements.${key}.name`) || key}"
+      },
+      {
+        "pattern": "`achievementTiers.${tier.toLowerCase()}`",
+        "type": "template_literal",
+        "file": "components/profile/showcase/PinnedHighlights.tsx",
+        "line": 71,
+        "context": "{t(`achievementTiers.${tier.toLowerCase()}`)}"
+      },
+      {
+        "pattern": "`profile.showcase.titles.${titleId}`",
+        "type": "template_literal",
+        "file": "components/profile/showcase/ShowcaseStage.tsx",
+        "line": 228,
+        "context": "{t(`profile.showcase.titles.${titleId}`)}"
+      },
+      {
+        "pattern": "`profile.showcase.stats.${stat.id}`",
+        "type": "template_literal",
+        "file": "components/profile/showcase/StageStatTile.tsx",
+        "line": 61,
+        "context": "{t(`profile.showcase.stats.${stat.id}`)}"
+      },
+      {
+        "pattern": "profile.showcase.stats.${stat.id}",
+        "file": "components/profile/showcase/StageStatTile.tsx",
+        "line": 61,
+        "context": "{t(`profile.showcase.stats.${stat.id}`)}",
+        "type": "template_literal"
       },
       {
         "pattern": "`quests.avatarPartCategory.${reward.category}`",
@@ -3526,7 +3568,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 314,
+        "line": 327,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3534,7 +3576,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 314,
+        "line": 327,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -4692,7 +4734,7 @@
       "usages": [
         {
           "file": "app/[locale]/PageClient.tsx",
-          "line": 253
+          "line": 269
         }
       ]
     },

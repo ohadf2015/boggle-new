@@ -15,7 +15,7 @@
  * classroom reward toast.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Socket } from 'socket.io-client';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -33,7 +33,9 @@ import { ISLANDS } from './academyNodes';
 import { buildAcademyIslands, pickNextAction, type AcademyIsland } from './academyIslands';
 import { useAcademyData } from './useAcademyData';
 import { AcademyHud } from './AcademyHud';
-import { AcademyMap, useMapLayout } from './AcademyMap';
+import { AcademyMap } from './AcademyMap';
+import { useHubLayout } from './hubLayout';
+import type { Insets } from './artFit';
 import { AcademyCta, ctaTone, useCtaOverline } from './AcademyCta';
 import { AcademySidePanel } from './AcademySidePanel';
 import { AcademyDock } from './AcademyDock';
@@ -41,6 +43,7 @@ import { DailyChest } from './DailyChest';
 import { ClassSheet } from './ClassSheet';
 import { InkPanel } from './chrome';
 import { useNodeLabel } from './AcademyNodeButton';
+import { cn } from '@/lib/utils';
 
 export interface AcademyHubProps {
   userId: string;
@@ -73,20 +76,39 @@ function LiveGameBridge({ classroomId, onChange }: { classroomId: string; onChan
 
 type Note = { kind: 'arena' } | { kind: 'boss'; left: number } | null;
 
-/** A real desktop: wide AND tall enough for the side card (a phone on its side is not). */
-const WIDE_QUERY = '(min-width: 1024px) and (min-height: 600px) and (min-aspect-ratio: 1/1)';
+/** Breathing room between the chrome and the nearest island box, px. */
+const CHROME_GAP = 8;
 
-function useWideScreen(): boolean {
-  const read = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(WIDE_QUERY).matches;
-  const [wide, setWide] = useState<boolean>(read);
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return;
-    const mq = window.matchMedia(WIDE_QUERY);
-    const onChange = () => setWide(mq.matches);
-    mq.addEventListener?.('change', onChange);
-    return () => mq.removeEventListener?.('change', onChange);
-  }, []);
-  return wide;
+/**
+ * How much of each edge the chrome covers, measured (visual px, zoom included)
+ * so the islands are solved against the real HUD and bottom bar.
+ */
+function useChromeInsets(top: React.RefObject<HTMLElement | null>, bottom: React.RefObject<HTMLElement | null>, deps: unknown[]): Insets {
+  const [insets, setInsets] = useState<Insets>({ top: 96, bottom: 170, left: 8, right: 8 });
+  useLayoutEffect(() => {
+    const read = () => {
+      const tr = top.current?.getBoundingClientRect();
+      const br = bottom.current?.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // jsdom (no layout) reports zeros — keep the estimate.
+      if (!tr || !br || (tr.height === 0 && br.height === 0)) return;
+      const next = { top: tr.bottom + CHROME_GAP, bottom: Math.max(0, vh - br.top) + CHROME_GAP, left: CHROME_GAP, right: CHROME_GAP };
+      setInsets((prev) =>
+        Math.abs(prev.top - next.top) < 1 && Math.abs(prev.bottom - next.bottom) < 1 ? prev : next,
+      );
+    };
+    read();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(read) : null;
+    if (top.current) ro?.observe(top.current);
+    if (bottom.current) ro?.observe(bottom.current);
+    window.addEventListener('resize', read);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener('resize', read);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  return insets;
 }
 
 export function AcademyHub(props: AcademyHubProps) {
@@ -96,8 +118,13 @@ export function AcademyHub(props: AcademyHubProps) {
   const [reducedEffects] = useReducedEffects();
   const prefersReduced = useReducedMotion();
   const reducedMotion = reducedEffects || !!prefersReduced;
-  const layout = useMapLayout();
-  const wide = useWideScreen();
+  const hub = useHubLayout();
+  const layout = hub.art;
+  const wide = hub.chrome === 'wide';
+  const rail = hub.chrome === 'rail';
+  const zoom: CSSProperties | undefined = hub.scale !== 1 ? { zoom: hub.scale } : undefined;
+  const topRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const [classOpen, setClassOpen] = useState(false);
   const [grantedXp, setGrantedXp] = useState<number | null>(null);
   const [live, setLive] = useState<LiveState>(NO_LIVE);
@@ -153,6 +180,7 @@ export function AcademyHub(props: AcademyHubProps) {
   // Pessimistic until every source answers: a student with a class must never
   // see "Join a classroom" or a half-built map flash first (pitfall class 1).
   const ready = !classroomLoading && (!data.lessonsLoading || data.lessons.length > 0);
+  const insets = useChromeInsets(topRef, bottomRef, [hub.chrome, hub.scale, hub.sideCard, ready]);
 
   // A late profile value must never roll the bar back below what the chest granted.
   const totalXp = Math.max(profileXp, grantedXp ?? 0);
@@ -195,15 +223,34 @@ export function AcademyHub(props: AcademyHubProps) {
     else if (target?.href) router.push(target.href);
   };
 
+  const hud = (
+    <AcademyHud
+      userId={userId}
+      name={studentName}
+      avatarConfig={avatarConfig}
+      totalXp={totalXp}
+      streak={data.streak}
+      stars={data.stars}
+      isGuest={isGuest}
+      onSignOut={onSignOut}
+      reducedMotion={reducedMotion}
+      title={pageTitle}
+      size={rail ? 'compact' : wide ? 'wide' : 'normal'}
+    />
+  );
+
   return (
     <div
       dir={dir}
       data-testid="academy-hub"
+      data-chrome={hub.chrome}
+      data-scale={hub.scale}
       className="fixed inset-0 overflow-hidden bg-neo-navy text-neo-white"
     >
       {classroomId && <LiveGameBridge classroomId={classroomId} onChange={setLive} />}
 
-      <main className="absolute inset-0" aria-label={t('academy.student.mapLabel', 'Academy map')}>
+      {/* Inline position: a global landscape-phone rule forces every <main> to relative. */}
+      <main className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} aria-label={t('academy.student.mapLabel', 'Academy map')}>
         <AcademyMap
           layout={layout}
           islands={ready ? islands : []}
@@ -213,33 +260,34 @@ export function AcademyHub(props: AcademyHubProps) {
           spotlightTone={ctaTone(action.kind)}
           onOpen={openNode}
           reducedMotion={reducedMotion}
+          insets={insets}
+          big={wide}
+          scale={hub.scale}
         />
       </main>
 
       {/* Top: ONE integrated HUD (who, class, level/XP, streak + stars in one tray). */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-3 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] sm:px-6 sm:pt-4">
-        <div className="pointer-events-auto">
-          <AcademyHud
-            userId={userId}
-            name={studentName}
-            avatarConfig={avatarConfig}
-            totalXp={totalXp}
-            streak={data.streak}
-            stars={data.stars}
-            isGuest={isGuest}
-            onSignOut={onSignOut}
-            reducedMotion={reducedMotion}
-            title={pageTitle}
-            wide={wide}
-          />
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-x-0 top-0 z-20',
+          rail
+            ? 'ps-[max(0.5rem,env(safe-area-inset-left,0px))] pe-[max(0.5rem,env(safe-area-inset-right,0px))] pt-[calc(env(safe-area-inset-top,0px)+0.375rem)]'
+            : 'px-3 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] sm:px-6 sm:pt-4',
+        )}
+      >
+        <div style={zoom} className={rail ? 'flex items-start justify-between gap-3' : undefined}>
+          <div ref={topRef} className={cn('pointer-events-auto', rail && 'min-w-0 max-w-md flex-1')}>
+            {hud}
+          </div>
+          {/* Phone: the chest is a small badge on the START side, away from the totals (end).
+              Phone on its side: at the far end of the top row, clear of the map's middle. */}
+          {!wide && (
+            <div className={cn('pointer-events-auto flex', rail ? 'shrink-0 pt-0.5' : 'mt-3')}>
+              <div className={rail ? 'me-1' : 'ms-1'}>{chest}</div>
+            </div>
+          )}
         </div>
         <p className="sr-only">{t('student.dashboard.greeting', { name: studentName })}</p>
-        {/* Phone: the chest is a small badge on the START side, away from the totals (end). */}
-        {!wide && (
-          <div className="pointer-events-auto mt-3 flex">
-            <div className="ms-1">{chest}</div>
-          </div>
-        )}
       </div>
 
       <AnimatePresence>
@@ -252,7 +300,7 @@ export function AcademyHub(props: AcademyHubProps) {
             animate={{ y: 0, scale: 1 }}
             exit={{ y: -8, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-            className="absolute inset-x-3 top-[8.5rem] z-30 mx-auto max-w-sm sm:top-36"
+            className={cn('absolute inset-x-3 z-30 mx-auto max-w-sm', rail ? 'top-16' : 'top-[8.5rem] sm:top-36')}
           >
             {reward ? (
               <InkPanel tone="lime" className="flex items-center justify-center gap-2 px-4 py-2 font-neo-display font-black text-neo-black">
@@ -286,17 +334,31 @@ export function AcademyHub(props: AcademyHubProps) {
         )}
       </AnimatePresence>
 
-      {/* Bottom. Phone: the ONE hero action over the dock. Desktop: side card
-          (start) · hero centred · dock (end), all over the cloud band. */}
-      <div className="absolute inset-x-0 bottom-0 z-20 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] sm:px-6 sm:pb-5">
+      {/* Bottom. Phone: the ONE hero action over the dock. Phone on its side: hero
+          and an icon dock share one row. Desktop: side card (start, when it fits)
+          · hero · dock (end), all over the cloud band. */}
+      <div
+        className={cn(
+          'absolute inset-x-0 bottom-0 z-20',
+          rail
+            ? 'ps-[max(0.5rem,env(safe-area-inset-left,0px))] pe-[max(0.5rem,env(safe-area-inset-right,0px))] pb-[calc(env(safe-area-inset-bottom,0px)+0.375rem)]'
+            : 'px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] sm:px-6 sm:pb-5',
+        )}
+      >
         <div
+          ref={bottomRef}
+          style={zoom}
           className={
-            wide
-              ? 'grid w-full grid-cols-[minmax(0,1fr)_minmax(0,40rem)_minmax(0,1fr)] items-end gap-5'
-              : 'mx-auto flex w-full max-w-xl flex-col gap-2.5'
+            wide && hub.sideCard
+              ? 'grid w-full grid-cols-[minmax(0,1fr)_minmax(0,40rem)_minmax(max-content,1fr)] items-end gap-5'
+              : wide
+                ? 'mx-auto flex w-full max-w-[64rem] items-end justify-center gap-5'
+                : rail
+                  ? 'mx-auto flex w-full max-w-3xl items-end gap-2'
+                  : 'mx-auto flex w-full max-w-xl flex-col gap-2.5'
           }
         >
-          {wide && (
+          {wide && hub.sideCard && (
             <div className="justify-self-start">
               {ready && pageTitle ? (
                 <AcademySidePanel title={pageTitle} streak={data.streak} boss={boss} chest={chest} />
@@ -305,7 +367,8 @@ export function AcademyHub(props: AcademyHubProps) {
               )}
             </div>
           )}
-          <div className={wide ? 'w-full' : undefined}>
+          {wide && !hub.sideCard && <div className="shrink-0 pb-3">{chest}</div>}
+          <div className={cn(wide && 'w-full', wide && !hub.sideCard && 'min-w-0 max-w-[40rem] flex-1', rail && 'min-w-0 flex-1')}>
             {ready ? (
               <AcademyCta
                 kind={action.kind}
@@ -316,23 +379,27 @@ export function AcademyHub(props: AcademyHubProps) {
                 joinError={joinError}
                 onPress={pressCta}
                 reducedMotion={reducedMotion}
-                big={wide}
+                size={wide ? 'big' : rail ? 'compact' : 'normal'}
               />
             ) : (
               <div
                 data-testid="academy-cta-pending"
                 aria-busy="true"
-                className="h-[68px] w-full animate-pulse rounded-[20px] border-3 border-neo-cream bg-neo-navy-light sm:h-[76px]"
+                className={cn(
+                  'w-full animate-pulse rounded-[20px] border-3 border-neo-cream bg-neo-navy-light',
+                  rail ? 'h-14' : wide ? 'h-[92px]' : 'h-[68px] sm:h-[76px]',
+                )}
               />
             )}
           </div>
-          <div className={wide ? 'w-full max-w-[30rem] justify-self-end' : undefined}>
+          <div className={cn(wide && 'shrink-0 justify-self-end', rail && 'shrink-0')}>
             <AcademyDock
               locale={language}
               reviewCount={data.reviewCount}
               onOpenClass={classroomId ? () => setClassOpen(true) : undefined}
               onSolo={ready && action.kind !== 'solo' ? goSolo : undefined}
               big={wide}
+              iconOnly={rail}
             />
           </div>
         </div>

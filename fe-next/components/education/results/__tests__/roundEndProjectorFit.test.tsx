@@ -94,8 +94,12 @@ describe('the projector recap fits the wall', () => {
       <ClassroomTvResults summary={bigSummary(0)} onRematch={() => {}} t={t} />
     );
     // On the wall (lg+): a root that scrolls only below lg is not a scroller.
+    // Nor is the "More" popover: it lives inside a closed <details>, floats
+    // OVER the wall only when the teacher opens it, and caps its own height so
+    // it can never run off-screen — an overlay, not a region of the wall.
     const scrollers = Array.from(container.querySelectorAll<HTMLElement>('[class]')).filter((el) => {
       const cls = (el.getAttribute('class') ?? '').split(/\s+/);
+      if (el.closest('[data-testid="reteach-more-panel"]')) return false;
       return cls.includes('overflow-y-auto') && !cls.includes('lg:overflow-hidden');
     });
     expect(scrollers).toHaveLength(1);

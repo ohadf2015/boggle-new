@@ -280,14 +280,14 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
             }}
           />
         </AcademyScene>
-        {/* The Baron: speech bubble under his scoreboard face below 2xl, a full portrait hugging the board in the 2xl gutter.
+        {/* The Baron: speech bubble under his scoreboard face below 2xl (a phone on its side: the free strip under the action bar), a full portrait hugging the board in the 2xl gutter.
             The bubble hides while the LESSON WORD banner shows, so the two never collide. */}
         <WorkshopRival
           mood={rival.mood}
           taunt={callout ? null : rival.taunt}
           size="game"
           bubbleSide="below"
-          className="fixed end-3 top-[12.5rem] z-[60] items-end 2xl:end-auto 2xl:start-[max(1rem,calc(50%-var(--wk-col)/2-17.5rem))] 2xl:top-1/2 2xl:-translate-y-1/2 2xl:items-center"
+          className="fixed end-3 top-[12.5rem] z-[60] items-end [@media(orientation:landscape)_and_(max-height:520px)]:top-auto [@media(orientation:landscape)_and_(max-height:520px)]:bottom-2 2xl:end-auto 2xl:start-[max(1rem,calc(50%-var(--wk-col)/2-17.5rem))] 2xl:top-1/2 2xl:-translate-y-1/2 2xl:items-center"
         />
         <div className="pointer-events-none fixed start-[calc(50%+var(--wk-col)/2+1.5rem)] top-1/2 z-[55] hidden w-[min(20rem,calc(50%-var(--wk-col)/2-2.5rem))] -translate-y-1/2 2xl:block">
           <WorkshopWordsPanel player={player} chips={chips} found={found} stars={stars} />

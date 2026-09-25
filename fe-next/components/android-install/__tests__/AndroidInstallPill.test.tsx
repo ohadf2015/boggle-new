@@ -131,6 +131,18 @@ describe('AndroidInstallPill', () => {
     expect(close.className).toContain('min-w-11');
   });
 
+  // Even as an icon tab, mid-edge sat on the home hub's GAME MODES header and a
+  // mode card's NEW badge. Phones: thumb-zone corner above the nav/ad stack.
+  it('sits above the bottom nav + ad stack on phones, mid-edge only from md up', () => {
+    useAndroidInstallStore.setState({ pillVisible: true });
+    render(<AndroidInstallPill />);
+    settle();
+    const bar = screen.getByRole('button', { name: 'androidAppPromo.pillClose' }).parentElement!;
+    expect(bar.className).toContain('bottom-[calc(var(--bottom-stack-height)+0.75rem)]');
+    expect(bar.className).toContain('md:top-1/2');
+    expect(bar.className).not.toMatch(/(^|\s)top-1\/2/);
+  });
+
   it('reopens the promo tagged as a pill re-entry when tapped', () => {
     useAndroidInstallStore.setState({ pillVisible: true });
     render(<AndroidInstallPill />);

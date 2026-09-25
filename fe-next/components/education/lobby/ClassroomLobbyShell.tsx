@@ -45,7 +45,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, className }: Cla
           a short lobby sits in the middle of a 900px desktop instead of
           stranding 500px of empty navy under it, and a tall one still gets its
           own scrollbar without ever handing the scroll to the page. */}
-      <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-1 flex-col justify-center gap-3 px-1 py-2 lg:max-w-4xl lg:gap-4">
+      <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-1 flex-col justify-center-safe gap-3 px-1 py-2 lg:max-w-4xl lg:gap-4">
         {/* The stage title: what this screen is for, in one line, on a
             show-card — the arena behind it says the rest. */}
         <header className="flex shrink-0 flex-col items-center gap-1 text-center">

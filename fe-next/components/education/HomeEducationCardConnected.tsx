@@ -60,10 +60,11 @@ function StudentHomeCard() {
  * unenrolled players. Shown on every homepage visit so teachers can find
  * classroom mode without having seen it "once" in a previous session.
  * Phone widths only: from md up the landing leads with the classroom hero, and the
- * strip above it repeated the same pitch. */
+ * strip above it repeated the same pitch. `order-last` puts it after the
+ * player's hub instead of above their greeting. */
 function EducationPromoCard() {
   return (
-    <div className="md:hidden">
+    <div className="order-last px-1.5 md:hidden">
       <HomeEducationCard role="promo" />
     </div>
   );

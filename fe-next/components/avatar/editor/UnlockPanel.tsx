@@ -57,7 +57,8 @@ export default function UnlockPanel({
     ? t('avatarBuilder.editor.needMoreGold', { amount: safeToLocaleString(info.goldShort, language) })
     : levelPath && info.price > 0
       ? t('avatarBuilder.editor.orKeepPlaying')
-      : null;
+      // Tried-on parts never save; say so, or Save reads as broken.
+      : t('avatarBuilder.editor.doneSkipsTryOn');
 
   // Compact two-column strip (≈72px) between the grid and the action bar:
   // what it is + how to get it on the start side, the buy button on the end side.

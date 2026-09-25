@@ -110,15 +110,15 @@ export function ClassroomCard({
     <m.div
       variants={slideUp}
       data-testid="classroom-card"
-      className="relative rounded-neo border-3 border-black bg-neo-cream shadow-hard transition-shadow hover:shadow-hard-lg"
+      className="@container relative rounded-neo border-3 border-black bg-neo-cream shadow-hard transition-shadow hover:shadow-hard-lg"
     >
       <div
         className={cn(
-          "flex items-center gap-2 rounded-t-[inherit] border-b-3 border-black px-3 py-1.5",
+          "flex items-center gap-2 rounded-t-[inherit] border-b-3 border-black px-3 py-1.5 [@media(orientation:landscape)_and_(max-height:500px)]:py-1",
           HEADER_BG[index % HEADER_BG.length],
         )}
       >
-        <h3 className="min-w-0 flex-1 truncate font-neo-display text-lg font-black text-black sm:text-xl">
+        <h3 className="min-w-0 flex-1 truncate font-neo-display text-base font-black text-black @[20rem]:text-lg @[24rem]:text-xl">
           {classroom.name}
         </h3>
         <span className="shrink-0 rounded-neo bg-black px-2 py-0.5 text-xs font-black text-white">
@@ -207,8 +207,10 @@ export function ClassroomCard({
         </div>
       </div>
 
-      <div className="space-y-2 p-2.5">
-        <div className="flex items-stretch gap-2 rounded-neo border-3 border-black bg-neo-yellow p-2 shadow-hard-sm">
+      {/* A phone turned sideways has width, not height: a 2x2 of invite |
+          cap meter over roster | Start (the roster list opens below). */}
+      <div className="space-y-2 p-2.5 [@media(orientation:landscape)_and_(max-height:500px)]:p-2 [@media(orientation:landscape)_and_(max-height:500px)]:grid [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-2 [@media(orientation:landscape)_and_(max-height:500px)]:gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:space-y-0">
+        <div className="flex items-stretch gap-2 rounded-neo border-3 border-black bg-neo-yellow p-2 shadow-hard-sm [@media(orientation:landscape)_and_(max-height:500px)]:col-start-1 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-1">
           <div className="flex min-w-0 flex-1 flex-col items-center justify-center">
             <p
               data-testid="invite-students-label"
@@ -219,21 +221,22 @@ export function ClassroomCard({
             <code
               data-testid="classroom-join-code"
               dir="ltr"
-              className="block whitespace-nowrap text-center font-neo-display text-3xl min-[380px]:text-4xl md:text-3xl xl:text-4xl font-black tabular-nums tracking-wider text-black"
+              className="block whitespace-nowrap text-center font-neo-display text-3xl @[19rem]:text-4xl font-black tabular-nums tracking-wider text-black"
             >
               {classroom.join_code}
             </code>
           </div>
           {/* Stacked, and each button may shrink: side by side, SHARE sliced
               to "SHAR" in a ~300px card. `min-w-0` is what actually lets a
-              flex child shrink past its label. */}
+              flex child shrink past its label. The `py-1!` beats globals.css's
+              unlayered 0.75rem padding on every landscape-phone <button>. */}
           <div className="flex w-[46%] shrink-0 flex-col gap-1.5">
             <Button
               type="button"
               data-testid="copy-join-code"
               onClick={onCopy}
               className={cn(
-                "min-h-10 min-w-0 flex-1 border-2 border-black bg-neo-cyan px-1.5 text-xs font-black text-black",
+                "min-h-10 min-w-0 flex-1 border-2 border-black bg-neo-cyan px-1.5 text-xs font-black text-black [@media(orientation:landscape)_and_(max-height:600px)]:min-h-9 [@media(orientation:landscape)_and_(max-height:600px)]:py-1!",
                 PRESS,
               )}
               aria-label={t("teacher.classroom.copyCode")}
@@ -248,7 +251,7 @@ export function ClassroomCard({
               data-testid="share-join-code"
               onClick={onShare}
               className={cn(
-                "min-h-10 min-w-0 flex-1 border-2 border-black bg-neo-cream px-1.5 text-xs font-black text-black",
+                "min-h-10 min-w-0 flex-1 border-2 border-black bg-neo-cream px-1.5 text-xs font-black text-black [@media(orientation:landscape)_and_(max-height:600px)]:min-h-9 [@media(orientation:landscape)_and_(max-height:600px)]:py-1!",
                 PRESS,
               )}
               aria-label={t("teacher.classroom.share")}
@@ -259,12 +262,19 @@ export function ClassroomCard({
           </div>
         </div>
 
-        {activity}
+        {/* Short screens (a 375x667 phone, a phone sideways) drop the recap:
+            its "next up" repeats the Start button below, and the card must
+            fit without scrolling. */}
+        {activity ? (
+          <div className="max-sm:[@media(max-height:760px)]:hidden [@media(orientation:landscape)_and_(max-height:500px)]:hidden">
+            {activity}
+          </div>
+        ) : null}
 
         <StudentCapMeter
           studentCount={count}
           source="classroom_card"
-          className="py-1.5"
+          className="py-1.5 [@media(orientation:landscape)_and_(max-height:500px)]:col-start-2 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-1"
         />
 
         <button
@@ -272,7 +282,7 @@ export function ClassroomCard({
           onClick={onToggleExpanded}
           aria-expanded={expanded}
           className={cn(
-            "flex min-h-10 w-full items-center justify-between rounded-neo border-2 border-black px-3 py-1.5 text-sm font-bold shadow-hard-sm transition-all",
+            "flex min-h-10 w-full items-center justify-between rounded-neo border-2 border-black px-3 py-1.5 text-sm font-bold shadow-hard-sm transition-all [@media(orientation:landscape)_and_(max-height:500px)]:col-start-1 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-2 [@media(orientation:landscape)_and_(max-height:600px)]:py-1!",
             expanded
               ? "bg-black text-white"
               : "bg-neo-cream text-black hover:bg-black/5",
@@ -296,7 +306,7 @@ export function ClassroomCard({
           {expanded && (
             <m.div
               key="student-list"
-              className="max-h-48 overflow-y-auto overscroll-contain"
+              className="max-h-48 overflow-y-auto overscroll-contain [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-3"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -315,7 +325,7 @@ export function ClassroomCard({
             href={startGameHref}
             data-testid="classroom-card-start-game"
             className={cn(
-              "flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-4 py-2",
+              "flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-4 py-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-start-2 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-2 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-10",
               "font-neo-display text-lg font-black uppercase tracking-tight text-black",
               PRESS,
               "hover:shadow-hard focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",

@@ -231,6 +231,26 @@ const es = {
       "due": "Entrega: {date}",
       "failed": "No se pudo asignar. Inténtalo de nuevo.",
       "title": "Tarea: palabras falladas"
+    },
+    "pages": {
+      "backToMap": "Volver a la Academia",
+      "lessonDone": "Hecha",
+      "lessonKeepGoing": "Continúa",
+      "lessonNew": "Nueva",
+      "starsAria": "{count} de 3 estrellas",
+      "untitledLesson": "Lección",
+      "wordCount": "Palabras: {count}",
+      "mastered": "{pct}% dominado",
+      "due": "Entrega: {date}",
+      "noLessonsTitle": "Aún no hay lecciones",
+      "noLessonsBody": "Cuando tu profe comparta una lección, aparecerá aquí.",
+      "moreLessons": "Las nuevas lecciones de tu profe aparecerán aquí.",
+      "maxTier": "MÁX",
+      "noAwards": "Juega una lección para empezar a ganar premios.",
+      "firstAward": "¡Termina una lección y gana tu primer premio!",
+      "awardsEarned": "Ganados: {earned}/{total}",
+      "lessonsDone": "Hechas: {done}/{total}",
+      "lessonsRegion": "Tus lecciones"
     }
   },
   // @academy:end
@@ -1642,7 +1662,7 @@ const es = {
       "inferno": "¡Infierno!"
     },
     "cardTitle": "Torre de Palabras",
-    "cardDesc": "Apila palabras hasta el cielo — vista de admin",
+    "cardDesc": "Apila palabras hasta el cielo",
     "howTo": {
       "title": "Cómo jugar",
       "cta": "¡Entendido!",
@@ -2485,7 +2505,6 @@ const es = {
     "creating": "Creando...",
     "guest": "Invitado",
     "unknown": "Desconocido",
-    "loading": "Comprobando…",
     "back": "Atrás",
     "backHome": "Volver a Inicio",
     "backToHome": "Volver al Inicio",
@@ -16363,7 +16382,7 @@ const es = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Nv {level}", "unlocksAtLevel": "Se desbloquea en Nv {level}", "youAreLevel": "Estás en Nv {level}", "goldOnly": "Exclusivo con oro", "buyFor": "Desbloquear · {price}", "needMoreGold": "Te faltan {amount} de oro", "orKeepPlaying": "o sigue jugando: es gratis", "takeOff": "Quitar", "tryingOn": "Probando", "collection": "{owned} de {total} coleccionados" },
+    "editor": { "levelChip": "Nv {level}", "unlocksAtLevel": "Se desbloquea en Nv {level}", "youAreLevel": "Estás en Nv {level}", "goldOnly": "Exclusivo con oro", "buyFor": "Desbloquear · {price}", "needMoreGold": "Te faltan {amount} de oro", "orKeepPlaying": "o sigue jugando: es gratis", "takeOff": "Quitar", "tryingOn": "Probando", "collection": "{owned} de {total} coleccionados", "signInToBuy": "Inicia sesión para comprar con oro", "unlocked": "¡Desbloqueado!", "purchaseFailed": "No se pudo desbloquear. No se gastó oro.", "doneSkipsTryOn": "Guardar mantiene tu look sin esto" },
     "glowUp": {
       "button": "Mejorar",
       "loading": "Mejorando…",

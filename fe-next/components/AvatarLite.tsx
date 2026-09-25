@@ -2,6 +2,9 @@
 
 import { cn } from '@/lib/utils';
 import { AVATAR_RENDER_VERSION } from '@/lib/avatar/renderVersion';
+import { FACE_CROP_MAX_PX, faceCropImageStyle } from '@/lib/avatar/faceCrop';
+
+const FACE_STYLE = faceCropImageStyle();
 
 /**
  * First-paint stand-in for `Avatar`: keeps the art library off the landing /
@@ -87,6 +90,8 @@ export default function AvatarLite({
           loading="lazy"
           decoding="async"
           className="h-full w-full object-cover"
+          // Same face window as the SVG path; also crops the PNG's own token ring.
+          style={px <= FACE_CROP_MAX_PX ? FACE_STYLE : undefined}
           // A 404 can land before hydration, when onError isn't attached yet — catch it on mount.
           ref={(el) => {
             if (el && el.complete && el.naturalWidth === 0) el.style.display = 'none';

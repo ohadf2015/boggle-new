@@ -108,7 +108,7 @@ export function WinnerSpotlight({
       className={cn(
         'flex items-center gap-4 rounded-neo border-[2px] border-neo-cream shadow-hard',
         'bg-neo-navy-elevated text-neo-white',
-        projector ? 'px-6 py-4 gap-6' : 'px-4 py-3'
+        projector ? 'px-6 py-4 gap-6 min-[2200px]:px-10 min-[2200px]:py-6' : 'px-4 py-3'
       )}
     >
       {/* The mascot is the constant: it is on the wall before the name is, so
@@ -133,7 +133,7 @@ export function WinnerSpotlight({
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
           'pointer-events-none shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy',
-          projector ? 'w-28 h-28' : 'w-16 h-16'
+          projector ? 'w-28 h-28 min-[2200px]:w-44 min-[2200px]:h-44' : 'w-16 h-16'
         )}
       >
         {active && !calm && (
@@ -174,7 +174,7 @@ export function WinnerSpotlight({
             // 40% white on navy-elevated measured 3.50:1 — a smudge at the
             // back of a room, which is the only place this line is read from.
             active ? 'text-neo-yellow' : 'text-neo-white/75',
-            projector ? 'text-3xl' : 'text-sm'
+            projector ? 'text-3xl min-[2200px]:text-5xl' : 'text-sm'
           )}
         >
           {active
@@ -185,14 +185,14 @@ export function WinnerSpotlight({
           <p
             className={cn(
               'mt-1 flex items-baseline gap-3 font-neo-display font-black text-neo-white truncate',
-              projector ? 'text-5xl' : 'text-2xl'
+              projector ? 'text-5xl min-[2200px]:text-8xl' : 'text-2xl'
             )}
           >
             <span className="truncate">{winner.username}</span>
             <span
               className={cn(
                 'shrink-0 tabular-nums text-neo-lime',
-                projector ? 'text-4xl' : 'text-xl'
+                projector ? 'text-4xl min-[2200px]:text-6xl' : 'text-xl'
               )}
             >
               {winner.score}

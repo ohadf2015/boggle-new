@@ -27,6 +27,7 @@ import { FACIAL_HAIR } from './facialHair';
 import { accDef, eyeDef, hairDef } from './registry';
 import { RarityBackdrop, RarityFrame, TokenEdge } from './rarityFx';
 import { OverlayBadge } from './OverlayBadge';
+import { FACE_CROP } from '@/lib/avatar/faceCrop';
 
 /** Game-mode color frame around avatar — matches brand palette */
 export type AvatarMode = 'multiplayer' | 'singleplayer' | 'brain' | 'practice';
@@ -37,6 +38,9 @@ export const MODE_FRAME_COLOR: Record<AvatarMode, string> = {
   brain: '#8B5CF6',
   practice: '#BFFF00',
 };
+
+export { FACE_CROP };
+const FACE_DECOR = `translate(${FACE_CROP.x} ${FACE_CROP.y}) scale(${FACE_CROP.size / 100})`;
 
 export interface AvatarArtProps {
   config: CustomAvatarConfig;
@@ -55,6 +59,8 @@ export interface AvatarArtProps {
   /** draw the rarity frame ring (off → rays + sparkles only) */
   rarityFrame?: boolean;
   testId?: string;
+  /** 'face' frames the head for small tiles; the container draws the ring. */
+  crop?: 'full' | 'face';
 }
 
 function hashNum(s: string): number {
@@ -65,8 +71,9 @@ function hashNum(s: string): number {
 
 export default function AvatarArt({
   config, uid: rawUid, size = 64, className = '', circular = false, mode, mood, overlay, tierMarker,
-  forceTier, animated = false, rarityFrame = true, testId = 'custom-avatar',
+  forceTier, animated = false, rarityFrame = true, testId = 'custom-avatar', crop = 'full',
 }: AvatarArtProps) {
+  const face = crop === 'face';
   const uid = safeId(rawUid);
   const withMood = applyMood(config, mood);
   const cfg = resolveAvatarConfig(withMood);
@@ -89,9 +96,39 @@ export default function AvatarArt({
     ? <circle cx="50" cy="50" r="50" fill={cfg.bgColor} />
     : <rect x="0" y="0" width="100" height="100" rx="16" fill={cfg.bgColor} />;
 
+  const decor = (
+    <>
+      {mode && (
+        circular ? (
+          <g data-mode-frame="" stroke={MODE_FRAME_COLOR[mode]}>
+            <circle cx="50" cy="50" r="48" fill="none" stroke="#000" strokeWidth="5" />
+            <circle cx="50" cy="50" r="48" fill="none" stroke={MODE_FRAME_COLOR[mode]} strokeWidth="3" />
+          </g>
+        ) : (
+          <g data-mode-frame="" stroke={MODE_FRAME_COLOR[mode]}>
+            <rect x="2" y="2" width="96" height="96" rx="14" fill="none" stroke="#000" strokeWidth="5" />
+            <rect x="2" y="2" width="96" height="96" rx="14" fill="none" stroke={MODE_FRAME_COLOR[mode]} strokeWidth="3" />
+          </g>
+        )
+      )}
+
+      {showGem && (
+        <g data-tier-gem={markerTier}>
+          <polygon points="80,6 92,18 80,30 68,18" fill="#000" />
+          <polygon points="80,8.5 89.5,18 80,27.5 70.5,18" fill={markerTier === 'legendary' ? '#FFD700' : '#A855F7'} />
+          <polygon points="80,8.5 89.5,18 80,18" fill="#fff" opacity="0.25" />
+          <polygon points="80,8.5 70.5,18 80,18" fill="#fff" opacity="0.55" />
+          <circle cx="76.5" cy="13.5" r="1.1" fill="#fff" opacity="0.9" />
+        </g>
+      )}
+
+      {overlay && <OverlayBadge overlay={overlay} />}
+    </>
+  );
+
   return (
     <svg
-      viewBox="0 0 100 100"
+      viewBox={face ? `${FACE_CROP.x} ${FACE_CROP.y} ${FACE_CROP.size} ${FACE_CROP.size}` : '0 0 100 100'}
       width={size}
       height={size}
       className={`${scope} ${animated ? 'av-anim' : ''} ${className} ${moodClass}`.replace(/\s+/g, ' ').trim()}
@@ -159,34 +196,13 @@ export default function AvatarArt({
         </g>
       </g>
 
-      <RarityFrame tier={visual} uid={uid} circular={circular} showRing={rarityFrame && !mode} />
-      {visual === 'common' && circular && rarityFrame && !mode && <TokenEdge />}
+      <RarityFrame tier={visual} uid={uid} circular={circular} showRing={rarityFrame && !mode && !face} />
+      {visual === 'common' && circular && rarityFrame && !mode && !face && <TokenEdge />}
 
-      {mode && (
-        circular ? (
-          <g data-mode-frame="" stroke={MODE_FRAME_COLOR[mode]}>
-            <circle cx="50" cy="50" r="48" fill="none" stroke="#000" strokeWidth="5" />
-            <circle cx="50" cy="50" r="48" fill="none" stroke={MODE_FRAME_COLOR[mode]} strokeWidth="3" />
-          </g>
-        ) : (
-          <g data-mode-frame="" stroke={MODE_FRAME_COLOR[mode]}>
-            <rect x="2" y="2" width="96" height="96" rx="14" fill="none" stroke="#000" strokeWidth="5" />
-            <rect x="2" y="2" width="96" height="96" rx="14" fill="none" stroke={MODE_FRAME_COLOR[mode]} strokeWidth="3" />
-          </g>
-        )
-      )}
-
-      {showGem && (
-        <g data-tier-gem={markerTier}>
-          <polygon points="80,6 92,18 80,30 68,18" fill="#000" />
-          <polygon points="80,8.5 89.5,18 80,27.5 70.5,18" fill={markerTier === 'legendary' ? '#FFD700' : '#A855F7'} />
-          <polygon points="80,8.5 89.5,18 80,18" fill="#fff" opacity="0.25" />
-          <polygon points="80,8.5 70.5,18 80,18" fill="#fff" opacity="0.55" />
-          <circle cx="76.5" cy="13.5" r="1.1" fill="#fff" opacity="0.9" />
-        </g>
-      )}
-
-      {overlay && <OverlayBadge overlay={overlay} />}
+      {/* Badges are drawn for the full token; a face crop maps them into its window. */}
+      {face && (mode || showGem || overlay)
+        ? <g transform={FACE_DECOR}>{decor}</g>
+        : decor}
     </svg>
   );
 }

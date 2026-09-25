@@ -231,6 +231,26 @@ const en = {
       "due": "Due {date}",
       "failed": "Couldn’t assign it. Try again.",
       "title": "Missed-words homework"
+    },
+    "pages": {
+      "backToMap": "Back to the Academy",
+      "lessonDone": "Done",
+      "lessonKeepGoing": "Keep going",
+      "lessonNew": "New",
+      "starsAria": "{count} of 3 stars",
+      "untitledLesson": "Lesson",
+      "wordCount": "{count} words",
+      "mastered": "{pct}% mastered",
+      "due": "Due {date}",
+      "noLessonsTitle": "No lessons yet",
+      "noLessonsBody": "When your teacher shares a lesson, it lands here.",
+      "moreLessons": "New lessons from your teacher show up here.",
+      "maxTier": "MAX",
+      "noAwards": "Play a lesson to start earning awards.",
+      "firstAward": "Finish a lesson to win your first award!",
+      "awardsEarned": "{earned}/{total} earned",
+      "lessonsDone": "{done}/{total} done",
+      "lessonsRegion": "Your lessons"
     }
   },
   // @academy:end
@@ -1564,7 +1584,7 @@ const en = {
     },
     "combo": { "roll": "On a roll", "fire": "On fire", "blaze": "Blazing", "inferno": "Inferno" },
     "cardTitle": "Word Tower",
-    "cardDesc": "Stack words sky-high — admin preview",
+    "cardDesc": "Stack words sky-high",
     "howTo": {
       "title": "How to play",
       "cta": "Got it!",
@@ -2115,7 +2135,6 @@ const en = {
     "creating": "Creating...",
     "guest": "Guest",
     "unknown": "Unknown",
-    "loading": "Checking…",
     "back": "Back",
     "backHome": "Back Home",
     "backToHome": "Back to Home",
@@ -14983,7 +15002,7 @@ const en = {
     }
   },
   "avatarBuilder": {
-    "editor": { "levelChip": "Lv {level}", "unlocksAtLevel": "Unlocks at Lv {level}", "youAreLevel": "You're Lv {level}", "goldOnly": "Gold exclusive", "buyFor": "Unlock · {price}", "needMoreGold": "{amount} more gold to go", "orKeepPlaying": "or keep playing, it's free", "takeOff": "Take it off", "tryingOn": "Trying on", "collection": "{owned} of {total} collected" },
+    "editor": { "levelChip": "Lv {level}", "unlocksAtLevel": "Unlocks at Lv {level}", "youAreLevel": "You're Lv {level}", "goldOnly": "Gold exclusive", "buyFor": "Unlock · {price}", "needMoreGold": "{amount} more gold to go", "orKeepPlaying": "or keep playing, it's free", "takeOff": "Take it off", "tryingOn": "Trying on", "collection": "{owned} of {total} collected", "signInToBuy": "Sign in to buy with gold", "unlocked": "Unlocked!", "purchaseFailed": "Couldn't unlock it. No gold was spent.", "doneSkipsTryOn": "Save keeps your look without it" },
     "glowUp": { "button": "Glow Up", "loading": "Glowing up…", "adminTag": "Admin", "resultTitle": "Your glow-up" },
     "title": "Avatar Builder",
     "base": "Shape",

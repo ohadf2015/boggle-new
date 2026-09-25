@@ -60,10 +60,9 @@ export interface SinglePlayerShellProps {
 }
 
 export function SinglePlayerShell(props: SinglePlayerShellProps) {
-  // Copy the bots each render: the simulation mutates the array in place, so a
-  // memoised child would otherwise keep showing the old scores (Class 2 pitfall).
-  const bots = props.bots.map((b) => ({ name: b.name, score: b.score }));
-  return <SoloGameLayout {...props} bots={bots} />;
+  // props.bots must carry LIVE scores (useBotSimulation's liveBots) — the
+  // BotOpponent configs in settings.bots stay at 0 all game.
+  return <SoloGameLayout {...props} />;
 }
 
 export default SinglePlayerShell;
