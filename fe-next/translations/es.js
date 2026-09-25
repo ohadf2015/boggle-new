@@ -12924,7 +12924,11 @@ const es = {
       "upgrade": "Mejorar",
       "giftedUntil": "Regalo · hasta el {date}",
       "renewsOn": "Se renueva el {date}",
-      "giftEnded": "El regalo Pro terminó"
+      "giftEnded": "El regalo Pro terminó",
+      "trialActive": "Prueba Pro",
+      "trialDayLeft": "Queda 1 día",
+      "trialDaysLeft": "Quedan {count} días",
+      "trialEndsToday": "Termina hoy"
     },
     "proGate": {
       "analytics": {
@@ -12952,6 +12956,8 @@ const es = {
       "loadError": "No se pudo cargar la última clase.",
       "retry": "Reintentar",
       "proCtaHint": "Desbloquea cada partida, cada estudiante y PDF imprimibles.",
+      "weeklySubject": "Esta semana en tu clase",
+      "polarTrialExpiredLine": "Tu prueba de Teacher Pro terminó. Reactívala para conservar los informes de la clase.",
       "regionLabel": "Resumen de progreso de {{classroom}}",
       "scheduleReteachCta": "Programar Live de repaso en ~{{days}} días",
       "scheduleReteachConfirm": "Live de repaso programado para {{date}} (~{{days}} días). Se abrió la invitación del calendario.",
@@ -13000,6 +13006,11 @@ const es = {
       "perMonth": "/mes",
       "autoRenew": "Se renueva automáticamente cada mes. Cancela cuando quieras.",
       "upgradeNow": "Mejora a Pro ahora",
+      "startTrial": "Empieza 14 días gratis",
+      "trialCtaSubtext": "Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
+      "trialEndedTitle": "Tu prueba de Teacher Pro terminó",
+      "trialEndedBody": "Reactívala por 9 $/mes. No es otra prueba gratis.",
+      "trialEndedCta": "Seguir con Pro — 9 $/mes",
       "checkoutError": "No se pudo iniciar el pago. Inténtalo de nuevo.",
       "signInRequired": "Inicia sesión para mejorar a Teacher Pro.",
       "currentPlan": "Estás en este plan",

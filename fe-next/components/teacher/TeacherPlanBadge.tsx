@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { polarTrialDaysLeft, polarTrialUx } from '@/lib/education/polarTrial';
 import { cn } from '@/lib/utils';
 
 const DATE_LOCALE: Record<string, string> = {
@@ -29,13 +31,34 @@ function formatDate(iso: string | null, language: string): string {
  */
 export function TeacherPlanBadge({ className }: { className?: string }) {
   const { t, language } = useLanguage();
-  const { hasPro, loading, source, periodEnd, grant, grantExpired } = useTeacherPro();
+  const { hasPro, loading, source, status, periodEnd, trialExpires, trialUsed, grant, grantExpired } = useTeacherPro();
+  // Capture once — React Compiler treats Date.now() during render as impure.
+  const [nowMs] = useState(() => Date.now());
 
   if (loading) return null;
+
+  const trialUx = polarTrialUx({
+    hasPro,
+    status: status ?? 'active',
+    source,
+    trialUsed: trialUsed === true,
+  });
 
   if (hasPro) {
     const isGift = source === 'admin_grant';
     const until = formatDate(grant?.expires_at ?? periodEnd, language);
+    const daysLeft = trialUx.showBadge
+      ? polarTrialDaysLeft(trialExpires ?? periodEnd, nowMs)
+      : null;
+    const trialLabel = !trialUx.showBadge
+      ? null
+      : daysLeft === null
+        ? t('teacher.plan.trialActive')
+        : daysLeft <= 0
+          ? t('teacher.plan.trialEndsToday')
+          : daysLeft === 1
+            ? t('teacher.plan.trialDayLeft')
+            : t('teacher.plan.trialDaysLeft', { count: String(daysLeft) });
     return (
       <div
         data-testid="teacher-plan-badge"
@@ -47,11 +70,15 @@ export function TeacherPlanBadge({ className }: { className?: string }) {
       >
         {isGift ? <Gift className="size-4 text-black" aria-hidden="true" /> : <Sparkles className="size-4 text-black" aria-hidden="true" />}
         <span className="font-neo-display text-sm font-black uppercase tracking-wide text-black">{t('teacher.plan.pro')}</span>
-        {until && (
+        {trialLabel ? (
+          <span data-testid="teacher-pro-trial-badge" className="text-xs font-bold text-black/70">
+            {trialLabel}
+          </span>
+        ) : until ? (
           <span className="hidden text-xs font-bold text-black/70 sm:inline">
             {isGift ? t('teacher.plan.giftedUntil', { date: until }) : t('teacher.plan.renewsOn', { date: until })}
           </span>
-        )}
+        ) : null}
       </div>
     );
   }

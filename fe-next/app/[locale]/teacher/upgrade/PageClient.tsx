@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,7 +15,10 @@ import {
   markResumeCheckoutIntent,
   clearResumeCheckoutIntent,
   consumeResumeCheckoutIntent,
+  consumeResumeTrialFlag,
 } from '@/lib/teacher/resumeCheckout';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { polarTrialUx } from '@/lib/education/polarTrial';
 import { ShieldCheck, BellRing, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -27,8 +30,18 @@ export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
   const { user, loading: authLoading } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const [pending, setPending] = useState<null | 'trial' | 'paid'>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const pendingTrial = useRef(false);
+  const { hasPro, loading: proLoading, status, source, trialUsed, known } = useTeacherPro();
+  // Hide the trial until status has actually loaded. A failed read stays on the
+  // paid CTA — offering a free trial we could not check is a second trial.
+  const offerTrial = known === true && !proLoading && polarTrialUx({
+    hasPro,
+    status: status ?? 'active',
+    source,
+    trialUsed: trialUsed === true,
+  }).offerTrial;
   // ponytail: no client-side checkout flag. There used to be one
   // (`NEXT_PUBLIC_CHECKOUT_ENABLED === 'true'`) and it shipped the only revenue button in the
   // product as `disabled` in production while the server was ready to sell — `NEXT_PUBLIC_*` is
@@ -54,18 +67,22 @@ export default function UpgradePricingPageClient() {
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
   }, []);
 
-  const handleUpgrade = useCallback(async () => {
-    setIsLoading(true);
+  const handleUpgrade = useCallback(async (trial: boolean) => {
+    pendingTrial.current = trial;
+    setPending(trial ? 'trial' : 'paid');
     try {
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
+        ...(trial
+          ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trial: true }) }
+          : {}),
       });
 
       if (!response.ok) {
         // 401 means the user is not authenticated. Show the auth modal instead of a generic error.
         if (response.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));
-          markResumeCheckoutIntent();
+          markResumeCheckoutIntent({ trial });
           setShowAuthModal(true);
           return;
         }
@@ -85,7 +102,7 @@ export default function UpgradePricingPageClient() {
     } catch (err) {
       toast.error(t('teacher.subscription.checkoutError'));
     } finally {
-      setIsLoading(false);
+      setPending(null);
     }
   }, [t]);
 
@@ -101,8 +118,10 @@ export default function UpgradePricingPageClient() {
   useEffect(() => {
     if (authLoading || !user) return;
     if (!consumeResumeCheckoutIntent()) return;
+    const trial = consumeResumeTrialFlag();
+    pendingTrial.current = trial;
     setShowAuthModal(false);
-    handleUpgrade();
+    handleUpgrade(trial);
   }, [user, authLoading, handleUpgrade]);
 
   // Free tier is deliberately framed as a starting point: the two caps a
@@ -224,9 +243,9 @@ export default function UpgradePricingPageClient() {
           data-testid="upgrade-hero-section"
           className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-6 items-stretch mb-3"
         >
-          {/* Hero image — capped by height on lg to preserve vertical budget. ONE primary CTA
-              lives in the Pro card, so this stays decorative and shrinks first when the
-              pricing column is taller. */}
+          {/* Hero image — capped by height on lg to preserve vertical budget. The trial
+              and $9 CTAs live in the Pro card, so this stays decorative and shrinks
+              first when the pricing column is taller. */}
           <div className="flex justify-center order-2 lg:order-1">
             <Image
               src="/images/education/pro-hero-poster.webp"
@@ -259,12 +278,15 @@ export default function UpgradePricingPageClient() {
               </p>
             </div>
 
-            {/* Pricing cards — the ONE primary CTA on this page lives inside the Pro card. */}
+            {/* Trial is the low-friction action. $9/mo stays the paid checkout. */}
             <PricingCards
               freeFeatures={freeFeatures}
               proFeatures={proFeatures}
-              isLoading={isLoading}
-              onUpgradeClick={handleUpgrade}
+              isLoading={pending !== null}
+              pending={pending}
+              showTrial={offerTrial}
+              onTrialClick={() => { void handleUpgrade(true); }}
+              onUpgradeClick={() => { void handleUpgrade(false); }}
             />
           </div>
         </div>
@@ -289,8 +311,8 @@ export default function UpgradePricingPageClient() {
         </div>
 
         {/* District / school pricing — a plain text link, deliberately NOT a bordered
-            card: the page has exactly one button-styled CTA (Upgrade to Pro), and a second
-            CTA-shaped box here would compete with it. */}
+            card. The trial and $9 buttons live in the Pro card; a CTA-shaped box
+            here would compete with them. */}
         <p className="text-center text-xs font-bold text-neo-white/60 mb-1.5">
           {t('teacher.subscription.districtTitle')}{' '}
           <Link
@@ -356,7 +378,7 @@ export default function UpgradePricingPageClient() {
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           initialMode="signin"
-          onAuthSuccess={handleUpgrade}
+          onAuthSuccess={() => { void handleUpgrade(pendingTrial.current); }}
         />
       )}
     </EducationShell>

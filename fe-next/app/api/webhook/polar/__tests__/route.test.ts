@@ -7,10 +7,11 @@ vi.mock('@/lib/polar', () => ({
 }))
 const upsertSubscription = vi.fn()
 const grantProFromOrder = vi.fn()
+const logSubscriptionEvent = vi.fn()
 vi.mock('@/lib/subscriptions', () => ({
   upsertSubscription: (...args: unknown[]) => upsertSubscription(...args),
   grantProFromOrder: (...args: unknown[]) => grantProFromOrder(...args),
-  logSubscriptionEvent: vi.fn(),
+  logSubscriptionEvent: (...args: unknown[]) => logSubscriptionEvent(...args),
 }))
 const maybeSendPaymentFailedEmail = vi.fn()
 vi.mock('@/lib/education/dunning', () => ({
@@ -46,6 +47,7 @@ const subscriptionData = {
 describe('polar webhook', () => {
   beforeEach(() => {
     upsertSubscription.mockClear()
+    logSubscriptionEvent.mockClear()
     signatureValid = true
     process.env.POLAR_PRO_PRODUCT_ID = PRO_PRODUCT_ID
   })
@@ -59,6 +61,36 @@ describe('polar webhook', () => {
     const res = await POST(polarEvent('subscription.active', subscriptionData))
     expect(res.status).toBe(401)
     expect(upsertSubscription).not.toHaveBeenCalled()
+  })
+
+  it('records a Polar trial as trialing Pro and stores trial_end on the row', async () => {
+    await POST(polarEvent('subscription.created', {
+      ...subscriptionData,
+      status: 'trialing',
+      trial_end: '2026-10-08T00:00:00Z',
+      current_period_end: '2026-11-08T00:00:00Z',
+      metadata: { user_id: 'u1', trial: true },
+    }))
+    expect(upsertSubscription).toHaveBeenCalledWith(expect.objectContaining({
+      userId: 'u1',
+      tier: 'pro',
+      status: 'trialing',
+      currentPeriodEnd: '2026-10-08T00:00:00Z',
+    }))
+    expect(logSubscriptionEvent).toHaveBeenCalledWith(expect.objectContaining({
+      payload: expect.objectContaining({ trial: true, trial_end: '2026-10-08T00:00:00Z' }),
+    }))
+  })
+
+  it('a paid subscription.active logs trial: false and does not use a trial end', async () => {
+    await POST(polarEvent('subscription.active', subscriptionData))
+    expect(upsertSubscription).toHaveBeenCalledWith(expect.objectContaining({
+      status: 'active',
+      currentPeriodEnd: '2026-09-09T00:00:00Z',
+    }))
+    expect(logSubscriptionEvent).toHaveBeenCalledWith(expect.objectContaining({
+      payload: expect.objectContaining({ trial: false, trial_end: null }),
+    }))
   })
 
   it('grants Pro on subscription.active', async () => {

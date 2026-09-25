@@ -27,6 +27,8 @@ interface Copy {
   accuracy: string;
   active: string;
   cta: string;
+  trialEndedCta: string;
+  trialEndedLine: string;
   ctaNote: string;
   openDashboard: string;
   signoff: string;
@@ -44,6 +46,8 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     accuracy: 'Accuracy',
     active: 'Students who played',
     cta: `Start Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mo`,
+    trialEndedCta: 'Reactivate Teacher Pro',
+    trialEndedLine: 'Your Teacher Pro trial ended — keep reports and unlimited classes for $9/mo.',
     ctaNote: 'Unlimited classes, printable reports, Polar checkout. Cancel anytime.',
     openDashboard: 'Open teacher dashboard',
     signoff: '— LexiClash',
@@ -59,6 +63,8 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     accuracy: 'דיוק',
     active: 'תלמידים ששיחקו',
     cta: `התחלת Teacher Pro — $${TEACHER_PRO_PRICE_USD}/חודש`,
+    trialEndedCta: 'הפעל מחדש את Teacher Pro',
+    trialEndedLine: 'תקופת הניסיון של Teacher Pro הסתיימה — המשך ב-$9 לחודש.',
     ctaNote: 'כיתות ללא הגבלה, דוחות להדפסה, תשלום Polar. ביטול בכל עת.',
     openDashboard: 'ללוח המורה',
     signoff: '— LexiClash',
@@ -89,10 +95,14 @@ export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subj
     })
     .join('');
 
+  const expiredLine = digest.polarTrialExpiredLineKey
+    ? `<p style="color:#0b1220;font-size:15px;font-weight:700">${escape(c.trialEndedLine)}</p>`
+    : '';
+
   const cta = digest.hasPro
     ? ''
-    : `<p style="margin:24px 0">
-<a href="${upgradeUrl(digest.locale)}" style="display:inline-block;background:#ff4d8d;color:#0b1220;font-weight:800;padding:12px 20px;text-decoration:none;border-radius:8px">${escape(c.cta)}</a>
+    : `${expiredLine}<p style="margin:24px 0">
+<a href="${upgradeUrl(digest.locale)}" style="display:inline-block;background:#ff4d8d;color:#0b1220;font-weight:800;padding:12px 20px;text-decoration:none;border-radius:8px">${escape(digest.polarTrialExpired ? c.trialEndedCta : c.cta)}</a>
 </p>
 <p style="color:#555;font-size:13px">${escape(c.ctaNote)}</p>`;
 

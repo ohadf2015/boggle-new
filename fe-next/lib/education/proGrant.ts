@@ -67,11 +67,15 @@ export interface SubscriptionRowLike {
   current_period_end: string | null;
 }
 
-/** An active Pro row the payment provider owns. A grant must never overwrite one. */
+/**
+ * A provider-owned Pro row. A grant must never overwrite one.
+ * `trialing` counts: a Polar free trial is still the provider's row.
+ */
 export function isPaidProviderSubscription(row: SubscriptionRowLike | null | undefined): boolean {
   if (!row) return false;
   const source = row.source || 'polar';
-  return row.tier === 'pro' && row.status === 'active' && source !== 'admin_grant';
+  const live = row.status === 'active' || row.status === 'trialing';
+  return row.tier === 'pro' && live && source !== 'admin_grant';
 }
 
 export interface ProEntitlement {
@@ -86,20 +90,23 @@ export interface ProEntitlement {
 /**
  * The single answer to "is this teacher Pro right now?".
  *
- * Provider rows: `tier === 'pro' && status === 'active'`, exactly as before. The
- * webhook drives their lifecycle and `current_period_end` is only the next renewal
- * date — enforcing it here would log a paying teacher out of Pro whenever a
- * renewal webhook arrives late.
+ * Provider rows: `tier === 'pro'` and `status` is `active` (paying) or
+ * `trialing` (Polar 14-day Teacher Pro trial). The webhook drives their
+ * lifecycle and `current_period_end` is the next renewal — or the trial end
+ * while trialing. Enforcing that date here would log a teacher out of Pro
+ * whenever a renewal webhook arrives late. Canceled, past_due, and paused
+ * are not Pro.
  *
- * Grant rows: same, AND `now < current_period_end`. A grant with no deadline is
- * treated as over, never as forever.
+ * Grant rows: `status === 'active'` AND `now < current_period_end`. A grant
+ * with no deadline is treated as over, never as forever. Grants are not trials.
  */
 export function resolveProEntitlement(row: SubscriptionRowLike | null | undefined, nowMs: number): ProEntitlement {
   if (!row) return { hasPro: false, source: 'polar', expired: false, periodEnd: null };
   const source = ((row.source as SubscriptionSource) || 'polar');
   const activePro = row.tier === 'pro' && row.status === 'active';
   if (source !== 'admin_grant') {
-    return { hasPro: activePro, source, expired: false, periodEnd: row.current_period_end };
+    const providerPro = row.tier === 'pro' && (row.status === 'active' || row.status === 'trialing');
+    return { hasPro: providerPro, source, expired: false, periodEnd: row.current_period_end };
   }
   const endMs = row.current_period_end ? Date.parse(row.current_period_end) : NaN;
   const stillValid = Number.isFinite(endMs) && endMs > nowMs;

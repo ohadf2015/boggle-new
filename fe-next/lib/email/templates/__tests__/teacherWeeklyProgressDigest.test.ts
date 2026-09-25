@@ -71,4 +71,27 @@ describe('teacherWeeklyProgressDigest', () => {
     expect(hostile.html).not.toContain('<script>');
     expect(hostile.html).toContain('&lt;script&gt;');
   });
+
+  it('adds a reactivation line when the Polar trial expired', () => {
+    const { html } = teacherWeeklyProgressDigest({
+      ...digest,
+      polarTrialExpired: true,
+      polarTrialExpiredLineKey: 'teacher.digest.polarTrialExpiredLine',
+    });
+    expect(html).toContain('Your Teacher Pro trial ended');
+    expect(html).toContain('Reactivate Teacher Pro');
+    expect(html).toContain('https://www.lexiclash.live/en/teacher/upgrade');
+    expect(html).not.toContain('trial=true');
+  });
+
+  it('does not add the expired line for a Pro teacher', () => {
+    const { html } = teacherWeeklyProgressDigest({
+      ...digest,
+      hasPro: true,
+      polarTrialExpired: false,
+      polarTrialExpiredLineKey: null,
+    });
+    expect(html).not.toContain('trial ended');
+    expect(html).not.toContain('/teacher/upgrade');
+  });
 });

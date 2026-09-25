@@ -123,3 +123,23 @@ describe('pickTeacherBanner milestone + dismiss', () => {
     ).toBe('pro');
   });
 });
+
+describe('pickTeacherBanner Polar Pro trial', () => {
+  it('a live Polar trial is Pro, so it gets no banner', () => {
+    expect(pickTeacherBanner({
+      hasTrial: true, isAdmin: false, hasPro: true, polarTrialExpired: false,
+    })).toBe('none');
+  });
+
+  it('an expired Polar trial is the one ask — it replaces the access banner and the Pro strip', () => {
+    expect(pickTeacherBanner({
+      hasTrial: true, isAdmin: false, hasPro: false, hasMilestone: true, polarTrialExpired: true,
+    })).toBe('reactivate');
+  });
+
+  it('does not ask while Pro has not answered yet', () => {
+    expect(pickTeacherBanner({
+      hasTrial: false, isAdmin: false, hasPro: false, proLoading: true, polarTrialExpired: true,
+    })).toBe('none');
+  });
+});

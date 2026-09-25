@@ -11,6 +11,11 @@ interface PricingCardsProps {
   freeFeatures: Array<{ label: string; included: boolean }>;
   proFeatures: string[];
   isLoading: boolean;
+  /** Which button is in flight, so the other label does not flip to "loading". */
+  pending?: 'trial' | 'paid' | null;
+  /** 14-day Polar trial. Hidden once they have Pro or have already used a trial. */
+  showTrial?: boolean;
+  onTrialClick?: () => void;
   onUpgradeClick: () => void;
 }
 
@@ -18,6 +23,9 @@ export function PricingCards({
   freeFeatures,
   proFeatures,
   isLoading,
+  pending = null,
+  showTrial = false,
+  onTrialClick,
   onUpgradeClick,
 }: PricingCardsProps) {
   const { t, language } = useLanguage();
@@ -154,6 +162,21 @@ export function PricingCards({
 
         <div className="flex-1" />
 
+        {showTrial && (
+          <>
+            <Button
+              onClick={onTrialClick}
+              disabled={isLoading}
+              data-testid="pricing-trial-cta"
+              className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
+            >
+              {pending === 'trial' ? t('common.loading') : t('teacher.subscription.startTrial')}
+            </Button>
+            <p className="text-center text-xs font-bold text-neo-black/80 mt-1.5 mb-2">
+              {t('teacher.subscription.trialCtaSubtext')}
+            </p>
+          </>
+        )}
         <Button
           onClick={() => {
             // Funnel step 1 — analytics only, and never in checkout's way.
@@ -165,9 +188,14 @@ export function PricingCards({
             onUpgradeClick();
           }}
           disabled={isLoading}
-          className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
+          data-testid="pricing-paid-cta"
+          className={
+            showTrial
+              ? 'w-full bg-neo-cream text-neo-black font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none'
+              : 'w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none'
+          }
         >
-          {isLoading
+          {pending === 'paid' || (isLoading && !showTrial)
             ? t('common.loading')
             : t('teacher.subscription.upgradeNow')}
         </Button>
