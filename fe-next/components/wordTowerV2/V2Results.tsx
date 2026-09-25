@@ -176,6 +176,8 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
         {/* `px-12` keeps the title clear of the close (end-3) and mute (start-3). */}
         <h2 className="px-12 font-neo-display text-3xl font-black uppercase">{t('wordTowerV2.collapsed')}</h2>
         {recapSrc ? (
+          // Runtime-generated recap (blob/data URL) — next/image cannot optimize it.
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={recapSrc}
             alt={t('wordTowerV2.recapAlt', { floors, m: peakM.toFixed(1) })}
