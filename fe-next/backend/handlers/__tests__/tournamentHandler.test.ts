@@ -20,6 +20,7 @@ import { broadcastToRoom } from '../../utils/socketHelpers';
 import { generateRandomTable } from '../../utils/gameUtils';
 import { makePositionsMap } from '../../modules/wordValidator';
 import gameStartCoordinator from '../../utils/gameStartCoordinator';
+import { resetBotsForNewRound } from '../../modules/botManager';
 
 vi.mock('../../utils/logger', () => ({ default: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('../../modules/gameStateManager');
@@ -49,6 +50,7 @@ vi.mock('../../utils/gameStartCoordinator', () => ({
   },
 }));
 vi.mock('../shared', () => ({ startGameTimer: vi.fn() }));
+vi.mock('../../modules/botManager', () => ({ resetBotsForNewRound: vi.fn() }));
 
 const mGetGame = getGame as Mock;
 const mGetGameBySocketId = getGameBySocketId as Mock;
@@ -218,6 +220,28 @@ describe('tournamentHandler', () => {
         messageId: 'msg-1',
       }));
       expect(gameStartCoordinator.initializeSequence).toHaveBeenCalledWith('G1', ['A'], 120);
+    });
+
+    it('a tournament round is a round boundary: the one bot reset runs, and the start payload is the shared classic one', () => {
+      // Previous round was Blast: its mode must not leak into a tournament round.
+      const game = makeGame({ tournamentId: 'T1', gameMode: 'blast', gameSessionId: 7 });
+      mGetGameBySocketId.mockReturnValue('G1');
+      mGetGame.mockReturnValue(game);
+      mGetTournament.mockReturnValue({ id: 'T1', name: 'T', totalRounds: 3, currentRound: 2 });
+      mGetGameUsers.mockReturnValue([{ username: 'A', isBot: false }, { username: 'B', isBot: true }]);
+      const { socket, handlers } = createSocket();
+      registerTournamentHandlers(mockIo, socket);
+      handlers['startTournamentRound']();
+
+      expect(resetBotsForNewRound).toHaveBeenCalledWith('G1');
+      const startCall = mBroadcast.mock.calls.find((c: unknown[]) => c[2] === 'startGame');
+      expect(startCall![3]).toEqual(expect.objectContaining({
+        gameMode: 'classic',
+        gameSessionId: 7,
+        goldenLetters: [],
+        letterGrid: [['A']],
+        messageId: 'msg-1',
+      }));
     });
 
     it('resets per-player round state (scores, words, achievements)', () => {

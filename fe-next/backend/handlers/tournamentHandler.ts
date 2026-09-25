@@ -32,6 +32,9 @@ import {
 } from '../modules/tournamentManager.js';
 import logger from '../utils/logger.js';
 import { startGameTimer } from './shared';
+import { resetBotsForNewRound } from '../modules/botManager.js';
+import { buildRoundPayload } from '../modes/roundPayload.js';
+import type { GameState } from '../modules/gameState/types.js';
 
 // Types for payloads
 interface CreateTournamentPayload {
@@ -168,15 +171,25 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     ) as LetterGrid;
     const timerSeconds = game.timerSeconds || 180;
 
-    // Update game state
-    updateGame(gameCode, {
+    // A tournament round is a round boundary like any other: the ONE per-round
+    // bot reset runs (bots are reused across rounds — pitfall class 2), and the
+    // round is plain classic, so last round's mode state must not leak in.
+    resetBotsForNewRound(gameCode);
+    const roundUpdates: Partial<GameState> = {
       letterGrid,
       timerSeconds,
       remainingTime: timerSeconds,
       gameDuration: timerSeconds,
       gameState: 'in-progress',
-      gameStartedAt: Date.now()
-    });
+      gameStartedAt: Date.now(),
+      gameMode: 'classic',
+      goldenLetters: [],
+      blastModeState: null,
+      wordHuntState: null,
+      wheelRushState: null,
+    };
+    Object.assign(game, roundUpdates);
+    updateGame(gameCode, roundUpdates);
 
     // Precompute positions
     const positions = makePositionsMap(letterGrid);
@@ -220,15 +233,8 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       standings: getTournamentStandings(tournamentId) || []
     });
 
-    // Broadcast game start
-    broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
-      letterGrid,
-      timerSeconds,
-      language: game.language,
-      minWordLength: game.minWordLength || 2,
-      messageId,
-      boardTheme: (game as unknown as { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null // Preserve theme from first round if any
-    });
+    // Broadcast game start — the shared start payload (backend/modes/roundPayload).
+    broadcastToRoom(io, getGameRoom(gameCode), 'startGame', buildRoundPayload(gameCode, game, { kind: 'start', messageId }));
 
     // Set acknowledgment timeout
     gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 2000, () => {

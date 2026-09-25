@@ -216,11 +216,15 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
     // Stop accepting new connections
     httpServer.close(() => lifecycleLogger.info('HTTP server closed'));
 
-    // Notify clients about shutdown.
+    // Notify THIS instance's clients about shutdown.
     // reconnectIn = minimum wait; reconnectJitterMs = random spread on top.
     // Each client reconnects at a random point in [reconnectIn, reconnectIn+jitter]
     // so the freshly-booted (single) instance isn't hit by every client at once.
-    io.emit('serverShutdown', {
+    // io.local, not io.emit: on the Redis adapter a plain emit reaches every
+    // instance sharing that Redis, so a draining instance used to make clients
+    // of HEALTHY instances drop themselves ("Fresh update incoming") and miss
+    // room broadcasts meanwhile (MP baseline defect #2).
+    io.local.emit('serverShutdown', {
       reconnectIn: 3000,
       reconnectJitterMs: 9000,
       message: 'Server is restarting',
