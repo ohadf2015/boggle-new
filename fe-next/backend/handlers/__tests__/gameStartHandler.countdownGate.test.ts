@@ -26,13 +26,15 @@ describe('gameStartHandler — countdown gate', () => {
 
   it('force-syncs still-loading players when the countdown fallback fires (host-starts-early catch-up)', () => {
     // The fallback callback must iterate the missing players and resend startGame
-    // with reconnect:true (silent resume) so a slow-loading client lands on the
+    // as a reconnect (reconnect:true, silent resume) so a slow-loading client lands on the
     // running board instead of being stuck "waiting for the game to load".
     const idx = source.indexOf('setCountdownCompleteTimeout(');
     expect(idx).toBeGreaterThan(0);
     const block = source.slice(idx, idx + 1500);
     expect(block).toMatch(/stats\.missing/);
-    expect(block).toMatch(/safeEmit\([\s\S]{0,160}reconnect:\s*true/);
+    // The resend is the shared round payload built as a 'reconnect' (which sets
+    // reconnect:true + skipAck) — the same builder the join re-emit uses.
+    expect(block).toMatch(/safeEmit\([\s\S]{0,160}kind:\s*'reconnect'/);
   });
 });
 

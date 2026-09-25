@@ -67,6 +67,7 @@ import { stopAllBots } from '../modules/botManager.js';
 import { notifyRoomCreated } from '../modules/notificationService.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 import { registerStartGameHandler } from './gameStartHandler.js';
+import { buildRoundPayload } from '../modes/roundPayload.js';
 import { renamePlayerInGame } from '../modules/playerRename.js';
 
 // Types for payloads
@@ -440,7 +441,6 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     if (isInProgress(game.gameState)) {
       logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);
-      const recoveryGameMode = game.gameMode || 'classic';
       // A running Vocab Quiz: same shell start as `join` (pitfall 3), and no board clock to "recover".
       const quizShell = quizShellStartFor(gameCode);
 
@@ -472,42 +472,13 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       }
 
 
-      safeEmit(socket, 'startGame', {
-        letterGrid: game.letterGrid,
-        timerSeconds: game.remainingTime ?? game.timerSeconds,
-        language: game.language,
-        minWordLength: game.minWordLength || 2,
-        messageId: 'recovery-' + Date.now(),
-        reconnect: true,
-        skipAck: true,
-        boardTheme: game.boardTheme || null,
-        gameMode: recoveryGameMode,
-        gameSessionId: game.gameSessionId,
-        // Teacher pause: a student who reconnects mid-pause must land ON the
-        // pause (overlay up, clock frozen). Same fields as the `join` reconnect
-        // path in playerReconnectHandler — keep them identical (pitfall 3).
-        isPaused: !!game.isPaused,
-        remainingTime: game.remainingTime ?? game.timerSeconds,
-        ...(recoveryGameMode === 'blast' && game.blastModeState ? {
-          blastTileOverlay: game.blastModeState.overlay || [],
-          blastSeed: game.blastModeState.seed ?? null,
-          blastWave: game.blastModeState.wave ?? 1,
-          blastPlayerMoves: game.blastModeState.playerMoves || {},
-          ...(game.blastModeState.grid ? { blastGrid: game.blastModeState.grid } : {}),
-          ...(game.blastModeState.tileStates ? { blastTileStates: game.blastModeState.tileStates } : {}),
-        } : {}),
-        ...(recoveryGameMode === 'word-hunt' && game.wordHuntState ? {
-          wordHuntTargetLength: game.wordHuntState.targetWordLength ?? 0,
-          wordHuntTargetCategory: game.wordHuntState.targetCategory ?? null,
-          wordHuntEliminatedPlayers: game.wordHuntState.eliminatedPlayers || [],
-          wordHuntPlayerLives: game.wordHuntState.playerLives || {},
-        } : {}),
-        ...(game.goldenLetters?.length ? { goldenLetters: game.goldenLetters } : {}),
-        // Carry the leaderboard in-payload so the score restores atomically with
-        // the board (see updateLeaderboard belt below for the ordering rationale).
-        leaderboard: getLeaderboard(gameCode),
-        ...quizShell,
-      });
+      // Same builder as the start broadcast, the `join` reconnect and late join
+      // (pitfall class 3): this door used to hand Blast players the TEMPLATE
+      // board instead of their own evolved one, and no found words.
+      safeEmit(socket, 'startGame', buildRoundPayload(gameCode, game, {
+        kind: 'recovery',
+        username: getUsernameBySocketId(socket.id) ?? null,
+      }));
 
       // Restore the player's live score. The board/timer ride on `startGame`,
       // but the score lives ONLY in the client `leaderboard[]` (fed by

@@ -13,7 +13,8 @@ import {
   isWordValidForScoring,
 } from '../../modules/communityWordManager';
 import { calculateGameScores, type PlayerScoreResult } from '../../modules/scoringEngine';
-import { sortWithWordHuntWinner } from '@/shared/utils/scoring';
+import { getGameModeModule, isDuplicateRuleDisabled } from '../../modes/index';
+import type { GameState } from '../../modules/gameState/types';
 import {
   awardFinalAchievements,
   ACHIEVEMENT_ICONS,
@@ -128,9 +129,9 @@ export async function calculateAndBroadcastFinalScores(
 
   // Get player count for duplicate rule logic
   const playerCount = Object.keys(game.users || {}).length;
-
-  // Disable duplicate rule for large rooms (more than 7 players) or Word Hunt mode
-  const duplicateRuleDisabled = playerCount > 7 || game.gameMode === 'word-hunt';
+  // Same rule the scoring engine applies (big rooms + modes that allow shared words).
+  const duplicateRuleDisabled = isDuplicateRuleDisabled(game.gameMode, playerCount);
+  const mode = getGameModeModule(game.gameMode);
 
   // Calculate final scores
 
@@ -169,12 +170,12 @@ export async function calculateAndBroadcastFinalScores(
     }
   }
 
-  // In Word Hunt, the player who found the target word is the winner
-  // Re-sort so target finder ranks first, others by score
-  if (game.gameMode === 'word-hunt' && game.wordHuntState?.targetFoundBy) {
-    const sorted = sortWithWordHuntWinner(finalScores, game.wordHuntState.targetFoundBy, (p) => p.totalScore);
+  // Mode ranking override (Word Hunt: the target finder wins).
+  if (mode.rankResults) {
+    // Copy first: a mode may hand back the same array it was given.
+    const ranked = [...mode.rankResults(finalScores, game as unknown as GameState)];
     finalScores.length = 0;
-    finalScores.push(...sorted);
+    finalScores.push(...ranked);
   }
 
   // Update game state with final scores
@@ -206,35 +207,6 @@ export async function calculateAndBroadcastFinalScores(
   for (const playerResult of resultsWithIconAchievements) {
     (playerResult as Record<string, unknown>).titles = titles[playerResult.username] || [];
   }
-
-  // Build word hunt summary if applicable
-  const huntState = game.gameMode === 'word-hunt' ? game.wordHuntState : null;
-  const wordHuntSummary = huntState ? {
-    targetWord: huntState.targetWord,
-    playerLives: huntState.playerLives as Record<string, number>,
-    eliminatedPlayers: huntState.eliminatedPlayers as string[],
-    targetFoundBy: huntState.targetFoundBy as string | null,
-    foundTarget: !!huntState.targetFoundBy,
-    survivalTime: game.gameStartedAt ? Math.round((Date.now() - game.gameStartedAt) / 1000) : 0,
-    discoveryWords: huntState.discoveryWordCount || 0,
-    // Per-player same-length guess count → drives the guess-efficiency insight
-    // tip in results (parity with SP). Server is the source of truth for ALL
-    // players; the client only has the local player's attempt array.
-    playerAttempts: (huntState.playerAttempts || {}) as Record<string, number>,
-  } : undefined;
-
-  // Build blast mode summary if applicable
-  const blastState = game.gameMode === 'blast' ? game.blastModeState : null;
-  const blastSummary = blastState ? {
-    playerMoves: blastState.playerMoves as Record<string, number>,
-    playerStats: blastState.playerStats ?? {},
-  } : undefined;
-
-  // Build wheel rush summary if applicable
-  const wheelRushState = game.gameMode === 'wheel-rush' ? game.wheelRushState : null;
-  const wheelRushSummary = wheelRushState ? {
-    playerStats: wheelRushState.playerStats ?? {},
-  } : undefined;
 
   // Build the classroom summary if a teacher launched this room. Derived here,
   // not on the client: `lessonGameData` only exists in the TEACHER's
@@ -438,9 +410,8 @@ export async function calculateAndBroadcastFinalScores(
     // Per-round id so the client series tracker can dedup a re-emitted round
     // without collapsing two distinct rounds that share identical scores.
     gameSessionId: game.gameSessionId,
-    wordHuntSummary,
-    blastSummary,
-    wheelRushSummary,
+    // Mode summary block (wordHuntSummary / blastSummary / wheelRushSummary).
+    ...mode.resultsSummary?.(game as unknown as GameState),
     classroomSummary,
     tvMode: game.tvMode ?? false,
     isRanked,

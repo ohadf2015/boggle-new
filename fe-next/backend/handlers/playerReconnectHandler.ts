@@ -40,9 +40,9 @@ import { addPlayerMidTournament, getTournament, getTournamentStandings } from '.
 import { ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
 import logger from '../utils/logger.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
-import { HUNT_INITIAL_LIFE } from '@/shared/constants/wordHuntMultiplayerConstants';
-import { getOrInitPlayerBoard } from '../modules/blastModeManager.js';
-import { quizShellStartFor, seatLateQuizSocket } from '../services/vocabQuizShell.js';
+import { seatLateQuizSocket } from '../services/vocabQuizShell.js';
+import { getGameModeModule } from '../modes/index.js';
+import { buildRoundPayload } from '../modes/roundPayload.js';
 
 interface AuthConnectionResult {
   handled: boolean;
@@ -225,70 +225,9 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
 
   // Send game state on reconnection if game is in progress (use state machine helper)
   if (isInProgress(game.gameState)) {
-    const reconnectPayload: Record<string, any> = {
-      letterGrid: game.letterGrid,
-      timerSeconds: game.remainingTime ?? game.timerSeconds,
-      language: game.language,
-      minWordLength: game.minWordLength || 2,
-      messageId: 'reconnect-' + Date.now(),
-      reconnect: true,
-      skipAck: true,
-      boardTheme: game.boardTheme || null,
-      gameMode: game.gameMode || 'classic',
-      gameSessionId: game.gameSessionId,
-      // Teacher pause: land the reconnecting student ON the pause. Mirrors the
-      // `requestGameState` recovery payload field-for-field (pitfall 3).
-      isPaused: !!game.isPaused,
-      remainingTime: game.remainingTime ?? game.timerSeconds,
-      // Replay player's own found words so the in-game word panel isn't blank
-      // after reconnect. Score totals come via updateLeaderboard below.
-      myFoundWords: game.playerWords?.[username] || [],
-      // Carry the authoritative leaderboard INSIDE startGame too, so the client
-      // restores the score in the same batched setState as the board — robust if
-      // the separate updateLeaderboard below is dropped, raced, or reset away.
-      leaderboard: getLeaderboard(gameCode),
-    };
-
-    // Include blast mode state for reconnecting players. Each player evolves an
-    // INDEPENDENT board (playerBoards[username]); the reconnecting player must get
-    // THEIR evolved board, not the pristine shared template (state.grid/tileStates).
-    // overlay/seed also diverge from the template after a board regen, so read them
-    // off the per-player board too.
-    if (game.gameMode === 'blast' && game.blastModeState) {
-      const board = getOrInitPlayerBoard(game.blastModeState, username);
-      reconnectPayload.blastTileOverlay = board.overlay || [];
-      reconnectPayload.blastSeed = board.seed ?? null;
-      reconnectPayload.blastWave = game.blastModeState.wave ?? 1;
-      // Send player's moves-used count so client can restore correct state
-      reconnectPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
-      // Send the player's own server-authoritative evolved board for MP sync.
-      if (board.grid) {
-        reconnectPayload.blastGrid = board.grid;
-      }
-      if (board.tileStates) {
-        reconnectPayload.blastTileStates = board.tileStates;
-      }
-    }
-
-    // Include word hunt state for reconnecting players
-    if (game.gameMode === 'word-hunt' && game.wordHuntState) {
-      reconnectPayload.wordHuntTargetLength = game.wordHuntState.targetWordLength ?? 0;
-      // Keep this block field-for-field identical to the late-join one below:
-      // both restore the SAME round state, and the category (the "hunt an
-      // animal" hint) was the one field only late-joiners received.
-      reconnectPayload.wordHuntTargetCategory = game.wordHuntState.targetCategory ?? null;
-      reconnectPayload.wordHuntEliminatedPlayers = game.wordHuntState.eliminatedPlayers || [];
-      reconnectPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};
-    }
-
-    // Replay golden letters so star tiles aren't lost on reconnect.
-    if (game.goldenLetters?.length) {
-      reconnectPayload.goldenLetters = game.goldenLetters;
-    }
-
-    // A running Vocab Quiz has no room grid — ride the quiz's own shell start,
-    // exactly as the late-join path below does (pitfall 3).
-    Object.assign(reconnectPayload, quizShellStartFor(gameCode));
+    // Same builder as the start broadcast, late join and the requestGameState
+    // watchdog: one payload shape through every door (pitfall class 3).
+    const reconnectPayload = buildRoundPayload(gameCode, game, { kind: 'reconnect', username });
     socket.emit('startGame', reconnectPayload);
     seatLateQuizSocket(socket, gameCode, username, game.users[username]);
 
@@ -327,68 +266,10 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
 function handleLateJoin(socket: Socket, game: GameState, gameCode: string, username: string): void {
   logger.info('SOCKET', `${username} joining game ${gameCode} in progress`);
 
-  const lateJoinPayload: Record<string, any> = {
-    letterGrid: game.letterGrid,
-    timerSeconds: game.remainingTime ?? game.timerSeconds,
-    language: game.language,
-    minWordLength: game.minWordLength || 2,
-    messageId: 'late-join-' + Date.now(),
-    lateJoin: true,
-    skipAck: true,
-    boardTheme: game.boardTheme || null,
-    gameMode: game.gameMode || 'classic',
-    gameSessionId: game.gameSessionId,
-    // Teacher pause — same fields as the reconnect payload above.
-    isPaused: !!game.isPaused,
-    remainingTime: game.remainingTime ?? game.timerSeconds,
-    // Carry the authoritative leaderboard INSIDE startGame, exactly as the
-    // reconnect payload above does and for the same reason: the client then
-    // restores the scoreboard in the same batched setState as the board, and
-    // the separate `updateLeaderboard` below becomes a belt rather than the
-    // only thread. Late join was the sibling still relying on that one emit —
-    // pitfall class 3, and the path that pays is the classroom one, where
-    // arriving after the teacher hits start IS the normal way in.
-    leaderboard: getLeaderboard(gameCode),
-  };
-
-  // Include blast mode state for late joiners. getOrInitPlayerBoard lazily clones
-  // the template into a fresh independent board for this never-seen player, so the
-  // late joiner starts clean AND the server now tracks their board for cascades.
-  if (game.gameMode === 'blast' && game.blastModeState) {
-    const board = getOrInitPlayerBoard(game.blastModeState, username);
-    lateJoinPayload.blastTileOverlay = board.overlay || [];
-    lateJoinPayload.blastSeed = board.seed ?? null;
-    lateJoinPayload.blastWave = game.blastModeState.wave ?? 1;
-    lateJoinPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
-    if (board.grid) {
-      lateJoinPayload.blastGrid = board.grid;
-    }
-    if (board.tileStates) {
-      lateJoinPayload.blastTileStates = board.tileStates;
-    }
-  }
-
-  // Include word hunt state for late joiners — also initialize their lives
-  if (game.gameMode === 'word-hunt' && game.wordHuntState) {
-    // Add late-joiner to playerLives if not already present
-    if (!(username in game.wordHuntState.playerLives)) {
-      game.wordHuntState.playerLives[username] = HUNT_INITIAL_LIFE;
-    }
-    lateJoinPayload.wordHuntTargetLength = game.wordHuntState.targetWordLength ?? 0;
-    lateJoinPayload.wordHuntTargetCategory = game.wordHuntState.targetCategory ?? null;
-    lateJoinPayload.wordHuntEliminatedPlayers = game.wordHuntState.eliminatedPlayers || [];
-    lateJoinPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};
-  }
-
-  // Include golden letters for late joiners so they see the star tiles too.
-  if (game.goldenLetters?.length) {
-    lateJoinPayload.goldenLetters = game.goldenLetters;
-  }
-
-  // A running Vocab Quiz has no room grid: without its shell start the late
-  // joiner's client never leaves the READY UP lobby. Same builder as the quiz's
-  // own opening broadcast and the reconnect path above.
-  Object.assign(lateJoinPayload, quizShellStartFor(gameCode));
+  // Seat the newcomer in the mode's round state (e.g. Word Hunt lives), then
+  // hand them the same payload a reconnecting player gets.
+  getGameModeModule(game.gameMode).onLateJoin?.(game, username);
+  const lateJoinPayload = buildRoundPayload(gameCode, game, { kind: 'lateJoin', username });
   socket.emit('startGame', lateJoinPayload);
   seatLateQuizSocket(socket, gameCode, username, game.users[username] ?? { isHost: false });
 

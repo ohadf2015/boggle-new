@@ -15,6 +15,8 @@ import {
   getComboMultiplier,
 } from '@/shared/utils/scoring';
 
+import { getGameModeRules, isDuplicateRuleDisabled } from '../modes/rules';
+
 // Re-export for backwards compatibility
 export { calculateWordScore, getComboBonus, getComboMultiplier };
 
@@ -62,15 +64,10 @@ export function calculateGameScores(
 ): PlayerScoreResult[] {
   const { playerCount = 0, gameMode } = options;
 
-  // Disable duplicate rule for large rooms (more than 7 players) or Word Hunt mode
-  // In Word Hunt, finding the same board words as opponents is fine — the goal is the target word
-  // In Wheel Rush, lock+steal mechanic means stealer and original locker both have the word
-  // in their playerWords with their own outcome scores; duplicate halving would corrupt totals.
-  const duplicateRuleDisabled = playerCount > 7 || gameMode === 'word-hunt' || gameMode === 'wheel-rush';
-
-  // Blast mode skips rarity multiplier — tile bonuses already reward unique paths
-  // Wheel Rush skips it too — first-finder multiplier + steal bonus already encode rarity
-  const rarityDisabled = gameMode === 'blast' || gameMode === 'wheel-rush';
+  // Per-mode rules (backend/modes/rules.ts) — the same rows the results payload
+  // reports, so the flag the client shows is the rule applied here.
+  const duplicateRuleDisabled = isDuplicateRuleDisabled(gameMode, playerCount);
+  const rarityDisabled = !getGameModeRules(gameMode).rarityScoring;
   if (!game) return [];
 
   const results: PlayerScoreResult[] = [];
