@@ -35,9 +35,10 @@ function inRangeChain(pages: unknown[][], error: { message: string } | null = nu
     callIndex += 1;
     return Promise.resolve({ data: page, error: null });
   });
-  const inFn = vi.fn().mockReturnValue({ range });
+  const order = vi.fn().mockReturnValue({ range });
+  const inFn = vi.fn().mockReturnValue({ order });
   const select = vi.fn().mockReturnValue({ in: inFn });
-  return { select, inFn, range, rangeCalls };
+  return { select, inFn, order, range, rangeCalls };
 }
 
 describe('getTeacherExportRows', () => {
@@ -216,6 +217,9 @@ describe('getTeacherExportRows', () => {
     // 1000 + 1 rows fetched across 2 pages of the SAME .in() chunk, proving
     // the export doesn't quietly drop student #1001 at the PostgREST cap.
     expect(membershipsChain.range).toHaveBeenCalledTimes(2);
+    // Offset pages over an unordered result can skip or repeat rows between
+    // requests; every page must be ordered by a unique column.
+    expect(membershipsChain.order).toHaveBeenCalledWith('id', { ascending: true });
     expect(result.error).toBeNull();
   });
 });

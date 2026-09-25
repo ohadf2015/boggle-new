@@ -49,6 +49,8 @@ async function fetchInChunks<Row>(
         .from(table)
         .select(select)
         .in(column, idChunk)
+        // Offset paging needs a stable order or rows can skip/repeat across pages.
+        .order('id', { ascending: true })
         .range(from, from + PAGE_SIZE - 1);
 
       if (error) {
