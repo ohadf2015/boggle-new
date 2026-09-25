@@ -82,7 +82,9 @@ export function isAllowedAdBannerRoute(
 // by AdSenseLoader (web auto-ads) and useInterstitialAd.
 // ------------------------------------------------------------------
 // `/join` is the class-code join (JoinFlow) — the student's first step into a classroom.
-const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/join', '/admin'];
+// `/report` is the parent-report link (Teacher Pro) — a minor's name and
+// activity, opened with no account. Never monetized.
+const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/join', '/admin', '/report'];
 
 /**
  * Whether NO ad of any kind may run on this route.

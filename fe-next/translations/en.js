@@ -2638,6 +2638,20 @@ const en = {
     "deleted": "Account deleted. All your data is gone.",
     "backToHome": "Back to Home"
   },
+  "parentReport": {
+    "metaTitle": "Progress Report — LexiClash",
+    "metaDescription": "A private student progress report shared by a teacher.",
+    "subtitle": "Progress Report",
+    "statXp": "XP earned",
+    "statLessons": "Lessons completed",
+    "statWords": "Words mastered",
+    "recentActivity": "Recent activity",
+    "noRecentActivity": "No activity yet",
+    "invalidTitle": "Link not available",
+    "invalidBody": "This report link has expired or is no longer valid. Ask the teacher for a new link.",
+    "footerNote": "Shared by your child's teacher via LexiClash — no account needed.",
+    "language": "View in"
+  },
   "share": {
     "button": "Share",
     "linkCopied": "Link copied! 🔗",
@@ -13119,6 +13133,8 @@ const en = {
       "practiceToSee": "Practice to see stats",
       "recentActivity": "Recent Activity",
       "retry": "Retry",
+      "shareParentReport": "Share with parent",
+      "shareParentReportFailed": "Couldn't create the link. Try again.",
       "streak": "{{count}}-day streak",
       "struggling": "Needs Help",
       "mastered": "Mastered",

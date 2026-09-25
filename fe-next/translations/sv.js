@@ -3311,6 +3311,20 @@ const sv = {
     "deleted": "Konto raderat. All data är borta.",
     "backToHome": "Tillbaka till startsidan"
   },
+  "parentReport": {
+    "metaTitle": "Framstegsrapport — LexiClash",
+    "metaDescription": "En privat framstegsrapport för en elev, delad av en lärare.",
+    "subtitle": "Framstegsrapport",
+    "statXp": "Intjänad XP",
+    "statLessons": "Avslutade lektioner",
+    "statWords": "Bemästrade ord",
+    "recentActivity": "Senaste aktivitet",
+    "noRecentActivity": "Ingen aktivitet än",
+    "invalidTitle": "Länken är inte tillgänglig",
+    "invalidBody": "Den här rapportlänken har gått ut eller är inte längre giltig. Be läraren om en ny länk.",
+    "footerNote": "Delad av ditt barns lärare via LexiClash — inget konto behövs.",
+    "language": "Visa på"
+  },
   "share": {
     "button": "Dela",
     "linkCopied": "Länk kopierad! 🔗",
@@ -14808,6 +14822,8 @@ const sv = {
       "practiceToSee": "Gör övningar för att se statistik",
       "recentActivity": "Senaste aktivitet",
       "retry": "Försök igen",
+      "shareParentReport": "Dela med förälder",
+      "shareParentReportFailed": "Kunde inte skapa länken. Försök igen.",
       "streak": "{{count}} dagars träning",
       "struggling": "Behöver stöd",
       "mastered": "Behärskar",

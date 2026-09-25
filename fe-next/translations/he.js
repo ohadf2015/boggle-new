@@ -3026,6 +3026,20 @@ const he = {
     "deleted": "החשבון נמחק. כל הנתונים שלך הוסרו.",
     "backToHome": "חזרה לדף הבית"
   },
+  "parentReport": {
+    "metaTitle": "דוח התקדמות — LexiClash",
+    "metaDescription": "דוח התקדמות פרטי של תלמיד/ה, ששותף על ידי המורה.",
+    "subtitle": "דוח התקדמות",
+    "statXp": "XP שנצבר",
+    "statLessons": "שיעורים שהושלמו",
+    "statWords": "מילים שנשלטו",
+    "recentActivity": "פעילות אחרונה",
+    "noRecentActivity": "אין עדיין פעילות",
+    "invalidTitle": "הקישור אינו זמין",
+    "invalidBody": "פג תוקפו של קישור הדוח או שהוא כבר אינו תקף. בקשו מהמורה קישור חדש.",
+    "footerNote": "שותף על ידי המורה של ילדכם באמצעות LexiClash — לא נדרש חשבון.",
+    "language": "הצג בשפה"
+  },
   "share": {
     "button": "שתף",
     "linkCopied": "הקישור הועתק! 🔗",
@@ -14428,6 +14442,8 @@ const he = {
       "practiceToSee": "תרגלו כדי לראות סטטיסטיקה",
       "recentActivity": "פעילות אחרונה",
       "retry": "נסו שוב",
+      "shareParentReport": "שתפו עם הורה",
+      "shareParentReportFailed": "לא הצלחנו ליצור את הקישור. נסו שוב.",
       "streak": "רצף {{count}} ימים",
       "struggling": "זקוק/ה לעזרה",
       "mastered": "שולט/ת",

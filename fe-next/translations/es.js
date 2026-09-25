@@ -3007,6 +3007,20 @@ const es = {
     "deleted": "Cuenta eliminada. Todos tus datos se han ido.",
     "backToHome": "Volver al inicio"
   },
+  "parentReport": {
+    "metaTitle": "Informe de progreso — LexiClash",
+    "metaDescription": "Un informe privado del progreso de un estudiante, compartido por su profesor.",
+    "subtitle": "Informe de progreso",
+    "statXp": "XP ganados",
+    "statLessons": "Lecciones completadas",
+    "statWords": "Palabras dominadas",
+    "recentActivity": "Actividad reciente",
+    "noRecentActivity": "Aún no hay actividad",
+    "invalidTitle": "Enlace no disponible",
+    "invalidBody": "Este enlace del informe ha caducado o ya no es válido. Pide al profesor un enlace nuevo.",
+    "footerNote": "Compartido por el profesor de tu hijo/a a través de LexiClash — no necesitas una cuenta.",
+    "language": "Ver en"
+  },
   "share": {
     "button": "Compartir",
     "linkCopied": "¡Link copiado! 🔗",
@@ -14522,6 +14536,8 @@ const es = {
       "practiceToSee": "Los datos aparecen después de practicar",
       "recentActivity": "Actividad Reciente",
       "retry": "Reintentar",
+      "shareParentReport": "Compartir con un familiar",
+      "shareParentReportFailed": "No se pudo crear el enlace. Inténtalo de nuevo.",
       "streak": "Racha: {{count}} días",
       "struggling": "Necesita apoyo",
       "mastered": "Dominado",

@@ -27,6 +27,17 @@ vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: () => <div data-testid="page-loader">Loading...</div>,
 }));
 
+// Mock the Pro "Share with parent" button — it has its own dedicated test
+// suite; here we only need to see it renders once per row and gets THIS
+// row's classroomId/studentId, never a mismatched pair.
+vi.mock('../ShareParentReportButton', () => ({
+  ShareParentReportButton: ({ classroomId, studentId }: { classroomId: string; studentId: string }) => (
+    <button data-testid={`share-parent-report-${studentId}`} data-classroom-id={classroomId}>
+      share
+    </button>
+  ),
+}));
+
 describe('StudentProgressTable', () => {
   const mockStudents: StudentProgressSummary[] = [
     {
@@ -235,5 +246,21 @@ describe('StudentProgressTable', () => {
     // THEN
     const streakHeader = screen.getByText('education.analytics.streak');
     expect(streakHeader).toHaveClass('hidden', 'md:table-cell'); // Hidden on mobile, visible on md+
+  });
+
+  it('renders a "share with parent" action per student, scoped to this classroom', () => {
+    mockUseStudentProgressMetrics.mockReturnValue({
+      students: mockStudents,
+      isLoading: false,
+      error: null,
+      refresh: vi.fn(),
+    });
+
+    render(<StudentProgressTable classroomId="classroom-1" />);
+
+    for (const student of mockStudents) {
+      const button = screen.getByTestId(`share-parent-report-${student.studentId}`);
+      expect(button).toHaveAttribute('data-classroom-id', 'classroom-1');
+    }
   });
 });

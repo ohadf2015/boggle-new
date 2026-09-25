@@ -137,6 +137,24 @@ describe('isAdFreeRoute', () => {
   });
 });
 
+describe('parent report links are ad-free (minor\'s data, no account, must never carry ads)', () => {
+  it('treats /report and /report/<token> as ad-free', () => {
+    expect(isAdFreeRoute('/report')).toBe(true);
+    expect(isAdFreeRoute('/report/abc.def')).toBe(true);
+    expect(isAdFreeRoute('/he/report/abc.def')).toBe(true);
+  });
+
+  it('never allows the banner on a report route', () => {
+    expect(isAllowedAdBannerRoute('/report/abc.def')).toBe(false);
+    expect(isAllowedAdBannerRoute('/he/report/abc.def')).toBe(false);
+  });
+
+  it('does not treat an unrelated /reports path as ad-free (exact segment match only)', () => {
+    expect(isAdFreeRoute('/reports')).toBe(false);
+    expect(isAdFreeRoute('/en/reports')).toBe(false);
+  });
+});
+
 describe('teacher module is ad-free in every format', () => {
   it('treats the class-code join (/join, /join/<code>) as ad-free', () => {
     expect(isAdFreeRoute('/en/join')).toBe(true);

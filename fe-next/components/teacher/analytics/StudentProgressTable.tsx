@@ -13,6 +13,7 @@ import {
 import { useStudentProgressMetrics } from '@/hooks/useStudentProgressMetrics';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { ShareParentReportButton } from './ShareParentReportButton';
 import type { StudentProgressSummary } from '@/lib/supabase/analytics';
 
 interface StudentProgressTableProps {
@@ -132,8 +133,16 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
         </span>
       ),
     }),
+    columnHelper.display({
+      id: 'shareParentReport',
+      header: '',
+      enableSorting: false,
+      cell: ({ row }) => (
+        <ShareParentReportButton classroomId={classroomId} studentId={row.original.studentId} />
+      ),
+    }),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- formatLastActive is stable
-  ], [t]);
+  ], [t, classroomId]);
 
   const table = useReactTable({
     data: students,

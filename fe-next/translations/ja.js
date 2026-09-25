@@ -3026,6 +3026,20 @@ const ja = {
     "deleted": "アカウント削除済み。すべてのデータが削除されました。",
     "backToHome": "ホームに戻る"
   },
+  "parentReport": {
+    "metaTitle": "進捗レポート — LexiClash",
+    "metaDescription": "先生が共有した、お子様の進捗に関する非公開レポートです。",
+    "subtitle": "進捗レポート",
+    "statXp": "獲得XP",
+    "statLessons": "完了したレッスン",
+    "statWords": "習得した単語",
+    "recentActivity": "最近のアクティビティ",
+    "noRecentActivity": "まだ活動がありません",
+    "invalidTitle": "リンクが無効です",
+    "invalidBody": "このレポートのリンクは期限切れか、無効になっています。先生に新しいリンクをお願いしてください。",
+    "footerNote": "お子様の先生がLexiClashで共有しました — アカウントは不要です。",
+    "language": "表示言語"
+  },
   "share": {
     "button": "シェア",
     "linkCopied": "リンクコピー完了！🔗",
@@ -14573,6 +14587,8 @@ const ja = {
       "practiceToSee": "練習すると表示されます",
       "recentActivity": "最近のアクティビティ",
       "retry": "リトライ",
+      "shareParentReport": "保護者と共有",
+      "shareParentReportFailed": "リンクを作成できませんでした。もう一度お試しください。",
       "streak": "{{count}}日連続",
       "struggling": "サポートが必要",
       "mastered": "習得済み",
