@@ -50,7 +50,6 @@
     "db:drizzle:studio": "drizzle-kit studio",
     "db:migrate": "node supabase/migrations/run-migrations.js",
     "db:migrate:check": "node -e \"require('./supabase/migrations/run-migrations.js')\" --dry-run",
-    "postbuild": "npm run db:migrate || echo 'Migration skipped (missing service key)'",
     "postinstall": "patch-package && node scripts/copy-sql-wasm.mjs",
     "setup:supabase": "bash scripts/setup-supabase-key.sh",
     "grant-dev-admin": "node scripts/grant-dev-admin.js",
