@@ -23,6 +23,7 @@ import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
+import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { ProGate } from '@/components/teacher/ProGate';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
@@ -240,6 +241,12 @@ function TeacherReportsInner() {
           classroomName={selectedClassroom?.name ?? ''}
         />
         <ProGate feature="reports">
+          <div className="mb-4 flex justify-end">
+            {/* Reuses this screen's own ProGate — the button's own internal
+                ProGate only ever mounts once the teacher is already Pro, so a
+                free teacher never sees two upsell cards stacked here. */}
+            <ExportAllClassesButton />
+          </div>
           <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
         </ProGate>
       </div>

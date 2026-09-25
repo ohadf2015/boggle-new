@@ -13521,6 +13521,23 @@ const es = {
         "fileName": "{{name}} – progreso de tareas",
         "untitled": "Lección sin título",
         "anonymousStudent": "Alumno {{id}}"
+      },
+      "exportAllClasses": {
+        "button": "Exportar todas las clases",
+        "downloading": "Exportando…",
+        "failed": "No se pudieron exportar tus clases. Inténtalo de nuevo.",
+        "empty": "Todavía no hay nada que exportar",
+        "fileName": "Todas las clases – exportación de progreso",
+        "anonymousStudent": "Alumno {{id}}",
+        "columns": {
+          "classroom": "Clase",
+          "student": "Alumno",
+          "lessonsCompleted": "Lecciones completadas",
+          "wordsMastered": "Palabras dominadas",
+          "totalXp": "XP total",
+          "lastActive": "Última actividad",
+          "gamesPlayed": "Partidas jugadas"
+        }
       }
     },
     "teacher": {

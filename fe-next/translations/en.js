@@ -12075,6 +12075,23 @@ const en = {
         "fileName": "{{name}} – assignment progress",
         "untitled": "Untitled lesson",
         "anonymousStudent": "Student {{id}}"
+      },
+      "exportAllClasses": {
+        "button": "Export all classes",
+        "downloading": "Exporting…",
+        "failed": "Couldn't export your classes. Try again.",
+        "empty": "Nothing to export yet",
+        "fileName": "All classes – progress export",
+        "anonymousStudent": "Student {{id}}",
+        "columns": {
+          "classroom": "Classroom",
+          "student": "Student",
+          "lessonsCompleted": "Lessons completed",
+          "wordsMastered": "Words mastered",
+          "totalXp": "Total XP",
+          "lastActive": "Last active",
+          "gamesPlayed": "Games played"
+        }
       }
     },
     "curriculum": {

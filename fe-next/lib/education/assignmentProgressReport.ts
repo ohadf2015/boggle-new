@@ -82,10 +82,19 @@ export function buildAssignmentProgressRows(args: {
   return rows;
 }
 
-/** RFC4180 cell: quote when the value contains comma, quote, or newline. */
+/**
+ * RFC4180 cell + CSV-formula-injection guard, shared by every CSV export in
+ * the app (reused by teacherExportAllClasses.ts).
+ *
+ * Order matters: neutralize a leading =, +, -, or @ FIRST (Excel/Sheets treat
+ * any of those as "this cell is a formula", so a student/classroom name like
+ * `=HYPERLINK(...)` would otherwise execute when the teacher opens the file),
+ * then apply the normal quote/comma/newline wrap on the result.
+ */
 export function csvEscape(value: string): string {
-  if (/[",\n\r]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
-  return value;
+  const neutralized = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  if (/[",\n\r]/.test(neutralized)) return `"${neutralized.replace(/"/g, '""')}"`;
+  return neutralized;
 }
 
 export function assignmentProgressToCsv(

@@ -13892,6 +13892,23 @@ const sv = {
         "fileName": "{{name}} – uppgiftsprogress",
         "untitled": "Namnlös lektion",
         "anonymousStudent": "Elev {{id}}"
+      },
+      "exportAllClasses": {
+        "button": "Exportera alla klasser",
+        "downloading": "Exporterar…",
+        "failed": "Det gick inte att exportera dina klasser. Försök igen.",
+        "empty": "Inget att exportera än",
+        "fileName": "Alla klasser – förloppsexport",
+        "anonymousStudent": "Elev {{id}}",
+        "columns": {
+          "classroom": "Klass",
+          "student": "Elev",
+          "lessonsCompleted": "Avslutade lektioner",
+          "wordsMastered": "Bemästrade ord",
+          "totalXp": "Totalt XP",
+          "lastActive": "Senast aktiv",
+          "gamesPlayed": "Spelade spel"
+        }
       }
     },
     "curriculum": {

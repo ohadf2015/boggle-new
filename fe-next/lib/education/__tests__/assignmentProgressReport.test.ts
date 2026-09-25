@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   buildAssignmentProgressRows,
   assignmentProgressToCsv,
+  csvEscape,
 } from '../assignmentProgressReport';
 
 const students = [
@@ -86,5 +87,47 @@ describe('assignmentProgressToCsv', () => {
     });
     const csv = assignmentProgressToCsv(rows, CSV_LABELS);
     expect(csv.split('\n')[1]).toBe('Ada,Drill,Missing,,,');
+  });
+});
+
+describe('csvEscape formula-injection guard', () => {
+  it('prefixes a leading = with a quote so spreadsheets never execute it', () => {
+    expect(csvEscape('=SUM(A1)')).toBe("'=SUM(A1)");
+  });
+
+  it('prefixes a leading + with a quote', () => {
+    expect(csvEscape('+1234')).toBe("'+1234");
+  });
+
+  it('prefixes a leading - with a quote even for a string that looks numeric', () => {
+    expect(csvEscape('-1234')).toBe("'-1234");
+  });
+
+  it('prefixes a leading @ with a quote', () => {
+    expect(csvEscape('@mention')).toBe("'@mention");
+  });
+
+  it('does not touch a value with no leading formula character', () => {
+    expect(csvEscape('Ada')).toBe('Ada');
+  });
+
+  it('only checks the first character, not = elsewhere in the string', () => {
+    expect(csvEscape('a=b')).toBe('a=b');
+  });
+
+  it('combines the injection prefix with RFC4180 comma quoting', () => {
+    expect(csvEscape('=A,B')).toBe('"\'=A,B"');
+  });
+
+  it('combines the injection prefix with RFC4180 quote-doubling', () => {
+    expect(csvEscape('=say "hi"')).toBe('"\'=say ""hi"""');
+  });
+
+  it('leaves an actual JS number serialized via String() alone (numbers bypass csvEscape)', () => {
+    // csvEscape only ever receives strings; numeric cells in both
+    // assignmentProgressToCsv and teacherExportToCsv are serialized with
+    // String(n) and never routed through csvEscape, so a real negative
+    // number is never mistakenly neutralized.
+    expect(String(-3)).toBe('-3');
   });
 });

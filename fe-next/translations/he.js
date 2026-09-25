@@ -13512,6 +13512,23 @@ const he = {
         "fileName": "{{name}} – התקדמות במשימות",
         "untitled": "שיעור ללא שם",
         "anonymousStudent": "תלמיד {{id}}"
+      },
+      "exportAllClasses": {
+        "button": "ייצוא כל הכיתות",
+        "downloading": "מייצא...",
+        "failed": "לא הצלחנו לייצא את הכיתות שלך. נסו שוב.",
+        "empty": "אין כרגע מה לייצא",
+        "fileName": "כל הכיתות – ייצוא התקדמות",
+        "anonymousStudent": "תלמיד {{id}}",
+        "columns": {
+          "classroom": "כיתה",
+          "student": "תלמיד",
+          "lessonsCompleted": "שיעורים שהושלמו",
+          "wordsMastered": "מילים שנשלטו",
+          "totalXp": "סה\"כ XP",
+          "lastActive": "פעילות אחרונה",
+          "gamesPlayed": "משחקים ששוחקו"
+        }
       }
     },
     "curriculum": {

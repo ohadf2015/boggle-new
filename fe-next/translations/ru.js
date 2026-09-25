@@ -12588,6 +12588,23 @@ const ru = {
         "fileName": "{{name}} – прогресс по заданиям",
         "untitled": "Урок без названия",
         "anonymousStudent": "Ученик {{id}}"
+      },
+      "exportAllClasses": {
+        "button": "Экспортировать все классы",
+        "downloading": "Экспорт…",
+        "failed": "Не удалось экспортировать ваши классы. Попробуйте ещё раз.",
+        "empty": "Пока нечего экспортировать",
+        "fileName": "Все классы – экспорт прогресса",
+        "anonymousStudent": "Ученик {{id}}",
+        "columns": {
+          "classroom": "Класс",
+          "student": "Ученик",
+          "lessonsCompleted": "Пройдено уроков",
+          "wordsMastered": "Освоено слов",
+          "totalXp": "Всего XP",
+          "lastActive": "Последняя активность",
+          "gamesPlayed": "Сыграно игр"
+        }
       }
     },
     "curriculum": {

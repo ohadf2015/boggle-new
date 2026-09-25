@@ -13657,6 +13657,23 @@ const ja = {
         "fileName": "{{name}} – 課題の進捗",
         "untitled": "無題のレッスン",
         "anonymousStudent": "生徒 {{id}}"
+      },
+      "exportAllClasses": {
+        "button": "全クラスを書き出す",
+        "downloading": "書き出し中…",
+        "failed": "クラスを書き出せませんでした。もう一度お試しください。",
+        "empty": "書き出す内容がまだありません",
+        "fileName": "全クラス – 進捗エクスポート",
+        "anonymousStudent": "生徒 {{id}}",
+        "columns": {
+          "classroom": "クラス",
+          "student": "生徒",
+          "lessonsCompleted": "完了したレッスン数",
+          "wordsMastered": "習得した単語数",
+          "totalXp": "合計XP",
+          "lastActive": "最終アクティブ日",
+          "gamesPlayed": "プレイ回数"
+        }
       }
     },
     "curriculum": {
