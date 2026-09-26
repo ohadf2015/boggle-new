@@ -166,7 +166,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           hiddenCount={visible.hiddenCount}
           isRevealed={(pos) => seen(`row-${pos}`)}
           t={t}
-          className="min-h-0 lg:max-h-[calc(560px*var(--mp-u,1))]"
+          className="min-h-0 flex-1 lg:max-h-[calc(560px*var(--mp-u,1))]"
         />
       </div>
       <div className="shrink-0 flex flex-col gap-[calc(10px*var(--mp-u,1))] lg:justify-center">

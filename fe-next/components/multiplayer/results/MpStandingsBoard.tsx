@@ -49,7 +49,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             className={cn(
               'relative flex items-center min-h-0 grow shrink overflow-hidden rounded-neo border-[3px] shadow-hard-sm',
               'gap-[calc(10px*var(--mp-u,1))] px-[calc(10px*var(--mp-u,1))]',
-              first ? 'basis-[calc(76px*var(--mp-u,1))] max-h-[calc(96px*var(--mp-u,1))] min-h-[calc(44px*var(--mp-u,1))]' : 'basis-[calc(58px*var(--mp-u,1))] max-h-[calc(72px*var(--mp-u,1))] min-h-[calc(34px*var(--mp-u,1))]',
+              first ? 'basis-[calc(76px*var(--mp-u,1))] max-h-[calc(108px*var(--mp-u,1))] min-h-[calc(44px*var(--mp-u,1))]' : 'basis-[calc(58px*var(--mp-u,1))] max-h-[calc(84px*var(--mp-u,1))] min-h-[calc(34px*var(--mp-u,1))]',
               podium ? podium.row : 'bg-neo-navy-light border-neo-black',
               r.isMe && !first && 'outline-[3px] outline-offset-2 outline-neo-lime outline',
               r.isMe && first && 'outline-[3px] outline-offset-2 outline-neo-white outline',
