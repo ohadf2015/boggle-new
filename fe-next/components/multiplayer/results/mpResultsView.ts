@@ -32,7 +32,7 @@ export function mascotFor(rank: number, total: number, score?: number): MascotMo
   return rank <= Math.ceil(total / 2) ? 'cheer' : 'think';
 }
 
-interface WordLike {
+export interface WordLike {
   word: string;
   score?: number;
   validated?: boolean;

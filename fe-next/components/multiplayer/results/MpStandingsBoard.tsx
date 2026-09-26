@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Bot, ChevronDown, ChevronUp, Crown } from 'lucide-react';
+import { Bot, ChevronDown, ChevronUp, Crown, Star } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
 import { podiumTier, type MpStandingRow } from './mpStandings';
@@ -108,7 +108,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
                   </span>
                 )}
               </span>
-              {(r.roundScore !== undefined || r.seriesTotal !== null) && (
+              {(r.roundScore !== undefined || r.seriesTotal !== null || r.bestWord) && (
                 <span className={cn('flex items-center gap-1 text-[calc(11px*var(--mp-u,1))] font-neo-body tabular-nums', first ? 'text-neo-black/75' : 'text-neo-white/70')}>
                   {r.roundScore !== undefined ? (
                     <span
@@ -118,9 +118,9 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
                     >
                       {t('mpUi.results.roundGain', { points: `\u2066+${r.roundScore}\u2069` })}
                     </span>
-                  ) : (
-                    t('mpUi.results.seriesTotal', { total: r.seriesTotal as number })
-                  )}
+                  ) : r.seriesTotal !== null ? (
+                    <span className="truncate">{t('mpUi.results.seriesTotal', { total: r.seriesTotal })}</span>
+                  ) : null}
                   {r.seriesDelta > 0 && (
                     <span data-testid="mp-standing-delta" className={cn('inline-flex items-center font-bold', first ? 'text-neo-black' : 'text-neo-lime', shown && fx.chipPop)}>
                       <ChevronUp aria-hidden="true" className="w-3 h-3" />
@@ -131,6 +131,20 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
                     <span data-testid="mp-standing-delta" className={cn('inline-flex items-center font-bold', first ? 'text-neo-black' : 'text-neo-pink')}>
                       <ChevronDown aria-hidden="true" className="w-3 h-3" />
                       {Math.abs(r.seriesDelta)}
+                    </span>
+                  )}
+                  {r.bestWord && (
+                    <span
+                      data-testid="mp-standing-best"
+                      className={cn(
+                        'inline-flex items-center gap-0.5 min-w-0 rounded-full border-2 px-1.5 leading-none py-[2px] font-bold',
+                        first ? 'border-neo-black bg-neo-black text-neo-lime' : 'border-neo-black bg-neo-yellow text-neo-black',
+                        shown && fx.wordPop,
+                      )}
+                    >
+                      <Star aria-hidden="true" className="w-3 h-3 shrink-0 fill-current" />
+                      <span dir="auto" className="truncate uppercase font-neo-display tracking-wide">{r.bestWord.word}</span>
+                      <span className="shrink-0 opacity-75">+{r.bestWord.score}</span>
                     </span>
                   )}
                 </span>

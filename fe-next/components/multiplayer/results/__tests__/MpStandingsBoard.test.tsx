@@ -42,3 +42,25 @@ describe('MpStandingsBoard round line', () => {
     expect(scored.className).not.toMatch(/opacity-/);
   });
 });
+
+describe('MpStandingsBoard word reel', () => {
+  it("Given rows with a best word, Then each row shows its player's word and points; a row without one shows none", () => {
+    // Given two rows, one with a best word
+    render(
+      <MpStandingsBoard
+        rows={[
+          row({ username: 'champ', rank: 1, score: 40, bestWord: { word: 'gult', score: 23 } }),
+          row({ username: 'blank', rank: 2, score: 0, bestWord: null }),
+        ]}
+        hiddenCount={0}
+        isRevealed={() => true}
+        t={t}
+      />,
+    );
+    // Then only the scoring row carries the word chip
+    const chips = screen.getAllByTestId('mp-standing-best');
+    expect(chips).toHaveLength(1);
+    expect(chips[0].textContent).toContain('gult');
+    expect(chips[0].textContent).toContain('+23');
+  });
+});

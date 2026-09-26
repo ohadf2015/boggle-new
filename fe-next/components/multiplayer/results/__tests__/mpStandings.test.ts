@@ -5,6 +5,23 @@ import { toMpRoster } from '@/lib/multiplayer/roster';
 const norm = (s: string | null | undefined) => (s ?? '').trim().toLowerCase();
 
 describe('buildMpStandings', () => {
+  it("carries each player's best counted word of the round (the reel under their name), null when nothing counted", () => {
+    // Given the server's scores with every player's words
+    const sorted = [
+      { username: 'Maya', score: 40, allWords: [
+        { word: 'gult', score: 23, validated: true },
+        { word: 'quartzy', score: 30, validated: true, isDuplicate: true },
+        { word: 'ra', score: 17, validated: true },
+      ] },
+      { username: 'Leo', score: 0, allWords: [{ word: 'zzz', score: 9, validated: false }] },
+      { username: 'Kai', score: 0 },
+    ];
+    // When the standings are built
+    const rows = buildMpStandings({ sortedScores: sorted, username: 'Leo', normalizeUsername: norm });
+    // Then each row carries its own best valid, non-duplicate word
+    expect(rows.map((r) => r.bestWord)).toEqual([{ word: 'gult', score: 23 }, null, null]);
+  });
+
   it('keeps the server order and the server score on every row (the live leaderboard numbers)', () => {
     // Given the server's sorted final scores
     const sorted = [

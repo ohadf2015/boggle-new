@@ -18440,9 +18440,19 @@ const ja = {
       "roundPoints": "このラウンドの得点",
       "yourRank": "あなたの順位",
       "lessonRecap": "レッスンのふりかえり",
-      "seriesPlace": "シリーズ {total}人中 #{rank}",
+      "seriesPlace": "総合 {total}人中 {rank}位",
       "seriesPts": "シリーズ点",
-      "roundGain": "このラウンド {points}"
+      "roundGain": "このラウンド {points}",
+      "awardsTitle": "ラウンド賞",
+      "awardTop": "トップワード",
+      "awardLongest": "最長",
+      "awardMost": "最多ワード",
+      "wordCount": "{count}語",
+      "letterCount": "{count}文字",
+      "roundByRound": "ラウンド別",
+      "roundShort": "R{n}",
+      "total": "合計",
+      "player": "プレイヤー"
     }
   }
 };

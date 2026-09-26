@@ -18173,9 +18173,19 @@ const ru = {
       "roundPoints": "Очки за раунд",
       "yourRank": "Ваше место",
       "lessonRecap": "Итоги урока",
-      "seriesPlace": "Серия: #{rank} из {total}",
+      "seriesPlace": "#{rank} из {total} в общем зачёте",
       "seriesPts": "очк. серии",
-      "roundGain": "{points} за раунд"
+      "roundGain": "{points} за раунд",
+      "awardsTitle": "Награды раунда",
+      "awardTop": "Лучшее слово",
+      "awardLongest": "Самое длинное",
+      "awardMost": "Больше всех слов",
+      "wordCount": "слов: {count}",
+      "letterCount": "букв: {count}",
+      "roundByRound": "По раундам",
+      "roundShort": "Р{n}",
+      "total": "Итого",
+      "player": "Игрок"
     }
   }
 };

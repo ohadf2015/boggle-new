@@ -27,6 +27,8 @@ import { MpMyCard } from './MpMyCard';
 import { MpNextModeCard } from './MpNextModeCard';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
 import MpResultsDetails from './MpResultsDetails';
+import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
+import { roundAwards, seriesGrid } from './mpResultsStory';
 import type { MpResultsController } from './useMpResultsController';
 import fx from './mpResults.module.css';
 
@@ -152,6 +154,10 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const roundGap = useMemo(() => rivalGap(rows), [rows]);
   const gap = series ? series.gap : roundGap;
   const champions = series?.champions ?? NO_CHAMPIONS;
+  // The album (desktop/TV): the series final tells the series round by round;
+  // otherwise the round is told as three awards.
+  const grid = useMemo(() => seriesGrid({ ladder, standings: seriesStandings, rounds: seriesRoundNumber }), [ladder, seriesStandings, seriesRoundNumber]);
+  const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
 
   const header = (
     <MpResultsHeader
@@ -173,7 +179,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         // Desktop/TV scale the whole show up (the HUD bar keeps the shell's --mp-u).
         'relative flex-1 min-h-0 w-full max-w-6xl tv:max-w-[1600px] mx-auto flex flex-col lg:[--mp-u:1.3] [@media(min-width:1024px)_and_(max-width:1799px)_and_(min-height:860px)]:[--mp-u:1.45] tv:[--mp-u:1.8]',
         'gap-[calc(10px*var(--mp-u,1))] p-[calc(12px*var(--mp-u,1))] lg:p-[calc(24px*var(--mp-u,1))]',
-        'lg:grid lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-[calc(28px*var(--mp-u,1))] lg:items-center',
+        'lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-[calc(28px*var(--mp-u,1))] lg:items-center',
       )}
     >
       <div className="min-h-0 flex-1 flex flex-col justify-center gap-[calc(8px*var(--mp-u,1))] lg:h-full">
@@ -233,6 +239,11 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             className={cn(!seen('card') && 'invisible', seen('card') && fx.cardIn)}
           />
         )}
+        {seen('card') && (grid ? (
+          <MpSeriesGrid grid={grid} t={t} className={cn('hidden lg:block', fx.cardIn)} />
+        ) : awards ? (
+          <MpRoundAwards awards={awards} t={t} className="hidden lg:block" />
+        ) : null)}
         {/* Native AdMob banner / CrazyGames banner. The web dev placeholder
             ([data-ad-zone], null in production) is hidden so dev matches prod. */}
         <div className="shrink-0 empty:hidden [&_[data-ad-zone]]:hidden">

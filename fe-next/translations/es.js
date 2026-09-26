@@ -18458,9 +18458,19 @@ const es = {
       "roundPoints": "Puntos de esta ronda",
       "yourRank": "Tu puesto",
       "lessonRecap": "Resumen de la lección",
-      "seriesPlace": "Serie: #{rank} de {total}",
+      "seriesPlace": "#{rank} de {total} en total",
       "seriesPts": "pts de serie",
-      "roundGain": "{points} esta ronda"
+      "roundGain": "{points} esta ronda",
+      "awardsTitle": "Premios de la ronda",
+      "awardTop": "Mejor palabra",
+      "awardLongest": "Más larga",
+      "awardMost": "Más palabras",
+      "wordCount": "{count} palabras",
+      "letterCount": "{count} letras",
+      "roundByRound": "Ronda a ronda",
+      "roundShort": "R{n}",
+      "total": "Total",
+      "player": "Jugador"
     }
   }
 };

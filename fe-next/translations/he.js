@@ -18370,9 +18370,19 @@ const he = {
       "roundPoints": "נקודות בסיבוב",
       "yourRank": "המקום שלך",
       "lessonRecap": "סיכום השיעור",
-      "seriesPlace": "סדרה: מקום {rank} מתוך {total}",
+      "seriesPlace": "מקום {rank} מתוך {total} בסיכום",
       "seriesPts": "נק׳ בסדרה",
-      "roundGain": "{points} בסיבוב הזה"
+      "roundGain": "{points} בסיבוב הזה",
+      "awardsTitle": "פרסי הסיבוב",
+      "awardTop": "מילת השיא",
+      "awardLongest": "הכי ארוכה",
+      "awardMost": "הכי הרבה מילים",
+      "wordCount": "{count} מילים",
+      "letterCount": "{count} אותיות",
+      "roundByRound": "סיבוב אחר סיבוב",
+      "roundShort": "ס׳{n}",
+      "total": "סה״כ",
+      "player": "שחקן"
     }
   }
 };

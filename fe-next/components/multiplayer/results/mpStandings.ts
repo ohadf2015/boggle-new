@@ -1,4 +1,5 @@
 import type { Avatar } from '@/shared/types/game';
+import { pickBestWord, type WordLike } from './mpResultsView';
 
 /**
  * One standings row for the results / intermission screens.
@@ -28,6 +29,8 @@ export interface MpStandingRow {
   seriesDelta: number;
   /** Series ladder only: the server's score for the round just played. */
   roundScore?: number;
+  /** This player's best counted word of the round (the word reel), if any. */
+  bestWord?: { word: string; score: number } | null;
 }
 
 interface ScoreLike {
@@ -35,9 +38,10 @@ interface ScoreLike {
   score: number;
   avatar?: Avatar;
   isBot?: boolean;
+  allWords?: WordLike[] | null;
 }
 
-interface SeriesStandingLike {
+export interface SeriesStandingLike {
   username: string;
   totalScore: number;
   roundScores: number[];
@@ -83,6 +87,7 @@ export function buildMpStandings({ sortedScores, username, normalizeUsername, se
       score,
       seriesTotal,
       seriesDelta,
+      bestWord: pickBestWord(p.allWords),
     });
   });
   return rows;

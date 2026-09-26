@@ -18440,9 +18440,19 @@ const sv = {
       "roundPoints": "Poäng den här rundan",
       "yourRank": "Din placering",
       "lessonRecap": "Lektionssammanfattning",
-      "seriesPlace": "Serien: #{rank} av {total}",
+      "seriesPlace": "#{rank} av {total} totalt",
       "seriesPts": "seriepoäng",
-      "roundGain": "{points} denna runda"
+      "roundGain": "{points} denna runda",
+      "awardsTitle": "Rundans priser",
+      "awardTop": "Toppord",
+      "awardLongest": "Längst",
+      "awardMost": "Flest ord",
+      "wordCount": "{count} ord",
+      "letterCount": "{count} bokstäver",
+      "roundByRound": "Runda för runda",
+      "roundShort": "R{n}",
+      "total": "Totalt",
+      "player": "Spelare"
     }
   }
 };
