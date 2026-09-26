@@ -11,14 +11,13 @@ import type { useSheetIdentity } from './useSheetIdentity';
  * "Playing as [avatar] Name ✎" — or the name field when there is no usable name
  * yet (or the player tapped ✎). Shared by the create and join sheets.
  */
-export function SheetIdentityRow({ id, alwaysEditable = false, onEnter }: {
+export function SheetIdentityRow({ id, onEnter }: {
   id: ReturnType<typeof useSheetIdentity>;
-  alwaysEditable?: boolean;
   onEnter?: () => void;
 }) {
   const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
-  const editing = alwaysEditable || !id.nameKnown;
+  const editing = !id.nameKnown;
 
   useEffect(() => {
     if (id.error) inputRef.current?.focus();

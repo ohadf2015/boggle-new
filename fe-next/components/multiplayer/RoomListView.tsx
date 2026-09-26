@@ -3,6 +3,7 @@
 import React, { type ReactNode } from 'react';
 import { Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNetworkState } from '@/hooks/useNetworkState';
 import CrazyGamesFriendsStrip from '@/components/multiplayer/CrazyGamesFriendsStrip';
 import type { ActiveRoom } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -54,6 +55,8 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   rankedSlot,
 }) => {
   const { t, dir } = useLanguage();
+  // Same offline guard as the footer CTAs (ArenaCTAStrip): a tap that cannot work stays inert.
+  const { online } = useNetworkState();
 
   return (
     <div
@@ -67,8 +70,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         <button
           type="button"
           data-testid="entry-create-side"
-          onClick={onCreateRoom}
-          className="hidden lg:flex items-center justify-center gap-2 h-[calc(64px*var(--mp-u,1))] rounded-neo-lg border-3 border-neo-pink bg-neo-navy-light px-4 font-neo-display text-lg tv:text-2xl font-bold uppercase text-neo-pink shadow-hard transition-transform duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
+          onClick={online ? onCreateRoom : undefined}
+          disabled={!online}
+          className="hidden lg:flex items-center justify-center gap-2 h-[calc(64px*var(--mp-u,1))] rounded-neo-lg border-3 border-neo-pink bg-neo-navy-light px-4 font-neo-display text-lg tv:text-2xl font-bold uppercase text-neo-pink shadow-hard transition-transform duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <Plus aria-hidden="true" className="h-5 w-5" />
           {t('mpUi.entry.create')}

@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useMemo, useEffect, useCallback, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { recordInAppPath } from '@/lib/navigation/previousInAppPath';
+import { syncMpChromeSession } from '@/lib/navigation/mpChromeSession';
 
 /**
  * Navigation Context
@@ -46,7 +47,9 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const pathname = usePathname();
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    recordInAppPath(`${window.location.pathname}${window.location.search}`);
+    const path = `${window.location.pathname}${window.location.search}`;
+    recordInAppPath(path);
+    syncMpChromeSession(path);
   }, [pathname]);
 
   const registerHeaderAudioControl = useCallback(() => {

@@ -194,15 +194,36 @@ export function useMultiplayerFlowState({
     [prefilledRoom, defaultLanguage, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, host]
   );
 
-  // JOIN BY CODE from the entry: exactly the invite-link path (profile → join,
-  // otherwise the join sheet for that code) — one route to a room, not two.
+  // JOIN BY CODE from the entry: the same join an invite link takes for a
+  // player (profile → join, otherwise the join sheet for that code) — but a
+  // typed code always JOINS. It never takes the classroom-host branch of
+  // handleInvitationAutoJoin, which CREATES a private room with the code.
   const handleCodeJoin = useCallback(
     (raw: string) => {
       const code = sanitizeGameCode(raw).toUpperCase();
       if (!code) return;
-      handleInvitationAutoJoin(code);
+      if (hasProfile()) {
+        const profile = getProfileData();
+        if (!isAuthenticated) trackGuestJoin(profile.username, code, defaultLanguage);
+        setGameCode(code);
+        setUsername(profile.username);
+        handleJoin(false, null, code, undefined, profile.username);
+        return;
+      }
+      dispatchFlow({
+        type: 'OPEN_JOIN',
+        room: {
+          gameCode: code,
+          roomName: code,
+          playerCount: 0,
+          language: defaultLanguage,
+          gameState: 'waiting' as const,
+          isRanked: false,
+          createdAt: Date.now(),
+        },
+      });
     },
-    [handleInvitationAutoJoin],
+    [hasProfile, getProfileData, isAuthenticated, defaultLanguage, setGameCode, setUsername, handleJoin],
   );
 
   // NOTE: CrazyGames invite is handled via the onInviteJoin callback above.

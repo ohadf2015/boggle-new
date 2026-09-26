@@ -94,4 +94,34 @@ describe('CodeEntry', () => {
     render(<CodeEntry onSubmit={vi.fn()} />);
     expect(boxes()[2].getAttribute('aria-label')).toBe('mpUi.entry.codeAria:3');
   });
+
+  it('another join failing (quick play, a sheet) leaves the boxes and focus alone', () => {
+    const { rerender } = render(<CodeEntry onSubmit={vi.fn()} />);
+    fireEvent.change(boxes()[0], { target: { value: 'Q' } });
+    const outside = document.createElement('button');
+    document.body.appendChild(outside);
+    outside.focus();
+    rerender(<CodeEntry onSubmit={vi.fn()} busy />);
+    rerender(<CodeEntry onSubmit={vi.fn()} busy={false} />);
+    expect(boxes()[0].value).toBe('Q');
+    expect(document.activeElement).toBe(outside);
+    outside.remove();
+  });
+
+  it('a failed code join never pulls focus out of an open dialog', () => {
+    const onSubmit = vi.fn();
+    const { rerender } = render(<CodeEntry onSubmit={onSubmit} />);
+    paste(boxes()[0], 'XWUCT4');
+    const dialog = document.createElement('div');
+    dialog.setAttribute('role', 'dialog');
+    const inside = document.createElement('button');
+    dialog.appendChild(inside);
+    document.body.appendChild(dialog);
+    inside.focus();
+    rerender(<CodeEntry onSubmit={onSubmit} busy />);
+    rerender(<CodeEntry onSubmit={onSubmit} busy={false} />);
+    expect(boxes().map((b) => b.value).join('')).toBe('');
+    expect(document.activeElement).toBe(inside);
+    dialog.remove();
+  });
 });

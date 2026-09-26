@@ -87,4 +87,11 @@ describe('MultiplayerFlow entry frame', () => {
     expect(props.handleJoin).not.toHaveBeenCalled();
     expect(screen.getByTestId('join-room-modal').textContent).toBe('ABC123');
   });
+
+  it('a typed code always JOINS — never the classroom host "create this code" path', () => {
+    render(<MultiplayerFlow {...props} host />);
+    fireEvent.click(screen.getByText('code'));
+    expect(props.handleJoin).toHaveBeenCalledWith(false, null, 'ABC123', undefined, 'StoredPlayer');
+    expect(props.handleJoin).not.toHaveBeenCalledWith(true, expect.anything(), 'ABC123', expect.anything(), expect.anything(), expect.anything());
+  });
 });

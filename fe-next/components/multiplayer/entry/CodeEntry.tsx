@@ -32,6 +32,13 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
   const [shake, setShake] = useState(0);
   const refs = useRef<Array<HTMLInputElement | null>>([]);
   const wasBusy = useRef(false);
+  /** Only a join THIS row submitted can fail here — quick play or a sheet's join must not clear it. */
+  const submitted = useRef(false);
+
+  const submit = (code: string) => {
+    submitted.current = true;
+    onSubmit(code);
+  };
 
   useEffect(() => {
     if (busy) {
@@ -40,13 +47,18 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
     }
     if (!wasBusy.current) return;
     wasBusy.current = false;
+    if (!submitted.current) return;
+    submitted.current = false;
     setChars(EMPTY);
     setShake((s) => s + 1);
   }, [busy]);
 
-  // After a failed join the row re-mounts (to replay the shake) — focus the new first box.
+  // After a failed join the row re-mounts (to replay the shake) — focus the new
+  // first box, unless the player is working in a dialog (a sheet over the entry).
   useEffect(() => {
-    if (shake > 0) refs.current[0]?.focus();
+    if (shake === 0) return;
+    if (document.activeElement?.closest?.('[role="dialog"]')) return;
+    refs.current[0]?.focus();
   }, [shake]);
 
   const focus = (i: number) => refs.current[Math.max(0, Math.min(CODE_LENGTH - 1, i))]?.focus();
@@ -62,7 +74,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
     setChars(next);
     const code = next.join('');
     if (code.length === CODE_LENGTH && next.every(Boolean)) {
-      onSubmit(code);
+      submit(code);
       refs.current[CODE_LENGTH - 1]?.blur();
       return;
     }
@@ -86,7 +98,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
     if (!code) return;
     if (code.length > CODE_LENGTH) {
       setChars(code.slice(0, CODE_LENGTH).split(''));
-      onSubmit(code);
+      submit(code);
       return;
     }
     fill(i === 0 || code.length === CODE_LENGTH ? 0 : i, code);

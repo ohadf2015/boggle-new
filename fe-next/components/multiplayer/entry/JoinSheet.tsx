@@ -86,7 +86,7 @@ export default function JoinSheet({
 
         {full && <p className="text-center text-sm font-bold text-neo-white">{t('mpUi.entry.roomFullWatch')}</p>}
 
-        <SheetIdentityRow id={id} alwaysEditable onEnter={join} />
+        <SheetIdentityRow id={id} onEnter={join} />
 
         <MpPrimaryCta
           tone={full ? 'cyan' : 'pink'}

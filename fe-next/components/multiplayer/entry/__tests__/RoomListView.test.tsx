@@ -20,6 +20,8 @@ vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => 
 vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: true }) }));
 vi.mock('@/components/multiplayer/CrazyGamesFriendsStrip', () => ({ __esModule: true, default: () => null }));
 vi.mock('../EntryIdentity', () => ({ EntryIdentity: () => <div data-testid="entry-identity" /> }));
+const net = { online: true, rttMs: 20 };
+vi.mock('@/hooks/useNetworkState', () => ({ useNetworkState: () => net }));
 vi.mock('@/utils/posthogEngagement', () => ({ trackMpRoomJoinClicked: vi.fn(), trackMpRoomJoinBlocked: vi.fn() }));
 
 import RoomListView from '../../RoomListView';
@@ -34,7 +36,10 @@ const props = {
 };
 
 describe('RoomListView (entry body)', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    net.online = true;
+  });
 
   it('puts identity, join-by-code and the arenas on one screen', () => {
     render(<RoomListView {...props} />);
@@ -68,5 +73,14 @@ describe('RoomListView (entry body)', () => {
     render(<RoomListView {...props} />);
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(markGuidanceShown).not.toHaveBeenCalled();
+  });
+
+  it('offline: the desktop CREATE goes inert like the footer CTAs', () => {
+    net.online = false;
+    render(<RoomListView {...props} />);
+    const create = screen.getByTestId('entry-create-side');
+    expect(create).toBeDisabled();
+    fireEvent.click(create);
+    expect(props.onCreateRoom).not.toHaveBeenCalled();
   });
 });

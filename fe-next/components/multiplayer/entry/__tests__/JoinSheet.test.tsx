@@ -53,17 +53,28 @@ describe('JoinSheet (via the JoinRoomModal re-export)', () => {
     expect(screen.getByTestId('join-ticket').textContent).toContain('3/8');
   });
 
-  it('prefills the identity name; JOIN joins and stores it', () => {
+  it('a known name means no form: the tap joins with it and stores it', () => {
     const onJoin = vi.fn();
     render(<JoinRoomModal {...props} onJoin={onJoin} />);
-    expect((screen.getByRole('textbox', { name: en('mpUi.entry.nameAria') }) as HTMLInputElement).value).toBe('Guesty');
+    expect(screen.queryByRole('textbox', { name: en('mpUi.entry.nameAria') })).toBeNull();
+    expect(screen.getByText('Guesty')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('join-submit'));
     expect(onJoin).toHaveBeenCalledWith('Guesty');
     expect(setStoredUsername).toHaveBeenCalledWith('Guesty');
     expect(setStoredCustomAvatar).toHaveBeenCalledWith(CFG);
   });
 
-  it('refuses an invalid name and says why', () => {
+  it('the name can still be changed before joining', () => {
+    const onJoin = vi.fn();
+    render(<JoinRoomModal {...props} onJoin={onJoin} />);
+    fireEvent.click(screen.getByRole('button', { name: en('mpUi.entry.editName') }));
+    fireEvent.change(screen.getByRole('textbox', { name: en('mpUi.entry.nameAria') }), { target: { value: 'Renamed' } });
+    fireEvent.click(screen.getByTestId('join-submit'));
+    expect(onJoin).toHaveBeenCalledWith('Renamed');
+  });
+
+  it('no usable name: the field shows and an invalid name is refused with a reason', () => {
+    storedName = '';
     const onJoin = vi.fn();
     render(<JoinRoomModal {...props} onJoin={onJoin} />);
     fireEvent.change(screen.getByRole('textbox', { name: en('mpUi.entry.nameAria') }), { target: { value: ' ' } });
