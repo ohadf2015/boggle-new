@@ -18337,7 +18337,7 @@ const he = {
       "codeLabel": "יש לך קוד חדר?",
       "codeAria": "קוד חדר, תו {{n}} מתוך {{total}}",
       "openArenas": "זירות פתוחות",
-      "playingNow": "{{count}} משחקים עכשיו",
+      "playingNow": "משחקים עכשיו: {{count}}",
       "moreArenas": "עוד {{count}}",
       "allArenas": "כל הזירות הפתוחות",
       "emptyTitle": "אין זירות פתוחות",

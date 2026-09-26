@@ -15,22 +15,27 @@ const MAX_NAME = 20;
 /** Rendered once at the largest size; CSS sizes it per breakpoint (64 phone · 112 desktop · 160 TV). */
 const AVATAR_PX = 160;
 
-/* Shared by the ready card and its placeholder, so the swap never shifts. */
+/*
+ * Shared by the ready card and its placeholder, so the swap never shifts.
+ * TV sizes are stacked on desktop-tall (`desktop-tall:tv:*`): the stylesheet
+ * emits desktop-tall utilities after tv ones, so a bare `tv:` value for a
+ * property desktop-tall also sets never applies (tvVariantOrder.test.ts).
+ */
 const CARD =
-  'relative flex items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard desktop-tall:flex-col desktop-tall:gap-3 desktop-tall:px-6 desktop-tall:py-6 desktop-tall:text-center tv:py-10';
+  'relative flex items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard desktop-tall:flex-col desktop-tall:gap-3 desktop-tall:px-6 desktop-tall:py-6 desktop-tall:text-center desktop-tall:tv:py-10';
 const AVATAR_SLOT = 'relative shrink-0';
 const AVATAR_BOX =
-  'block h-16 w-16 desktop-tall:h-28 desktop-tall:w-28 tv:h-40 tv:w-40 overflow-hidden rounded-full border-3 border-neo-black';
+  'block h-16 w-16 desktop-tall:h-28 desktop-tall:w-28 desktop-tall:tv:h-40 desktop-tall:tv:w-40 overflow-hidden rounded-full border-3 border-neo-black';
 const TEXT_COL = 'min-w-0 flex-1 desktop-tall:w-full desktop-tall:flex-none';
 const TAGLINE =
   'hidden desktop-tall:block mb-1 font-neo-display text-3xl tv:text-5xl font-bold uppercase tracking-tight text-neo-lime';
 const LABEL = 'block text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-cyan';
 const NAME_ROW =
-  'w-full pe-8 font-neo-display! desktop-tall:text-3xl! tv:text-5xl! font-bold desktop-tall:ps-8 desktop-tall:text-center border-b-3 pb-0.5';
+  'w-full pe-8 font-neo-display! desktop-tall:text-3xl! desktop-tall:tv:text-5xl! font-bold desktop-tall:ps-8 desktop-tall:text-center border-b-3 pb-0.5';
 // One line height per breakpoint whatever the phone font size, so a long name
 // (smaller type) never changes the row — or the card — height. Listed AFTER
 // the size in cn(): tailwind-merge drops a leading-* that precedes a text-*.
-const NAME_LEADING = 'leading-8! desktop-tall:leading-9! tv:leading-none!';
+const NAME_LEADING = 'leading-8! desktop-tall:leading-9! desktop-tall:tv:leading-none!';
 
 /**
  * Phone type size for the name: at 24px Fredoka the field shows ~16 characters
