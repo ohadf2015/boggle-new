@@ -22,4 +22,13 @@ describe('BattleModeCard — illustrated mode tiles', () => {
     expect(screen.getByRole('button', { name: 'gameModes.blast.name' })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByRole('button', { name: 'gameModes.classic.name' })).toHaveAttribute('aria-pressed', 'true');
   });
+  it('with a how-to handler the grid spare slot becomes a "How to play" tile', () => {
+    const onHowToPlay = vi.fn();
+    render(<BattleModeCard selectedGameMode="classic" setSelectedGameMode={vi.fn()} t={t} onHowToPlay={onHowToPlay} />);
+    const tile = screen.getByTestId('lobby-how-to-play');
+    expect(tile).toHaveTextContent('mpUi.lobby.howToPlay');
+    expect(tile.parentElement).toBe(screen.getByTestId('game-mode-classic').parentElement);
+    tile.click();
+    expect(onHowToPlay).toHaveBeenCalledTimes(1);
+  });
 });

@@ -87,9 +87,9 @@ const ART: Partial<Record<GameModeOption, ReactNode>> = {
   blast: (
     <>
       <circle cx={30} cy={29} r={15} fill={INK} transform="translate(2 2)" />
-      <circle cx={30} cy={29} r={15} fill="#2a2a44" {...S} />
+      <circle cx={30} cy={29} r={15} fill="#4a4a7a" {...S} />
       <path d="M24 22 a8 8 0 0 1 8 -4" fill="none" stroke={C.cream} strokeWidth={2.5} strokeLinecap="round" opacity={0.7} />
-      <rect x={34} y={11} width={8} height={7} rx={1.5} transform="rotate(35 38 14)" fill="#2a2a44" {...S} />
+      <rect x={34} y={11} width={8} height={7} rx={1.5} transform="rotate(35 38 14)" fill="#4a4a7a" {...S} />
       <path d="M41 11 q4 -6 9 -4" fill="none" stroke={INK} strokeWidth={2.5} strokeLinecap="round" />
       <path d="M51 1 l2 5 5 1 -4 3 1 5 -4 -3 -5 2 2 -5 -3 -4 5 0 z" fill={C.yellow} stroke={INK} strokeWidth={1.5} strokeLinejoin="round" />
       <circle cx={52} cy={8} r={2} fill={C.orange} />
@@ -110,6 +110,21 @@ export function ModeArt({ mode, className }: { mode: GameModeOption; className?:
   return (
     <svg data-testid={`mode-art-${mode}`} aria-hidden="true" focusable="false" viewBox="0 0 64 48" className={className}>
       {art}
+    </svg>
+  );
+}
+
+/** The "How to play" tile's sticker: a rule book with a question bubble. */
+export function HowToArt({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 64 48" className={className}>
+      <rect x={16} y={12} width={26} height={30} rx={3} fill={INK} transform="translate(2 2)" />
+      <rect x={16} y={12} width={26} height={30} rx={3} fill={C.cyan} {...S} />
+      <line x1={22} y1={20} x2={36} y2={20} {...S} strokeWidth={2} />
+      <line x1={22} y1={26} x2={36} y2={26} {...S} strokeWidth={2} />
+      <line x1={22} y1={32} x2={31} y2={32} {...S} strokeWidth={2} />
+      <path d="M40 4 h16 a4 4 0 0 1 4 4 v9 a4 4 0 0 1 -4 4 h-8 l-5 5 v-5 h-3 a4 4 0 0 1 -4 -4 v-9 a4 4 0 0 1 4 -4 z" fill={C.lime} {...S} />
+      <text x={48} y={17.5} textAnchor="middle" fontFamily="var(--font-fredoka, Fredoka), system-ui, sans-serif" fontWeight={800} fontSize={12} fill={INK}>?</text>
     </svg>
   );
 }

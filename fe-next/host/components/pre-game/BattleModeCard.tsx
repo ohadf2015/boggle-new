@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { HelpCircle } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
-import { ModeArt } from '@/components/multiplayer/lobby/ModeArt';
+import { HowToArt, ModeArt } from '@/components/multiplayer/lobby/ModeArt';
 import { useExperiment } from '@/hooks/useExperiment';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
@@ -19,7 +18,7 @@ interface BattleModeCardProps {
   language?: string | null;
   /** @deprecated Blast is offered to all players now. */
   hasBlastAccess?: boolean;
-  /** Opens the how-to-play sheet; renders a "How to play" link beside the rule. */
+  /** Opens the how-to-play sheet; adds a "How to play" tile in the grid's spare slot. */
   onHowToPlay?: () => void;
   /** Stretch the tile grid to the space the parent gives it (lobby body). */
   fill?: boolean;
@@ -119,20 +118,27 @@ export function BattleModeCard({
             </button>
           );
         })}
-      </div>
-      <p className="flex items-start gap-2 min-h-8 text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] leading-snug text-neo-white/80">
-        <span className="min-w-0 flex-1 line-clamp-2">{getModeDescription(selectedGameMode, t)}</span>
         {onHowToPlay && (
           <button
             type="button"
             onClick={onHowToPlay}
             data-testid="lobby-how-to-play"
-            className="shrink-0 inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-navy-light px-2 py-1 font-bold text-neo-cyan shadow-hard-sm active:translate-y-0.5"
+            className={cn(
+              styles.modeTile,
+              'flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 border-dashed border-neo-cyan/60 bg-neo-navy text-neo-cyan text-center',
+              'transition-[transform,border-color] duration-150 hover:border-neo-cyan active:translate-y-0.5',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+            )}
           >
-            <HelpCircle aria-hidden="true" className="w-3.5 h-3.5" />
-            {t('mpUi.lobby.howToPlay')}
+            <HowToArt className={cn(styles.modeArt, 'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))]')} />
+            <span className="shrink-0 max-w-full font-neo-display text-[11px] tall:text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase leading-[1.1] line-clamp-2 break-words">
+              {t('mpUi.lobby.howToPlay')}
+            </span>
           </button>
         )}
+      </div>
+      <p className="min-h-5 text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] leading-snug font-bold text-neo-white/80 line-clamp-2">
+        {getModeDescription(selectedGameMode, t)}
       </p>
     </section>
   );

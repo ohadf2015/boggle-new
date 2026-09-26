@@ -5,7 +5,9 @@
  *   header  [exit] [board language] … [invite] [chat] [sound]
  *   body    8-seat grid (same `lobbySeats` source as the host) · DJ Lexi + status
  *   footer  READY toggle
- * Desktop (≥720px): seats + DJ Lexi status left; invite + chat launcher right.
+ * Desktop (≥720px): seats + DJ Lexi status (rules accordion) left; invite +
+ * chat right — the base suite pins chat and rules as mounted on the joiner's
+ * desktop, so they stay there (the host's rail follows DESIGN §3: launcher).
  * A classroom student gets ClassroomWaitingStage instead (unchanged contract).
  */
 import React, { memo, useState, useCallback, useMemo } from 'react';
@@ -37,8 +39,9 @@ import { DJMascot } from '@/components/ui/DJMascot';
 import { MpHudBar } from '@/components/multiplayer/shell/MpHudBar';
 import { lobbySeats, readyTally, LOBBY_SEATS } from '@/components/multiplayer/lobby/lobbySeats';
 import { ReadyButton } from '@/components/multiplayer/lobby/ReadyButton';
+import { ReadyMeter } from '@/components/multiplayer/lobby/ReadyMeter';
 import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
-import { LobbyExitButton, LobbyChatButton, LobbyChatLauncher, LobbyChatPanel, HowToPlaySheet, ChatSheet } from '@/components/multiplayer/lobby/LobbyChrome';
+import { LobbyExitButton, LobbyChatButton, LobbyChatPanel, HowToPlaySheet, ChatSheet } from '@/components/multiplayer/lobby/LobbyChrome';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
@@ -204,23 +207,36 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
 
   // DJ Lexi holds the floor while the host sets up: the card takes the body's
   // free height, so the phone never shows a dead band above READY.
-  const waiting = (
+  const waitingCard = (howTo: { pill?: React.ReactNode; accordion?: React.ReactNode }) => (
     <div data-testid="waiting-status" className={cn(CARD, 'flex-1 min-h-0 flex flex-col items-center justify-center gap-3 text-center overflow-hidden')}>
-      <DJMascot size="xs" className="!w-[min(calc(168px*var(--mp-u,1)),22vh)] !h-[min(calc(168px*var(--mp-u,1)),22vh)] min-h-12 min-w-12 shrink" alt="" />
+      <DJMascot size="xs" className="!w-[min(calc(168px*var(--mp-u,1)),22vh)] !h-[min(calc(168px*var(--mp-u,1)),22vh)] min-h-12 min-w-12 shrink -rotate-3 rounded-neo-lg border-3 border-neo-black shadow-hard overflow-hidden" alt="" />
       {/* The shared status line truncates to one line; here it has room to wrap. */}
       <div className="min-w-0 max-w-md flex flex-col items-center gap-2 [&_p]:whitespace-normal [&_p]:line-clamp-3 [&_p]:text-neo-white/85 [&_p]:font-bold [&_p]:text-[length:calc(15px*var(--mp-u,1))]">
+        <ReadyMeter seats={seats} meId={username} />
         {status}
-        {howToMode && (
-          <button
-            type="button"
-            onClick={() => setSheet('howto')}
-            className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-navy px-3 py-1 text-xs font-bold text-neo-cyan shadow-hard-sm active:translate-y-0.5"
-          >
-            <HelpCircle aria-hidden="true" className="w-3.5 h-3.5" />
-            {t('mpUi.lobby.howToPlay')}
-          </button>
-        )}
+        {howTo.pill}
       </div>
+      {howTo.accordion}
+    </div>
+  );
+
+  // One how-to control per layout: the pill opens the sheet on phone; desktop
+  // has the room for the collapsed rules accordion right in the card. It stays
+  // collapsed: nothing broadcasts the host's lobby pick, so this is the room's
+  // fallback mode, not a promise.
+  const howToPill = howToMode && (
+    <button
+      type="button"
+      onClick={() => setSheet('howto')}
+      className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-navy px-3 py-1 text-xs font-bold text-neo-cyan shadow-hard-sm active:translate-y-0.5"
+    >
+      <HelpCircle aria-hidden="true" className="w-3.5 h-3.5" />
+      {t('mpUi.lobby.howToPlay')}
+    </button>
+  );
+  const howToAccordion = howToMode && (
+    <div className="w-full max-w-md text-start">
+      <GameInstructions selectedGameMode={howToMode} t={t} lang={lang} defaultOpen={false} />
     </div>
   );
 
@@ -254,13 +270,20 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
             leftContent={
               <>
                 {roster}
-                {waiting}
+                {waitingCard({ accordion: howToAccordion })}
               </>
             }
             rightContent={
               <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
                 <InviteCard gameCode={gameCode} t={props.t} />
-                <LobbyChatLauncher onPress={() => setSheet('chat')} unread={unread} t={t} className="mt-auto" />
+                <section className={cn(CARD, 'flex-1 min-h-28 flex flex-col p-0 overflow-hidden')}>
+                  <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
+                    {t('mpUi.lobby.chat')}
+                  </h2>
+                  <div className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain">
+                    <LobbyChatPanel username={username} isHost={false} gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
+                  </div>
+                </section>
               </div>
             }
           />
@@ -274,7 +297,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
         <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
           <div className="flex-1 min-h-0 flex flex-col gap-3 px-3 py-3 w-full max-w-[600px] mx-auto">
             {roster}
-            {waiting}
+            {waitingCard({ pill: howToPill })}
           </div>
           {readyButton && (
             <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">

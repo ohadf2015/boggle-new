@@ -77,11 +77,23 @@ describe('PlayerWaitingView — joiner lobby on the shell', () => {
     expect(within(screen.getByTestId('lobby-howto-sheet')).getByTestId('game-instructions')).toHaveAttribute('data-mode', 'classic');
   });
 
-  it('desktop: no chat panel and no how-to accordion in the body — both live behind the rail launchers', () => {
+  it('one how-to control per layout: the rules accordion on desktop, the pill → sheet on phone', () => {
     render(<PlayerWaitingView {...props} />);
-    expect(screen.queryByTestId('room-chat')).toBeNull();
-    expect(screen.queryByTestId('game-instructions')).toBeNull();
-    fireEvent.click(within(screen.getByTestId('desktop-chat-area')).getByTestId('lobby-chat-launcher'));
-    expect(within(screen.getByTestId('lobby-chat-sheet')).getByTestId('room-chat')).toBeInTheDocument();
+    const desktop = within(screen.getByTestId('desktop-lobby-layout'));
+    expect(desktop.getAllByTestId('game-instructions')).toHaveLength(1);
+    expect(desktop.queryByText('mpUi.lobby.howToPlay')).toBeNull();
+    expect(phone().queryByTestId('game-instructions')).toBeNull();
+    expect(phone().getByText('mpUi.lobby.howToPlay')).toBeInTheDocument();
+  });
+
+  it('desktop keeps the room chat in the right rail', () => {
+    render(<PlayerWaitingView {...props} />);
+    expect(within(screen.getByTestId('desktop-chat-area')).getByTestId('room-chat')).toBeInTheDocument();
+  });
+
+  it('a ready meter shows one pip per human guest, lit when the server says ready', () => {
+    render(<PlayerWaitingView {...props} readyUsernames={['Bo']} />);
+    const pips = within(phone().getByTestId('lobby-ready-meter')).getAllByTestId('lobby-ready-pip');
+    expect(pips.map((p) => [p.getAttribute('data-player'), p.getAttribute('data-ready')])).toEqual([['Ada', 'false'], ['Bo', 'true']]);
   });
 });

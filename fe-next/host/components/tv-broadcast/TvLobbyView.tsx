@@ -263,7 +263,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
               {t('tvLobby.viewOnlyBadge')}
             </span>
           </div>
-          <div className="rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
+          <div className="shrink-0 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
             <PlayerRoster
               players={filteredPlayers}
               username={username}
@@ -274,8 +274,9 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
               variant="tv"
             />
           </div>
-          <div className="rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
+          <div className="flex-1 min-h-0 flex flex-col rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
             <BattleModeCard
+              fill
               selectedGameMode={selectedGameMode}
               setSelectedGameMode={setSelectedGameMode}
               t={t}
