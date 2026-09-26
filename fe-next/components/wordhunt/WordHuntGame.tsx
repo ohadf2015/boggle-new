@@ -45,6 +45,8 @@ export interface WordHuntGameProps {
   /** True when mounted as the MP desktop shell's center slot — collapses the
    *  internal sidebar layout so the board fills the slot (shell supplies the roster). */
   isDesktopCanvas?: boolean;
+  /** Live MP round frame owns HUD/roster/rule: render the compact strip + board only. */
+  mpChrome?: boolean;
 }
 
 export const WordHuntGame = memo<WordHuntGameProps>(({
@@ -61,6 +63,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   socket,
   foundWords,
   isDesktopCanvas = false,
+  mpChrome = false,
 }) => {
   const { t, dir } = useLanguage();
   const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
@@ -286,6 +289,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       onQuit={onQuit}
       onShowHelp={handleShowHelp}
       isDesktopCanvas={isDesktopCanvas}
+      mpChrome={mpChrome}
 
       // Clue boxes (from bridge)
       targetLength={bridge.targetLength}

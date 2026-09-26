@@ -80,6 +80,10 @@ export interface WordHuntGameLayoutProps {
    *  the board fills the slot instead of being squeezed by a duplicate sidebar. */
   isDesktopCanvas?: boolean;
 
+  /** Live MP round frame owns the HUD, roster and rule line: render only the
+   *  compact mode strip (clues + life bar) and the board. */
+  mpChrome?: boolean;
+
   // Common
   t: (key: string, params?: Record<string, string | number>) => string;
   gameDir: 'ltr' | 'rtl';
@@ -136,6 +140,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
 
   isDesktopCanvas = false,
 
+  mpChrome = false,
+
   // Common
   t,
   gameDir,
@@ -146,23 +152,27 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   // we force the compact treatment so the board keeps its room. The min-width
   // guard scopes this to the sidebar layout; portrait phones keep their own
   // `max-height:560px` tuning.
-  const shortLandscape = useMediaQuery('(min-width: 720px) and (max-height: 760px)');
+  const shortLandscapeQuery = useMediaQuery('(min-width: 720px) and (max-height: 760px)');
+  // In the MP round frame the strip is always compact: one ≤72px mode panel.
+  const shortLandscape = mpChrome || shortLandscapeQuery;
 
   return (
-    <div className={cn('flex-1 flex flex-col min-h-0 overflow-x-hidden overflow-y-auto', !isDesktopCanvas && 'min-[720px]:flex-row')} translate="no">
+    <div className={cn('flex-1 flex flex-col min-h-0 overflow-x-hidden overflow-y-auto', !isDesktopCanvas && !mpChrome && 'min-[720px]:flex-row')} translate="no">
       {/* Main game area — capped width on wider screens, with vertical rhythm between sections */}
       <div className={cn(
         'flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden w-full max-w-3xl mx-auto',
         shortLandscape ? 'gap-0.5' : 'gap-1.5 md:gap-2 [@media(max-height:560px)]:gap-0.5',
       )}>
         {/* Score + Quit — compact */}
-        <WordHuntMPHeader
-          score={score}
-          onQuit={onQuit}
-          onShowHelp={onShowHelp}
-          t={t}
-          compact={shortLandscape}
-        />
+        {!mpChrome && (
+          <WordHuntMPHeader
+            score={score}
+            onQuit={onQuit}
+            onShowHelp={onShowHelp}
+            t={t}
+            compact={shortLandscape}
+          />
+        )}
 
         {/* Clue Boxes — tight vertical padding; on short landscape collapse outer padding too.
             Skeleton placeholder while server target metadata is in flight (recovery race). */}
@@ -284,7 +294,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
 
         {/* MP Leaderboard — mobile strip. Cap by absolute px on short landscape so the grid keeps room. */}
-        <div className="shrink-0 max-h-[80px] [@media(min-height:560px)]:max-h-[10vh] overflow-y-auto min-[720px]:hidden">
+        {!mpChrome && <div className="shrink-0 max-h-[80px] [@media(min-height:560px)]:max-h-[10vh] overflow-y-auto min-[720px]:hidden">
           <WordHuntMPLeaderboard
             playerLives={playerLives}
             eliminatedPlayers={eliminatedPlayers}
@@ -292,12 +302,12 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
             currentUsername={currentUsername}
             t={t}
           />
-        </div>
+        </div>}
       </div>
 
       {/* MP Leaderboard — desktop sidebar. Suppressed in the shell (its left rail
           already shows the roster) so it doesn't duplicate or squeeze the board. */}
-      <div className={cn('hidden min-[720px]:flex min-[720px]:flex-col min-[720px]:w-56 lg:w-72 xl:w-80 min-[720px]:border-s-3 min-[720px]:border-neo-black min-[720px]:bg-neo-navy/50 min-[720px]:overflow-y-auto', isDesktopCanvas && '!hidden')}>
+      {!mpChrome && <div className={cn('hidden min-[720px]:flex min-[720px]:flex-col min-[720px]:w-56 lg:w-72 xl:w-80 min-[720px]:border-s-3 min-[720px]:border-neo-black min-[720px]:bg-neo-navy/50 min-[720px]:overflow-y-auto', isDesktopCanvas && '!hidden')}>
         <WordHuntMPLeaderboard
           playerLives={playerLives}
           eliminatedPlayers={eliminatedPlayers}
@@ -305,7 +315,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           currentUsername={currentUsername}
           t={t}
         />
-      </div>
+      </div>}
     </div>
   );
 });

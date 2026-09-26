@@ -56,7 +56,9 @@ import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
 import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
-import { useRouter, useParams } from 'next/navigation';
+import { useMpExit } from '@/hooks/useMpExit';
+import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
+import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
 
 // ==================== Hint Types ====================
 
@@ -259,8 +261,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
 
-  const router = useRouter();
-  const params = useParams();
+  const mpExit = useMpExit();
   const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =
     useReconnectFlow({ gameCode, username, gameActive });
 
@@ -268,9 +269,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('mp_solo_handoff', JSON.stringify({ grid: letterGrid, gameCode }));
     }
-    const locale = (params?.locale as string) || 'en';
-    router.push(`/${locale}/singleplayer?mpHandoff=1`);
-  }, [router, params, letterGrid, gameCode]);
+    mpExit('continue-solo');
+  }, [mpExit, letterGrid, gameCode]);
 
   // Listen for per-word server feedback to drive pending-word chip transitions
   useEffect(() => {
@@ -442,7 +442,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             minWordLength={minWordLength}
             socket={socket}
             foundWords={foundWords}
-            isDesktopCanvas={shellEnabled && isShellMode(gameMode)}
+            mpChrome
           />
       ) : (
         <InGameScreen
@@ -451,7 +451,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           gameCode={gameCode}
           isHost={false}
           isPlaying={true}
-          inDesktopShell={shellEnabled && isShellMode(gameMode ?? '')}
+          mpChrome
           gameplayFocusMode={true}
           t={t}
           dir={dir}
@@ -505,11 +505,29 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         />
       );
 
+  const roundFrame = isRoundFrameMode(gameMode);
+
   return (
-    <div className={getMpInGameContainerClass(gameMode)}>
-      {/* Desktop wraps the mode canvas in the 3-column shell (roster / game /
-          words+insights); mobile/tablet renders the canvas directly. */}
-      {shellEnabled && isShellMode(gameMode) ? (
+    <div className={roundFrame ? MP_ROUND_CONTAINER_CLASS : getMpInGameContainerClass(gameMode)}>
+      {/* Classic + word-hunt: the one round frame (HUD / roster / board, phone
+          and desktop). Blast keeps its own HUD inside the desktop shell. */}
+      {roundFrame ? (
+        <MpRoundShell
+          desktopShell={shellEnabled}
+          roomId={gameCode}
+          meId={username}
+          gameMode={gameMode}
+          remainingTime={remainingTime}
+          totalTime={totalTime ?? (gameDuration || null)}
+          leaderboard={leaderboard}
+          users={rosterUsers}
+          foundWords={foundWords}
+          comboLevel={comboLevel}
+          revealed={!showStartAnimation}
+          onExit={onExitRoom}
+          canvas={gameCanvas}
+        />
+      ) : shellEnabled && isShellMode(gameMode) ? (
         <MpDesktopShellFrame
           gameMode={gameMode}
           canvas={gameCanvas}

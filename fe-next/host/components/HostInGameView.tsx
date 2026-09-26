@@ -2,7 +2,9 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter, useParams } from 'next/navigation';
+import { useMpExit } from '@/hooks/useMpExit';
+import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
+import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
 import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
@@ -157,8 +159,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 }): React.ReactElement | null => {
   const [showStopConfirm, setShowStopConfirm] = useState(false);
 
-  const router = useRouter();
-  const params = useParams();
+  const mpExit = useMpExit();
 
   // Get player's game history for trail display logic
   const { profile } = useAuth();
@@ -182,9 +183,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('mp_solo_handoff', JSON.stringify({ grid: tableData, gameCode }));
     }
-    const locale = (params?.locale as string) || 'en';
-    router.push(`/${locale}/singleplayer?mpHandoff=1`);
-  }, [router, params, tableData, gameCode]);
+    mpExit('continue-solo');
+  }, [mpExit, tableData, gameCode]);
 
   // Listen for per-word server feedback to drive pending-word chip transitions
   useEffect(() => {
@@ -268,6 +268,18 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     }).sort((a, b) => b.score - a.score);
   }, [playersReady, playerScores, playerWordCounts]);
 
+  // Seat list for the round roster (host + bots + joiners, presence).
+  const roundUsers = useMemo(
+    () => playersReady.filter((p): p is PlayerData => typeof p === 'object' && !!p).map((p) => ({
+      username: p.username,
+      avatar: p.avatar ?? undefined,
+      isHost: p.isHost,
+      isBot: p.isBot,
+      presenceStatus: p.presenceStatus,
+    })),
+    [playersReady],
+  );
+
   // Normalize found words to expected format
   const foundWords = useMemo(() => {
     return hostFoundWords.map((word, index) => ({
@@ -303,6 +315,29 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     ) : (
       canvas
     );
+
+  // Shared overlays for every branch (one copy, so the branches cannot drift).
+  const stopConfirm = showStopConfirm && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
+        <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
+        <div className="flex gap-3 justify-center">
+          <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+            {t('mp.stopGameYes')}
+          </button>
+          <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+            {t('common.cancel')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+  const connectionOverlays = (
+    <>
+      {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
+      {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
+    </>
+  );
 
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   if (!gameModeConfirmed) return null;
@@ -340,56 +375,19 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           isDesktopCanvas={inShell}
         />
         )}
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-        {showStopConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-              <div className="flex gap-3 justify-center">
-                <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('mp.stopGameYes')}
-                </button>
-                <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {connectionOverlays}
+        {stopConfirm}
       </>
     );
   }
 
-  // Word Tower versus — per-player towers, no shared grid
-  if (gameMode === 'word-tower') {
+  // Gridless versus modes — per-player towers / secret bids / crossword race.
+  if (gameMode === 'word-tower' || gameMode === 'sealed-bid' || gameMode === 'crossword') {
+    const Versus = gameMode === 'word-tower' ? WordTowerVersus : gameMode === 'sealed-bid' ? SealedBidVersus : CrosswordVersus;
     return (
       <>
-        <WordTowerVersus socket={socket} username={username} onQuit={handleStopGameClick} />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-      </>
-    );
-  }
-
-  // Sealed Bid — secret auction bids, no shared grid
-  if (gameMode === 'sealed-bid') {
-    return (
-      <>
-        <SealedBidVersus socket={socket} username={username} onQuit={handleStopGameClick} />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-      </>
-    );
-  }
-
-  // Crossword race — all players solve the same puzzle, no shared grid
-  if (gameMode === 'crossword') {
-    return (
-      <>
-        <CrosswordVersus socket={socket} username={username} onQuit={handleStopGameClick} />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
+        <Versus socket={socket} username={username} onQuit={handleStopGameClick} />
+        {connectionOverlays}
       </>
     );
   }
@@ -417,69 +415,96 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           isDesktopCanvas={inShell}
         />
         )}
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-        {showStopConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-              <div className="flex gap-3 justify-center">
-                <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('mp.stopGameYes')}
-                </button>
-                <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {connectionOverlays}
+        {stopConfirm}
       </>
     );
   }
 
-  // Word-hunt with host playing: use dedicated WordHuntGame
-  if (gameMode === 'word-hunt' && hostPlaying) {
+  const pendingChips = pendingWords.size > 0 && (
+    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex flex-wrap gap-1 justify-center pointer-events-none">
+      {Array.from(pendingWords.entries()).map(([word, status]) => (
+        <PendingWordChip key={word} word={word} status={status} onDismiss={dismissPending} />
+      ))}
+    </div>
+  );
+
+  // The playing host: classic + word-hunt run in the SAME round frame as the
+  // joiner (one HUD, roster, hidden-until-GO board) — pitfall class 3.
+  if (hostPlaying && isRoundFrameMode(gameMode)) {
+    const canvas = gameMode === 'word-hunt' ? (
+      <WordHuntGame
+        grid={tableData}
+        gameLanguage={roomLanguage}
+        leaderboard={leaderboard}
+        username={username}
+        score={leaderboard.find(p => p.username === username)?.score ?? 0}
+        onQuit={handleStopGameClick}
+        onWordSubmit={onWordSubmit}
+        onWordHuntGuess={handleWordHuntGuess}
+        gameActive={true}
+        minWordLength={minWordLength}
+        socket={socket}
+        foundWords={foundWords}
+        mpChrome
+      />
+    ) : (
+      <InGameScreen
+        username={username}
+        gameCode={gameCode}
+        isHost={true}
+        isPlaying={hostPlaying}
+        mpChrome
+        gameplayFocusMode={hostPlaying}
+        t={t}
+        socket={socket}
+        letterGrid={tableData}
+        remainingTime={remainingTime}
+        timerValue={timerValue}
+        gameActive={true}
+        showStartAnimation={showStartAnimation}
+        gameLanguage={roomLanguage}
+        minWordLength={minWordLength}
+        comboLevel={comboLevel}
+        comboLevelRef={comboLevelRef}
+        foundWords={foundWords}
+        leaderboard={leaderboard}
+        onExitRoom={handleStopGameClick}
+        onWordSubmit={onWordSubmit}
+        earthquakeState={earthquakeState}
+        fireRoundActive={fireRoundActive}
+        fireRoundRemaining={fireRoundRemaining}
+        boardTheme={boardTheme}
+        gameMode={gameMode ?? undefined}
+        onWordHuntGuess={handleWordHuntGuess}
+        totalGamesPlayed={profile?.total_games}
+      />
+    );
     return (
-      <>
-        {wrapCanvas(
-        <WordHuntGame
-          grid={tableData}
-          gameLanguage={roomLanguage}
+      <div className={MP_ROUND_CONTAINER_CLASS}>
+        <MpRoundShell
+          desktopShell={shellEnabled}
+          roomId={gameCode}
+          meId={username}
+          gameMode={gameMode}
+          remainingTime={remainingTime}
+          totalTime={totalTime ?? timerValue * 60}
           leaderboard={leaderboard}
-          username={username}
-          score={leaderboard.find(p => p.username === username)?.score ?? 0}
-          onQuit={handleStopGameClick}
-          onWordSubmit={onWordSubmit}
-          onWordHuntGuess={handleWordHuntGuess}
-          gameActive={true}
-          minWordLength={minWordLength}
-          socket={socket}
+          users={roundUsers}
           foundWords={foundWords}
-          isDesktopCanvas={inShell}
+          comboLevel={comboLevel}
+          revealed={!showStartAnimation}
+          onExit={handleStopGameClick}
+          canvas={canvas}
         />
-        )}
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-        {showStopConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-              <div className="flex gap-3 justify-center">
-                <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('mp.stopGameYes')}
-                </button>
-                <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
+        {pendingChips}
+        {connectionOverlays}
+        {stopConfirm}
+      </div>
     );
   }
 
+  // Non-playing host fallback (the projector normally takes this role).
   return (
     <>
     {wrapCanvas(
@@ -531,31 +556,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     />
     </div>
     )}
-    {/* Pending word chips — optimistic submit feedback */}
-    {pendingWords.size > 0 && (
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex flex-wrap gap-1 justify-center pointer-events-none">
-        {Array.from(pendingWords.entries()).map(([word, status]) => (
-          <PendingWordChip key={word} word={word} status={status} onDismiss={dismissPending} />
-        ))}
-      </div>
-    )}
-    {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-    {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-    {showStopConfirm && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-        <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-          <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-          <div className="flex gap-3 justify-center">
-            <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-              {t('mp.stopGameYes')}
-            </button>
-            <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-              {t('common.cancel')}
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
+    {pendingChips}
+    {connectionOverlays}
+    {stopConfirm}
     </>
   );
 };

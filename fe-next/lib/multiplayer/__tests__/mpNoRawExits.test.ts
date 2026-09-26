@@ -35,8 +35,6 @@ const EXIT_IMPLEMENTATION = new Set([
 const LEGACY_ALLOWLIST: Record<string, string> = {
   'components/multiplayer/RoomListView.tsx': 'ENTRY — CrazyGames back link to /{locale}',
   'components/multiplayer/ArenaEmptyState.tsx': 'ENTRY — /daily link',
-  'host/components/HostInGameView.tsx': 'ROUND — continue-solo push',
-  'player/components/PlayerInGameView.tsx': 'ROUND — continue-solo push',
   'components/views/ResultsPage.tsx': 'RESULTS — replace() exits + lesson/practice pushes',
 };
 

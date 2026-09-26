@@ -88,3 +88,37 @@
   .rosterPop,
   .ringPulse { display: none; }
 }
+
+/*
+ * In-round frame. Phone: hud / roster strip / board. Desktop (lg, 1024+):
+ * roster rail | hud over board | words ladder. TV scales via --mp-u.
+ * Grid areas keep ONE hud element for every size (one timer, one score).
+ */
+.layout {
+  display: grid;
+  grid-template-areas: 'hud' 'roster' 'board';
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+.areaHud { grid-area: hud; }
+.areaRoster { grid-area: roster; }
+.areaBoard { grid-area: board; }
+.areaLeft { grid-area: left; display: none; }
+.areaRight { grid-area: right; display: none; }
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-areas: 'left hud right' 'left board right';
+    grid-template-columns: minmax(200px, 1fr) minmax(0, 760px) minmax(200px, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 1rem;
+  }
+  .areaRoster { display: none; }
+  .areaLeft,
+  .areaRight { display: flex; }
+}
+@media (min-width: 1800px) and (min-height: 1000px) {
+  .layout {
+    grid-template-columns: minmax(300px, 1fr) minmax(0, 1100px) minmax(300px, 1fr);
+    column-gap: 1.5rem;
+  }
+}
