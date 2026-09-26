@@ -18448,7 +18448,8 @@ const es = {
       "chooseLanguage": "Elige idioma",
       "howToPlay": "Cómo se juega",
       "reconnectElapsed": "{{seconds}} s",
-      "hostLeftIn": "Volviendo a las arenas en {{seconds}} s"
+      "hostLeftIn": "Volviendo a las arenas en {{seconds}} s",
+      "editName": "Cambiar nombre"
     },
     "lobby": {},
     "round": {},

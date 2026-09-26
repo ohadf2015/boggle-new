@@ -1,10 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { type ReactNode } from 'react';
+// Legacy module paths on purpose: the MultiplayerFlow.* guard tests mock
+// './RoomListView', './JoinRoomModal' and './CreateRoomModal' (they re-export
+// the entry's CreateSheet / JoinSheet).
+import RoomListView from './RoomListView';
 import JoinRoomModal from './JoinRoomModal';
 import CreateRoomModal from './CreateRoomModal';
 import CgLobbyHero from './CgLobbyHero';
-import CgAwareLobbyChrome from './CgAwareLobbyChrome';
+import ArenaCTAStrip from './ArenaCTAStrip';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 import { getStoredUsername } from '@/utils/profileStorage';
 import ClassroomJoinNamePrompt from './ClassroomJoinNamePrompt';
@@ -13,8 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { MatchmakingOverlay } from '@/components/multiplayer/MatchmakingOverlay';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { QuickPlaySeekingOverlay } from '@/components/multiplayer/QuickPlaySeekingOverlay';
-import { NativeLanguageBanner } from '@/components/NativeLanguageBanner';
-import { FirstGameLanguageNotice } from '@/components/FirstGameLanguageNotice';
+import { MpScreen } from './shell/MpScreen';
 import { useMultiplayerFlowState } from './useMultiplayerFlowState';
 
 export interface MultiplayerFlowProps {
@@ -44,9 +47,9 @@ export interface MultiplayerFlowProps {
   // expects to host the room with that exact code.
   host?: boolean;
 
-  // When true, suppress the public lobby chrome (RoomListView, SeasonBanner,
-  // admin Ranked button) — classroom users have a code via ClassroomModeBanner
-  // and shouldn't see competing matchmaking CTAs while auto-join is in flight.
+  // When true, suppress the public lobby chrome (room list, admin Ranked
+  // button) — classroom users have a code via ClassroomModeBanner and shouldn't
+  // see competing matchmaking CTAs while auto-join is in flight.
   isClassroomMode?: boolean;
   /** An early classroom joiner held until the teacher opens the room. */
   waitingForTeacher?: boolean;
@@ -69,10 +72,17 @@ export interface MultiplayerFlowProps {
   setUsername: (name: string) => void;
   setRoomName: (name: string) => void;
   setHostUsername: (name: string) => void;
+
+  /** The entry header (EntryScreen supplies the arcade header; classroom gets none). */
+  header?: ReactNode;
 }
 
+const TEST_ID = 'mp-entry';
+
 /**
- * MultiplayerFlow — the MP entry: room list with create / join sheets.
+ * MultiplayerFlow — the MP entry (DESIGN §b.1/§b.2): ONE no-scroll MpScreen with
+ * the header slot, the arenas body (identity, join by code, open arenas) and a
+ * QUICK START footer; create / join are MpSheets over it.
  *
  * State and join actions live in `useMultiplayerFlowState`; which view shows
  * comes from the pure `resolveEntryView` (classroom name prompt → classroom
@@ -84,7 +94,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
   const s = useMultiplayerFlowState(props);
   const {
     refreshRooms, activeRooms, roomsLoading, isJoining, isAuthenticated, displayName, prefilledRoom,
-    defaultLanguage, waitingForTeacher, profileAvatar,
+    defaultLanguage, waitingForTeacher, profileAvatar, header,
   } = props;
 
   // Classroom joins with a room code own the screen. A guest with NO stored
@@ -94,60 +104,105 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
   // Students routed through `/join/[code]` arrive with a name already stored.
   if (s.entryView === 'classroom-name' && prefilledRoom) {
     return (
-      <ClassroomJoinNamePrompt
-        roomCode={prefilledRoom}
-        onSubmit={s.handleClassroomNameSubmit}
-        initialName={getStoredUsername() || ''}
-        disabled={isJoining}
+      <MpScreen
+        testId={TEST_ID}
+        bodyScroll="inner"
+        body={
+          <ClassroomJoinNamePrompt
+            roomCode={prefilledRoom}
+            onSubmit={s.handleClassroomNameSubmit}
+            initialName={getStoredUsername() || ''}
+            disabled={isJoining}
+          />
+        }
       />
     );
   }
 
   if (s.entryView === 'classroom-waiting') {
     return (
-      <div className="flex-1 flex items-center justify-center px-4 py-8" data-testid="classroom-waiting">
-        <div className="flex flex-col items-center gap-3 text-neo-white font-neo-body">
-          <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
-          <p className="text-sm sm:text-base">{t(waitingForTeacher ? 'education.studentPreview.waiting.title' : 'education.classroomGame.waitingForPlayers')}</p>
-        </div>
-      </div>
+      <MpScreen
+        testId={TEST_ID}
+        body={
+          <div className="flex-1 flex items-center justify-center px-4 py-8" data-testid="classroom-waiting">
+            <div className="flex flex-col items-center gap-3 text-neo-white font-neo-body">
+              <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
+              <p className="text-sm sm:text-base">{t(waitingForTeacher ? 'education.studentPreview.waiting.title' : 'education.classroomGame.waitingForPlayers')}</p>
+            </div>
+          </div>
+        }
+      />
     );
   }
 
   if (s.entryView === 'seeking') {
-    return <QuickPlaySeekingOverlay t={t as (key: string) => string} onCancel={s.dismissSeeking} />;
+    return (
+      <MpScreen
+        testId={TEST_ID}
+        header={header}
+        body={<QuickPlaySeekingOverlay t={t as (key: string) => string} onCancel={s.dismissSeeking} />}
+      />
+    );
   }
 
-  // Always show the room list as base, with sheets as overlays
+  const heroOwnsScreen = s.showCgHero && !s.heroExpanded;
+
+  const rankedSlot = isAdmin ? (
+    <button
+      type="button"
+      onClick={() => s.matchmaking.joinQueue('classic', defaultLanguage)}
+      disabled={s.matchmaking.status !== 'idle'}
+      className="w-full rounded-neo border-3 border-neo-black bg-neo-pink px-4 py-2 font-neo-display font-bold uppercase tracking-tight text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-50"
+    >
+      {t('matchmaking.rankedMatch')}
+    </button>
+  ) : null;
+
   return (
     <>
-      <NativeLanguageBanner />
-      <FirstGameLanguageNotice />
-      {s.showCgHero && (
-        <CgLobbyHero
-          variant={s.heroVariant.variant}
-          displayName={s.heroVariant.displayName}
-          onPlay={s.onHeroPlay}
-          onBrowse={s.onHeroBrowse}
-        />
-      )}
-
-      {(!s.showCgHero || s.heroExpanded) && (
-        <CgAwareLobbyChrome
-          isAdmin={isAdmin}
-          defaultLanguage={defaultLanguage}
-          activeRooms={activeRooms}
-          roomsLoading={roomsLoading}
-          roomFetchTimedOut={s.roomFetchTimedOut}
-          joiningRoomCode={s.joiningRoomCode}
-          isJoining={isJoining || s.isQuickPlayPending}
-          onRefreshRooms={refreshRooms}
-          onRoomClick={s.handleRoomClick}
-          onCreateRoom={s.openCreate}
-          onQuickPlay={s.handleQuickPlay}
-          matchmaking={s.matchmaking}
-        />
-      )}
+      <MpScreen
+        testId={TEST_ID}
+        header={header}
+        body={
+          heroOwnsScreen ? (
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+              <CgLobbyHero
+                variant={s.heroVariant.variant}
+                displayName={s.heroVariant.displayName}
+                onPlay={s.onHeroPlay}
+                onBrowse={s.onHeroBrowse}
+              />
+            </div>
+          ) : (
+            <RoomListView
+              activeRooms={activeRooms}
+              roomsLoading={roomsLoading}
+              onRefreshRooms={refreshRooms}
+              onRoomClick={s.handleRoomClick}
+              onCreateRoom={s.openCreate}
+              onQuickPlay={s.handleQuickPlay}
+              isQuickPlayLoading={!!s.joiningRoomCode || isJoining || s.isQuickPlayPending}
+              joiningRoomCode={s.joiningRoomCode}
+              onJoinCode={s.handleCodeJoin}
+              isJoining={isJoining || s.isQuickPlayPending}
+              roomFetchTimedOut={s.roomFetchTimedOut}
+              isAuthenticated={isAuthenticated}
+              displayName={displayName}
+              profileAvatar={profileAvatar}
+              rankedSlot={rankedSlot}
+            />
+          )
+        }
+        footer={
+          heroOwnsScreen ? undefined : (
+            <ArenaCTAStrip
+              onQuickPlay={s.handleQuickPlay}
+              onCreateRoom={s.openCreate}
+              isQuickPlayLoading={!!s.joiningRoomCode || isJoining || s.isQuickPlayPending}
+            />
+          )
+        }
+      />
 
       <MatchmakingOverlay
         status={s.matchmaking.status}
@@ -161,7 +216,6 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
         t={t as (key: string, params?: Record<string, unknown>) => string}
       />
 
-      {/* Join Room Modal */}
       <JoinRoomModal
         isOpen={s.flowView === 'join-modal'}
         onClose={s.handleModalClose}
@@ -173,7 +227,6 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
         profileAvatar={profileAvatar}
       />
 
-      {/* Create Room Modal */}
       <CreateRoomModal
         isOpen={s.flowView === 'create-modal'}
         onClose={s.handleModalClose}

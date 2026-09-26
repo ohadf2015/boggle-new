@@ -19,6 +19,7 @@ import { trackGrowthEvent, trackGuestJoin } from '@/utils/growthTracking';
 import { useMatchmaking } from '@/hooks/useMatchmaking';
 import { useCgLobbyHeroVariant } from '@/hooks/useCgLobbyHeroVariant';
 import { entryFlowReducer, INITIAL_ENTRY_FLOW, resolveEntryView } from '@/lib/multiplayer/mpPhase';
+import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { useQuickPlay, generateGameCode } from './useQuickPlay';
 import type { MultiplayerFlowProps } from './MultiplayerFlow';
 
@@ -193,6 +194,17 @@ export function useMultiplayerFlowState({
     [prefilledRoom, defaultLanguage, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, host]
   );
 
+  // JOIN BY CODE from the entry: exactly the invite-link path (profile → join,
+  // otherwise the join sheet for that code) — one route to a room, not two.
+  const handleCodeJoin = useCallback(
+    (raw: string) => {
+      const code = sanitizeGameCode(raw).toUpperCase();
+      if (!code) return;
+      handleInvitationAutoJoin(code);
+    },
+    [handleInvitationAutoJoin],
+  );
+
   // NOTE: CrazyGames invite is handled via the onInviteJoin callback above.
   // Do NOT add a separate effect for inviteRoomId — it causes a double-join race.
 
@@ -320,7 +332,7 @@ export function useMultiplayerFlowState({
     entryView, flowView: flow.view, selectedRoom, matchmaking, joiningRoomCode, roomFetchTimedOut,
     isQuickPlayPending, showCgHero, heroExpanded, heroVariant,
     openCreate: handleCreateClick, handleModalClose, handleRoomClick, handleJoinFromModal, handleCreateFromModal,
-    handleQuickPlay, handleClassroomNameSubmit, dismissSeeking,
+    handleQuickPlay, handleClassroomNameSubmit, dismissSeeking, handleCodeJoin,
     onHeroPlay: () => { heroVariant.markSeen(); handleQuickPlay(); },
     onHeroBrowse: () => { heroVariant.markSeen(); setHeroExpanded(true); setHeroDismissed(true); },
   };

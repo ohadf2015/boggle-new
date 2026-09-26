@@ -18430,7 +18430,8 @@ const sv = {
       "chooseLanguage": "Välj språk",
       "howToPlay": "Så spelar du",
       "reconnectElapsed": "{{seconds}} s",
-      "hostLeftIn": "Tillbaka till arenorna om {{seconds}} s"
+      "hostLeftIn": "Tillbaka till arenorna om {{seconds}} s",
+      "editName": "Byt namn"
     },
     "lobby": {},
     "round": {},

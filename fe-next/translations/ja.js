@@ -18430,7 +18430,8 @@ const ja = {
       "chooseLanguage": "言語を選択",
       "howToPlay": "遊び方",
       "reconnectElapsed": "{{seconds}}秒",
-      "hostLeftIn": "{{seconds}}秒後にアリーナへ戻ります"
+      "hostLeftIn": "{{seconds}}秒後にアリーナへ戻ります",
+      "editName": "名前を変更"
     },
     "lobby": {},
     "round": {},

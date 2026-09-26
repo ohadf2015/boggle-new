@@ -18338,7 +18338,7 @@ const he = {
       "codeAria": "קוד חדר, תו {{n}} מתוך {{total}}",
       "openArenas": "זירות פתוחות",
       "playingNow": "{{count}} משחקים עכשיו",
-      "moreArenas": "+{{count}} נוספות",
+      "moreArenas": "עוד {{count}}",
       "allArenas": "כל הזירות הפתוחות",
       "emptyTitle": "אין זירות פתוחות",
       "emptyLine": "התחלה מהירה ממלאת את המקומות בבוטים",
@@ -18360,7 +18360,8 @@ const he = {
       "chooseLanguage": "בחירת שפה",
       "howToPlay": "איך משחקים",
       "reconnectElapsed": "{{seconds}} שנ׳",
-      "hostLeftIn": "חוזרים לזירות בעוד {{seconds}} שנ׳"
+      "hostLeftIn": "חוזרים לזירות בעוד {{seconds}} שנ׳",
+      "editName": "שינוי שם"
     },
     "lobby": {},
     "round": {},

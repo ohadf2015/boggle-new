@@ -18163,7 +18163,8 @@ const ru = {
       "chooseLanguage": "Выберите язык",
       "howToPlay": "Как играть",
       "reconnectElapsed": "{{seconds}} с",
-      "hostLeftIn": "Возврат к аренам через {{seconds}} с"
+      "hostLeftIn": "Возврат к аренам через {{seconds}} с",
+      "editName": "Сменить имя"
     },
     "lobby": {},
     "round": {},

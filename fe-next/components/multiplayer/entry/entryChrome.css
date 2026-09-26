@@ -1,0 +1,20 @@
+/*
+ * First-paint chrome hide for the MP entry (see entryChrome.ts).
+ * EntryScreen renders [data-mp-entry-chrome='off'] in its SSR HTML, so the
+ * global header, its CLS flow spacer and the bottom nav are hidden from the very
+ * first paint — no hydration-time layout shift.
+ */
+body:has([data-mp-entry-chrome='off']) header.fixed,
+body:has([data-mp-entry-chrome='off']) [aria-hidden='true'].h-header,
+body:has([data-mp-entry-chrome='off']) [data-global-bottom-nav] {
+  display: none !important;
+}
+
+/*
+ * Every MpScreen is a full-frame surface: the hidden header's flow spacer is
+ * dead height above it (AutoHideHeader keeps it after a cold load because no
+ * user activation happened before `isInGame` flipped).
+ */
+body:has([data-mp-screen]) [aria-hidden='true'].h-header {
+  display: none !important;
+}
