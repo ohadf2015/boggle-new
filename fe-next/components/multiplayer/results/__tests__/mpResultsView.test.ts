@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickVisibleRows, mascotFor, pickBestWord, rivalGap } from '../mpResultsView';
+import { pickVisibleRows, mascotFor, pickBestWord, rivalGap, nextModeForViewer } from '../mpResultsView';
 import type { MpStandingRow } from '../mpStandings';
 
 const row = (username: string, rank: number, score: number, isMe = false): MpStandingRow => ({
@@ -84,5 +84,18 @@ describe('readyTally', () => {
   it('a room with only the host still reports a sane total', async () => {
     const { readyTally } = await import('../mpResultsView');
     expect(readyTally([{ username: 'Host', isHost: true }], [])).toEqual({ ready: 0, total: 0, readySet: new Set() });
+  });
+});
+
+describe('nextModeForViewer', () => {
+  it('the host sees the mode they picked (random included — each round re-rolls)', () => {
+    expect(nextModeForViewer({ isHost: true, hostPick: 'classic' })).toBe('classic');
+    expect(nextModeForViewer({ isHost: true, hostPick: 'random' })).toBe('random');
+  });
+
+  it('a joiner never sees a guessed mode: the server does not send the host pick, so their store holds its "random" default', () => {
+    // Round-1 capture: host card read CLASSIC while every joiner read SURPRISE MODE.
+    expect(nextModeForViewer({ isHost: false, hostPick: 'random' })).toBeNull();
+    expect(nextModeForViewer({ isHost: false, hostPick: 'classic' })).toBeNull();
   });
 });

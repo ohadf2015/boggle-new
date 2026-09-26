@@ -12,12 +12,11 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useShareOpenGuard } from '@/hooks/useShareOpenGuard';
-import { useHostSelectedGameMode } from '@/hooks/gameState/store';
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
 import { buildMpStandings } from './mpStandings';
-import { pickBestWord, pickVisibleRows, readyTally, rivalGap } from './mpResultsView';
+import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, rivalGap } from './mpResultsView';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
 import { useAutoAdvance } from './useAutoAdvance';
@@ -125,8 +124,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     else handleMarkReady();
   }, [isHost, c, handleMarkReady]);
 
-  const hostPick = useHostSelectedGameMode() as GameModeOption | null | undefined;
-  const nextMode: GameModeOption | null = isHost ? c.selectedGameMode : (hostPick ?? null);
+  const nextMode = nextModeForViewer<GameModeOption>({ isHost, hostPick: c.selectedGameMode });
   const me = data.currentPlayerData;
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
   const gap = useMemo(() => rivalGap(rows), [rows]);
@@ -150,7 +148,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       onPointerDown={done ? undefined : handleSkip}
       className={cn(
         // Desktop/TV scale the whole show up (the HUD bar keeps the shell's --mp-u).
-        'relative flex-1 min-h-0 w-full max-w-6xl tv:max-w-[1600px] mx-auto flex flex-col lg:[--mp-u:1.3] tv:[--mp-u:1.8]',
+        'relative flex-1 min-h-0 w-full max-w-6xl tv:max-w-[1600px] mx-auto flex flex-col lg:[--mp-u:1.3] [@media(min-width:1024px)_and_(max-width:1799px)_and_(min-height:860px)]:[--mp-u:1.45] tv:[--mp-u:1.8]',
         'gap-[calc(10px*var(--mp-u,1))] p-[calc(12px*var(--mp-u,1))] lg:p-[calc(24px*var(--mp-u,1))]',
         'lg:grid lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-[calc(28px*var(--mp-u,1))] lg:items-center',
       )}

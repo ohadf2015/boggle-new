@@ -81,6 +81,7 @@ vi.mock('@/utils/guestManager', () => ({ getGuestStatsSummary: () => ({ gamesPla
 vi.mock('@/lib/boardSelection', () => ({ pickRichestBoardClient: () => [['A']] }));
 
 import MpResultsScreen from '../MpResultsScreen';
+import { useGameStore } from '@/hooks/gameState/store';
 
 type Socket = { emit: ReturnType<typeof vi.fn>; on: ReturnType<typeof vi.fn>; off: ReturnType<typeof vi.fn> };
 
@@ -170,6 +171,26 @@ describe('MpResultsScreen', () => {
     skip();
     fireEvent.click(screen.getByTestId('mp-primary-cta'));
     expect(h.markReady).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['classic', 'random'] as const)('intermission joiner: NEXT UP never shows a guessed mode (store holds %s) — the host is picking', (stored) => {
+    // Only the host device knows the next mode (the server learns it at startGame).
+    // Round-1 capture: host card read CLASSIC while every joiner read SURPRISE MODE.
+    useGameStore.getState().setHostSelectedGameMode(stored);
+    renderScreen({ isHost: false });
+    skip();
+    const card = screen.getByTestId('mp-next-mode');
+    expect(card.getAttribute('data-mode')).toBe('');
+    expect(card.textContent).toContain('mpUi.results.hostPicking');
+    useGameStore.getState().setHostSelectedGameMode('random');
+  });
+
+  it('intermission host: NEXT UP shows the mode the host picked', () => {
+    useGameStore.getState().setHostSelectedGameMode('classic');
+    renderScreen({ isHost: true });
+    skip();
+    expect(screen.getByTestId('mp-next-mode').getAttribute('data-mode')).toBe('classic');
+    useGameStore.getState().setHostSelectedGameMode('random');
   });
 
   it('intermission host: START NEXT awaits the interstitial before resetGame/startGame', async () => {

@@ -82,3 +82,13 @@ export function readyTally(players: ReadyPlayer[], readyUsernames: string[]): { 
   }
   return { ready: readySet.size, total, readySet };
 }
+
+/**
+ * NEXT UP for this viewer. Only the host's device knows the next mode: the
+ * server learns it at `startGame`, so a joiner's store still holds its
+ * 'random' default. A joiner gets null ("host is picking"), never a guess
+ * that would read SURPRISE MODE while the host's own card reads CLASSIC.
+ */
+export function nextModeForViewer<M extends string>({ isHost, hostPick }: { isHost: boolean; hostPick: M }): M | null {
+  return isHost ? hostPick : null;
+}
