@@ -32,6 +32,21 @@ vi.mock('../../modules/classroomGameManager', async (importOriginal) => ({
   updateClassroomGameState: vi.fn().mockResolvedValue(undefined),
 }));
 
+// Bot setup awaits these Supabase-backed caches BEFORE it schedules any move.
+// Left real, each round waited on a live network call (DNS to the test
+// Supabase host) that fake timers cannot advance: under a loaded full-suite
+// run the call outlived the 30s fake-timer window, the bot's scheduler was
+// registered after it, and the round read "bot frozen" (repro: 1 in 8 runs
+// with 8 files in parallel). Resolve them deterministically — the empty
+// corpus/blacklist paths are the ones the code already falls back to.
+vi.mock('../../modules/botBehaviorCache', async (importOriginal) => ({
+  ...(await importOriginal()),
+  getCachedPlayerWords: vi.fn().mockResolvedValue([]),
+  getCachedBlacklist: vi.fn().mockResolvedValue(new Set()),
+  getCachedWrongWords: vi.fn().mockResolvedValue([]),
+  getCachedDifficultyParams: vi.fn().mockResolvedValue(null),
+}));
+
 vi.setConfig({ testTimeout: 60000 });
 
 const HOST = 'BotRoundHost';
