@@ -53,9 +53,32 @@ describe('PlayerRoster — the 8-seat lobby grid', () => {
     const grid = seat.parentElement!;
     // Then the grid stretches items to their 1fr column (justify-items-center would size them to max-content)
     expect(grid.className).not.toMatch(/\bjustify-items-center\b/);
-    // And the seat fills its column so the name's `truncate` has a width to clip at
+    // And the seat fills its column so the name wraps/clamps at that width
     expect(seat.className).toMatch(/\bw-full\b/);
     expect(seat.className).toMatch(/\bmin-w-0\b/);
+  });
+
+  it('a seat name wraps onto two lines instead of a one-line ellipsis ("LobHo…" at 390px)', () => {
+    // Given a 12-char name in a ~78px phone column
+    render(<PlayerRoster players={[...room, { username: 'LobJoin03xyz' }]} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
+    const name = screen.getByText('LobJoin03xyz');
+    // Then it is clamped to two lines and may break anywhere, never single-line truncated
+    expect(name.className).not.toMatch(/\btruncate\b/);
+    expect(name.className).toMatch(/\bline-clamp-2\b/);
+    expect(name.className).toMatch(/overflow-wrap:anywhere/);
+  });
+
+  it('my editable name uses the whole column: no inline pencil icon stealing width', () => {
+    // Given I am a guest who can rename myself
+    render(<PlayerRoster players={[{ username: 'LobHost03xyz', isHost: true }]} username="LobHost03xyz" gameCode="ABCD" maxPlayers={8} t={t} canEditSelfName onSelfNameChange={() => {}} />);
+    const edit = screen.getByTestId('edit-name-button');
+    // Then the button is still the labelled rename control
+    expect(edit).toHaveAttribute('aria-label', 'playerView.editName');
+    // And it holds only the (two-line clamped) name, no icon
+    expect(edit.querySelector('svg')).toBeNull();
+    const name = screen.getByText('LobHost03xyz');
+    expect(name.className).not.toMatch(/\btruncate\b/);
+    expect(name.className).toMatch(/\bline-clamp-2\b/);
   });
 
   it('host: a bot seat can be removed', () => {

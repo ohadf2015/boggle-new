@@ -56,6 +56,13 @@ const AVATAR_PX = { host: 128, guest: 128, tv: 160 } as const;
 const seatBox = { width: 'var(--seat)', height: 'var(--seat)' } as const;
 
 /**
+ * Seat names wrap to two centred lines and may break mid-word (usernames have
+ * no spaces), so a 12-20 char name stays readable in a ~78px phone column
+ * instead of collapsing to "LobHo…".
+ */
+const SEAT_NAME = 'max-w-full min-w-0 text-center line-clamp-2 [overflow-wrap:anywhere]';
+
+/**
  * The lobby seat grid: 8 chairs, 4×2, for host, joiner and TV alike — every
  * seat comes from `lobbySeats` → `toMpRoster`, the one roster source. A join
  * pops a seat in, a ready player gets a lime check stamp, the host's empty
@@ -235,18 +242,17 @@ export const PlayerRoster = memo(function PlayerRoster({
             onClick={() => { setSelfNameDraft(username); setIsEditingSelfName(true); }}
             aria-label={t('playerView.editName')}
             className={cn(
-              'max-w-full flex items-center justify-center gap-1 font-neo-body font-bold leading-tight text-neo-lime rounded-neo border-[2px] border-transparent hover:border-neo-cream px-1',
+              'max-w-full min-w-0 flex items-center justify-center font-neo-body font-bold leading-tight text-neo-lime rounded-neo border-[2px] border-transparent hover:border-neo-cream px-0.5',
               variant === 'tv' ? 'text-[clamp(16px,2.2vh,24px)]' : 'text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))]',
             )}
           >
-            <span dir="auto" className="truncate min-w-0">{seat.name}</span>
-            <Pencil aria-hidden="true" className="w-3 h-3 shrink-0 opacity-70" />
+            <span dir="auto" className={cn(SEAT_NAME, 'underline decoration-dashed decoration-neo-lime/60 underline-offset-[3px]')}>{seat.name}</span>
           </button>
         ) : (
           <span
             dir="auto"
             className={cn(
-              'max-w-full truncate font-neo-body font-bold leading-tight',
+              SEAT_NAME, 'font-neo-body font-bold leading-tight',
               variant === 'tv' ? 'text-[clamp(16px,2.2vh,24px)]' : 'text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))]',
               isMe ? 'text-neo-lime' : 'text-neo-white',
             )}
