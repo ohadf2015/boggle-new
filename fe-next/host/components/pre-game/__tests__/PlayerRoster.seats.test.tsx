@@ -46,6 +46,18 @@ describe('PlayerRoster — the 8-seat lobby grid', () => {
     expect(screen.queryByLabelText('hostView.removeBot')).toBeNull();
   });
 
+  it('a long name is clipped to its own column instead of running into the next seat (390px phone)', () => {
+    // Given a seat whose name is wider than a quarter of a phone card
+    render(<PlayerRoster players={[...room, { username: 'Puzzle Pro Bot 87', isBot: true }]} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
+    const seat = screen.getAllByTestId('lobby-seat').find((el) => el.getAttribute('data-player') === 'Puzzle Pro Bot 87')!;
+    const grid = seat.parentElement!;
+    // Then the grid stretches items to their 1fr column (justify-items-center would size them to max-content)
+    expect(grid.className).not.toMatch(/\bjustify-items-center\b/);
+    // And the seat fills its column so the name's `truncate` has a width to clip at
+    expect(seat.className).toMatch(/\bw-full\b/);
+    expect(seat.className).toMatch(/\bmin-w-0\b/);
+  });
+
   it('host: a bot seat can be removed', () => {
     render(<PlayerRoster players={room} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
     fireEvent.click(screen.getByLabelText('hostView.removeBot'));

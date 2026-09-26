@@ -143,7 +143,7 @@ export const PlayerRoster = memo(function PlayerRoster({
         data-testid="lobby-seat"
         data-player={seat.id}
         data-me={String(isMe)}
-        className={cn('group/seat relative flex flex-col items-center gap-1 min-w-0', styles.seatIn)}
+        className={cn('group/seat relative flex flex-col items-center gap-1 w-full min-w-0', styles.seatIn)}
       >
         <div className="relative shrink-0" style={seatBox}>
           {isMe && onSelfAvatarClick ? (
@@ -328,7 +328,7 @@ export const PlayerRoster = memo(function PlayerRoster({
           </div>
         )}
       </div>
-      <div className="grid grid-cols-4 justify-items-center gap-x-2 gap-y-3 pt-3">
+      <div className="grid grid-cols-4 gap-x-2 gap-y-3 pt-3">
         {seats.map(renderSeat)}
         {Array.from({ length: emptyCount }, (_, i) => renderEmptySeat(i))}
       </div>
