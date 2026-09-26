@@ -18415,7 +18415,19 @@ const es = {
       "backToArenas": "Volver a las arenas"
     },
     "entry": {},
-    "lobby": {},
+    "lobby": {
+      "squad": "Tu equipo",
+      "startVsBots": "contra bots · {count}/{max}",
+      "seatsTaken": "{count}/{max} jugadores",
+      "chat": "Chat",
+      "invite": "Invitar",
+      "inviteTitle": "Invita a tus amigos",
+      "howToPlay": "Cómo jugar",
+      "scanToJoin": "Escanea para unirte",
+      "orEnterCode": "o introduce el código",
+      "tvJoinHeadline": "¡Saca el móvil y únete!",
+      "tvJoinAt": "Únete en"
+    },
     "round": {},
     "results": {}
   }

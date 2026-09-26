@@ -18327,7 +18327,19 @@ const he = {
       "backToArenas": "חזרה לזירות"
     },
     "entry": {},
-    "lobby": {},
+    "lobby": {
+      "squad": "החבורה",
+      "startVsBots": "נגד בוטים · {count}/{max}",
+      "seatsTaken": "{count}/{max} שחקנים",
+      "chat": "צ׳אט",
+      "invite": "הזמנה",
+      "inviteTitle": "הזמינו חברים",
+      "howToPlay": "איך משחקים",
+      "scanToJoin": "סרקו כדי להצטרף",
+      "orEnterCode": "או הקלידו קוד",
+      "tvJoinHeadline": "שלפו טלפון והצטרפו!",
+      "tvJoinAt": "הצטרפו ב־"
+    },
     "round": {},
     "results": {}
   }

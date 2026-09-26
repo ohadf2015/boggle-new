@@ -18130,7 +18130,19 @@ const ru = {
       "backToArenas": "Назад к аренам"
     },
     "entry": {},
-    "lobby": {},
+    "lobby": {
+      "squad": "Команда",
+      "startVsBots": "против ботов · {count}/{max}",
+      "seatsTaken": "{count}/{max} игроков",
+      "chat": "Чат",
+      "invite": "Позвать",
+      "inviteTitle": "Позови друзей",
+      "howToPlay": "Как играть",
+      "scanToJoin": "Сканируй, чтобы войти",
+      "orEnterCode": "или введи код",
+      "tvJoinHeadline": "Доставай телефон и заходи!",
+      "tvJoinAt": "Заходи на"
+    },
     "round": {},
     "results": {}
   }

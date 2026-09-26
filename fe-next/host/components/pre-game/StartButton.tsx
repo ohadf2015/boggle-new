@@ -1,11 +1,9 @@
 'use client';
 
 import { memo } from 'react';
-import { m } from 'framer-motion';
-import { Swords, Play } from 'lucide-react';
+import { MpPrimaryCta } from '@/components/multiplayer/shell/MpPrimaryCta';
 import { cn } from '../../../lib/utils';
-
-// ==================== Props ====================
+import styles from '@/components/multiplayer/lobby/lobby.module.css';
 
 interface StartButtonProps {
   onStartGame: () => void;
@@ -15,21 +13,22 @@ interface StartButtonProps {
   maxPlayers?: number;
   t: (path: string, params?: Record<string, string | number>) => string;
   className?: string;
-  /** Compact single-line layout for mobile */
+  /** @deprecated the footer CTA is one size (64px phone, 96px TV). */
   compact?: boolean;
   /**
    * Translation key for the button copy. Defaults to the arcade "Start Battle!".
-   * Classroom rooms pass a teacher-register key instead ("Start Quiz" / "Start
-   * Game") — a teacher projecting a vocabulary quiz is not starting a battle.
+   * Classroom rooms pass a teacher-register key ("Start Quiz" / "Start Game").
    */
   labelKey?: string;
+  /** Second line — who you are about to play. Defaults to the seat count. */
+  sublabel?: string;
+  /** Everyone is ready: one celebratory wiggle (re-runs each time it flips on). */
+  celebrate?: boolean;
 }
 
-/** The arcade default. Anything else swaps the crossed-swords glyph for a plain play arrow. */
 const DEFAULT_LABEL_KEY = 'hostView.startBattle';
 
-// ==================== Component ====================
-
+/** The lobby's one primary action, on the shell's `MpPrimaryCta`. */
 export const StartButton = memo<StartButtonProps>(function StartButton({
   onStartGame,
   disabled,
@@ -38,74 +37,26 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
   maxPlayers = 8,
   t,
   className = '',
-  compact = false,
   labelKey = DEFAULT_LABEL_KEY,
+  sublabel,
+  celebrate = false,
 }) {
-  const LabelIcon = labelKey === DEFAULT_LABEL_KEY ? Swords : Play;
-  // Compact: single-line start button + status inline
-  if (compact) {
-    return (
-      <div className={cn('flex items-center gap-3', className)}>
-        <m.button
-          onClick={onStartGame}
-          disabled={disabled}
-          className={cn(
-            'flex-1 h-11 flex items-center justify-center gap-2',
-            'font-neo-display font-black text-lg uppercase tracking-tight',
-            'border-3 border-neo-black transition-all rounded-neo',
-            'active:translate-y-0.5 active:shadow-hard-pressed',
-            'disabled:opacity-50 disabled:cursor-not-allowed',
-            'bg-neo-lime text-neo-black shadow-hard-sm'
-          )}
-        >
-          {tournamentCreating ? (
-            <span className="text-sm">{t('hostView.creatingTournament')}</span>
-          ) : (
-            <>
-              <LabelIcon className="w-5 h-5" />
-              <span>{t(labelKey)}</span>
-            </>
-          )}
-        </m.button>
-        <span className={cn(
-          'text-[10px] font-bold uppercase whitespace-nowrap',
-          playerCount === 0 ? 'text-neo-red' : 'text-slate-500'
-        )}>
-          {playerCount === 0 ? t('hostView.needPlayers') : `${playerCount}/${maxPlayers}`}
-        </span>
-      </div>
-    );
-  }
-
   return (
-    <div className={cn('relative', className)}>
-      <m.button
-        onClick={onStartGame}
-        disabled={disabled}
-        className={cn(
-          'w-full h-14 flex items-center justify-center gap-3',
-          'font-neo-display font-black text-2xl uppercase tracking-tight',
-          'border-3 border-neo-black rounded-2xl transition-all',
-          'active:translate-y-0.5 active:shadow-hard-pressed',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
-          'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-          'bg-neo-lime text-neo-black shadow-hard-lg'
-        )}
-      >
-        {tournamentCreating ? (
-          <span className="text-lg">{t('hostView.creatingTournament')}</span>
-        ) : (
-          <>
-            <LabelIcon className="w-6 h-6" />
-            <span>{t(labelKey)}</span>
-          </>
-        )}
-      </m.button>
-      {/* Inline player count badge */}
-      <div className="absolute end-3 top-1/2 -translate-y-1/2 bg-neo-black text-neo-lime text-[10px] font-black px-3 py-1 rounded-full border-2 border-neo-black shadow-hard-sm">
-        {playerCount} / {maxPlayers}
-      </div>
-    </div>
+    <MpPrimaryCta
+      testId="lobby-start"
+      tone="lime"
+      label={tournamentCreating ? t('hostView.creatingTournament') : t(labelKey)}
+      sublabel={tournamentCreating ? undefined : (sublabel ?? `${playerCount}/${maxPlayers}`)}
+      onPress={onStartGame}
+      disabled={disabled}
+      className={cn(
+        'border-3 border-neo-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+        celebrate && styles.goWiggle,
+        className,
+      )}
+    />
   );
 });
 

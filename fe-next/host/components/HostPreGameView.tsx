@@ -1,57 +1,47 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
-import { BookOpen, LogOut, Monitor, Zap, Check } from 'lucide-react';
-import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
-import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useSocket } from '../../utils/SocketContext';
-import { useGameActions, useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
+/**
+ * Host lobby (host is playing). One screen, no page scroll, at phone, desktop
+ * and TV sizes:
+ *   header  [exit] [room code → copy + invite sheet] … [chat] [sound] [gear]
+ *   body    status lane · 8-seat grid · mode picker (+ "How to play")
+ *   footer  [INVITE] [START BATTLE · n/8 | vs bots]
+ * Desktop (≥720px) keeps the 7/5 grid: seats + mode left, invite + chat right.
+ * All timers / bot rescue / start guards live in `useHostLobby`.
+ */
+import React, { useCallback, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { BookOpen, Monitor, UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { EmoteTray } from '@/player/components/lobby/EmoteTray';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
-import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
-import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
-import { languageFlag, languageLabelKey } from '@/lib/i18n/languageLabels';
-
-import { GAME_PRESETS } from './pre-game/PresetSelector';
-import { classroomHostPreset } from '@/lib/education/classroomHostPreset';
+import { MpHudBar } from '@/components/multiplayer/shell/MpHudBar';
+import { MpRoomCode } from '@/components/multiplayer/shell/MpRoomCode';
 import { StartButton } from './pre-game/StartButton';
-import { MobileShareSection } from './pre-game/MobileShareSection';
-import { SoloPlayPrompt } from './pre-game/SoloPlayPrompt';
-import {
-  shouldShowSoloPlayPrompt,
-  shouldAutoStartAfterBotFill,
-  PUBLIC_ROOM_BOT_START_GRACE_SECONDS,
-} from '@/lib/multiplayer/soloHostPrompt';
-import { trackSoloPlayPrompt } from '@/utils/posthogEngagement';
 import { PlayerRoster } from './pre-game/PlayerRoster';
 import { BattleModeCard } from './pre-game/BattleModeCard';
 import { AdvancedSettingsModal } from './pre-game/AdvancedSettingsModal';
 import { LobbyAudioButton } from './pre-game/LobbyAudioButton';
 import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
-import { GameInstructions } from './pre-game/GameInstructions';
-import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
-import { ChatBubble } from './pre-game/ChatBubble';
-import dynamic from 'next/dynamic';
-const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
+import TvTutorialOverlay from './tv-broadcast/TvTutorialOverlay';
+import { useHostLobby, LOBBY_MAX_PLAYERS, type HostLobbyPlayer } from '@/components/multiplayer/lobby/useHostLobby';
+import { HostStatusLane } from '@/components/multiplayer/lobby/HostStatusLane';
+import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
+import { lobbySeats, readyTally, startSublabel } from '@/components/multiplayer/lobby/lobbySeats';
+import {
+  LobbyExitButton, LobbyChatButton, LobbyCountPill, LobbyChatPanel, InviteSheet, HowToPlaySheet, ChatSheet,
+} from '@/components/multiplayer/lobby/LobbyChrome';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { cn } from '@/lib/utils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel } from '@/shared/types/game';
+import type { Language, LetterGrid, DifficultyLevel } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
-// ==================== Types ====================
+const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 
-interface PlayerData {
-  username: string;
-  avatar?: AvatarType | null;
-  isHost?: boolean;
-  presenceStatus?: PresenceStatus;
-  isWindowFocused?: boolean;
-  isBot?: boolean;
-}
+export { QUICKPLAY_AUTO_FILL_SECONDS } from '@/components/multiplayer/lobby/useHostLobby';
 
 interface TournamentData {
   currentRound?: number;
@@ -65,18 +55,9 @@ interface LessonData {
   lessonName: string;
   vocabularyWords: string[];
   language: Language;
-  /**
-   * Game mode the teacher chose in ClassroomGameLobby. Seeds the host's mode
-   * selector so the choice actually applies (see initialMode below). Optional
-   * for back-compat with older sessionStorage payloads.
-   */
+  /** Game mode the teacher chose; seeds the host's mode selector. */
   gameMode?: GameModeOption;
-  templateSettings?: {
-    timerSeconds: number;
-    difficulty: string;
-    minWordLength: number;
-    allowLateJoin: boolean;
-  } | null;
+  templateSettings?: { timerSeconds: number; difficulty: string; minWordLength: number; allowLateJoin: boolean } | null;
 }
 
 interface HostPreGameViewProps {
@@ -100,27 +81,20 @@ interface HostPreGameViewProps {
   tournamentData: TournamentData | null;
   hostPlaying: boolean;
   setHostPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-  playersReady: (string | PlayerData)[];
+  playersReady: (string | HostLobbyPlayer)[];
   /** Usernames the server reports as lobby-ready (non-host). */
   readyUsernames?: string[];
   /** Total non-host humans the server is tracking for readiness. */
   readyTotal?: number;
   /** Server-owned lobby auto-start countdown (seconds), or null when idle. */
   autoStartSecondsLeft?: number | null;
-  /** Cancel the lobby auto-start countdown. */
   onCancelAutoStart?: () => void;
   playerWordCounts: Record<string, number>;
   shufflingGrid: LetterGrid | null;
   highlightedCells: { row: number; col: number }[];
   tableData: LetterGrid;
   onStartGame: () => void;
-  /**
-   * Start the game DIRECTLY with bot opponents, bypassing the solo-confirm
-   * popup. Used by the automatic rescue paths (passive alone-timer + Quick
-   * Play countdown) where there is no user click to gate the modal on — an
-   * abandoned host would never dismiss a popup, stranding the lobby. Falls
-   * back to `onStartGame` when not provided.
-   */
+  /** Start straight away with bots (rescue paths + the explicit vs-bots tap). */
   onAutoStartWithBots?: () => void;
   onExitRoom: () => void;
   onCancelTournament: () => void;
@@ -129,71 +103,38 @@ interface HostPreGameViewProps {
   lessonData?: LessonData | null;
   onNameChange?: (newName: string) => void;
   onAvatarChange?: (config: CustomAvatarConfig) => void;
-  /** When true (Quick Play / classroom), hide invite + share affordances. */
+  /** Quick Play / classroom: no invite or share affordances. */
   isPrivate?: boolean;
-  /** Quick Play: skip 30s alone-timer, auto-fill bots + start immediately. */
+  /** Quick Play: auto-fill bots + start. */
   isQuickPlay?: boolean;
 }
 
-// ==================== Constants ====================
+type T = (path: string, params?: Record<string, string | number>) => string;
 
-/**
- * Auto-fill bots timer: when a quickplay host is alone in the lobby,
- * trigger bot fill after this many seconds instead of requiring a click.
- * Configurable so it can be tuned based on UX feedback.
- */
-export const QUICKPLAY_AUTO_FILL_SECONDS = 5;
+const CARD = 'rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-3 desktop-tall:p-4';
 
-// ==================== Component ====================
+function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
+  const {
+    gameCode, roomLanguage, username, timerValue, setTimerValue, difficulty, setDifficulty, minWordLength, setMinWordLength,
+    hostPlaying, setHostPlaying, playersReady, readyUsernames = [], autoStartSecondsLeft = null, onCancelAutoStart,
+    onExitRoom, tournamentCreating, lessonData, onNameChange, onAvatarChange, isPrivate = false, isQuickPlay = false,
+  } = props;
+  const t = props.t as T;
+  const lobby = useHostLobby({
+    gameCode, username, hostPlaying, playersReady, timerValue, setTimerValue, setDifficulty, setMinWordLength,
+    tournamentCreating, lessonData, isPrivate, isQuickPlay, onStartGame: props.onStartGame, onAutoStartWithBots: props.onAutoStartWithBots,
+  });
+  const { isAuthenticated, updateProfile } = useAuth();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const { sendEmote, cooldownActive } = useLobbyEmotes({ socket: lobby.socket });
 
-function HostPreGameView({
-  gameCode,
-  roomLanguage,
-  language,
-  username,
-  t,
-  timerValue,
-  setTimerValue,
-  setTimerDirection: _setTimerDirection,
-  difficulty,
-  setDifficulty,
-  minWordLength,
-  setMinWordLength,
-  hostPlaying,
-  setHostPlaying,
-  playersReady,
-  readyUsernames = [],
-  readyTotal = 0,
-  autoStartSecondsLeft = null,
-  onCancelAutoStart,
-  onStartGame,
-  onAutoStartWithBots,
-  onExitRoom,
-  tournamentCreating,
-  lessonData,
-  onNameChange,
-  onAvatarChange,
-  isPrivate = false,
-  isQuickPlay = false,
-}: HostPreGameViewProps): React.ReactElement {
-  const { socket } = useSocket();
-  // Disable Start while any player (host or guest) is mid rewarded-ad — starting
-  // would tear a watcher out of their ad and void the reward they're earning.
-  const { anyAdActive } = useLobbyAdGate({ socket });
-  const { isAdmin, isAuthenticated, updateProfile } = useAuth();
-  // Blast is enabled for all players — the prior blast_access/admin gate was
-  // removed once MP blast reached parity (shared-board clear ends room, bots
-  // play the live board, blast-specific results screen). Kept as a constant so
-  // the existing child props keep working without a wider refactor.
-  const hasBlastAccess = true;
-  const { isOnCrazyGamesPlatform: _isOnCrazyGamesPlatform } = useCrazyGames();
+  const [sheet, setSheet] = useState<'invite' | 'howto' | 'chat' | null>(null);
+  const closeSheet = useCallback(() => setSheet(null), []);
+  const unread = useChatUnread({ socket: lobby.socket, username, open: sheet === 'chat' });
 
-
-  // Avatar & name editing state (UI lives in PlayerRoster, modal lives here)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const [currentAvatar, setCurrentAvatar] = useState<CustomAvatarConfig>(() => getOrCreateStoredCustomAvatar());
-
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
     setCurrentAvatar(config);
@@ -201,679 +142,199 @@ function HostPreGameView({
     setIsAvatarBuilderOpen(false);
     await updateProfile({ avatar_config: config }).catch(() => {});
   }, [onAvatarChange, updateProfile]);
-
   const handleSelfNameChange = useCallback((newName: string) => {
     const trimmed = newName.trim();
     if (trimmed && trimmed !== username) onNameChange?.(trimmed);
   }, [username, onNameChange]);
+  const openAvatarBuilder = useCallback(() => setIsAvatarBuilderOpen(true), []);
 
-  const handleOpenAvatarBuilder = useCallback(() => setIsAvatarBuilderOpen(true), []);
+  // A classroom room's mode was fixed in the setup wizard: no picker here.
+  const isClassroomRoom = Boolean(lessonData);
+  const seats = lobbySeats(lobby.seatedPlayers, username, readyUsernames);
+  const { allReady } = readyTally(seats);
+  const sublabel = startSublabel({ seated: seats.length, humanGuests: lobby.humanGuestCount, t });
 
-  // Lobby emotes — the host changes their OWN avatar's emotion (face-swap) and
-  // the server echoes it to the whole room. Replaces the old floating-emoji FAB:
-  // the expression lives ON the avatar, the same affordance every player has.
-  const { sendEmote, cooldownActive } = useLobbyEmotes({ socket });
+  // TV/projector toggle — the caption states the consequence at the decision point.
+  const tvModeToggle = (
+    <button
+      type="button"
+      onClick={() => setHostPlaying((prev) => !prev)}
+      aria-label={`${t('hostView.broadcastModeTitle')} — ${t('hostView.broadcastModeDesc')}`}
+      className={cn(
+        'inline-flex items-center gap-1.5 h-9 px-2.5 rounded-neo border-2 border-neo-black text-[11px] font-bold uppercase tracking-wider shadow-hard-sm active:translate-y-0.5',
+        !hostPlaying ? 'bg-neo-cyan text-neo-black' : 'bg-neo-navy text-neo-white/70 hover:text-neo-white',
+      )}
+    >
+      <Monitor aria-hidden="true" className="w-4 h-4" />
+      <span>{t('hostView.broadcastModeTitle')}</span>
+    </button>
+  );
 
-  // Self-only lobby action rendered beneath the roster avatars: an emote picker
-  // that changes your avatar's emotion (server-echoed to the room). The rewarded
-  // daily-avatar-part claim moved OUT of the lobby and INTO the avatar builder —
-  // in-context, opt-in, and no longer competing with the emote for attention.
-  const selfRosterActions = (
-    <div className="flex flex-col items-center gap-2 pt-1">
-      <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
+  const emote = <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />;
+
+  const statusLane = (
+    <HostStatusLane
+      t={t}
+      autoStartSecondsLeft={autoStartSecondsLeft}
+      onCancelAutoStart={onCancelAutoStart}
+      botCountdown={lobby.botCountdown}
+      onCancelBotCountdown={lobby.cancelBotCountdown}
+      showSoloPrompt={lobby.showSoloPrompt}
+      onPlayVsBots={lobby.handleSoloPlayVsBots}
+      adHold={lobby.anyAdActive}
+    />
+  );
+
+  const roster = (headerExtra?: React.ReactNode) => (
+    <div className={CARD}>
+      <PlayerRoster
+        players={lobby.seatedPlayers}
+        username={username}
+        gameCode={gameCode}
+        maxPlayers={LOBBY_MAX_PLAYERS}
+        readyUsernames={readyUsernames}
+        t={t}
+        onSelfAvatarClick={openAvatarBuilder}
+        onSelfNameChange={handleSelfNameChange}
+        canEditSelfName={!isAuthenticated}
+        selfActions={emote}
+        headerExtra={headerExtra}
+      />
     </div>
   );
 
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const [showTvTutorial, setShowTvTutorial] = useState(false);
-  const [startGameInFlight, setStartGameInFlight] = useState(false);
-  // Source of truth for the host's intent is `hostSelectedGameMode` (preserved across
-  // rounds). `gameMode` holds the resolved mode during gameplay and isn't a reliable
-  // signal of intent post-round (a "random" pick gets replaced with the rolled value).
-  const hostSelectedGameMode = useHostSelectedGameMode();
-  // Classroom games carry the teacher's chosen mode on `lessonData.gameMode`.
-  // It is authoritative for the initial selection (the teacher already picked
-  // in the lobby) and takes precedence over the store default. Without this the
-  // selector seeds from `hostSelectedGameMode` (default 'random'), the startGame
-  // emit then carries 'random', and the backend silently rolls a random mode —
-  // dropping the teacher's choice. The host can still change it before starting.
-  const intendedMode: GameModeOption = lessonData?.gameMode ?? hostSelectedGameMode ?? 'random';
-  const initialMode = (intendedMode === 'blast' && !isAdmin && !hasBlastAccess)
-    ? 'random'
-    : (intendedMode || 'random');
-  const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(initialMode);
-  const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
-
-  useEffect(() => {
-    const mode = selectedGameMode || 'random';
-    setStoreGameMode(mode);
-    setHostSelectedGameMode(mode);
-  }, [selectedGameMode, setStoreGameMode, setHostSelectedGameMode]);
-
-  // Apply default preset on mount.
-  //
-  // A classroom teacher already answered these in the setup wizard, so the
-  // 'fast' preset must not overwrite them — it silently reset every classroom
-  // game to 1 minute on a MEDIUM board no matter what the teacher chose.
-  useEffect(() => {
-    if (!hasInitialized) {
-      const classroomPreset = classroomHostPreset(lessonData?.templateSettings);
-      if (classroomPreset) {
-        setTimerValue(classroomPreset.timerMinutes);
-        setDifficulty(classroomPreset.difficulty);
-        setMinWordLength(classroomPreset.minWordLength);
-      } else {
-        const preset = GAME_PRESETS['fast'];
-        setTimerValue(preset.timer);
-        setDifficulty(preset.difficulty);
-        setMinWordLength(2);
-      }
-      setHasInitialized(true);
-    }
-  }, [hasInitialized, lessonData, setTimerValue, setDifficulty, setMinWordLength]);
-
-  // TV tutorial trigger on toggle
-  const prevHostPlayingRef = useRef(hostPlaying);
-  const [tvTutorialInitialized, setTvTutorialInitialized] = useState(false);
-
-  useEffect(() => {
-    if (!tvTutorialInitialized) {
-      setTvTutorialInitialized(true);
-      prevHostPlayingRef.current = hostPlaying;
-      return;
-    }
-    const wasHostPlaying = prevHostPlayingRef.current;
-    const isNowTvMode = !hostPlaying;
-    if (wasHostPlaying && isNowTvMode && !isTvTutorialComplete()) {
-      setShowTvTutorial(true);
-    }
-    prevHostPlayingRef.current = hostPlaying;
-  }, [hostPlaying, tvTutorialInitialized]);
-
-  // Filter out host when TV mode is enabled
-  const filteredPlayersForDisplay = useMemo(() => {
-    if (hostPlaying) return playersReady;
-    return playersReady.filter(player => {
-      const name = typeof player === 'string' ? player : player.username;
-      const isHostPlayer = typeof player === 'object' ? player.isHost : false;
-      return !isHostPlayer && name !== username;
-    });
-  }, [playersReady, hostPlaying, username]);
-
-  // CrazyGames invite integration
-  const maxPlayers = 8;
-  const gameState: 'waiting' | 'playing' | 'ended' = 'waiting';
-
-  const { showInviteButton, hideInviteButton, isInviteButtonVisible } = useCrazyGamesInvite({
-    maxPlayers,
-    currentPlayers: filteredPlayersForDisplay.length,
-    gameState,
-  });
-
-  useEffect(() => {
-    // Private rooms (Quick Play / classroom) intentionally suppress the
-    // CrazyGames invite chip — these flows aren't designed for friend invites.
-    if (isPrivate) {
-      if (isInviteButtonVisible) hideInviteButton();
-      return;
-    }
-    if (gameCode && gameState === 'waiting') {
-      showInviteButton(gameCode);
-    }
-    return () => {
-      if (isInviteButtonVisible) hideInviteButton();
-    };
-  }, [gameCode, gameState, showInviteButton, hideInviteButton, isInviteButtonVisible, isPrivate]);
-
-  // Human opponents in the room (excludes the host + self). This — NOT a raw
-  // player count — drives bot-fill and the alone timer: a host is "alone" when
-  // no human opponents are present, whether or not the host is also playing. A
-  // host-inclusive count hid the mobile case where hostPlaying is forced true,
-  // so a solo host counted as 1 and started an opponent-less game with no bots.
-  const humanGuestCount = playersReady.filter(p => {
-    const isHostPlayer = typeof p === 'object' ? p.isHost : false;
-    const name = typeof p === 'string' ? p : p.username;
-    return !isHostPlayer && name !== username;
-  }).length;
-  // A host alone in the lobby may still press Start: clicking opens the solo
-  // confirm dialog (Invite Friends vs Play with bots — see handleStartClick).
-  // Only a missing timer / tournament-in-flight blocks it — never "no players
-  // yet", which trapped new hosts behind a 40s wait.
-  // startGameInFlight ensures the button shows disabled state while the emit completes,
-  // preventing the rage-click issue where players hammer an unresponsive-looking button.
-  const isStartDisabled = !timerValue || tournamentCreating || anyAdActive || startGameInFlight;
-
-  // Auto-fill bots countdown
-  const [botCountdown, setBotCountdown] = useState<number | null>(null);
-
-  // Held in refs, not the countdown effect's dep array: the parent re-creates
-  // these callbacks on every render, and depending on them would tear down and
-  // re-register the interval each time — the countdown would never reach 0.
-  const onAutoStartWithBotsRef = useRef(onAutoStartWithBots);
-  const onStartGameRef = useRef(onStartGame);
-  onAutoStartWithBotsRef.current = onAutoStartWithBots;
-  onStartGameRef.current = onStartGame;
-  const aloneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const postFillStartRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // The post-fill auto-start fires 20s after it is scheduled, so the values it
-  // was scheduled against are stale by then — the host may have pressed Start
-  // themselves. Re-read the live signals at FIRE time, not schedule time.
-  const autoStartSignalsRef = useRef({ isQuickPlay, isPrivate, humanGuestCount, gameState });
-  autoStartSignalsRef.current = { isQuickPlay, isPrivate, humanGuestCount, gameState };
-
-  useEffect(() => {
-    if (humanGuestCount === 0) {
-      if (isQuickPlay) {
-        // Quick Play: skip alone-timer, kick off ~5s "filling bots…" countdown.
-        // The timer fires without user interaction — abandoned hosts never click dialogs.
-        setBotCountdown(QUICKPLAY_AUTO_FILL_SECONDS);
-      } else if (!isPrivate) {
-        // Passive fallback for a PUBLIC-room host who never presses Start. A short
-        // 15s alone-timer first absorbs the "is anyone joining?" window, then a
-        // visible 20s "starting with bots…" countdown gives the host ample time to
-        // read it and still invite a friend before bots fill in (bumped from 10s,
-        // which felt abrupt). A human joining cancels this (the else-branch below).
-        // Private (invite / classroom) rooms are excluded — that host is waiting
-        // on specific humans and can still press Start to fill bots on demand.
-        aloneTimerRef.current = setTimeout(() => {
-          setBotCountdown(20);
-        }, 15_000);
-      }
-    } else {
-      if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
-      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-      // A real human turned up — cancel any pending bots-only auto-start.
-      if (postFillStartRef.current) {
-        clearTimeout(postFillStartRef.current);
-        postFillStartRef.current = null;
-      }
-      setBotCountdown(null);
-    }
-    return () => {
-      if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
-    };
-  }, [humanGuestCount, isQuickPlay, isPrivate]);
-
-  // Never leave a queued auto-start behind on unmount — it would start a game in
-  // a room the host has already left.
-  useEffect(() => () => {
-    if (postFillStartRef.current) clearTimeout(postFillStartRef.current);
-  }, []);
-
-  // Clear the in-flight state when the game transitions away from waiting.
-  // This ensures the Start button re-enables as soon as the game actually starts
-  // on the server (when we receive the startGame broadcast).
-  useEffect(() => {
-    if (gameState !== 'waiting' && startGameInFlight) {
-      setStartGameInFlight(false);
-    }
-  }, [gameState, startGameInFlight]);
-
-  // Passive rescue for a solo host (alone-timer + Quick Play countdown).
-  //
-  // For a PUBLIC room this only FILLS the lobby with bots and deliberately never
-  // starts: that host chose to open a room and may still be waiting on a friend,
-  // so starting stays their explicit action.
-  //
-  // QUICK PLAY is the deliberate exception. A Quick Play tap means "give me a
-  // game now" — the player never asked to host anything and has no idea the
-  // Start button is theirs to press. Filling their lobby with bots and then
-  // waiting stranded 9 of the 29 quick-play sessions whose lobby actually
-  // auto-filled with bots (31%) in a populated lobby where nothing happened.
-  // 93% of solo-prompt sessions overall are players in their first 24 hours.
-  // See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
-  useEffect(() => {
-    if (botCountdown === null) return;
-    if (botCountdown <= 0) {
-      // Track auto-fill when timer expires (quickplay or alone-timer fallback).
-      // Keep mp_solo_prompt_shown as the base event, add auto_filled property.
-      trackSoloPlayPrompt({ event: 'shown', auto_filled: true });
-      // setAutoFill is the backend's bot-fill primitive; the prior 'addBots'
-      // event had no server handler so silently dropped (bots never spawned).
-      // It adds bots and broadcasts the roster — it does NOT start the game.
-      socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
-      setBotCountdown(null);
-      if (isQuickPlay) {
-        (onAutoStartWithBotsRef.current ?? onStartGameRef.current)();
-      } else if (shouldAutoStartAfterBotFill({ isQuickPlay, isPrivate, humanGuestCount, gameState })) {
-        // Public room: bots are in, but the host still has to press a Start they
-        // don't know is theirs — 35% never did. Give one last grace window (a
-        // human joining or the room emptying clears this), then just play.
-        postFillStartRef.current = setTimeout(() => {
-          postFillStartRef.current = null;
-          // Re-check against live values: during the grace window the host may
-          // have started the game themselves, or a human may have joined and
-          // started it. Firing blind here would start an already-running round.
-          if (!shouldAutoStartAfterBotFill(autoStartSignalsRef.current)) return;
-          (onAutoStartWithBotsRef.current ?? onStartGameRef.current)();
-        }, PUBLIC_ROOM_BOT_START_GRACE_SECONDS * 1000);
-      }
-      return;
-    }
-    countdownIntervalRef.current = setInterval(() => {
-      setBotCountdown(prev => (prev !== null ? prev - 1 : null));
-    }, 1000);
-    return () => {
-      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-    };
-  }, [botCountdown, socket, gameCode, isQuickPlay, isPrivate, humanGuestCount, gameState]);
-
-  const handleRoomLanguageChange = useCallback((newLang: Language) => {
-    socket?.emit('changeRoomLanguage', { gameCode, language: newLang });
-  }, [socket, gameCode]);
-
-  const cancelBotCountdown = useCallback(() => {
-    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-    if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
-    setBotCountdown(null);
-  }, []);
-
-  // Host pressed Start. We do NOT silently fill bots here: if they're alone,
-  // onStartGame (→ startGame → setShowSoloConfirm) hands the decision to the
-  // host via the SoloStartConfirmDialog (Invite Friends vs Play with bots). On
-  // confirm, the server fills bots for the solo player — so pressing Start can no
-  // longer add bots behind the host's back.
-  const handleStartClick = useCallback(() => {
-    // Hard guard (beyond the disabled button): never start while a player is
-    // mid rewarded-ad — protects against any non-button start path too.
-    if (anyAdActive) return;
-
-    // Set in-flight state immediately to provide visual feedback. This prevents
-    // the rage-click issue where players tap the button and see no response
-    // because the network emit is async. The debounce lock in useHostGameActions
-    // prevents double-submit, but the button itself must show disabled state
-    // for the player to know their click registered.
-    setStartGameInFlight(true);
-
-    // Reset in-flight state after a timeout to prevent getting stuck. The server
-    // should process startGame within 3s; if not, clear the button so the host
-    // can try again.
-    setTimeout(() => {
-      setStartGameInFlight(false);
-    }, 3000);
-
-    // Fire the start game handler. The in-flight state will be cleared when:
-    // (1) The game transitions away from 'lobby' state (server processes startGame), or
-    // (2) The 3s timeout above fires (failsafe).
-    onStartGame();
-  }, [anyAdActive, onStartGame]);
-
-  // Solo-host rescue prompt: shown vs hidden is a single derived condition so the
-  // render and the "shown" telemetry agree. Gated on !isPrivate to match the alone-
-  // timer exclusion (a classroom/invite host waits on specific humans, not bots).
-  const showSoloPrompt = shouldShowSoloPlayPrompt({
-    humanGuestCount,
-    gameState,
-    botCountdownActive: botCountdown !== null,
-    isPrivate,
-  });
-
-  // Fire `shown` once per host session the moment the prompt first appears — the
-  // head of the shown→clicked→game_started funnel that lets us read whether it works.
-  const soloPromptShownRef = useRef(false);
-  useEffect(() => {
-    if (showSoloPrompt && !soloPromptShownRef.current) {
-      soloPromptShownRef.current = true;
-      trackSoloPlayPrompt({ event: 'shown' });
-    }
-  }, [showSoloPrompt]);
-
-  // The "Play vs Bots" rescue card IS the host's explicit consent, so it starts
-  // straight away via the bots path (onAutoStartWithBots → confirmSoloStart) —
-  // no redundant confirm dialog. The server fills the bots on solo start, mirroring
-  // the dialog's own "Skip & Play with bots" action (neither emits client setAutoFill).
-  const handleSoloPlayVsBots = useCallback(() => {
-    if (anyAdActive) return;
-    trackSoloPlayPrompt({ event: 'clicked' });
-    (onAutoStartWithBots ?? onStartGame)();
-  }, [anyAdActive, onAutoStartWithBots, onStartGame]);
-
-  // Bot countdown banner
-  const renderBotCountdown = (): React.ReactElement | null => {
-    if (botCountdown === null) return null;
-    return (
-      <m.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-        className="bg-neo-orange/20 border border-neo-orange/50 rounded-xl px-4 py-2 flex items-center justify-between"
-      >
-        <span className="text-neo-orange font-bold text-sm">
-          {t('hostView.noOneYet')} {t('hostView.addingBots')} {botCountdown}...
-        </span>
-        <button
-          type="button"
-          onClick={cancelBotCountdown}
-          className="text-xs font-bold uppercase text-neo-orange border border-neo-orange/50 rounded-lg px-3 py-1 hover:bg-neo-orange/10 transition-colors"
-        >
-          {t('common.cancel')}
-        </button>
-      </m.div>
-    );
-  };
-
-  // Everyone's ready → loud server-synced auto-start banner with a Cancel escape.
-  const renderAutoStartBanner = (): React.ReactElement | null => {
-    if (autoStartSecondsLeft === null) return null;
-    return (
-      <m.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-        className="bg-neo-lime/20 border-3 border-neo-lime rounded-neo-lg px-4 py-2.5 flex items-center justify-between shadow-hard"
-        role="status"
-        aria-live="polite"
-      >
-        <span className="text-neo-lime font-neo-display font-bold text-sm flex items-center gap-2">
-          <Zap className="w-4 h-4 shrink-0" />
-          {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
-        </span>
-        {onCancelAutoStart && (
-          <button
-            type="button"
-            onClick={onCancelAutoStart}
-            className="text-xs font-bold uppercase text-neo-lime border-2 border-neo-lime/60 rounded-lg px-3 py-1 hover:bg-neo-lime/10 transition-colors shrink-0"
-          >
-            {t('common.cancel')}
-          </button>
-        )}
-      </m.div>
-    );
-  };
-
-  // Solo-host rescue: a host alone in the lobby is the dominant MP pre-game drop.
-  // Show an immediate, explicit "play vs bots" CTA in place of the silent dead-air
-  // window — stands down once a bot-fill countdown is already running (its banner
-  // then owns the messaging) or a human guest arrives.
-  const renderSoloPrompt = (): React.ReactElement | null => {
-    if (!showSoloPrompt) return null;
-    return <SoloPlayPrompt onPlayVsBots={handleSoloPlayVsBots} t={t} />;
-  };
-
-  // Guests are ready: nudge the host to start manually (auto-start removed, so
-  // the host is always the one who begins). Fires from the first ready player
-  // through all-ready (`<=`) — at all-ready the existing "{count}/{total} ready
-  // — start the game!" copy IS the affirmative "everyone's in, press Start" cue
-  // that the removed auto-start banner used to provide.
-  // A classroom room's mode was fixed in the setup wizard. The picker cannot
-  // change it and does not even list the quiz, so it is hidden here too — a
-  // teacher who taps "switch to player mode" must not meet it again.
-  const isClassroomRoom = Boolean(lessonData);
-  const startLabelKey = isClassroomRoom ? 'hostView.startClassGame' : undefined;
-
-  const readyCount = readyUsernames.length;
-  const allReady = readyTotal > 0 && readyCount >= readyTotal;
-  // Always-visible ready tally (whenever there are guests who can ready up) so the
-  // host sees at a glance how many are set — goes loud (lime + wobble) the moment
-  // everyone's in. Replaces the old count-only-when-nonzero yellow nudge.
-  const readyChip = readyTotal > 0 ? (
-    <div
-      data-testid="host-ready-chip"
-      role="status"
-      aria-live="polite"
-      className={cn(
-        'mx-auto w-fit flex items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black px-3 py-1 mb-1.5 font-neo-display font-bold text-sm uppercase tracking-wide shadow-hard-sm',
-        allReady ? 'bg-neo-lime text-neo-black animate-neo-wobble' : 'bg-neo-navy-light text-neo-cream',
-      )}
-    >
-      <Check className="w-4 h-4 stroke-[3] shrink-0" />
-      <span>{readyCount}/{readyTotal} {t('hostView.playersReady')}</span>
+  const modePicker = !isClassroomRoom && (
+    <div className={CARD}>
+      <BattleModeCard
+        selectedGameMode={lobby.selectedGameMode}
+        setSelectedGameMode={lobby.setSelectedGameMode}
+        t={t}
+        isAdmin={lobby.isAdmin}
+        language={roomLanguage}
+        onHowToPlay={() => setSheet('howto')}
+      />
     </div>
-  ) : null;
+  );
 
-  // TV mode toggle — neo-brutalist pill with hard shadow. The caption beneath
-  // surfaces the view-only consequence AT the decision point, so a host knows
-  // before flipping it that they won't be playing in this mode.
-  const tvModeToggle = (
-    <div className="flex flex-col items-end gap-0.5">
-      <button
-        type="button"
-        onClick={() => setHostPlaying(prev => !prev)}
-        className={cn(
-          'flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-neo-black transition-all text-[10px] font-bold uppercase tracking-wider shadow-hard-sm active:translate-y-0.5 active:shadow-none',
-          !hostPlaying
-            ? 'bg-neo-cyan/20 text-neo-cyan'
-            : 'bg-white/5 text-neo-cream/50 hover:bg-white/10'
-        )}
-        aria-label={`${t('hostView.broadcastModeTitle')} — ${t('hostView.broadcastModeDesc')}`}
-      >
-        <Monitor className="w-3.5 h-3.5" />
-        <span>{t('hostView.broadcastModeTitle')}</span>
-        <span className={cn(
-          'w-7 h-4 rounded-full border-2 border-neo-black relative transition-colors',
-          !hostPlaying ? 'bg-neo-cyan' : 'bg-white/10'
-        )}>
-          <span className={cn(
-            'absolute top-0.5 w-2.5 h-2.5 rounded-full bg-neo-black transition-all duration-200',
-            !hostPlaying ? 'inset-inline-end-0.5' : 'inset-inline-start-0.5'
-          )} />
-        </span>
-      </button>
-      <span className={cn(
-        'text-[9px] font-bold uppercase tracking-wider transition-colors',
-        !hostPlaying ? 'text-neo-cyan' : 'text-neo-cream/40'
-      )}>
-        {t('hostView.broadcastModeDesc')}
-      </span>
-    </div>
+  const startButton = (
+    <StartButton
+      onStartGame={lobby.handleStartClick}
+      disabled={lobby.isStartDisabled}
+      tournamentCreating={tournamentCreating}
+      playerCount={seats.length}
+      maxPlayers={LOBBY_MAX_PLAYERS}
+      t={t}
+      labelKey={isClassroomRoom ? 'hostView.startClassGame' : undefined}
+      sublabel={sublabel}
+      celebrate={allReady}
+    />
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto w-full relative">
-      {/* Dot-grid background texture */}
-      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
-      {/* Top gradient accent bar */}
-      <div className="w-full h-1 bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime shrink-0 z-20" />
-      {/* Lesson Mode Banner */}
+    <div className="flex-1 flex flex-col min-h-0 w-full bg-neo-navy text-neo-white relative lg:max-w-7xl lg:mx-auto">
       {lessonData && (
-        <div className="shrink-0 px-3 py-2 bg-neo-purple/20 border-b-2 border-neo-purple/50">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-neo-purple" />
-            <span className="text-sm font-bold text-neo-purple">
-              {t('hostView.lessonMode')}:
-            </span>
-            <span className="text-sm text-neo-cream">
-              {lessonData.lessonName}
-            </span>
-            <span className="text-xs text-neo-cream/60">
-              ({lessonData.vocabularyWords.length} {t('hostView.words')})
-            </span>
-          </div>
+        <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-neo-purple/20 border-b-2 border-neo-purple/50 text-sm min-w-0">
+          <BookOpen aria-hidden="true" className="w-4 h-4 text-neo-purple shrink-0" />
+          <span className="font-bold text-neo-purple shrink-0">{t('hostView.lessonMode')}:</span>
+          <span className="truncate" dir="auto">{lessonData.lessonName}</span>
+          <span className="text-xs text-neo-white/60 shrink-0">({lessonData.vocabularyWords.length} {t('hostView.words')})</span>
         </div>
       )}
 
-      {/* Header */}
-      <header className="shrink-0 px-2 sm:px-3 py-1 sm:py-1.5 short:py-0.5 bg-neo-navy/95 border-b-3 border-neo-black sticky top-0 z-20">
-        <div className="flex items-center justify-between gap-2">
-          {/* Game language chip — prominent so hosts see the board language before starting */}
-          <div
-            data-testid="lobby-language-chip"
-            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-neo border-2 border-neo-lime/70 bg-neo-navy-light shadow-hard-sm"
-            aria-label={t('joinView.selectLanguage')}
-          >
-            <span className="text-base leading-none" aria-hidden>
-              {languageFlag(roomLanguage)}
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-neo-lime short:max-sm:hidden">
-              {t(languageLabelKey(roomLanguage))}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {!isPrivate && (
-              <div className="min-[720px]:hidden">
-                <MobileShareSection gameCode={gameCode} t={t} showHint={humanGuestCount === 0} compact />
-              </div>
-            )}
-            {/* UI-language switcher — only show when UI language differs from room/board language.
-                When they match (same flag on both chips), the chip is redundant clutter (visual audit 2026-05-14). */}
-            {language !== roomLanguage && <QuickLanguageSwitcher compact />}
-            <LobbyAudioButton />
-            <AdvancedSettingsModal
-              timerValue={timerValue}
-              setTimerValue={setTimerValue}
-              difficulty={difficulty}
-              setDifficulty={setDifficulty}
-              minWordLength={minWordLength}
-              setMinWordLength={setMinWordLength}
-              roomLanguage={roomLanguage}
-              onRoomLanguageChange={handleRoomLanguageChange}
-              t={t}
-            />
-            <button
-              type="button"
-              onClick={onExitRoom}
-              className="w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
-              aria-label={t('common.exit')}
-            >
-              <LogOut className="w-3.5 h-3.5 text-neo-black rtl:scale-x-[-1]" />
-            </button>
-          </div>
-        </div>
+      <header className="shrink-0 border-b-3 border-neo-black bg-neo-navy">
+        <MpHudBar
+          className="grid-cols-[auto_1fr_auto]"
+          start={<LobbyExitButton onPress={onExitRoom} t={t} />}
+          center={
+            isPrivate
+              ? <LobbyCountPill count={seats.length} max={LOBBY_MAX_PLAYERS} />
+              : <MpRoomCode code={gameCode} size="chip" onCopy={() => setSheet('invite')} className="px-2 text-[24px] tracking-[0.1em] [&>svg]:hidden min-[720px]:text-[calc(28px*var(--mp-u,1))] min-[720px]:tracking-[0.2em] min-[720px]:[&>svg]:inline" />
+          }
+          end={
+            <>
+              <LobbyChatButton onPress={() => setSheet('chat')} unread={unread} t={t} className="min-[720px]:hidden" />
+              <LobbyAudioButton />
+              <AdvancedSettingsModal
+                timerValue={timerValue}
+                setTimerValue={setTimerValue}
+                difficulty={difficulty}
+                setDifficulty={setDifficulty}
+                minWordLength={minWordLength}
+                setMinWordLength={setMinWordLength}
+                roomLanguage={roomLanguage}
+                onRoomLanguageChange={lobby.handleRoomLanguageChange}
+                t={t}
+              />
+            </>
+          }
+        />
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <h1 className="sr-only">{t('hostView.lobbyTitle')}</h1>
 
-        {/* Desktop Layout — two-column grid. Triggers at 720px so tablet-portrait (744px) gets side-by-side instead of stacking with wasted width. */}
+        {/* Desktop / tablet (≥720px): seats + mode left, invite + chat right. */}
         <div className="hidden min-[720px]:flex min-[720px]:flex-col flex-1 min-h-0">
           <DesktopLobbyLayout
             leftContent={
               <>
-                <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-                <AnimatePresence>{renderAutoStartBanner()}</AnimatePresence>
-                <AnimatePresence>{renderSoloPrompt()}</AnimatePresence>
-                <div className="animate-fade-in-up shrink-0 rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard px-4 pt-2.5 pb-3 overflow-visible">
-                  <PlayerRoster
-                    players={filteredPlayersForDisplay}
-                    username={username}
-                    gameCode={gameCode}
-                    maxPlayers={maxPlayers}
-                    hostLabel={t('hostView.wonderhostLeader')}
-                    readyUsernames={readyUsernames}
-                    t={t}
-                    onSelfAvatarClick={handleOpenAvatarBuilder}
-                    onSelfNameChange={handleSelfNameChange}
-                    canEditSelfName={!isAuthenticated}
-                    headerExtra={tvModeToggle}
-                    selfActions={selfRosterActions}
-                  />
-                </div>
-                {!isClassroomRoom && (
-                  <div className="animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-                    <BattleModeCard
-                      selectedGameMode={selectedGameMode}
-                      setSelectedGameMode={setSelectedGameMode}
-                      t={t}
-                      isAdmin={isAdmin}
-                      language={roomLanguage}
-                      hasBlastAccess={hasBlastAccess}
-                    />
-                  </div>
-                )}
+                {statusLane}
+                {roster(tvModeToggle)}
+                {modePicker}
               </>
             }
             rightContent={
-              <div data-testid="desktop-chat-area">
-                {!isPrivate && (
-                  <div className="animate-fade-in-up" style={{ animationDelay: '60ms' }}>
-                    <InviteCard gameCode={gameCode} t={t} />
+              <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
+                {!isPrivate && <InviteCard gameCode={gameCode} t={t} showHint={lobby.humanGuestCount === 0} />}
+                <section className={cn(CARD, 'flex-1 min-h-48 flex flex-col p-0 overflow-hidden')}>
+                  <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
+                    {t('mpUi.lobby.chat')}
+                  </h2>
+                  <div className="flex-1 min-h-0 flex flex-col">
+                    <LobbyChatPanel username={username} isHost gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
                   </div>
-                )}
-                <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-                  <GameInstructions selectedGameMode={selectedGameMode} t={t} lang={roomLanguage} />
-                </div>
+                </section>
               </div>
             }
           />
-          {/* Sticky bottom start button — desktop */}
-          <div className="shrink-0 px-6 py-3 short:py-1.5 desktop-short:lg:py-1 desktop-medium-short:lg:py-2 border-t-3 border-neo-black bg-neo-navy/95">
-            {readyChip}
-            {anyAdActive && (
-              <p role="status" className="text-center text-neo-cyan font-neo-body text-xs mb-1.5">
-                {t('hostView.adWatchHold')}
-              </p>
-            )}
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <StartButton
-                  onStartGame={handleStartClick}
-                  disabled={isStartDisabled}
-                  tournamentCreating={tournamentCreating}
-                  playerCount={filteredPlayersForDisplay.length}
-                  maxPlayers={maxPlayers}
-                  t={t}
-                  labelKey={startLabelKey}
-                />
-              </div>
-            </div>
+          <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
+            <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{startButton}</div>
           </div>
         </div>
 
-        {/* Mobile Layout — single scroll + sticky bottom start. Below 720px (phone portrait/landscape). */}
+        {/* Phone (<720px): one fixed column, footer CTA pinned. */}
         <div className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
-          <div className="flex-1 min-h-0 overflow-y-auto relative z-10">
-            <div className="max-w-[600px] mx-auto px-4 py-3 gap-3 flex flex-col pb-3">
-              <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
-              <AnimatePresence>{renderAutoStartBanner()}</AnimatePresence>
-              <AnimatePresence>{renderSoloPrompt()}</AnimatePresence>
-              <PlayerRoster
-                players={filteredPlayersForDisplay}
-                username={username}
-                gameCode={gameCode}
-                maxPlayers={maxPlayers}
-                hostLabel={t('hostView.wonderhostLeader')}
-                readyUsernames={readyUsernames}
-                t={t}
-                compact
-                onSelfAvatarClick={handleOpenAvatarBuilder}
-                onSelfNameChange={handleSelfNameChange}
-                canEditSelfName={!isAuthenticated}
-                selfActions={selfRosterActions}
-              />
-              {!isClassroomRoom && (
-                <BattleModeCard
-                  selectedGameMode={selectedGameMode}
-                  setSelectedGameMode={setSelectedGameMode}
-                  t={t}
-                  isAdmin={isAdmin}
-                  language={roomLanguage}
-                  hasBlastAccess={hasBlastAccess}
-                />
-              )}
-              <GameInstructions selectedGameMode={selectedGameMode} t={t} defaultOpen={false} lang={roomLanguage} />
-              {!isPrivate && <InviteCard gameCode={gameCode} t={t} />}
-            </div>
+          <div className="flex-1 min-h-0 flex flex-col justify-center gap-3 px-3 py-2 w-full max-w-[600px] mx-auto">
+            {statusLane}
+            {roster()}
+            {modePicker}
           </div>
-          {/* Sticky bottom start button — mobile */}
-          <div className="shrink-0 px-5 short:px-3 py-3 short:py-1.5 border-t-3 border-neo-black bg-neo-navy/95" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
-            {readyChip}
-            {anyAdActive && (
-              <p role="status" className="max-w-[600px] mx-auto text-center text-neo-cyan font-neo-body text-xs mb-1.5">
-                {t('hostView.adWatchHold')}
-              </p>
-            )}
-            <div className="max-w-[600px] mx-auto flex flex-col short:flex-row short:items-stretch gap-2">
-              <div className="short:flex-1 short:min-w-0">
-                <StartButton
-                  onStartGame={handleStartClick}
-                  disabled={isStartDisabled}
-                  tournamentCreating={tournamentCreating}
-                  playerCount={filteredPlayersForDisplay.length}
-                  maxPlayers={maxPlayers}
-                  t={t}
-                  labelKey={startLabelKey}
-                />
-              </div>
+          <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
+            <div className="max-w-[600px] mx-auto flex items-stretch gap-2">
+              {!isPrivate && (
+                <button
+                  type="button"
+                  onClick={() => setSheet('invite')}
+                  data-testid="lobby-invite-button"
+                  className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-neo-display text-xs font-bold uppercase shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+                >
+                  <UserPlus aria-hidden="true" className="w-6 h-6" />
+                  {t('mpUi.lobby.invite')}
+                </button>
+              )}
+              <div className="flex-1 min-w-0">{startButton}</div>
             </div>
           </div>
         </div>
       </main>
 
-      <TvTutorialOverlay onComplete={() => setShowTvTutorial(false)} onSkip={() => setShowTvTutorial(false)} t={t} forceShow={showTvTutorial} />
+      {!isPrivate && <InviteSheet open={sheet === 'invite'} onClose={closeSheet} gameCode={gameCode} t={t} />}
+      <HowToPlaySheet open={sheet === 'howto'} onClose={closeSheet} mode={lobby.selectedGameMode} lang={roomLanguage} t={t} />
+      <ChatSheet open={sheet === 'chat'} onClose={closeSheet} t={t}>
+        <LobbyChatPanel username={username} isHost gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
+      </ChatSheet>
+
+      <TvTutorialOverlay onComplete={lobby.closeTvTutorial} onSkip={lobby.closeTvTutorial} t={t} forceShow={lobby.showTvTutorial} />
       <AvatarBuilderModal
         isOpen={isAvatarBuilderOpen}
         onClose={() => setIsAvatarBuilderOpen(false)}
@@ -881,7 +342,6 @@ function HostPreGameView({
         initialConfig={currentAvatar}
         premium={avatarPremium}
       />
-      <ChatBubble gameCode={gameCode} username={username} isHost t={t} />
     </div>
   );
 }

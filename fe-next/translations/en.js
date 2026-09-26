@@ -17475,7 +17475,19 @@ const en = {
       "backToArenas": "Back to arenas"
     },
     "entry": {},
-    "lobby": {},
+    "lobby": {
+      "squad": "Squad",
+      "startVsBots": "vs bots · {count}/{max}",
+      "seatsTaken": "{count}/{max} players",
+      "chat": "Chat",
+      "invite": "Invite",
+      "inviteTitle": "Invite friends",
+      "howToPlay": "How to play",
+      "scanToJoin": "Scan to join",
+      "orEnterCode": "or enter code",
+      "tvJoinHeadline": "Grab your phone & join!",
+      "tvJoinAt": "Join at"
+    },
     "round": {},
     "results": {}
   }

@@ -84,7 +84,7 @@ export function EmoteTray({
   }
 
   return (
-    <div data-testid="emote-tray" className={cn('flex items-center gap-2', className)}>
+    <div data-testid="emote-tray" className={cn('relative flex items-center gap-2', className)}>
       <button
         type="button"
         data-testid="emote-trigger"
@@ -98,10 +98,12 @@ export function EmoteTray({
       >
         {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Smile className="h-5 w-5 text-neo-pink" aria-hidden="true" />}
       </button>
+      {/* The picker floats over the lobby (absolute) so opening it never
+          pushes the seat grid or the footer CTA — the lobby must not scroll. */}
       {open && (
         <div
           className={cn(
-            'flex flex-wrap items-center gap-2',
+            'absolute top-full end-0 z-30 mt-2 grid w-max grid-cols-4 gap-2 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-2 shadow-hard',
             disabled && 'opacity-50',
           )}
         >

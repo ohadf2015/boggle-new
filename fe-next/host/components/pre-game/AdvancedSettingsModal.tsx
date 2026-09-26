@@ -11,6 +11,7 @@ import {
 } from '../../../components/ui/dialog';
 import { cn } from '../../../lib/utils';
 import { formatTimeMMSS } from '@/shared/utils';
+import { languageFlag } from '@/lib/i18n/languageLabels';
 import type { Language, DifficultyLevel } from '@/shared/types/game';
 
 interface AdvancedSettingsModalProps {
@@ -97,13 +98,17 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
+        {/* Header gear: same 40px icon-button as the rest of the lobby header.
+            The board-language flag rides on it so the host sees what the board
+            will be spelled in without a separate chip. */}
         <m.button
           whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-neo border-2 border-neo-white/20 bg-white/5 text-neo-cream/70 text-xs font-bold uppercase hover:bg-white/10 hover:border-neo-white/30 transition-all"
+          data-testid="lobby-language-chip"
+          className="relative inline-flex items-center justify-center shrink-0 w-10 h-10 tv:w-16 tv:h-16 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm focus-visible:outline-2 focus-visible:outline-neo-cyan"
           aria-label={t('hostView.advancedSettings')}
         >
-          <Settings className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">{t('hostView.settings')}</span>
+          <Settings aria-hidden="true" className="w-5 h-5" />
+          <span aria-hidden="true" className="absolute -bottom-1.5 -end-1.5 text-sm leading-none">{languageFlag(roomLanguage)}</span>
         </m.button>
       </DialogTrigger>
       <DialogContent

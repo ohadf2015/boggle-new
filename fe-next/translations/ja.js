@@ -18397,7 +18397,19 @@ const ja = {
       "backToArenas": "アリーナに戻る"
     },
     "entry": {},
-    "lobby": {},
+    "lobby": {
+      "squad": "メンバー",
+      "startVsBots": "ボット対戦 · {count}/{max}",
+      "seatsTaken": "{count}/{max}人",
+      "chat": "チャット",
+      "invite": "招待",
+      "inviteTitle": "友だちを招待",
+      "howToPlay": "遊び方",
+      "scanToJoin": "スキャンして参加",
+      "orEnterCode": "またはコードを入力",
+      "tvJoinHeadline": "スマホを出して参加しよう！",
+      "tvJoinAt": "参加はこちら"
+    },
     "round": {},
     "results": {}
   }
