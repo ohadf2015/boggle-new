@@ -13783,7 +13783,16 @@ const sv = {
       "nextMonth": "Nästa månad",
       "customDate": "Anpassat datum",
       "instructionsLabel": "Instruktioner",
-      "instructionsPlaceholder": "Lägg till valfria instruktioner för elever..."
+      "instructionsPlaceholder": "Lägg till valfria instruktioner för elever...",
+      "starterPacksTitle": "Börja med ett startpaket",
+      "starterPacksHint": "Ingen lektion än? Ett tryck skapar ordlistan och ger Word Craft till imorgon.",
+      "starterPackDue": "Till imorgon",
+      "starterAnimals": "Djur",
+      "starterAnimalsDesc": "10 korta djurord — spelbara ikväll",
+      "starterColors": "Färger och former",
+      "starterColorsDesc": "Färger och grundformer för nybörjare",
+      "starterFood": "Mat",
+      "starterFoodDesc": "Vardagliga matord för första läxan"
     },
     "completion": {
       "overallProgress": "Övergripande framsteg",

@@ -29,6 +29,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 // Free by default in every test; the cap-gate describe block overrides.
 let proState = { hasPro: false, loading: false };
+vi.mock('@/hooks/useClassroom', () => ({
+  useClassrooms: vi.fn(() => ({
+    classrooms: [{ id: 'classroom-1', name: 'Period 1', language: 'en' }],
+  })),
+}));
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
 }));
