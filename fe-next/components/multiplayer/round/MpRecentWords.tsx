@@ -26,7 +26,7 @@ function MpRecentWordsImpl({ words }: { words: LadderWord[] }) {
           )}
         >
           <span dir="auto">{w.word}</span>
-          {w.score > 0 && <span className="text-xs tabular-nums opacity-80">+{w.score}</span>}
+          {w.score > 0 && <span data-testid="mp-recent-word-points" dir="ltr" className="text-xs tabular-nums opacity-80">+{w.score}</span>}
         </li>
       ))}
     </ul>

@@ -34,6 +34,13 @@ const REJECT_KEY: Record<Exclude<MpRejectReason, 'found-by-other'>, string> = {
   'already-found': 'mpUi.round.reject.alreadyFound',
 };
 
+/**
+ * First-strong isolate: a player name dropped into a translated line keeps its
+ * own direction (a Hebrew name in "You passed {name}!" — or a Latin one in the
+ * Hebrew line — never reorders the text around it).
+ */
+export const isolateName = (name: string): string => `\u2068${name}\u2069`;
+
 export interface RoundJuice {
   gain: MpScoreGain | null;
   floaters: RoundFloater[];
@@ -95,7 +102,7 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
     if (lastReject.reason === 'found-by-other') {
       setCallout({
         id: lastReject.id,
-        text: t('mpUi.round.gotItFirst', { name: lastReject.foundBy ?? '?', points: lastReject.points ?? 0 }),
+        text: t('mpUi.round.gotItFirst', { name: isolateName(lastReject.foundBy ?? '?'), points: lastReject.points ?? 0 }),
         tone: 'quiet',
         color: 'cyan',
       });
@@ -120,16 +127,16 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
     const rank = next.findIndex((p) => p.username === meId) + 1;
     if (rank > 0 && prevRank > 0 && rank !== prevRank) setRankFlipKey(`r${rank}-${++seq.current}`);
     if (passed.length > 0) {
-      setCallout({ id: nextId('pass'), text: t('mpUi.round.youPassed', { name: passed[0] }), tone: 'loud', color: 'lime' });
+      setCallout({ id: nextId('pass'), text: t('mpUi.round.youPassed', { name: isolateName(passed[0]) }), tone: 'loud', color: 'lime' });
     } else if (overtakenBy.length > 0) {
-      setCallout({ id: nextId('over'), text: t('mpUi.round.passedYou', { name: overtakenBy[0] }), tone: 'quiet', color: 'pink' });
+      setCallout({ id: nextId('over'), text: t('mpUi.round.passedYou', { name: isolateName(overtakenBy[0]) }), tone: 'quiet', color: 'pink' });
     }
     // Lead change: the leader's name changed and at least one of them is me.
     const prevLead = prev[0]?.username;
     const lead = next[0]?.username;
     if (prevLead && lead && prevLead !== lead && (next[0].score ?? 0) > 0 && (lead === meId || prevLead === meId)) {
       const mine = lead === meId;
-      setBanners((b) => [...b, { id: nextId('lead'), text: mine ? t('mpUi.round.tookLead') : t('mpUi.round.lostLead', { name: lead }), color: mine ? 'lime' : 'pink' }]);
+      setBanners((b) => [...b, { id: nextId('lead'), text: mine ? t('mpUi.round.tookLead') : t('mpUi.round.lostLead', { name: isolateName(lead) }), color: mine ? 'lime' : 'pink' }]);
       playLeadChangeSound();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

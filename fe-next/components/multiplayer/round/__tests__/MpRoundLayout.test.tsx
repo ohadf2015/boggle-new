@@ -193,7 +193,7 @@ describe('MpRoundLayout', () => {
     act(() => recordWordRejected('dog', 'found-by-other', { foundBy: 'bot', points: 2 }));
     const callout = screen.getByTestId('mp-callout');
     expect(callout).toHaveTextContent('mpUi.round.gotItFirst');
-    expect(callout).toHaveTextContent('"name":"bot"');
+    expect(callout).toHaveTextContent('"name":"\u2068bot\u2069"'); // bot, bidi-isolated
     expect(callout).toHaveTextContent('"points":2');
   });
 
@@ -212,6 +212,23 @@ describe('MpRoundLayout', () => {
     rerender(<MpRoundLayout {...props({ leaderboard: [{ username: 'me', score: 20 }, { username: 'bot', score: 10 }] })} />);
     expect(screen.getByTestId('mp-callout')).toHaveTextContent('mpUi.round.youPassed');
     expect(screen.getByTestId('mp-callout')).toHaveAttribute('data-tone', 'loud');
+  });
+
+  it('names in callouts are bidi-isolated (a Hebrew name never scrambles an English line, or vice versa)', () => {
+    const base = [{ username: 'bot', score: 10 }, { username: 'me', score: 5 }];
+    const { rerender } = render(<MpRoundLayout {...props({ leaderboard: base })} />);
+    rerender(<MpRoundLayout {...props({ leaderboard: [{ username: 'me', score: 20 }, { username: 'bot', score: 10 }] })} />);
+    expect(screen.getByTestId('mp-callout')).toHaveTextContent('"name":"\u2068bot\u2069"');
+    act(() => recordWordRejected('dog', 'found-by-other', { foundBy: 'דני2', points: 2 }));
+    expect(screen.getByTestId('mp-callout')).toHaveTextContent('"name":"\u2068דני2\u2069"');
+  });
+
+  it('recent-word points stay "+N" in RTL (points isolated as LTR)', () => {
+    render(<MpRoundLayout {...props({ foundWords: [{ word: 'tar', timestamp: 1 }] })} />);
+    act(() => recordWordAccepted({ word: 'tar', score: 5 }));
+    const pts = screen.getByTestId('mp-recent-word-points');
+    expect(pts).toHaveAttribute('dir', 'ltr');
+    expect(pts).toHaveTextContent('+5');
   });
 
   it('heartbeat once per second in the last 5 seconds', () => {
