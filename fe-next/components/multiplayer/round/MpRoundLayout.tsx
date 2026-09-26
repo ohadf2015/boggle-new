@@ -9,6 +9,7 @@ import { MpCallouts, MpRosterStrip } from '../shell';
 import { WordsLadder, type LadderWord } from '../desktop/WordsLadder';
 import { MpRoundHud } from './MpRoundHud';
 import { MpScoreFloaters } from './MpScoreFloaters';
+import { MpRecentWords } from './MpRecentWords';
 import { roundModeMeta, timerColor } from './roundModes';
 import { useRoundJuice } from './useRoundJuice';
 import styles from './round.module.css';
@@ -161,7 +162,10 @@ function MpRoundLayoutImpl({
         {/* The callout stage sits in the board area's free band: above the pill
             for classic, below the clue strip + life bar for word-hunt. */}
         <div data-testid="mp-callout-stage" className={cn('absolute inset-x-0 top-0', mode.slug === 'wordHunt' && 'top-[calc(132px*var(--mp-u,1))]')}>
-          <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
+          <MpRecentWords words={ladder} />
+          <div className="relative">
+            <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
+          </div>
         </div>
         <span data-testid="mp-reject-sr" aria-live="polite" className="sr-only">{juice.rejectText ?? ''}</span>
         <MpScoreFloaters floaters={juice.floaters} />

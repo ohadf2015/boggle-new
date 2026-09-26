@@ -237,6 +237,19 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-callout-stage').className).not.toContain('132px');
   });
 
+  it('phone: my latest words ride the stage as chips (newest first, server points), capped', () => {
+    const words = ['cat', 'dog', 'rat', 'bird', 'cart', 'dart', 'tar'].map((word, i) => ({ word, timestamp: i }));
+    const { rerender } = render(<MpRoundLayout {...props({ foundWords: words.slice(0, 6) })} />);
+    act(() => recordWordAccepted({ word: 'tar', score: 5 }));
+    rerender(<MpRoundLayout {...props({ foundWords: words })} />);
+    const strip = screen.getByTestId('mp-recent-words');
+    expect(strip.className).toContain('lg:hidden');
+    const chips = screen.getAllByTestId('mp-recent-word');
+    expect(chips.length).toBeLessThanOrEqual(5);
+    expect(chips[0]).toHaveTextContent('tar');
+    expect(chips[0]).toHaveTextContent('+5');
+  });
+
   it('docks a found-count pill', () => {
     render(<MpRoundLayout {...props({ foundWords: [{ word: 'a' }, { word: 'b' }, { word: 'c' }] })} />);
     expect(screen.getByTestId('mp-found-pill')).toHaveTextContent('"count":3');
