@@ -169,6 +169,14 @@ describe('ArenaList', () => {
     expect(tail.className).not.toMatch(/(^|\s)hidden(\s|$)/);
   });
 
+  it("a row's seat icon and chevron scale with its TV type, not stay phone-sized", () => {
+    render(<ArenaList {...base} rooms={rooms(1)} />);
+    const seatsIcon = screen.getByTestId('arena-row-seats').querySelector('svg')!;
+    expect(seatsIcon.getAttribute('class')).toMatch(/(^|\s)tv:h-5(\s|$)/);
+    const chevron = screen.getByTestId('arena-row-seats').nextElementSibling!;
+    expect(chevron.getAttribute('class')).toMatch(/(^|\s)tv:h-6(\s|$)/);
+  });
+
   it("the tail's mascot loads eagerly — with a short list it is the phone's LCP element", () => {
     render(<ArenaList {...base} rooms={rooms(1)} />);
     const img = screen.getByTestId('arena-list-tail').querySelector('img');

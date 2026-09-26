@@ -131,11 +131,11 @@ export const ArenaRow = memo(function ArenaRow({ room, joining, locked, onPick }
             seatsBump > 0 && 'animate-mp-bump',
           )}
         >
-          <Users aria-hidden="true" className="h-3.5 w-3.5" />
+          <Users aria-hidden="true" className="h-3.5 w-3.5 tv:h-5 tv:w-5" />
           {room.playerCount || 0}
           {room.maxPlayers ? `/${room.maxPlayers}` : ''}
         </span>
-        <DirectionalIcon icon={ChevronRight} className="h-4 w-4 text-neo-white/70 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+        <DirectionalIcon icon={ChevronRight} className="h-4 w-4 tv:h-6 tv:w-6 text-neo-white/70 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
       </span>
     </button>
   );

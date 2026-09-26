@@ -88,6 +88,17 @@ describe('AvatarStack', () => {
     expect(configOf(b)).toEqual(getSeededAvatarConfig(hashString('room-player-1')));
   });
 
+  it('scales 1.5x on a TV (DESIGN §b: every size token), faces and the +N chip alike', () => {
+    render(
+      <AvatarStack avatars={makeAvatars(3)} totalCount={5} maxVisible={3} />
+    );
+    const face = screen.getAllByTestId('avatar')[0].parentElement!;
+    expect(face.className).toMatch(/(^|\s)w-6(\s|$)/);
+    expect(face.className).toMatch(/(^|\s)tv:w-9(\s|$)/);
+    expect(face.className).toMatch(/(^|\s)tv:h-9(\s|$)/);
+    expect(screen.getByTestId('avatar-stack-overflow').className).toMatch(/(^|\s)tv:w-9(\s|$)/);
+  });
+
   it('has data-testid="avatar-stack" on container', () => {
     render(
       <AvatarStack avatars={makeAvatars(1)} totalCount={1} />

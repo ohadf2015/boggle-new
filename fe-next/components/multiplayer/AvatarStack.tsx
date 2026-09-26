@@ -16,21 +16,23 @@ interface AvatarStackProps {
   className?: string;
 }
 
+// A TV (the `tv:` variant) scales every size 1.5x, like the rest of the entry.
+// `px` is the renderer's drawing size; the SVG fills its box at any size.
 const STACK_SIZES = {
   sm: {
-    px: 24,
-    face: 'w-6 h-6',
-    container: 'h-6',
-    overlap: '-ms-2',
-    overflow: 'w-6 h-6 text-[7px]',
+    px: 36,
+    face: 'w-6 h-6 tv:w-9 tv:h-9',
+    container: 'h-6 tv:h-9',
+    overlap: '-ms-2 tv:-ms-3',
+    overflow: 'w-6 h-6 text-[7px] tv:w-9 tv:h-9 tv:text-[11px]',
     ring: 'ring-2',
   },
   md: {
-    px: 28,
-    face: 'w-7 h-7',
-    container: 'h-7',
-    overlap: '-ms-2.5',
-    overflow: 'w-7 h-7 text-[8px]',
+    px: 42,
+    face: 'w-7 h-7 tv:w-[42px] tv:h-[42px]',
+    container: 'h-7 tv:h-[42px]',
+    overlap: '-ms-2.5 tv:-ms-4',
+    overflow: 'w-7 h-7 text-[8px] tv:w-[42px] tv:h-[42px] tv:text-xs',
     ring: 'ring-2',
   },
 };
