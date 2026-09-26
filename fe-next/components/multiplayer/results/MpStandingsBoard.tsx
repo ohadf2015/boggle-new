@@ -32,7 +32,7 @@ const PODIUM = [
  */
 function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: MpStandingsBoardProps) {
   return (
-    <ol data-testid="mp-standings" className={cn('flex flex-col min-h-0 gap-[calc(6px*var(--mp-u,1))]', className)}>
+    <ol data-testid="mp-standings" className={cn('flex flex-col justify-center min-h-0 gap-[calc(6px*var(--mp-u,1))]', className)}>
       {rows.map((r, i) => {
         const pos = i + 1;
         const shown = isRevealed(pos);
@@ -47,9 +47,9 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             data-revealed={String(shown)}
             aria-hidden={shown ? undefined : true}
             className={cn(
-              'relative flex items-center min-h-0 flex-1 overflow-hidden rounded-neo border-[3px] shadow-hard-sm',
+              'relative flex items-center min-h-0 grow shrink overflow-hidden rounded-neo border-[3px] shadow-hard-sm',
               'gap-[calc(10px*var(--mp-u,1))] px-[calc(10px*var(--mp-u,1))]',
-              first ? 'max-h-[calc(72px*var(--mp-u,1))] min-h-[calc(44px*var(--mp-u,1))]' : 'max-h-[calc(56px*var(--mp-u,1))] min-h-[calc(34px*var(--mp-u,1))]',
+              first ? 'basis-[calc(68px*var(--mp-u,1))] max-h-[calc(84px*var(--mp-u,1))] min-h-[calc(44px*var(--mp-u,1))]' : 'basis-[calc(54px*var(--mp-u,1))] max-h-[calc(64px*var(--mp-u,1))] min-h-[calc(34px*var(--mp-u,1))]',
               podium ? podium.row : 'bg-neo-navy-light border-neo-black',
               r.isMe && !first && 'outline-[3px] outline-offset-2 outline-neo-lime outline',
               r.isMe && first && 'outline-[3px] outline-offset-2 outline-neo-white outline',
@@ -58,14 +58,14 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             )}
           >
             {first && shown && (
-              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-0 w-1/4 bg-neo-white/40">
-                <span className={cn('block h-full w-full', fx.shine)} />
+              <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+                <span className={cn('absolute inset-y-0 start-0 block w-1/5 bg-neo-white/45', fx.shine)} />
               </span>
             )}
             <span
               className={cn(
                 'relative shrink-0 grid place-items-center rounded-neo border-2 border-neo-black font-neo-display font-bold tabular-nums',
-                'w-[calc(32px*var(--mp-u,1))] h-[calc(32px*var(--mp-u,1))] text-[calc(16px*var(--mp-u,1))]',
+                'w-[calc(34px*var(--mp-u,1))] h-[calc(34px*var(--mp-u,1))] text-[calc(17px*var(--mp-u,1))]',
                 podium ? (first ? 'bg-neo-black text-neo-lime' : podium.badge) : 'bg-neo-navy text-neo-white',
               )}
             >
@@ -76,9 +76,11 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
                 'relative shrink-0 rounded-full border-2',
                 first ? 'border-neo-black' : r.isMe ? 'border-neo-lime' : 'border-neo-black',
               )}
-              style={{ width: 'calc(36px * var(--mp-u, 1))', height: 'calc(36px * var(--mp-u, 1))' }}
+              style={{ width: 'calc(40px * var(--mp-u, 1))', height: 'calc(40px * var(--mp-u, 1))' }}
             >
-              <Avatar avatarImage={r.avatar?.avatarImage} customAvatar={r.avatar?.customAvatar ?? null} userId={r.username} pixelSize={36} disableEffects />
+              <span className="absolute top-0 left-0 block origin-top-left [transform:scale(var(--mp-u,1))]">
+                <Avatar avatarImage={r.avatar?.avatarImage} customAvatar={r.avatar?.customAvatar ?? null} userId={r.username} pixelSize={36} disableEffects />
+              </span>
               {first && shown && (
                 <Crown
                   data-testid="mp-standing-crown"
@@ -92,7 +94,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             </span>
             <span className="min-w-0 flex-1 flex flex-col justify-center leading-tight">
               <span className="flex items-center gap-1.5 min-w-0">
-                <span dir="auto" className={cn('truncate font-neo-display font-bold', 'text-[calc(16px*var(--mp-u,1))]')}>
+                <span dir="auto" className={cn('truncate font-neo-display font-bold', 'text-[calc(17px*var(--mp-u,1))]')}>
                   {r.username}
                 </span>
                 {r.isMe && (
@@ -121,7 +123,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             </span>
             <span
               data-testid="mp-standing-score"
-              className={cn('shrink-0 font-neo-display font-bold tabular-nums', first ? 'text-[calc(28px*var(--mp-u,1))]' : 'text-[calc(22px*var(--mp-u,1))]')}
+              className={cn('shrink-0 font-neo-display font-bold tabular-nums', first ? 'text-[calc(32px*var(--mp-u,1))]' : 'text-[calc(24px*var(--mp-u,1))]')}
             >
               {r.score}
             </span>

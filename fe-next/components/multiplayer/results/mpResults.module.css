@@ -50,14 +50,14 @@
 }
 @keyframes shine-sweep {
   0% { transform: translateX(-120%) skewX(-18deg); }
-  100% { transform: translateX(420%) skewX(-18deg); }
+  100% { transform: translateX(600%) skewX(-18deg); }
 }
 [dir='rtl'] .shine {
   animation-name: shine-sweep-rtl;
 }
 @keyframes shine-sweep-rtl {
   0% { transform: translateX(120%) skewX(18deg); }
-  100% { transform: translateX(-420%) skewX(18deg); }
+  100% { transform: translateX(-600%) skewX(18deg); }
 }
 
 .cardIn {

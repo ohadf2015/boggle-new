@@ -39,6 +39,8 @@ const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions'
 /** Max standings rows on one screen (8 seats; in a bigger room I stay visible). */
 const MAX_ROWS = 8;
 const AUTO_ADVANCE_SECONDS = 10;
+/** Signup nudge lands this long after the reveal ends (never on the verdict). */
+const NUDGE_DELAY_MS = 4000;
 
 /**
  * The results show: TIME! → standings rise last → 1st → my card rolls → footer.
@@ -88,6 +90,15 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once per room, after the reveal
   }, [done, gameCode, data.isCurrentUserWinner]);
 
+  // The signup nudge waits a beat after the show, so it never lands on the verdict.
+  const [nudgeReady, setNudgeReady] = useState(false);
+  useEffect(() => {
+    if (!done) return undefined;
+    const id = setTimeout(() => setNudgeReady(true), NUDGE_DELAY_MS);
+    return () => clearTimeout(id);
+  }, [done]);
+  const nudgeSheetOpen = nudgeReady && c.nudge.activeNudge === 'sheet';
+
   const tally = useMemo(() => readyTally(data.sortedScores, socketEvents.readyUsernames), [data.sortedScores, socketEvents.readyUsernames]);
   const isReady = socketEvents.isCurrentPlayerReady;
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -96,7 +107,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const auto = useAutoAdvance({
     seconds: AUTO_ADVANCE_SECONDS,
     armed: footerShown,
-    paused: detailsOpen || pickerOpen || c.showExitConfirm || c.showShareModal || socketEvents.showWordFeedback,
+    paused: detailsOpen || pickerOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || socketEvents.showWordFeedback,
     enabled: branch === 'intermission' && !c.isClassroom && (isHost || !isReady),
     onFire: isHost ? handleStartGame : handleMarkReady,
     persistCancel: !isOnCrazyGamesPlatform,
@@ -138,12 +149,13 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       data-branch={branch ?? 'pending'}
       onPointerDown={done ? undefined : handleSkip}
       className={cn(
-        'relative flex-1 min-h-0 w-full max-w-6xl mx-auto flex flex-col',
+        // Desktop/TV scale the whole show up (the HUD bar keeps the shell's --mp-u).
+        'relative flex-1 min-h-0 w-full max-w-6xl tv:max-w-[1600px] mx-auto flex flex-col lg:[--mp-u:1.3] tv:[--mp-u:1.8]',
         'gap-[calc(10px*var(--mp-u,1))] p-[calc(12px*var(--mp-u,1))] lg:p-[calc(24px*var(--mp-u,1))]',
         'lg:grid lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-[calc(28px*var(--mp-u,1))] lg:items-center',
       )}
     >
-      <div className="min-h-0 flex-1 flex flex-col gap-[calc(8px*var(--mp-u,1))] lg:h-full lg:justify-center">
+      <div className="min-h-0 flex-1 flex flex-col justify-center gap-[calc(8px*var(--mp-u,1))] lg:h-full">
         {showChampion && (
           <p className={cn('shrink-0 self-center inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-neo-black font-bold text-[calc(12px*var(--mp-u,1))]', fx.chipPop)}>
             <Trophy aria-hidden="true" className="w-4 h-4" />
@@ -156,7 +168,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           hiddenCount={visible.hiddenCount}
           isRevealed={(pos) => seen(`row-${pos}`)}
           t={t}
-          className="flex-1 lg:flex-none lg:h-[min(100%,calc(560px*var(--mp-u,1)))]"
+          className="min-h-0 lg:max-h-[calc(560px*var(--mp-u,1))]"
         />
       </div>
       <div className="shrink-0 flex flex-col gap-[calc(10px*var(--mp-u,1))] lg:justify-center">
@@ -213,7 +225,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   );
 
   const footer = (
-    <div className="relative w-full max-w-xl mx-auto px-[calc(12px*var(--mp-u,1))] pt-2 pb-[calc(10px*var(--mp-u,1))] min-h-[calc(84px*var(--mp-u,1))] flex flex-col justify-center overflow-hidden">
+    <div className="relative w-full max-w-xl lg:max-w-2xl tv:max-w-4xl lg:[--mp-u:1.15] tv:[--mp-u:1.6] mx-auto px-[calc(12px*var(--mp-u,1))] pt-2 pb-[calc(10px*var(--mp-u,1))] min-h-[calc(84px*var(--mp-u,1))] flex flex-col justify-center overflow-hidden">
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
@@ -255,8 +267,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             t={t}
             language={c.language}
           />
-          <MultiplayerSignupSheet isOpen={c.nudge.activeNudge === 'sheet'} onClose={c.nudge.dismissNudge} stats={c.nudge.stats} bottomOffset={0} />
-          <SignupToast isVisible={c.nudge.activeNudge === 'toast'} onDismiss={c.nudge.dismissNudge} mpGamesThisSession={c.nudge.stats.mpGamesThisSession} />
+          <MultiplayerSignupSheet isOpen={nudgeSheetOpen} onClose={c.nudge.dismissNudge} stats={c.nudge.stats} bottomOffset={0} />
+          <SignupToast isVisible={nudgeReady && c.nudge.activeNudge === 'toast'} onDismiss={c.nudge.dismissNudge} mpGamesThisSession={c.nudge.stats.mpGamesThisSession} />
           <PostRoundSummary />
         </>
       )}
