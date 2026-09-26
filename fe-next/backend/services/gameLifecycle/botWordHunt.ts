@@ -27,10 +27,23 @@ import { setBotTimeout } from '../../modules/botLifecycle';
 import { ensureLanguageLoaded } from '../../dictionary';
 import logger from '../../utils/logger';
 import { creditBotBonus, runBotLoop, type BotPlayRules, type BotRoundContext } from './botEngine';
+import type { BotScoreTuning } from './botScoreGate';
 import { quoteBoardWord, recordMissedBoardWord } from './botClassic';
 
 /** Delay before ending game after bot finds target (ms) */
 const TARGET_FOUND_END_DELAY_MS = 3000;
+
+/**
+ * Pre-refactor bots capped the target-found lump bonus at a flat 20 points
+ * (BOT_SCORE_BUFFER) before any human had scored — the bonus is a single
+ * credit (finder bonus + up to 140 guess-efficiency), loud enough that a bot
+ * banking it out of an empty scoreboard reads as the bot "solving" the round
+ * unprompted. `graceMs: 0` disables the generic gate's 25s free-scoring
+ * window (which would otherwise let it through unconditionally) and
+ * `noHumanCeiling` restores the same flat cap the per-difficulty post-grace
+ * ceiling (400/650/900) can't express.
+ */
+const TARGET_BONUS_TUNING: BotScoreTuning = { graceMs: 0, noHumanCeiling: 20 };
 
 /** Timing config per difficulty — startDelay is high so bots find regular words first.
  *  minWrongGuesses × HUNT_WRONG_GUESS_PENALTY (10) approaches HUNT_INITIAL_LIFE (100):
@@ -200,7 +213,7 @@ function takeTargetGuess(ctx: BotRoundContext, bot: Bot, strategy: BotWordHuntSt
     // Bot guesses live on strategy.guessesMade (not huntState.playerAttempts),
     // so pass the count explicitly for the guess-efficiency bonus.
     const result = recordTargetFound(huntState, bot.username, strategy.guessesMade.length);
-    creditBotBonus(ctx, bot, result.bonus);
+    creditBotBonus(ctx, bot, result.bonus, TARGET_BONUS_TUNING);
     broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntTargetFound', {
       username: bot.username,
       targetWord: huntState.targetWord,

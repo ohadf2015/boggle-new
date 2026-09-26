@@ -54,6 +54,14 @@ export interface BotScoreTuning {
   floorMult?: number;
   /** Multiplier on the post-grace fallback ceiling. */
   ceilingMult?: number;
+  /**
+   * Absolute post-grace ceiling before any human has scored, replacing the
+   * per-difficulty BOT_POST_GRACE_CEILING entirely (ceilingMult is ignored
+   * when this is set). For a single lump bonus (e.g. a Word Hunt target-found
+   * credit) that must stay flat across difficulties — mirrors the pre-refactor
+   * BOT_SCORE_BUFFER=20 cap, which a per-difficulty multiplier can't express.
+   */
+  noHumanCeiling?: number;
   /** Override the free-scoring grace window (ms) before any human has scored. */
   graceMs?: number;
 }
@@ -88,6 +96,7 @@ export function shouldBotScore(
     const graceMs = tuning?.graceMs ?? BOT_FREE_SCORING_GRACE_MS;
     const startedAt = getBotScoringStart(gameCode);
     if (!startedAt || Date.now() - startedAt <= graceMs) return true;
+    if (tuning?.noHumanCeiling !== undefined) return projectedScore <= tuning.noHumanCeiling;
     const baseCeiling = BOT_POST_GRACE_CEILING[botDifficulty] ?? BOT_POST_GRACE_CEILING.medium;
     return projectedScore <= baseCeiling * (tuning?.ceilingMult ?? 1);
   }

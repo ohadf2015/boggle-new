@@ -99,7 +99,7 @@ vi.mock('../utils/socketHelpers', () => ({
   safeEmit: vi.fn(),
 }));
 
-vi.mock('../modules/botManager', () => ({ isBot: vi.fn(() => false), stopAllBots: vi.fn(), cleanupGameBots: vi.fn(), getGameBots: vi.fn(() => []), getBotByUsername: vi.fn(), addBot: vi.fn(), removeBot: vi.fn(), resetBotCombo: vi.fn(), addWordToBlacklist: vi.fn(), resyncBotsForNewGrid: vi.fn() }));
+vi.mock('../modules/botManager', () => ({ isBot: vi.fn(() => false), stopAllBots: vi.fn(), cleanupGameBots: vi.fn(), getGameBots: vi.fn(() => []), getBotByUsername: vi.fn(), addBot: vi.fn(), removeBot: vi.fn(), resetBotCombo: vi.fn(), addWordToBlacklist: vi.fn() }));
 
 vi.mock('../utils/errorHandler', () => ({
   emitError: vi.fn(),

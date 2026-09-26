@@ -12,7 +12,7 @@ import {
   isWordCommunityValid,
   isWordValidForScoring,
 } from '../../modules/communityWordManager';
-import { calculateGameScores, type PlayerScoreResult } from '../../modules/scoringEngine';
+import { calculateGameScores, countHumanPlayers, type PlayerScoreResult } from '../../modules/scoringEngine';
 import { getGameModeModule, isDuplicateRuleDisabled } from '../../modes/index';
 import type { GameState } from '../../modules/gameState/types';
 import {
@@ -135,13 +135,17 @@ export async function calculateAndBroadcastFinalScores(
 
   // Calculate final scores
 
+  // Rarity's percentage denominator must match wordCountMap's human-only
+  // finder numerator (above: "Only humans affect wordCountMap/submitters"),
+  // or a bot-filled room drifts the results score away from the live one
+  // (live's rarity multiplier is always 1 — see wordScore.ts).
   const finalScores: PlayerScoreResult[] = calculateGameScores(
     game as any,
     wordCountMap,
     dictionaryValidatedWords,
     communityValidatedWords,
     aiValidatedWords,
-    { playerCount, gameMode: game.gameMode }
+    { playerCount, humanPlayerCount: countHumanPlayers(game.users), gameMode: game.gameMode }
   );
 
   // Apply MP boost tokens (firstWordBonus, scoreMultiplier) BEFORE sorting and

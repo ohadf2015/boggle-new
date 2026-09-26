@@ -48,7 +48,29 @@ export interface AiValidationResult {
 
 export interface CalculateScoresOptions {
   playerCount?: number;
+  /**
+   * Rarity-scoring population — the denominator `wordCountMap`'s finder
+   * counts (the numerator) are measured against. The caller building
+   * wordCountMap already counts only HUMAN finders (bots must not strip
+   * uniqueness/rarity bonuses); pass the matching human-only count here via
+   * `countHumanPlayers`, or a bot-filled room drifts the percentage — a lone
+   * human's word (100% of the humans who could find it) can get
+   * miscategorized as rare/uncommon purely because bots inflate the
+   * denominator while never appearing in the numerator. Live scoring's
+   * rarity multiplier is always 1 (see wordScore.ts), so any such drift is a
+   * results-only bonus the player never saw live. Defaults to `playerCount`.
+   */
+  humanPlayerCount?: number;
   gameMode?: string;
+}
+
+/**
+ * Human (non-bot) players — the finder population rarity scoring must be
+ * measured against so it stays consistent with wordCountMap's human-only
+ * numerator. One shared definition of "who counts as a finder" for both.
+ */
+export function countHumanPlayers(users: Record<string, { isBot?: boolean } | undefined> | null | undefined): number {
+  return Object.values(users || {}).filter((u) => !u?.isBot).length;
 }
 
 /**
@@ -63,6 +85,7 @@ export function calculateGameScores(
   options: CalculateScoresOptions = {}
 ): PlayerScoreResult[] {
   const { playerCount = 0, gameMode } = options;
+  const rarityPopulation = options.humanPlayerCount ?? playerCount;
 
   // Per-mode rules (backend/modes/rules.ts) — the same rows the results payload
   // reports, so the flag the client shows is the rule applied here.
@@ -121,9 +144,9 @@ export function calculateGameScores(
       let rarityMultiplier = 1.0;
       let wordRarity: 'common' | 'uncommon' | 'rare' | 'legendary' = 'common';
 
-      if (playerCount > 1 && !duplicateRuleDisabled && !rarityDisabled) {
+      if (rarityPopulation > 1 && !duplicateRuleDisabled && !rarityDisabled) {
         const playersWhoFoundThis = wordCountMap[word] || 1;
-        const percentageWhoFound = (playersWhoFoundThis / playerCount) * 100;
+        const percentageWhoFound = (playersWhoFoundThis / rarityPopulation) * 100;
 
         if (percentageWhoFound <= 5) {
           // Only 1 player in 20 found this - legendary!

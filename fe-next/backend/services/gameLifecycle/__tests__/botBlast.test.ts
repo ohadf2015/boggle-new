@@ -68,7 +68,6 @@ const mocks = vi.hoisted(() => ({
   getBotBots: vi.fn(() => []),
   getGameBots: vi.fn(() => []),
   startBot: vi.fn(),
-  resyncBotsForNewGrid: vi.fn(),
   findAllWords: vi.fn(() => ['hello', 'world', 'test']),
   getCachedTrie: vi.fn(() => ({})),
   setBotTimeout: vi.fn((bot, callback, delay) => {

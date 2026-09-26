@@ -107,6 +107,26 @@ describe('shouldBotScore — per-mode tuning', () => {
     clearBotScoringStart('GAME_G');
   });
 
+  it('noHumanCeiling overrides the per-difficulty post-grace ceiling with a flat absolute cap', () => {
+    // Restores the pre-refactor BOT_SCORE_BUFFER=20 early-round cap for a single
+    // lump bonus (e.g. Word Hunt target-found), which the per-difficulty ceiling
+    // (400/650/900) can't express via ceilingMult alone.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    getLeaderboard.mockReturnValue([{ username: 'Alice', score: 0, isBot: false }]);
+    clearBotScoringStart('GAME_NHC');
+    markBotScoringStart('GAME_NHC');
+    vi.advanceTimersByTime(30_000); // past default 25s grace
+
+    // Same flat 20-point ceiling regardless of difficulty (hard's own ceiling is 900).
+    expect(shouldBotScore('GAME_NHC', 'Bot', 0, 20, 'hard', { noHumanCeiling: 20 })).toBe(true);
+    expect(shouldBotScore('GAME_NHC', 'Bot', 0, 21, 'hard', { noHumanCeiling: 20 })).toBe(false);
+    // And for easy (own ceiling 400) — still 20, not scaled by difficulty.
+    expect(shouldBotScore('GAME_NHC', 'Bot', 0, 21, 'easy', { noHumanCeiling: 20 })).toBe(false);
+
+    clearBotScoringStart('GAME_NHC');
+  });
+
   it('omitting tuning preserves default calibration', () => {
     getLeaderboard.mockReturnValue([{ username: 'Alice', score: 300, isBot: false }]);
     clearBotVariance('GAME_D');

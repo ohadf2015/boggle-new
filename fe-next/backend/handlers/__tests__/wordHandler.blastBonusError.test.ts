@@ -104,7 +104,6 @@ vi.mock('../../../backend/modules/botManager', () => ({
   isBot: vi.fn(() => false), stopAllBots: vi.fn(), cleanupGameBots: vi.fn(),
   getGameBots: vi.fn(() => []), getBotByUsername: vi.fn(), addBot: vi.fn(),
   removeBot: vi.fn(), resetBotCombo: vi.fn(), addWordToBlacklist: vi.fn(),
-  resyncBotsForNewGrid: vi.fn(),
 }));
 
 vi.mock('../../../backend/utils/errorHandler', () => ({
@@ -144,7 +143,6 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
   advanceBlastWave: vi.fn(),
   tryBeginWaveAdvance: vi.fn().mockReturnValue(false),
   endWaveAdvance: vi.fn(),
-  resyncBotsForNewGrid: vi.fn(),
   // Per-player board model — must resolve a board before the (throwing)
   // getTilesOnPath, so the thrown error is the intended overlay-corruption one.
   getOrInitPlayerBoard: vi.fn(() => ({

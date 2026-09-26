@@ -26,16 +26,6 @@ export function setBotTimeout(bot: Bot, callback: () => void, delay: number): Re
 }
 
 /**
- * Clear a specific bot timer
- */
-export function clearBotTimeout(bot: Bot, timerId: ReturnType<typeof setTimeout>): void {
-  if (bot.activeTimers.has(timerId)) {
-    clearTimeout(timerId);
-    bot.activeTimers.delete(timerId);
-  }
-}
-
-/**
  * Stop a bot from playing: deactivate it and cancel every pending timer.
  */
 export function stopBot(bot: Bot): void {

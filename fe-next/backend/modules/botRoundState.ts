@@ -12,8 +12,6 @@
 const scoringStart = new Map<string, number>();
 /** Memoized ±10% variance on the relative score target, per (game, bot). */
 const variance = new Map<string, number>();
-/** Last blast word-pool resync per game (throttle). */
-const lastResyncAt = new Map<string, number>();
 /** Anti-grief clear windows per (game, bot) — never keyed by bot name alone. */
 const clearWindows = new Map<string, { count: number; resetAt: number }>();
 
@@ -46,17 +44,6 @@ export function clearBotVariance(gameCode: string): void {
   for (const key of variance.keys()) if (key.startsWith(prefix)) variance.delete(key);
 }
 
-/** True (and records the time) when a resync is due for this game. */
-export function takeBotResyncSlot(gameCode: string, minIntervalMs: number, now: number = Date.now()): boolean {
-  if (now - (lastResyncAt.get(gameCode) ?? 0) < minIntervalMs) return false;
-  lastResyncAt.set(gameCode, now);
-  return true;
-}
-
-export function noteBotResync(gameCode: string, now: number = Date.now()): void {
-  lastResyncAt.set(gameCode, now);
-}
-
 /** The bot's current one-minute anti-grief window (rolled over when expired). */
 export function getBotClearWindow(gameCode: string, botUsername: string, now: number = Date.now()): { count: number; resetAt: number } {
   const key = botKey(gameCode, botUsername);
@@ -71,7 +58,6 @@ export function getBotClearWindow(gameCode: string, botUsername: string, now: nu
 export function clearBotRoundState(gameCode: string): void {
   clearBotScoringStart(gameCode);
   clearBotVariance(gameCode);
-  lastResyncAt.delete(gameCode);
   const prefix = `${gameCode}:`;
   for (const key of clearWindows.keys()) if (key.startsWith(prefix)) clearWindows.delete(key);
 }
