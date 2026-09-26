@@ -66,6 +66,13 @@ describe('WordHuntGameLayout mpChrome', () => {
     expect(clueProps.at(-1)?.compact).toBe(true);
   });
 
+  it('anchors the board low (thumb zone), same as classic — the gap above is the callout stage', () => {
+    render(<WordHuntGameLayout {...baseProps} mpChrome />);
+    const slot = screen.getByTestId('grid-section').parentElement!.parentElement!;
+    expect(slot.className).toContain('items-end');
+    expect(slot.className).not.toContain('items-center');
+  });
+
   it('never splits into its own sidebar row (the round frame owns desktop)', () => {
     const { container } = render(<WordHuntGameLayout {...baseProps} mpChrome />);
     expect((container.firstChild as HTMLElement).className).not.toContain('min-[720px]:flex-row');

@@ -232,7 +232,11 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
              so the bottom row never overflows when clue boxes + life bar + leaderboard
              share the column. No dvh floor — that pushed the last row off-screen. */}
         <div
-          className="flex-1 min-h-0 px-1 relative overflow-hidden flex items-center justify-center"
+          className={cn(
+            'flex-1 min-h-0 px-1 relative overflow-hidden flex justify-center',
+            // MP round frame: board low in the thumb zone; the gap above is the callout stage.
+            mpChrome ? 'items-end pb-9 lg:pb-1' : 'items-center',
+          )}
           style={{ containerType: 'size' }}
         >
           {/* Grid frame: square that fits the container.
