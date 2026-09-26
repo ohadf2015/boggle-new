@@ -62,10 +62,22 @@ describe('PlayerRoster — the 8-seat lobby grid', () => {
     // Given a 12-char name in a ~78px phone column
     render(<PlayerRoster players={[...room, { username: 'LobJoin03xyz' }]} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
     const name = screen.getByText('LobJoin03xyz');
-    // Then it is clamped to two lines and may break anywhere, never single-line truncated
+    // Then it is clamped to two lines, never single-line truncated
     expect(name.className).not.toMatch(/\btruncate\b/);
     expect(name.className).toMatch(/\bline-clamp-2\b/);
-    expect(name.className).toMatch(/overflow-wrap:anywhere/);
+    // And it wraps only at its natural seams (camel humps, letter→digit), balanced —
+    // not at ANY character: overflow-wrap:anywhere orphaned "0p" under "LobJoinTp4s".
+    expect(name.className).not.toMatch(/overflow-wrap:anywhere/);
+    expect(name.className).toMatch(/\btext-balance\b/);
+    expect(name.querySelectorAll('wbr')).toHaveLength(2);
+  });
+
+  it('a spaced (e.g. Hebrew) name wraps on whole words — no forced break inside a word', () => {
+    render(<PlayerRoster players={[...room, { username: 'אוהד פישר' }]} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
+    const name = screen.getByText('אוהד פישר');
+    expect(name.querySelectorAll('wbr')).toHaveLength(0);
+    expect(name.className).not.toMatch(/overflow-wrap:anywhere/);
+    expect(name).toHaveAttribute('dir', 'auto');
   });
 
   it('my editable name uses the whole column: no inline pencil icon stealing width', () => {

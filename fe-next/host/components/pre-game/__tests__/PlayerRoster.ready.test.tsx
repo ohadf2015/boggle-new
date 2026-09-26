@@ -60,4 +60,19 @@ describe('PlayerRoster — ready indicators', () => {
     render(<PlayerRoster players={players} username="Host" gameCode="ABCD" maxPlayers={8} t={t} readyUsernames={[]} />);
     expect(screen.queryByTestId('roster-ready-badge')).not.toBeInTheDocument();
   });
+
+  it('TV projector: the N/M Ready chip is couch-readable, not the 11px phone chip', () => {
+    // Given the TV lobby roster (1920 projector)
+    render(<PlayerRoster players={players} username="Host" gameCode="ABCD" maxPlayers={8} t={t} readyUsernames={[]} variant="tv" />);
+    const chip = screen.getByTestId('roster-ready-count');
+    // Then it drops the phone's 11px size for the TV clamp and bigger padding
+    expect(chip.className).not.toMatch(/text-\[11px\]/);
+    expect(chip.className).toMatch(/text-\[clamp\(/);
+    expect(chip.className).toMatch(/\bpx-3\b/);
+  });
+
+  it('phone/desktop keep the compact ready chip', () => {
+    render(<PlayerRoster players={players} username="Host" gameCode="ABCD" maxPlayers={8} t={t} readyUsernames={[]} />);
+    expect(screen.getByTestId('roster-ready-count').className).toMatch(/text-\[11px\]/);
+  });
 });

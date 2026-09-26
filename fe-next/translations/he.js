@@ -3904,7 +3904,7 @@ const he = {
     "waitingForPlayers": "...ממתינים לשחקנים",
     "seconds": "שניות",
     "switchToPlayer": "מעבר למצב שחקן",
-    "viewOnlyBadge": "מצב TV · צפייה בלבד",
+    "viewOnlyBadge": "מצב TV · המארח צופה",
     "tryPracticeRound": "ניסיון סיבוב תרגול (בוטים)",
     "practiceRoundFailed": "לא הצלחנו להוסיף שחקני תרגול. בדקו את החיבור ונסו שוב."
   },

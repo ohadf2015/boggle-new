@@ -3473,7 +3473,7 @@ const en = {
     "waitingForPlayers": "Waiting for Players...",
     "seconds": "seconds",
     "switchToPlayer": "Switch to Player Mode",
-    "viewOnlyBadge": "TV Mode · View Only",
+    "viewOnlyBadge": "TV Mode · Host watches",
     "tryPracticeRound": "Try a Practice Round (Bots)",
     "practiceRoundFailed": "Could not add practice players. Check your connection and try again."
   },

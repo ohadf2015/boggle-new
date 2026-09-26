@@ -3920,7 +3920,7 @@ const es = {
     "waitingForPlayers": "Esperando jugadores...",
     "seconds": "segundos",
     "switchToPlayer": "Cambiar a modo jugador",
-    "viewOnlyBadge": "Modo TV · Solo visualización",
+    "viewOnlyBadge": "Modo TV · El anfitrión mira",
     "tryPracticeRound": "Probar una ronda de práctica (Bots)",
     "practiceRoundFailed": "No se pudieron añadir jugadores de práctica. Revisa tu conexión e inténtalo de nuevo."
   },

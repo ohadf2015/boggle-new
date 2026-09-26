@@ -3861,7 +3861,7 @@ const ja = {
     "waitingForPlayers": "プレイヤーを待っています...",
     "seconds": "秒",
     "switchToPlayer": "プレイヤーモードに切替",
-    "viewOnlyBadge": "TVモード · 閲覧のみ",
+    "viewOnlyBadge": "TVモード · ホストは観戦",
     "tryPracticeRound": "練習ラウンドを試す (ボット)",
     "practiceRoundFailed": "練習用プレイヤーを追加できませんでした。接続を確認してもう一度お試しください。"
   },

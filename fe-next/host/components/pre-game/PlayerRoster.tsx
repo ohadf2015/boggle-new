@@ -8,6 +8,7 @@ import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { cn } from '../../../lib/utils';
 import { ConfirmationDialog } from '../../../components/ui/ConfirmationDialog';
 import { MAX_BOTS_PER_ROOM } from '@/shared/constants/gameConstants';
+import { SeatNameText } from '@/components/multiplayer/lobby/SeatName';
 import { lobbySeats, readyTally, LOBBY_SEATS, type LobbyPlayerInput, type LobbySeat } from '@/components/multiplayer/lobby/lobbySeats';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
 
@@ -56,11 +57,13 @@ const AVATAR_PX = { host: 128, guest: 128, tv: 160 } as const;
 const seatBox = { width: 'var(--seat)', height: 'var(--seat)' } as const;
 
 /**
- * Seat names wrap to two centred lines and may break mid-word (usernames have
- * no spaces), so a 12-20 char name stays readable in a ~78px phone column
- * instead of collapsing to "LobHo…".
+ * Seat names wrap to two centred, balanced lines so a 12-20 char name stays
+ * readable in a ~78px phone column instead of collapsing to "LobHo…". They wrap
+ * at whole words and at a username's natural seams (<SeatNameText>: camel humps,
+ * letter→digit, `_-.`) — never at any character, which orphaned "0p" under
+ * "LobJoinTp4s". break-word is only the fallback for a seamless over-long token.
  */
-const SEAT_NAME = 'max-w-full min-w-0 text-center line-clamp-2 [overflow-wrap:anywhere]';
+const SEAT_NAME = 'max-w-full min-w-0 text-center line-clamp-2 text-balance [overflow-wrap:break-word]';
 
 /**
  * The lobby seat grid: 8 chairs, 4×2, for host, joiner and TV alike — every
@@ -246,7 +249,7 @@ export const PlayerRoster = memo(function PlayerRoster({
               variant === 'tv' ? 'text-[clamp(16px,2.2vh,24px)]' : 'text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))]',
             )}
           >
-            <span dir="auto" className={cn(SEAT_NAME, 'underline decoration-dashed decoration-neo-lime/60 underline-offset-[3px]')}>{seat.name}</span>
+            <span dir="auto" className={cn(SEAT_NAME, 'underline decoration-dashed decoration-neo-lime/60 underline-offset-[3px]')}><SeatNameText name={seat.name} /></span>
           </button>
         ) : (
           <span
@@ -257,7 +260,7 @@ export const PlayerRoster = memo(function PlayerRoster({
               isMe ? 'text-neo-lime' : 'text-neo-white',
             )}
           >
-            {seat.name}
+            <SeatNameText name={seat.name} />
           </span>
         )}
       </div>
@@ -318,11 +321,13 @@ export const PlayerRoster = memo(function PlayerRoster({
             <span
               data-testid="roster-ready-count"
               className={cn(
-                'inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-2 py-0.5 text-[11px] leading-none shadow-hard-sm normal-case tracking-normal',
+                'inline-flex items-center gap-1 rounded-full border-2 border-neo-black leading-none shadow-hard-sm normal-case tracking-normal',
+                // The TV chip is read from the couch: projector clamp, not the phone's 11px.
+                variant === 'tv' ? 'px-3 py-1.5 gap-2 text-[clamp(16px,2.2vh,24px)]' : 'px-2 py-0.5 text-[11px]',
                 tally.allReady ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-white',
               )}
             >
-              <Check aria-hidden="true" className="w-3 h-3 stroke-[3]" />
+              <Check aria-hidden="true" className={cn('stroke-[3]', variant === 'tv' ? 'w-5 h-5' : 'w-3 h-3')} />
               {tally.ready}/{tally.total} {t('hostView.playersReady')}
             </span>
           )}

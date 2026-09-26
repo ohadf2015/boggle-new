@@ -4146,7 +4146,7 @@ const sv = {
     "waitingForPlayers": "Väntar på spelare...",
     "seconds": "sekunder",
     "switchToPlayer": "Byt till spelarläge",
-    "viewOnlyBadge": "TV-läge · Endast visning",
+    "viewOnlyBadge": "TV-läge · Värden tittar",
     "tryPracticeRound": "Testa en träningsrunda (Bots)",
     "practiceRoundFailed": "Kunde inte lägga till träningsspelare. Kontrollera anslutningen och försök igen."
   },
