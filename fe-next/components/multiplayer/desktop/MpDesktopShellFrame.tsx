@@ -1,10 +1,10 @@
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import type { Socket } from 'socket.io-client';
 import { StandardDesktopAdapter } from './StandardDesktopAdapter';
 import { BlastDesktopAdapter } from './BlastDesktopAdapter';
 import { WordHuntDesktopAdapter } from './WordHuntDesktopAdapter';
 import { WheelRushDesktopAdapter } from './WheelRushDesktopAdapter';
-import type { RosterPlayer } from './RosterRail';
+import { toRosterPlayers, type MpRosterUserLike } from '@/lib/multiplayer/roster';
 import type { LadderWord } from './WordsLadder';
 import type { BlastGoal } from './insights/GoalBanner';
 
@@ -28,25 +28,8 @@ interface FoundWordLike {
   timestamp?: number;
 }
 
-/**
- * Maps the live server leaderboard to the desktop shell's RosterPlayer shape.
- * The live MP path keys players by username, so userId === username and the
- * current player is flagged via meId.
- */
-export function toRosterPlayers(
-  leaderboard: LeaderboardEntryLike[] | undefined,
-  meId?: string,
-): RosterPlayer[] {
-  if (!leaderboard) return [];
-  return leaderboard.map((p) => ({
-    userId: p.username,
-    username: p.username,
-    score: p.score,
-    wordCount: p.wordCount,
-    status: 'connected' as const,
-    isYou: p.username === meId,
-  }));
-}
+// Moved to lib/multiplayer/roster (the single roster source); re-exported for existing importers.
+export { toRosterPlayers };
 
 /**
  * Maps the local player's found words to the shell's WordsLadder shape.
@@ -70,6 +53,12 @@ export interface MpDesktopShellFrameProps {
   /** The mode's game component, rendered into the shell's center slot unchanged. */
   canvas: ReactNode;
   leaderboard: LeaderboardEntryLike[] | undefined;
+  /**
+   * The room's seat list (`updateUsers`). Merged into the roster so seated
+   * players who have not scored yet still show — the joiner's rail read
+   * "PLAYERS 0" in a full room without it.
+   */
+  users?: MpRosterUserLike[];
   foundWords: FoundWordLike[] | undefined;
   socket?: Socket | null;
   meId?: string;
@@ -98,8 +87,11 @@ export interface MpDesktopShellFrameProps {
  * without an adapter (callers should only mount this for `isShellMode`).
  */
 export function MpDesktopShellFrame(props: MpDesktopShellFrameProps) {
-  const roster = toRosterPlayers(props.leaderboard, props.meId);
-  const ladder = toLadderWords(props.foundWords, props.meId);
+  const { leaderboard, users, foundWords, meId } = props;
+  // Stable identities across timer ticks (perf rule 4): the adapters' memoized
+  // rails compare these by reference.
+  const roster = useMemo(() => toRosterPlayers(leaderboard, meId, users), [leaderboard, meId, users]);
+  const ladder = useMemo(() => toLadderWords(foundWords, meId), [foundWords, meId]);
   const common = {
     roomId: props.roomId,
     leaderboard: roster,

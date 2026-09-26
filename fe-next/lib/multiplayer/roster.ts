@@ -131,3 +131,42 @@ export function rankOf(roster: readonly MpRosterPlayer[], meId: string): { rank:
 export function rosterSeedFromJoined<T extends MpRosterUserLike>(data: { users?: T[] }): T[] | null {
   return Array.isArray(data.users) ? data.users : null;
 }
+
+/** The desktop rail's row shape (mirrors `RosterPlayerInput` in desktop/leaderboardView). */
+export interface MpRailPlayer {
+  userId: string;
+  username: string;
+  score: number;
+  wordCount?: number;
+  status: 'connected' | 'disconnected';
+  isYou: boolean;
+}
+
+/**
+ * Live leaderboard → desktop rail rows (moved from MpDesktopShellFrame). Keeps
+ * the leaderboard's order and fields; seated players it has not scored yet are
+ * appended with 0 so the joiner's rail can never read "PLAYERS 0" in a full
+ * room. The live MP path keys players by username, so userId === username.
+ */
+export function toRosterPlayers(
+  leaderboard: ReadonlyArray<{ username: string; score: number; wordCount?: number }> | undefined,
+  meId?: string,
+  users?: readonly MpRosterUserLike[],
+): MpRailPlayer[] {
+  const rows: MpRailPlayer[] = (leaderboard ?? []).map((p) => ({
+    userId: p.username,
+    username: p.username,
+    score: p.score,
+    wordCount: p.wordCount,
+    status: 'connected' as const,
+    isYou: p.username === meId,
+  }));
+  if (!users?.length) return rows;
+  const seen = new Set(rows.map((r) => r.userId));
+  for (const u of users) {
+    if (!u?.username || seen.has(u.username)) continue;
+    seen.add(u.username);
+    rows.push({ userId: u.username, username: u.username, score: 0, status: 'connected', isYou: u.username === meId });
+  }
+  return rows;
+}

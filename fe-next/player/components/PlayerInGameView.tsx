@@ -43,6 +43,7 @@ import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/mu
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { MpDesktopShellFrame, isShellMode } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
+import type { MpRosterUserLike } from '@/lib/multiplayer/roster';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
@@ -129,6 +130,11 @@ interface PlayerInGameViewProps {
   // Player data
   foundWords: FoundWord[];
   leaderboard: LeaderboardEntry[];
+  /**
+   * The room's seat list (updateUsers). Merged into the desktop roster so the
+   * joiner never reads "PLAYERS 0" before the first leaderboard update.
+   */
+  rosterUsers?: MpRosterUserLike[];
   totalBoardWords?: number | null;
 
   // Tournament
@@ -194,6 +200,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Player data
   foundWords,
   leaderboard,
+  rosterUsers,
   totalBoardWords,
 
   // Tournament
@@ -351,6 +358,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             gameMode={gameMode}
             canvas={wheelCanvas}
             leaderboard={leaderboard}
+            users={rosterUsers}
             foundWords={foundWords}
             socket={socket}
             meId={username}
@@ -506,6 +514,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           gameMode={gameMode}
           canvas={gameCanvas}
           leaderboard={leaderboard}
+          users={rosterUsers}
           foundWords={foundWords}
           socket={socket}
           meId={username}

@@ -800,7 +800,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         comboLevelRef={comboLevelRef}
         lastWordTime={lastWordTime}
         foundWords={mappedFoundWords}
-        leaderboard={leaderboard}
+        leaderboard={leaderboard} rosterUsers={playersReady}
         totalBoardWords={totalBoardWords}
         tournamentData={tournamentData}
         tournamentStandings={tournamentStandings}

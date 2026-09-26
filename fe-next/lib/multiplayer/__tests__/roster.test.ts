@@ -94,3 +94,28 @@ describe('rosterSeedFromJoined — the lobby is seeded by the joined payload', (
     expect(rosterSeedFromJoined({ users: [] })).toEqual([]);
   });
 });
+
+describe('toRosterPlayers — desktop rail shape, now merged with the seat list', () => {
+  it('keeps the leaderboard order and fields when no seat list is given (back-compat)', async () => {
+    const { toRosterPlayers } = await import('../roster');
+    const out = toRosterPlayers([{ username: 'me', score: 10, wordCount: 3 }, { username: 'b', score: 8 }], 'me');
+    expect(out).toEqual([
+      { userId: 'me', username: 'me', score: 10, wordCount: 3, status: 'connected', isYou: true },
+      { userId: 'b', username: 'b', score: 8, wordCount: undefined, status: 'connected', isYou: false },
+    ]);
+  });
+
+  it('adds seated players the leaderboard has not scored yet (joiner "PLAYERS 0")', async () => {
+    const { toRosterPlayers } = await import('../roster');
+    const out = toRosterPlayers([], 'me', [{ username: 'host', isHost: true }, { username: 'me' }]);
+    expect(out.map((p) => p.userId)).toEqual(['host', 'me']);
+    expect(out.every((p) => p.score === 0 && p.status === 'connected')).toBe(true);
+    expect(out.find((p) => p.userId === 'me')?.isYou).toBe(true);
+  });
+
+  it('does not duplicate a player present in both lists', async () => {
+    const { toRosterPlayers } = await import('../roster');
+    const out = toRosterPlayers([{ username: 'me', score: 4 }], 'me', [{ username: 'me' }, { username: 'x' }]);
+    expect(out.map((p) => p.userId)).toEqual(['me', 'x']);
+  });
+});
