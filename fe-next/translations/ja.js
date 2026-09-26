@@ -18428,6 +18428,9 @@ const ja = {
       "language": "言語: {{language}}",
       "chooseLanguage": "言語を選択",
       "howToPlay": "遊び方",
+      "codeTicket": "ルームコード",
+      "reconnectElapsed": "{{seconds}}秒",
+      "hostLeftIn": "{{seconds}}秒後にアリーナへ戻ります",
       "editName": "名前を変更"
     },
     "lobby": {},

@@ -18358,6 +18358,9 @@ const he = {
       "language": "שפה: {{language}}",
       "chooseLanguage": "בחירת שפה",
       "howToPlay": "איך משחקים",
+      "codeTicket": "קוד חדר",
+      "reconnectElapsed": "{{seconds}} שנ׳",
+      "hostLeftIn": "חוזרים לזירות בעוד {{seconds}} שנ׳",
       "editName": "שינוי שם"
     },
     "lobby": {},

@@ -1,48 +1,43 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { DoorOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HostLeftGraceModalProps {
-  /** When true the modal is shown and the countdown begins. */
+  /** When true the banner is shown and the countdown begins. */
   isOpen: boolean;
-  /** Called when the countdown reaches zero OR the user clicks the manual exit button. Fires at most once per open cycle. */
+  /** Called when the countdown reaches zero OR the user taps the exit button. Fires at most once per open cycle. */
   onExit: () => void;
   /** Countdown duration. Defaults to 10s — long enough to read what happened, short enough to not feel stuck. */
   seconds?: number;
   /**
    * Discriminator from server-side `hostLeftRoomClosing` payload (audit 2026-05-10).
-   * When provided, the modal body uses the reason-specific i18n key so players see
+   * When provided, the body uses the reason-specific i18n key so players see
    * "Host didn't return in time" vs "Host moved to a different room" vs the
    * generic fallback. Without it, falls through to the generic body.
    */
   reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
 }
 
-/**
- * HostLeftGraceModal — soft cushion between server-side `hostLeftRoomClosing`
- * and the player landing back on the lobby. Replaces the prior 4s "Room
- * closed" toast which gave players no time to read or to choose timing.
- * See multiplayer-ux-2026-05-04 #2.
- */
 const REASON_TO_KEY: Record<NonNullable<HostLeftGraceModalProps['reason']>, string> = {
   explicit_no_successor: 'multiplayerFlow.hostLeftReason.explicitNoSuccessor',
   grace_expired: 'multiplayerFlow.hostLeftReason.graceExpired',
   host_switched_room: 'multiplayerFlow.hostLeftReason.hostSwitchedRoom',
 };
 
-export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({
-  isOpen,
-  onExit,
-  seconds = 10,
-  reason,
-}) => {
+/**
+ * HostLeftGraceModal — the soft cushion between server-side `hostLeftRoomClosing`
+ * and the player landing back on the arenas (multiplayer-ux-2026-05-04 #2).
+ *
+ * MP rebuild (DESIGN §b.8): an in-shell BANNER docked over the top of the
+ * current screen, not a page modal — the room stays visible, nothing is
+ * focus-trapped, no scrim. Name and props are kept: the frozen PageClient
+ * lazy-loads it as `HostLeftGraceModal` and owns the exit (in-place reset,
+ * classroom hub). The server only emits the room-CLOSING case today; there is
+ * no "you're the host now" event wired, so this banner has one variant.
+ */
+export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({ isOpen, onExit, seconds = 10, reason }) => {
   const { t, dir } = useLanguage();
   const [remaining, setRemaining] = useState<number>(seconds);
   const firedRef = useRef<boolean>(false);
@@ -82,45 +77,43 @@ export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({
     onExitRef.current();
   };
 
+  if (!isOpen) return null;
+
+  const body = reason && REASON_TO_KEY[reason] ? t(REASON_TO_KEY[reason]) : t('multiplayerFlow.hostLeftModal.body');
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleExitNow()}>
-      <DialogContent
-        noDescription
-        dir={dir}
-        className="max-w-[380px] p-0 gap-0 border-4 border-neo-black bg-neo-navy"
-      >
-        <DialogHeader className="px-5 pt-5">
-          <DialogTitle className="text-lg font-black uppercase tracking-tight text-neo-pink">
-            {t('multiplayerFlow.hostLeftModal.title')}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="px-5 py-4 space-y-3">
-          <p className="text-sm text-neo-white">
-            {reason && REASON_TO_KEY[reason]
-              ? t(REASON_TO_KEY[reason])
-              : t('multiplayerFlow.hostLeftModal.body')}
+    <div
+      data-testid="host-left-banner"
+      dir={dir}
+      className="fixed inset-x-0 top-0 z-[70] px-2 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] pointer-events-none"
+    >
+      <div className="pointer-events-auto mx-auto flex w-full max-w-[calc(640px*var(--mp-u,1))] items-center gap-3 rounded-neo border-3 border-neo-black bg-neo-pink px-3 py-2.5 text-neo-black shadow-hard animate-mp-drop">
+        <span
+          data-testid="host-left-countdown"
+          role="status"
+          aria-live="polite"
+          className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-3 border-neo-black bg-neo-navy font-neo-display text-xl font-bold tabular-nums text-neo-lime"
+        >
+          <span key={remaining} className="animate-mp-punch">{remaining}</span>
+        </span>
+        <div role="alert" className="min-w-0 flex-1">
+          <p className="flex items-center gap-1.5 font-neo-display text-base font-bold uppercase leading-tight tracking-tight">
+            <DoorOpen aria-hidden="true" className="h-4 w-4 shrink-0" />
+            <span className="truncate">{t('multiplayerFlow.hostLeftModal.title')}</span>
           </p>
-          <p
-            data-testid="host-left-countdown"
-            role="status"
-            aria-live="polite"
-            className="text-3xl font-black tabular-nums text-neo-lime font-neo-display"
-          >
-            {remaining}
-          </p>
+          <p className="text-xs font-bold leading-snug line-clamp-2">{body}</p>
+          <p className="text-[11px] font-neo-body opacity-80">{t('mpUi.entry.hostLeftIn', { seconds: remaining })}</p>
         </div>
-        <div className="px-5 pb-5">
-          <button
-            data-testid="host-left-exit-now"
-            type="button"
-            onClick={handleExitNow}
-            className="w-full py-3 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-neo-display font-bold text-base uppercase tracking-wide shadow-hard-lg active:shadow-hard-pressed active:translate-x-px active:translate-y-px transition-all"
-          >
-            {t('multiplayerFlow.hostLeftModal.exitNow')}
-          </button>
-        </div>
-      </DialogContent>
-    </Dialog>
+        <button
+          data-testid="host-left-exit-now"
+          type="button"
+          onClick={handleExitNow}
+          className="shrink-0 min-h-11 rounded-neo border-3 border-neo-black bg-neo-lime px-3 font-neo-display text-sm font-bold uppercase tracking-wide text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        >
+          {t('multiplayerFlow.hostLeftModal.exitNow')}
+        </button>
+      </div>
+    </div>
   );
 };
 

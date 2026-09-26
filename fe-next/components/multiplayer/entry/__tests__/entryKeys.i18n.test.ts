@@ -9,8 +9,13 @@ import { join } from 'node:path';
 import { BUNDLES, LOCALES, resolveKey } from './localeBundles';
 
 const ROOT = join(__dirname, '..', '..', '..', '..');
-// ENTRY's files (DESIGN §f). The connection overlays are FOUNDATION's.
+// ENTRY's files (DESIGN §f), plus FOUNDATION's leftovers the lead amendment
+// hands to ENTRY: the connection overlays, whose strings live in mpUi.entry.
 const OWNED = [
+  'components/multiplayer/ReconnectingOverlay.tsx',
+  'components/multiplayer/HostLeftGraceModal.tsx',
+  'components/multiplayer/MPGameAbortedModal.tsx',
+  'components/multiplayer/ConnectionQualityChip.tsx',
   'components/multiplayer/entry',
   'components/multiplayer/MultiplayerFlow.tsx',
   'components/multiplayer/useMultiplayerFlowState.ts',

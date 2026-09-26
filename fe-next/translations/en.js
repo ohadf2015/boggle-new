@@ -17506,6 +17506,9 @@ const en = {
       "language": "Language: {{language}}",
       "chooseLanguage": "Choose language",
       "howToPlay": "How to play",
+      "codeTicket": "Room code",
+      "reconnectElapsed": "{{seconds}}s",
+      "hostLeftIn": "Back to arenas in {{seconds}}s",
       "editName": "Change name"
     },
     "lobby": {},

@@ -18446,6 +18446,9 @@ const es = {
       "language": "Idioma: {{language}}",
       "chooseLanguage": "Elige idioma",
       "howToPlay": "Cómo se juega",
+      "codeTicket": "Código de sala",
+      "reconnectElapsed": "{{seconds}} s",
+      "hostLeftIn": "Volviendo a las arenas en {{seconds}} s",
       "editName": "Cambiar nombre"
     },
     "lobby": {},

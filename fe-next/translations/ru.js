@@ -18161,6 +18161,9 @@ const ru = {
       "language": "Язык: {{language}}",
       "chooseLanguage": "Выберите язык",
       "howToPlay": "Как играть",
+      "codeTicket": "Код комнаты",
+      "reconnectElapsed": "{{seconds}} с",
+      "hostLeftIn": "Возврат к аренам через {{seconds}} с",
       "editName": "Сменить имя"
     },
     "lobby": {},

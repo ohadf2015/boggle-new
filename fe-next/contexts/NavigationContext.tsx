@@ -1,6 +1,8 @@
 'use client';
 
 import { createContext, useContext, useState, useMemo, useEffect, useCallback, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
+import { recordInAppPath } from '@/lib/navigation/previousInAppPath';
 
 /**
  * Navigation Context
@@ -36,6 +38,16 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const [isInGame, setIsInGame] = useState(false);
   const [activeTab, setActiveTab] = useState<'home' | 'brain' | 'profile'>('home');
   const [headerAudioControlCount, setHeaderAudioControlCount] = useState(0);
+
+  // In-app route history for "back to where I came from" exits (the MP entry's
+  // home button): `document.referrer` never updates on client-side navigation.
+  // Read window.location so the route's query string is kept (usePathname
+  // drops it).
+  const pathname = usePathname();
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    recordInAppPath(`${window.location.pathname}${window.location.search}`);
+  }, [pathname]);
 
   const registerHeaderAudioControl = useCallback(() => {
     setHeaderAudioControlCount(c => c + 1);
