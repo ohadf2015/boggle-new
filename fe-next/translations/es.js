@@ -18430,6 +18430,7 @@ const es = {
       "allArenas": "Todas las arenas abiertas",
       "emptyTitle": "No hay arenas abiertas",
       "emptyLine": "Inicio rápido llena los asientos con bots",
+      "moreSoon": "Nuevas arenas aparecen en vivo",
       "hostedBy": "Anfitrión: {{name}}",
       "full": "Llena",
       "live": "En juego",

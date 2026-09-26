@@ -150,6 +150,23 @@ describe('ArenaList', () => {
     expect(screen.getByTestId('arena-online').textContent).toContain('"count":6');
   });
 
+  it('a short list ends in a live tail — a mascot line that fills the column, no buttons', () => {
+    render(<ArenaList {...base} rooms={rooms(1)} />);
+    const tail = screen.getByTestId('arena-list-tail');
+    expect(tail.textContent).toContain('mpUi.entry.moreSoon');
+    expect(within(tail).queryByRole('button')).toBeNull();
+    expect(tail.className).not.toMatch(/(^|\s)hidden(\s|$)/);
+  });
+
+  it('the tail steps aside on phone once the phone rows are full, and entirely once desktop is', () => {
+    const { unmount } = render(<ArenaList {...base} rooms={rooms(PHONE_ROW_CAP)} />);
+    expect(screen.getByTestId('arena-list-tail').className).toMatch(/(^|\s)hidden(\s|$)/);
+    expect(screen.getByTestId('arena-list-tail').className).toContain('lg:flex');
+    unmount();
+    render(<ArenaList {...base} rooms={rooms(DESKTOP_ROW_CAP)} />);
+    expect(screen.queryByTestId('arena-list-tail')).toBeNull();
+  });
+
   it('empty: one mascot line, no buttons competing with the footer', () => {
     render(<ArenaList {...base} rooms={[]} />);
     const empty = screen.getByTestId('arena-empty-state');

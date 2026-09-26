@@ -17490,6 +17490,7 @@ const en = {
       "allArenas": "All open arenas",
       "emptyTitle": "No open arenas",
       "emptyLine": "Quick Start fills the seats with bots",
+      "moreSoon": "New arenas pop in live",
       "hostedBy": "Host: {{name}}",
       "full": "Full",
       "live": "Live",

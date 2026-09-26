@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import { LayoutList, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ArenaEmptyState from '@/components/multiplayer/ArenaEmptyState';
@@ -8,6 +9,7 @@ import { trackMpRoomJoinBlocked, trackMpRoomJoinClicked } from '@/utils/posthogE
 import { cn } from '@/lib/utils';
 import { ArenaRow, isRoomFull, isRoomLive, type ArenaRoom } from './ArenaRow';
 import { EntrySheet } from './EntrySheet';
+import './arenaList.css';
 
 /** Rows shown before "+N more": phone / desktop+TV. CSS breakpoints decide, never JS (pitfall class 1). */
 export const PHONE_ROW_CAP = 4;
@@ -61,6 +63,10 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
 
   const phoneMore = sorted.length - PHONE_ROW_CAP;
   const desktopMore = sorted.length - DESKTOP_ROW_CAP;
+  // A short list ends in a live tail line that fills the column (never a dead
+  // band under two rows). It steps aside once the rows fill the breakpoint's cap,
+  // and hides itself when too little height is left (arenaList.css).
+  const showTail = desktopMore < 0;
   const moreChip =
     'inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs tv:text-lg font-bold uppercase text-neo-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime';
 
@@ -129,6 +135,26 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
               </li>
             ))}
           </ul>
+          {showTail && (
+            <div
+              data-testid="arena-list-tail"
+              className={cn('mp-arena-tail min-h-0 flex-1', phoneMore >= 0 ? 'hidden lg:flex' : 'flex')}
+            >
+              <div className="mp-arena-tail-inner flex w-full flex-col items-center justify-center gap-2 rounded-neo-lg border-3 border-dashed border-neo-white/15 px-4 text-center">
+                <Image
+                  src="/mascot/waiting.webp"
+                  alt=""
+                  aria-hidden="true"
+                  width={176}
+                  height={176}
+                  className="mp-arena-tail-img h-[clamp(64px,34cqh,176px)] w-auto object-contain motion-safe:animate-mp-bump"
+                />
+                <p className="font-neo-display text-sm lg:text-base tv:text-2xl font-bold text-neo-white/75">
+                  {t('mpUi.entry.moreSoon')}
+                </p>
+              </div>
+            </div>
+          )}
           {(phoneMore > 0 || desktopMore > 0) && (
             <div className="flex justify-center">
               {phoneMore > 0 && (

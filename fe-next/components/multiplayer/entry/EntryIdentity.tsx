@@ -22,8 +22,10 @@ const AVATAR_PX = 160;
  * emits desktop-tall utilities after tv ones, so a bare `tv:` value for a
  * property desktop-tall also sets never applies (tvVariantOrder.test.ts).
  */
+// On a tall desktop / TV the card takes the column's spare height (content
+// centred), so the left column runs top-to-bottom like the arenas beside it.
 const CARD =
-  'relative flex items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard desktop-tall:flex-col desktop-tall:gap-3 desktop-tall:px-6 desktop-tall:py-6 desktop-tall:text-center desktop-tall:tv:py-10';
+  'relative flex items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard desktop-tall:flex-1 desktop-tall:flex-col desktop-tall:justify-center desktop-tall:gap-3 desktop-tall:px-6 desktop-tall:py-6 desktop-tall:text-center desktop-tall:tv:py-10';
 const AVATAR_SLOT = 'relative shrink-0';
 const AVATAR_BOX =
   'block h-16 w-16 desktop-tall:h-28 desktop-tall:w-28 desktop-tall:tv:h-40 desktop-tall:tv:w-40 overflow-hidden rounded-full border-3 border-neo-black';

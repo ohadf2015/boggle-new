@@ -18412,6 +18412,7 @@ const ja = {
       "allArenas": "参加できるアリーナ一覧",
       "emptyTitle": "参加できるアリーナはありません",
       "emptyLine": "クイックスタートならボットが席を埋めます",
+      "moreSoon": "新しいアリーナがリアルタイムで登場",
       "hostedBy": "ホスト: {{name}}",
       "full": "満員",
       "live": "対戦中",

@@ -18412,6 +18412,7 @@ const sv = {
       "allArenas": "Alla öppna arenor",
       "emptyTitle": "Inga öppna arenor",
       "emptyLine": "Snabbstart fyller platserna med botar",
+      "moreSoon": "Nya arenor dyker upp live",
       "hostedBy": "Värd: {{name}}",
       "full": "Fullt",
       "live": "Live",
