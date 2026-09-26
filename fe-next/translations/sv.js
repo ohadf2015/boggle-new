@@ -18407,7 +18407,11 @@ const sv = {
       "howToPlay": "Så spelar du",
       "scanToJoin": "Skanna för att gå med",
       "orEnterCode": "eller ange koden",
-      "tvJoinHeadline": "Ta fram mobilen och häng med!"
+      "tvJoinHeadline": "Ta fram mobilen och häng med!",
+      "letters": "bokstäver",
+      "editSettings": "Ändra rundans inställningar",
+      "chatHint": "Säg hej till gänget",
+      "chatUnread": "{count} nya"
     },
     "round": {},
     "results": {}

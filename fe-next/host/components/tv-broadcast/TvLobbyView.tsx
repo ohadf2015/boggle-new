@@ -2,9 +2,8 @@
 
 import React, { memo, useState, useEffect, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Timer, Zap, Monitor } from 'lucide-react';
+import { Zap, Monitor } from 'lucide-react';
 import TvJoinBar from './TvJoinBar';
-import { formatTimeMMSS } from '@/shared/utils/timeFormatting';
 import { PlayerRoster } from '../pre-game/PlayerRoster';
 import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
@@ -20,6 +19,7 @@ import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } 
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { LobbyDevChromeGuard } from '@/components/multiplayer/lobby/LobbyDevChromeGuard';
+import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
 
 /** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
 const SOLO_DEMO_FILL_TIMEOUT_MS = 8000;
@@ -78,13 +78,6 @@ interface TvLobbyViewProps {
     allowLateJoin: boolean;
   } | null;
 }
-
-/** Board size + label per difficulty (mirrors the host's settings sheet). */
-const DIFFICULTY_INFO: Record<string, { board: string; labelKey: string }> = {
-  EASY: { board: '5×5', labelKey: 'hostView.presetEasy' },
-  MEDIUM: { board: '6×6', labelKey: 'hostView.presetParty' },
-  HARD: { board: '7×7', labelKey: 'hostView.presetChallenge' },
-};
 
 /** Start-button copy for a classroom room, by the mode the teacher already chose. */
 function classroomStartLabelKey(mode: ClassroomGameMode | undefined): string {
@@ -244,8 +237,6 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     );
   }
 
-  const timerText = Number.isInteger(timerValue) ? String(timerValue) : formatTimeMMSS(timerValue * 60);
-  const difficultyInfo = DIFFICULTY_INFO[difficulty] ?? DIFFICULTY_INFO.MEDIUM;
   // Same address the join bar encodes, so both QRs land in the same place.
   const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/${roomLanguage}/join/${gameCode}` : '';
 
@@ -321,20 +312,8 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             </span>
           </div>
 
-          <div
-            data-testid="tv-lobby-settings"
-            className="shrink-0 flex items-center justify-center gap-6 rounded-neo border-3 border-neo-black bg-neo-navy-light px-4 py-3 shadow-hard-sm text-xl tv:text-2xl"
-          >
-            <span className="inline-flex items-center gap-2">
-              <Timer aria-hidden="true" className="w-6 h-6 text-neo-cyan" />
-              <span className="font-neo-display font-bold">{timerText}</span>
-              {Number.isInteger(timerValue) && <span className="text-neo-white/70 text-lg">{t('hostView.min')}</span>}
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <Zap aria-hidden="true" className="w-6 h-6 text-neo-lime" />
-              <span className="font-neo-display font-bold">{difficultyInfo.board}</span>
-              <span className="text-neo-white/70 text-lg">{t(difficultyInfo.labelKey)}</span>
-            </span>
+          <div data-testid="tv-lobby-settings" className="shrink-0">
+            <LobbySettingsSummary timerValue={timerValue} difficulty={difficulty} t={t} className="text-xl tv:text-2xl py-3 bg-neo-navy-light" />
           </div>
 
           {autoStartSecondsLeft !== null && (

@@ -6,7 +6,8 @@
  *   header  [exit] [room code → copy + invite sheet] … [chat] [sound] [gear]
  *   body    status lane · 8-seat grid · mode picker (+ "How to play")
  *   footer  [INVITE] [START BATTLE · n/8 | vs bots]
- * Desktop (≥720px) keeps the 7/5 grid: seats + mode left, invite + chat right.
+ * Desktop (≥720px) keeps the 7/5 grid: seats + mode left; invite, settings
+ * summary and a chat launcher right (chat itself only ever opens in a sheet).
  * All timers / bot rescue / start guards live in `useHostLobby`.
  */
 import React, { useState } from 'react';
@@ -30,8 +31,9 @@ import { HostStatusLane } from '@/components/multiplayer/lobby/HostStatusLane';
 import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
 import { lobbySeats, startSublabel } from '@/components/multiplayer/lobby/lobbySeats';
 import {
-  LobbyExitButton, LobbyChatButton, LobbyCountPill, LobbyChatPanel, InviteSheet, HowToPlaySheet, ChatSheet,
+  LobbyExitButton, LobbyChatButton, LobbyChatLauncher, LobbyCountPill, LobbyChatPanel, InviteSheet, HowToPlaySheet, ChatSheet,
 } from '@/components/multiplayer/lobby/LobbyChrome';
+import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { cn } from '@/lib/utils';
@@ -129,6 +131,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   const { sendEmote, cooldownActive } = useLobbyEmotes({ socket: lobby.socket });
 
   const [sheet, setSheet] = useState<'invite' | 'howto' | 'chat' | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const closeSheet = () => setSheet(null);
   const unread = useChatUnread({ socket: lobby.socket, username, open: sheet === 'chat' });
 
@@ -207,8 +210,9 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   const modePicker = !isClassroomRoom && (
-    <div className={CARD}>
+    <div className={cn(CARD, 'flex-1 min-h-0 flex flex-col')}>
       <BattleModeCard
+        fill
         selectedGameMode={lobby.selectedGameMode}
         setSelectedGameMode={lobby.setSelectedGameMode}
         t={t}
@@ -217,6 +221,10 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
         onHowToPlay={() => setSheet('howto')}
       />
     </div>
+  );
+
+  const settingsSummary = (
+    <LobbySettingsSummary timerValue={timerValue} difficulty={difficulty} minWordLength={minWordLength} t={t} onPress={() => setSettingsOpen(true)} />
   );
 
   const startButton = (
@@ -267,6 +275,8 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
                 roomLanguage={roomLanguage}
                 onRoomLanguageChange={lobby.handleRoomLanguageChange}
                 t={t}
+                open={settingsOpen}
+                onOpenChange={setSettingsOpen}
               />
             </>
           }
@@ -287,18 +297,12 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
             }
             rightContent={
               <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
-                {/* Status sits over the invite on desktop: the right column's chat
-                    flexes to absorb it, so the seat column never has to scroll. */}
+                {/* Status sits over the invite; chat is a launcher row, not a
+                    panel, so the rail never spends itself on an idle chat. */}
                 {statusLane}
                 {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} />}
-                <section className={cn(CARD, 'flex-1 min-h-28 flex flex-col p-0 overflow-hidden')}>
-                  <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
-                    {t('mpUi.lobby.chat')}
-                  </h2>
-                  <div className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain">
-                    <LobbyChatPanel username={username} isHost gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
-                  </div>
-                </section>
+                {settingsSummary}
+                <LobbyChatLauncher onPress={() => setSheet('chat')} unread={unread} t={t} className="mt-auto" />
               </div>
             }
           />
@@ -309,10 +313,11 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
 
         {/* Phone (<720px): one fixed column, footer CTA pinned. */}
         <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
-          <div className="flex-1 min-h-0 flex flex-col justify-center gap-3 px-3 py-2 w-full max-w-[600px] mx-auto">
+          <div className="flex-1 min-h-0 flex flex-col gap-3 px-3 py-3 w-full max-w-[600px] mx-auto">
             {statusLane}
             {roster()}
             {modePicker}
+            {settingsSummary}
           </div>
           <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
             <div className="max-w-[600px] mx-auto flex items-stretch gap-2">

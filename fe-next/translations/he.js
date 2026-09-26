@@ -18337,7 +18337,11 @@ const he = {
       "howToPlay": "איך משחקים",
       "scanToJoin": "סרקו כדי להצטרף",
       "orEnterCode": "או הקלידו קוד",
-      "tvJoinHeadline": "שלפו טלפון והצטרפו!"
+      "tvJoinHeadline": "שלפו טלפון והצטרפו!",
+      "letters": "אותיות",
+      "editSettings": "עריכת הגדרות הסיבוב",
+      "chatHint": "תגידו היי לחבורה",
+      "chatUnread": "{count} חדשות"
     },
     "round": {},
     "results": {}

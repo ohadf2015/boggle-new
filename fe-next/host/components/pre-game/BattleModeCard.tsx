@@ -3,7 +3,8 @@
 import React, { useCallback } from 'react';
 import { HelpCircle } from 'lucide-react';
 import { cn } from '../../../lib/utils';
-import { getModeDescription, MODE_ICONS, type GameModeOption } from '@/components/GameModeSelector';
+import { getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
+import { ModeArt } from '@/components/multiplayer/lobby/ModeArt';
 import { useExperiment } from '@/hooks/useExperiment';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
@@ -20,6 +21,8 @@ interface BattleModeCardProps {
   hasBlastAccess?: boolean;
   /** Opens the how-to-play sheet; renders a "How to play" link beside the rule. */
   onHowToPlay?: () => void;
+  /** Stretch the tile grid to the space the parent gives it (lobby body). */
+  fill?: boolean;
   className?: string;
 }
 
@@ -48,9 +51,10 @@ const FAMILY: Record<ModeColorFamily, { on: string; rest: string; icon: string }
 };
 
 /**
- * The lobby mode picker: a 3-column chip grid (icon + short name), the chosen
- * chip flooded in its mode colour, and ONE line under the grid with that
- * mode's rule — the grid never grows when you change your mind.
+ * The lobby mode picker: a 3-column grid of illustrated tiles (sticker art +
+ * short name), the chosen tile flooded in its mode colour, and ONE line under
+ * the grid with that mode's rule — the grid never grows when you change your
+ * mind. With `fill` the tiles stretch into the body's free height.
  */
 export function BattleModeCard({
   selectedGameMode,
@@ -59,6 +63,7 @@ export function BattleModeCard({
   isAdmin = false,
   language = null,
   onHowToPlay,
+  fill = false,
   className,
 }: BattleModeCardProps): React.ReactElement {
   const handleSelect = useCallback((mode: GameModeOption) => setSelectedGameMode(mode), [setSelectedGameMode]);
@@ -74,11 +79,11 @@ export function BattleModeCard({
   });
 
   return (
-    <section className={cn('flex flex-col gap-2 min-w-0', className)}>
+    <section className={cn('flex flex-col gap-2 min-w-0 min-h-0', fill && 'flex-1', className)}>
       <h3 className="font-neo-display text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase tracking-wider text-neo-white/80">
         {t('hostView.battleMode')}
       </h3>
-      <div className="grid grid-cols-3 gap-2">
+      <div className={cn('grid grid-cols-3 gap-2 desktop-tall:gap-[calc(10px*var(--mp-u,1))]', fill && 'flex-1 min-h-0 auto-rows-fr')}>
         {visibleModes.map(({ mode, nameKey }) => {
           const isActive = selectedGameMode === mode;
           const family = FAMILY[getModePresentation(mode).color];
@@ -90,18 +95,25 @@ export function BattleModeCard({
               data-testid={`game-mode-${mode}`}
               aria-pressed={isActive}
               className={cn(
-                'flex items-center gap-1.5 min-w-0 min-h-11 tall:min-h-12 desktop-tall:min-h-[min(calc(56px*var(--mp-u,1)),6.5vh)] px-2 desktop-tall:px-[calc(10px*var(--mp-u,1))] py-1.5 rounded-neo border-2 text-start',
-                'transition-[transform,background-color,border-color] duration-150 active:translate-y-0.5',
+                styles.modeTile,
+                'group flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 text-center',
+                'transition-[transform,background-color,border-color,box-shadow] duration-150 active:translate-y-0.5 active:shadow-none',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isActive
-                  ? cn(family.on, 'border-neo-black shadow-hard-sm', styles.chipPunch)
-                  : cn('bg-neo-navy-light text-neo-white', family.rest),
+                  ? cn(family.on, 'border-neo-black shadow-hard', styles.chipPunch)
+                  : cn('bg-neo-navy-light text-neo-white shadow-hard-sm', family.rest),
               )}
             >
-              <span aria-hidden="true" className={cn('shrink-0 [&_svg]:w-5 [&_svg]:h-5 desktop-tall:[&_svg]:w-[calc(20px*var(--mp-u,1))] desktop-tall:[&_svg]:h-[calc(20px*var(--mp-u,1))]', isActive ? 'text-neo-black' : family.icon)}>
-                {MODE_ICONS[mode]}
-              </span>
-              <span className="min-w-0 font-neo-display text-[11px] tall:text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase leading-[1.1] line-clamp-2 break-words">
+              <ModeArt
+                mode={mode}
+                className={cn(
+                  styles.modeArt,
+                  'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))]',
+                  isActive ? 'text-neo-black' : family.icon,
+                  isActive && styles.modeArtOn,
+                )}
+              />
+              <span className="shrink-0 max-w-full font-neo-display text-[11px] tall:text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase leading-[1.1] line-clamp-2 break-words">
                 {t(nameKey)}
               </span>
             </button>

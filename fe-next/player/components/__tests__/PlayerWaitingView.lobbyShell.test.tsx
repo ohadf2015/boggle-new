@@ -76,4 +76,12 @@ describe('PlayerWaitingView — joiner lobby on the shell', () => {
     fireEvent.click(phone().getByText('mpUi.lobby.howToPlay'));
     expect(within(screen.getByTestId('lobby-howto-sheet')).getByTestId('game-instructions')).toHaveAttribute('data-mode', 'classic');
   });
+
+  it('desktop: no chat panel and no how-to accordion in the body — both live behind the rail launchers', () => {
+    render(<PlayerWaitingView {...props} />);
+    expect(screen.queryByTestId('room-chat')).toBeNull();
+    expect(screen.queryByTestId('game-instructions')).toBeNull();
+    fireEvent.click(within(screen.getByTestId('desktop-chat-area')).getByTestId('lobby-chat-launcher'));
+    expect(within(screen.getByTestId('lobby-chat-sheet')).getByTestId('room-chat')).toBeInTheDocument();
+  });
 });

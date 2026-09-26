@@ -17485,7 +17485,11 @@ const en = {
       "howToPlay": "How to play",
       "scanToJoin": "Scan to join",
       "orEnterCode": "or enter code",
-      "tvJoinHeadline": "Grab your phone & join!"
+      "tvJoinHeadline": "Grab your phone & join!",
+      "letters": "letters",
+      "editSettings": "Edit round settings",
+      "chatHint": "Say hi to the squad",
+      "chatUnread": "{count} new"
     },
     "round": {},
     "results": {}

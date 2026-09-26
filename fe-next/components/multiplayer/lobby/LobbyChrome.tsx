@@ -7,7 +7,7 @@
  * FAB — lives behind one of these now, so the body is seats + mode only.
  */
 import { useEffect, useState, type ReactNode } from 'react';
-import { LogOut, MessageCircle } from 'lucide-react';
+import { ChevronRight, LogOut, MessageCircle } from 'lucide-react';
 import { MpSheet } from '@/components/multiplayer/shell/MpSheet';
 import RoomChat from '@/components/RoomChat';
 import { LobbyTutorialPanel } from '@/components/lobby/LobbyTutorialPanel';
@@ -51,7 +51,7 @@ export function LobbyExitButton({ onPress, t, className }: { onPress: () => void
   );
 }
 
-/** Header chat icon with an unread badge (phone only: desktop shows chat inline). */
+/** Header chat icon with an unread badge (phone; desktop uses the rail's LobbyChatLauncher). */
 export function LobbyChatButton({ onPress, unread, t, className }: { onPress: () => void; unread: number; t: T; className?: string }) {
   return (
     <button type="button" onClick={onPress} aria-label={t('mpUi.lobby.chat')} data-testid="lobby-chat-button" className={cn(ICON_BUTTON, className)}>
@@ -65,6 +65,42 @@ export function LobbyChatButton({ onPress, unread, t, className }: { onPress: ()
           {unread > 9 ? '9+' : unread}
         </span>
       )}
+    </button>
+  );
+}
+
+/**
+ * Desktop rail chat entry: one row, not a panel. The chat (and the guest age
+ * gate) opens in the sheet, so an idle room never spends the rail on an empty
+ * "Tell us your age" box.
+ */
+export function LobbyChatLauncher({ onPress, unread, t, className }: { onPress: () => void; unread: number; t: T; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      data-testid="lobby-chat-launcher"
+      className={cn(
+        'group w-full flex items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 px-4 py-3 text-start shadow-hard',
+        'transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-neo-cyan',
+        className,
+      )}
+    >
+      <span className="relative shrink-0 inline-flex items-center justify-center w-[calc(40px*var(--mp-u,1))] h-[calc(40px*var(--mp-u,1))] rounded-neo border-2 border-neo-black bg-neo-pink text-neo-black shadow-hard-sm transition-transform group-hover:-rotate-6">
+        <MessageCircle aria-hidden="true" className="w-5 h-5" />
+        {unread > 0 && (
+          <span key={unread} className="absolute -top-2 -end-2 min-w-5 h-5 px-1 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black text-[11px] font-bold leading-4 text-center animate-mp-bump">
+            {unread > 9 ? '9+' : unread}
+          </span>
+        )}
+      </span>
+      <span className="min-w-0 flex-1 flex flex-col">
+        <span className="font-neo-display text-[length:calc(15px*var(--mp-u,1))] font-bold uppercase tracking-wider text-neo-white">{t('mpUi.lobby.chat')}</span>
+        <span className="truncate text-[length:calc(13px*var(--mp-u,1))] font-bold text-neo-white/70">
+          {unread > 0 ? t('mpUi.lobby.chatUnread', { count: unread }) : t('mpUi.lobby.chatHint')}
+        </span>
+      </span>
+      <ChevronRight aria-hidden="true" className="shrink-0 w-5 h-5 text-neo-white/60 rtl:-scale-x-100 group-hover:text-neo-cyan" />
     </button>
   );
 }

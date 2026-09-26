@@ -18407,7 +18407,11 @@ const ja = {
       "howToPlay": "遊び方",
       "scanToJoin": "スキャンして参加",
       "orEnterCode": "またはコードを入力",
-      "tvJoinHeadline": "スマホを出して参加しよう！"
+      "tvJoinHeadline": "スマホを出して参加しよう！",
+      "letters": "文字",
+      "editSettings": "ラウンド設定を変更",
+      "chatHint": "みんなにあいさつしよう",
+      "chatUnread": "新着 {count}件"
     },
     "round": {},
     "results": {}

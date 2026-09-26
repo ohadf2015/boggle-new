@@ -18425,7 +18425,11 @@ const es = {
       "howToPlay": "Cómo jugar",
       "scanToJoin": "Escanea para unirte",
       "orEnterCode": "o introduce el código",
-      "tvJoinHeadline": "¡Saca el móvil y únete!"
+      "tvJoinHeadline": "¡Saca el móvil y únete!",
+      "letters": "letras",
+      "editSettings": "Editar ajustes de la ronda",
+      "chatHint": "Saluda al grupo",
+      "chatUnread": "{count} nuevos"
     },
     "round": {},
     "results": {}

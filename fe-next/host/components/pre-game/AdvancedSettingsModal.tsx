@@ -24,6 +24,9 @@ interface AdvancedSettingsModalProps {
   roomLanguage: Language;
   onRoomLanguageChange: (lang: Language) => void;
   t: (path: string, params?: Record<string, string | number>) => string;
+  /** Controlled open state — lets another control (the rail's settings summary) open the dialog. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 // Minutes. 1.5 (= 1:30) is the default round length for classic MP.
@@ -57,8 +60,15 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
   roomLanguage,
   onRoomLanguageChange,
   t,
+  open: openProp,
+  onOpenChange,
 }) {
-  const [open, setOpen] = useState(false);
+  const [openLocal, setOpenLocal] = useState(false);
+  const open = openProp ?? openLocal;
+  const setOpen = useCallback((next: boolean) => {
+    setOpenLocal(next);
+    onOpenChange?.(next);
+  }, [onOpenChange]);
   const [draftTimer, setDraftTimer] = useState(timerValue);
   const [draftDifficulty, setDraftDifficulty] = useState<DifficultyLevel>(difficulty);
   const [draftMinWord, setDraftMinWord] = useState(minWordLength);
@@ -91,9 +101,10 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
     setDifficulty,
     setMinWordLength,
     onRoomLanguageChange,
+    setOpen,
   ]);
 
-  const handleCancel = useCallback(() => setOpen(false), []);
+  const handleCancel = useCallback(() => setOpen(false), [setOpen]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
