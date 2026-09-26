@@ -138,6 +138,13 @@ describe('ArenaList', () => {
     expect(screen.getByText(/mpUi\.entry\.hostedBy/).textContent).toContain('אוהד');
   });
 
+  it('a host name truncates in its own direction box, so an RTL row never cuts its start', () => {
+    render(<ArenaList {...base} rooms={[room(1, { hostUsername: 'Cosmic Avocado' } as never)]} />);
+    const name = screen.getByText('Cosmic Avocado');
+    expect(name.getAttribute('dir')).toBe('auto');
+    expect(name.className).toMatch(/\btruncate\b/);
+  });
+
   it('refresh is a labelled button', () => {
     const onRefresh = vi.fn();
     render(<ArenaList {...base} onRefresh={onRefresh} rooms={rooms(1)} />);
@@ -181,6 +188,18 @@ describe('ArenaList', () => {
     render(<ArenaList {...base} rooms={rooms(1)} />);
     const img = screen.getByTestId('arena-list-tail').querySelector('img');
     expect(img?.getAttribute('loading')).toBe('eager');
+  });
+
+  // waiting.webp carries its own dark backdrop, a box a shade off the page navy.
+  // Lightening it into a navy group of its own erases the box. The tail is a
+  // size container, which isolates blending, so the group's navy has to be its own.
+  it("the tail's sticker blends into a navy group of its own, so its baked box never shows", () => {
+    render(<ArenaList {...base} rooms={rooms(1)} />);
+    const img = screen.getByTestId('arena-list-tail').querySelector('img')!;
+    expect(img.className).toMatch(/(^|\s)mix-blend-lighten(\s|$)/);
+    const group = img.parentElement!;
+    expect(group.className).toMatch(/(^|\s)isolate(\s|$)/);
+    expect(group.className).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
   });
 
   it('the tail steps aside on phone once the phone rows are full, and entirely once desktop is', () => {

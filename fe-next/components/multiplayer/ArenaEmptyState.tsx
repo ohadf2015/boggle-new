@@ -15,8 +15,10 @@ const ArenaEmptyState: React.FC = () => {
   return (
     <div
       data-testid="arena-empty-state"
-      className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-neo-lg border-3 border-dashed border-neo-white/25 px-4 py-4 text-center"
+      className="isolate flex min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-neo-lg border-3 border-dashed border-neo-white/25 bg-neo-navy px-4 py-4 text-center"
     >
+      {/* The sticker carries its own dark backdrop, a shade off the page navy:
+          lightened into this navy group, the box disappears. */}
       <Image
         src="/mascot/spectating.webp"
         alt=""
@@ -24,7 +26,7 @@ const ArenaEmptyState: React.FC = () => {
         width={96}
         height={96}
         loading="eager"
-        className="h-24 w-24 lg:h-32 lg:w-32 tv:h-44 tv:w-44 shrink rounded-neo object-contain motion-safe:animate-mp-bump"
+        className="h-24 w-24 lg:h-32 lg:w-32 tv:h-44 tv:w-44 shrink rounded-neo object-contain mix-blend-lighten motion-safe:animate-mp-bump"
       />
       <div className="min-w-0">
         <p className="font-neo-display text-lg lg:text-2xl tv:text-4xl font-bold uppercase leading-tight text-neo-white">

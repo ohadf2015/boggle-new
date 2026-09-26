@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { arenaModeStyle } from './arenaModes';
 import { isRoomFull } from './ArenaRow';
 import { EntrySheet, EntrySheetCta } from './EntrySheet';
+import { HostedBy } from './HostedBy';
 import type { JoinTarget } from './joinTarget';
 import { SheetIdentityRow } from './SheetIdentityRow';
 import { useSheetIdentity } from './useSheetIdentity';
@@ -51,9 +52,7 @@ function RoomTicket({ room }: { room: JoinTarget }) {
         <p className="mt-0.5 flex min-w-0 items-center gap-2 text-sm tv:text-lg font-bold text-neo-white/85">
           <span className={cn('shrink-0 uppercase tracking-wide', mode.text)}>{t(mode.labelKey)}</span>
           <span aria-hidden="true" className="shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
-          {room.hostUsername && (
-            <span dir="auto" className="min-w-0 truncate">{t('mpUi.entry.hostedBy', { name: room.hostUsername })}</span>
-          )}
+          {room.hostUsername && <HostedBy name={room.hostUsername} />}
         </p>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">

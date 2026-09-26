@@ -9,6 +9,7 @@ import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
 import { arenaModeStyle } from './arenaModes';
+import { HostedBy } from './HostedBy';
 
 /** The lobby payload also carries the host (backend getActiveRooms). */
 export type ArenaRoom = ActiveRoom & { hostUsername?: string };
@@ -110,9 +111,7 @@ export const ArenaRow = memo(function ArenaRow({ room, joining, locked, onPick }
         <span className="mt-0.5 tv:mt-0 flex min-w-0 items-center gap-2 text-xs tv:text-lg text-neo-white/85">
           <span className={cn('font-bold uppercase tracking-wide', mode.text)}>{t(mode.labelKey)}</span>
           <span aria-hidden="true">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
-          {room.hostUsername && (
-            <span dir="auto" className="min-w-0 truncate">{t('mpUi.entry.hostedBy', { name: room.hostUsername })}</span>
-          )}
+          {room.hostUsername && <HostedBy name={room.hostUsername} />}
         </span>
       </span>
 

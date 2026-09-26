@@ -69,6 +69,17 @@ describe('ArenaEmptyState (one mascot line, no buttons)', () => {
     expect(screen.queryByText('multiplayerFlow.roomList.gameModes.wheelRush')).toBeNull();
   });
 
+  // spectating.webp carries its own dark backdrop, a box a shade off the page
+  // navy (visible at TV size). Lightening it into a navy group erases the box.
+  it('the sticker blends into a navy group of its own, so its baked box never shows', () => {
+    const { container } = render(<ArenaEmptyState />);
+    const img = container.querySelector('img')!;
+    expect(img.className).toMatch(/(^|\s)mix-blend-lighten(\s|$)/);
+    const group = img.parentElement!;
+    expect(group.className).toMatch(/(^|\s)isolate(\s|$)/);
+    expect(group.className).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
+  });
+
   it('mascot image is decorative (empty alt)', () => {
     const { container } = render(<ArenaEmptyState />);
     const mascot = container.querySelector('img');

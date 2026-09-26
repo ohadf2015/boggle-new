@@ -4,7 +4,7 @@
  * identity, one JOIN (or WATCH when the room is full).
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { ActiveRoom } from '@/shared/types/game';
 import { bundleT } from './localeBundles';
@@ -105,6 +105,13 @@ describe('JoinSheet (via the JoinRoomModal re-export)', () => {
     expect(ticket.textContent).toContain('🇮🇱');
     expect(ticket.textContent).toContain('3/8');
     expect(ticket.textContent).toContain(en('mpUi.entry.hostedBy', { name: 'Turbo Salmon' }));
+  });
+
+  it('the host name truncates in its own direction box on the ticket', () => {
+    render(<JoinRoomModal {...props} room={{ ...room, hostUsername: 'Cosmic Avocado' }} />);
+    const name = within(screen.getByTestId('join-ticket')).getByText('Cosmic Avocado');
+    expect(name.getAttribute('dir')).toBe('auto');
+    expect(name.className).toMatch(/\btruncate\b/);
   });
 
   it('a code nobody lists is an honest ticket: the code, no seat count, no guessed flag or mode', () => {
