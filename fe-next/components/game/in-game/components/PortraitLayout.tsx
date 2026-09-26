@@ -189,7 +189,18 @@ interface PortraitLayoutProps {
 
   // Desktop shell integration: when true, desktop shell owns the timer UI (suppress 4× CircularTimer mounts)
   inDesktopShell?: boolean;
+
+  /**
+   * Live MP round (opt-in, default off): the round screen owns the HUD in a
+   * sibling subtree, so render only the word pill + board, sized to fill the
+   * slot. Also never replays the tile entrance behind the countdown.
+   */
+  mpChrome?: boolean;
 }
+
+/** mpChrome: the slot is just pill + board, no header/stats reserve. */
+const MP_CHROME_ROOT_CLASS = 'flex flex-col flex-1 w-full min-h-0 overflow-hidden px-2';
+const MP_CHROME_FRAME_CLASS = 'relative aspect-square mx-auto w-[min(720px,100cqi,calc(100cqb-56px))] max-h-full';
 
 /**
  * PortraitLayout - Portrait/Desktop mode layout for the game
@@ -261,6 +272,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   timerUrgencyState = 'normal',
   onTimerState,
   inDesktopShell = false,
+  mpChrome = false,
 }) {
   // Derive avatar map from leaderboard for WordHunt player lives.
   // Use deferred so socket-burst leaderboard updates don't recompute mid-drag.
@@ -376,7 +388,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
       {/* Combo milestone announcement + screen flash.
           ScreenFlashOverlay is a full-viewport luminance flash — suppress entirely under reduced motion. */}
-      {isPlaying && (
+      {isPlaying && !mpChrome && (
         <>
           <ComboMilestoneAnnouncement comboLevel={comboLevel} />
           {!reduceMotion && <ScreenFlashOverlay trigger={foundWords.length} />}
@@ -384,7 +396,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       )}
 
       {/* Floating Score Animation - renders above everything */}
-      {isPlaying && (
+      {isPlaying && !mpChrome && (
         <FloatingScoreAnimation
           score={floatingScore}
           isFireRound={isFireRoundScore}
@@ -406,7 +418,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className={cn(
+      <div className={mpChrome ? cn(MP_CHROME_ROOT_CLASS, comboShakeKey > 0 && 'animate-combo-shake') : cn(
         'flex flex-col gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-all duration-500 ease-in-out pb-16 medium-short:pb-12 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0',
         // In the MP shell the canvas is just the board column — don't run the
         // internal lg: 3-column split (the shell supplies the side rails).
@@ -415,7 +427,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         comboShakeKey > 0 && 'animate-combo-shake',
       )}>
         {/* Mobile Header */}
-        <GameHeader
+        {!mpChrome && <GameHeader
           onExitRoom={onExitRoom}
           onShowTutorial={onShowTutorial}
           onPauseToggle={onPauseToggle}
@@ -424,13 +436,13 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           gameActive={gameActive}
           t={t}
           variant="mobile"
-        />
+        />}
 
         {/* Left Column: Found Words (Desktop only).
             Render the container whenever the right panel renders so the
             center column stays optically centered (countdown overlay is
             fixed inset-0 → viewport center must equal game-area center). */}
-        {!gameplayFocusMode && (
+        {!gameplayFocusMode && !mpChrome && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 min-h-0 shrink-0 overflow-y-auto">
             {isPlaying && (
               <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} />
@@ -441,7 +453,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         {/* Center Column: Timer, Score, Grid — container-queryable so board auto-fits */}
         <div className="@container/center [container-type:size] flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-hidden lg:overflow-y-hidden lg:overflow-x-visible">
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
-          {remainingTime !== null && (
+          {remainingTime !== null && !mpChrome && (
             <div
               ref={gameStatsRef}
               className="flex flex-col gap-0 w-full px-1 md:px-2 sticky top-0 z-40 shrink-0"
@@ -566,7 +578,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {/* Word Forming Area - inside header area for tighter integration */}
           {isPlaying && gameMode !== 'word-hunt' && (
             <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5 desktop-short:lg:-mt-2 desktop-short:lg:mb-0 desktop-medium-short:lg:-mt-2 desktop-medium-short:lg:mb-0">
-              <LeadChangeBanner event={leadChangeEvent ?? null} />
+              {!mpChrome && <LeadChangeBanner event={leadChangeEvent ?? null} />}
               <WordFormingAreaConnected
                 isTypingMode={isTypingMode}
                 typedWord={typedWord}
@@ -639,13 +651,13 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           >
             <div
               data-testid="grid-frame"
-              className="relative aspect-square mx-auto w-[min(720px,94cqi,calc(100cqb-200px))] medium-short:w-[min(560px,92cqi,calc(100cqb-150px))] short:w-[min(560px,94cqi,calc(100cqb-150px))] lg:w-[min(680px,100cqi,calc(100cqb-120px))] desktop-short:lg:w-[min(560px,100cqi,calc(100cqb-90px))] desktop-medium-short:lg:w-[min(620px,100cqi,calc(100cqb-100px))] max-h-full"
+              className={mpChrome ? MP_CHROME_FRAME_CLASS : "relative aspect-square mx-auto w-[min(720px,94cqi,calc(100cqb-200px))] medium-short:w-[min(560px,92cqi,calc(100cqb-150px))] short:w-[min(560px,94cqi,calc(100cqb-150px))] lg:w-[min(680px,100cqi,calc(100cqb-120px))] desktop-short:lg:w-[min(560px,100cqi,calc(100cqb-90px))] desktop-medium-short:lg:w-[min(620px,100cqi,calc(100cqb-100px))] max-h-full"}
             >
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
                 interactive={isBoardInteractive({ isPlaying, showStartAnimation })}
-                animateOnMount={!hasAnimated}
+                animateOnMount={mpChrome ? false : !hasAnimated}
                 onWordSubmit={onWordSubmit}
                 onPathSubmit={onPathSubmit}
                 onWordChange={onWordChange}
@@ -704,7 +716,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {/* Mobile rank rail — always visible in MP (even in gameplayFocusMode,
               which hides the full mobile leaderboard below). Gives phone players a
               clear "You're #N" plus a transient "{name} passed you!" cue. */}
-          {isPlaying && deferredLeaderboard && deferredLeaderboard.length > 1 && (
+          {isPlaying && !mpChrome && deferredLeaderboard && deferredLeaderboard.length > 1 && (
             <div className="mt-0.5 flex justify-center">
               {isClassroomStudentPlay ? (
                 /* A class session swaps the absolute pill for local framing:
@@ -736,7 +748,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {/* Mobile: Split-view with the single live leaderboard + words.
               Leaderboard only when there are other players; word list always shows while playing
               so single-player users can see their progress. */}
-          {isPlaying && !gameplayFocusMode && (
+          {isPlaying && !gameplayFocusMode && !mpChrome && (
             <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink overflow-y-auto min-h-0 max-h-[120px] sm:max-h-[140px] medium-short:max-h-[88px] short:max-h-[80px] scrollbar-thin">
               {/* The full class standings are the second absolute-rank surface
                   on a student's phone — windowed around "me", but still printing
@@ -765,7 +777,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             including classic mode, which runs in gameplayFocusMode. Focus mode
             now only suppresses chat here (it keeps the grid screen calm), NOT the
             standings: desktop players were previously blind to who was winning. */}
-        {!inDesktopShell && ((deferredLeaderboard && deferredLeaderboard.length > 1) || !gameplayFocusMode) && (
+        {!inDesktopShell && !mpChrome && ((deferredLeaderboard && deferredLeaderboard.length > 1) || !gameplayFocusMode) && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
             {/* Single live leaderboard — ranked standings with a "your standing"
                 cue (leading by N / N points to catch). Replaces the previous
