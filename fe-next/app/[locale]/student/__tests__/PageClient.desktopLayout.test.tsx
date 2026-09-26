@@ -96,6 +96,7 @@ describe('StudentPageClient — one screen, nothing to scroll', () => {
     const solo = await screen.findByTestId('academy-solo');
     expect(screen.getByTestId('academy-cta')).toHaveAttribute('data-kind', 'next');
     solo.click();
+    // academy=1 keeps academy-originated solo play ad-free (5b2bb36e6).
     expect(knobs.push).toHaveBeenCalledWith('/en/quick-play?academy=1');
   });
 });
