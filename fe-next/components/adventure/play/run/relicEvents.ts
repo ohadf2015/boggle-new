@@ -10,6 +10,7 @@
  */
 import { hintCharges, maxHpFor, secondsBonus, type RelicId } from '@/lib/adventure/play/relics';
 import type { CombatFx } from '@/lib/adventure/play/combat';
+import { relicBonusLabel } from './relicTriggers';
 
 export interface RelicFire {
   relics: RelicId[];
@@ -30,6 +31,10 @@ export function levelStartFire(owned: readonly string[]): RelicFire {
   const hints = hintCharges(owned);
   if (own(owned, 'lens-of-insight')) { relics.push('lens-of-insight'); labels['lens-of-insight'] = `${hints}`; }
   if (own(owned, 'sage-scroll')) { relics.push('sage-scroll'); labels['sage-scroll'] = '★'; }
+  // The always-on scoring relic: it works on every word, so the level deal is
+  // the ONE place it is named — pulsing it per word would be constant noise.
+  // The label is read from the catalog, so a rebalance can never drift from it.
+  if (own(owned, 'magnet')) { relics.push('magnet'); labels['magnet'] = relicBonusLabel('magnet', '', 0); }
   return { relics, labels };
 }
 

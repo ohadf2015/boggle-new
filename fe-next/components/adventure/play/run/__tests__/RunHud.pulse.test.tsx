@@ -73,4 +73,27 @@ describe('RunHud — the relic flash on a word', () => {
     );
     expect(icon('vampire-fang')?.dataset.firing).toBe('true');
   });
+
+  it('Given a hit left over from the PREVIOUS battle, then nothing fires — the word was never credited here', () => {
+    // AdventureLevel is not remounted between nodes: lastHit survives, but
+    // resetAttempt emptied `words`. The old indexOf fallback (-1 → 0) used to
+    // manufacture index 0 — twin-ink's exact trigger — at every battle start.
+    render(<RunHud {...base} relics={['twin-ink']} words={[]} lastHit={{ id: 7, word: 'house', pts: 20, result: 'ok' }} />);
+    expect(icon('twin-ink')?.dataset.firing).toBeUndefined();
+    expect(screen.queryByTestId('relic-fire-twin-ink')).toBeNull();
+  });
+
+  it('Given the same hit but fresh combat ticks, then the relic does NOT re-fire', () => {
+    // The fight clock rebuilds `combat` 5×/s; the pulse must key on the hit's id,
+    // not on the memo's object identity, or the callout re-fires all fight long.
+    const combatAt = (now: number) => ({ hp: 8, maxHp: 10, shields: 0, guard: false, now, projectiles: [], defeated: false, dead: false }) as never;
+    const { rerender } = render(
+      <RunHud {...base} relics={['sharp-quill']} words={['stretch']} lastHit={hit('stretch')} combat={combatAt(200)} />,
+    );
+    const first = screen.getByTestId('relic-fire-sharp-quill');
+    rerender(<RunHud {...base} relics={['sharp-quill']} words={['stretch']} lastHit={hit('stretch')} combat={combatAt(400)} />);
+    rerender(<RunHud {...base} relics={['sharp-quill']} words={['stretch']} lastHit={hit('stretch')} combat={combatAt(600)} />);
+    // A re-fire bumps the pulse id, which re-keys the callout — a NEW element.
+    expect(screen.getByTestId('relic-fire-sharp-quill')).toBe(first);
+  });
 });

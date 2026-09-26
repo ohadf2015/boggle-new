@@ -20,6 +20,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ChevronsUp } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -84,22 +85,34 @@ export default function EcosystemRewards({ result, delay = 0, celebrate = false,
   useEffect(() => {
     if (firedRef.current) return;
     firedRef.current = true;
+    let cancelled = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
-    if (gains.length) timers.push(setTimeout(() => playXpGainSound?.(), Math.round(delay * 1000)));
+    // Toasts THIS screen put on the app-wide <Toaster> — it outlives the screen,
+    // so without tracking them they float into the next battle.
+    const toastIds: string[] = [];
+    if (gains.length) timers.push(setTimeout(() => { if (!cancelled) playXpGainSound?.(); }, Math.round(delay * 1000)));
 
     if (unlocked.length) {
       void import('@/components/achievements/AchievementToast').then(({ showAchievementToast }) => {
+        // The screen can be gone before the chunk lands (Continue raced the
+        // import): timers scheduled from here would never be cleaned up and
+        // would fire over the NEXT battle. Guard both scheduling and firing.
+        if (cancelled) return;
         unlocked.forEach((key, i) => {
           timers.push(setTimeout(
-            () => showAchievementToast({ achievement: lifetimeDef(key), count: 1, isNew: true }),
+            () => { if (!cancelled) toastIds.push(showAchievementToast({ achievement: lifetimeDef(key), count: 1, isNew: true })); },
             Math.round(delay * 1000) + 400 + i * TOAST_GAP_MS,
           ));
         });
       }).catch(() => { /* toast art is a bonus beat — never break the result screen */ });
     }
 
-    if (levelUp && celebrate) timers.push(setTimeout(() => setShowLevelUp(true), Math.round(delay * 1000) + LEVEL_UP_DELAY_MS));
-    return () => timers.forEach(clearTimeout);
+    if (levelUp && celebrate) timers.push(setTimeout(() => { if (!cancelled) setShowLevelUp(true); }, Math.round(delay * 1000) + LEVEL_UP_DELAY_MS));
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+      toastIds.forEach((id) => toast.dismiss(id));
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot on mount; `result` is fixed for this screen's life
   }, []);
 

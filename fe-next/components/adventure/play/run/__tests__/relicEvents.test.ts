@@ -19,6 +19,12 @@ describe('levelStartFire', () => {
   it('given lens-of-insight, then it names the hints you hold', () => {
     expect(levelStartFire(['lens-of-insight']).labels['lens-of-insight']).toBe('3');
   });
+
+  it('given magnet, then the level deal names its always-on boost once — not on every word', () => {
+    const fire = levelStartFire(['magnet']);
+    expect(fire.relics).toContain('magnet');
+    expect(fire.labels['magnet']).toBe('+20%');
+  });
 });
 
 describe('fightStartFire', () => {

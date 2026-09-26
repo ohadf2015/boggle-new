@@ -74,7 +74,9 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
   const queueRef = useRef<ArenaCommand[]>([]);
   const seqRef = useRef(0);
   const hpRef = useRef(combat.hp);
-  const castRef = useRef<number | null>(null);
+  // Seed with the hit on screen: a stage that mounts mid-run (a boss node after
+  // an elite one) must not re-cast a word from the PREVIOUS battle.
+  const castRef = useRef<number | null>(lastHit?.id ?? null);
   const fxSeenRef = useRef(0);
 
   // --- Combat fx → arena commands (append-only; the canvas drains).

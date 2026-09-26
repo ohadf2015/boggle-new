@@ -14,6 +14,8 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ pla
 
 const showAchievementToast = vi.fn();
 vi.mock('@/components/achievements/AchievementToast', () => ({ showAchievementToast }));
+const toastDismiss = vi.fn();
+vi.mock('react-hot-toast', () => ({ default: { dismiss: (...a: unknown[]) => toastDismiss(...a), custom: vi.fn() } }));
 
 import EcosystemRewards from '../EcosystemRewards';
 import type { RunResult } from '../../runTypes';
@@ -25,7 +27,12 @@ const result = (over: Partial<RunResult> = {}): RunResult => ({
 });
 
 describe('EcosystemRewards', () => {
-  beforeEach(() => { vi.useFakeTimers(); showAchievementToast.mockClear(); });
+  beforeEach(() => {
+    vi.useFakeTimers();
+    showAchievementToast.mockClear();
+    showAchievementToast.mockImplementation((p: { achievement: { id: string } }) => `toast-${p.achievement.id}`);
+    toastDismiss.mockClear();
+  });
   afterEach(() => { vi.useRealTimers(); });
 
   it('Given a node that moved nothing, then nothing is rendered at all', () => {
@@ -70,5 +77,26 @@ describe('EcosystemRewards', () => {
     await act(async () => { await vi.dynamicImportSettled?.(); });
     act(() => { vi.advanceTimersByTime(5000); });
     expect(showAchievementToast).not.toHaveBeenCalled();
+  });
+
+  it('Given the player continues before the toast chunk lands, then no toast leaks into the next battle', async () => {
+    // The timers used to be registered inside the import's .then() — an unmount
+    // that raced the import cleaned up nothing, and the toasts fired anyway.
+    const { unmount } = render(<EcosystemRewards result={result({ achievementsUnlocked: ['VETERAN'] })} />);
+    unmount();
+    await act(async () => { await vi.dynamicImportSettled?.(); });
+    act(() => { vi.advanceTimersByTime(8000); });
+    expect(showAchievementToast).not.toHaveBeenCalled();
+  });
+
+  it('Given a toast already showing when the screen closes, then it is dismissed — not carried into the next battle', async () => {
+    // The <Toaster> is app-wide, so a toast outlives its screen unless the
+    // screen takes it down on the way out.
+    const { unmount } = render(<EcosystemRewards result={result({ achievementsUnlocked: ['VETERAN'] })} />);
+    await act(async () => { await vi.dynamicImportSettled?.(); });
+    act(() => { vi.advanceTimersByTime(5000); });
+    expect(showAchievementToast).toHaveBeenCalledTimes(1);
+    unmount();
+    expect(toastDismiss).toHaveBeenCalledWith('toast-VETERAN');
   });
 });

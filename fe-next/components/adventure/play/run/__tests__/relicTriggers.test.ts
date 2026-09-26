@@ -24,8 +24,10 @@ describe('triggeredRelics', () => {
     expect(triggeredRelics('cat', 2, ['echo-stone'])).toEqual(['echo-stone']);
   });
 
-  it('Given magnet and stat-only relics, then only magnet (always on) triggers outside a fight', () => {
-    expect(triggeredRelics('dog', 4, ['magnet', 'hourglass', 'vampire-fang'])).toEqual(['magnet']);
+  it('Given magnet (always on), then it never pulses per word — the level deal announces it once instead', () => {
+    // A relic whose factor never returns 1 would flash on EVERY word, which reads
+    // as noise, not feedback. It fires in levelStartFire, not here.
+    expect(triggeredRelics('dog', 4, ['magnet', 'hourglass', 'vampire-fang'])).toEqual([]);
   });
 
   it('Given vampire-fang in a fight, when a 6+ letter word lands, then the fang triggers', () => {
