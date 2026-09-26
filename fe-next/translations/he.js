@@ -18383,7 +18383,9 @@ const he = {
       "keyboardHint": "הקלידו מילה · Enter לשליחה · Esc לניקוי",
       "yourWords": "המילים שלך",
       "noWords": "עוד אין מילים. מצאו את הראשונה!",
-      "players": "שחקנים"
+      "players": "שחקנים",
+      "specialWord": "{name} מצא את המילה המיוחדת {word}!",
+      "specialWordMine": "מילה מיוחדת: {word}! +{bonus}"
     },
     "results": {}
   }

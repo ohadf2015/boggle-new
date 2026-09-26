@@ -18453,7 +18453,9 @@ const ja = {
       "keyboardHint": "単語を入力 · Enterで送信 · Escでクリア",
       "yourWords": "あなたの単語",
       "noWords": "まだ単語がありません。最初の1つを見つけよう！",
-      "players": "プレイヤー"
+      "players": "プレイヤー",
+      "specialWord": "{name}がスペシャルワード「{word}」を発見！",
+      "specialWordMine": "スペシャルワード「{word}」！ +{bonus}"
     },
     "results": {}
   }

@@ -2,9 +2,9 @@
 
 /**
  * The "+N" floater pool, fed ONLY by the server's `wordAccepted.score`
- * (mpFeedback lastWord — it already includes the combo). Shared by the round
- * frame (useRoundJuice) and the blast overlay (MpServerScoreFly), so every MP
- * mode shows the same server number.
+ * (mpFeedback lastWord — it already includes the combo). The round frame
+ * (useRoundJuice) runs every grid mode, blast included, so every MP mode
+ * shows the same server number.
  */
 import { useEffect, useRef, useState } from 'react';
 import { useMpLastWord } from '@/hooks/useMpFeedback';

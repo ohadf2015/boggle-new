@@ -4,21 +4,16 @@ import React, { useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useMpExit } from '@/hooks/useMpExit';
 import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
-import { MpServerScoreFly } from '@/components/multiplayer/round/MpServerScoreFly';
+import { MpBlastCanvas } from '@/components/multiplayer/round/MpBlastCanvas';
 import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
-import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
-const BlastGame = dynamic(
-  () => import('@/components/blast/legacy/BlastGame').then(m => ({ default: m.BlastGame })),
-  { ssr: false, loading: () => <GameLoadingFallback /> },
-);
 const WordHuntGame = dynamic(
   () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
@@ -187,12 +182,6 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     mpExit('continue-solo');
   }, [mpExit, tableData, gameCode]);
 
-  // Blast multiplayer bridge — converts Zustand state to BlastGame props
-  const blastBridge = useBlastMultiplayerBridge({
-    letterGrid: tableData,
-    gridSize: tableData?.[0]?.length ?? 4,
-  });
-
   // Blast multiplayer: emit word + comboType to server via socket
   const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null) => {
     if (!socket) return;
@@ -359,39 +348,6 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     );
   }
 
-  // Blast with host playing: use dedicated BlastGame (same as PlayerInGameView)
-  if (gameMode === 'blast' && hostPlaying) {
-    return (
-      <>
-        {wrapCanvas(
-        <>
-        <BlastGame
-          config={blastBridge.config}
-          mode="multiplayer"
-          remainingTime={remainingTime}
-          totalTime={totalTime}
-          leaderboard={leaderboard}
-          username={username}
-          onGameEnd={() => {/* Server controls game end in multiplayer */}}
-          onMPDeadEnd={() => socket?.emit('blastDeadEnd')}
-          onMPBoardCleared={handleMPBoardCleared}
-          onQuit={handleStopGameClick}
-          onWordWithComboType={handleBlastWordWithCombo}
-          initialTileStates={blastBridge.initialTileStates}
-          blastSeed={blastBridge.blastSeed}
-          serverGrid={blastBridge.serverGrid}
-          serverPointsOnly
-          isDesktopCanvas={inShell}
-        />
-        <MpServerScoreFly />
-        </>
-        )}
-        {connectionOverlays}
-        {stopConfirm}
-      </>
-    );
-  }
-
   const pendingChips = <PendingWordChips pendingWords={pendingWords} dismissPending={dismissPending} />;
 
   // Classic board props — shared by the round frame and the non-playing fallback.
@@ -426,10 +382,22 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     totalGamesPlayed: profile?.total_games,
   };
 
-  // The playing host: classic + word-hunt run in the SAME round frame as the
-  // joiner (one HUD, roster, hidden-until-GO board) — pitfall class 3.
+  const roundTotal = totalTime ?? timerValue * 60;
+
+  // The playing host: classic, word-hunt and blast run in the SAME round frame
+  // as the joiner (one HUD, roster, hidden-until-GO board) — pitfall class 3.
   if (hostPlaying && isRoundFrameMode(gameMode)) {
-    const canvas = gameMode === 'word-hunt' ? (
+    const canvas = gameMode === 'blast' ? (
+      <MpBlastCanvas
+        grid={tableData}
+        username={username}
+        socket={socket}
+        totalTime={roundTotal}
+        onQuit={handleStopGameClick}
+        onWordWithComboType={handleBlastWordWithCombo}
+        onBoardCleared={handleMPBoardCleared}
+      />
+    ) : gameMode === 'word-hunt' ? (
       <WordHuntGame
         grid={tableData}
         gameLanguage={roomLanguage}
@@ -456,7 +424,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           meId={username}
           gameMode={gameMode}
           remainingTime={remainingTime}
-          totalTime={totalTime ?? timerValue * 60}
+          totalTime={roundTotal}
           leaderboard={leaderboard}
           users={roundUsers}
           foundWords={foundWords}
@@ -464,6 +432,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           revealed={!showStartAnimation}
           onExit={handleStopGameClick}
           canvas={canvas}
+          socket={socket}
         />
         {pendingChips}
         {connectionOverlays}

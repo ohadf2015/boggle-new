@@ -12,6 +12,7 @@
  * Two lanes, never a stack (MpCallouts): newest callout wins; banners queue.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMpLastReject } from '@/hooks/useMpFeedback';
@@ -41,6 +42,15 @@ const REJECT_KEY: Record<Exclude<MpRejectReason, 'found-by-other'>, string> = {
  */
 export const isolateName = (name: string): string => `\u2068${name}\u2069`;
 
+/** Longest name a loud one-line callout carries on a phone; longer ones are clipped with "…". */
+export const CALLOUT_NAME_MAX = 10;
+
+/** A clipped, bidi-isolated name for a callout line (code points, so an emoji is never split). */
+export const calloutName = (name: string): string => {
+  const chars = Array.from(name);
+  return isolateName(chars.length > CALLOUT_NAME_MAX ? `${chars.slice(0, CALLOUT_NAME_MAX - 1).join('')}\u2026` : name);
+};
+
 export interface RoundJuice {
   gain: MpScoreGain | null;
   floaters: RoundFloater[];
@@ -51,8 +61,16 @@ export interface RoundJuice {
   timeUp: boolean;
   /** Screen-reader-only reason for the last plain rejection (the pill shows it visually). */
   rejectText: string | null;
-  /** Server points per accepted word (lowercased) — feeds the words ladder. */
-  pointsByWord: ReadonlyMap<string, number>;
+}
+
+/** The two socket calls the round juice needs. */
+export type RoundSocket = Pick<Socket, 'on' | 'off'>;
+
+interface SpecialWordFound {
+  word?: string;
+  /** The server's key (backend wordValidationHandler). */
+  foundBy?: string;
+  bonus?: number;
 }
 
 interface Params {
@@ -60,9 +78,11 @@ interface Params {
   /** Best-first standings (server scores). */
   standings: readonly RankedPlayer[];
   remainingTime: number | null | undefined;
+  /** Live room socket: server-only moments (special word) that mpFeedback does not carry. */
+  socket?: RoundSocket | null;
 }
 
-export function useRoundJuice({ meId, standings, remainingTime }: Params): RoundJuice {
+export function useRoundJuice({ meId, standings, remainingTime, socket }: Params): RoundJuice {
   const { t } = useLanguage();
   const { playComboSound, playLeadChangeSound, playTimerHeartbeatSound } = useSoundEffects();
   const freshWord = useFreshLastWord();
@@ -76,7 +96,6 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
   const [rankFlipKey, setRankFlipKey] = useState<string | undefined>(undefined);
   const [timeUp, setTimeUp] = useState(false);
   const [rejectText, setRejectText] = useState<string | null>(null);
-  const [pointsByWord, setPointsByWord] = useState<ReadonlyMap<string, number>>(() => new Map());
   const seq = useRef(0);
   const nextId = (p: string) => `${p}-${++seq.current}`;
 
@@ -85,10 +104,9 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
     [freshWord],
   );
 
-  // Accepted word → ladder points + combo callout (the floater pool is useServerFloaters).
+  // Accepted word → combo callout (floaters: useServerFloaters; ladder points: useServerAcceptedWords).
   useEffect(() => {
     if (!freshWord) return;
-    setPointsByWord((prev) => new Map(prev).set(freshWord.word.toLowerCase(), freshWord.points));
     if (freshWord.comboLevel >= ON_FIRE_LEVEL) {
       setCallout({ id: nextId('fire'), text: t('mpUi.round.onFire', { level: freshWord.comboLevel }), tone: 'loud', color: 'lime' });
       playComboSound(freshWord.comboLevel);
@@ -102,7 +120,7 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
     if (lastReject.reason === 'found-by-other') {
       setCallout({
         id: lastReject.id,
-        text: t('mpUi.round.gotItFirst', { name: isolateName(lastReject.foundBy ?? '?'), points: lastReject.points ?? 0 }),
+        text: t('mpUi.round.gotItFirst', { name: calloutName(lastReject.foundBy ?? '?'), points: lastReject.points ?? 0 }),
         tone: 'quiet',
         color: 'cyan',
       });
@@ -127,20 +145,38 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
     const rank = next.findIndex((p) => p.username === meId) + 1;
     if (rank > 0 && prevRank > 0 && rank !== prevRank) setRankFlipKey(`r${rank}-${++seq.current}`);
     if (passed.length > 0) {
-      setCallout({ id: nextId('pass'), text: t('mpUi.round.youPassed', { name: isolateName(passed[0]) }), tone: 'loud', color: 'lime' });
+      setCallout({ id: nextId('pass'), text: t('mpUi.round.youPassed', { name: calloutName(passed[0]) }), tone: 'loud', color: 'lime' });
     } else if (overtakenBy.length > 0) {
-      setCallout({ id: nextId('over'), text: t('mpUi.round.passedYou', { name: isolateName(overtakenBy[0]) }), tone: 'quiet', color: 'pink' });
+      setCallout({ id: nextId('over'), text: t('mpUi.round.passedYou', { name: calloutName(overtakenBy[0]) }), tone: 'quiet', color: 'pink' });
     }
     // Lead change: the leader's name changed and at least one of them is me.
     const prevLead = prev[0]?.username;
     const lead = next[0]?.username;
     if (prevLead && lead && prevLead !== lead && (next[0].score ?? 0) > 0 && (lead === meId || prevLead === meId)) {
       const mine = lead === meId;
-      setBanners((b) => [...b, { id: nextId('lead'), text: mine ? t('mpUi.round.tookLead') : t('mpUi.round.lostLead', { name: isolateName(lead) }), color: mine ? 'lime' : 'pink' }]);
+      setBanners((b) => [...b, { id: nextId('lead'), text: mine ? t('mpUi.round.tookLead') : t('mpUi.round.lostLead', { name: calloutName(lead) }), color: mine ? 'lime' : 'pink' }]);
       playLeadChangeSound();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [standings, meId]);
+
+  // Special word: a banner (never a card over the board), finder from the
+  // server's `foundBy`, points = the server's bonus.
+  useEffect(() => {
+    if (!socket) return undefined;
+    const onSpecial = (data: SpecialWordFound) => {
+      if (!data?.word) return;
+      const finder = data.foundBy ?? '';
+      const mine = finder === meId;
+      const params = { word: data.word.toUpperCase(), name: calloutName(finder), bonus: data.bonus ?? 0 };
+      setBanners((b) => [...b, { id: nextId('special'), text: t(mine ? 'mpUi.round.specialWordMine' : 'mpUi.round.specialWord', params), color: mine ? 'lime' : 'purple' }]);
+    };
+    socket.on('specialWordFound', onSpecial);
+    return () => {
+      socket.off('specialWordFound', onSpecial);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket, meId]);
 
   // Timer: heartbeat per whole second in the last 5s; TIME! slam at 0.
   const whole = remainingTime == null ? null : Math.max(0, Math.ceil(remainingTime));
@@ -156,5 +192,5 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
 
   const dropBanner = useCallback(() => setBanners((b) => b.slice(1)), []);
 
-  return { gain, floaters, callout, banners, dropBanner, rankFlipKey, timeUp, rejectText, pointsByWord };
+  return { gain, floaters, callout, banners, dropBanner, rankFlipKey, timeUp, rejectText };
 }

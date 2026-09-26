@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
 import { MpDesktopShellFrame } from '../desktop/MpDesktopShellFrame';
 import { MpRoundLayout, type MpRoundLayoutProps } from './MpRoundLayout';
 
-/** Round-frame modes: the canvas runs with its own chrome off (`mpChrome`). */
-export const ROUND_FRAME_MODES = ['classic', 'word-hunt'] as const;
+/** Round-frame modes: the canvas runs with its own chrome off (`mpChrome`; blast via MpBlastCanvas). */
+export const ROUND_FRAME_MODES = ['classic', 'word-hunt', 'blast'] as const;
 
 export function isRoundFrameMode(mode: string | null | undefined): boolean {
   // An unconfirmed/legacy null mode renders the classic board.

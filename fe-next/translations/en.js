@@ -17531,7 +17531,9 @@ const en = {
       "keyboardHint": "Type a word · Enter to submit · Esc to clear",
       "yourWords": "Your words",
       "noWords": "No words yet. Find the first one!",
-      "players": "Players"
+      "players": "Players",
+      "specialWord": "{name} found the special word {word}!",
+      "specialWordMine": "Special word {word}! +{bonus}"
     },
     "results": {}
   }

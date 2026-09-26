@@ -278,4 +278,61 @@ describe('MpRoundLayout', () => {
     render(<MpRoundLayout {...props({ foundWords: [{ word: 'a' }, { word: 'b' }, { word: 'c' }] })} />);
     expect(screen.getByTestId('mp-found-pill')).toHaveTextContent('"count":3');
   });
+
+  it('desktop: the word count lives in the YOUR WORDS header; the pill is phone-only (it sat on the board corner)', () => {
+    render(<MpRoundLayout {...props({ foundWords: [{ word: 'a' }, { word: 'b' }] })} />);
+    expect(screen.getByTestId('mp-found-pill').className).toContain('lg:hidden');
+    expect(screen.getByTestId('mp-words-count')).toHaveTextContent('2');
+  });
+
+  it('blast: the server accepts fill my words and the count (blast submits straight to the socket)', () => {
+    render(<MpRoundLayout {...props({ gameMode: 'blast', foundWords: [] })} />);
+    act(() => recordWordAccepted({ word: 'stare', score: 17 }));
+    expect(screen.getByTestId('ladder-row-stare')).toHaveTextContent('17');
+    expect(screen.getAllByTestId('mp-recent-word')[0]).toHaveTextContent('stare');
+    expect(screen.getByTestId('mp-words-count')).toHaveTextContent('1');
+  });
+
+  it('blast: no found pill (its clear strip already counts words); the canvas sheds blast\'s own clock/score/exit', () => {
+    render(<MpRoundLayout {...props({ gameMode: 'blast' })} />);
+    expect(screen.queryByTestId('mp-found-pill')).toBeNull();
+    expect(screen.getByTestId('mp-round-canvas').className).toContain('blastCanvas');
+  });
+
+  it('blast: callouts drop below blast\'s clear strip (never cover its progress bar)', () => {
+    render(<MpRoundLayout {...props({ gameMode: 'blast' })} />);
+    expect(screen.getByTestId('mp-callout-stage').className).toContain('top-[52px]');
+  });
+
+  it('no host crown in-round (a crown on a last-place host reads as "the leader")', () => {
+    render(<MpRoundLayout {...props({ users: [{ username: 'me' }, { username: 'bot', isBot: true }, { username: 'amy', isHost: true }] })} />);
+    expect(screen.queryByTestId('mp-roster-crown')).toBeNull();
+  });
+
+  it('a special word lands in the banner lane with the SERVER finder (`foundBy`), never over the board', () => {
+    const handlers = new Map<string, (d: unknown) => void>();
+    const socket = { on: (e: string, h: (d: unknown) => void) => handlers.set(e, h), off: vi.fn() };
+    render(<MpRoundLayout {...props({ socket: socket as never })} />);
+    act(() => handlers.get('specialWordFound')?.({ word: 'moonbeam', foundBy: 'bot', bonus: 10 }));
+    const banner = screen.getByTestId('mp-banner');
+    expect(banner).toHaveTextContent('mpUi.round.specialWord:');
+    expect(banner).toHaveTextContent('"name":"\u2068bot\u2069"');
+    expect(banner).toHaveTextContent('"word":"MOONBEAM"');
+  });
+
+  it('my own special word: the "+bonus" banner shows the server bonus', () => {
+    const handlers = new Map<string, (d: unknown) => void>();
+    const socket = { on: (e: string, h: (d: unknown) => void) => handlers.set(e, h), off: vi.fn() };
+    render(<MpRoundLayout {...props({ socket: socket as never })} />);
+    act(() => handlers.get('specialWordFound')?.({ word: 'moonbeam', foundBy: 'me', bonus: 10 }));
+    expect(screen.getByTestId('mp-banner')).toHaveTextContent('mpUi.round.specialWordMine');
+    expect(screen.getByTestId('mp-banner')).toHaveTextContent('"bonus":10');
+  });
+
+  it('a long name is clipped in a loud callout so the line fits a phone', () => {
+    const base = [{ username: 'Bartholomew_the_Great', score: 10 }, { username: 'me', score: 5 }];
+    const { rerender } = render(<MpRoundLayout {...props({ leaderboard: base })} />);
+    rerender(<MpRoundLayout {...props({ leaderboard: [{ username: 'me', score: 20 }, { username: 'Bartholomew_the_Great', score: 10 }] })} />);
+    expect(screen.getByTestId('mp-callout')).toHaveTextContent('"name":"⁨Bartholom…⁩"');
+  });
 });

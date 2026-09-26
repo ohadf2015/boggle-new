@@ -4,14 +4,9 @@ import React, { memo, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import dynamic from 'next/dynamic';
 import InGameScreen from '../../components/game/InGameScreen';
-import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
-const BlastGame = dynamic(
-  () => import('@/components/blast/legacy/BlastGame').then(m => ({ default: m.BlastGame })),
-  { ssr: false, loading: () => <GameLoadingFallback /> },
-);
 const WordHuntGame = dynamic(
   () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
@@ -38,7 +33,7 @@ import type { BoardTheme } from '@/shared/types/socket';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
-import { MpDesktopShellFrame, isShellMode } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
+import { MpDesktopShellFrame } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
 import type { MpRosterUserLike } from '@/lib/multiplayer/roster';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -55,7 +50,7 @@ import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverla
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
 import { useMpExit } from '@/hooks/useMpExit';
 import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
-import { MpServerScoreFly } from '@/components/multiplayer/round/MpServerScoreFly';
+import { MpBlastCanvas } from '@/components/multiplayer/round/MpBlastCanvas';
 import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
 
 type HintsState = PlayerHintsState;
@@ -162,12 +157,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Mode-overlay state subscribed inside InGameScreen — keeps this view
   // from re-rendering on irrelevant store updates when gameMode isn't classic.
-
-  // Blast multiplayer bridge — converts Zustand state to BlastGame props
-  const blastBridge = useBlastMultiplayerBridge({
-    letterGrid: letterGrid || shufflingGrid,
-    gridSize: (letterGrid || shufflingGrid)?.[0]?.length ?? 4,
-  });
 
   const { pendingWords, enqueuePending, dismissPending } = useRoundPendingWords(socket, username);
 
@@ -293,28 +282,17 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // The active mode's game component. On desktop it becomes the shell's center
   // slot; on mobile/tablet it's rendered directly.
+  const roundTotal = totalTime ?? (gameDuration || 0);
   const gameCanvas = gameMode === 'blast' ? (
-        <>
-          <BlastGame
-            config={blastBridge.config}
-            mode="multiplayer"
-            remainingTime={remainingTime}
-            totalTime={totalTime}
-            leaderboard={leaderboard}
-            username={username}
-            onGameEnd={() => {/* Server controls game end in multiplayer */}}
-            onMPDeadEnd={() => socket?.emit('blastDeadEnd')}
-            onMPBoardCleared={handleMPBoardCleared}
-            onQuit={onExitRoom}
-            onWordWithComboType={handleBlastWordWithCombo}
-            initialTileStates={blastBridge.initialTileStates}
-            blastSeed={blastBridge.blastSeed}
-            serverGrid={blastBridge.serverGrid}
-            serverPointsOnly
-            isDesktopCanvas={shellEnabled && isShellMode(gameMode)}
-          />
-          <MpServerScoreFly />
-        </>
+        <MpBlastCanvas
+          grid={effectiveGrid}
+          username={username}
+          socket={socket}
+          totalTime={roundTotal}
+          onQuit={onExitRoom}
+          onWordWithComboType={handleBlastWordWithCombo}
+          onBoardCleared={handleMPBoardCleared}
+        />
       ) : gameMode === 'word-hunt' ? (
           <WordHuntGame
             grid={effectiveGrid}
@@ -396,8 +374,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   return (
     <div className={roundFrame ? MP_ROUND_CONTAINER_CLASS : getMpInGameContainerClass(gameMode)}>
-      {/* Classic + word-hunt: the one round frame (HUD / roster / board, phone
-          and desktop). Blast keeps its own HUD inside the desktop shell. */}
+      {/* Classic, word-hunt and blast: the one round frame (HUD / roster /
+          board, phone and desktop). */}
       {roundFrame ? (
         <MpRoundShell
           desktopShell={shellEnabled}
@@ -405,7 +383,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           meId={username}
           gameMode={gameMode}
           remainingTime={remainingTime}
-          totalTime={totalTime ?? (gameDuration || null)}
+          totalTime={roundTotal || null}
           leaderboard={leaderboard}
           users={rosterUsers}
           foundWords={foundWords}
@@ -413,19 +391,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           revealed={!showStartAnimation}
           onExit={onExitRoom}
           canvas={gameCanvas}
-        />
-      ) : shellEnabled && isShellMode(gameMode) ? (
-        <MpDesktopShellFrame
-          gameMode={gameMode}
-          canvas={gameCanvas}
-          leaderboard={leaderboard}
-          users={rosterUsers}
-          foundWords={foundWords}
           socket={socket}
-          meId={username}
-          roomId={gameCode}
-          remainingTime={remainingTime}
-          totalTime={totalTime}
         />
       ) : (
         gameCanvas

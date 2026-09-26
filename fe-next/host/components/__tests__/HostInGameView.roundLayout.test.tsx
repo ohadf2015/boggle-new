@@ -31,13 +31,21 @@ vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ profile: { total_games: 0 } }) }));
 const mode = { value: 'classic' as string | undefined };
+// Stable identities, like the real zustand store and usePendingWords (useCallback).
+const { storeState, pendingApi } = vi.hoisted(() => ({
+  storeState: { setBlastBoardClearedByLocal: () => {} },
+  pendingApi: {} as Record<string, unknown>,
+}));
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => mode.value,
   useGameModeConfirmed: () => true,
-  useGameStore: (sel: (s: { setBlastBoardClearedByLocal: () => void }) => unknown) => sel({ setBlastBoardClearedByLocal: () => {} }),
+  useGameStore: (sel: (s: { setBlastBoardClearedByLocal: () => void }) => unknown) => sel(storeState),
 }));
 vi.mock('@/lib/multiplayer/usePendingWords', () => ({
-  usePendingWords: () => ({ pendingWords: new Map(), enqueuePending: vi.fn(), confirmPending: vi.fn(), rejectPending: vi.fn(), dismissPending: vi.fn(), clearAll: vi.fn(), isPending: vi.fn().mockReturnValue(false) }),
+  usePendingWords: () => {
+    if (!pendingApi.enqueuePending) Object.assign(pendingApi, { pendingWords: new Map(), enqueuePending: vi.fn(), confirmPending: vi.fn(), rejectPending: vi.fn(), dismissPending: vi.fn(), clearAll: vi.fn(), isPending: vi.fn().mockReturnValue(false) });
+    return pendingApi;
+  },
 }));
 const abort = { value: false };
 vi.mock('@/lib/multiplayer/useReconnectFlow', () => ({
@@ -53,6 +61,8 @@ vi.mock('@/components/multiplayer/MPGameAbortedModal', () => ({
 const routerPush = vi.fn();
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: routerPush }), useParams: () => ({ locale: 'en' }) }));
 vi.mock('@/components/ui/CircularTimer', () => ({ default: () => <div /> }));
+// NumberFlow's custom element is not defined here; a score change would crash its update path.
+vi.mock('@/components/ui/AnimatedCounter', () => ({ default: ({ value }: { value: number }) => <span>{value}</span> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <i /> }));
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Mute' }) }));
 
@@ -132,6 +142,29 @@ describe('HostInGameView — round frame', () => {
     expect(screen.getByTestId('mp-floater').textContent).toBe('+17');
     expect(blastProps.length).toBe(renders);
     now.mockRestore();
+  });
+
+  it('blast: the playing host gets the same round frame as the joiner (one HUD, blast clock/standings off)', async () => {
+    mode.value = 'blast';
+    render(<HostInGameView {...props} />);
+    await screen.findByTestId('blast-game');
+    expect(screen.getByTestId('mp-round-canvas')).toContainElement(screen.getByTestId('blast-game'));
+    expect(screen.getAllByTestId('mp-hud-bar')).toHaveLength(1);
+    const p = blastProps.at(-1);
+    expect(p.isDesktopCanvas).toBe(true);
+    expect(p.leaderboard).toBeUndefined();
+    expect(screen.queryByTestId('mp-server-score-fly')).not.toBeInTheDocument();
+  });
+
+  it('blast: a timer tick or a score update never re-renders the host\'s blast board', async () => {
+    mode.value = 'blast';
+    const { rerender } = render(<HostInGameView {...props} />);
+    await screen.findByTestId('blast-game');
+    const renders = blastProps.length;
+    rerender(<HostInGameView {...props} remainingTime={59} playerScores={{ Host: 12, Bot: 9 }} />);
+    rerender(<HostInGameView {...props} remainingTime={58} playerScores={{ Host: 15, Bot: 9 }} />);
+    expect(blastProps.length).toBe(renders);
+    expect(screen.getByTestId('mp-rank-value')).toHaveTextContent('#1');
   });
 
   it('continue-solo leaves through useMpExit', () => {

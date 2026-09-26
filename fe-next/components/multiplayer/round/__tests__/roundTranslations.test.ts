@@ -37,6 +37,11 @@ describe('mpUi.round translations', () => {
     }
   });
 
+  it('has the special-word banner lines (found by someone / by me)', () => {
+    expect(EN.specialWord).toEqual(expect.stringContaining('{word}'));
+    expect(EN.specialWordMine).toEqual(expect.stringContaining('{bonus}'));
+  });
+
   describe.each(Object.entries({ en, he, sv, ja, es, ru }))('%s', (locale, bundle) => {
     const L = leaves(round(bundle));
 

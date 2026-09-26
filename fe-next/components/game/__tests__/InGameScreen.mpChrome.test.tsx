@@ -23,6 +23,7 @@ vi.mock('@/components/GridComponent', async () => {
   return { default: Grid };
 });
 vi.mock('@/components/RoomChat', () => ({ default: () => null }));
+vi.mock('@/components/game/KeyboardHintTooltip', () => ({ default: () => <div data-testid="keyboard-speed-tip" /> }));
 const { leadSounds } = vi.hoisted(() => ({ leadSounds: { milestone: vi.fn(), brk: vi.fn() } }));
 vi.mock('@/hooks/useLeadChangeDetection', () => ({
   useLeadChangeDetection: () => ({ type: 'took-lead', id: 1 }),
@@ -112,6 +113,28 @@ describe('InGameScreen mpChrome — play surface only', () => {
     render(<InGameScreen {...props()} />);
     expect(leadSounds.milestone).not.toHaveBeenCalled();
     expect(leadSounds.brk).not.toHaveBeenCalled();
+  });
+
+  it('no SPEED TIP popover over the board (the round keeps its one-line keyboard hint)', () => {
+    const { unmount } = render(<InGameScreen {...props({ mpChrome: false })} />);
+    expect(screen.getByTestId('keyboard-speed-tip')).toBeInTheDocument();
+    unmount();
+    render(<InGameScreen {...props()} />);
+    expect(screen.queryByTestId('keyboard-speed-tip')).toBeNull();
+  });
+
+  it('a special word never pops a card over the board (the round\'s banner lane announces it)', () => {
+    const handlers = new Map<string, (d: unknown) => void>();
+    const socket = { on: (e: string, h: (d: unknown) => void) => handlers.set(e, h), off: () => {}, emit: () => {} };
+    const fire = () => act(() => handlers.get('specialWordFound')?.({ word: 'moonbeam', foundBy: 'bot', bonus: 10 }));
+    const { unmount } = render(<InGameScreen {...props({ mpChrome: false, socket: socket as never })} />);
+    fire();
+    expect(screen.getByText('moonbeam')).toBeInTheDocument();
+    unmount();
+    handlers.clear();
+    render(<InGameScreen {...props({ socket: socket as never })} />);
+    fire();
+    expect(screen.queryByText('moonbeam')).toBeNull();
   });
 
   it('a timer tick does not re-render the board', () => {

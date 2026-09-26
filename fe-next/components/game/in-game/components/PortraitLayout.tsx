@@ -408,17 +408,19 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         />
       )}
 
+      {/* mpChrome: no keyboard popover and no special-word card over the board —
+          the round keeps a one-line keyboard hint and a banner lane. */}
       <GameOverlays
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
-        isPlaying={isPlaying}
+        isPlaying={isPlaying && !mpChrome}
         isDesktop={isDesktop}
         isTypingMode={isTypingMode}
         isHelpOpen={isHelpOpen}
         onCloseHelp={onCloseHelp}
         roundEvent={roundEvent}
-        specialWordEvent={specialWordEvent}
+        specialWordEvent={mpChrome ? null : specialWordEvent}
         t={t}
       />
 

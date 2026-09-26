@@ -11,7 +11,8 @@ import { MpRoundHud } from './MpRoundHud';
 import { MpScoreFloaters } from './MpScoreFloaters';
 import { MpRecentWords } from './MpRecentWords';
 import { roundModeMeta, timerColor } from './roundModes';
-import { useRoundJuice } from './useRoundJuice';
+import { useRoundJuice, type RoundSocket } from './useRoundJuice';
+import { mergeServerWords, useServerAcceptedWords } from './useServerAcceptedWords';
 import styles from './round.module.css';
 
 interface FoundWordLike {
@@ -53,6 +54,8 @@ export interface MpRoundLayoutProps {
   onExit: () => void;
   /** The mode's play surface (board + word pill), rendered unchanged. */
   canvas: ReactNode;
+  /** Live room socket, for server moments mpFeedback does not carry (special word). */
+  socket?: RoundSocket | null;
 }
 
 /**
@@ -73,6 +76,7 @@ function MpRoundLayoutImpl({
   revealed,
   onExit,
   canvas,
+  socket,
 }: MpRoundLayoutProps) {
   const { t } = useLanguage();
   const reduceMotion = useShouldReduceMotion();
@@ -82,6 +86,8 @@ function MpRoundLayoutImpl({
   const prevRoster = useRef<MpRosterPlayer[] | undefined>(undefined);
   const roster = useMemo(() => {
     const next = toMpRoster(leaderboard, users, meId, { previous: prevRoster.current });
+    // In-round the crown would read as "the leader" — hosting is a lobby fact.
+    for (const p of next) p.isHost = false;
     prevRoster.current = next;
     return next;
   }, [leaderboard, users, meId]);
@@ -89,20 +95,22 @@ function MpRoundLayoutImpl({
   const { rank, total } = rankOf(roster, meId);
   const myScore = roster.find((p) => p.id === meId)?.score ?? 0;
 
-  const juice = useRoundJuice({ meId, standings, remainingTime });
+  const juice = useRoundJuice({ meId, standings, remainingTime, socket });
 
-  const found = useMemo(() => uniqueFound(foundWords), [foundWords]);
-  // Ladder points: the server's per-word points (mpFeedback), never a client sum.
+  // My words, each once, with the SERVER's points: the view's list (optimistic
+  // add + echo) merged with every server accept — blast submits straight to
+  // the socket, so only the server knows its words (pitfall class 3).
+  const accepted = useServerAcceptedWords();
   const ladder = useMemo<LadderWord[]>(
     () =>
-      found.map((w, i) => ({
-        word: w.word,
-        score: w.score || juice.pointsByWord.get(w.word.toLowerCase()) || 0,
-        ts: w.timestamp ?? i,
-        userId: meId,
-      })),
-    [found, meId, juice.pointsByWord],
+      mergeServerWords(
+        uniqueFound(foundWords).map((w, i) => ({ word: w.word, score: w.score ?? 0, ts: w.timestamp ?? i, userId: meId })),
+        accepted,
+        meId,
+      ),
+    [foundWords, accepted, meId],
   );
+  const isBlast = mode.slug === 'blast';
 
   return (
     <div data-testid="mp-round-layout" data-mode={mode.slug} className={cn(styles.layout, 'relative flex-1 min-h-0 w-full h-full bg-neo-navy')}>
@@ -141,6 +149,8 @@ function MpRoundLayoutImpl({
         className={cn(
           styles.areaBoard,
           styles.fillBoard,
+          // Blast keeps its board, word area and clear strip; the round HUD owns exit, clock and score.
+          isBlast && styles.blastCanvas,
           'relative min-h-0 min-w-0 flex flex-col',
           !revealed && 'invisible',
           // The drop runs once, when the class lands (the GO render).
@@ -148,17 +158,23 @@ function MpRoundLayoutImpl({
         )}
       >
         {canvas}
-        <span
-          data-testid="mp-found-pill"
-          className="pointer-events-none absolute bottom-1 end-2 z-10 rounded-full border-2 border-neo-black bg-neo-navy-light px-2.5 py-0.5 text-xs tv:text-lg font-bold text-neo-white/80 shadow-hard-sm tabular-nums"
-        >
-          {t('mpUi.round.found', { count: found.length })}
-        </span>
+        {/* Phone only: desktop counts in the YOUR WORDS header; blast's clear strip counts its own. */}
+        {!isBlast && (
+          <span
+            data-testid="mp-found-pill"
+            className="lg:hidden pointer-events-none absolute bottom-1 end-2 z-10 rounded-full border-2 border-neo-black bg-neo-navy-light px-2.5 py-0.5 text-xs font-bold text-neo-white/80 shadow-hard-sm tabular-nums"
+          >
+            {t('mpUi.round.found', { count: ladder.length })}
+          </span>
+        )}
       </div>
 
       {/* Desktop: my words */}
       <aside className={cn(styles.areaRight, 'min-h-0 flex-col gap-2 pt-3')} aria-label={t('mpUi.round.yourWords')}>
-        <h2 className="font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1">{t('mpUi.round.yourWords')}</h2>
+        <h2 className="flex items-baseline justify-between gap-2 font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1">
+          {t('mpUi.round.yourWords')}
+          <span data-testid="mp-words-count" className="rounded-full bg-neo-lime px-2 text-neo-black tabular-nums">{ladder.length}</span>
+        </h2>
         <div className="flex-1 min-h-0 overflow-hidden rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard flex flex-col">
           {ladder.length > 0 ? (
             <WordsLadder words={ladder} meId={meId} />
@@ -171,8 +187,12 @@ function MpRoundLayoutImpl({
       {/* Juice lanes: callouts/banners over the board, floaters toward the score */}
       <div className={cn(styles.areaBoard, 'pointer-events-none relative z-30')}>
         {/* The callout stage sits in the board area's free band: above the pill
-            for classic, below the clue strip + life bar for word-hunt. */}
-        <div data-testid="mp-callout-stage" className={cn('absolute inset-x-0 top-0', mode.slug === 'wordHunt' && 'top-[calc(132px*var(--mp-u,1))]')}>
+            for classic, below the clue strip + life bar for word-hunt, below
+            the clear strip for blast. */}
+        <div
+          data-testid="mp-callout-stage"
+          className={cn('absolute inset-x-0 top-0 px-3', mode.slug === 'wordHunt' && 'top-[calc(132px*var(--mp-u,1))]', isBlast && 'top-[52px]')}
+        >
           <MpRecentWords words={ladder} />
           <div className="relative">
             <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />

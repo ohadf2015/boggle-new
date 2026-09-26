@@ -18186,7 +18186,9 @@ const ru = {
       "keyboardHint": "Введи слово · Enter отправить · Esc очистить",
       "yourWords": "Твои слова",
       "noWords": "Слов пока нет. Найди первое!",
-      "players": "Игроки"
+      "players": "Игроки",
+      "specialWord": "{name} нашёл особое слово {word}!",
+      "specialWordMine": "Особое слово {word}! +{bonus}"
     },
     "results": {}
   }

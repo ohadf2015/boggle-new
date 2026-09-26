@@ -1,7 +1,7 @@
 /**
  * BlastGame's MP opt-in `serverPointsOnly` (default off): every point blast
- * shows comes from the server. The client engine's "+N" fly is off (the ROUND
- * overlay MpServerScoreFly shows `wordAccepted.score`), the word pill drops its
+ * shows comes from the server. The client engine's "+N" fly is off (the round
+ * frame's floaters show `wordAccepted.score`), the word pill drops its
  * client "+N". (The MP HUD score already reads the leaderboard — asserted
  * here so it stays that way.) Solo and quick-play keep both client numbers
  * (default render lock:

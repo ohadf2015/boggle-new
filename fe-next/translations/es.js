@@ -18471,7 +18471,9 @@ const es = {
       "keyboardHint": "Escribe una palabra · Enter envía · Esc borra",
       "yourWords": "Tus palabras",
       "noWords": "Aún no hay palabras. ¡Encuentra la primera!",
-      "players": "Jugadores"
+      "players": "Jugadores",
+      "specialWord": "¡{name} encontró la palabra especial {word}!",
+      "specialWordMine": "¡Palabra especial {word}! +{bonus}"
     },
     "results": {}
   }
