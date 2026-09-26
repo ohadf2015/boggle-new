@@ -11,8 +11,11 @@
  */
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
 import { WORDCRAFT_FOCUS } from './wordcraftAssignment';
-import type { CreateLessonFn, CreateLessonAndAssignResult } from './createLessonWithAssignment';
-import { createLessonAndAssign } from './createLessonWithAssignment';
+import {
+  createLessonAndAssign,
+  type CreateLessonFn,
+  type CreateLessonAndAssignResult,
+} from './createLessonWithAssignment';
 
 export const FIRST_ASSIGNMENT_DUE_IN_DAYS = 1;
 

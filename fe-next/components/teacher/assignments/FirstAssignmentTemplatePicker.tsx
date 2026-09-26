@@ -35,7 +35,7 @@ export function FirstAssignmentTemplatePicker({
             disabled={isSubmitting}
             onClick={() => onAssign(pack)}
             className={cn(
-              'min-h-11 rounded-neo border-3 border-black bg-neo-navy-light p-4 text-start',
+              'min-h-11 rounded-neo border-3 border-neo-cream bg-neo-navy-light p-4 text-start',
               'hover:-translate-y-0.5 hover:shadow-hard-sm',
               'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
               'disabled:cursor-not-allowed disabled:opacity-60',
