@@ -112,4 +112,23 @@ describe('WordHuntDangerToast', () => {
     expect(dangerEl?.getAttribute('data-toast-type')).toBe('danger');
     expect(eliminatedEl?.getAttribute('data-toast-type')).toBe('eliminated');
   });
+
+  describe('placement', () => {
+    const toasts: DangerToast[] = [{ id: '1', type: 'danger', playerName: 'X', timestamp: Date.now() }];
+
+    it('default: fixed at the top of the viewport (quick-play / legacy MP chrome)', () => {
+      render(<WordHuntDangerToast toasts={toasts} onDismiss={vi.fn()} />);
+      const stack = screen.getByTestId('wh-danger-stack');
+      expect(stack.className).toContain('fixed');
+      expect(stack.className).toContain('top-4');
+    });
+
+    it('panel (MP round frame): pinned over the mode panel inside the canvas, never over the round HUD timer/score', () => {
+      render(<WordHuntDangerToast toasts={toasts} onDismiss={vi.fn()} placement="panel" />);
+      const stack = screen.getByTestId('wh-danger-stack');
+      expect(stack.className).not.toContain('fixed');
+      expect(stack.className).toContain('absolute');
+      expect(stack.className).toContain('inset-x-0');
+    });
+  });
 });

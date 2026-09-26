@@ -33,8 +33,6 @@ const EXIT_IMPLEMENTATION = new Set([
 
 /** Legacy sites each piece converts to useMpExit (delete the entry when done). */
 const LEGACY_ALLOWLIST: Record<string, string> = {
-  'host/components/HostInGameView.tsx': 'ROUND — continue-solo push',
-  'player/components/PlayerInGameView.tsx': 'ROUND — continue-solo push',
   'components/views/ResultsPage.tsx': 'RESULTS — replace() exits + lesson/practice pushes',
 };
 

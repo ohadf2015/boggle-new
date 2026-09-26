@@ -54,7 +54,20 @@ export type { HintsState, InGameScreenProps } from './in-game/types';
  * Shows active game state with grid, timer, found words, and leaderboard
  * Ensures consistent UI between host and player during gameplay
  */
-const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
+/**
+ * Opt-in props for the live multiplayer round (default off — quick-play, solo
+ * and legacy callers render byte-identically; see
+ * __tests__/InGameScreen.defaultRender.snapshot.test.tsx).
+ */
+interface MpRoundOptIns {
+  /**
+   * The MP round screen owns the HUD (timer, score, rank, roster, callouts) in
+   * a sibling subtree; this renders only the play surface (word pill + board).
+   */
+  mpChrome?: boolean;
+}
+
+const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScreen({
   // Core identity
   username,
   gameCode,
@@ -116,6 +129,9 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
 
   // Desktop shell integration
   inDesktopShell = false,
+
+  // Live MP round chrome (opt-in)
+  mpChrome = false,
 }) {
   // Mode-overlay state read directly from store — keeps parents from
   // re-rendering on irrelevant store updates (was previously prop-passed
@@ -337,13 +353,14 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
 
   // Play sound on lead change
   useEffect(() => {
-    if (!leadChangeEvent) return;
+    // mpChrome: the MP round's juice layer owns the lead-change cue (one sound, not two).
+    if (!leadChangeEvent || mpChrome) return;
     if (leadChangeEvent.type === 'took-lead') {
       playComboMilestoneSound(5);
     } else {
       playComboBreakSound(1);
     }
-  }, [leadChangeEvent, playComboMilestoneSound, playComboBreakSound]);
+  }, [leadChangeEvent, mpChrome, playComboMilestoneSound, playComboBreakSound]);
 
   // Golden letter positions from backend startGame payload
   const [goldenLetters, setGoldenLetters] = useState<Array<{ row: number; col: number }>>([]);
@@ -700,6 +717,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
         totalBoardWords={totalBoardWords}
         gameStatsRef={gameStatsRef}
         inDesktopShell={inDesktopShell}
+        mpChrome={mpChrome}
       >
         {children}
       </PortraitLayout>

@@ -80,3 +80,12 @@ describe('WordsLadder', () => {
     expect(screen.queryByTestId('ladder-kb-chip-LEGACY')).not.toBeInTheDocument();
   });
 });
+
+describe('WordsLadder — RTL words', () => {
+  it('renders each word bidi-isolated in the display font (monospace pulled Hebrew letters apart)', () => {
+    render(<WordsLadder words={[{ word: 'אטנו', score: 22, ts: 1, userId: 'me' }]} meId="me" />);
+    const cell = screen.getByText('אטנו');
+    expect(cell).toHaveAttribute('dir', 'auto');
+    expect(cell.className).not.toContain('font-mono');
+  });
+});

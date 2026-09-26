@@ -7,6 +7,8 @@ import { WheelRushDesktopAdapter } from './WheelRushDesktopAdapter';
 import { toRosterPlayers, type MpRosterUserLike } from '@/lib/multiplayer/roster';
 import type { LadderWord } from './WordsLadder';
 import type { BlastGoal } from './insights/GoalBanner';
+import { MpRoundLayout, type MpRoundLayoutProps } from '../round/MpRoundLayout';
+import { mergeServerWords, useServerAcceptedWords } from '../round/useServerAcceptedWords';
 
 /** Modes that have a desktop-shell adapter wired here. */
 export const SHELL_MODES = ['classic', 'blast', 'word-hunt', 'wheel-rush'] as const;
@@ -78,6 +80,11 @@ export interface MpDesktopShellFrameProps {
   comboMultiplier?: number;
   retiredTileCount?: number;
   luckyBoostActive?: boolean;
+  /**
+   * The rebuilt round frame (classic, word-hunt): rail | HUD over board |
+   * ladder, shared with phone. When set, the legacy per-mode adapter is skipped.
+   */
+  round?: Omit<MpRoundLayoutProps, 'canvas' | 'gameMode'>;
 }
 
 /**
@@ -87,11 +94,28 @@ export interface MpDesktopShellFrameProps {
  * without an adapter (callers should only mount this for `isShellMode`).
  */
 export function MpDesktopShellFrame(props: MpDesktopShellFrameProps) {
+  if (props.round) {
+    return (
+      <div data-mp-shell data-game-mode={props.gameMode} className="flex-1 min-h-0 flex flex-col">
+        <MpRoundLayout {...props.round} gameMode={props.gameMode} canvas={props.canvas} />
+      </div>
+    );
+  }
+  return <LegacyShellFrame {...props} />;
+}
+
+function LegacyShellFrame(props: MpDesktopShellFrameProps) {
   const { leaderboard, users, foundWords, meId } = props;
   // Stable identities across timer ticks (perf rule 4): the adapters' memoized
   // rails compare these by reference.
   const roster = useMemo(() => toRosterPlayers(leaderboard, meId, users), [leaderboard, meId, users]);
-  const ladder = useMemo(() => toLadderWords(foundWords, meId), [foundWords, meId]);
+  // Blast submits straight to the socket, so `foundWords` alone misses its
+  // words: merge the server's accepts (once each, server points).
+  const accepted = useServerAcceptedWords();
+  const ladder = useMemo(
+    () => mergeServerWords(toLadderWords(foundWords, meId), accepted, meId ?? ''),
+    [foundWords, meId, accepted],
+  );
   const common = {
     roomId: props.roomId,
     leaderboard: roster,

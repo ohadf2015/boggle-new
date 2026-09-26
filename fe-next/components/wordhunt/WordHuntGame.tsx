@@ -45,6 +45,8 @@ export interface WordHuntGameProps {
   /** True when mounted as the MP desktop shell's center slot — collapses the
    *  internal sidebar layout so the board fills the slot (shell supplies the roster). */
   isDesktopCanvas?: boolean;
+  /** Live MP round frame owns HUD/roster/rule: render the compact strip + board only. */
+  mpChrome?: boolean;
 }
 
 export const WordHuntGame = memo<WordHuntGameProps>(({
@@ -61,6 +63,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   socket,
   foundWords,
   isDesktopCanvas = false,
+  mpChrome = false,
 }) => {
   const { t, dir } = useLanguage();
   const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
@@ -135,11 +138,14 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   });
 
   // Handle word change from grid swiping
+  // Keyed on the stable callback, not the per-render `ftue` object: a fresh
+  // onWordChange re-rendered the board on every leaderboard/score update.
+  const markFtueActivity = ftue.markActivity;
   const handleWordChange = useCallback((word: string, count: number) => {
-    if (count > 0) ftue.markActivity();
+    if (count > 0) markFtueActivity();
     setFormedWord(word);
     setLetterCount(count);
-  }, [ftue]);
+  }, [markFtueActivity]);
 
   // Handle word submission — validate locally, emit to server, dual submission
   function handleWordSubmit(word: string) {
@@ -276,16 +282,20 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
 
   return (
     <>
-    {showQuickRules && <WordHuntQuickRules onDismiss={handleDismissRules} t={t} />}
+    {/* mpChrome: the round frame's countdown carries the rule and its callout lane
+        owns feedback, so neither the first-time rules card (fixed over the HUD)
+        nor the first-time nudges (fixed over the board) float in the round. */}
+    {showQuickRules && !mpChrome && <WordHuntQuickRules onDismiss={handleDismissRules} t={t} />}
     <LowHPOverlay hp={bridge.lifePoints} />
     <WordHuntCategoryHint targetLength={bridge.targetLength} targetCategory={bridge.targetCategory} />
-    <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} />
+    <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} placement={mpChrome ? 'panel' : 'viewport'} />
     <WordHuntGameLayout
       // Header (no timer)
       score={score}
       onQuit={onQuit}
       onShowHelp={handleShowHelp}
       isDesktopCanvas={isDesktopCanvas}
+      mpChrome={mpChrome}
 
       // Clue boxes (from bridge)
       targetLength={bridge.targetLength}
@@ -344,12 +354,14 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       t={t}
       gameDir={dir}
     />
-    <WordHuntFirstTimeNudges
-      lifePoints={bridge.lifePoints}
-      discoveryClueCount={bridge.accumulatedClues.size}
-      wrongGuessCount={wrongGuessCount}
-      t={t}
-    />
+    {!mpChrome && (
+      <WordHuntFirstTimeNudges
+        lifePoints={bridge.lifePoints}
+        discoveryClueCount={bridge.accumulatedClues.size}
+        wrongGuessCount={wrongGuessCount}
+        t={t}
+      />
+    )}
     </>
   );
 });

@@ -1,9 +1,9 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
 
-import { usePendingWords } from '../usePendingWords';
+import { usePendingWords, SETTLED_CHIP_MS } from '../usePendingWords';
 
 describe('usePendingWords', () => {
   it('starts empty', () => {
@@ -54,5 +54,44 @@ describe('usePendingWords', () => {
     expect(result.current.isPending('WORD')).toBe(true);
     act(() => { result.current.confirmPending('WORD'); });
     expect(result.current.isPending('WORD')).toBe(false);
+  });
+
+  describe('settled chips leave on their own (a confirmed chip has no exit animation, and reduced motion drops the shake — they piled up over the board all round)', () => {
+    beforeEach(() => { vi.useFakeTimers(); });
+    afterEach(() => { vi.useRealTimers(); });
+
+    it('a confirmed word is removed after a short beat', () => {
+      const { result } = renderHook(() => usePendingWords());
+      act(() => { result.current.enqueuePending('CAT'); });
+      act(() => { result.current.confirmPending('CAT'); });
+      expect(result.current.pendingWords.get('CAT')).toBe('confirmed');
+      act(() => { vi.advanceTimersByTime(SETTLED_CHIP_MS); });
+      expect(result.current.pendingWords.has('CAT')).toBe(false);
+    });
+
+    it('a rejected word is removed after a short beat too', () => {
+      const { result } = renderHook(() => usePendingWords());
+      act(() => { result.current.enqueuePending('XQ'); });
+      act(() => { result.current.rejectPending('XQ'); });
+      act(() => { vi.advanceTimersByTime(SETTLED_CHIP_MS); });
+      expect(result.current.pendingWords.has('XQ')).toBe(false);
+    });
+
+    it('a still-pending word is never auto-removed', () => {
+      const { result } = renderHook(() => usePendingWords());
+      act(() => { result.current.enqueuePending('DOG'); });
+      act(() => { vi.advanceTimersByTime(SETTLED_CHIP_MS * 3); });
+      expect(result.current.pendingWords.get('DOG')).toBe('pending');
+    });
+
+    it('re-submitting a word after it settled is not removed by the old timer', () => {
+      const { result } = renderHook(() => usePendingWords());
+      act(() => { result.current.enqueuePending('CAT'); });
+      act(() => { result.current.confirmPending('CAT'); });
+      act(() => { vi.advanceTimersByTime(SETTLED_CHIP_MS - 10); });
+      act(() => { result.current.enqueuePending('CAT'); });
+      act(() => { vi.advanceTimersByTime(20); });
+      expect(result.current.pendingWords.get('CAT')).toBe('pending');
+    });
   });
 });

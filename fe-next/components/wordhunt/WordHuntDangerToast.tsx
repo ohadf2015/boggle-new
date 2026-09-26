@@ -23,6 +23,10 @@ export interface DangerToast {
 interface WordHuntDangerToastProps {
   toasts: DangerToast[];
   onDismiss: (id: string) => void;
+  /** 'viewport' (default): fixed at the top of the screen. 'panel': the MP round
+   *  frame — absolute at the top of the canvas (over the mode panel), because the
+   *  viewport top is the round HUD's timer and score. */
+  placement?: 'viewport' | 'panel';
 }
 
 const MAX_VISIBLE = 3;
@@ -80,14 +84,21 @@ function ToastItem({ toast, onDismiss }: { toast: DangerToast; onDismiss: (id: s
   );
 }
 
-export function WordHuntDangerToast({ toasts, onDismiss }: WordHuntDangerToastProps) {
+export function WordHuntDangerToast({ toasts, onDismiss, placement = 'viewport' }: WordHuntDangerToastProps) {
   // Show only newest MAX_VISIBLE toasts
   const visible = toasts.length > MAX_VISIBLE
     ? toasts.slice(toasts.length - MAX_VISIBLE)
     : toasts;
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col-reverse gap-2 pointer-events-none">
+    <div
+      data-testid="wh-danger-stack"
+      className={
+        placement === 'panel'
+          ? 'absolute inset-x-0 top-1 z-40 flex flex-col-reverse items-center gap-2 px-2 pointer-events-none'
+          : 'fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col-reverse gap-2 pointer-events-none'
+      }
+    >
       <AdaptiveAnimatePresence>
         {visible.map((toast) => (
           <AdaptiveMotion.div

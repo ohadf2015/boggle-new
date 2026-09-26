@@ -59,13 +59,13 @@ function WordsLadderImpl({ words, meId }: WordsLadderProps) {
             data-mine={String(mine)}
             data-stolen={String(stolen)}
             data-bump={idx === 0 ? 'true' : 'false'}
-            className={`flex justify-between items-center text-sm px-2 py-1 rounded ${mine ? 'text-foreground' : 'text-foreground/60'} ${stolen ? 'line-through decoration-red-500' : ''} ${idx === 0 ? 'animate-ladder-bump font-bold' : ''}`}
+            className={`flex justify-between items-center text-sm tv:text-2xl px-2 py-1 tv:py-2 rounded ${mine ? 'text-foreground' : 'text-foreground/60'} ${stolen ? 'line-through decoration-red-500' : ''} ${idx === 0 ? 'animate-ladder-bump font-bold' : ''}`}
           >
-            <span className="font-mono">{w.word}</span>
+            <span dir="auto" className="font-neo-display font-bold uppercase">{w.word}</span>
             {w.inputMethod === 'kb' && (
               <span
                 data-testid={`ladder-kb-chip-${w.word}`}
-                className="text-xs px-1 rounded bg-neo-cyan text-foreground"
+                className="text-xs tv:text-base px-1 rounded bg-neo-cyan text-foreground"
                 aria-label="keyboard bonus"
                 title="+10% keyboard bonus"
               >

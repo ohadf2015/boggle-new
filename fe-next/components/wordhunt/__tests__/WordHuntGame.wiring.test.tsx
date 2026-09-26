@@ -118,6 +118,37 @@ describe('WordHuntGame wiring', () => {
     expect(screen.getByTestId('category-hint')).toBeInTheDocument();
   });
 
+  describe('mpChrome (MP round frame): nothing floats over the HUD or the board', () => {
+    beforeEach(() => {
+      localStorage.removeItem('lexiclash_wh_rules_seen');
+      mockBridgeReturn.accumulatedClues = new Map([[0, 'A']]);
+    });
+    afterEach(() => {
+      mockBridgeReturn.accumulatedClues = new Map();
+    });
+
+    it('default (prop off): first-time quick rules and the first-clue nudge still show', () => {
+      render(<WordHuntGame {...defaultProps} />);
+      expect(screen.getByTestId('nudge-container')).toBeInTheDocument();
+      expect(screen.getByTestId('nudge-firstClue')).toBeInTheDocument();
+      expect(screen.getByTestId('quick-rules')).toBeInTheDocument();
+    });
+
+    it('mpChrome: no first-time nudge over the board and no quick-rules card over the HUD (the countdown carries the rule)', () => {
+      render(<WordHuntGame {...defaultProps} mpChrome />);
+      expect(screen.queryByTestId('nudge-container')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('quick-rules')).not.toBeInTheDocument();
+    });
+
+    it('mpChrome: danger toasts sit over the mode panel, not over the round HUD; default keeps the viewport-top stack', () => {
+      const { unmount } = render(<WordHuntGame {...defaultProps} />);
+      expect(screen.getByTestId('wh-danger-stack').className).toContain('fixed');
+      unmount();
+      render(<WordHuntGame {...defaultProps} mpChrome />);
+      expect(screen.getByTestId('wh-danger-stack').className).not.toContain('fixed');
+    });
+  });
+
   it('emits requestGameState after 1.5s when targetLength is 0 and game is active (recovery)', async () => {
     vi.useFakeTimers();
     mockBridgeReturn.targetLength = 0;

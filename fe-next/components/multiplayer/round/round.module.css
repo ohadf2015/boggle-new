@@ -1,0 +1,164 @@
+/*
+ * ROUND piece motion. Transform-only keyframes (perf rule 1); every one is
+ * disabled under prefers-reduced-motion (the number/color still changes).
+ */
+
+/* Countdown numeral: scale punch 1.4 → 1 (one keyframe per numeral, keyed). */
+@keyframes countPunch {
+  0% { transform: scale(1.4); }
+  60% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+.countPunch { animation: countPunch 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* GO burst ring: a small bordered ring scaling out (never a full-screen layer). */
+@keyframes goRing {
+  0% { transform: scale(0.4); opacity: 1; }
+  100% { transform: scale(5); opacity: 0; }
+}
+.goRing { animation: goRing 600ms ease-out forwards; }
+
+/* Board reveal on GO: rows drop in, staggered (translateY only). */
+@keyframes boardDrop {
+  0% { transform: translateY(-28px); }
+  70% { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+.boardDrop { animation: boardDrop 360ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* "+N" floater: flies up toward the score chip. */
+@keyframes flyUp {
+  0% { transform: translate3d(0, 0, 0) scale(0.7); opacity: 0; }
+  15% { transform: translate3d(0, -8px, 0) scale(1.15); opacity: 1; }
+  100% { transform: translate3d(var(--fly-x, 0px), var(--fly-y, -120px), 0) scale(0.8); opacity: 0; }
+}
+.flyUp { animation: flyUp 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards; will-change: transform; }
+
+/* TIME! slam at 0 (scale 1.6 → 1, 250ms). */
+@keyframes timeSlam {
+  0% { transform: scale(1.6) rotate(-4deg); }
+  100% { transform: scale(1) rotate(-4deg); }
+}
+.timeSlam { animation: timeSlam 250ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Combo meter segment lighting up. */
+@keyframes segPop {
+  0% { transform: scaleY(0.3); }
+  70% { transform: scaleY(1.25); }
+  100% { transform: scaleY(1); }
+}
+.segPop { animation: segPop 200ms ease-out both; transform-origin: bottom; }
+
+@media (prefers-reduced-motion: reduce) {
+  .countPunch,
+  .goRing,
+  .boardDrop,
+  .flyUp,
+  .timeSlam,
+  .segPop {
+    animation: none !important;
+  }
+  .goRing { display: none; }
+}
+
+/*
+ * In-round frame. Phone: hud / roster strip / board. Desktop (lg, 1024+):
+ * roster rail | hud over board | words ladder. TV scales via --mp-u.
+ * Grid areas keep ONE hud element for every size (one timer, one score).
+ */
+.layout {
+  display: grid;
+  grid-template-areas: 'hud' 'roster' 'board';
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+.areaHud { grid-area: hud; }
+.areaRoster { grid-area: roster; }
+.areaBoard { grid-area: board; }
+.areaLeft { grid-area: left; display: none; }
+.areaRight { grid-area: right; display: none; }
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-areas: 'left hud right' 'left board right';
+    grid-template-columns: minmax(200px, 1fr) minmax(0, 760px) minmax(200px, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 1rem;
+  }
+  .areaRoster { display: none; }
+  .areaLeft,
+  .areaRight { display: flex; }
+}
+@media (min-width: 1800px) and (min-height: 1000px) {
+  .layout {
+    /* The board is height-bound on a TV (~860px at 1080p): cap its column there
+       so the spare width goes to the rails (full names, 10-ft seats) instead of
+       dead margins either side of the board. */
+    grid-template-columns: minmax(300px, 1fr) minmax(0, min(1100px, calc(100dvh - 220px))) minmax(300px, 1fr);
+    column-gap: 1.5rem;
+  }
+}
+
+/*
+ * The board fills its square slot. `.game-board-frame` (globals) caps itself
+ * by VIEWPORT math (80vmin / 100dvh - 280px / 580px) written for the legacy
+ * stacked chrome — in the round frame the slot is already exact, so the cap
+ * only wasted space (a 522px board in a 716px slot at 1440×900; 312px in a
+ * 374px slot on a phone). Scoped to the round canvas.
+ */
+.fillBoard :global(.game-board-frame) {
+  --board-size: 100%;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/*
+ * Blast in the round frame. BlastStage is shared with quick-play (read-only),
+ * so the MP frame sheds its duplicate chrome from the wrapper: the round HUD
+ * already owns exit, clock and score. Blast keeps its word count, combo badge
+ * and tile-clear strip (the mode panel), its board and its word area.
+ */
+.blastCanvas :global([data-testid='blast-hud'] > div:has([data-testid='blast-quit-btn'])),
+.blastCanvas :global([data-testid='blast-hud'] div:has(> [data-testid='blast-score-label'])) {
+  display: none;
+}
+/* With the score cell gone, the clear bar takes the rest of the strip. */
+.blastCanvas :global([data-testid='blast-hud'] div:has(> [data-testid='blast-progress-label'])) {
+  flex: 1 1 0%;
+}
+
+/*
+ * Toast lanes (useRoundToastLane: .roundLive on <html> while any round view is
+ * mounted; useRoundFrameToastLane: .roundFrame while the MpRoundLayout frame is).
+ * The app's toasters are shared and fixed to the top-centre — exactly where the
+ * round HUD's timer and score live — so during a round:
+ *  - the achievement capsule is held back (the unlock is listed on results);
+ *  - in the frame, react-hot-toast (AFK warning, host change, time added…) still
+ *    shows, but below the phone HUD + roster strip, and in the start rail above
+ *    the mode card on desktop/TV (never over the board). Its container position
+ *    is an inline style, hence !important.
+ */
+.roundLive :global([data-testid='achievement-inline-toast']) {
+  display: none !important;
+}
+.roundFrame :global([data-rht-toaster]) {
+  top: calc(env(safe-area-inset-top, 0px) + 6.75rem) !important;
+}
+@media (min-width: 1024px) {
+  .roundFrame :global([data-rht-toaster]) {
+    /* above the rail's mode card (the column's foot) */
+    top: auto !important;
+    bottom: 10rem !important;
+    height: 9rem;
+    inset-inline-start: 1rem !important;
+    inset-inline-end: auto !important;
+    width: min(22vw, 420px);
+  }
+}
+@media (min-width: 1800px) and (min-height: 1000px) {
+  .roundFrame :global([data-rht-toaster]) {
+    top: auto !important;
+    bottom: 13rem !important;
+  }
+}

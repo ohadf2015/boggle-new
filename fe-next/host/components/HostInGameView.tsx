@@ -1,21 +1,19 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter, useParams } from 'next/navigation';
+import { useMpExit } from '@/hooks/useMpExit';
+import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
+import { MpBlastCanvas } from '@/components/multiplayer/round/MpBlastCanvas';
+import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
-import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
-const BlastGame = dynamic(
-  () => import('@/components/blast/legacy/BlastGame').then(m => ({ default: m.BlastGame })),
-  { ssr: false, loading: () => <GameLoadingFallback /> },
-);
 const WordHuntGame = dynamic(
   () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
@@ -46,8 +44,9 @@ import {
   useGameModeConfirmed,
   useGameStore,
 } from '@/hooks/gameState/store';
-import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
-import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
+import { useRoundPendingWords, PendingWordChips } from '@/components/multiplayer/round/useRoundPendingWords';
+import { useRoundToastLane } from '@/components/multiplayer/round/useRoundToastLane';
+import { StopGameConfirm } from '@/components/multiplayer/round/StopGameConfirm';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { MpDesktopShellFrame, isShellMode } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
@@ -157,8 +156,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 }): React.ReactElement | null => {
   const [showStopConfirm, setShowStopConfirm] = useState(false);
 
-  const router = useRouter();
-  const params = useParams();
+  const mpExit = useMpExit();
 
   // Get player's game history for trail display logic
   const { profile } = useAuth();
@@ -173,7 +171,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   const isVocabQuizRoom = useIsVocabQuizRoom(socket);
   const setBlastBoardClearedByLocal = useGameStore((s) => s.setBlastBoardClearedByLocal);
 
-  const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
+  const { pendingWords, enqueuePending, dismissPending } = useRoundPendingWords(socket, username);
+  // Shared toasters (achievement capsule, react-hot-toast) stay off the round HUD.
+  useRoundToastLane();
 
   const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =
     useReconnectFlow({ gameCode, username, gameActive: true });
@@ -182,37 +182,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('mp_solo_handoff', JSON.stringify({ grid: tableData, gameCode }));
     }
-    const locale = (params?.locale as string) || 'en';
-    router.push(`/${locale}/singleplayer?mpHandoff=1`);
-  }, [router, params, tableData, gameCode]);
-
-  // Listen for per-word server feedback to drive pending-word chip transitions
-  useEffect(() => {
-    if (!socket) return;
-    // playerFoundWord is now coalesced server-side into playerFoundWordBatch.
-    const handlePlayerFoundBatch = (data: { words?: Array<{ username: string; word: string }> }) => {
-      data.words?.forEach((w) => { if (w.username === username) confirmPending(w.word); });
-    };
-    const handleWordRejected = (data: { word: string }) => rejectPending(data.word);
-    socket.on('playerFoundWordBatch', handlePlayerFoundBatch);
-    socket.on('wordRejected', handleWordRejected);
-    socket.on('wordAlreadyFound', handleWordRejected);
-    socket.on('wordNotOnBoard', handleWordRejected);
-    socket.on('endGame', clearAll);
-    return () => {
-      socket.off('playerFoundWordBatch', handlePlayerFoundBatch);
-      socket.off('wordRejected', handleWordRejected);
-      socket.off('wordAlreadyFound', handleWordRejected);
-      socket.off('wordNotOnBoard', handleWordRejected);
-      socket.off('endGame', clearAll);
-    };
-  }, [socket, username, confirmPending, rejectPending, clearAll]);
-
-  // Blast multiplayer bridge — converts Zustand state to BlastGame props
-  const blastBridge = useBlastMultiplayerBridge({
-    letterGrid: tableData,
-    gridSize: tableData?.[0]?.length ?? 4,
-  });
+    mpExit('continue-solo');
+  }, [mpExit, tableData, gameCode]);
 
   // Blast multiplayer: emit word + comboType to server via socket
   const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null) => {
@@ -268,6 +239,18 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     }).sort((a, b) => b.score - a.score);
   }, [playersReady, playerScores, playerWordCounts]);
 
+  // Seat list for the round roster (host + bots + joiners, presence).
+  const roundUsers = useMemo(
+    () => playersReady.filter((p): p is PlayerData => typeof p === 'object' && !!p).map((p) => ({
+      username: p.username,
+      avatar: p.avatar ?? undefined,
+      isHost: p.isHost,
+      isBot: p.isBot,
+      presenceStatus: p.presenceStatus,
+    })),
+    [playersReady],
+  );
+
   // Normalize found words to expected format
   const foundWords = useMemo(() => {
     return hostFoundWords.map((word, index) => ({
@@ -303,6 +286,17 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     ) : (
       canvas
     );
+
+  // Shared overlays for every branch (one copy, so the branches cannot drift).
+  const stopConfirm = (
+    <StopGameConfirm open={showStopConfirm} t={t} onConfirm={handleConfirmStopGame} onCancel={() => setShowStopConfirm(false)} />
+  );
+  const connectionOverlays = (
+    <>
+      {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
+      {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
+    </>
+  );
 
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   if (!gameModeConfirmed) return null;
@@ -340,222 +334,127 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           isDesktopCanvas={inShell}
         />
         )}
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-        {showStopConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-              <div className="flex gap-3 justify-center">
-                <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('mp.stopGameYes')}
-                </button>
-                <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {connectionOverlays}
+        {stopConfirm}
       </>
     );
   }
 
-  // Word Tower versus — per-player towers, no shared grid
-  if (gameMode === 'word-tower') {
+  // Gridless versus modes — per-player towers / secret bids / crossword race.
+  if (gameMode === 'word-tower' || gameMode === 'sealed-bid' || gameMode === 'crossword') {
+    const Versus = gameMode === 'word-tower' ? WordTowerVersus : gameMode === 'sealed-bid' ? SealedBidVersus : CrosswordVersus;
     return (
       <>
-        <WordTowerVersus socket={socket} username={username} onQuit={handleStopGameClick} />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
+        <Versus socket={socket} username={username} onQuit={handleStopGameClick} />
+        {connectionOverlays}
       </>
     );
   }
 
-  // Sealed Bid — secret auction bids, no shared grid
-  if (gameMode === 'sealed-bid') {
-    return (
-      <>
-        <SealedBidVersus socket={socket} username={username} onQuit={handleStopGameClick} />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-      </>
-    );
-  }
+  const pendingChips = <PendingWordChips pendingWords={pendingWords} dismissPending={dismissPending} />;
 
-  // Crossword race — all players solve the same puzzle, no shared grid
-  if (gameMode === 'crossword') {
-    return (
-      <>
-        <CrosswordVersus socket={socket} username={username} onQuit={handleStopGameClick} />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-      </>
-    );
-  }
+  // Classic board props — shared by the round frame and the non-playing fallback.
+  const classicProps = {
+    username,
+    gameCode,
+    isHost: true,
+    isPlaying: hostPlaying,
+    gameplayFocusMode: hostPlaying,
+    t,
+    socket,
+    letterGrid: tableData,
+    remainingTime,
+    timerValue,
+    gameActive: true,
+    showStartAnimation,
+    gameLanguage: roomLanguage,
+    minWordLength,
+    comboLevel,
+    comboLevelRef,
+    foundWords,
+    leaderboard,
+    onExitRoom: handleStopGameClick,
+    onWordSubmit,
+    earthquakeState,
+    fireRoundActive,
+    fireRoundRemaining,
+    boardTheme,
+    gameMode: gameMode ?? undefined,
+    onWordHuntGuess: hostPlaying ? handleWordHuntGuess : undefined,
+    // Player experience (for keyboard trail inactivity threshold)
+    totalGamesPlayed: profile?.total_games,
+  };
 
-  // Blast with host playing: use dedicated BlastGame (same as PlayerInGameView)
-  if (gameMode === 'blast' && hostPlaying) {
+  const roundTotal = totalTime ?? timerValue * 60;
+
+  // The playing host: classic, word-hunt and blast run in the SAME round frame
+  // as the joiner (one HUD, roster, hidden-until-GO board) — pitfall class 3.
+  if (hostPlaying && isRoundFrameMode(gameMode)) {
+    const canvas = gameMode === 'blast' ? (
+      <MpBlastCanvas
+        grid={tableData}
+        username={username}
+        socket={socket}
+        totalTime={roundTotal}
+        onQuit={handleStopGameClick}
+        onWordWithComboType={handleBlastWordWithCombo}
+        onBoardCleared={handleMPBoardCleared}
+      />
+    ) : gameMode === 'word-hunt' ? (
+      <WordHuntGame
+        grid={tableData}
+        gameLanguage={roomLanguage}
+        leaderboard={leaderboard}
+        username={username}
+        score={leaderboard.find(p => p.username === username)?.score ?? 0}
+        onQuit={handleStopGameClick}
+        onWordSubmit={onWordSubmit}
+        onWordHuntGuess={handleWordHuntGuess}
+        gameActive={true}
+        minWordLength={minWordLength}
+        socket={socket}
+        foundWords={foundWords}
+        mpChrome
+      />
+    ) : (
+      <InGameScreen {...classicProps} mpChrome />
+    );
     return (
-      <>
-        {wrapCanvas(
-        <BlastGame
-          config={blastBridge.config}
-          mode="multiplayer"
+      <div className={MP_ROUND_CONTAINER_CLASS}>
+        <MpRoundShell
+          desktopShell={shellEnabled}
+          roomId={gameCode}
+          meId={username}
+          gameMode={gameMode}
           remainingTime={remainingTime}
-          totalTime={totalTime}
+          totalTime={roundTotal}
           leaderboard={leaderboard}
-          username={username}
-          onGameEnd={() => {/* Server controls game end in multiplayer */}}
-          onMPDeadEnd={() => socket?.emit('blastDeadEnd')}
-          onMPBoardCleared={handleMPBoardCleared}
-          onQuit={handleStopGameClick}
-          onWordWithComboType={handleBlastWordWithCombo}
-          initialTileStates={blastBridge.initialTileStates}
-          blastSeed={blastBridge.blastSeed}
-          serverGrid={blastBridge.serverGrid}
-          isDesktopCanvas={inShell}
-        />
-        )}
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-        {showStopConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-              <div className="flex gap-3 justify-center">
-                <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('mp.stopGameYes')}
-                </button>
-                <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
-    );
-  }
-
-  // Word-hunt with host playing: use dedicated WordHuntGame
-  if (gameMode === 'word-hunt' && hostPlaying) {
-    return (
-      <>
-        {wrapCanvas(
-        <WordHuntGame
-          grid={tableData}
-          gameLanguage={roomLanguage}
-          leaderboard={leaderboard}
-          username={username}
-          score={leaderboard.find(p => p.username === username)?.score ?? 0}
-          onQuit={handleStopGameClick}
-          onWordSubmit={onWordSubmit}
-          onWordHuntGuess={handleWordHuntGuess}
-          gameActive={true}
-          minWordLength={minWordLength}
-          socket={socket}
+          users={roundUsers}
           foundWords={foundWords}
-          isDesktopCanvas={inShell}
+          comboLevel={comboLevel}
+          revealed={!showStartAnimation}
+          onExit={handleStopGameClick}
+          canvas={canvas}
+          socket={socket}
         />
-        )}
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-        {showStopConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-            <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-              <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-              <div className="flex gap-3 justify-center">
-                <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('mp.stopGameYes')}
-                </button>
-                <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
+        {pendingChips}
+        {connectionOverlays}
+        {stopConfirm}
+      </div>
     );
   }
 
+  // Non-playing host fallback (the projector normally takes this role).
   return (
     <>
-    {wrapCanvas(
-    <div className="relative flex-1 flex flex-col min-h-0">
-    <InGameScreen
-      // Core identity
-      username={username}
-      gameCode={gameCode}
-      isHost={true}
-      isPlaying={hostPlaying}
-      inDesktopShell={inShell}
-      gameplayFocusMode={hostPlaying}
-      t={t}
-      socket={socket}
-
-      // Game state
-      letterGrid={tableData}
-      remainingTime={remainingTime}
-      timerValue={timerValue}
-      gameActive={true}
-      showStartAnimation={showStartAnimation}
-      gameLanguage={roomLanguage}
-      minWordLength={minWordLength}
-      comboLevel={comboLevel}
-      comboLevelRef={comboLevelRef}
-
-      // Player data
-      foundWords={foundWords}
-      leaderboard={leaderboard}
-
-      // Callbacks
-      onExitRoom={handleStopGameClick}
-      onWordSubmit={onWordSubmit}
-
-      // Earthquake/Fire Round
-      earthquakeState={earthquakeState}
-      fireRoundActive={fireRoundActive}
-      fireRoundRemaining={fireRoundRemaining}
-
-      // Theme
-      boardTheme={boardTheme}
-
-      // Game mode overlays
-      gameMode={gameMode ?? undefined}
-      onWordHuntGuess={hostPlaying ? handleWordHuntGuess : undefined}
-
-      // Player experience (for keyboard trail inactivity threshold)
-      totalGamesPlayed={profile?.total_games}
-    />
-    </div>
-    )}
-    {/* Pending word chips — optimistic submit feedback */}
-    {pendingWords.size > 0 && (
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex flex-wrap gap-1 justify-center pointer-events-none">
-        {Array.from(pendingWords.entries()).map(([word, status]) => (
-          <PendingWordChip key={word} word={word} status={status} onDismiss={dismissPending} />
-        ))}
-      </div>
-    )}
-    {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-    {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
-    {showStopConfirm && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-        <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-          <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-          <div className="flex gap-3 justify-center">
-            <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-              {t('mp.stopGameYes')}
-            </button>
-            <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-              {t('common.cancel')}
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
+      {wrapCanvas(
+        <div className="relative flex-1 flex flex-col min-h-0">
+          <InGameScreen {...classicProps} inDesktopShell={inShell} />
+        </div>,
+      )}
+      {pendingChips}
+      {connectionOverlays}
+      {stopConfirm}
     </>
   );
 };

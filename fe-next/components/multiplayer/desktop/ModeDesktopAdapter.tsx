@@ -7,7 +7,6 @@ import { WordsLadder, type LadderWord } from './WordsLadder';
 import { KeyboardHintStrip } from './KeyboardHintStrip';
 import { ThemedPanel } from './ThemedPanel';
 import { ShellBadgeTimer } from '../shell/MpTimer';
-import { MyStatsCard } from './insights/MyStatsCard';
 import { OpponentInsightFeedConnected } from './insights/OpponentInsightFeedConnected';
 import { PaceDeltaChip } from './insights/PaceDeltaChip';
 import { LatestScoreTickBanner } from './insights/LatestScoreTickBanner';
@@ -42,7 +41,7 @@ export interface ModeDesktopConfig {
   withTexture?: boolean;
   /** Under the mode name (row) or beside it (stacked). */
   badgeExtra?: ReactNode;
-  /** Above MyStatsCard in the left rail. */
+  /** The left rail's mode panel (under the roster and the mode badge). */
   secondaryExtra?: ReactNode;
   /** Above the words ladder, under the score tick. */
   ladderExtra?: ReactNode;
@@ -58,7 +57,7 @@ type Props = DesktopAdapterBaseProps & { config: ModeDesktopConfig };
  * memoized on its own inputs so the 1-Hz `remainingTime` tick re-renders the
  * badge only — never the roster, ladder or insight feeds.
  */
-function ModeDesktopAdapterImpl({ config, roomId, leaderboard, foundWords, remainingTime, totalTime, canvas, meId, socket, startTimeMs }: Props) {
+function ModeDesktopAdapterImpl({ config, roomId, leaderboard, foundWords, remainingTime, totalTime, canvas, meId, socket }: Props) {
   const { t } = useLanguage();
   const { mode, testPrefix, modeNameKey, timerColor, timerSize, badgeLayout = 'row', withTexture, badgeExtra, secondaryExtra, ladderExtra, streamExtra } = config;
 
@@ -93,15 +92,8 @@ function ModeDesktopAdapterImpl({ config, roomId, leaderboard, foundWords, remai
     );
   }, [t, mode, testPrefix, modeNameKey, timerColor, timerSize, badgeLayout, withTexture, badgeExtra, totalTime, remainingTime]);
 
-  const secondarySlot = useMemo(
-    () => (
-      <div className="flex flex-col gap-3">
-        {secondaryExtra}
-        <MyStatsCard mode={mode} meId={meId} foundWords={foundWords} startTimeMs={startTimeMs} />
-      </div>
-    ),
-    [secondaryExtra, mode, meId, foundWords, startTimeMs],
-  );
+  // No YOUR STATS card: BEST – / PACE 0 / KEYS 0 read as dead UI (DESIGN.md deletes it).
+  const secondarySlot = useMemo(() => <div className="flex flex-col gap-3">{secondaryExtra}</div>, [secondaryExtra]);
 
   const wordsLadderSlot = useMemo(
     () => (
