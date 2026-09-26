@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickVisibleRows, mascotFor, pickBestWord, rivalGap, nextModeForViewer } from '../mpResultsView';
+import { pickVisibleRows, mascotFor, pickBestWord, rivalGap, nextModeForViewer, seriesPlacing } from '../mpResultsView';
 import type { MpStandingRow } from '../mpStandings';
 
 const row = (username: string, rank: number, score: number, isMe = false): MpStandingRow => ({
@@ -113,5 +113,51 @@ describe('nextModeForViewer', () => {
     // Round-1 capture: host card read CLASSIC while every joiner read SURPRISE MODE.
     expect(nextModeForViewer({ isHost: false, hostPick: 'random' })).toBeNull();
     expect(nextModeForViewer({ isHost: false, hostPick: 'classic' })).toBeNull();
+  });
+});
+
+describe('seriesPlacing (final screen of a series)', () => {
+  const sRow = (username: string, rank: number, score: number, seriesTotal: number | null, isMe = false): MpStandingRow => ({
+    username, rank, score, isMe, seriesTotal, seriesDelta: 0,
+  });
+
+  it('r4 capture: round 5 all on 0, host 94 over the series -> a 0-total joiner is 2nd of 4, 94 behind the champion (never "#1 tied")', () => {
+    // Given the last round's server order (everyone 0) and the series totals
+    const rows = [
+      sRow('Host', 1, 0, 94),
+      sRow('P', 1, 0, 0),
+      sRow('T', 1, 0, 0, true),
+      sRow('H', 1, 0, 0),
+    ];
+    // When the series placing is read for me
+    const out = seriesPlacing(rows);
+    // Then it speaks about the series, not the tied last round
+    expect(out).toEqual({
+      rank: 2,
+      total: 4,
+      seriesTotal: 0,
+      champions: ['Host'],
+      gap: { kind: 'behind', name: 'Host', points: 94 },
+    });
+  });
+
+  it('the champion reads 1st with the margin over the runner-up, whatever the last round order was', () => {
+    const rows = [sRow('A', 1, 40, 120), sRow('Me', 2, 10, 150, true), sRow('B', 3, 0, 90)];
+    expect(seriesPlacing(rows)).toMatchObject({ rank: 1, seriesTotal: 150, champions: ['Me'], gap: { kind: 'ahead', name: 'A', points: 30 } });
+  });
+
+  it('shares 1st on equal totals (competition rank), naming every champion', () => {
+    const rows = [sRow('A', 1, 5, 80, true), sRow('B', 2, 3, 80), sRow('C', 3, 1, 20)];
+    expect(seriesPlacing(rows)).toMatchObject({ rank: 1, champions: ['A', 'B'], gap: { kind: 'tied', name: 'B', more: 0 } });
+  });
+
+  it('crowns no series champion when nobody scored all series', () => {
+    const rows = [sRow('A', 1, 0, 0), sRow('Me', 1, 0, 0, true)];
+    expect(seriesPlacing(rows)?.champions).toEqual([]);
+  });
+
+  it('is null without series totals (round 1 / no series) or without me', () => {
+    expect(seriesPlacing([sRow('A', 1, 5, null, true)])).toBeNull();
+    expect(seriesPlacing([sRow('A', 1, 5, 5), sRow('B', 2, 1, 1)])).toBeNull();
   });
 });

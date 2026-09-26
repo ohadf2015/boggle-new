@@ -24,6 +24,11 @@ export interface MpMyCardProps {
   gap: RivalGap | null;
   /** The card's beat has landed: counters roll from 0 to the server number. */
   revealed: boolean;
+  /**
+   * Final screen of a series: rank/score/gap are the SERIES placing (the
+   * verdict), labelled as such; the rows keep the round numbers.
+   */
+  series?: boolean;
   t: TFn;
   className?: string;
 }
@@ -33,7 +38,7 @@ export interface MpMyCardProps {
  * up, the best word and what I earned. Numbers are the server's (the counter
  * only animates the display, from 0 to `score`).
  */
-function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, revealed, t, className }: MpMyCardProps) {
+function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, revealed, series = false, t, className }: MpMyCardProps) {
   const mood = mascotFor(rank, total, score);
   const gapLine = !gap
     ? null
@@ -49,6 +54,7 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
     <section
       data-testid="mp-my-card"
       data-winner={String(winner)}
+      data-series={String(series)}
       aria-label={t('mpUi.results.yourRank')}
       className={cn(
         'relative flex items-center min-w-0 rounded-neo-lg border-[3px] border-neo-black shadow-hard',
@@ -83,14 +89,18 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
       <div className="min-w-0 flex-1 flex flex-col gap-[calc(4px*var(--mp-u,1))]">
         <div className="flex items-baseline gap-2 min-w-0">
           <span className="font-neo-display font-bold uppercase leading-none text-[calc(15px*var(--mp-u,1))] truncate">
-            {winner ? t('mpUi.results.winner') : `#${rank} ${t('mpUi.results.placeOf', { total })}`}
+            {winner
+              ? t(series ? 'mpUi.results.seriesChampion' : 'mpUi.results.winner')
+              : series
+                ? t('mpUi.results.seriesPlace', { rank, total })
+                : `#${rank} ${t('mpUi.results.placeOf', { total })}`}
           </span>
         </div>
         <div className="flex items-baseline gap-1.5">
           <span data-testid="mp-my-score" className="font-neo-display font-bold tabular-nums leading-none text-[calc(38px*var(--mp-u,1))]">
             <AnimatedCounter value={revealed ? score : 0} previousValue={0} size="xl" className="text-neo-black !text-[length:inherit]" />
           </span>
-          <span className="font-neo-body font-bold text-[calc(13px*var(--mp-u,1))] opacity-70">{t('mpUi.results.pts')}</span>
+          <span className="font-neo-body font-bold text-[calc(13px*var(--mp-u,1))] opacity-70">{t(series ? 'mpUi.results.seriesPts' : 'mpUi.results.pts')}</span>
         </div>
         {gapLine && (
           <p dir="auto" className="font-neo-body font-semibold leading-tight text-[calc(12px*var(--mp-u,1))] truncate">{gapLine}</p>

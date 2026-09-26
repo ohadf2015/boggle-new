@@ -18439,7 +18439,9 @@ const ja = {
       "teacherPaced": "先生が次のゲームを始めます",
       "roundPoints": "このラウンドの得点",
       "yourRank": "あなたの順位",
-      "lessonRecap": "レッスンのふりかえり"
+      "lessonRecap": "レッスンのふりかえり",
+      "seriesPlace": "シリーズ {total}人中 #{rank}",
+      "seriesPts": "シリーズ点"
     }
   }
 };

@@ -16,7 +16,7 @@ import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
 import { buildMpStandings, podiumTier } from './mpStandings';
-import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, rivalGap } from './mpResultsView';
+import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, rivalGap, seriesPlacing } from './mpResultsView';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
 import { useAutoAdvance } from './useAutoAdvance';
@@ -62,18 +62,26 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   // One source for "where did I land" on this screen: my standings row, whose
   // rank is the live HUD's shared competition rank (ties: 1, 2, 2, 4).
   const myRow = useMemo(() => rows.find((r) => r.isMe), [rows]);
-  const myRank = myRow?.rank ?? data.currentPlayerRank;
-  const myPodium = myRow ? podiumTier(myRow) : null;
+  const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
+  // The final screen of a series is judged on the series: my card, the verdict
+  // (sound/confetti/share) and the champion chip all read this one placing.
+  const series = useMemo(() => (branch === 'final' ? seriesPlacing(rows) : null), [branch, rows]);
+  const myRank = series?.rank ?? myRow?.rank ?? data.currentPlayerRank;
+  const myScore = series?.seriesTotal ?? data.currentPlayerData?.score ?? 0;
+  const myPodium = series ? podiumTier({ rank: series.rank, score: series.seriesTotal }) : myRow ? podiumTier(myRow) : null;
   const iWon = myPodium === 1;
+  const topTwo = useMemo(() => {
+    const nums = series ? rows.map((r) => r.seriesTotal ?? 0).sort((a, b) => b - a) : rows.map((r) => r.score);
+    return { top: nums[0] ?? 0, runnerUp: nums[1] ?? 0 };
+  }, [series, rows]);
   const beats = useResultBeats({
     podium: myPodium,
     isWinner: iWon,
-    topScore: data.sortedScores[0]?.score ?? 0,
-    runnerUpScore: data.sortedScores[1]?.score ?? 0,
+    topScore: topTwo.top,
+    runnerUpScore: topTwo.runnerUp,
     instant: reduced,
   });
   const { stage, done, skip } = useRevealStage(timeline, { instant: reduced, onBeat: beats.onBeat });
-  const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
   const handleSkip = useCallback(() => {
     lock();
     skip();
@@ -132,8 +140,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const nextMode = nextModeForViewer<GameModeOption>({ isHost, hostPick: c.selectedGameMode });
   const me = data.currentPlayerData;
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
-  const gap = useMemo(() => rivalGap(rows), [rows]);
-  const showChampion = branch === 'final' && seriesRoundNumber >= 2 && !!props.seriesLeader;
+  const roundGap = useMemo(() => rivalGap(rows), [rows]);
+  const gap = series ? series.gap : roundGap;
+  const champions = series?.champions ?? [];
 
   const header = (
     <MpResultsHeader
@@ -159,10 +168,11 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       )}
     >
       <div className="min-h-0 flex-1 flex flex-col justify-center gap-[calc(8px*var(--mp-u,1))] lg:h-full">
-        {showChampion && (
-          <p className={cn('shrink-0 self-center inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-neo-black font-bold text-[calc(12px*var(--mp-u,1))]', fx.chipPop)}>
+        {champions.length > 0 && (
+          <p data-testid="mp-series-champion" className={cn('shrink-0 self-center inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-neo-black font-bold text-[calc(12px*var(--mp-u,1))]', fx.chipPop)}>
             <Trophy aria-hidden="true" className="w-4 h-4" />
-            <span dir="auto" className="truncate max-w-[12rem]">{props.seriesLeader}</span>
+            <span dir="auto" className="truncate max-w-[12rem]">{champions[0]}</span>
+            {champions.length > 1 && <span className="tabular-nums">+{champions.length - 1}</span>}
             <span className="uppercase">· {t('mpUi.results.seriesChampion')}</span>
           </p>
         )}
@@ -195,12 +205,13 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           rank={myRank}
           winner={iWon && rows.length > 1}
           total={data.sortedScores.length}
-          score={me?.score ?? 0}
+          score={myScore}
           bestWord={bestWord}
           xp={socketEvents.xpGainedData?.xpEarned ?? null}
           coins={c.sideEffects.coinReward?.awarded ?? null}
           gap={gap}
           revealed={seen('card')}
+          series={!!series}
           t={t}
         />
         </div>

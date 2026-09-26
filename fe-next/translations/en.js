@@ -17517,7 +17517,9 @@ const en = {
       "teacherPaced": "Your teacher starts the next game",
       "roundPoints": "Points this round",
       "yourRank": "Your place",
-      "lessonRecap": "Lesson recap"
+      "lessonRecap": "Lesson recap",
+      "seriesPlace": "Series #{rank} of {total}",
+      "seriesPts": "series pts"
     }
   }
 };

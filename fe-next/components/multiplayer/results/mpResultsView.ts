@@ -75,6 +75,45 @@ export function rivalGap(rows: MpStandingRow[]): RivalGap | null {
   return second ? { kind: 'ahead', name: second.username, points: mine - second.score } : null;
 }
 
+export interface SeriesPlacing {
+  /** My competition rank over the series totals (ties share a rank). */
+  rank: number;
+  total: number;
+  seriesTotal: number;
+  /** Everyone level on the top total; empty when nobody scored all series. */
+  champions: string[];
+  gap: RivalGap | null;
+}
+
+/**
+ * The final screen of a series answers "who won the SERIES". Rows keep the
+ * server's round numbers (== the live leaderboard); this re-ranks the same
+ * rows by their series totals so the champion chip and my card read ONE
+ * source and never say "#1, tied" on a 0-point last round. Null without
+ * series totals (round 1 / no series) or when I am not in the room.
+ */
+export function seriesPlacing(rows: MpStandingRow[]): SeriesPlacing | null {
+  if (rows.length === 0 || rows.some((r) => r.seriesTotal === null)) return null;
+  const ordered = rows
+    .map((r, i) => ({ r, i, total: r.seriesTotal as number }))
+    .sort((a, b) => b.total - a.total || a.i - b.i);
+  const ranked: MpStandingRow[] = [];
+  ordered.forEach(({ r, total }, i) => {
+    const prev = ranked[i - 1];
+    ranked.push({ ...r, score: total, rank: prev && prev.score === total ? prev.rank : i + 1 });
+  });
+  const me = ranked.find((r) => r.isMe);
+  if (!me) return null;
+  const top = ranked[0].score;
+  return {
+    rank: me.rank,
+    total: ranked.length,
+    seriesTotal: me.score,
+    champions: top > 0 ? ranked.filter((r) => r.score === top).map((r) => r.username) : [],
+    gap: rivalGap(ranked),
+  };
+}
+
 interface ReadyPlayer {
   username: string;
   isHost?: boolean;

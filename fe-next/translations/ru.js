@@ -18172,7 +18172,9 @@ const ru = {
       "teacherPaced": "Учитель запустит следующую игру",
       "roundPoints": "Очки за раунд",
       "yourRank": "Ваше место",
-      "lessonRecap": "Итоги урока"
+      "lessonRecap": "Итоги урока",
+      "seriesPlace": "Серия: #{rank} из {total}",
+      "seriesPts": "очк. серии"
     }
   }
 };

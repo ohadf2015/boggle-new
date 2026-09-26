@@ -316,5 +316,55 @@ describe('MpResultsScreen', () => {
       expect(screen.getByTestId('mp-my-card').textContent).toContain('mpUi.results.tiedWithMore:{"name":"Host","more":2}');
     });
   });
+  describe('final screen of a series (r4 capture: round 5 all on 0, host 94 over the series)', () => {
+    const ZERO = ['Host', 'P', 'T', 'H'].map((username) => ({ username, score: 0, allWords: [] }));
+    const STANDINGS = [
+      { username: 'Host', totalScore: 94, roundScores: [15, 20, 30, 29, 0], rankChange: 0 },
+      { username: 'P', totalScore: 0, roundScores: [0, 0, 0, 0, 0], rankChange: 0 },
+      { username: 'T', totalScore: 0, roundScores: [0, 0, 0, 0, 0], rankChange: 0 },
+      { username: 'H', totalScore: 0, roundScores: [0, 0, 0, 0, 0], rankChange: 0 },
+    ];
+    const final = (username: string) => renderScreen({
+      finalScores: ZERO, username, seriesRoundNumber: 5, seriesStandings: STANDINGS, seriesLeader: 'Host',
+    });
+
+    it('rows keep the live round numbers; my card gives my SERIES place, never "#1 tied" on 0 points', () => {
+      final('T');
+      skip();
+      // the big row numbers are still the server's round scores (== live leaderboard)
+      expect(screen.getAllByTestId('mp-standing-score').map((n) => n.textContent)).toEqual(['0', '0', '0', '0']);
+      const card = screen.getByTestId('mp-my-card');
+      expect(card.getAttribute('data-series')).toBe('true');
+      expect(screen.getByTestId('mp-my-rank').textContent).toBe('#2');
+      expect(card.textContent).not.toContain('mpUi.results.tiedWith');
+      expect(card.textContent).toContain('mpUi.results.behind:{"points":94,"name":"Host"}');
+      expect(card.getAttribute('data-winner')).toBe('false');
+    });
+
+    it('the champion chip and the champion card agree (one source: the series totals)', () => {
+      final('Host');
+      skip();
+      expect(screen.getByTestId('mp-series-champion').textContent).toContain('Host');
+      const card = screen.getByTestId('mp-my-card');
+      expect(card.getAttribute('data-winner')).toBe('true');
+      expect(screen.getByTestId('mp-my-rank').textContent).toBe('#1');
+      expect(screen.getByTestId('mp-my-score').textContent).toBe('94');
+    });
+
+    it('a series nobody scored in names no champion', () => {
+      renderScreen({
+        finalScores: ZERO, username: 'T', seriesRoundNumber: 5, seriesLeader: 'Host',
+        seriesStandings: STANDINGS.map((s) => ({ ...s, totalScore: 0, roundScores: [0, 0, 0, 0, 0] })),
+      });
+      skip();
+      expect(screen.queryByTestId('mp-series-champion')).toBeNull();
+    });
+
+    it('the intermission card stays about the round just played', () => {
+      renderScreen({ finalScores: ZERO, username: 'T', seriesRoundNumber: 3, seriesStandings: STANDINGS });
+      skip();
+      expect(screen.getByTestId('mp-my-card').getAttribute('data-series')).toBe('false');
+    });
+  });
 });
 

@@ -20,7 +20,7 @@ const USED = [
   'behind', 'ahead', 'tiedWith', 'tiedWithMore', 'bestWord', 'xp', 'coins', 'seriesTotal', 'moreHidden', 'nextUp', 'hostPicking',
   'tapToChange', 'chooseMode', 'startNext', 'ready', 'youreReady', 'readyCount', 'waitingHost', 'autoIn',
   'cancelAuto', 'autoOff', 'rematch', 'newSeries', 'leave', 'share', 'seriesChampion', 'teacherPaced',
-  'roundPoints', 'yourRank', 'lessonRecap',
+  'roundPoints', 'yourRank', 'lessonRecap', 'seriesPlace', 'seriesPts',
 ];
 
 describe('mpUi.results translations', () => {

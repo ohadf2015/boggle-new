@@ -18457,7 +18457,9 @@ const es = {
       "teacherPaced": "Tu profe empieza la siguiente partida",
       "roundPoints": "Puntos de esta ronda",
       "yourRank": "Tu puesto",
-      "lessonRecap": "Resumen de la lección"
+      "lessonRecap": "Resumen de la lección",
+      "seriesPlace": "Serie: #{rank} de {total}",
+      "seriesPts": "pts de serie"
     }
   }
 };

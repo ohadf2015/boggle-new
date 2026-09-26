@@ -18369,7 +18369,9 @@ const he = {
       "teacherPaced": "המורה יתחיל/תתחיל את המשחק הבא",
       "roundPoints": "נקודות בסיבוב",
       "yourRank": "המקום שלך",
-      "lessonRecap": "סיכום השיעור"
+      "lessonRecap": "סיכום השיעור",
+      "seriesPlace": "סדרה: מקום {rank} מתוך {total}",
+      "seriesPts": "נק׳ בסדרה"
     }
   }
 };
