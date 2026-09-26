@@ -131,7 +131,17 @@ function MpRoundLayoutImpl({
 
       {/* Phone: live roster strip under the HUD */}
       <div className={cn(styles.areaRoster, 'min-w-0 px-3 pb-1')}>
-        <MpRosterStrip players={roster} meId={meId} layout="row" max={6} showScores className="justify-center" />
+        {/* At most four seats (the rest fold into "+N"; I always stay visible). From
+            four seats a name only fits as "P…", so names go screen-reader-only and
+            the avatars + scores carry the strip. */}
+        <MpRosterStrip
+          players={roster}
+          meId={meId}
+          layout="row"
+          max={4}
+          showScores
+          className={cn('justify-center gap-1.5', roster.length >= 4 && '[&_[data-testid=mp-roster-seat]>span[dir=auto]]:sr-only')}
+        />
       </div>
 
       {/* Desktop: roster rail */}

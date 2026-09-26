@@ -125,6 +125,26 @@ describe('MpRoundLayout', () => {
     expect(new Set(seats.map((s) => s.getAttribute('data-player')))).toEqual(new Set(['me', 'bot', 'amy']));
   });
 
+  it('phone strip fits a 390px phone: at most 4 seats, the rest fold into "+N" (I always stay visible)', () => {
+    const lb = ['a', 'b', 'c', 'd', 'e', 'me'].map((username, i) => ({ username, score: 60 - i * 10 }));
+    render(<MpRoundLayout {...props({ leaderboard: lb, users: lb.map(({ username }) => ({ username })) })} />);
+    const strip = document.querySelector('[data-testid="mp-roster-strip"][data-layout="row"]') as HTMLElement;
+    const seats = strip.querySelectorAll('[data-testid="mp-roster-seat"]');
+    expect(seats).toHaveLength(4);
+    expect(strip.querySelector('[data-me="true"]')).not.toBeNull();
+    expect(strip.querySelector('[data-testid="mp-roster-overflow"]')).toHaveTextContent('+2');
+  });
+
+  it('phone strip with 4+ seats: avatars + scores, names for screen readers only (they truncated to "P…")', () => {
+    const four = ['a', 'b', 'c', 'me'].map((username, i) => ({ username, score: 40 - i * 10 }));
+    const { unmount } = render(<MpRoundLayout {...props({ leaderboard: four, users: four.map(({ username }) => ({ username })) })} />);
+    const row = () => document.querySelector('[data-testid="mp-roster-strip"][data-layout="row"]') as HTMLElement;
+    expect(row().className).toContain('[&_[data-testid=mp-roster-seat]>span[dir=auto]]:sr-only');
+    unmount();
+    render(<MpRoundLayout {...props()} />);
+    expect(row().className).not.toContain('sr-only');
+  });
+
   it('keeps the board mounted but hidden until GO, then drops it in', () => {
     const { rerender } = render(<MpRoundLayout {...props({ revealed: false })} />);
     const stage = screen.getByTestId('mp-round-canvas');
