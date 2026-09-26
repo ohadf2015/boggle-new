@@ -5,6 +5,7 @@ import { KeyRound, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { cn } from '@/lib/utils';
+import { useEntrySfx } from './useEntrySfx';
 
 /** Room codes are six characters (generateGameCode). */
 export const CODE_LENGTH = 6;
@@ -28,6 +29,7 @@ interface CodeEntryProps {
  */
 export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps) {
   const { t } = useLanguage();
+  const sfx = useEntrySfx();
   const [chars, setChars] = useState<string[]>(EMPTY);
   const [shake, setShake] = useState(0);
   const refs = useRef<Array<HTMLInputElement | null>>([]);
@@ -74,10 +76,12 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
     setChars(next);
     const code = next.join('');
     if (code.length === CODE_LENGTH && next.every(Boolean)) {
+      sfx.lock();
       submit(code);
       refs.current[CODE_LENGTH - 1]?.blur();
       return;
     }
+    sfx.tick();
     focus(i);
   };
 
@@ -98,6 +102,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
     if (!code) return;
     if (code.length > CODE_LENGTH) {
       setChars(code.slice(0, CODE_LENGTH).split(''));
+      sfx.lock();
       submit(code);
       return;
     }
@@ -148,7 +153,8 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
             className={cn(
               'h-12 lg:h-14 tv:h-20 w-full min-w-0 rounded-neo border-3 border-neo-black text-center font-neo-display! text-2xl! tv:text-4xl! font-bold uppercase outline-hidden transition-transform duration-100',
               'focus:-translate-y-0.5 focus:border-neo-lime focus:shadow-hard-sm disabled:opacity-60',
-              ch ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy text-neo-white',
+              // A filled box pops once as its character lands (the class arrives with the character).
+              ch ? 'bg-neo-lime text-neo-black animate-mp-bump' : 'bg-neo-navy text-neo-white',
             )}
           />
         ))}

@@ -1,15 +1,14 @@
 'use client';
 
-import { KeyRound, Users } from 'lucide-react';
+import { DoorOpen, KeyRound, Users } from 'lucide-react';
 import AvatarStack from '@/components/multiplayer/AvatarStack';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { cn } from '@/lib/utils';
-import { MpPrimaryCta } from '../shell/MpPrimaryCta';
 import { arenaModeStyle } from './arenaModes';
 import { isRoomFull } from './ArenaRow';
-import { EntrySheet } from './EntrySheet';
+import { EntrySheet, EntrySheetCta } from './EntrySheet';
 import type { JoinTarget } from './joinTarget';
 import { SheetIdentityRow } from './SheetIdentityRow';
 import { useSheetIdentity } from './useSheetIdentity';
@@ -27,8 +26,9 @@ export interface JoinSheetProps {
   profileAvatar?: CustomAvatarConfig | null;
 }
 
-const TICKET = 'flex items-center gap-3 rounded-neo border-2 border-neo-black border-s-[6px] bg-neo-navy p-3 shadow-hard-sm';
-const TILE = 'flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black shadow-hard-sm';
+const TICKET = 'flex items-center gap-3 tv:gap-4 rounded-neo border-2 border-neo-black border-s-[6px] bg-neo-navy p-3 tv:p-4 shadow-hard-sm';
+const TILE = 'flex h-12 w-12 tv:h-[72px] tv:w-[72px] shrink-0 items-center justify-center rounded-neo border-2 border-neo-black shadow-hard-sm';
+const TILE_ICON = 'h-6 w-6 tv:h-9 tv:w-9 text-neo-black';
 
 /** A listed room: its mode, name, host, language, who is inside and the seats (bumps as they fill). */
 function RoomTicket({ room }: { room: JoinTarget }) {
@@ -41,13 +41,14 @@ function RoomTicket({ room }: { room: JoinTarget }) {
   return (
     <div data-testid="join-ticket" className={cn(TICKET, mode.stripe)}>
       <span className={cn(TILE, mode.tile)}>
-        <Icon aria-hidden="true" className="h-6 w-6 text-neo-black" />
+        <Icon aria-hidden="true" className={TILE_ICON} />
       </span>
       <div className="min-w-0 flex-1">
-        <p dir="auto" className="truncate font-neo-display text-lg font-bold leading-tight text-neo-white">
+        {/* The room's own name, in its own direction — two lines before it ever truncates. */}
+        <p dir="auto" className="line-clamp-2 break-words font-neo-display text-lg tv:text-3xl font-bold leading-tight text-neo-white">
           {room.roomName || room.gameCode}
         </p>
-        <p className="mt-0.5 flex min-w-0 items-center gap-2 text-sm font-bold text-neo-white/85">
+        <p className="mt-0.5 flex min-w-0 items-center gap-2 text-sm tv:text-xl font-bold text-neo-white/85">
           <span className={cn('shrink-0 uppercase tracking-wide', mode.text)}>{t(mode.labelKey)}</span>
           <span aria-hidden="true" className="shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
           {room.hostUsername && (
@@ -57,17 +58,19 @@ function RoomTicket({ room }: { room: JoinTarget }) {
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
         {room.playerAvatars && room.playerAvatars.length > 0 && (
-          <AvatarStack avatars={room.playerAvatars} totalCount={room.playerCount || 0} maxVisible={3} size="sm" />
+          <span className="hidden sm:block">
+            <AvatarStack avatars={room.playerAvatars} totalCount={room.playerCount || 0} maxVisible={3} size="sm" />
+          </span>
         )}
         <span
           key={seats}
           data-testid="join-seats"
           className={cn(
-            'flex items-center gap-1 font-neo-display text-base font-bold tabular-nums animate-mp-bump',
+            'flex items-center gap-1 font-neo-display text-base tv:text-2xl font-bold tabular-nums animate-mp-bump',
             full ? 'text-neo-red' : 'text-neo-cyan',
           )}
         >
-          <Users aria-hidden="true" className="h-4 w-4" />
+          <Users aria-hidden="true" className="h-4 w-4 tv:h-6 tv:w-6" />
           {seats}
         </span>
       </div>
@@ -81,11 +84,11 @@ function CodeTicket({ code }: { code: string }) {
   return (
     <div data-testid="join-ticket" className={cn(TICKET, 'border-s-neo-yellow')}>
       <span className={cn(TILE, 'bg-neo-yellow')}>
-        <KeyRound aria-hidden="true" className="h-6 w-6 text-neo-black" />
+        <KeyRound aria-hidden="true" className={TILE_ICON} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-neo-yellow">{t('mpUi.entry.codeTicket')}</p>
-        <p dir="ltr" className="font-neo-display text-2xl font-bold uppercase leading-tight tracking-[0.2em] text-neo-white">
+        <p className="text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-yellow">{t('mpUi.entry.codeTicket')}</p>
+        <p dir="ltr" className="font-neo-display text-2xl tv:text-5xl font-bold uppercase leading-tight tracking-[0.2em] text-neo-white">
           {code}
         </p>
       </div>
@@ -126,23 +129,20 @@ export default function JoinSheet({
   };
 
   return (
-    <EntrySheet open={isOpen} onClose={onClose} title={t('mpUi.entry.joinTitle')} testId="join-sheet">
+    <EntrySheet open={isOpen} onClose={onClose} title={t('mpUi.entry.joinTitle')} icon={DoorOpen} tone="pink" testId="join-sheet">
       {room.unlisted ? <CodeTicket code={room.gameCode} /> : <RoomTicket room={room} />}
 
-      {full && <p className="text-center text-sm font-bold text-neo-white">{t('mpUi.entry.roomFullWatch')}</p>}
+      {full && <p className="text-center text-sm tv:text-xl font-bold text-neo-white">{t('mpUi.entry.roomFullWatch')}</p>}
 
       <SheetIdentityRow id={id} onEnter={join} />
 
-      <div data-entry-cta="">
-        <MpPrimaryCta
-          tone={full ? 'cyan' : 'pink'}
-          testId="join-submit"
-          label={full ? t('mpUi.entry.watch') : t('mpUi.entry.join')}
-          onPress={join}
-          loading={isJoining}
-          className="shadow-hard-lg"
-        />
-      </div>
+      <EntrySheetCta
+        tone={full ? 'cyan' : 'pink'}
+        testId="join-submit"
+        label={full ? t('mpUi.entry.watch') : t('mpUi.entry.join')}
+        onPress={join}
+        loading={isJoining}
+      />
     </EntrySheet>
   );
 }

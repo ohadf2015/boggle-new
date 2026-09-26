@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { LayoutList, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ArenaEmptyState from '@/components/multiplayer/ArenaEmptyState';
 import { trackMpRoomJoinBlocked, trackMpRoomJoinClicked } from '@/utils/posthogEngagement';
@@ -146,7 +146,7 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
         </>
       )}
 
-      <EntrySheet open={showAll} onClose={() => setShowAll(false)} title={t('mpUi.entry.allArenas')} testId="arena-all-sheet">
+      <EntrySheet open={showAll} onClose={() => setShowAll(false)} title={t('mpUi.entry.allArenas')} icon={LayoutList} tone="cyan" testId="arena-all-sheet">
         <ul role="list" aria-label={t('mpUi.entry.allArenas')} className="flex flex-col gap-2 p-0.5">
           {sorted.map((room) => (
             <li key={room.gameCode}>{row(room)}</li>

@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_CONFIG } from '@/lib/languageConfig';
 import { sanitizeRoomName } from '@/utils/consts';
 import type { Language } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { cn } from '@/lib/utils';
-import { MpPrimaryCta } from '../shell/MpPrimaryCta';
 import { defaultRoomName } from './defaultRoomName';
-import { EntrySheet } from './EntrySheet';
+import { EntrySheet, EntrySheetCta } from './EntrySheet';
 import { SheetIdentityRow } from './SheetIdentityRow';
 import { useSheetIdentity } from './useSheetIdentity';
 
@@ -73,12 +73,12 @@ export default function CreateSheet({
   };
 
   return (
-    <EntrySheet open={isOpen} onClose={onClose} title={t('mpUi.entry.createTitle')} testId="create-sheet">
+    <EntrySheet open={isOpen} onClose={onClose} title={t('mpUi.entry.createTitle')} icon={Swords} tone="lime" testId="create-sheet">
       <SheetIdentityRow id={id} onEnter={create} />
 
       <div>
-        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.15em] text-neo-white/85">{t('mpUi.entry.boardLanguage')}</p>
-        <div className="flex gap-2" role="group" aria-label={t('mpUi.entry.boardLanguage')}>
+        <p className="mb-2 text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-white/85">{t('mpUi.entry.boardLanguage')}</p>
+        <div className="flex gap-2 tv:gap-3" role="group" aria-label={t('mpUi.entry.boardLanguage')}>
           {BOARD_LANGUAGES.map((code) => {
             const active = code === language;
             return (
@@ -90,12 +90,12 @@ export default function CreateSheet({
                 aria-label={LANGUAGE_CONFIG[code].nativeName}
                 onClick={() => setLanguage(code)}
                 className={cn(
-                  'flex h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black px-2.5 font-neo-display text-sm font-bold shadow-hard-sm transition-transform duration-100 active:translate-y-0.5 active:shadow-hard-pressed',
-                  active ? 'flex-1 bg-neo-lime text-neo-black' : 'w-11 bg-neo-navy text-neo-white hover:-translate-y-0.5',
+                  'flex h-11 tv:h-16 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black px-2.5 font-neo-display text-sm tv:text-xl font-bold shadow-hard-sm transition-transform duration-100 active:translate-y-0.5 active:shadow-hard-pressed',
+                  active ? 'flex-1 bg-neo-lime text-neo-black' : 'w-11 tv:w-16 shrink-0 bg-neo-navy text-neo-white hover:-translate-y-0.5',
                 )}
               >
-                <span className="text-xl leading-none" aria-hidden="true">{LANGUAGE_CONFIG[code].flag}</span>
-                {active && <span data-chip-label="" className="truncate">{LANGUAGE_CONFIG[code].nativeName}</span>}
+                <span className="text-xl tv:text-3xl leading-none" aria-hidden="true">{LANGUAGE_CONFIG[code].flag}</span>
+                {active && <span key={code} data-chip-label="" className="truncate animate-mp-bump">{LANGUAGE_CONFIG[code].nativeName}</span>}
               </button>
             );
           })}
@@ -104,7 +104,7 @@ export default function CreateSheet({
 
       {namingRoom ? (
         <label className="block">
-          <span className="mb-1 block text-[11px] font-bold uppercase tracking-[0.15em] text-neo-white/85">{t('mpUi.entry.roomName')}</span>
+          <span className="mb-1 block text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-white/85">{t('mpUi.entry.roomName')}</span>
           <input
             autoFocus
             value={roomName}
@@ -114,29 +114,26 @@ export default function CreateSheet({
             dir="auto"
             aria-label={t('mpUi.entry.roomName')}
             placeholder={defaultRoomName(t, id.name)}
-            className="h-11 w-full rounded-neo border-2 border-neo-black bg-neo-navy px-3 font-bold text-neo-white outline-hidden placeholder:text-neo-white/50 focus:border-neo-lime"
+            className="h-11 tv:h-16 w-full rounded-neo border-2 border-neo-black bg-neo-navy px-3 font-bold tv:text-2xl text-neo-white outline-hidden placeholder:text-neo-white/50 focus:border-neo-lime"
           />
         </label>
       ) : (
         <button
           type="button"
           onClick={() => setNamingRoom(true)}
-          className="self-start rounded-neo px-1 py-1 text-sm font-bold text-neo-cyan underline decoration-2 underline-offset-4 hover:text-neo-lime"
+          className="self-start rounded-neo px-1 py-1 text-sm tv:text-xl font-bold text-neo-cyan underline decoration-2 underline-offset-4 hover:text-neo-lime"
         >
           {t('mpUi.entry.addRoomName')}
         </button>
       )}
 
-      <div data-entry-cta="">
-        <MpPrimaryCta
-          tone="lime"
-          testId="create-start-battle"
-          label={t('mpUi.entry.startBattle')}
-          onPress={create}
-          loading={isCreating}
-          className="shadow-hard-lg"
-        />
-      </div>
+      <EntrySheetCta
+        tone="lime"
+        testId="create-start-battle"
+        label={t('mpUi.entry.startBattle')}
+        onPress={create}
+        loading={isCreating}
+      />
     </EntrySheet>
   );
 }

@@ -89,6 +89,23 @@ describe('EntrySheet', () => {
     expect(body).toContainElement(screen.getByText('two'));
   });
 
+  it('carries the TV unit into the sheet (a sheet renders outside MpScreen, so --mp-u is its own)', () => {
+    mockDesktop(true);
+    render(<EntrySheet open onClose={() => {}} title="T"><p>row</p></EntrySheet>);
+    const body = screen.getByText('row').parentElement!;
+    expect(body.className).toContain('[--mp-u:1]');
+    expect(body.className).toContain('tv:[--mp-u:1.5]');
+  });
+
+  it('titles carry the sheet\'s icon tile', () => {
+    mockDesktop(false);
+    const Icon = (props: React.SVGProps<SVGSVGElement>) => <svg data-testid="the-icon" {...props} />;
+    render(<EntrySheet open onClose={() => {}} title="New room" icon={Icon} tone="lime"><p>row</p></EntrySheet>);
+    const heading = screen.getByRole('heading', { name: 'New room' });
+    expect(heading).toContainElement(screen.getByTestId('the-icon'));
+    expect(screen.getByTestId('entry-sheet-icon').className).toContain('bg-neo-lime');
+  });
+
   it('renders nothing while closed', () => {
     mockDesktop(false);
     render(<EntrySheet open={false} onClose={() => {}} title="T"><p>row</p></EntrySheet>);

@@ -8,6 +8,7 @@ import { EloRankBadge } from '@/components/multiplayer/EloRankBadge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useEntryIdentity, type EntryIdentityInput } from './useEntryIdentity';
+import { useEntrySfx } from './useEntrySfx';
 
 const EntryAvatarBuilder = dynamic(() => import('./EntryAvatarBuilder'), { ssr: false });
 
@@ -57,6 +58,7 @@ function nameSizeClass(name: string): string {
 export function EntryIdentity(props: EntryIdentityInput) {
   const { t } = useLanguage();
   const id = useEntryIdentity(props);
+  const sfx = useEntrySfx();
   const [builderOpen, setBuilderOpen] = useState(false);
   const [spin, setSpin] = useState(0);
 
@@ -106,6 +108,7 @@ export function EntryIdentity(props: EntryIdentityInput) {
             onClick={() => {
               id.reroll();
               setSpin((s) => s + 1);
+              sfx.pop();
             }}
             aria-label={t('mpUi.entry.rerollAvatar')}
             className="absolute -bottom-1.5 -end-1.5 flex h-8 w-8 items-center justify-center rounded-full border-2 border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm transition-transform hover:scale-110 active:scale-90 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"

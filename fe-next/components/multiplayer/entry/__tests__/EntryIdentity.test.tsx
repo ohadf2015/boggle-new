@@ -39,6 +39,8 @@ vi.mock('@/components/multiplayer/EloRankBadge', () => ({
   EloRankBadge: ({ rating }: { rating: number }) => <div data-testid="rank-badge">{rating}</div>,
 }));
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
+const playSound = vi.fn();
+vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playSound }) }));
 
 import { EntryIdentity } from '../EntryIdentity';
 
@@ -78,6 +80,12 @@ describe('EntryIdentity', () => {
     expect(setStoredUsername).not.toHaveBeenCalled();
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(input.getAttribute('aria-invalid')).toBe('true');
+  });
+
+  it('guest: a reroll pops with a sound cue (allowed off the game screen)', () => {
+    render(<EntryIdentity isAuthenticated={false} displayName={null} />);
+    fireEvent.click(screen.getByRole('button', { name: 'mpUi.entry.rerollAvatar' }));
+    expect(playSound).toHaveBeenCalledWith('tileAppear', expect.objectContaining({ requiresGameActive: false }));
   });
 
   it('signed in: shows the account name, never offers a random reroll', () => {

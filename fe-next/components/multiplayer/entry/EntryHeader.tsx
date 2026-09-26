@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { HelpCircle, Volume2, VolumeX } from 'lucide-react';
+import { HelpCircle, Languages, Volume2, VolumeX } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { useMasterMute } from '@/hooks/useMasterMute';
@@ -88,7 +88,7 @@ export function EntryHeader() {
         }
       />
 
-      <EntrySheet open={sheet === 'language'} onClose={close} title={t('mpUi.entry.chooseLanguage')} testId="entry-language-sheet">
+      <EntrySheet open={sheet === 'language'} onClose={close} title={t('mpUi.entry.chooseLanguage')} icon={Languages} tone="yellow" testId="entry-language-sheet">
         <div className="grid grid-cols-2 gap-2">
           {LANGUAGE_OPTIONS.map((opt) => {
             const active = opt.code === current;
@@ -103,11 +103,11 @@ export function EntryHeader() {
                   if (!active) setLanguage?.(opt.code);
                 }}
                 className={cn(
-                  'flex min-h-12 items-center gap-3 rounded-neo border-2 border-neo-black px-3 py-2 text-start font-neo-display font-bold shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
+                  'flex min-h-12 tv:min-h-16 items-center gap-3 rounded-neo border-2 border-neo-black px-3 py-2 text-start font-neo-display tv:text-2xl font-bold shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
                   active ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy text-neo-white hover:-translate-y-0.5',
                 )}
               >
-                <span className="text-2xl leading-none" aria-hidden="true">{opt.flag}</span>
+                <span className="text-2xl tv:text-4xl leading-none" aria-hidden="true">{opt.flag}</span>
                 <span>{opt.nativeName}</span>
               </button>
             );
@@ -115,7 +115,7 @@ export function EntryHeader() {
         </div>
       </EntrySheet>
 
-      <EntrySheet open={sheet === 'help'} onClose={close} title={t('mpUi.entry.howToPlay')} testId="entry-help-sheet">
+      <EntrySheet open={sheet === 'help'} onClose={close} title={t('mpUi.entry.howToPlay')} icon={HelpCircle} tone="purple" testId="entry-help-sheet">
         {sheet === 'help' && <HowToPlay onClose={close} />}
       </EntrySheet>
     </>
