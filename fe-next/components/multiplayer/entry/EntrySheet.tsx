@@ -4,6 +4,7 @@ import { useEffect, useRef, type ComponentType, type ReactNode, type SVGProps } 
 import { cn } from '@/lib/utils';
 import { MpSheet } from '../shell/MpSheet';
 import { MpPrimaryCta, type MpPrimaryCtaProps } from '../shell/MpPrimaryCta';
+import { CtaGlint } from './CtaGlint';
 import { useEntrySfx } from './useEntrySfx';
 import { useSheetSide } from './useSheetSide';
 import './entrySheet.css';
@@ -87,9 +88,7 @@ export function EntrySheetCta(props: MpPrimaryCtaProps) {
   return (
     <div data-entry-cta="" className="relative">
       <MpPrimaryCta {...props} className={cn('shadow-hard-lg', props.className)} />
-      <span aria-hidden="true" className="mp-entry-glint pointer-events-none absolute inset-0 overflow-hidden rounded-neo">
-        <span />
-      </span>
+      <CtaGlint />
     </div>
   );
 }

@@ -10,13 +10,13 @@
 import React from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k }) }));
 
 import { MpSheet } from '../../shell/MpSheet';
-import { EntrySheet, ENTRY_SHEET_BODY_CLASS } from '../EntrySheet';
+import { EntrySheet, EntrySheetCta, ENTRY_SHEET_BODY_CLASS } from '../EntrySheet';
 
 function mockDesktop(matches: boolean) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -106,6 +106,19 @@ describe('EntrySheet', () => {
     expect(screen.getByTestId('entry-sheet-icon').className).toContain('bg-neo-lime');
   });
 
+  it('a sheet CTA lands last and carries the one glint', () => {
+    mockDesktop(false);
+    render(
+      <EntrySheet open onClose={() => {}} title="T">
+        <p>row</p>
+        <EntrySheetCta tone="lime" label="Go" onPress={() => {}} testId="go" />
+      </EntrySheet>,
+    );
+    const cta = screen.getByTestId('go').parentElement!;
+    expect(cta.hasAttribute('data-entry-cta')).toBe(true);
+    expect(within(cta).getByTestId('cta-glint').getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('renders nothing while closed', () => {
     mockDesktop(false);
     render(<EntrySheet open={false} onClose={() => {}} title="T"><p>row</p></EntrySheet>);
@@ -132,6 +145,15 @@ describe('entry sheet motion (entrySheet.css)', () => {
 
   it('respects prefers-reduced-motion', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*animation: none/);
+  });
+
+  it('the CTA glint sweeps by transform only and is gone under reduced motion', () => {
+    const glint = fs.readFileSync(path.resolve(__dirname, '../ctaGlint.css'), 'utf8');
+    for (const kf of glint.match(/@keyframes[^{]+\{[\s\S]*?\}\s*\}/g) ?? []) {
+      expect(kf).toContain('transform');
+      expect(kf).not.toMatch(/opacity|width|height|top|left|box-shadow/);
+    }
+    expect(glint).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*\.mp-cta-glint \{ display: none; \}/);
   });
 });
 

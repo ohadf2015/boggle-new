@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNetworkState } from '@/hooks/useNetworkState';
 import { MpPrimaryCta } from '@/components/multiplayer/shell/MpPrimaryCta';
+import { CtaGlint } from '@/components/multiplayer/entry/CtaGlint';
 
 interface ArenaCTAStripProps {
   onQuickPlay: () => void;
@@ -34,7 +35,7 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({ onQuickPlay, onCreateRoom
       className="border-t-2 border-neo-black/70 bg-neo-navy px-4 pt-3 pb-3 lg:pb-5 tv:pb-8"
     >
       <div data-cta-row="" className="mx-auto flex w-full max-w-xl items-stretch gap-3 lg:max-w-[calc(480px*var(--mp-u,1))]">
-        <div className="flex-[2] min-w-0">
+        <div className="relative flex-[2] min-w-0">
           <MpPrimaryCta
             tone="lime"
             testId="arena-quick-start"
@@ -44,6 +45,8 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({ onQuickPlay, onCreateRoom
             loading={isQuickPlayLoading && !offline}
             className="shadow-hard-lg"
           />
+          {/* One glint once the entry has painted: the eye lands on the primary. */}
+          <CtaGlint delayMs={900} />
         </div>
         <button
           type="button"

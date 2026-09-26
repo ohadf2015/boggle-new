@@ -150,6 +150,17 @@ describe('ArenaList', () => {
     expect(screen.getByTestId('arena-online').textContent).toContain('"count":6');
   });
 
+  it('a row\'s seats bump when someone joins that room live — not on first paint', () => {
+    const { rerender } = render(<ArenaList {...base} rooms={[room(1, { playerCount: 2 })]} />);
+    const first = screen.getByTestId('arena-row-seats');
+    expect(first.className).not.toContain('animate-mp-bump');
+    rerender(<ArenaList {...base} rooms={[room(1, { playerCount: 3 })]} />);
+    const bumped = screen.getByTestId('arena-row-seats');
+    expect(bumped.textContent).toContain('3/8');
+    expect(bumped.className).toContain('animate-mp-bump');
+    expect(bumped).not.toBe(first);
+  });
+
   it('a short list ends in a live tail — a mascot line that fills the column, no buttons', () => {
     render(<ArenaList {...base} rooms={rooms(1)} />);
     const tail = screen.getByTestId('arena-list-tail');

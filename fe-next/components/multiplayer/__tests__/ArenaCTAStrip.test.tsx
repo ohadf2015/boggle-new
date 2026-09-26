@@ -31,6 +31,14 @@ describe('ArenaCTAStrip', () => {
     expect(screen.getByRole('button', { name: 'mpUi.entry.create' })).toBeInTheDocument();
   });
 
+  it('QUICK START catches one glint after first paint (decorative, never in the way)', () => {
+    render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
+    const glint = screen.getByTestId('cta-glint');
+    expect(glint.getAttribute('aria-hidden')).toBe('true');
+    expect(glint.className).toContain('pointer-events-none');
+    expect(glint.parentElement).toContainElement(screen.getByRole('button', { name: 'multiplayerFlow.roomList.quickStart' }));
+  });
+
   it('invokes onQuickPlay when Quick Start clicked', () => {
     const onQuickPlay = vi.fn();
     render(<ArenaCTAStrip onQuickPlay={onQuickPlay} onCreateRoom={vi.fn()} />);

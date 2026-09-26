@@ -30,32 +30,8 @@
   animation-duration: 320ms;
 }
 
-/*
- * One glint across the sheet's CTA once it has landed: a hard-edged band (no
- * soft glow), swept by transform only, clipped to the button. `both` parks it
- * off the button before and after the sweep.
- */
-@keyframes mp-entry-glint {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-@keyframes mp-entry-glint-rtl {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-.mp-entry-glint > span {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 42%, rgb(255 255 255 / 0.5) 42%, rgb(255 255 255 / 0.5) 50%, transparent 50%);
-  transform: translateX(-100%);
-  animation: mp-entry-glint 620ms cubic-bezier(0.4, 0, 0.2, 1) 440ms both;
-}
-[dir='rtl'] .mp-entry-glint > span { animation-name: mp-entry-glint-rtl; }
-
 @media (prefers-reduced-motion: reduce) {
   .mp-entry-sheet-body > * { animation: none; }
-  .mp-entry-glint { display: none; }
 }
 /* Calm (cosy) mode strips springy entrances, as globals.css does for its own. */
 html[data-cosy='true'] .mp-entry-sheet-body > * { animation: none; }
-html[data-cosy='true'] .mp-entry-glint { display: none; }

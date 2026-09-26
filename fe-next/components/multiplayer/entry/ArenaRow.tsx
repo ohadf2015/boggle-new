@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, type KeyboardEvent } from 'react';
+import { memo, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { ChevronRight, Loader2, Users } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import AvatarStack from '@/components/multiplayer/AvatarStack';
@@ -37,6 +37,18 @@ function moveFocus(e: KeyboardEvent<HTMLButtonElement>, step: 1 | -1) {
   }
 }
 
+/** How many times `value` has changed since mount (0 on first paint). */
+function useChangeCount(value: unknown): number {
+  const [count, setCount] = useState(0);
+  const last = useRef(value);
+  useEffect(() => {
+    if (Object.is(last.current, value)) return;
+    last.current = value;
+    setCount((c) => c + 1);
+  }, [value]);
+  return count;
+}
+
 /**
  * One open arena: mode stripe + icon, the room title in its own direction (never
  * upper-cased — the name is the host's, not ours), the host on its own line,
@@ -49,6 +61,8 @@ export const ArenaRow = memo(function ArenaRow({ room, joining, locked, onPick }
   const full = isRoomFull(room);
   const live = isRoomLive(room);
   const title = room.roomName || room.gameCode;
+  // Seats bump when they change live (someone joined or left) — never on first paint.
+  const seatsBump = useChangeCount(room.playerCount);
 
   return (
     <button
@@ -108,7 +122,15 @@ export const ArenaRow = memo(function ArenaRow({ room, joining, locked, onPick }
             <AvatarStack avatars={room.playerAvatars} totalCount={room.playerCount || 0} maxVisible={3} size="sm" />
           </span>
         ) : null}
-        <span className={cn('flex items-center gap-1 font-neo-display text-sm tv:text-xl font-bold tabular-nums', full ? 'text-neo-red' : 'text-neo-white')}>
+        <span
+          key={seatsBump}
+          data-testid="arena-row-seats"
+          className={cn(
+            'flex items-center gap-1 font-neo-display text-sm tv:text-xl font-bold tabular-nums',
+            full ? 'text-neo-red' : 'text-neo-white',
+            seatsBump > 0 && 'animate-mp-bump',
+          )}
+        >
           <Users aria-hidden="true" className="h-3.5 w-3.5" />
           {room.playerCount || 0}
           {room.maxPlayers ? `/${room.maxPlayers}` : ''}
