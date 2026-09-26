@@ -46,6 +46,12 @@ describe('WheelRushDesktopAdapter', () => {
     expect(screen.getAllByText('WHEEL').length).toBeGreaterThanOrEqual(1);
   });
 
+  it('no YOUR STATS card (BEST – / PACE 0 / KEYS 0 read as dead UI — DESIGN.md deletes it)', () => {
+    render(<WheelRushDesktopAdapter {...mkProps()} />);
+    expect(screen.queryByTestId('my-stats-card')).toBeNull();
+    expect(screen.getByTestId('wr-fog-meter')).toBeInTheDocument();
+  });
+
   it('mounts inside MultiplayerDesktopShell', () => {
     const { container } = render(<WheelRushDesktopAdapter {...mkProps()} />);
     expect(container.querySelector('[data-mp-shell]')).toBeInTheDocument();

@@ -254,7 +254,7 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-callout-stage').className).not.toContain('132px');
   });
 
-  it('phone: my latest words ride the stage as chips (newest first, server points), capped', () => {
+  it('phone: my words ride the stage as a trail of chips (newest first, server points)', () => {
     const words = ['cat', 'dog', 'rat', 'bird', 'cart', 'dart', 'tar'].map((word, i) => ({ word, timestamp: i }));
     const { rerender } = render(<MpRoundLayout {...props({ foundWords: words.slice(0, 6) })} />);
     act(() => recordWordAccepted({ word: 'tar', score: 5 }));
@@ -262,9 +262,34 @@ describe('MpRoundLayout', () => {
     const strip = screen.getByTestId('mp-recent-words');
     expect(strip.className).toContain('lg:hidden');
     const chips = screen.getAllByTestId('mp-recent-word');
-    expect(chips.length).toBeLessThanOrEqual(5);
+    expect(chips).toHaveLength(7);
     expect(chips[0]).toHaveTextContent('tar');
     expect(chips[0]).toHaveTextContent('+5');
+    expect(chips[6]).toHaveTextContent('cat');
+    expect(screen.queryByTestId('mp-recent-more')).toBeNull();
+  });
+
+  it('word-hunt: no rule hint in the stage (its clue strip teaches; "any word heals" stays on the countdown)', () => {
+    render(<MpRoundLayout {...props({ gameMode: 'word-hunt', foundWords: [] })} />);
+    expect(screen.queryByTestId('mp-words-hint')).toBeNull();
+  });
+
+  it('phone: the trail keeps the 12 newest words; older ones fold into a "+N" chip', () => {
+    const words = Array.from({ length: 14 }, (_, i) => ({ word: `w${i}x`, timestamp: i }));
+    render(<MpRoundLayout {...props({ foundWords: words })} />);
+    const chips = screen.getAllByTestId('mp-recent-word');
+    expect(chips).toHaveLength(12);
+    expect(chips[0]).toHaveTextContent('w13x');
+    expect(screen.getByTestId('mp-recent-more')).toHaveTextContent('+2');
+  });
+
+  it('phone: before the first word the stage shows the mode rule, quietly; the first word replaces it', () => {
+    const { rerender } = render(<MpRoundLayout {...props({ foundWords: [] })} />);
+    const hint = screen.getByTestId('mp-words-hint');
+    expect(hint).toHaveTextContent('mpUi.round.mode.classic.rule');
+    expect(hint.className).toContain('lg:hidden');
+    rerender(<MpRoundLayout {...props({ foundWords: [{ word: 'cat', timestamp: 1 }] })} />);
+    expect(screen.queryByTestId('mp-words-hint')).toBeNull();
   });
 
   it('a word listed twice (optimistic add + server echo) counts and shows ONCE', () => {

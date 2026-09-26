@@ -193,7 +193,8 @@ function MpRoundLayoutImpl({
           data-testid="mp-callout-stage"
           className={cn('absolute inset-x-0 top-0 px-3', mode.slug === 'wordHunt' && 'top-[calc(132px*var(--mp-u,1))]', isBlast && 'top-[52px]')}
         >
-          <MpRecentWords words={ladder} />
+          {/* Word-hunt's clue strip already teaches; its rule stays on the countdown. */}
+          <MpRecentWords words={ladder} emptyHint={mode.slug === 'wordHunt' ? undefined : t(mode.ruleKey)} />
           <div className="relative">
             <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
           </div>
