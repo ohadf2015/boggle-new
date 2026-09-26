@@ -1,0 +1,15 @@
+/*
+ * The OPEN ARENAS tail (ArenaList.tsx): a flex-1 box under a short list. It is
+ * a size container, so it can tell how much height the rows left it: below
+ * ~210px the mascot goes, below ~110px the whole line does — a squeezed tail
+ * never clips its own mascot or crowds the rows.
+ */
+.mp-arena-tail {
+  container-type: size;
+}
+@container (max-height: 210px) {
+  .mp-arena-tail-img { display: none; }
+}
+@container (max-height: 110px) {
+  .mp-arena-tail-inner { display: none; }
+}

@@ -19,7 +19,9 @@ import { trackGrowthEvent, trackGuestJoin } from '@/utils/growthTracking';
 import { useMatchmaking } from '@/hooks/useMatchmaking';
 import { useCgLobbyHeroVariant } from '@/hooks/useCgLobbyHeroVariant';
 import { entryFlowReducer, INITIAL_ENTRY_FLOW, resolveEntryView } from '@/lib/multiplayer/mpPhase';
+import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { useQuickPlay, generateGameCode } from './useQuickPlay';
+import { codeTicket, resolveJoinTarget } from './entry/joinTarget';
 import type { MultiplayerFlowProps } from './MultiplayerFlow';
 
 export function useMultiplayerFlowState({
@@ -147,19 +149,9 @@ export function useMultiplayerFlowState({
         if (classroomNameSubmittedRef.current) return;
         setNeedsClassroomName(true);
       } else {
-        // Need to collect profile - show join modal for a minimal room object
-        dispatchFlow({
-          type: 'OPEN_JOIN',
-          room: {
-            gameCode: roomCode,
-            roomName: roomCode,
-            playerCount: 0,
-            language: defaultLanguage,
-            gameState: 'waiting' as const,
-            isRanked: false,
-            createdAt: Date.now(),
-          },
-        });
+        // Need to collect profile — the join sheet for this code (the sheet
+        // resolves the live listing for it; see entry/joinTarget).
+        dispatchFlow({ type: 'OPEN_JOIN', room: codeTicket(roomCode, defaultLanguage) });
       }
     },
     [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host, isAuthenticated, isClassroomMode]
@@ -191,6 +183,27 @@ export function useMultiplayerFlowState({
       handleJoin(false, null, prefilledRoom, undefined, name);
     },
     [prefilledRoom, defaultLanguage, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, host]
+  );
+
+  // JOIN BY CODE from the entry: the same join an invite link takes for a
+  // player (profile → join, otherwise the join sheet for that code) — but a
+  // typed code always JOINS. It never takes the classroom-host branch of
+  // handleInvitationAutoJoin, which CREATES a private room with the code.
+  const handleCodeJoin = useCallback(
+    (raw: string) => {
+      const code = sanitizeGameCode(raw).toUpperCase();
+      if (!code) return;
+      if (hasProfile()) {
+        const profile = getProfileData();
+        if (!isAuthenticated) trackGuestJoin(profile.username, code, defaultLanguage);
+        setGameCode(code);
+        setUsername(profile.username);
+        handleJoin(false, null, code, undefined, profile.username);
+        return;
+      }
+      dispatchFlow({ type: 'OPEN_JOIN', room: codeTicket(code, defaultLanguage) });
+    },
+    [hasProfile, getProfileData, isAuthenticated, defaultLanguage, setGameCode, setUsername, handleJoin],
   );
 
   // NOTE: CrazyGames invite is handled via the onInviteJoin callback above.
@@ -316,11 +329,14 @@ export function useMultiplayerFlowState({
     isSeekingOverlay,
   });
 
+  // The join sheet's room comes from the live listing whichever path opened it.
+  const joinTarget = resolveJoinTarget(selectedRoom, activeRooms);
+
   return {
-    entryView, flowView: flow.view, selectedRoom, matchmaking, joiningRoomCode, roomFetchTimedOut,
+    entryView, flowView: flow.view, selectedRoom, joinTarget, matchmaking, joiningRoomCode, roomFetchTimedOut,
     isQuickPlayPending, showCgHero, heroExpanded, heroVariant,
     openCreate: handleCreateClick, handleModalClose, handleRoomClick, handleJoinFromModal, handleCreateFromModal,
-    handleQuickPlay, handleClassroomNameSubmit, dismissSeeking,
+    handleQuickPlay, handleClassroomNameSubmit, dismissSeeking, handleCodeJoin,
     onHeroPlay: () => { heroVariant.markSeen(); handleQuickPlay(); },
     onHeroBrowse: () => { heroVariant.markSeen(); setHeroExpanded(true); setHeroDismissed(true); },
   };

@@ -5,11 +5,14 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AvatarStack from '../AvatarStack';
 import type { RoomPlayerAvatar } from '@/shared/types/game';
+import { getSeededAvatarConfig, getRandomAvatarConfig, hashString } from '@/shared/types/customAvatar';
 
-// Mock Avatar component to avoid SVG rendering complexity
-vi.mock('@/components/Avatar', () => ({
-  default: function MockAvatar({ userId, size }: { userId?: string; size?: string }) {
-    return <div data-testid="avatar" data-userid={userId} data-size={size} />;
+// The stack renders the (static) renderer directly: the lazy components/Avatar
+// wrapper would put an async loader in EntryScreen's SSR'd chunk group
+// (see entry/__tests__/entryChunkGroup.test.ts). Mock it to avoid SVG rendering.
+vi.mock('@/components/avatar/AvatarRenderer', () => ({
+  default: function MockAvatarRenderer({ config, size }: { config: unknown; size?: number }) {
+    return <div data-testid="avatar" data-config={JSON.stringify(config)} data-size={size} />;
   },
 }));
 
@@ -18,6 +21,8 @@ const makeAvatars = (count: number): RoomPlayerAvatar[] =>
     username: `player-${i}`,
     avatarImage: `avatar-${i}`,
   }));
+
+const configOf = (el: HTMLElement) => JSON.parse(el.getAttribute('data-config') || 'null');
 
 describe('AvatarStack', () => {
   it('renders nothing when avatars array is empty', () => {
@@ -58,12 +63,40 @@ describe('AvatarStack', () => {
     expect(screen.queryByTestId('avatar-stack-overflow')).toBeNull();
   });
 
-  it('passes username as userId to Avatar', () => {
+  it('uses the username as the identity seed (the userId Avatar used to get)', () => {
     render(
       <AvatarStack avatars={[{ username: 'alice' }]} totalCount={1} />
     );
     const avatar = screen.getByTestId('avatar');
-    expect(avatar).toHaveAttribute('data-userid', 'alice');
+    expect(configOf(avatar)).toEqual(getSeededAvatarConfig(hashString('alice')));
+  });
+
+  it("renders the player's own avatar when the room payload carries one", () => {
+    const own = getRandomAvatarConfig();
+    render(
+      <AvatarStack avatars={[{ username: 'bob', customAvatar: own }]} totalCount={1} />
+    );
+    expect(configOf(screen.getByTestId('avatar'))).toEqual(own);
+  });
+
+  it('seeds a nameless player from their seat, so two of them never share a face by accident', () => {
+    render(
+      <AvatarStack avatars={[{}, {}]} totalCount={2} />
+    );
+    const [a, b] = screen.getAllByTestId('avatar');
+    expect(configOf(a)).toEqual(getSeededAvatarConfig(hashString('room-player-0')));
+    expect(configOf(b)).toEqual(getSeededAvatarConfig(hashString('room-player-1')));
+  });
+
+  it('scales 1.5x on a TV (DESIGN §b: every size token), faces and the +N chip alike', () => {
+    render(
+      <AvatarStack avatars={makeAvatars(3)} totalCount={5} maxVisible={3} />
+    );
+    const face = screen.getAllByTestId('avatar')[0].parentElement!;
+    expect(face.className).toMatch(/(^|\s)w-6(\s|$)/);
+    expect(face.className).toMatch(/(^|\s)tv:w-9(\s|$)/);
+    expect(face.className).toMatch(/(^|\s)tv:h-9(\s|$)/);
+    expect(screen.getByTestId('avatar-stack-overflow').className).toMatch(/(^|\s)tv:w-9(\s|$)/);
   });
 
   it('has data-testid="avatar-stack" on container', () => {

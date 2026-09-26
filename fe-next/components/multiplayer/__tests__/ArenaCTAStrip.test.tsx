@@ -25,10 +25,18 @@ describe('ArenaCTAStrip', () => {
     cleanup();
   });
 
-  it('renders both Quick Start and Create Private Battle buttons', () => {
+  it('renders both Quick Start and Create buttons', () => {
     render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
     expect(screen.getByRole('button', { name: 'multiplayerFlow.roomList.quickStart' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'multiplayerFlow.roomList.createPrivateBattle' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'mpUi.entry.create' })).toBeInTheDocument();
+  });
+
+  it('QUICK START catches one glint after first paint (decorative, never in the way)', () => {
+    render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
+    const glint = screen.getByTestId('cta-glint');
+    expect(glint.getAttribute('aria-hidden')).toBe('true');
+    expect(glint.className).toContain('pointer-events-none');
+    expect(glint.parentElement).toContainElement(screen.getByRole('button', { name: 'multiplayerFlow.roomList.quickStart' }));
   });
 
   it('invokes onQuickPlay when Quick Start clicked', () => {
@@ -38,43 +46,45 @@ describe('ArenaCTAStrip', () => {
     expect(onQuickPlay).toHaveBeenCalledTimes(1);
   });
 
-  it('invokes onCreateRoom when Create Private Battle clicked', () => {
+  it('invokes onCreateRoom when Create clicked', () => {
     const onCreateRoom = vi.fn();
     render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={onCreateRoom} />);
-    fireEvent.click(screen.getByRole('button', { name: 'multiplayerFlow.roomList.createPrivateBattle' }));
+    fireEvent.click(screen.getByRole('button', { name: 'mpUi.entry.create' }));
     expect(onCreateRoom).toHaveBeenCalledTimes(1);
   });
 
-  it('disables Quick Start and shows Loader while loading', () => {
+  it('disables Quick Start and marks it busy while loading', () => {
     render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} isQuickPlayLoading />);
-    const cta = screen.getByRole('button', { name: 'multiplayerFlow.roomList.quickStart' });
+    const cta = screen.getByTestId('arena-quick-start');
     expect(cta).toBeDisabled();
-    expect(screen.getByTestId('loader')).toBeInTheDocument();
+    expect(cta).toHaveAttribute('aria-busy', 'true');
   });
 
-  it('Create Private Battle is never disabled by Quick Start loading', () => {
+  it('Create is never disabled by Quick Start loading', () => {
     render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} isQuickPlayLoading />);
-    expect(screen.getByRole('button', { name: 'multiplayerFlow.roomList.createPrivateBattle' })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: 'mpUi.entry.create' })).not.toBeDisabled();
   });
 
   it('does not invoke onQuickPlay when disabled', () => {
     const onQuickPlay = vi.fn();
     render(<ArenaCTAStrip onQuickPlay={onQuickPlay} onCreateRoom={vi.fn()} isQuickPlayLoading />);
-    fireEvent.click(screen.getByRole('button', { name: 'multiplayerFlow.roomList.quickStart' }));
+    fireEvent.click(screen.getByTestId('arena-quick-start'));
     expect(onQuickPlay).not.toHaveBeenCalled();
   });
 
-  // Layout: stacked on phones, side-by-side (primary + subordinate) from sm up.
-  // It must NOT revert to a stacked column at ≥720px — that only existed to fit
-  // the old narrow desktop left-rail, and read as a weight-mismatched stack
-  // (big lime over a thin pink outline). The lobby is single-column now, so the
-  // pair gets the full column width and stays a row.
-  it('lays the CTAs side-by-side from sm up and never reverts to a column on desktop', () => {
+  // MP rebuild (DESIGN §b.1): the footer is ONE row at every width —
+  // [QUICK START 2/3][CREATE 1/3] on phone; on desktop QUICK START is centred
+  // at 480px and CREATE moves to the left column (so the footer copy hides).
+  it('keeps the CTAs on one row at every width, QUICK START twice as wide', () => {
     render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
     const strip = screen.getByTestId('arena-cta-strip');
-    expect(strip.className).toMatch(/sm:flex-row/);
-    expect(strip.className).not.toMatch(/min-\[720px\]:flex-col/);
+    const row = strip.querySelector('[data-cta-row]') as HTMLElement;
+    expect(row.className).toMatch(/\bflex\b/);
+    expect(row.className).not.toMatch(/flex-col/);
+    expect(screen.getByTestId('arena-quick-start').parentElement?.className).toMatch(/flex-\[2\]|flex-2/);
+    expect(screen.getByTestId('arena-create-room').className).toMatch(/lg:hidden/);
   });
+
   // t_0d9276d6: above-fold CTAs must paint visible in the first HTML. An
   // opacity:0 framer entrance hid Quick Start until hydration on mobile.
   it('paints the CTA strip statically (no opacity:0 entrance)', () => {

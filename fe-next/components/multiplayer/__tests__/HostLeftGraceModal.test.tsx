@@ -8,15 +8,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
-    open ? <div data-testid="dialog">{children}</div> : null,
-  DialogContent: ({ children, className }: { children: React.ReactNode; className?: string; noDescription?: boolean }) =>
-    <div className={className} data-testid="dialog-content">{children}</div>,
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-}));
-
+/**
+ * MP rebuild (DESIGN §b.8): the host-left cushion is an in-shell BANNER, not a
+ * page modal — the room stays visible under it, nothing is focus-trapped and no
+ * scrim dims the screen. Behaviour (countdown, single exit, identity-robust
+ * onExit, reason copy) is unchanged; these tests pin it on the banner.
+ */
 describe('HostLeftGraceModal (UX audit 2026-05-04 #2)', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -29,34 +26,34 @@ describe('HostLeftGraceModal (UX audit 2026-05-04 #2)', () => {
 
   it('does not render when isOpen=false', () => {
     render(<HostLeftGraceModal isOpen={false} onExit={vi.fn()} />);
-    expect(screen.queryByTestId('dialog')).toBeNull();
+    expect(screen.queryByTestId('host-left-banner')).toBeNull();
   });
 
   it('renders generic body copy when no reason is supplied', () => {
     render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
     // Mock t() returns the key — assert the generic key landed in the DOM.
-    expect(screen.getByTestId('dialog-content').textContent).toContain('multiplayerFlow.hostLeftModal.body');
+    expect(screen.getByTestId('host-left-banner').textContent).toContain('multiplayerFlow.hostLeftModal.body');
   });
 
   it('renders reason-specific body when reason="grace_expired"', () => {
     render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} reason="grace_expired" />);
-    expect(screen.getByTestId('dialog-content').textContent).toContain('multiplayerFlow.hostLeftReason.graceExpired');
-    expect(screen.getByTestId('dialog-content').textContent).not.toContain('multiplayerFlow.hostLeftModal.body');
+    expect(screen.getByTestId('host-left-banner').textContent).toContain('multiplayerFlow.hostLeftReason.graceExpired');
+    expect(screen.getByTestId('host-left-banner').textContent).not.toContain('multiplayerFlow.hostLeftModal.body');
   });
 
   it('renders reason-specific body when reason="host_switched_room"', () => {
     render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} reason="host_switched_room" />);
-    expect(screen.getByTestId('dialog-content').textContent).toContain('multiplayerFlow.hostLeftReason.hostSwitchedRoom');
+    expect(screen.getByTestId('host-left-banner').textContent).toContain('multiplayerFlow.hostLeftReason.hostSwitchedRoom');
   });
 
   it('renders reason-specific body when reason="explicit_no_successor"', () => {
     render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} reason="explicit_no_successor" />);
-    expect(screen.getByTestId('dialog-content').textContent).toContain('multiplayerFlow.hostLeftReason.explicitNoSuccessor');
+    expect(screen.getByTestId('host-left-banner').textContent).toContain('multiplayerFlow.hostLeftReason.explicitNoSuccessor');
   });
 
-  it('renders dialog with countdown when isOpen=true', () => {
+  it('renders the banner with countdown when isOpen=true', () => {
     render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
-    expect(screen.getByTestId('dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('host-left-banner')).toBeInTheDocument();
     expect(screen.getByTestId('host-left-countdown').textContent).toContain('10');
   });
 
@@ -141,5 +138,19 @@ describe('HostLeftGraceModal (UX audit 2026-05-04 #2)', () => {
     rerender(<HostLeftGraceModal isOpen={false} onExit={vi.fn()} seconds={10} />);
     rerender(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
     expect(screen.getByTestId('host-left-countdown').textContent).toContain('10');
+  });
+
+  it('is an in-shell banner, not a modal dialog (no scrim, no focus trap)', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    const banner = screen.getByTestId('host-left-banner');
+    expect(banner.getAttribute('aria-modal')).toBeNull();
+    expect(banner.className).not.toMatch(/inset-0/);
+    expect(banner.className).not.toMatch(/backdrop-blur/);
+  });
+
+  it('says when the player goes back to the arenas', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} seconds={10} />);
+    expect(screen.getByTestId('host-left-banner').textContent).toContain('mpUi.entry.hostLeftIn');
   });
 });

@@ -1,111 +1,65 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
-import { Zap, Users } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Loader } from '@/components/ui/Loader';
 import { useNetworkState } from '@/hooks/useNetworkState';
-
-// No opacity:0 entrance. Same lesson as the arena hero LCP block in
-// RoomListView: an above-fold CTA that starts invisible waits on hydration
-// to fade in, so mobile first paint shows a hero with no actionable button
-// (field bounce on /en/multiplayer). Keep whileHover/whileTap juice only.
-const stripVariants = {
-  visible: {
-    y: 0,
-    opacity: 1,
-    scale: 1,
-  },
-};
+import { MpPrimaryCta } from '@/components/multiplayer/shell/MpPrimaryCta';
+import { CtaGlint } from '@/components/multiplayer/entry/CtaGlint';
 
 interface ArenaCTAStripProps {
   onQuickPlay: () => void;
   onCreateRoom: () => void;
   isQuickPlayLoading?: boolean;
-  /** Skips entrance animation when the parent already mounted (prevents re-entrance on prop churn). */
-  skipEnterAnimation?: boolean;
 }
 
-const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({
-  onQuickPlay,
-  onCreateRoom,
-  isQuickPlayLoading = false,
-  // Kept for RoomListView API compat; entrance is always static now so SSR
-  // HTML matches first paint (no opacity:0 wait on hydration).
-  skipEnterAnimation: _skipEnterAnimation = false,
-}) => {
+/**
+ * The entry footer (DESIGN §b.1): [QUICK START lime, 2/3] [CREATE pink outline,
+ * 1/3] on phone. From `lg` CREATE lives in the left column, so the footer is
+ * QUICK START alone, centred at 480px (×1.5 on TV). One primary per footer.
+ *
+ * Offline guard (onboarding friction audit 2026-08-07): when the DEVICE is
+ * offline both CTAs go inert and QUICK START says it is reconnecting — a replay
+ * showed players rage-clicking bright buttons the app already knew could not
+ * work. The dead-socket-while-online case is handled in useMultiplayerJoin.
+ * Painted statically (no opacity entrance): the footer is above the fold.
+ */
+const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({ onQuickPlay, onCreateRoom, isQuickPlayLoading = false }) => {
   const { t } = useLanguage();
   const { online } = useNetworkState();
-
-  // A replayed session showed the app rendering its "Offline" badge while both
-  // of these buttons stayed bright, enabled and inviting — the player tapped a
-  // CTA the app already knew could not work, then rage-clicked and left.
-  // Scope: this covers the DEVICE-offline case, which is what the replay
-  // showed. The dead-socket-while-online case is handled inside
-  // useMultiplayerJoin (pending state up front, explicit reconnect, 12s wait)
-  // rather than here — reading socket context from this leaf would make it
-  // unrenderable outside a SocketProvider, which its own tests caught.
-  // See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
-  const isUnavailable = !online;
-  const quickPlayDisabled = isQuickPlayLoading || isUnavailable;
-  const quickPlayLabel = isUnavailable
-    ? t('mp.quality.reconnecting')
-    : t('multiplayerFlow.roomList.quickStart');
+  const offline = !online;
 
   return (
-    <m.section
+    <section
       data-testid="arena-cta-strip"
-      variants={stripVariants}
-      initial={false}
-      animate="visible"
-      className="flex flex-col sm:flex-row gap-2.5"
-      data-skip-enter={_skipEnterAnimation ? '1' : undefined}
+      className="border-t-2 border-neo-black/70 bg-neo-navy px-4 pt-3 pb-3 lg:pb-5 tv:pb-8"
     >
-      {/* Primary action — instant matchmaking. Bumped to the clear hero:
-          larger min-height, an icon chip for weight, and a lift-on-hover so it
-          reads as the obvious first move. */}
-      <m.button
-        type="button"
-        data-testid="arena-quick-start"
-        onClick={onQuickPlay}
-        disabled={quickPlayDisabled}
-        aria-label={quickPlayLabel}
-        aria-busy={isUnavailable || undefined}
-        whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
-        whileTap={{ scale: 0.97 }}
-        className="flex-2 min-h-[56px] py-3 px-4 flex items-center justify-center gap-3 bg-neo-lime border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-hard-pressed disabled:hover:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
-      >
-        <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-neo-black/15 border-2 border-neo-black/25 shrink-0">
-          {isQuickPlayLoading || isUnavailable ? (
-            <Loader size="sm" />
-          ) : (
-            <Zap className="w-5 h-5 text-neo-black" />
-          )}
-        </span>
-        <span className="text-neo-black font-black text-lg sm:text-xl uppercase tracking-tight">
-          {quickPlayLabel}
-        </span>
-      </m.button>
-
-      {/* Secondary action — create a private room. Visibly subordinate:
-          dark fill, pink outline that warms on hover. */}
-      <m.button
-        type="button"
-        data-testid="arena-create-room"
-        onClick={onCreateRoom}
-        disabled={isUnavailable}
-        aria-label={t('multiplayerFlow.roomList.createPrivateBattle')}
-        whileHover={{ scale: 1.02, transition: { type: 'spring' as const, stiffness: 400, damping: 20 } }}
-        whileTap={{ scale: 0.97 }}
-        className="flex-1 min-h-[48px] py-3 px-4 flex items-center justify-center gap-2 bg-neo-navy-light border-3 border-neo-pink/50 rounded-xl shadow-hard-sm hover:border-neo-pink hover:bg-neo-navy-light/70 active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:border-neo-pink/50 disabled:hover:bg-neo-navy-light focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
-      >
-        <Users className="w-4 h-4 text-neo-pink shrink-0" />
-        <span className="text-neo-pink font-black text-sm uppercase tracking-wide whitespace-nowrap">
-          {t('multiplayerFlow.roomList.createPrivateBattle')}
-        </span>
-      </m.button>
-    </m.section>
+      <div data-cta-row="" className="mx-auto flex w-full max-w-xl items-stretch gap-3 lg:max-w-[calc(480px*var(--mp-u,1))]">
+        <div className="relative flex-[2] min-w-0">
+          <MpPrimaryCta
+            tone="lime"
+            testId="arena-quick-start"
+            label={offline ? t('mp.quality.reconnecting') : t('multiplayerFlow.roomList.quickStart')}
+            onPress={onQuickPlay}
+            disabled={offline}
+            loading={isQuickPlayLoading && !offline}
+            className="shadow-hard-lg"
+          />
+          {/* One glint once the entry has painted: the eye lands on the primary. */}
+          <CtaGlint delayMs={900} />
+        </div>
+        <button
+          type="button"
+          data-testid="arena-create-room"
+          onClick={offline ? undefined : onCreateRoom}
+          disabled={offline}
+          className="lg:hidden flex-1 min-w-0 h-[calc(64px*var(--mp-u,1))] flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-pink bg-neo-navy-light px-2 font-neo-display text-sm font-bold uppercase leading-tight text-neo-pink shadow-hard transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
+        >
+          <Plus aria-hidden="true" className="h-5 w-5" />
+          <span className="max-w-full truncate">{t('mpUi.entry.create')}</span>
+        </button>
+      </div>
+    </section>
   );
 };
 
