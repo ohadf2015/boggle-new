@@ -14,7 +14,7 @@ body:has([data-mp-entry-chrome='off']) [data-global-bottom-nav] {
  * For the rest of the MP session (lobby, countdown, round, results, TV views)
  * the hidden header's flow spacer is dead height: AutoHideHeader keeps it after
  * a cold load because no user tap happened before `isInGame` flipped. The entry
- * sets html[data-mp-session] on mount (lib/navigation/mpChromeSession);
+ * sets html[data-mp-session] on mount (entry/mpChromeSession);
  * NavigationProvider clears it when the route leaves /multiplayer. Any MpScreen
  * also qualifies, for a session that never mounted the arcade entry.
  */

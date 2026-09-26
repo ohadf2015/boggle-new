@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 import { NavigationProvider } from '../NavigationContext';
-import { getTrackedPreviousPath, resetInAppPathHistory } from '@/lib/navigation/previousInAppPath';
+import { getTrackedPreviousPath, resetInAppPathHistory } from '@/contexts/NavigationContext';
 
 function setUrl(path: string) {
   window.history.replaceState({}, '', path);

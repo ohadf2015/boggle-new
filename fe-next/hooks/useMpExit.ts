@@ -14,7 +14,7 @@ import { createContext, useCallback, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isInAppPreviousPath, mpExit, type MpExitReason } from '@/lib/multiplayer/exitDestination';
-import { getTrackedPreviousPath } from '@/lib/navigation/previousInAppPath';
+import { getTrackedPreviousPath } from '@/contexts/NavigationContext';
 
 export type { MpExitReason } from '@/lib/multiplayer/exitDestination';
 

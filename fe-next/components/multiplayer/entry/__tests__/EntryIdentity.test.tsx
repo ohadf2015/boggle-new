@@ -102,6 +102,30 @@ describe('EntryIdentity', () => {
     expect(screen.queryByLabelText('mpUi.entry.nameAria')).toBeNull();
   });
 
+  // The entry is SSR'd with the placeholder and swaps to the real card after
+  // mount. On desktop the card grows a tagline row and 3xl type, so a skeleton
+  // that only mirrors the avatar made the card jump ~56px at 1440x900 (CLS).
+  // Every text row the ready card has, the placeholder reserves with the SAME
+  // classes (contents hidden).
+  it('placeholder reserves the same text rows as the ready card (no shift on swap)', () => {
+    const slots = (root: HTMLElement) =>
+      Object.fromEntries(
+        Array.from(root.querySelectorAll<HTMLElement>('[data-slot]')).map((el) => [
+          el.dataset.slot,
+          el.className.replace(/\binvisible\b/g, '').replace(/\s+/g, ' ').trim(),
+        ]),
+      );
+    authState = { loading: true, profile: null };
+    const { unmount } = render(<EntryIdentity isAuthenticated={false} displayName="" profileAvatar={null} />);
+    const skeleton = slots(screen.getByTestId('entry-identity-skeleton'));
+    unmount();
+    authState = { loading: false, profile: null };
+    render(<EntryIdentity isAuthenticated={false} displayName="" profileAvatar={null} />);
+    const ready = slots(screen.getByTestId('entry-identity'));
+    expect(Object.keys(ready).sort()).toEqual(['avatar', 'label', 'tagline', 'text']);
+    expect(skeleton).toEqual(ready);
+  });
+
   it('signed in with a rating: shows the rank badge', () => {
     authState = { loading: false, profile: { ranked_mmr: 1234 } };
     render(<EntryIdentity isAuthenticated displayName="NeoPlayer" profileAvatar={CFG_A as never} />);

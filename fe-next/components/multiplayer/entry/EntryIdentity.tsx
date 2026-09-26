@@ -15,6 +15,19 @@ const MAX_NAME = 20;
 /** Rendered once at the largest size; CSS sizes it per breakpoint (64 phone · 112 desktop · 160 TV). */
 const AVATAR_PX = 160;
 
+/* Shared by the ready card and its placeholder, so the swap never shifts. */
+const CARD =
+  'relative flex items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard desktop-tall:flex-col desktop-tall:gap-3 desktop-tall:px-6 desktop-tall:py-6 desktop-tall:text-center tv:py-10';
+const AVATAR_SLOT = 'relative shrink-0';
+const AVATAR_BOX =
+  'block h-16 w-16 desktop-tall:h-28 desktop-tall:w-28 tv:h-40 tv:w-40 overflow-hidden rounded-full border-3 border-neo-black';
+const TEXT_COL = 'min-w-0 flex-1 desktop-tall:w-full desktop-tall:flex-none';
+const TAGLINE =
+  'hidden desktop-tall:block mb-1 font-neo-display text-3xl tv:text-5xl font-bold uppercase tracking-tight text-neo-lime';
+const LABEL = 'block text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-cyan';
+const NAME_ROW =
+  'w-full pe-8 font-neo-display! text-2xl! desktop-tall:text-3xl! tv:text-5xl! font-bold desktop-tall:ps-8 desktop-tall:text-center border-b-3 pb-0.5';
+
 /**
  * Identity is part of the entry (Gartic's strongest move, DESIGN §a): a 64px
  * avatar with a reroll badge (guests), an inline name field, and a rank badge
@@ -27,16 +40,18 @@ export function EntryIdentity(props: EntryIdentityInput) {
   const [builderOpen, setBuilderOpen] = useState(false);
   const [spin, setSpin] = useState(0);
 
-  const card =
-    'relative flex items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard desktop-tall:flex-col desktop-tall:gap-3 desktop-tall:px-6 desktop-tall:py-6 desktop-tall:text-center tv:py-10';
-
   if (!id.ready || !id.avatar) {
+    // Same rows, same classes as the ready card (contents hidden): the entry is
+    // SSR'd with this placeholder, so any row it lacks is a layout shift on swap.
     return (
-      <div data-testid="entry-identity-skeleton" aria-hidden="true" className={card}>
-        <div className="h-16 w-16 desktop-tall:h-28 desktop-tall:w-28 tv:h-40 tv:w-40 shrink-0 rounded-full border-3 border-neo-black bg-neo-navy" />
-        <div className="flex flex-1 flex-col gap-2">
-          <div className="h-3 w-20 rounded bg-neo-navy" />
-          <div className="h-7 w-40 max-w-full rounded bg-neo-navy" />
+      <div data-testid="entry-identity-skeleton" aria-hidden="true" className={CARD}>
+        <div data-slot="avatar" className={AVATAR_SLOT}>
+          <div className={cn(AVATAR_BOX, 'bg-neo-navy')} />
+        </div>
+        <div data-slot="text" className={TEXT_COL}>
+          <p data-slot="tagline" className={cn(TAGLINE, 'invisible')}>{t('mpUi.entry.tagline')}</p>
+          <p data-slot="label" className={cn(LABEL, 'invisible')}>{t('mpUi.entry.playingAs')}</p>
+          <div className={cn(NAME_ROW, 'border-neo-white/10 text-transparent')}>&nbsp;</div>
         </div>
       </div>
     );
@@ -45,8 +60,8 @@ export function EntryIdentity(props: EntryIdentityInput) {
   const avatarKey = `${id.avatar.bgColor ?? ''}${id.avatar.skinColor ?? ''}${spin}`;
 
   return (
-    <div data-testid="entry-identity" className={card}>
-      <div className="relative shrink-0">
+    <div data-testid="entry-identity" className={CARD}>
+      <div data-slot="avatar" className={AVATAR_SLOT}>
         <button
           type="button"
           onClick={() => setBuilderOpen(true)}
@@ -55,7 +70,7 @@ export function EntryIdentity(props: EntryIdentityInput) {
         >
           <span
             key={avatarKey}
-            className="block h-16 w-16 desktop-tall:h-28 desktop-tall:w-28 tv:h-40 tv:w-40 overflow-hidden rounded-full border-3 border-neo-black bg-neo-navy shadow-hard-sm transition-transform duration-150 group-hover:-rotate-3 group-active:scale-95 animate-mp-stamp"
+            className={cn(AVATAR_BOX, 'bg-neo-navy shadow-hard-sm transition-transform duration-150 group-hover:-rotate-3 group-active:scale-95 animate-mp-stamp')}
           >
             <AvatarRenderer config={id.avatar} size={AVATAR_PX} mode="multiplayer" circular className="h-full w-full" />
           </span>
@@ -84,11 +99,11 @@ export function EntryIdentity(props: EntryIdentityInput) {
         )}
       </div>
 
-      <div className="min-w-0 flex-1 desktop-tall:w-full desktop-tall:flex-none">
-        <p aria-hidden="true" className="hidden desktop-tall:block mb-1 font-neo-display text-3xl tv:text-5xl font-bold uppercase tracking-tight text-neo-lime">
+      <div data-slot="text" className={TEXT_COL}>
+        <p data-slot="tagline" aria-hidden="true" className={TAGLINE}>
           {t('mpUi.entry.tagline')}
         </p>
-        <label htmlFor="entry-name" className="block text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-cyan">
+        <label data-slot="label" htmlFor="entry-name" className={LABEL}>
           {t('mpUi.entry.playingAs')}
         </label>
         <div className="relative">
@@ -113,8 +128,8 @@ export function EntryIdentity(props: EntryIdentityInput) {
             aria-describedby={id.error ? 'entry-name-error' : undefined}
             placeholder={t('mpUi.entry.namePlaceholder')}
             className={cn(
-              'w-full bg-transparent pe-8 font-neo-display! text-2xl! desktop-tall:text-3xl! tv:text-5xl! font-bold text-neo-white outline-hidden desktop-tall:ps-8 desktop-tall:text-center',
-              'border-b-3 pb-0.5 transition-colors placeholder:text-neo-white/50',
+              NAME_ROW,
+              'bg-transparent text-neo-white outline-hidden transition-colors placeholder:text-neo-white/50',
               id.error ? 'border-neo-red motion-safe:animate-neo-shake' : 'border-neo-white/25 focus:border-neo-lime',
             )}
           />

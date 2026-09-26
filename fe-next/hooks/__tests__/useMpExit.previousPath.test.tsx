@@ -11,7 +11,7 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ push, replace: vi.fn() }
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en' }) }));
 
 import { useMpExit, readPreviousInAppPath } from '../useMpExit';
-import { recordInAppPath, resetInAppPathHistory } from '@/lib/navigation/previousInAppPath';
+import { recordInAppPath, resetInAppPathHistory } from '@/contexts/NavigationContext';
 
 const setReferrer = (v: string) => Object.defineProperty(document, 'referrer', { configurable: true, value: v });
 

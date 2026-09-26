@@ -10,7 +10,7 @@ import {
   recordInAppPath,
   getTrackedPreviousPath,
   resetInAppPathHistory,
-} from '../previousInAppPath';
+} from '../NavigationContext';
 
 describe('previousInAppPath store', () => {
   beforeEach(() => resetInAppPathHistory());

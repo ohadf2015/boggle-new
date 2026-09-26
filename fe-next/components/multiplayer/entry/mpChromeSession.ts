@@ -15,8 +15,16 @@ export const MP_SESSION_ATTR = 'data-mp-session';
 
 export function markMpChromeSession(): void {
   if (typeof document === 'undefined') return;
-  document.documentElement.setAttribute(MP_SESSION_ATTR, '');
+  const root = document.documentElement;
+  if (!root.hasAttribute(MP_SESSION_ATTR)) root.setAttribute(MP_SESSION_ATTR, '');
 }
+
+/**
+ * The same mark as an inline script for the SSR stream, so it lands while the
+ * document is still parsing — before hydration can remount the page tree and
+ * drop the entry's SSR marker for a frame (see EntryScreen).
+ */
+export const MP_SESSION_MARK_SCRIPT = `document.documentElement.setAttribute('${MP_SESSION_ATTR}','')`;
 
 /** Called on every route change: any non-multiplayer route ends the session. */
 export function syncMpChromeSession(path: string): void {
