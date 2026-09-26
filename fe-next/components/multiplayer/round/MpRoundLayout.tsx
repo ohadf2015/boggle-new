@@ -140,7 +140,7 @@ function MpRoundLayoutImpl({
           layout="row"
           max={4}
           showScores
-          className={cn('justify-center gap-1.5', roster.length >= 4 && '[&_[data-testid=mp-roster-seat]>span[dir=auto]]:sr-only')}
+          className={cn('justify-center gap-1.5', roster.length >= 4 && '[&_[data-player]>span[dir=auto]]:sr-only')}
         />
       </div>
 

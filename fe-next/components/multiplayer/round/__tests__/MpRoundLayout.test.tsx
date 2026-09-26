@@ -139,7 +139,7 @@ describe('MpRoundLayout', () => {
     const four = ['a', 'b', 'c', 'me'].map((username, i) => ({ username, score: 40 - i * 10 }));
     const { unmount } = render(<MpRoundLayout {...props({ leaderboard: four, users: four.map(({ username }) => ({ username })) })} />);
     const row = () => document.querySelector('[data-testid="mp-roster-strip"][data-layout="row"]') as HTMLElement;
-    expect(row().className).toContain('[&_[data-testid=mp-roster-seat]>span[dir=auto]]:sr-only');
+    expect(row().className).toContain('[&_[data-player]>span[dir=auto]]:sr-only');
     unmount();
     render(<MpRoundLayout {...props()} />);
     expect(row().className).not.toContain('sr-only');
