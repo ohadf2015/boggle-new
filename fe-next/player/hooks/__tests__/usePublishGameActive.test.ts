@@ -6,8 +6,7 @@
  * pushed the board down and covered the StudentRankRail — recurring-pitfall
  * Class 1, one value in two places. PlayerView now publishes its flag.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerViewSource } from '../../__tests__/playerViewSource';
 import { renderHook, act } from '@testing-library/react';
 import { useGameStore } from '@/hooks/gameState/store';
 import { usePublishGameActive } from '../usePublishGameActive';
@@ -36,7 +35,8 @@ describe('usePublishGameActive', () => {
   });
 
   it('is wired into PlayerView with its local round flag', () => {
-    const source = readFileSync(resolve(__dirname, '../../PlayerView.tsx'), 'utf8');
+    // PlayerView was split into a router + phase hooks (FOUNDATION); read them all.
+    const source = readPlayerViewSource();
     expect(source).toMatch(/usePublishGameActive\(gameActive\)/);
   });
 });
