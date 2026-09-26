@@ -6,7 +6,7 @@
  */
 import { vi } from 'vitest';
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 
 vi.mock('@/components/education/vocabQuiz/VocabQuizView', () => ({ VocabQuizView: () => null }));
 vi.mock('@/components/wordTower/WordTowerVersus', () => ({ WordTowerVersus: () => null }));
@@ -63,6 +63,7 @@ vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: fals
 
 import PlayerInGameView from '../PlayerInGameView';
 import { MpExitProvider } from '@/hooks/useMpExit';
+import { recordWordAccepted } from '@/lib/multiplayer/mpFeedback';
 
 const baseProps = {
   username: 'p1',
@@ -133,10 +134,18 @@ describe('PlayerInGameView — round frame', () => {
     expect(marker).toContainElement(screen.getByTestId('mp-round-layout'));
   });
 
-  it('blast: the "+N" fly is server-scored in a live room', () => {
+  it('blast: the "+N" fly is server-scored in a live room (client fly off, server overlay on)', () => {
     mockGameMode.value = 'blast';
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1_000);
     render(<PlayerInGameView {...baseProps} />);
-    expect(blastProps.at(-1).serverScoredFly).toBe(true);
+    expect(blastProps.at(-1).hideClientScoreFly).toBe(true);
+    const renders = blastProps.length;
+    now.mockReturnValue(2_000);
+    act(() => recordWordAccepted({ word: 'stare', score: 17 }));
+    expect(screen.getByTestId('mp-floater').textContent).toBe('+17');
+    // The accept re-renders only the overlay, never the blast board.
+    expect(blastProps.length).toBe(renders);
+    now.mockRestore();
   });
 
   it('continue-solo leaves through useMpExit, not router.push', () => {

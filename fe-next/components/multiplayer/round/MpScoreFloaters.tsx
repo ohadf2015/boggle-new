@@ -2,7 +2,7 @@
 
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
-import type { RoundFloater } from './useRoundJuice';
+import type { RoundFloater } from './useServerFloaters';
 import styles from './round.module.css';
 
 /**

@@ -55,6 +55,7 @@ import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverla
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
 import { useMpExit } from '@/hooks/useMpExit';
 import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
+import { MpServerScoreFly } from '@/components/multiplayer/round/MpServerScoreFly';
 import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
 
 type HintsState = PlayerHintsState;
@@ -293,6 +294,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // The active mode's game component. On desktop it becomes the shell's center
   // slot; on mobile/tablet it's rendered directly.
   const gameCanvas = gameMode === 'blast' ? (
+        <>
           <BlastGame
             config={blastBridge.config}
             mode="multiplayer"
@@ -308,9 +310,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             initialTileStates={blastBridge.initialTileStates}
             blastSeed={blastBridge.blastSeed}
             serverGrid={blastBridge.serverGrid}
-            serverScoredFly
+            hideClientScoreFly
             isDesktopCanvas={shellEnabled && isShellMode(gameMode)}
           />
+          <MpServerScoreFly />
+        </>
       ) : gameMode === 'word-hunt' ? (
           <WordHuntGame
             grid={effectiveGrid}

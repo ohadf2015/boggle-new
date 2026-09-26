@@ -4,6 +4,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useMpExit } from '@/hooks/useMpExit';
 import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
+import { MpServerScoreFly } from '@/components/multiplayer/round/MpServerScoreFly';
 import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundContainer';
 import type { Socket } from 'socket.io-client';
 import InGameScreen from '../../components/game/InGameScreen';
@@ -363,6 +364,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     return (
       <>
         {wrapCanvas(
+        <>
         <BlastGame
           config={blastBridge.config}
           mode="multiplayer"
@@ -378,9 +380,11 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           initialTileStates={blastBridge.initialTileStates}
           blastSeed={blastBridge.blastSeed}
           serverGrid={blastBridge.serverGrid}
-          serverScoredFly
+          hideClientScoreFly
           isDesktopCanvas={inShell}
         />
+        <MpServerScoreFly />
+        </>
         )}
         {connectionOverlays}
         {stopConfirm}

@@ -4,7 +4,7 @@
  * (pitfall class 3). Continue-solo leaves through useMpExit.
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi } from 'vitest';
 import type { Socket } from 'socket.io-client';
 
@@ -58,6 +58,7 @@ vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: fals
 
 import HostInGameView from '../HostInGameView';
 import { MpExitProvider } from '@/hooks/useMpExit';
+import { recordWordAccepted } from '@/lib/multiplayer/mpFeedback';
 
 const props = {
   gameCode: 'ROOM42',
@@ -121,9 +122,16 @@ describe('HostInGameView — round frame', () => {
 
   it('blast: the host\'s "+N" fly is server-scored too (same as the joiner)', async () => {
     mode.value = 'blast';
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1_000);
     render(<HostInGameView {...props} />);
     await screen.findByTestId('blast-game');
-    expect(blastProps.at(-1).serverScoredFly).toBe(true);
+    expect(blastProps.at(-1).hideClientScoreFly).toBe(true);
+    const renders = blastProps.length;
+    now.mockReturnValue(2_000);
+    act(() => recordWordAccepted({ word: 'stare', score: 17 }));
+    expect(screen.getByTestId('mp-floater').textContent).toBe('+17');
+    expect(blastProps.length).toBe(renders);
+    now.mockRestore();
   });
 
   it('continue-solo leaves through useMpExit', () => {

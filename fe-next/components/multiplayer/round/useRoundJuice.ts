@@ -14,14 +14,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { useMpLastReject, useMpLastWord } from '@/hooks/useMpFeedback';
+import { useMpLastReject } from '@/hooks/useMpFeedback';
 import { detectOvertakes, detectPasses, type RankedPlayer } from '@/lib/multiplayer/overtakeDetection';
 import type { MpRejectReason } from '@/lib/multiplayer/mpFeedback';
 import type { MpBanner, MpCallout, MpScoreGain } from '../shell';
+import { useFreshLastWord, useServerFloaters, type RoundFloater } from './useServerFloaters';
 
-/** Floaters alive at once (perf rule 6). */
-export const MAX_FLOATERS = 3;
-export const FLOATER_MS = 520;
+export { MAX_FLOATERS, FLOATER_MS, type RoundFloater } from './useServerFloaters';
+
 /** Combo level from which an accept is "on fire". */
 export const ON_FIRE_LEVEL = 3;
 /** Heartbeat from this many seconds left. */
@@ -33,11 +33,6 @@ const REJECT_KEY: Record<Exclude<MpRejectReason, 'found-by-other'>, string> = {
   'not-on-board': 'mpUi.round.reject.notOnBoard',
   'already-found': 'mpUi.round.reject.alreadyFound',
 };
-
-export interface RoundFloater {
-  id: string;
-  points: number;
-}
 
 export interface RoundJuice {
   gain: MpScoreGain | null;
@@ -63,14 +58,14 @@ interface Params {
 export function useRoundJuice({ meId, standings, remainingTime }: Params): RoundJuice {
   const { t } = useLanguage();
   const { playComboSound, playLeadChangeSound, playTimerHeartbeatSound } = useSoundEffects();
-  const lastWord = useMpLastWord();
+  const freshWord = useFreshLastWord();
+  const floaters = useServerFloaters(freshWord);
   const lastReject = useMpLastReject();
   // Events recorded before this round mounted belong to a previous round.
   const [mountedAt] = useState(() => Date.now());
 
   const [callout, setCallout] = useState<MpCallout | null>(null);
   const [banners, setBanners] = useState<MpBanner[]>([]);
-  const [floaters, setFloaters] = useState<RoundFloater[]>([]);
   const [rankFlipKey, setRankFlipKey] = useState<string | undefined>(undefined);
   const [timeUp, setTimeUp] = useState(false);
   const [rejectText, setRejectText] = useState<string | null>(null);
@@ -78,26 +73,15 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
   const seq = useRef(0);
   const nextId = (p: string) => `${p}-${++seq.current}`;
 
-  const freshWord = lastWord && lastWord.ts >= mountedAt ? lastWord : null;
   const gain = useMemo<MpScoreGain | null>(
     () => (freshWord ? { id: freshWord.id, points: freshWord.points } : null),
     [freshWord],
   );
 
-  // Accepted word → floater (pooled) + combo callout.
-  const floaterTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  // Accepted word → ladder points + combo callout (the floater pool is useServerFloaters).
   useEffect(() => {
     if (!freshWord) return;
     setPointsByWord((prev) => new Map(prev).set(freshWord.word.toLowerCase(), freshWord.points));
-    if (freshWord.points > 0) {
-      const f = { id: freshWord.id, points: freshWord.points };
-      setFloaters((prev) => [...prev, f].slice(-MAX_FLOATERS));
-      const timer = setTimeout(() => {
-        floaterTimers.current.delete(timer);
-        setFloaters((prev) => prev.filter((x) => x.id !== f.id));
-      }, FLOATER_MS);
-      floaterTimers.current.add(timer);
-    }
     if (freshWord.comboLevel >= ON_FIRE_LEVEL) {
       setCallout({ id: nextId('fire'), text: t('mpUi.round.onFire', { level: freshWord.comboLevel }), tone: 'loud', color: 'lime' });
       playComboSound(freshWord.comboLevel);
@@ -105,11 +89,6 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
     // Keyed on the event id only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [freshWord?.id]);
-  useEffect(() => {
-    const timers = floaterTimers.current;
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
   // Rejections: quiet; found-by-other: quiet cyan with the partial credit.
   useEffect(() => {
     if (!lastReject || lastReject.ts < mountedAt) return;

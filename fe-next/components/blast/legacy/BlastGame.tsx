@@ -50,6 +50,9 @@ import { useIdleDetection } from '@/hooks/useIdleDetection';
 import { trackDeadTime } from '@/utils/growthTracking';
 import type { LetterGrid, Avatar } from '@/shared/types';
 
+/** Stable empty list for `hideClientScoreFly` (no new array per render). */
+const NO_SCORE_FLIES: ScoreFlyEvent[] = [];
+
 const BLAST_DEAD_TIME_THRESHOLD_MS = 15000;
 const BLAST_CONTINUE_BONUS_MOVES = 5;
 
@@ -78,8 +81,8 @@ interface BlastGameProps {
   blastSeed?: number | null;
   /** MP only: server-authoritative letter grid (from `startGame`/store `letterGrid`). */
   serverGrid?: LetterGrid | null;
-  /** Live MP only (opt-in, default off): the "+N" fly shows the server's `wordAccepted.score`. */
-  serverScoredFly?: boolean;
+  /** Live MP only (opt-in, default off): hide the client-computed "+N" fly; the MP round draws the server's `wordAccepted.score`. */
+  hideClientScoreFly?: boolean;
   remainingTime?: number | null;
   totalTime?: number;
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: Avatar }>;
@@ -124,7 +127,7 @@ export function BlastGame({
   initialTileStates,
   blastSeed,
   serverGrid,
-  serverScoredFly = false,
+  hideClientScoreFly = false,
   remainingTime: _remainingTime,
   totalTime: _totalTime,
   leaderboard,
@@ -341,7 +344,6 @@ export function BlastGame({
     recorder: highlightRecorderRef.current,
     // Variable "treasure roll" reward is SOLO-only — MP scoring is server-authoritative.
     enableTreasureRoll: !isMultiplayer,
-    serverScoredFly,
     effects: {
       setLastWordLength, setWordSubmitCount, setWordFoundParticle,
       setClearedTilesForEffects, setScoreFlyEvents,
@@ -755,7 +757,7 @@ export function BlastGame({
         onQuit={handleQuit}
         activeModifier={isMultiplayer ? null : activeModifier}
         noWordsRemaining={engine.noWordsRemaining}
-        scoreFlyEvents={scoreFlyEvents}
+        scoreFlyEvents={hideClientScoreFly ? NO_SCORE_FLIES : scoreFlyEvents}
         onScoreFlyComplete={handleScoreFlyComplete}
         comboFlash={comboFlash}
         onComboFlashComplete={handleComboFlashComplete}
