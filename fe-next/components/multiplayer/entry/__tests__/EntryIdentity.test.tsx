@@ -145,4 +145,29 @@ describe('EntryIdentity', () => {
     expect(screen.queryByTestId('entry-name-saved')).toBeNull();
     vi.useRealTimers();
   });
+
+  // Generated guest names run long ("Unhinged Flamingo", 17): at 24px Fredoka the
+  // phone field shows ~16 characters, so the player's own name was clipped. The
+  // phone size steps down with length; the row keeps one line height so a long
+  // name never shifts the card.
+  it.each([
+    ['Guesty', 'text-2xl!'],
+    ['Unhinged Flamingo', 'text-xl!'],
+    ['Extremely Long Namez', 'text-lg!'],
+  ])('fits %s on a phone (%s), on a fixed line height', (name, size) => {
+    storedName = name;
+    render(<EntryIdentity isAuthenticated={false} displayName="" profileAvatar={null} />);
+    const input = screen.getByLabelText('mpUi.entry.nameAria');
+    const tokens = input.className.split(/\s+/);
+    expect(tokens).toContain(size);
+    expect(tokens.filter((c) => /^text-(?:lg|xl|2xl)!$/.test(c))).toEqual([size]);
+    expect(tokens).toContain('leading-8!');
+  });
+
+  it('the placeholder reserves the fixed name line height too', () => {
+    authState = { loading: true, profile: null };
+    render(<EntryIdentity isAuthenticated={false} displayName="" profileAvatar={null} />);
+    const row = screen.getByTestId('entry-identity-skeleton').querySelector('[data-slot="text"] > div');
+    expect(row?.className.split(/\s+/)).toContain('leading-8!');
+  });
 });

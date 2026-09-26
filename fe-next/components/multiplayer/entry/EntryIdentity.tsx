@@ -26,7 +26,22 @@ const TAGLINE =
   'hidden desktop-tall:block mb-1 font-neo-display text-3xl tv:text-5xl font-bold uppercase tracking-tight text-neo-lime';
 const LABEL = 'block text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-cyan';
 const NAME_ROW =
-  'w-full pe-8 font-neo-display! text-2xl! desktop-tall:text-3xl! tv:text-5xl! font-bold desktop-tall:ps-8 desktop-tall:text-center border-b-3 pb-0.5';
+  'w-full pe-8 font-neo-display! desktop-tall:text-3xl! tv:text-5xl! font-bold desktop-tall:ps-8 desktop-tall:text-center border-b-3 pb-0.5';
+// One line height per breakpoint whatever the phone font size, so a long name
+// (smaller type) never changes the row — or the card — height. Listed AFTER
+// the size in cn(): tailwind-merge drops a leading-* that precedes a text-*.
+const NAME_LEADING = 'leading-8! desktop-tall:leading-9! tv:leading-none!';
+
+/**
+ * Phone type size for the name: at 24px Fredoka the field shows ~16 characters
+ * and generated guest names run longer ("Unhinged Flamingo"), so it steps down
+ * rather than clipping the player's own name. Desktop and TV have the room.
+ */
+function nameSizeClass(name: string): string {
+  if (name.length > 17) return 'text-lg!';
+  if (name.length > 14) return 'text-xl!';
+  return 'text-2xl!';
+}
 
 /**
  * Identity is part of the entry (Gartic's strongest move, DESIGN §a): a 64px
@@ -51,7 +66,7 @@ export function EntryIdentity(props: EntryIdentityInput) {
         <div data-slot="text" className={TEXT_COL}>
           <p data-slot="tagline" className={cn(TAGLINE, 'invisible')}>{t('mpUi.entry.tagline')}</p>
           <p data-slot="label" className={cn(LABEL, 'invisible')}>{t('mpUi.entry.playingAs')}</p>
-          <div className={cn(NAME_ROW, 'border-neo-white/10 text-transparent')}>&nbsp;</div>
+          <div className={cn(NAME_ROW, 'text-2xl!', NAME_LEADING, 'border-neo-white/10 text-transparent')}>&nbsp;</div>
         </div>
       </div>
     );
@@ -129,6 +144,8 @@ export function EntryIdentity(props: EntryIdentityInput) {
             placeholder={t('mpUi.entry.namePlaceholder')}
             className={cn(
               NAME_ROW,
+              nameSizeClass(id.name),
+              NAME_LEADING,
               'bg-transparent text-neo-white outline-hidden transition-colors placeholder:text-neo-white/50',
               id.error ? 'border-neo-red motion-safe:animate-neo-shake' : 'border-neo-white/25 focus:border-neo-lime',
             )}
