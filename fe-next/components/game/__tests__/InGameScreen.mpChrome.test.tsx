@@ -23,6 +23,16 @@ vi.mock('@/components/GridComponent', async () => {
   return { default: Grid };
 });
 vi.mock('@/components/RoomChat', () => ({ default: () => null }));
+const { leadSounds } = vi.hoisted(() => ({ leadSounds: { milestone: vi.fn(), brk: vi.fn() } }));
+vi.mock('@/hooks/useLeadChangeDetection', () => ({
+  useLeadChangeDetection: () => ({ type: 'took-lead', id: 1 }),
+}));
+vi.mock('@/contexts/SoundEffectsContext', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  const noop = () => {};
+  const api = new Proxy({}, { get: (_t, k) => (k === 'playComboMilestoneSound' ? leadSounds.milestone : k === 'playComboBreakSound' ? leadSounds.brk : noop) });
+  return { ...actual, useSoundEffects: () => api };
+});
 
 import InGameScreen from '@/components/game/InGameScreen';
 
@@ -94,6 +104,14 @@ describe('InGameScreen mpChrome — play surface only', () => {
     act(() => {});
     expect(gridProps.animated.length).toBeGreaterThan(0);
     expect(gridProps.animated.every((v) => v === false)).toBe(true);
+  });
+
+  it('lead changes sound ONCE: the round juice owns the lead-change cue under mpChrome', () => {
+    leadSounds.milestone.mockClear();
+    leadSounds.brk.mockClear();
+    render(<InGameScreen {...props()} />);
+    expect(leadSounds.milestone).not.toHaveBeenCalled();
+    expect(leadSounds.brk).not.toHaveBeenCalled();
   });
 
   it('a timer tick does not re-render the board', () => {

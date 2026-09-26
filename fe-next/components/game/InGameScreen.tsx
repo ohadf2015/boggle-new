@@ -353,13 +353,14 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
 
   // Play sound on lead change
   useEffect(() => {
-    if (!leadChangeEvent) return;
+    // mpChrome: the MP round's juice layer owns the lead-change cue (one sound, not two).
+    if (!leadChangeEvent || mpChrome) return;
     if (leadChangeEvent.type === 'took-lead') {
       playComboMilestoneSound(5);
     } else {
       playComboBreakSound(1);
     }
-  }, [leadChangeEvent, playComboMilestoneSound, playComboBreakSound]);
+  }, [leadChangeEvent, mpChrome, playComboMilestoneSound, playComboBreakSound]);
 
   // Golden letter positions from backend startGame payload
   const [goldenLetters, setGoldenLetters] = useState<Array<{ row: number; col: number }>>([]);

@@ -89,6 +89,10 @@ export interface WordHuntGameLayoutProps {
   gameDir: 'ltr' | 'rtl';
 }
 
+/** Stable empties: a fresh Set per render broke the board memo on every tick. */
+const NO_ELIMINATED_LETTERS: Set<string> = new Set();
+const NO_REVEALED_LETTERS: Set<number> = new Set();
+
 export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   // Header
   score,
@@ -187,7 +191,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
               targetWord={'?'.repeat(targetLength)}
               attempts={attempts}
               accumulatedClues={accumulatedClues}
-              revealedLetters={new Set<number>()}
+              revealedLetters={NO_REVEALED_LETTERS}
               knownLetters={knownLetters}
               latestAttemptFeedback={latestAttemptFeedback}
               showFeedbackOverlay={showFeedbackOverlay}
@@ -262,7 +266,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
             <SurvivalGridSection
               grid={grid}
               isGameOver={isGameOver}
-              eliminatedLetters={new Set<string>()}
+              eliminatedLetters={NO_ELIMINATED_LETTERS}
               onWordSubmit={onWordSubmit}
               onWordChange={onWordChange}
               highlightedPath={highlightedPath}

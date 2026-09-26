@@ -138,11 +138,14 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   });
 
   // Handle word change from grid swiping
+  // Keyed on the stable callback, not the per-render `ftue` object: a fresh
+  // onWordChange re-rendered the board on every leaderboard/score update.
+  const markFtueActivity = ftue.markActivity;
   const handleWordChange = useCallback((word: string, count: number) => {
-    if (count > 0) ftue.markActivity();
+    if (count > 0) markFtueActivity();
     setFormedWord(word);
     setLetterCount(count);
-  }, [ftue]);
+  }, [markFtueActivity]);
 
   // Handle word submission — validate locally, emit to server, dual submission
   function handleWordSubmit(word: string) {
