@@ -123,10 +123,6 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   // Admin-only dev previews — also carry generated cube icons so the "+ More"
   // grid is full-bleed art across the board. Colours spread to avoid clusters.
-  wordTower: {
-    titleKey: 'wordTower.cardTitle', descKey: 'wordTower.cardDesc', path: '/word-tower',
-    Icon: Building2, variant: 'lime', badge: 'NEW', modeImage: '/modes/word-tower.png', genIcon: '/modes/cubes/wordtower.png',
-  },
   sealedBid: {
     titleKey: 'landing.sealedBidMode', descKey: 'landing.sealedBidModeDesc', path: '/sealed-bid',
     Icon: Gavel, variant: 'cyan', badge: 'ADMIN', category: 'calm', genIcon: '/modes/cubes/sealedbid.png',

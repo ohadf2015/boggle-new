@@ -260,21 +260,6 @@ export const EXPERIMENTS = {
   }),
 
   /**
-   * Word Tower solo game mode (Tower Bloxx word-chain). Admin-only
-   * during development: the landing-card + route are additionally gated on
-   * `isAdmin`, so `on` here only reveals the mode to admins. Flip in PostHog to
-   * widen rollout once the mode graduates. Email override keeps it live for the
-   * dev account without PostHog config.
-   */
-  'word-tower': defineExperiment({
-    variants: ['off', 'on'] as const,
-    default: 'off',
-    description: 'Word Tower solo mode — admin-gated dev preview. on = visible to admins.',
-    forceVariantByEmail: {
-      'ohadf2015@gmail.com': 'on',
-    },
-  }),
-  /**
    * Personalized word mastery. control hides /profile/words; enabled shows
    * mastered vs learning lists plus a practice CTA seeded from weakest words.
    * Also gated by NEXT_PUBLIC_WORD_MASTERY=1 and the word_mastery_v1 DB flag.

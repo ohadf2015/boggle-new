@@ -57,7 +57,6 @@ type LandingCardKey =
   | 'connections'
   | 'brainGym'
   | 'wordCraft'
-  | 'wordTower'
   | 'sealedBid'
   | 'crossword'
   | 'wordfall'
@@ -208,7 +207,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'sealedBid', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'sealedBid', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
 
   // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
   // New and returning players alike see the full roster (the old newcomer

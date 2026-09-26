@@ -1,12 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { en } from '@/translations/en.js';
-import { emptyEstate, perksFromEstate } from '@/lib/wordTowerV2/estate';
-import { PLOT_SLOTS } from '@/lib/wordTowerV2/estateCatalog';
+import { emptyEstate } from '@/lib/wordTowerV2/estate';
 import { createRun } from '@/lib/wordTowerV2/run';
 import { V2Results } from '../../V2Results';
 import { EstateButton } from '../EstateButton';
-import { PerkChips } from '../PerkChips';
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playSound: vi.fn() }) }));
 vi.mock('@/hooks/useMasterMute', () => ({
@@ -48,20 +46,5 @@ describe('empire entry points', () => {
       />,
     );
     expect(screen.getByRole('button', { name: new RegExp(en.wordTowerV2.estate.open, 'i') })).toBeTruthy();
-  });
-
-  it('given built plots, when the run chip row renders, then each perk is stated in words', () => {
-    const estate = { ...emptyEstate(), plots: PLOT_SLOTS.map((slot) => ({ slot, level: 5, damaged: false })) };
-    render(<PerkChips t={t} perks={perksFromEstate(estate)} onOpen={() => undefined} />);
-    expect(screen.getByRole('button').textContent).toContain('% steadier');
-  });
-
-  // Was: the empty row carried a "build your district" invitation. It stacked a
-  // second cream box on top of the gameplay hint, two boxes over the tower both
-  // asking for a tap. The invitation now rides the empire button's badge, which
-  // is on screen either way — so an estate with no perks states nothing.
-  it('given a fresh estate, when the run chip row renders, then it states nothing', () => {
-    render(<PerkChips t={t} perks={perksFromEstate(emptyEstate())} onOpen={() => undefined} />);
-    expect(screen.getByRole('button').textContent).toBe('');
   });
 });

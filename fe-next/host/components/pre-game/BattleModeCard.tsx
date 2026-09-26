@@ -5,7 +5,6 @@ import { m, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { getModeDescription, MODE_ICONS, type GameModeOption } from '@/components/GameModeSelector';
-import { useExperiment } from '@/hooks/useExperiment';
 
 interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
@@ -87,7 +86,6 @@ const MODES: ModeVisualConfig[] = [
   { mode: 'word-hunt', nameKey: 'gameModes.wordHunt.name', family: 'pink' },
   { mode: 'wheel-rush', nameKey: 'gameModes.wheelRush.name', family: 'lime' },
   { mode: 'blast', nameKey: 'gameModes.blast.name', family: 'pink' },
-  { mode: 'word-tower', nameKey: 'wordTower.cardTitle', family: 'purple' },
   { mode: 'sealed-bid', nameKey: 'gameModes.sealedBid.name', family: 'pink' },
   { mode: 'crossword', nameKey: 'gameModes.crossword.name', family: 'cyan' },
 ];
@@ -106,16 +104,11 @@ export function BattleModeCard({
   }, [setSelectedGameMode]);
 
   // Blast is now offered to ALL players (gate removed after MP-blast parity).
-  // Word Tower stays admin-only AND behind the `word-tower` experiment (mirrors
-  // the solo gating; server enforces admin too).
-  const { variant: wordTowerVariant } = useExperiment('word-tower');
-  const wordTowerEnabled = isAdmin && wordTowerVariant === 'on';
   // Sealed Bid has curated racks + dictionary only for EN and HE boards.
   const sealedBidEnabled = isAdmin && (language === 'en' || language === 'he');
   // Crossword has a baked puzzle pool for every locale (falls back to EN).
   const crosswordEnabled = isAdmin;
   const visibleModes = MODES.filter((m) => {
-    if (m.mode === 'word-tower') return wordTowerEnabled;
     if (m.mode === 'sealed-bid') return sealedBidEnabled;
     if (m.mode === 'crossword') return crosswordEnabled;
     return true;

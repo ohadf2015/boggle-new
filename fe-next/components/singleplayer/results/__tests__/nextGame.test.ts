@@ -93,7 +93,7 @@ describe('buildNextGameOptions — introducing solo players to other modes', () 
   it('always ends with one discovery tile for a public mode, reusing the landing labels', () => {
     const opts = buildNextGameOptions({ mode: 'practice', difficulty: 'EASY', isWinner: false, language: 'he' });
     const discover = opts[opts.length - 1];
-    expect(discover).toMatchObject({ id: 'discover', kind: 'link', modeKey: 'wordTower', href: '/he/word-tower', labelKey: 'wordTower.cardTitle' });
+    expect(discover).toMatchObject({ id: 'discover', kind: 'link', modeKey: 'wordTowerV2', href: '/he/word-tower', labelKey: 'wordTowerV2.cardTitle' });
   });
 
   it('rotates the discovery mode with games played so each results screen shows something new', () => {
@@ -104,6 +104,6 @@ describe('buildNextGameOptions — introducing solo players to other modes', () 
       const d = opts.find((o) => o.id === 'discover');
       return d && d.kind === 'link' ? d.modeKey : null;
     });
-    expect(keys).toEqual(['wordTower', 'connections', 'blast', 'wordCraft', 'wordTower']);
+    expect(keys).toEqual(['wordTowerV2', 'connections', 'blast', 'wordCraft', 'wordTowerV2']);
   });
 });
