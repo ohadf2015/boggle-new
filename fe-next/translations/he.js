@@ -18307,6 +18307,29 @@ const he = {
     "description": "הרפתקה מחכה. נסה את המגדל היומי.",
     "playAdventure": "שחק הרפתקה",
     "playWordTower": "שחק מגדל מילים"
+  },
+  // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
+  "mpUi": {
+    "shell": {
+      "back": "חזרה",
+      "home": "דף הבית",
+      "leave": "יציאה מהחדר",
+      "close": "סגירה",
+      "copyCode": "העתקת קוד החדר",
+      "copied": "הועתק!",
+      "timeLeft": "נותרו {seconds} שניות",
+      "rankOf": "מקום {rank} מתוך {total}",
+      "host": "מארח",
+      "bot": "בוט",
+      "ready": "מוכן",
+      "emptySeat": "מקום פנוי",
+      "playersCount": "{count}/{max} שחקנים",
+      "backToArenas": "חזרה לזירות"
+    },
+    "entry": {},
+    "lobby": {},
+    "round": {},
+    "results": {}
   }
 };
 

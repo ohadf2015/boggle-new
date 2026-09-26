@@ -18377,6 +18377,29 @@ const sv = {
     "description": "Äventyr väntar. Prova det dagliga tornet.",
     "playAdventure": "Spela äventyr",
     "playWordTower": "Spela ordtorn"
+  },
+  // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
+  "mpUi": {
+    "shell": {
+      "back": "Tillbaka",
+      "home": "Hem",
+      "leave": "Lämna rummet",
+      "close": "Stäng",
+      "copyCode": "Kopiera rumskod",
+      "copied": "Kopierad!",
+      "timeLeft": "{seconds} sekunder kvar",
+      "rankOf": "Plats {rank} av {total}",
+      "host": "Värd",
+      "bot": "Bot",
+      "ready": "Redo",
+      "emptySeat": "Ledig plats",
+      "playersCount": "{count}/{max} spelare",
+      "backToArenas": "Tillbaka till arenorna"
+    },
+    "entry": {},
+    "lobby": {},
+    "round": {},
+    "results": {}
   }
 };
 

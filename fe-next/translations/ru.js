@@ -18110,6 +18110,29 @@ const ru = {
     "description": "Приключение ждёт. Попробуйте ежедневную башню.",
     "playAdventure": "Играть в приключение",
     "playWordTower": "Играть в башню слов"
+  },
+  // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
+  "mpUi": {
+    "shell": {
+      "back": "Назад",
+      "home": "Главная",
+      "leave": "Выйти из комнаты",
+      "close": "Закрыть",
+      "copyCode": "Скопировать код комнаты",
+      "copied": "Скопировано!",
+      "timeLeft": "Осталось {seconds} с",
+      "rankOf": "Место {rank} из {total}",
+      "host": "Хозяин",
+      "bot": "Бот",
+      "ready": "Готов",
+      "emptySeat": "Свободное место",
+      "playersCount": "Игроков: {count}/{max}",
+      "backToArenas": "Назад к аренам"
+    },
+    "entry": {},
+    "lobby": {},
+    "round": {},
+    "results": {}
   }
 };
 

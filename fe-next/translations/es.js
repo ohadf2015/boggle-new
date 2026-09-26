@@ -18395,6 +18395,29 @@ const es = {
     "description": "La aventura te espera. Prueba la torre diaria.",
     "playAdventure": "Jugar aventura",
     "playWordTower": "Jugar torre de palabras"
+  },
+  // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
+  "mpUi": {
+    "shell": {
+      "back": "Volver",
+      "home": "Inicio",
+      "leave": "Salir de la sala",
+      "close": "Cerrar",
+      "copyCode": "Copiar código de sala",
+      "copied": "¡Copiado!",
+      "timeLeft": "Quedan {seconds} segundos",
+      "rankOf": "Puesto {rank} de {total}",
+      "host": "Anfitrión",
+      "bot": "Bot",
+      "ready": "Listo",
+      "emptySeat": "Asiento libre",
+      "playersCount": "{count}/{max} jugadores",
+      "backToArenas": "Volver a las arenas"
+    },
+    "entry": {},
+    "lobby": {},
+    "round": {},
+    "results": {}
   }
 };
 

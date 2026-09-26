@@ -18377,6 +18377,29 @@ const ja = {
     "description": "冒険があなたを待っています。毎日のタワーを試してください。",
     "playAdventure": "冒険をプレイ",
     "playWordTower": "ワードタワーをプレイ"
+  },
+  // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
+  "mpUi": {
+    "shell": {
+      "back": "戻る",
+      "home": "ホーム",
+      "leave": "ルームを退出",
+      "close": "閉じる",
+      "copyCode": "ルームコードをコピー",
+      "copied": "コピーしました！",
+      "timeLeft": "残り{seconds}秒",
+      "rankOf": "{total}人中{rank}位",
+      "host": "ホスト",
+      "bot": "ボット",
+      "ready": "準備OK",
+      "emptySeat": "空席",
+      "playersCount": "{count}/{max}人",
+      "backToArenas": "アリーナに戻る"
+    },
+    "entry": {},
+    "lobby": {},
+    "round": {},
+    "results": {}
   }
 };
 

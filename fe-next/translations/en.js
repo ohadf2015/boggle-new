@@ -17455,6 +17455,29 @@ const en = {
     "description": "Adventure awaits. Try the daily tower.",
     "playAdventure": "Play Adventure",
     "playWordTower": "Play Word Tower"
+  },
+  // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
+  "mpUi": {
+    "shell": {
+      "back": "Back",
+      "home": "Home",
+      "leave": "Leave room",
+      "close": "Close",
+      "copyCode": "Copy room code",
+      "copied": "Copied!",
+      "timeLeft": "{seconds} seconds left",
+      "rankOf": "Rank {rank} of {total}",
+      "host": "Host",
+      "bot": "Bot",
+      "ready": "Ready",
+      "emptySeat": "Empty seat",
+      "playersCount": "{count}/{max} players",
+      "backToArenas": "Back to arenas"
+    },
+    "entry": {},
+    "lobby": {},
+    "round": {},
+    "results": {}
   }
 };
 
