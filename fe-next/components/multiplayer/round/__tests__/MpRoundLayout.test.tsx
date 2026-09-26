@@ -131,6 +131,11 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-round-canvas').className).toContain('boardDrop');
   });
 
+  it('lets the board fill its slot (no legacy viewport cap on .game-board-frame)', () => {
+    render(<MpRoundLayout {...props()} />);
+    expect(screen.getByTestId('mp-round-canvas').className).toContain('fillBoard');
+  });
+
   it('a timer tick or leaderboard update never re-renders the canvas', () => {
     const { rerender } = render(<MpRoundLayout {...props()} />);
     const settled = canvasRenders.count;

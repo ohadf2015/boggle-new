@@ -128,6 +128,7 @@ function MpRoundLayoutImpl({
         aria-hidden={revealed ? undefined : 'true'}
         className={cn(
           styles.areaBoard,
+          styles.fillBoard,
           'relative min-h-0 min-w-0 flex flex-col',
           !revealed && 'invisible',
           // The drop runs once, when the class lands (the GO render).
