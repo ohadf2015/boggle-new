@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 import sitemap from './sitemap';
@@ -126,6 +126,13 @@ describe('sitemap', () => {
         `missing /word-tower for ${locale}`
       ).toBeDefined();
     }
+  });
+
+  it('does not describe /adventure as beta-gated or noindexed', () => {
+    const src = readFileSync(join(__dirname, 'sitemap.ts'), 'utf8');
+    expect(src).not.toContain('Adventure is beta-gated');
+    expect(src).not.toMatch(/noindexed at page level \(see app\/\[locale\]\/adventure/);
+    expect(src).toContain('Adventure is GA and indexed');
   });
 
   // /word-tower/daily is a daily run URL — not indexed, stays noindex.

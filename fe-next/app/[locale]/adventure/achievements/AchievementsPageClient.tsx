@@ -2,7 +2,7 @@
  * AchievementsPageClient Component
  *
  * Client-side achievements page with grid and detail modal.
- * Public: guests see the adventure guest gate, signed-in players the grid.
+ * Public: guests and signed-in players see the achievement catalog grid.
  */
 
 'use client';
@@ -16,7 +16,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AchievementGrid } from '@/components/adventure/achievements';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
-import { AdventureGuestGate } from '@/components/adventure/AdventureGuestGate';
 import {
   ADVENTURE_ACHIEVEMENTS,
   type AdventureAchievementId,
@@ -24,16 +23,14 @@ import {
 
 export function AchievementsPageClient() {
   const { t, language } = useLanguage();
-  const { loading, user, profile, isAuthenticated } = useAuth();
+  const { loading, user, profile } = useAuth();
   const { achievementCounts } = useAdventureAchievements();
   const [selectedAchievement, setSelectedAchievement] = useState<{
     achievement: typeof ADVENTURE_ACHIEVEMENTS[AdventureAchievementId];
     count: number;
   } | null>(null);
 
-  // A session user is enough; the profile row can land later (or fail).
-  const signedIn = isAuthenticated || !!user;
-  // Hold until auth resolves so a signed-in player never flashes the guest gate.
+  // Hold until auth resolves so a signed-in player never flashes empty progress.
   const isResolving = loading || (!!user && !profile);
 
   const handleSelectAchievement = useCallback((id: AdventureAchievementId) => {
@@ -49,11 +46,6 @@ export function AchievementsPageClient() {
   }, []);
 
   if (isResolving) return null;
-
-  // Show guest gate for unauthenticated users
-  if (!signedIn) {
-    return <AdventureGuestGate surface="achievements" />;
-  }
 
   return (
     <div

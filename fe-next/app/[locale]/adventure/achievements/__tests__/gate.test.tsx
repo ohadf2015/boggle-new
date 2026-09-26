@@ -39,7 +39,7 @@ import AchievementsPage from '../page';
 beforeEach(() => replace.mockClear());
 
 describe('AchievementsPage gate', () => {
-  it('given an ordinary guest player, when the page renders, then the guest gate displays for the achievements surface', () => {
+  it('given an ordinary guest player, when the page renders, then the achievement catalog grid displays (no teaser gate)', () => {
     useAuth.mockReturnValue({
       loading: false,
       user: null,
@@ -50,7 +50,8 @@ describe('AchievementsPage gate', () => {
 
     render(<AchievementsPage />);
 
-    expect(screen.getByTestId('guest-gate-achievements')).toBeInTheDocument();
+    expect(screen.getByTestId('achievement-grid')).toBeInTheDocument();
+    expect(screen.queryByTestId('guest-gate-achievements')).not.toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
 
