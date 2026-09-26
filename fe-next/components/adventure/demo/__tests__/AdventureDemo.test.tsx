@@ -108,7 +108,21 @@ describe('AdventureDemo', () => {
     }
   });
 
-  it('shows the fight button when ready, not the grid submit', async () => {
+  it('renders an interactive board without any click once the board has loaded', async () => {
+    render(
+      <Suspense fallback={null}>
+        <AdventureDemo onExit={vi.fn()} />
+      </Suspense>
+    );
+
+    // No "Fight" button anymore — the guest already opted in at the gate, so the
+    // demo auto-starts (phase ready -> start()) as soon as the board loads.
+    await waitFor(() => {
+      expect(screen.getByRole('grid')).toHaveAttribute('tabindex', '0');
+    });
+  });
+
+  it('fires adventure_demo_started exactly once automatically after load', async () => {
     render(
       <Suspense fallback={null}>
         <AdventureDemo onExit={vi.fn()} />
@@ -116,29 +130,14 @@ describe('AdventureDemo', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('adventurePlay.fight')).toBeTruthy();
-    });
-  });
-
-  it('fires demo_started when fight button is clicked', async () => {
-    const user = userEvent.setup();
-    render(
-      <Suspense fallback={null}>
-        <AdventureDemo onExit={vi.fn()} />
-      </Suspense>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('adventurePlay.fight')).toBeTruthy();
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith('adventure_demo_started', {});
     });
 
-    const fightButton = screen.getByText('adventurePlay.fight');
-    await user.click(fightButton);
-
-    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('adventure_demo_started', {});
+    const startedCalls = mockTrackGrowthEvent.mock.calls.filter((c) => c[0] === 'adventure_demo_started');
+    expect(startedCalls).toHaveLength(1);
   });
 
-  it('calls onExit when back button is clicked', async () => {
+  it('calls onExit from the top-bar back button', async () => {
     const onExit = vi.fn();
     const user = userEvent.setup();
     render(
@@ -151,27 +150,22 @@ describe('AdventureDemo', () => {
       expect(screen.getByText('a')).toBeTruthy();
     });
 
-    const backButton = screen.getByRole('button', { name: 'adventurePlay.guest.backToGate' });
+    const backButton = screen.getByRole('button', { name: 'adventurePlay.backToMap' });
     await user.click(backButton);
     expect(onExit).toHaveBeenCalled();
   });
 
-  it('when play again is clicked, shows a fresh board and fight button', async () => {
-    const user = userEvent.setup();
+  it('when play again is clicked, shows a fresh board that auto-starts again', async () => {
     render(
       <Suspense fallback={null}>
         <AdventureDemo onExit={vi.fn()} />
       </Suspense>
     );
 
-    // Wait for board to load and fight button to appear
+    // Board loads and auto-starts (0.5s level set in the mock).
     await waitFor(() => {
-      expect(screen.getByText('adventurePlay.fight')).toBeTruthy();
+      expect(screen.getByRole('grid')).toHaveAttribute('tabindex', '0');
     });
-
-    // Click fight to start
-    const fightButton = screen.getByText('adventurePlay.fight');
-    await user.click(fightButton);
 
     // Wait for time to run out (0.5 seconds set in mock)
     await waitFor(
@@ -185,17 +179,31 @@ describe('AdventureDemo', () => {
       { timeout: 3000 }
     );
 
+    const startedCallsBeforeReplay = mockTrackGrowthEvent.mock.calls.filter(
+      (c) => c[0] === 'adventure_demo_started'
+    );
+    expect(startedCallsBeforeReplay).toHaveLength(1);
+
     // Click play again button
+    const user = userEvent.setup();
     const playAgainButton = screen.getByRole('button', { name: 'adventurePlay.guest.playAgain' });
     await user.click(playAgainButton);
 
-    // Fight button should reappear
+    // Fresh board auto-starts again — no click needed to make it interactive.
     await waitFor(() => {
-      expect(screen.getByText('adventurePlay.fight')).toBeTruthy();
+      expect(screen.getByRole('grid')).toHaveAttribute('tabindex', '0');
     });
 
     // Result card should be gone
     expect(screen.queryByText('adventurePlay.guest.demoWon')).toBeNull();
     expect(screen.queryByText('adventurePlay.guest.demoLost')).toBeNull();
+
+    // adventure_demo_started fired once more for the new round.
+    await waitFor(() => {
+      const startedCallsAfterReplay = mockTrackGrowthEvent.mock.calls.filter(
+        (c) => c[0] === 'adventure_demo_started'
+      );
+      expect(startedCallsAfterReplay).toHaveLength(2);
+    });
   });
 });

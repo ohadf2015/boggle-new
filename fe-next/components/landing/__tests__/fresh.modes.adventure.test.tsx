@@ -9,16 +9,18 @@
  */
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 
 const lang = { language: 'en', dir: 'ltr' as 'ltr' | 'rtl' };
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: lang.language, dir: lang.dir }),
 }));
 
+const trackGrowthEvent = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackLandingCtaClick: vi.fn(),
   trackModeSelected: vi.fn(),
+  trackGrowthEvent: (...a: unknown[]) => trackGrowthEvent(...a),
 }));
 
 import { ModeRow, FRESH_MODE_KEYS } from '../fresh/ModeRow';
@@ -89,5 +91,19 @@ describe('ModeRow (fresh) — Adventure card for guests', () => {
     expect(blastCard).toBeTruthy();
     const badge = blastCard?.querySelector('[data-testid="mode-badge"]');
     expect(badge).toBeFalsy();
+  });
+
+  it('given a guest taps a featured card, then featured_mode_card_clicked fires for it (and not for others)', () => {
+    trackGrowthEvent.mockClear();
+    const { container } = render(<ModeRow />);
+    fireEvent.click(container.querySelector('a[href="/en/adventure"]')!);
+    expect(trackGrowthEvent).toHaveBeenCalledWith('featured_mode_card_clicked', { mode: 'adventure', surface: 'fresh' });
+
+    const other = Array.from(container.querySelectorAll('a')).find(
+      (a) => !/adventure|word-tower/.test(a.getAttribute('href') ?? ''),
+    );
+    trackGrowthEvent.mockClear();
+    if (other) fireEvent.click(other);
+    expect(trackGrowthEvent).not.toHaveBeenCalled();
   });
 });

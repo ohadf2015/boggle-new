@@ -450,7 +450,7 @@ export type GrowthEvent =
   | 'new_modes_announcement_clicked'
   | 'new_modes_announcement_dismissed'
   // Featured mode card engagement (homepage + daily hub).
-  //   featured_mode_card_clicked: player clicked a promoted mode card. Props: { mode: string, surface: 'hub'|'desktop' }.
+  //   featured_mode_card_clicked: player clicked a promoted mode card. Props: { mode: string, surface: 'hub'|'desktop'|'fresh' }.
   | 'featured_mode_card_clicked'
   // SEO landing page CTAs (measure mode discoverability via organic search).
   //   mode_landing_play_clicked: player clicked "Play" from an SEO landing page. Props: { mode: string }.

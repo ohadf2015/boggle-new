@@ -22,7 +22,7 @@ import type { NodeState } from '@/lib/adventure/play/nodeResolve';
 import { eliteTrophy } from '@/lib/adventure/play/trophy';
 import { isWordOnBoard } from '@/utils/clientWordValidator';
 import { fetchWithAuth } from '@/utils/authFetch';
-import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
+import { trackGameStart, trackGameEnd, trackGrowthEvent } from '@/utils/growthTracking';
 import { tickClock } from '@/lib/adventure/play/runClock';
 import { clearClearedNodes } from '@/components/adventure/map/clearedNodes';
 import { useCoinActions } from '@/contexts/CoinContext';
@@ -404,6 +404,8 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
     startedAtRef.current = Date.now();
     // Stable mode label across every adventure node — trackGameEnd dedupes on it.
     trackGameStart(ADVENTURE_MODE, { world, level: lvl.level, levelKind: lvl.kind, nodeKind: nodeKindRef.current, nodeId: currentNodeRef.current });
+    // Fights are nodes too: same funnel event NodeScreen fires for shop/rest/treasure/event.
+    trackGrowthEvent('adventure_node_entered', { world, nodeKind: nodeKindRef.current ?? lvl.kind });
     // Every node fights back: elite/boss with their full scripts, an ordinary
     // fight with a slow, non-lethal rival whose HP is the top-star bar it draws.
     const combatLvl = isCombatKind(lvl.kind);

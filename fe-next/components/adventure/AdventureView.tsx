@@ -138,8 +138,8 @@ export default function AdventureView() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#0f1b3d] text-neo-cream">
-      <header className="sticky top-0 z-40 flex items-center gap-1.5 px-3 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] bg-[#0f1b3d]/90 backdrop-blur-sm border-b-[3px] border-black">
+    <div className="h-dvh shrink-0 bg-[#0f1b3d] text-neo-cream flex flex-col">
+      <header className="sticky top-0 z-40 shrink-0 flex items-center gap-1.5 px-3 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] bg-[#0f1b3d]/90 backdrop-blur-sm border-b-[3px] border-black">
         <Link href={`/${language}`} aria-label={t('adventurePlay.backHome')}
           className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000]">
           <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
@@ -163,21 +163,23 @@ export default function AdventureView() {
         </Link>
       </header>
 
-      {state === 'loading' ? (
-        <div className="grid place-items-center py-24"><Loader2 className="w-8 h-8 animate-spin" /></div>
-      ) : state === 'error' ? (
-        <div className="p-8 text-center">
-          <p className="font-bold">{t('adventurePlay.loadError')}</p>
-          <button type="button" onClick={() => void refresh()} className="mt-3 rounded-xl border-[3px] border-black bg-neo-cyan text-black font-bold px-4 py-2">{t('adventurePlay.tryAgain')}</button>
-        </div>
-      ) : (
-        <WorldMap
-          totalStars={totalStars}
-          completions={completions}
-          onWorldSelect={(world) => setView({ kind: 'run', world })}
-          onContinue={(world) => setView({ kind: 'run', world })}
-        />
-      )}
+      <div className="flex-1 min-h-0 flex flex-col">
+        {state === 'loading' ? (
+          <div className="grid place-items-center py-24"><Loader2 className="w-8 h-8 animate-spin" /></div>
+        ) : state === 'error' ? (
+          <div className="p-8 text-center">
+            <p className="font-bold">{t('adventurePlay.loadError')}</p>
+            <button type="button" onClick={() => void refresh()} className="mt-3 rounded-xl border-[3px] border-black bg-neo-cyan text-black font-bold px-4 py-2">{t('adventurePlay.tryAgain')}</button>
+          </div>
+        ) : (
+          <WorldMap
+            totalStars={totalStars}
+            completions={completions}
+            onWorldSelect={(world) => setView({ kind: 'run', world })}
+            onContinue={(world) => setView({ kind: 'run', world })}
+          />
+        )}
+      </div>
 
       <CollectionPanel isOpen={panel === 'collection'} onClose={() => setPanel(null)} inventory={inventory} />
       <SkinVault isOpen={panel === 'skins'} onClose={() => setPanel(null)} unlocked={skins} equippedWorld={skinWorld} onEquip={equip} />

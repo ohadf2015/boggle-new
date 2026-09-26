@@ -22,7 +22,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { MODE_META, modeRoute } from '@/lib/landing/modeMeta';
-import { trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
+import { trackGrowthEvent, trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
 export const FRESH_MODE_KEYS = ['adventure', 'wordTowerV2', 'wordCraft', 'connections', 'brainGym', 'blast'] as const;
@@ -63,6 +63,10 @@ export function ModeRow() {
   const onCardClick = (key: FreshModeKey) => {
     trackModeSelected(key, 'home');
     trackLandingCtaClick('mode_card', { mode: key, variant: MODE_META[key]?.variant, surface: 'fresh' });
+    // Same featured-card signal as LandingChallengeCards, from the guest/fresh home.
+    if (key === 'adventure' || key === 'wordTowerV2') {
+      trackGrowthEvent('featured_mode_card_clicked', { mode: key, surface: 'fresh' });
+    }
   };
 
   return (

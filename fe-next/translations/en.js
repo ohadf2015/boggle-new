@@ -887,6 +887,7 @@ const en = {
       "signIn": "Sign in to play",
       "back": "Back",
       "backToGate": "Back to battle selection",
+      "demoLabel": "Free battle",
       "demoResult": "Battle complete",
       "demoWon": "You won!",
       "demoLost": "You lost!",

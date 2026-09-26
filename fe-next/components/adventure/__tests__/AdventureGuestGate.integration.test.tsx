@@ -94,7 +94,7 @@ describe('AdventureGuestGate Integration', () => {
     if (fetchSpy) fetchSpy.mockRestore();
   });
 
-  it('given unauth guest clicks play battle, when the demo loads, then real board renders with fight button', async () => {
+  it('given unauth guest clicks play battle, when the demo loads, then real board renders and is interactive with no extra click', async () => {
     const user = userEvent.setup();
     render(
       <Suspense fallback={null}>
@@ -117,11 +117,15 @@ describe('AdventureGuestGate Integration', () => {
       expect(screen.getByText(letter)).toBeTruthy();
     }
 
-    // Fight button should be present
-    expect(screen.getByText('adventurePlay.fight')).toBeTruthy();
+    // The guest already chose "play a free battle" at the gate — there is no
+    // second "Fight" button. The board auto-starts (phase ready -> start()) and
+    // becomes interactive on its own once it has loaded.
+    await waitFor(() => {
+      expect(screen.getByRole('grid')).toHaveAttribute('tabindex', '0');
+    });
   });
 
-  it('given guest clicks fight button, when the fight starts, then demo_started is fired', async () => {
+  it('given guest plays the demo, when the board loads, then demo_started is fired automatically once', async () => {
     const user = userEvent.setup();
     render(
       <Suspense fallback={null}>
@@ -133,17 +137,15 @@ describe('AdventureGuestGate Integration', () => {
     const playBattleButton = screen.getByText('adventurePlay.guest.playBattle');
     await user.click(playBattleButton);
 
-    // Wait for board to load
+    // Wait for board to load and auto-start — no fight button to click anymore.
     await waitFor(() => {
-      expect(screen.getByText('adventurePlay.fight')).toBeTruthy();
+      expect(screen.getByRole('grid')).toHaveAttribute('tabindex', '0');
     });
 
-    // Click fight
-    const fightButton = screen.getByText('adventurePlay.fight');
-    await user.click(fightButton);
-
-    // Verify demo_started was fired
+    // Verify demo_started was fired automatically, exactly once.
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('adventure_demo_started', {});
+    const startedCalls = mockTrackGrowthEvent.mock.calls.filter((c) => c[0] === 'adventure_demo_started');
+    expect(startedCalls).toHaveLength(1);
   });
 
   it('given guest plays demo, when the run completes, then only demo endpoint was called (no writes)', async () => {
@@ -158,14 +160,11 @@ describe('AdventureGuestGate Integration', () => {
     const playBattleButton = screen.getByText('adventurePlay.guest.playBattle');
     await user.click(playBattleButton);
 
-    // Wait for board to load
+    // Board loads and auto-starts on its own (0.5s level set in the mock) —
+    // no fight button to click.
     await waitFor(() => {
-      expect(screen.getByText('adventurePlay.fight')).toBeTruthy();
+      expect(screen.getByRole('grid')).toHaveAttribute('tabindex', '0');
     });
-
-    // Click fight
-    const fightButton = screen.getByText('adventurePlay.fight');
-    await user.click(fightButton);
 
     // Wait for time to run out
     await waitFor(
@@ -180,6 +179,7 @@ describe('AdventureGuestGate Integration', () => {
 
     // Verify only demo endpoint was called, no write endpoints
     const allCalls = fetchSpy.mock.calls.map((c) => String(c[0]));
+    expect(allCalls.length).toBeGreaterThan(0);
     for (const call of allCalls) {
       expect(call).toMatch(/\/api\/adventure\/demo/);
       expect(call).not.toMatch(/\/api\/adventure\/(start|node|complete)/);

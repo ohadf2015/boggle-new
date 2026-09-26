@@ -887,6 +887,7 @@ const sv = {
       "signIn": "Logga in för att spela",
       "back": "Tillbaka",
       "backToGate": "Tillbaka till slag-urval",
+      "demoLabel": "Gratis strid",
       "demoResult": "Slag slutfört",
       "demoWon": "Du vann!",
       "demoLost": "Du förlorade!",

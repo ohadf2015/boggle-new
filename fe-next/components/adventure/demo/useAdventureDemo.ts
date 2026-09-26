@@ -43,6 +43,7 @@ export function useAdventureDemo({ language, isWord }: Options) {
   const [grid, setGrid] = useState<string[][]>([]);
   const [lvl, setLvl] = useState<PlayLevel | null>(null);
   const [words, setWords] = useState<string[]>([]);
+  const [score, setScore] = useState(0);
   const [msLeft, setMsLeft] = useState(0);
   const [result, setResult] = useState<RunResult | null>(null);
   const [combat, setCombat] = useState<CombatState | null>(null);
@@ -154,6 +155,7 @@ export function useAdventureDemo({ language, isWord }: Options) {
       lastPointsRef.current = pts[pts.length - 1] ?? 0;
       pointsRef.current = pts;
       scoreRef.current = pts.reduce((a, b) => a + b, 0);
+      setScore(scoreRef.current);
       if (combatRef.current) dispatchCombat({ type: 'word', word: w, points: lastPointsRef.current });
       return 'ok';
     },
@@ -201,6 +203,7 @@ export function useAdventureDemo({ language, isWord }: Options) {
     grid,
     lvl,
     words,
+    score,
     msLeft,
     result,
     combat,

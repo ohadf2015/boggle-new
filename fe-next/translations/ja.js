@@ -887,6 +887,7 @@ const ja = {
       "signIn": "ログインして遊ぶ",
       "back": "戻る",
       "backToGate": "バトル選択に戻る",
+      "demoLabel": "無料バトル",
       "demoResult": "バトル完了",
       "demoWon": "勝利！",
       "demoLost": "敗北…",

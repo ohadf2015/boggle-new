@@ -4,13 +4,16 @@
  * Demo adventure player for guests: uses AdventureLevel UI but read-only.
  * Reuses GridComponent, HUD, combat, and scoring logic from the main game.
  */
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import GridComponent from '@/components/GridComponent';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { worldSkinId } from '@/lib/adventure/play/worldSkins';
 import { useAdventureDemo } from './useAdventureDemo';
 import { useWordChecker } from '../play/useWordChecker';
 import { DemoResultCard } from './DemoResultCard';
+import LevelTopBar from '../play/LevelTopBar';
+import FoeTarget from '../play/fx/FoeTarget';
+import { WORLD_CONFIGS } from '@/lib/adventure/worldConfig';
 import type { Language } from '@/types';
 
 interface AdventureDemoProps {
@@ -18,6 +21,7 @@ interface AdventureDemoProps {
 }
 
 const WORLD = 1;
+const WORLD_NAME = WORLD_CONFIGS.find((w) => w.id === WORLD)?.name ?? '';
 const worldBackdrop = (world: number) => `/images/adventure/play/world-${world}.webp`;
 
 interface DemoRunProps {
@@ -39,9 +43,11 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
     [run]
   );
 
-  const handleGameStart = useCallback(() => {
-    run.start();
-  }, [run]);
+  // The guest already chose "play a free battle" — no second start button.
+  const { phase, start } = run;
+  useEffect(() => {
+    if (phase === 'ready') start();
+  }, [phase, start]);
 
   const lvl = run.lvl;
 
@@ -82,15 +88,20 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
         backgroundPosition: 'center',
       }}
     >
-      {/* Back button */}
-      <header className="sticky top-0 z-40 px-3 pt-[max(0.625rem,env(safe-area-inset-top))] pb-2.5">
-        <button
-          onClick={onExit}
-          className="inline-flex items-center gap-1.5 rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000] hover:bg-neo-cream/90"
-          aria-label={t('adventurePlay.guest.backToGate')}
-        >
-          ← {t('adventurePlay.guest.back')}
-        </button>
+      {/* Same top bar + foe card as a real level: timer, exit, rival HP vs the star bars. */}
+      <header className="sticky top-0 z-40 px-3 pt-[max(0.625rem,env(safe-area-inset-top))] pb-2.5 space-y-2">
+        <LevelTopBar
+          worldName={t('adventure.worlds.' + WORLD_NAME)}
+          levelLabel={t('adventurePlay.guest.demoLabel')}
+          secs={Math.ceil(run.msLeft / 1000)}
+          urgent={run.phase === 'playing' && run.msLeft <= 10_000}
+          onExit={onExit}
+          world={WORLD}
+        />
+        {lvl && (
+          <FoeTarget world={WORLD} score={run.score} stars={lvl.stars} lastHit={null}
+            combat={run.phase === 'playing' ? run.combat : null} />
+        )}
       </header>
 
       {/* Board */}
@@ -106,17 +117,6 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
         </div>
       )}
 
-      {/* Start button (if not running) */}
-      {run.phase === 'ready' && (
-        <div className="flex justify-center pb-6">
-          <button
-            onClick={handleGameStart}
-            className="px-6 py-3 bg-neo-lime text-black font-bold rounded-lg hover:bg-[#dcff00] text-lg"
-          >
-            {t('adventurePlay.fight')}
-          </button>
-        </div>
-      )}
     </div>
   );
 }

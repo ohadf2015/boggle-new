@@ -887,6 +887,7 @@ const he = {
       "signIn": "התחברו כדי לשחק",
       "back": "חזרה",
       "backToGate": "חזרה לבחירת קרב",
+      "demoLabel": "קרב חינם",
       "demoResult": "הקרב הסתיים",
       "demoWon": "ניצחתם!",
       "demoLost": "הפסדתם!",

@@ -887,6 +887,7 @@ const es = {
       "signIn": "Inicia sesión para jugar",
       "back": "Atrás",
       "backToGate": "Volver a la selección de batalla",
+      "demoLabel": "Batalla gratis",
       "demoResult": "Batalla completada",
       "demoWon": "¡Ganaste!",
       "demoLost": "¡Perdiste!",
