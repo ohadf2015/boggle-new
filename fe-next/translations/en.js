@@ -1800,14 +1800,14 @@ const en = {
     },
     "adventure": {
       "title": "Word Adventure Game - RPG Word Puzzle Free",
-      "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
+      "description": "Battle bosses across 100 levels & 10 themed worlds. Free RPG word puzzle with fire tiles, power-ups & skill tree. No download, no signup needed.",
       "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
       "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!",
       "playLabel": "Play"
     },
     "wordTowerV2": {
       "title": "Word Tower - Stack Words, Build a Tower | Free Game",
-      "description": "Stack words to build the tallest tower! Word Tower is a physics-based word puzzle game. Chain combos, unlock power-ups, and climb the leaderboard. Free, no download required.",
+      "description": "Stack words to build the tallest tower! Chain combos, earn coins, unlock upgrades, and raid rivals. Leaderboard play, free, no download required.",
       "ogTitle": "Word Tower - Physics Word Puzzle Game",
       "ogDescription": "Stack words to build your tower! Chain combos, unlock power-ups, and compete. Free game!",
       "playLabel": "Play"
