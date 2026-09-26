@@ -30,20 +30,32 @@ export function removeBlockBody(world: TowerWorld, id: string): boolean {
 }
 
 /**
+ * The playfield's despawn region: past these, a body is invisible and gone.
+ * Shared with wreck.ts — the wrecking ball is not in the block maps, so it
+ * checks the same bounds on its own.
+ */
+export function despawnBounds(world: TowerWorld): { left: number; right: number; groundY: number } {
+  return {
+    left: -world.despawnHalfWidthPx - DESPAWN_MARGIN_PX,
+    right: world.despawnHalfWidthPx + DESPAWN_MARGIN_PX,
+    groundY: GROUND_THICKNESS_PX + DESPAWN_MARGIN_PX,
+  };
+}
+
+/**
  * Despawn blocks that fell outside the playfield and are not part of the standing chain.
  * Prevents debris from accumulating off-screen indefinitely.
  * Does NOT modify collapse tracking (peakHeightPx, collapseHeldMs).
  */
 export function cleanupDebris(world: TowerWorld, chainIds: Set<string>): void {
-  const bounds = { left: -world.despawnHalfWidthPx - DESPAWN_MARGIN_PX, right: world.despawnHalfWidthPx + DESPAWN_MARGIN_PX };
-  const groundY = GROUND_THICKNESS_PX + DESPAWN_MARGIN_PX;
+  const bounds = despawnBounds(world);
 
   for (const [id, body] of world.blocks) {
     // Never despawn chain blocks or hanging blocks (static, not landed)
     if (chainIds.has(id) || (body.isStatic && !world.landed.has(id))) continue;
 
     const outsideH = body.bounds.max.x < bounds.left || body.bounds.min.x > bounds.right;
-    const belowG = body.bounds.min.y > groundY;
+    const belowG = body.bounds.min.y > bounds.groundY;
 
     if (outsideH || belowG) removeBlockBody(world, id);
   }

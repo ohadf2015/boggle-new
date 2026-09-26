@@ -13,6 +13,7 @@
  */
 import { Bodies, Body, Composite } from 'matter-js';
 import { GRAVITY_PX_PER_MS2, type TowerWorld, createTowerWorld, spawnBlock, stepWorld } from './engine';
+import { despawnBounds } from './debris';
 import type { TowerBlock } from './estateTower';
 import { cleanUntrustedText } from './sanitizeText';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from './scoring';
@@ -232,6 +233,25 @@ export function stepWreck(w: WreckWorld, elapsedMs: number): void {
     Body.setPosition(w.ball, { x: p.x, y: p.y });
   }
   stepWorld(w.tower, elapsedMs);
+  despawnBallIfOutOfBounds(w);
+}
+
+/**
+ * The ball is a plain Matter body the block maps never see, so cleanupDebris
+ * can't remove it: a cut ball flung past the playfield edge would fall — and
+ * get simulated — for the rest of the round. Despawn it on the same bounds the
+ * blocks use. A ball that stays in play is kept: it lies in the rubble in the
+ * payoff shot. ballSpent (|x|>1400, y>400) always fires before this bound, so
+ * no caller can be waiting on a ball this removes.
+ */
+function despawnBallIfOutOfBounds(w: WreckWorld): void {
+  const b = w.ball;
+  if (!b || w.chain) return;
+  const { left, right, groundY } = despawnBounds(w.tower);
+  if (b.bounds.max.x < left || b.bounds.min.x > right || b.bounds.min.y > groundY) {
+    Composite.remove(w.tower.engine.world, b);
+    w.ball = null;
+  }
 }
 
 /** Blocks knocked out of place: dropped a block-height, or shoved off their spot. */
