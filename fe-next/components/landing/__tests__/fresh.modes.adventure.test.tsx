@@ -1,21 +1,18 @@
 /**
- * Test: Adventure card appears on fresh (guest) homepage with NEW badge,
- * positioned first in the mode row (with Word Tower V2 second).
+ * Test: the new modes (Adventure, Word Tower) are featured to guests as a
+ * spotlight pair at the top of the "Pick your game" section — key art + NEW
+ * sticker — not as two more carousel cards with a tiny badge.
  *
- * Regression: adventure.playCount = 0 on the server, so it doesn't appear in
- * the popularity-ranked list. The guest row must still surface it like the
- * returning-visitor hub does (class-1 dual source of truth: force-append when
- * popularity data has no stats).
+ * Regression: adventure.playCount = 0 on the server, so it never appears in a
+ * popularity-ranked list. The fresh page must surface it unconditionally.
  */
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/react';
 
-const lang = { language: 'en', dir: 'ltr' as 'ltr' | 'rtl' };
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: lang.language, dir: lang.dir }),
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
-
 const trackGrowthEvent = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackLandingCtaClick: vi.fn(),
@@ -23,87 +20,34 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...a: unknown[]) => trackGrowthEvent(...a),
 }));
 
-import { ModeRow, FRESH_MODE_KEYS } from '../fresh/ModeRow';
+import { ModeRow } from '../fresh/ModeRow';
 
-describe('ModeRow (fresh) — Adventure card for guests', () => {
-  it('Adventure is the first card in FRESH_MODE_KEYS', () => {
-    expect(FRESH_MODE_KEYS[0]).toBe('adventure');
-  });
-
-  it('Word Tower V2 is the second card', () => {
-    expect(FRESH_MODE_KEYS[1]).toBe('wordTowerV2');
-  });
-
-  it('renders adventure as the first mode card with href /en/adventure', () => {
+describe('ModeRow (fresh) — new modes spotlight for guests', () => {
+  it('Given the modes section, then the spotlight leads it: Adventure first, Word Tower second', () => {
     const { container } = render(<ModeRow />);
-    const cards = [...container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')];
-    expect(cards.length).toBeGreaterThan(0);
-    const firstCard = cards[0];
-    expect(firstCard.getAttribute('data-mode')).toBe('adventure');
-    expect(firstCard.getAttribute('href')).toBe('/en/adventure');
+    const section = container.querySelector('[data-fresh-section="modes"]')!;
+    const spots = [...section.querySelectorAll('a[data-spotlight-mode]')];
+    expect(spots.map((a) => a.getAttribute('href'))).toEqual(['/en/adventure', '/en/word-tower']);
+    const firstCarouselCard = section.querySelector('li a');
+    expect(spots[0].compareDocumentPosition(firstCarouselCard!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('second card is word tower v2 with href /en/word-tower', () => {
+  it('Given the carousel, then no card repeats a spotlight mode or carries a badge', () => {
     const { container } = render(<ModeRow />);
-    const cards = [...container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')];
-    expect(cards[1].getAttribute('data-mode')).toBe('wordTowerV2');
-    expect(cards[1].getAttribute('href')).toBe('/en/word-tower');
+    const hrefs = [...container.querySelectorAll('li a')].map((a) => a.getAttribute('href'));
+    expect(hrefs).not.toContain('/en/adventure');
+    expect(hrefs).not.toContain('/en/word-tower');
+    expect(container.querySelector('li [data-testid="mode-badge"]')).toBeNull();
   });
 
-  it('does not filter out adventure from FRESH_MODE_KEYS', () => {
-    expect(FRESH_MODE_KEYS).toContain('adventure');
-  });
-
-  it('all mode cards are accessible (links have localized hrefs)', () => {
-    const { container } = render(<ModeRow />);
-    const cards = [...container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')];
-    for (const card of cards) {
-      const href = card.getAttribute('href');
-      expect(href).toBeTruthy();
-      expect(href).toMatch(/^\/en\//);
-    }
-  });
-
-  it('Adventure card displays a NEW badge', () => {
-    const { container } = render(<ModeRow />);
-    const cards = [...container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')];
-    const adventureCard = cards[0];
-    expect(adventureCard.getAttribute('data-mode')).toBe('adventure');
-    const badge = adventureCard.querySelector('[data-testid="mode-badge"]');
-    expect(badge).toBeTruthy();
-    expect(badge?.textContent?.toUpperCase()).toContain('NEW');
-  });
-
-  it('Word Tower V2 card displays a NEW badge', () => {
-    const { container } = render(<ModeRow />);
-    const cards = [...container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')];
-    const wtv2Card = cards[1];
-    expect(wtv2Card.getAttribute('data-mode')).toBe('wordTowerV2');
-    const badge = wtv2Card.querySelector('[data-testid="mode-badge"]');
-    expect(badge).toBeTruthy();
-    expect(badge?.textContent?.toUpperCase()).toContain('NEW');
-  });
-
-  it('Blast card does NOT display a badge (only featured modes show badges)', () => {
-    const { container } = render(<ModeRow />);
-    const cards = [...container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')];
-    const blastCard = cards.find((c) => c.getAttribute('data-mode') === 'blast');
-    expect(blastCard).toBeTruthy();
-    const badge = blastCard?.querySelector('[data-testid="mode-badge"]');
-    expect(badge).toBeFalsy();
-  });
-
-  it('given a guest taps a featured card, then featured_mode_card_clicked fires for it (and not for others)', () => {
+  it('given a guest taps a featured mode, then featured_mode_card_clicked fires with surface fresh (and not for carousel cards)', () => {
     trackGrowthEvent.mockClear();
     const { container } = render(<ModeRow />);
-    fireEvent.click(container.querySelector('a[href="/en/adventure"]')!);
+    fireEvent.click(container.querySelector('a[data-spotlight-mode="adventure"]')!);
     expect(trackGrowthEvent).toHaveBeenCalledWith('featured_mode_card_clicked', { mode: 'adventure', surface: 'fresh' });
 
-    const other = Array.from(container.querySelectorAll('a')).find(
-      (a) => !/adventure|word-tower/.test(a.getAttribute('href') ?? ''),
-    );
     trackGrowthEvent.mockClear();
-    if (other) fireEvent.click(other);
-    expect(trackGrowthEvent).not.toHaveBeenCalled();
+    fireEvent.click(container.querySelector('li a')!);
+    expect(trackGrowthEvent).not.toHaveBeenCalledWith('featured_mode_card_clicked', expect.anything());
   });
 });

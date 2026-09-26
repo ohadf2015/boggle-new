@@ -92,14 +92,13 @@ describe('ModeRow — image loading', () => {
     expect(missingFiles, `Missing files or case mismatches:\n${missingFiles.join('\n')}`).toHaveLength(0);
   });
 
-  it('adventure and wordTowerV2 featured cards have badge="NEW"', () => {
+  it('adventure and wordTowerV2 are featured in the spotlight with key art and a NEW sticker', () => {
     const { container } = render(<ModeRow />);
-
-    const adventureCard = container.querySelector('[data-mode="adventure"]');
-    const wtCard = container.querySelector('[data-mode="wordTowerV2"]');
-
-    expect(adventureCard?.querySelector('[data-testid="mode-badge"]')).toBeTruthy();
-    expect(wtCard?.querySelector('[data-testid="mode-badge"]')).toBeTruthy();
+    for (const mode of ['adventure', 'wordTowerV2']) {
+      const card = container.querySelector(`a[data-spotlight-mode="${mode}"]`);
+      expect(card?.querySelector('img')?.getAttribute('src')).toBeTruthy();
+      expect(card?.textContent).toContain('landing.badge.new');
+    }
   });
 
   it('wordCraft, connections, brainGym all render with valid genIcon paths', () => {

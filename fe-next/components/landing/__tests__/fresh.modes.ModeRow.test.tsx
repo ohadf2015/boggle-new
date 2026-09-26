@@ -24,8 +24,6 @@ vi.mock('@/utils/growthTracking', () => ({
 import { ModeRow, FRESH_MODE_KEYS } from '../fresh/ModeRow';
 
 const PUBLIC_HREFS = [
-  '/en/adventure',
-  '/en/word-tower',
   '/en/word-craft',
   '/en/connections/pyramid',
   '/en/brain',
@@ -62,14 +60,14 @@ describe('ModeRow (fresh section 4)', () => {
       expect(a.getAttribute('href')).not.toMatch(/crossword|quick-play|sealed-bid|blast\/v2/);
     }
     // Adventure is now public (GA) and should appear for guests
-    expect(FRESH_MODE_KEYS).toContain('adventure');
+    expect(FRESH_MODE_KEYS).not.toContain('adventure'); // featured in the spotlight above the row
     expect(FRESH_MODE_KEYS).not.toContain('crossword');
   });
 
   it('localises links by the current language', () => {
     lang.language = 'he';
     const { container } = render(<ModeRow />);
-    expect(cards(container)[0].getAttribute('href')).toBe('/he/adventure');
+    expect(cards(container)[0].getAttribute('href')).toBe('/he/word-craft');
   });
 
   it('each card carries its own homeFresh title and one line', () => {
@@ -84,8 +82,8 @@ describe('ModeRow (fresh section 4)', () => {
   it('a card click keeps the hub instrumentation (mode_card + mode_selected)', () => {
     const { container } = render(<ModeRow />);
     fireEvent.click(cards(container)[1]);
-    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'wordTowerV2' }));
-    expect(trackModeSelected).toHaveBeenCalledWith('wordTowerV2', 'home');
+    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'connections' }));
+    expect(trackModeSelected).toHaveBeenCalledWith('connections', 'home');
   });
 
   it('is a scroll-snap row whose first card clears the gutter', () => {
@@ -109,7 +107,7 @@ describe('ModeRow (fresh section 4)', () => {
 
   it('each card renders its art image with valid src', () => {
     const { container } = render(<ModeRow />);
-    const images = [...container.querySelectorAll<HTMLImageElement>('[data-fresh-section="modes"] img')];
+    const images = [...container.querySelectorAll<HTMLImageElement>('[data-fresh-section="modes"] li img')];
     expect(images.length).toBeGreaterThan(0);
     // All images should have src attribute set
     for (const img of images) {

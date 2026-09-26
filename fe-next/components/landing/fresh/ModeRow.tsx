@@ -3,15 +3,15 @@
 /**
  * Section 4 of the fresh homepage: a swipeable scroll-snap row of game modes.
  *
- * - Only modes a logged-out visitor can open. Adventure is now public (GA);
- *   crossword / quick-play / sealed-bid remain beta-gated in
- *   LandingChallengeCards (and route-guards), so they don't appear here.
+ * - Only modes a logged-out visitor can open. crossword / quick-play /
+ *   sealed-bid remain beta-gated in LandingChallengeCards (and route-guards).
+ * - The new modes (Adventure, Word Tower) lead the section as the
+ *   NewModesSpotlight pair (key art + loot chest), so the row skips them.
  * - Order is newcomer-first: blast ranks lowest for first-day players
  *   (lib/landing/newcomerModeOrder.ts), so it goes last. Arena removed to avoid
  *   clutter — the returning-visitor hub surfaces it prominently.
  * - A card click fires the same `mode_card` + `mode_selected` events the hub
  *   cubes fire, so before/after funnels still compare.
- * - Featured cards (adventure, wordTowerV2) display a NEW badge.
  * - Visible at rest. Motion is CSS only (hover lift + art zoom, press tilt),
  *   all behind motion-safe. Prev/next buttons scroll by direction (RTL-safe).
  */
@@ -22,10 +22,11 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { MODE_META, modeRoute } from '@/lib/landing/modeMeta';
-import { trackGrowthEvent, trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
+import { trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
+import { NewModesSpotlight } from '../NewModesSpotlight';
 
-export const FRESH_MODE_KEYS = ['adventure', 'wordTowerV2', 'wordCraft', 'connections', 'brainGym', 'blast'] as const;
+export const FRESH_MODE_KEYS = ['wordCraft', 'connections', 'brainGym', 'blast'] as const;
 type FreshModeKey = (typeof FRESH_MODE_KEYS)[number];
 
 /** Literal class strings (Tailwind v4 only sees literals). Neighbours never share a colour. */
@@ -40,7 +41,7 @@ const CARD_TILT = ['-rotate-1', 'rotate-1'] as const;
  * bleeds its FX to the edge and brainGym is already tall, so they stay at 1.
  */
 const ART_ZOOM: Record<FreshModeKey, number> = {
-  adventure: 1.1, wordTowerV2: 1, wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
+  wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
 };
 
 function prefersReducedMotion(): boolean {
@@ -63,10 +64,6 @@ export function ModeRow() {
   const onCardClick = (key: FreshModeKey) => {
     trackModeSelected(key, 'home');
     trackLandingCtaClick('mode_card', { mode: key, variant: MODE_META[key]?.variant, surface: 'fresh' });
-    // Same featured-card signal as LandingChallengeCards, from the guest/fresh home.
-    if (key === 'adventure' || key === 'wordTowerV2') {
-      trackGrowthEvent('featured_mode_card_clicked', { mode: key, surface: 'fresh' });
-    }
   };
 
   return (
@@ -83,7 +80,12 @@ export function ModeRow() {
             {t('homeFresh.modes.line')}
           </p>
         </div>
-        <div className="hidden shrink-0 gap-3 md:flex">
+      </div>
+
+      <div className="mx-auto mt-10 w-full max-w-6xl px-4 sm:px-6 md:mt-12 lg:px-8">
+        <NewModesSpotlight surface="fresh" />
+        {/* Pager sits on the carousel it drives, not up by the heading. */}
+        <div className="mt-12 hidden justify-end gap-3 md:flex">
           <PagerButton label={t('homeFresh.modes.prev')} icon={ArrowLeft} onClick={() => page(-1)} />
           <PagerButton label={t('homeFresh.modes.next')} icon={ArrowRight} onClick={() => page(1)} />
         </div>
@@ -94,7 +96,7 @@ export function ModeRow() {
         className={cn(
           // Full-bleed row: cards start on the heading's gutter but run to the
           // viewport edge, so the next card peeks at every width (swipe cue).
-          'mt-8 grid w-full grid-flow-col gap-4 overflow-x-auto overscroll-x-contain px-4 pb-8 pt-3 md:gap-5',
+          'mt-6 grid w-full grid-flow-col gap-4 overflow-x-auto overscroll-x-contain px-4 pb-8 pt-3 md:gap-5',
           'auto-cols-[74%] sm:auto-cols-[42%] md:auto-cols-[31%] lg:auto-cols-[16rem]',
           'snap-x snap-mandatory scroll-px-4 sm:scroll-px-6 sm:px-6',
           'lg:scroll-px-[max(2rem,calc((100%-72rem)/2+2rem))] lg:px-[max(2rem,calc((100%-72rem)/2+2rem))]',
@@ -107,7 +109,6 @@ export function ModeRow() {
           if (!meta?.genIcon || !href) return null;
           const artScale: CSSProperties | undefined =
             ART_ZOOM[key] > 1 ? { transform: `scale(${ART_ZOOM[key]})` } : undefined;
-          const isFeatured = key === 'adventure' || key === 'wordTowerV2';
           return (
             <li key={key} className="flex snap-start">
               <Link
@@ -135,14 +136,6 @@ export function ModeRow() {
                       className="select-none object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:scale-[1.08] motion-safe:group-active:scale-95"
                     />
                   </div>
-                  {isFeatured && meta.badge && (
-                    <span
-                      data-testid="mode-badge"
-                      className="absolute top-1 end-1 z-10 rounded-full border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[0.6rem] font-black uppercase leading-none tracking-wide text-neo-navy shadow-hard-sm"
-                    >
-                      {t(`landing.badge.${meta.badge.toLowerCase()}`)}
-                    </span>
-                  )}
                 </div>
                 <div className="mt-3 flex flex-1 items-end justify-between gap-3">
                   <div className="min-w-0">

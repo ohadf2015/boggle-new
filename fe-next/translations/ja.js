@@ -278,7 +278,7 @@ const ja = {
           "line": "10つの世界で100ステージ。登って征服しよう。"
         },
         "wordTowerV2": {
-          "title": "ワードタワーV2",
+          "title": "ワードタワー",
           "line": "言葉を積み上げて、物理演算を楽しもう。"
         },
         "arena": {
@@ -1631,7 +1631,7 @@ const ja = {
       "friend": "友だち",
       "back": "もう一回",
     },
-    "cardTitle": "ワードタワー v2",
+    "cardTitle": "ワードタワー",
     "cardDesc": "本物の物理演算 — ベータ版",
     "collapsed": "タワー崩壊！",
     "newBest": "自己ベスト更新！",
@@ -18383,10 +18383,21 @@ const ja = {
     }
   },
   "newModes": {
-    "title": "新しいゲームモード",
-    "description": "冒険があなたを待っています。毎日のタワーを試してください。",
-    "playAdventure": "冒険をプレイ",
-    "playWordTower": "ワードタワーをプレイ"
+    "title": "新しい遊び方がふたつ",
+    "description": "10の世界をめぐる冒険と、崩れるかもしれないタワー。",
+    "adventureTitle": "アドベンチャー",
+    "adventureLine": "10の世界、100のステージ。最後に待つのは言葉を喰らうドラゴン。",
+    "wordTowerTitle": "ワードタワー",
+    "wordTowerLine": "言葉を積んで空の上まで。ぐらつく一語で全部くずれる。",
+    "playAdventure": "冒険に出る",
+    "playWordTower": "積みはじめる",
+    "loot": {
+      "title": "プレイするたびにお宝のチャンス",
+      "line": "アドベンチャーではレリック、ワードタワーでは宝箱。中身をのぞいてみよう。",
+      "tap": "宝箱をあける",
+      "again": "もう一回",
+      "chest": "{tier}の宝箱"
+    }
   }
 };
 

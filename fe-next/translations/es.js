@@ -278,7 +278,7 @@ const es = {
           "line": "100 niveles en 10 mundos. Sube y conquista."
         },
         "wordTowerV2": {
-          "title": "Torre de Palabras V2",
+          "title": "Torre de Palabras",
           "line": "Apila palabras, observa la física."
         },
         "arena": {
@@ -1630,7 +1630,7 @@ const es = {
       "friend": "Tu amigo",
       "back": "Otra vez",
     },
-    "cardTitle": "Torre de Palabras v2",
+    "cardTitle": "Torre de Palabras",
     "cardDesc": "Física real: versión beta",
     "collapsed": "¡Se cayó la torre!",
     "newBest": "¡Nuevo récord!",
@@ -18401,10 +18401,21 @@ const es = {
     }
   },
   "newModes": {
-    "title": "Nuevos modos de juego",
-    "description": "La aventura te espera. Prueba la torre diaria.",
-    "playAdventure": "Jugar aventura",
-    "playWordTower": "Jugar torre de palabras"
+    "title": "Dos formas nuevas de jugar",
+    "description": "Una aventura por diez mundos y una torre que se puede derrumbar.",
+    "adventureTitle": "Aventura",
+    "adventureLine": "10 mundos, 100 niveles y un dragón hambriento de palabras al final.",
+    "wordTowerTitle": "Torre de Palabras",
+    "wordTowerLine": "Apila palabras hasta el cielo. Una palabra floja y se viene abajo.",
+    "playAdventure": "Empezar la aventura",
+    "playWordTower": "Empezar a construir",
+    "loot": {
+      "title": "Cada partida puede soltar botín",
+      "line": "Reliquias en Aventura, cofres en la Torre. Echa un vistazo.",
+      "tap": "Abre el cofre",
+      "again": "Otra vez",
+      "chest": "Cofre · {tier}"
+    }
   }
 };
 

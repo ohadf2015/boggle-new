@@ -278,7 +278,7 @@ const en = {
           "line": "100 levels across 10 worlds. Climb and conquer."
         },
         "wordTowerV2": {
-          "title": "Word Tower V2",
+          "title": "Word Tower",
           "line": "Stack words, watch physics unfold."
         },
         "arena": {
@@ -1575,7 +1575,7 @@ const en = {
       "friend": "Your friend",
       "back": "Play again",
     },
-    "cardTitle": "Word Tower v2",
+    "cardTitle": "Word Tower",
     "cardDesc": "Real physics — beta preview",
     "collapsed": "Tower down!",
     "newBest": "New best!",
@@ -17461,10 +17461,21 @@ const en = {
     "error": "Something went wrong. Please try again."
   },
   "newModes": {
-    "title": "New Game Modes",
-    "description": "Adventure awaits. Try the daily tower.",
-    "playAdventure": "Play Adventure",
-    "playWordTower": "Play Word Tower"
+    "title": "Two new ways to play",
+    "description": "A quest across ten worlds, and a tower that can topple.",
+    "adventureTitle": "Adventure",
+    "adventureLine": "10 worlds, 100 levels and a word-hungry dragon at the top.",
+    "wordTowerTitle": "Word Tower",
+    "wordTowerLine": "Stack words sky-high. One shaky word and it all comes down.",
+    "playAdventure": "Start the quest",
+    "playWordTower": "Start building",
+    "loot": {
+      "title": "Every run can drop loot",
+      "line": "Relics in Adventure, treasure chests in Word Tower. Peek inside.",
+      "tap": "Open the chest",
+      "again": "Roll again",
+      "chest": "{tier} chest"
+    }
   }
 };
 

@@ -189,7 +189,7 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData, onSta
             Hidden on CrazyGames so the consumer embed is not redirected off-platform. */}
         {mounted && !hideExternalAuth && <HomeEducationCardConnected />}
 
-        {/* New modes announcement — one-time dismissible card introducing Adventure + Word Tower V2 */}
+        {/* New modes spotlight — one-time dismissible, Adventure + Word Tower with key art */}
         {mounted && <NewModesAnnouncement />}
 
         {/* ===== MOBILE: focused arcade Home Hub (CSS-gated `md:hidden`, never a JS

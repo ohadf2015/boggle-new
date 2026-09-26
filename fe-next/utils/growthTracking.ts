@@ -449,8 +449,10 @@ export type GrowthEvent =
   | 'new_modes_announcement_shown'
   | 'new_modes_announcement_clicked'
   | 'new_modes_announcement_dismissed'
+  //   new_modes_loot_peek: player opened the spotlight's loot chest (LootPeek). Props: { item, roll }.
+  | 'new_modes_loot_peek'
   // Featured mode card engagement (homepage + daily hub).
-  //   featured_mode_card_clicked: player clicked a promoted mode card. Props: { mode: string, surface: 'hub'|'desktop'|'fresh' }.
+  //   featured_mode_card_clicked: player clicked a promoted mode card. Props: { mode: string, surface: 'hub'|'desktop'|'fresh'|'returning' } (fresh/returning = NewModesSpotlight).
   | 'featured_mode_card_clicked'
   // SEO landing page CTAs (measure mode discoverability via organic search).
   //   mode_landing_play_clicked: player clicked "Play" from an SEO landing page. Props: { mode: string }.

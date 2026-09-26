@@ -84,6 +84,9 @@ export const LANDING_EXTRA_KEYS = [
   'wordTower.cardDesc',
   'wordTowerV2.cardTitle',
   'wordTowerV2.cardDesc',
+  // New-modes spotlight loot peek (components/landing/LootPeek.tsx) names real loot.
+  'adventurePlay.relic',
+  'wordTowerV2.chest.tier',
   'legal.copyright',
   'legal.privacyPolicy',
   'legal.refundPolicy',

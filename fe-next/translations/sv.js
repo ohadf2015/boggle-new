@@ -278,7 +278,7 @@ const sv = {
           "line": "100 nivåer i 10 världar. Klättra och erövra."
         },
         "wordTowerV2": {
-          "title": "Ordtornet V2",
+          "title": "Ordtornet",
           "line": "Stapla ord och se fysiken verka."
         },
         "arena": {
@@ -1916,7 +1916,7 @@ const sv = {
       "friend": "Din vän",
       "back": "Spela igen",
     },
-    "cardTitle": "Ordtornet v2",
+    "cardTitle": "Ordtornet",
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",
     "newBest": "Nytt rekord!",
@@ -18383,10 +18383,21 @@ const sv = {
     }
   },
   "newModes": {
-    "title": "Nya spellägen",
-    "description": "Äventyr väntar. Prova det dagliga tornet.",
-    "playAdventure": "Spela äventyr",
-    "playWordTower": "Spela ordtorn"
+    "title": "Två nya sätt att spela",
+    "description": "Ett äventyr genom tio världar och ett torn som kan rasa.",
+    "adventureTitle": "Äventyr",
+    "adventureLine": "10 världar, 100 nivåer och en ordhungrig drake på toppen.",
+    "wordTowerTitle": "Ordtornet",
+    "wordTowerLine": "Stapla ord mot himlen. Ett vingligt ord och allt rasar.",
+    "playAdventure": "Börja äventyret",
+    "playWordTower": "Börja bygga",
+    "loot": {
+      "title": "Varje runda kan ge byte",
+      "line": "Reliker i Äventyr, skattkistor i Ordtornet. Kika in.",
+      "tap": "Öppna kistan",
+      "again": "Igen",
+      "chest": "Kista · {tier}"
+    }
   }
 };
 
