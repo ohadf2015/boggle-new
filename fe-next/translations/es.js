@@ -18455,7 +18455,8 @@ const es = {
       "seriesChampion": "Campeón de la serie",
       "teacherPaced": "Tu profe empieza la siguiente partida",
       "roundPoints": "Puntos de esta ronda",
-      "yourRank": "Tu puesto"
+      "yourRank": "Tu puesto",
+      "lessonRecap": "Resumen de la lección"
     }
   }
 };

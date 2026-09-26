@@ -18367,7 +18367,8 @@ const he = {
       "seriesChampion": "אלוף/ת הסדרה",
       "teacherPaced": "המורה יתחיל/תתחיל את המשחק הבא",
       "roundPoints": "נקודות בסיבוב",
-      "yourRank": "המקום שלך"
+      "yourRank": "המקום שלך",
+      "lessonRecap": "סיכום השיעור"
     }
   }
 };

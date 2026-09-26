@@ -18437,7 +18437,8 @@ const sv = {
       "seriesChampion": "Seriemästare",
       "teacherPaced": "Din lärare startar nästa spel",
       "roundPoints": "Poäng den här rundan",
-      "yourRank": "Din placering"
+      "yourRank": "Din placering",
+      "lessonRecap": "Lektionssammanfattning"
     }
   }
 };

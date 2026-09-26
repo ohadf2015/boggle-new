@@ -185,7 +185,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           )}
         >
           <ListOrdered aria-hidden="true" className="w-4 h-4" />
-          {t('mpUi.results.details')}
+          {props.classroomSummary ? t('mpUi.results.lessonRecap') : t('mpUi.results.details')}
           <DirectionalIcon icon={ChevronRight} className="w-4 h-4" />
         </button>
         <MpMyCard
