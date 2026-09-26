@@ -49,7 +49,7 @@ function useRoundCanvas(enabled: boolean): HTMLElement | null {
 function Placed({ canvas, children }: { canvas: HTMLElement | null; children: ReactNode }) {
   if (!canvas) return <>{children}</>;
   return createPortal(
-    <span data-quality-slot="round" className="pointer-events-none absolute bottom-1 start-2 z-10 flex">
+    <span data-quality-slot="round" className="pointer-events-none absolute bottom-1 tv:bottom-0 start-2 z-10 flex">
       {children}
     </span>,
     canvas,
@@ -91,7 +91,7 @@ export function ConnectionQualityChip() {
       aria-live="polite"
       data-quality={state}
       className={cn(
-        'inline-flex items-center gap-1.5 tv:gap-2 rounded-full border-2 border-neo-black px-2.5 py-0.5 tv:px-4 tv:py-1 font-neo-display text-[11px] tv:text-base font-bold uppercase tracking-wide text-neo-black shadow-hard-sm animate-mp-drop',
+        'inline-flex items-center gap-1.5 tv:gap-2 rounded-full border-2 border-neo-black px-2.5 py-0.5 tv:px-4 tv:py-0.5 font-neo-display text-[11px] tv:text-base tv:leading-none font-bold uppercase tracking-wide text-neo-black shadow-hard-sm animate-mp-drop',
         offline ? 'bg-neo-red' : 'bg-neo-yellow',
       )}
     >
