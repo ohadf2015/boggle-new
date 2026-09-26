@@ -18425,8 +18425,7 @@ const es = {
       "howToPlay": "Cómo jugar",
       "scanToJoin": "Escanea para unirte",
       "orEnterCode": "o introduce el código",
-      "tvJoinHeadline": "¡Saca el móvil y únete!",
-      "tvJoinAt": "Únete en"
+      "tvJoinHeadline": "¡Saca el móvil y únete!"
     },
     "round": {},
     "results": {}

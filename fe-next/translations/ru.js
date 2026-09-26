@@ -18140,8 +18140,7 @@ const ru = {
       "howToPlay": "Как играть",
       "scanToJoin": "Сканируй, чтобы войти",
       "orEnterCode": "или введи код",
-      "tvJoinHeadline": "Доставай телефон и заходи!",
-      "tvJoinAt": "Заходи на"
+      "tvJoinHeadline": "Доставай телефон и заходи!"
     },
     "round": {},
     "results": {}

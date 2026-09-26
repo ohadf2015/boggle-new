@@ -17485,8 +17485,7 @@ const en = {
       "howToPlay": "How to play",
       "scanToJoin": "Scan to join",
       "orEnterCode": "or enter code",
-      "tvJoinHeadline": "Grab your phone & join!",
-      "tvJoinAt": "Join at"
+      "tvJoinHeadline": "Grab your phone & join!"
     },
     "round": {},
     "results": {}

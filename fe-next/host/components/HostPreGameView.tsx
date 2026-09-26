@@ -28,7 +28,7 @@ import TvTutorialOverlay from './tv-broadcast/TvTutorialOverlay';
 import { useHostLobby, LOBBY_MAX_PLAYERS, type HostLobbyPlayer } from '@/components/multiplayer/lobby/useHostLobby';
 import { HostStatusLane } from '@/components/multiplayer/lobby/HostStatusLane';
 import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
-import { lobbySeats, readyTally, startSublabel } from '@/components/multiplayer/lobby/lobbySeats';
+import { lobbySeats, startSublabel } from '@/components/multiplayer/lobby/lobbySeats';
 import {
   LobbyExitButton, LobbyChatButton, LobbyCountPill, LobbyChatPanel, InviteSheet, HowToPlaySheet, ChatSheet,
 } from '@/components/multiplayer/lobby/LobbyChrome';
@@ -116,7 +116,7 @@ const CARD = 'rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shad
 function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   const {
     gameCode, roomLanguage, username, timerValue, setTimerValue, difficulty, setDifficulty, minWordLength, setMinWordLength,
-    hostPlaying, setHostPlaying, playersReady, readyUsernames = [], autoStartSecondsLeft = null, onCancelAutoStart,
+    hostPlaying, setHostPlaying, playersReady, readyUsernames = [], readyTotal = 0, autoStartSecondsLeft = null, onCancelAutoStart,
     onExitRoom, tournamentCreating, lessonData, onNameChange, onAvatarChange, isPrivate = false, isQuickPlay = false,
   } = props;
   const t = props.t as T;
@@ -151,7 +151,9 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   // A classroom room's mode was fixed in the setup wizard: no picker here.
   const isClassroomRoom = Boolean(lessonData);
   const seats = lobbySeats(lobby.seatedPlayers, username, readyUsernames);
-  const { allReady } = readyTally(seats);
+  // "Everyone's in" is the server's call (playersReadyUpdate totals), not a
+  // client recount — one source of truth (pitfall class 3).
+  const allReady = readyTotal > 0 && readyUsernames.length >= readyTotal;
   const sublabel = startSublabel({ seated: seats.length, humanGuests: lobby.humanGuestCount, t });
 
   // TV/projector toggle — the caption states the consequence at the decision point.

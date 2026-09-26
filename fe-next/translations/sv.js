@@ -18407,8 +18407,7 @@ const sv = {
       "howToPlay": "Så spelar du",
       "scanToJoin": "Skanna för att gå med",
       "orEnterCode": "eller ange koden",
-      "tvJoinHeadline": "Ta fram mobilen och häng med!",
-      "tvJoinAt": "Gå med på"
+      "tvJoinHeadline": "Ta fram mobilen och häng med!"
     },
     "round": {},
     "results": {}

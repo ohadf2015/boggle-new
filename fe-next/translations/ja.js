@@ -18407,8 +18407,7 @@ const ja = {
       "howToPlay": "遊び方",
       "scanToJoin": "スキャンして参加",
       "orEnterCode": "またはコードを入力",
-      "tvJoinHeadline": "スマホを出して参加しよう！",
-      "tvJoinAt": "参加はこちら"
+      "tvJoinHeadline": "スマホを出して参加しよう！"
     },
     "round": {},
     "results": {}
