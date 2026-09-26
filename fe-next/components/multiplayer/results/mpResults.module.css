@@ -1,0 +1,134 @@
+/*
+ * Results reveal juice. Transform-only keyframes (DESIGN.md §e rule 1): no
+ * width/height/top/left/box-shadow animation, no opacity tweens on full-screen
+ * layers. Each runs ONCE (no infinite loops). Reduced motion → none of it.
+ */
+
+.timeSlam {
+  animation: time-slam 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes time-slam {
+  0% { transform: scale(1.8) rotate(-8deg); }
+  100% { transform: scale(1) rotate(-3deg); }
+}
+
+.titleDrop {
+  animation: title-drop 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes title-drop {
+  0% { transform: translateY(-14px); }
+  100% { transform: translateY(0); }
+}
+
+.rowRise {
+  animation: row-rise 340ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes row-rise {
+  0% { transform: translateY(22px) scale(0.92); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.firstSlam {
+  animation: first-slam 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes first-slam {
+  0% { transform: scale(1.35) rotate(-2deg); }
+  60% { transform: scale(0.97) rotate(0.5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.crownDrop {
+  animation: crown-drop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 120ms both;
+}
+@keyframes crown-drop {
+  0% { transform: translateY(-36px) rotate(-35deg) scale(1.6); }
+  100% { transform: translateY(0) rotate(-12deg) scale(1); }
+}
+
+.shine {
+  animation: shine-sweep 900ms ease-out 250ms both;
+}
+@keyframes shine-sweep {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(420%) skewX(-18deg); }
+}
+[dir='rtl'] .shine {
+  animation-name: shine-sweep-rtl;
+}
+@keyframes shine-sweep-rtl {
+  0% { transform: translateX(120%) skewX(18deg); }
+  100% { transform: translateX(-420%) skewX(18deg); }
+}
+
+.cardIn {
+  animation: card-in 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes card-in {
+  0% { transform: translateY(28px) rotate(-3deg) scale(0.94); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+.stamp {
+  animation: rank-stamp 300ms cubic-bezier(0.34, 1.56, 0.64, 1) 80ms both;
+}
+@keyframes rank-stamp {
+  0% { transform: rotate(-14deg) scale(1.8); }
+  100% { transform: rotate(-6deg) scale(1); }
+}
+
+.mascotHop {
+  animation: mascot-hop 620ms cubic-bezier(0.34, 1.56, 0.64, 1) 150ms both;
+}
+@keyframes mascot-hop {
+  0% { transform: translateY(40px) rotate(8deg) scale(0.6); }
+  60% { transform: translateY(-6px) rotate(-4deg) scale(1.05); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+.chipPop {
+  animation: chip-pop 260ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes chip-pop {
+  0% { transform: scale(0.4); }
+  100% { transform: scale(1); }
+}
+
+.footerUp {
+  animation: footer-up 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes footer-up {
+  0% { transform: translateY(110%); }
+  100% { transform: translateY(0); }
+}
+
+.tick {
+  animation: tick-punch 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes tick-punch {
+  0% { transform: scale(1.45); }
+  100% { transform: scale(1); }
+}
+
+.ringArc {
+  transition: stroke-dashoffset 1s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timeSlam,
+  .titleDrop,
+  .rowRise,
+  .firstSlam,
+  .crownDrop,
+  .shine,
+  .cardIn,
+  .stamp,
+  .mascotHop,
+  .chipPop,
+  .footerUp,
+  .tick {
+    animation: none;
+  }
+  .ringArc {
+    transition: none;
+  }
+}

@@ -1,5 +1,5 @@
 /**
- * ResultsPage Ad Slot Tests
+ * MpResultsScreen Ad Slot Tests (moved from components/__tests__/ResultsPage.adSlot.test.tsx)
  *
  * Bug: Multiplayer results page was missing the `ResultsBannerSlot` component
  * that every other results page (SP, daily, challenge) uses to display the
@@ -249,7 +249,11 @@ vi.mock('@/hooks/useInterstitialAd', () => ({
 }));
 
 // Import after all mocks are set up
-import ResultsPage from '@/components/views/ResultsPage';
+// The header's sound toggle (new on the rebuilt screen) reads the app's MusicProvider.
+vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
+vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
+
+import ResultsPage from '../MpResultsScreen';
 
 const renderResultsPage = (props: {
   finalScores: Array<{ username: string; score: number; allWords?: any[] }>;
@@ -348,6 +352,8 @@ describe('ResultsPage — AdMob banner slot', () => {
       isHost: true,
     });
 
+    // The deep dive (ResultsMainContent) lives behind DETAILS on the rebuilt screen.
+    fireEvent.click(screen.getByTestId('mp-results-details-open'));
     const onStartGame = mainContentPropsCapture.current?.onStartGame as undefined | (() => Promise<void> | void);
     expect(typeof onStartGame).toBe('function');
 

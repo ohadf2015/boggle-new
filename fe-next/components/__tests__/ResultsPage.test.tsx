@@ -274,7 +274,8 @@ describe('ResultsPage - WordFeedbackModal', () => {
     // so this bug class (modals missing in landscape) can no longer occur.
     const fs = require('fs');
     const path = require('path');
-    const sourceFile = path.join(__dirname, '../views/ResultsPage.tsx');
+    // Moved: the results screen that renders ResultsModals is now MpResultsStage.
+    const sourceFile = path.join(__dirname, '../multiplayer/results/MpResultsStage.tsx');
     const source = fs.readFileSync(sourceFile, 'utf-8');
 
     // Verify: no landscape early return exists
