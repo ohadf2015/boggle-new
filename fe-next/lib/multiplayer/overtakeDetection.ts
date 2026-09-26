@@ -67,3 +67,33 @@ export function detectOvertakes(
 
   return { myRank, overtakenBy };
 }
+
+export interface PassResult {
+  /** My current 1-based rank, or 0 if I'm not on the board. */
+  myRank: number;
+  /** Usernames that were above me and are now below me, best (prev) first. */
+  passed: string[];
+}
+
+/**
+ * The inverse of {@link detectOvertakes}: the players *I* just passed. Drives
+ * the loud "You passed {name}!" callout and the roster row flash.
+ */
+export function detectPasses(prev: RankedPlayer[], next: RankedPlayer[], me: string): PassResult {
+  const nextRanks = rankMap(next);
+  const myRank = nextRanks.get(me) ?? 0;
+  if (myRank === 0 || prev.length === 0) return { myRank, passed: [] };
+  const prevRanks = rankMap(prev);
+  const myPrevRank = prevRanks.get(me);
+  if (myPrevRank === undefined || myRank >= myPrevRank) return { myRank, passed: [] };
+
+  const passed: string[] = [];
+  for (const p of prev) {
+    if (p.username === me) continue;
+    const theirPrevRank = prevRanks.get(p.username)!;
+    if (theirPrevRank >= myPrevRank) continue; // was not above me
+    const theirNextRank = nextRanks.get(p.username);
+    if (theirNextRank !== undefined && theirNextRank > myRank) passed.push(p.username);
+  }
+  return { myRank, passed };
+}

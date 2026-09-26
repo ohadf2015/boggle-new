@@ -20,6 +20,7 @@ import { useFoundWords, useGameActions, useGameStore } from '@/hooks/gameState';
 import { useSafeSocketEvents } from '@/hooks/useSafeSocketEvent';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import logger from '@/utils/logger';
+import { recordWordAccepted, recordWordRejected } from '@/lib/multiplayer/mpFeedback';
 import type { WordAcceptedPayload } from '@/shared/types/socket';
 import type {
   SpamWarningPayload,
@@ -199,6 +200,9 @@ export function usePlayerWordEvents({
         resetCombo();
       }
 
+      // One feedback channel for the HUD (score chip / floaters / callouts).
+      recordWordAccepted({ word: data.word, score: data.score, comboLevel: newComboLevel });
+
       // Handle merged blast data (Fix 2) — extract from wordAccepted instead of separate blastWordAccepted
       if (data.blast) {
         const store = useGameStore.getState();
@@ -214,6 +218,7 @@ export function usePlayerWordEvents({
   const handleWordAlreadyFound = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for duplicate word (warning pattern)
     customHaptic(GAME_HAPTICS.invalidWord);
+    if (data?.word) recordWordRejected(data.word, 'already-found');
 
     // Note: WordFormingArea now handles duplicate feedback visually
     if (data?.word) {
@@ -230,6 +235,7 @@ export function usePlayerWordEvents({
   const handleWordAlreadyFoundByOther = useCallback((data: { word: string; foundBy: string; foundByAvatar?: unknown; confirmationScore?: number }) => {
     // Haptic feedback - use info pattern (not error) since player gets partial credit
     customHaptic(GAME_HAPTICS.invalidWord);
+    if (data?.word) recordWordRejected(data.word, 'found-by-other', { foundBy: data.foundBy, points: data.confirmationScore ?? 0 });
 
     // Keep the word in found words with partial credit score (don't remove it)
     if (data?.word) {
@@ -253,6 +259,7 @@ export function usePlayerWordEvents({
   const handleWordNotOnBoard = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for invalid word
     customHaptic(GAME_HAPTICS.invalidWord);
+    recordWordRejected(data.word, 'not-on-board');
 
     // Note: WordFormingArea now handles rejected feedback visually
     setFoundWords(prev => prev.map(fw =>
@@ -266,6 +273,7 @@ export function usePlayerWordEvents({
   const handleWordTooShort = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for too short word
     customHaptic(GAME_HAPTICS.invalidWord);
+    recordWordRejected(data.word, 'too-short');
 
     // Note: WordFormingArea now handles rejected feedback visually
     setFoundWords(prev => prev.filter(fw =>
@@ -277,6 +285,7 @@ export function usePlayerWordEvents({
   const handleWordRejected = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for rejected word
     customHaptic(GAME_HAPTICS.invalidWord);
+    recordWordRejected(data.word, 'invalid');
 
     toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
     // Note: WordFormingArea now handles rejected feedback visually

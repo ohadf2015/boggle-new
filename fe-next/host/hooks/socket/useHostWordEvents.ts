@@ -13,6 +13,7 @@ type WordTooShortPayload = { word: string; minLength: number };
 type WordAlreadyFoundPayload = { word: string };
 type WordNotOnBoardPayload = { word: string };
 import { useGameStore } from '@/hooks/gameState/store';
+import { recordWordAccepted, recordWordRejected } from '@/lib/multiplayer/mpFeedback';
 
 interface UseHostWordEventsProps {
   socket: Socket | null;
@@ -102,6 +103,9 @@ export function useHostWordEvents({
       resetCombo();
     }
 
+    // Same feedback channel as the joiner's usePlayerWordEvents.
+    recordWordAccepted({ word: data.word, score: data.score, comboLevel: newComboLevel });
+
     // Handle merged blast data (Fix 2) — extract from wordAccepted instead of separate blastWordAccepted
     if (data.blast) {
       const store = useGameStore.getState();
@@ -121,6 +125,7 @@ export function useHostWordEvents({
 
     const handleWordAlreadyFound = (data: WordAlreadyFoundPayload) => {
       if (hostPlaying) {
+        if (data?.word) recordWordRejected(data.word, 'already-found');
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => {
@@ -143,6 +148,7 @@ export function useHostWordEvents({
 
     const handleWordNotOnBoard = (data: WordNotOnBoardPayload) => {
       if (hostPlaying) {
+        if (data?.word) recordWordRejected(data.word, 'not-on-board');
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
@@ -153,6 +159,7 @@ export function useHostWordEvents({
 
     const handleWordRejected = (data: WordRejectedPayload) => {
       if (hostPlaying) {
+        if (data?.word) recordWordRejected(data.word, 'invalid');
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
@@ -163,6 +170,7 @@ export function useHostWordEvents({
 
     const handleWordTooShort = (data: WordTooShortPayload) => {
       if (hostPlaying) {
+        if (data?.word) recordWordRejected(data.word, 'too-short');
         if (data?.word) {
           const wordLower = data.word.toLowerCase();
           setHostFoundWords(prev => prev.filter(w => w.toLowerCase() !== wordLower));
