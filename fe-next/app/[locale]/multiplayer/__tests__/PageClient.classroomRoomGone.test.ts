@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readMpPageSource } from './mpPageSource';
 
 /**
  * One event, three outcomes (critic-livequiz-r4, finding #10): the server closed
@@ -13,7 +12,7 @@ import { resolve } from 'node:path';
  * of provider-wrapped app shell, so this file guards the WIRING the same way
  * PageClient.rosterSounds does — by contract on the source.
  */
-const source = readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
+const source = readMpPageSource();
 
 describe('PageClient — a classroom student survives the room closing', () => {
   it('uses the shared classroom-student predicate rather than re-deriving it', () => {

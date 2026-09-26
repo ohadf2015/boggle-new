@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { Mascot } from '@/components/ui/Mascot';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
-import { sectionHome } from '@/lib/navigation/sectionHome';
+import { mpExit } from '@/lib/multiplayer/exitDestination';
+import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 
 export default function MultiplayerError({
   error,
@@ -16,6 +17,7 @@ export default function MultiplayerError({
   reset: () => void;
 }) {
   const params = useParams();
+  const router = useRouter();
   const locale = (params?.locale as string) || 'en';
 
   const t = (path: string): string => {
@@ -60,16 +62,36 @@ export default function MultiplayerError({
           <button
             type="button"
             onClick={() => {
-              // A classroom game (?classroom=true[&host=true]) must send the
-              // teacher/student back to their own hub, not the consumer
-              // arcade lobby or the main app home — see sectionHome's
-              // `search` handling and lib/multiplayer/exitDestination.ts.
-              const home = sectionHome({
-                pathname: typeof window !== 'undefined' ? window.location.pathname : `/${locale}`,
+              // `mpExit('error')`: a classroom game (?classroom=true[&host=true])
+              // goes to the teacher/student hub; everyone else goes back to the
+              // MP entry — never the LexiClash homepage.
+              const search = typeof window !== 'undefined' ? window.location.search : '';
+              const query = new URLSearchParams(search);
+              const action = mpExit('error', {
+                isClassroomMode: query.get('classroom') === 'true',
+                isHost: query.get('host') === 'true',
                 locale,
-                search: typeof window !== 'undefined' ? window.location.search : undefined,
               });
-              window.location.href = home;
+              let target = `/${locale}/multiplayer`;
+              if (action.kind === 'navigate') {
+                target = action.href;
+              } else if (typeof window !== 'undefined') {
+                // Drop room/classroom/host so the entry does not re-enter the
+                // room that just crashed (the 2026-05-04 reload trap).
+                const stripped = new URL(stripMultiplayerExitParams(window.location.href));
+                target = `${stripped.pathname}${stripped.search}`;
+                // Same guard as every in-room exit: no auto-rejoin on the remount.
+                try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
+              }
+              // A stale chunk after a deploy only recovers with a real load;
+              // everything else stays an SPA nav (a hard nav blanks the
+              // Capacitor static-export WebView).
+              if (error.name === 'ChunkLoadError' && typeof window !== 'undefined') {
+                window.location.assign(target);
+                return;
+              }
+              router.push(target);
+              if (action.kind !== 'navigate') reset();
             }}
             className="px-5 py-2 rounded-lg font-bold bg-neo-navy-light text-white border border-gray-600 hover:bg-neo-navy-elevated transition-all"
           >

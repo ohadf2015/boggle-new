@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readMpPageSource } from './mpPageSource';
 
 /**
  * Bug: handleExitToLobby (used by the results "Exit" button and the host-left
@@ -11,7 +10,7 @@ import { resolve } from 'node:path';
  *
  * Source-contract style (matches PageClient.gameStartConsumed.test).
  */
-const source = readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
+const source = readMpPageSource();
 
 describe('PageClient — exit to lobby notifies the server', () => {
   it('handleExitToLobby emits leaveRoom so the player is not a ghost in the room', () => {

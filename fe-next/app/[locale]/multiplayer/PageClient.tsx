@@ -1,739 +1,58 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
+/**
+ * The multiplayer page frame. State lives in `useMpPageState`; the phase view
+ * is rendered by `MpPhaseRouter` from the pure `resolveMpPagePhase`. This file
+ * owns only what wraps every phase: socket context, connection banners,
+ * classroom chrome, teacher controls and the host-left modal. FROZEN after
+ * FOUNDATION: pieces change their screens, never this frame.
+ */
+import React from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { useSearchParams, useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
-import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
 import { TeacherLiveControls } from '@/components/education/TeacherLiveControls';
-import { useTeacherStripState } from '@/components/education/controls/useTeacherStripState';
-import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
 import { StudentWordBank } from '@/components/education/StudentWordBank';
 import { hideClassroomChrome, classroomPanelExpanded } from '@/lib/education/classroomLobbyChrome';
-import { isClassroomStudent, classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
-import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
 import { ConnectionQualityChip } from '@/components/multiplayer/ConnectionQualityChip';
 import SpectatorBanner from '@/components/SpectatorBanner';
 import { SocketContext } from '@/utils/SocketContext';
-import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useMusic } from '@/contexts/MusicContext';
-import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { setStoredUsername } from '@/utils/profileStorage';
-import { PageLoader } from '@/components/ui/PageLoader';
-import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
-import { useConnectionToasts } from '@/hooks/useConnectionToasts';
-import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
-import { throttleLatest } from '@/utils/throttle';
-import { useAchievementSocketBridge } from '@/hooks/useAchievementSocketBridge';
-import { useMultiplayerAuth } from '@/hooks/useMultiplayerAuth';
-import { useMultiplayerSession } from '@/hooks/useMultiplayerSession';
-import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
-import { useSeriesTracker } from '@/hooks/useSeriesTracker';
-import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotifications';
-import { useMultiplayerSounds } from '@/hooks/useMultiplayerSounds';
-import { useHideNavigation } from '@/contexts/NavigationContext';
-import { useMultiplayerJoin } from './useMultiplayerJoin';
-import { useGameActions, useGameStore, useGameActive, useShowStartAnimation } from '@/hooks/gameState';
-import { resolveMultiplayerMusicTrack } from './multiplayerMusic';
-import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
-import { neoInfoToast } from '@/components/NeoToast';
+import { clearSessionPreservingUsername } from '@/utils/session';
+import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
+import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
+import { useMpPageState } from './useMpPageState';
+import { MpPhaseRouter } from './MpPhaseRouter';
+import { MpExitProvider } from '@/hooks/useMpExit';
+
+export { VALID_MODES, applyMpPreselectMode } from './preselectMode';
+
 // Grace modal only appears on a rare host-left socket event, never at lobby first
 // paint — lazy-load to keep it out of the multiplayer route's initial parse.
 const HostLeftGraceModal = nextDynamic(
   () => import('@/components/multiplayer/HostLeftGraceModal').then((m) => m.HostLeftGraceModal),
   { ssr: false },
 );
-import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
-import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
-import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
-import { rejoinFeedback } from '@/lib/multiplayer/rejoinFeedback';
-import { trackInviteRoomDead, trackGrowthEvent, trackInviteConsumed } from '@/utils/growthTracking';
-import type { Language, ActiveRoom, Avatar, GameMode, GameModeSelection } from '@/shared/types/game';
-import type { Socket } from 'socket.io-client';
-import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
-import { useClassroomRoomWait } from './useClassroomRoomWait';
-import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
-
-// Dynamic imports for code splitting
-const HostView = nextDynamic(() => import('@/host/HostView'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
-
-const PlayerView = nextDynamic(() => import('@/player/PlayerView'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
-
-// SSR the lobby view: it is the first above-fold paint (the `!isActive` default in
-// renderView). With ssr:false the hero + CTAs were absent from server HTML, so first
-// paint waited on PageClient bundle + this chunk + hydration → ~3s blank FCP (field:
-// /multiplayer FCP 2976ms vs 256ms on lighter routes). ssr:true emits the lobby into
-// the initial HTML (FCP ≈ TTFB) while still code-splitting the chunk for hydration.
-// Hydration-safe on web: the only non-deterministic branch (CgLobbyHero variant from
-// localStorage) is gated behind isOnCrazyGamesPlatform, which is false off the CG
-// platform, so the lobby renders the same CgAwareLobbyChrome on server and client.
-// In-game views (HostView/PlayerView/ResultsPage) stay ssr:false — they are behind
-// interaction (isActive), never first paint, and depend on live socket state.
-const MultiplayerFlow = nextDynamic(() => import('@/components/multiplayer/MultiplayerFlow'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: true,
-});
-
-const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
-
-export const VALID_MODES: GameMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
-
-/**
- * Apply a `?mode=` deep-link to the game-mode store. Writes BOTH fields:
- * `gameMode` (resolved gameplay mode) AND `hostSelectedGameMode` (host intent —
- * the field the host `startGame` emit reads). Writing only `gameMode` left the
- * intent at 'random', so deep-linked modes (Word Hunt / Wheel Rush cards) were
- * silently rolled away by the backend. The else-branch deliberately does NOT
- * reset `hostSelectedGameMode` — it persists host intent across rounds.
- */
-export function applyMpPreselectMode(
-  rawMode: GameMode | null,
-  actions: {
-    setGameMode: (m: GameModeSelection) => void;
-    setHostSelectedGameMode: (m: GameModeSelection) => void;
-  },
-): void {
-  if (rawMode && VALID_MODES.includes(rawMode)) {
-    actions.setGameMode(rawMode);
-    actions.setHostSelectedGameMode(rawMode);
-  } else {
-    actions.setGameMode('random');
-  }
-}
-
-function ViewLoadingSkeleton(): React.JSX.Element {
-  return (
-    <div className="flex-1 flex relative">
-      <PlayfulBackground intensity="medium" colorScheme="game" />
-      <PageLoader size="md" className="relative z-10" />
-    </div>
-  );
-}
-
-/**
- * Report a returning user's invite as consumed, timed from the landing stamp.
- * Module scope on purpose: it runs from the socket's `joined` callback, never
- * during render, but a `Date.now()` sitting lexically inside the component
- * reads as an impure render call to react-hooks/purity. Hoisting it keeps the
- * lint gate honest instead of silencing it. The new-user path reports this
- * from useInviteOnboardingMode instead.
- */
-function reportInviteConsumed(roomCode: string): void {
-  if (typeof sessionStorage === 'undefined') return;
-  const landedTs = sessionStorage.getItem('invite_landed_ts');
-  if (!landedTs) return;
-  const totalSeconds = Math.round((Date.now() - Number(landedTs)) / 1000);
-  trackInviteConsumed({ roomCode, path: 'direct', totalSeconds });
-  sessionStorage.removeItem('invite_landed_ts');
-}
 
 export default function MultiplayerPageClient(): React.JSX.Element {
-  const searchParams = useSearchParams();
-  const isClassroomMode = searchParams?.get('classroom') === 'true';
-  const isClassroomHost = searchParams?.get('host') === 'true';
-  const preselectedMode = searchParams?.get('mode') as GameMode | null;
-  const autoCreate = searchParams?.get('autoCreate') === 'true';
-  const quickPlay = searchParams?.get('quickPlay') === 'true';
-  const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
-
-  const [gameCode, setGameCode] = useState<string>('');
-  const [roomName, setRoomName] = useState<string>('');
-  const [hostUsername, setHostUsername] = useState<string>('');
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [isHost, setIsHost] = useState<boolean>(false);
-  // Classroom flows create rooms with `isPrivate=true` (quick-play rooms are
-  // now public so they surface in the lobby). The server echoes the flag in
-  // `joined` — we plumb it through so the lobby can hide invite/share UI for
-  // rooms that are not meant to be discovered.
-  const [isPrivate, setIsPrivate] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
-  const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
-  const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>>([]);
-  // Coalesce roster updates: in busy rooms `updateUsers` can fire many times/sec
-  // (presence/focus/score pings). Throttling to one apply per 150ms collapses the
-  // re-render storm to ~6.7/s while always landing the latest roster.
-  const setPlayersInRoomThrottled = useMemo(
-    () => throttleLatest((users: Parameters<typeof setPlayersInRoom>[0]) => setPlayersInRoom(users), 150),
-    []
-  );
-  useEffect(() => () => setPlayersInRoomThrottled.cancel(), [setPlayersInRoomThrottled]);
-  const [isJoining, setIsJoining] = useState<boolean>(false);
-  // Soft-cushion modal state for `hostLeftRoomClosing` socket event.
-  // Replaces the prior 2s `window.location` reload (audit 2026-05-10 #1) so
-  // the player gets a 10-second readable explanation + manual exit button.
-  const [hostLeftState, setHostLeftState] = useState<{
-    reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
-    message: string;
-  } | null>(null);
-
-  const setIsInGame = useHideNavigation();
-
-  // Pre-select game mode from URL param (e.g., ?mode=word-hunt).
-  // Default MP mode is 'random' when no URL override.
-  useEffect(() => {
-    applyMpPreselectMode(preselectedMode, {
-      setGameMode: setStoreGameMode,
-      setHostSelectedGameMode,
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useConnectionToasts();
-
-  const { t, language } = useLanguage();
-
-  // classroom_host_lobby_viewed — fills instrumentation gap behind the 2026-09-10
-  // rage-click signal on ?classroom=true&host=true. Mount-only: distinguishes a
-  // teacher's classroom-host landing from an ordinary MP lobby view.
-  useEffect(() => {
-    if (isClassroomMode && isClassroomHost) {
-      trackGrowthEvent('classroom_host_lobby_viewed', { language });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
-  // CrazyGames requires displaying their usernames in multiplayer (Full Launch requirement)
-  const { user: cgUser, isCrazyGames, login: loginCrazyGames } = useCrazyGamesAuth();
-  const { playTrack, stopMusic, TRACKS } = useMusic();
-  // Lobby / countdown / in-game beds start on phase changes but nothing in the
-  // live MP tree ever stopped them — browser-back or nav to another route left
-  // the bed looping on the hub and every page after (same class as the Word Hunt
-  // fix in DailyChallenge, 7e3947017b). This component stays mounted across
-  // lobby → game → results, so unmount == leaving the multiplayer route.
-  useEffect(() => () => stopMusic(500), [stopMusic]);
-  // Countdown overlay flag — flips beforeGame → inGame music once play begins.
-  const showStartAnimation = useShowStartAnimation();
-
   const {
-    username, setUsername, guestAvatar, setGuestAvatar,
-    authLoadingStartTime, usernameManuallySetRef, hasSetRandomNameRef,
-  } = useMultiplayerAuth(language as Language);
-
-  const [lessonDataState, setLessonDataState] = useState<{
-    lessonId: string; lessonName: string; vocabularyWords: string[];
-    language: Language; gameMode?: GameMode;
-    templateSettings?: { timerSeconds: number; difficulty: string; minWordLength: number; allowLateJoin: boolean } | null;
-  } | null>(null);
-
-  // Ref bridge: allows hooks called before useMultiplayerSocket to access the socket
-  const socketRef = useRef<Socket | null>(null);
-
-  const handleSetLessonData = useCallback((data: typeof lessonDataState) => { setLessonDataState(data); }, []);
-  const handleSetAttemptingReconnect = useCallback(() => {}, []);
-
-  const {
-    setShouldAutoJoin, prefilledRoomCode, setPrefilledRoomCode, lessonData,
-  } = useMultiplayerSession({
-    language: language as Language, socket: null, isConnected: false,
-    isActive, attemptingReconnect: false, username, profile,
-    usernameManuallySetRef, hasSetRandomNameRef,
-    onSetGameCode: setGameCode, onSetUsername: setUsername, onSetRoomName: setRoomName,
-    onSetGuestAvatar: setGuestAvatar, onSetAttemptingReconnect: handleSetAttemptingReconnect,
-    onSetRoomLanguage: setRoomLanguage, onSetLessonData: handleSetLessonData, t,
-  });
-
-  // The room's own record of what it is playing and whose class it belongs to.
-  // The teacher's browser has this in sessionStorage already; nobody else in the
-  // room does, which is why a student's classroom lobby announced Classic and
-  // classic settings in the middle of a Vocab Quiz.
-  const liveClassroomGame = useLiveClassroomGameInfo(gameCode || prefilledRoomCode, isClassroomMode);
-
-  const {
-    showResults, setShowResults, resultsData, setResultsData,
-    isSpectator, setIsSpectator, spectators, setSpectators,
-    pendingGameStart, setPendingGameStart, setGameStartTime,
-    gameDuration, handleShowResults, handleReturnToRoom, handleUpgradeToPlayer,
-  } = useMultiplayerGameFlow({ socketRef, gameCode, isAuthenticated, refreshProfile });
-
-  // Stable reference: this is in the dep array of PlayerView's pendingGameStart
-  // effect — an inline arrow would re-fire game-start side effects every render.
-  const handleGameStartConsumed = useCallback(() => setPendingGameStart(null), [setPendingGameStart]);
-
-  const router = useRouter();
-
-  // A classroom room that stops existing must not hand its students to the
-  // arcade. `isClassroomStudent` is the one place that decision is made; the
-  // three call sites below (host migration, room-gone error, host-left modal)
-  // are the three ways a live room reached them with three different outcomes.
-  const classroomStudentRef = useRef<boolean>(false);
-  classroomStudentRef.current = isClassroomStudent({ isClassroomMode, isHost: isHost || isClassroomHost });
-
-  const exitClassroomStudentToHub = useCallback(() => {
-    clearSessionPreservingUsername(username);
-    setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
-    setShowResults(false); setResultsData(null);
-    toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });
-    router.push(classroomStudentHomePath(language));
-  }, [username, t, router, language, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
-  // Early classroom joiner: the teacher's code is up but her room is not open yet — wait, never bounce.
-  const roomWait = useClassroomRoomWait({ socketRef, isActive, onGiveUp: exitClassroomStudentToHub,
-    rejoin: (code) => handleJoin(false, null, code, undefined, username) });
-
-  // Native-safe exit to the multiplayer lobby: reset MP state IN PLACE (no page
-  // reload). Shared by the results "Exit" button and the host-left grace modal.
-  // A hard `window.location.href` nav blanks the Capacitor static-export WebView
-  // (no server resolves the route); flipping showResults/isActive off renders the
-  // lobby instantly within the live SPA instead.
-  const handleExitToLobby = useCallback(() => {
-    // Tell the server we left BEFORE resetting local state, so the room drops us
-    // from its roster (and migrates host if we were it) instead of keeping a
-    // ghost player around for the next round. socketRef is used because the
-    // `socket`/`signalIntentionalLeave` from useMultiplayerSocket are declared
-    // after this callback. Mirrors the ConnectionBanner onLeaveGame path.
-    if (gameCode) {
-      try { socketRef.current?.emit('leaveRoom', { gameCode, username }); } catch { /* socket gone */ }
-    }
-    clearSessionPreservingUsername(username);
-    setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
-    setShowResults(false); setResultsData(null);
-    try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* storage blocked */ }
-    if (typeof window !== 'undefined') {
-      const stripped = stripMultiplayerExitParams(window.location.href);
-      if (stripped !== window.location.href) {
-        window.history.replaceState({}, '', stripped);
-      }
-    }
-    // Stripping the params says what this room is NOT; it does not say where the
-    // user now is. Without the params `/multiplayer` is the CONSUMER arcade
-    // lobby, so a teacher leaving a classroom game was left standing in the
-    // consumer app with the education shell gone (measured 2026-09-15). The
-    // strip stays — it closes the 2026-05-04 reload-re-entry trap — and the
-    // destination is chosen here. `replaceState` alone could never fix this: it
-    // rewrites the URL without re-running route guards or re-evaluating the
-    // layout, which is exactly why the education shell never came back.
-    const destination = multiplayerExitDestination({
-      isClassroomMode,
-      isHost: isHost || isClassroomHost,
-      locale: language,
-    });
-    // `null` = an ordinary arcade game, where the lobby genuinely is home and
-    // the in-place reset above is the whole exit (a hard nav blanks the
-    // Capacitor WebView). A router push is SPA navigation, so it is safe there
-    // too — `exitClassroomStudentToHub` already relies on that.
-    if (destination) router.push(destination);
-  }, [gameCode, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
-      isClassroomMode, isHost, isClassroomHost, language, router]);
-
-  // Hide global footer only when in a game room or viewing results (not the lobby)
-  useEffect(() => {
-    setIsInGame(isActive || showResults);
-  }, [setIsInGame, isActive, showResults]);
-  useEffect(() => {
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
-
-  const seriesTracker = useSeriesTracker();
-
-  const gameActive = useGameActive();
-  // Resolved mode of the running round — decides whether "Skip word" is offered.
-  const liveGameMode = useGameStore((s) => s.gameMode);
-  usePlayerJoinLeaveNotifications({
-    players: playersInRoom,
-    currentUsername: username,
-    t,
-    enabled: isActive,
-    deferToQueue: gameActive,
-  });
-  // Word Hunt elimination / danger feedback is owned by the in-game
-  // WordHuntDangerToast (capped, auto-dismissing, per-type styled). A second
-  // page-level toast stream was duplicating every elimination and stacking
-  // uncapped over the board — removed in favour of the single in-game source.
-  const mpSounds = useMultiplayerSounds();
-  const { sfxMuted, toggleSfxMute } = useSoundEffects();
-
-  const {
-    socket, isConnected, roomsLoading, attemptingReconnect,
-    setAttemptingReconnect, refreshRooms, signalIntentionalLeave,
+    t, language, router, isClassroomMode, isClassroomHost, username, hostUsername, gameCode, prefilledRoomCode,
+    isActive, isHost, showResults, gameActive, liveGameMode, playersInRoom, lessonDataState, liveClassroomGame,
+    socket, isConnected, isSpectator, spectators, handleUpgradeToPlayer, signalIntentionalLeave,
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
-    classroomAccessibility, classroomLive,
-    classroomLevel, classroomWordBank,
-  } = useMultiplayerSocket({
-    language: language as Language, gameCode, username, roomName,
-    isActive, isHost, roomLanguage,
-    onJoined: (data) => {
-      // Capture BEFORE the reset below — this join completing while a
-      // reconnect was in flight is what makes it a "rejoin".
-      const rejoin = rejoinFeedback({ wasReconnecting: attemptingReconnect, roomCode: data.gameCode || gameCode });
-      setIsHost(data.isHost);
-      setIsActive(true);
-      setIsPrivate(!!data.isPrivate);
-      setError('');
-      setAttemptingReconnect(false);
-      if (rejoin) toast(t(rejoin.key, rejoin.params), { duration: 3000, icon: rejoin.icon, id: MP_TOAST_IDS.rejoined });
-      setShouldAutoJoin(false);
-      setIsJoining(false);
-      setPrefilledRoomCode('');
-      // `mp_quickplay_joined` moved into useMultiplayerJoin, which knows the join
-      // was a Quick Play from `options.quickPlay` rather than inferring it from a
-      // `?quickPlay=true` URL param. The param is absent for the in-lobby "Quick
-      // Start" button, so this emit could never fire for those users and reported
-      // every one of them as an abandon.
-      // Track invite consumed for returning users who arrived via ?room= invite redirect.
-      // New-user path fires this in useInviteOnboardingMode instead.
-      if (prefilledRoomCode) reportInviteConsumed(prefilledRoomCode);
-      if (data.language) setRoomLanguage(data.language);
-      const joinedUsername = data.username || username;
-      if (data.isHost) { setUsername(joinedUsername); setStoredUsername(joinedUsername); }
-      else if (username) { setStoredUsername(username); }
-      saveSession({
-        gameCode: data.gameCode || gameCode, username: joinedUsername,
-        isHost: data.isHost, roomName: data.roomName || roomName || '',
-        hostUsername: data.isHost ? joinedUsername : undefined,
-        language: data.language || roomLanguage || 'en',
-      });
-    },
-    onUpdateUsers: (users) => setPlayersInRoomThrottled(users),
-    onActiveRooms: (rooms) => setActiveRooms(rooms),
-    onJoinedAsSpectator: (data) => {
-      setIsSpectator(true);
-      setGameCode(data.gameCode);
-      setRoomName(data.roomName);
-      setRoomLanguage(data.language);
-      setIsJoining(false);
-      saveSession({ gameCode: data.gameCode, username: data.username || username, isHost: false, roomName: data.roomName, language: data.language });
-      toast(t('spectator.youAreSpectating'), { duration: 4000, icon: '👀' });
-    },
-    onSpectatorList: (spectatorList) => setSpectators(spectatorList),
-    onSpectatorUpgraded: (data) => {
-      if (data.success) {
-        setIsSpectator(false);
-        setIsActive(true);
-        setPlayersInRoom(data.users || []);
-        toast.success(t('spectator.upgraded'), { duration: 3000, icon: '🎮' });
-      }
-    },
-    onError: (data) => {
-      setIsJoining(false);
-      // Classify by structured error CODE first (message substrings as legacy
-      // fallback). The old message-only matcher leaked raw English for the
-      // GAME_CLOSED paths whose custom message lacked "closed"/"not found".
-      const kind = classifyRoomError(data);
-      // Same code derivation as the 'gone' branch below: both state values can be empty on a cold invite load.
-      if (kind === 'notOpen') { setError(''); roomWait.hold(gameCode || prefilledRoomCode || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('room') ?? '' : '')); return; }
-      if (kind === 'gone') {
-        // Snapshot identity BEFORE the resets below clear it: the dead-invite
-        // toast needs the room code, and `cameFromInvite` is derived from the
-        // `room=` param that this branch strips from the URL at the end.
-        const cameFromInvite = typeof window !== 'undefined' && window.location.search.includes('room=');
-        const urlRoom = typeof window !== 'undefined'
-          ? new URLSearchParams(window.location.search).get('room') ?? ''
-          : '';
-        const goneCode = gameCode || prefilledRoomCode || urlRoom;
-        // Stale lobby tap or room torn down mid-join. Drop the dead room from
-        // the local list synchronously so a re-tap can't re-fire the same dead
-        // join before the server round-trip refreshes the list.
-        if (gameCode) setActiveRooms((rooms) => rooms.filter((r) => r.gameCode !== gameCode));
-        // Feedback policy lives in `roomGoneFeedback`. Active players get the
-        // "room timed out" nudge. Cold invite-link followers now get a clear
-        // "that room is no longer available" message instead of being silently
-        // dropped onto an empty lobby — that silent drop WAS the 2026-05-25
-        // "empty page" report (invite → dead room → room= stripped → bare
-        // "NO BATTLES IN PROGRESS" lobby with zero explanation). Stale lobby
-        // taps (not active, no invite) stay silent as before.
-        // Always renders — `roomGoneFeedback` no longer returns null, so a
-        // stale lobby tap can't end in silence. The shared `roomGone` toast id
-        // collapses a run of dead-room taps into one message instead of a stack.
-        // A classroom student gets the classroom sentence and their own hub —
-        // the arcade "no battles in progress" lobby means nothing to them and
-        // reads as the app having simply lost their class.
-        if (classroomStudentRef.current) {
-          setError('');
-          setPrefilledRoomCode(''); setAttemptingReconnect(false); setShouldAutoJoin(false);
-          exitClassroomStudentToHub();
-          return;
-        }
-        const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
-        toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
-        if (!isActive && cameFromInvite) {
-          trackInviteRoomDead({ roomCode: goneCode || 'unknown' });
-        }
-        setError('');
-        setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setIsHost(false); setIsPrivate(false);
-        setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
-        socket?.emit('getActiveRooms');
-        // Strip classroom/host too, not just room: leaving them re-enters the
-        // classroom HOST boot path and silently creates another room.
-        if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
-          window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
-        }
-      } else if (kind === 'codeExists') {
-        setError(t('errors.gameCodeExists'));
-        toast.error(t('errors.gameCodeExists'), { duration: 4000, icon: '❌', id: MP_TOAST_IDS.codeExists });
-        setIsActive(false); setIsHost(false); setAttemptingReconnect(false);
-      } else if (kind === 'usernameTaken') {
-        setError(t('errors.usernameTaken'));
-        toast.error(t('errors.usernameTaken'), { duration: 4000, icon: '❌', id: MP_TOAST_IDS.usernameTaken });
-        setIsActive(false); setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
-      } else if (kind === 'rateLimited') {
-        // Rage-clicking Join is how a player trips the 50 msg/10s limiter, so the
-        // generic "an error occurred" this used to show invited the next tap and
-        // extended the lockout. Say what happened and what to do instead.
-        setError(t('errors.tooManyAttempts'));
-        toast.error(t('errors.tooManyAttempts'), { duration: 4000, icon: '⏳', id: MP_TOAST_IDS.rateLimited });
-        setAttemptingReconnect(false);
-      } else {
-        // Prefer a translated string; `data.message` is a hardcoded English
-        // sentence from the backend, so it is the last resort, not the default.
-        const errorMsg = t('errors.generic') || data.message || 'Error';
-        setError(errorMsg);
-        toast.error(errorMsg, { duration: 4000, icon: '❌', id: MP_TOAST_IDS.joinError });
-      }
-    },
-    onGameStart: (data) => {
-      setPendingGameStart(data);
-      setGameStartTime(Date.now());
-      setShowResults(false);
-      setResultsData(null);
-      mpSounds.onMatchStart();
-    },
-    onGameReset: () => {
-      // Reset Zustand store so stale blast/word-hunt state doesn't leak into the next round.
-      // Also clear results — PlayerView is unmounted during results screen, so its own
-      // resetGame handler can't fire. PageClient must handle this since it's always mounted.
-      useGameStore.getState().resetForNewRound();
-      setShowResults(false);
-      setResultsData(null);
-      setPendingGameStart(null);
-    },
-    onHostLeftRoomClosing: (data) => {
-      // Show grace modal — actual session/state cleanup happens in onExit.
-      // The modal countdown gives the player time to read what happened
-      // before being yanked back to the lobby.
-      setHostLeftState({
-        reason: data.reason,
-        message: data.resolvedMessage || t('multiplayerFlow.roomClosed'),
-      });
-    },
-    onSessionMigrated: () => {
-      clearSessionPreservingUsername(username);
-      setIsActive(false); setIsHost(false); setGameCode('');
-      toast(t('multiplayerFlow.roomClosed'), { duration: 3000, icon: 'ℹ️' });
-    },
-    onWarning: () => {},
-    onRateLimited: () => {
-      setIsJoining(false);
-      toast.error(t('multiplayerFlow.rateLimited'), { duration: 3000, icon: '⏳', id: MP_TOAST_IDS.rateLimited });
-    },
-    onHostTransferred: (data) => {
-      if (data.newHost !== username) return;
-      // A classroom student is never a host candidate. The server's ordinary
-      // migration picked one when the teacher dropped, and they were rendered
-      // the teacher's own share-code/QR screen. Send them home instead.
-      if (classroomStudentRef.current) { exitClassroomStudentToHub(); return; }
-      setIsHost(true);
-    },
-    t,
-  });
-
-  // Sync ref bridge so hooks called before useMultiplayerSocket get the latest socket
-  socketRef.current = socket;
-
-  // SPED audio-cue accommodation: the room asks for sound nudged ON. Applied
-  // once per game start and only ever as an UNMUTE — a student's own mute tap
-  // afterwards always wins (the teacher's nudge never re-fires mid-round).
-  const audioCuesActive = !!classroomAccessibility?.audioCues;
-  useEffect(() => {
-    if (audioCuesActive && sfxMuted) toggleSfxMute();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- one nudge per game start, not per mute toggle
-  }, [audioCuesActive]);
-
-  useAchievementSocketBridge(socket);
-
-  // Listen for room language changes (host changed the game dictionary language)
-  useEffect(() => {
-    if (!socket) return;
-    const handleRoomLanguageChanged = (data: { language: Language; changedBy: string }) => {
-      setRoomLanguage(data.language);
-      neoInfoToast(t('hostView.languageChangedNotification', { name: data.changedBy, language: t(`joinView.${data.language === 'en' ? 'english' : data.language === 'he' ? 'hebrew' : data.language === 'sv' ? 'swedish' : data.language === 'ja' ? 'japanese' : data.language === 'es' ? 'spanish' : 'russian'}`) }));
-    };
-    socket.on('roomLanguageChanged', handleRoomLanguageChanged);
-    return () => { socket.off('roomLanguageChanged', handleRoomLanguageChanged); };
-  }, [socket, t]);
-
-  const handleJoin = useMultiplayerJoin({
-    socket, gameCode, username, roomName, hostUsername,
-    language: language as Language, t, isSupabaseEnabled,
-    user, profile, loading, authLoadingStartTime,
-    guestAvatar, setGuestAvatar,
-    setUsername, setError, setIsJoining,
-  });
-
-  // Sound: game over — victory if first place, defeat otherwise
-  useEffect(() => {
-    if (!showResults || !resultsData?.scores?.length) return;
-    const myRank = resultsData.scores.findIndex(s => s.username === username);
-    if (myRank === 0) mpSounds.onVictory(true);
-    else mpSounds.onDefeat();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showResults]);
-
-  // Sound: roster changes — a join/leave cue when the player set changes (party
-  // lobby feel). Diff against the previous username set so it fires ONCE per real
-  // change, never on the initial population (null sentinel) or on presence/focus-
-  // only updateUsers pings (same members → no diff). mpSounds callbacks are
-  // useCallback-stable so depending only on playersInRoom is correct.
-  const prevRosterRef = useRef<Set<string> | null>(null);
-  useEffect(() => {
-    const current = new Set(playersInRoom.map(p => p.username));
-    const prev = prevRosterRef.current;
-    prevRosterRef.current = current;
-    if (!prev) return; // first population — don't replay a burst of joins
-    let added = false;
-    let removed = false;
-    for (const u of current) if (!prev.has(u)) { added = true; break; }
-    for (const u of prev) if (!current.has(u)) { removed = true; break; }
-    if (added) mpSounds.onPlayerJoined();
-    if (removed) mpSounds.onPlayerLeft();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playersInRoom]);
-
-  // Series tracking
-  useEffect(() => {
-    if (showResults && resultsData?.scores) seriesTracker.recordRound(resultsData.scores, resultsData.gameSessionId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showResults, resultsData?.scores]);
-
-  // Only reset series when user truly leaves the room (gameCode cleared),
-  // not on transient isActive=false from reconnectable disconnects
-  useEffect(() => {
-    if (!isActive && !gameCode) seriesTracker.reset();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, gameCode]);
-
-  // Music transitions: lobby → countdown bed → in-game track. The third phase
-  // (inGame) was missing before — the countdown bed leaked through the whole
-  // round, so the in-game music never replaced the lobby/homepage vibe.
-  useEffect(() => {
-    const next = resolveMultiplayerMusicTrack({ isActive, showResults, showStartAnimation });
-    if (!next) return;
-    playTrack(TRACKS[next === 'inGame' ? 'IN_GAME' : next === 'beforeGame' ? 'BEFORE_GAME' : 'LOBBY']);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, showResults, showStartAnimation]);
-
-  const handleManualReconnect = useCallback(() => {
-    if (socket && !socket.connected) socket.connect();
-  }, [socket]);
-
-  // PageClient renders UNDER the app-wide SocketProvider, so this reads the
-  // global socket context (the local provider below only wraps children). The
-  // global `serverShutdown` handler sets isServerUpdating during a deploy —
-  // forward it so the in-game ConnectionBanner shows calm "updating" copy.
-  const globalSocket = useContext(SocketContext);
-  const isServerUpdating = globalSocket?.isServerUpdating ?? false;
-
-  const socketContextValue = useMemo(() => ({
-    socket, isConnected, connectionError: error, isReconnecting: attemptingReconnect,
-    isServerUpdating,
-    getReconnectAttempt: () => 0, maxReconnectAttempts: 20, manualReconnect: handleManualReconnect,
-  }), [socket, isConnected, error, attemptingReconnect, isServerUpdating, handleManualReconnect]);
-
-  // Round state from the server's own traffic: the host never writes the store's `gameActive` (see controls/teacherStripVisibility).
-  const teacherStrip = useTeacherStripState({ socket, isActive, isHost, isClassroomMode, showResults, storeGameActive: gameActive });
-  const quizOwnsScreen = useIsVocabQuizRoom(socket);
-  // A Vocab Quiz ends on its own podium; the board results would show zeros (see quizOwnsRoundEnd).
-  const quizEndsThisRound = quizOwnsRoundEnd({ isQuizRoom: quizOwnsScreen, showResults, isActive });
-  const renderView = (): React.JSX.Element => {
-    if (showResults && !quizEndsThisRound) {
-      return (
-        <FeatureErrorBoundary featureName="Results">
-          <ResultsPage
-            finalScores={resultsData?.scores ?? null} gameCode={gameCode}
-            onReturnToRoom={handleReturnToRoom} onExitToLobby={handleExitToLobby} username={username} socket={socket}
-            duplicateRuleDisabled={resultsData?.duplicateRuleDisabled}
-            playerCount={resultsData?.playerCount} isHost={isHost}
-            roomLanguage={roomLanguage ?? undefined}
-            gridSize={Array.isArray(resultsData?.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4}
-            gameDuration={gameDuration} seriesStandings={seriesTracker.standings}
-            seriesRoundNumber={seriesTracker.roundNumber}
-            seriesTotalGames={seriesTracker.totalGames}
-            seriesLeader={seriesTracker.seriesLeader}
-            onResetSeries={seriesTracker.reset}
-            wordHuntSummary={resultsData?.wordHuntSummary}
-            blastSummary={resultsData?.blastSummary}
-            wheelRushSummary={resultsData?.wheelRushSummary}
-            classroomSummary={resultsData?.classroomSummary}
-          />
-        </FeatureErrorBoundary>
-      );
-    }
-
-    if (!isActive) {
-      return (
-        <FeatureErrorBoundary featureName="Lobby">
-          <MultiplayerFlow
-            handleJoin={handleJoin} refreshRooms={refreshRooms}
-            activeRooms={activeRooms} roomsLoading={roomsLoading}
-            isJoining={isJoining} isAuthenticated={isAuthenticated} autoCreate={autoCreate} quickPlay={quickPlay}
-            displayName={(isCrazyGames && cgUser?.username) || profile?.display_name || ''} profileAvatar={profile?.avatar_config}
-            onCrazyGamesLogin={isCrazyGames && !cgUser ? loginCrazyGames : undefined}
-            prefilledRoom={prefilledRoomCode} defaultLanguage={language as Language}
-            host={isClassroomHost}
-            isClassroomMode={isClassroomMode} waitingForTeacher={!!roomWait.waitingCode}
-            setGameCode={setGameCode} setUsername={setUsername}
-            setRoomName={setRoomName} setHostUsername={setHostUsername}
-          />
-        </FeatureErrorBoundary>
-      );
-    }
-
-    if (isHost) {
-      return (
-        <FeatureErrorBoundary featureName="Host Game">
-          <HostView
-            gameCode={gameCode} roomLanguage={roomLanguage ?? undefined}
-            initialPlayers={playersInRoom} username={username}
-            onShowResults={handleShowResults} pendingGameStart={pendingGameStart}
-            onGameStartConsumed={handleGameStartConsumed} lessonData={lessonData}
-            onUsernameChange={setUsername} autoStart={false}
-            isPrivate={isPrivate}
-            isQuickPlay={quickPlay}
-            onExitToLobby={handleExitToLobby}
-            isClassroomMode={isClassroomMode}
-            classroomGameMode={liveClassroomGame?.gameMode}
-            classroomLive={classroomLive}
-          />
-        </FeatureErrorBoundary>
-      );
-    }
-
-    return (
-      <FeatureErrorBoundary featureName="Player Game">
-        <PlayerView
-          gameCode={gameCode} username={username}
-          onShowResults={handleShowResults} initialPlayers={playersInRoom}
-          pendingGameStart={pendingGameStart}
-          onGameStartConsumed={handleGameStartConsumed}
-          roomLanguage={roomLanguage} onUsernameChange={setUsername}
-          seriesRoundNumber={seriesTracker.roundNumber}
-          onExitToLobby={handleExitToLobby}
-          isClassroomMode={isClassroomMode}
-          classroomGameMode={liveClassroomGame?.gameMode}
-        />
-      </FeatureErrorBoundary>
-    );
-  };
+    classroomAccessibility, classroomLevel, classroomWordBank, teacherStrip, quizOwnsScreen,
+    socketContextValue, hostLeftState, setHostLeftState, classroomStudentRef, exitClassroomStudentToHub,
+    handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
+    routerProps,
+  } = useMpPageState();
 
   return (
     <SocketContext.Provider value={socketContextValue}>
+      <MpExitProvider value={exitMp}>
       <ErrorBoundary>
         <div tabIndex={-1} className="flex-1 flex flex-col min-h-0 w-full overflow-x-clip">
           {/* Root fills the flex-fit locked body (which reserves banner height via padding-bottom),
@@ -762,12 +81,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
               window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
             }
             // This is the in-lobby Back button — the exit a teacher actually
-            // taps mid-lesson, and the one measured landing on `/en/multiplayer`
-            // (the consumer arcade) on 2026-09-15. Same decision as
-            // `handleExitToLobby`: stripping says what the room is NOT, this
-            // says where the user now is. Both paths have to make it — fixing
-            // only one leaves the other broken, which is how they drifted apart
-            // in the first place.
+            // taps mid-lesson (measured landing on the consumer arcade on
+            // 2026-09-15). Same decision as `handleExitToLobby`: stripping says
+            // what the room is NOT, this says where the user now is. Both paths
+            // have to make it — fixing only one is how they drifted apart.
             const destination = multiplayerExitDestination({
               isClassroomMode,
               isHost: isHost || isClassroomHost,
@@ -825,22 +142,16 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           ) : (
             // AutoHideHeader manages visibility via isInGame (= isActive || showResults):
             // room list → full header; room lobby/gameplay/results → header hidden.
-            //
-            // The spacer cannot be unconditional OR unconditionally collapsed:
-            //  - Always on: the room lobby renders its own sticky header, so the
-            //    reserved 80px sits above it as a visibly empty dark band.
-            //  - Always off (the prior `? null`): CLS 0.979 on reconnect, where
-            //    isActive flips ~200ms post-socket-connect with no user input,
-            //    collapsing the slot inside the CLS measurement window.
-            // 'user-initiated' keeps the spacer for the reconnect flip and drops it
-            // when the user tapped into the room, where the shift is input-excluded.
+            // 'user-initiated' keeps the spacer for the reconnect flip (CLS 0.979
+            // when it collapsed inside the measurement window) and drops it when
+            // the user tapped into the room, where the shift is input-excluded.
             <AutoHideHeader collapseSpacerWhenHidden="user-initiated" />
           )}
           {/* SPED large-text accommodation: the teacher's support preset rides
               the startGame payload; zoom scales the whole play surface (grid,
               word input, word bank) without touching per-component font sizes. */}
           <div className="flex-1 flex flex-col min-h-0" style={classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
-            {renderView()}
+            <MpPhaseRouter {...routerProps} />
           </div>
           {/* Teacher live controls (classroom rooms). Overlay for everyone while
               paused; the floating bar only for the host. Both gated on a live
@@ -880,6 +191,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           />
         </div>
       </ErrorBoundary>
+      </MpExitProvider>
     </SocketContext.Provider>
   );
 }

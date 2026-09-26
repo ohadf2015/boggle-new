@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readMpPageSource } from './mpPageSource';
 
 /**
  * Differentiation reaches the live game through ONE mount: the server sends the
@@ -10,7 +9,7 @@ import { resolve } from 'node:path';
  * own tests cannot see.
  */
 describe('multiplayer PageClient mounts StudentWordBank from the socket hook', () => {
-  const src = readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
+  const src = readMpPageSource();
 
   it('imports the component and reads both fields off useMultiplayerSocket', () => {
     expect(src).toMatch(/import \{ StudentWordBank \} from '@\/components\/education\/StudentWordBank'/);

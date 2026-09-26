@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readMpPageSource } from './mpPageSource';
 
 /**
  * Measured live 2026-09-15. A teacher launched a classroom game from
@@ -21,7 +20,7 @@ import { resolve } from 'node:path';
  * `PageClient.classroomRoomGone.test.ts` does for the room-gone wiring — this
  * file guards the WIRING by contract on the source.
  */
-const source = readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
+const source = readMpPageSource();
 
 /** Body of `handleExitToLobby`, from its declaration to the closing `}, [`. */
 function exitHandlerBody(): string {

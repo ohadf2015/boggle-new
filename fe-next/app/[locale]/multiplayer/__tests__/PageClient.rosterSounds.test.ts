@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readMpPageSource } from './mpPageSource';
 
 /**
  * "improve the sounds in mp and wire them well": useMultiplayerSounds exposes
@@ -9,7 +8,7 @@ import { resolve } from 'node:path';
  *
  * Source-contract style (matches PageClient.gameStartConsumed.test).
  */
-const source = readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
+const source = readMpPageSource();
 
 describe('PageClient — roster-change sounds', () => {
   it('plays a join sound when the roster grows', () => {

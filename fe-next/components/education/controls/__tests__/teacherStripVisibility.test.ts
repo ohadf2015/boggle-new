@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readMpPageSource } from '../../../../app/[locale]/multiplayer/__tests__/mpPageSource';
 import {
   IDLE_ROUND_STATE,
   reduceRoundSignal,
@@ -154,10 +153,8 @@ describe('teacherStripVisibility', () => {
    * the store flag as the gate, this fails before it reaches a projector.
    */
   describe('the multiplayer shell mounts it on the round signal, not the store flag', () => {
-    const source = readFileSync(
-      resolve(__dirname, '../../../../app/[locale]/multiplayer/PageClient.tsx'),
-      'utf-8',
-    );
+    // PageClient was split into a frame + hooks (FOUNDATION); read them all.
+    const source = readMpPageSource();
 
     it('gates <TeacherLiveControls> on useTeacherStripState', () => {
       expect(source).toContain('useTeacherStripState');

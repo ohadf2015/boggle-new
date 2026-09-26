@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readMpPageSource } from './mpPageSource';
 
 /**
  * Bug: the multiplayer route (lobby, host and player views) starts music beds
@@ -16,7 +15,7 @@ import { resolve } from 'node:path';
  *
  * Source-contract style (matches PageClient.exitToLobbyLeaveRoom.test).
  */
-const source = readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
+const source = readMpPageSource();
 
 describe('PageClient — music stops when leaving the multiplayer route', () => {
   it('destructures stopMusic from useMusic', () => {

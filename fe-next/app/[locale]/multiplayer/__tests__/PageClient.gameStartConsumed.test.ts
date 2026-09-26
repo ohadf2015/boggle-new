@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readMpPageSource } from './mpPageSource';
 
 /**
  * Bug: PageClient passed `onGameStartConsumed` to PlayerView as an inline arrow
@@ -12,7 +11,7 @@ import { resolve } from 'node:path';
  * Fix: memoize the callback with useCallback so its reference is stable.
  */
 
-const source = readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
+const source = readMpPageSource();
 
 describe('PageClient — onGameStartConsumed callback stability', () => {
   it('does not pass an inline arrow function for onGameStartConsumed', () => {

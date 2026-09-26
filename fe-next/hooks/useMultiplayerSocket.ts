@@ -48,6 +48,10 @@ interface UseMultiplayerSocketOptions {
     language?: Language;
     roomName?: string;
     isPrivate?: boolean;
+    /** The room's seat list — every server `joined` emit carries it (getGameUsers). */
+    users?: Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>;
+    reconnected?: boolean;
+    gameInProgress?: boolean;
   }) => void;
   onUpdateUsers: (users: Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>) => void;
   onActiveRooms: (rooms: ActiveRoom[]) => void;

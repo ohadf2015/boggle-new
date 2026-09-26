@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readMpPageSource } from '../../../app/[locale]/multiplayer/__tests__/mpPageSource';
 
 /**
  * `stripMultiplayerExitParams` removes room + classroom + host together,
@@ -21,19 +20,10 @@ import { join } from 'node:path';
  * them silently divergent. Guard the call sites, since the pure function's own
  * tests pass either way.
  */
-const PAGE = join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  'app',
-  '[locale]',
-  'multiplayer',
-  'PageClient.tsx'
-);
 
 describe('multiplayer exit paths all use the shared param strip', () => {
-  const source = readFileSync(PAGE, 'utf8');
+  // PageClient was split into a frame + hooks (FOUNDATION); read them all.
+  const source = readMpPageSource();
 
   it('never hand-rolls a room-only delete', () => {
     const offenders = source
