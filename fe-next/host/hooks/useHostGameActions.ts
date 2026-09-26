@@ -11,7 +11,7 @@
 
 import React, { useCallback, useRef, useState, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '@/components/NeoToast';
+import { neoErrorToast, neoInfoToast, TOAST_ICONS } from '@/components/NeoToast';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -246,11 +246,8 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       tvMode: !hostPlaying,
       ...(boostToken ? { boostToken } : {}),
     });
-
-    neoSuccessToast(t('common.gameStarted'), {
-      icon: TOAST_ICONS.gamepad,
-      duration: 3000,
-    });
+    // No success toast here: the MP countdown stage is the GO moment (a toast
+    // reading "GO! You're in!" repeated it on top of the countdown).
   }, [
     playersCount,
     gameType,
@@ -452,11 +449,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           gameMode: options?.gameMode || hostSelectedGameMode || 'random',
           tvMode: !hostPlaying,
         });
-
-        neoSuccessToast(t('common.gameStarted'), {
-          icon: TOAST_ICONS.gamepad,
-          duration: 3000,
-        });
+        // No success toast — the countdown stage is the GO (see executeStartGame).
       } else {
         neoErrorToast(t('hostView.resetFailed', 'Failed to reset game'), {
           icon: TOAST_ICONS.xCircle,

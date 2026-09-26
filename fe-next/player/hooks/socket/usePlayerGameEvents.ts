@@ -491,10 +491,12 @@ export function usePlayerGameEvents({
       sendStartGameAck(socket, data, 'PLAYER');
       onGameStartRef.current?.();
 
-      const toastMessage = data.lateJoin
-        ? (t('common.joinedGame', 'Joined game!'))
-        : t('common.gameStarted');
-      neoSuccessToast(toastMessage, { id: 'game-started', icon: data.lateJoin ? TOAST_ICONS.gamepad : TOAST_ICONS.rocket, duration: 3000 });
+      // A fresh start's GO moment is the countdown stage — no toast on top of it
+      // (it repeated the countdown's GO). Reconnect/recovery resumes silently.
+      // A late joiner skips the countdown, so "Joined game!" is their only cue.
+      if (data.lateJoin) {
+        neoSuccessToast(t('common.joinedGame', 'Joined game!'), { id: 'game-started', icon: TOAST_ICONS.gamepad, duration: 3000 });
+      }
     };
 
     // Fallback timeout: if we enter waitingForResults but never get validatedScores,
