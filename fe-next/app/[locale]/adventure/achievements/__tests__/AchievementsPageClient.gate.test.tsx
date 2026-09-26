@@ -39,7 +39,7 @@ beforeEach(() => {
 });
 
 describe('AchievementsPageClient gate', () => {
-  it('given an ordinary guest player, when opened, then the guest gate renders for achievements', () => {
+  it('given an ordinary guest player, when opened, then the achievement catalog grid renders (no teaser gate)', () => {
     useAuth.mockReturnValue({
       loading: false,
       user: null,
@@ -50,7 +50,8 @@ describe('AchievementsPageClient gate', () => {
 
     render(<AchievementsPageClient />);
 
-    expect(screen.getByTestId('guest-gate-achievements')).toBeInTheDocument();
+    expect(screen.getByTestId('achievement-grid')).toBeInTheDocument();
+    expect(screen.queryByTestId('guest-gate-achievements')).not.toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
 

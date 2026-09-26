@@ -37,6 +37,8 @@ export interface PolarTrialSignals {
 export interface PolarTrialUx {
   /** Subtle days-left badge. Not TrialUrgencyBanner. */
   showBadge: boolean;
+  /** Days-remaining dashboard banner with a paid Polar checkout CTA. */
+  showLifecycleBanner: boolean;
   /** Pay $9/mo. Not another free trial, and not stacked on the access banner. */
   showReactivation: boolean;
   /** Upgrade page may post `{ trial: true }`. */
@@ -52,6 +54,7 @@ export function polarTrialUx({ hasPro, status, source, trialUsed }: PolarTrialSi
   const used = trialUsed || onTrial;
   return {
     showBadge: onTrial,
+    showLifecycleBanner: onTrial,
     showReactivation: !hasPro && used,
     offerTrial: !hasPro && !used,
   };

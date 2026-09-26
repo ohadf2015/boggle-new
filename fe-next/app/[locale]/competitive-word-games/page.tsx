@@ -11,19 +11,25 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 
+/** Differentiator before brand; ≤60 chars. SERP neighbors (WordHoot, WordDuel) sell Wordle-vs-friends — we sell free ranked vs real players, no download. */
+const EN_TITLE = 'Free ranked word games vs real players | LexiClash';
+/** Answer in the first 120 chars. */
+const EN_DESCRIPTION =
+  'Play competitive word games free — live ranked matches vs real players, global leaderboard, no download. Open your browser and start a match in seconds.';
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const isTargetLocale = locale === 'en';
   const pageUrl = `${BASE_URL}/en/competitive-word-games`;
 
   return {
-    title: 'Play Competitive Word Games — Live Ranked Matches | LexiClash',
-    description: 'Play competitive word games vs real opponents — live grid battles, ranked daily puzzles, global leaderboard. Free in-browser, no download or signup.',
+    title: EN_TITLE,
+    description: EN_DESCRIPTION,
     keywords: 'best competitive word games with global leaderboards, competitive word games, word games with leaderboards, ranked word games, multiplayer word game leaderboard, real-time word game competition, free competitive word games online',
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
-      title: 'Play Competitive Word Games — Live Ranked Matches | LexiClash',
-      description: 'Play competitive word games vs real opponents — live grid battles, ranked daily puzzles, global leaderboard. Free in-browser, no download or signup.',
+      title: EN_TITLE,
+      description: EN_DESCRIPTION,
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -31,8 +37,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Play Competitive Word Games — Live Ranked Matches | LexiClash',
-      description: 'Play competitive word games vs real opponents — live grid battles, ranked daily puzzles, global leaderboard. Free in-browser, no download or signup.',
+      title: EN_TITLE,
+      description: EN_DESCRIPTION,
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -111,11 +117,10 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
         </h1>
 
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200" data-speakable="true">
-          Most word games are solitary — you solve, you close the tab. LexiClash is built the other way
-          around: real-time multiplayer battles, ranked daily challenges where everyone gets the same
-          puzzle, and a worldwide leaderboard that actually means something. It is free, runs in any
-          browser, and there are no pay-to-win boosts deciding the match. If you want competitive word
-          games with global leaderboards, this is the short list — and you can start a match right now.
+          Play competitive word games free — live ranked matches vs real players, a global
+          leaderboard, and no download. Most word games are solitary. LexiClash is the other way
+          around: real-time grid battles and ranked daily puzzles where everyone gets the same board.
+          No pay-to-win. Start a match in your browser now.
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">

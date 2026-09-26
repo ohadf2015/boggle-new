@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TeacherProAskBanner } from '@/components/teacher/TeacherProAskBanner';
 import { TeacherProTrialEndedBanner } from '@/components/teacher/TeacherProTrialEndedBanner';
+import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
@@ -31,7 +32,7 @@ function TeacherDashboardInner() {
   const { language } = useLanguage();
   const { isAdmin } = useAuth();
   const { trial } = useTeacherAccess();
-  const { hasPro, loading: proLoading, status, source, trialUsed } = useTeacherPro();
+  const { hasPro, loading: proLoading, status, source, trialUsed, trialExpires, periodEnd } = useTeacherPro();
   const polarTrial = polarTrialUx({
     hasPro,
     status: status ?? 'active',
@@ -76,9 +77,10 @@ function TeacherDashboardInner() {
     milestoneLoading,
     proAskDismissed: dismissed,
     // Expired Polar Pro trial replaces the access banner and the milestone
-    // ask. A live Polar trial is hasPro, so the picker returns none and the
-    // days-left chip on TeacherPlanBadge is the only trial UI.
+    // ask. A live Polar trial is hasPro + the lifecycle banner (days left
+    // and a Keep-Pro CTA to /teacher/upgrade). The header chip stays.
     polarTrialExpired: polarTrial.showReactivation,
+    polarTrialing: polarTrial.showLifecycleBanner,
   });
   const banner =
     picked === 'trial' && !hasRecentConfig && !trial?.isExpired ? null : picked;
@@ -99,10 +101,15 @@ function TeacherDashboardInner() {
     banner !== 'reactivate';
 
   useEffect(() => {
-    if (banner === 'pro' || banner === 'reactivate') {
+    if (banner === 'pro' || banner === 'reactivate' || banner === 'trialing') {
       trackGrowthEvent('iap_viewed', {
         product: 'teacher_pro',
-        source: banner === 'reactivate' ? 'dashboard_trial_ended' : 'dashboard_banner',
+        source:
+          banner === 'reactivate'
+            ? 'dashboard_trial_ended'
+            : banner === 'trialing'
+              ? 'dashboard_trial_lifecycle'
+              : 'dashboard_banner',
         event_type: 'impression',
       });
     }
@@ -125,6 +132,8 @@ function TeacherDashboardInner() {
           <TeacherProAskBanner onDismiss={dismiss} />
         ) : banner === 'reactivate' ? (
           <TeacherProTrialEndedBanner />
+        ) : banner === 'trialing' ? (
+          <TeacherProTrialLifecycleBanner trialExpires={trialExpires ?? periodEnd} />
         ) : undefined
       }
       usagePrompt={

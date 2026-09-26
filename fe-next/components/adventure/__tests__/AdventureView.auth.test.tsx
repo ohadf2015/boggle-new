@@ -17,8 +17,21 @@ vi.mock('../WorldMap', () => ({ default: () => <div data-testid="world-map" /> }
 vi.mock('../CollectionPanel', () => ({ default: () => null }));
 vi.mock('../play/AdventureLevel', () => ({ default: () => null }));
 vi.mock('../play/SkinVault', () => ({ default: () => null }));
-vi.mock('../AdventureGuestGate', () => ({
-  AdventureGuestGate: ({ surface }: any) => <div data-testid={`guest-gate-${surface}`} />,
+vi.mock('next/dynamic', () => ({
+  default: (loader: () => unknown) => {
+    const src = String(loader);
+    if (src.includes('AdventureDemo')) {
+      return function MockAdventureDemo() {
+        return <div data-testid="adventure-demo" />;
+      };
+    }
+    return function MockDynamic() {
+      return null;
+    };
+  },
+}));
+vi.mock('../demo/AdventureDemo', () => ({
+  AdventureDemo: () => <div data-testid="adventure-demo" />,
 }));
 
 import AdventureView from '../AdventureView';
@@ -36,10 +49,11 @@ describe('AdventureView auth gate', () => {
     expect(screen.getByTestId('adventure-auth-pending')).toBeTruthy();
   });
 
-  it('given auth resolved signed-out, when it renders, then it shows the guest gate for the map', () => {
+  it('given auth resolved signed-out, when it renders, then it shows the playable demo not a teaser gate', () => {
     auth.loading = false;
     render(<AdventureView />);
-    expect(screen.getByTestId('guest-gate-map')).toBeTruthy();
+    expect(screen.getByTestId('adventure-demo')).toBeTruthy();
+    expect(screen.queryByTestId('guest-gate-map')).toBeNull();
   });
 
   it('given a session user whose profile row has not arrived, when it renders, then it shows the map, not the wall', () => {

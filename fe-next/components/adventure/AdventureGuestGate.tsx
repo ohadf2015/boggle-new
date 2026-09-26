@@ -2,8 +2,9 @@
 
 /**
  * AdventureGuestGate — inviting teaser screen for guests on the adventure map
- * and achievements pages. Shows hero art, pitch, benefits, and a sign-in CTA.
- * Tracks gate_viewed on mount and signin_clicked when the button is tapped.
+ * and achievements pages. Shows hero art, pitch, benefits, and dual CTAs:
+ * primary "Play a free battle" (demo), secondary "Sign in to play" (auth).
+ * Tracks gate_viewed on mount, demo_started, and signin_clicked.
  */
 import { useState, useEffect, useRef, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
@@ -15,6 +16,7 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
+const AdventureDemo = dynamic(() => import('./demo/AdventureDemo').then(m => ({ default: m.AdventureDemo })), { ssr: false });
 
 interface AdventureGuestGateProps {
   surface: 'map' | 'achievements';
@@ -43,6 +45,7 @@ const BULLETS: BulletPoint[] = [
 export function AdventureGuestGate({ surface }: AdventureGuestGateProps): ReactNode {
   const { t, language } = useLanguageSafe();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showDemo, setShowDemo] = useState(false);
   const hasTrackedRef = useRef(false);
 
   // Track gate_viewed on mount, once only (guard against StrictMode double-render).
@@ -53,10 +56,19 @@ export function AdventureGuestGate({ surface }: AdventureGuestGateProps): ReactN
     }
   }, [surface]);
 
+  const handlePlayDemo = () => {
+    setShowDemo(true);
+  };
+
   const handleSignIn = () => {
     trackGrowthEvent('adventure_guest_signin_clicked', { surface });
     setShowAuthModal(true);
   };
+
+  // Show demo if active
+  if (showDemo) {
+    return <AdventureDemo onExit={() => setShowDemo(false)} />;
+  }
 
   return (
     <div className="min-h-dvh flex flex-col bg-[#0f1b3d] text-neo-cream">
@@ -107,20 +119,33 @@ export function AdventureGuestGate({ surface }: AdventureGuestGateProps): ReactN
             })}
           </ul>
 
-          {/* Sign-in button */}
+          {/* Play demo button (primary) */}
+          <button
+            type="button"
+            onClick={handlePlayDemo}
+            className={cn(
+              'w-full rounded-xl border-[3px] border-black font-bold px-5 py-3 shadow-[3px_3px_0_#000]',
+              'bg-neo-lime text-black hover:bg-[#dcff00] transition-colors',
+              'uppercase tracking-wide text-sm mb-3'
+            )}
+          >
+            {t('adventurePlay.guest.playBattle')}
+          </button>
+
+          {/* Sign-in button (secondary) */}
           <button
             type="button"
             onClick={handleSignIn}
             className={cn(
               'w-full rounded-xl border-[3px] border-black font-bold px-5 py-3 shadow-[3px_3px_0_#000]',
-              'bg-neo-lime text-black hover:bg-[#dcff00] transition-colors',
+              'bg-neo-cream text-black hover:bg-neo-cream/90 transition-colors',
               'uppercase tracking-wide text-sm'
             )}
           >
             {t('adventurePlay.guest.signIn')}
           </button>
 
-          {/* Home link (secondary) */}
+          {/* Home link (tertiary) */}
           <div className="mt-4 text-center">
             <Link
               href={`/${language}`}

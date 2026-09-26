@@ -17,6 +17,9 @@ export function triggeredRelics(word: string, index: number, relics: readonly st
   const out: RelicId[] = [];
   for (const id of relics) {
     if (!isRelicId(id) || out.includes(id)) continue;
+    // Always-on relics (magnet) apply to every word — flashing them per word is
+    // noise, not feedback. relicEvents.levelStartFire announces them once.
+    if (RELICS[id].alwaysOn) continue;
     const e = RELICS[id].effect;
     if (e.type === 'flat' && e.bonus(ctx) > 0) out.push(id);
     else if (e.type === 'mult' && e.factor(ctx) !== 1) out.push(id);

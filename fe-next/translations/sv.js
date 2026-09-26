@@ -278,7 +278,7 @@ const sv = {
           "line": "100 nivåer i 10 världar. Klättra och erövra."
         },
         "wordTowerV2": {
-          "title": "Ordtornet V2",
+          "title": "Ordtornet",
           "line": "Stapla ord och se fysiken verka."
         },
         "arena": {
@@ -832,9 +832,9 @@ const sv = {
       "long-bow": "Långbåge",
       "short-sword": "Kortsvärd",
       "storm-rune": "Stormruna",
-      "twin-ink": "Tvillingbläck",
+      "twin-ink": "Öppningsbläck",
       "echo-stone": "Ekosten",
-      "magnet": "Magnet",
+      "magnet": "Poängmagnet",
       "heart-locket": "Hjärtmedaljong",
       "hourglass": "Timglas",
       "lens-of-insight": "Insiktens lins",
@@ -883,7 +883,17 @@ const sv = {
       "bullet1": "Strida mot allt svårare motståndare",
       "bullet2": "Lås upp sällsynta världsutseenden och kraftfulla relikvier",
       "bullet3": "Säkra din plats på topplistorna",
-      "signIn": "Logga in för att spela"
+      "playBattle": "Spela ett gratis slag",
+      "signIn": "Logga in för att spela",
+      "back": "Tillbaka",
+      "backToGate": "Tillbaka till slag-urval",
+      "demoLabel": "Gratis strid",
+      "demoResult": "Slag slutfört",
+      "demoWon": "Du vann!",
+      "demoLost": "Du förlorade!",
+      "demoScore": "Poäng: {score}",
+      "saveProgress": "Logga in för att spara dina framsteg och tjäna mynt",
+      "playAgain": "Spela igen"
     },
     "title": "Äventyr",
     "start": "Starta",
@@ -1749,7 +1759,7 @@ const sv = {
       }
     },
     "coins": { "run": "{n} mynt denna runda" },
-    "streak": { "a11y": "Perfekt svit ×{n}", "toRare": "{n} perfekta → sällsynt låda", "crate": "LÅDA", "meterA11y": "Perfekt svit {n}, ger ×{mult}. {rare} till för en sällsynt låda." },
+    "streak": { "a11y": "Perfekt svit ×{n}", "toRare": "{n} perfekta → sällsynt låda", "crate": "LÅDA", "meterA11y": "Perfekt svit {n}, ger ×{mult}. {rare} till för en sällsynt låda.", "label": "Svit" },
     "milestone": { "floors": "Våningar!", "a11y": "{n} våningar" },
     "chest": {
       "tier": { "common": "Vanlig", "rare": "Sällsynt", "epic": "Episk" },
@@ -1906,12 +1916,12 @@ const sv = {
       "friend": "Din vän",
       "back": "Spela igen",
     },
-    "cardTitle": "Ordtornet v2",
+    "cardTitle": "Ordtornet",
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",
     "newBest": "Nytt rekord!",
-    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}"},
-    "stability": {"label": "Stabilitet", "a11y": "Stabilitet: {band}, {pct} % risk", "steady": "Stadig", "wobbly": "Vinglig", "danger": "Fara!"},
+    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}", "menu": "Meny", "banked": "Insamlat"},
+    "stability": {"label": "Stabilitet", "a11y": "Stabilitet: {band}, {pct} % risk", "steady": "Stadig", "wobbly": "Vinglig", "danger": "Sikta mitt!"},
     "biome": {"downtown": "Centrum", "sunset": "Tak i solnedgång", "clouds": "Molnhavet", "jetstream": "Jetströmmen", "aurora": "Norrsken", "orbit": "Omloppsbana", "cosmos": "Djupa rymden"},
     "newSky": "Ny himmel",
     "call": {"perfect": {"0": "PERFEKT!", "1": "MITT I PRICK!", "2": "EXAKT!", "3": "FELFRITT!"}, "good": {"0": "SNYGGT!", "1": "STADIGT!", "2": "RENT!", "3": "SMIDIGT!"}, "sloppy": {"0": "VINGLIGT…", "1": "NÄRA ÖGAT!", "2": "HÄNGER KVAR!"}, "miss": {"0": "HOPPSAN!", "1": "OJ!", "2": "DET RASAR!"}, "combo": {"double": "DUBBEL!", "triple": "TRIPPEL!", "quad": "FYRDUBBEL!", "unstoppable": "OSTOPPBAR ×{n}!", "legendary": "LEGENDARISK ×{n}!"}, "word": {"big": "STORT ORD!", "mega": "MEGAORD!"}},
@@ -13290,7 +13300,8 @@ const sv = {
       "trialActive": "Pro-provperiod",
       "trialDayLeft": "1 dag kvar",
       "trialDaysLeft": "{count} dagar kvar",
-      "trialEndsToday": "Slutar idag"
+      "trialEndsToday": "Slutar idag",
+      "trialEnded": "Provperioden är slut"
     },
     "proGate": {
       "analytics": {
@@ -13319,6 +13330,7 @@ const sv = {
       "proCtaHint": "Lås upp varje spel, varje elev och utskrivbara PDF:er.",
       "weeklySubject": "Den här veckan i din klass",
       "polarTrialExpiredLine": "Din provperiod på Teacher Pro är slut. Aktivera igen för att behålla klassrapporterna.",
+      "polarTrialActiveLine": "Din Teacher Pro-provperiod har {count} dagar kvar. Behåll rapporter och obegränsade klasser för 9 $/mån.",
       "regionLabel": "Fortgångssammandrag för {{classroom}}",
       "scheduleReteachCta": "Schemalägg reteach-Live om ~{{days}} dagar",
       "scheduleReteachConfirm": "Reteach-Live schemalagd till {{date}} (~{{days}} dagar). Kalenderinbjudan öppnades.",
@@ -13372,6 +13384,11 @@ const sv = {
       "trialEndedTitle": "Din provperiod på Teacher Pro är slut",
       "trialEndedBody": "Aktivera igen för 9 $/månad. Det här är inte en ny gratis provperiod.",
       "trialEndedCta": "Behåll Pro — 9 $/mån",
+      "trialLifecycleTitle": "{count} dagar kvar av din Teacher Pro-provperiod",
+      "trialLifecycleTitleToday": "Din Teacher Pro-provperiod slutar idag",
+      "trialLifecycleTitleOne": "1 dag kvar av din Teacher Pro-provperiod",
+      "trialLifecycleBody": "Behåll obegränsade klasser och utskrivbara rapporter — 9 $/mån efter provperioden.",
+      "trialLifecycleCta": "Behåll Pro — 9 $/mån",
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",
@@ -18373,10 +18390,21 @@ const sv = {
     }
   },
   "newModes": {
-    "title": "Nya spellägen",
-    "description": "Äventyr väntar. Prova det dagliga tornet.",
-    "playAdventure": "Spela äventyr",
-    "playWordTower": "Spela ordtorn"
+    "title": "Två nya sätt att spela",
+    "description": "Ett äventyr genom tio världar och ett torn som kan rasa.",
+    "adventureTitle": "Äventyr",
+    "adventureLine": "10 världar, 100 nivåer och en ordhungrig drake på toppen.",
+    "wordTowerTitle": "Ordtornet",
+    "wordTowerLine": "Stapla ord mot himlen. Ett vingligt ord och allt rasar.",
+    "playAdventure": "Börja äventyret",
+    "playWordTower": "Börja bygga",
+    "loot": {
+      "title": "Varje runda kan ge byte",
+      "line": "Reliker i Äventyr, skattkistor i Ordtornet. Kika in.",
+      "tap": "Öppna kistan",
+      "again": "Igen",
+      "chest": "Kista · {tier}"
+    }
   },
   // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
   "mpUi": {

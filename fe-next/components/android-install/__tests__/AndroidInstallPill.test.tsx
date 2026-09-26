@@ -110,6 +110,14 @@ describe('AndroidInstallPill', () => {
     expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
   });
 
+  it('renders nothing on Adventure (banner allowed there, but the pill covered the map CTA)', () => {
+    pathname = '/he/adventure';
+    useAndroidInstallStore.setState({ pillVisible: true });
+    render(<AndroidInstallPill />);
+    settle();
+    expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
+  });
+
   it('shows the pill and tracks the impression once when active + eligible', () => {
     useAndroidInstallStore.setState({ pillVisible: true });
     render(<AndroidInstallPill />);

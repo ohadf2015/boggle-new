@@ -278,7 +278,7 @@ const he = {
           "line": "100 שלבים ב-10 עולמות. טיפוס וכיבוש."
         },
         "wordTowerV2": {
-          "title": "מגדל מילים V2",
+          "title": "מגדל מילים",
           "line": "ערמו מילים, צפו בפיזיקה."
         },
         "arena": {
@@ -832,9 +832,9 @@ const he = {
       "long-bow": "קשת ארוכה",
       "short-sword": "חרב קצרה",
       "storm-rune": "רונת סערה",
-      "twin-ink": "דיו תאומה",
+      "twin-ink": "דיו פתיחה",
       "echo-stone": "אבן הד",
-      "magnet": "מגנט",
+      "magnet": "מגנט נקודות",
       "heart-locket": "תליון לב",
       "hourglass": "שעון חול",
       "lens-of-insight": "עדשת תובנה",
@@ -883,7 +883,17 @@ const he = {
       "bullet1": "תקפו הרבה מהלומות קשות יותר ויותר",
       "bullet2": "פתחו עיצובי עולם נדירים וחפצים חזקים",
       "bullet3": "קחו את מקומכם בלוח המובילים",
-      "signIn": "התחברו כדי לשחק"
+      "playBattle": "שחקו קרב חינם",
+      "signIn": "התחברו כדי לשחק",
+      "back": "חזרה",
+      "backToGate": "חזרה לבחירת קרב",
+      "demoLabel": "קרב חינם",
+      "demoResult": "הקרב הסתיים",
+      "demoWon": "ניצחתם!",
+      "demoLost": "הפסדתם!",
+      "demoScore": "ניקוד: {score}",
+      "saveProgress": "התחברו כדי לשמור את ההתקדמות שלכם וקבלו מטבעות",
+      "playAgain": "שחקו שוב"
     },
     "title": "הרפתקה",
     "start": "מתחילים",
@@ -1464,7 +1474,7 @@ const he = {
       }
     },
     "coins": { "run": "{n} מטבעות במשחק" },
-    "streak": { "a11y": "רצף מושלם ×{n}", "toRare": "עוד {n} מושלמים לארגז נדיר", "crate": "ארגז", "meterA11y": "רצף מושלם {n}, כפל ×{mult}. עוד {rare} לארגז נדיר." },
+    "streak": { "a11y": "רצף מושלם ×{n}", "toRare": "עוד {n} מושלמים לארגז נדיר", "crate": "ארגז", "meterA11y": "רצף מושלם {n}, כפל ×{mult}. עוד {rare} לארגז נדיר." , "label": "פס" },
     "milestone": { "floors": "עוד קומות!", "a11y": "{n} קומות" },
     "chest": {
       "tier": { "common": "רגיל", "rare": "נדיר", "epic": "אפי" },
@@ -1621,12 +1631,12 @@ const he = {
       "friend": "חבר",
       "back": "עוד פעם",
     },
-    "cardTitle": "מגדל מילים 2",
+    "cardTitle": "מגדל מילים",
     "cardDesc": "פיזיקה אמיתית — גרסת בטא",
     "collapsed": "המגדל קרס!",
     "newBest": "שיא חדש!",
-    "hud": {"floor": "קומה", "floorA11y": "קומה {n}, {m} מטר", "effect": "{name}: נשארו {n}", "exit": "לסיים ולאסוף", "daily": "יומי", "dailyBadge": "יומי {date}"},
-    "stability": {"label": "יציבות", "a11y": "יציבות: {band}, סיכון {pct}%", "steady": "יציב", "wobbly": "מתנדנד", "danger": "סכנה!"},
+    "hud": {"floor": "קומה", "floorA11y": "קומה {n}, {m} מטר", "effect": "{name}: נשארו {n}", "exit": "לסיים ולאסוף", "daily": "יומי", "dailyBadge": "יומי {date}", "menu": "תפריט", "banked": "צבור"},
+    "stability": {"label": "יציבות", "a11y": "יציבות: {band}, סיכון {pct}%", "steady": "יציב", "wobbly": "מתנדנד", "danger": "כוונו למרכז!"},
     "biome": {"downtown": "מרכז העיר", "sunset": "גגות בשקיעה", "clouds": "ים של עננים", "jetstream": "זרם סילון", "aurora": "זוהר קוטבי", "orbit": "מסלול", "cosmos": "חלל עמוק"},
     "newSky": "שמיים חדשים",
     "call": {"perfect": {"0": "מושלם!", "1": "בול!", "2": "בדיוק!", "3": "ללא רבב!"}, "good": {"0": "יפה!", "1": "סולידי!", "2": "נקי!", "3": "חלק!"}, "sloppy": {"0": "מתנדנד…", "1": "היה קרוב!", "2": "מחזיק מעמד!"}, "miss": {"0": "אופס!", "1": "אוי!", "2": "נופל!"}, "combo": {"double": "כפול!", "triple": "שלוש!", "quad": "ארבע!", "unstoppable": "בלתי ניתן לעצירה ×{n}", "legendary": "אגדי ×{n}"}, "word": {"big": "מילה גדולה!", "mega": "מגה מילה!"}},
@@ -12910,7 +12920,8 @@ const he = {
       "trialActive": "ניסיון Pro",
       "trialDayLeft": "נותר יום אחד",
       "trialDaysLeft": "נותרו {count} ימים",
-      "trialEndsToday": "מסתיים היום"
+      "trialEndsToday": "מסתיים היום",
+      "trialEnded": "הניסיון הסתיים"
     },
     "proGate": {
       "analytics": {
@@ -12939,6 +12950,7 @@ const he = {
       "proCtaHint": "פתחו כל משחק, כל תלמיד, ודוחות PDF להדפסה.",
       "weeklySubject": "השבוע בכיתה שלך",
       "polarTrialExpiredLine": "תקופת הניסיון של Teacher Pro הסתיימה. הפעילו מחדש כדי לשמור על דוחות הכיתה.",
+      "polarTrialActiveLine": "נותרו {count} ימים בניסיון Teacher Pro. שמרו על דוחות וכיתות ללא הגבלה ב-9$ לחודש.",
       "regionLabel": "תקציר התקדמות עבור {{classroom}}",
       "scheduleReteachCta": "לקבוע Live לחזרה בעוד ~{{days}} ימים",
       "scheduleReteachConfirm": "Live לחזרה נקבע ל־{{date}} (~{{days}} ימים). הזמנה ליומן נפתחה.",
@@ -12992,6 +13004,11 @@ const he = {
       "trialEndedTitle": "תקופת הניסיון של Teacher Pro הסתיימה",
       "trialEndedBody": "הפעילו מחדש ב-9$ לחודש. זו לא תקופת ניסיון נוספת.",
       "trialEndedCta": "להמשיך ב-Pro — 9$ לחודש",
+      "trialLifecycleTitle": "נותרו {count} ימים בניסיון Teacher Pro",
+      "trialLifecycleTitleToday": "ניסיון Teacher Pro מסתיים היום",
+      "trialLifecycleTitleOne": "נותר יום אחד בניסיון Teacher Pro",
+      "trialLifecycleBody": "שמרו על כיתות ללא הגבלה ודוחות להדפסה — 9$ לחודש אחרי הניסיון.",
+      "trialLifecycleCta": "להמשיך ב-Pro — 9$ לחודש",
       "checkoutError": "התשלום לא הצליח להתחיל. נסו שוב.",
       "signInRequired": "אנא התחברו כדי לשדרג ל-Teacher Pro.",
       "currentPlan": "אתם במסלול הזה",
@@ -18303,10 +18320,21 @@ const he = {
     }
   },
   "newModes": {
-    "title": "משחקי מצבים חדשים",
-    "description": "הרפתקה מחכה. נסה את המגדל היומי.",
-    "playAdventure": "שחק הרפתקה",
-    "playWordTower": "שחק מגדל מילים"
+    "title": "שתי דרכים חדשות לשחק",
+    "description": "מסע בעשרה עולמות, ומגדל שעלול לקרוס.",
+    "adventureTitle": "הרפתקה",
+    "adventureLine": "10 עולמות, 100 שלבים ודרקון רעב למילים שמחכה בסוף.",
+    "wordTowerTitle": "מגדל מילים",
+    "wordTowerLine": "בונים מגדל ממילים. מילה אחת עקומה והכול מתמוטט.",
+    "playAdventure": "יוצאים למסע",
+    "playWordTower": "מתחילים לבנות",
+    "loot": {
+      "title": "כל סיבוב יכול להפיל שלל",
+      "line": "חפצי קסם בהרפתקה, תיבות אוצר במגדל. הציצו מה יש בפנים.",
+      "tap": "פתחו את התיבה",
+      "again": "עוד פעם",
+      "chest": "תיבת אוצר · {tier}"
+    }
   },
   // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
   "mpUi": {

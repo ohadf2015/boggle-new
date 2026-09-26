@@ -278,7 +278,7 @@ const es = {
           "line": "100 niveles en 10 mundos. Sube y conquista."
         },
         "wordTowerV2": {
-          "title": "Torre de Palabras V2",
+          "title": "Torre de Palabras",
           "line": "Apila palabras, observa la física."
         },
         "arena": {
@@ -832,9 +832,9 @@ const es = {
       "long-bow": "Arco largo",
       "short-sword": "Espada corta",
       "storm-rune": "Runa de tormenta",
-      "twin-ink": "Tinta gemela",
+      "twin-ink": "Tinta inicial",
       "echo-stone": "Piedra del eco",
-      "magnet": "Imán",
+      "magnet": "Imán de puntos",
       "heart-locket": "Relicario de corazón",
       "hourglass": "Reloj de arena",
       "lens-of-insight": "Lente de la perspicacia",
@@ -883,7 +883,17 @@ const es = {
       "bullet1": "Batalla contra encuentros cada vez más difíciles",
       "bullet2": "Desbloquea diseños de mundos raros y reliquias poderosas",
       "bullet3": "Reclama tu puesto en la tabla de clasificación",
-      "signIn": "Inicia sesión para jugar"
+      "playBattle": "Juega una batalla gratis",
+      "signIn": "Inicia sesión para jugar",
+      "back": "Atrás",
+      "backToGate": "Volver a la selección de batalla",
+      "demoLabel": "Batalla gratis",
+      "demoResult": "Batalla completada",
+      "demoWon": "¡Ganaste!",
+      "demoLost": "¡Perdiste!",
+      "demoScore": "Puntuación: {score}",
+      "saveProgress": "Inicia sesión para guardar tu progreso y ganar monedas",
+      "playAgain": "Jugar de nuevo"
     },
     "title": "Aventura",
     "start": "Empezar",
@@ -1463,7 +1473,7 @@ const es = {
       }
     },
     "coins": { "run": "{n} monedas esta ronda" },
-    "streak": { "a11y": "Racha perfecta ×{n}", "toRare": "{n} perfectos → caja rara", "crate": "CAJA", "meterA11y": "Racha perfecta {n}, paga ×{mult}. Faltan {rare} para una caja rara." },
+    "streak": { "a11y": "Racha perfecta ×{n}", "toRare": "{n} perfectos → caja rara", "crate": "CAJA", "meterA11y": "Racha perfecta {n}, paga ×{mult}. Faltan {rare} para una caja rara.", "label": "Racha" },
     "milestone": { "floors": "¡Pisos!", "a11y": "{n} pisos" },
     "chest": {
       "tier": { "common": "Común", "rare": "Rara", "epic": "Épica" },
@@ -1620,12 +1630,12 @@ const es = {
       "friend": "Tu amigo",
       "back": "Otra vez",
     },
-    "cardTitle": "Torre de Palabras v2",
+    "cardTitle": "Torre de Palabras",
     "cardDesc": "Física real: versión beta",
     "collapsed": "¡Se cayó la torre!",
     "newBest": "¡Nuevo récord!",
-    "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar", "daily": "DIARIO", "dailyBadge": "Diario {date}"},
-    "stability": {"label": "Estabilidad", "a11y": "Estabilidad: {band}, {pct}% de riesgo", "steady": "Firme", "wobbly": "Tambaleante", "danger": "¡Peligro!"},
+    "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar", "daily": "DIARIO", "dailyBadge": "Diario {date}", "menu": "Menú", "banked": "Acumulado"},
+    "stability": {"label": "Estabilidad", "a11y": "Estabilidad: {band}, {pct}% de riesgo", "steady": "Firme", "wobbly": "Tambaleante", "danger": "¡Al centro!"},
     "biome": {"downtown": "Centro", "sunset": "Azoteas al atardecer", "clouds": "Mar de nubes", "jetstream": "Corriente en chorro", "aurora": "Aurora", "orbit": "Órbita", "cosmos": "Cosmos profundo"},
     "newSky": "Cielo nuevo",
     "call": {"perfect": {"0": "¡PERFECTO!", "1": "¡EN EL BLANCO!", "2": "¡EXACTO!", "3": "¡IMPECABLE!"}, "good": {"0": "¡BIEN!", "1": "¡SÓLIDO!", "2": "¡LIMPIO!", "3": "¡SUAVE!"}, "sloppy": {"0": "TAMBALEANTE…", "1": "¡POR POCO!", "2": "¡AGUANTA!"}, "miss": {"0": "¡UPS!", "1": "¡AY!", "2": "¡SE CAE!"}, "combo": {"double": "¡DOBLE!", "triple": "¡TRIPLE!", "quad": "¡CUÁDRUPLE!", "unstoppable": "¡IMPARABLE ×{n}!", "legendary": "¡LEGENDARIO ×{n}!"}, "word": {"big": "¡PALABRA GRANDE!", "mega": "¡MEGAPALABRA!"}},
@@ -13003,7 +13013,8 @@ const es = {
       "trialActive": "Prueba Pro",
       "trialDayLeft": "Queda 1 día",
       "trialDaysLeft": "Quedan {count} días",
-      "trialEndsToday": "Termina hoy"
+      "trialEndsToday": "Termina hoy",
+      "trialEnded": "La prueba terminó"
     },
     "proGate": {
       "analytics": {
@@ -13033,6 +13044,7 @@ const es = {
       "proCtaHint": "Desbloquea cada partida, cada estudiante y PDF imprimibles.",
       "weeklySubject": "Esta semana en tu clase",
       "polarTrialExpiredLine": "Tu prueba de Teacher Pro terminó. Reactívala para conservar los informes de la clase.",
+      "polarTrialActiveLine": "Tu prueba de Teacher Pro tiene {count} días. Conserva informes y clases ilimitadas por 9 $/mes.",
       "regionLabel": "Resumen de progreso de {{classroom}}",
       "scheduleReteachCta": "Programar Live de repaso en ~{{days}} días",
       "scheduleReteachConfirm": "Live de repaso programado para {{date}} (~{{days}} días). Se abrió la invitación del calendario.",
@@ -13086,6 +13098,11 @@ const es = {
       "trialEndedTitle": "Tu prueba de Teacher Pro terminó",
       "trialEndedBody": "Reactívala por 9 $/mes. No es otra prueba gratis.",
       "trialEndedCta": "Seguir con Pro — 9 $/mes",
+      "trialLifecycleTitle": "Quedan {count} días de tu prueba de Teacher Pro",
+      "trialLifecycleTitleToday": "Tu prueba de Teacher Pro termina hoy",
+      "trialLifecycleTitleOne": "Queda 1 día de tu prueba de Teacher Pro",
+      "trialLifecycleBody": "Conserva clases ilimitadas e informes imprimibles — 9 $/mes al terminar la prueba.",
+      "trialLifecycleCta": "Seguir con Pro — 9 $/mes",
       "checkoutError": "No se pudo iniciar el pago. Inténtalo de nuevo.",
       "signInRequired": "Inicia sesión para mejorar a Teacher Pro.",
       "currentPlan": "Estás en este plan",
@@ -18391,10 +18408,21 @@ const es = {
     }
   },
   "newModes": {
-    "title": "Nuevos modos de juego",
-    "description": "La aventura te espera. Prueba la torre diaria.",
-    "playAdventure": "Jugar aventura",
-    "playWordTower": "Jugar torre de palabras"
+    "title": "Dos formas nuevas de jugar",
+    "description": "Una aventura por diez mundos y una torre que se puede derrumbar.",
+    "adventureTitle": "Aventura",
+    "adventureLine": "10 mundos, 100 niveles y un dragón hambriento de palabras al final.",
+    "wordTowerTitle": "Torre de Palabras",
+    "wordTowerLine": "Apila palabras hasta el cielo. Una palabra floja y se viene abajo.",
+    "playAdventure": "Empezar la aventura",
+    "playWordTower": "Empezar a construir",
+    "loot": {
+      "title": "Cada partida puede soltar botín",
+      "line": "Reliquias en Aventura, cofres en la Torre. Echa un vistazo.",
+      "tap": "Abre el cofre",
+      "again": "Otra vez",
+      "chest": "Cofre · {tier}"
+    }
   },
   // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
   "mpUi": {

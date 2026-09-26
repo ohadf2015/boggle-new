@@ -383,8 +383,9 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
             stageEl={stageRef.current} />
         )}
 
-        {/* Stage: enemy / boss / star track */}
-        <div ref={stageRef} data-adv-slot="stage" className="mt-3 min-h-[5.5rem] flex items-center">
+        {/* Stage: enemy / boss / star track. FoeTarget unmounts after defeat, so
+            no large min-h needed; LevelStage (boss/elite) stays fixed height. */}
+        <div ref={stageRef} data-adv-slot="stage" className={cn('empty:mt-0 mt-3 flex items-center', lvl && !lvl.isBoss && !isElite ? 'min-h-0' : 'min-h-[5.5rem]')}>
           {lvl && !lvl.isBoss && !isElite
             ? <FoeTarget world={world} score={shownScore} stars={lvl.stars} lastHit={lastHit}
                 combat={run.phase === 'playing' ? run.combat : null} dispatchCombat={run.dispatchCombat} />

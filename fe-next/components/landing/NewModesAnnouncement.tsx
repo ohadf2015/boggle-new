@@ -1,17 +1,25 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import Link from 'next/link';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { modeRoute } from '@/lib/landing/modeMeta';
 import { markPromoShown } from '@/lib/landing/promoOverlaySession';
+import { NewModesSpotlight } from './NewModesSpotlight';
 
-const STORAGE_KEY = 'newModesAnnouncementSeen';
+// v2 key (spotlight redesign): the old text card's marker is set for nearly every
+// returning visitor, including those who never actually saw it (see useTopPlayers SSR fix).
+const STORAGE_KEY = 'newModesSpotlightSeen';
+/**
+ * Set when the card is shown, cleared on dismiss: a remount in the same session
+ * (hydration regeneration, back-navigation to home) keeps the card instead of
+ * reading its own show-time marker as "already seen" and vanishing.
+ */
+const SESSION_KEY = 'newModesAnnouncementSession';
 
 /**
- * One-time dismissible announcement card for the new game modes (Adventure + Word Tower V2).
+ * One-time dismissible spotlight for the new game modes (Adventure + Word Tower).
  * Shows only to returning visitors (fresh-new visitors see homeTree only).
  * Mounts exclusively inside ReturningHome, above the `md:hidden`/desktop split.
  *
@@ -22,7 +30,7 @@ const STORAGE_KEY = 'newModesAnnouncementSeen';
  * - Dismiss hides the card (local state) and fires `_dismissed` event.
  *
  * Layout:
- * - Fixed card above bottom nav (with logical spacing for RTL).
+ * - Heading + close, then the shared NewModesSpotlight pair (key art, loot chest).
  * - No opacity tween; static appear to avoid Class 5 mobile web flash.
  */
 export function NewModesAnnouncement() {
@@ -45,6 +53,10 @@ export function NewModesAnnouncement() {
     if (hasShownRef.current) return; // StrictMode guard: prevent double-fire.
 
     try {
+      if (sessionStorage.getItem(SESSION_KEY)) {
+        setIsVisible(true);
+        return;
+      }
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         // Already seen; stay hidden.
@@ -53,6 +65,7 @@ export function NewModesAnnouncement() {
 
       // Write marker FIRST. Only show if this succeeds (persist at SHOW time).
       localStorage.setItem(STORAGE_KEY, 'true');
+      sessionStorage.setItem(SESSION_KEY, '1');
 
       // Also gate other promotional overlays at the session level
       markPromoShown();
@@ -72,6 +85,7 @@ export function NewModesAnnouncement() {
 
   const handleDismiss = () => {
     setIsVisible(false);
+    try { sessionStorage.removeItem(SESSION_KEY); } catch { /* private mode: card just stays hidden */ }
     trackGrowthEvent('new_modes_announcement_dismissed', {});
   };
 
@@ -80,52 +94,24 @@ export function NewModesAnnouncement() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-2 sm:px-3 lg:px-6 xl:px-8 py-2">
-      {/* Fixed card anchored above bottom nav, static appear (no tween) */}
-      <div
-        className="relative rounded-neo border border-neo-cream dark:border-neo-cream/30 bg-neo-navy dark:bg-neo-navy-darker shadow-neo-hard p-4 sm:p-5"
-        style={{
-          /* logical spacing for RTL */
-          paddingInlineEnd: 'calc(var(--radius-size, 4px) + 0.5rem)',
-        }}
-      >
-        {/* Close button — positioned top-right (logical end) */}
-        <button
-          onClick={handleDismiss}
-          className="absolute top-3 end-3 p-1.5 hover:opacity-70 transition-opacity"
-          aria-label={t('common.close')}
-        >
-          <X size={20} className="text-neo-cream" />
-        </button>
-
-        {/* Announcement content */}
-        <div className="pe-8">
-          <h3 className="text-base font-bold text-neo-cream mb-2">
+    <section aria-labelledby="new-modes-title" className="relative flex flex-col gap-4 sm:gap-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 id="new-modes-title" className="font-neo-display text-2xl font-bold leading-tight text-neo-cream text-balance sm:text-3xl">
             {t('newModes.title')}
-          </h3>
-          <p className="text-sm text-neo-cream/80 mb-4">
-            {t('newModes.description')}
-          </p>
-
-          {/* Two CTA buttons */}
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Link
-              href={adventureHref}
-              onClick={() => handleModeClick('adventure')}
-              className="flex-1 px-3 py-2 rounded-neo bg-lime-400 text-neo-navy font-bold text-center hover:opacity-85 transition-opacity text-sm"
-            >
-              {t('newModes.playAdventure')}
-            </Link>
-            <Link
-              href={wtv2Href}
-              onClick={() => handleModeClick('wordTowerV2')}
-              className="flex-1 px-3 py-2 rounded-neo bg-purple-400 text-neo-navy font-bold text-center hover:opacity-85 transition-opacity text-sm"
-            >
-              {t('newModes.playWordTower')}
-            </Link>
-          </div>
+          </h2>
+          <p className="mt-1 font-neo-body text-sm text-neo-cream/80 sm:text-base">{t('newModes.description')}</p>
         </div>
+        <button
+          type="button"
+          onClick={handleDismiss}
+          aria-label={t('common.close')}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard active:translate-y-[2px] active:shadow-hard-pressed focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream"
+        >
+          <X size={18} strokeWidth={3} />
+        </button>
       </div>
-    </div>
+      <NewModesSpotlight surface="returning" onModeClick={handleModeClick} />
+    </section>
   );
 }

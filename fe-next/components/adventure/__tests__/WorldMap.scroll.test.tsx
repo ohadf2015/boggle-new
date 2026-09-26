@@ -1,11 +1,11 @@
 /**
  * WorldMap Auto-Scroll Tests
  *
- * The world map renders top=last world, bottom=World 1, and auto-scrolls to the
- * bottom on mount so the player starts at World 1. It MUST do this by scrolling
- * its own overflow container — never via Element.scrollIntoView, which scrolls
- * every scrollable ancestor including the document and drags the whole page down
- * to the footer (the "page opens at the footer" bug).
+ * The world map renders top=last world, bottom=World 1, and auto-scrolls to center
+ * the player's next world on mount (the first unlocked-not-completed world, or the
+ * last completed if all are done). It MUST do this by scrolling its own overflow
+ * container — never via Element.scrollIntoView, which scrolls every scrollable
+ * ancestor including the document and drags the whole page down to the footer.
  */
 
 import React from 'react';

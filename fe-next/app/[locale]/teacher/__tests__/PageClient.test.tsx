@@ -210,14 +210,24 @@ describe('TeacherPage upgrade CTA', () => {
     expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
   });
 
-  it('a live Polar trial does not stack the access banner or a Pro ask', () => {
+  it('a live Polar trial shows the days-remaining lifecycle banner, not the access banner or a Pro ask', () => {
     accessState = { trial: mkTrial({ daysLeft: 2, isUrgent: true }) };
     proState = { ...proState, hasPro: true, source: 'polar', status: 'trialing', trialUsed: true };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
+    expect(screen.getByTestId('teacher-pro-trial-lifecycle')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'teacher.subscription.trialLifecycleCta' })).toHaveAttribute(
+      'href',
+      '/en/teacher/upgrade',
+    );
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-trial-ended')).toBeNull();
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
+      product: 'teacher_pro',
+      source: 'dashboard_trial_lifecycle',
+      event_type: 'impression',
+    });
   });
 
   it('an expired Polar trial is one reactivation CTA, not a second free trial or a stacked ask', () => {

@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { MAX_DISTRICT, MAX_PLOT_LEVEL, PLOT_SLOTS } from '@/lib/wordTowerV2/estateCatalog';
 import { emptyEstate, perksFromEstate } from '@/lib/wordTowerV2/estate';
-import { ART_SETS, DAMAGE_OVERLAY, backdropFor, buildingSprite, nextPerkLine, perkChips, plotStage, whatsNew } from '../estateArt';
+import { ART_SETS, DAMAGE_OVERLAY, backdropFor, buildingSprite, nextPerkLine, plotStage, whatsNew } from '../estateArt';
 
 const PUBLIC = join(process.cwd(), 'public');
 const onDisk = (url: string) => existsSync(join(PUBLIC, url));
@@ -49,18 +49,6 @@ describe('estateArt', () => {
   it('given a maxed plot, when the perk line is read, then it reports the level it already holds', () => {
     const line = nextPerkLine(1, 'landmark', 5);
     expect(line.params.n).toBe(15);
-  });
-
-  it('given a fresh estate, when perk chips are built, then there are none to show', () => {
-    expect(perkChips(perksFromEstate(emptyEstate()))).toEqual([]);
-  });
-
-  it('given upgraded plots, when perk chips are built, then each changed perk becomes one chip', () => {
-    const estate = { ...emptyEstate(), plots: PLOT_SLOTS.map((slot) => ({ slot, level: 4, damaged: false })) };
-    const chips = perkChips(perksFromEstate(estate));
-    expect(chips.map((c) => c.id)).toEqual(['foundation', 'craneYard', 'vault', 'insurance', 'landmark']);
-    expect(chips[0]).toMatchObject({ key: 'wordTowerV2.estate.chip.foundation' });
-    expect(chips.every((c) => c.params.n > 0)).toBe(true);
   });
 
   it('given coins and damage, when the what-is-new state is read, then it lists affordable and broken plots', () => {

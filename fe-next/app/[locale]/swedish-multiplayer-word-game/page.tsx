@@ -10,18 +10,24 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 
+/** Differentiator before brand; ≤60 chars. SERP neighbors (Wordfeud) sell friends + Swedish dict — we sell gratis browser Alfapet, no app. */
+const SV_TITLE = 'Alfapet online gratis — inget konto | LexiClash';
+/** Answer in the first 120 chars so Google does not fall back to FAQ body (live snippet was game-mode FAQ). */
+const SV_DESCRIPTION =
+  'Spela Alfapet på svenska gratis i webbläsaren — inget konto, ingen app. Realtid mot vänner, 10 000+ svenska ord. Starta ett rum nu.';
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const isTargetLocale = locale === 'sv';
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Scrabble på Svenska Gratis Online — Inget Konto | LexiClash',
-    description: 'Spela Scrabble på svenska gratis online — ingen app, inget konto. Realtidsmultiplayer som Alfapet med vänner, 10 000+ svenska ord. Starta direkt!',
+    title: SV_TITLE,
+    description: SV_DESCRIPTION,
     keywords: 'alfapet spel online, ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
-      title: 'Scrabble på Svenska Gratis Online — Inget Konto | LexiClash',
-      description: 'Spela Scrabble på svenska gratis online — ingen app, inget konto. Realtidsmultiplayer som Alfapet med vänner, 10 000+ svenska ord. Starta direkt!',
+      title: SV_TITLE,
+      description: SV_DESCRIPTION,
       locale: 'sv_SE',
       type: 'website',
       url: pageUrl,
@@ -36,8 +42,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Scrabble på Svenska Gratis Online — Inget Konto | LexiClash',
-      description: 'Spela Scrabble på svenska gratis online — ingen app, inget konto. Realtidsmultiplayer som Alfapet med vänner, 10 000+ svenska ord. Starta direkt!',
+      title: SV_TITLE,
+      description: SV_DESCRIPTION,
       images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {
@@ -76,6 +82,10 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
 
   const faqs = [
     {
+      q: 'Var kan man spela Scrabble online på svenska gratis?',
+      a: 'LexiClash är ett gratis Alfapet-/Scrabble-alternativ på svenska i webbläsaren — ingen app, ingen registrering. Skapa ett rum, bjud in vänner via länk och tävla i realtid med över 10 000 svenska ord. En match tar 2–3 minuter.',
+    },
+    {
       q: 'Hur börjar jag spela multiplayer ordspel?',
       a: 'Klicka helt enkelt på "Skapa rum" eller "Gå med i rum" på multiplayer-sidan. Dela rumslänken med vänner, så kan ni börja tävla i realtid!',
     },
@@ -94,10 +104,6 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
     {
       q: 'Vilka spellägen finns?',
       a: 'Spela multiplayer-rum, dagliga utmaningar (ordhjul och ordjakt), ordletare, blastläge och mer. Varje läge har unika regler och poängberäkning. Ordhjulet är en daglig pussel där alla bokstäver ska inkludera mittenbokstaven.',
-    },
-    {
-      q: 'Var kan man spela Scrabble online på svenska gratis?',
-      a: 'LexiClash är det bästa gratis alternativet till Scrabble och Wordfeud på svenska. Spela direkt i webbläsaren — ingen app, ingen registrering. Skapa ett rum, bjud in upp till 50 vänner via länk, och tävla i realtid med över 10 000 svenska ord.',
     },
   ];
 
@@ -139,12 +145,10 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
           Multiplayer Ordspel Online - Spela Boggle & Scrabble på Svenska
         </h1>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Letar du efter Scrabble på svenska online — gratis, utan app och utan konto? LexiClash är det
-          snabbaste sättet att avgöra vem i kompisgänget som faktiskt kan flest ord. Skapa ett rum, skicka
-          länken, och upp till 50 spelare tävlar på samma bokstavsrutnät i realtid. Med över 10 000 svenska
-          ord i ordboken och matcher på 2–3 minuter är det lika enkelt att komma igång som det är svårt
-          att sluta.
+        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200" data-speakable="true">
+          Spela Alfapet på svenska gratis i webbläsaren — inget konto, ingen app. LexiClash är ett
+          realtids-alternativ till Wordfeud: skapa ett rum, skicka länken, och upp till 50 spelare tävlar
+          på samma bokstavsrutnät. Över 10 000 svenska ord, matcher på 2–3 minuter. Starta direkt.
         </p>
 
         <section className="mb-12">

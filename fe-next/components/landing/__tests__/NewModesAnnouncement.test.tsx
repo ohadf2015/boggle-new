@@ -5,6 +5,8 @@ const trackGrowthEvent = vi.fn();
 
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: any[]) => trackGrowthEvent(...args),
+  trackModeSelected: vi.fn(),
+  trackLandingCtaClick: vi.fn(),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
@@ -23,7 +25,10 @@ vi.mock('@/lib/landing/modeMeta', () => ({
 
 import { NewModesAnnouncement } from '../NewModesAnnouncement';
 
-const STORAGE_KEY = 'newModesAnnouncementSeen';
+// v2 key: the redesign must reach visitors who already saw (or lost) the old text card.
+const STORAGE_KEY = 'newModesSpotlightSeen';
+/** Captured before any test stubs window.localStorage, so restores really restore. */
+const realLocalStorage = window.localStorage;
 
 beforeEach(() => {
   trackGrowthEvent.mockClear();
@@ -36,6 +41,7 @@ beforeEach(() => {
     return routes[lang]?.[key] || `/en/${key}`;
   });
   localStorage.clear();
+  sessionStorage.clear();
 });
 
 describe('NewModesAnnouncement', () => {
@@ -207,7 +213,7 @@ describe('NewModesAnnouncement', () => {
 
     // Restore real localStorage
     Object.defineProperty(window, 'localStorage', {
-      value: localStorage,
+      value: realLocalStorage,
       writable: true,
       configurable: true,
     });
@@ -244,9 +250,30 @@ describe('NewModesAnnouncement', () => {
 
     // Restore real localStorage
     Object.defineProperty(window, 'localStorage', {
-      value: localStorage,
+      value: realLocalStorage,
       writable: true,
       configurable: true,
     });
+  });
+
+  it('given it was shown earlier this session, when the tree remounts (hydration regen, back-nav), then it is still visible and _shown does not re-fire', async () => {
+    const first = render(<NewModesAnnouncement />);
+    await waitFor(() => expect(screen.getByText('newModes.title')).toBeInTheDocument());
+    first.unmount();
+    trackGrowthEvent.mockClear();
+
+    render(<NewModesAnnouncement />);
+    await waitFor(() => expect(screen.getByText('newModes.title')).toBeInTheDocument());
+    expect(trackGrowthEvent).not.toHaveBeenCalledWith('new_modes_announcement_shown', {});
+  });
+
+  it('given it was dismissed this session, when the tree remounts, then it stays hidden', async () => {
+    const first = render(<NewModesAnnouncement />);
+    await waitFor(() => expect(screen.getByText('newModes.title')).toBeInTheDocument());
+    fireEvent.click(screen.getByLabelText('common.close'));
+    first.unmount();
+
+    render(<NewModesAnnouncement />);
+    expect(screen.queryByText('newModes.title')).not.toBeInTheDocument();
   });
 });

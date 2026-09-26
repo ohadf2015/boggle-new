@@ -100,8 +100,9 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // at page level after the AdSense "low value content" rejection. Search
   // intent is covered by /word-craft-game, /daily-word-wheel and /guides/*.
   addForAllLocales(routes, '/word-craft-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  // Adventure is beta-gated: guests see a teaser gate, signed-in non-beta users are redirected.
-  // Included in sitemap but noindexed at page level (see app/[locale]/adventure/layout.tsx).
+  // Adventure is GA and indexed (layout.tsx robots.index=true). Guests get a
+  // playable demo battle plus the SSR FAQ/feature landing; signed-in players
+  // get the full world-map run. Not a teaser gate — do not noindex this URL.
   addForAllLocales(routes, '/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 });
   // Word Tower canonical URL is /word-tower (clean, no -v2 suffix).
   addForAllLocales(routes, '/word-tower', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });

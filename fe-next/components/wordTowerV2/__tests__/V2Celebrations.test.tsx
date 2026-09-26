@@ -61,6 +61,28 @@ describe('V2Celebrations banner lane', () => {
     expect(screen.getByText('wordTowerV2.reward.plumb.desc')).toBeTruthy();
   });
 
+  it('given an achievement badge, when rendered, then the description wraps without truncation (no ellipsis, no line-clamp, no truncate class)', () => {
+    const { container } = render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={() => {}} />,
+    );
+    const descSpan = screen.getByText('wordTowerV2.ach.highRise.desc');
+    const classList = descSpan.className;
+    expect(classList).not.toContain('truncate');
+    expect(classList).not.toContain('line-clamp');
+    expect(classList).not.toContain('ellipsis');
+  });
+
+  it('given a reward crate, when rendered, then the description wraps without truncation (no ellipsis, no line-clamp, no truncate class)', () => {
+    const { container } = render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'reward', id: 'plumb', priority: 2 }]} onBannerDone={() => {}} />,
+    );
+    const descSpan = screen.getByText('wordTowerV2.reward.plumb.desc');
+    const classList = descSpan.className;
+    expect(classList).not.toContain('truncate');
+    expect(classList).not.toContain('line-clamp');
+    expect(classList).not.toContain('ellipsis');
+  });
+
   it('given a queue, when rendered, then only the head shows, and it reports done after its time', () => {
     vi.useFakeTimers();
     const onDone = vi.fn();
@@ -116,6 +138,114 @@ describe('V2Celebrations one message at a time', () => {
       <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'best', id: 'best', priority: 3 }]} onBannerDone={() => {}} />,
     );
     expect(screen.getByText('wordTowerV2.newBest')).toBeTruthy();
+  });
+
+  it('given a slab on the hook, when a badge is queued, then it hides until the slab clears', () => {
+    render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={() => {}} swinging />,
+    );
+    expect(screen.queryByText('wordTowerV2.ach.highRise.name')).toBeNull();
+  });
+});
+
+describe('V2Celebrations banner positioning', () => {
+  it('given no slab on hook, when a banner shows, then it sits just below the measured HUD at hud+0.5rem (exact offset)', () => {
+    const { container } = render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={() => {}} />,
+    );
+    const lane = container.querySelector('[data-wt2-lane="banner"]')!;
+    const classes = lane.className.split(/\s+/);
+    // Must contain the exact offset at hud+0.5rem, not hud+5rem
+    const hasCorrectOffset = classes.some((cls) => cls === 'top-[calc(var(--wt2-hud,7rem)+0.5rem)]');
+    expect(hasCorrectOffset).toBe(true);
+    // Must not use bottom- positioning
+    const hasBottomClass = classes.some((cls) => cls.startsWith('bottom-'));
+    expect(hasBottomClass).toBe(false);
+  });
+
+  it('given no slab on hook, when a banner shows, then it sits at a different offset than the callout lane', () => {
+    const { container } = render(
+      <V2Celebrations
+        t={t}
+        callout={{ key: 1, textKey: 'wordTowerV2.call.good.0', tone: 'cyan', points: 0 }}
+        banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]}
+        onBannerDone={() => {}}
+      />,
+    );
+    const calloutLane = container.querySelector('[data-wt2-lane="callout"]')!;
+    const bannerLane = container.querySelector('[data-wt2-lane="banner"]')!;
+
+    // Extract top- classes: callout uses top-[max(...)] or top-[calc(...)], banner uses top-[calc(...)]
+    const calloutTopClass = calloutLane.className
+      .split(/\s+/)
+      .find((cls) => cls.startsWith('top-['));
+    const bannerTopClass = bannerLane.className.split(/\s+/).find((cls) => cls.startsWith('top-['));
+
+    expect(calloutTopClass).toBeDefined();
+    expect(bannerTopClass).toBeDefined();
+    expect(calloutTopClass).not.toBe(bannerTopClass);
+  });
+
+  it('given a slab on hook, when a badge is queued, then the lane disappears (never over drop zone)', () => {
+    vi.useFakeTimers();
+    const { container } = render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={() => {}} swinging />,
+    );
+    const lane = container.querySelector('[data-wt2-lane="banner"]')!;
+    // Lane exists but no card is rendered inside
+    expect(lane.querySelector('[data-testid="banner-card"]')).toBeNull();
+  });
+
+  it('given a rival challenge message showing, when a badge is queued, then it waits for the message to clear', () => {
+    vi.useFakeTimers();
+    const onDone = vi.fn();
+    render(
+      <V2Celebrations
+        t={t}
+        callout={null}
+        banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]}
+        onBannerDone={onDone}
+        rivalChallenge
+      />,
+    );
+    expect(screen.queryByText('wordTowerV2.ach.highRise.name')).toBeNull();
+    expect(onDone).not.toHaveBeenCalled();
+  });
+});
+
+describe('V2Celebrations banner dismissal', () => {
+  it('given a badge on screen, when clicked, then it dismisses immediately', () => {
+    const onDone = vi.fn();
+    render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={onDone} />,
+    );
+    const button = screen.getByRole('button', { name: /highRise|Five-Story/i });
+    button.click();
+    expect(onDone).toHaveBeenCalledOnce();
+  });
+
+  it('given a badge on screen, when double-clicked quickly, then it dismisses only once', () => {
+    vi.useFakeTimers();
+    const onDone = vi.fn();
+    render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={onDone} />,
+    );
+    const button = screen.getByRole('button', { name: /highRise|Five-Story/i });
+    act(() => {
+      button.click();
+      button.click();
+    });
+    expect(onDone).toHaveBeenCalledOnce();
+  });
+
+  it('given a badge, when its timer expires, then it auto-dismisses and calls onBannerDone', () => {
+    vi.useFakeTimers();
+    const onDone = vi.fn();
+    render(
+      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={onDone} />,
+    );
+    act(() => vi.advanceTimersByTime(2500)); // Timer should fire before 2500ms
+    expect(onDone).toHaveBeenCalledOnce();
   });
 });
 

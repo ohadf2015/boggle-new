@@ -126,12 +126,16 @@ export default function RunHud({
     if (!lastHit || lastHit.result !== 'ok' || !relics.length) return null;
     const w = lastHit.word.toLowerCase().trim();
     const idx = words.indexOf(w);
+    // A hit from a PREVIOUS battle: this screen is not remounted between nodes,
+    // so lastHit survives while resetAttempt empties `words`. The old fallback
+    // (-1 → 0) manufactured index 0 — twin-ink's exact trigger — at the start of
+    // every battle, before the player had submitted anything.
+    if (idx < 0) return null;
     // The heal happens on the FIGHT's health bar, not the run's hearts — and it
     // only happens below max, so that is what decides whether the fang may claim it.
     const canHeal = combat ? combat.hp < combat.maxHp : hp < maxHp;
-    const fired = triggeredRelics(w, idx >= 0 ? idx : Math.max(0, words.length - 1), relics, { inFight, canHeal });
-    const at = idx >= 0 ? idx : Math.max(0, words.length - 1);
-    return fired.length ? { relics: fired, labels: Object.fromEntries(fired.map((r) => [r, relicBonusLabel(r, w, at)])) } : null;
+    const fired = triggeredRelics(w, idx, relics, { inFight, canHeal });
+    return fired.length ? { relics: fired, labels: Object.fromEntries(fired.map((r) => [r, relicBonusLabel(r, w, idx)])) } : null;
   }, [lastHit, relics, words, inFight, hp, maxHp, combat]);
 
   // One pulse channel, many triggers. A word is only ONE of the ways a relic
@@ -145,7 +149,16 @@ export default function RunHud({
     setPulse({ id: (pulseSeq.current += 1), relics: f.relics, labels: f.labels });
   });
 
-  useEffect(() => { if (wordPulse) fire.current(wordPulse as never); }, [wordPulse]);
+  // The fight clock rebuilds `combat` 5×/s, which rebuilds `wordPulse` with a
+  // fresh identity every tick — firing on identity re-triggered the callout for
+  // the whole fight. Fire once per HIT (its id is monotonic), like BoardFx and
+  // FoeTarget already do.
+  const firedHit = useRef(0);
+  useEffect(() => {
+    if (!wordPulse || !lastHit || lastHit.id === firedHit.current) return;
+    firedHit.current = lastHit.id;
+    fire.current(wordPulse as never);
+  }, [wordPulse, lastHit]);
   // Level dealt: the passives that already changed this level's terms.
   useEffect(() => { if (playing) fire.current(levelStartFire(relics)); }, [playing, relics]);
   // Fight opened holding a shield you did not earn in this fight.

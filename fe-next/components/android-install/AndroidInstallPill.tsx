@@ -104,7 +104,11 @@ export default function AndroidInstallPill() {
   // after this mounted, so a mount-time read would miss it.
   const inGame = useInGameSurface();
 
-  const shown = pillVisible && eligible && !sessionHidden && routeAllowed && !inGame;
+  // Adventure keeps its banner (monetized by design) but not this pill: it sat on
+  // the map's Continue button, the one primary action there (blind judge 2026-09-26).
+  const onAdventure = /^\/(?:[a-z]{2}\/)?adventure(?:\/|$)/.test(pathname ?? '');
+
+  const shown = pillVisible && eligible && !sessionHidden && routeAllowed && !inGame && !onAdventure;
 
   // Track the impression once per appearance.
   useEffect(() => {

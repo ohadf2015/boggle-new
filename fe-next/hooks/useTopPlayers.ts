@@ -32,8 +32,14 @@ interface UseTopPlayersOptions {
 export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
   const { initialData } = options;
 
+  // The cache is browser-only: on the server it outlives the request, so a
+  // seeded cache made later SSR renders disagree with the browser's first
+  // render (hydration mismatch → the returning home regenerated its tree).
+  const isBrowser = typeof window !== 'undefined';
+
   // Seed module cache with server-provided data so subsequent renders skip fetch
   if (
+    isBrowser &&
     initialData &&
     initialData.length > 0 &&
     topPlayersCache.data === null
@@ -43,7 +49,7 @@ export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
     topPlayersCache.limit = limit;
   }
 
-  const cached = topPlayersCache.limit === limit ? topPlayersCache.data : null;
+  const cached = isBrowser && topPlayersCache.limit === limit ? topPlayersCache.data : null;
   const isCacheFresh = () => cached && (Date.now() - topPlayersCache.timestamp) < TOP_PLAYERS_CACHE_TTL_MS;
 
   const [players, setPlayers] = useState<TopPlayer[]>(cached || initialData || []);

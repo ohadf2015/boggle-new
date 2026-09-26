@@ -125,9 +125,15 @@ describe('pickTeacherBanner milestone + dismiss', () => {
 });
 
 describe('pickTeacherBanner Polar Pro trial', () => {
-  it('a live Polar trial is Pro, so it gets no banner', () => {
+  it('a live Polar trial is Pro, so it gets the lifecycle banner not the access countdown', () => {
     expect(pickTeacherBanner({
-      hasTrial: true, isAdmin: false, hasPro: true, polarTrialExpired: false,
+      hasTrial: true, isAdmin: false, hasPro: true, polarTrialExpired: false, polarTrialing: true,
+    })).toBe('trialing');
+  });
+
+  it('a paying Pro teacher still gets no banner', () => {
+    expect(pickTeacherBanner({
+      hasTrial: true, isAdmin: false, hasPro: true, polarTrialExpired: false, polarTrialing: false,
     })).toBe('none');
   });
 

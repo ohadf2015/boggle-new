@@ -278,7 +278,7 @@ const ja = {
           "line": "10つの世界で100ステージ。登って征服しよう。"
         },
         "wordTowerV2": {
-          "title": "ワードタワーV2",
+          "title": "ワードタワー",
           "line": "言葉を積み上げて、物理演算を楽しもう。"
         },
         "arena": {
@@ -832,9 +832,9 @@ const ja = {
       "long-bow": "ロングボウ",
       "short-sword": "ショートソード",
       "storm-rune": "嵐のルーン",
-      "twin-ink": "ふたごのインク",
+      "twin-ink": "はじまりのインク",
       "echo-stone": "こだまの石",
-      "magnet": "マグネット",
+      "magnet": "スコアマグネット",
       "heart-locket": "ハートのロケット",
       "hourglass": "砂時計",
       "lens-of-insight": "洞察のレンズ",
@@ -883,7 +883,17 @@ const ja = {
       "bullet1": "難度が上がる敵との戦い",
       "bullet2": "レアなワールドスキンと強力な遺物を獲得",
       "bullet3": "ランキングボードで順位を獲得しよう",
-      "signIn": "ログインして遊ぶ"
+      "playBattle": "無料バトルで遊ぶ",
+      "signIn": "ログインして遊ぶ",
+      "back": "戻る",
+      "backToGate": "バトル選択に戻る",
+      "demoLabel": "無料バトル",
+      "demoResult": "バトル完了",
+      "demoWon": "勝利！",
+      "demoLost": "敗北…",
+      "demoScore": "スコア: {score}",
+      "saveProgress": "ログインして進捗を保存してコインを獲得",
+      "playAgain": "もう一度遊ぶ"
     },
     "title": "アドベンチャー",
     "start": "スタート",
@@ -1464,7 +1474,7 @@ const ja = {
       }
     },
     "coins": { "run": "今回のコイン {n}" },
-    "streak": { "a11y": "パーフェクト連続 ×{n}", "toRare": "パーフェクト{n}回 → レアの箱", "crate": "箱", "meterA11y": "パーフェクト連続{n}、×{mult}。レアの箱まであと{rare}。" },
+    "streak": { "a11y": "パーフェクト連続 ×{n}", "toRare": "パーフェクト{n}回 → レアの箱", "crate": "箱", "meterA11y": "パーフェクト連続{n}、×{mult}。レアの箱まであと{rare}。" , "label": "ストリーク" },
     "milestone": { "floors": "階、達成!", "a11y": "{n}階" },
     "chest": {
       "tier": { "common": "ノーマル", "rare": "レア", "epic": "エピック" },
@@ -1621,12 +1631,12 @@ const ja = {
       "friend": "友だち",
       "back": "もう一回",
     },
-    "cardTitle": "ワードタワー v2",
+    "cardTitle": "ワードタワー",
     "cardDesc": "本物の物理演算 — ベータ版",
     "collapsed": "タワー崩壊！",
     "newBest": "自己ベスト更新！",
-    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "effect": "{name}：残り{n}", "exit": "終了して受け取る", "daily": "デイリー", "dailyBadge": "デイリー {date}"},
-    "stability": {"label": "安定度", "a11y": "安定度：{band}、リスク{pct}%", "steady": "安定", "wobbly": "グラグラ", "danger": "危険！"},
+    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "effect": "{name}：残り{n}", "exit": "終了して受け取る", "daily": "デイリー", "dailyBadge": "デイリー {date}", "menu": "メニュー", "banked": "獲得済み"},
+    "stability": {"label": "安定度", "a11y": "安定度：{band}、リスク{pct}%", "steady": "安定", "wobbly": "グラグラ", "danger": "中央を狙え！"},
     "biome": {"downtown": "ダウンタウン", "sunset": "夕焼けの屋上", "clouds": "雲海", "jetstream": "ジェット気流", "aurora": "オーロラ", "orbit": "軌道", "cosmos": "深宇宙"},
     "newSky": "新しい空",
     "call": {"perfect": {"0": "パーフェクト！", "1": "ど真ん中！", "2": "ぴったり！", "3": "完璧！"}, "good": {"0": "ナイス！", "1": "いいね！", "2": "きれい！", "3": "スムーズ！"}, "sloppy": {"0": "グラグラ…", "1": "あぶない！", "2": "ギリギリ！"}, "miss": {"0": "おっと！", "1": "うわっ！", "2": "崩れる！"}, "combo": {"double": "ダブル！", "triple": "トリプル！", "quad": "クアッド！", "unstoppable": "止まらない ×{n}！", "legendary": "伝説 ×{n}！"}, "word": {"big": "長い単語！", "mega": "超長い単語！"}},
@@ -13055,7 +13065,8 @@ const ja = {
       "trialActive": "Proトライアル",
       "trialDayLeft": "残り1日",
       "trialDaysLeft": "残り{count}日",
-      "trialEndsToday": "本日期限"
+      "trialEndsToday": "本日期限",
+      "trialEnded": "トライアル終了"
     },
     "proGate": {
       "analytics": {
@@ -13084,6 +13095,7 @@ const ja = {
       "proCtaHint": "すべてのゲーム・生徒・印刷用PDFを解除します。",
       "weeklySubject": "今週のクラス",
       "polarTrialExpiredLine": "Teacher Proのトライアルが終了しました。クラスのレポートを残すには再開してください。",
+      "polarTrialActiveLine": "Teacher Proトライアルは残り{count}日です。月額9ドルでレポートと無制限クラスを続けられます。",
       "regionLabel": "{{classroom}} の進捗ダイジェスト",
       "scheduleReteachCta": "約{{days}}日後に再指導Liveを予定",
       "scheduleReteachConfirm": "{{date}}（約{{days}}日後）に再指導Liveを予定しました。カレンダー招待を開きました。",
@@ -13137,6 +13149,11 @@ const ja = {
       "trialEndedTitle": "Teacher Proのトライアルが終了しました",
       "trialEndedBody": "月額9ドルで再開できます。無料トライアルの再付与ではありません。",
       "trialEndedCta": "Proを続ける — 月額9ドル",
+      "trialLifecycleTitle": "Teacher Proトライアル残り{count}日",
+      "trialLifecycleTitleToday": "Teacher Proトライアルは本日期限です",
+      "trialLifecycleTitleOne": "Teacher Proトライアル残り1日",
+      "trialLifecycleBody": "無制限クラスと印刷レポートを継続 — トライアル後は月額9ドル。",
+      "trialLifecycleCta": "Proを続ける — 月額9ドル",
       "checkoutError": "決済を開始できませんでした。もう一度お試しください。",
       "signInRequired": "Teacher Proにアップグレードするにはサインインしてください。",
       "currentPlan": "現在のプランです",
@@ -18373,10 +18390,21 @@ const ja = {
     }
   },
   "newModes": {
-    "title": "新しいゲームモード",
-    "description": "冒険があなたを待っています。毎日のタワーを試してください。",
-    "playAdventure": "冒険をプレイ",
-    "playWordTower": "ワードタワーをプレイ"
+    "title": "新しい遊び方がふたつ",
+    "description": "10の世界をめぐる冒険と、崩れるかもしれないタワー。",
+    "adventureTitle": "アドベンチャー",
+    "adventureLine": "10の世界、100のステージ。最後に待つのは言葉を喰らうドラゴン。",
+    "wordTowerTitle": "ワードタワー",
+    "wordTowerLine": "言葉を積んで空の上まで。ぐらつく一語で全部くずれる。",
+    "playAdventure": "冒険に出る",
+    "playWordTower": "積みはじめる",
+    "loot": {
+      "title": "プレイするたびにお宝のチャンス",
+      "line": "アドベンチャーではレリック、ワードタワーでは宝箱。中身をのぞいてみよう。",
+      "tap": "宝箱をあける",
+      "again": "もう一回",
+      "chest": "{tier}の宝箱"
+    }
   },
   // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
   "mpUi": {

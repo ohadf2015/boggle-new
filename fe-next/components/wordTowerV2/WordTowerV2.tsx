@@ -22,7 +22,7 @@ import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { type TowerGear, gearFromEstate } from '@/lib/wordTowerV2/gear';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
-import { V2TopBar } from './V2TopBar';
+import { V2Hud } from './V2Hud';
 import { V2Dock } from './V2Dock';
 import { V2Results } from './V2Results';
 import { RevengeHome } from './rivals/RevengeHome';
@@ -31,13 +31,12 @@ import { RunRewards } from './rewards/RunRewards';
 import { useRewardsFlow } from './rewards/useRewardsFlow';
 import { useEstate } from './useEstate';
 import { DistrictScreen } from './estate/DistrictScreen';
-import { perkChips } from './estate/estateArt';
 import { EstateButton } from './estate/EstateButton';
-import { PerkChips } from './estate/PerkChips';
 import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
 import { useV2Ready } from './useV2Ready';
 import { BraceControl } from './rescue/BraceControl';
+import { StabilityBrace } from './rescue/StabilityBrace';
 import { type RescueReject, useBrace } from './rescue/useBrace';
 import { WreckScene } from './WreckScene';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -595,12 +594,9 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         />
       ) : null}
 
-      {phase !== 'over' && !smashing && !district && run.floors === 0 && !rival && perkChips(estateApi.perks).length > 0 ? (
-        <PerkChips t={t} perks={estateApi.perks} onOpen={() => setDistrict(true)} />
-      ) : null}
 
       {phase !== 'over' && !smashing && !district ? (
-        <V2TopBar
+        <V2Hud
           t={t}
           heightM={heightM}
           score={score}
@@ -612,7 +608,6 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           raids={estateApi.inbox.length}
           coinsRef={coinsRef}
           onOpenEstate={() => setDistrict(true)}
-          risk={game.risk}
           onExit={exitFlow.goHome}
           barRef={setBarEl}
           wide={wide}
@@ -634,20 +629,14 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         reducedMotion={reducedMotion}
       />
       {phase !== 'over' && !smashing && !district ? <BraceControl t={t} api={braceApi} reducedMotion={reducedMotion} /> : null}
-      <V2Celebrations t={t} callout={game.callout} banners={game.banners} onBannerDone={game.shiftBanner} swinging={phase === 'swinging'} />
-      {/* One hint at a time, only on the first floor: spell it, then edit it,
-          then drop it. It sits ABOVE the dock and never over the tower. */}
-      {phase !== 'over' && run.floors === 0 && heightM < 0.5 && !rival ? (
-        <div className="pointer-events-none absolute inset-x-4 bottom-[calc(var(--wt2-dock,17rem)+0.75rem)] z-20 mx-auto w-fit max-w-xs rounded-neo border-neo-thick border-black bg-neo-cream px-3 py-1.5 text-center font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-pop lg:max-w-sm lg:px-5 lg:py-2.5 lg:text-lg">
-          {t(
-            phase === 'swinging'
-              ? 'wordTowerV2.hint.drop'
-              : selected.length >= 2
-                ? 'wordTowerV2.editHint'
-                : 'wordTowerV2.hint.spell',
-          )}
-        </div>
-      ) : null}
+      <V2Celebrations
+        t={t}
+        callout={game.callout}
+        banners={game.banners}
+        onBannerDone={game.shiftBanner}
+        swinging={phase === 'swinging'}
+        rivalChallenge={!!rival && phase === 'composing' && run.floors === 0}
+      />
       {rival && phase === 'composing' && run.floors === 0 ? (
         <div className="pointer-events-none absolute inset-x-4 top-[calc(var(--wt2-hud,7rem)+0.5rem)] z-20 mx-auto max-w-sm rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-2 text-center font-neo-display text-base font-bold text-neo-navy shadow-hard animate-neo-pop">
           {t('wordTowerV2.wreck.challenge', { name: rivalName })}
@@ -682,6 +671,16 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         accentHex={accentHex}
         reducedMotion={reducedMotion}
         canPutBack={!!preSubmitRef.current}
+        stabilitySlot={
+          phase !== 'over' && !smashing && !district ? (
+            <StabilityBrace
+              t={t}
+              risk={game.risk}
+              api={braceApi}
+              reducedMotion={reducedMotion}
+            />
+          ) : undefined
+        }
         onScramble={scramble}
         onSelectTile={selectTile}
         onDeselectTile={deselectTile}

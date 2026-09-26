@@ -1,33 +1,117 @@
 {
-  "generatedAt": "2026-09-25T08:17:12.848Z",
+  "generatedAt": "2026-09-26T08:01:40.826Z",
   "commits": [
     {
-      "sha": "46f7bead77a0cedb2a78bb9162499f6e033dc98f",
-      "shortSha": "46f7bea",
-      "subject": "test(drills): mock daily-quest fire-and-forget in processCompletion test",
+      "sha": "ba2669f9fd4a1b3a8afba4711444f636efaf0429",
+      "shortSha": "ba2669f",
+      "subject": "Merge origin/master into local grok teacher-pro-trial merge (keep master's newer versions)",
       "author": "Ohad Fisher",
-      "date": "2026-09-25T11:16:46+03:00"
+      "date": "2026-09-25T13:54:09+03:00"
     },
     {
-      "sha": "c7efd579d873b0f4d30ce89d8000645f7044a768",
-      "shortSha": "c7efd57",
-      "subject": "wip(seo): brain landing copy — 4 drills, Brain Check, honest claims",
+      "sha": "4f6944111fc5c91ab99edd2bd6515e45fb89b1fd",
+      "shortSha": "4f69441",
+      "subject": "fix(teacher): order paginated export queries by id",
       "author": "Ohad Fisher",
-      "date": "2026-09-25T11:10:25+03:00"
+      "date": "2026-09-25T13:31:45+03:00"
     },
     {
-      "sha": "b2ac5b37bd851ec2348dc0a0302438c0c37507a0",
-      "shortSha": "b2ac5b3",
-      "subject": "wip(brain): unified drill shell, brain check UI, hub rewrite, removals, i18n",
+      "sha": "f354f2a43b6f01a2ed55ad5bafb50024eab3d2f1",
+      "shortSha": "f354f2a",
+      "subject": "feat(teacher): Pro export-all-classes CSV",
       "author": "Ohad Fisher",
-      "date": "2026-09-25T10:48:57+03:00"
+      "date": "2026-09-25T13:26:01+03:00"
     },
     {
-      "sha": "96f735139bde83c1ed761f3cc4340f2bfdb4f837",
-      "shortSha": "96f7351",
-      "subject": "wip(brain): brain check stats core, staircase, server pipeline",
+      "sha": "83b0ce8f342b75a6f9368ff3187fe7c003332d9a",
+      "shortSha": "83b0ce8",
+      "subject": "fix(brain): Brain Check cooldown gate, steadier check boards, accurate Memory Hunt copy",
       "author": "Ohad Fisher",
-      "date": "2026-09-25T10:43:58+03:00"
+      "date": "2026-09-25T13:31:10+03:00"
+    },
+    {
+      "sha": "f6edb4946b6a6f050588a3a64c2374ca2e72b08b",
+      "shortSha": "f6edb49",
+      "subject": "fix(education): hub, SEO copy and schema stop selling a $149/yr school plan",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T13:03:35+03:00"
+    },
+    {
+      "sha": "a95842baf187686bc02de3ee0030c4f495115831",
+      "shortSha": "a95842b",
+      "subject": "fix(education): for-schools copy only promises what ships",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T13:01:11+03:00"
+    },
+    {
+      "sha": "5b2bb36e6f2dd2aee48e929e78828cd4697bc075",
+      "shortSha": "5b2bb36",
+      "subject": "fix(ads): Academy solo play stays ad-free",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T12:42:20+03:00"
+    },
+    {
+      "sha": "ec2f3a43726fc5d4032cb077f8ac0e30e2bc0f32",
+      "shortSha": "ec2f3a4",
+      "subject": "fix(brain): Brain Check measures what it says — resolution floor, clean metrics, floor-safe levels",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T12:33:55+03:00"
+    },
+    {
+      "sha": "e8cc49385833cc19aae5918f01b4db58791722a1",
+      "shortSha": "e8cc493",
+      "subject": "fix(brain): check badge + drill names fit 390px phones",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T12:20:00+03:00"
+    },
+    {
+      "sha": "4d399bf00ec8d2a23d004720cbd3ba08dd48f29f",
+      "shortSha": "4d399bf",
+      "subject": "feat(teacher): word mastery trends card in Pro analytics",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T10:43:09+03:00"
+    },
+    {
+      "sha": "e0f51d499a1d710056822f9a9888837e2b66ecea",
+      "shortSha": "e0f51d4",
+      "subject": "fix(education): teacher module audit — Pro gate, roster race, XP, i18n, trial copy",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T10:43:00+03:00"
+    },
+    {
+      "sha": "be3bb86667340a7d42ab4bd8b552a41ebc9cd5f0",
+      "shortSha": "be3bb86",
+      "subject": "fix(ads): teacher/education/student surfaces carry no ads in any format",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T10:42:42+03:00"
+    },
+    {
+      "sha": "18c681ebaf3a3c6a28cc573c0fb99f6785c3f4b6",
+      "shortSha": "18c681e",
+      "subject": "feat(brain): Brain Drills v2 — honest Brain Check measurement, adaptive staircase, leaner hub",
+      "author": "Ohad Fisher",
+      "date": "2026-09-25T11:36:23+03:00"
+    },
+    {
+      "sha": "bc8c69436e4c9d4514f3a7cda5f770e08819c821",
+      "shortSha": "bc8c694",
+      "subject": "ci(supabase): fix broken migrations workflow — Management-API migrator instead of 'supabase db push' (#1146)",
+      "author": "ohadf2015",
+      "date": "2026-09-25T11:31:08+03:00"
+    },
+    {
+      "sha": "edaaf300820c827d22b09df49f75640296a6f80d",
+      "shortSha": "edaaf30",
+      "subject": "fix(audio): stop music beds on route leave (multiplayer + solo) (#1147)",
+      "author": "ohadf2015",
+      "date": "2026-09-25T11:31:03+03:00"
+    },
+    {
+      "sha": "364c8211d23da26fe36b664a9eb7d75c5f2e1b4a",
+      "shortSha": "364c821",
+      "subject": "feat(education): Teacher Pro 14-day Polar trial (trial → paid) (#1143)",
+      "author": "ohadf2015",
+      "date": "2026-09-25T11:09:34+03:00"
     },
     {
       "sha": "46d892797551a3c9f0ce96563bd712990003c33d",
@@ -44,102 +128,18 @@
       "date": "2026-09-24T23:46:39+03:00"
     },
     {
+      "sha": "61fa0f0266d7d7b69f8d73c83e8fee90aef285e6",
+      "shortSha": "61fa0f0",
+      "subject": "Merge grok/boggle-new-teacher-pro-trial-20260924 (approved via company-brain)",
+      "author": "Ohad Fisher",
+      "date": "2026-09-24T23:22:59+03:00"
+    },
+    {
       "sha": "8927dbc70a7778339877a3a5929e6b5ee511c1d7",
       "shortSha": "8927dbc",
       "subject": "fix(education): satisfy repo guards — CSS island bob, Academy frame shell contract",
       "author": "Ohad Fisher",
       "date": "2026-09-24T23:06:03+03:00"
-    },
-    {
-      "sha": "a1088ab7afbde3a62dd737b660c5b3fd933a6e2d",
-      "shortSha": "a1088ab",
-      "subject": "fix(teacher): Teacher HQ, classes and reports fit every screen; GO LIVE holds still",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T22:45:05+03:00"
-    },
-    {
-      "sha": "9ef0c23aedd94fc94b7057f0ce65a001a29a19d1",
-      "shortSha": "9ef0c23",
-      "subject": "fix(education): live stage fits every screen — TV-scale launch, reachable reteach, waiting stage",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T22:05:08+03:00"
-    },
-    {
-      "sha": "9db5bf82a24d13180e951dbe322f39ebb5e0020c",
-      "shortSha": "9db5bf8",
-      "subject": "fix(student): lessons, awards and join fit every screen in the Academy frame",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T21:33:01+03:00"
-    },
-    {
-      "sha": "3bdbb8f0e8afdc6f4e70f06d804e912260da7a6a",
-      "shortSha": "3bdbb8f",
-      "subject": "fix(i18n): common.loading shadowed by a stray \"Checking…\" in five locales",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T21:13:53+03:00"
-    },
-    {
-      "sha": "722f3ce011de2f831cc278fe756cc850d6803829",
-      "shortSha": "722f3ce",
-      "subject": "fix(education): Word Workshop + Missed Words Review fit every screen",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T20:40:32+03:00"
-    },
-    {
-      "sha": "640296f36eb5c3bda0c76e937fadf5d1de0fd676",
-      "shortSha": "640296f",
-      "subject": "fix(student): Academy Map fits every screen — landscape phones, tablets, TV",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T19:17:26+03:00"
-    },
-    {
-      "sha": "0ebd05756f872237b7bdbf56c8d332485d48992c",
-      "shortSha": "0ebd057",
-      "subject": "fix(avatar): gold purchases, avatar save, face-cropped small avatars; tidy home hub top",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T20:55:48+03:00"
-    },
-    {
-      "sha": "c9cf0042d435b616d4a9c52f45202b907a4c9f64",
-      "shortSha": "c9cf004",
-      "subject": "feat(singleplayer): focused solo results — no auto-start, next game above the fold",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T22:18:03+03:00"
-    },
-    {
-      "sha": "c2c7ca9279e362b2b44a8020387b8118f0f8b3e4",
-      "shortSha": "c2c7ca9",
-      "subject": "fix(i18n): drop stale \"admin preview\" from public Word Tower card",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T22:18:03+03:00"
-    },
-    {
-      "sha": "e43cb12b7182c5de6b3fe091326ce41bc9e5fc18",
-      "shortSha": "e43cb12",
-      "subject": "fix(singleplayer): race bar reads live bot scores (bot looked idle)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T22:18:02+03:00"
-    },
-    {
-      "sha": "31e145fffbc667dfcb3d4c81c58a0177b51da194",
-      "shortSha": "31e145f",
-      "subject": "fix(avatar): hide the bottom ad while the avatar builder is open",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T13:48:24+03:00"
-    },
-    {
-      "sha": "b50fc41a0ea2ddad2ba96df6950f53a69f7b8ff5",
-      "shortSha": "b50fc41",
-      "subject": "chore(education): mark decorative academy art <img> as intentional (pre-push lint is --max-warnings=0)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T13:40:09+03:00"
-    },
-    {
-      "sha": "5daa12ed6930803322aab69085e48e4d3464de7d",
-      "shortSha": "5daa12e",
-      "subject": "feat(education): Word Workshop + Missed Words Review academy modes",
-      "author": "Ohad Fisher",
-      "date": "2026-09-24T13:10:30+03:00"
     }
   ]
 }

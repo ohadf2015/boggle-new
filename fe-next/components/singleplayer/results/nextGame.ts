@@ -87,9 +87,9 @@ function applyNewPlayerRotation(
  * Public modes a solo player has likely never seen, one per results screen,
  * rotating with rounds played. Labels come from the landing table, so no new
  * copy. Only modes the landing hub shows EVERY player — admin/beta previews
- * (adventure, quickPlay, crossword, wordTowerV2…) stay out.
+ * (quickPlay, crossword…) stay out.
  */
-export const DISCOVERY_MODES = ['wordTower', 'connections', 'blast', 'wordCraft'] as const;
+export const DISCOVERY_MODES = ['wordTowerV2', 'connections', 'blast', 'wordCraft'] as const;
 
 const VARIANT_ACCENT: Partial<Record<ModeCubeVariant, NextGameAccent>> = {
   lime: 'lime', cyan: 'cyan', blue: 'cyan', orange: 'amber', pink: 'pink', purple: 'pink',

@@ -21,7 +21,16 @@ export type RelicEffect =
   | { type: 'mult'; factor: (w: WordCtx) => number }
   | { type: 'stat' };
 
-export interface RelicDef { rarity: Rarity; effect: RelicEffect }
+export interface RelicDef {
+  rarity: Rarity;
+  effect: RelicEffect;
+  /**
+   * Applies to EVERY word unconditionally (magnet). Pulsing it per word is
+   * noise, so `triggeredRelics` skips it and `levelStartFire` names it once
+   * when the level is dealt, beside the other always-on passives.
+   */
+  alwaysOn?: boolean;
+}
 
 const flat = (bonus: (w: WordCtx) => number): RelicEffect => ({ type: 'flat', bonus });
 const mult = (factor: (w: WordCtx) => number): RelicEffect => ({ type: 'mult', factor });
@@ -34,7 +43,7 @@ export const RELICS: Record<RelicId, RelicDef> = {
   'storm-rune': { rarity: 'common', effect: flat((w) => (w.len === 5 ? 5 : 0)) },
   'twin-ink': { rarity: 'common', effect: mult((w) => (w.index === 0 ? 2 : 1)) },
   'echo-stone': { rarity: 'rare', effect: flat((w) => Math.min(w.index, 10)) },
-  magnet: { rarity: 'rare', effect: mult(() => 1.2) },
+  magnet: { rarity: 'rare', effect: mult(() => 1.2), alwaysOn: true },
   'heart-locket': { rarity: 'common', effect: stat },
   hourglass: { rarity: 'common', effect: stat },
   'lens-of-insight': { rarity: 'common', effect: stat },

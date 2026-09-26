@@ -4,7 +4,6 @@ import React, { useCallback } from 'react';
 import { cn } from '../../../lib/utils';
 import { getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
 import { HowToArt, ModeArt } from '@/components/multiplayer/lobby/ModeArt';
-import { useExperiment } from '@/hooks/useExperiment';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
 
@@ -31,7 +30,6 @@ const MODES: Array<{ mode: GameModeOption; nameKey: string }> = [
   { mode: 'word-hunt', nameKey: 'gameModes.wordHunt.name' },
   { mode: 'wheel-rush', nameKey: 'gameModes.wheelRush.name' },
   { mode: 'blast', nameKey: 'gameModes.blast.name' },
-  { mode: 'word-tower', nameKey: 'wordTower.cardTitle' },
   { mode: 'sealed-bid', nameKey: 'gameModes.sealedBid.name' },
   { mode: 'crossword', nameKey: 'gameModes.crossword.name' },
 ];
@@ -68,11 +66,9 @@ export function BattleModeCard({
 }: BattleModeCardProps): React.ReactElement {
   const handleSelect = useCallback((mode: GameModeOption) => setSelectedGameMode(mode), [setSelectedGameMode]);
 
-  // Word Tower stays admin-only AND behind the `word-tower` experiment; Sealed
-  // Bid needs curated EN/HE racks; Crossword is an admin preview.
-  const { variant: wordTowerVariant } = useExperiment('word-tower');
+  // Sealed Bid needs curated EN/HE racks; Crossword is an admin preview.
+  // (Legacy MP Word Tower left the picker on master — bf90dc061.)
   const visibleModes = MODES.filter(({ mode }) => {
-    if (mode === 'word-tower') return isAdmin && wordTowerVariant === 'on';
     if (mode === 'sealed-bid') return isAdmin && (language === 'en' || language === 'he');
     if (mode === 'crossword') return isAdmin;
     return true;

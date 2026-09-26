@@ -15,7 +15,7 @@
  * is still loading we show nothing rather than an upsell a later answer retracts
  * (recurring pitfall class 1).
  */
-export type TeacherBanner = 'trial' | 'pro' | 'reactivate' | 'none';
+export type TeacherBanner = 'trial' | 'pro' | 'reactivate' | 'trialing' | 'none';
 
 export function pickTeacherBanner({
   hasTrial,
@@ -26,6 +26,7 @@ export function pickTeacherBanner({
   milestoneLoading = false,
   proAskDismissed = false,
   polarTrialExpired = false,
+  polarTrialing = false,
 }: {
   hasTrial: boolean;
   isAdmin: boolean;
@@ -42,14 +43,22 @@ export function pickTeacherBanner({
    * so the dashboard never stacks three Pro asks.
    */
   polarTrialExpired?: boolean;
+  /**
+   * Live Polar Teacher Pro trial (hasPro + trialing). One days-remaining
+   * banner with a paid checkout CTA — not the access-trial countdown.
+   */
+  polarTrialing?: boolean;
 }): TeacherBanner {
   // Pro is checked FIRST, and so is "Pro has not answered yet". A gifted-Pro
   // teacher keeps the trial deadline she was granted Pro to replace; checking
   // `hasTrial` first put a trial countdown over a Pro dashboard, and turned it
   // into an "Upgrade to Pro" card the day that dead deadline passed.
-  // A live Polar trial is Pro, so it also lands here (the days-left badge is
-  // not a banner). An expired Polar trial is the single ask below.
-  if (proLoading || hasPro) return 'none';
+  // A live Polar trial is still Pro, but conversion needs the lifecycle banner
+  // (days left + Keep Pro CTA). Paid/gifted Pro stays quiet. An expired Polar
+  // trial is the single reactivation ask below.
+  if (proLoading) return 'none';
+  if (hasPro && polarTrialing) return 'trialing';
+  if (hasPro) return 'none';
   if (polarTrialExpired) return 'reactivate';
   if (hasTrial) return 'trial';
   if (isAdmin) return 'none';

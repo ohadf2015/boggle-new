@@ -23,6 +23,7 @@ import { startAllCronJobs, stopAllCronJobs } from '../backend/services/cronSched
 import { initCronQueue, registerAllCronJobs, shutdownCronQueue } from '../backend/queues/cronQueue';
 import type { ScheduledTask } from 'node-cron';
 import { isClientDisconnectError } from './clientDisconnect';
+import { cronsDisabledReason } from './cronGate';
 
 /**
  * Shutdown handler function type
@@ -122,10 +123,11 @@ export async function initializeServer(io: Server): Promise<void> {
   }
 
   // Start cron schedulers — BullMQ (durable, with retries) or node-cron (legacy).
-  // DISABLE_CRONS=1: local QA servers (dev or `npm start` in a worktree) share the
-  // production DB + service key; they must not run prod jobs (emails, promotions).
-  if (process.env.DISABLE_CRONS === '1') {
-    lifecycleLogger.warn('Cron schedulers disabled (DISABLE_CRONS=1)');
+  // Local QA servers and non-canonical Railway services share the production DB +
+  // service key; they must not run prod jobs (emails, promotions). See cronGate.
+  const cronsOff = cronsDisabledReason(process.env);
+  if (cronsOff) {
+    lifecycleLogger.warn(`Cron schedulers disabled (${cronsOff})`);
   } else if (process.env.USE_BULLMQ === 'true') {
     try {
       initCronQueue();

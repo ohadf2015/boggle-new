@@ -62,6 +62,17 @@ describe('TeacherPlanBadge', () => {
     expect(screen.getByRole('link')).toHaveAttribute('href', '/en/teacher/upgrade');
   });
 
+  it('a lapsed Polar trial says trial ended instead of a plain free plan', () => {
+    mockUseTeacherPro.mockReturnValue({
+      hasPro: false, loading: false, source: 'polar', status: 'canceled',
+      periodEnd: null, trialExpires: null, trialUsed: true, grant: null, grantExpired: false,
+    });
+    render(<TeacherPlanBadge />);
+    expect(screen.getByTestId('teacher-plan-badge')).toHaveAttribute('data-plan', 'free');
+    expect(screen.getByText('teacher.plan.trialEnded')).toBeInTheDocument();
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/en/teacher/upgrade');
+  });
+
   it('a lapsed gift says so instead of pretending it never existed', () => {
     mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, source: 'admin_grant', periodEnd: '2026-01-01T00:00:00Z', grant: null, grantExpired: true });
     render(<TeacherPlanBadge />);

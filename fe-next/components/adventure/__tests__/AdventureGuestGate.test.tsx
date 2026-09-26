@@ -24,6 +24,14 @@ vi.mock('@/components/auth/AuthModal', () => ({
   ),
 }));
 
+vi.mock('../demo/AdventureDemo', () => ({
+  AdventureDemo: ({ onExit }: any) => (
+    <div data-testid="adventure-demo">
+      <button data-testid="demo-exit" onClick={onExit}>Exit Demo</button>
+    </div>
+  ),
+}));
+
 import { AdventureGuestGate } from '../AdventureGuestGate';
 
 describe('AdventureGuestGate', () => {
@@ -108,5 +116,64 @@ describe('AdventureGuestGate', () => {
 
     const img = screen.getByAltText(/adventure|roguelike/i);
     expect(img).toBeTruthy();
+  });
+
+  it('given a guest on the map surface, when it renders, then it shows the play battle button', () => {
+    render(
+      <Suspense fallback={null}>
+        <AdventureGuestGate surface="map" />
+      </Suspense>
+    );
+
+    expect(screen.getByText('adventurePlay.guest.playBattle')).toBeTruthy();
+  });
+
+  it('given a guest clicks play battle, when they tap the button, then demo loads', async () => {
+    const user = userEvent.setup();
+    render(
+      <Suspense fallback={null}>
+        <AdventureGuestGate surface="map" />
+      </Suspense>
+    );
+
+    const playBattleButton = screen.getByText('adventurePlay.guest.playBattle');
+    await user.click(playBattleButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('adventure-demo')).toBeTruthy();
+    });
+  });
+
+  it('given the demo is active, when user clicks exit, then they return to the gate', async () => {
+    const user = userEvent.setup();
+    render(
+      <Suspense fallback={null}>
+        <AdventureGuestGate surface="map" />
+      </Suspense>
+    );
+
+    const playBattleButton = screen.getByText('adventurePlay.guest.playBattle');
+    await user.click(playBattleButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('adventure-demo')).toBeTruthy();
+    });
+
+    const demoExitButton = screen.getByTestId('demo-exit');
+    await user.click(demoExitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('adventurePlay.guest.pitch')).toBeTruthy();
+    });
+  });
+
+  it('given the gate, when rendered, then sign-in button is still available as secondary CTA', () => {
+    render(
+      <Suspense fallback={null}>
+        <AdventureGuestGate surface="map" />
+      </Suspense>
+    );
+
+    expect(screen.getByText('adventurePlay.guest.signIn')).toBeTruthy();
   });
 });

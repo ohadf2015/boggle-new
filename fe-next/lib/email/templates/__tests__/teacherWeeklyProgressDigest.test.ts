@@ -90,8 +90,26 @@ describe('teacherWeeklyProgressDigest', () => {
       hasPro: true,
       polarTrialExpired: false,
       polarTrialExpiredLineKey: null,
+      polarTrialActive: false,
+      polarTrialDaysLeft: null,
+      polarTrialActiveLineKey: null,
     });
     expect(html).not.toContain('trial ended');
     expect(html).not.toContain('/teacher/upgrade');
+  });
+
+  it('appends a Keep-Pro nudge for a teacher still on the Polar trial', () => {
+    const { html } = teacherWeeklyProgressDigest({
+      ...digest,
+      hasPro: true,
+      polarTrialExpired: false,
+      polarTrialExpiredLineKey: null,
+      polarTrialActive: true,
+      polarTrialDaysLeft: 6,
+      polarTrialActiveLineKey: 'teacher.digest.polarTrialActiveLine',
+    });
+    expect(html).toContain('6 days left in your Teacher Pro trial');
+    expect(html).toContain('Keep Pro — $9/mo');
+    expect(html).toContain('https://www.lexiclash.live/en/teacher/upgrade');
   });
 });

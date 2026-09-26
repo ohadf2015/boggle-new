@@ -168,6 +168,7 @@ export const WorldNode = memo(function WorldNode({
           <AdaptiveMotion.button
             onClick={isUnlocked ? onClick : () => setShowStarGate(true)}
             data-testid={`world-${world.id}`}
+            aria-current={isNextWorld ? 'step' : undefined}
             aria-label={isUnlocked
               ? `${t('adventure.playWorld')} ${worldName} - ${currentStars}/${totalWorldStars} ${t('adventure.stars')}, ${completedLevels}/${LEVELS_PER_WORLD} ${t('adventure.levelsCompleted')}`
               : `${worldName} - ${t('adventure.locked')}, ${t('adventurePlay.beatPrevBoss')}`

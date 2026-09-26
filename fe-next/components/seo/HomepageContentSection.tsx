@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import Link from 'next/link';
 import { FreshClose } from '@/components/landing/fresh/FreshClose';
 import { FreshFaqMore } from '@/components/landing/fresh/FreshFaqMore';
 import { FreshFaqAll, FreshReadMore } from '@/components/landing/fresh/FreshFaqLinks';
@@ -97,6 +98,7 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
 
 export function HomepageContentSection({ content, locale }: HomepageContentSectionProps) {
   const l = labels[locale] ?? labels.en;
+  const siteAnswer = content.faq.find((item) => item.question === 'What is www.lexiclash.live?');
   const shown = content.faq.slice(0, FAQ_VISIBLE);
   const folded = content.faq.slice(FAQ_VISIBLE);
 
@@ -119,6 +121,28 @@ export function HomepageContentSection({ content, locale }: HomepageContentSecti
         aria-label={l.about}
         className="mx-auto w-full max-w-3xl px-4 pb-24 pt-24 font-neo-body text-neo-cream sm:px-6 md:pb-40 md:pt-32"
       >
+        {siteAnswer && (
+          <section aria-labelledby="what-is-lexiclash-live" className="mb-10">
+            <h2
+              id="what-is-lexiclash-live"
+              className="font-neo-display text-xl font-bold leading-tight text-neo-cream text-balance"
+            >
+              {siteAnswer.question}
+            </h2>
+            <p
+              className="mt-3 max-w-[56ch] font-neo-body text-base leading-relaxed text-neo-cream/90 md:text-lg"
+              data-speakable="true"
+            >
+              {siteAnswer.answer}
+            </p>
+            <Link
+              href={`/${locale}/multiplayer`}
+              className="mt-5 inline-block rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
+            >
+              Play LexiClash free
+            </Link>
+          </section>
+        )}
         <section aria-labelledby="home-faq-title">
           <div
             data-faq-card

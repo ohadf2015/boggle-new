@@ -116,7 +116,9 @@ export type GrowthEvent =
   | 'daily_last_chance_clicked'
   // Adventure
   | 'adventure_guest_gate_viewed' // guest gate shown; props { surface: 'map'|'achievements' }
-  | 'adventure_guest_signin_clicked' // guest clicked sign-in on gate; props { surface: 'map'|'achievements' }
+  | 'adventure_guest_signin_clicked' // guest clicked sign-in on gate; props { surface: 'map'|'achievements'|'demo' }
+  | 'adventure_demo_started' // guest clicked "Play a free battle"; props {}
+  | 'adventure_demo_finished' // demo fight ended; props { won: boolean, score: number }
   | 'adventure_level_start'
   | 'adventure_level_pass'
   | 'adventure_level_fail'
@@ -447,8 +449,10 @@ export type GrowthEvent =
   | 'new_modes_announcement_shown'
   | 'new_modes_announcement_clicked'
   | 'new_modes_announcement_dismissed'
+  //   new_modes_loot_peek: player opened the spotlight's loot chest (LootPeek). Props: { item, roll }.
+  | 'new_modes_loot_peek'
   // Featured mode card engagement (homepage + daily hub).
-  //   featured_mode_card_clicked: player clicked a promoted mode card. Props: { mode: string, surface: 'hub'|'desktop' }.
+  //   featured_mode_card_clicked: player clicked a promoted mode card. Props: { mode: string, surface: 'hub'|'desktop'|'fresh'|'returning' } (fresh/returning = NewModesSpotlight).
   | 'featured_mode_card_clicked'
   // SEO landing page CTAs (measure mode discoverability via organic search).
   //   mode_landing_play_clicked: player clicked "Play" from an SEO landing page. Props: { mode: string }.

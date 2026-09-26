@@ -30,8 +30,8 @@ const AdventureView = nextDynamic(
 );
 
 /**
- * Adventure Mode page route — public. AdventureView owns the auth split:
- * guests get the guest gate/demo, signed-in players get the full game.
+ * Adventure Mode page route — public and indexed. AdventureView owns the
+ * auth split: guests get a playable demo battle, signed-in players the full map.
  */
 export default function AdventurePageClient(): React.JSX.Element {
   return (

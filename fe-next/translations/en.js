@@ -278,7 +278,7 @@ const en = {
           "line": "100 levels across 10 worlds. Climb and conquer."
         },
         "wordTowerV2": {
-          "title": "Word Tower V2",
+          "title": "Word Tower",
           "line": "Stack words, watch physics unfold."
         },
         "arena": {
@@ -832,9 +832,9 @@ const en = {
       "long-bow": "Long Bow",
       "short-sword": "Short Sword",
       "storm-rune": "Storm Rune",
-      "twin-ink": "Twin Ink",
+      "twin-ink": "Opening Ink",
       "echo-stone": "Echo Stone",
-      "magnet": "Magnet",
+      "magnet": "Score Magnet",
       "heart-locket": "Heart Locket",
       "hourglass": "Hourglass",
       "lens-of-insight": "Lens of Insight",
@@ -883,7 +883,17 @@ const en = {
       "bullet1": "Battle through increasingly difficult encounters",
       "bullet2": "Unlock rare world skins and powerful relics",
       "bullet3": "Claim your rank on the leaderboard",
-      "signIn": "Sign in to play"
+      "playBattle": "Play a free battle",
+      "signIn": "Sign in to play",
+      "back": "Back",
+      "backToGate": "Back to battle selection",
+      "demoLabel": "Free battle",
+      "demoResult": "Battle complete",
+      "demoWon": "You won!",
+      "demoLost": "You lost!",
+      "demoScore": "Score: {score}",
+      "saveProgress": "Sign in to save your progress and earn coins",
+      "playAgain": "Play again"
     },
     "title": "Adventure",
     "start": "Start",
@@ -1408,7 +1418,7 @@ const en = {
       }
     },
     "coins": { "run": "{n} coins this run" },
-    "streak": { "a11y": "Perfect streak ×{n}", "toRare": "{n} perfect → rare crate", "crate": "CRATE", "meterA11y": "Perfect streak {n}, paying ×{mult}. {rare} more for a rare crate." },
+    "streak": { "a11y": "Perfect streak ×{n}", "toRare": "{n} perfect → rare crate", "crate": "CRATE", "meterA11y": "Perfect streak {n}, paying ×{mult}. {rare} more for a rare crate.", "label": "Streak" },
     "milestone": { "floors": "Floors up!", "a11y": "{n} floors" },
     "chest": {
       "tier": { "common": "Common", "rare": "Rare", "epic": "Epic" },
@@ -1565,12 +1575,12 @@ const en = {
       "friend": "Your friend",
       "back": "Play again",
     },
-    "cardTitle": "Word Tower v2",
+    "cardTitle": "Word Tower",
     "cardDesc": "Real physics — beta preview",
     "collapsed": "Tower down!",
     "newBest": "New best!",
-    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}"},
-    "stability": {"label": "Stability", "a11y": "Stability: {band}, {pct}% risk", "steady": "Steady", "wobbly": "Wobbly", "danger": "Danger!"},
+    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}", "menu": "Menu", "banked": "Banked"},
+    "stability": {"label": "Stability", "a11y": "Stability: {band}, {pct}% risk", "steady": "Steady", "wobbly": "Wobbly", "danger": "Aim center!"},
     "biome": {"downtown": "Downtown", "sunset": "Sunset Rooftops", "clouds": "Cloud Deck", "jetstream": "Jet Stream", "aurora": "Aurora", "orbit": "Orbit", "cosmos": "Deep Cosmos"},
     "newSky": "New sky",
     "call": {"perfect": {"0": "PERFECT!", "1": "BULLSEYE!", "2": "SPOT ON!", "3": "FLAWLESS!"}, "good": {"0": "NICE!", "1": "SOLID!", "2": "CLEAN!", "3": "SMOOTH!"}, "sloppy": {"0": "WOBBLY…", "1": "CLOSE ONE!", "2": "HANGING ON!"}, "miss": {"0": "OOPS!", "1": "WHOOPS!", "2": "TIMBER!"}, "combo": {"double": "DOUBLE!", "triple": "TRIPLE!", "quad": "QUAD!", "unstoppable": "UNSTOPPABLE ×{n}", "legendary": "LEGENDARY ×{n}"}, "word": {"big": "BIG WORD!", "mega": "MEGA WORD!"}},
@@ -1790,14 +1800,14 @@ const en = {
     },
     "adventure": {
       "title": "Word Adventure Game - RPG Word Puzzle Free",
-      "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
+      "description": "Battle bosses across 100 levels & 10 themed worlds. Free RPG word puzzle with fire tiles, power-ups & skill tree. No download, no signup needed.",
       "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
       "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!",
       "playLabel": "Play"
     },
     "wordTowerV2": {
       "title": "Word Tower - Stack Words, Build a Tower | Free Game",
-      "description": "Stack words to build the tallest tower! Word Tower is a physics-based word puzzle game. Chain combos, unlock power-ups, and climb the leaderboard. Free, no download required.",
+      "description": "Stack words to build the tallest tower! Chain combos, earn coins, unlock upgrades, and raid rivals. Leaderboard play, free, no download required.",
       "ogTitle": "Word Tower - Physics Word Puzzle Game",
       "ogDescription": "Stack words to build your tower! Chain combos, unlock power-ups, and compete. Free game!",
       "playLabel": "Play"
@@ -11611,7 +11621,8 @@ const en = {
       "trialActive": "Pro trial",
       "trialDayLeft": "1 day left",
       "trialDaysLeft": "{count} days left",
-      "trialEndsToday": "Ends today"
+      "trialEndsToday": "Ends today",
+      "trialEnded": "Trial ended"
     },
     "teacher": {
       "activeGames": "Active Games",
@@ -12273,6 +12284,7 @@ const en = {
       "proCtaHint": "Unlock every game, every student, and printable PDFs.",
       "weeklySubject": "This week in your class",
       "polarTrialExpiredLine": "Your Teacher Pro trial has ended. Reactivate to keep class reports.",
+      "polarTrialActiveLine": "Your Teacher Pro trial has {count} days left. Keep reports and unlimited classes for $9/mo.",
       "regionLabel": "Progress digest for {{classroom}}",
       "scheduleReteachCta": "Schedule reteach Live in ~{{days}} days",
       "scheduleReteachConfirm": "Reteach Live scheduled for {{date}} (~{{days}} days). Calendar invite opened.",
@@ -12325,6 +12337,11 @@ const en = {
       "trialEndedTitle": "Your Teacher Pro trial ended",
       "trialEndedBody": "Reactivate for $9/month. This is not another free trial.",
       "trialEndedCta": "Keep Pro — $9/mo",
+      "trialLifecycleTitle": "{count} days left in your Teacher Pro trial",
+      "trialLifecycleTitleToday": "Your Teacher Pro trial ends today",
+      "trialLifecycleTitleOne": "1 day left in your Teacher Pro trial",
+      "trialLifecycleBody": "Keep unlimited classes and printable reports — $9/mo after the trial.",
+      "trialLifecycleCta": "Keep Pro — $9/mo",
       "checkoutError": "Failed to start checkout. Please try again.",
       "signInRequired": "Please sign in to upgrade to Teacher Pro.",
       "currentPlan": "You're on this plan",
@@ -17451,10 +17468,21 @@ const en = {
     "error": "Something went wrong. Please try again."
   },
   "newModes": {
-    "title": "New Game Modes",
-    "description": "Adventure awaits. Try the daily tower.",
-    "playAdventure": "Play Adventure",
-    "playWordTower": "Play Word Tower"
+    "title": "Two new ways to play",
+    "description": "A quest across ten worlds, and a tower that can topple.",
+    "adventureTitle": "Adventure",
+    "adventureLine": "10 worlds, 100 levels and a word-hungry dragon at the top.",
+    "wordTowerTitle": "Word Tower",
+    "wordTowerLine": "Stack words sky-high. One shaky word and it all comes down.",
+    "playAdventure": "Start the quest",
+    "playWordTower": "Start building",
+    "loot": {
+      "title": "Every run can drop loot",
+      "line": "Relics in Adventure, treasure chests in Word Tower. Peek inside.",
+      "tap": "Open the chest",
+      "again": "Roll again",
+      "chest": "{tier} chest"
+    }
   },
   // @mpUi: multiplayer UI rebuild. FOUNDATION seeds; each piece adds keys ONLY in its own sub-block.
   "mpUi": {

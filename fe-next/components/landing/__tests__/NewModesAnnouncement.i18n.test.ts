@@ -35,6 +35,20 @@ describe('NewModesAnnouncement i18n coverage', () => {
     'newModes.description',
     'newModes.playAdventure',
     'newModes.playWordTower',
+    'newModes.adventureTitle',
+    'newModes.adventureLine',
+    'newModes.wordTowerTitle',
+    'newModes.wordTowerLine',
+    'newModes.loot.title',
+    'newModes.loot.line',
+    'newModes.loot.tap',
+    'newModes.loot.again',
+    'newModes.loot.chest',
+    'landing.badge.new',
+    // LootPeek names real loot through the game's own keys (grafted subtrees).
+    'adventurePlay.relic.lucky-clover',
+    'adventurePlay.relic.phoenix-feather',
+    'wordTowerV2.chest.tier.epic',
     'common.close', // aria-label on close button
   ];
 
@@ -43,6 +57,12 @@ describe('NewModesAnnouncement i18n coverage', () => {
       const subset = pickLandingMessages(catalogue, LANDING_NAMESPACES, LANDING_EXTRA_KEYS);
       const value = resolve(subset, key);
       expect(typeof value).toBe('string');
+    });
+
+    it('never shows an internal version number in a player-facing Word Tower title', () => {
+      for (const key of ['homeFresh.modes.items.wordTowerV2.title', 'wordTowerV2.cardTitle', 'newModes.wordTowerTitle']) {
+        expect(String(resolve(catalogue, key))).not.toMatch(/v\s*2|\s2$/i);
+      }
     });
   });
 });

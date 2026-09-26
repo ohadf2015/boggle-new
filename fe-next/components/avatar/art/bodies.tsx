@@ -2,16 +2,23 @@
  * Torso / outfit ("bodyStyle"). A bust cut off by the frame: shoulders from
  * y≈78 down past the bottom edge. Shirt color is the player's pick.
  */
-import type { ReactNode } from 'react';
+import type { ComponentType } from 'react';
 import { DETAIL, INK, L, O, Shaded, WHITE, shade, tint, type ArtCtx } from './kit';
 import { Neck } from './heads';
 
 const SHOULDERS = 'M16 104 Q16 86 31 81 L43 77 Q50 81 57 77 L69 81 Q84 86 84 104 Z';
 const BARE = 'M18 104 Q18 87 32 82 L43 78 L57 78 L68 82 Q82 87 82 104 Z';
 
-type BodyFn = (ctx: ArtCtx) => ReactNode;
+/**
+ * Each outfit is a real component, rendered as <Outfit ctx />. Never call one as
+ * a function: prod runs the React Compiler, which gives every PascalCase JSX
+ * function its own memo cache — called as `fn(ctx)` it borrows the caller's
+ * cache slots, and switching style handed the new outfit the old one's cache
+ * (Sentry JAVASCRIPT-NEXTJS-2A4: the ctx object rendered as a child).
+ */
+type BodyFn = ComponentType<{ ctx: ArtCtx }>;
 
-function Tee(ctx: ArtCtx) {
+function Tee({ ctx }: { ctx: ArtCtx }) {
   const collar = ctx.gender === 'female' ? 'M42 78 Q50 88 58 78' : 'M43 77.5 Q50 84 57 77.5';
   return (
     <g>
@@ -25,7 +32,7 @@ function Tee(ctx: ArtCtx) {
   );
 }
 
-function Hoodie(ctx: ArtCtx) {
+function Hoodie({ ctx }: { ctx: ArtCtx }) {
   const hood = shade(ctx.shirt, 0.22);
   return (
     <g>
@@ -43,7 +50,7 @@ function Hoodie(ctx: ArtCtx) {
   );
 }
 
-function Suit(ctx: ArtCtx) {
+function Suit({ ctx }: { ctx: ArtCtx }) {
   const jacket = ctx.shirt;
   return (
     <g>
@@ -57,7 +64,7 @@ function Suit(ctx: ArtCtx) {
   );
 }
 
-function Turtleneck(ctx: ArtCtx) {
+function Turtleneck({ ctx }: { ctx: ArtCtx }) {
   const band = shade(ctx.shirt, 0.1);
   return (
     <g>
@@ -71,7 +78,7 @@ function Turtleneck(ctx: ArtCtx) {
   );
 }
 
-function OffShoulder(ctx: ArtCtx) {
+function OffShoulder({ ctx }: { ctx: ArtCtx }) {
   return (
     <g>
       <Neck ctx={ctx} />
@@ -82,7 +89,7 @@ function OffShoulder(ctx: ArtCtx) {
   );
 }
 
-function CropTop(ctx: ArtCtx) {
+function CropTop({ ctx }: { ctx: ArtCtx }) {
   return (
     <g>
       <Neck ctx={ctx} />
@@ -106,6 +113,6 @@ export const BODIES: Record<string, BodyFn> = {
 };
 
 export function Body({ ctx, style }: { ctx: ArtCtx; style: string }) {
-  const fn = BODIES[style] ?? Tee;
-  return <>{fn(ctx)}</>;
+  const Outfit = BODIES[style] ?? Tee;
+  return <Outfit ctx={ctx} />;
 }

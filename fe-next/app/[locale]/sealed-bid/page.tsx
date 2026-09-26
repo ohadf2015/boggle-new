@@ -15,6 +15,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCoinActions } from '@/contexts/CoinContext';
+import { haptics } from '@/utils/haptics';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { GameStage } from '@/components/game/GameStage';
@@ -149,8 +150,12 @@ export default function SealedBidPage() {
       SharedFxApp.spawnBurst('sparkle-gold', window.innerWidth / 2, window.innerHeight / 3, {
         count: lucky ? 32 : 16,
       });
+      // Lucky 2x is the rare surprise moment — a distinct LEGENDARY buzz makes it
+      // felt, not just seen, on devices where the sparkle burst goes unnoticed.
+      void (lucky ? haptics.legendary() : haptics.success());
     } else {
       playSound('wordRejected');
+      if (finalSett.outcome === 'clash') void haptics.error();
     }
   }, [phase, pending, currentDeal, chosenWord, stake, wallet, language, playSound, t]);
 

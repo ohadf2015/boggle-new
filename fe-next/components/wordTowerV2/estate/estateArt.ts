@@ -206,22 +206,6 @@ export function nextPerkLine(district: number, slot: PlotSlot, level: number): P
   return { key: `wordTowerV2.estate.perkLine.${slot}`, params: { n: LINE_VALUE[slot](perksAt(district, slot, target)) } };
 }
 
-export interface PerkChip {
-  id: PlotSlot;
-  key: string;
-  params: { n: number };
-}
-
-/** Every perk that is no longer neutral, as a chip the run can show. */
-export function perkChips(perks: Perks): PerkChip[] {
-  const chips: PerkChip[] = [];
-  for (const slot of PLOT_SLOTS) {
-    const n = LINE_VALUE[slot](perks);
-    if (n > 0) chips.push({ id: slot, key: `wordTowerV2.estate.chip.${slot}`, params: { n } });
-  }
-  return chips;
-}
-
 // ── "What's new" when you come back ──────────────────────────────────────────
 
 export interface EstateNews {

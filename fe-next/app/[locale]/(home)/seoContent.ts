@@ -37,6 +37,11 @@ export const seoContent: Record<string, HomepageSeoContent> = {
     ],
     faq: [
       {
+        question: 'What is www.lexiclash.live?',
+        answer:
+          'www.lexiclash.live is LexiClash, a free multiplayer word game you play in the browser. Find words on a shared letter grid in real time, race friends or ranked opponents, and climb a global leaderboard. No download and no signup. Play in six languages — start a match in seconds.',
+      },
+      {
         question: 'What is LexiClash and how do I play?',
         answer:
           'LexiClash is a free multiplayer word game where you find words on a letter grid in real time. Swipe or type to connect adjacent letters and form words before the timer runs out. The longer and rarer the word, the more points you score. You can play solo, against AI, or challenge friends in private rooms.',
