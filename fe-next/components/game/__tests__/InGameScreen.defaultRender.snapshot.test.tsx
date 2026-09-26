@@ -114,4 +114,34 @@ describe('InGameScreen default render (no MP opt-in props)', () => {
       ),
     ).toMatchSnapshot();
   });
+
+  it('non-focus board (header, stats, side panels, mobile split view) is unchanged', () => {
+    expect(
+      snap(
+        <InGameScreen
+          username="me"
+          gameCode="ABCDEF"
+          isHost={false}
+          isPlaying
+          gameplayFocusMode={false}
+          t={t}
+          dir="ltr"
+          socket={null}
+          letterGrid={grid}
+          remainingTime={55}
+          timerValue={1}
+          gameActive
+          showStartAnimation={false}
+          gameLanguage="en"
+          minWordLength={3}
+          comboLevel={1}
+          foundWords={[{ word: 'dog', isValid: true, score: 2 }, { word: 'rate', isValid: true, score: 3 }]}
+          leaderboard={[{ username: 'me', score: 5 }, { username: 'bot', score: 4 }, { username: 'amy', score: 1 }]}
+          onExitRoom={noop}
+          onWordSubmit={noop}
+          gameMode="classic"
+        />,
+      ),
+    ).toMatchSnapshot();
+  });
 });

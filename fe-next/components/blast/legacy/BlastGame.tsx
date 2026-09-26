@@ -397,8 +397,8 @@ export function BlastGame({
 
   // serverPointsOnly: the pill keeps its accept/reject state, minus the client "+N".
   const pointlessFeedback = useMemo(
-    () => (wordSubmission.currentFeedback ? { ...wordSubmission.currentFeedback, score: undefined } : null),
-    [wordSubmission.currentFeedback],
+    () => (serverPointsOnly && wordSubmission.currentFeedback ? { ...wordSubmission.currentFeedback, score: undefined } : null),
+    [serverPointsOnly, wordSubmission.currentFeedback],
   );
 
   // Handlers
