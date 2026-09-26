@@ -73,6 +73,11 @@ describe('WordHuntGameLayout mpChrome', () => {
     expect(slot.className).not.toContain('items-center');
   });
 
+  it('lifts the board cap on TV-sized screens (the round slot is exact)', () => {
+    const { container } = render(<WordHuntGameLayout {...baseProps} mpChrome />);
+    expect(container.querySelector('.wordhunt-grid-container')!.className).toContain('tv:[--wh-grid-size:min(100cqw,100cqh,980px)]');
+  });
+
   it('never splits into its own sidebar row (the round frame owns desktop)', () => {
     const { container } = render(<WordHuntGameLayout {...baseProps} mpChrome />);
     expect((container.firstChild as HTMLElement).className).not.toContain('min-[720px]:flex-row');

@@ -256,7 +256,11 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
               slot). One 560 cap below xl lets the container govern instead; that
               also lifts tablet portrait (768w) from 440 to its slot size. */}
           <div
-            className="wordhunt-grid-container relative mx-auto flex [--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]"
+            className={cn(
+              'wordhunt-grid-container relative mx-auto flex [--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]',
+              // Round frame on a TV-sized screen: the slot is exact, let the board use it.
+              mpChrome && 'tv:[--wh-grid-size:min(100cqw,100cqh,980px)]',
+            )}
             style={{
               width: 'var(--wh-grid-size)',
               height: 'var(--wh-grid-size)',
