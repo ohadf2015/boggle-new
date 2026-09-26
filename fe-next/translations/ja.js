@@ -18398,7 +18398,63 @@ const ja = {
     },
     "entry": {},
     "lobby": {},
-    "round": {},
+    "round": {
+      "getReady": "準備して",
+      "mode": {
+        "classic": {
+          "name": "クラシック",
+          "rule": "隣り合う文字をなぞろう。長い単語ほど高得点！"
+        },
+        "blast": {
+          "name": "ブラスト",
+          "rule": "単語でタイルを消そう。特殊タイルは爆発、連鎖させよう！"
+        },
+        "wordHunt": {
+          "name": "ワードハント",
+          "rule": "どの単語でも回復。隠された単語を当てたら勝ち！"
+        },
+        "wheelRush": {
+          "name": "ホイールラッシュ",
+          "rule": "ライバルより先にホイールの文字で単語を作ろう。"
+        },
+        "wordTower": {
+          "name": "ワードタワー",
+          "rule": "単語を積んで一番高いタワーを建てよう。"
+        },
+        "sealedBid": {
+          "name": "シールドビッド",
+          "rule": "こっそり入札。ポイントは賢く使おう。"
+        },
+        "crossword": {
+          "name": "クロスワードレース",
+          "rule": "誰よりも先にマスを埋めよう。"
+        },
+        "random": {
+          "name": "サプライズモード",
+          "rule": "盤面をすばやく読んでスタート！"
+        }
+      },
+      "leave": "ラウンドを抜ける",
+      "combo": "コンボ ×{level}",
+      "onFire": "絶好調 ×{level}！",
+      "gotItFirst": "{name}が先に見つけた · +{points}",
+      "passedYou": "{name}に抜かれた！",
+      "youPassed": "{name}を抜いた！",
+      "tookLead": "トップに立った！",
+      "lostLead": "{name}がトップに",
+      "timeUp": "タイムアップ！",
+      "found": "{count}個発見",
+      "reject": {
+        "invalid": "単語ではありません",
+        "tooShort": "短すぎます",
+        "notOnBoard": "盤面にありません",
+        "alreadyFound": "もう見つけた単語"
+      },
+      "keyboardHint": "単語を入力 · Enterで送信 · Escでクリア",
+      "yourWords": "あなたの単語",
+      "noWords": "まだ単語がありません。最初の1つを見つけよう！",
+      "players": "プレイヤー"
+    },
     "results": {}
   }
 };

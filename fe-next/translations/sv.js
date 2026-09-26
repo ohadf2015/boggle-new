@@ -18398,7 +18398,63 @@ const sv = {
     },
     "entry": {},
     "lobby": {},
-    "round": {},
+    "round": {
+      "getReady": "Gör dig redo",
+      "mode": {
+        "classic": {
+          "name": "Klassisk",
+          "rule": "Dra genom bokstäver som rör varandra. Längre ord ger mer poäng."
+        },
+        "blast": {
+          "name": "Blast",
+          "rule": "Rensa brickor med ord. Specialbrickor exploderar, kedja ihop dem!"
+        },
+        "wordHunt": {
+          "name": "Ordjakt",
+          "rule": "Varje ord läker dig. Knäck det gömda ordet för att vinna."
+        },
+        "wheelRush": {
+          "name": "Hjulrusch",
+          "rule": "Bygg ord från hjulet före dina rivaler."
+        },
+        "wordTower": {
+          "name": "Ordtornet",
+          "rule": "Stapla ord och bygg det högsta tornet."
+        },
+        "sealedBid": {
+          "name": "Hemligt bud",
+          "rule": "Buda i hemlighet. Spendera dina poäng klokt."
+        },
+        "crossword": {
+          "name": "Korsordsrace",
+          "rule": "Fyll rutnätet före alla andra."
+        },
+        "random": {
+          "name": "Överraskningsläge",
+          "rule": "Läs brädet snabbt och kör!"
+        }
+      },
+      "leave": "Lämna rundan",
+      "combo": "Kombo ×{level}",
+      "onFire": "Het ×{level}!",
+      "gotItFirst": "{name} hann först · +{points}",
+      "passedYou": "{name} gick förbi dig!",
+      "youPassed": "Du gick förbi {name}!",
+      "tookLead": "Du tog ledningen!",
+      "lostLead": "{name} tog ledningen",
+      "timeUp": "Tiden är ute!",
+      "found": "{count} hittade",
+      "reject": {
+        "invalid": "Inget ord",
+        "tooShort": "För kort",
+        "notOnBoard": "Finns inte på brädet",
+        "alreadyFound": "Redan hittat"
+      },
+      "keyboardHint": "Skriv ett ord · Enter skickar · Esc rensar",
+      "yourWords": "Dina ord",
+      "noWords": "Inga ord än. Hitta det första!",
+      "players": "Spelare"
+    },
     "results": {}
   }
 };

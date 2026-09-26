@@ -18416,7 +18416,63 @@ const es = {
     },
     "entry": {},
     "lobby": {},
-    "round": {},
+    "round": {
+      "getReady": "Prepárate",
+      "mode": {
+        "classic": {
+          "name": "Clásico",
+          "rule": "Arrastra por letras vecinas. Las palabras largas valen más."
+        },
+        "blast": {
+          "name": "Explosión",
+          "rule": "Limpia fichas con palabras. Las especiales explotan: ¡encadénalas!"
+        },
+        "wordHunt": {
+          "name": "Caza de palabras",
+          "rule": "Cualquier palabra te cura. Descifra la palabra oculta para ganar."
+        },
+        "wheelRush": {
+          "name": "Ruleta rápida",
+          "rule": "Forma palabras con la rueda antes que tus rivales."
+        },
+        "wordTower": {
+          "name": "Torre de palabras",
+          "rule": "Apila palabras y construye la torre más alta."
+        },
+        "sealedBid": {
+          "name": "Puja secreta",
+          "rule": "Puja en secreto. Gasta tus puntos con cabeza."
+        },
+        "crossword": {
+          "name": "Carrera de crucigrama",
+          "rule": "Llena la cuadrícula antes que nadie."
+        },
+        "random": {
+          "name": "Modo sorpresa",
+          "rule": "¡Lee el tablero rápido y a jugar!"
+        }
+      },
+      "leave": "Salir de la ronda",
+      "combo": "Combo ×{level}",
+      "onFire": "¡En racha ×{level}!",
+      "gotItFirst": "{name} la encontró primero · +{points}",
+      "passedYou": "¡{name} te ha superado!",
+      "youPassed": "¡Superaste a {name}!",
+      "tookLead": "¡Vas en cabeza!",
+      "lostLead": "{name} toma la delantera",
+      "timeUp": "¡Tiempo!",
+      "found": "{count} encontradas",
+      "reject": {
+        "invalid": "No es una palabra",
+        "tooShort": "Demasiado corta",
+        "notOnBoard": "No está en el tablero",
+        "alreadyFound": "Ya encontrada"
+      },
+      "keyboardHint": "Escribe una palabra · Enter envía · Esc borra",
+      "yourWords": "Tus palabras",
+      "noWords": "Aún no hay palabras. ¡Encuentra la primera!",
+      "players": "Jugadores"
+    },
     "results": {}
   }
 };

@@ -17476,7 +17476,63 @@ const en = {
     },
     "entry": {},
     "lobby": {},
-    "round": {},
+    "round": {
+      "getReady": "Get ready",
+      "mode": {
+        "classic": {
+          "name": "Classic",
+          "rule": "Drag through touching letters. Longer words score more."
+        },
+        "blast": {
+          "name": "Blast",
+          "rule": "Clear tiles with words. Specials explode, so chain them!"
+        },
+        "wordHunt": {
+          "name": "Word Hunt",
+          "rule": "Any word heals you. Crack the hidden word to win."
+        },
+        "wheelRush": {
+          "name": "Wheel Rush",
+          "rule": "Build words from the wheel before your rivals do."
+        },
+        "wordTower": {
+          "name": "Word Tower",
+          "rule": "Stack words to build the tallest tower."
+        },
+        "sealedBid": {
+          "name": "Sealed Bid",
+          "rule": "Bid in secret. Spend your points wisely."
+        },
+        "crossword": {
+          "name": "Crossword Race",
+          "rule": "Fill the grid before anyone else."
+        },
+        "random": {
+          "name": "Surprise Mode",
+          "rule": "Read the board fast and go!"
+        }
+      },
+      "leave": "Leave round",
+      "combo": "Combo ×{level}",
+      "onFire": "On fire ×{level}!",
+      "gotItFirst": "{name} got it first · +{points}",
+      "passedYou": "{name} passed you!",
+      "youPassed": "You passed {name}!",
+      "tookLead": "You took the lead!",
+      "lostLead": "{name} took the lead",
+      "timeUp": "Time!",
+      "found": "{count} found",
+      "reject": {
+        "invalid": "Not a word",
+        "tooShort": "Too short",
+        "notOnBoard": "Not on the board",
+        "alreadyFound": "Already found"
+      },
+      "keyboardHint": "Type a word · Enter to submit · Esc to clear",
+      "yourWords": "Your words",
+      "noWords": "No words yet. Find the first one!",
+      "players": "Players"
+    },
     "results": {}
   }
 };
