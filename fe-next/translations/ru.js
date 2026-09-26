@@ -11995,7 +11995,8 @@ const ru = {
       "trialActive": "Пробный Pro",
       "trialDayLeft": "Остался 1 день",
       "trialDaysLeft": "Осталось {count} дн.",
-      "trialEndsToday": "Заканчивается сегодня"
+      "trialEndsToday": "Заканчивается сегодня",
+      "trialEnded": "Пробный период закончился"
     },
     "proGate": {
       "analytics": {
@@ -12024,6 +12025,7 @@ const ru = {
       "proCtaHint": "Откройте каждую игру, каждого ученика и PDF для печати.",
       "weeklySubject": "Эта неделя в вашем классе",
       "polarTrialExpiredLine": "Пробный Teacher Pro закончился. Возобновите его, чтобы сохранить отчёты класса.",
+      "polarTrialActiveLine": "До конца пробного Teacher Pro осталось {count} дн. Сохраните отчёты и безлимитные классы за 9 $/мес.",
       "regionLabel": "Сводка прогресса для {{classroom}}",
       "scheduleReteachCta": "Запланировать reteach Live через ~{{days}} дн.",
       "scheduleReteachConfirm": "Reteach Live запланирован на {{date}} (~{{days}} дн.). Приглашение в календарь открыто.",
@@ -12077,6 +12079,11 @@ const ru = {
       "trialEndedTitle": "Пробный Teacher Pro закончился",
       "trialEndedBody": "Верните Pro за 9 $ в месяц. Это не ещё одна бесплатная пробная версия.",
       "trialEndedCta": "Оставить Pro — 9 $/мес",
+      "trialLifecycleTitle": "До конца пробного Teacher Pro: {count} дн.",
+      "trialLifecycleTitleToday": "Пробный Teacher Pro заканчивается сегодня",
+      "trialLifecycleTitleOne": "До конца пробного Teacher Pro: 1 день",
+      "trialLifecycleBody": "Сохраните безлимитные классы и печатные отчёты — 9 $/мес после пробного периода.",
+      "trialLifecycleCta": "Оставить Pro — 9 $/мес",
       "checkoutError": "Не удалось начать оплату. Попробуйте ещё раз.",
       "signInRequired": "Пожалуйста, войдите для перехода на Teacher Pro.",
       "currentPlan": "Ваш текущий план",

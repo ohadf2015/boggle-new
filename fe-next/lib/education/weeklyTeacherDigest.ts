@@ -17,6 +17,7 @@ import {
 } from './windowedClassroomProgress';
 
 export const POLAR_TRIAL_EXPIRED_DIGEST_KEY = 'teacher.digest.polarTrialExpiredLine' as const;
+export const POLAR_TRIAL_ACTIVE_DIGEST_KEY = 'teacher.digest.polarTrialActiveLine' as const;
 
 export interface WeeklyClassroomInput {
   classroomId: string;
@@ -41,6 +42,10 @@ export interface WeeklyTeacherDigest {
   polarTrialExpired: boolean;
   /** Set only when polarTrialExpired && !hasPro. */
   polarTrialExpiredLineKey: typeof POLAR_TRIAL_EXPIRED_DIGEST_KEY | null;
+  /** Live Polar trial — days remaining, including 0 for "ends today". */
+  polarTrialActive: boolean;
+  polarTrialDaysLeft: number | null;
+  polarTrialActiveLineKey: typeof POLAR_TRIAL_ACTIVE_DIGEST_KEY | null;
   classrooms: WeeklyTeacherDigestClassroom[];
 }
 
@@ -62,6 +67,7 @@ export function buildWeeklyTeacherDigest({
   locale,
   hasPro,
   polarTrialExpired = false,
+  polarTrialDaysLeft = null,
   classrooms,
   windowDays = 7,
   now = Date.now(),
@@ -72,11 +78,15 @@ export function buildWeeklyTeacherDigest({
   locale: string;
   hasPro: boolean;
   polarTrialExpired?: boolean;
+  /** Whole days left on a live Polar trial. Null if not trialing. */
+  polarTrialDaysLeft?: number | null;
   classrooms: WeeklyClassroomInput[];
   windowDays?: ProgressWindowDays;
   now?: number;
 }): WeeklyTeacherDigest {
   const expiredUpsell = polarTrialExpired && !hasPro;
+  const activeTrial =
+    hasPro && polarTrialDaysLeft !== null && polarTrialDaysLeft !== undefined;
   return {
     teacherId,
     email,
@@ -85,6 +95,9 @@ export function buildWeeklyTeacherDigest({
     hasPro,
     polarTrialExpired: expiredUpsell,
     polarTrialExpiredLineKey: expiredUpsell ? POLAR_TRIAL_EXPIRED_DIGEST_KEY : null,
+    polarTrialActive: activeTrial,
+    polarTrialDaysLeft: activeTrial ? polarTrialDaysLeft : null,
+    polarTrialActiveLineKey: activeTrial ? POLAR_TRIAL_ACTIVE_DIGEST_KEY : null,
     classrooms: classrooms.map((c) => ({
       classroomId: c.classroomId,
       classroomName: c.classroomName,
@@ -137,6 +150,7 @@ export function assembleWeeklyDigests({
   sessions,
   proUserIds,
   expiredTrialUserIds = new Set<string>(),
+  trialingDaysByUser = new Map<string, number>(),
   now = Date.now(),
 }: {
   teachers: WeeklyTeacherRow[];
@@ -145,6 +159,8 @@ export function assembleWeeklyDigests({
   sessions: WeeklySessionRow[];
   proUserIds: Set<string>;
   expiredTrialUserIds?: Set<string>;
+  /** userId → whole days remaining on a live Polar trial. */
+  trialingDaysByUser?: Map<string, number>;
   now?: number;
 }): WeeklyTeacherDigest[] {
   const seenEmail = new Set<string>();
@@ -180,6 +196,9 @@ export function assembleWeeklyDigests({
       locale: teacher.locale,
       hasPro: proUserIds.has(teacher.userId),
       polarTrialExpired: expiredTrialUserIds.has(teacher.userId),
+      polarTrialDaysLeft: trialingDaysByUser.has(teacher.userId)
+        ? trialingDaysByUser.get(teacher.userId)!
+        : null,
       now,
       classrooms: rooms.map((room) => ({
         classroomId: room.id,

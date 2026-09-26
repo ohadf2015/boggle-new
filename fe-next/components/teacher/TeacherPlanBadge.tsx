@@ -98,7 +98,11 @@ export function TeacherPlanBadge({ className }: { className?: string }) {
       )}
     >
       <span className="font-neo-display text-sm font-black uppercase tracking-wide">
-        {grantExpired ? t('teacher.plan.giftEnded') : t('teacher.plan.free')}
+        {trialUx.showReactivation
+          ? t('teacher.plan.trialEnded')
+          : grantExpired
+            ? t('teacher.plan.giftEnded')
+            : t('teacher.plan.free')}
       </span>
       <span className="text-xs font-bold underline underline-offset-2">{t('teacher.plan.upgrade')}</span>
     </Link>

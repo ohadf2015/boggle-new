@@ -13013,7 +13013,8 @@ const es = {
       "trialActive": "Prueba Pro",
       "trialDayLeft": "Queda 1 día",
       "trialDaysLeft": "Quedan {count} días",
-      "trialEndsToday": "Termina hoy"
+      "trialEndsToday": "Termina hoy",
+      "trialEnded": "La prueba terminó"
     },
     "proGate": {
       "analytics": {
@@ -13043,6 +13044,7 @@ const es = {
       "proCtaHint": "Desbloquea cada partida, cada estudiante y PDF imprimibles.",
       "weeklySubject": "Esta semana en tu clase",
       "polarTrialExpiredLine": "Tu prueba de Teacher Pro terminó. Reactívala para conservar los informes de la clase.",
+      "polarTrialActiveLine": "Tu prueba de Teacher Pro tiene {count} días. Conserva informes y clases ilimitadas por 9 $/mes.",
       "regionLabel": "Resumen de progreso de {{classroom}}",
       "scheduleReteachCta": "Programar Live de repaso en ~{{days}} días",
       "scheduleReteachConfirm": "Live de repaso programado para {{date}} (~{{days}} días). Se abrió la invitación del calendario.",
@@ -13096,6 +13098,11 @@ const es = {
       "trialEndedTitle": "Tu prueba de Teacher Pro terminó",
       "trialEndedBody": "Reactívala por 9 $/mes. No es otra prueba gratis.",
       "trialEndedCta": "Seguir con Pro — 9 $/mes",
+      "trialLifecycleTitle": "Quedan {count} días de tu prueba de Teacher Pro",
+      "trialLifecycleTitleToday": "Tu prueba de Teacher Pro termina hoy",
+      "trialLifecycleTitleOne": "Queda 1 día de tu prueba de Teacher Pro",
+      "trialLifecycleBody": "Conserva clases ilimitadas e informes imprimibles — 9 $/mes al terminar la prueba.",
+      "trialLifecycleCta": "Seguir con Pro — 9 $/mes",
       "checkoutError": "No se pudo iniciar el pago. Inténtalo de nuevo.",
       "signInRequired": "Inicia sesión para mejorar a Teacher Pro.",
       "currentPlan": "Estás en este plan",
