@@ -29,6 +29,14 @@ vi.mock('@/contexts/AccessibilityContext', () => ({ useShouldReduceMotion: () =>
 vi.mock('@/components/ui/CircularTimer', () => ({ default: () => <div data-testid="ring" /> }));
 vi.mock('@/components/ui/AnimatedCounter', () => ({ default: ({ value }: { value: number }) => <span data-testid="counter">{value}</span> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <i /> }));
+const { mute, registered } = vi.hoisted(() => ({
+  mute: { allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Mute' },
+  registered: { count: 0 },
+}));
+vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => mute }));
+vi.mock('@/contexts/NavigationContext', () => ({
+  useRegisterHeaderAudioControl: () => { registered.count += 1; },
+}));
 
 import { MpRoundLayout, type MpRoundLayoutProps } from '../MpRoundLayout';
 import { recordWordAccepted, recordWordRejected, resetMpFeedback } from '@/lib/multiplayer/mpFeedback';
@@ -76,6 +84,20 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-score-chip')).toHaveTextContent('4');
     expect(screen.getByTestId('mp-rank-value')).toHaveTextContent('#2');
     expect(screen.getByTestId('mp-rank-chip')).toHaveTextContent('/3');
+  });
+
+  it('owns mute inside the HUD (the global floating FAB stands down — it covered the score)', () => {
+    render(<MpRoundLayout {...props()} />);
+    expect(registered.count).toBeGreaterThan(0);
+    const btn = screen.getByTestId('mp-round-mute');
+    expect(screen.getByTestId('mp-hud-bar')).toContainElement(btn);
+    fireEvent.click(btn);
+    expect(mute.toggle).toHaveBeenCalled();
+  });
+
+  it('shows ONE clock: the big m:ss digits, not a second label inside the ring', () => {
+    render(<MpRoundLayout {...props()} />);
+    expect(screen.getByTestId('mp-timer').className).toContain('[&_svg~div]:hidden');
   });
 
   it('the exit button hands off to the view (which confirms)', () => {

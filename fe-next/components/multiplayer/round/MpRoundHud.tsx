@@ -4,6 +4,8 @@ import { memo } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MpBackButton, MpHudBar, MpRankChip, MpScoreChip, MpTimer, type MpScoreGain, type MpTimerColor } from '../shell';
 import { MpComboMeter } from './MpComboMeter';
+import { MpRoundMute } from './MpRoundMute';
+import { QuietBoundary } from './QuietBoundary';
 
 export interface MpRoundHudProps {
   remainingTime: number;
@@ -19,7 +21,7 @@ export interface MpRoundHudProps {
 }
 
 /**
- * The single in-round top bar: [exit · rank] [timer + m:ss] [combo · score].
+ * The single in-round top bar: [exit · rank] [timer + m:ss] [combo · score · mute].
  * Structure is CSS; only the ring/chip SIZE tier reads a media query — the
  * round mounts behind the solid countdown, so it has resolved long before GO.
  */
@@ -36,11 +38,23 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
           <MpRankChip rank={rank} total={total} flipKey={rankFlipKey} />
         </>
       }
-      center={<MpTimer remainingSec={remainingTime} totalSec={Math.max(totalTime, 1)} size={timerSize} colorFamily={timerColor} />}
+      center={
+        <MpTimer
+          remainingSec={remainingTime}
+          totalSec={Math.max(totalTime, 1)}
+          size={timerSize}
+          colorFamily={timerColor}
+          // One clock: the ring's own inner label duplicates the big m:ss digits.
+          className="[&_svg~div]:hidden"
+        />
+      }
       end={
         <>
           <MpComboMeter level={comboLevel} />
           <MpScoreChip value={score} gain={gain} size={isDesktop ? 'lg' : 'md'} />
+          <QuietBoundary>
+            <MpRoundMute />
+          </QuietBoundary>
         </>
       }
     />

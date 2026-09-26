@@ -120,7 +120,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players }: MpCountdownStag
       data-mode={mode.slug}
       role="status"
       aria-live="assertive"
-      className="fixed inset-0 z-[80] flex flex-col items-center justify-between overflow-hidden bg-neo-navy opacity-100 text-neo-white pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] px-4 select-none"
+      className="fixed inset-0 z-[10000] flex flex-col items-center justify-between overflow-hidden bg-neo-navy opacity-100 text-neo-white pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] px-4 select-none"
     >
       {/* What you're about to play */}
       <div className="flex flex-col items-center gap-3 tv:gap-5 text-center max-w-md tv:max-w-3xl">

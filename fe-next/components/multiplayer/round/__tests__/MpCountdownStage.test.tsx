@@ -39,7 +39,8 @@ describe('MpCountdownStage', () => {
     expect(root.className).toContain('fixed inset-0');
     expect(root.className).toContain('bg-neo-navy');
     expect(root.className).not.toMatch(/bg-neo-navy\/\d+/);
-    expect(root.className).toContain('z-[80]');
+    // Above the global mute FAB (z-70) AND the toaster (z-9999): nothing peeks over the stage.
+    expect(root.className).toContain('z-[10000]');
     // Appears statically — no opacity tween on the full-screen layer.
     expect(root.className).not.toContain('transition-opacity');
     expect(root.style.opacity).toBe('');

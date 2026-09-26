@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useMpExit } from '@/hooks/useMpExit';
 import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
@@ -48,8 +48,8 @@ import {
   useGameModeConfirmed,
   useGameStore,
 } from '@/hooks/gameState/store';
-import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
-import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
+import { useRoundPendingWords, PendingWordChips } from '@/components/multiplayer/round/useRoundPendingWords';
+import { StopGameConfirm } from '@/components/multiplayer/round/StopGameConfirm';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { MpDesktopShellFrame, isShellMode } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
@@ -174,7 +174,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   const isVocabQuizRoom = useIsVocabQuizRoom(socket);
   const setBlastBoardClearedByLocal = useGameStore((s) => s.setBlastBoardClearedByLocal);
 
-  const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
+  const { pendingWords, enqueuePending, dismissPending } = useRoundPendingWords(socket, username);
 
   const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =
     useReconnectFlow({ gameCode, username, gameActive: true });
@@ -185,28 +185,6 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     }
     mpExit('continue-solo');
   }, [mpExit, tableData, gameCode]);
-
-  // Listen for per-word server feedback to drive pending-word chip transitions
-  useEffect(() => {
-    if (!socket) return;
-    // playerFoundWord is now coalesced server-side into playerFoundWordBatch.
-    const handlePlayerFoundBatch = (data: { words?: Array<{ username: string; word: string }> }) => {
-      data.words?.forEach((w) => { if (w.username === username) confirmPending(w.word); });
-    };
-    const handleWordRejected = (data: { word: string }) => rejectPending(data.word);
-    socket.on('playerFoundWordBatch', handlePlayerFoundBatch);
-    socket.on('wordRejected', handleWordRejected);
-    socket.on('wordAlreadyFound', handleWordRejected);
-    socket.on('wordNotOnBoard', handleWordRejected);
-    socket.on('endGame', clearAll);
-    return () => {
-      socket.off('playerFoundWordBatch', handlePlayerFoundBatch);
-      socket.off('wordRejected', handleWordRejected);
-      socket.off('wordAlreadyFound', handleWordRejected);
-      socket.off('wordNotOnBoard', handleWordRejected);
-      socket.off('endGame', clearAll);
-    };
-  }, [socket, username, confirmPending, rejectPending, clearAll]);
 
   // Blast multiplayer bridge — converts Zustand state to BlastGame props
   const blastBridge = useBlastMultiplayerBridge({
@@ -317,20 +295,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     );
 
   // Shared overlays for every branch (one copy, so the branches cannot drift).
-  const stopConfirm = showStopConfirm && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
-        <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
-        <div className="flex gap-3 justify-center">
-          <button type="button" onClick={handleConfirmStopGame} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-            {t('mp.stopGameYes')}
-          </button>
-          <button type="button" onClick={() => setShowStopConfirm(false)} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
-            {t('common.cancel')}
-          </button>
-        </div>
-      </div>
-    </div>
+  const stopConfirm = (
+    <StopGameConfirm open={showStopConfirm} t={t} onConfirm={handleConfirmStopGame} onCancel={() => setShowStopConfirm(false)} />
   );
   const connectionOverlays = (
     <>
@@ -421,13 +387,39 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     );
   }
 
-  const pendingChips = pendingWords.size > 0 && (
-    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex flex-wrap gap-1 justify-center pointer-events-none">
-      {Array.from(pendingWords.entries()).map(([word, status]) => (
-        <PendingWordChip key={word} word={word} status={status} onDismiss={dismissPending} />
-      ))}
-    </div>
-  );
+  const pendingChips = <PendingWordChips pendingWords={pendingWords} dismissPending={dismissPending} />;
+
+  // Classic board props — shared by the round frame and the non-playing fallback.
+  const classicProps = {
+    username,
+    gameCode,
+    isHost: true,
+    isPlaying: hostPlaying,
+    gameplayFocusMode: hostPlaying,
+    t,
+    socket,
+    letterGrid: tableData,
+    remainingTime,
+    timerValue,
+    gameActive: true,
+    showStartAnimation,
+    gameLanguage: roomLanguage,
+    minWordLength,
+    comboLevel,
+    comboLevelRef,
+    foundWords,
+    leaderboard,
+    onExitRoom: handleStopGameClick,
+    onWordSubmit,
+    earthquakeState,
+    fireRoundActive,
+    fireRoundRemaining,
+    boardTheme,
+    gameMode: gameMode ?? undefined,
+    onWordHuntGuess: hostPlaying ? handleWordHuntGuess : undefined,
+    // Player experience (for keyboard trail inactivity threshold)
+    totalGamesPlayed: profile?.total_games,
+  };
 
   // The playing host: classic + word-hunt run in the SAME round frame as the
   // joiner (one HUD, roster, hidden-until-GO board) — pitfall class 3.
@@ -449,36 +441,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
         mpChrome
       />
     ) : (
-      <InGameScreen
-        username={username}
-        gameCode={gameCode}
-        isHost={true}
-        isPlaying={hostPlaying}
-        mpChrome
-        gameplayFocusMode={hostPlaying}
-        t={t}
-        socket={socket}
-        letterGrid={tableData}
-        remainingTime={remainingTime}
-        timerValue={timerValue}
-        gameActive={true}
-        showStartAnimation={showStartAnimation}
-        gameLanguage={roomLanguage}
-        minWordLength={minWordLength}
-        comboLevel={comboLevel}
-        comboLevelRef={comboLevelRef}
-        foundWords={foundWords}
-        leaderboard={leaderboard}
-        onExitRoom={handleStopGameClick}
-        onWordSubmit={onWordSubmit}
-        earthquakeState={earthquakeState}
-        fireRoundActive={fireRoundActive}
-        fireRoundRemaining={fireRoundRemaining}
-        boardTheme={boardTheme}
-        gameMode={gameMode ?? undefined}
-        onWordHuntGuess={handleWordHuntGuess}
-        totalGamesPlayed={profile?.total_games}
-      />
+      <InGameScreen {...classicProps} mpChrome />
     );
     return (
       <div className={MP_ROUND_CONTAINER_CLASS}>
@@ -507,58 +470,14 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Non-playing host fallback (the projector normally takes this role).
   return (
     <>
-    {wrapCanvas(
-    <div className="relative flex-1 flex flex-col min-h-0">
-    <InGameScreen
-      // Core identity
-      username={username}
-      gameCode={gameCode}
-      isHost={true}
-      isPlaying={hostPlaying}
-      inDesktopShell={inShell}
-      gameplayFocusMode={hostPlaying}
-      t={t}
-      socket={socket}
-
-      // Game state
-      letterGrid={tableData}
-      remainingTime={remainingTime}
-      timerValue={timerValue}
-      gameActive={true}
-      showStartAnimation={showStartAnimation}
-      gameLanguage={roomLanguage}
-      minWordLength={minWordLength}
-      comboLevel={comboLevel}
-      comboLevelRef={comboLevelRef}
-
-      // Player data
-      foundWords={foundWords}
-      leaderboard={leaderboard}
-
-      // Callbacks
-      onExitRoom={handleStopGameClick}
-      onWordSubmit={onWordSubmit}
-
-      // Earthquake/Fire Round
-      earthquakeState={earthquakeState}
-      fireRoundActive={fireRoundActive}
-      fireRoundRemaining={fireRoundRemaining}
-
-      // Theme
-      boardTheme={boardTheme}
-
-      // Game mode overlays
-      gameMode={gameMode ?? undefined}
-      onWordHuntGuess={hostPlaying ? handleWordHuntGuess : undefined}
-
-      // Player experience (for keyboard trail inactivity threshold)
-      totalGamesPlayed={profile?.total_games}
-    />
-    </div>
-    )}
-    {pendingChips}
-    {connectionOverlays}
-    {stopConfirm}
+      {wrapCanvas(
+        <div className="relative flex-1 flex flex-col min-h-0">
+          <InGameScreen {...classicProps} inDesktopShell={inShell} />
+        </div>,
+      )}
+      {pendingChips}
+      {connectionOverlays}
+      {stopConfirm}
     </>
   );
 };

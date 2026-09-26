@@ -58,6 +58,7 @@ const shell = { value: false };
 vi.mock('@/hooks/useDesktopShellEnabled', () => ({ useDesktopShellEnabled: () => shell.value }));
 vi.mock('@/components/ui/CircularTimer', () => ({ default: () => <div /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <i /> }));
+vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Mute' }) }));
 
 import PlayerInGameView from '../PlayerInGameView';
 import { MpExitProvider } from '@/hooks/useMpExit';

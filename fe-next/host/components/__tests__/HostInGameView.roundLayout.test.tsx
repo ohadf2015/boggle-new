@@ -52,6 +52,7 @@ const routerPush = vi.fn();
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: routerPush }), useParams: () => ({ locale: 'en' }) }));
 vi.mock('@/components/ui/CircularTimer', () => ({ default: () => <div /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <i /> }));
+vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: vi.fn(), label: 'Mute', title: 'Mute' }) }));
 
 import HostInGameView from '../HostInGameView';
 import { MpExitProvider } from '@/hooks/useMpExit';
