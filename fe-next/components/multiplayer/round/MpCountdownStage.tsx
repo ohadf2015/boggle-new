@@ -122,7 +122,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players }: MpCountdownStag
       aria-live="assertive"
       className="fixed inset-0 z-[10000] flex flex-col items-center justify-between overflow-hidden bg-neo-navy opacity-100 text-neo-white pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] px-4 select-none"
     >
-      {/* What you're about to play */}
+      {/* What you're about to play (mode badge + one-line rule) */}
       <div className="flex flex-col items-center gap-3 tv:gap-5 text-center max-w-md tv:max-w-3xl">
         <span
           data-testid="mp-countdown-mode"
@@ -153,7 +153,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players }: MpCountdownStag
           data-testid="mp-countdown-numeral"
           className={cn(
             'relative font-neo-display font-bold leading-none tabular-nums [text-shadow:0.06em_0.06em_0_var(--neo-black)]',
-            isGo ? 'text-[26vh] lg:text-[30vh] text-neo-lime' : cn('text-[40vh]', MODE_TEXT[mode.color]),
+            isGo ? 'text-[min(26vh,46vw)] text-neo-lime' : cn('text-[40vh]', MODE_TEXT[mode.color]),
             !reduceMotion && styles.countPunch,
           )}
         >

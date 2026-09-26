@@ -200,7 +200,11 @@ interface PortraitLayoutProps {
 
 /** mpChrome: the slot is just pill + board, no header/stats reserve. */
 const MP_CHROME_ROOT_CLASS = 'flex flex-col flex-1 w-full min-h-0 overflow-hidden px-2';
-const MP_CHROME_FRAME_CLASS = 'relative aspect-square mx-auto w-[min(720px,100cqi,calc(100cqb-56px))] max-h-full';
+const MP_CHROME_FRAME_CLASS = 'relative aspect-square mx-auto w-[min(720px,100cqi,calc(100cqb-88px))] max-h-full';
+/** mpChrome: pill + board anchored together at the bottom (thumb zone); the
+ *  free space above is the round's callout stage. */
+const MP_CHROME_CENTER_CLASS = '@container/center [container-type:size] flex-1 flex flex-col justify-end min-w-0 min-h-0 overflow-hidden';
+const MP_CHROME_GRID_CLASS = 'flex flex-col items-center min-h-0 overflow-visible gap-1 pb-9 lg:pb-1';
 
 /**
  * PortraitLayout - Portrait/Desktop mode layout for the game
@@ -451,7 +455,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         )}
 
         {/* Center Column: Timer, Score, Grid — container-queryable so board auto-fits */}
-        <div className="@container/center [container-type:size] flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-hidden lg:overflow-y-hidden lg:overflow-x-visible">
+        <div className={mpChrome ? MP_CHROME_CENTER_CLASS : "@container/center [container-type:size] flex-1 flex flex-col min-w-0 min-h-0 overflow-x-clip overflow-y-hidden lg:overflow-y-hidden lg:overflow-x-visible"}>
           {/* Stats section with vertical stacking on mobile - reduced gap for tighter layout */}
           {remainingTime !== null && !mpChrome && (
             <div
@@ -644,7 +648,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           <div
             data-testid="grid-container"
             className={cn(
-              'flex-1 flex flex-col items-center justify-center min-h-0 overflow-visible pt-1 md:pt-0 gap-2 desktop-short:lg:gap-0 desktop-short:lg:pt-0 short:gap-0 short:pt-0',
+              mpChrome ? MP_CHROME_GRID_CLASS : 'flex-1 flex flex-col items-center justify-center min-h-0 overflow-visible pt-1 md:pt-0 gap-2 desktop-short:lg:gap-0 desktop-short:lg:pt-0 short:gap-0 short:pt-0',
               'transition-shadow duration-500',
               comboGlow
             )}

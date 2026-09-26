@@ -82,6 +82,13 @@ describe('InGameScreen mpChrome — play surface only', () => {
     expect(screen.queryByRole('button', { name: 'playerView.exit' })).toBeNull();
   });
 
+  it('anchors word pill + board together at the bottom (thumb zone; the space above is the callout stage)', () => {
+    render(<InGameScreen {...props()} />);
+    const gridContainer = screen.getByTestId('grid-container');
+    expect(gridContainer.className).not.toMatch(/(^|\s)flex-1(\s|$)/);
+    expect(gridContainer.parentElement!.className).toContain('justify-end');
+  });
+
   it('never replays the tile entrance behind the countdown (the round owns the GO drop)', () => {
     render(<InGameScreen {...props()} />);
     act(() => {});

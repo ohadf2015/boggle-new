@@ -18,7 +18,10 @@ interface FoundWordLike {
   score?: number;
   timestamp?: number;
   isValid?: boolean | null;
+  duplicate?: boolean;
 }
+
+const counts = (w: FoundWordLike) => w.isValid !== false && !w.duplicate;
 
 export interface MpRoundLayoutProps {
   meId: string;
@@ -76,10 +79,17 @@ function MpRoundLayoutImpl({
 
   const juice = useRoundJuice({ meId, standings, remainingTime });
 
-  const validCount = useMemo(() => foundWords.filter((w) => w.isValid !== false).length, [foundWords]);
+  const validCount = useMemo(() => foundWords.filter(counts).length, [foundWords]);
+  // Ladder points: the server's per-word points (mpFeedback), never a client sum.
   const ladder = useMemo<LadderWord[]>(
-    () => foundWords.filter((w) => w.isValid !== false).map((w, i) => ({ word: w.word, score: w.score ?? 0, ts: w.timestamp ?? i, userId: meId })),
-    [foundWords, meId],
+    () =>
+      foundWords.filter(counts).map((w, i) => ({
+        word: w.word,
+        score: w.score || juice.pointsByWord.get(w.word.toLowerCase()) || 0,
+        ts: w.timestamp ?? i,
+        userId: meId,
+      })),
+    [foundWords, meId, juice.pointsByWord],
   );
 
   return (
@@ -148,6 +158,7 @@ function MpRoundLayoutImpl({
       {/* Juice lanes: callouts/banners over the board, floaters toward the score */}
       <div className={cn(styles.areaBoard, 'pointer-events-none relative z-30')}>
         <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
+        <span data-testid="mp-reject-sr" aria-live="polite" className="sr-only">{juice.rejectText ?? ''}</span>
         <MpScoreFloaters floaters={juice.floaters} />
       </div>
       {juice.timeUp && (

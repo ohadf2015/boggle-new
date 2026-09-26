@@ -47,6 +47,10 @@ export interface RoundJuice {
   dropBanner: () => void;
   rankFlipKey: string | undefined;
   timeUp: boolean;
+  /** Screen-reader-only reason for the last plain rejection (the pill shows it visually). */
+  rejectText: string | null;
+  /** Server points per accepted word (lowercased) — feeds the words ladder. */
+  pointsByWord: ReadonlyMap<string, number>;
 }
 
 interface Params {
@@ -69,6 +73,8 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
   const [floaters, setFloaters] = useState<RoundFloater[]>([]);
   const [rankFlipKey, setRankFlipKey] = useState<string | undefined>(undefined);
   const [timeUp, setTimeUp] = useState(false);
+  const [rejectText, setRejectText] = useState<string | null>(null);
+  const [pointsByWord, setPointsByWord] = useState<ReadonlyMap<string, number>>(() => new Map());
   const seq = useRef(0);
   const nextId = (p: string) => `${p}-${++seq.current}`;
 
@@ -82,6 +88,7 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
   const floaterTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
   useEffect(() => {
     if (!freshWord) return;
+    setPointsByWord((prev) => new Map(prev).set(freshWord.word.toLowerCase(), freshWord.points));
     if (freshWord.points > 0) {
       const f = { id: freshWord.id, points: freshWord.points };
       setFloaters((prev) => [...prev, f].slice(-MAX_FLOATERS));
@@ -115,7 +122,9 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
       });
       return;
     }
-    setCallout({ id: lastReject.id, text: t(REJECT_KEY[lastReject.reason]), tone: 'quiet' });
+    // Plain rejections stay QUIET: the word pill already shakes red with the
+    // reason, so no callout — just a screen-reader announcement.
+    setRejectText(t(REJECT_KEY[lastReject.reason]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastReject?.id]);
 
@@ -161,5 +170,5 @@ export function useRoundJuice({ meId, standings, remainingTime }: Params): Round
 
   const dropBanner = useCallback(() => setBanners((b) => b.slice(1)), []);
 
-  return { gain, floaters, callout, banners, dropBanner, rankFlipKey, timeUp };
+  return { gain, floaters, callout, banners, dropBanner, rankFlipKey, timeUp, rejectText, pointsByWord };
 }

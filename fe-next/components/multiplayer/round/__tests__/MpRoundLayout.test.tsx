@@ -97,7 +97,7 @@ describe('MpRoundLayout', () => {
 
   it('shows ONE clock: the big m:ss digits, not a second label inside the ring', () => {
     render(<MpRoundLayout {...props()} />);
-    expect(screen.getByTestId('mp-timer').className).toContain('[&_svg~div]:hidden');
+    expect(screen.getByTestId('mp-timer').className).toContain('[&_svg~div]:hidden!');
   });
 
   it('the exit button hands off to the view (which confirms)', () => {
@@ -154,12 +154,21 @@ describe('MpRoundLayout', () => {
     expect(sounds.playComboSound).toHaveBeenCalled();
   });
 
-  it('a rejection is QUIET (small, no loud callout)', () => {
+  it('a plain rejection stays QUIET: no visible callout (the word pill already shakes red), SR-only reason', () => {
     render(<MpRoundLayout {...props()} />);
     act(() => recordWordRejected('xq', 'too-short'));
-    const callout = screen.getByTestId('mp-callout');
-    expect(callout).toHaveAttribute('data-tone', 'quiet');
-    expect(callout).toHaveTextContent('mpUi.round.reject.tooShort');
+    expect(screen.queryByTestId('mp-callout')).toBeNull();
+    expect(screen.getByTestId('mp-reject-sr')).toHaveTextContent('mpUi.round.reject.tooShort');
+    expect(screen.getByTestId('mp-reject-sr').className).toContain('sr-only');
+  });
+
+  it('the words ladder shows the SERVER points per word and skips duplicates', () => {
+    const { rerender } = render(<MpRoundLayout {...props({ foundWords: [{ word: 'cats' }] })} />);
+    act(() => recordWordAccepted({ word: 'cats', score: 7 }));
+    rerender(<MpRoundLayout {...props({ foundWords: [{ word: 'cats' }, { word: 'cats', duplicate: true } as never] })} />);
+    const rows = screen.getAllByTestId('ladder-row-cats');
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toHaveTextContent('7');
   });
 
   it('a word someone found first shows "{name} got it first · +N" (quiet)', () => {

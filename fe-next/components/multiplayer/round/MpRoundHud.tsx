@@ -45,7 +45,7 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
           size={timerSize}
           colorFamily={timerColor}
           // One clock: the ring's own inner label duplicates the big m:ss digits.
-          className="[&_svg~div]:hidden"
+          className="[&_svg~div]:hidden!"
         />
       }
       end={
