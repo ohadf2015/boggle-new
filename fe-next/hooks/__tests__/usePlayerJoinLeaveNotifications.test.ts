@@ -122,6 +122,20 @@ describe('usePlayerJoinLeaveNotifications', () => {
     expect(neoInfoToast).not.toHaveBeenCalled();
   });
 
+  it('does not announce the room you just entered (roster seeded from `joined` as enabled flips on)', () => {
+    type P = { players: Player[]; enabled: boolean };
+    const { rerender } = renderHook(
+      ({ players, enabled }: P) => usePlayerJoinLeaveNotifications({ players, currentUsername: 'Me', t: mockT, enabled }),
+      { initialProps: { players: [] as Player[], enabled: false } },
+    );
+    // PageClient applies the seat list and isActive=true in the same render.
+    rerender({ players: [{ username: 'Me' }, { username: 'Host' }, { username: 'Cy' }], enabled: true });
+    expect(neoInfoToast).not.toHaveBeenCalled();
+    // A real join afterwards still announces.
+    rerender({ players: [{ username: 'Me' }, { username: 'Host' }, { username: 'Cy' }, { username: 'Dee' }], enabled: true });
+    expect(neoInfoToast).toHaveBeenCalledTimes(1);
+  });
+
   it('should handle simultaneous join and leave', () => {
     const { rerender } = renderHook(
       ({ players }: { players: Player[] }) =>

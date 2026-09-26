@@ -43,6 +43,7 @@ export function usePlayerJoinLeaveNotifications({
   deferToQueue = false,
 }: UsePlayerJoinLeaveNotificationsProps) {
   const prevUsernamesRef = useRef<Set<string> | null>(null);
+  const wasEnabledRef = useRef<boolean>(enabled);
 
   useEffect(() => {
     const currentUsernames = new Set(players.map((p) => p.username));
@@ -54,7 +55,12 @@ export function usePlayerJoinLeaveNotifications({
       return;
     }
 
-    if (!enabled) {
+    // Disabled, or just enabled (entering a room — the roster is seeded from
+    // `joined` in the same render): baseline silently, never announce the
+    // players who were already there.
+    const justEnabled = enabled && !wasEnabledRef.current;
+    wasEnabledRef.current = enabled;
+    if (!enabled || justEnabled) {
       prevUsernamesRef.current = currentUsernames;
       return;
     }
