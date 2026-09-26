@@ -326,7 +326,8 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
                   type="button"
                   onClick={() => setSheet('invite')}
                   data-testid="lobby-invite-button"
-                  className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-neo-display text-xs font-bold uppercase shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+                  // Outlined secondary: START BATTLE! beside it is the lobby's one solid CTA.
+                  className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-cyan bg-neo-navy text-neo-cyan font-neo-display text-xs font-bold uppercase shadow-hard-sm hover:bg-neo-cyan/10 active:translate-y-0.5 active:shadow-none"
                 >
                   <UserPlus aria-hidden="true" className="w-6 h-6" />
                   {t('mpUi.lobby.invite')}

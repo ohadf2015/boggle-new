@@ -132,6 +132,16 @@ describe('HostPreGameView — lobby on the shell', () => {
     expect(within(within(screen.getByTestId('lobby-phone')).getByTestId('lobby-start')).getByText('mpUi.lobby.seatsTaken')).toBeInTheDocument();
   });
 
+  it('phone footer: INVITE is an outlined secondary beside the one solid START', () => {
+    render(<HostPreGameView {...baseProps} hostPlaying playersReady={[{ username: 'Host', isHost: true }]} />);
+    const invite = within(screen.getByTestId('lobby-phone')).getByTestId('lobby-invite-button');
+    // A solid cyan tile with a hard shadow competed with START BATTLE! at 390px.
+    expect(invite.className).not.toMatch(/\bbg-neo-cyan(?![/\w-])/);
+    expect(invite.className).not.toMatch(/\bshadow-hard(?![-\w])/);
+    expect(invite.className).toContain('border-neo-cyan');
+    expect(invite.className).toContain('text-neo-cyan');
+  });
+
   it('a private room shows the head count instead of a shareable code, and no invite', () => {
     render(<HostPreGameView {...baseProps} isPrivate hostPlaying playersReady={[{ username: 'Host', isHost: true }]} />);
     expect(screen.queryByText('SOLO01')).toBeNull();
