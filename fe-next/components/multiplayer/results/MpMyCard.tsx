@@ -108,10 +108,12 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
         )}
         <div className="flex flex-wrap items-center gap-1.5 min-w-0">
           {bestWord && (
-            <span className={cn('inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-lime px-2 py-0.5 text-[calc(12px*var(--mp-u,1))] font-bold max-w-full', revealed && fx.chipPop)}>
+            <span data-testid="mp-my-best-word" className={cn('inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-lime px-2 py-0.5 text-[calc(12px*var(--mp-u,1))] font-bold max-w-full min-w-0', revealed && fx.chipPop)}>
               <Star aria-hidden="true" className="w-3.5 h-3.5 shrink-0 fill-neo-black" />
-              <span className="sr-only">{t('mpUi.results.bestWord')}</span>
-              <span dir="auto" className="uppercase truncate">{bestWord.word}</span>
+              <span data-testid="mp-my-best-word-label" className="shrink-0 uppercase font-neo-body text-[0.8em] tracking-wide opacity-70">
+                {t('mpUi.results.bestWord')}
+              </span>
+              <span dir="auto" className="uppercase truncate font-neo-display">{bestWord.word}</span>
               <span className="tabular-nums opacity-70">+{bestWord.score}</span>
             </span>
           )}

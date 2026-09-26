@@ -111,7 +111,11 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
               {(r.roundScore !== undefined || r.seriesTotal !== null) && (
                 <span className={cn('flex items-center gap-1 text-[calc(11px*var(--mp-u,1))] font-neo-body tabular-nums', first ? 'text-neo-black/75' : 'text-neo-white/70')}>
                   {r.roundScore !== undefined ? (
-                    <span data-testid="mp-standing-round" className="truncate">
+                    <span
+                      data-testid="mp-standing-round"
+                      data-quiet={String(r.roundScore === 0)}
+                      className={cn('truncate', r.roundScore === 0 && 'opacity-50')}
+                    >
                       {t('mpUi.results.roundGain', { points: `\u2066+${r.roundScore}\u2069` })}
                     </span>
                   ) : (
