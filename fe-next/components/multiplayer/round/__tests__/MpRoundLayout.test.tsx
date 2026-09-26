@@ -153,6 +153,46 @@ describe('MpRoundLayout', () => {
     expect(row.className).toContain('tv:text-2xl');
   });
 
+  it('desktop/TV rail: names show at full length or wrap to two lines — never "RndHostclassicho…" (no-space handles break anywhere)', () => {
+    render(<MpRoundLayout {...props()} />);
+    const rail = document.querySelector('[data-testid="mp-roster-strip"][data-layout="rail"]') as HTMLElement;
+    const name = '[&_[data-player]>span[dir=auto]]';
+    for (const c of ['whitespace-normal', 'line-clamp-2', '[overflow-wrap:anywhere]', 'flex-1', 'min-w-0']) {
+      expect(rail.className).toContain(`${name}:${c}`);
+    }
+  });
+
+  it('desktop/TV rail: the roster is a full-height panel (like YOUR WORDS opposite), so the column reads framed, not a void under 4 seats', () => {
+    render(<MpRoundLayout {...props()} />);
+    const panel = screen.getByTestId('mp-rail-roster');
+    expect(panel.className).toContain('flex-1');
+    expect(panel.className).toContain('min-h-0');
+    expect(panel).toContainElement(document.querySelector('[data-testid="mp-roster-strip"][data-layout="rail"]') as HTMLElement);
+  });
+
+  it('phone trail is labelled as a list ("Your words"), so it never reads as a second feedback toast', () => {
+    render(<MpRoundLayout {...props({ foundWords: [{ word: 'cat', timestamp: 1 }] })} />);
+    const label = screen.getByTestId('mp-recent-label');
+    expect(label).toHaveTextContent('mpUi.round.yourWords');
+    expect(screen.getByTestId('mp-recent-words').firstElementChild).toBe(label);
+  });
+
+  it('desktop/TV rail: the mode card anchors the bottom of the roster column (name + one-line rule), so the column is never a dead void', () => {
+    render(<MpRoundLayout {...props({ gameMode: 'word-hunt' })} />);
+    const card = screen.getByTestId('mp-rail-mode');
+    expect(card).toHaveTextContent('mpUi.round.mode.wordHunt.name');
+    expect(card).toHaveTextContent('mpUi.round.mode.wordHunt.rule');
+    expect(card.className).toContain('mt-auto');
+  });
+
+  it('desktop/TV words panel before the first word: a purposeful empty state (what lands here), not "No words yet"', () => {
+    render(<MpRoundLayout {...props({ foundWords: [] })} />);
+    const empty = screen.getByTestId('mp-words-empty');
+    expect(empty).toHaveTextContent('mpUi.round.wordsEmpty.title');
+    expect(empty).toHaveTextContent('mpUi.round.wordsEmpty.body');
+    expect(empty).not.toHaveTextContent('mpUi.round.noWords');
+  });
+
   it('desktop/TV: the rank chip stands as tall as the score chip (competitive clarity: "#2/4" was a 40px afterthought)', () => {
     render(<MpRoundLayout {...props()} />);
     const chip = screen.getByTestId('mp-rank-chip');
@@ -258,12 +298,11 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-callout')).toHaveTextContent('"name":"\u2068דני2\u2069"');
   });
 
-  it('recent-word points stay "+N" in RTL (points isolated as LTR)', () => {
+  it('phone trail carries NO points: the "+N" for a word is said once, by the pill/floater (a second "+5" above the board read as a duplicate toast)', () => {
     render(<MpRoundLayout {...props({ foundWords: [{ word: 'tar', timestamp: 1 }] })} />);
     act(() => recordWordAccepted({ word: 'tar', score: 5 }));
-    const pts = screen.getByTestId('mp-recent-word-points');
-    expect(pts).toHaveAttribute('dir', 'ltr');
-    expect(pts).toHaveTextContent('+5');
+    expect(screen.queryByTestId('mp-recent-word-points')).toBeNull();
+    expect(screen.getAllByTestId('mp-recent-word')[0]).not.toHaveTextContent('+5');
   });
 
   it('heartbeat once per second in the last 5 seconds', () => {
@@ -289,7 +328,7 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-callout-stage').className).not.toContain('132px');
   });
 
-  it('phone: my words ride the stage as a trail of chips (newest first, server points)', () => {
+  it('phone: my words ride the stage as a trail of chips (newest first, server accepts included)', () => {
     const words = ['cat', 'dog', 'rat', 'bird', 'cart', 'dart', 'tar'].map((word, i) => ({ word, timestamp: i }));
     const { rerender } = render(<MpRoundLayout {...props({ foundWords: words.slice(0, 6) })} />);
     act(() => recordWordAccepted({ word: 'tar', score: 5 }));
@@ -299,45 +338,37 @@ describe('MpRoundLayout', () => {
     const chips = screen.getAllByTestId('mp-recent-word');
     expect(chips).toHaveLength(7);
     expect(chips[0]).toHaveTextContent('tar');
-    expect(chips[0]).toHaveTextContent('+5');
     expect(chips[6]).toHaveTextContent('cat');
     expect(screen.queryByTestId('mp-recent-more')).toBeNull();
   });
 
-  it('phone: the newest word STAMPS big onto the stage (the free band over the board is a reward, not a void); older words stay small chips', () => {
+  it('phone: ONE feedback channel per word — the trail is a record, not a second "+N" toast: the newest word is a plain chip (no big stamp, no motion); the accept moment belongs to the pill/floater', () => {
     const words = ['cat', 'dog', 'tar'].map((word, i) => ({ word, timestamp: i }));
     render(<MpRoundLayout {...props({ foundWords: words })} />);
     const chips = screen.getAllByTestId('mp-recent-word');
-    expect(chips[0]).toHaveAttribute('data-hero', 'true');
-    expect(chips[0].className).toContain('text-3xl');
-    expect(chips[1]).not.toHaveAttribute('data-hero');
-    expect(chips[1].className).toContain('text-sm');
-    // the hero owns its own row
-    expect(screen.getByTestId('mp-recent-break')).toBeInTheDocument();
+    for (const chip of chips) {
+      expect(chip).not.toHaveAttribute('data-hero');
+      expect(chip.className).toContain('text-sm');
+      expect(chip.className).not.toMatch(/text-(2|3)xl/);
+      expect(chip.className).not.toContain('wordStamp');
+    }
+    expect(screen.queryByTestId('mp-recent-break')).toBeNull();
+    // newest still reads as newest (first, emphasised border), just not as an event
+    expect(chips[0]).toHaveTextContent('tar');
+    expect(chips[0]).toHaveAttribute('data-newest', 'true');
   });
 
-  it('phone: a long hero word never overflows a 390px phone (clipped, and a size step down past 8 letters) — Latin and Hebrew', () => {
+  it('phone: a long newest word never overflows a 390px phone (clipped) — Latin and Hebrew', () => {
     for (const word of ['extraordinarily', 'התרגשותיות']) {
       const { unmount } = render(<MpRoundLayout {...props({ foundWords: [{ word, timestamp: 1, score: 40 }] })} />);
-      const hero = screen.getAllByTestId('mp-recent-word')[0];
-      expect(hero.className).toContain('max-w-full');
-      expect(hero.className).toContain('min-w-0');
-      expect(hero.className).toContain('text-2xl');
-      expect(hero.className).not.toContain('text-3xl');
-      const text = hero.querySelector('span[dir="auto"]') as HTMLElement;
+      const chip = screen.getAllByTestId('mp-recent-word')[0];
+      expect(chip.className).toContain('max-w-full');
+      expect(chip.className).toContain('min-w-0');
+      const text = chip.querySelector('span[dir="auto"]') as HTMLElement;
       expect(text).toHaveTextContent(word);
       expect(text.className).toContain('truncate');
       unmount();
     }
-  });
-
-  it('phone: the stamp is transform-only motion and stands still under reduced motion', () => {
-    const { unmount } = render(<MpRoundLayout {...props({ foundWords: [{ word: 'cat', timestamp: 1 }] })} />);
-    expect(screen.getAllByTestId('mp-recent-word')[0].className).toContain('wordStamp');
-    unmount();
-    reduce.value = true;
-    render(<MpRoundLayout {...props({ foundWords: [{ word: 'cat', timestamp: 1 }] })} />);
-    expect(screen.getAllByTestId('mp-recent-word')[0].className).not.toContain('wordStamp');
   });
 
   it('word-hunt: no rule hint in the stage (its clue strip teaches; "any word heals" stays on the countdown)', () => {

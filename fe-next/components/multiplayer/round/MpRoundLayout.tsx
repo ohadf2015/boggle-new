@@ -10,7 +10,7 @@ import { WordsLadder, type LadderWord } from '../desktop/WordsLadder';
 import { MpRoundHud } from './MpRoundHud';
 import { MpScoreFloaters } from './MpScoreFloaters';
 import { MpRecentWords } from './MpRecentWords';
-import { roundModeMeta, timerColor } from './roundModes';
+import { MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, timerColor } from './roundModes';
 import { useRoundJuice, type RoundSocket } from './useRoundJuice';
 import { mergeServerWords, useServerAcceptedWords } from './useServerAcceptedWords';
 import styles from './round.module.css';
@@ -81,6 +81,7 @@ function MpRoundLayoutImpl({
   const { t } = useLanguage();
   const reduceMotion = useShouldReduceMotion();
   const mode = roundModeMeta(gameMode);
+  const ModeIcon = MODE_ICONS[mode.icon] ?? FALLBACK_MODE_ICON;
 
   // One roster source for host and joiner (lib/multiplayer/roster).
   const prevRoster = useRef<MpRosterPlayer[] | undefined>(undefined);
@@ -147,15 +148,34 @@ function MpRoundLayoutImpl({
       {/* Desktop: roster rail */}
       <aside className={cn(styles.areaLeft, 'min-h-0 flex-col gap-2 pt-3')} aria-label={t('mpUi.round.players')}>
         <h2 className="font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1">{t('mpUi.round.players')}</h2>
-        <div className="min-h-0 overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3">
+        {/* Full height, like YOUR WORDS opposite: the column is framed, never a void under a short roster. */}
+        <div data-testid="mp-rail-roster" className="flex-1 min-h-0 overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3 tv:p-4">
           <MpRosterStrip
             players={roster}
             meId={meId}
             layout="rail"
             showScores
-            // 10-ft TV: names + scores at 24px (the shell's 14px vanishes across a room).
-            className="tv:gap-3 tv:[&_[data-player]>span:not(:first-child)]:text-2xl"
+            className={cn(
+              // A name shows whole or wraps to two lines (handles have no spaces:
+              // break anywhere) — never "RndHostclassicho…". The score keeps its width.
+              '[&_[data-player]>span[dir=auto]]:whitespace-normal [&_[data-player]>span[dir=auto]]:line-clamp-2 [&_[data-player]>span[dir=auto]]:[overflow-wrap:anywhere] [&_[data-player]>span[dir=auto]]:flex-1 [&_[data-player]>span[dir=auto]]:min-w-0 [&_[data-player]>span[dir=auto]]:leading-tight',
+              // 10-ft TV: names + scores at 24px (14px vanishes across a room).
+              'tv:gap-4 tv:[&_[data-player]]:gap-3 tv:[&_[data-player]>span:not(:first-child)]:text-2xl',
+            )}
           />
+        </div>
+        {/* The mode, anchoring the column's foot: what everyone is playing, for the room. */}
+        <div
+          data-testid="mp-rail-mode"
+          className="mt-auto shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3 tv:p-5"
+        >
+          <p className={cn('flex items-center gap-2 font-neo-display font-bold uppercase tracking-wide text-base tv:text-3xl', MODE_TEXT[mode.color])}>
+            <ModeIcon aria-hidden="true" className="shrink-0 w-5 h-5 tv:w-8 tv:h-8" />
+            <span dir="auto">{t(mode.nameKey)}</span>
+          </p>
+          <p dir="auto" className="mt-1 tv:mt-2 text-sm tv:text-xl font-bold leading-snug text-neo-white/70 text-balance">
+            {t(mode.ruleKey)}
+          </p>
         </div>
       </aside>
 
@@ -196,7 +216,15 @@ function MpRoundLayoutImpl({
           {ladder.length > 0 ? (
             <WordsLadder words={ladder} meId={meId} />
           ) : (
-            <p className="m-auto p-4 text-center text-sm tv:text-xl text-neo-white/60">{t('mpUi.round.noWords')}</p>
+            <div data-testid="mp-words-empty" className="m-auto flex flex-col items-center gap-3 tv:gap-5 p-6 text-center">
+              {/* A ghost of the first ladder row: shows WHAT lands here, not "nothing". */}
+              <div aria-hidden="true" className="flex w-40 tv:w-64 items-center justify-between rounded-neo border-2 border-dashed border-neo-white/30 px-3 py-1.5 tv:py-3 font-neo-display font-bold uppercase text-neo-white/40 text-sm tv:text-2xl">
+                <span>• • •</span>
+                <span dir="ltr" className="tabular-nums">+?</span>
+              </div>
+              <p dir="auto" className="font-neo-display font-bold uppercase tracking-wide text-base tv:text-3xl text-neo-white text-balance [overflow-wrap:anywhere]">{t('mpUi.round.wordsEmpty.title')}</p>
+              <p dir="auto" className="max-w-[16rem] tv:max-w-[22rem] text-sm tv:text-xl font-bold leading-snug text-neo-white/60 text-balance">{t('mpUi.round.wordsEmpty.body')}</p>
+            </div>
           )}
         </div>
       </aside>
@@ -211,7 +239,7 @@ function MpRoundLayoutImpl({
           className={cn('absolute inset-x-0 top-0 px-3', mode.slug === 'wordHunt' && 'top-[calc(132px*var(--mp-u,1))]', isBlast && 'top-[52px]')}
         >
           {/* Word-hunt's clue strip already teaches; its rule stays on the countdown. */}
-          <MpRecentWords words={ladder} emptyHint={mode.slug === 'wordHunt' ? undefined : t(mode.ruleKey)} />
+          <MpRecentWords words={ladder} label={t('mpUi.round.yourWords')} emptyHint={mode.slug === 'wordHunt' ? undefined : t(mode.ruleKey)} />
           <div className="relative">
             <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
           </div>

@@ -45,6 +45,7 @@ import {
   useGameStore,
 } from '@/hooks/gameState/store';
 import { useRoundPendingWords, PendingWordChips } from '@/components/multiplayer/round/useRoundPendingWords';
+import { useRoundToastLane } from '@/components/multiplayer/round/useRoundToastLane';
 import { StopGameConfirm } from '@/components/multiplayer/round/StopGameConfirm';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
@@ -171,6 +172,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   const setBlastBoardClearedByLocal = useGameStore((s) => s.setBlastBoardClearedByLocal);
 
   const { pendingWords, enqueuePending, dismissPending } = useRoundPendingWords(socket, username);
+  // Shared toasters (achievement capsule, react-hot-toast) stay off the round HUD.
+  useRoundToastLane();
 
   const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =
     useReconnectFlow({ gameCode, username, gameActive: true });

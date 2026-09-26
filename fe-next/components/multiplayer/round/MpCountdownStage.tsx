@@ -1,7 +1,6 @@
 'use client';
 
 import { memo, useEffect, useRef, useState } from 'react';
-import { Building2, Gavel, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Target, Zap, type LucideIcon } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,7 +9,7 @@ import { useGameMode } from '@/hooks/gameState/selectors';
 import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
 import { cn } from '@/lib/utils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { MODE_FILL, MODE_TEXT, roundModeMeta } from './roundModes';
+import { MODE_FILL, MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta } from './roundModes';
 import styles from './round.module.css';
 
 /** Max avatars in the "who am I about to play?" row; the rest become "+N". */
@@ -33,7 +32,6 @@ export interface MpCountdownStageProps {
   players?: ReadonlyArray<CountdownPlayer>;
 }
 
-const ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Gavel, Grid3x3, Grid2x2, Shuffle };
 
 /** Pick a glanceable few: connected humans first, then bots. */
 export function selectCountdownAvatars(players?: ReadonlyArray<CountdownPlayer>): CountdownPlayer[] {
@@ -110,7 +108,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players }: MpCountdownStag
   const isGo = count === 0;
   const avatars = selectCountdownAvatars(players);
   const overflow = Math.max(0, (players?.filter((p) => !p.disconnected).length ?? 0) - avatars.length);
-  const Icon = ICONS[mode.icon] ?? Shuffle;
+  const Icon = MODE_ICONS[mode.icon] ?? FALLBACK_MODE_ICON;
   const goText = t('countdown.go');
   const label = isGo ? (goText && goText !== 'countdown.go' ? goText : 'GO!') : String(count);
 

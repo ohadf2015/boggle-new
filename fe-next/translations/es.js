@@ -18470,7 +18470,10 @@ const es = {
       },
       "keyboardHint": "Escribe una palabra · Enter envía · Esc borra",
       "yourWords": "Tus palabras",
-      "noWords": "Aún no hay palabras. ¡Encuentra la primera!",
+      "wordsEmpty": {
+        "title": "Aquí caen tus palabras",
+        "body": "Cada palabra que encuentres se apila aquí con sus puntos, la más nueva arriba."
+      },
       "players": "Jugadores",
       "specialWord": "¡{name} encontró la palabra especial {word}!",
       "specialWordMine": "¡Palabra especial {word}! +{bonus}"

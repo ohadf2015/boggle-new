@@ -44,6 +44,7 @@ import {
 } from '@/hooks/gameState/store';
 import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
 import { useRoundPendingWords, PendingWordChips } from '@/components/multiplayer/round/useRoundPendingWords';
+import { useRoundToastLane } from '@/components/multiplayer/round/useRoundToastLane';
 import { PlayerRoundDialogs } from './in-game/PlayerRoundDialogs';
 import type { PlayerFoundWord, PlayerHintsState, PlayerLeaderboardEntry, PlayerTournamentData } from './in-game/types';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
@@ -159,6 +160,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // from re-rendering on irrelevant store updates when gameMode isn't classic.
 
   const { pendingWords, enqueuePending, dismissPending } = useRoundPendingWords(socket, username);
+  // Shared toasters (achievement capsule, react-hot-toast) stay off the round HUD.
+  useRoundToastLane();
 
   const mpExit = useMpExit();
   const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =

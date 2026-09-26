@@ -74,6 +74,7 @@ vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: fals
 import PlayerInGameView from '../PlayerInGameView';
 import { MpExitProvider } from '@/hooks/useMpExit';
 import { recordWordAccepted } from '@/lib/multiplayer/mpFeedback';
+import { ROUND_TOAST_LANE_CLASS } from '@/components/multiplayer/round/useRoundToastLane';
 
 const baseProps = {
   username: 'p1',
@@ -113,6 +114,13 @@ describe('PlayerInGameView — round frame', () => {
     shell.value = false;
     abort.value = false;
     routerPush.mockClear();
+  });
+
+  it('toast lane: while the round view is up, shared toasters are routed off the HUD (and released after)', () => {
+    const { unmount } = render(<PlayerInGameView {...baseProps} />);
+    expect(document.documentElement.classList.contains(ROUND_TOAST_LANE_CLASS)).toBe(true);
+    unmount();
+    expect(document.documentElement.classList.contains(ROUND_TOAST_LANE_CLASS)).toBe(false);
   });
 
   it('classic: board inside the round frame with the legacy chrome off', () => {

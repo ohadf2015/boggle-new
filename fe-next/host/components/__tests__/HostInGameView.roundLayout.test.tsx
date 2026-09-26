@@ -69,6 +69,7 @@ vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: fals
 import HostInGameView from '../HostInGameView';
 import { MpExitProvider } from '@/hooks/useMpExit';
 import { recordWordAccepted } from '@/lib/multiplayer/mpFeedback';
+import { ROUND_TOAST_LANE_CLASS } from '@/components/multiplayer/round/useRoundToastLane';
 
 const props = {
   gameCode: 'ROOM42',
@@ -100,6 +101,13 @@ describe('HostInGameView — round frame', () => {
     mode.value = 'classic';
     abort.value = false;
     routerPush.mockClear();
+  });
+
+  it('toast lane: while the round view is up, shared toasters are routed off the HUD (and released after)', () => {
+    const { unmount } = render(<HostInGameView {...props} />);
+    expect(document.documentElement.classList.contains(ROUND_TOAST_LANE_CLASS)).toBe(true);
+    unmount();
+    expect(document.documentElement.classList.contains(ROUND_TOAST_LANE_CLASS)).toBe(false);
   });
 
   it('classic: the playing host gets the round frame (HUD + board, chrome off)', () => {

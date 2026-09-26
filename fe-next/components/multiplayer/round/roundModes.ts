@@ -4,6 +4,7 @@
  * on the countdown live in `mpUi.round.mode.<slug>` so every live mode
  * (crossword included) has copy in all six locales.
  */
+import { Building2, Gavel, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Target, Zap, type LucideIcon } from 'lucide-react';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 
 export interface RoundModeMeta {
@@ -35,6 +36,10 @@ export function roundModeMeta(mode: string | null | undefined): RoundModeMeta {
     ruleKey: `mpUi.round.mode.${slug}.rule`,
   };
 }
+
+/** The registry's icon names → lucide components (look up; unknown → `Shuffle`). */
+export const MODE_ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Gavel, Grid3x3, Grid2x2, Shuffle };
+export const FALLBACK_MODE_ICON: LucideIcon = Shuffle;
 
 /** Text + fill classes per colour family (dark-only surfaces). */
 export const MODE_TEXT: Record<ModeColorFamily, string> = {

@@ -34,15 +34,6 @@
 }
 .flyUp { animation: flyUp 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards; will-change: transform; }
 
-/* Phone stage: the newest word stamps down (scale + tilt settle, transform only). */
-@keyframes wordStamp {
-  /* relative to the chip's own -rotate-2 tilt (the `rotate` property) */
-  0% { transform: scale(1.6) rotate(-8deg); }
-  55% { transform: scale(0.94) rotate(1deg); }
-  100% { transform: scale(1) rotate(0deg); }
-}
-.wordStamp { animation: wordStamp 280ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-
 /* TIME! slam at 0 (scale 1.6 → 1, 250ms). */
 @keyframes timeSlam {
   0% { transform: scale(1.6) rotate(-4deg); }
@@ -64,7 +55,6 @@
   .boardDrop,
   .flyUp,
   .timeSlam,
-  .wordStamp,
   .segPop {
     animation: none !important;
   }
@@ -100,7 +90,10 @@
 }
 @media (min-width: 1800px) and (min-height: 1000px) {
   .layout {
-    grid-template-columns: minmax(300px, 1fr) minmax(0, 1100px) minmax(300px, 1fr);
+    /* The board is height-bound on a TV (~860px at 1080p): cap its column there
+       so the spare width goes to the rails (full names, 10-ft seats) instead of
+       dead margins either side of the board. */
+    grid-template-columns: minmax(300px, 1fr) minmax(0, min(1100px, calc(100dvh - 220px))) minmax(300px, 1fr);
     column-gap: 1.5rem;
   }
 }
@@ -133,4 +126,38 @@
 /* With the score cell gone, the clear bar takes the rest of the strip. */
 .blastCanvas :global([data-testid='blast-hud'] div:has(> [data-testid='blast-progress-label'])) {
   flex: 1 1 0%;
+}
+
+/*
+ * Toast lane (useRoundToastLane puts .roundLive on <html> while a round view is
+ * mounted). The app's toasters are shared and fixed to the top-centre — exactly
+ * where the round HUD's timer and score live — so during a round:
+ *  - the achievement capsule is held back (the unlock is listed on results);
+ *  - react-hot-toast (AFK warning, host change, time added…) still shows, but
+ *    below the phone HUD + roster strip, and in the start rail's bottom corner
+ *    on desktop/TV (never over the board). Its container position is an inline
+ *    style, hence !important.
+ */
+.roundLive :global([data-testid='achievement-inline-toast']) {
+  display: none !important;
+}
+.roundLive :global([data-rht-toaster]) {
+  top: calc(env(safe-area-inset-top, 0px) + 6.75rem) !important;
+}
+@media (min-width: 1024px) {
+  .roundLive :global([data-rht-toaster]) {
+    /* above the rail's mode card (the column's foot) */
+    top: auto !important;
+    bottom: 10rem !important;
+    height: 9rem;
+    inset-inline-start: 1rem !important;
+    inset-inline-end: auto !important;
+    width: min(22vw, 420px);
+  }
+}
+@media (min-width: 1800px) and (min-height: 1000px) {
+  .roundLive :global([data-rht-toaster]) {
+    top: auto !important;
+    bottom: 13rem !important;
+  }
 }

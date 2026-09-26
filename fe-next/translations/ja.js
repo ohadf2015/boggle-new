@@ -18452,7 +18452,10 @@ const ja = {
       },
       "keyboardHint": "単語を入力 · Enterで送信 · Escでクリア",
       "yourWords": "あなたの単語",
-      "noWords": "まだ単語がありません。最初の1つを見つけよう！",
+      "wordsEmpty": {
+        "title": "見つけた単語はここに並ぶ",
+        "body": "見つけた単語が得点つきでここに積み上がる。新しいものが一番上。"
+      },
       "players": "プレイヤー",
       "specialWord": "{name}がスペシャルワード「{word}」を発見！",
       "specialWordMine": "スペシャルワード「{word}」！ +{bonus}"

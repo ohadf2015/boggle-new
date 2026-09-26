@@ -17530,7 +17530,10 @@ const en = {
       },
       "keyboardHint": "Type a word · Enter to submit · Esc to clear",
       "yourWords": "Your words",
-      "noWords": "No words yet. Find the first one!",
+      "wordsEmpty": {
+        "title": "Your words land here",
+        "body": "Each word you find stacks up here with its points, newest on top."
+      },
       "players": "Players",
       "specialWord": "{name} found the special word {word}!",
       "specialWordMine": "Special word {word}! +{bonus}"

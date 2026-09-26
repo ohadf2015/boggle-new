@@ -18452,7 +18452,10 @@ const sv = {
       },
       "keyboardHint": "Skriv ett ord · Enter skickar · Esc rensar",
       "yourWords": "Dina ord",
-      "noWords": "Inga ord än. Hitta det första!",
+      "wordsEmpty": {
+        "title": "Här landar dina ord",
+        "body": "Varje ord du hittar staplas här med sina poäng, det nyaste överst."
+      },
       "players": "Spelare",
       "specialWord": "{name} hittade specialordet {word}!",
       "specialWordMine": "Specialord {word}! +{bonus}"
