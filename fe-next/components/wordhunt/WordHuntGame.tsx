@@ -288,7 +288,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     {showQuickRules && !mpChrome && <WordHuntQuickRules onDismiss={handleDismissRules} t={t} />}
     <LowHPOverlay hp={bridge.lifePoints} />
     <WordHuntCategoryHint targetLength={bridge.targetLength} targetCategory={bridge.targetCategory} />
-    <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} />
+    <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} placement={mpChrome ? 'panel' : 'viewport'} />
     <WordHuntGameLayout
       // Header (no timer)
       score={score}

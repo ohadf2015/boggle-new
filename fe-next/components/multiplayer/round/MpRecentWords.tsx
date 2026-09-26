@@ -8,6 +8,8 @@ import type { LadderWord } from '../desktop/WordsLadder';
 
 /** Chips the phone trail shows; older words fold into one "+N" chip (at most ~3 rows on a 390px phone). */
 export const MAX_RECENT_WORDS = 12;
+/** Past this many letters the stamped hero word steps down from text-3xl. */
+const HERO_LONG_WORD = 8;
 
 /**
  * Phone only: my words in the free stage above the board — the desktop
@@ -40,16 +42,21 @@ function MpRecentWordsImpl({ words, emptyHint }: { words: LadderWord[]; emptyHin
               className={cn(
                 'inline-flex items-baseline border-neo-black font-neo-display font-bold uppercase',
                 hero
-                  ? cn('gap-2 rounded-neo border-3 bg-neo-lime px-4 py-1 text-3xl text-neo-black shadow-hard -rotate-2 mb-1', !reduceMotion && styles.wordStamp)
+                  ? cn(
+                      // Never wider than the phone: long words step down a size, then clip.
+                      'max-w-full min-w-0 gap-2 rounded-neo border-3 bg-neo-lime px-4 py-1 text-neo-black shadow-hard -rotate-2 mb-1',
+                      w.word.length > HERO_LONG_WORD ? 'text-2xl' : 'text-3xl',
+                      !reduceMotion && styles.wordStamp,
+                    )
                   : 'gap-1 rounded-full border-2 bg-neo-navy-light px-2.5 py-0.5 text-sm text-neo-white/80 shadow-hard-sm',
               )}
             >
-              <span dir="auto">{w.word}</span>
+              <span dir="auto" className={hero ? 'truncate min-w-0' : undefined}>{w.word}</span>
               {w.score > 0 && (
                 <span
                   data-testid="mp-recent-word-points"
                   dir="ltr"
-                  className={cn('tabular-nums', hero ? 'text-lg' : 'text-xs opacity-80')}
+                  className={cn('shrink-0 tabular-nums', hero ? 'text-lg' : 'text-xs opacity-80')}
                 >
                   +{w.score}
                 </span>

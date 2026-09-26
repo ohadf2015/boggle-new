@@ -316,6 +316,21 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-recent-break')).toBeInTheDocument();
   });
 
+  it('phone: a long hero word never overflows a 390px phone (clipped, and a size step down past 8 letters) — Latin and Hebrew', () => {
+    for (const word of ['extraordinarily', 'התרגשותיות']) {
+      const { unmount } = render(<MpRoundLayout {...props({ foundWords: [{ word, timestamp: 1, score: 40 }] })} />);
+      const hero = screen.getAllByTestId('mp-recent-word')[0];
+      expect(hero.className).toContain('max-w-full');
+      expect(hero.className).toContain('min-w-0');
+      expect(hero.className).toContain('text-2xl');
+      expect(hero.className).not.toContain('text-3xl');
+      const text = hero.querySelector('span[dir="auto"]') as HTMLElement;
+      expect(text).toHaveTextContent(word);
+      expect(text.className).toContain('truncate');
+      unmount();
+    }
+  });
+
   it('phone: the stamp is transform-only motion and stands still under reduced motion', () => {
     const { unmount } = render(<MpRoundLayout {...props({ foundWords: [{ word: 'cat', timestamp: 1 }] })} />);
     expect(screen.getAllByTestId('mp-recent-word')[0].className).toContain('wordStamp');

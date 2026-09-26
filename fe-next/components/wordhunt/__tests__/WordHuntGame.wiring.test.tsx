@@ -139,6 +139,14 @@ describe('WordHuntGame wiring', () => {
       expect(screen.queryByTestId('nudge-container')).not.toBeInTheDocument();
       expect(screen.queryByTestId('quick-rules')).not.toBeInTheDocument();
     });
+
+    it('mpChrome: danger toasts sit over the mode panel, not over the round HUD; default keeps the viewport-top stack', () => {
+      const { unmount } = render(<WordHuntGame {...defaultProps} />);
+      expect(screen.getByTestId('wh-danger-stack').className).toContain('fixed');
+      unmount();
+      render(<WordHuntGame {...defaultProps} mpChrome />);
+      expect(screen.getByTestId('wh-danger-stack').className).not.toContain('fixed');
+    });
   });
 
   it('emits requestGameState after 1.5s when targetLength is 0 and game is active (recovery)', async () => {
