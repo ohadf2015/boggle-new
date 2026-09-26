@@ -17493,7 +17493,6 @@ const en = {
       "hostedBy": "Host: {{name}}",
       "full": "Full",
       "live": "Live",
-      "quickStart": "Quick start",
       "create": "Create room",
       "createTitle": "New room",
       "startBattle": "Start battle",
@@ -17507,8 +17506,6 @@ const en = {
       "language": "Language: {{language}}",
       "chooseLanguage": "Choose language",
       "howToPlay": "How to play",
-      "reconnectElapsed": "{{seconds}}s",
-      "hostLeftIn": "Back to arenas in {{seconds}}s",
       "editName": "Change name"
     },
     "lobby": {},

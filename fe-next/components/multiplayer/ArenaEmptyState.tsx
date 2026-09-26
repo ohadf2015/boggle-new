@@ -23,6 +23,7 @@ const ArenaEmptyState: React.FC = () => {
         aria-hidden="true"
         width={96}
         height={96}
+        loading="eager"
         className="h-24 w-24 lg:h-32 lg:w-32 tv:h-44 tv:w-44 shrink rounded-neo object-contain motion-safe:animate-mp-bump"
       />
       <div className="min-w-0">

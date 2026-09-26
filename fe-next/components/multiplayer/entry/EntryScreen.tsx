@@ -1,8 +1,6 @@
 'use client';
 
-import { useRef, type ComponentProps } from 'react';
-import { useServerInsertedHTML } from 'next/navigation';
-import { markMpChromeSession, MP_SESSION_MARK_SCRIPT } from './mpChromeSession';
+import type { ComponentProps } from 'react';
 import MultiplayerFlow from '../MultiplayerFlow';
 import { EntryHeader } from './EntryHeader';
 import { ENTRY_CHROME_ATTR } from './entryChrome';
@@ -19,20 +17,6 @@ export type EntryScreenProps = ComponentProps<typeof MultiplayerFlow>;
  */
 export default function EntryScreen(props: EntryScreenProps) {
   const arcade = !props.isClassroomMode;
-  // A cold load can remount the page tree during hydration and drop the SSR
-  // marker below for a frame while this lazy chunk resolves, flashing the header
-  // spacer in (a 60–124px layout shift). The <html> session mark survives that
-  // remount, so it is set as early as possible:
-  // - SSR: a one-line script streamed into the HTML runs while it parses (once
-  //   per request; Next calls these callbacks on every flush);
-  // - client: during render, not in an effect (client-side arrival).
-  const streamed = useRef(false);
-  useServerInsertedHTML(() => {
-    if (!arcade || streamed.current) return null;
-    streamed.current = true;
-    return <script dangerouslySetInnerHTML={{ __html: MP_SESSION_MARK_SCRIPT }} />;
-  });
-  if (arcade) markMpChromeSession();
   return (
     <>
       {arcade && <span hidden {...{ [ENTRY_CHROME_ATTR]: 'off' }} />}

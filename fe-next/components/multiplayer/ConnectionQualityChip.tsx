@@ -1,9 +1,7 @@
 'use client';
 
-import { WifiLow, WifiOff } from 'lucide-react';
 import { useNetworkState } from '@/hooks/useNetworkState';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 
 type QualityState = 'good' | 'degraded' | 'weak' | 'offline';
 
@@ -14,12 +12,7 @@ function classify(online: boolean, rttMs: number | null): QualityState {
   return 'weak';
 }
 
-/**
- * RTT-tier connection signal for the MP shell. Nothing on a healthy link;
- * a small yellow signal dot when degraded; a hard-shadow neo chip when weak or
- * offline. Colour + icon + text, never colour alone.
- */
-export function ConnectionQualityChip() {
+export function ConnectionQualityChip(){
   const { online, rttMs } = useNetworkState();
   const { t } = useLanguage();
   const state = classify(online, rttMs);
@@ -31,26 +24,26 @@ export function ConnectionQualityChip() {
       <span
         role="status"
         aria-label={t('mp.quality.degraded')}
-        data-quality="degraded"
-        className="inline-block h-3 w-3 rounded-full border-2 border-neo-black bg-neo-yellow shadow-hard-sm"
+        className="inline-block w-2 h-2 rounded-full bg-neo-yellow animate-pulse"
       />
     );
   }
 
-  const offline = state === 'offline';
-  const Icon = offline ? WifiOff : WifiLow;
+  const label = state === 'offline' ? t('mp.quality.reconnecting') : t('mp.quality.weak');
+  const colorCls = state === 'offline'
+    ? 'border-neo-red/40 text-neo-red bg-neo-red/10'
+    : 'border-neo-yellow/40 text-neo-yellow bg-neo-yellow/10';
+
   return (
     <span
       role="status"
       aria-live="polite"
-      data-quality={state}
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black px-2.5 py-0.5 font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-black shadow-hard-sm animate-mp-drop',
-        offline ? 'bg-neo-red' : 'bg-neo-yellow',
-      )}
+      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-xs font-neo-body ${colorCls}`}
     >
-      <Icon aria-hidden="true" className="h-3.5 w-3.5" />
-      {offline ? t('mp.quality.reconnecting') : t('mp.quality.weak')}
+      {state === 'offline' && (
+        <span className="w-1.5 h-1.5 rounded-full border border-neo-red animate-spin" aria-hidden="true" />
+      )}
+      {label}
     </span>
   );
 }

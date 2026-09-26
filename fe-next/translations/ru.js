@@ -18148,7 +18148,6 @@ const ru = {
       "hostedBy": "Хост: {{name}}",
       "full": "Мест нет",
       "live": "Идёт игра",
-      "quickStart": "Быстрый старт",
       "create": "Создать комнату",
       "createTitle": "Новая комната",
       "startBattle": "Начать битву",
@@ -18162,8 +18161,6 @@ const ru = {
       "language": "Язык: {{language}}",
       "chooseLanguage": "Выберите язык",
       "howToPlay": "Как играть",
-      "reconnectElapsed": "{{seconds}} с",
-      "hostLeftIn": "Возврат к аренам через {{seconds}} с",
       "editName": "Сменить имя"
     },
     "lobby": {},

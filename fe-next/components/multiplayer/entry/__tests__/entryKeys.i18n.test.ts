@@ -9,16 +9,22 @@ import { join } from 'node:path';
 import { BUNDLES, LOCALES, resolveKey } from './localeBundles';
 
 const ROOT = join(__dirname, '..', '..', '..', '..');
+// ENTRY's files (DESIGN §f). The connection overlays are FOUNDATION's.
 const OWNED = [
   'components/multiplayer/entry',
   'components/multiplayer/MultiplayerFlow.tsx',
+  'components/multiplayer/useMultiplayerFlowState.ts',
   'components/multiplayer/RoomListView.tsx',
+  'components/multiplayer/CreateRoomModal.tsx',
+  'components/multiplayer/JoinRoomModal.tsx',
   'components/multiplayer/ArenaCTAStrip.tsx',
   'components/multiplayer/ArenaEmptyState.tsx',
-  'components/multiplayer/ReconnectingOverlay.tsx',
-  'components/multiplayer/HostLeftGraceModal.tsx',
-  'components/multiplayer/MPGameAbortedModal.tsx',
-  'components/multiplayer/ConnectionQualityChip.tsx',
+  'components/multiplayer/AvatarStack.tsx',
+  'components/multiplayer/CrazyGamesFriendsStrip.tsx',
+  'components/multiplayer/CgLobbyHero.tsx',
+  'components/multiplayer/MatchmakingOverlay.tsx',
+  'components/multiplayer/QuickPlaySeekingOverlay.tsx',
+  'components/multiplayer/ClassroomJoinNamePrompt.tsx',
 ];
 
 function sources(path: string, out: string[] = []): string[] {
@@ -53,6 +59,14 @@ describe('ENTRY i18n keys', () => {
       return typeof v !== 'string' || v.trim() === '';
     });
     expect(missing).toEqual([]);
+  });
+
+  it('every mpUi.entry key is rendered by an ENTRY source (no dead copy to translate)', () => {
+    const used = new Set(KEYS);
+    const dead = Object.keys(resolveKey(BUNDLES.en, 'mpUi.entry') as object)
+      .map((key) => `mpUi.entry.${key}`)
+      .filter((key) => !used.has(key));
+    expect(dead).toEqual([]);
   });
 
   it('every locale has exactly the English mpUi.entry key set', () => {

@@ -18415,7 +18415,6 @@ const sv = {
       "hostedBy": "Värd: {{name}}",
       "full": "Fullt",
       "live": "Live",
-      "quickStart": "Snabbstart",
       "create": "Skapa rum",
       "createTitle": "Nytt rum",
       "startBattle": "Starta striden",
@@ -18429,8 +18428,6 @@ const sv = {
       "language": "Språk: {{language}}",
       "chooseLanguage": "Välj språk",
       "howToPlay": "Så spelar du",
-      "reconnectElapsed": "{{seconds}} s",
-      "hostLeftIn": "Tillbaka till arenorna om {{seconds}} s",
       "editName": "Byt namn"
     },
     "lobby": {},

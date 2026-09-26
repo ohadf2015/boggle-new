@@ -18433,7 +18433,6 @@ const es = {
       "hostedBy": "Anfitrión: {{name}}",
       "full": "Llena",
       "live": "En juego",
-      "quickStart": "Inicio rápido",
       "create": "Crear sala",
       "createTitle": "Sala nueva",
       "startBattle": "Empezar batalla",
@@ -18447,8 +18446,6 @@ const es = {
       "language": "Idioma: {{language}}",
       "chooseLanguage": "Elige idioma",
       "howToPlay": "Cómo se juega",
-      "reconnectElapsed": "{{seconds}} s",
-      "hostLeftIn": "Volviendo a las arenas en {{seconds}} s",
       "editName": "Cambiar nombre"
     },
     "lobby": {},

@@ -11,14 +11,22 @@ body:has([data-mp-entry-chrome='off']) [data-global-bottom-nav] {
 }
 
 /*
- * For the rest of the MP session (lobby, countdown, round, results, TV views)
- * the hidden header's flow spacer is dead height: AutoHideHeader keeps it after
- * a cold load because no user tap happened before `isInGame` flipped. The entry
- * sets html[data-mp-session] on mount (entry/mpChromeSession);
- * NavigationProvider clears it when the route leaves /multiplayer. Any MpScreen
- * also qualifies, for a session that never mounted the arcade entry.
+ * In-room phases (lobby, round, results) render in an MpScreen. The hidden
+ * header's flow spacer is dead height there: with the flag on, `isInGame` never
+ * flips on entering a room, so AutoHideHeader's "collapse the spacer after a
+ * user tap" latch is computed once, at a cold load (no activation → keep).
+ *
+ * Between screens nothing carries a marker: while the lazy entry chunk resolves
+ * after hydration (a props update drops the SSR entry for ~40ms) and while a
+ * room's lazy view loads after QUICK START. The route rule covers those gaps,
+ * keyed on the MP layout's canonical <link> (entryChrome.ts MP_ROUTE_CANONICAL):
+ * Next swaps route metadata in the same commit that leaves the route. Only the
+ * spacer — a classroom game on this route keeps its education header.
+ *
+ * Every rule is keyed to the MP route itself, never to a flag something has to
+ * clear: nothing the entry owns sees the route change that would clear it.
  */
-html[data-mp-session] [aria-hidden='true'].h-header,
-body:has([data-mp-screen]) [aria-hidden='true'].h-header {
+body:has([data-mp-screen]) [aria-hidden='true'].h-header,
+html:has(link[rel='canonical'][href$='/multiplayer']) [aria-hidden='true'].h-header {
   display: none !important;
 }

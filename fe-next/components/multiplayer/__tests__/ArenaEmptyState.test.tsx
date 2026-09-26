@@ -47,6 +47,13 @@ describe('ArenaEmptyState (one mascot line, no buttons)', () => {
     expect(mascot).toHaveAttribute('src', '/mascot/spectating.webp');
   });
 
+  // With no open arena the mascot is the entry's LCP element (Next warned in
+  // dev); a lazy image would start loading only after layout.
+  it('loads the mascot eagerly — it is the LCP element of an empty entry', () => {
+    const { container } = render(<ArenaEmptyState />);
+    expect(container.querySelector('img')).toHaveAttribute('loading', 'eager');
+  });
+
   it('renders no buttons or links (the footer owns QUICK START; nothing leaves MP)', () => {
     const { container } = render(<ArenaEmptyState />);
     expect(screen.queryAllByRole('button')).toHaveLength(0);

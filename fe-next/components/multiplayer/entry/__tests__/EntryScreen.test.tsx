@@ -4,6 +4,11 @@
  * would SSR the entry WITH chrome and drop it after hydration (a layout shift on
  * the landing). The entry therefore renders a marker in its SSR HTML and ships a
  * stylesheet keyed to it, so the chrome is hidden from first paint.
+ *
+ * Every rule is keyed to MP DOM (the marker, or an MpScreen), never to a
+ * document-level flag: nothing ENTRY owns sees the route change that would have
+ * to clear such a flag, so it would outlive /multiplayer and strip the header
+ * spacer from every page visited next.
  */
 import React from 'react';
 import { readFileSync } from 'node:fs';
@@ -11,16 +16,9 @@ import { join } from 'node:path';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
-// What the page looked like when the flow first rendered (before any effect).
-const seenAtRender: { session: boolean | null } = { session: null };
 vi.mock('../../MultiplayerFlow', () => ({
   __esModule: true,
-  default: (p: { header?: React.ReactNode }) => {
-    if (seenAtRender.session === null) {
-      seenAtRender.session = document.documentElement.hasAttribute('data-mp-session');
-    }
-    return <div data-testid="flow">{p.header}</div>;
-  },
+  default: (p: { header?: React.ReactNode }) => <div data-testid="flow">{p.header}</div>,
 }));
 vi.mock('../EntryHeader', () => ({ EntryHeader: () => <div data-testid="entry-header" /> }));
 
@@ -32,7 +30,7 @@ vi.mock('next/navigation', () => ({
 
 import { renderToStaticMarkup } from 'react-dom/server';
 import EntryScreen from '../EntryScreen';
-import { ENTRY_HIDES_GLOBAL_CHROME, ENTRY_CHROME_ATTR } from '../entryChrome';
+import { ENTRY_HIDES_GLOBAL_CHROME, ENTRY_CHROME_ATTR, MP_ROUTE_CANONICAL } from '../entryChrome';
 
 const props = {
   handleJoin: vi.fn(), refreshRooms: vi.fn(), activeRooms: [], roomsLoading: false, isJoining: false,
@@ -51,41 +49,13 @@ describe('EntryScreen chrome', () => {
     expect(screen.getByTestId('entry-header')).toBeInTheDocument();
   });
 
-  // A client-side remount of the page tree during hydration drops the SSR marker
-  // for a frame while the lazy EntryScreen chunk resolves; the header spacer then
-  // flashes in (a 60px layout shift at 390x844). The <html> session mark survives
-  // a remount, so it must be on the document BEFORE the entry's first paint —
-  // during render, not in an effect.
-  it('marks the MP session on <html> during render, before any effect runs', () => {
-    document.documentElement.removeAttribute('data-mp-session');
-    seenAtRender.session = null;
-    render(<EntryScreen {...props} />);
-    expect(seenAtRender.session).toBe(true);
-  });
-
-  it('classroom entry never marks the MP session', () => {
-    document.documentElement.removeAttribute('data-mp-session');
-    serverInserted.length = 0;
-    render(<EntryScreen {...props} isClassroomMode />);
-    expect(document.documentElement.hasAttribute('data-mp-session')).toBe(false);
-    const html = serverInserted.map((cb) => renderToStaticMarkup(<>{cb()}</>)).join('');
-    expect(html).not.toContain('data-mp-session');
-  });
-
-  // On a cold load the page tree is remounted during hydration BEFORE the lazy
-  // entry chunk renders on the client (measured: remount ~495ms, first entry
-  // render ~534ms), so even a render-time mark lands a frame late. The SSR
-  // stream therefore carries a one-line script that marks <html> while the
-  // document is still parsing — no client ever renders a <script> element.
-  it('streams a parse-time <html> session mark into the SSR HTML, once', () => {
+  it('never writes a document-level mark: no render-time write, no server-inserted script', () => {
     serverInserted.length = 0;
     render(<EntryScreen {...props} />);
-    expect(serverInserted.length).toBeGreaterThan(0);
-    const first = serverInserted.map((cb) => renderToStaticMarkup(<>{cb()}</>)).join('');
-    expect(first).toMatch(/<script>[^<]*document\.documentElement\.setAttribute\(["']data-mp-session["']/);
-    // Next calls inserted-HTML callbacks on every stream flush: emit it once.
-    const again = serverInserted.map((cb) => renderToStaticMarkup(<>{cb()}</>)).join('');
-    expect(again).toBe('');
+    const mpAttrs = document.documentElement.getAttributeNames().filter((name) => name.startsWith('data-mp'));
+    expect(mpAttrs).toEqual([]);
+    const streamed = serverInserted.map((cb) => renderToStaticMarkup(<>{cb()}</>)).join('');
+    expect(streamed).toBe('');
   });
 
   it('classroom entry keeps the education chrome: no marker, no arcade header', () => {
@@ -102,5 +72,45 @@ describe('EntryScreen chrome', () => {
     expect(rules).toMatch(/\[data-global-bottom-nav\]/);
     expect(rules).toMatch(/\.h-header/);
     expect(rules).toMatch(/display:\s*none\s*!important/);
+  });
+
+  // Every rule is keyed to the MP route itself — the entry's SSR marker, an
+  // MpScreen, or the MP layout's canonical <link> (Next swaps route metadata in
+  // the same commit that leaves the route) — never to a flag something has to
+  // clear: nothing ENTRY owns sees the route change that would clear it.
+  const ROUTE_SCOPES = [
+    `body:has([${ENTRY_CHROME_ATTR}='off']) `,
+    'body:has([data-mp-screen]) ',
+    `html:has(${MP_ROUTE_CANONICAL}) `,
+  ];
+  const SPACER = "[aria-hidden='true'].h-header";
+
+  function chromeSelectors(): string[] {
+    const css = readFileSync(join(__dirname, '..', 'entryChrome.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    return Array.from(css.matchAll(/([^{}]+)\{[^}]*\}/g))
+      .flatMap((m) => m[1].split(','))
+      .map((sel) => sel.replace(/\s+/g, ' ').trim())
+      .filter(Boolean);
+  }
+
+  it('scopes every rule to the MP route, so leaving it never leaves chrome hidden', () => {
+    const selectors = chromeSelectors();
+    expect(selectors.length).toBeGreaterThan(0);
+    for (const sel of selectors) {
+      expect(ROUTE_SCOPES.some((scope) => sel.startsWith(scope))).toBe(true);
+    }
+    // In-room phases (lobby, round, results) render in an MpScreen.
+    expect(selectors).toContain(`body:has([data-mp-screen]) ${SPACER}`);
+  });
+
+  // With the flag on, AutoHideHeader keeps its CLS spacer after a cold load (no
+  // tap before `isInGame` flipped). Between MP screens nothing carries the entry
+  // marker or an MpScreen: while the lazy entry chunk resolves after hydration
+  // (measured: SSR entry dropped for ~40ms at 390x844, CLS 0.144) and while a
+  // room's lazy view loads after QUICK START (0.071 down, 0.071 back up). The
+  // route-level rule keeps the spacer out for the whole MP session.
+  it('hides the header spacer for the whole MP route, and ONLY the spacer (classroom keeps its header)', () => {
+    const routeRules = chromeSelectors().filter((sel) => sel.startsWith(`html:has(${MP_ROUTE_CANONICAL}) `));
+    expect(routeRules).toEqual([`html:has(${MP_ROUTE_CANONICAL}) ${SPACER}`]);
   });
 });

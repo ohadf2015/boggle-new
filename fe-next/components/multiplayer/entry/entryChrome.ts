@@ -14,7 +14,12 @@
  * MpScreen: with the flag on, `isInGame` never flips on entering a room, so
  * AutoHideHeader's "collapse the spacer after a user tap" latch is computed once
  * at a cold load (no activation → keep spacer) and would otherwise leave a
- * 60–124px band above the lobby.
+ * 60–124px band above the lobby. Between those two, nothing carries a marker —
+ * while the lazy entry chunk resolves after hydration, and while a room's lazy
+ * view loads — so the spacer is also hidden for the whole route, keyed on the MP
+ * layout's canonical <link> (MP_ROUTE_CANONICAL). Every rule is keyed to the MP
+ * route itself, so leaving /multiplayer can never leave another page's chrome
+ * hidden.
  *
  * Side effects of `isInGame` on entry, accepted on purpose: `body.screen-fit-
  * locked` suppresses the native ad banner (it would composite over the footer's
@@ -25,3 +30,11 @@ export const ENTRY_HIDES_GLOBAL_CHROME = true;
 
 /** The SSR marker attribute `entryChrome.css` keys on. */
 export const ENTRY_CHROME_ATTR = 'data-mp-entry-chrome';
+
+/**
+ * The MP layout's canonical <link>: present in the SSR <head> from the first
+ * byte, and swapped by Next in the same commit that leaves the route — the one
+ * route-scoped hook outside the lazy entry boundary. `entryChrome.css` keys its
+ * route-wide spacer rule on it (pinned by entryChromeRoute.test.ts).
+ */
+export const MP_ROUTE_CANONICAL = "link[rel='canonical'][href$='/multiplayer']";

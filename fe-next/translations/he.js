@@ -18345,7 +18345,6 @@ const he = {
       "hostedBy": "מארח: {{name}}",
       "full": "מלא",
       "live": "חי",
-      "quickStart": "התחלה מהירה",
       "create": "צור חדר",
       "createTitle": "חדר חדש",
       "startBattle": "יאללה לקרב",
@@ -18359,8 +18358,6 @@ const he = {
       "language": "שפה: {{language}}",
       "chooseLanguage": "בחירת שפה",
       "howToPlay": "איך משחקים",
-      "reconnectElapsed": "{{seconds}} שנ׳",
-      "hostLeftIn": "חוזרים לזירות בעוד {{seconds}} שנ׳",
       "editName": "שינוי שם"
     },
     "lobby": {},

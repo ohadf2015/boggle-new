@@ -14,7 +14,6 @@ import { createContext, useCallback, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isInAppPreviousPath, mpExit, type MpExitReason } from '@/lib/multiplayer/exitDestination';
-import { getTrackedPreviousPath } from '@/contexts/NavigationContext';
 
 export type { MpExitReason } from '@/lib/multiplayer/exitDestination';
 
@@ -25,18 +24,12 @@ const MpExitContext = createContext<MpExitFn | null>(null);
 export const MpExitProvider = MpExitContext.Provider;
 
 /**
- * The in-app route the player came from, for `back-from-entry`.
- *
- * The SPA history NavigationProvider records on every route change wins:
- * `document.referrer` reflects only the initial document load, so after a
- * client-side hop (home → daily → multiplayer) it still names the first page.
- * The referrer is the fallback for a hard arrival (full page load from another
- * page of the app). Only a same-origin, non-MP path counts (no open redirect,
- * no loop back into MP).
+ * The in-app route the player came from, for `back-from-entry`. Only a
+ * same-origin, non-MP referrer counts (no open redirect, no loop back into MP).
+ * `document.referrer` reflects the initial load, not SPA hops — a client-side
+ * arrival falls back to the locale root, which is still inside the app.
  */
 export function readPreviousInAppPath(): string | null {
-  const tracked = getTrackedPreviousPath();
-  if (isInAppPreviousPath(tracked)) return tracked;
   if (typeof document === 'undefined' || !document.referrer) return null;
   try {
     const ref = new URL(document.referrer);

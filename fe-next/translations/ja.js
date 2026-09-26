@@ -18415,7 +18415,6 @@ const ja = {
       "hostedBy": "ホスト: {{name}}",
       "full": "満員",
       "live": "対戦中",
-      "quickStart": "クイックスタート",
       "create": "ルームを作成",
       "createTitle": "新しいルーム",
       "startBattle": "バトル開始",
@@ -18429,8 +18428,6 @@ const ja = {
       "language": "言語: {{language}}",
       "chooseLanguage": "言語を選択",
       "howToPlay": "遊び方",
-      "reconnectElapsed": "{{seconds}}秒",
-      "hostLeftIn": "{{seconds}}秒後にアリーナへ戻ります",
       "editName": "名前を変更"
     },
     "lobby": {},
