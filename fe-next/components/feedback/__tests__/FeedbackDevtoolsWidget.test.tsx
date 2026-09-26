@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { act, render } from '@testing-library/react';
 import FeedbackDevtoolsWidget, {
     FEEDBACK_WIDGET_INTENT_EVENTS,
@@ -33,7 +33,6 @@ async function flushEffects(): Promise<void> {
 
 afterEach(() => {
     widgetScript()?.remove();
-    vi.unstubAllEnvs();
 });
 
 describe('<FeedbackDevtoolsWidget>', () => {
@@ -94,19 +93,5 @@ describe('<FeedbackDevtoolsWidget>', () => {
             window.dispatchEvent(new Event('keydown'));
         });
         expect(document.querySelectorAll(`script[src="${FEEDBACK_WIDGET_SRC}"]`).length).toBe(1);
-    });
-
-    // Its telemetry endpoint rejects the localhost origin at the CORS preflight:
-    // on `next dev` the first signal after a tap (any console error) logged two
-    // more console errors on every MP gauntlet capture (2026-09-26).
-    it('never injects on the dev server, whatever the gesture', async () => {
-        vi.stubEnv('NODE_ENV', 'development');
-        render(<FeedbackDevtoolsWidget />);
-        await flushEffects();
-        await act(async () => {
-            for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) window.dispatchEvent(new Event(ev));
-        });
-        expect(widgetScript()).toBeNull();
-        expect(document.querySelector('script[src*="widget.js"]')).toBeNull();
     });
 });

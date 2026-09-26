@@ -78,10 +78,6 @@ function injectFeedbackWidget(): void {
 
 export default function FeedbackDevtoolsWidget(): ReactNode {
     useEffect(() => {
-        // Its telemetry endpoint rejects the localhost origin at the CORS
-        // preflight, so on `next dev` every signal it posted logged two console
-        // errors.
-        if (process.env.NODE_ENV === 'development') return;
         const onIntent = () => {
             injectFeedbackWidget();
             for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {

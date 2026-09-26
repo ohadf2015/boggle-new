@@ -11,12 +11,6 @@ vi.mock('@/utils/platform', () => ({
   isNative: () => mockIsNative(),
 }));
 
-// The real hook throws without a provider when NODE_ENV is 'development',
-// which the dev-server case stubs.
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ language: 'en' }),
-}));
-
 vi.mock('@/lib/supabase', () => ({
   supabase: { auth: { signInWithIdToken: vi.fn() } },
 }));
@@ -62,15 +56,6 @@ describe('GoogleOneTapInitializer', () => {
 
   it('renders nothing on the native platform', () => {
     mockIsNative.mockReturnValue(true);
-    render(<GoogleOneTapInitializer />);
-    expect(screen.queryByTestId('gsi-script')).toBeNull();
-  });
-
-  // `next dev` has no production origin for GIS to vouch for: the FedCM prompt
-  // only logged "Provider's accounts list is empty" / [GSI_LOGGER] errors into
-  // every page's console there (every MP gauntlet capture, 2026-09-26).
-  it('renders nothing on the dev server', () => {
-    vi.stubEnv('NODE_ENV', 'development');
     render(<GoogleOneTapInitializer />);
     expect(screen.queryByTestId('gsi-script')).toBeNull();
   });

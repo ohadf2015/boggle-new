@@ -58,17 +58,12 @@ export default function GoogleOneTapInitializer() {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
 
-  // Never on `next dev`: there the FedCM prompt logged "Provider's accounts list
-  // is empty" and [GSI_LOGGER] errors on every page load (MP gauntlet captures,
-  // 2026-09-26). Test One Tap on a deployed origin.
-  const enabled =
-    process.env.NODE_ENV !== 'development' &&
-    shouldEnableGoogleOneTap({
-      isNativePlatform: isNative(),
-      clientId,
-      supabaseConfigured: !!supabase,
-      isAuthenticated,
-    });
+  const enabled = shouldEnableGoogleOneTap({
+    isNativePlatform: isNative(),
+    clientId,
+    supabaseConfigured: !!supabase,
+    isAuthenticated,
+  });
 
   const initOneTap = useCallback(async () => {
     if (promptedRef.current || !clientId) return;
