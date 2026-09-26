@@ -148,7 +148,14 @@ function MpRoundLayoutImpl({
       <aside className={cn(styles.areaLeft, 'min-h-0 flex-col gap-2 pt-3')} aria-label={t('mpUi.round.players')}>
         <h2 className="font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1">{t('mpUi.round.players')}</h2>
         <div className="min-h-0 overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3">
-          <MpRosterStrip players={roster} meId={meId} layout="rail" showScores />
+          <MpRosterStrip
+            players={roster}
+            meId={meId}
+            layout="rail"
+            showScores
+            // 10-ft TV: names + scores at 24px (the shell's 14px vanishes across a room).
+            className="tv:gap-3 tv:[&_[data-player]>span:not(:first-child)]:text-2xl"
+          />
         </div>
       </aside>
 

@@ -78,6 +78,16 @@ describe('WordHuntGameLayout mpChrome', () => {
     expect(container.querySelector('.wordhunt-grid-container')!.className).toContain('tv:[--wh-grid-size:min(100cqw,100cqh,980px)]');
   });
 
+  it('10-ft TV: the mode panel (clue strip + life bar) scales 1.5x — its 12px compact text is unreadable across a room', () => {
+    const { unmount } = render(<WordHuntGameLayout {...baseProps} mpChrome />);
+    expect(screen.getByTestId('real-clue-boxes').parentElement!.className).toContain('tv:[zoom:1.5]');
+    expect(screen.getByTestId('life-bar').parentElement!.className).toContain('tv:[zoom:1.5]');
+    unmount();
+    render(<WordHuntGameLayout {...baseProps} />);
+    expect(screen.getByTestId('real-clue-boxes').parentElement!.className).not.toContain('zoom');
+    expect(screen.getByTestId('life-bar').parentElement!.className).not.toContain('zoom');
+  });
+
   it('never splits into its own sidebar row (the round frame owns desktop)', () => {
     const { container } = render(<WordHuntGameLayout {...baseProps} mpChrome />);
     expect((container.firstChild as HTMLElement).className).not.toContain('min-[720px]:flex-row');

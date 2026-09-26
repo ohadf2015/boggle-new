@@ -282,7 +282,10 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
 
   return (
     <>
-    {showQuickRules && <WordHuntQuickRules onDismiss={handleDismissRules} t={t} />}
+    {/* mpChrome: the round frame's countdown carries the rule and its callout lane
+        owns feedback, so neither the first-time rules card (fixed over the HUD)
+        nor the first-time nudges (fixed over the board) float in the round. */}
+    {showQuickRules && !mpChrome && <WordHuntQuickRules onDismiss={handleDismissRules} t={t} />}
     <LowHPOverlay hp={bridge.lifePoints} />
     <WordHuntCategoryHint targetLength={bridge.targetLength} targetCategory={bridge.targetCategory} />
     <WordHuntDangerToast toasts={dangerToasts} onDismiss={dismissToast} />
@@ -351,12 +354,14 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       t={t}
       gameDir={dir}
     />
-    <WordHuntFirstTimeNudges
-      lifePoints={bridge.lifePoints}
-      discoveryClueCount={bridge.accumulatedClues.size}
-      wrongGuessCount={wrongGuessCount}
-      t={t}
-    />
+    {!mpChrome && (
+      <WordHuntFirstTimeNudges
+        lifePoints={bridge.lifePoints}
+        discoveryClueCount={bridge.accumulatedClues.size}
+        wrongGuessCount={wrongGuessCount}
+        t={t}
+      />
+    )}
     </>
   );
 });

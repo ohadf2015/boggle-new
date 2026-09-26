@@ -34,6 +34,15 @@
 }
 .flyUp { animation: flyUp 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards; will-change: transform; }
 
+/* Phone stage: the newest word stamps down (scale + tilt settle, transform only). */
+@keyframes wordStamp {
+  /* relative to the chip's own -rotate-2 tilt (the `rotate` property) */
+  0% { transform: scale(1.6) rotate(-8deg); }
+  55% { transform: scale(0.94) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.wordStamp { animation: wordStamp 280ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
 /* TIME! slam at 0 (scale 1.6 → 1, 250ms). */
 @keyframes timeSlam {
   0% { transform: scale(1.6) rotate(-4deg); }
@@ -55,6 +64,7 @@
   .boardDrop,
   .flyUp,
   .timeSlam,
+  .wordStamp,
   .segPop {
     animation: none !important;
   }

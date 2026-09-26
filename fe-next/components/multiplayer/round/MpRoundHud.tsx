@@ -40,7 +40,13 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
           <MpBackButton kind="leave" onPress={onExit} />
           {/* "#2/4" is a number, not prose: keep it LTR inside RTL layouts. */}
           <span dir="ltr" className="inline-flex">
-            <MpRankChip rank={rank} total={total} flipKey={rankFlipKey} />
+            <MpRankChip
+              rank={rank}
+              total={total}
+              flipKey={rankFlipKey}
+              // Desktop/TV: as tall as the score chip — the rank is the race.
+              className="lg:h-[calc(56px*var(--mp-u,1))] lg:px-3 lg:items-center lg:[&>[data-testid=mp-rank-value]]:text-3xl lg:[&>span:last-child]:text-base"
+            />
           </span>
         </>
       }

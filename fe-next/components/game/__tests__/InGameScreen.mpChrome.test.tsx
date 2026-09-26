@@ -100,6 +100,13 @@ describe('InGameScreen mpChrome — play surface only', () => {
     expect(gridContainer.parentElement!.className).toContain('justify-end');
   });
 
+  it('on a TV-sized screen the board grows past the 720px phone/desktop cap (fills the 10-ft slot)', () => {
+    render(<InGameScreen {...props()} />);
+    const frame = screen.getByTestId('grid-frame');
+    expect(frame.className).toContain('w-[min(720px,100cqi,calc(100cqb-88px))]');
+    expect(frame.className).toContain('tv:w-[min(1080px,100cqi,calc(100cqb-88px))]');
+  });
+
   it('never replays the tile entrance behind the countdown (the round owns the GO drop)', () => {
     render(<InGameScreen {...props()} />);
     act(() => {});

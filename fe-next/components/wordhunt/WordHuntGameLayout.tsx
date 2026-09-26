@@ -17,6 +17,10 @@ import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { HighlightedCell } from '@/components/GridComponent';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
 
+/** MP round frame on a 10-ft TV: the compact mode panel (12px text) scales with
+ *  the shell's --mp-u (1.5). `zoom` scales px, not %, so the strip keeps its width. */
+const TV_PANEL_SCALE = 'tv:[zoom:1.5]';
+
 export interface WordHuntGameLayoutProps {
   // Header
   score: number;
@@ -183,6 +187,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         <div className={cn(
           'flex-shrink-0',
           shortLandscape ? 'px-1' : 'px-2 [@media(max-height:560px)]:px-1',
+          mpChrome && TV_PANEL_SCALE,
           wrongGuessShake && 'animate-neo-shake',
         )}>
           {targetLength > 0 ? (
@@ -221,7 +226,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         )}
 
         {/* Life Bar — compact wrapper */}
-        <div className="px-2 shrink-0">
+        <div className={cn('px-2 shrink-0', mpChrome && TV_PANEL_SCALE)}>
           <SurvivalLifeBar
             lifePoints={lifePoints}
             isGameOver={isGameOver}

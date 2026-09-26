@@ -198,9 +198,10 @@ interface PortraitLayoutProps {
   mpChrome?: boolean;
 }
 
-/** mpChrome: the slot is just pill + board, no header/stats reserve. */
+/** mpChrome: the slot is just pill + board, no header/stats reserve. On a TV
+ *  (1800x1000+) the 720 cap left a ~190px dead band over the board. */
 const MP_CHROME_ROOT_CLASS = 'flex flex-col flex-1 w-full min-h-0 overflow-hidden px-2';
-const MP_CHROME_FRAME_CLASS = 'relative aspect-square mx-auto w-[min(720px,100cqi,calc(100cqb-88px))] max-h-full';
+const MP_CHROME_FRAME_CLASS = 'relative aspect-square mx-auto w-[min(720px,100cqi,calc(100cqb-88px))] tv:w-[min(1080px,100cqi,calc(100cqb-88px))] max-h-full';
 /** mpChrome: pill + board anchored together at the bottom (thumb zone); the
  *  free space above is the round's callout stage. */
 const MP_CHROME_CENTER_CLASS = '@container/center [container-type:size] flex-1 flex flex-col justify-end min-w-0 min-h-0 overflow-hidden';

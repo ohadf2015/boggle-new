@@ -145,6 +145,21 @@ describe('MpRoundLayout', () => {
     expect(row().className).not.toContain('sr-only');
   });
 
+  it('10-ft TV: the roster rail names/scores and the words ladder rows scale up (14px text is unreadable across a room)', () => {
+    render(<MpRoundLayout {...props()} />);
+    const rail = document.querySelector('[data-testid="mp-roster-strip"][data-layout="rail"]') as HTMLElement;
+    expect(rail.className).toContain('tv:[&_[data-player]>span:not(:first-child)]:text-2xl');
+    const row = screen.getByTestId('ladder-row-cat');
+    expect(row.className).toContain('tv:text-2xl');
+  });
+
+  it('desktop/TV: the rank chip stands as tall as the score chip (competitive clarity: "#2/4" was a 40px afterthought)', () => {
+    render(<MpRoundLayout {...props()} />);
+    const chip = screen.getByTestId('mp-rank-chip');
+    expect(chip.className).toContain('lg:h-[calc(56px*var(--mp-u,1))]');
+    expect(chip.className).toContain('lg:[&>[data-testid=mp-rank-value]]:text-3xl');
+  });
+
   it('keeps the board mounted but hidden until GO, then drops it in', () => {
     const { rerender } = render(<MpRoundLayout {...props({ revealed: false })} />);
     const stage = screen.getByTestId('mp-round-canvas');
@@ -287,6 +302,27 @@ describe('MpRoundLayout', () => {
     expect(chips[0]).toHaveTextContent('+5');
     expect(chips[6]).toHaveTextContent('cat');
     expect(screen.queryByTestId('mp-recent-more')).toBeNull();
+  });
+
+  it('phone: the newest word STAMPS big onto the stage (the free band over the board is a reward, not a void); older words stay small chips', () => {
+    const words = ['cat', 'dog', 'tar'].map((word, i) => ({ word, timestamp: i }));
+    render(<MpRoundLayout {...props({ foundWords: words })} />);
+    const chips = screen.getAllByTestId('mp-recent-word');
+    expect(chips[0]).toHaveAttribute('data-hero', 'true');
+    expect(chips[0].className).toContain('text-3xl');
+    expect(chips[1]).not.toHaveAttribute('data-hero');
+    expect(chips[1].className).toContain('text-sm');
+    // the hero owns its own row
+    expect(screen.getByTestId('mp-recent-break')).toBeInTheDocument();
+  });
+
+  it('phone: the stamp is transform-only motion and stands still under reduced motion', () => {
+    const { unmount } = render(<MpRoundLayout {...props({ foundWords: [{ word: 'cat', timestamp: 1 }] })} />);
+    expect(screen.getAllByTestId('mp-recent-word')[0].className).toContain('wordStamp');
+    unmount();
+    reduce.value = true;
+    render(<MpRoundLayout {...props({ foundWords: [{ word: 'cat', timestamp: 1 }] })} />);
+    expect(screen.getAllByTestId('mp-recent-word')[0].className).not.toContain('wordStamp');
   });
 
   it('word-hunt: no rule hint in the stage (its clue strip teaches; "any word heals" stays on the countdown)', () => {
