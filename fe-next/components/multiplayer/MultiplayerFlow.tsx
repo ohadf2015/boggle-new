@@ -219,7 +219,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
       <JoinRoomModal
         isOpen={s.flowView === 'join-modal'}
         onClose={s.handleModalClose}
-        room={s.selectedRoom}
+        room={s.joinTarget}
         isJoining={isJoining}
         onJoin={s.handleJoinFromModal}
         isAuthenticated={isAuthenticated}

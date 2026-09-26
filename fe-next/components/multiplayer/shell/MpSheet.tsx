@@ -11,6 +11,12 @@ export interface MpSheetProps {
   title: ReactNode;
   /** `bottom` sheet on phone (default) · `end` side panel (560px) on desktop. */
   side?: 'bottom' | 'end';
+  /**
+   * `slide` (default): the panel slides in from its edge. `static`: the panel
+   * is painted where it rests from the first frame (the caller animates its
+   * content instead) — nothing looking right after open sees it mid-flight.
+   */
+  entrance?: 'slide' | 'static';
   children: ReactNode;
   testId?: string;
 }
@@ -22,7 +28,7 @@ const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:n
  * fade, no blur — pitfall class 5 / anti-glassmorphism); only the panel slides
  * (transform only). Esc and scrim tap close; Tab is trapped in the panel.
  */
-export function MpSheet({ open, onClose, title, side = 'bottom', children, testId = 'mp-sheet' }: MpSheetProps) {
+export function MpSheet({ open, onClose, title, side = 'bottom', entrance = 'slide', children, testId = 'mp-sheet' }: MpSheetProps) {
   const { t } = useLanguage();
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
@@ -84,8 +90,9 @@ export function MpSheet({ open, onClose, title, side = 'bottom', children, testI
         className={cn(
           'absolute flex flex-col bg-neo-navy-light text-neo-white border-neo-black shadow-hard-lg outline-none',
           side === 'bottom'
-            ? 'inset-x-0 bottom-0 max-h-[85%] rounded-t-neo-lg border-t-4 pb-[env(safe-area-inset-bottom)] animate-mp-sheet-up'
-            : 'inset-y-0 end-0 w-full max-w-[560px] border-s-4 animate-mp-sheet-in',
+            ? 'inset-x-0 bottom-0 max-h-[85%] rounded-t-neo-lg border-t-4 pb-[env(safe-area-inset-bottom)]'
+            : 'inset-y-0 end-0 w-full max-w-[560px] border-s-4',
+          entrance === 'slide' && (side === 'bottom' ? 'animate-mp-sheet-up' : 'animate-mp-sheet-in'),
         )}
       >
         <div className="flex items-center justify-between gap-2 px-4 py-3 border-b-2 border-neo-black">

@@ -12,8 +12,7 @@ import type { Language } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
 import { MpHudBar } from '../shell/MpHudBar';
 import { MpBackButton } from '../shell/MpBackButton';
-import { MpSheet } from '../shell/MpSheet';
-import { useSheetSide } from './useSheetSide';
+import { EntrySheet } from './EntrySheet';
 
 const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
 
@@ -49,7 +48,6 @@ export function EntryHeader() {
   const { t, language, setLanguage } = useLanguage();
   const exit = useMpExit();
   const mute = useMasterMute();
-  const side = useSheetSide();
   const [sheet, setSheet] = useState<'language' | 'help' | null>(null);
   useRegisterHeaderAudioControl();
 
@@ -90,7 +88,7 @@ export function EntryHeader() {
         }
       />
 
-      <MpSheet open={sheet === 'language'} onClose={close} title={t('mpUi.entry.chooseLanguage')} side={side} testId="entry-language-sheet">
+      <EntrySheet open={sheet === 'language'} onClose={close} title={t('mpUi.entry.chooseLanguage')} testId="entry-language-sheet">
         <div className="grid grid-cols-2 gap-2">
           {LANGUAGE_OPTIONS.map((opt) => {
             const active = opt.code === current;
@@ -115,11 +113,11 @@ export function EntryHeader() {
             );
           })}
         </div>
-      </MpSheet>
+      </EntrySheet>
 
-      <MpSheet open={sheet === 'help'} onClose={close} title={t('mpUi.entry.howToPlay')} side={side} testId="entry-help-sheet">
+      <EntrySheet open={sheet === 'help'} onClose={close} title={t('mpUi.entry.howToPlay')} testId="entry-help-sheet">
         {sheet === 'help' && <HowToPlay onClose={close} />}
-      </MpSheet>
+      </EntrySheet>
     </>
   );
 }

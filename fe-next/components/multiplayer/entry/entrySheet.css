@@ -1,0 +1,37 @@
+/*
+ * Entry sheets (EntrySheet.tsx): the panel is painted where it rests from the
+ * first frame; its rows settle in instead. Transform only, no opacity (a
+ * mid-fade CTA reads as disabled), offsets small enough that no frame can push
+ * a row out of the panel's padding. `backwards` holds each staggered row on its
+ * start frame through its delay — without it a row paints in place, jumps up
+ * when the delay ends, then drops.
+ */
+@keyframes mp-entry-settle {
+  0% { transform: translateY(-10px); }
+  65% { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+/* The CTA lands last and harder: a small stamp, never wider than the padding. */
+@keyframes mp-entry-slam {
+  0% { transform: translateY(-14px) scale(0.96); }
+  60% { transform: translateY(2px) scale(1.01); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.mp-entry-sheet-body > * {
+  animation: mp-entry-settle 260ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.mp-entry-sheet-body > :nth-child(2) { animation-delay: 40ms; }
+.mp-entry-sheet-body > :nth-child(3) { animation-delay: 80ms; }
+.mp-entry-sheet-body > :nth-child(n + 4) { animation-delay: 120ms; }
+.mp-entry-sheet-body > [data-entry-cta] {
+  animation-name: mp-entry-slam;
+  animation-duration: 320ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mp-entry-sheet-body > * { animation: none; }
+}
+/* Calm (cosy) mode strips springy entrances, as globals.css does for its own. */
+html[data-cosy='true'] .mp-entry-sheet-body > * { animation: none; }

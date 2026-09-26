@@ -21,6 +21,7 @@ import { useCgLobbyHeroVariant } from '@/hooks/useCgLobbyHeroVariant';
 import { entryFlowReducer, INITIAL_ENTRY_FLOW, resolveEntryView } from '@/lib/multiplayer/mpPhase';
 import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { useQuickPlay, generateGameCode } from './useQuickPlay';
+import { codeTicket, resolveJoinTarget } from './entry/joinTarget';
 import type { MultiplayerFlowProps } from './MultiplayerFlow';
 
 export function useMultiplayerFlowState({
@@ -148,19 +149,9 @@ export function useMultiplayerFlowState({
         if (classroomNameSubmittedRef.current) return;
         setNeedsClassroomName(true);
       } else {
-        // Need to collect profile - show join modal for a minimal room object
-        dispatchFlow({
-          type: 'OPEN_JOIN',
-          room: {
-            gameCode: roomCode,
-            roomName: roomCode,
-            playerCount: 0,
-            language: defaultLanguage,
-            gameState: 'waiting' as const,
-            isRanked: false,
-            createdAt: Date.now(),
-          },
-        });
+        // Need to collect profile — the join sheet for this code (the sheet
+        // resolves the live listing for it; see entry/joinTarget).
+        dispatchFlow({ type: 'OPEN_JOIN', room: codeTicket(roomCode, defaultLanguage) });
       }
     },
     [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host, isAuthenticated, isClassroomMode]
@@ -210,18 +201,7 @@ export function useMultiplayerFlowState({
         handleJoin(false, null, code, undefined, profile.username);
         return;
       }
-      dispatchFlow({
-        type: 'OPEN_JOIN',
-        room: {
-          gameCode: code,
-          roomName: code,
-          playerCount: 0,
-          language: defaultLanguage,
-          gameState: 'waiting' as const,
-          isRanked: false,
-          createdAt: Date.now(),
-        },
-      });
+      dispatchFlow({ type: 'OPEN_JOIN', room: codeTicket(code, defaultLanguage) });
     },
     [hasProfile, getProfileData, isAuthenticated, defaultLanguage, setGameCode, setUsername, handleJoin],
   );
@@ -349,8 +329,11 @@ export function useMultiplayerFlowState({
     isSeekingOverlay,
   });
 
+  // The join sheet's room comes from the live listing whichever path opened it.
+  const joinTarget = resolveJoinTarget(selectedRoom, activeRooms);
+
   return {
-    entryView, flowView: flow.view, selectedRoom, matchmaking, joiningRoomCode, roomFetchTimedOut,
+    entryView, flowView: flow.view, selectedRoom, joinTarget, matchmaking, joiningRoomCode, roomFetchTimedOut,
     isQuickPlayPending, showCgHero, heroExpanded, heroVariant,
     openCreate: handleCreateClick, handleModalClose, handleRoomClick, handleJoinFromModal, handleCreateFromModal,
     handleQuickPlay, handleClassroomNameSubmit, dismissSeeking, handleCodeJoin,

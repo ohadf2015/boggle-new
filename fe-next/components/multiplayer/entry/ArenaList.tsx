@@ -6,9 +6,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import ArenaEmptyState from '@/components/multiplayer/ArenaEmptyState';
 import { trackMpRoomJoinBlocked, trackMpRoomJoinClicked } from '@/utils/posthogEngagement';
 import { cn } from '@/lib/utils';
-import { MpSheet } from '../shell/MpSheet';
 import { ArenaRow, isRoomFull, isRoomLive, type ArenaRoom } from './ArenaRow';
-import { useSheetSide } from './useSheetSide';
+import { EntrySheet } from './EntrySheet';
 
 /** Rows shown before "+N more": phone / desktop+TV. CSS breakpoints decide, never JS (pitfall class 1). */
 export const PHONE_ROW_CAP = 4;
@@ -37,7 +36,6 @@ function rank(r: ArenaRoom): number {
  */
 export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefresh, fetchTimedOut, className }: ArenaListProps) {
   const { t } = useLanguage();
-  const side = useSheetSide();
   const [showAll, setShowAll] = useState(false);
 
   const sorted = useMemo(
@@ -148,13 +146,13 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
         </>
       )}
 
-      <MpSheet open={showAll} onClose={() => setShowAll(false)} title={t('mpUi.entry.allArenas')} side={side} testId="arena-all-sheet">
+      <EntrySheet open={showAll} onClose={() => setShowAll(false)} title={t('mpUi.entry.allArenas')} testId="arena-all-sheet">
         <ul role="list" aria-label={t('mpUi.entry.allArenas')} className="flex flex-col gap-2 p-0.5">
           {sorted.map((room) => (
             <li key={room.gameCode}>{row(room)}</li>
           ))}
         </ul>
-      </MpSheet>
+      </EntrySheet>
     </section>
   );
 }

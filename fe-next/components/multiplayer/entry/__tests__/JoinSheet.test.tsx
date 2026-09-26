@@ -29,6 +29,7 @@ vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ updateProfile: vi.f
 vi.mock('@/components/avatar/AvatarRenderer', () => ({ __esModule: true, default: () => <div data-testid="avatar-renderer" /> }));
 
 import JoinRoomModal from '../../JoinRoomModal';
+import { codeTicket } from '../joinTarget';
 
 const en = bundleT('en');
 const room: ActiveRoom = {
@@ -95,6 +96,36 @@ describe('JoinSheet (via the JoinRoomModal re-export)', () => {
   it('while joining: busy and inert', () => {
     render(<JoinRoomModal {...props} isJoining />);
     expect(screen.getByTestId('join-submit')).toBeDisabled();
+  });
+
+  it('a listed room\'s ticket carries its mode, flag, seats and host', () => {
+    render(<JoinRoomModal {...props} room={{ ...room, gameMode: 'blast', hostUsername: 'Turbo Salmon' }} />);
+    const ticket = screen.getByTestId('join-ticket');
+    expect(ticket.textContent).toContain(en('multiplayerFlow.roomList.gameModes.blast'));
+    expect(ticket.textContent).toContain('🇮🇱');
+    expect(ticket.textContent).toContain('3/8');
+    expect(ticket.textContent).toContain(en('mpUi.entry.hostedBy', { name: 'Turbo Salmon' }));
+  });
+
+  it('a code nobody lists is an honest ticket: the code, no seat count, no guessed flag or mode', () => {
+    render(<JoinRoomModal {...props} room={codeTicket('zz9qx2', 'he')} />);
+    const ticket = screen.getByTestId('join-ticket');
+    expect(ticket.textContent).toContain('ZZ9QX2');
+    expect(ticket.textContent).toContain(en('mpUi.entry.codeTicket'));
+    expect(ticket.textContent).not.toMatch(/\d+\/\d+|(^|\D)0(\D|$)/);
+    expect(ticket.textContent).not.toContain('🇮🇱');
+    expect(ticket.textContent).not.toContain(en('multiplayerFlow.roomList.gameModes.classic'));
+    expect(screen.getByTestId('join-submit').textContent).toContain(en('mpUi.entry.join'));
+  });
+
+  it('seats that change while the sheet is open bump (re-keyed, transform-only)', () => {
+    const { rerender } = render(<JoinRoomModal {...props} />);
+    const before = screen.getByTestId('join-seats');
+    rerender(<JoinRoomModal {...props} room={{ ...room, playerCount: 4 }} />);
+    const after = screen.getByTestId('join-seats');
+    expect(after).not.toBe(before);
+    expect(after.textContent).toContain('4/8');
+    expect(after.className).toContain('animate-mp-bump');
   });
 
   it('renders nothing without a room', () => {
