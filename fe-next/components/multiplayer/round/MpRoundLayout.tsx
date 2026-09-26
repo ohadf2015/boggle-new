@@ -13,6 +13,7 @@ import { MpRecentWords } from './MpRecentWords';
 import { MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, timerColor } from './roundModes';
 import { useRoundJuice, type RoundSocket } from './useRoundJuice';
 import { mergeServerWords, useServerAcceptedWords } from './useServerAcceptedWords';
+import { useRoundFrameToastLane } from './useRoundToastLane';
 import styles from './round.module.css';
 
 interface FoundWordLike {
@@ -97,6 +98,8 @@ function MpRoundLayoutImpl({
   const myScore = roster.find((p) => p.id === meId)?.score ?? 0;
 
   const juice = useRoundJuice({ meId, standings, remainingTime, socket });
+  // react-hot-toast leaves the HUD row for this frame's lane (phone: under the roster strip; desktop/TV: start rail).
+  useRoundFrameToastLane();
 
   // My words, each once, with the SERVER's points: the view's list (optimistic
   // add + echo) merged with every server accept — blast submits straight to

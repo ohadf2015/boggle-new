@@ -39,6 +39,7 @@ vi.mock('@/contexts/NavigationContext', () => ({
 }));
 
 import { MpRoundLayout, type MpRoundLayoutProps } from '../MpRoundLayout';
+import { ROUND_FRAME_LANE_CLASS } from '../useRoundToastLane';
 import { recordWordAccepted, recordWordRejected, resetMpFeedback } from '@/lib/multiplayer/mpFeedback';
 
 const canvasRenders = { count: 0 };
@@ -160,6 +161,13 @@ describe('MpRoundLayout', () => {
     for (const c of ['whitespace-normal', 'line-clamp-2', '[overflow-wrap:anywhere]', 'flex-1', 'min-w-0']) {
       expect(rail.className).toContain(`${name}:${c}`);
     }
+  });
+
+  it('toast lane: the round frame routes react-hot-toast into its lane while mounted', () => {
+    const { unmount } = render(<MpRoundLayout {...props()} />);
+    expect(document.documentElement.classList.contains(ROUND_FRAME_LANE_CLASS)).toBe(true);
+    unmount();
+    expect(document.documentElement.classList.contains(ROUND_FRAME_LANE_CLASS)).toBe(false);
   });
 
   it('desktop/TV rail: the roster is a full-height panel (like YOUR WORDS opposite), so the column reads framed, not a void under 4 seats', () => {

@@ -129,23 +129,24 @@
 }
 
 /*
- * Toast lane (useRoundToastLane puts .roundLive on <html> while a round view is
- * mounted). The app's toasters are shared and fixed to the top-centre — exactly
- * where the round HUD's timer and score live — so during a round:
+ * Toast lanes (useRoundToastLane: .roundLive on <html> while any round view is
+ * mounted; useRoundFrameToastLane: .roundFrame while the MpRoundLayout frame is).
+ * The app's toasters are shared and fixed to the top-centre — exactly where the
+ * round HUD's timer and score live — so during a round:
  *  - the achievement capsule is held back (the unlock is listed on results);
- *  - react-hot-toast (AFK warning, host change, time added…) still shows, but
- *    below the phone HUD + roster strip, and in the start rail's bottom corner
- *    on desktop/TV (never over the board). Its container position is an inline
- *    style, hence !important.
+ *  - in the frame, react-hot-toast (AFK warning, host change, time added…) still
+ *    shows, but below the phone HUD + roster strip, and in the start rail above
+ *    the mode card on desktop/TV (never over the board). Its container position
+ *    is an inline style, hence !important.
  */
 .roundLive :global([data-testid='achievement-inline-toast']) {
   display: none !important;
 }
-.roundLive :global([data-rht-toaster]) {
+.roundFrame :global([data-rht-toaster]) {
   top: calc(env(safe-area-inset-top, 0px) + 6.75rem) !important;
 }
 @media (min-width: 1024px) {
-  .roundLive :global([data-rht-toaster]) {
+  .roundFrame :global([data-rht-toaster]) {
     /* above the rail's mode card (the column's foot) */
     top: auto !important;
     bottom: 10rem !important;
@@ -156,7 +157,7 @@
   }
 }
 @media (min-width: 1800px) and (min-height: 1000px) {
-  .roundLive :global([data-rht-toaster]) {
+  .roundFrame :global([data-rht-toaster]) {
     top: auto !important;
     bottom: 13rem !important;
   }

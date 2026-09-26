@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { renderHook, cleanup } from '@testing-library/react';
-import { useRoundToastLane, ROUND_TOAST_LANE_CLASS } from '../useRoundToastLane';
+import { useRoundToastLane, useRoundFrameToastLane, ROUND_TOAST_LANE_CLASS, ROUND_FRAME_LANE_CLASS } from '../useRoundToastLane';
 
 const css = readFileSync(resolve(__dirname, '../round.module.css'), 'utf8');
 const html = () => document.documentElement;
@@ -33,8 +33,22 @@ describe('useRoundToastLane — global toasts never sit over the round HUD', () 
     );
   });
 
-  it('the lane moves react-hot-toast off the HUD row (its inline top is overridden), phone and desktop', () => {
-    const rules = css.match(new RegExp(`\\.${ROUND_TOAST_LANE_CLASS}\\s+:global\\(\\[data-rht-toaster\\]\\)\\s*\\{[^}]*\\}`, 'g')) ?? [];
+  it('Given the round FRAME (classic / word-hunt / blast) mounts, Then the react-hot-toast lane class is set, ref-counted, and only by the frame', () => {
+    const view = renderHook(() => useRoundToastLane());
+    expect(html().classList.contains(ROUND_FRAME_LANE_CLASS)).toBe(false);
+    const a = renderHook(() => useRoundFrameToastLane());
+    const b = renderHook(() => useRoundFrameToastLane());
+    expect(html().classList.contains(ROUND_FRAME_LANE_CLASS)).toBe(true);
+    a.unmount();
+    expect(html().classList.contains(ROUND_FRAME_LANE_CLASS)).toBe(true);
+    b.unmount();
+    expect(html().classList.contains(ROUND_FRAME_LANE_CLASS)).toBe(false);
+    view.unmount();
+  });
+
+  it('the frame lane moves react-hot-toast off the HUD row (its inline top is overridden), phone and desktop — tuned for the frame only, so other modes keep their placement', () => {
+    expect(css).not.toMatch(new RegExp(`\\.${ROUND_TOAST_LANE_CLASS}\\s+:global\\(\\[data-rht-toaster\\]\\)`));
+    const rules = css.match(new RegExp(`\\.${ROUND_FRAME_LANE_CLASS}\\s+:global\\(\\[data-rht-toaster\\]\\)\\s*\\{[^}]*\\}`, 'g')) ?? [];
     // phone rule + desktop rule
     expect(rules.length).toBeGreaterThanOrEqual(2);
     for (const r of rules) expect(r).toMatch(/top:[^;]*!important/);
