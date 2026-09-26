@@ -18,11 +18,10 @@
  * test locks the wiring and survives refactors (same approach as
  * PlayerView.lifecycle.test.ts).
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerViewSource } from './playerViewSource';
 
 describe('PlayerView — in-game language sourced from store', () => {
-  const source = readFileSync(resolve(__dirname, '../PlayerView.tsx'), 'utf8');
+  const source = readPlayerViewSource();
 
   it('imports useGameLanguage from the gameState store', () => {
     expect(source).toMatch(

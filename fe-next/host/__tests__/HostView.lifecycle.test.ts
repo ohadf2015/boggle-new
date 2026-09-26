@@ -9,14 +9,11 @@
  * ~20 context/hook mocks; the source-contract test is a lightweight
  * regression lock that fails if a refactor drops the wiring.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readHostViewSource } from './hostViewSource';
 
 describe('HostView — CrazyGames lifecycle wiring', () => {
-  const source = readFileSync(
-    resolve(__dirname, '../HostView.tsx'),
-    'utf8',
-  );
+  // HostView was split into a router + phase hooks (FOUNDATION); read them all.
+  const source = readHostViewSource();
 
   it('imports useCrazyGamesLifecycle hook', () => {
     expect(source).toMatch(

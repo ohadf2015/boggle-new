@@ -12,14 +12,10 @@
  * Fix: destructure stable useCallback methods (timerReset, timerSetTime, timerResume)
  * and move `onGameStartConsumed()` inside `startGame` so it fires after the delay.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerViewSource } from './playerViewSource';
 
 describe('PlayerView — timer effect dependency stability', () => {
-  const source = readFileSync(
-    resolve(__dirname, '../PlayerView.tsx'),
-    'utf8',
-  );
+  const source = readPlayerViewSource();
 
   it('destructures stable timer methods from gameTimer', () => {
     expect(source).toMatch(/const\s*\{[^}]*timerResume[^}]*\}\s*=\s*gameTimer/);

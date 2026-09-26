@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerViewSource } from './playerViewSource';
 
 /**
  * PlayerView — startGame retry must not replay countdown
@@ -17,7 +16,7 @@ import { resolve } from 'node:path';
  * Fix: track the last-revealed messageId in a ref and skip
  * setShowModeReveal(true) when it matches the current pending messageId.
  */
-const source = readFileSync(resolve(__dirname, '../PlayerView.tsx'), 'utf8');
+const source = readPlayerViewSource();
 
 describe('PlayerView — startGame retry reveal dedup', () => {
   it('declares revealedMessageIdRef to track the last-revealed messageId', () => {

@@ -12,14 +12,11 @@
  * forces `waitingForResults=true`, and emits `requestResults` to pull the server's
  * cached scoring payload.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readHostViewSource } from './hostViewSource';
 
 describe('HostView — timer-zero watchdog wiring', () => {
-  const source = readFileSync(
-    resolve(__dirname, '../HostView.tsx'),
-    'utf8',
-  );
+  // HostView was split into a router + phase hooks (FOUNDATION); read them all.
+  const source = readHostViewSource();
 
   it('imports useTimerZeroWatchdog from the shared hook', () => {
     expect(source).toMatch(

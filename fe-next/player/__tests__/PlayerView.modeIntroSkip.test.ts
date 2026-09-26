@@ -16,14 +16,10 @@
  *   - The auto-dismiss `setTimeout` MUST fire for everyone — no
  *     `hasSeenIntro` early-return short-circuit.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerViewSource } from './playerViewSource';
 
 describe('PlayerView — MP cozy intro suppression', () => {
-  const source = readFileSync(
-    resolve(__dirname, '../PlayerView.tsx'),
-    'utf8',
-  );
+  const source = readPlayerViewSource();
 
   it('does not pass modeKey prop to <ModeRevealOverlay>', () => {
     const occurrences = source.match(/<ModeRevealOverlay\b[\s\S]*?modeKey\s*=/g);

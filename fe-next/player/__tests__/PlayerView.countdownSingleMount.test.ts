@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerViewSource } from './playerViewSource';
 
 /**
  * PlayerView — single countdown mount contract
@@ -15,7 +14,7 @@ import { resolve } from 'node:path';
  * (showModeReveal / showStartAnimation) always routes through the main return,
  * so the early-return branch never renders the countdown.
  */
-const source = readFileSync(resolve(__dirname, '../PlayerView.tsx'), 'utf8');
+const source = readPlayerViewSource();
 
 describe('PlayerView — single countdown mount', () => {
   it('mounts GoRipplesAnimation from exactly one position', () => {

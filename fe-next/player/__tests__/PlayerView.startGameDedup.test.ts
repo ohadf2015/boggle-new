@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerViewSource } from './playerViewSource';
 
 /**
  * PlayerView — pendingGameStart dedup contract
@@ -14,7 +13,7 @@ import { resolve } from 'node:path';
  * The handled-check must sit ABOVE the `isReconnect` branch so reconnect
  * double-handling is covered too.
  */
-const source = readFileSync(resolve(__dirname, '../PlayerView.tsx'), 'utf8');
+const source = readPlayerViewSource();
 
 describe('PlayerView — pendingGameStart dedup', () => {
   it('imports wasStartGameHandled from gameEventUtils', () => {

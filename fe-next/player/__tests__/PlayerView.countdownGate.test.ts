@@ -12,14 +12,10 @@
  * pre-game-data branch becomes unreachable once setLetterGrid + gameTimer
  * batch with setShowModeReveal in the same commit.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readPlayerViewSource } from './playerViewSource';
 
 describe('PlayerView — countdown selection gate', () => {
-  const source = readFileSync(
-    resolve(__dirname, '../PlayerView.tsx'),
-    'utf8',
-  );
+  const source = readPlayerViewSource();
 
   it('forwards (showModeReveal || showStartAnimation) as showStartAnimation prop', () => {
     expect(source).toMatch(
