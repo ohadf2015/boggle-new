@@ -159,12 +159,14 @@ describe('MpResultsScreen', () => {
     expect(screen.getAllByTestId('mp-standing-row').every((r) => r.getAttribute('data-revealed') === 'true')).toBe(true);
   });
 
-  it('reduced motion: everything is on screen without a choreography', () => {
+  it('reduced motion: everything is on screen without a choreography, once the screen knows what it is judging', () => {
     h.reduced = true;
     vi.useFakeTimers();
     renderScreen();
-    expect(screen.getAllByTestId('mp-standing-row').every((r) => r.getAttribute('data-revealed') === 'true')).toBe(true);
+    // intermission vs final is not judged yet: nothing is shown on a guess
+    expect(screen.getAllByTestId('mp-standing-row').every((r) => r.getAttribute('data-revealed') === 'false')).toBe(true);
     act(() => { vi.advanceTimersByTime(600); });
+    expect(screen.getAllByTestId('mp-standing-row').every((r) => r.getAttribute('data-revealed') === 'true')).toBe(true);
     expect(screen.getByTestId('mp-primary-cta')).toBeTruthy();
   });
 
@@ -309,8 +311,10 @@ describe('MpResultsScreen', () => {
     });
 
     it('a 0-point podium slot gets no podium treatment', () => {
+      vi.useFakeTimers();
       h.reduced = true;
       renderScreen({ finalScores: TIED, username: 'T' });
+      act(() => { vi.advanceTimersByTime(600); });
       const rows = screen.getAllByTestId('mp-standing-row');
       expect(rows.map((r) => r.getAttribute('data-podium'))).toEqual(['1', 'none', 'none', 'none']);
       expect(screen.getAllByTestId('mp-standing-crown')).toHaveLength(1);
@@ -359,6 +363,21 @@ describe('MpResultsScreen', () => {
       expect(card.textContent).not.toContain('mpUi.results.tiedWith');
       expect(card.textContent).toContain('mpUi.results.behind:{"points":94,"name":"Host"}');
       expect(card.getAttribute('data-winner')).toBe('false');
+    });
+
+    it('reduced motion: the board never shows the round order first and then flips to the ladder', () => {
+      vi.useFakeTimers();
+      h.reduced = true;
+      final('T');
+      // before the branch locks nothing is on screen (no 1,1,1,1 flash)
+      expect(screen.getAllByTestId('mp-standing-row').some((r) => r.getAttribute('data-revealed') === 'true')).toBe(false);
+      expect(screen.getByTestId('mp-my-card').className).toContain('invisible');
+      act(() => { vi.advanceTimersByTime(600); });
+      const rows = screen.getAllByTestId('mp-standing-row');
+      expect(rows.every((r) => r.getAttribute('data-revealed') === 'true')).toBe(true);
+      expect(rows[0].textContent).toContain('Host');
+      expect(rows.map((r) => r.getAttribute('data-rank'))).toEqual(['1', '2', '2', '2']);
+      expect(screen.getByTestId('mp-my-rank').textContent).toBe('#2');
     });
 
     it('the champion chip and the champion card agree (one source: the series totals)', () => {

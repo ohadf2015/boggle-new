@@ -198,7 +198,7 @@ describe('seriesLadder (the final board of a series ranks the SERIES)', () => {
     expect(ladder.map((r) => [r.username, r.seriesDelta])).toEqual([['B', 1], ['A', -1], ['C', 0]]);
   });
 
-  it('a tie broken by the last round counts as a climb for the breaker only', () => {
+  it('the tie-breaker holds 1st (no climb), the other drops one', () => {
     // Before: A 40, B 40 (both 1st). After: A 40, B 45.
     const rows = [sRow('B', 1, 5, 45), sRow('A', 2, 0, 40)];
     expect(seriesLadder(rows)!.map((r) => [r.username, r.rank, r.seriesDelta])).toEqual([['B', 1, 0], ['A', 2, -1]]);

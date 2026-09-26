@@ -93,8 +93,11 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     skip();
     beats.fireVerdict(true);
   }, [lock, skip, beats]);
-  const seen = (name: Parameters<typeof timeline.stageOf>[0]) => stage >= timeline.stageOf(name);
-  const footerShown = seen('footer') && branch !== null;
+  // Nothing is shown before intermission vs final is locked: under reduced
+  // motion the stage is complete at mount, and a series final would otherwise
+  // show the round order first and flip to the ladder half a second later.
+  const seen = (name: Parameters<typeof timeline.stageOf>[0]) => branch !== null && stage >= timeline.stageOf(name);
+  const footerShown = seen('footer');
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
