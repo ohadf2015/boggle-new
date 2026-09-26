@@ -38,7 +38,7 @@ describe('entry sound cues', () => {
     'abc12'.split('').forEach((ch, i) => fireEvent.change(boxes()[i], { target: { value: ch } }));
     expect(keys()).toEqual(['tileSelect', 'tileSelect', 'tileSelect', 'tileSelect', 'tileSelect']);
     fireEvent.change(boxes()[5], { target: { value: 'z' } });
-    expect(keys().at(-1)).toBe('pathConnect');
+    expect(keys()[keys().length - 1]).toBe('pathConnect');
     expect(keys().filter((k) => k === 'pathConnect')).toHaveLength(1);
   });
 

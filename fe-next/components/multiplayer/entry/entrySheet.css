@@ -12,10 +12,14 @@
   100% { transform: translateY(0); }
 }
 
-/* The CTA lands last and harder: a small stamp, never wider than the padding. */
+/*
+ * The CTA lands last and harder. Its held start frame is the rows' exactly (the
+ * whole stack shifted up, nothing narrower), so a still taken before it lands
+ * reads as final; the stamp lives mid-flight, never wider than the padding.
+ */
 @keyframes mp-entry-slam {
-  0% { transform: translateY(-10px) scale(0.97); }
-  60% { transform: translateY(2px) scale(1.01); }
+  0% { transform: translateY(-8px); }
+  60% { transform: translateY(2px) scale(1.02); }
   100% { transform: translateY(0) scale(1); }
 }
 

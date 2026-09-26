@@ -147,6 +147,12 @@ describe('entry sheet motion (entrySheet.css)', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*animation: none/);
   });
 
+  it('the CTA holds the same start frame as the rows (a still before it lands still reads as final)', () => {
+    const start = (name: string) => css.match(new RegExp(`@keyframes ${name} \\{\\s*0% \\{([^}]*)\\}`))?.[1].trim();
+    expect(start('mp-entry-settle')).toBeTruthy();
+    expect(start('mp-entry-slam')).toBe(start('mp-entry-settle'));
+  });
+
   it('the CTA glint sweeps by transform only and is gone under reduced motion', () => {
     const glint = fs.readFileSync(path.resolve(__dirname, '../ctaGlint.css'), 'utf8');
     for (const kf of glint.match(/@keyframes[^{]+\{[\s\S]*?\}\s*\}/g) ?? []) {
