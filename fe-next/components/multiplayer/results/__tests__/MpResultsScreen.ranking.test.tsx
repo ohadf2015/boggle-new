@@ -1,5 +1,5 @@
 /**
- * ResultsPage Ranking Tests
+ * MpResultsScreen Ranking Tests (moved from components/__tests__/ResultsPage.ranking.test.tsx)
  *
  * Tests for player placement/ranking calculation and display
  *
@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 
@@ -266,8 +266,16 @@ vi.mock('@/hooks/useInterstitialAd', () => ({
   }),
 }));
 
+// NumberFlow needs a real browser; the rank under test is not the counter.
+// The header's sound toggle (new on the rebuilt screen) reads the app's MusicProvider.
+vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
+vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
+
 // Import after all mocks are set up
-import ResultsPage from '@/components/views/ResultsPage';
+import ResultsPage from '../MpResultsScreen';
+
+/** The rank on my card (the one-screen verdict). */
+const myCardRank = () => screen.getByTestId('mp-my-rank').textContent;
 
 // Helper to render ResultsPage with required providers
 const renderResultsPage = (props: {
@@ -287,13 +295,16 @@ const renderResultsPage = (props: {
     roomLanguage: 'en' as const,
   };
 
-  return render(
+  const utils = render(
     <NavigationProvider>
       <LanguageProvider>
         <ResultsPage {...defaultProps} {...props} />
       </LanguageProvider>
     </NavigationProvider>
   );
+  // The deep dive (ResultsMainContent) lives behind DETAILS on the rebuilt screen.
+  fireEvent.click(screen.getByTestId('mp-results-details-open'));
+  return utils;
 };
 
 describe('ResultsPage Ranking', () => {
@@ -317,6 +328,7 @@ describe('ResultsPage Ranking', () => {
 
       // The main content should receive rank 1 for the winning player
       expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
+      expect(myCardRank()).toBe('#1');
     });
 
     it('should show rank 2 when player has second highest score', () => {
@@ -331,6 +343,8 @@ describe('ResultsPage Ranking', () => {
       });
 
       expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(2);
+
+      expect(myCardRank()).toBe('#2');
     });
 
     /**
@@ -359,6 +373,7 @@ describe('ResultsPage Ranking', () => {
       // EXPECTED: rank should be 1 (player with highest score)
       // Username normalization (trim) ensures match despite trailing space
       expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
+      expect(myCardRank()).toBe('#1');
     });
 
     it('should show rank 1 even when username case differs (bug fix)', () => {
@@ -375,6 +390,7 @@ describe('ResultsPage Ranking', () => {
       // EXPECTED: rank should be 1 (player with highest score)
       // Username normalization (lowercase) ensures match despite case difference
       expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
+      expect(myCardRank()).toBe('#1');
     });
 
     it('should show rank 1 for zero-score player listed first in multiplayer', () => {
@@ -392,6 +408,7 @@ describe('ResultsPage Ranking', () => {
 
       // ZeroScorePlayer is first in the sorted list (stable sort, both score 0)
       expect(globalThis.__TEST_MAIN_CONTENT_PROPS__?.currentPlayerRank).toBe(1);
+      expect(myCardRank()).toBe('#1');
     });
   });
 });

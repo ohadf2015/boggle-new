@@ -21,9 +21,11 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
-const source = readFileSync(resolve(__dirname, '../ResultsPage.tsx'), 'utf8');
+// Moved with the code: the mode hero scenes + lesson recap now render in the
+// DETAILS sheet (MpResultsDetails), which replaced ResultsPage's two layouts.
+const source = readFileSync(resolve(__dirname, '../MpResultsDetails.tsx'), 'utf8');
 
-describe('ResultsPage — mode hero scenes yield to the classroom recap', () => {
+describe('MpResultsDetails (was ResultsPage) — mode hero scenes yield to the classroom recap', () => {
   it('imports the shared hero-slot predicate', () => {
     expect(source).toMatch(/modeSceneOwnsHeroSlot/);
     expect(source).toMatch(/roundEndResultsRoute/);

@@ -21,7 +21,6 @@ const MP_SCOPES = [
   'host',
   'player',
   'app/[locale]/multiplayer',
-  'components/views/ResultsPage.tsx',
 ];
 
 /** The exit implementation — allowed to navigate by design. */
@@ -33,7 +32,8 @@ const EXIT_IMPLEMENTATION = new Set([
 
 /** Legacy sites each piece converts to useMpExit (delete the entry when done). */
 const LEGACY_ALLOWLIST: Record<string, string> = {
-  'components/views/ResultsPage.tsx': 'RESULTS — replace() exits + lesson/practice pushes',
+  // RESULTS converted its exits to useMpExit('leave-room'); only this deep link remains (needs an mpExit reason from FOUNDATION).
+  'components/multiplayer/results/useOpenLessonPractice.ts': 'RESULTS — classroom lesson-practice deep link (/student/lessons/…)',
 };
 
 const NAV = /router\.(?:push|replace)\(|href=\{|href="\/|<Link\b|window\.location\.(?:href\s*=|assign\()/;

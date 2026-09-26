@@ -30,9 +30,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
-const source = readFileSync(resolve(__dirname, '../ResultsPage.tsx'), 'utf8');
+// Moved with the code: the played-mode latch lives in the results controller;
+// the mode hero gates live in the DETAILS sheet. Both replaced ResultsPage.
+const source = readFileSync(resolve(__dirname, '../useMpResultsController.ts'), 'utf8');
+const detailsSource = readFileSync(resolve(__dirname, '../MpResultsDetails.tsx'), 'utf8');
 
-describe('ResultsPage — mode scenes reflect the mode actually played', () => {
+describe('MP results (was ResultsPage) — mode scenes reflect the mode actually played', () => {
   it('imports the shared predicate rather than reading the raw store value', () => {
     expect(source).toMatch(/playedGameMode/);
     expect(source).toMatch(/roundEndResultsRoute/);
@@ -68,10 +71,15 @@ describe('ResultsPage — mode scenes reflect the mode actually played', () => {
 
   it('still gates every mode hero on the classroom recap flag', () => {
     // The sibling invariant must survive this change, not be traded for it.
-    const heroGates = (source.match(/^.*(blastMpResults|wheel-rush).*$/gm) ?? []).filter(
+    const heroGates = (detailsSource.match(/^.*(blastMpResults|wheel-rush).*$/gm) ?? []).filter(
       (l) => l.includes('&&') && l.includes('{') && l.includes('===')
     );
     expect(heroGates.length).toBeGreaterThan(0);
     for (const gate of heroGates) expect(gate).toMatch(/heroSlotOwnedByMode/);
+  });
+
+  it('the DETAILS sheet takes the latched mode from the controller, never the raw store hook', () => {
+    expect(detailsSource).not.toMatch(/useGameMode\(\)/);
+    expect(detailsSource).toMatch(/resolvedGameMode/);
   });
 });
