@@ -177,11 +177,12 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       onPointerDown={done ? undefined : handleSkip}
       className={cn(
         // Desktop/TV scale the whole show up (the HUD bar keeps the shell's --mp-u).
-        'relative flex-1 min-h-0 w-full max-w-6xl tv:max-w-[1600px] mx-auto flex flex-col lg:[--mp-u:1.3] [@media(min-width:1024px)_and_(max-width:1799px)_and_(min-height:860px)]:[--mp-u:1.45] tv:[--mp-u:1.8]',
+        'relative isolate flex-1 min-h-0 w-full max-w-6xl tv:max-w-[1600px] mx-auto flex flex-col lg:[--mp-u:1.3] [@media(min-width:1024px)_and_(max-width:1799px)_and_(min-height:860px)]:[--mp-u:1.45] tv:[--mp-u:1.8]',
         'gap-[calc(10px*var(--mp-u,1))] p-[calc(12px*var(--mp-u,1))] lg:p-[calc(24px*var(--mp-u,1))]',
         'lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-[calc(28px*var(--mp-u,1))] lg:items-center',
       )}
     >
+      <div aria-hidden="true" className={fx.halftone} />
       <div className="min-h-0 flex-1 flex flex-col justify-center gap-[calc(8px*var(--mp-u,1))] lg:h-full">
         {champions.length > 0 && (
           <p data-testid="mp-series-champion" className={cn('shrink-0 self-center inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-neo-black font-bold text-[calc(12px*var(--mp-u,1))]', fx.chipPop)}>
