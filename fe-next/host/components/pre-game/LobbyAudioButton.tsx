@@ -30,16 +30,15 @@ export const LobbyAudioButton = memo(function LobbyAudioButton() {
       title={title}
       data-testid="lobby-audio-button"
       className={cn(
-        'w-8 h-8 flex items-center justify-center shrink-0 rounded-neo border-2 transition-all',
-        'active:translate-y-0.5 active:shadow-none',
-        allMuted
-          ? 'border-neo-white/20 bg-white/5 text-neo-cream/50 hover:bg-white/10'
-          : 'border-neo-white/20 bg-white/5 text-neo-cream/70 hover:bg-white/10',
+        // Same 40px icon-button as the rest of the MP lobby header (×1.5 on TV via --mp-u).
+        'w-[calc(40px*var(--mp-u,1))] h-[calc(40px*var(--mp-u,1))] flex items-center justify-center shrink-0 rounded-neo border-2 border-neo-black shadow-hard-sm transition-transform',
+        'active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-neo-cyan',
+        allMuted ? 'bg-neo-navy-light text-neo-white/50' : 'bg-neo-navy-light text-neo-white',
       )}
     >
       {allMuted
-        ? <VolumeX className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
-        : <Volume2 className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />}
+        ? <VolumeX className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
+        : <Volume2 className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />}
     </button>
   );
 });

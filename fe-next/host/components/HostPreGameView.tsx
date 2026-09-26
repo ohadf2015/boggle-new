@@ -231,7 +231,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 w-full bg-neo-navy text-neo-white relative lg:max-w-7xl lg:mx-auto">
+    <div className="flex-1 flex flex-col min-h-0 w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
       {lessonData && (
         <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-neo-purple/20 border-b-2 border-neo-purple/50 text-sm min-w-0">
           <BookOpen aria-hidden="true" className="w-4 h-4 text-neo-purple shrink-0" />
@@ -248,7 +248,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           center={
             isPrivate
               ? <LobbyCountPill count={seats.length} max={LOBBY_MAX_PLAYERS} />
-              : <MpRoomCode code={gameCode} size="chip" onCopy={() => setSheet('invite')} className="px-2 text-[24px] tracking-[0.1em] [&>svg]:hidden min-[720px]:text-[calc(28px*var(--mp-u,1))] min-[720px]:tracking-[0.2em] min-[720px]:[&>svg]:inline" />
+              : <MpRoomCode code={gameCode} size="chip" onCopy={() => setSheet('invite')} className="px-2 text-[24px] tracking-[0.1em] [&>svg]:hidden min-[720px]:text-[length:calc(28px*var(--mp-u,1))] min-[720px]:tracking-[0.2em] min-[720px]:[&>svg]:inline" />
           }
           end={
             <>
@@ -303,7 +303,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
         </div>
 
         {/* Phone (<720px): one fixed column, footer CTA pinned. */}
-        <div className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
+        <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
           <div className="flex-1 min-h-0 flex flex-col justify-center gap-3 px-3 py-2 w-full max-w-[600px] mx-auto">
             {statusLane}
             {roster()}

@@ -1,28 +1,29 @@
 'use client';
 
+/**
+ * Joiner lobby. One screen, no page scroll:
+ *   header  [exit] [board language] … [invite] [chat] [sound]
+ *   body    8-seat grid (same `lobbySeats` source as the host) · DJ Lexi + status
+ *   footer  READY toggle
+ * Desktop (≥720px): seats + status + how-to-play left, invite + chat right.
+ * A classroom student gets ClassroomWaitingStage instead (unchanged contract).
+ */
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { m, AnimatePresence } from 'framer-motion';
-const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap } from 'lucide-react';
+import { Check, HelpCircle, Pencil, X } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { LobbyAudioButton } from '../../host/components/pre-game/LobbyAudioButton';
 import { LobbyAutoStartStatus } from '@/components/lobby/LobbyAutoStartStatus';
-import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
-import RoomChat from '../../components/RoomChat';
-import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
 import { EmoteTray } from './lobby/EmoteTray';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
+import { PlayerRoster } from '../../host/components/pre-game/PlayerRoster';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
-// Shared how-to-play source — host renders the same component, so players and
-// host see IDENTICAL instructions (all modes incl. wheel-rush, localized images,
-// a11y). Previously the player inlined a degraded 3-mode/no-image copy.
 import { GameInstructions } from '../../host/components/pre-game/GameInstructions';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
@@ -31,13 +32,18 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { useGameMode } from '@/hooks/gameState';
-import { LANGUAGE_FLAGS, getLanguageName } from '@/lib/languageConfig';
-import { SPRING_PRESETS } from '@/lib/animation/presets';
+import { languageFlag, languageLabelKey } from '@/lib/i18n/languageLabels';
+import { DJMascot } from '@/components/ui/DJMascot';
+import { MpHudBar } from '@/components/multiplayer/shell/MpHudBar';
+import { lobbySeats, readyTally, LOBBY_SEATS } from '@/components/multiplayer/lobby/lobbySeats';
+import { ReadyButton } from '@/components/multiplayer/lobby/ReadyButton';
+import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
+import { LobbyExitButton, LobbyChatButton, LobbyChatPanel, HowToPlaySheet, ChatSheet } from '@/components/multiplayer/lobby/LobbyChrome';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
 
-// ==================== Types ====================
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 
 interface PlayerReadyInfo {
   username: string;
@@ -62,74 +68,45 @@ interface PlayerWaitingViewProps {
   onConfirmExit: () => void;
   onNameChange?: (newName: string) => void;
   onAvatarChange?: (config: CustomAvatarConfig) => void;
-  /** Usernames the server reports as ready (non-host). Drives roster badges. */
+  /** Usernames the server reports as ready (non-host). Drives seat badges. */
   readyUsernames?: string[];
-  /** Whether the local player is ready. */
   isReady?: boolean;
-  /** Toggle local ready state (emits `lobbyReady`). Absent on host/spectator. */
+  /** Toggle local ready state (emits `lobbyReady`). Absent on spectators. */
   onToggleReady?: () => void;
-  /** Whether a ready toggle is currently in-flight (prevents double-click rage). */
   readyInFlight?: boolean;
-  /**
-   * This room belongs to a teacher's class.
-   *
-   * The share code and the invite card are how a HOST fills a public room. A
-   * student arrived by scanning that code off a projector; the roster is the
-   * class, and the only person who admits anyone is the teacher.
-   */
+  /** A teacher's class: no share code, invite, chat or ad slot. */
   isClassroomMode?: boolean;
-  /**
-   * The mode the teacher picked, from the room's own record. The lobby store's
-   * `gameMode` is whatever board mode the room last held, so a Vocab Quiz lobby
-   * reads as `classic` there and the how-to-play panel taught the wrong game.
-   */
+  /** The mode the teacher picked, from the room's own record. */
   classroomGameMode?: ClassroomGameMode;
 }
 
-const MAX_PLAYERS = 8;
+type T = (path: string, params?: Record<string, string | number>) => string;
 
-// ==================== Component ====================
+const CARD = 'rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-3 desktop-tall:p-4';
 
-const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
-  gameCode,
-  gameLanguage,
-  username,
-  t,
-  playersReady,
-  showExitConfirm,
-  setShowExitConfirm,
-  onExitRoom,
-  onConfirmExit,
-  onNameChange,
-  onAvatarChange,
-  readyUsernames = [],
-  isReady = false,
-  onToggleReady,
-  readyInFlight = false,
-  isClassroomMode = false,
-  classroomGameMode,
-}): React.ReactElement => {
+const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.ReactElement => {
+  const {
+    gameCode, gameLanguage, username, playersReady, showExitConfirm, setShowExitConfirm, onExitRoom, onConfirmExit,
+    onNameChange, onAvatarChange, readyUsernames = [], isReady = false, onToggleReady, readyInFlight = false,
+    isClassroomMode = false, classroomGameMode,
+  } = props;
+  const t = props.t as T;
   const { isAuthenticated, updateProfile } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const gameMode = useGameMode();
 
-  // Lobby emotes — self-contained over the shared socket (no prop threading).
-  // The server echoes every emote to the whole room, sender included.
-  const socketCtx = useSocketOptional();
-  const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({
-    socket: socketCtx?.socket ?? null,
-  });
-  // Broadcast this guest's rewarded-ad state so the host's Start disables while
-  // they watch (return unused — guests gate nothing).
-  useLobbyAdGate({ socket: socketCtx?.socket ?? null });
+  // Emotes + ad gate ride the shared socket (no prop threading).
+  const socket = useSocketOptional()?.socket ?? null;
+  const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({ socket });
+  useLobbyAdGate({ socket });
 
-  // The 1Hz auto-start countdown lives in <LobbyAutoStartStatus/>, a memoized
-  // leaf, so the 8-avatar tree does not re-render once per second.
+  const [sheet, setSheet] = useState<'howto' | 'chat' | null>(null);
+  const closeSheet = useCallback(() => setSheet(null), []);
+  const unread = useChatUnread({ socket, username, open: sheet === 'chat' });
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const [currentAvatar, setCurrentAvatar] = useState<CustomAvatarConfig>(() => getOrCreateStoredCustomAvatar());
-
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
     setCurrentAvatar(config);
@@ -137,340 +114,31 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     setIsAvatarBuilderOpen(false);
     await updateProfile({ avatar_config: config }).catch(() => {});
   }, [onAvatarChange, updateProfile]);
+  const openAvatarBuilder = useCallback(() => setIsAvatarBuilderOpen(true), []);
+  const handleSelfNameChange = useCallback((name: string) => {
+    const trimmed = name.trim();
+    if (trimmed && trimmed !== username) onNameChange?.(trimmed);
+  }, [username, onNameChange]);
 
-  const nonHostPlayers = playersReady;
-  const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - nonHostPlayers.length);
+  // Same seat source as the host → the joiner's count can never read 0.
+  const seats = useMemo(() => lobbySeats(playersReady, username, readyUsernames), [playersReady, username, readyUsernames]);
+  const { ready: readyCount, total: readyTotal } = readyTally(seats);
 
-  // Ready-state lookups for roster badges + the "N/M ready" status line. Bots
-  // auto-count as ready; the host clicks Start, never Ready. Memoized so
-  // unrelated re-renders keep stable child props.
-  const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
-  const readyTotal = useMemo(() => nonHostPlayers.filter((p) => {
-    const o = typeof p === 'object' ? p : null;
-    return !o?.isHost && !o?.isBot;
-  }).length, [nonHostPlayers]);
-  const readyCount = useMemo(() => nonHostPlayers.filter((p) => {
-    const o = typeof p === 'object' ? p : null;
-    const nm = typeof p === 'string' ? p : p.username;
-    // Match server `getPlayersReadyCount`: humans only, host + bots excluded.
-    if (o?.isHost || o?.isBot) return false;
-    return readySet.has(nm);
-  }).length, [nonHostPlayers, readySet]);
+  // How-to-play follows the room: a classroom's teacher-chosen mode (a quiz
+  // has no board to teach), otherwise the store's mode with classic fallback.
+  const howToMode: GameModeOption | null = isClassroomMode
+    ? (classroomGameMode && classroomGameMode !== VOCAB_QUIZ_MODE ? (classroomGameMode as GameModeOption) : null)
+    : ((gameMode || 'classic') as GameModeOption);
+  const lang = gameLanguage ?? 'en';
 
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [editNameValue, setEditNameValue] = useState(username);
+  const readyButton = onToggleReady ? (
+    <ReadyButton isReady={isReady} onToggle={onToggleReady} inFlight={readyInFlight} t={t} />
+  ) : null;
+  const status = <LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />;
+  const emote = <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />;
 
-  const handleSaveName = useCallback(() => {
-    const trimmed = editNameValue.trim();
-    if (trimmed && trimmed !== username) {
-      onNameChange?.(trimmed);
-    }
-    setIsEditingName(false);
-  }, [editNameValue, username, onNameChange]);
-
-  // ==================== Name (+ guest rename) ====================
-  const renderNameEditor = (): React.ReactElement => (
-    <>
-      {isEditingName ? (
-        <div className="flex items-center gap-2">
-          <input
-            data-testid="name-edit-input"
-            type="text"
-            value={editNameValue}
-            onChange={(e) => setEditNameValue(e.target.value)}
-            maxLength={20}
-            className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
-            autoFocus
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSaveName();
-              if (e.key === 'Escape') setIsEditingName(false);
-            }}
-          />
-          <button
-            type="button"
-            data-testid="name-save-button"
-            onClick={handleSaveName}
-            className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
-          >
-            <Check className="w-4 h-4 text-neo-black" />
-          </button>
-          <button
-            type="button"
-            onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
-            className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
-          >
-            <X className="w-4 h-4 text-neo-cream" />
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-black text-neo-cream truncate">
-            {username}
-          </h2>
-          {!isAuthenticated && (
-            <button
-              type="button"
-              data-testid="edit-name-button"
-              onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-              className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border-[2px] border-neo-cream text-neo-cream flex items-center justify-center transition-colors"
-              aria-label={t('playerView.editName')}
-            >
-              <Pencil className="w-3.5 h-3.5 text-neo-cream" />
-            </button>
-          )}
-        </div>
-      )}
-    </>
-  );
-
-  // ==================== Ready toggle ====================
-  const renderReadyButton = (): React.ReactElement | null => (
-    <>
-      {/* Ready toggle — advisory: the host can start whenever they like. */}
-      {onToggleReady ? (
-        <m.button
-          type="button"
-          data-testid="ready-button"
-          onClick={onToggleReady}
-          disabled={readyInFlight}
-          whileTap={{ scale: 0.96 }}
-          aria-pressed={isReady}
-          className={cn(
-            'mt-3 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-neo border-3 font-black uppercase tracking-wide shadow-hard transition-colors',
-            readyInFlight && 'opacity-50 cursor-not-allowed',
-            !readyInFlight && (isReady
-              // Confirmed: solid lime fill + check — unmistakable "you're ready".
-              ? 'bg-neo-lime text-neo-black border-neo-black'
-              // Resting CTA: lime-outlined on navy — clearly a ready button asking for the tap.
-              : 'bg-neo-navy border-neo-lime text-neo-lime hover:bg-neo-lime/10'),
-          )}
-        >
-          {isReady ? <Check className="w-5 h-5 stroke-[3]" /> : <Zap className="w-5 h-5" />}
-          <span>{isReady ? t('playerView.readyConfirmed') : t('playerView.readyUp')}</span>
-        </m.button>
-      ) : null}
-    </>
-  );
-
-  // ==================== Hero Card ====================
-  const renderHeroCard = (): React.ReactElement => (
-    <m.div
-      data-testid="waiting-status"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={SPRING_PRESETS.balanced}
-      className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard-lg overflow-hidden"
-    >
-      <div className="h-1.5 bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime" />
-
-      <div className="p-4 sm:p-5 flex items-center gap-4 sm:gap-5">
-        {/* Large clickable avatar. The lime ring lives on the BUTTON, not the
-            inner disc: an audit reads a control's OWN fill/border edge. */}
-        <button
-          type="button"
-          data-testid="edit-avatar-button"
-          onClick={() => setIsAvatarBuilderOpen(true)}
-          className="relative shrink-0 group rounded-full border-[3px] border-neo-lime"
-        >
-          <div className="w-20 h-20 rounded-full border-3 border-neo-black overflow-hidden shadow-hard transition-transform group-hover:scale-105 group-active:scale-95">
-            <Avatar
-              customAvatar={currentAvatar}
-              size="2xl"
-              className="w-full h-full"
-              // Mirror the player's own lobby emote on the big hero face so a
-              // tapped emote (tray just below) has an obvious, immediate effect.
-              mood={emotesByUsername[username]?.emote}
-            />
-          </div>
-          <div className="absolute inset-0 rounded-full bg-neo-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <Camera className="w-6 h-6 text-neo-cream" />
-          </div>
-          <div className="absolute -bottom-1 -inset-e-1 w-7 h-7 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
-            <Pencil className="w-3.5 h-3.5 text-neo-black" />
-          </div>
-        </button>
-
-        {/* Name + status */}
-        <div className="flex-1 min-w-0">
-          {renderNameEditor()}
-
-          {renderReadyButton()}
-
-          <LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />
-
-          {/* Beside your avatar+name so it reads as "react as ME": a tapped face
-              swaps the hero avatar above, and your roster tile, for the room. */}
-          <div className="mt-3 flex items-end gap-2">
-            <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
-          </div>
-        </div>
-      </div>
-    </m.div>
-  );
-
-  // ==================== Player Roster ====================
-  const renderPlayerRoster = (): React.ReactElement => (
-    <section className="space-y-2">
-      {/* No roster header — the top bar already shows the live X/8 count. */}
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide pt-1">
-        <AnimatePresence>
-          {nonHostPlayers.map((player, index) => {
-            const name = typeof player === 'string' ? player : player.username;
-            const avatar = typeof player === 'object' ? player.avatar : null;
-            const isHostPlayer = typeof player === 'object' ? player.isHost : false;
-            const isBot = typeof player === 'object' ? player.isBot : false;
-            const isMe = name === username;
-
-            return (
-              <m.div
-                key={name}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{
-                  type: 'spring', stiffness: 400, damping: 22, delay: index * 0.06,
-                }}
-                className="shrink-0 flex flex-col items-center gap-1.5"
-              >
-                <div
-                  className="relative animate-avatar-float pointer-events-none"
-                  style={{ animationDelay: `${index * 200}ms` }}
-                >
-                  {isHostPlayer && (
-                    <m.div
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 z-10"
-                      animate={{ rotate: [0, 5, -5, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
-                    >
-                      <Crown className="w-4 h-4 text-neo-yellow" />
-                    </m.div>
-                  )}
-                  <div className={cn(
-                    'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden shadow-hard aspect-square',
-                    isMe ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : '',
-                  )}>
-                    {/* Avatar owns the whole fallback chain (customAvatar → seeded
-                        face from userId). Don't gate on hasAvatar: the legacy
-                        `{emoji,color}` payload has none and still renders. */}
-                    <Avatar
-                      customAvatar={avatar?.customAvatar ?? undefined}
-                      userId={name}
-                      pixelSize={64}
-                      mode="multiplayer"
-                      className="w-full h-full"
-                      mood={emotesByUsername[name]?.emote}
-                    />
-                  </div>
-                  {/* Lobby emote = avatar FACE-SWAP only (the `mood` prop above).
-                      No emoji bubble — the face is the whole signal. */}
-                  {isBot && (
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-cyan border-2 border-neo-black rounded-full flex items-center justify-center">
-                      <Bot className="w-3 h-3 text-neo-black" />
-                    </div>
-                  )}
-                  {/* Ready badge — non-host humans the server marked ready */}
-                  {!isHostPlayer && !isBot && readySet.has(name) && (
-                    <div
-                      data-testid="roster-ready-badge"
-                      className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
-                      aria-label={t('playerView.readyConfirmed')}
-                    >
-                      <Check className="w-3 h-3 text-neo-black stroke-[3]" />
-                    </div>
-                  )}
-                </div>
-                <span className="text-[11px] font-bold truncate w-16 text-center text-neo-cream">
-                  {name}
-                </span>
-              </m.div>
-            );
-          })}
-        </AnimatePresence>
-
-        {/* Empty Slots */}
-        {Array.from({ length: emptySlots }).map((_, i) => (
-          <div key={`empty-${i}`} className="shrink-0 flex flex-col items-center gap-1.5">
-            <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center">
-              <Plus className="w-5 h-5 text-neo-cyan/50" />
-            </div>
-            <span className="text-[10px] font-bold text-slate-600 uppercase">
-              {t('common.join')}
-            </span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-
-  // ==================== Interactive Game Instructions ====================
-  // Render the SHARED GameInstructions component (same one the host uses) so the
-  // host and every player see IDENTICAL how-to-play content for every mode —
-  // including wheel-rush + localized step images that the old inline copy lacked.
-  const renderModeTips = (): React.ReactElement | null => {
-    // In a classroom the teacher has already locked the mode in and the room
-    // record says which; the store still holds the last BOARD mode, so a Vocab
-    // Quiz lobby reads as `classic` there and taught the wrong game. A quiz has
-    // no board how-to-play — show nothing rather than something false.
-    if (isClassroomMode) {
-      if (!classroomGameMode || classroomGameMode === VOCAB_QUIZ_MODE) return null;
-      return (
-        <GameInstructions
-          selectedGameMode={classroomGameMode as GameModeOption}
-          t={t}
-          defaultOpen={false}
-          lang={gameLanguage ?? 'en'}
-        />
-      );
-    }
-    // Public rooms: always show How-to-Play. The host may not have locked a mode
-    // in yet (null/'random'), so fall back to classic rather than hide it.
-    const mode = (gameMode || 'classic') as GameModeOption;
-    return (
-      <GameInstructions
-        selectedGameMode={mode}
-        t={t}
-        defaultOpen={false}
-        lang={gameLanguage ?? 'en'}
-      />
-    );
-  };
-
-  // ==================== Mobile Content ====================
-  // Non-scrolling flex column: fixed-size sections stack at their natural height
-  // and the chat panel (flex-1, min-h-0) absorbs whatever is left, so the screen
-  // fits without page scroll.
-  const renderMobileContent = (): React.ReactElement => (
-    <div className="flex-1 flex flex-col overflow-hidden px-3 py-2 gap-2 min-h-0">
-      <section className="shrink-0">{renderHeroCard()}</section>
-      <div className="shrink-0">{renderPlayerRoster()}</div>
-      <div className="shrink-0">{renderModeTips()}</div>
-      {/* Public rooms only — a classroom renders ClassroomWaitingStage (no
-          chat, no age gate) and never reaches this column. */}
-      <section className="flex-1 min-h-[38vh] pb-1">
-        {/* overflow-y-auto, not -hidden: the squeezed flex-fill scrolls WITHIN
-            the panel. The page itself never scrolls. */}
-        <div className="h-full bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-y-auto overscroll-contain">
-          {isOnCrazyGamesPlatform ? (
-            <LobbyTutorialPanel t={t} />
-          ) : (
-            <RoomChat
-              username={username}
-              isHost={false}
-              gameCode={gameCode}
-              className="h-full"
-              onNewMessage={() => {}}
-              variant="embedded"
-            />
-          )}
-        </div>
-      </section>
-    </div>
-  );
-
-  // Shared by the public lobby and the classroom stage.
   const dialogs = (
     <>
-      {/* Avatar Builder Modal */}
       <AvatarBuilderModal
         isOpen={isAvatarBuilderOpen}
         onClose={() => setIsAvatarBuilderOpen(false)}
@@ -478,54 +146,34 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         initialConfig={currentAvatar}
         premium={avatarPremium}
       />
-
-      {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
         <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-black">{t('playerView.exitConfirmation')}</AlertDialogTitle>
-            <AlertDialogDescription className="text-neo-black/70 font-bold">
-              {t('playerView.exitWarning')}
-            </AlertDialogDescription>
+            <AlertDialogDescription className="text-neo-black/70 font-bold">{t('playerView.exitWarning')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
-              {t('common.cancel')}
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirmExit} className="bg-neo-red text-neo-white border-3 border-neo-black shadow-hard-sm font-bold">
-              {t('common.confirm')}
-            </AlertDialogAction>
+            <AlertDialogCancel className="bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirmExit} className="bg-neo-red text-neo-white border-3 border-neo-black shadow-hard-sm font-bold">{t('common.confirm')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
   );
 
-  // A classroom student waits ON the stage the projector shows — their face in
-  // the spotlight, Lexi, classmates arriving — not in the public party lobby
-  // (see ClassroomWaitingStage). No share code, invite card, chat, ad slot or
-  // second mute control: the teacher fills the room, EducationHeader owns
-  // navigation and music.
   if (isClassroomMode) {
     return (
       <>
         <ClassroomWaitingStage
           username={username}
-          avatar={
-            <Avatar
-              customAvatar={currentAvatar}
-              size="2xl"
-              className="!w-full !h-full"
-              mood={emotesByUsername[username]?.emote}
-            />
-          }
-          onEditAvatar={() => setIsAvatarBuilderOpen(true)}
-          nameSlot={renderNameEditor()}
-          readySlot={renderReadyButton()}
-          statusSlot={<LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />}
-          emoteSlot={<EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />}
-          instructionsSlot={renderModeTips()}
-          classmates={nonHostPlayers
+          avatar={<Avatar customAvatar={currentAvatar} size="2xl" className="!w-full !h-full" mood={emotesByUsername[username]?.emote} />}
+          onEditAvatar={openAvatarBuilder}
+          nameSlot={<ClassroomNameEditor username={username} canEdit={!isAuthenticated} onSave={handleSelfNameChange} t={t} />}
+          readySlot={readyButton}
+          statusSlot={status}
+          emoteSlot={emote}
+          instructionsSlot={howToMode ? <GameInstructions selectedGameMode={howToMode} t={t} defaultOpen={false} lang={lang} /> : null}
+          classmates={playersReady
             .map((p) => (typeof p === 'string' ? { username: p } : p))
             .filter((p) => !('isHost' in p && p.isHost))}
           onExit={onExitRoom}
@@ -536,99 +184,180 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     );
   }
 
+  const roster = (
+    <div className={CARD}>
+      <PlayerRoster
+        players={playersReady}
+        username={username}
+        gameCode={gameCode}
+        maxPlayers={LOBBY_SEATS}
+        readyUsernames={readyUsernames}
+        t={t}
+        variant="guest"
+        onSelfAvatarClick={openAvatarBuilder}
+        onSelfNameChange={handleSelfNameChange}
+        canEditSelfName={!isAuthenticated}
+        selfActions={emote}
+      />
+    </div>
+  );
+
+  const waiting = (
+    <div data-testid="waiting-status" className={cn(CARD, 'flex items-center gap-3')}>
+      <DJMascot size="xs" className="!w-16 !h-16 tall:!w-24 tall:!h-24 shrink-0" alt="" />
+      {/* The shared status line truncates to one line; here it has room to wrap. */}
+      <div className="min-w-0 flex-1 flex flex-col gap-2 [&_p]:whitespace-normal [&_p]:line-clamp-3 [&_p]:text-neo-white/85 [&_p]:font-bold">
+        {status}
+        {howToMode && (
+          <button
+            type="button"
+            onClick={() => setSheet('howto')}
+            className="self-start inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-navy px-3 py-1 text-xs font-bold text-neo-cyan shadow-hard-sm active:translate-y-0.5"
+          >
+            <HelpCircle aria-hidden="true" className="w-3.5 h-3.5" />
+            {t('mpUi.lobby.howToPlay')}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
-      {/* Header */}
-      <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <MobileShareSection gameCode={gameCode} t={t} compact />
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {gameLanguage && (
-              <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
-                <span className="text-sm">{LANGUAGE_FLAGS[gameLanguage] || '🌐'}</span>
-                <span className="text-xs font-black text-neo-cream uppercase">
-                  {getLanguageName(gameLanguage, true)}
-                </span>
-              </div>
-            )}
-            {/* UI-language pill — distinct from the board-language chip above; one tap. */}
-            <QuickLanguageSwitcher compact />
-            <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-neo-cyan" />
-              <span className="text-xs font-black text-neo-cream">
-                {nonHostPlayers.length}/{MAX_PLAYERS}
+    <div className="flex-1 flex flex-col min-h-0 w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
+      <header className="shrink-0 border-b-3 border-neo-black bg-neo-navy">
+        <MpHudBar
+          className="grid-cols-[auto_1fr_auto]"
+          start={<LobbyExitButton onPress={onExitRoom} t={t} />}
+          center={
+            gameLanguage ? (
+              <span className="inline-flex items-center gap-1.5 h-10 px-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-sm min-w-0">
+                <span aria-hidden="true" className="text-base leading-none">{languageFlag(gameLanguage)}</span>
+                <span className="truncate text-xs font-bold uppercase tracking-wider text-neo-lime">{t(languageLabelKey(gameLanguage))}</span>
               </span>
-            </div>
-            {/* Public-lobby mute (a classroom's EducationHeader hosts MusicControls). */}
-            <LobbyAudioButton />
-            <button
-              type="button"
-              onClick={onExitRoom}
-              /* `text-neo-black` on the BUTTON, not only the icon: an audit reads
-                 an icon-only control's name against the button's own colour, and
-                 the inherited white measured 3.55:1 on --neo-red (black: 5.92). */
-              className="w-9 h-9 flex items-center justify-center bg-neo-red text-neo-black border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
-              aria-label={t('common.exit')}
-            >
-              <LogOut className="w-4 h-4 text-neo-black rtl:scale-x-[-1]" />
-            </button>
-          </div>
-        </div>
+            ) : null
+          }
+          end={
+            <>
+              <MobileShareSection gameCode={gameCode} t={t} compact />
+              <LobbyChatButton onPress={() => setSheet('chat')} unread={unread} t={t} className="min-[720px]:hidden" />
+              <LobbyAudioButton />
+            </>
+          }
+        />
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 min-h-0 overflow-hidden flex flex-col bg-neo-navy/95">
-        {/* Desktop Layout — triggers at 720px (tablet portrait+) for parity with HostPreGameView */}
-        <div className="hidden min-[720px]:block h-full">
+      <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div className="hidden min-[720px]:flex min-[720px]:flex-col flex-1 min-h-0">
           <DesktopLobbyLayout
             leftContent={
               <>
-                {renderHeroCard()}
-                {renderPlayerRoster()}
-                {renderModeTips()}
+                {roster}
+                {waiting}
+                {howToMode && (
+                  <div className={CARD}>
+                    <GameInstructions selectedGameMode={howToMode} t={t} lang={lang} defaultOpen={false} />
+                  </div>
+                )}
               </>
             }
             rightContent={
               <>
-                <InviteCard gameCode={gameCode} t={t} desktop />
-                <div
-                  data-testid="desktop-chat-area"
-                  className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden"
-                >
-                  {isOnCrazyGamesPlatform ? (
-                    <LobbyTutorialPanel t={t} />
-                  ) : (
-                    <RoomChat
-                      username={username}
-                      isHost={false}
-                      gameCode={gameCode}
-                      className="h-full"
-                      onNewMessage={() => {}}
-                      variant="embedded"
-                    />
-                  )}
-                </div>
+                <InviteCard gameCode={gameCode} t={t} />
+                <section data-testid="desktop-chat-area" className={cn(CARD, 'flex-1 min-h-48 flex flex-col p-0 overflow-hidden')}>
+                  <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
+                    {t('mpUi.lobby.chat')}
+                  </h2>
+                  <div className="flex-1 min-h-0 flex flex-col">
+                    <LobbyChatPanel username={username} isHost={false} gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
+                  </div>
+                </section>
               </>
             }
           />
+          {readyButton && (
+            <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
+              <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{readyButton}</div>
+            </div>
+          )}
         </div>
 
-        {/* Mobile Layout — below 720px (phones) */}
-        <div className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
-          {renderMobileContent()}
+        <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
+          <div className="flex-1 min-h-0 flex flex-col justify-center gap-3 px-3 py-2 w-full max-w-[600px] mx-auto">
+            {roster}
+            {waiting}
+          </div>
+          {readyButton && (
+            <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
+              <div className="max-w-[600px] mx-auto">{readyButton}</div>
+            </div>
+          )}
         </div>
       </main>
 
-      {/* B4 — CrazyGames banner (public rooms; a classroom returned above). */}
-      <div data-testid="lobby-ad-slot" className="w-full shrink-0 flex justify-center py-2">
-        <CrazyGamesBanner size="320x50" />
-      </div>
+      {isOnCrazyGamesPlatform && (
+        <div data-testid="lobby-ad-slot" className="w-full shrink-0 flex justify-center py-1">
+          <CrazyGamesBanner size="320x50" />
+        </div>
+      )}
 
+      {howToMode && <HowToPlaySheet open={sheet === 'howto'} onClose={closeSheet} mode={howToMode} lang={lang} t={t} />}
+      <ChatSheet open={sheet === 'chat'} onClose={closeSheet} t={t}>
+        <LobbyChatPanel username={username} isHost={false} gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
+      </ChatSheet>
       {dialogs}
     </div>
   );
 };
+
+/** The classroom stage's name line (guest rename). The public lobby renames on the seat. */
+function ClassroomNameEditor({ username, canEdit, onSave, t }: { username: string; canEdit: boolean; onSave: (name: string) => void; t: T }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(username);
+  const save = () => {
+    onSave(value);
+    setEditing(false);
+  };
+  if (editing) {
+    return (
+      <div className="flex items-center gap-2">
+        <input
+          data-testid="name-edit-input"
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          maxLength={20}
+          autoFocus
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') save();
+            if (e.key === 'Escape') setEditing(false);
+          }}
+          className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
+        />
+        <button type="button" data-testid="name-save-button" onClick={save} aria-label={t('common.save')} className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0">
+          <Check className="w-4 h-4 text-neo-black" />
+        </button>
+        <button type="button" onClick={() => { setEditing(false); setValue(username); }} aria-label={t('common.cancel')} className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0">
+          <X className="w-4 h-4 text-neo-cream" />
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2">
+      <h2 className="text-xl font-black text-neo-cream truncate">{username}</h2>
+      {canEdit && (
+        <button
+          type="button"
+          data-testid="edit-name-button"
+          onClick={() => { setValue(username); setEditing(true); }}
+          className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border-[2px] border-neo-cream text-neo-cream flex items-center justify-center transition-colors"
+          aria-label={t('playerView.editName')}
+        >
+          <Pencil className="w-3.5 h-3.5 text-neo-cream" />
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default memo(PlayerWaitingView);

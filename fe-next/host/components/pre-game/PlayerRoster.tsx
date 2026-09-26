@@ -48,10 +48,10 @@ interface PlayerRosterProps {
 const SEAT_SIZE = {
   host: '[--seat:calc(64px*var(--mp-u,1))] tall:[--seat:calc(72px*var(--mp-u,1))] min-[720px]:[--seat:calc(84px*var(--mp-u,1))] desktop-tall:[--seat:calc(96px*var(--mp-u,1))]',
   guest: '[--seat:calc(64px*var(--mp-u,1))] tall:[--seat:calc(72px*var(--mp-u,1))] min-[720px]:[--seat:calc(84px*var(--mp-u,1))] desktop-tall:[--seat:calc(96px*var(--mp-u,1))]',
-  tv: '[--seat:112px] desktop-tall:[--seat:128px] tv:[--seat:160px]',
+  tv: '[--seat:clamp(80px,12vh,150px)]',
 } as const;
 
-const AVATAR_PX = { host: 96, guest: 96, tv: 160 } as const;
+const AVATAR_PX = { host: 128, guest: 128, tv: 160 } as const;
 
 const seatBox = { width: 'var(--seat)', height: 'var(--seat)' } as const;
 
@@ -120,7 +120,8 @@ export const PlayerRoster = memo(function PlayerRoster({
     const face = (
       <span
         className={cn(
-          'block rounded-full border-[3px] border-neo-black overflow-hidden bg-neo-navy-light shadow-hard-sm',
+          // Avatar pins an inline px size; `!` lets the face fill the responsive seat.
+          'block rounded-full border-[3px] border-neo-black overflow-hidden bg-neo-navy-light shadow-hard-sm [&>div]:!w-full [&>div]:!h-full',
           isMe && 'outline-[3px] outline-solid outline-neo-lime outline-offset-2',
           seat.conn !== 'ok' && 'grayscale',
         )}
@@ -201,35 +202,57 @@ export const PlayerRoster = memo(function PlayerRoster({
           )}
         </div>
         {isMe && isEditingSelfName ? (
-          <input
-            data-testid="self-name-edit-input"
-            type="text"
-            value={selfNameDraft}
-            onChange={(e) => setSelfNameDraft(e.target.value)}
-            maxLength={20}
-            autoFocus
-            onBlur={commitSelfNameEdit}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') commitSelfNameEdit();
-              if (e.key === 'Escape') { setIsEditingSelfName(false); setSelfNameDraft(username); }
-            }}
-            className="w-full max-w-24 bg-neo-navy-light text-neo-white border-2 border-neo-lime rounded-neo px-1 py-0.5 text-center text-xs font-bold focus:outline-hidden"
-          />
-        ) : (
+          <div className="flex items-center gap-1 max-w-full">
+            <input
+              data-testid="name-edit-input"
+              type="text"
+              value={selfNameDraft}
+              onChange={(e) => setSelfNameDraft(e.target.value)}
+              maxLength={20}
+              autoFocus
+              onBlur={commitSelfNameEdit}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') commitSelfNameEdit();
+                if (e.key === 'Escape') { setIsEditingSelfName(false); setSelfNameDraft(username); }
+              }}
+              className="min-w-0 w-20 bg-neo-navy text-neo-white border-2 border-neo-lime rounded-neo px-1 py-0.5 text-center text-xs font-bold focus:outline-hidden"
+            />
+            <button
+              type="button"
+              data-testid="name-save-button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={commitSelfNameEdit}
+              aria-label={t('common.save')}
+              className="shrink-0 w-6 h-6 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black"
+            >
+              <Check aria-hidden="true" className="w-3.5 h-3.5 stroke-[3]" />
+            </button>
+          </div>
+        ) : isMe && canEditSelfName ? (
           <button
             type="button"
-            data-testid={isMe ? 'self-edit-name-button' : undefined}
-            disabled={!(isMe && canEditSelfName)}
-            onClick={isMe && canEditSelfName ? () => { setSelfNameDraft(username); setIsEditingSelfName(true); } : undefined}
+            data-testid="edit-name-button"
+            onClick={() => { setSelfNameDraft(username); setIsEditingSelfName(true); }}
+            aria-label={t('playerView.editName')}
             className={cn(
-              'max-w-full flex items-center justify-center gap-1 font-neo-body font-bold leading-tight disabled:cursor-default',
-              variant === 'tv' ? 'text-lg tv:text-2xl' : 'text-xs desktop-tall:text-sm',
-              isMe ? 'text-neo-lime' : 'text-neo-white',
+              'max-w-full flex items-center justify-center gap-1 font-neo-body font-bold leading-tight text-neo-lime rounded-neo border-[2px] border-transparent hover:border-neo-cream px-1',
+              variant === 'tv' ? 'text-[clamp(16px,2.2vh,24px)]' : 'text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))]',
             )}
           >
             <span dir="auto" className="truncate min-w-0">{seat.name}</span>
-            {isMe && canEditSelfName && <Pencil aria-hidden="true" className="w-3 h-3 shrink-0 opacity-70" />}
+            <Pencil aria-hidden="true" className="w-3 h-3 shrink-0 opacity-70" />
           </button>
+        ) : (
+          <span
+            dir="auto"
+            className={cn(
+              'max-w-full truncate font-neo-body font-bold leading-tight',
+              variant === 'tv' ? 'text-[clamp(16px,2.2vh,24px)]' : 'text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))]',
+              isMe ? 'text-neo-lime' : 'text-neo-white',
+            )}
+          >
+            {seat.name}
+          </span>
         )}
       </div>
     );
@@ -252,7 +275,7 @@ export const PlayerRoster = memo(function PlayerRoster({
     const label = canAddBot ? t('hostView.bot') : t('common.join');
     const labelClass = cn(
       'font-neo-display font-bold uppercase tracking-wide leading-tight',
-      variant === 'tv' ? 'text-lg' : 'text-[11px] desktop-tall:text-xs',
+      variant === 'tv' ? 'text-lg' : 'text-[11px] desktop-tall:text-[length:calc(12px*var(--mp-u,1))]',
       canAddBot ? 'text-neo-cyan' : 'text-neo-white/40',
       i > 0 && 'opacity-40',
     );
@@ -282,7 +305,7 @@ export const PlayerRoster = memo(function PlayerRoster({
   return (
     <section className={cn('relative flex flex-col gap-2 min-w-0', SEAT_SIZE[variant], className)}>
       <div className="flex items-center justify-between gap-2 min-h-11">
-        <h2 className={cn('flex items-center gap-2 font-neo-display font-bold uppercase tracking-wider text-neo-white/80', variant === 'tv' ? 'text-2xl' : 'text-sm')}>
+        <h2 className={cn('flex items-center gap-2 font-neo-display font-bold uppercase tracking-wider text-neo-white/80', variant === 'tv' ? 'text-[clamp(18px,2.6vh,28px)]' : 'text-[length:calc(14px*var(--mp-u,1))]')}>
           <span>{t('mpUi.lobby.squad')}</span>
           <span className="tabular-nums text-neo-white" dir="ltr">{seats.length}/{chairs}</span>
           {tally.total > 0 && (

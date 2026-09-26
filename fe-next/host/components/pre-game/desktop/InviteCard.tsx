@@ -85,7 +85,7 @@ export function InviteCard({ gameCode, t, className, showHint = false, variant =
         <span
           dir="ltr"
           data-testid="invite-code"
-          className="font-neo-display font-bold uppercase leading-none tracking-[0.2em] text-neo-white text-[clamp(32px,6vh,56px)] tv:text-[84px]"
+          className="font-neo-display font-bold uppercase leading-none tracking-[0.2em] text-neo-white text-[clamp(32px,6vh,56px)] tv:text-[64px] tv:tracking-[0.12em]"
         >
           {gameCode}
         </span>

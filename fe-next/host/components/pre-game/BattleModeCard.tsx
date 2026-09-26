@@ -75,7 +75,7 @@ export function BattleModeCard({
 
   return (
     <section className={cn('flex flex-col gap-2 min-w-0', className)}>
-      <h3 className="font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
+      <h3 className="font-neo-display text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase tracking-wider text-neo-white/80">
         {t('hostView.battleMode')}
       </h3>
       <div className="grid grid-cols-3 gap-2">
@@ -90,7 +90,7 @@ export function BattleModeCard({
               data-testid={`game-mode-${mode}`}
               aria-pressed={isActive}
               className={cn(
-                'flex items-center gap-1.5 min-w-0 min-h-11 tall:min-h-12 desktop-tall:min-h-14 px-2 py-1.5 rounded-neo border-2 text-start',
+                'flex items-center gap-1.5 min-w-0 min-h-11 tall:min-h-12 desktop-tall:min-h-[calc(56px*var(--mp-u,1))] px-2 desktop-tall:px-[calc(10px*var(--mp-u,1))] py-1.5 rounded-neo border-2 text-start',
                 'transition-[transform,background-color,border-color] duration-150 active:translate-y-0.5',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isActive
@@ -98,17 +98,17 @@ export function BattleModeCard({
                   : cn('bg-neo-navy-light text-neo-white', family.rest),
               )}
             >
-              <span aria-hidden="true" className={cn('shrink-0 [&_svg]:w-5 [&_svg]:h-5', isActive ? 'text-neo-black' : family.icon)}>
+              <span aria-hidden="true" className={cn('shrink-0 [&_svg]:w-5 [&_svg]:h-5 desktop-tall:[&_svg]:w-[calc(20px*var(--mp-u,1))] desktop-tall:[&_svg]:h-[calc(20px*var(--mp-u,1))]', isActive ? 'text-neo-black' : family.icon)}>
                 {MODE_ICONS[mode]}
               </span>
-              <span className="min-w-0 font-neo-display text-[11px] tall:text-xs desktop-tall:text-sm font-bold uppercase leading-[1.1] line-clamp-2 break-words">
+              <span className="min-w-0 font-neo-display text-[11px] tall:text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase leading-[1.1] line-clamp-2 break-words">
                 {t(nameKey)}
               </span>
             </button>
           );
         })}
       </div>
-      <p className="flex items-start gap-2 min-h-8 text-xs desktop-tall:text-sm leading-snug text-neo-white/80">
+      <p className="flex items-start gap-2 min-h-8 text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] leading-snug text-neo-white/80">
         <span className="min-w-0 flex-1 line-clamp-2">{getModeDescription(selectedGameMode, t)}</span>
         {onHowToPlay && (
           <button
