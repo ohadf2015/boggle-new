@@ -1,6 +1,6 @@
 /**
  * Default-render lock for the MP round rebuild's opt-in BlastGame prop
- * (`hideClientScoreFly`). Quick-play (BlastQuickRound) and solo must render
+ * (`serverPointsOnly`). Quick-play (BlastQuickRound) and solo must render
  * byte-identically without it. Recorded BEFORE the prop was added.
  */
 import React from 'react';

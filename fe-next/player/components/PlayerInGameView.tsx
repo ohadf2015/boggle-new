@@ -310,7 +310,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             initialTileStates={blastBridge.initialTileStates}
             blastSeed={blastBridge.blastSeed}
             serverGrid={blastBridge.serverGrid}
-            hideClientScoreFly
+            serverPointsOnly
             isDesktopCanvas={shellEnabled && isShellMode(gameMode)}
           />
           <MpServerScoreFly />

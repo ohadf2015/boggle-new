@@ -8,7 +8,7 @@ import { useFreshLastWord, useServerFloaters } from './useServerFloaters';
  * Server-scored "+N" over a canvas that keeps its own chrome (blast). It owns
  * the mpFeedback subscription, so an accepted word re-renders only this
  * overlay — never the board beside it. Pair it with BlastGame's
- * `hideClientScoreFly` so the client-computed fly never shows in MP.
+ * `serverPointsOnly` so the client-computed fly never shows in MP.
  */
 function MpServerScoreFlyImpl() {
   const floaters = useServerFloaters(useFreshLastWord());

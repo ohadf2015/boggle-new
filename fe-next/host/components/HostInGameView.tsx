@@ -380,7 +380,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           initialTileStates={blastBridge.initialTileStates}
           blastSeed={blastBridge.blastSeed}
           serverGrid={blastBridge.serverGrid}
-          hideClientScoreFly
+          serverPointsOnly
           isDesktopCanvas={inShell}
         />
         <MpServerScoreFly />

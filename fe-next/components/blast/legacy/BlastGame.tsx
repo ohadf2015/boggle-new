@@ -50,7 +50,7 @@ import { useIdleDetection } from '@/hooks/useIdleDetection';
 import { trackDeadTime } from '@/utils/growthTracking';
 import type { LetterGrid, Avatar } from '@/shared/types';
 
-/** Stable empty list for `hideClientScoreFly` (no new array per render). */
+/** Stable empty list for `serverPointsOnly` (no new array per render). */
 const NO_SCORE_FLIES: ScoreFlyEvent[] = [];
 
 const BLAST_DEAD_TIME_THRESHOLD_MS = 15000;
@@ -81,8 +81,12 @@ interface BlastGameProps {
   blastSeed?: number | null;
   /** MP only: server-authoritative letter grid (from `startGame`/store `letterGrid`). */
   serverGrid?: LetterGrid | null;
-  /** Live MP only (opt-in, default off): hide the client-computed "+N" fly; the MP round draws the server's `wordAccepted.score`. */
-  hideClientScoreFly?: boolean;
+  /**
+   * Live MP only (opt-in, default off): show no client-computed points — no
+   * "+N" fly, no "+N" on the word pill. The MP round draws the server's
+   * `wordAccepted.score` instead.
+   */
+  serverPointsOnly?: boolean;
   remainingTime?: number | null;
   totalTime?: number;
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: Avatar }>;
@@ -127,7 +131,7 @@ export function BlastGame({
   initialTileStates,
   blastSeed,
   serverGrid,
-  hideClientScoreFly = false,
+  serverPointsOnly = false,
   remainingTime: _remainingTime,
   totalTime: _totalTime,
   leaderboard,
@@ -390,6 +394,12 @@ export function BlastGame({
     announceCombo: noop,
     onWordAccepted: handleWordAccepted,
   });
+
+  // serverPointsOnly: the pill keeps its accept/reject state, minus the client "+N".
+  const pointlessFeedback = useMemo(
+    () => (wordSubmission.currentFeedback ? { ...wordSubmission.currentFeedback, score: undefined } : null),
+    [wordSubmission.currentFeedback],
+  );
 
   // Handlers
 
@@ -747,7 +757,7 @@ export function BlastGame({
         livesRemaining={isMultiplayer ? undefined : livesRemaining}
         comboLevel={combo.comboLevel}
         formedWord={formedWord}
-        currentFeedback={wordSubmission.currentFeedback}
+        currentFeedback={serverPointsOnly ? pointlessFeedback : wordSubmission.currentFeedback}
         sequencerState={sequencer.state}
         interactive={!engine.isCascading && !sequencer.state.isAnimating && pendingDiscovery == null && !engine.gameState.isDeadEnd && !engine.gameState.isComplete}
         onWordSubmit={wordSubmission.handleWordSubmit}
@@ -757,7 +767,7 @@ export function BlastGame({
         onQuit={handleQuit}
         activeModifier={isMultiplayer ? null : activeModifier}
         noWordsRemaining={engine.noWordsRemaining}
-        scoreFlyEvents={hideClientScoreFly ? NO_SCORE_FLIES : scoreFlyEvents}
+        scoreFlyEvents={serverPointsOnly ? NO_SCORE_FLIES : scoreFlyEvents}
         onScoreFlyComplete={handleScoreFlyComplete}
         comboFlash={comboFlash}
         onComboFlashComplete={handleComboFlashComplete}

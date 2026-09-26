@@ -138,7 +138,7 @@ describe('PlayerInGameView — round frame', () => {
     mockGameMode.value = 'blast';
     const now = vi.spyOn(Date, 'now').mockReturnValue(1_000);
     render(<PlayerInGameView {...baseProps} />);
-    expect(blastProps.at(-1).hideClientScoreFly).toBe(true);
+    expect(blastProps.at(-1).serverPointsOnly).toBe(true);
     const renders = blastProps.length;
     now.mockReturnValue(2_000);
     act(() => recordWordAccepted({ word: 'stare', score: 17 }));
