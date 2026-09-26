@@ -58,7 +58,8 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
       aria-label={t('mpUi.results.yourRank')}
       className={cn(
         'relative flex items-center min-w-0 rounded-neo-lg border-[3px] border-neo-black shadow-hard',
-        'gap-[calc(12px*var(--mp-u,1))] p-[calc(10px*var(--mp-u,1))]',
+        // pt clears the DETAILS tab that overhangs the card's top edge.
+        'gap-[calc(12px*var(--mp-u,1))] p-[calc(10px*var(--mp-u,1))] pt-[calc(20px*var(--mp-u,1))]',
         winner ? 'bg-neo-yellow text-neo-black' : 'bg-neo-cream text-neo-black',
         !revealed && 'invisible',
         revealed && fx.cardIn,
@@ -96,11 +97,11 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
                 : `#${rank} ${t('mpUi.results.placeOf', { total })}`}
           </span>
         </div>
-        <div className="flex items-baseline gap-1.5">
+        <div className="flex items-baseline gap-1.5 min-w-0">
           <span data-testid="mp-my-score" className="font-neo-display font-bold tabular-nums leading-none text-[calc(38px*var(--mp-u,1))]">
             <AnimatedCounter value={revealed ? score : 0} previousValue={0} size="xl" className="text-neo-black !text-[length:inherit]" />
           </span>
-          <span className="font-neo-body font-bold text-[calc(13px*var(--mp-u,1))] opacity-70">{t(series ? 'mpUi.results.seriesPts' : 'mpUi.results.pts')}</span>
+          <span className="min-w-0 truncate font-neo-body font-bold text-[calc(13px*var(--mp-u,1))] opacity-70">{t(series ? 'mpUi.results.seriesPts' : 'mpUi.results.pts')}</span>
         </div>
         {gapLine && (
           <p dir="auto" className="font-neo-body font-semibold leading-tight text-[calc(12px*var(--mp-u,1))] truncate">{gapLine}</p>
