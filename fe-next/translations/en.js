@@ -17491,6 +17491,7 @@ const en = {
       "behind": "{points} pts behind {name}",
       "ahead": "Won by {points} over {name}",
       "tiedWith": "Tied with {name}!",
+      "tiedWithMore": "Tied with {name} +{more}!",
       "bestWord": "Best word",
       "xp": "+{xp} XP",
       "coins": "+{coins}",

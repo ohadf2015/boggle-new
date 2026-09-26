@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { Bot, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
-import type { MpStandingRow } from './mpStandings';
+import { podiumTier, type MpStandingRow } from './mpStandings';
 import fx from './mpResults.module.css';
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
@@ -36,13 +36,16 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
       {rows.map((r, i) => {
         const pos = i + 1;
         const shown = isRevealed(pos);
-        const podium = r.rank <= 3 ? PODIUM[r.rank - 1] : null;
-        const first = r.rank === 1;
+        // Ties share a rank (and its colour); 0 points never earn the podium.
+        const tier = podiumTier(r);
+        const podium = tier ? PODIUM[tier - 1] : null;
+        const first = tier === 1;
         return (
           <li
             key={r.username}
             data-testid="mp-standing-row"
             data-rank={r.rank}
+            data-podium={tier ?? 'none'}
             data-me={String(r.isMe)}
             data-revealed={String(shown)}
             aria-hidden={shown ? undefined : true}

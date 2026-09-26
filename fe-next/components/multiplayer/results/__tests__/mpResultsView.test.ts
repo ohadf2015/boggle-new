@@ -36,6 +36,11 @@ describe('mascotFor', () => {
     expect(mascotFor(2, 2)).toBe('think');
     expect(mascotFor(1, 1)).toBe('victory');
   });
+  it('no points means no trophy: a shared 0-point "1st" gets the oops face', () => {
+    expect(mascotFor(1, 4, 0)).toBe('oops');
+    expect(mascotFor(2, 4, 0)).toBe('oops');
+    expect(mascotFor(2, 4, 12)).toBe('cheer');
+  });
 });
 
 describe('pickBestWord', () => {
@@ -62,6 +67,17 @@ describe('rivalGap', () => {
   });
   it('winner: the margin over 2nd', () => {
     expect(rivalGap([row('Me', 1, 50, true), row('B', 2, 20)])).toEqual({ kind: 'ahead', name: 'B', points: 30 });
+  });
+  it('behind: measured to the nearest HIGHER score, never to a tied row above', () => {
+    // Given Host 28, then P / Me / H all on 0 (shared rank 2)
+    const tiedRows = [row('Host', 1, 28), row('P', 2, 0), row('Me', 2, 0, true), row('H', 2, 0)];
+    // Then my gap is to the tie's leader-above, not "tied with P"
+    expect(rivalGap(tiedRows)).toEqual({ kind: 'behind', name: 'Host', points: 28 });
+  });
+  it('tied at the top: names one co-leader and counts the rest', () => {
+    const tiedTop = [row('A', 1, 10), row('Me', 1, 10, true), row('B', 1, 10), row('C', 4, 2)];
+    expect(rivalGap(tiedTop)).toEqual({ kind: 'tied', name: 'A', more: 1 });
+    expect(rivalGap([row('Me', 1, 7, true), row('B', 1, 7)])).toEqual({ kind: 'tied', name: 'B', more: 0 });
   });
   it('solo or not ranked: nothing', () => {
     expect(rivalGap([row('Me', 1, 50, true)])).toBeNull();

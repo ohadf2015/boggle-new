@@ -7,7 +7,8 @@ import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
 import { REVEAL, type RevealEventName } from './revealTimeline';
 
 interface Options {
-  myRank: number;
+  /** My podium tier (`podiumTier`: rank 1-3 WITH points) or null — gates confetti. */
+  podium: 1 | 2 | 3 | null;
   isWinner: boolean;
   topScore: number;
   runnerUpScore: number;
@@ -20,7 +21,7 @@ interface Options {
  * defeat + podium confetti) fires exactly once — on 1st place's slam, or at
  * once when the show is skipped or reduced — never twice.
  */
-export function useResultBeats({ myRank, isWinner, topScore, runnerUpScore, instant }: Options) {
+export function useResultBeats({ podium, isWinner, topScore, runnerUpScore, instant }: Options) {
   const { playVictorySound, playDefeatSound, playEpicVictorySound, playTileAppearSound } = useSoundEffects();
   const verdictFiredRef = useRef(false);
 
@@ -33,12 +34,12 @@ export function useResultBeats({ myRank, isWinner, topScore, runnerUpScore, inst
     } else {
       playDefeatSound();
     }
-    // Podium only (confetti for last place reads as mockery); never on the
-    // native/mobile-web static-overlay path (Chromium layer flash, class 5).
-    if (withConfetti && myRank >= 1 && myRank <= 3 && !prefersStaticFullscreenOverlay()) {
-      fireRankConfetti(myRank, myRank === 1 ? 'full' : 'light');
+    // Podium only (confetti for last place — or a shared 0-point #2 — reads as
+    // mockery); never on the native/mobile-web static-overlay path (class 5).
+    if (withConfetti && podium && !prefersStaticFullscreenOverlay()) {
+      fireRankConfetti(podium, podium === 1 ? 'full' : 'light');
     }
-  }, [isWinner, topScore, runnerUpScore, myRank, playVictorySound, playEpicVictorySound, playDefeatSound]);
+  }, [isWinner, topScore, runnerUpScore, podium, playVictorySound, playEpicVictorySound, playDefeatSound]);
 
   useEffect(() => {
     if (instant) fireVerdict(false);

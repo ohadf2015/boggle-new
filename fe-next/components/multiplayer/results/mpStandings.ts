@@ -13,7 +13,11 @@ export interface MpStandingRow {
   avatar?: Avatar;
   isBot?: boolean;
   isMe: boolean;
-  /** 1-based position in the server order (same as `currentPlayerRank`). */
+  /**
+   * 1-based competition rank over the server order: equal scores share a rank
+   * (1, 2, 2, 4) — the same rule the live HUD roster uses (`toMpRoster`), so a
+   * player never reads #2 live and #3 a second later on results.
+   */
   rank: number;
   score: number;
   /** Series total incl. this round's live score; null on round 1 / no series. */
@@ -48,7 +52,8 @@ export function buildMpStandings({ sortedScores, username, normalizeUsername, se
   const withSeries = !!series && series.roundNumber >= 2;
   const byName = new Map((series?.standings ?? []).map((s) => [s.username, s]));
 
-  return sortedScores.map((p, i) => {
+  const rows: MpStandingRow[] = [];
+  sortedScores.forEach((p, i) => {
     const score = Number.isFinite(p.score) ? p.score : 0;
     let seriesTotal: number | null = null;
     let seriesDelta = 0;
@@ -64,15 +69,25 @@ export function buildMpStandings({ sortedScores, username, normalizeUsername, se
         seriesTotal = score;
       }
     }
-    return {
+    const prev = rows[i - 1];
+    rows.push({
       username: p.username,
       avatar: p.avatar,
       isBot: p.isBot,
       isMe: !!me && normalizeUsername(p.username) === me,
-      rank: i + 1,
+      rank: prev && prev.score === score ? prev.rank : i + 1,
       score,
       seriesTotal,
       seriesDelta,
-    };
+    });
   });
+  return rows;
+}
+
+/**
+ * Podium colour/crown tier (1-3) or null. Points are required: a 0-point row
+ * is never crowned or podium-coloured, so an all-zero room crowns no one.
+ */
+export function podiumTier({ rank, score }: Pick<MpStandingRow, 'rank' | 'score'>): 1 | 2 | 3 | null {
+  return score > 0 && rank >= 1 && rank <= 3 ? (rank as 1 | 2 | 3) : null;
 }

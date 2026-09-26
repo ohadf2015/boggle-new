@@ -18146,6 +18146,7 @@ const ru = {
       "behind": "{points} очк. до {name}",
       "ahead": "Победа над {name} с отрывом {points}",
       "tiedWith": "Ничья с {name}!",
+      "tiedWithMore": "Ничья: {name} и ещё {more}!",
       "bestWord": "Лучшее слово",
       "xp": "+{xp} XP",
       "coins": "+{coins}",

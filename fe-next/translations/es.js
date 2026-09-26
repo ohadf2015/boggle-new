@@ -18431,6 +18431,7 @@ const es = {
       "behind": "A {points} pts de {name}",
       "ahead": "Ganaste a {name} por {points}",
       "tiedWith": "¡Empate con {name}!",
+      "tiedWithMore": "¡Empate con {name} +{more}!",
       "bestWord": "Mejor palabra",
       "xp": "+{xp} XP",
       "coins": "+{coins}",

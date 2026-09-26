@@ -18413,6 +18413,7 @@ const ja = {
       "behind": "{name}まであと{points}点",
       "ahead": "{name}に{points}点差で勝利",
       "tiedWith": "{name}と同点！",
+      "tiedWithMore": "{name}ほか{more}人と同点！",
       "bestWord": "ベストワード",
       "xp": "+{xp} XP",
       "coins": "+{coins}",

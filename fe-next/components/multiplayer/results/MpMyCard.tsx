@@ -11,7 +11,10 @@ import fx from './mpResults.module.css';
 type TFn = (key: string, params?: Record<string, string | number>) => string;
 
 export interface MpMyCardProps {
+  /** Shared competition rank (ties read the same number). */
   rank: number;
+  /** Sole or shared 1st WITH points (`podiumTier === 1`) — the gold treatment. */
+  winner: boolean;
   total: number;
   /** The server's round score for me. */
   score: number;
@@ -30,13 +33,14 @@ export interface MpMyCardProps {
  * up, the best word and what I earned. Numbers are the server's (the counter
  * only animates the display, from 0 to `score`).
  */
-function MpMyCardImpl({ rank, total, score, bestWord, xp, coins, gap, revealed, t, className }: MpMyCardProps) {
-  const mood = mascotFor(rank, total);
-  const winner = rank === 1 && total > 1;
+function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, revealed, t, className }: MpMyCardProps) {
+  const mood = mascotFor(rank, total, score);
   const gapLine = !gap
     ? null
-    : gap.points === 0
-      ? t('mpUi.results.tiedWith', { name: gap.name })
+    : gap.kind === 'tied'
+      ? gap.more > 0
+        ? t('mpUi.results.tiedWithMore', { name: gap.name, more: gap.more })
+        : t('mpUi.results.tiedWith', { name: gap.name })
       : gap.kind === 'ahead'
         ? t('mpUi.results.ahead', { points: gap.points, name: gap.name })
         : t('mpUi.results.behind', { points: gap.points, name: gap.name });
@@ -44,6 +48,7 @@ function MpMyCardImpl({ rank, total, score, bestWord, xp, coins, gap, revealed, 
   return (
     <section
       data-testid="mp-my-card"
+      data-winner={String(winner)}
       aria-label={t('mpUi.results.yourRank')}
       className={cn(
         'relative flex items-center min-w-0 rounded-neo-lg border-[3px] border-neo-black shadow-hard',
@@ -67,7 +72,7 @@ function MpMyCardImpl({ rank, total, score, bestWord, xp, coins, gap, revealed, 
           className={cn(
             'absolute -bottom-1 -end-2 grid place-items-center rounded-neo border-[3px] border-neo-black shadow-hard-sm font-neo-display font-bold tabular-nums',
             'min-w-[calc(40px*var(--mp-u,1))] h-[calc(34px*var(--mp-u,1))] px-1 text-[calc(20px*var(--mp-u,1))]',
-            winner ? 'bg-neo-lime' : rank <= 3 ? 'bg-neo-cyan' : 'bg-neo-pink',
+            winner ? 'bg-neo-lime' : score > 0 && rank <= 3 ? 'bg-neo-cyan' : 'bg-neo-pink',
             revealed && fx.stamp,
           )}
         >

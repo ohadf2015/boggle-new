@@ -18413,6 +18413,7 @@ const sv = {
       "behind": "{points} p efter {name}",
       "ahead": "Vann med {points} över {name}",
       "tiedWith": "Lika med {name}!",
+      "tiedWithMore": "Lika med {name} +{more}!",
       "bestWord": "Bästa ordet",
       "xp": "+{xp} XP",
       "coins": "+{coins}",

@@ -15,7 +15,7 @@ import { useShareOpenGuard } from '@/hooks/useShareOpenGuard';
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
-import { buildMpStandings } from './mpStandings';
+import { buildMpStandings, podiumTier } from './mpStandings';
 import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, rivalGap } from './mpResultsView';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
@@ -59,10 +59,15 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const visible = useMemo(() => pickVisibleRows(rows, MAX_ROWS), [rows]);
   const timeline = useMemo(() => buildRevealTimeline(visible.rows.length), [visible.rows.length]);
 
-  const myRank = data.currentPlayerRank;
+  // One source for "where did I land" on this screen: my standings row, whose
+  // rank is the live HUD's shared competition rank (ties: 1, 2, 2, 4).
+  const myRow = useMemo(() => rows.find((r) => r.isMe), [rows]);
+  const myRank = myRow?.rank ?? data.currentPlayerRank;
+  const myPodium = myRow ? podiumTier(myRow) : null;
+  const iWon = myPodium === 1;
   const beats = useResultBeats({
-    myRank,
-    isWinner: data.isCurrentUserWinner,
+    podium: myPodium,
+    isWinner: iWon,
     topScore: data.sortedScores[0]?.score ?? 0,
     runnerUpScore: data.sortedScores[1]?.score ?? 0,
     instant: reduced,
@@ -84,10 +89,10 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const { shouldFireShareOpen } = useShareOpenGuard();
   const { setShowShareModal } = c;
   useEffect(() => {
-    if (!done || !data.isCurrentUserWinner || !gameCode) return;
+    if (!done || !iWon || !gameCode) return;
     if (shouldFireShareOpen(gameCode)) setShowShareModal(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once per room, after the reveal
-  }, [done, gameCode, data.isCurrentUserWinner]);
+  }, [done, gameCode, iWon]);
 
   // The signup nudge waits a beat after the show, so it never lands on the verdict.
   const [nudgeReady, setNudgeReady] = useState(false);
@@ -188,6 +193,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         </button>
         <MpMyCard
           rank={myRank}
+          winner={iWon && rows.length > 1}
           total={data.sortedScores.length}
           score={me?.score ?? 0}
           bestWord={bestWord}

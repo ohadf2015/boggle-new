@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildMpStandings } from '../mpStandings';
+import { buildMpStandings, podiumTier } from '../mpStandings';
+import { toMpRoster } from '@/lib/multiplayer/roster';
 
 const norm = (s: string | null | undefined) => (s ?? '').trim().toLowerCase();
 
@@ -80,5 +81,40 @@ describe('buildMpStandings', () => {
       normalizeUsername: norm,
     });
     expect(rows[0].score).toBe(0);
+  });
+
+  it('tied scores share a rank, exactly as the live roster ranks them (1, 2, 2, 2)', () => {
+    // Given the round-3 capture: host 28, three joiners on 0
+    const sorted = [
+      { username: 'Host', score: 28 },
+      { username: 'P', score: 0 },
+      { username: 'T', score: 0 },
+      { username: 'H', score: 0 },
+    ];
+    // When the results standings and the live HUD roster rank the same payload
+    const rows = buildMpStandings({ sortedScores: sorted, username: 'T', normalizeUsername: norm });
+    const live = toMpRoster(sorted, [], 'T');
+    // Then every player reads the same rank on both screens (T was #2 live, #3 on results)
+    expect(rows.map((r) => [r.username, r.rank])).toEqual(live.map((p) => [p.name, p.rank]));
+    expect(rows.map((r) => r.rank)).toEqual([1, 2, 2, 2]);
+  });
+
+  it('a gap after a tie skips ranks (competition ranking: 1, 1, 3)', () => {
+    const rows = buildMpStandings({
+      sortedScores: [{ username: 'A', score: 9 }, { username: 'B', score: 9 }, { username: 'C', score: 4 }],
+      username: 'C',
+      normalizeUsername: norm,
+    });
+    expect(rows.map((r) => r.rank)).toEqual([1, 1, 3]);
+  });
+});
+
+describe('podiumTier', () => {
+  const r = (rank: number, score: number) => ({ rank, score });
+  it('ranks 1-3 with points get their podium tier', () => {
+    expect([podiumTier(r(1, 28)), podiumTier(r(2, 5)), podiumTier(r(3, 1)), podiumTier(r(4, 1))]).toEqual([1, 2, 3, null]);
+  });
+  it('nobody is crowned or podium-coloured on 0 points (an all-zero room crowns no one)', () => {
+    expect([podiumTier(r(1, 0)), podiumTier(r(2, 0))]).toEqual([null, null]);
   });
 });

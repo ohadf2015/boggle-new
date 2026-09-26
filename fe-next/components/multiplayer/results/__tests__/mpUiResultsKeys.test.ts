@@ -17,7 +17,7 @@ const vars = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort();
 /** Every key the results screens call t() with. */
 const USED = [
   'time', 'finalTitle', 'roundDone', 'details', 'detailsTitle', 'skipHint', 'you', 'pts', 'winner', 'placeOf',
-  'behind', 'ahead', 'tiedWith', 'bestWord', 'xp', 'coins', 'seriesTotal', 'moreHidden', 'nextUp', 'hostPicking',
+  'behind', 'ahead', 'tiedWith', 'tiedWithMore', 'bestWord', 'xp', 'coins', 'seriesTotal', 'moreHidden', 'nextUp', 'hostPicking',
   'tapToChange', 'chooseMode', 'startNext', 'ready', 'youreReady', 'readyCount', 'waitingHost', 'autoIn',
   'cancelAuto', 'autoOff', 'rematch', 'newSeries', 'leave', 'share', 'seriesChampion', 'teacherPaced',
   'roundPoints', 'yourRank', 'lessonRecap',

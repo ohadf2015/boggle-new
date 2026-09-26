@@ -24,7 +24,9 @@ export const MASCOT_SRC: Record<MascotMood, string> = {
   oops: '/mascot/bridge-oops-nobg.webp',
 };
 
-export function mascotFor(rank: number, total: number): MascotMood {
+/** `score` 0 = no points: no trophy face, even on a shared 1st. */
+export function mascotFor(rank: number, total: number, score?: number): MascotMood {
+  if (score === 0) return 'oops';
   if (rank <= 1 || total <= 1) return 'victory';
   if (total >= 3 && rank >= total) return 'oops';
   return rank <= Math.ceil(total / 2) ? 'cheer' : 'think';
@@ -50,18 +52,27 @@ export function pickBestWord(words: WordLike[] | undefined | null): { word: stri
   return best;
 }
 
-export type RivalGap = { kind: 'behind' | 'ahead'; name: string; points: number };
+export type RivalGap =
+  | { kind: 'behind' | 'ahead'; name: string; points: number }
+  /** Level with `name` and `more` other players. */
+  | { kind: 'tied'; name: string; more: number };
 
-/** Behind: points to the player above me. Winner: margin over 2nd. */
+/**
+ * My one-line standing. Behind: points to the nearest HIGHER score (a tied row
+ * above me is not "ahead"). Level on top: who I share 1st with. Sole leader:
+ * margin over 2nd. Ties below 1st read as behind — the chase is what matters.
+ */
 export function rivalGap(rows: MpStandingRow[]): RivalGap | null {
   const i = rows.findIndex((r) => r.isMe);
   if (i < 0 || rows.length < 2) return null;
-  if (i === 0) {
-    const second = rows[1];
-    return { kind: 'ahead', name: second.username, points: rows[0].score - second.score };
-  }
-  const above = rows[i - 1];
-  return { kind: 'behind', name: above.username, points: above.score - rows[i].score };
+  const mine = rows[i].score;
+  let above: MpStandingRow | undefined;
+  for (let j = i - 1; j >= 0 && !above; j--) if (rows[j].score > mine) above = rows[j];
+  if (above) return { kind: 'behind', name: above.username, points: above.score - mine };
+  const level = rows.filter((r, j) => j !== i && r.score === mine);
+  if (level.length > 0) return { kind: 'tied', name: level[0].username, more: level.length - 1 };
+  const second = rows[i + 1];
+  return second ? { kind: 'ahead', name: second.username, points: mine - second.score } : null;
 }
 
 interface ReadyPlayer {

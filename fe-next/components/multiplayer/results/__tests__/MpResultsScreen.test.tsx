@@ -275,4 +275,46 @@ describe('MpResultsScreen', () => {
     // skip lands every beat at once without replaying beat side effects
     expect(h.confetti.mock.calls.length).toBeLessThanOrEqual(1);
   });
+
+  describe('ties (round-3 capture: host 28, three joiners on 0)', () => {
+    const TIED = [
+      { username: 'Host', score: 28, allWords: [] },
+      { username: 'P', score: 0, allWords: [] },
+      { username: 'T', score: 0, allWords: [] },
+      { username: 'H', score: 0, allWords: [] },
+    ];
+
+    it('tied rows and my card read the shared rank the live HUD showed (#2, not #3)', () => {
+      renderScreen({ finalScores: TIED, username: 'T' });
+      skip();
+      const rows = screen.getAllByTestId('mp-standing-row');
+      expect(rows.map((r) => r.getAttribute('data-rank'))).toEqual(['1', '2', '2', '2']);
+      expect(screen.getByTestId('mp-my-rank').textContent).toBe('#2');
+      // a shared #2 on 0 points is not a podium finish: no confetti on the skip-to-verdict
+      expect(h.confetti).not.toHaveBeenCalled();
+    });
+
+    it('my gap line chases the nearest higher score, not a tied row above', () => {
+      renderScreen({ finalScores: TIED, username: 'T' });
+      skip();
+      expect(screen.getByTestId('mp-my-card').textContent).toContain('mpUi.results.behind:{"points":28,"name":"Host"}');
+    });
+
+    it('a 0-point podium slot gets no podium treatment', () => {
+      h.reduced = true;
+      renderScreen({ finalScores: TIED, username: 'T' });
+      const rows = screen.getAllByTestId('mp-standing-row');
+      expect(rows.map((r) => r.getAttribute('data-podium'))).toEqual(['1', 'none', 'none', 'none']);
+      expect(screen.getAllByTestId('mp-standing-crown')).toHaveLength(1);
+    });
+
+    it('an all-zero room crowns no one', () => {
+      h.reduced = true;
+      renderScreen({ finalScores: TIED.map((p) => ({ ...p, score: 0 })), username: 'T' });
+      expect(screen.queryByTestId('mp-standing-crown')).toBeNull();
+      expect(screen.getByTestId('mp-my-card').getAttribute('data-winner')).toBe('false');
+      expect(screen.getByTestId('mp-my-card').textContent).toContain('mpUi.results.tiedWithMore:{"name":"Host","more":2}');
+    });
+  });
 });
+

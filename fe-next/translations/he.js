@@ -18343,6 +18343,7 @@ const he = {
       "behind": "{points} נק׳ מאחורי {name}",
       "ahead": "ניצחת את {name} ב־{points} נק׳",
       "tiedWith": "תיקו עם {name}!",
+      "tiedWithMore": "תיקו עם {name} ועוד {more}!",
       "bestWord": "המילה הכי טובה",
       "xp": "+{xp} XP",
       "coins": "+{coins}",
