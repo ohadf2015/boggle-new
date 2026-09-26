@@ -75,6 +75,44 @@ export function rivalGap(rows: MpStandingRow[]): RivalGap | null {
   return second ? { kind: 'ahead', name: second.username, points: mine - second.score } : null;
 }
 
+/** Competition ranks (1, 2, 2, 4) for `scores` already sorted high → low. */
+function competitionRanks(scores: number[]): number[] {
+  const ranks: number[] = [];
+  scores.forEach((s, i) => ranks.push(i > 0 && scores[i - 1] === s ? ranks[i - 1] : i + 1));
+  return ranks;
+}
+
+/** Competition rank of every row by `score`, keyed by row index. */
+function rankBy(entries: { i: number; score: number }[]): Map<number, number> {
+  const sorted = [...entries].sort((a, b) => b.score - a.score || a.i - b.i);
+  const ranks = competitionRanks(sorted.map((e) => e.score));
+  return new Map(sorted.map((e, k) => [e.i, ranks[k]]));
+}
+
+/**
+ * The final board of a series: the same rows re-ranked by SERIES total, so a
+ * 0-point last round never reads 1,1,1,1 next to "Series #2 of 4". The big
+ * number becomes the series total; `roundScore` keeps the server's round score
+ * (the live leaderboard's number) for the row's secondary line. Rank movement
+ * is derived from the totals on screen (before vs after this round), never the
+ * tracker's copy, which can hold a pre-validation round. Null without totals.
+ */
+export function seriesLadder(rows: MpStandingRow[]): MpStandingRow[] | null {
+  if (rows.length === 0 || rows.some((r) => r.seriesTotal === null)) return null;
+  const entries = rows.map((r, i) => ({ r, i, total: r.seriesTotal as number }));
+  const before = rankBy(entries.map(({ r, i, total }) => ({ i, score: total - r.score })));
+  const after = rankBy(entries.map(({ i, total }) => ({ i, score: total })));
+  return [...entries]
+    .sort((a, b) => b.total - a.total || a.i - b.i)
+    .map(({ r, i, total }) => ({
+      ...r,
+      score: total,
+      roundScore: r.score,
+      rank: after.get(i) as number,
+      seriesDelta: (before.get(i) as number) - (after.get(i) as number),
+    }));
+}
+
 export interface SeriesPlacing {
   /** My competition rank over the series totals (ties share a rank). */
   rank: number;
@@ -86,31 +124,20 @@ export interface SeriesPlacing {
 }
 
 /**
- * The final screen of a series answers "who won the SERIES". Rows keep the
- * server's round numbers (== the live leaderboard); this re-ranks the same
- * rows by their series totals so the champion chip and my card read ONE
- * source and never say "#1, tied" on a 0-point last round. Null without
- * series totals (round 1 / no series) or when I am not in the room.
+ * My place on the series ladder — the champion chip, my card and the verdict
+ * read this one placing, the board shows the same ladder. Null when I am not
+ * in the room.
  */
-export function seriesPlacing(rows: MpStandingRow[]): SeriesPlacing | null {
-  if (rows.length === 0 || rows.some((r) => r.seriesTotal === null)) return null;
-  const ordered = rows
-    .map((r, i) => ({ r, i, total: r.seriesTotal as number }))
-    .sort((a, b) => b.total - a.total || a.i - b.i);
-  const ranked: MpStandingRow[] = [];
-  ordered.forEach(({ r, total }, i) => {
-    const prev = ranked[i - 1];
-    ranked.push({ ...r, score: total, rank: prev && prev.score === total ? prev.rank : i + 1 });
-  });
-  const me = ranked.find((r) => r.isMe);
+export function seriesPlacing(ladder: MpStandingRow[]): SeriesPlacing | null {
+  const me = ladder.find((r) => r.isMe);
   if (!me) return null;
-  const top = ranked[0].score;
+  const top = ladder[0].score;
   return {
     rank: me.rank,
-    total: ranked.length,
+    total: ladder.length,
     seriesTotal: me.score,
-    champions: top > 0 ? ranked.filter((r) => r.score === top).map((r) => r.username) : [],
-    gap: rivalGap(ranked),
+    champions: top > 0 ? ladder.filter((r) => r.score === top).map((r) => r.username) : [],
+    gap: rivalGap(ladder),
   };
 }
 

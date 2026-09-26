@@ -18441,7 +18441,8 @@ const sv = {
       "yourRank": "Din placering",
       "lessonRecap": "Lektionssammanfattning",
       "seriesPlace": "Serien: #{rank} av {total}",
-      "seriesPts": "seriepoäng"
+      "seriesPts": "seriepoäng",
+      "roundGain": "{points} denna runda"
     }
   }
 };

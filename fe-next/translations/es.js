@@ -18459,7 +18459,8 @@ const es = {
       "yourRank": "Tu puesto",
       "lessonRecap": "Resumen de la lección",
       "seriesPlace": "Serie: #{rank} de {total}",
-      "seriesPts": "pts de serie"
+      "seriesPts": "pts de serie",
+      "roundGain": "{points} esta ronda"
     }
   }
 };

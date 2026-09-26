@@ -18441,7 +18441,8 @@ const ja = {
       "yourRank": "あなたの順位",
       "lessonRecap": "レッスンのふりかえり",
       "seriesPlace": "シリーズ {total}人中 #{rank}",
-      "seriesPts": "シリーズ点"
+      "seriesPts": "シリーズ点",
+      "roundGain": "このラウンド {points}"
     }
   }
 };

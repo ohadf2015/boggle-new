@@ -18371,7 +18371,8 @@ const he = {
       "yourRank": "המקום שלך",
       "lessonRecap": "סיכום השיעור",
       "seriesPlace": "סדרה: מקום {rank} מתוך {total}",
-      "seriesPts": "נק׳ בסדרה"
+      "seriesPts": "נק׳ בסדרה",
+      "roundGain": "{points} בסיבוב הזה"
     }
   }
 };

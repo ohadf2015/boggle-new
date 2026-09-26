@@ -17519,7 +17519,8 @@ const en = {
       "yourRank": "Your place",
       "lessonRecap": "Lesson recap",
       "seriesPlace": "Series #{rank} of {total}",
-      "seriesPts": "series pts"
+      "seriesPts": "series pts",
+      "roundGain": "{points} this round"
     }
   }
 };

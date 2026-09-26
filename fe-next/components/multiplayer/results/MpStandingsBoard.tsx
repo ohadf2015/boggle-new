@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Bot, ChevronDown, ChevronUp, Crown, Trophy } from 'lucide-react';
+import { Bot, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
 import { podiumTier, type MpStandingRow } from './mpStandings';
@@ -14,8 +14,6 @@ export interface MpStandingsBoardProps {
   hiddenCount: number;
   /** Is the row at visual position `pos` (1 = top) revealed yet? */
   isRevealed: (pos: number) => boolean;
-  /** Series champion(s) on a series final: a trophy by their total (the crown stays the round's). */
-  champions?: readonly string[];
   t: TFn;
   className?: string;
 }
@@ -30,9 +28,11 @@ const PODIUM = [
  * The standings, revealed last place → 2nd, then 1st slams in with the crown.
  * Rows keep their slot while hidden (visibility, not mount), so nothing jumps;
  * the rise is transform-only. Rows share the body's height (flex-1, capped), so
- * 2 or 8 players both fill one screen with zero scroll.
+ * 2 or 8 players both fill one screen with zero scroll. On a series final the
+ * rows are the series ladder: the crown is the champion's and each row carries
+ * its round points (`roundScore`) under the name.
  */
-function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, champions = [], t, className }: MpStandingsBoardProps) {
+function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: MpStandingsBoardProps) {
   return (
     <ol data-testid="mp-standings" className={cn('flex flex-col justify-center min-h-0 gap-[calc(6px*var(--mp-u,1))]', className)}>
       {rows.map((r, i) => {
@@ -108,24 +108,23 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, champions = [], t
                   </span>
                 )}
               </span>
-              {r.seriesTotal !== null && (
+              {(r.roundScore !== undefined || r.seriesTotal !== null) && (
                 <span className={cn('flex items-center gap-1 text-[calc(11px*var(--mp-u,1))] font-neo-body tabular-nums', first ? 'text-neo-black/75' : 'text-neo-white/70')}>
-                  {champions.includes(r.username) && (
-                    <Trophy
-                      data-testid="mp-standing-champion"
-                      aria-label={t('mpUi.results.seriesChampion')}
-                      className={cn('w-[calc(13px*var(--mp-u,1))] h-[calc(13px*var(--mp-u,1))] shrink-0', first ? 'text-neo-black' : 'text-neo-yellow', shown && fx.chipPop)}
-                    />
+                  {r.roundScore !== undefined ? (
+                    <span data-testid="mp-standing-round" className="truncate">
+                      {t('mpUi.results.roundGain', { points: `\u2066+${r.roundScore}\u2069` })}
+                    </span>
+                  ) : (
+                    t('mpUi.results.seriesTotal', { total: r.seriesTotal as number })
                   )}
-                  {t('mpUi.results.seriesTotal', { total: r.seriesTotal })}
                   {r.seriesDelta > 0 && (
-                    <span data-testid="mp-standing-delta" className="inline-flex items-center font-bold text-neo-lime">
+                    <span data-testid="mp-standing-delta" className={cn('inline-flex items-center font-bold', first ? 'text-neo-black' : 'text-neo-lime', shown && fx.chipPop)}>
                       <ChevronUp aria-hidden="true" className="w-3 h-3" />
                       {r.seriesDelta}
                     </span>
                   )}
                   {r.seriesDelta < 0 && (
-                    <span data-testid="mp-standing-delta" className="inline-flex items-center font-bold text-neo-pink">
+                    <span data-testid="mp-standing-delta" className={cn('inline-flex items-center font-bold', first ? 'text-neo-black' : 'text-neo-pink')}>
                       <ChevronDown aria-hidden="true" className="w-3 h-3" />
                       {Math.abs(r.seriesDelta)}
                     </span>

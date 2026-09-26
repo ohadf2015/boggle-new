@@ -3,10 +3,12 @@ import type { Avatar } from '@/shared/types/game';
 /**
  * One standings row for the results / intermission screens.
  *
- * The big number is ALWAYS the server's round score, in the server's order —
- * the same numbers the live leaderboard showed a second ago (pitfall class 3:
+ * Built in the server's order with the server's round score as the big number
+ * — the same numbers the live leaderboard showed a second ago (pitfall class 3:
  * one side is the source of truth, the other displays it). Series totals are a
- * labelled secondary line, only from round 2 on.
+ * labelled secondary line, only from round 2 on. The FINAL screen of a series
+ * re-ranks these rows into the series ladder (`seriesLadder`): there the big
+ * number is the series total and `roundScore` keeps the server's round score.
  */
 export interface MpStandingRow {
   username: string;
@@ -24,6 +26,8 @@ export interface MpStandingRow {
   seriesTotal: number | null;
   /** Series rank movement since last round (+ = climbed). */
   seriesDelta: number;
+  /** Series ladder only: the server's score for the round just played. */
+  roundScore?: number;
 }
 
 interface ScoreLike {

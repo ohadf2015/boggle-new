@@ -336,11 +336,23 @@ describe('MpResultsScreen', () => {
       finalScores: ZERO, username, seriesRoundNumber: 5, seriesStandings: STANDINGS, seriesLeader: 'Host',
     });
 
-    it('rows keep the live round numbers; my card gives my SERIES place, never "#1 tied" on 0 points', () => {
+    it('the board IS the series ladder (never 1,1,1,1 beside "Series #2"); round points ride on each row', () => {
       final('T');
       skip();
-      // the big row numbers are still the server's round scores (== live leaderboard)
-      expect(screen.getAllByTestId('mp-standing-score').map((n) => n.textContent)).toEqual(['0', '0', '0', '0']);
+      const rows = screen.getAllByTestId('mp-standing-row');
+      expect(rows.map((r) => r.textContent)).toEqual([
+        expect.stringContaining('Host'), expect.stringContaining('P'), expect.stringContaining('T'), expect.stringContaining('H'),
+      ]);
+      expect(rows.map((r) => r.getAttribute('data-rank'))).toEqual(['1', '2', '2', '2']);
+      expect(screen.getAllByTestId('mp-standing-score').map((n) => n.textContent)).toEqual(['94', '0', '0', '0']);
+      expect(screen.getAllByTestId('mp-standing-round').map((n) => n.textContent)).toEqual(
+        Array(4).fill('mpUi.results.roundGain:{"points":"\u2066+0\u2069"}'),
+      );
+      // the crown is the series champion's, and only theirs
+      expect(screen.getAllByTestId('mp-standing-crown')).toHaveLength(1);
+      expect(within(rows[0]).getByTestId('mp-standing-crown')).toBeTruthy();
+      // my row agrees with my card: rank 2
+      expect(rows.find((r) => r.getAttribute('data-me') === 'true')?.getAttribute('data-rank')).toBe('2');
       const card = screen.getByTestId('mp-my-card');
       expect(card.getAttribute('data-series')).toBe('true');
       expect(screen.getByTestId('mp-my-rank').textContent).toBe('#2');
@@ -353,9 +365,9 @@ describe('MpResultsScreen', () => {
       final('Host');
       skip();
       expect(screen.getByTestId('mp-series-champion').textContent).toContain('Host');
-      // the board points at the champion too (the crown is the ROUND's 1st)
-      const champRows = screen.getAllByTestId('mp-standing-row').filter((r) => within(r).queryByTestId('mp-standing-champion'));
-      expect(champRows.map((r) => r.textContent)).toEqual([expect.stringContaining('Host')]);
+      // the board crowns the same champion (the crown is the SERIES' 1st)
+      const crowned = screen.getAllByTestId('mp-standing-row').filter((r) => within(r).queryByTestId('mp-standing-crown'));
+      expect(crowned.map((r) => r.textContent)).toEqual([expect.stringContaining('Host')]);
       const card = screen.getByTestId('mp-my-card');
       expect(card.getAttribute('data-winner')).toBe('true');
       expect(screen.getByTestId('mp-my-rank').textContent).toBe('#1');
@@ -376,6 +388,14 @@ describe('MpResultsScreen', () => {
       skip();
       expect(screen.getByTestId('mp-my-card').getAttribute('data-series')).toBe('false');
     });
+
+    it('the intermission board keeps the live round order and numbers (== the live leaderboard)', () => {
+      renderScreen({ finalScores: ZERO, username: 'T', seriesRoundNumber: 3, seriesStandings: STANDINGS });
+      skip();
+      expect(screen.getAllByTestId('mp-standing-row').map((r) => r.getAttribute('data-rank'))).toEqual(['1', '1', '1', '1']);
+      expect(screen.getAllByTestId('mp-standing-score').map((n) => n.textContent)).toEqual(['0', '0', '0', '0']);
+      expect(screen.queryAllByTestId('mp-standing-round')).toHaveLength(0);
+    });
   });
   describe('the verdict of a series final follows the SERIES (round-5 winner P lost the series to Host)', () => {
     const R5 = [
@@ -389,6 +409,18 @@ describe('MpResultsScreen', () => {
       { username: 'T', totalScore: 0, roundScores: [0, 0, 0, 0, 0], rankChange: 0 },
     ];
     const final = (username: string) => renderScreen({ finalScores: R5, username, seriesRoundNumber: 5, seriesStandings: STANDINGS });
+
+    it('the round-5 winner who lost the series sits 2nd on the board with its +30 on the row', () => {
+      final('P');
+      skip();
+      const rows = screen.getAllByTestId('mp-standing-row');
+      expect(rows.map((r) => r.getAttribute('data-rank'))).toEqual(['1', '2', '3']);
+      expect(within(rows[0]).getByTestId('mp-standing-score').textContent).toBe('120');
+      expect(rows[1].getAttribute('data-me')).toBe('true');
+      expect(within(rows[1]).getByTestId('mp-standing-score').textContent).toBe('60');
+      expect(within(rows[1]).getByTestId('mp-standing-round').textContent).toBe('mpUi.results.roundGain:{"points":"\u2066+30\u2069"}');
+      expect(within(rows[1]).queryByTestId('mp-standing-crown')).toBeNull();
+    });
 
     it('tap-to-skip: the round winner who lost the series gets 2nd-place light confetti and the defeat sound', () => {
       final('P');

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickVisibleRows, mascotFor, pickBestWord, rivalGap, nextModeForViewer, seriesPlacing } from '../mpResultsView';
+import { pickVisibleRows, mascotFor, pickBestWord, rivalGap, nextModeForViewer, seriesPlacing, seriesLadder } from '../mpResultsView';
 import type { MpStandingRow } from '../mpStandings';
 
 const row = (username: string, rank: number, score: number, isMe = false): MpStandingRow => ({
@@ -130,7 +130,7 @@ describe('seriesPlacing (final screen of a series)', () => {
       sRow('H', 1, 0, 0),
     ];
     // When the series placing is read for me
-    const out = seriesPlacing(rows);
+    const out = seriesPlacing(seriesLadder(rows)!);
     // Then it speaks about the series, not the tied last round
     expect(out).toEqual({
       rank: 2,
@@ -143,21 +143,69 @@ describe('seriesPlacing (final screen of a series)', () => {
 
   it('the champion reads 1st with the margin over the runner-up, whatever the last round order was', () => {
     const rows = [sRow('A', 1, 40, 120), sRow('Me', 2, 10, 150, true), sRow('B', 3, 0, 90)];
-    expect(seriesPlacing(rows)).toMatchObject({ rank: 1, seriesTotal: 150, champions: ['Me'], gap: { kind: 'ahead', name: 'A', points: 30 } });
+    expect(seriesPlacing(seriesLadder(rows)!)).toMatchObject({ rank: 1, seriesTotal: 150, champions: ['Me'], gap: { kind: 'ahead', name: 'A', points: 30 } });
   });
 
   it('shares 1st on equal totals (competition rank), naming every champion', () => {
     const rows = [sRow('A', 1, 5, 80, true), sRow('B', 2, 3, 80), sRow('C', 3, 1, 20)];
-    expect(seriesPlacing(rows)).toMatchObject({ rank: 1, champions: ['A', 'B'], gap: { kind: 'tied', name: 'B', more: 0 } });
+    expect(seriesPlacing(seriesLadder(rows)!)).toMatchObject({ rank: 1, champions: ['A', 'B'], gap: { kind: 'tied', name: 'B', more: 0 } });
   });
 
   it('crowns no series champion when nobody scored all series', () => {
     const rows = [sRow('A', 1, 0, 0), sRow('Me', 1, 0, 0, true)];
-    expect(seriesPlacing(rows)?.champions).toEqual([]);
+    expect(seriesPlacing(seriesLadder(rows)!)?.champions).toEqual([]);
   });
 
-  it('is null without series totals (round 1 / no series) or without me', () => {
-    expect(seriesPlacing([sRow('A', 1, 5, null, true)])).toBeNull();
-    expect(seriesPlacing([sRow('A', 1, 5, 5), sRow('B', 2, 1, 1)])).toBeNull();
+  it('is null without me in the room', () => {
+    expect(seriesPlacing(seriesLadder([sRow('A', 1, 5, 5), sRow('B', 2, 1, 1)])!)).toBeNull();
+  });
+});
+
+describe('seriesLadder (the final board of a series ranks the SERIES)', () => {
+  const sRow = (username: string, rank: number, score: number, seriesTotal: number | null, seriesDelta = 0): MpStandingRow => ({
+    username, rank, score, isMe: false, seriesTotal, seriesDelta,
+  });
+
+  it('r4 capture: a 0-point last round never ranks everyone #1 -- the champion leads, the rest share 2nd', () => {
+    // Given round 5 all on 0 (server ranks 1,1,1,1) and series totals 94/0/0/0
+    const rows = [sRow('P', 1, 0, 0), sRow('Host', 1, 0, 94), sRow('T', 1, 0, 0), sRow('H', 1, 0, 0)];
+    // When the ladder is built
+    const ladder = seriesLadder(rows)!;
+    // Then the big number and rank are the series', the round points ride along
+    expect(ladder.map((r) => r.username)).toEqual(['Host', 'P', 'T', 'H']);
+    expect(ladder.map((r) => r.rank)).toEqual([1, 2, 2, 2]);
+    expect(ladder.map((r) => r.score)).toEqual([94, 0, 0, 0]);
+    expect(ladder.map((r) => r.roundScore)).toEqual([0, 0, 0, 0]);
+  });
+
+  it('the round-5 winner who lost the series sits 2nd, carrying its round points', () => {
+    const rows = [sRow('P', 1, 30, 60), sRow('Host', 2, 5, 120), sRow('T', 3, 0, 0)];
+    const ladder = seriesLadder(rows)!;
+    expect(ladder.map((r) => [r.username, r.rank, r.score, r.roundScore])).toEqual([
+      ['Host', 1, 120, 5],
+      ['P', 2, 60, 30],
+      ['T', 3, 0, 0],
+    ]);
+  });
+
+  it('rank movement is derived from the totals shown (before vs after this round), never a stale tracker copy', () => {
+    // Given A led 50-40 before the last round and B out-scored A 30-5 in it,
+    // while the tracker still says nobody moved
+    const rows = [sRow('B', 1, 30, 70, 0), sRow('A', 2, 5, 55, 0), sRow('C', 3, 0, 10, 0)];
+    // When the ladder is built
+    const ladder = seriesLadder(rows)!;
+    // Then B climbed one, A dropped one, C held
+    expect(ladder.map((r) => [r.username, r.seriesDelta])).toEqual([['B', 1], ['A', -1], ['C', 0]]);
+  });
+
+  it('a tie broken by the last round counts as a climb for the breaker only', () => {
+    // Before: A 40, B 40 (both 1st). After: A 40, B 45.
+    const rows = [sRow('B', 1, 5, 45), sRow('A', 2, 0, 40)];
+    expect(seriesLadder(rows)!.map((r) => [r.username, r.rank, r.seriesDelta])).toEqual([['B', 1, 0], ['A', 2, -1]]);
+  });
+
+  it('is null without series totals (round 1 / no series)', () => {
+    expect(seriesLadder([sRow('A', 1, 5, null)])).toBeNull();
+    expect(seriesLadder([])).toBeNull();
   });
 });

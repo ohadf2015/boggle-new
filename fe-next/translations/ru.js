@@ -18174,7 +18174,8 @@ const ru = {
       "yourRank": "Ваше место",
       "lessonRecap": "Итоги урока",
       "seriesPlace": "Серия: #{rank} из {total}",
-      "seriesPts": "очк. серии"
+      "seriesPts": "очк. серии",
+      "roundGain": "{points} за раунд"
     }
   }
 };

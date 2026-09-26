@@ -16,7 +16,7 @@ import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
 import { buildMpStandings, podiumTier } from './mpStandings';
-import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, rivalGap, seriesPlacing } from './mpResultsView';
+import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, rivalGap, seriesLadder, seriesPlacing } from './mpResultsView';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
 import { useAutoAdvance } from './useAutoAdvance';
@@ -57,24 +57,28 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     normalizeUsername: data.normalizeUsername,
     series: { roundNumber: seriesRoundNumber, standings: seriesStandings },
   }), [data.sortedScores, username, data.normalizeUsername, seriesRoundNumber, seriesStandings]);
-  const visible = useMemo(() => pickVisibleRows(rows, MAX_ROWS), [rows]);
+  const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
+  // The final screen of a series is judged on the series: the board becomes the
+  // series ladder, and my card, the verdict (sound/confetti/share) and the
+  // champion chip all read my one placing on it. (The branch locks on the TIME!
+  // beat, before any row is revealed, so the reorder is never seen.)
+  const ladder = useMemo(() => (branch === 'final' ? seriesLadder(rows) : null), [branch, rows]);
+  const series = useMemo(() => (ladder ? seriesPlacing(ladder) : null), [ladder]);
+  const boardRows = ladder ?? rows;
+  const visible = useMemo(() => pickVisibleRows(boardRows, MAX_ROWS), [boardRows]);
   const timeline = useMemo(() => buildRevealTimeline(visible.rows.length), [visible.rows.length]);
 
-  // One source for "where did I land" on this screen: my standings row, whose
-  // rank is the live HUD's shared competition rank (ties: 1, 2, 2, 4).
+  // Otherwise one source for "where did I land": my standings row, whose rank
+  // is the live HUD's shared competition rank (ties: 1, 2, 2, 4).
   const myRow = useMemo(() => rows.find((r) => r.isMe), [rows]);
-  const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
-  // The final screen of a series is judged on the series: my card, the verdict
-  // (sound/confetti/share) and the champion chip all read this one placing.
-  const series = useMemo(() => (branch === 'final' ? seriesPlacing(rows) : null), [branch, rows]);
   const myRank = series?.rank ?? myRow?.rank ?? data.currentPlayerRank;
   const myScore = series?.seriesTotal ?? data.currentPlayerData?.score ?? 0;
   const myPodium = series ? podiumTier({ rank: series.rank, score: series.seriesTotal }) : myRow ? podiumTier(myRow) : null;
   const iWon = myPodium === 1;
   const topTwo = useMemo(() => {
-    const nums = series ? rows.map((r) => r.seriesTotal ?? 0).sort((a, b) => b - a) : rows.map((r) => r.score);
+    const nums = boardRows.map((r) => r.score);
     return { top: nums[0] ?? 0, runnerUp: nums[1] ?? 0 };
-  }, [series, rows]);
+  }, [boardRows]);
   const beats = useResultBeats({
     podium: myPodium,
     isWinner: iWon,
@@ -182,7 +186,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           rows={visible.rows}
           hiddenCount={visible.hiddenCount}
           isRevealed={(pos) => seen(`row-${pos}`)}
-          champions={champions}
           t={t}
           className="min-h-0 flex-1 lg:max-h-[calc(560px*var(--mp-u,1))]"
         />
