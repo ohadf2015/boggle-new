@@ -31,7 +31,10 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
   const timerSize = isTv ? 'xl' : isDesktop ? 'lg' : 'md';
   return (
     <MpHudBar
-      className="px-2 lg:px-0"
+      // Phone: the end group (combo · score · mute) is wider than the start
+      // group, so a symmetric 1fr|auto|1fr grid pushed it into the clock.
+      // auto|1fr|auto keeps every group whole; the timer centres in the middle.
+      className="px-2 lg:px-0 grid-cols-[auto_minmax(0,1fr)_auto]"
       start={
         <>
           <MpBackButton kind="leave" onPress={onExit} />

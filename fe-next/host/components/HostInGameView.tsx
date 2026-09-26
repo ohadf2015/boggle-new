@@ -378,6 +378,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           initialTileStates={blastBridge.initialTileStates}
           blastSeed={blastBridge.blastSeed}
           serverGrid={blastBridge.serverGrid}
+          serverScoredFly
           isDesktopCanvas={inShell}
         />
         )}

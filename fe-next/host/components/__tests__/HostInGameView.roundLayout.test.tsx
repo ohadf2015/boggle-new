@@ -24,6 +24,8 @@ vi.mock('@/components/game/InGameScreen', () => ({
 }));
 const huntProps: any[] = [];
 vi.mock('@/components/wordhunt/WordHuntGame', () => ({ WordHuntGame: (p: any) => { huntProps.push(p); return <div data-testid="word-hunt-game" />; } }));
+const blastProps: any[] = [];
+vi.mock('@/components/blast/legacy/BlastGame', () => ({ BlastGame: (p: any) => { blastProps.push(p); return <div data-testid="blast-game" />; } }));
 vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({ config: {}, initialTileStates: [], blastSeed: 0, waveNumber: 1 }),
 }));
@@ -115,6 +117,13 @@ describe('HostInGameView — round frame', () => {
   it('hides the board while the countdown is up', () => {
     render(<HostInGameView {...props} showStartAnimation />);
     expect(screen.getByTestId('mp-round-canvas').className).toContain('invisible');
+  });
+
+  it('blast: the host\'s "+N" fly is server-scored too (same as the joiner)', async () => {
+    mode.value = 'blast';
+    render(<HostInGameView {...props} />);
+    await screen.findByTestId('blast-game');
+    expect(blastProps.at(-1).serverScoredFly).toBe(true);
   });
 
   it('continue-solo leaves through useMpExit', () => {

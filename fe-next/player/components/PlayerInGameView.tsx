@@ -308,6 +308,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             initialTileStates={blastBridge.initialTileStates}
             blastSeed={blastBridge.blastSeed}
             serverGrid={blastBridge.serverGrid}
+            serverScoredFly
             isDesktopCanvas={shellEnabled && isShellMode(gameMode)}
           />
       ) : gameMode === 'word-hunt' ? (

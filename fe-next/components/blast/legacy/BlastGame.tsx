@@ -78,6 +78,8 @@ interface BlastGameProps {
   blastSeed?: number | null;
   /** MP only: server-authoritative letter grid (from `startGame`/store `letterGrid`). */
   serverGrid?: LetterGrid | null;
+  /** Live MP only (opt-in, default off): the "+N" fly shows the server's `wordAccepted.score`. */
+  serverScoredFly?: boolean;
   remainingTime?: number | null;
   totalTime?: number;
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: Avatar }>;
@@ -122,6 +124,7 @@ export function BlastGame({
   initialTileStates,
   blastSeed,
   serverGrid,
+  serverScoredFly = false,
   remainingTime: _remainingTime,
   totalTime: _totalTime,
   leaderboard,
@@ -338,6 +341,7 @@ export function BlastGame({
     recorder: highlightRecorderRef.current,
     // Variable "treasure roll" reward is SOLO-only — MP scoring is server-authoritative.
     enableTreasureRoll: !isMultiplayer,
+    serverScoredFly,
     effects: {
       setLastWordLength, setWordSubmitCount, setWordFoundParticle,
       setClearedTilesForEffects, setScoreFlyEvents,

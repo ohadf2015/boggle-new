@@ -25,6 +25,7 @@ import type { HighlightRecorder } from '@/lib/blast/highlightRecorder';
 import type { useBlastEngine } from './useBlastEngine';
 import type { useBlastSequencer } from './useBlastSequencer';
 import type { useBlastSounds } from './useBlastSounds';
+import { awaitServerPoints } from '@/components/multiplayer/round/serverPoints';
 
 type BlastEngine = ReturnType<typeof useBlastEngine>;
 type BlastSequencer = ReturnType<typeof useBlastSequencer>;
@@ -69,7 +70,16 @@ interface UseBlastWordHandlerParams {
    * the displayed score — keep it off for multiplayer.
    */
   enableTreasureRoll?: boolean;
+  /**
+   * Live MP only (opt-in): the "+N" fly shows the SERVER's points for the word
+   * (`wordAccepted.score`, which already includes the combo) once it arrives —
+   * never the client engine total. No ack → no number. Quick-play and solo keep
+   * the engine total (default off).
+   */
+  serverScoredFly?: boolean;
 }
+
+const flyTier = (score: number): 1 | 2 | 3 => (score >= 25 ? 3 : score >= 10 ? 2 : 1);
 
 export function useBlastWordHandler({
   engine,
@@ -88,6 +98,7 @@ export function useBlastWordHandler({
   scoreMultiplier = 1,
   recorder,
   enableTreasureRoll = false,
+  serverScoredFly = false,
 }: UseBlastWordHandlerParams) {
   // Re-entrancy guard. handleWordAccepted is async and runs for ~1-2s (animate
   // clear → submit → full cascade). The board disables input during that window,
@@ -104,6 +115,8 @@ export function useBlastWordHandler({
     processingRef.current = true;
 
     try {
+    // Before the MP emit below, so the server's ack is always "after" this.
+    const submittedAt = Date.now();
     const path = lastPathRef.current;
     lastPathRef.current = [];
 
@@ -186,7 +199,7 @@ export function useBlastWordHandler({
     const flyId = `fly-${++flyIdRef.current}`;
     // A jackpot roll always reads as epic (tier 3) regardless of raw score, so the
     // surprise lands with full juice; lucky bumps at least to tier 2.
-    const baseTier: 1 | 2 | 3 = result.score >= 25 ? 3 : result.score >= 10 ? 2 : 1;
+    const baseTier = flyTier(result.score);
     const tier: 1 | 2 | 3 = treasureTier === 'jackpot' ? 3
       : treasureTier === 'lucky' ? (Math.max(baseTier, 2) as 1 | 2 | 3)
       : baseTier;
@@ -203,16 +216,28 @@ export function useBlastWordHandler({
         dominantTileType = c.type;
       }
     }
-    effects.setScoreFlyEvents(prev => [...prev.slice(-2), {
-      id: flyId, score: result.score,
+    const fly = {
+      id: flyId,
       startX: ((avgCol + 0.5) / config.gridSize) * 100,
       startY: ((avgRow + 0.5) / config.gridSize) * 100,
-      tier,
       tileType: dominantTileType,
-      ...(treasureBonus > 0 && treasureTier !== 'common'
-        ? { bonus: treasureBonus, luckyTier: treasureTier }
-        : {}),
-    }]);
+    };
+    if (serverScoredFly) {
+      // Non-blocking: the cascade below must not wait on the network.
+      void awaitServerPoints(data.word, submittedAt).then((points) => {
+        if (points == null || points <= 0) return;
+        effects.setScoreFlyEvents(prev => [...prev.slice(-2), { ...fly, score: points, tier: flyTier(points) }]);
+      });
+    } else {
+      effects.setScoreFlyEvents(prev => [...prev.slice(-2), {
+        ...fly,
+        score: result.score,
+        tier,
+        ...(treasureBonus > 0 && treasureTier !== 'common'
+          ? { bonus: treasureBonus, luckyTier: treasureTier }
+          : {}),
+      }]);
+    }
 
     // Currency earn (SP only, wired via callback)
     try {
@@ -324,7 +349,7 @@ export function useBlastWordHandler({
       processingRef.current = false;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier, enableTreasureRoll]);
+  }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier, enableTreasureRoll, serverScoredFly]);
 
   return { handleWordAccepted };
 }

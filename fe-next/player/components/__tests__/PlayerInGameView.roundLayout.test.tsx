@@ -34,7 +34,8 @@ vi.mock('@/components/game/InGameScreen', () => ({
 }));
 const huntProps: any[] = [];
 vi.mock('@/components/wordhunt/WordHuntGame', () => ({ WordHuntGame: (p: any) => { huntProps.push(p); return <div data-testid="word-hunt-game" />; } }));
-vi.mock('@/components/blast/legacy/BlastGame', () => ({ BlastGame: () => <div data-testid="blast-game" /> }));
+const blastProps: any[] = [];
+vi.mock('@/components/blast/legacy/BlastGame', () => ({ BlastGame: (p: any) => { blastProps.push(p); return <div data-testid="blast-game" />; } }));
 vi.mock('@/components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({
   useBlastMultiplayerBridge: () => ({ config: {}, initialTileStates: null, blastSeed: 42 }),
 }));
@@ -130,6 +131,12 @@ describe('PlayerInGameView — round frame', () => {
     const marker = document.querySelector('[data-mp-shell]');
     expect(marker).toBeInTheDocument();
     expect(marker).toContainElement(screen.getByTestId('mp-round-layout'));
+  });
+
+  it('blast: the "+N" fly is server-scored in a live room', () => {
+    mockGameMode.value = 'blast';
+    render(<PlayerInGameView {...baseProps} />);
+    expect(blastProps.at(-1).serverScoredFly).toBe(true);
   });
 
   it('continue-solo leaves through useMpExit, not router.push', () => {

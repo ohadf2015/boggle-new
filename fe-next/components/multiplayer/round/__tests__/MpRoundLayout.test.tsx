@@ -95,6 +95,13 @@ describe('MpRoundLayout', () => {
     expect(mute.toggle).toHaveBeenCalled();
   });
 
+  it('HUD groups never overlap: asymmetric auto|1fr|auto tracks (the end group is the widest)', () => {
+    render(<MpRoundLayout {...props()} />);
+    const bar = screen.getByTestId('mp-hud-bar');
+    expect(bar.className).toContain('grid-cols-[auto_minmax(0,1fr)_auto]');
+    expect(bar.className).not.toContain('grid-cols-[1fr_auto_1fr]');
+  });
+
   it('shows ONE clock: the big m:ss digits, not a second label inside the ring', () => {
     render(<MpRoundLayout {...props()} />);
     expect(screen.getByTestId('mp-timer').className).toContain('[&_svg~div]:hidden!');
