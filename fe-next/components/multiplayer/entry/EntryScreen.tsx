@@ -5,6 +5,7 @@ import MultiplayerFlow from '../MultiplayerFlow';
 import { EntryHeader } from './EntryHeader';
 import { ENTRY_CHROME_ATTR } from './entryChrome';
 import './entryChrome.css';
+import './entryToasts.css';
 
 export type EntryScreenProps = ComponentProps<typeof MultiplayerFlow>;
 

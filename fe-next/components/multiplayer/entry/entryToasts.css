@@ -1,0 +1,15 @@
+/*
+ * The toast lane on the MP entry (pinned by __tests__/entryToasts.test.ts).
+ *
+ * The global <Toaster> sits top-center at top:20px. A phone entry header is a
+ * full row — [home][LEXICLASH] … [lang][sound][?] — so a top toast would land on
+ * the wordmark. Below 768px the toaster container starts under the 56px header
+ * instead; wider headers keep an empty centre track that takes a toast as-is.
+ * react-hot-toast writes `top` inline on its [data-rht-toaster] container, hence
+ * !important. Keyed to the entry's SSR marker: no other page is touched.
+ */
+@media (max-width: 767.98px) {
+  body:has([data-mp-entry-chrome='off']) [data-rht-toaster] {
+    top: calc(env(safe-area-inset-top, 0px) + 64px) !important;
+  }
+}

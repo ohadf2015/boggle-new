@@ -26,6 +26,12 @@ export function useConnectionToasts() {
   const connectionError = socketContext?.connectionError ?? null;
   const previousConnectedRef = useRef<boolean | null>(null);
   const disconnectToastIdRef = useRef<string | null>(null);
+  // "We're back!" is only true after the player was TOLD the link went away.
+  // A cold load mounts before the shared socket connects, and that first
+  // false → true flip is not a reconnect (it used to toast "We're back!" over
+  // the MP entry header on every cold load). Set when a lost / reconnecting /
+  // failed toast is shown while mounted; cleared by the celebration.
+  const lossShownRef = useRef(false);
 
   useEffect(() => {
     // Skip initial mount
@@ -52,6 +58,7 @@ export function useConnectionToasts() {
           icon: '📡',
         }
       );
+      lossShownRef.current = true;
     }
 
     // Reconnecting
@@ -68,6 +75,7 @@ export function useConnectionToasts() {
           duration: Infinity,
         }
       );
+      lossShownRef.current = true;
     }
 
     // Reconnect failed / gave up — the "Reconnecting..." toast above has
@@ -89,15 +97,19 @@ export function useConnectionToasts() {
           icon: '⚠️',
         }
       );
+      lossShownRef.current = true;
     }
 
-    // Reconnected
+    // Reconnected — only after a loss the player was shown (see lossShownRef).
     if (!wasConnected && isConnected) {
       // Dismiss any existing toast
       if (disconnectToastIdRef.current) {
         toast.dismiss(disconnectToastIdRef.current);
         disconnectToastIdRef.current = null;
       }
+
+      if (!lossShownRef.current) return;
+      lossShownRef.current = false;
 
       toast.success(
         t('common.reconnected', 'Connected!'),
