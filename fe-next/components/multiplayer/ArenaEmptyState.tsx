@@ -23,7 +23,7 @@ const ArenaEmptyState: React.FC = () => {
         aria-hidden="true"
         width={96}
         height={96}
-        className="h-20 w-20 lg:h-28 lg:w-28 tv:h-40 tv:w-40 shrink rounded-neo object-contain motion-safe:animate-mp-bump"
+        className="h-24 w-24 lg:h-32 lg:w-32 tv:h-44 tv:w-44 shrink rounded-neo object-contain motion-safe:animate-mp-bump"
       />
       <div className="min-w-0">
         <p className="font-neo-display text-lg lg:text-2xl tv:text-4xl font-bold uppercase leading-tight text-neo-white">

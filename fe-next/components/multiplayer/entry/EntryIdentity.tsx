@@ -115,7 +115,7 @@ export function EntryIdentity(props: EntryIdentityInput) {
             className={cn(
               'w-full bg-transparent pe-8 font-neo-display! text-2xl! desktop-tall:text-3xl! tv:text-5xl! font-bold text-neo-white outline-hidden desktop-tall:ps-8 desktop-tall:text-center',
               'border-b-3 pb-0.5 transition-colors placeholder:text-neo-white/50',
-              id.error ? 'border-neo-red animate-neo-shake' : 'border-neo-white/25 focus:border-neo-lime',
+              id.error ? 'border-neo-red motion-safe:animate-neo-shake' : 'border-neo-white/25 focus:border-neo-lime',
             )}
           />
           {id.saved && (

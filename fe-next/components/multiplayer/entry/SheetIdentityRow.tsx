@@ -46,7 +46,7 @@ export function SheetIdentityRow({ id, alwaysEditable = false, onEnter }: {
               placeholder={t('mpUi.entry.namePlaceholder')}
               className={cn(
                 'w-full bg-transparent font-neo-display! text-xl! font-bold text-neo-white outline-hidden border-b-3 pb-0.5 placeholder:text-neo-white/50',
-                id.error ? 'border-neo-red animate-neo-shake' : 'border-neo-white/25 focus:border-neo-lime',
+                id.error ? 'border-neo-red motion-safe:animate-neo-shake' : 'border-neo-white/25 focus:border-neo-lime',
               )}
             />
             {id.error && (

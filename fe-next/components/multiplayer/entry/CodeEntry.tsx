@@ -113,7 +113,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
         {busy && <Loader2 aria-hidden="true" className="ms-auto h-4 w-4 animate-spin text-neo-white" />}
       </p>
       {/* Codes are Latin alphanumerics: the row stays LTR in every locale. */}
-      <div key={shake} dir="ltr" className={cn('grid grid-cols-6 gap-1.5 sm:gap-2', shake > 0 && 'animate-neo-shake')}>
+      <div key={shake} dir="ltr" className={cn('grid grid-cols-6 gap-1.5 sm:gap-2', shake > 0 && 'motion-safe:animate-neo-shake')}>
         {chars.map((ch, i) => (
           <input
             key={i}
