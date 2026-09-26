@@ -13065,7 +13065,8 @@ const ja = {
       "trialActive": "Proトライアル",
       "trialDayLeft": "残り1日",
       "trialDaysLeft": "残り{count}日",
-      "trialEndsToday": "本日期限"
+      "trialEndsToday": "本日期限",
+      "trialEnded": "トライアル終了"
     },
     "proGate": {
       "analytics": {
@@ -13094,6 +13095,7 @@ const ja = {
       "proCtaHint": "すべてのゲーム・生徒・印刷用PDFを解除します。",
       "weeklySubject": "今週のクラス",
       "polarTrialExpiredLine": "Teacher Proのトライアルが終了しました。クラスのレポートを残すには再開してください。",
+      "polarTrialActiveLine": "Teacher Proトライアルは残り{count}日です。月額9ドルでレポートと無制限クラスを続けられます。",
       "regionLabel": "{{classroom}} の進捗ダイジェスト",
       "scheduleReteachCta": "約{{days}}日後に再指導Liveを予定",
       "scheduleReteachConfirm": "{{date}}（約{{days}}日後）に再指導Liveを予定しました。カレンダー招待を開きました。",
@@ -13147,6 +13149,11 @@ const ja = {
       "trialEndedTitle": "Teacher Proのトライアルが終了しました",
       "trialEndedBody": "月額9ドルで再開できます。無料トライアルの再付与ではありません。",
       "trialEndedCta": "Proを続ける — 月額9ドル",
+      "trialLifecycleTitle": "Teacher Proトライアル残り{count}日",
+      "trialLifecycleTitleToday": "Teacher Proトライアルは本日期限です",
+      "trialLifecycleTitleOne": "Teacher Proトライアル残り1日",
+      "trialLifecycleBody": "無制限クラスと印刷レポートを継続 — トライアル後は月額9ドル。",
+      "trialLifecycleCta": "Proを続ける — 月額9ドル",
       "checkoutError": "決済を開始できませんでした。もう一度お試しください。",
       "signInRequired": "Teacher Proにアップグレードするにはサインインしてください。",
       "currentPlan": "現在のプランです",

@@ -46,6 +46,7 @@ describe('buildWeeklyTeacherDigest', () => {
     expect(digest.classrooms[0].progress.completionPct).toBe(50);
     expect(digest.classrooms[0].progress.accuracyPct).toBe(80);
     expect(digest.polarTrialExpiredLineKey).toBeNull();
+    expect(digest.polarTrialActive).toBe(false);
     expect(shouldSendWeeklyDigest(digest)).toBe(true);
   });
 
@@ -83,6 +84,29 @@ describe('buildWeeklyTeacherDigest', () => {
       })),
     });
     expect(converted.polarTrialExpiredLineKey).toBeNull();
+  });
+
+  it('adds the Polar trial-active key for a Pro teacher still on trial', () => {
+    const trialing = buildWeeklyTeacherDigest({
+      teacherId: 't1',
+      email: 'ada@school.edu',
+      fullName: 'Ada',
+      locale: 'en',
+      hasPro: true,
+      polarTrialDaysLeft: 6,
+      classrooms: [
+        {
+          classroomId: 'c1',
+          classroomName: 'Year 7',
+          roster: [{ studentId: 's1', name: 'Sam' }],
+          sessions: [],
+        },
+      ],
+    });
+    expect(trialing.polarTrialActive).toBe(true);
+    expect(trialing.polarTrialDaysLeft).toBe(6);
+    expect(trialing.polarTrialActiveLineKey).toBe('teacher.digest.polarTrialActiveLine');
+    expect(trialing.polarTrialExpiredLineKey).toBeNull();
   });
 
   it('does not send when the teacher has no classrooms', () => {

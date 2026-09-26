@@ -11621,7 +11621,8 @@ const en = {
       "trialActive": "Pro trial",
       "trialDayLeft": "1 day left",
       "trialDaysLeft": "{count} days left",
-      "trialEndsToday": "Ends today"
+      "trialEndsToday": "Ends today",
+      "trialEnded": "Trial ended"
     },
     "teacher": {
       "activeGames": "Active Games",
@@ -12283,6 +12284,7 @@ const en = {
       "proCtaHint": "Unlock every game, every student, and printable PDFs.",
       "weeklySubject": "This week in your class",
       "polarTrialExpiredLine": "Your Teacher Pro trial has ended. Reactivate to keep class reports.",
+      "polarTrialActiveLine": "Your Teacher Pro trial has {count} days left. Keep reports and unlimited classes for $9/mo.",
       "regionLabel": "Progress digest for {{classroom}}",
       "scheduleReteachCta": "Schedule reteach Live in ~{{days}} days",
       "scheduleReteachConfirm": "Reteach Live scheduled for {{date}} (~{{days}} days). Calendar invite opened.",
@@ -12335,6 +12337,11 @@ const en = {
       "trialEndedTitle": "Your Teacher Pro trial ended",
       "trialEndedBody": "Reactivate for $9/month. This is not another free trial.",
       "trialEndedCta": "Keep Pro — $9/mo",
+      "trialLifecycleTitle": "{count} days left in your Teacher Pro trial",
+      "trialLifecycleTitleToday": "Your Teacher Pro trial ends today",
+      "trialLifecycleTitleOne": "1 day left in your Teacher Pro trial",
+      "trialLifecycleBody": "Keep unlimited classes and printable reports — $9/mo after the trial.",
+      "trialLifecycleCta": "Keep Pro — $9/mo",
       "checkoutError": "Failed to start checkout. Please try again.",
       "signInRequired": "Please sign in to upgrade to Teacher Pro.",
       "currentPlan": "You're on this plan",

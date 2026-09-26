@@ -12920,7 +12920,8 @@ const he = {
       "trialActive": "ניסיון Pro",
       "trialDayLeft": "נותר יום אחד",
       "trialDaysLeft": "נותרו {count} ימים",
-      "trialEndsToday": "מסתיים היום"
+      "trialEndsToday": "מסתיים היום",
+      "trialEnded": "הניסיון הסתיים"
     },
     "proGate": {
       "analytics": {
@@ -12949,6 +12950,7 @@ const he = {
       "proCtaHint": "פתחו כל משחק, כל תלמיד, ודוחות PDF להדפסה.",
       "weeklySubject": "השבוע בכיתה שלך",
       "polarTrialExpiredLine": "תקופת הניסיון של Teacher Pro הסתיימה. הפעילו מחדש כדי לשמור על דוחות הכיתה.",
+      "polarTrialActiveLine": "נותרו {count} ימים בניסיון Teacher Pro. שמרו על דוחות וכיתות ללא הגבלה ב-9$ לחודש.",
       "regionLabel": "תקציר התקדמות עבור {{classroom}}",
       "scheduleReteachCta": "לקבוע Live לחזרה בעוד ~{{days}} ימים",
       "scheduleReteachConfirm": "Live לחזרה נקבע ל־{{date}} (~{{days}} ימים). הזמנה ליומן נפתחה.",
@@ -13002,6 +13004,11 @@ const he = {
       "trialEndedTitle": "תקופת הניסיון של Teacher Pro הסתיימה",
       "trialEndedBody": "הפעילו מחדש ב-9$ לחודש. זו לא תקופת ניסיון נוספת.",
       "trialEndedCta": "להמשיך ב-Pro — 9$ לחודש",
+      "trialLifecycleTitle": "נותרו {count} ימים בניסיון Teacher Pro",
+      "trialLifecycleTitleToday": "ניסיון Teacher Pro מסתיים היום",
+      "trialLifecycleTitleOne": "נותר יום אחד בניסיון Teacher Pro",
+      "trialLifecycleBody": "שמרו על כיתות ללא הגבלה ודוחות להדפסה — 9$ לחודש אחרי הניסיון.",
+      "trialLifecycleCta": "להמשיך ב-Pro — 9$ לחודש",
       "checkoutError": "התשלום לא הצליח להתחיל. נסו שוב.",
       "signInRequired": "אנא התחברו כדי לשדרג ל-Teacher Pro.",
       "currentPlan": "אתם במסלול הזה",

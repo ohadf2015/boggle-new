@@ -21,25 +21,25 @@ describe('polarTrialExpires', () => {
 describe('polarTrialUx', () => {
   it('a live Polar trial shows the badge and neither ask', () => {
     expect(polarTrialUx({ hasPro: true, status: 'trialing', source: 'polar', trialUsed: true })).toEqual({
-      showBadge: true, showReactivation: false, offerTrial: false,
+      showBadge: true, showLifecycleBanner: true, showReactivation: false, offerTrial: false,
     });
   });
 
   it('a paying teacher sees no trial chrome', () => {
     expect(polarTrialUx({ hasPro: true, status: 'active', source: 'polar', trialUsed: true })).toEqual({
-      showBadge: false, showReactivation: false, offerTrial: false,
+      showBadge: false, showLifecycleBanner: false, showReactivation: false, offerTrial: false,
     });
   });
 
   it('an expired Polar trial reactivates for $9 and does not offer another trial', () => {
     expect(polarTrialUx({ hasPro: false, status: 'canceled', source: 'polar', trialUsed: true })).toEqual({
-      showBadge: false, showReactivation: true, offerTrial: false,
+      showBadge: false, showLifecycleBanner: false, showReactivation: true, offerTrial: false,
     });
   });
 
   it('a free teacher who never trialed can start one', () => {
     expect(polarTrialUx({ hasPro: false, status: 'active', source: 'polar', trialUsed: false })).toEqual({
-      showBadge: false, showReactivation: false, offerTrial: true,
+      showBadge: false, showLifecycleBanner: false, showReactivation: false, offerTrial: true,
     });
   });
 

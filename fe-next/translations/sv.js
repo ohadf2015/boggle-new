@@ -13300,7 +13300,8 @@ const sv = {
       "trialActive": "Pro-provperiod",
       "trialDayLeft": "1 dag kvar",
       "trialDaysLeft": "{count} dagar kvar",
-      "trialEndsToday": "Slutar idag"
+      "trialEndsToday": "Slutar idag",
+      "trialEnded": "Provperioden är slut"
     },
     "proGate": {
       "analytics": {
@@ -13329,6 +13330,7 @@ const sv = {
       "proCtaHint": "Lås upp varje spel, varje elev och utskrivbara PDF:er.",
       "weeklySubject": "Den här veckan i din klass",
       "polarTrialExpiredLine": "Din provperiod på Teacher Pro är slut. Aktivera igen för att behålla klassrapporterna.",
+      "polarTrialActiveLine": "Din Teacher Pro-provperiod har {count} dagar kvar. Behåll rapporter och obegränsade klasser för 9 $/mån.",
       "regionLabel": "Fortgångssammandrag för {{classroom}}",
       "scheduleReteachCta": "Schemalägg reteach-Live om ~{{days}} dagar",
       "scheduleReteachConfirm": "Reteach-Live schemalagd till {{date}} (~{{days}} dagar). Kalenderinbjudan öppnades.",
@@ -13382,6 +13384,11 @@ const sv = {
       "trialEndedTitle": "Din provperiod på Teacher Pro är slut",
       "trialEndedBody": "Aktivera igen för 9 $/månad. Det här är inte en ny gratis provperiod.",
       "trialEndedCta": "Behåll Pro — 9 $/mån",
+      "trialLifecycleTitle": "{count} dagar kvar av din Teacher Pro-provperiod",
+      "trialLifecycleTitleToday": "Din Teacher Pro-provperiod slutar idag",
+      "trialLifecycleTitleOne": "1 dag kvar av din Teacher Pro-provperiod",
+      "trialLifecycleBody": "Behåll obegränsade klasser och utskrivbara rapporter — 9 $/mån efter provperioden.",
+      "trialLifecycleCta": "Behåll Pro — 9 $/mån",
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",

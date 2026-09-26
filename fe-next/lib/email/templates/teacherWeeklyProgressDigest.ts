@@ -29,6 +29,8 @@ interface Copy {
   cta: string;
   trialEndedCta: string;
   trialEndedLine: string;
+  trialActiveCta: string;
+  trialActiveLine: (days: number) => string;
   ctaNote: string;
   openDashboard: string;
   signoff: string;
@@ -48,6 +50,13 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     cta: `Start Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mo`,
     trialEndedCta: 'Reactivate Teacher Pro',
     trialEndedLine: 'Your Teacher Pro trial ended — keep reports and unlimited classes for $9/mo.',
+    trialActiveCta: 'Keep Pro — $9/mo',
+    trialActiveLine: (days) =>
+      days <= 0
+        ? 'Your Teacher Pro trial ends today — keep reports and unlimited classes for $9/mo.'
+        : days === 1
+          ? '1 day left in your Teacher Pro trial — keep reports and unlimited classes for $9/mo.'
+          : `${days} days left in your Teacher Pro trial — keep reports and unlimited classes for $9/mo.`,
     ctaNote: 'Unlimited classes, printable reports, Polar checkout. Cancel anytime.',
     openDashboard: 'Open teacher dashboard',
     signoff: '— LexiClash',
@@ -65,6 +74,13 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     cta: `התחלת Teacher Pro — $${TEACHER_PRO_PRICE_USD}/חודש`,
     trialEndedCta: 'הפעל מחדש את Teacher Pro',
     trialEndedLine: 'תקופת הניסיון של Teacher Pro הסתיימה — המשך ב-$9 לחודש.',
+    trialActiveCta: 'להמשיך ב-Pro — 9$ לחודש',
+    trialActiveLine: (days) =>
+      days <= 0
+        ? 'ניסיון Teacher Pro מסתיים היום — שמרו על דוחות וכיתות ללא הגבלה ב-9$ לחודש.'
+        : days === 1
+          ? 'נותר יום אחד בניסיון Teacher Pro — שמרו על דוחות וכיתות ללא הגבלה ב-9$ לחודש.'
+          : `נותרו ${days} ימים בניסיון Teacher Pro — שמרו על דוחות וכיתות ללא הגבלה ב-9$ לחודש.`,
     ctaNote: 'כיתות ללא הגבלה, דוחות להדפסה, תשלום Polar. ביטול בכל עת.',
     openDashboard: 'ללוח המורה',
     signoff: '— LexiClash',
@@ -98,13 +114,22 @@ export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subj
   const expiredLine = digest.polarTrialExpiredLineKey
     ? `<p style="color:#0b1220;font-size:15px;font-weight:700">${escape(c.trialEndedLine)}</p>`
     : '';
+  const activeLine = digest.polarTrialActiveLineKey
+    ? `<p style="color:#0b1220;font-size:15px;font-weight:700">${escape(c.trialActiveLine(digest.polarTrialDaysLeft ?? 0))}</p>`
+    : '';
 
-  const cta = digest.hasPro
-    ? ''
-    : `${expiredLine}<p style="margin:24px 0">
-<a href="${upgradeUrl(digest.locale)}" style="display:inline-block;background:#ff4d8d;color:#0b1220;font-weight:800;padding:12px 20px;text-decoration:none;border-radius:8px">${escape(digest.polarTrialExpired ? c.trialEndedCta : c.cta)}</a>
+  const showUpgrade = !digest.hasPro || digest.polarTrialActive;
+  const ctaLabel = digest.polarTrialExpired
+    ? c.trialEndedCta
+    : digest.polarTrialActive
+      ? c.trialActiveCta
+      : c.cta;
+  const cta = showUpgrade
+    ? `${expiredLine}${activeLine}<p style="margin:24px 0">
+<a href="${upgradeUrl(digest.locale)}" style="display:inline-block;background:#ff4d8d;color:#0b1220;font-weight:800;padding:12px 20px;text-decoration:none;border-radius:8px">${escape(ctaLabel)}</a>
 </p>
-<p style="color:#555;font-size:13px">${escape(c.ctaNote)}</p>`;
+<p style="color:#555;font-size:13px">${escape(c.ctaNote)}</p>`
+    : '';
 
   return {
     subject: c.subject(n),
