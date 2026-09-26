@@ -16,6 +16,11 @@
  * The entry's lazy islands are declared in entryLazy.tsx, and entryChrome.ts,
  * which the page itself imports, pulls that module into the route's chunk
  * group, where the loaders are already available when EntryScreen loads.
+ *
+ * Limit: the walk skips node_modules, so a package with its own internal
+ * import() (the @capacitor/browser pattern) would bring the phantom back
+ * without failing here. The real check is curling every <link rel="preload">
+ * href in the SSR HTML of /<locale>/multiplayer and requiring a 200.
  */
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, statSync } from 'node:fs';
