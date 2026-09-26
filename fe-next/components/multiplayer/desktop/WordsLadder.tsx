@@ -61,7 +61,7 @@ function WordsLadderImpl({ words, meId }: WordsLadderProps) {
             data-bump={idx === 0 ? 'true' : 'false'}
             className={`flex justify-between items-center text-sm px-2 py-1 rounded ${mine ? 'text-foreground' : 'text-foreground/60'} ${stolen ? 'line-through decoration-red-500' : ''} ${idx === 0 ? 'animate-ladder-bump font-bold' : ''}`}
           >
-            <span className="font-mono">{w.word}</span>
+            <span dir="auto" className="font-neo-display font-bold uppercase">{w.word}</span>
             {w.inputMethod === 'kb' && (
               <span
                 data-testid={`ladder-kb-chip-${w.word}`}
