@@ -18452,7 +18452,22 @@ const es = {
       "hostLeftIn": "Volviendo a las arenas en {{seconds}} s",
       "editName": "Cambiar nombre"
     },
-    "lobby": {},
+    "lobby": {
+      "squad": "Tu equipo",
+      "startVsBots": "contra bots · {count}/{max}",
+      "seatsTaken": "{count}/{max} jugadores",
+      "chat": "Chat",
+      "invite": "Invitar",
+      "inviteTitle": "Invita a tus amigos",
+      "howToPlay": "Cómo jugar",
+      "scanToJoin": "Escanea para unirte",
+      "orEnterCode": "o introduce el código",
+      "tvJoinHeadline": "¡Saca el móvil y únete!",
+      "letters": "letras",
+      "editSettings": "Editar ajustes de la ronda",
+      "chatHint": "Saluda al grupo",
+      "chatUnread": "{count} nuevos"
+    },
     "round": {},
     "results": {}
   }

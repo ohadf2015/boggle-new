@@ -18434,7 +18434,22 @@ const sv = {
       "hostLeftIn": "Tillbaka till arenorna om {{seconds}} s",
       "editName": "Byt namn"
     },
-    "lobby": {},
+    "lobby": {
+      "squad": "Gänget",
+      "startVsBots": "mot bottar · {count}/{max}",
+      "seatsTaken": "{count}/{max} spelare",
+      "chat": "Chatt",
+      "invite": "Bjud in",
+      "inviteTitle": "Bjud in vänner",
+      "howToPlay": "Så spelar du",
+      "scanToJoin": "Skanna för att gå med",
+      "orEnterCode": "eller ange koden",
+      "tvJoinHeadline": "Ta fram mobilen och häng med!",
+      "letters": "bokstäver",
+      "editSettings": "Ändra rundans inställningar",
+      "chatHint": "Säg hej till gänget",
+      "chatUnread": "{count} nya"
+    },
     "round": {},
     "results": {}
   }

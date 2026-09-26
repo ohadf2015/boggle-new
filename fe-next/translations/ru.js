@@ -18167,7 +18167,22 @@ const ru = {
       "hostLeftIn": "Возврат к аренам через {{seconds}} с",
       "editName": "Сменить имя"
     },
-    "lobby": {},
+    "lobby": {
+      "squad": "Команда",
+      "startVsBots": "против ботов · {count}/{max}",
+      "seatsTaken": "{count}/{max} игроков",
+      "chat": "Чат",
+      "invite": "Позвать",
+      "inviteTitle": "Позови друзей",
+      "howToPlay": "Как играть",
+      "scanToJoin": "Сканируй, чтобы войти",
+      "orEnterCode": "или введи код",
+      "tvJoinHeadline": "Доставай телефон и заходи!",
+      "letters": "букв",
+      "editSettings": "Изменить настройки раунда",
+      "chatHint": "Скажи привет команде",
+      "chatUnread": "{count} новых"
+    },
     "round": {},
     "results": {}
   }

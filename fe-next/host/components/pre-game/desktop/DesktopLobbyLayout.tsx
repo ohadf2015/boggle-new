@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
 import { cn } from '../../../../lib/utils';
 
 // ==================== Types ====================
@@ -32,22 +31,20 @@ export function DesktopLobbyLayout({
   className,
 }: DesktopLobbyLayoutProps): React.ReactElement {
   return (
-    <m.div
+    // Static: a full-area layer never fades in (DESIGN e.2 / pitfall class 5).
+    <div
       data-testid="desktop-lobby-layout"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
-        'grid flex-1 min-h-0 p-4 desktop-tall:p-6 xl:desktop-tall:p-8 bg-neo-navy',
+        'grid flex-1 min-h-0 p-4 desktop-tall:px-6 desktop-tall:py-5 bg-neo-navy',
         'grid-cols-12',
-        'gap-4 desktop-tall:gap-5 xl:desktop-tall:gap-8',
+        'gap-4 desktop-tall:gap-5 xl:desktop-tall:gap-6',
         className
       )}
     >
       {/* Left Column - Hero Start + Players + Settings */}
       <div
         data-testid="desktop-left-column"
-        className="col-span-7 xl:col-span-8 flex flex-col gap-5 xl:gap-6 overflow-y-auto overscroll-contain scrollable-area min-h-0"
+        className="col-span-7 xl:col-span-8 flex flex-col gap-4 overflow-y-auto overscroll-contain scrollable-area min-h-0"
       >
         {leftContent}
       </div>
@@ -59,7 +56,7 @@ export function DesktopLobbyLayout({
       >
         {rightContent}
       </div>
-    </m.div>
+    </div>
   );
 }
 

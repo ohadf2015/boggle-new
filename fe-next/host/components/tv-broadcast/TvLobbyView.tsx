@@ -1,8 +1,8 @@
 'use client';
 
 import React, { memo, useState, useEffect, useMemo } from 'react';
-import { m } from 'framer-motion';
-import { Timer, Zap, Monitor } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import { Zap, Monitor } from 'lucide-react';
 import TvJoinBar from './TvJoinBar';
 import { PlayerRoster } from '../pre-game/PlayerRoster';
 import { StartButton } from '../pre-game/StartButton';
@@ -18,6 +18,8 @@ import { useClassroomModeSeed } from '../../hooks/useClassroomModeSeed';
 import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import { LobbyDevChromeGuard } from '@/components/multiplayer/lobby/LobbyDevChromeGuard';
+import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
 
 /** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
 const SOLO_DEMO_FILL_TIMEOUT_MS = 8000;
@@ -228,50 +230,40 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
           practiceRoundPending={soloDemoInProgress}
           practiceRoundFailed={soloDemoFailed}
         />
+        <LobbyDevChromeGuard />
         {/* Receive-only emoji floats — students fling reactions, the wall shows them. */}
         <LobbyReactions username={username} receiveOnly />
       </>
     );
   }
 
+  // Same address the join bar encodes, so both QRs land in the same place.
+  const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/${roomLanguage}/join/${gameCode}` : '';
+
+  // Projector lobby, 10-ft readable: persistent join bar on top (the same bar
+  // the round broadcast keeps), then the room — seats + mode — beside a hero
+  // join card (QR + code) and the one START. Fits 1920×1080 with no scroll.
   return (
-    <div data-testid="tv-lobby-view" className="flex flex-col h-full min-h-screen bg-neo-navy">
-      {/* Join bar — QR + code at the top */}
-      <TvJoinBar
-        gameCode={gameCode}
-        playerCount={playerCount}
-        language={roomLanguage}
-        t={t}
-      />
+    <div data-testid="tv-lobby-view" className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-neo-navy text-neo-white tv:[--mp-u:1.25]">
+      <LobbyDevChromeGuard />
+      <TvJoinBar gameCode={gameCode} playerCount={playerCount} language={roomLanguage} t={t} />
 
-      {/* View-only badge — always-on reminder that the host is the screen, not a
-          competitor. The first-toggle tutorial says this once; this carries the
-          message for repeat hosts the tutorial won't re-show for. */}
-      <div className="flex justify-center pt-4">
-        <span
-          data-testid="tv-view-only-badge"
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-neo-cyan bg-neo-cyan/15 text-neo-cyan text-sm font-bold uppercase tracking-wider shadow-hard-sm"
-        >
-          <Monitor className="w-4 h-4 shrink-0" />
-          {t('tvLobby.viewOnlyBadge')}
-        </span>
-      </div>
-
-      {/* Main content grid */}
-      <div className="flex-1 grid grid-cols-3 gap-6 p-8 max-w-7xl mx-auto w-full">
-        {/* Left column: Players */}
-        <div className="col-span-2 flex flex-col gap-6">
-          {/* Waiting headline */}
-          <m.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-neo-display font-black text-neo-cream text-center"
-          >
-            {t('tvLobby.waitingForPlayers')}
-          </m.h1>
-
-          {/* Player roster — TV-sized */}
-          <div className="flex-1">
+      <div className="flex-1 min-h-0 grid grid-cols-12 gap-6 tv:gap-10 px-6 py-5 tv:px-10 tv:py-6 w-full max-w-[1800px] mx-auto">
+        {/* Left: who's in + what we play */}
+        <div className="col-span-7 min-h-0 flex flex-col gap-4 tv:gap-5">
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="font-neo-display font-bold text-[clamp(28px,4.4vh,52px)] text-neo-white leading-tight">
+              {t('tvLobby.waitingForPlayers')}
+            </h1>
+            <span
+              data-testid="tv-view-only-badge"
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-neo-black bg-neo-cyan text-neo-black text-sm tv:text-lg font-bold uppercase tracking-wider shadow-hard-sm"
+            >
+              <Monitor aria-hidden="true" className="w-4 h-4 tv:w-5 tv:h-5 shrink-0" />
+              {t('tvLobby.viewOnlyBadge')}
+            </span>
+          </div>
+          <div className="shrink-0 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
             <PlayerRoster
               players={filteredPlayers}
               username={username}
@@ -279,102 +271,112 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
               maxPlayers={8}
               readyUsernames={readyUsernames}
               t={t}
+              variant="tv"
             />
           </div>
-        </div>
-
-        {/* Right column: Settings + Start */}
-        <div className="flex flex-col gap-6">
-          {/* Game settings summary */}
-          <div
-            data-testid="tv-lobby-settings"
-            className="bg-neo-navy-light border-neo rounded-neo p-6 space-y-4"
-          >
-            <div className="flex items-center gap-3 text-neo-cream">
-              <Timer className="w-6 h-6 text-neo-cyan" />
-              <span className="text-2xl font-neo-display font-bold">{timerValue}</span>
-              <span className="text-lg text-neo-cream/60">{t('tvLobby.seconds')}</span>
-            </div>
-            <div className="flex items-center gap-3 text-neo-cream">
-              <Zap className="w-6 h-6 text-neo-lime" />
-              <span className="text-2xl font-neo-display font-bold capitalize">{difficulty}</span>
-            </div>
-          </div>
-
-          {/* Battle mode selector — arcade rooms only. A classroom room's mode is
-              fixed in the setup wizard and already stated in the settings panel
-              above; offering a picker here (which does not even list the quiz)
-              only asks a teacher to re-choose something they cannot change. */}
-          {!isClassroomMode && (
+          <div className="flex-1 min-h-0 flex flex-col rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-4 tv:p-5">
             <BattleModeCard
+              fill
               selectedGameMode={selectedGameMode}
               setSelectedGameMode={setSelectedGameMode}
               t={t}
               isAdmin={isAdmin}
+              language={roomLanguage}
             />
-          )}
+          </div>
+        </div>
 
-          {/* Auto-start countdown banner (everyone ready) */}
+        {/* Right: the join card, settings, START */}
+        <div className="col-span-5 min-h-0 flex flex-col gap-4 tv:gap-6">
+          <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-purple/20 shadow-hard p-4 tv:p-6 text-center">
+            <p className="font-neo-display font-bold uppercase tracking-wider text-neo-lime text-xl tv:text-3xl">
+              {t('mpUi.lobby.tvJoinHeadline')}
+            </p>
+            <div className="rounded-neo border-4 border-neo-black bg-white p-3 shadow-hard">
+              <QRCodeSVG
+                value={joinUrl || gameCode}
+                size={360}
+                level="M"
+                bgColor="#ffffff"
+                fgColor="#000000"
+                className="block w-[min(360px,30vh)] h-[min(360px,30vh)]"
+                role="img"
+                aria-label={t('hostView.scanToJoin')}
+              />
+            </div>
+            <span
+              dir="ltr"
+              data-testid="tv-lobby-code"
+              className="font-neo-display font-bold uppercase leading-none tracking-[0.15em] text-neo-white text-[min(120px,10vh)]"
+            >
+              {gameCode}
+            </span>
+          </div>
+
+          <div data-testid="tv-lobby-settings" className="shrink-0">
+            <LobbySettingsSummary timerValue={timerValue} difficulty={difficulty} t={t} className="text-xl tv:text-2xl py-3 bg-neo-navy-light" />
+          </div>
+
           {autoStartSecondsLeft !== null && (
-            <div className="bg-neo-lime/20 border-3 border-neo-lime rounded-neo-lg px-4 py-3 flex items-center justify-between shadow-hard" role="status" aria-live="polite">
-              <span className="text-neo-lime font-neo-display font-bold text-lg flex items-center gap-2">
-                <Zap className="w-5 h-5 shrink-0" />
+            <div className="shrink-0 bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo-lg px-4 py-3 flex items-center justify-between shadow-hard" role="status" aria-live="polite">
+              <span className="font-neo-display font-bold text-xl flex items-center gap-2">
+                <Zap aria-hidden="true" className="w-5 h-5 shrink-0" />
                 {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
               </span>
               <button
+                type="button"
                 onClick={cancelAutoStart}
-                className="text-sm font-bold uppercase text-neo-lime border-2 border-neo-lime/60 rounded-lg px-4 py-1.5 hover:bg-neo-lime/10 transition-colors shrink-0"
+                className="text-sm font-bold uppercase border-2 border-neo-black bg-neo-navy text-neo-lime rounded-neo px-4 py-1.5 shrink-0"
               >
                 {t('common.cancel')}
               </button>
             </div>
           )}
 
-          {/* Start button — big for TV */}
-          <StartButton
-            onStartGame={onStartGame}
-            disabled={playerCount === 0}
-            tournamentCreating={tournamentCreating}
-            playerCount={playerCount}
-            t={t}
-            labelKey={isClassroomMode ? classroomStartLabelKey(classroomGameMode) : undefined}
-            className="text-2xl"
-          />
+          <div className="shrink-0">
+            <StartButton
+              onStartGame={onStartGame}
+              disabled={playerCount === 0}
+              tournamentCreating={tournamentCreating}
+              playerCount={playerCount}
+              t={t}
+              labelKey={isClassroomMode ? classroomStartLabelKey(classroomGameMode) : undefined}
+            />
+          </div>
 
-          {/* Solo demo button — practice round with stand-in players (teacher testing alone) */}
-          {onStartSoloDemoWithBots && (
-            <button
-              data-testid="solo-demo-button"
-              onClick={handleSoloDemoClick}
-              disabled={playerCount > 0 || soloDemoInProgress}
-              className="flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-2 border-neo-lime bg-neo-lime/10 text-neo-lime hover:bg-neo-lime/20 hover:border-neo-lime disabled:opacity-50 disabled:cursor-not-allowed text-base font-bold shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all"
-            >
-              <Zap className="w-5 h-5 shrink-0" />
-              {soloDemoInProgress ? t('common.loading') : t('tvLobby.tryPracticeRound')}
-            </button>
+          {(onStartSoloDemoWithBots || setHostPlaying) && (
+            <div className="shrink-0 flex gap-3">
+              {onStartSoloDemoWithBots && (
+                <button
+                  type="button"
+                  data-testid="solo-demo-button"
+                  onClick={handleSoloDemoClick}
+                  disabled={playerCount > 0 || soloDemoInProgress}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-lime disabled:opacity-50 disabled:cursor-not-allowed text-base font-bold shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+                >
+                  <Zap aria-hidden="true" className="w-5 h-5 shrink-0" />
+                  {soloDemoInProgress ? t('common.loading') : t('tvLobby.tryPracticeRound')}
+                </button>
+              )}
+              {/* Back to phone/player mode — plain to find for a host who landed here by mistake. */}
+              {setHostPlaying && (
+                <button
+                  type="button"
+                  data-testid="switch-to-player-mode"
+                  onClick={() => setHostPlaying(true)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white text-base font-bold shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+                >
+                  <Monitor aria-hidden="true" className="w-5 h-5 shrink-0" />
+                  {t('tvLobby.switchToPlayer')}
+                </button>
+              )}
+            </div>
           )}
 
           {soloDemoFailed && (
-            <p
-              data-testid="solo-demo-failed"
-              role="status"
-              className="text-center text-base font-bold text-neo-pink"
-            >
+            <p data-testid="solo-demo-failed" role="status" className="text-center text-base font-bold text-neo-pink">
               {t('tvLobby.practiceRoundFailed')}
             </p>
-          )}
-
-          {/* Exit TV mode → switch back to phone/player mode. Prominent so a host
-              who landed here by mistake can clearly find the way out. */}
-          {setHostPlaying && (
-            <button
-              data-testid="switch-to-player-mode"
-              onClick={() => setHostPlaying(true)}
-              className="flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-cream hover:bg-neo-cream/10 hover:border-neo-cream text-base font-bold shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all"
-            >
-              <Monitor className="w-5 h-5 shrink-0" />
-              {t('tvLobby.switchToPlayer')}
-            </button>
           )}
         </div>
       </div>

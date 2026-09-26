@@ -18434,7 +18434,22 @@ const ja = {
       "hostLeftIn": "{{seconds}}秒後にアリーナへ戻ります",
       "editName": "名前を変更"
     },
-    "lobby": {},
+    "lobby": {
+      "squad": "メンバー",
+      "startVsBots": "ボット対戦 · {count}/{max}",
+      "seatsTaken": "{count}/{max}人",
+      "chat": "チャット",
+      "invite": "招待",
+      "inviteTitle": "友だちを招待",
+      "howToPlay": "遊び方",
+      "scanToJoin": "スキャンして参加",
+      "orEnterCode": "またはコードを入力",
+      "tvJoinHeadline": "スマホを出して参加しよう！",
+      "letters": "文字",
+      "editSettings": "ラウンド設定を変更",
+      "chatHint": "みんなにあいさつしよう",
+      "chatUnread": "新着 {count}件"
+    },
     "round": {},
     "results": {}
   }
