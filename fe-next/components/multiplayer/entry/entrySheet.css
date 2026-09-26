@@ -1,6 +1,16 @@
 /*
- * Entry sheets (EntrySheet.tsx): the panel is painted where it rests from the
- * first frame; its rows settle in instead. Transform only, no opacity (a
+ * The panel is painted where it rests from the first frame. MpSheet (FOUNDATION)
+ * slides it in; an entry sheet sits in the at-rest scope, which stills exactly
+ * those two slide classes. Three class/attribute parts outrank globals.css's
+ * `[dir='rtl'] .animate-mp-sheet-in` whatever order the stylesheets load in.
+ */
+.mp-entry-sheet-at-rest [data-side].animate-mp-sheet-up,
+.mp-entry-sheet-at-rest [data-side].animate-mp-sheet-in {
+  animation: none;
+}
+
+/*
+ * The rows settle in instead of the panel. Transform only, no opacity (a
  * mid-fade CTA reads as disabled), offsets small enough that no frame can push
  * a row out of the panel's padding. `backwards` holds each staggered row on its
  * start frame through its delay — without it a row paints in place, jumps up

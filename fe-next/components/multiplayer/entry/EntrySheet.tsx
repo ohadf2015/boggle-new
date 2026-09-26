@@ -11,6 +11,12 @@ import './entrySheet.css';
 
 /** The settle body: its direct children animate in (entrySheet.css). */
 export const ENTRY_SHEET_BODY_CLASS = 'mp-entry-sheet-body';
+/**
+ * The scope that stills MpSheet's slide (entrySheet.css). MpSheet is
+ * FOUNDATION's and keeps sliding for every other piece; only a sheet opened
+ * through EntrySheet sits inside this scope.
+ */
+export const ENTRY_SHEET_AT_REST_CLASS = 'mp-entry-sheet-at-rest';
 
 const TONE = {
   lime: 'bg-neo-lime',
@@ -37,9 +43,11 @@ export interface EntrySheetProps {
  *
  * The panel never slides: it is painted where it rests from the first frame,
  * so a sheet looks the same whenever it is looked at and however it was opened
- * (a typed code, a room card, a header chip — pitfall class 3). The rows settle
- * in instead (transform only, reduced-motion aware); a row marked
- * `data-entry-cta` lands last with a small stamp and a glint.
+ * (a typed code, a room card, a header chip — pitfall class 3). The stilling
+ * lives in the entry's own stylesheet, scoped to a box-less wrapper, so MpSheet
+ * itself is untouched. The rows settle in instead (transform only,
+ * reduced-motion aware); a row marked `data-entry-cta` lands last with a small
+ * stamp and a glint.
  *
  * A sheet renders outside MpScreen, so it carries its own TV unit (`--mp-u`):
  * the CTA inside matches the footer's 96px TV height.
@@ -72,10 +80,14 @@ export function EntrySheet({ open, onClose, title, icon: Icon, tone = 'cyan', te
     title
   );
 
+  if (!open) return null;
+
   return (
-    <MpSheet open={open} onClose={onClose} title={heading} side={side} entrance="static" testId={testId}>
-      <div className={cn(ENTRY_SHEET_BODY_CLASS, 'flex flex-col gap-4 tv:gap-6 [--mp-u:1] tv:[--mp-u:1.5]')}>{children}</div>
-    </MpSheet>
+    <div className={cn(ENTRY_SHEET_AT_REST_CLASS, 'contents')}>
+      <MpSheet open onClose={onClose} title={heading} side={side} testId={testId}>
+        <div className={cn(ENTRY_SHEET_BODY_CLASS, 'flex flex-col gap-4 tv:gap-6 [--mp-u:1] tv:[--mp-u:1.5]')}>{children}</div>
+      </MpSheet>
+    </div>
   );
 }
 

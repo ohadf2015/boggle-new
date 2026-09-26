@@ -6,6 +6,11 @@
  * button, and the phone CTA below the fold — while the same sheet opened by the
  * other path looked fine (pitfall class 3). The juice moves onto the content:
  * transform-only, small offsets that can never push a CTA off screen.
+ *
+ * MpSheet is FOUNDATION's (DESIGN §f) and keeps its slide for every other
+ * piece: the entry stills it from its own stylesheet, scoped to the wrapper
+ * EntrySheet puts around the sheet. These tests pin that the scoped rule really
+ * lands on the rendered panel (and on nothing else).
  */
 import React from 'react';
 import fs from 'node:fs';
@@ -16,7 +21,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k }) }));
 
 import { MpSheet } from '../../shell/MpSheet';
-import { EntrySheet, EntrySheetCta, ENTRY_SHEET_BODY_CLASS } from '../EntrySheet';
+import { EntrySheet, EntrySheetCta, ENTRY_SHEET_BODY_CLASS, ENTRY_SHEET_AT_REST_CLASS } from '../EntrySheet';
 
 function mockDesktop(matches: boolean) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -31,10 +36,24 @@ function mockDesktop(matches: boolean) {
   })) as unknown as typeof window.matchMedia;
 }
 
-const SLIDE = /animate-mp-sheet-(up|in)/;
+const SHEET_CSS = fs
+  .readFileSync(path.resolve(__dirname, '../entrySheet.css'), 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '');
 
-describe('MpSheet entrance', () => {
-  it('keeps its slide by default (other pieces render it unchanged)', () => {
+/**
+ * The selector list of every entrySheet.css rule that stills a slide inside the
+ * entry scope (`animation: none` under the at-rest class). '' when none exists.
+ */
+const AT_REST = Array.from(SHEET_CSS.matchAll(/([^{}]+)\{([^{}]*)\}/g))
+  .filter(([, selector, body]) => selector.includes(`.${ENTRY_SHEET_AT_REST_CLASS}`) && /animation:\s*none/.test(body))
+  .map(([, selector]) => selector.trim())
+  .join(', ');
+
+/** Class + attribute + pseudo-class count: the middle digit of specificity. */
+const classWeight = (selector: string) => (selector.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+/g) ?? []).length;
+
+describe('MpSheet (FOUNDATION) keeps its slide', () => {
+  it('slides by default (other pieces render it unchanged)', () => {
     const { unmount } = render(<MpSheet open onClose={() => {}} title="T">b</MpSheet>);
     expect(screen.getByTestId('mp-sheet-panel').className).toContain('animate-mp-sheet-up');
     unmount();
@@ -42,14 +61,27 @@ describe('MpSheet entrance', () => {
     expect(screen.getByTestId('mp-sheet-panel').className).toContain('animate-mp-sheet-in');
   });
 
-  it('entrance="static" paints the panel where it rests — no slide on either side', () => {
-    const { unmount } = render(<MpSheet open onClose={() => {}} title="T" entrance="static">b</MpSheet>);
-    expect(screen.getByTestId('mp-sheet-panel').className).not.toMatch(SLIDE);
+  it('a bare MpSheet is outside the entry scope — the stilling rule never reaches it', () => {
+    expect(AT_REST).not.toBe('');
+    const { unmount } = render(<MpSheet open onClose={() => {}} title="T">b</MpSheet>);
+    expect(screen.getByTestId('mp-sheet-panel').matches(AT_REST)).toBe(false);
     unmount();
-    render(<MpSheet open onClose={() => {}} title="T" side="end" entrance="static">b</MpSheet>);
-    const panel = screen.getByTestId('mp-sheet-panel');
-    expect(panel.className).not.toMatch(SLIDE);
-    expect(panel.getAttribute('data-side')).toBe('end');
+    render(<MpSheet open onClose={() => {}} title="T" side="end">b</MpSheet>);
+    expect(screen.getByTestId('mp-sheet-panel').matches(AT_REST)).toBe(false);
+  });
+});
+
+describe('the entry scope stills the panel (entrySheet.css)', () => {
+  it('names both of MpSheet\'s slide classes, and nothing looser', () => {
+    const selectors = AT_REST.split(',').map((s) => s.trim());
+    expect(selectors.some((s) => s.includes('.animate-mp-sheet-up'))).toBe(true);
+    expect(selectors.some((s) => s.includes('.animate-mp-sheet-in'))).toBe(true);
+    for (const s of selectors) expect(s).toMatch(/\.animate-mp-sheet-(up|in)\b/);
+  });
+
+  it('outranks the RTL slide rule ([dir=\'rtl\'] .animate-mp-sheet-in) whatever the stylesheet order', () => {
+    const rtlRule = "[dir='rtl'] .animate-mp-sheet-in";
+    for (const s of AT_REST.split(',')) expect(classWeight(s)).toBeGreaterThan(classWeight(rtlRule));
   });
 });
 
@@ -64,7 +96,7 @@ describe('EntrySheet', () => {
     render(<EntrySheet open onClose={() => {}} title="New room" testId="create-sheet"><p>row</p></EntrySheet>);
     const panel = screen.getByTestId('mp-sheet-panel');
     expect(panel.getAttribute('data-side')).toBe('end');
-    expect(panel.className).not.toMatch(SLIDE);
+    expect(panel.matches(AT_REST)).toBe(true);
     expect(screen.getByTestId('create-sheet')).toBeInTheDocument();
   });
 
@@ -73,7 +105,15 @@ describe('EntrySheet', () => {
     render(<EntrySheet open onClose={() => {}} title="Join" testId="join-sheet"><p>row</p></EntrySheet>);
     const panel = screen.getByTestId('mp-sheet-panel');
     expect(panel.getAttribute('data-side')).toBe('bottom');
-    expect(panel.className).not.toMatch(SLIDE);
+    expect(panel.matches(AT_REST)).toBe(true);
+  });
+
+  it('the at-rest scope adds no box (the sheet stays fixed to the viewport)', () => {
+    mockDesktop(false);
+    render(<EntrySheet open onClose={() => {}} title="Join" testId="join-sheet"><p>row</p></EntrySheet>);
+    const scope = screen.getByTestId('join-sheet').parentElement!;
+    expect(scope.classList.contains(ENTRY_SHEET_AT_REST_CLASS)).toBe(true);
+    expect(scope.classList.contains('contents')).toBe(true);
   });
 
   it('wraps the rows in the settle body (the content animates, never the panel)', () => {
