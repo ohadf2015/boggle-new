@@ -12,8 +12,7 @@
  *   - Private/classroom: never force-fills.
  *   - Start: in-flight lock (rage-click), never while a player is mid-ad.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type React from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { useSocket } from '@/utils/SocketContext';
 import { useGameActions, useHostSelectedGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
@@ -58,9 +57,9 @@ export interface UseHostLobbyArgs {
   hostPlaying: boolean;
   playersReady: (string | HostLobbyPlayer)[];
   timerValue: number;
-  setTimerValue: React.Dispatch<React.SetStateAction<number>>;
-  setDifficulty: React.Dispatch<React.SetStateAction<DifficultyLevel>>;
-  setMinWordLength: React.Dispatch<React.SetStateAction<number>>;
+  setTimerValue: Dispatch<SetStateAction<number>>;
+  setDifficulty: Dispatch<SetStateAction<DifficultyLevel>>;
+  setMinWordLength: Dispatch<SetStateAction<number>>;
   tournamentCreating: boolean;
   lessonData?: HostLobbyLessonData | null;
   isPrivate: boolean;

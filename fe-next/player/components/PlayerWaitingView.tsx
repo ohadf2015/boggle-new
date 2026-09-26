@@ -238,7 +238,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
           }
           end={
             <>
-              <MobileShareSection gameCode={gameCode} t={t} compact />
+              <MobileShareSection gameCode={gameCode} t={props.t} compact />
               <LobbyChatButton onPress={() => setSheet('chat')} unread={unread} t={t} className="min-[720px]:hidden" />
               <LobbyAudioButton />
             </>
@@ -262,7 +262,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
             }
             rightContent={
               <>
-                <InviteCard gameCode={gameCode} t={t} />
+                <InviteCard gameCode={gameCode} t={props.t} />
                 <section data-testid="desktop-chat-area" className={cn(CARD, 'flex-1 min-h-48 flex flex-col p-0 overflow-hidden')}>
                   <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
                     {t('mpUi.lobby.chat')}

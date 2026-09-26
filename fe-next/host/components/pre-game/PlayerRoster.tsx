@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { Bot, Check, Crown, Pencil, Plus, X } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useSocket } from '../../../utils/SocketContext';
@@ -92,28 +92,28 @@ export const PlayerRoster = memo(function PlayerRoster({
   // { name, description } keeps the dialog text stable through its exit.
   const [pendingKick, setPendingKick] = useState<{ name: string; description: string } | null>(null);
 
-  const commitSelfNameEdit = useCallback(() => {
+  const commitSelfNameEdit = () => {
     const trimmed = selfNameDraft.trim();
     if (trimmed && trimmed !== username) onSelfNameChange?.(trimmed);
     setIsEditingSelfName(false);
-  }, [selfNameDraft, username, onSelfNameChange]);
+  };
 
-  const addBot = useCallback(() => {
+  const addBot = () => {
     socket?.emit('addBot', { difficulty: 'medium', gameCode });
-  }, [socket, gameCode]);
+  };
 
-  const removeSeat = useCallback((seat: LobbySeat) => {
+  const removeSeat = (seat: LobbySeat) => {
     if (seat.isBot) {
       socket?.emit('removeBot', { username: seat.id, gameCode });
       return;
     }
     setPendingKick({ name: seat.id, description: t('hostView.kickConfirm', { name: seat.id }) });
-  }, [socket, gameCode, t]);
+  };
 
-  const confirmKick = useCallback(() => {
+  const confirmKick = () => {
     if (pendingKick) socket?.emit('kickPlayer', { targetUsername: pendingKick.name });
     setPendingKick(null);
-  }, [pendingKick, socket]);
+  };
 
   const renderSeat = (seat: LobbySeat) => {
     const isMe = seat.id === username;

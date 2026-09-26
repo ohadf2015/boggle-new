@@ -9,7 +9,7 @@
  * Desktop (≥720px) keeps the 7/5 grid: seats + mode left, invite + chat right.
  * All timers / bot rescue / start guards live in `useHostLobby`.
  */
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { BookOpen, Monitor, UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -129,24 +129,24 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   const { sendEmote, cooldownActive } = useLobbyEmotes({ socket: lobby.socket });
 
   const [sheet, setSheet] = useState<'invite' | 'howto' | 'chat' | null>(null);
-  const closeSheet = useCallback(() => setSheet(null), []);
+  const closeSheet = () => setSheet(null);
   const unread = useChatUnread({ socket: lobby.socket, username, open: sheet === 'chat' });
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const [currentAvatar, setCurrentAvatar] = useState<CustomAvatarConfig>(() => getOrCreateStoredCustomAvatar());
-  const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
+  const handleAvatarSave = async (config: CustomAvatarConfig) => {
     setStoredCustomAvatar(config);
     setCurrentAvatar(config);
     onAvatarChange?.(config);
     setIsAvatarBuilderOpen(false);
     await updateProfile({ avatar_config: config }).catch(() => {});
-  }, [onAvatarChange, updateProfile]);
-  const handleSelfNameChange = useCallback((newName: string) => {
+  };
+  const handleSelfNameChange = (newName: string) => {
     const trimmed = newName.trim();
     if (trimmed && trimmed !== username) onNameChange?.(trimmed);
-  }, [username, onNameChange]);
-  const openAvatarBuilder = useCallback(() => setIsAvatarBuilderOpen(true), []);
+  };
+  const openAvatarBuilder = () => setIsAvatarBuilderOpen(true);
 
   // A classroom room's mode was fixed in the setup wizard: no picker here.
   const isClassroomRoom = Boolean(lessonData);
@@ -285,7 +285,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
             }
             rightContent={
               <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
-                {!isPrivate && <InviteCard gameCode={gameCode} t={t} showHint={lobby.humanGuestCount === 0} />}
+                {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} />}
                 <section className={cn(CARD, 'flex-1 min-h-48 flex flex-col p-0 overflow-hidden')}>
                   <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
                     {t('mpUi.lobby.chat')}
