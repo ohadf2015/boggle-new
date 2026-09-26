@@ -156,14 +156,15 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   const allReady = readyTotal > 0 && readyUsernames.length >= readyTotal;
   const sublabel = startSublabel({ seated: seats.length, humanGuests: lobby.humanGuestCount, t });
 
-  // TV/projector toggle — the caption states the consequence at the decision point.
+  // TV/projector toggle. useHostViewState pins phone/tablet (<1024px, read at
+  // mount) to player mode, so the toggle only exists where it can take effect.
   const tvModeToggle = (
     <button
       type="button"
       onClick={() => setHostPlaying((prev) => !prev)}
       aria-label={`${t('hostView.broadcastModeTitle')} — ${t('hostView.broadcastModeDesc')}`}
       className={cn(
-        'inline-flex items-center gap-1.5 h-9 px-2.5 rounded-neo border-2 border-neo-black text-[11px] font-bold uppercase tracking-wider shadow-hard-sm active:translate-y-0.5',
+        'hidden lg:inline-flex items-center gap-1.5 h-9 px-2.5 rounded-neo border-2 border-neo-black text-[11px] font-bold uppercase tracking-wider shadow-hard-sm active:translate-y-0.5',
         !hostPlaying ? 'bg-neo-cyan text-neo-black' : 'bg-neo-navy text-neo-white/70 hover:text-neo-white',
       )}
     >
