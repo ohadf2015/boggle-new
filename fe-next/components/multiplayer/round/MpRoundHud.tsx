@@ -38,7 +38,10 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
       start={
         <>
           <MpBackButton kind="leave" onPress={onExit} />
-          <MpRankChip rank={rank} total={total} flipKey={rankFlipKey} />
+          {/* "#2/4" is a number, not prose: keep it LTR inside RTL layouts. */}
+          <span dir="ltr" className="inline-flex">
+            <MpRankChip rank={rank} total={total} flipKey={rankFlipKey} />
+          </span>
         </>
       }
       center={

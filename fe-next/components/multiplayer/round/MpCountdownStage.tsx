@@ -179,7 +179,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players }: MpCountdownStag
             )}
           </div>
         )}
-        <p className="font-neo-display font-bold uppercase tracking-[0.2em] text-sm tv:text-2xl text-neo-white/60">
+        <p className="font-neo-display font-bold uppercase tracking-[0.2em] rtl:tracking-normal text-sm tv:text-2xl text-neo-white/60">
           {t('mpUi.round.getReady')}
         </p>
       </div>

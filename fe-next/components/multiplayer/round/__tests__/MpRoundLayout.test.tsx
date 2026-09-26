@@ -107,6 +107,11 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-timer').className).toContain('[&_svg~div]:hidden!');
   });
 
+  it('the rank fraction stays LTR in RTL layouts ("#2/3", never "3/#2")', () => {
+    render(<MpRoundLayout {...props()} />);
+    expect(screen.getByTestId('mp-rank-chip').parentElement).toHaveAttribute('dir', 'ltr');
+  });
+
   it('the exit button hands off to the view (which confirms)', () => {
     const onExit = vi.fn();
     render(<MpRoundLayout {...props({ onExit })} />);
