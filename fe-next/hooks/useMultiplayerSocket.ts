@@ -13,6 +13,7 @@ import {
   getSocketURL,
 } from '@/utils/SocketContext';
 import { saveSession, clearSessionPreservingUsername, getSession } from '@/utils/session';
+import { buildRejoinPayload } from '@/lib/multiplayer/reloadRejoin';
 import { setGuestName } from '@/utils/guestManager';
 import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage';
 import logger from '@/utils/logger';
@@ -240,22 +241,14 @@ export function useMultiplayerSocket(
       // This is critical for CrazyGames iframe where the socket can disconnect/reconnect
       // due to visibility changes, giving the socket a new ID and losing server mappings
       if (wasConnectedRef.current && !intentionalLeaveRef.current) {
-        const savedSession = getSession();
-        if (savedSession && savedSession.gameCode && savedSession.username) {
-          logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
-          // Silent reconnect — the socket-status indicator already conveys this
-          // and a "Reconnecting..." toast on every wifi blip was noise.
-          // Re-emit join with full identity context for proper server-side matching
-          // Missing authUserId caused reconnections to lose authenticated player mapping
-          const joinPayload: Record<string, unknown> = {
-            gameCode: savedSession.gameCode,
-            username: savedSession.username,
-          };
-          // Forward auth context from socket handshake if available
-          const socketAuth = socketInstance.auth as Record<string, unknown> | undefined;
-          if (socketAuth?.token) {
-            joinPayload.authToken = socketAuth.token;
-          }
+        // Silent reconnect — the socket-status indicator already conveys this
+        // and a "Reconnecting..." toast on every wifi blip was noise. The join
+        // payload (gameCode + username + handshake authToken — a missing token
+        // lost the authenticated mapping) is the SAME one a page reload sends
+        // (useReloadRejoin): one payload through both doors.
+        const joinPayload = buildRejoinPayload(getSession(), (socketInstance.auth as Record<string, unknown> | undefined)?.token);
+        if (joinPayload) {
+          logger.log('[SOCKET.IO] Reconnecting to game:', joinPayload.gameCode);
           socketInstance.emit('join', joinPayload);
         }
       }

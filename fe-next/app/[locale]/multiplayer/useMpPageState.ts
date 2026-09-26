@@ -26,6 +26,7 @@ import { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
 import { useSeriesTracker } from '@/hooks/useSeriesTracker';
 import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotifications';
 import { useMultiplayerSounds } from '@/hooks/useMultiplayerSounds';
+import { useReloadRejoin } from '@/hooks/useReloadRejoin';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { useGameActions, useGameStore, useGameActive, useShowStartAnimation } from '@/hooks/gameState';
@@ -131,7 +132,12 @@ export function useMpPageState() {
   const socketRef = useRef<Socket | null>(null);
 
   const handleSetLessonData = useCallback((data: typeof lessonDataState) => { setLessonDataState(data); }, []);
-  const handleSetAttemptingReconnect = useCallback(() => {}, []);
+  // A fresh, seated reload (decided by useMultiplayerSession) must return to the
+  // game: this flag feeds useReloadRejoin, which re-emits `join` once the socket
+  // is up. It used to be a no-op, so a reload dropped players on the room list.
+  const [reloadRejoinPending, setReloadRejoinPending] = useState<boolean>(false);
+  const handleSetAttemptingReconnect = useCallback((value: boolean) => setReloadRejoinPending(value), []);
+  const settleReloadRejoin = useCallback(() => setReloadRejoinPending(false), []);
 
   const {
     setShouldAutoJoin, prefilledRoomCode, setPrefilledRoomCode, lessonData,
@@ -272,6 +278,8 @@ export function useMpPageState() {
 
   // Sync ref bridge so hooks called before the room socket get the latest socket
   socketRef.current = socket;
+
+  useReloadRejoin({ pending: reloadRejoinPending, socket, isConnected, isActive, onSettled: settleReloadRejoin });
 
   useAchievementSocketBridge(socket);
 
