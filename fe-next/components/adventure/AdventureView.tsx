@@ -138,7 +138,7 @@ export default function AdventureView() {
   }
 
   return (
-    <div className="h-dvh shrink-0 bg-[#0f1b3d] text-neo-cream flex flex-col">
+    <div className="h-[calc(100dvh-var(--bottom-nav-height,0px))] shrink-0 bg-[#0f1b3d] text-neo-cream flex flex-col">
       <header className="sticky top-0 z-40 shrink-0 flex items-center gap-1.5 px-3 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] bg-[#0f1b3d]/90 backdrop-blur-sm border-b-[3px] border-black">
         <Link href={`/${language}`} aria-label={t('adventurePlay.backHome')}
           className="rounded-xl border-[3px] border-black bg-neo-cream text-black p-2 shadow-[3px_3px_0_#000]">

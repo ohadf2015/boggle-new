@@ -1921,7 +1921,7 @@ const sv = {
     "collapsed": "Tornet rasade!",
     "newBest": "Nytt rekord!",
     "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}", "menu": "Meny", "banked": "Insamlat"},
-    "stability": {"label": "Stabilitet", "a11y": "Stabilitet: {band}, {pct} % risk", "steady": "Stadig", "wobbly": "Vinglig", "danger": "Fara!"},
+    "stability": {"label": "Stabilitet", "a11y": "Stabilitet: {band}, {pct} % risk", "steady": "Stadig", "wobbly": "Vinglig", "danger": "Sikta mitt!"},
     "biome": {"downtown": "Centrum", "sunset": "Tak i solnedgång", "clouds": "Molnhavet", "jetstream": "Jetströmmen", "aurora": "Norrsken", "orbit": "Omloppsbana", "cosmos": "Djupa rymden"},
     "newSky": "Ny himmel",
     "call": {"perfect": {"0": "PERFEKT!", "1": "MITT I PRICK!", "2": "EXAKT!", "3": "FELFRITT!"}, "good": {"0": "SNYGGT!", "1": "STADIGT!", "2": "RENT!", "3": "SMIDIGT!"}, "sloppy": {"0": "VINGLIGT…", "1": "NÄRA ÖGAT!", "2": "HÄNGER KVAR!"}, "miss": {"0": "HOPPSAN!", "1": "OJ!", "2": "DET RASAR!"}, "combo": {"double": "DUBBEL!", "triple": "TRIPPEL!", "quad": "FYRDUBBEL!", "unstoppable": "OSTOPPBAR ×{n}!", "legendary": "LEGENDARISK ×{n}!"}, "word": {"big": "STORT ORD!", "mega": "MEGAORD!"}},

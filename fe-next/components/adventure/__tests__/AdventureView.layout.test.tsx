@@ -47,11 +47,13 @@ describe('AdventureView layout contract (WorldMap scrolling)', () => {
 
   it('(RED) root is h-dvh flex flex-col (definite height, not min-h-dvh auto-growing)', () => {
     render(<AdventureView />);
-    const root = document.querySelector('[class*="h-dvh"][class*="flex"][class*="flex-col"]');
+    const root = document.querySelector('[class*="100dvh"][class*="flex"][class*="flex-col"]');
     expect(root).toBeTruthy();
     // The page renders crawlable SEO content after the game in a flex column:
     // without shrink-0 a fixed h-dvh root is squeezed toward 0 (the Word Tower bug).
     expect(root!.className).toContain('shrink-0');
+    // Height stops above the global bottom nav so the map's Continue CTA is never under it.
+    expect(root!.className).toContain('var(--bottom-nav-height');
   });
 
   it('(RED) header has shrink-0 to prevent growing on content height', () => {

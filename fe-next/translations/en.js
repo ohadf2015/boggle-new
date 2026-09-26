@@ -1580,7 +1580,7 @@ const en = {
     "collapsed": "Tower down!",
     "newBest": "New best!",
     "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}", "menu": "Menu", "banked": "Banked"},
-    "stability": {"label": "Stability", "a11y": "Stability: {band}, {pct}% risk", "steady": "Steady", "wobbly": "Wobbly", "danger": "Danger!"},
+    "stability": {"label": "Stability", "a11y": "Stability: {band}, {pct}% risk", "steady": "Steady", "wobbly": "Wobbly", "danger": "Aim center!"},
     "biome": {"downtown": "Downtown", "sunset": "Sunset Rooftops", "clouds": "Cloud Deck", "jetstream": "Jet Stream", "aurora": "Aurora", "orbit": "Orbit", "cosmos": "Deep Cosmos"},
     "newSky": "New sky",
     "call": {"perfect": {"0": "PERFECT!", "1": "BULLSEYE!", "2": "SPOT ON!", "3": "FLAWLESS!"}, "good": {"0": "NICE!", "1": "SOLID!", "2": "CLEAN!", "3": "SMOOTH!"}, "sloppy": {"0": "WOBBLY…", "1": "CLOSE ONE!", "2": "HANGING ON!"}, "miss": {"0": "OOPS!", "1": "WHOOPS!", "2": "TIMBER!"}, "combo": {"double": "DOUBLE!", "triple": "TRIPLE!", "quad": "QUAD!", "unstoppable": "UNSTOPPABLE ×{n}", "legendary": "LEGENDARY ×{n}"}, "word": {"big": "BIG WORD!", "mega": "MEGA WORD!"}},

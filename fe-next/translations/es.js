@@ -1635,7 +1635,7 @@ const es = {
     "collapsed": "¡Se cayó la torre!",
     "newBest": "¡Nuevo récord!",
     "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar", "daily": "DIARIO", "dailyBadge": "Diario {date}", "menu": "Menú", "banked": "Acumulado"},
-    "stability": {"label": "Estabilidad", "a11y": "Estabilidad: {band}, {pct}% de riesgo", "steady": "Firme", "wobbly": "Tambaleante", "danger": "¡Peligro!"},
+    "stability": {"label": "Estabilidad", "a11y": "Estabilidad: {band}, {pct}% de riesgo", "steady": "Firme", "wobbly": "Tambaleante", "danger": "¡Al centro!"},
     "biome": {"downtown": "Centro", "sunset": "Azoteas al atardecer", "clouds": "Mar de nubes", "jetstream": "Corriente en chorro", "aurora": "Aurora", "orbit": "Órbita", "cosmos": "Cosmos profundo"},
     "newSky": "Cielo nuevo",
     "call": {"perfect": {"0": "¡PERFECTO!", "1": "¡EN EL BLANCO!", "2": "¡EXACTO!", "3": "¡IMPECABLE!"}, "good": {"0": "¡BIEN!", "1": "¡SÓLIDO!", "2": "¡LIMPIO!", "3": "¡SUAVE!"}, "sloppy": {"0": "TAMBALEANTE…", "1": "¡POR POCO!", "2": "¡AGUANTA!"}, "miss": {"0": "¡UPS!", "1": "¡AY!", "2": "¡SE CAE!"}, "combo": {"double": "¡DOBLE!", "triple": "¡TRIPLE!", "quad": "¡CUÁDRUPLE!", "unstoppable": "¡IMPARABLE ×{n}!", "legendary": "¡LEGENDARIO ×{n}!"}, "word": {"big": "¡PALABRA GRANDE!", "mega": "¡MEGAPALABRA!"}},
