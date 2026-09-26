@@ -300,9 +300,9 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
                 {/* Status sits over the invite; chat is a launcher row, not a
                     panel, so the rail never spends itself on an idle chat. */}
                 {statusLane}
-                {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} />}
+                {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} className="flex-1 min-h-0 justify-center" />}
                 {settingsSummary}
-                <LobbyChatLauncher onPress={() => setSheet('chat')} unread={unread} t={t} className="mt-auto" />
+                <LobbyChatLauncher onPress={() => setSheet('chat')} unread={unread} t={t} className={isPrivate ? 'mt-auto' : undefined} />
               </div>
             }
           />
