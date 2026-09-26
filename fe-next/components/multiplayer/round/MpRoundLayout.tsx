@@ -158,7 +158,11 @@ function MpRoundLayoutImpl({
 
       {/* Juice lanes: callouts/banners over the board, floaters toward the score */}
       <div className={cn(styles.areaBoard, 'pointer-events-none relative z-30')}>
-        <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
+        {/* The callout stage sits in the board area's free band: above the pill
+            for classic, below the clue strip + life bar for word-hunt. */}
+        <div data-testid="mp-callout-stage" className={cn('absolute inset-x-0 top-0', mode.slug === 'wordHunt' && 'top-[calc(132px*var(--mp-u,1))]')}>
+          <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
+        </div>
         <span data-testid="mp-reject-sr" aria-live="polite" className="sr-only">{juice.rejectText ?? ''}</span>
         <MpScoreFloaters floaters={juice.floaters} />
       </div>

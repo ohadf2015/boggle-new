@@ -224,6 +224,14 @@ describe('MpRoundLayout', () => {
     expect(screen.getByTestId('mp-time-up')).toHaveTextContent('mpUi.round.timeUp');
   });
 
+  it('word-hunt: callouts drop below the clue strip + life bar (never cover the clues)', () => {
+    const { unmount } = render(<MpRoundLayout {...props({ gameMode: 'word-hunt' })} />);
+    expect(screen.getByTestId('mp-callout-stage').className).toContain('top-[calc(132px*var(--mp-u,1))]');
+    unmount();
+    render(<MpRoundLayout {...props({ gameMode: 'classic' })} />);
+    expect(screen.getByTestId('mp-callout-stage').className).not.toContain('132px');
+  });
+
   it('docks a found-count pill', () => {
     render(<MpRoundLayout {...props({ foundWords: [{ word: 'a' }, { word: 'b' }, { word: 'c' }] })} />);
     expect(screen.getByTestId('mp-found-pill')).toHaveTextContent('"count":3');
