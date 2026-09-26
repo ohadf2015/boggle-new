@@ -38,6 +38,7 @@ const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions'
 /** Max standings rows on one screen (8 seats; in a bigger room I stay visible). */
 const MAX_ROWS = 8;
 const AUTO_ADVANCE_SECONDS = 10;
+const NO_CHAMPIONS: readonly string[] = [];
 /** Signup nudge lands this long after the reveal ends (never on the verdict). */
 const NUDGE_DELAY_MS = 4000;
 
@@ -80,6 +81,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     topScore: topTwo.top,
     runnerUpScore: topTwo.runnerUp,
     instant: reduced,
+    ready: branch !== null,
   });
   const { stage, done, skip } = useRevealStage(timeline, { instant: reduced, onBeat: beats.onBeat });
   const handleSkip = useCallback(() => {
@@ -142,7 +144,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
   const roundGap = useMemo(() => rivalGap(rows), [rows]);
   const gap = series ? series.gap : roundGap;
-  const champions = series?.champions ?? [];
+  const champions = series?.champions ?? NO_CHAMPIONS;
 
   const header = (
     <MpResultsHeader
@@ -180,6 +182,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           rows={visible.rows}
           hiddenCount={visible.hiddenCount}
           isRevealed={(pos) => seen(`row-${pos}`)}
+          champions={champions}
           t={t}
           className="min-h-0 flex-1 lg:max-h-[calc(560px*var(--mp-u,1))]"
         />

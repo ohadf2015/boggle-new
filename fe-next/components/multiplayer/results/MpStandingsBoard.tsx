@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Bot, ChevronDown, ChevronUp, Crown } from 'lucide-react';
+import { Bot, ChevronDown, ChevronUp, Crown, Trophy } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
 import { podiumTier, type MpStandingRow } from './mpStandings';
@@ -14,6 +14,8 @@ export interface MpStandingsBoardProps {
   hiddenCount: number;
   /** Is the row at visual position `pos` (1 = top) revealed yet? */
   isRevealed: (pos: number) => boolean;
+  /** Series champion(s) on a series final: a trophy by their total (the crown stays the round's). */
+  champions?: readonly string[];
   t: TFn;
   className?: string;
 }
@@ -30,7 +32,7 @@ const PODIUM = [
  * the rise is transform-only. Rows share the body's height (flex-1, capped), so
  * 2 or 8 players both fill one screen with zero scroll.
  */
-function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: MpStandingsBoardProps) {
+function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, champions = [], t, className }: MpStandingsBoardProps) {
   return (
     <ol data-testid="mp-standings" className={cn('flex flex-col justify-center min-h-0 gap-[calc(6px*var(--mp-u,1))]', className)}>
       {rows.map((r, i) => {
@@ -108,6 +110,13 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
               </span>
               {r.seriesTotal !== null && (
                 <span className={cn('flex items-center gap-1 text-[calc(11px*var(--mp-u,1))] font-neo-body tabular-nums', first ? 'text-neo-black/75' : 'text-neo-white/70')}>
+                  {champions.includes(r.username) && (
+                    <Trophy
+                      data-testid="mp-standing-champion"
+                      aria-label={t('mpUi.results.seriesChampion')}
+                      className={cn('w-[calc(13px*var(--mp-u,1))] h-[calc(13px*var(--mp-u,1))] shrink-0', first ? 'text-neo-black' : 'text-neo-yellow', shown && fx.chipPop)}
+                    />
+                  )}
                   {t('mpUi.results.seriesTotal', { total: r.seriesTotal })}
                   {r.seriesDelta > 0 && (
                     <span data-testid="mp-standing-delta" className="inline-flex items-center font-bold text-neo-lime">

@@ -12,8 +12,14 @@ interface Options {
   isWinner: boolean;
   topScore: number;
   runnerUpScore: number;
-  /** Reduced motion: no choreography, no confetti — the verdict sound once on mount. */
+  /** Reduced motion: no choreography, no confetti — the verdict sound once, as soon as it can be judged. */
   instant: boolean;
+  /**
+   * The verdict can be judged (intermission vs final is locked). Until then a
+   * request is held, never played on a guess: a skip or reduced motion would
+   * otherwise judge a series final by the round (the verdict fires only once).
+   */
+  ready: boolean;
 }
 
 /**
@@ -21,13 +27,19 @@ interface Options {
  * defeat + podium confetti) fires exactly once — on 1st place's slam, or at
  * once when the show is skipped or reduced — never twice.
  */
-export function useResultBeats({ podium, isWinner, topScore, runnerUpScore, instant }: Options) {
+export function useResultBeats({ podium, isWinner, topScore, runnerUpScore, instant, ready }: Options) {
   const { playVictorySound, playDefeatSound, playEpicVictorySound, playTileAppearSound } = useSoundEffects();
   const verdictFiredRef = useRef(false);
-
+  // The first ask wins (a beat, a skip, or reduced motion); it plays once `ready`.
+  const [asked, setAsked] = useState<{ confetti: boolean } | null>(null);
   const fireVerdict = useCallback((withConfetti: boolean) => {
-    if (verdictFiredRef.current) return;
+    setAsked((a) => a ?? { confetti: withConfetti });
+  }, []);
+
+  useEffect(() => {
+    if (!ready || !asked || verdictFiredRef.current) return;
     verdictFiredRef.current = true;
+    const withConfetti = asked.confetti;
     if (isWinner) {
       if (runnerUpScore > 0 && topScore >= runnerUpScore * 2) playEpicVictorySound();
       else playVictorySound();
@@ -39,7 +51,7 @@ export function useResultBeats({ podium, isWinner, topScore, runnerUpScore, inst
     if (withConfetti && podium && !prefersStaticFullscreenOverlay()) {
       fireRankConfetti(podium, podium === 1 ? 'full' : 'light');
     }
-  }, [isWinner, topScore, runnerUpScore, podium, playVictorySound, playEpicVictorySound, playDefeatSound]);
+  }, [ready, asked, isWinner, topScore, runnerUpScore, podium, playVictorySound, playEpicVictorySound, playDefeatSound]);
 
   useEffect(() => {
     if (instant) fireVerdict(false);

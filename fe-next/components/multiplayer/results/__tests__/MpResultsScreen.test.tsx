@@ -16,6 +16,8 @@ const h = vi.hoisted(() => ({
   markReady: vi.fn(),
   mpExit: vi.fn(),
   confetti: vi.fn(),
+  win: vi.fn(),
+  lose: vi.fn(),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -27,7 +29,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated: false, user: null }) }));
 vi.mock('@/hooks/useIsGuest', () => ({ useIsGuest: () => true }));
-vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => new Proxy({}, { get: () => vi.fn() }) }));
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => new Proxy({}, {
+    get: (_t, k) => (k === 'playVictorySound' || k === 'playEpicVictorySound' ? h.win : k === 'playDefeatSound' ? h.lose : vi.fn()),
+  }),
+}));
 vi.mock('framer-motion', async (orig) => ({ ...(await orig<typeof import('framer-motion')>()), useReducedMotion: () => h.reduced }));
 // The header's sound toggle (new on the rebuilt screen) reads the app's MusicProvider.
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
@@ -122,6 +128,8 @@ describe('MpResultsScreen', () => {
     h.markReady.mockClear();
     h.mpExit.mockClear();
     h.confetti.mockClear();
+    h.win.mockClear();
+    h.lose.mockClear();
     h.showInterstitial.mockReset();
     h.showInterstitial.mockResolvedValue(undefined);
     sessionStorage.clear();
@@ -345,6 +353,9 @@ describe('MpResultsScreen', () => {
       final('Host');
       skip();
       expect(screen.getByTestId('mp-series-champion').textContent).toContain('Host');
+      // the board points at the champion too (the crown is the ROUND's 1st)
+      const champRows = screen.getAllByTestId('mp-standing-row').filter((r) => within(r).queryByTestId('mp-standing-champion'));
+      expect(champRows.map((r) => r.textContent)).toEqual([expect.stringContaining('Host')]);
       const card = screen.getByTestId('mp-my-card');
       expect(card.getAttribute('data-winner')).toBe('true');
       expect(screen.getByTestId('mp-my-rank').textContent).toBe('#1');
@@ -364,6 +375,53 @@ describe('MpResultsScreen', () => {
       renderScreen({ finalScores: ZERO, username: 'T', seriesRoundNumber: 3, seriesStandings: STANDINGS });
       skip();
       expect(screen.getByTestId('mp-my-card').getAttribute('data-series')).toBe('false');
+    });
+  });
+  describe('the verdict of a series final follows the SERIES (round-5 winner P lost the series to Host)', () => {
+    const R5 = [
+      { username: 'P', score: 30, allWords: [] },
+      { username: 'Host', score: 5, allWords: [] },
+      { username: 'T', score: 0, allWords: [] },
+    ];
+    const STANDINGS = [
+      { username: 'Host', totalScore: 120, roundScores: [40, 40, 30, 5, 5], rankChange: 0 },
+      { username: 'P', totalScore: 60, roundScores: [10, 10, 5, 5, 30], rankChange: 0 },
+      { username: 'T', totalScore: 0, roundScores: [0, 0, 0, 0, 0], rankChange: 0 },
+    ];
+    const final = (username: string) => renderScreen({ finalScores: R5, username, seriesRoundNumber: 5, seriesStandings: STANDINGS });
+
+    it('tap-to-skip: the round winner who lost the series gets 2nd-place light confetti and the defeat sound', () => {
+      final('P');
+      skip();
+      expect(h.confetti.mock.calls).toEqual([[2, 'light']]);
+      expect(h.win).not.toHaveBeenCalled();
+      expect(h.lose).toHaveBeenCalledTimes(1);
+    });
+
+    it('tap-to-skip: the series champion who lost round 5 gets the full confetti and the win sound', () => {
+      final('Host');
+      skip();
+      expect(h.confetti.mock.calls).toEqual([[1, 'full']]);
+      expect(h.win).toHaveBeenCalledTimes(1);
+      expect(h.lose).not.toHaveBeenCalled();
+    });
+
+    it('reduced motion: the verdict sound waits for the branch and follows the series (no confetti)', async () => {
+      vi.useFakeTimers();
+      h.reduced = true;
+      final('P');
+      await act(async () => { vi.advanceTimersByTime(1_000); });
+      expect(h.win).not.toHaveBeenCalled();
+      expect(h.lose).toHaveBeenCalledTimes(1);
+      expect(h.confetti).not.toHaveBeenCalled();
+    });
+
+    it('the full show (no skip) lands the series verdict on 1st place\'s slam', async () => {
+      vi.useFakeTimers();
+      final('Host');
+      await act(async () => { vi.advanceTimersByTime(6_000); });
+      expect(h.confetti.mock.calls).toEqual([[1, 'full']]);
+      expect(h.win).toHaveBeenCalledTimes(1);
     });
   });
 });
