@@ -24,8 +24,6 @@ interface Props {
   /** ImpactBurst flies its coins into this exact rect. */
   coinsRef: RefObject<HTMLDivElement | null>;
   onOpenEstate: () => void;
-  /** 0..1 — how close the standing tower is to going over (StabilityMeter). */
-  risk?: number;
   /** Leave the game mid-run. The caller banks the run before navigating. */
   onExit?: () => void;
   /** The band's element — the camera frames the hanging slab under its bottom edge. */
@@ -60,7 +58,6 @@ export function V2Hud({
   raids,
   coinsRef,
   onOpenEstate,
-  risk,
   onExit,
   barRef,
   wide,
@@ -90,7 +87,6 @@ export function V2Hud({
         run={run}
         coins={coins}
         coinsRef={coinsRef}
-        risk={risk}
         onExit={onExit}
         onMenuOpen={handleMenuOpen}
         barRef={barRef}

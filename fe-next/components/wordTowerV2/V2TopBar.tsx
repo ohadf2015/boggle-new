@@ -6,7 +6,6 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
 import type { RunState } from '@/lib/wordTowerV2/run';
 import { ITEM } from './estate/estateArt';
-import { StabilityMeter } from './StabilityMeter';
 import { useFloorPop } from './useFloorPop';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -21,8 +20,6 @@ interface Props {
   coins: number;
   /** ImpactBurst flies its coins into this exact rect. */
   coinsRef: RefObject<HTMLDivElement | null>;
-  /** 0..1 — how close the standing tower is to going over (StabilityMeter). */
-  risk?: number;
   /** Leave the game mid-run. The caller banks the run before navigating. */
   onExit?: () => void;
   /** Open the HUD menu drawer for secondary items. */
@@ -63,7 +60,6 @@ export const V2TopBar = memo(function V2TopBar({
   run,
   coins,
   coinsRef,
-  risk = 0,
   onExit,
   onMenuOpen,
   barRef,
@@ -86,7 +82,7 @@ export const V2TopBar = memo(function V2TopBar({
       className="pointer-events-none absolute inset-x-3 top-[max(0.5rem,env(safe-area-inset-top))] z-40 flex flex-col gap-1.5"
       aria-live="polite"
     >
-      {/* Row 1 — where am I. ONE row, <=5 items: exit, height+score, coins, stability, [menu/mute reserved].
+      {/* Row 1 — where am I. ONE row, 4 items (5 on daily): exit, height+score, coins, [daily], menu.
           `pe-12` reserves the corner for the global mute FAB.
           NO flex-wrap: width is constrained and items are compact. */}
       <div data-wt2-topbar-row className="flex items-center gap-2 pe-12">
@@ -130,19 +126,12 @@ export const V2TopBar = memo(function V2TopBar({
             ) : null}
           </div>
 
-          {/* Score and best/daily badge sit BELOW the height chip. */}
+          {/* Score only (no daily badge here anymore). Best chip if non-daily. */}
           <div className="flex shrink-0 items-center gap-1">
             <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-xs font-bold leading-tight tabular-nums text-neo-cream lg:text-base">
               {score.toLocaleString()}
             </div>
-            {daily && dailyDateKey ? (
-              <div
-                className="rounded-neo border-neo border-black bg-neo-cyan px-1 py-0.5 font-neo-display text-[9px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-xs"
-                aria-label={t('wordTowerV2.hud.dailyBadge', { date: dailyDateFormatted || '' })}
-              >
-                <span className="uppercase">{t('wordTowerV2.hud.daily')}</span>
-              </div>
-            ) : bestM > 0.5 ? (
+            {!daily && bestM > 0.5 ? (
               <div
                 className="flex items-center gap-0.5 rounded-neo border-neo border-black bg-neo-yellow px-1 font-neo-display text-[9px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-xs"
                 aria-label={t('wordTower.hud.best', { m: bestM.toFixed(1) })}
@@ -167,8 +156,15 @@ export const V2TopBar = memo(function V2TopBar({
           </span>
         </div>
 
-        {/* Stability meter: compact inline display. */}
-        <StabilityMeter t={t} risk={risk} reducedMotion={reducedMotion} />
+        {/* Daily badge (direct child, only on daily runs): replaces the trophy. */}
+        {daily && dailyDateKey ? (
+          <div
+            className="rounded-neo border-neo border-black bg-neo-cyan px-1 py-0.5 font-neo-display text-[9px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-xs"
+            aria-label={t('wordTowerV2.hud.dailyBadge', { date: dailyDateFormatted || '' })}
+          >
+            <span className="uppercase">{t('wordTowerV2.hud.daily')}</span>
+          </div>
+        ) : null}
 
         {/* Menu button: opens drawer with secondary items (streak, effects, estate). */}
         {onMenuOpen ? (

@@ -78,19 +78,11 @@ describe('V2TopBar', () => {
     expect(onMenuOpen).toHaveBeenCalledOnce();
   });
 
-  it('given a tower close to going over, when rendered, then the stability meter reads DANGER with its risk', () => {
-    const { container } = render(bar({ risk: 0.82 }));
+  it('given the topbar, when rendered, then stability meter is NOT present in it (moved to merged control in dock)', () => {
+    const { container } = render(bar());
 
-    const meter = container.querySelector('[data-wt2-stability]')!;
-    expect(meter.getAttribute('data-band')).toBe('danger');
-    expect(meter.getAttribute('role')).toBe('meter');
-    expect(meter.getAttribute('aria-valuenow')).toBe('82');
-    expect(screen.getByText('wordTowerV2.stability.danger')).toBeTruthy();
-  });
-
-  it('given a plumb tower, when rendered, then the meter reads steady', () => {
-    const { container } = render(bar({ risk: 0.05 }));
-    expect(container.querySelector('[data-wt2-stability]')!.getAttribute('data-band')).toBe('steady');
+    const meter = container.querySelector('[data-wt2-stability]');
+    expect(meter).toBeNull();
   });
 
   it('given a run in progress, when the exit is tapped, then the game is asked to leave (the run banks on the way out)', () => {
@@ -106,15 +98,15 @@ describe('V2TopBar', () => {
     expect(screen.getByLabelText('wordTowerV2.results.home')).toBeTruthy();
   });
 
-  it('given the bar, then the stability meter is in Row 1', () => {
-    const { container } = render(bar());
+  it('given the bar with exit and menu, then Row 1 has exactly 4 items (exit, height+score, coins, menu)', () => {
+    const { container } = render(bar({ onExit: vi.fn(), onMenuOpen: vi.fn() }));
     const rows = container.querySelectorAll('[data-wt2-topbar-row]');
     // Only Row 1 now (secondary items moved to menu)
     expect(rows.length).toBe(1);
 
-    // Stability meter should be in Row 1
+    // Exact count of direct children
     const row1 = rows[0];
-    expect(row1.querySelector('[data-wt2-stability]')).toBeTruthy();
+    expect(row1.children.length).toBe(4);
   });
 
   it('given a daily run, when rendered, then the daily badge shows the date, not the best chip', () => {

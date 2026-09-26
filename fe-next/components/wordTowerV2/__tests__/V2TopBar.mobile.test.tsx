@@ -121,17 +121,11 @@ describe('V2TopBar at mobile viewport (390px)', () => {
     expect(screen.queryAllByLabelText(/wordTowerV2\.coins\.run/)).toHaveLength(1);
   });
 
-  it('given a 390px viewport, when rendered, then stability meter is COMPACT and in Row 1', () => {
-    const { container } = render(bar({ risk: 0.5 }));
+  it('given a 390px viewport, when rendered, then stability meter is NOT in Row 1 (moved to dock)', () => {
+    const { container } = render(bar());
 
     const stability = container.querySelector('[data-wt2-stability]');
-    expect(stability).toBeTruthy();
-
-    // Should be in Row 1
-    const topBar = container.querySelector('[data-wt2-topbar]');
-    const rows = topBar!.querySelectorAll('[data-wt2-topbar-row]');
-    const firstRow = rows[0];
-    expect(firstRow.contains(stability)).toBeTruthy();
+    expect(stability).toBeNull();
   });
 
 

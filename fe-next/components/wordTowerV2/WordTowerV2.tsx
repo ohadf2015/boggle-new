@@ -36,6 +36,7 @@ import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
 import { useV2Ready } from './useV2Ready';
 import { BraceControl } from './rescue/BraceControl';
+import { StabilityBrace } from './rescue/StabilityBrace';
 import { type RescueReject, useBrace } from './rescue/useBrace';
 import { WreckScene } from './WreckScene';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -607,7 +608,6 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           raids={estateApi.inbox.length}
           coinsRef={coinsRef}
           onOpenEstate={() => setDistrict(true)}
-          risk={game.risk}
           onExit={exitFlow.goHome}
           barRef={setBarEl}
           wide={wide}
@@ -671,6 +671,16 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         accentHex={accentHex}
         reducedMotion={reducedMotion}
         canPutBack={!!preSubmitRef.current}
+        stabilitySlot={
+          phase !== 'over' && !smashing && !district ? (
+            <StabilityBrace
+              t={t}
+              risk={game.risk}
+              api={braceApi}
+              reducedMotion={reducedMotion}
+            />
+          ) : undefined
+        }
         onScramble={scramble}
         onSelectTile={selectTile}
         onDeselectTile={deselectTile}

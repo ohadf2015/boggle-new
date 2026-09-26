@@ -27,7 +27,7 @@ const bar = (over: Partial<Parameters<typeof V2TopBar>[0]> = {}) => (
   />
 );
 
-describe('V2TopBar HUD refactor: one row, <=5 items', () => {
+describe('V2TopBar HUD refactor: one row, exactly 4-5 items', () => {
   it('given a run in progress, when rendered, then the TOP HUD is ONE flex row with NO wrapping', () => {
     const { container } = render(bar());
 
@@ -45,21 +45,15 @@ describe('V2TopBar HUD refactor: one row, <=5 items', () => {
     expect(rowClasses).toMatch(/flex/);
   });
 
-  it('given a run in progress, when rendered, then the TOP row contains exactly <=5 visible items: exit, height+score, coins, stability, menu', () => {
-    const { container } = render(bar());
+  it('given a run in progress with exit + menu, when rendered, then the TOP row contains exactly 4 visible items', () => {
+    const { container } = render(bar({ onExit: vi.fn(), onMenuOpen: vi.fn() }));
 
     const topBar = container.querySelector('[data-wt2-topbar]');
     const rows = topBar!.querySelectorAll('[data-wt2-topbar-row]');
     const firstRow = rows[0];
 
-    // Count direct children (buttons/divs) that are rendered, excluding wrappers
-    const visibleItems = Array.from(firstRow.children).filter(child => {
-      const classes = (child as HTMLElement).getAttribute('class') ?? '';
-      // Count buttons and main content divs, not wrappers
-      return (child as HTMLElement).tagName === 'BUTTON' || (child instanceof HTMLDivElement && classes.includes('flex'));
-    });
-
-    expect(visibleItems.length).toBeLessThanOrEqual(5);
+    // Exact count: exit, height+score (1 item), coins, menu = 4 items
+    expect(firstRow.children.length).toBe(4);
   });
 
   it('given a run in progress, when rendered, then the exit button is present and clickable', () => {
@@ -91,34 +85,35 @@ describe('V2TopBar HUD refactor: one row, <=5 items', () => {
     expect(screen.queryAllByLabelText(/wordTowerV2\.coins\.run/)).toHaveLength(1);
   });
 
-  it('given a tower with risk, when rendered, then the stability meter is COMPACT in the top row', () => {
-    const { container } = render(bar({ risk: 0.5 }));
+  it('given a tower with risk, when rendered, then the stability meter is NOT in the top row (moved to dock)', () => {
+    const { container } = render(bar());
 
-    const stability = container.querySelector('[data-wt2-stability]');
-    expect(stability).toBeTruthy();
-
-    // Should be in the top row (Row 1)
+    // Stability meter should NOT be in the topbar anymore
     const topBar = container.querySelector('[data-wt2-topbar]');
-    const rows = topBar!.querySelectorAll('[data-wt2-topbar-row]');
-    const firstRow = rows[0];
-    expect(firstRow.contains(stability)).toBeTruthy();
+    const stabilityInTopBar = topBar?.querySelector('[data-wt2-stability]');
+    expect(stabilityInTopBar).toBeNull();
   });
 
-  it('given a daily run with date, when rendered, then the stability label shows DAILY instead of the band name', () => {
+  it('given a daily run with date, when rendered, then the daily badge appears in the top row as a direct child', () => {
     const { container } = render(bar({
       daily: true,
       dailyDateKey: '2026-09-25',
       dailyDateFormatted: '25 Sep',
-      risk: 0.3
+      onExit: vi.fn(),
+      onMenuOpen: vi.fn(),
     }));
 
     // Daily badge should appear with date
     const dailyBadge = screen.getByLabelText(/DAILY 25 Sep/);
     expect(dailyBadge).toBeTruthy();
 
-    // The stability meter should still be present
-    const stability = container.querySelector('[data-wt2-stability]');
-    expect(stability).toBeTruthy();
+    // It should be a direct child of the top row
+    const topBar = container.querySelector('[data-wt2-topbar]');
+    const row = topBar?.querySelector('[data-wt2-topbar-row]');
+    expect(row?.contains(dailyBadge)).toBeTruthy();
+
+    // Row should have 5 items: exit, height+score, coins, daily, menu
+    expect(row?.children.length).toBe(5);
   });
 
   it('given secondary items are not rendered in V2TopBar, when a menu opener is provided, then it is clickable', () => {
@@ -158,7 +153,7 @@ describe('V2TopBar HUD refactor: one row, <=5 items', () => {
     expect(screen.getByText(/15\.5/)).toBeTruthy();
   });
 
-  it('given the bar, then stability is in Row 1 (streak has moved to the menu)', () => {
+  it('given the bar, then stability is NOT in Row 1 (moved to merged control in dock)', () => {
     const { container } = render(bar({
       run: { ...createRun(1), balls: 0, combo: 2 },
       tenants: 0,
@@ -171,10 +166,10 @@ describe('V2TopBar HUD refactor: one row, <=5 items', () => {
     // Only one row now
     expect(rows.length).toBe(1);
 
-    // Row 1 should have stability
+    // Row 1 should NOT have stability meter
     const firstRow = rows[0];
     const stability = firstRow.querySelector('[data-wt2-stability]');
 
-    expect(stability).toBeTruthy();
+    expect(stability).toBeNull();
   });
 });

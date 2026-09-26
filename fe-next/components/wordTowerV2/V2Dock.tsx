@@ -1,6 +1,6 @@
 'use client';
 
-import type { RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { Delete, Shuffle, Undo2 } from 'lucide-react';
 import { WordTowerWheel } from '@/components/wordTower/WordTowerWheel';
 
@@ -25,6 +25,8 @@ interface Props {
   reducedMotion: boolean;
   /** The hanging word can still be put back (only while it hangs, once). */
   canPutBack: boolean;
+  /** Merged stability + brace control, rendered in the dock row next to the wheel. */
+  stabilitySlot?: ReactNode;
   onScramble: () => void;
   onSelectTile: (i: number) => void;
   onDeselectTile: (i: number) => void;
@@ -62,6 +64,7 @@ export function V2Dock(p: Props) {
           {t(p.rejected.includes('.') ? p.rejected : `wordTower.error.${p.rejected}`)}
         </div>
       ) : null}
+
       <div
         className={
           p.wide
@@ -82,6 +85,7 @@ export function V2Dock(p: Props) {
           </span>
         </button>
 
+        {/* Middle column: stability pill stacked above the wheel */}
         {p.dictError ? (
           <button
             type="button"
@@ -91,22 +95,25 @@ export function V2Dock(p: Props) {
             {t('wordTower.loadError')}
           </button>
         ) : (
-          <WordTowerWheel
-            tray={p.wheel.map((l) => l.toUpperCase())}
-            selected={p.selected}
-            word={p.word.toUpperCase()}
-            placing={p.swinging}
-            canBuild={p.valid}
-            intensity={p.intensity}
-            accentHex={p.accentHex}
-            reducedMotion={p.reducedMotion}
-            dir={p.dir}
-            t={t}
-            onSelectTile={p.onSelectTile}
-            onDeselectTile={p.onDeselectTile}
-            onSubmit={p.onSubmit}
-            onDrop={p.onDrop}
-          />
+          <div className="flex flex-col items-center gap-1">
+            {!p.wide && p.stabilitySlot ? <div className="pointer-events-auto">{p.stabilitySlot}</div> : null}
+            <WordTowerWheel
+              tray={p.wheel.map((l) => l.toUpperCase())}
+              selected={p.selected}
+              word={p.word.toUpperCase()}
+              placing={p.swinging}
+              canBuild={p.valid}
+              intensity={p.intensity}
+              accentHex={p.accentHex}
+              reducedMotion={p.reducedMotion}
+              dir={p.dir}
+              t={t}
+              onSelectTile={p.onSelectTile}
+              onDeselectTile={p.onDeselectTile}
+              onSubmit={p.onSubmit}
+              onDrop={p.onDrop}
+            />
+          </div>
         )}
 
         {/* One slot, two jobs: rub out a letter while spelling, take the whole
@@ -124,6 +131,9 @@ export function V2Dock(p: Props) {
           {p.swinging ? <Undo2 className="h-6 w-6" aria-hidden /> : <Delete className="h-6 w-6" aria-hidden />}
         </button>
       </div>
+
+      {/* Wide layout: stability slot in the flex row */}
+      {p.wide && p.stabilitySlot && <div className="pointer-events-auto">{p.stabilitySlot}</div>}
     </div>
   );
 }

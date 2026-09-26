@@ -240,7 +240,6 @@ const FROZEN_EXTRA = [
   'components/wordTowerV2/estate/DistrictScreen.tsx|neo-navy|neo-black',
   'components/wordTowerV2/estate/PlotPanel.tsx|neo-navy|neo-black',
   'components/wordTowerV2/estate/PlotPanel.tsx|neo-navy-light|neo-black',
-  'components/wordTowerV2/rescue/BraceControl.tsx|neo-navy|neo-black',
   'components/wordTowerV2/rewards/ChestReveal.tsx|neo-navy-light|neo-black',
   'components/wordTowerV2/rivals/Payback.tsx|neo-navy|neo-black',
   'components/wordTowerV2/rivals/Payback.tsx|neo-navy|neo-black',
