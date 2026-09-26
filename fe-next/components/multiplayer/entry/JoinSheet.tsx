@@ -45,10 +45,10 @@ function RoomTicket({ room }: { room: JoinTarget }) {
       </span>
       <div className="min-w-0 flex-1">
         {/* The room's own name, in its own direction — two lines before it ever truncates. */}
-        <p dir="auto" className="line-clamp-2 break-words font-neo-display text-lg tv:text-3xl font-bold leading-tight text-neo-white">
+        <p dir="auto" className="line-clamp-2 break-words font-neo-display text-lg tv:text-2xl font-bold leading-tight text-neo-white">
           {room.roomName || room.gameCode}
         </p>
-        <p className="mt-0.5 flex min-w-0 items-center gap-2 text-sm tv:text-xl font-bold text-neo-white/85">
+        <p className="mt-0.5 flex min-w-0 items-center gap-2 text-sm tv:text-lg font-bold text-neo-white/85">
           <span className={cn('shrink-0 uppercase tracking-wide', mode.text)}>{t(mode.labelKey)}</span>
           <span aria-hidden="true" className="shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
           {room.hostUsername && (
@@ -58,8 +58,12 @@ function RoomTicket({ room }: { room: JoinTarget }) {
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
         {room.playerAvatars && room.playerAvatars.length > 0 && (
+          // Who is inside, from sm up — but not on TV, where the sm stack is a speck.
+          // Nested so no element carries two competing display variants.
           <span className="hidden sm:block">
-            <AvatarStack avatars={room.playerAvatars} totalCount={room.playerCount || 0} maxVisible={3} size="sm" />
+            <span className="block tv:hidden">
+              <AvatarStack avatars={room.playerAvatars} totalCount={room.playerCount || 0} maxVisible={3} size="sm" />
+            </span>
           </span>
         )}
         <span
