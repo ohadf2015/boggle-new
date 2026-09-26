@@ -42,16 +42,17 @@ const MODES: Array<{ mode: GameModeOption; nameKey: string }> = [
  * and results use, so a mode wears one colour through the whole match.
  */
 const FAMILY: Record<ModeColorFamily, { on: string; rest: string; icon: string }> = {
-  lime: { on: 'bg-neo-lime text-neo-black', rest: 'border-neo-lime/50 hover:border-neo-lime', icon: 'text-neo-lime' },
-  pink: { on: 'bg-neo-pink text-neo-black', rest: 'border-neo-pink/50 hover:border-neo-pink', icon: 'text-neo-pink' },
-  cyan: { on: 'bg-neo-cyan text-neo-black', rest: 'border-neo-cyan/50 hover:border-neo-cyan', icon: 'text-neo-cyan' },
-  purple: { on: 'bg-neo-purple text-neo-black', rest: 'border-neo-purple/50 hover:border-neo-purple', icon: 'text-neo-purple' },
-  orange: { on: 'bg-neo-orange text-neo-black', rest: 'border-neo-orange/50 hover:border-neo-orange', icon: 'text-neo-orange' },
+  lime: { on: 'bg-neo-lime/20 border-neo-lime', rest: 'border-neo-lime/50 hover:border-neo-lime', icon: 'text-neo-lime' },
+  pink: { on: 'bg-neo-pink/20 border-neo-pink', rest: 'border-neo-pink/50 hover:border-neo-pink', icon: 'text-neo-pink' },
+  cyan: { on: 'bg-neo-cyan/20 border-neo-cyan', rest: 'border-neo-cyan/50 hover:border-neo-cyan', icon: 'text-neo-cyan' },
+  purple: { on: 'bg-neo-purple/20 border-neo-purple', rest: 'border-neo-purple/50 hover:border-neo-purple', icon: 'text-neo-purple' },
+  orange: { on: 'bg-neo-orange/20 border-neo-orange', rest: 'border-neo-orange/50 hover:border-neo-orange', icon: 'text-neo-orange' },
 };
 
 /**
  * The lobby mode picker: a 3-column grid of illustrated tiles (sticker art +
- * short name), the chosen tile flooded in its mode colour, and ONE line under
+ * short name), the chosen tile tinted + ringed in its mode colour (a tint, not a
+ * solid flood — the footer START is the lobby's one solid CTA), and ONE line under
  * the grid with that mode's rule — the grid never grows when you change your
  * mind. With `fill` the tiles stretch into the body's free height.
  */
@@ -99,7 +100,7 @@ export function BattleModeCard({
                 'transition-[transform,background-color,border-color,box-shadow] duration-150 active:translate-y-0.5 active:shadow-none',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isActive
-                  ? cn(family.on, 'border-neo-black shadow-hard', styles.chipPunch)
+                  ? cn(family.on, 'border-[3px] text-neo-white shadow-hard', styles.chipPunch)
                   : cn('bg-neo-navy-light text-neo-white shadow-hard-sm', family.rest),
               )}
             >
@@ -108,7 +109,7 @@ export function BattleModeCard({
                 className={cn(
                   styles.modeArt,
                   'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))]',
-                  isActive ? 'text-neo-black' : family.icon,
+                  family.icon,
                   isActive && styles.modeArtOn,
                 )}
               />

@@ -74,17 +74,17 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
     }
   }, [gameCode, joinUrl, t]);
 
-  // Trigger button — primary CTA in lobby, brand lime color so it reads as
-  // "do this next" not "optional extra". showHint adds wobble for empty rooms.
+  // Trigger button — a lime-outline secondary: the joiner's footer READY UP! is
+  // the lobby's one solid-lime CTA. showHint adds wobble for empty rooms.
   const triggerButton = (
     <DialogTrigger asChild>
       <m.button
         data-testid="mobile-share-trigger"
         whileTap={{ scale: 0.95 }}
         className={cn(
-          // Brand-lime CTA in both sizes so "invite" reads as the next action,
-          // not a neutral chip lost among the header's exit/settings controls.
-          'flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black font-black uppercase tracking-wide shadow-hard active:translate-y-0.5 active:shadow-hard-sm transition-all',
+          // Lime outline in both sizes: still findable among the header's
+          // exit/settings controls, but never a rival to READY UP!.
+          'flex items-center gap-1.5 rounded-full border-2 border-neo-lime bg-neo-navy text-neo-lime font-black uppercase tracking-wide shadow-hard-sm hover:bg-neo-lime/10 active:translate-y-0.5 active:shadow-none transition-all',
           compact ? 'h-8 px-3.5 text-xs' : 'h-10 px-4 text-sm',
           showHint && 'animate-neo-wobble',
         )}

@@ -7,9 +7,10 @@ import styles from './lobby.module.css';
 type T = (path: string, params?: Record<string, string | number>) => string;
 
 /**
- * The joiner's footer primary: a big READY toggle. Resting = lime outline
- * asking for the tap; ready = solid lime with a check that stamps on. It is
- * advisory — the host can start whenever they like.
+ * The joiner's footer primary: a big READY toggle. Resting = the lobby's one
+ * solid-lime CTA asking for the tap; once ready it steps down to a lime outline
+ * with a check that stamps on (tap again to un-ready). It is advisory — the
+ * host can start whenever they like.
  */
 export function ReadyButton({
   isReady, onToggle, inFlight, t, className,
@@ -26,7 +27,7 @@ export function ReadyButton({
         'font-neo-display text-xl tv:text-3xl font-bold uppercase tracking-wide shadow-hard transition-[transform,background-color] duration-150',
         'active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
         'disabled:opacity-50 disabled:cursor-not-allowed',
-        isReady ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy text-neo-lime border-neo-lime hover:bg-neo-lime/10',
+        isReady ? 'bg-neo-navy text-neo-lime border-neo-lime hover:bg-neo-lime/10' : 'bg-neo-lime text-neo-black hover:brightness-110',
         className,
       )}
     >

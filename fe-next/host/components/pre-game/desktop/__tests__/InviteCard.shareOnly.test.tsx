@@ -69,11 +69,21 @@ describe('InviteCard share-only lobby surface', () => {
     expect(share).toBeInTheDocument();
   });
 
-  it('styles the share button with the lime CTA color (was the copy color)', () => {
+  // CTA hierarchy (integration critic): on the lobby panel SHARE sat as a second
+  // solid-lime button competing with START BATTLE! / READY UP!. The lobby's ONE
+  // solid lime is the footer primary; the panel SHARE is a lime-outline secondary.
+  it('lobby panel: SHARE is a lime-outline secondary, never a second solid-lime CTA', () => {
     render(<InviteCard gameCode="ABC123" t={t} />);
     const share = screen.getByTestId('native-share-button');
-    expect(share.className).toContain('bg-neo-lime');
+    expect(share.className).not.toMatch(/\bbg-neo-lime(?![/\w-])/);
+    expect(share.className).toContain('border-neo-lime');
+    expect(share.className).toContain('text-neo-lime');
     expect(share.className).not.toContain('bg-neo-cyan');
+  });
+
+  it('invite sheet: SHARE stays the solid-lime primary (it is the only action there)', () => {
+    render(<InviteCard gameCode="ABC123" t={t} variant="sheet" />);
+    expect(screen.getByTestId('native-share-button').className).toMatch(/\bbg-neo-lime(?![/\w-])/);
   });
 
   it('still renders the share button when navigator.share is unavailable so users on non-Web-Share browsers get the copy fallback', () => {

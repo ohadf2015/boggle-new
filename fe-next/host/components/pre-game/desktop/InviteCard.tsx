@@ -22,8 +22,10 @@ export interface InviteCardProps {
 
 /**
  * The invite: a scannable QR, the room code big enough to read across a room,
- * the join address, and ONE lime SHARE (Web Share, clipboard fallback). The
- * code is display-only here — copying lives on the header code chip.
+ * the join address, and ONE SHARE (Web Share, clipboard fallback). On the lobby
+ * panel SHARE is a lime-outline secondary — the footer START/READY is the one
+ * solid-lime CTA; inside the invite sheet it is the only action, so it goes solid.
+ * The code is display-only here — copying lives on the header code chip.
  */
 export function InviteCard({ gameCode, t, className, showHint = false, variant = 'panel' }: InviteCardProps): React.ReactElement {
   const [linkCopied, setLinkCopied] = useState(false);
@@ -97,9 +99,12 @@ export function InviteCard({ gameCode, t, className, showHint = false, variant =
         onClick={handleNativeShare}
         aria-label={t('share.button')}
         className={cn(
-          'w-full h-12 flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black',
-          'font-neo-display text-base font-bold uppercase tracking-wider shadow-hard transition-transform',
+          'w-full h-12 flex items-center justify-center gap-2 rounded-neo border-3',
+          'font-neo-display text-base font-bold uppercase tracking-wider transition-transform',
           'hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
+          variant === 'sheet'
+            ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard'
+            : 'border-neo-lime bg-neo-navy text-neo-lime shadow-hard-sm hover:bg-neo-lime/10',
         )}
       >
         {linkCopied ? <Check aria-hidden="true" className="w-5 h-5" /> : <Share2 aria-hidden="true" className="w-5 h-5" />}

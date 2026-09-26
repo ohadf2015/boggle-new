@@ -31,4 +31,13 @@ describe('BattleModeCard — illustrated mode tiles', () => {
     tile.click();
     expect(onHowToPlay).toHaveBeenCalledTimes(1);
   });
+
+  it('the chosen tile is tinted + ringed in its mode colour, not flooded solid (START stays the one solid lime)', () => {
+    render(<BattleModeCard selectedGameMode="classic" setSelectedGameMode={vi.fn()} t={t} />);
+    const tile = screen.getByTestId('game-mode-classic');
+    expect(tile).toHaveAttribute('aria-pressed', 'true');
+    expect(tile.className).not.toMatch(/\bbg-neo-lime(?![/\w-])/);
+    expect(tile.className).toMatch(/\bbg-neo-lime\/\d+/);
+    expect(tile.className).toContain('border-neo-lime');
+  });
 });

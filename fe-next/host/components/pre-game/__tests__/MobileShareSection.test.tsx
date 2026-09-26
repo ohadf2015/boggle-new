@@ -81,6 +81,15 @@ async function renderAndOpenDialog(gameCode: string, props?: Partial<React.Compo
   });
 }
 
+describe('MobileShareSection — CTA hierarchy', () => {
+  it('the header INVITE trigger is a secondary outline, not a solid-lime rival to READY UP!', () => {
+    render(<MobileShareSection gameCode="ABC123" t={mockT} compact />);
+    const trigger = screen.getByTestId('mobile-share-trigger');
+    expect(trigger.className).not.toMatch(/\bbg-neo-lime(?![/\w-])/);
+    expect(trigger.className).toContain('border-neo-lime');
+  });
+});
+
 describe('MobileShareSection', () => {
   const originalClipboard = navigator.clipboard;
 
