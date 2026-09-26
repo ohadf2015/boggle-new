@@ -24,7 +24,6 @@ import AdventureLevel from './play/AdventureLevel';
 import SkinVault from './play/SkinVault';
 import { useAdventureProgress } from './play/useAdventureProgress';
 import { equipWorldSkin, equippedWorld } from './play/equipWorldSkin';
-import { AdventureGuestGate } from './AdventureGuestGate';
 
 /**
  * QA-only: `?preview=win` / `?preview=over` mount the run-END screens with a
@@ -33,6 +32,12 @@ import { AdventureGuestGate } from './AdventureGuestGate';
  * screenshotted or reviewed at all. Lazily loaded: no flag, no bundle.
  */
 const RunResultPreview = dynamic(() => import('./play/run/RunResultPreview'), { ssr: false });
+
+/** Guest playable battle — not a teaser wall. Indexed /adventure must not ship a gate. */
+const AdventureDemo = dynamic(
+  () => import('./demo/AdventureDemo').then((m) => ({ default: m.AdventureDemo })),
+  { ssr: false },
+);
 
 /** The world map, or one world's run (which opens on its act map). */
 type View = { kind: 'map' } | { kind: 'run'; world: number };
@@ -111,8 +116,11 @@ export default function AdventureView() {
     );
   }
 
+  // Guests play a real battle (demo). The start/progress APIs need a session, so
+  // the full world-map run stays signed-in; a teaser gate must not sit on an
+  // indexable URL (Googlebot is a guest).
   if (!signedIn) {
-    return <AdventureGuestGate surface="map" />;
+    return <AdventureDemo onExit={() => { window.location.assign(`/${language}`); }} />;
   }
 
   if (view.kind === 'run') {
