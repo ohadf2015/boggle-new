@@ -3,6 +3,7 @@ import AboutPageClient from './PageClient';
 
 export const revalidate = 86400;
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -190,6 +191,7 @@ export default async function AboutPage({ params }: PageProps) {
           />
         );
       })()}
+      <EducationCalloutLink locale={locale} />
     </>
   );
 }

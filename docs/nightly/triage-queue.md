@@ -2424,3 +2424,21 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: reverted all (working tree clean); tag left un-resolved in restore queue
   - why: net-negative to ship — the only conflict-free hunks were unsafe/unverifiable; genuinely valuable content in this tag (education/translations/growthTracking) is all in the CONFLICTED set, which needs a human/careful pass, not a blind restore
   - recommended owner: review-by-eod (consider this tag effectively stale enough that a fresh re-diagnosis from current master beats a 19-day-old backup; do not re-attempt raw restore without re-reading each conflicted file's current master version first)
+
+## 2026-09-26
+- [Sentry] Error fetching student classroom: permission denied for function is_classroom_owner (42501)
+  - JAVASCRIPT-NEXTJS-2A6, first/last seen 2026-09-25 19:04-19:05Z, count=2, userCount=0
+  - https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-2A6
+  - status: deferred
+  - why: auth/RLS-adjacent (classroom_memberships policy invoking is_classroom_owner). Verified live DB grants are currently correct (authenticated has EXECUTE, anon does not) — issue not reproducible against current state (userCount=0 suggests anon/guest role or a transient auth degradation, correlates with same-window "AuthApiError: Request rate limit reached" JAVASCRIPT-NEXTJS-20C). Needs a live repro or auth-service correlation, not a blind migration.
+  - recommended owner: backend (auth/RLS review)
+- [Sentry] Error: Objects are not valid as a React child (avatar config object) on /sv/profile
+  - JAVASCRIPT-NEXTJS-2A4, first/last seen 2026-09-25 18:47Z, count=1, userCount=1
+  - https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-2A4
+  - status: deferred
+  - why: single occurrence, minified-only stacktrace (chunk 4bd1b696, no first-party frame), grep of all `avatar_config`/`customAvatar` prop usages found no direct-object-as-child pattern — root cause not locatable without a source-mapped stack trace or repro.
+  - recommended owner: self (re-triage if it recurs with a resolved stacktrace)
+- [lane 03] `exp-game-abandon-confirm-v1` still unwired — `lib/experiments/quitConfirmDescription.ts` (`resolveQuitConfirmDescription`, variants `control`/`stats-shown`) has zero callers repo-wide (`rg -n "resolveQuitConfirmDescription"` = only its own definition). No PostHog flag was created per STEP 3b's hard precondition (0 call sites → do not create). Needs a caller wired into the quit-confirm dialog (grep the singleplayer quit/abandon confirm component) before this experiment can go live. Matches prior memory note (2026-06-16) — still open 3+ months later.
+  - status: open
+  - why: M-effort (find the quit-confirm dialog, pass `useExperiment('exp-game-abandon-confirm-v1').variant` through, wire score/wordCount), skipped tonight for time budget.
+  - recommended owner: lane 03 next run, or human if it keeps rolling over
