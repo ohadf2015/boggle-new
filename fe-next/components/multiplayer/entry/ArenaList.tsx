@@ -147,6 +147,7 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
                   aria-hidden="true"
                   width={176}
                   height={176}
+                  loading="eager"
                   className="mp-arena-tail-img h-[clamp(64px,34cqh,176px)] w-auto object-contain motion-safe:animate-mp-bump"
                 />
                 <p className="font-neo-display text-sm lg:text-base tv:text-2xl font-bold text-neo-white/75">

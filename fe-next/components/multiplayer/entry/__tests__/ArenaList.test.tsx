@@ -169,6 +169,12 @@ describe('ArenaList', () => {
     expect(tail.className).not.toMatch(/(^|\s)hidden(\s|$)/);
   });
 
+  it("the tail's mascot loads eagerly — with a short list it is the phone's LCP element", () => {
+    render(<ArenaList {...base} rooms={rooms(1)} />);
+    const img = screen.getByTestId('arena-list-tail').querySelector('img');
+    expect(img?.getAttribute('loading')).toBe('eager');
+  });
+
   it('the tail steps aside on phone once the phone rows are full, and entirely once desktop is', () => {
     const { unmount } = render(<ArenaList {...base} rooms={rooms(PHONE_ROW_CAP)} />);
     expect(screen.getByTestId('arena-list-tail').className).toMatch(/(^|\s)hidden(\s|$)/);
