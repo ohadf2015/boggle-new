@@ -39,7 +39,7 @@ export function StreakRing({ t, combo, bestCombo, reducedMotion }: { t: T; combo
   return (
     <div
       data-wt2-streak-ring
-      className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-neo-thick border-black bg-neo-navy shadow-hard lg:h-14 lg:w-14"
+      className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-neo-thick border-neo-cyan bg-neo-navy shadow-hard lg:h-14 lg:w-14"
       aria-label={t('wordTowerV2.streak.meterA11y', { n: combo, mult: meter.mult, rare: meter.toMarker })}
     >
       <svg viewBox="0 0 36 36" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden>

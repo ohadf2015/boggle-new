@@ -70,10 +70,10 @@ export function V2HudMenu({
       {/* Bottom sheet drawer */}
       <div
         data-wt2-hud-menu
-        className="fixed bottom-0 inset-x-0 z-50 max-h-[60vh] overflow-y-auto rounded-t-neo border-t-neo-thick border-black bg-neo-navy shadow-hard-up"
+        className="fixed bottom-0 inset-x-0 z-50 max-h-[60vh] overflow-y-auto rounded-t-neo border-t-neo-thick border-neo-cyan bg-neo-navy shadow-hard-up"
       >
         {/* Close button at top */}
-        <div className="sticky top-0 flex items-center justify-between border-b-neo border-black bg-neo-navy px-4 py-3">
+        <div className="sticky top-0 flex items-center justify-between border-b-neo border-neo-cyan/40 bg-neo-navy px-4 py-3">
           <h2 className="font-neo-display text-sm font-bold text-neo-cream uppercase">
             {t('wordTowerV2.hud.menu')}
           </h2>

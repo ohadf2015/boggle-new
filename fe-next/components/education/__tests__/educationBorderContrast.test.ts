@@ -232,7 +232,6 @@ const FROZEN_EXTRA = [
   'components/wordTowerV2/V2Dock.tsx|neo-navy|neo-cream/30',
   'components/wordTowerV2/V2Results.tsx|neo-navy|neo-black',
   'components/wordTowerV2/V2Results.tsx|neo-navy|neo-black',
-  'components/wordTowerV2/V2TopBar.tsx|neo-navy|neo-black',
   'components/wordTowerV2/WordTowerV2.tsx|neo-navy|neo-black',
   'components/wordTowerV2/estate/DistrictComplete.tsx|neo-navy|neo-black',
   'components/wordTowerV2/estate/DistrictComplete.tsx|neo-navy|neo-black',
