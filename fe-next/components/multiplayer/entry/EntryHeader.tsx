@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
 import { HelpCircle, Languages, Volume2, VolumeX } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
@@ -13,8 +12,7 @@ import { cn } from '@/lib/utils';
 import { MpHudBar } from '../shell/MpHudBar';
 import { MpBackButton } from '../shell/MpBackButton';
 import { EntrySheet } from './EntrySheet';
-
-const HowToPlay = dynamic(() => import('@/components/HowToPlay'), { ssr: false });
+import { LazyHowToPlay } from './entryLazy';
 
 const ICON_BTN =
   'inline-flex items-center justify-center gap-1.5 h-10 min-w-10 tv:h-16 tv:min-w-16 px-2 shrink-0 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime';
@@ -116,7 +114,7 @@ export function EntryHeader() {
       </EntrySheet>
 
       <EntrySheet open={sheet === 'help'} onClose={close} title={t('mpUi.entry.howToPlay')} icon={HelpCircle} tone="purple" testId="entry-help-sheet">
-        {sheet === 'help' && <HowToPlay onClose={close} />}
+        {sheet === 'help' && <LazyHowToPlay onClose={close} />}
       </EntrySheet>
     </>
   );

@@ -1,3 +1,8 @@
+// The one ENTRY module the page imports: it carries the entry's lazy islands
+// into the route chunk group, keeping every async loader out of EntryScreen's
+// SSR'd chunk group (see entryLazy.tsx).
+import './entryLazy';
+
 /**
  * Whether the global site chrome (AutoHideHeader, bottom nav) is hidden on the
  * MP entry screen. PageClient is the ONE writer of the nav-hiding state

@@ -1,7 +1,8 @@
 'use client';
 
-import { memo } from 'react';
-import Avatar from '@/components/Avatar';
+import { memo, useMemo } from 'react';
+import AvatarRenderer from '@/components/avatar/AvatarRenderer';
+import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { RoomPlayerAvatar } from '@/shared/types/game';
 import { cn } from '@/lib/utils';
 
@@ -10,21 +11,23 @@ interface AvatarStackProps {
   totalCount: number;
   /** Max avatars to render before showing +N overflow */
   maxVisible?: number;
-  /** Avatar size — maps to Avatar component sizes */
+  /** Stack density: sm = 24px faces, md = 28px faces */
   size?: 'sm' | 'md';
   className?: string;
 }
 
 const STACK_SIZES = {
   sm: {
-    avatarSize: 'sm' as const,
+    px: 24,
+    face: 'w-6 h-6',
     container: 'h-6',
     overlap: '-ms-2',
     overflow: 'w-6 h-6 text-[7px]',
     ring: 'ring-2',
   },
   md: {
-    avatarSize: 'sm' as const,
+    px: 28,
+    face: 'w-7 h-7',
     container: 'h-7',
     overlap: '-ms-2.5',
     overflow: 'w-7 h-7 text-[8px]',
@@ -33,8 +36,23 @@ const STACK_SIZES = {
 };
 
 /**
+ * One face in the stack: the player's own avatar, else the same deterministic
+ * avatar components/Avatar would seed from their username. It uses the renderer
+ * directly because the entry already ships it statically (EntryIdentity), and
+ * Avatar's lazy renderer would put an async loader in EntryScreen's SSR'd chunk
+ * group (entry/__tests__/entryChunkGroup.test.ts).
+ */
+function StackFace({ customAvatar, seed, px }: { customAvatar?: CustomAvatarConfig; seed: string; px: number }) {
+  const config = useMemo(
+    () => customAvatar ?? getSeededAvatarConfig(hashString(seed)),
+    [customAvatar, seed],
+  );
+  return <AvatarRenderer config={config} size={px} circular crop="face" disableEffects className="h-full w-full" />;
+}
+
+/**
  * Stacked avatar display for room lists.
- * Renders real Avatar components with overlapping layout.
+ * Renders real avatars with an overlapping layout.
  */
 const AvatarStack = memo<AvatarStackProps>(({
   avatars,
@@ -58,19 +76,15 @@ const AvatarStack = memo<AvatarStackProps>(({
         <div
           key={av.username || `avatar-${i}`}
           className={cn(
-            'relative rounded-full shrink-0',
+            'relative rounded-full overflow-hidden shrink-0',
+            config.face,
             config.ring,
             'ring-neo-navy-light',
             i > 0 && config.overlap,
           )}
           style={{ zIndex: maxVisible - i }}
         >
-          <Avatar
-            customAvatar={av.customAvatar}
-            avatarImage={av.avatarImage}
-            userId={av.username || `room-player-${i}`}
-            size={config.avatarSize}
-          />
+          <StackFace customAvatar={av.customAvatar} seed={av.username || `room-player-${i}`} px={config.px} />
         </div>
       ))}
       {overflow > 0 && (

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
 import { Check, Dices, Pencil } from 'lucide-react';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import { EloRankBadge } from '@/components/multiplayer/EloRankBadge';
@@ -9,8 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useEntryIdentity, type EntryIdentityInput } from './useEntryIdentity';
 import { useEntrySfx } from './useEntrySfx';
-
-const EntryAvatarBuilder = dynamic(() => import('./EntryAvatarBuilder'), { ssr: false });
+import { LazyEntryAvatarBuilder } from './entryLazy';
 
 const MAX_NAME = 20;
 /** Rendered once at the largest size; CSS sizes it per breakpoint (64 phone · 112 desktop · 160 TV). */
@@ -184,7 +182,7 @@ export function EntryIdentity(props: EntryIdentityInput) {
       )}
 
       {builderOpen && (
-        <EntryAvatarBuilder
+        <LazyEntryAvatarBuilder
           isOpen={builderOpen}
           onClose={() => setBuilderOpen(false)}
           onSave={id.saveAvatar}
