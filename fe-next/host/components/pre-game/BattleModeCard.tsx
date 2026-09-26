@@ -90,7 +90,7 @@ export function BattleModeCard({
               data-testid={`game-mode-${mode}`}
               aria-pressed={isActive}
               className={cn(
-                'flex items-center gap-1.5 min-w-0 min-h-11 tall:min-h-12 desktop-tall:min-h-[calc(56px*var(--mp-u,1))] px-2 desktop-tall:px-[calc(10px*var(--mp-u,1))] py-1.5 rounded-neo border-2 text-start',
+                'flex items-center gap-1.5 min-w-0 min-h-11 tall:min-h-12 desktop-tall:min-h-[min(calc(56px*var(--mp-u,1)),6.5vh)] px-2 desktop-tall:px-[calc(10px*var(--mp-u,1))] py-1.5 rounded-neo border-2 text-start',
                 'transition-[transform,background-color,border-color] duration-150 active:translate-y-0.5',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isActive

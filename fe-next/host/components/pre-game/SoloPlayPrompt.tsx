@@ -23,8 +23,8 @@ export const SoloPlayPrompt = memo<SoloPlayPromptProps>(function SoloPlayPrompt(
     >
       <Bot className="w-5 h-5 text-neo-cyan shrink-0" aria-hidden="true" />
       <div className="flex-1 min-w-0">
-        <p className="font-neo-display font-bold text-sm leading-tight text-neo-white truncate">{t('hostView.soloPrompt.title')}</p>
-        <p className="font-neo-body text-[11px] leading-tight text-neo-white/70 truncate hidden desktop-tall:block">
+        <p className="font-neo-display font-bold text-[length:calc(14px*var(--mp-u,1))] leading-tight text-neo-white truncate">{t('hostView.soloPrompt.title')}</p>
+        <p className="font-neo-body text-[length:calc(11px*var(--mp-u,1))] leading-tight text-neo-white/70 truncate hidden desktop-tall:block">
           {t('hostView.soloPrompt.subtitle')}
         </p>
       </div>
@@ -32,8 +32,8 @@ export const SoloPlayPrompt = memo<SoloPlayPromptProps>(function SoloPlayPrompt(
         type="button"
         onClick={onPlayVsBots}
         className={cn(
-          'shrink-0 h-9 px-3 flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black',
-          'font-neo-display font-bold text-sm uppercase shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-none',
+          'shrink-0 h-[calc(36px*var(--mp-u,1))] px-3 flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black',
+          'font-neo-display font-bold text-[length:calc(14px*var(--mp-u,1))] uppercase shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-none',
           'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-white',
         )}
       >

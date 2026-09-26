@@ -263,11 +263,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
             rightContent={
               <>
                 <InviteCard gameCode={gameCode} t={props.t} />
-                <section data-testid="desktop-chat-area" className={cn(CARD, 'flex-1 min-h-48 flex flex-col p-0 overflow-hidden')}>
+                <section data-testid="desktop-chat-area" className={cn(CARD, 'flex-1 min-h-28 flex flex-col p-0 overflow-hidden')}>
                   <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
                     {t('mpUi.lobby.chat')}
                   </h2>
-                  <div className="flex-1 min-h-0 flex flex-col">
+                  <div className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain">
                     <LobbyChatPanel username={username} isHost={false} gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
                   </div>
                 </section>

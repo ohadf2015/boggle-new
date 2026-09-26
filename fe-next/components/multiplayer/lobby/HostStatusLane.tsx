@@ -23,7 +23,7 @@ export interface HostStatusLaneProps {
   className?: string;
 }
 
-const LANE = 'flex items-center gap-2 min-h-11 rounded-neo border-2 px-3 py-1.5 font-neo-display font-bold text-sm';
+const LANE = 'flex items-center gap-2 min-h-[calc(44px*var(--mp-u,1))] rounded-neo border-2 px-3 py-1.5 font-neo-display font-bold text-[length:calc(14px*var(--mp-u,1))]';
 
 /**
  * ONE line of lobby status, newest-most-urgent wins (never a stack):

@@ -278,19 +278,21 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           <DesktopLobbyLayout
             leftContent={
               <>
-                {statusLane}
                 {roster(tvModeToggle)}
                 {modePicker}
               </>
             }
             rightContent={
               <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
+                {/* Status sits over the invite on desktop: the right column's chat
+                    flexes to absorb it, so the seat column never has to scroll. */}
+                {statusLane}
                 {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} />}
-                <section className={cn(CARD, 'flex-1 min-h-48 flex flex-col p-0 overflow-hidden')}>
+                <section className={cn(CARD, 'flex-1 min-h-28 flex flex-col p-0 overflow-hidden')}>
                   <h2 className="shrink-0 px-4 py-2 border-b-2 border-neo-black font-neo-display text-sm font-bold uppercase tracking-wider text-neo-white/80">
                     {t('mpUi.lobby.chat')}
                   </h2>
-                  <div className="flex-1 min-h-0 flex flex-col">
+                  <div className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain">
                     <LobbyChatPanel username={username} isHost gameCode={gameCode} t={t} crazyGames={isOnCrazyGamesPlatform} />
                   </div>
                 </section>

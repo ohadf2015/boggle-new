@@ -58,7 +58,7 @@ export function InviteCard({ gameCode, t, className, showHint = false, variant =
     <div
       data-testid="invite-card"
       className={cn(
-        'flex flex-col items-center gap-3 text-center',
+        'flex flex-col items-center gap-2 desktop-tall:gap-3 text-center',
         variant === 'panel' && 'rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard',
         showHint && 'animate-neo-wobble',
         className,
@@ -75,7 +75,7 @@ export function InviteCard({ gameCode, t, className, showHint = false, variant =
           includeMargin={false}
           bgColor="#ffffff"
           fgColor="#000000"
-          className="block w-[clamp(120px,22vh,200px)] h-[clamp(120px,22vh,200px)] tv:w-[300px] tv:h-[300px]"
+          className="block w-[clamp(104px,19vh,200px)] h-[clamp(104px,19vh,200px)] tv:w-[min(300px,24vh)] tv:h-[min(300px,24vh)]"
           aria-label={t('hostView.scanToJoin')}
           role="img"
         />
