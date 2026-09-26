@@ -18447,7 +18447,6 @@ const sv = {
       "awardTop": "Toppord",
       "awardLongest": "Längst",
       "awardMost": "Flest ord",
-      "wordCount": "{count} ord",
       "letterCount": "{count} bokstäver",
       "roundByRound": "Runda för runda",
       "roundShort": "R{n}",

@@ -18447,7 +18447,6 @@ const ja = {
       "awardTop": "トップワード",
       "awardLongest": "最長",
       "awardMost": "最多ワード",
-      "wordCount": "{count}語",
       "letterCount": "{count}文字",
       "roundByRound": "ラウンド別",
       "roundShort": "R{n}",

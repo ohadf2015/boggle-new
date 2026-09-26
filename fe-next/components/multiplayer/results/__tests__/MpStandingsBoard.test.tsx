@@ -62,5 +62,7 @@ describe('MpStandingsBoard word reel', () => {
     expect(chips).toHaveLength(1);
     expect(chips[0].textContent).toContain('gult');
     expect(chips[0].textContent).toContain('+23');
+    // "+23" never flips to "23+" in Hebrew
+    expect(chips[0].querySelector('[dir="ltr"]')?.textContent).toBe('+23');
   });
 });

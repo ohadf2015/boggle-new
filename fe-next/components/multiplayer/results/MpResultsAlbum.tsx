@@ -34,8 +34,9 @@ const AWARDS: { key: keyof RoundAwards; label: string; icon: LucideIcon; tone: s
   { key: 'most', label: 'mpUi.results.awardMost', icon: Layers, tone: 'bg-neo-pink' },
 ];
 
+/** Top word: "+N" points; longest: its letter count; most words: the bare count. */
 function awardValue(key: keyof RoundAwards, a: RoundAward, t: TFn): string {
-  if (key === 'most') return t('mpUi.results.wordCount', { count: a.value });
+  if (key === 'most') return String(a.value);
   if (key === 'longest') return t('mpUi.results.letterCount', { count: a.value });
   return `+${a.value}`;
 }
@@ -69,7 +70,10 @@ function MpRoundAwardsImpl({ awards, t, className }: { awards: RoundAwards; t: T
               {a.word && (
                 <span dir="auto" className="truncate font-neo-display font-bold uppercase leading-none text-[calc(18px*var(--mp-u,1))]">{a.word}</span>
               )}
-              <span className={cn('font-neo-display font-bold tabular-nums leading-none text-neo-yellow', a.word ? 'text-[calc(12px*var(--mp-u,1))]' : 'text-[calc(18px*var(--mp-u,1))]')}>
+              <span
+                dir={key === 'longest' ? undefined : 'ltr'}
+                className={cn('self-start font-neo-display font-bold tabular-nums leading-none text-neo-yellow', a.word ? 'text-[calc(12px*var(--mp-u,1))]' : 'text-[calc(26px*var(--mp-u,1))]')}
+              >
                 {awardValue(key, a, t)}
               </span>
               <span className="flex items-center gap-1 min-w-0">

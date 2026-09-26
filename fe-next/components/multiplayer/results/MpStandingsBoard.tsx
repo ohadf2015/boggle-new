@@ -144,7 +144,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
                     >
                       <Star aria-hidden="true" className="w-3 h-3 shrink-0 fill-current" />
                       <span dir="auto" className="truncate uppercase font-neo-display tracking-wide">{r.bestWord.word}</span>
-                      <span className="shrink-0 opacity-75">+{r.bestWord.score}</span>
+                      <span dir="ltr" className="shrink-0 opacity-75">+{r.bestWord.score}</span>
                     </span>
                   )}
                 </span>

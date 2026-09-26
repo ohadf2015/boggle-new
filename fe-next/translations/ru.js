@@ -18180,7 +18180,6 @@ const ru = {
       "awardTop": "Лучшее слово",
       "awardLongest": "Самое длинное",
       "awardMost": "Больше всех слов",
-      "wordCount": "слов: {count}",
       "letterCount": "букв: {count}",
       "roundByRound": "По раундам",
       "roundShort": "Р{n}",

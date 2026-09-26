@@ -48,3 +48,10 @@ describe('MpMyCard best word chip', () => {
     expect(screen.queryByTestId('mp-my-best-word')).toBeNull();
   });
 });
+
+describe('MpMyCard points in RTL', () => {
+  it('Given a best word, Then its "+N" is an LTR island (never "12+" in Hebrew)', () => {
+    render(<MpMyCard {...base} />);
+    expect(screen.getByTestId('mp-my-best-word').querySelector('[dir="ltr"]')?.textContent).toBe('+12');
+  });
+});

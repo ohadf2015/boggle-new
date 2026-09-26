@@ -18377,7 +18377,6 @@ const he = {
       "awardTop": "מילת השיא",
       "awardLongest": "הכי ארוכה",
       "awardMost": "הכי הרבה מילים",
-      "wordCount": "{count} מילים",
       "letterCount": "{count} אותיות",
       "roundByRound": "סיבוב אחר סיבוב",
       "roundShort": "ס׳{n}",

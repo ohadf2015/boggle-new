@@ -21,7 +21,7 @@ const USED = [
   'tapToChange', 'chooseMode', 'startNext', 'ready', 'youreReady', 'readyCount', 'waitingHost', 'autoIn',
   'cancelAuto', 'autoOff', 'rematch', 'newSeries', 'leave', 'share', 'seriesChampion', 'teacherPaced',
   'roundPoints', 'yourRank', 'lessonRecap', 'seriesPlace', 'seriesPts', 'roundGain',
-  'awardsTitle', 'awardTop', 'awardLongest', 'awardMost', 'wordCount', 'letterCount', 'roundByRound', 'roundShort', 'total', 'player',
+  'awardsTitle', 'awardTop', 'awardLongest', 'awardMost', 'letterCount', 'roundByRound', 'roundShort', 'total', 'player',
 ];
 
 describe('mpUi.results translations', () => {

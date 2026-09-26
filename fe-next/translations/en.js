@@ -17525,7 +17525,6 @@ const en = {
       "awardTop": "Top word",
       "awardLongest": "Longest",
       "awardMost": "Most words",
-      "wordCount": "{count} words",
       "letterCount": "{count} letters",
       "roundByRound": "Round by round",
       "roundShort": "R{n}",

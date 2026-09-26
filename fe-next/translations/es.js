@@ -18465,7 +18465,6 @@ const es = {
       "awardTop": "Mejor palabra",
       "awardLongest": "Más larga",
       "awardMost": "Más palabras",
-      "wordCount": "{count} palabras",
       "letterCount": "{count} letras",
       "roundByRound": "Ronda a ronda",
       "roundShort": "R{n}",

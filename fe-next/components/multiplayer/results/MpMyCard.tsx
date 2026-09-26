@@ -114,7 +114,7 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
                 {t('mpUi.results.bestWord')}
               </span>
               <span dir="auto" className="uppercase truncate font-neo-display">{bestWord.word}</span>
-              <span className="tabular-nums opacity-70">+{bestWord.score}</span>
+              <span dir="ltr" className="tabular-nums opacity-70">+{bestWord.score}</span>
             </span>
           )}
           {xp != null && xp > 0 && (

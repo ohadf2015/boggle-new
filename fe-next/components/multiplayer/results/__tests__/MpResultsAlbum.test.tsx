@@ -25,7 +25,10 @@ describe('MpRoundAwards', () => {
     );
     expect(screen.getByTestId('mp-award-best').textContent).toMatch(/gult.*\+23.*Maya/);
     expect(screen.getByTestId('mp-award-longest').textContent).toMatch(/quartz.*letterCount.*6.*Leo/);
-    expect(screen.getByTestId('mp-award-most').textContent).toMatch(/wordCount.*3.*Leo/);
+    // "Most words" is the bare count under its label (never "1 words")
+    expect(screen.getByTestId('mp-award-most').textContent).toMatch(/awardMost3Leo/);
+    // Points stay "+23" in RTL: every "+N" is an LTR island
+    expect(screen.getByTestId('mp-award-best').querySelector('[dir="ltr"]')?.textContent).toBe('+23');
   });
 
   it('Given nobody counted a word, Then the panel is not rendered at all', () => {
