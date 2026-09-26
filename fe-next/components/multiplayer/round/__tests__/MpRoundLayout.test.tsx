@@ -250,6 +250,13 @@ describe('MpRoundLayout', () => {
     expect(chips[0]).toHaveTextContent('+5');
   });
 
+  it('a word listed twice (optimistic add + server echo) counts and shows ONCE', () => {
+    render(<MpRoundLayout {...props({ foundWords: [{ word: 'alen' }, { word: 'akin' }, { word: 'ALEN' }] })} />);
+    expect(screen.getAllByTestId('mp-recent-word')).toHaveLength(2);
+    expect(screen.getAllByTestId('ladder-row-alen')).toHaveLength(1);
+    expect(screen.getByTestId('mp-found-pill')).toHaveTextContent('"count":2');
+  });
+
   it('docks a found-count pill', () => {
     render(<MpRoundLayout {...props({ foundWords: [{ word: 'a' }, { word: 'b' }, { word: 'c' }] })} />);
     expect(screen.getByTestId('mp-found-pill')).toHaveTextContent('"count":3');

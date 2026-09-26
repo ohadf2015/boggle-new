@@ -24,6 +24,17 @@ interface FoundWordLike {
 
 const counts = (w: FoundWordLike) => w.isValid !== false && !w.duplicate;
 
+/** Valid, non-duplicate words, each once (an optimistic add + the server echo can list a word twice). */
+function uniqueFound(words: readonly FoundWordLike[]): FoundWordLike[] {
+  const seen = new Set<string>();
+  return words.filter((w) => {
+    const key = w.word.toLowerCase();
+    if (!counts(w) || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export interface MpRoundLayoutProps {
   meId: string;
   gameMode: string | null | undefined;
@@ -80,17 +91,17 @@ function MpRoundLayoutImpl({
 
   const juice = useRoundJuice({ meId, standings, remainingTime });
 
-  const validCount = useMemo(() => foundWords.filter(counts).length, [foundWords]);
+  const found = useMemo(() => uniqueFound(foundWords), [foundWords]);
   // Ladder points: the server's per-word points (mpFeedback), never a client sum.
   const ladder = useMemo<LadderWord[]>(
     () =>
-      foundWords.filter(counts).map((w, i) => ({
+      found.map((w, i) => ({
         word: w.word,
         score: w.score || juice.pointsByWord.get(w.word.toLowerCase()) || 0,
         ts: w.timestamp ?? i,
         userId: meId,
       })),
-    [foundWords, meId, juice.pointsByWord],
+    [found, meId, juice.pointsByWord],
   );
 
   return (
@@ -141,7 +152,7 @@ function MpRoundLayoutImpl({
           data-testid="mp-found-pill"
           className="pointer-events-none absolute bottom-1 end-2 z-10 rounded-full border-2 border-neo-black bg-neo-navy-light px-2.5 py-0.5 text-xs tv:text-lg font-bold text-neo-white/80 shadow-hard-sm tabular-nums"
         >
-          {t('mpUi.round.found', { count: validCount })}
+          {t('mpUi.round.found', { count: found.length })}
         </span>
       </div>
 
