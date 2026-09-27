@@ -11,9 +11,9 @@ interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
   t: (path: string, params?: Record<string, string | number>) => string;
-  /** Surfaces the admin-only previews (Word Tower, Sealed Bid, Crossword). */
+  /** Legacy host flag — no MP mode is gated on it since the sealed-bid/crossword removal (2026-09-27). */
   isAdmin?: boolean;
-  /** Board language — gates admin-only modes by dictionary availability. */
+  /** Board language — no MP mode is gated on it since 2026-09-27. */
   language?: string | null;
   /** @deprecated Blast is offered to all players now. */
   hasBlastAccess?: boolean;
@@ -30,8 +30,9 @@ const MODES: Array<{ mode: GameModeOption; nameKey: string }> = [
   { mode: 'word-hunt', nameKey: 'gameModes.wordHunt.name' },
   { mode: 'wheel-rush', nameKey: 'gameModes.wheelRush.name' },
   { mode: 'blast', nameKey: 'gameModes.blast.name' },
-  { mode: 'sealed-bid', nameKey: 'gameModes.sealedBid.name' },
-  { mode: 'crossword', nameKey: 'gameModes.crossword.name' },
+  // Ohad 2026-09-27: sealed-bid and crossword are out of the MP picker — they
+  // were admin-only previews crowding the phone grid. They stay available in
+  // SOLO (GameModeSelector / ModesScreen).
 ];
 
 /**
@@ -58,21 +59,13 @@ export function BattleModeCard({
   selectedGameMode,
   setSelectedGameMode,
   t,
-  isAdmin = false,
-  language = null,
   onHowToPlay,
   fill = false,
   className,
 }: BattleModeCardProps): React.ReactElement {
   const handleSelect = useCallback((mode: GameModeOption) => setSelectedGameMode(mode), [setSelectedGameMode]);
 
-  // Sealed Bid needs curated EN/HE racks; Crossword is an admin preview.
-  // (Legacy MP Word Tower left the picker on master — bf90dc061.)
-  const visibleModes = MODES.filter(({ mode }) => {
-    if (mode === 'sealed-bid') return isAdmin && (language === 'en' || language === 'he');
-    if (mode === 'crossword') return isAdmin;
-    return true;
-  });
+  // Every MODES entry is offered to every host now — no per-mode gating.
 
   return (
     <section className={cn('flex flex-col gap-2 min-w-0', fill && 'flex-1', className)}>
@@ -86,7 +79,7 @@ export function BattleModeCard({
        * can never shrink below the tiles' min-h.
        */}
       <div className={cn('grid grid-cols-3 gap-2 desktop-tall:gap-[calc(10px*var(--mp-u,1))]', fill && 'flex-1 auto-rows-fr')}>
-        {visibleModes.map(({ mode, nameKey }) => {
+        {MODES.map(({ mode, nameKey }) => {
           const isActive = selectedGameMode === mode;
           const family = FAMILY[getModePresentation(mode).color];
           return (
@@ -98,7 +91,7 @@ export function BattleModeCard({
               aria-pressed={isActive}
               className={cn(
                 styles.modeTile,
-                'group flex flex-col items-center justify-center gap-1 min-w-0 min-h-[64px] tall:min-h-[72px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 text-center',
+                'group flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] tall:min-h-[80px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 text-center',
                 'transition-[transform,background-color,border-color,box-shadow] duration-150 active:translate-y-0.5 active:shadow-none',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isActive
@@ -128,7 +121,7 @@ export function BattleModeCard({
             data-testid="lobby-how-to-play"
             className={cn(
               styles.modeTile,
-              'flex flex-col items-center justify-center gap-1 min-w-0 min-h-[64px] tall:min-h-[72px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 border-dashed border-neo-cyan/60 bg-neo-navy text-neo-cyan text-center',
+              'flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] tall:min-h-[80px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 border-dashed border-neo-cyan/60 bg-neo-navy text-neo-cyan text-center',
               'transition-[transform,border-color] duration-150 hover:border-neo-cyan active:translate-y-0.5',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
             )}

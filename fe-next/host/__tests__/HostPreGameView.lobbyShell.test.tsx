@@ -124,17 +124,19 @@ describe('HostPreGameView — lobby on the shell', () => {
 
   it('START says "vs bots" while no human has joined (replaces the pink banner)', () => {
     render(<HostPreGameView {...baseProps} hostPlaying playersReady={[{ username: 'Host', isHost: true }]} />);
-    expect(within(within(screen.getByTestId('lobby-phone')).getByTestId('lobby-start')).getByText('mpUi.lobby.startVsBots')).toBeInTheDocument();
+    // Round 3 (2026-09-27): the CTA strip moved OUT of lobby-phone — it is a
+    // pinned sibling so it never scrolls. Scope footer assertions to it.
+    expect(within(within(screen.getByTestId('lobby-phone-footer')).getByTestId('lobby-start')).getByText('mpUi.lobby.startVsBots')).toBeInTheDocument();
   });
 
   it('START shows the seat count once a human joined', () => {
     render(<HostPreGameView {...baseProps} hostPlaying playersReady={[{ username: 'Host', isHost: true }, { username: 'Ada', isHost: false }]} />);
-    expect(within(within(screen.getByTestId('lobby-phone')).getByTestId('lobby-start')).getByText('mpUi.lobby.seatsTaken')).toBeInTheDocument();
+    expect(within(within(screen.getByTestId('lobby-phone-footer')).getByTestId('lobby-start')).getByText('mpUi.lobby.seatsTaken')).toBeInTheDocument();
   });
 
   it('phone footer: INVITE is an outlined secondary beside the one solid START', () => {
     render(<HostPreGameView {...baseProps} hostPlaying playersReady={[{ username: 'Host', isHost: true }]} />);
-    const invite = within(screen.getByTestId('lobby-phone')).getByTestId('lobby-invite-button');
+    const invite = within(screen.getByTestId('lobby-phone-footer')).getByTestId('lobby-invite-button');
     // A solid cyan tile with a hard shadow competed with START BATTLE! at 390px.
     expect(invite.className).not.toMatch(/\bbg-neo-cyan(?![/\w-])/);
     expect(invite.className).not.toMatch(/\bshadow-hard(?![-\w])/);

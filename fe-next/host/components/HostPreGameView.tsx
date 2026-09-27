@@ -244,7 +244,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   return (
-    <div className="min-h-full flex flex-col w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
+    <div className="h-full flex flex-col w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
       {lessonData && (
         <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-neo-purple/20 border-b-2 border-neo-purple/50 text-sm min-w-0">
           <BookOpen aria-hidden="true" className="w-4 h-4 text-neo-purple shrink-0" />
@@ -286,13 +286,13 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
       </header>
 
       {/*
-       * No overflow-hidden here: the phone column below sizes to its content
-       * (flex children keep their automatic minimum) and, when the lobby is
-       * taller than the viewport, extends the scroll region of the enclosing
-       * MpScreen body (bodyScroll="inner") instead of being clipped. Desktop
-       * columns scroll internally inside DesktopLobbyLayout.
+       * Round 3 (Ohad 2026-09-27): main is the SINGLE scroll region — the phone
+       * CTA strip is a pinned sibling below it, so the bottom section never
+       * scrolls. The root is h-full (fixed to the MpScreen body); no
+       * overflow-hidden anywhere — overflowing content grows main's scroll,
+       * never clips (tile rows must never compress into each other).
        */}
-      <main className="flex-1 min-h-0 flex flex-col">
+      <main className="flex-1 min-h-0 overflow-y-auto flex flex-col">
         <h1 className="sr-only">{t('hostView.lobbyTitle')}</h1>
 
         {/* Desktop / tablet (≥720px): seats + mode left, invite + chat right. */}
@@ -320,36 +320,36 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           </div>
         </div>
 
-        {/* Phone (<720px): one column; content-sized so the MpScreen body
-            scrolls when it exceeds the viewport — never squeeze (tile rows
-            must never compress into each other). The footer CTA stays pinned
-            via the column's flex-1 while content fits. */}
-        <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col flex-1">
+        {/* Phone (<720px): one column inside the scrolling main; the CTA
+            strip lives OUTSIDE main so it stays pinned while this scrolls. */}
+        <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col">
           <div className="flex-1 flex flex-col gap-2 px-3 py-2 w-full max-w-[600px] mx-auto">
             {statusLane}
             {roster()}
             {modePicker}
             {settingsSummary}
           </div>
-          <div className="shrink-0 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
-            <div className="max-w-[600px] mx-auto flex items-stretch gap-2">
-              {!isPrivate && (
-                <button
-                  type="button"
-                  onClick={() => setSheet('invite')}
-                  data-testid="lobby-invite-button"
-                  // Outlined secondary: START BATTLE! beside it is the lobby's one solid CTA.
-                  className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-cyan bg-neo-navy text-neo-cyan font-neo-display text-xs font-bold uppercase shadow-hard-sm hover:bg-neo-cyan/10 active:translate-y-0.5 active:shadow-none"
-                >
-                  <UserPlus aria-hidden="true" className="w-6 h-6" />
-                  {t('mpUi.lobby.invite')}
-                </button>
-              )}
-              <div className="flex-1 min-w-0">{startButton}</div>
-            </div>
-          </div>
         </div>
       </main>
+      {/* Phone CTA strip — pinned sibling AFTER the scroll region: tall
+          lobbies scroll inside <main>; this never moves. */}
+      <div data-testid="lobby-phone-footer" className="min-[720px]:hidden shrink-0 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
+        <div className="max-w-[600px] mx-auto flex items-stretch gap-2">
+          {!isPrivate && (
+            <button
+              type="button"
+              onClick={() => setSheet('invite')}
+              data-testid="lobby-invite-button"
+              // Outlined secondary: START BATTLE! beside it is the lobby's one solid CTA.
+              className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-cyan bg-neo-navy text-neo-cyan font-neo-display text-xs font-bold uppercase shadow-hard-sm hover:bg-neo-cyan/10 active:translate-y-0.5 active:shadow-none"
+            >
+              <UserPlus aria-hidden="true" className="w-6 h-6" />
+              {t('mpUi.lobby.invite')}
+            </button>
+          )}
+          <div className="flex-1 min-w-0">{startButton}</div>
+        </div>
+      </div>
 
       {!isPrivate && <InviteSheet open={sheet === 'invite'} onClose={closeSheet} gameCode={gameCode} t={t} />}
       <HowToPlaySheet open={sheet === 'howto'} onClose={closeSheet} mode={lobby.selectedGameMode} lang={roomLanguage} t={t} />

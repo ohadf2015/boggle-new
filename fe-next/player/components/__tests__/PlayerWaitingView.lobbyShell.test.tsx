@@ -53,7 +53,9 @@ describe('PlayerWaitingView — joiner lobby on the shell', () => {
   it('seats the whole room — host, bots and bare-string players (never "PLAYERS 0")', () => {
     render(<PlayerWaitingView {...props} />);
     const seats = phone().getAllByTestId('lobby-seat');
-    expect(seats.map((s) => s.getAttribute('data-player'))).toEqual(['Host', 'Ada', 'Bo', 'Bot Lexi']);
+    // Round 2 (2026-09-27): MY seat is pinned first on phone (Ada), then the
+    // rest of the room in join order.
+    expect(seats.map((s) => s.getAttribute('data-player'))).toEqual(['Ada', 'Host', 'Bo', 'Bot Lexi']);
     expect(phone().getByText('4/8')).toBeInTheDocument();
   });
 
