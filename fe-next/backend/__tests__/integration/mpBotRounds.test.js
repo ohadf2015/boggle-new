@@ -47,6 +47,18 @@ vi.mock('../../modules/botBehaviorCache', async (importOriginal) => ({
   getCachedDifficultyParams: vi.fn().mockResolvedValue(null),
 }));
 
+// submitWord's dictionary check (isValidWordCached) awaits a Redis cache read
+// (cache/wordCache). ioredis implements connect/command timeouts and the
+// offline-queue reconnect with setTimeout — which this file FAKES. With no
+// Redis (CI, or any env without one) the first submitWord's cache read waits
+// on a reconnect that fake time never reaches → real-time 60s timeout, for
+// classic/blast/word-hunt (wheel-rush validates against the puzzle, not the
+// dictionary). Miss-to-real-dictionary keeps the assertion hermetic.
+vi.mock('../../cache/wordCache', () => ({
+  getCachedWordValidation: vi.fn().mockResolvedValue(null),
+  setCachedWordValidation: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.setConfig({ testTimeout: 60000 });
 
 const HOST = 'BotRoundHost';
