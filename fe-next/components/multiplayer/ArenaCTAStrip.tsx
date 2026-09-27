@@ -53,10 +53,13 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({ onQuickPlay, onCreateRoom
           data-testid="arena-create-room"
           onClick={offline ? undefined : onCreateRoom}
           disabled={offline}
-          className="lg:hidden flex-1 min-w-0 h-[calc(64px*var(--mp-u,1))] flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-pink bg-neo-navy-light px-2 font-neo-display text-sm font-bold uppercase leading-tight text-neo-pink shadow-hard transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
+          className="lg:hidden flex-1 min-w-0 h-[calc(64px*var(--mp-u,1))] flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-pink bg-neo-navy-light px-2 font-neo-display text-xs font-bold uppercase leading-tight text-neo-pink shadow-hard transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
         >
-          <Plus aria-hidden="true" className="h-5 w-5" />
-          <span className="max-w-full truncate">{t('mpUi.entry.create')}</span>
+          <Plus aria-hidden="true" className="h-5 w-5 shrink-0" />
+          {/* 1/3 of a 390px row is ~93px — too narrow for "CREATE ROOM" on one
+              line. Wrap to two centred lines (still fits the 64px button under
+              the icon); never truncate the label into "CREAT…". */}
+          <span className="max-w-full text-center text-balance">{t('mpUi.entry.create')}</span>
         </button>
       </div>
     </section>

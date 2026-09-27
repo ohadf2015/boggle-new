@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { type ReactNode } from 'react';
+import { emitRewardAdActive, isFullscreenAdActive } from '../useRewardAdPause';
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
@@ -118,6 +119,7 @@ describe('useAdMob', () => {
     Object.keys(listeners).forEach((k) => delete listeners[k]);
     social.tier = 'adult';
     clockOffsetMs = 0;
+    emitRewardAdActive(false); // module-level bus flag survives across tests
     vi.spyOn(Date, 'now').mockImplementation(() => realDateNow() + clockOffsetMs);
   });
 
@@ -361,6 +363,46 @@ describe('useAdMob', () => {
     });
     // The consumed slot is re-warmed so the next eligible interstitial is instant.
     expect(AdMob.prepareInterstitial).toHaveBeenCalled();
+  });
+
+  it('interstitial raises the fullscreen-ad bus for exactly the show window', async () => {
+    // An AdMob interstitial is a native Activity that hides the WebView →
+    // visibilitychange fires → the socket's 5s background-disconnect would kill
+    // the room connection mid-ad (the "ad between games → disconnected" report).
+    // The bus flag tells that guard (and the MP ad-gate echo) to stand down.
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await drainInterstitial(() => result.current.showInterstitial(), 5);
+    });
+    expect(isFullscreenAdActive()).toBe(false); // settled shows leave no flag behind
+    await act(async () => {
+      const p = result.current.showInterstitial(); // eligible — shows
+      await flush();
+      expect(AdMob.showInterstitial).toHaveBeenCalled();
+      expect(isFullscreenAdActive()).toBe(true); // the ad owns the screen now
+      fireEvent('interstitialAdDismissed');
+      await p;
+    });
+    expect(isFullscreenAdActive()).toBe(false);
+  });
+
+  it('no-fill / ineligible interstitial never raises the bus flag', async () => {
+    vi.mocked(AdMob.prepareInterstitial).mockRejectedValue(new Error('no fill'));
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      await act(async () => {
+        await drainInterstitial(() => result.current.showInterstitial(), 5);
+        const p = result.current.showInterstitial(); // eligible but no fill
+        await flush();
+        await p;
+      });
+      expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+      expect(isFullscreenAdActive()).toBe(false);
+    } finally {
+      vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined);
+    }
   });
 
   it('no-fill interstitial does not show, still resolves, and preserves the slot', async () => {

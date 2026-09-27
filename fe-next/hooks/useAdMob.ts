@@ -3,6 +3,7 @@ import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, RewardInte
 import { useAdMobContext } from '@/contexts/AdMobContext';
 import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
 import { kickWebViewRepaint } from '@/lib/native/webviewRepaint';
+import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 import { trackRewardedLifecycle, trackInterstitialLifecycle, type InterstitialLifecycleStage, type RewardedLifecycleStage } from '@/utils/growthTracking';
 import { trackAdClosed, classifyInterstitialTerminal, classifyRewardedTerminal } from '@/lib/ads/adQuality';
 
@@ -349,6 +350,9 @@ export function useAdMob() {
       const settle = () => {
         if (settled) return;
         settled = true;
+        // The fullscreen window is over (dismiss / failure / watchdog) — drop the
+        // bus flag so the socket background-disconnect guard re-arms.
+        emitRewardAdActive(false);
         if (timer) { clearTimeout(timer); timer = null; }
         handles.forEach((h) => { try { h.remove(); } catch {} });
         handles.length = 0;
@@ -443,6 +447,11 @@ export function useAdMob() {
           // The ad is about to own the screen — restart the budget so the
           // watchdog bounds a HUNG show, not the user watching a working one.
           armWatchdog(INTERSTITIAL_SHOW_TIMEOUT_MS);
+          // Raise the fullscreen-ad bus BEFORE the native Activity covers the
+          // WebView: the ensuing visibilitychange must not trip the socket's
+          // 5s background-disconnect (the "ad between games → disconnected"
+          // report). settle() drops it on every terminal path.
+          emitRewardAdActive(true);
           await AdMob.showInterstitial();
           trackInterstitialLifecycle('show_resolved');
         } catch {

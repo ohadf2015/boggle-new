@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 7349,
+    "totalKeysInCode": 7432,
     "keyCountByLanguage": {
-      "en": 14294,
-      "es": 14582,
-      "he": 14504,
-      "ja": 14563,
-      "ru": 14336,
-      "sv": 14560
+      "en": 14477,
+      "es": 14765,
+      "he": 14687,
+      "ja": 14746,
+      "ru": 14519,
+      "sv": 14743
     },
     "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 389,
+      "templateLiterals": 391,
       "fallbackUsages": 1,
-      "variableKeys": 117
+      "variableKeys": 118
     }
   },
   "runtimeRisks": {
@@ -107,7 +107,7 @@
         "pattern": "`sealedBid.outcome.${settlement.outcome}`",
         "type": "template_literal",
         "file": "app/[locale]/sealed-bid/page.tsx",
-        "line": 285,
+        "line": 290,
         "context": "? t(`sealedBid.outcome.${settlement.outcome}`)"
       },
       {
@@ -429,7 +429,7 @@
         "pattern": "`adventure.worlds.${nextWorldConfig.name}`",
         "type": "template_literal",
         "file": "components/adventure/WorldMap.tsx",
-        "line": 252,
+        "line": 286,
         "context": "{t(`adventure.worlds.${nextWorldConfig.name}`)} — {runFloorStep ? t('adventurePlay.map.depth', { ste"
       },
       {
@@ -443,7 +443,7 @@
         "pattern": "`adventurePlay.variety.kind.${s.kind}`",
         "type": "template_literal",
         "file": "components/adventure/WorldMapNode.tsx",
-        "line": 368,
+        "line": 369,
         "context": "kinds: rampOf(world.id).map((s) => t(`adventurePlay.variety.kind.${s.kind}`)).join(', '),"
       },
       {
@@ -492,7 +492,7 @@
         "pattern": "`adventurePlay.combat.elite.w${world}`",
         "type": "template_literal",
         "file": "components/adventure/play/fx/FoeTarget.tsx",
-        "line": 96,
+        "line": 111,
         "context": "const name = t(`adventurePlay.combat.elite.w${world}`);"
       },
       {
@@ -569,7 +569,7 @@
         "pattern": "`landing.home.titles.${title}`",
         "type": "template_literal",
         "file": "components/adventure/play/run/EcosystemRewards.tsx",
-        "line": 123,
+        "line": 136,
         "context": "{title && <span className=\"opacity-80\"> · {t(`landing.home.titles.${title}`)}</span>}"
       },
       {
@@ -688,7 +688,7 @@
         "pattern": "`adventurePlay.combat.status.${status.kind}`",
         "type": "template_literal",
         "file": "components/adventure/play/stage/ArenaStage.tsx",
-        "line": 229,
+        "line": 231,
         "context": "{status.kind === 'phase' && combat.phase < 2 ? t('adventurePlay.combat.phaseTwo') : t(`adventurePlay"
       },
       {
@@ -800,14 +800,14 @@
         "pattern": "`blast.pregameBuff.${initialBuff}`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 716,
+        "line": 732,
         "context": "const label = t(`blast.pregameBuff.${initialBuff}`) || initialBuff;"
       },
       {
         "pattern": "`blast.pregameBuff.${initialBuff}Desc`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 717,
+        "line": 733,
         "context": "const desc = t(`blast.pregameBuff.${initialBuff}Desc`) || '';"
       },
       {
@@ -1651,18 +1651,25 @@
         "context": "{t(`asyncChallenge.mode.${challenge.gameMode}`)}"
       },
       {
+        "pattern": "`wordTowerV2.chest.tier.${i.tier}`",
+        "type": "template_literal",
+        "file": "components/landing/LootPeek.tsx",
+        "line": 51,
+        "context": "? t('newModes.loot.chest', { tier: t(`wordTowerV2.chest.tier.${i.tier}`) })"
+      },
+      {
+        "pattern": "`adventurePlay.relic.${i.id}`",
+        "type": "template_literal",
+        "file": "components/landing/LootPeek.tsx",
+        "line": 52,
+        "context": ": t(`adventurePlay.relic.${i.id}`);"
+      },
+      {
         "pattern": "`homeFresh.close.readMoreLinks.${key}`",
         "type": "template_literal",
         "file": "components/landing/fresh/FreshFaqLinks.tsx",
         "line": 56,
         "context": "{t(`homeFresh.close.readMoreLinks.${key}`)}"
-      },
-      {
-        "pattern": "`landing.badge.${meta.badge.toLowerCase()}`",
-        "type": "template_literal",
-        "file": "components/landing/fresh/ModeRow.tsx",
-        "line": 139,
-        "context": "{t(`landing.badge.${meta.badge.toLowerCase()}`)}"
       },
       {
         "pattern": "`landing.home.tier.${tier.toLowerCase()}`",
@@ -2522,36 +2529,50 @@
         "pattern": "`wordTowerV2.reward.${banner.id}.name`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Celebrations.tsx",
-        "line": 138,
-        "context": "<span className=\"font-neo-display text-xl font-black leading-tight\">{t(`wordTowerV2.reward.${banner."
+        "line": 178,
+        "context": "<span className=\"font-neo-display text-base font-black leading-tight\">{t(`wordTowerV2.reward.${banne"
       },
       {
         "pattern": "`wordTowerV2.reward.${banner.id}.desc`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Celebrations.tsx",
-        "line": 139,
-        "context": "<span className=\"font-neo-body text-xs font-semibold leading-snug\">{t(`wordTowerV2.reward.${banner.i"
+        "line": 179,
+        "context": "<span className=\"font-neo-body text-xs font-semibold leading-snug break-words\">{t(`wordTowerV2.rewar"
       },
       {
         "pattern": "`wordTowerV2.ach.${banner.id}.name`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Celebrations.tsx",
-        "line": 153,
-        "context": "<span className=\"font-neo-display text-xl font-black leading-tight\">{t(`wordTowerV2.ach.${banner.id}"
+        "line": 198,
+        "context": "<span className=\"font-neo-display text-base font-black leading-tight\">{t(`wordTowerV2.ach.${banner.i"
       },
       {
         "pattern": "`wordTowerV2.ach.${banner.id}.desc`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Celebrations.tsx",
-        "line": 154,
-        "context": "<span className=\"font-neo-body text-xs font-semibold leading-snug\">{t(`wordTowerV2.ach.${banner.id}."
+        "line": 199,
+        "context": "<span className=\"font-neo-body text-xs font-semibold leading-snug break-words\">{t(`wordTowerV2.ach.$"
       },
       {
         "pattern": "`wordTowerV2.biome.${banner.id}`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Celebrations.tsx",
-        "line": 173,
+        "line": 228,
         "context": "<span className=\"font-neo-display text-2xl font-black\">{t(`wordTowerV2.biome.${banner.id}`)}</span>"
+      },
+      {
+        "pattern": "`wordTowerV2.reward.${id}.name`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/V2HudMenu.tsx",
+        "line": 138,
+        "context": "aria-label={t('wordTowerV2.hud.effect', { name: t(`wordTowerV2.reward.${id}.name`), n })}"
+      },
+      {
+        "pattern": "`wordTowerV2.reward.${id}.name`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/V2HudMenu.tsx",
+        "line": 142,
+        "context": "{t(`wordTowerV2.reward.${id}.name`)}"
       },
       {
         "pattern": "`wordTowerV2.ach.${id}.name`",
@@ -2566,20 +2587,6 @@
         "file": "components/wordTowerV2/V2Results.tsx",
         "line": 244,
         "context": "<div className=\"mt-0.5 font-neo-display text-sm font-bold\">{t(`wordTowerV2.ach.${goal.id}.desc`)}</d"
-      },
-      {
-        "pattern": "`wordTowerV2.reward.${id}.name`",
-        "type": "template_literal",
-        "file": "components/wordTowerV2/V2TopBar.tsx",
-        "line": 314,
-        "context": "aria-label={t('wordTowerV2.hud.effect', { name: t(`wordTowerV2.reward.${id}.name`), n })}"
-      },
-      {
-        "pattern": "`wordTowerV2.reward.${id}.name`",
-        "type": "template_literal",
-        "file": "components/wordTowerV2/V2TopBar.tsx",
-        "line": 321,
-        "context": "{t(`wordTowerV2.reward.${id}.name`)}"
       },
       {
         "pattern": "`wordTowerV2.estate.district.${districtDef(estate.district).id}`",
@@ -2615,6 +2622,13 @@
         "file": "components/wordTowerV2/estate/PlotPanel.tsx",
         "line": 57,
         "context": "<p className=\"mt-1 font-neo-display text-xs font-bold leading-snug opacity-80 md:text-sm\">{t(`wordTo"
+      },
+      {
+        "pattern": "`wordTowerV2.stability.${band}`",
+        "type": "template_literal",
+        "file": "components/wordTowerV2/rescue/StabilityBrace.tsx",
+        "line": 68,
+        "context": "band: t(`wordTowerV2.stability.${band}`),"
       },
       {
         "pattern": "`wordTowerV2.chest.tier.${chest.tier}`",
@@ -2799,9 +2813,17 @@
         "pattern": "t(CLASSROOM_ROOM_GONE_KEY)",
         "variable": "CLASSROOM_ROOM_GONE_KEY",
         "type": "variable_key",
-        "file": "app/[locale]/multiplayer/PageClient.tsx",
-        "line": 284,
+        "file": "app/[locale]/multiplayer/useMpPageState.ts",
+        "line": 181,
         "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });"
+      },
+      {
+        "pattern": "t(CLASSROOM_ROOM_GONE_KEY)",
+        "variable": "CLASSROOM_ROOM_GONE_KEY",
+        "file": "app/[locale]/multiplayer/useMpPageState.ts",
+        "line": 181,
+        "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });",
+        "type": "variable_key"
       },
       {
         "pattern": "t(locale)",
@@ -2904,7 +2926,7 @@
         "variable": "taunt",
         "type": "variable_key",
         "file": "components/adventure/play/stage/ArenaStage.tsx",
-        "line": 215,
+        "line": 217,
         "context": "{t(taunt, { requirement: t('adventurePlay.longerWords') })}"
       },
       {
@@ -3000,7 +3022,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 366,
+        "line": 376,
         "context": "(key: string, fallbackOrParams?: string | Record<string, string | number>) => t(key, fallbackOrParam"
       },
       {
@@ -3008,7 +3030,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 449,
+        "line": 465,
         "context": "const tAdapter = useCallback((key: string, fallback?: string) => t(key, fallback) || undefined, [t])"
       },
       {
@@ -3268,28 +3290,36 @@
         "context": "{t(error)}"
       },
       {
-        "pattern": "t(nameError)",
-        "variable": "nameError",
-        "type": "variable_key",
-        "file": "components/multiplayer/CreateRoomModal.tsx",
-        "line": 233,
-        "context": "{t(nameError)}"
-      },
-      {
-        "pattern": "t(nameError)",
-        "variable": "nameError",
-        "type": "variable_key",
-        "file": "components/multiplayer/JoinRoomModal.tsx",
-        "line": 179,
-        "context": "{t(nameError)}"
-      },
-      {
         "pattern": "t(taglineKey)",
         "variable": "taglineKey",
         "type": "variable_key",
         "file": "components/multiplayer/SeasonBanner.tsx",
         "line": 29,
         "context": "const taglineRaw = t(taglineKey);"
+      },
+      {
+        "pattern": "t(modeNameKey)",
+        "variable": "modeNameKey",
+        "type": "variable_key",
+        "file": "components/multiplayer/desktop/ModeDesktopAdapter.tsx",
+        "line": 76,
+        "context": "<span className=\"font-neo-display font-bold uppercase text-sm tracking-widest text-neo-pink\">{t(mode"
+      },
+      {
+        "pattern": "t(modeNameKey)",
+        "variable": "modeNameKey",
+        "type": "variable_key",
+        "file": "components/multiplayer/desktop/ModeDesktopAdapter.tsx",
+        "line": 86,
+        "context": "<span className=\"font-neo-display font-bold uppercase text-xl tracking-wide truncate\">{t(modeNameKey"
+      },
+      {
+        "pattern": "t(label)",
+        "variable": "label",
+        "type": "variable_key",
+        "file": "components/multiplayer/results/MpResultsAlbum.tsx",
+        "line": 68,
+        "context": "<span className=\"truncate font-neo-body font-bold uppercase text-neo-white/70 text-[calc(10px*var(--"
       },
       {
         "pattern": "t(labelKey)",
@@ -3568,7 +3598,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "host/components/pre-game/AdvancedSettingsModal.tsx",
-        "line": 187,
+        "line": 203,
         "context": "aria-label={t(labelKey)}"
       },
       {
@@ -3576,7 +3606,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "host/components/pre-game/AdvancedSettingsModal.tsx",
-        "line": 196,
+        "line": 212,
         "context": "<span>{t(labelKey)}</span>"
       },
       {
@@ -3584,7 +3614,7 @@
         "variable": "nameKey",
         "type": "variable_key",
         "file": "host/components/pre-game/BattleModeCard.tsx",
-        "line": 181,
+        "line": 113,
         "context": "{t(nameKey)}"
       },
       {
@@ -3592,16 +3622,8 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "host/components/pre-game/StartButton.tsx",
-        "line": 66,
-        "context": "<span>{t(labelKey)}</span>"
-      },
-      {
-        "pattern": "t(labelKey)",
-        "variable": "labelKey",
-        "type": "variable_key",
-        "file": "host/components/pre-game/StartButton.tsx",
-        "line": 100,
-        "context": "<span>{t(labelKey)}</span>"
+        "line": 48,
+        "context": "label={tournamentCreating ? t('hostView.creatingTournament') : t(labelKey)}"
       },
       {
         "pattern": "t(nameKey)",
@@ -4639,7 +4661,7 @@
       "usages": [
         {
           "file": "host/hooks/useHostGameActions.ts",
-          "line": 319
+          "line": 316
         }
       ]
     },

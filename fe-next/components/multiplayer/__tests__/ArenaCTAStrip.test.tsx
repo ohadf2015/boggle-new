@@ -85,6 +85,19 @@ describe('ArenaCTAStrip', () => {
     expect(screen.getByTestId('arena-create-room').className).toMatch(/lg:hidden/);
   });
 
+  // 390px phone: the 1/3 CREATE button has ~93px for its label — `truncate`
+  // clipped it to "CREAT…" (r4 review screenshots). The label must wrap to two
+  // centred lines inside the 64px button instead of clipping.
+  it('CREATE label wraps to two centred lines instead of truncating', () => {
+    render(<ArenaCTAStrip onQuickPlay={vi.fn()} onCreateRoom={vi.fn()} />);
+    const createBtn = screen.getByTestId('arena-create-room');
+    const label = createBtn.querySelector('span');
+    expect(label).not.toBeNull();
+    expect(label!.className).not.toMatch(/truncate/);
+    expect(label!.className).not.toMatch(/whitespace-nowrap/);
+    expect(label!.className).toMatch(/text-center/);
+  });
+
   // t_0d9276d6: above-fold CTAs must paint visible in the first HTML. An
   // opacity:0 framer entrance hid Quick Start until hydration on mobile.
   it('paints the CTA strip statically (no opacity:0 entrance)', () => {

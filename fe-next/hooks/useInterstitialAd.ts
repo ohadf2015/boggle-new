@@ -6,7 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { isAdFreeRoute } from '@/lib/admob-routes';
 import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useAdMob } from '@/hooks/useAdMob';
+import { useAdMob, INTERSTITIAL_MAX_WAIT_MS } from '@/hooks/useAdMob';
 import { useH5GamesAds } from '@/hooks/useH5GamesAds';
 
 /**
@@ -17,7 +17,9 @@ import { useH5GamesAds } from '@/hooks/useH5GamesAds';
  *   Android/iOS Capacitor → AdMob interstitial
  *   Production web (not CG, not native) → H5 Games Ads adBreak({type:'next'})
  *
- * Calls are fire-and-forget; failures are swallowed by the underlying hooks.
+ * Every platform's promise settles on ad completion (dismiss / error / safety
+ * watchdog), so an awaiting caller is gated by the ad cycle on all three.
+ * Failures are swallowed by the underlying hooks.
  */
 export function useInterstitialAd() {
   const { requestMidgameAd } = useCrazyGamesAds();
@@ -52,7 +54,13 @@ export function useInterstitialAd() {
       );
 
       if (isOnCrazyGamesPlatform) {
-        requestMidgameAd();
+        // CG guarantees adFinished/adError, but a hung SDK would wedge an
+        // awaiting caller (the MP host's startGame) forever. Cap the gate so
+        // the flow degrades to the old fire-and-forget behavior instead.
+        await Promise.race([
+          requestMidgameAd(),
+          new Promise<void>((resolve) => setTimeout(resolve, INTERSTITIAL_MAX_WAIT_MS)),
+        ]);
         return;
       }
       if (Capacitor.isNativePlatform()) {
@@ -60,7 +68,7 @@ export function useInterstitialAd() {
         return;
       }
       if (h5EnvEnabled && (isProd || hasH5TestFlag)) {
-        h5Ads.showInterstitial(name);
+        await h5Ads.showInterstitial(name);
       }
     },
     [pathname, requestMidgameAd, isOnCrazyGamesPlatform, adMob, h5Ads],

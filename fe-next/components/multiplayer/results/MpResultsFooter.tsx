@@ -58,13 +58,15 @@ export interface MpIntermissionFooterProps {
   ready: number;
   total: number;
   auto: { active: boolean; secondsLeft: number; total: number; cancel: () => void } | null;
+  /** Someone in the room is mid-ad: START holds so the watcher isn't torn out. */
+  adHold?: boolean;
   onStart: () => void;
   onReady: () => void;
   t: TFn;
 }
 
 /** Between rounds: [auto ring] [START NEXT (host) | I'M IN (joiner)] + ready status. */
-export function MpIntermissionFooter({ isHost, isClassroom, isReady, ready, total, auto, onStart, onReady, t }: MpIntermissionFooterProps) {
+export function MpIntermissionFooter({ isHost, isClassroom, isReady, ready, total, auto, adHold = false, onStart, onReady, t }: MpIntermissionFooterProps) {
   const status = total > 0 ? t('mpUi.results.readyCount', { ready, total }) : undefined;
   if (isClassroom && !isHost) {
     return (
@@ -77,7 +79,14 @@ export function MpIntermissionFooter({ isHost, isClassroom, isReady, ready, tota
     <div className="flex items-center gap-[calc(10px*var(--mp-u,1))]">
       {auto?.active && <MpAutoRing secondsLeft={auto.secondsLeft} total={auto.total} onCancel={auto.cancel} t={t} />}
       {isHost ? (
-        <MpPrimaryCta tone="lime" label={t('mpUi.results.startNext')} sublabel={status} onPress={onStart} className="flex-1 min-w-0" />
+        <MpPrimaryCta
+          tone="lime"
+          label={t('mpUi.results.startNext')}
+          sublabel={adHold ? t('hostView.adWatchHold') : status}
+          onPress={onStart}
+          disabled={adHold}
+          className="flex-1 min-w-0"
+        />
       ) : isReady ? (
         <MpPrimaryCta tone="cyan" label={t('mpUi.results.youreReady')} sublabel={t('mpUi.results.waitingHost')} onPress={() => {}} disabled className="flex-1 min-w-0 disabled:opacity-100" />
       ) : (

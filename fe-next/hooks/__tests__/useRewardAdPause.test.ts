@@ -9,11 +9,12 @@
 
 import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useRewardAdPause, emitRewardAdActive } from '../useRewardAdPause';
+import { useRewardAdPause, emitRewardAdActive, isFullscreenAdActive } from '../useRewardAdPause';
 
 describe('useRewardAdPause', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    emitRewardAdActive(false);
   });
 
   it('returns false initially', () => {
@@ -65,5 +66,29 @@ describe('useRewardAdPause', () => {
 
     addSpy.mockRestore();
     removeSpy.mockRestore();
+  });
+});
+
+describe('isFullscreenAdActive', () => {
+  beforeEach(() => {
+    emitRewardAdActive(false);
+  });
+
+  it('tracks the bus with NO hook mounted — non-React gates (socket background-disconnect) read it synchronously', () => {
+    // The mobile visibilitychange → 5s → socket.disconnect() guard must consult
+    // this DURING a native fullscreen ad (AdMob Activity hides the WebView), when
+    // no React re-render may happen before the 5s timer fires.
+    expect(isFullscreenAdActive()).toBe(false);
+    act(() => { emitRewardAdActive(true); });
+    expect(isFullscreenAdActive()).toBe(true);
+    act(() => { emitRewardAdActive(false); });
+    expect(isFullscreenAdActive()).toBe(false);
+  });
+
+  it('a hook mounted MID-ad still sees the ad (it missed the event)', () => {
+    act(() => { emitRewardAdActive(true); });
+    const { result } = renderHook(() => useRewardAdPause());
+    expect(result.current).toBe(true);
+    act(() => { emitRewardAdActive(false); });
   });
 });

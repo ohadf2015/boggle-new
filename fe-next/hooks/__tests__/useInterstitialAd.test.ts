@@ -31,6 +31,9 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 }));
 vi.mock('@/hooks/useAdMob', () => ({
   useAdMob: () => ({ isAvailable: false, showInterstitial: admobShow }),
+  // Mirrors prepare(15s) + show(30s) from the real module; the code under test
+  // reads the same export, so the race and the test can never drift apart here.
+  INTERSTITIAL_MAX_WAIT_MS: 45_000,
 }));
 vi.mock('@/hooks/useH5GamesAds', () => ({
   useH5GamesAds: () => ({ isAvailable: true, showInterstitial: h5Show, showRewarded: vi.fn(), initialize: vi.fn() }),
@@ -40,6 +43,7 @@ vi.mock('@capacitor/core', () => ({
 }));
 
 import { useInterstitialAd } from '../useInterstitialAd';
+import { INTERSTITIAL_MAX_WAIT_MS } from '../useAdMob';
 
 describe('useInterstitialAd', () => {
   beforeEach(() => {
@@ -158,5 +162,89 @@ describe('useInterstitialAd', () => {
       unmount();
     }
     expect(midgame).toHaveBeenCalledTimes(5);
+  });
+
+  // The MP host awaits showInterstitial BEFORE emitting startGame so the room
+  // stays on results while the host watches. That only holds if EVERY platform's
+  // promise settles on ad completion — not at fire time.
+  it('CG path: the returned promise resolves only when the midgame ad completes', async () => {
+    cgFlag.value = true;
+    let finishAd: ((shown: boolean) => void) | null = null;
+    midgame.mockImplementation(() => new Promise<boolean>((res) => { finishAd = res; }));
+    try {
+      const { result } = renderHook(() => useInterstitialAd());
+      let settled = false;
+      await act(async () => {
+        const p = result.current.showInterstitial('multiplayer-round-complete').then(() => { settled = true; });
+        await Promise.resolve();
+        expect(midgame).toHaveBeenCalledTimes(1);
+        expect(settled).toBe(false); // the ad is still running — the await must hold
+        finishAd!(true);
+        await p;
+      });
+      expect(settled).toBe(true);
+    } finally {
+      midgame.mockReset();
+    }
+  });
+
+  it('CG path: a hung midgame SDK cannot wedge the host — the gate caps at INTERSTITIAL_MAX_WAIT_MS', async () => {
+    // CG's contract guarantees adFinished/adError, but if the SDK hangs the
+    // host's awaited startGame would never fire and the room would sit on the
+    // results wash forever (pitfall: silent failure). The timeout degrades to
+    // the old fire-and-forget behavior instead.
+    cgFlag.value = true;
+    midgame.mockImplementation(() => new Promise<boolean>(() => { /* never settles */ }));
+    vi.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useInterstitialAd());
+      let settled = false;
+      let p: Promise<void> | undefined;
+      act(() => {
+        p = result.current.showInterstitial('multiplayer-round-complete').then(() => { settled = true; });
+      });
+      await act(async () => { await Promise.resolve(); });
+      expect(settled).toBe(false);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(INTERSTITIAL_MAX_WAIT_MS + 100);
+        await p;
+      });
+      expect(settled).toBe(true);
+    } finally {
+      vi.useRealTimers();
+      midgame.mockReset();
+    }
+  });
+
+  it('H5 path: the returned promise resolves only when the adBreak completes', async () => {
+    const originalSearch = window.location.search;
+    const originalEnv = process.env.NEXT_PUBLIC_H5_ADS_ENABLED;
+    Object.defineProperty(window, 'location', {
+      value: { ...window.location, search: '?h5ads_test=1' },
+      writable: true,
+    });
+    process.env.NEXT_PUBLIC_H5_ADS_ENABLED = 'true';
+    let finishAd: (() => void) | null = null;
+    h5Show.mockImplementation(() => new Promise<void>((res) => { finishAd = res; }));
+    try {
+      const { result } = renderHook(() => useInterstitialAd());
+      let settled = false;
+      await act(async () => {
+        const p = result.current.showInterstitial('multiplayer-round-complete').then(() => { settled = true; });
+        await Promise.resolve();
+        expect(h5Show).toHaveBeenCalledTimes(1);
+        expect(settled).toBe(false);
+        finishAd!();
+        await p;
+      });
+      expect(settled).toBe(true);
+    } finally {
+      h5Show.mockReset();
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, search: originalSearch },
+        writable: true,
+      });
+      process.env.NEXT_PUBLIC_H5_ADS_ENABLED = originalEnv;
+    }
   });
 });

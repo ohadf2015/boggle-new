@@ -7,6 +7,8 @@ import { sanitizeRoomName } from '@/utils/consts';
 import { computeReconnectDelay } from '@/utils/reconnectDelay';
 import { isExpectedSocketErrorCode } from '@/utils/sentry';
 import { getRejoinIntent, planReconnectRejoin } from '@/utils/socketRejoin';
+import { shouldArmBackgroundDisconnect } from '@/utils/socketBackgroundDisconnect';
+import { isFullscreenAdActive } from '@/hooks/useRewardAdPause';
 import { readGuestBirthYear } from '@/lib/families/guestAge';
 import { resolveGrandfatheredAdult } from '@/lib/families/grandfather';
 import { watchSocketAuthUpgrade } from '@/utils/socketAuthUpgrade';
@@ -429,6 +431,14 @@ export function SocketProvider({ children }: SocketProviderProps) {
     // This is critical for Android WebView where the OS may throttle background timers.
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
+        // A fullscreen ad (AdMob Activity / adBreak) hides the page without the
+        // player leaving: disconnecting here killed the room connection mid-ad
+        // (the "ad between games → disconnected" report). Keep the socket — the
+        // server pingTimeout is the backstop for a genuinely dead client.
+        if (!shouldArmBackgroundDisconnect({ fullscreenAdActive: isFullscreenAdActive() })) {
+          logger.log('[SOCKET.IO] Page hidden by a fullscreen ad — keeping the socket connected');
+          return;
+        }
         // App backgrounded — disconnect after a grace period (user might just be switching tabs briefly)
         bgTimerRef.current = setTimeout(() => {
           // Guard against stale closure: only disconnect if this is still the active socket
