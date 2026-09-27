@@ -7,6 +7,7 @@ import { useAssignments } from '@/hooks/useAssignments';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { AssignmentLimitUpsell } from './AssignmentLimitUpsell';
+import { FirstAssignmentTemplatePicker } from './FirstAssignmentTemplatePicker';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { labelLessonsForPicker } from '@/lib/education/lessonLabels';
@@ -26,6 +27,13 @@ import {
   type PracticeFocusSetting,
 } from '@/lib/education/vocabFocus';
 import { WORDCRAFT_FOCUS } from '@/lib/education/wordcraftAssignment';
+import {
+  assignFirstAssignmentTemplate,
+  firstAssignmentTemplatesFor,
+  type FirstAssignmentTemplate,
+} from '@/lib/education/firstAssignmentTemplates';
+import { trackTeacherFirstAssignmentTemplate } from '@/lib/education/telemetry';
+import type { Language } from '@/lib/supabase/education/types';
 
 interface AssignmentCreatorProps {
   classroomId: string;
@@ -59,12 +67,12 @@ export default function AssignmentCreator({
   const assignmentCount = assignments?.length ?? 0;
   const atAssignmentCap =
     !proLoading && !hasPro && assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
-  const { lessons, isLoading: isLoadingLessons } = useLessons();
+  const { lessons, isLoading: isLoadingLessons, createLesson } = useLessons();
   // `useLessons()` spans every class this teacher owns, and reusing one list
   // across periods is intended — so two rows can read "Week 3 Vocabulary" with
   // nothing to tell them apart. Name the classroom, but only where it is
   // actually ambiguous.
-  const { classrooms } = useClassrooms();
+  const { classrooms = [] } = useClassrooms();
   const lessonLabels = useMemo(() => {
     const namesById: Record<string, string> = {};
     for (const c of classrooms) namesById[c.id] = c.name;
@@ -91,6 +99,19 @@ export default function AssignmentCreator({
     [selectedLesson]
   );
   const supportedFocuses = focusCounts ? VOCAB_FOCUSES.filter((f) => focusCounts[f] > 0) : [];
+
+  const classroomLanguage: Language =
+    classrooms.find((c) => c.id === classroomId)?.language ?? 'en';
+  const starterPacks = useMemo(
+    () => firstAssignmentTemplatesFor(classroomLanguage),
+    [classroomLanguage],
+  );
+  const showStarterPacks = !isLoadingLessons && lessons.length === 0;
+
+  useEffect(() => {
+    if (!isOpen || !showStarterPacks || starterPacks.length === 0) return;
+    trackTeacherFirstAssignmentTemplate({ templateId: starterPacks[0].id, action: 'view' });
+  }, [isOpen, showStarterPacks, starterPacks]);
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -148,6 +169,33 @@ export default function AssignmentCreator({
     }
   };
 
+  const handleAssignTemplate = async (template: FirstAssignmentTemplate) => {
+    if (!user) {
+      toast.error(t('teacher.assignment.error'));
+      return;
+    }
+    setIsSubmitting(true);
+    trackTeacherFirstAssignmentTemplate({ templateId: template.id, action: 'assign' });
+    const result = await assignFirstAssignmentTemplate({
+      template,
+      classroomId,
+      teacherId: user.id,
+      lessonName: t(template.nameKey),
+      lessonDescription: t(template.descriptionKey),
+      createLesson,
+    });
+    setIsSubmitting(false);
+    if (result.success && result.assigned) {
+      toast.success(t('teacher.assignment.created'));
+      onComplete();
+      onClose();
+      return;
+    }
+    toast.error(
+      result.assignmentError || result.error || t('teacher.assignment.error'),
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent
@@ -166,6 +214,13 @@ export default function AssignmentCreator({
 
         {atAssignmentCap ? (
           <AssignmentLimitUpsell currentCount={assignmentCount} onClose={onClose} />
+        ) : showStarterPacks ? (
+          <FirstAssignmentTemplatePicker
+            packs={starterPacks}
+            isSubmitting={isSubmitting}
+            onAssign={(pack) => void handleAssignTemplate(pack)}
+            onClose={onClose}
+          />
         ) : (
         <div className="space-y-5">
             {/* Assignment Type Selector */}

@@ -16,6 +16,7 @@
  */
 import { createAssignment } from '@/lib/supabase/education/assignments';
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
+import type { AssignmentFocusValue } from '@/lib/education/wordcraftAssignment';
 import logger from '@/utils/logger';
 
 export interface NewLessonInput {
@@ -54,10 +55,15 @@ export async function createLessonAndAssign({
   lesson,
   teacherId,
   createLesson,
+  dueDate,
+  practiceFocus,
 }: {
   lesson: NewLessonInput;
   teacherId: string;
   createLesson: CreateLessonFn;
+  /** Local YYYY-MM-DD. Omitted stays null — the teacher can set it later. */
+  dueDate?: string | null;
+  practiceFocus?: AssignmentFocusValue | null;
 }): Promise<CreateLessonAndAssignResult> {
   const result = await createLesson({
     name: lesson.name,
@@ -101,6 +107,8 @@ export async function createLessonAndAssign({
       lesson_id: lessonId,
       teacher_id: teacherId,
       assignment_type: 'practice',
+      ...(dueDate !== undefined ? { due_date: dueDate } : {}),
+      ...(practiceFocus ? { practice_focus: practiceFocus } : {}),
     });
 
     if (assignment.error) {

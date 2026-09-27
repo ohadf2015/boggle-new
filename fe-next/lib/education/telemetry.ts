@@ -200,6 +200,17 @@ export function trackTeacherOnboardingStep(args: TeacherOnboardingChecklistStepA
   });
 }
 
+/** One-tap starter pack on the empty assignment dialog. */
+export function trackTeacherFirstAssignmentTemplate(args: {
+  templateId: string;
+  action: 'view' | 'assign';
+}): void {
+  safeCapture('teacher_first_assignment_template', {
+    template_id: args.templateId,
+    action: args.action,
+  });
+}
+
 export interface EduTeacherSnapshot {
   classroomCount: number;
   studentCount: number;
