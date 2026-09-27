@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Body, Composite } from 'matter-js';
 import {
   MAX_BALLS,
   buildWreckWorld,
@@ -88,6 +89,38 @@ describe('wreck world', () => {
     hangBall(w);
     run(w, 4000);
     expect(wreckedCount(w)).toBe(0);
+  });
+
+  it('given a cut ball flung past the playfield edge, when it leaves the world, then it is despawned', () => {
+    // Given a ball cut loose with a hard sideways fling that misses everything —
+    // the ball is a plain Matter body the block maps never see, so cleanupDebris
+    // can't remove it, and past the ground's edge it would fall (and simulate)
+    // for the rest of the round.
+    const w = buildWreckWorld(WORDS);
+    run(w, 600);
+    hangBall(w);
+    cutBall(w);
+    // Hard enough to still be airborne past the despawn bound — a weaker throw
+    // lands on the street and rolling friction parks it inside the playfield.
+    Body.setVelocity(w.ball!, { x: 40, y: -12 });
+    // When it crosses the despawn bound
+    run(w, 6000);
+    // Then the body is gone from both the world handle and the Matter composite
+    expect(w.ball).toBeNull();
+    const balls = Composite.allBodies(w.tower.engine.world).filter((b) => b.label === 'wrecking-ball');
+    expect(balls).toHaveLength(0);
+  });
+
+  it('given a cut ball that smashes the tower and settles in the rubble, when it stops, then it is NOT despawned', () => {
+    // The spent ball lying in the wreck is part of the payoff shot — only a ball
+    // that left the playfield may be removed.
+    const w = buildWreckWorld(WORDS);
+    run(w, 600);
+    hangBall(w);
+    run(w, w.quarterPeriodMs);
+    cutBall(w);
+    run(w, 4000);
+    expect(w.ball).not.toBeNull();
   });
 });
 
