@@ -64,7 +64,6 @@ import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
 // that reason (they are gated behind HomeOnlySeasonGate).
 const AnchoredNativeBanner = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/ads/AnchoredNativeBanner'), { ssr: false });
 const BannerCoordinatorMount = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/ads/BannerCoordinatorMount'), { ssr: false });
-const WebAnchorAdObserver = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/ads/WebAnchorAdObserver'), { ssr: false });
 const SignupPromptHost = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/auth/SignupPromptHost').then(m => m.SignupPromptHost), { ssr: false });
 const PlayerStyleOnboardingWrapper = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ './components/PlayerStyleOnboardingWrapper'), { ssr: false });
 const AgeGatePromptWrapper = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ './components/AgeGatePromptWrapper'), { ssr: false });
@@ -296,10 +295,6 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                     declare intent into. */}
                                                 <BannerCoordinatorMount />
                                                 <AnchoredNativeBanner />
-                                                {/* WEB AdSense anchor-ad measurer — publishes --web-anchor-ad-height
-                                                    so bottom CTAs (e.g. daily Play button) clear the injected
-                                                    fixed anchor the AdMob var can't see. No-op on native AdMob. */}
-                                                <WebAnchorAdObserver />
                                             </NavigationProvider>
                                             </AdMobProvider>
                                         </HapticsProvider>
