@@ -18,12 +18,18 @@
 
 import { usePathname } from 'next/navigation';
 import { ReactNode, useMemo, lazy, Suspense } from 'react';
+import nextDynamic from 'next/dynamic';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { GameSpecificProviders } from './providers';
 import { EssentialProviders } from './essential-providers';
 
 const CommandPalette = lazy(() => import('@/components/CommandPalette'));
+// Named chunk so `/` does not parse socket/howler/game providers. Rendered
+// only when needsGameProviders is true; ssr stays on so game routes still SSR.
+const GameSpecificProviders = nextDynamic(
+  () => import('./providers').then((m) => m.GameSpecificProviders),
+  { loading: () => null },
+);
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 

@@ -58,6 +58,18 @@ describe('<head> scripts cannot race hydration', () => {
     expect(SOURCE).not.toContain('<AdSenseLoader />');
   });
 
+  it('does not preconnect rejected AdSense origins (mobile sockets + 162 KiB trap)', () => {
+    // Preconnect/dns-prefetch to pagead2 still opened connections on every
+    // mobile load after Auto-Ads was deleted. PSI treated that as the 162 KiB
+    // loader graph even with no adsbygoogle.js tag.
+    expect(SOURCE).not.toContain('pagead2.googlesyndication.com');
+    expect(SOURCE).not.toContain('googleads.g.doubleclick.net');
+  });
+
+  it('does not mount WebAnchorAdObserver — there is no Auto-Ads anchor to measure', () => {
+    expect(SOURCE).not.toContain('WebAnchorAdObserver');
+  });
+
   it('still keeps the storage shim as a same-document inline script, which must be first', () => {
     // The shim has to run before any app code touches localStorage, so it stays inline and
     // positional — which is exactly why nothing else in <head> may shift it.
