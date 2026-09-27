@@ -47,8 +47,8 @@ interface PlayerRosterProps {
 
 /** Seat size is one CSS var so the whole grid scales per breakpoint (and by --mp-u on TV). */
 const SEAT_SIZE = {
-  host: '[--seat:calc(64px*var(--mp-u,1))] tall:[--seat:calc(72px*var(--mp-u,1))] min-[720px]:[--seat:min(calc(84px*var(--mp-u,1)),9vh)] desktop-tall:[--seat:min(calc(96px*var(--mp-u,1)),11vh)]',
-  guest: '[--seat:calc(64px*var(--mp-u,1))] tall:[--seat:calc(72px*var(--mp-u,1))] min-[720px]:[--seat:min(calc(84px*var(--mp-u,1)),9vh)] desktop-tall:[--seat:min(calc(96px*var(--mp-u,1)),11vh)]',
+  host: '[--seat:calc(56px*var(--mp-u,1))] tall:[--seat:calc(64px*var(--mp-u,1))] min-[720px]:[--seat:min(calc(84px*var(--mp-u,1)),9vh)] desktop-tall:[--seat:min(calc(96px*var(--mp-u,1)),11vh)]',
+  guest: '[--seat:calc(56px*var(--mp-u,1))] tall:[--seat:calc(64px*var(--mp-u,1))] min-[720px]:[--seat:min(calc(84px*var(--mp-u,1)),9vh)] desktop-tall:[--seat:min(calc(96px*var(--mp-u,1)),11vh)]',
   tv: '[--seat:clamp(80px,12vh,150px)]',
 } as const;
 

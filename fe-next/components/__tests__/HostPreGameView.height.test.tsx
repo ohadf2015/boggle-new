@@ -121,7 +121,7 @@ describe('HostPreGameView Height Constraint', () => {
     vi.clearAllMocks();
   });
 
-  it('should use flex-1 instead of h-dvh to fit within parent container', () => {
+  it('should size to the parent (min-h-full) to fit within the MpScreen body without h-dvh', () => {
     const { container } = render(
       <MusicProvider>
         <SocketContext.Provider value={socketContextValue}>
@@ -133,9 +133,10 @@ describe('HostPreGameView Height Constraint', () => {
     // Get the root div of HostPreGameView
     const rootDiv = container.firstChild as HTMLElement;
 
-    // The root div should have flex-1 class (fills available space in flex context), NOT h-dvh
-    // This ensures the component fills its parent container without exceeding it
-    expect(rootDiv.className).toContain('flex-1');
+    // The root must fill its parent container (min-h-full — grows into the
+    // MpScreen scroll region when the lobby is taller than the viewport),
+    // NOT h-dvh, which would break out of the shell on native insets.
+    expect(rootDiv.className).toContain('min-h-full');
     expect(rootDiv.className).not.toContain('h-dvh');
   });
 

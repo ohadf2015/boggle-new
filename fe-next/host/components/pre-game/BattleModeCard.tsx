@@ -75,11 +75,17 @@ export function BattleModeCard({
   });
 
   return (
-    <section className={cn('flex flex-col gap-2 min-w-0 min-h-0', fill && 'flex-1', className)}>
+    <section className={cn('flex flex-col gap-2 min-w-0', fill && 'flex-1', className)}>
       <h3 className="font-neo-display text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase tracking-wider text-neo-white/80">
         {t('hostView.battleMode')}
       </h3>
-      <div className={cn('grid grid-cols-3 gap-2 desktop-tall:gap-[calc(10px*var(--mp-u,1))]', fill && 'flex-1 min-h-0 auto-rows-fr')}>
+      {/*
+       * Rows keep their automatic (content) minimum: fr rows inside a
+       * definite-height grid are what let the tiles compress into each other
+       * on short phones. fill only stretches the grid into FREE height — it
+       * can never shrink below the tiles' min-h.
+       */}
+      <div className={cn('grid grid-cols-3 gap-2 desktop-tall:gap-[calc(10px*var(--mp-u,1))]', fill && 'flex-1 auto-rows-fr')}>
         {visibleModes.map(({ mode, nameKey }) => {
           const isActive = selectedGameMode === mode;
           const family = FAMILY[getModePresentation(mode).color];
@@ -92,7 +98,7 @@ export function BattleModeCard({
               aria-pressed={isActive}
               className={cn(
                 styles.modeTile,
-                'group flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 text-center',
+                'group flex flex-col items-center justify-center gap-1 min-w-0 min-h-[64px] tall:min-h-[72px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 text-center',
                 'transition-[transform,background-color,border-color,box-shadow] duration-150 active:translate-y-0.5 active:shadow-none',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isActive
@@ -122,7 +128,7 @@ export function BattleModeCard({
             data-testid="lobby-how-to-play"
             className={cn(
               styles.modeTile,
-              'flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 border-dashed border-neo-cyan/60 bg-neo-navy text-neo-cyan text-center',
+              'flex flex-col items-center justify-center gap-1 min-w-0 min-h-[64px] tall:min-h-[72px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 border-dashed border-neo-cyan/60 bg-neo-navy text-neo-cyan text-center',
               'transition-[transform,border-color] duration-150 hover:border-neo-cyan active:translate-y-0.5',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
             )}
