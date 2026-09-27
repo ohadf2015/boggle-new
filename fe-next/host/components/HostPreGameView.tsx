@@ -113,7 +113,7 @@ interface HostPreGameViewProps {
 
 type T = (path: string, params?: Record<string, string | number>) => string;
 
-const CARD = 'rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-3 desktop-tall:p-4';
+const CARD = 'rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 shadow-hard p-2 min-[720px]:p-3 desktop-tall:p-4';
 
 function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   const {
@@ -210,7 +210,9 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   const modePicker = !isClassroomRoom && (
-    <div className={cn(CARD, 'flex-1 min-h-0 flex flex-col')}>
+    // flex-1 WITHOUT min-h-0: the automatic minimum keeps the mode grid at its
+    // content height, so tiles can never be squashed into overlapping rows.
+    <div className={cn(CARD, 'flex-1 flex flex-col')}>
       <BattleModeCard
         fill
         selectedGameMode={lobby.selectedGameMode}
@@ -242,7 +244,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
+    <div className="min-h-full flex flex-col w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
       {lessonData && (
         <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-neo-purple/20 border-b-2 border-neo-purple/50 text-sm min-w-0">
           <BookOpen aria-hidden="true" className="w-4 h-4 text-neo-purple shrink-0" />
@@ -283,7 +285,14 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
         />
       </header>
 
-      <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
+      {/*
+       * No overflow-hidden here: the phone column below sizes to its content
+       * (flex children keep their automatic minimum) and, when the lobby is
+       * taller than the viewport, extends the scroll region of the enclosing
+       * MpScreen body (bodyScroll="inner") instead of being clipped. Desktop
+       * columns scroll internally inside DesktopLobbyLayout.
+       */}
+      <main className="flex-1 min-h-0 flex flex-col">
         <h1 className="sr-only">{t('hostView.lobbyTitle')}</h1>
 
         {/* Desktop / tablet (≥720px): seats + mode left, invite + chat right. */}
@@ -300,7 +309,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
                 {/* Status sits over the invite; chat is a launcher row, not a
                     panel, so the rail never spends itself on an idle chat. */}
                 {statusLane}
-                {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} className="flex-1 min-h-0 justify-center" />}
+                {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} className="flex-1 justify-center" />}
                 {settingsSummary}
                 <LobbyChatLauncher onPress={() => setSheet('chat')} unread={unread} t={t} className={isPrivate ? 'mt-auto' : undefined} />
               </div>
@@ -311,15 +320,18 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           </div>
         </div>
 
-        {/* Phone (<720px): one fixed column, footer CTA pinned. */}
-        <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
-          <div className="flex-1 min-h-0 flex flex-col gap-3 px-3 py-3 w-full max-w-[600px] mx-auto">
+        {/* Phone (<720px): one column; content-sized so the MpScreen body
+            scrolls when it exceeds the viewport — never squeeze (tile rows
+            must never compress into each other). The footer CTA stays pinned
+            via the column's flex-1 while content fits. */}
+        <div data-testid="lobby-phone" className="min-[720px]:hidden flex flex-col flex-1">
+          <div className="flex-1 flex flex-col gap-2 px-3 py-2 w-full max-w-[600px] mx-auto">
             {statusLane}
             {roster()}
             {modePicker}
             {settingsSummary}
           </div>
-          <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
+          <div className="shrink-0 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
             <div className="max-w-[600px] mx-auto flex items-stretch gap-2">
               {!isPrivate && (
                 <button
