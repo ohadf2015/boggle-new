@@ -17,6 +17,8 @@ interface PricingCardsProps {
   showTrial?: boolean;
   onTrialClick?: () => void;
   onUpgradeClick: () => void;
+  /** Which card is the teacher's actual plan. Trialing counts as Pro. */
+  currentTier?: 'free' | 'pro';
 }
 
 export function PricingCards({
@@ -27,6 +29,7 @@ export function PricingCards({
   showTrial = false,
   onTrialClick,
   onUpgradeClick,
+  currentTier = 'free',
 }: PricingCardsProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
@@ -95,12 +98,15 @@ export function PricingCards({
           {t('teacher.subscription.freeStartNote')}
         </p>
 
-        <Button
-          disabled
-          className="w-full bg-neo-cream text-neo-black/70 font-black border-2 border-black cursor-not-allowed"
-        >
-          {t('teacher.subscription.currentPlan')}
-        </Button>
+        {currentTier === 'free' && (
+          <Button
+            disabled
+            data-testid="pricing-free-current"
+            className="w-full bg-neo-cream text-neo-black/70 font-black border-2 border-black cursor-not-allowed"
+          >
+            {t('teacher.subscription.currentPlan')}
+          </Button>
+        )}
       </div>
 
       {/* Pro Card */}
@@ -162,46 +168,58 @@ export function PricingCards({
 
         <div className="flex-1" />
 
-        {showTrial && (
+        {currentTier === 'pro' ? (
+          <Button
+            disabled
+            data-testid="pricing-pro-current"
+            className="w-full bg-neo-cream text-neo-black/70 font-black border-2 border-black cursor-not-allowed"
+          >
+            {t('teacher.subscription.currentPlan')}
+          </Button>
+        ) : (
           <>
+            {showTrial && (
+              <>
+                <Button
+                  onClick={onTrialClick}
+                  disabled={isLoading}
+                  data-testid="pricing-trial-cta"
+                  className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
+                >
+                  {pending === 'trial' ? t('common.loading') : t('teacher.subscription.startTrial')}
+                </Button>
+                <p className="text-center text-xs font-bold text-neo-black/80 mt-1.5 mb-2">
+                  {t('teacher.subscription.trialCtaSubtext')}
+                </p>
+              </>
+            )}
             <Button
-              onClick={onTrialClick}
+              onClick={() => {
+                // Funnel step 1 — analytics only, and never in checkout's way.
+                try {
+                  trackEduProUpgradeClicked({ source: 'pricing_page' });
+                } catch {
+                  /* ignore */
+                }
+                onUpgradeClick();
+              }}
               disabled={isLoading}
-              data-testid="pricing-trial-cta"
-              className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
+              data-testid="pricing-paid-cta"
+              className={
+                showTrial
+                  ? 'w-full bg-neo-cream text-neo-black font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none'
+                  : 'w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none'
+              }
             >
-              {pending === 'trial' ? t('common.loading') : t('teacher.subscription.startTrial')}
+              {pending === 'paid' || (isLoading && !showTrial)
+                ? t('common.loading')
+                : t('teacher.subscription.upgradeNow')}
             </Button>
-            <p className="text-center text-xs font-bold text-neo-black/80 mt-1.5 mb-2">
-              {t('teacher.subscription.trialCtaSubtext')}
+            <p className="text-center text-xs font-bold text-neo-black/80 mt-1.5">
+              {t('teacher.subscription.proCtaSubtext')}
             </p>
           </>
         )}
-        <Button
-          onClick={() => {
-            // Funnel step 1 — analytics only, and never in checkout's way.
-            try {
-              trackEduProUpgradeClicked({ source: 'pricing_page' });
-            } catch {
-              /* ignore */
-            }
-            onUpgradeClick();
-          }}
-          disabled={isLoading}
-          data-testid="pricing-paid-cta"
-          className={
-            showTrial
-              ? 'w-full bg-neo-cream text-neo-black font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none'
-              : 'w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none'
-          }
-        >
-          {pending === 'paid' || (isLoading && !showTrial)
-            ? t('common.loading')
-            : t('teacher.subscription.upgradeNow')}
-        </Button>
-        <p className="text-center text-xs font-bold text-neo-black/80 mt-1.5">
-          {t('teacher.subscription.proCtaSubtext')}
-        </p>
       </div>
     </div>
   );

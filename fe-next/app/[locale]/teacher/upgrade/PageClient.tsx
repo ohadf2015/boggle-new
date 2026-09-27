@@ -285,6 +285,7 @@ export default function UpgradePricingPageClient() {
               isLoading={pending !== null}
               pending={pending}
               showTrial={offerTrial}
+              currentTier={hasPro ? 'pro' : 'free'}
               onTrialClick={() => { void handleUpgrade(true); }}
               onUpgradeClick={() => { void handleUpgrade(false); }}
             />
