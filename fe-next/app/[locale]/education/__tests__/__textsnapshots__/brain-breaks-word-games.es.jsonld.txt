@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/brain-breaks-word-games#page",
+  "name": "Pausas de concentración para aula | Juegos de palabras",
+  "description": "Juegos rápidos para recuperar la atención en 1–5 minutos. Sin preparación, funciona en cualquier dispositivo, toda la clase a la vez.",
+  "url": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/brain-breaks-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Educación",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Pausas de concentración",
+      "item": "https://www.lexiclash.live/es/education/brain-breaks-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/brain-breaks-word-games#resource",
+  "name": "Pausas de concentración para aula | Juegos de palabras",
+  "description": "Una pausa de concentración es una actividad de 1–5 minutos que restaura el enfoque. LexiClash ejecuta juegos de búsqueda de palabras en vivo en cualquier proyector o pantalla compartida—todos los alumnos juegan simultáneamente en sus teléfonos. Sin preparación, sin materiales. Funciona porque requiere suficiente atención para interrumpir la inquietud sin descarrilar la lección.",
+  "url": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+  "inLanguage": "es",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "6-14",
+  "teaches": "vocabulary, word recognition, attention reset",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT3M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/brain-breaks-word-games#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cómo doy un código de acceso a los alumnos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cuando inicias un juego de aula, aparece un código en tu pantalla. Dilo en voz alta o muéstralo en la pizarra. Los alumnos lo escriben o lo escanean. Se unen en 10 segundos. Sin inicio de sesión."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué pasa si algunos alumnos no tienen teléfono?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pueden compartir con un compañero o jugar como equipo. O guarda juegos individuales para cuando todos tengan dispositivos. Las pausas son flexibles."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Necesito enseñarles a jugar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Las reglas están en la pantalla. En la primera ronda, camina a través de un ejemplo rápido. La mayoría entiende en 30 segundos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usar esto si enseño otro idioma?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash soporta seis idiomas: inglés, hebreo, español, sueco, japonés y ruso. Establece el idioma de tu aula y los juegos usan palabras en ese idioma. También puedes cargar listas de palabras personalizadas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto debe durar una pausa de concentración?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1–5 minutos. Más corta es a menudo mejor. Un juego de 2 minutos es suficiente entre actividades. Más tiempo si los alumnos están muy inquietos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Esto distraerá a los alumnos de la lección?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Solo si no estableces un límite claro. Di desde el inicio: \"Jugamos 3 minutos, luego teléfonos adentro.\" Cuando conocen el límite, se re-enfocan más fácilmente."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usar el mismo juego dos veces en una semana?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. La repetición está bien. Los alumnos a menudo disfrutan volver a jugar para vencer su puntuación anterior."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué juegos son mejores para pausas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Búsqueda de palabras (búsqueda silenciosa), rueda de palabras (rotación), duelos rápidos (1–2 min). Evita torneos largos. Elige juegos en los que puedan entrar en 10 segundos."
+      }
+    }
+  ]
+}

@@ -1,0 +1,606 @@
+'use client';
+
+/**
+ * WordHuntResultsContent - Results tab content for DailyWordHuntResults.
+ *
+ * Extracted from DailyWordHuntResults to keep files under 500 lines.
+ * Contains the main results view: result display, performance,
+ * rank badge, facts, share section, signup CTA, fail state,
+ * leaderboard, and more options.
+ */
+
+import React, { useEffect, useMemo, useState } from 'react';
+import { m } from 'framer-motion';
+import { Eye, ArrowRight, CheckCircle2, BookOpen, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import DismissibleSignupLine, { isSignupLineDismissedLocally } from '@/components/daily/results/DismissibleSignupLine';
+import ResultsSignupModal from '@/components/daily/results/ResultsSignupModal';
+import { useIsGuest } from '@/hooks/useIsGuest';
+import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import DailyInsightStack from './DailyInsightStack';
+import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
+import { SuggestWordCard } from './SuggestWordCard';
+import { RejectedWordAppeal } from '@/components/results/RejectedWordAppeal';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
+import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import { NextQuestCta } from './results/NextQuestCta';
+import { STICKY_CTA_WORD_HUNT } from './stickyCta';
+import { useExperiment } from '@/hooks/useExperiment';
+import { getPastWordHuntPerformance } from '@/utils/dailyChallenge';
+import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import type { WordHuntResult } from '@/utils/dailyChallenge/types';
+import type { Language } from '@/shared/types/game';
+import {
+  ResultDisplay,
+  PerformanceSection,
+  RankBadge,
+  StatsBlurb,
+  PastPerformanceCompare,
+  DailyWordHuntFacts,
+  ShareSection,
+  EmojiShareCard,
+  CoinUnlockCard,
+  StreakFreezeIndicator,
+  MasteryRatingSection,
+  type WordHuntStats,
+  type CoinReward,
+} from './results';
+
+export interface WordHuntResultsContentProps {
+  result: WordHuntResult;
+  puzzleNumber: number;
+  puzzleDate: string;
+  language: Language;
+  countdown: string;
+  isNewCompletion?: boolean;
+  survivalBonusTime: number;
+  rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
+  emojiWords: Array<{ word: string; found: boolean }>;
+  stats: WordHuntStats | null;
+  shareHandlers: {
+    handleNativeShare: () => void;
+    handleChallengeShare: () => void;
+    handleWhatsApp: () => void;
+    handleTwitter: () => void;
+    handleTelegram: () => void;
+    handleLinkedIn: () => void;
+    handleFacebook: () => void;
+    handleEmail: () => void;
+    handleSMS: () => void;
+    handleCopy: () => void;
+    handleDownloadShareImage: () => void;
+    copied: boolean;
+    isGeneratingImage: boolean;
+    showSharePanel: boolean;
+    setShowSharePanel: (show: boolean) => void;
+    ogImageUrl: string | null;
+    challengeUrl?: string;
+  };
+  coinActions: {
+    coinReward: CoinReward | null;
+    handleRetryChallenge: () => void;
+    canAffordRetry: boolean;
+    canAffordReveal: boolean;
+    retryCost: number;
+    currentCoins: number;
+    targetWordRevealed: boolean;
+    revealCost: number;
+    handleRevealTargetWord: () => void;
+    handleRevealTargetWordViaAd: () => void;
+  };
+  /** Native ad-gated retry callback — runs the underlying retry without spending coins. */
+  onRetryFree?: () => void | Promise<void>;
+  isAuthenticated: boolean;
+  inlineSignupDismissed: boolean;
+  onInlineSignupDismiss: () => void;
+  leaderboardKey: number;
+  profile: { id: string } | null;
+  guestFingerprint: string | null;
+  onGameLanguageChange?: (lang: Language) => void;
+  onShowCreatePuzzle: () => void;
+  onSpendStart: (position: { x: number; y: number }, amount: number) => void;
+  onBackToLobby?: () => void;
+  freezesAvailable?: number;
+  isStreakProtected?: boolean;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
+}
+
+export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
+  result,
+  puzzleNumber,
+  puzzleDate,
+  language,
+  countdown,
+  isNewCompletion: _isNewCompletion,
+  survivalBonusTime,
+  rarestWord,
+  emojiWords,
+  stats,
+  shareHandlers,
+  coinActions,
+  onRetryFree,
+  isAuthenticated,
+  inlineSignupDismissed,
+  onInlineSignupDismiss,
+  leaderboardKey,
+  profile,
+  guestFingerprint,
+  onGameLanguageChange,
+  onShowCreatePuzzle,
+  onSpendStart,
+  onBackToLobby: _onBackToLobby,
+  freezesAvailable = 0,
+  isStreakProtected = false,
+  t,
+}) => {
+  // Resolution-aware: gating on the `isAuthenticated` prop alone would flash the
+  // simplified screen at a logged-in player on first paint (rules/60 Class 1).
+  const isGuest = useIsGuest(isAuthenticated);
+
+  // Word Wheel completion gate: localStorage-first (no first-paint flash) then
+  // server-of-record cross-device check — so a player who finished the wheel on
+  // another device sees "Back to Daily Hub", not a nag to replay it.
+  const wordWheelPlayed = useDailyModePlayed('word-wheel', language, {
+    isAuthenticated,
+    playerId: profile?.id,
+    guestFingerprint,
+  });
+  // Mirror for the Word Bridge (Connections) cross-promo — don't nudge a mode
+  // the player already finished today. Lazy-init avoids a first-paint flash.
+  // (localStorage-only is fine here: Connections is a separate daily system.)
+  const [connectionsPlayed, setConnectionsPlayed] = useState(() =>
+    typeof window === 'undefined' ? false : hasPlayedConnectionsToday(),
+  );
+  useEffect(() => {
+    const refresh = () => setConnectionsPlayed(hasPlayedConnectionsToday());
+    refresh();
+    const onVis = () => { if (!document.hidden) refresh(); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('focus', refresh);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
+
+  // NOTE: the `wordhunt-crosspromo-position` A/B (wheel CTA above vs below the
+  // leaderboard) is concluded — the primary CTA is now pinned to the bottom of
+  // the scrollport in both cases, so the two arms would render identically and
+  // collect null data. Removed rather than left tracking exposure for nothing.
+
+  // A/B: hide the dead "Tap a player to see their path" hint that causes rage clicks.
+  const { variant: hintVariant, trackExposure: trackHintExposure } =
+    useExperiment('exp-wordhunt-hint-v1');
+  useEffect(() => {
+    trackHintExposure();
+    trackGrowthEvent('wordhunt_results_loaded', {
+      solved: result.solved,
+      hint_variant: hintVariant,
+      language,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trackHintExposure]);
+
+  // Local play history vs today's result — powers the "vs your past" comparison.
+  const pastPerformance = useMemo(
+    () => getPastWordHuntPerformance(language, puzzleDate),
+    [language, puzzleDate],
+  );
+
+  // Signup card state: check both session dismiss (prop) AND localStorage persistence
+  const locallyDismissed = isSignupLineDismissedLocally();
+  const shouldShowSignupLine = !isAuthenticated && !inlineSignupDismissed && !locallyDismissed;
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  /* The three blocks a guest keeps. Hoisted so the guest branch below reuses
+     them verbatim instead of a second copy that can drift.
+
+     failStateNode = reveal target word + watch ad. Guests keep it — the answer
+     is what they came back for. */
+  const failStateNode = !result.solved ? (
+      <div className="space-y-3">
+        {/* Reveal target word */}
+        {coinActions.targetWordRevealed ? (
+          <div className="py-3 px-4 bg-neo-navy-light/50 rounded-neo border-2 border-slate-700/50 text-center space-y-2">
+            <div className="text-xs text-slate-400">{t('wordHunt.results.theTargetWordWas')}</div>
+            <div className="text-2xl font-black text-neo-lime tracking-wider">
+              {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
+            </div>
+            {result.meaning && (
+              <div className="mt-2 flex items-start gap-2.5 rounded-neo border-neo-thick border-black bg-neo-cyan/15 px-3 py-2.5 shadow-hard text-start">
+                <BookOpen className="w-4 h-4 text-neo-cyan shrink-0 mt-0.5" aria-hidden="true" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-neo-cyan">
+                    {t('wordHunt.results.meaning')}
+                  </span>
+                  <span className="text-sm font-bold text-neo-cream leading-snug">
+                    {result.meaning}
+                  </span>
+                  {/* CC BY-SA attribution: meanings are dictionary-sourced from Wiktionary (all langs) */}
+                  <span className="text-[10px] text-slate-400 mt-0.5">
+                    {t('wordHunt.results.meaningSource')}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="max-w-btn space-y-2">
+            <CoinUnlockCard
+              icon={<Eye className="w-5 h-5 text-white" />}
+              title={t('wordHunt.results.revealTargetWord')}
+              subtitle={t('wordHunt.results.seeTheAnswer')}
+              cost={coinActions.revealCost}
+              currentCoins={coinActions.currentCoins}
+              gradientFrom="from-neo-pink"
+              gradientTo="to-neo-pink"
+              onClick={coinActions.handleRevealTargetWord}
+              onSpendStart={(pos) => onSpendStart(pos, coinActions.revealCost)}
+              t={t}
+            />
+          </div>
+        )}
+      </div>
+  ) : null;
+
+  const heroNode = (
+    <ResultDisplay
+      solved={result.solved}
+      attemptsUsed={result.attemptsUsed}
+      targetWord={result.targetWord}
+      streakDays={result.streakDays}
+      language={language}
+      puzzleNumber={puzzleNumber}
+      countdown={countdown}
+      lifeRemaining={result.lifeRemaining || 0}
+      wordsDiscovered={result.wordsDiscovered?.length || 0}
+      currentUserId={profile?.id}
+      meaning={result.meaning}
+      t={t}
+    />
+  );
+
+  /* "Am I getting better?" belongs at a glance, not behind a tap — it used to
+     sit inside the collapsed "Full recap" accordion (defaultExpanded=false),
+     which meant NOBODY saw it without expanding, and guests never even
+     mounted it until they dismissed the signup nudge. Rendered once, right
+     under the hero, for guests and authed players alike, win or lose. */
+  const masteryRatingNode = (
+    <MasteryRatingSection
+      playerId={profile?.id}
+      guestFingerprint={guestFingerprint}
+      language={language}
+      t={t}
+    />
+  );
+
+  const leaderboardNode = (
+    <>
+      {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
+      <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>
+        <TabbedDailyLeaderboard
+          key={leaderboardKey}
+          puzzleDate={puzzleDate}
+          language={language}
+          currentPlayerId={isAuthenticated && profile ? profile.id : null}
+          currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+          maxVisible={3}
+          compact
+          t={t}
+          defaultTab="today"
+          scope="word-hunt"
+          myHuntWordsDiscovered={result.wordsDiscovered?.map(w => w.word)}
+        />
+      </div>
+    </>
+  );
+
+  // Minimal signup line for the default scroll path. The full heavy card is only
+  // shown in a modal if the player taps "Save your streak".
+  const signupLineNode = (
+    <DismissibleSignupLine
+      isVisible={shouldShowSignupLine}
+      onDismiss={onInlineSignupDismiss}
+      onOpenSignup={() => {
+        setShowSignupModal(true);
+        trackGrowthEvent('signup_prompt_clicked', { source: 'word_hunt_results' });
+      }}
+    />
+  );
+
+  // Simplified signup modal — shown only if tapped, not on default scroll path
+  const signupModalNode = showSignupModal && !isAuthenticated ? (
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+      <ResultsSignupModal
+        pendingResult={{ result, puzzleNumber, puzzleDate, language }}
+        onDismiss={() => {
+          setShowSignupModal(false);
+          onInlineSignupDismiss();
+        }}
+        className="fixed inset-0 z-40 flex items-center justify-center p-4"
+      />
+    </div>
+  ) : null;
+
+  /* An unregistered player has no streak, no coin balance, no past plays and no
+     stats row — the full recap is mostly empty cards plus promos. Show the
+     score, the answer, where they placed, and the one thing we want from them.
+     Dismissing the CTA falls through to the full recap (no dead end). */
+  if (isGuest && !inlineSignupDismissed && !locallyDismissed) {
+    return (
+      <div className="space-y-4">
+        {heroNode}
+        {masteryRatingNode}
+
+        {/* Guests never had a next step here at all — the wheel CTA lived only in
+            the full recap. With ~90% of daily players unregistered, that was the
+            branch that most needed one. */}
+        <NextQuestCta justFinished="word-hunt" currentLanguage={language} source="word_hunt_results_guest" />
+
+        {/* The signup nudge must never cost the product its only viral loop.
+            ~90% of daily players are guests, so the guest-simplified branch is
+            where the emoji grid and its share action matter MOST, not where
+            they can be dropped. Keep it here even though the recap (and its
+            heavier ShareSection copy) is gone for this branch. */}
+        <EmojiShareCard
+          puzzleNumber={puzzleNumber}
+          score={result.efficiencyScore ?? 0}
+          solved={result.solved}
+          words={emojiWords}
+          language={language}
+          t={t}
+          shareUrl={shareHandlers.challengeUrl}
+        />
+        <ShareSection
+          solved={result.solved}
+          onShare={shareHandlers.handleNativeShare}
+          onChallengeShare={shareHandlers.handleChallengeShare}
+          onRetry={coinActions.handleRetryChallenge}
+          onRetryFree={onRetryFree}
+          canAffordRetry={coinActions.canAffordRetry}
+          retryCost={coinActions.retryCost}
+          currentCoins={coinActions.currentCoins}
+          onWhatsApp={shareHandlers.handleWhatsApp}
+          onTwitter={shareHandlers.handleTwitter}
+          onTelegram={shareHandlers.handleTelegram}
+          onCopy={shareHandlers.handleCopy}
+          onDownloadImage={shareHandlers.handleDownloadShareImage}
+          copied={shareHandlers.copied}
+          isGeneratingImage={shareHandlers.isGeneratingImage}
+          onSpendStart={onSpendStart}
+          t={t}
+        />
+
+        {failStateNode}
+        {leaderboardNode}
+        {signupLineNode}
+        {signupModalNode}
+      </div>
+    );
+  }
+
+  return (
+  <div className="space-y-4">
+    {heroNode}
+    {masteryRatingNode}
+
+    {/* Primary CTA — exactly one next step.
+        This used to be a pair of hardcoded nodes: "STEP 2 OF 2 → Word Wheel"
+        when the wheel was unplayed, "back to daily" once it was. Both predate
+        Word Tower and Connections going public, so a player who finished Hunt
+        and Wheel was told the day was over while two modes sat unplayed — and
+        the step badge miscounted a four-mode day as two. NextQuestCta reads the
+        same server-backed play state the hub does, offers whatever is genuinely
+        next, and only says "all clear" when all four are done. It carries the
+        `cross_promo_click` event the old wheel CTA emitted. */}
+    <NextQuestCta
+      justFinished="word-hunt"
+      currentLanguage={language}
+      source="word_hunt_results"
+      className={STICKY_CTA_WORD_HUNT}
+    />
+
+    {/* Share and retry sit with the emoji grid, NOT inside the recap. The grid
+        is the shareable artifact and this is how it leaves the app — burying the
+        share action behind a disclosure is the opposite of the goal.
+
+        The grid was dropped from this screen during the subtraction rounds and
+        restored here: it is the one growth mechanic that works with a population
+        of one (a spoiler-free result anyone can post), and the bar's own research
+        credits this exact format as the biggest driver of Wordle's spread. It was
+        never on the deliberate removal list. */}
+    <EmojiShareCard
+      puzzleNumber={puzzleNumber}
+      score={result.efficiencyScore ?? 0}
+      solved={result.solved}
+      words={emojiWords}
+      language={language}
+      t={t}
+      shareUrl={shareHandlers.challengeUrl}
+    />
+    <ShareSection
+      solved={result.solved}
+      onShare={shareHandlers.handleNativeShare}
+      onChallengeShare={shareHandlers.handleChallengeShare}
+      onRetry={coinActions.handleRetryChallenge}
+      onRetryFree={onRetryFree}
+      canAffordRetry={coinActions.canAffordRetry}
+      retryCost={coinActions.retryCost}
+      currentCoins={coinActions.currentCoins}
+      onWhatsApp={shareHandlers.handleWhatsApp}
+      onTwitter={shareHandlers.handleTwitter}
+      onTelegram={shareHandlers.handleTelegram}
+      onCopy={shareHandlers.handleCopy}
+      onDownloadImage={shareHandlers.handleDownloadShareImage}
+      copied={shareHandlers.copied}
+      isGeneratingImage={shareHandlers.isGeneratingImage}
+      onSpendStart={onSpendStart}
+      t={t}
+    />
+
+    {/* Leaderboard — who else played, and how you stack up. */}
+    {leaderboardNode}
+
+    {/* Full recap — the long tail. `CollapsibleSection` (not `Collapsible`)
+        because it takes a `summary`: a bare chevron labelled "Full recap" gives
+        the player no reason to tap it. Same disclosure the wheel results use. */}
+    <CollapsibleSection
+      title={t('daily.results.fullRecap', 'Full recap')}
+      summary={t('daily.results.fullRecapSummary', 'Your rank, your rarest word, your coins — and who you beat')}
+      icon={<Sparkles className="w-4 h-4" />}
+      defaultExpanded={false}
+      variant="primary"
+    >
+      <div className="space-y-4">
+        {/* Vs your own past plays */}
+        <PastPerformanceCompare
+          currentScore={result.efficiencyScore ?? 0}
+          solved={result.solved}
+          past={pastPerformance}
+          t={t}
+        />
+
+        {/* Streak freeze shields */}
+        {(freezesAvailable > 0 || isStreakProtected) && (
+          <StreakFreezeIndicator
+            freezesAvailable={freezesAvailable}
+            isProtected={isStreakProtected}
+            t={t}
+          />
+        )}
+
+        {/* WIN state: Performance breakdown */}
+        {result.solved && (
+          <PerformanceSection
+            coinReward={coinActions.coinReward}
+            coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
+            survivalBonusTime={survivalBonusTime}
+            rarestWord={rarestWord}
+            solved={result.solved}
+            efficiencyScore={result.efficiencyScore || 0}
+            lifeRemaining={result.lifeRemaining || 0}
+            wordsDiscovered={result.wordsDiscovered?.length || 0}
+            guessesUsed={result.attemptsUsed}
+            extraTries={result.extraTries}
+            t={t}
+            language={language}
+          />
+        )}
+
+        {/* Rank badge */}
+        {stats && <RankBadge stats={stats} t={t} />}
+
+        {/* Stats blurb */}
+        {stats && <StatsBlurb stats={stats} solved={result.solved} t={t} />}
+
+        {/* Tip badge */}
+        {(() => {
+          const words = result.wordsDiscovered ?? [];
+          const lengths = words.map((w) => w.word.length);
+          const avgWordLength = lengths.length
+            ? Math.round((lengths.reduce((a, b) => a + b, 0) / lengths.length) * 10) / 10
+            : 0;
+          return (
+            <div className="mx-auto max-w-xs">
+              <WordHuntTipBadge stats={{
+                score: result.efficiencyScore || 0,
+                survived: result.solved,
+                lifeRemaining: result.lifeRemaining || 0,
+                discoveryWords: words.length,
+                foundTarget: result.solved,
+                isFirstFinder: false,
+                totalPlayers: 1,
+                rank: 1,
+                validWordCount: words.length,
+                invalidWordCount: 0,
+                avgWordLength,
+                longestWordLength: lengths.length ? Math.max(...lengths) : 0,
+                attemptsToFind: result.attemptsUsed,
+              }} />
+            </div>
+          );
+        })()}
+
+        {/* Daily Insights */}
+        <DailyInsightStack mode="word_hunt" date={puzzleDate} />
+
+        {/* Fail state (reveal target) */}
+        {failStateNode}
+
+
+        {/* Minimal signup line — guests see this in the default scroll path */}
+        {signupLineNode}
+
+        {/* Daily complete badge */}
+        {wordWheelPlayed && (
+          <div className="flex items-center gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-lime shadow-hard-lg">
+            <CheckCircle2 className="w-6 h-6 text-neo-black shrink-0" />
+            <div>
+              <span className="font-neo-display font-black text-neo-black text-sm">
+                {t('wordWheel.results.dailyComplete', 'Daily Challenge complete!')}
+              </span>
+              <p className="text-neo-black/70 text-xs">
+                {t('wordWheel.results.dailyCompleteDesc', 'Both games done. Come back tomorrow!')}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Connections cross-promo */}
+        {wordWheelPlayed && !connectionsPlayed && (language === 'en' || language === 'he') && (
+          <Link
+            href={`/${language}/connections/pyramid`}
+            data-testid="daily-connections-cross-promo"
+            onClick={() =>
+              trackGrowthEvent('cross_promo_click', {
+                target: 'connections',
+                source: 'word_hunt_results',
+                placement: 'post_daily_complete',
+                language,
+              })
+            }
+            className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0 font-neo-display font-black text-neo-white text-lg">
+                ↔
+              </div>
+              <div>
+                <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
+                  {t('connections.landing.crossPromoTitle', language === 'he' ? 'נסה ראש זנב' : 'Try Word Bridge')}
+                </span>
+                <p className="text-neo-white text-xs mt-0.5">
+                  {t('connections.landing.crossPromoBody', language === 'he' ? 'שתי מילים, גשר אחד. חינם.' : 'Two words. One bridge. Free.')}
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
+          </Link>
+        )}
+
+        {/* Word Hunt facts */}
+        {stats && (
+          <m.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+          >
+            <DailyWordHuntFacts result={result} stats={stats} t={t} />
+          </m.div>
+        )}
+
+        {/* Word appeal */}
+        <RejectedWordAppeal language={language} t={t} />
+
+        {/* Suggest word */}
+        <SuggestWordCard language={language} playerId={profile?.id} guestFingerprint={guestFingerprint} />
+      </div>
+    </CollapsibleSection>
+
+    {/* Signup modal — only shown if user tapped the minimal line */}
+    {signupModalNode}
+  </div>
+  );
+};

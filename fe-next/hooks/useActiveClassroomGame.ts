@@ -1,0 +1,286 @@
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { getSocketURL } from '@/utils/SocketContext';
+import { setEduClassroomContext } from '@/lib/education/telemetry';
+
+export interface ActiveGame {
+  gameCode: string;
+  teacherName: string;
+  lessonNames: string[];
+  playerCount?: number;
+  /** Which classroom this game belongs to. Absent from an older server. */
+  classroomId?: string;
+  /** That classroom's display name, resolved server-side. Absent from an older server. */
+  classroomName?: string | null;
+}
+
+const POLL_INTERVAL = 15_000;
+
+/**
+ * Hook to detect active classroom games via Socket.IO.
+ *
+ * The ONE place the student client listens for their class's live game.
+ * `ClassroomGameBanner` used to carry a second, near-identical copy of this
+ * logic that opened its socket with no auth token — the server rejected it
+ * before ever subscribing it to `classroom:<id>`, so the banner could never
+ * fire (recurring pitfall class 3: two routes, one silently weaker).
+ *
+ * Clearing is as load-bearing as setting: a game that ends must take its JOIN
+ * button with it, or the student taps through to a dead multiplayer room.
+ * Both clear paths — an empty `activeClassroomGames` list and the server's
+ * `classroomGameEnded` broadcast — are handled here.
+ */
+export function useActiveClassroomGame(classroomId: string) {
+  const [activeGame, setActiveGame] = useState<ActiveGame | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** Unsubscribes the auth watcher below; null whenever there is nothing to undo. */
+  const authCleanupRef = useRef<(() => void) | null>(null);
+
+  const requestActiveGames = useCallback((sock: Socket) => {
+    if (sock.connected) {
+      sock.emit('getActiveClassroomGames', { classroomId });
+    }
+  }, [classroomId]);
+
+  useEffect(() => {
+    const socketUrl = getSocketURL();
+    let socketInstance: ReturnType<typeof io> | undefined;
+    /**
+     * The teardown flag, and the whole reason this hook could show another
+     * class's game.
+     *
+     * `initSocket` is async: it awaits `getSession()` before `socketInstance`
+     * is ever assigned. React runs this effect's cleanup the moment
+     * `classroomId` changes — INSIDE that window — so `socketInstance
+     * ?.disconnect()` had nothing to disconnect and silently did nothing
+     * (recurring pitfall class 4). The classroom-A socket then lived forever:
+     * still subscribed to `classroom:A`, still polling every 15 seconds, and
+     * still holding the same stable `setActiveGame` — so it kept writing
+     * classroom A's game into a hook that now represents classroom B.
+     *
+     * Cleanup therefore records the intent, and the async setup honours it
+     * whenever it finally lands.
+     */
+    let cancelled = false;
+
+    async function initSocket() {
+      let token: string | undefined;
+      /** Undone on cleanup; set only when we open WITHOUT a token. */
+      let unsubscribeAuth: (() => void) | undefined;
+      try {
+        const { createClient } = await import('@/utils/supabase/client');
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token;
+
+        // The handshake is read ONCE, by the server, at connect time — it sets
+        // `socket.data.verifiedUserId` and never revisits it. So a socket that
+        // opens without a token is anonymous for its entire life, and
+        // `joinClassroomGame` hard-refuses an anonymous socket
+        // ("Authentication required", `classroomGameHandler.ts:319`). The
+        // banner's JOIN then fails every single time, and re-entering the class
+        // code does not help because nothing re-mounts this socket.
+        //
+        // `getSession()` comes back empty more often than it looks: a cold load
+        // or a deep link can run this effect before the cookie-backed session
+        // has hydrated, and an in-app WebView (Google Classroom opens links in
+        // one) can partition storage so the first read finds nothing. Watching
+        // for the session and re-handshaking costs one reconnect and converts a
+        // permanent dead end into a short delay.
+        if (!token) {
+          const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+            const late = (nextSession as { access_token?: string } | null)?.access_token;
+            // No token means signed-out or a no-op event. Reconnecting then
+            // would drop a working anonymous feed for nothing.
+            if (!late || cancelled) return;
+            const sock = socketInstance;
+            if (!sock) return;
+            sock.auth = { token: late };
+            // A handshake is only re-read on a fresh connection.
+            sock.disconnect();
+            sock.connect();
+            // One upgrade is all we need; stop listening so a token refresh
+            // does not bounce the socket every hour.
+            unsubscribeAuth?.();
+            unsubscribeAuth = undefined;
+          });
+          unsubscribeAuth = () => data?.subscription?.unsubscribe?.();
+          authCleanupRef.current = () => {
+            unsubscribeAuth?.();
+            unsubscribeAuth = undefined;
+          };
+        }
+      } catch {
+        // proceed without token
+      }
+
+      // A non-optional local so the listener closures below have a socket that
+      // cannot be undefined; `socketInstance` exists only for the cleanup path.
+      const sock = io(socketUrl, {
+        transports: ['websocket', 'polling'],
+        auth: token ? { token } : {},
+      });
+      socketInstance = sock;
+
+      // The classroom changed (or the page unmounted) while the session was
+      // resolving. Close this one immediately and wire up nothing.
+      if (cancelled) {
+        sock.disconnect();
+        return;
+      }
+
+      sock.on('connect', () => {
+        setIsConnected(true);
+        requestActiveGames(sock);
+      });
+
+      sock.on('disconnect', () => {
+        setIsConnected(false);
+      });
+
+      sock.io.on('reconnect', () => {
+        requestActiveGames(sock);
+      });
+
+      sock.on('classroomGameCreated', (data: {
+        gameCode: string;
+        classroomId?: string;
+        classroomName?: string | null;
+        teacherName: string;
+        lessonNames: string[];
+      }) => {
+        // Trust the payload's own scope, not just the room we think we are in.
+        // The server sends classroomId and this ignored it, so any path that
+        // ever put this socket in a second classroom room would surface another
+        // class's game under this student's banner. Also refuse a record with no
+        // room code: it cannot be joined, so it must not be advertised.
+        if (data?.classroomId && data.classroomId !== classroomId) return;
+        if (!data?.gameCode) return;
+        setError(null);
+        setActiveGame({
+          gameCode: data.gameCode,
+          classroomId: data.classroomId,
+          classroomName: data.classroomName,
+          teacherName: data.teacherName,
+          lessonNames: data.lessonNames,
+        });
+      });
+
+      // The list is authoritative in BOTH directions. An empty list means the
+      // game is over (or its Redis key expired); leaving the old one on screen
+      // is what kept "JOIN NOW" pointing at a dead room.
+      sock.on('activeClassroomGames', (data: { classroomId?: string; games: ActiveGame[] }) => {
+        // Whose answer is this? The payload used to say nothing, so the client
+        // had no way to tell and trusted every one of them. A response for a
+        // classroom this hook is not watching is not evidence about this
+        // classroom — in particular it must never CLEAR a running game.
+        if (data?.classroomId && data.classroomId !== classroomId) return;
+        setError(null);
+        // A Redis set has no order, so `games[0]` is arbitrary. Take the first
+        // one that is actually joinable rather than whichever the store handed
+        // back — that arbitrariness is what showed students an older game's
+        // lesson name and then walked them into a dead room.
+        //
+        // Each game is re-checked against this classroom too. `classroomId` is
+        // optional only so an older server (which sends neither) keeps working;
+        // when it IS present it is authoritative.
+        const joinable = (data?.games ?? []).find(
+          (g) => !!g?.gameCode && (!g.classroomId || g.classroomId === classroomId)
+        ) ?? null;
+        setActiveGame(joinable);
+        // Second analytics clear path. The student who plays in class, walks
+        // away mid-game and later plays solo never receives `classroomGameEnded`
+        // (this hook's socket is gone by then), so without this their solo games
+        // would keep the classroom tag. Returning to the hub with no live game
+        // is the honest "you are not in a class game" signal.
+        if (!joinable) setEduClassroomContext(null);
+      });
+
+      // Analytics scope for the class's live game. Until this listener existed
+      // the server's `classroomGameStarted` broadcast had NO receiver at all,
+      // so `classroom_id` never reached the browser and has never appeared on a
+      // single game lifecycle event. Registering it as a super property puts it
+      // on every later event by construction, rather than asking each emitter
+      // (and its `growth:`-prefixed twin) to remember.
+      sock.on('classroomGameStarted', (data: { gameCode?: string; classroomId?: string }) => {
+        // Trust the payload's own scope, exactly as the banner does above. An
+        // older server omits it, and the socket is only ever subscribed to the
+        // room it asked for, so our own argument is a safe fallback.
+        if (data?.classroomId && data.classroomId !== classroomId) return;
+        setEduClassroomContext(data?.classroomId ?? classroomId);
+      });
+
+      // The server broadcasts this from every end-of-ROUND path, and the
+      // teacher starts the next round seconds to minutes later while the class
+      // reads the results screen. Only `sessionEnded` means the game itself is
+      // over (the teacher's own `endClassroomGame`); clearing on a round end
+      // blanked the JOIN card for a full 15-second poll while the room, the
+      // roster and the code were all alive. Room teardown carries no broadcast
+      // at all — the next poll drops it, because the code is pruned out of the
+      // classroom index the moment its session is marked ended.
+      sock.on('classroomGameEnded', (data: { gameCode?: string; sessionEnded?: boolean }) => {
+        if (!data?.sessionEnded) return;
+        // Clearing is as load-bearing as setting: a super property persists in
+        // localStorage, so a classroom left behind would tag every later SOLO
+        // game as classroom play.
+        setEduClassroomContext(null);
+        setActiveGame((current) => {
+          if (!current) return null;
+          // No gameCode on the payload → end whatever this classroom was running.
+          if (data?.gameCode && data.gameCode !== current.gameCode) return current;
+          return null;
+        });
+      });
+
+      // Rejections used to vanish. "Not a member", "Authentication required" and
+      // a bad payload all looked exactly like "no game is running" (class 4).
+      sock.on('classroomGameError', (data: { error?: string }) => {
+        setError(data?.error ?? 'unknown');
+      });
+
+      sock.on('classroomGamePlayerJoined', (data: {
+        gameCode: string;
+        playerCount: number;
+      }) => {
+        setActiveGame((current) => {
+          if (current && current.gameCode === data.gameCode) {
+            return { ...current, playerCount: data.playerCount };
+          }
+          return current;
+        });
+      });
+
+      setSocket(sock);
+
+      pollIntervalRef.current = setInterval(() => {
+        requestActiveGames(sock);
+      }, POLL_INTERVAL);
+    }
+
+    initSocket();
+    return () => {
+      cancelled = true;
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+      // DELIBERATELY no `setEduClassroomContext(null)` here. Both consumers
+      // (ClassroomGameBanner, PlayWithClassButton) `router.push` to
+      // /multiplayer to PLAY, which unmounts this hook — so clearing on unmount
+      // would wipe classroom_id at the exact moment the classroom game begins,
+      // a beat before `game_started` fires on the multiplayer page. The whole
+      // feature would be a silent no-op. The scope has to survive that
+      // navigation; it is cleared when the session ends or when the classroom
+      // reports no live game instead.
+      authCleanupRef.current?.();
+      authCleanupRef.current = null;
+      socketInstance?.disconnect();
+    };
+  }, [classroomId, requestActiveGames]);
+
+  return { activeGame, isConnected, socket, setActiveGame, error };
+}

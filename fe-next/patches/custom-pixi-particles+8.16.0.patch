@@ -1,0 +1,86 @@
+diff --git a/node_modules/custom-pixi-particles/dist/lib/effects/GhostEffect.js b/node_modules/custom-pixi-particles/dist/lib/effects/GhostEffect.js
+index 3512ab6..744bf21 100644
+--- a/node_modules/custom-pixi-particles/dist/lib/effects/GhostEffect.js
++++ b/node_modules/custom-pixi-particles/dist/lib/effects/GhostEffect.js
+@@ -112,7 +112,13 @@ export default class GhostEffect extends Container {
+         // tslint:disable-next-line:no-bitwise
+         b2 = end & 0xff;
+         // tslint:disable-next-line:one-variable-per-declaration no-bitwise
+-        const r = r1 + (r2 - r1) * t, g = g1 + (g2 - g1) * t, b = b1 + (b2 - b1) * t;
++        const rr = r1 + (r2 - r1) * t, gg = g1 + (g2 - g1) * t, bb = b1 + (b2 - b1) * t;
++        // PATCH: clamp interpolated channels. Progress overshoot (t outside [0,1])
++        // can drift channels negative, sign-extending bitwise OR to negative int32
++        // ("Unable to convert color -4" on sprite.tint). Mirrors Color.hex patch.
++        const r = Math.max(0, Math.min(255, rr | 0));
++        const g = Math.max(0, Math.min(255, gg | 0));
++        const b = Math.max(0, Math.min(255, bb | 0));
+         // tslint:disable-next-line:no-bitwise
+         return (r << 16) | (g << 8) | b;
+     }
+diff --git a/node_modules/custom-pixi-particles/dist/lib/effects/ShatterEffect.js b/node_modules/custom-pixi-particles/dist/lib/effects/ShatterEffect.js
+index e93a640..6ed3f89 100644
+--- a/node_modules/custom-pixi-particles/dist/lib/effects/ShatterEffect.js
++++ b/node_modules/custom-pixi-particles/dist/lib/effects/ShatterEffect.js
+@@ -182,7 +182,13 @@ export default class ShatterEffect extends Container {
+         // tslint:disable-next-line:no-bitwise
+         b2 = end & 0xff;
+         // tslint:disable-next-line:one-variable-per-declaration no-bitwise
+-        const r = r1 + (r2 - r1) * t, g = g1 + (g2 - g1) * t, b = b1 + (b2 - b1) * t;
++        const rr = r1 + (r2 - r1) * t, gg = g1 + (g2 - g1) * t, bb = b1 + (b2 - b1) * t;
++        // PATCH: clamp interpolated channels. Progress overshoot (t outside [0,1])
++        // can drift channels negative, sign-extending bitwise OR to negative int32
++        // ("Unable to convert color -4" on sprite.tint). Mirrors Color.hex patch.
++        const r = Math.max(0, Math.min(255, rr | 0));
++        const g = Math.max(0, Math.min(255, gg | 0));
++        const b = Math.max(0, Math.min(255, bb | 0));
+         // tslint:disable-next-line:no-bitwise
+         return (r << 16) | (g << 8) | b;
+     }
+diff --git a/node_modules/custom-pixi-particles/dist/lib/pixi/particleLinkLayer.js b/node_modules/custom-pixi-particles/dist/lib/pixi/particleLinkLayer.js
+index 15e5725..c698972 100644
+--- a/node_modules/custom-pixi-particles/dist/lib/pixi/particleLinkLayer.js
++++ b/node_modules/custom-pixi-particles/dist/lib/pixi/particleLinkLayer.js
+@@ -22,9 +22,15 @@ function blendRgb(a, b) {
+     const br = (b >> 16) & 0xff;
+     const bg = (b >> 8) & 0xff;
+     const bb = b & 0xff;
+-    const r = (ar + br) >> 1;
+-    const g = (ag + bg) >> 1;
+-    const bl = (ab + bb) >> 1;
++    const rr = (ar + br) >> 1;
++    const gg = (ag + bg) >> 1;
++    const bbl = (ab + bb) >> 1;
++    // PATCH: clamp blended channels. If either input was poisoned negative
++    // upstream, the OR result sign-extends to negative int32 ("Unable to
++    // convert color -4" on tint). Mirrors Color.hex patch.
++    const r = Math.max(0, Math.min(255, rr | 0));
++    const g = Math.max(0, Math.min(255, gg | 0));
++    const bl = Math.max(0, Math.min(255, bbl | 0));
+     return (r << 16) | (g << 8) | bl;
+ }
+ const linkDrawScratch = {
+diff --git a/node_modules/custom-pixi-particles/dist/lib/util/Color.js b/node_modules/custom-pixi-particles/dist/lib/util/Color.js
+index 7f7aeec..b98ddd8 100644
+--- a/node_modules/custom-pixi-particles/dist/lib/util/Color.js
++++ b/node_modules/custom-pixi-particles/dist/lib/util/Color.js
+@@ -153,10 +153,16 @@ export default class Color {
+      * @returns {number} The hex value of the Color object
+      */
+     get hex() {
+-        let hex = this.r << 16;
+-        hex = hex | (this.g << 8);
+-        hex = hex | this.b;
+-        return hex;
++        // PATCH: clamp channels to [0,255] before bitwise-OR.
++        // Upstream bug: when r/g/b drift below 0 (e.g. behaviour overshoot, fade
++        // interpolation), `r << 16` sign-extends to negative int32, producing
++        // values like -1 / -2. PixiJS v8 then throws "Unable to convert color -1"
++        // from sprite.tint = ..., crashing the Ticker on every frame.
++        // Repro: 113 of 176 $exception events on /he/blast (PostHog 2026-04-27).
++        const r = Math.max(0, Math.min(255, this.r | 0));
++        const g = Math.max(0, Math.min(255, this.g | 0));
++        const b = Math.max(0, Math.min(255, this.b | 0));
++        return (r << 16) | (g << 8) | b;
+     }
+     /**
+      * @function hex

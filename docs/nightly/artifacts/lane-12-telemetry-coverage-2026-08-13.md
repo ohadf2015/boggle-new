@@ -1,0 +1,3 @@
+status: research-only
+files_touched: docs/nightly/impact-ledger.ndjson, docs/nightly/reports/2026-08-13.md (no fe-next code changed)
+next_steps: root-cause `first_word_found` dead call site (SinglePlayerGame.tsx:100) — confirmed pipeline-healthy, confirmed real single-player traffic (950 game_started/7d), zero fires 14d across all name variants. Ran out of safe time budget before root-causing (candidates: foundWords pre-populated non-empty on mount, or component no longer mounted for real traffic post quick-play-overhaul — both unverified). IMPACT CHECK verdict appended (game_abandon_attempted 0→4/3d = improved). Then continue never-wired backlog: room_joined_via_link, room_joined_via_code, replay_countdown_shown, results_autoplay_cancelled, daily_rival_landed.

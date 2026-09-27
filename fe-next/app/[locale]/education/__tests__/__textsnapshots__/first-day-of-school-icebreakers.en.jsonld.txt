@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers#page",
+  "name": "First Day of School Icebreakers | LexiClash",
+  "description": "Classroom icebreaker games that get quiet rooms talking. Low-pressure word games for your first day—no names to memorize, no one on the spot.",
+  "url": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+  "inLanguage": "en",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/en/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.lexiclash.live/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Education",
+      "item": "https://www.lexiclash.live/en/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "First Day Icebreakers",
+      "item": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers#resource",
+  "name": "First Day of School Icebreakers | LexiClash",
+  "description": "A whole-class word game where all students play together on shared letters—no individual spotlights, no waiting turns. LexiClash gives teachers a live board and students a low-pressure way to talk, discover names, and feel the room shift from silence to energy in under fifteen minutes.",
+  "url": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+  "inLanguage": "en",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "8-16",
+  "teaches": "social cohesion, vocabulary in context, rapid name learning",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/en/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/en/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers#faq",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What about students who don't want to speak up?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "They're in. They find words silently. You notice the board fill up under their name. The pressure to \"introduce yourself\" is gone—you just see who they are in real time. Some kids talk less in round one, more in round two. That's how it works."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use this if students already know each other?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. It builds names into faces, not just names into a list. Plus, a fresh class mix (even in repeat years) creates enough distance that the low-pressure intro still lands."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What grade levels does this work for?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Elementary through high school. Adjust the language: younger kids hunt simpler words; older kids hunt longer words or play with a theme filter. One game, many speeds."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I play this asynchronously?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Give students a join code, a prompt (e.g., \"Find words about summer\"), and a deadline. They play on their own time. Less icebreaker energy, more asynchronous see-what-they-know."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if a student doesn't have a device?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pair them with a neighbor, or they help that pair hunt. They're still known. Still part of the room."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use this for ESL or multilingual classes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. Younger learners hunt shorter words; advanced learners hunt by meaning. Post the prompt in English or the home language."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I keep it moving?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Set a timer. Two minutes per round, not ten. Kids move fast once they get the shape of the game. Spot a few names out loud between rounds to keep you engaged and them known."
+      }
+    }
+  ]
+}

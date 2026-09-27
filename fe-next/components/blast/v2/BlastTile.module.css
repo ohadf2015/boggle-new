@@ -1,0 +1,265 @@
+/* Board wrapper — sets up container query context for tile sizing and
+   draws a faint frame around the playing field. The wrapping flex parent
+   uses `containerType: size` so both width (cqi) and height (cqb) drive
+   tile sizing — boards stay big regardless of how few rows are filled. */
+.board {
+  container-type: size;
+  border-radius: 18px;
+  isolation: isolate;
+}
+
+/* Tile size adapts to BOTH column count AND row count by taking the smaller
+   of width-fit and height-fit. Without the height constraint, a 6-col board
+   with only 2 rows of tiles produced a 3:1 ratio that pinned tiles to ~30px
+   on phones with most of the play area wasted. min(cqi, cqb) lets the board
+   fill its allotted box and pump tile size up to ~88px on tall phones.
+   Falls back to 18cqi for callers that forget to pass column/row counts. */
+.board {
+  --blast-tile-gap: 8px;
+  --blast-tile-cap: 88px;
+  --blast-tile-min: 32px;
+  --blast-cols: 6;
+  --blast-rows: 6;
+  --blast-tile-size: clamp(
+    var(--blast-tile-min),
+    min(
+      calc((100cqi - (var(--blast-cols) - 1) * var(--blast-tile-gap) - 32px) / var(--blast-cols)),
+      calc((100cqb - (var(--blast-rows) - 1) * var(--blast-tile-gap) - 32px) / var(--blast-rows))
+    ),
+    var(--blast-tile-cap)
+  );
+}
+
+/* The playfield frame. Wordfall's board is mostly empty by design — tiles fall
+   into it from above — so without a frame the play area reads as void and the
+   whole screen looks unfinished (a tile grid floating in the dark). Framing the
+   well grid turns that emptiness into "the shaft the tiles drop down", which is
+   what every polished falling-block game does.
+
+   Sized purely from the same custom properties the wells use rather than by
+   wrapping them in a padded container: a wrapper would offset the wells by its
+   padding while the tiles (a sibling layer) stayed put, and the two grids would
+   drift apart. This element only paints. */
+.playfieldFrame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Headroom above the grid. Wordfall drops tiles in from the top, so the frame
+     extends up past the wells and the grid sits on its floor: the empty space
+     then reads as the shaft the tiles fall down rather than as a void the board
+     happens to be floating in. Bounded by container height so short viewports
+     don't get a frame taller than the board. */
+  --blast-shaft: clamp(0px, 20cqb, 150px);
+  width: calc(
+    var(--blast-cols, 6) * var(--blast-tile-size, 64px) +
+      (var(--blast-cols, 6) - 1) * var(--blast-tile-gap, 8px) + 26px
+  );
+  height: calc(
+    var(--blast-rows, 6) * var(--blast-tile-size, 64px) +
+      (var(--blast-rows, 6) - 1) * var(--blast-tile-gap, 8px) + 26px +
+      var(--blast-shaft)
+  );
+  /* Grow upward only — the extra height must not lift the grid off the floor. */
+  transform: translate(-50%, calc(-50% - (var(--blast-shaft) / 2)));
+  /* Tinted with the level's mode colour so the frame is part of the theme
+     identity rather than neutral chrome. A dark border here would be invisible:
+     unlike a tile (dark border against a cream face) the frame's face is dark
+     too, so the rim has to carry the contrast itself. */
+  border: 3px solid color-mix(in srgb, var(--blast-mode-color, #bfff00) 55%, #0b1530);
+  border-radius: 20px;
+  /* Ground plate: light enough to read as a surface the tiles rest on. */
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 4px 0 rgba(0, 0, 0, 0.38),
+    inset 0 -3px 0 rgba(255, 255, 255, 0.07),
+    0 0 22px color-mix(in srgb, var(--blast-mode-color, #bfff00) 18%, transparent),
+    7px 7px 0 0 #0b1530;
+  pointer-events: none;
+}
+
+/* Hard shadows must fall the other way in Hebrew or the frame looks lit from
+   the wrong side against the rest of the RTL chrome. */
+[dir='rtl'] .playfieldFrame {
+  box-shadow:
+    inset 0 4px 0 rgba(0, 0, 0, 0.38),
+    inset 0 -3px 0 rgba(255, 255, 255, 0.07),
+    0 0 22px color-mix(in srgb, var(--blast-mode-color, #bfff00) 18%, transparent),
+    -7px 7px 0 0 #0b1530;
+}
+
+/* Empty slot behind each tile position. Same size & gap as tiles so landed
+   tiles align perfectly with their well. Was nearly invisible (0.018 alpha),
+   which left players unable to see the grid they were dropping into — the
+   wells now read as real sockets pressed into the ground plate. */
+.cellWell {
+  width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  /* Sockets must read against the playfield's near-black. The previous
+     0.22 fill + 0.055 bottom highlight went muddy on OLED phones —
+     bump both so empty cells stay legible next to lit tiles. */
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow:
+    inset 0 3px 0 rgba(0, 0, 0, 0.5),
+    inset 0 -2px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Column wrapper for live tiles — must hold a fixed width matching the well
+   beneath, otherwise an emptied column collapses to 0px and `justify-center`
+   shifts the remaining columns horizontally mid-fall. That sideways shift
+   is what made tiles read as "falling down AND to the side" during gravity. */
+.tileColumn {
+  width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  flex: 0 0 var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  /* Hold the FULL grid height even after words clear so a partial column
+     doesn't collapse to its tile count. Matches the cell-well backdrop
+     (visualRows tiles + gaps). With flex-col-reverse the remaining tiles
+     rest at the column BOTTOM (aligned to the well bottoms), and the
+     centered board (items-center) then centers a full-height column over
+     its full-height well instead of floating a shrunken one mid-air. */
+  min-height: calc(
+    var(--blast-rows, 6) * var(--blast-tile-size, 64px) +
+      (var(--blast-rows, 6) - 1) * var(--blast-tile-gap, 8px)
+  );
+}
+
+.tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  aspect-ratio: 1 / 1;
+  /* Neo-brutalist hard border: 3px solid, near-black */
+  border: 3px solid #0b1530;
+  border-radius: 10px;
+  /* Depth + brand, without touching the letter's contrast.
+     The face stays light and the letter stays near-black because in Wordfall
+     the LETTER is the gameplay — unlike a colour-match game, tinting the face
+     would trade legibility for energy. So the brand colour rides the bevel
+     instead: a bright top highlight and a mode-tinted bottom lip give the tile
+     a moulded edge and put the level's colour on every tile, while the letter
+     keeps a full-contrast cream-on-navy read. */
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -5px 0 color-mix(in srgb, var(--tile-mode-color, #ec4899) 42%, #a9a6b5),
+    inset 0 -7px 0 rgba(0, 0, 0, 0.12),
+    4px 4px 0 0 #0b1530;
+  font-weight: 900;
+  font-size: calc(var(--blast-tile-size, 64px) * 0.45);
+  /* A pale wash of the level's colour over brand cream, not the old warm beige
+     (which read as a Scrabble tile). Held to 12% so the near-black letter keeps
+     roughly 14:1 contrast on every mode colour — the tile carries the theme,
+     the letter stays the most legible thing on screen. The lip below mixes the
+     mode colour over a COOL neutral: over the old warm beige, lime levels mixed
+     to olive. */
+  background: color-mix(in srgb, var(--tile-mode-color, #ec4899) 12%, #fffef0);
+  color: #0b1530;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
+  /* Smooth state transitions for depth effect */
+  transition: all 120ms ease-out;
+}
+
+/* Selected state: electric accent color face + white letter */
+.tile[data-state="selected"] {
+  /* Lifts on selection: same moulded edge, deeper hard shadow. The bottom lip
+     goes dark here because the face is already the mode colour. */
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -5px 0 rgba(0, 0, 0, 0.22),
+    6px 6px 0 0 #0b1530;
+  /* Accent color — modeColor prop tints it, pink default for Blast */
+  background: var(--tile-mode-color, #ec4899);
+  color: #ffffff;
+  /* Subtle lift animation on selection */
+  filter: brightness(1.1);
+}
+
+/* Just-cleared state: drop shadow effect as tile explodes out */
+.tile[data-state="just-cleared"] {
+  box-shadow: none;
+}
+
+/* Frozen tile styling: lighter blue tint with reduced opacity */
+.tile[data-state-frozen] {
+  background: #bae6fd;
+  opacity: 0.6;
+}
+
+/* Double bonus rainbow pulse animation */
+.tile[data-double-bonus] {
+  animation: rainbow-pulse 1.6s linear infinite;
+}
+
+@keyframes rainbow-pulse {
+  0%, 100% {
+    border-color: #ec4899;
+  }
+  33% {
+    border-color: #06b6d4;
+  }
+  66% {
+    border-color: #84cc16;
+  }
+}
+
+.letter {
+  line-height: 1;
+  /* Bold display font for Fredoka */
+  font-family: inherit;
+}
+
+.coin,
+.gem {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #0b1530;
+}
+
+.coin {
+  background: #fbbf24;
+}
+
+.gem {
+  background: #a855f7;
+  animation: gem-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gem-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.revealGlow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: 0 0 0 3px #06b6d4, 0 0 16px 4px #06b6d4;
+  animation: revealPulse 0.9s ease-in-out 2;
+}
+
+@keyframes revealPulse {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealGlow {
+    animation: none;
+    opacity: 0.6;
+  }
+}

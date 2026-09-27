@@ -1,0 +1,275 @@
+'use client';
+
+/**
+ * PracticeModeStage — the one place that decides which practice screen renders.
+ *
+ * This switch used to live inside the lesson page, which had grown to 554 lines
+ * and mixed three unrelated jobs: fetching a lesson, owning the XP session, and
+ * routing eight practice modes. Pulling the routing out is what got that page
+ * back under the file-size cap and left it doing one thing.
+ *
+ * Every mode is handed the same two forward props — `onNext` and `nextLabel` —
+ * so the big green button at the end of a round belongs to the completion card
+ * itself rather than to a separate bar bolted underneath it. That matters: the
+ * old design put "practise again" on the card and "next game" on a fixed strip
+ * at the bottom of the viewport, so the two halves of the same decision lived
+ * 400px apart and one of them was routinely off-screen on a phone.
+ *
+ * Word Tower is the one special case. It records as `solo_board` (there is no
+ * `word_tower` value in the practice_type CHECK constraint), so the variant is
+ * what decides which of the two screens opens.
+ */
+
+import {
+  FlashcardReview,
+  SoloPracticeBoard,
+  WordListPreview,
+  WarmupRound,
+  WordMatchingPractice,
+  SpellingChallengePractice,
+  TimedBlitzPractice,
+  VocabFocusPractice,
+} from '@/components/practice';
+import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
+import dynamic from 'next/dynamic';
+
+// Word Craft carries the Pixi board; only a Word Craft assignment pays for it.
+const WordCraftPractice = dynamic(() => import('@/components/education/practicePicker/WordCraftPractice'), {
+  ssr: false,
+});
+import { availableFocuses, type VocabFocus } from '@/lib/education/vocabFocus';
+import { ProducePractice } from '@/components/practice/ProducePractice';
+import { PRODUCE_FOCUSES, type ProduceFocus } from '@/lib/education/produceQuestions';
+
+/**
+ * `ProduceFocus` is a deliberate SUBSET of `VocabFocus` — multiple-meaning and
+ * roots/affixes have answers that are not the lesson word, so they cannot be
+ * production tasks. This narrows a picker focus safely instead of casting.
+ */
+function isProduceFocus(focus: VocabFocus): focus is ProduceFocus {
+  return (PRODUCE_FOCUSES as readonly string[]).includes(focus);
+}
+import type { PracticeType } from '@/hooks/usePracticeSession';
+import type { PracticeVariant } from '@/lib/education/practicePicker';
+import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
+
+export interface PracticeRoundPayload {
+  focus?: VocabFocus;
+  cardsReviewed?: number;
+  cardsCorrect?: number;
+  vocabularyWordsFound?: string[];
+  /** Word Craft: every word the player built — the server's "3 valid words" leg of the homework bar. */
+  wordsFound?: string[];
+  newWordsFound?: string[];
+}
+
+export interface PracticeModeStageProps {
+  mode: PracticeType;
+  variant: PracticeVariant | null;
+  focus: VocabFocus | null;
+  lessonName: string;
+  language: Language;
+  words: VocabularyWord[];
+  /** Normalised round-finished handler — one path for all eight modes. */
+  onFinish: (type: PracticeType, payload: PracticeRoundPayload) => void | Promise<void>;
+  onBack: () => void;
+  xpSessionData: { sessionXpEarned: number; sessionMasteryMessage: string | null };
+  /** Straight into the next ready mode, when the lesson has one left. */
+  onNext?: () => void;
+  nextLabel?: string;
+}
+
+export default function PracticeModeStage({
+  mode,
+  variant,
+  focus,
+  lessonName,
+  language,
+  words,
+  onFinish,
+  onBack,
+  xpSessionData,
+  onNext,
+  nextLabel,
+}: PracticeModeStageProps) {
+  if (words.length === 0) return null;
+
+  const common = { lessonName, words, language, onBack };
+  const forward = { onNext, nextLabel };
+
+  switch (mode) {
+    case 'flashcard':
+      return (
+        <FlashcardReview
+          words={words}
+          onComplete={(results) =>
+            onFinish('flashcard', { cardsReviewed: results.total, cardsCorrect: results.correct })
+          }
+          onBack={onBack}
+          xpSessionData={xpSessionData}
+          {...forward}
+        />
+      );
+
+    case 'solo_board':
+      if (variant === 'wordcraft') {
+        // Classroom Word Craft homework. Records as solo_board (mode=wordcraft);
+        // XP pays for the lesson words the student built on the board.
+        return (
+          <WordCraftPractice
+            words={words.map((entry) => entry.word)}
+            language={language}
+            onComplete={async (results) => {
+              await onFinish('solo_board', { vocabularyWordsFound: results.vocabularyWordsFound, wordsFound: results.wordsFound, newWordsFound: [] });
+            }}
+            onBack={onBack}
+            {...forward}
+          />
+        );
+      }
+      if (variant === 'word_tower') {
+        return (
+          <WordTowerPractice
+            words={words.map((entry) => entry.word)}
+            language={language}
+            onComplete={async (results) => {
+              // Deliberately NOT followed by onBack(): Word Tower now holds the
+              // screen and shows its own completion moment, where the old code
+              // unmounted it the instant the result was recorded.
+              await onFinish('solo_board', {
+                vocabularyWordsFound: results.vocabularyWordsFound,
+                newWordsFound: [],
+              });
+            }}
+            onBack={onBack}
+            {...forward}
+          />
+        );
+      }
+      return (
+        <SoloPracticeBoard
+          {...common}
+          onComplete={(results) =>
+            onFinish('solo_board', {
+              vocabularyWordsFound: results.vocabularyWordsFound,
+              newWordsFound: [],
+            })
+          }
+          xpSessionData={xpSessionData}
+          {...forward}
+        />
+      );
+
+    case 'word_list':
+      return <WordListPreview {...common} />;
+
+    case 'warmup':
+      return (
+        <WarmupRound
+          {...common}
+          onComplete={(results) =>
+            onFinish('solo_board', {
+              vocabularyWordsFound: results.vocabularyWordsFound,
+              newWordsFound: [],
+            })
+          }
+          xpSessionData={xpSessionData}
+          {...forward}
+        />
+      );
+
+    case 'matching':
+      return (
+        <WordMatchingPractice
+          words={words}
+          onComplete={(results) =>
+            onFinish('matching', { cardsReviewed: results.total, cardsCorrect: results.correct })
+          }
+          onBack={onBack}
+          xpSessionData={xpSessionData}
+          {...forward}
+        />
+      );
+
+    case 'spelling':
+      return (
+        <SpellingChallengePractice
+          words={words}
+          onComplete={(results) =>
+            onFinish('spelling', { cardsReviewed: results.total, cardsCorrect: results.correct })
+          }
+          onBack={onBack}
+          xpSessionData={xpSessionData}
+          {...forward}
+        />
+      );
+
+    case 'blitz':
+      return (
+        <TimedBlitzPractice
+          words={words}
+          onComplete={(results) =>
+            onFinish('blitz', {
+              cardsReviewed: results.wordsAttempted,
+              cardsCorrect: results.wordsFound,
+            })
+          }
+          onBack={onBack}
+          xpSessionData={xpSessionData}
+          {...forward}
+        />
+      );
+
+    case 'vocab_focus': {
+      const resolved = focus ?? availableFocuses(words, { language })[0] ?? 'definition';
+      // Word Forge — the student WRITES the word instead of picking it. A
+      // variant of vocab_focus rather than a mode of its own, exactly as Word
+      // Tower is a variant of solo_board: `practice_type` is a DB CHECK
+      // constraint with no 'produce' value. Without this branch the produce
+      // tiles would open the four-choice drill and the one mode that asks for
+      // production would silently be recognition.
+      if (variant === 'produce') {
+        const produceFocus = isProduceFocus(resolved) ? resolved : 'definition';
+        return (
+          <ProducePractice
+            words={words}
+            focus={produceFocus}
+            language={language}
+            onComplete={(results) =>
+              onFinish('vocab_focus', {
+                focus: results.focus,
+                cardsReviewed: results.total,
+                // Near misses are retrievals with a spelling slip, not correct
+                // answers. Counting them as correct would inflate the mastery
+                // signal the teacher's report is built on.
+                cardsCorrect: results.correct,
+              })
+            }
+            onBack={onBack}
+            {...forward}
+          />
+        );
+      }
+      return (
+        <VocabFocusPractice
+          words={words}
+          focus={resolved}
+          language={language}
+          onComplete={(results) =>
+            onFinish('vocab_focus', {
+              focus: results.focus,
+              cardsReviewed: results.total,
+              cardsCorrect: results.correct,
+            })
+          }
+          onBack={onBack}
+          xpSessionData={xpSessionData}
+          {...forward}
+        />
+      );
+    }
+
+    default:
+      return null;
+  }
+}

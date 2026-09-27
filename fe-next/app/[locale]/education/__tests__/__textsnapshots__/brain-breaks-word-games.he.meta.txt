@@ -1,0 +1,64 @@
+{
+  "title": "הפסקות מוח בכיתה | משחקי מילים חינמיים",
+  "description": "משחקים מהירים לאחזור קשב בתוך 1–5 דקות. ללא הכנה, כל המכשירים, כיתה שלמה. כשהתלמידים הפסיקו להקשיב.",
+  "keywords": [
+    "הפסקות מוח בכיתה",
+    "פעילויות הפסקה מהירות",
+    "משחקי מילים לכיתה",
+    "הפסקה חד־דקתית",
+    "משחקים בלי הכנה",
+    "קשב תלמידים",
+    "פעילויות אנרגיה",
+    "משחקים לכיתה"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "es": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/brain-breaks-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/brain-breaks-word-games"
+  },
+  "ogTitle": "הפסקות מוח בכיתה | משחקי מילים חינמיים",
+  "ogDescription": "משחקים מהירים לאחזור קשב בתוך 1–5 דקות. ללא הכנה, כל המכשירים, כיתה שלמה. כשהתלמידים הפסיקו להקשיב.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "הפסקות מוח בכיתה | משחקי מילים חינמיים"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "הפסקות מוח בכיתה | משחקי מילים חינמיים",
+  "twDescription": "משחקים מהירים לאחזור קשב בתוך 1–5 דקות. ללא הכנה, כל המכשירים, כיתה שלמה. כשהתלמידים הפסיקו להקשיב.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

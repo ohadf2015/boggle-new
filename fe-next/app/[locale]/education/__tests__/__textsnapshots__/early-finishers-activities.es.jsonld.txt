@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/early-finishers-activities#page",
+  "name": "Actividades para estudiantes que terminan primero | LexiClash",
+  "description": "Juegos de palabras independientes para que terminen sin aburrirse. Sin supervisión constante, los estudiantes juegan y aprenden al mismo tiempo.",
+  "url": "https://www.lexiclash.live/es/education/early-finishers-activities",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/early-finishers-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Recursos de enseñanza",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Actividades para estudiantes que terminan primero",
+      "item": "https://www.lexiclash.live/es/education/early-finishers-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/early-finishers-activities#resource",
+  "name": "Actividades para estudiantes que terminan primero | LexiClash",
+  "description": "Los juegos de palabras independientes como LexiClash permiten que los estudiantes rápidos jueguen sin interrupciones constantes. Sin distracciones de clase, sin trabajo extra para ti, y cada palabra viene de la lección que acabas de enseñar.",
+  "url": "https://www.lexiclash.live/es/education/early-finishers-activities",
+  "inLanguage": "es",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "Retención de vocabulario, reconocimiento de palabras, aprendizaje independiente",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT10M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/early-finishers-activities#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Se apresurarán en el trabajo principal para llegar al juego?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Algunos lo harán, al principio. Establece reglas claras: \"Debes terminar el trabajo correctamente antes de jugar.\" Usa una lista de verificación para que sepan qué significa \"terminado\". Después de una semana, se vuelve normal. La mayoría de los docentes dicen que el juego motiva a los estudiantes más lentos porque ven a sus compañeros jugando."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Es seguro? ¿Hay chat o enlaces externos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sin chat, sin mensajes directos, sin enlaces externos. Es solo un juego de palabras. Los estudiantes ven nombres y puntuaciones de otros jugadores en la tabla de clasificación, pero eso es todo. No se comparte información personal."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Y el tiempo de pantalla?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cada ronda dura 2–4 minutos. Si un estudiante termina 10 minutos antes, juega una ronda, no seis. El juego los detiene cuando se acaba el tiempo. Es más corto que un video de descanso."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Necesito enseñarles cómo jugar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Demostración de dos minutos con toda la clase. Muéstrales la cuadrícula, señala una palabra, déjalos encontrar una. Eso es suficiente. Aprenden jugando. Sin tutorial."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué pasa si no tengo dispositivos en el aula?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Necesitas al menos un dispositivo (un teléfono o tablet) para que los estudiantes que terminan primero lo compartan. Muchas aulas tienen un conjunto de Chromebooks o un iPad compartido. LexiClash funciona en todos ellos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usar el mismo código todo el año?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, el mismo código todo el año. Los estudiantes no necesitan memorizarlo—lo escribes en la pizarra una vez y se queda ahí. Lo usan cada vez que terminan primero."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Veré qué jugaron?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Tu panel de docente muestra puntuaciones, qué palabras encontraron y cuáles no. Úsalo para elegir vocabulario para la lección de la próxima semana."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Y si los que terminan primero son solo una distracción, no una brecha de aprendizaje?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dale palabras más difíciles o establece una puntuación más alta. LexiClash se adapta a diferentes niveles. O rota: algunos juegan, otros leen, otros hacen matemáticas. El juego es una estación en tu sistema."
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.claude.nightly-feedback-daemon</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/ohadfisher/git/boggle-new/scripts/nightly/lib/feedback-daemon.sh</string>
+    </array>
+
+    <!-- Persistent long-poll daemon — keep alive forever -->
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Throttle restart on crash so we don't hammer if the script itself errors. -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/ohadfisher/git/boggle-new</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/ohadfisher/.nvm/versions/node/v22.22.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/ohadfisher</string>
+        <key>PROJECT_DIR</key>
+        <string>/Users/ohadfisher/git/boggle-new</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/ohadfisher/logs/lexi-nightly/feedback-daemon.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ohadfisher/logs/lexi-nightly/feedback-daemon.log</string>
+
+    <key>LowPriorityIO</key>
+    <true/>
+</dict>
+</plist>

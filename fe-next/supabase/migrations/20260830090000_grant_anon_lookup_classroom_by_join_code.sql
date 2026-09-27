@@ -1,0 +1,15 @@
+-- `lookup_classroom_by_join_code()` had EXECUTE for authenticated + service_role only.
+--
+-- The classroom preview a student sees BEFORE signing up
+-- (app/api/education/classroom/preview) runs on the request-scoped cookie client, which is
+-- `anon` for a logged-out visitor — exactly the QR / join-code entry point. Every one of
+-- those calls raised 42501 "permission denied for function lookup_classroom_by_join_code",
+-- surfaced as `Error querying classroom preview` in Sentry and as a bare
+-- "Classroom not found" for the student.
+--
+-- Granting anon is the design the enumeration fix already assumed: the function is
+-- SECURITY DEFINER, takes one exact 6-character code and returns at most one row, so it
+-- leaks nothing the code holder doesn't already have. See
+-- 20260821000000_classrooms_select_no_enumeration.sql — "stranger -> 0 classrooms,
+-- 0 join codes, lookup_classroom_by_join_code() still resolves 1".
+GRANT EXECUTE ON FUNCTION public.lookup_classroom_by_join_code(text) TO anon;

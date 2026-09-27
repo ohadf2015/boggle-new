@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities#page",
+  "name": "Мероприятия конца года — Словесные игры",
+  "description": "Поддержите интерес учащихся в последние дни учебного года. Словесные игры без проверки. Бесплатно начать.",
+  "url": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Дом",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Образование",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Мероприятия Конца Года",
+      "item": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities#resource",
+  "name": "Мероприятия конца года — Словесные игры",
+  "description": "Возьмите словесные игры, которые не требуют ни подготовки, ни проверки. Создайте класс в LexiClash, покажите код на доске и запустите раунд Boggle, «Колеса слов», Connections или словарных дуэлей. Класс соревнуется, вы переводите дух, а последние дни учебного года всё ещё считаются учёбой. Начать можно бесплатно.",
+  "url": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities",
+  "inLanguage": "ru",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "словарный запас, орфография, паттерны слов, категоризация, совместная игра",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT30M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Какая лучшая игра для последней недели школы?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Поиск слов в стиле Boggle и головоломки Connections работают лучше всего: быстрый темп, нет побеждённых или проигравших (только \"нашли ли вы слова?\"), и все учащиеся играют одновременно."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могут ли мои учащиеся играть дома?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Если учащиеся имеют устройства, они могут присоединиться к любой игре, которую вы проводите, введя код доступа. Им не нужна электронная почта или учётная запись—они просто пишут своё имя."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Сколько учащихся могут играть одновременно?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Весь класс. Любое количество учащихся может присоединиться к игре и играть вместе в реальном времени."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Что если учащийся закончит раньше?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "В LexiClash все учащиеся играют в одну и ту же игру одновременно, поэтому нет \"закончить раньше\". Все видят один и тот же доску и играют до конца времени."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я отслеживать, какие учащиеся играли?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Панель управления вашего класса показывает участие: кто играл, сколько игр, какие слова они нашли, и шаблоны слов по всему классу."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Эти игры обучают чтению или словарному запасу?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Поиск слов развивает распознавание паттернов и орфографию. Connections учат категоризации и отношениям. Оба усиливают активное словарное знание без рабочих листов."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Что если мои учащиеся имеют разные уровни чтения?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Настраиваемые списки слов решают эту проблему. Используйте более лёгкие слова (три-пять букв) для более молодых учащихся или слабых читателей; используйте более сложные слова для продвинутых учащихся. Все учащиеся играют в одну игру, но со словами, адаптированными к их уровню."
+      }
+    }
+  ]
+}

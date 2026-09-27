@@ -1,0 +1,55 @@
+{
+  "title": "Engelska ordspel för klassrummet — lärarledda, 6 språk | LexiClash",
+  "description": "Engelska ordspel för hela klassen: eleverna ansluter från mobilen med en kod på sex tecken, brädet visas på projektorn och du sätter Stöd, Bas eller Utmaning per elev. Sex språk, inga elevkonton.",
+  "keywords": "esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles, juegos de vocabulario en ingles, juego de vocabulario en ingles, vocabulario en ingles juegos, juegos para aprender vocabulario en ingles",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/sv/education/esl-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "es": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/esl-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/esl-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/esl-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/esl-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/esl-word-games"
+  },
+  "ogTitle": "Engelska ordspel för klassrummet",
+  "ogDescription": "Flerspelarordspel i realtid för elever. Gratis konton, 6 ordböcker, lärarpanel.",
+  "ogLocale": "sv_SE",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/sv/education/esl-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-sv.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Engelska ordspel för klassrummet"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Engelska ordspel för klassrummet",
+  "twDescription": "Gratis flerspelarengelskaspel för klassrummet.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-sv.webp"
+  ]
+}

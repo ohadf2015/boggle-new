@@ -1,0 +1,55 @@
+{
+  "title": "無料の教室向け語彙ゲーム — ライブマルチプレイヤー、6言語 | LexiClash",
+  "description": "無料で使える教室向けの語彙ゲーム。ライブマルチプレイヤー、1v1デュエル、自分の単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語、ロシア語の6言語に対応。どのブラウザでも動作。無料で始められます。",
+  "keywords": "vocabulary games for classroom, classroom vocabulary games, free vocabulary games, classroom word games, vocabulary games for students, vocabulary games online free, multiplayer vocabulary game, free vocabulary game for teachers, free word games for kids classroom",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "he": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+    "en": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "sv": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+    "ja": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+    "es": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "ru": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom",
+    "en-IL": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "he-IL": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+    "en-US": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-US": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-GB": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "en-SE": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "sv-SE": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+    "en-JP": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "ja-JP": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+    "en-ES": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-ES": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-MX": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-MX": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-AU": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-AR": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "es-CO": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "ru-RU": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom"
+  },
+  "ogTitle": "無料の教室向け語彙ゲーム",
+  "ogDescription": "先生向けのライブ語彙ゲーム。クラス全体チャレンジ、1v1デュエル、自分の単語リスト、6言語。学生アカウントはいつも無料。",
+  "ogLocale": "ja_JP",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-ja.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "無料の教室向け語彙ゲーム"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "無料の教室向け語彙ゲーム",
+  "twDescription": "先生が実際に使う教室向け語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、6言語 — 学生アカウントはいつも無料。",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-ja.webp"
+  ]
+}

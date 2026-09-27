@@ -1,0 +1,378 @@
+'use client';
+
+import { memo, useMemo, useState } from 'react';
+import { m, useReducedMotion } from 'framer-motion';
+import { ArrowLeft, BookOpen, Clock, GraduationCap, Grid3x3, Play, UserPlus, Zap } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { cn } from '@/lib/utils';
+import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
+import { boardSizeLabel, classroomModeLabelKey } from '@/components/education/classroomModeLabels';
+import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import ProjectorJoinPanel from './ProjectorJoinPanel';
+import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
+import { canStartProjectorRound } from './projectorLobbyModel';
+import { LobbyModeSwitcher } from '@/components/education/lobby/LobbyModeSwitcher';
+import { getSharedSocketIfExists } from '@/utils/SocketContext';
+
+interface ProjectorLobbyProps {
+  gameCode: string;
+  language: string;
+  baseUrl?: string;
+  /** Host already stripped upstream — the projector shows the class, not the teacher. */
+  students: ProjectorStudent[];
+  readyUsernames?: string[];
+  t: (path: string, params?: Record<string, string | number>) => string;
+  onStartGame: () => void;
+  /** Leave the room. The projector covers the page header, so it owns the way out. */
+  onExitRoom?: () => void;
+  /** `hostView.startQuiz` / `hostView.startClassGame` — the teacher's own register. */
+  startLabelKey: string;
+  starting?: boolean;
+  lessonName?: string;
+  wordCount?: number;
+  classroomGameMode?: ClassroomGameMode;
+  /**
+   * The teacher's OWN copy of the settings, straight from `lessonGameData` in
+   * sessionStorage. It exists the instant the lobby mounts; the server record
+   * 404s until Redis has the room. Same precedence the banner used: local
+   * first, server as the fallback — never a default dressed up as an answer.
+   */
+  templateSettings?: {
+    timerSeconds: number;
+    difficulty: string;
+    minWordLength: number;
+    allowLateJoin: boolean;
+  } | null;
+  autoStartSecondsLeft?: number | null;
+  onCancelAutoStart?: () => void;
+  onStartPracticeRound?: () => void;
+  practiceRoundPending?: boolean;
+  practiceRoundFailed?: boolean;
+}
+
+/**
+ * ProjectorLobby — the single classroom lobby surface.
+ *
+ * WHAT THIS REPLACES: a classroom host used to get two join surfaces stacked on
+ * one screen — `ClassroomModeBanner`'s expanded panel (code + QR + copy) and
+ * `TvJoinBar` inside `TvLobbyView` (code + QR + address), each with its own
+ * size, colour and wording. The banner now stands down for a host in the lobby
+ * (see ClassroomModeBanner) and everything it carried — class name, lesson,
+ * word count, mode, timer, board size, late join — is printed here instead, so
+ * the collapse loses nothing.
+ *
+ * Dark-only by construction: `bg-neo-navy` is hardcoded, never the
+ * `bg-neo-cream dark:bg-neo-navy` pair, which flashes cream on a lazy mount
+ * (recurring pitfall class 5) — a cream strobe across a classroom wall.
+ *
+ * The same component is the teacher's phone/laptop view, because the projector
+ * usually IS the teacher's mirrored screen: every size is `vw`-based with a
+ * mobile step, and the layout stacks under `md`.
+ */
+export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby({
+  gameCode,
+  language,
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live',
+  students,
+  readyUsernames = [],
+  t,
+  onStartGame,
+  onExitRoom,
+  startLabelKey,
+  starting = false,
+  lessonName,
+  wordCount = 0,
+  classroomGameMode,
+  templateSettings = null,
+  autoStartSecondsLeft = null,
+  onCancelAutoStart,
+  onStartPracticeRound,
+  practiceRoundPending = false,
+  practiceRoundFailed = false,
+}) {
+  // The server's own record of the room. The teacher's sessionStorage knows the
+  // lesson; only this knows the CLASS's name. One fetch per code, and a failure
+  // costs a label, never the lobby.
+  const liveGame = useLiveClassroomGameInfo(gameCode, true);
+
+  const canStart = canStartProjectorRound(students.length);
+  const reduceMotion = useReducedMotion();
+  const startReady = canStart && !starting;
+  /**
+   * A mode the teacher switched to from THIS surface outranks both sources
+   * below. `classroomGameMode` is derived from `lessonGameData`, which the
+   * multiplayer shell reads into React state once at mount — so after an
+   * in-place switch it still described the old game, and the chips said
+   * "10 · Questions" beside a BLAST room (measured live 2026-09-11).
+   */
+  const [switchedMode, setSwitchedMode] = useState<ClassroomGameMode | null>(null);
+  const mode: ClassroomGameMode = switchedMode ?? classroomGameMode ?? liveGame?.gameMode ?? 'classic';
+  const isQuiz = mode === VOCAB_QUIZ_MODE;
+  const settings = liveGame?.settings ?? null;
+
+  const sessionName = liveGame?.classroomName || t('education.classroomGame.classroomSession');
+  const resolvedLessonName = lessonName || (liveGame?.lessonNames ?? []).join(' · ');
+
+  const timerMinutes = templateSettings
+    ? Math.round(templateSettings.timerSeconds / 60)
+    : settings?.timerMinutes ?? null;
+  const boardSize = templateSettings?.difficulty ?? settings?.boardSize ?? undefined;
+  const allowLateJoin = templateSettings?.allowLateJoin ?? settings?.allowLateJoin ?? true;
+
+  const facts = useMemo(() => {
+    const rows: { key: string; icon: React.ReactNode; text: string }[] = [
+      {
+        key: 'mode',
+        icon: <Zap className="h-[1em] w-[1em]" aria-hidden="true" />,
+        text: t(classroomModeLabelKey(mode)),
+      },
+    ];
+    // A quiz has no grid and no round clock — printing a board size and
+    // "3 minutes" beside it describes a game nobody in the room is playing.
+    if (isQuiz) {
+      if (settings?.vocabQuizQuestionCount != null) {
+        rows.push({
+          key: 'questions',
+          icon: <Grid3x3 className="h-[1em] w-[1em]" aria-hidden="true" />,
+          text: `${settings.vocabQuizQuestionCount} · ${t('education.classroomGame.questions')}`,
+        });
+      }
+      if (settings?.vocabQuizSeconds != null) {
+        rows.push({
+          key: 'seconds',
+          icon: <Clock className="h-[1em] w-[1em]" aria-hidden="true" />,
+          text: t('vocabQuiz.setup.seconds', { seconds: settings.vocabQuizSeconds }),
+        });
+      }
+    } else {
+      if (timerMinutes != null) {
+        rows.push({
+          key: 'timer',
+          icon: <Clock className="h-[1em] w-[1em]" aria-hidden="true" />,
+          text: `${timerMinutes} ${t('common.minutes')}`,
+        });
+      }
+      rows.push({
+        key: 'board',
+        icon: <Grid3x3 className="h-[1em] w-[1em]" aria-hidden="true" />,
+        text: boardSizeLabel(boardSize),
+      });
+    }
+    rows.push({
+      key: 'late',
+      icon: <UserPlus className="h-[1em] w-[1em]" aria-hidden="true" />,
+      text: allowLateJoin
+        ? t('education.projectorLobby.lateJoinOn')
+        : t('education.projectorLobby.lateJoinOff'),
+    });
+    return rows;
+  }, [allowLateJoin, boardSize, isQuiz, mode, settings, t, timerMinutes]);
+
+  return (
+    <div
+      data-testid="projector-lobby"
+      className={cn(
+        // Full-screen by construction: the lobby OWNS the viewport rather than
+        // sitting under the page header with its Start button below the fold —
+        // a teacher must never scroll a projector to find the way to begin.
+        // z-[65] clears EducationHeader's z-[60]; toasts sit far above both.
+        'fixed inset-0 z-[65] flex flex-col gap-[1vw] overflow-hidden',
+        'bg-neo-navy px-[2.5vw] py-[1.2vw]'
+      )}
+    >
+      {/* The arena. Painted from the first frame (eager, no fade — a
+          fullscreen opacity tween is the Class-5 flash), decorative, and
+          under a navy scrim so every line of copy keeps its contrast. Every
+          content row below is `relative`, so it paints above these two. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative art / avatar data URLs: next/image adds nothing */}
+      <img
+        data-testid="projector-arena-art"
+        src="/images/education/arena-lobby-bg.webp"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        decoding="async"
+        className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover"
+      />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-neo-navy/45" />
+
+      {/* Who this room belongs to. Replaces the banner strip for the host. */}
+      <header
+        data-testid="projector-session"
+        className="relative flex shrink-0 flex-wrap items-center gap-x-[1.2vw] gap-y-2 font-neo-body"
+      >
+        {onExitRoom && (
+          <button
+            type="button"
+            data-testid="projector-exit"
+            onClick={onExitRoom}
+            aria-label={t('common.back')}
+            className="shrink-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-2 text-neo-cream shadow-hard-sm transition-colors hover:bg-neo-navy"
+          >
+            <DirectionalIcon icon={ArrowLeft} className="h-5 w-5" />
+          </button>
+        )}
+        <span className="inline-flex items-center gap-2 rounded-full border-3 border-neo-black bg-neo-cyan px-[1.2vw] shadow-hard-sm text-neo-black py-[0.4vw] text-[3vw] font-black uppercase tracking-wider md:text-[1.15vw]">
+          <GraduationCap className="h-[1em] w-[1em]" aria-hidden="true" />
+          {sessionName}
+        </span>
+        {resolvedLessonName && (
+          <span className="inline-flex min-w-0 items-center gap-2 rounded-full border-3 border-neo-cream bg-neo-navy/90 px-[1vw] py-[0.3vw] text-[3vw] font-bold text-neo-cream shadow-hard-sm md:text-[1.15vw]">
+            <BookOpen className="h-[1em] w-[1em] shrink-0" aria-hidden="true" />
+            <span className="truncate">{resolvedLessonName}</span>
+          </span>
+        )}
+        {wordCount > 0 && (
+          <span className="rounded-full bg-neo-navy/80 px-[0.8vw] py-[0.2vw] text-[2.6vw] font-bold text-neo-cream md:text-[1vw]">
+            {t('education.classroomGame.words', { count: wordCount })}
+          </span>
+        )}
+      </header>
+
+      <div className="relative shrink-0">
+        <ProjectorJoinPanel gameCode={gameCode} language={language} baseUrl={baseUrl} t={t} />
+      </div>
+
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <ProjectorRoster students={students} readyUsernames={readyUsernames} t={t} />
+      </div>
+
+      {autoStartSecondsLeft !== null && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="relative flex shrink-0 items-center justify-between gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-3 shadow-hard"
+        >
+          <span className="font-neo-display text-[3vw] font-bold text-neo-black md:text-[1.2vw]">
+            {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
+          </span>
+          {onCancelAutoStart && (
+            <button
+              type="button"
+              onClick={onCancelAutoStart}
+              className="shrink-0 rounded-lg border-2 border-neo-black bg-neo-cream px-4 py-1.5 font-bold uppercase text-neo-black transition-colors hover:bg-neo-white"
+            >
+              {t('common.cancel')}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Settings ticker + the one Start control. Stacks on a phone — the
+          teacher's own screen is often the projector, mirrored. */}
+      <footer className="relative flex shrink-0 flex-col gap-[1.5vw] rounded-neo-lg border-4 border-neo-cream bg-neo-navy/90 p-[2vw] shadow-hard-lg md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-[1vw] md:px-[0.8vw] md:py-[0.5vw]">
+        <ul className="flex flex-wrap items-center gap-[0.8vw] font-neo-body">
+          {facts.map((fact) =>
+            // The chip that NAMES the game is the control that changes it.
+            // Round 1 shipped a picker that only existed before the room, so a
+            // teacher who wanted a different game had to exit — ending the room
+            // for every student in it — and come back with a new code. This
+            // surface is `fixed inset-0 z-[65]`, i.e. it IS the teacher's
+            // screen in the lobby, so the control has to be on it; everything
+            // behind it is unreachable. Same room, same code, no rejoining.
+            fact.key === 'mode' ? (
+              <li key={fact.key} className="inline-flex">
+                <LobbyModeSwitcher
+                  gameCode={gameCode}
+                  currentMode={mode}
+                  socket={getSharedSocketIfExists()}
+                  t={t}
+                  onModeApplied={setSwitchedMode}
+                />
+              </li>
+            ) : (
+              <li
+                key={fact.key}
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-[1vw] py-[0.4vw] text-[2.6vw] font-bold text-neo-cream/85 md:text-[1vw]"
+              >
+                {fact.icon}
+                {fact.text}
+              </li>
+            )
+          )}
+        </ul>
+
+        <div className="flex w-full min-w-0 flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
+          {/* The reason sits BESIDE the control it explains, not under it: a
+              disabled button with no stated cause is the silent no-op this
+              repo keeps shipping (recurring pitfall class 4). */}
+          {!canStart && (
+            <p
+              data-testid="projector-start-reason"
+              role="status"
+              className="rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-3 py-2 text-start font-neo-body text-[3.2vw] font-bold leading-tight text-neo-pink md:max-w-[34ch] md:px-[1vw] md:py-[0.5vw] md:text-[1vw]"
+            >
+              {t('education.projectorLobby.startBlocked')}
+            </p>
+          )}
+          {practiceRoundFailed && (
+            <p
+              data-testid="projector-practice-failed"
+              role="status"
+              className="max-w-[28ch] text-start font-neo-body text-[2.6vw] font-bold text-neo-pink md:text-[1vw]"
+            >
+              {t('tvLobby.practiceRoundFailed')}
+            </p>
+          )}
+          {onStartPracticeRound && !canStart && (
+            <button
+              type="button"
+              data-testid="projector-practice-round"
+              onClick={onStartPracticeRound}
+              disabled={practiceRoundPending}
+              className="w-full rounded-neo border-3 border-neo-lime bg-neo-lime/10 px-3 py-2 font-neo-display text-[3.4vw] font-black uppercase text-neo-lime shadow-hard-sm transition-all active:translate-y-0.5 active:shadow-none disabled:opacity-50 md:w-auto md:px-[1.4vw] md:py-[0.7vw] md:text-[1.05vw]"
+            >
+              {practiceRoundPending ? t('common.loading') : t('tvLobby.tryPracticeRound')}
+            </button>
+          )}
+          {/* Once someone is in, Start breathes — a transform-only scale loop,
+              still under reduced motion. It is the one thing the teacher has
+              to find from across the room. */}
+          <m.div
+            className="w-full md:w-auto"
+            animate={startReady && !reduceMotion ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+            transition={startReady && !reduceMotion ? { duration: 1.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
+          >
+          <button
+            type="button"
+            data-testid="projector-start"
+            data-ready={startReady ? 'true' : 'false'}
+            onClick={onStartGame}
+            disabled={!canStart || starting}
+            className={cn(
+              'flex w-full items-center justify-center gap-[0.6vw] rounded-neo border-4 md:w-auto',
+              'px-4 py-3 font-neo-display text-[5vw] font-black uppercase tracking-tight',
+              'md:px-[2.4vw] md:py-[0.7vw] md:text-[2vw]',
+              'transition-all active:translate-y-1 active:shadow-hard',
+              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              // Locked, not muddy: a 40%-opacity lime on navy reads as a dead
+              // olive slab, so "not yet" is said in the palette instead. And
+              // the locked state keeps a FULL cream edge with cream ink —
+              // measured 2026-09-11, the old `disabled:` pair rendered black
+              // ink on navy-light: text 1.32:1, edge 1.23:1, i.e. a Start
+              // button that did not read as a control at all.
+              //
+              // Branched in JS rather than through `disabled:` variants: the
+              // black base colours are what those variants have to beat, and
+              // stating one colour per state leaves nothing to beat.
+              !canStart || starting
+                ? 'cursor-not-allowed border-neo-cream bg-neo-navy-light text-neo-cream opacity-80 shadow-none'
+                : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl hover:-translate-y-0.5'
+            )}
+          >
+            <Play className="h-[0.8em] w-[0.8em] shrink-0" aria-hidden="true" />
+            {/* Recomputed from the LIVE mode, not the prop: the prop is
+                derived upstream from the same stale `lessonGameData`, so after
+                a switch to a board game it still read START QUIZ. */}
+            {starting
+              ? t('hostView.creatingTournament')
+              : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
+          </button>
+          </m.div>
+        </div>
+      </footer>
+    </div>
+  );
+});
+
+export default ProjectorLobby;

@@ -1,0 +1,279 @@
+'use client';
+
+import { useCallback, useState } from 'react';
+import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
+import type { RivalMarker } from '@/lib/wordTower/rivals';
+import { WordTowerSmashScene } from './WordTowerSmashScene';
+import { useAutoDismiss } from './useAutoDismiss';
+
+interface Props {
+  tokens: number;
+  rivals: RivalMarker[];
+  pickerOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onSend: (rivalId: string, rivalName: string, accuracy: number) => void;
+  /** Attacker's height (m) — feeds the shared damage formula in the smash scene. */
+  attackerHeightM: number;
+  /** The most recent hit — drives the wrecking-ball animation + toast. */
+  lastHit: { id: string; targetName: string; targetId: string } | null;
+  onDismissHit: () => void;
+  earnedToast: number | null;
+  onDismissEarned: () => void;
+  /** Reward-ad path: defined when a watch-ad CTA is available. */
+  onWatchAdForToken?: () => void;
+  adLoading?: boolean;
+  adEarnedToast?: boolean;
+  onDismissAdEarned?: () => void;
+  /** Render the chip/CTA/toasts in normal flow (inside the play screen's left
+   *  utility rail) instead of self-positioning absolutely. The picker + smash
+   *  overlays stay absolute either way. */
+  inline?: boolean;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  reducedMotion?: boolean;
+}
+
+/**
+ * WordTowerSabotageBay — the wrecking-ball UI.
+ *
+ * - HUD chip showing token count (click to open picker)
+ * - Full-screen rival picker overlay (cards with avatar/name/height)
+ * - Wrecking-ball animation (CSS keyframe) when a hit lands
+ * - Earn toast when a fresh token drops in
+ *
+ * Backend cross-player persistence is deferred — local hits only show on the
+ * sender's view today (see memory note for the API/table follow-up).
+ */
+export function WordTowerSabotageBay({
+  tokens,
+  rivals,
+  pickerOpen,
+  onOpen,
+  onClose,
+  onSend,
+  attackerHeightM,
+  lastHit,
+  onDismissHit,
+  earnedToast,
+  onDismissEarned,
+  onWatchAdForToken,
+  adLoading,
+  adEarnedToast,
+  onDismissAdEarned,
+  inline,
+  t,
+  reducedMotion,
+}: Props) {
+  const [smashTarget, setSmashTarget] = useState<RivalMarker | null>(null);
+
+  // Transition from picker → smash scene: pick a rival, close picker, open scene
+  const handlePickRival = useCallback((rival: RivalMarker) => {
+    setSmashTarget(rival);
+    onClose();
+  }, [onClose]);
+
+  // Smash scene done: commit the hit (with the player's strike accuracy) and
+  // clear the overlay. Accuracy (0..1) drives the authoritative damage.
+  const handleSmashDone = useCallback((accuracy: number) => {
+    if (smashTarget) {
+      onSend(smashTarget.id, smashTarget.name, accuracy);
+      setSmashTarget(null);
+    }
+  }, [smashTarget, onSend]);
+  // Auto-dismiss via the shared hook (rAF watchdog + visibilitychange recovery)
+  // — these toasts fire right as the Pixi smash scene is animating, exactly the
+  // busy-main-thread condition useAutoDismiss was hardened against, so a bare
+  // setTimeout here could strand the toast the same way the pre-fix ones did.
+  useAutoDismiss(earnedToast, onDismissEarned, 2600);
+  useAutoDismiss(lastHit?.id ?? null, onDismissHit, 2200);
+  useAutoDismiss(adEarnedToast || null, () => onDismissAdEarned?.(), 2600);
+
+  const hasTokens = tokens > 0;
+
+  return (
+    <>
+      {/* Floating token chip — sits in the TOP section on the start side, just
+          under the header (founder ask: "the wrecking ball should show on top and
+          not in the bottom section when it exists"). Tap to open the picker. ONLY
+          shown when tokens > 0 ("the wrecking ball should only show on the screen
+          when the player has it"). */}
+      {hasTokens && (
+        <button
+          type="button"
+          onClick={onOpen}
+          aria-label={t('wordTower.sabotage.chip')}
+          data-wreck-ready="true"
+          className={cn(
+            'pointer-events-auto relative flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform hover:scale-105 active:translate-y-px',
+            !inline && 'absolute start-3 top-16 z-40',
+            !reducedMotion && 'animate-neo-pop',
+          )}
+        >
+          {/* Ready pulse ring — stronger "you have a ball / targets vulnerable" signal. */}
+          {!reducedMotion && (
+            <span
+              className="pointer-events-none absolute -inset-1 rounded-neo border-2 border-neo-yellow/80 opacity-80"
+              style={{ animation: 'wt-wreck-ready-pulse 1.4s ease-out infinite' }}
+              aria-hidden
+            />
+          )}
+          <span
+            data-testid="wt-wreck-ball-icon"
+            className="relative flex h-6 w-6 items-center justify-center rounded-full border-neo border-black bg-neo-navy shadow-hard-sm"
+            aria-hidden
+          >
+            <span className="block h-3.5 w-3.5 rounded-full bg-neo-pink ring-2 ring-neo-yellow" />
+            <span className="absolute -top-0.5 h-2 w-0.5 bg-neo-yellow" />
+          </span>
+          {/* Inline (left-rail) mode keeps the chip icon-first so centred notice
+              banners never collide with a wide label on narrow phones. */}
+          <span className={cn(inline && 'hidden sm:inline')}>{t('wordTower.sabotage.chip')}</span>
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-black bg-neo-yellow px-1 font-neo-display text-[11px] font-black text-black">
+            {tokens}
+          </span>
+          <style>{`
+            @keyframes wt-wreck-ready-pulse {
+              0% { transform: scale(1); opacity: 0.9; }
+              70% { transform: scale(1.12); opacity: 0; }
+              100% { transform: scale(1.12); opacity: 0; }
+            }
+          `}</style>
+        </button>
+      )}
+
+      {/* Watch-Ad CTA — cyan secondary action, only when ad is available and
+          tokens are below cap. Positioned below the spend chip when it exists,
+          or at the chip position if the chip is hidden (tokens === 0). */}
+      {onWatchAdForToken && (
+        <button
+          type="button"
+          onClick={adLoading ? undefined : onWatchAdForToken}
+          disabled={adLoading}
+          aria-label={t('wordTower.sabotage.watchAd')}
+          className={cn(
+            'pointer-events-auto flex items-center gap-1 rounded-neo border-neo border-black px-2 py-1 font-neo-display text-xs font-bold uppercase shadow-hard transition-transform',
+            !inline && 'absolute start-3 z-40',
+            !inline && (hasTokens ? 'top-28' : 'top-16'),
+            adLoading
+              ? 'bg-neo-navy/60 text-neo-white/40'
+              : 'bg-neo-cyan text-black hover:scale-105 active:translate-y-px',
+            !adLoading && !reducedMotion && 'animate-neo-pop',
+          )}
+        >
+          <span aria-hidden>{adLoading ? '⏳' : '📺'}</span>
+          <span>{t('wordTower.sabotage.watchAd')}</span>
+        </button>
+      )}
+
+      {/* AD-EARN toast — token just granted via reward ad. (Inline mode: the
+          play screen renders this beat in its notice column instead; the
+          auto-dismiss timers above still run either way.) */}
+      {adEarnedToast && !inline && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={cn(
+            'pointer-events-none rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1.5 text-start shadow-hard',
+            !inline && 'absolute start-3 top-40 z-40',
+            !reducedMotion && 'animate-neo-pop',
+          )}
+        >
+          <div className="font-neo-display text-sm font-black text-black">
+            {t('wordTower.sabotage.adEarned')}
+          </div>
+        </div>
+      )}
+
+      {/* EARN toast — a token just dropped in. (Inline mode: shown in the play
+          screen's notice column instead.) */}
+      {earnedToast != null && !inline && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={cn(
+            'pointer-events-none rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-1.5 text-start shadow-hard',
+            !inline && 'absolute start-3 top-40 z-40',
+            !reducedMotion && 'animate-neo-pop',
+          )}
+        >
+          <div className="font-neo-display text-sm font-black text-black">
+            {t('wordTower.sabotage.earned')}
+          </div>
+          <div className="font-neo-body text-[10px] font-bold text-black/70">
+            {t('wordTower.sabotage.earnedHint', { n: earnedToast })}
+          </div>
+        </div>
+      )}
+
+      {/* Picker overlay — full-screen so the choice feels weighty (and so the
+          user can clearly see who they're targeting in context). */}
+      {pickerOpen && (
+        <div
+          className="pointer-events-auto fixed inset-0 z-50 flex flex-col items-center justify-end bg-black/55 backdrop-blur-sm p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('wordTower.sabotage.pickTarget')}
+        >
+          <div className={cn('w-full max-w-md rounded-neo border-neo-thick border-black bg-neo-navy p-4 shadow-hard', !reducedMotion && 'animate-neo-pop')}>
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="font-neo-display text-base font-black uppercase text-neo-white">
+                {t('wordTower.sabotage.pickTarget')}
+              </h3>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label={t('wordTower.sabotage.cancel')}
+                className="rounded-neo border-neo border-black bg-neo-navy-light px-2 py-1 font-neo-body text-xs font-bold text-neo-white shadow-hard"
+              >
+                <span aria-hidden>✕</span>
+              </button>
+            </div>
+            {rivals.length === 0 ? (
+              <p className="rounded-neo border-neo border-dashed border-neo-white/30 px-3 py-6 text-center font-neo-body text-sm text-neo-white/70">
+                {t('wordTower.sabotage.noTargets')}
+              </p>
+            ) : (
+              <ul className="grid max-h-[55dvh] gap-2 overflow-y-auto pr-1">
+                {rivals.map((r) => (
+                  <li key={r.id}>
+                    <button
+                      type="button"
+                      onClick={() => handlePickRival(r)}
+                      className="flex w-full items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-2.5 text-start font-neo-display text-base font-black uppercase text-neo-white shadow-hard transition-transform active:translate-y-px"
+                    >
+                      {/* Real custom/seeded Avatar only — never emoji-face placeholders. */}
+                      <Avatar
+                        customAvatar={r.customAvatar ?? undefined}
+                        userId={r.playerId ?? r.id}
+                        pixelSize={28}
+                        disableEffects
+                        className="shrink-0 rounded-full border border-black"
+                      />
+                      <span className="flex-1 truncate">{r.name}</span>
+                      <span className="font-neo-body text-xs font-bold text-neo-white/80">
+                        {Math.round(r.heightM)}m
+                      </span>
+                      <span aria-hidden>💥</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Smash scene overlay — mounts when a rival is picked from the picker. */}
+      {smashTarget && (
+        <WordTowerSmashScene
+          target={smashTarget}
+          attackerHeightM={attackerHeightM}
+          onDone={handleSmashDone}
+          t={t}
+          reducedMotion={reducedMotion}
+        />
+      )}
+    </>
+  );
+}

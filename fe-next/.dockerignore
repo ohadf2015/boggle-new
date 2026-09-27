@@ -1,0 +1,47 @@
+# Dependencies (installed in build)
+node_modules
+.next
+
+# Dev/test files
+coverage
+e2e
+__tests__
+**/*.test.ts
+**/*.test.tsx
+**/__tests__
+
+# Git
+.git
+.gitignore
+
+# IDE / OS
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# Docs / configs not needed at runtime
+docs
+*.md
+!README.md
+.superdesign
+.planning
+.claude
+
+# Python envs (rembg etc.)
+.venv
+.venv-rembg
+
+# Capacitor mobile
+android
+ios
+
+# Build artifacts (rebuilt in Docker)
+dist
+backend/dist
+*.tsbuildinfo
+
+# Debug / dev
+debug-screenshot.png
+commit-push.zip
+fix-error-logging.py

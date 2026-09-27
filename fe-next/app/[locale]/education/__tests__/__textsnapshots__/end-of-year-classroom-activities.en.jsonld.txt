@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities#page",
+  "name": "End of Year Classroom Activities — Word Games",
+  "description": "Keep students engaged in the final week of term with LexiClash word games. No marking required. Free to start.",
+  "url": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+  "inLanguage": "en",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/en/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.lexiclash.live/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Education",
+      "item": "https://www.lexiclash.live/en/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "End of Year Activities",
+      "item": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities#resource",
+  "name": "End of Year Classroom Activities — Word Games",
+  "description": "Use LexiClash word games—no prep, no grading. Create a classroom, give students a join code, and run your choice of live Boggle, Word Wheel, Connections puzzles, or 1v1 vocabulary duels. Grades are done; students play together while you watch their progress. Free to start.",
+  "url": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+  "inLanguage": "en",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "vocabulary, spelling, word patterns, categorization, collaborative play",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT30M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/en/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/en/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities#faq",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the best game for the last week of school?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Boggle-style word hunts and Connections puzzles work best: fast-paced, no winners or losers (just \"did you find the words?\"), and every student plays at once. Word Wheel is great for speed and light competition."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can my students play from home?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. If students have devices, they can join any game you host by entering the join code. They do not need an email or account—they just type their name."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many students can play at once?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The whole class. Any number of students can join a game and play live together."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if a student finishes early?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In LexiClash, all students play the same game at the same time, so there is no \"finishing early.\" Everyone sees the same board and plays until time runs out."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I track which students played?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Your classroom dashboard shows participation: who played, how many games, which words they found, and class-wide word patterns."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do the games teach reading or vocabulary?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Word hunts build pattern recognition and spelling. Connections teach categorization and relationships. Both reinforce active word knowledge without worksheets."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if my students have different reading levels?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Custom word lists solve this. Use easier words (three to five letters) for younger students or lower readers; use harder words for advanced students. All students play the same game, but with words matched to their level."
+      }
+    }
+  ]
+}

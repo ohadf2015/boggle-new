@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/brain-breaks-word-games#page",
+  "name": "Физминутки словесные игры | Бесплатный класс LexiClash",
+  "description": "Быстрые словесные игры для восстановления внимания за 1–5 минут. Без подготовки, на любом устройстве, весь класс одновременно.",
+  "url": "https://www.lexiclash.live/ru/education/brain-breaks-word-games",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/brain-breaks-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Образование",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Физминутки",
+      "item": "https://www.lexiclash.live/ru/education/brain-breaks-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/brain-breaks-word-games#resource",
+  "name": "Физминутки словесные игры | Бесплатный класс LexiClash",
+  "description": "Физминутка — это 1–5 минутная активность, восстанавливающая внимание. LexiClash запускает прямые игры поиска слов на любом проекторе или общем экране—все ученики играют одновременно на своих телефонах. Без подготовки, без материалов. Это работает, потому что требует достаточного внимания, чтобы прервать беспокойство, не теряя контроля класса.",
+  "url": "https://www.lexiclash.live/ru/education/brain-breaks-word-games",
+  "inLanguage": "ru",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "6-14",
+  "teaches": "vocabulary, word recognition, attention reset",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT3M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/brain-breaks-word-games#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Как дать ученикам код класса?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Когда вы начинаете игру класса, код появляется на вашем экране. Скажите его вслух или покажите на доске. Ученики вводят или сканируют его. Присоединяются за 10 секунд. Без входа."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Что если у некоторых учеников нет телефона?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Они могут играть в паре с соседом или как команда. Или сохраняйте одиночные игры на время, когда все присутствуют. Физминутки гибкие."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Нужно ли учить их играть?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Нет. Правила на экране. В первом раунде пройдите через быстрый пример. Большинство понимает за 30 секунд."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я использовать это, если преподаю на другом языке?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash поддерживает шесть языков: английский, иврит, испанский, шведский, японский, русский. Установите язык класса, и игры используют слова на этом языке. Вы можете загружать пользовательские словари."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Сколько должна длиться физминутка?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1–5 минут. Короче часто лучше. 2-минутная игра между активностями. Дольше (3–5), если класс очень возбужден."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Это отвлечет учеников от урока?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Только если не установить четкий предел. С начала скажите: \"Играем 3 минуты, потом телефоны убираем.\" Зная границу, они быстрее вернутся."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я использовать одну игру дважды в неделю?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Повторение хорошо. Ученикам нравится играть снова, чтобы улучшить свой результат."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Какие игры лучше всего для физминуток?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Поиск слов (тихий поиск), словесное колесо (вращение), быстрые дуэли (1–2 мин). Избегайте длинных турниров. Выбирайте игры, в которые можно войти за 10 секунд."
+      }
+    }
+  ]
+}

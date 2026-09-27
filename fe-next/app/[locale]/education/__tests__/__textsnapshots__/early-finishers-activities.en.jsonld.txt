@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/en/education/early-finishers-activities#page",
+  "name": "Early Finishers Activities | LexiClash",
+  "description": "Self-directed word games to keep early finishers engaged without teacher supervision. Zero setup, runs itself all term.",
+  "url": "https://www.lexiclash.live/en/education/early-finishers-activities",
+  "inLanguage": "en",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/en/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/en/education/early-finishers-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.lexiclash.live/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Teaching guides",
+      "item": "https://www.lexiclash.live/en/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Early finishers activities",
+      "item": "https://www.lexiclash.live/en/education/early-finishers-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/en/education/early-finishers-activities#resource",
+  "name": "Early Finishers Activities | LexiClash",
+  "description": "Self-directed word games like LexiClash let early finishers play independently while other students finish. No teacher interruptions, no extra marking, and they reinforce vocabulary from the lesson. Set it up once, use it all term.",
+  "url": "https://www.lexiclash.live/en/education/early-finishers-activities",
+  "inLanguage": "en",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "Vocabulary retention, word recognition, independent learning",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT10M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/en/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/en/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/en/education/early-finishers-activities#faq",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Will they rush through their main work just to get to the game?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Some will, at first. Set clear rules: \"You must finish the work properly before you play.\" Use a checklist so they know what \"finished\" means. After a week, it becomes normal. Most teachers say the game actually motivates slower workers because they see peers playing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it safe? Any chat or outside links?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No chat, no DMs, no external links. It's a word game only. Students see other players' names and scores on the leaderboard, but that's all. No personal information is shared."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What about screen time?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each round is 2–4 minutes. If a student finishes 10 minutes early, they play one round, not six. The game stops them when the timer ends. It's shorter than a recess video."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to teach them how to play?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Two-minute demo with the whole class. Show them the grid, point to a word, let them find one. That's enough. They learn by playing. No tutorial needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if I have no devices in the room?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You need at least one device (a phone or tablet) for early finishers to share. Many classrooms have a class set of Chromebooks or a shared iPad. LexiClash works on all of them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use the same code all term, or do I need a new one each week?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Same code all term. Students don't need to remember it—you write it on the board or a card once, and it stays there. They use it every time they finish early."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will I see what they played?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Your teacher dashboard shows scores, which words they found, and which they missed. Use that to pick vocabulary for next week's lesson."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if early finishers are just a distraction, not a learning gap?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Give them harder words or set a higher score goal. LexiClash adapts to different levels. Or rotate them: some play the word game, others read, others do maths. The game is one station in your system."
+      }
+    }
+  ]
+}

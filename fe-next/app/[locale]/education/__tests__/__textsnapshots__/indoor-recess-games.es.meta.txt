@@ -1,0 +1,64 @@
+{
+  "title": "Juegos para recreo en días lluviosos | LexiClash",
+  "description": "Plan estructurado de 20 minutos para juegos en clase cuando llueve. Juegos de palabras gratuitos, actividades silenciosas y horarios para cualquier tamaño de grupo.",
+  "keywords": [
+    "juegos para recreo en la lluvia",
+    "actividades en días nublados para aula",
+    "ideas para recreo en casa",
+    "juegos silenciosos para clase",
+    "juegos para toda la clase",
+    "actividades cuando llueve",
+    "juegos educativos gratuitos",
+    "pausas activas para niños"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/es/education/indoor-recess-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "ja": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "es": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru": "https://www.lexiclash.live/ru/education/indoor-recess-games",
+    "en-IL": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he-IL": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en-US": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-US": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-GB": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "en-SE": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "en-JP": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "en-ES": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-ES": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-MX": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-MX": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-AU": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-AR": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "es-CO": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/indoor-recess-games"
+  },
+  "ogTitle": "Juegos para recreo en días lluviosos | LexiClash",
+  "ogDescription": "Plan estructurado de 20 minutos para juegos en clase cuando llueve. Juegos de palabras gratuitos, actividades silenciosas y horarios para cualquier tamaño de grupo.",
+  "ogLocale": "es_ES",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/es/education/indoor-recess-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-es.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Juegos para recreo en días lluviosos | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Juegos para recreo en días lluviosos | LexiClash",
+  "twDescription": "Plan estructurado de 20 minutos para juegos en clase cuando llueve. Juegos de palabras gratuitos, actividades silenciosas y horarios para cualquier tamaño de grupo.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-es.webp"
+  ]
+}

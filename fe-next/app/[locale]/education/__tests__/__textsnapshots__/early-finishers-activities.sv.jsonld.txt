@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/early-finishers-activities#page",
+  "name": "Aktiviteter för elever som är klara först | LexiClash",
+  "description": "Självstyrda ordspel för elever som arbetar snabbt. Ingen övervakning varje dag, eleverna spelar och lär samtidigt.",
+  "url": "https://www.lexiclash.live/sv/education/early-finishers-activities",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/early-finishers-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Undervisningsresurser",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Aktiviteter för elever som är klara först",
+      "item": "https://www.lexiclash.live/sv/education/early-finishers-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/early-finishers-activities#resource",
+  "name": "Aktiviteter för elever som är klara först | LexiClash",
+  "description": "Självstyrda ordspel låter snabba elever fortsätta på egen hand medan resten av klassen arbetar klart. De öppnar LexiClash, spelar en runda på ordlistan du redan använt, och behöver inte fråga dig om något. Ingen störning i lektionen, inget extra att rätta, och orden kommer från dagens genomgång.",
+  "url": "https://www.lexiclash.live/sv/education/early-finishers-activities",
+  "inLanguage": "sv",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "Ordförrådsminne, ordkännedom, oberoende lärande",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT10M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/early-finishers-activities#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Skyndar de sig genom huvudarbetet bara för att få spela?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Vissa gör det, till en början. Sätt tydliga regler: \"Du måste göra arbetet ordentligt innan du spelar.\" Använd en checklista så de vet vad \"klar\" betyder. Efter en vecka blir det normalt. De flesta lärare säger att spelet faktiskt motiverar elever som arbetar långsammare eftersom de ser kamrater spela."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Är det säkert? Finns det chatt eller externa länkar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ingen chatt, inga direktmeddelanden, inga externa länkar. Det är bara ett ordspel. Elever ser namn och poäng från andra spelare i poänglistan, men det är allt. Ingen personlig information delas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vad sägs om skärmtid?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Varje omgång är 2–4 minuter. Om en elev blir klar 10 minuter tidigare spelar de en omgång, inte sex. Spelet stoppar dem när tiden är ute. Det är kortare än en rastvideo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Behöver jag lära dem hur man spelar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "2-minuters demo med hela klassen. Visa dem nätet, peka på ett ord, låt dem hitta ett. Det räcker. De lär sig genom att spela. Ingen handledning behövs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vad händer om jag inte har enheter i klassrummet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Du behöver minst en enhet (en telefon eller surfplatta) för elever som är klara att dela. Många klassrum har en uppsättning Chromebooks eller en delad iPad. LexiClash fungerar på alla."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag använda samma kod hela året?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja, samma kod hela året. Elever behöver inte memorera det—du skriver det på tavlan en gång och det stannar där. De använder det varje gång de är klara först."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Ser jag vad de spelade?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Din lärarpanel visar poäng, vilka ord de hittade och vilka de missade. Använd det för att välja vokabulär för nästa veckas lektion."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vad om elever som är klara först bara är en störning, inte en kunskapslucka?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ge dem svårare ord eller sätt ett högre poängmål. LexiClash anpassas till olika nivåer. Eller rotera: några spelar ordspelet, andra läser, andra gör matte. Spelet är en station i ditt system."
+      }
+    }
+  ]
+}

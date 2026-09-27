@@ -1,0 +1,534 @@
+import { vi, type Mock, } from 'vitest';
+/**
+ * Practice API Route Tests
+ * Tests for PATCH handler XP wiring and idempotency
+ */
+
+// Mock next/server BEFORE any imports
+vi.mock('next/server', () => {
+  class MockNextRequest {
+    private _body: any;
+    url: string;
+    method: string;
+
+    constructor(url: string, init?: { method?: string; body?: string }) {
+      this.url = url;
+      this.method = init?.method || 'GET';
+      this._body = init?.body ? JSON.parse(init.body) : null;
+    }
+
+    async json() {
+      return this._body;
+    }
+  }
+
+  return {
+    NextRequest: MockNextRequest,
+    NextResponse: {
+      json: vi.fn((data: any, init?: { status?: number }) => ({
+        json: async () => data,
+        status: init?.status || 200,
+      })),
+    },
+  };
+});
+
+vi.mock('@/utils/supabase/server');
+vi.mock('@/utils/logger', () => ({
+  __esModule: true,
+  default: {
+    log: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    time: vi.fn(),
+    timeEnd: vi.fn(),
+  },
+}));
+vi.mock('@/backend/modules/educationXpManager', () => ({
+  calculatePracticeXp: vi.fn(() => ({ totalXp: 120, breakdown: { dailyPractice: 20, flashcardCorrect: 100 }, masteryMessage: 'Great!' })),
+}));
+
+// E3 audit fix: practice route must enforce a per-user rate limit so a
+// hostile client can't spam session writes (DB bloat + XP grind risk).
+const mockCheckApiRateLimit = vi.fn().mockReturnValue({ success: true });
+vi.mock('@/lib/apiRateLimit', () => ({
+  checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
+}));
+
+// Lesson access (classroom membership, not lesson_assignments) is read with
+// the service-role client — RLS hides a classroom lesson from the student's
+// own session. See app/api/education/practice/lessons/route.ts.
+const mockAdmin = vi.fn();
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => mockAdmin(),
+}));
+
+import { NextRequest } from 'next/server';
+import { PATCH, POST } from '../route';
+import { createClient } from '@/utils/supabase/server';
+import * as logger from '@/utils/logger';
+
+/**
+ * Minimal PostgREST double for the admin client, mirroring
+ * app/api/education/practice/lessons/__tests__/route.test.ts. Each table
+ * answers the one query shape the access check builds; an unexpected table
+ * throws rather than silently returning an empty list.
+ */
+function adminDouble(rows: Record<string, unknown[]>) {
+  return {
+    from(table: string) {
+      if (!(table in rows)) throw new Error(`unexpected table ${table}`);
+      const data = rows[table];
+      const builder: Record<string, unknown> = {};
+      for (const method of ['select', 'eq', 'in', 'limit']) {
+        builder[method] = () => builder;
+      }
+      builder.single = async () => ({
+        data: (data as unknown[])[0] ?? null,
+        error: (data as unknown[])[0] ? null : { code: 'PGRST116' },
+      });
+      builder.then = (resolve: (v: unknown) => unknown) =>
+        Promise.resolve({ data, error: null }).then(resolve);
+      return builder;
+    },
+  };
+}
+
+describe('PATCH /api/education/practice', () => {
+  let mockSupabase: any;
+  let mockAuth: any;
+  let mockFrom: any;
+  let mockRpc: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    // Setup mock RPC function
+    mockRpc = vi.fn().mockResolvedValue({ data: null, error: null });
+
+    // Setup mock from() builder
+    mockFrom = vi.fn(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      single: vi.fn(),
+    }));
+
+    // Setup mock auth
+    mockAuth = {
+      getUser: vi.fn().mockResolvedValue({
+        data: { user: { id: '550e8400-e29b-41d4-a716-446655440002' } },
+        error: null,
+      }),
+    };
+
+    // Setup mock Supabase client
+    mockSupabase = {
+      auth: mockAuth,
+      from: mockFrom,
+      rpc: mockRpc,
+    };
+
+    // Mock createClient to return our mock
+
+    createClient.mockResolvedValue(mockSupabase);
+  });
+
+  describe('XP Award on Completion', () => {
+    it('should award XP via RPC when practice session is completed', async () => {
+      // GIVEN: Session exists and is not yet completed
+      // The ownership SELECT also carries the columns the XP calculation reads,
+      // so completion needs one write instead of two.
+      const ownershipCheckMock = vi.fn().mockResolvedValue({
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          practice_type: 'flashcard',
+          completed_at: null,
+        },
+        error: null,
+      });
+
+      const sessionUpdateMock = vi.fn().mockResolvedValue({
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          practice_type: 'flashcard',
+          cards_reviewed: 10,
+          cards_correct: 8,
+          xp_awarded: 0,
+          completed_at: '2026-02-14T12:00:00Z',
+        },
+        error: null,
+      });
+
+      // Additional from() call for XP update after server calculation
+      const xpUpdateMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      // Table-aware, not call-count-aware: the handler reads the session, reads
+      // the streak, then performs exactly ONE session write.
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_lesson_progress') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: { current_streak: 0 }, error: null }),
+          };
+        }
+        let isWrite = false;
+        const builder: Record<string, Mock> = {
+          select: vi.fn(() => builder),
+          eq: vi.fn(() => builder),
+          update: vi.fn(() => {
+            isWrite = true;
+            xpUpdateMock();
+            return builder;
+          }),
+          single: vi.fn(() => (isWrite ? sessionUpdateMock() : ownershipCheckMock())),
+        };
+        return builder;
+      });
+
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          sessionId: '550e8400-e29b-41d4-a716-446655440001',
+          cardsReviewed: 10,
+          cardsCorrect: 8,
+          completed: true,
+        }),
+      });
+
+      // WHEN: PATCH request is made
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      // THEN: Response is successful
+      expect(response.status).toBe(200);
+      expect(data.session).toBeDefined();
+
+      // THEN: RPC was called with SERVER-CALCULATED XP (not client-supplied)
+      expect(mockRpc).toHaveBeenCalledWith('award_education_xp', {
+        p_student_id: '550e8400-e29b-41d4-a716-446655440002',
+        p_xp_amount: 120, // From mocked calculatePracticeXp
+        p_lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+      });
+    });
+
+    it('should NOT award XP when session is not completed', async () => {
+      // GIVEN: Session update without completion
+      // The ownership SELECT also carries the columns the XP calculation reads,
+      // so completion needs one write instead of two.
+      const ownershipCheckMock = vi.fn().mockResolvedValue({
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          practice_type: 'flashcard',
+          completed_at: null,
+        },
+        error: null,
+      });
+
+      const sessionUpdateMock = vi.fn().mockResolvedValue({
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          xp_awarded: 0,
+          words_attempted: 5,
+          completed_at: null,
+        },
+        error: null,
+      });
+
+      mockFrom.mockImplementation(() => {
+        const callCount = mockFrom.mock.calls.length;
+        const builder = {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          update: vi.fn().mockReturnThis(),
+          single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
+        };
+        return builder;
+      });
+
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          sessionId: '550e8400-e29b-41d4-a716-446655440001',
+          wordsAttempted: 5,
+        }),
+      });
+
+      // WHEN: PATCH request is made without completion
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      // THEN: Response is successful
+      expect(response.status).toBe(200);
+      expect(data.session).toBeDefined();
+
+      // THEN: RPC was NOT called
+      expect(mockRpc).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Idempotency Guard', () => {
+    it('should return existing session when already completed (prevent double-awarding)', async () => {
+      // GIVEN: Session already completed
+      const ownershipCheckMock = vi.fn().mockResolvedValue({
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          student_id: '550e8400-e29b-41d4-a716-446655440002',
+          completed_at: '2026-02-14T10:00:00Z',
+        },
+        error: null,
+      });
+
+      mockFrom.mockImplementation(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: ownershipCheckMock,
+      }));
+
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          sessionId: '550e8400-e29b-41d4-a716-446655440001',
+          xpAwarded: 120,
+          completed: true,
+        }),
+      });
+
+      // WHEN: PATCH request is made on already-completed session
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      // THEN: Response returns existing session
+      expect(response.status).toBe(200);
+      expect(data.session.completed_at).toBe('2026-02-14T10:00:00Z');
+
+      // THEN: Session update was NOT called (only ownership check)
+      expect(mockFrom).toHaveBeenCalledTimes(1);
+
+      // THEN: RPC was NOT called (no double-awarding)
+      expect(mockRpc).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Graceful RPC Failure', () => {
+    it('should succeed even when RPC fails (graceful degradation)', async () => {
+      // GIVEN: RPC call will fail
+      mockRpc.mockResolvedValue({
+        data: null,
+        error: { message: 'RPC function not found' },
+      });
+
+      // The ownership SELECT also carries the columns the XP calculation reads,
+      // so completion needs one write instead of two.
+      const ownershipCheckMock = vi.fn().mockResolvedValue({
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          practice_type: 'flashcard',
+          completed_at: null,
+        },
+        error: null,
+      });
+
+      const sessionUpdateMock = vi.fn().mockResolvedValue({
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          practice_type: 'flashcard',
+          cards_reviewed: 10,
+          cards_correct: 8,
+          xp_awarded: 0,
+          completed_at: '2026-02-14T12:00:00Z',
+        },
+        error: null,
+      });
+
+      const xpUpdateMock = vi.fn().mockResolvedValue({ data: null, error: null });
+
+      // Table-aware, not call-count-aware: the handler reads the session, reads
+      // the streak, then performs exactly ONE session write.
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_lesson_progress') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: { current_streak: 0 }, error: null }),
+          };
+        }
+        let isWrite = false;
+        const builder: Record<string, Mock> = {
+          select: vi.fn(() => builder),
+          eq: vi.fn(() => builder),
+          update: vi.fn(() => {
+            isWrite = true;
+            xpUpdateMock();
+            return builder;
+          }),
+          single: vi.fn(() => (isWrite ? sessionUpdateMock() : ownershipCheckMock())),
+        };
+        return builder;
+      });
+
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          sessionId: '550e8400-e29b-41d4-a716-446655440001',
+          cardsReviewed: 10,
+          cardsCorrect: 8,
+          completed: true,
+        }),
+      });
+
+      // WHEN: PATCH request is made and RPC fails
+      const response = await PATCH(request);
+      const data = await response.json();
+
+      // THEN: Response is still successful (session saved despite XP failure)
+      expect(response.status).toBe(200);
+      expect(data.session).toBeDefined();
+
+      // THEN: RPC was called with server-calculated XP but failed
+      expect(mockRpc).toHaveBeenCalledWith('award_education_xp', {
+        p_student_id: '550e8400-e29b-41d4-a716-446655440002',
+        p_xp_amount: 120, // Server-calculated, not client-supplied
+        p_lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+      });
+
+      // THEN: Error was logged
+
+      expect(logger.default.error).toHaveBeenCalledWith(
+        'Failed to award education XP:',
+        expect.objectContaining({ message: 'RPC function not found' })
+      );
+    });
+  });
+
+  describe('rate limiting (E3)', () => {
+    beforeEach(() => {
+      mockCheckApiRateLimit.mockClear();
+      mockCheckApiRateLimit.mockReturnValue({ success: true });
+    });
+
+    it('PATCH consults checkApiRateLimit before doing work', async () => {
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          sessionId: '550e8400-e29b-41d4-a716-446655440099',
+          completed: true,
+        }),
+      });
+
+      await PATCH(request);
+
+      expect(mockCheckApiRateLimit).toHaveBeenCalled();
+      const [, bucket] = mockCheckApiRateLimit.mock.calls[0];
+      expect(bucket).toBe('education-practice');
+    });
+
+    it('PATCH returns 429 when limiter rejects', async () => {
+      mockCheckApiRateLimit.mockReturnValueOnce({ success: false, retryAfter: 30 });
+
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          sessionId: '550e8400-e29b-41d4-a716-446655440099',
+          completed: true,
+        }),
+      });
+
+      const response = await PATCH(request);
+      expect(response.status).toBe(429);
+    });
+
+    it('POST returns 429 when limiter rejects', async () => {
+      mockCheckApiRateLimit.mockReturnValueOnce({ success: false, retryAfter: 30 });
+
+      const request = new NextRequest('http://localhost/api/education/practice', {
+        method: 'POST',
+        body: JSON.stringify({
+          lessonId: '550e8400-e29b-41d4-a716-446655440003',
+          practiceType: 'flashcard',
+        }),
+      });
+
+      const response = await POST(request);
+      expect(response.status).toBe(429);
+    });
+  });
+});
+
+describe('POST /api/education/practice — lesson access (classroom membership, not lesson_assignments)', () => {
+  const USER = '550e8400-e29b-41d4-a716-446655440002';
+  const LESSON = '550e8400-e29b-41d4-a716-446655440003';
+  const CLASSROOM = '550e8400-e29b-41d4-a716-446655440010';
+
+  function requestFor(lessonId: string) {
+    return new NextRequest('http://localhost/api/education/practice', {
+      method: 'POST',
+      body: JSON.stringify({ lessonId, practiceType: 'flashcard' }),
+    });
+  }
+
+  function mockServerClient() {
+    const insertMock = vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data: { id: 'session-1', practice_type: 'flashcard' }, error: null }),
+      }),
+    });
+    (createClient as any).mockResolvedValue({
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER } }, error: null }) },
+      from: vi.fn((table: string) => {
+        if (table === 'practice_sessions') return { insert: insertMock };
+        throw new Error(`server client should not read ${table} for the access check`);
+      }),
+    });
+    return insertMock;
+  }
+
+  beforeEach(() => {
+    mockCheckApiRateLimit.mockReturnValue({ success: true });
+  });
+
+  it('starts a session for a classroom member with NO lesson_assignments row', async () => {
+    mockServerClient();
+    mockAdmin.mockReturnValue(
+      adminDouble({
+        vocabulary_lessons: [{ teacher_id: 'teacher-1', classroom_id: CLASSROOM }],
+        classroom_memberships: [{ classroom_id: CLASSROOM }],
+      })
+    );
+
+    const response = await POST(requestFor(LESSON));
+    const body = await response.json();
+
+    expect(response.status).toBe(201);
+    expect(body.session).toBeDefined();
+  });
+
+  it('403s a student who is not a classroom member, has no assignment, and does not own the lesson', async () => {
+    mockServerClient();
+    mockAdmin.mockReturnValue(
+      adminDouble({
+        vocabulary_lessons: [{ teacher_id: 'teacher-1', classroom_id: CLASSROOM }],
+        classroom_memberships: [],
+      })
+    );
+
+    const response = await POST(requestFor(LESSON));
+
+    expect(response.status).toBe(403);
+  });
+});

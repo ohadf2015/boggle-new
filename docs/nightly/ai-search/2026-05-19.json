@@ -1,0 +1,39 @@
+{
+  "date": "2026-05-19",
+  "site": "https://lexiclash.live/",
+  "source": "bing-wmt-ai-performance",
+  "totals": {
+    "total_citations_window": 712,
+    "avg_cited_pages": 2,
+    "window_label": "Feb 19 — May 16 (87 days, default view)"
+  },
+  "trend": {
+    "last_7d_total": 124,
+    "may_14_spike": 120,
+    "note": "Sharp inflection May 13-14 (59+120) vs prior weekly avg ~50. Investigate: new Copilot grounding behavior, or a viral query? Track daily."
+  },
+  "grounding_queries": [
+    { "query": "boggle wordshake", "citations": 143 },
+    { "query": "words with friends multiplayer free online", "citations": 18 },
+    { "query": "smart anagram", "citations": 12 },
+    { "query": "best online games vocabulary logical thinking leaderboards progress tracking", "citations": 6 },
+    { "query": "daily word wheel", "citations": 5 },
+    { "query": "most popular online word games leaderboard multiplayer browser", "citations": 4 }
+  ],
+  "cited_pages": [
+    { "url": "https://www.lexiclash.live/en", "citations": 352 },
+    { "url": "https://www.lexiclash.live/en/boggle-word-shake-free", "citations": 156 },
+    { "url": "https://www.lexiclash.live/en/daily-word-wheel", "citations": 48 },
+    { "url": "https://www.lexiclash.live/en/online-word-games-with-friends", "citations": 39 },
+    { "url": "https://www.lexiclash.live/en/play-boggle-online-free", "citations": 27 },
+    { "url": "https://www.lexiclash.live/en/best-online-word-games", "citations": 17 },
+    { "url": "https://www.lexiclash.live/en/multiplayer-word-game-online", "citations": 16 },
+    { "url": "https://www.lexiclash.live/en/anagram/smart", "citations": 13 },
+    { "url": "https://www.lexiclash.live/en/blog/daily-challenge-strategies", "citations": 8 },
+    { "url": "https://www.lexiclash.live/es", "citations": 7 },
+    { "url": "https://www.lexiclash.live/en/multiplayer", "citations": 4 },
+    { "url": "https://www.lexiclash.live/en/words-with-friends-alternative", "citations": 3 },
+    { "url": "https://www.lexiclash.live/en/daily/word-wheel", "citations": 3 },
+    { "url": "https://www.lexiclash.live/he", "citations": 3 }
+  ]
+}

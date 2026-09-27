@@ -1,0 +1,345 @@
+/**
+ * The projector's whole end-of-round moment.
+ *
+ * A classroom host is forced into broadcast mode, so this screen — not the
+ * results page — is what the teacher and thirty students actually look at when
+ * the timer hits zero. It has to survive being screenshotted at any instant,
+ * read from the back of a room, and replayed four times in one period.
+ */
+
+import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+vi.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: vi.fn(),
+  fireVictoryConfetti: vi.fn(),
+  cleanupConfetti: vi.fn(),
+}));
+
+vi.mock('@/lib/education/roundEndSound', () => ({
+  playRoundEndCue: vi.fn(() => null),
+  ROUND_WIN_SOUND: '/sounds/education-round-win.mp3',
+  CLASS_SWEEP_SOUND: '/sounds/education-class-sweep.mp3',
+}));
+
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    language: 'en',
+    t: (key: string, params?: Record<string, string | number>) =>
+      params ? `${key}:${JSON.stringify(params)}` : key,
+  }),
+}));
+
+const { proState } = vi.hoisted(() => ({
+  proState: { hasPro: false, loading: true },
+}));
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => proState,
+}));
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: vi.fn(),
+}));
+
+import { ClassroomTvResults } from '../ClassroomTvResults';
+import type { ClassroomSummary } from '@/shared/types/classroom';
+
+const t = (key: string, params?: Record<string, string | number>) =>
+  params ? `${key}:${JSON.stringify(params)}` : key;
+
+const summary = (over: Partial<ClassroomSummary> = {}): ClassroomSummary => ({
+  teacherName: 'Ms. Cohen',
+  lessonNames: ['Unit 3'],
+  lessonIds: ['lesson-1'],
+  totalWords: 4,
+  classFoundCount: 2,
+  coverage: [
+    { word: 'photon', foundBy: ['Maya'] },
+    { word: 'atom', foundBy: ['Noa'] },
+    { word: 'quark', foundBy: [] },
+    { word: 'boson', foundBy: [] },
+  ],
+  missedWords: ['quark', 'boson'],
+  masteryByPlayer: { Maya: { found: 2, total: 4 }, Noa: { found: 1, total: 4 } },
+  podium: [
+    { username: 'Maya', score: 90, rank: 1 },
+    { username: 'Noa', score: 70, rank: 2 },
+  ],
+  ...over,
+});
+
+describe('ClassroomTvResults', () => {
+  beforeEach(() => {
+    window.sessionStorage.clear();
+    proState.hasPro = false;
+    proState.loading = true;
+  });
+
+  afterEach(cleanup);
+
+  it('has the podium on the wall before a single name is revealed', () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.getByTestId('podium-place-1')).toBeInTheDocument();
+    expect(screen.getByTestId('podium-place-2')).toBeInTheDocument();
+    expect(screen.getByTestId('winner-spotlight')).toHaveAttribute('data-active', 'false');
+  });
+
+  it('lands the winner and the mascot celebration on the beat', async () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    await waitFor(
+      () => expect(screen.getByTestId('winner-spotlight')).toHaveAttribute('data-active', 'true'),
+      { timeout: 7000 }
+    );
+    expect(screen.getByTestId('podium-place-1')).toHaveTextContent('Maya');
+  });
+
+  it('fills the coverage meter only once the reveal reaches it', async () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.getByTestId('coverage-fill')).toHaveStyle({ width: '0%' });
+    await waitFor(() => expect(screen.getByTestId('coverage-fill')).toHaveStyle({ width: '50%' }), {
+      timeout: 7000,
+    });
+  });
+
+  it('says nothing about a session on the first round', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    expect(screen.queryByTestId('classroom-tv-round')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('classroom-tv-sweep-streak')).not.toBeInTheDocument();
+  });
+
+  it('counts the round out from the second one, so Rematch carries momentum', () => {
+    const { unmount } = render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    unmount();
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    expect(screen.getByTestId('classroom-tv-round')).toHaveTextContent('2');
+  });
+
+  it('flies a streak chip only once the class has swept twice running', () => {
+    const swept = summary({ classFoundCount: 4, missedWords: [] });
+    const { unmount } = render(<ClassroomTvResults summary={swept} onRematch={vi.fn()} t={t} />);
+    expect(screen.queryByTestId('classroom-tv-sweep-streak')).not.toBeInTheDocument();
+    unmount();
+    render(<ClassroomTvResults summary={swept} onRematch={vi.fn()} t={t} />);
+    expect(screen.getByTestId('classroom-tv-sweep-streak')).toHaveTextContent('2');
+  });
+
+  it('keeps the class story off the student card key', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const keys = Array.from({ length: window.sessionStorage.length }, (_, i) =>
+      window.sessionStorage.key(i)
+    );
+    expect(keys.some((k) => k?.endsWith('::class'))).toBe(true);
+  });
+
+  it('is a dark-only surface — never the cream pair that flashes on a lazy mount', () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    const root = screen.getByTestId('classroom-tv-results');
+    expect(root.className).toContain('bg-neo-navy');
+    expect(root.className).not.toContain('bg-neo-cream');
+  });
+
+  it('publishes the stage it is on, so a capture waits for the finished frame', async () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    const root = screen.getByTestId('classroom-tv-results');
+    // Painted from the first frame AND self-describing: a screenshot harness
+    // that does not know the timeline can poll this instead of guessing.
+    expect(root).toHaveAttribute('data-round-end-stage', 'stage');
+    await waitFor(() => expect(root).toHaveAttribute('data-round-end-stage', 'done'), {
+      timeout: 7000,
+    });
+  });
+
+  /**
+   * Was "scrolls inside itself, never the page body". Containing the scroll
+   * was right and still holds; putting it on the ROOT was not. Measured on the
+   * wall at 1280x633: scrollHeight 1202 against clientHeight 595, with REMATCH
+   * — the screen's one action — six hundred pixels under the fold behind a
+   * gesture nobody performs on a projector. The recap now fits, and the only
+   * region that may overflow is the list of words left to reteach.
+   * See `roundEndProjectorFit.test.tsx`.
+   */
+  it('locks its own root and scrolls nothing but the reteach list', () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.getByTestId('classroom-tv-results').className).toContain('overflow-hidden');
+    expect(screen.getByTestId('coverage-words').className).toContain('overflow-y-auto');
+  });
+
+  it('names the winning TEAM, not just the winning child, after a team battle', () => {
+    // The podium ranks individuals. In a team battle that is not what the room
+    // was playing for, and until 2026-09-16 the teacher's screen had no team
+    // result on it at all — only the students' own phones did.
+    render(
+      <ClassroomTvResults
+        summary={summary({
+          teamBattle: {
+            teamCount: 2,
+            teams: [
+              { id: 0, memberNames: ['Maya'] },
+              { id: 1, memberNames: ['Noa'] },
+            ],
+            scores: [
+              { username: 'Maya', score: 90 },
+              { username: 'Noa', score: 70 },
+            ],
+          },
+        })}
+        t={t}
+      />
+    );
+    expect(screen.getByTestId('team-battle-standings')).toBeInTheDocument();
+    expect(screen.getByTestId('team-standing-0')).toHaveTextContent('Maya');
+  });
+
+  it('shows no team panel in a free-for-all', () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.queryByTestId('team-battle-standings')).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * THE BUG: a classroom host never mounts ClassroomResultsCard (hostLeavesProjectorRecap
+ * keeps them on this wall). Reteach / share / assign lived only behind isTeacher on
+ * that card, so Teacher Pro follow-up was unreachable on the only screen the host
+ * actually sees. Same ReteachActions + useReteachLinks — no second copy of the CTAs.
+ */
+describe('ClassroomTvResults — host reteach / share / assign on the wall', () => {
+  it('surfaces ReteachActions when the class missed words', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    expect(screen.getByTestId('play-reteach-round')).toBeInTheDocument();
+    expect(screen.getByTestId('reteach-more-actions')).toBeInTheDocument();
+  });
+
+  it('keeps reteach off the coverage scroller so REMATCH and reteach stay on the wall', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    expect(screen.getByTestId('play-reteach-round').closest('[data-testid="coverage-words"]')).toBeNull();
+    expect(screen.getByTestId('classroom-tv-rematch').closest('[data-testid="coverage-words"]')).toBeNull();
+  });
+
+  it('hides reteach when the class found every word', () => {
+    render(
+      <ClassroomTvResults
+        summary={summary({ classFoundCount: 4, missedWords: [] })}
+        onRematch={vi.fn()}
+        t={t}
+      />
+    );
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('reteach-more-actions')).not.toBeInTheDocument();
+  });
+
+  it('offers share and assign from the same disclosure the phone card uses', () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    screen.getByTestId('reteach-more-actions').click();
+    expect(screen.getByTestId('share-miss-gap-practice')).toBeInTheDocument();
+    expect(screen.getByTestId('assign-miss-gap-async-homework')).toBeInTheDocument();
+  });
+});
+
+/**
+ * #1120's Pro progress report lived on ClassroomResultsCard. A classroom host
+ * never mounts that card (hostLeavesProjectorRecap). The wall reuses
+ * ResultsPrimaryActions — no second paywall, no second Rematch.
+ */
+describe('ClassroomTvResults — Pro progress report on the host wall', () => {
+  beforeEach(() => {
+    proState.hasPro = false;
+    proState.loading = true;
+  });
+
+  it('offers a free teacher the unlock ask, not a report they cannot open', () => {
+    proState.hasPro = false;
+    proState.loading = false;
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const cta = screen.getByTestId('unlock-report-upgrade-cta');
+    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(cta.textContent).toContain('$9');
+    expect(screen.queryByTestId('full-report-link')).not.toBeInTheDocument();
+    // The wall's own Rematch stays the one loud button.
+    expect(screen.getByTestId('classroom-tv-rematch')).toBeInTheDocument();
+    expect(screen.queryByTestId('rematch-same-list')).not.toBeInTheDocument();
+    expect(screen.getByTestId('play-reteach-round')).toBeInTheDocument();
+  });
+
+  it('offers a Pro teacher the report', () => {
+    proState.hasPro = true;
+    proState.loading = false;
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.getByTestId('full-report-link')).toHaveAttribute('href', '/en/teacher/reports');
+    expect(screen.queryByTestId('unlock-report-upgrade-cta')).not.toBeInTheDocument();
+  });
+
+  it('paints neither link while entitlement is still loading', () => {
+    proState.loading = true;
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.queryByTestId('full-report-link')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('unlock-report-upgrade-cta')).not.toBeInTheDocument();
+  });
+
+  it('still offers the report when the class found every word', () => {
+    proState.hasPro = true;
+    proState.loading = false;
+    render(
+      <ClassroomTvResults
+        summary={summary({ classFoundCount: 4, missedWords: [] })}
+        onRematch={vi.fn()}
+        t={t}
+      />,
+    );
+    expect(screen.getByTestId('full-report-link')).toBeInTheDocument();
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+  });
+});
+
+describe('ClassroomTvResults — the Pro ask never competes with the celebration', () => {
+  beforeEach(() => {
+    window.sessionStorage.clear();
+    proState.hasPro = false;
+    proState.loading = false;
+  });
+  afterEach(cleanup);
+
+  it('Given a free teacher, Then the unlock ask sits AFTER Play again and reteach, not beside them', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const cta = screen.getByTestId('unlock-report-upgrade-cta');
+    const rematch = screen.getByTestId('classroom-tv-rematch');
+    const reteach = screen.getByTestId('play-reteach-round');
+    const follows = (a: Element, b: Element) =>
+      !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(follows(rematch, cta)).toBe(true);
+    expect(follows(reteach, cta)).toBe(true);
+  });
+
+  it('Given a free teacher, Then the ask is small and unfilled — secondary, not a second button', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const cls = screen.getByTestId('unlock-report-upgrade-cta').className.split(/\s+/);
+    expect(cls).not.toContain('bg-neo-cyan');
+    expect(cls).toContain('text-xs');
+  });
+
+  it('arrives only after the celebration beat (a delayed, transform-only pop; static under reduced motion)', () => {
+    render(<ClassroomTvResults summary={summary()} onRematch={vi.fn()} t={t} />);
+    const slot = screen.getByTestId('tv-followup-after-celebration');
+    expect(slot).toContainElement(screen.getByTestId('unlock-report-upgrade-cta'));
+    expect(slot.className).toMatch(/motion-safe:animate-\[lc-quiet-arrive_\S+_5\.8s_both\]/);
+    expect(slot.className).not.toContain('opacity-0');
+  });
+
+  it('crowns the highest SCORE even when the payload ranks contradict it', async () => {
+    render(
+      <ClassroomTvResults
+        summary={summary({
+          podium: [
+            { username: 'Maya', score: 60, rank: 1 },
+            { username: 'Noa', score: 95, rank: 2 },
+          ],
+        })}
+        t={t}
+      />
+    );
+    await waitFor(
+      () => expect(screen.getByTestId('winner-spotlight')).toHaveAttribute('data-active', 'true'),
+      { timeout: 7000 }
+    );
+    expect(screen.getByTestId('winner-spotlight')).toHaveTextContent('Noa');
+    expect(screen.getByTestId('podium-place-1')).toHaveTextContent('Noa');
+  });
+});

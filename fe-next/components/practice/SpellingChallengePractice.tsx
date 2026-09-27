@@ -1,0 +1,415 @@
+'use client';
+
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { ArrowLeft, Lightbulb, Check, X } from 'lucide-react';
+import { useSpellingGame } from './hooks/useSpellingGame';
+import PracticeResultsCard from './PracticeResultsCard';
+import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { EnrichedVocabularyWord } from '@/types/vocabulary';
+import { WordContextRow } from './WordContextRow';
+import { PronunciationButton } from './PronunciationButton';
+import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
+import StreakFlame from '@/components/education/practice/StreakFlame';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
+
+export interface SpellingChallengePracticeProps {
+  words: VocabularyWord[];
+  onComplete: (results: { correct: number; total: number; accuracy: number }) => void;
+  onBack: () => void;
+  /** Jump straight into the next ready mode, when the lesson offers one. */
+  onNext?: () => void;
+  /** Human name of that next mode, for the button label. */
+  nextLabel?: string;
+  /** XP session data to display on results screen (optional) */
+  xpSessionData?: {
+    sessionXpEarned: number;
+    sessionMasteryMessage: string | null;
+  };
+}
+
+/**
+ * SpellingChallengePractice - Type-the-word spelling practice mode
+ *
+ * Features:
+ * - Shows definition, student types the word
+ * - Progressive difficulty (shorter words first)
+ * - Hint system (first letter free, additional hints reset streak)
+ * - Streak tracking with visual feedback
+ * - Auto-advance after answer (1s correct, 2s incorrect)
+ * - Results display with PracticeResultsCard
+ */
+export function SpellingChallengePractice({
+  words,
+  onComplete,
+  onBack,
+  xpSessionData,
+  onNext,
+  nextLabel,
+}: SpellingChallengePracticeProps) {
+  const { t, dir, language } = useLanguage();
+  const isRTL = dir === 'rtl';
+  const sfx = usePracticeSfx();
+
+  /*
+    Trimmed, de-duplicated, blanks dropped — a teacher's list arrives with all
+    three. Spelling asks for the WORD and nothing else (the definition is a
+    bonus prompt, not the question — see the definition card below), so the
+    only entry this drill cannot use is one with no word at all.
+  */
+  const usable = useMemo(() => wordsReadyForDrill(words, 'word'), [words]);
+
+  const {
+    currentWord,
+    wordIndex,
+    totalWords,
+    currentHint,
+    getHint,
+    submitAnswer,
+    currentStreak,
+    maxStreak,
+    hintsUsed,
+    correctCount,
+    attempts,
+    accuracy,
+    isComplete,
+    resetGame,
+  } = useSpellingGame(usable);
+
+  // Mirror the hook's sort-by-length so wordIndex maps to the right enriched
+  // word — including the hook's drop of entries with no `word`, or the two
+  // lists index differently and the hint row describes a different card than
+  // the one on screen.
+  const sortedWords = useMemo(
+    () => [...usable].sort((a, b) => a.word.length - b.word.length),
+    [usable]
+  );
+
+  const [inputValue, setInputValue] = useState('');
+  const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string } | null>(null);
+  const [showResults, setShowResults] = useState(false);
+  const [totalHintsUsed, setTotalHintsUsed] = useState(0);
+  const [timeSpent, setTimeSpent] = useState(0);
+  const sessionStartRef = useRef<number>(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize session start time — and open the round with a cue, so the
+  // student hears that a drill has begun rather than just seeing a new card.
+  useEffect(() => {
+    sessionStartRef.current = Date.now();
+    sfx.start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per mount
+  }, []);
+
+  // Focus input on mount and word change
+  useEffect(() => {
+    if (!isComplete && !feedback && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [wordIndex, isComplete, feedback]);
+
+  // Show results and report completion when game ends
+  useEffect(() => {
+    if (isComplete && !showResults) {
+      setTimeSpent(Math.floor((Date.now() - sessionStartRef.current) / 1000));
+      setTimeout(() => {
+        setShowResults(true);
+        onComplete({ correct: correctCount, total: attempts, accuracy });
+      }, 500);
+    }
+  }, [isComplete, showResults, onComplete, correctCount, attempts, accuracy]);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!inputValue.trim() || feedback) return;
+
+      const result = submitAnswer(inputValue);
+      if (result.correct) sfx.correct();
+      else sfx.wrong();
+      setFeedback(result);
+      setInputValue('');
+
+      // Clear feedback after auto-advance delay
+      const delay = result.correct ? 1000 : 2000;
+      setTimeout(() => {
+        setFeedback(null);
+      }, delay);
+    },
+    [inputValue, feedback, submitAnswer, sfx]
+  );
+
+  const handleRestart = useCallback(() => {
+    resetGame();
+    setShowResults(false);
+    setFeedback(null);
+    setInputValue('');
+    setTotalHintsUsed(0);
+    setTimeSpent(0);
+    sessionStartRef.current = Date.now();
+  }, [resetGame]);
+
+
+  // Track hints used across all words — intentionally fires on word transition only
+  useEffect(() => {
+    setTotalHintsUsed(prev => prev + hintsUsed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wordIndex]);
+
+  if (usable.length < 1) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
+  if (showResults) {
+    return (
+      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4">
+        <PracticeResultsCard
+          correct={correctCount}
+          total={attempts}
+          xpEarned={xpSessionData?.sessionXpEarned}
+          onRestart={handleRestart}
+          onBack={onBack}
+          timeSpent={timeSpent}
+          maxStreak={maxStreak}
+          hintsUsed={totalHintsUsed}
+          onNext={onNext}
+          nextLabel={nextLabel}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-full bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <div className="max-w-2xl mx-auto mb-6">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            aria-label={t('common.back')}
+            className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
+          >
+            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
+          </Button>
+
+          <div className="text-center">
+            <h2 className="text-xl font-neo-display text-neo-white mb-1">
+              {t('education.practice.spellTheWord')}
+            </h2>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-neo-white font-neo-body" data-testid="progress-text">
+                {wordIndex + (isComplete ? 0 : 0)} / {totalWords}
+              </p>
+              <div className="h-1 w-20 bg-neo-black/30 rounded-neo overflow-hidden">
+                <AdaptiveMotion.div
+                  className="h-full bg-neo-cyan"
+                  animate={{ width: `${(wordIndex / totalWords) * 100}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="w-10" />
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/*
+          The streak used to be a flat orange pill reading "4x streak". It is
+          now a fire that visibly grows through four stages and stings when it
+          reaches a new one — the one tense mechanic in this drill, finally
+          audible. `streak-display` stays as the testid for existing coverage.
+        */}
+        {currentStreak > 0 && (
+          <div data-testid="streak-display" className="flex justify-center">
+            <StreakFlame streak={currentStreak} />
+          </div>
+        )}
+
+        {/* Definition card */}
+        <AdaptiveAnimatePresence mode="wait">
+          <AdaptiveMotion.div
+            key={wordIndex}
+            initial={{ x: isRTL ? -20 : 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: isRTL ? 20 : -20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            data-testid="definition-card"
+            className={cn(
+              'p-8 rounded-neo',
+              // Cream edge, not black: a black border on navy measures 1.23:1,
+              // so the prompt card had no visible edge at all.
+              'bg-neo-navy-light border-[3px] border-neo-cream',
+              'shadow-hard-lg',
+              'min-h-[120px] flex items-center justify-center'
+            )}
+          >
+            <p className="font-neo-body text-neo-white text-2xl text-center">
+              {/*
+                A word with no definition is not a broken round — Spelling's
+                prompt is the audio. "No words to practice" over a live 8-word
+                drill read as a failure that had not happened.
+              */}
+              {currentWord?.definition || t('student.practiceFun.listenAndSpell')}
+            </p>
+            <WordContextRow
+              partOfSpeech={(sortedWords[wordIndex] as Partial<EnrichedVocabularyWord>)?.partOfSpeech}
+              example={(sortedWords[wordIndex] as Partial<EnrichedVocabularyWord>)?.examples?.[0]?.text}
+            />
+          </AdaptiveMotion.div>
+        </AdaptiveAnimatePresence>
+
+        {/* Hint display */}
+        <div
+          data-testid="hint-display"
+          className="flex items-center justify-center gap-3"
+        >
+          <span className="font-mono text-neo-cyan text-2xl tracking-widest">
+            {/*
+              Blanks come from the SORTED list. Reading the unsorted prop here
+              counted the underscores off a different word entirely, and the
+              optional chain stopped one level too early: an entry with no
+              `word` threw and took the whole round down with it.
+            */}
+            {currentHint}
+            {'_'.repeat(
+              Math.max(0, (sortedWords[wordIndex]?.word?.length ?? 0) - currentHint.length)
+            )}
+          </span>
+          {sortedWords[wordIndex] && (
+            <PronunciationButton
+              word={sortedWords[wordIndex].word}
+              lang={language}
+              size="sm"
+            />
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              sfx.hint();
+              getHint();
+            }}
+            disabled={!!feedback || isComplete}
+            data-testid="hint-button"
+            className="text-neo-yellow hover:text-neo-yellow/80"
+          >
+            <Lightbulb className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {/* Feedback display */}
+        <AdaptiveAnimatePresence>
+          {feedback && (
+            <AdaptiveMotion.div
+              data-testid="feedback-display"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 1] }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.25, times: [0, 0.6, 1] }}
+              className={cn(
+                'p-4 rounded-neo border-[3px] text-center',
+                feedback.correct
+                  ? 'bg-neo-green/20 border-neo-green'
+                  : 'bg-neo-pink/20 border-neo-pink animate-neo-shake'
+              )}
+            >
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <AdaptiveMotion.div
+                  initial={{ rotate: -180, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.2 }}
+                >
+                  {feedback.correct ? (
+                    <Check className="w-6 h-6 text-neo-green" />
+                  ) : (
+                    <X className="w-6 h-6 text-neo-pink" />
+                  )}
+                </AdaptiveMotion.div>
+                <AdaptiveMotion.span
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.15, duration: 0.15 }}
+                  className={cn(
+                    'font-neo-display text-lg',
+                    feedback.correct ? 'text-neo-green' : 'text-neo-pink'
+                  )}
+                >
+                  {feedback.correct
+                    ? (t('education.practice.correct'))
+                    : (t('education.practice.incorrect'))}
+                </AdaptiveMotion.span>
+              </div>
+              {!feedback.correct && (
+                <p className="text-neo-white font-neo-body">
+                  {t('student.practiceFun.answerLabel')}{' '}
+                  <span className="text-neo-lime font-black">{feedback.correctWord}</span>
+                </p>
+              )}
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+
+        {/* Input form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            disabled={!!feedback || isComplete}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
+            data-testid="spelling-input"
+            aria-label={t('education.practice.spellTheWord')}
+            className={cn(
+              'px-6 py-4 rounded-neo',
+              'border-[4px] border-neo-black',
+              'bg-neo-white text-neo-black',
+              'font-neo-body text-xl',
+              'shadow-hard',
+              'focus:outline-hidden focus:ring-4 focus:ring-neo-purple',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'transition-all'
+            )}
+            placeholder={t('education.practice.typeWord')}
+          />
+          <button
+            type="submit"
+            disabled={!!feedback || isComplete || !inputValue.trim()}
+            className={cn(
+              'px-6 py-4 rounded-neo',
+              // Lime + black, the same primary the picker's PLAY uses. White on
+              // neo-purple measures 4.23:1 — under AA — and dropped further the
+              // moment `disabled:opacity-50` faded the label with the fill.
+              'bg-neo-lime hover:bg-neo-lime/90',
+              'border-[3px] border-black',
+              'shadow-hard hover:shadow-hard-lg',
+              'font-neo-display text-black text-xl',
+              // Disabled drains the FILL and keeps a readable label and a
+              // visible edge, instead of fading the whole control.
+              'disabled:bg-neo-navy-light disabled:text-neo-cream disabled:border-neo-cream',
+              'disabled:shadow-none disabled:cursor-not-allowed',
+              'transition-all active:translate-y-1'
+            )}
+          >
+            {t('education.practice.submit')}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default SpellingChallengePractice;

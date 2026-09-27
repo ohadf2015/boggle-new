@@ -1,0 +1,64 @@
+{
+  "title": "授業中の脳トレ休憩 | 無料オンライン単語ゲーム",
+  "description": "1～5分で集中力を取り戻す高速ゲーム。準備不要、すべてのデバイスで動作、クラス全体で一緒にプレイ。",
+  "keywords": [
+    "授業中の脳トレ",
+    "集中力回復",
+    "単語ゲーム教室",
+    "クラス活動",
+    "オンラインゲーム",
+    "教育的ゲーム",
+    "短時間活動",
+    "生徒のエンゲージメント"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "es": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/brain-breaks-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/brain-breaks-word-games"
+  },
+  "ogTitle": "授業中の脳トレ休憩 | 無料オンライン単語ゲーム",
+  "ogDescription": "1～5分で集中力を取り戻す高速ゲーム。準備不要、すべてのデバイスで動作、クラス全体で一緒にプレイ。",
+  "ogLocale": "ja_JP",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-ja.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "授業中の脳トレ休憩 | 無料オンライン単語ゲーム"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "授業中の脳トレ休憩 | 無料オンライン単語ゲーム",
+  "twDescription": "1～5分で集中力を取り戻す高速ゲーム。準備不要、すべてのデバイスで動作、クラス全体で一緒にプレイ。",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-ja.webp"
+  ]
+}

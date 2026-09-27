@@ -1,0 +1,17 @@
+-- Chest opens by chest # + tier
+-- Setup: In PostHog, create Trends insight:
+--  Event: blast_chest_opened
+--  Breakdowns: tier (wood/silver/gold/legendary)
+--  Time series: Daily
+--
+-- Measure: Count of chest opens per tier per day
+-- Target: Healthy mix across tiers; legendary ~5-10% of opens
+--
+-- Key metrics per chest #:
+--  chest_number: frequency of which chests are being unlocked
+--  tier: distribution of chest quality (indicates RNG fairness)
+--  is_duplicate: avatar part acquisition patterns
+--
+-- Alerts:
+-- - If legendary < 2%, RNG seed may be biased
+-- - If wood > 90%, may indicate difficulty too easy or chest-farming

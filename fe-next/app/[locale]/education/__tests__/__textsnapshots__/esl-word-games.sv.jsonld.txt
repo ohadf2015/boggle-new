@@ -1,0 +1,147 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/esl-word-games#page",
+  "name": "Engelska ordspel för klassrummet — lärarledda, 6 språk | LexiClash",
+  "description": "Engelska ordspel för hela klassen: eleverna ansluter från mobilen med en kod på sex tecken, brädet visas på projektorn och du sätter Stöd, Bas eller Utmaning per elev. Sex språk, inga elevkonton.",
+  "url": "https://www.lexiclash.live/sv/education/esl-word-games",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/esl-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Gratis Engelskaspel",
+      "item": "https://www.lexiclash.live/sv/education/esl-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/esl-word-games#resource",
+  "name": "Engelska ordspel för klassrummet — lärarledda, 6 språk | LexiClash",
+  "description": "Engelska ordspel för hela klassen: eleverna ansluter från mobilen med en kod på sex tecken, brädet visas på projektorn och du sätter Stöd, Bas eller Utmaning per elev. Sex språk, inga elevkonton.",
+  "url": "https://www.lexiclash.live/sv/education/esl-word-games",
+  "inLanguage": "sv",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "ESL Practice",
+    "EFL Practice",
+    "Vocabulary Building",
+    "Spelling Practice",
+    "Bilingual Programs"
+  ],
+  "educationalLevel": [
+    "Beginner",
+    "Intermediate",
+    "Advanced",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "English vocabulary, spelling, letter patterns, sight-word recognition",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/esl-word-games#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Vilka är de bästa gratis engelskaspelen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash erbjuder ordbildning i realtid: snabb Boggle, Word Wheel för ordförråd, Word Hunt för måljakt. Mot kompisar eller AI — konkurrenskraftig och rolig."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Måste elever ha konto?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja, men det är gratis. Lärare gör klassrummet, elever ansluter med kod. Ingen betalning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur hjälper ordspel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Stärker stavning, ordförråd, snabbhet under tryck — allt som hjälper till flyt. Flerspelar engagerar, speciellt tonåringar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag anpassa för olika nivåer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Ladda upp egna listor och sätt varje elev på Stöd, Bas eller Utmaning. Panelen visar vilka ord som är svåra."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Fungerar för vuxna?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolut. Vuxna och universitet använder LexiClash för ordförrådsuppgifter."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Tvåspråkiga program?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. 6 ordböcker. Perfekt för immersion och övergång."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Engelska ordspel för klassrummet — lärarledda, 6 språk | LexiClash",
+  "description": "Engelska ordspel för hela klassen: eleverna ansluter från mobilen med en kod på sex tecken, brädet visas på projektorn och du sätter Stöd, Bas eller Utmaning per elev. Sex språk, inga elevkonton.",
+  "url": "https://www.lexiclash.live/sv/education/esl-word-games",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "sv"
+}

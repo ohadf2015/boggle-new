@@ -1,0 +1,55 @@
+{
+  "title": "Английские словесные игры для класса — 6 языков | LexiClash",
+  "description": "Английские словесные игры для всего класса: ученики входят с телефона по коду из шести символов, доска идёт на проектор, а вы задаёте Поддержку, Базу или Вызов каждому ученику. Шесть языков, без ученических аккаунтов.",
+  "keywords": "esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles, juegos de vocabulario en ingles, juego de vocabulario en ingles, vocabulario en ingles juegos, juegos para aprender vocabulario en ingles",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ru/education/esl-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "es": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/esl-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/esl-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/esl-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/esl-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/esl-word-games"
+  },
+  "ogTitle": "Английские словесные игры для класса",
+  "ogDescription": "Живые многопользовательские игры для класса. Бесплатные учетные записи ученика, 6 словарей, панель учителя.",
+  "ogLocale": "ru_RU",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ru/education/esl-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Английские словесные игры для класса"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Английские словесные игры для класса",
+  "twDescription": "Бесплатные игры английского языка ESL/EFL для класса. Многопользовательские, 6 языков, панель учителя.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

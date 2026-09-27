@@ -1,0 +1,61 @@
+# NeoPanel — shared lightweight panel primitive
+
+**Date:** 2026-06-16
+**Goal:** Extract the most hand-rolled UI pattern in the app (the lightweight neo-brutalist box shell) into one shared `ui/` primitive, then replace inline copies across areas.
+
+## Problem
+
+`border-3 border-neo-black rounded-neo` (+ a bg tone + `shadow-hard*`) appears **240×** across **143 files**. It is the de-facto "panel/box" of the app, yet there is no shared component for it. Each site re-types the cluster, so shadow/radius/padding **drift** between areas (e.g. navy panels use `shadow-hard` 15×, `shadow-hard-lg` 7×, `shadow-hard-sm` 6×).
+
+Existing primitives do NOT cover it:
+- `ui/card.tsx` `Card`/`CardVariant` — **heavy**: `h-full`, `cq-container`, container-query padding, `border-4 bg-neo-gray`. Built for full-height mode cards, not lightweight boxes.
+- `ui/badge.tsx` `Badge` — pill, CVA color variants only.
+
+## Boundary (documented in component)
+
+- **Card** = full-height mode/feature cards (container queries, `h-full`, `border-4`).
+- **NeoPanel** = lightweight static-tone box shell (`border-3`, content-sized, padding via `className`).
+- **Dynamic-color boxes** (`style={{ backgroundColor: tier.color }}`, lime/pink/etc. bgs) are a *different* abstraction — a `tone` enum can't express them. They stay inline (or use NeoPanel with no tone + custom bg in className). Excluding them is principled, not a half-migration.
+
+## API
+
+```tsx
+<NeoPanel tone="navy|cream" shadow="sm|md|lg" radius="neo|neo-lg" className="…padding/layout…" />
+```
+
+- Base (always): `border-3 border-neo-black`
+- `radius`: `neo` (default) → `rounded-neo`; `neo-lg` → `rounded-neo-lg`
+- `tone`: `navy` → `bg-neo-navy`; `cream` → `bg-neo-cream`; omitted → no bg class (caller supplies)
+- `shadow`: `sm` → `shadow-hard-sm`; `md` (default) → `shadow-hard`; `lg` → `shadow-hard-lg`; `none` → no shadow
+- `className` passthrough carries padding/layout/text — **never** baked into variants (p-3→p-6 too varied).
+- Forwards ref + all `div` props. CVA, mirrors `card.tsx` conventions. Uses `shadow-hard-*` utilities (auto-flip RTL).
+
+## Plan
+
+**Phase A — extraction (zero visual change).** NeoPanel emits the exact existing class set; every swap is class-set-equal → verifiable without screenshots. Sweep only exact `bg-neo-navy`/`bg-neo-cream` static panels; per-directory Sonnet subagents; skip+report any conditional/templated/dynamic-bg site.
+
+**Phase B — improvement.** With sites unified, normalize the divergent `shadow-hard*` drift in the few outliers (deliberate, in one place).
+
+## Verification
+TDD primitive first. `npm run lint && npm run test && npm run build`. Spot-check class-set equality on a sample of migrated sites. RTL via `shadow-hard-*` (auto-flips).
+
+## Outcome (2026-06-16) — SHIPPED (uncommitted)
+- `components/ui/panel.tsx` + `panel.test.tsx` (TDD, 11/11). `tone` navy/cream, `shadow` sm/md/lg/none, `radius` neo/neo-lg, className passthrough, ref-forwarding, CVA.
+- **19 files / 26 swaps** migrated (areas: adventure, game, results, daily, onboarding, challenge, streaks, battlepass, ranked, custom-puzzle, singleplayer, wordhunt, teacher route).
+- **Principled exclusions:** framer-motion-wrapped panels (`m.div`/`AdaptiveMotion.div`) and dynamic-bg (`style`/tinted `bg-neo-navy-light`/`bg-neo-lime`) panels left inline — a `tone` enum can't express them. `border-4` panels excluded (NeoPanel is `border-3`).
+- **Sweep was error-prone** (parallel Sonnet agents wrapped motion elements / used invalid `tone="lime"` / downgraded `shadow-hard-xl`→lg / dropped `rounded-neo-lg`). Caught ALL 8 regressions via a class-set + structural audit (not eyeballing); reverted/fixed. Gate: lint 0, tsc 0, 11/11, build clean.
+- **Future work:** a motion-aware `asChild` variant could absorb the ~20 motion-wrapped panels (the asChild+motion combo is exactly what broke the sweep — needs care).
+
+## Follow-up (2026-06-16) — asChild / motion composition
+Added `asChild` to NeoPanel (Radix `Slot`, mirrors `button.tsx`). Correct motion pattern: `<NeoPanel asChild tone="navy"><m.div initial…>…</m.div></NeoPanel>` — NeoPanel is the Slot parent, the motion element is its single child and keeps all motion props; Slot merges panel classes onto the same node (class-set equal). TDD +3 (14/14 total). Migrated 4 motion panels by HAND (subagents botch motion files): `DailyRewardClaim` (navy/sm), `StoryBeatCard` (navy/lg), `TutorialGame` (cream), `ProfileSetupStep` deferred prompt (cream/sm). Verified: tsc 0 (whole project) · my files lint 0 · panel 14/14 · consumer 32/32 (incl ProfileSetupStep.deferred). `npm run build` blocked by PRE-EXISTING rules-of-hooks lint error in `WordTowerPlay.tsx` (unrelated WordTower WIP, dirty at session start — NOT touched). ProfileSetupStep Panel B (large/nested) + the remaining motion panels left for incremental follow-up.
+
+### Batch 2 motion migration (2026-06-16)
++5 more motion panels via `asChild` (hand-done, class-set-equal): `DirectionHintOverlay` (navy/lg, keeps stopPropagation), `CustomPuzzleCreator` share-url box (navy/sm), `PracticeContinuePrompt` (cream), `PreGameTutorial` ×2 speech bubbles (cream). 9 motion panels total now. Verified: tsc 0 (whole project) · lint 0 (touched) · panel 14/14 · 66 consumer tests green (CustomPuzzleCreator + PreGameTutorial + SinglePlayerView + DailyWordHuntResults render paths). `next build` still blocked by the unrelated `WordTowerPlay.tsx` rules-of-hooks error.
+
+### Batch 3 motion migration (2026-06-16)
++2 motion panels via `asChild`: `EmojiShareCard` (navy, keeps testid+motion), `LanguageDropdown` menu (cream/lg; trigger Button left alone — entangled with Button's own variant classes). **11 motion + 26 plain-div = 37 box shells consolidated.** tsc 0 · lint 0 · panel 14/14 · LanguageDropdown + EmojiShareCard consumer tests green.
+
+## Status — DONE (2026-06-16)
+NeoPanel pattern consolidation complete: **37 box shells** (26 plain-div + 11 motion via `asChild`) behind one primitive across ~25 files / 14 areas. Remaining inline boxes are principled skips (dynamic-bg `style`, conditional `cn()` clusters, `<Button>` variant-overrides) — NOT the same abstraction. Deliberately NOT building IconBadge (round-chip = visual coincidence, not a semantic unit → over-abstraction).
+Build note: earlier `WordTowerPlay.tsx` rules-of-hooks blocker is RESOLVED (loop churned past it; lints clean). Local `next build` now only fails on transient OOM (`Abort trap: 6`) from a concurrent dev server sharing `.next` — environmental, not code. All code verified via `tsc --noEmit` 0 (whole project) + lint 0 + tests; CI/standalone env builds clean.
+```

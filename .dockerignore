@@ -1,0 +1,91 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+**/.next
+**/out
+**/build
+**/dist
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+CLAUDE.md
+**/*.md
+docs/
+
+# Testing (not needed in production image)
+coverage
+.nyc_output
+test-results/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/__tests__/
+**/__mocks__/
+**/jest.config.*
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Claude / AI
+.claude/
+**/.claude/
+
+# Worktrees (can be multi-GB)
+.worktrees/
+
+# Python virtual environments (1.3GB+)
+**/.venv*/
+
+# Misc
+.cache
+**/.cache
+*.tgz
+*.tar.gz
+
+# Lighthouse / perf / playwright configs
+**/lighthouserc.*
+**/playwright.config.*
+**/playwright-report/
+
+# Storybook
+**/.storybook/
+**/storybook-static/
+
+# Editor configs not needed at runtime
+**/.editorconfig

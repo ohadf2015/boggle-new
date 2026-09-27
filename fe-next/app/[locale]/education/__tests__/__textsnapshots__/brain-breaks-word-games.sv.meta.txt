@@ -1,0 +1,64 @@
+{
+  "title": "Pausning för fokus i klassrummet | Ordspel online",
+  "description": "Snabba ordspel för att återställa fokus på 1–5 minuter. Ingen förberedelse, fungerar på alla enheter, hela klassen tillsammans.",
+  "keywords": [
+    "pausning för fokus",
+    "klassrumsaktiviteter",
+    "ordspel för skolan",
+    " snabba pausningar",
+    "klassrumsenergi",
+    "återhämtning av uppmärksamhet",
+    "spelbaserade aktiviteter",
+    "undervisningsmetoder"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "es": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/brain-breaks-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/brain-breaks-word-games"
+  },
+  "ogTitle": "Pausning för fokus i klassrummet | Ordspel online",
+  "ogDescription": "Snabba ordspel för att återställa fokus på 1–5 minuter. Ingen förberedelse, fungerar på alla enheter, hela klassen tillsammans.",
+  "ogLocale": "sv_SE",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-sv.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Pausning för fokus i klassrummet | Ordspel online"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Pausning för fokus i klassrummet | Ordspel online",
+  "twDescription": "Snabba ordspel för att återställa fokus på 1–5 minuter. Ingen förberedelse, fungerar på alla enheter, hela klassen tillsammans.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-sv.webp"
+  ]
+}

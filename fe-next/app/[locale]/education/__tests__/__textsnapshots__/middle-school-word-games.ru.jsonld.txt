@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/middle-school-word-games#page",
+  "name": "Словесные игры для средней школы | Расширение словарного запаса",
+  "description": "Бесплатные словесные игры для классов 5–9. Реальная конкуренция, пользовательские словари, многопользовательская игра в реальном времени—без электронной почты.",
+  "url": "https://www.lexiclash.live/ru/education/middle-school-word-games",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/middle-school-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Образование",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Словесные игры для средней школы",
+      "item": "https://www.lexiclash.live/ru/education/middle-school-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/middle-school-word-games#resource",
+  "name": "Словесные игры для средней школы | Расширение словарного запаса",
+  "description": "LexiClash—это бесплатная браузерная игра со словами, в которой ученики присоединяются к классам в прямом эфире с кодом для конкуренции в охоте за словами, вызовах на словарный запас и многопользовательских играх в реальном времени. Учителя получают отслеживание прогресса и могут загружать пользовательские списки слов для любого предмета. Электронная почта не требуется.",
+  "url": "https://www.lexiclash.live/ru/education/middle-school-word-games",
+  "inLanguage": "ru",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Vocabulary Development"
+  ],
+  "educationalLevel": [
+    "Secondary"
+  ],
+  "typicalAgeRange": "11-15",
+  "teaches": "Vocabulary acquisition, lexical recall, academic language, competitive communication",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/middle-school-word-games#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Ученикам нужны адреса электронной почты?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Нет. Для игр в прямом эфире они присоединяются только по коду. Если хотят отслеживать личный прогресс, могут войти, но это не обязательно."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Как я знаю, чему они научились?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Панель учителя показывает точность по словам, количество попыток и паттерны по всему классу. Экспортируйте отчёты в свою электронную ведомость."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я загружать собственный словарь?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Загружайте список слов для любого предмета или теста. LexiClash генерирует игры из ваших слов."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Соревнование не демотивирует слабых читателей?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Зависит от подачи. LexiClash позволяет скрывать рейтинги, группировать по уровню или сосредоточиться на улучшении. Игры идут быстро, низкий балл болит меньше, чем провал."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Сколько длится типичная игра?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Большинство 5–15 минут. Отлично для разминки или повтора, не целый урок."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Есть чат или внешний контент?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Нет. Классные игры только для ваших учеников. Чат, ссылки и реклам нет."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Школа это заблокирует?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash образовательный и обычно разрешён. Если блокируется, свяжитесь с IT—поможем."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "На каких устройствах это работает?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chromebook, iPad, телефоны, ноутбуки и интерактивные доски. Без установки. Откройте браузер и присоединяйтесь."
+      }
+    }
+  ]
+}

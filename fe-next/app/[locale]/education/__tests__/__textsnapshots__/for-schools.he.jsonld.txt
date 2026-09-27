@@ -1,0 +1,174 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/for-schools#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "האם LexiClash חינם למורים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. כל מורה מקבל ניסיון חינם של 14 יום ל-Teacher Pro: משחק כיתתי, דו-קרבות 1 על 1, כל שש השפות, בלי פרסומות, בלי חשבונות תלמידים, בלי כרטיס אשראי. בתום הניסיון, המשחק הכיתתי נשאר חינם למורים בודדים — עד 3 כיתות של 50 תלמידים כל אחת. Teacher Pro עולה $9 לחודש ומוסיף ניתוח נתונים לכל כיתה, דוחות התקדמות ל-PDF/CSV וכיתות ללא הגבלה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה כוללת תוכנית בית ספר או רשות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "תוכנית הכיתה (ב-$39 לסמסטר, דרך הטופס בעמוד הזה) כוללת כיתה שלמה עם כל יכולות Teacher Pro — ניתוח נתונים, דוחות, כלי שיעורי בית — בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO להטמעה ברמת בית ספר או רשות נמצאים במפת הדרכים שלנו ועדיין לא הושקו — ספרו לנו מה אתם צריכים ונחזור אליכם, עם הצעת מחיר לפי בקשה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם תלמידים צריכים חשבונות או התחברות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "לא. התלמידים מצטרפים למשחק כיתתי עם קוד — אין מה להקים, אין נתוני תלמידים לנהל. זה הופך הטמעה בכל בית הספר להרבה יותר פשוטה מכלים שדורשים רישום או SSO לפני שמשחקים."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אילו שפות נתמכות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "אנגלית, עברית (תמיכה מלאה מימין לשמאל), ספרדית, שוודית, יפנית ורוסית, כל אחת עם מילון מובנה — בנוי לכיתות ESL, דו-לשוניות וטבילה לשונית."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "איך מתחילים את הניסיון או מקבלים תוכנית בית ספר?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "הירשמו כמורה כדי להתחיל ניסיון Teacher Pro של 14 יום משלכם. מרחיבים לכיתה שלמה או לבית ספר? מלאו את הטופס בעמוד הזה עם התפקיד שלכם, בית הספר ומספר תלמידים משוער, ונחזור אליכם בנוגע לתוכנית הכיתה או להצעת מחיר לבית ספר או רשות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "במה זה שונה מ-Kahoot, Gimkit או Quizlet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "אלה כלי חידונים/כרטיסיות שמתמקדים באנגלית. LexiClash הוא משחק בניית מילים (לא שאלות סגורות), תומך בשש שפות כולל עברית מימין לשמאל, מתאים לכיתה שלמה של עד 50 תלמידים בחינם, ומציע דו-קרבות אמיתיים 1 על 1."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אפשר להשתמש ב-LexiClash לתלמידי ESL או לומדי אנגלית (ELL)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן — LexiClash נבנה עם לומדי שפות במחשבה. הוא תומך באנגלית, עברית (מימין לשמאל), ספרדית, שוודית, יפנית ורוסית עם מילונים מובנים. תלמידים יכולים להתחרות בשפה שלהם או לתרגל את השפה שהם לומדים, מה שהופך אותו למתאים באופן טבעי לכיתות ESL, דו-לשוניות וטבילה לשונית. משחק בניית המילים — שבו תלמידים מוצאים, מאייתים ומגישים מילים אמיתיות מול יריב חי או מול כל הכיתה — מחזק אוצר מילים ואיות באופן טבעי, בלי שאלות סגורות פסיביות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אפשר להשתמש ב-LexiClash כמשחק לתרגול איות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. פורמט בניית המילים של LexiClash — שבו תלמידים מוצאים, מאייתים ומגישים מילים אמיתיות מול יריב חי או מול כל הכיתה — הופך את תרגול האיות לתחרותי ומרתק במקום פסיבי. מורים משתמשים בו לחימום אוצר מילים, לחזרות בסוף יחידה ולטורנירים כיתתיים."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם LexiClash עובד על Chromebook ומכשירי בית ספר?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. LexiClash רץ לגמרי בדפדפן — בלי אפליקציה להתקין, בלי חשבונות תלמידים להקים. הוא עובד על Chromebook, iPad, מחשבים שולחניים וטלפונים. התלמידים מצטרפים עם קוד משחק, והמורים יכולים לשתף מטלות ישירות ל-Google Classroom. SSO ברמת הרשות (Clever, ClassLink) נמצא במפת הדרכים שלנו."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "@id": "https://www.lexiclash.live/he/education#org",
+  "name": "LexiClash Education",
+  "url": "https://www.lexiclash.live/he/education",
+  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term; schools and districts contact us.",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "areaServed": [
+    "US",
+    "IL",
+    "SE",
+    "JP",
+    "ES"
+  ],
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Teacher Free",
+      "price": 0,
+      "priceCurrency": "USD",
+      "category": "free",
+      "description": "Free tier for individual teachers, with no expiry: 3 classrooms of up to 50 students, custom word lists, live classroom games",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Teacher Pro",
+      "price": 9,
+      "priceCurrency": "USD",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": 9,
+        "priceCurrency": "USD",
+        "unitText": "month"
+      },
+      "category": "paid",
+      "description": "Unlimited classrooms plus progress analytics, miss-gap homework and reteach tools",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Classroom plan",
+      "price": 39,
+      "priceCurrency": "USD",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": 39,
+        "priceCurrency": "USD",
+        "unitText": "term"
+      },
+      "category": "paid",
+      "description": "Whole class, all Pro features, class streaks and priority support. Lead capture until school billing trigger.",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Schools & districts",
+      "category": "paid",
+      "description": "Contact us for school and district rollout. Same lead form, tagged school_lead. No public checkout.",
+      "availability": "https://schema.org/InStock"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/for-schools#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "בית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "חינוך",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "משחקי אוצר מילים ואנגלית לבתי ספר",
+      "item": "https://www.lexiclash.live/he/education/for-schools"
+    }
+  ]
+}

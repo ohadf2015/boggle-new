@@ -1,0 +1,191 @@
+name: CI Failure Assistant
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  analyze-failure:
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get failed workflow run info
+        id: run-info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = context.payload.workflow_run;
+
+            // Get the jobs for this run
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run.id
+            });
+
+            // Find failed jobs
+            const failedJobs = jobs.data.jobs.filter(job => job.conclusion === 'failure');
+
+            // Get logs for failed jobs
+            const failureDetails = [];
+
+            for (const job of failedJobs) {
+              const logs = await github.rest.actions.downloadJobLogsForWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                job_id: job.id
+              });
+
+              // Extract last 100 lines of log (most relevant for errors)
+              const logContent = logs.data;
+              const lines = logContent.split('\n').slice(-100).join('\n');
+
+              failureDetails.push({
+                jobName: job.name,
+                conclusion: job.conclusion,
+                steps: job.steps.filter(s => s.conclusion === 'failure').map(s => s.name),
+                logTail: lines.substring(0, 3000) // Limit to avoid huge comments
+              });
+            }
+
+            return {
+              runId: run.id,
+              runUrl: run.html_url,
+              headBranch: run.head_branch,
+              headSha: run.head_sha.substring(0, 7),
+              event: run.event,
+              failedJobs: failedJobs.map(j => j.name),
+              failureDetails: failureDetails
+            };
+
+      - name: Comment on PR with failure analysis
+        if: github.event.workflow_run.event == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const info = ${{ steps.run-info.outputs.result }};
+
+            // Find the PR
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${info.headBranch}`,
+              state: 'open'
+            });
+
+            if (prs.data.length === 0) return;
+
+            const pr = prs.data[0];
+
+            // Build failure report
+            let body = `## ❌ CI Failed - Analysis\n\n`;
+            body += `**Run:** [${info.runId}](${info.runUrl})\n`;
+            body += `**Commit:** \`${info.headSha}\`\n\n`;
+            body += `### Failed Jobs\n\n`;
+
+            for (const detail of info.failureDetails) {
+              body += `#### 🔴 ${detail.jobName}\n`;
+              body += `**Failed steps:** ${detail.steps.join(', ') || 'Unknown'}\n\n`;
+
+              if (detail.logTail) {
+                body += `<details>\n<summary>📋 Error Log (last lines)</summary>\n\n`;
+                body += `\`\`\`\n${detail.logTail}\n\`\`\`\n`;
+                body += `</details>\n\n`;
+              }
+            }
+
+            body += `### 🤖 Quick Fix Suggestions\n\n`;
+            body += `To get AI-assisted fixes, try:\n`;
+            body += `1. **GitHub Copilot Chat:** Ask \`@github How do I fix the CI failure in this PR?\`\n`;
+            body += `2. **VS Code Copilot:** Open the failing file and ask Copilot to fix the error\n`;
+            body += `3. **Re-run with debug:** Add \`[debug]\` to your commit message for verbose logs\n\n`;
+            body += `---\n<sub>💡 Tip: Review the error logs above and use Copilot to suggest fixes.</sub>`;
+
+            // Find existing bot comment
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number
+            });
+
+            const botComment = comments.data.find(c =>
+              c.user.type === 'Bot' &&
+              c.body.includes('CI Failed - Analysis')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body
+              });
+            }
+
+      - name: Create issue for push failures
+        if: github.event.workflow_run.event == 'push'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const info = ${{ steps.run-info.outputs.result }};
+
+            // Check if similar issue exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'ci-failure'
+            });
+
+            // Only create if no recent issue for same branch
+            const existingIssue = issues.data.find(i =>
+              i.title.includes(info.headBranch) &&
+              new Date(i.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+            );
+
+            if (existingIssue) {
+              // Update existing issue
+              let body = existingIssue.body + `\n\n---\n\n`;
+              body += `## Update: New failure at ${new Date().toISOString()}\n`;
+              body += `**Commit:** \`${info.headSha}\`\n`;
+              body += `**Run:** [${info.runId}](${info.runUrl})\n`;
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body
+              });
+            } else {
+              // Create new issue
+              let body = `## CI Pipeline Failure on \`${info.headBranch}\`\n\n`;
+              body += `**Run:** [${info.runId}](${info.runUrl})\n`;
+              body += `**Commit:** \`${info.headSha}\`\n\n`;
+              body += `### Failed Jobs\n`;
+              body += info.failedJobs.map(j => `- ${j}`).join('\n');
+              body += `\n\n### Action Required\n`;
+              body += `1. Check the [workflow run](${info.runUrl}) for details\n`;
+              body += `2. Use GitHub Copilot Chat: \`@github Analyze the CI failure\`\n`;
+              body += `3. Fix the issue and push again\n`;
+
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 CI Failure on ${info.headBranch}`,
+                body,
+                labels: ['ci-failure', 'automated']
+              });
+            }

@@ -1,0 +1,95 @@
+/**
+ * React reconciles <head> children BY POSITION and does not key them, so any third-party script
+ * that inserts itself into <head> before hydration finishes shifts every React-owned head child
+ * and mismatches the first inline one. That is not a hypothetical: an SSR'd `<script async
+ * src=adsbygoogle.js>` here produced 56 React #418 hydration errors across 50 sessions in 7 days
+ * on `/` alone (growth-radar rows 1867-1869/1871/1998), because adsbygoogle.js inserts its own
+ * `show_ads_impl` script at head index 1 while React is still hydrating.
+ *
+ * The rule this pins: a third-party script tag in this layout's <head> must go through
+ * next/script with `strategy="lazyOnload"` — the only strategy that cannot land before hydration
+ * completes. `afterInteractive` is documented as "after SOME hydration occurs", which is the same
+ * race with a smaller window, so it is rejected too.
+ *
+ * A source-shape test rather than a render test on purpose: the bug is invisible in a render
+ * because it needs a real third party to mutate a real <head> mid-hydration. What is checkable is
+ * the shape that allows it, and that is what regresses when someone re-adds a raw tag "just for
+ * the crawler".
+ */
+import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const SOURCE = readFileSync(join(__dirname, '..', 'layout.tsx'), 'utf8');
+
+/** Third-party origins whose scripts are known to mutate <head> on load. */
+const THIRD_PARTY_HOSTS = [
+  'pagead2.googlesyndication.com',
+  'www.googletagmanager.com',
+  'connect.facebook.net',
+  'analytics.tiktok.com',
+  'cdn.logrocket.io',
+  'growthradar.app',
+];
+
+describe('<head> scripts cannot race hydration', () => {
+  it('loads no third-party script through a raw lowercase <script src>', () => {
+    // Raw `<script ... src="...">` tags, as opposed to next/script's `<Script>`.
+    const rawScripts: string[] = SOURCE.match(/<script\b[^>]*?src=[^>]*?>/g) ?? [];
+    const offenders = rawScripts.filter((tag) => THIRD_PARTY_HOSTS.some((h) => tag.includes(h)));
+    expect(offenders).toEqual([]);
+  });
+
+  /**
+   * Web AdSense Auto-Ads was deleted 2026-09-15 (kanban t_79e9fcc1): the site is
+   * REJECTED for web AdSense, so adsbygoogle.js + its 162 KiB show_ads_impl were
+   * structurally unmonetizable main-thread cost (Lighthouse 2026-08-24 mobile PSI 33).
+   * The remaining web ad path is H5 Games Ads (lib/ads/h5GamesAds.ts) — adBreak-only,
+   * injected on user intent from a useEffect, never from this layout.
+   * Site-ownership verification for a future resubmission is the
+   * `google-adsense-account` META in app/layout.tsx — it needs no script.
+   */
+  it('does not load AdSense from the layout at all — web Auto-Ads is deleted', () => {
+    // Tags only. Prose naming the script is how this file explains itself.
+    const scriptTags: string[] = SOURCE.match(/<[Ss]cript\b[^>]*>/g) ?? [];
+    expect(scriptTags.filter((t) => t.includes('adsbygoogle'))).toEqual([]);
+    // The consent-gated injector component was deleted with the program; a mount
+    // reappearing here means someone re-added Auto-Ads to the first-paint graph.
+    expect(SOURCE).not.toContain('<AdSenseLoader />');
+  });
+
+  it('does not preconnect rejected AdSense origins (mobile sockets + 162 KiB trap)', () => {
+    // Preconnect/dns-prefetch to pagead2 still opened connections on every
+    // mobile load after Auto-Ads was deleted. PSI treated that as the 162 KiB
+    // loader graph even with no adsbygoogle.js tag.
+    expect(SOURCE).not.toContain('pagead2.googlesyndication.com');
+    expect(SOURCE).not.toContain('googleads.g.doubleclick.net');
+  });
+
+  it('does not mount WebAnchorAdObserver — there is no Auto-Ads anchor to measure', () => {
+    expect(SOURCE).not.toContain('WebAnchorAdObserver');
+  });
+
+  it('still keeps the storage shim as a same-document inline script, which must be first', () => {
+    // The shim has to run before any app code touches localStorage, so it stays inline and
+    // positional — which is exactly why nothing else in <head> may shift it.
+    const headStart = SOURCE.indexOf('<head>');
+    const shimAt = SOURCE.indexOf('STORAGE_SHIM_SCRIPT', headStart);
+    const firstNextScriptAt = SOURCE.indexOf('<Script', headStart);
+    expect(headStart).toBeGreaterThan(-1);
+    expect(shimAt).toBeGreaterThan(headStart);
+    // No next/script tag may be emitted ahead of the shim and shift it.
+    expect(shimAt).toBeLessThan(firstNextScriptAt);
+  });
+
+  it('loads the i18n catalogue via next/script beforeInteractive, not a raw <script src>', () => {
+    // Prod HTML 2026-09-11: a raw `<script src={messagesSrc}>` was emitted
+    // AFTER dozens of Next async chunks, so hydration ran without
+    // __LEXI_MESSAGES__ → t() returned keys → React #418 (args=text) on every
+    // page load. beforeInteractive is the Next API that injects the tag ahead
+    // of the runtime.
+    expect(SOURCE).toMatch(/<Script[^>]*id="lexi-i18n-messages"/);
+    expect(SOURCE).toMatch(/strategy="beforeInteractive"/);
+    expect(SOURCE).not.toMatch(/<script src=\{messagesSrc\}/);
+  });
+});

@@ -1,0 +1,46 @@
+name: Supabase Migrations
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'fe-next/supabase/migrations/**'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  migrate:
+    name: Run Database Migrations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run Database Migrations
+        # Management-API migrator (forward-only watermark over
+        # supabase_migrations.schema_migrations). Replaces `supabase db push`,
+        # which hard-fails on the remote/local ledger drift and needs
+        # SUPABASE_DB_PASSWORD. See fe-next/scripts/apply-supabase-migrations.mjs.
+        run: node fe-next/scripts/apply-supabase-migrations.mjs
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+      - name: Migration Summary
+        if: always()
+        run: |
+          echo "### Migration Results" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ Database migrations completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Database migrations FAILED — see the 'Run Database Migrations' step" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Project:** ${{ secrets.SUPABASE_PROJECT_REF }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/he/education/middle-school-word-games#page",
+  "name": "משחקי מילים לחטיבת ביניים | אוצר מילים",
+  "description": "משחקי מילים חינמיים לכיתות ז׳–ט׳. תחרות אמיתיות, רשימות מילים מותאמות, משחק בהזמן הממשי—ללא דוא״ל.",
+  "url": "https://www.lexiclash.live/he/education/middle-school-word-games",
+  "inLanguage": "he",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/he/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/middle-school-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "בית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "חינוך",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "משחקי מילים לחטיבת ביניים",
+      "item": "https://www.lexiclash.live/he/education/middle-school-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/he/education/middle-school-word-games#resource",
+  "name": "משחקי מילים לחטיבת ביניים | אוצר מילים",
+  "description": "LexiClash היא משחק מילים חינמי בדפדפן שבו תלמידים נכנסים לכיתות חיות עם קוד כדי להתחרות בציד מילים, אתגרי אוצר מילים ומשחקים מרובי שחקנים בזמן אמת. מורים מקבלים מעקב התקדמות ויכולים להעלות רשימות מילים מותאמות לכל נושא. אין דוא״ל נדרש.",
+  "url": "https://www.lexiclash.live/he/education/middle-school-word-games",
+  "inLanguage": "he",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Vocabulary Development"
+  ],
+  "educationalLevel": [
+    "Secondary"
+  ],
+  "typicalAgeRange": "11-15",
+  "teaches": "Vocabulary acquisition, lexical recall, academic language, competitive communication",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/he/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/he/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/middle-school-word-games#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "האם תלמידים צריכים כתובות דוא״ל?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "לא. למשחקי כיתה חיים, הם מצטרפים עם קוד בלבד. אם הם רוצים לעקוב אחרי התקדמות אישית, הם יכולים לבחור להיכנס, אך זה לא נדרש."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "כיצד אדע מה התלמידים שלי למדו?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "לוח המחוונים של המורה מראה דיוק לפי מילה, ספור ניסיון ודפוסים בכל הכיתה. ייצא דוחות ללוח הציונים שלך."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אוכל להעלות את אוצר המילים שלי?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. העלו רשימת מילים לכל נושא או בדיקה. LexiClash יוצר משחקים מהמילים שלך."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם משחק תחרותי מנטרל קוראים חלשים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "זה תלוי בדרך שבה אתה מסגרת זאת. LexiClash מאפשר לך להסתיר לוחות דירוג, קבוצה תלמידים לפי רמה, או להתמקד בשיפור אישי. משחקים גם זזים מהר, כך שניקוד נמוך מרגיש פחות מלבוש מאשר בדיקה נכשלה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "כמה זמן לוקח משחק טיפוסי?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "רוב המשחקים הם 5–15 דקות. מושלם עבור פעמון או סקירה, לא תקופה שלמה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "יש צ׳אט או תוכן חיצוני?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "לא. משחקי כיתה סגורים לתלמידים שלך בלבד. אין צ׳אט, אין קישורים, אין מודעות של צד שלישי."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם בית הספר שלנו יחסום זאת?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash היא חינוכית ובדרך כלל מאושרת בבתי ספר. אם נתקלת בחסימה, פנה לחטיבת ה-IT—אנחנו יכולים לעזור."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אילו מכשירים זה עובד עליהם?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chromebook, iPad, טלפון, מחשב נייד ולוח חכם. אין צורך בהתקנה. פשוט פתח את הדפדפן והצטרף."
+      }
+    }
+  ]
+}

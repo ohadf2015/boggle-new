@@ -1,0 +1,141 @@
+/**
+ * Classroom → multiplayer handoff contract.
+ *
+ * One module owns BOTH ends of the channel so they cannot drift apart again:
+ * the URL the teacher's lobby navigates to, and the predicate the multiplayer
+ * session uses to decide whether to rehydrate `lessonGameData` from
+ * sessionStorage. When these lived in two files the read was gated on
+ * `?fromLesson=true`, which no caller ever set — the teacher's vocabulary and
+ * chosen game mode were written and silently discarded.
+ */
+
+import { sanitizeUsername } from '@/utils/consts';
+
+/** The URL ClassroomGameLobby sends the teacher to after the room is created. */
+export function classroomMultiplayerPath(locale: string, gameCode: string): string {
+  return `/${locale}/multiplayer?room=${gameCode}&classroom=true&host=true`;
+}
+
+/**
+ * Whether this multiplayer entry carries a teacher-launched lesson.
+ *
+ * Deliberately NOT ungated: `lessonGameData` outlives the tab's classroom game
+ * when the teacher leaves without passing through results, so a casual room
+ * opened afterwards would inherit the class vocabulary.
+ */
+export function shouldLoadLessonData(search: string): boolean {
+  const params = new URLSearchParams(search);
+  return params.get('classroom') === 'true' || params.get('fromLesson') === 'true';
+}
+
+/**
+ * The `lessonGameData` sessionStorage payload, as written by ClassroomGameLobby
+ * and read back by useMultiplayerSession. Declared here so the reteach round
+ * can rebuild it without re-importing the lobby.
+ */
+export interface LessonGameData {
+  lessonId: string;
+  lessonName: string;
+  vocabularyWords: string[];
+  language?: string;
+  gameMode?: string;
+  targetWord?: string;
+  /** Team battle: free-for-all or teams, with the teacher's team count. */
+  playStyle?: 'ffa' | 'teams';
+  teamCount?: number;
+  /** SPED-friendly accommodations (ride the startGame payload server-side). */
+  accessibility?: {
+    largeText?: boolean;
+    audioCues?: boolean;
+    participationPoints?: boolean;
+  };
+  templateSettings?: {
+    timerSeconds: number;
+    difficulty: string;
+    minWordLength: number;
+    allowLateJoin: boolean;
+  } | null;
+}
+
+/** The slice of the server-built classroom summary a reteach round needs. */
+export interface ReteachSource {
+  /** Lesson words no one in the room found — the entire reteach vocabulary. */
+  missedWords: string[];
+  lessonIds: string[];
+  lessonNames: string[];
+}
+
+/**
+ * Build the lesson payload for a reteach round: the same lesson, narrowed to
+ * only the words the class missed.
+ *
+ * `previous` is the payload of the round just played (the teacher's own
+ * sessionStorage), so the reteach inherits their mode, timer, and board size
+ * instead of resetting to defaults. It may be null (cleared storage, legacy
+ * deeplink) — then the summary's ids/names are the fallback.
+ *
+ * Returns null when there is nothing to reteach, or when the result would
+ * fail the session reader's own validation (missing lessonId/lessonName) —
+ * staging such a payload would silently re-run the FULL lesson, which is the
+ * exact bug this channel exists to prevent.
+ */
+export function buildReteachLessonData(
+  previous: Partial<LessonGameData> | null,
+  summary: ReteachSource
+): LessonGameData | null {
+  if (!summary.missedWords || summary.missedWords.length === 0) return null;
+
+  const base = previous && typeof previous === 'object' ? previous : {};
+  const lessonId = base.lessonId || summary.lessonIds.join(',');
+  const lessonName = base.lessonName || summary.lessonNames.join(', ');
+  if (!lessonId || !lessonName) return null;
+
+  return {
+    ...base,
+    lessonId,
+    lessonName,
+    vocabularyWords: summary.missedWords,
+    // A Word Hunt target pinned for the full lesson may be a word the class
+    // already found — on a reteach board let the game choose.
+    targetWord: '',
+  };
+}
+
+/**
+ * Stage a reteach round in sessionStorage. Both the phone results page and the
+ * projector recap call this — the host never mounts ClassroomResultsCard, so
+ * the TV recap must use the same writer or a second copy of the payload would
+ * drift. Returns false when there is nothing to reteach or storage is blocked;
+ * callers must not reload on false (that would restage the FULL lesson).
+ */
+export function stageReteachLessonData(summary: ReteachSource): boolean {
+  try {
+    const raw = sessionStorage.getItem('lessonGameData');
+    const previous = raw ? JSON.parse(raw) : null;
+    const reteach = buildReteachLessonData(previous, summary);
+    if (!reteach) return false;
+    sessionStorage.setItem('lessonGameData', JSON.stringify(reteach));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * teacherName on createClassroomGame is UsernameSchema (no `@`, max 30).
+ * Magic-link teachers fall back to email; OAuth names can be longer than 30.
+ * Either one is `Invalid payload` server-side and looks like a dead CREATE ROOM.
+ */
+export function socketTeacherName(
+  user: { email?: string | null; user_metadata?: Record<string, unknown> } | null | undefined,
+  displayName?: string | null,
+): string {
+  const meta = user?.user_metadata;
+  const raw =
+    (displayName && displayName.trim()) ||
+    (typeof meta?.full_name === 'string' ? meta.full_name : '') ||
+    (typeof meta?.name === 'string' ? meta.name : '') ||
+    user?.email?.split('@')[0] ||
+    '';
+  return sanitizeUsername(raw) || 'Teacher';
+}

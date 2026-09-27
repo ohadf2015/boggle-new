@@ -1,0 +1,121 @@
+'use client';
+
+import { Reveal } from '@/components/ui/Reveal';
+import { useTheme } from '@/utils/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+import { Loader } from '@/components/ui/Loader';
+import { GoogleIcon, DiscordIcon } from './icons/BrandIcons';
+import { cn } from '@/lib/utils';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { isNative } from '@/utils/platform';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
+import type { OAuthProvider } from './types';
+
+interface OAuthButtonGroupProps {
+  onSignIn: (provider: 'google' | 'discord') => void;
+  loadingProvider: string | null;
+  disabled?: boolean;
+  className?: string;
+  /**
+   * Soft-sheet / dialog surface id (t_c75cbe59). GSI renderButton bypasses
+   * `onSignIn`, so the mid-funnel `signup_prompt_clicked` would never fire
+   * for the primary Google CTA without threading this into GoogleSignInButton.
+   */
+  analyticsSource?: string;
+}
+
+/**
+ * OAuth sign-in buttons for Google and Discord.
+ * When on CrazyGames platform, shows CrazyGames auth instead.
+ */
+export function OAuthButtonGroup({
+  onSignIn,
+  loadingProvider,
+  disabled = false,
+  className,
+  analyticsSource,
+}: OAuthButtonGroupProps) {
+  const { theme } = useTheme();
+  const { t } = useLanguage();
+  const isDarkMode = theme === 'dark';
+  const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
+
+  const providers: OAuthProvider[] = [
+    {
+      id: 'google',
+      icon: GoogleIcon,
+      label: 'Google',
+      color: isDarkMode
+        ? 'bg-white text-gray-900 hover:bg-gray-100'
+        : 'bg-white text-gray-900 hover:bg-gray-100 border border-gray-300',
+    },
+    {
+      id: 'discord',
+      icon: DiscordIcon,
+      label: 'Discord',
+      color: 'bg-brand-discord text-white hover:bg-brand-discord-hover',
+    },
+  ];
+
+  const isAnyLoading = loadingProvider !== null || disabled;
+
+  // On web with a Google web client configured, use Google's in-page token
+  // button (signInWithIdToken) so the consent screen shows OUR domain instead
+  // of <ref>.supabase.co. Native keeps the SDK redirect path below.
+  const useGsiGoogleButton = !isNative() && !!process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+
+  // On CrazyGames platform, show CrazyGames auth instead of OAuth buttons
+  if (isOnCrazyGamesPlatform) {
+    return (
+      <div className={cn('space-y-3', className)}>
+        <Button
+          onClick={() => showAuthPrompt()}
+          disabled={isAnyLoading}
+          className={cn(
+            'w-full h-12 text-base font-medium rounded-xl transition-all',
+            'bg-neo-pink text-white hover:bg-neo-pink/90'
+          )}
+        >
+          {loadingProvider === 'crazygames' ? (
+            <Loader size="sm" />
+          ) : (
+            <span>{t('auth.loginCrazyGames')}</span>
+          )}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn('space-y-3', className)}>
+      {providers.map((provider) => (
+        <Reveal key={provider.id}>
+          {provider.id === 'google' && useGsiGoogleButton ? (
+            <GoogleSignInButton analyticsSource={analyticsSource} />
+          ) : (
+          <Button
+            onClick={() => onSignIn(provider.id)}
+            disabled={isAnyLoading}
+            className={cn(
+              'w-full h-12 text-base font-medium rounded-xl transition-all',
+              provider.color
+            )}
+          >
+            {loadingProvider === provider.id ? (
+              <Loader size="sm" />
+            ) : (
+              <provider.icon className="w-5 h-5" />
+            )}
+            <span className="ms-2">
+              {t('auth.signInWith', { provider: provider.label })}
+            </span>
+          </Button>
+          )}
+        </Reveal>
+      ))}
+    </div>
+  );
+}
+
+export default OAuthButtonGroup;

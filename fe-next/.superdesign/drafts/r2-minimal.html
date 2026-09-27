@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neo-lime: #BFFF00;
+      --neo-pink: #FF1493;
+      --neo-cyan: #00FFFF;
+      --neo-purple: #8B5CF6;
+      --neo-yellow: #FDE047;
+      --neo-navy: #0F0F1B;
+      --neo-navy-light: #1A1A2E;
+    }
+
+    .font-neo-display { font-family: 'Fredoka', sans-serif; }
+    .font-neo-body { font-family: 'Rubik', sans-serif; }
+
+    .bg-dark-mesh {
+      background-color: var(--neo-navy);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(191, 255, 0, 0.05) 0px, transparent 50%);
+    }
+
+    .glass { 
+      background: rgba(26, 26, 46, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glow-cyan { box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); border: 1px solid rgba(0, 255, 255, 0.4); }
+    .glow-pink { box-shadow: 0 0 15px rgba(255, 20, 147, 0.3); border: 1px solid rgba(255, 20, 147, 0.4); }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(13, 1fr);
+      gap: 6px;
+    }
+
+    .tile-float {
+      box-shadow: 0 8px 16px -4px rgba(0,0,0,0.5);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes soft-pulse {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    .animate-soft-pulse { animation: soft-pulse 2s infinite ease-in-out; }
+  </style>
+</head>
+<body class="font-neo-body">
+  <div class="w-full h-screen flex flex-col bg-dark-mesh text-white relative overflow-hidden">
+    
+    <!-- 1. Sleek Header -->
+    <header class="shrink-0 pt-14 px-5 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <button id="nav-back-link" class="w-9 h-9 flex items-center justify-center bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors">
+          <iconify-icon icon="lucide:chevron-right" class="text-xl rotate-180"></iconify-icon>
+        </button>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-neo-display font-semibold tracking-tight">WordCraft</h1>
+            <span class="bg-neo-yellow text-neo-navy text-[9px] font-bold px-1.5 py-0.5 rounded-full">BETA</span>
+          </div>
+          <p class="text-[10px] text-white/40 font-medium tracking-wide uppercase mt-0.5">Strategic Lexicon Duel</p>
+        </div>
+      </div>
+      <button id="nav-settings-link" class="w-9 h-9 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+        <iconify-icon icon="lucide:settings-2" class="text-xl"></iconify-icon>
+      </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-5 py-4 space-y-6">
+      
+      <!-- 2. Slim Scoreboard -->
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center gap-2">
+          <!-- Player -->
+          <div class="flex-1 glass rounded-2xl p-3 flex items-center gap-3 border-r-2 border-r-neo-lime">
+            <div class="w-10 h-10 rounded-full bg-neo-lime/10 flex items-center justify-center border border-neo-lime/20">
+              <iconify-icon icon="lucide:user" class="text-neo-lime text-lg"></iconify-icon>
+            </div>
+            <div>
+              <p class="text-[9px] text-white/40 font-bold uppercase tracking-widest">אני</p>
+              <p class="text-xl font-neo-display font-bold leading-none">142</p>
+            </div>
+          </div>
+
+          <div class="text-[10px] font-black text-white/20 italic tracking-tighter">VS</div>
+
+          <!-- Bot -->
+          <div class="flex-1 glass rounded-2xl p-3 flex items-center gap-3 border-l-2 border-l-neo-pink">
+            <div class="w-10 h-10 rounded-full bg-neo-pink/10 flex items-center justify-center border border-neo-pink/20">
+              <iconify-icon icon="lucide:bot" class="text-neo-pink text-lg"></iconify-icon>
+            </div>
+            <div class="text-left">
+              <p class="text-[9px] text-white/40 font-bold uppercase tracking-widest">BOT</p>
+              <p class="text-xl font-neo-display font-bold leading-none">98</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="flex items-center justify-between px-4 py-2 bg-white/5 rounded-full border border-white/5 text-[11px]">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-neo-lime animate-soft-pulse"></span>
+            <span class="font-medium text-neo-lime/90 uppercase tracking-widest">תורך לשחק</span>
+          </div>
+          <div class="flex items-center gap-2 text-white/40">
+            <iconify-icon icon="lucide:package"></iconify-icon>
+            <span>נותרו <span class="text-white font-bold">48</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Modern Board -->
+      <div class="mx-auto w-full max-w-[340px]">
+        <div class="board-grid">
+          <!-- Row 1: Mix of empty and premium -->
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+          <div class="aspect-square rounded-sm glow-pink flex items-center justify-center text-[8px] font-black text-neo-pink/60">3W</div>
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+          <div class="aspect-square rounded-sm glow-cyan flex items-center justify-center text-[8px] font-black text-neo-cyan/60">2L</div>
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+          <div class="aspect-square rounded-sm glow-cyan flex items-center justify-center text-[8px] font-black text-neo-cyan/60">2L</div>
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+          <div class="aspect-square rounded-sm glow-pink flex items-center justify-center text-[8px] font-black text-neo-pink/60">3W</div>
+          <div class="aspect-square rounded-sm bg-white/5"></div>
+
+          <!-- Repeating structure for a few visual rows -->
+          <div class="col-span-13 grid grid-cols-13 gap-[6px] opacity-20">
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+          </div>
+
+          <!-- Center Star Row (Minimalist star) -->
+          <div class="col-span-6 grid grid-cols-6 gap-[6px]">
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm glow-cyan flex items-center justify-center text-[8px] font-black text-neo-cyan/60">2L</div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+          </div>
+          <div class="aspect-square bg-white rounded-sm shadow-xl flex items-center justify-center">
+             <iconify-icon icon="lucide:star" class="text-neo-pink text-xs fill-neo-pink"></iconify-icon>
+          </div>
+          <div class="col-span-6 grid grid-cols-6 gap-[6px]">
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm glow-cyan flex items-center justify-center text-[8px] font-black text-neo-cyan/60">2L</div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+            <div class="aspect-square rounded-sm bg-white/5"></div>
+          </div>
+
+          <!-- Placed Tiles Example -->
+          <div class="col-span-5"></div>
+          <div class="aspect-square bg-white rounded-sm tile-float flex items-center justify-center">
+             <span class="text-neo-navy font-neo-display font-bold text-lg">ל</span>
+          </div>
+          <div class="aspect-square bg-white rounded-sm tile-float flex items-center justify-center">
+             <span class="text-neo-navy font-neo-display font-bold text-lg">ש</span>
+          </div>
+          <div class="aspect-square bg-white rounded-sm tile-float flex items-center justify-center">
+             <span class="text-neo-navy font-neo-display font-bold text-lg">ם</span>
+          </div>
+          <div class="col-span-5"></div>
+
+           <div class="col-span-13 h-20"></div>
+        </div>
+      </div>
+
+      <!-- 4. Slim Heat Meter -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-[10px] uppercase font-bold tracking-widest text-white/30 px-1">
+          <span>עוצמת מהלך</span>
+          <span class="text-neo-lime">30%</span>
+        </div>
+        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-l from-neo-lime to-neo-lime/40 rounded-full" style="width: 30%"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- 5. Floating Tile Rack (Card Hand Style) -->
+    <div class="shrink-0 px-4 pb-12 pt-4 relative">
+      <div class="flex justify-center -space-x-3 space-x-reverse h-16">
+        <!-- Card 1 -->
+        <button class="relative w-14 h-18 bg-white rounded-xl tile-float -rotate-6 transform hover:-translate-y-4 transition-all duration-300 ring-2 ring-black/10 flex flex-col items-center justify-center border border-white/20">
+          <span class="text-2xl font-black font-neo-display text-neo-navy">א</span>
+          <span class="absolute bottom-1 right-1.5 text-[9px] font-bold text-neo-navy/50">1</span>
+        </button>
+        <!-- Card 2 (Selected) -->
+        <button class="relative w-14 h-18 bg-neo-lime rounded-xl tile-float -translate-y-3 rotate-0 transform transition-all duration-300 ring-4 ring-neo-lime shadow-[0_12px_24px_-8px_rgba(191,255,0,0.5)] flex flex-col items-center justify-center">
+          <span class="text-2xl font-black font-neo-display text-neo-navy">ב</span>
+          <span class="absolute bottom-1 right-1.5 text-[9px] font-bold text-neo-navy/60">3</span>
+          <div class="absolute -top-1 right-1 w-2.5 h-2.5 rounded-full bg-neo-pink ring-2 ring-neo-navy"></div>
+        </button>
+        <!-- Card 3 -->
+        <button class="relative w-14 h-18 bg-white rounded-xl tile-float rotate-3 transform hover:-translate-y-4 transition-all duration-300 ring-2 ring-black/10 flex flex-col items-center justify-center">
+          <span class="text-2xl font-black font-neo-display text-neo-navy">ג</span>
+          <span class="absolute bottom-1 right-1.5 text-[9px] font-bold text-neo-navy/50">3</span>
+        </button>
+        <!-- Card 4 -->
+        <button class="relative w-14 h-18 bg-white rounded-xl tile-float rotate-6 transform hover:-translate-y-4 transition-all duration-300 ring-2 ring-black/10 flex flex-col items-center justify-center">
+          <span class="text-2xl font-black font-neo-display text-neo-navy">ד</span>
+          <span class="absolute bottom-1 right-1.5 text-[9px] font-bold text-neo-navy/50">2</span>
+        </button>
+        <!-- Card 5 -->
+        <button class="relative w-14 h-18 bg-white rounded-xl tile-float rotate-12 transform hover:-translate-y-4 transition-all duration-300 ring-2 ring-black/10 flex flex-col items-center justify-center">
+          <span class="text-2xl font-black font-neo-display text-neo-navy">ה</span>
+          <span class="absolute bottom-1 right-1.5 text-[9px] font-bold text-neo-navy/50">1</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 6. Fixed Action Bar -->
+    <footer class="shrink-0 glass border-t border-white/10 px-6 py-5 flex items-center justify-between gap-4">
+      <div class="flex gap-3">
+        <button id="action-recall-link" class="w-11 h-11 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+          <iconify-icon icon="lucide:rotate-ccw" class="text-xl"></iconify-icon>
+        </button>
+        <button id="action-shuffle-link" class="w-11 h-11 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+          <iconify-icon icon="lucide:shuffle" class="text-xl"></iconify-icon>
+        </button>
+      </div>
+
+      <button id="action-submit-link" class="flex-1 h-14 bg-neo-lime text-neo-navy rounded-2xl font-neo-display font-bold text-lg flex items-center justify-center gap-3 shadow-[0_8px_20px_-4px_rgba(191,255,0,0.4)] hover:brightness-110 active:scale-[0.98] transition-all">
+        <iconify-icon icon="lucide:check-circle" class="text-2xl"></iconify-icon>
+        שלח מהלך
+      </button>
+
+      <button id="action-pass-link" class="w-11 h-11 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition-colors">
+        <iconify-icon icon="lucide:fast-forward" class="text-xl"></iconify-icon>
+      </button>
+    </footer>
+
+  </div>
+</body>
+</html>

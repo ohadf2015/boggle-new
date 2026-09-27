@@ -1,0 +1,55 @@
+{
+  "title": "Gratis ordförråd spel för klassrummet — Live multiplayer, 6 språk | LexiClash",
+  "description": "Gratis ordförråd spel för klassrummet. Live multiplayer, 1v1 ordförrådsdueller, dina ordlistor. 6 språk inkl. hebreiska och ryska. Vilken webbläsare som helst. Gratis att börja.",
+  "keywords": "vocabulary games for classroom, classroom vocabulary games, free vocabulary games, classroom word games, vocabulary games for students, vocabulary games online free, multiplayer vocabulary game, free vocabulary game for teachers, free word games for kids classroom",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "he": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+    "en": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "sv": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+    "ja": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+    "es": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "ru": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom",
+    "en-IL": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "he-IL": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+    "en-US": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-US": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-GB": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "en-SE": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "sv-SE": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+    "en-JP": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "ja-JP": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+    "en-ES": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-ES": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-MX": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-MX": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-AU": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-AR": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "es-CO": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "ru-RU": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom"
+  },
+  "ogTitle": "Gratis ordförråd spel för klassrummet",
+  "ogDescription": "Live multiplayer ordförråd spel för lärare. Helklassutmaningar, 1v1 dueller, dina ordlistor, 6 språk. Studentkonton alltid gratis.",
+  "ogLocale": "sv_SE",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-sv.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Gratis ordförråd spel för klassrummet"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Gratis ordförråd spel för klassrummet",
+  "twDescription": "Ordförråds spelet som lärare faktiskt använder. Live multiplayer, dueller, dina ordlistor, 6 språk — studentkonton alltid gratis.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-sv.webp"
+  ]
+}

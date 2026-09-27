@@ -1,0 +1,99 @@
+@@ -61,6 +61,28 @@
+     expect(screen.getByText('wordTowerV2.reward.plumb.desc')).toBeTruthy();
+   });
+ 
++  it('given an achievement badge, when rendered, then the description wraps without truncation (no ellipsis, no line-clamp, no truncate class)', () => {
++    const { container } = render(
++      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={() => {}} />,
++    );
++    const descSpan = screen.getByText('wordTowerV2.ach.highRise.desc');
++    const classList = descSpan.className;
++    expect(classList).not.toContain('truncate');
++    expect(classList).not.toContain('line-clamp');
++    expect(classList).not.toContain('ellipsis');
++  });
++
++  it('given a reward crate, when rendered, then the description wraps without truncation (no ellipsis, no line-clamp, no truncate class)', () => {
++    const { container } = render(
++      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'reward', id: 'plumb', priority: 2 }]} onBannerDone={() => {}} />,
++    );
++    const descSpan = screen.getByText('wordTowerV2.reward.plumb.desc');
++    const classList = descSpan.className;
++    expect(classList).not.toContain('truncate');
++    expect(classList).not.toContain('line-clamp');
++    expect(classList).not.toContain('ellipsis');
++  });
++
+   it('given a queue, when rendered, then only the head shows, and it reports done after its time', () => {
+     vi.useFakeTimers();
+     const onDone = vi.fn();
+@@ -117,6 +139,69 @@
+     );
+     expect(screen.getByText('wordTowerV2.newBest')).toBeTruthy();
+   });
++
++  it('given a slab on the hook, when a badge is queued, then it hides until the slab clears', () => {
++    render(
++      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={() => {}} swinging />,
++    );
++    expect(screen.queryByText('wordTowerV2.ach.highRise.name')).toBeNull();
++  });
++});
++
++describe('V2Celebrations banner positioning', () => {
++  it('given no slab on hook, when a banner shows, then it sits below the measured HUD (top-based)', () => {
++    const { container } = render(
++      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={() => {}} />,
++    );
++    const lane = container.querySelectorAll('[aria-live="polite"]')[1]!; // Second aria-live is the banner lane
++    expect(lane.className).toContain('var(--wt2-hud');
++  });
++
++  it('given a slab on hook, when a badge is queued, then the lane disappears (never over drop zone)', () => {
++    vi.useFakeTimers();
++    const { container } = render(
++      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={() => {}} swinging />,
++    );
++    const lane = container.querySelectorAll('[aria-live="polite"]')[1]!;
++    // Lane exists but no card is rendered inside
++    expect(lane.querySelector('[data-testid="banner-card"]')).toBeNull();
++  });
++});
++
++describe('V2Celebrations banner dismissal', () => {
++  it('given a badge on screen, when clicked, then it dismisses immediately', () => {
++    const onDone = vi.fn();
++    render(
++      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={onDone} />,
++    );
++    const button = screen.getByRole('button', { name: /highRise|Five-Story/i });
++    button.click();
++    expect(onDone).toHaveBeenCalledOnce();
++  });
++
++  it('given a badge on screen, when double-clicked quickly, then it dismisses only once', () => {
++    vi.useFakeTimers();
++    const onDone = vi.fn();
++    render(
++      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={onDone} />,
++    );
++    const button = screen.getByRole('button', { name: /highRise|Five-Story/i });
++    act(() => {
++      button.click();
++      button.click();
++    });
++    expect(onDone).toHaveBeenCalledOnce();
++  });
++
++  it('given a badge, when its timer expires, then it auto-dismisses and calls onBannerDone', () => {
++    vi.useFakeTimers();
++    const onDone = vi.fn();
++    render(
++      <V2Celebrations t={t} callout={null} banners={[{ key: 1, kind: 'achievement', id: 'highRise', priority: 4 }]} onBannerDone={onDone} />,
++    );
++    act(() => vi.advanceTimersByTime(2500)); // Timer should fire before 2500ms
++    expect(onDone).toHaveBeenCalledOnce();
++  });
+ });
+ 
+ /**

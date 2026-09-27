@@ -1,0 +1,4 @@
+status: research-only
+attempted: run coverage audit (registry vs live PostHog) + per-mode completion check, fix highest-leverage DEAD/wired-but-silent event
+files_touched: none
+next_steps: quickstart_shuffle_clicked cratered to literal 0 (29->0 w/w) while sibling quickstart_play_clicked on the same component only halved (68->33) — code path (QuickStartStep.tsx:207) checked clean, no recent commit touched it, no bug found by reading. Needs live browser QA on the onboarding quickStart step (agent-browser or Playwriter) to see if the shuffle button is actually clickable/visible in prod. first_win_signup_shown cratered drop is EXPLAINED (dedup fix 74566c5c9, 2026-09-15) — do not re-flag. No per-mode game_started/game_completed hole exists right now (all 10 modes have both sides firing) — the §2 backlog item can be marked resolved unless a future audit finds one again.

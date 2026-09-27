@@ -1,0 +1,38 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build AAB and upload to Play internal testing track (fast propagation, ≤100 testers)"
+  lane :internal do
+    aab = ENV["AAB_PATH"] || "android/app/build/outputs/bundle/release/app-release.aab"
+    changelog = ENV["RELEASE_NOTES"] || `git log -1 --pretty=%B`.strip
+    supply(
+      track: "internal",
+      aab: aab,
+      skip_upload_apk: true,
+      release_status: "completed",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true
+    )
+    UI.success("Uploaded #{aab} to alpha. Changelog: #{changelog}")
+  end
+
+  desc "Promote latest internal build to production"
+  lane :promote_to_production do
+    supply(
+      track: "internal",
+      track_promote_to: "production",
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Verify assetlinks.json via Google Digital Asset Links API"
+  lane :verify_assetlinks do
+    sh("node ../scripts/verify-assetlinks.mjs")
+  end
+end

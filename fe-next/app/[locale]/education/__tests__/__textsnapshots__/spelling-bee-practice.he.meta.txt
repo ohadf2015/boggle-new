@@ -1,0 +1,55 @@
+{
+  "title": "תרגול איות חינם — משחקי מילים להתכוננות לתחרויות | LexiClash",
+  "description": "תרגול איות בחינם דרך משחקי מילים: Boggle, אנגרמות, גלגל מילים ודו-קרבות 1v1. בלי הרשמה, בלי אפליקציה — רק דפדפן.",
+  "keywords": "spelling bee practice online, online spelling bee practice, spelling bee training, spelling games online, spelling practice free, scripps spelling bee practice, classroom spelling bee, spelling games for kids, spelling bee online, spelling competition practice",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/spelling-bee-practice",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "he": "https://www.lexiclash.live/he/education/spelling-bee-practice",
+    "en": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "sv": "https://www.lexiclash.live/sv/education/spelling-bee-practice",
+    "ja": "https://www.lexiclash.live/ja/education/spelling-bee-practice",
+    "es": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "ru": "https://www.lexiclash.live/ru/education/spelling-bee-practice",
+    "en-IL": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "he-IL": "https://www.lexiclash.live/he/education/spelling-bee-practice",
+    "en-US": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "es-US": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "en-GB": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "en-SE": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "sv-SE": "https://www.lexiclash.live/sv/education/spelling-bee-practice",
+    "en-JP": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "ja-JP": "https://www.lexiclash.live/ja/education/spelling-bee-practice",
+    "en-ES": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "es-ES": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "en-MX": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "es-MX": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "en-AU": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "es-AR": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "es-CO": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "ru-RU": "https://www.lexiclash.live/ru/education/spelling-bee-practice"
+  },
+  "ogTitle": "תרגול איות חינם — משחקי מילים להתכוננות לתחרויות | LexiClash",
+  "ogDescription": "תרגול איות בחינם דרך משחקי מילים: Boggle, אנגרמות, גלגל מילים ודו-קרבות 1v1. בלי הרשמה, בלי אפליקציה — רק דפדפן.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/spelling-bee-practice",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "תרגול איות חינם — משחקי מילים להתכוננות לתחרויות | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "תרגול איות חינם — משחקי מילים להתכוננות לתחרויות | LexiClash",
+  "twDescription": "תרגול איות בחינם דרך משחקי מילים: Boggle, אנגרמות, גלגל מילים ודו-קרבות 1v1. בלי הרשמה, בלי אפליקציה — רק דפדפן.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

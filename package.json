@@ -1,0 +1,23 @@
+{
+  "name": "boggle",
+  "version": "1.0.0",
+  "description": "Multiplayer Boggle game with real-time WebSocket",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cd fe-next && npm start",
+    "dev": "cd fe-next && npm run dev",
+    "build": "cd fe-next && npm run build",
+    "prepare": "husky"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "baseline-browser-mapping": "^2.9.19",
+    "husky": "^9.1.7",
+    "puppeteer": "^24.31.0"
+  }
+}

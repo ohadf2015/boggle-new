@@ -1,0 +1,4 @@
+status: research-only
+attempted: ran mandated push_prompt_shown impact check (verdict=regressed, logged to impact-ledger.ndjson), root-caused it to shouldShowPushPrompt() eligibility gate (not the 07-30 fix, confirmed deployed via ancestor check), escalated via telegram alert (fixing needs an async Capacitor-permission rewrite, too risky blind); ran DEAD/CRATERED coverage audit (35 DEAD, confirms carried growth: prefix double-emission finding, no new code fix attempted)
+files_touched: docs/nightly/impact-ledger.ndjson, docs/nightly/reports/2026-08-02.md
+next_steps: (1) human decision on push_prompt_shown eligibility gate rewrite (Capacitor-aware async permission check) — see telegram alert; (2) growth: prefix double-emission still unowned, 3+ weeks carried, drains DEAD list from 35→~8 if resolved; (3) per-mode completion-hole query (STEP1 second query) not reached this run, pick up next lane-12 pass

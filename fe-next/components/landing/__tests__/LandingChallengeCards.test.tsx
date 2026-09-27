@@ -1,0 +1,178 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { LandingChallengeCards } from '../LandingChallengeCards';
+import { MODE_META } from '@/lib/landing/modeMeta';
+
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
+
+vi.mock('@/components/landing/home/HomeDailyHero', () => {
+  const HomeDailyHero = () => <div data-testid="home-daily-hero" />;
+  HomeDailyHero.displayName = 'HomeDailyHero';
+  return { __esModule: true, HomeDailyHero };
+});
+
+vi.mock('@/utils/contextualGuidanceStorage', () => ({
+  shouldShowGuidance: () => false,
+}));
+vi.mock('@/utils/onboardingStorage', () => ({
+  hasCompletedOnboarding: () => true,
+}));
+vi.mock('@/components/daily/DailyChallengeBanner', () => {
+  const DailyChallengeBanner = () => <div data-testid="daily-banner" />;
+  DailyChallengeBanner.displayName = 'DailyChallengeBanner';
+  return { __esModule: true, default: DailyChallengeBanner };
+});
+
+const mockIsVeteran = vi.fn(() => false);
+vi.mock('@/hooks/useIsPracticeVeteran', () => ({
+  useIsPracticeVeteran: () => mockIsVeteran(),
+}));
+
+const mockIsOnCG = vi.fn(() => false);
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: mockIsOnCG() }),
+}));
+
+// Default to "experienced" stats (≥ 3 games) so existing tests retain their
+// "all modes visible" assertions. New newcomer-collapse cases override this.
+const mockUserStats = vi.fn(() => ({ userStats: { totalGamesPlayed: 5 }, isLoading: false }));
+vi.mock('@/hooks/useUserStats', () => ({
+  useUserStats: () => mockUserStats(),
+}));
+
+const baseProps = {
+  language: 'en',
+  activePlayers: 10,
+  openRooms: 2,
+  totalPlayers: 100,
+  playerAllTimeBest: null,
+  t: (key: string) => key,
+  dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
+};
+
+describe('LandingChallengeCards', () => {
+  it('renders arena, and never a practice card', () => {
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.getByText('landing.arena')).toBeInTheDocument();
+    expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
+  });
+
+  it('shows blast mode for all players', () => {
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.getByText('landing.blastMode')).toBeInTheDocument();
+  });
+
+  it('surfaces every shippable mode (connections, brain gym) so players can discover them', () => {
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.getByText('landing.wordChainMode')).toBeInTheDocument();
+    expect(screen.getByText('landing.brainTraining')).toBeInTheDocument();
+  });
+
+  it('renders daily challenge cube', () => {
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.getByTestId('home-daily-hero')).toBeInTheDocument();
+  });
+
+  describe('practice is off the hub for every cohort', () => {
+    afterEach(() => mockIsVeteran.mockReturnValue(false));
+
+    it('is absent for a non-veteran — it used to be the highlighted onramp', () => {
+      mockIsVeteran.mockReturnValue(false);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      const practice = container.querySelector('[data-cube-key="practice"]');
+      expect(practice).toBeNull();
+      // The highlight is rendered as text content "onboarding.welcome.startHere"
+
+    });
+
+    it('is absent from the SP grid too, not merely un-featured', () => {
+      mockIsVeteran.mockReturnValue(false);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      const practice = container.querySelector('[data-cube-key="practice"]');
+      expect(practice).toBeNull();
+
+    });
+
+    it('veteran landing has no practice cube', () => {
+      mockIsVeteran.mockReturnValue(true);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();
+    });
+
+    it('stays absent even though MODE_META.practice.path now resolves to a real route', () => {
+      // Regression guard: MODE_META.practice.path was fixed from the retired
+      // '/practice' to '/singleplayer?autoStart=practice' (see modeMetaRoutes
+      // test) so lib/email/welcomeModes.ts stops linking a dead route. That
+      // fix must NOT resurrect the hub tile — the retirement in 712e2475d is
+      // a data-backed product decision (299 started, 151/50.5% never played a
+      // real game after) independent of whether the path resolves.
+      expect(MODE_META.practice.path).not.toBe('/practice');
+      mockIsVeteran.mockReturnValue(false);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();
+    });
+  });
+
+  describe('CrazyGames bypass — practice gate disabled, every mode open', () => {
+    afterEach(() => {
+      mockIsVeteran.mockReturnValue(false);
+      mockIsOnCG.mockReturnValue(false);
+    });
+
+    it('on CG: no featured-practice row even when player has not graduated', () => {
+      mockIsVeteran.mockReturnValue(false);
+      mockIsOnCG.mockReturnValue(true);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-testid="landing-section-practice-featured"]')).toBeNull();
+    });
+
+    it('on CG: arena/blast/adventure are not locked even for non-veterans', () => {
+      mockIsVeteran.mockReturnValue(false);
+      mockIsOnCG.mockReturnValue(true);
+      render(<LandingChallengeCards {...baseProps} />);
+      // quickPlay removed — practice now shows to all users
+      expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('practice visibility (quickPlay removed)', () => {
+    afterEach(() => mockIsVeteran.mockReturnValue(false));
+
+    it('veterans do not see the practice card', () => {
+      mockIsVeteran.mockReturnValue(true);
+      render(<LandingChallengeCards {...baseProps} />);
+      expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
+      expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
+    });
+
+    it('newcomers see neither practice nor quickPlay', () => {
+      mockIsVeteran.mockReturnValue(false);
+      render(<LandingChallengeCards {...baseProps} />);
+      expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
+      expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('all modes always surfaced — no newcomer collapse', () => {
+    afterEach(() => {
+      mockIsVeteran.mockReturnValue(false);
+    });
+
+    it('brand-new player (0 games) sees every mode — no More-Game-Modes expander', () => {
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+    });
+
+    it('connections + brainGym render above the fold for a brand-new player', () => {
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      // No expander, so the discovery modes live directly in the grid.
+      expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+      expect(container.textContent).toContain('landing.wordChainMode');
+      expect(container.textContent).toContain('landing.brainTraining');
+    });
+  });
+});

@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities#page",
+  "name": "Actividades de fin de año — Juegos de Palabras",
+  "description": "Mantén a los estudiantes comprometidos en los últimos días. Juegos de palabras sin calificación. Gratis para empezar.",
+  "url": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Educación",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Actividades de Fin de Año",
+      "item": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities#resource",
+  "name": "Actividades de fin de año — Juegos de Palabras",
+  "description": "Usa juegos de palabras que no requieren preparación ni corrección. Crea un aula en LexiClash, proyecta el código de clase y juega una ronda de Boggle, Word Wheel, Connections o duelos de vocabulario. El grupo compite, tú recuperas el aliento, y los últimos días del curso siguen contando como aprendizaje. Gratis para empezar.",
+  "url": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+  "inLanguage": "es",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "vocabulario, ortografía, patrones de palabras, categorización, juego colaborativo",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT30M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuál es el mejor juego para la última semana de escuela?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Las búsquedas de palabras estilo Boggle y los rompecabezas Connections funcionan mejor: ritmo rápido, sin ganadores ni perdedores (solo \"¿encontraste las palabras?\"), y todos los estudiantes juegan simultáneamente. Word Wheel es excelente para la velocidad y la competencia ligera."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Pueden mis estudiantes jugar desde casa?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Si los estudiantes tienen dispositivos, pueden unirse a cualquier juego que hospedes ingresando el código de acceso. No necesitan correo electrónico ni cuenta—solo escriben su nombre."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuántos estudiantes pueden jugar a la vez?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Toda la clase. Cualquier número de estudiantes puede unirse a un juego y jugar juntos en vivo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué pasa si un estudiante termina temprano?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En LexiClash, todos los estudiantes juegan el mismo juego al mismo tiempo, así que no hay \"terminar temprano.\" Todos ven el mismo tablero y juegan hasta que se acaba el tiempo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo rastrear qué estudiantes jugaron?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Tu panel de control de clase muestra participación: quién jugó, cuántos juegos, qué palabras encontraron, y patrones de palabras en toda la clase."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Estos juegos enseñan lectura o vocabulario?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Las búsquedas de palabras construyen reconocimiento de patrones y ortografía. Connections enseña categorización y relaciones. Ambos refuerzan el conocimiento activo de palabras sin hojas de trabajo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué si mis estudiantes tienen diferentes niveles de lectura?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Las listas de palabras personalizadas resuelven esto. Usa palabras más fáciles (tres a cinco letras) para estudiantes más jóvenes o lectores más bajos; usa palabras más difíciles para estudiantes avanzados. Todos los estudiantes juegan el mismo juego, pero con palabras adaptadas a su nivel."
+      }
+    }
+  ]
+}

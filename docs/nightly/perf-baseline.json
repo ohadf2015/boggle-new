@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-26",
+  "note": "Supabase MCP connected tonight (unlike 09-24/09-25). Brief's frontend LCP items (imposketch.io/r/FOX4 etc, 28688ms) confirmed CROSS-TENANT NOISE -- $host breakdown shows imposketch.io=435 web_vitals events/24h vs www.lexiclash.live=44, dominating the un-filtered phase-0 aggregate. Filtered to lexiclash host: 44 total events, no single route clears n>50 -- correctly DEFERRED, no regression verdict possible. Backend: pg_stat_statements top-6 by total_exec_time are PostgREST's own schema-cache introspection queries (pg_timezone_names, base_types/pks_fks recursive CTEs, ~20k calls each -- not app-fixable) plus one real app query on analytics_events (event_type=ANY() AND created_at>=X ORDER BY created_at DESC, 12255 calls, mean 36ms) which already has the optimal composite index idx_analytics_events_type_created(event_type, created_at DESC) -- nothing to add. vocabulary_lessons_classroom_id_fkey unindexed advisor item re-checked: table has 23 rows -- an index would be pure write-cost with zero read benefit (seq scan on 23 rows is sub-millisecond), correctly skipped per hard rule (advisor-flagged alone isn't sufficient, needs EXPLAIN ANALYZE justification, and there's no query to EXPLAIN against a 23-row table). auth_db_connections_absolute is a dashboard toggle, not code -- human queue, unchanged. Net: research-only night, no code shipped -- confirmed absence of a real regression is itself the useful result (prevents chasing a phantom fix).",
+  "backend": {
+    "advisor_warnings_count": 2,
+    "shipped": [],
+    "closed": {
+      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified 09-26: table is 23 rows. Index would add write cost for zero measurable read benefit. Advisor INFO-level lint fires regardless of table size -- not a real regression, skip.",
+      "analytics_events_hot_query": "top real app query by total_exec_time (12255 calls, mean 36ms) already covered by idx_analytics_events_type_created(event_type, created_at DESC) matching its WHERE+ORDER BY exactly -- no action needed."
+    },
+    "deferred": {
+      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
+      "realtime_wal_json_parser_cpu": "systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- founder-scope publication-membership call, not this lane's fix"
+    }
+  },
+  "frontend": {
+    "by_route": [],
+    "shipped": [],
+    "note": "lexiclash.live $host total = 44 web_vitals events in 24h across ALL routes -- below the 50-sample floor for even one route. No regression verdict possible tonight. Brief's imposketch.io routes (435 events, dominant in the unfiltered aggregate) are a different app sharing this PostHog project -- excluded, not ours."
+  },
+  "bundle": {
+    "note": "not re-measured tonight (time budget spent on backend/frontend verification+debunking above) -- carrying 09-24 baseline numbers unchanged, no fresh .next build available",
+    "total_kb": 34104,
+    "top_chunks": [
+      { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },
+      { "name": "64789.a961d6eeffd5c081.js", "kb": 808 },
+      { "name": "39299.8ee9a222b588c035.js", "kb": 652 },
+      { "name": "68292.99fcfa5b93f48ce2.js", "kb": 648 },
+      { "name": "82745.8ffb8070ce8dcdba.js", "kb": 628 },
+      { "name": "62972.990f204fadcebf3f.js", "kb": 580 },
+      { "name": "45477.c65b3fc0f14f4c03.js", "kb": 552 },
+      { "name": "1683.19fb6b288823a83f.js", "kb": 500 },
+      { "name": "956.03280bfb46471c90.js", "kb": 488 },
+      { "name": "72539.23a8e6fbbede68ea.js", "kb": 472 }
+    ]
+  }
+}

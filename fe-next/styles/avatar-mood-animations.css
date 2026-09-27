@@ -1,0 +1,62 @@
+/*
+ * Avatar mood wrapper animations.
+ *
+ * Applied to the inner <svg> by AvatarRenderer when a transient mood is active.
+ * Independent of the tier-effects wrapper (outer div in Avatar.tsx) — different
+ * element, so transforms compose rather than clobber.
+ *
+ * Snappy + hard, matching the neo-brutalist brand (no easing mush). One-shot for
+ * pop/shake (the reaction is a beat, not a loop); pulse loops for the duration of
+ * an active streak.
+ *
+ * IMPORTANT: the expression swap (eyes/mouth) is information and lives in the SVG
+ * parts, not here — so reduced-motion users still SEE the reaction. We only drop
+ * the decorative transform.
+ */
+
+.avatar-mood-pop,
+.avatar-mood-shake,
+.avatar-mood-pulse {
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* correct / win — a confident bounce up */
+.avatar-mood-pop {
+  animation: avatar-mood-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) 1;
+}
+@keyframes avatar-mood-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.18); }
+  60% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+/* wrong / lose — a sharp side-to-side headshake */
+.avatar-mood-shake {
+  animation: avatar-mood-shake 0.4s steps(2, end) 2;
+}
+@keyframes avatar-mood-shake {
+  0% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-3px) rotate(-4deg); }
+  75% { transform: translateX(3px) rotate(4deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* streak — an on-fire breathing pulse that loops while the streak holds */
+.avatar-mood-pulse {
+  animation: avatar-mood-pulse 0.6s ease-in-out infinite;
+}
+@keyframes avatar-mood-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-mood-pop,
+  .avatar-mood-shake,
+  .avatar-mood-pulse {
+    animation: none;
+    transform: none;
+  }
+}

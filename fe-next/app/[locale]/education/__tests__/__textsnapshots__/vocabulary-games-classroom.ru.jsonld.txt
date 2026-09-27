@@ -1,0 +1,146 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom#page",
+  "name": "Бесплатные словарные игры для класса — Живой мультиплеер, 6 языков | LexiClash",
+  "description": "Бесплатные словарные игры для класса. Живой мультиплеер, дуэли 1v1, ваши списки слов. Английский, испанский, иврит, шведский, японский, русский. Любой браузер. Бесплатный старт.",
+  "url": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Образование",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Бесплатные словарные игры для класса",
+      "item": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom#resource",
+  "name": "Бесплатные словарные игры для класса — Живой мультиплеер, 6 языков | LexiClash",
+  "description": "Бесплатные словарные игры для класса. Живой мультиплеер, дуэли 1v1, ваши списки слов. Английский, испанский, иврит, шведский, японский, русский. Любой браузер. Бесплатный старт.",
+  "url": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom",
+  "inLanguage": "ru",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Vocabulary Building",
+    "Classroom Activity",
+    "Whole-Class Multiplayer",
+    "Formative Assessment",
+    "ESL Practice"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual word usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Нужна ли регистрация ученикам?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да, но это бесплатно и занимает 30 секунд. Электронная почта или аккаунт Google. Без кредитной карты, без сюрпризов."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Можем ли мы использовать собственные списки слов?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Загрузите список в панель учителя и запустите игры в классе или дуэли 1v1 с вашей лексикой."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Как долго длятся игры?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "3–5 минут. Идеально для разминки, переходов или перерывов. Сложность и время настраиваются."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Какие классы поддерживаются?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Для классов 4–12, программ ESL, взрослых учащихся и двуязычных классов. Сложность адаптируется в каждой игре."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Вы продаёте данные учеников?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Нет, никогда. Мы соответствуем стандартам защиты данных учащихся. Полная приватность гарантирована."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Что если WiFi слабый?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash работает в любом браузере и при любом подключении. Работает на школьном WiFi, планшетах, Chromebook и компьютерах."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Бесплатные словарные игры для класса — Живой мультиплеер, 6 языков | LexiClash",
+  "description": "Бесплатные словарные игры для класса. Живой мультиплеер, дуэли 1v1, ваши списки слов. Английский, испанский, иврит, шведский, японский, русский. Любой браузер. Бесплатный старт.",
+  "url": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "ru"
+}

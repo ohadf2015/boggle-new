@@ -1,0 +1,455 @@
+{
+  "locale": "es",
+  "levels": [
+    {
+      "id": "es-chain-01",
+      "levelNumber": 1,
+      "theme": "onboarding",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "PAN",
+        "GATO"
+      ]
+    },
+    {
+      "id": "es-chain-02",
+      "levelNumber": 2,
+      "theme": "fruits",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "UVA",
+        "PERA",
+        "KIWI"
+      ]
+    },
+    {
+      "id": "es-chain-03",
+      "levelNumber": 3,
+      "theme": "animals",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "OSO",
+        "LEON",
+        "LOBO"
+      ]
+    },
+    {
+      "id": "es-chain-04",
+      "levelNumber": 4,
+      "theme": "food",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "PAN",
+        "SOPA",
+        "MIEL"
+      ]
+    },
+    {
+      "id": "es-chain-05",
+      "levelNumber": 5,
+      "theme": "colors",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "ROJO",
+        "AZUL",
+        "ROSA"
+      ]
+    },
+    {
+      "id": "es-chain-06",
+      "levelNumber": 6,
+      "theme": "ocean",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "OLA",
+        "PEZ",
+        "MAR",
+        "FOCA"
+      ]
+    },
+    {
+      "id": "es-chain-07",
+      "levelNumber": 7,
+      "theme": "space",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "LUNA",
+        "NAVE",
+        "MARTE"
+      ]
+    },
+    {
+      "id": "es-chain-08",
+      "levelNumber": 8,
+      "theme": "animals",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "OSO",
+        "LEON",
+        "LOBO",
+        "PATO"
+      ]
+    },
+    {
+      "id": "es-chain-09",
+      "levelNumber": 9,
+      "theme": "fruits",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "UVA",
+        "PERA",
+        "KIWI",
+        "FRESA"
+      ]
+    },
+    {
+      "id": "es-chain-10",
+      "levelNumber": 10,
+      "theme": "weather",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "NUBE",
+        "RAYO",
+        "NIEVE"
+      ]
+    },
+    {
+      "id": "es-chain-11",
+      "levelNumber": 11,
+      "theme": "animals",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "OSO",
+        "LEON",
+        "LOBO",
+        "PATO",
+        "RANA"
+      ]
+    },
+    {
+      "id": "es-chain-12",
+      "levelNumber": 12,
+      "theme": "food",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "PAN",
+        "SOPA",
+        "MIEL",
+        "ARROZ",
+        "QUESO"
+      ]
+    },
+    {
+      "id": "es-chain-13",
+      "levelNumber": 13,
+      "theme": "nature",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "RIO",
+        "HOJA",
+        "FLOR",
+        "LAGO",
+        "RAMA"
+      ]
+    },
+    {
+      "id": "es-chain-14",
+      "levelNumber": 14,
+      "theme": "space",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "LUNA",
+        "NAVE",
+        "MARTE",
+        "CIELO"
+      ]
+    },
+    {
+      "id": "es-chain-15",
+      "levelNumber": 15,
+      "theme": "animals",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "OSO",
+        "LEON",
+        "LOBO",
+        "PATO",
+        "RANA"
+      ]
+    },
+    {
+      "id": "es-chain-16",
+      "levelNumber": 16,
+      "theme": "ocean",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "OLA",
+        "PEZ",
+        "MAR",
+        "FOCA",
+        "ALGA",
+        "CORAL"
+      ]
+    },
+    {
+      "id": "es-chain-17",
+      "levelNumber": 17,
+      "theme": "joy",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "PAZ",
+        "RISA",
+        "AMOR",
+        "FELIZ",
+        "BAILE",
+        "ALEGRE"
+      ]
+    },
+    {
+      "id": "es-chain-18",
+      "levelNumber": 18,
+      "theme": "cozy",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "TAZA",
+        "LANA",
+        "CALMA",
+        "SUAVE",
+        "TIBIO",
+        "SUENO"
+      ]
+    },
+    {
+      "id": "es-chain-19",
+      "levelNumber": 19,
+      "theme": "fruits",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "UVA",
+        "PERA",
+        "KIWI",
+        "FRESA",
+        "LIMON",
+        "MANGO"
+      ]
+    },
+    {
+      "id": "es-chain-20",
+      "levelNumber": 20,
+      "theme": "spooky",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "GATO",
+        "MIEDO",
+        "BRUJA",
+        "NOCHE",
+        "ARANA",
+        "HUESO"
+      ]
+    },
+    {
+      "id": "es-chain-21",
+      "levelNumber": 21,
+      "theme": "magic",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "HADA",
+        "ELFO",
+        "MAGO",
+        "MAGIA",
+        "GENIO",
+        "POCION"
+      ]
+    },
+    {
+      "id": "es-chain-22",
+      "levelNumber": 22,
+      "theme": "home",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "CASA",
+        "MESA",
+        "CAMA",
+        "SOFA",
+        "SILLA",
+        "PUERTA"
+      ]
+    },
+    {
+      "id": "es-chain-23",
+      "levelNumber": 23,
+      "theme": "school",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "TIZA",
+        "GOMA",
+        "MAPA",
+        "LIBRO",
+        "CLASE",
+        "LAPIZ"
+      ]
+    },
+    {
+      "id": "es-chain-24",
+      "levelNumber": 24,
+      "theme": "space",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "LUNA",
+        "NAVE",
+        "MARTE",
+        "CIELO",
+        "COMETA"
+      ]
+    },
+    {
+      "id": "es-chain-25",
+      "levelNumber": 25,
+      "theme": "transport",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "TREN",
+        "MOTO",
+        "TAXI",
+        "COCHE",
+        "BARCO",
+        "METRO"
+      ]
+    },
+    {
+      "id": "es-chain-26",
+      "levelNumber": 26,
+      "theme": "adventure",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "RIO",
+        "MAPA",
+        "VIAJE",
+        "SENDA",
+        "CUEVA",
+        "TIENDA"
+      ]
+    },
+    {
+      "id": "es-chain-27",
+      "levelNumber": 27,
+      "theme": "ocean",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "OLA",
+        "PEZ",
+        "MAR",
+        "FOCA",
+        "ALGA",
+        "CORAL"
+      ]
+    },
+    {
+      "id": "es-chain-28",
+      "levelNumber": 28,
+      "theme": "mythology",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "OGRO",
+        "MITO",
+        "HEROE",
+        "DIOSA",
+        "NINFA",
+        "TITAN"
+      ]
+    },
+    {
+      "id": "es-chain-29",
+      "levelNumber": 29,
+      "theme": "music",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "NOTA",
+        "CORO",
+        "PIANO",
+        "RITMO",
+        "TAMBOR",
+        "FLAUTA"
+      ]
+    },
+    {
+      "id": "es-chain-30",
+      "levelNumber": 30,
+      "theme": "science",
+      "locale": "es",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "GAS",
+        "IMAN",
+        "ATOMO",
+        "ACIDO",
+        "LASER",
+        "ROBOT"
+      ]
+    }
+  ]
+}

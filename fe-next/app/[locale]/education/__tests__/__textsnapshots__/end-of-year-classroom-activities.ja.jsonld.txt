@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities#page",
+  "name": "学年末活動 — 単語ゲーム",
+  "description": "学年末の授業で生徒を楽しませましょう。採点不要の単語ゲーム。無料で始められます。",
+  "url": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "学年末の活動",
+      "item": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities#resource",
+  "name": "学年末活動 — 単語ゲーム",
+  "description": "LexiClashの単語ゲームを使用してください。準備なし、採点なし。クラスを作成し、生徒に参加コードを与え、Boggle、Word Wheel、Connections、または単語の決闘をプレイしてください。無料で始められます。",
+  "url": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities",
+  "inLanguage": "ja",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "単語力、スペル、単語パターン、カテゴリー化、協力的な遊び",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT30M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "学年末で最高のゲームは何ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Boggleスタイルの単語探しとConnectionsパズルが最適です。テンポが速く、勝者も敗者もありません（「単語を見つけた？」だけ）、全ての生徒が同時にプレイします。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生徒は自宅からプレイできますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。生徒がデバイスを持っていれば、参加コードを入力して、あなたがホストするゲームに参加できます。メールアドレスやアカウントは必要ありません。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "同時に何人の生徒がプレイできますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "クラス全体です。任意の数の生徒がゲームに参加して一緒にプレイできます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生徒が早く終わったらどうしますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClashでは全ての生徒が同じゲームを同時にプレイするため、「早く終わる」ことはありません。全員が同じボードを見て、時間切れまでプレイします。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "どの生徒がプレイしたか追跡できますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。クラスダッシュボードは参加状況を表示します：誰がプレイしたか、何ゲーム、見つけた単語、クラス全体の単語パターン。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "ゲームは読解や単語力を教えていますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。単語探しはパターン認識とスペルを構築します。Connectionsはカテゴリー化と関係を教えます。どちらも能動的な単語知識を強化します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生徒の読解レベルが異なる場合はどうしますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "カスタム単語リストがこれを解決します。若い生徒または読解が苦手な生徒には簡単な単語（3～5文字）を使用してください。全ての生徒が同じゲームをプレイしますが、単語は彼らのレベルに合わせられます。"
+      }
+    }
+  ]
+}

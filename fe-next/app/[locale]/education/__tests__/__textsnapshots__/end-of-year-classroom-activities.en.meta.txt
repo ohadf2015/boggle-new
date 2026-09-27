@@ -1,0 +1,63 @@
+{
+  "title": "End of Year Classroom Activities — Word Games",
+  "description": "Keep students engaged in the final week of term with LexiClash word games. No marking required. Free to start.",
+  "keywords": [
+    "end of year classroom activities",
+    "last day of school games",
+    "final week of school activities",
+    "end of term classroom games",
+    "post-testing activities for students",
+    "engagement games for last week",
+    "word games final week school"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "he": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+    "en": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "sv": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities",
+    "ja": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities",
+    "es": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "ru": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities",
+    "en-IL": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "he-IL": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+    "en-US": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-US": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-GB": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "en-SE": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "sv-SE": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities",
+    "en-JP": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "ja-JP": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities",
+    "en-ES": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-ES": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-MX": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-MX": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-AU": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-AR": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "es-CO": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "ru-RU": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities"
+  },
+  "ogTitle": "End of Year Classroom Activities — Word Games",
+  "ogDescription": "Keep students engaged in the final week of term with LexiClash word games. No marking required. Free to start.",
+  "ogLocale": "en_US",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "End of Year Classroom Activities — Word Games"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "End of Year Classroom Activities — Word Games",
+  "twDescription": "Keep students engaged in the final week of term with LexiClash word games. No marking required. Free to start.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

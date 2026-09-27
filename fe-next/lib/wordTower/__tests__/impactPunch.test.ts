@@ -1,0 +1,41 @@
+/**
+ * Word Tower — impact punch (TDD). Perfect drops / clutch saves land with a
+ * micro zoom-punch + golden flash. Hitstop FEEL without rescaling time — the
+ * scene's sway is phase-locked to the absolute clock, so real time dilation
+ * would desync the crane and the tower.
+ */
+import { describe, it, expect } from 'vitest';
+import { punchScaleAt, PUNCH_MS, MAX_PUNCH, MIN_PUNCH_SCALE } from '../impactPunch';
+
+describe('punchScaleAt', () => {
+  it('is 1 at both ends of the window', () => {
+    expect(punchScaleAt(0, 1)).toBeCloseTo(1, 5);
+    expect(punchScaleAt(PUNCH_MS, 1)).toBeCloseTo(1, 5);
+  });
+
+  it('peaks above 1 early, bounded by 1 + MAX_PUNCH', () => {
+    const peak = punchScaleAt(PUNCH_MS * 0.2, 1);
+    expect(peak).toBeGreaterThan(1.01);
+    expect(peak).toBeLessThanOrEqual(1 + MAX_PUNCH + 0.001);
+  });
+
+  it('zero intensity = flat 1', () => {
+    expect(punchScaleAt(PUNCH_MS * 0.2, 0)).toBe(1);
+  });
+
+  it('outside the window = 1 (safe to call every frame)', () => {
+    expect(punchScaleAt(-50, 1)).toBeCloseTo(1, 5);
+    expect(punchScaleAt(PUNCH_MS * 3, 1)).toBeCloseTo(1, 5);
+  });
+
+  it('negative intensity shrinks briefly but stays above MIN_PUNCH_SCALE', () => {
+    const peak = punchScaleAt(PUNCH_MS * 0.2, -1);
+    expect(peak).toBeLessThan(0.99);
+    expect(peak).toBeGreaterThanOrEqual(MIN_PUNCH_SCALE - 0.001);
+  });
+
+  it('returns to 1 after a negative punch', () => {
+    expect(punchScaleAt(PUNCH_MS, -1)).toBeCloseTo(1, 5);
+    expect(punchScaleAt(PUNCH_MS * 2, -0.7)).toBeCloseTo(1, 5);
+  });
+});

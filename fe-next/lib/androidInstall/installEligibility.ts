@@ -1,0 +1,33 @@
+/**
+ * Platform gate for the persistent Android-install RE-ENTRY surfaces
+ * (the header menu row and the session pill).
+ *
+ * Deliberately narrower than `shouldShowAndroidInstallPromo` in
+ * `utils/androidApp.ts`: that gate also enforces cooldown / once-per-session /
+ * route allowlist because it governs an UNSOLICITED auto-popup. The re-entry
+ * surfaces are USER-INITIATED, so this gate only filters out platforms where
+ * installing the native Android app is impossible or pointless (iOS, the native
+ * shell, an installed standalone PWA). Desktop IS eligible — desktop players are
+ * a deliberate promo target.
+ *
+ * The cooldown is deliberately absent here: the header menu row must stay
+ * reachable after a dismissal. The PILL, which auto-appears rather than waiting
+ * to be asked for, layers `isInstallPromoDismissed()` on top of this gate.
+ */
+
+import { isAndroidInstallPromoUA } from '@/utils/androidApp';
+
+export interface InstallEntryInput {
+  /** navigator.userAgent */
+  ua: string;
+  /** running inside the Capacitor native shell */
+  isCapacitorNative: boolean;
+  /** running as an installed standalone PWA */
+  isStandalone: boolean;
+}
+
+export function isAndroidInstallEntryEligible(input: InstallEntryInput): boolean {
+  if (input.isCapacitorNative) return false;
+  if (input.isStandalone) return false;
+  return isAndroidInstallPromoUA(input.ua);
+}

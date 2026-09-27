@@ -1,0 +1,105 @@
+node_modules
+build
+.env
+.DS_Store
+.claude-memory/
+.memdb/
+.trae/
+.worktrees/
+.tmp-fal/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.next
+
+# Test artifacts and reports
+test-results/
+playwright-report/
+playwriter-report/
+coverage/
+.nyc_output/
+*.lcov
+**/*.venv-rembg
+
+# Test media (screenshots, videos, traces)
+**/*-test-results/
+**/*.spec.png
+**/*.spec.jpg
+**/*.spec.jpeg
+**/*.test.png
+**/*.test.jpg
+**/*.test.jpeg
+**/test-*.png
+**/test-*.jpg
+**/test-*.jpeg
+**/screenshot-*.png
+**/trace-*.zip
+**/*.webm
+**/*.mp4
+**/*.mov
+!fe-next/public/**/*.webm
+!fe-next/public/**/*.mp4
+# portal preview clips are DELIVERABLES, not build noise — the last pair was lost to this ignore rule
+!fe-next/standalone/store-assets/*.mp4
+/test-screenshots
+/screenshots
+fe-next/app-debug.apk
+
+# Temporary files
+tmp/
+fe-next/tmp/
+.vercel
+.claude/worktrees/
+.claude/scheduled_tasks.lock
+fe-next/dist/
+.env.local
+dump.rdb
+
+# Release signing keys
+*.keystore
+*.jks
+supabase/.temp/
+
+# Nightly Intelligence Suite — operational data (regenerated nightly; read locally
+# by stale-fallback + Pass-2 attribution). Briefs feed lanes via env, not via git.
+docs/nightly/intel/
+
+# Local tool caches + scratch backups (never commit)
+.claude/council-cache/
+**/.claude/council-cache/
+*.logo-bak
+
+# Scratch image-generation outputs (source of truth lives in docs/play-games-icons/)
+output/
+
+# Python bytecode cache (nightly tools)
+__pycache__/
+*.pyc
+
+# Nightly runtime data (regenerated each run; artifacts/ideas ARE committed by run.sh, these are not)
+docs/nightly/feedback/
+docs/nightly/reports/
+# mode-qa screenshots are transient visual-QA proof (anti-fabrication on-disk check); not committed (avoid PNG bloat)
+docs/nightly/mode-qa/
+
+# Marketing frame dumps and film renders from the trailer/storyboard pipeline.
+# Hundreds of MB per run (336MB across four dirs on 2026-08-14) and reproducible
+# from the storyboard .md, which IS committed. Kept out so a broad `git add`
+# can't sweep them into a commit.
+docs/marketing/*-frames/
+docs/marketing/*-film/
+docs/marketing/**/*-frames/
+docs/marketing/**/*-film/
+
+# Stray screenshots dropped at the repo root by browser-verification runs.
+# Transient proof-of-render, never referenced by code or docs. Ignored rather
+# than deleted so a concurrent session's in-flight capture is not destroyed.
+/test.png
+/live-*-tooltip.png
+
+# Release artifacts (build output, never commit)
+fe-next/LexiClash-release.apk
+fe-next/LexiClash-release.apk.idsig
+*.apk
+*.idsig

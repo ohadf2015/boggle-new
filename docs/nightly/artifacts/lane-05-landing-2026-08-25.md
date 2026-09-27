@@ -1,0 +1,4 @@
+status: shipped
+attempted: STEP 0 default — improve one admin-beta mode (rotate target, avoid last-3-nights repeats); check feedback ndjson for mode:tweak/polish:try first.
+files_touched: fe-next/lib/word-craft/run/powerCards.ts, fe-next/lib/word-craft/run/__tests__/powerCards.test.ts, docs/nightly/reports/2026-08-25.md
+next_steps: Word Craft/Cards power-card draw is now rarity-weighted (common 10 : rare 4 : legendary 1) instead of a plain shuffle — tests green (15/15). eslint on the 2 changed files was still running in background at end of lane (blgls5fy2); check its output before trusting lint-clean, though the diff is small/typed and low-risk. Next candidate rotation target for lane 05: brain-drill or wheel-rush's sibling word-craft/Gem Hunt sub-mode were both touched more recently than Cards — keep rotating away from Cards/sealed-bid/Connections/Gem Hunt for the next few nights.

@@ -1,0 +1,63 @@
+{
+  "title": "First Day of School Icebreakers | LexiClash",
+  "description": "Classroom icebreaker games that get quiet rooms talking. Low-pressure word games for your first day—no names to memorize, no one on the spot.",
+  "keywords": [
+    "first day of school icebreakers",
+    "back to school icebreaker games",
+    "get to know you games",
+    "classroom icebreakers",
+    "name games for the classroom",
+    "first day of school activities",
+    "icebreakers for middle school"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "he": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+    "en": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "sv": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+    "ja": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+    "es": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "ru": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers",
+    "en-IL": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "he-IL": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+    "en-US": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-US": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-GB": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "en-SE": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "sv-SE": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+    "en-JP": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "ja-JP": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+    "en-ES": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-ES": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-MX": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-MX": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-AU": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-AR": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "es-CO": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "ru-RU": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers"
+  },
+  "ogTitle": "First Day of School Icebreakers | LexiClash",
+  "ogDescription": "Classroom icebreaker games that get quiet rooms talking. Low-pressure word games for your first day—no names to memorize, no one on the spot.",
+  "ogLocale": "en_US",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "First Day of School Icebreakers | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "First Day of School Icebreakers | LexiClash",
+  "twDescription": "Classroom icebreaker games that get quiet rooms talking. Low-pressure word games for your first day—no names to memorize, no one on the spot.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

@@ -1,0 +1,60 @@
+'use client';
+
+import React, { Suspense } from 'react';
+import nextDynamic from 'next/dynamic';
+import { PageLoader } from '@/components/ui/PageLoader';
+import { retryImport } from '@/utils/retryImport';
+import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
+
+// Dynamic — PlayfulBackground pulls in framer-motion, which otherwise blocks
+// first paint before the SinglePlayerView chunk even starts downloading.
+const PlayfulBackground = nextDynamic(
+  () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
+  { ssr: false }
+);
+
+// Loading fallback component with playful design
+function LoadingFallback(): React.JSX.Element {
+  return (
+    <div className="flex-1 flex relative">
+      <PlayfulBackground intensity="medium" colorScheme="game" />
+      <PageLoader size="lg" text="Loading single player..." className="relative z-10" />
+    </div>
+  );
+}
+
+// Dynamic import for code splitting. retryImport so a stale-deploy / flaky
+// network ChunkLoadError retries then cache-busts instead of freezing
+// "Loading single player...". Hang-timeout (10s) covers the case the import
+// never settles (pending forever — retry never runs). ChunkErrorBoundary is
+// outside the chunk so a hang/reject can still render retry/reload.
+// The board is ssr:false — it cannot SSR.
+const SINGLEPLAYER_IMPORT_HANG_MS = 10_000;
+
+const SinglePlayerView = nextDynamic(
+  retryImport(() => import('@/components/singleplayer/SinglePlayerView'), {
+    timeoutMs: SINGLEPLAYER_IMPORT_HANG_MS,
+  }),
+  {
+    loading: LoadingFallback,
+    ssr: false,
+  },
+);
+
+/**
+ * Single Player page route
+ * Handles all single player game modes: Solo vs Bots, Practice, Challenge
+ *
+ * Wrapped in Suspense boundary to properly handle useSearchParams
+ * which can cause "Rendered fewer hooks than expected" errors without it.
+ * See: https://nextjs.org/docs/app/api-reference/functions/use-search-params
+ */
+export default function SinglePlayerPageClient(): React.JSX.Element {
+  return (
+    <ChunkErrorBoundary>
+      <Suspense fallback={<LoadingFallback />}>
+        <SinglePlayerView />
+      </Suspense>
+    </ChunkErrorBoundary>
+  );
+}

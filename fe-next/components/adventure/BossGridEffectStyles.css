@@ -1,0 +1,216 @@
+/* ============================================
+   BOSS GRID EFFECTS — CSS-only animations
+   ============================================
+   Applied via data-boss-effect attribute on .adventure-grid container.
+   Uses child selectors to target tiles without per-tile React state.
+   All animations use GPU-friendly transform/opacity/filter only.
+   ============================================ */
+
+/* ============================================
+   OBSCURE CATEGORY — darken/hide tiles
+   ============================================ */
+
+@keyframes boss-tile-darken {
+  0%   { filter: brightness(1); opacity: 1; }
+  30%  { filter: brightness(0.15); opacity: 0.4; }
+  70%  { filter: brightness(0.2); opacity: 0.5; }
+  100% { filter: brightness(1); opacity: 1; }
+}
+
+.boss-effect-obscure-cavein [role="gridcell"]:nth-child(3n),
+.boss-effect-obscure-cavein [role="gridcell"]:nth-child(5n+1) {
+  animation: boss-tile-darken 1.8s ease-in-out forwards;
+}
+
+.boss-effect-obscure-mirror [role="gridcell"]:nth-child(even) {
+  animation: boss-tile-darken 1.5s ease-in-out forwards;
+  animation-delay: calc(var(--tile-col, 0) * 60ms);
+}
+
+.boss-effect-obscure-quiz [role="gridcell"] {
+  animation: boss-tile-darken 1.2s ease-in-out forwards;
+  animation-delay: calc(var(--tile-index, 0) * 25ms);
+}
+
+/* ============================================
+   ROTATE CATEGORY — grid container transforms
+   ============================================ */
+
+@keyframes boss-board-rock {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(-5deg) scale(0.98); }
+  45%  { transform: rotate(4deg) scale(0.97); }
+  75%  { transform: rotate(-2deg) scale(0.99); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+@keyframes boss-board-spin {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(0.92); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes boss-tile-drift {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(calc((var(--tile-col, 0) - 2) * 3px), calc((var(--tile-row, 0) - 2) * 3px)); }
+  75%  { transform: translate(calc((var(--tile-col, 0) - 2) * -2px), calc((var(--tile-row, 0) - 2) * -2px)); }
+  100% { transform: translate(0, 0); }
+}
+
+.adventure-grid.boss-effect-rotate-board {
+  animation: boss-board-rock 1.2s ease-in-out forwards;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.adventure-grid.boss-effect-rotate-symmetric {
+  animation: boss-board-spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.adventure-grid.boss-effect-rotate-shift [role="gridcell"] {
+  animation: boss-tile-drift 1.0s ease-in-out forwards;
+}
+
+.adventure-grid.boss-effect-rotate-anchor {
+  animation: boss-board-rock 1.0s ease-in-out forwards;
+  transform-origin: center center;
+}
+
+/* ============================================
+   DECAY CATEGORY — tiles visually degrade
+   ============================================ */
+
+@keyframes boss-tile-corrode {
+  0%   { filter: sepia(0) saturate(1); }
+  30%  { filter: sepia(0.9) saturate(0.4) brightness(0.6); }
+  70%  { filter: sepia(0.7) saturate(0.5) brightness(0.7); }
+  100% { filter: sepia(0) saturate(1) brightness(1); }
+}
+
+@keyframes boss-tile-absorb {
+  0%   { transform: scale(1); opacity: 1; }
+  40%  { transform: scale(0.82); opacity: 0.5; filter: brightness(0.4) hue-rotate(200deg); }
+  100% { transform: scale(1); opacity: 1; filter: none; }
+}
+
+@keyframes boss-hazard-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 2px transparent; }
+  50%      { box-shadow: inset 0 0 0 3px rgba(255, 50, 0, 0.9), 0 0 10px rgba(255, 50, 0, 0.5); }
+}
+
+.boss-effect-decay-tiles [role="gridcell"] {
+  animation: boss-tile-corrode 1.8s ease-in-out forwards;
+  animation-delay: calc(var(--tile-index, 0) * 35ms);
+}
+
+.boss-effect-decay-absorption [role="gridcell"]:nth-child(2n) {
+  animation: boss-tile-absorb 1.8s ease-in-out forwards;
+}
+
+.boss-effect-decay-hazard [role="gridcell"] {
+  animation: boss-hazard-pulse 0.5s ease-in-out 3 forwards;
+  animation-delay: calc(var(--tile-index, 0) * 20ms);
+}
+
+.boss-effect-decay-stack [role="gridcell"]:nth-child(n+9) {
+  animation: boss-tile-corrode 1.5s ease-in-out forwards;
+}
+
+/* ============================================
+   SCRAMBLE CATEGORY — letter chaos
+   ============================================ */
+
+@keyframes boss-letter-chaos {
+  0%   { transform: rotate(0deg) scale(1); opacity: 1; }
+  15%  { transform: rotate(-20deg) scale(1.15); opacity: 0.6; }
+  40%  { transform: rotate(15deg) scale(0.85); opacity: 0.4; }
+  65%  { transform: rotate(-8deg) scale(1.1); opacity: 0.7; }
+  100% { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes boss-tile-maze {
+  0%   { opacity: 1; }
+  25%  { opacity: 0.3; filter: brightness(0.7); }
+  75%  { opacity: 0.7; filter: brightness(0.9); }
+  100% { opacity: 1; }
+}
+
+.boss-effect-scramble-full [role="gridcell"] span {
+  animation: boss-letter-chaos 1.2s ease-in-out forwards;
+  animation-delay: calc(var(--tile-index, 0) * 20ms);
+  display: inline-block;
+}
+
+.boss-effect-scramble-maze [role="gridcell"] {
+  animation: boss-tile-maze 1.5s ease-in-out forwards;
+  animation-delay: calc(var(--tile-col, 0) * 80ms);
+}
+
+/* ============================================
+   COSMETIC CATEGORY — overlays and tints
+   ============================================ */
+
+@keyframes boss-sticky-tint {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50%      { box-shadow: 0 0 14px 4px rgba(255, 200, 0, 0.7); }
+}
+
+@keyframes boss-cosmic-burst {
+  0%   { filter: brightness(1) hue-rotate(0deg); }
+  25%  { filter: brightness(2.2) hue-rotate(90deg); }
+  50%  { filter: brightness(1.8) hue-rotate(180deg); }
+  75%  { filter: brightness(1.4) hue-rotate(270deg); }
+  100% { filter: brightness(1) hue-rotate(360deg); }
+}
+
+@keyframes boss-babel-shimmer {
+  0%   { opacity: 1; filter: hue-rotate(0deg); }
+  33%  { opacity: 0.6; filter: hue-rotate(120deg); }
+  66%  { opacity: 0.8; filter: hue-rotate(240deg); }
+  100% { opacity: 1; filter: hue-rotate(0deg); }
+}
+
+.boss-effect-cosmetic-sticky [role="gridcell"] {
+  animation: boss-sticky-tint 1.2s ease-in-out forwards;
+  animation-delay: calc(var(--tile-index, 0) * 30ms);
+}
+
+.boss-effect-cosmetic-allsticky [role="gridcell"] {
+  animation: boss-sticky-tint 0.6s ease-in-out 2 forwards;
+}
+
+.boss-effect-cosmetic-cosmic [role="gridcell"] {
+  animation: boss-cosmic-burst 1.5s ease-in-out forwards;
+  animation-delay: calc(var(--tile-index, 0) * 15ms);
+}
+
+.boss-effect-cosmetic-babel [role="gridcell"] {
+  animation: boss-babel-shimmer 1.5s ease-in-out forwards;
+  animation-delay: calc(var(--tile-col, 0) * 50ms);
+}
+
+/* ============================================
+   REDUCED MOTION — strip animations, keep hints
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .adventure-grid[data-boss-effect] [role="gridcell"],
+  .adventure-grid[data-boss-effect] [role="gridcell"] span,
+  .adventure-grid[data-boss-effect] {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Structural color hints for accessibility */
+  .adventure-grid[data-boss-effect="obscure"] [role="gridcell"]:nth-child(3n) {
+    filter: brightness(0.6);
+  }
+  .adventure-grid[data-boss-effect="decay"] [role="gridcell"] {
+    filter: sepia(0.4);
+  }
+  .adventure-grid[data-boss-effect="scramble"] [role="gridcell"] {
+    filter: blur(1px);
+  }
+}

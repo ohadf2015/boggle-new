@@ -1,0 +1,148 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/spelling-bee-practice#page",
+  "name": "スペリング練習オンライン — 無料単語ゲーム | LexiClash",
+  "description": "無料のスペリング練習。Boggle、アナグラム、ホイール、デュエル。登録なし、アプリなし — ブラウザだけ。",
+  "url": "https://www.lexiclash.live/ja/education/spelling-bee-practice",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/spelling-bee-practice#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "スペリング練習オンライン",
+      "item": "https://www.lexiclash.live/ja/education/spelling-bee-practice"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/spelling-bee-practice#resource",
+  "name": "スペリング練習オンライン — 無料単語ゲーム | LexiClash",
+  "description": "無料のスペリング練習。Boggle、アナグラム、ホイール、デュエル。登録なし、アプリなし — ブラウザだけ。",
+  "url": "https://www.lexiclash.live/ja/education/spelling-bee-practice",
+  "inLanguage": "ja",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Spelling Practice",
+    "Spelling Bee Preparation",
+    "Vocabulary Building",
+    "Pattern Recognition",
+    "Competition Training"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "7-18",
+  "teaches": "Spelling, letter pattern recognition, word recall under time pressure, vocabulary",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/spelling-bee-practice#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "オンラインでスペリング練習を無料でできますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClashはスペリング選手に3つの補完的な練習形式を提供します。Boggleグリッド（ランダムな文字から有効なすべての単語を見つける）、ワードホイール（キュレーションされた文字セットから長い単語を形成する）、アナグラムパズル（文字を目標単語に並べ替える）。すべて無料、登録なし、アプリなし — ブラウザを開いて遊ぶだけです。1日複数の短いセッションはパターン認識と時間プレッシャー下での想起を構築します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "スペリング準備にどのように役立ちますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "スペリング競争はストレス下での想起+単語パターン認識+音声キューの下でのスペリングをテストします。単語ゲームは最初の2つを直接練習します。ワードホイールとBoggleは生徒に文字パターンをスキャンし、有効な単語を素早く認識させます。アナグラムは時間プレッシャー下での文字の並べ替えを練習します — 不慣れな単語を文字ごとにスペリングするのと同じメンタルモーション。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "別のスペリング選手と1v1で練習できますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。語彙デュエルモードを使用して、2人の生徒を同じ文字グリッド上でペアリングします。ターゲットスコアに最初に到達した方が勝ちます。真摯なスペリング選手が一緒に練習するための競争プレッシャーの優れたシミュレーション。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "これは小学校、中学校、高校のスペリングに適していますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい — 難易度は構成可能です。若い選手はより短い単語とより長いタイマーでプレイできます。年上の選手はより長い単語とより厳しい制限時間に直面します。カスタム高度な単語リストはスペリング固有の語彙（ギリシャ語/ラテン語のルーツ、科学用語、地理的な名前）を練習できます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "LexiClashはScripps National Spelling Bee単語リストを使用していますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClashはカスタム単語リストのアップロードをサポートしているため、教師と保護者はScripps研究リスト、地域のスペリング単語銀行、教科書からの学年固有の語彙を含むリストを貼り付けることができます。組み込みリストは熱身練習のための一般的な英語語彙をカバーしています。カスタムリストは競争固有の練習を処理します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "スペリング選手はどのくらいの頻度で練習する必要がありますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "想起練習（Roediger & Karpicke 2006）と分散反復（Cepeda et al. 2008）に関する研究は、週4～5日、10～15分のセッション、数日の間隔を示唆しています。LexiClashセッションはそのパターンに適合するように設計されています。5～10分のマルチプレイヤーラウンド + 2～3分のソロドリル。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "LexiClashは学校のスペリング競争に対応していますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。教師は全クラスのスペリング暖房を実行できます（クラス全員が6文字のコードで参加、学生アカウントなし）、1v1排除戦、またはソロ練習を割り当てます。教師のダッシュボードは生徒ごとの精度と、ほとんどの競争者がつまずいた単語を示しています — レビューセッションのターゲット化に役立ちます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "家で準備している個々の学生にとって無料ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい — 家庭での個人練習は無料で、ユーザーごとの料金はかかりません。ブラウザを開き、モードを選択し、練習を開始します。アカウント不要（オプションのアカウントは進捗を保存し、ストリーク追跡をロック解除します）。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+status: shipped
+files_touched: docs/nightly/ideas/2026-08-14.md (new), docs/nightly/ideas/2026-08-14-reddit.md (new), docs/nightly/reports/2026-08-14.md (appended Lane 4 section)
+next_steps: reddit-fetch.sh feed/search returned jq-parse errors for dailygames/Anagrams/search tonight (only `feed wordgames` worked, and only after retries) — worth a quick look if it stays broken multiple nights; also snapshot returned null score/num_comments so upvote-based filtering was skipped in favor of textual signal, note for lane 7 learnings. Two brain-drill/sealed-bid polish ideas ready for lane 05 to pick up.

@@ -1,0 +1,264 @@
+import React from 'react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
+import { PreResultFanfare } from '../PreResultFanfare';
+import type { MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
+import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
+
+// Default to the desktop (animated) path; the native describe forces static.
+// On the native Android System WebView / mobile renderers, a full-area element
+// that animates its opacity from 0 promotes a fresh GPU compositor layer whose
+// uninitialised backing paints ONE white frame before content composites — the
+// reported "white flash after the first game". The static path must avoid that.
+vi.mock('@/lib/native/webViewLayerFlash', () => ({
+  prefersStaticFullscreenOverlay: vi.fn(() => false),
+}));
+
+// Mock the inner video component. It honours `autoDismissMs` exactly like the
+// real MascotCelebrationVideo (timer → onDone) so we can verify the fanfare
+// auto-advances on its own, not only via the skip button.
+vi.mock('@/components/mascot/MascotCelebrationVideo', () => ({
+  MascotCelebrationVideo: ({ kind, onDone, overlay, forceSrc, autoDismissMs }: any) => {
+    React.useEffect(() => {
+      if (!autoDismissMs || autoDismissMs <= 0) return;
+      const t = window.setTimeout(() => onDone?.(), autoDismissMs);
+      return () => window.clearTimeout(t);
+    }, [autoDismissMs, onDone]);
+    return (
+      <div
+        data-testid="inner-celebration-video"
+        data-kind={kind}
+        data-overlay={overlay}
+        data-force-src={forceSrc}
+        data-auto-dismiss-ms={autoDismissMs}
+      >
+        <button data-testid="trigger-done" onClick={onDone}>
+          Simulate Video Done
+        </button>
+      </div>
+    );
+  },
+}));
+
+// canvas-confetti is dynamically imported inside the component — hoisted mock
+// so the dynamic import resolves to our spy.
+const { confettiMock } = vi.hoisted(() => ({ confettiMock: vi.fn() }));
+vi.mock('canvas-confetti', () => ({ default: confettiMock }));
+
+function setReducedMotion(matches: boolean) {
+  window.matchMedia = ((q: string) => ({
+    matches,
+    media: q,
+    onchange: null,
+    addEventListener() {},
+    removeEventListener() {},
+    addListener() {},
+    removeListener() {},
+    dispatchEvent() {
+      return false;
+    },
+  })) as unknown as typeof window.matchMedia;
+}
+
+describe('PreResultFanfare — pre-result video then transition to results', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('renders the MascotCelebrationVideo with the provided kind as the pre-result moment', () => {
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    const inner = screen.getByTestId('inner-celebration-video');
+    expect(inner).toBeInTheDocument();
+    expect(inner.dataset.kind).toBe('champion');
+    // Should not be the old full-screen overlay style by default for pre
+    expect(inner.dataset.overlay).toBe('false');
+  });
+
+  it('calls onComplete when the video finishes (the signal to transition to result page)', () => {
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="bingo" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    expect(onComplete).not.toHaveBeenCalled();
+
+    // Simulate the video ending (user or auto)
+    act(() => {
+      screen.getByTestId('trigger-done').click();
+    });
+
+    // The component uses a short exit animation timeout before calling onComplete
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('auto-advances to the result page on its own — no skip click required', () => {
+    // REGRESSION: the fanfare passed autoDismissMs={0} to a LOOPing video, so
+    // onEnded never fired and the timer was disabled — the only way out was the
+    // skip button. A player who looked away was stranded on the celebration.
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    // It must arm a real auto-dismiss timer (non-zero), unlike before.
+    const inner = screen.getByTestId('inner-celebration-video');
+    expect(Number(inner.dataset.autoDismissMs)).toBeGreaterThan(0);
+
+    expect(onComplete).not.toHaveBeenCalled();
+
+    // Let the clip play out + the exit animation settle — no interaction at all.
+    act(() => {
+      vi.advanceTimersByTime(6000);
+    });
+
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows a skip control so users can go straight to the result page', () => {
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="streak" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    // The skip should be present (accessible, uses t())
+    const skip = screen.getByRole('button', { name: /skip|results/i });
+    expect(skip).toBeInTheDocument();
+
+    act(() => {
+      skip.click();
+    });
+
+    // Skip also triggers the exit timeout path
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
+    expect(onComplete).toHaveBeenCalled();
+  });
+
+  it('uses the correct kind for different game moments (reuses existing pick logic)', () => {
+    const onComplete = vi.fn();
+    const { rerender } = render(
+      <PreResultFanfare kind="defeat" onComplete={onComplete} t={(k, f) => f || k} />
+    );
+    expect(screen.getByTestId('inner-celebration-video').dataset.kind).toBe('defeat');
+
+    rerender(<PreResultFanfare kind="mission-complete" onComplete={onComplete} t={(k, f) => f || k} />);
+    expect(screen.getByTestId('inner-celebration-video').dataset.kind).toBe('mission-complete');
+  });
+
+  it('fires a colour-matched confetti burst on mount', async () => {
+    vi.useRealTimers();
+    setReducedMotion(false);
+    confettiMock.mockClear();
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    await vi.waitFor(() => expect(confettiMock).toHaveBeenCalled());
+    // champion palette includes the celebration gold
+    const colors = confettiMock.mock.calls[0][0].colors as string[];
+    expect(colors).toContain('#FFE135');
+  });
+
+  it('does NOT fling pure-white confetti (white particles flashed on the dark results page)', async () => {
+    vi.useRealTimers();
+    setReducedMotion(false);
+    confettiMock.mockClear();
+    render(<PreResultFanfare kind="champion" onComplete={vi.fn()} t={(k, f) => f || k} />);
+
+    await vi.waitFor(() => expect(confettiMock).toHaveBeenCalled());
+    for (const call of confettiMock.mock.calls) {
+      const colors = ((call[0].colors as string[]) || []).map((c) => c.toUpperCase());
+      expect(colors).not.toContain('#FFFFFF');
+    }
+  });
+
+  it('renders a screen-edge glow vignette (like the fanfare demo) hugging the sides', () => {
+    setReducedMotion(false);
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    const glow = screen.getByTestId('pre-result-edge-glow');
+    expect(glow).toBeInTheDocument();
+    // Vignette = transparent center, colour only past the outer radius
+    expect(glow.getAttribute('style')).toMatch(/radial-gradient/i);
+    expect(glow).toHaveAttribute('aria-hidden');
+  });
+
+  it('does NOT render the edge glow under reduced motion (hands off immediately)', () => {
+    setReducedMotion(true);
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="bingo" onComplete={onComplete} t={(k, f) => f || k} />);
+    expect(screen.queryByTestId('pre-result-edge-glow')).not.toBeInTheDocument();
+    setReducedMotion(false);
+  });
+
+  it('does NOT fire confetti (and skips straight to results) under reduced motion', () => {
+    setReducedMotion(true);
+    confettiMock.mockClear();
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="bingo" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    // Reduced-motion path hands off immediately and shows no video/confetti
+    expect(onComplete).toHaveBeenCalled();
+    expect(confettiMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('inner-celebration-video')).not.toBeInTheDocument();
+    setReducedMotion(false); // restore for other tests
+  });
+
+  it('on DESKTOP the edge glow uses the opacity-in pulse animation (keeps the juice)', () => {
+    setReducedMotion(false);
+    vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(false);
+    render(<PreResultFanfare kind="champion" onComplete={vi.fn()} t={(k, f) => f || k} />);
+
+    const glow = screen.getByTestId('pre-result-edge-glow');
+    // Desktop animates the glow in (opacity 0 → 1 keyframe) for the entrance pop.
+    expect(glow.className).toContain('animate-[preFanfareEdgeGlow');
+  });
+
+  describe('native / mobile static variant (no GPU-layer white flash)', () => {
+    beforeEach(() => {
+      setReducedMotion(false);
+      vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(true);
+    });
+    afterEach(() => {
+      vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(false);
+    });
+
+    it('renders the edge glow WITHOUT an opacity-0 entrance animation (no fresh GPU layer)', () => {
+      render(<PreResultFanfare kind="champion" onComplete={vi.fn()} t={(k, f) => f || k} />);
+
+      const glow = screen.getByTestId('pre-result-edge-glow');
+      // The `preFanfareEdgeGlow` keyframe starts at opacity:0 — animating it from
+      // 0 is exactly what promotes the white-backed compositor layer. On native it
+      // must NOT run; the glow paints statically in the normal document layer.
+      expect(glow.className).not.toContain('animate-[preFanfareEdgeGlow');
+      expect(glow.className).not.toContain('animate-');
+      // It must paint from the first frame at a settled, non-zero opacity (so it
+      // is visible without an entrance tween), not start hidden.
+      expect(glow.style.opacity).not.toBe('');
+      expect(Number(glow.style.opacity)).toBeGreaterThan(0);
+    });
+
+    it('marks the fanfare root as the static overlay variant', () => {
+      render(<PreResultFanfare kind="bingo" onComplete={vi.fn()} t={(k, f) => f || k} />);
+      expect(screen.getByTestId('pre-result-fanfare')).toHaveAttribute('data-static-overlay', 'true');
+    });
+
+    it('still shows the mascot video and auto-advances to results on the static path', () => {
+      const onComplete = vi.fn();
+      render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+      expect(screen.getByTestId('inner-celebration-video')).toBeInTheDocument();
+      expect(onComplete).not.toHaveBeenCalled();
+      act(() => {
+        vi.advanceTimersByTime(6000);
+      });
+      expect(onComplete).toHaveBeenCalledTimes(1);
+    });
+  });
+});

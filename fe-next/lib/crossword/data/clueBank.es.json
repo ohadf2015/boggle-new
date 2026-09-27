@@ -1,0 +1,2494 @@
+{
+  "abeja": {
+    "clue": "Insecto productor de miel",
+    "score": 45
+  },
+  "acero": {
+    "clue": "Metal duro y resistente usado en construcción",
+    "score": 77
+  },
+  "agua": {
+    "clue": "Líquido vital para vivir",
+    "score": 90
+  },
+  "aguja": {
+    "clue": "Se enhebra para coser",
+    "score": 80
+  },
+  "ala": {
+    "clue": "Extremidad para volar en las aves",
+    "score": 90
+  },
+  "alga": {
+    "clue": "Planta del fondo marino",
+    "score": 45
+  },
+  "alma": {
+    "clue": "Esencia inmortal de una persona",
+    "score": 80
+  },
+  "amiga": {
+    "clue": "Compañera de confianza",
+    "score": 80
+  },
+  "amigo": {
+    "clue": "Compañero de confianza",
+    "score": 80
+  },
+  "amor": {
+    "clue": "Sentimiento de afecto profundo",
+    "score": 45
+  },
+  "ancla": {
+    "clue": "Objeto que sujeta el barco en el agua",
+    "score": 45
+  },
+  "araña": {
+    "clue": "Tejedor de redes en la naturaleza",
+    "score": 80
+  },
+  "arco": {
+    "clue": "Estructura curva que sostiene peso",
+    "score": 45
+  },
+  "arena": {
+    "clue": "Material en playas y desiertos",
+    "score": 45
+  },
+  "arma": {
+    "clue": "Instrumento para la defensa o el ataque",
+    "score": 45
+  },
+  "arpa": {
+    "clue": "Instrumento musical de cuerdas y forma triangular",
+    "score": 40
+  },
+  "arroz": {
+    "clue": "Grano básico de Oriente",
+    "score": 45
+  },
+  "asno": {
+    "clue": "Equino de orejas largas y testuz resistente",
+    "score": 65
+  },
+  "atun": {
+    "clue": "Pez marino comestible",
+    "score": 42
+  },
+  "avena": {
+    "clue": "Grano para el desayuno",
+    "score": 45
+  },
+  "avion": {
+    "clue": "Vehículo que surca los cielos",
+    "score": 45
+  },
+  "azul": {
+    "clue": "Color del cielo despejado",
+    "score": 80
+  },
+  "bahia": {
+    "clue": "Ensenada costera",
+    "score": 80
+  },
+  "baile": {
+    "clue": "Movimiento rítmico al son de la música",
+    "score": 45
+  },
+  "balon": {
+    "clue": "Objeto esférico de juego deportivo",
+    "score": 45
+  },
+  "bambu": {
+    "clue": "Planta que come el panda",
+    "score": 57
+  },
+  "banco": {
+    "clue": "Asiento con respaldo en un parque",
+    "score": 80
+  },
+  "barba": {
+    "clue": "Vello facial del hombre",
+    "score": 80
+  },
+  "barco": {
+    "clue": "Embarcación de vela o motor",
+    "score": 45
+  },
+  "barro": {
+    "clue": "Mezcla de tierra y agua",
+    "score": 80
+  },
+  "bata": {
+    "clue": "Prenda que se viste en casa o el consultorio",
+    "score": 30
+  },
+  "beso": {
+    "clue": "Muestra de afecto con los labios",
+    "score": 80
+  },
+  "bicho": {
+    "clue": "Insecto diminuto del jardín",
+    "score": 45
+  },
+  "boca": {
+    "clue": "Apertura para comer y hablar",
+    "score": 92
+  },
+  "boda": {
+    "clue": "Ceremonia donde se unen dos en matrimonio",
+    "score": 30
+  },
+  "bolsa": {
+    "clue": "Receptáculo de tela o papel",
+    "score": 80
+  },
+  "bomba": {
+    "clue": "Dispositivo para extraer agua",
+    "score": 45
+  },
+  "bota": {
+    "clue": "Calzado que llega a la rodilla",
+    "score": 80
+  },
+  "boton": {
+    "clue": "Cierre de prenda",
+    "score": 45
+  },
+  "brazo": {
+    "clue": "Extremidad para abrazar o trabajar",
+    "score": 80
+  },
+  "bueno": {
+    "clue": "De excelente calidad",
+    "score": 80
+  },
+  "burro": {
+    "clue": "Équido de orejas largas y hocico largo",
+    "score": 80
+  },
+  "buzon": {
+    "clue": "Donde llega la correspondencia",
+    "score": 45
+  },
+  "buho": {
+    "clue": "Ave nocturna cazadora",
+    "score": 45
+  },
+  "cabra": {
+    "clue": "Animal saltador de montaña",
+    "score": 45
+  },
+  "cafe": {
+    "clue": "Bebida oscura y aromática",
+    "score": 45
+  },
+  "caja": {
+    "clue": "Recipiente de cartón",
+    "score": 45
+  },
+  "cajon": {
+    "clue": "Compartimiento del escritorio",
+    "score": 80
+  },
+  "caldo": {
+    "clue": "Base de muchas sopas y guisos",
+    "score": 80
+  },
+  "calle": {
+    "clue": "Vía pública de tránsito",
+    "score": 45
+  },
+  "cama": {
+    "clue": "Mueble para dormir",
+    "score": 45
+  },
+  "canoa": {
+    "clue": "Embarcación ligera de remos",
+    "score": 45
+  },
+  "capa": {
+    "clue": "Vestidura que ondea al viento",
+    "score": 80
+  },
+  "carne": {
+    "clue": "Proteína del bistec",
+    "score": 45
+  },
+  "carpa": {
+    "clue": "Gran lona de circo",
+    "score": 80
+  },
+  "carro": {
+    "clue": "Lo que conduces en la calle",
+    "score": 80
+  },
+  "carta": {
+    "clue": "Se envía por correo",
+    "score": 80
+  },
+  "casa": {
+    "clue": "Vivienda de una familia",
+    "score": 80
+  },
+  "casco": {
+    "clue": "Protección para la cabeza",
+    "score": 80
+  },
+  "cebra": {
+    "clue": "Animal de rayas blancas y negras",
+    "score": 45
+  },
+  "cedro": {
+    "clue": "Árbol aromático de madera valiosa",
+    "score": 45
+  },
+  "ceja": {
+    "clue": "Pelo sobre el ojo",
+    "score": 65
+  },
+  "cerdo": {
+    "clue": "Animal de corral con hocico",
+    "score": 45
+  },
+  "cerro": {
+    "clue": "Elevación del terreno",
+    "score": 45
+  },
+  "cesta": {
+    "clue": "Recipiente tejido para alimentos",
+    "score": 45
+  },
+  "chica": {
+    "clue": "Muchacha joven",
+    "score": 65
+  },
+  "chile": {
+    "clue": "Condimento picante",
+    "score": 30
+  },
+  "chivo": {
+    "clue": "Animal barbudo de la granja",
+    "score": 45
+  },
+  "cielo": {
+    "clue": "Bóveda azul de día",
+    "score": 90
+  },
+  "cinta": {
+    "clue": "Tira flexible para empacar",
+    "score": 80
+  },
+  "circo": {
+    "clue": "Espectáculo con acróbatas y animales",
+    "score": 30
+  },
+  "cisne": {
+    "clue": "Ave blanca y elegante de lagos",
+    "score": 45
+  },
+  "clavo": {
+    "clue": "Puntilla metálica que cuelga cuadros",
+    "score": 80
+  },
+  "cobra": {
+    "clue": "Serpiente con capucha",
+    "score": 65
+  },
+  "coco": {
+    "clue": "Fruto tropical con cáscara dura",
+    "score": 45
+  },
+  "codo": {
+    "clue": "Articulación entre brazo y antebrazo",
+    "score": 80
+  },
+  "cofre": {
+    "clue": "Caja de madera para guardar cosas valiosas",
+    "score": 30
+  },
+  "cola": {
+    "clue": "Fila de personas esperando",
+    "score": 80
+  },
+  "color": {
+    "clue": "Matiz o tonalidad de la luz",
+    "score": 45
+  },
+  "comer": {
+    "clue": "Probar bocados sabrosos",
+    "score": 65
+  },
+  "copa": {
+    "clue": "Vasija para beber vino",
+    "score": 92
+  },
+  "coral": {
+    "clue": "Animalito marino que forma arrecifes",
+    "score": 45
+  },
+  "costa": {
+    "clue": "Línea donde la tierra se junta con el mar",
+    "score": 30
+  },
+  "cubo": {
+    "clue": "Forma geométrica de seis caras cuadradas",
+    "score": 80
+  },
+  "cueva": {
+    "clue": "Refugio subterráneo natural",
+    "score": 65
+  },
+  "cuna": {
+    "clue": "Cama para recién nacido",
+    "score": 92
+  },
+  "dado": {
+    "clue": "Cubo de juego con números",
+    "score": 80
+  },
+  "daga": {
+    "clue": "Arma blanca pequeña",
+    "score": 80
+  },
+  "dalia": {
+    "clue": "Flor de pétalos vistosos",
+    "score": 45
+  },
+  "dardo": {
+    "clue": "Proyectil puntiagudo para lanzar",
+    "score": 80
+  },
+  "dedo": {
+    "clue": "Extremo que levanta para señalar",
+    "score": 80
+  },
+  "diosa": {
+    "clue": "Figura femenina mitológica",
+    "score": 80
+  },
+  "disco": {
+    "clue": "Soporte circular de música",
+    "score": 80
+  },
+  "dolor": {
+    "clue": "Sensación desagradable del cuerpo",
+    "score": 80
+  },
+  "dulce": {
+    "clue": "Sabor agradable al paladar",
+    "score": 65
+  },
+  "enano": {
+    "clue": "Persona de pequeña estatura",
+    "score": 80
+  },
+  "erizo": {
+    "clue": "Mamífero nocturno con púas que se enrolla en bola",
+    "score": 65
+  },
+  "esqui": {
+    "clue": "Deporte en pistas nevadas",
+    "score": 80
+  },
+  "falda": {
+    "clue": "Prenda femenina sin perneras",
+    "score": 45
+  },
+  "faro": {
+    "clue": "Torre que guía a los navegantes",
+    "score": 45
+  },
+  "farol": {
+    "clue": "Luz que cuelga en la calle",
+    "score": 80
+  },
+  "feria": {
+    "clue": "Fiesta popular con atracciones y juegos",
+    "score": 80
+  },
+  "filo": {
+    "clue": "Bordes afilados de cuchillo o espada",
+    "score": 80
+  },
+  "flor": {
+    "clue": "Parte colorida de la planta",
+    "score": 45
+  },
+  "foca": {
+    "clue": "Mamífero marino que ladra",
+    "score": 65
+  },
+  "forma": {
+    "clue": "Figura o silueta de un cuerpo",
+    "score": 80
+  },
+  "fresa": {
+    "clue": "Fruta roja con semillas afuera",
+    "score": 80
+  },
+  "fruta": {
+    "clue": "Manzana, naranja o plátano",
+    "score": 80
+  },
+  "frio": {
+    "clue": "Contrario al calor",
+    "score": 65
+  },
+  "fuego": {
+    "clue": "Llamas que calientan",
+    "score": 77
+  },
+  "fenix": {
+    "clue": "Ave mitológica que renace de sus cenizas",
+    "score": 45
+  },
+  "gallo": {
+    "clue": "Cantante madrugador de la granja",
+    "score": 45
+  },
+  "gamba": {
+    "clue": "Crustáceo marino de agua salada",
+    "score": 80
+  },
+  "ganso": {
+    "clue": "Ave acuática que grazna en la granja",
+    "score": 45
+  },
+  "garza": {
+    "clue": "Ave de largas patas y pico",
+    "score": 45
+  },
+  "gato": {
+    "clue": "Felino que ronronea",
+    "score": 65
+  },
+  "gema": {
+    "clue": "Piedra valiosa para joyas",
+    "score": 80
+  },
+  "gol": {
+    "clue": "Tanto en fútbol",
+    "score": 90
+  },
+  "golpe": {
+    "clue": "Impacto o contacto violento",
+    "score": 65
+  },
+  "goma": {
+    "clue": "Útil escolar que borra el lápiz",
+    "score": 80
+  },
+  "gorra": {
+    "clue": "Prenda con visera para el sol",
+    "score": 45
+  },
+  "gota": {
+    "clue": "Pequeña porción de líquido",
+    "score": 80
+  },
+  "gruta": {
+    "clue": "Caverna natural",
+    "score": 45
+  },
+  "hacha": {
+    "clue": "Herramienta para cortar leña",
+    "score": 80
+  },
+  "hada": {
+    "clue": "Ser mágico de los cuentos",
+    "score": 80
+  },
+  "heno": {
+    "clue": "Pasto seco para el ganado",
+    "score": 80
+  },
+  "higo": {
+    "clue": "Fruto dulce de árbol mediterráneo",
+    "score": 45
+  },
+  "hilo": {
+    "clue": "Cordel delgado para coser",
+    "score": 80
+  },
+  "hoja": {
+    "clue": "Brota del árbol en primavera",
+    "score": 45
+  },
+  "horno": {
+    "clue": "Donde se cuece el pan",
+    "score": 45
+  },
+  "hueso": {
+    "clue": "Estructura dura del esqueleto",
+    "score": 45
+  },
+  "huevo": {
+    "clue": "Producto de la gallina",
+    "score": 45
+  },
+  "humo": {
+    "clue": "Vapor que sale del fuego",
+    "score": 80
+  },
+  "iman": {
+    "clue": "Atrae el hierro y acero",
+    "score": 65
+  },
+  "isla": {
+    "clue": "Tierra rodeada de agua",
+    "score": 80
+  },
+  "jabon": {
+    "clue": "Limpiador corporal sólido",
+    "score": 65
+  },
+  "jamon": {
+    "clue": "Embutido de cerdo ibérico y curado",
+    "score": 80
+  },
+  "jarra": {
+    "clue": "Vasija para servir bebidas",
+    "score": 45
+  },
+  "jaula": {
+    "clue": "Prisión para aves",
+    "score": 45
+  },
+  "joya": {
+    "clue": "Piedra preciosa valiosa",
+    "score": 80
+  },
+  "juego": {
+    "clue": "Entretenimiento con reglas",
+    "score": 80
+  },
+  "junco": {
+    "clue": "Planta acuática de tallos huecos",
+    "score": 45
+  },
+  "labio": {
+    "clue": "Borde de la boca",
+    "score": 45
+  },
+  "lago": {
+    "clue": "Cuerpo de agua dulce",
+    "score": 80
+  },
+  "lana": {
+    "clue": "Fibra de oveja o cabra que se teje",
+    "score": 80
+  },
+  "lava": {
+    "clue": "Magma expulsada por volcán",
+    "score": 80
+  },
+  "leche": {
+    "clue": "Producto blanco que da la vaca",
+    "score": 90
+  },
+  "leon": {
+    "clue": "Rey de la selva",
+    "score": 45
+  },
+  "libro": {
+    "clue": "Obra escrita para leer",
+    "score": 80
+  },
+  "limon": {
+    "clue": "Fruta ácida y amarilla",
+    "score": 92
+  },
+  "lince": {
+    "clue": "Felino salvaje de orejas puntudas",
+    "score": 80
+  },
+  "llama": {
+    "clue": "Fuego que brilla y calienta",
+    "score": 80
+  },
+  "llave": {
+    "clue": "Abre cerraduras",
+    "score": 65
+  },
+  "lobo": {
+    "clue": "Aullador de la noche en bosques",
+    "score": 45
+  },
+  "lodo": {
+    "clue": "Tierra mojada del río",
+    "score": 80
+  },
+  "lomo": {
+    "clue": "Corte de carne entre el costillar y la cadera",
+    "score": 65
+  },
+  "loro": {
+    "clue": "Ave que repite palabras",
+    "score": 30
+  },
+  "luna": {
+    "clue": "Satélite terrestre que brilla de noche",
+    "score": 80
+  },
+  "luz": {
+    "clue": "Lo opuesto a la oscuridad",
+    "score": 90
+  },
+  "lapiz": {
+    "clue": "Utensilio de madera para escribir",
+    "score": 80
+  },
+  "magia": {
+    "clue": "Arte de asombrar con trucos",
+    "score": 80
+  },
+  "mago": {
+    "clue": "Prestidigitador o hechicero",
+    "score": 65
+  },
+  "mango": {
+    "clue": "Asidero de herramienta",
+    "score": 80
+  },
+  "manta": {
+    "clue": "Tela para cubrirse en cama o playa",
+    "score": 92
+  },
+  "mapa": {
+    "clue": "Representación gráfica de un territorio",
+    "score": 80
+  },
+  "mar": {
+    "clue": "Extensión de agua salada",
+    "score": 90
+  },
+  "maiz": {
+    "clue": "Cereal de granos amarillos en la mazorca",
+    "score": 60
+  },
+  "mecha": {
+    "clue": "Lo que arde en una vela o lámpara",
+    "score": 80
+  },
+  "melon": {
+    "clue": "Fruta redonda de verano",
+    "score": 80
+  },
+  "menta": {
+    "clue": "Sabor fresco de caramelos y chicles",
+    "score": 80
+  },
+  "mesa": {
+    "clue": "Mueble donde se come o se trabaja",
+    "score": 57
+  },
+  "metal": {
+    "clue": "Elemento dúctil que conduce electricidad",
+    "score": 65
+  },
+  "miel": {
+    "clue": "Lo que producen las abejas",
+    "score": 80
+  },
+  "mirlo": {
+    "clue": "Ave negra y melodiosa",
+    "score": 45
+  },
+  "mono": {
+    "clue": "Primate de cola larga",
+    "score": 80
+  },
+  "mora": {
+    "clue": "Baya oscura de la zarza",
+    "score": 45
+  },
+  "morsa": {
+    "clue": "Mamífero ártico con largos colmillos",
+    "score": 65
+  },
+  "mosca": {
+    "clue": "Insecto molesto que posa en la comida",
+    "score": 45
+  },
+  "mujer": {
+    "clue": "Persona de sexo femenino",
+    "score": 80
+  },
+  "mural": {
+    "clue": "Pintura decorativa de gran tamaño",
+    "score": 92
+  },
+  "musgo": {
+    "clue": "Planta que crece en rocas húmedas",
+    "score": 45
+  },
+  "muslo": {
+    "clue": "Parte de la pierna entre cadera y rodilla",
+    "score": 30
+  },
+  "nabo": {
+    "clue": "Raíz comestible de huerto blanca",
+    "score": 92
+  },
+  "nadar": {
+    "clue": "Desplazarse en el agua con brazos y piernas",
+    "score": 65
+  },
+  "nariz": {
+    "clue": "Órgano del olfato",
+    "score": 80
+  },
+  "negro": {
+    "clue": "Color del carbón",
+    "score": 80
+  },
+  "nido": {
+    "clue": "Hogar de las aves",
+    "score": 45
+  },
+  "nieve": {
+    "clue": "Copos blancos del invierno",
+    "score": 90
+  },
+  "niño": {
+    "clue": "Pequeño varón en edad infantil",
+    "score": 90
+  },
+  "noche": {
+    "clue": "Ausencia de luz solar",
+    "score": 80
+  },
+  "nogal": {
+    "clue": "Árbol que produce nueces",
+    "score": 30
+  },
+  "norte": {
+    "clue": "Dirección geográfica boreal",
+    "score": 80
+  },
+  "nube": {
+    "clue": "Velo blanco del firmamento",
+    "score": 90
+  },
+  "nudo": {
+    "clue": "Lazo apretado que asegura dos cabos",
+    "score": 80
+  },
+  "nuez": {
+    "clue": "Fruto seco con cáscara dura",
+    "score": 45
+  },
+  "oasis": {
+    "clue": "Vergel en medio del desierto",
+    "score": 80
+  },
+  "ojo": {
+    "clue": "Órgano de la visión",
+    "score": 90
+  },
+  "ola": {
+    "clue": "Movimiento del agua marina",
+    "score": 90
+  },
+  "olivo": {
+    "clue": "Árbol que da aceitunas",
+    "score": 45
+  },
+  "olla": {
+    "clue": "Recipiente para guisos y caldos",
+    "score": 45
+  },
+  "orca": {
+    "clue": "Cetáceo depredador inteligente",
+    "score": 65
+  },
+  "oreja": {
+    "clue": "Parte del cuerpo para escuchar",
+    "score": 80
+  },
+  "oro": {
+    "clue": "Metal precioso",
+    "score": 90
+  },
+  "oruga": {
+    "clue": "Larva que se convierte en mariposa",
+    "score": 80
+  },
+  "oso": {
+    "clue": "Plantígrado pardo de gran envergadura",
+    "score": 90
+  },
+  "ostra": {
+    "clue": "Molusco que produce perlas",
+    "score": 65
+  },
+  "otoño": {
+    "clue": "Estación de hojas y temperaturas frescas",
+    "score": 80
+  },
+  "oveja": {
+    "clue": "Productora de lana",
+    "score": 45
+  },
+  "oido": {
+    "clue": "Sentido auditivo",
+    "score": 65
+  },
+  "pala": {
+    "clue": "Herramienta para cavar",
+    "score": 80
+  },
+  "pan": {
+    "clue": "Alimento hecho con harina",
+    "score": 90
+  },
+  "pared": {
+    "clue": "Superficie que cierra una habitación",
+    "score": 80
+  },
+  "pata": {
+    "clue": "Extremidad del animal",
+    "score": 45
+  },
+  "pato": {
+    "clue": "Ave acuática de pico plano",
+    "score": 45
+  },
+  "pavo": {
+    "clue": "Ave navideña de gran tamaño",
+    "score": 57
+  },
+  "pecho": {
+    "clue": "Parte frontal del torso",
+    "score": 80
+  },
+  "pera": {
+    "clue": "Fruta que cuelga en otoño",
+    "score": 80
+  },
+  "perla": {
+    "clue": "Joya que forma la ostra en el mar",
+    "score": 80
+  },
+  "perro": {
+    "clue": "Animal de compañía que ladra",
+    "score": 45
+  },
+  "pesca": {
+    "clue": "Actividad de captura en agua",
+    "score": 80
+  },
+  "piano": {
+    "clue": "Instrumento de teclas y cuerda",
+    "score": 45
+  },
+  "pico": {
+    "clue": "Cima de montaña",
+    "score": 80
+  },
+  "pie": {
+    "clue": "Extremidad inferior del cuerpo",
+    "score": 90
+  },
+  "pista": {
+    "clue": "Indicio para hallar la respuesta",
+    "score": 80
+  },
+  "piña": {
+    "clue": "Fruta tropical con corona de hojas",
+    "score": 80
+  },
+  "plata": {
+    "clue": "Metal precioso de color gris brillante",
+    "score": 80
+  },
+  "playa": {
+    "clue": "Arenales junto al mar",
+    "score": 65
+  },
+  "pluma": {
+    "clue": "Herramienta del escritor",
+    "score": 80
+  },
+  "pollo": {
+    "clue": "Ave doméstica de granja",
+    "score": 45
+  },
+  "polvo": {
+    "clue": "Partículas finas en el aire",
+    "score": 80
+  },
+  "pomo": {
+    "clue": "Manilla de la puerta",
+    "score": 45
+  },
+  "potro": {
+    "clue": "Caballo joven sin domar",
+    "score": 80
+  },
+  "pozo": {
+    "clue": "Agujero profundo en tierra para extraer agua",
+    "score": 65
+  },
+  "pulga": {
+    "clue": "Insecto saltador que molesta a las mascotas",
+    "score": 30
+  },
+  "pulpo": {
+    "clue": "Molusco marino de ocho brazos",
+    "score": 80
+  },
+  "puño": {
+    "clue": "Mano cerrada",
+    "score": 50
+  },
+  "queso": {
+    "clue": "Producto lácteo de sabor salado",
+    "score": 80
+  },
+  "rama": {
+    "clue": "Parte del árbol donde crecen las hojas",
+    "score": 45
+  },
+  "rana": {
+    "clue": "Anfibio saltador",
+    "score": 65
+  },
+  "rayo": {
+    "clue": "Descarga eléctrica en tormenta",
+    "score": 80
+  },
+  "red": {
+    "clue": "Malla de hilos entrecruzados",
+    "score": 90
+  },
+  "reina": {
+    "clue": "Pieza importante en ajedrez",
+    "score": 80
+  },
+  "reloj": {
+    "clue": "Marca las horas del día",
+    "score": 80
+  },
+  "remo": {
+    "clue": "Pala del navegante",
+    "score": 45
+  },
+  "rey": {
+    "clue": "Monarca o soberano",
+    "score": 90
+  },
+  "risa": {
+    "clue": "Sonido de alegría y diversión",
+    "score": 80
+  },
+  "rojo": {
+    "clue": "Color de la sangre",
+    "score": 45
+  },
+  "ron": {
+    "clue": "Bebida de caña de azúcar",
+    "score": 90
+  },
+  "rosa": {
+    "clue": "Flor de tallo espinoso",
+    "score": 45
+  },
+  "rosca": {
+    "clue": "Pan dulce de forma circular",
+    "score": 80
+  },
+  "rubi": {
+    "clue": "Piedra preciosa roja",
+    "score": 80
+  },
+  "rueda": {
+    "clue": "Objeto redondo que gira en los autos",
+    "score": 45
+  },
+  "ruina": {
+    "clue": "Resto de un edificio destruido",
+    "score": 80
+  },
+  "sable": {
+    "clue": "Arma blanca con hoja curva",
+    "score": 80
+  },
+  "sal": {
+    "clue": "Mineral blanco para condimentar",
+    "score": 90
+  },
+  "salsa": {
+    "clue": "Aderezo picante que acompaña los tacos",
+    "score": 80
+  },
+  "sapo": {
+    "clue": "Anfibio saltador y verrugoso",
+    "score": 65
+  },
+  "sauce": {
+    "clue": "Árbol que crece junto al agua",
+    "score": 30
+  },
+  "sello": {
+    "clue": "Marca que autentica documentos",
+    "score": 80
+  },
+  "selva": {
+    "clue": "Bosque tropical denso",
+    "score": 65
+  },
+  "señal": {
+    "clue": "Indicación visible o audible que comunica algo",
+    "score": 65
+  },
+  "silla": {
+    "clue": "Asiento con respaldo y patas",
+    "score": 65
+  },
+  "soga": {
+    "clue": "Cuerda gruesa de marinero",
+    "score": 80
+  },
+  "sol": {
+    "clue": "Astro que ilumina el día",
+    "score": 90
+  },
+  "sopa": {
+    "clue": "Plato caliente con caldo",
+    "score": 75
+  },
+  "suelo": {
+    "clue": "Tierra firme o pavimento de una habitación",
+    "score": 65
+  },
+  "sueño": {
+    "clue": "Lo que ves cuando duermes",
+    "score": 65
+  },
+  "tabla": {
+    "clue": "Pieza de madera plana para cortar",
+    "score": 80
+  },
+  "tallo": {
+    "clue": "Soporte verde de hojas y flores",
+    "score": 55
+  },
+  "tapiz": {
+    "clue": "Lienzo tejido para pared",
+    "score": 80
+  },
+  "taza": {
+    "clue": "Recipiente para beber café o té",
+    "score": 57
+  },
+  "techo": {
+    "clue": "Límite superior de una habitación",
+    "score": 80
+  },
+  "tela": {
+    "clue": "Material para la ropa",
+    "score": 45
+  },
+  "tigre": {
+    "clue": "Felino salvaje de rayas anaranjadas",
+    "score": 80
+  },
+  "tinta": {
+    "clue": "Líquido para escribir",
+    "score": 80
+  },
+  "topo": {
+    "clue": "Mamífero excavador nocturno",
+    "score": 65
+  },
+  "toro": {
+    "clue": "Bovino cornudo de gran tamaño",
+    "score": 92
+  },
+  "torre": {
+    "clue": "Pieza del ajedrez de movimiento recto",
+    "score": 80
+  },
+  "traje": {
+    "clue": "Atuendo formal de ejecutivo",
+    "score": 80
+  },
+  "tribu": {
+    "clue": "Grupo social primitivo",
+    "score": 65
+  },
+  "trigo": {
+    "clue": "Cereal para hacer pan",
+    "score": 80
+  },
+  "trono": {
+    "clue": "Asiento regio donde se sienta el monarca",
+    "score": 45
+  },
+  "tumba": {
+    "clue": "Lugar de descanso eterno",
+    "score": 80
+  },
+  "tunel": {
+    "clue": "Paso subterráneo",
+    "score": 65
+  },
+  "uva": {
+    "clue": "Fruto de la vid",
+    "score": 90
+  },
+  "uña": {
+    "clue": "Lámina córnea de los dedos",
+    "score": 90
+  },
+  "vaca": {
+    "clue": "Rumiante que produce leche",
+    "score": 65
+  },
+  "vado": {
+    "clue": "Cruce de río sin puente",
+    "score": 80
+  },
+  "vaina": {
+    "clue": "Estuche de la espada",
+    "score": 45
+  },
+  "valle": {
+    "clue": "Depresión entre montañas",
+    "score": 80
+  },
+  "vara": {
+    "clue": "Palo o tubo de forma alargada",
+    "score": 80
+  },
+  "vaso": {
+    "clue": "Recipiente de vidrio para beber",
+    "score": 57
+  },
+  "vela": {
+    "clue": "Luz que arde en la iglesia",
+    "score": 80
+  },
+  "verde": {
+    "clue": "Color del pasto y las hojas",
+    "score": 80
+  },
+  "verja": {
+    "clue": "Puerta de barrotes",
+    "score": 80
+  },
+  "volar": {
+    "clue": "Desplazarse sin tocar tierra",
+    "score": 65
+  },
+  "vuelo": {
+    "clue": "Desplazamiento aéreo",
+    "score": 65
+  },
+  "yegua": {
+    "clue": "Hembra del caballo",
+    "score": 80
+  },
+  "zorro": {
+    "clue": "Animal astuto y ágil",
+    "score": 30
+  },
+  "alamo": {
+    "clue": "Árbol de hojas temblantes",
+    "score": 45
+  },
+  "angel": {
+    "clue": "Ser celestial benevolente",
+    "score": 65
+  },
+  "baño": {
+    "clue": "Cuarto donde se enjuaga el cuerpo",
+    "score": 45
+  },
+  "beber": {
+    "clue": "Ingerir un líquido",
+    "score": 65
+  },
+  "bello": {
+    "clue": "Opuesto a lo feo",
+    "score": 45
+  },
+  "blusa": {
+    "clue": "Prenda femenina de la cintura hacia arriba",
+    "score": 30
+  },
+  "brisa": {
+    "clue": "Viento suave y agradable",
+    "score": 30
+  },
+  "brujo": {
+    "clue": "Mago de la tradición folklórica",
+    "score": 45
+  },
+  "campo": {
+    "clue": "Extensión de tierra cultivada o natural",
+    "score": 80
+  },
+  "cima": {
+    "clue": "Punto más alto de una montaña",
+    "score": 80
+  },
+  "clave": {
+    "clue": "Solución para abrir una cerradura",
+    "score": 80
+  },
+  "cojin": {
+    "clue": "Lo que hace cómodo un asiento",
+    "score": 65
+  },
+  "crema": {
+    "clue": "Sustancia grasa de la leche",
+    "score": 45
+  },
+  "globo": {
+    "clue": "Esfera flotante de fiesta",
+    "score": 80
+  },
+  "grifo": {
+    "clue": "Llave de agua en cocina o baño",
+    "score": 45
+  },
+  "jugo": {
+    "clue": "Bebida de frutas exprimidas",
+    "score": 45
+  },
+  "lanza": {
+    "clue": "Arma antigua con punta",
+    "score": 80
+  },
+  "lazo": {
+    "clue": "Cuerda con nudo corredizo",
+    "score": 80
+  },
+  "leña": {
+    "clue": "Combustible para la chimenea",
+    "score": 80
+  },
+  "mano": {
+    "clue": "Extremidad con cinco dedos",
+    "score": 65
+  },
+  "nave": {
+    "clue": "Embarcación marinera",
+    "score": 30
+  },
+  "palma": {
+    "clue": "Árbol tropical de frutos secos",
+    "score": 45
+  },
+  "pez": {
+    "clue": "Ser acuático con aletas",
+    "score": 90
+  },
+  "puñal": {
+    "clue": "Arma blanca corta",
+    "score": 80
+  },
+  "raton": {
+    "clue": "Pequeño roedor de bigotes",
+    "score": 90
+  },
+  "rio": {
+    "clue": "Corriente de agua dulce",
+    "score": 90
+  },
+  "salto": {
+    "clue": "Despegue del piso",
+    "score": 80
+  },
+  "sonar": {
+    "clue": "Producir ruido, como una campana",
+    "score": 88
+  },
+  "tia": {
+    "clue": "Hermana de los padres",
+    "score": 90
+  },
+  "zanja": {
+    "clue": "Surco profundo cavado en la tierra",
+    "score": 80
+  },
+  "zumo": {
+    "clue": "Bebida de fruta exprimida",
+    "score": 45
+  },
+  "zurdo": {
+    "clue": "Que usa la mano izquierda",
+    "score": 92
+  },
+  "bruja": {
+    "clue": "Hechicera de los cuentos",
+    "score": 80
+  },
+  "chico": {
+    "clue": "Muchacho joven",
+    "score": 50
+  },
+  "niña": {
+    "clue": "Joven del sexo femenino",
+    "score": 80
+  },
+  "pino": {
+    "clue": "Conífera navideña",
+    "score": 80
+  },
+  "roca": {
+    "clue": "Peñasco mineral duro",
+    "score": 65
+  },
+  "ropa": {
+    "clue": "Lo que vestimos a diario",
+    "score": 80
+  },
+  "amo": {
+    "clue": "Señor de la hacienda",
+    "score": 90
+  },
+  "lio": {
+    "clue": "Revoltijo de cosas",
+    "score": 90
+  },
+  "hey": {
+    "clue": "Interjección para llamar la atención",
+    "score": 90
+  },
+  "uno": {
+    "clue": "Primer número",
+    "score": 90
+  },
+  "ios": {
+    "clue": "Sistema operativo de Apple",
+    "score": 90
+  },
+  "ten": {
+    "clue": "Número tras nueve",
+    "score": 90
+  },
+  "aca": {
+    "clue": "Lugar donde uno está",
+    "score": 90
+  },
+  "sur": {
+    "clue": "Opuesto del norte",
+    "score": 90
+  },
+  "iba": {
+    "clue": "Se dirigía a algún lugar",
+    "score": 90
+  },
+  "amy": {
+    "clue": "Nombre de mujer en inglés",
+    "score": 90
+  },
+  "ven": {
+    "clue": "Orden para acercarse",
+    "score": 90
+  },
+  "era": {
+    "clue": "Período histórico",
+    "score": 90
+  },
+  "uso": {
+    "clue": "Práctica habitual",
+    "score": 90
+  },
+  "den": {
+    "clue": "Guarida de animales salvajes",
+    "score": 90
+  },
+  "wow": {
+    "clue": "Expresión de asombro o admiración",
+    "score": 90
+  },
+  "hmm": {
+    "clue": "Sonido de duda o reflexión",
+    "score": 90
+  },
+  "doc": {
+    "clue": "Médico, informalmente",
+    "score": 90
+  },
+  "lei": {
+    "clue": "Norma o estatuto jurídico",
+    "score": 90
+  },
+  "sir": {
+    "clue": "Título británico para caballeros",
+    "score": 90
+  },
+  "dia": {
+    "clue": "Período de 24 horas",
+    "score": 90
+  },
+  "ser": {
+    "clue": "Existir o tener identidad",
+    "score": 90
+  },
+  "has": {
+    "clue": "Hay, pero en segunda persona",
+    "score": 90
+  },
+  "mac": {
+    "clue": "Impermeable corto",
+    "score": 90
+  },
+  "año": {
+    "clue": "Período de doce meses",
+    "score": 90
+  },
+  "mmm": {
+    "clue": "Sonido de satisfacción ante algo delicioso",
+    "score": 90
+  },
+  "rie": {
+    "clue": "Expresa risa o alegría",
+    "score": 90
+  },
+  "tom": {
+    "clue": "Pavo macho de granja",
+    "score": 90
+  },
+  "leo": {
+    "clue": "Signo del zodiaco de verano",
+    "score": 90
+  },
+  "ama": {
+    "clue": "Dueña del hogar",
+    "score": 90
+  },
+  "ana": {
+    "clue": "Colección de dichos memorables",
+    "score": 90
+  },
+  "ley": {
+    "clue": "Norma que todos debemos seguir",
+    "score": 90
+  },
+  "lee": {
+    "clue": "Descifra un texto escrito",
+    "score": 90
+  },
+  "eva": {
+    "clue": "Primera mujer según la Biblia",
+    "score": 90
+  },
+  "adn": {
+    "clue": "Molécula de la herencia",
+    "score": 90
+  },
+  "dos": {
+    "clue": "Número par entre uno y tres",
+    "score": 90
+  },
+  "mas": {
+    "clue": "Conjunción de contraste u oposición",
+    "score": 90
+  },
+  "gas": {
+    "clue": "Combustible de los autos",
+    "score": 90
+  },
+  "haz": {
+    "clue": "Manojo de leña",
+    "score": 90
+  },
+  "vea": {
+    "clue": "Forma imperativa de observar",
+    "score": 90
+  },
+  "ben": {
+    "clue": "Árbol tropical de flores blancas",
+    "score": 90
+  },
+  "vas": {
+    "clue": "Tú te desplazas",
+    "score": 90
+  },
+  "cae": {
+    "clue": "Desciende sin resistencia",
+    "score": 90
+  },
+  "paz": {
+    "clue": "Ausencia de guerra y conflicto",
+    "score": 90
+  },
+  "new": {
+    "clue": "Opuesto a antiguo",
+    "score": 90
+  },
+  "fin": {
+    "clue": "Término o conclusión",
+    "score": 90
+  },
+  "fue": {
+    "clue": "Pasado de ser",
+    "score": 90
+  },
+  "sam": {
+    "clue": "Tío estadounidense",
+    "score": 90
+  },
+  "feo": {
+    "clue": "Falto de belleza",
+    "score": 90
+  },
+  "ahi": {
+    "clue": "En ese lugar",
+    "score": 90
+  },
+  "dan": {
+    "clue": "Rango en artes marciales",
+    "score": 90
+  },
+  "oir": {
+    "clue": "Percibir sonidos",
+    "score": 90
+  },
+  "oye": {
+    "clue": "Grito para captar atención",
+    "score": 90
+  },
+  "voy": {
+    "clue": "Marcho hacia adelante",
+    "score": 90
+  },
+  "tan": {
+    "clue": "Expresión de intensidad o grado",
+    "score": 90
+  },
+  "das": {
+    "clue": "Entregas, en presente",
+    "score": 90
+  },
+  "vos": {
+    "clue": "Pronombre para dirigirse informalmente",
+    "score": 90
+  },
+  "vio": {
+    "clue": "Miró en el pasado",
+    "score": 90
+  },
+  "ese": {
+    "clue": "El demostrativo de allá",
+    "score": 90
+  },
+  "sue": {
+    "clue": "Demandar ante la justicia",
+    "score": 90
+  },
+  "ray": {
+    "clue": "Pez de agua salada con cuerpo plano",
+    "score": 90
+  },
+  "ooh": {
+    "clue": "Sonido de sorpresa o admiración",
+    "score": 90
+  },
+  "bob": {
+    "clue": "Corte de cabello femenino a la altura del mentón",
+    "score": 90
+  },
+  "usa": {
+    "clue": "Pone en práctica",
+    "score": 90
+  },
+  "vez": {
+    "clue": "Ocasión o momento",
+    "score": 90
+  },
+  "fbi": {
+    "clue": "Agencia federal estadounidense de investigación",
+    "score": 90
+  },
+  "ver": {
+    "clue": "Percibir con los ojos",
+    "score": 90
+  },
+  "kim": {
+    "clue": "Nombre coreano popular en el mundo",
+    "score": 90
+  },
+  "ido": {
+    "clue": "Despistado, fuera de sí",
+    "score": 90
+  },
+  "tio": {
+    "clue": "Hermano de tus progenitores",
+    "score": 90
+  },
+  "fui": {
+    "clue": "Marché tiempo atrás",
+    "score": 90
+  },
+  "mal": {
+    "clue": "Contrario a bien",
+    "score": 90
+  },
+  "joe": {
+    "clue": "Taza de café en inglés",
+    "score": 90
+  },
+  "roy": {
+    "clue": "Monarca de antaño",
+    "score": 90
+  },
+  "mes": {
+    "clue": "Doceava parte del año",
+    "score": 90
+  },
+  "liz": {
+    "clue": "Forma corta de un nombre bíblico",
+    "score": 90
+  },
+  "lou": {
+    "clue": "Reed, músico de rock clásico",
+    "score": 90
+  },
+  "jay": {
+    "clue": "Pájaro de plumaje azul y negro",
+    "score": 90
+  },
+  "van": {
+    "clue": "Se desplazan hacia un lugar",
+    "score": 90
+  },
+  "hoy": {
+    "clue": "Jornada actual",
+    "score": 90
+  },
+  "bar": {
+    "clue": "Lugar de copas",
+    "score": 90
+  },
+  "dio": {
+    "clue": "Otorgó en el pasado",
+    "score": 90
+  },
+  "aun": {
+    "clue": "Todavía no ocurre",
+    "score": 90
+  },
+  "ire": {
+    "clue": "Furia o enojo intenso",
+    "score": 90
+  },
+  "soy": {
+    "clue": "Verbo conjugado en primera persona",
+    "score": 90
+  },
+  "ira": {
+    "clue": "Cólera sin control",
+    "score": 90
+  },
+  "max": {
+    "clue": "Grado superior alcanzado",
+    "score": 90
+  },
+  "tal": {
+    "clue": "De esa manera",
+    "score": 90
+  },
+  "doy": {
+    "clue": "Entrego generosamente",
+    "score": 90
+  },
+  "par": {
+    "clue": "Número divisible entre dos",
+    "score": 90
+  },
+  "web": {
+    "clue": "Sitio de internet o página virtual",
+    "score": 90
+  },
+  "que": {
+    "clue": "Pronombre relativo muy común en español",
+    "score": 90
+  },
+  "voz": {
+    "clue": "Sonido de la garganta",
+    "score": 90
+  },
+  "asi": {
+    "clue": "De esta manera",
+    "score": 90
+  },
+  "hay": {
+    "clue": "Existe o se encuentra presente",
+    "score": 90
+  },
+  "ian": {
+    "clue": "Nombre escocés común",
+    "score": 90
+  },
+  "sed": {
+    "clue": "Deseo de beber",
+    "score": 90
+  },
+  "des": {
+    "clue": "Prefijo de negación e inversión",
+    "score": 90
+  },
+  "don": {
+    "clue": "Título de cortesía para caballeros",
+    "score": 90
+  },
+  "veo": {
+    "clue": "Percibo con los ojos",
+    "score": 90
+  },
+  "jim": {
+    "clue": "Forma inglesa de Jaime",
+    "score": 90
+  },
+  "abuelo": {
+    "clue": "Ascendiente directo en segunda generación",
+    "score": 50
+  },
+  "aceite": {
+    "clue": "Grasa que a temperatura ambiente mantiene forma líquida y",
+    "score": 50
+  },
+  "acorde": {
+    "clue": "Que corresponde o está en consonancia con otro individuo",
+    "score": 50
+  },
+  "ajedrez": {
+    "clue": "Juego de mesa que disputan dos jugadores sobre un tablero de",
+    "score": 50
+  },
+  "ajolote": {
+    "clue": "Anfibio endémico de México",
+    "score": 50
+  },
+  "almeja": {
+    "clue": "Nombre vulgar de varias especies de moluscos bivalvos con",
+    "score": 50
+  },
+  "altura": {
+    "clue": "Distancia vertical de un punto a la base, longitud vertical",
+    "score": 50
+  },
+  "anchoa": {
+    "clue": "Familia de peces comestibles de agua salada, Engraulidae",
+    "score": 50
+  },
+  "anexo": {
+    "clue": "Que está adjunto o añadido a otro",
+    "score": 50
+  },
+  "anillo": {
+    "clue": "Aro de cualquier metal",
+    "score": 50
+  },
+  "ardilla": {
+    "clue": "Cualquiera de varias especies de mamíferos roedores",
+    "score": 50
+  },
+  "arroyo": {
+    "clue": "Curso de agua tan pequeño y poco caudaloso que no puede",
+    "score": 50
+  },
+  "atleta": {
+    "clue": "Persona que realiza un deporte",
+    "score": 50
+  },
+  "aurora": {
+    "clue": "Luces que indican el despuntar del día antes del amanecer",
+    "score": 50
+  },
+  "autor": {
+    "clue": "Persona que crea algo y, en particular",
+    "score": 50
+  },
+  "azúcar": {
+    "clue": "Sustancia sólida cristalina, de color blanco en estado puro",
+    "score": 50
+  },
+  "bahía": {
+    "clue": "Penetración del mar en la costa",
+    "score": 50
+  },
+  "bailar": {
+    "clue": "Mover el cuerpo de forma rítmica",
+    "score": 50
+  },
+  "ballena": {
+    "clue": "Cualquiera de muchos mamíferos de gran tamaño",
+    "score": 50
+  },
+  "bandera": {
+    "clue": "Trozo de tela, comúnmente de varios colores emblemáticos",
+    "score": 50
+  },
+  "bastón": {
+    "clue": "Vara o palo, generalmente de madera con empuñadura y contera",
+    "score": 50
+  },
+  "batería": {
+    "clue": "Conjunto de piezas de artillería colocadas en un paraje para",
+    "score": 50
+  },
+  "bigote": {
+    "clue": "Pilosidad que crece sobre el labio superior",
+    "score": 50
+  },
+  "blanco": {
+    "clue": "De tono luminoso, brillante e incoloro",
+    "score": 50
+  },
+  "bodega": {
+    "clue": "Almacén de vinos",
+    "score": 50
+  },
+  "bollo": {
+    "clue": "Pastel pequeño y esponjoso",
+    "score": 50
+  },
+  "bonito": {
+    "clue": "Agradable a la vista y al sentido estético",
+    "score": 50
+  },
+  "botón": {
+    "clue": "Pieza que, inserta en un ojal",
+    "score": 50
+  },
+  "buzón": {
+    "clue": "Ranura para depositar envíos de correo",
+    "score": 50
+  },
+  "camello": {
+    "clue": "Cualquiera de dos especies de mamíferos ungulados nativos del",
+    "score": 50
+  },
+  "camino": {
+    "clue": "Lugar por el que se transita",
+    "score": 50
+  },
+  "canal": {
+    "clue": "Depresión artificial cóncava y alargada en el terreno",
+    "score": 50
+  },
+  "canasta": {
+    "clue": "Cesto redondo u ancho de boca",
+    "score": 50
+  },
+  "cancha": {
+    "clue": "Terreno para practicar un deporte",
+    "score": 50
+  },
+  "cantar": {
+    "clue": "Usar la voz para emitir sonido melodioso",
+    "score": 50
+  },
+  "capilla": {
+    "clue": "Edificio contiguo a una iglesia, o parte integrante de ella",
+    "score": 50
+  },
+  "carpeta": {
+    "clue": "Elemento utilizado comúnmente para archivar cualquier tipo de",
+    "score": 50
+  },
+  "carrera": {
+    "clue": "Competición atlética consistente en recorrer una distancia",
+    "score": 50
+  },
+  "cetro": {
+    "clue": "Vara o bastón de oro u otra materia preciosa",
+    "score": 50
+  },
+  "cinco": {
+    "clue": "Cuatro y uno",
+    "score": 50
+  },
+  "ciudad": {
+    "clue": "Asentamiento de gran tamaño y actividad primariamente",
+    "score": 50
+  },
+  "collar": {
+    "clue": "Adorno que se pone en torno al cuello",
+    "score": 50
+  },
+  "columna": {
+    "clue": "Elemento sustentante vertical de cuerpo cilíndrico",
+    "score": 50
+  },
+  "comedia": {
+    "clue": "Género teatral o cinematográfico en la que predominan los",
+    "score": 50
+  },
+  "concha": {
+    "clue": "Pieza sólida y resistente que protege el cuerpo de diversas",
+    "score": 50
+  },
+  "conejo": {
+    "clue": "Cualquiera de unas dos docenas de especies de pequeños",
+    "score": 50
+  },
+  "consejo": {
+    "clue": "Opinión recomendada u ofrecida para ser seguida por otras",
+    "score": 50
+  },
+  "cortina": {
+    "clue": "Paño grande, hecho de tejidos de seda, lana, lino u otro género",
+    "score": 50
+  },
+  "cristal": {
+    "clue": "Sustancia en la cual sus átomos o moléculas se encuentran",
+    "score": 50
+  },
+  "cráter": {
+    "clue": "Boca de forma aproximadamente circular ubicada en volcanes y",
+    "score": 50
+  },
+  "cuadro": {
+    "clue": "Lienzo o tabla pintado artísticamente",
+    "score": 50
+  },
+  "cuartel": {
+    "clue": "Lugar e instalaciones en los que se asienta un regimiento",
+    "score": 50
+  },
+  "cuarzo": {
+    "clue": "Mineral compuesto de dióxido de silicio",
+    "score": 50
+  },
+  "cuchara": {
+    "clue": "Utensilio que sirve para llevar a la boca algunos alimentos",
+    "score": 50
+  },
+  "cumbre": {
+    "clue": "Punto más elevado de una montaña",
+    "score": 50
+  },
+  "deporte": {
+    "clue": "Cualquier actividad en la que se sigue un conjunto de reglas",
+    "score": 50
+  },
+  "diluvio": {
+    "clue": "Inundación precedida de copiosas lluvias",
+    "score": 50
+  },
+  "drama": {
+    "clue": "Tipo de representación teatral practicada en la Grecia antigua",
+    "score": 50
+  },
+  "duende": {
+    "clue": "Pequeña criatura mitológica de pequeño tamaño",
+    "score": 50
+  },
+  "eclipse": {
+    "clue": "Hecho en el que la luz procedente de un cuerpo celeste es",
+    "score": 50
+  },
+  "enero": {
+    "clue": "Primer mes del año en el calendario gregoriano",
+    "score": 50
+  },
+  "ensayo": {
+    "clue": "Acción de práctica realizada para perfeccionar la propia",
+    "score": 50
+  },
+  "espada": {
+    "clue": "Arma blanca que consiste en una hoja de metal larga",
+    "score": 50
+  },
+  "espejo": {
+    "clue": "Superficie capaz de reflejar la luz y suficientemente clara",
+    "score": 50
+  },
+  "espina": {
+    "clue": "Parte de una hoja",
+    "score": 50
+  },
+  "esquí": {
+    "clue": "Deporte que consiste en deslizarse sobre la nieve con unas",
+    "score": 50
+  },
+  "estatua": {
+    "clue": "Escultura labrada a imitación del natural",
+    "score": 50
+  },
+  "estilo": {
+    "clue": "Modo de comportarse típico de una época, grupo",
+    "score": 50
+  },
+  "familia": {
+    "clue": "Conjunto de personas, unidas por descendencia",
+    "score": 50
+  },
+  "fecha": {
+    "clue": "Especificación de un día dentro de un calendario",
+    "score": 50
+  },
+  "femenil": {
+    "clue": "Perteneciente o relativo a las mujeres",
+    "score": 50
+  },
+  "fiesta": {
+    "clue": "Día consagrado a actos religiosos",
+    "score": 50
+  },
+  "figura": {
+    "clue": "Forma exterior característica de un cuerpo",
+    "score": 50
+  },
+  "flecha": {
+    "clue": "Proyectil con forma estrecha y fina",
+    "score": 50
+  },
+  "fogata": {
+    "clue": "Fuego que levanta llamas abundantes o intensas",
+    "score": 50
+  },
+  "fondo": {
+    "clue": "Lugar más hacia dentro o profundo de un sitio cerrado",
+    "score": 50
+  },
+  "fresco": {
+    "clue": "De factura o producción muy reciente",
+    "score": 50
+  },
+  "frío": {
+    "clue": "De temperatura inferior a la normal",
+    "score": 50
+  },
+  "gacela": {
+    "clue": "Mamífero artiodáctilo rumiante",
+    "score": 50
+  },
+  "galleta": {
+    "clue": "Pasta compuesta de harina, azúcar y a veces huevo",
+    "score": 50
+  },
+  "ganador": {
+    "clue": "Que triunfa en una competencia u otro evento",
+    "score": 50
+  },
+  "gigante": {
+    "clue": "Muy grande",
+    "score": 50
+  },
+  "gorrión": {
+    "clue": "Pájaro cosmopolita que mide 14,5 cm",
+    "score": 50
+  },
+  "grande": {
+    "clue": "Superior en tamaño a un determinado patrón tomado como medida",
+    "score": 50
+  },
+  "harina": {
+    "clue": "Polvo resultante de moler cereales",
+    "score": 50
+  },
+  "hielo": {
+    "clue": "Acción o efecto de helar o de helarse",
+    "score": 50
+  },
+  "hogaza": {
+    "clue": "Pan de gran tamaño, de forma redondeada",
+    "score": 50
+  },
+  "hoguera": {
+    "clue": "Fuego intencional y controlado a veces de gran tamaño",
+    "score": 50
+  },
+  "hongo": {
+    "clue": "Cualquiera de los organismos heterótrofos que digieren su",
+    "score": 50
+  },
+  "huella": {
+    "clue": "Acción o efecto de hollar",
+    "score": 50
+  },
+  "huerta": {
+    "clue": "Terreno pequeño dedicado al cultivo de vegetales",
+    "score": 50
+  },
+  "ilegal": {
+    "clue": "Que va contra la ley",
+    "score": 50
+  },
+  "indicio": {
+    "clue": "Evidencia o dato que sirve como base para una inferencia",
+    "score": 50
+  },
+  "insular": {
+    "clue": "De una isla o perteneciente a ella",
+    "score": 50
+  },
+  "jaguar": {
+    "clue": "Felino sudamericano de gran tamaño",
+    "score": 50
+  },
+  "jamón": {
+    "clue": "Pata posterior del cerdo, destinada al consumo humano",
+    "score": 50
+  },
+  "jardín": {
+    "clue": "Espacio verde dedicado al recreo",
+    "score": 50
+  },
+  "jinete": {
+    "clue": "Persona que monta a caballo",
+    "score": 50
+  },
+  "jugador": {
+    "clue": "Que juega",
+    "score": 50
+  },
+  "jurista": {
+    "clue": "Persona que se dedica a estudiar o profesar la ciencia del",
+    "score": 50
+  },
+  "laguna": {
+    "clue": "Gran acumulación de agua dulce, rara vez agua salada",
+    "score": 50
+  },
+  "leyenda": {
+    "clue": "Acción o efecto de leer",
+    "score": 50
+  },
+  "león": {
+    "clue": "Felino del Viejo Mundo de gran tamaño",
+    "score": 50
+  },
+  "liebre": {
+    "clue": "Mamífero del orden de los lagomorfos",
+    "score": 50
+  },
+  "lluvia": {
+    "clue": "Conjunto de gotas de agua producidas por la condensación del",
+    "score": 50
+  },
+  "lombriz": {
+    "clue": "Cualquiera de varios miles de especies de gusanos anélidos de",
+    "score": 50
+  },
+  "lucero": {
+    "clue": "Cualquiera de los astros que en el cielo parecen los más",
+    "score": 50
+  },
+  "lucha": {
+    "clue": "Enfrentamiento entre dos o más personas",
+    "score": 50
+  },
+  "lágrima": {
+    "clue": "Gota de líquido transparente que segregan las glándulas",
+    "score": 50
+  },
+  "madre": {
+    "clue": "Progenitora de sexo femenino",
+    "score": 50
+  },
+  "maestro": {
+    "clue": "Persona que enseña en una institución educacional",
+    "score": 50
+  },
+  "malla": {
+    "clue": "Cada uno de los cuadriláteros que",
+    "score": 50
+  },
+  "mancha": {
+    "clue": "Marca que queda en una superficie al derramar alguna sustancia",
+    "score": 50
+  },
+  "mandato": {
+    "clue": "Orden que da un superior a sus subordinados para que sea",
+    "score": 50
+  },
+  "marcial": {
+    "clue": "Que pertenece o concierne a la guerra o a lo bélico",
+    "score": 50
+  },
+  "matiz": {
+    "clue": "Gradación de un color",
+    "score": 50
+  },
+  "medusa": {
+    "clue": "Organismo clasificados en el filo Cnidaria, pelágicos",
+    "score": 50
+  },
+  "mejor": {
+    "clue": "Comparativo irregular de bueno",
+    "score": 50
+  },
+  "merluza": {
+    "clue": "Cualquiera de los peces marinos del orden de los gadiformes",
+    "score": 50
+  },
+  "mocasín": {
+    "clue": "Calzado artesanal hecho de una sola pieza de piel sin curtir",
+    "score": 50
+  },
+  "modelo": {
+    "clue": "Representación gráfica o esquemática de una realidad",
+    "score": 50
+  },
+  "moderno": {
+    "clue": "Que pertenece a una época reciente o actual",
+    "score": 50
+  },
+  "morada": {
+    "clue": "Acción de permanecer",
+    "score": 50
+  },
+  "mundo": {
+    "clue": "Totalidad de lo existente",
+    "score": 50
+  },
+  "museo": {
+    "clue": "Institución pública o privada, sin fines de lucro",
+    "score": 50
+  },
+  "muñeca": {
+    "clue": "Articulación del cuerpo que une el brazo con la mano",
+    "score": 50
+  },
+  "máscara": {
+    "clue": "Figura hecha con la intención de tapar el rostro por algún",
+    "score": 50
+  },
+  "naranja": {
+    "clue": "Color entre rojo y amarillo",
+    "score": 50
+  },
+  "neblina": {
+    "clue": "Niebla ligera o poco densa",
+    "score": 50
+  },
+  "nieto": {
+    "clue": "Descendiente directo en la segunda generación",
+    "score": 50
+  },
+  "notario": {
+    "clue": "Abogado autorizado para dar fe pública acerca de contratos",
+    "score": 50
+  },
+  "nuevo": {
+    "clue": "Que tiene poco tiempo de existencia",
+    "score": 50
+  },
+  "ombligo": {
+    "clue": "Cicatriz dejada en el bajo vientre al cortar el cordón",
+    "score": 50
+  },
+  "origen": {
+    "clue": "El principio de algo",
+    "score": 50
+  },
+  "oído": {
+    "clue": "Sentido mediante el cual percibimos el sonido",
+    "score": 50
+  },
+  "palacio": {
+    "clue": "Edificio grande y lujoso usado como residencia de reyes",
+    "score": 50
+  },
+  "pantera": {
+    "clue": "Cualquiera de varias especies de grandes felinos",
+    "score": 50
+  },
+  "pastel": {
+    "clue": "Masa con base de harina utilizada para envolver ingredientes",
+    "score": 50
+  },
+  "pastor": {
+    "clue": "Persona que cría o cuida ganado",
+    "score": 50
+  },
+  "patio": {
+    "clue": "Espacio cerrado con paredes o galerías",
+    "score": 50
+  },
+  "patria": {
+    "clue": "Tierra natal o adoptiva ordenada como nación",
+    "score": 50
+  },
+  "pedal": {
+    "clue": "Palanca o pieza que se oprime con el pie para poner en",
+    "score": 50
+  },
+  "pierna": {
+    "clue": "Miembros inferiores del ser humano y posteriores de otros",
+    "score": 50
+  },
+  "piloto": {
+    "clue": "Conductor de un barco",
+    "score": 50
+  },
+  "piscina": {
+    "clue": "Estanque artificial para bañarse",
+    "score": 50
+  },
+  "planta": {
+    "clue": "Forma de vida vegetal",
+    "score": 50
+  },
+  "plaza": {
+    "clue": "En una ciudad o poblado",
+    "score": 50
+  },
+  "polea": {
+    "clue": "Mecanismo compuesto de una rueda, acanalada en su borde",
+    "score": 50
+  },
+  "pradera": {
+    "clue": "Campo o llanura de gran extensión cubierta de hierba",
+    "score": 50
+  },
+  "premio": {
+    "clue": "Retribución honorífica que se concede a uno por sus méritos",
+    "score": 50
+  },
+  "primo": {
+    "clue": "Hijo del tío de alguien",
+    "score": 50
+  },
+  "puente": {
+    "clue": "Construcción sólida que permite salvar un obstáculo pasando",
+    "score": 50
+  },
+  "punto": {
+    "clue": "Porción más pequeña de un espacio, sin dimensión",
+    "score": 50
+  },
+  "raqueta": {
+    "clue": "Implemento deportivo usado para golpear una pelota",
+    "score": 50
+  },
+  "reptil": {
+    "clue": "Cualquiera de unas 7000 especies de vertebrados amniotas",
+    "score": 50
+  },
+  "rubio": {
+    "clue": "De color amarillo parecido al oro",
+    "score": 50
+  },
+  "rubí": {
+    "clue": "Gema de color rojo, variedad del corindón",
+    "score": 50
+  },
+  "sangre": {
+    "clue": "Líquido rojo viscoso que circula por venas y arterias de los",
+    "score": 50
+  },
+  "segundo": {
+    "clue": "Que ocurre o se encuentra después del primero en una serie",
+    "score": 50
+  },
+  "seguro": {
+    "clue": "Exento de riesgo o peligro",
+    "score": 50
+  },
+  "signo": {
+    "clue": "Señal, indicio",
+    "score": 50
+  },
+  "sobre": {
+    "clue": "Envoltorio de una carta de correo",
+    "score": 50
+  },
+  "sombra": {
+    "clue": "Ausencia de luz",
+    "score": 50
+  },
+  "sonda": {
+    "clue": "Plomada o vara utilizada en los navíos para medir la",
+    "score": 50
+  },
+  "talento": {
+    "clue": "Capacidad de comprender, de entender",
+    "score": 50
+  },
+  "tango": {
+    "clue": "Recinto en que los tratantes alojaban a los esclavos negros",
+    "score": 50
+  },
+  "tarta": {
+    "clue": "Pastel chato de frutas o verduras, generalmente salado",
+    "score": 50
+  },
+  "templo": {
+    "clue": "Edificio dedicado al culto religioso o espiritual",
+    "score": 50
+  },
+  "tendero": {
+    "clue": "Propietario o dependiente de una tienda de comestibles",
+    "score": 50
+  },
+  "tenedor": {
+    "clue": "Utensilio de mesa que consta de un mango y una cabeza con",
+    "score": 50
+  },
+  "terror": {
+    "clue": "Miedo, espanto",
+    "score": 50
+  },
+  "tesoro": {
+    "clue": "Depósito de plata, oro, y otros bienes de gran valor",
+    "score": 50
+  },
+  "tiburón": {
+    "clue": "Cualquiera de numerosas especies de peces de esqueleto",
+    "score": 50
+  },
+  "tijeras": {
+    "clue": "Herramienta para cortar",
+    "score": 50
+  },
+  "torta": {
+    "clue": "Masa de pan o similar",
+    "score": 50
+  },
+  "tuerca": {
+    "clue": "Pieza que, dotada de una rosca interior",
+    "score": 50
+  },
+  "vampiro": {
+    "clue": "En la cultura popular de varios países",
+    "score": 50
+  },
+  "vapor": {
+    "clue": "Sustancia en estado gaseoso a una temperatura tal que el",
+    "score": 50
+  },
+  "veneno": {
+    "clue": "Sustancia que, introducida en el organismo",
+    "score": 50
+  },
+  "viento": {
+    "clue": "Movimiento del aire",
+    "score": 50
+  },
+  "vinagre": {
+    "clue": "Líquido miscible con el agua, con sabor agrio",
+    "score": 50
+  },
+  "virus": {
+    "clue": "Agente infeccioso compuesto de ácido nucleico rodeado por",
+    "score": 50
+  },
+  "vuelta": {
+    "clue": "Movimiento que se hace sobre sí mismo hasta quedar en una",
+    "score": 50
+  },
+  "yelmo": {
+    "clue": "En las armaduras antiguas",
+    "score": 50
+  },
+  "yunque": {
+    "clue": "Herramienta hecha de una pieza grande de metal o piedra",
+    "score": 50
+  },
+  "zafiro": {
+    "clue": "Gema de color azul",
+    "score": 50
+  }
+}

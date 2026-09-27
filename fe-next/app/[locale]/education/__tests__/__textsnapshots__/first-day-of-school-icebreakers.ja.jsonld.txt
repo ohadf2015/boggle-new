@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers#page",
+  "name": "学年始め のアイスブレーカー | レキシクラッシュ",
+  "description": "静かな教室を活気づけるゲーム。初日に最適—名前を覚える必要なし、誰も目立たない。",
+  "url": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "学年始めアイスブレーカー",
+      "item": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers#resource",
+  "name": "学年始め のアイスブレーカー | レキシクラッシュ",
+  "description": "クラス全体で共有の文字を探すゲーム。誰も一人で発表することなく、待つこともありません。レキシクラッシュは先生にライブボードを、学生には低圧力で話し、名前を発見し、教室が沈黙から活気へ変わるのを感じられる 15 分以下の方法を提供します。",
+  "url": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+  "inLanguage": "ja",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "8-16",
+  "teaches": "社会的結束、文脈での語彙、迅速な名前学習",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "声を出したくない学生はどうですか?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "彼らは含まれています。彼らは静かに言葉を見つけます。ボードが彼らの名前の下で満たされるのを見ます。「自分を紹介する」というプレッシャーは消えます—あなたはリアルタイムで彼らが誰であるかを見ているだけです。いくつかの学生はラウンド 1 で少なく話し、2 で多く話します。そういうものです。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "学生がすでに互いに知っている場合、これを使用できますか?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。名前をリストに結びつけるのではなく、名前を顔に結びつけます。さらに、新鮮なクラス構成（繰り返し年でも）は十分な距離を作成し、低圧力の紹介がまだ機能します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "どの年齢グループで機能しますか?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "小学校から高校まで。言語を調整する：より若い学生は簡単な単語を探します。年上の学生はより長い単語を探すか、テーマフィルター付きで遊びます。1 つのゲーム、多くの速度。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "非同期でこれをプレイできますか?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。学生に接続コード、テーマ（例：「夏についての単語を探す」）、および期限を与えます。彼らは自分たちのペースで遊びます。アイスブレーカー エネルギーが少なく、彼らが知ることをより多く発見できます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "学生がデバイスを持っていない場合はどうなりますか?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "それらを隣人とペアにします。彼らは知られています。それでもクラスルームの一部です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "これを ESL または多言語クラスに使用できますか?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "もちろん。より若い学習者は短い単語を探します。上級学習者は意味を探します。テーマを英語または母国語で投稿します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "どのように進め続けますか?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "タイマーを設定します。1 ラウンドあたり 2 分、10 分ではありません。子どもたちはゲームのリズムを理解すると速く動きます。ラウンド間に何人かの学生を指名して、関与し続け、彼らを知らせます。"
+      }
+    }
+  ]
+}

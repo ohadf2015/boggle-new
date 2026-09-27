@@ -1,0 +1,64 @@
+{
+  "title": "Juegos de Palabras para Secundaria | Vocabulario",
+  "description": "Juegos de palabras gratis para aulas de secundaria. Competición real, listas de vocabulario personalizadas, multijugador en vivo—sin email.",
+  "keywords": [
+    "juegos de palabras para secundaria",
+    "juegos de vocabulario para secundaria",
+    "juegos de palabras para aula",
+    "juegos educativos de palabras",
+    "actividades de vocabulario",
+    "juegos competitivos para clase",
+    "palabras para adolescentes",
+    "juegos interactivos de lenguaje"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/es/education/middle-school-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "he": "https://www.lexiclash.live/he/education/middle-school-word-games",
+    "en": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+    "es": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/middle-school-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/middle-school-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/middle-school-word-games"
+  },
+  "ogTitle": "Juegos de Palabras para Secundaria | Vocabulario",
+  "ogDescription": "Juegos de palabras gratis para aulas de secundaria. Competición real, listas de vocabulario personalizadas, multijugador en vivo—sin email.",
+  "ogLocale": "es_ES",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/es/education/middle-school-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-es.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Juegos de Palabras para Secundaria | Vocabulario"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Juegos de Palabras para Secundaria | Vocabulario",
+  "twDescription": "Juegos de palabras gratis para aulas de secundaria. Competición real, listas de vocabulario personalizadas, multijugador en vivo—sin email.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-es.webp"
+  ]
+}

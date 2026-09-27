@@ -1,0 +1,147 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/esl-word-games#page",
+  "name": "教室向け英語単語ゲーム — 先生主導、6言語 | LexiClash",
+  "description": "クラス全体で走らせる英語の単語ゲーム。生徒は6文字のコードでスマホから参加し、盤はプロジェクターに映り、先生が生徒ごとにサポート・コア・チャレンジを設定します。6言語、生徒アカウント不要。",
+  "url": "https://www.lexiclash.live/ja/education/esl-word-games",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/esl-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "無料英語ゲーム",
+      "item": "https://www.lexiclash.live/ja/education/esl-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/esl-word-games#resource",
+  "name": "教室向け英語単語ゲーム — 先生主導、6言語 | LexiClash",
+  "description": "クラス全体で走らせる英語の単語ゲーム。生徒は6文字のコードでスマホから参加し、盤はプロジェクターに映り、先生が生徒ごとにサポート・コア・チャレンジを設定します。6言語、生徒アカウント不要。",
+  "url": "https://www.lexiclash.live/ja/education/esl-word-games",
+  "inLanguage": "ja",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "ESL Practice",
+    "EFL Practice",
+    "Vocabulary Building",
+    "Spelling Practice",
+    "Bilingual Programs"
+  ],
+  "educationalLevel": [
+    "Beginner",
+    "Intermediate",
+    "Advanced",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "English vocabulary, spelling, letter patterns, sight-word recognition",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/esl-word-games#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "最高の無料英語ゲームは？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash は、リアルタイムゲーム：高速 Boggle、Word Wheel 語彙、Word Hunt 探索。クラスメートや AI と対戦 — 競争的で面白い。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "アカウントが必要？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい、でも無料。先生がクラスを作成、生徒はコードで参加。支払いなし。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "どう役立つ？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "スペリング、語彙、プレッシャー下での速度を鍛える — すべて流暢性に繋がる。マルチプレイヤーが十代を引き込む。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "レベル別にカスタマイズできる？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。自分のリストをアップロードし、生徒ごとにサポート・コア・チャレンジを設定。ダッシュボードで苦手が見えます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "大人にも対応？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "もちろん。大人と大学プログラムが語彙練習に使用。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "バイリンガルプログラムで使える？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。6つの辞書。イマージョンと移行に最適。"
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "教室向け英語単語ゲーム — 先生主導、6言語 | LexiClash",
+  "description": "クラス全体で走らせる英語の単語ゲーム。生徒は6文字のコードでスマホから参加し、盤はプロジェクターに映り、先生が生徒ごとにサポート・コア・チャレンジを設定します。6言語、生徒アカウント不要。",
+  "url": "https://www.lexiclash.live/ja/education/esl-word-games",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "ja"
+}

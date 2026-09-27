@@ -1,0 +1,290 @@
+import { describe, it, expect } from 'vitest';
+import sitemap from '../sitemap';
+import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
+
+describe('sitemap', () => {
+  // Regression: previously used generateSitemaps() which made Next.js serve
+  // chunks at /sitemap/[id].xml but NOT an index at /sitemap.xml. The
+  // [locale] catch-all then matched "sitemap.xml" as a locale value and
+  // returned HTML, triggering Google's "Sitemap appears to be HTML page".
+  it('exports a parameterless default function (single-sitemap mode)', () => {
+    expect(typeof sitemap).toBe('function');
+    expect(sitemap.length).toBe(0);
+  });
+
+  it('returns a non-empty array of sitemap entries', () => {
+    const entries = sitemap();
+    expect(Array.isArray(entries)).toBe(true);
+    expect(entries.length).toBeGreaterThan(100);
+  });
+
+  it('every entry is an absolute https URL on the production domain', () => {
+    for (const entry of sitemap()) {
+      expect(entry.url).toMatch(/^https:\/\/www\.lexiclash\.live\//);
+    }
+  });
+
+  it('covers all five locales as path prefixes', () => {
+    const urls = sitemap().map((e) => e.url);
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+      expect(urls.some((u) => u.includes(`/${locale}/`) || u.endsWith(`/${locale}`))).toBe(true);
+    }
+  });
+
+  it('stays under Google sitemap caps (50k URLs, 50MB)', () => {
+    const entries = sitemap();
+    expect(entries.length).toBeLessThan(50_000);
+    // Rough size estimate: each entry ~2KB with hreflangs. 410 × 2KB ≈ 820KB.
+    expect(entries.length * 2048).toBeLessThan(50 * 1024 * 1024);
+  });
+
+  it('includes education sub-routes (duels + classroom-game) for all locales', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+      expect(urls.has(`https://www.lexiclash.live/${locale}/education/duels`), `sitemap missing /${locale}/education/duels`).toBe(true);
+      expect(urls.has(`https://www.lexiclash.live/${locale}/education/classroom-game`), `sitemap missing /${locale}/education/classroom-game`).toBe(true);
+    }
+  });
+
+  /**
+   * EDUCATION_PAGES is the only list of education landings. Sitemap.ts used to
+   * restate these 17 slugs; a new registry entry would then ship in the footer
+   * and hub but not /sitemap.xml. These tests import the registry so they fail
+   * if sitemap.ts and educationPageLinks.ts drift.
+   */
+  const EDUCATION_LANDINGS = EDUCATION_PAGES.map((p) => `/education/${p.slug}`);
+  const ALL_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
+
+  it('emits every EDUCATION_PAGES slug for all six locales (17×6)', () => {
+    expect(EDUCATION_PAGES).toHaveLength(17);
+    const urls = new Set(sitemap().map((e) => e.url));
+    let present = 0;
+    for (const path of EDUCATION_LANDINGS) {
+      for (const locale of ALL_LOCALES) {
+        if (urls.has(`https://www.lexiclash.live/${locale}${path}`)) present += 1;
+      }
+    }
+    expect(present).toBe(EDUCATION_PAGES.length * ALL_LOCALES.length);
+  });
+
+  it('lists every education landing in every locale the page itself indexes', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const path of EDUCATION_LANDINGS) {
+      for (const locale of ALL_LOCALES) {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}${path}`),
+          `sitemap missing /${locale}${path}`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('declares self-referencing education hreflang that matches the page metadata', () => {
+    const entries = sitemap();
+    for (const path of EDUCATION_LANDINGS) {
+      const entry = entries.find((e) => e.url === `https://www.lexiclash.live/en${path}`);
+      expect(entry, `no sitemap entry for /en${path}`).toBeDefined();
+      const langs = entry!.alternates?.languages as Record<string, string>;
+      for (const locale of ALL_LOCALES) {
+        expect(langs[locale], `${path} hreflang ${locale} must self-reference`).toBe(
+          `https://www.lexiclash.live/${locale}${path}`,
+        );
+      }
+      expect(langs['x-default']).toBe(`https://www.lexiclash.live/en${path}`);
+    }
+  });
+
+  it('includes English commercial-intent doorway pages (WWF / multiplayer / free-online targets)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const required = [
+      'https://www.lexiclash.live/en/words-with-friends-alternative',
+      'https://www.lexiclash.live/en/online-word-games-with-friends',
+      'https://www.lexiclash.live/en/free-multiplayer-word-game',
+      'https://www.lexiclash.live/en/play-boggle-online-free',
+      'https://www.lexiclash.live/en/word-games-online-free',
+    ];
+    for (const url of required) {
+      expect(urls.has(url), `sitemap missing: ${url}`).toBe(true);
+    }
+  });
+
+  // AdSense low-value-content remediation (2026-06-04): per-date archive pages
+  // are thin per-puzzle stat snapshots. They are now noindex,follow at the page
+  // level (app/[locale]/daily/archive/[date]/page.tsx) and are NO LONGER listed
+  // in the sitemap — ~780 URLs across 5 locales were dragging the domain's
+  // content-quality average below AdSense's bar. They stay fully playable; we
+  // just don't advertise them. See docs/2026-06-04-adsense-approval-plan.md.
+  it('does NOT include per-date daily archive URLs (thin, now noindex)', () => {
+    const archiveDateUrls = sitemap()
+      .map((e) => e.url)
+      .filter((u) => /\/daily\/archive\/\d{4}-\d{2}-\d{2}$/.test(u));
+    expect(
+      archiveDateUrls.length,
+      `expected 0 per-date archive URLs, found ${archiveDateUrls.length}`,
+    ).toBe(0);
+  });
+
+  // AdSense thin-page sweep (2026-06-17): /practice (hub + modes) and /education/access
+  // are interactive-only / form pages now noindexed at the page level. A noindexed URL
+  // in the sitemap triggers GSC "Submitted URL marked noindex", so they are omitted.
+  // See docs/2026-06-17-adsense-thin-page-noindex-spec.md.
+  it('does NOT include noindexed thin interactive pages (practice, education/access)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const mustBeAbsent = [
+      ...['en', 'he', 'sv', 'ja', 'es'].flatMap((l) => [
+        `https://www.lexiclash.live/${l}/practice`,
+        `https://www.lexiclash.live/${l}/practice/classic`,
+        `https://www.lexiclash.live/${l}/practice/wordHunt`,
+        `https://www.lexiclash.live/${l}/practice/wheelRush`,
+        `https://www.lexiclash.live/${l}/education/access`,
+      ]),
+    ];
+    for (const url of mustBeAbsent) {
+      expect(urls.has(url), `sitemap should NOT list noindexed page: ${url}`).toBe(false);
+    }
+  });
+
+  it('still lists the /daily/archive hub (canonical archive entry point)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+      expect(
+        urls.has(`https://www.lexiclash.live/${locale}/daily/archive`),
+        `sitemap missing archive hub for /${locale}`,
+      ).toBe(true);
+    }
+  });
+
+  it('does NOT include today or future archive dates (only finalized past puzzles)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date();
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+      expect(urls.has(`https://www.lexiclash.live/${locale}/daily/archive/${today}`)).toBe(false);
+      expect(urls.has(`https://www.lexiclash.live/${locale}/daily/archive/${tomorrowStr}`)).toBe(false);
+    }
+  });
+
+  // ─── EN-only-indexed pages must be advertised EN-only ───
+  // These route groups set robots: { index: locale === 'en' } in their page
+  // metadata (English-only body / thin programmatic content). Emitting their
+  // he/sv/ja/es variants in the sitemap made Google crawl them only to obey a
+  // noindex tag — the "Excluded by noindex tag" coverage spike (GSC 2026-05-20,
+  // ~900 anagram + words + comparison URLs). Sitemap must match the noindex.
+
+  it('omits anagram solver seed pages in every locale (retired from sitemap 2026-06-08)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    // Programmatic /anagram/[letters] routes are robots:{index:false} and were
+    // pulled from the sitemap entirely — emitting them only invited crawl of
+    // noindexed URLs (the "Excluded by noindex tag" GSC spike). 'belt' is a seed
+    // (sorted form 'belt'); none of its locale variants — including EN — may appear.
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+      expect(
+        urls.has(`https://www.lexiclash.live/${locale}/anagram/belt`),
+        `sitemap should NOT advertise retired /${locale}/anagram/belt`,
+      ).toBe(false);
+    }
+  });
+
+  // AdSense rejected www.lexiclash.live TWICE for "low value content"
+  // (docs/2026-07-18-game-portals-web-ads-application-status.md §5), which keeps the
+  // whole WEB ad line — ~5x the native session volume — at zero revenue. The remaining
+  // programmatic word-list pages are the textbook trigger: 27 auto-generated list URLs
+  // with no original writing. PostHog 60d: they drew ZERO pageviews out of 7,673, so
+  // retiring them costs no traffic. Same treatment the /anagram seeds got on 2026-06-08.
+  it('omits programmatic word-list pages (retired 2026-08-09 for AdSense reapply)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
+      for (const n of [3, 4, 5, 6, 7, 8]) {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}/words/${n}-letter-words`),
+          `sitemap should NOT advertise retired /${locale}/words/${n}-letter-words`,
+        ).toBe(false);
+      }
+      for (const letter of 'abcdefghijklmnopqrstuvwxyz') {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}/words/starting-with/${letter}`),
+          `sitemap should NOT advertise retired /${locale}/words/starting-with/${letter}`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('keeps the /words hub itself listed (real navigable content)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    expect(urls.has('https://www.lexiclash.live/en/words')).toBe(true);
+  });
+
+  it('lists the anagram hub for EN only', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    expect(urls.has('https://www.lexiclash.live/en/anagram')).toBe(true);
+    for (const locale of ['he', 'sv', 'ja', 'es']) {
+      expect(urls.has(`https://www.lexiclash.live/${locale}/anagram`)).toBe(false);
+    }
+  });
+
+  // SUPERSEDED 2026-08-09 by 'omits programmatic word-list pages'. This used to assert
+  // the EN-only listing of /words/{n}-letter-words + /words/starting-with/[letter].
+  // Those 27 URLs are now retired from the sitemap AND noindexed to clear the AdSense
+  // "low value content" rejection that keeps all web ad revenue at zero. Not a test
+  // deleted to make a change pass — the behaviour it guarded was deliberately reversed.
+
+  it('lists generic comparison pages for EN only (English-only body)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const slug of ['lexiclash-vs-wordle', 'lexiclash-vs-quizlet', 'lexiclash-vs-scrabble']) {
+      expect(urls.has(`https://www.lexiclash.live/en/${slug}`), `missing /en/${slug}`).toBe(true);
+      for (const locale of ['he', 'sv', 'ja', 'es']) {
+        expect(urls.has(`https://www.lexiclash.live/${locale}/${slug}`)).toBe(false);
+      }
+    }
+  });
+
+  it('keeps locale-specific comparison pages on their target locale', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    // These have a native localized body and are index:true only on their locale.
+    expect(urls.has('https://www.lexiclash.live/sv/lexiclash-vs-wordfeud')).toBe(true);
+    expect(urls.has('https://www.lexiclash.live/es/lexiclash-vs-apalabrados')).toBe(true);
+  });
+
+  // The Russian keyword cluster has a Russian-only body. Emitting it under any
+  // other locale would ship an untranslated page as thin duplicate content.
+  it('lists the Russian keyword landing cluster for /ru only', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const ruOnlyPaths = [
+      '/igry-v-slova-onlayn',
+      '/balda-onlayn',
+      '/erudit-onlayn',
+      '/sostav-slova-iz-bukv',
+      '/filvordy-onlayn',
+      '/slovo-dnya',
+    ];
+    for (const path of ruOnlyPaths) {
+      expect(
+        urls.has(`https://www.lexiclash.live/ru${path}`),
+        `sitemap dropped RU landing ${path}`,
+      ).toBe(true);
+      for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}${path}`),
+          `sitemap leaked Russian-only ${path} into /${locale}`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  // Regression guard: genuinely-localized routes must STILL appear in all five
+  // locales. Catches an over-eager refactor that narrows a localized route.
+  it('still lists genuinely-localized routes for all five locales', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const localizedPaths = ['/multiplayer', '/daily', '/blog', '/blog/word-game-history', '/how-to-play'];
+    for (const path of localizedPaths) {
+      for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}${path}`),
+          `sitemap dropped localized ${locale}${path}`,
+        ).toBe(true);
+      }
+    }
+  });
+});

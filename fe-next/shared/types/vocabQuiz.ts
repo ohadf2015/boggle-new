@@ -1,0 +1,303 @@
+/**
+ * Live Vocab Quiz — the wire contract between the classroom quiz server loop
+ * and both client surfaces (student phone, host projector).
+ *
+ * Deliberately NOT part of `GameMode` in shared/types/game.ts. A quiz has no
+ * letter grid, no submitted words and no duplicate/rarity scoring, so widening
+ * that union would drag it into `ALL_GAME_MODES` random rolls, quick-play
+ * matchmaking and every `game.gameMode` branch in the board engine. It travels
+ * instead as a classroom setting (`ClassroomGameSettings.gameMode`) and the
+ * client learns a quiz is live from `vocabQuiz:state`.
+ */
+
+import type { VocabFocus, PracticeFocusSetting } from '@/lib/education/vocabFocus';
+import type { GameMode } from './game';
+
+export type { VocabFocus, PracticeFocusSetting };
+
+/** Wire value for the fifth classroom mode. */
+export const VOCAB_QUIZ_MODE = 'vocab-quiz' as const;
+export type VocabQuizMode = typeof VOCAB_QUIZ_MODE;
+
+/**
+ * What a teacher may pick in the classroom wizard: the board modes plus the
+ * quiz. Wider than `GameMode` on purpose — the quiz is not a board mode, and
+ * this type keeps that distinction visible at the one layer that mixes them.
+ */
+export type ClassroomGameMode = GameMode | VocabQuizMode;
+
+/**
+ * The modes a teacher can actually pick in the classroom mode picker, in picker order.
+ *
+ * `GameMode` is wider (nine values) because it covers every board the app ships;
+ * only these five are offered for a live class. The teacher-facing catalog built
+ * from this list lives in `lib/education/gameModes.ts` (`TEACHER_GAME_MODES`);
+ * the Zod enum in `backend/handlers/classroomGameHandler.ts` is the enforcing
+ * twin. `app/[locale]/education/__tests__/playFormats.test.ts` asserts this
+ * array still agrees with both.
+ */
+export const CLASSROOM_GAME_MODES: readonly ClassroomGameMode[] = [
+  'classic',
+  'word-hunt',
+  'blast',
+  'wheel-rush',
+  VOCAB_QUIZ_MODE,
+] as const;
+
+// ---------------------------------------------------------------------------
+// Round shape
+// ---------------------------------------------------------------------------
+
+export const VOCAB_QUIZ_DEFAULT_QUESTION_COUNT = 10;
+export const VOCAB_QUIZ_MIN_QUESTION_COUNT = 4;
+export const VOCAB_QUIZ_MAX_QUESTION_COUNT = 30;
+
+export const VOCAB_QUIZ_DEFAULT_SECONDS = 20;
+export const VOCAB_QUIZ_MIN_SECONDS = 5;
+export const VOCAB_QUIZ_MAX_SECONDS = 90;
+
+/** The "answer reveal + standings" beat between questions. */
+export const VOCAB_QUIZ_REVEAL_MS = 3_000;
+/**
+ * Longest the reveal waits past VOCAB_QUIZ_REVEAL_MS for a student who got it
+ * right to open their chest. Without the hold, a fast class cut to the next
+ * question before anyone could tap; without the cap, one idle phone stalls
+ * the room.
+ */
+export const VOCAB_QUIZ_CHEST_HOLD_MS = 5_000;
+/** Once a chest opens during the reveal, the room lingers this long (never past the hold cap) so the reveal is seen. */
+export const VOCAB_QUIZ_CHEST_REVEAL_BEAT_MS = 2_500;
+
+export type VocabQuizPhase = 'question' | 'reveal' | 'ended';
+
+// ---------------------------------------------------------------------------
+// Server → client payloads
+// ---------------------------------------------------------------------------
+
+/**
+ * One question as the students see it. `answerIndex` is deliberately absent —
+ * it only ships in the reveal, so the answer is never sitting in a student's
+ * devtools while the clock runs.
+ */
+export interface VocabQuizQuestionPayload {
+  gameCode: string;
+  /** 0-based. */
+  index: number;
+  total: number;
+  focus: VocabFocus;
+  prompt: string;
+  choices: string[];
+  /** Full length of this question's clock. */
+  limitMs: number;
+  /** How much of that clock is left right now (a late joiner gets less). */
+  remainingMs: number;
+  /** Server clock at emit, so a client can drift-correct its own countdown. */
+  serverNow: number;
+}
+
+export interface VocabQuizStanding {
+  username: string;
+  score: number;
+  streak: number;
+  bestStreak: number;
+  correctCount: number;
+}
+
+export interface VocabQuizReveal {
+  gameCode: string;
+  index: number;
+  total: number;
+  answerIndex: number;
+  answer: string;
+  /** The lesson word this question drilled — what the teacher's report keys on. */
+  word: string;
+  definition?: string;
+  /** Votes per choice index, for the host's distribution bars. */
+  distribution: number[];
+  standings: VocabQuizStanding[];
+  /** ms until the next question starts. */
+  nextInMs: number;
+  /** True when this was the last question. */
+  isLast: boolean;
+  /**
+   * The word the class meets next, reduced to a tease: its first letter and how
+   * long it is. Rides the reveal so the between-questions countdown has
+   * something to show without a second event (and without shipping the whole
+   * next question early).
+   */
+  nextHint?: VocabQuizNextHint;
+}
+
+/** First letter + length of the next question's word. */
+export interface VocabQuizNextHint {
+  letter: string;
+  length: number;
+}
+
+/**
+ * Live commitment count while the clock still runs — what makes the projector's
+ * bars fill in as students lock in, instead of snapping into place at the
+ * reveal. Carries no correctness signal: `distribution` is votes per choice, and
+ * which choice is right ships only in the reveal.
+ */
+export interface VocabQuizLockIn {
+  gameCode: string;
+  /** Question this count belongs to — a late packet for the previous one is dropped. */
+  index: number;
+  /** How many students have committed. */
+  locked: number;
+  /** How many students are in the room. */
+  total: number;
+  /** Votes per choice index. */
+  distribution: number[];
+}
+
+/** Private per-student result for the question they just answered. */
+export interface VocabQuizAnswerResult {
+  index: number;
+  correct: boolean;
+  choiceIndex: number;
+  points: number;
+  speedBonus: number;
+  streakBonus: number;
+  streak: number;
+  totalScore: number;
+  /** Whether this correct answer unlocks a treasure chest reveal. */
+  chestPending?: boolean;
+}
+
+/**
+ * Full snapshot — the reconnect / late-join payload. One shape covers "quiz is
+ * running", "we're between questions" and "it's over", so a refreshing student
+ * restores from exactly one event instead of guessing from three.
+ */
+export interface VocabQuizStateSnapshot {
+  gameCode: string;
+  active: boolean;
+  phase: VocabQuizPhase;
+  focus: PracticeFocusSetting;
+  paused: boolean;
+  index: number;
+  total: number;
+  serverNow: number;
+  /** Present while `phase === 'question'`. */
+  question?: VocabQuizQuestionPayload;
+  /** Present while `phase === 'reveal'`. */
+  reveal?: VocabQuizReveal;
+  /** The viewer's own answer for the current question, if they already sent one. */
+  myAnswer?: VocabQuizAnswerResult;
+  myScore: number;
+  myStreak: number;
+  standings: VocabQuizStanding[];
+  /** The resolved chest outcome for this question, if the player picked a chest. */
+  myChest?: TreasureChestState;
+}
+
+export interface VocabQuizEnded {
+  gameCode: string;
+  standings: VocabQuizStanding[];
+  totalQuestions: number;
+}
+
+// ---------------------------------------------------------------------------
+// Client → server payloads
+// ---------------------------------------------------------------------------
+
+export interface VocabQuizAnswerPayload {
+  /** Which question this answer is for — a late packet for question N-1 is dropped. */
+  index: number;
+  choiceIndex: number;
+}
+
+// ---------------------------------------------------------------------------
+// Teacher setup
+// ---------------------------------------------------------------------------
+
+/** How many questions each focus can build from the teacher's current lesson. */
+export type VocabQuizFocusAvailability = Record<VocabFocus, number>;
+
+export interface VocabQuizSettings {
+  focus: PracticeFocusSetting;
+  questionCount: number;
+  secondsPerQuestion: number;
+}
+
+export const VOCAB_QUIZ_DEFAULT_SETTINGS: VocabQuizSettings = {
+  focus: 'any',
+  questionCount: VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
+  secondsPerQuestion: VOCAB_QUIZ_DEFAULT_SECONDS,
+};
+
+// ---------------------------------------------------------------------------
+// Treasure Chests (Gold-Quest-style rewards)
+// ---------------------------------------------------------------------------
+
+export type TreasureChestOutcome = 'gain' | 'double' | 'steal' | 'swap' | 'small-loss';
+
+export interface TreasureChestState {
+  /** Username of the player who opened this chest. */
+  actor: string;
+  /** Outcome seeded server-side for (gameCode, questionIndex, studentId). */
+  outcome: TreasureChestOutcome;
+  /** Amount of points gained or lost. */
+  amount: number;
+  /** Player the outcome affects (for steal/swap). */
+  targetUsername?: string;
+  /** Updated standings after chest reveal. */
+  standings: VocabQuizStanding[];
+  /** The actor's own total after the chest — only on the private result. */
+  myScore?: number;
+}
+
+/**
+ * Private notice to the student a steal or swap landed on. Carries their new
+ * total, because the victim's score changed without them doing anything and
+ * the client never recomputes a score on its own (Class 3).
+ */
+export interface TreasureChestHit {
+  actor: string;
+  outcome: 'steal' | 'swap';
+  /** Points the victim lost (always >= 0). */
+  amount: number;
+  /** The victim's total after the hit. */
+  score: number;
+}
+
+export interface TreasureChestRequest {
+  /** Question index the chest belongs to — a stale pick is dropped. */
+  index: number;
+  /** Which of the three chests was tapped (0..2). */
+  chest: number;
+}
+
+/** Socket event names, in one place so client and server cannot drift. */
+export const VOCAB_QUIZ_EVENTS = {
+  question: 'vocabQuiz:question',
+  reveal: 'vocabQuiz:reveal',
+  state: 'vocabQuiz:state',
+  answerResult: 'vocabQuiz:answerResult',
+  ended: 'vocabQuiz:ended',
+  paused: 'vocabQuiz:paused',
+  lockIn: 'vocabQuiz:lockIn',
+  answer: 'vocabQuiz:answer',
+  requestState: 'vocabQuiz:requestState',
+  /** Private: the actor's own chest result. */
+  treasureChestResult: 'vocabQuiz:treasureChestResult',
+  /** Room-wide: every chest opened, for the projector ticker and standings. */
+  treasureChestEvent: 'vocabQuiz:treasureChestEvent',
+  /** Private: tells a student someone stole from / swapped with them. */
+  chestHit: 'vocabQuiz:chestHit',
+  openChest: 'vocabQuiz:openChest',
+  /** Student → server: my chest reveal has been seen (ends the reveal hold early). */
+  chestSeen: 'vocabQuiz:chestSeen',
+} as const;
+
+/**
+ * The translate function shape these components accept.
+ *
+ * Matches how `LanguageContext.t` is actually called with parameters —
+ * `t(path, params)` — which is also the prop type the multiplayer shell passes
+ * down. The context's own `t` additionally accepts a string fallback in the
+ * middle position; this narrower type is the subset every caller here uses.
+ */
+export type TranslateFn = (key: string, params?: Record<string, string | number>) => string;

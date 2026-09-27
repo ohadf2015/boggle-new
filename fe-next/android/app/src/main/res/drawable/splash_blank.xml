@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Blank navy splash icon (#1a1a2e == neo-navy).
+
+  Used as windowSplashScreenAnimatedIcon so the Android 12+ system splash masks
+  a navy-on-navy shape into its circle => effectively NO logo. Replaces the old
+  launcher-icon circle that flashed on every cold start / low-memory re-entry.
+  Keep this the exact same navy as the launch + post-splash window background so
+  the splash is a seamless navy flash instead of a stray logo.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#FF1A1A2E" />
+</shape>

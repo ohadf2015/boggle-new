@@ -1,0 +1,122 @@
+{
+  "baseInputDir": "raw/adventure",
+  "baseOutputDir": "public/images/adventure",
+  "defaultRemoveBg": false,
+  "defaultTargetKb": 200,
+  "assets": [
+    {
+      "input": "meadows-bg.png",
+      "output": "backgrounds/meadows",
+      "removeBg": false,
+      "targetKb": 200
+    },
+    {
+      "input": "springs-bg.png",
+      "output": "backgrounds/springs",
+      "removeBg": false,
+      "targetKb": 200
+    },
+    {
+      "input": "caverns-bg.png",
+      "output": "backgrounds/caverns",
+      "removeBg": false,
+      "targetKb": 200
+    },
+    {
+      "input": "meadows-hills.png",
+      "output": "parallax/meadows-hills",
+      "removeBg": false,
+      "targetKb": 150
+    },
+    {
+      "input": "meadows-grass.png",
+      "output": "parallax/meadows-grass",
+      "removeBg": false,
+      "targetKb": 150
+    },
+    {
+      "input": "springs-waterfall.png",
+      "output": "parallax/springs-waterfall",
+      "removeBg": false,
+      "targetKb": 150
+    },
+    {
+      "input": "springs-mist.png",
+      "output": "parallax/springs-mist",
+      "removeBg": false,
+      "targetKb": 150
+    },
+    {
+      "input": "springs-rocks.png",
+      "output": "parallax/springs-rocks",
+      "removeBg": false,
+      "targetKb": 150
+    },
+    {
+      "input": "caverns-crystals-far.png",
+      "output": "parallax/caverns-crystals-far",
+      "removeBg": false,
+      "targetKb": 150
+    },
+    {
+      "input": "caverns-stalactites.png",
+      "output": "parallax/caverns-stalactites",
+      "removeBg": false,
+      "targetKb": 150
+    },
+    {
+      "input": "caverns-crystals-near.png",
+      "output": "parallax/caverns-crystals-near",
+      "removeBg": false,
+      "targetKb": 150
+    },
+    {
+      "input": "lexi-idle-1.png",
+      "output": "sprites/lexi-idle-1",
+      "removeBg": true,
+      "targetKb": 100
+    },
+    {
+      "input": "lexi-idle-2.png",
+      "output": "sprites/lexi-idle-2",
+      "removeBg": true,
+      "targetKb": 100
+    },
+    {
+      "input": "lexi-celebrate-1.png",
+      "output": "sprites/lexi-celebrate-1",
+      "removeBg": true,
+      "targetKb": 100
+    },
+    {
+      "input": "lexi-celebrate-2.png",
+      "output": "sprites/lexi-celebrate-2",
+      "removeBg": true,
+      "targetKb": 100
+    },
+    {
+      "input": "lexi-sad-1.png",
+      "output": "sprites/lexi-sad-1",
+      "removeBg": true,
+      "targetKb": 100
+    },
+    {
+      "input": "lexi-sad-2.png",
+      "output": "sprites/lexi-sad-2",
+      "removeBg": true,
+      "targetKb": 100
+    },
+    {
+      "input": "lexi-hint-1.png",
+      "output": "sprites/lexi-hint-1",
+      "removeBg": true,
+      "targetKb": 100
+    },
+    {
+      "input": "lexi-hint-2.png",
+      "output": "sprites/lexi-hint-2",
+      "removeBg": true,
+      "targetKb": 100
+    }
+  ]
+}

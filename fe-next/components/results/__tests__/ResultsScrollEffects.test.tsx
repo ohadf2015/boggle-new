@@ -1,0 +1,201 @@
+import React, { useRef } from 'react';
+import { render } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// GSAP/ScrollTrigger can't meaningfully run in jsdom (no layout/scroll). We only
+// assert the rendered layers here — no GSAP behaviour.
+vi.mock('gsap', () => ({
+  default: {
+    registerPlugin: vi.fn(),
+    to: vi.fn(() => ({ scrollTrigger: { kill: vi.fn() }, kill: vi.fn() })),
+    set: vi.fn(),
+    utils: { clamp: () => 0 },
+  },
+}));
+vi.mock('gsap/ScrollTrigger', () => ({ ScrollTrigger: {} }));
+
+// Native detection — flip per-test to assert the GPU-layer scroll effects are
+// inert inside the Capacitor WebView (where promoted `will-change`/`translate3d`
+// layers paint an uninitialised white backing before they composite).
+vi.mock('@capacitor/core', () => ({
+  Capacitor: { isNativePlatform: vi.fn(() => false) },
+}));
+
+import { Capacitor } from '@capacitor/core';
+import {
+  ResultsParallaxBackdrop,
+  ResultsHeroTilt,
+  ResultsScrollProgressRail,
+  ResultsSectionReveal,
+} from '../ResultsScrollEffects';
+
+const mockIsNative = vi.mocked(Capacitor.isNativePlatform);
+
+function Harness({ enabled }: { enabled?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <div data-testid="harness" ref={ref}>
+      <ResultsParallaxBackdrop scrollRef={ref} enabled={enabled} />
+    </div>
+  );
+}
+
+function TiltHarness({ enabled }: { enabled?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <div data-testid="harness" ref={ref}>
+      <ResultsHeroTilt scrollRef={ref} enabled={enabled}>
+        <span>child</span>
+      </ResultsHeroTilt>
+    </div>
+  );
+}
+
+function RailHarness({ enabled }: { enabled?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <div data-testid="harness" ref={ref}>
+      <ResultsScrollProgressRail scrollRef={ref} enabled={enabled} />
+    </div>
+  );
+}
+
+/**
+ * Drive `window.matchMedia` so a render-time `(max-width: 768px)` read reports
+ * the chosen viewport. `mobile = true` => the mobile result tree surface, where
+ * the GPU-layer white-backing flash actually fires (mobile Chrome/Safari share
+ * the same Chromium compositor quirk as the Android WebView).
+ */
+function setViewport(mobile: boolean) {
+  window.matchMedia = ((q: string) => ({
+    matches: /max-width:\s*768px/.test(q) ? mobile : false,
+    media: q,
+    onchange: null,
+    addEventListener() {},
+    removeEventListener() {},
+    addListener() {},
+    removeListener() {},
+    dispatchEvent() {
+      return false;
+    },
+  })) as unknown as typeof window.matchMedia;
+}
+
+beforeEach(() => {
+  mockIsNative.mockReturnValue(false);
+  setViewport(false); // default: desktop web
+});
+
+describe('ResultsParallaxBackdrop', () => {
+  it('renders NO white velocity-flicker layer (white flashes over components)', () => {
+    const { container } = render(<Harness />);
+    // The scroll-velocity white layer flashed white over the page on fast scroll.
+    expect(container.innerHTML).not.toMatch(/rgba\(255,\s*255,\s*255/i);
+  });
+
+  it('runs no effect layers when disabled (the CSS-hidden tree must stay inert)', () => {
+    const { container } = render(<Harness enabled={false} />);
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+  });
+
+  it('renders the parallax layer on web (enabled)', () => {
+    const { container } = render(<Harness />);
+    expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull();
+  });
+
+  it('renders NO GPU layer on native — the promoted layer flashes white in the WebView', () => {
+    mockIsNative.mockReturnValue(true);
+    const { container } = render(<Harness />);
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+    // No will-change/translate3d hardware-layer hints leak into the DOM.
+    expect(container.innerHTML).not.toMatch(/will-change|translate3d/i);
+  });
+
+  it('renders NO GPU layer on mobile WEB — the freshly-promoted layer flashes white in mobile Chrome/Safari (primary phone surface), same Chromium quirk as the WebView', () => {
+    setViewport(true); // mobile viewport, NOT native, NOT reduced-motion
+    const { container } = render(<Harness />);
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+    expect(container.innerHTML).not.toMatch(/will-change|translate3d/i);
+  });
+});
+
+describe('ResultsHeroTilt', () => {
+  it('promotes a will-change layer on web', () => {
+    const { container } = render(<TiltHarness />);
+    expect(container.querySelector('[style*="will-change"]')).not.toBeNull();
+  });
+
+  it('renders children with NO will-change layer on native (no white flash)', () => {
+    mockIsNative.mockReturnValue(true);
+    const { container, getByText } = render(<TiltHarness />);
+    expect(getByText('child')).toBeTruthy();
+    expect(container.querySelector('[style*="will-change"]')).toBeNull();
+  });
+
+  it('renders children with NO will-change layer on mobile WEB (the tilt wraps the whole results body — its layer flashes white on mobile renderers)', () => {
+    setViewport(true);
+    const { container, getByText } = render(<TiltHarness />);
+    expect(getByText('child')).toBeTruthy();
+    expect(container.querySelector('[style*="will-change"]')).toBeNull();
+  });
+});
+
+describe('ResultsSectionReveal', () => {
+  it('animates the section on web (framer-motion m.div reveal)', () => {
+    const { queryByTestId, getByText } = render(
+      <ResultsSectionReveal index={0}>
+        <span>section</span>
+      </ResultsSectionReveal>,
+    );
+    expect(getByText('section')).toBeTruthy();
+    expect(queryByTestId('results-section-reveal-motion')).not.toBeNull();
+    expect(queryByTestId('results-section-reveal-static')).toBeNull();
+  });
+
+  it('renders a plain static div on native — every section is wrapped in this reveal, and framer-motion promotes each m.div to its own GPU layer that the WebView paints white on creation (the results "flashing white" after the fanfare)', () => {
+    mockIsNative.mockReturnValue(true);
+    const { container, queryByTestId, getByText } = render(
+      <ResultsSectionReveal index={0}>
+        <span>section</span>
+      </ResultsSectionReveal>,
+    );
+    // Content still renders — we drop the animation, not the section.
+    expect(getByText('section')).toBeTruthy();
+    expect(queryByTestId('results-section-reveal-static')).not.toBeNull();
+    expect(queryByTestId('results-section-reveal-motion')).toBeNull();
+    // No transform / will-change hardware-layer hint leaks into the markup.
+    expect(container.innerHTML).not.toMatch(/will-change|transform|translate/i);
+  });
+
+  it('renders a plain static div on mobile WEB — every section is wrapped in this reveal; on mobile renderers each m.div promotes a layer that paints white on creation (the results "flashing white" section-by-section after the fanfare)', () => {
+    setViewport(true); // mobile viewport, NOT native, NOT reduced-motion
+    const { container, queryByTestId, getByText } = render(
+      <ResultsSectionReveal index={0}>
+        <span>section</span>
+      </ResultsSectionReveal>,
+    );
+    expect(getByText('section')).toBeTruthy();
+    expect(queryByTestId('results-section-reveal-static')).not.toBeNull();
+    expect(queryByTestId('results-section-reveal-motion')).toBeNull();
+    expect(container.innerHTML).not.toMatch(/will-change|transform|translate/i);
+  });
+});
+
+describe('ResultsScrollProgressRail', () => {
+  it('renders the rail on web', () => {
+    const { container } = render(<RailHarness />);
+    expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull();
+  });
+
+  it('renders nothing on native (no promoted layer to flash white)', () => {
+    mockIsNative.mockReturnValue(true);
+    const { container } = render(<RailHarness />);
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+  });
+
+  it('renders nothing on mobile WEB (the will-change:height layer flashes white on mobile renderers)', () => {
+    setViewport(true);
+    const { container } = render(<RailHarness />);
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+  });
+});

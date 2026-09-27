@@ -1,0 +1,55 @@
+{
+  "title": "משחקי מילים באנגלית לכיתה — בהובלת המורה, 6 שפות | LexiClash",
+  "description": "משחקי מילים באנגלית שמריצים לכל הכיתה: התלמידים מצטרפים מהטלפון עם קוד בן שישה תווים, הלוח עולה על המקרן, ואתם קובעים תמיכה, ליבה או אתגר לכל תלמיד. שש שפות, בלי חשבונות תלמידים.",
+  "keywords": "esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles, juegos de vocabulario en ingles, juego de vocabulario en ingles, vocabulario en ingles juegos, juegos para aprender vocabulario en ingles",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/esl-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "es": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/esl-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/esl-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/esl-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/esl-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/esl-word-games"
+  },
+  "ogTitle": "משחקי מילים באנגלית לכיתה",
+  "ogDescription": "משחקי אנגלית בזמן אמת. חשבונות חינמיים, 6 מילונים, לוח מורה.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/esl-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "משחקי מילים באנגלית לכיתה"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "משחקי מילים באנגלית לכיתה",
+  "twDescription": "משחקי אנגלית מרובי משתתפים לכיתה, בחינם.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

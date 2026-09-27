@@ -1,0 +1,146 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom#page",
+  "name": "無料の教室向け語彙ゲーム — ライブマルチプレイヤー、6言語 | LexiClash",
+  "description": "無料で使える教室向けの語彙ゲーム。ライブマルチプレイヤー、1v1デュエル、自分の単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語、ロシア語の6言語に対応。どのブラウザでも動作。無料で始められます。",
+  "url": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "無料の教室向け語彙ゲーム",
+      "item": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom#resource",
+  "name": "無料の教室向け語彙ゲーム — ライブマルチプレイヤー、6言語 | LexiClash",
+  "description": "無料で使える教室向けの語彙ゲーム。ライブマルチプレイヤー、1v1デュエル、自分の単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語、ロシア語の6言語に対応。どのブラウザでも動作。無料で始められます。",
+  "url": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+  "inLanguage": "ja",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Vocabulary Building",
+    "Classroom Activity",
+    "Whole-Class Multiplayer",
+    "Formative Assessment",
+    "ESL Practice"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual word usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "生徒は登録が必要ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。でも無料で30秒だけです。メールアドレスか Google アカウント。クレジットカード不要、追加料金なし。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "自分の単語リストが使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。教師用ダッシュボードにアップロードして、そのリストでクラスゲームや 1v1 デュエルができます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "ゲームは何分ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "3～5分。ウォームアップ、時間つなぎ、休憩に最適。難易度と時間は変更できます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "どの学年向け？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "4年生～12年生、ESL、大人の学習者、バイリンガルクラス向け。ゲームごとに難易度が変わります。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "学生のデータを売っていますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ。売ったり共有したりしません。FERPA対応。プライバシーポリシーは完全です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "WiFi が不安定な環境では？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash はブラウザで動きます。学校の WiFi でも、タブレット、Chromebook、パソコンでもサポートしています。"
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "無料の教室向け語彙ゲーム — ライブマルチプレイヤー、6言語 | LexiClash",
+  "description": "無料で使える教室向けの語彙ゲーム。ライブマルチプレイヤー、1v1デュエル、自分の単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語、ロシア語の6言語に対応。どのブラウザでも動作。無料で始められます。",
+  "url": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "ja"
+}

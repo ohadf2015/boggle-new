@@ -1,0 +1,64 @@
+{
+  "title": "משחקי מילים לחטיבת ביניים | אוצר מילים",
+  "description": "משחקי מילים חינמיים לכיתות ז׳–ט׳. תחרות אמיתיות, רשימות מילים מותאמות, משחק בהזמן הממשי—ללא דוא״ל.",
+  "keywords": [
+    "משחקי מילים לחטיבת ביניים",
+    "משחקי אוצר מילים",
+    "משחקים לעברית בחטיבה",
+    "משחקי תחרות כיתתיות",
+    "משחקים לשיעורי שפה",
+    "משחקי עברית תחרותיים",
+    "פעילויות חטיבה ביניים",
+    "אימון מילים לבחינות"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/middle-school-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "he": "https://www.lexiclash.live/he/education/middle-school-word-games",
+    "en": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+    "es": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/middle-school-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/middle-school-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/middle-school-word-games"
+  },
+  "ogTitle": "משחקי מילים לחטיבת ביניים | אוצר מילים",
+  "ogDescription": "משחקי מילים חינמיים לכיתות ז׳–ט׳. תחרות אמיתיות, רשימות מילים מותאמות, משחק בהזמן הממשי—ללא דוא״ל.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/middle-school-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "משחקי מילים לחטיבת ביניים | אוצר מילים"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "משחקי מילים לחטיבת ביניים | אוצר מילים",
+  "twDescription": "משחקי מילים חינמיים לכיתות ז׳–ט׳. תחרות אמיתיות, רשימות מילים מותאמות, משחק בהזמן הממשי—ללא דוא״ל.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

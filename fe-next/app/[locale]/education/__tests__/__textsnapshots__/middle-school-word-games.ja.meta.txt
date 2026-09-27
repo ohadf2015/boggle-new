@@ -1,0 +1,64 @@
+{
+  "title": "中学生向けの言葉ゲーム | 語彙学習",
+  "description": "中学校(中1-中3)の教室向け無料言葉ゲーム。本物の競争、カスタム語彙、リアルタイムマルチプレイヤー—メール不要。",
+  "keywords": [
+    "中学生向けの言葉ゲーム",
+    "語彙学習ゲーム",
+    "教室向けの言葉ゲーム",
+    "中学英語ゲーム",
+    "語彙練習ゲーム",
+    "リアルタイム言葉ゲーム",
+    "競争的な学習ゲーム",
+    "対話型言葉ゲーム"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "he": "https://www.lexiclash.live/he/education/middle-school-word-games",
+    "en": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+    "es": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/middle-school-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/middle-school-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/middle-school-word-games"
+  },
+  "ogTitle": "中学生向けの言葉ゲーム | 語彙学習",
+  "ogDescription": "中学校(中1-中3)の教室向け無料言葉ゲーム。本物の競争、カスタム語彙、リアルタイムマルチプレイヤー—メール不要。",
+  "ogLocale": "ja_JP",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-ja.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "中学生向けの言葉ゲーム | 語彙学習"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "中学生向けの言葉ゲーム | 語彙学習",
+  "twDescription": "中学校(中1-中3)の教室向け無料言葉ゲーム。本物の競争、カスタム語彙、リアルタイムマルチプレイヤー—メール不要。",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-ja.webp"
+  ]
+}

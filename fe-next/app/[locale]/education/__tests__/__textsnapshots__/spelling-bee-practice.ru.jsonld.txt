@@ -1,0 +1,148 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/spelling-bee-practice#page",
+  "name": "Практика орфографии бесплатно — словесные игры для подготовки к конкурсам | LexiClash",
+  "description": "Практика орфографии в интернете. Boggle, анаграммы, словесные колеса, дуэли 1v1. Без регистрации и приложения — только браузер.",
+  "url": "https://www.lexiclash.live/ru/education/spelling-bee-practice",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/spelling-bee-practice#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Образование",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Практика орфографии бесплатно",
+      "item": "https://www.lexiclash.live/ru/education/spelling-bee-practice"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/spelling-bee-practice#resource",
+  "name": "Практика орфографии бесплатно — словесные игры для подготовки к конкурсам | LexiClash",
+  "description": "Практика орфографии в интернете. Boggle, анаграммы, словесные колеса, дуэли 1v1. Без регистрации и приложения — только браузер.",
+  "url": "https://www.lexiclash.live/ru/education/spelling-bee-practice",
+  "inLanguage": "ru",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Spelling Practice",
+    "Spelling Bee Preparation",
+    "Vocabulary Building",
+    "Pattern Recognition",
+    "Competition Training"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "7-18",
+  "teaches": "Spelling, letter pattern recognition, word recall under time pressure, vocabulary",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/spelling-bee-practice#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Как бесплатно практиковать орфографию онлайн?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash предлагает три взаимодополняющих способа тренировки: сетки Boggle (находите все действительные слова из случайных букв), словесное колесо (составляйте длинные слова из выбранного набора) и анаграммы (переставляйте буквы для получения целевого слова). Всё полностью бесплатно, без регистрации, без приложения — просто откройте браузер и играйте. Несколько коротких сеансов в день укрепляют навык распознавания паттернов и тренируют запоминание в условиях спешки."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Как это помогает при подготовке к конкурсу?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Конкурсы проверяют три навыка: вспоминание под стрессом, распознавание орфографических паттернов и написание слова на слух. Словесные игры прямо тренируют первые два. Колесо и Boggle заставляют ваш мозг быстро сканировать комбинации букв и узнавать правильные слова. Анаграммы тренируют перестановку букв под нажимом — точно то же мышление, которое требуется при написании незнакомого слова по буквам."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Можно ли тренироваться в дуэли 1v1 с другим участником?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Используйте режим дуэлей, чтобы встать один на один с соперником на одной сетке. Кто первый наберёт нужное количество очков — побеждает. Это отличная имитация реального конкурентного давления."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Подходит ли для конкурсов в школе, гимназии и университете?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да — сложность полностью настраивается. Младшие участники могут использовать более короткие слова и больше времени; старшие сталкиваются с длинными и сложными словами с жёсткими ограничениями по времени. Вы можете загрузить специализированные списки для тренировки редких слов, научных терминов, географических названий и других сложных категорий."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Использует ли LexiClash списки слов из известных конкурсов?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash позволяет вам загружать любые собственные списки слов. Учителя и родители могут вставить списки из справочников, рекомендуемые для подготовки, или специальные словари по изучаемым дисциплинам. Встроенные списки содержат общий словарный запас для общей подготовки; ваши списки используются для узкоспециализированной тренировки."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Как часто нужно тренироваться?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Исследования показывают (Roediger & Karpicke 2006, Cepeda et al. 2008), что эффективнее всего: 10-15 минут 4-5 раз в неделю, распределённые по времени, а не интенсивная подготовка в последний момент. Сеансы LexiClash рассчитаны именно на такой режим: 5-10 минут совместной игры + 2-3 минуты индивидуальной работы."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Подходит ли для класса?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Учитель может провести занятие для всего класса (до 30 человек присоединяются по коду из 4 цифр, без личных аккаунтов), организовать турниры с выбыванием или задать индивидуальные упражнения. Панель учителя показывает результаты каждого ученика и какие слова вызывают сложность — это помогает сосредоточить дополнительную работу на слабых местах."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Это бесплатно для отдельных учеников, занимающихся дома?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да — полностью бесплатно, никаких платных функций, никакой подписки. Откройте браузер, выберите режим, начните тренироваться. Аккаунт не обязателен (но если создадите — будет сохранять ваши результаты и показывать вашу полоску успехов)."
+      }
+    }
+  ]
+}

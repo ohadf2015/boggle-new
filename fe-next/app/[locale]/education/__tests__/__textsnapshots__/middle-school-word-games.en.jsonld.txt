@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/en/education/middle-school-word-games#page",
+  "name": "Word Games for Middle School | Vocabulary Building",
+  "description": "Free word games for 6th–8th grade classrooms. Real competitive gameplay, custom vocabulary lists, live multiplayer—no email required.",
+  "url": "https://www.lexiclash.live/en/education/middle-school-word-games",
+  "inLanguage": "en",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/en/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/en/education/middle-school-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.lexiclash.live/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Education",
+      "item": "https://www.lexiclash.live/en/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Middle School Word Games",
+      "item": "https://www.lexiclash.live/en/education/middle-school-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/en/education/middle-school-word-games#resource",
+  "name": "Word Games for Middle School | Vocabulary Building",
+  "description": "LexiClash is a free browser-based word game where students join live classrooms with a code to compete in word hunts, vocabulary challenges, and real-time multiplayer games. Teachers get progress tracking and can upload custom vocabulary lists for any subject. No email required.",
+  "url": "https://www.lexiclash.live/en/education/middle-school-word-games",
+  "inLanguage": "en",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Vocabulary Development"
+  ],
+  "educationalLevel": [
+    "Secondary"
+  ],
+  "typicalAgeRange": "11-15",
+  "teaches": "Vocabulary acquisition, lexical recall, academic language, competitive communication",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/en/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/en/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/en/education/middle-school-word-games#faq",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Do students need email addresses?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. For live classroom games, they join with a code only. If they want to track personal progress, they can choose to sign in, but it's not required."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I know what my students learned?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Your teacher dashboard shows accuracy by word, attempt count, and patterns across the class. Export reports to your gradebook."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I upload my own vocabulary?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Upload a word list for any subject or test. LexiClash generates games from your words."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does competitive gameplay turn off struggling readers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on how you frame it. LexiClash lets you hide leaderboards, group students by level, or focus on individual improvement. Games also move fast, so a low score feels less stigmatizing than a failed test."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long is a typical game?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most games are 5–15 minutes. Perfect for a warm-up or review, not a full class period."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there chat or external content?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Classroom games are closed to your students only. No chat, no links, no third-party ads."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will my school block this?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash is educational and usually whitelisted. If you hit a block, contact your IT team—we can help make the case."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What devices does it work on?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chromebooks, iPads, phones, laptops, and smartboards. No install needed. Just open the browser and join."
+      }
+    }
+  ]
+}

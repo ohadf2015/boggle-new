@@ -1,0 +1,195 @@
+/**
+ * useSignupPrompt - Show signup modal for guests ONLY post-game
+ *
+ * Prompts guests to sign up after completing at least 1 game
+ * and only surfaces the modal on results screens, never pre-game.
+ * Gate: 1+ games completed (ensures first-game is done before prompt).
+ * Variant via PostHog flag: after-first-win (1 win minimum) or after-third-game (3 games minimum).
+ *
+ * t_4833c3cd: timing + latch hardening for the prompt→completed cliff.
+ * Soft-sheet arm (signup-prompt-friction-v1) fires at the emotional peak
+ * (1.5s); control keeps the legacy 3.5s delay. Timer re-checks the
+ * once-per-session latch so parallel mounts (Host + leftover results
+ * callers) cannot double-fire prompt_shown.
+ *
+ * t_da22db9a: the peak-timing claim only holds for in-session games. A
+ * returning guest's localStorage stats qualify on app BOOT, and the delay
+ * then popped the sheet on whatever page they landed on (observed in
+ * PostHog 14d: /en/daily, /en/education/* — mistimed, often under a z-90
+ * results dialog). The prompt now requires a fresh `guestStatsChanged`
+ * (a game just completed this SPA session) so it fires only at a real
+ * post-game pause.
+ * t_da22db9a: emit signup-prompt-active so One Tap can cancel; sole intended
+ * mount is SignupPromptHost (Results dual-mount removed).
+ */
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getGuestStats } from '@/utils/guestManager';
+import { usePostHogFlag } from '@/hooks/usePostHogFlag';
+import { useConsentDecided } from '@/hooks/useConsentDecided';
+import { useExperiment } from '@/hooks/useExperiment';
+import { trackSignupFunnel } from '@/utils/growthTracking';
+import { isGameActive } from '@/utils/abandonOnPagehide';
+import {
+  SIGNUP_PROMPT_SHOWN_KEY,
+  emitSignupPromptActive,
+} from '@/lib/auth/signupPromptCoordination';
+
+/** Legacy delay — control arm of signup-prompt-friction-v1. */
+export const SIGNUP_PROMPT_DELAY_CONTROL_MS = 3500;
+/** Peak-timing delay — soft-sheet arm (default after t_4833c3cd). */
+export const SIGNUP_PROMPT_DELAY_PEAK_MS = 1500;
+
+interface UseSignupPromptParams {
+  isAuthenticated: boolean;
+  hasUser: boolean;
+  authLoading: boolean;
+  disabled?: boolean;
+}
+
+interface SignupPromptResult {
+  showSignupModal: boolean;
+  setShowSignupModal: (show: boolean) => void;
+  dismissSignupModal: () => void;
+  /** True when the prompt qualifies as a first-win celebration (winner emotional peak). */
+  isFirstWin: boolean;
+  /** Friction experiment arm — host chooses Dialog vs soft sheet. */
+  frictionVariant: 'control' | 'soft-sheet';
+}
+
+/**
+ * Hook to manage signup prompt display for guests
+ * Shows modal after qualify gate with a delay
+ */
+export function useSignupPrompt({
+  isAuthenticated,
+  hasUser,
+  authLoading,
+  disabled = false,
+}: UseSignupPromptParams): SignupPromptResult {
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [isFirstWin, setIsFirstWin] = useState(false);
+  // Bump on `guestStatsChanged` window event so the gate re-evaluates when a
+  // game updates localStorage. SignupPromptHost mounts once at the provider;
+  // without this, stats read at 0/0 on app boot and never re-check.
+  const [statsVersion, setStatsVersion] = useState(0);
+  // Capture the variant the prompt was shown under so dismissal/completion
+  // events can attribute correctly without re-reading guest stats.
+  const shownVariantRef = useRef<{ isFirstWin: boolean } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onChange = () => setStatsVersion((v) => v + 1);
+    window.addEventListener('guestStatsChanged', onChange);
+    return () => window.removeEventListener('guestStatsChanged', onChange);
+  }, []);
+
+  // A/B test: 'after-first-win' gates on actual win (with 5-game fallback for non-winners);
+  // 'after-third-game' gates purely on games count.
+  const signupVariant = usePostHogFlag<string>('show-signup-after-first-win', 'after-first-win');
+
+  // t_4833c3cd friction surface + peak timing.
+  const { variant: frictionVariant, trackExposure: trackFrictionExposure } =
+    useExperiment('signup-prompt-friction-v1');
+  const delayMs =
+    frictionVariant === 'control'
+      ? SIGNUP_PROMPT_DELAY_CONTROL_MS
+      : SIGNUP_PROMPT_DELAY_PEAK_MS;
+
+  // Hold the prompt until the cookie-consent decision is resolved. The consent banner
+  // (z-110, no backdrop) would otherwise sit on top of this modal (z-90), so the modal
+  // pops up *behind* it and gets revealed when the user clicks Decline/Accept.
+  const consentDecided = useConsentDecided();
+
+  useEffect(() => {
+    if (disabled || isAuthenticated || hasUser || authLoading) return;
+    if (typeof window === 'undefined') return;
+    if (!consentDecided) return;
+
+    const alreadyShown = sessionStorage.getItem(SIGNUP_PROMPT_SHOWN_KEY);
+    if (alreadyShown) return;
+
+    // t_da22db9a: never fire at app boot. `statsVersion` only bumps on a
+    // `guestStatsChanged` event (a game just wrote stats — see saveGuestStats).
+    // Without this gate a returning guest with qualifying history gets the
+    // sheet 1.5s after landing on ANY page. First-session guests still get
+    // their prompt: their first completed game fires the event, re-running
+    // this effect at the results screen.
+    if (statsVersion === 0) return;
+
+    const stats = getGuestStats();
+    const games = stats.games || 0;
+    const wins = stats.wins || 0;
+
+    // MANDATORY GATE: Never show before first game is completed.
+    // This ensures the signup flow only appears post-game, not during gameplay or pre-game lobbies.
+    if (games < 1) return;
+
+    // Post-first-game threshold: based on variant and emotional peak strategy.
+    // after-third-game: fires at 3+ games (consistent, predictable)
+    // after-first-win (default): fires at the FIRST completed game in this
+    //   session — the #978 post-game emotional peak. The old
+    //   wins>=1 || games>=5 gate meant a first-time guest who lost games 1–4
+    //   never qualified (t_c75cbe59: solo impressions collapsed to ~0.5/day,
+    //   host-filtered prompt→completed funnel at 0%). Celebration copy still
+    //   keys off qualifiesAsFirstWin (an actual win).
+    const qualifies = signupVariant === 'after-third-game'
+      ? games >= 3
+      : games >= 1;
+
+    if (!qualifies) return;
+
+    const qualifiesAsFirstWin = signupVariant !== 'after-third-game' && wins >= 1;
+
+    const timer = setTimeout(() => {
+      // Never interrupt live gameplay: if the player already started another
+      // round, a mid-game modal gets reflex-dismissed (or worse, drives an
+      // abandon). Defer WITHOUT latching the once-per-session flag — the next
+      // `guestStatsChanged` (i.e. that game's results screen) re-runs this
+      // effect and shows the prompt at a natural pause.
+      if (isGameActive()) return;
+      // Parallel mounts (SignupPromptHost + leftover results callers) both
+      // schedule timers before either latches. Re-check here so only the
+      // first fire wins — prevents double prompt_shown + stacked UI.
+      if (sessionStorage.getItem(SIGNUP_PROMPT_SHOWN_KEY)) return;
+      setIsFirstWin(qualifiesAsFirstWin);
+      setShowSignupModal(true);
+      sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
+      shownVariantRef.current = { isFirstWin: qualifiesAsFirstWin };
+      trackSignupFunnel('prompt_shown', qualifiesAsFirstWin, { surface: frictionVariant });
+      trackFrictionExposure();
+      emitSignupPromptActive(true);
+    }, delayMs);
+
+    return () => clearTimeout(timer);
+  }, [
+    isAuthenticated,
+    hasUser,
+    authLoading,
+    disabled,
+    signupVariant,
+    statsVersion,
+    consentDecided,
+    delayMs,
+    frictionVariant,
+    trackFrictionExposure,
+  ]);
+
+  const dismissSignupModal = useCallback(() => {
+    setShowSignupModal(false);
+    emitSignupPromptActive(false);
+    const shown = shownVariantRef.current;
+    if (shown) {
+      shownVariantRef.current = null;
+      trackSignupFunnel('dismissed', shown.isFirstWin);
+    }
+  }, []);
+
+  return {
+    showSignupModal,
+    setShowSignupModal,
+    dismissSignupModal,
+    isFirstWin,
+    frictionVariant,
+  };
+}

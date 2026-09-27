@@ -1,0 +1,309 @@
+import type { ConnectionPuzzle, PuzzleLocale } from '../types';
+import { inferTheme } from '../theme';
+import { EN_PUZZLES } from './generated/en.generated';
+import { HE_PUZZLES } from './generated/he.generated';
+import { ES_PUZZLES } from './generated/es.generated';
+import { SV_PUZZLES } from './generated/sv.generated';
+import { JA_PUZZLES } from './generated/ja.generated';
+import { RU_PUZZLES } from './generated/ru.generated';
+
+/**
+ * Locales with a materialized native pool. Authored in the DB
+ * (public.connections_puzzles), materialized to static .ts via
+ * scripts/connections/materialize-puzzles.mjs. A locale with no entry here
+ * falls back to 'en' via resolveLocale, exactly as before. ('ja' uses the
+ * device IME — see localeNeedsIME / PuzzleCard.)
+ */
+const PUZZLES_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {
+  en: EN_PUZZLES,
+  he: HE_PUZZLES,
+  es: ES_PUZZLES,
+  sv: SV_PUZZLES,
+  ja: JA_PUZZLES,
+  ru: RU_PUZZLES,
+};
+
+/**
+ * Deterministic greedy that spreads consecutive puzzles apart on four axes, in
+ * priority order: exact bridge (hard), coarse semantic theme (soft), and the
+ * word1 / word2 stems (soft). Players complained about "many similar riddles in
+ * a row" even when the bridge varied — sometimes the surrounding words matched
+ * (כוס+חלב then כוס+קפה: different bridges, identical word1), and sometimes the
+ * puzzles merely shared a *feel* (two food-ish, two nature-ish back-to-back).
+ * The theme axis (see ../theme) is what catches the latter.
+ *
+ * For each slot we score every remaining item by a penalty against the previous
+ * pick and take the lowest. The bridge penalty dominates, so the same bridge is
+ * never placed adjacently unless every remaining item shares it (truly forced).
+ * Theme and stem penalties are soft nudges. A tiny "drain the biggest remaining
+ * bridge bucket first" term breaks ties, so a dominant bridge can't pile up at
+ * the end and force a run of repeats. Pure + deterministic (id-sorted base,
+ * integer/rational penalties) — required for reproducible level numbering.
+ */
+const BRIDGE_PENALTY = 10000;
+const THEME_PENALTY = 100;
+const STEM_PENALTY = 30;
+
+// Recency windows (2026-07-03): penalizing only the IMMEDIATELY previous pick
+// let the same bridge/stem echo back at distance 2 — players read that as
+// "almost the same puzzle again". Each axis now looks back over a short
+// window with penalties decaying by recency (÷1, ÷2, ÷3…), so a repeat two
+// or three levels back still repels but never outweighs a fresher clash.
+const BRIDGE_WINDOW = 4;
+const THEME_WINDOW = 2;
+const STEM_WINDOW = 3;
+
+/**
+ * mulberry32 — tiny deterministic PRNG. Used to vary the greedy's base order
+ * per player (seed from playerSeed.ts) so two players don't walk an identical
+ * level path, while every anti-adjacency guarantee below still holds.
+ */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  const rand = mulberry32(seed);
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+/** Exported for tests — production callers go through the ordered level path. */
+export function interleaveByBridge(items: ConnectionPuzzle[], seed = 0): ConnectionPuzzle[] {
+  // Stable, deterministic base order; greedy reorders from here. A non-zero
+  // seed shuffles the base deterministically, so ties in the greedy resolve
+  // differently per player — same puzzles, personal order.
+  let remaining = [...items].sort((a, b) => a.id.localeCompare(b.id));
+  if (seed !== 0) remaining = seededShuffle(remaining, seed);
+  const themeOf = new Map(remaining.map((p) => [p.id, inferTheme(p)] as const));
+
+  const out: ConnectionPuzzle[] = [];
+
+  while (remaining.length > 0) {
+    // Remaining count per bridge — used only as a tie-break toward draining the
+    // dominant bucket first (scaled tiny so it never overrides a real penalty).
+    const bridgeCount = new Map<string, number>();
+    for (const p of remaining) bridgeCount.set(p.bridge, (bridgeCount.get(p.bridge) ?? 0) + 1);
+
+    let bestIdx = 0;
+    let bestScore = Infinity;
+    for (let i = 0; i < remaining.length; i++) {
+      const p = remaining[i];
+      const th = themeOf.get(p.id)!;
+      let penalty = 0;
+      for (let back = 1; back <= BRIDGE_WINDOW; back++) {
+        const recent = out[out.length - back];
+        if (!recent) break;
+        if (p.bridge === recent.bridge) penalty += BRIDGE_PENALTY / back;
+        if (back <= THEME_WINDOW && th !== 'misc' && th === themeOf.get(recent.id)) {
+          penalty += THEME_PENALTY / back;
+        }
+        if (back <= STEM_WINDOW) {
+          if (p.word1 === recent.word1) penalty += STEM_PENALTY / back;
+          if (p.word2 === recent.word2) penalty += STEM_PENALTY / back;
+        }
+      }
+      // Prefer draining the largest remaining bridge bucket (tiny weight → pure
+      // tie-break). Among equal penalties the lowest index (id-sorted) wins.
+      penalty -= (bridgeCount.get(p.bridge) ?? 0) * 0.001;
+      if (penalty < bestScore) {
+        bestScore = penalty;
+        bestIdx = i;
+      }
+    }
+
+    out.push(remaining.splice(bestIdx, 1)[0]);
+  }
+  return out;
+}
+
+/**
+ * Hand-vetted opening for the level path. A new player walks
+ * getPuzzleForLevel(1), (2), … — and the raw easy band led with the most
+ * generic compounding morphemes (DRAW·BACK·FIRE, SNOW·BALL·ROOM), so the first
+ * impression was "too easy / too obvious." The pool already contained
+ * approachable-but-delightful "aha" easy puzzles (JIG·SAW·DUST, RAIN·BOW·TIE);
+ * they were just buried by id/source ordering. This list pulls the charmers to
+ * the front, verbatim, then the rest of the easy band interleaves as before.
+ *
+ * Picked to (a) be gettable yet have a satisfying twist, (b) be concrete/visual,
+ * (c) disperse bridge + stems so no two openers feel alike. Ids must be `easy`
+ * in the pool (asserted in openingCuration.test.ts); an unknown/typo'd id is
+ * silently skipped — it can't break the level path.
+ *
+ * Locales not listed here (sv/es/ja) fall through to the plain interleave,
+ * byte-for-byte unchanged. `he` is authored from the meaning-pivot puzzles
+ * (the bridge flips sense between the two phrases: כאב·ראש·ממשלה — "head"ache /
+ * "head" of state) and is flagged for native review.
+ */
+export const CURATED_OPENING: Partial<Record<PuzzleLocale, readonly string[]>> = {
+  // Rebuilt 2026-07-03 from the dual-judge sweep: only judge-approved (≥80)
+  // easy puzzles; old entries the sweep re-labeled or deactivated were dropped.
+  en: [
+    'en-v-035', // PINE · APPLE · SAUCE   — pineapple / applesauce
+    'en-q-010', // POP · CORN · FIELD     — popcorn / cornfield
+    'en-v-036', // BUTTER · CUP · CAKE    — buttercup / cupcake
+    'en-q-006', // SAIL · BOAT · HOUSE    — sailboat / boathouse
+    'en-v-037', // COW · BOY · FRIEND     — cowboy / boyfriend
+    'en-q-008', // ARM · CHAIR · MAN      — armchair / chairman
+    'en-q-005', // HEAD · BAND · STAND    — headband / bandstand
+    'en-q-004', // EYE · BALL · PARK      — eyeball / ballpark
+  ],
+  he: [
+    'he-e-034', // כאב · ראש · ממשלה     — כאב ראש (headache) / ראש ממשלה (PM)
+    'he-m-079', // פרח · בר · מצווה      — פרח בר (wildflower) / בר מצווה — meaning pivot
+    'he-h-020', // בית · ספר · תורה      — בית ספר (school) / ספר תורה (scroll)
+    // Was he-o-002 (עץ · תפוח · אדום) until the 2026-09-20 Hebrew sweep culled
+    // it: עץ תפוח is real but תפוח אדום is a generic adjective pairing (ירוק,
+    // גדול, רקוב all fit), so it broke quality law 2. Replaced with a stronger
+    // meaning pivot at the same difficulty — ponytail → racehorse.
+    'he-e-024', // זנב · סוס · מרוץ      — זנב סוס (ponytail) / סוס מרוץ (racehorse)
+    'he-h-022', // מי · ברז · מים        — מי ברז (tap water) / ברז מים
+    'he-e-001', // עוגת · שוקולד · חם    — עוגת שוקולד / שוקולד חם
+    'he-m-093', // חדר · שינה · עמוקה    — חדר שינה / שינה עמוקה
+    'he-h-084', // דלת · כניסה · ראשית   — דלת כניסה / כניסה ראשית
+  ],
+  // es/sv/ja/ru: top judge-scored (≥75) concrete easy puzzles, distinct bridges
+  // (2026-07-03 dual-judge sweep — see docs/superpowers/specs/2026-07-03-connections-quality-and-pyramid-design.md).
+  es: [
+    'es-e-001', // pasa · TIEMPO · libre     — pasatiempo / tiempo libre
+    'es-e-002', // cumple · AÑOS · luz       — cumpleaños / años luz
+    'es-e-009', // sobre · MESA · redonda    — sobremesa / mesa redonda
+    'es-h-002', // para · SOL · naciente     — parasol / sol naciente
+    'es-e-003', // video · JUEGO · mesa      — videojuego / juego de mesa
+    'es-e-006', // ferro · CARRIL · bici     — ferrocarril / carril bici
+    'es-h-009', // lava · PLATOS · hondos    — lavaplatos / platos hondos
+    'es-h-008', // traba · LENGUAS · vivas   — trabalenguas / lenguas vivas
+  ],
+  sv: [
+    'sv-e-001', // fot · BOLL · plan         — fotboll / bollplan
+    'sv-e-008', // sjuk · HUS · läkare       — sjukhus / husläkare
+    'sv-h-022', // barn · BOK · hylla        — barnbok / bokhylla
+    'sv-h-024', // köks · KNIV · ställ       — kökskniv / knivställ
+    'sv-h-028', // guld · RING · finger      — guldring / ringfinger
+    'sv-h-033', // tåg · BILJETT · kontroll  — tågbiljett / biljettkontroll
+    'sv-h-034', // is · GLASS · pinne        — isglass / glasspinne
+    'sv-h-036', // jul · GRAN · fot          — julgran / granfot
+  ],
+  ja: [
+    'ja-m-003', // 外 · 国 · 語              — 外国 / 国語
+    'ja-e-004', // 学 · 校 · 長              — 学校 / 校長
+    'ja-h-004', // 会 · 社 · 員              — 会社 / 社員
+    'ja-h-047', // 何 · 時 · 間              — 何時 / 時間
+    'ja-h-033', // 都 · 市 · 場              — 都市 / 市場
+    'ja-h-045', // 注 · 目 · 的              — 注目 / 目的
+    'ja-v-002', // 七 · 夕 · 日              — 七夕 / 夕日
+    'ja-v-005', // 団 · 子 · 供              — 団子 / 子供
+  ],
+  ru: [
+    'ru-a-004', // КРУГЛЫЙ · СТОЛ · ПЕРЕГОВОРОВ — круглый стол / стол переговоров
+    'ru-a-012', // ЗОЛОТОЙ · ЗУБ · МУДРОСТИ     — золотой зуб / зуб мудрости
+    'ru-a-014', // ФУТБОЛЬНОЕ · ПОЛЕ · ЧУДЕС    — футбольное поле / поле чудес
+    'ru-a-016', // КРАСНАЯ · КНИГА · РЕКОРДОВ   — красная книга / книга рекордов
+    'ru-a-011', // АНГЛИЙСКИЙ · ЯЗЫК · ЖЕСТОВ   — английский язык / язык жестов
+    'ru-a-007', // ВОЛШЕБНАЯ · ПАЛОЧКА · ВЫРУЧАЛОЧКА — волшебная палочка / палочка-выручалочка
+    'ru-a-003', // ВЫСШАЯ · ШКОЛА · ЖИЗНИ       — высшая школа / школа жизни
+    'ru-a-026', // НОВЫЙ · ГОД · СВИНЬИ         — новый год / год свиньи
+  ],
+};
+
+/**
+ * Difficulty-ramped order: easy → medium → hard. Within each difficulty, bridges
+ * are interleaved so the same category does not appear back-to-back. The curated
+ * opening (if any) is pinned to the front of the easy band verbatim; the rest of
+ * the easy band, plus medium and hard, interleave as before. Built once at module
+ * load — pools are import-time constants.
+ */
+const orderedCache = new Map<string, ConnectionPuzzle[]>();
+
+function orderedFor(locale: PuzzleLocale, seed: number): ConnectionPuzzle[] {
+  const key = `${locale}:${seed}`;
+  const cached = orderedCache.get(key);
+  if (cached) return cached;
+
+  const all = PUZZLES_BY_LOCALE[locale] ?? [];
+  const easyAll = all.filter((p) => p.difficulty === 'easy');
+
+  // Pin curated openers to the front (verbatim, in listed order), keeping only
+  // ids that resolve to an actual easy puzzle. Everything else interleaves.
+  const byId = new Map(easyAll.map((p) => [p.id, p] as const));
+  const opening = (CURATED_OPENING[locale] ?? [])
+    .map((id) => byId.get(id))
+    .filter((p): p is ConnectionPuzzle => !!p);
+  const openSet = new Set(opening.map((p) => p.id));
+  const easyRest = easyAll.filter((p) => !openSet.has(p.id));
+
+  const ordered = [
+    ...opening,
+    ...interleaveByBridge(easyRest, seed),
+    ...interleaveByBridge(all.filter((p) => p.difficulty === 'medium'), seed),
+    ...interleaveByBridge(all.filter((p) => p.difficulty === 'hard'), seed),
+  ];
+  orderedCache.set(key, ordered);
+  return ordered;
+}
+
+/** Map a UI locale to a locale we have a native pool for; otherwise fall back to 'en'. */
+function resolveLocale(locale: string): PuzzleLocale {
+  return locale in PUZZLES_BY_LOCALE ? (locale as PuzzleLocale) : 'en';
+}
+
+export function getPuzzlesForLocale(locale: string): ConnectionPuzzle[] {
+  return PUZZLES_BY_LOCALE[resolveLocale(locale)] ?? PUZZLES_BY_LOCALE.en ?? [];
+}
+
+function activeOrdered(
+  locale: PuzzleLocale,
+  banned?: ReadonlySet<string>,
+  seed = 0,
+): ConnectionPuzzle[] {
+  const ordered = orderedFor(locale, seed);
+  if (!banned || banned.size === 0) return ordered;
+  return ordered.filter((p) => !banned.has(p.id));
+}
+
+export function getTotalLevels(locale: string, banned?: ReadonlySet<string>, seed = 0): number {
+  return activeOrdered(resolveLocale(locale), banned, seed).length;
+}
+
+/**
+ * Returns the puzzle for a given level number (1-based). Cycles through the
+ * ordered pool when level exceeds total — keeps the game playable at high levels.
+ *
+ * `banned` is the auto-ban set from `v_connections_banned_puzzles` (≥3 distinct
+ * authenticated players flagged dislike+gave_up). Filtered out before
+ * indexing so level numbers always map to a *playable* puzzle.
+ */
+export function getPuzzleForLevel(
+  locale: string,
+  level: number,
+  banned?: ReadonlySet<string>,
+  seed = 0,
+): ConnectionPuzzle | null {
+  const ordered = activeOrdered(resolveLocale(locale), banned, seed);
+  if (ordered.length === 0) return null;
+  const lvl = Math.max(1, Math.floor(level));
+  const idx = (lvl - 1) % ordered.length;
+  return ordered[idx];
+}
+
+/** @deprecated kept for any legacy callers; new code should use getPuzzleForLevel */
+export function getShuffledPuzzles(locale: string, count = 20): ConnectionPuzzle[] {
+  const all = getPuzzlesForLocale(locale);
+  const shuffled = [...all].sort(() => Math.random() - 0.5);
+  const easy = shuffled.filter((p) => p.difficulty === 'easy').slice(0, Math.floor(count * 0.4));
+  const medium = shuffled.filter((p) => p.difficulty === 'medium').slice(0, Math.floor(count * 0.4));
+  const hard = shuffled.filter((p) => p.difficulty === 'hard').slice(0, Math.floor(count * 0.2));
+  return [...easy, ...medium, ...hard].sort(() => Math.random() - 0.5);
+}

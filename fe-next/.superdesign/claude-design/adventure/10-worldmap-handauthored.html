@@ -1,0 +1,130 @@
+<!-- @dsCard group="Adventure · World Map" label="World Map — NEO (hard chrome + graphic biome)" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adventure World Map — Neo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#1a1a2e; --navy-l:#16213e; --cream:#FFFEF0; --ink:#0a0a12;
+    --lime:#BFFF00; --pink:#FF1493; --cyan:#00FFFF; --purple:#8B5CF6;
+    --yellow:#FFE135; --orange:#FF6B35;
+    --disp:'Fredoka',system-ui,sans-serif; --body:'Rubik',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#0b0b16;display:flex;justify-content:center;padding:24px;font-family:var(--body);}
+  .phone{width:390px;height:780px;border-radius:28px;overflow:hidden;position:relative;
+    /* GRAPHIC BIOME: flat bold color BANDS (not haze) + halftone dot texture */
+    background:
+      linear-gradient(180deg,#063246 0%,#063246 26%,#0a4a5e 26%,#0a4a5e 52%,#0d5e6e 52%,#0d5e6e 100%);
+  }
+  /* crisp halftone overlay — defined dots, not blur */
+  .phone::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.18;
+    background-image:radial-gradient(rgba(255,255,255,.5) 1.1px, transparent 1.2px);
+    background-size:13px 13px;}
+  /* hard graphic horizon line */
+  .horizon{position:absolute;top:200px;left:0;right:0;height:0;border-top:3px solid var(--ink);z-index:1;}
+  /* HEADER — hard chip chrome */
+  .hdr{position:relative;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:16px 14px;}
+  .wtab{background:var(--cyan);border:3px solid var(--ink);border-radius:12px;padding:6px 14px;
+    box-shadow:4px 4px 0 var(--ink);font-family:var(--disp);font-weight:700;font-size:20px;color:var(--ink);}
+  .stat{display:flex;gap:8px;}
+  .scoin{background:var(--navy);border:2px solid var(--ink);border-radius:10px;padding:5px 10px;
+    box-shadow:2px 2px 0 var(--ink);color:var(--cream);font-weight:700;font-size:13px;display:flex;align-items:center;gap:5px;}
+  .scoin .c{color:var(--yellow);}
+  /* TRAIL */
+  .trail{position:absolute;inset:84px 0 0 0;z-index:4;display:flex;flex-direction:column;align-items:center;}
+  /* thick dashed connector path */
+  .path{width:0;height:34px;border-left:4px dashed var(--ink);opacity:.55;}
+  .node{position:relative;width:150px;border:3px solid var(--ink);border-radius:18px;
+    box-shadow:6px 6px 0 var(--ink);overflow:hidden;}
+  .node .cap{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;
+    font-family:var(--disp);font-weight:700;color:var(--ink);font-size:14px;border-bottom:3px solid var(--ink);}
+  .node .body{padding:14px 12px;display:flex;align-items:center;gap:12px;background:var(--navy);}
+  .bignum{font-family:var(--disp);font-size:42px;font-weight:700;line-height:1;color:var(--cream);
+    text-shadow:3px 3px 0 var(--ink);}
+  .nmeta{display:flex;flex-direction:column;gap:4px;}
+  .nlbl{color:var(--cream);font-weight:600;font-size:13px;}
+  .stars{display:flex;gap:3px;}
+  .stars span{width:18px;height:18px;display:grid;place-items:center;font-size:13px;
+    border:2px solid var(--ink);border-radius:5px;background:var(--yellow);color:var(--ink);box-shadow:1px 1px 0 var(--ink);}
+  .stars span.off{background:var(--navy-l);color:#5b6b80;}
+  /* per-node accent */
+  .done .cap{background:var(--lime);}
+  .cur{border-color:var(--ink);box-shadow:6px 6px 0 var(--ink), 0 0 0 4px var(--cyan);}
+  .cur .cap{background:var(--cyan);}
+  .cur .body{position:relative;}
+  .playbadge{position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    background:var(--pink);border:2px solid var(--ink);border-radius:8px;box-shadow:2px 2px 0 var(--ink);
+    color:var(--cream);font-family:var(--disp);font-weight:700;font-size:12px;padding:5px 10px;}
+  .locked .cap{background:#4a4a5e;color:#0a0a12;}
+  .locked .body{background:#20202e;}
+  .locked .bignum{color:#3f4a5e;text-shadow:2px 2px 0 var(--ink);}
+  .locked .nlbl{color:#5b6b80;}
+  .gate{display:flex;align-items:center;gap:6px;color:#8a93a8;font-size:11px;font-weight:600;}
+  /* boss preview node */
+  .boss .cap{background:var(--orange);}
+  .boss .body{background:#2a1020;}
+  .bosstag{margin-left:auto;background:var(--ink);color:var(--orange);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;letter-spacing:.5px;}
+  .note{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#bfeaf2;font-size:10px;font-weight:600;z-index:5;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="horizon"></div>
+    <div class="hdr">
+      <div class="wtab">🌊 Springs</div>
+      <div class="stat">
+        <div class="scoin"><span class="c">◆</span> 1,240</div>
+        <div class="scoin">⭐ 14/30</div>
+      </div>
+    </div>
+
+    <div class="trail">
+      <div class="node done">
+        <div class="cap">World 2 · Lv 3 <span class="bosstag" style="background:transparent;color:var(--ink)">CLEARED</span></div>
+        <div class="body">
+          <div class="bignum">3</div>
+          <div class="nmeta"><div class="nlbl">Tide Pools</div>
+            <div class="stars"><span>★</span><span>★</span><span>★</span></div></div>
+        </div>
+      </div>
+      <div class="path"></div>
+
+      <div class="node cur">
+        <div class="cap">World 2 · Lv 4 <span class="bosstag" style="background:var(--ink);color:var(--cyan)">NOW</span></div>
+        <div class="body">
+          <div class="bignum">4</div>
+          <div class="nmeta"><div class="nlbl">The Current</div>
+            <div class="stars"><span>★</span><span>★</span><span class="off">★</span></div></div>
+          <div class="playbadge">PLAY ▸</div>
+        </div>
+      </div>
+      <div class="path"></div>
+
+      <div class="node locked">
+        <div class="cap">World 2 · Lv 5</div>
+        <div class="body">
+          <div class="bignum">5</div>
+          <div class="nmeta"><div class="nlbl">Deep Trench</div>
+            <div class="gate">🔒 Clear Lv 4 to unlock</div></div>
+        </div>
+      </div>
+      <div class="path"></div>
+
+      <div class="node boss locked">
+        <div class="cap">World 2 · Boss <span class="bosstag">⚔ BOSS</span></div>
+        <div class="body">
+          <div class="bignum">10</div>
+          <div class="nmeta"><div class="nlbl">The Kraken</div>
+            <div class="gate">🔒 Collect 18 ⭐ to challenge</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="note">NEO — flat biome bands + crisp halftone · 3px borders + 6px hard shadows · electric accents · star plates</div>
+  </div>
+</body>
+</html>

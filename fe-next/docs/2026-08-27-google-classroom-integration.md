@@ -1,0 +1,186 @@
+# Google Classroom integration — spec
+
+**Status:** Phase 1 implemented 2026-08-27. Phase 1.5 Marketplace Discovery slice shipped 2026-09-07 (Stream assign via share dialog + iframe URIs; no roster OAuth). Phase 1.6 miss-gap grade passback shipped 2026-09-08 (Kahoot Marketplace foil; no roster OAuth). Phase 1.7 Unplugged reteach Live grade passback shipped 2026-09-14 (Kahoot Classroom add-on foil; no roster OAuth). Phase 1.8 free-Workspace miss-gap Live assign shipped 2026-09-15 (Quizlet Education Plus lock foil; no roster OAuth). Phase 2 NOT started, and blocked on a decision that is
+the product owner's, not an engineer's (see below).
+
+## Why
+
+Measured on 2026-08-27: 41 teacher access requests, all approved, 35 holding the teacher role —
+and **2 classrooms in the module's entire history, with 1 student who has ever joined one.**
+
+The create-flow is not the problem. It measures **3 clicks and 1 required field** to a visible join
+code; Google Classroom, captured against the real authenticated product, takes **6 clicks**. We are
+already twice as short as the benchmark and 33 of 35 teachers still finished nothing.
+
+What a teacher actually stalls on is the step after the code: **getting 28 kids to type it.** Today
+the only handoff is "copy this 6-character code and somehow get it to your class." Google Classroom
+already holds that class, and every one of those students is already signed in to it.
+
+Two further constraints shape the phasing:
+
+- **A teacher gets one day.** No approved teacher has ever been active on a second day. Anything
+  that defers value to "later" is deferring it to never.
+- **8 of 35 teachers played our word games after approval and never set up a class.** We compete for
+  their attention with our own consumer product, so the handoff has to be short enough to finish in
+  the same sitting.
+
+## Phase 1 — Share to Classroom link (SHIPPED)
+
+A plain link to Google's own share dialog:
+
+```
+https://classroom.google.com/share?url=<encoded>&title=<encoded>&body=<encoded>&itemtype=announcement
+```
+
+Verified against `developers.google.com/classroom/guides/sharebutton`: `url` is the only required
+parameter, and **no OAuth, API key or credential of any kind is involved.** Google prompts the
+teacher to sign in with their Workspace for Education account inside its own dialog. They pick a
+class, we never see it.
+
+The teacher clicks it, picks their class, and the join link lands on that class's Stream — where
+every student already looks. No code to read out, no code to mistype.
+
+Deliberately chosen over the API route because it:
+- needs **no OAuth scopes**, so it is not gated on Google's verification review (weeks),
+- touches **no student PII** — we learn nothing about the roster,
+- stores **no tokens**, so it introduces no new trust boundary,
+- works for every teacher **today**, not just the first 100 in a testing-mode allowlist.
+
+**Implementation:** `lib/education/googleClassroomShare.ts` (pure, no network, no side effects) plus
+one action in `ClassroomManager`. Copy in all six locales.
+
+
+## Phase 1.5 — Marketplace / Workspace add-on Discovery (SHIPPED slice)
+
+Foil Discovery Education Gemini Classroom (2026-08-31) + Kahootopia Assignments.
+Teachers need a path **inside Classroom** (not only the in-app #968 CTA) to
+one-click post Unplugged reteach homework (printable #957 + Live deep-link
+#959/#968) into the Stream.
+
+**Shipped in this slice (no OAuth, no roster PII):**
+
+- Attachment Discovery iframe: `/{locale}/education/classroom-addon`
+- Teacher/Student attachment view: `/{locale}/education/classroom-addon/attachment`
+  (reuses Unplugged reteach Live)
+- Assign API: `POST /api/classroom-addon/assign` → `#968` Stream share URL +
+  AddOnAttachment URI body
+- Marketplace listing JSON: `GET /api/classroom-addon/marketplace`
+- CSP `frame-ancestors` allows `classroom.google.com` on addon routes only
+
+Stream post still uses Phase 1 `classroom.google.com/share?itemtype=assignment`
+with the Unplugged Live absolute URL on **lexiclash.live**. Creating a native
+add-on attachment via `courses.courseWork.addOnAttachments.create` needs
+`classroom.addons.teacher` only (NOT `classroom.rosters.readonly`) and is
+deferred — Discovery already emits the attachment body shape when that lands.
+
+**Implementation:** `lib/education/googleClassroomAddon.ts`, Discovery UI,
+API routes above. Skips teacher-p0 / streak tracks.
+
+## Phase 1.6 — Miss-gap grade passback (SHIPPED slice)
+
+Kahoot Marketplace grade-passback foil for **#975 async miss-gap homework**.
+When a student marks practice complete, LexiClash scores the turn-in
+(on-time = 100/100, late = 70/100) and exposes:
+
+- Grade receipt tool route: `/{locale}/education/miss-gap-grade-passback` (**NON_LANDING**)
+- `POST /api/classroom-addon/grade-passback` → `attachment.maxPoints` +
+  `studentSubmission` patch body (`pointsEarned`, `postState=TURNED_IN`)
+- Classroom iframe CSP on the receipt route (same ancestors as #970)
+
+No roster OAuth. `classroom.addons.teacher` patch wire-up remains deferred —
+the attachment / submission shapes ship today so Grade sync can land without
+another rebuild of the homework path.
+
+**Implementation:** `lib/education/missGapGradePassback.ts`, receipt UI,
+API route above; wired from `MissGapAsyncAssignment` on complete.
+
+
+## Phase 1.7 — Unplugged reteach Live grade passback (SHIPPED slice)
+
+Kahoot Classroom add-on grade-passback foil for **Unplugged reteach Live**
+completion (complements Phase 1.6 miss-gap homework). When the teacher finishes
+an Unplugged Live session, LexiClash scores class cleared/total and exposes:
+
+- Grade receipt tool route: `/{locale}/education/unplugged-grade-passback` (**NON_LANDING**)
+- `POST /api/classroom-addon/unplugged-grade-passback` → `attachment.maxPoints` +
+  `studentSubmission` patch body (`pointsEarned`, `postState=TURNED_IN`)
+- Finish CTA on Unplugged Live end sticker → open Classroom grade receipt
+- Parent WhatsApp miss-gap practice card on the receipt (#980)
+- Classroom iframe CSP on the receipt route (same ancestors as #970 / #977)
+
+No roster OAuth. `classroom.addons.teacher` patch wire-up remains deferred.
+Class-level missed words + cleared/total only — never student names.
+
+**Implementation:** `lib/education/unpluggedReteachGradePassback.ts`, receipt UI,
+API route above; wired from `UnpluggedReteachLive` / `UnpluggedFinishCard` on finish.
+
+## Phase 2 — Roster import (NOT BUILT — needs a product decision first)
+
+The obvious next step is `courses.list` + `courses.students.list` so a teacher picks an existing
+Google class instead of typing a name, and their students are pre-enrolled.
+
+**This is blocked on a privacy decision, not on engineering.**
+
+`classroom.rosters.readonly` returns student **Google identities** — real names and school email
+addresses, for minors. Today LexiClash students join anonymously as guests with a display name and
+no account. Importing a roster means either creating real accounts for children, or storing their
+school email addresses. That is a COPPA-shaped question, and this project has already made a
+deliberate ruling in the adjacent space: the Play Console notes record that under-13 targeting was
+**dropped on purpose** in June 2026 to keep offerwall/interstitial monetization, because Families
+policy is incompatible with it. Pulling minors' identities back in cuts against that decision.
+
+Do not build Phase 2 until someone with authority answers: *do we store school-issued student
+identities, and under which policy?*
+
+If the answer is yes, the engineering constraints are:
+
+- **Verify `provider_token` survives first.** The plan would rest on Supabase's
+  `signInWithOAuth({ scopes })` handing back `provider_token` / `provider_refresh_token`. Supabase
+  surfaces those **once**, in the session right after the OAuth redirect, and does not persist them
+  across refresh. A refresh token only arrives with `access_type=offline` + `prompt=consent`.
+  **Confirm empirically that `session.provider_refresh_token` is actually populated before writing
+  any UI** — if it is not, Supabase-mediated OAuth cannot back this and we need our own callback
+  route holding the client secret, which is a materially different build.
+- **Scopes stay read-only:** `classroom.courses.readonly` + `classroom.rosters.readonly`. Do NOT
+  request a write scope to post to the Stream — Phase 1 already gets that for free.
+- **Tokens are a trust boundary:** encrypted at rest, service-role access only, RLS denying all
+  client reads, never reachable from a `NEXT_PUBLIC_*` path.
+- **Sensitive-scope verification** with Google is a review process measured in weeks. Testing mode
+  covers 100 users, which is enough for the current 35 teachers but is not a public launch.
+- `google-auth-library@^10.5.0` is already a dependency; the Classroom REST API needs no extra SDK,
+  plain `fetch` with a bearer token is enough.
+
+## Env / config
+
+Phase 1 introduces **no new environment variables** — that is part of why it ships today.
+Note for Phase 2: `NEXT_PUBLIC_*` values freeze at build time in this repo. A previously-shipped
+Teacher Pro outage came from exactly that (`NEXT_PUBLIC_CHECKOUT_ENABLED` set at runtime but not
+baked into the bundle), and "unset" is indistinguishable from "set but not baked" when read from a
+browser. Probe the runtime endpoint, not just the rendered HTML.
+
+
+### Classic Unplugged (Kahoot Classic:Unplugged foil)
+
+Shared teacher-screen miss-gap Live (`/education/classic-unplugged`). Class or 2–4 teams discuss; teacher reveals and submits consensus. No student devices, no answer timer. Reuses Unplugged finish sticker + Phase 1.7 / #1045 grade passback (`cleared/total`). Foils the Sep 2026 Classic:Unplugged asymmetry left after #1047 Team Tiles. Prod: **lexiclash.live** (never lexiclash.com).
+
+### Team Tiles Unplugged (Kahoot Team Tiles foil)
+
+Shared teacher-screen miss-gap tileboard (`/education/team-tiles-unplugged`). Teams flip tiles → word; teacher marks. Reuses Unplugged finish sticker + Phase 1.7 / #1045 grade passback (`cleared/total`). No student devices. Class-level words only — no roster OAuth. Prod: **lexiclash.live** (never lexiclash.com).
+
+
+### Free-Workspace miss-gap Live assign (Quizlet Education Plus foil)
+
+Phase-1 `classroom.google.com/share` assignment pointing at the class-gap card (`?intent=live`). Teacher assigns a 3-min miss-gap Live into Classwork; students open from Classroom; teacher starts Live from the card. **Works on free Google Workspace for Education** — Quizlet's Google Classroom add-on requires Education Plus / Teaching & Learning Upgrade. No roster OAuth. Surfaces: Marketplace Discovery CTA, results "Assign miss-gap Live", `liveStreamAssignUrl` on `/api/classroom-addon/assign`. Prod: **lexiclash.live**.
+
+### Miss-gap Live question pack (Kahoot ChatGPT-app foil)
+
+Kahoot's ChatGPT app hops teachers out to generate a quiz pack. From miss-gap
+results, **Launch Live question pack** writes a quickLaunch `paste` intent and
+opens `classroom-game?flow=quickLaunch` — stays inside LexiClash, no ChatGPT hop.
+Class-level missed words only. Implementation: `lib/education/missGapQuestionPack.ts`,
+wired from `useReteachLinks` / `ReteachActions`.
+
+
+### Conversational Classroom add-on planner (Discovery Gemini foil)
+
+Teacher plain-language prompt inside the Marketplace add-on (`/education/classroom-addon/planner`, API `/api/classroom-addon/plan`) routes into shipped Classic Unplugged, Team Tiles Unplugged, or Unplugged reteach Live + #1045 grade passback. Example prompts: "Unplugged reteach on yesterday's misses", "3-min Live on CEFR gaps". Class-level missed words only — no roster OAuth / student names. Does **not** reopen Unplugged game logic. Foils Discovery Education Gemini conversational Classroom. Prod: **lexiclash.live**.

@@ -1,0 +1,155 @@
+'use client';
+
+import { useCallback, useEffect, useRef } from 'react';
+import Script from 'next/script';
+import { isNative, isEdgeBrowser } from '@/utils/platform';
+import { supabase, signInWithGoogle } from '@/lib/supabase';
+import { ensureGoogleIdInitialized, type GoogleIdServices } from '@/lib/auth/googleOneTap';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import { trackSignupPromptClicked } from '@/utils/growthTracking';
+import { GoogleIcon } from '@/components/auth/shared/icons/BrandIcons';
+
+const GSI_SRC = 'https://accounts.google.com/gsi/client';
+const GSI_MAX_WIDTH = 400; // GIS hard cap
+
+interface GoogleSignInButtonProps {
+  className?: string;
+  /** Force a pixel width. If omitted, the button fills its container (≤400px). */
+  width?: number;
+  /**
+   * Signup-prompt surface (e.g. first_win_sheet). GSI iframe clicks never hit
+   * useOAuthSignIn — fire prompt_clicked on pointerdown so the mid-funnel
+   * stays wired for soft-sheet Google (t_c75cbe59).
+   */
+  analyticsSource?: string;
+}
+
+/**
+ * Google's official "Sign in with Google" button (web), wrapped in a
+ * neo-brutalist frame to match the app's other auth buttons.
+ *
+ * On Microsoft Edge, Google's GSI (in-page iframe) button is broken because
+ * Edge blocks third-party cookies by default. Edge users get a fallback
+ * button that triggers Supabase's redirect-based OAuth flow instead.
+ *
+ * The GSI button is an iframe and can't be CSS-styled, and it MUST stay visible
+ * (GSI anti-clickjacking ignores clicks on hidden/obscured buttons — a custom
+ * overlay is impossible). So we render Google's own `outline` (white) button and
+ * wrap it in a neo frame whose chrome (border-3, rounded-xl, 48px) matches the
+ * Discord Button so the two providers read as a matched pair. It uses the in-page
+ * ID-token flow → consent shows OUR domain.
+ *
+ * Shares the single global GIS init with the One Tap initializer; success
+ * propagates via Supabase `SIGNED_IN`. Web-only (native uses the SDK).
+ */
+export default function GoogleSignInButton({ className, width, analyticsSource }: GoogleSignInButtonProps) {
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+  const { language } = useLanguage();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const renderedRef = useRef(false);
+
+  const enabled = !isNative() && !!clientId && !!supabase;
+
+  // GSI iframe swallows clicks — pointerdown on our chrome is the last
+  // reliable signal that the soft-sheet Google CTA was engaged.
+  const handlePromptClickIntent = () => {
+    if (analyticsSource) trackSignupPromptClicked(analyticsSource);
+  };
+
+  const renderButton = useCallback(async () => {
+    if (renderedRef.current || !clientId || !containerRef.current) return;
+    const google = (window as unknown as { google?: GoogleIdServices }).google;
+    if (!google?.accounts?.id) return;
+
+    await ensureGoogleIdInitialized(google, clientId);
+    // Re-read the ref: init is async, and a component that unmounted while it was
+    // in flight (auth modal closed, route changed) nulls the ref out. Passing that
+    // null to renderButton is what logs `[GSI_LOGGER]: Failed to render button
+    // because there is no parent or options set.` to Sentry.
+    const container = containerRef.current;
+    if (!container) return;
+    renderedRef.current = true;
+    // 'outline' = white button (white bg, dark text). The colored "G" can't be
+    // recolored — Google's branding rules forbid a monochrome logo, so a black G
+    // is impossible. White button inside our black frame = neo-brutalist look.
+    //
+    // No forced width by default: a width wider than the content makes GSI float
+    // the logo+text off-center (it drifts to the "end", glaringly so with RTL
+    // locales). Auto-sizing keeps the button snug to its content so the content
+    // stays centered; the full-width white frame below supplies the full-width
+    // look. An explicit `width` prop still wins for callers that need a fixed size.
+    google.accounts.id.renderButton(container, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      shape: 'rectangular',
+      text: 'continue_with',
+      logo_alignment: 'center',
+      // Follow the SITE language, not the browser locale — otherwise a visitor
+      // on /he with a Dutch browser gets "Doorgaan met Google". `locale` is a
+      // renderButton option (it is NOT part of the initialize config).
+      locale: language,
+      ...(width != null ? { width: Math.min(width, GSI_MAX_WIDTH) } : {}),
+    });
+  }, [clientId, width, language]);
+
+  // GIS may already be loaded (the global One Tap initializer pulls it in) — render
+  // immediately rather than waiting for a fresh onReady.
+  useEffect(() => {
+    if (enabled) void renderButton();
+  }, [enabled, renderButton]);
+
+  // Edge browser: GSI iframe + third-party cookie blocking breaks the flow.
+  // Render a fallback button that triggers Supabase's redirect-based OAuth.
+  if (isEdgeBrowser()) {
+    return (
+      <div className={cn('flex justify-center', className)}>
+        <button
+          type="button"
+          data-testid="google-signin-edge-fallback"
+          onClick={() => { handlePromptClickIntent(); void signInWithGoogle(); }}
+          className={cn(
+            'w-full flex items-center justify-center gap-2 py-3 rounded-xl',
+            'border-3 border-neo-black bg-white text-neo-black font-black text-sm',
+            'shadow-hard transition-all hover:shadow-hard-sm active:translate-y-0.5',
+          )}
+        >
+          <GoogleIcon className="w-5 h-5" />
+          <span>Continue with Google</span>
+        </button>
+      </div>
+    );
+  }
+
+  if (!enabled) return null;
+
+  // Google's docs: the GSI button's displayed language comes from the `hl`
+  // query param on the SCRIPT tag URL — the client library itself is fetched
+  // in that language. Without it, GSI falls back to the browser/OS locale, so
+  // a browser set to e.g. Arabic renders an Arabic button even on the English
+  // site. `renderButton`'s own `locale` option only sticks if it matches the
+  // locale the library was loaded with, so both must agree.
+  const gsiSrc = `${GSI_SRC}?hl=${language}`;
+
+  return (
+    <div ref={wrapperRef} className={cn('flex justify-center', className)}>
+      <Script id="google-gsi-client" src={gsiSrc} strategy="afterInteractive" onReady={() => void renderButton()} />
+      {/* Neo-brutalist frame around the (visible, clickable) Google button — hard
+          black border + hard shadow, corners clipped to rounded-neo. Full width +
+          white bg + centered: GSI renders a snug, content-sized white button, and
+          the white frame bg blends with it so the control reads as one full-width
+          button (matching the Discord/email buttons) with perfectly centered
+          content — instead of a fixed-width button with the logo+text drifting to
+          one end. */}
+      <div
+        data-testid="gsi-frame"
+        onPointerDown={handlePromptClickIntent}
+        className="flex w-full min-h-[48px] items-center justify-center overflow-hidden rounded-xl border-3 border-neo-black bg-white shadow-hard"
+      >
+        <div ref={containerRef} data-testid="gsi-button-container" />
+      </div>
+    </div>
+  );
+}

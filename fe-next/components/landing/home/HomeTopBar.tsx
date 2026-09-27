@@ -1,0 +1,207 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Flame } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import AvatarLite from '@/components/AvatarLite';
+import { NeoSkeleton } from '@/components/ui/skeleton';
+import { getXpProgress, getTitleForLevel } from '@/backend/modules/xpManager';
+import { clampPercent } from '@/lib/landing/homeHubFormat';
+import { useAccountStreak } from '@/hooks/useAccountStreak';
+import type { ProfileData } from '@/contexts/auth/authTypes';
+
+/** localStorage key — a stable per-device seed so a guest's random avatar is the
+ *  same across reloads (and matches whatever they later see pre-sign-in). */
+const GUEST_AVATAR_SEED_KEY = 'lc:guestAvatarSeed';
+
+interface HomeTopBarProps {
+  profile: ProfileData | null;
+  /** active locale — powers the avatar's link to the profile page */
+  language: string;
+  t: (
+    key: string,
+    fallbackOrParams?: string | Record<string, string | number>,
+    params?: Record<string, string | number>,
+  ) => string;
+  /** auth still resolving — show skeletons for profile-derived values (name/level/coins) */
+  profileLoading?: boolean;
+}
+
+/**
+ * HomeTopBar — the arcade-home greeting row: avatar wrapped in a lime level ring
+ * (conic fill = real XP progress within the current level), a level badge,
+ * "Hey, {name}" + "Level {n} · {title}", and streak + coins pills.
+ *
+ * All numbers are real: level/title/progress derive from `profile.total_xp`
+ * via the shared `xpManager` curve, coins from `profile.total_coins`. Missing
+ * fields degrade gracefully (level 1, no title, 0 coins) — never "undefined".
+ */
+export function HomeTopBar({
+  profile,
+  language,
+  t,
+  profileLoading = false,
+}: HomeTopBarProps) {
+  // Same source as the header StreakBadge — the player's ACCOUNT streak for a
+  // signed-in player (the same server number the daily-puzzle card shows),
+  // falling back to the device-local retention streak only for a guest.
+  const { streak, loading: streakLoading } = useAccountStreak();
+
+  // Profile + streak are client-resolved (auth / retention store). On the server and
+  // the first client render they may differ — and `coins.toLocaleString()` is
+  // locale-dependent (Node vs browser) — so gate ALL dynamic values behind a
+  // mount flag. SSR + first client render both paint the skeleton state → identical
+  // → no hydration mismatch; real values (or the neutral guest state) commit after
+  // mount (the same reflow the rest of the landing already accepts).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // Stable per-device random seed → a new player (or anyone whose profile hasn't
+  // loaded) gets a generated avatar instead of an endless skeleton. localStorage
+  // keeps it identical across reloads. Client-only (SSR can't read it), so the
+  // pre-mount frame still paints the avatar skeleton — accepted to avoid an
+  // avatar-swap flicker from an SSR placeholder seed.
+  const [guestSeed, setGuestSeed] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      let s = localStorage.getItem(GUEST_AVATAR_SEED_KEY);
+      if (!s) {
+        s = Math.random().toString(36).slice(2, 10);
+        localStorage.setItem(GUEST_AVATAR_SEED_KEY, s);
+      }
+      setGuestSeed(s);
+    } catch {
+      setGuestSeed('guest');
+    }
+  }, []);
+
+  const p = mounted ? profile : null;
+  const liveStreak = mounted ? streak : 0;
+
+  // Skeleton only while genuinely loading — a logged-out guest is NOT loading and
+  // gets the neutral state ("Player", level 1, 0), never an endless skeleton.
+  // Pre-mount paints skeleton too so SSR matches the first client frame.
+  const showProfileSkeleton = !mounted || profileLoading;
+  const showStreakSkeleton = !mounted || streakLoading;
+
+  // The avatar always has a seed → generated avatar, never a skeleton. The real
+  // profile id wins once loaded; otherwise the stable guest seed gives a random one.
+  const avatarSeed = p?.id ?? guestSeed ?? undefined;
+
+  const totalXp = p?.total_xp ?? 0;
+  const progress = getXpProgress(totalXp);
+  // Prefer the persisted level but fall back to the XP-derived one if absent.
+  const level = p?.current_level ?? progress.currentLevel;
+  // `getTitleForLevel` returns a raw constant key (e.g. "LEXICON_KING"). Localize
+  // it via the `landing.home.titles.*` table; fall back to a humanized key so a
+  // missing translation degrades to "Lexicon King" rather than the raw token.
+  const titleKey = getTitleForLevel(level);
+  const title = titleKey ? t(`landing.home.titles.${titleKey}`, humanizeTitleKey(titleKey)) : null;
+  const ringPct = clampPercent(progress.progressPercent);
+  const coins = p?.total_coins ?? 0;
+  const name = p?.display_name || p?.username || t('common.player');
+
+  return (
+    <div className="flex items-center justify-between gap-2.5 px-0.5">
+      {/* avatar + greeting — tapping the avatar/name opens the profile */}
+      <Link
+        href={`/${language}/profile`}
+        aria-label={t('nav.profile', 'Profile')}
+        className="flex min-w-0 items-center gap-2.5 rounded-full transition-transform active:scale-95"
+      >
+        <div
+          className="relative h-[50px] w-[50px] shrink-0 rounded-full p-[3px]"
+          style={{
+            background: `conic-gradient(var(--neo-lime) 0 ${ringPct}%, rgba(255,255,255,0.16) ${ringPct}% 100%)`,
+          }}
+          aria-hidden="true"
+        >
+          {/* The real face without the client art library: AvatarLite overlays
+              the versioned server PNG (same compositor as Avatar), face-cropped,
+              with its own black edge — no second bordered disc around it.
+              Pre-mount frame has no seed → plain disc. */}
+          <AvatarLite
+            customAvatar={p?.avatar_config ?? null}
+            userId={avatarSeed}
+            pixelSize={44}
+          />
+          {/* Level badge — skeleton dot while the profile loads, never empty. */}
+          {showProfileSkeleton ? (
+            <NeoSkeleton variant="circular" width={19} height={19} className="absolute -bottom-[3px] -end-[3px] border-2 border-black" />
+          ) : (
+            <span className="absolute -bottom-[3px] -end-[3px] flex h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-black bg-neo-lime px-1 font-neo-display text-[11px] font-black leading-none text-neo-navy shadow-hard-sm">
+              {level}
+            </span>
+          )}
+        </div>
+        <div className="min-w-0">
+          {showProfileSkeleton ? (
+            <div className="flex flex-col gap-1.5 py-0.5">
+              <NeoSkeleton variant="text" width={120} height={15} />
+              <NeoSkeleton variant="text" width={80} height={11} />
+            </div>
+          ) : (
+            <>
+              <div className="truncate font-neo-display text-[17px] font-bold leading-tight text-neo-cream">
+                {t('landing.home.greeting', { name })}
+              </div>
+              <div className="truncate font-neo-body text-xs font-medium leading-snug text-neo-white/55">
+                {title
+                  ? t('landing.home.levelTitle', { level, title })
+                  : t('landing.home.levelOnly', { level })}
+              </div>
+            </>
+          )}
+        </div>
+      </Link>
+
+      {/* streak + coins */}
+      <div className="flex shrink-0 items-center gap-2">
+        <span className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm">
+          <Flame className="h-[15px] w-[15px] text-neo-orange" strokeWidth={2.2} aria-hidden="true" />
+          {showStreakSkeleton ? (
+            <NeoSkeleton variant="text" width={14} height={14} />
+          ) : (
+            <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream">{liveStreak}</span>
+          )}
+        </span>
+        <span className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm">
+          <CoinGlyph />
+          {showProfileSkeleton ? (
+            <NeoSkeleton variant="text" width={28} height={14} />
+          ) : (
+            <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream">
+              {coins.toLocaleString()}
+            </span>
+          )}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Humanize a raw level-title constant as a safety net when its translation is
+ * missing: "LEXICON_KING" → "Lexicon King". Never user-facing in the happy path
+ * (the `landing.home.titles.*` table covers every key), but beats leaking a token.
+ */
+function humanizeTitleKey(key: string): string {
+  return key
+    .toLowerCase()
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+/** Two overlapping lime discs — a tiny stacked-coins glyph, on-brand vs a generic icon. */
+function CoinGlyph() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="9" cy="12" r="7" fill="var(--neo-lime)" stroke="#000" strokeWidth="1.4" />
+      <circle cx="15" cy="12" r="7" fill="#d4ff4d" stroke="#000" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+export default HomeTopBar;

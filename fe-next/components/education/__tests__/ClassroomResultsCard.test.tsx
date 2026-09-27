@@ -1,0 +1,383 @@
+/**
+ * Classroom-aware results.
+ *
+ * The old results screen showed a lesson card built from the TEACHER's
+ * sessionStorage, so a room of 25 students saw nothing. This card renders from
+ * the server-built summary in the shared results payload, and shows the teacher
+ * a class-wide view while each student sees their own.
+ */
+
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ClassroomResultsCard } from '../ClassroomResultsCard';
+import type { ClassroomSummary } from '@/shared/types/classroom';
+import { shareWithFallback } from '@/utils/shareWithFallback';
+import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
+
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    language: 'en',
+    t: (key: string, params?: Record<string, string | number>) =>
+      params ? `${key}:${JSON.stringify(params)}` : key,
+  }),
+}));
+
+vi.mock('@/utils/shareWithFallback', () => ({
+  shareWithFallback: vi.fn().mockResolvedValue('copied'),
+}));
+
+vi.mock('@/lib/education/missedWordsPracticeSheet', () => ({
+  openMissedWordsPracticeSheet: vi.fn().mockReturnValue(true),
+}));
+
+vi.mock('@/lib/education/unpluggedReteachPrintablePack', () => ({
+  openUnpluggedReteachPrintablePack: vi.fn().mockReturnValue(true),
+}));
+
+const summary: ClassroomSummary = {
+  teacherName: 'Ms. Cohen',
+  lessonNames: ['Physics 101'],
+  lessonIds: ['lesson-1'],
+  totalWords: 3,
+  coverage: [
+    { word: 'photon', foundBy: ['Maya'] },
+    { word: 'atom', foundBy: ['Maya', 'Noa'] },
+    { word: 'neutron', foundBy: [] },
+  ],
+  missedWords: ['neutron'],
+  classFoundCount: 2,
+  masteryByPlayer: {
+    Maya: { found: 2, total: 3 },
+    Noa: { found: 1, total: 3 },
+  },
+};
+
+describe('ClassroomResultsCard', () => {
+  beforeEach(() => {
+    vi.mocked(shareWithFallback).mockClear();
+    vi.mocked(shareWithFallback).mockResolvedValue('copied');
+    vi.mocked(openMissedWordsPracticeSheet).mockClear();
+    vi.mocked(openMissedWordsPracticeSheet).mockReturnValue(true);
+    vi.mocked(openUnpluggedReteachPrintablePack).mockClear();
+    vi.mocked(openUnpluggedReteachPrintablePack).mockReturnValue(true);
+  });
+
+  it('names the lesson and teacher so a student knows whose class this was', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.getByText(/Physics 101/)).toBeInTheDocument();
+    expect(screen.getByText(/Ms\. Cohen/)).toBeInTheDocument();
+  });
+
+  it('shows a student their own mastery, not the class total', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.getByText(/yourMastery.*"found":1.*"total":3/)).toBeInTheDocument();
+  });
+
+  it('marks which lesson words the student personally found and missed', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.getByTestId('lesson-word-atom')).toHaveAttribute('data-found', 'true');
+    expect(screen.getByTestId('lesson-word-photon')).toHaveAttribute('data-found', 'false');
+    expect(screen.getByTestId('lesson-word-neutron')).toHaveAttribute('data-found', 'false');
+  });
+
+  it('does not show a student the per-word roster of who found what', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByText(/Maya/)).not.toBeInTheDocument();
+  });
+
+  it('gives the teacher the class-wide coverage count', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    expect(screen.getByText(/classCoverage.*"found":2.*"total":3/)).toBeInTheDocument();
+  });
+
+  it('gives the teacher the reteach list — the words nobody found', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    expect(screen.getByTestId('reteach-list')).toHaveTextContent('neutron');
+  });
+
+  it('tells the teacher how many students found each word', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    expect(screen.getByTestId('lesson-word-atom')).toHaveTextContent('2');
+  });
+
+  it('congratulates instead of showing an empty reteach list', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('reteach-list')).not.toBeInTheDocument();
+    expect(screen.getByText(/allFound/)).toBeInTheDocument();
+  });
+
+  it('handles a student who found nothing without crashing on a missing mastery row', () => {
+    render(<ClassroomResultsCard summary={summary} username="LateJoiner" isTeacher={false} />);
+    expect(screen.getByText(/yourMastery.*"found":0.*"total":3/)).toBeInTheDocument();
+  });
+
+  it('offers the teacher a reteach round on exactly the missed words', () => {
+    const onReteach = vi.fn();
+    render(
+      <ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher onReteach={onReteach} />
+    );
+    const button = screen.getByTestId('play-reteach-round');
+    fireEvent.click(button);
+    expect(onReteach).toHaveBeenCalledTimes(1);
+  });
+
+  it('never offers a student the reteach round — only the teacher drives the class', () => {
+    render(
+      <ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} onReteach={vi.fn()} />
+    );
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+  });
+
+  it('offers no reteach round when the class found every word', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(
+      <ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher onReteach={vi.fn()} />
+    );
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+  });
+
+  it('renders no reteach button without a handler, e.g. for a non-host viewer', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+  });
+
+  it('lets a teacher share the class gap with parents/Slack', async () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('share-class-gap'));
+    await waitFor(() => {
+      expect(shareWithFallback).toHaveBeenCalledTimes(1);
+    });
+    const arg = vi.mocked(shareWithFallback).mock.calls[0][0];
+    expect(arg.url).toContain('https://www.lexiclash.live/en/education/class-gap');
+    expect(arg.url).toContain('neutron');
+    expect(arg.url).not.toContain('Maya');
+    expect(arg.url).not.toContain('Noa');
+    expect(arg.url).not.toContain('lexiclash.com');
+  });
+
+  /**
+   * Round 2's verdict counted NINE competing calls to action on the student's
+   * results screen. "Share the class's gap with a parent" was one of them, and
+   * it is the least defensible: it is a teacher's report, worded for an adult,
+   * sent from a fifteen-year-old's phone about a class rather than about them.
+   * The student's screen keeps exactly one thing to do — practise what they
+   * missed. The share stays, on the device that has a reason to use it.
+   */
+  it('keeps the parent-share on the teacher device, not on thirty phones', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('share-class-gap')).not.toBeInTheDocument();
+  });
+
+  it('leaves a student exactly one thing to do: practise what they missed', () => {
+    render(
+      <ClassroomResultsCard
+        summary={summary}
+        username="Noa"
+        isTeacher={false}
+        onPractice={() => {}}
+      />
+    );
+    const actions = screen
+      .getByTestId('classroom-results-card')
+      .querySelectorAll('button, a[href]');
+    expect(actions).toHaveLength(1);
+  });
+
+  it('confirms when the gap link was copied for Slack/parent chat', async () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('share-class-gap'));
+    await waitFor(() => {
+      expect(screen.getByText('education.results.shareGapCopied')).toBeInTheDocument();
+    });
+  });
+
+  it('offers the teacher a Google Classroom post for a 3-min reteach Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('post-reteach-google-classroom');
+    expect(link).toHaveAttribute('href');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('https://classroom.google.com/share');
+    expect(href).toContain(encodeURIComponent('https://www.lexiclash.live/en/education/class-gap'));
+    expect(href).toContain('itemtype=announcement');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('lexiclash.com');
+  });
+
+  it('never offers a student the Google Classroom reteach post', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('post-reteach-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('hides the Google Classroom reteach post when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('post-reteach-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('offers the teacher a Google Classroom assignment for practice after Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('assign-practice-google-classroom');
+    expect(link).toHaveAttribute('href');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('https://classroom.google.com/share');
+    expect(href).toContain(encodeURIComponent('https://www.lexiclash.live/en/education/class-gap'));
+    expect(href).toContain('itemtype=assignment');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('lexiclash.com');
+  });
+
+  it('never offers a student the Google Classroom practice assignment', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('assign-practice-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('hides the Google Classroom practice assignment when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('assign-practice-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('offers the teacher a printable missed-words practice sheet after Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('print-missed-words-practice-sheet'));
+    expect(openMissedWordsPracticeSheet).toHaveBeenCalledTimes(1);
+    const arg = vi.mocked(openMissedWordsPracticeSheet).mock.calls[0][0];
+    expect(arg.missedWords).toEqual(['neutron']);
+    expect(arg.lesson).toContain('Physics 101');
+    expect(arg.teacher).toBe('Ms. Cohen');
+    expect(JSON.stringify(arg)).not.toContain('Maya');
+    expect(JSON.stringify(arg)).not.toContain('Noa');
+  });
+
+  it('never offers a student the printable practice sheet', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('print-missed-words-practice-sheet')).not.toBeInTheDocument();
+  });
+
+  it('hides the printable practice sheet when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('print-missed-words-practice-sheet')).not.toBeInTheDocument();
+  });
+
+  it('offers the teacher an unplugged reteach Live link from last-session misses', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('start-unplugged-reteach-live');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('/en/education/unplugged-reteach');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('Noa');
+  });
+
+  it('never offers a student the unplugged reteach Live CTA', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('start-unplugged-reteach-live')).not.toBeInTheDocument();
+  });
+
+  it('hides the unplugged reteach Live CTA when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('start-unplugged-reteach-live')).not.toBeInTheDocument();
+  });
+
+
+  it('offers the teacher a Google Classroom Unplugged reteach assignment after Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('assign-unplugged-google-classroom');
+    expect(link).toHaveAttribute('href');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('https://classroom.google.com/share');
+    expect(href).toContain(encodeURIComponent('https://www.lexiclash.live/en/education/unplugged-reteach'));
+    expect(href).toContain('itemtype=assignment');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('Noa');
+    expect(href).not.toContain('lexiclash.com');
+  });
+
+  it('never offers a student the Google Classroom Unplugged assignment', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('assign-unplugged-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('hides the Google Classroom Unplugged assignment when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('assign-unplugged-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('offers the teacher a shareable miss-gap practice card after Unplugged assign', async () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('share-miss-gap-practice'));
+    await waitFor(() => expect(shareWithFallback).toHaveBeenCalled());
+    const arg = vi.mocked(shareWithFallback).mock.calls.at(-1)?.[0] as {
+      url?: string;
+      clipboardText?: string;
+    };
+    expect(arg.url).toContain('https://www.lexiclash.live/en/education/miss-gap-practice');
+    expect(arg.url).toContain('neutron');
+    expect(arg.url).not.toContain('Maya');
+    expect(arg.url).not.toContain('Noa');
+    expect(arg.clipboardText).toContain('miss-gap-practice');
+  });
+
+  it('never offers a student the miss-gap practice share CTA', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('share-miss-gap-practice')).not.toBeInTheDocument();
+  });
+
+  it('hides the miss-gap practice share CTA when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('share-miss-gap-practice')).not.toBeInTheDocument();
+  });
+
+  it('offers the teacher async miss-gap homework (due-date flow, not Unplugged Live)', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('assign-miss-gap-async-homework');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('/en/education/miss-gap-assignment');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('unplugged-reteach');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('Noa');
+  });
+
+  it('never offers a student the async miss-gap homework CTA', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('assign-miss-gap-async-homework')).not.toBeInTheDocument();
+  });
+
+  it('hides the async miss-gap homework CTA when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('assign-miss-gap-async-homework')).not.toBeInTheDocument();
+  });
+
+  it('offers the teacher an unplugged reteach printable pack with QR Live deep-link', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('print-unplugged-reteach-pack'));
+    expect(openUnpluggedReteachPrintablePack).toHaveBeenCalledTimes(1);
+    const arg = vi.mocked(openUnpluggedReteachPrintablePack).mock.calls[0][0];
+    expect(arg.missedWords).toEqual(['neutron']);
+    expect(arg.lesson).toContain('Physics 101');
+    expect(JSON.stringify(arg)).not.toContain('Maya');
+    expect(JSON.stringify(arg)).not.toContain('Noa');
+  });
+
+  it('never offers a student the unplugged reteach printable pack', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('print-unplugged-reteach-pack')).not.toBeInTheDocument();
+  });
+
+  it('hides the unplugged reteach printable pack when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('print-unplugged-reteach-pack')).not.toBeInTheDocument();
+  });
+});

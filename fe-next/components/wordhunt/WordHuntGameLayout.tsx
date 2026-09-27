@@ -1,0 +1,378 @@
+'use client';
+
+import { memo } from 'react';
+import { cn } from '@/lib/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { SurvivalClueBoxes } from '@/components/daily/survival/SurvivalClueBoxes';
+import { SurvivalLifeBar } from '@/components/daily/survival/SurvivalLifeBar';
+import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSection';
+import { WordHuntMPHeader } from './WordHuntMPHeader';
+import { WordHuntMPLeaderboard, type LeaderboardPlayer } from './WordHuntMPLeaderboard';
+import { WordHuntGameOverOverlay } from './WordHuntGameOverOverlay';
+import type { DeathRecapStats } from './WordHuntDeathRecap';
+import type { LetterGrid } from '@/types';
+import type { LetterFeedback } from '@/utils/wordHuntFeedback';
+import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival/types';
+import type { HintLevel } from '@/utils/aiHintGenerator';
+import type { HighlightedCell } from '@/components/GridComponent';
+import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
+
+/** MP round frame on a 10-ft TV: the compact mode panel (12px text) scales with
+ *  the shell's --mp-u (1.5). `zoom` scales px, not %, so the strip keeps its width. */
+const TV_PANEL_SCALE = 'tv:[zoom:1.5]';
+
+export interface WordHuntGameLayoutProps {
+  // Header
+  score: number;
+  onQuit: () => void;
+  onShowHelp?: () => void;
+
+  // Clue boxes
+  targetLength: number;
+  currentHint: HintLevel | null;
+  attempts: TargetAttempt[];
+  accumulatedClues: Map<number, AccumulatedClue>;
+  knownLetters: Set<string>;
+  latestAttemptFeedback: LetterFeedback[] | null;
+  showFeedbackOverlay: boolean;
+
+  // Life bar
+  lifePoints: number;
+  isGameOver: boolean;
+  targetFound: boolean;
+  /** Username of who found the target (null = not found yet). Used to show correct overlay. */
+  targetFoundBy?: string | null;
+  isLifeGaining: boolean;
+  lifeGainAmount: number | null;
+
+  // Clue animation
+  isClueGaining: boolean;
+
+  // Grid
+  grid: LetterGrid;
+  onWordSubmit: (word: string) => void;
+  onWordChange: (word: string, count: number) => void;
+  highlightedPath?: HighlightedCell[];
+
+  // Word forming (kept for caller compat, not rendered — feedback shown in clue boxes)
+  formedWord?: string;
+  letterCount?: number;
+  wordFeedback?: unknown;
+  /** Currently formed word length equals targetLength — surface warning in clue boxes. */
+  matchesTargetLength?: boolean;
+
+  // Leaderboard
+  playerLives: Record<string, number>;
+  eliminatedPlayers: string[];
+  leaderboard: LeaderboardPlayer[];
+  currentUsername: string;
+  wrongGuessShake?: boolean;
+
+  // Death recap
+  deathRecapStats?: DeathRecapStats | null;
+
+  /** Suppress the MP game-over overlay entirely (e.g. in adventure mode). */
+  hideGameOverOverlay?: boolean;
+
+  /** MP drag-FTUE coachmark control. Owner-component decides visibility +
+   *  dismissal; layout just mounts it inside the grid wrapper so the cursor
+   *  animation can read `[data-letter]` tile rects. */
+  dragFTUE?: { visible: boolean; onDismiss: () => void };
+
+  /** True when this layout is the center slot of the MP desktop shell. Collapses
+   *  the internal min-[720px] sidebar layout (the shell supplies the roster), so
+   *  the board fills the slot instead of being squeezed by a duplicate sidebar. */
+  isDesktopCanvas?: boolean;
+
+  /** Live MP round frame owns the HUD, roster and rule line: render only the
+   *  compact mode strip (clues + life bar) and the board. */
+  mpChrome?: boolean;
+
+  // Common
+  t: (key: string, params?: Record<string, string | number>) => string;
+  gameDir: 'ltr' | 'rtl';
+}
+
+/** Stable empties: a fresh Set per render broke the board memo on every tick. */
+const NO_ELIMINATED_LETTERS: Set<string> = new Set();
+const NO_REVEALED_LETTERS: Set<number> = new Set();
+
+export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
+  // Header
+  score,
+  onQuit,
+  onShowHelp,
+
+  // Clue boxes
+  targetLength,
+  currentHint,
+  attempts,
+  accumulatedClues,
+  knownLetters,
+  latestAttemptFeedback,
+  showFeedbackOverlay,
+
+  // Life bar
+  lifePoints,
+  isGameOver,
+  targetFound,
+  targetFoundBy,
+  isLifeGaining,
+  lifeGainAmount,
+
+  // Clue animation
+  isClueGaining,
+
+  // Match warning
+  matchesTargetLength,
+
+  // Grid
+  grid,
+  onWordSubmit,
+  onWordChange,
+  highlightedPath,
+
+  // Leaderboard
+  playerLives,
+  eliminatedPlayers,
+  leaderboard,
+  currentUsername,
+  wrongGuessShake,
+
+  // Death recap
+  deathRecapStats,
+
+  hideGameOverOverlay,
+
+  dragFTUE,
+
+  isDesktopCanvas = false,
+
+  mpChrome = false,
+
+  // Common
+  t,
+  gameDir,
+}) => {
+  // Wide-but-short viewports (e.g. 1530×695) run the row layout (≥720px) but
+  // have too little height for the full-size chrome — the clue boxes + header
+  // crowd the grid until it's squished and selected tiles overlap. In that band
+  // we force the compact treatment so the board keeps its room. The min-width
+  // guard scopes this to the sidebar layout; portrait phones keep their own
+  // `max-height:560px` tuning.
+  const shortLandscapeQuery = useMediaQuery('(min-width: 720px) and (max-height: 760px)');
+  // In the MP round frame the strip is always compact: one ≤72px mode panel.
+  const shortLandscape = mpChrome || shortLandscapeQuery;
+
+  return (
+    <div className={cn('flex-1 flex flex-col min-h-0 overflow-x-hidden overflow-y-auto', !isDesktopCanvas && !mpChrome && 'min-[720px]:flex-row')} translate="no">
+      {/* Main game area — capped width on wider screens, with vertical rhythm between sections */}
+      <div className={cn(
+        'flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden w-full max-w-3xl mx-auto',
+        shortLandscape ? 'gap-0.5' : 'gap-1.5 md:gap-2 [@media(max-height:560px)]:gap-0.5',
+      )}>
+        {/* Score + Quit — compact */}
+        {!mpChrome && (
+          <WordHuntMPHeader
+            score={score}
+            onQuit={onQuit}
+            onShowHelp={onShowHelp}
+            t={t}
+            compact={shortLandscape}
+          />
+        )}
+
+        {/* Clue Boxes — tight vertical padding; on short landscape collapse outer padding too.
+            Skeleton placeholder while server target metadata is in flight (recovery race). */}
+        <div className={cn(
+          'flex-shrink-0',
+          shortLandscape ? 'px-1' : 'px-2 [@media(max-height:560px)]:px-1',
+          mpChrome && TV_PANEL_SCALE,
+          wrongGuessShake && 'animate-neo-shake',
+        )}>
+          {targetLength > 0 ? (
+            <SurvivalClueBoxes
+              currentHint={currentHint}
+              targetWord={'?'.repeat(targetLength)}
+              attempts={attempts}
+              accumulatedClues={accumulatedClues}
+              revealedLetters={NO_REVEALED_LETTERS}
+              knownLetters={knownLetters}
+              latestAttemptFeedback={latestAttemptFeedback}
+              showFeedbackOverlay={showFeedbackOverlay}
+              isClueGaining={isClueGaining}
+              skipAnimations={false}
+              gameDir={gameDir}
+              t={t}
+              matchesTargetLength={matchesTargetLength}
+              compact={shortLandscape}
+            />
+          ) : (
+            <ClueTilesSkeleton t={t} />
+          )}
+        </div>
+
+        {/* Persistent dual-mechanic reminder. The auto-dismissing quick-rules
+            card vanishes in 8s, leaving players thinking they must spell the
+            hidden word; this one-liner stays so it's always clear that ANY
+            valid word heals and only matching the target wins. */}
+        {targetLength > 0 && !shortLandscape && (
+          <p
+            data-testid="wh-heal-hint"
+            className="shrink-0 px-2 text-center text-[11px] sm:text-xs font-neo-body text-neo-white leading-tight"
+          >
+            {t('wordHunt.survival.healHint')}
+          </p>
+        )}
+
+        {/* Life Bar — compact wrapper */}
+        <div className={cn('px-2 shrink-0', mpChrome && TV_PANEL_SCALE)}>
+          <SurvivalLifeBar
+            lifePoints={lifePoints}
+            isGameOver={isGameOver}
+            isLifeGaining={isLifeGaining}
+            lifeGainAmount={lifeGainAmount}
+            skipAnimations={false}
+            onLifeGainComplete={() => {}}
+          />
+        </div>
+
+        {/* Grid — caps to a square that fits BOTH width and remaining height,
+             so the bottom row never overflows when clue boxes + life bar + leaderboard
+             share the column. No dvh floor — that pushed the last row off-screen. */}
+        <div
+          className={cn(
+            'flex-1 min-h-0 px-1 relative overflow-hidden flex justify-center',
+            // MP round frame: the square is width-bound on a tall phone, so the
+            // excess height is split — the callout stage (offset 132px, below the
+            // life bar) owns the band above, pb keeps a thumb-zone bias below and
+            // clears the absolute found pill. items-end pooled ~230px of dead navy
+            // above the board at 390x844 (r4 review).
+            mpChrome ? 'items-center pb-9 lg:pb-1' : 'items-center',
+          )}
+          style={{ containerType: 'size' }}
+        >
+          {/* Grid frame: square that fits the container.
+              `flex` (NOT items-center) is load-bearing: it lets the flex-1 SurvivalGridSection
+              fill this square on BOTH axes (width via flex-1, height via default stretch).
+              Without it the height chain collapses to auto, the inner .game-board-frame's
+              `max-height: min(--board-size, 100%)` clamp goes inert, and the viewport-based
+              --board-size overflows the slot → top/bottom rows clip under the chrome.
+
+              The 100cqw/100cqh terms already clamp the board to its slot, so the px
+              term only ever shrinks it further. At 440 it left ~40px of usable width
+              unspent on anything wider than ~440 (measured: a 440 grid in a 480x540
+              slot). One 560 cap below xl lets the container govern instead; that
+              also lifts tablet portrait (768w) from 440 to its slot size. */}
+          <div
+            className={cn(
+              'wordhunt-grid-container relative mx-auto flex [--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]',
+              // Round frame on a TV-sized screen: the slot is exact, let the board use it.
+              mpChrome && 'tv:[--wh-grid-size:min(100cqw,100cqh,980px)]',
+            )}
+            style={{
+              width: 'var(--wh-grid-size)',
+              height: 'var(--wh-grid-size)',
+              aspectRatio: '1 / 1',
+            }}
+          >
+            <SurvivalGridSection
+              grid={grid}
+              isGameOver={isGameOver}
+              eliminatedLetters={NO_ELIMINATED_LETTERS}
+              onWordSubmit={onWordSubmit}
+              onWordChange={onWordChange}
+              highlightedPath={highlightedPath}
+              t={t}
+            />
+
+            {/* MP drag-to-spell FTUE — only mounted in MP matches when
+                the player has been idle 20s; auto-hides on first word. */}
+            {dragFTUE?.visible && (
+              <MPDragCoachmark
+                t={t}
+                accent="pink"
+                targetSelector="[data-letter]:not([disabled])"
+                onDismiss={dragFTUE.onDismiss}
+              />
+            )}
+
+            {/* Game over overlay — death or victory, then spectator mode */}
+            {!hideGameOverOverlay && (
+              <WordHuntGameOverOverlay
+                reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
+                t={t}
+                attemptsToFind={attempts.filter((a) => a.word.length === targetLength).length}
+                deathRecapStats={deathRecapStats}
+                playersRemaining={
+                  Object.entries(playerLives).filter(
+                    ([u, life]) => life > 0 && !eliminatedPlayers.includes(u),
+                  ).length
+                }
+              />
+            )}
+          </div>
+        </div>
+
+        {/* MP Leaderboard — mobile strip. Cap by absolute px on short landscape so the grid keeps room. */}
+        {!mpChrome && <div className="shrink-0 max-h-[80px] [@media(min-height:560px)]:max-h-[10vh] overflow-y-auto min-[720px]:hidden">
+          <WordHuntMPLeaderboard
+            playerLives={playerLives}
+            eliminatedPlayers={eliminatedPlayers}
+            leaderboard={leaderboard}
+            currentUsername={currentUsername}
+            t={t}
+          />
+        </div>}
+      </div>
+
+      {/* MP Leaderboard — desktop sidebar. Suppressed in the shell (its left rail
+          already shows the roster) so it doesn't duplicate or squeeze the board. */}
+      {!mpChrome && <div className={cn('hidden min-[720px]:flex min-[720px]:flex-col min-[720px]:w-56 lg:w-72 xl:w-80 min-[720px]:border-s-3 min-[720px]:border-neo-black min-[720px]:bg-neo-navy/50 min-[720px]:overflow-y-auto', isDesktopCanvas && '!hidden')}>
+        <WordHuntMPLeaderboard
+          playerLives={playerLives}
+          eliminatedPlayers={eliminatedPlayers}
+          leaderboard={leaderboard}
+          currentUsername={currentUsername}
+          t={t}
+        />
+      </div>}
+    </div>
+  );
+});
+
+WordHuntGameLayout.displayName = 'WordHuntGameLayout';
+
+/**
+ * Placeholder shown when MP word-hunt target metadata is missing (race / lost startGame).
+ * Mirrors the SurvivalClueBoxes shell so the layout doesn't shift when real data arrives.
+ * Auto-recovery in WordHuntGame emits `requestGameState` after 1.5s.
+ */
+function ClueTilesSkeleton({ t }: { t: (key: string) => string }) {
+  return (
+    <div
+      data-testid="wh-clue-skeleton"
+      className="mx-auto max-w-3xl w-full px-3 py-2 mb-0.5 rounded-neo-lg bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20 animate-pulse"
+      role="status"
+      aria-live="polite"
+      aria-label={t('wordHunt.survival.syncingTarget')}
+    >
+      {/* Match the real clue box's reserved warning slot so the skeleton→real swap doesn't shift. */}
+      <div className="min-h-[1.5rem] sm:min-h-[1.75rem] mb-1 [@media(max-height:560px)]:hidden [@media(max-height:560px)]:min-h-0 [@media(max-height:560px)]:mb-0" />
+      <div className="text-center mb-2 text-xl sm:text-2xl font-black text-neo-white">
+        {t('wordHunt.survival.syncingTarget')}
+      </div>
+      <div className="flex justify-center flex-wrap gap-2 sm:gap-2.5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center border-2 rounded-neo font-bold shadow-hard bg-neo-black/60 border-neo-black text-neo-white"
+          >
+            ?
+          </div>
+        ))}
+      </div>
+      <div className="min-h-[40px] sm:min-h-[44px] [@media(max-height:560px)]:min-h-0" />
+    </div>
+  );
+}

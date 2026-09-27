@@ -1,0 +1,95 @@
+/**
+ * First-paint namespaces for the locale-root landing HTML.
+ *
+ * The full hashed catalogue is ~540KiB and is loaded beforeInteractive on
+ * every page today — that is the largest first-party main-thread cost on `/en`
+ * vs wordle.at (bootup 14s vs 2s). Landing only needs chrome + hero copy.
+ *
+ * Fat namespaces used for one footer/education teaser key (education ~62KiB,
+ * legal ~30KiB) are grafted via LANDING_EXTRA_KEYS instead of copied whole.
+ */
+export const LANDING_NAMESPACES = [
+  'name',
+  'direction',
+  'flag',
+  'logo',
+  'landing',
+  // Fresh-visitor homepage copy (components/landing/fresh/*), generated into
+  // translations/*.js by the homepage gauntlet merge.
+  'homeFresh',
+  'nav',
+  'common',
+  'footer',
+  'home',
+  'unfinishedBoard',
+  'wotd',
+  'presence',
+  'cookieConsent',
+  'androidAppPromo',
+  'offline',
+  'errors',
+  'error',
+  'notFound',
+  'auth',
+  'onboarding',
+  'profile',
+  'settings',
+  'daily',
+  'dailyMissions',
+  'quests',
+  'friends',
+  'notifications',
+  'gift',
+  'season',
+  'xp',
+  'music',
+  'calendar',
+  'support',
+  'streakBar',
+  'leaderboard',
+  'newsletter',
+  'validation',
+  'email',
+  'joinView',
+  'ugc',
+  'bugReport',
+  'languages',
+  'share',
+  'newModes',
+] as const;
+
+export const LANDING_EXTRA_KEYS = [
+  'education.home.badge_promo',
+  'education.home.badge_student',
+  'education.home.badge_teacher',
+  'education.home.promo_cta',
+  'education.home.promo_subtitle',
+  'education.home.promo_title',
+  'education.home.student_cta',
+  'education.home.student_subtitle',
+  'education.home.student_title',
+  'education.home.teacher_cta',
+  'education.home.teacher_subtitle',
+  'education.home.teacher_title',
+  'education.home.trial_ended',
+  'education.nav.section',
+  'education.nav.forTeachers',
+  'education.nav.myClassroom',
+  // Mode cards (lib/landing/modeMeta.ts) whose namespace is too fat to ship whole.
+  'crossword.name',
+  'crossword.tagline',
+  'wordcraft.modeTitle',
+  'wordcraft.modeDesc',
+  'wordTower.cardTitle',
+  'wordTower.cardDesc',
+  'wordTowerV2.cardTitle',
+  'wordTowerV2.cardDesc',
+  // New-modes spotlight loot peek (components/landing/LootPeek.tsx) names real loot.
+  'adventurePlay.relic',
+  'wordTowerV2.chest.tier',
+  'legal.copyright',
+  'legal.privacyPolicy',
+  'legal.refundPolicy',
+  'legal.termsOfService',
+  'legal.title',
+] as const;

@@ -1,0 +1,94 @@
+/* Avatar editor micro-motion. CSS only (off the main thread), and every
+   animation settles to the element's natural visible state — nothing starts
+   at opacity 0. prefers-reduced-motion turns all of it off. */
+
+/* Equip pop: squash → overshoot → settle, on every committed change. */
+@keyframes avatar-editor-pop {
+  0% { transform: scale(1, 1); }
+  25% { transform: scale(1.07, 0.93); }
+  55% { transform: scale(0.97, 1.04) translateY(-3%); }
+  80% { transform: scale(1.01, 0.99); }
+  100% { transform: scale(1, 1); }
+}
+
+/* Try-on: a curious little head tilt instead of the equip pop. */
+@keyframes avatar-editor-tryon {
+  0% { transform: rotate(0deg) scale(1); }
+  30% { transform: rotate(-4deg) scale(1.04); }
+  60% { transform: rotate(3deg) scale(1.02); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+/* Idle breathing so the stage never feels like a static image. */
+@keyframes avatar-editor-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5%); }
+}
+
+/* Selected-cell check badge. */
+@keyframes avatar-editor-check {
+  0% { transform: scale(0.4) rotate(-20deg); }
+  70% { transform: scale(1.15) rotate(6deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Legendary prismatic frame + foil sweep. */
+@keyframes avatar-editor-prism {
+  to { --avatar-editor-angle: 360deg; }
+}
+@keyframes avatar-editor-foil {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  60%, 100% { transform: translateX(220%) skewX(-18deg); }
+}
+
+@property --avatar-editor-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.avatar-editor-idle { animation: avatar-editor-idle 3.2s ease-in-out infinite; }
+.avatar-editor-pop { animation: avatar-editor-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.avatar-editor-tryon { animation: avatar-editor-tryon 520ms ease-out; }
+.avatar-editor-check { animation: avatar-editor-check 260ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* Legendary cells: a rotating conic border (gold → pink → cyan) under the cell. */
+.avatar-editor-legendary {
+  background:
+    linear-gradient(var(--neo-navy-light), var(--neo-navy-light)) padding-box,
+    conic-gradient(from var(--avatar-editor-angle), #ffd700, #ff1493, #00ffff, #ffd700) border-box;
+  border-color: transparent !important;
+  animation: avatar-editor-prism 4s linear infinite;
+}
+
+.avatar-editor-foil {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.avatar-editor-foil::after {
+  content: '';
+  position: absolute;
+  inset: -10% auto -10% 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: avatar-editor-foil 2.6s ease-in-out infinite;
+}
+
+/* Thin scrollbars inside the part grid only. */
+.avatar-editor-scroll { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
+.avatar-editor-noscrollbar { scrollbar-width: none; }
+.avatar-editor-noscrollbar::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-editor-idle,
+  .avatar-editor-pop,
+  .avatar-editor-tryon,
+  .avatar-editor-check,
+  .avatar-editor-legendary,
+  .avatar-editor-foil::after {
+    animation: none !important;
+  }
+}

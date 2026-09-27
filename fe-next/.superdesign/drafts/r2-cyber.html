@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Rubik:wght@400;500;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <style>
+    @view-transition { navigation: auto; }
+    :root {
+      --neo-lime: #BFFF00;
+      --neo-pink: #FF1493;
+      --neo-cyan: #00FFFF;
+      --neo-purple: #8B5CF6;
+      --neo-yellow: #FDE047;
+      --neo-navy: #0a0a1a;
+      --vapor-start: #FF00CC;
+      --vapor-mid: #333399;
+      --vapor-end: #00FFFF;
+    }
+
+    .font-neo-display { font-family: 'Fredoka', sans-serif; }
+    .font-neo-body { font-family: 'Rubik', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    .bg-cyber { 
+      background: radial-gradient(circle at 50% 50%, #1a1a3a 0%, #0a0a1a 100%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      from { transform: translateY(100vh) translateX(0); }
+      to { transform: translateY(-100px) translateX(20px); }
+    }
+
+    .vapor-header {
+      background: linear-gradient(90deg, var(--vapor-start), var(--vapor-mid), var(--vapor-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glass-panel {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .neon-ring-cyan {
+      box-shadow: 0 0 8px #00FFFF, inset 0 0 8px #00FFFF;
+      border: 1.5px solid #00FFFF;
+    }
+
+    .neon-ring-pink {
+      box-shadow: 0 0 8px #FF1493, inset 0 0 8px #FF1493;
+      border: 1.5px solid #FF1493;
+    }
+
+    .acrylic-tile {
+      background: rgba(191, 255, 0, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(191, 255, 0, 0.4);
+      box-shadow: 0 0 10px rgba(191, 255, 0, 0.2);
+    }
+
+    .pulse-glow {
+      animation: pulse-glow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.5; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(13, 1fr);
+      gap: 3px;
+    }
+
+    .heat-meter-glow {
+      box-shadow: 0 0 12px var(--neo-lime);
+    }
+  </style>
+</head>
+<body>
+  <div class="w-full h-screen flex flex-col bg-cyber text-white relative">
+    <!-- Particles background -->
+    <div class="particle" style="left: 10%; animation-delay: 0s"></div>
+    <div class="particle" style="left: 30%; animation-delay: -5s"></div>
+    <div class="particle" style="left: 70%; animation-delay: -10s"></div>
+    <div class="particle" style="left: 90%; animation-delay: -15s"></div>
+
+    <!-- 1. Header -->
+    <header class="shrink-0 pt-12 px-5 flex items-center justify-between z-10">
+      <div class="flex items-center gap-4">
+        <button id="header-back-btn" class="w-10 h-10 flex items-center justify-center bg-black/40 border border-white/20 rounded-xl backdrop-blur-md active:scale-95 transition-transform">
+          <iconify-icon icon="lucide:chevron-right" class="text-xl rotate-180 text-white"></iconify-icon>
+        </button>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <h1 class="text-2xl font-neo-display font-black vapor-header tracking-tighter">WordCraft</h1>
+            <span class="text-[9px] font-mono border border-cyan-400/50 text-cyan-400 px-1.5 py-0.5 rounded shadow-[0_0_8px_rgba(0,255,255,0.3)]">BETA</span>
+          </div>
+          <p class="text-[10px] text-white/40 uppercase tracking-[0.2em] mt-0.5">Cyber-Arcade Matrix</p>
+        </div>
+      </div>
+      <button id="header-settings-btn" class="w-10 h-10 flex items-center justify-center">
+        <iconify-icon icon="lucide:cpu" class="text-xl text-white/40 hover:text-cyan-400 transition-colors"></iconify-icon>
+      </button>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-4 py-4 space-y-4 z-10">
+      
+      <!-- 2. Scoreboard Row -->
+      <div class="flex gap-3 items-stretch">
+        <!-- Player Card -->
+        <div class="flex-1 glass-panel p-3 rounded-2xl border-l-4 border-l-[#BFFF00] relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-full h-full bg-[#BFFF00]/5 pointer-events-none"></div>
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-7 h-7 rounded-lg bg-black/60 border border-[#BFFF00]/40 flex items-center justify-center">
+              <iconify-icon icon="lucide:user" class="text-xs text-[#BFFF00]"></iconify-icon>
+            </div>
+            <span class="text-[10px] font-mono text-white/50">USER_01</span>
+          </div>
+          <div class="text-3xl font-neo-display font-black text-[#BFFF00] tracking-tighter">142</div>
+          <div class="flex items-center gap-1 mt-1">
+             <span class="w-1.5 h-1.5 rounded-full bg-[#BFFF00] pulse-glow"></span>
+             <span class="text-[9px] text-white/30 uppercase">Active Connection</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center">
+          <div class="text-xs font-mono text-white/20 px-2 border-y border-white/10">VS</div>
+        </div>
+
+        <!-- Bot Card -->
+        <div class="flex-1 glass-panel p-3 rounded-2xl border-l-4 border-l-[#FF1493] opacity-60">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-7 h-7 rounded-lg bg-black/60 border border-[#FF1493]/40 flex items-center justify-center">
+              <iconify-icon icon="lucide:bot" class="text-xs text-[#FF1493]"></iconify-icon>
+            </div>
+            <span class="text-[10px] font-mono text-white/50">WORDBOT_AI</span>
+          </div>
+          <div class="text-3xl font-neo-display font-black text-[#FF1493] tracking-tighter">98</div>
+          <div class="text-[9px] text-white/30 uppercase mt-1">Idle State</div>
+        </div>
+      </div>
+
+      <!-- 3. Hint Pill -->
+      <div class="flex justify-center">
+        <div class="glass-panel px-6 py-2 rounded-full border-[#BFFF00]/30 flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-[#BFFF00] shadow-[0_0_8px_#BFFF00]"></div>
+          <span class="text-xs font-mono font-bold text-[#BFFF00] uppercase tracking-widest">בחר אות למשחק</span>
+        </div>
+      </div>
+
+      <!-- 4. Dark Glass Board -->
+      <div class="mx-auto max-w-[340px] bg-black/60 border-2 border-white/5 rounded-2xl p-2 shadow-2xl relative">
+        <!-- Grid overlay -->
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
+        
+        <div class="board-grid relative">
+          <!-- Mocking a few cells with neon rings and acrylic tiles -->
+          <div class="aspect-square bg-white/5 border border-white/5 flex items-center justify-center"></div>
+          <div class="aspect-square flex items-center justify-center">
+            <div class="w-full h-full neon-ring-pink pulse-glow rounded-sm"></div>
+          </div>
+          <div class="aspect-square bg-white/5 border border-white/5"></div>
+          <div class="aspect-square flex items-center justify-center">
+            <div class="w-full h-full neon-ring-cyan pulse-glow rounded-sm"></div>
+          </div>
+          
+          <!-- Fill remaining 13x13 logic via placeholder for brevity -->
+          <div class="col-span-13 grid grid-cols-13 gap-[2px]">
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square acrylic-tile flex items-center justify-center rounded-sm">
+              <span class="text-xs font-bold text-[#BFFF00]">ק</span>
+            </div>
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square acrylic-tile flex items-center justify-center rounded-sm">
+              <span class="text-xs font-bold text-[#BFFF00]">ו</span>
+            </div>
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square acrylic-tile flex items-center justify-center rounded-sm">
+              <span class="text-xs font-bold text-[#BFFF00]">ם</span>
+            </div>
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square bg-white/5"></div>
+            <div class="aspect-square bg-white/5"></div>
+          </div>
+
+          <!-- Center Star -->
+          <div class="col-span-13 flex justify-center py-4 opacity-20">
+            <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+          </div>
+          
+          <div class="col-span-13 grid grid-cols-13 gap-[2px]">
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square flex items-center justify-center">
+               <iconify-icon icon="lucide:star" class="text-[#FF1493] drop-shadow-[0_0_8px_#FF1493]"></iconify-icon>
+            </div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+            <div class="aspect-square opacity-0"></div>
+          </div>
+
+          <div class="col-span-13 py-10 flex items-center justify-center">
+            <span class="text-[8px] font-mono text-white/10 uppercase tracking-widest">Tactical Grid Active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Heat Meter -->
+      <div class="w-full glass-panel p-3 rounded-2xl border-white/5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em]">Heat Sync</span>
+          <span class="text-[10px] font-mono text-[#BFFF00] shadow-[0_0_8px_#BFFF00]">34.2%</span>
+        </div>
+        <div class="h-1.5 bg-black/60 rounded-full overflow-hidden border border-white/5">
+          <div class="h-full bg-gradient-to-r from-cyan-400 to-[#BFFF00] heat-meter-glow transition-all duration-1000" style="width: 34%"></div>
+        </div>
+      </div>
+
+      <!-- 6. Tile Rack -->
+      <div class="glass-panel p-4 rounded-3xl border-white/10 flex gap-2 justify-center overflow-x-auto">
+        <!-- Acrylic Tiles -->
+        <button class="relative shrink-0 w-12 h-14 acrylic-tile rounded-xl flex items-center justify-center active:scale-95 transition-all group">
+          <span class="text-2xl font-neo-display font-black text-[#BFFF00] drop-shadow-[0_0_5px_rgba(191,255,0,0.5)]">א</span>
+          <span class="absolute bottom-1 left-1.5 text-[8px] font-mono text-[#BFFF00]/60">1</span>
+          <div class="absolute -inset-1 border border-[#BFFF00]/20 rounded-xl group-active:border-[#BFFF00]/60 transition-colors"></div>
+        </button>
+        <button class="relative shrink-0 w-12 h-14 acrylic-tile rounded-xl flex items-center justify-center ring-2 ring-cyan-400 shadow-[0_0_15px_rgba(0,255,255,0.4)] translate-y-[-4px]">
+          <span class="text-2xl font-neo-display font-black text-[#BFFF00]">ב</span>
+          <span class="absolute bottom-1 left-1.5 text-[8px] font-mono text-[#BFFF00]/60">3</span>
+        </button>
+        <button class="relative shrink-0 w-12 h-14 acrylic-tile rounded-xl flex items-center justify-center opacity-80">
+          <span class="text-2xl font-neo-display font-black text-[#BFFF00]">ג</span>
+          <span class="absolute bottom-1 left-1.5 text-[8px] font-mono text-[#BFFF00]/60">3</span>
+        </button>
+        <button class="relative shrink-0 w-12 h-14 acrylic-tile rounded-xl flex items-center justify-center opacity-80">
+          <span class="text-2xl font-neo-display font-black text-[#BFFF00]">ד</span>
+          <span class="absolute bottom-1 left-1.5 text-[8px] font-mono text-[#BFFF00]/60">2</span>
+        </button>
+        <button class="relative shrink-0 w-12 h-14 acrylic-tile rounded-xl flex items-center justify-center opacity-80">
+          <span class="text-2xl font-neo-display font-black text-[#BFFF00]">ה</span>
+          <span class="absolute bottom-1 left-1.5 text-[8px] font-mono text-[#BFFF00]/60">1</span>
+        </button>
+        <button class="relative shrink-0 w-12 h-14 acrylic-tile rounded-xl flex items-center justify-center opacity-80">
+          <span class="text-2xl font-neo-display font-black text-[#BFFF00]">ו</span>
+          <span class="absolute bottom-1 left-1.5 text-[8px] font-mono text-[#BFFF00]/60">1</span>
+        </button>
+        <button class="relative shrink-0 w-12 h-14 acrylic-tile rounded-xl flex items-center justify-center opacity-80">
+          <span class="text-2xl font-neo-display font-black text-[#BFFF00]">ז</span>
+          <span class="absolute bottom-1 left-1.5 text-[8px] font-mono text-[#BFFF00]/60">8</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- 7. Bottom Controls -->
+    <footer class="shrink-0 pb-10 px-4 pt-4 glass-panel border-t-0 rounded-t-3xl flex gap-3">
+      <button id="submit-word-btn" class="flex-1 h-14 bg-gradient-to-r from-cyan-500 to-[#BFFF00] text-black font-neo-display font-black rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(191,255,0,0.4)] active:scale-95 transition-transform">
+        <iconify-icon icon="lucide:terminal" class="text-xl"></iconify-icon>
+        שלח מילה
+      </button>
+      <button class="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40 active:text-cyan-400 transition-colors">
+        <iconify-icon icon="lucide:rotate-ccw" class="text-xl"></iconify-icon>
+      </button>
+      <button class="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/40 active:text-pink-400 transition-colors">
+        <iconify-icon icon="lucide:fast-forward" class="text-xl"></iconify-icon>
+      </button>
+    </footer>
+  </div>
+</body>
+</html>

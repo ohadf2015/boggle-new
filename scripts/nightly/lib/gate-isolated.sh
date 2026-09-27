@@ -1,0 +1,888 @@
+#!/bin/bash
+# gate-isolated.sh — run the lint/test/build gate against ONLY the nightly's
+# authored changes, in a throwaway git worktree. Sourced by run.sh.
+#
+# WHY: the in-place gate runs lint/test/build over the WHOLE working tree, so a
+# founder's concurrent WIP (or a half-finished edit from another session) that
+# doesn't lint/type-check fails the nightly's gate even when every lane's own
+# code is clean. That is exactly what aborted the 2026-05-23 daytime run.
+#
+# THE SAFETY PROPERTY (proven by test/gate-isolated.test.sh):
+#   The founder's working tree is NEVER read for gating and NEVER written. We
+#   add a worktree at HEAD (clean committed master), copy ONLY the lane-authored
+#   files into it, CoW-clone node_modules, and gate there. A bug in here can
+#   therefore only produce a wrong pass/fail — it can NEVER lose founder WIP.
+#   And it gates exactly `clean master + authored` = what actually gets committed.
+#
+# Requires: $PROJECT_DIR, $RUN_LOG, log(). $NIGHTLY_GATE_CMD overridable for tests.
+# Returns: 0 gate passed · 1 gate failed · 2 setup failed (caller falls back).
+
+# Build-time files git can't see (gitignored) that `next build` needs in the
+# worktree. node_modules is handled separately (CoW clone).
+NIGHTLY_GATE_ENV_FILES=(
+  "fe-next/.env.local"
+  "fe-next/.env"
+  "fe-next/.env.production.local"
+)
+
+# nightly_gate_output_is_toolchain_error <gate_output_file> → exit 0 (true) iff the
+# gate failed because a TOOL BINARY was missing (rc 127 "command not found"), NOT
+# because the lane code is broken.
+#
+# WHY (2026-07-21 false-drop): this workstation's fe-next/node_modules/.bin dev-tool
+# symlinks (eslint, vitest, next, tsc) go MISSING intermittently — parallel sessions
+# running concurrent `npm install`s corrupt them (only 60 of the bin entries survived;
+# eslint/vitest/next/tsc were all gone). The isolated gate CoW-clones node_modules
+# faithfully, so `npm run lint` / `npm run test:changed` — which invoke the BARE
+# binaries (`eslint`, `vitest`) via .bin — die with `sh: eslint: command not found`
+# (rc 127). tsc alone survived because the gate already runs it as `npx --no-install
+# tsc` (.bin-independent). rc 127 was flattened to rc=1 (line ~302: "any nonzero that
+# isn't 124/137 → rc=1") → drop-and-re-gate found no parseable offender → DROPPED all
+# 14 build-clean authored files and shipped docs-only. A missing-tool failure is an
+# ENVIRONMENT failure (rc=2, caller falls back to the in-place gate — never a code
+# drop), the same class as the 124/137 timeout/OOM inconclusive already special-cased.
+# Best-effort: false on empty/missing output. Only ever consulted on a FAILED gate,
+# where "command not found" is overwhelmingly a missing tool, not lane-code output.
+nightly_gate_output_is_toolchain_error() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 1
+  # `sh: eslint: command not found` (bash/zsh) and `sh: 1: eslint: not found` (dash/ash)
+  # are the two shell "binary missing" spellings npm's script runner emits.
+  LC_ALL=C grep -qaE 'command not found|[^[:alnum:]_]not found$' "$out" 2>/dev/null
+}
+
+# nightly_gate_output_is_native_crash <gate_output_file> → exit 0 (true) iff the gate
+# output shows a NATIVE process crash of the toolchain — the shell's job-control crash
+# report for a child killed by a signal: "Abort trap: 6" (SIGABRT), "Bus error: 10"
+# (SIGBUS), or "Segmentation fault: 11" (SIGSEGV). These come from a V8 / SWC / esbuild /
+# jemalloc native abort (usually under memory pressure), NEVER from normal eslint / tsc /
+# vitest output — those report errors as text and exit cleanly with rc=1.
+#
+# WHY (2026-07-09 + 2026-07-14 false-drops): `npm run build:fast` Abort-trapped (exit 134)
+# under machine load. The gate only special-cased 124/137, so 134 flattened to rc=1 →
+# drop-and-re-gate found no parseable offender → DROPPED a whole night of build-clean code
+# to docs-only. A native crash means the gate did NOT complete → the verdict is UNKNOWN,
+# not a content failure — the same INCONCLUSIVE class as the 124/137 timeout/OOM already
+# handled. npm can also remap the crashed child's 134/138/139 to its OWN rc=1, so this
+# string net catches the crash even when the exit code was flattened (belt to the rc check's
+# suspenders, mirroring the toolchain-error string net). Only ever consulted on a FAILED gate.
+# Best-effort: false on empty/missing output.
+nightly_gate_output_is_native_crash() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 1
+  LC_ALL=C grep -qaE 'Abort trap: 6|Bus error: 10|Segmentation fault: 11' "$out" 2>/dev/null
+}
+
+# nightly_build_heap_mb → the V8 old-space ceiling (MB) the nightly passes to `next build`
+# via BUILD_HEAP_MB (fe-next/package.json: `--max-old-space-size=${BUILD_HEAP_MB:-6144}`).
+# WHY (2026-09-13 → 09-19, 5 of 7 nights): build:fast died "JavaScript heap out of memory"
+# at the hard-coded 6144MB → Abort trap: 6 (rc 134) on BOTH the full gate and the build-only
+# re-gate, forcing every night down to the typecheck tier. This workstation has 32GB; 12GB
+# gives the webpack build ~2x headroom. CI/dev keep the 6144 default (unset var).
+# Override: NIGHTLY_BUILD_HEAP_MB.
+nightly_build_heap_mb() { printf '%s' "${NIGHTLY_BUILD_HEAP_MB:-12288}"; }
+
+# nightly_gate_wedge_reason <gate_output_file> → "oom" | "wedge"
+# Why an INCONCLUSIVE (rc=3) gate did not complete. "oom" = the output shows a V8 heap
+# exhaustion (next build / tsc / vitest worker) — a MEMORY ceiling, fixable by heap size,
+# NOT the silent next-build TS-phase hang. Everything else (idle-kill, backstop, other
+# native crash) = "wedge". Before this, run.sh logged every rc=3 as "next-build's TS phase
+# is the wedge" — on 2026-09-19 both "wedges" were in fact rc=134 heap OOMs.
+nightly_gate_wedge_reason() {
+  local out="$1"
+  if [ -n "$out" ] && [ -s "$out" ] \
+     && LC_ALL=C grep -qaE 'heap out of memory|Ineffective mark-compacts near heap limit|ERR_WORKER_OUT_OF_MEMORY' "$out" 2>/dev/null; then
+    printf 'oom\n'
+  else
+    printf 'wedge\n'
+  fi
+}
+
+# _gate_ensure_bin <worktree_fe_next_dir> → self-heal node_modules/.bin before gating.
+# The CoW-cloned node_modules inherits the main repo's (recurringly) broken .bin, so
+# the bare-binary npm scripts (lint, test:changed, build:fast) would fail with
+# "command not found". `npm rebuild` re-links every installed package's bin without
+# touching the lockfile or fetching from the network (verified: restores eslint/
+# vitest/tsc/next in one pass). Only runs when a tool is actually missing, so healthy
+# clones pay nothing. Bounded by gtimeout if present so a contended rebuild can't wedge
+# the gate. Failure is non-fatal — the toolchain-error classifier below is the net.
+_gate_ensure_bin() {
+  local fe="$1" b need=0
+  [ -d "$fe/node_modules" ] || return 0
+  for b in eslint vitest tsc next; do
+    [ -e "$fe/node_modules/.bin/$b" ] || { need=1; break; }
+  done
+  [ "$need" = "1" ] || return 0
+  log "isolated-gate: node_modules/.bin missing dev-tool symlink(s) — self-healing with 'npm rebuild' (recurring broken-.bin condition; would otherwise fail the gate with 'command not found' and false-drop clean code)"
+  if command -v gtimeout >/dev/null 2>&1; then
+    ( cd "$fe" && gtimeout 300 npm rebuild >/dev/null 2>>"$RUN_LOG" )
+  else
+    ( cd "$fe" && npm rebuild >/dev/null 2>>"$RUN_LOG" )
+  fi || log "isolated-gate: 'npm rebuild' self-heal failed — toolchain-error classifier will treat any resulting 'command not found' as a SETUP failure, not a code failure"
+}
+
+# _gate_npm_chain <skip_lint> → the bash -c body that runs the gate inside fe-next.
+# skip_lint=1 OMITS `npm run lint`. Used by the baseline-poison salvage: when every
+# gate-failing file is NON-authored (a pre-existing lint error on the untouched
+# baseline), the authored files are already known lint-clean, so we re-gate them with
+# lint skipped to PROVE they are test+build clean — without being blocked by a lint
+# error the nightly didn't introduce. build:schemas runs FIRST: `npm run test` imports
+# ../dist via the compiled bridge (backend/utils/socketValidation.ts), and a fresh
+# worktree has no dist/ yet (this reverted every code lane on 2026-05-26).
+_gate_npm_chain() {
+  local skip_lint="${1:-0}" build_only="${2:-0}" typecheck_only="${3:-0}" typeonly_notest="${4:-0}" chain=""
+  # typeonly_notest=1 → build:schemas + standalone `tsc --noEmit` ONLY (no test, no next-build,
+  # no lint). The baseline-red SHIP path uses this to build-verify the authored set after the
+  # tests are already PROVEN pre-existing-red (2026-06-18). It deliberately omits the test phase
+  # — test:changed would re-pull the same red files into the cone and wrongly block the ship —
+  # and next-build (build:fast), which wedges >900s in a fresh worktree (the wedge that, conflated
+  # with a real build break, dropped a whole night of build-clean code). tsc gives the type/import
+  # verdict wedge-proof in ~54s. build:schemas first (the dist bridge tsc resolves through).
+  if [ "$typeonly_notest" = "1" ]; then
+    printf '%s' "npm run build:schemas && npx --no-install tsc --noEmit"
+    return 0
+  fi
+  # typecheck_only=1 → the CONCLUSIVE timeout tier: build:schemas + standalone
+  # `tsc --noEmit` + test:changed. WHY this exists (2026-06-16): `next build`'s OWN
+  # internal "Running TypeScript" phase wedges silently >900s in a fresh worktree —
+  # 18x+ slower than a standalone `tsc --noEmit`, which type-checks the SAME project
+  # in ~54s (measured: cold, CoW node_modules, no .tsbuildinfo). So when BOTH the full
+  # gate and the build-only re-gate wedge in that phase, the old code dropped ALL the
+  # night's code (the 06-12/13/16 docs-only salvages). This tier gives the verdict
+  # those wedges never produced, FAST and unwedgeable:
+  #   • tsc --noEmit  → the type/import verdict next-build's TS phase hangs on, in 54s.
+  #   • test:changed  → vitest --changed (both projects); in the worktree the authored
+  #     files are uncommitted-vs-HEAD, so this runs EXACTLY the lane-affected tests —
+  #     lane-attributed, fast, and it streams progress so it can't trip the idle kill.
+  # build:schemas first: the dist bridge (backend/utils/socketValidation.ts) that
+  # test:changed's backend suites import has no dist/ in a fresh worktree.
+  if [ "$typecheck_only" = "1" ]; then
+    printf '%s' "npm run build:schemas && npx --no-install tsc --noEmit && npm run test:changed"
+    return 0
+  fi
+  # build_only=1 → skip lint AND test, run ONLY build:schemas + build:fast. Used by
+  # the baseline-aware ship path: when every failing test already fails on clean
+  # master (red baseline), `test` short-circuited so the authored set's BUILD was
+  # never verified — proving it builds clean before shipping keeps the old "never
+  # ship build-breaking code" guarantee even when we deliberately ignore the tests.
+  if [ "$build_only" = "1" ]; then
+    # tsc --noEmit gives the type verdict + NIGHTLY_SKIP_NEXT_TS=1 tells next build to
+    # SKIP its own "Running TypeScript" phase — which wedges silently >900s in a fresh
+    # worktree (2026-07-01: the build-only re-gate wedged there, dropping to the slow
+    # typecheck tier after a ~40min hang). Mirrors the happy-path chain (line ~103).
+    printf '%s' "npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; BUILD_HEAP_MB=$(nightly_build_heap_mb) NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; }"
+    return 0
+  fi
+  [ "$skip_lint" = "1" ] || chain="npm run lint && "
+  # ORDER: lint → build:schemas → build:fast → test. The BUILD runs BEFORE the
+  # test phase so a build verdict (the real lane-breakage signal — type/import errors
+  # like an orphaned page that imports missing siblings) is reached even if the test
+  # phase overruns its budget. On 2026-06-06 `test` ran first and was SIGKILLed at
+  # 1800s, so `next build` never ran and the gate learned nothing before dropping all
+  # code. build:schemas still precedes everything (the dist-bridge the tests need).
+  #
+  # TEST SCOPE (2026-06-17): default to `test:changed` — vitest --changed runs only the
+  # MODULE-GRAPH CONE of the authored files (the worktree has them uncommitted-vs-HEAD,
+  # so --changed picks them up exactly). WHY: the full `npm run test` suite wedges on
+  # pool-timeouts + 4 chronic-red suites (PracticeWheelSandbox, wordHandler.blast*,
+  # blastTileGeneration, blastModeManager.thaw) that NO lane touches, hitting the 5400s
+  # backstop → rc=124 → the night gets docs-only-salvaged and all code is dropped (the
+  # 06-12/13/16/17 losses). The cone skips those unrelated suites while still testing
+  # every importer of a changed file. The typecheck_only tier already proved this path
+  # fast + correct. Escape hatch: NIGHTLY_GATE_FULL_TEST=1 restores the full suite.
+  local test_cmd="npm run test:changed"
+  [ "${NIGHTLY_GATE_FULL_TEST:-0}" = "1" ] && test_cmd="npm run test"
+  # TYPE VERDICT (2026-06-28): run a standalone `tsc --noEmit` (≈54s) BEFORE build:fast and
+  # tell next build to SKIP its own "Running TypeScript" phase (NIGHTLY_SKIP_NEXT_TS=1 →
+  # next.config typescript.ignoreBuildErrors). That phase type-checks the build's GENERATED
+  # route types and is 18x+ slower AND streams no output for 15-30min, tripping the 900s idle
+  # watchdog → tests-inconclusive 4 of 7 nights (06-21/24/25/27 ALL wedged there, test phase
+  # never ran). tsc --noEmit gives the identical type/import verdict fast + non-silent; next
+  # build still runs webpack so import/module breakage is still caught. Same pattern the
+  # typecheck_only fallback tier already uses (line ~64) — just promoted to the happy path.
+  printf '%s' "${chain}npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; BUILD_HEAP_MB=$(nightly_build_heap_mb) NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; } && ${test_cmd}"
+}
+
+# nightly_map_test_to_authored_source <newline-separated test paths> <authored_allowlist_file>
+# → the authored SOURCE files that the given failing TEST files cover, intersected with the
+# authored allowlist. A vitest FAIL names `foo/bar.test.tsx`, but the change that broke it is
+# almost always its SOURCE sibling `foo/bar.tsx` (or, for a `__tests__/` layout, the parent-dir
+# source `foo/Bar.tsx`). When the test file itself is NOT authored, peeling it is a no-op — the
+# broken source survives and the re-gate stays red → docs-only drop-all (2026-07-23:
+# `app/[locale]/scrabble-alternative-online/page.test.tsx` failed on the nightly's authored
+# `page.tsx`, but only `page.tsx` was in the allowlist, so the failing test mapped to nothing and
+# all 11 build-clean files were dropped). Pure string derivation (no filesystem): strip the
+# `.test|.spec` + ext, emit each source-extension candidate for both the sibling and the
+# de-`__tests__/` parent path, then keep only candidates present in the allowlist.
+nightly_map_test_to_authored_source() {
+  local tests="$1" allow="$2"
+  [ -n "$tests" ] && [ -n "$allow" ] && [ -s "$allow" ] || return 0
+  {
+    printf '%s\n' "$tests" | while IFS= read -r t; do
+      [ -n "$t" ] || continue
+      local base ext
+      base=$(printf '%s' "$t" | sed -E 's/\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)$//')
+      [ "$base" = "$t" ] && continue   # not a test-file token; skip
+      for ext in tsx ts jsx js; do
+        printf '%s.%s\n' "$base" "$ext"                                    # sibling: foo/bar.test.tsx → foo/bar.tsx
+        case "$base" in
+          */__tests__/*) printf '%s.%s\n' "$(printf '%s' "$base" | sed -E 's#/__tests__/#/#')" "$ext" ;;  # foo/__tests__/Bar → foo/Bar
+        esac
+      done
+    done
+  } | grep -xF -f "$allow" 2>/dev/null | sort -u
+}
+
+# nightly_baseline_ship_decision <authored_fail_file> <baseline_rc> <baseline_fail_file> <authored_allowlist_file>
+# Pure decision for the baseline-aware salvage when the gate failed but no authored
+# file was pinned as a lint/tsc offender. The three list files hold repo-relative
+# failing TEST paths (from nightly_parse_test_failures). Prints ONE verdict:
+#   ship          — baseline (clean HEAD) is red on test(s) AND the authored set adds
+#                   no NEW failing test → not the nightly's fault; ship (caller does a
+#                   build-only re-gate first, so build-breakage is still caught).
+#   peel\n<files> — authored set introduced NEW failing test file(s) that ARE authored
+#                   → drop just those and re-gate (same as a broken lane lint/tsc file).
+#   fallthrough   — undecidable here (HEAD clean, or no comparable test baseline) →
+#                   caller uses the existing lint-skip / docs-only salvage (no regression).
+nightly_baseline_ship_decision() {
+  local af="$1" brc="$2" bf="$3" allow="$4"
+  local authored_n baseline_n
+  authored_n=$(grep -c . "$af" 2>/dev/null); authored_n=${authored_n:-0}
+  baseline_n=$(grep -c . "$bf" 2>/dev/null); baseline_n=${baseline_n:-0}
+  # No authored failing tests → nothing to attribute → conservative fallthrough.
+  [ "$authored_n" -gt 0 ] || { printf 'fallthrough\n'; return 0; }
+  # Which authored failing tests are NEW (introduced by the lane, not red on clean HEAD)?
+  #   • baseline gate PASSED (brc=0) → clean HEAD is green on ALL of them → the LANE introduced
+  #     every failure. This used to `fallthrough` (→ caller's docs-only drop-all) because a
+  #     lane-caused TEST failure was un-peelable without a test→source map — exactly the
+  #     2026-07-23 scrabble class, where the failing test PASSES on master and the lane's
+  #     source change broke it. With nightly_map_test_to_authored_source we CAN now peel the
+  #     lane's source, so a green baseline must route to peel, NOT fallthrough.
+  #   • baseline gate FAILED (brc≠0) but named NO failing tests (failed at lint/build, or the
+  #     scoped run was undecidable) → we can't tell which authored fails are pre-existing →
+  #     conservative fallthrough (unchanged — never ship on an undecidable baseline).
+  #   • baseline gate FAILED with a test-fail list → NEW = authored − baseline (unchanged).
+  local newf new_n
+  if [ "$brc" = "0" ]; then
+    newf=$(grep . "$af" 2>/dev/null || true)                 # clean HEAD green → all authored fails are lane-new
+  else
+    [ "$baseline_n" -gt 0 ] || { printf 'fallthrough\n'; return 0; }
+    newf=$(grep -vxF -f "$bf" "$af" 2>/dev/null || true)     # authored − baseline
+  fi
+  new_n=$(printf '%s' "$newf" | grep -c . 2>/dev/null); new_n=${new_n:-0}
+  # brc≠0 with every authored fail also red on baseline → not the lane's fault → ship.
+  if [ "$new_n" -eq 0 ]; then printf 'ship\n'; return 0; fi
+  # Some new failures — peel the ones WE authored. The peel set is the UNION of (a) NEW failing
+  # tests we authored directly and (b) the authored SOURCE files those tests cover (a failing
+  # test is usually broken by its non-authored source sibling — see the 2026-07-23 incident in
+  # nightly_map_test_to_authored_source). Both are allowlist-intersected, so a stray never peels
+  # a file the nightly didn't write. If nothing maps (the lane authored neither the test nor its
+  # source — e.g. a shared-util change surfacing in a non-authored test) → conservative fallthrough.
+  local newauth mapped peel_set
+  newauth=$(printf '%s\n' "$newf" | grep -xF -f "$allow" 2>/dev/null || true)
+  mapped=$(nightly_map_test_to_authored_source "$newf" "$allow")
+  peel_set=$(printf '%s\n%s\n' "$newauth" "$mapped" | grep . | sort -u)
+  if [ -n "$peel_set" ]; then printf 'peel\n%s\n' "$peel_set"; return 0; fi
+  printf 'fallthrough\n'; return 0
+}
+
+# nightly_gate_timeout_route <build_only_rc> → ship | peel | docs-only
+# Pure decision for an INCONCLUSIVE (timed-out, rc=3) gate AFTER a fast build-only
+# re-gate. A timeout means the slow full vitest suite didn't finish; the build-only
+# re-gate (build:schemas + build:fast, no lint/test) gives the verdict the timed-out
+# gate never produced:
+#   build-only rc=0 → ship       (authored set compiles + type-checks + builds; tests
+#                                 unverified this run → ship with a loud alert)
+#   build-only rc=1 → peel       (a REAL build break; output now names the offender →
+#                                 hand to the existing drop-and-re-gate peel loop)
+#   build-only rc=3 → docs-only  (build-only ALSO timed out → unverifiable in budget →
+#                                 conservative docs-only salvage, now rare)
+# Pulled out of run.sh so the routing is locked by a unit test, not just live orchestration.
+nightly_gate_timeout_route() {
+  case "${1:-}" in
+    0) printf 'ship\n' ;;
+    1) printf 'peel\n' ;;
+    *) printf 'docs-only\n' ;;
+  esac
+}
+
+# nightly_gate_typecheck_route <typecheck_rc> → ship | peel | docs-only
+# Pure decision for the CONCLUSIVE typecheck tier (build:schemas + tsc --noEmit +
+# test:changed) that runs ONLY when BOTH the full gate and the build-only re-gate
+# wedged (rc=3 twice) — i.e. next-build's silent TS phase hung but a standalone
+# tsc + lane-scoped tests can still give a verdict in ~1 min:
+#   tc rc=0 → ship       (authored set type-checks + its affected tests pass; the
+#                         full next-build/full-suite stayed unverified → loud alert)
+#   tc rc=1 → peel       (a REAL type error or a lane-broken test; output now names
+#                         the offender → hand to the drop-and-re-gate peel loop)
+#   tc rc=3 → docs-only  (even the 54s tsc tier wedged — should never happen; keep
+#                         the conservative last resort)
+# Same shape as nightly_gate_timeout_route; pulled out so the routing is unit-locked.
+nightly_gate_typecheck_route() {
+  case "${1:-}" in
+    0) printf 'ship\n' ;;
+    1) printf 'peel\n' ;;
+    *) printf 'docs-only\n' ;;
+  esac
+}
+
+# _nightly_bisect_gate <list_file> <mode: quick|full> → 0 pass / 1 fail / other inconclusive
+# Default oracle for nightly_bisect_offenders. quick = the fast conclusive typecheck
+# tier (build:schemas + tsc --noEmit + test:changed, ~1min, wedge-resistant); full =
+# the complete gate (lint + tsc + build:fast + test) — the same authority required to
+# ship. run_isolated_gate is worktree-based + NON-mutating, so every trial is
+# independent and the founder tree is never touched. Overridable via
+# NIGHTLY_BISECT_GATE_FN for unit tests.
+_nightly_bisect_gate() {
+  if [ "${2:-quick}" = "full" ]; then
+    run_isolated_gate "$1"            # lint + tsc + build:fast + test:changed
+  else
+    run_isolated_gate "$1" 0 0 0 1    # build:schemas + tsc --noEmit + test:changed
+  fi
+}
+
+# nightly_bisect_offenders <all_code_list_file> <out_offenders_file>
+# SUBSET-PEEL BISECT BACKSTOP (2026-07-24) — the deferred "class-killer".
+#
+# Last resort BEFORE the destructive docs-only drop-all: instead of throwing away
+# EVERY authored code file because the gate is red, delta-debug to the MINIMAL
+# offending subset so the innocent majority still ships. It decides purely on gate
+# PASS/FAIL — it NEVER parses gate output — so it is immune to the recurring
+# "parser one format behind" false-drop class (2026-07-02/18/21/23…). On 2026-07-23
+# a human did exactly this by hand (1 real offender + 9 innocents restored); this is
+# that salvage, automated.
+#
+# Atomic grouping: fe-next/translations/*.js bisect as ONE unit — a split (ship
+# en.js, drop he.js) ships orphan i18n keys the BUILD can't catch (surfaces as a
+# ratchet/runtime break the NEXT preflight). Independent files (dict candidates,
+# migrations, unrelated components) bisect individually; a stray test/source split
+# is caught by the final full-gate re-verify.
+#
+# Returns 0 and writes the offending files to <out_offenders_file> IFF it isolated a
+# PROPER, non-empty offender subset whose complement (the kept set) PASSES the FULL
+# gate. Returns 1 (out file empty) on: ≤1 code file, no isolable offender, an empty
+# kept set, a kept set that fails the full gate (cheap oracle too weak), a wedge, or
+# budget/wall-time exhaustion → caller falls back to the conservative docs-only
+# drop-all. Every give-up path LOGS its reason (it used to return 1 silently).
+# If the full gate is INCONCLUSIVE (rc 3/2 — heap OOM / wedge), the kept set is
+# re-verified with the typecheck tier instead; NIGHTLY_BISECT_VERIFY_TIER=typecheck
+# then tells the caller it shipped at reduced strength.
+#
+# Cost is bounded: NIGHTLY_BISECT_MAX_GATES gate calls (default 2*units+3) and
+# NIGHTLY_BISECT_BUDGET_SECS wall-time (default 3600s). Seam: NIGHTLY_BISECT_GATE_FN.
+nightly_bisect_offenders() {
+  local all="$1" out="$2"
+  : > "$out"
+  local n; n=$(grep -c . "$all" 2>/dev/null); n=${n:-0}
+  [ "$n" -gt 1 ] || { log "subset-peel bisect: GAVE UP — only $n code file(s); nothing to bisect (docs-only is already minimal)"; return 1; }
+
+  local gate_fn="${NIGHTLY_BISECT_GATE_FN:-_nightly_bisect_gate}"
+  local budget_secs="${NIGHTLY_BISECT_BUDGET_SECS:-3600}"
+  local start=$SECONDS calls=0
+
+  # --- Build UNITS: translations collapse to ONE unit; everything else stands alone.
+  local units_dir; units_dir=$(mktemp -d -t bisect-units.XXXXXX)
+  local -a units=()
+  local trans_unit="" f u
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    if printf '%s' "$f" | grep -q '/translations/.*\.js$'; then
+      [ -z "$trans_unit" ] && { trans_unit="$units_dir/translations"; : > "$trans_unit"; units+=("$trans_unit"); }
+      echo "$f" >> "$trans_unit"
+    else
+      u="$units_dir/u${#units[@]}"; echo "$f" > "$u"; units+=("$u")
+    fi
+  done < "$all"
+
+  local budget="${NIGHTLY_BISECT_MAX_GATES:-$(( 2 * ${#units[@]} + 3 ))}"
+  local kept; kept=$(mktemp)     # accumulating verified-green kept files
+  local -a offender_units=()
+  local trial rc
+
+  _bisect_cleanup() { rm -f "$kept"; rm -rf "$units_dir"; }
+  _bisect_over_budget() { [ "$calls" -ge "$budget" ] || [ "$(( SECONDS - start ))" -ge "$budget_secs" ]; }
+
+  # --- Incremental accept: grow a kept set, flag units that break it. Order-independent
+  # for the common case (one real offender + independent innocents).
+  for u in "${units[@]}"; do
+    if _bisect_over_budget; then
+      log "subset-peel bisect: GAVE UP — BISECT BUDGET EXHAUSTED ($calls/$budget gate calls, $(( SECONDS - start ))/${budget_secs}s) before every unit was tried → docs-only drop-all"
+      _bisect_cleanup; return 1
+    fi
+    trial=$(mktemp); cat "$kept" "$u" > "$trial"
+    "$gate_fn" "$trial" quick; rc=$?; calls=$(( calls + 1 ))
+    if [ "$rc" = "0" ]; then cp "$trial" "$kept"
+    elif [ "$rc" = "1" ]; then offender_units+=("$u")
+    else   # wedge/setup → bail (never ship on an unknown verdict)
+      log "subset-peel bisect: GAVE UP — typecheck-tier trial was INCONCLUSIVE (rc=$rc${NIGHTLY_LAST_GATE_WEDGE_REASON:+, $NIGHTLY_LAST_GATE_WEDGE_REASON}) on $(tr '\n' ' ' < "$u") → docs-only drop-all"
+      rm -f "$trial"; _bisect_cleanup; return 1
+    fi
+    rm -f "$trial"
+  done
+
+  # --- Second chance: a unit may have failed only because a dependency wasn't kept yet
+  # (import ordering). Retry each flagged unit against the FINAL kept set.
+  local -a still_bad=()
+  # ${a[@]+"${a[@]}"}: an EMPTY array under `set -u` is "unbound" on macOS /bin/bash 3.2 —
+  # the plain form aborted the whole caller (run.sh is set -u) on the no-offender path.
+  for u in ${offender_units[@]+"${offender_units[@]}"}; do
+    if _bisect_over_budget; then still_bad+=("$u"); continue; fi
+    trial=$(mktemp); cat "$kept" "$u" > "$trial"
+    "$gate_fn" "$trial" quick; rc=$?; calls=$(( calls + 1 ))
+    if [ "$rc" = "0" ]; then cp "$trial" "$kept"; else still_bad+=("$u"); fi
+    rm -f "$trial"
+  done
+  offender_units=(${still_bad[@]+"${still_bad[@]}"})
+
+  # --- Decide: need a non-empty kept set AND a non-empty offender set (a proper split).
+  local kept_n=0 off_n=${#offender_units[@]}
+  kept_n=$(grep -c . "$kept" 2>/dev/null); kept_n=${kept_n:-0}
+  if [ "$kept_n" -eq 0 ]; then
+    log "subset-peel bisect: GAVE UP — NO PASSING SUBSET (every one of ${#units[@]} unit(s) failed the typecheck tier) → docs-only drop-all"
+    _bisect_cleanup; return 1
+  fi
+  if [ "$off_n" -eq 0 ]; then
+    log "subset-peel bisect: GAVE UP — no isolable offender (all ${#units[@]} unit(s) pass the typecheck tier individually/cumulatively; the red is outside what the cheap oracle sees) → docs-only drop-all"
+    _bisect_cleanup; return 1
+  fi
+
+  # --- Authoritative FULL gate on the reconstructed kept set (the cheap oracle is
+  # weaker than the ship gate — never ship code the full gate rejects).
+  # rc=1 → the full gate REJECTS the kept set → never ship (weak-oracle guard).
+  # rc=3/2 (2026-09-19) → the full gate did NOT COMPLETE (next-build heap OOM rc=134 /
+  # idle wedge / setup) — every night 09-13→09-19 OOMed here, so bisect could NEVER
+  # succeed and always fell to drop-all. An inconclusive full gate is not a rejection:
+  # fall back to the CONCLUSIVE typecheck tier (build:schemas + tsc --noEmit + test:changed)
+  # on the exact kept set — the same tier run.sh already ships on after a next-build wedge.
+  # NIGHTLY_BISECT_VERIFY_TIER tells the caller which tier verified (full|typecheck).
+  NIGHTLY_BISECT_VERIFY_TIER=full
+  "$gate_fn" "$kept" full; rc=$?; calls=$(( calls + 1 ))
+  if [ "$rc" = "1" ]; then
+    log "subset-peel bisect: GAVE UP — the kept set ($kept_n file(s)) FAILS the authoritative full gate (typecheck-tier oracle too weak) → docs-only drop-all"
+    _bisect_cleanup; return 1
+  elif [ "$rc" != "0" ]; then
+    log "subset-peel bisect: full-gate re-verify of the kept set was INCONCLUSIVE (rc=$rc${NIGHTLY_LAST_GATE_WEDGE_REASON:+, $NIGHTLY_LAST_GATE_WEDGE_REASON}) — re-verifying with the conclusive typecheck tier instead"
+    "$gate_fn" "$kept" quick; rc=$?; calls=$(( calls + 1 ))
+    if [ "$rc" != "0" ]; then
+      log "subset-peel bisect: GAVE UP — full gate inconclusive AND the typecheck-tier re-verify of the kept set returned rc=$rc → docs-only drop-all"
+      _bisect_cleanup; return 1
+    fi
+    NIGHTLY_BISECT_VERIFY_TIER=typecheck
+    log "subset-peel bisect: kept set VERIFIED by the typecheck tier (full gate inconclusive) — shipping at REDUCED gate strength"
+  fi
+
+  local ou; for ou in ${offender_units[@]+"${offender_units[@]}"}; do cat "$ou" >> "$out"; done
+  sort -u "$out" -o "$out"
+  _bisect_cleanup
+  return 0
+}
+
+# run_isolated_gate <authored_list_file> [skip_lint=0] [baseline=0]
+# baseline=1 gates a CLEAN HEAD checkout with NO authored files applied (the
+# authored list is ignored / may be empty) — used by run_baseline_gate to learn
+# whether master ITSELF is red independent of any lane code.
+run_isolated_gate() {
+  local authored="$1" skip_lint="${2:-0}" baseline="${3:-0}" build_only="${4:-0}" typecheck_only="${5:-0}" typeonly_notest="${6:-0}"
+  if [ "$baseline" != "1" ]; then
+    [ -n "$authored" ] && [ -s "$authored" ] || { log "isolated-gate: empty authored list — nothing to gate"; return 0; }
+  fi
+
+  local wt; wt=$(mktemp -d -t nightly-gate.XXXXXX)
+  rm -rf "$wt"   # 'git worktree add' wants a non-existent path
+  if ! git -C "$PROJECT_DIR" worktree add --detach --quiet "$wt" HEAD 2>>"$RUN_LOG"; then
+    log "isolated-gate: 'git worktree add' failed — caller should fall back to in-place gate"
+    git -C "$PROJECT_DIR" worktree prune 2>/dev/null || true
+    return 2
+  fi
+
+  # Apply ONLY the lane-authored files onto the clean checkout. A path present in
+  # the main working tree is copied; a path the lane DELETED (absent now) is
+  # removed in the worktree so the gate sees the deletion too.
+  local p _skipped_ignored=0
+  while IFS= read -r p; do
+    [ -z "$p" ] && continue
+    # Never gate a gitignored path. A lane's verify-build can emit build
+    # artifacts (e.g. fe-next/.next-verify/**) that slip into the authored list;
+    # copying thousands of 500KB+ chunks into the worktree wedged eslint for 75
+    # min on 2026-05-31. These are never shippable (git add skips them), so they
+    # must never enter the gate either. Defense independent of .gitignore edits.
+    if git -C "$PROJECT_DIR" check-ignore -q "$p" 2>/dev/null; then
+      _skipped_ignored=$(( _skipped_ignored + 1 )); continue
+    fi
+    if [ -e "$PROJECT_DIR/$p" ]; then
+      mkdir -p "$wt/$(dirname "$p")" 2>/dev/null || true
+      cp -p "$PROJECT_DIR/$p" "$wt/$p" 2>>"$RUN_LOG" || true
+    else
+      rm -f "$wt/$p" 2>/dev/null || true
+    fi
+  done < "$authored"
+
+  # node_modules: copy-on-write clone (instant on APFS, ~0 real disk). Fall back
+  # to a plain copy if the filesystem doesn't support clonefile.
+  if [ -d "$PROJECT_DIR/fe-next/node_modules" ]; then
+    cp -Rc "$PROJECT_DIR/fe-next/node_modules" "$wt/fe-next/node_modules" 2>>"$RUN_LOG" \
+      || cp -R "$PROJECT_DIR/fe-next/node_modules" "$wt/fe-next/node_modules" 2>>"$RUN_LOG" \
+      || { log "isolated-gate: node_modules clone failed — falling back to in-place gate"; _isolated_gate_cleanup "$wt"; return 2; }
+    # Regenerate .bin symlinks the clone may have inherited broken (see _gate_ensure_bin).
+    _gate_ensure_bin "$wt/fe-next"
+  fi
+  # Build-time env (gitignored → absent from the checkout).
+  local envf
+  for envf in "${NIGHTLY_GATE_ENV_FILES[@]}"; do
+    [ -f "$PROJECT_DIR/$envf" ] && { mkdir -p "$wt/$(dirname "$envf")"; cp -p "$PROJECT_DIR/$envf" "$wt/$envf" 2>/dev/null || true; }
+  done
+
+  [ "$_skipped_ignored" -gt 0 ] && log "isolated-gate: skipped $_skipped_ignored gitignored path(s) (build artifacts — never gated/shipped)"
+  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)$([ "$skip_lint" = "1" ] && printf ' [lint skipped — baseline-poison re-gate]')$([ "$build_only" = "1" ] && printf ' [build-only — verifying authored set builds despite red test baseline]')$([ "$typecheck_only" = "1" ] && printf ' [typecheck tier — tsc --noEmit + test:changed; conclusive verdict after a next-build TS wedge]')$([ "$typeonly_notest" = "1" ] && printf ' [typeonly — build:schemas + tsc --noEmit, no test/next-build; baseline-red ship verification]')"
+  # Capture the gate's combined output to a file the caller can parse (the
+  # drop-and-re-gate salvage needs to know WHICH file failed). Path is exposed
+  # via the global NIGHTLY_LAST_GATE_OUTPUT; caller parses then removes it.
+  NIGHTLY_LAST_GATE_OUTPUT=$(mktemp -t nightly-gate-out.XXXXXX)
+  NIGHTLY_LAST_GATE_WEDGE_REASON=""   # set to oom|wedge only when this gate is INCONCLUSIVE (rc=3)
+  local rc=0
+  # TIMEOUT: lanes get a gtimeout ceiling; the gate must too. A hung lint/test/build
+  # (the .next-verify eslint wedge on 2026-05-31 ran 75min) otherwise stalls the run
+  # with no upper bound. Default 45min, env-overridable. The wrapper bounds BOTH the
+  # real npm chain AND the deterministic test seam, so the timeout path is observable
+  # and unit-testable (the seam previously ran unbounded → untestable).
+  #
+  # A timeout is INCONCLUSIVE (rc=3), NOT a content failure (rc=1). vitest SIGKILLed
+  # mid-run prints no per-file FAIL summary, so the salvage parser gets nothing and
+  # would otherwise drop ALL authored code (the 2026-06-06 zero-code night). rc=3 lets
+  # the caller re-verify with a fast build-only re-gate instead of discarding the work.
+  # PROGRESS watchdog instead of a fixed wall-clock cap (2026-06-07): the old fixed
+  # 2700s gtimeout SIGKILLed a slow-but-ADVANCING suite, shipping tests UNVERIFIED.
+  # run_with_idle_timeout kills only on a true wedge — no new gate output for
+  # NIGHTLY_GATE_IDLE_SECS (default 600s, safely past next build's ~4min quiet compile
+  # window) — and otherwise runs to completion, so a slow suite now finishes and tests
+  # get VERIFIED. NIGHTLY_GATE_TIMEOUT is kept as the far-out absolute backstop
+  # (default raised 2700→5400s) against a busy-but-useless hang. An idle/max kill
+  # returns 124 → the rc=3 INCONCLUSIVE path below fires exactly as before.
+  # shellcheck source=/dev/null
+  . "$(dirname "${BASH_SOURCE[0]}")/idle-timeout.sh"
+  # IDLE DEFAULT 900s→2700s (2026-07-13): every tier above (full/build-only/typecheck/
+  # typeonly) kept wedging on the SAME trigger even after each got promoted to a
+  # "faster" tsc-only path — the 2026-07-12 night wedged on ALL FOUR tiers, including
+  # the ~54s-cold typeonly tier. Root cause was never next-build's TS phase specifically;
+  # it's that this machine runs a permanently-loaded dev workstation (concurrent Claude
+  # Code worktree agents, ~6 duplicate MCP-server sets, stale dev-server processes —
+  # load average 8-13 observed at 1am gate time), so a cold tsc/build that benchmarks
+  # ~54s idle-machine can go silent 15-20+ min under real contention with zero actual
+  # hang. 900s was tuned for a quiet machine that doesn't exist here and false-positive
+  # killed real progress every night, cascading through every fallback tier to
+  # docs-only salvage. 2700s gives ~2x headroom over the worst observed silent stretch
+  # (~19min) while the unchanged 5400s max backstop still catches a genuine infinite hang.
+  local _gidle="${NIGHTLY_GATE_IDLE_SECS:-2700}" _gmax="${NIGHTLY_GATE_TIMEOUT:-5400}"
+  if [ -n "${NIGHTLY_GATE_CMD:-}" ]; then
+    # Test seam: a deterministic command run inside the worktree's fe-next, watched by
+    # the same idle/max watchdog so a silent `sleep` exercises the idle-kill rc=3 path.
+    run_with_idle_timeout "$_gidle" "$_gmax" "$NIGHTLY_LAST_GATE_OUTPUT" -- \
+      bash -c 'cd "$1/fe-next" && eval "$2"' _ "$wt" "$NIGHTLY_GATE_CMD" || rc=$?
+  else
+    # build:schemas FIRST — `npm run test` imports `../dist/backend/utils/schemas`
+    # via the compiled-bridge in backend/utils/socketValidation.ts:69. The fresh
+    # worktree has no dist/ yet, so 12 handler-test suites fail with "Cannot find
+    # module" — that's what reverted every CODE lane on 2026-05-26. Cheap (~3s
+    # tsc), then build:fast (next build), then the full test suite last.
+    local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint" "$build_only" "$typecheck_only" "$typeonly_notest")"
+    run_with_idle_timeout "$_gidle" "$_gmax" "$NIGHTLY_LAST_GATE_OUTPUT" -- \
+      bash -c "$_body" _ "$wt" || rc=$?
+  fi
+  if [ "${rc:-0}" = "124" ] || [ "${rc:-0}" = "137" ] || [ "${rc:-0}" = "134" ]; then
+    # 124 = gtimeout's SIGTERM fired. 137 = SIGKILL — either the --kill-after grace
+    # SIGKILLed a child (next build / vitest spawn that ignored/outlived SIGTERM) OR an
+    # OOM-kill (tsc/vitest have OOM'd before). 134 = SIGABRT ("Abort trap: 6") — a NATIVE
+    # crash of the build toolchain (V8/SWC/esbuild/jemalloc abort under memory pressure),
+    # seen on 2026-07-09 + 07-14. All mean the gate did NOT complete → the verdict is
+    # UNKNOWN, not a content failure. The old code only special-cased 124, so a 137 wedge
+    # or a 134 crash silently fell through to rc=1 → docs-only drop-all (the catastrophe in
+    # a different exit code). "timeout/OOM/native-crash" keeps a recurring crash visible.
+    NIGHTLY_LAST_GATE_WEDGE_REASON=$(nightly_gate_wedge_reason "$NIGHTLY_LAST_GATE_OUTPUT")
+    if [ "$NIGHTLY_LAST_GATE_WEDGE_REASON" = "oom" ]; then
+      log "isolated-gate: did NOT complete (rc=${rc:-0}: JavaScript HEAP OUT OF MEMORY — next build heap ceiling BUILD_HEAP_MB=$(nightly_build_heap_mb)MB exhausted; not a code failure) — INCONCLUSIVE (rc=3; caller re-verifies, does NOT drop code)"
+    else
+      log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle / ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop, or a native toolchain crash) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    fi
+    rc=3
+  elif [ "${rc:-0}" != "0" ] && nightly_gate_output_is_native_crash "$NIGHTLY_LAST_GATE_OUTPUT"; then
+    # npm can remap a crashed child's 134/138/139 to its OWN rc=1, hiding the SIGABRT.
+    # The shell's "Abort trap: 6" / "Bus error" / "Segmentation fault" crash line still
+    # survives in the output → treat it as the same INCONCLUSIVE native-crash class, never
+    # a code failure. The rc=3 path re-verifies build-only, so a misfire can only cost a
+    # re-verify, never ship broken code. (2026-07-09 + 07-14 build:fast Abort-trap drops.)
+    NIGHTLY_LAST_GATE_WEDGE_REASON=$(nightly_gate_wedge_reason "$NIGHTLY_LAST_GATE_OUTPUT")
+    log "isolated-gate: output shows a native toolchain crash (Abort trap / bus error / segfault$([ "$NIGHTLY_LAST_GATE_WEDGE_REASON" = oom ] && printf ' — JavaScript HEAP OUT OF MEMORY')) though the exit code was ${rc:-0} — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    rc=3
+  elif [ "${rc:-0}" != "0" ]; then
+    # A MISSING TOOL BINARY (rc 127 "command not found") is an ENVIRONMENT failure, not
+    # broken lane code. Left as rc=1 it flows to drop-and-re-gate which, finding no
+    # parseable offender, drops ALL authored code (the 2026-07-21 false-drop of 14 clean
+    # files). Reclassify to rc=2 → caller falls back to the in-place gate; code is never
+    # dropped. _gate_ensure_bin above should prevent this; this is the belt to its
+    # suspenders (e.g. if npm rebuild itself failed under contention).
+    if nightly_gate_output_is_toolchain_error "$NIGHTLY_LAST_GATE_OUTPUT"; then
+      log "isolated-gate: FAILED on a missing tool binary ('command not found'), NOT lane code — node_modules/.bin unprovisioned even after self-heal. Classifying as SETUP failure (rc=2 → in-place fallback), never a code failure that would drop clean authored code."
+      rc=2
+    else
+      rc=1
+    fi
+  fi
+  cat "$NIGHTLY_LAST_GATE_OUTPUT" >> "$RUN_LOG" 2>/dev/null || true
+
+  _isolated_gate_cleanup "$wt"
+  if [ "$rc" = "0" ]; then
+    [ "$skip_lint" = "1" ] && log "isolated-gate(no-lint): PASS — authored set is test+build clean" \
+                           || log "isolated-gate: PASS"
+  elif [ "$rc" = "1" ]; then
+    [ "$skip_lint" = "1" ] && log "isolated-gate(no-lint): FAIL — authored set breaks test/build (not just baseline lint)" \
+                           || log "isolated-gate: FAIL (lane code broke lint/test/build)"
+  fi
+  return $rc
+}
+
+# nightly_parse_gate_failures <gate_output_file> → repo-relative source paths
+# (fe-next/...) that eslint or tsc flagged with an ERROR. Best-effort: handles
+# eslint's absolute file-header lines and tsc's `path(line,col): error` form,
+# normalises both to repo-relative, de-dups. Prints nothing if it can't parse —
+# the caller then falls back to the existing docs-only salvage (never regresses).
+#
+# 2026-05-27 fixes:
+#   • Exclude `node_modules/` — happy-dom/vitest/etc paths appear in test-runner
+#     error output and were being dropped as if lane-authored (27/27 drops on
+#     2026-05-27 round 1 were noise of this kind).
+#   • Anchor extension at non-alpha boundary so `\.js` doesn't swallow `\.json`
+#     (the run dropped `fe-next/package.js` — a non-existent file produced by
+#     `package.json` truncation under the old `\.(tsx?|jsx?|mjs|cjs)` group).
+# Caller is also expected to intersect with the authored allowlist (run.sh)
+# so even a stray parse never drops a non-authored file.
+nightly_parse_gate_failures() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 0
+  {
+    # eslint prints the file path as a HEADER on its own line; in the worktree it's
+    # absolute and contains /fe-next/… — keep from fe-next/ onward. Match ONLY a
+    # whole-line path token (an eslint header), NEVER a path embedded in prose.
+    # An earlier substring scrape (`grep -oE '/fe-next/…\.js…'`) matched any path
+    # ANYWHERE in the output and flagged it as a lint offender, which then got
+    # HARD-REVERTED by drop-and-re-gate. Two real ways that destroyed authored work:
+    #   • Babel: "…deoptimised the styling of …/fe-next/translations/en.js as it
+    #     exceeds the max of 500KB" — emitted whenever the large i18n bundles change;
+    #     nuked en/es/sv.js twice (2026-05-27, 2026-06-05).
+    #   • vitest stack frames: "  at …/fe-next/foo.test.tsx:33".
+    # Anchoring to a whole-line token rejects both. (warning-only headers still
+    # emit — harmless, a warning-only file won't fail the gate.)
+    grep -E '^[[:space:]]*[^[:space:]]+\.(tsx|ts|jsx|js|mjs|cjs)[[:space:]]*$' "$out" \
+      | sed -E 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+      | grep '/fe-next/' \
+      | sed -E 's#^.*/(fe-next/)#\1#' \
+      | grep -v '/node_modules/'
+    # tsc: `components/foo.tsx(12,3): error TS....` (relative to fe-next cwd).
+    grep -oE '^[A-Za-z0-9_][][A-Za-z0-9_./-]*\.(tsx|ts|jsx|js|mjs|cjs)\([0-9]+,[0-9]+\): error' "$out" \
+      | sed -E 's/\([0-9]+,[0-9]+\): error.*$//' \
+      | sed -E 's#^#fe-next/#' \
+      | grep -v '/node_modules/'
+    # next build (build:fast): App Router prints the offending file as a bare `./path`
+    # line on its OWN line — a TS error adds a `:line:col` suffix (`./app/foo/page.tsx:5:1`),
+    # a webpack module-not-found (orphaned page importing a missing sibling — the canonical
+    # gate-timeout partial) prints it WITHOUT one (`./app/foo/page.tsx`, in the error head +
+    # "Import trace"). Match both: REQUIRE the leading `./` (Next always emits it) so prose
+    # can't match, make `:line:col` optional. Relative to the fe-next cwd. Allowlist-
+    # intersected in run.sh, so a stray match is dropped anyway; the `./` anchor + code
+    # extension already exclude the `https://nextjs.org/...` doc URL and the trace label.
+    grep -oE '^\./[A-Za-z0-9_][][A-Za-z0-9_./-]*\.(tsx|ts|jsx|js|mjs|cjs)(:[0-9]+:[0-9]+)?$' "$out" \
+      | sed -E 's/:[0-9]+:[0-9]+$//; s#^\./##' \
+      | sed -E 's#^#fe-next/#' \
+      | grep -v '/node_modules/'
+  } 2>/dev/null | sort -u
+}
+
+# nightly_parse_test_failures <gate_output_file> → repo-relative TEST FILE paths
+# (fe-next/...) that vitest reported as FAIL. The drop-and-re-gate parser above
+# only catches lint/tsc errors (`file(line,col): error`); a failing TEST emits no
+# such line, so a test that ALREADY fails on untouched master left `_bad` empty,
+# the lint-skip re-gate reran the same red test, and the run collapsed to docs-only
+# (the 2026-06-02/03 zero-code nights). This parser feeds the baseline-aware salvage:
+# compare the authored gate's failing tests against a clean-HEAD baseline's — a test
+# red on master is NOT the nightly's fault.
+#
+# Vitest prints a per-failure header:  " FAIL  <path>.test.tsx > describe > it"
+# (ANSI-coloured; path relative to fe-next, the gate's cwd, or absolute inside the
+# worktree). Strip ANSI, pull the path token, normalise to fe-next/…, drop
+# node_modules. Best-effort: prints nothing if unparseable (caller stays safe).
+nightly_parse_test_failures() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 0
+  # The `[][A-Za-z0-9_./-]` class includes a literal `]` (first, per POSIX) and `[` so
+  # a Next.js dynamic-route segment (`app/[locale]/foo/page.test.tsx`) parses — WITHOUT
+  # the brackets the class stops at `app/`, the FAIL header yields no token, and every
+  # failing `app/[locale]/**` test reads as "no parseable offenders" → docs-only drop-all
+  # (the 2026-07-23 scrabble-alternative-online/page.test.tsx incident). The next-build
+  # branch of nightly_parse_gate_failures already anchors brackets this way; kept in sync.
+  sed -E $'s/\x1b\\[[0-9;]*m//g' "$out" 2>/dev/null \
+    | grep -oE 'FAIL +[][A-Za-z0-9_./-]+\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)' \
+    | sed -E 's/^FAIL +//' \
+    | awk '{ if ($0 ~ /\/fe-next\//) sub(/^.*\/fe-next\//,"fe-next/"); else if ($0 !~ /^fe-next\//) $0="fe-next/"$0; print }' \
+    | grep -v '/node_modules/' \
+    | sort -u
+}
+
+# nightly_parse_worker_crashed_tests <gate_output_file> → repo-relative TEST FILE paths
+# (fe-next/...) whose vitest WORKER FAILED TO START / was terminated (fork-spawn crash or
+# OOM under machine load) — an INFRA crash that prints NO `FAIL <path>` header.
+#
+# WHY this exists (2026-07-18 false-drop incident): the baseline-aware salvage compares the
+# authored gate's failing tests to a clean-HEAD baseline gate's. A pre-existing-broken test
+# (`AdventureView.timerPerf.test.tsx`) FAILED normally in the authored gate (→ a FAIL line)
+# but its worker CRASHED AT FORK-START in the scoped baseline gate under load:
+#   `[vitest-pool]: Failed to start forks worker for test files …/AdventureView.timerPerf.test.tsx.`
+# That crash emits no FAIL header, so nightly_parse_test_failures saw it as NOT-failing on
+# baseline → the decision computed it as a NEW authored-introduced failure → since the file is
+# non-authored it was neither shipped nor peeled → fallthrough → docs-only DROP of all 11
+# build-clean lane files. A worker that never started proves NOTHING about the test — its
+# baseline verdict is UNKNOWN, not GREEN. The caller unions these into the baseline "failing"
+# set so an inconclusive-on-baseline test can't masquerade as a fresh authored break.
+#
+# vitest can name several files in one crash line ("… for test files A, B."); the token
+# scraper picks every test path in the matched lines. Same infra-crash phrasings + vitest-pool
+# namespace that nightly_gate_has_unattributed_failures already knows (kept in sync).
+# Best-effort: prints nothing if unparseable (caller stays safe — a miss only reverts to the
+# prior conservative behavior, never ships more).
+nightly_parse_worker_crashed_tests() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 0
+  sed -E $'s/\x1b\\[[0-9;]*m//g' "$out" 2>/dev/null \
+    | grep -aE 'Failed to start .*worker for test files|Worker terminated|ERR_WORKER_OUT_OF_MEMORY|Worker forks emitted error|Failed to terminate .*worker|\[vitest-pool(-runner)?\]:' \
+    | grep -aoE '[][A-Za-z0-9_./-]+\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)' \
+    | awk '{ if ($0 ~ /\/fe-next\//) sub(/^.*\/fe-next\//,"fe-next/"); else if ($0 !~ /^fe-next\//) $0="fe-next/"$0; print }' \
+    | grep -v '/node_modules/' \
+    | sort -u
+}
+
+# nightly_gate_has_unattributed_failures <gate_output_file> → exit 0 (true) iff the gate
+# output contains a CODE-level failure that nightly_parse_test_failures CANNOT see as a
+# `FAIL <path>` line — so the baseline-aware 'ship' verdict ("every FAIL-line test also fails
+# on clean HEAD") is UNSAFE: a NEW authored breakage may be hidden from the comparison.
+#
+# The 2026-06-11 near-miss: the authored growthTracking→isAndroid break surfaced as an
+# "Unhandled Rejection" (a rejected promise from a mock missing an export) with NO `FAIL`
+# line → 'ship' fired on only the pre-existing baseline-red FAIL files → it nearly shipped
+# test-broken code (a coincidental build-only rc=3 was the only thing that stopped it).
+#
+# DISCRIMINATION (deliberate, do not "simplify" away): a vitest worker OOM / startup crash
+# ALSO prints under an "Unhandled Error" header (`Worker terminated … JS heap out of memory`
+# / `ERR_WORKER_OUT_OF_MEMORY` / `Failed to start … worker`). That is INFRA noise, not a
+# hidden authored break, and worker OOM is a recurring full-suite flake here. Treating it as
+# unattributed would fire this guard on virtually every red-master night (those run the full
+# suite → OOM co-occurs) and silently revert the 2026-06-02/03 baseline-red-ship fix that
+# stops zero-code nights. So: an Unhandled REJECTION always blocks; an Unhandled ERROR blocks
+# ONLY when it is not a worker-OOM/crash. OOM-only inconclusiveness is handled elsewhere via
+# the rc=3 timeout routing, not here. Returns 1 (false) on empty/missing output.
+#
+# 2026-07-10 recurring-nightly-drop incident: an enumerated list of exact worker-crash
+# messages (`Worker terminated`/`ERR_WORKER_OUT_OF_MEMORY`/`Failed to start … worker`) missed
+# two other vitest-pool-internal phrasings — `Worker forks emitted error.` and
+# `Failed to terminate forks worker …` — which fired this guard on 4+ consecutive nights
+# and salvaged every lane's real, working code to docs-only. Both variants are namespaced
+# under vitest's own `[vitest-pool]:` / `[vitest-pool-runner]:` prefix (vitest's
+# worker-process lifecycle logging), so that namespace is ALSO matched — but the namespace
+# alone (2026-07-10's fix) turned out NOT to cover the original enumerated messages: real
+# `Worker terminated due to reaching memory limit` / `ERR_WORKER_OUT_OF_MEMORY` output has
+# no `[vitest-pool]:` tag on it, so the namespace-only match silently stopped exempting the
+# OOM crash this function exists for — misclassifying it as a hidden authored break and
+# blocking ship on worker-OOM-only red nights (2026-07-13: caught by gate-isolated.test.sh
+# going red, never actually observed live because no lane ran it). Match BOTH: the known
+# infra-crash phrasings AND the vitest-pool namespace, so future wordings are still covered.
+nightly_gate_has_unattributed_failures() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 1
+  # A rejected promise (e.g. a mock missing an export) — always a code-level hidden failure.
+  LC_ALL=C grep -qaE 'Unhandled Rejection' "$out" 2>/dev/null && return 0
+  # An unhandled error that is NOT a vitest worker-pool lifecycle crash is also code-level.
+  if LC_ALL=C grep -qaE 'Unhandled Error' "$out" 2>/dev/null; then
+    LC_ALL=C grep -qaE 'Worker terminated|ERR_WORKER_OUT_OF_MEMORY|Failed to start .*worker|Worker forks emitted error|Failed to terminate forks worker|\[vitest-pool(-runner)?\]:' "$out" 2>/dev/null || return 0
+  fi
+  return 1
+}
+
+# nightly_baseline_test_tokens <fail_test_file> → space-joined vitest positional
+# filters (test-file basenames) for a TARGETED baseline gate. The 2026-06-13 outage:
+# the baseline gate ran the FULL 3278-test suite on clean HEAD, a network integration
+# test (wikipediaTimeout.integration) WEDGED it → rc=3 inconclusive → the decision read
+# "no comparable baseline" → docs-only DROP of build-clean lane code. Scoping the baseline
+# to ONLY the authored gate's failing test files (none of which touch the network) makes it
+# deterministic: a real rc=1 + FAIL lines instead of a hang. We emit BASENAMES, not paths,
+# on purpose: nightly_parse_test_failures drops a backend test's `backend/` segment (vitest
+# runs cwd=fe-next/backend), so the parsed path can't be resolved on disk — but a basename
+# is a valid vitest substring filter that matches in whichever project owns the file.
+# De-dupes (one file, many failing describes → one filter). Prints nothing on empty/missing.
+nightly_baseline_test_tokens() {
+  local f="$1"
+  [ -n "$f" ] && [ -s "$f" ] || return 0
+  awk -F/ 'NF{print $NF}' "$f" 2>/dev/null | sort -u | tr '\n' ' ' | sed 's/ *$//'
+}
+
+# nightly_baseline_test_cmd <space-joined tokens> → the scoped clean-HEAD test command.
+# Runs BOTH vitest projects with the same basename filters; each file belongs to exactly one
+# project, so the OTHER project matches nothing. WHY --passWithNoTests (2026-09-13 → 09-19):
+# without it vitest exits 1 on "No test files found" — every frontend-only failing-test list
+# (WordWheelChallenge.*.test.tsx) made test:backend exit 1 right after test:frontend reported
+# "Test Files 7 passed", so the baseline read RED with ZERO FAIL lines → "not a decidable
+# pre-existing baseline" every night, and the lane's own test break was never peeled.
+nightly_baseline_test_cmd() {
+  local tokens="$1"
+  printf '%s' "npm run build:schemas && { npm run test:backend -- --passWithNoTests $tokens; _bk=\$?; npm run test:frontend -- --passWithNoTests $tokens; _fe=\$?; [ \$_bk -eq 0 ] && [ \$_fe -eq 0 ]; }"
+}
+
+# nightly_baseline_ran_no_tests <gate_output_file> → exit 0 iff BOTH vitest projects reported
+# "No test files found" (i.e. the scoped baseline tested nothing at all). Strips ANSI first.
+nightly_baseline_ran_no_tests() {
+  local out="$1" n
+  [ -n "$out" ] && [ -s "$out" ] || return 1
+  n=$(sed -E $'s/\x1b\\[[0-9;]*m//g' "$out" 2>/dev/null | grep -c 'No test files found')
+  [ "${n:-0}" -ge 2 ]
+}
+
+# run_baseline_gate [skip_lint=0] [targeted_tokens=""] — gate a CLEAN HEAD checkout with
+# NO authored files applied, to learn whether master ITSELF is red (a pre-existing failing
+# test/lint that no lane introduced). Output is left in NIGHTLY_LAST_GATE_OUTPUT for the
+# caller to parse (same contract as run_isolated_gate). Returns the gate rc.
+#
+# When targeted_tokens is non-empty, the test phase is SCOPED to just those vitest filters
+# (build:schemas still runs first for the dist bridge) — this is the wedge-proof baseline
+# the 2026-06-13 fix added: it can't hang on an unrelated slow/networked suite, so a red
+# master yields rc=1 + FAIL lines (→ proven pre-existing → ship) instead of rc=3 (→ drop).
+run_baseline_gate() {
+  local skip_lint="${1:-0}" targeted_tokens="${2:-}" _empty rc
+  _empty=$(mktemp -t nightly-baseline-empty.XXXXXX); : > "$_empty"
+  if [ -n "$targeted_tokens" ]; then
+    log "baseline-gate: gating CLEAN HEAD scoped to the authored gate's failing test file(s) [$targeted_tokens] — wedge-proof pre-existing-red check"
+    # Run BOTH vitest projects with the filters (each project runs only its matching files;
+    # the other matches nothing → passes fast). `;`-separate + AND the rcs so a red in EITHER
+    # project propagates to a non-zero gate rc; combined output feeds the FAIL-line parser.
+    # build:schemas precedes the tests (the dist bridge handler suites import ../dist/...).
+    local _saved_cmd="${NIGHTLY_GATE_CMD:-}" _had_cmd=0
+    [ -n "${NIGHTLY_GATE_CMD:-}" ] && _had_cmd=1
+    export NIGHTLY_GATE_CMD="$(nightly_baseline_test_cmd "$targeted_tokens")"
+    run_isolated_gate "$_empty" "$skip_lint" 1; rc=$?
+    if [ "$_had_cmd" = 1 ]; then export NIGHTLY_GATE_CMD="$_saved_cmd"; else unset NIGHTLY_GATE_CMD; fi
+    # --passWithNoTests makes the NON-owning project pass; but if NEITHER project matched a
+    # file (e.g. unresolvable tokens) a rc=0 would read as "clean HEAD green on all of them"
+    # → nightly_baseline_ship_decision would PEEL authored files on zero evidence. Nothing
+    # ran = UNDECIDABLE, not green → rc=3 (the decision's conservative fallthrough).
+    if [ "$rc" = "0" ] && nightly_baseline_ran_no_tests "${NIGHTLY_LAST_GATE_OUTPUT:-}"; then
+      log "baseline-gate: NEITHER vitest project matched the scoped test file(s) — no test ran, baseline UNDECIDABLE (rc=3), not green"
+      rc=3
+    fi
+  else
+    log "baseline-gate: gating CLEAN HEAD (no authored files) to detect pre-existing master breakage"
+    run_isolated_gate "$_empty" "$skip_lint" 1; rc=$?
+  fi
+  rm -f "$_empty" 2>/dev/null || true
+  return $rc
+}
+
+_isolated_gate_cleanup() {
+  local wt="$1"
+  git -C "$PROJECT_DIR" worktree remove --force "$wt" 2>/dev/null || rm -rf "$wt"
+  git -C "$PROJECT_DIR" worktree prune 2>/dev/null || true
+}

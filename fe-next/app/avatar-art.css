@@ -1,0 +1,23 @@
+/* Avatar idle motion (components/avatar/art/AvatarArt). Loaded ONCE via globals.css;
+   an animated avatar opts in with the .av-anim class. Static renders (SSR PNG,
+   disableEffects) never carry the class. Per-avatar timing is an inline animation-delay. */
+@keyframes avBlink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+@keyframes avBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-.9px)}}
+@keyframes avTw{0%,100%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(.45) rotate(45deg);opacity:.55}}
+@keyframes avSpin{to{transform:rotate(360deg)}}
+@keyframes avGlow{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes avFlick{0%,100%{transform:scale(1,1)}50%{transform:scale(.94,1.1)}}
+@keyframes avFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.4px)}}
+@keyframes avSheen{0%,55%{transform:translateX(0)}100%{transform:translateX(190px)}}
+@keyframes avPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.av-anim .av-blink{transform-box:fill-box;transform-origin:50% 50%;animation:avBlink 5.4s infinite}
+.av-anim .av-bob{animation:avBob 3.6s ease-in-out infinite}
+.av-anim .av-tw{transform-box:fill-box;transform-origin:50% 50%;animation:avTw 1.9s ease-in-out infinite}
+.av-anim .av-rays{transform-box:view-box;transform-origin:50px 50px;animation:avSpin 40s linear infinite}
+.av-anim .av-glow{animation:avGlow 2.2s ease-in-out infinite}
+.av-anim .av-flicker{transform-box:fill-box;transform-origin:50% 100%;animation:avFlick .6s ease-in-out infinite}
+.av-anim .av-float{animation:avFloat 2.8s ease-in-out infinite}
+.av-anim .av-spin-prop{transform-box:fill-box;transform-origin:50% 50%;animation:avSpin 1.4s linear infinite}
+.av-anim .av-sheen{animation:avSheen 4.2s ease-in-out infinite}
+.av-anim .av-pulse{transform-box:fill-box;transform-origin:50% 50%;animation:avPulse 1.3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.av-anim,.av-anim *{animation:none!important}}

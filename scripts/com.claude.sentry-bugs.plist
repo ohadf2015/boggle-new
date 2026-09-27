@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Unique identifier for this job -->
+    <key>Label</key>
+    <string>com.claude.sentry-bugs</string>
+
+    <!-- Command to run -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/ohadfisher/git/boggle-new/scripts/run-sentry-bugs.sh</string>
+        <string>4</string>
+    </array>
+
+    <!-- Run every 4 hours (14400 seconds) -->
+    <key>StartInterval</key>
+    <integer>14400</integer>
+
+    <!-- Working directory -->
+    <key>WorkingDirectory</key>
+    <string>/Users/ohadfisher/git/boggle-new</string>
+
+    <!-- Environment variables (ensure PATH includes homebrew) -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/ohadfisher</string>
+    </dict>
+
+    <!-- Log output -->
+    <key>StandardOutPath</key>
+    <string>/Users/ohadfisher/logs/claude-sentry/launchd-stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ohadfisher/logs/claude-sentry/launchd-stderr.log</string>
+
+    <!-- Low priority I/O -->
+    <key>LowPriorityIO</key>
+    <true/>
+
+    <!-- Timeout after 30 minutes (1800 seconds) if it hangs -->
+    <key>TimeOut</key>
+    <integer>1800</integer>
+</dict>
+</plist>

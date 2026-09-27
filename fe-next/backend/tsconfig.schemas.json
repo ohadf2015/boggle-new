@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "lib": ["ES2022", "DOM"],
+    "outDir": "./dist",
+    "rootDir": "..",
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": false,
+    "sourceMap": false,
+    "noEmit": false,
+    "noImplicitAny": false,
+    "allowJs": false,
+    "baseUrl": "..",
+    "typeRoots": ["../node_modules/@types"],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "./utils/schemas.ts",
+    "./modules/scoringEngine.ts",
+    "../shared/schemas/*.ts",
+    "../shared/types/*.ts",
+    "../shared/stateMachines/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

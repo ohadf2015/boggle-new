@@ -1,0 +1,77 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createRequestClient } from '@/utils/supabase/server';
+import { captureApiError } from '@/utils/sentry';
+
+interface ClaimResult {
+  success: boolean;
+  xp_awarded: number;
+  coins_awarded: number;
+}
+
+/**
+ * POST /api/player/gifts/[id]/claim
+ * Claim a gift and receive XP/coins rewards
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: giftId } = await params;
+    // Bearer-aware client: cookie-only auth silently 401s for clients whose
+    // session isn't in cookies (Capacitor webview, cookie-blocked browsers),
+    // which made gifts unclaimable for exactly the players receiving them.
+    const { supabase, token } = await createRequestClient(request);
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token ?? undefined);
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Use the database function for atomic claim operation
+    const { data: result, error: claimError } = await supabase
+      .rpc('claim_admin_gift', { gift_id: giftId });
+
+    if (claimError) {
+      console.error('Error claiming gift:', claimError);
+      captureApiError(new Error(claimError.message), '/api/player/gifts/[id]/claim', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+        body: { giftId },
+      });
+      return NextResponse.json({ error: 'Failed to claim gift' }, { status: 500 });
+    }
+
+    const claimResult = result as ClaimResult;
+
+    if (!claimResult.success) {
+      return NextResponse.json(
+        { error: 'Cannot claim gift' },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      xpAwarded: claimResult.xp_awarded,
+      coinsAwarded: claimResult.coins_awarded,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in POST /api/player/gifts/[id]/claim:', errorMessage);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/player/gifts/[id]/claim',
+      { method: 'POST', statusCode: 500 }
+    );
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

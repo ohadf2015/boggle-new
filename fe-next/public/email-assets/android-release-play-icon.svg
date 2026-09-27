@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <!-- Neo "app tile" play glyph for the Android release email CTA.
+       Black rounded tile + lime triangle echoes the lime CTA button.
+       On-brand (kawaii/neo), language-neutral, no trademark imitation. -->
+  <rect x="8" y="8" width="176" height="176" rx="42" fill="#000000"/>
+  <rect x="8" y="8" width="176" height="176" rx="42" fill="none" stroke="#BFFF00" stroke-width="6"/>
+  <path d="M76 58 L76 134 L138 96 Z" fill="#BFFF00"/>
+</svg>

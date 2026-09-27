@@ -1,0 +1,280 @@
+/**
+ * Google Classroom Marketplace — Attachment Discovery iframe.
+ *
+ * Teacher enters class-level missed words; one-click assigns a 3-min miss-gap
+ * Live (Quizlet Education Plus foil — works on free Workspace) or posts
+ * Unplugged reteach homework (#968 printable + Live deep-link) to the Classroom
+ * Stream via the Phase-1 share dialog (no OAuth / no roster PII).
+ */
+
+'use client';
+
+import { useMemo, useState } from 'react';
+import { Check, GraduationCap, Play, Printer, Share2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import {
+  buildClassroomAddonAssign,
+  type ClassroomAddonContextQuery,
+} from '@/lib/education/googleClassroomAddon';
+import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
+import { shareWithFallback } from '@/utils/shareWithFallback';
+import { NeoNote } from '@/components/ui/note';
+
+export interface ClassroomAddonDiscoveryProps {
+  locale: string;
+  initialMissedWords?: string[];
+  initialLesson?: string;
+  context?: ClassroomAddonContextQuery;
+}
+
+export function ClassroomAddonDiscovery({
+  locale,
+  initialMissedWords = [],
+  initialLesson = '',
+  context,
+}: ClassroomAddonDiscoveryProps) {
+  const { t } = useLanguage();
+  const [lesson, setLesson] = useState(initialLesson);
+  const [missedText, setMissedText] = useState(initialMissedWords.join(', '));
+  const [missGapShareState, setMissGapShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
+
+  const assign = useMemo(() => {
+    return buildClassroomAddonAssign({
+      missed_words: missedText,
+      lesson: lesson || undefined,
+      locale,
+    });
+  }, [missedText, lesson, locale]);
+
+  const liveStreamHref = assign.ok ? assign.liveStreamAssignUrl : null;
+  const streamHref = assign.ok ? assign.streamAssignUrl : null;
+  const unpluggedHref = assign.ok ? assign.unpluggedUrl : null;
+  const words = assign.ok ? assign.attachment.title : '';
+
+
+  const handleShareMissGapPractice = async () => {
+    if (!assign.ok) return;
+    const missed = missedText
+      .split(/[,;\n]+/)
+      .map((w) => w.trim())
+      .filter(Boolean);
+    if (missed.length === 0) return;
+    const lessonName = lesson.trim() || 'Unplugged reteach';
+    const url = buildMissGapPracticeShareUrl({
+      locale,
+      lessonNames: [lessonName],
+      teacherName: '',
+      found: 0,
+      total: missed.length,
+      missedWords: missed,
+    });
+    const text = t('education.results.shareMissGapPracticeText', {
+      lesson: lessonName,
+      missed: missed.join(', '),
+    });
+    const result = await shareWithFallback({
+      title: t('education.results.shareMissGapPracticeTitle'),
+      text,
+      url,
+      clipboardText: `${text}\n${url}`,
+    });
+    if (result === 'copied' || result === 'shared') setMissGapShareState(result);
+  };
+
+  const handlePrint = () => {
+    if (!assign.ok) return;
+    const missed = missedText
+      .split(/[,;\n]+/)
+      .map((w) => w.trim())
+      .filter(Boolean);
+    openMissedWordsPracticeSheet({
+      lesson: lesson.trim() || 'Unplugged reteach',
+      missedWords: missed,
+      locale,
+      labels: {
+        title: t('education.results.printPracticeSheetTitle', { lesson: lesson || 'Lesson' }),
+        subtitle: t('education.results.printPracticeSheetSubtitle'),
+        writeLabel: t('education.results.printPracticeSheetWriteLabel'),
+        sentenceLabel: t('education.results.printPracticeSheetSentenceLabel'),
+        nameLine: t('education.results.printPracticeSheetNameLine'),
+        dateLine: t('education.results.printPracticeSheetDateLine'),
+        footer: t('education.results.printPracticeSheetFooter'),
+      },
+    });
+  };
+
+  const inClassroom = Boolean(context?.courseId || context?.addOnToken);
+
+  return (
+    <div
+      className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light shadow-hard"
+      data-testid="classroom-addon-discovery"
+      data-in-classroom={String(inClassroom)}
+    >
+      <p className="text-neo-pink font-bold text-xs uppercase tracking-widest mb-2">
+        {t('education.classroomAddon.eyebrow')}
+      </p>
+      <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight flex items-center gap-2">
+        <GraduationCap className="w-6 h-6 text-neo-lime shrink-0" aria-hidden />
+        {t('education.classroomAddon.title')}
+      </h1>
+      <p className="text-neo-white/70 font-neo-body text-sm mt-2">
+        {t('education.classroomAddon.subtitle')}
+      </p>
+
+      <label className="block mt-5">
+        <span className="text-neo-white font-bold text-sm">
+          {t('education.classroomAddon.lessonLabel')}
+        </span>
+        <input
+          type="text"
+          value={lesson}
+          onChange={(e) => setLesson(e.target.value)}
+          data-testid="classroom-addon-lesson"
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm"
+          autoComplete="off"
+        />
+      </label>
+
+      <label className="block mt-4">
+        <span className="text-neo-white font-bold text-sm">
+          {t('education.classroomAddon.missedWordsLabel')}
+        </span>
+        <textarea
+          value={missedText}
+          onChange={(e) => setMissedText(e.target.value)}
+          data-testid="classroom-addon-missed-words"
+          rows={3}
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm"
+        />
+      </label>
+
+      <p className="text-neo-white/50 font-neo-body text-xs mt-2">
+        {t('education.classroomAddon.privacyNote')}
+      </p>
+
+      <a
+        href={`/${locale}/education/classroom-addon/planner`}
+        data-testid="classroom-addon-open-planner"
+        className="mt-3 inline-flex text-neo-lime font-bold text-xs underline-offset-2 hover:underline"
+      >
+        {t('education.classroomAddon.planner.title')}
+      </a>
+
+      {liveStreamHref ? (
+        <a
+          href={liveStreamHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="classroom-addon-assign-live"
+          className={cn(
+            'mt-5 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold text-sm',
+            'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard hover:shadow-hard-lg transition-all',
+          )}
+        >
+          <Play className="w-4 h-4" aria-hidden />
+          {t('education.classroomAddon.assignLive')}
+        </a>
+      ) : (
+        <NeoNote
+          tone="alert"
+          data-testid="classroom-addon-need-words"
+          className="mt-5 text-neo-white font-neo-body text-sm"
+        >
+          {t('education.classroomAddon.needMissedWords')}
+        </NeoNote>
+      )}
+
+      {liveStreamHref && (
+        <p
+          className="mt-2 text-neo-lime/90 font-neo-body text-xs"
+          data-testid="classroom-addon-free-workspace-foil"
+        >
+          {t('education.classroomAddon.freeWorkspaceFoil')}
+        </p>
+      )}
+
+      {streamHref && (
+        <a
+          href={streamHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="classroom-addon-post-stream"
+          className={cn(
+            'mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+            'bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all',
+          )}
+        >
+          <Share2 className="w-4 h-4" aria-hidden />
+          {t('education.classroomAddon.postToStream')}
+        </a>
+      )}
+
+      {unpluggedHref && (
+        <a
+          href={unpluggedHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="classroom-addon-open-unplugged"
+          className={cn(
+            'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+            'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all',
+          )}
+        >
+          {t('education.classroomAddon.openUnplugged')}
+        </a>
+      )}
+
+      {assign.ok && (
+        <button
+          type="button"
+          data-testid="classroom-addon-print-sheet"
+          onClick={handlePrint}
+          className={cn(
+            'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+            'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all',
+          )}
+        >
+          <Printer className="w-4 h-4" aria-hidden />
+          {t('education.results.printPracticeSheet')}
+        </button>
+      )}
+
+      {assign.ok && (
+        <button
+          type="button"
+          data-testid="classroom-addon-share-miss-gap"
+          onClick={handleShareMissGapPractice}
+          className={cn(
+            'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+            'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all',
+          )}
+        >
+          {missGapShareState === 'idle' ? (
+            <>
+              <Share2 className="w-4 h-4" aria-hidden />
+              {t('education.results.shareMissGapPractice')}
+            </>
+          ) : (
+            <>
+              <Check className="w-4 h-4" aria-hidden />
+              {t('education.results.shareMissGapPracticeCopied')}
+            </>
+          )}
+        </button>
+      )}
+
+      {/* Keep attachment title out of visual tree noise but available for tests */}
+      <span className="sr-only" data-testid="classroom-addon-attachment-title">
+        {words}
+      </span>
+    </div>
+  );
+}

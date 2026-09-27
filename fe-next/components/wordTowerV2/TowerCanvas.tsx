@@ -1,0 +1,646 @@
+'use client';
+
+import { Application, Container, Graphics, type Text } from 'pixi.js';
+import { useEffect, useRef } from 'react';
+import { PX_PER_M, type TowerWorld, snapshotWorld, stepWorld } from '@/lib/wordTowerV2/engine';
+import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, SWING, fallTimeMs, predictLandingX, throwArc } from '@/lib/wordTowerV2/crane';
+import { type LandingQuality, perfectHalfWidth } from '@/lib/wordTowerV2/landing';
+import { buildSkyline, rulerTicks, skyProps } from '@/lib/wordTowerV2/scenery';
+import { BLOCK_HEIGHT_PX } from '@/lib/wordTowerV2/scoring';
+import { clampLook, clampLookX, focusX } from '@/lib/wordTowerV2/look';
+import { frameCamera, screenSize, towerSkirts, type DockSide } from '@/lib/wordTowerV2/camera';
+import { publishHeightM } from '@/lib/wordTowerV2/altitude';
+import { floorsAt, skyAt } from '@/lib/wordTowerV2/biomes';
+import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
+import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
+import { COMBO_FLASH, CONFETTI_BURST, GOLD_STARS, RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
+import { createBestLabel, paintBestLine, paintGround, paintLandingMark, paintRuler, paintThrowArc, paintTowerShaft } from './towerArt';
+import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, paintGhost, setBlockGold, setBlockRebar, tickBlock } from './apartmentArt';
+import { createCity, paintCity, placeCity } from './skylineArt';
+import { paintCraneFrame, paintCraneHook } from './craneArt';
+import { SkyLayer } from './skyArt';
+import { paintGear } from './gearArt';
+import type { TowerGear } from '@/lib/wordTowerV2/gear';
+import { standingChain } from '@/lib/wordTowerV2/stability';
+import { TenantCrowd } from './tenantArt';
+
+/**
+ * Pixi renderer + the rAF loop that drives the fixed-timestep world.
+ *
+ * Pixi owns the WHOLE picture — sky, city, street, crane, floors, FX — on one
+ * camera. The sky used to be a DOM stack behind a transparent canvas; it
+ * re-rendered on every height publish and flickered at each biome change.
+ *
+ * ponytail: no interpolation. Physics runs at 120Hz and displays run at 60-120Hz,
+ * so there is always at least one fresh substep per frame.
+ */
+
+export type TowerFx =
+  | { kind: 'land'; id: string; quality: LandingQuality }
+  | { kind: 'gold'; id: string }
+  | { kind: 'tenants'; id: string; count: number }
+  /** Rebar crate: these floors were welded in place. */
+  | { kind: 'rebar'; ids: string[] }
+  | { kind: 'collapse' }
+  /** A crash with floors left standing: the rubble that was cleared away. */
+  | { kind: 'crumble'; points: Array<{ x: number; y: number }> };
+
+export interface FrameStats {
+  p95Ms: number;
+  fps: number;
+  bodies: number;
+}
+
+export interface GhostPreview {
+  word: string;
+  widthPx: number;
+  valid: boolean;
+}
+
+interface Props {
+  world: TowerWorld;
+  labels: Map<string, string>;
+  getDockPx: () => number;
+  /** Measured bottom edge of the top HUD (px); the hanging slab is framed under it. */
+  getHudPx?: () => number;
+  getHangingId: () => string | null;
+  /** Sideways speed (px/ms) the hanging block would be released with now. */
+  getHangVx: () => number;
+  /** The crane's pivot x while a floor hangs (latched over the top floor at hoist); null between hoists. */
+  getCraneX?: () => number | null;
+  /** Crane Yard perk: widens the perfect band — drawn with the SAME maths the judge uses. */
+  getPerfectWindowMult?: () => number;
+  /** The slab being spelled (composing phase), or null. */
+  getGhost: () => GhostPreview | null;
+  /** Best height so far (metres) for the goal line, or null. */
+  getBestM: () => number | null;
+  /** Effects queued by game logic; the loop drains it every frame. */
+  fxQueue: TowerFx[];
+  bestLabel: string;
+  /** Screen edge for the altitude ruler — the side the HUD is NOT on. */
+  rulerSide: 'left' | 'right';
+  /**
+   * Where the controls are. On desktop/TV the wheel is a side panel and THIS
+   * canvas is the play column, so the camera can spend the height on floors.
+   */
+  dockSide?: DockSide;
+  onFrameStats?: (stats: FrameStats) => void;
+  onBeforeStep?: (nowMs: number) => void;
+  /** First contact of a falling block (Matter speed), for the landing thunk. */
+  onImpact?: (speed: number) => void;
+  /** One tenant just popped into a floor (fires once per tenant). */
+  onTenantArrive?: () => void;
+  /**
+   * Where a floor just landed, in canvas-local CSS px — the DOM reward layer
+   * draws the payout on that exact pixel. Read from LAST frame's camera (this
+   * runs before the camera is re-solved); one frame of drift is invisible.
+   */
+  onLandPoint?: (p: { x: number; y: number; quality: LandingQuality }) => void;
+  /** Settled height, quantized (m) — the far city sinks away with it. */
+  getSceneM?: () => number;
+  /**
+   * Bump to send the free-look camera home. The parent bumps it on every hoist,
+   * so the view is always back on the crane before a swing has to be timed —
+   * no idle timer can yank it away mid-drop.
+   */
+  homeKey: number;
+  reducedMotion?: boolean;
+  /** Workshop upgrades to paint on the tower (plinth, braces, cornices, rooftop, crane paint). */
+  getGear?: () => TowerGear | null;
+  className?: string;
+}
+
+/** Floor number encoded in a block id (`r0-b7` -> 7). -1 when there is none. */
+function floorNo(id: string): number {
+  return Number(/(\d+)$/.exec(id)?.[1] ?? -1);
+}
+
+/** How far sideways the free look may pan, as a fraction of the viewport width. */
+const LOOK_X_VIEWPORTS = 0.6;
+
+function percentile(sorted: number[], p: number): number {
+  if (sorted.length === 0) return 0;
+  return sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))];
+}
+
+const FLASH_COLOUR: Partial<Record<LandingQuality, number>> = { perfect: 0xbfff00, miss: 0xff3366 };
+
+export default function TowerCanvas(props: Props) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  // Everything the rAF loop reads, in one ref, so the loop is created once and
+  // never torn down by a re-render mid-run.
+  const propsRef = useRef(props);
+  propsRef.current = props;
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+
+    let disposed = false;
+    let raf = 0;
+    let app: Application | null = null;
+    let resizeObserver: ResizeObserver | null = null;
+
+    // Free look: drag or wheel the canvas to walk the tower back down. `target`
+    // is where the player put it; `lookY` chases it so the home snap eases.
+    // Sideways it is a CAMERA pan: the street, crane and skylines move with
+    // the tower (below), never the building alone over a frozen backdrop.
+    let lookTarget = 0;
+    let lookY = 0;
+    let lookXTarget = 0;
+    let lookX = 0;
+    let lookHome = propsRef.current.homeKey;
+    let dragFrom: { x: number; y: number; look: number; lookX: number } | null = null;
+    const onPointerDown = (e: PointerEvent) => {
+      dragFrom = { x: e.clientX, y: e.clientY, look: lookTarget, lookX: lookXTarget };
+      host.setPointerCapture(e.pointerId);
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      // Content follows the finger: drag UP to walk down your own tower.
+      if (!dragFrom) return;
+      lookTarget = dragFrom.look + (e.clientY - dragFrom.y);
+      lookXTarget = dragFrom.lookX + (e.clientX - dragFrom.x);
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      dragFrom = null;
+      if (host.hasPointerCapture(e.pointerId)) host.releasePointerCapture(e.pointerId);
+    };
+    const onWheel = (e: WheelEvent) => {
+      lookTarget -= e.deltaY;
+      // Trackpads and shift+wheel report sideways scroll here.
+      lookXTarget -= e.deltaX;
+    };
+    host.addEventListener('pointerdown', onPointerDown);
+    host.addEventListener('pointermove', onPointerMove);
+    host.addEventListener('pointerup', onPointerUp);
+    host.addEventListener('pointercancel', onPointerUp);
+    host.addEventListener('wheel', onWheel, { passive: true });
+
+    const views = new Map<string, BlockView>();
+    const frameTimes: number[] = [];
+    let lastStatsAt = 0;
+    let cameraY = 0;
+    // The tower's centre line is wherever the FIRST floor was put down, not the
+    // crane's x=0. Latched once floor 0 settles, and released when the run is
+    // torn down (no floor 0 in the snapshot) so the next run re-anchors.
+    let anchorX = 0;
+    let anchorLatched = false;
+    let camX = 0;
+    // The camera frames a FILTERED height: settled Matter stacks jitter in the
+    // 3rd decimal forever, so the raw value kept the ease from ever landing and
+    // the whole scene (and the sky) micro-drifted.
+    let camTopM = 0;
+    let groundKey = '';
+    let rulerKey = '';
+    let craneKey = '';
+    let flashAlpha = 0;
+    let flashColour = 0xffffff;
+
+    void (async () => {
+      const created = new Application();
+      await created.init({
+        backgroundAlpha: 0,
+        antialias: true,
+        resizeTo: host,
+        // Capping DPR is the single biggest mobile win: a 3x device would shade
+        // 9x the pixels for no visible gain on 34px blocks.
+        resolution: Math.min(window.devicePixelRatio || 1, 2),
+        autoDensity: true,
+      });
+
+      if (disposed) {
+        created.destroy(true);
+        return;
+      }
+
+      app = created;
+      host.appendChild(created.canvas);
+      // `resizeTo` only listens to window resize. In the Android WebView the host
+      // can settle AFTER init with no window event, leaving a canvas stuck at
+      // ~60% width — the tower then played in the left half of the screen.
+      resizeObserver = new ResizeObserver(() => created.resize());
+      resizeObserver.observe(host);
+
+      const scene = new Container();
+      const flash = new Graphics();
+      const sky = new SkyLayer(skyProps(11));
+      const farCity = createCity();
+      const nearCity = createCity();
+      created.stage.addChild(sky.container, farCity.container, nearCity.container, scene, flash);
+
+      const ruler = new Graphics();
+      const rulerLayer = new Container();
+      const rulerLabels = new Map<number, Text>();
+      const bestLine = new Graphics();
+      let bestText = propsRef.current.bestLabel;
+      let bestLabel = createBestLabel(bestText);
+      const guide = new Graphics();
+      const landingMark = new Graphics();
+      const crane = new Graphics();
+      const hook = new Graphics();
+      const shaft = new Graphics();
+      const blocks = new Container();
+      const ghost = createGhost();
+      const ground = new Graphics();
+      const crowd = new TenantCrowd();
+      // Last: the plinth is sunk into the street, so it must draw over the ground.
+      const gearLayer = new Graphics();
+      scene.addChild(ruler, rulerLayer, bestLine, bestLabel, crane, guide, hook, shaft, blocks, crowd.layer, landingMark, ghost.container, ground, gearLayer);
+
+      const shake = new ScreenShake();
+      const particles = new ParticlePool(scene);
+
+      let lastTs = performance.now();
+
+      const tick = (ts: number) => {
+        raf = requestAnimationFrame(tick);
+        const p = propsRef.current;
+        const world = p.world;
+
+        const frameMs = ts - lastTs;
+        lastTs = ts;
+        const dt = frameMs / 1000;
+        frameTimes.push(frameMs);
+
+        p.onBeforeStep?.(ts);
+        stepWorld(world, Math.min(frameMs, 100));
+        const snap = snapshotWorld(world);
+        const byId = new Map(snap.blocks.map((b) => [b.id, b]));
+
+        let hardest = 0;
+        for (const impact of world.pendingImpacts) {
+          // Micro-vibrations (speed <= 4) are ignored; heavy impacts get juice.
+          if (impact.speed <= 4) continue;
+          hardest = Math.max(hardest, impact.speed);
+          const hit = views.get(impact.id);
+          if (hit) hit.squash = Math.min(1, impact.speed / 12);
+          shake.shake({ intensity: Math.min(12, impact.speed * 0.4), duration: 0.25, decay: 'exponential' });
+          const block = byId.get(impact.id);
+          if (!block) continue;
+          const impactY = block.y + block.heightPx / 2;
+          particles.burst(TOWER_DUST, block.x, impactY, 8);
+          if (impact.speed > 10) particles.burst(RUBBLE_BURST, block.x, impactY, 8);
+        }
+
+        if (hardest > 0) p.onImpact?.(hardest);
+
+        for (const fx of p.fxQueue.splice(0)) {
+          if (fx.kind === 'rebar') {
+            for (const id of fx.ids) {
+              const v = views.get(id);
+              if (v) setBlockRebar(v);
+              const b = byId.get(id);
+              if (b) particles.burst(TOWER_DUST, b.x, b.y, 6);
+            }
+            flashColour = 0x37e0ff;
+            flashAlpha = 0.2;
+            continue;
+          }
+          if (fx.kind === 'crumble') {
+            for (const pt of fx.points) {
+              particles.burst(RUBBLE_BURST, pt.x, pt.y, 10);
+              particles.burst(TOWER_DUST, pt.x, pt.y, 8);
+            }
+            shake.shake({ intensity: 13, duration: 0.5, decay: 'exponential' });
+            flashColour = 0xff9f43;
+            flashAlpha = 0.25;
+            continue;
+          }
+          if (fx.kind === 'collapse') {
+            shake.shake({ intensity: 16, duration: 0.6, decay: 'exponential' });
+            flashColour = 0xff3366;
+            flashAlpha = 0.35;
+            continue;
+          }
+          const block = byId.get(fx.id);
+          const view = views.get(fx.id);
+          if (fx.kind === 'tenants') {
+            // Half the screen in world units, from last frame's zoom (it barely moves).
+            const halfScreen = screenSize(created.renderer).w / 2 / scene.scale.x;
+            crowd.moveIn(fx.id, fx.count, block?.x ?? 0, halfScreen);
+            continue;
+          }
+          if (!block) continue;
+          if (fx.kind === 'gold') {
+            if (view) setBlockGold(view);
+            particles.burst(GOLD_STARS, block.x, block.y, 20);
+            continue;
+          }
+          p.onLandPoint?.({
+            x: scene.x + block.x * scene.scale.x,
+            y: scene.y + (block.y - block.heightPx / 2) * scene.scale.x,
+            quality: fx.quality,
+          });
+          if (fx.quality === 'perfect') {
+            if (view) view.flash = 1;
+            particles.burst(COMBO_FLASH, block.x, block.y, 14);
+            particles.burst(CONFETTI_BURST, block.x, block.y - block.heightPx, 18);
+            // Camera kick + a dust ring along the seam: a perfect floor should
+            // LAND, not merely appear. Tower Bloxx sells the snap this way.
+            shake.shake({ intensity: 9, duration: 0.22, decay: 'exponential' });
+            particles.burst(TOWER_DUST, block.x - block.widthPx / 2, block.y + block.heightPx / 2, 6);
+            particles.burst(TOWER_DUST, block.x + block.widthPx / 2, block.y + block.heightPx / 2, 6);
+          }
+          // Below the collapse kick (16) on purpose: a miss is a stumble, not the end.
+          if (fx.quality === 'miss') shake.shake({ intensity: 10, duration: 0.35, decay: 'exponential' });
+          const colour = FLASH_COLOUR[fx.quality];
+          if (colour !== undefined) {
+            flashColour = colour;
+            flashAlpha = fx.quality === 'perfect' ? 0.18 : 0.22;
+          }
+        }
+
+        shake.update(dt);
+        particles.update(dt);
+        crowd.update(
+          frameMs,
+          scene.scale.x,
+          (id) => {
+            const b = byId.get(id);
+            return b ? { x: b.x, y: b.y, halfW: b.widthPx / 2 } : null;
+          },
+          (id) => {
+            const v = views.get(id);
+            if (v) addTenant(v);
+            p.onTenantArrive?.();
+          },
+        );
+
+        const { w, h } = screenSize(created.renderer);
+
+        camTopM = publishHeightM(camTopM, snap.towerHeightM);
+        const frame = frameCamera({ viewportW: w, viewportH: h, dockPx: p.getDockPx(), towerTopM: camTopM, dockSide: p.dockSide, hudPx: p.getHudPx?.() });
+        const { scale } = frame;
+        // Frame-rate independent ease (a fixed 0.08/frame ran 2x faster at 120Hz).
+        cameraY += (frame.cameraY - cameraY) * (1 - Math.exp(-dt * 5));
+
+        const base = snap.blocks.find((b) => floorNo(b.id) === 0);
+        if (!base) {
+          anchorLatched = false;
+          anchorX = 0;
+        } else if (!anchorLatched && world.landed.has(base.id) && base.resting) {
+          anchorX = base.x;
+          anchorLatched = true;
+        }
+        // The crane line: where the swing is centred. While a floor hangs it is
+        // the pivot latched at hoist; between hoists, the settled top floor —
+        // exactly where the next hoist will latch it, so nothing jumps.
+        let top: (typeof snap.blocks)[number] | null = null;
+        const hangingNow = p.getHangingId();
+        for (const b of snap.blocks) {
+          if (b.id === hangingNow || !b.resting || !world.landed.has(b.id)) continue;
+          if (!top || b.y < top.y) top = b;
+        }
+        const craneX = p.getCraneX?.() ?? top?.x ?? (anchorLatched ? anchorX : 0);
+        // The swing's far end must stay on screen: arm sweep + half the slab
+        // (the widest the hook ever carries) + a little air.
+        const hangHalfW = (hangingNow ? byId.get(hangingNow)?.widthPx : p.getGhost()?.widthPx) ?? 200;
+        const reach = CRANE_ARM_PX * Math.sin(SWING.amplitudeRad) + hangHalfW / 2 + 24 / scale;
+        camX += (focusX(anchorLatched ? anchorX : null, craneX, w / 2 / scale - reach) - camX) * (1 - Math.exp(-dt * 5));
+
+        if (p.homeKey !== lookHome) {
+          lookHome = p.homeKey;
+          lookTarget = 0;
+          lookXTarget = 0;
+        }
+        // Re-clamped every frame: the reachable range grows as the tower does.
+        lookTarget = clampLook(lookTarget, cameraY);
+        lookY += (lookTarget - lookY) * (1 - Math.exp(-dt * 14));
+        lookXTarget = clampLookX(lookXTarget, w * LOOK_X_VIEWPORTS);
+        lookX += (lookXTarget - lookX) * (1 - Math.exp(-dt * 14));
+
+        scene.scale.set(scale);
+        scene.x = w / 2 - camX * scale + lookX + shake.offset.x;
+        scene.y = frame.groundScreenY + cameraY + lookY + shake.offset.y;
+
+        const halfW = w / 2 / scale;
+        // World x under the middle of the screen. Screen-edge furniture (street,
+        // crane mast, ruler, best line) is drawn around this instead of around
+        // world 0, so it still spans the screen when the camera follows a
+        // tower that walked sideways (focusX).
+        // Deliberately excludes the shake offset: the whole scene shakes on
+        // impact, and cancelling it here would freeze the street mid-quake.
+        const viewCenterX = camX - lookX / scale;
+        // The street stays in the WORLD (with the tower), so a sideways pan
+        // moves it too; pinned to the screen, the pan read as dragging the
+        // building. The crane rail and the ruler are screen furniture.
+        ground.x = camX;
+        crane.x = viewCenterX;
+        ruler.x = viewCenterX;
+        rulerLayer.x = viewCenterX;
+
+        // The near city stands exactly on the ground line; the far one trails
+        // at half speed, so climbing reads as depth, not as the city sliding.
+        // Visible metres, from the screen's bottom to top edge.
+        const mAt = (screenY: number) => -((screenY - scene.y) / scale) / PX_PER_M;
+        // The sky follows what is ON SCREEN (the eased camera), so a biome change
+        // is a continuous blend as the view climbs — never a snap.
+        // Quantized to 1/20 floor: a blend then repaints the 14 bands ~40 times, not every frame.
+        const skyNow = skyAt(Math.round(floorsAt(mAt(h * 0.5)) * 20) / 20);
+        sky.update({
+          w,
+          h,
+          ts,
+          dt,
+          sky: skyNow,
+          groundY: scene.y,
+          scale,
+          floorPx: BLOCK_HEIGHT_PX,
+          reducedMotion: !!p.reducedMotion,
+        });
+
+        // Wide enough to cover the whole free-look range on both sides.
+        const panW = w * LOOK_X_VIEWPORTS;
+        const cityW = Math.ceil(w + 2 * panW) + 120;
+        paintCity(farCity, `f${cityW}`, () => buildSkyline(41, cityW, 70, 160), { fill: 0x2a2f5a, edge: 0x2a2f5a, windowAlpha: 0.22 });
+        paintCity(nearCity, `n${cityW}`, () => buildSkyline(7, cityW, 36, 100), { fill: 0x141830, edge: 0x0b0e1c, windowAlpha: 0.85 });
+        // Beyond parallax the far city sinks as you climb, so by ~8m the skies
+        // own the screen instead of a skyline hanging in space.
+        const sink = Math.min(p.getSceneM?.() ?? 0, 8) * 22;
+        // Skylines trail the pan at parallax: the far one barely moves.
+        placeCity(farCity, -60 - panW + lookX * 0.35, frame.groundScreenY + (cameraY + lookY) * 0.55 + sink + shake.offset.y * 0.5, h, ts);
+        placeCity(nearCity, -60 - panW + lookX * 0.8 + shake.offset.x, scene.y, h, ts);
+        const groundHalfW = halfW + panW / scale + 40;
+        if (groundKey !== `${groundHalfW}|${scale}`) {
+          groundKey = `${groundHalfW}|${scale}`;
+          paintGround(ground, groundHalfW, scale);
+        }
+
+        // Translations can land after init; rebuild the flag when its text changes.
+        if (p.bestLabel !== bestText) {
+          bestText = p.bestLabel;
+          const next = createBestLabel(bestText);
+          scene.addChildAt(next, scene.getChildIndex(bestLabel));
+          bestLabel.destroy({ children: true });
+          bestLabel = next;
+        }
+        // Floor ruler: a tick per storey, a number every 5. Repainted only when
+        // the visible floor range, zoom or side changes.
+        const edgeX = (p.rulerSide === 'left' ? -1 : 1) * (halfW - 10 / scale);
+        const fromFloor = Math.floor(floorsAt(mAt(h)));
+        const toFloor = Math.ceil(floorsAt(mAt(0)));
+        const nextRulerKey = `${fromFloor}|${toFloor}|${scale.toFixed(3)}|${edgeX.toFixed(1)}`;
+        if (nextRulerKey !== rulerKey) {
+          rulerKey = nextRulerKey;
+          paintRuler(ruler, rulerLabels, rulerLayer, scale, edgeX, p.rulerSide, rulerTicks(fromFloor, toFloor), BLOCK_HEIGHT_PX);
+        }
+
+        const bestM = p.getBestM();
+        paintBestLine(bestLine, bestLabel, halfW, scale, bestM && bestM > 0.5 ? -bestM * PX_PER_M : null, viewCenterX);
+
+        const hangingId = p.getHangingId();
+        // Under every floor: fills the wedge of sky an overhang leaves, and
+        // runs the lowest floors past the bottom edge so a panned camera never
+        // shows the tower ending in mid-air above the dock.
+        paintTowerShaft(
+          shaft,
+          towerSkirts(
+            // Only what is on screen (plus a floor of margin): a 40-floor run
+            // would otherwise redraw 40 shafts a frame for floors nobody sees.
+            snap.blocks.filter(
+              (b) =>
+                b.id !== hangingId &&
+                world.landed.has(b.id) &&
+                scene.y + (b.y - b.heightPx) * scale < h + 240 &&
+                scene.y + (b.y + b.heightPx) * scale > -120,
+            ),
+            (h - scene.y) / scale,
+          ),
+          scale,
+        );
+        for (const block of snap.blocks) {
+          let view = views.get(block.id);
+          if (!view) {
+            // Floor number from the id (`r0-b7` -> 7): colour cycle + lobby on floor 0.
+            const floor = floorNo(block.id);
+            view = createBlockView(floor < 0 ? views.size : floor, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale);
+            blocks.addChild(view.container);
+            views.set(block.id, view);
+          }
+          paintBlock(view, scale);
+          tickBlock(view, dt);
+          view.container.position.set(block.x, block.y);
+          view.container.rotation = block.angleRad;
+        }
+
+        // Crane geometry: the block hangs CRANE_CLEARANCE_PX above the tower top,
+        // the pivot a full arm above that.
+        const hangY = -(snap.towerHeightM * PX_PER_M + CRANE_CLEARANCE_PX);
+        const pivotY = hangY - CRANE_ARM_PX;
+        const hanging = hangingId ? byId.get(hangingId) : undefined;
+        const ghostPreview = hanging ? null : p.getGhost();
+
+        ghost.container.visible = !!ghostPreview;
+        if (ghostPreview) {
+          paintGhost(ghost, scale, ghostPreview.word, ghostPreview.widthPx, BLOCK_HEIGHT_PX, ghostPreview.valid);
+          // A gentle idle bob so the waiting slab reads as hanging, not pasted.
+          ghost.container.position.set(craneX, hangY + Math.sin(ts / 420) * 2);
+        }
+
+        // Idle: an empty hook still hangs where the next slab will appear, so
+        // the crane is always on screen and the player knows where words go.
+        const idleY = hangY + Math.sin(ts / 420) * 2;
+        const hookTarget = hanging ?? { x: craneX, y: ghostPreview ? ghost.container.y : idleY, heightPx: BLOCK_HEIGHT_PX };
+        const craneFrame = {
+          scale,
+          halfW,
+          topY: -scene.y / scale,
+          bottomY: (h - scene.y) / scale,
+          // Mast on the HUD's side: the ruler owns the other edge.
+          side: (p.rulerSide === 'left' ? 'right' : 'left') as 'left' | 'right',
+          pivot: { x: craneX, y: pivotY },
+          hook: { x: hookTarget.x, y: hookTarget.y - hookTarget.heightPx / 2 },
+        };
+        const gear = p.getGear?.() ?? null;
+        if (gear) {
+          const base = snap.blocks.find((b) => floorNo(b.id) === 0);
+          const landed = snap.blocks.filter((b) => b.id !== hangingId && world.landed.has(b.id));
+          const ids = base ? standingChain(landed, base.id) : [];
+          paintGear(gearLayer, gear, ids.map((id) => byId.get(id)!).filter(Boolean), scale, ts, {
+            top: (-120 - scene.y) / scale,
+            bottom: (h + 240 - scene.y) / scale,
+          });
+        } else gearLayer.clear();
+        // Crane Yard upgrade: the rail and pulley wear the part's finish.
+        const craneGear = gear?.craneYard;
+        const paintedCrane =
+          craneGear && craneGear.level > 0 ? { ...craneFrame, paint: { main: craneGear.material.main, shade: craneGear.material.trim } } : craneFrame;
+        craneKey = paintCraneFrame(crane, paintedCrane, craneKey);
+        paintCraneHook(hook, paintedCrane);
+        if (hanging) {
+          // The WHOLE arc, and where it touches down. Round 2 drew only the first
+          // 40% so as not to "solve the landing" — but the block keeps drifting
+          // for the entire fall, so every drop landed well past the guide's tip
+          // and alignment felt impossible. A truthful guide is not an aim-bot:
+          // the target still sweeps and the tap still has to be timed.
+          const bottom = hanging.y + hanging.heightPx / 2;
+          const towerTopY = -snap.towerHeightM * PX_PER_M;
+          const dropPx = Math.max(1, towerTopY - bottom);
+          const vx = p.getHangVx();
+          const landX = predictLandingX(hanging.x, vx, dropPx);
+          const gravity = world.engine.gravity.y * (world.engine.gravity.scale ?? 0.001);
+          paintThrowArc(guide, scale, throwArc({ x: hanging.x, y: bottom + 10 / scale, vx, gravity, durationMs: fallTimeMs(dropPx) * 0.92, points: 12 }));
+          const top = snap.blocks.reduce<(typeof snap.blocks)[number] | null>(
+            (best, b) =>
+              // Same rule as the judge (supportTop): only blocks that have landed.
+              b.id === hanging.id || !world.landed.has(b.id) || (best && best.y - best.heightPx / 2 <= b.y - b.heightPx / 2) ? best : b,
+            null,
+          );
+          const supportX = top?.x ?? 0;
+          const perfectHalfW = perfectHalfWidth(top?.widthPx ?? 200, p.getPerfectWindowMult?.() ?? 1);
+          paintLandingMark(landingMark, scale, landX, towerTopY, hanging.widthPx, Math.abs(landX - supportX) < perfectHalfW, {
+            x: supportX,
+            halfW: perfectHalfW,
+            pulse: 0.5 + 0.5 * Math.sin(ts / 160),
+          });
+          landingMark.visible = true;
+        } else {
+          guide.clear();
+          landingMark.visible = false;
+        }
+
+        // Offscreen settled blocks still cost a draw call — hide them.
+        for (const [id, view] of views) {
+          const screenY = scene.y + view.container.y * scale;
+          view.container.visible = screenY > -120 && screenY < h + 120;
+          if (!byId.has(id)) {
+            view.container.destroy({ children: true });
+            views.delete(id);
+          }
+        }
+
+        flashAlpha = Math.max(0, flashAlpha - dt * 1.6);
+        flash.clear();
+        if (flashAlpha > 0) flash.rect(0, 0, w, h).fill({ color: flashColour, alpha: flashAlpha });
+
+        if (ts - lastStatsAt > 500 && p.onFrameStats) {
+          const sorted = [...frameTimes].sort((a, b) => a - b);
+          p.onFrameStats({
+            p95Ms: Number(percentile(sorted, 95).toFixed(2)),
+            fps: Math.round(1000 / (sorted.reduce((s, v) => s + v, 0) / sorted.length || 16.7)),
+            bodies: snap.blocks.length,
+          });
+          frameTimes.length = 0;
+          lastStatsAt = ts;
+        }
+      };
+
+      raf = requestAnimationFrame(tick);
+    })();
+
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(raf);
+      resizeObserver?.disconnect();
+      host.removeEventListener('pointerdown', onPointerDown);
+      host.removeEventListener('pointermove', onPointerMove);
+      host.removeEventListener('pointerup', onPointerUp);
+      host.removeEventListener('pointercancel', onPointerUp);
+      host.removeEventListener('wheel', onWheel);
+      app?.destroy(true, { children: true });
+    };
+  }, []);
+
+  // touch-action none: a vertical drag is the camera, never a pull-to-refresh.
+  return <div ref={hostRef} className={props.className} style={{ touchAction: 'none' }} />;
+}

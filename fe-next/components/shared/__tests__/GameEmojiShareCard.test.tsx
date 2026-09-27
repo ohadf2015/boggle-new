@@ -1,0 +1,222 @@
+// @vitest-environment jsdom
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest';
+import { GameEmojiShareCard } from '../GameEmojiShareCard';
+
+const t = (key: string) => {
+  const map: Record<string, string> = {
+    'share.emojiCard.classicHeader': 'LexiClash Daily #{number}',
+    'share.emojiCard.blastHeader': 'LexiClash Blast',
+    'share.emojiCard.share': 'Share',
+    'share.emojiCard.copy': 'Copy',
+    'share.emojiCard.lettersCount': '{len}-letter × {count}',
+    'share.emojiCard.stars': 'stars',
+    'share.emojiCard.waveLine': 'Wave {n} · {pct}%',
+    'share.words': 'words',
+    'share.longest': 'Longest',
+    'share.combo': 'combo',
+    'common.pts': 'pts',
+    'common.copied': 'Copied!',
+    'blast.cleared': 'Cleared',
+  };
+  return map[key] ?? key;
+};
+
+describe('GameEmojiShareCard — classic mode', () => {
+  const classicData = {
+    mode: 'classic' as const,
+    puzzleNumber: 42,
+    score: 350,
+    words: ['CAT', 'STONE', 'LIGHT'],
+  };
+
+  it('renders puzzle number in header', () => {
+    render(<GameEmojiShareCard data={classicData} t={t} />);
+    expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('42');
+  });
+
+  it('renders score and pts', () => {
+    render(<GameEmojiShareCard data={classicData} t={t} />);
+    expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('350');
+    expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('pts');
+  });
+
+  it('renders labeled recap, never Wordle letter-squares or emoji', () => {
+    render(<GameEmojiShareCard data={classicData} t={t} />);
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card.textContent).not.toContain('🟩');
+    expect(card.textContent).not.toContain('🟨');
+    expect(card.textContent).not.toContain('⬛');
+    expect(card.textContent).not.toContain('⬜');
+    expect(card.textContent).not.toContain('⚡');
+    expect(card.textContent).not.toContain('📝');
+    expect(card).toHaveTextContent('3');
+    expect(card).toHaveTextContent('words');
+    expect(card).toHaveTextContent('STONE');
+    expect(card).toHaveTextContent('LexiClash');
+  });
+
+  it('shows Share and Copy buttons', () => {
+    render(<GameEmojiShareCard data={classicData} t={t} />);
+    expect(screen.getByText('Share')).toBeInTheDocument();
+    expect(screen.getByText('Copy')).toBeInTheDocument();
+  });
+
+  it('shows domain', () => {
+    render(<GameEmojiShareCard data={classicData} t={t} />);
+    expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('lexiclash.live');
+  });
+
+  it('shows Copied! feedback after copy click', async () => {
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    render(<GameEmojiShareCard data={classicData} t={t} />);
+    fireEvent.click(screen.getByText('Copy'));
+    expect(await screen.findByText('Copied!')).toBeInTheDocument();
+  });
+});
+
+describe('GameEmojiShareCard — blast mode', () => {
+  const blastData = {
+    mode: 'blast' as const,
+    score: 1200,
+    stars: 3 as const,
+    clearPercentage: 95,
+    wordsFound: ['CAT', 'DOG'],
+    maxCombo: 5,
+    wavesCompleted: 2,
+    waveResults: [
+      { waveNumber: 1, clearPercentage: 100 },
+      { waveNumber: 2, clearPercentage: 90 },
+    ],
+  };
+
+  it('renders blast header', () => {
+    render(<GameEmojiShareCard data={blastData} t={t} />);
+    expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('LexiClash Blast');
+  });
+
+  it('renders score and clear percentage', () => {
+    render(<GameEmojiShareCard data={blastData} t={t} />);
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card).toHaveTextContent('1,200');
+    expect(card).toHaveTextContent('95%');
+    expect(card).toHaveTextContent('Cleared');
+  });
+
+  it('renders labeled wave rows, not star emoji', () => {
+    render(<GameEmojiShareCard data={blastData} t={t} />);
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card).toHaveTextContent('Wave 1');
+    expect(card.textContent).not.toContain('⭐');
+  });
+
+  it('renders combo when maxCombo >= 3', () => {
+    render(<GameEmojiShareCard data={blastData} t={t} />);
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card).toHaveTextContent('5x');
+    expect(card).toHaveTextContent('combo');
+  });
+
+  it('does not render combo when maxCombo < 3', () => {
+    const data = { ...blastData, maxCombo: 2 };
+    render(<GameEmojiShareCard data={data} t={t} />);
+    expect(screen.getByTestId('game-emoji-share-card')).not.toHaveTextContent('combo');
+  });
+});
+
+describe('GameEmojiShareCard — onShareClick telemetry hook', () => {
+  const data = {
+    mode: 'classic' as const,
+    puzzleNumber: 1,
+    score: 100,
+    words: ['CAT'],
+  };
+
+  it('invokes onShareClick with "copy" when Copy pressed', () => {
+    const onShareClick = vi.fn();
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    render(<GameEmojiShareCard data={data} t={t} onShareClick={onShareClick} />);
+    fireEvent.click(screen.getByText('Copy'));
+    expect(onShareClick).toHaveBeenCalledWith('copy');
+  });
+
+  it('invokes onShareClick with "native" when Share pressed and navigator.share exists', () => {
+    const onShareClick = vi.fn();
+    Object.assign(navigator, {
+      share: vi.fn().mockResolvedValue(undefined),
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    render(<GameEmojiShareCard data={data} t={t} onShareClick={onShareClick} />);
+    fireEvent.click(screen.getByText('Share'));
+    expect(onShareClick).toHaveBeenCalledWith('native');
+  });
+});
+
+describe('GameEmojiShareCard — connections mode', () => {
+  const connectionsT = (key: string) => {
+    const map: Record<string, string> = {
+      'share.emojiCard.connectionsHeader': 'LexiClash Word Bridge · {date}',
+      'share.emojiCard.bridges': 'bridges',
+      'share.emojiCard.rank': 'rank',
+      'share.emojiCard.share': 'Share',
+      'share.emojiCard.copy': 'Copy',
+      'share.streak': 'streak',
+      'common.pts': 'pts',
+      'common.copied': 'Copied!',
+    };
+    return map[key] ?? key;
+  };
+  const connectionsData = {
+    mode: 'connections' as const,
+    dateISO: '2026-09-13',
+    score: 350,
+    solved: 3,
+    total: 5,
+    streak: 7,
+    rank: 12,
+  };
+
+  it('renders the dated header, score and labeled bridge stats', () => {
+    render(<GameEmojiShareCard data={connectionsData} t={connectionsT} />);
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card).toHaveTextContent('LexiClash Word Bridge · 2026-09-13');
+    expect(card).toHaveTextContent('350');
+    expect(card).toHaveTextContent('3/5');
+    expect(card).toHaveTextContent('bridges');
+    expect(card).toHaveTextContent('#12');
+  });
+
+  it('renders no emoji in the artifact', () => {
+    render(<GameEmojiShareCard data={connectionsData} t={connectionsT} />);
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card.textContent).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2B1B}-\u{2B1C}\u{26A1}]/u);
+  });
+
+  it('renders the optional extra slot inside the card', () => {
+    render(
+      <GameEmojiShareCard
+        data={connectionsData}
+        t={connectionsT}
+        extra={<div data-testid="recap-extra">tiles here</div>}
+      />,
+    );
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card.contains(screen.getByTestId('recap-extra'))).toBe(true);
+  });
+
+  it('copies the provided shareText override instead of the generated text', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(
+      <GameEmojiShareCard data={connectionsData} t={connectionsT} shareText="CUSTOM PASTE TEXT" />,
+    );
+    fireEvent.click(screen.getByText('Copy'));
+    await screen.findByText('Copied!');
+    expect(writeText).toHaveBeenCalledWith('CUSTOM PASTE TEXT');
+  });
+});

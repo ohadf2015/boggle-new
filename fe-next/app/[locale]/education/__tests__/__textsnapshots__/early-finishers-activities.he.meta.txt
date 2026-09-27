@@ -1,0 +1,63 @@
+{
+  "title": "פעילויות לתלמידים שמסיימים מוקדם | LexiClash",
+  "description": "משחקי מילים עצמאיים לתלמידים שמסיימים עבודה מוקדם. בלי הנחיה מהמורה, בלי הפסקות בשיעור, וכל מילה היא מהשיעור שלך.",
+  "keywords": [
+    "פעילויות לתלמידים שמסיימים מוקדם",
+    "משחקי מילים לכיתה",
+    "אתגרים לתלמידים מהירים",
+    "עבודה עצמאית בכיתה",
+    "משחקים חינוכיים לתלמידים",
+    "משחקים עצמאיים בכיתה",
+    "משחקי מילים בלי פקוח"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/early-finishers-activities",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "he": "https://www.lexiclash.live/he/education/early-finishers-activities",
+    "en": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "sv": "https://www.lexiclash.live/sv/education/early-finishers-activities",
+    "ja": "https://www.lexiclash.live/ja/education/early-finishers-activities",
+    "es": "https://www.lexiclash.live/es/education/early-finishers-activities",
+    "ru": "https://www.lexiclash.live/ru/education/early-finishers-activities",
+    "en-IL": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "he-IL": "https://www.lexiclash.live/he/education/early-finishers-activities",
+    "en-US": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "es-US": "https://www.lexiclash.live/es/education/early-finishers-activities",
+    "en-GB": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "en-SE": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "sv-SE": "https://www.lexiclash.live/sv/education/early-finishers-activities",
+    "en-JP": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "ja-JP": "https://www.lexiclash.live/ja/education/early-finishers-activities",
+    "en-ES": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "es-ES": "https://www.lexiclash.live/es/education/early-finishers-activities",
+    "en-MX": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "es-MX": "https://www.lexiclash.live/es/education/early-finishers-activities",
+    "en-AU": "https://www.lexiclash.live/en/education/early-finishers-activities",
+    "es-AR": "https://www.lexiclash.live/es/education/early-finishers-activities",
+    "es-CO": "https://www.lexiclash.live/es/education/early-finishers-activities",
+    "ru-RU": "https://www.lexiclash.live/ru/education/early-finishers-activities"
+  },
+  "ogTitle": "פעילויות לתלמידים שמסיימים מוקדם | LexiClash",
+  "ogDescription": "משחקי מילים עצמאיים לתלמידים שמסיימים עבודה מוקדם. בלי הנחיה מהמורה, בלי הפסקות בשיעור, וכל מילה היא מהשיעור שלך.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/early-finishers-activities",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "פעילויות לתלמידים שמסיימים מוקדם | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "פעילויות לתלמידים שמסיימים מוקדם | LexiClash",
+  "twDescription": "משחקי מילים עצמאיים לתלמידים שמסיימים עבודה מוקדם. בלי הנחיה מהמורה, בלי הפסקות בשיעור, וכל מילה היא מהשיעור שלך.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

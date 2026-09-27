@@ -1,0 +1,62 @@
+{
+  "title": "פעילויות סוף שנה בכיתה — משחקי מילים",
+  "description": "שמור על תלמידים מעורבים בימים האחרונים של שנת הלימודים. משחקי מילים לא דורשים בדיקה. בחינם להתחיל.",
+  "keywords": [
+    "פעילויות סוף שנה",
+    "משחקי כיתה לסוף השנה",
+    "פעילויות יום אחרון בבית ספר",
+    "משחקי מילים כיתה",
+    "פעילויות לימודיות סוף שנה",
+    "משחקים לסוף זמן הלימודים"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "he": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+    "en": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "sv": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities",
+    "ja": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities",
+    "es": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "ru": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities",
+    "en-IL": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "he-IL": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+    "en-US": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-US": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-GB": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "en-SE": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "sv-SE": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities",
+    "en-JP": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "ja-JP": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities",
+    "en-ES": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-ES": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-MX": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-MX": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-AU": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-AR": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "es-CO": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "ru-RU": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities"
+  },
+  "ogTitle": "פעילויות סוף שנה בכיתה — משחקי מילים",
+  "ogDescription": "שמור על תלמידים מעורבים בימים האחרונים של שנת הלימודים. משחקי מילים לא דורשים בדיקה. בחינם להתחיל.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "פעילויות סוף שנה בכיתה — משחקי מילים"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "פעילויות סוף שנה בכיתה — משחקי מילים",
+  "twDescription": "שמור על תלמידים מעורבים בימים האחרונים של שנת הלימודים. משחקי מילים לא דורשים בדיקה. בחינם להתחיל.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

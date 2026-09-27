@@ -1,0 +1,184 @@
+/**
+ * The three ways a teacher can answer "which words?" on the PLAY NOW panel.
+ *
+ * Every fill here is SOLID, and every control names its own text colour. Both
+ * are deliberate. A `/70` opacity modifier on a CSS-variable colour compiles,
+ * under Tailwind v4, to `color-mix(... )` — which the browser reports as
+ * `oklab(… / 0.7)`. To anything reading `getComputedStyle().backgroundColor`
+ * (the contrast audit, a screen-reader-adjacent tool, any theming pass) that is
+ * not a colour it can reason about, so a translucent control scores as though
+ * it had no fill at all. And an unstyled `<button>` inherits the shell's white
+ * text, which on a cream fill is 1.02:1 — text you cannot read on a control
+ * that looks fine in a screenshot.
+ *
+ * All three are visible as one segmented row and each is a plain pressable —
+ * deliberately NOT `role="tab"`. The dashboard's own contract test forbids a
+ * tab bar, and rightly: a tab implies pages of a form you work through, and
+ * this panel is one armed button with a way to change its ammunition.
+ */
+
+'use client';
+
+import { memo } from 'react';
+import { BookMarked, Sparkles, ClipboardPaste, Check } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import { MIN_PASTED_WORDS } from './quickLaunchIntent';
+
+export type PlayNowSource = 'recent' | 'packs' | 'paste';
+
+const SOURCE_META: Array<{ id: PlayNowSource; labelKey: string; icon: typeof BookMarked; tint: string }> = [
+  { id: 'recent', labelKey: 'teacher.playNow.sourceRecent', icon: BookMarked, tint: 'bg-neo-cyan' },
+  { id: 'packs', labelKey: 'teacher.playNow.sourcePacks', icon: Sparkles, tint: 'bg-neo-lime' },
+  { id: 'paste', labelKey: 'teacher.playNow.sourcePaste', icon: ClipboardPaste, tint: 'bg-neo-pink' },
+];
+
+export const SourceSwitch = memo(function SourceSwitch({
+  active,
+  available,
+  onChange,
+}: {
+  active: PlayNowSource;
+  available: ReadonlySet<PlayNowSource>;
+  onChange: (next: PlayNowSource) => void;
+}) {
+  const { t } = useLanguage();
+  return (
+    <div role="group" aria-label={t('teacher.playNow.sourceGroup')} className="flex flex-wrap gap-2">
+      {SOURCE_META.filter((s) => available.has(s.id)).map(({ id, labelKey, icon: Icon, tint }) => {
+        const on = active === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            data-testid={`play-now-source-${id}`}
+            aria-pressed={on}
+            onClick={() => onChange(id)}
+            className={cn(
+              'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-black px-4 py-2',
+              'font-neo-display text-sm font-black uppercase tracking-wide transition-all duration-100',
+              'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              // Selected differs by FILL, not by a shade of the same fill.
+              on
+                ? cn(tint, 'text-black shadow-hard -translate-y-0.5')
+                : 'bg-neo-cream text-neo-gray shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard'
+            )}
+          >
+            <Icon className="size-4 shrink-0" aria-hidden="true" />
+            {t(labelKey)}
+          </button>
+        );
+      })}
+    </div>
+  );
+});
+
+/** One row in the recent-lessons or starter-pack list. Selected = armed. */
+export const PickRow = memo(function PickRow({
+  title,
+  meta,
+  selected,
+  testId,
+  accent,
+  recommendedLabel,
+  onSelect,
+}: {
+  title: string;
+  meta: string;
+  selected: boolean;
+  testId: string;
+  accent: string;
+  /** Set on the row the panel arms itself with, so the default is named rather
+   *  than left for the teacher to infer from a tick they did not put there. */
+  recommendedLabel?: string;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      data-testid={testId}
+      aria-pressed={selected}
+      onClick={onSelect}
+      className={cn(
+        'group flex w-full min-h-14 items-center gap-3 rounded-neo border-3 border-black px-4 py-3 text-start',
+        // `text-black` on the button itself: it would otherwise inherit the
+        // shell's white and sit at 1.02:1 on its own cream fill.
+        'text-black transition-all duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+        selected
+          ? cn(accent, 'shadow-hard -translate-y-0.5')
+          : 'bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard'
+      )}
+    >
+      <span
+        className={cn(
+          'flex size-8 shrink-0 items-center justify-center rounded-neo border-3 border-black',
+          // The row already carries the accent when armed, so the tick goes
+          // pale against it rather than disappearing into it.
+          selected ? 'bg-neo-cream' : 'bg-neo-white'
+        )}
+        aria-hidden="true"
+      >
+        {selected ? <Check className="size-4 text-black" strokeWidth={4} /> : null}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-neo-display text-base font-black text-black">{title}</span>
+        <span className="flex items-center gap-1.5 font-neo-body text-xs font-bold text-neo-gray">
+          <span className="truncate">{meta}</span>
+          {recommendedLabel ? (
+            <span
+              data-testid={`${testId}-recommended`}
+              className="shrink-0 rounded-full border-2 border-black bg-neo-white px-1.5 py-px font-neo-display text-[10px] font-black uppercase leading-tight text-black"
+            >
+              {recommendedLabel}
+            </span>
+          ) : null}
+        </span>
+      </span>
+    </button>
+  );
+});
+
+export const PastePanel = memo(function PastePanel({
+  value,
+  words,
+  onChange,
+}: {
+  value: string;
+  words: string[];
+  onChange: (next: string) => void;
+}) {
+  const { t } = useLanguage();
+  const tooFew = words.length < MIN_PASTED_WORDS;
+  return (
+    <div className="space-y-2">
+      <label htmlFor="play-now-paste" className="block font-neo-display text-sm font-black uppercase text-neo-white">
+        {t('teacher.playNow.pasteLabel')}
+      </label>
+      <textarea
+        id="play-now-paste"
+        data-testid="play-now-paste-input"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={4}
+        placeholder={t('teacher.playNow.pastePlaceholder')}
+        className={cn(
+          'w-full rounded-neo border-3 border-black bg-neo-cream px-3 py-2',
+          'font-neo-body text-base font-bold text-black shadow-hard-sm',
+          'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan'
+        )}
+      />
+      <p
+        data-testid="play-now-paste-hint"
+        className={cn(
+          'font-neo-body text-xs font-bold',
+          tooFew ? 'text-neo-pink' : 'text-neo-lime'
+        )}
+      >
+        {tooFew
+          ? t('teacher.playNow.pasteTooFew', { min: MIN_PASTED_WORDS })
+          : t('teacher.playNow.pasteReady', { count: words.length })}
+      </p>
+    </div>
+  );
+});
+

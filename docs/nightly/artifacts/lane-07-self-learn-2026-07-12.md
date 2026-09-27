@@ -1,0 +1,4 @@
+status: shipped
+files_touched: docs/nightly/learnings.md (rewritten, 168 lines), docs/nightly/loop-improvements/2026-07-12.md (new), docs/nightly/reports/2026-07-12.md (appended lane-7 section)
+summary: Rewrote learnings from 07-06..07-12. Window = 4 docs-only salvage + 2 reduced-tier code ships (07-07, 07-11); 0 pushed reverts. MILESTONE: word-tower graduated 90%→Released 07-10, lane 11 rotated to crossword (55%). MCP drought at 17 nights (4 migrations pending). Retired resolved VirtualGamesList lint watch. Feedback collapsed to 1 callback (Blast Ghost-Round idea:build).
+next_steps: Implement loop-improvement #1 (per-suite Vitest kill + changed-files scope in gate.sh) — the fix that converts docs-only nights into code ships. Ship mcp-health.sh preflight probe. Human: mint never-expire Supabase PAT.

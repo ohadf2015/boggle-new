@@ -1,0 +1,161 @@
+/**
+ * roundEndResultsRoute — who owns the screen when a classroom round ends.
+ *
+ * A classroom round has exactly one end-of-round surface per device: the
+ * projector gets `ClassroomTvResultsScreen` (inside HostView) and every phone
+ * gets `ClassroomResultsCard` (inside ResultsPage). Both are gated on the
+ * server-built `classroomSummary`. The ROUTING that decides which tree is
+ * mounted used to be gated on something else — the game mode — and the two
+ * disagreed, which is recurring-pitfalls Class 3 in its purest form: the happy
+ * path (Classic) was tested every round and the sibling path silently diverged.
+ *
+ * What that cost, measured: with NEXT ROUND MODE set to `random`, a rematch
+ * that resolved to `wheel-rush` hit a bypass in `useHostGameEvents` and pushed
+ * the teacher onto the arcade ResultsPage. The projector recap lives in the
+ * tree that just unmounted, and the bypass payload did not carry
+ * `classroomSummary`, so neither surface rendered. The class saw the Wheel
+ * Rush results hero ("WHEEL SETTLES") and then the next lobby: no podium, no
+ * coverage meter, no win moment, one round in every four or five.
+ *
+ * So both decisions now read the SAME value the render branches read. Routing
+ * and rendering cannot drift, and a mode added next sprint is covered by
+ * default instead of by remembering to add it here.
+ */
+
+/**
+ * The modes the CLIENT's next-round selector offers (`ALL_MODES` in
+ * `components/results/StickyReadyBar.tsx`). Not the set `random` can deal:
+ * the server rolls `selectNextGameMode(history, ALL_GAME_MODES)`, a SUPERSET
+ * that also carries word-tower / sealed-bid / crossword. That mismatch is
+ * exactly why a per-mode allowlist was never a safe way to protect the recap,
+ * and why the decision below keys on `classroomSummary` instead. This list is
+ * a convenience for tests, never a gate.
+ */
+export const NEXT_ROUND_MODES = [
+  'word-hunt',
+  'classic',
+  'wheel-rush',
+  'blast',
+  'random',
+] as const;
+
+export interface HostResultsRouteInput {
+  /** False for every classroom room — `useHostViewState` hard-sets broadcast. */
+  hostPlaying: boolean;
+  /** The mode the round that just ended was played in. */
+  gameMode?: string | null;
+  /** Server-built and present for every player of a teacher-launched room. */
+  hasClassroomSummary: boolean;
+}
+
+/**
+ * True when the host should leave HostView for the standard ResultsPage.
+ *
+ * Two reasons only:
+ *  - the host was PLAYING, so the standard results page is their results page;
+ *  - an ARCADE wheel-rush round ended in broadcast mode. That mode has no TV
+ *    results view, so without this the host sits on the dead game screen until
+ *    they reload. This is the original bypass and it stays exactly as strong.
+ *
+ * A classroom room is never either: it always has its own projector recap, so
+ * the mode is irrelevant and the teacher stays put.
+ */
+export function hostLeavesProjectorRecap({
+  hostPlaying,
+  gameMode,
+  hasClassroomSummary,
+}: HostResultsRouteInput): boolean {
+  if (hostPlaying) return true;
+  if (hasClassroomSummary) return false;
+  return gameMode === 'wheel-rush';
+}
+
+/**
+ * True when THIS device is the classroom projector the host is kept on, so
+ * teacher follow-up has to be painted here.
+ *
+ * `hostLeavesProjectorRecap` is the reason. A classroom host is not playing
+ * and the room has a summary, so the predicate returns false and HostView
+ * stays up. `ClassroomResultsCard` — the phone mount of `ReteachActions` and
+ * of the Pro progress-report ask — never mounts on that device. Follow-up
+ * links, share, reteach, and the report ask are therefore this wall's, or
+ * the host never sees them. #1080 moved `ReteachActions` onto the wall.
+ * #1120 put the report back on the card alone. One predicate so the next
+ * teacher action cannot land on the card and call it done.
+ *
+ * False for everyone else, on purpose:
+ *  - a host who is PLAYING leaves for ResultsPage and gets the card;
+ *  - an arcade broadcast room has no lesson and no teacher follow-up;
+ *  - a student phone is not this function's caller. The card still gates
+ *    the same components on `isTeacher`.
+ */
+export function projectorRecapShowsTeacherFollowUp(input: HostResultsRouteInput): boolean {
+  if (input.hostPlaying) return false;
+  if (!input.hasClassroomSummary) return false;
+  // If the leave rule ever sends a classroom host to ResultsPage, the card
+  // owns these actions and the wall must not grow a second set.
+  return !hostLeavesProjectorRecap(input);
+}
+
+/**
+ * True when a game mode's own results hero (Wheel Rush's radial scene, Blast's
+ * ranked list) may take the top slot on ResultsPage.
+ *
+ * In a classroom round it may not: the lesson recap is the moment a student
+ * came for, and a mode scene above it pushes the podium, the delta chip and
+ * the coverage meter below the fold on a 390px phone. One predicate so the
+ * desktop and mobile layouts cannot answer this differently.
+ */
+export function modeSceneOwnsHeroSlot({
+  hasClassroomSummary,
+}: Pick<HostResultsRouteInput, 'hasClassroomSummary'>): boolean {
+  return !hasClassroomSummary;
+}
+
+/** What the results surface knows about the round that just ended. */
+export interface PlayedGameModeInput {
+  /** The store's `gameMode` — the round's mode OR the next round's intent. */
+  gameMode?: string | null;
+  /** True only while that value came from the server's `startGame` payload. */
+  gameModeConfirmed: boolean;
+}
+
+/**
+ * The mode the round that just ENDED was played in, or `undefined` when we no
+ * longer know — never a guess.
+ *
+ * `gameMode` alone cannot answer this. It carries two different things at two
+ * different times: the mode the server confirmed for the round in progress,
+ * and an optimistic selection for the round to come. `setGameMode` writes the
+ * second and clears `gameModeConfirmed`; only `confirmGameMode` /
+ * `batchStartGame` — both fed by the server's `startGame` — set it again.
+ *
+ * The teacher's mode picker writes through the optimistic path, and it does it
+ * to the whole room: `useClassroomModeSwitch` answers the server's
+ * `classroomGameModeChanged` broadcast with `setGameMode(mode)`. A teacher
+ * lining up the next round from the podium therefore rewrote `gameMode` on
+ * every student's phone while those phones were still showing the previous
+ * round's results — and a Classic round's stat card came out headed "Blast
+ * Results".
+ *
+ * `HostInGameView` has refused to render a mode-specific view without this
+ * flag since the "prevents classic flash" fix; so has the game-end telemetry.
+ * The results surface was the sibling that read the flag's value instead of
+ * the flag (recurring pitfall class 3), so the rule lives here as one
+ * predicate both results layouts call.
+ *
+ * WHY WITHHOLDING IS THE RIGHT ANSWER, not a lesser one. Once the mode has
+ * been overwritten the played mode is genuinely gone from the store, so the
+ * honest options are "no mode-specific card" and "the wrong mode's card". Only
+ * the mode-specific extra is affected: the podium, the scores, the lesson
+ * recap and the word list are all mode-independent and still render. Rendering
+ * the pessimistic state while a value is unresolved is the same discipline
+ * pitfall class 1 asks for everywhere else.
+ */
+export function playedGameMode({
+  gameMode,
+  gameModeConfirmed,
+}: PlayedGameModeInput): string | undefined {
+  if (!gameModeConfirmed) return undefined;
+  return gameMode ?? undefined;
+}

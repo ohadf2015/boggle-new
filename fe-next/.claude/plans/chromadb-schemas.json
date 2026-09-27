@@ -1,0 +1,145 @@
+{
+  "generated_at": "2026-01-11T20:41:46.954Z",
+  "collections": [
+    {
+      "name": "color_instances",
+      "description": "Every color usage instance with file/line context",
+      "metadata": {
+        "hnsw_space": "cosine",
+        "purpose": "Track all color usage across codebase for migration"
+      },
+      "schema": {
+        "id": "string (UUID)",
+        "file_path": "string",
+        "line_number": "number",
+        "color_type": "string (hex|rgb|tailwind|css-var)",
+        "color_value": "string",
+        "context": "string (code snippet)",
+        "component_name": "string",
+        "category": "string (brand|tier|avatar|gradient|semantic|decorative|unknown)",
+        "needs_migration": "boolean",
+        "recommended_token": "string",
+        "wcag_compliant": "boolean"
+      },
+      "embedding_strategy": "Embed: context + component_name + category"
+    },
+    {
+      "name": "color_categories",
+      "description": "6-category taxonomy for color classification",
+      "metadata": {
+        "hnsw_space": "cosine",
+        "purpose": "Define and document color categorization system"
+      },
+      "schema": {
+        "id": "string",
+        "category_name": "string",
+        "subcategory": "string",
+        "description": "string",
+        "usage_guidelines": "string",
+        "examples": "array<string>",
+        "wcag_requirements": "object { min_contrast: number, level: string }",
+        "neo_palette_mapping": "string"
+      },
+      "embedding_strategy": "Embed: description + usage_guidelines"
+    },
+    {
+      "name": "design_tokens",
+      "description": "Token definitions with usage examples",
+      "metadata": {
+        "hnsw_space": "cosine",
+        "purpose": "Searchable design token documentation"
+      },
+      "schema": {
+        "id": "string",
+        "token_name": "string",
+        "css_variable": "string",
+        "tailwind_class": "string",
+        "color_value": "string",
+        "category": "string",
+        "usage_context": "string",
+        "replaces": "array<string>",
+        "examples": "array<string>"
+      },
+      "embedding_strategy": "Embed: token_name + usage_context + examples"
+    },
+    {
+      "name": "gradient_presets",
+      "description": "Standard gradient recipes",
+      "metadata": {
+        "hnsw_space": "cosine",
+        "purpose": "Catalog and recommend gradient patterns"
+      },
+      "schema": {
+        "id": "string",
+        "preset_name": "string",
+        "gradient_stops": "object { from: string, via?: string, to: string }",
+        "direction": "string",
+        "css_class": "string",
+        "usage_context": "string",
+        "replaces": "array<string>"
+      },
+      "embedding_strategy": "Embed: preset_name + usage_context"
+    },
+    {
+      "name": "migration_rules",
+      "description": "Old pattern → new token mappings",
+      "metadata": {
+        "hnsw_space": "l2",
+        "purpose": "Automated migration suggestions"
+      },
+      "schema": {
+        "id": "string",
+        "old_pattern": "string",
+        "new_token": "string",
+        "category": "string",
+        "confidence": "number (0-1)",
+        "requires_manual_review": "boolean",
+        "notes": "string"
+      },
+      "embedding_strategy": "Embed: old_pattern + new_token + notes"
+    },
+    {
+      "name": "accessibility_violations",
+      "description": "WCAG compliance issues",
+      "metadata": {
+        "hnsw_space": "l2",
+        "purpose": "Track and fix accessibility problems"
+      },
+      "schema": {
+        "id": "string",
+        "file_path": "string",
+        "line_number": "number",
+        "foreground_color": "string",
+        "background_color": "string",
+        "contrast_ratio": "number",
+        "required_ratio": "number",
+        "wcag_level": "string (AA|AAA)",
+        "component_name": "string",
+        "suggested_fix": "string",
+        "severity": "string (critical|high|medium|low)"
+      },
+      "embedding_strategy": "Embed: component_name + suggested_fix"
+    },
+    {
+      "name": "component_color_usage",
+      "description": "Per-component migration tracking",
+      "metadata": {
+        "hnsw_space": "cosine",
+        "purpose": "Track migration progress by component"
+      },
+      "schema": {
+        "id": "string",
+        "component_path": "string",
+        "component_name": "string",
+        "color_count": "number",
+        "categories_used": "array<string>",
+        "migration_status": "string (not-started|in-progress|completed|blocked)",
+        "priority": "number (1-5)",
+        "dependencies": "array<string>",
+        "test_coverage": "number (0-100)"
+      },
+      "embedding_strategy": "Embed: component_name + component_path"
+    }
+  ],
+  "total_collections": 7
+}

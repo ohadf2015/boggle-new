@@ -1,0 +1,55 @@
+{
+  "title": "ESL Word Games for the Classroom — Teacher-Led, 6 Languages | LexiClash",
+  "description": "ESL word games you run for a whole class of English learners: students join from their phones with a six-character code, the board goes on the projector, and you set Support, Core or Challenge per student. Six languages, no student accounts, free for 3 classes of 50.",
+  "keywords": "esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles, juegos de vocabulario en ingles, juego de vocabulario en ingles, vocabulario en ingles juegos, juegos para aprender vocabulario en ingles",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/en/education/esl-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "es": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/esl-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/esl-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/esl-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/esl-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/esl-word-games"
+  },
+  "ogTitle": "ESL Word Games for the Classroom",
+  "ogDescription": "Live multiplayer word games for the classroom. Free student accounts, 6 dictionaries, teacher dashboard.",
+  "ogLocale": "en_US",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/en/education/esl-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "ESL Word Games for the Classroom"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "ESL Word Games for the Classroom",
+  "twDescription": "Free ESL/EFL word games for the classroom. Live multiplayer, 6 languages, teacher dashboard.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

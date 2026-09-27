@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Working-tree safety net: snapshots uncommitted work every 3 min so a
+     concurrent `git reset --hard` on the shared tree is always recoverable.
+     Install:  cp this → ~/Library/LaunchAgents/  then  launchctl load -w it.
+     Disable:  launchctl unload -w ~/Library/LaunchAgents/com.lexi.wt-guard.plist -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.lexi.wt-guard</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/ohadfisher/git/boggle-new/scripts/wt-guard/wt-snapshot.sh</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>180</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/ohadfisher/logs/lexi-nightly/wt-guard.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/ohadfisher/logs/lexi-nightly/wt-guard.log</string>
+</dict>
+</plist>

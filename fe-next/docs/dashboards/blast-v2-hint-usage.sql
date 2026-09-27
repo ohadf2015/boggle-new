@@ -1,0 +1,16 @@
+-- Hints by level, identifies too-hard levels
+-- Setup: In PostHog, create Trends insight:
+--  Event: blast_hint_used
+--  Breakdown: level
+--  Time series: Cumulative or daily count
+--
+-- Measure: Avg hints per level completion (hints_used / blast_level_completed count)
+-- Target: < 1.5 avg hints per clear (indicates good difficulty balance)
+--
+-- Key metrics:
+--  hint_type: shuffle, reveal_letter, reveal_word (cost 50, 100, 150 coins)
+--  coin_cost: total coin drain from hints (affects economy)
+--
+-- Alerts:
+-- - If level X avg > 3 hints, may be too hard → DDA adjustment or design issue
+-- - If hint usage spikes on one level, check for broken/ambiguous words

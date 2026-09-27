@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers#page",
+  "name": "Isbrytarspel för Första Skoldagen | LexiClash",
+  "description": "Ordspel för klassrum där eleverna är tysta. Lågtrycksspel för första dagen—inga namnlistor, ingen står i centrum.",
+  "url": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Första Dagen Isbrytare",
+      "item": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers#resource",
+  "name": "Isbrytarspel för Första Skoldagen | LexiClash",
+  "description": "Ett ordspel för hela klassen på samma bokstäver—ingen enskild framställning, ingen väntan. LexiClash ger lärare ett levande spelbord och eleverna ett lågtrycksätt att prata, lära känna varandra och känna klassrummet gå från tystnad till energi på under 15 minuter.",
+  "url": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+  "inLanguage": "sv",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "8-16",
+  "teaches": "social sammanhållning, ordförråd i sammanhang, snabb namnlärning",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Vad med elever som inte vill tala?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "De är med. De hittar ord tyst. Du ser spelborden fyllas med deras namn. Trycket att \"presentera sig själv\" försvinner—du ser bara vilka de är i realtid. Några elever pratar mindre i runda ett, mer i två. Så fungerar det."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag använda detta om eleverna redan känner varandra?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Det kopplar namn till ansikten, inte bara namn till en lista. Plus skapar en ny klasssammansättning (även under återkommande år) tillräckligt avstånd för att lågtryckspresentationen fortfarande fungerar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vilka åldersgrupper fungerar det för?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Grundskola till gymnasium. Justera språket: yngre elever jagar enklare ord; äldre jagar längre ord eller spelar med ett temafilter. Ett spel, många hastigheter."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag spela detta asynkront?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Ge eleverna en anslutningskod, ett tema (t.ex. \"Hitta ord om sommaren\") och en deadline. De spelar på sin egen tid. Mindre isbrytarenergi, mer asynchron upptäck vad de vet."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vad om en elev inte har en enhet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Para ihop dem med en klasskamrat, eller de hjälper det paret. De är fortfarande kända. Fortfarande del av klassrummet."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag använda detta för ESL eller flerspråkiga klasser?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolut. Yngre elever jagar kortare ord; avancerade elever jagar efter betydelse. Posta temat på engelska eller hemspråket."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur håller jag det i gång?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ställ en timer. Två minuter per omgång, inte tio. Barn rör sig fort när de förstår spelets rytm. Nämn ett par namn mellan omgångar för att hålla dig engagerad och dem kända."
+      }
+    }
+  ]
+}

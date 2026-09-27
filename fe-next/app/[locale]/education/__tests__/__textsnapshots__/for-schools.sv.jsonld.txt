@@ -1,0 +1,174 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/for-schools#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Är LexiClash gratis för lärare?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Varje lärare får en 14-dagars gratis provperiod av Teacher Pro: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till 3 klasser med 50 elever vardera. Teacher Pro kostar $9/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vad ingår i en skol- eller distriktsplan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Klassplanen ($39/termin, via formuläret på den här sidan) täcker en hel klass med alla Teacher Pro-funktioner — statistik, rapporter, läxverktyg — plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO för skol- eller distriktsutrullning finns på vår färdplan och är inte lanserade än — berätta vad ni behöver så hör vi av oss, med pris på begäran."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Behöver eleverna konton eller inloggning?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nej. Eleverna ansluter till ett klassrumsspel med en kod — inget att skapa, inga elevdata att hantera. Det gör en skolövergripande lansering mycket enklare än verktyg som kräver klasslistor eller SSO innan man kan spela."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vilka språk stöds?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Engelska, hebreiska (fullt höger-till-vänster-stöd), spanska, svenska, japanska och ryska, var och en med en inbyggd ordbok — byggd för ESL, tvåspråkiga och immersionsklassrum."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur börjar vi vår provperiod eller får en skolplan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Registrera dig som lärare för att starta din egen 14-dagars Teacher Pro-provperiod. Ska ni istället rulla ut till en hel klass eller skola? Fyll i formuläret på den här sidan med din roll, skola och ungefärligt antal elever, så hör vi av oss om Klassplanen eller en offert för skola/distrikt."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur skiljer sig detta från Kahoot, Gimkit eller Quizlet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Det är quiz-/flashcardverktyg som är engelskfokuserade. LexiClash är ett ordbyggande spel (inte flervalsfrågor), stöder sex språk inklusive hebreiska RTL, får plats för en hel klass på upp till 50 elever gratis, och erbjuder riktiga 1v1-dueller."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag använda LexiClash för ESL eller elever med engelska som andraspråk (ELL)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja — LexiClash byggdes med språkinlärare i åtanke. Det stöder engelska, hebreiska (RTL), spanska, svenska, japanska och ryska med inbyggda ordböcker. Eleverna kan tävla på sitt eget språk eller öva det språk de lär sig, vilket gör det naturligt för ESL, tvåspråkiga och immersionsklassrum. Ordbyggande spel — där elever hittar, stavar och skickar in riktiga ord mot en levande motståndare eller hela klassen — stärker ordförråd och stavning organiskt, utan passiva flervalsfrågor."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan eleverna använda LexiClash som ett stavningsövningsspel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. LexiClashs ordbyggande format — där elever hittar, stavar och skickar in riktiga ord mot en levande motståndare eller hela klassen — gör stavningsövning konkurrenskraftig och engagerande i stället för passiv. Lärare använder det för stavningsuppvärmningar, repetitioner i slutet av ett avsnitt och klassrumsturneringar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Fungerar LexiClash på Chromebooks och skolenheter?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. LexiClash körs helt i webbläsaren — ingen app att installera, inga elevkonton att skapa. Det fungerar på Chromebooks, iPads, stationära datorer och telefoner. Eleverna ansluter med en spelkod, och lärare kan dela uppgifter direkt till Google Classroom. Distrikts-SSO (Clever, ClassLink) finns på vår färdplan."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "@id": "https://www.lexiclash.live/sv/education#org",
+  "name": "LexiClash Education",
+  "url": "https://www.lexiclash.live/sv/education",
+  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term; schools and districts contact us.",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "areaServed": [
+    "US",
+    "IL",
+    "SE",
+    "JP",
+    "ES"
+  ],
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Teacher Free",
+      "price": 0,
+      "priceCurrency": "USD",
+      "category": "free",
+      "description": "Free tier for individual teachers, with no expiry: 3 classrooms of up to 50 students, custom word lists, live classroom games",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Teacher Pro",
+      "price": 9,
+      "priceCurrency": "USD",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": 9,
+        "priceCurrency": "USD",
+        "unitText": "month"
+      },
+      "category": "paid",
+      "description": "Unlimited classrooms plus progress analytics, miss-gap homework and reteach tools",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Classroom plan",
+      "price": 39,
+      "priceCurrency": "USD",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": 39,
+        "priceCurrency": "USD",
+        "unitText": "term"
+      },
+      "category": "paid",
+      "description": "Whole class, all Pro features, class streaks and priority support. Lead capture until school billing trigger.",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Schools & districts",
+      "category": "paid",
+      "description": "Contact us for school and district rollout. Same lead form, tagged school_lead. No public checkout.",
+      "availability": "https://schema.org/InStock"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/for-schools#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Gratis ordförråds- och ESL-ordspel för skolor",
+      "item": "https://www.lexiclash.live/sv/education/for-schools"
+    }
+  ]
+}

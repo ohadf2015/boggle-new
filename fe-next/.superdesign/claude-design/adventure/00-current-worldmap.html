@@ -1,0 +1,48 @@
+<!-- @dsCard group="Adventure · World Map" label="Current (as-is) — soft haze" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adventure World Map — Current</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0b0b16; display:flex; justify-content:center; padding:24px; font-family:system-ui, sans-serif; }
+  .phone { width:390px; height:780px; border-radius:28px; overflow:hidden; position:relative;
+    /* CURRENT: soft radial haze + vignette (the banned glassmorphism-adjacent look) */
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(0,220,255,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at center, transparent 40%, rgba(0,40,60,0.5) 100%),
+      linear-gradient(to bottom, #1a1a2e 0%, #0a2a3a 50%, #061a2a 100%);
+  }
+  .hdr { display:flex; justify-content:space-between; align-items:center; padding:18px 16px; }
+  .title { color:#e8e8f0; font-size:20px; font-weight:700; }
+  .chip { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:14px;
+    padding:6px 12px; color:#cfe9ff; font-size:13px; }
+  .trail { position:absolute; inset:80px 0 0 0; display:flex; flex-direction:column; align-items:center; gap:34px; padding-top:20px; }
+  .node { width:120px; height:120px; border-radius:24px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    /* soft blur glow — 20px blur, low-contrast */
+    background:rgba(0,255,255,0.18); border:1px solid rgba(34,211,238,0.6);
+    box-shadow:0 0 20px rgba(34,211,238,0.3); color:#dffaff; }
+  .node .n { font-size:30px; font-weight:700; }
+  .node .lbl { font-size:12px; opacity:.85; }
+  .stars { font-size:12px; color:#ffe39a; margin-top:4px; }
+  .locked { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); box-shadow:none; color:#7a7a8a; }
+  .note { position:absolute; bottom:14px; left:0; right:0; text-align:center; color:#6a6a80; font-size:11px; }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="hdr">
+      <div class="title">Springs</div>
+      <div class="chip">⭐ 14 / 30</div>
+    </div>
+    <div class="trail">
+      <div class="node"><div class="n">3</div><div class="lbl">Tide Pools</div><div class="stars">★★★</div></div>
+      <div class="node" style="background:rgba(0,255,255,0.1);"><div class="n">4</div><div class="lbl">Current</div><div class="stars">★★☆</div></div>
+      <div class="node locked"><div class="n">🔒</div><div class="lbl">Deep</div></div>
+    </div>
+    <div class="note">CURRENT — soft 20px blur glows · low-contrast haze · thin 1px borders</div>
+  </div>
+</body>
+</html>

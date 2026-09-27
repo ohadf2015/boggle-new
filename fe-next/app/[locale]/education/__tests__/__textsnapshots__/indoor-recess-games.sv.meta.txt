@@ -1,0 +1,64 @@
+{
+  "title": "Inomhusspel för rast när det regnar | LexiClash",
+  "description": "Strukturerad 20-minutersplan för klassuppgifter under dåligt väder. Gratis ordspel, tysta aktiviteter och schema för alla klasstorleker.",
+  "keywords": [
+    "inomhusrast aktiviteter",
+    "regndagsspel för klassrum",
+    "tystleken inomhus",
+    "klassrum ordspel",
+    "hela klassens spel",
+    "aktiviteter när det regnar",
+    "gratis klassrumsspel",
+    "hjärnpauser för barn"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "ja": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "es": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru": "https://www.lexiclash.live/ru/education/indoor-recess-games",
+    "en-IL": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he-IL": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en-US": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-US": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-GB": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "en-SE": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "en-JP": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "en-ES": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-ES": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-MX": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-MX": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-AU": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-AR": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "es-CO": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/indoor-recess-games"
+  },
+  "ogTitle": "Inomhusspel för rast när det regnar | LexiClash",
+  "ogDescription": "Strukturerad 20-minutersplan för klassuppgifter under dåligt väder. Gratis ordspel, tysta aktiviteter och schema för alla klasstorleker.",
+  "ogLocale": "sv_SE",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-sv.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Inomhusspel för rast när det regnar | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Inomhusspel för rast när det regnar | LexiClash",
+  "twDescription": "Strukturerad 20-minutersplan för klassuppgifter under dåligt väder. Gratis ordspel, tysta aktiviteter och schema för alla klasstorleker.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-sv.webp"
+  ]
+}

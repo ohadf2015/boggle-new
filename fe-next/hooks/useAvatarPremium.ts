@@ -1,0 +1,134 @@
+'use client';
+
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCoinsFromContext } from '@/contexts/CoinContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { queryKeys } from '@/lib/queryKeys';
+import { isPartUsable, normalizeLevel, partKey } from '@/lib/avatar/unlocks';
+import { getWithAuth } from '@/utils/authFetch';
+import toast from 'react-hot-toast';
+
+const TEMP_PREMIUM_KEY = 'lexiclash_temp_premium';
+const TEMP_UNLOCK_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+interface TempUnlocks {
+  [partKey: string]: number; // expiry timestamp
+}
+
+function getTempUnlocks(): TempUnlocks {
+  if (typeof window === 'undefined') return {};
+  try {
+    const stored = localStorage.getItem(TEMP_PREMIUM_KEY);
+    if (!stored) return {};
+    return JSON.parse(stored) as TempUnlocks;
+  } catch {
+    return {};
+  }
+}
+
+function saveTempUnlocks(unlocks: TempUnlocks): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(TEMP_PREMIUM_KEY, JSON.stringify(unlocks));
+}
+
+export function useAvatarPremium() {
+  const queryClient = useQueryClient();
+  const { coins, refreshCoins } = useCoinsFromContext();
+  const { user, isAuthenticated, profile } = useAuth();
+  const { t } = useLanguage();
+  // Guests / unknown profile → level 1 (the ladder grants nothing at level 1).
+  const level = normalizeLevel(profile?.current_level);
+  const [tempUnlocks, setTempUnlocks] = useState<TempUnlocks>({});
+
+  // Load temp unlocks from localStorage after hydration (avoid SSR mismatch)
+  useEffect(() => {
+    setTempUnlocks(getTempUnlocks());
+  }, []);
+
+  // Load permanent unlocks from profile via TanStack Query
+  const { data: premiumData } = useQuery<{ premiumAvatarParts: string[] }>({
+    queryKey: queryKeys.avatar.premiumParts(),
+    queryFn: async () => {
+      const res = await getWithAuth('/api/avatar/premium-parts');
+      if (!res.ok) throw new Error('Failed to fetch premium parts');
+      return res.json();
+    },
+    enabled: !!isAuthenticated && !!user,
+    staleTime: 5 * 60_000,
+  });
+
+  const permanentUnlocks = useMemo(() => premiumData?.premiumAvatarParts ?? [], [premiumData?.premiumAvatarParts]);
+
+  const purchaseMutation = useMutation({
+    mutationFn: async ({ category, partId }: { category: string; partId: string }) => {
+      const res = await fetch('/api/avatar/purchase-part', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category, partId }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error || 'Purchase failed');
+      }
+
+      return res.json();
+    },
+    onSuccess: async (data) => {
+      if (data.premiumAvatarParts) {
+        queryClient.setQueryData(queryKeys.avatar.premiumParts(), { premiumAvatarParts: data.premiumAvatarParts });
+      } else {
+        queryClient.invalidateQueries({ queryKey: queryKeys.avatar.premiumParts() });
+      }
+      await refreshCoins();
+      toast(t('avatarBuilder.editor.unlocked'), { duration: 1500 });
+    },
+    onError: () => {
+      // Server text is English and internal ("Failed to save purchase"); every failure refunds.
+      toast.error(t('avatarBuilder.editor.purchaseFailed'), { duration: 2500 });
+    },
+  });
+
+  // Free OR owned (bought / claimed) OR level-unlocked OR temp-unlocked (ad).
+  const isPartUnlocked = useCallback((category: string, value: string): boolean => {
+    if (isPartUsable(category, value, { ownedKeys: permanentUnlocks, level })) return true;
+    const expiry = tempUnlocks[partKey(category, value)];
+    return !!expiry && expiry > Date.now();
+  }, [permanentUnlocks, tempUnlocks, level]);
+
+  const unlockTemporarily = useCallback((category: string, value: string) => {
+    const key = partKey(category, value);
+    const expiry = Date.now() + TEMP_UNLOCK_DURATION;
+    setTempUnlocks(prev => {
+      const next = { ...prev, [key]: expiry };
+      saveTempUnlocks(next);
+      return next;
+    });
+  }, []);
+
+  const purchaseWithGold = useCallback(async (category: string, partId: string): Promise<boolean> => {
+    // Guests hold local gold, but purchases are account-bound (the route 401s).
+    if (!isAuthenticated || !user) {
+      toast.error(t('avatarBuilder.editor.signInToBuy'), { duration: 2500 });
+      return false;
+    }
+    try {
+      await purchaseMutation.mutateAsync({ category, partId });
+      return true;
+    } catch {
+      return false;
+    }
+  }, [purchaseMutation, isAuthenticated, user, t]);
+
+  return {
+    isPartUnlocked,
+    unlockTemporarily,
+    purchaseWithGold,
+    isPurchasing: purchaseMutation.isPending,
+    permanentUnlocks,
+    coins,
+    level,
+  };
+}

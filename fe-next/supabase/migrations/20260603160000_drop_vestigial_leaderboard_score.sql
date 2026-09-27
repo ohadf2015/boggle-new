@@ -1,0 +1,13 @@
+-- Drop the vestigial `score` column on the leaderboard table.
+--
+-- The live competitive column is `total_score` — written by
+-- recompute_current_season_leaderboard and read by every leaderboard endpoint
+-- (get_leaderboard, get_user_rank, the tRPC + Express routes). `score` was a
+-- stale legacy column read by NOTHING (NOT NULL default 0, only residual
+-- values) and a latent footgun: a future read of `score` instead of
+-- `total_score` would silently render 0 for everyone.
+--
+-- Safe to drop: no view/function/constraint depends on it (the
+-- recompute_current_season_leaderboard INSERT never lists `score`), and the
+-- generated types are updated in the same change (utils/supabase/database.types.ts).
+ALTER TABLE public.leaderboard DROP COLUMN IF EXISTS score;

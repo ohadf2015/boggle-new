@@ -1,0 +1,403 @@
+/* ============================================================
+   Cosmetics Preview Classes
+   Used in CosmeticCollection and CosmeticPreview thumbnails.
+   Each class matches the `preview` field in lib/cosmetics.ts.
+   ============================================================ */
+
+/* ── Tile Skins ─────────────────────────────────────────── */
+
+.tile-skin-default {
+  background: #fff5e6;
+  border: 2px solid #2a2a3e;
+}
+
+.tile-skin-neon {
+  background: linear-gradient(135deg, #050d1a 0%, #000f1f 100%);
+  border: 2px solid #00ffff;
+  box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+.tile-skin-wooden {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.08) 0px,
+      rgba(0, 0, 0, 0.08) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    linear-gradient(135deg, #a8754a 0%, #6b4426 50%, #8b6434 100%);
+  border: 2px solid #3d1f0a;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6), inset 2px 2px 0 rgba(255, 255, 255, 0.08);
+}
+
+.tile-skin-crystal {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+    linear-gradient(135deg, #b8e0ff 0%, #88ccff 50%, #6ab8ff 100%);
+  border: 2px solid #0055dd;
+  box-shadow: inset 0 0 8px rgba(100, 200, 255, 0.4), inset -2px -2px 0 rgba(255, 255, 255, 0.15);
+}
+
+.tile-skin-fire {
+  background: linear-gradient(135deg, #cc4400 0%, #ff5500 35%, #ff2200 70%, #dd1100 100%);
+  border: 2px solid #660000;
+  box-shadow: inset 0 0 10px rgba(255, 100, 0, 0.5), inset 0 0 6px rgba(255, 200, 0, 0.2);
+}
+
+/* ── Board Themes ────────────────────────────────────────── */
+
+.board-theme-classic {
+  background: #1a1a2e;
+  border: 2px solid #2a2a3e;
+}
+
+.board-theme-dark {
+  background: #0a0a14;
+  border: 2px solid #111122;
+}
+
+.board-theme-ocean {
+  background: linear-gradient(135deg, #001a33 0%, #002244 50%, #003366 100%);
+  border: 2px solid #0055aa;
+}
+
+.board-theme-galaxy {
+  background: radial-gradient(ellipse at 30% 30%, #2a0a4e 0%, #1a0a2e 40%, #0a0a1e 100%);
+  border: 2px solid #6622cc;
+}
+
+/* ── Victory Effects ─────────────────────────────────────── */
+
+.victory-effect-confetti {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.victory-effect-confetti::after {
+  content: '🎊';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+.victory-effect-fireworks {
+  background: radial-gradient(ellipse at 50% 50%, #1a0a2e 0%, #0a0a14 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.victory-effect-fireworks::after {
+  content: '🎆';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+.victory-effect-lightning {
+  background: linear-gradient(135deg, #0a1a1a 0%, #001a1a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.victory-effect-lightning::after {
+  content: '⚡';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+/* ── Profile Frames ──────────────────────────────────────── */
+
+.frame-none {
+  background: #1a1a2e;
+  border: 2px dashed #2a2a3e;
+  opacity: 0.6;
+}
+
+.frame-bronze-ring {
+  background: #1a1a2e;
+  border: 3px solid #cd7f32;
+  box-shadow: 0 0 0 2px #7a4a1a, inset 0 0 0 2px #7a4a1a;
+}
+
+.frame-silver-ring {
+  background: #1a1a2e;
+  border: 3px solid #c0c0c0;
+  box-shadow: 0 0 0 2px #888888, inset 0 0 0 2px #888888;
+}
+
+.frame-gold-crown {
+  background: #1a1a2e;
+  border: 3px solid #ffe135;
+  box-shadow: 0 0 8px rgba(255, 225, 53, 0.5), 0 0 0 2px #886600;
+}
+
+.frame-diamond-halo {
+  background: #0a1a2e;
+  border: 3px solid #00ffff;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.6), 0 0 0 2px #0066aa;
+}
+
+/* ============================================================
+   Board Theme — Applied on game grid wrapper
+   .board-theme-[x] on parent → all tile cells inherit vars
+   ============================================================ */
+
+.cosmetic-board-classic {
+  --board-bg: #1a1a2e;
+  --board-border: #2a2a3e;
+  background-color: var(--board-bg);
+}
+
+.cosmetic-board-dark {
+  --board-bg: #070710;
+  --board-border: #11111f;
+  background-color: var(--board-bg);
+}
+
+.cosmetic-board-ocean {
+  --board-bg: #001a33;
+  --board-border: #003366;
+  background: linear-gradient(160deg, #001a33 0%, #002a55 100%);
+}
+
+.cosmetic-board-galaxy {
+  --board-bg: #0e0720;
+  --board-border: #4a1a88;
+  background: radial-gradient(ellipse at 40% 30%, #1a0a3e 0%, #0a0618 100%);
+}
+
+/* ============================================================
+   Tile Skin — Applied on grid wrapper via data-tile-skin attr
+   Cells inside inherit the skin through child selectors.
+   ============================================================ */
+
+[data-tile-skin='neon'] .letter-tile-gradient {
+  background: linear-gradient(135deg, #050d1a 0%, #000f1f 100%) !important;
+  border-color: #00ffff !important;
+  box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.5) !important;
+  color: #00ffff !important;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.9);
+}
+
+[data-tile-skin='wooden'] .letter-tile-gradient {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    linear-gradient(135deg, #a8754a 0%, #6b4426 50%, #8b6434 100%) !important;
+  border-color: #3d1f0a !important;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6), inset 2px 2px 0 rgba(255, 255, 255, 0.08) !important;
+  color: #ffe8cc !important;
+}
+
+[data-tile-skin='crystal'] .letter-tile-gradient {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+    linear-gradient(135deg, #b8e0ff 0%, #88ccff 50%, #6ab8ff 100%) !important;
+  border-color: #0055dd !important;
+  box-shadow: inset 0 0 8px rgba(100, 200, 255, 0.4), inset -2px -2px 0 rgba(255, 255, 255, 0.15) !important;
+  color: #002855 !important;
+}
+
+[data-tile-skin='fire'] .letter-tile-gradient {
+  background: linear-gradient(135deg, #cc4400 0%, #ff5500 35%, #ff2200 70%, #dd1100 100%) !important;
+  border-color: #660000 !important;
+  box-shadow: inset 0 0 10px rgba(255, 100, 0, 0.5), inset 0 0 6px rgba(255, 200, 0, 0.2) !important;
+  color: #ffe8cc !important;
+  text-shadow: 0 0 6px rgba(255, 200, 0, 0.7);
+}
+
+/* ============================================================
+   Avatar Frames — applied via .avatar-{frameId} on rounded wrapper
+   Used by Avatar component when player equips a profileFrame.
+   ============================================================ */
+
+.avatar-frame-bronze {
+  box-shadow: 0 0 0 3px #cd7f32, 0 0 0 5px #5a3514, 2px 2px 0 5px #000;
+}
+
+.avatar-frame-silver {
+  box-shadow: 0 0 0 3px #d8d8d8, 0 0 0 5px #6e6e6e, 2px 2px 0 5px #000;
+}
+
+.avatar-frame-gold {
+  box-shadow: 0 0 0 3px #ffe135, 0 0 12px 4px rgba(255, 225, 53, 0.55), 2px 2px 0 5px #000;
+}
+
+.avatar-frame-diamond {
+  box-shadow: 0 0 0 3px #00ffff, 0 0 16px 4px rgba(0, 255, 255, 0.6), 2px 2px 0 5px #000;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Daily word-wheel tile skins
+   The wheel renders letters as round buttons (WheelLetter), not the square grid
+   tile, so it can't reuse `.letter-tile-gradient`. These rules reskin the
+   resting OUTER wheel letters with the same palettes as the grid skins, so an
+   equipped tile skin shows up in the daily word-wheel too. The lime center and
+   dimmed used-letters are left untouched (no data-tile-skin set on them).
+   ────────────────────────────────────────────────────────────────────────── */
+.wheel-letter-skinnable[data-tile-skin='neon'] {
+  background: linear-gradient(135deg, #050d1a 0%, #000f1f 100%) !important;
+  border-color: #00ffff !important;
+  color: #00ffff !important;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.9);
+}
+.wheel-letter-skinnable[data-tile-skin='wooden'] {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    linear-gradient(135deg, #a8754a 0%, #6b4426 50%, #8b6434 100%) !important;
+  border-color: #3d1f0a !important;
+  color: #ffe8cc !important;
+}
+.wheel-letter-skinnable[data-tile-skin='crystal'] {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+    linear-gradient(135deg, #b8e0ff 0%, #88ccff 50%, #6ab8ff 100%) !important;
+  border-color: #0055dd !important;
+  color: #002855 !important;
+}
+.wheel-letter-skinnable[data-tile-skin='fire'] {
+  background: linear-gradient(135deg, #cc4400 0%, #ff5500 35%, #ff2200 70%, #dd1100 100%) !important;
+  border-color: #660000 !important;
+  color: #ffe8cc !important;
+  text-shadow: 0 0 6px rgba(255, 200, 0, 0.7);
+}
+
+/* ============================================================
+   Adventure world skins — earned by beating each world's boss
+   (item boss-trophy-wN), equippable in every grid mode.
+   Accent fills carry black/navy letters; dark fills carry cream.
+   ============================================================ */
+
+[data-tile-skin='world-1'] .letter-tile-gradient {
+  background:
+    linear-gradient(to top, #5a8a00 0 18%, transparent 18%),
+    linear-gradient(160deg, #d9ff66 0%, #bfff00 55%, #a6d900 100%) !important;
+  border-color: #000 !important;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.45), inset 0 -3px 0 rgba(0, 0, 0, 0.25) !important;
+  color: #0d1a00 !important;
+}
+
+[data-tile-skin='world-2'] .letter-tile-gradient {
+  background:
+    radial-gradient(ellipse 60% 22% at 30% 22%, rgba(255, 255, 255, 0.7), transparent 70%),
+    linear-gradient(180deg, #66ffff 0%, #00d9e6 50%, #0088b3 100%) !important;
+  border-color: #003a4d !important;
+  box-shadow: inset 0 -4px 0 rgba(0, 40, 80, 0.35) !important;
+  color: #002233 !important;
+}
+
+[data-tile-skin='world-3'] .letter-tile-gradient {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0 22%, transparent 22% 55%, rgba(255, 255, 255, 0.12) 55% 62%, transparent 62%),
+    linear-gradient(135deg, #7b2ff7 0%, #4b0fa8 60%, #2a0866 100%) !important;
+  border-color: #d9b3ff !important;
+  box-shadow: inset 0 0 10px rgba(200, 140, 255, 0.55) !important;
+  color: #fffef0 !important;
+  text-shadow: 0 0 8px rgba(217, 179, 255, 0.9);
+}
+
+[data-tile-skin='world-4'] .letter-tile-gradient {
+  background: linear-gradient(180deg, #ffd166 0%, #ff8c42 45%, #ff4f7b 100%) !important;
+  border-color: #3d0f00 !important;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.4), inset 0 -3px 0 rgba(90, 0, 30, 0.3) !important;
+  color: #2b0a00 !important;
+}
+
+[data-tile-skin='world-5'] .letter-tile-gradient {
+  background:
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 7px, rgba(60, 10, 0, 0.28) 7px 9px),
+    linear-gradient(180deg, #ff7a45 0%, #d93a1a 60%, #8c1c07 100%) !important;
+  border-color: #2b0500 !important;
+  box-shadow: inset 0 3px 0 rgba(255, 200, 150, 0.35) !important;
+  color: #fff3e6 !important;
+  text-shadow: 2px 2px 0 rgba(60, 10, 0, 0.8);
+}
+
+[data-tile-skin='world-6'] .letter-tile-gradient {
+  background:
+    repeating-conic-gradient(rgba(0, 0, 0, 0.1) 0 25%, transparent 0 50%) 0 0 / 12px 12px,
+    linear-gradient(135deg, #ff6bb8 0%, #ff2e93 100%) !important;
+  border-color: #000 !important;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.35) !important;
+  color: #1a0010 !important;
+}
+
+[data-tile-skin='world-7'] .letter-tile-gradient {
+  background:
+    linear-gradient(115deg, transparent 0 30%, rgba(255, 255, 255, 0.85) 38%, transparent 46%),
+    linear-gradient(180deg, #f4f9ff 0%, #c7dcf2 50%, #9db8d9 100%) !important;
+  border-color: #16213e !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.6) !important;
+  color: #16213e !important;
+}
+
+[data-tile-skin='world-8'] .letter-tile-gradient {
+  background:
+    radial-gradient(1px 1px at 20% 30%, #fff 99%, transparent),
+    radial-gradient(1.5px 1.5px at 70% 20%, #ffd6ff 99%, transparent),
+    radial-gradient(1px 1px at 80% 75%, #fff 99%, transparent),
+    radial-gradient(1px 1px at 35% 80%, #b3e5ff 99%, transparent),
+    radial-gradient(circle at 70% 30%, #9b30ff 0%, #3b0a73 55%, #12002b 100%) !important;
+  border-color: #e0a3ff !important;
+  box-shadow: inset 0 0 10px rgba(224, 163, 255, 0.5) !important;
+  color: #fffef0 !important;
+  text-shadow: 0 0 8px rgba(255, 214, 255, 0.95);
+}
+
+[data-tile-skin='world-9'] .letter-tile-gradient {
+  background:
+    linear-gradient(to bottom, #ffffff 0 26%, transparent 26%),
+    linear-gradient(180deg, #e8fffb 0%, #5ce6c8 55%, #13806b 100%) !important;
+  border-color: #0a2f3d !important;
+  box-shadow: inset 0 -3px 0 rgba(0, 50, 60, 0.3) !important;
+  color: #0a2f3d !important;
+}
+
+[data-tile-skin='world-10'] .letter-tile-gradient {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0 12%, transparent 12%),
+    linear-gradient(160deg, #fff1a8 0%, #ffd23f 40%, #d99a00 75%, #a66f00 100%) !important;
+  border-color: #3d2600 !important;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.5), inset 0 -3px 0 rgba(90, 50, 0, 0.4) !important;
+  color: #3d2600 !important;
+  text-shadow: 0 1px 0 rgba(255, 240, 180, 0.8);
+}
+
+/* Adventure play-screen motion (respect reduced motion) */
+@keyframes adv-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-4px) rotate(-3deg); }
+  75% { transform: translateX(4px) rotate(3deg); }
+}
+@keyframes adv-pop {
+  0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60% { transform: scale(1.25) rotate(6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes adv-float-up {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-28px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*='animate-[adv-'] { animation: none !important; }
+}

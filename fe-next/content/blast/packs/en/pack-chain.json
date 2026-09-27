@@ -1,0 +1,495 @@
+{
+  "locale": "en",
+  "levels": [
+    {
+      "id": "en-chain-01",
+      "levelNumber": 1,
+      "theme": "onboarding",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "CAT",
+        "SUN",
+        "EGG"
+      ]
+    },
+    {
+      "id": "en-chain-02",
+      "levelNumber": 2,
+      "theme": "fruits",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "FIG",
+        "PEAR",
+        "KIWI"
+      ]
+    },
+    {
+      "id": "en-chain-03",
+      "levelNumber": 3,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "COW",
+        "GOAT",
+        "DEER"
+      ]
+    },
+    {
+      "id": "en-chain-04",
+      "levelNumber": 4,
+      "theme": "food",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "JAM",
+        "RICE",
+        "CAKE"
+      ]
+    },
+    {
+      "id": "en-chain-05",
+      "levelNumber": 5,
+      "theme": "colors",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "RED",
+        "BLUE",
+        "PINK"
+      ]
+    },
+    {
+      "id": "en-chain-06",
+      "levelNumber": 6,
+      "theme": "ocean",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "CRAB",
+        "SEAL",
+        "WHALE",
+        "SHARK",
+        "JELLY"
+      ]
+    },
+    {
+      "id": "en-chain-07",
+      "levelNumber": 7,
+      "theme": "space",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "MARS",
+        "MOON",
+        "STAR",
+        "NOVA",
+        "COMET"
+      ]
+    },
+    {
+      "id": "en-chain-08",
+      "levelNumber": 8,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "WOLF",
+        "LION",
+        "BEAR",
+        "TIGER",
+        "MOOSE"
+      ]
+    },
+    {
+      "id": "en-chain-09",
+      "levelNumber": 9,
+      "theme": "fruits",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "PLUM",
+        "MANGO",
+        "GRAPE",
+        "LEMON",
+        "PEACH"
+      ]
+    },
+    {
+      "id": "en-chain-10",
+      "levelNumber": 10,
+      "theme": "weather",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "RAIN",
+        "SNOW",
+        "CLOUD",
+        "STORM",
+        "FROST"
+      ]
+    },
+    {
+      "id": "en-chain-11",
+      "levelNumber": 11,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "HORSE",
+        "ZEBRA",
+        "PANDA",
+        "KOALA",
+        "OTTER",
+        "CAMEL"
+      ]
+    },
+    {
+      "id": "en-chain-12",
+      "levelNumber": 12,
+      "theme": "food",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BREAD",
+        "PASTA",
+        "SALAD",
+        "HONEY",
+        "OLIVE",
+        "SUSHI"
+      ]
+    },
+    {
+      "id": "en-chain-13",
+      "levelNumber": 13,
+      "theme": "nature",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "RIVER",
+        "TREE",
+        "LEAF",
+        "STONE",
+        "ROCK",
+        "GRASS"
+      ]
+    },
+    {
+      "id": "en-chain-14",
+      "levelNumber": 14,
+      "theme": "space",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "COMET",
+        "MARS",
+        "MOON",
+        "STAR",
+        "ALIEN",
+        "ORBIT"
+      ]
+    },
+    {
+      "id": "en-chain-15",
+      "levelNumber": 15,
+      "theme": "animals",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "TIGER",
+        "ZEBRA",
+        "EAGLE",
+        "OTTER",
+        "MOOSE",
+        "SLOTH"
+      ]
+    },
+    {
+      "id": "en-chain-16",
+      "levelNumber": 16,
+      "theme": "ocean",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "WAVE",
+        "REEF",
+        "SHELL",
+        "SHARK",
+        "WHALE",
+        "CORAL",
+        "BEACH"
+      ]
+    },
+    {
+      "id": "en-chain-17",
+      "levelNumber": 17,
+      "theme": "joy",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "JOY",
+        "HUGS",
+        "GRIN",
+        "GLAD",
+        "SMILE",
+        "LAUGH",
+        "MERRY"
+      ]
+    },
+    {
+      "id": "en-chain-18",
+      "levelNumber": 18,
+      "theme": "cozy",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "NAP",
+        "WARM",
+        "COZY",
+        "SOFT",
+        "CALM",
+        "QUILT",
+        "SLEEP"
+      ]
+    },
+    {
+      "id": "en-chain-19",
+      "levelNumber": 19,
+      "theme": "fruits",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "PLUM",
+        "PEAR",
+        "KIWI",
+        "MANGO",
+        "LEMON",
+        "GRAPE",
+        "PEACH"
+      ]
+    },
+    {
+      "id": "en-chain-20",
+      "levelNumber": 20,
+      "theme": "spooky",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BAT",
+        "OWL",
+        "MASK",
+        "BONES",
+        "GHOST",
+        "WITCH",
+        "SCARY"
+      ]
+    },
+    {
+      "id": "en-chain-21",
+      "levelNumber": 21,
+      "theme": "magic",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "ELF",
+        "WAND",
+        "WISH",
+        "RUNE",
+        "MAGIC",
+        "SPELL",
+        "CHARM",
+        "FAIRY"
+      ]
+    },
+    {
+      "id": "en-chain-22",
+      "levelNumber": 22,
+      "theme": "home",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BED",
+        "RUG",
+        "DOOR",
+        "LAMP",
+        "ROOM",
+        "SOFA",
+        "CHAIR",
+        "TABLE"
+      ]
+    },
+    {
+      "id": "en-chain-23",
+      "levelNumber": 23,
+      "theme": "school",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "PEN",
+        "DESK",
+        "BOOK",
+        "MATH",
+        "RULER",
+        "PAPER",
+        "CHALK",
+        "CLASS"
+      ]
+    },
+    {
+      "id": "en-chain-24",
+      "levelNumber": 24,
+      "theme": "space",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "MARS",
+        "NOVA",
+        "STAR",
+        "MOON",
+        "COMET",
+        "ORBIT",
+        "ALIEN",
+        "EARTH"
+      ]
+    },
+    {
+      "id": "en-chain-25",
+      "levelNumber": 25,
+      "theme": "transport",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "CAR",
+        "BIKE",
+        "BOAT",
+        "TRAIN",
+        "PLANE",
+        "TRUCK",
+        "FERRY",
+        "METRO"
+      ]
+    },
+    {
+      "id": "en-chain-26",
+      "levelNumber": 26,
+      "theme": "adventure",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "MAP",
+        "TENT",
+        "RAFT",
+        "HIKE",
+        "TREK",
+        "BRAVE",
+        "QUEST",
+        "SCOUT",
+        "CLIMB"
+      ]
+    },
+    {
+      "id": "en-chain-27",
+      "levelNumber": 27,
+      "theme": "ocean",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "FISH",
+        "REEF",
+        "WAVE",
+        "SHELL",
+        "SHARK",
+        "WHALE",
+        "CORAL",
+        "BEACH",
+        "PEARL"
+      ]
+    },
+    {
+      "id": "en-chain-28",
+      "levelNumber": 28,
+      "theme": "mythology",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "ELF",
+        "OGRE",
+        "TROLL",
+        "GIANT",
+        "FAIRY",
+        "GNOME",
+        "NYMPH",
+        "PIXIE",
+        "GHOUL"
+      ]
+    },
+    {
+      "id": "en-chain-29",
+      "levelNumber": 29,
+      "theme": "music",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "DRUM",
+        "SONG",
+        "BAND",
+        "TUNE",
+        "BEAT",
+        "FLUTE",
+        "PIANO",
+        "ORGAN",
+        "NOTES"
+      ]
+    },
+    {
+      "id": "en-chain-30",
+      "levelNumber": 30,
+      "theme": "science",
+      "locale": "en",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "ATOM",
+        "CELL",
+        "BONE",
+        "GENE",
+        "BRAIN",
+        "BLOOD",
+        "NERVE",
+        "VIRUS",
+        "LASER"
+      ]
+    }
+  ]
+}

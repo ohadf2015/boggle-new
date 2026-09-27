@@ -1,0 +1,64 @@
+{
+  "title": "Словесные игры для средней школы | Расширение словарного запаса",
+  "description": "Бесплатные словесные игры для классов 5–9. Реальная конкуренция, пользовательские словари, многопользовательская игра в реальном времени—без электронной почты.",
+  "keywords": [
+    "словесные игры для средней школы",
+    "игры на словарный запас",
+    "игры для уроков русского языка",
+    "конкурентные классные игры",
+    "интерактивные игры со словами",
+    "словарные вызовы для школьников",
+    "мотивирующие языковые игры",
+    "тесты словарного запаса"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ru/education/middle-school-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "he": "https://www.lexiclash.live/he/education/middle-school-word-games",
+    "en": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+    "es": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/middle-school-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/middle-school-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/middle-school-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/middle-school-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/middle-school-word-games"
+  },
+  "ogTitle": "Словесные игры для средней школы | Расширение словарного запаса",
+  "ogDescription": "Бесплатные словесные игры для классов 5–9. Реальная конкуренция, пользовательские словари, многопользовательская игра в реальном времени—без электронной почты.",
+  "ogLocale": "ru_RU",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ru/education/middle-school-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Словесные игры для средней школы | Расширение словарного запаса"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Словесные игры для средней школы | Расширение словарного запаса",
+  "twDescription": "Бесплатные словесные игры для классов 5–9. Реальная конкуренция, пользовательские словари, многопользовательская игра в реальном времени—без электронной почты.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

@@ -1,0 +1,349 @@
+/*
+ * Fresh-page section motion (piece A: sections 2, 3, 5, 6 and the How to
+ * Play steps). CSS only: the
+ * fresh tree ships no framer-motion.
+ *
+ * Contract: the element's own (un-animated) style IS the finished frame, so
+ * reduced motion, no-JS and a paused capture all see a complete picture.
+ * Loops wait HOLD (9s) before starting, so a first read (and any capture in
+ * the first seconds) sees the resting frame: the visitor's own language, the
+ * full 7-day streak, the whole room code. Every animation lives behind
+ * `prefers-reduced-motion: no-preference` and moves only transform/opacity
+ * on small elements.
+ */
+
+/* ── shared ─────────────────────────────────────────────────────────────── */
+
+.tiltCard {
+  transform: rotate(-2deg);
+}
+.tiltCardAlt {
+  transform: rotate(2deg);
+}
+
+/* ── Daily: a new day resets to 6, then today's flame lights → 7 ───────── */
+
+.rollWindow {
+  display: inline-block;
+  height: 1em;
+  line-height: 1;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.rollStrip {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(-50%);
+}
+.todayFlame {
+  transform: scale(1);
+}
+.todayRing {
+  position: relative;
+}
+.todayRing::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 3px solid var(--neo-lime);
+  border-radius: 10px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Friends: two racers on dashed lanes, a room code typing itself ────── */
+
+.lane {
+  container-type: inline-size;
+}
+.runner {
+  --dir: 1;
+  --p: 0.8;
+  transform: translateX(calc((100cqw - 100%) * var(--p) * var(--dir)));
+}
+.runner:dir(rtl) {
+  --dir: -1;
+}
+.runnerB {
+  --p: 0.62;
+}
+
+/* ── Languages: one word, flipping through six languages ───────────────── */
+
+.face {
+  opacity: 0;
+  visibility: hidden;
+}
+.faceRest {
+  opacity: 1;
+  visibility: visible;
+}
+.chipGlow {
+  opacity: 0;
+}
+.chipGlowRest {
+  opacity: 1;
+}
+
+/* ── Classrooms: the badge fan opens on hover ──────────────────────────── */
+
+.badgeBack {
+  transform: translateX(-30%) rotate(-10deg) scale(0.8);
+}
+.badgeBackAlt {
+  transform: translateX(30%) rotate(10deg) scale(0.8);
+}
+.badgeFront {
+  transform: rotate(-3deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rollStrip {
+    animation: fresh-roll 6s cubic-bezier(0.34, 1.56, 0.64, 1) 9s infinite;
+  }
+  .todayFlame {
+    animation: fresh-flame 6s cubic-bezier(0.34, 1.56, 0.64, 1) 9s infinite;
+  }
+  .todayRing::after {
+    animation: fresh-ring 6s ease-out 9s infinite;
+  }
+  .bob {
+    animation: fresh-bob 3.2s ease-in-out infinite;
+  }
+
+  .runner {
+    animation: fresh-race 6s cubic-bezier(0.45, 0.05, 0.35, 1) 9s infinite;
+  }
+  .runnerB {
+    animation-name: fresh-race-b;
+  }
+  .codeChar {
+    animation: fresh-type 6s steps(1, end) infinite;
+    animation-delay: calc(9s + var(--i, 0) * 0.22s);
+  }
+
+  .face {
+    animation: fresh-face 15s linear infinite;
+    animation-delay: calc(9s + var(--f, 0) * 2.5s);
+  }
+  .face .tile {
+    animation: fresh-tile 15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    animation-delay: calc(9s + var(--f, 0) * 2.5s + var(--t, 0) * 70ms);
+  }
+  .chipGlow {
+    animation: fresh-chip 15s linear infinite;
+    animation-delay: calc(9s + var(--f, 0) * 2.5s);
+  }
+
+  .badgeBack,
+  .badgeBackAlt,
+  .badgeFront {
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .badgeFan:hover .badgeBack {
+    transform: translateX(-42%) rotate(-16deg) scale(0.84);
+  }
+  .badgeFan:hover .badgeBackAlt {
+    transform: translateX(42%) rotate(16deg) scale(0.84);
+  }
+  .badgeFan:hover .badgeFront {
+    transform: rotate(0deg) translateY(-6px);
+  }
+
+  /* How to Play (LandingSEOSection): the four step tiles pop along the lime
+     path in order, then rest. Scale only: the tile's tilt (Tailwind `rotate`)
+     and hover lift (`translate`) are separate properties and compose. */
+  .stepPop {
+    animation: fresh-step 7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    animation-delay: calc(9s + var(--step, 0) * 0.3s);
+  }
+}
+
+@keyframes fresh-step {
+  0%,
+  10%,
+  100% {
+    transform: scale(1);
+  }
+  5% {
+    transform: scale(1.14);
+  }
+}
+
+/* 0-40%: the finished 7-day streak. 40-48%: a new day rolls back to 6.
+   48-66%: today waits. 66-76%: today's flame pops and the count rolls to 7. */
+@keyframes fresh-roll {
+  0%,
+  40% {
+    transform: translateY(-50%);
+  }
+  48%,
+  66% {
+    transform: translateY(0);
+  }
+  76%,
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes fresh-flame {
+  0%,
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  46%,
+  66% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  72% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  78%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fresh-ring {
+  0%,
+  68% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  72% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes fresh-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(3deg);
+  }
+}
+
+/* Starts from the resting mid-race frame, finishes, fades, restarts. */
+@keyframes fresh-race {
+  0% {
+    --p: 0.8;
+    opacity: 1;
+  }
+  30%,
+  60% {
+    --p: 1;
+    opacity: 1;
+  }
+  68% {
+    --p: 1;
+    opacity: 0;
+  }
+  70% {
+    --p: 0;
+    opacity: 0;
+  }
+  76% {
+    --p: 0.02;
+    opacity: 1;
+  }
+  100% {
+    --p: 0.8;
+    opacity: 1;
+  }
+}
+
+@keyframes fresh-race-b {
+  0% {
+    --p: 0.62;
+    opacity: 1;
+  }
+  34%,
+  60% {
+    --p: 0.84;
+    opacity: 1;
+  }
+  68% {
+    --p: 0.84;
+    opacity: 0;
+  }
+  70% {
+    --p: 0;
+    opacity: 0;
+  }
+  76% {
+    --p: 0.02;
+    opacity: 1;
+  }
+  100% {
+    --p: 0.62;
+    opacity: 1;
+  }
+}
+
+/* Each character: on, then off briefly near the end of the loop and retyped. */
+@keyframes fresh-type {
+  0%,
+  86% {
+    opacity: 1;
+  }
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* A face is on for 1/6 of the loop (starting ON, so the resting face never
+   blinks when the loop starts), then cuts off: no cross-fade, so no frame
+   ever shows a half-transparent word. The tile flip is the entrance. */
+@keyframes fresh-face {
+  0%,
+  16.5% {
+    opacity: 1;
+    visibility: visible;
+  }
+  16.6%,
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes fresh-tile {
+  0% {
+    transform: rotateX(90deg);
+  }
+  1.2%,
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes fresh-chip {
+  0%,
+  16% {
+    opacity: 1;
+  }
+  16.7%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@property --p {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0.8;
+}

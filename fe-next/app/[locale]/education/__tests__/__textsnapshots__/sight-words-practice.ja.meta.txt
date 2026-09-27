@@ -1,0 +1,33 @@
+{
+  "title": "Sight Words Practice Online — Free Dolch & Fry Word Games | LexiClash",
+  "description": "Free sight words practice with real games. Paste any Dolch or Fry list into a custom word list, then drill it with flashcards, word matching, spelling challenges, and whole-class word games. No student accounts, no downloads — just a browser.",
+  "keywords": "sight words practice, dolch sight words, fry sight words, sight word games, sight word activities, high frequency words practice, dolch word list games, fry first 100 words, sight word flashcards online, kindergarten sight words games",
+  "robots": {
+    "index": false,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/en/education/sight-words-practice",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/sight-words-practice",
+    "en": "https://www.lexiclash.live/en/education/sight-words-practice"
+  },
+  "ogTitle": "Sight Words Practice Online — Free Dolch & Fry Word Games | LexiClash",
+  "ogDescription": "Free sight words practice with real games. Paste any Dolch or Fry list into a custom word list, then drill it with flashcards, word matching, spelling challenges, and whole-class word games. No student accounts, no downloads — just a browser.",
+  "ogLocale": "ja_JP",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ja/education/sight-words-practice",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-ja.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Sight Words Practice Online — Free Dolch & Fry Word Games | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Sight Words Practice Online — Free Dolch & Fry Word Games | LexiClash",
+  "twDescription": "Free sight words practice with real games. Paste any Dolch or Fry list into a custom word list, then drill it with flashcards, word matching, spelling challenges, and whole-class word games. No student accounts, no downloads — just a browser.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-ja.webp"
+  ]
+}

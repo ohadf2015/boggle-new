@@ -1,0 +1,2 @@
+json_key_file(ENV["PLAY_SA_JSON"] || File.expand_path("~/.config/play-console-sa.json"))
+package_name("live.lexiclash.app")

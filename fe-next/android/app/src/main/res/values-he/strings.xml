@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_daily_short">יומי</string>
+    <string name="shortcut_daily_long">אתגר יומי</string>
+    <string name="shortcut_mp_short">רב משתתפים</string>
+    <string name="shortcut_mp_long">שחק מול שחקנים</string>
+    <string name="shortcut_solo_short">יחיד</string>
+    <string name="shortcut_solo_long">משחק יחיד</string>
+    <string name="shortcut_connections_short">קשרים</string>
+    <string name="shortcut_connections_long">שחק קשרים</string>
+</resources>

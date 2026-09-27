@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/he/education/brain-breaks-word-games#page",
+  "name": "הפסקות מוח בכיתה | משחקי מילים חינמיים",
+  "description": "משחקים מהירים לאחזור קשב בתוך 1–5 דקות. ללא הכנה, כל המכשירים, כיתה שלמה. כשהתלמידים הפסיקו להקשיב.",
+  "url": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+  "inLanguage": "he",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/he/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/brain-breaks-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "בית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "חינוך",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "הפסקות קשב",
+      "item": "https://www.lexiclash.live/he/education/brain-breaks-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/he/education/brain-breaks-word-games#resource",
+  "name": "הפסקות מוח בכיתה | משחקי מילים חינמיים",
+  "description": "הפסקת קשב היא פעילות של 1–5 דקות שמחזירה קשב. LexiClash מריץ משחקי חיפוש מילים חיים על כל מקרן או מסך משותף—כל התלמידים משחקים בו־זמנית בטלפון. בלי הכנה, בלי חומרים. זה עובד כי זה דורש מספיק קשב כדי להפסיק חוסר שקט בלי להפיל את השיעור.",
+  "url": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+  "inLanguage": "he",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "6-14",
+  "teaches": "vocabulary, word recognition, attention reset",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT3M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/he/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/he/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/brain-breaks-word-games#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "איך אני נותן לתלמידים קוד כניסה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כשאתה מתחיל משחק כיתתי, קוד מופיע על המסך שלך. אומר בקול או על הלוח. התלמידים מקלידים או סורקים בטלפון. הם נכנסים בעוד 10 שניות. אין התחברות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה אם לחלק מהתלמידים אין טלפון?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "הם יכולים להזדווג עם שכן או לשחק כקבוצה (טלפון אחד לקבוצה). או שמור משחקים סולו ליום כשכולם בנוכחות. אין כלל שזה חייב להיות כיתה שלמה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אני צריך ללמד אותם איך משחקים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "לא. כללים הם על המסך. בסיבוב הראשון, עוברים דוגמה. \"מצא מילה כלשהי. לחץ עליה. זה מקבל נקודות.\" סיום. חצי דקה וכל אחד מבין."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אני מלמד שפה שונה. האם אני יכול להשתמש?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash תומך בשש שפות: אנגלית, עברית, ספרדית, שוודית, יפנית, רוסית. קבע את שפת הכיתה בתDashboard, והמשחקים משתמשים במילים בשפה זו. אתה יכול גם להעלות רשימות מילים מותאמות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "כמה זמן הפסקת קשב צריכה להיות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1–5 דקות. קצר הוא לרוב טוב יותר. משחק בן דקתיים מספיק כדי להחזיר קשב בין כל שתי פעילויות. יותר זמן (3–5) אם התלמידים מאוד \"מטורללים\"."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "זה יפריע לשיעור?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "רק אם אתה לא שם גבול. קבע זמן סיום בתחילה: \"משחקים 3 דקות, אחר כך טלפונים ניכנסים.\" כשהתלמידים יודעים את הגבול, הם חוזרים בקלות. הפסקות מחזירות קשב — הן לא מפילות אותו."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אני יכול להשתמש באותו משחק פעמיים בשבוע?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. חזרה היא בסדר. התלמידים לרוב אוהבים לשחק שוב כדי לנצח את הציון שלהם. אתה יכול גם להעלות רשימת מילים מותאמת והשתמש בה כל שבוע."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה משחקים הם הטובים ביותר להפסקה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "חיפוש מילים (רשת שקט), גלגל מילים (מחפש סיבוב), ודו־קרבות מהירים (1–2 דקות) עובדים הכי טוב. הימנע מטורנירים ארוכים. קח משחקים שהתלמידים יכולים להיכנס בעוד 10 שניות."
+      }
+    }
+  ]
+}

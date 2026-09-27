@@ -1,0 +1,148 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/spelling-bee-practice#page",
+  "name": "Stavningspraktik Online — Gratis Ordspel | LexiClash",
+  "description": "Gratis stavningspraktik genom ordspel. Boggle, anagram, hjul, dueller. Ingen registrering, ingen app — bara webbläsare.",
+  "url": "https://www.lexiclash.live/sv/education/spelling-bee-practice",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/spelling-bee-practice#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Stavningspraktik Online",
+      "item": "https://www.lexiclash.live/sv/education/spelling-bee-practice"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/spelling-bee-practice#resource",
+  "name": "Stavningspraktik Online — Gratis Ordspel | LexiClash",
+  "description": "Gratis stavningspraktik genom ordspel. Boggle, anagram, hjul, dueller. Ingen registrering, ingen app — bara webbläsare.",
+  "url": "https://www.lexiclash.live/sv/education/spelling-bee-practice",
+  "inLanguage": "sv",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Spelling Practice",
+    "Spelling Bee Preparation",
+    "Vocabulary Building",
+    "Pattern Recognition",
+    "Competition Training"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "7-18",
+  "teaches": "Spelling, letter pattern recognition, word recall under time pressure, vocabulary",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/spelling-bee-practice#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Hur kan jag träna stavning online gratis?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash ger stavningsdelagare tre kompletterande träningsformat: Boggle-rutnät (hitta alla giltiga ord från slumpmässiga bokstäver), ordhjul (forma långa ord från en kurerad uppsättning bokstäver) och anagrampussel (ordna om bokstäver till målord). Allt gratis, ingen registrering, ingen app — bara öppna webbläsaren och spela. Flera korta pass per dag bygger mönsterigenkänning och återkallelse under tidspress."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur hjälper det till med stavningsförberedelse?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Stavningstävlingar testar återkallelse under stress + ordbokstavsmönsterigenkänning + stavning under ljudledning. Ordspel tränar de två första direkt. Ordhjul och Boggle tvingar elever att skanna bokstavsmönster och känna igen giltiga ord snabbt. Anagram tränar omordning av bokstäver under tidspress — samma mentala rörelse som stavning av okända ord bokstav för bokstav."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag träna 1v1 med en annan stavningstävlingsmonstrant?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Använd ordförrådsduellläge för att para två elever ansikte mot ansikte på samma bokstavsnät. Först till målsiffra vinner. Utmärkt simulering av tävlingstryck för seriösa stavningsdelagare som tränar tillsammans."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Är det lämpligt för stavningstävlingar i grundskola, högstadium och gymnasium?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja — svårighetsnivån är justerbar. Yngre deltagare kan spela med kortare ord och längre timer; äldre deltagare möter längre ord och snävare tidsgränser. Anpassade ordlistor kan träna stavningsspecifik ordförråd (grekisk/latinska rötter, vetenskapliga termer, geografiska namn)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Använder LexiClash Scripps National Spelling Bee-ordlistor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash stöder anpassad ordlisteöverföring, så lärare och föräldrar kan klistra in valfri lista — inklusive Scripps-studielistor, regionala stavningsordlistor eller klassspecifik ordförråd från läroböcker. Inbyggda listor täcker allmän engelsk ordförråd för uppvärmningstraning; anpassade listor hanterar stavningsspecifik träning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur ofta bör en stavningsdetagare träna?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Forskning om retrieval practice (Roediger & Karpicke 2006) och spaced repetition (Cepeda et al. 2008) föreslår 10–15 minuters pass, 4–5 dagar per vecka, fördelat över veckor snarare än pakrat på dagar. LexiClash-pass är designade för att passa det mönstret: 5–10 minuters multiplayer-omgångar + 2–3 minuters soloträning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Är LexiClash klassrumsklar för stavningstävlingar i skolor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Lärare kan köra stavningsuppvärmning för hela klassen (hela klassen ansluter med en klasskod, utan elevkonton), 1v1-eliminationsmatcher eller tilldela soloträning. Lärarinstrumentpanelen visar noggrannhet per elev och vilka ord som trippade de flesta deltagarna — användbar för att rikta in granskningssessioner."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Är det gratis för enskilda elever som förbereder sig hemma?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja — helt gratis, ingen premium-nivå, ingen avgift per användare. Öppna webbläsaren, välj ett läge, börja träna. Inget konto krävs (även om valfritt konto sparar din progress och låser upp streakspårning)."
+      }
+    }
+  ]
+}

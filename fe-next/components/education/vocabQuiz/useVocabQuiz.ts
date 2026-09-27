@@ -1,0 +1,378 @@
+/**
+ * Live Vocab Quiz — client socket state.
+ *
+ * One hook drives both surfaces (student phone, host projector). It holds no
+ * scoring logic of its own: every number here arrived from the server, because
+ * a client that recomputes "the same" score drifts from it (Class 3 in
+ * .claude/rules/60-recurring-pitfalls.md).
+ *
+ * The countdown is the one thing computed locally, and only as a render
+ * convenience: it is re-anchored to the server clock on every question, reveal
+ * and reconnect, so it can never wander far.
+ */
+
+'use client';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Socket } from 'socket.io-client';
+import {
+  VOCAB_QUIZ_EVENTS,
+  type VocabQuizQuestionPayload,
+  type VocabQuizReveal,
+  type VocabQuizStateSnapshot,
+  type VocabQuizAnswerResult,
+  type VocabQuizStanding,
+  type VocabQuizEnded,
+  type VocabQuizPhase,
+  type VocabQuizLockIn,
+  type TreasureChestState,
+  type TreasureChestHit,
+} from '@/shared/types/vocabQuiz';
+
+export interface VocabQuizClientState {
+  phase: VocabQuizPhase | 'idle';
+  paused: boolean;
+  question: VocabQuizQuestionPayload | null;
+  reveal: VocabQuizReveal | null;
+  standings: VocabQuizStanding[];
+  /** This viewer's answer for the CURRENT question, once the server scored it. */
+  myAnswer: VocabQuizAnswerResult | null;
+  /** The choice tapped but not yet scored — locks the buttons without judging them. */
+  pendingChoice: number | null;
+  myScore: number;
+  myStreak: number;
+  /** Whole seconds left on the current question. */
+  secondsLeft: number;
+  /** 0..1 — drives the timer bar width. */
+  fractionLeft: number;
+  totalQuestions: number;
+  questionNumber: number;
+  finished: boolean;
+  /**
+   * Who has committed to what on the CURRENT question, while the clock still
+   * runs. Null between questions — the reveal carries its own final
+   * distribution, and letting a live count survive into the reveal would
+   * repaint the bars the class just watched settle.
+   */
+  lockIn: VocabQuizLockIn | null;
+  /**
+   * True when this player answered correctly and a chest awaits reveal.
+   * Set by answerResult.chestPending; cleared when moving to the next question.
+   */
+  chestPending: boolean;
+  /**
+   * THIS player's resolved chest for the current question. Only the private
+   * `treasureChestResult` sets it — another student's chest (room-wide
+   * `treasureChestEvent`) must never land here or it would hide this
+   * player's own picker. Null until then; cleared on the next question.
+   */
+  myChest: TreasureChestState | null;
+  /**
+   * Every chest opened in the room on this question (drives the projector
+   * ticker). Cleared when moving to the next question.
+   */
+  chestEvents: TreasureChestState[];
+  /** The last steal/swap that landed on this player, if any this question. */
+  chestHit: TreasureChestHit | null;
+  /**
+   * Words this viewer got wrong (or never answered) in the CURRENT quiz, read
+   * off each reveal. Feeds the in-place practice sheet; a new quiz (question
+   * index 0) starts a fresh array.
+   */
+  missed: VocabQuizMissedWord[];
+}
+
+export interface VocabQuizMissedWord {
+  index: number;
+  word: string;
+  /** The right answer as the reveal showed it (a definition, a word, …). */
+  meaning: string;
+}
+
+const IDLE: VocabQuizClientState = {
+  phase: 'idle',
+  paused: false,
+  question: null,
+  reveal: null,
+  standings: [],
+  myAnswer: null,
+  pendingChoice: null,
+  myScore: 0,
+  myStreak: 0,
+  secondsLeft: 0,
+  fractionLeft: 1,
+  totalQuestions: 0,
+  questionNumber: 0,
+  finished: false,
+  lockIn: null,
+  chestPending: false,
+  myChest: null,
+  chestEvents: [],
+  chestHit: null,
+  missed: [],
+};
+
+export interface UseVocabQuizResult extends VocabQuizClientState {
+  /** Send an answer. Ignored once this question is already answered. */
+  answer: (choiceIndex: number) => void;
+  /** True once a quiz has been seen on this socket — the cue to render the quiz UI. */
+  isQuizRoom: boolean;
+}
+
+export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
+  const [state, setState] = useState<VocabQuizClientState>(IDLE);
+  const [isQuizRoom, setIsQuizRoom] = useState(false);
+
+  /**
+   * Deadline in LOCAL time. The server sends `serverNow` with every question,
+   * so we translate once per question instead of trusting the two clocks to
+   * agree — a device with a skewed clock would otherwise show a wrong timer.
+   */
+  const deadlineRef = useRef<number | null>(null);
+  const limitRef = useRef<number>(1);
+
+  const anchorClock = useCallback((remainingMs: number, limitMs: number) => {
+    deadlineRef.current = Date.now() + remainingMs;
+    limitRef.current = Math.max(1, limitMs);
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const onQuestion = (payload: VocabQuizQuestionPayload) => {
+      setIsQuizRoom(true);
+      anchorClock(payload.remainingMs, payload.limitMs);
+      setState((prev) => ({
+        ...prev,
+        phase: 'question',
+        paused: false,
+        question: payload,
+        reveal: null,
+        // A new question clears the previous answer — without this the student
+        // sees their old pick still locked in and cannot answer.
+        myAnswer: null,
+        pendingChoice: null,
+        totalQuestions: payload.total,
+        questionNumber: payload.index + 1,
+        secondsLeft: Math.ceil(payload.remainingMs / 1000),
+        fractionLeft: payload.remainingMs / Math.max(1, payload.limitMs),
+        finished: false,
+        // A new question starts with an empty room, and the same question
+        // re-broadcast (resume / extend time) has had its answers kept by the
+        // server — either way the next lockIn packet is the truth.
+        lockIn: prev.questionNumber === payload.index + 1 ? prev.lockIn : null,
+        // Clear chest state when moving to the next question
+        chestPending: false,
+        myChest: null,
+        chestEvents: [],
+        chestHit: null,
+        missed: payload.index === 0 && prev.questionNumber !== 1 ? [] : prev.missed,
+      }));
+    };
+
+    const onReveal = (payload: VocabQuizReveal) => {
+      setIsQuizRoom(true);
+      deadlineRef.current = null;
+      setState((prev) => ({
+        ...prev,
+        phase: 'reveal',
+        reveal: payload,
+        standings: payload.standings,
+        totalQuestions: payload.total,
+        questionNumber: payload.index + 1,
+        secondsLeft: 0,
+        fractionLeft: 0,
+        lockIn: null,
+        missed:
+          prev.myAnswer?.correct || prev.missed.some((m) => m.index === payload.index)
+            ? prev.missed
+            : [
+                ...prev.missed,
+                { index: payload.index, word: payload.word, meaning: payload.definition ?? payload.answer },
+              ],
+      }));
+    };
+
+    /**
+     * Live commitment count. Dropped unless it belongs to the question on
+     * screen: the last student's packet and the reveal cross on the wire, and a
+     * stale count landing after the reveal would overwrite the settled bars
+     * (Class 3 — two paths writing the same surface).
+     */
+    const onLockIn = (payload: VocabQuizLockIn) => {
+      setState((prev) => {
+        if (prev.phase !== 'question') return prev;
+        if (!prev.question || payload.index !== prev.question.index) return prev;
+        return { ...prev, lockIn: payload };
+      });
+    };
+
+    const onAnswerResult = (payload: VocabQuizAnswerResult) => {
+      setState((prev) => ({
+        ...prev,
+        myAnswer: payload,
+        myScore: payload.totalScore,
+        myStreak: payload.streak,
+        chestPending: payload.chestPending ?? false,
+      }));
+    };
+
+    // Private: my own chest. The server's total is the truth (Class 3).
+    const onTreasureChestResult = (payload: TreasureChestState) => {
+      setState((prev) => ({
+        ...prev,
+        myChest: payload,
+        myScore: payload.myScore ?? prev.myScore,
+        standings: payload.standings,
+      }));
+    };
+
+    // Room-wide: anyone's chest — ticker + standings only.
+    const onTreasureChestEvent = (payload: TreasureChestState) => {
+      setState((prev) => ({
+        ...prev,
+        standings: payload.standings,
+        chestEvents: [...prev.chestEvents, payload],
+      }));
+    };
+
+    // Someone stole from / swapped with me: my total moved without my input.
+    const onChestHit = (payload: TreasureChestHit) => {
+      setState((prev) => ({ ...prev, myScore: payload.score, chestHit: payload }));
+    };
+
+    const onState = (snap: VocabQuizStateSnapshot) => {
+      setIsQuizRoom(true);
+      if (snap.question) anchorClock(snap.question.remainingMs, snap.question.limitMs);
+      else deadlineRef.current = null;
+
+      setState((prev) => ({
+        phase: snap.phase,
+        paused: snap.paused,
+        question: snap.question ?? null,
+        reveal: snap.reveal ?? null,
+        standings: snap.standings,
+        myAnswer: snap.myAnswer ?? null,
+        pendingChoice: snap.myAnswer?.choiceIndex ?? null,
+        myScore: snap.myScore,
+        myStreak: snap.myStreak,
+        secondsLeft: snap.question ? Math.ceil(snap.question.remainingMs / 1000) : 0,
+        fractionLeft: snap.question ? snap.question.remainingMs / Math.max(1, snap.question.limitMs) : 0,
+        totalQuestions: snap.total,
+        questionNumber: snap.index + 1,
+        finished: !snap.active,
+        lockIn: null,
+        chestPending: snap.myAnswer?.chestPending ?? false,
+        myChest: snap.myChest ?? null,
+        chestEvents: [],
+        chestHit: null,
+        // A reconnect keeps what this phone already saw of the current quiz.
+        missed: prev.missed,
+      }));
+    };
+
+    const onEnded = (payload: VocabQuizEnded) => {
+      setIsQuizRoom(true);
+      deadlineRef.current = null;
+      setState((prev) => ({
+        ...prev,
+        phase: 'ended',
+        question: null,
+        standings: payload.standings,
+        totalQuestions: payload.totalQuestions,
+        secondsLeft: 0,
+        fractionLeft: 0,
+        finished: true,
+        lockIn: null,
+        chestPending: false,
+      }));
+    };
+
+    const onPaused = ({ paused }: { paused: boolean }) => {
+      setState((prev) => ({ ...prev, paused }));
+    };
+
+    const requestState = () => socket.emit(VOCAB_QUIZ_EVENTS.requestState);
+
+    socket.on(VOCAB_QUIZ_EVENTS.question, onQuestion);
+    socket.on(VOCAB_QUIZ_EVENTS.reveal, onReveal);
+    socket.on(VOCAB_QUIZ_EVENTS.lockIn, onLockIn);
+    socket.on(VOCAB_QUIZ_EVENTS.answerResult, onAnswerResult);
+    socket.on(VOCAB_QUIZ_EVENTS.treasureChestResult, onTreasureChestResult);
+    socket.on(VOCAB_QUIZ_EVENTS.treasureChestEvent, onTreasureChestEvent);
+    socket.on(VOCAB_QUIZ_EVENTS.chestHit, onChestHit);
+    socket.on(VOCAB_QUIZ_EVENTS.state, onState);
+    socket.on(VOCAB_QUIZ_EVENTS.ended, onEnded);
+    socket.on(VOCAB_QUIZ_EVENTS.paused, onPaused);
+    // Ask on mount AND on every reconnect: a refresh mid-round must restore the
+    // live question with the time actually left, not wait for the next one.
+    //
+    // But NOT on `connect`, which is the one obvious place to put it and is
+    // wrong. A reconnecting socket arrives with a brand-new id the server has
+    // never seen; only the `join` that `utils/SocketContext.tsx` re-emits from
+    // its own `connect` handler rebuilds the server's in-memory socket.id →
+    // game / username maps. `vocabQuizHandler`'s `requestState` resolves through
+    // exactly those maps and answers a miss with `if (!ctx) return;` — silence.
+    // `join` goes out first on the wire, but the server handles it
+    // asynchronously (Supabase + Redis), so a `connect`-fired `requestState`
+    // routinely overtook it and died unanswered: a blank quiz until the next
+    // question happened to broadcast, and never at all if the round was between
+    // questions, paused, or on its last one. Class 3 racing class 4.
+    //
+    // So sequence it behind the server's own confirmation that the join landed.
+    // `playerJoinHandler` sends `joined` for a player and `joinedAsSpectator`
+    // for the other door; wiring only one would rebuild the same asymmetry a
+    // layer down, so both are here. Re-asking is idempotent — the server just
+    // re-snapshots — so the extra ask on a first join costs nothing and closes
+    // the mirror race where this view mounts before the join completes.
+    socket.on('joined', requestState);
+    socket.on('joinedAsSpectator', requestState);
+    requestState();
+
+    return () => {
+      socket.off(VOCAB_QUIZ_EVENTS.question, onQuestion);
+      socket.off(VOCAB_QUIZ_EVENTS.reveal, onReveal);
+      socket.off(VOCAB_QUIZ_EVENTS.lockIn, onLockIn);
+      socket.off(VOCAB_QUIZ_EVENTS.answerResult, onAnswerResult);
+      socket.off(VOCAB_QUIZ_EVENTS.treasureChestResult, onTreasureChestResult);
+      socket.off(VOCAB_QUIZ_EVENTS.treasureChestEvent, onTreasureChestEvent);
+      socket.off(VOCAB_QUIZ_EVENTS.chestHit, onChestHit);
+      socket.off(VOCAB_QUIZ_EVENTS.state, onState);
+      socket.off(VOCAB_QUIZ_EVENTS.ended, onEnded);
+      socket.off(VOCAB_QUIZ_EVENTS.paused, onPaused);
+      socket.off('joined', requestState);
+      socket.off('joinedAsSpectator', requestState);
+    };
+  }, [socket, anchorClock]);
+
+  // Local countdown. Paused rounds freeze by re-anchoring on resume, so the
+  // tick simply stops advancing rather than tracking a paused offset itself.
+  useEffect(() => {
+    if (state.phase !== 'question' || state.paused) return;
+    const id = setInterval(() => {
+      const deadline = deadlineRef.current;
+      if (deadline === null) return;
+      const remainingMs = Math.max(0, deadline - Date.now());
+      setState((prev) => ({
+        ...prev,
+        secondsLeft: Math.ceil(remainingMs / 1000),
+        fractionLeft: remainingMs / limitRef.current,
+      }));
+    }, 100);
+    return () => clearInterval(id);
+  }, [state.phase, state.paused, state.questionNumber]);
+
+  const answer = useCallback(
+    (choiceIndex: number) => {
+      if (!socket || !state.question || state.myAnswer || state.pendingChoice !== null || state.paused) return;
+      socket.emit(VOCAB_QUIZ_EVENTS.answer, { index: state.question.index, choiceIndex });
+      // Lock the buttons on the tap itself. The server's `answerResult` decides
+      // right or wrong a moment later; until then the UI shows "locked in"
+      // rather than guessing, so a correct answer never flashes red first.
+      setState((prev) => (prev.pendingChoice === null ? { ...prev, pendingChoice: choiceIndex } : prev));
+    },
+    [socket, state.question, state.myAnswer, state.pendingChoice, state.paused]
+  );
+
+  return { ...state, answer, isQuizRoom };
+}

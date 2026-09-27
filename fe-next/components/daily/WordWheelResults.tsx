@@ -1,0 +1,608 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { m, animate as fmAnimate } from 'framer-motion';
+import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap, Type, Home, Sparkles, Gem } from 'lucide-react';
+import Link from 'next/link';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { cn } from '@/lib/utils';
+import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
+import { selectRareFindCelebration, type RareFind } from '@/lib/wordWheel/wordRarity';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import PracticeChainCta from '@/components/practice/PracticeChainCta';
+import DailyInsightStack from './DailyInsightStack';
+import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import { useIsGuest } from '@/hooks/useIsGuest';
+import WordWheelSignupCta from './WordWheelSignupCta';
+import WordWheelReplayCta from './WordWheelReplayCta';
+import CatchUpSuggestion from './CatchUpSuggestion';
+import { STICKY_CTA_WORD_WHEEL } from './stickyCta';
+import { NextQuestCta } from './results/NextQuestCta';
+import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
+import MpModeCrossPromo from './MpModeCrossPromo';
+import { wasSignupModalDismissedRecently } from '@/utils/dailyChallenge';
+import type { Language } from '@/types';
+import type { WordWheelGameResult } from './WordWheelGame';
+
+// Threshold for the "exceptional run" celebration — covers two cases:
+//   • score ≥ EXCELLENT_SCORE: graded run, almost-all-words tier
+//   • wordsFound ≥ EXCELLENT_WORD_COUNT: brute-coverage signal
+// Either trigger flips on extra confetti, layered sound, and the banner.
+const EXCELLENT_SCORE = 80;
+const EXCELLENT_WORD_COUNT = 20;
+
+interface WordWheelResultsProps {
+  result: WordWheelGameResult;
+  puzzleNumber: number;
+  puzzleDate: string;
+  language: Language;
+  hasPlayedWordHunt: boolean;
+  /** True when today's Connections (Word Bridge) daily is done — the results
+   *  follow-up CTA nudges Connections first (Ohad directive 2026-09-13), so an
+   *  unfinished Connections suppresses the back-to-hub state. */
+  hasPlayedConnections?: boolean;
+  currentPlayerId?: string | null;
+  currentGuestFingerprint?: string | null;
+  /**
+   * Bumped by the parent once the submit POST lands. Used as the leaderboard's
+   * `key` so it remounts and refetches — the first mount races the write and
+   * would otherwise show a board without this player.
+   */
+  leaderboardKey?: number;
+  /** Whether the viewer is signed in. Gates the guest signup CTA. */
+  isAuthenticated?: boolean;
+  /** Current daily-streak length (getDailyStreak().currentStreak) — surfaced as a chip + signup hook. */
+  streakDays?: number;
+  /** True on the player's first-ever daily completion (welcome framing). */
+  isFirstCompletion?: boolean;
+  /** True when this is the terminal 'already-played' view (returning player) — enables the practice CTA. */
+  alreadyPlayed?: boolean;
+  /** True when this was a catch-up play (past day) — shows catch-up suggestion. */
+  isCatchup?: boolean;
+  /** Practice only: starts a fresh practice wheel (new random puzzle). When
+   *  absent the button is hidden — old callers stay valid. */
+  onPracticeAgain?: () => void;
+}
+
+function getResultTier(score: number): {
+  key: string; color: string; bg: string; icon: React.ReactNode; glowColor: string;
+} {
+  if (score >= 80) return {
+    key: 'wordWheel.excellent', color: 'text-neo-lime', bg: 'bg-neo-lime/10',
+    icon: <Crown className="w-8 h-8" />, glowColor: 'shadow-[0_0_30px_rgba(191,255,0,0.4)]',
+  };
+  if (score >= 50) return {
+    key: 'wordWheel.great', color: 'text-neo-cyan', bg: 'bg-neo-cyan/10',
+    icon: <Flame className="w-8 h-8" />, glowColor: 'shadow-[0_0_25px_rgba(0,255,255,0.3)]',
+  };
+  if (score >= 25) return {
+    key: 'wordWheel.good', color: 'text-neo-purple', bg: 'bg-neo-purple/10',
+    icon: <Zap className="w-8 h-8" />, glowColor: 'shadow-[0_0_20px_rgba(139,92,246,0.3)]',
+  };
+  return {
+    key: 'wordWheel.tryAgain', color: 'text-neo-pink', bg: 'bg-neo-pink/10',
+    icon: <Star className="w-8 h-8" />, glowColor: '',
+  };
+}
+
+// Pre-generated confetti configs (pure — no Math.random in render)
+interface ConfettiConfig {
+  left: number; size: number; heightRatio: number;
+  duration: number; rotation: number; xDrift: number; isRound: boolean;
+}
+
+function generateConfettiConfigs(count: number): ConfettiConfig[] {
+  const configs: ConfettiConfig[] = [];
+  // Simple seeded-ish spread using golden ratio
+  for (let i = 0; i < count; i++) {
+    const t = i / count;
+    const phi = (1 + Math.sqrt(5)) / 2;
+    const pseudo = ((i * phi) % 1);
+    const pseudo2 = ((i * phi * phi) % 1);
+    const pseudo3 = (((i + 7) * phi) % 1);
+    configs.push({
+      left: t * 100,
+      size: 6 + pseudo * 8,
+      heightRatio: 0.6 + pseudo2 * 0.8,
+      duration: 2 + pseudo * 2,
+      rotation: pseudo2 * 720 - 360,
+      xDrift: (pseudo3 - 0.5) * 200,
+      isRound: pseudo > 0.5,
+    });
+  }
+  return configs;
+}
+
+const CONFETTI_CONFIGS = generateConfettiConfigs(40);
+
+function ConfettiParticle({ delay, color, config }: { delay: number; color: string; config: ConfettiConfig }) {
+  return (
+    <m.div
+      className="absolute pointer-events-none"
+      style={{
+        left: `${config.left}%`,
+        top: -10,
+        width: config.size,
+        height: config.size * config.heightRatio,
+        backgroundColor: color,
+        borderRadius: config.isRound ? '50%' : '2px',
+      }}
+      initial={{ y: -20, opacity: 1, rotate: 0 }}
+      animate={{
+        y: typeof window !== 'undefined' ? window.innerHeight + 20 : 800,
+        opacity: [1, 1, 0.8, 0],
+        rotate: config.rotation,
+        x: config.xDrift,
+      }}
+      transition={{ duration: config.duration, delay, ease: 'easeIn' }}
+    />
+  );
+}
+
+const CONFETTI_COLORS = ['#BFFF00', '#00FFFF', '#FF1493', '#8B5CF6', '#FFD700', '#FF3366', '#44FF44'];
+
+const WordWheelResults: React.FC<WordWheelResultsProps> = ({
+  result, puzzleNumber, puzzleDate, language: gameLang, hasPlayedWordHunt,
+  hasPlayedConnections = false,
+  currentPlayerId, currentGuestFingerprint, leaderboardKey = 0,
+  isAuthenticated = false, streakDays = 0, isFirstCompletion = false, alreadyPlayed = false,
+  isCatchup = false, onPracticeAgain,
+}) => {
+  const { t, language } = useLanguage();
+  const { submitLeaderboardScore } = useCrazyGames();
+  const { playSound } = useSoundEffects();
+  const isPractice = usePracticeFlag();
+  const tier = getResultTier(result.score);
+  const isExceptional = result.score >= EXCELLENT_SCORE || result.wordsFound.length >= EXCELLENT_WORD_COUNT;
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [animatedScore, setAnimatedScore] = useState(0);
+  const [rareFind, setRareFind] = useState<RareFind | null>(null);
+  // Live rank + field size for today, reported up by the leaderboard below.
+  // Feeds the rank-aware guest signup hook ("you're #1 today"). The same board
+  // already lists this player (by id or guest fingerprint), so this is just
+  // surfacing the position they can see right beneath the CTA.
+  const [currentRank, setCurrentRank] = useState<number | null>(null);
+  const [totalPlayers, setTotalPlayers] = useState(0);
+
+  // Resolution-aware: gating on the `isAuthenticated` prop alone would flash the
+  // stripped layout at a logged-in player on first paint (rules/60 Class 1).
+  const isGuest = useIsGuest(isAuthenticated);
+
+  // Funnel anchor: fire once on mount so PostHog can measure results-page drop-off
+  useEffect(() => {
+    trackGrowthEvent('results_viewed', { mode: 'word-wheel', score: result.score });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Rarest-find celebration: pull the day's distinct-player count per word and
+  // surface the player's rarest find ("only you found X — so far" / "rare find").
+  // Skipped in practice (no shared field to compare against). Best-effort: any
+  // fetch/parse failure simply yields no card.
+  useEffect(() => {
+    if (isPractice || result.wordsFound.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/daily-challenge/word-wheel/word-rarity/${puzzleDate}/${gameLang}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        const counts = (json?.counts ?? {}) as Record<string, number>;
+        const find = selectRareFindCelebration(result.wordsFound, counts);
+        if (!cancelled && find) setRareFind(find);
+      } catch { /* rarity is best-effort */ }
+    })();
+    return () => { cancelled = true; };
+  }, [isPractice, result.wordsFound, puzzleDate, gameLang]);
+
+  // Animate score counting up with natural deceleration
+  useEffect(() => {
+    if (result.score === 0) return;
+    const controls = fmAnimate(0, result.score, {
+      duration: 1.5,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setAnimatedScore(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [result.score]);
+
+  // Submit completion score to CrazyGames leaderboard (no-op off-platform).
+  // Drives CG retention metrics by tying daily-challenge engagement to the
+  // platform leaderboard the player can return to.
+  useEffect(() => {
+    if (result.score > 0) {
+      submitLeaderboardScore(result.score);
+    }
+  }, [result.score, submitLeaderboardScore]);
+
+  // Trigger confetti for good scores
+  useEffect(() => {
+    if (result.score >= 25) {
+      const timer = setTimeout(() => setShowConfetti(true), 600);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [result.score]);
+
+  // Layered celebration for exceptional runs — partyTada lands ~700ms after
+  // the existing victoryFanfare from WordWheelGame so they sequence, not stack.
+  // crownVictory follows another ~500ms later to cap the moment.
+  useEffect(() => {
+    if (!isExceptional || isPractice) return;
+    const t1 = setTimeout(() => playSound('partyTada', { volume: 0.7, requiresGameActive: false }), 700);
+    const t2 = setTimeout(() => playSound('crownVictory', { volume: 0.6, requiresGameActive: false }), 1200);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [isExceptional, isPractice, playSound]);
+
+  const confettiCount = isExceptional ? 80 : result.score >= 50 ? 25 : 15;
+
+  return (
+    <m.div
+      /* No `overflow-hidden` here: an overflow-hidden ancestor becomes the
+         scrollport for `position: sticky` and, since this box never scrolls,
+         would silently pin the CTA to nothing. The confetti layer below does
+         its own clipping (`absolute inset-0 overflow-hidden`), so nothing
+         escapes. */
+      className="relative flex flex-col items-center gap-3 w-full max-w-md mx-auto px-4 py-5"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* DOM Confetti — rendered ABOVE the result cards (pointer-events-none) so
+          it rains in front of the content instead of hiding behind the opaque
+          stat/leaderboard cards, where it was effectively invisible on mobile. */}
+      {showConfetti && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-30">
+          {CONFETTI_CONFIGS.slice(0, confettiCount).map((config, i) => (
+            <ConfettiParticle
+              key={`confetti-${i}`}
+              delay={i * 0.08}
+              color={CONFETTI_COLORS[i % CONFETTI_COLORS.length]}
+              config={config}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Back to daily landing */}
+      <div className="w-full flex justify-start z-10">
+        <Link
+          href={`/${language}/daily`}
+          className="inline-flex items-center text-sm text-neo-white hover:text-neo-white transition-colors"
+        >
+          <ArrowLeft className="me-2 rtl:rotate-180 w-4 h-4" />
+          {t('common.back')}
+        </Link>
+      </div>
+
+      {/* Title */}
+      <m.div
+        className="text-center z-10"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
+        <h2 className="font-neo-display font-black text-xl text-neo-white">
+          {t('wordWheel.results.title')}
+        </h2>
+        <span className="text-neo-white/70 text-xs">#{puzzleNumber}</span>
+      </m.div>
+
+      {/* Score circle — solid elevated-navy fill + tier glow + tier-colored
+          number. The previous translucent `tier.bg` (e.g. bg-neo-lime/10) tinted
+          the disc a muddy olive over the navy stage; a clean navy fill keeps the
+          colored score crisp. */}
+      <m.div
+        className={cn(
+          'relative flex flex-col items-center justify-center w-28 h-28 rounded-full',
+          'border-3 border-neo-black bg-neo-navy-light shadow-hard-lg z-10',
+          tier.glowColor,
+        )}
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
+      >
+        <m.div
+          className={cn(tier.color, '[&>svg]:w-6 [&>svg]:h-6')}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.5, type: 'spring' }}
+        >
+          {tier.icon}
+        </m.div>
+        <span className={cn('font-neo-display font-black text-3xl leading-none', tier.color)}>
+          {animatedScore}
+        </span>
+        <span className="text-neo-white/70 text-[10px] uppercase tracking-wide">{t('wordWheel.scoreLabel')}</span>
+      </m.div>
+
+      {/* Tier message */}
+      <m.p
+        className={cn('font-neo-display font-bold text-lg z-10', tier.color)}
+        initial={{ scale: 0 }}
+        animate={{ scale: [0, 1.2, 1] }}
+        transition={{ delay: 0.8, duration: 0.4 }}
+      >
+        {t(tier.key)}
+      </m.p>
+
+      {/* Daily streak chip — surfaces the streak that was previously computed and
+          thrown away. The single strongest daily-habit signal; orange = streak
+          semantic. Hidden in practice (no streak persisted). */}
+      {!isPractice && streakDays >= 1 && (
+        <m.div
+          data-testid="word-wheel-streak-chip"
+          className="z-10 flex items-center gap-1.5 px-3 py-1 rounded-neo border-3 border-neo-black bg-neo-orange text-neo-black shadow-hard"
+          initial={{ scale: 0, y: -6 }}
+          // Spring from 0 -> 1 overshoots naturally (stiffness 360 / damping 16
+          // is underdamped, ~1.2 peak) — passing [0, 1.15, 1] keyframes to a
+          // spring logs "Only two keyframes currently supported with spring and
+          // inertia animations" in real browsers (growth-radar #2699).
+          animate={{ scale: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.45, type: 'spring', stiffness: 360, damping: 16 }}
+        >
+          <Flame className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+          <span className="font-neo-display font-black text-sm tracking-wide uppercase">
+            {t('wordWheel.results.streakChip', { count: streakDays })}
+          </span>
+        </m.div>
+      )}
+
+      {/* Exceptional-run banner — only renders for the top tier (almost-all
+          words / score ≥ 80). Mass + double Sparkles + spring scale gives it
+          the "this was special" feel without competing with the score circle. */}
+      {isExceptional && (
+        <m.div
+          data-testid="word-wheel-perfect-banner"
+          className="z-10 flex items-center gap-2 px-4 py-1.5 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_24px_rgba(191,255,0,0.55)]"
+          initial={{ scale: 0, y: -6 }}
+          // See streak chip above — springs take 2 keyframes max; the
+          // underdamped spring produces the 1.18 overshoot on its own.
+          animate={{ scale: 1, y: 0 }}
+          transition={{ delay: 1.0, duration: 0.55, type: 'spring', stiffness: 380, damping: 16 }}
+        >
+          <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+          <span className="font-neo-display font-black text-sm tracking-wider uppercase">
+            {t('wordWheel.results.perfectBanner', 'Word Wizard!')}
+          </span>
+          <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+        </m.div>
+      )}
+
+      {/* Rarest-find celebration — "only you found X (so far)" or a rare-but-
+          shared find. Honesty gates live in selectRareFindCelebration. */}
+      {rareFind && (
+        <m.div
+          data-testid="word-wheel-rare-find"
+          data-exclusive={rareFind.isExclusive ? 'true' : 'false'}
+          className={cn(
+            'z-10 flex flex-col items-center gap-0.5 px-4 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-lg',
+            rareFind.isExclusive
+              ? 'bg-neo-yellow text-neo-black shadow-[3px_3px_0px_black,0_0_24px_rgba(255,225,53,0.5)]'
+              : 'bg-neo-purple text-neo-white',
+          )}
+          initial={{ scale: 0, y: -6 }}
+          // See streak chip above — springs take 2 keyframes max; the
+          // underdamped spring produces the overshoot on its own.
+          animate={{ scale: 1, y: 0 }}
+          transition={{ delay: 1.1, duration: 0.5, type: 'spring', stiffness: 360, damping: 16 }}
+        >
+          <span className="flex items-center gap-1.5 font-neo-display font-black text-xs sm:text-sm tracking-wide uppercase">
+            <Gem className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+            {rareFind.isExclusive
+              ? t('wordWheel.results.onlyYouFound', 'Only you found this — so far!')
+              : t('wordWheel.results.rareFind', { count: rareFind.playerCount })}
+            <Gem className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+          </span>
+          <span dir="auto" className="font-neo-body font-black text-lg tracking-widest">
+            {gameLang === 'he' ? applyHebrewFinalLetters(rareFind.word) : rareFind.word}
+          </span>
+        </m.div>
+      )}
+
+      {/* Words-found stat — the single performance stat worth surfacing. The run
+          timer was dropped: every Word Wheel run is a fixed 2:00, so showing it
+          was constant noise that only added height. Compact inline pill. */}
+      <m.div
+        data-testid="word-wheel-words-stat"
+        className="z-10 inline-flex items-center gap-2 px-4 py-1.5 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <span className="text-neo-lime font-black text-xl leading-none">{result.wordsFound.length}</span>
+        <span className="text-neo-white/80 text-xs">{t('wordWheel.results.wordsFound')}</span>
+      </m.div>
+
+      {/* The shareable artifact, sitting right under the verdict where the bar
+          puts it. A blind review of this screen named the same gap twice: the
+          result had no way out of the app, while the reference card's emoji grid
+          is the whole reason its puzzles spread. Reuses the card the
+          singleplayer results already ship — its `classic` shape (puzzle number,
+          score, word list) is exactly a wheel run — rather than adding a second
+          share component. Hidden on an empty run: nobody posts a blank grid. */}
+      {result.wordsFound.length > 0 && (
+        <div className="w-full z-10">
+          <GameEmojiShareCard
+            data={{
+              mode: 'classic',
+              puzzleNumber,
+              score: result.score,
+              words: result.wordsFound,
+            }}
+            t={t}
+            language={language}
+            onShareClick={(method) => trackGrowthEvent('cross_promo_click', {
+              target: 'share',
+              source: 'word_wheel_results',
+              placement: 'emoji_card',
+              method,
+              language,
+            })}
+          />
+        </div>
+      )}
+
+      {/* Guest signup conversion — Word Wheel bypasses the generic guest-stats
+          signup gate, so this restores a value-led signup surface for the mode.
+          Experiment-gated (wheel-signup-offer-v1); framing via selectWheelSignupOffer. */}
+      {!isPractice && (
+        <WordWheelSignupCta
+          isAuthenticated={isAuthenticated}
+          isPractice={isPractice}
+          streakDays={streakDays}
+          isFirstCompletion={isFirstCompletion}
+          dismissedRecently={wasSignupModalDismissedRecently()}
+          score={result.score}
+          rank={currentRank}
+          totalPlayers={totalPlayers}
+        />
+      )}
+
+      {/* Practice mode: replace cross-promos + leaderboard with chain CTA so the
+          player flows from one practice mode to the next without dead-ends. */}
+      {isPractice && (
+        <m.div
+          className="w-full z-10"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          {/* Primary next action: another wheel, right now. Without this the
+              chain CTA (wheelRush = last mode → hub link) is a dead-end for a
+              player who wants to keep spinning. */}
+          {onPracticeAgain && (
+            <button
+              type="button"
+              data-testid="wheel-practice-again"
+              onClick={onPracticeAgain}
+              className="w-full mb-2 py-3 rounded-neo border-3 border-neo-black bg-neo-purple text-neo-white font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
+            >
+              {t('wordWheel.practice.again')}
+            </button>
+          )}
+          <PracticeChainCta currentMode="wheelRush" />
+        </m.div>
+      )}
+
+      {/* ONE next step for the whole daily, for every mode.
+          This was three hand-rolled sticky CTAs chained by hand — Connections,
+          then Word Hunt, then "back to the hub" — which never mentioned Word
+          Tower at all, so a player who had finished the other three was told the
+          day was over with a mode still unplayed. NextQuestCta reads the same
+          server-backed play state the hub does and offers whatever is actually
+          next, keeping the `cross_promo_click` event these emitted.
+
+          The original rule was "no CTA for a guest", but its stated reason was
+          specifically that this slot is PINNED and a guest's signup card already
+          lives there. So the rule is kept where it applies — a guest gets the
+          handoff in normal flow instead of pinned, so it cannot ride over the
+          signup card. Dropping it entirely would dead-end ~90% of players on a
+          screen whose whole job is "what next", and would leave Word Wheel
+          behaving differently from Word Hunt for the same player (rules/60
+          Class 3). */}
+      {!isPractice && (
+        <NextQuestCta
+          justFinished="word-wheel"
+          currentLanguage={language}
+          source={isGuest ? 'word_wheel_results_guest' : 'word_wheel_results'}
+          className={isGuest ? 'w-full' : STICKY_CTA_WORD_WHEEL}
+        />
+      )}
+
+      {/* Hint: tap a player row to see diff */}
+      {!isPractice && result.wordsFound.length > 0 && (
+        <p className="text-xs text-neo-white text-center font-medium -mb-1">
+          {t('wordWheel.results.tapPlayerHint', 'Tap a player to see what you missed')}
+        </p>
+      )}
+
+      {/* Leaderboard — hidden in practice (no score persisted, would only confuse). */}
+      {!isPractice && (
+        <m.div
+          className="w-full z-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <TabbedDailyLeaderboard
+            key={leaderboardKey}
+            puzzleDate={puzzleDate}
+            language={gameLang}
+            currentPlayerId={currentPlayerId}
+            currentGuestFingerprint={currentGuestFingerprint}
+            scope="word-wheel"
+            defaultTab="today"
+            t={t}
+            maxVisible={5}
+            compact
+            myWheelWordsFound={result.wordsFound}
+            onCurrentUserRankChange={setCurrentRank}
+            onParticipantCountChange={setTotalPlayers}
+          />
+        </m.div>
+      )}
+
+      {/* Everything past the verdict, the next-step CTA and the leaderboard is
+          recap: useful, but not what the player came back for. It stays one tap
+          away instead of being cut, so no behaviour — and no analytics event —
+          is lost. Impression events inside now fire when the recap is OPENED,
+          which is a truer impression than firing on mount while off-screen. */}
+      {/* Catch-up dailies — a missed daily is another GAME, not a detail about
+          this one, so it stays outside the disclosure (it renders nothing when
+          there is nothing to catch up). Mirrors the Word Hunt results screen. */}
+      {!isPractice && !isGuest && (
+        <div className="w-full z-10">
+          <CatchUpSuggestion mode="word-wheel" excludeDate={puzzleDate} />
+        </div>
+      )}
+
+      {!isPractice && !isGuest && (
+        <CollapsibleSection
+          title={t('daily.results.fullRecap', 'Full recap')}
+          summary={t('daily.results.fullRecapSummary', 'Your rank, your rarest word, your coins — and who you beat')}
+          className="w-full z-10"
+        >
+          <div className="flex flex-col gap-3">
+            <DailyInsightStack mode="word_wheel" date={puzzleDate} />
+
+            {/* Returning-player anti-bounce: an engaged returner gets an instant
+                next game instead of a dead end. Experiment-gated. */}
+            {alreadyPlayed && <WordWheelReplayCta />}
+
+            {/* Only once today's pair is done, so it never competes with the
+                "finish today's challenge" daily<->daily CTA above. */}
+            {hasPlayedWordHunt && (
+              <MpModeCrossPromo language={language} source="word_wheel_results" t={t} />
+            )}
+
+            {result.wordsFound.length > 0 && (
+              <div>
+                <h3 className="text-neo-white text-xs font-bold uppercase mb-2">
+                  {t('wordWheel.foundWords')}
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {result.wordsFound.map((word) => (
+                    <span
+                      key={word}
+                      className="px-2 py-0.5 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white text-xs font-semibold shadow-hard-xs"
+                    >
+                      {gameLang === 'he' ? applyHebrewFinalLetters(word) : word}{' '}
+                      <span className="text-neo-lime">+{scoreWord(word)}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </CollapsibleSection>
+      )}
+
+    </m.div>
+  );
+};
+
+export default WordWheelResults;

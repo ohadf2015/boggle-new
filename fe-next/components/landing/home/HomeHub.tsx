@@ -1,0 +1,105 @@
+'use client';
+
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
+import type { ProfileData } from '@/contexts/auth/authTypes';
+import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
+import type { TopPlayer } from '@/hooks/useTopPlayers';
+import { LandingChallengeCards } from '../LandingChallengeCards';
+import { LandingLeaderboardPreview } from '../LandingLeaderboardPreview';
+import { HomeTopBar } from './HomeTopBar';
+import { HomeSocialStrip } from './HomeSocialStrip';
+import { HomeRankCard } from './HomeRankCard';
+
+interface DailyChallengePreloadedStats {
+  hasPlayed: boolean;
+  hasSolved: boolean | null;
+  currentStreak: number;
+  puzzleNumber: number;
+  loading: boolean;
+}
+
+interface HomeHubProps {
+  className?: string;
+  profile: ProfileData | null;
+  /** auth still resolving — drives the top-bar profile skeletons */
+  authLoading?: boolean;
+  language: string;
+  isAdmin?: boolean;
+  /** live-room stats (active players powers the section live pill + arena count) */
+  liveRoomStats: { activePlayers: number; openRooms: number; totalPlayers: number; isLoading: boolean };
+  /** landing-stats feed for the social strip */
+  gamesToday: number;
+  playerAllTimeBest: { score: number } | null;
+  dailyChallengeStats: DailyChallengePreloadedStats;
+  cardOrder?: LandingGameMode[];
+  topPlayers: TopPlayer[];
+  topPlayersLoading: boolean;
+}
+
+/**
+ * HomeHub — the focused mobile arcade home (CSS-gated `md:hidden`; the desktop
+ * landing renders the classic tree unchanged). Composes the redesign top-to-bottom:
+ * top bar → promoted Daily hero + mode bento (via `LandingChallengeCards layout="hub"`,
+ * reusing the SAME gated model list) → live social strip → Your Rank card →
+ * compact leaderboard. Bottom padding clears the app-wide `GlobalBottomNav`
+ * (consumes `--bottom-nav-height`).
+ */
+export function HomeHub({
+  className,
+  profile,
+  authLoading,
+  language,
+  isAdmin,
+  liveRoomStats,
+  gamesToday,
+  playerAllTimeBest,
+  dailyChallengeStats,
+  cardOrder,
+  topPlayers,
+  topPlayersLoading,
+}: HomeHubProps) {
+  const { t } = useLanguage();
+
+  // min-h-[28rem] reserves the mobile arcade hub's first-paint height.
+  // Lighthouse CLS 0.13 vs bar 0.016 was this one node:
+  // `div.flex-1 > div.flex > section.w-full > div.flex` (HomeHub root).
+  return (
+    <div className={cn('flex w-full min-h-[28rem] flex-col gap-[18px] px-1.5 pt-1', className)}>
+      <HomeTopBar
+        profile={profile}
+        language={language}
+        t={t}
+        profileLoading={authLoading}
+      />
+
+      <LandingChallengeCards
+        layout="hub"
+        language={language}
+        isAdmin={isAdmin}
+        hasBlastAccess={true}
+        activePlayers={liveRoomStats.activePlayers}
+        openRooms={liveRoomStats.openRooms}
+        totalPlayers={liveRoomStats.totalPlayers}
+        playerAllTimeBest={playerAllTimeBest}
+        t={t}
+        dailyChallengeStats={dailyChallengeStats}
+        cardOrder={cardOrder}
+      />
+
+      <HomeSocialStrip
+        activePlayers={liveRoomStats.activePlayers}
+        gamesToday={gamesToday}
+        liveStatsLoading={liveRoomStats.isLoading}
+        t={t}
+      />
+
+      <HomeRankCard playerAllTimeBest={playerAllTimeBest} t={t} />
+
+      <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
+    </div>
+  );
+}
+
+export default HomeHub;

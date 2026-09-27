@@ -1,0 +1,514 @@
+/**
+ * Jest Setup for Frontend Tests
+ *
+ * This file runs before each test file and sets up:
+ * - React Testing Library matchers
+ * - Global mocks for browser APIs
+ * - Socket.IO mocks
+ * - Next.js router mocks
+ */
+
+import '@testing-library/jest-dom';
+
+// ==========================================
+// Vitest globals compatibility
+// ==========================================
+// Some test files use `vi.fn()` etc. without importing from 'vitest'.
+// Provide a global `vi` that delegates to jest for those files.
+// (Files that DO import from 'vitest' are handled by jest-vitest-transform.js)
+if (typeof globalThis.vi === 'undefined') {
+  globalThis.vi = {
+    fn: (...args) => jest.fn(...args),
+    mock: (...args) => jest.mock(...args),
+    unmock: (...args) => jest.unmock(...args),
+    spyOn: (...args) => jest.spyOn(...args),
+    mocked: (fn) => fn,
+    resetAllMocks: () => jest.resetAllMocks(),
+    clearAllMocks: () => jest.clearAllMocks(),
+    restoreAllMocks: () => jest.restoreAllMocks(),
+    useFakeTimers: (...args) => jest.useFakeTimers(...args),
+    useRealTimers: () => jest.useRealTimers(),
+    advanceTimersByTime: (ms) => jest.advanceTimersByTime(ms),
+    runAllTimers: () => jest.runAllTimers(),
+    runAllTimersAsync: async () => jest.runAllTimers(),
+    runOnlyPendingTimers: () => jest.runOnlyPendingTimers(),
+    runOnlyPendingTimersAsync: async () => jest.runOnlyPendingTimers(),
+    clearAllTimers: () => jest.clearAllTimers(),
+    getTimerCount: () => jest.getTimerCount(),
+    setSystemTime: (date) => jest.setSystemTime(date),
+    resetModules: () => jest.resetModules(),
+    hoisted: (factory) => factory(),
+    stubGlobal: (name, value) => {
+      if (!globalThis.vi._stubbedGlobals) globalThis.vi._stubbedGlobals = new Map();
+      if (!globalThis.vi._stubbedGlobals.has(name)) {
+        globalThis.vi._stubbedGlobals.set(name, globalThis[name]);
+      }
+      globalThis[name] = value;
+    },
+    unstubAllGlobals: () => {
+      if (!globalThis.vi._stubbedGlobals) return;
+      for (const [name, original] of globalThis.vi._stubbedGlobals) {
+        if (original === undefined) delete globalThis[name];
+        else globalThis[name] = original;
+      }
+      globalThis.vi._stubbedGlobals.clear();
+    },
+    stubEnv: (name, value) => { process.env[name] = value; },
+    unstubAllEnvs: () => {},
+    dynamicImportSettled: () => Promise.resolve(),
+    doMock: (...args) => jest.doMock(...args),
+    importActual: (path) => Promise.resolve(jest.requireActual(path)),
+    waitFor: async (cb, _opts) => {
+      // Simple polling shim — matches Vitest's vi.waitFor surface enough
+      // for tests that just need "retry until truthy / no-throw".
+      const deadline = Date.now() + ((_opts && _opts.timeout) || 1000);
+      let lastErr;
+      while (Date.now() < deadline) {
+        try {
+          const r = await cb();
+          if (r !== false) return r;
+        } catch (e) { lastErr = e; }
+        await new Promise((res) => setTimeout(res, (_opts && _opts.interval) || 25));
+      }
+      if (lastErr) throw lastErr;
+      throw new Error('vi.waitFor: timed out');
+    },
+  };
+}
+
+// ==========================================
+// Browser API polyfills jsdom lacks
+// ==========================================
+if (typeof globalThis.window !== 'undefined') {
+  // PointerEvent (used by drag-gesture tests). Forward common Event props
+  // via super() (bubbles/cancelable/composed are read-only on Event) and copy
+  // PointerEvent-specific props as own properties.
+  if (typeof globalThis.PointerEvent === 'undefined') {
+    globalThis.PointerEvent = class PointerEvent extends Event {
+      constructor(type, props = {}) {
+        super(type, {
+          bubbles: !!props.bubbles,
+          cancelable: !!props.cancelable,
+          composed: !!props.composed,
+        });
+        const PTR_KEYS = [
+          'pointerId', 'pointerType', 'isPrimary', 'pressure', 'tangentialPressure',
+          'tiltX', 'tiltY', 'twist', 'clientX', 'clientY', 'screenX', 'screenY',
+          'movementX', 'movementY', 'altKey', 'ctrlKey', 'metaKey', 'shiftKey', 'button', 'buttons',
+        ];
+        for (const k of PTR_KEYS) if (k in props) this[k] = props[k];
+      }
+    };
+  }
+  // document.elementFromPoint — jsdom returns undefined; tests that need real
+  // hit-testing will still fail, but smoke tests that just call it won't crash.
+  if (typeof document !== 'undefined' && typeof document.elementFromPoint !== 'function') {
+    document.elementFromPoint = () => null;
+  }
+  // crypto.randomUUID — node 19+ has it on globalThis.crypto; ensure it's
+  // wired into both window.crypto and globalThis.crypto for jsdom.
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID !== 'function') {
+    try {
+      globalThis.crypto.randomUUID = require('crypto').randomUUID;
+    } catch (_) { /* node too old; leave undefined */ }
+  }
+}
+
+// TextDecoder / TextEncoder — present in modern node but not always on
+// jsdom's `window`. Some libs (esbuild bundles, util consumers) look on
+// global directly.
+if (typeof globalThis.TextDecoder === 'undefined') {
+  globalThis.TextDecoder = require('util').TextDecoder;
+}
+if (typeof globalThis.TextEncoder === 'undefined') {
+  globalThis.TextEncoder = require('util').TextEncoder;
+}
+
+// Web Fetch globals — node 18+ has them, but jsdom's window doesn't expose
+// them unless you opt in via `customExportConditions`. Mirror to globalThis
+// so route handlers and NextResponse-related code can load under jsdom.
+for (const name of ['Request', 'Response', 'Headers', 'fetch', 'FormData', 'Blob']) {
+  if (typeof globalThis[name] === 'undefined') {
+    try {
+      const fromUndici = require('undici')[name];
+      if (fromUndici) globalThis[name] = fromUndici;
+    } catch (_) {
+      // undici unavailable; fall back to anything node exposes on global
+      if (global[name]) globalThis[name] = global[name];
+    }
+  }
+}
+
+// Jest-only matcher polyfills for Vitest-isms.
+if (typeof expect !== 'undefined' && expect.extend) {
+  expect.extend({
+    toHaveBeenCalledOnce(received) {
+      const calls = received?.mock?.calls?.length ?? -1;
+      return {
+        pass: calls === 1,
+        message: () => `expected mock to have been called exactly once, but was called ${calls} time(s)`,
+      };
+    },
+  });
+}
+
+// describe.skipIf / it.skipIf — Vitest helpers Jest lacks.
+if (typeof describe !== 'undefined' && typeof describe.skipIf !== 'function') {
+  describe.skipIf = (cond) => (cond ? describe.skip : describe);
+  describe.runIf = (cond) => (cond ? describe : describe.skip);
+}
+if (typeof it !== 'undefined' && typeof it.skipIf !== 'function') {
+  it.skipIf = (cond) => (cond ? it.skip : it);
+  it.runIf = (cond) => (cond ? it : it.skip);
+}
+
+// ==========================================
+// Mock Sentry
+// ==========================================
+
+// Remotion is mocked via moduleNameMapper -> __mocks__/remotion.js
+// That file uses jest.fn() so individual tests can override via .mockReturnValue()
+
+jest.mock('@sentry/nextjs', () => ({
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+  captureEvent: jest.fn(),
+  withScope: jest.fn((callback) => callback({ setTag: jest.fn(), setContext: jest.fn() })),
+  configureScope: jest.fn(),
+  setUser: jest.fn(),
+  setTag: jest.fn(),
+  setContext: jest.fn(),
+  addBreadcrumb: jest.fn(),
+  Severity: {
+    Fatal: 'fatal',
+    Error: 'error',
+    Warning: 'warning',
+    Log: 'log',
+    Info: 'info',
+    Debug: 'debug',
+  },
+}));
+
+// ==========================================
+// Mock Browser APIs
+// ==========================================
+
+// Mock localStorage
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+  length: 0,
+  key: jest.fn(),
+};
+global.localStorage = localStorageMock;
+
+// Mock sessionStorage
+const sessionStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+  length: 0,
+  key: jest.fn(),
+};
+global.sessionStorage = sessionStorageMock;
+
+// Mock matchMedia - Use a regular function (not jest.fn()) to avoid being reset by resetMocks: true
+const createMatchMediaMock = () => (query) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener: jest.fn(),
+  removeListener: jest.fn(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+  dispatchEvent: jest.fn(),
+});
+
+// `window` is only defined under the jsdom test environment — node-env tests
+// (e.g. API route tests) skip the matchMedia stub since nothing in them
+// touches the browser API.
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: createMatchMediaMock(),
+  });
+}
+
+// Mock ResizeObserver - use class syntax to ensure proper instantiation
+class MockResizeObserver {
+  constructor(callback) {
+    this.callback = callback;
+  }
+  observe = jest.fn();
+  unobserve = jest.fn();
+  disconnect = jest.fn();
+}
+global.ResizeObserver = MockResizeObserver;
+
+// Mock IntersectionObserver
+global.IntersectionObserver = class IntersectionObserver {
+  constructor(callback) {
+    this.callback = callback;
+    this.observe = jest.fn();
+    this.unobserve = jest.fn();
+    this.disconnect = jest.fn();
+    this.root = null;
+    this.rootMargin = '';
+    this.thresholds = [];
+  }
+};
+
+// Mock requestAnimationFrame
+global.requestAnimationFrame = jest.fn(callback => setTimeout(callback, 0));
+global.cancelAnimationFrame = jest.fn(id => clearTimeout(id));
+
+// Mock performance.now (for timing tests)
+if (!global.performance) {
+  global.performance = {};
+}
+global.performance.now = jest.fn(() => Date.now());
+
+// Mock fetch API with a default implementation
+const mockFetchImplementation = (url, _options) => {
+  // Default response for dictionary check
+  if (url.includes('/api/dictionary/check')) {
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ isValid: true, source: 'dictionary' }),
+    });
+  }
+
+  // Default fallback for other endpoints
+  return Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({}),
+  });
+};
+
+global.fetch = jest.fn(mockFetchImplementation);
+
+// ==========================================
+// Mock Next.js Router
+// ==========================================
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+  }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+  useParams: () => ({}),
+}));
+
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+    back: jest.fn(),
+    pathname: '/',
+    query: {},
+    asPath: '/',
+    locale: 'en',
+    events: {
+      on: jest.fn(),
+      off: jest.fn(),
+      emit: jest.fn(),
+    },
+  }),
+}));
+
+// ==========================================
+// Mock Socket.IO
+// ==========================================
+
+const mockSocket = {
+  id: 'test-socket-id',
+  connected: true,
+  disconnected: false,
+  on: jest.fn(),
+  off: jest.fn(),
+  emit: jest.fn(),
+  connect: jest.fn(),
+  disconnect: jest.fn(),
+  removeAllListeners: jest.fn(),
+};
+
+jest.mock('socket.io-client', () => ({
+  io: jest.fn(() => mockSocket),
+}));
+
+// Export mock socket for use in tests
+global.mockSocket = mockSocket;
+
+// ==========================================
+// Mock Contexts
+// ==========================================
+
+// Create mock context values that can be overridden in tests
+const mockSocketContext = {
+  socket: mockSocket,
+  isConnected: true,
+  isReconnecting: false,
+  error: null,
+};
+
+const mockAuthContext = {
+  user: null,
+  isLoading: false,
+  isAuthenticated: false,
+  signIn: jest.fn(),
+  signOut: jest.fn(),
+  signUp: jest.fn(),
+};
+
+const mockLanguageContext = {
+  language: 'en',
+  setLanguage: jest.fn(),
+  t: jest.fn((key) => key),
+  dir: 'ltr',
+};
+
+// Export mock contexts for use in tests
+global.mockSocketContext = mockSocketContext;
+global.mockAuthContext = mockAuthContext;
+global.mockLanguageContext = mockLanguageContext;
+
+// ==========================================
+// Mock Sound/Audio
+// ==========================================
+
+global.Audio = jest.fn().mockImplementation(() => ({
+  play: jest.fn().mockResolvedValue(undefined),
+  pause: jest.fn(),
+  load: jest.fn(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+}));
+
+// ==========================================
+// Mock useDevicePerformance Hook
+// ==========================================
+
+// Default values for useDevicePerformance mock
+const defaultDevicePerformanceValue = {
+  isLowEnd: false,
+  prefersReducedMotion: false,
+  enableGlowEffects: true,
+  enableComplexAnimations: true,
+  targetFPS: 60,
+  throttleMs: 16,
+  reduceParticles: false,
+  maxParticles: 20,
+  isSlowConnection: false,
+  isMobile: false,
+};
+
+// Create a mock function with a stable default implementation
+// Tests can override this using mockReturnValue
+const mockUseDevicePerformance = jest.fn(() => defaultDevicePerformanceValue);
+
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: mockUseDevicePerformance,
+  createAdaptiveThrottle: () => (fn) => fn,
+}));
+
+// Export for tests that need to customize the mock
+global.mockUseDevicePerformance = mockUseDevicePerformance;
+global.defaultDevicePerformanceValue = defaultDevicePerformanceValue;
+
+// ==========================================
+// Mock Console for Clean Output
+// ==========================================
+
+// Suppress console.error for expected errors in tests
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args) => {
+    // Suppress React act() warnings and expected test errors
+    if (
+      typeof args[0] === 'string' &&
+      (args[0].includes('act(...)') ||
+        args[0].includes('Warning:') ||
+        args[0].includes('Not implemented'))
+    ) {
+      return;
+    }
+    originalError.call(console, ...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalError;
+});
+
+// ==========================================
+// Cleanup After Each Test
+// ==========================================
+
+afterEach(() => {
+  // Clear all mocks (but don't restore fetch - let tests handle their own fetch mocks)
+  jest.clearAllMocks();
+
+  // Clear localStorage
+  localStorageMock.getItem.mockClear();
+  localStorageMock.setItem.mockClear();
+  // jsdom defines localStorage as a non-configurable getter, so the `global.localStorage =
+  // localStorageMock` above does NOT always take — meaning some suites talk to jsdom's REAL
+  // store, which persists across tests in a file. Any key a component writes (ad cadence
+  // counters, one-shot prompt markers) then bleeds into every later case. vitest.setup.ts got
+  // this fix on 2026-08-18; jest also globs the vitest suites, so it needs the same clear.
+  // Harmless when the mock did take: `clear` is then a jest.fn no-op.
+  try { window.localStorage.clear(); } catch {}
+
+  // Reset socket mock
+  mockSocket.on.mockClear();
+  mockSocket.off.mockClear();
+  mockSocket.emit.mockClear();
+});
+
+// ==========================================
+// Test Utilities
+// ==========================================
+
+/**
+ * Create a mock event with specified properties
+ * @param {Object} properties - Event properties
+ * @returns {Object} - Mock event
+ */
+global.createMockEvent = (properties = {}) => ({
+  preventDefault: jest.fn(),
+  stopPropagation: jest.fn(),
+  target: { value: '' },
+  currentTarget: { value: '' },
+  ...properties,
+});
+
+/**
+ * Wait for async updates in components
+ * @param {number} ms - Milliseconds to wait
+ * @returns {Promise} - Promise that resolves after delay
+ */
+global.waitForAsync = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Create a deferred promise for async testing
+ * @returns {Object} - Object with promise, resolve, and reject
+ */
+global.createDeferred = () => {
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+};

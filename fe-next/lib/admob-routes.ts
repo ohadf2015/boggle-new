@@ -1,0 +1,106 @@
+// Routes where the AdMob anchored banner is NOT shown.
+// Gameplay routes hide the banner so it doesn't cover the play surface.
+// `/adventure` is intentionally allowed — adventure layout reserves space
+// via the --admob-banner-height CSS var so buttons are never covered.
+// `/profile` and `/friends` allow banner (passive menu/social, safe to monetize).
+// `/admin/*` is blocked — operator console, never monetized.
+//
+// `/multiplayer` is deliberately ABSENT: lobby and active game share one path,
+// so the route gate cannot distinguish them. The passive lobby (isActive=false)
+// shows the banner; active gameplay/results add `screen-fit-locked` to <body>,
+// which bannerController's shouldSuppressBanner() hides at the global level.
+// Do NOT re-add `/multiplayer` here — it would silently kill the lobby banner.
+const GAME_ROUTES = [
+  '/singleplayer',
+  '/daily',
+  '/challenge',
+  '/join',
+  '/brain',
+  '/custom',
+  '/party-screen',
+  '/teacher',
+  '/education',
+  '/student',
+  '/auth/callback',
+  '/hebrew-multiplayer-word-game',
+  '/admin',
+  '/connections',
+  // Word Tower is a full-bleed play surface: the anchored banner AND the
+  // install promo (which gates on this same list) were drawn over the crane and
+  // the landing zone mid-drop.
+  '/word-tower',
+  // Crossword is the same shape: a fit-to-viewport board with a pinned keyboard.
+  // The install pill (`fixed end-0 top-1/2`) sat straight over the right-hand
+  // columns of the grid, covering cells the player has to tap.
+  '/crossword',
+];
+
+// Hub landings that share a prefix with a GAME_ROUTES entry but are themselves
+// PASSIVE menus (not gameplay). The anchored banner is allowed here and sits
+// pinned to the viewport bottom — the same static placement as the home
+// dashboard — instead of an in-flow slot that scrolls with the content. Matched
+// EXACTLY so the gameplay sub-routes (/brain/drills, /daily/word-hunt,
+// /daily/word-wheel, /daily/flow) stay blocked by GAME_ROUTES below.
+const ALLOWED_HUB_ROUTES = ['/brain', '/daily', '/connections'];
+
+const LOCALE_PREFIX = /^\/(en|he|sv|ja|es|ru)/;
+
+/**
+ * Whether the AdMob anchored banner may show on this route.
+ *
+ * @param pathname current pathname (may include a locale prefix)
+ * @param search   optional query params — used to keep the classroom/education
+ *                 multiplayer lobby (`/multiplayer?classroom=true`) ad-free, a
+ *                 child-directed surface that the bare path cannot reveal.
+ */
+export function isAllowedAdBannerRoute(
+  pathname: string | null,
+  search?: URLSearchParams | null,
+): boolean {
+  if (!pathname) return false;
+  // Ad-free surfaces (teacher / education / student / class join) win over everything.
+  if (isAdFreeRoute(pathname, search)) return false;
+  const path = pathname.replace(LOCALE_PREFIX, '') || '/';
+  // Normalise a single trailing slash so '/daily/' matches the hub exactly.
+  const normalized = path.length > 1 ? path.replace(/\/$/, '') : path;
+  // Hub landings win over their GAME_ROUTES prefix — exact match only.
+  if (ALLOWED_HUB_ROUTES.includes(normalized)) return true;
+  // Classroom multiplayer is an education (child-directed) surface — never monetize.
+  if (path.startsWith('/multiplayer') && search?.get('classroom') === 'true') {
+    return false;
+  }
+  return !GAME_ROUTES.some((r) => path.startsWith(r));
+}
+
+// ------------------------------------------------------------------
+// Ad-free surfaces — EVERY ad format, not just the anchored banner.
+//
+// The education module ("ad-free for students", see education/for-schools
+// content + `education.landing.pro.noAds`) and the operator console must never
+// carry AdSense auto-ads, interstitials, or banners. `isAllowedAdBannerRoute`
+// above only gates the native banner; this is the cross-format gate consumed
+// by AdSenseLoader (web auto-ads) and useInterstitialAd.
+// ------------------------------------------------------------------
+// `/join` is the class-code join (JoinFlow) — the student's first step into a classroom.
+// `/report` is the parent-report link (Teacher Pro) — a minor's name and
+// activity, opened with no account. Never monetized.
+const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/join', '/admin', '/report'];
+
+/**
+ * Whether NO ad of any kind may run on this route.
+ *
+ * @param pathname current pathname (may include a locale prefix)
+ * @param search   optional query — `/multiplayer?classroom=true` is the
+ *                 classroom lobby, an education surface the path alone hides.
+ */
+export function isAdFreeRoute(
+  pathname: string | null,
+  search?: URLSearchParams | null,
+): boolean {
+  if (!pathname) return false;
+  const path = pathname.replace(LOCALE_PREFIX, '') || '/';
+  if (path.startsWith('/multiplayer') && search?.get('classroom') === 'true') return true;
+  // Solo play launched from the student Academy (`?academy=1`) — a student surface.
+  if (search?.get('academy') === '1') return true;
+  return AD_FREE_ROUTES.some((r) => path === r || path.startsWith(`${r}/`));
+}

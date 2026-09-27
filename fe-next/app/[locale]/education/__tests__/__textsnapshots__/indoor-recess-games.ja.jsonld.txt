@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/indoor-recess-games#page",
+  "name": "雨の日の室内休み時間ゲーム | LexiClash",
+  "description": "20分の構造化された室内休み時間プラン。無料の単語ゲーム、静かなアクティビティ、すべてのクラスサイズに対応。",
+  "url": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/indoor-recess-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "室内休み時間ゲーム",
+      "item": "https://www.lexiclash.live/ja/education/indoor-recess-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/indoor-recess-games#resource",
+  "name": "雨の日の室内休み時間ゲーム | LexiClash",
+  "description": "LexiClashは、プロジェクター・タブレット・スマートフォンなどどのブラウザでも動く無料の単語ゲーム。クラス全体でマルチプレイでき、生徒のメールアドレスは不要。構造化された20分プランで、先生がリアルタイムに授業をコントロールできます。",
+  "url": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+  "inLanguage": "ja",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "6-13",
+  "teaches": "単語認識、語彙、協調的な問題解決、構造化されたゲームでの時間管理。",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT20M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/indoor-recess-games#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "学生はログインまたはアカウント設定が必要ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ。クラス全体でプレイするには、あなたが部屋を作成します。生徒はコードで参加します。メールなし、アカウントなし、パスワードなし。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "途中でアイデアが尽きたらどうしますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ゲームモードを変更。単語ハントをプレイしましたか？接続に切り替え。同じ20分ブロック、新しいパズル、エネルギーをリセット。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "読み取りが平均以下の子どもたちと一緒にプレイできますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。単語の難易度と長さを設定できます。若い読者向けの短い単語。あなたがボードを制御するので、ブロックの途中で難しいパズルをスキップできます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "実際にはどのくらいのデバイスが必要ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "たった1つ。プロジェクターとコンピューター、タブレット、またはスマートボード。あなたが制御します。他は皆見ていて答えを叫びます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "インターネットが接続されていない場合はどうしますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "これらのゲームにはインターネットが必要です。あなたのものがダウンしている場合は、上記の静かな紙のゲームを使用するか、壁のゲームにジャンプします：ハングマン、20の質問、またはライムチェーン。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "スコアを記録する必要がありますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ。ゲームはそれを保つ。しかし、あなたのクラスがスコアボードなしでより良く機能する場合は、スコア表示をオフにすることができます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "休み時間以外にこれらのゲームを使用できますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "もちろん。気分転換、レッスン終了、雨の日、または5分フィラー。同じ20分プランが機能します。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/brain-breaks-word-games#page",
+  "name": "Pausning för fokus i klassrummet | Ordspel online",
+  "description": "Snabba ordspel för att återställa fokus på 1–5 minuter. Ingen förberedelse, fungerar på alla enheter, hela klassen tillsammans.",
+  "url": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/brain-breaks-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Hjärnpauser",
+      "item": "https://www.lexiclash.live/sv/education/brain-breaks-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/brain-breaks-word-games#resource",
+  "name": "Pausning för fokus i klassrummet | Ordspel online",
+  "description": "En hjärnpaus är en 1–5 minuters aktivitet som återställer uppmärksamheten. LexiClash kör direktsända ordsökningsspel på vilken projektor eller delad skärm som helst—alla elever spelar samtidigt på sina telefoner. Ingen förberedelse, inga material. Det fungerar för att det kräver tillräckligt fokus för att avbryta rastlöshet utan att ta klassrummet ur kontroll.",
+  "url": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+  "inLanguage": "sv",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "6-14",
+  "teaches": "vocabulary, word recognition, attention reset",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT3M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/brain-breaks-word-games#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Hur ger jag eleverna en klassrumskod?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "När du startar ett klassrumsspel, visas en kod på din skärm. Säg den högt eller visa den på tavlan. Eleverna skriver eller skannar in den på sin telefon. De går med på 10 sekunder. Ingen inloggning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vad händer om vissa elever inte har en telefon?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "De kan para ihop sig med en klasskamrat eller spela som lag. Eller spara enspelar-spel till när alla enheter är närvarande. Pausningar är flexibla."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Måste jag lära dem hur man spelar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nej. Reglerna är på skärmen. Vid första omgången, gå igenom ett snabbt exempel. De flesta förstår på 30 sekunder."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag använda detta om jag undervisar ett annat språk?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash stöder sex språk: engelska, hebreiska, spanska, svenska, japanska och ryska. Ställ in ditt klassrumsspråk och spelen använder ord på det språket. Du kan också ladda upp anpassade ordlistor."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur lång ska en hjärnpaus vara?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1–5 minuter. Kortare är ofta bättre. Ett 2-minuters spel räcker mellan aktiviteter. Längre (3–5) om eleverna är mycket rastlösa."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kommer detta att distraera eleverna från lektionen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Bara om du inte sätter en tydlig gräns. Säg från början: \"Vi spelar i 3 minuter, sedan telefoner in.\" När eleverna vet gränsen, fokuserar de om mer lätt."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag använda samma spel två gånger på en vecka?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Upprepning är okej. Eleverna tycker ofta om att spela igen för att slå sitt eget poäng."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vilka spel är bäst för pausningar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ordsökning (tyst grill-sökning), ordhjul (snurrande) och snabba dueler (1–2 min) fungerar bäst. Undvik långa turneringar. Välj spel som eleverna kan hoppa in i på 10 sekunder."
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+    at AsyncTaskManager.abortAll (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/async-task-manager/AsyncTaskManager.js:292:30)
+    at AsyncTaskManager.abort (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/async-task-manager/AsyncTaskManager.js:52:21)
+    at DetachedBrowserFrame.abort (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/browser/detached-browser/DetachedBrowserFrame.js:112:58)
+    at DetachedWindowAPI.abort (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/window/DetachedWindowAPI.js:51:35)
+    at teardownWindow (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/vitest/dist/chunks/index.DC7d2Pf8.js:331:22)
+    at Object.teardown (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/vitest/dist/chunks/index.DC7d2Pf8.js:392:10)
+    at file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/vitest/dist/chunks/base.B6Opl8PE.js:168:65
+    at Traces.$ (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)
+DOMException [AbortError]: The operation was aborted.
+    at Fetch.onAsyncTaskManagerAbort (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/fetch/Fetch.js:546:23)
+    at Object.<anonymous> (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/fetch/Fetch.js:416:101)
+    at AsyncTaskManager.abortAll (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/async-task-manager/AsyncTaskManager.js:292:30)
+    at AsyncTaskManager.abort (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/async-task-manager/AsyncTaskManager.js:52:21)
+    at DetachedBrowserFrame.abort (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/browser/detached-browser/DetachedBrowserFrame.js:112:58)
+    at DetachedWindowAPI.abort (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/happy-dom/lib/window/DetachedWindowAPI.js:51:35)
+    at teardownWindow (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/vitest/dist/chunks/index.DC7d2Pf8.js:331:22)
+    at Object.teardown (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/vitest/dist/chunks/index.DC7d2Pf8.js:392:10)
+    at file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/vitest/dist/chunks/base.B6Opl8PE.js:168:65
+    at Traces.$ (file:///Users/ohadfisher/git/boggle-new/fe-next/node_modules/vitest/dist/chunks/traces.DT5aQ62U.js:142:27)
+
+ Test Files  184 passed (184)
+      Tests  984 passed (984)
+   Start at  23:30:27
+   Duration  53.05s (transform 8.50s, setup 62.01s, import 45.27s, tests 25.01s, environment 52.00s)
+
+VITEST_RC=0
