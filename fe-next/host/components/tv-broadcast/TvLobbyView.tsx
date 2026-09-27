@@ -18,7 +18,6 @@ import { useClassroomModeSeed } from '../../hooks/useClassroomModeSeed';
 import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
-import { LobbyDevChromeGuard } from '@/components/multiplayer/lobby/LobbyDevChromeGuard';
 import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
 
 /** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
@@ -230,7 +229,6 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
           practiceRoundPending={soloDemoInProgress}
           practiceRoundFailed={soloDemoFailed}
         />
-        <LobbyDevChromeGuard />
         {/* Receive-only emoji floats — students fling reactions, the wall shows them. */}
         <LobbyReactions username={username} receiveOnly />
       </>
@@ -245,7 +243,6 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   // join card (QR + code) and the one START. Fits 1920×1080 with no scroll.
   return (
     <div data-testid="tv-lobby-view" className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-neo-navy text-neo-white tv:[--mp-u:1.25]">
-      <LobbyDevChromeGuard />
       <TvJoinBar gameCode={gameCode} playerCount={playerCount} language={roomLanguage} t={t} />
 
       <div className="flex-1 min-h-0 grid grid-cols-12 gap-6 tv:gap-10 px-6 py-5 tv:px-10 tv:py-6 w-full max-w-[1800px] mx-auto">

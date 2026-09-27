@@ -4393,6 +4393,18 @@ body.crazygames-embed .game-view-container,
   .mp-screen { --mp-u: 1.5; }
 }
 
+/* Dev-only TanStack Query devtools launcher: a fixed 48px button docked at the
+   bottom-end corner — exactly where every MpScreen (and the TV lobby) pins its
+   footer CTA (QUICK START/CREATE on the entry, START BATTLE/READY in the
+   lobbies, mirrored in RTL). The launcher only exists in development builds, so
+   this rule is inert in prod. Plain CSS, not a component-rendered <style>:
+   React 19 hydration removes a non-precedence <style> that SSR shipped, which
+   is why the component guard never actually applied in the live dev browser. */
+body:has([data-mp-screen]) .tsqd-open-btn-container,
+body:has([data-testid="tv-lobby-view"]) .tsqd-open-btn-container {
+  display: none !important;
+}
+
 /* Document-scroll lock while any MpScreen is mounted (useMpShellLock). Its own
    class, never screen-fit-locked (NavigationContext's), so each value has one
    writer. Outranks .screen-fit on specificity, like body.edu-shell-locked. */
