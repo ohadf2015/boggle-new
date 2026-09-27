@@ -37,7 +37,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function EducationPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const content = educationSeoContent[locale] ?? educationSeoContent.en;
-  const faqSchema = buildEducationFaqJsonLd(locale, content.faq);
+  const faqItems = content.geoAnswer ? [content.geoAnswer, ...content.faq] : content.faq;
+  const faqSchema = buildEducationFaqJsonLd(locale, faqItems);
   const orgSchema = buildEducationOrgJsonLd(locale);
   const breadcrumbSchema = buildEducationBreadcrumbJsonLd(locale);
   const courseSchema = buildEducationCourseJsonLd(locale);
@@ -55,13 +56,28 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       )}
       <EducationPageClient />
+      {content.geoAnswer && (
+        <section
+          data-answer
+          className="mx-auto mt-8 w-full max-w-4xl px-4 font-neo-body text-neo-white"
+        >
+          <div className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-8">
+            <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
+              {content.geoAnswer.question}
+            </h2>
+            <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">
+              {content.geoAnswer.answer}
+            </p>
+          </div>
+        </section>
+      )}
       <EducationResourceLinks locale={locale} />
       <GamePageSeoContent
         title={content.title}
         description={content.description}
         features={content.features}
         faq={content.faq}
-        collapsible
+        faqAsHeadings
       />
     </>
   );

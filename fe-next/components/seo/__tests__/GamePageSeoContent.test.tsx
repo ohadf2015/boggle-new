@@ -101,4 +101,11 @@ describe('GamePageSeoContent', () => {
     // Only the FAQ items use <details> — the outer card must not be one.
     expect(container.querySelector('section > details')).toBeNull();
   });
+
+  it('faqAsHeadings renders visible H3s instead of FAQ accordions', () => {
+    const { container } = render(<GamePageSeoContent {...props} faqAsHeadings />);
+    expect(container.querySelector('h3')?.textContent).toBe('Is it free?');
+    expect(container.querySelector('[data-geo-faq]')).not.toBeNull();
+    expect(container.querySelector('details')).toBeNull();
+  });
 });

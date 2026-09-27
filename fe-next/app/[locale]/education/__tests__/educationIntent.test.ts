@@ -66,6 +66,34 @@ describe('hub FAQ — GEO-citable teacher questions', () => {
   });
 });
 
+describe('hub GEO answer — 40–60 word cite-able H2 block', () => {
+  function wordCount(s: string): number {
+    return s.trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  it('every locale ships a geoAnswer in the 40–60 word band', () => {
+    for (const loc of Object.keys(educationSeoContent)) {
+      const { question, answer } = educationSeoContent[loc].geoAnswer;
+      expect(question.length, `${loc} geo q`).toBeGreaterThan(10);
+      const n = wordCount(answer);
+      if (loc === 'ja') {
+        // Japanese copy is not space-delimited; pin a real paragraph, not tokens.
+        expect(answer.length, `${loc} geo answer chars`).toBeGreaterThan(80);
+      } else {
+        expect(n, `${loc} geo answer words=${n}`).toBeGreaterThanOrEqual(40);
+        expect(n, `${loc} geo answer words=${n}`).toBeLessThanOrEqual(70);
+      }
+    }
+  });
+
+  it('EN/HE/ES answers name the no-login + 6-character join code moat', () => {
+    expect(educationSeoContent.en.geoAnswer.answer).toMatch(/6-character/i);
+    expect(educationSeoContent.en.geoAnswer.answer).toMatch(/no app|no .*account/i);
+    expect(educationSeoContent.he.geoAnswer.answer).toMatch(/6 תווים/);
+    expect(educationSeoContent.es.geoAnswer.answer).toMatch(/6 caracteres/);
+  });
+});
+
 describe('hub FAQ — native Hebrew, not machine-translated', () => {
   const he = educationSeoContent.he.faq;
   const allHe = he.map((f) => `${f.question} ${f.answer}`).join(' ');

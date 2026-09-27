@@ -38,11 +38,29 @@ export function educationCourseJsonLd(args: { name: string; description: string;
   return {
     '@context': 'https://schema.org',
     '@type': 'Course',
+    '@id': `${args.url}#course`,
     name: args.name,
     description: args.description,
     url: args.url,
     provider: { '@type': 'Organization', name: 'LexiClash', url: BASE_URL },
     inLanguage: args.locale,
+    isAccessibleForFree: true,
+    // Google Course rich results flag a missing offers/hasCourseInstance pair
+    // as an error. The classroom games are free; Teacher Pro is a separate product.
+    offers: {
+      '@type': 'Offer',
+      category: 'Free',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+    },
+    hasCourseInstance: [
+      {
+        '@type': 'CourseInstance',
+        courseMode: 'Online',
+        courseWorkload: 'PT5M',
+      },
+    ],
   };
 }
 

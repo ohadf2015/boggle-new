@@ -125,6 +125,13 @@ export function buildEducationCourseJsonLd(locale: string) {
     url: `${BASE_URL}/${lang}/education`,
     inLanguage: lang,
     isAccessibleForFree: true,
+    offers: {
+      '@type': 'Offer' as const,
+      category: 'Free',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+    },
     educationalLevel: ['Primary', 'Secondary', 'Adult Education'],
     teaches: 'Vocabulary, spelling, word recognition, language fluency',
     provider: {

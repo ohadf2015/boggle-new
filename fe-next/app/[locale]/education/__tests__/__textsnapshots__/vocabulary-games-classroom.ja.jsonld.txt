@@ -134,6 +134,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Course",
+  "@id": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom#course",
   "name": "無料の教室向け語彙ゲーム — ライブマルチプレイヤー、6言語 | LexiClash",
   "description": "無料で使える教室向けの語彙ゲーム。ライブマルチプレイヤー、1v1デュエル、自分の単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語、ロシア語の6言語に対応。どのブラウザでも動作。無料で始められます。",
   "url": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
@@ -142,5 +143,20 @@
     "name": "LexiClash",
     "url": "https://www.lexiclash.live"
   },
-  "inLanguage": "ja"
+  "inLanguage": "ja",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
+    }
+  ]
 }
