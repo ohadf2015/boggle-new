@@ -35,7 +35,7 @@ vi.mock('../../utils/metrics', () => ({ inc: vi.fn() }));
 vi.mock('../../utils/logger', () => ({ __esModule: true, default: { info: vi.fn(), warn: vi.fn(), debug: vi.fn(), error: vi.fn() } }));
 vi.mock('../shared', () => ({ isSocketMigrating: vi.fn().mockReturnValue(false) }));
 
-import { registerLobbyAdGateHandlers, __resetLobbyAdGateState } from '../lobbyAdGateHandler';
+import { registerLobbyAdGateHandlers, __resetLobbyAdGateState, wasRecentAdWatcher } from '../lobbyAdGateHandler';
 
 function createMockSocket(id: string): Socket & { _handlers: Record<string, Function> } {
   const handlers: Record<string, Function> = {};
@@ -91,8 +91,22 @@ describe('lobbyAdGateHandler', () => {
     expect(lastUpdate(io)).toEqual({ usernames: [] });
   });
 
-  it('ignores the signal outside the lobby (gameState !== waiting)', () => {
+  it('accepts the signal on the results screen (gameState finished)', () => {
+    // The host's between-games interstitial runs in 'finished' — the room (and
+    // the host-transfer grace) must still learn that someone is mid-ad.
+    mockGetGame.mockReturnValue({ gameState: 'finished' });
+    socket._handlers['lobby:adWatching']({ active: true });
+    expect(lastUpdate(io)).toEqual({ usernames: ['Alice'] });
+  });
+
+  it('accepts the signal mid-round (gameState playing) — a mid-round rewarded ad protects the watcher too', () => {
     mockGetGame.mockReturnValue({ gameState: 'playing' });
+    socket._handlers['lobby:adWatching']({ active: true });
+    expect(lastUpdate(io)).toEqual({ usernames: ['Alice'] });
+  });
+
+  it('ignores when there is no game at all', () => {
+    mockGetGame.mockReturnValue(null);
     socket._handlers['lobby:adWatching']({ active: true });
     expect(lastUpdate(io)).toBeNull();
   });
@@ -114,6 +128,41 @@ describe('lobbyAdGateHandler', () => {
     expect(lastUpdate(io)).toEqual({ usernames: ['Alice'] });
     socket._handlers['disconnect']?.('transport close');
     expect(lastUpdate(io)).toEqual({ usernames: [] });
+  });
+
+  it('a disconnect mid-ad leaves a short grace marker for the host-transfer guard', () => {
+    // handleHostDisconnect reads wasRecentAdWatcher to take the grace path
+    // instead of instantly transferring a host whose socket died under a
+    // fullscreen ad. The UI gate still clears immediately (no wedged Start).
+    socket._handlers['lobby:adWatching']({ active: true });
+    socket._handlers['disconnect']?.('transport close');
+    expect(lastUpdate(io)).toEqual({ usernames: [] });
+    expect(wasRecentAdWatcher('sock-1')).toBe(true);
+  });
+
+  it('the grace marker expires on its own (TTL)', () => {
+    vi.useFakeTimers();
+    try {
+      socket._handlers['lobby:adWatching']({ active: true });
+      socket._handlers['disconnect']?.('transport close');
+      expect(wasRecentAdWatcher('sock-1')).toBe(true);
+      vi.advanceTimersByTime(2 * 60 * 1000 + 1000);
+      expect(wasRecentAdWatcher('sock-1')).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('no grace marker for a disconnect that was NOT mid-ad', () => {
+    socket._handlers['disconnect']?.('transport close');
+    expect(wasRecentAdWatcher('sock-1')).toBe(false);
+  });
+
+  it('no grace marker after a clean ad end (active=false before disconnect)', () => {
+    socket._handlers['lobby:adWatching']({ active: true });
+    socket._handlers['lobby:adWatching']({ active: false });
+    socket._handlers['disconnect']?.('transport close');
+    expect(wasRecentAdWatcher('sock-1')).toBe(false);
   });
 
   it('tracks multiple watchers independently', () => {

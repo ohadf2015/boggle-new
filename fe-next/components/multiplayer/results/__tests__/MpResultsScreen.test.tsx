@@ -88,6 +88,7 @@ vi.mock('@/lib/boardSelection', () => ({ pickRichestBoardClient: () => [['A']] }
 
 import MpResultsScreen from '../MpResultsScreen';
 import { useGameStore } from '@/hooks/gameState/store';
+import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 
 type Socket = { emit: ReturnType<typeof vi.fn>; on: ReturnType<typeof vi.fn>; off: ReturnType<typeof vi.fn> };
 
@@ -133,6 +134,7 @@ describe('MpResultsScreen', () => {
     h.showInterstitial.mockReset();
     h.showInterstitial.mockResolvedValue(undefined);
     sessionStorage.clear();
+    emitRewardAdActive(false); // module-level bus flag survives across tests
   });
   afterEach(() => vi.useRealTimers());
 
@@ -228,6 +230,45 @@ describe('MpResultsScreen', () => {
     expect(h.showInterstitial).toHaveBeenCalledTimes(1);
     await act(async () => { await Promise.resolve(); await Promise.resolve(); });
     expect(socket.emit.mock.calls.map((c) => c[0])).toContain('resetGame');
+  });
+
+  describe('ad-gate on the intermission (the "ad between games" hold)', () => {
+    const adUpdateFrom = (socket: Socket) =>
+      socket.on.mock.calls.find((c) => c[0] === 'lobbyAdWatchingUpdate')?.[1] as ((d: { usernames: string[] }) => void) | undefined;
+
+    it('echoes local fullscreen-ad state to the room via lobby:adWatching (the server ad-gate + host hold read it)', () => {
+      const { socket } = renderScreen({ isHost: true });
+      act(() => { emitRewardAdActive(true); });
+      expect(socket.emit.mock.calls.filter((c) => c[0] === 'lobby:adWatching').at(-1)?.[1]).toEqual({ active: true });
+      act(() => { emitRewardAdActive(false); });
+      expect(socket.emit.mock.calls.filter((c) => c[0] === 'lobby:adWatching').at(-1)?.[1]).toEqual({ active: false });
+    });
+
+    it('host: START NEXT holds while a room member is mid-ad, resumes when the ad ends', () => {
+      const { socket } = renderScreen({ isHost: true });
+      skip();
+      const adUpdate = adUpdateFrom(socket);
+      expect(adUpdate).toBeTypeOf('function');
+      act(() => { adUpdate!({ usernames: ['Leo'] }); });
+      const cta = screen.getByTestId('mp-primary-cta');
+      expect(cta).toBeDisabled();
+      expect(cta.textContent).toContain('hostView.adWatchHold');
+      act(() => { adUpdate!({ usernames: [] }); });
+      expect(screen.getByTestId('mp-primary-cta')).not.toBeDisabled();
+    });
+
+    it('host: the auto-advance holds while a room member is mid-ad, and resumes after', async () => {
+      vi.useFakeTimers();
+      const { socket } = renderScreen({ isHost: true });
+      skip();
+      const adUpdate = adUpdateFrom(socket);
+      act(() => { adUpdate!({ usernames: ['Leo'] }); });
+      await act(async () => { vi.advanceTimersByTime(11_000); });
+      expect(h.showInterstitial).not.toHaveBeenCalled(); // held — no auto-start mid-ad
+      act(() => { adUpdate!({ usernames: [] }); });
+      await act(async () => { vi.advanceTimersByTime(11_000); });
+      expect(h.showInterstitial).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('final (series complete): host REMATCH starts a new series', async () => {

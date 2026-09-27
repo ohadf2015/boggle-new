@@ -14,6 +14,7 @@ import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
 import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import { useMpExit } from '@/hooks/useMpExit';
+import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { getGuestStatsSummary } from '@/utils/guestManager';
 import { useGameMode, useGameModeConfirmed, useHostSelectedGameMode, useGameActions } from '@/hooks/gameState/store';
 import { playedGameMode } from '@/lib/education/roundEndResultsRoute';
@@ -88,6 +89,13 @@ export function useMpResultsController(props: MpResultsProps) {
 
   const socketEvents = useResultsSocketEvents({ socket, username });
   const reactions = useQuickReactions({ socket: socket ?? null, username: username || '' });
+
+  // The intermission ad-gate: echo this client's fullscreen-ad state to the
+  // room (the server holds an ad-watching host's seat; the room sees who is
+  // mid-ad), and hold the host's START NEXT / auto-advance while ANY member is
+  // mid-ad — starting then would tear the watcher out of their ad (the "ad
+  // between games → the game isn't waiting" report). Same gate as the lobby's.
+  const adGate = useLobbyAdGate({ socket: socket ?? null });
 
   const data = useResultsData({
     finalScores,
@@ -213,6 +221,7 @@ export function useMpResultsController(props: MpResultsProps) {
     setSelectedGameMode,
     socketEvents,
     reactions,
+    adGate,
     data,
     marginToNext,
     sideEffects,

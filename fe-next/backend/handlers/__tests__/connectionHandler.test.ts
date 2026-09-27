@@ -70,6 +70,14 @@ vi.mock('../../utils/gameStartCoordinator', () => ({
   default: { handlePlayerDisconnect: vi.fn() },
 }));
 
+// The ad-gate's grace marker decides instant-transfer vs hold-the-seat for a
+// host whose socket died under a fullscreen ad. Mocked: the marker lifecycle
+// itself is pinned in lobbyAdGateHandler.test.ts.
+const { mockWasRecentAdWatcher } = vi.hoisted(() => ({ mockWasRecentAdWatcher: vi.fn() }));
+vi.mock('../lobbyAdGateHandler', () => ({
+  wasRecentAdWatcher: (...a: unknown[]) => mockWasRecentAdWatcher(...a),
+}));
+
 const mockGetGame = getGame as Mock;
 const mockGetGameBySocketId = getGameBySocketId as Mock;
 const mockGetUsernameBySocketId = getUsernameBySocketId as Mock;
@@ -124,6 +132,7 @@ describe('connectionHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+    mockWasRecentAdWatcher.mockReturnValue(false);
     mockGetGameRoom.mockReturnValue('game:GAME1');
     mockGetActiveRooms.mockReturnValue([]);
     mockGetGameUsers.mockReturnValue([]);
@@ -350,6 +359,54 @@ describe('connectionHandler', () => {
 
   // ─── Host disconnect ───
   describe('host disconnect', () => {
+    it('holds the host seat (grace path, NO instant transfer) when the host dropped mid-ad', () => {
+      // A fullscreen ad (interstitial between games, rewarded mid-round) can
+      // kill the socket. The ad ends in seconds and the client reconnects and
+      // reclaims host — an instant transfer would strand them and let the new
+      // host start the next round without them (the "ad between games →
+      // disconnected" report). The grace marker comes from lobbyAdGateHandler.
+      mockWasRecentAdWatcher.mockReturnValue(true);
+      const game = makeGame();
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetNextEligibleHost.mockReturnValue('Player1');
+      mockTransferHost.mockReturnValue({ success: true });
+
+      handlers['disconnect']('transport close');
+
+      expect(mockTransferHost).not.toHaveBeenCalled();
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'hostDisconnected',
+        expect.objectContaining({ gracePeriodMs: expect.any(Number) })
+      );
+      expect(mockTimerManager.setTimeout).toHaveBeenCalledWith(
+        'hostReconnect:GAME1', expect.any(Function), expect.any(Number)
+      );
+    });
+
+    it('still transfers instantly when the host was NOT mid-ad', () => {
+      mockWasRecentAdWatcher.mockReturnValue(false);
+      const game = makeGame();
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Host');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetNextEligibleHost.mockReturnValue('Player1');
+      mockTransferHost.mockReturnValue({ success: true });
+
+      handlers['disconnect']('transport close');
+
+      expect(mockTransferHost).toHaveBeenCalledWith('GAME1', 'Player1');
+    });
+
     it('transfers host to next eligible player immediately', () => {
       const game = makeGame();
       const { socket, handlers } = createMockSocket('socket-host');

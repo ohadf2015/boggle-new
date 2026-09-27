@@ -27,6 +27,11 @@ export interface ShowRewardedOptions {
   name: string;
 }
 
+/** Caps the interstitial await: a blocked SDK queues the break into a
+ *  never-arriving adsbygoogle and adBreakDone never fires — the MP host awaits
+ *  this before startGame, so a hang here would wedge the whole room on results. */
+export const H5_INTERSTITIAL_SAFETY_MS = 30_000;
+
 export interface UseH5GamesAdsReturn {
   /** Load + configure the SDK. Idempotent. */
   initialize: () => Promise<void>;
@@ -36,8 +41,9 @@ export interface UseH5GamesAdsReturn {
     onError?: (reason: string) => void,
     opts?: ShowRewardedOptions,
   ) => void;
-  /** Fire-and-forget interstitial (`type:'next'`). Safe to call without awaiting. */
-  showInterstitial: (name: string) => void;
+  /** Interstitial (`type:'next'`). Resolves on adBreakDone / throw / safety
+   *  watchdog — awaiting it gates on the ad cycle (MP host's next round). */
+  showInterstitial: (name: string) => Promise<void>;
   /** True in browser; false during SSR. Does NOT mean "ads will fill" — that's runtime. */
   isAvailable: boolean;
 }
@@ -103,15 +109,27 @@ export function useH5GamesAds(): UseH5GamesAdsReturn {
     });
   }, [isAvailable]);
 
-  const showInterstitial = useCallback((name: string) => {
-    if (!isAvailable) return;
-    const fire = () => {
-      try {
-        adBreak({ type: 'next', name });
-      } catch { /* fire-and-forget; nothing to surface */ }
-    };
-    if (!initRef.current) initRef.current = initH5GamesAds();
-    initRef.current.then(fire).catch(fire);
+  const showInterstitial = useCallback((name: string): Promise<void> => {
+    if (!isAvailable) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      let settled = false;
+      const settle = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(watchdog);
+        resolve();
+      };
+      const watchdog = setTimeout(settle, H5_INTERSTITIAL_SAFETY_MS);
+      const fire = () => {
+        try {
+          adBreak({ type: 'next', name, adBreakDone: () => settle() });
+        } catch {
+          settle();
+        }
+      };
+      if (!initRef.current) initRef.current = initH5GamesAds();
+      initRef.current.then(fire).catch(fire);
+    });
   }, [isAvailable]);
 
   return { initialize, showRewarded, showInterstitial, isAvailable };

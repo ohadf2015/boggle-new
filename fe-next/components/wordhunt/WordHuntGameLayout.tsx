@@ -243,8 +243,12 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         <div
           className={cn(
             'flex-1 min-h-0 px-1 relative overflow-hidden flex justify-center',
-            // MP round frame: board low in the thumb zone; the gap above is the callout stage.
-            mpChrome ? 'items-end pb-9 lg:pb-1' : 'items-center',
+            // MP round frame: the square is width-bound on a tall phone, so the
+            // excess height is split — the callout stage (offset 132px, below the
+            // life bar) owns the band above, pb keeps a thumb-zone bias below and
+            // clears the absolute found pill. items-end pooled ~230px of dead navy
+            // above the board at 390x844 (r4 review).
+            mpChrome ? 'items-center pb-9 lg:pb-1' : 'items-center',
           )}
           style={{ containerType: 'size' }}
         >

@@ -130,7 +130,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const auto = useAutoAdvance({
     seconds: AUTO_ADVANCE_SECONDS,
     armed: footerShown,
-    paused: detailsOpen || pickerOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || socketEvents.showWordFeedback,
+    paused: detailsOpen || pickerOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || socketEvents.showWordFeedback || c.adGate.anyAdActive,
     enabled: branch === 'intermission' && !c.isClassroom && (isHost || !isReady),
     onFire: isHost ? handleStartGame : handleMarkReady,
     persistCancel: !isOnCrazyGamesPlatform,
@@ -274,6 +274,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
               ready={tally.ready}
               total={tally.total}
               auto={{ active: auto.active, secondsLeft: auto.secondsLeft, total: AUTO_ADVANCE_SECONDS, cancel: auto.cancel }}
+              adHold={c.adGate.anyAdActive}
               onStart={startNext}
               onReady={markReady}
               t={t}
