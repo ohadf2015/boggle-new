@@ -134,6 +134,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Course",
+  "@id": "https://www.lexiclash.live/es/education/vocabulary-games-classroom#course",
   "name": "Juegos de vocabulario gratis para el aula — Multijugador en vivo, 6 idiomas | LexiClash",
   "description": "Juegos de vocabulario gratis para la clase. Multijugador en vivo, duelos de vocabulario 1v1, tus listas de palabras. 6 idiomas incl. hebreo y ruso. Cualquier navegador. Gratis para empezar.",
   "url": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
@@ -142,5 +143,20 @@
     "name": "LexiClash",
     "url": "https://www.lexiclash.live"
   },
-  "inLanguage": "es"
+  "inLanguage": "es",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
+    }
+  ]
 }

@@ -37,4 +37,24 @@ describe('educationStructuredData — canonical domain', () => {
     expect(schema.provider.url).toBe('https://www.lexiclash.live');
     expect(schema.provider.url).not.toContain('lexiclash.com');
   });
+
+  it('educationCourseJsonLd includes Offer + CourseInstance so Google Course rich results have zero missing-field errors', () => {
+    const schema = educationCourseJsonLd({
+      name: 'Vocabulary Building Through Word Games',
+      description: 'Self-paced classroom word games.',
+      url: 'https://www.lexiclash.live/en/education/games-for-teachers',
+      locale: 'en',
+    });
+    expect(schema['@type']).toBe('Course');
+    expect(schema.isAccessibleForFree).toBe(true);
+    expect(schema.offers).toMatchObject({
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    });
+    expect(schema.hasCourseInstance[0]).toMatchObject({
+      '@type': 'CourseInstance',
+      courseMode: 'Online',
+    });
+  });
 });

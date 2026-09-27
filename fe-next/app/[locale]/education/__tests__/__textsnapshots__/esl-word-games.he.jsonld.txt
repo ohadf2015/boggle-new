@@ -135,6 +135,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Course",
+  "@id": "https://www.lexiclash.live/he/education/esl-word-games#course",
   "name": "משחקי מילים באנגלית לכיתה — בהובלת המורה, 6 שפות | LexiClash",
   "description": "משחקי מילים באנגלית שמריצים לכל הכיתה: התלמידים מצטרפים מהטלפון עם קוד בן שישה תווים, הלוח עולה על המקרן, ואתם קובעים תמיכה, ליבה או אתגר לכל תלמיד. שש שפות, בלי חשבונות תלמידים.",
   "url": "https://www.lexiclash.live/he/education/esl-word-games",
@@ -143,5 +144,20 @@
     "name": "LexiClash",
     "url": "https://www.lexiclash.live"
   },
-  "inLanguage": "he"
+  "inLanguage": "he",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
+    }
+  ]
 }

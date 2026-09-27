@@ -19,6 +19,12 @@ interface GamePageSeoContentProps {
   /** Escape hatch: keep the old visually-hidden rendering for pages whose design
    *  cannot host a visible reference block (e.g. the 3D showcase landing). */
   srOnly?: boolean;
+  /**
+   * Education/GEO pages: render each FAQ as a visible H3 + paragraph instead of
+   * a collapsed <details>. Answer engines quote the first visible heading.
+   * Game screens keep the accordion (default) so the play surface stays first.
+   */
+  faqAsHeadings?: boolean;
 }
 
 /**
@@ -47,6 +53,7 @@ export function GamePageSeoContent({
   asH1 = false,
   collapsible = false,
   srOnly = false,
+  faqAsHeadings = false,
 }: GamePageSeoContentProps) {
   const Heading = asH1 ? 'h1' : 'h2';
 
@@ -101,26 +108,36 @@ export function GamePageSeoContent({
       )}
 
       {faq.length > 0 && (
-        <div className="space-y-2">
-          {faq.map((item, i) => (
-            <details
-              key={i}
-              className="group rounded-neo border-2 border-neo-black bg-neo-navy shadow-hard-sm"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 font-neo-display font-bold text-neo-white marker:hidden sm:p-4">
-                <span>{item.question}</span>
-                <span
-                  aria-hidden
-                  className="shrink-0 font-black text-neo-pink transition-transform duration-200 group-open:rotate-45"
-                >
-                  +
-                </span>
-              </summary>
-              <p className="px-3 pb-3 text-sm leading-relaxed text-neo-cream/90 sm:px-4 sm:pb-4">
-                {item.answer}
-              </p>
-            </details>
-          ))}
+        <div className="space-y-3" data-geo-faq={faqAsHeadings ? '' : undefined}>
+          {faq.map((item, i) =>
+            faqAsHeadings ? (
+              <article
+                key={i}
+                className="rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-3 shadow-hard-sm sm:px-4 sm:py-4"
+              >
+                <h3 className="font-neo-display font-bold text-neo-white">{item.question}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neo-cream/90">{item.answer}</p>
+              </article>
+            ) : (
+              <details
+                key={i}
+                className="group rounded-neo border-2 border-neo-black bg-neo-navy shadow-hard-sm"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 font-neo-display font-bold text-neo-white marker:hidden sm:p-4">
+                  <span>{item.question}</span>
+                  <span
+                    aria-hidden
+                    className="shrink-0 font-black text-neo-pink transition-transform duration-200 group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="px-3 pb-3 text-sm leading-relaxed text-neo-cream/90 sm:px-4 sm:pb-4">
+                  {item.answer}
+                </p>
+              </details>
+            ),
+          )}
         </div>
       )}
     </>

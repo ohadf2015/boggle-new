@@ -9,7 +9,13 @@
   "isPartOf": {
     "@id": "https://www.lexiclash.live/he/education#org"
   },
-  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp"
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
 }
 ---
 {
@@ -43,7 +49,7 @@
   "@type": "LearningResource",
   "@id": "https://www.lexiclash.live/he/education/games-for-teachers#resource",
   "name": "משחקי מילים חינמיים למורים — בלי הכנה, עם אנליטיקה | LexiClash",
-  "description": "משחקי מילים בחינם לכיתה. בלי הכנה, עם הרשימות שלכם ומעקב התקדמות. ל-5 דקות, להפסקה או ליום מילוי מקום. חינם להתחלה.",
+  "description": "יוצרים כיתה ב-LexiClash Education ומשתפים קוד בן 6 תווים. התלמידים משחקים בכל דפדפן — Chromebook, טלפון או טאבלט — בלי אפליקציה ובלי חשבון. משתמשים ברשימת המילים שלכם. סבב נמשך 2–10 דקות לחימום, להפסקה או ליום מילוי מקום. המסלול החינמי מכסה 3 כיתות עד 50 תלמידים.",
   "url": "https://www.lexiclash.live/he/education/games-for-teachers",
   "inLanguage": "he",
   "learningResourceType": "Activity",
@@ -127,6 +133,36 @@
         "@type": "Answer",
         "text": "לא. כל דפדפן מספיק: טלפונים, טאבלטים ומחשבים. עובד אפילו עם WiFi חלש."
       }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "@id": "https://www.lexiclash.live/he/education/games-for-teachers#course",
+  "name": "משחקי מילים חינמיים למורים — בלי הכנה, עם אנליטיקה | LexiClash",
+  "description": "משחקי מילים בחינם לכיתה. בלי הכנה, עם הרשימות שלכם ומעקב התקדמות. ל-5 דקות, להפסקה או ליום מילוי מקום. חינם להתחלה.",
+  "url": "https://www.lexiclash.live/he/education/games-for-teachers",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "he",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
     }
   ]
 }

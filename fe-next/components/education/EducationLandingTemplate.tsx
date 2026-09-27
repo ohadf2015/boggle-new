@@ -9,6 +9,7 @@ import { ACCENT, EducationSectionRenderer } from '@/components/education/Educati
 import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
+import { GeoFaqList } from '@/components/seo/GeoFaqList';
 import {
   buildEducationLandingJsonLd,
   type EducationLandingContent,
@@ -172,34 +173,8 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
           );
         })}
 
-        {content.faqs.length > 0 && (
-          <section className="mt-20 sm:mt-24">
-            <h2 className="font-neo-display text-3xl font-black uppercase leading-[1.05] sm:text-4xl">
-              {content.labels.faqTitle}
-            </h2>
-            <div className="mt-8 space-y-3">
-              {content.faqs.map((faq) => (
-                <details
-                  key={faq.q}
-                  className="group rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light shadow-hard open:shadow-hard-lg"
-                >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
-                    <span>{faq.q}</span>
-                    <span
-                      className={`grid h-7 w-7 shrink-0 place-items-center rounded border-2 border-neo-black ${a.fill} ${a.ink} transition-transform duration-150 group-open:rotate-45`}
-                      aria-hidden
-                    >
-                      +
-                    </span>
-                  </summary>
-                  <div className="border-t-3 border-neo-black px-5 py-4 text-sm leading-relaxed text-neo-white/75 sm:px-6 sm:text-base">
-                    {faq.a}
-                  </div>
-                </details>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* Always-visible H2/H3 Q&A — GEO engines quote expanded headings, not collapsed <details>. */}
+        <GeoFaqList title={content.labels.faqTitle} items={content.faqs} />
 
         {/*
           The page's own curated links render first; `EducationRelatedLinks` tops
