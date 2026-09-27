@@ -19,10 +19,12 @@ describe('EmoteTray — the trigger reads as a control on a navy card', () => {
     expect(screen.getByTestId('emote-trigger').className).toContain('border-[2px]');
   });
 
-  it('borders in cream, not black — black on navy is 1.23:1', () => {
+  it('borders in black on the pink face — cream on pink would sink under 3:1', () => {
     render(<EmoteTray onEmote={vi.fn()} t={t} compact />);
     const cls = screen.getByTestId('emote-trigger').className;
-    expect(cls).toContain('border-neo-cream');
-    expect(cls).not.toContain('border-neo-black');
+    expect(cls).toContain('bg-neo-pink');
+    expect(cls).toContain('border-neo-black');
+    expect(cls).not.toContain('border-neo-cream');
+    expect(cls).toContain('rounded-full');
   });
 });

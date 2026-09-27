@@ -76,3 +76,46 @@ describe('PlayerRoster — ready indicators', () => {
     expect(screen.getByTestId('roster-ready-count').className).toMatch(/text-\[11px\]/);
   });
 });
+
+describe('PlayerRoster — bot slots (Ohad 2026-09-27: max 3, no wall of bot chairs)', () => {
+  const t = (key: string) => key;
+
+  it('pins at most MAX_BOTS_PER_ROOM(3) bot buttons on the host view — the rest are plain open seats', () => {
+    render(
+      <PlayerRoster
+        players={[{ username: 'Fish', isHost: true }]}
+        username="Fish"
+        gameCode="RDJAY9"
+        maxPlayers={8}
+        t={t}
+        variant="host"
+      />,
+    );
+    const buttons = screen
+      .getAllByTestId('lobby-seat-empty')
+      .filter((el) => el.tagName === 'BUTTON');
+    expect(buttons.length).toBe(3);
+  });
+
+  it('shows zero bot buttons once three bots are seated', () => {
+    render(
+      <PlayerRoster
+        players={[
+          { username: 'Fish', isHost: true },
+          { username: 'bot-1', isBot: true },
+          { username: 'bot-2', isBot: true },
+          { username: 'bot-3', isBot: true },
+        ]}
+        username="Fish"
+        gameCode="RDJAY9"
+        maxPlayers={8}
+        t={t}
+        variant="host"
+      />,
+    );
+    const buttons = screen
+      .getAllByTestId('lobby-seat-empty')
+      .filter((el) => el.tagName === 'BUTTON');
+    expect(buttons.length).toBe(0);
+  });
+});

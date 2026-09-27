@@ -121,7 +121,7 @@ describe('HostPreGameView Height Constraint', () => {
     vi.clearAllMocks();
   });
 
-  it('should size to the parent (min-h-full) to fit within the MpScreen body without h-dvh', () => {
+  it('should size to the parent (h-full) to fit within the MpScreen body without h-dvh', () => {
     const { container } = render(
       <MusicProvider>
         <SocketContext.Provider value={socketContextValue}>
@@ -133,10 +133,11 @@ describe('HostPreGameView Height Constraint', () => {
     // Get the root div of HostPreGameView
     const rootDiv = container.firstChild as HTMLElement;
 
-    // The root must fill its parent container (min-h-full — grows into the
-    // MpScreen scroll region when the lobby is taller than the viewport),
-    // NOT h-dvh, which would break out of the shell on native insets.
-    expect(rootDiv.className).toContain('min-h-full');
+    // The root must fill its parent container exactly (h-full — fixed to the
+    // MpScreen body; the single internal scroll lives in <main>), NOT h-dvh,
+    // which would break out of the shell on native insets, and NOT min-h-full,
+    // which would push the phone CTA strip below the fold instead of pinning it.
+    expect(rootDiv.className).toContain('h-full');
     expect(rootDiv.className).not.toContain('h-dvh');
   });
 
