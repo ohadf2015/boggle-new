@@ -66,11 +66,18 @@ describe('WordHuntGameLayout mpChrome', () => {
     expect(clueProps.at(-1)?.compact).toBe(true);
   });
 
-  it('anchors the board low (thumb zone), same as classic — the gap above is the callout stage', () => {
+  it('centres the board in the free band — the callout stage owns the top, the thumb zone + found pill the bottom', () => {
+    // The square is width-bound (~382px at 390w) while the slot offers ~610px of
+    // height. items-end pooled the whole ~230px excess above the board as dead
+    // navy (r4 review); the stage needs only its 132px offset + one chip row.
+    // Unlike classic (.fillBoard stretches .game-board-frame to the slot), the
+    // word-hunt square CANNOT fill the height — so the excess is split, not pooled.
     render(<WordHuntGameLayout {...baseProps} mpChrome />);
     const slot = screen.getByTestId('grid-section').parentElement!.parentElement!;
-    expect(slot.className).toContain('items-end');
-    expect(slot.className).not.toContain('items-center');
+    expect(slot.className).toContain('items-center');
+    expect(slot.className).not.toContain('items-end');
+    // pb keeps a bottom bias (thumb zone) and clears the absolute found pill.
+    expect(slot.className).toContain('pb-9');
   });
 
   it('lifts the board cap on TV-sized screens (the round slot is exact)', () => {
