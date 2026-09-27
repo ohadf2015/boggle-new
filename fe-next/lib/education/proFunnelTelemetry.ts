@@ -2,7 +2,7 @@
  * Teacher Pro funnel — the client-side steps.
  *
  * Full funnel (all `$host`-visible):
- *   edu_pro_upgrade_clicked        client  — pricing page "Upgrade now" tap
+ *   edu_pro_upgrade_clicked        client  — pricing page or dashboard trial CTA tap
  *   edu_pro_checkout_started       server  — /api/subscription/checkout made a Polar checkout
  *   edu_pro_checkout_succeeded     server  — Polar webhook `subscription.active` (authoritative)
  *   edu_pro_checkout_success_seen  client  — teacher landed back on Teacher HQ, Pro welcome shown
@@ -26,7 +26,10 @@ function safeCapture(event: string, props: Record<string, unknown>): void {
   }
 }
 
-export type ProUpgradeSource = 'pricing_page';
+export type ProUpgradeSource =
+  | 'pricing_page'
+  | 'dashboard_trial_lifecycle'
+  | 'dashboard_trial_ended';
 
 export function trackEduProUpgradeClicked(args: { source: ProUpgradeSource }): void {
   safeCapture('edu_pro_upgrade_clicked', { source: args.source });
