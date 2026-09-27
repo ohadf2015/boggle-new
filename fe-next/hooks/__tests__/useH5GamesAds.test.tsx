@@ -148,6 +148,62 @@ describe('useH5GamesAds', () => {
     expect(adBreakCalls[0].name).toBe('post-game');
   });
 
+  it('showInterstitial resolves only on adBreakDone — the MP host awaits it before startGame', async () => {
+    const { result } = renderHook(() => useH5GamesAds());
+    let settled = false;
+    let p: Promise<void> | undefined;
+    act(() => {
+      p = result.current.showInterstitial('multiplayer-round-complete').then(() => { settled = true; });
+    });
+    await act(async () => { await Promise.resolve(); });
+
+    expect(adBreakCalls).toHaveLength(1);
+    expect(settled).toBe(false); // the break is still running — the await must hold
+
+    const opts = adBreakCalls[0] as { adBreakDone: (info: { breakStatus: string }) => void };
+    await act(async () => {
+      opts.adBreakDone({ breakStatus: 'viewed' });
+      await p;
+    });
+    expect(settled).toBe(true);
+  });
+
+  it('showInterstitial still resolves when adBreak throws (a hung await would wedge the host)', async () => {
+    const { result } = renderHook(() => useH5GamesAds());
+    const { adBreak } = await import('@/lib/ads/h5GamesAds');
+    vi.mocked(adBreak).mockImplementationOnce(() => { throw new Error('sdk dead'); });
+
+    let settled = false;
+    await act(async () => {
+      await result.current.showInterstitial('post-game').then(() => { settled = true; });
+    });
+    expect(settled).toBe(true);
+  });
+
+  it('showInterstitial resolves on the safety watchdog when adBreakDone never fires (blocked SDK)', async () => {
+    // With an ad blocker the break is queued into a never-arriving SDK — no
+    // adBreakDone, ever. The host awaits this promise before startGame; without
+    // a watchdog the room would sit on the results wash forever.
+    vi.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useH5GamesAds());
+      let settled = false;
+      let p: Promise<void> | undefined;
+      await act(async () => {
+        p = result.current.showInterstitial('multiplayer-round-complete').then(() => { settled = true; });
+        await Promise.resolve();
+      });
+      expect(settled).toBe(false);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(30_000);
+        await p;
+      });
+      expect(settled).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('isAvailable reflects browser environment', () => {
     const { result } = renderHook(() => useH5GamesAds());
     expect(result.current.isAvailable).toBe(true);

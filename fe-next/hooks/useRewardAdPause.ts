@@ -4,6 +4,20 @@ import { useState, useEffect } from 'react';
 
 const REWARD_AD_ACTIVE_EVENT = 'rewardAdActiveChange';
 
+/** Module-level mirror of the bus, for gates that can't hook into React — the
+ *  mobile visibilitychange → 5s → socket.disconnect() guard reads this when the
+ *  page hides, where no re-render may happen before the timer fires. */
+let fullscreenAdActive = false;
+
+/**
+ * Synchronous read: is a fullscreen ad on screen RIGHT NOW? Covers rewarded ads
+ * AND interstitials (both emit the bus — an AdMob interstitial is a native
+ * Activity that hides the WebView exactly like a rewarded ad).
+ */
+export function isFullscreenAdActive(): boolean {
+  return fullscreenAdActive;
+}
+
 /**
  * Announce whether a fullscreen rewarded ad is currently on screen.
  *
@@ -14,6 +28,7 @@ const REWARD_AD_ACTIVE_EVENT = 'rewardAdActiveChange';
  * (e.g. +30s) arrives too late to matter (the "ad stuck, no reward" report).
  */
 export function emitRewardAdActive(active: boolean): void {
+  fullscreenAdActive = active;
   if (typeof window === 'undefined') return;
   window.dispatchEvent(
     new CustomEvent(REWARD_AD_ACTIVE_EVENT, { detail: { active } }),
@@ -27,7 +42,8 @@ export function emitRewardAdActive(active: boolean): void {
  * hide the in-game ad CTA mid-ad and unmount its hook.
  */
 export function useRewardAdPause(): boolean {
-  const [active, setActive] = useState(false);
+  // Seed from the module flag: a component mounted MID-ad missed the event.
+  const [active, setActive] = useState(() => isFullscreenAdActive());
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

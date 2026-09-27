@@ -35,6 +35,7 @@ import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
 import { buildMpDropEvent, buildHostLeftDropEvents } from '../utils/mpDropTelemetry.js';
+import { wasRecentAdWatcher } from './lobbyAdGateHandler.js';
 import { getPostHogServer } from '@/lib/posthog';
 import logger from '../utils/logger.js';
 
@@ -145,7 +146,14 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
   //   - ranked: MMR / match outcome is tied to the original host's session
   // For all three, skip the transfer loop and let the grace-period path run.
   // The original host can still reclaim host on reconnect.
-  const allowAutoTransfer = !game.isClassroom && !game.isRanked && !game.tournamentId;
+  //
+  // Ad-watchers get the same treatment: a fullscreen ad (the between-games
+  // interstitial, a mid-round rewarded) can kill the socket for seconds. An
+  // instant transfer then let the new host start the next round without them —
+  // the "ad between games → disconnected" report. Hold the seat on the grace
+  // path; if they never return, the grace-expiry transfer below still runs.
+  const hostDroppedMidAd = wasRecentAdWatcher(socket.id);
+  const allowAutoTransfer = !game.isClassroom && !game.isRanked && !game.tournamentId && !hostDroppedMidAd;
 
   // Try to find a new host from remaining connected players.
   // Retry up to 3 distinct candidates in case any of them disconnect between
