@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isNative } from '@/utils/platform';
+import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import { supabase } from '@/lib/supabase';
 import {
   ensureGoogleIdInitialized,
@@ -55,6 +57,7 @@ function cancelOneTapPrompt(): void {
 export default function GoogleOneTapInitializer() {
   const { isAuthenticated } = useAuth();
   const { language } = useLanguage();
+  const pathname = usePathname();
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
 
@@ -98,6 +101,9 @@ export default function GoogleOneTapInitializer() {
   // Do NOT gate the Script mount on signup-funnel suppress (that reads localStorage
   // and would hydrate-mismatch). Suppress is enforced inside initOneTap + cancel.
   if (!enabled) return null;
+  // Fullscreen game routes: GSI (~100KiB) was unused JS #1 on /singleplayer PSI.
+  // One Tap is not useful over the board; GoogleSignInButton still loads GSI on demand.
+  if (isHeavyGamePath(pathname)) return null;
 
   // hl on the script URL controls GSI's rendered language (see GoogleSignInButton) —
   // without it, One Tap falls back to the browser/OS locale instead of the site's.

@@ -57,6 +57,19 @@ describe('EngagementScript', () => {
     }
   });
 
+  it('shouldNotInjectOnFallbackWhenFallbackMsIsNull', () => {
+    vi.useFakeTimers();
+    try {
+      render(<EngagementScript src={SRC} fallbackMs={null} />);
+      act(() => {
+        vi.advanceTimersByTime(60_000);
+      });
+      expect(scriptsFor(SRC)).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('shouldInjectOnlyOnceAcrossManyEvents', () => {
     render(<EngagementScript src={SRC} />);
     act(() => {
@@ -86,7 +99,7 @@ describe('locale layout loads gtag.js on engagement', () => {
   it('shouldNotUseLazyOnloadForTheGtagLoader', () => {
     const src = fs.readFileSync(path.resolve(__dirname, '../../app/[locale]/layout.tsx'), 'utf8');
     expect(src).not.toMatch(/<Script\s+src="https:\/\/www\.googletagmanager\.com\/gtag\/js/);
-    expect(src).toMatch(/<EngagementScript\s+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-7VLG16BJQH"/);
+    expect(src).toMatch(/<LocaleGtagLoader\s*\/>/);
     // ga4-init (the inline dataLayer push) and consent mode stay as they were.
     expect(src).toContain('<Script id="ga4-init" strategy="lazyOnload">');
     expect(src).toContain('<GoogleConsentMode />');

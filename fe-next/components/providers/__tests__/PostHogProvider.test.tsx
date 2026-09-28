@@ -72,6 +72,7 @@ describe('PostHogProvider', () => {
       opt_out_capturing_by_default: true,
       capture_pageview: false,
       capture_pageleave: true,
+      surveys: false,
     }));
   });
 

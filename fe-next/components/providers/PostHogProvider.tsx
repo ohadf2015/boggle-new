@@ -49,6 +49,9 @@ function initPostHog() {
     capture_pageview: false, // We track manually on route change
     capture_pageleave: true,
     capture_exceptions: true, // Capture unhandled JS errors and promise rejections
+    // surveys.js (~27KiB) was unused-js on every /singleplayer PSI run. We do
+    // not run in-app PostHog surveys; skip the extra network + parse.
+    surveys: false,
     // Enable Web-Vitals ATTRIBUTION so $web_vitals events carry the LCP element
     // (tag/id/class). Without it the nightly perf-watch sees an LCP number but no
     // element, so a homepage-LCP regression can't be targeted without guessing

@@ -15,7 +15,7 @@
 import React from 'react';
 
 const clientProps: Array<Record<string, unknown>> = [];
-vi.mock('@/app/[locale]/PageClient', () => ({
+vi.mock('@/app/[locale]/(home)/HomeClient', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
     clientProps.push(props);

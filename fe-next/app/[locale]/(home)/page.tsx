@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import HomePageClient from '../PageClient';
+import HomeClient from './HomeClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 import { HomepageContentSection } from '@/components/seo/HomepageContentSection';
 import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
@@ -107,7 +107,7 @@ export default async function HomePage({ params }: PageProps) {
           visible prose — Google requires the structured data to match copy that is
           actually on the page. */}
       <FaqPageJsonLd faqs={content.faq.map(({ question, answer }) => ({ q: question, a: answer }))} />
-      <HomePageClient initialData={initialData} />
+      <HomeClient initialData={initialData} />
       {/* No cross-link banner boxes here (homepage gauntlet, SPEC §12): the
           /en /es /sv "play free online" landing links are carried inline by the
           How to Play line (LandingSEOSection, in the server HTML), so the three

@@ -12,7 +12,7 @@ import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
 import InGameAudioButton from '@/components/InGameAudioButton';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import { EngagementScript } from '@/components/EngagementScript';
+import { LocaleGtagLoader } from '@/components/LocaleGtagLoader';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import FeedbackDevtoolsWidget from '@/components/feedback/FeedbackDevtoolsWidget';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
@@ -709,11 +709,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
         {/* GA4 G-7VLG16BJQH — gtag.js loads on the visitor's first engagement
-            (EngagementScript), not with the page: even lazyOnload landed inside
-            the first-load window. Google Consent Mode v2 defines window.gtag +
-            dataLayer inline, so earlier gtag() calls queue and replay, and tags
-            respect the stored consent decision when the script arrives. */}
-        <EngagementScript src="https://www.googletagmanager.com/gtag/js?id=G-7VLG16BJQH" />
+            (LocaleGtagLoader → EngagementScript), not with the page. On
+            fullscreen game routes the 3s bounce fallback is skipped so PSI
+            cannot pull ~155KiB into the LCP window. Google Consent Mode v2
+            defines window.gtag + dataLayer inline, so earlier gtag() calls
+            queue and replay. */}
+        <LocaleGtagLoader />
         <Script id="ga4-init" strategy="lazyOnload">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7VLG16BJQH');`}</Script>
                 {/* Dark-only theme — static string literal, no user input, safe from XSS */}
                 <script

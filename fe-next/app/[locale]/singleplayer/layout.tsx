@@ -129,6 +129,10 @@ export default async function SinglePlayerLayout({ children, params }: SinglePla
 
   return (
     <>
+      {/* LCP on /singleplayer is the loader mascot (winner.webp, ~148KiB, Low
+          priority in PSI). Preload + fetchpriority=high so discovery insight
+          stops failing and LCP is not gated on late image fetch. */}
+      <link rel="preload" as="image" href="/mascot/winner.webp" fetchPriority="high" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema]) }}
