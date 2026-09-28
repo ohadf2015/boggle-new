@@ -76,6 +76,7 @@ import { linkLogRocketSession } from '@/utils/sentry';
 import { hasConsent } from '@/utils/cookieConsent';
 import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
+import InGameAudioButton from '@/components/InGameAudioButton';
 // QuietCelebrationLayer + CosyAmbientBackdrop render visible surfaces — keep
 // them server-rendered (static) so they don't flash in after hydration.
 import QuietCelebrationLayer from '@/components/cosy/QuietCelebrationLayer';
@@ -255,6 +256,11 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                             <AdMobProvider>
                                             <NavigationProvider>
                                                 {memoizedChildren}
+                                                {/* Mute FAB during gameplay. Was a static layout import
+                                                    which put lucide + NavigationContext consumers on every
+                                                    /singleplayer first-load chunk. Lives here so it only
+                                                    parses with the rest of the after-paint provider stack. */}
+                                                <InGameAudioButton />
                                                 {/* Native-app only: kills the long-press text/image selection callout (looks broken in the webview) */}
                                                 <NativeSelectionGuard />
                                                 {/* Mounts the SharedFxApp Pixi singleton once so coin/level-up/firework FX actually render */}

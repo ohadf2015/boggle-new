@@ -22,4 +22,19 @@ describe('ConditionalProviders game-stack split', () => {
     expect(SOURCE).toMatch(/GameSpecificProviders/);
     expect(SOURCE).toMatch(/import\(['"]\.\/providers['"]\)/);
   });
+
+  it('does not statically import EssentialProviders (Auth/Music/Query/PostHog)', () => {
+    expect(SOURCE).not.toMatch(
+      /import\s*\{[^}]*EssentialProviders[^}]*\}\s*from\s*['"]\.\/essential-providers['"]/,
+    );
+  });
+
+  it('loads EssentialProviders through next/dynamic so /singleplayer can skip it until after paint', () => {
+    expect(SOURCE).toMatch(/import\(['"]\.\/essential-providers['"]\)/);
+  });
+
+  it('gates the heavy boot with shouldMountHeavyClientBoot / after-first-paint', () => {
+    expect(SOURCE).toMatch(/shouldMountHeavyClientBoot/);
+    expect(SOURCE).toMatch(/useAfterFirstPaint/);
+  });
 });

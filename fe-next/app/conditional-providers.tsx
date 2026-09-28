@@ -21,13 +21,21 @@ import { ReactNode, useMemo, lazy, Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { EssentialProviders } from './essential-providers';
+import { shouldMountHeavyClientBoot, useAfterFirstPaint } from '@/lib/perf/afterFirstPaint';
+import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 
 const CommandPalette = lazy(() => import('@/components/CommandPalette'));
 // Named chunk so `/` does not parse socket/howler/game providers. Rendered
 // only when needsGameProviders is true; ssr stays on so game routes still SSR.
 const GameSpecificProviders = nextDynamic(
   () => import('./providers').then((m) => m.GameSpecificProviders),
+  { loading: () => null },
+);
+// Same split as GameSpecificProviders: a static import of EssentialProviders
+// puts Auth/Music/Query/PostHog in the layout graph on every route, including
+// /singleplayer where we must not parse them before first paint.
+const EssentialProviders = nextDynamic(
+  () => import('./essential-providers').then((m) => m.EssentialProviders),
   { loading: () => null },
 );
 import { getCachedTranslation } from '@/translations/loadTranslation';
@@ -82,6 +90,8 @@ export function needsGameProviders(pathname: string | null): boolean {
  */
 export function ConditionalProviders({ children, lang }: ConditionalProvidersProps) {
   const pathname = usePathname();
+  const afterPaint = useAfterFirstPaint(isHeavyGamePath(pathname));
+  const mountHeavy = shouldMountHeavyClientBoot(pathname, afterPaint);
 
   // Read the catalogue instead of receiving it as a prop. As a prop it crossed
   // the server→client boundary, so React serialised ~525kB of JSON into every
@@ -94,6 +104,10 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
   const needsGameStack = useMemo(() => {
     return needsGameProviders(pathname);
   }, [pathname]);
+
+  if (!mountHeavy) {
+    return <>{children}</>;
+  }
 
   // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
   // Conditionally add game-specific providers inside
