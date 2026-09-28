@@ -323,14 +323,18 @@ const nextConfig = {
       // Catch-all: redirect any path without a locale prefix to /en/...
       // This prevents 308s from the app router and gives Google clean 301s.
       // Must be AFTER the non-www redirect and root redirect above.
+      // `singleplayer` is excluded so the beforeFiles rewrite (/singleplayer →
+      // /en/singleplayer) can win: Next.js order is Headers → Redirects →
+      // beforeFiles rewrites → filesystem, so a matching permanent redirect
+      // here would 308 before the rewrite ever runs (r6 / #1176 follow-up).
       {
-        source: '/:path((?!en|he|sv|ja|es|ru|api|_next|favicon\\.ico|.*\\..*).*)',
+        source: '/:path((?!en|he|sv|ja|es|ru|api|_next|favicon\\.ico|singleplayer|.*\\..*).*)',
         destination: '/en/:path',
         permanent: true,
       },
       // Also handle nested paths without locale (e.g. /legal/privacy → /en/legal/privacy)
       {
-        source: '/:path((?!en|he|sv|ja|es|ru|api|_next|favicon\\.ico|.*\\..*).*?)/:rest*',
+        source: '/:path((?!en|he|sv|ja|es|ru|api|_next|favicon\\.ico|singleplayer|.*\\..*).*?)/:rest*',
         destination: '/en/:path/:rest*',
         permanent: true,
       },

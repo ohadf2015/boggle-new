@@ -3,6 +3,11 @@
  * catch-all 308 redirect. PSI (and real visitors) save a full round trip before
  * any render-blocking resource can start; in Lighthouse's Lantern model the 308
  * hop sat in the critical path and pinned simulated FCP at ~1803ms (r4/r5).
+ *
+ * Next.js order is Headers → Redirects → beforeFiles rewrites → filesystem.
+ * So the catch-all permanent redirect MUST also exclude `singleplayer`, or it
+ * wins before the rewrite runs (production after #1176 still 308'd). See r6
+ * follow-up / t_dfd64604.
  */
 import { describe, it, expect, vi } from 'vitest';
 
@@ -15,7 +20,7 @@ vi.mock('@sentry/nextjs', () => ({
 
 const nextConfig = (await import('../../next.config.mjs')).default;
 
-describe('/singleplayer rewrite (r6)', () => {
+describe('/singleplayer rewrite (r6 follow-up)', () => {
   it('rewrites /singleplayer to /en/singleplayer in beforeFiles', async () => {
     const rewrites = await (nextConfig as { rewrites?: () => Promise<unknown> }).rewrites?.();
     const beforeFiles = (rewrites as { beforeFiles?: Array<{ source: string; destination: string }> })
@@ -27,18 +32,28 @@ describe('/singleplayer rewrite (r6)', () => {
     expect(rule!.destination).toBe('/en/singleplayer');
   });
 
-  it('the catch-all bare-path 308 to /en/:path still exists (so the rewrite is what saves the hop)', async () => {
+  it('catch-all locale redirects exclude singleplayer so the rewrite can win', async () => {
     const redirects = await (nextConfig as {
-      redirects?: () => Promise<Array<{ source: string; destination: string }>>;
+      redirects?: () => Promise<Array<{ source: string; destination: string; permanent?: boolean }>>;
     }).redirects?.();
 
-    // Next.js runs beforeFiles rewrites BEFORE redirects, so this catch-all
-    // 308 (/singleplayer -> /en/singleplayer) only fires for paths without a
-    // beforeFiles rule. Guard the redirect so a future cleanup can't delete
-    // the reason the rewrite matters — or worse, leave both gone.
-    const catchAll = (redirects ?? []).find(
+    // Flat catch-all: /:path → /en/:path
+    const flat = (redirects ?? []).find(
       (r) => r.destination === '/en/:path' && r.source.includes(':path'),
     );
-    expect(catchAll, 'catch-all /en/:path redirect missing — update this test').toBeDefined();
+    expect(flat, 'flat catch-all /en/:path redirect missing').toBeDefined();
+    expect(flat!.source).toMatch(/singleplayer/);
+    // Negative-lookahead style exclusion (same family as en|he|…).
+    expect(flat!.source).toMatch(/\(\?!.*singleplayer/);
+    expect(flat!.permanent).toBe(true);
+
+    // Nested catch-all: /:path/:rest* → /en/:path/:rest*
+    const nested = (redirects ?? []).find(
+      (r) => r.destination === '/en/:path/:rest*' && r.source.includes(':rest*'),
+    );
+    expect(nested, 'nested catch-all /en/:path/:rest* redirect missing').toBeDefined();
+    expect(nested!.source).toMatch(/singleplayer/);
+    expect(nested!.source).toMatch(/\(\?!.*singleplayer/);
+    expect(nested!.permanent).toBe(true);
   });
 });
