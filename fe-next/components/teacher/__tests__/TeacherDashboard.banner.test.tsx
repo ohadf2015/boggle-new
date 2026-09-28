@@ -105,13 +105,27 @@ describe('<TeacherDashboard> — the banner slot', () => {
     expect(screen.queryByTestId('teacher-dashboard-banner')).toBeNull();
   });
 
+  it('pins a Polar trial banner on the deck instead of behind the Go Pro chip', () => {
+    render(
+      <TeacherDashboard
+        pinBanner
+        banner={<div data-testid="a-banner">trial ends soon</div>}
+      />,
+    );
+    expect(screen.getByTestId('a-banner')).toBeInTheDocument();
+    expect(screen.queryByTestId('teacher-dashboard-banner')).toBeNull();
+    expect(screen.getByTestId('teacher-dashboard-pinned-banner').contains(screen.getByTestId('a-banner'))).toBe(
+      true,
+    );
+  });
+
   it('the route client hands the banner to the dashboard instead of stacking it', () => {
     // A sibling of an `h-dvh` root makes the page taller than the viewport.
     const src = readFileSync(
       path.join(__dirname, '..', '..', '..', 'app', '[locale]', 'teacher', 'PageClient.tsx'),
       'utf8',
     );
-    expect(src).toMatch(/<TeacherDashboard\s+banner=/);
+    expect(src).toMatch(/<TeacherDashboard[\s\S]*banner=/);
     expect(src, 'no banner may render as a sibling of <TeacherDashboard />').not.toMatch(
       /<TeacherProAskBanner \/>\s*\n\s*<TeacherDashboard \/>/,
     );

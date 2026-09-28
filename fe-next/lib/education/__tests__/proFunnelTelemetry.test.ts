@@ -32,6 +32,17 @@ describe('trackEduProUpgradeClicked', () => {
     expect(captureMock).toHaveBeenCalledWith('edu_pro_upgrade_clicked', { source: 'pricing_page' });
   });
 
+  it('Given a dashboard trial CTA, When tracked, Then the source distinguishes lifecycle from expired', () => {
+    trackEduProUpgradeClicked({ source: 'dashboard_trial_lifecycle' });
+    trackEduProUpgradeClicked({ source: 'dashboard_trial_ended' });
+    expect(captureMock).toHaveBeenNthCalledWith(1, 'edu_pro_upgrade_clicked', {
+      source: 'dashboard_trial_lifecycle',
+    });
+    expect(captureMock).toHaveBeenNthCalledWith(2, 'edu_pro_upgrade_clicked', {
+      source: 'dashboard_trial_ended',
+    });
+  });
+
   it('Given PostHog throws, When tracked, Then the click handler is never broken', () => {
     captureMock.mockImplementationOnce(() => {
       throw new Error('posthog down');
