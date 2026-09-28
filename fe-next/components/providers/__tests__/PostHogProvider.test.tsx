@@ -73,6 +73,7 @@ describe('PostHogProvider', () => {
       capture_pageview: false,
       capture_pageleave: true,
       surveys: false,
+      disable_surveys: true,
     }));
   });
 
