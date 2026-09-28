@@ -36,17 +36,37 @@ describe('PartThumb with the 2A4 stored config', () => {
 import { AVATAR_MOODS } from '@/lib/avatar/avatarMood';
 
 describe('AvatarArt 2A4 config × every mood/overlay/mode/crop', () => {
-  it('renders every combination without throwing', () => {
+  // moods×overlays×modes×crops ≈ 480 renders. animated×circular used to be
+  // nested here too (~1920 total) and regularly blew vitest's 30s testTimeout
+  // on CI shard 6 — master went red after #1168 and again after Nearpod #1169
+  // even though those PRs' own suites were green. animated/circular stay covered
+  // by the first describe + the smoke cases below.
+  it('renders every mood/overlay/mode/crop without throwing', { timeout: 90_000 }, () => {
     const bad: string[] = [];
     const modes = [undefined, 'multiplayer', 'singleplayer', 'brain', 'practice'] as const;
-    for (const mood of [undefined, ...AVATAR_MOODS]) for (const overlay of [null, 'alert', 'flame'] as const)
-      for (const mode of modes) for (const crop of ['full', 'face'] as const) for (const animated of [false, true])
-        for (const circular of [false, true]) {
-          try {
-            render(<AvatarArt config={stored} uid="u1" mood={mood} overlay={overlay} mode={mode} crop={crop}
-              animated={animated} circular={circular} tierMarker />).unmount();
-          } catch (e) { bad.push(`${mood}/${overlay}/${mode}/${crop}/${animated}/${circular}: ${(e as Error).message.slice(0, 50)}`); }
-        }
+    for (const mood of [undefined, ...AVATAR_MOODS])
+      for (const overlay of [null, 'alert', 'flame'] as const)
+        for (const mode of modes)
+          for (const crop of ['full', 'face'] as const) {
+            try {
+              render(<AvatarArt config={stored} uid="u1" mood={mood} overlay={overlay} mode={mode} crop={crop}
+                tierMarker />).unmount();
+            } catch (e) {
+              bad.push(`${mood}/${overlay}/${mode}/${crop}: ${(e as Error).message.slice(0, 50)}`);
+            }
+          }
     expect(bad).toEqual([]);
+  });
+
+  it.each([
+    { animated: true, circular: false },
+    { animated: false, circular: true },
+    { animated: true, circular: true },
+  ])('renders animated=$animated circular=$circular without throwing', ({ animated, circular }) => {
+    expect(() =>
+      render(
+        <AvatarArt config={stored} uid="u1" animated={animated} circular={circular} tierMarker />,
+      ).unmount(),
+    ).not.toThrow();
   });
 });
