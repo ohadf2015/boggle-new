@@ -15,7 +15,7 @@
  * is still loading we show nothing rather than an upsell a later answer retracts
  * (recurring pitfall class 1).
  */
-export type TeacherBanner = 'trial' | 'pro' | 'reactivate' | 'trialing' | 'none';
+export type TeacherBanner = 'trial' | 'pro' | 'reactivate' | 'trialing' | 'offerTrial' | 'none';
 
 export function pickTeacherBanner({
   hasTrial,
@@ -27,6 +27,8 @@ export function pickTeacherBanner({
   proAskDismissed = false,
   polarTrialExpired = false,
   polarTrialing = false,
+  polarOfferTrial = false,
+  offerTrialDismissed = false,
 }: {
   hasTrial: boolean;
   isAdmin: boolean;
@@ -48,6 +50,13 @@ export function pickTeacherBanner({
    * banner with a paid checkout CTA — not the access-trial countdown.
    */
   polarTrialing?: boolean;
+  /**
+   * Eligible for the Polar 14-day trial (`polarTrialUx.offerTrial`).
+   * This is the visibility fix: HQ used to wait for a milestone $9 ask
+   * while the trial CTA lived only on /teacher/upgrade.
+   */
+  polarOfferTrial?: boolean;
+  offerTrialDismissed?: boolean;
 }): TeacherBanner {
   // Pro is checked FIRST, and so is "Pro has not answered yet". A gifted-Pro
   // teacher keeps the trial deadline she was granted Pro to replace; checking
@@ -60,6 +69,9 @@ export function pickTeacherBanner({
   if (hasPro && polarTrialing) return 'trialing';
   if (hasPro) return 'none';
   if (polarTrialExpired) return 'reactivate';
+  // Polar trial start beats the access-trial countdown and the milestone $9
+  // strip: 0 of 65 teachers ever started a trial they could not see.
+  if (polarOfferTrial && !offerTrialDismissed) return 'offerTrial';
   if (hasTrial) return 'trial';
   if (isAdmin) return 'none';
   // The Pro strip is a milestone ask, not a first-visit billboard. Hide it

@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildProCheckoutSucceededEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -109,11 +109,13 @@ export async function POST(request: NextRequest) {
       case 'subscription.resumed':
         await handleSubscriptionActive(payload, userId)
         if (eventType === 'subscription.active') trackProConversion(payload, userId)
+        trackProTrial(payload, userId)
         break
       case 'subscription.updated':
       case 'subscription.cycled':
       case 'subscription.paused':
         await handleSubscriptionUpdated(payload, userId)
+        trackProTrial(payload, userId)
         break
       case 'subscription.past_due':
         await handleSubscriptionUpdated(payload, userId)
@@ -165,9 +167,24 @@ export async function POST(request: NextRequest) {
 function trackProConversion(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    if (mapStatus(payload?.data?.status) === 'trialing') return
     captureProFunnelServerEvent(buildProCheckoutSucceededEvent(userId, String(payload?.data?.id ?? '')))
   } catch (err) {
     console.error('[Polar] conversion telemetry threw:', err)
+  }
+}
+
+/**
+ * `edu_pro_trial_succeeded` — Polar actually opened the 14-day trial.
+ * Distinct from paid `edu_pro_checkout_succeeded`. Never throws.
+ */
+function trackProTrial(payload: WebhookPayload, userId?: string) {
+  try {
+    if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    if (mapStatus(payload?.data?.status) !== 'trialing') return
+    captureProFunnelServerEvent(buildProTrialSucceededEvent(userId, String(payload?.data?.id ?? '')))
+  } catch (err) {
+    console.error('[Polar] trial telemetry threw:', err)
   }
 }
 

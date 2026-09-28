@@ -143,6 +143,19 @@ describe('pickTeacherBanner Polar Pro trial', () => {
     })).toBe('reactivate');
   });
 
+  it('a never-trialed free teacher sees the Polar trial offer before the milestone $9 strip', () => {
+    expect(pickTeacherBanner({
+      hasTrial: true, isAdmin: false, hasPro: false, hasMilestone: true, polarOfferTrial: true,
+    })).toBe('offerTrial');
+  });
+
+  it('after they dismiss the Polar trial offer, the access/milestone path returns', () => {
+    expect(pickTeacherBanner({
+      hasTrial: false, isAdmin: false, hasPro: false, hasMilestone: true,
+      polarOfferTrial: true, offerTrialDismissed: true,
+    })).toBe('pro');
+  });
+
   it('does not ask while Pro has not answered yet', () => {
     expect(pickTeacherBanner({
       hasTrial: false, isAdmin: false, hasPro: false, proLoading: true, polarTrialExpired: true,

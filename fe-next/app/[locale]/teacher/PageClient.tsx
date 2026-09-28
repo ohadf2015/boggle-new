@@ -7,11 +7,13 @@ import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TeacherProAskBanner } from '@/components/teacher/TeacherProAskBanner';
 import { TeacherProTrialEndedBanner } from '@/components/teacher/TeacherProTrialEndedBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
+import { TeacherProTrialOfferBanner } from '@/components/teacher/TeacherProTrialOfferBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherProMilestone } from '@/hooks/useTeacherProMilestone';
+import { useTeacherTrialOffer } from '@/hooks/useTeacherTrialOffer';
 import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
@@ -46,6 +48,7 @@ function TeacherDashboardInner() {
     dismissed,
     dismiss,
   } = useTeacherProMilestone();
+  const { dismissed: trialOfferDismissed, dismiss: dismissTrialOffer } = useTeacherTrialOffer();
   const {
     reason: usageReason,
     count: usageCount,
@@ -81,6 +84,8 @@ function TeacherDashboardInner() {
     // and a Keep-Pro CTA to /teacher/upgrade). The header chip stays.
     polarTrialExpired: polarTrial.showReactivation,
     polarTrialing: polarTrial.showLifecycleBanner,
+    polarOfferTrial: polarTrial.offerTrial,
+    offerTrialDismissed: trialOfferDismissed,
   });
   const banner =
     picked === 'trial' && !hasRecentConfig && !trial?.isExpired ? null : picked;
@@ -98,10 +103,11 @@ function TeacherDashboardInner() {
     usageReason !== null &&
     !usageDismissed &&
     banner !== 'pro' &&
-    banner !== 'reactivate';
+    banner !== 'reactivate' &&
+    banner !== 'offerTrial';
 
   useEffect(() => {
-    if (banner === 'pro' || banner === 'reactivate' || banner === 'trialing') {
+    if (banner === 'pro' || banner === 'reactivate' || banner === 'trialing' || banner === 'offerTrial') {
       trackGrowthEvent('iap_viewed', {
         product: 'teacher_pro',
         source:
@@ -109,7 +115,9 @@ function TeacherDashboardInner() {
             ? 'dashboard_trial_ended'
             : banner === 'trialing'
               ? 'dashboard_trial_lifecycle'
-              : 'dashboard_banner',
+              : banner === 'offerTrial'
+                ? 'dashboard_trial_offer'
+                : 'dashboard_banner',
         event_type: 'impression',
       });
     }
@@ -128,6 +136,8 @@ function TeacherDashboardInner() {
             onDismiss={trialNudgeOpen ? dismissTrialNudge : undefined}
             ctaLabel={trialNudgeOpen ? teacherProUpgradeCtaLabel(language) : undefined}
           />
+        ) : banner === 'offerTrial' ? (
+          <TeacherProTrialOfferBanner onDismiss={dismissTrialOffer} />
         ) : banner === 'pro' ? (
           <TeacherProAskBanner onDismiss={dismiss} />
         ) : banner === 'reactivate' ? (

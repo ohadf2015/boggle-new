@@ -13380,6 +13380,8 @@ const sv = {
       "autoRenew": "Förnyas automatiskt varje månad. Avsluta när du vill.",
       "upgradeNow": "Uppgradera till Pro nu",
       "startTrial": "Starta 14 dagars gratis provperiod",
+      "trialOfferTitle": "Prova Teacher Pro gratis i 14 dagar",
+      "trialOfferBody": "Obegränsade klasser och rapporter. Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
       "trialCtaSubtext": "Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
       "trialEndedTitle": "Din provperiod på Teacher Pro är slut",
       "trialEndedBody": "Aktivera igen för 9 $/månad. Det här är inte en ny gratis provperiod.",

@@ -12342,6 +12342,8 @@ const en = {
       "autoRenew": "Renews automatically each month. Cancel anytime.",
       "upgradeNow": "Upgrade to Pro Now",
       "startTrial": "Start 14-day free trial",
+      "trialOfferTitle": "Try Teacher Pro free for 14 days",
+      "trialOfferBody": "Unlimited classes and reports. Free for 14 days, then $9/month. Cancel anytime.",
       "trialCtaSubtext": "Free for 14 days, then $9/month. Cancel anytime.",
       "trialEndedTitle": "Your Teacher Pro trial ended",
       "trialEndedBody": "Reactivate for $9/month. This is not another free trial.",

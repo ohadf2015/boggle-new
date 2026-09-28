@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Sparkles, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { polarTrialDaysLeft, polarTrialUx } from '@/lib/education/polarTrial';
+import { polarTrialDaysLeft, polarTrialChipUpgrade, polarTrialUx } from '@/lib/education/polarTrial';
 import { cn } from '@/lib/utils';
 
 const DATE_LOCALE: Record<string, string> = {
@@ -71,9 +71,20 @@ export function TeacherPlanBadge({ className }: { className?: string }) {
         {isGift ? <Gift className="size-4 text-black" aria-hidden="true" /> : <Sparkles className="size-4 text-black" aria-hidden="true" />}
         <span className="font-neo-display text-sm font-black uppercase tracking-wide text-black">{t('teacher.plan.pro')}</span>
         {trialLabel ? (
-          <span data-testid="teacher-pro-trial-badge" className="text-xs font-bold text-black/70">
-            {trialLabel}
-          </span>
+          <>
+            <span data-testid="teacher-pro-trial-badge" className="text-xs font-bold text-black/70">
+              {trialLabel}
+            </span>
+            {polarTrialChipUpgrade(daysLeft) ? (
+              <Link
+                href={`/${language}/teacher/upgrade`}
+                data-testid="teacher-pro-trial-upgrade-chip"
+                className="text-xs font-black uppercase underline underline-offset-2 text-black"
+              >
+                {t('teacher.plan.upgrade')}
+              </Link>
+            ) : null}
+          </>
         ) : until ? (
           <span className="hidden text-xs font-bold text-black/70 sm:inline">
             {isGift ? t('teacher.plan.giftedUntil', { date: until }) : t('teacher.plan.renewsOn', { date: until })}

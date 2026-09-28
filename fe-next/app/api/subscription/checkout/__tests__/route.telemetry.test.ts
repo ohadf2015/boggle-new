@@ -11,6 +11,9 @@ vi.mock('@/lib/polar', () => ({
   getPolarClient: () => ({ createCheckout }),
   getProProductId: () => process.env.POLAR_PRO_PRODUCT_ID,
 }))
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => null,
+}))
 const getAuthedUser = vi.fn()
 vi.mock('@/lib/auth/getAuthedUser', () => ({
   getAuthedUser: (...args: unknown[]) => getAuthedUser(...args),
@@ -77,5 +80,19 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     const res = await POST(req())
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
+  })
+
+  it('Given { trial: true }, When Polar creates checkout, Then it fires edu_pro_trial_started not checkout_started', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trial: true }),
+    }) as never)
+    expect(res.status).toBe(200)
+    expect(capture).toHaveBeenCalledTimes(1)
+    expect(capture.mock.calls[0][0].event).toBe('edu_pro_trial_started')
+    expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 })
