@@ -197,7 +197,7 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
         </span>
         <h2
           id="play-now-heading"
-          className="font-neo-display text-lg font-black uppercase leading-none tracking-tight text-black sm:text-2xl [@media(orientation:landscape)_and_(max-height:500px)]:text-lg"
+          className="min-w-0 truncate font-neo-display text-lg font-black uppercase leading-none tracking-tight text-black sm:text-2xl [@media(orientation:landscape)_and_(max-height:500px)]:text-lg"
         >
           {t('academy.hq.startTitle', 'Start a game')}
         </h2>
@@ -257,8 +257,11 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
             disabled={!armed}
             onClick={handleGo}
             className={cn(
-              'relative flex min-h-16 w-full items-center justify-center gap-3 rounded-neo border-3 border-black px-6 py-2',
-              'font-neo-display text-3xl font-black uppercase tracking-tight sm:min-h-20 sm:text-4xl lg:text-5xl',
+              // min-w-0 + overflow-hidden: flex children default to min-width:auto,
+              // so a long locale ("יוצאים לדרך") at text-3xl blew past a 320px
+              // phone and forced the shell to scroll sideways.
+              'relative flex min-h-16 w-full min-w-0 items-center justify-center gap-2 overflow-hidden rounded-neo border-3 border-black px-3 py-2 sm:gap-3 sm:px-6',
+              'font-neo-display text-2xl font-black uppercase tracking-tight max-[360px]:text-xl sm:min-h-20 sm:text-4xl lg:text-5xl',
               // `!`: globals.css pads every landscape-phone <button> 0.75rem, unlayered,
               // which beats any layered utility.
               '[@media(orientation:landscape)_and_(max-height:500px)]:min-h-10 [@media(orientation:landscape)_and_(max-height:500px)]:py-0.5! [@media(orientation:landscape)_and_(max-height:500px)]:text-2xl max-sm:[@media(max-height:700px)]:min-h-12 max-sm:[@media(max-height:700px)]:py-1',
@@ -271,8 +274,8 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
                 : 'cursor-not-allowed bg-neo-cream text-neo-gray shadow-hard-sm'
             )}
           >
-            <Rocket className="size-8 shrink-0 sm:size-10 [@media(orientation:landscape)_and_(max-height:500px)]:size-6 max-sm:[@media(max-height:700px)]:size-6" strokeWidth={3} aria-hidden="true" />
-            {t('teacher.playNow.goLive')}
+            <Rocket className="size-7 shrink-0 sm:size-10 [@media(orientation:landscape)_and_(max-height:500px)]:size-6 max-sm:[@media(max-height:700px)]:size-6" strokeWidth={3} aria-hidden="true" />
+            <span className="min-w-0 truncate">{t('teacher.playNow.goLive')}</span>
           </button>
         </div>
 

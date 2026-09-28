@@ -111,10 +111,13 @@ export function EducationShell({
 
       {/* Desktop puts the sidebar beside the content column; this row is the
           part that flexes, and it never scrolls itself. */}
-      <div data-testid="education-shell-body" className="flex min-h-0 flex-1">
+      {/* min-w-0: a flex row child defaults to min-width:auto and will not
+          shrink below its content — beside the sidebar that pushed the scroll
+          region wider than the viewport and flashed a horizontal scrollbar. */}
+      <div data-testid="education-shell-body" className="flex min-h-0 min-w-0 flex-1">
         {nav ? <EducationShellNav nav={nav} variant="sidebar" /> : null}
 
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {statusRow ? (
             <div data-testid="education-shell-status" className="shrink-0">
               {statusRow}
@@ -134,8 +137,13 @@ export function EducationShell({
             aria-label={scrollRegionLabel}
             className={cn(
               // `edu-shell-scroll` is the hook globals.css uses to move the cookie
-          // sheet's height reservation off <body> and onto this region.
-          'edu-shell-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]',
+              // sheet's height reservation off <body> and onto this region.
+              // overflow-y:auto makes overflow-x compute to auto too — any wide
+              // child then flashes a page-level horizontal scrollbar on phones
+              // (reports already worked around this locally). Clip x here so
+              // the shell never scrolls sideways; tables that must scroll keep
+              // their own overflow-x-auto.
+              'edu-shell-scroll min-h-0 flex-1 overflow-y-auto overflow-x-clip min-w-0 overscroll-contain [scrollbar-gutter:stable]',
               contentClassName,
             )}
           >

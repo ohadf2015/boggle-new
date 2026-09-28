@@ -19,8 +19,8 @@ import { HqSheet } from "./HqSheet";
  * navy is ~1.3:1 and reads as no control at all (the contrast test pins this).
  */
 const TOP_CHIP = cn(
-  "inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-neo border-3 border-neo-cream",
-  "bg-neo-navy-light px-2.5 font-neo-display text-xs font-black uppercase leading-none text-neo-white",
+  "inline-flex min-h-9 max-w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-neo border-3 border-neo-cream",
+  "bg-neo-navy-light px-2 font-neo-display text-xs font-black uppercase leading-none text-neo-white",
   "shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard sm:px-3 sm:text-sm lg:min-h-10",
   "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
 );
@@ -132,7 +132,7 @@ export function HqDock({
               strokeWidth={2.5}
               aria-hidden="true"
             />
-            <span className="whitespace-nowrap">
+            <span className="min-w-0 truncate">
               {t("teacher.dashboard.tools")}
             </span>
           </>
@@ -207,7 +207,7 @@ export function HqDock({
           summary={
             <>
               <Sparkles className="size-4 shrink-0" aria-hidden="true" />
-              <span className="whitespace-nowrap">
+              <span className="min-w-0 truncate">
                 {t("academy.hq.proChip", "Go Pro")}
               </span>
             </>

@@ -43,6 +43,17 @@ describe('EducationShell', () => {
     expect(region.className).toContain('overflow-y-auto');
   });
 
+  it('clips horizontal overflow so overflow-y:auto never flashes a sideways scrollbar', () => {
+    // CSS: overflow-y:auto computes overflow-x to auto too. Reports already
+    // worked around this with a local overflow-x-clip; the shell owns it now
+    // so Teacher HQ / Classes / Library never need a page-level horizontal scroll.
+    const { getByTestId } = render(<EducationShell>body</EducationShell>);
+    const region = getByTestId('education-shell-scroll');
+    expect(region.className).toContain('overflow-x-clip');
+    expect(region.className).toContain('min-w-0');
+    expect(getByTestId('education-shell-body').className).toContain('min-w-0');
+  });
+
   it('has exactly ONE scrolling region — a nested scroller is the bug this replaces', () => {
     const { getByTestId } = render(
       <EducationShell header={<div>h</div>} statusRow={<div>s</div>} hero={<div>hero</div>}>

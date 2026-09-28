@@ -22,8 +22,11 @@ describe('student lesson PageClient — active-drill viewport', () => {
     expect(shell).toMatch(/h-dvh/);
     expect(shell).toMatch(/overflow-hidden/);
     expect(shell).toMatch(/flex-col/);
-    // Exactly one region inside it scrolls.
+    // Exactly one region inside it scrolls. Contiguous min-h-0/flex-1/
+    // overflow-y-auto is the height contract; overflow-x-clip stops
+    // overflow-y:auto from also enabling sideways scroll on phones.
     expect(shell).toMatch(/min-h-0 flex-1 overflow-y-auto/);
+    expect(shell).toMatch(/overflow-x-clip/);
     // The XP bar is a header slot in that column, not a layer over it.
     expect(practiceContent).toMatch(/<EducationShell/);
     expect(practiceContent).toMatch(/shrink-0/);
