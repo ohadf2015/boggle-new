@@ -216,10 +216,8 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.getByTestId('teacher-pro-trial-lifecycle')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'teacher.subscription.trialLifecycleCta' })).toHaveAttribute(
-      'href',
-      '/en/teacher/upgrade',
-    );
+    expect(screen.getByRole('button', { name: 'teacher.subscription.trialLifecycleCta' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'teacher.subscription.trialLifecycleCta' })).toBeNull();
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-trial-ended')).toBeNull();
@@ -237,10 +235,8 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.getByTestId('teacher-pro-trial-ended')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'teacher.subscription.trialEndedCta' })).toHaveAttribute(
-      'href',
-      '/en/teacher/upgrade',
-    );
+    expect(screen.getByRole('button', { name: 'teacher.subscription.trialEndedCta' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'teacher.subscription.trialEndedCta' })).toBeNull();
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();

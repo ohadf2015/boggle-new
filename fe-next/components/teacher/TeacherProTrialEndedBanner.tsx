@@ -1,15 +1,15 @@
 'use client';
 
-import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
 
 /**
- * Polar Teacher Pro trial has ended. One pay CTA — not another free trial,
- * and not the access-trial `TrialUrgencyBanner`. The banner picker mounts
- * this alone so it does not stack on the milestone Pro ask.
+ * Polar Teacher Pro trial has ended. One pay CTA — POSTs the existing
+ * /api/subscription/checkout till. Not another free trial, and not the
+ * access-trial `TrialUrgencyBanner`.
  */
 export function TeacherProTrialEndedBanner() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <aside
@@ -25,13 +25,12 @@ export function TeacherProTrialEndedBanner() {
             {t('teacher.subscription.trialEndedBody')}
           </p>
         </div>
-        <Link
-          href={`/${language}/teacher/upgrade`}
-          data-testid="teacher-pro-trial-ended-cta"
-          className="inline-flex shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-black px-4 py-2 font-neo-display text-sm font-black text-white shadow-hard hover:-translate-y-0.5"
+        <TeacherProCheckoutButton
+          source="dashboard_trial_ended"
+          testId="teacher-pro-trial-ended-cta"
         >
           {t('teacher.subscription.trialEndedCta')}
-        </Link>
+        </TeacherProCheckoutButton>
       </div>
     </aside>
   );

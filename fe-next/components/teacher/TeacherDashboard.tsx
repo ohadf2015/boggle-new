@@ -58,14 +58,18 @@ export interface TeacherDashboardProps {
   /**
    * The trial / Pro strip, when the route client has one to show. A slot, not
    * a sibling: next to an `h-dvh` root it grew the page past the viewport.
-   * On HQ it lives behind the "Go Pro" dock chip, after the hero.
+   * Milestone Pro ask lives behind the "Go Pro" dock chip. Polar trial /
+   * expired-trial banners pin to the deck (`pinBanner`) so conversion is not
+   * one extra tap behind a chip.
    */
   banner?: ReactNode;
+  /** Polar trial countdown / expired-trial: render `banner` on the deck. */
+  pinBanner?: boolean;
   /** The usage-triggered Pro card (10+ students / 3+ assignments). Same chip. */
   usagePrompt?: ReactNode;
 }
 
-export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboardProps = {}) {
+export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: TeacherDashboardProps = {}) {
   const { t, language } = useLanguage();
   const { profile } = useAuth();
   const router = useRouter();
@@ -197,7 +201,8 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
 
   const closeProjector = useCallback(() => setProjectorOpen(false), []);
 
-  const hasProChip = !!(banner || usagePrompt);
+  const chipBanner = pinBanner ? undefined : banner;
+  const hasProChip = !!(chipBanner || usagePrompt);
   const firstRun = !classroomsLoading && (classrooms.length === 0 || !!newlyCreatedJoinCode);
 
   return (
@@ -247,6 +252,14 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
           '[@media(orientation:landscape)_and_(max-height:500px)]:grid [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-5 [@media(orientation:landscape)_and_(max-height:500px)]:grid-rows-[auto_minmax(0,1fr)] [@media(orientation:landscape)_and_(max-height:500px)]:gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:py-1.5',
         )}
       >
+        {pinBanner && banner ? (
+          <div
+            data-testid="teacher-dashboard-pinned-banner"
+            className="lg:col-span-5 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-5"
+          >
+            {banner}
+          </div>
+        ) : null}
         {/* Top row: which class, and the ONE Tools entry (+ Go Pro chip).
             The shell's tab bar is the nav; nothing else competes with it. The
             dock sits in this row's end but is rendered LAST, so keyboard and
@@ -387,9 +400,9 @@ export default function TeacherDashboard({ banner, usagePrompt }: TeacherDashboa
             ) : undefined
           }
           pro={
-            banner || usagePrompt ? (
+            chipBanner || usagePrompt ? (
               <>
-                {banner}
+                {chipBanner}
                 {usagePrompt ? (
                   <div data-testid="teacher-dashboard-usage-prompt">{usagePrompt}</div>
                 ) : null}

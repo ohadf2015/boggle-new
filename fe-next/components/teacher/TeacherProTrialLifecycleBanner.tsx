@@ -1,28 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
-import {
-  TEACHER_PRO_CHECKOUT_PATH,
-} from '@/components/education/TeacherProCheckoutCta';
+import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
 
 /**
  * Live Polar Teacher Pro trial — days remaining + paid checkout CTA.
  *
  * Distinct from the access-trial `TrialUrgencyBanner` and from the expired
- * `TeacherProTrialEndedBanner`. A live Polar trial is already Pro, so the
- * header chip used to be the only UI; conversion needs an upgrade path
- * before the clock hits zero. Destination is the existing Polar front door
- * (`/{locale}/teacher/upgrade`), not a second checkout POST.
+ * `TeacherProTrialEndedBanner`. CTA POSTs /api/subscription/checkout (Polar
+ * Teacher Pro $9/mo) — same till as the upgrade page, not a second handler.
  */
 export function TeacherProTrialLifecycleBanner({
   trialExpires,
 }: {
   trialExpires: string | null;
 }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [nowMs] = useState(() => Date.now());
   const daysLeft = polarTrialDaysLeft(trialExpires, nowMs);
   const urgent = daysLeft !== null && daysLeft <= 3;
@@ -50,13 +45,12 @@ export function TeacherProTrialLifecycleBanner({
             {t('teacher.subscription.trialLifecycleBody')}
           </p>
         </div>
-        <Link
-          href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
-          data-testid="teacher-pro-trial-lifecycle-cta"
-          className="inline-flex shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-black px-4 py-2 font-neo-display text-sm font-black text-white shadow-hard hover:-translate-y-0.5"
+        <TeacherProCheckoutButton
+          source="dashboard_trial_lifecycle"
+          testId="teacher-pro-trial-lifecycle-cta"
         >
           {t('teacher.subscription.trialLifecycleCta')}
-        </Link>
+        </TeacherProCheckoutButton>
       </div>
     </aside>
   );
