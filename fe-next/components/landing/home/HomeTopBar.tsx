@@ -123,6 +123,7 @@ export function HomeTopBar({
               Pre-mount frame has no seed → plain disc. */}
           <AvatarLite
             customAvatar={p?.avatar_config ?? null}
+            revision={p?.updated_at ?? null}
             userId={avatarSeed}
             pixelSize={44}
           />

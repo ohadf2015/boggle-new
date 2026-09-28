@@ -177,7 +177,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               )}
             >
               <span className={playerStyle.accentHex ? 'rounded-full ring-2 ring-accent ring-offset-1 ring-offset-neo-navy' : ''}>
-                <AvatarLite customAvatar={profile.avatar_config} userId={user?.id} size="sm" />
+                <AvatarLite customAvatar={profile.avatar_config} userId={user?.id} revision={profile.updated_at ?? null} size="sm" />
               </span>
               <span className="hidden sm:inline max-w-[80px] truncate font-medium">{profile.display_name || profile.username}</span>
               {profile.total_xp !== undefined && (

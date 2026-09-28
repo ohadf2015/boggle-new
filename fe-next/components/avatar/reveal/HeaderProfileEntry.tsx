@@ -30,6 +30,7 @@ export default function HeaderProfileEntry() {
       label={level != null ? `${t('revealUnlock.profileEntry')} · ${t('revealUnlock.levelShort', { level })}` : t('revealUnlock.profileEntry')}
       avatarConfig={profile?.avatar_config ?? null}
       userId={user?.id ?? profile?.id}
+      revision={profile?.updated_at ?? null}
       level={level}
       hasNew={hasNew}
       onClick={clearUnseenUnlock}

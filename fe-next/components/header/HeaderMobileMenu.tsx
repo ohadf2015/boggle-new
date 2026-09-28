@@ -465,6 +465,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             displayName={profile.display_name || profile.username}
                                             avatarConfig={avatarConfig}
                                             userId={user?.id}
+                                            revision={profile?.updated_at ?? null}
                                             currentLevel={profile.current_level ?? null}
                                             tier={scoreTier(profile.total_score)}
                                             coins={profile.total_coins || 0}
