@@ -142,6 +142,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/lexiclash-neged-wordle",
   "/lexiclash-vs-apalabrados",
   "/lexiclash-vs-blooket",
+  "/lexiclash-vs-nearpod",
   "/lexiclash-vs-cabanagrams",
   "/lexiclash-vs-flocabulary",
   "/lexiclash-vs-freerice",

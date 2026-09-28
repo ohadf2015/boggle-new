@@ -14993,6 +14993,21 @@ const he = {
         "cta": "ארחו אוצר מילים חינמי לכל הכיתה עם תקרת חינם ברורה של 50"
       }
     },
+    "vsNearpod": {
+      "silverFree": {
+        "eyebrow": "מגבלות חינם — honesty foil",
+        "title": "Nearpod Silver: 40 הצטרפויות תלמידים + 300 MB. LexiClash: כיתה שלמה בחינם (50) + miss→reteach Live.",
+        "lede": "עמוד התמחור של Nearpod מפרסם ב-Silver חינם 40 הצטרפויות תלמידים לשיעור ו-300 MB אחסון (Gold 75 / Platinum 90 / School·District 250). LexiClash חינם מכסה כיתה של עד 50 עם miss-gap → reteach Live.",
+        "nearpodTitle": "Nearpod Silver (חינם) — מגבלות מפורסמות",
+        "nearpodBody": "Silver $0: 40 הצטרפויות לשיעור + 300 MB. Gold 75 / Platinum 90 / School·District 250.",
+        "lexiTitle": "LexiClash — כיתה שלמה בחינם + miss→Live",
+        "lexiBody": "שכבת חינם: עד 50 תלמידים לכיתה למשחקי אוצר מילים, וכן miss-gap → reteach Live. מגבלת מושבים אחת ברורה.",
+        "citePrefix": "תמחור Nearpod:",
+        "citePricingLabel": "nearpod.com/pricing (Silver $0)",
+        "citeSuffix": " — Silver 40 הצטרפויות + 300 MB; Gold 75; Platinum 90; School/District 250.",
+        "cta": "הריצו אוצר מילים חינמי לכיתה שלמה עם מגבלה ברורה של 50 מושבים"
+      }
+    },
 "vsBlooket": {
       "gapsSet": {
         "eyebrow": "אחרי הדוח — השוואה כנה",

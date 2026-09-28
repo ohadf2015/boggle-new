@@ -13685,6 +13685,21 @@ const en = {
         "cta": "Host whole-class free vocab with a clear 50-seat free limit"
       }
     },
+    "vsNearpod": {
+      "silverFree": {
+        "eyebrow": "Free-tier caps — honesty foil",
+        "title": "Nearpod Silver: 40 joins/lesson + 300 MB. LexiClash: whole-class free (50) + miss→reteach Live.",
+        "lede": "Nearpod pricing publishes Silver free caps of 40 joins per lesson and 300 MB storage (Gold 75 / Platinum 90 / School·District 250). LexiClash free covers up to 50 students per class with miss-gap → reteach Live — one clear free classroom seat cap.",
+        "nearpodTitle": "Nearpod Silver (free) — published caps",
+        "nearpodBody": "Silver $0: 40 joins per lesson + 300 MB storage. Gold raises joins to 75 (1 GB); Platinum to 90 (5 GB); School/District licenses list 250 joins and unlimited storage.",
+        "lexiTitle": "LexiClash — whole-class free + miss→Live",
+        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games, plus miss-gap → reteach Live. One published classroom free cap — no separate 300 MB storage gate on the free reteach path.",
+        "citePrefix": "Nearpod pricing:",
+        "citePricingLabel": "nearpod.com/pricing (Silver $0)",
+        "citeSuffix": " — Silver 40 joins + 300 MB; Gold 75; Platinum 90; School/District 250.",
+        "cta": "Host whole-class free vocab with a clear 50-seat free limit"
+      }
+    },
 "vsBlooket": {
       "gapsSet": {
         "eyebrow": "After the report — honesty foil",

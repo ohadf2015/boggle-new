@@ -3665,6 +3665,21 @@ const ru = {
         "cta": "Провести бесплатный vocab на весь класс с ясным бесплатным лимитом 50"
       }
     },
+    "vsNearpod": {
+      "silverFree": {
+        "eyebrow": "Лимиты бесплатного плана — honesty foil",
+        "title": "Nearpod Silver: 40 подключений учеников + 300 MB. LexiClash: весь класс бесплатно (50) + miss→reteach Live.",
+        "lede": "Страница цен Nearpod публикует на Silver бесплатно 40 подключений учеников за урок и 300 MB хранилища (Gold 75 / Platinum 90 / School·District 250). LexiClash бесплатно покрывает до 50 учеников в классе с miss-gap → reteach Live.",
+        "nearpodTitle": "Nearpod Silver (бесплатно) — опубликованные лимиты",
+        "nearpodBody": "Silver $0: 40 подключений за урок + 300 MB. Gold 75 / Platinum 90 / School·District 250.",
+        "lexiTitle": "LexiClash — весь класс бесплатно + miss→Live",
+        "lexiBody": "Бесплатный план: до 50 учеников в классе для словарных игр плюс miss-gap → reteach Live. Один чёткий лимит бесплатных мест.",
+        "citePrefix": "Цены Nearpod:",
+        "citePricingLabel": "nearpod.com/pricing (Silver $0)",
+        "citeSuffix": " — Silver 40 подключений + 300 MB; Gold 75; Platinum 90; School/District 250.",
+        "cta": "Проведите бесплатную словарную игру для всего класса с чётким лимитом 50 мест"
+      }
+    },
 "vsBlooket": {
       "gapsSet": {
         "eyebrow": "После отчёта — честное сравнение",
