@@ -1,6 +1,7 @@
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { SinglePlayerLcpShell } from '@/components/singleplayer/SinglePlayerLcpShell';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
@@ -129,10 +130,11 @@ export default async function SinglePlayerLayout({ children, params }: SinglePla
 
   return (
     <>
-      {/* LCP on /singleplayer is the loader mascot (winner.webp, ~148KiB, Low
-          priority in PSI). Preload + fetchpriority=high so discovery insight
-          stops failing and LCP is not gated on late image fetch. */}
+      {/* LCP on /singleplayer is the loader mascot (winner.webp, ~148KiB).
+          Preload for discovery, AND a server-rendered <img> outside the
+          ssr:false PageClient bailout so paint is not gated on JS. */}
       <link rel="preload" as="image" href="/mascot/winner.webp" fetchPriority="high" />
+      <SinglePlayerLcpShell />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema]) }}
