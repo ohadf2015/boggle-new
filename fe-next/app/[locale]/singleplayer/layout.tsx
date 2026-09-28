@@ -130,10 +130,10 @@ export default async function SinglePlayerLayout({ children, params }: SinglePla
 
   return (
     <>
-      {/* LCP on /singleplayer is the loader mascot (winner.webp, ~148KiB).
-          Preload for discovery, AND a server-rendered <img> outside the
-          ssr:false PageClient bailout so paint is not gated on JS. */}
-      <link rel="preload" as="image" href="/mascot/winner.webp" fetchPriority="high" />
+      {/* LCP on /singleplayer is a still 192px mascot (~3KiB). The animated
+          winner.webp (51 frames / 148KiB) must NOT be the LCP image — browsers
+          wait on all frames and PSI billed ~142KiB compression waste. */}
+      <link rel="preload" as="image" href="/mascot/winner-lcp.webp" fetchPriority="high" />
       <SinglePlayerLcpShell />
       <script
         type="application/ld+json"

@@ -6,6 +6,7 @@ import { locales, defaultLocale } from '../lib/i18n';
 import { matchLanguageList } from '../lib/localeResolution';
 import { loadTranslation, getCachedTranslation, seedTranslationCache, type TranslationData } from '../translations/loadTranslation';
 import { isPartialCatalogue } from '@/lib/i18n/isPartialCatalogue';
+import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import logger from '@/utils/logger';
 import { trackTelemetryEvent } from '@/utils/sentry';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
@@ -174,15 +175,27 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                     logger.warn(`Failed to load translations for ${language}:`, err);
                 });
             };
-            // First engagement or first client navigation, never on idle: an idle
-            // upgrade always landed inside the first load, spending ~150KB br on
-            // a catalogue the landing page does not use (it renders only the
-            // subset namespaces). Guarded by fresh.perf.LanguageContext.deferredUpgrade.test.
             const onEngage = () => upgrade();
             const opts = { capture: true, passive: true } as const;
             const detach = () => {
                 for (const type of SUBSET_UPGRADE_EVENTS) window.removeEventListener(type, onEngage, opts);
             };
+            // Fullscreen game routes boot the slim catalogue so LCP is not
+            // gated on ~166KB parse. Upgrade immediately after hydration —
+            // not on idle (landing rule) and not on engagement (the start
+            // card needs playerView strings before the user taps Play).
+            if (isHeavyGamePath(pathname)) {
+                upgrade();
+                subsetUpgradeRef.current = upgrade;
+                return () => {
+                    cancelled = true;
+                    subsetUpgradeRef.current = null;
+                };
+            }
+            // First engagement or first client navigation, never on idle: an idle
+            // upgrade always landed inside the first load, spending ~150KB br on
+            // a catalogue the landing page does not use (it renders only the
+            // subset namespaces). Guarded by fresh.perf.LanguageContext.deferredUpgrade.test.
             for (const type of SUBSET_UPGRADE_EVENTS) window.addEventListener(type, onEngage, opts);
             subsetUpgradeRef.current = upgrade;
             return () => {

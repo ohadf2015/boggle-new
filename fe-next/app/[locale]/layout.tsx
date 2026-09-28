@@ -5,6 +5,7 @@ import { layoutTranslations as translations } from '@/translations/layout';
 import { ConditionalProviders } from '../conditional-providers';
 import MESSAGES_MANIFEST from '@/lib/i18n/messagesManifest.json';
 import { isLandingPath, PATHNAME_HEADER } from '@/lib/i18n/isLandingPath';
+import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import { HREFLANG_LOCALES } from '@/lib/seo/hreflang';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
@@ -275,7 +276,14 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     const messagesSrc = MESSAGES_MANIFEST[validLocale] ?? MESSAGES_MANIFEST.en;
     const landingMessagesSrc =
         MESSAGES_MANIFEST[`${validLocale}Landing`] ?? messagesSrc;
-    const isLanding = isLandingPath(headerList.get(PATHNAME_HEADER) || '');
+    const requestPath = headerList.get(PATHNAME_HEADER) || '';
+    const isLanding = isLandingPath(requestPath);
+    // Fullscreen game routes have the same first-paint constraint as landing:
+    // the 166KB full catalogue as beforeInteractive pins FCP at 1803ms and
+    // gates LCP on main-thread parse (PSI /singleplayer 2026-09-28). Slim
+    // landing asset beforeInteractive; LanguageContext upgrades to the full
+    // catalogue after hydration on these paths.
+    const slimI18n = isLanding || isHeavyGamePath(requestPath);
 
     // IMPORTANT: The theme script below modifies the DOM before React hydration
     // To prevent hydration mismatches, we need to ensure the server-rendered className
@@ -607,7 +615,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     async runtime chunks in the served HTML, so hydration can
                     win the race. next/script beforeInteractive is injected into
                     the initial HTML ahead of the Next runtime on purpose. */}
-                {isLanding ? (
+                {slimI18n ? (
                     <>
                         <link rel="preload" as="script" href={landingMessagesSrc} />
                         <Script id="lexi-i18n-messages-landing" src={landingMessagesSrc} strategy="beforeInteractive" />

@@ -86,4 +86,10 @@ describe('landing subset: full catalogue waits for first engagement', () => {
     // THEN the full catalogue is fetched for the new page
     expect(loadTranslation).toHaveBeenCalledTimes(1);
   });
+
+  it('shouldUpgradeImmediatelyOnAFullscreenGameRoute', () => {
+    pathname = '/en/singleplayer';
+    renderProvider();
+    expect(loadTranslation).toHaveBeenCalledTimes(1);
+  });
 });
