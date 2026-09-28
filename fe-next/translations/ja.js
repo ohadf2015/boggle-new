@@ -15138,6 +15138,21 @@ const ja = {
         "cta": "明確な無料50席でクラス全体のボキャブをホスト"
       }
     },
+    "vsNearpod": {
+      "silverFree": {
+        "eyebrow": "無料枠の上限 — honesty foil",
+        "title": "Nearpod Silver: レッスンあたり40プレイヤー参加 + 300 MB。LexiClash: クラス全体無料（50）+ miss→reteach Live。",
+        "lede": "Nearpodの料金ページは、Silver無料でレッスンあたり40プレイヤー参加・300 MBストレージ（Gold 75 / Platinum 90 / School·District 250）と公開しています。LexiClash無料は最大50人のクラス全体と miss-gap → reteach Live を提供します。",
+        "nearpodTitle": "Nearpod Silver（無料）— 公開上限",
+        "nearpodBody": "Silver $0: レッスンあたり40プレイヤー参加 + 300 MB。Gold 75 / Platinum 90 / School·District 250。",
+        "lexiTitle": "LexiClash — クラス全体無料 + miss→Live",
+        "lexiBody": "無料枠: クラスあたり最大50人の語彙ゲームに加え、miss-gap → reteach Live。明確な無料座席上限はひとつ。",
+        "citePrefix": "Nearpod pricing:",
+        "citePricingLabel": "nearpod.com/pricing（Silver $0）",
+        "citeSuffix": " — Silver 40参加 + 300 MB; Gold 75; Platinum 90; School/District 250。",
+        "cta": "明確な50席の無料枠でクラス全体の語彙ゲームをホスト"
+      }
+    },
 "vsBlooket": {
       "gapsSet": {
         "eyebrow": "レポートのあと — 正直な比較",

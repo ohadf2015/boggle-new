@@ -15087,6 +15087,21 @@ const es = {
         "cta": "Organiza vocabulario gratis para toda la clase con un tope gratis claro de 50"
       }
     },
+    "vsNearpod": {
+      "silverFree": {
+        "eyebrow": "Límites del plan gratis — honesty foil",
+        "title": "Nearpod Silver: 40 uniones de estudiantes + 300 MB. LexiClash: clase completa gratis (50) + miss→reteach Live.",
+        "lede": "La página de precios de Nearpod publica en Silver gratis 40 uniones de estudiantes por lección y 300 MB de almacenamiento (Gold 75 / Platinum 90 / School·District 250). LexiClash gratis cubre hasta 50 estudiantes por clase con miss-gap → reteach Live.",
+        "nearpodTitle": "Nearpod Silver (gratis) — límites publicados",
+        "nearpodBody": "Silver $0: 40 uniones por lección + 300 MB. Gold 75 / Platinum 90 / School·District 250.",
+        "lexiTitle": "LexiClash — clase completa gratis + miss→Live",
+        "lexiBody": "Plan gratis: hasta 50 estudiantes por clase para vocabulario, más miss-gap → reteach Live. Un límite claro de asientos gratis.",
+        "citePrefix": "Precios de Nearpod:",
+        "citePricingLabel": "nearpod.com/pricing (Silver $0)",
+        "citeSuffix": " — Silver 40 uniones + 300 MB; Gold 75; Platinum 90; School/District 250.",
+        "cta": "Organiza vocabulario gratis para toda la clase con un límite claro de 50 asientos"
+      }
+    },
 "vsBlooket": {
       "gapsSet": {
         "eyebrow": "Después del informe — comparación honesta",

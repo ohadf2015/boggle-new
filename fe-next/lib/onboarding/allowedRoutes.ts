@@ -69,6 +69,7 @@ const MARKETING_LANDING_PREFIXES: ReadonlyArray<string> = [
   // Competitor comparison landings
   '/lexiclash-vs-apalabrados',
   '/lexiclash-vs-blooket',
+  '/lexiclash-vs-nearpod',
   '/lexiclash-vs-cabanagrams',
   '/lexiclash-vs-flocabulary',
   '/lexiclash-vs-freerice',

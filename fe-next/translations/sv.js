@@ -15373,6 +15373,21 @@ const sv = {
         "cta": "Håll helklass gratis vocab med tydlig gratisgräns på 50"
       }
     },
+    "vsNearpod": {
+      "silverFree": {
+        "eyebrow": "Gratisnivåns tak — honesty foil",
+        "title": "Nearpod Silver: 40 elevanslutningar + 300 MB. LexiClash: hela klassen gratis (50) + miss→reteach Live.",
+        "lede": "Nearpods prissida publicerar på Silver gratis 40 elevanslutningar per lektion och 300 MB lagring (Gold 75 / Platinum 90 / School·District 250). LexiClash gratis täcker upp till 50 elever per klass med miss-gap → reteach Live.",
+        "nearpodTitle": "Nearpod Silver (gratis) — publicerade tak",
+        "nearpodBody": "Silver $0: 40 anslutningar per lektion + 300 MB. Gold 75 / Platinum 90 / School·District 250.",
+        "lexiTitle": "LexiClash — hela klassen gratis + miss→Live",
+        "lexiBody": "Gratisnivå: upp till 50 elever per klass för ordförrådsspel plus miss-gap → reteach Live. Ett tydligt gratisplatstak.",
+        "citePrefix": "Nearpod-priser:",
+        "citePricingLabel": "nearpod.com/pricing (Silver $0)",
+        "citeSuffix": " — Silver 40 anslutningar + 300 MB; Gold 75; Platinum 90; School/District 250.",
+        "cta": "Hosta gratis ordförråd för hela klassen med ett tydligt 50-plats gratisgräns"
+      }
+    },
 "vsBlooket": {
       "gapsSet": {
         "eyebrow": "Efter rapporten — ärlig jämförelse",
