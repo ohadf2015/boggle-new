@@ -24,12 +24,13 @@ vi.mock('@/translations/loadTranslation', () => ({
 import SinglePlayerLayout from '../layout';
 
 describe('singleplayer LCP shell (server HTML)', () => {
-  it('paints winner.webp as a raw img (not next/image, not client-only)', () => {
+  it('paints winner-lcp.webp as a raw img (not next/image, not client-only)', () => {
     const html = renderToStaticMarkup(<SinglePlayerLcpShell />);
     expect(html).toContain('id="sp-lcp-paint"');
-    expect(html).toMatch(/src="\/mascot\/winner\.webp"/);
+    expect(html).toMatch(/src="\/mascot\/winner-lcp\.webp"/);
     expect(html).toMatch(/fetchPriority="high"/);
     expect(html).not.toContain('data-nimg');
+    expect(html).not.toMatch(/src="\/mascot\/winner\.webp"/);
   });
 
   it('is mounted from the route layout so it survives the ssr:false swap', async () => {
@@ -39,7 +40,15 @@ describe('singleplayer LCP shell (server HTML)', () => {
     });
     const html = renderToStaticMarkup(tree);
     expect(html).toContain('id="sp-lcp-paint"');
-    expect(html).toMatch(/rel="preload"[^>]*href="\/mascot\/winner\.webp"/);
+    expect(html).toMatch(/rel="preload"[^>]*href="\/mascot\/winner-lcp\.webp"/);
     expect(html).toContain('data-testid="sp-child"');
+  });
+
+  it('ships a still LCP asset well under the 148KB animated winner.webp', async () => {
+    const { stat } = await import('node:fs/promises');
+    const { join } = await import('node:path');
+    const info = await stat(join(__dirname, '../../../../public/mascot/winner-lcp.webp'));
+    expect(info.size).toBeGreaterThan(500);
+    expect(info.size).toBeLessThan(25 * 1024);
   });
 });

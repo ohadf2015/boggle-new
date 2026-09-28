@@ -13,8 +13,13 @@ describe('landing first-paint i18n', () => {
     expect(LAYOUT).toMatch(/landingMessagesSrc/);
     expect(LAYOUT).toMatch(/lexi-i18n-messages-landing/);
     expect(LAYOUT).toMatch(/strategy="beforeInteractive"/);
-    expect(LAYOUT).toMatch(/isLanding \?/);
+    expect(LAYOUT).toMatch(/slimI18n \?/);
     expect(LAYOUT).toContain('id="lexi-i18n-messages"');
+  });
+
+  it('uses the slim catalogue on fullscreen game routes so /singleplayer is not main-thread gated', () => {
+    expect(LAYOUT).toMatch(/isHeavyGamePath/);
+    expect(LAYOUT).toMatch(/slimI18n/);
   });
 
   it('builds a per-locale landing asset, not only the 500KiB full catalogue', () => {

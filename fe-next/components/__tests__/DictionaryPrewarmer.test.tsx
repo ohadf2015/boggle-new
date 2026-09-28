@@ -18,19 +18,37 @@ describe('DictionaryPrewarmer', () => {
   beforeEach(() => {
     prewarmMock.mockReset();
     prewarmMock.mockResolvedValue(undefined);
-    pathnameMock.mockReturnValue('/en/singleplayer');
+    pathnameMock.mockReturnValue('/en/blog');
     try { localStorage.clear(); } catch { /* jsdom */ }
   });
 
-  it('prewarms eagerly on mount (no idle/timeout deferral)', () => {
-    // Must fire immediately so the active-locale dictionary is fetched (and thus
-    // SW-cached) before the user can go offline. A short-lived session may never
-    // reach a requestIdleCallback, so deferral would leave the dict cold.
+  it('prewarms eagerly on non-game nested routes (no idle/timeout deferral)', () => {
+    pathnameMock.mockReturnValue('/en/blog');
     render(<DictionaryPrewarmer lang="en" />);
     expect(prewarmMock).toHaveBeenCalledWith('en');
   });
 
+  it('does not fetch the 704KB dictionary during the /singleplayer LCP window', () => {
+    pathnameMock.mockReturnValue('/en/singleplayer');
+    render(<DictionaryPrewarmer lang="en" />);
+    expect(prewarmMock).not.toHaveBeenCalled();
+  });
+
+  it('warms the dictionary on /singleplayer after idle timeout', () => {
+    vi.useFakeTimers();
+    const ric = (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback;
+    delete (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback;
+    pathnameMock.mockReturnValue('/en/singleplayer');
+    render(<DictionaryPrewarmer lang="en" />);
+    expect(prewarmMock).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(3500);
+    expect(prewarmMock).toHaveBeenCalledWith('en');
+    vi.useRealTimers();
+    if (ric) (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback = ric;
+  });
+
   it('re-prewarms when the language changes', () => {
+    pathnameMock.mockReturnValue('/en/blog');
     const { rerender } = render(<DictionaryPrewarmer lang="en" />);
     prewarmMock.mockClear();
     rerender(<DictionaryPrewarmer lang="he" />);

@@ -22,7 +22,7 @@ export function SinglePlayerLcpShell() {
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/mascot/winner.webp"
+        src="/mascot/winner-lcp.webp"
         alt=""
         width={112}
         height={112}
