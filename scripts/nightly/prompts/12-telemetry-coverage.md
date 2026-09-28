@@ -47,6 +47,7 @@ Then per-mode completion (the §2 hole):
 bash scripts/nightly/lib/posthog-query.sh hogql \
   "SELECT event, coalesce(properties.mode, properties.gameMode, 'none') AS m, count() AS c FROM events WHERE event IN ('game_started','game_completed') AND timestamp > now() - INTERVAL 14 DAY AND (properties.\$host = 'www.lexiclash.live' OR properties.\$host IS NULL) GROUP BY event, m ORDER BY m, event LIMIT 100"
 ```
+**Flood caveat (2026-09-28):** if a count looks impossibly high (one id can loop hundreds of completes/day — 847 `game_completed` from a single Linux Chrome session on 15–16 Sep 2026), re-run the query grouped by `distinct_id` and exclude ids with >50 events in the window before judging an event healthy or cratered; report `uniq(distinct_id)` alongside raw counts.
 **Always filter `properties.$host = 'www.lexiclash.live' OR properties.$host IS NULL`** — this
 PostHog project is shared by ~12 unrelated apps (`imposketch.io`, `growthradar.app`,
 `stoquant.com`, etc). Unfiltered, their own `game_started`/`page_view`/etc events land in `events`

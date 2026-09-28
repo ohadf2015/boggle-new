@@ -40,6 +40,7 @@ Use the Bash helper for ALL PostHog data: `scripts/nightly/lib/posthog-query.sh 
   • Funnel: homepage → game-start → game-complete → return-day-2, last 24h vs prior-7d-baseline
   • Largest drop per step
   • Flag list: query `GET /api/projects/{PROJECT_ID}/feature_flags/` to enumerate active flags + their experiment-result link
+  • FLOOD CAP (HARD — 2026-09-28): every count-based query GROUPs BY distinct_id FIRST and EXCLUDES any id with >50 events in the window from the headline number; report excluded volume separately ("excluded N events from M outlier ids") and always pair event counts with uniq(distinct_id). One looping Linux Chrome session fired 847 `game_completed` on 15–16 Sep 2026 (distinct_id 01a056e6-3165-7ceb-b81d-505a7fab8169) and moved the weekly outcome-checker headline 8x (986 raw → 130 capped) — an uncapped funnel comparison will chase a phantom collapse. Pattern: `WITH w AS (SELECT distinct_id, count() AS n FROM events WHERE event='<ev>' AND timestamp > now() - INTERVAL 7 DAY AND (properties.\$host = 'www.lexiclash.live' OR properties.\$host IS NULL) GROUP BY distinct_id) SELECT sum(n) AS raw, uniq(distinct_id) AS uniques, sumIf(n, n<=50) AS capped, sumIf(n, n>50) AS excluded FROM w`.
 
 ═══ STEP 2 — Flag hygiene ═══
 For each active flag:
