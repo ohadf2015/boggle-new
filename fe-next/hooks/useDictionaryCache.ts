@@ -22,6 +22,8 @@ import type { Language } from '@/shared/types/game';
 import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { DictionaryWorkerApi } from '@/workers/dictionaryWorker';
 import { buildWordSet } from '@/lib/dictionary/buildWordSet';
+import { fetchDictionaryWordsNetwork } from '@/lib/dictionary/sharedDictionaryFetch';
+import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 
 // IndexedDB configuration
 const DB_NAME = 'lexiclash-dictionary';
@@ -222,8 +224,8 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
       return workerResult;
     }
 
-    // Fallback: fetch on main thread
-    const response = await fetch(`/api/dictionary-words?lang=${language}`);
+    // Fallback: fetch on main thread (deduped with warmDictionaryCache)
+    const response = await fetchDictionaryWordsNetwork(language);
     if (!response.ok) {
       throw new Error(`Failed to fetch dictionary: ${response.status}`);
     }
@@ -326,7 +328,11 @@ export function __resetDictionaryCacheForTests(seed?: Map<Language, Set<string>>
 /**
  * Hook for client-side dictionary caching
  */
-export function useDictionaryCache(language: Language): UseDictionaryCacheReturn {
+export function useDictionaryCache(
+  language: Language,
+  options?: { enabled?: boolean },
+): UseDictionaryCacheReturn {
+  const enabled = options?.enabled !== false;
   const [isLoaded, setIsLoaded] = useState(memoryCache.has(language));
   const [isLoading, setIsLoading] = useState(false);
   const [wordCount, setWordCount] = useState(memoryCache.get(language)?.size || 0);
@@ -335,11 +341,22 @@ export function useDictionaryCache(language: Language): UseDictionaryCacheReturn
 
   // Load dictionary on mount or language change
   useEffect(() => {
+    // /singleplayer PSI auto-starts phase=playing, so a playing-only gate still
+    // fetched 704KB during load. Defer the network until a submit prewarms
+    // (server /api/validate-word covers the first word). IDB/memory hits skip
+    // the network and still load.
+    const path = typeof window !== 'undefined' ? window.location.pathname : '';
+    const deferNetwork = !enabled || isHeavyGamePath(path);
+
     // If already loaded in memory, use it
     if (memoryCache.has(language)) {
       dictionaryRef.current = memoryCache.get(language)!;
       setIsLoaded(true);
       setWordCount(dictionaryRef.current.size);
+      return;
+    }
+
+    if (deferNetwork) {
       return;
     }
 
@@ -362,7 +379,7 @@ export function useDictionaryCache(language: Language): UseDictionaryCacheReturn
       .finally(() => {
         setIsLoading(false);
       });
-  }, [language]);
+  }, [language, enabled]);
 
   /**
    * Check if a word is in the dictionary

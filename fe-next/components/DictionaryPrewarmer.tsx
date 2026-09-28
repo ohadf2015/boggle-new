@@ -16,7 +16,8 @@ interface Props {
 // transfer on the landing page. The bare "/" matters: www.lexiclash.live/ is
 // served as the landing (server-side locale rewrite keeps the browser URL at
 // "/", so usePathname() returns "/"), and without it the warm fired on every
-// first-time landing visit. Game routes keep the eager warm.
+// first-time landing visit. Game routes keep the eager warm EXCEPT fullscreen
+// game paths, which must not fetch during PSI's load window.
 const LANDING_RE = /^\/([a-z]{2})?\/?$/i;
 
 function shouldSkipWarm(pathname: string | null): boolean {
@@ -24,7 +25,7 @@ function shouldSkipWarm(pathname: string | null): boolean {
   const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
   if (conn?.saveData || conn?.effectiveType === '2g' || conn?.effectiveType === 'slow-2g') return true;
 
-  if (!LANDING_RE.test(pathname || '')) return false; // game routes: keep warming
+  if (!LANDING_RE.test(pathname || '')) return false; // nested routes: keep warming (unless heavy game, gated below)
 
   // On the landing page, only warm when the SW already holds the dictionary
   // (cache hit, no network) or the user has played before (likely to play again).
@@ -35,26 +36,15 @@ function shouldSkipWarm(pathname: string | null): boolean {
   }
 }
 
-const GAME_WARM_IDLE_MS = 3500;
-
-function scheduleAfterFirstPaint(fn: () => void): () => void {
-  const w = window as Window & {
-    requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number;
-    cancelIdleCallback?: (id: number) => void;
-  };
-  if (typeof w.requestIdleCallback === 'function') {
-    const id = w.requestIdleCallback(() => fn(), { timeout: GAME_WARM_IDLE_MS });
-    return () => w.cancelIdleCallback?.(id);
-  }
-  const t = window.setTimeout(fn, GAME_WARM_IDLE_MS);
-  return () => window.clearTimeout(t);
-}
-
 export default function DictionaryPrewarmer({ lang }: Props) {
   const pathname = usePathname();
 
   useEffect(() => {
     if (shouldSkipWarm(pathname)) return;
+    // Idle-defer on /singleplayer still landed inside PSI (start 1.7–8.2s) and
+    // autoStart=bots means phase=playing from the first paint — so skip entirely.
+    // useWordSubmission prewarms on the first submit; server validation covers it.
+    if (isHeavyGamePath(pathname)) return;
 
     let cancelled = false;
     let onControllerChange: (() => void) | undefined;
@@ -97,14 +87,10 @@ export default function DictionaryPrewarmer({ lang }: Props) {
       }
     };
 
-    // /singleplayer PSI: this 704KB fetch was inside the LCP window. The game
-    // hook (useDictionaryCache) only mounts on phase==='playing', so deferring
-    // the layout prewarm does not delay first-word validation until Play.
-    const cancelIdle = isHeavyGamePath(pathname) ? scheduleAfterFirstPaint(run) : (run(), () => {});
+    run();
 
     return () => {
       cancelled = true;
-      cancelIdle();
       if (sw && onControllerChange) sw.removeEventListener('controllerchange', onControllerChange);
     };
   }, [lang, pathname]);

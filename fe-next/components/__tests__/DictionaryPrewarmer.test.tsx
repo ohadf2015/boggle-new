@@ -34,15 +34,15 @@ describe('DictionaryPrewarmer', () => {
     expect(prewarmMock).not.toHaveBeenCalled();
   });
 
-  it('warms the dictionary on /singleplayer after idle timeout', () => {
+  it('never warms the dictionary on /singleplayer (idle is still inside the PSI load window)', () => {
     vi.useFakeTimers();
     const ric = (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback;
     delete (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback;
     pathnameMock.mockReturnValue('/en/singleplayer');
     render(<DictionaryPrewarmer lang="en" />);
     expect(prewarmMock).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(3500);
-    expect(prewarmMock).toHaveBeenCalledWith('en');
+    vi.advanceTimersByTime(60_000);
+    expect(prewarmMock).not.toHaveBeenCalled();
     vi.useRealTimers();
     if (ric) (window as Window & { requestIdleCallback?: unknown }).requestIdleCallback = ric;
   });

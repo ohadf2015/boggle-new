@@ -284,6 +284,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     // landing asset beforeInteractive; LanguageContext upgrades to the full
     // catalogue after hydration on these paths.
     const slimI18n = isLanding || isHeavyGamePath(requestPath);
+    const heavyGame = isHeavyGamePath(requestPath);
 
     // IMPORTANT: The theme script below modifies the DOM before React hydration
     // To prevent hydration mismatches, we need to ensure the server-rendered className
@@ -715,7 +716,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     }}
                 />
             </head>
-            <body className="antialiased screen-fit" suppressHydrationWarning>
+            <body className="antialiased screen-fit" suppressHydrationWarning data-lc-heavy-game={heavyGame ? '1' : undefined}>
         {/* GA4 G-7VLG16BJQH — gtag.js loads on the visitor's first engagement
             (LocaleGtagLoader → EngagementScript), not with the page. On
             fullscreen game routes the 3s bounce fallback is skipped so PSI
@@ -746,20 +747,20 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     Anchor-ad height observer unmounted 2026-09-27 (t_88511d33): no Auto-Ads
                     anchor exists; the body MutationObserver was leftover main-thread
                     cost. H5 Games Ads remains the web ad path (intent-gated). */}
-                <SocialMediaPixels />
-                <WebVitalsReporter />
+                {!heavyGame && <SocialMediaPixels />}
+                {!heavyGame && <WebVitalsReporter />}
                 {/* Report current page so admin live monitor sees users not in a game */}
-                <PagePresenceReporter />
+                {!heavyGame && <PagePresenceReporter />}
                 <ServiceWorkerRegistration />
                 {/* Defer loading animations.css (60KB) after page mount */}
-                <AnimationsLoader />
+                {!heavyGame && <AnimationsLoader />}
                 {/* Warm client dict Set on idle so first word submit skips ~100-300ms fetch */}
-                <DictionaryPrewarmer lang={validLocale as Language} />
+                {!heavyGame && <DictionaryPrewarmer lang={validLocale as Language} />}
                 {/* DeepLinkHandler moved to NativeAppProvider (client component) to avoid Capacitor/Turbopack issues */}
                 {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
-                <NativeOAuthInitializer />
+                {!heavyGame && <NativeOAuthInitializer />}
                 {/* Warm the Android-only Play Games Services bridge on mobile */}
-                <NativePGSInitializer />
+                {!heavyGame && <NativePGSInitializer />}
                 {/* Server-rendered legal navigation — guarantees crawlers find
                     privacy/terms/about links even without JS execution */}
                 <nav aria-label="Site Navigation" className="sr-only">
@@ -783,8 +784,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {/* Auto-recovers stale-deploy chunk 404s that escape error boundaries
                         (prefetch / asset onerror / next/dynamic import rejections). */}
                     <ChunkErrorRecovery />
-                    <OfflineBanner />
-                    <OfflineSyncBridge />
+                    {!heavyGame && <OfflineBanner />}
+                    {!heavyGame && <OfflineSyncBridge />}
                     <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">
                         <main
                             id="main-content"
@@ -797,9 +798,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                                 <ChunkErrorBoundary>{children}</ChunkErrorBoundary>
                             </div>
                         </main>
-                        <AutoHideFooter className="relative z-0 shrink-0" />
+                        {!heavyGame && <AutoHideFooter className="relative z-0 shrink-0" />}
                         {/* Global bottom navigation - mobile only, hidden during gameplay */}
-                        <GlobalBottomNav />
+                        {!heavyGame && <GlobalBottomNav />}
                         {/* Global mute control — appears only during active gameplay, when
                             the header (and its MusicControls) is hidden. */}
                         <InGameAudioButton />
@@ -807,14 +808,14 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {/* Install prompts, cookie banner, version checker, churn tracker
                         and the seasonal countdown — all post-hydration only, all
                         ssr:false so they stay out of this layout's entry chunk. */}
-                    <DeferredLayoutWidgets />
+                    {!heavyGame && <DeferredLayoutWidgets />}
                     {/* Single feedback entry point: feedback.devtools shared widget.
                         Intent-gated (no first-paint script) — 250 KiB / ~3.6s off
                         the landing Lighthouse graph until the user gestures. */}
-                    <FeedbackDevtoolsWidget />
+                    {!heavyGame && <FeedbackDevtoolsWidget />}
                     {/* Google One Tap (web) — in-page ID-token sign-in so Google's
                         consent shows our domain, not <ref>.supabase.co. No redirect. */}
-                    <GoogleOneTapInitializer />
+                    {!heavyGame && <GoogleOneTapInitializer />}
                 </ConditionalProviders>
             </body>
         </html>

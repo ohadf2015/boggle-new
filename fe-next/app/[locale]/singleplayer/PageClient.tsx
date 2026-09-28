@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import nextDynamic from 'next/dynamic';
 import { retryImport } from '@/utils/retryImport';
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
@@ -18,6 +18,7 @@ function LoadingFallback(): React.JSX.Element {
       translate="no"
       aria-busy="true"
       aria-label="Loading single player"
+      data-testid="sp-game-hydrate-pending"
     />
   );
 }
@@ -47,8 +48,28 @@ const SinglePlayerView = nextDynamic(
  * Wrapped in Suspense boundary to properly handle useSearchParams
  * which can cause "Rendered fewer hooks than expected" errors without it.
  * See: https://nextjs.org/docs/app/api-reference/functions/use-search-params
+ *
+ * Game client is not mounted until after first paint so the server LCP
+ * shell can become FCP without waiting on Script Evaluation of the board.
  */
 export default function SinglePlayerPageClient(): React.JSX.Element {
+  const [hydrateGame, setHydrateGame] = useState(false);
+
+  useEffect(() => {
+    let inner = 0;
+    const outer = window.requestAnimationFrame(() => {
+      inner = window.requestAnimationFrame(() => setHydrateGame(true));
+    });
+    return () => {
+      window.cancelAnimationFrame(outer);
+      window.cancelAnimationFrame(inner);
+    };
+  }, []);
+
+  if (!hydrateGame) {
+    return <LoadingFallback />;
+  }
+
   return (
     <ChunkErrorBoundary>
       <Suspense fallback={<LoadingFallback />}>
