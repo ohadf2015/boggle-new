@@ -15154,10 +15154,10 @@ const ja = {
       },
       "freeTier": {
         "eyebrow": "無料枠の上限 — honesty foil",
-        "title": "Blooket Starter: ライブ最大60人 + 宿題14日。LexiClash: クラス全体無料（50）+ miss→reteach Live。",
-        "lede": "Blooketのヘルプとアップグレードページは、Starter無料でライブ最大60人・宿題期限最大14日（Plusは300人 / 365日）と公開しています。LexiClash無料は最大50人のクラス全体と miss-gap → reteach Live を提供します。",
+        "title": "Blooket Starter: ライブ最大60プレイヤー + 宿題14日。LexiClash: クラス全体無料（50）+ miss→reteach Live。",
+        "lede": "Blooketのヘルプとアップグレードページは、Starter無料でライブ最大60プレイヤー・宿題期限最大14日（Plusは300プレイヤー / 365日）と公開しています。LexiClash無料は最大50人のクラス全体と miss-gap → reteach Live を提供します。",
         "blooketTitle": "Blooket Starter（無料）— 公開上限",
-        "blooketBody": "無料ライブは最大60人。Plusは最大300人。宿題期限はStarter最大14日、Plus最大365日。",
+        "blooketBody": "無料ライブは最大60プレイヤー。Plusは最大300プレイヤー。宿題期限はStarter最大14日、Plus最大365日。",
         "lexiTitle": "LexiClash — クラス全体無料 + miss→Live",
         "lexiBody": "無料枠: クラスあたり最大50人の語彙ゲームに加え、miss-gap → reteach Live。明確な無料座席上限はひとつ。",
         "citePrefix": "Blooket help / upgrade:",

@@ -15390,7 +15390,7 @@ const sv = {
       "freeTier": {
         "eyebrow": "Gratisnivåns tak — honesty foil",
         "title": "Blooket Starter: ≤60 live-spelare + läxa 14 dagar. LexiClash: hela klassen gratis (50) + miss→reteach Live.",
-        "lede": "Blookets hjälp och upgrade publicerar på Starter gratis upp till 60 live-spelare och läxdeadlines upp till 14 dagar (Plus höjer till 300 / 365). LexiClash gratis täcker en klass upp till 50 med miss-gap → reteach Live.",
+        "lede": "Blookets hjälp och upgrade publicerar på Starter gratis upp till 60 live-spelare och läxdeadlines upp till 14 dagar (Plus höjer till 300 / 365). LexiClash gratis täcker upp till 50 elever per klass med miss-gap → reteach Live.",
         "blooketTitle": "Blooket Starter (gratis) — publicerade tak",
         "blooketBody": "Upp till 60 personer live på gratis; Plus upp till 300. Läxor: upp till 14 dagar på Starter, upp till 365 på Plus.",
         "lexiTitle": "LexiClash — hela klassen gratis + miss→Live",
