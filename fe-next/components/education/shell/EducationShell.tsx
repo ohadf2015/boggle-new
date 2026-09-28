@@ -143,7 +143,7 @@ export function EducationShell({
               // (reports already worked around this locally). Clip x here so
               // the shell never scrolls sideways; tables that must scroll keep
               // their own overflow-x-auto.
-              'edu-shell-scroll min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-clip overscroll-contain [scrollbar-gutter:stable]',
+              'edu-shell-scroll min-h-0 flex-1 overflow-y-auto overflow-x-clip min-w-0 overscroll-contain [scrollbar-gutter:stable]',
               contentClassName,
             )}
           >
