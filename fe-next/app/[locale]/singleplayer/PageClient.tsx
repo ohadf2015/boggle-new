@@ -6,19 +6,17 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { retryImport } from '@/utils/retryImport';
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
 
-// Dynamic — PlayfulBackground pulls in framer-motion, which otherwise blocks
-// first paint before the SinglePlayerView chunk even starts downloading.
-const PlayfulBackground = nextDynamic(
-  () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
-  { ssr: false }
-);
-
-// Loading fallback component with playful design
+// Loading fallback matches SinglePlayerGame's fullscreen shell.
 function LoadingFallback(): React.JSX.Element {
+  // Match SinglePlayerGame's fullscreen shell (`fixed inset-0 z-[70] bg-neo-navy`).
+  // The ssr:false game overlay used to mount over a flex loader, which was the
+  // 0.073 CLS culprit on /singleplayer PSI (worst run 0.097).
   return (
-    <div className="flex-1 flex relative">
-      <PlayfulBackground intensity="medium" colorScheme="game" />
-      <PageLoader size="lg" text="Loading single player..." className="relative z-10" />
+    <div
+      className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy"
+      translate="no"
+    >
+      <PageLoader size="lg" text="Loading single player..." priority className="flex-1" />
     </div>
   );
 }

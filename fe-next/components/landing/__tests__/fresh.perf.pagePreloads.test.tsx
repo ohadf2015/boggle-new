@@ -13,7 +13,7 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-vi.mock('@/app/[locale]/PageClient', () => ({
+vi.mock('@/app/[locale]/(home)/HomeClient', () => ({
   __esModule: true,
   default: () => <div data-testid="home-client" />,
 }));

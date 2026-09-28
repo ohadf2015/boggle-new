@@ -19,7 +19,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-vi.mock('@/app/[locale]/PageClient', () => ({ __esModule: true, default: () => <div data-testid="home-client" /> }));
+vi.mock('@/app/[locale]/(home)/HomeClient', () => ({ __esModule: true, default: () => <div data-testid="home-client" /> }));
 vi.mock('@/lib/landing/fetchLandingData', () => ({ fetchLandingData: vi.fn(async () => undefined) }));
 vi.mock('@/components/seo/HomepageContentSection', () => ({
   HomepageContentSection: () => <section data-testid="home-content" />,
