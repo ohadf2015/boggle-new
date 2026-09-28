@@ -135,6 +135,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Course",
+  "@id": "https://www.lexiclash.live/sv/education/esl-word-games#course",
   "name": "Engelska ordspel för klassrummet — lärarledda, 6 språk | LexiClash",
   "description": "Engelska ordspel för hela klassen: eleverna ansluter från mobilen med en kod på sex tecken, brädet visas på projektorn och du sätter Stöd, Bas eller Utmaning per elev. Sex språk, inga elevkonton.",
   "url": "https://www.lexiclash.live/sv/education/esl-word-games",
@@ -143,5 +144,20 @@
     "name": "LexiClash",
     "url": "https://www.lexiclash.live"
   },
-  "inLanguage": "sv"
+  "inLanguage": "sv",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
+    }
+  ]
 }

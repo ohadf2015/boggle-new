@@ -134,6 +134,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Course",
+  "@id": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom#course",
   "name": "Бесплатные словарные игры для класса — Живой мультиплеер, 6 языков | LexiClash",
   "description": "Бесплатные словарные игры для класса. Живой мультиплеер, дуэли 1v1, ваши списки слов. Английский, испанский, иврит, шведский, японский, русский. Любой браузер. Бесплатный старт.",
   "url": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom",
@@ -142,5 +143,20 @@
     "name": "LexiClash",
     "url": "https://www.lexiclash.live"
   },
-  "inLanguage": "ru"
+  "inLanguage": "ru",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
+    }
+  ]
 }

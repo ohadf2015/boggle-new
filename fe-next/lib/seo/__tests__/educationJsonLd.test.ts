@@ -154,6 +154,15 @@ describe('educationJsonLd', () => {
       });
     });
 
+    it('declares a zero-price Offer (Google Course rich-results required pair with hasCourseInstance)', () => {
+      const schema = buildEducationCourseJsonLd('en');
+      expect(schema.offers).toMatchObject({
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      });
+    });
+
     it('uses locale in url + inLanguage', () => {
       const schema = buildEducationCourseJsonLd('he');
       expect(schema.url).toBe('https://www.lexiclash.live/he/education');

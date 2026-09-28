@@ -32,7 +32,7 @@ interface PlayerRosterProps {
   canEditSelfName?: boolean;
   /** Rendered at the end of the header row (e.g. the TV/projector toggle). */
   headerExtra?: React.ReactNode;
-  /** My own seat controls (the emote trigger), at the end of the header row. */
+  /** My own seat controls (the emote trigger), rendered on my seat under my name. */
   selfActions?: React.ReactNode;
   /** Usernames the server reports as lobby-ready. */
   readyUsernames?: string[];
@@ -66,10 +66,12 @@ const seatBox = { width: 'var(--seat)', height: 'var(--seat)' } as const;
 const SEAT_NAME = 'max-w-full min-w-0 text-center line-clamp-2 text-balance [overflow-wrap:break-word]';
 
 /**
- * The lobby seat grid: 8 chairs, 4×2, for host, joiner and TV alike — every
- * seat comes from `lobbySeats` → `toMpRoster`, the one roster source. A join
- * pops a seat in, a ready player gets a lime check stamp, the host's empty
- * chairs are "+ BOT" buttons.
+ * The lobby seat grid: 8 chairs from `lobbySeats` → `toMpRoster`, the one
+ * roster source. Phone lays them out as ONE row — my seat pinned, the rest
+ * scrolling horizontally — so the roster stops spending two grid rows and the
+ * battle-mode picker gets the space. Desktop/TV keeps the 4×2 grid (the
+ * wrappers flatten via `display:contents`). A join pops a seat in, a ready
+ * player gets a lime check stamp, the host's empty chairs are "+ BOT" buttons.
  */
 export const PlayerRoster = memo(function PlayerRoster({
   players,
@@ -95,7 +97,16 @@ export const PlayerRoster = memo(function PlayerRoster({
   const chairs = Math.min(maxPlayers, LOBBY_SEATS);
   const emptyCount = Math.max(0, chairs - seats.length);
   const botCount = seats.filter((s) => s.isBot).length;
+  // My seat stays pinned outside the phone scroller; the rest of the crew
+  // scrolls. Desktop renders both wrappers as `display:contents`, so order in
+  // the grid is me-first then the rest — pinned-you reads correctly there too.
+  const meSeat = seats.find((s) => s.id === username);
+  const otherSeats = seats.filter((s) => s.id !== username);
   const canAddBot = isHostView && seats.length < chairs && botCount < MAX_BOTS_PER_ROOM;
+  // Ohad 2026-09-27: at most MAX_BOTS_PER_ROOM clickable "+ BOT" chairs — the
+  // room cap stays 3; the leftover empty seats render as plain open chairs so
+  // the strip doesn't look like a wall of bot buttons.
+  const botSlots = canAddBot ? Math.min(MAX_BOTS_PER_ROOM - botCount, emptyCount) : 0;
 
   const [isEditingSelfName, setIsEditingSelfName] = useState(false);
   const [selfNameDraft, setSelfNameDraft] = useState(username);
@@ -153,7 +164,13 @@ export const PlayerRoster = memo(function PlayerRoster({
         data-testid="lobby-seat"
         data-player={seat.id}
         data-me={String(isMe)}
-        className={cn('group/seat relative flex flex-col items-center gap-1 w-full min-w-0', styles.seatIn)}
+        className={cn(
+          'group/seat relative flex flex-col items-center gap-1 min-w-0',
+          // Phone strip: fixed, non-shrinking column; ≥720px grid stretches it.
+          'max-[719px]:w-[calc(var(--seat)+8px)] max-[719px]:shrink-0',
+          'min-[720px]:w-full',
+          styles.seatIn,
+        )}
       >
         <div className="relative shrink-0" style={seatBox}>
           {isMe && onSelfAvatarClick ? (
@@ -263,6 +280,17 @@ export const PlayerRoster = memo(function PlayerRoster({
             <SeatNameText name={seat.name} />
           </span>
         )}
+        {isMe && selfActions && (
+          // The emote trigger lives on MY seat, under my name — clearly mine,
+          // and the picker floats below it without ever clipping (my seat sits
+          // outside the phone scroller). The label makes it read as "emotes".
+          <span data-testid="self-seat-actions" className="mt-0.5 flex flex-col items-center gap-0.5">
+            {selfActions}
+            <span className="font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-pink">
+              {t('lobby.emote.title')}
+            </span>
+          </span>
+        )}
       </div>
     );
   };
@@ -274,21 +302,21 @@ export const PlayerRoster = memo(function PlayerRoster({
       <span
         className={cn(
           'flex items-center justify-center rounded-full border-[3px] border-dashed',
-          canAddBot ? 'border-neo-cyan/60 text-neo-cyan bg-neo-cyan/5' : 'border-neo-white/25 text-neo-white/40',
+          i < botSlots ? 'border-neo-cyan/60 text-neo-cyan bg-neo-cyan/5' : 'border-neo-white/25 text-neo-white/40',
         )}
         style={seatBox}
       >
         <Plus aria-hidden="true" className={cn('w-1/3 h-1/3', styles.plus)} />
       </span>
     );
-    const label = canAddBot ? t('hostView.bot') : t('common.join');
+    const label = i < botSlots ? t('hostView.bot') : isHostView ? null : t('common.join');
     const labelClass = cn(
       'font-neo-display font-bold uppercase tracking-wide leading-tight',
       variant === 'tv' ? 'text-lg' : 'text-[11px] desktop-tall:text-[length:calc(12px*var(--mp-u,1))]',
-      canAddBot ? 'text-neo-cyan' : 'text-neo-white/40',
+      i < botSlots ? 'text-neo-cyan' : 'text-neo-white/40',
       i > 0 && 'opacity-40',
     );
-    if (canAddBot) {
+    if (i < botSlots) {
       return (
         <button
           key={`empty-${i}`}
@@ -296,7 +324,7 @@ export const PlayerRoster = memo(function PlayerRoster({
           data-testid="lobby-seat-empty"
           onClick={addBot}
           aria-label={t('hostView.addBot')}
-          className={cn('flex flex-col items-center gap-1 min-w-0 rounded-neo focus-visible:outline-2 focus-visible:outline-neo-cyan', styles.emptySeat)}
+          className={cn('flex flex-col items-center gap-1 min-w-0 max-[719px]:w-[calc(var(--seat)+8px)] max-[719px]:shrink-0 rounded-neo focus-visible:outline-2 focus-visible:outline-neo-cyan', styles.emptySeat)}
         >
           {circle}
           <span className={labelClass}>+ {label}</span>
@@ -304,7 +332,7 @@ export const PlayerRoster = memo(function PlayerRoster({
       );
     }
     return (
-      <div key={`empty-${i}`} data-testid="lobby-seat-empty" className="flex flex-col items-center gap-1 min-w-0">
+      <div key={`empty-${i}`} data-testid="lobby-seat-empty" className="flex flex-col items-center gap-1 min-w-0 max-[719px]:w-[calc(var(--seat)+8px)] max-[719px]:shrink-0">
         {circle}
         <span className={labelClass}>{label}</span>
       </div>
@@ -332,16 +360,23 @@ export const PlayerRoster = memo(function PlayerRoster({
             </span>
           )}
         </h2>
-        {(selfActions || headerExtra) && (
-          <div className="flex items-center gap-2 shrink-0">
-            {selfActions}
-            {headerExtra}
-          </div>
+        {headerExtra && (
+          <div className="flex items-center gap-2 shrink-0">{headerExtra}</div>
         )}
       </div>
-      <div className="grid grid-cols-4 gap-x-2 gap-y-3 pt-3">
-        {seats.map(renderSeat)}
-        {Array.from({ length: emptyCount }, (_, i) => renderEmptySeat(i))}
+      {/*
+       * Phone: ONE row — my seat pinned, the rest of the crew (+BOT chairs)
+       * scroll horizontally; ≥720px renders both wrappers as display:contents
+       * so the 4×2 grid sees every seat as a direct child.
+       */}
+      <div className="flex items-start gap-2 pt-3 min-[720px]:grid min-[720px]:grid-cols-4 min-[720px]:gap-x-2 min-[720px]:gap-y-3">
+        {meSeat ? renderSeat(meSeat) : null}
+        <div className="flex-1 min-w-0 overflow-x-auto scrollbar-none min-[720px]:contents">
+          <div className="flex items-start gap-2 min-[720px]:contents">
+            {otherSeats.map(renderSeat)}
+            {Array.from({ length: emptyCount }, (_, i) => renderEmptySeat(i))}
+          </div>
+        </div>
       </div>
       {isHostView && (
         <ConfirmationDialog

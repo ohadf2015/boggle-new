@@ -9,7 +9,13 @@
   "isPartOf": {
     "@id": "https://www.lexiclash.live/sv/education#org"
   },
-  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp"
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
 }
 ---
 {
@@ -43,7 +49,7 @@
   "@type": "LearningResource",
   "@id": "https://www.lexiclash.live/sv/education/games-for-teachers#resource",
   "name": "Gratis ordspel för lärare — Ingen förberedelse, analys | LexiClash",
-  "description": "Gratis ordspel för klassrummet. Ingen förberedelse, dina listor, spår framsteg. 5 minuter, paus eller vikariedag. Gratis att börja.",
+  "description": "Skapa en klass i LexiClash Education och dela en kod på sex tecken. Eleverna spelar i valfri webbläsare — Chromebook, telefon eller surfplatta — utan app eller elevkonto. Använd din egen ordlista. En runda tar 2–10 minuter som uppvärmning, hjärnpaus eller vikariedag. Gratisplanen täcker 3 klasser med upp till 50 elever.",
   "url": "https://www.lexiclash.live/sv/education/games-for-teachers",
   "inLanguage": "sv",
   "learningResourceType": "Activity",
@@ -127,6 +133,36 @@
         "@type": "Answer",
         "text": "Nej. Alla enheter med en webbläsare fungerar: Chromebooks, iPad-skivor, bärbara datorer eller elevtelefoner. Fungerar i klassrum med instabil WiFi via cachade tillgångar."
       }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "@id": "https://www.lexiclash.live/sv/education/games-for-teachers#course",
+  "name": "Gratis ordspel för lärare — Ingen förberedelse, analys | LexiClash",
+  "description": "Gratis ordspel för klassrummet. Ingen förberedelse, dina listor, spår framsteg. 5 minuter, paus eller vikariedag. Gratis att börja.",
+  "url": "https://www.lexiclash.live/sv/education/games-for-teachers",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "sv",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
     }
   ]
 }

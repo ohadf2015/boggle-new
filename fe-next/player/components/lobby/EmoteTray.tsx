@@ -93,10 +93,14 @@ export function EmoteTray({
         onClick={() => setOpen((v) => !v)}
         className={cn(
           buttonClass,
-          open && 'bg-neo-pink text-neo-black -translate-y-0.5',
+          // A pink face button, not an anonymous navy square — it must read as
+          // "emotes" at a glance. Black edge on pink (cream would sink); the
+          // arbitrary width survives the tailwind-merge border pitfall.
+          'rounded-full bg-neo-pink text-neo-black border-neo-black',
+          open && '-translate-y-0.5',
         )}
       >
-        {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Smile className="h-5 w-5 text-neo-pink" aria-hidden="true" />}
+        {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Smile className="h-5 w-5 text-neo-black" aria-hidden="true" />}
       </button>
       {/* The picker floats over the lobby (absolute) so opening it never
           pushes the seat grid or the footer CTA — the lobby must not scroll. */}

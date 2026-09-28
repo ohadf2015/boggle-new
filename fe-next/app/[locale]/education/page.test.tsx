@@ -48,17 +48,20 @@ describe('education main page', () => {
   });
 
   /**
-   * The hub's SEO card (title, description, features, a second FAQ) rendered
-   * fully open at the very bottom — 2.2 screens at 390px, after the page's own
-   * FAQ. GamePageSeoContent already has a `collapsible` mode built for this;
-   * the content stays in the server HTML either way.
+   * #1155 (2026-09-27) replaced the collapsed <details> SEO card with a GEO
+   * answer block (visible H2) + FAQ rendered as heading articles — nothing is
+   * collapsed anymore. The crawler invariant stays: all copy is in the server
+   * HTML inside the card section.
    */
-  it('collapses the SEO card behind a closed <details>, content still in the HTML', async () => {
+  it('renders the SEO card copy in the server HTML (GEO answer + FAQ headings, nothing collapsed)', async () => {
     const { container } = render(await Page({ params: Promise.resolve({ locale: 'en' }) }));
-    const card = [...container.querySelectorAll('details')].find((d) =>
-      d.textContent?.includes('Free Vocabulary Games for the Classroom'),
+    const card = [...container.querySelectorAll('section')].find((s) =>
+      s.getAttribute('aria-label')?.includes('Free Vocabulary Games for the Classroom'),
     );
-    expect(card).toBeDefined();
-    expect(card?.hasAttribute('open')).toBe(false);
+    expect(card).toBeTruthy();
+    expect(card?.textContent).toContain('Free Vocabulary Games for the Classroom');
+    expect(card?.textContent).toContain('Do students need an account to play?');
+    // The accordion wrapper is gone — content must not sit in a closed <details>.
+    expect(card?.querySelector('details')).toBeNull();
   });
 });

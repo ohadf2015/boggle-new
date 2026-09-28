@@ -9,7 +9,13 @@
   "isPartOf": {
     "@id": "https://www.lexiclash.live/en/education#org"
   },
-  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp"
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
 }
 ---
 {
@@ -43,7 +49,7 @@
   "@type": "LearningResource",
   "@id": "https://www.lexiclash.live/en/education/games-for-teachers#resource",
   "name": "Free Word Games for Teachers — Zero Prep, Class Analytics | LexiClash",
-  "description": "Free browser-based word games built for real classrooms: zero prep, custom vocabulary lists, per-student progress tracking. Use as 5-min warm-up, brain break, or sub-day activity. Free to start.",
+  "description": "Create a class in LexiClash Education and share a 6-character join code. Students play in any browser — Chromebook, phone, or tablet — with no app or student account. Use your own vocabulary list. A round takes 2–10 minutes for a warm-up, brain break, or sub day. The free plan fits 3 classes of up to 50 students.",
   "url": "https://www.lexiclash.live/en/education/games-for-teachers",
   "inLanguage": "en",
   "learningResourceType": "Activity",
@@ -127,6 +133,36 @@
         "@type": "Answer",
         "text": "No. Any device with a browser works: Chromebooks, iPads, laptops, or student phones. Works offline in classrooms with patchy WiFi via cached assets."
       }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "@id": "https://www.lexiclash.live/en/education/games-for-teachers#course",
+  "name": "Free Word Games for Teachers — Zero Prep, Class Analytics | LexiClash",
+  "description": "Free browser-based word games built for real classrooms: zero prep, custom vocabulary lists, per-student progress tracking. Use as 5-min warm-up, brain break, or sub-day activity. Free to start.",
+  "url": "https://www.lexiclash.live/en/education/games-for-teachers",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "en",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
     }
   ]
 }

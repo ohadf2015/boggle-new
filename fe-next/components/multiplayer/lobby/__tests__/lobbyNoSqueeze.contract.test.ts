@@ -16,14 +16,24 @@ const hostView = readFileSync(join(__dirname, '../../../../host/components/HostP
 const battleModeCard = readFileSync(join(__dirname, '../../../../host/components/pre-game/BattleModeCard.tsx'), 'utf8');
 
 describe('host lobby no-squeeze contract', () => {
-  it('view root sizes by min-h-full (fills short screens, grows into the MpScreen scroll region when tall)', () => {
-    expect(hostView).toMatch(/className="min-h-full flex flex-col w-full/);
+  it('view root sizes by h-full (fixed to the MpScreen body; the internal scroll lives in main)', () => {
+    expect(hostView).toMatch(/className="h-full flex flex-col w-full/);
+    expect(hostView).not.toMatch(/className="min-h-full/);
   });
 
-  it('main must not clip overflowing phone content', () => {
+  it('main is the single scroll region and must not clip with overflow-hidden', () => {
     const mainLine = hostView.split('\n').find((l) => l.includes('<main'));
     expect(mainLine).toBeDefined();
+    expect(mainLine).toContain('overflow-y-auto');
     expect(mainLine).not.toContain('overflow-hidden');
+  });
+
+  it('phone CTA strip is pinned OUTSIDE the scroll region (after </main>) so it never scrolls', () => {
+    const mainClose = hostView.indexOf('</main>');
+    expect(mainClose).toBeGreaterThan(-1);
+    expect(hostView.indexOf('data-testid="lobby-invite-button"')).toBeGreaterThan(mainClose);
+    const stripLine = hostView.split('\n').find((l) => l.includes('lobby-invite-button'));
+    expect(stripLine).toBeDefined();
   });
 
   it('phone column keeps its automatic minimum (no min-h-0 clamp above the mode grid)', () => {

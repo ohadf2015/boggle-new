@@ -135,6 +135,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Course",
+  "@id": "https://www.lexiclash.live/ja/education/esl-word-games#course",
   "name": "教室向け英語単語ゲーム — 先生主導、6言語 | LexiClash",
   "description": "クラス全体で走らせる英語の単語ゲーム。生徒は6文字のコードでスマホから参加し、盤はプロジェクターに映り、先生が生徒ごとにサポート・コア・チャレンジを設定します。6言語、生徒アカウント不要。",
   "url": "https://www.lexiclash.live/ja/education/esl-word-games",
@@ -143,5 +144,20 @@
     "name": "LexiClash",
     "url": "https://www.lexiclash.live"
   },
-  "inLanguage": "ja"
+  "inLanguage": "ja",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "category": "Free",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "hasCourseInstance": [
+    {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "courseWorkload": "PT5M"
+    }
+  ]
 }

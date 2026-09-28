@@ -10,6 +10,8 @@ export type EducationSeoEntry = {
   description: string;
   features: string[];
   faq: EducationFaqItem[];
+  /** Cite-able 40–60 word answer. Rendered as a visible H2, not an accordion. */
+  geoAnswer: EducationFaqItem;
 };
 
 export const educationSeoContent: Record<string, EducationSeoEntry> = {
@@ -23,6 +25,11 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       'Curriculum-aligned word exercises for any subject or grade level',
       'Real-time leaderboards to motivate and reward student achievement',
     ],
+    geoAnswer: {
+      question: 'How do I run a free vocabulary game in class with no student logins?',
+      answer:
+        'Create a LexiClash Education class and share a 6-character join code. Students open any browser on a Chromebook, phone, or tablet and play immediately — no app, email, or student account. Use your own word list. Rounds last 2–10 minutes for a warm-up, brain break, or review. The free plan covers 3 classes of up to 50 students.',
+    },
     faq: [
       { question: 'What word games are available for the classroom?', answer: 'LexiClash Education offers multiplayer vocabulary duels, timed word hunts, and collaborative word-building challenges — all playable directly in a browser with no downloads required.' },
       { question: 'How do teachers set up a classroom word game?', answer: 'Teachers create a classroom in the teacher dashboard, invite students with a join code, and launch any word game or assignment in seconds. Progress and scores are tracked automatically.' },
@@ -48,6 +55,11 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       'תרגילי מילים שמתאימים לכל מקצוע ולכל שכבת גיל בתוכנית הלימודים',
       'טבלאות מובילים בזמן אמת שמעודדות את התלמידים ומתגמלות הצלחות',
     ],
+    geoAnswer: {
+      question: 'איך מריצים משחק אוצר מילים חינמי בכיתה בלי חשבונות לתלמידים?',
+      answer:
+        'יוצרים כיתה ב-LexiClash Education ומשתפים קוד הצטרפות בן 6 תווים. התלמידים נכנסים מכל דפדפן — Chromebook, טלפון או טאבלט — ומשחקים מיד, בלי אפליקציה, בלי אימייל ובלי חשבון. משתמשים ברשימת המילים שלכם. סבב נמשך 2–10 דקות לחימום, להפסקה קצרה או לחזרה. המסלול החינמי מכסה 3 כיתות של עד 50 תלמידים.',
+    },
     faq: [
       { question: 'אילו משחקי מילים זמינים לכיתה?', answer: 'LexiClash Education מציע דו-קרבות אוצר מילים לכמה שחקנים, ציד מילים בזמן מוגבל, ואתגרי בניית מילים משותפים — הכל ישירות בדפדפן, בלי שום הורדה.' },
       { question: 'איך מורה מקים כיתה?', answer: 'נכנסים ללוח הבקרה למורה, יוצרים כיתה, ומזמינים את התלמידים עם קוד הצטרפות. כל משחק או מטלה עולים לאוויר תוך שניות, והניקוד וההתקדמות נרשמים אוטומטית.' },
@@ -73,6 +85,11 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       'あらゆる科目や学年向けのカリキュラム準拠ワード演習',
       'リアルタイムリーダーボードで生徒のモチベーションを高める',
     ],
+    geoAnswer: {
+      question: '生徒のログインなしで、無料の語彙ゲームを授業で始めるには？',
+      answer:
+        'LexiClash Educationでクラスを作り、6文字の参加コードを共有します。生徒はChromebook、スマホ、タブレットのブラウザですぐに遊べます。アプリもメールも生徒アカウントも不要です。自分の単語リストを使えます。1ラウンドは2〜10分で、ウォームアップ、休憩、復習に向きます。無料プランは1クラス50人まで、最大3クラスです。',
+    },
     faq: [
       { question: '教室で利用できるワードゲームは？', answer: 'LexiClash Educationはマルチプレイヤー語彙デュエル、時間制限付きワードハント、共同ワードビルディングチャレンジを提供します。すべてブラウザで直接プレイ可能、ダウンロード不要です。' },
       { question: '教師はどのようにクラスルームワードゲームを設定しますか？', answer: '教師は教師ダッシュボードでクラスを作成し、参加コードで生徒を招待し、数秒でゲームや課題を開始できます。進捗とスコアは自動的に追跡されます。' },
@@ -98,6 +115,11 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       'Läroplansanpassade ordövningar för alla ämnen och årskurser',
       'Topplistor i realtid för att motivera och belöna elevernas prestationer',
     ],
+    geoAnswer: {
+      question: 'Hur startar jag ett gratis ordförrådsspel i klassen utan elevkonton?',
+      answer:
+        'Skapa en klass i LexiClash Education och dela en kod på sex tecken. Eleverna spelar direkt i valfri webbläsare på Chromebook, telefon eller surfplatta — ingen app, e-post eller elevkonto. Använd din egen ordlista. En runda tar 2–10 minuter som uppvärmning, hjärnpaus eller repetition. Gratisplanen täcker 3 klasser med upp till 50 elever.',
+    },
     faq: [
       { question: 'Vilka ordspel finns tillgängliga för klassrummet?', answer: 'LexiClash Education erbjuder ordförrådsdueller för flera spelare, tidsbegränsade ordjakter och samarbetsutmaningar — alla spelbara direkt i webbläsaren utan nedladdningar.' },
       { question: 'Hur ställer lärare in ett ordspel i klassrummet?', answer: 'Lärare skapar ett klassrum i lärarpanelen, bjuder in elever med en kod och startar valfritt spel eller uppgift på sekunder. Framsteg och poäng spåras automatiskt.' },
@@ -123,6 +145,11 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       'Ejercicios de palabras alineados con el currículo para cualquier materia y nivel',
       'Clasificaciones en tiempo real para motivar y recompensar los logros de los estudiantes',
     ],
+    geoAnswer: {
+      question: '¿Cómo monto un juego de vocabulario gratis en clase sin cuentas de estudiantes?',
+      answer:
+        'Crea una clase en LexiClash Education y comparte un código de 6 caracteres. El alumnado juega al instante en cualquier navegador — Chromebook, teléfono o tablet — sin app, correo ni cuenta. Usa tu propia lista de palabras. Una ronda dura 2–10 minutos: calentamiento, pausa o repaso. El plan gratis cubre 3 clases de hasta 50 estudiantes.',
+    },
     faq: [
       { question: '¿Qué juegos de palabras para el aula están disponibles?', answer: 'LexiClash Education ofrece duelos de vocabulario multijugador, búsquedas de palabras cronometradas y desafíos colaborativos de construcción de palabras, todo jugable en el navegador sin descargas.' },
       { question: '¿Cómo configuran los profesores un juego de palabras en clase?', answer: 'Los profesores crean un aula en el panel del profesor, invitan a los alumnos con un código de acceso y lanzan cualquier juego o tarea en segundos. El progreso y las puntuaciones se registran automáticamente.' },
@@ -148,6 +175,11 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       'Упражнения на слова, соответствующие учебной программе для любого предмета и уровня',
       'Рейтинговые таблицы в реальном времени для мотивации и поощрения достижений учащихся',
     ],
+    geoAnswer: {
+      question: 'Как провести бесплатную словарную игру в классе без аккаунтов учеников?',
+      answer:
+        'Создайте класс в LexiClash Education и поделитесь кодом из 6 символов. Ученики играют сразу в любом браузере — Chromebook, телефон или планшет — без приложения, почты и аккаунта. Используйте свой список слов. Раунд занимает 2–10 минут: разминка, пауза или повторение. Бесплатный план покрывает 3 класса до 50 учеников.',
+    },
     faq: [
       { question: 'Какие словесные игры доступны для класса?', answer: 'LexiClash Education предлагает многопользовательские словарные дуэли, поиск слов на время и совместные задания по составлению слов — всё можно играть прямо в браузере без загрузок.' },
       { question: 'Как учитель настраивает словесную игру в классе?', answer: 'Учитель создаёт класс в панели учителя, приглашает учащихся по коду доступа и запускает игру или задание за несколько секунд. Прогресс и баллы фиксируются автоматически.' },
