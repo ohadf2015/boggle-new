@@ -21,8 +21,6 @@ import { ReactNode, useMemo, lazy, Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { shouldMountHeavyClientBoot, useAfterFirstPaint } from '@/lib/perf/afterFirstPaint';
-import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 
 const CommandPalette = lazy(() => import('@/components/CommandPalette'));
 // Named chunk so `/` does not parse socket/howler/game providers. Rendered
@@ -90,8 +88,6 @@ export function needsGameProviders(pathname: string | null): boolean {
  */
 export function ConditionalProviders({ children, lang }: ConditionalProvidersProps) {
   const pathname = usePathname();
-  const afterPaint = useAfterFirstPaint(isHeavyGamePath(pathname));
-  const mountHeavy = shouldMountHeavyClientBoot(pathname, afterPaint);
 
   // Read the catalogue instead of receiving it as a prop. As a prop it crossed
   // the server→client boundary, so React serialised ~525kB of JSON into every
@@ -104,10 +100,6 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
   const needsGameStack = useMemo(() => {
     return needsGameProviders(pathname);
   }, [pathname]);
-
-  if (!mountHeavy) {
-    return <>{children}</>;
-  }
 
   // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
   // Conditionally add game-specific providers inside
