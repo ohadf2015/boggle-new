@@ -1,58 +1,26 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import nextDynamic from 'next/dynamic';
 import { layoutTranslations as translations } from '@/translations/layout';
-import { ConditionalProviders } from '../conditional-providers';
 import MESSAGES_MANIFEST from '@/lib/i18n/messagesManifest.json';
 import { isLandingPath, PATHNAME_HEADER } from '@/lib/i18n/isLandingPath';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import { HREFLANG_LOCALES } from '@/lib/seo/hreflang';
-import AutoHideFooter from '@/components/AutoHideFooter';
-import GlobalBottomNav from '@/components/GlobalBottomNav';
-import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
-import InGameAudioButton from '@/components/InGameAudioButton';
-import GoogleConsentMode from '@/components/GoogleConsentMode';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { LocaleGtagLoader } from '@/components/LocaleGtagLoader';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
-import FeedbackDevtoolsWidget from '@/components/feedback/FeedbackDevtoolsWidget';
-import WebVitalsReporter from '@/components/WebVitalsReporter';
-import PagePresenceReporter from '@/components/PagePresenceReporter';
+import GoogleConsentMode from '@/components/GoogleConsentMode';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
-// Eager (not nextDynamic): a lazily-loaded recovery component could itself be
-// the stale chunk that 404s, defeating its purpose.
-import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
-import ChunkErrorBoundary from '@/components/ChunkErrorBoundary';
-import AnimationsLoader from '@/components/AnimationsLoader';
 import { STORAGE_SHIM_SCRIPT } from '@/utils/storageShim';
 import { CHUNK_BOOT_GUARD_SCRIPT } from '@/utils/chunkBootGuard';
-import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
-import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
-import GoogleOneTapInitializer from '@/components/auth/GoogleOneTapInitializer';
-import NativePGSInitializer from '@/components/NativePGSInitializer';
-import { OfflineBanner } from '@/components/offline/OfflineBanner';
-import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
 import { ANDROID_PACKAGE } from '@/utils/androidApp';
 import type { Language } from '@/shared/types/game';
+import LocaleBodyChrome from './LocaleBodyChrome';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic } from '../fonts';
 import Script from "next/script";
 import { headers } from 'next/headers';
 import { getRumBeaconScript } from '@/lib/analytics/rumBeaconScript';
-
-// Install prompts, cookie banner, version checker, churn tracker and the
-// seasonal countdown all live in DeferredLayoutWidgets. They were declared here
-// with next/dynamic's default `ssr: true`, which keeps the modules in this
-// layout's own entry chunk — 175kB raw / 58kB gz on every route. `ssr: false`
-// actually splits them out but is rejected inside a Server Component, so they
-// moved to a client wrapper. See components/DeferredLayoutWidgets.tsx.
-const DeferredLayoutWidgets = nextDynamic(() => import('@/components/DeferredLayoutWidgets'), {
-  loading: () => null,
-});
-const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixels'), {
-  loading: () => null,
-});
 
 // Synchronously primes CSS vars from localStorage before paint to prevent CLS
 // from AdMob SizeChanged async event and GlobalBottomNav ResizeObserver.
@@ -747,20 +715,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     Anchor-ad height observer unmounted 2026-09-27 (t_88511d33): no Auto-Ads
                     anchor exists; the body MutationObserver was leftover main-thread
                     cost. H5 Games Ads remains the web ad path (intent-gated). */}
-                {!heavyGame && <SocialMediaPixels />}
-                {!heavyGame && <WebVitalsReporter />}
-                {/* Report current page so admin live monitor sees users not in a game */}
-                {!heavyGame && <PagePresenceReporter />}
                 <ServiceWorkerRegistration />
-                {/* Defer loading animations.css (60KB) after page mount */}
-                {!heavyGame && <AnimationsLoader />}
-                {/* Warm client dict Set on idle so first word submit skips ~100-300ms fetch */}
-                {!heavyGame && <DictionaryPrewarmer lang={validLocale as Language} />}
-                {/* DeepLinkHandler moved to NativeAppProvider (client component) to avoid Capacitor/Turbopack issues */}
-                {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
-                {!heavyGame && <NativeOAuthInitializer />}
-                {/* Warm the Android-only Play Games Services bridge on mobile */}
-                {!heavyGame && <NativePGSInitializer />}
                 {/* Server-rendered legal navigation — guarantees crawlers find
                     privacy/terms/about links even without JS execution */}
                 <nav aria-label="Site Navigation" className="sr-only">
@@ -775,48 +730,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         <li><a href={`/${validLocale}/legal/disclaimer`}>{translations[validLocale]?.nav?.disclaimer || 'Disclaimer'}</a></li>
                     </ul>
                 </nav>
-                <ConditionalProviders lang={validLocale}>
-                    {/* Pin every new route to the top of the page — the app's scroll
-                        container is <body class="screen-fit">, so without this a stale
-                        offset (or a child's mount-time auto-scroll) can open a page at
-                        the footer. */}
-                    <ScrollToTopOnNavigate />
-                    {/* Auto-recovers stale-deploy chunk 404s that escape error boundaries
-                        (prefetch / asset onerror / next/dynamic import rejections). */}
-                    <ChunkErrorRecovery />
-                    {!heavyGame && <OfflineBanner />}
-                    {!heavyGame && <OfflineSyncBridge />}
-                    <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">
-                        <main
-                            id="main-content"
-                            className="main-content-safe flex-1 min-h-0 flex flex-col"
-                            tabIndex={-1}
-                        >
-                            <div className="flex-1 flex flex-col min-h-0">
-                                {/* Catch render-time ChunkLoadError that never become window events
-                                    (t_9cc3561f — extend #979 beyond CDN document bust alone). */}
-                                <ChunkErrorBoundary>{children}</ChunkErrorBoundary>
-                            </div>
-                        </main>
-                        {!heavyGame && <AutoHideFooter className="relative z-0 shrink-0" />}
-                        {/* Global bottom navigation - mobile only, hidden during gameplay */}
-                        {!heavyGame && <GlobalBottomNav />}
-                        {/* Global mute control — appears only during active gameplay, when
-                            the header (and its MusicControls) is hidden. */}
-                        <InGameAudioButton />
-                    </div>
-                    {/* Install prompts, cookie banner, version checker, churn tracker
-                        and the seasonal countdown — all post-hydration only, all
-                        ssr:false so they stay out of this layout's entry chunk. */}
-                    {!heavyGame && <DeferredLayoutWidgets />}
-                    {/* Single feedback entry point: feedback.devtools shared widget.
-                        Intent-gated (no first-paint script) — 250 KiB / ~3.6s off
-                        the landing Lighthouse graph until the user gestures. */}
-                    {!heavyGame && <FeedbackDevtoolsWidget />}
-                    {/* Google One Tap (web) — in-page ID-token sign-in so Google's
-                        consent shows our domain, not <ref>.supabase.co. No redirect. */}
-                    {!heavyGame && <GoogleOneTapInitializer />}
-                </ConditionalProviders>
+                {/* Site chrome + provider stack are a client shell: static imports
+                    here kept Auth/Music/footer/nav in layout-*.js on /singleplayer
+                    even when we skipped rendering them (r4 FCP still 1803ms). */}
+                <LocaleBodyChrome lang={validLocale as Language}>
+                    {children}
+                </LocaleBodyChrome>
             </body>
         </html>
     );
