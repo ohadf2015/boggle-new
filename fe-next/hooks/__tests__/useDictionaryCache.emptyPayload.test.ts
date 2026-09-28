@@ -24,6 +24,7 @@ import {
   hasWordInMemoryCache,
   __resetDictionaryCacheForTests,
 } from '../useDictionaryCache';
+import { __resetSharedDictionaryFetchForTests } from '@/lib/dictionary/sharedDictionaryFetch';
 
 function textResponse(body: string) {
   return { ok: true, status: 200, text: async () => body } as unknown as Response;
@@ -32,6 +33,7 @@ function textResponse(body: string) {
 describe('useDictionaryCache — an empty payload is a failure, not a dictionary', () => {
   beforeEach(() => {
     __resetDictionaryCacheForTests();
+    __resetSharedDictionaryFetchForTests();
     vi.restoreAllMocks();
   });
 

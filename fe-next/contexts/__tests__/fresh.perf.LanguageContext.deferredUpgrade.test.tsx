@@ -41,13 +41,32 @@ const renderProvider = () =>
   );
 
 describe('landing subset: full catalogue waits for first engagement', () => {
+  // r4 defers the fullscreen-route upgrade behind two chained rAFs
+  // (after-first-paint). Capture the callbacks in a registry and invoke them
+  // explicitly per test wave: mapping rAF onto sinon's fake setTimeout makes
+  // cleanup blow up ("timer created with setTimeout() but cleared with
+  // cancelAnimationFrame()") because LanguageContext's effect cleanup always
+  // calls cancelAnimationFrame, and stub/unstub ordering vs the auto-cleanup
+  // hook is not something this test should depend on.
+  let rafCallbacks: FrameRequestCallback[] = [];
+  const runRafWave = () => {
+    const wave = rafCallbacks.splice(0);
+    wave.forEach((cb) => cb(0));
+  };
   beforeEach(() => {
     vi.useFakeTimers();
+    rafCallbacks = [];
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      rafCallbacks.push(cb);
+      return rafCallbacks.length;
+    });
+    vi.stubGlobal('cancelAnimationFrame', () => {});
     loadTranslation.mockClear();
     pathname = '/en';
   });
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it('shouldNotFetchTheFullCatalogueWhileTheVisitorIsIdle', () => {
@@ -96,8 +115,11 @@ describe('landing subset: full catalogue waits for first engagement', () => {
   it('shouldUpgradeAfterFirstPaintOnAFullscreenGameRoute', () => {
     pathname = '/en/singleplayer';
     renderProvider();
+    // Two chained rAFs = after first paint: the outer frame schedules the
+    // inner one, so flush one wave at a time.
     act(() => {
-      vi.runOnlyPendingTimers();
+      runRafWave();
+      runRafWave();
     });
     expect(loadTranslation).toHaveBeenCalledTimes(1);
   });
