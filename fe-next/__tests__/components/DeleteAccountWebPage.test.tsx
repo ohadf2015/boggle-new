@@ -69,7 +69,9 @@ describe('DeleteAccountPageClient', () => {
       await waitFor(() => {
         expect(signInWithMagicLink).toHaveBeenCalledWith('test@example.com');
       });
-      expect(screen.getByText('deleteAccountWeb.checkEmail')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('deleteAccountWeb.checkEmail')).toBeInTheDocument();
+      });
     });
 
     it('shows error when magic link fails', async () => {
