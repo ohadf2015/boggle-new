@@ -181,15 +181,24 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 for (const type of SUBSET_UPGRADE_EVENTS) window.removeEventListener(type, onEngage, opts);
             };
             // Fullscreen game routes boot the slim catalogue so LCP is not
-            // gated on ~166KB parse. Upgrade immediately after hydration —
-            // not on idle (landing rule) and not on engagement (the start
-            // card needs playerView strings before the user taps Play).
+            // gated on ~166KB parse. Delay the upgrade until after first paint
+            // (two rAFs) so Script Evaluation of the catalogue does not pin FCP.
+            // Engagement still upgrades immediately on landing.
             if (isHeavyGamePath(pathname)) {
-                upgrade();
+                let inner = 0;
+                const outer = typeof window !== 'undefined'
+                    ? window.requestAnimationFrame(() => {
+                        inner = window.requestAnimationFrame(upgrade);
+                    })
+                    : 0;
                 subsetUpgradeRef.current = upgrade;
                 return () => {
                     cancelled = true;
                     subsetUpgradeRef.current = null;
+                    if (typeof window !== 'undefined') {
+                        window.cancelAnimationFrame(outer);
+                        window.cancelAnimationFrame(inner);
+                    }
                 };
             }
             // First engagement or first client navigation, never on idle: an idle

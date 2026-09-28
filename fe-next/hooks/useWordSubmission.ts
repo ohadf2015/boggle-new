@@ -17,7 +17,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { validateWordLocally, isWordOnBoard, buildPositionsMap } from '@/utils/clientWordValidator';
 import { getComboBonus, calculateWordScore } from '@/shared/utils/scoring';
-import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { useDictionaryCache, prewarmDictionary } from '@/hooks/useDictionaryCache';
 import { usePrevalidation } from '@/hooks/usePrevalidation';
 import { trackWordFound, trackInvalidWord } from '@/utils/posthogEngagement';
 import type { Language, LetterGrid } from '@/shared/types/game';
@@ -304,6 +304,12 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
   const submitWord = useCallback((word: string) => {
     const normalizedWord = word.toLowerCase().trim();
     const now = Date.now();
+
+    // Game routes defer the 704KB dictionary until a real submit so PSI load
+    // does not fetch it. First word uses the server; this warms the rest.
+    if (!isDictionaryCacheLoaded) {
+      void prewarmDictionary(language);
+    }
 
     // Spam detection
     const spamCheck = checkSpam();

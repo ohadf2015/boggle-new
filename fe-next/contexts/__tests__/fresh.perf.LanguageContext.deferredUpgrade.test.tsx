@@ -87,9 +87,18 @@ describe('landing subset: full catalogue waits for first engagement', () => {
     expect(loadTranslation).toHaveBeenCalledTimes(1);
   });
 
-  it('shouldUpgradeImmediatelyOnAFullscreenGameRoute', () => {
+  it('shouldNotUpgradeSynchronouslyOnAFullscreenGameRoute', () => {
     pathname = '/en/singleplayer';
     renderProvider();
+    expect(loadTranslation).not.toHaveBeenCalled();
+  });
+
+  it('shouldUpgradeAfterFirstPaintOnAFullscreenGameRoute', () => {
+    pathname = '/en/singleplayer';
+    renderProvider();
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
     expect(loadTranslation).toHaveBeenCalledTimes(1);
   });
 });

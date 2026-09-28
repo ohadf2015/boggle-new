@@ -7,7 +7,6 @@ import { useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
-import SinglePlayerGame from './SinglePlayerGame';
 import { getHighScore } from './highScoreManager';
 import { recordGameResult } from '@/utils/playerStats';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
@@ -42,6 +41,10 @@ const ResultsLoading = () => <div className="flex min-h-[60vh] items-center just
 const SinglePlayerResults = nextDynamic(() => import('./SinglePlayerResults'), { ssr: false, loading: ResultsLoading });
 const PracticeResults = nextDynamic(() => import('./results/PracticeResults'), { ssr: false, loading: ResultsLoading });
 const PreGameTutorial = nextDynamic(() => import('./PreGameTutorial'), { ssr: false });
+const SinglePlayerGame = nextDynamic(() => import('./SinglePlayerGame'), {
+  ssr: false,
+  loading: () => <div className="flex min-h-[60vh] items-center justify-center" aria-busy="true"><PageLoader size="lg" /></div>,
+});
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
 export type SinglePlayerPhase = 'pre-game' | 'playing' | 'results';

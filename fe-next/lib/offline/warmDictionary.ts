@@ -14,6 +14,8 @@
  * on subsequent navigations, and skipped entirely when offline.
  */
 
+import { dictionaryWordsUrl, fetchDictionaryWordsNetwork } from '@/lib/dictionary/sharedDictionaryFetch';
+
 export interface WarmDictionaryDeps {
   fetchFn?: typeof fetch;
   isOnline?: () => boolean;
@@ -24,7 +26,7 @@ export interface WarmDictionaryDeps {
 export type WarmResult = 'offline' | 'already-cached' | 'warmed' | 'error';
 
 function dictUrl(lang: string): string {
-  return `/api/dictionary-words?lang=${lang}`;
+  return dictionaryWordsUrl(lang);
 }
 
 async function defaultIsCached(url: string): Promise<boolean> {
@@ -51,8 +53,9 @@ export async function warmDictionaryCache(
   if (!fetchFn) return 'error';
 
   try {
-    // The SW intercepts this and SWR-caches the response. We don't need the body.
-    await fetchFn(url, { credentials: 'same-origin' });
+    // Shared in-flight GET — same URL as useDictionaryCache / the worker.
+    // Body is unused; the SW intercepts and SWR-caches the response.
+    await fetchDictionaryWordsNetwork(lang, fetchFn);
     return 'warmed';
   } catch {
     return 'error';
