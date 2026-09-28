@@ -29,6 +29,18 @@ export function buildProCheckoutSucceededEvent(userId: string, subscriptionId: s
   };
 }
 
+export function buildProTrialStartedEvent(userId: string): EduServerEvent {
+  return { distinctId: userId, event: 'edu_pro_trial_started', properties: { ...BASE } };
+}
+
+export function buildProTrialSucceededEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'edu_pro_trial_succeeded',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
+}
+
 /** Never throws: a dead analytics endpoint must never fail a checkout or a webhook. */
 export function captureProFunnelServerEvent(event: EduServerEvent): void {
   try {

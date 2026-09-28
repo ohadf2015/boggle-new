@@ -69,3 +69,8 @@ export function polarTrialDaysLeft(iso: string | null | undefined, nowMs: number
   if (ms <= 0) return 0;
   return Math.ceil(ms / 86_400_000);
 }
+
+/** Chip upgrade CTA only when the trial is in its last 3 days (inclusive). */
+export function polarTrialChipUpgrade(daysLeft: number | null): boolean {
+  return daysLeft !== null && daysLeft <= 3;
+}

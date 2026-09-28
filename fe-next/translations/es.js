@@ -13094,6 +13094,8 @@ const es = {
       "autoRenew": "Se renueva automáticamente cada mes. Cancela cuando quieras.",
       "upgradeNow": "Mejora a Pro ahora",
       "startTrial": "Empieza 14 días gratis",
+      "trialOfferTitle": "Prueba Teacher Pro 14 días gratis",
+      "trialOfferBody": "Clases e informes ilimitados. Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
       "trialCtaSubtext": "Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
       "trialEndedTitle": "Prueba caducada — mejora para conservar tus clases",
       "trialEndedBody": "Conserva clases ilimitadas e informes imprimibles por 9 $/mes. No es otra prueba gratis.",

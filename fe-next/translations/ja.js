@@ -13145,6 +13145,8 @@ const ja = {
       "autoRenew": "毎月自動更新されます。いつでも解約できます。",
       "upgradeNow": "今すぐProにアップグレード",
       "startTrial": "14日間の無料トライアルを開始",
+      "trialOfferTitle": "Teacher Proを14日間無料で試す",
+      "trialOfferBody": "クラスもレポートも無制限。14日間無料、その後は月額9ドル。いつでも解約できます。",
       "trialCtaSubtext": "14日間無料、その後は月額9ドル。いつでも解約できます。",
       "trialEndedTitle": "トライアル終了 — クラスを維持するにはアップグレード",
       "trialEndedBody": "月額9ドルで無制限クラスと印刷レポートを維持できます。無料トライアルの再付与ではありません。",

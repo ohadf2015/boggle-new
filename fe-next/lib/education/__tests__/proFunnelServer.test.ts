@@ -14,6 +14,8 @@ import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry';
 import {
   buildProCheckoutStartedEvent,
   buildProCheckoutSucceededEvent,
+  buildProTrialStartedEvent,
+  buildProTrialSucceededEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
 
@@ -25,6 +27,22 @@ describe('Pro funnel server events', () => {
       distinctId: 'u-1',
       event: 'edu_pro_checkout_started',
       properties: { product: 'teacher_pro', provider: 'polar' },
+    });
+  });
+
+  it('Given a Polar trial checkout, When built, Then it is edu_pro_trial_started', () => {
+    expect(buildProTrialStartedEvent('u-1')).toEqual({
+      distinctId: 'u-1',
+      event: 'edu_pro_trial_started',
+      properties: { product: 'teacher_pro', provider: 'polar' },
+    });
+  });
+
+  it('Given a trialing subscription, When built, Then it is edu_pro_trial_succeeded with the id', () => {
+    expect(buildProTrialSucceededEvent('u-1', 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'edu_pro_trial_succeeded',
+      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
     });
   });
 

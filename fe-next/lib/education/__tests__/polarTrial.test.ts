@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { polarTrialDaysLeft, polarTrialExpires, polarTrialUx } from '../polarTrial';
+import { polarTrialDaysLeft, polarTrialExpires, polarTrialUx, polarTrialChipUpgrade } from '../polarTrial';
 
 const END = '2026-10-08T00:00:00.000Z';
 
@@ -56,5 +56,14 @@ describe('polarTrialDaysLeft', () => {
     expect(polarTrialDaysLeft('2026-10-01T01:00:00.000Z', now)).toBe(1);
     expect(polarTrialDaysLeft('2026-09-30T00:00:00.000Z', now)).toBe(0);
     expect(polarTrialDaysLeft(null, now)).toBeNull();
+  });
+});
+
+describe('polarTrialChipUpgrade', () => {
+  it('is true at 3 days or fewer, false above, false when unknown', () => {
+    expect(polarTrialChipUpgrade(3)).toBe(true);
+    expect(polarTrialChipUpgrade(0)).toBe(true);
+    expect(polarTrialChipUpgrade(4)).toBe(false);
+    expect(polarTrialChipUpgrade(null)).toBe(false);
   });
 });
