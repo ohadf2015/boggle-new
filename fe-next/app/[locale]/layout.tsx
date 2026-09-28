@@ -586,12 +586,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     the initial HTML ahead of the Next runtime on purpose. */}
                 {slimI18n ? (
                     <>
-                        <link rel="preload" as="script" href={landingMessagesSrc} />
+                        {/* No manual preload: <Script beforeInteractive> already emits
+                            the matching <link rel="preload"> — a manual duplicate made
+                            Lighthouse model two identical preloads on every page. */}
                         <Script id="lexi-i18n-messages-landing" src={landingMessagesSrc} strategy="beforeInteractive" />
                     </>
                 ) : (
                     <>
-                        <link rel="preload" as="script" href={messagesSrc} />
                         <Script id="lexi-i18n-messages" src={messagesSrc} strategy="beforeInteractive" />
                     </>
                 )}

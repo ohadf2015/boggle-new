@@ -3,8 +3,11 @@
 /**
  * Client shell for the locale body. Site chrome (footer, nav, OAuth, pixels)
  * lives behind next/dynamic ssr:false so a /singleplayer load never parses it.
- * ConditionalProviders (Auth/Music/Query) is also a dynamic import and is not
- * mounted on heavy-game routes until after first paint.
+ * ConditionalProviders (Auth/Music/Query) mounts immediately — the r6 revert
+ * of #1175's two-rAF gate: gating its dynamic chunk on rAF timestamps made
+ * Lighthouse's Lantern model serialize that fetch behind main-thread work,
+ * producing the ~11s simulated LCP tail (r5 runs 1+6). The chunk split itself
+ * (no eager parse of Auth/Music/Query on the game route) is kept.
  */
 
 import type { ReactNode } from 'react';
@@ -14,13 +17,8 @@ import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
 import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
 import ChunkErrorBoundary from '@/components/ChunkErrorBoundary';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
-import { shouldMountHeavyClientBoot, useAfterFirstPaint } from '@/lib/perf/afterFirstPaint';
+import { ConditionalProviders } from '../conditional-providers';
 import type { Language } from '@/shared/types/game';
-
-const ConditionalProviders = nextDynamic(
-  () => import('../conditional-providers').then((m) => m.ConditionalProviders),
-  { loading: () => null },
-);
 
 const SiteExtras = nextDynamic(() => import('./SiteExtras'), {
   ssr: false,
@@ -35,8 +33,6 @@ interface LocaleBodyChromeProps {
 export default function LocaleBodyChrome({ lang, children }: LocaleBodyChromeProps) {
   const pathname = usePathname();
   const heavyGame = isHeavyGamePath(pathname);
-  const afterPaint = useAfterFirstPaint(heavyGame);
-  const mountHeavy = shouldMountHeavyClientBoot(pathname, afterPaint);
 
   const inner = (
     <>
@@ -56,10 +52,6 @@ export default function LocaleBodyChrome({ lang, children }: LocaleBodyChromePro
       </div>
     </>
   );
-
-  if (!mountHeavy) {
-    return inner;
-  }
 
   return <ConditionalProviders lang={lang}>{inner}</ConditionalProviders>;
 }

@@ -29,12 +29,16 @@ describe('ConditionalProviders game-stack split', () => {
     );
   });
 
-  it('loads EssentialProviders through next/dynamic so /singleplayer can skip it until after paint', () => {
+  it('loads EssentialProviders through next/dynamic so the game route does not eagerly parse it', () => {
     expect(SOURCE).toMatch(/import\(['"]\.\/essential-providers['"]\)/);
   });
 
-  it('gates the heavy boot with shouldMountHeavyClientBoot / after-first-paint', () => {
-    expect(SOURCE).toMatch(/shouldMountHeavyClientBoot/);
-    expect(SOURCE).toMatch(/useAfterFirstPaint/);
+  // r6: #1175's two-rAF mount gate was reverted — gating the dynamic chunk on
+  // rAF timestamps made Lantern serialize that fetch behind main-thread work
+  // (the ~11s simulated LCP tail in r5). Providers mount immediately; the chunk
+  // split itself is kept. Assert the gate is gone so it cannot silently return.
+  it('does not gate the mount on rAF / after-first-paint (r6 revert of #1175)', () => {
+    expect(SOURCE).not.toMatch(/shouldMountHeavyClientBoot/);
+    expect(SOURCE).not.toMatch(/useAfterFirstPaint/);
   });
 });

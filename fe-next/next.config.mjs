@@ -160,12 +160,27 @@ const nextConfig = {
   // and Universal Links never validate. (They never did; see
   // __tests__/config/wellKnownRewrites.test.ts.)
   async rewrites() {
-    return [
-      {
-        source: '/.well-known/apple-app-site-association',
-        destination: '/api/.well-known/apple-app-site-association',
-      },
-    ];
+    return {
+      beforeFiles: [
+        // Bare /singleplayer: internal rewrite to /en/singleplayer instead of the
+        // catch-all 308 below. PSI (and every real visitor on the bare path) saves
+        // a full redirect round trip before any render-blocking resource can start
+        // — the 308 hop sat in Lantern's critical path and pinned simulated FCP.
+        // SEO is unchanged: the page still canonicals to /en/singleplayer, same as
+        // the redirect target. Locale auto-detect only ever ran at '/', never here
+        // (the catch-all always targeted /en).
+        {
+          source: '/singleplayer',
+          destination: '/en/singleplayer',
+        },
+      ],
+      afterFiles: [
+        {
+          source: '/.well-known/apple-app-site-association',
+          destination: '/api/.well-known/apple-app-site-association',
+        },
+      ],
+    };
   },
 
   async redirects() {
