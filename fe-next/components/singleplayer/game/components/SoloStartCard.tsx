@@ -8,7 +8,9 @@
  * visible (they can study it) but the round waits for one tap. The card is also
  * the only how-to-play a first-timer gets, so it teaches the one gesture.
  *
- * Static appear, no opacity tween on the full-screen scrim (Class 5 flash).
+ * Static appear, no tween on the card (Class 5 flash / CLS 0.073). The
+ * previous `solo-card-in` translateY+scale animation moved the
+ * timer/MASTERBOT/FIND-10 box ~48px on first paint.
  */
 import { useEffect } from 'react';
 import { Timer, Trophy } from 'lucide-react';
@@ -47,9 +49,8 @@ export function SoloStartCard({ rivals, seconds, onStart, t }: SoloStartCardProp
     <div className="absolute inset-0 z-40 grid place-items-center overflow-y-auto bg-neo-navy/80 p-4" role="dialog" aria-modal="true" aria-labelledby="solo-start-title">
       <div
         data-testid="solo-start-card"
-        className="w-full max-w-[24rem] rounded-2xl border-4 border-neo-black bg-neo-cream p-5 [@media(max-height:520px)]:p-3.5 text-neo-black shadow-[6px_6px_0_#000] motion-safe:animate-[solo-card-in_260ms_cubic-bezier(.2,1.4,.4,1)_both]"
+        className="w-full max-w-[24rem] min-h-[20rem] [@media(max-height:520px)]:min-h-0 rounded-2xl border-4 border-neo-black bg-neo-cream p-5 [@media(max-height:520px)]:p-3.5 text-neo-black shadow-[6px_6px_0_#000]"
       >
-        <style>{'@keyframes solo-card-in{from{transform:translateY(12px) scale(.94)}to{transform:none}}'}</style>
         {bot && (
           <div className="mb-2 flex justify-center">
             <span className="rounded-full border-[3px] border-neo-black bg-neo-pink px-3 py-0.5 text-xs font-black uppercase tracking-wider shadow-[2px_2px_0_#000]">

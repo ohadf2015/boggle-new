@@ -27,6 +27,7 @@ import {
 import { filterEmptyException } from '@/utils/posthogExceptionFilter';
 import { installAbandonOnPagehide } from '@/utils/abandonOnPagehide';
 import { installInpAttributionTracker } from '@/utils/inpAttribution';
+import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 
 let posthogInitialized = false;
 
@@ -50,8 +51,12 @@ function initPostHog() {
     capture_pageleave: true,
     capture_exceptions: true, // Capture unhandled JS errors and promise rejections
     // surveys.js (~27KiB) was unused-js on every /singleplayer PSI run. We do
-    // not run in-app PostHog surveys; skip the extra network + parse.
+    // not run in-app PostHog surveys. `surveys: false` is the surveys *config
+    // object* and is ignored as a disable — posthog-js 1.364 still fetched
+    // eu-assets.i.posthog.com/static/surveys.js. `disable_surveys` is the
+    // actual opt-out (see PostHogConfig).
     surveys: false,
+    disable_surveys: true,
     // Enable Web-Vitals ATTRIBUTION so $web_vitals events carry the LCP element
     // (tag/id/class). Without it the nightly perf-watch sees an LCP number but no
     // element, so a homepage-LCP regression can't be targeted without guessing
@@ -89,7 +94,22 @@ function PostHogPageView() {
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    initPostHog();
+    // Game routes: posthog-js parse + surveys.js fetch competed with LCP/TBT
+    // (chunk boot 1.2–1.7s). Idle-defer init; capture calls queue on the lazy
+    // proxy until then. Home/SEO routes still init immediately.
+    let idleId: number | undefined;
+    let bootTimer: ReturnType<typeof setTimeout> | undefined;
+    const boot = () => initPostHog();
+    const path = typeof window !== 'undefined' ? window.location.pathname : '';
+    if (typeof window !== 'undefined' && isHeavyGamePath(path)) {
+      if (typeof window.requestIdleCallback === 'function') {
+        idleId = window.requestIdleCallback(boot, { timeout: 4000 });
+      } else {
+        bootTimer = setTimeout(boot, 2000);
+      }
+    } else {
+      boot();
+    }
 
     let platformRecheckId: ReturnType<typeof setTimeout> | null = null;
 
@@ -141,6 +161,10 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
+      if (idleId != null && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId);
+      }
+      if (bootTimer) clearTimeout(bootTimer);
       if (platformRecheckId) clearTimeout(platformRecheckId);
       uninstallVisibility();
       uninstallAbandon();

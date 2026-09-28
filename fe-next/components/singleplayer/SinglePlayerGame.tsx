@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useMemo, useEffect, useRef, useCallback, useState } from 'react';
-import { PageLoader } from '@/components/ui/PageLoader';
 import { shouldShowScorePopup } from '@/lib/singleplayer/scorePopup';
 import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
@@ -406,12 +405,19 @@ function SinglePlayerGame({
     core.t,
   ]);
 
-  // Loading state - shown when grid is not yet initialized
+  // Loading state - shown when grid is not yet initialized.
+  // MUST be the same `fixed inset-0 z-[70]` box as the ready shell: the
+  // previous `min-h-[60vh]` in-flow loader was a different size than the
+  // overlay, so the timer/MASTERBOT/FIND-10 shell shifted 48px (CLS 0.0729
+  // pinned across every PSI run). No mascot here — LCP img is in the layout.
   if (!commonProps) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <PageLoader size="lg" text={core.t('common.loading')} />
-      </div>
+      <div
+        className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy"
+        translate="no"
+        aria-busy="true"
+        aria-label={core.t('common.loading')}
+      />
     );
   }
 

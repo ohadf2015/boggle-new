@@ -282,12 +282,10 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
           )}
         </div>
 
-        {(soloChrome || (soloMissions && soloMissions.length > 0)) && (
-          <div data-solo-slot="missions" className="mt-2 flex flex-col gap-1.5">
-            {soloMissions && soloMissions.length > 0 ? <MissionChips missions={soloMissions} /> : null}
-            {soloChrome}
-          </div>
-        )}
+        <div data-solo-slot="missions" className="mt-2 flex min-h-[2.25rem] flex-col gap-1.5">
+          {soloMissions && soloMissions.length > 0 ? <MissionChips missions={soloMissions} /> : null}
+          {soloChrome}
+        </div>
 
         {/* Board — sized to the slot's short side, so it is square and never spills. */}
         <div

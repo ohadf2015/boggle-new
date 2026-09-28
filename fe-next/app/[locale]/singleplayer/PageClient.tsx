@@ -2,22 +2,23 @@
 
 import React, { Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
-import { PageLoader } from '@/components/ui/PageLoader';
 import { retryImport } from '@/utils/retryImport';
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
 
 // Loading fallback matches SinglePlayerGame's fullscreen shell.
 function LoadingFallback(): React.JSX.Element {
-  // Match SinglePlayerGame's fullscreen shell (`fixed inset-0 z-[70] bg-neo-navy`).
-  // The ssr:false game overlay used to mount over a flex loader, which was the
-  // 0.073 CLS culprit on /singleplayer PSI (worst run 0.097).
+  // Opaque navy, NO mascot. The LCP <img> lives in the server layout
+  // (SinglePlayerLcpShell) so it is not unmounted when this ssr:false
+  // boundary hydrates — remounting winner.webp was the 4–6s LCP render delay.
+  // Same `fixed inset-0 z-[70] bg-neo-navy` box as the game overlay so the
+  // swap cannot shift the page (CLS 0.073 was this box changing size).
   return (
     <div
-      className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy"
+      className="fixed inset-0 z-[69] overflow-hidden bg-neo-navy"
       translate="no"
-    >
-      <PageLoader size="lg" text="Loading single player..." priority className="flex-1" />
-    </div>
+      aria-busy="true"
+      aria-label="Loading single player"
+    />
   );
 }
 

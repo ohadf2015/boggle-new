@@ -148,4 +148,11 @@ describe('SoloGameLayout', () => {
     expect(onExit).toHaveBeenCalled();
     expect(onPauseToggle).toHaveBeenCalled();
   });
+
+  it('reserves the missions slot even with no missions so the board cannot shift', () => {
+    render(<SoloGameLayout {...props({ soloMissions: undefined, soloChrome: undefined })} />);
+    const slot = document.querySelector('[data-solo-slot="missions"]');
+    expect(slot).not.toBeNull();
+    expect(slot?.className).toContain('min-h-[2.25rem]');
+  });
 });
