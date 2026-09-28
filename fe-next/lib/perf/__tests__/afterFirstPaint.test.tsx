@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { shouldMountHeavyClientBoot } from '../afterFirstPaint';
-import { useAfterFirstPaint } from '../afterFirstPaint';
+import { shouldMountHeavyClientBoot, useAfterFirstPaint } from '../afterFirstPaint';
 
 describe('shouldMountHeavyClientBoot', () => {
   it('mounts immediately on marketing routes', () => {
