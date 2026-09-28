@@ -15006,6 +15006,21 @@ const he = {
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
         "cta": "נסו miss-gap → Live בלי לבנות סט מחדש"
+      },
+      "freeTier": {
+        "eyebrow": "מגבלות חינם — honesty foil",
+        "title": "Blooket Starter: עד 60 שחקנים חיים + שיעורי בית 14 יום. LexiClash: כיתה שלמה בחינם (50) + miss→reteach Live.",
+        "lede": "עמודי העזרה והשדרוג של Blooket מפרסמים ב-Starter חינם עד 60 שחקנים חיים ומועדי שיעורי בית עד 14 יום (Plus מעלה ל-300 / 365). LexiClash חינם מכסה כיתה של עד 50 עם miss-gap → reteach Live.",
+        "blooketTitle": "Blooket Starter (חינם) — מגבלות מפורסמות",
+        "blooketBody": "עד 60 באורח חי בחינם; Plus עד 300. שיעורי בית: עד 14 יום ב-Starter, עד 365 ב-Plus.",
+        "lexiTitle": "LexiClash — כיתה שלמה בחינם + miss→Live",
+        "lexiBody": "שכבת חינם: עד 50 תלמידים לכיתה למשחקי אוצר מילים, וכן miss-gap → reteach Live. מגבלת מושבים אחת ברורה.",
+        "citePrefix": "עזרה / שדרוג Blooket:",
+        "citeIsFreeLabel": "Is Blooket Free? (≤60 בחינם)",
+        "citePlusLabel": "Blooket Plus Features (300 / 365d)",
+        "citeUpgradeLabel": "Upgrade (טבלת Starter מול Plus)",
+        "citeSuffix": " — Starter ≤60 חי + שיעורי בית ≤14d; Plus ≤300 + ≤365d.",
+        "cta": "הריצו אוצר מילים חינמי לכיתה שלמה עם מגבלה ברורה של 50 מושבים"
       }
     },
     "practice": {

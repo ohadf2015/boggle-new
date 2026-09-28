@@ -3678,6 +3678,21 @@ const ru = {
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
         "cta": "Попробовать miss-gap → Live без пересборки набора"
+      },
+      "freeTier": {
+        "eyebrow": "Лимиты бесплатного плана — honesty foil",
+        "title": "Blooket Starter: ≤60 игроков live + ДЗ 14 дней. LexiClash: весь класс бесплатно (50) + miss→reteach Live.",
+        "lede": "Справка и upgrade Blooket публикуют на Starter бесплатно до 60 live-игроков и дедлайны ДЗ до 14 дней (Plus — 300 / 365). LexiClash бесплатно покрывает класс до 50 с miss-gap → reteach Live.",
+        "blooketTitle": "Blooket Starter (бесплатно) — опубликованные лимиты",
+        "blooketBody": "До 60 человек live на бесплатном плане; Plus до 300. ДЗ: до 14 дней на Starter, до 365 на Plus.",
+        "lexiTitle": "LexiClash — весь класс бесплатно + miss→Live",
+        "lexiBody": "Бесплатно: до 50 учеников на класс для словарных игр плюс miss-gap → reteach Live. Один явный лимит бесплатных мест.",
+        "citePrefix": "Справка / upgrade Blooket:",
+        "citeIsFreeLabel": "Is Blooket Free? (≤60 бесплатно)",
+        "citePlusLabel": "Blooket Plus Features (300 / 365d)",
+        "citeUpgradeLabel": "Upgrade (таблица Starter vs Plus)",
+        "citeSuffix": " — Starter ≤60 live + ДЗ ≤14d; Plus ≤300 + ≤365d.",
+        "cta": "Проведите бесплатную словарную игру для всего класса с лимитом 50 мест"
       }
     },
     "practice": {

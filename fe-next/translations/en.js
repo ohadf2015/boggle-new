@@ -13698,6 +13698,21 @@ const en = {
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
         "cta": "Try miss-gap → Live without rebuilding a set"
+      },
+      "freeTier": {
+        "eyebrow": "Free-tier caps — honesty foil",
+        "title": "Blooket Starter: ≤60 live players + homework 14-day deadline. LexiClash: whole-class free (50) + miss→reteach Live.",
+        "lede": "Blooket help and upgrade pages publish Starter free caps of up to 60 live players and homework deadlines up to 14 days (Plus raises those to 300 players / 365 days). LexiClash free covers a whole class of up to 50 with miss-gap → reteach Live — one clear free classroom seat cap.",
+        "blooketTitle": "Blooket Starter (free) — published caps",
+        "blooketBody": "Host a live game with up to 60 people on free; Plus raises the live cap to 300 (except Racing and team modes). Homework deadlines: up to 14 days on Starter, up to 365 days on Plus. Running the game modes themselves stays free — the caps sit on player count and homework length.",
+        "lexiTitle": "LexiClash — whole-class free + miss→Live",
+        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games, plus miss-gap → reteach Live deep-link. One published classroom free cap — no separate homework-deadline gate on the free reteach path.",
+        "citePrefix": "Blooket help / upgrade:",
+        "citeIsFreeLabel": "Is Blooket Free? (≤60 on free)",
+        "citePlusLabel": "Blooket Plus Features (300 / 365d)",
+        "citeUpgradeLabel": "Upgrade (Starter vs Plus table)",
+        "citeSuffix": " — Starter ≤60 live + homework ≤14d; Plus ≤300 live + homework ≤365d.",
+        "cta": "Host whole-class free vocab with a clear 50-seat free limit"
       }
     },
     "practice": {

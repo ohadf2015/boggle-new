@@ -15386,6 +15386,21 @@ const sv = {
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
         "cta": "Testa miss-gap → Live utan att bygga om ett set"
+      },
+      "freeTier": {
+        "eyebrow": "Gratisnivåns tak — honesty foil",
+        "title": "Blooket Starter: ≤60 live-spelare + läxa 14 dagar. LexiClash: hela klassen gratis (50) + miss→reteach Live.",
+        "lede": "Blookets hjälp och upgrade publicerar på Starter gratis upp till 60 live-spelare och läxdeadlines upp till 14 dagar (Plus höjer till 300 / 365). LexiClash gratis täcker en klass upp till 50 med miss-gap → reteach Live.",
+        "blooketTitle": "Blooket Starter (gratis) — publicerade tak",
+        "blooketBody": "Upp till 60 personer live på gratis; Plus upp till 300. Läxor: upp till 14 dagar på Starter, upp till 365 på Plus.",
+        "lexiTitle": "LexiClash — hela klassen gratis + miss→Live",
+        "lexiBody": "Gratisnivå: upp till 50 elever per klass för ordförrådsspel plus miss-gap → reteach Live. Ett tydligt gratisplatstak.",
+        "citePrefix": "Blooket-hjälp / upgrade:",
+        "citeIsFreeLabel": "Is Blooket Free? (≤60 gratis)",
+        "citePlusLabel": "Blooket Plus Features (300 / 365d)",
+        "citeUpgradeLabel": "Upgrade (Starter vs Plus)",
+        "citeSuffix": " — Starter ≤60 live + läxa ≤14d; Plus ≤300 + ≤365d.",
+        "cta": "Hosta gratis ordförråd för hela klassen med ett tydligt 50-plats gratisgräns"
       }
     },
     "practice": {

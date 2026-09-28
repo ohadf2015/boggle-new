@@ -15100,6 +15100,21 @@ const es = {
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
         "cta": "Probar miss-gap → Live sin reconstruir un set"
+      },
+      "freeTier": {
+        "eyebrow": "Límites del plan gratis — honesty foil",
+        "title": "Blooket Starter: ≤60 jugadores en vivo + tarea 14 días. LexiClash: clase completa gratis (50) + miss→reteach Live.",
+        "lede": "La ayuda y la página de upgrade de Blooket publican en Starter gratis hasta 60 jugadores en vivo y plazos de tarea de hasta 14 días (Plus sube a 300 / 365 días). LexiClash gratis cubre una clase de hasta 50 con miss-gap → reteach Live.",
+        "blooketTitle": "Blooket Starter (gratis) — límites publicados",
+        "blooketBody": "Hasta 60 personas en vivo en gratis; Plus sube a 300 (excepto Racing y modos de equipo). Tareas: hasta 14 días en Starter, hasta 365 en Plus.",
+        "lexiTitle": "LexiClash — clase completa gratis + miss→Live",
+        "lexiBody": "Plan gratis: hasta 50 estudiantes por clase para vocabulario, más miss-gap → reteach Live. Un límite claro de asientos gratis.",
+        "citePrefix": "Ayuda / upgrade de Blooket:",
+        "citeIsFreeLabel": "Is Blooket Free? (≤60 en gratis)",
+        "citePlusLabel": "Blooket Plus Features (300 / 365d)",
+        "citeUpgradeLabel": "Upgrade (tabla Starter vs Plus)",
+        "citeSuffix": " — Starter ≤60 en vivo + tarea ≤14d; Plus ≤300 + tarea ≤365d.",
+        "cta": "Organiza vocabulario gratis para toda la clase con un límite claro de 50 asientos"
       }
     },
     "practice": {

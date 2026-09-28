@@ -15151,6 +15151,21 @@ const ja = {
         "citeLabel": "Identify knowledge gaps in Blooket reports",
         "citeSuffix": " — Workflow 2: Build a Targeted Follow-Up Set (「Gaps Set」).",
         "cta": "セットを作り直さずに miss-gap → Live を試す"
+      },
+      "freeTier": {
+        "eyebrow": "無料枠の上限 — honesty foil",
+        "title": "Blooket Starter: ライブ最大60人 + 宿題14日。LexiClash: クラス全体無料（50）+ miss→reteach Live。",
+        "lede": "Blooketのヘルプとアップグレードページは、Starter無料でライブ最大60人・宿題期限最大14日（Plusは300人 / 365日）と公開しています。LexiClash無料は最大50人のクラス全体と miss-gap → reteach Live を提供します。",
+        "blooketTitle": "Blooket Starter（無料）— 公開上限",
+        "blooketBody": "無料ライブは最大60人。Plusは最大300人。宿題期限はStarter最大14日、Plus最大365日。",
+        "lexiTitle": "LexiClash — クラス全体無料 + miss→Live",
+        "lexiBody": "無料枠: クラスあたり最大50人の語彙ゲームに加え、miss-gap → reteach Live。明確な無料座席上限はひとつ。",
+        "citePrefix": "Blooket help / upgrade:",
+        "citeIsFreeLabel": "Is Blooket Free?（無料≤60）",
+        "citePlusLabel": "Blooket Plus Features（300 / 365d）",
+        "citeUpgradeLabel": "Upgrade（Starter vs Plus）",
+        "citeSuffix": " — Starter ≤60ライブ + 宿題≤14d; Plus ≤300 + ≤365d。",
+        "cta": "明確な50席の無料枠でクラス全体の語彙ゲームをホスト"
       }
     },
     "practice": {

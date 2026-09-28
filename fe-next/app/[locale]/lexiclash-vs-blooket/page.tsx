@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { BlooketGapsSetHonestyStrip } from '@/components/education/BlooketGapsSetHonestyStrip';
+import { BlooketFreeTierHonestyStrip } from '@/components/education/BlooketFreeTierHonestyStrip';
 
 export const revalidate = 86400;
 
@@ -58,12 +59,12 @@ const faqs = [
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
-  ['Free tier (full classroom features)', '✓ Whole class free (50)', 'Free plan; Plus is paid'],
+  ['Free tier (full classroom features)', '✓ Whole class free (50)', 'Starter free: ≤60 live · homework ≤14d (Plus: 300 / 365d)'],
   ['No student signup', '✓ 6-character join code', '✓ Join code (accounts for full features)'],
   ['Game type', 'Word-formation (Boggle/Wheel/Anagram)', 'Trivia quiz + arcade game modes'],
   ['Content setup', 'Built-in or upload word list', 'Write your own question sets'],
   ['Vocabulary / spelling focus', '✓ Purpose-built', 'Generic — depends on your questions'],
-  ['Live whole-class multiplayer', '✓ Free, up to 30', '✓ (player cap higher on Plus)'],
+  ['Live whole-class multiplayer', '✓ Free, up to 50', 'Starter ≤60 · Plus ≤300'],
   ['1v1 duels with student pairing', '✓', '✗'],
   ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'No built-in language validation'],
   ['Class analytics dashboard', '✓ Free', 'Reports (some gated on Plus)'],
@@ -149,6 +150,7 @@ export default async function Page({ params }: PageProps) {
           <p className="mt-3 text-xs text-neo-gray-300">Blooket plan features and pricing as of 2026 — check blooket.com for current Blooket Plus tiers.</p>
         </section>
 
+        <BlooketFreeTierHonestyStrip locale={locale} />
         <BlooketGapsSetHonestyStrip locale={locale} />
 
         <section className="mb-12">
