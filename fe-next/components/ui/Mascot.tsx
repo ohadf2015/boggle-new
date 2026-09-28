@@ -638,6 +638,7 @@ export const Mascot = memo(function Mascot({
             height={SIZE_PIXELS[size]}
             className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
             priority={shouldPrioritize}
+            fetchPriority={shouldPrioritize ? 'high' : undefined}
             loading={loadingStrategy as 'lazy' | undefined}
             unoptimized
           />
@@ -722,6 +723,7 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
               height={SIZE_PIXELS[size]}
               className={`object-contain ${hasClip ? 'scale-110' : ''} drop-shadow-lg`}
               priority={shouldPrioritize}
+              fetchPriority={shouldPrioritize ? 'high' : undefined}
               loading={loadingStrategy as 'lazy' | undefined}
               unoptimized
             />
