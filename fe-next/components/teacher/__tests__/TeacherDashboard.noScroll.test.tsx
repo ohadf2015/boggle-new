@@ -212,4 +212,21 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       classroomsMock.value = [{ id: 'c1', name: 'Class 1' }];
     });
   });
+
+  describe('narrow phones do not force horizontal scroll', () => {
+    it('Given the deck, Then columns can shrink (min-w-0) instead of growing past the viewport', () => {
+      render(<TeacherDashboard />);
+      expect(screen.getByTestId('teacher-dashboard-grid').className).toContain('min-w-0');
+      expect(screen.getByTestId('teacher-dashboard-main').className).toContain('min-w-0');
+      expect(screen.getByTestId('teacher-dashboard-aside').className).toContain('min-w-0');
+    });
+
+    it('Given a Pro chip on a phone, Then the dock spacer is narrower than the old w-60', () => {
+      // Source contract: absolute dock needs reserved end space, but w-60 on a
+      // 320px phone left ~56px for the class chip and invited sideways scroll.
+      const src = readFileSync(path.join(__dirname, '..', 'TeacherDashboard.tsx'), 'utf8');
+      expect(src).toMatch(/hasProChip[\s\S]*?w-36 max-\[360px\]:w-28 sm:w-60/);
+      expect(src).not.toMatch(/hasProChip \? 'w-60 sm:w-72'/);
+    });
+  });
 });

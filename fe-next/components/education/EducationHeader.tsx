@@ -188,7 +188,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           <Link
             href={`/${language}/education`}
             className={cn(
-              'flex items-center gap-1 sm:gap-2',
+              'flex min-w-0 items-center gap-1 sm:gap-2',
               'hover:opacity-90 transition-opacity',
               'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 rounded-sm'
             )}
@@ -207,11 +207,11 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
 
-            {/* Logo text */}
-            <div className="flex flex-col">
+            {/* Logo text — truncate so help + hamburger never get pushed off a 320px phone. */}
+            <div className="flex min-w-0 flex-col">
               <span
                 className={cn(
-                  'text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight',
+                  'truncate text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight',
                   'text-neo-black dark:text-neo-white',
                   'leading-none'
                 )}

@@ -244,7 +244,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
       <div
         data-testid="teacher-dashboard-grid"
         className={cn(
-          'relative mx-auto flex h-full min-h-0 w-full max-w-[1640px] flex-col gap-2 px-3 py-2',
+          'relative mx-auto flex h-full min-h-0 min-w-0 w-full max-w-[1640px] flex-col gap-2 px-3 py-2',
           'sm:gap-3 sm:px-5 sm:py-3',
           'lg:grid lg:grid-cols-5 lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-4 lg:px-8 lg:py-4',
           // A phone turned sideways (844x390) is short, not narrow: the stacked
@@ -299,8 +299,18 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
               </span>
             ) : null}
           </div>
-          {/* Room for the dock that sits over this row's end (rendered last). */}
-          <div aria-hidden="true" className={cn('shrink-0', hasProChip ? 'w-60 sm:w-72' : 'w-36 sm:w-44')} />
+          {/* Room for the absolute dock at this row's end. Narrow phones
+              cannot spare w-60 for a chip row — keep Tools (+ Go Pro)
+              reachable without shoving the class chip off-canvas. */}
+          <div
+            aria-hidden="true"
+            className={cn(
+              'shrink-0',
+              hasProChip
+                ? 'w-36 max-[360px]:w-28 sm:w-60 md:w-72'
+                : 'w-28 max-[360px]:w-24 sm:w-36 md:w-44',
+            )}
+          />
         </div>
 
         {classroomsError ? (
@@ -339,14 +349,14 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                 may stretch into space the other hasn't claimed yet. */}
             <div
               data-testid="teacher-dashboard-main"
-              className="shrink-0 lg:col-span-3 lg:min-h-0 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-3 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-0"
+              className="min-w-0 shrink-0 lg:col-span-3 lg:min-h-0 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-3 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-0"
             >
               <PlayNowLauncher onLaunch={handleQuickLaunch} />
             </div>
 
             <div
               data-testid="teacher-dashboard-aside"
-              className="flex min-h-0 flex-1 flex-col lg:col-span-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2"
+              className="flex min-h-0 min-w-0 flex-1 flex-col lg:col-span-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2"
             >
               {/* Step 2 is ALWAYS mounted, in one frame: skeleton while the
                   class read is open (or the default class is a render away),
@@ -375,7 +385,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         )}
 
         <HqDock
-          className="absolute end-3 top-2 z-10 sm:end-5 sm:top-3 lg:end-8 lg:top-4"
+          className="absolute end-3 top-2 z-10 max-w-[calc(100%-0.75rem)] sm:end-5 sm:top-3 lg:end-8 lg:top-4"
           classroomCount={classrooms.length}
           reportsHref={reportsHref}
           lessonsOpen={lessonsOpen}
