@@ -60,4 +60,16 @@ describe('GET /api/avatar/png/:playerId', () => {
     expect(res.headers['cache-control']).not.toContain('s-maxage');
     expect(res.headers['cache-control']).toContain('max-age=300');
   }, 30000);
+
+  it('accepts a versioned path and treats it as a long-cache URL', async () => {
+    maybeSingle.mockResolvedValueOnce({ data: { avatar_config: CONFIG } });
+    const res = await request(app).get(`/avatar-png/${ID}/v/abc123`).buffer(true);
+    expect(res.status).toBe(200);
+    expect(res.headers['cache-control']).toContain('s-maxage');
+    expect((res.body as Buffer).subarray(1, 4).toString()).toBe('PNG');
+  }, 30000);
+
+  it('400s on an unsafe version token', async () => {
+    expect((await request(app).get(`/avatar-png/${ID}/v/zzzzzzzz`)).status).toBe(400);
+  });
 });

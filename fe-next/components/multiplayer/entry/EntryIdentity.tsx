@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useEntryIdentity, type EntryIdentityInput } from './useEntryIdentity';
 import { useEntrySfx } from './useEntrySfx';
 import { LazyEntryAvatarBuilder } from './entryLazy';
+import { computeAvatarSeedHash } from '@/lib/avatar/configHash';
 
 const MAX_NAME = 20;
 /** Rendered once at the largest size; CSS sizes it per breakpoint (64 phone · 112 desktop · 160 TV). */
@@ -79,7 +80,7 @@ export function EntryIdentity(props: EntryIdentityInput) {
     );
   }
 
-  const avatarKey = `${id.avatar.bgColor ?? ''}${id.avatar.skinColor ?? ''}${spin}`;
+  const avatarKey = `${computeAvatarSeedHash(id.avatar)}:${spin}`;
 
   return (
     <div data-testid="entry-identity" className={CARD}>

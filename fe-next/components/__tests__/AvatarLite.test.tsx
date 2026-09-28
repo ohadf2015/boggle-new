@@ -32,7 +32,7 @@ describe('AvatarLite real face', () => {
     // Then the circle shows their actual avatar, not just a flat color
     const img = container.querySelector('img');
     expect(img).not.toBeNull();
-    expect(img!.getAttribute('src')).toMatch(new RegExp(`^/api/avatar/png/${uuid}\\?v=`));
+    expect(img!.getAttribute('src')).toMatch(new RegExp(`^/api/avatar/png/${uuid}/v/[a-f0-9]+$`));
   });
 
   it('cache-busts when the config changes', () => {
@@ -43,11 +43,20 @@ describe('AvatarLite real face', () => {
     );
   });
 
+  it('cache-busts when hair changes but colors stay the same', () => {
+    const base = { bgColor: '#111111', skinColor: '#aaaaaa', hair: 'bob', eyes: 'round', base: 'round', mouth: 'smile' };
+    const a = render(<AvatarLite userId={uuid} customAvatar={base} />);
+    const b = render(<AvatarLite userId={uuid} customAvatar={{ ...base, hair: 'spiky' }} />);
+    expect(a.container.querySelector('img')!.getAttribute('src')).not.toBe(
+      b.container.querySelector('img')!.getAttribute('src'),
+    );
+  });
+
   it('shows the same seeded face Avatar uses for guests, seeds and players without a config', () => {
     // Given no stored config, the full Avatar draws getSeededAvatarConfig(userId) —
     // AvatarLite must show that face too, never a bare disc.
     const guest = render(<AvatarLite userId="guest-seed" customAvatar={{ bgColor: '#111' }} />).container.querySelector('img');
-    expect(guest!.getAttribute('src')).toMatch(/^\/api\/avatar\/png\/guest-seed\?v=/);
+    expect(guest!.getAttribute('src')).toMatch(/^\/api\/avatar\/png\/guest-seed\/v\/[a-f0-9]+$/);
     expect(render(<AvatarLite userId={uuid} />).container.querySelector('img')).not.toBeNull();
   });
 

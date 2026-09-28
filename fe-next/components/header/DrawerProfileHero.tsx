@@ -26,6 +26,8 @@ interface DrawerProfileHeroProps {
   /** Player-chosen accent hex (PlayerStyle). When set it wins over the tier ring color. */
   accentHex: string | null;
   isRtl: boolean;
+  /** profile.updated_at — busts AvatarLite PNG cache after save */
+  revision?: string | null;
 }
 
 /**
@@ -49,6 +51,7 @@ export function DrawerProfileHero({
   totalGames,
   accentHex,
   isRtl,
+  revision,
 }: DrawerProfileHeroProps) {
   const { t } = useLanguage();
   const visual = tierVisual(tier);
@@ -67,7 +70,7 @@ export function DrawerProfileHero({
             className="rounded-full border-3 shadow-hard-sm p-0.5 bg-neo-navy transition-colors"
             style={{ borderColor: ringColor }}
           >
-            <AvatarLite customAvatar={avatarConfig} userId={userId} size="lg" />
+            <AvatarLite customAvatar={avatarConfig} userId={userId} revision={revision} size="lg" />
           </div>
           {currentLevel != null && (
             <div className="absolute -bottom-1 -right-1 bg-neo-lime text-neo-black text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-neo-black shadow-hard-sm">

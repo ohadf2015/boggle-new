@@ -12,6 +12,8 @@ export interface ProfileEntryButtonProps {
   /** An unlock was revealed this session and the profile wasn't opened yet. */
   hasNew: boolean;
   onClick?: () => void;
+  /** profile.updated_at — busts AvatarLite PNG cache after save */
+  revision?: string | null;
 }
 
 /**
@@ -20,7 +22,7 @@ export interface ProfileEntryButtonProps {
  * AvatarLite only — header is first-paint, the full renderer never loads here.
  * 36px under 380px wide: the guest header row measured only 42px free at 360.
  */
-export default function ProfileEntryButton({ href, label, avatarConfig, userId, level, hasNew, onClick }: ProfileEntryButtonProps) {
+export default function ProfileEntryButton({ href, label, avatarConfig, userId, level, hasNew, onClick, revision }: ProfileEntryButtonProps) {
   return (
     <Link
       href={href}
@@ -30,7 +32,7 @@ export default function ProfileEntryButton({ href, label, avatarConfig, userId, 
       className="relative shrink-0 flex items-center justify-center w-9 h-9 min-[380px]:w-11 min-[380px]:h-11 rounded-full hover:-translate-y-px active:translate-y-px transition-transform"
     >
       <span className="block rounded-full border-3 border-neo-black bg-neo-navy shadow-hard-sm">
-        <AvatarLite customAvatar={avatarConfig} userId={userId} pixelSize={30} className="border-0 min-[380px]:!w-[34px] min-[380px]:!h-[34px]" />
+        <AvatarLite customAvatar={avatarConfig} userId={userId} revision={revision} pixelSize={30} className="border-0 min-[380px]:!w-[34px] min-[380px]:!h-[34px]" />
       </span>
       {level != null && (
         <span

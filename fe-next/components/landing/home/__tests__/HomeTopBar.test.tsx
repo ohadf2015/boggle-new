@@ -205,8 +205,8 @@ describe('HomeTopBar', () => {
 
   it('stays off the client art library and never builds an unversioned PNG url (source)', () => {
     const src = readFileSync(path.resolve(__dirname, '../HomeTopBar.tsx'), 'utf8');
-    // A raw `/api/avatar/png/${id}` has no `?v=` → served the pre-redraw face
-    // from device cache after the art changed. AvatarLite owns the url.
+    // A raw `/api/avatar/png/${id}` (no `/v/:bust`) kept serving the pre-redraw
+    // face from device cache after the art changed. AvatarLite owns the url.
     expect(src).not.toMatch(/src=\{`\/api\/avatar\/png/);
     // Avatar.tsx / AvatarRenderer would put the art library on the landing
     // first-paint graph (LandingView.bundleGraph guard).

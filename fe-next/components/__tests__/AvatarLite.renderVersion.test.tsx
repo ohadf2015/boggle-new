@@ -14,7 +14,7 @@ describe('AvatarLite PNG cache-bust includes the renderer version', () => {
   it('same config + different renderer version → different URL (art changes beat the 7-day s-maxage)', () => {
     const a = avatarPngSrc(uuid, cfg, 'r1');
     const b = avatarPngSrc(uuid, cfg, 'r2');
-    expect(a).toMatch(new RegExp(`^/api/avatar/png/${uuid}\\?v=`));
+    expect(a).toMatch(new RegExp(`^/api/avatar/png/${uuid}/v/[a-f0-9]+$`));
     expect(a).not.toBe(b);
   });
 
@@ -23,9 +23,21 @@ describe('AvatarLite PNG cache-bust includes the renderer version', () => {
   });
 
   it('serves the seeded face for guests / missing config, null only without a usable id', () => {
-    expect(avatarPngSrc('guest', cfg)).toMatch(/^\/api\/avatar\/png\/guest\?v=/);
-    expect(avatarPngSrc(uuid, null)).toMatch(new RegExp(`^/api/avatar/png/${uuid}\\?v=`));
+    expect(avatarPngSrc('guest', cfg)).toMatch(/^\/api\/avatar\/png\/guest\/v\/[a-f0-9]+$/);
+    expect(avatarPngSrc(uuid, null)).toMatch(new RegExp(`^/api/avatar/png/${uuid}/v/[a-f0-9]+$`));
     expect(avatarPngSrc(undefined, cfg)).toBeNull();
     expect(avatarPngSrc('../etc', cfg)).toBeNull();
+  });
+
+  it('busts when a non-color visual field changes (hair/eyes save with same bg/skin)', () => {
+    const base = { bgColor: '#111111', skinColor: '#aaaaaa', hair: 'bob', eyes: 'round', base: 'round', mouth: 'smile' };
+    const edited = { ...base, hair: 'spiky' };
+    expect(avatarPngSrc(uuid, base)).not.toBe(avatarPngSrc(uuid, edited));
+  });
+
+  it('busts when revision (e.g. profile.updated_at) advances after save', () => {
+    const a = avatarPngSrc(uuid, cfg, AVATAR_RENDER_VERSION, '2026-09-28T10:00:00Z');
+    const b = avatarPngSrc(uuid, cfg, AVATAR_RENDER_VERSION, '2026-09-28T10:00:01Z');
+    expect(a).not.toBe(b);
   });
 });
