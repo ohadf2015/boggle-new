@@ -15181,22 +15181,6 @@ const ja = {
         "cta": "アクティブ設問メーターなしでクラス全体の無料語彙ゲームをホスト"
       }
     },
-    "vsSocrative": {
-      "freeTier": {
-        "eyebrow": "無料枠の上限 — 正直フォイル",
-        "title": "Socrative Free: 5 Quizzes / 1 Room / 50人。LexiClash: クラス全体無料（50）+ miss→reteach Live。",
-        "lede": "Socrativeの料金は Free: 5 Quizzes・1 Room・50人/アクティビティ。Wayground Basic 20 max とは別。LexiClash無料はクラス最大50 + miss→Live。",
-        "socTitle": "Socrative Free — 公開上限",
-        "socBody": "Pricing Free: 5 Quizzes · 1 Room · 50人/アクティビティ · 30日レポート。",
-        "lexiTitle": "LexiClash — クラス全体無料 + miss→Live",
-        "lexiBody": "無料: クラス最大50人の語彙ゲーム + miss-gap → reteach Live。5クイズ/1ルーム上限なし。",
-        "citePrefix": "Socrative:",
-        "citePlansLabel": "socrative.com/pricing (Free: 5 / 1 / 50)",
-        "citeHelpLabel": "Help — choosing the right plan",
-        "citeSuffix": " — Free: 5 Quizzes · 1 Room · 50人/アクティビティ。",
-        "cta": "明確な50席の無料枠でクラス全体の語彙ゲームをホスト"
-      }
-    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "無料枠の上限 — honesty foil",

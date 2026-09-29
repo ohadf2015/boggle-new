@@ -15130,22 +15130,6 @@ const es = {
         "cta": "Organiza vocabulario gratis en clase sin un medidor de preguntas activas"
       }
     },
-    "vsSocrative": {
-      "freeTier": {
-        "eyebrow": "Límites del plan gratis — foil de honestidad",
-        "title": "Socrative Free: 5 Quizzes / 1 Room / 50 estudiantes. LexiClash: clase completa gratis (50) + miss→reteach Live.",
-        "lede": "Socrative publica Free: 5 Quizzes, 1 Room, 50 estudiantes por actividad. Distinto de Wayground Basic 20 max. LexiClash free cubre hasta 50 por clase con miss-gap → reteach Live.",
-        "socTitle": "Socrative Free — límites publicados",
-        "socBody": "Pricing Free: 5 Quizzes · 1 Room · 50 estudiantes por actividad · historial 30 días.",
-        "lexiTitle": "LexiClash — clase completa gratis + miss→Live",
-        "lexiBody": "Plan free: hasta 50 estudiantes por clase + miss-gap → reteach Live. Sin techo de 5 quizzes / 1 room.",
-        "citePrefix": "Socrative:",
-        "citePlansLabel": "socrative.com/pricing (Free: 5 / 1 / 50)",
-        "citeHelpLabel": "Help — choosing the right plan",
-        "citeSuffix": " — Free: 5 Quizzes · 1 Room · 50 estudiantes por actividad.",
-        "cta": "Organiza vocabulario gratis para toda la clase con un límite claro de 50 plazas"
-      }
-    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Límites del plan gratis — honesty foil",
