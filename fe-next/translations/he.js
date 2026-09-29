@@ -14993,6 +14993,22 @@ const he = {
         "cta": "ארחו אוצר מילים חינמי לכל הכיתה עם תקרת חינם ברורה של 50"
       }
     },
+    "vsMentimeter": {
+      "free50": {
+        "eyebrow": "מגבלות חינם — honesty foil",
+        "title": "Mentimeter Free: 50 משתתפים בחודש. LexiClash: כיתה שלמה בחינם (50) + miss→reteach Live.",
+        "lede": "העזרה של Mentimeter מפרסמת עד 50 משתתפים בחודש; בטבלת המחירים Participants per month: 50. המונה מתאפס בתאריך יצירת החשבון, עם חלון חסד של 8 שעות למצגת אחת מעל 50. בולטים שיווקיים אומרים Unlimited participants once per month. LexiClash חינם מכסה כיתה של עד 50 עם miss-gap → reteach Live.",
+        "mentiTitle": "Mentimeter Free (חינם) — מגבלות מפורסמות",
+        "mentiBody": "Help: עד 50 משתתפים בחודש. טבלה Free: Participants per month: 50. איפוס בתאריך יצירת החשבון; חסד 8 שעות.",
+        "lexiTitle": "LexiClash — כיתה שלמה בחינם + miss→Live",
+        "lexiBody": "שכבת חינם: עד 50 תלמידים לכיתה למשחקי אוצר מילים, וכן miss-gap → reteach Live. מגבלת מושבים אחת ברורה.",
+        "citePrefix": "Mentimeter:",
+        "citeHelpLabel": "Help — Free account (50 לחודש)",
+        "citePlansLabel": "plans?view=standard (טבלה: 50)",
+        "citeSuffix": " — 50 משתתפים בחודש; איפוס בתאריך יצירת החשבון; חסד 8 שעות.",
+        "cta": "הריצו אוצר מילים חינמי לכיתה שלמה עם מגבלה ברורה של 50 מושבים"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "מגבלות חינם — honesty foil",

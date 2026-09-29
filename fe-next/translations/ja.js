@@ -15138,6 +15138,22 @@ const ja = {
         "cta": "明確な無料50席でクラス全体のボキャブをホスト"
       }
     },
+    "vsMentimeter": {
+      "free50": {
+        "eyebrow": "無料枠の上限 — honesty foil",
+        "title": "Mentimeter Free: 月50プレイヤー参加。LexiClash: クラス全体無料（50）+ miss→reteach Live。",
+        "lede": "Mentimeterのヘルプは月あたり最大50プレイヤー参加と公開し、料金表は Participants per month: 50 と記載。カウンターはアカウント作成日にリセットされ、50超の1回のプレゼンには8時間の猶予があります。無料マーケ文言は Unlimited participants once per month。LexiClash無料は最大50人のクラス全体と miss-gap → reteach Live を提供します。",
+        "mentiTitle": "Mentimeter Free（無料）— 公開上限",
+        "mentiBody": "Help: 月50プレイヤー参加。料金表 Free: Participants per month: 50。アカウント作成日にリセット。50超の1回は8時間猶予。",
+        "lexiTitle": "LexiClash — クラス全体無料 + miss→Live",
+        "lexiBody": "無料枠: クラスあたり最大50人の語彙ゲームに加え、miss-gap → reteach Live。明確な無料座席上限はひとつ。",
+        "citePrefix": "Mentimeter:",
+        "citeHelpLabel": "Help — Free account（月50）",
+        "citePlansLabel": "plans?view=standard（表: 50）",
+        "citeSuffix": " — 月50プレイヤー参加; アカウント作成日にリセット; 8時間猶予。",
+        "cta": "明確な50席の無料枠でクラス全体の語彙ゲームをホスト"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "無料枠の上限 — honesty foil",

@@ -15373,6 +15373,22 @@ const sv = {
         "cta": "Håll helklass gratis vocab med tydlig gratisgräns på 50"
       }
     },
+    "vsMentimeter": {
+      "free50": {
+        "eyebrow": "Gratisnivåns tak — honesty foil",
+        "title": "Mentimeter Free: 50 deltagare/månad. LexiClash: hela klassen gratis (50) + miss→reteach Live.",
+        "lede": "Mentimeters hjälp publicerar upp till 50 deltagare per månad; pristabellen listar Participants per month: 50. Räknaren nollställs på kontots skapandedatum, med 8 timmars grace för en presentation över 50. Free-marknadsföringspunkter säger Unlimited participants once per month. LexiClash gratis täcker upp till 50 elever per klass med miss-gap → reteach Live.",
+        "mentiTitle": "Mentimeter Free (gratis) — publicerade tak",
+        "mentiBody": "Help: upp till 50 deltagare per månad. Tabell Free: Participants per month: 50. Nollställs på skapandedatum; 8 timmars grace.",
+        "lexiTitle": "LexiClash — hela klassen gratis + miss→Live",
+        "lexiBody": "Gratisnivå: upp till 50 elever per klass för ordförrådsspel plus miss-gap → reteach Live. Ett tydligt gratisplatstak.",
+        "citePrefix": "Mentimeter:",
+        "citeHelpLabel": "Help — Free account (50/månad)",
+        "citePlansLabel": "plans?view=standard (tabell: 50)",
+        "citeSuffix": " — 50 deltagare per månad; nollställs på skapandedatum; 8 timmars grace.",
+        "cta": "Hosta gratis ordförråd för hela klassen med ett tydligt 50-plats gratisgräns"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Gratisnivåns tak — honesty foil",
