@@ -130,6 +130,14 @@ describe('GoogleSignInButton', () => {
   // options set.` — the container ref was checked BEFORE awaiting GIS init and
   // dereferenced again after, so a component that unmounted during the await
   // (auth modal closed, route changed) handed Google a null parent.
+  // t_375bffc3: GSI anti-clickjacking drops clicks when an ancestor clips the iframe.
+  it('keeps the GSI chrome wrapper overflow-visible so the iframe stays clickable', () => {
+    render(<GoogleSignInButton />);
+    const frame = screen.getByTestId('gsi-frame');
+    expect(frame.className).toMatch(/overflow-visible/);
+    expect(frame.className).not.toMatch(/overflow-hidden/);
+  });
+
   it('does not hand Google a null parent when it unmounts during GIS init', async () => {
     let releaseInit: () => void = () => {};
     vi.mocked(ensureGoogleIdInitialized).mockReturnValueOnce(

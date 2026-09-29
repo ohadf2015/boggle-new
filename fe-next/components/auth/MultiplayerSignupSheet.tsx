@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Shield, Trophy, TrendingUp, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,6 +16,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { OAuthButtonGroup } from './shared';
+import { GsiClientPreloader } from './GsiClientPreloader';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { AccumulatedStats } from '@/hooks/useMultiplayerSignupNudge';
@@ -71,16 +72,26 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isOnCrazyGamesPlatform, onClose]);
 
+  // Clear framer transform after settle — GSI anti-clickjacking ignores clicks
+  // when any ancestor still has a CSS transform (t_375bffc3).
+  const [motionSettled, setMotionSettled] = useState(false);
+  useEffect(() => {
+    if (!isOpen) setMotionSettled(false);
+  }, [isOpen]);
+
   if (isOnCrazyGamesPlatform) return null;
 
   return (
-    <AnimatePresence>
+    <>
+      <GsiClientPreloader />
+      <AnimatePresence>
       {isOpen && (
         <m.div
           initial={{ y: '100%', opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+          onAnimationComplete={() => setMotionSettled(true)}
           style={{
             // Sit ABOVE the fixed sticky ready-bar (measured at runtime) so the
             // OAuth buttons never hide behind it. undefined → Tailwind fallback.
@@ -90,15 +101,20 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
               bottomOffset > 0
                 ? `calc(100dvh - ${bottomOffset + SHEET_BAR_GAP + 12}px)`
                 : undefined,
+            // Drop transform after enter so GSI iframe is clickable.
+            ...(motionSettled ? { transform: 'none' } : {}),
           }}
           className={cn(
-            'fixed inset-x-0 z-50 bottom-[calc(9rem+0.5rem)] max-h-[calc(100dvh-11rem)]',
-            'flex flex-col rounded-2xl border-3 border-black overflow-hidden',
+            // z-[120] above shared Dialog / share modal z-90 (t_375bffc3).
+            'fixed inset-x-0 z-[120] bottom-[calc(9rem+0.5rem)] max-h-[calc(100dvh-11rem)]',
+            // overflow-visible: do not clip/obscure the GSI iframe (anti-clickjacking).
+            'flex flex-col rounded-2xl border-3 border-black overflow-visible',
             'shadow-hard-lg md:max-w-lg md:mx-auto max-w-[calc(100%-1.5rem)] mx-auto',
             isDarkMode ? 'bg-neo-navy-light' : 'bg-white',
           )}
           role="region"
           aria-label={t('auth.mpSignup.title')}
+          data-testid="mp-signup-sheet"
         >
           {/* Drag handle */}
           <div className="flex justify-center pt-3 pb-1 shrink-0">
@@ -209,6 +225,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
         </m.div>
       )}
     </AnimatePresence>
+    </>
   );
 };
 
