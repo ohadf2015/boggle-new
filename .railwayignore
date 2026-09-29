@@ -91,14 +91,13 @@ yarn-debug.log*
 yarn-error.log*
 logs/
 
-# Docker (not needed for Railway)
-Dockerfile
+# Docker — railway.json builds fe-next/Dockerfile, so Dockerfile and .dockerignore
+# MUST be uploaded (guarded by fe-next/__tests__/railwayignore.dockerfile-contract.test.ts).
 Dockerfile.bun
 docker-compose.yml
-.dockerignore
 
-# Dev scripts not needed in production
-scripts/docker-*
+# Dev scripts not needed in production (docker-migrate.sh / docker-entrypoint.sh ARE needed
+# by the Dockerfile runner stage, so scripts/docker-* must not be excluded)
 fe-next/lighthouserc.*.cjs
 fe-next/e2e/
 fe-next/playwright.config.*
@@ -112,4 +111,4 @@ temp/
 .superdesign/
 fe-next/remotion-root/
 fe-next/app/sw.js/
-fe-next/supabase/
+# NOTE: fe-next/supabase/ is COPY'd by the Dockerfile (migrations) — do not ignore it.
