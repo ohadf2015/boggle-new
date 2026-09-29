@@ -31,7 +31,8 @@ export async function ensureHowl(): Promise<(typeof import('howler'))['Howl']> {
     _howlPromise = import('howler').then((mod) => {
       _HowlCtor = mod.Howl;
       patchHowlerRemoveEventListenerRace();
-      patchHowlerStaleSoundListeners(_HowlCtor);
+      patchHowlerStaleSoundListeners(mod);
+      patchHowlerLoadQueueRecursion(_HowlCtor);
       return _HowlCtor;
     });
   }
@@ -77,14 +78,20 @@ function patchHowlerRemoveEventListenerRace(): void {
  * without assigning to globalThis — then the stale-listener patch is a no-op
  * and production keeps throwing on `duration` / `removeEventListener`.
  * Fall back to probing a disposable Howl's `_sounds[0]`.
+ * Exported for unit testing.
  */
-function resolveHowlerSoundPrototype(
-  Howl: (typeof import('howler'))['Howl']
-): Record<string, (this: { _node?: unknown }, ...args: unknown[]) => unknown> | null {
-  type Listener = (this: { _node?: unknown }, ...args: unknown[]) => unknown;
-  type SoundProto = Record<string, Listener>;
+type SoundProto = Record<string, (this: { _node?: unknown }, ...args: unknown[]) => unknown>;
+
+/** Minimal structural shape of the howler module the probe relies on. */
+interface HowlerModuleLike {
+  Howl: new (options: any) => { load: () => unknown; unload: () => unknown };
+  Howler: { codecs: (ext: string) => boolean };
+}
+
+export function resolveHowlerSoundPrototype(mod: HowlerModuleLike): SoundProto | null {
   const fromGlobal = (globalThis as { Sound?: { prototype: SoundProto } }).Sound?.prototype;
   if (fromGlobal) return fromGlobal;
+  const { Howl, Howler } = mod;
   try {
     // Tiny silent wav — never plays; html5 so a Sound gets a real _node pool slot.
     const probe = new Howl({
@@ -95,6 +102,17 @@ function resolveHowlerSoundPrototype(
       preload: false,
       volume: 0,
     });
+    // Howler constructs Sound objects lazily inside load(), and only when a
+    // codec check passes — a preload:false (or codec-less jsdom) probe has an
+    // empty _sounds array and the stale-listener patch silently never applies.
+    // Force the codec gate so the Sound is built synchronously.
+    const originalCodecs = Howler.codecs;
+    Howler.codecs = () => true;
+    try {
+      probe.load();
+    } finally {
+      Howler.codecs = originalCodecs;
+    }
     const sound = (probe as unknown as { _sounds?: { constructor?: { prototype: SoundProto } }[] })
       ._sounds?.[0];
     const proto = sound?.constructor?.prototype ?? null;
@@ -105,9 +123,9 @@ function resolveHowlerSoundPrototype(
   }
 }
 
-function patchHowlerStaleSoundListeners(Howl: (typeof import('howler'))['Howl']): void {
+function patchHowlerStaleSoundListeners(mod: typeof import('howler')): void {
   type Listener = (this: { _node?: unknown }, ...args: unknown[]) => unknown;
-  const proto = resolveHowlerSoundPrototype(Howl);
+  const proto = resolveHowlerSoundPrototype(mod);
   if (!proto) return;
   for (const name of ['_loadListener', '_endListener', '_errorListener']) {
     const original = proto[name];
@@ -124,7 +142,7 @@ function patchHowlerStaleSoundListeners(Howl: (typeof import('howler'))['Howl'])
   type HowlProto = {
     unload?: (this: { _sounds?: { _node?: { removeEventListener?: unknown } | null }[] }) => unknown;
   };
-  const howlProto = Howl.prototype as HowlProto;
+  const howlProto = mod.Howl.prototype as HowlProto;
   const origUnload = howlProto.unload;
   if (typeof origUnload !== 'function' || (origUnload as { __urPatched?: boolean }).__urPatched) {
     return;
@@ -151,6 +169,69 @@ function patchHowlerStaleSoundListeners(Howl: (typeof import('howler'))['Howl'])
   };
   (guarded as { __urPatched?: boolean }).__urPatched = true;
   howlProto.unload = guarded;
+}
+
+/**
+ * Howler's Howl._loadQueue drains its action queue by recursion:
+ * volume() succeeds → _emit('volume') → _loadQueue('volume') → shift →
+ * _loadQueue() → task.action() → volume() → _emit('volume') → …
+ * Every volume()/fade() call made while the Howl is play-locked or still
+ * loading queues one task; a long lock (slow play() promise, suspended
+ * AudioContext) plus slider drags builds a queue of hundreds, and the first
+ * successful volume() cascades through all of them in one synchronous
+ * recursion — RangeError: Maximum call stack size exceeded (Sentry issue
+ * 149131810). Same drain semantics, but iterative: a re-entrancy flag turns
+ * the emit-driven nested calls into simple shifts and lets one flat loop
+ * drive the queue.
+ */
+function patchHowlerLoadQueueRecursion(Howl: (typeof import('howler'))['Howl']): void {
+  type QueueTask = { event: string; action: () => void };
+  type QueueHowl = { _queue: QueueTask[]; __lexiDrainingQueue?: boolean };
+  type HowlProto = { _loadQueue?: (this: QueueHowl, event?: string) => unknown };
+  const proto = Howl.prototype as HowlProto;
+  const original = proto._loadQueue;
+  if (typeof original !== 'function' || (original as { __lqPatched?: boolean }).__lqPatched) {
+    return;
+  }
+
+  const iterative = function (this: QueueHowl, event?: string) {
+    const self = this;
+    if (!Array.isArray(self._queue) || self._queue.length === 0) return self;
+
+    if (self.__lexiDrainingQueue) {
+      // Re-entrant call from an action's _emit: keep howler's shift semantics
+      // (a matching event consumes the head task) and let the outer loop run
+      // the next action once the current one returns.
+      if (event && self._queue[0] && self._queue[0].event === event) {
+        self._queue.shift();
+      }
+      return self;
+    }
+
+    self.__lexiDrainingQueue = true;
+    try {
+      let pendingEvent = event;
+      while (self._queue.length > 0) {
+        const task = self._queue[0];
+        if (pendingEvent) {
+          if (task.event !== pendingEvent) break;
+          self._queue.shift();
+          pendingEvent = undefined;
+          continue;
+        }
+        task.action();
+        // The action didn't consume itself (no matching emit — e.g. still
+        // play-locked so it re-queued): leave it queued for the next event,
+        // exactly as howler's single-step recursion would.
+        if (self._queue[0] === task) break;
+      }
+    } finally {
+      self.__lexiDrainingQueue = false;
+    }
+    return self;
+  };
+  (iterative as { __lqPatched?: boolean }).__lqPatched = true;
+  proto._loadQueue = iterative;
 }
 
 /**
