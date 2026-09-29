@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { GsiClientPreloader } from './GsiClientPreloader';
 import { m, AnimatePresence } from 'framer-motion';
 import { Trophy, TrendingUp, Medal, Users, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
@@ -167,6 +168,12 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
     </>
   );
 
+  // Clear framer transform after settle so GSI anti-clickjacking allows clicks (t_375bffc3).
+  const [motionSettled, setMotionSettled] = useState(false);
+  useEffect(() => {
+    if (!isOpen) setMotionSettled(false);
+  }, [isOpen]);
+
   // ── Soft sheet (default / treatment) — non-blocking, value before auth ──
   // Portal to body at z-[120]: PracticeResults / SP sticky CTAs are also
   // `fixed … z-50` and paint later in the tree, so an in-tree z-50 sheet lost
@@ -180,11 +187,14 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            onAnimationComplete={() => setMotionSettled(true)}
+            style={motionSettled ? { transform: 'none' } : undefined}
             className={cn(
               'fixed inset-x-0 z-[120] max-h-[min(70dvh,28rem)]',
               // Clear sticky results CTAs + safe area (MP sheet uses the same idea).
               'bottom-[calc(0.75rem+var(--results-sticky-cta-h,0px)+env(safe-area-inset-bottom,0px))]',
-              'flex flex-col rounded-2xl border-3 border-black overflow-hidden',
+              // overflow-visible: do not clip/obscure the GSI iframe (anti-clickjacking).
+              'flex flex-col rounded-2xl border-3 border-black overflow-visible',
               'shadow-hard-lg md:max-w-lg md:mx-auto max-w-[calc(100%-1.5rem)] mx-auto',
               isDarkMode ? 'bg-neo-navy-light' : 'bg-white',
             )}
@@ -283,7 +293,12 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
       </AnimatePresence>
     );
     if (typeof document === 'undefined') return sheet;
-    return createPortal(sheet, document.body);
+    return (
+      <>
+        <GsiClientPreloader />
+        {createPortal(sheet, document.body)}
+      </>
+    );
   }
 
   // ── Legacy blocking Dialog (control holdout) ──

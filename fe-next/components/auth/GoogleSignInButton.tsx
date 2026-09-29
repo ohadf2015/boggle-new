@@ -137,7 +137,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
     <div ref={wrapperRef} className={cn('flex justify-center', className)}>
       <Script id="google-gsi-client" src={gsiSrc} strategy="afterInteractive" onReady={() => void renderButton()} />
       {/* Neo-brutalist frame around the (visible, clickable) Google button — hard
-          black border + hard shadow, corners clipped to rounded-neo. Full width +
+          black border + hard shadow, corners rounded-neo; overflow MUST stay visible — GSI anti-clickjacking drops clicks when an ancestor clips/obscures the iframe (t_375bffc3). Full width +
           white bg + centered: GSI renders a snug, content-sized white button, and
           the white frame bg blends with it so the control reads as one full-width
           button (matching the Discord/email buttons) with perfectly centered
@@ -146,7 +146,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
       <div
         data-testid="gsi-frame"
         onPointerDown={handlePromptClickIntent}
-        className="flex w-full min-h-[48px] items-center justify-center overflow-hidden rounded-xl border-3 border-neo-black bg-white shadow-hard"
+        className="flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-white shadow-hard"
       >
         <div ref={containerRef} data-testid="gsi-button-container" />
       </div>
