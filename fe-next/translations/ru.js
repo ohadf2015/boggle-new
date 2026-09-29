@@ -12131,6 +12131,7 @@ const ru = {
       "trialLifecycleTitleToday": "Пробный Teacher Pro заканчивается сегодня",
       "trialLifecycleTitleOne": "До конца пробного Teacher Pro: 1 день",
       "trialLifecycleBody": "Сохраните безлимитные классы и печатные отчёты — 9 $/мес после пробного периода.",
+      "trialExpiringLoss": "Без Pro вы потеряете безлимитные классы и печатные отчёты об учениках.",
       "trialLifecycleCta": "Оставить Pro — 9 $/мес",
       "checkoutError": "Не удалось начать оплату. Попробуйте ещё раз.",
       "signInRequired": "Пожалуйста, войдите для перехода на Teacher Pro.",

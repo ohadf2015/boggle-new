@@ -13010,6 +13010,7 @@ const he = {
       "trialLifecycleTitleToday": "ניסיון Teacher Pro מסתיים היום",
       "trialLifecycleTitleOne": "נותר יום אחד בניסיון Teacher Pro",
       "trialLifecycleBody": "שמרו על כיתות ללא הגבלה ודוחות להדפסה — 9$ לחודש אחרי הניסיון.",
+      "trialExpiringLoss": "ללא Pro, תאבדו כיתות ללא הגבלה ודוחות תלמידים להדפסה.",
       "trialLifecycleCta": "להמשיך ב-Pro — 9$ לחודש",
       "checkoutError": "התשלום לא הצליח להתחיל. נסו שוב.",
       "signInRequired": "אנא התחברו כדי לשדרג ל-Teacher Pro.",

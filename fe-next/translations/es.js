@@ -13104,6 +13104,7 @@ const es = {
       "trialLifecycleTitleToday": "Tu prueba de Teacher Pro termina hoy",
       "trialLifecycleTitleOne": "Queda 1 día de tu prueba de Teacher Pro",
       "trialLifecycleBody": "Conserva clases ilimitadas e informes imprimibles — 9 $/mes al terminar la prueba.",
+      "trialExpiringLoss": "Sin Pro, perderás las clases ilimitadas y los informes de alumnos imprimibles.",
       "trialLifecycleCta": "Seguir con Pro — 9 $/mes",
       "checkoutError": "No se pudo iniciar el pago. Inténtalo de nuevo.",
       "signInRequired": "Inicia sesión para mejorar a Teacher Pro.",
