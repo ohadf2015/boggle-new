@@ -15416,6 +15416,22 @@ const sv = {
         "cta": "Hosta gratis ordförråd för klassen utan en aktivfrågemätare"
       }
     },
+    "vsSocrative": {
+      "freeTier": {
+        "eyebrow": "Gratisgränser — ärlighetsfoil",
+        "title": "Socrative Free: 5 Quizzes / 1 Room / 50 elever. LexiClash: hela klassen gratis (50) + miss→Live.",
+        "lede": "Socrative publicerar Free: 5 Quizzes, 1 Room, 50 elever per aktivitet. Skilt från Wayground Basic 20 max. LexiClash free täcker upp till 50 per klass + miss→Live.",
+        "socTitle": "Socrative Free — publicerade gränser",
+        "socBody": "Pricing Free: 5 Quizzes · 1 Room · 50 elever · 30-dagars historik.",
+        "lexiTitle": "LexiClash — hela klassen gratis + miss→Live",
+        "lexiBody": "Free: upp till 50 elever per klass + miss-gap → reteach Live. Inget 5-quiz / 1-rumstak.",
+        "citePrefix": "Socrative:",
+        "citePlansLabel": "socrative.com/pricing (Free: 5 / 1 / 50)",
+        "citeHelpLabel": "Help — choosing the right plan",
+        "citeSuffix": " — Free: 5 Quizzes · 1 Room · 50 elever.",
+        "cta": "Håll gratis ordlek för hela klassen med en tydlig 50-platsgräns"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Gratisnivåns tak — honesty foil",
