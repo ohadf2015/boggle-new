@@ -18,12 +18,16 @@ import path from 'node:path';
 
 const TAG_START = /<(?:m|motion|AdaptiveMotion)\.([A-Za-z0-9]+)/g;
 const ARRAY_PROP =
-  /(scale|opacity|x|y|rotate|width|height):\s*(\[[^\]]+\])/g;
+  /(scaleX|scaleY|scale|opacity|rotateX|rotateY|rotateZ|rotate|width|height|\bx|\by):\s*(\[[^\]]+\])/g;
 const SPRING_CONST =
   /const\s+(\w+)\s*=\s*\{[^}]*type:\s*['"]spring['"][^}]*\}/gs;
+const IDENT_ANIM = /^([A-Za-z_]\w*)(?:\s*\[[^\]]*\])?\s*$/;
+const SPREAD_IDENT = /\.\.\.([A-Za-z_]\w*)(?:\[[^\]]*\])?/g;
 
-function extractBalanced(src: string, openIdx: number): string | null {
-  if (src[openIdx] !== '{') return null;
+function extractDelimited(src: string, openIdx: number): string | null {
+  const open = src[openIdx];
+  const close = open === '{' ? '}' : open === '[' ? ']' : open === '(' ? ')' : null;
+  if (!close) return null;
   let i = openIdx;
   let depth = 0;
   let inStr: string | null = null;
@@ -43,14 +47,37 @@ function extractBalanced(src: string, openIdx: number): string | null {
       i += 1;
       continue;
     }
-    if (c === '{') depth += 1;
-    else if (c === '}') {
+    if (c === open) depth += 1;
+    else if (c === close) {
       depth -= 1;
       if (depth === 0) return src.slice(openIdx + 1, i);
     }
     i += 1;
   }
   return null;
+}
+
+function extractBalanced(src: string, openIdx: number): string | null {
+  return extractDelimited(src, openIdx);
+}
+
+/** Resolve `const Name = …` so identifier/spread animate props can be scanned. */
+function lookupConst(name: string, text: string): string | null {
+  const re = new RegExp(`(?:const|let|var)\\s+${name}\\s*(?::[^=]+)?=\\s*`);
+  const m = re.exec(text);
+  if (!m) return null;
+  const idx = m.index + m[0].length;
+  const body = extractDelimited(text, idx);
+  return body;
+}
+
+function resolveAnimExpr(expr: string, text: string): string {
+  const ident = IDENT_ANIM.exec(expr.trim());
+  if (ident) {
+    const body = lookupConst(ident[1], text);
+    if (body) return body;
+  }
+  return expr.replace(SPREAD_IDENT, (_, name: string) => lookupConst(name, text) ?? '');
 }
 
 function extractJsxProp(tag: string, prop: string): string | null {
@@ -87,7 +114,7 @@ function springAppliesToProp(trans: string, prop: string): boolean {
   }
   // Strip per-prop overrides, then look for default type:spring
   const stripped = trans.replace(
-    /\b(?:scale|opacity|x|y|rotate|width|height|filter|boxShadow)\s*:\s*\{[^{}]*\}/g,
+    /\b(?:scaleX|scaleY|scale|opacity|rotateX|rotateY|rotateZ|rotate|width|height|filter|boxShadow|\bx|\by)\s*:\s*\{[^{}]*\}/g,
     '',
   );
   return /type:\s*['"]spring['"]/.test(stripped);
@@ -140,7 +167,19 @@ export type SpringKeyframeHit = {
 };
 
 
-const TRANSFORM_PROPS = new Set(['scale', 'x', 'y', 'rotate', 'width', 'height']);
+const TRANSFORM_PROPS = new Set([
+  'scale',
+  'scaleX',
+  'scaleY',
+  'x',
+  'y',
+  'rotate',
+  'rotateX',
+  'rotateY',
+  'rotateZ',
+  'width',
+  'height',
+]);
 
 /**
  * True when this multi-kf transform is clearly tweened (safe with 3+ frames).
@@ -238,12 +277,16 @@ export function findSpringKeyframeViolations(
 
       for (const animateProp of [
         'animate',
+        'exit',
+        'initial',
         'whileHover',
         'whileTap',
         'whileInView',
       ] as const) {
-        const animExpr = extractJsxProp(tag, animateProp);
-        if (!animExpr) continue;
+        const rawAnimExpr = extractJsxProp(tag, animateProp);
+        if (!rawAnimExpr) continue;
+        // Resolve identifier / spread animate props (e.g. animate={WOBBLES[0]}, {...MOOD})
+        const animExpr = resolveAnimExpr(rawAnimExpr, text);
         // Missing transition is itself a signal: Motion defaults transforms to spring.
         const transExpr = extractJsxProp(tag, 'transition') ?? '';
 
