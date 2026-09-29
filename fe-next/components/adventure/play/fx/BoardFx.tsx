@@ -233,7 +233,7 @@ function BoardFxComponent({ children, lastHit, hitPath = [], shaking, targetRef,
         </div>
       )}
       {hintBoxes.length > 0 && typeof document !== 'undefined' && createPortal(
-        <div className="pointer-events-none fixed inset-0 z-[62]" aria-hidden data-testid="adv-hint-layer">
+        <div className="pointer-events-none fixed inset-0 z-62" aria-hidden data-testid="adv-hint-layer">
           {/* Gold dashed "marching" rings + a bulb on the first tile + an arrow to the next:
               never the pink ring + numbered badge a player's own selection uses. */}
           {hintBoxes.length > 1 && (
