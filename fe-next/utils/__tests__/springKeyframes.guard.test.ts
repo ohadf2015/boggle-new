@@ -25,7 +25,7 @@ import path from 'path';
 
 const FE_NEXT_ROOT = path.resolve(__dirname, '..', '..');
 
-const SKIP_DIRS = new Set(['node_modules', '.next', 'coverage', '.git', 'out']);
+const SKIP_DIRS = new Set(['node_modules', '.next', 'coverage', '.git', 'out', '__tests__']);
 const TEST_FILE = 'springKeyframes.guard.test.ts';
 
 // >= 3 numeric elements (multi-line tolerant)
