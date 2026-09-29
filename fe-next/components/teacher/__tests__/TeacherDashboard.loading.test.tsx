@@ -10,8 +10,11 @@
  *  - zero classes: the same region becomes "create your class" with ONE CTA;
  *  - loaded: the class name chip reads correctly even when the data is in the
  *    opposite script (a Latin class name under Hebrew UI);
- *  - mode cards keep a fixed aspect on phones in every state — the REAL
- *    launcher renders here, not a stub, so the aspect class is really there.
+ *  - mode chips keep a fixed, content-sized shape in every state — the REAL
+ *    launcher renders here, not a stub, so the shape contract is really there.
+ *    (They used to be illustrated cards pinned by aspect ratio; the calm
+ *    redesign made them compact chips, and the same defect — stretching into
+ *    freed height — is now forbidden by shape, not aspect.)
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
@@ -74,14 +77,15 @@ function joinRegion() {
   return screen.getByRole('region', { name: /get students in/i });
 }
 
-function expectModeCardsKeepTheirAspect() {
-  const cards = screen.getAllByTestId(/^hq-mode-/);
-  expect(cards.length).toBeGreaterThanOrEqual(4);
-  for (const card of cards) {
-    const cls = card.className.toString();
-    // A fixed aspect on phones, and never stretched to the grid row's height.
-    expect(cls, cls).toMatch(/(^|\s)aspect-\[\d+\/\d+\]/);
+function expectModeChipsKeepTheirShape() {
+  const chips = screen.getAllByTestId(/^hq-mode-/);
+  expect(chips.length).toBeGreaterThanOrEqual(4);
+  for (const chip of chips) {
+    const cls = chip.className.toString();
+    // Content-sized and anchored to the top of their row: a chip may never
+    // stretch into whatever height the grid row happens to have.
     expect(cls, cls).toMatch(/(^|\s)self-start(\s|$)/);
+    expect(cls, cls).not.toMatch(/(^|\s)(flex-1|h-full)(\s|$)|aspect-\[/);
   }
 }
 
@@ -108,9 +112,9 @@ describe('<TeacherDashboard> — layout survives every data state', () => {
       expect(screen.queryByTestId('hq-join-code')).toBeNull();
     });
 
-    it('Then the mode cards keep a fixed aspect instead of stretching into the freed height', () => {
+    it('Then the mode chips keep a fixed shape instead of stretching into the freed height', () => {
       render(<TeacherDashboard />);
-      expectModeCardsKeepTheirAspect();
+      expectModeChipsKeepTheirShape();
       // The phone's hero column sizes to its content, it does not grow.
       const main = screen.getByTestId('teacher-dashboard-main');
       expect(main.className).not.toMatch(/(^|\s)flex-1(\s|$)/);
@@ -137,9 +141,9 @@ describe('<TeacherDashboard> — layout survives every data state', () => {
       expect(screen.queryByTestId('hq-join-skeleton')).toBeNull();
     });
 
-    it('Then the mode cards still keep their aspect', () => {
+    it('Then the mode chips still keep their shape', () => {
       render(<TeacherDashboard />);
-      expectModeCardsKeepTheirAspect();
+      expectModeChipsKeepTheirShape();
     });
   });
 
@@ -148,12 +152,12 @@ describe('<TeacherDashboard> — layout survives every data state', () => {
       state.isLoading = false;
     });
 
-    it('Then the join card is live and the mode cards keep their aspect', () => {
+    it('Then the join card is live and the mode chips keep their shape', () => {
       state.classrooms = [{ id: 'c1', name: 'Period 1', join_code: 'AAA111', member_count: 0 }];
       render(<TeacherDashboard />);
       expect(within(joinRegion()).getByTestId('hq-join-code')).toHaveTextContent('AAA111');
       expect(joinRegion()).not.toHaveAttribute('aria-busy', 'true');
-      expectModeCardsKeepTheirAspect();
+      expectModeChipsKeepTheirShape();
     });
 
     it('Then a Latin class name under Hebrew UI isolates its direction and truncates at its END', () => {

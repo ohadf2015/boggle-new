@@ -6,19 +6,19 @@
  * on arrival — a word list picked, a game picked, defaults chosen — so the
  * whole flow is still a single press of one enormous button.
  *
- * What changed for HQ: the game is now a visible choice. Four illustrated mode
- * cards (Academy node art) sit above START, one always pre-selected — the game
- * the armed words can actually carry — so choosing is optional and START stays
- * one tap. What it deliberately still does NOT ask for: a roster, a lesson
- * (a starter pack or a pasted list becomes one on the way), a timer or a board
- * size. The class comes from the deck's class chips, never from here.
+ * The game is a visible but CALM choice: four compact chips (colour + icon,
+ * never four saturated posters) sit above START, one always pre-selected —
+ * the game the armed words can actually carry — so choosing is optional and
+ * START stays one tap. What it deliberately still does NOT ask for: a roster,
+ * a lesson (a starter pack or a pasted list becomes one on the way), a timer
+ * or a board size. The class comes from the deck's class chips, never from
+ * here.
  */
 
 'use client';
 
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { m } from 'framer-motion';
-import { Rocket, Zap, X, ChevronUp } from 'lucide-react';
+import { Rocket, X, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useLessons } from '@/hooks/useVocabularyLesson';
@@ -184,34 +184,35 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
     <section
       data-testid="play-now-launcher"
       aria-labelledby="play-now-heading"
-      className="@container relative flex h-full min-h-0 flex-col overflow-hidden rounded-neo-lg border-3 border-neo-cream bg-neo-navy-light/95 shadow-hard-xl"
+      className="@container relative flex h-full min-h-0 flex-col overflow-hidden rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard"
     >
-      <div className="flex shrink-0 items-center gap-2 border-b-3 border-neo-black bg-neo-lime px-2.5 py-1.5 sm:px-4 sm:py-2 [@media(orientation:landscape)_and_(max-height:500px)]:py-1">
+      <div className="flex shrink-0 items-center gap-2 border-b-2 border-neo-cream/40 px-3 py-2 sm:px-4 [@media(orientation:landscape)_and_(max-height:500px)]:py-1.5">
         {/* Step 1 of 2 — HQ reads as a sequence: pick + GO LIVE, then get them in. */}
         <span
           data-testid="hq-step-badge-1"
           aria-hidden="true"
-          className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-black font-neo-display text-base font-black leading-none text-neo-lime sm:size-8 sm:text-lg [@media(orientation:landscape)_and_(max-height:500px)]:size-6 [@media(orientation:landscape)_and_(max-height:500px)]:text-sm"
+          className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-neo-lime font-neo-display text-sm font-black leading-none text-neo-lime"
         >
           1
         </span>
         <h2
           id="play-now-heading"
-          className="min-w-0 truncate font-neo-display text-lg font-black uppercase leading-none tracking-tight text-black sm:text-2xl [@media(orientation:landscape)_and_(max-height:500px)]:text-lg"
+          className="min-w-0 truncate font-neo-display text-base font-bold leading-none tracking-tight text-neo-white sm:text-lg"
         >
           {t('academy.hq.startTitle', 'Start a game')}
         </h2>
-        <Zap className="size-5 shrink-0 text-black" strokeWidth={3} aria-hidden="true" />
-        <p className="ms-auto hidden truncate font-neo-body text-sm font-bold text-black/70 @[34rem]:block">
+        <p className="ms-auto hidden truncate font-neo-body text-xs font-bold text-neo-white/60 @[34rem]:block">
           {t('teacher.playNow.subtitle')}
         </p>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-2 p-2 sm:gap-3 sm:p-3">
+      <div className="flex min-h-0 flex-1 flex-col justify-evenly gap-3 p-3 sm:gap-4 sm:p-4">
         <div
           role="radiogroup"
           aria-label={t('academy.hq.pickGame', 'Pick a game')}
-          className="grid min-h-0 flex-1 grid-cols-4 gap-2 pt-2 sm:gap-3 lg:grid-cols-2 lg:grid-rows-2 lg:gap-4 [@media(orientation:landscape)_and_(max-height:500px)]:flex-none [@media(orientation:landscape)_and_(max-height:500px)]:pt-0 max-sm:[@media(max-height:700px)]:flex-none max-sm:[@media(max-height:700px)]:pt-0"
+          // Two per row at desktop: four-in-a-row squeezes a chip to ~150px
+          // and the mode's NAME truncates — the verb must get the pixels.
+          className="grid shrink-0 grid-cols-2 gap-2 sm:gap-3"
         >
           {HQ_MODES.map((mode) => (
             <HqModeCard
@@ -230,54 +231,41 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
         {/* What is already loaded, said BEFORE the button. */}
         <p
           data-testid="play-now-armed"
-          className="shrink-0 truncate text-center font-neo-body text-xs font-bold text-neo-white sm:text-sm"
+          className="shrink-0 truncate text-center font-neo-body text-xs font-bold text-neo-white/80 sm:text-sm"
         >
           {armed
             ? t('teacher.playNow.armedWith', { title: armed.intent.title, count: armed.words.length })
             : t('teacher.playNow.pickSomething')}
         </p>
 
-        {/* The loudest thing on HQ: solid lime, the biggest type, a hard
-            shadow and — once armed — a slow beacon ring (static when motion
-            is reduced). Nothing on the deck may out-shout it. */}
-        <div className="relative shrink-0">
-          {armed && !reduced ? (
-            <m.span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 rounded-neo border-4 border-neo-lime"
-              // A pulse that leaves: mostly invisible, so a still frame never
-              // reads as a stray double border.
-              animate={{ scale: [1, 1.05], opacity: [0.75, 0] }}
-              transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 0.6, ease: 'easeOut' }}
-            />
-          ) : null}
-          <button
-            type="button"
-            data-testid="play-now-go"
-            disabled={!armed}
-            onClick={handleGo}
-            className={cn(
-              // min-w-0 + overflow-hidden: flex children default to min-width:auto,
-              // so a long locale ("יוצאים לדרך") at text-3xl blew past a 320px
-              // phone and forced the shell to scroll sideways.
-              'relative flex min-h-16 w-full min-w-0 items-center justify-center gap-2 overflow-hidden rounded-neo border-3 border-black px-3 py-2 sm:gap-3 sm:px-6',
-              'font-neo-display text-2xl font-black uppercase tracking-tight max-[360px]:text-xl sm:min-h-20 sm:text-4xl lg:text-5xl',
-              // `!`: globals.css pads every landscape-phone <button> 0.75rem, unlayered,
-              // which beats any layered utility.
-              '[@media(orientation:landscape)_and_(max-height:500px)]:min-h-10 [@media(orientation:landscape)_and_(max-height:500px)]:py-0.5! [@media(orientation:landscape)_and_(max-height:500px)]:text-2xl max-sm:[@media(max-height:700px)]:min-h-12 max-sm:[@media(max-height:700px)]:py-1',
-              // Never a geometric transition: a button that moves under the pointer
-              // fails Playwright's stability check and shifts under a finger.
-              // Press feel is shadow + brightness only; the beacon is a sibling.
-              'transition-[box-shadow,filter] duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-              armed
-                ? 'bg-neo-lime text-black shadow-hard-xl hover:shadow-hard-2xl hover:brightness-105 active:shadow-hard-pressed active:brightness-95'
-                : 'cursor-not-allowed bg-neo-cream text-neo-gray shadow-hard-sm'
-            )}
-          >
-            <Rocket className="size-7 shrink-0 sm:size-10 [@media(orientation:landscape)_and_(max-height:500px)]:size-6 max-sm:[@media(max-height:700px)]:size-6" strokeWidth={3} aria-hidden="true" />
-            <span className="min-w-0 truncate">{t('teacher.playNow.goLive')}</span>
-          </button>
-        </div>
+        {/* The ONE shout on HQ: solid lime, the biggest type, a hard shadow.
+            Nothing else on the deck is allowed to out-shout it. */}
+        <button
+          type="button"
+          data-testid="play-now-go"
+          disabled={!armed}
+          onClick={handleGo}
+          className={cn(
+            // min-w-0 + overflow-hidden: flex children default to min-width:auto,
+            // so a long locale ("יוצאים לדרך") at text-3xl blew past a 320px
+            // phone and forced the shell to scroll sideways (#1173).
+            'relative flex min-h-16 w-full min-w-0 shrink-0 items-center justify-center gap-3 overflow-hidden rounded-neo border-3 border-black px-3 py-2 sm:px-6',
+            'font-neo-display text-3xl font-black uppercase tracking-tight max-[360px]:text-xl sm:min-h-20 sm:text-4xl lg:min-h-24 lg:text-5xl',
+            // `!`: globals.css pads every landscape-phone <button> 0.75rem, unlayered,
+            // which beats any layered utility.
+            '[@media(orientation:landscape)_and_(max-height:500px)]:min-h-10 [@media(orientation:landscape)_and_(max-height:500px)]:py-0.5! [@media(orientation:landscape)_and_(max-height:500px)]:text-2xl max-sm:[@media(max-height:700px)]:min-h-12 max-sm:[@media(max-height:700px)]:py-1',
+            // Never a geometric transition: a button that moves under the pointer
+            // fails Playwright's stability check and shifts under a finger.
+            // Press feel is shadow + brightness only.
+            'transition-[box-shadow,filter] duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+            armed
+              ? 'bg-neo-lime text-black shadow-hard-xl hover:shadow-hard-2xl hover:brightness-105 active:shadow-hard-pressed active:brightness-95'
+              : 'cursor-not-allowed bg-neo-cream text-neo-gray shadow-hard-sm'
+          )}
+        >
+          <Rocket className="size-8 shrink-0 sm:size-10 [@media(orientation:landscape)_and_(max-height:500px)]:size-6 max-sm:[@media(max-height:700px)]:size-6" strokeWidth={3} aria-hidden="true" />
+          <span className="min-w-0 truncate">{t('teacher.playNow.goLive')}</span>
+        </button>
 
         {/* Everything in here exists to CHANGE the default words, never to
             reach it. Opens as a sheet over this card, so it never grows the
@@ -287,8 +275,8 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
             data-testid="play-now-change-summary"
             className="flex cursor-pointer list-none items-center justify-center gap-1.5 marker:content-none"
           >
-            <ChevronUp className="size-4 text-neo-white/80" aria-hidden="true" />
-            <p className="font-neo-display text-[0.7rem] font-black uppercase tracking-widest text-neo-white/80 underline decoration-2 underline-offset-2">
+            <ChevronUp className="size-4 text-neo-white/60" aria-hidden="true" />
+            <p className="font-neo-body text-xs font-bold text-neo-white/60 underline decoration-1 underline-offset-2">
               {t('teacher.playNow.changeWords')}
             </p>
           </summary>

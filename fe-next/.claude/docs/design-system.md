@@ -52,6 +52,29 @@
 - Display: Fredoka (`font-neo-display`)
 - Body: Rubik (`font-neo-body`)
 
+**Refined surfaces (Teacher HQ recipe):** calm command-deck screens keep the
+DNA (navy canvas, Fredoka, hard edges, electric accents) but dial it down:
+- Panel shell: `rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard`
+  (hairline cream edge — never `border-3` + `shadow-hard-xl` on quiet panels).
+- ONE saturated fill per surface, tied to meaning (lime = go, cyan = class);
+  everything else is navy + cream/white ink. Panel titles: Fredoka `font-bold`
+  sentence case; `font-black uppercase` is reserved for the ONE hero CTA.
+  Chrome never wears the hero's fill: the nav's active state is a tinted lime
+  OUTLINE (`border-neo-lime` + `bg-neo-lime/10` + `text-neo-lime`), because a
+  second solid lime slab competes with GO LIVE.
+- Maximum-legibility data (a join code read from the back row): ink-on-cream
+  plate (`bg-neo-cream border-neo-black text-neo-black`).
+- Colour-coded choices always pair colour with a distinct icon shape
+  (Kahoot colour+shape bar) and carry `aria-label` + `title` with the full
+  name, so truncation can never hide the verb — see
+  `components/teacher/hq/hqModes.ts`.
+- Heavy sheet bodies mount on first open (`HqSheet mountWhenOpen`), not on
+  every dashboard load.
+- No looping attention animations (beacon rings, radar pings) on calm decks;
+  micro-interactions are spring hover/press only, all reduced-motion aware.
+- Canvas: flat `bg-neo-navy`, at most a faint static radial tint — no
+  full-bleed illustration behind a working deck.
+
 **Animation Classes:**
 - `animate-neo-press` - button press effect
 - `animate-neo-pop` - entrance pop

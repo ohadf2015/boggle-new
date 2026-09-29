@@ -11,7 +11,7 @@
  * dead-ending with a config but no classroom context to load.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import type { GameConfiguration } from '@/hooks/useRecentGameSettings';
@@ -320,7 +320,13 @@ describe('TeacherDashboard — Play Tab First-Run State', () => {
       // WHEN
       render(<TeacherDashboard />);
 
-      // THEN — the lesson list is the landing screen
+      // THEN — the lessons sheet is on the landing screen (the builder itself
+      // mounts on first open: it is the heaviest tree on the deck)
+      const sheet = screen.getByTestId('teacher-lessons') as HTMLDetailsElement;
+      act(() => {
+        sheet.open = true;
+        fireEvent(sheet, new Event('toggle'));
+      });
       expect(screen.getByTestId('lesson-builder')).toBeInTheDocument();
       expect(screen.queryByText('Start Game')).not.toBeInTheDocument();
     });

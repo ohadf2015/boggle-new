@@ -19,8 +19,10 @@ import { HqSheet } from "./HqSheet";
  * navy is ~1.3:1 and reads as no control at all (the contrast test pins this).
  */
 const TOP_CHIP = cn(
-  "inline-flex min-h-9 max-w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-neo border-3 border-neo-cream",
-  "bg-neo-navy-light px-2 font-neo-display text-xs font-black uppercase leading-none text-neo-white",
+  // max-w-full + min-w-0: the chip sits in a flex row beside the hero on
+  // 320px phones — without them a long locale forces horizontal scroll (#1173).
+  "inline-flex min-h-9 max-w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-neo border-2 border-neo-cream",
+  "bg-neo-navy-light px-2.5 font-neo-display text-xs font-bold uppercase leading-none text-neo-white",
   "shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard sm:px-3 sm:text-sm lg:min-h-10",
   "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
 );
@@ -30,8 +32,8 @@ const TOP_CHIP = cn(
  * Exported so the sheet's four shortcuts share one shape.
  */
 export const DOCK_TILE = cn(
-  "flex h-full min-h-20 w-full min-w-0 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-neo border-3 border-neo-cream",
-  "bg-neo-navy-light px-2 py-2 text-center font-neo-display text-xs font-black uppercase leading-tight text-neo-white",
+  "flex h-full min-h-20 w-full min-w-0 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream",
+  "bg-neo-navy-light px-2 py-2 text-center font-neo-display text-xs font-bold uppercase leading-tight text-neo-white",
   "shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard sm:text-sm",
   "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
 );
@@ -108,6 +110,10 @@ export function HqDock({
         testId="teacher-lessons"
         sheetId="lessons"
         hideSummary
+        // The builder is the heaviest tree on the deck (a full lesson editor);
+        // it mounts on first open, not on every dashboard load. The reviewWords
+        // deep link opens the sheet, so it still lands mounted.
+        mountWhenOpen
         open={lessonsOpen}
         onOpenChange={onLessonsOpenChange}
         title={t("teacher.nav.lessons")}

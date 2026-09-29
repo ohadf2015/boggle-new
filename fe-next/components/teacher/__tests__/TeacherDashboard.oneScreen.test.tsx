@@ -11,7 +11,7 @@
  * into a single closed disclosure, and nothing is behind a tab.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -91,8 +91,16 @@ vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
 import TeacherDashboard from '../TeacherDashboard';
 
 describe('<TeacherDashboard> — one screen', () => {
-  it('puts the lessons on the landing screen', () => {
+  it('keeps the lessons on the landing screen in a closed sheet that mounts on first open', () => {
     render(<TeacherDashboard />);
+    const sheet = screen.getByTestId('teacher-lessons') as HTMLDetailsElement;
+    expect(sheet).not.toHaveAttribute('open');
+    // The builder is the heaviest tree on the deck: not mounted while closed.
+    expect(screen.queryByTestId('lesson-builder')).toBeNull();
+    act(() => {
+      sheet.open = true;
+      fireEvent(sheet, new Event('toggle'));
+    });
     expect(screen.getByTestId('lesson-builder')).toBeInTheDocument();
   });
 
@@ -111,7 +119,8 @@ describe('<TeacherDashboard> — one screen', () => {
     expect(tools.contains(screen.getByTestId('classroom-manager'))).toBe(true);
     expect(tools.contains(screen.getByTestId('assignment-panel'))).toBe(true);
     expect(tools.contains(screen.getByTestId('last-game-insights'))).toBe(true);
-    expect(tools.contains(screen.getByTestId('lesson-builder'))).toBe(false);
+    // The builder is behind its own sheet and — closed — not mounted at all.
+    expect(screen.queryByTestId('lesson-builder')).toBeNull();
   });
 
   it('drops the surfaces that pushed the lessons off the screen', () => {

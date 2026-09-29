@@ -16,7 +16,7 @@
  * was a no-op — the worst pairing, because it teaches her the feature is broken.
  */
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const { mockSearchParams, mockUseAuth } = vi.hoisted(() => ({
@@ -119,6 +119,14 @@ describe('TeacherDashboard — the review-words deep link', () => {
 
     render(<TeacherDashboard />);
 
+    // The sheet stays closed without a deep link; the builder mounts on first
+    // open (heaviest tree on the deck, so it is not paid for on every load).
+    const sheet = screen.getByTestId('teacher-lessons') as HTMLDetailsElement;
+    expect(sheet).not.toHaveAttribute('open');
+    act(() => {
+      sheet.open = true;
+      fireEvent(sheet, new Event('toggle'));
+    });
     await waitFor(() => expect(screen.getByTestId('lesson-builder')).toBeInTheDocument());
   });
 });

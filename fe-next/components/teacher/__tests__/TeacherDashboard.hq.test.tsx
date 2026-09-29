@@ -113,6 +113,11 @@ describe('<TeacherDashboard> — Teacher HQ deck', () => {
     const lessons = screen.getByTestId('teacher-lessons');
     expect(lessons.tagName).toBe('DETAILS');
     expect(lessons).not.toHaveAttribute('open');
+    // The builder is the heaviest tree on the deck: it mounts on first open,
+    // not on every dashboard load.
+    expect(screen.queryByTestId('lesson-builder')).toBeNull();
+    fireEvent.click(screen.getByTestId('hq-tool-lessons'));
+    expect(lessons).toHaveAttribute('open');
     expect(lessons.contains(screen.getByTestId('lesson-builder'))).toBe(true);
   });
 

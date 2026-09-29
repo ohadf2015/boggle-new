@@ -1,19 +1,19 @@
 /**
  * TeacherDashboard — "Teacher HQ", the one-screen command deck.
  *
- * Zero scroll at phone and desktop, on the observatory art. Class chips pick
- * the class; the hero is START A GAME (mode cards → the express lobby, so a
- * teacher reaches a joinable room in ≤3 taps with the class preselected); the
- * second hero is GET STUDENTS IN (70% of classes never get a student — the join
- * code, link and projector are the product). Lessons, class tools and the Pro
- * ask open as sheets from the dock; nothing stacks into a long column.
+ * Zero scroll at phone and desktop, on a calm navy canvas. Class chips pick
+ * the class; the hero is START A GAME (one armed button, a quiet row of mode
+ * chips above it, the express lobby on the other side — a teacher reaches a
+ * joinable room in ≤3 taps with the class preselected); the second hero is
+ * GET STUDENTS IN (70% of classes never get a student — the join code, link
+ * and projector are the product). Lessons, class tools and the Pro ask open
+ * as sheets from the dock; nothing stacks into a long column.
  */
 'use client';
 
 import { type ReactNode, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -226,20 +226,15 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         />
       )}
 
-      {/* Observatory art behind the deck. Dark-only surface: navy ground,
-          never a cream/dark pair (pitfall class 5). No transform anywhere on
-          this subtree — the sheets below are `position: fixed`. */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <Image
-          src="/images/education/teacher-hq-bg.webp"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="select-none object-cover"
-        />
-        <div className="absolute inset-0 bg-neo-navy/55" />
-      </div>
+      {/* Calm canvas: flat navy with a whisper of light from the top. The
+          full-bleed observatory art + scrim used to sit behind every pixel of
+          the deck — permanent visual noise competing with the two surfaces a
+          teacher actually reads. No transform anywhere on this subtree — the
+          sheets below are `position: fixed`. */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(255,254,240,0.05),transparent_60%)]"
+        aria-hidden="true"
+      />
 
       <div
         data-testid="teacher-dashboard-grid"
@@ -274,7 +269,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
               <span
                 data-testid="hq-class-chip-skeleton"
                 aria-hidden="true"
-                className="block h-9 w-28 animate-pulse rounded-neo border-3 border-neo-cyan/60 bg-neo-navy motion-reduce:animate-none"
+                className="block h-9 w-28 animate-pulse rounded-neo border-2 border-neo-cyan/60 bg-neo-navy motion-reduce:animate-none"
               />
             ) : classrooms.length > 1 ? (
               <ClassSwitcher
@@ -287,7 +282,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
             ) : selectedClassroom ? (
               <span
                 data-testid="hq-class-chip"
-                className="inline-flex min-h-9 max-w-full items-center rounded-neo border-3 border-black bg-neo-cyan px-3 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm"
+                className="inline-flex min-h-9 max-w-full items-center rounded-neo border-2 border-black bg-neo-cyan px-3 font-neo-display text-xs font-bold uppercase tracking-wide text-black shadow-hard-sm"
               >
                 {/* Class names are DATA, often in the other script (a Latin
                     name under Hebrew UI): `dir="auto"` isolates it and makes

@@ -22,8 +22,10 @@ import type { EducationNavItem, ResolvedEducationNav } from './navItems';
  * Contrast: an inactive tab with no fill is the same shape as the devtools
  * button the sweep flags (`edgeRatio: 0`). So inactive tabs carry their own
  * `bg-neo-navy-light` fill plus a 2px cream edge (16.8:1 on navy), and the
- * active tab differs by FILL — `bg-neo-lime` with a BLACK label, because cream
- * on lime measures 1.2:1. Widths are written `border-[2px]` / `border-t-[3px]`:
+ * active tab differs by a tinted lime OUTLINE — lime edge, lime ink, a 10%
+ * lime wash. The solid lime slab is reserved for the one hero CTA on the
+ * screen (GO LIVE); an earlier solid-lime active tab competed with it.
+ * Widths are written `border-[2px]` / `border-t-[3px]`:
  * twMerge folds `border-neo` into the same class group as `border-neo-<colour>`
  * and drops the width, leaving the control borderless under preflight.
  *
@@ -60,7 +62,10 @@ function itemClasses(active: boolean, variant: 'tabs' | 'sidebar') {
         // until there is desktop width for a label beside it.
         'min-h-[48px] w-full justify-center px-2 py-2 text-[15px] lg:justify-start lg:px-3',
     active
-      ? 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm'
+      // A tinted lime OUTLINE, not the solid slab: GO LIVE owns the one
+      // solid lime fill on the deck, and chrome must not compete with it.
+      // Lime ink on the translucent lime-over-navy fill still clears 4.5:1.
+      ? 'border-[2px] border-neo-lime bg-neo-lime/10 text-neo-lime shadow-hard-sm'
       : 'border-[2px] border-neo-cream bg-neo-navy-light text-neo-cream hover:bg-neo-cyan hover:text-neo-black',
   );
 }

@@ -28,7 +28,7 @@ export function TeacherStatusRow({ className }: { className?: string }) {
     <div
       data-testid="teacher-status-row"
       className={cn(
-        'flex items-center gap-3 border-b-3 border-black/40 bg-neo-navy px-3 py-1.5 sm:px-6 sm:py-2',
+        'flex items-center gap-3 px-3 py-1.5 sm:px-6 sm:py-2',
         // Short screens (phones under 760px tall — 375x667, 360x740 — and any
         // phone sideways) need every row for the deck: the row collapses to
         // nothing, its h1 stays for screen readers, and the mascot + plan
@@ -58,7 +58,7 @@ export function TeacherStatusRow({ className }: { className?: string }) {
       <div className="min-w-0 flex-1 max-sm:[@media(max-height:760px)]:sr-only [@media(orientation:landscape)_and_(max-height:500px)]:sr-only">
         {/* "Teacher HQ", not "Teacher Dashboard": the long title truncated to
             "TEACHER DASH…" beside the plan badge on every phone. */}
-        <h1 className="truncate font-neo-display text-lg font-black uppercase leading-none tracking-tight text-neo-white sm:text-2xl">
+        <h1 className="truncate font-neo-display text-lg font-bold leading-none tracking-tight text-neo-white sm:text-xl">
           {t('academy.teacher.hqTitle', 'Teacher HQ')}
         </h1>
         <p className="hidden truncate font-neo-body text-xs font-bold text-neo-white/60 sm:block">

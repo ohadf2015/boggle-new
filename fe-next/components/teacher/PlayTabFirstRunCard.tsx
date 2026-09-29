@@ -96,14 +96,14 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
         {createdJoinCode ? (
           <>
             {/* The code, same plate as the live card: read from the back row. */}
-            <div className="flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-yellow bg-neo-navy px-2 py-1 shadow-hard-sm lg:py-2">
-              <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-yellow/75 lg:text-sm">
+            <div className="flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream px-2 py-1 shadow-hard-sm lg:py-2">
+              <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-black/60 lg:text-sm">
                 {t('teacher.classroom.createdBannerTitle')}
               </span>
               <code
                 data-testid="first-run-join-code"
                 dir="ltr"
-                className="select-all whitespace-nowrap font-mono text-5xl font-black leading-none tracking-[0.1em] text-neo-yellow sm:text-6xl lg:text-7xl"
+                className="select-all whitespace-nowrap font-mono text-5xl font-black leading-none tracking-[0.1em] text-neo-black sm:text-6xl lg:text-7xl"
               >
                 {createdJoinCode}
               </code>
@@ -133,16 +133,16 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
             {/* Where the code will be: six empty slots, so the promise is visible. */}
             <div
               aria-hidden="true"
-              className="flex shrink-0 flex-col items-center justify-center gap-1 rounded-neo border-3 border-dashed border-neo-yellow/60 bg-neo-navy px-2 py-1.5 lg:gap-2 lg:py-3"
+              className="flex shrink-0 flex-col items-center justify-center gap-1 rounded-neo border-3 border-dashed border-neo-cream/40 bg-neo-navy px-2 py-1.5 lg:gap-2 lg:py-3"
             >
-              <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-yellow/75 lg:text-sm">
+              <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-white/60 lg:text-sm">
                 {t('academy.hq.classCode', 'Class code')}
               </span>
               <span dir="ltr" className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
                 {Array.from({ length: 6 }, (_, i) => (
                   <span
                     key={i}
-                    className="flex h-10 w-8 items-center justify-center rounded-md border-2 border-dashed border-neo-yellow/45 font-mono text-2xl font-black text-neo-yellow/40 sm:h-12 sm:w-10 lg:h-16 lg:w-14 lg:text-4xl"
+                    className="flex h-10 w-8 items-center justify-center rounded-md border-2 border-dashed border-neo-cream/40 font-mono text-2xl font-black text-neo-white/40 sm:h-12 sm:w-10 lg:h-16 lg:w-14 lg:text-4xl"
                   >
                     ?
                   </span>

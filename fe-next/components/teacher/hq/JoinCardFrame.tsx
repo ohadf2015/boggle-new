@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, type ReactNode } from "react";
-import { UsersRound } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
@@ -20,10 +19,10 @@ export interface JoinCardFrameProps {
  * states — skeleton (class read open), first run (no class yet) and the live
  * card. Same edge, same header row, same step badge: the slot never changes
  * shape as data arrives, so nothing around it can reflow into the gap (the r3
- * capture caught the card unmounting and the mode cards stretching into it).
+ * capture caught the card unmounting and the mode chips stretching into it).
  *
- * Step 2 is deliberately quieter than step 1 — navy header, cyan type — so
- * GO LIVE stays the loudest thing on HQ.
+ * Step 2 stays deliberately quieter than step 1 — a hairline header, a cyan
+ * step ring — so GO LIVE stays the loudest thing on HQ.
  */
 export function JoinCardFrame({ status, busy = false, testId, className, children }: JoinCardFrameProps) {
   const { t } = useLanguage();
@@ -34,25 +33,24 @@ export function JoinCardFrame({ status, busy = false, testId, className, childre
       aria-labelledby={headingId}
       aria-busy={busy || undefined}
       className={cn(
-        "@container flex min-h-0 flex-col overflow-hidden rounded-neo-lg border-3 border-neo-cream/70 bg-neo-navy-light/95 shadow-hard-lg",
+        "@container flex min-h-0 flex-col overflow-hidden rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard",
         className,
       )}
     >
-      <div className="flex shrink-0 items-center gap-2 border-b-3 border-neo-cream/60 bg-neo-navy px-2.5 py-1.5 sm:px-4 sm:py-2 [@media(orientation:landscape)_and_(max-height:500px)]:py-1">
+      <div className="flex shrink-0 items-center gap-2 border-b-2 border-neo-cream/40 px-3 py-2 sm:px-4 [@media(orientation:landscape)_and_(max-height:500px)]:py-1.5">
         <span
           data-testid="hq-step-badge-2"
           aria-hidden="true"
-          className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan font-neo-display text-base font-black leading-none text-black sm:size-8 sm:text-lg [@media(orientation:landscape)_and_(max-height:500px)]:size-6 [@media(orientation:landscape)_and_(max-height:500px)]:text-sm"
+          className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-neo-cyan font-neo-display text-sm font-black leading-none text-neo-cyan"
         >
           2
         </span>
         <h2
           id={headingId}
-          className="min-w-0 truncate font-neo-display text-base font-black uppercase leading-none tracking-tight text-neo-cyan @[18rem]:text-lg @[24rem]:text-xl"
+          className="min-w-0 truncate font-neo-display text-base font-bold leading-none tracking-tight text-neo-white"
         >
           {t("academy.hq.getStudentsIn", "Get students in")}
         </h2>
-        <UsersRound className="hidden size-5 shrink-0 text-neo-cyan @[24rem]:block" strokeWidth={3} aria-hidden="true" />
         {status}
       </div>
       {children}

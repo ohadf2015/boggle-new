@@ -18,15 +18,15 @@ export function GetStudentsInSkeleton({ className }: { className?: string }) {
     <JoinCardFrame busy testId="hq-join-skeleton" className={className}>
       <div className="flex min-h-0 flex-1 flex-col gap-2 p-2 sm:gap-3 sm:p-3 lg:p-4" aria-hidden="true">
         {/* The code plate: label bar + six shimmer boxes, same box as the live code. */}
-        <div className="flex shrink-0 flex-col items-center justify-center gap-1 rounded-neo border-3 border-neo-yellow/40 bg-neo-navy px-2 py-1.5 shadow-hard-sm lg:gap-2 lg:py-3">
-          <span className={cn("h-2.5 w-20 rounded-full bg-neo-yellow/25 lg:h-3.5 lg:w-28", SHIMMER)} />
+        <div className="flex shrink-0 flex-col items-center justify-center gap-1 rounded-neo border-3 border-neo-cream/40 bg-neo-navy px-2 py-1.5 shadow-hard-sm lg:gap-2 lg:py-3">
+          <span className={cn("h-2.5 w-20 rounded-full bg-neo-cream/25 lg:h-3.5 lg:w-28", SHIMMER)} />
           <span dir="ltr" className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
             {Array.from({ length: 6 }, (_, i) => (
               <span
                 key={i}
                 data-testid="hq-join-skeleton-code-box"
                 className={cn(
-                  "h-10 w-8 rounded-md border-2 border-neo-yellow/35 bg-neo-yellow/10 sm:h-12 sm:w-10 lg:h-16 lg:w-14 2xl:h-20 2xl:w-16",
+                  "h-10 w-8 rounded-md border-2 border-neo-cream/40 bg-neo-cream/10 sm:h-12 sm:w-10 lg:h-16 lg:w-14 2xl:h-20 2xl:w-16",
                   SHIMMER,
                 )}
                 style={{ animationDelay: `${i * 90}ms` }}

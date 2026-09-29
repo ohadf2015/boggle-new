@@ -123,41 +123,33 @@ export function GetStudentsInCard({
           title={t("academy.hq.codeReady", "Code ready")}
           className="ms-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border-2 border-neo-lime/70 px-2 py-0.5 font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-neo-lime sm:text-xs"
         >
-          <span className="relative flex size-2">
-            {reduced ? null : (
-              <m.span
-                aria-hidden="true"
-                className="absolute inset-0 rounded-full bg-neo-lime"
-                animate={{ scale: [1, 2.2], opacity: [0.7, 0] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
-              />
-            )}
-            <span className="relative size-2 rounded-full bg-neo-lime" />
-          </span>
+          <span className="size-2 rounded-full bg-neo-lime" aria-hidden="true" />
           <span className="hidden @[20rem]:inline">{t("academy.hq.codeReady", "Code ready")}</span>
         </span>
       }
     >
       <div className="flex min-h-0 flex-1 flex-col gap-2 p-2 sm:gap-3 sm:p-3 lg:p-4">
-        {/* THE hero of this card: the code, read from the back row. */}
+        {/* THE hero of this card: the code, read from the back row. Ink on
+            cream — the highest-legibility plate on the deck, and the one
+            light surface on it. */}
         {/* `@container`: the code is sized by THIS box's width (~4.2em for six
             mono glyphs + tracking, so 20cqi always fits), capped per
             breakpoint. A viewport size overflowed the ~280px column at 1024. */}
-        <div className="@container flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-yellow bg-neo-navy px-2 py-1 shadow-hard-sm lg:py-2">
-          <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-yellow/75 lg:text-sm [@media(orientation:landscape)_and_(max-height:500px)]:sr-only">
+        <div className="@container flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream px-2 py-1 shadow-hard-sm lg:py-3">
+          <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-black/60 lg:text-sm [@media(orientation:landscape)_and_(max-height:500px)]:sr-only">
             {t("academy.hq.classCode", "Class code")}
           </span>
           <span
             data-testid="hq-join-code"
             dir="ltr"
-            className="select-all whitespace-nowrap font-mono text-[min(20cqi,3rem)] font-black leading-none tracking-[0.1em] text-neo-yellow sm:text-[min(20cqi,3.75rem)] lg:text-[min(20cqi,4.5rem)] 2xl:text-[min(20cqi,6rem)] [@media(orientation:landscape)_and_(max-height:500px)]:text-[min(20cqi,2.25rem)] max-sm:[@media(max-height:700px)]:text-[min(20cqi,2.5rem)]"
+            className="select-all whitespace-nowrap font-mono text-[min(20cqi,3rem)] font-black leading-none tracking-[0.1em] text-neo-black sm:text-[min(20cqi,3.75rem)] lg:text-[min(22cqi,5rem)] 2xl:text-[min(22cqi,6rem)] [@media(orientation:landscape)_and_(max-height:500px)]:text-[min(20cqi,2.25rem)] max-sm:[@media(max-height:700px)]:text-[min(20cqi,2.5rem)]"
           >
             {classroom.join_code}
           </span>
           {shortUrl ? (
             <span
               dir="ltr"
-              className="mt-1 hidden max-w-full truncate font-mono text-sm font-bold text-neo-white/70 lg:block"
+              className="mt-1 hidden max-w-full truncate font-mono text-sm font-bold text-black/60 lg:block"
             >
               {shortUrl}
             </span>
@@ -230,21 +222,8 @@ export function GetStudentsInCard({
               data-testid="hq-roster-waiting"
               className="flex w-full min-w-0 items-center gap-3 lg:h-full lg:flex-col lg:justify-center lg:gap-4"
             >
-              <span className="relative flex size-10 shrink-0 items-center justify-center lg:size-20">
-                {reduced
-                  ? null
-                  : [0, 0.8].map((delay) => (
-                      <m.span
-                        key={delay}
-                        aria-hidden="true"
-                        className="absolute inset-0 rounded-full border-2 border-neo-cyan"
-                        animate={{ scale: [1, 1.9], opacity: [0.8, 0] }}
-                        transition={{ duration: 1.6, delay, repeat: Infinity, ease: "easeOut" }}
-                      />
-                    ))}
-                <span className="relative flex size-full items-center justify-center rounded-full border-3 border-neo-black bg-neo-cyan shadow-hard-sm">
-                  <UsersRound className="size-5 text-black lg:size-10" strokeWidth={3} aria-hidden="true" />
-                </span>
+              <span className="relative flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan shadow-hard-sm lg:size-20">
+                <UsersRound className="size-5 text-black lg:size-10" strokeWidth={3} aria-hidden="true" />
               </span>
               <JoinedCount
                 loading={rosterLoading}

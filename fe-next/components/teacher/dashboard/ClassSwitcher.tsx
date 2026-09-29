@@ -63,8 +63,8 @@ export const ClassSwitcher = memo(function ClassSwitcher({
             aria-pressed={on}
             onClick={() => onSelect(c.id)}
             className={cn(
-              'inline-flex min-h-11 max-w-full items-center gap-2 rounded-neo border-3 px-3 py-2',
-              'font-neo-display text-xs font-black uppercase tracking-wide transition-all duration-100',
+              'inline-flex min-h-11 max-w-full items-center gap-2 rounded-neo border-2 px-3 py-2',
+              'font-neo-display text-xs font-bold uppercase tracking-wide transition-all duration-100',
               'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
               on
                 // Selected: a solid cyan slab with a black edge (~20:1) and

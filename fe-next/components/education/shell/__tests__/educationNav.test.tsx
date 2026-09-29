@@ -124,14 +124,17 @@ describe('<EducationNav>', () => {
     expect(bar.className).not.toMatch(/border-neo(\s|$)/);
   });
 
-  it('marks the active tab by FILL, and gives inactive tabs an edge of their own', () => {
+  it('marks the active tab with a tinted lime outline — never the hero CTA’s solid lime slab', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     const active = getByTestId('education-tab-play');
     const inactive = getByTestId('education-tab-reports');
 
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('bg-neo-lime');
-    expect(active.className).toContain('text-neo-black');
+    expect(active.className).toContain('border-neo-lime');
+    expect(active.className).toContain('text-neo-lime');
+    // GO LIVE owns the one solid lime slab on the deck; a second one on the
+    // chrome competes with the button the screen exists for.
+    expect(active.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
 
     expect(inactive.getAttribute('aria-current')).toBeNull();
     // Not a ghost: its own fill plus a 2px cream edge against the navy bar.

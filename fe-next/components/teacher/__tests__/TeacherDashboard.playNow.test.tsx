@@ -69,10 +69,12 @@ describe('<TeacherDashboard> — play now in one tap', () => {
   it('leads with the PLAY NOW panel, above everything else on the page', () => {
     const { container } = render(<TeacherDashboard />);
     const launcher = screen.getByTestId('play-now-launcher');
-    const builder = screen.getByTestId('lesson-builder');
+    // The builder itself mounts on first open (it is the heaviest tree on the
+    // deck); its SHEET is the secondary surface that must follow the hero.
+    const lessons = screen.getByTestId('teacher-lessons');
     expect(launcher).toBeInTheDocument();
     expect(
-      launcher.compareDocumentPosition(builder) & Node.DOCUMENT_POSITION_FOLLOWING
+      launcher.compareDocumentPosition(lessons) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
     expect(container.querySelector('[data-testid="play-now-launcher"]')).toBeTruthy();
   });

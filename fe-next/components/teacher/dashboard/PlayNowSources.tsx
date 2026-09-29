@@ -98,6 +98,8 @@ export const PickRow = memo(function PickRow({
       type="button"
       data-testid={testId}
       aria-pressed={selected}
+      aria-label={title}
+      title={title}
       onClick={onSelect}
       className={cn(
         'group flex w-full min-h-14 items-center gap-3 rounded-neo border-3 border-black px-4 py-3 text-start',
@@ -121,7 +123,7 @@ export const PickRow = memo(function PickRow({
         {selected ? <Check className="size-4 text-black" strokeWidth={4} /> : null}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-neo-display text-base font-black text-black">{title}</span>
+        <span data-pickrow-title className="line-clamp-2 break-words font-neo-display text-base font-black leading-snug text-black">{title}</span>
         <span className="flex items-center gap-1.5 font-neo-body text-xs font-bold text-neo-gray">
           <span className="truncate">{meta}</span>
           {recommendedLabel ? (
