@@ -364,8 +364,8 @@ const content: Record<EducationLocale, LocaleContent> = {
     ],
   },
   es: {
-    metaTitle: 'Juegos ESL de palabras para el aula — sin cuentas | LexiClash',
-    metaDescription: 'Juegos ESL de vocabulario en inglés para el aula: código de 6 caracteres, proyector, y un nivel por alumno. Gratis y sin cuentas.',
+    metaTitle: 'Juegos de inglés gratis para el aula — online | LexiClash',
+    metaDescription: 'Juegos de vocabulario en inglés gratis para el aula: los alumnos entran con un código, sin cuentas ni descargas, y juegan en el proyector. Nivel por alumno y 6 idiomas.',
     ogTitle: 'Juegos ESL de palabras para el aula',
     ogDescription: 'Juegos ESL para toda la clase: código al móvil, tablero en el proyector, nivel por alumno. Gratis, sin cuentas.',
     twitterDescription: 'Juegos ESL para el aula: código, proyector, nivel por alumno. Gratis.',

@@ -1,6 +1,6 @@
 {
-  "title": "Juegos ESL de palabras para el aula — sin cuentas | LexiClash",
-  "description": "Juegos ESL de vocabulario en inglés para el aula: código de 6 caracteres, proyector, y un nivel por alumno. Gratis y sin cuentas.",
+  "title": "Juegos de inglés gratis para el aula — online | LexiClash",
+  "description": "Juegos de vocabulario en inglés gratis para el aula: los alumnos entran con un código, sin cuentas ni descargas, y juegan en el proyector. Nivel por alumno y 6 idiomas.",
   "keywords": "esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles, juegos de vocabulario en ingles, juego de vocabulario en ingles, vocabulario en ingles juegos, juegos para aprender vocabulario en ingles",
   "robots": {
     "index": true,
