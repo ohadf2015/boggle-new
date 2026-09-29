@@ -36,6 +36,10 @@ docs
 android
 ios
 
+# Always keep migrations in the image context (runner COPY needs this dir)
+!supabase
+!supabase/**
+
 # Build artifacts (rebuilt in Docker)
 dist
 backend/dist
