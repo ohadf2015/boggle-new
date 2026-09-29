@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TeacherProAskBanner } from '@/components/teacher/TeacherProAskBanner';
 import { TeacherProTrialEndedBanner } from '@/components/teacher/TeacherProTrialEndedBanner';
+import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
 import { TeacherProTrialOfferBanner } from '@/components/teacher/TeacherProTrialOfferBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
@@ -13,6 +14,7 @@ import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherProMilestone } from '@/hooks/useTeacherProMilestone';
+import { useTeacherTrialExpiring } from '@/hooks/useTeacherTrialExpiring';
 import { useTeacherTrialOffer } from '@/hooks/useTeacherTrialOffer';
 import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
@@ -49,6 +51,7 @@ function TeacherDashboardInner() {
     dismiss,
   } = useTeacherProMilestone();
   const { dismissed: trialOfferDismissed, dismiss: dismissTrialOffer } = useTeacherTrialOffer();
+  const { dismissed: trialExpiringDismissed, dismiss: dismissTrialExpiring } = useTeacherTrialExpiring();
   const {
     reason: usageReason,
     count: usageCount,
@@ -126,9 +129,15 @@ function TeacherDashboardInner() {
   // Handed to the dashboard, never rendered beside it: a sibling of an `h-dvh`
   // root grows the page past the viewport and the document starts scrolling
   // again — for precisely the teachers who have a banner to see.
+  const trialDaysLeft = polarTrialDaysLeft(trialExpires ?? periodEnd, Date.now());
+  const isTrialExpiring = trialDaysLeft !== null && trialDaysLeft <= 3;
+
   return (
     <TeacherDashboard
-      pinBanner={banner === 'trialing' || banner === 'reactivate'}
+      pinBanner={
+        (banner === 'trialing' && (!isTrialExpiring || !trialExpiringDismissed)) ||
+        banner === 'reactivate'
+      }
       banner={
         banner === 'trial' && trial ? (
           <TrialUrgencyBanner
@@ -144,7 +153,16 @@ function TeacherDashboardInner() {
         ) : banner === 'reactivate' ? (
           <TeacherProTrialEndedBanner />
         ) : banner === 'trialing' ? (
-          <TeacherProTrialLifecycleBanner trialExpires={trialExpires ?? periodEnd} />
+          isTrialExpiring ? (
+            !trialExpiringDismissed ? (
+              <TeacherProTrialExpiringBanner
+                trialExpires={trialExpires ?? periodEnd}
+                onDismiss={dismissTrialExpiring}
+              />
+            ) : undefined
+          ) : (
+            <TeacherProTrialLifecycleBanner trialExpires={trialExpires ?? periodEnd} />
+          )
         ) : undefined
       }
       usagePrompt={

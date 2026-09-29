@@ -13155,6 +13155,7 @@ const ja = {
       "trialLifecycleTitleToday": "Teacher Proトライアルは本日期限です",
       "trialLifecycleTitleOne": "Teacher Proトライアル残り1日",
       "trialLifecycleBody": "無制限クラスと印刷レポートを継続 — トライアル後は月額9ドル。",
+      "trialExpiringLoss": "Proがない場合、無制限のクラスと印刷可能な生徒レポートが利用できなくなります。",
       "trialLifecycleCta": "Proを続ける — 月額9ドル",
       "checkoutError": "決済を開始できませんでした。もう一度お試しください。",
       "signInRequired": "Teacher Proにアップグレードするにはサインインしてください。",

@@ -12352,6 +12352,7 @@ const en = {
       "trialLifecycleTitleToday": "Your Teacher Pro trial ends today",
       "trialLifecycleTitleOne": "1 day left in your Teacher Pro trial",
       "trialLifecycleBody": "Keep unlimited classes and printable reports — $9/mo after the trial.",
+      "trialExpiringLoss": "Without Pro, you will lose unlimited classes and printable student reports.",
       "trialLifecycleCta": "Keep Pro — $9/mo",
       "checkoutError": "Failed to start checkout. Please try again.",
       "signInRequired": "Please sign in to upgrade to Teacher Pro.",

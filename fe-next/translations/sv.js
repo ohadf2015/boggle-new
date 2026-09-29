@@ -13390,6 +13390,7 @@ const sv = {
       "trialLifecycleTitleToday": "Din Teacher Pro-provperiod slutar idag",
       "trialLifecycleTitleOne": "1 dag kvar av din Teacher Pro-provperiod",
       "trialLifecycleBody": "Behåll obegränsade klasser och utskrivbara rapporter — 9 $/mån efter provperioden.",
+      "trialExpiringLoss": "Utan Pro förlorar du obegränsade klasser och utskrivbara elevrapporter.",
       "trialLifecycleCta": "Behåll Pro — 9 $/mån",
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",

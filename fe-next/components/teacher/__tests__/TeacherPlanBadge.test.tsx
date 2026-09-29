@@ -65,6 +65,16 @@ describe('TeacherPlanBadge', () => {
     expect(screen.getByTestId('teacher-pro-trial-upgrade-chip')).toHaveAttribute('href', '/en/teacher/upgrade');
   });
 
+  it('when exactly 3 days remain (boundary), the chip adds an Upgrade CTA', () => {
+    const trialExpires = new Date(Date.now() + 3 * 86400000).toISOString();
+    mockUseTeacherPro.mockReturnValue({
+      hasPro: true, loading: false, source: 'polar', status: 'trialing',
+      periodEnd: trialExpires, trialExpires, trialUsed: true, grant: null, grantExpired: false,
+    });
+    render(<TeacherPlanBadge />);
+    expect(screen.getByTestId('teacher-pro-trial-upgrade-chip')).toHaveAttribute('href', '/en/teacher/upgrade');
+  });
+
   it('a free teacher sees "Free plan" and a link to upgrade', () => {
     mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false });
     render(<TeacherPlanBadge />);
