@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
@@ -19,7 +19,7 @@ import { useTeacherTrialOffer } from '@/hooks/useTeacherTrialOffer';
 import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
-import { polarTrialUx } from '@/lib/education/polarTrial';
+import { polarTrialUx, polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { isTrialUpgradeNudgeWindow } from '@/lib/education/trial';
 import { useTrialUpgradeNudge } from '@/lib/education/useTrialUpgradeNudge';
 import {
@@ -129,7 +129,9 @@ function TeacherDashboardInner() {
   // Handed to the dashboard, never rendered beside it: a sibling of an `h-dvh`
   // root grows the page past the viewport and the document starts scrolling
   // again — for precisely the teachers who have a banner to see.
-  const trialDaysLeft = polarTrialDaysLeft(trialExpires ?? periodEnd, Date.now());
+  // Capture once — react-hooks/purity treats Date.now() during render as impure.
+  const [nowMs] = useState(() => Date.now());
+  const trialDaysLeft = polarTrialDaysLeft(trialExpires ?? periodEnd, nowMs);
   const isTrialExpiring = trialDaysLeft !== null && trialDaysLeft <= 3;
 
   return (
