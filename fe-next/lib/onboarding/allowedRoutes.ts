@@ -72,6 +72,8 @@ const MARKETING_LANDING_PREFIXES: ReadonlyArray<string> = [
   '/lexiclash-vs-nearpod',
   '/lexiclash-vs-mentimeter',
   '/lexiclash-vs-wooclap',
+  '/lexiclash-vs-wayground',
+  '/lexiclash-vs-gimkit',
   '/lexiclash-vs-cabanagrams',
   '/lexiclash-vs-flocabulary',
   '/lexiclash-vs-freerice',
