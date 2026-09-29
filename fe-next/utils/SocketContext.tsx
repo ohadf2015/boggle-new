@@ -532,6 +532,17 @@ export function SocketProvider({ children }: SocketProviderProps) {
   );
 }
 
+const SOCKET_FALLBACK: SocketContextValue = {
+  socket: null,
+  isConnected: false,
+  isReconnecting: false,
+  isServerUpdating: false,
+  connectionError: null,
+  getReconnectAttempt: () => 0,
+  maxReconnectAttempts: 0,
+  manualReconnect: () => {},
+};
+
 /**
  * Hook to access the Socket.IO connection
  * @returns Socket context value
@@ -539,7 +550,13 @@ export function SocketProvider({ children }: SocketProviderProps) {
 export function useSocket(): SocketContextValue {
   const context = useContext(SocketContext);
   if (!context) {
-    throw new Error('useSocket must be used within a SocketProvider');
+    // Throw in dev to catch a missing provider early; in production a
+    // provider-less render path must not crash the page.
+    if (process.env.NODE_ENV === 'development') {
+      throw new Error('useSocket must be used within a SocketProvider');
+    }
+    logger.log('[Socket] useSocket outside provider — returning disconnected stub');
+    return SOCKET_FALLBACK;
   }
   return context;
 }

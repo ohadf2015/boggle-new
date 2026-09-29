@@ -602,7 +602,13 @@ export function MusicProviderStub({ children }: { children: React.ReactNode }): 
 export function useMusic(): MusicContextType {
   const context = useContext(MusicContext);
   if (!context) {
-    throw new Error('useMusic must be used within a MusicProvider');
+    // Throw in dev to catch a missing provider early; in production a
+    // provider-less render path must not crash the page (Sentry 150021158).
+    if (process.env.NODE_ENV === 'development') {
+      throw new Error('useMusic must be used within a MusicProvider');
+    }
+    logger.log('[Music] useMusic outside provider — returning no-op stub');
+    return stubValue;
   }
   return context;
 }

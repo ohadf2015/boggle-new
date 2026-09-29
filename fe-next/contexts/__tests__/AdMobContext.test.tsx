@@ -536,10 +536,21 @@ describe('AdMobProvider', () => {
     await expect(captured!.whenReady()).resolves.toBeUndefined();
   });
 
-  it('throws when used outside provider', () => {
+  it('throws when used outside provider in development, falls back otherwise', () => {
+    // Production (NODE_ENV !== development): graceful no-op fallback — a
+    // provider-less render path must not crash the page.
     expect(() => {
       render(<TestConsumer onMount={vi.fn()} />);
-    }).toThrow('useAdMobContext must be used within AdMobProvider');
+    }).not.toThrow();
+
+    vi.stubEnv('NODE_ENV', 'development');
+    try {
+      expect(() => {
+        render(<TestConsumer onMount={vi.fn()} />);
+      }).toThrow('useAdMobContext must be used within AdMobProvider');
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   // Age-gate opportunity: interstitials are suppressed for the 'unknown' tier,

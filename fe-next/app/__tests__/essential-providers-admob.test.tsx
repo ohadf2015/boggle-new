@@ -39,9 +39,18 @@ describe('AdMobProvider integration (wired into EssentialProviders)', () => {
     expect(typeof result.current.hideBanner).toBe('function');
   });
 
-  it('useAdMob throws when AdMobProvider is missing from tree', () => {
-    expect(() => renderHook(() => useAdMob())).toThrow(
-      'useAdMobContext must be used within AdMobProvider'
-    );
+  it('useAdMob throws when AdMobProvider is missing from tree in development', () => {
+    // Production path falls back gracefully instead of throwing — a
+    // provider-less render path must not crash the page.
+    expect(() => renderHook(() => useAdMob())).not.toThrow();
+
+    vi.stubEnv('NODE_ENV', 'development');
+    try {
+      expect(() => renderHook(() => useAdMob())).toThrow(
+        'useAdMobContext must be used within AdMobProvider'
+      );
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });

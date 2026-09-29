@@ -40,10 +40,18 @@ export function HapticsProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+const HAPTICS_FALLBACK: HapticsContextValue = {
+  enabled: true,
+  setEnabled: () => {},
+};
+
 export function useHapticsConfig() {
   const context = useContext(HapticsContext);
   if (!context) {
-    throw new Error('useHapticsConfig must be used within HapticsProvider');
+    if (process.env.NODE_ENV === 'development') {
+      throw new Error('useHapticsConfig must be used within HapticsProvider');
+    }
+    return HAPTICS_FALLBACK;
   }
   return context;
 }

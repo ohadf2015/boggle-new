@@ -81,14 +81,24 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   );
 }
 
+const NAVIGATION_FALLBACK: NavigationContextValue = {
+  isInGame: false,
+  setIsInGame: () => {},
+  activeTab: 'home',
+  setActiveTab: () => {},
+  headerAudioControlActive: false,
+  registerHeaderAudioControl: () => () => {},
+};
+
 export function useNavigation() {
   const context = useContext(NavigationContext);
   if (!context) {
-    const errorMessage = 'useNavigation must be used within a NavigationProvider';
+    // Throw in dev to catch a missing provider early; in production a
+    // provider-less render path must not crash the page.
     if (process.env.NODE_ENV === 'development') {
-      console.error(errorMessage);
+      throw new Error('useNavigation must be used within a NavigationProvider');
     }
-    throw new Error(errorMessage);
+    return NAVIGATION_FALLBACK;
   }
   return context;
 }

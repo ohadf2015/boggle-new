@@ -262,6 +262,25 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
   );
 }
 
+const ACCESSIBILITY_FALLBACK: AccessibilityContextType = {
+  settings: DEFAULT_SETTINGS,
+  toggleFireRoundLights: () => {},
+  toggleEarthquakeEffects: () => {},
+  toggleHaptics: () => {},
+  cycleReduceMotion: () => {},
+  toggleLargeLetters: () => {},
+  toggleCosyMode: () => {},
+  cosyMode: false,
+  shouldReduceMotion: false,
+  disableFireRoundLights: false,
+  disableEarthquakeEffects: false,
+  hapticsEnabled: true,
+  largeLettersEnabled: false,
+  suppressTimerUrgency: false,
+  celebrationIntensity: 'full',
+  updateSetting: () => {},
+};
+
 /**
  * Hook to access accessibility settings
  * @returns Accessibility context with settings and update functions
@@ -269,7 +288,10 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
 export function useAccessibility(): AccessibilityContextType {
   const context = useContext(AccessibilityContext);
   if (!context) {
-    throw new Error('useAccessibility must be used within an AccessibilityProvider');
+    if (process.env.NODE_ENV === 'development') {
+      throw new Error('useAccessibility must be used within an AccessibilityProvider');
+    }
+    return ACCESSIBILITY_FALLBACK;
   }
   return context;
 }

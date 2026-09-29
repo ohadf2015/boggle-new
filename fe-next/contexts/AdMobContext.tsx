@@ -329,8 +329,27 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const ADMOB_FALLBACK: AdMobContextValue = {
+  recordGameEnd: () => {},
+  shouldShowInterstitial: () => false,
+  recordInterstitialShown: () => {},
+  hasNoAds: () => false,
+  getConfig: () => null,
+  whenReady: () => Promise.resolve(),
+  prepareInterstitial: () => Promise.resolve(),
+  isInterstitialReady: () => false,
+  consumeInterstitial: () => {},
+  noteInterstitialTerminal: () => {},
+  ageGatePromptOpportunity: false,
+};
+
 export function useAdMobContext(): AdMobContextValue {
   const ctx = useContext(AdMobContext);
-  if (!ctx) throw new Error('useAdMobContext must be used within AdMobProvider');
+  if (!ctx) {
+    if (process.env.NODE_ENV === 'development') {
+      throw new Error('useAdMobContext must be used within AdMobProvider');
+    }
+    return ADMOB_FALLBACK;
+  }
   return ctx;
 }
