@@ -133,6 +133,15 @@ export async function proxy(request: NextRequest) {
 
   // Handle paths without locale prefix
   if (!pathnameHasLocale) {
+    // Bare /singleplayer: always internal rewrite to /en/singleplayer (+ search),
+    // never Accept-Language and never a 301. Proxy runs BEFORE next.config
+    // beforeFiles rewrites, so a user 301 here would win over the config rewrite
+    // (prod after #1177: HTTP 301 Location /en/singleplayer, 16-byte body).
+    // Same target as next.config beforeFiles + the old catch-all exclusion.
+    if (pathname === '/singleplayer' || pathname === '/singleplayer/') {
+      return NextResponse.rewrite(new URL(`/en/singleplayer${search}`, request.url));
+    }
+
     const locale = getLocaleFromRequest(request) || DEFAULT_LOCALE;
     const targetPath = pathname === '/' ? `/${locale}${search}` : `/${locale}${pathname}${search}`;
 

@@ -134,6 +134,40 @@ describe('Proxy — Supabase Auth Refresh', () => {
   });
 });
 
+describe('Proxy — bare /singleplayer rewrite (r6 follow-up 2)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetSession.mockResolvedValue({ data: { session: null }, error: null });
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+  });
+
+  it('rewrites /singleplayer to /en/singleplayer for users (no 301)', async () => {
+    await proxy(makeRequest('/singleplayer'));
+    expect(NextResponse.rewrite).toHaveBeenCalledTimes(1);
+    const rewriteUrl = (NextResponse.rewrite as Mock).mock.calls[0][0] as URL;
+    expect(rewriteUrl.pathname).toBe('/en/singleplayer');
+    expect(NextResponse.redirect).not.toHaveBeenCalled();
+  });
+
+  it('rewrites /singleplayer/ the same way', async () => {
+    await proxy(makeRequest('/singleplayer/'));
+    expect(NextResponse.rewrite).toHaveBeenCalledTimes(1);
+    const rewriteUrl = (NextResponse.rewrite as Mock).mock.calls[0][0] as URL;
+    expect(rewriteUrl.pathname).toBe('/en/singleplayer');
+    expect(NextResponse.redirect).not.toHaveBeenCalled();
+  });
+
+  it('still 301-redirects other locale-less paths like /pricing', async () => {
+    await proxy(makeRequest('/pricing'));
+    expect(NextResponse.redirect).toHaveBeenCalledTimes(1);
+    const [redirectUrl, status] = (NextResponse.redirect as Mock).mock.calls[0] as [URL, number];
+    expect(redirectUrl.pathname).toBe('/en/pricing');
+    expect(status).toBe(301);
+    expect(NextResponse.rewrite).not.toHaveBeenCalled();
+  });
+});
+
 describe('Proxy — Probe short-circuit (Sentry JAVASCRIPT-NEXTJS-NE)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
