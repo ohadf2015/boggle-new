@@ -3665,6 +3665,22 @@ const ru = {
         "cta": "Провести бесплатный vocab на весь класс с ясным бесплатным лимитом 50"
       }
     },
+    "vsMentimeter": {
+      "free50": {
+        "eyebrow": "Лимиты бесплатного плана — honesty foil",
+        "title": "Mentimeter Free: 50 участников/месяц. LexiClash: весь класс бесплатно (50) + miss→reteach Live.",
+        "lede": "Справка Mentimeter публикует до 50 участников в месяц; в таблице цен Participants per month: 50. Счётчик сбрасывается в дату создания аккаунта, с 8-часовым окном для одной презентации свыше 50. Маркетинговые буллеты Free говорят Unlimited participants once per month. LexiClash бесплатно покрывает до 50 учеников в классе с miss-gap → reteach Live.",
+        "mentiTitle": "Mentimeter Free (бесплатно) — опубликованные лимиты",
+        "mentiBody": "Help: до 50 участников в месяц. Таблица Free: Participants per month: 50. Сброс в дату создания аккаунта; 8 часов grace.",
+        "lexiTitle": "LexiClash — весь класс бесплатно + miss→Live",
+        "lexiBody": "Бесплатный план: до 50 учеников в классе для словарных игр плюс miss-gap → reteach Live. Один чёткий лимит бесплатных мест.",
+        "citePrefix": "Mentimeter:",
+        "citeHelpLabel": "Help — Free account (50/месяц)",
+        "citePlansLabel": "plans?view=standard (таблица: 50)",
+        "citeSuffix": " — 50 участников в месяц; сброс в дату создания аккаунта; 8 часов grace.",
+        "cta": "Проведите бесплатную словарную игру для всего класса с чётким лимитом 50 мест"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Лимиты бесплатного плана — honesty foil",

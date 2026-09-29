@@ -13685,6 +13685,22 @@ const en = {
         "cta": "Host whole-class free vocab with a clear 50-seat free limit"
       }
     },
+    "vsMentimeter": {
+      "free50": {
+        "eyebrow": "Free-tier caps — honesty foil",
+        "title": "Mentimeter Free: 50 participants/month. LexiClash: whole-class free (50) + miss→reteach Live.",
+        "lede": "Mentimeter Help publishes up to 50 participants per month; the pricing table lists Participants per month: 50. The counter resets on the account-creation date, with an 8-hour grace for one over-50 presentation. Free marketing bullets say Unlimited participants once per month — the Help/table number is 50. LexiClash free covers up to 50 students per class with miss-gap → reteach Live.",
+        "mentiTitle": "Mentimeter Free — published caps",
+        "mentiBody": "Help: Up to 50 participants per month. Pricing table Free: Participants per month: 50. Reset on account-creation date; 8-hour grace for one over-50 presentation. Free bullets: Unlimited participants once per month.",
+        "lexiTitle": "LexiClash — whole-class free + miss→Live",
+        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games, plus miss-gap → reteach Live. One published classroom free cap — no monthly participant counter.",
+        "citePrefix": "Mentimeter:",
+        "citeHelpLabel": "Help — Free account (50/month)",
+        "citePlansLabel": "plans?view=standard (table: 50)",
+        "citeSuffix": " — 50 participants per month; reset on account-creation date; 8-hour grace.",
+        "cta": "Host whole-class free vocab with a clear 50-seat free limit"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Free-tier caps — honesty foil",

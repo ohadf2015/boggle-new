@@ -15087,6 +15087,22 @@ const es = {
         "cta": "Organiza vocabulario gratis para toda la clase con un tope gratis claro de 50"
       }
     },
+    "vsMentimeter": {
+      "free50": {
+        "eyebrow": "Límites del plan gratis — honesty foil",
+        "title": "Mentimeter Free: 50 participantes/mes. LexiClash: clase completa gratis (50) + miss→reteach Live.",
+        "lede": "La ayuda de Mentimeter publica hasta 50 participantes por mes; la tabla de precios lista Participants per month: 50. El contador se reinicia en la fecha de creación de la cuenta, con 8 horas de gracia para una presentación que supere 50. Los bullets de marketing Free dicen Unlimited participants once per month. LexiClash gratis cubre hasta 50 estudiantes por clase con miss-gap → reteach Live.",
+        "mentiTitle": "Mentimeter Free (gratis) — límites publicados",
+        "mentiBody": "Help: hasta 50 participantes por mes. Tabla Free: Participants per month: 50. Reinicio en la fecha de creación de la cuenta; 8 horas de gracia.",
+        "lexiTitle": "LexiClash — clase completa gratis + miss→Live",
+        "lexiBody": "Plan gratis: hasta 50 estudiantes por clase para vocabulario, más miss-gap → reteach Live. Un límite claro de asientos gratis.",
+        "citePrefix": "Mentimeter:",
+        "citeHelpLabel": "Help — Free account (50/mes)",
+        "citePlansLabel": "plans?view=standard (tabla: 50)",
+        "citeSuffix": " — 50 participantes por mes; reinicio en fecha de creación; 8 horas de gracia.",
+        "cta": "Organiza vocabulario gratis para toda la clase con un límite claro de 50 asientos"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Límites del plan gratis — honesty foil",
