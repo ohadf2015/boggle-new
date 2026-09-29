@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sectionHome, isEducationPath } from '@/lib/navigation/sectionHome';
+import { sectionHome, isEducationPath, EDUCATION_TOP_LEVEL_SEGMENTS } from '@/lib/navigation/sectionHome';
 
 describe('sectionHome', () => {
   describe('isEducationPath', () => {
@@ -17,8 +17,22 @@ describe('sectionHome', () => {
       expect(isEducationPath('/en/multiplayer')).toBe(false);
       expect(isEducationPath('/en/daily')).toBe(false);
       expect(isEducationPath('/en/adventure')).toBe(false);
-      expect(isEducationPath('/en/education')).toBe(false);
       expect(isEducationPath('/multiplayer')).toBe(false);
+    });
+
+    it('returns true for ANY /education/* path, including SEO landings (prefix rule)', () => {
+      // Every page under /education belongs to the education section — an error
+      // or 404 on a landing must stay in education, never bounce to the
+      // consumer homepage. A literal sub-route allowlist rotted before.
+      expect(isEducationPath('/en/education')).toBe(true);
+      expect(isEducationPath('/en/education/for-schools')).toBe(true);
+      expect(isEducationPath('/en/education/games-for-teachers')).toBe(true);
+      expect(isEducationPath('/en/education/spelling-bee-practice')).toBe(true);
+      expect(isEducationPath('/en/education/esl-word-games')).toBe(true);
+      expect(isEducationPath('/en/education/vocabulary-games-classroom')).toBe(true);
+      expect(isEducationPath('/en/education/classroom-addon')).toBe(true);
+      expect(isEducationPath('/en/education/class-gap')).toBe(true);
+      expect(isEducationPath('/en/education/chatgpt-reteach')).toBe(true);
     });
 
     it('returns true for functional /education/* flow sub-routes (not marketing)', () => {
@@ -37,12 +51,10 @@ describe('sectionHome', () => {
       expect(isEducationPath('/en/education/unplugged-reteach')).toBe(true);
     });
 
-    it('returns false for /education marketing/SEO landing pages', () => {
-      // The bare /education landing and its SEO content siblings stay outside
-      // isEducationPath — they're marketing pages, not a stateful flow.
-      expect(isEducationPath('/en/education')).toBe(false);
-      expect(isEducationPath('/en/education/esl-word-games')).toBe(false);
-      expect(isEducationPath('/en/education/vocabulary-games-classroom')).toBe(false);
+    it('returns true for /education SEO/marketing landing pages too', () => {
+      expect(isEducationPath('/en/education')).toBe(true);
+      expect(isEducationPath('/en/education/esl-word-games')).toBe(true);
+      expect(isEducationPath('/en/education/vocabulary-games-classroom')).toBe(true);
     });
 
     it('returns false for empty or invalid paths', () => {
@@ -102,6 +114,12 @@ describe('sectionHome', () => {
         expect(sectionHome({ pathname: '/en/education/unplugged-reteach' })).toBe('/en/education');
       });
 
+      it('returns /locale/education for /education/* subpaths, landings included', () => {
+        expect(sectionHome({ pathname: '/en/education/for-schools' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/education/spelling-bee-practice' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/he/education/games-for-teachers' })).toBe('/he/education');
+      });
+
       it('preserves locale for education routes', () => {
         expect(sectionHome({ pathname: '/he/teacher' })).toBe('/he/education');
         expect(sectionHome({ pathname: '/sv/student' })).toBe('/sv/education');
@@ -123,9 +141,10 @@ describe('sectionHome', () => {
         expect(sectionHome({ pathname: '/en/daily/archive' })).toBe('/en');
       });
 
-      it('returns /locale/ for /education routes themselves', () => {
+      it('never falls back to the page that errored: the bare /education landing goes to the app home', () => {
         expect(sectionHome({ pathname: '/en/education' })).toBe('/en');
-        expect(sectionHome({ pathname: '/en/education/landing' })).toBe('/en');
+        expect(sectionHome({ pathname: '/he/education' })).toBe('/he');
+        expect(sectionHome({ pathname: '/ru/education' })).toBe('/ru');
       });
 
       it('preserves locale for non-education routes', () => {
@@ -196,6 +215,21 @@ describe('sectionHome', () => {
         // embedded in `pathname` is still ignored, same as before this fix.
         expect(sectionHome({ pathname: '/en/multiplayer?classroom=true&host=true' })).toBe('/en');
       });
+    });
+  });
+
+  describe('EDUCATION_TOP_LEVEL_SEGMENTS registry', () => {
+    it('registers exactly these education first-segments', () => {
+      // A future consumer route named "join" or "classroom" collides with this
+      // set and fails this test — that failure is the deliberate registration
+      // checkpoint, not a false positive.
+      expect([...EDUCATION_TOP_LEVEL_SEGMENTS].sort()).toEqual([
+        'classroom',
+        'education',
+        'join',
+        'student',
+        'teacher',
+      ]);
     });
   });
 });

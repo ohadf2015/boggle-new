@@ -45,7 +45,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     socket, isConnected, isSpectator, spectators, handleUpgradeToPlayer, signalIntentionalLeave,
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
     classroomAccessibility, classroomLevel, classroomWordBank, teacherStrip, quizOwnsScreen,
-    socketContextValue, hostLeftState, setHostLeftState, classroomStudentRef, exitClassroomStudentToHub,
+    socketContextValue, hostLeftState, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
     handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
     routerProps,
   } = useMpPageState();
@@ -86,7 +86,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             // what the room is NOT, this says where the user now is. Both paths
             // have to make it — fixing only one is how they drifted apart.
             const destination = multiplayerExitDestination({
-              isClassroomMode,
+              // Tri-state, not the URL flag: a student who typed a classroom
+              // code into the arcade lobby has no flag. A pending record exits
+              // as arcade here — user-initiated exits cannot wait (accepted
+              // residual; the irreversible socket decisions DO defer).
+              isClassroomMode: classroomContext === 'classroom',
               isHost: isHost || isClassroomHost,
               locale: language,
             });
@@ -181,7 +185,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
               // Same native-safe in-place reset as the results "Exit" button,
               // then clear the grace modal — except for a classroom student,
               // whose "back to the lobby" is the student hub, not the arcade.
-              if (classroomStudentRef.current) {
+              // Pessimistic while the record is pending: only a definitive
+              // arcade context routes to the consumer lobby.
+              const { context, isHost: hostNow } = classroomDecisionRef.current;
+              if (!hostNow && context !== 'arcade') {
                 exitClassroomStudentToHub();
               } else {
                 handleExitToLobby();

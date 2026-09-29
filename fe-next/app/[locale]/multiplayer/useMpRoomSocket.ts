@@ -6,7 +6,7 @@
  * Split out of PageClient (FOUNDATION 2026-09-26); the handler bodies moved
  * verbatim — only their inputs now arrive through `MpRoomSocketContext`.
  */
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
+import { useCallback, useEffect, useRef, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import toast from 'react-hot-toast';
 import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
 import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
@@ -17,6 +17,7 @@ import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
 import { rejoinFeedback } from '@/lib/multiplayer/rejoinFeedback';
 import { rosterSeedFromJoined } from '@/lib/multiplayer/roster';
 import { resetMpFeedback } from '@/lib/multiplayer/mpFeedback';
+import { hostTransferAction, roomGoneAction, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { trackInviteRoomDead, trackInviteConsumed } from '@/utils/growthTracking';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
@@ -76,7 +77,9 @@ export interface MpRoomSocketContext {
   onMatchStart: () => void;
   /** Early classroom joiner: hold on the teacher's code instead of bouncing. */
   roomWaitHold: (code: string) => void;
-  classroomStudentRef: MutableRefObject<boolean>;
+  /** Tri-state classroom detection — 'pending' defers the irreversible decisions. */
+  classroomContext: ClassroomContext;
+  classroomDecisionRef: MutableRefObject<{ context: ClassroomContext; isHost: boolean }>;
   exitClassroomStudentToHub: () => void;
 }
 
@@ -102,10 +105,20 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
     setIsHost, setIsActive, setIsPrivate, setError, setIsJoining, setShouldAutoJoin, setPrefilledRoomCode,
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
-    setResultsData, setHostLeftState, classroomStudentRef, exitClassroomStudentToHub,
+    setResultsData, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
   } = ctx;
   const roomWait = { hold: ctx.roomWaitHold };
   const mpSounds = { onMatchStart: ctx.onMatchStart };
+
+  // One-shot events that arrive while the classroom record is pending are
+  // parked here and flushed by the effect below once the context resolves —
+  // never decided on the optimistic arcade default (pitfall class 1).
+  const deferredHostTransferRef = useRef(false);
+  const deferredRoomGoneRef = useRef<{ goneCode: string; cameFromInvite: boolean } | null>(null);
+  // onError is registered before `handleRoomGone` can be defined (it needs the
+  // socket the hook returns), so the handler reaches it through this ref —
+  // same render-time bridge pattern as classroomDecisionRef.
+  const handleRoomGoneRef = useRef<(args: { goneCode: string; cameFromInvite: boolean }) => void>(() => {});
 
   const {
     socket, isConnected, roomsLoading, attemptingReconnect,
@@ -182,44 +195,14 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       // Same code derivation as the 'gone' branch below: both state values can be empty on a cold invite load.
       if (kind === 'notOpen') { setError(''); roomWait.hold(gameCode || prefilledRoomCode || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('room') ?? '' : '')); return; }
       if (kind === 'gone') {
-        // Snapshot identity BEFORE the resets below clear it: the dead-invite
-        // toast needs the room code, and `cameFromInvite` is derived from the
-        // `room=` param that this branch strips from the URL at the end.
+        // Snapshot identity BEFORE handleRoomGone's resets clear it: the dead-
+        // invite toast needs the room code, and `cameFromInvite` is derived
+        // from the `room=` param that branch strips from the URL at the end.
         const cameFromInvite = typeof window !== 'undefined' && window.location.search.includes('room=');
         const urlRoom = typeof window !== 'undefined'
           ? new URLSearchParams(window.location.search).get('room') ?? ''
           : '';
-        const goneCode = gameCode || prefilledRoomCode || urlRoom;
-        // Stale lobby tap or room torn down mid-join. Drop the dead room from
-        // the local list synchronously so a re-tap can't re-fire the same dead
-        // join before the server round-trip refreshes the list.
-        if (gameCode) setActiveRooms((rooms) => rooms.filter((r) => r.gameCode !== gameCode));
-        // Feedback policy lives in `roomGoneFeedback` (never silent: a cold
-        // invite to a dead room gets "that room is no longer available" instead
-        // of an empty lobby — the 2026-05-25 "empty page" report). The shared
-        // `roomGone` toast id collapses a run of dead-room taps into one.
-        // A classroom student gets the classroom sentence and their own hub —
-        // the arcade "no battles in progress" lobby means nothing to them.
-        if (classroomStudentRef.current) {
-          setError('');
-          setPrefilledRoomCode(''); setAttemptingReconnect(false); setShouldAutoJoin(false);
-          exitClassroomStudentToHub();
-          return;
-        }
-        const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
-        toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
-        if (!isActive && cameFromInvite) {
-          trackInviteRoomDead({ roomCode: goneCode || 'unknown' });
-        }
-        setError('');
-        setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setIsHost(false); setIsPrivate(false);
-        setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
-        socket?.emit('getActiveRooms');
-        // Strip classroom/host too, not just room: leaving them re-enters the
-        // classroom HOST boot path and silently creates another room.
-        if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
-          window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
-        }
+        handleRoomGoneRef.current({ goneCode: gameCode || prefilledRoomCode || urlRoom, cameFromInvite });
       } else if (kind === 'codeExists') {
         setError(t('errors.gameCodeExists'));
         toast.error(t('errors.gameCodeExists'), { duration: 4000, icon: '❌', id: MP_TOAST_IDS.codeExists });
@@ -284,12 +267,81 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       if (data.newHost !== username) return;
       // A classroom student is never a host candidate. The server's ordinary
       // migration picked one when the teacher dropped, and they were rendered
-      // the teacher's own share-code/QR screen. Send them home instead.
-      if (classroomStudentRef.current) { exitClassroomStudentToHub(); return; }
+      // the teacher's own share-code/QR screen. Send them home instead — and
+      // while the classroom record is still pending, defer rather than guess:
+      // the flush effect re-runs this decision once the context resolves.
+      const action = hostTransferAction(classroomDecisionRef.current);
+      if (action === 'exit-to-hub') { exitClassroomStudentToHub(); return; }
+      if (action === 'defer') { deferredHostTransferRef.current = true; return; }
       setIsHost(true);
     },
     t,
   });
+
+  // The server says the room is gone. Feedback policy lives in
+  // `roomGoneFeedback`; the classroom-vs-arcade decision is `roomGoneAction`,
+  // parked via deferredRoomGoneRef while the record is pending and flushed
+  // below. Extracted (not inline in the socket handler) so the flush effect
+  // can re-run the exact same path — two copies are how these drift (class 3).
+  const handleRoomGone = useCallback(({ goneCode, cameFromInvite }: { goneCode: string; cameFromInvite: boolean }) => {
+    // Stale lobby tap or room torn down mid-join. Drop the dead room from the
+    // local list synchronously so a re-tap can't re-fire the same dead join
+    // before the server round-trip refreshes the list.
+    if (gameCode) setActiveRooms((rooms) => rooms.filter((r) => r.gameCode !== gameCode));
+    const action = roomGoneAction(classroomDecisionRef.current);
+    if (action === 'defer') { deferredRoomGoneRef.current = { goneCode, cameFromInvite }; return; }
+    // A classroom student gets the classroom sentence and their own hub — the
+    // arcade "no battles in progress" lobby means nothing to them and reads
+    // as the app having simply lost their class.
+    if (action === 'exit-to-hub') {
+      setError('');
+      setPrefilledRoomCode(''); setAttemptingReconnect(false); setShouldAutoJoin(false);
+      exitClassroomStudentToHub();
+      return;
+    }
+    // Feedback policy lives in `roomGoneFeedback` (never silent: a cold
+    // invite to a dead room gets "that room is no longer available" instead
+    // of an empty lobby — the 2026-05-25 "empty page" report). The shared
+    // `roomGone` toast id collapses a run of dead-room taps into one.
+    const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
+    toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
+    if (!isActive && cameFromInvite) {
+      trackInviteRoomDead({ roomCode: goneCode || 'unknown' });
+    }
+    setError('');
+    setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setIsHost(false); setIsPrivate(false);
+    setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
+    socket?.emit('getActiveRooms');
+    // Strip classroom/host too, not just room: leaving them re-enters the
+    // classroom HOST boot path and silently creates another room.
+    if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
+      window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
+    }
+  }, [gameCode, isActive, t, socket, classroomDecisionRef, exitClassroomStudentToHub, setActiveRooms, setError,
+      setPrefilledRoomCode, setAttemptingReconnect, setShouldAutoJoin, setGameCode, setIsActive, setIsHost, setIsPrivate]);
+  handleRoomGoneRef.current = handleRoomGone;
+
+  // Flush decisions parked while the classroom record was pending. A deferred
+  // host transfer takes the seat only once the room is known to be arcade — a
+  // classroom student is never permanently promoted inside the fetch window.
+  // The two flushes are independent: a transfer that exits to the hub must not
+  // strand a parked room-gone (no toast, no URL strip, no session clear).
+  useEffect(() => {
+    if (classroomContext === 'pending') return;
+    if (deferredHostTransferRef.current) {
+      deferredHostTransferRef.current = false;
+      if (hostTransferAction({ context: classroomContext, isHost: classroomDecisionRef.current.isHost }) === 'exit-to-hub') {
+        exitClassroomStudentToHub();
+      } else {
+        setIsHost(true);
+      }
+    }
+    const parkedRoomGone = deferredRoomGoneRef.current;
+    if (parkedRoomGone) {
+      deferredRoomGoneRef.current = null;
+      handleRoomGone(parkedRoomGone);
+    }
+  }, [classroomContext, classroomDecisionRef, exitClassroomStudentToHub, handleRoomGone, setIsHost]);
 
   return {
     socket, isConnected, roomsLoading, attemptingReconnect,

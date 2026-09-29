@@ -29,36 +29,16 @@ export interface SectionHomeParams {
 }
 
 /**
- * Routes (top-level under locale) that belong to the education section.
- * These are the routes whose parents should navigate to /education, not /.
+ * Top-level segments (under the locale) that belong to the education section.
+ * Prefix-based, not a per-page allowlist: `/education` alone has ~20 SEO
+ * landing pages, and a literal list of them rotted before — any new landing
+ * silently bounced its errors to the consumer homepage. Every page under
+ * /education (landing included) resolves to the education home.
+ *
+ * Exported so the registry test pins the exact contents: adding a consumer
+ * route whose name collides (e.g. a consumer "join") must fail loudly.
  */
-const EDUCATION_ROUTES = new Set(['/teacher', '/student', '/join', '/classroom']);
-
-/**
- * `/education/*` sub-routes that are functional flows (gameplay, class tools,
- * grade passback, Google Classroom add-on, etc.) rather than SEO/marketing
- * landing pages. `/education` itself and pages like
- * `/education/esl-word-games` are marketing content — bouncing an error there
- * to the main app home is fine. These are not: a teacher or student mid-flow
- * here who hits a chunk error or a stale deep link must stay inside education,
- * not land on the consumer homepage (the 31% education→home-within-60s bug).
- */
-const EDUCATION_SUBROUTES = new Set([
-  'classroom-game',
-  'duels',
-  'access',
-  'miss-gap-assignment',
-  'miss-gap-grade-passback',
-  'miss-gap-practice',
-  'miss-gap-whatsapp',
-  'unplugged-grade-passback',
-  'unplugged-reteach',
-  'classic-unplugged',
-  'team-tiles-unplugged',
-  'classroom-addon',
-  'class-gap',
-  'chatgpt-reteach',
-]);
+export const EDUCATION_TOP_LEVEL_SEGMENTS: ReadonlySet<string> = new Set(['teacher', 'student', 'join', 'classroom', 'education']);
 
 /**
  * Extract locale from pathname, e.g. '/en/teacher' → 'en', '/foo/bar' → undefined
@@ -75,18 +55,16 @@ function detectLocale(pathname: string): string | undefined {
 }
 
 /**
- * Determine if a pathname is part of an education flow.
+ * Determine if a pathname is part of the education section.
  *
  * A pathname is in education if it has a recognized locale AND its first
- * segment after the locale is in EDUCATION_ROUTES, or is `education` followed
- * by a known functional sub-route (EDUCATION_SUBROUTES), e.g.:
+ * segment after the locale is one of EDUCATION_TOP_LEVEL_SEGMENTS, e.g.:
  * - /en/teacher → true
  * - /en/teacher/classroom/abc → true
  * - /en/student/achievements → true
- * - /en/education/classroom-game → true (functional flow, not marketing)
- * - /en/education/duels/abc123 → true
- * - /en/education → false (the marketing landing page itself)
- * - /en/education/esl-word-games → false (SEO landing page)
+ * - /en/education → true
+ * - /en/education/for-schools → true (SEO landing; still education)
+ * - /en/education/classroom-game → true
  * - /en/multiplayer?classroom=true → false (context is in query, not route;
  *   see `sectionHome`'s `search` param for that case)
  * - /teacher → false (no locale prefix)
@@ -108,12 +86,7 @@ export function isEducationPath(pathname: string): boolean {
   if (!LOCALES.includes(locale)) return false;
   const topLevelSegment = segs[1];
   if (!topLevelSegment) return false;
-  if (EDUCATION_ROUTES.has(`/${topLevelSegment}`)) return true;
-  if (topLevelSegment === 'education') {
-    const subSegment = segs[2];
-    return !!subSegment && EDUCATION_SUBROUTES.has(subSegment);
-  }
-  return false;
+  return EDUCATION_TOP_LEVEL_SEGMENTS.has(topLevelSegment);
 }
 
 /**
@@ -151,7 +124,12 @@ export function sectionHome({ pathname, locale: explicitLocale, search }: Sectio
   }
 
   const inEducation = isEducationPath(pathname);
-  return inEducation ? `/${locale}/education` : `/${locale}`;
+  if (!inEducation) return `/${locale}`;
+  // The bare landing IS the education fallback target — an error boundary
+  // there must not loop the user back onto the page that errored.
+  const segs = pathOnly.split('/').filter(Boolean);
+  if (segs.length === 2 && segs[1] === 'education') return `/${locale}`;
+  return `/${locale}/education`;
 }
 
 export default sectionHome;

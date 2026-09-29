@@ -8,10 +8,10 @@
 import { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
 import toast from 'react-hot-toast';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
+import { useClassroomLiveGame } from '@/hooks/useLiveClassroomGameInfo';
 import { useTeacherStripState } from '@/components/education/controls/useTeacherStripState';
 import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
-import { isClassroomStudent, classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
+import { resolveClassroomContext, classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -152,7 +152,16 @@ export function useMpPageState() {
 
   // The room's own record of what it is playing and whose class it belongs to
   // (a student's classroom lobby used to announce Classic mid-Vocab-Quiz).
-  const liveClassroomGame = useLiveClassroomGameInfo(gameCode || prefilledRoomCode, isClassroomMode);
+  // Fetched for EVERY room, not only `?classroom=true` ones: a student who
+  // typed a classroom code into the arcade lobby has no URL flag, and this
+  // record (404 for arcade rooms) is the only signal that their exits must
+  // stay in education.
+  const { info: liveClassroomGame, status: liveClassroomGameStatus } = useClassroomLiveGame(gameCode || prefilledRoomCode, true);
+  // Tri-state: 'pending' while the record is still out, so the irreversible
+  // classroom decisions (host transfer, room-gone, host-left) defer instead of
+  // guessing arcade (pitfall class 1 — an optimistic default a later source
+  // flips).
+  const classroomContext = resolveClassroomContext({ urlClassroom: isClassroomMode, recordStatus: liveClassroomGameStatus });
 
   const {
     showResults, setShowResults, resultsData, setResultsData,
@@ -168,11 +177,12 @@ export function useMpPageState() {
   const router = useRouter();
 
   // A classroom room that stops existing must not hand its students to the
-  // arcade. `isClassroomStudent` is the one place that decision is made; the
-  // three call sites (host migration, room-gone error, host-left modal) are the
-  // three ways a live room reached them with three different outcomes.
-  const classroomStudentRef = useRef<boolean>(false);
-  classroomStudentRef.current = isClassroomStudent({ isClassroomMode, isHost: isHost || isClassroomHost });
+  // arcade. The decisions are pure (`lib/education/classroomRoomGone.ts`); the
+  // call sites (host migration + room-gone in useMpRoomSocket, host-left modal
+  // in PageClient) read them through a ref so socket handlers see the current
+  // context rather than the one captured when the listener was registered.
+  const classroomDecisionRef = useRef<{ context: ClassroomContext; isHost: boolean }>({ context: 'pending', isHost: false });
+  classroomDecisionRef.current = { context: classroomContext, isHost: isHost || isClassroomHost };
 
   const exitClassroomStudentToHub = useCallback(() => {
     clearSessionPreservingUsername(username);
@@ -214,7 +224,7 @@ export function useMpPageState() {
     // trap) and the destination is chosen here with a real router navigation —
     // `replaceState` alone never re-runs route guards or the layout.
     const destination = multiplayerExitDestination({
-      isClassroomMode,
+      isClassroomMode: classroomContext === 'classroom',
       isHost: isHost || isClassroomHost,
       locale: language,
     });
@@ -223,7 +233,7 @@ export function useMpPageState() {
     // Capacitor WebView). A router push is SPA navigation, so it is safe too.
     if (destination) router.push(destination);
   }, [gameCode, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
-      isClassroomMode, isHost, isClassroomHost, language, router]);
+      classroomContext, isHost, isClassroomHost, language, router]);
 
   // The page's `useMpExit()` target: every MP screen exits through here.
   // In-room reasons take the one in-place reset above (leaveRoom emit, session
@@ -231,11 +241,11 @@ export function useMpPageState() {
   // continue-solo leave the multiplayer route.
   const exitMp = useCallback((reason: MpExitReason) => {
     const action = mpExit(reason, {
-      isClassroomMode, isHost: isHost || isClassroomHost, locale: language, previousPath: readPreviousInAppPath(),
+      isClassroomMode: classroomContext === 'classroom', isHost: isHost || isClassroomHost, locale: language, previousPath: readPreviousInAppPath(),
     });
     if (reason !== 'back-from-entry') handleExitToLobby();
     if (action.kind === 'navigate' && (reason === 'back-from-entry' || reason === 'continue-solo')) router.push(action.href);
-  }, [isClassroomMode, isHost, isClassroomHost, language, handleExitToLobby, router]);
+  }, [classroomContext, isHost, isClassroomHost, language, handleExitToLobby, router]);
 
   // PageClient is the ONE writer of the global nav-hiding state (pitfall
   // class 1): hidden in a room and on results; on entry per the ENTRY piece's
@@ -273,7 +283,7 @@ export function useMpPageState() {
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
     setResultsData, setHostLeftState, onMatchStart: mpSounds.onMatchStart, roomWaitHold: roomWait.hold,
-    classroomStudentRef, exitClassroomStudentToHub,
+    classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
   });
 
   // Sync ref bridge so hooks called before the room socket get the latest socket
@@ -345,7 +355,7 @@ export function useMpPageState() {
     socket, isConnected, isSpectator, spectators, handleUpgradeToPlayer, signalIntentionalLeave,
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
     classroomAccessibility, classroomLevel, classroomWordBank, teacherStrip, quizOwnsScreen,
-    socketContextValue, hostLeftState, setHostLeftState, classroomStudentRef, exitClassroomStudentToHub,
+    socketContextValue, hostLeftState, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
     handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
     routerProps,
   };

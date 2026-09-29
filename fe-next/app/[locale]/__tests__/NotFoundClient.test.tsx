@@ -61,6 +61,13 @@ describe('NotFoundClient — primary CTA is education-aware (sectionHome)', () =
     expect(cta.getAttribute('href')).toBe('/en/education');
   });
 
+  it('routes a missing /education/* SEO landing back to /{locale}/education, not the consumer home', () => {
+    mockPathname = '/en/education/for-schools';
+    render(<NotFoundClient />);
+    const cta = screen.getByRole('link', { name: /notFound.button/i }) as HTMLAnchorElement;
+    expect(cta.getAttribute('href')).toBe('/en/education');
+  });
+
   it('routes a genuinely non-education missing path to bare /{locale}', () => {
     mockPathname = '/en/some-random-missing-page';
     render(<NotFoundClient />);

@@ -110,15 +110,15 @@ describe('Navigation Fixes — All 4 Causes', () => {
 
   describe('Fix #4: EducationHeader separates leave-education action', () => {
     it('should have exit-education button at the bottom, not adjacent to education home', () => {
-      // The EducationHeader should have a "Leave Education" section at the BOTTOM of the mobile menu,
-      // clearly separated from the "Navigation" section which includes "Education Home".
-      // This test is primarily a code-review assertion since it's UI-level, but we verify the logic:
-      // - Education navigation links should go to /education/* paths
-      // - Exit education link should go to /{locale}, the main app home
-
-      // This is verified by ensuring parentRoute and sectionHome treat these differently:
-      expect(parentRoute('/en/education')).toBe('/en'); // /education is NOT an education route
-      expect(isEducationPath('/en/education')).toBe(false);
+      // Two DIFFERENT decisions live here and must not be conflated:
+      // - parentRoute('/en/education') is deliberate back-navigation: the URL
+      //   parent of the education landing is the main app home, and an explicit
+      //   "Leave Education" tap should go there.
+      // - isEducationPath('/en/education') feeds sectionHome, the ERROR
+      //   fallback: an error on any /education page must stay inside education,
+      //   never bounce to the consumer homepage.
+      expect(parentRoute('/en/education')).toBe('/en');
+      expect(isEducationPath('/en/education')).toBe(true);
     });
 
     it('should make it clear that leaving education goes to main app, not deeper education', () => {
@@ -162,11 +162,15 @@ describe('Navigation Fixes — All 4 Causes', () => {
       expect(rtlFallback).toBe('/he/education');
     });
 
-    it('should distinguish education section from education marketing pages', () => {
-      // /education itself is a marketing/landing page, not part of the education section routes
-      const educationLanding = '/en/education';
-      expect(isEducationPath(educationLanding)).toBe(false); // /education is NOT an education route
-      expect(sectionHome({ pathname: educationLanding })).toBe('/en'); // Falls back to main home
+    it('keeps /education/* landings inside education on error, but never loops the bare landing to itself', () => {
+      // Every SEO landing under /education belongs to the education section —
+      // an error fallback must never bounce them to the consumer home.
+      expect(isEducationPath('/en/education/for-schools')).toBe(true);
+      expect(sectionHome({ pathname: '/en/education/for-schools' })).toBe('/en/education');
+      // The bare landing IS the education fallback target, so an error there
+      // falls back to the app home — falling back to itself would loop.
+      expect(isEducationPath('/en/education')).toBe(true);
+      expect(sectionHome({ pathname: '/en/education' })).toBe('/en');
     });
   });
 

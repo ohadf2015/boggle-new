@@ -35,6 +35,16 @@ const EDUCATION_PATHS = [
   'education/miss-gap-assignment',
   'education/miss-gap-whatsapp',
   'education/unplugged-reteach',
+  'education/classroom-addon',
+  'education/class-gap',
+  'education/chatgpt-reteach',
+  // The bare 'education' landing is deliberately absent: it IS the education
+  // fallback target, so its own error fallback is the app home (self-loop guard).
+  'education/for-schools',
+  'education/games-for-teachers',
+  'education/spelling-bee-practice',
+  'education/esl-word-games',
+  'education/vocabulary-games-classroom',
   'join/ABC',
 ];
 

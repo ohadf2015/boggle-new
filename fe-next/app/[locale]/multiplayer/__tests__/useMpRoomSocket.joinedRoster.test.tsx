@@ -38,7 +38,8 @@ function ctx(overrides: Partial<MpRoomSocketContext> = {}): MpRoomSocketContext 
     setPlayersInRoom: vi.fn(), setPlayersInRoomThrottled: Object.assign(vi.fn(), { cancel: vi.fn() }),
     setPendingGameStart: noop, setGameStartTime: noop, setShowResults: noop, setResultsData: noop,
     setHostLeftState: noop, onMatchStart: noop, roomWaitHold: noop,
-    classroomStudentRef: { current: false }, exitClassroomStudentToHub: noop,
+    classroomContext: 'arcade', classroomDecisionRef: { current: { context: 'arcade', isHost: false } },
+    exitClassroomStudentToHub: noop,
     ...overrides,
   };
 }

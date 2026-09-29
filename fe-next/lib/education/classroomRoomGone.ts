@@ -32,6 +32,69 @@ export function isClassroomStudent({ isClassroomMode, isHost }: ClassroomRolePar
   return isClassroomMode && !isHost;
 }
 
+/** Fetch lifecycle of the room's live record (`useClassroomLiveGame`). */
+export type ClassroomRecordStatus = 'idle' | 'loading' | 'found' | 'absent' | 'error';
+
+/**
+ * Whether the current room is a classroom room: 'classroom', 'arcade', or
+ * 'pending' while the record fetch is still out. Tri-state on purpose — a
+ * boolean answered "arcade" during the fetch window, an optimistic default a
+ * later source flips (pitfall class 1), and the consumers are irreversible
+ * navigations.
+ */
+export type ClassroomContext = 'classroom' | 'arcade' | 'pending';
+
+export interface ClassroomContextParams {
+  /** The room was opened with `?classroom=true`. */
+  urlClassroom: boolean;
+  /** Lifecycle of the room's live record. */
+  recordStatus: ClassroomRecordStatus;
+}
+
+/**
+ * Resolve the classroom context from the two sources. The URL flag alone
+ * misses the student who typed a classroom code into the arcade lobby; the
+ * record (404 for arcade rooms) is the server-backed second source. Either
+ * positive answer is sufficient; 'arcade' only once the record has actually
+ * answered. 'error' (retries exhausted, e.g. sustained 429) degrades to the
+ * pre-detection behavior rather than blocking decisions forever.
+ */
+export function resolveClassroomContext({ urlClassroom, recordStatus }: ClassroomContextParams): ClassroomContext {
+  if (urlClassroom || recordStatus === 'found') return 'classroom';
+  // 'idle' means no fetch is in flight and none is coming (no valid room
+  // code) — mapping it to 'pending' would park a deferred decision forever.
+  if (recordStatus !== 'loading') return 'arcade';
+  return 'pending';
+}
+
+export type HostTransferAction = 'exit-to-hub' | 'accept-host' | 'defer';
+
+/**
+ * What this client does when the server hands it the host seat. A classroom
+ * student never accepts; a pending context DEFERS — the transfer is flushed
+ * once the record resolves, so a classroom student is never permanently
+ * promoted inside the fetch window.
+ */
+export function hostTransferAction({ context, isHost }: { context: ClassroomContext; isHost: boolean }): HostTransferAction {
+  if (isHost) return 'accept-host';
+  if (context === 'classroom') return 'exit-to-hub';
+  if (context === 'pending') return 'defer';
+  return 'accept-host';
+}
+
+export type RoomGoneAction = 'exit-to-hub' | 'arcade-feedback' | 'defer';
+
+/**
+ * What this client does when the server says the room is gone. Same policy as
+ * the host transfer: classroom students go to their hub, a pending context
+ * defers rather than guessing arcade, everyone else keeps the arcade feedback.
+ */
+export function roomGoneAction({ context, isHost }: { context: ClassroomContext; isHost: boolean }): RoomGoneAction {
+  if (isClassroomStudent({ isClassroomMode: context === 'classroom', isHost })) return 'exit-to-hub';
+  if (context === 'pending' && !isHost) return 'defer';
+  return 'arcade-feedback';
+}
+
 /** Where a classroom student goes when the room is gone. */
 export function classroomStudentHomePath(locale: string): string {
   return `/${locale || 'en'}/student`;
