@@ -25,7 +25,7 @@ export default function HitMark({ mark }: { mark: HitMarkData }) {
   const style = TIER_STYLE[mark.tier];
   const size = mark.tier === 'crit' ? 50 : mark.tier === 'big' ? 40 : 30;
   return createPortal(
-    <div key={mark.id} className="adv-hit-mark pointer-events-none fixed z-[65]" aria-hidden
+    <div key={mark.id} className="adv-hit-mark pointer-events-none fixed z-65" aria-hidden
       data-testid="adv-hit-mark" data-tier={mark.tier}
       style={{ left: mark.spot.x, top: mark.spot.y }}>
       <span className="adv-hit-mark-num tabular-nums" dir="ltr" style={{ fontSize: size, color: style.fill }}>

@@ -58,7 +58,7 @@ export default function DeedStamp({ event }: { event: DeedEvent | null }) {
   const big = shown.deed === 'obliterated';
 
   return createPortal(
-    <div key={shown.id} className="pointer-events-none fixed inset-0 z-[71] overflow-hidden" aria-live="polite" data-testid="adv-deed" data-deed={shown.deed}>
+    <div key={shown.id} className="pointer-events-none fixed inset-0 z-71 overflow-hidden" aria-live="polite" data-testid="adv-deed" data-deed={shown.deed}>
       {!reduce && (
         <motion.div className="absolute inset-0" style={{ background: look.flash }}
           initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0] }} transition={{ duration: big ? 0.38 : 0.26, times: [0, 0.15, 1] }} />

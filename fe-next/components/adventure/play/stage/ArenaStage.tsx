@@ -33,11 +33,12 @@ import { ThreatPlate } from './IntentDial';
 import { PLAYER_STATUS } from './PlayerBar';
 import { enemyArt, hpSegments } from './combatView';
 import type { CombatJuice } from './useCombatJuice';
-import LootFlight from './LootFlight';
 import type { ArenaLayout } from '../arena/arenaLayout';
 import { commandsFromFeed, effectColor, type ArenaCommand, type FxEntry } from '../arena/arenaCommands';
 import { wordPower } from '../arena/arenaBeats';
 import type { HitEvent } from '../events';
+
+const LootFlight = dynamic(() => import('./LootFlight'), { ssr: false });
 
 const ArenaCanvas = dynamic(() => import('../arena/ArenaCanvas'), { ssr: false });
 

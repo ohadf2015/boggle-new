@@ -68,7 +68,7 @@ export default function LootFlight({ from, gold, relic, onDone }: Props) {
   if (!from || !pieces?.length || typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[59] pointer-events-none overflow-hidden" aria-hidden>
+    <div className="fixed inset-0 z-59 pointer-events-none overflow-hidden" aria-hidden>
       {pieces.map((p) => {
         const mid = { x: from.x + (p.to.x - from.x) * 0.45 + p.spread * 70, y: Math.min(from.y, p.to.y) - 64 };
         const size = p.kind === 'relic' ? 44 : 22;
