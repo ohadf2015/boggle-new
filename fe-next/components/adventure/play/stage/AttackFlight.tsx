@@ -108,7 +108,7 @@ export default function AttackFlight({ combat, status }: Props) {
   const onTiles = playerHit?.kind === 'freeze' || playerHit?.kind === 'curse';
 
   return createPortal(
-    <div className="fixed inset-0 z-[58] pointer-events-none overflow-hidden" aria-hidden={!playerHit}>
+    <div className="fixed inset-0 z-58 pointer-events-none overflow-hidden" aria-hidden={!playerHit}>
       <AnimatePresence>
         {flight && arc && (
           <motion.div key={flight.id} className="absolute left-0 top-0"

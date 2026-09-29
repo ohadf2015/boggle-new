@@ -65,7 +65,7 @@ function BoardLayer({ fog, bombs, pops, size }: Props) {
 
   const keys = Object.keys(rects);
   return (
-    <div ref={ref} className="pointer-events-none absolute inset-0 z-[15]" aria-hidden data-testid="variant-board-layer">
+    <div ref={ref} className="pointer-events-none absolute inset-0 z-15" aria-hidden data-testid="variant-board-layer">
       {fog && keys.map((k) => {
         const r = rects[k];
         const [row, col] = k.split('-').map(Number);

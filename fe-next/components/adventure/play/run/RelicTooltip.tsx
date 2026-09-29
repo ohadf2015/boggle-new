@@ -93,10 +93,10 @@ export default function RelicTooltip({ id, onClose, stackCtx, anchor, avoid }: P
       exit={{ opacity: 0, y: -6 }}
       transition={{ duration: 0.14 }}
       onClick={onClose}
-      /* z-[120] clears the play surface (z-50), the word-cast layer (z-70) and
+      /* z-120 clears the play surface (z-50), the word-cast layer (z-70) and
          every banner on the map screen — this bubble is never underneath. */
       className={cn(
-        'z-[120] flex w-[min(17rem,calc(100vw-1rem))] items-start gap-2.5 rounded-xl border-[3px] border-black bg-[#0f1b3d] p-2 text-neo-cream shadow-[4px_4px_0_#000]',
+        'z-120 flex w-[min(17rem,calc(100vw-1rem))] items-start gap-2.5 rounded-xl border-[3px] border-black bg-[#0f1b3d] p-2 text-neo-cream shadow-[4px_4px_0_#000]',
         mounted ? 'fixed' : 'absolute start-0 top-full mt-1.5',
       )}
       style={at ? { left: at.left, top: at.top } : undefined}

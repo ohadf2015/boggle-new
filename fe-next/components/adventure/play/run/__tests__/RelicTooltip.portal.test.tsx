@@ -10,7 +10,7 @@ import RelicBar from '../RelicBar';
 /**
  * ROUND 2 GAP. `s50-hud-tooltip.png` showed the relic tooltip clipped and mostly
  * hidden behind the map screen's floor-title banner — the judge read it as a
- * rendering bug, not an affordance. The bubble now lives on the body at z-[120],
+ * rendering bug, not an affordance. The bubble now lives on the body at z-120,
  * so no ancestor of the rail can clip it and no sibling banner can out-stack it.
  */
 describe('RelicTooltip — nothing can paint over it', () => {
@@ -34,7 +34,7 @@ describe('RelicTooltip — nothing can paint over it', () => {
     const tip = open();
     expect(tip.className).toContain('fixed');
     // The play screen is z-50 and the word-cast FX layer is z-70; the bubble clears both.
-    expect(tip.className).toContain('z-[120]');
+    expect(tip.className).toContain('z-120');
   });
 
   it('Given the bubble is open, then it carries the same effect text the reward card shows', () => {
