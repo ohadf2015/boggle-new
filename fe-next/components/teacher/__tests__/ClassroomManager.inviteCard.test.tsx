@@ -2,7 +2,7 @@
  * ClassroomManager — invite-hero card, empty-state wizard, create celebration.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 vi.mock('@/utils/confettiUtils', () => ({
@@ -296,6 +296,86 @@ describe('ClassroomManager invite + celebration UX', () => {
     // THEN — straight to the wizard, no ask
     expect(screen.queryByText('teacher.subscription.trialExpiredTitle')).not.toBeInTheDocument();
     expect(screen.getByPlaceholderText('teacher.classroom.namePlaceholder')).toBeInTheDocument();
+  });
+
+  it('shouldNotAutoExpandTheRosterAfterCreation', async () => {
+    // The auto-expanded roster used to push the new card past the locked
+    // viewport, slicing START A GAME to an unreachable sliver for exactly the
+    // first-run teachers the celebration is for.
+    const user = userEvent.setup();
+    createClassroom.mockImplementation(async (name: string) => {
+      const created = {
+        id: 'cls-new',
+        name,
+        language: 'en',
+        teacher_id: 'user1',
+        join_code: 'XYZ789',
+        created_at: '2026-09-29',
+        member_count: 0,
+      };
+      classroomsState.classrooms = [...classroomsState.classrooms, created];
+      return { success: true, data: created };
+    });
+    render(<ClassroomManager />);
+
+    await user.click(screen.getAllByRole('button', { name: createButtonName })[0]);
+    await user.type(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'), 'Period 3');
+    await user.click(screen.getAllByRole('button', { name: createButtonName }).at(-1)!);
+
+    await screen.findByTestId('classroom-created-banner');
+    expect(screen.queryByTestId('classroom-student-list')).not.toBeInTheDocument();
+  });
+
+  it('shouldKeepTheCreatedBannerAStripWithoutTheDemotedVerbs', async () => {
+    // The join code is already on the card — the banner re-promoting COPY /
+    // SHARE / Google Classroom as page-level buttons contradicted the
+    // menu-demotion discipline and added a second lime slab.
+    const user = userEvent.setup();
+    createClassroom.mockResolvedValue({
+      success: true,
+      data: { id: 'cls-new', name: 'Period 3', language: 'en', join_code: 'XYZ789' },
+    });
+    render(<ClassroomManager />);
+
+    await user.click(screen.getAllByRole('button', { name: createButtonName })[0]);
+    await user.type(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'), 'Period 3');
+    await user.click(screen.getAllByRole('button', { name: createButtonName }).at(-1)!);
+
+    const banner = await screen.findByTestId('classroom-created-banner');
+    expect(within(banner).queryByRole('link')).not.toBeInTheDocument();
+    expect(within(banner).getAllByRole('button')).toHaveLength(1); // dismiss only
+    expect(banner.className).not.toMatch(/bg-neo-lime(\s|$)/);
+  });
+
+  it('shouldIncrementANameThatAlreadyExists', async () => {
+    // The prefilled default makes a duplicate "My Class" one tap away; the
+    // second tap must produce "… 2", not a silent clone.
+    const user = userEvent.setup();
+    classroomsState.classrooms = [
+      {
+        id: 'cls-1',
+        name: 'Period 3',
+        language: 'en',
+        teacher_id: 'user1',
+        join_code: 'ABC123',
+        created_at: '2026-08-26',
+        member_count: 0,
+      },
+    ];
+    createClassroom.mockResolvedValue({
+      success: true,
+      data: { id: 'cls-new', name: 'Period 3 (2)', language: 'en', join_code: 'XYZ789' },
+    });
+    render(<ClassroomManager />);
+
+    await user.click(screen.getAllByRole('button', { name: createButtonName })[0]);
+    await user.click(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'));
+    await user.keyboard('{Control>}a{/Control}Period 3');
+    await user.click(screen.getAllByRole('button', { name: createButtonName }).at(-1)!);
+
+    await waitFor(() => {
+      expect(createClassroom).toHaveBeenCalledWith('Period 3 (2)', 'en');
+    });
   });
 
   it('shouldShowHintWhenClassroomHasZeroStudents', () => {

@@ -14,7 +14,6 @@
 
 'use client';
 
-import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
@@ -39,14 +38,15 @@ export default function TeacherClassroomsPage() {
 function ClassesTitle() {
   const { t } = useLanguage();
   return (
-    <h1 className="min-w-0 truncate font-neo-display text-lg font-black uppercase leading-none tracking-tight text-neo-white [text-shadow:3px_3px_0_#000] min-[400px]:text-xl sm:text-4xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
+    <h1 className="min-w-0 truncate font-neo-display text-lg font-bold leading-none tracking-tight text-neo-cream min-[400px]:text-xl sm:text-3xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
       {t('academy.teacher.classesTitle', 'Your classes')}
     </h1>
   );
 }
 
-/** Same observatory art as Teacher HQ, so Classes reads as a room of the same
- *  building, not a bare admin page. Dark-only surface (pitfall class 5). */
+/** Calm canvas, same recipe as Teacher HQ: flat navy with a whisper of light
+ *  from the top — no full-bleed illustration behind a working deck. Dark-only
+ *  surface (pitfall class 5). */
 function ClassesShell({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   return (
@@ -56,16 +56,11 @@ function ClassesShell({ children }: { children: React.ReactNode }) {
       scrollRegionLabel={t('teacher.nav.classes')}
       contentClassName="relative p-4 sm:p-6 lg:px-8 lg:py-5 [@media(orientation:landscape)_and_(max-height:500px)]:px-3 [@media(orientation:landscape)_and_(max-height:500px)]:py-2"
     >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <Image
-          src="/images/education/teacher-hq-bg.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="select-none object-cover"
-        />
-        <div className="absolute inset-0 bg-neo-navy/70" />
-      </div>
+      <div
+        data-testid="calm-canvas-tint"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(255,254,240,0.05),transparent_60%)]"
+        aria-hidden="true"
+      />
       {children}
     </EducationShell>
   );

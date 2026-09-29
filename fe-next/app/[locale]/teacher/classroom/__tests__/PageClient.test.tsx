@@ -13,7 +13,12 @@ vi.mock('@/components/education/EducationHeader', () => ({
 }));
 
 vi.mock('@/components/teacher/ClassroomManager', () => ({
-  default: () => <div data-testid="classroom-manager-mock">Classroom Manager Mock</div>,
+  default: ({ heading }: { heading?: React.ReactNode }) => (
+    <div data-testid="classroom-manager-mock">
+      {heading}
+      Classroom Manager Mock
+    </div>
+  ),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -43,5 +48,15 @@ describe('TeacherClassroomsPage', () => {
   it('mounts inside the education shell, with the Classes tab active', () => {
     render(<ClassroomsPageClient />);
     expect(screen.getByTestId('education-tab-classes').getAttribute('aria-current')).toBe('page');
+  });
+
+  it('uses the calm canvas — no observatory art, no text-shadow title', () => {
+    const { container } = render(<ClassroomsPageClient />);
+
+    expect(container.querySelector('[src*="teacher-hq-bg"]')).toBeNull();
+
+    const title = screen.getByText('academy.teacher.classesTitle');
+    expect(title.className).not.toMatch(/text-shadow/);
+    expect(title.className).not.toMatch(/uppercase/);
   });
 });

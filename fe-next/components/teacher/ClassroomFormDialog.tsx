@@ -51,9 +51,11 @@ export function ClassroomFormDialog({
 
   // Re-seed every time the dialog opens — the parent keeps one mounted dialog
   // for both modes, so stale values from the previous open must not leak in.
+  // Create mode prefills the localized default: "name + go" is one tap, and
+  // the prefill is selected on focus so typing replaces it wholesale.
   useEffect(() => {
     if (open) {
-      setName(initialName);
+      setName(mode === 'create' ? t('teacher.classroom.defaultName') : initialName);
       setSelectedLanguage(initialLanguage ?? (language as Language));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

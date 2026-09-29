@@ -11,6 +11,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
@@ -67,8 +68,13 @@ const CLASSROOM = {
   member_count: 0,
 };
 
-const shareLink = () =>
-  screen.getByRole('link', { name: /Google Classroom/i }) as HTMLAnchorElement;
+// The share lives behind the card's "…" menu: the card keeps two verbs in the
+// spotlight (Start a game, copy the code) and demotes every other channel.
+const shareLink = async () => {
+  const user = userEvent.setup();
+  await user.click(screen.getByTestId('classroom-card-menu'));
+  return screen.getByRole('menuitem', { name: /Google Classroom/i }) as HTMLAnchorElement;
+};
 
 describe('ClassroomManager — share to Google Classroom', () => {
   beforeEach(() => {
@@ -76,33 +82,33 @@ describe('ClassroomManager — share to Google Classroom', () => {
     classroomsState.classrooms = [CLASSROOM];
   });
 
-  it('offers the share as a real link, not a button', () => {
+  it('offers the share as a real link, not a button', async () => {
     render(<ClassroomManager />);
-    expect(shareLink().tagName).toBe('A');
+    expect((await shareLink()).tagName).toBe('A');
   });
 
-  it('sends the teacher to Google\'s own share dialog', () => {
+  it('sends the teacher to Google\'s own share dialog', async () => {
     render(<ClassroomManager />);
-    const url = new URL(shareLink().href);
+    const url = new URL((await shareLink()).href);
     expect(url.origin + url.pathname).toBe('https://classroom.google.com/share');
   });
 
-  it('shares the student join link for this classroom, code and all', () => {
+  it('shares the student join link for this classroom, code and all', async () => {
     render(<ClassroomManager />);
-    const shared = new URL(new URL(shareLink().href).searchParams.get('url')!);
+    const shared = new URL(new URL((await shareLink()).href).searchParams.get('url')!);
     expect(shared.pathname).toContain('/join/ABC123');
   });
 
-  it('opens in a new tab without handing Google our referrer window', () => {
+  it('opens in a new tab without handing Google our referrer window', async () => {
     render(<ClassroomManager />);
-    const a = shareLink();
+    const a = await shareLink();
     expect(a.target).toBe('_blank');
     expect(a.rel).toContain('noopener');
   });
 
-  it('titles the post with the classroom name, apostrophe intact', () => {
+  it('titles the post with the classroom name, apostrophe intact', async () => {
     render(<ClassroomManager />);
-    expect(new URL(shareLink().href).searchParams.get('title')).toContain("Mrs O'Brien's 4B");
+    expect(new URL((await shareLink()).href).searchParams.get('title')).toContain("Mrs O'Brien's 4B");
   });
 
   it('does not render when there is no classroom to share', () => {

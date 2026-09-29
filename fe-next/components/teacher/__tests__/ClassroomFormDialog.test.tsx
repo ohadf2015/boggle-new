@@ -39,18 +39,34 @@ describe('ClassroomFormDialog', () => {
     expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('en');
   });
 
-  it('submit is disabled until the name is non-empty, then calls onSubmit trimmed', async () => {
+  it('prefills the localized default name in create mode, so creating is one tap', () => {
+    render(<ClassroomFormDialog {...baseProps} mode="create" />);
+
+    expect(screen.getByPlaceholderText('teacher.classroom.namePlaceholder')).toHaveValue(
+      'teacher.classroom.defaultName',
+    );
+    expect(screen.getByRole('button', { name: 'teacher.classroom.create' })).toBeEnabled();
+  });
+
+  it('a custom name replaces the prefilled default via standard select-all', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(<ClassroomFormDialog {...baseProps} mode="create" onSubmit={onSubmit} />);
 
-    const submit = screen.getByRole('button', { name: 'teacher.classroom.create' });
-    expect(submit).toBeDisabled();
-
-    await user.type(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'), '  Period 3  ');
-    await user.click(submit);
+    await user.click(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'));
+    await user.keyboard('{Control>}a{/Control}  Period 3  ');
+    await user.click(screen.getByRole('button', { name: 'teacher.classroom.create' }));
 
     expect(onSubmit).toHaveBeenCalledWith('Period 3', 'en');
+  });
+
+  it('clearing the prefilled name disables submit again', async () => {
+    const user = userEvent.setup();
+    render(<ClassroomFormDialog {...baseProps} mode="create" />);
+
+    await user.clear(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'));
+
+    expect(screen.getByRole('button', { name: 'teacher.classroom.create' })).toBeDisabled();
   });
 
   it('cancel closes the dialog without submitting', async () => {

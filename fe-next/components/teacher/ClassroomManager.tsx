@@ -7,11 +7,13 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { Plus, Copy, Share2, GraduationCap } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import toast from 'react-hot-toast';
 import { type Language } from '@/lib/supabase/education/types';
-import { ClassroomCard } from './hq/ClassroomCard';
+import { ClassCard } from './classroom/ClassCard';
+import { uniqueClassroomName } from './classroom/uniqueClassName';
+import { NeoNote } from '@/components/ui/note';
 import { ClassPager } from './hq/ClassPager';
 import { ClassroomCardActivity } from './hq/ClassroomCardActivity';
 import { CLASS_GRID_QUERIES, classPageSize, pageOf, pageSlice } from './hq/classPaging';
@@ -98,7 +100,8 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
 
   const handleCreate = async (name: string, classroomLanguage: Language) => {
     setIsSaving(true);
-    const result = await createClassroom(name, classroomLanguage);
+    const uniqueName = uniqueClassroomName(name, classrooms.map((c) => c.name));
+    const result = await createClassroom(uniqueName, classroomLanguage);
     setIsSaving(false);
 
     if (result.success) {
@@ -116,7 +119,6 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
           name: result.data.name,
           join_code: result.data.join_code,
         });
-        setExpandedClassroomId(result.data.id);
       }
     } else if (result.code === 'CLASS_LIMIT_REACHED' && result.currentCount !== undefined && result.limit !== undefined) {
       // Show upsell modal for class limit
@@ -257,7 +259,7 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
         onClick={openCreateDialog}
         className={cn(
           'bg-neo-cyan text-black font-neo-body font-black',
-          'border-3 border-black shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
+          'border-2 border-black shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
           'transition-all',
           heading && 'whitespace-nowrap max-sm:h-10 max-sm:px-2.5 max-sm:text-sm [@media(orientation:landscape)_and_(max-height:500px)]:h-9 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-9! [@media(orientation:landscape)_and_(max-height:500px)]:py-1!',
         )}
@@ -301,62 +303,37 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
         {createdClassroom && (
           <m.div
             key="classroom-created-banner"
-            data-testid="classroom-created-banner"
             variants={slideUp}
             initial="hidden"
             animate="visible"
             exit="hidden"
-            className="rounded-neo border-3 border-black bg-neo-lime px-5 py-4 shadow-hard"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="min-w-0">
-                <p className="font-neo-display font-black text-black text-balance">
+            {/* Inline strip, not a slab: the join code and its verbs already
+                live on the new card (paged into view) — repeating COPY /
+                SHARE / Google Classroom here added a second lime surface and
+                pushed that card's START button past the locked viewport. */}
+            <NeoNote
+              tone="ok"
+              data-testid="classroom-created-banner"
+              className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
+            >
+              <p className="min-w-0 font-neo-body text-sm text-neo-cream">
+                <span className="font-neo-display font-bold">
                   {t('teacher.classroom.createdBannerTitle', 'Classroom ready!')}
-                </p>
-                <p className="text-sm font-neo-body font-bold text-black/70 text-pretty">
-                  {t('teacher.classroom.createdBannerBody', 'Share this code with your students.')}
-                </p>
-                <code className="mt-2 inline-block text-3xl sm:text-4xl font-neo-display font-black text-black tracking-wider tabular-nums">
+                </span>{' '}
+                {t('teacher.classroom.createdBannerBody', 'Share this code with your students.')}{' '}
+                <code dir="ltr" className="font-neo-display font-black tabular-nums tracking-wider">
                   {createdClassroom.join_code}
                 </code>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  onClick={() => copyJoinCode(createdClassroom.join_code)}
-                  className="bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
-                >
-                  <Copy className="w-4 h-4 me-2" />
-                  {t('teacher.classroom.copyCode')}
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => shareInvite(createdClassroom.name, createdClassroom.join_code)}
-                  className="bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
-                >
-                  <Share2 className="w-4 h-4 me-2" />
-                  {t('teacher.classroom.share')}
-                </Button>
-                {googleClassroomHref(createdClassroom.name, createdClassroom.join_code) && (
-                  <a
-                    href={googleClassroomHref(createdClassroom.name, createdClassroom.join_code)!}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-white px-4 py-2 text-sm font-black text-black shadow-hard-sm transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
-                  >
-                    <GraduationCap className="w-4 h-4" />
-                    {t('teacher.classroom.googleClassroom', 'Post to Google Classroom')}
-                  </a>
-                )}
-                <Button
-                  type="button"
-                  onClick={() => setCreatedClassroom(null)}
-                  className="bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition-all"
-                >
-                  {t('teacher.classroom.dismissBanner', 'Got it')}
-                </Button>
-              </div>
-            </div>
+              </p>
+              <button
+                type="button"
+                onClick={() => setCreatedClassroom(null)}
+                className="shrink-0 rounded-neo border-2 border-neo-cream/40 px-3 py-1 text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime"
+              >
+                {t('teacher.classroom.dismissBanner', 'Got it')}
+              </button>
+            </NeoNote>
           </m.div>
         )}
       </AnimatePresence>
@@ -376,10 +353,9 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
             animate="visible"
           >
             {paged.items.map((classroom) => (
-              <ClassroomCard
+              <ClassCard
                 key={classroom.id}
                 classroom={classroom}
-                index={classrooms.indexOf(classroom)}
                 expanded={expandedClassroomId === classroom.id}
                 onToggleExpanded={() =>
                   setExpandedClassroomId(expandedClassroomId === classroom.id ? null : classroom.id)
@@ -417,13 +393,14 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
                 type="button"
                 variants={slideUp}
                 data-testid="classroom-add-tile"
+                aria-label={t('teacher.classroom.createAnother')}
                 onClick={openCreateDialog}
-                className="hidden items-center gap-3 self-start justify-self-start rounded-neo border-[3px] border-dashed border-neo-cream/60 bg-neo-navy/80 py-3 pe-5 ps-3 text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:border-neo-cream focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan sm:inline-flex"
+                className="hidden items-center gap-3 self-start justify-self-start rounded-neo border-2 border-dashed border-neo-cream/40 bg-neo-navy/80 py-3 pe-5 ps-3 text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:border-neo-cream focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan sm:inline-flex"
               >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-cyan text-black shadow-hard-sm">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan text-black shadow-hard-sm">
                   <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
                 </span>
-                <span className="font-neo-display text-base font-black uppercase tracking-tight">
+                <span className="font-neo-display text-base font-bold tracking-tight">
                   {t('teacher.classroom.create')}
                 </span>
               </m.button>

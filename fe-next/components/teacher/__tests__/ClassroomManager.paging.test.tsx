@@ -137,4 +137,15 @@ describe('ClassroomManager — paging instead of page scroll', () => {
     render(<ClassroomManager richCards />);
     expect(screen.queryByTestId('classroom-add-tile')).toBeNull();
   });
+
+  // Round 2 critic: the seat and the top-row button exposed the SAME accessible
+  // name — two "Create Classroom" controls a screen reader cannot tell apart.
+  it('Given the add seat, Then its accessible name is distinct from the header Create button', () => {
+    state.classrooms = [mk(1)];
+    mq.wide = true;
+    render(<ClassroomManager richCards />);
+    expect(screen.getByTestId('classroom-add-tile')).toHaveAccessibleName(
+      'teacher.classroom.createAnother',
+    );
+  });
 });
