@@ -4,10 +4,11 @@
  * any render-blocking resource can start; in Lighthouse's Lantern model the 308
  * hop sat in the critical path and pinned simulated FCP at ~1803ms (r4/r5).
  *
- * Next.js order is Headers → Redirects → beforeFiles rewrites → filesystem.
- * So the catch-all permanent redirect MUST also exclude `singleplayer`, or it
- * wins before the rewrite runs (production after #1176 still 308'd). See r6
- * follow-up / t_dfd64604.
+ * Next.js order is Headers → Redirects → Middleware (proxy.ts) → beforeFiles
+ * rewrites → filesystem. The catch-all permanent redirect MUST exclude
+ * `singleplayer`, or it 308s before the rewrite (post-#1176). After that
+ * exclusion, proxy.ts must also rewrite (not 301) — see r7 follow-up.
+ * Refs: r6 / #1177 / t_dfd64604.
  */
 import { describe, it, expect, vi } from 'vitest';
 

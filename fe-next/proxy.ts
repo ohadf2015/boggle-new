@@ -133,6 +133,26 @@ export async function proxy(request: NextRequest) {
 
   // Handle paths without locale prefix
   if (!pathnameHasLocale) {
+    // Perf (r6 / #1177 follow-up): bare /singleplayer must stay an internal
+    // rewrite to /en/singleplayer — never a locale 301. next.config excludes
+    // this path from the catch-all redirect and has a beforeFiles rewrite, but
+    // after that exclusion the proxy still runs first and was 301'ing users
+    // (prod after #1177: Location /en/singleplayer, 16-byte body). Match the
+    // beforeFiles destination (/en/...) so FCP/LCP stay hop-free.
+    if (pathname === '/singleplayer' || pathname.startsWith('/singleplayer/')) {
+      const rewriteUrl = new URL(`/en${pathname}${search}`, request.url);
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set('x-lc-pathname', pathname);
+      const rewriteResponse = NextResponse.rewrite(rewriteUrl, {
+        request: { headers: requestHeaders },
+      });
+      // Carry Set-Cookie from the auth session refresh above (if any).
+      response.cookies.getAll().forEach((cookie) => {
+        rewriteResponse.cookies.set(cookie.name, cookie.value);
+      });
+      return rewriteResponse;
+    }
+
     const locale = getLocaleFromRequest(request) || DEFAULT_LOCALE;
     const targetPath = pathname === '/' ? `/${locale}${search}` : `/${locale}${pathname}${search}`;
 
