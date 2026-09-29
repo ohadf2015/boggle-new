@@ -68,6 +68,13 @@ DNA (navy canvas, Fredoka, hard edges, electric accents) but dial it down:
   (Kahoot colour+shape bar) and carry `aria-label` + `title` with the full
   name, so truncation can never hide the verb — see
   `components/teacher/hq/hqModes.ts`.
+- **The verb never truncates.** A primary label or action (mode chip, CTA,
+  pack/card title) wraps (`line-clamp-2`) or shrinks to fit — never bare
+  `truncate`. `truncate` is for user-generated overflow only, and then always
+  with the full text on `title` + `aria-label`. Badges/ornaments sit out of
+  flow (`absolute`), never in the label's flex track. Contract-test the
+  geometry, not the pixels — pattern:
+  `components/student/academy/__tests__/academyLabelFit.test.tsx`.
 - Heavy sheet bodies mount on first open (`HqSheet mountWhenOpen`), not on
   every dashboard load.
 - No looping attention animations (beacon rings, radar pings) on calm decks;

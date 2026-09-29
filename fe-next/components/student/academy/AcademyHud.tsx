@@ -22,6 +22,8 @@ interface Props {
   avatarConfig?: CustomAvatarConfig | null;
   totalXp: number;
   streak: number;
+  /** Last play was yesterday — today's flame can still be saved. */
+  streakAtRisk?: boolean;
   stars: number;
   isGuest: boolean;
   onSignOut: () => void;
@@ -38,7 +40,7 @@ const TRAY_STYLE = {
   boxShadow: 'inset 0 0 0 1.5px #f5c542, inset 0 3px 5px rgba(0,0,0,0.6)',
 } as const;
 
-export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars, isGuest, onSignOut, reducedMotion, title, size = 'normal' }: Props) {
+export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streakAtRisk = false, stars, isGuest, onSignOut, reducedMotion, title, size = 'normal' }: Props) {
   const wide = size === 'wide';
   const compact = size === 'compact';
   const { t } = useLanguage();
@@ -81,19 +83,19 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 items-center gap-1.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
           <p dir="auto" className={`min-w-0 shrink truncate font-neo-display font-black leading-tight text-neo-white ${wide ? 'text-xl' : compact ? 'text-sm' : 'text-base sm:text-lg'} ${INK_TEXT}`}>
             {name}
           </p>
           {title && (
-            <h1
+            <span
               dir="auto"
               data-testid="academy-class-tag"
-              className={`min-w-0 max-w-[62%] shrink-[2] truncate rounded-full border-2 border-neo-black px-2 font-neo-display font-black uppercase leading-[18px] tracking-wide text-neo-white ${wide ? 'text-xs leading-[22px]' : 'text-[10px]'} ${INK_TEXT}`}
+              className={`min-w-0 max-w-full truncate rounded-full border-2 border-neo-black px-2 font-neo-display font-black uppercase leading-[18px] tracking-wide text-neo-white ${wide ? 'text-xs leading-[22px]' : 'text-[10px]'} ${INK_TEXT}`}
               style={toneStyle('pink', { shadow: 0, trim: 1 })}
             >
               {title}
-            </h1>
+            </span>
           )}
         </div>
         <div
@@ -136,9 +138,32 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, stars,
         style={TRAY_STYLE}
       >
       <span className="flex items-center gap-1" title={t('education.xp.streak', 'Day Streak')}>
-        <Medallion tone="ember" size={wide ? 36 : compact ? 22 : 28} shadow={1}>
-          <Flame className="h-4 w-4 fill-neo-yellow text-neo-black" strokeWidth={2.5} />
-        </Medallion>
+        <span
+          data-testid="academy-streak-flame"
+          data-state={streak <= 0 ? 'none' : streakAtRisk ? 'at-risk' : 'calm'}
+          aria-label={streak > 0 && streakAtRisk ? t('academy.student.streakAtRiskAria', 'Your streak is in danger — play today to save it') : undefined}
+          className="relative inline-flex"
+        >
+          <span
+            aria-hidden="true"
+            className="inline-flex"
+            style={
+              !still && streak > 0
+                ? { animation: streakAtRisk ? 'academy-flame-risk 0.9s ease-in-out infinite' : 'academy-flame-calm 2.6s ease-in-out infinite' }
+                : undefined
+            }
+          >
+            <Medallion tone="ember" size={wide ? 36 : compact ? 22 : 28} shadow={1}>
+              <Flame className="h-4 w-4 fill-neo-yellow text-neo-black" strokeWidth={2.5} />
+            </Medallion>
+          </span>
+          {streak > 0 && streakAtRisk && (
+            <span
+              aria-hidden="true"
+              className="absolute -top-1 -end-1 h-2.5 w-2.5 rounded-full border border-neo-black bg-neo-red"
+            />
+          )}
+        </span>
         <span className="sr-only">{t('education.xp.streak', 'Day Streak')}</span>
         <span className={`min-w-[1ch] font-neo-display ${compact ? 'text-base' : 'text-lg'} font-black tabular-nums text-neo-white ${INK_TEXT}`}>{streak}</span>
       </span>

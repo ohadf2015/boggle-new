@@ -32,10 +32,10 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
       >
         <div className="flex items-center justify-between gap-3 border-b-3 border-neo-black bg-neo-lime px-4 py-3">
           <div className="min-w-0">
-            <h2 className="truncate font-neo-display text-lg font-black uppercase text-neo-black">
+            <h2 className="line-clamp-2 font-neo-display text-lg font-black uppercase text-neo-black">
               {t('student.dashboard.leaderboard', 'Leaderboard')}
             </h2>
-            {className && <p className="truncate font-neo-body text-xs font-bold text-neo-black/70">{className}</p>}
+            {className && <p className="line-clamp-2 font-neo-body text-xs font-bold text-neo-black/70">{className}</p>}
           </div>
           <button
             type="button"

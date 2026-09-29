@@ -24,6 +24,7 @@ import PracticeCompletionMoment from '@/components/education/practice/PracticeCo
 import BeatTheClock from '@/components/education/practice/BeatTheClock';
 import { PracticeInsufficientData } from './PracticeInsufficientData';
 import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
+import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
@@ -75,6 +76,7 @@ export default function FlashcardReview({
   const [autoPronounce, setAutoPronounce] = useState(false);
 
   const { speak } = useSpeechSynthesis(language);
+  const sfx = usePracticeSfx();
 
   const currentWord = usable[currentIndex];
   const progress = ((currentIndex + 1) / usable.length) * 100;
@@ -118,6 +120,7 @@ export default function FlashcardReview({
   }, [autoPronounce, currentWord, speak]);
 
   const handleAnswer = useCallback((correct: boolean) => {
+    sfx[correct ? 'correct' : 'wrong']();
     setResults((prev) => [...prev, correct]);
     onCardReviewed?.(correct);
 
@@ -132,7 +135,7 @@ export default function FlashcardReview({
       setCurrentIndex((prev) => prev + 1);
       setIsFlipped(false);
     }
-  }, [currentIndex, usable.length, results, onCardReviewed, onComplete]);
+  }, [currentIndex, usable.length, results, onCardReviewed, onComplete, sfx]);
 
   const handleRestart = useCallback(() => {
     setCurrentIndex(0);
@@ -191,7 +194,7 @@ export default function FlashcardReview({
               >
                 <span className="font-neo-body text-neo-white">{word.word}</span>
                 {results[idx] ? (
-                  <Check className="h-4 w-4 text-neo-cyan" aria-hidden="true" />
+                  <Check className="h-4 w-4 text-neo-lime" aria-hidden="true" />
                 ) : (
                   <X className="h-4 w-4 text-neo-pink" aria-hidden="true" />
                 )}
@@ -460,7 +463,7 @@ export default function FlashcardReview({
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className={cn(
               'flex-1 flex items-center justify-center gap-2 py-3 rounded-neo',
-              'bg-neo-cyan text-black font-neo-display font-black uppercase',
+              'bg-neo-lime text-black font-neo-display font-black uppercase',
               'border-[3px] border-black shadow-hard',
               'disabled:opacity-40 disabled:cursor-not-allowed'
             )}

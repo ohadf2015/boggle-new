@@ -37,6 +37,8 @@ import { AcademyMap } from './AcademyMap';
 import { useHubLayout } from './hubLayout';
 import type { Insets } from './artFit';
 import { AcademyCta, ctaTone, useCtaOverline } from './AcademyCta';
+import { academyMascotMood } from './academyMascotMood';
+import { AcademyMascot } from './AcademyMascot';
 import { AcademySidePanel } from './AcademySidePanel';
 import { AcademyDock } from './AcademyDock';
 import { DailyChest } from './DailyChest';
@@ -173,6 +175,12 @@ export function AcademyHub(props: AcademyHubProps) {
     [data.lessons, data.reviewLessonId, data.reviewCount, language, level, classroomId, isLive, layout],
   );
   const action = pickNextAction({ hasClass: !!classroomId, live: isLive, islands, boss });
+  const mascotMood = academyMascotMood({
+    kind: action.kind,
+    streakAtRisk: data.streakAtRisk,
+    streak: data.streak,
+    reviewCount: data.reviewCount,
+  });
   const target = [...islands, ...(boss ? [boss] : [])].find((n) => n.key === action.nodeKey);
   const spotlightTag = useCtaOverline(action.kind);
   const targetLabel = useNodeLabel(target ?? { key: 'none', kind: 'lesson', type: 'lesson', state: 'open', stars: 0, mastery: 0 });
@@ -230,6 +238,7 @@ export function AcademyHub(props: AcademyHubProps) {
       avatarConfig={avatarConfig}
       totalXp={totalXp}
       streak={data.streak}
+      streakAtRisk={data.streakAtRisk}
       stars={data.stars}
       isGuest={isGuest}
       onSignOut={onSignOut}
@@ -368,7 +377,9 @@ export function AcademyHub(props: AcademyHubProps) {
             </div>
           )}
           {wide && !hub.sideCard && <div className="shrink-0 pb-3">{chest}</div>}
-          <div className={cn(wide && 'w-full', wide && !hub.sideCard && 'min-w-0 max-w-[40rem] flex-1', rail && 'min-w-0 flex-1')}>
+          <div className={cn('flex flex-col gap-1', wide && 'w-full', wide && !hub.sideCard && 'min-w-0 max-w-[40rem] flex-1', rail && 'min-w-0 flex-1')}>
+            {/* Lexi sits out the phone-on-its-side row: one short row has no room for a bubble. */}
+            {ready && !rail && <AcademyMascot mood={mascotMood} reducedMotion={reducedMotion} />}
             {ready ? (
               <AcademyCta
                 kind={action.kind}

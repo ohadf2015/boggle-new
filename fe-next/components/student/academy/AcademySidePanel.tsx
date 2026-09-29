@@ -31,7 +31,7 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
   return (
     <InkPanel tone="night" data-testid="academy-side-panel" className="w-full max-w-[26rem] p-4 pt-6">
       <Ribbon tone="pink" className="absolute -top-4 start-3 max-w-[80%]">
-        <p dir="auto" className={`truncate font-neo-display text-sm font-black uppercase tracking-wide text-neo-white ${INK_TEXT}`}>{title}</p>
+        <p dir="auto" className={`line-clamp-2 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white ${INK_TEXT}`}>{title}</p>
       </Ribbon>
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1 space-y-2.5">
@@ -70,7 +70,7 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
                 />
               </span>
               <div className="min-w-0 flex-1">
-                <p dir="auto" className={`truncate font-neo-display text-base font-black leading-tight text-neo-white ${INK_TEXT}`}>
+                <p dir="auto" className={`line-clamp-2 font-neo-display text-base font-black leading-tight text-neo-white ${INK_TEXT}`}>
                   {boss.state === 'locked'
                     ? t('academy.student.bossNeed', 'Master {have}/{need} words', { have, need })
                     : t('academy.student.bossReady', 'Unlocked')}

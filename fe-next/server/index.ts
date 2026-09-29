@@ -14,7 +14,7 @@
 // IMPORTANT: Must be first import - sets up globalThis.AsyncLocalStorage for Next.js 16+
 import './preload';
 
-import 'dotenv/config';
+import './loadEnv';
 import { httpLogger } from './logger';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import * as http from 'http';

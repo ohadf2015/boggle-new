@@ -298,7 +298,7 @@ export default function StudentLessonView() {
                 <div className="flex-1 min-w-0">
                   {/* Name + status badge */}
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <h3 className="text-xl font-neo-display font-black text-black truncate">
+                    <h3 className="text-xl font-neo-display font-black text-black line-clamp-2">
                       {lessonName}
                     </h3>
 

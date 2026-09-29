@@ -232,7 +232,7 @@ export function VocabFocusPractice({
               <span className={cn('inline-flex items-center justify-center w-8 h-8 rounded-neo border-[2px] border-black text-neo-black', style.bg)}>
                 {style.icon}
               </span>
-              <h2 className="text-xl font-neo-display text-neo-white truncate">
+              <h2 className="text-xl font-neo-display text-neo-white line-clamp-2">
                 {t(`education.vocabFocus.focus.${focus}`)}
               </h2>
             </div>

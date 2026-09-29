@@ -1628,7 +1628,7 @@ body.crazygames-embed [aria-hidden="true"].h-header {
   }
 
   /* Fix small icons inside buttons in landscape mode */
-  button svg,
+  button:not(.svg-free) svg,
   a[role="button"] svg,
   header button svg,
   header a svg {
@@ -2036,7 +2036,7 @@ body.crazygames-embed [aria-hidden="true"].h-header {
   }
 
   /* Fix icons inside buttons on very short landscape screens */
-  button svg,
+  button:not(.svg-free) svg,
   a[role="button"] svg {
     width: 1.125rem !important;
     height: 1.125rem !important;

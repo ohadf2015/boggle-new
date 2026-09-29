@@ -130,7 +130,7 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
             <span className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12" aria-hidden="true">
               <Image src={art} alt="" fill unoptimized sizes="48px" className="object-contain drop-shadow-[2px_2px_0_#000]" />
             </span>
-            <h1 dir="auto" className={cn('min-w-0 flex-1 truncate font-neo-display font-black leading-tight text-neo-white', rail ? 'text-xl' : 'text-2xl sm:text-3xl', INK_TEXT)}>
+            <h1 dir="auto" title={title} aria-label={title} className={cn('min-w-0 flex-1 truncate font-neo-display font-black leading-tight text-neo-white', rail ? 'text-xl' : 'text-2xl sm:text-3xl', INK_TEXT)}>
               {title}
             </h1>
             {badge && <div className="shrink-0">{badge}</div>}

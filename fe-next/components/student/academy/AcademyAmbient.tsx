@@ -82,11 +82,8 @@ const FALLS: Record<MapLayout, { x: number; y: number; h: number; w: number }[]>
 /**
  * Compositor-only CSS loops (transform/opacity) — cheaper than a framer loop
  * per waterfall on a low-end phone. Only mounted when motion is allowed.
+ * Keyframes live in app/globals.css (single definition, no per-mount injection).
  */
-const AMBIENT_CSS = `
-@keyframes academy-fall { from { transform: translateY(-50%); } to { transform: translateY(0); } }
-@keyframes academy-fall-glint { 0%,100% { opacity: .35; } 50% { opacity: .7; } }
-`;
 
 function Sparkle({ size }: { size: number }) {
   return (
@@ -102,7 +99,6 @@ export function AcademyAmbient({ layout, reducedMotion }: { layout: MapLayout; r
 
   return (
     <div aria-hidden="true" data-testid="academy-ambient" className="pointer-events-none absolute inset-0">
-      {!still && <style>{AMBIENT_CSS}</style>}
       {!still &&
         FALLS[layout].map((fall, i) => (
           <span

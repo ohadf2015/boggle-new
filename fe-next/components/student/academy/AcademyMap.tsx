@@ -113,7 +113,6 @@ function Spotlight({ at, still, tone }: { at: IslandPoint; still: boolean; tone:
           animation: still ? undefined : 'academy-beam 3.2s ease-in-out infinite',
         }}
       />
-      {!still && <style>{'@keyframes academy-beam { 0%,100% { opacity: .65; } 50% { opacity: 1; } }'}</style>}
     </>
   );
 }

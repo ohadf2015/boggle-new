@@ -122,7 +122,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         disabled={isJoining}
         className={cn(
           'icon-only relative flex w-full items-center gap-3 overflow-hidden rounded-[20px] border-3 border-neo-black ps-2 pe-2 text-start text-neo-black disabled:cursor-wait',
-          big ? 'h-[92px] gap-4 ps-3 pe-3' : compact ? 'h-14 gap-2' : 'h-[68px] sm:h-[76px]',
+          big ? 'min-h-[92px] gap-4 ps-3 pe-3' : compact ? 'h-14 gap-2' : 'min-h-[68px] sm:min-h-[76px]',
         )}
         style={toneStyle(tone, { shadow: 5, trim: 2.5 })}
         animate={still ? undefined : { scale: [1, 1.025, 1] }}
@@ -175,11 +175,11 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
             {kind === 'live' && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-neo-red" aria-hidden="true" />}
             {overline}
           </span>
-          <span dir="auto" className={cn('block truncate font-neo-display font-black uppercase leading-none tracking-tight', big ? 'text-3xl' : compact ? 'text-lg' : 'text-xl sm:text-2xl')}>
+          <span dir="auto" data-testid="academy-cta-title" className={cn('block line-clamp-2 font-neo-display font-black uppercase leading-[1.02] tracking-tight', big ? 'text-3xl' : compact ? 'text-lg' : 'text-xl sm:text-2xl')}>
             {title}
           </span>
           {sub && !compact && (
-            <span dir="auto" className="mt-0.5 block truncate font-neo-body text-xs font-bold text-neo-black/75">
+            <span dir="auto" data-testid="academy-cta-sub" className="mt-0.5 block line-clamp-2 font-neo-body text-xs font-bold text-neo-black/75">
               {sub}
             </span>
           )}

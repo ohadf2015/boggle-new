@@ -17,6 +17,7 @@ const knobs = vi.hoisted(() => ({
   lessons: [] as unknown[],
   reviewLessonId: '',
   reviewCount: 0,
+  streakAtRisk: false,
 }));
 
 vi.mock('next/navigation', () => ({
@@ -54,6 +55,7 @@ vi.mock('@/components/student/academy/useAcademyData', () => ({
     reviewLessonId: knobs.reviewLessonId,
     reviewCount: knobs.reviewCount,
     streak: 3,
+    streakAtRisk: knobs.streakAtRisk,
     stars: 2,
   }),
 }));
@@ -79,6 +81,7 @@ export function resetKnobs() {
   knobs.lessons = [];
   knobs.reviewLessonId = '';
   knobs.reviewCount = 0;
+  knobs.streakAtRisk = false;
   knobs.landscape = false;
   knobs.view = null;
   window.matchMedia = ((q: string) => ({

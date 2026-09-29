@@ -17,9 +17,9 @@ interface SwipeFeedbackOverlayProps {
 /**
  * Visual feedback overlay showing swipe direction
  *
- * Displays green "Got It" indicator when swiping right,
- * red "Don't Know" indicator when swiping left.
- * Opacity increases as user drags further.
+ * Displays a lime "Got It" indicator when swiping right, a pink "Don't Know"
+ * indicator when swiping left — the brand's two meaning-colors (never raw
+ * green/red). Opacity increases as user drags further.
  */
 export function SwipeFeedbackOverlay({
   x,
@@ -37,35 +37,35 @@ export function SwipeFeedbackOverlay({
 
   return (
     <div className={cn('pointer-events-none absolute inset-0 z-10', className)}>
-      {/* Got It - Right swipe (Green) */}
+      {/* Got It - Right swipe */}
       <m.div
         className={cn(
           'absolute inset-0 flex items-center justify-center',
-          'bg-green-500/20 border-4 border-green-500 rounded-neo',
+          'bg-neo-lime/20 border-4 border-neo-lime rounded-neo',
           isRTL ? 'flex-row-reverse' : ''
         )}
         style={{ opacity: gotItOpacity }}
       >
-        <div className="flex items-center gap-3 bg-green-500 px-6 py-3 rounded-neo shadow-hard-sm -rotate-12">
-          <Check size={32} className="text-white" strokeWidth={3} />
-          <span className="text-2xl font-neo-display text-white uppercase">
+        <div className="flex items-center gap-3 bg-neo-lime px-6 py-3 rounded-neo shadow-hard-sm -rotate-12">
+          <Check size={32} className="text-neo-black" strokeWidth={3} />
+          <span className="text-2xl font-neo-display text-neo-black uppercase">
             {t('education.lesson.gotIt')}
           </span>
         </div>
       </m.div>
 
-      {/* Don't Know - Left swipe (Red) */}
+      {/* Don't Know - Left swipe */}
       <m.div
         className={cn(
           'absolute inset-0 flex items-center justify-center',
-          'bg-red-500/20 border-4 border-red-500 rounded-neo',
+          'bg-neo-pink/20 border-4 border-neo-pink rounded-neo',
           isRTL ? 'flex-row-reverse' : ''
         )}
         style={{ opacity: dontKnowOpacity }}
       >
-        <div className="flex items-center gap-3 bg-red-500 px-6 py-3 rounded-neo shadow-hard-sm rotate-12">
-          <X size={32} className="text-white" strokeWidth={3} />
-          <span className="text-2xl font-neo-display text-white uppercase">
+        <div className="flex items-center gap-3 bg-neo-pink px-6 py-3 rounded-neo shadow-hard-sm rotate-12">
+          <X size={32} className="text-neo-white" strokeWidth={3} />
+          <span className="text-2xl font-neo-display text-neo-white uppercase">
             {t('education.lesson.dontKnow')}
           </span>
         </div>

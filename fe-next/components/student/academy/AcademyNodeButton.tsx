@@ -173,18 +173,11 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
     // A zero-size anchor at the island's point (in % of the art); the button
     // hangs off it, so the UI zoom scales the button and never its position.
     <span className="absolute z-10 h-0 w-0" style={{ left: `${at.x}%`, top: `${at.y}%` }}>
-    {/* A div with the button role, not a <button>: a global landscape-phone rule
-        forces every `button svg` to 20px (!important) and pads every button,
-        which would crush the pointer, the boss ring and the chains. */}
-    <m.div
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          press();
-        }
-      }}
+    {/* svg-free + icon-only: exempts the island art from the landscape-phone
+        global rules that clamp every `button svg` to 20px and pad buttons
+        (app/animations.css) — those would crush the pointer, ring and chains. */}
+    <m.button
+      type="button"
       data-testid={`academy-node-${node.key}`}
       data-compact={compact}
       data-state={node.state}
@@ -192,7 +185,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
       aria-label={aria}
       onClick={press}
       className={cn(
-        'absolute left-0 top-0 flex -translate-x-1/2 flex-col items-center outline-none',
+        'svg-free icon-only absolute left-0 top-0 flex -translate-x-1/2 flex-col items-center outline-none',
         isBoss ? '-translate-y-1/2' : '-translate-y-[82%]',
         'focus-visible:[&>div]:ring-4 focus-visible:[&>div]:ring-neo-cyan focus-visible:[&>div]:rounded-full',
       )}
@@ -270,7 +263,6 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
         )}
         {recommended && !still && (
           <>
-            <style>{'@keyframes academy-twinkle { 0%,100% { transform: scale(.3) rotate(0deg); opacity: 0; } 50% { transform: scale(1) rotate(90deg); opacity: 1; } }'}</style>
             {TWINKLES.map((tw, i) => (
               <span
                 key={i}
@@ -391,6 +383,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
 
       <span
         dir="auto"
+        data-testid="academy-node-label"
         className={cn(
           'relative -mt-1 flex items-center gap-1.5 whitespace-nowrap rounded-[10px] border-2 border-neo-black px-2 py-0.5 font-neo-display font-black leading-tight',
           plaqueSize,
@@ -406,7 +399,7 @@ export function AcademyNodeButton({ node, at, index, big, recommended, tag: tagW
           </span>
         )}
       </span>
-    </m.div>
+    </m.button>
     </span>
   );
 }

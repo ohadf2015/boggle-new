@@ -123,7 +123,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
 
           {/* Title and mode */}
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-neo-display text-neo-white truncate">
+            <h1 className="text-lg font-neo-display text-neo-white line-clamp-2">
               {lessonName}
             </h1>
             <p className="text-xs text-neo-white font-neo-body">

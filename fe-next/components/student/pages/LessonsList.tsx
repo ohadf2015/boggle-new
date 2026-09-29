@@ -81,7 +81,7 @@ export function LessonCard({ entry, level, locale }: { entry: StudentLesson; lev
         <Image src={NODE_ART[type] ?? NODE_ART.lesson!} alt="" fill unoptimized sizes="56px" className="object-contain drop-shadow-[2px_2px_0_#000]" />
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
-        <span dir="auto" className={cn('truncate font-neo-display text-lg font-black leading-tight text-neo-white', INK_TEXT)}>
+        <span dir="auto" className={cn('line-clamp-2 font-neo-display text-lg font-black leading-tight text-neo-white', INK_TEXT)}>
           {entry.lesson?.name ?? t('academy.pages.untitledLesson', 'Lesson')}
         </span>
         <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-neo-body text-xs font-bold text-neo-white/85">

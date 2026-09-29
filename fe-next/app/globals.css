@@ -6161,3 +6161,30 @@ html.modal-open ins.adsbygoogle[data-anchor-status] {
     animation: none;
   }
 }
+
+/* Academy hub — streak flame moods + recommended-island twinkles (single
+   definition; components only reference the animation name). */
+@keyframes academy-flame-calm {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+@keyframes academy-flame-risk {
+  0%, 100% { transform: scale(1); filter: saturate(1.2); }
+  50% { transform: scale(1.22); filter: saturate(1.9) brightness(1.15); }
+}
+@keyframes academy-twinkle {
+  0%, 100% { transform: scale(.3) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1) rotate(90deg); opacity: 1; }
+}
+@keyframes academy-fall {
+  from { transform: translateY(-50%); }
+  to { transform: translateY(0); }
+}
+@keyframes academy-fall-glint {
+  0%, 100% { opacity: .35; }
+  50% { opacity: .7; }
+}
+@keyframes academy-beam {
+  0%, 100% { opacity: .65; }
+  50% { opacity: 1; }
+}
