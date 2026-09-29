@@ -169,7 +169,7 @@ describe('AccessRequestForm', () => {
 
     it('sends only role, locale, use_case and school — never name or email', async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockResolvedValueOnce({ ok: true });
+      (global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true, success: true }) });
       render(<AccessRequestForm knownName="Jane Doe" knownEmail="jane@school.edu" />);
       await fillValid(user);
       await user.click(screen.getByRole('button', { name: /Send application/i }));
@@ -213,7 +213,7 @@ describe('AccessRequestForm', () => {
   describe('post-submit guidance', () => {
     it('shows a success status region promising instant access', async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockResolvedValueOnce({ ok: true });
+      (global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true, success: true }) });
       render(<AccessRequestForm />);
       await fillValid(user);
       await user.click(screen.getByRole('button', { name: /Send application/i }));
@@ -227,7 +227,7 @@ describe('AccessRequestForm', () => {
 
     it('refreshes the profile, then redirects to the locale teacher dashboard', async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockResolvedValueOnce({ ok: true });
+      (global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true, success: true }) });
       render(<AccessRequestForm />);
       await fillValid(user);
       await user.click(screen.getByRole('button', { name: /Send application/i }));

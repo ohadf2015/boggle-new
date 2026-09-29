@@ -24,7 +24,10 @@ export function createAdminClient(): SupabaseClient | null {
   }
 
   if (!_adminClient) {
-    _adminClient = createClient(supabaseUrl, serviceKey, {
+    // Build from the TRIMMED values: a key pasted into a hosting dashboard
+    // with a trailing newline passes the placeholder check above but sends a
+    // malformed apikey header, 401ing every admin call.
+    _adminClient = createClient(supabaseUrl.trim(), trimmed, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
   }

@@ -17,6 +17,15 @@ function bad(msg: string, status = 400) {
   return NextResponse.json({ ok: false, error: msg }, { status });
 }
 
+// The request row is already committed when this answers, so a generic 500
+// would lie ("Something went wrong" next to a durably filed request). 202 +
+// approvalPending tells the client the truth: received, approval still
+// processing. A re-submit re-runs the approval against the stranded pending
+// row (rate limit allows 3/24h), so the path self-heals.
+function pendingApproval() {
+  return NextResponse.json({ ok: true, success: true, approvalPending: true }, { status: 202 });
+}
+
 export async function POST(req: Request) {
   let body: any;
   try { body = await req.json(); } catch { return bad('invalid json'); }
@@ -97,7 +106,10 @@ export async function POST(req: Request) {
   // 'pending' forever, and profiles RLS blocks self-escalation of user_role
   // the same way.
   const admin = createAdminClient();
-  if (!admin) return bad('service role key not configured', 500);
+  if (!admin) {
+    console.error('[access-request] service role key not configured — request left pending for', email);
+    return pendingApproval();
+  }
 
   const trialExpiresAt = teacherTrialExpiry(Date.now());
   const nowIso = new Date().toISOString();
@@ -109,7 +121,10 @@ export async function POST(req: Request) {
     .select('id');
   // Approves this user's pending row. This insert just created exactly one
   // (or the idempotency guard short-circuited), so the approval should match.
-  if (approve.error) return bad('approval failed: ' + approve.error.message, 500);
+  if (approve.error) {
+    console.error('[access-request] approval failed for', email, '-', approve.error.message);
+    return pendingApproval();
+  }
   if (!approve.data?.length) {
     // The racing twin request approved the row first — a double-submit
     // converged on a single row. Confirm an approved request exists and
@@ -121,16 +136,30 @@ export async function POST(req: Request) {
       .eq('user_id', user.id)
       .eq('status', 'approved')
       .limit(1);
-    if (!already?.length) return bad('request not approved', 500);
+    if (!already?.length) {
+      console.error('[access-request] approval matched no pending row and no approved twin for', email);
+      return pendingApproval();
+    }
     return NextResponse.json({ ok: true, success: true });
   }
 
   const promoted = await admin.from('profiles').update({ user_role: 'teacher' }).eq('id', user.id).select('id');
-  if (promoted.error) return bad('promotion failed: ' + promoted.error.message, 500);
-  if (!promoted.data?.length) return bad('profile not promoted', 500);
+  if (promoted.error) {
+    console.error('[access-request] profile promotion failed for', email, '-', promoted.error.message);
+    return pendingApproval();
+  }
+  if (!promoted.data?.length) {
+    console.error('[access-request] profile promotion matched no row for', email);
+    return pendingApproval();
+  }
 
+  // Admin notify is best-effort like the confirmation below, but never
+  // silent — a failed notify means nobody knows a request needs attention.
   const tpl = teacherAccessAdminNotify(payload);
-  await sendEmail({ to: 'lexiclash.game@gmail.com', subject: tpl.subject, html: tpl.html });
+  const notified = await sendEmail({ to: 'lexiclash.game@gmail.com', subject: tpl.subject, html: tpl.html });
+  if (!notified.ok) {
+    console.error('[access-request] admin notify email failed -', notified.error);
+  }
 
   // Confirmation email is best-effort — the approval (DB state) is the source
   // of truth and must not be undone by a flaky mail provider, so failures

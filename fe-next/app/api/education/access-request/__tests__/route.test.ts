@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST } from '../route';
 
 // Mutable auth/db state the mocked Supabase client reads from, reset per test.
@@ -13,6 +13,8 @@ let approveMock = vi.fn(async (_args?: any) => ({ data: [{ id: 'req-1' }], error
 let adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
 let adminAvailable = true;
 let sendEmailMock = vi.fn(async (_args: any) => ({ ok: true as boolean, error: undefined as string | undefined }));
+// Rows the twin-check select (approved request already exists?) returns.
+let twinRows: any[] = [];
 
 vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
@@ -57,7 +59,7 @@ vi.mock('@/utils/supabase/admin', () => ({
             select: (cols: string) => ({
               eq: (key: string, val: string) => ({
                 eq: (key2: string, val2: string) => ({
-                  limit: (n: number) => vi.fn(async () => ({ data: [], error: null }))(),
+                  limit: (n: number) => vi.fn(async () => ({ data: twinRows, error: null }))(),
                 }),
               }),
             }),
@@ -102,6 +104,7 @@ describe('POST /api/education/access-request', () => {
     approveMock = vi.fn(async () => ({ data: [{ id: 'req-1' }], error: null }));
     adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
     adminAvailable = true;
+    twinRows = [];
     sendEmailMock = vi.fn(async () => ({ ok: true, error: undefined }));
   });
 
@@ -263,13 +266,6 @@ describe('POST /api/education/access-request', () => {
       expect(typeof update.reviewed_at).toBe('string');
     });
 
-    it('500s when the approval matched no request row (silent no-op guard)', async () => {
-      approveMock = vi.fn(async () => ({ data: [], error: null }));
-      const res = await POST(mkReq(validPayload));
-      expect(res.status).toBe(500);
-      expect(adminSelectMock).not.toHaveBeenCalled();
-    });
-
     it('promotes the profile to teacher via the admin (service-role) client', async () => {
       const res = await POST(mkReq(validPayload));
       expect(res.status).toBe(200);
@@ -281,24 +277,30 @@ describe('POST /api/education/access-request', () => {
       expect(call.val).toBe('user-1');
     });
 
-    it('500s when the promotion matched no profile row (silent no-op guard)', async () => {
-      adminSelectMock = vi.fn(async () => ({ data: [], error: null }));
-      const res = await POST(mkReq(validPayload));
-      expect(res.status).toBe(500);
-    });
-
-    it('500s when the admin client is not configured', async () => {
-      adminAvailable = false;
-      const res = await POST(mkReq(validPayload));
-      expect(res.status).toBe(500);
-    });
-
     it('still answers 200 when the confirmation email fails', async () => {
       sendEmailMock = vi.fn(async () => ({ ok: false, error: 'resend down' }));
       const res = await POST(mkReq(validPayload));
       expect(res.status).toBe(200);
       const json = await res.json();
       expect(json.ok).toBe(true);
+    });
+
+    it('still answers 200 but logs loudly when the ADMIN notify email fails (no silent islands)', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        sendEmailMock = vi.fn(async (args: any) =>
+          args.to === 'lexiclash.game@gmail.com'
+            ? { ok: false, error: 'resend down' }
+            : { ok: true, error: undefined });
+        const res = await POST(mkReq(validPayload));
+        expect(res.status).toBe(200);
+        expect(errorSpy).toHaveBeenCalledWith(
+          expect.stringContaining('[access-request] admin notify'),
+          'resend down'
+        );
+      } finally {
+        errorSpy.mockRestore();
+      }
     });
 
     it('sends the admin notify + the confirmation to the verified account email', async () => {
@@ -315,6 +317,94 @@ describe('POST /api/education/access-request', () => {
       const confirm = sendEmailMock.mock.calls.find((c) => (c[0] as any).to === 'jane@school.edu');
       expect(confirm).toBeTruthy();
       expect((confirm![0] as any).subject.length).toBeGreaterThan(0);
+    });
+  });
+
+  // The insert commits BEFORE the approval step runs. Once the request row is
+  // durably stored, a failing approve/promote step must NOT surface as a
+  // generic 500 — the teacher did succeed in filing. The truthful answer is
+  // 202 approvalPending: request received, approval still processing (a
+  // re-submit re-runs the approval against the stranded pending row, and the
+  // server log carries the real error).
+  describe('post-insert failure truthfulness (insert committed, approve/promote failed)', () => {
+    let errorSpy: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
+
+    it('202 approvalPending when the approve step errors — request stays on record', async () => {
+      approveMock = vi.fn(async () => ({ data: null, error: { message: 'Invalid API key' } }));
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(202);
+      const json = await res.json();
+      expect(json.ok).toBe(true);
+      expect(json.approvalPending).toBe(true);
+      // Never a naked 500, and the failure must be LOUD on the server.
+      expect(errorSpy).toHaveBeenCalled();
+      // Partial chain stops: no promotion, no emails.
+      expect(adminSelectMock).not.toHaveBeenCalled();
+      expect(sendEmailMock).not.toHaveBeenCalled();
+    });
+
+    it('202 approvalPending when approval matched no pending row and no approved twin exists', async () => {
+      approveMock = vi.fn(async () => ({ data: [], error: null }));
+      twinRows = [];
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(202);
+      const json = await res.json();
+      expect(json.approvalPending).toBe(true);
+      expect(errorSpy).toHaveBeenCalled();
+      expect(adminSelectMock).not.toHaveBeenCalled();
+    });
+
+    it('200 (not 202) when the racing twin already approved the row', async () => {
+      approveMock = vi.fn(async () => ({ data: [], error: null }));
+      twinRows = [{ id: 'req-twin' }];
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.ok).toBe(true);
+      expect(json.approvalPending).toBeUndefined();
+    });
+
+    it('202 approvalPending when profile promotion errors after the row approved', async () => {
+      adminSelectMock = vi.fn(async () => ({ data: null, error: { message: 'profiles rls' } }));
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(202);
+      const json = await res.json();
+      expect(json.approvalPending).toBe(true);
+      expect(errorSpy).toHaveBeenCalled();
+      expect(sendEmailMock).not.toHaveBeenCalled();
+    });
+
+    it('202 approvalPending when promotion matched no profile row', async () => {
+      adminSelectMock = vi.fn(async () => ({ data: [], error: null }));
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(202);
+      const json = await res.json();
+      expect(json.approvalPending).toBe(true);
+      expect(errorSpy).toHaveBeenCalled();
+    });
+
+    it('202 approvalPending when the admin client is not configured', async () => {
+      adminAvailable = false;
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(202);
+      const json = await res.json();
+      expect(json.approvalPending).toBe(true);
+      expect(errorSpy).toHaveBeenCalled();
+    });
+
+    it('500 when the INSERT itself fails — nothing committed, so a real error is truthful', async () => {
+      insertMock = vi.fn(async () => ({ data: null, error: { message: 'db down' } }));
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(500);
+      const json = await res.json();
+      expect(json.ok).toBe(false);
+      expect(approveMock).not.toHaveBeenCalled();
     });
   });
 });

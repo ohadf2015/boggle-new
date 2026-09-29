@@ -52,6 +52,10 @@ export function AccessRequestForm({
   const inFlight = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  // The request row committed but instant approval is still finishing
+  // server-side (202 approvalPending). Distinct from success: no /teacher
+  // redirect — the account isn't promoted yet, so pushing would bounce.
+  const [approvalPending, setApprovalPending] = useState(false);
 
   // Access is granted the moment the POST succeeds — show the success beat
   // briefly, then send the new teacher straight to their dashboard. The
@@ -106,6 +110,11 @@ export function AccessRequestForm({
         setError(res.status === 429 ? t('education.access.rate_limited') : t('education.access.submit_error'));
         return;
       }
+      const json = await res.json().catch(() => null);
+      if (json?.approvalPending) {
+        setApprovalPending(true);
+        return;
+      }
       setSuccess(true);
     } catch {
       setError(t('education.access.submit_error'));
@@ -114,6 +123,30 @@ export function AccessRequestForm({
       setSubmitting(false);
     }
   };
+
+  if (approvalPending) {
+    return (
+      <m.div
+        role="status"
+        initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+        className="rounded-neo border-neo-thick bg-neo-cyan p-6 text-center text-neo-navy shadow-hard"
+      >
+        <span className="mb-3 block text-5xl" aria-hidden="true">📬</span>
+        <h3 className="text-2xl font-bold font-neo-display">{t('education.access.approval_pending_title')}</h3>
+        <p className="mt-2 text-neo-navy/85">{t('education.access.approval_pending_body')}</p>
+        <p className="mt-3 text-sm text-neo-navy/75">{t('education.access.approval_pending_retry')}</p>
+        <button
+          type="button"
+          onClick={() => setApprovalPending(false)}
+          className="mt-4 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-2 text-sm font-bold text-neo-white font-neo-display shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard active:shadow-hard-pressed"
+        >
+          {t('education.access.approval_pending_back')}
+        </button>
+      </m.div>
+    );
+  }
 
   if (success) {
     return (
