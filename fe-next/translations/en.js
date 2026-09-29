@@ -13701,6 +13701,22 @@ const en = {
         "cta": "Host whole-class free vocab with a clear 50-seat free limit"
       }
     },
+    "vsWooclap": {
+      "starter5": {
+        "eyebrow": "Free-tier caps — honesty foil",
+        "title": "Wooclap Starter: 5 active questions / 30d. LexiClash: free classroom play without an active-question meter.",
+        "lede": "Wooclap Help (June 2, 2026) publishes Starter free up to 5 active questions; more than 5 active in 30 days prompts an upgrade. Active = 3+ responses from unique participants. The education pricing page lists 5 questions per month and Unlimited participants (up to 1000 on all plans). LexiClash free classroom vocab has no active-question meter — question-quota honesty, not a participant-cap fight.",
+        "wooTitle": "Wooclap Starter — published caps",
+        "wooBody": "Help: up to 5 active questions; >5 active in 30 days → upgrade. Active = 3+ unique-participant responses. Pricing: 5 questions per month; Unlimited participants; up to 1000 participants all plans.",
+        "lexiTitle": "LexiClash — free classroom, no active-question meter",
+        "lexiBody": "Free classroom vocab play without a 5-active / 30-day question quota. Question-quota honesty foil — not a participant-cap fight.",
+        "citePrefix": "Wooclap:",
+        "citeHelpLabel": "Help — pricing (5 active / 30d)",
+        "citePlansLabel": "pricing-education (5 questions/month)",
+        "citeSuffix": " — Starter: 5 active questions / 30 days; active = 3+ unique responses; up to 1000 participants.",
+        "cta": "Host free classroom vocab without an active-question meter"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Free-tier caps — honesty foil",

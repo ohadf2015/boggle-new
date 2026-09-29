@@ -15103,6 +15103,22 @@ const es = {
         "cta": "Organiza vocabulario gratis para toda la clase con un límite claro de 50 asientos"
       }
     },
+    "vsWooclap": {
+      "starter5": {
+        "eyebrow": "Límites del plan gratis — honesty foil",
+        "title": "Wooclap Starter: 5 preguntas activas / 30d. LexiClash: clase gratis sin medidor de preguntas activas.",
+        "lede": "La ayuda de Wooclap (2 jun 2026) publica Starter gratis hasta 5 preguntas activas; más de 5 activas en 30 días pide upgrade. Activa = 3+ respuestas de participantes únicos. La página de precios lista 5 questions per month y Unlimited participants (hasta 1000). LexiClash gratis no tiene medidor de preguntas activas.",
+        "wooTitle": "Wooclap Starter (gratis) — límites publicados",
+        "wooBody": "Help: hasta 5 preguntas activas; >5 activas en 30 días → upgrade. Activa = 3+ respuestas de participantes únicos. Pricing: 5 questions per month; Unlimited participants; hasta 1000.",
+        "lexiTitle": "LexiClash — clase gratis sin medidor de preguntas activas",
+        "lexiBody": "Vocabulario de clase gratis sin cuota de 5 preguntas activas / 30 días. Honesty de cuota de preguntas — no pelea de tope de participantes.",
+        "citePrefix": "Wooclap:",
+        "citeHelpLabel": "Help — pricing (5 activas / 30d)",
+        "citePlansLabel": "pricing-education (5 questions/month)",
+        "citeSuffix": " — Starter: 5 preguntas activas / 30 días; activa = 3+ respuestas únicas; hasta 1000 participantes.",
+        "cta": "Organiza vocabulario gratis en clase sin un medidor de preguntas activas"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Límites del plan gratis — honesty foil",
