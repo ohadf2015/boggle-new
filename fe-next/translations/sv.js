@@ -15432,6 +15432,23 @@ const sv = {
         "cta": "Håll gratis ordlek för hela klassen med en tydlig 50-platsgräns"
       }
     },
+    "vsClassPoint": {
+      "basicFree": {
+        "eyebrow": "Gratisgränser — ärlighetsfoil",
+        "title": "ClassPoint Basic Free: max 25 / 5 frågor per PPT. LexiClash: hela klassen gratis (50) + miss→Live.",
+        "lede": "ClassPoint publicerar Basic Free: max 25, 5 frågor per PPT, 5 typer, 3 Draggable, 3 sparade klasser. Skilt från Socrative Free 5/1/50. LexiClash free täcker upp till 50 per klass + miss→Live.",
+        "cpTitle": "ClassPoint Basic Free — publicerade gränser",
+        "cpBody": "Pricing Basic Free: Max 25 · 5 Questions/PPT · 5 types · 3 Draggable · 3 saved classes.",
+        "lexiTitle": "LexiClash — hela klassen gratis + miss→Live",
+        "lexiBody": "Free: upp till 50 elever per klass + miss-gap → reteach Live. Inget Max-25 / 5 frågor per PPT-tak.",
+        "citePrefix": "ClassPoint:",
+        "citePlansLabel": "classpoint.io/pricing (Basic Free: 25 / 5 Q)",
+        "citeSchoolsLabel": "Schools & districts (Premium contrast)",
+        "citeSuffix": " — Basic Free: Max 25 · 5 Questions per PPT.",
+        "cta": "Håll gratis ordlek för hela klassen med en tydlig 50-platsgräns"
+      }
+    },
+
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Gratisnivåns tak — honesty foil",
