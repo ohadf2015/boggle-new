@@ -126,7 +126,7 @@ const LANDING_PREFIXES: ReadonlyArray<string> = [
     // Competitor comparison landings
     '/lexiclash-vs-apalabrados', '/lexiclash-vs-cabanagrams', '/lexiclash-vs-kahoot',
     '/lexiclash-vs-popple', '/lexiclash-vs-puzzly-words', '/lexiclash-vs-quizlet',
-    '/lexiclash-vs-blooket', '/lexiclash-vs-nearpod', '/lexiclash-vs-mentimeter', '/lexiclash-vs-wooclap', '/lexiclash-vs-flocabulary',
+    '/lexiclash-vs-blooket', '/lexiclash-vs-nearpod', '/lexiclash-vs-mentimeter', '/lexiclash-vs-wooclap', '/lexiclash-vs-wayground', '/lexiclash-vs-gimkit', '/lexiclash-vs-flocabulary',
     '/lexiclash-vs-vocabularyspellingcity', '/lexiclash-vs-freerice',
     '/lexiclash-contra-wordle', '/lexiclash-neged-wordle',
 ];

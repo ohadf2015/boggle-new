@@ -1,12 +1,15 @@
 /**
  * Education honesty strip (marketing foil, not a product feature):
- * Wayground (Quizizz) Starter plan — 20 activity library limit
- * vs LexiClash classroom reteach / Live (no 20-resource library ceiling).
+ * Wayground (Quizizz) Basic / Starter — 20 max activity storage
+ * vs LexiClash free classroom vocab (no 20-resource library ceiling).
  *
- * Evidence: https://help.wayground.com/support/solutions/articles/158000404038-wayground-starter-basic-plan
- * Updated 12 May 2026 — “20 activity limit: Store up to 20 resources”
+ * Evidence:
+ * - https://wayground.com/home/plans — Basic: “Unlimited activity storage → 20 max”
+ * - https://help.wayground.com/support/solutions/articles/158000404038-wayground-starter-basic-plan
+ *   Updated 12 May 2026 — “20 activity limit: Store up to 20 resources”
  *
- * Distinct from Kahoot Go Free 40vs10 FAQ #1132 and Blooket Gaps #1125.
+ * Distinct from Mentimeter Free 50 (#1183), Wooclap Starter 5 (#1186),
+ * Nearpod Silver (#1169), Blooket (#1166), Gimkit Pro-Exclusive (#1137).
  */
 'use client';
 
@@ -14,8 +17,9 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
-const EVIDENCE_URL =
+const HELP_URL =
   'https://help.wayground.com/support/solutions/articles/158000404038-wayground-starter-basic-plan';
+const PLANS_URL = 'https://wayground.com/home/plans';
 
 export interface WaygroundStarterLimitHonestyStripProps {
   locale?: string;
@@ -79,13 +83,23 @@ export function WaygroundStarterLimitHonestyStrip({
       <p className="mt-4 text-xs text-neo-gray-300">
         {t('education.vsWayground.starterLimit.citePrefix')}{' '}
         <a
-          href={EVIDENCE_URL}
+          href={PLANS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
+          data-testid="wayground-starter-plans-link"
+        >
+          {t('education.vsWayground.starterLimit.citePlansLabel')}
+        </a>
+        {' · '}
+        <a
+          href={HELP_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="underline decoration-neo-cyan/60 underline-offset-2 hover:text-neo-cyan"
           data-testid="wayground-starter-limit-evidence-link"
         >
-          {t('education.vsWayground.starterLimit.citeLabel')}
+          {t('education.vsWayground.starterLimit.citeHelpLabel')}
         </a>
         {t('education.vsWayground.starterLimit.citeSuffix')}
       </p>
@@ -103,4 +117,5 @@ export function WaygroundStarterLimitHonestyStrip({
   );
 }
 
-export const WAYGROUND_STARTER_LIMIT_EVIDENCE_URL = EVIDENCE_URL;
+export const WAYGROUND_STARTER_LIMIT_EVIDENCE_URL = HELP_URL;
+export const WAYGROUND_PLANS_URL = PLANS_URL;

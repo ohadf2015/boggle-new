@@ -1,6 +1,6 @@
 /**
- * Marketing honesty foil: Wayground Starter 20-activity library limit vs LexiClash reteach Live.
- * Distinct from Kahoot Go #1132 and Blooket Gaps #1125.
+ * Marketing honesty foil: Wayground Basic 20 max activity storage vs LexiClash free classroom vocab.
+ * Distinct from Mentimeter #1183, Wooclap #1186, Nearpod #1169, Blooket #1166, Gimkit #1137.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -8,25 +8,29 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   WaygroundStarterLimitHonestyStrip,
   WAYGROUND_STARTER_LIMIT_EVIDENCE_URL,
+  WAYGROUND_PLANS_URL,
 } from '../WaygroundStarterLimitHonestyStrip';
 
 const translations: Record<string, string> = {
   'education.vsWayground.starterLimit.eyebrow': 'Free-tier library — honesty foil',
   'education.vsWayground.starterLimit.title':
-    'Wayground Starter: 20 activity library limit. LexiClash: reteach Live, no 20-resource ceiling.',
+    'Wayground Basic: 20 max activity storage. LexiClash: free classroom vocab, no 20-resource ceiling.',
   'education.vsWayground.starterLimit.lede':
-    'Wayground (Quizizz) Starter help — Updated 12 May 2026 — lists “20 activity limit: Store up to 20 resources.” LexiClash classroom reteach / Live deep-links miss gaps without a 20-resource library cap.',
-  'education.vsWayground.starterLimit.waygroundTitle': 'Wayground Starter — 20 activity limit',
+    'Wayground plans list “20 max” activity storage; Starter help (Updated 12 May 2026) says “Store up to 20 resources.” LexiClash free classroom vocab has no 20-resource library cap.',
+  'education.vsWayground.starterLimit.waygroundTitle': 'Wayground Basic — 20 max',
   'education.vsWayground.starterLimit.waygroundBody':
-    'Starter (Basic) plan: Store up to 20 resources on your account. Hit 20 and you archive or upgrade before creating more — even when the class still needs reteach sets.',
-  'education.vsWayground.starterLimit.lexiTitle': 'LexiClash — classroom reteach / Live',
+    'Basic / Starter: Unlimited activity storage → 20 max. Hit 20 and you archive or upgrade before creating more — even when the class still needs reteach sets.',
+  'education.vsWayground.starterLimit.lexiTitle': 'LexiClash — free classroom vocab',
   'education.vsWayground.starterLimit.lexiBody':
     'Miss gaps become a reteach Live deep-link — no 20-activity library ceiling on the free classroom loop.',
-  'education.vsWayground.starterLimit.citePrefix': 'Wayground Starter plan:',
-  'education.vsWayground.starterLimit.citeLabel': 'help.wayground.com Starter (Updated 12 May 2026)',
+  'education.vsWayground.starterLimit.citePrefix': 'Evidence:',
+  'education.vsWayground.starterLimit.citePlansLabel': 'wayground.com/home/plans (“20 max”)',
+  'education.vsWayground.starterLimit.citeHelpLabel':
+    'help.wayground.com Starter (Updated 12 May 2026)',
   'education.vsWayground.starterLimit.citeSuffix':
     ' — “20 activity limit: Store up to 20 resources”.',
-  'education.vsWayground.starterLimit.cta': 'Launch classroom reteach Live without a 20-resource cap',
+  'education.vsWayground.starterLimit.cta':
+    'Launch free classroom vocab without a 20-resource cap',
 };
 
 vi.mock('next/link', () => ({
@@ -46,26 +50,32 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 describe('WaygroundStarterLimitHonestyStrip', () => {
-  it('foils Wayground Starter 20-activity limit against LexiClash reteach Live', () => {
+  it('foils Wayground Basic 20 max against LexiClash free classroom vocab', () => {
     render(<WaygroundStarterLimitHonestyStrip locale="en" />);
 
     const strip = screen.getByTestId('wayground-starter-limit-honesty-strip');
     expect(strip).toBeInTheDocument();
     expect(strip.textContent).toMatch(/20/);
-    expect(strip.textContent).toMatch(/activity|resources/i);
+    expect(strip.textContent).toMatch(/activity|resources|max/i);
     expect(strip.textContent).toMatch(/Wayground|Quizizz/i);
-    expect(strip.textContent).toMatch(/reteach|Live/i);
+    expect(strip.textContent).toMatch(/classroom|reteach|Live|vocab/i);
 
     expect(screen.getByTestId('wayground-starter-limit-card').textContent).toMatch(/20/);
-    expect(screen.getByTestId('lexiclash-reteach-live-card').textContent).toMatch(/Live|reteach/i);
+    expect(screen.getByTestId('lexiclash-reteach-live-card').textContent).toMatch(
+      /Live|reteach|classroom|vocab/i,
+    );
   });
 
-  it('cites the Wayground Starter plan evidence URL', () => {
+  it('cites plans 20 max and Starter help evidence URLs', () => {
     render(<WaygroundStarterLimitHonestyStrip locale="en" />);
-    const link = screen.getByTestId('wayground-starter-limit-evidence-link');
-    expect(link).toHaveAttribute('href', WAYGROUND_STARTER_LIMIT_EVIDENCE_URL);
+    const help = screen.getByTestId('wayground-starter-limit-evidence-link');
+    expect(help).toHaveAttribute('href', WAYGROUND_STARTER_LIMIT_EVIDENCE_URL);
     expect(WAYGROUND_STARTER_LIMIT_EVIDENCE_URL).toContain('help.wayground.com');
     expect(WAYGROUND_STARTER_LIMIT_EVIDENCE_URL).toContain('158000404038');
+
+    const plans = screen.getByTestId('wayground-starter-plans-link');
+    expect(plans).toHaveAttribute('href', WAYGROUND_PLANS_URL);
+    expect(WAYGROUND_PLANS_URL).toContain('wayground.com/home/plans');
   });
 
   it('CTAs into classroom-game for the locale', () => {
