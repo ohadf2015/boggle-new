@@ -15055,16 +15055,16 @@ const he = {
     "vsClassPoint": {
       "basicFree": {
         "eyebrow": "מגבלות חינם — כנות",
-        "title": "ClassPoint Basic Free: מקסימום 25 / 5 שאלות ל-PPT. LexiClash: כיתה שלמה בחינם (50) + miss→Live.",
-        "lede": "ClassPoint מפרסם Basic Free: מקס 25, 5 שאלות ל-PPT, 5 סוגי שאלות, 3 Draggable, 3 כיתות שמורות. שונה מ-Socrative Free 5/1/50. LexiClash חינם עד 50 בכיתה + miss→Live.",
+        "title": "ClassPoint Basic Free: Max-25-class-size / 5 שאלות ל-PPT. LexiClash: כיתה שלמה בחינם (50) + miss→Live.",
+        "lede": "ClassPoint מפרסם Basic Free: Max-25-class-size, 5 שאלות ל-PPT, 5 סוגי שאלות, 3 Draggable, 3 כיתות שמורות. שונה מ-Socrative Free 5/1/50. LexiClash חינם עד 50 בכיתה + miss→Live.",
         "cpTitle": "ClassPoint Basic Free — מגבלות מפורסמות",
-        "cpBody": "Pricing Basic Free: Max 25 · 5 Questions/PPT · 5 types · 3 Draggable · 3 saved classes.",
+        "cpBody": "Pricing Basic Free: Max-25-class-size · 5 Questions/PPT · 5 types · 3 Draggable · 3 saved classes.",
         "lexiTitle": "LexiClash — כיתה שלמה בחינם + miss→Live",
         "lexiBody": "חינם: עד 50 תלמידים בכיתה + miss-gap → reteach Live. בלי תקרת Max-25 / 5 שאלות ל-PPT.",
         "citePrefix": "ClassPoint:",
         "citePlansLabel": "classpoint.io/pricing (Basic Free: 25 / 5 Q)",
         "citeSchoolsLabel": "Schools & districts (Premium contrast)",
-        "citeSuffix": " — Basic Free: Max 25 · 5 Questions per PPT.",
+        "citeSuffix": " — Basic Free: Max-25-class-size · 5 Questions per PPT.",
         "cta": "ארחו אוצר מילים בכיתה שלמה עם מגבלת 50 מקומות חינם ברורה"
       }
     },

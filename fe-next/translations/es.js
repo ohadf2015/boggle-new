@@ -15149,16 +15149,16 @@ const es = {
     "vsClassPoint": {
       "basicFree": {
         "eyebrow": "Límites del plan gratis — foil de honestidad",
-        "title": "ClassPoint Basic Free: máximo 25 / 5 preguntas por PPT. LexiClash: clase completa gratis (50) + miss→reteach Live.",
-        "lede": "ClassPoint publica Basic Free: máximo 25, 5 preguntas por PPT, 5 tipos, 3 objetos arrastrables, 3 clases guardadas. Distinto de Socrative Free 5/1/50. LexiClash free cubre hasta 50 por clase con miss-gap → reteach Live.",
+        "title": "ClassPoint Basic Free: Max-25-class-size / 5 preguntas por PPT. LexiClash: clase completa gratis (50) + miss→reteach Live.",
+        "lede": "ClassPoint publica Basic Free: Max-25-class-size, 5 preguntas por PPT, 5 tipos, 3 objetos arrastrables, 3 clases guardadas. Distinto de Socrative Free 5/1/50. LexiClash free cubre hasta 50 por clase con miss-gap → reteach Live.",
         "cpTitle": "ClassPoint Basic Free — límites publicados",
-        "cpBody": "Pricing Basic Free: Max 25 · 5 Questions/PPT · 5 tipos · 3 Draggable · 3 saved classes.",
+        "cpBody": "Pricing Basic Free: Max-25-class-size · 5 Questions/PPT · 5 tipos · 3 Draggable · 3 saved classes.",
         "lexiTitle": "LexiClash — clase completa gratis + miss→Live",
         "lexiBody": "Plan free: hasta 50 estudiantes por clase + miss-gap → reteach Live. Sin techo Max-25 / 5 preguntas por PPT.",
         "citePrefix": "ClassPoint:",
         "citePlansLabel": "classpoint.io/pricing (Basic Free: 25 / 5 Q)",
         "citeSchoolsLabel": "Schools & districts (Premium contrast)",
-        "citeSuffix": " — Basic Free: Max 25 · 5 Questions per PPT.",
+        "citeSuffix": " — Basic Free: Max-25-class-size · 5 Questions per PPT.",
         "cta": "Organiza vocabulario gratis para toda la clase con un límite claro de 50 plazas"
       }
     },

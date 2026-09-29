@@ -15200,16 +15200,16 @@ const ja = {
     "vsClassPoint": {
       "basicFree": {
         "eyebrow": "無料枠の上限 — 正直フォイル",
-        "title": "ClassPoint Basic Free: 最大25人 / PPTあたり5問。LexiClash: クラス全体無料（50）+ miss→reteach Live。",
-        "lede": "ClassPointの料金は Basic Free: 最大25人・PPTあたり5問・5種の質問・3つのDraggable・保存クラス3。Socrative Free 5/1/50とは別。LexiClash無料はクラス最大50 + miss→Live。",
+        "title": "ClassPoint Basic Free: Max-25-class-size / PPTあたり5問。LexiClash: クラス全体無料（50）+ miss→reteach Live。",
+        "lede": "ClassPointの料金は Basic Free: Max-25-class-size・PPTあたり5問・5種の質問・3つのDraggable・保存クラス3。Socrative Free 5/1/50とは別。LexiClash無料はクラス最大50 + miss→Live。",
         "cpTitle": "ClassPoint Basic Free — 公開上限",
-        "cpBody": "Pricing Basic Free: Max 25 · 5 Questions/PPT · 5 types · 3 Draggable · 3 saved classes。",
+        "cpBody": "Pricing Basic Free: Max-25-class-size · 5 Questions/PPT · 5 types · 3 Draggable · 3 saved classes。",
         "lexiTitle": "LexiClash — クラス全体無料 + miss→Live",
         "lexiBody": "無料: クラス最大50人の語彙ゲーム + miss-gap → reteach Live。Max-25 / 5問/PPT上限なし。",
         "citePrefix": "ClassPoint:",
         "citePlansLabel": "classpoint.io/pricing (Basic Free: 25 / 5 Q)",
         "citeSchoolsLabel": "Schools & districts (Premium contrast)",
-        "citeSuffix": " — Basic Free: Max 25 · 5 Questions per PPT。",
+        "citeSuffix": " — Basic Free: Max-25-class-size · 5 Questions per PPT。",
         "cta": "明確な50席の無料枠でクラス全体の語彙ゲームをホスト"
       }
     },
