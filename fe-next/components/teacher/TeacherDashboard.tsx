@@ -58,12 +58,12 @@ export interface TeacherDashboardProps {
   /**
    * The trial / Pro strip, when the route client has one to show. A slot, not
    * a sibling: next to an `h-dvh` root it grew the page past the viewport.
-   * Milestone Pro ask lives behind the "Go Pro" dock chip. Polar trial /
-   * expired-trial banners pin to the deck (`pinBanner`) so conversion is not
-   * one extra tap behind a chip.
+   * Milestone Pro ask lives behind the "Go Pro" dock chip. Polar trial
+   * start, countdown, and expired-trial banners pin to the deck
+   * (`pinBanner`) so conversion is not one extra tap behind a chip.
    */
   banner?: ReactNode;
-  /** Polar trial countdown / expired-trial: render `banner` on the deck. */
+  /** Polar trial start, countdown, or expired-trial: render `banner` on the deck. */
   pinBanner?: boolean;
   /** The usage-triggered Pro card (10+ students / 3+ assignments). Same chip. */
   usagePrompt?: ReactNode;

@@ -26,8 +26,19 @@ vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div /> }));
 // `h-dvh` root it made the page taller than the viewport. The mock has to render
 // what it is handed, or these assertions would pass on a dropped banner.
 vi.mock('@/components/teacher/TeacherDashboard', () => ({
-  default: ({ banner, usagePrompt }: { banner?: React.ReactNode; usagePrompt?: React.ReactNode }) => (
-    <div data-testid="teacher-dashboard">{banner}{usagePrompt}</div>
+  default: ({
+    banner,
+    usagePrompt,
+    pinBanner,
+  }: {
+    banner?: React.ReactNode;
+    usagePrompt?: React.ReactNode;
+    pinBanner?: boolean;
+  }) => (
+    <div data-testid="teacher-dashboard" data-pin-banner={pinBanner ? '1' : '0'}>
+      {banner}
+      {usagePrompt}
+    </div>
   ),
 }));
 vi.mock('@/components/education/TrialUrgencyBanner', () => ({
@@ -138,6 +149,7 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.getByTestId('teacher-pro-ask')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-dashboard')).toHaveAttribute('data-pin-banner', '0');
     expect(screen.getByText(/\$9/)).toBeInTheDocument();
     expect(screen.getByText('teacher.subscription.unlimitedClasses')).toBeInTheDocument();
     expect(screen.getByText('education.landing.pro.analytics')).toBeInTheDocument();
@@ -221,6 +233,7 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.getByTestId('teacher-pro-trial-lifecycle')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-dashboard')).toHaveAttribute('data-pin-banner', '1');
     expect(screen.getByRole('button', { name: 'teacher.subscription.trialLifecycleCta' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'teacher.subscription.trialLifecycleCta' })).toBeNull();
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
@@ -240,6 +253,7 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.getByTestId('teacher-pro-trial-ended')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-dashboard')).toHaveAttribute('data-pin-banner', '1');
     expect(screen.getByRole('button', { name: 'teacher.subscription.trialEndedCta' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'teacher.subscription.trialEndedCta' })).toBeNull();
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
@@ -353,6 +367,7 @@ describe('TeacherPage Polar 14-day trial offer', () => {
   it('shows the Start 14-day free trial banner even before a milestone, not the $9 strip', () => {
     render(<TeacherPage />);
     expect(screen.getByTestId('teacher-pro-trial-offer')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-dashboard')).toHaveAttribute('data-pin-banner', '1');
     expect(screen.getByTestId('teacher-pro-trial-offer-cta')).toHaveTextContent('teacher.subscription.startTrial');
     expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {

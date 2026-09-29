@@ -81,7 +81,10 @@ function TeacherDashboardInner() {
     proAskDismissed: dismissed,
     // Expired Polar Pro trial replaces the access banner and the milestone
     // ask. A live Polar trial is hasPro + the lifecycle banner (days left
-    // and a Keep-Pro CTA that POSTs /api/subscription/checkout). The header chip stays.
+    // and a Keep-Pro CTA that POSTs /api/subscription/checkout). The 14-day
+    // start offer is the same kind of conversion banner: on the deck, not
+    // one extra tap inside the closed Go Pro chip. The milestone $9 ask
+    // stays in that chip.
     polarTrialExpired: polarTrial.showReactivation,
     polarTrialing: polarTrial.showLifecycleBanner,
     polarOfferTrial: polarTrial.offerTrial,
@@ -128,7 +131,7 @@ function TeacherDashboardInner() {
   // again — for precisely the teachers who have a banner to see.
   return (
     <TeacherDashboard
-      pinBanner={banner === 'trialing' || banner === 'reactivate'}
+      pinBanner={banner === 'trialing' || banner === 'reactivate' || banner === 'offerTrial'}
       banner={
         banner === 'trial' && trial ? (
           <TrialUrgencyBanner
