@@ -1,9 +1,10 @@
 /**
- * t_c3fc4a61 — adventure overlays must use named z-index tokens (z-60), never
- * Tailwind arbitrary `z-[60]`. GrowthRadar recorded ~10
- * `querySelector('.z-[60]')` failures: brackets are invalid in unescaped CSS
- * selectors, and session tooling that builds selectors from classList throws
- * on the adventure play surface.
+ * t_a6fb639b / prior t_c3fc4a61 -- adventure overlays must use named z-index
+ * tokens (z-60), never Tailwind arbitrary z-[N]. GrowthRadar querySelector
+ * failures: brackets are invalid in unescaped CSS selectors.
+ *
+ * Expanded after #1117: catch residual arbitrary z-[N] in className strings
+ * AND template literals across adventure/play (not only 60/70).
  */
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
@@ -21,19 +22,22 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-describe('adventure overlay z-index tokens (t_c3fc4a61)', () => {
-  it('does not ship bare z-[60]/z-[70] class strings (invalid as CSS selectors)', () => {
+/** Match z-[digits] even inside template literals / cn() fragments. */
+const ARBITRARY_Z = /z-\[(\d+)\]/g;
+
+describe('adventure overlay z-index tokens (t_a6fb639b)', () => {
+  it('does not ship arbitrary z-[N] class strings (invalid as CSS selectors)', () => {
     const offenders: string[] = [];
     for (const file of walk(ROOT)) {
       const src = fs.readFileSync(file, 'utf8');
-      for (const m of src.matchAll(/['"`][^'"`]*z-\[(60|70)\][^'"`]*['"`]/g)) {
+      for (const m of src.matchAll(ARBITRARY_Z)) {
         offenders.push(`${path.relative(ROOT, file)}: ${m[0]}`);
       }
     }
     expect(offenders).toEqual([]);
   });
 
-  it('named z-60 token is querySelector-safe; arbitrary z-[60] needs escaping', () => {
+  it('named z-60 token is querySelector-safe; bare .z-[60] is not CSSOM-safe', () => {
     expect(() => document.querySelector('.z-\\[60\\]')).not.toThrow();
     expect(() => document.querySelector('.z-60')).not.toThrow();
     const invalid = '.z-[60]';
@@ -44,9 +48,8 @@ describe('adventure overlay z-index tokens (t_c3fc4a61)', () => {
     } catch {
       cssomRejected = true;
     }
-    if (typeof CSSStyleSheet !== 'undefined') {
-      expect(cssomRejected || invalid.includes('[')).toBe(true);
-    }
+    expect(cssomRejected || invalid.includes('[')).toBe(true);
     expect(invalid).toContain('[');
   });
+
 });

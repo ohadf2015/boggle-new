@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 /**
  * Adventure level screen — the classic board (GridComponent) wearing the
  * world's tile skin, over the world backdrop, with a star meter or boss fight.
@@ -33,11 +35,9 @@ import { foeScore } from './foeScore';
 import RunStatusOverlay from './RunStatusOverlay';
 import LevelTopBar from './LevelTopBar';
 import { resultHeld, FINALE_HOLD_MAX_MS } from './finaleHold';
-import DeedStamp, { type DeedEvent } from './deed/DeedStamp';
 import { deedTier, DEED_DROPS_PER_LEVEL } from './deed/deedTier';
 import { castTiming } from './fx/castPath';
 import { hitTier } from './fx/hitTier';
-import DraftOverlay from './DraftOverlay';
 import RunMapScreen from '../map/RunMapScreen';
 import { readCleared, recordCleared, clearClearedNodes, isFreshRun } from '../map/clearedNodes';
 import NodeScreen from './nodes/NodeScreen';
@@ -48,6 +48,10 @@ import BoardLayer from './variants/BoardLayer';
 import { runFloor } from './runFloor';
 import { isCombatKind } from '@/lib/adventure/play/levels';
 import { cn } from '@/lib/utils';
+
+import type { DeedEvent } from './deed/DeedStamp';
+const DraftOverlay = dynamic(() => import('./DraftOverlay'), { ssr: false });
+const DeedStamp = dynamic(() => import('./deed/DeedStamp'), { ssr: false });
 
 export const worldBackdrop = (world: number) => `/images/adventure/play/world-${world}.webp`;
 

@@ -114,7 +114,7 @@ export default function RelicFireCallout({ fired, fireKey, host, chipAt, onDone 
   const rest = over ? fired.slice(MAX_ROWS - 1) : [];
 
   const layer = (
-    <div className="pointer-events-none fixed inset-0 z-[115]" aria-hidden data-testid="relic-fire-layer">
+    <div className="pointer-events-none fixed inset-0 z-115" aria-hidden data-testid="relic-fire-layer">
       {/* The connecting trails: a lime beam from each firing chip down into the
           panel. This is the attribution — without it the panel is just another
           number floating near the top of the screen. */}

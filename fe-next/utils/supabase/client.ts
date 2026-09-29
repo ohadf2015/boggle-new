@@ -3,18 +3,52 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 let _client: SupabaseClient | null = null;
 
+/**
+ * Auth lock that NEVER uses `{ steal: true }`.
+ * Supabase's default lock steals after acquireTimeout, which surfaces as
+ * GrowthRadar lock-steal / "Lock broken by another request with the steal
+ * option" on adventure (and other) surfaces (t_a6fb639b). We wait up to the
+ * timeout, then run the critical section without stealing so concurrent
+ * getSession/getUser callers serialize or fall through quietly.
+ */
 async function quietLock<R>(name: string, acquireTimeout: number, fn: () => Promise<R>): Promise<R> {
   if (typeof navigator === 'undefined' || !navigator.locks?.request) {
     return await fn();
   }
+  // acquireTimeout === 0 -> non-blocking probe (supabase init path).
+  if (acquireTimeout === 0) {
+    try {
+      return await navigator.locks.request(
+        name,
+        { mode: 'exclusive', ifAvailable: true },
+        async (lock) => {
+          if (!lock) return await fn();
+          return await fn();
+        },
+      );
+    } catch {
+      return await fn();
+    }
+  }
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer =
+    controller && acquireTimeout > 0
+      ? setTimeout(() => controller.abort(), acquireTimeout)
+      : undefined;
   try {
     return await navigator.locks.request(
       name,
-      { mode: 'exclusive', ifAvailable: acquireTimeout === 0 },
+      {
+        mode: 'exclusive',
+        ...(controller ? { signal: controller.signal } : {}),
+      },
       async () => await fn(),
     );
   } catch {
+    // Timed out / aborted -- run without stealing the held lock.
     return await fn();
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 

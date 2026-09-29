@@ -28,7 +28,7 @@ export default function RivalAttack({ combat, feed }: { combat: CombatState; fee
     <>
       <AttackFlight combat={combat} status={juice.status} />
       {mounted && createPortal(
-        <div className="pointer-events-none fixed inset-0 z-[57]" aria-hidden>
+        <div className="pointer-events-none fixed inset-0 z-57" aria-hidden>
           <AnimatePresence>
             {juice.hurtPulse > 0 && (
               <motion.div key={`hurt-${juice.hurtPulse}`} className="absolute inset-0"
