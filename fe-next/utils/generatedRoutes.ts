@@ -144,6 +144,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/lexiclash-vs-blooket",
   "/lexiclash-vs-nearpod",
   "/lexiclash-vs-mentimeter",
+  "/lexiclash-vs-wooclap",
   "/lexiclash-vs-cabanagrams",
   "/lexiclash-vs-flocabulary",
   "/lexiclash-vs-freerice",

@@ -15389,6 +15389,22 @@ const sv = {
         "cta": "Hosta gratis ordförråd för hela klassen med ett tydligt 50-plats gratisgräns"
       }
     },
+    "vsWooclap": {
+      "starter5": {
+        "eyebrow": "Gratisnivåns tak — honesty foil",
+        "title": "Wooclap Starter: 5 aktiva frågor / 30d. LexiClash: gratis klassrum utan aktivfrågemätare.",
+        "lede": "Wooclaps hjälp (2 juni 2026) publicerar Starter gratis upp till 5 aktiva frågor; fler än 5 aktiva på 30 dagar → uppgradering. Aktiv = 3+ svar från unika deltagare. Prissidan listar 5 questions per month och Unlimited participants (upp till 1000). LexiClash gratis har ingen aktivfrågemätare.",
+        "wooTitle": "Wooclap Starter (gratis) — publicerade tak",
+        "wooBody": "Help: upp till 5 aktiva frågor; >5 aktiva på 30 dagar → uppgradering. Aktiv = 3+ svar från unika deltagare. Pricing: 5 questions per month; Unlimited participants; upp till 1000.",
+        "lexiTitle": "LexiClash — gratis klassrum utan aktivfrågemätare",
+        "lexiBody": "Gratis ordförråd för klassen utan kvot på 5 aktiva / 30 dagar. Frågekvots-honesty — inte deltagartaksbråk.",
+        "citePrefix": "Wooclap:",
+        "citeHelpLabel": "Help — pricing (5 aktiva / 30d)",
+        "citePlansLabel": "pricing-education (5 questions/month)",
+        "citeSuffix": " — Starter: 5 aktiva frågor / 30 dagar; aktiv = 3+ unika svar; upp till 1000 deltagare.",
+        "cta": "Hosta gratis ordförråd för klassen utan en aktivfrågemätare"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Gratisnivåns tak — honesty foil",
