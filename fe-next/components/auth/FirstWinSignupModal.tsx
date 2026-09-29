@@ -120,6 +120,12 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, useSheet, isOnCrazyGamesPlatform, onClose]);
 
+  // Clear framer transform after settle so GSI anti-clickjacking allows clicks (t_375bffc3).
+  const [motionSettled, setMotionSettled] = useState(false);
+  useEffect(() => {
+    if (!isOpen) setMotionSettled(false);
+  }, [isOpen]);
+
   if (isOnCrazyGamesPlatform) return null;
 
   const statsBlock =
@@ -167,12 +173,6 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
       {error && <AuthErrorMessage message={error} className="mt-3" />}
     </>
   );
-
-  // Clear framer transform after settle so GSI anti-clickjacking allows clicks (t_375bffc3).
-  const [motionSettled, setMotionSettled] = useState(false);
-  useEffect(() => {
-    if (!isOpen) setMotionSettled(false);
-  }, [isOpen]);
 
   // ── Soft sheet (default / treatment) — non-blocking, value before auth ──
   // Portal to body at z-[120]: PracticeResults / SP sticky CTAs are also
