@@ -29,6 +29,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Ensure supabase/ exists for the runner COPY even if the build context
+# omitted it (CLI uploads / dockerignore edge cases). Empty dir is fine:
+# docker-entrypoint only runs migrations when explicitly invoked.
+RUN mkdir -p /app/supabase
+
 # Run the postinstall work here (deps installed with --ignore-scripts): apply
 # patch-package patches to the build-time node_modules and generate the gitignored
 # public/sql/sql-wasm.wasm so it flows into the runner image (line: COPY public).
