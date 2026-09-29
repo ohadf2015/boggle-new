@@ -13324,6 +13324,10 @@ const sv = {
         "title": "Framstegsrapporter är en Pro-funktion",
         "body": "Se hur varje elev klarar sig i alla dina klasser och spel: inlärda ord, nivåer, XP och utskrivbara PDF:er till utvecklingssamtal. Uppgradera till Teacher Pro för att låsa upp klass- och elevrapporter."
       },
+      "pressureDials": {
+        "title": "Lugnt läge för ängsliga elever",
+        "body": "Pro ger dig tryckreglagen: dölj topplistan till slutet, mjuka upp eller stäng av timern och poängsätt noggrannhet i stället för tempo. Samma spel kan köras som en uppumpad gameshow eller en lugn kunskapskontroll."
+      },
       "cta": "Lås upp med Pro — {{price}}/månad"
     },
     "digest": {
@@ -13444,6 +13448,7 @@ const sv = {
       "featureOutcome2": "Lägg till alla klasser du undervisar, inte bara de tre första",
       "featureOutcome3": "Se vem som fastnar, ord för ord, i realtid",
       "featureOutcome4": "Jämför framsteg över alla dina klasser",
+      "featureOutcome5": "Lugnt läge för ängsliga elever — timer, topplista och tempopoäng är dina att skruva på",
       "priceTaxNote": "Moms kan tillkomma i kassan.",
       "proHeroAlt": "En lärare tittar på klassens live-topplista på tavlan medan eleverna spelar från sina platser.",
       "valueHeadline": "Bäst för daglig repetition och exit tickets. Kolla hela klassen på en runda.",
@@ -13893,6 +13898,35 @@ const sv = {
       "failedToSaveLesson": "Kunde inte spara lektionen"
     },
     "reports": {
+      "arc": {
+        "title": "Inlärningsbåge",
+        "subtitle": "Varje elev, över alla sessioner",
+        "studentSubtitle": "{{name}}, över alla sessioner",
+        "unknownStudent": "Elev",
+        "noEvidenceClass": "Spela en lektionsomgång med klassen så landar varje elevs båge här.",
+        "noEvidenceStudent": "Inga sessioner ännu",
+        "emptyStudent": "{{name}} har inte haft en session med utfrågade ord än — bågen börjar med nästa omgång.",
+        "wordsClassMisses": "Ord klassen fortsätter missa",
+        "studentsStuck": "{{stuck}} av {{total}} elever",
+        "requeueNote": "Missade ord köas automatiskt om i varje elevs repetition av missade ord.",
+        "assignFollowUp": "Tilldela uppföljningsövning",
+        "assigning": "Tilldelar...",
+        "followUpDone": "Tilldelad — den ligger i deras lektionslista.",
+        "followUpFailed": "Kunde inte tilldela. Försök igen.",
+        "followUpName": "{{classroom}} — ord att lära om ({{date}})",
+        "viewStudent": "Visa {{name}}s båge",
+        "accuracyOverTime": "Träffsäkerhet över tid",
+        "growth": "{{first}}% → {{last}}%",
+        "sparklineLabel": "Träffsäkerhet över {{count}} sessioner, från {{first}}% till {{last}}%",
+        "requeueStudent": "{{name}}s missade ord ligger redan i kö i repetitionen av missade ord.",
+        "attempts": "{{count}} försök",
+        "trend": {
+          "mastered": "Bemästrat",
+          "improving": "På god väg",
+          "stuck": "Behöver en genomgång",
+          "insufficient": "En session hittills"
+        }
+      },
       "title": "Framstegsrapport",
       "studentReport": "Elevrapport",
       "classReport": "Klassrapport",

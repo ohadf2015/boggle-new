@@ -8,14 +8,17 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ChevronRight, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
+import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
+import { resolveDisplayName } from '@/lib/displayName';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
+import { ClassArcPanel } from '@/components/teacher/reports/ClassArcPanel';
+import { StudentArcView } from '@/components/teacher/reports/StudentArcView';
 import { AssignmentProgressReport } from '@/components/teacher/reports/AssignmentProgressReport';
 import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
@@ -53,6 +56,7 @@ function TeacherReportsInner() {
   // Local state so a click switches views without waiting on navigation...
   const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(classroomIdFromUrl);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(studentIdFromUrl);
+  const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
 
   // ...but the URL stays the source of truth: browser Back/Forward change it,
   // and the view used to stay pinned on the old student.
@@ -108,8 +112,9 @@ function TeacherReportsInner() {
   );
 
   const handleStudentClick = useCallback(
-    (studentId: string) => {
+    (studentId: string, name?: string) => {
       setSelectedStudentId(studentId);
+      setSelectedStudentName(name ?? null);
       pushView(selectedClassroomId, studentId);
     },
     [pushView, selectedClassroomId],
@@ -119,6 +124,27 @@ function TeacherReportsInner() {
     setSelectedStudentId(null);
     pushView(selectedClassroomId, null);
   }, [pushView, selectedClassroomId]);
+
+  // A deep link (or browser Back) lands with a studentId but no name — resolve
+  // it from the roster so the arc header and re-queue note greet the student.
+  useEffect(() => {
+    if (!selectedClassroomId || !selectedStudentId || selectedStudentName) return;
+    let cancelled = false;
+    getClassroomStudents(selectedClassroomId).then(({ data }) => {
+      if (cancelled) return;
+      const match = (data ?? []).find((s) => s.student_id === selectedStudentId);
+      if (!match) return;
+      setSelectedStudentName(
+        resolveDisplayName(
+          [match.profiles?.display_name, match.profiles?.username],
+          t('teacher.reports.arc.unknownStudent')
+        )
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedClassroomId, selectedStudentId, selectedStudentName, t]);
 
   const viewKey = selectedStudentId
     ? `student:${selectedStudentId}`
@@ -156,7 +182,7 @@ function TeacherReportsInner() {
     view = (
       <>
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-neo-display text-2xl font-black uppercase leading-none tracking-tight text-neo-white [text-shadow:3px_3px_0_#000] sm:text-4xl">
+          <h1 className="font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">
             {t('teacher.reports.title')}
           </h1>
           <TeacherPlanBadge />
@@ -183,7 +209,7 @@ function TeacherReportsInner() {
                   // The class picker IS the primary action of this screen, and
                   // it read as navy-on-navy with a black edge (~1.2:1 both
                   // ways). Cream edge + a lighter fill puts it back on the page.
-                  className="group flex min-h-20 w-full items-center justify-between gap-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-4 text-start shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0.5 active:shadow-none"
+                  className="group flex min-h-20 w-full items-center justify-between gap-3 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 text-start shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0.5 active:shadow-none"
                 >
                   <span className="min-w-0">
                     <span className="block break-words font-neo-display text-lg font-bold text-neo-white">
@@ -213,25 +239,38 @@ function TeacherReportsInner() {
     );
   } else if (selectedStudentId) {
     view = (
-      <ProGate feature="reports">
-      <>
+      <div className="space-y-8">
         <button
           type="button"
           onClick={handleBackToClass}
-          className="mb-6 inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 py-2 text-neo-white shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none"
+          className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 text-neo-white shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none"
           aria-label={t('teacher.reports.backToClass')}
         >
           <DirectionalIcon icon={ArrowLeft} className="size-5" />
           <span>{t('teacher.reports.backToClass')}</span>
         </button>
-        <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
-      </>
-      </ProGate>
+        {/* The arc is the free surface (§8.2: the student is the analytics
+            unit); the deep printable report under it stays Pro. */}
+        <StudentArcView
+          studentId={selectedStudentId}
+          classroomId={selectedClassroomId}
+          studentName={selectedStudentName ?? undefined}
+        />
+        <ProGate feature="reports">
+          <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
+        </ProGate>
+      </div>
     );
   } else {
     const selectedClassroom = classrooms?.find((c) => c.id === selectedClassroomId);
     view = (
       <div className="space-y-8">
+        <ClassArcPanel
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+          classroomLanguage={selectedClassroom?.language ?? 'en'}
+          onStudentClick={handleStudentClick}
+        />
         <ProgressDigestDashboard
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
@@ -312,18 +351,8 @@ function ReportsShell({ children }: { children: React.ReactNode }) {
       scrollRegionLabel={t('teacher.reports.title')}
       contentClassName="relative p-4 sm:p-6 lg:p-8"
     >
-      {/* Same observatory as HQ and Classes: Reports is a room of the same
-          building, not a bare admin page. Dark-only surface (pitfall 5). */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <Image
-          src="/images/education/teacher-hq-bg.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="select-none object-cover"
-        />
-        <div className="absolute inset-0 bg-neo-navy/75" />
-      </div>
+      {/* Calm canvas (Teacher HQ recipe): flat navy, no full-bleed illustration
+          behind a working deck. Dark-only surface (pitfall 5). */}
       <div className="relative">{children}</div>
     </EducationShell>
   );

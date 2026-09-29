@@ -13089,6 +13089,10 @@ const ja = {
         "title": "進捗レポートはPro機能です",
         "body": "すべてのクラスとゲームでの生徒の様子を確認できます。習得した単語、レベル、XP、保護者面談向けの印刷可能なPDF。Teacher Proにアップグレードすると、クラスと生徒のレポートが使えるようになります。"
       },
+      "pressureDials": {
+        "title": "不安な生徒のための落ち着いたモード",
+        "body": "Proならプレッシャーダイヤルを自由に調整できます。リーダーボードを終了まで非表示に、タイマーを弱めるかオフに、採点はスピードではなく正確さで。同じゲームを熱狂的なゲームショーにも、落ち着いた習熟度チェックにもできます。"
+      },
       "cta": "Pro で解除 — 月額 {{price}}"
     },
     "digest": {
@@ -13209,6 +13213,7 @@ const ja = {
       "featureOutcome2": "最初の3クラスだけでなく、担当するすべてのクラスを追加",
       "featureOutcome3": "誰がどの単語でつまずいているかリアルタイムで把握",
       "featureOutcome4": "すべてのクラスの進捗を比較",
+      "featureOutcome5": "不安な生徒のための落ち着いたモード — タイマー・リーダーボード・スピード採点を自由に調整",
       "priceTaxNote": "お支払い時に税が加算される場合があります。",
       "proHeroAlt": "生徒が席からプレイする中、教師が黒板のライブ順位表を見ている様子。",
       "valueHeadline": "毎日の復習と出口チケットに最適。1ラウンドでクラス全員を確認。",
@@ -13658,6 +13663,35 @@ const ja = {
       "failedToSaveLesson": "レッスンの保存に失敗しました"
     },
     "reports": {
+      "arc": {
+        "title": "学習の軌跡",
+        "subtitle": "生徒ごと・全セッションの記録",
+        "studentSubtitle": "{{name}}・全セッションの記録",
+        "unknownStudent": "生徒",
+        "noEvidenceClass": "クラスでレッスンゲームをプレイすると、生徒ごとの軌跡がここに表示されます。",
+        "noEvidenceStudent": "まだセッションがありません",
+        "emptyStudent": "{{name}}さんはまだ出題語のあるセッションがありません。次のゲームから軌跡が始まります。",
+        "wordsClassMisses": "クラスが繰り返し間違える単語",
+        "studentsStuck": "{{total}}人中{{stuck}}人",
+        "requeueNote": "間違えた単語は各生徒の「まちがえた単語」復習に自動で再キューされます。",
+        "assignFollowUp": "フォローアップ練習を割り当てる",
+        "assigning": "割り当て中...",
+        "followUpDone": "割り当てました — 生徒のレッスンリストに表示されます。",
+        "followUpFailed": "割り当てできませんでした。もう一度お試しください。",
+        "followUpName": "{{classroom}} — 復習する単語（{{date}}）",
+        "viewStudent": "{{name}}さんの軌跡を見る",
+        "accuracyOverTime": "正確さの推移",
+        "growth": "{{first}}% → {{last}}%",
+        "sparklineLabel": "{{count}}回のセッションの正確さ（{{first}}%から{{last}}%へ）",
+        "requeueStudent": "{{name}}さんが間違えた単語はすでに「まちがえた単語」復習にキューされています。",
+        "attempts": "{{count}}回",
+        "trend": {
+          "mastered": "習得済み",
+          "improving": "上達中",
+          "stuck": "再指導が必要",
+          "insufficient": "まだ1セッション"
+        }
+      },
       "title": "進捗レポート",
       "studentReport": "生徒進捗レポート",
       "classReport": "クラス進捗レポート",

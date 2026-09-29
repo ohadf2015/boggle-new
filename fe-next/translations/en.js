@@ -12068,6 +12068,35 @@ const en = {
       "failedToSaveLesson": "Failed to save lesson"
     },
     "reports": {
+      "arc": {
+        "title": "Learning arc",
+        "subtitle": "Each student, across every session",
+        "studentSubtitle": "{{name}}, across every session",
+        "unknownStudent": "Student",
+        "noEvidenceClass": "Play a lesson game with this class and each student's arc lands here.",
+        "noEvidenceStudent": "No sessions yet",
+        "emptyStudent": "{{name}} has not had a session with asked words yet — their arc starts with the next game.",
+        "wordsClassMisses": "Words the class keeps missing",
+        "studentsStuck": "{{stuck}} of {{total}} students",
+        "requeueNote": "Missed words already re-queue in each student's Missed Words review.",
+        "assignFollowUp": "Assign follow-up practice",
+        "assigning": "Assigning...",
+        "followUpDone": "Assigned — it's on their lesson list.",
+        "followUpFailed": "Couldn't assign it. Try again.",
+        "followUpName": "{{classroom}} — words to re-learn ({{date}})",
+        "viewStudent": "View {{name}}'s arc",
+        "accuracyOverTime": "Accuracy over time",
+        "growth": "{{first}}% → {{last}}%",
+        "sparklineLabel": "Accuracy across {{count}} sessions, from {{first}}% to {{last}}%",
+        "requeueStudent": "{{name}}'s missed words are already queued in their Missed Words review.",
+        "attempts": "{{count}} tries",
+        "trend": {
+          "mastered": "Mastered",
+          "improving": "Getting there",
+          "stuck": "Needs a re-teach",
+          "insufficient": "One session so far"
+        }
+      },
       "title": "Progress Report",
       "studentReport": "Student Progress Report",
       "classReport": "Class Progress Report",
@@ -12287,6 +12316,10 @@ const en = {
         "title": "Progress reports are a Pro feature",
         "body": "See how every student is doing across all your classes and games: words mastered, levels, XP, and printable PDFs for parent evenings. Upgrade to Teacher Pro to unlock class and student reports."
       },
+      "pressureDials": {
+        "title": "Calm mode for anxious students",
+        "body": "Pro hands you the pressure dials: hide the leaderboard until the end, soften or switch off the timer, and score accuracy instead of speed. The same game runs as a hyped game-show or a calm mastery check."
+      },
       "cta": "Unlock this with Pro — {{price}}/month"
     },
     "digest": {
@@ -12407,6 +12440,7 @@ const en = {
       "featureOutcome2": "Add every section you teach, not just the first 3 classes",
       "featureOutcome3": "See who is stuck, word by word, live",
       "featureOutcome4": "Compare progress across all your classes",
+      "featureOutcome5": "Calm mode for anxious students — timer, leaderboard and speed-scoring are yours to dial",
       "priceTaxNote": "Taxes may be added at checkout.",
       "proHeroAlt": "A teacher watching a live class leaderboard on the board while students play from their seats.",
       "valueHeadline": "Best for everyday review and exit tickets. Run a whole-class check in one round.",

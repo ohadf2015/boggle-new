@@ -13038,6 +13038,10 @@ const es = {
         "title": "Los informes de progreso son una función Pro",
         "body": "Mira cómo le va a cada estudiante en todas tus clases y juegos: palabras dominadas, niveles, XP e informes PDF imprimibles para reuniones de padres. Actualiza a Teacher Pro para desbloquear los informes de clase y de estudiantes."
       },
+      "pressureDials": {
+        "title": "Modo tranquilo para alumnos con ansiedad",
+        "body": "Pro pone los diales de presión en tus manos: oculta la clasificación hasta el final, suaviza o apaga el temporizador y puntúa la precisión en lugar de la velocidad. El mismo juego puede ser un concurso trepidante o una comprobación de dominio tranquila."
+      },
       "cta": "Desbloquéalo con Pro: {{price}}/mes"
     },
     "digest": {
@@ -13158,6 +13162,7 @@ const es = {
       "featureOutcome2": "Añade todas las secciones que enseñas, no solo las primeras 3 clases",
       "featureOutcome3": "Mira quién se atasca, palabra a palabra, en directo",
       "featureOutcome4": "Compara el progreso de todas tus clases",
+      "featureOutcome5": "Modo tranquilo para alumnos con ansiedad: el temporizador, la clasificación y los puntos de velocidad son tuyos",
       "priceTaxNote": "Pueden añadirse impuestos al pagar.",
       "proHeroAlt": "Una profesora mira la clasificación de la clase en directo en la pizarra mientras el alumnado juega desde sus sitios.",
       "valueHeadline": "Ideal para el repaso diario y tickets de salida. Comprueba a toda la clase en una ronda.",
@@ -13513,6 +13518,35 @@ const es = {
       "failedToSaveLesson": "Error al guardar la lección"
     },
     "reports": {
+      "arc": {
+        "title": "Arco de aprendizaje",
+        "subtitle": "Cada estudiante, a lo largo de todas las sesiones",
+        "studentSubtitle": "{{name}}, a lo largo de todas las sesiones",
+        "unknownStudent": "Estudiante",
+        "noEvidenceClass": "Juega una partida de lección con la clase y el arco de cada estudiante aparecerá aquí.",
+        "noEvidenceStudent": "Sin sesiones todavía",
+        "emptyStudent": "{{name}} aún no ha tenido una sesión con palabras preguntadas; su arco empieza con la próxima partida.",
+        "wordsClassMisses": "Palabras que la clase sigue fallando",
+        "studentsStuck": "{{stuck}} de {{total}} estudiantes",
+        "requeueNote": "Las palabras falladas ya se reencolan en el repaso de palabras falladas de cada estudiante.",
+        "assignFollowUp": "Asignar práctica de repaso",
+        "assigning": "Asignando...",
+        "followUpDone": "Asignada — ya está en su lista de lecciones.",
+        "followUpFailed": "No se pudo asignar. Inténtalo de nuevo.",
+        "followUpName": "{{classroom}} — palabras para reaprender ({{date}})",
+        "viewStudent": "Ver el arco de {{name}}",
+        "accuracyOverTime": "Precisión a lo largo del tiempo",
+        "growth": "{{first}}% → {{last}}%",
+        "sparklineLabel": "Precisión en {{count}} sesiones, de {{first}}% a {{last}}%",
+        "requeueStudent": "Las palabras que {{name}} falló ya están en cola en su repaso de palabras falladas.",
+        "attempts": "{{count}} intentos",
+        "trend": {
+          "mastered": "Dominada",
+          "improving": "Por buen camino",
+          "stuck": "Necesita repaso guiado",
+          "insufficient": "Una sesión hasta ahora"
+        }
+      },
       "title": "Reporte de Progreso",
       "studentReport": "Reporte del Estudiante",
       "classReport": "Reporte de Clase",

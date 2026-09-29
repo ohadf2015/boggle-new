@@ -42,6 +42,20 @@ vi.mock('@/components/teacher/digest/ProgressDigestDashboard', () => ({
   ),
 }));
 
+// The free arc surfaces mount on every class/student view; their own suites
+// cover their behavior.
+vi.mock('@/components/teacher/reports/ClassArcPanel', () => ({
+  ClassArcPanel: ({ classroomId }: { classroomId: string }) => (
+    <div data-testid="class-arc-panel" data-classroom-id={classroomId} />
+  ),
+}));
+
+vi.mock('@/components/teacher/reports/StudentArcView', () => ({
+  StudentArcView: ({ studentId }: { studentId: string }) => (
+    <div data-testid="student-arc-view" data-student-id={studentId} />
+  ),
+}));
+
 vi.mock('@/components/teacher/reports/AssignmentProgressReport', () => ({
   AssignmentProgressReport: ({ classroomId }: { classroomId: string }) => (
     <div data-testid="assignment-progress-report" data-classroom-id={classroomId}>
@@ -104,6 +118,11 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/lib/education/useTeacherAccess', () => ({
   useTeacherAccess: () => ({ hasAccess: true, status: 'approved', latestRequest: null, isLoading: false }),
+}));
+
+// Deep links resolve the clicked student's name from the roster; not under test here.
+vi.mock('@/lib/supabase/education/classrooms', () => ({
+  getClassroomStudents: vi.fn().mockResolvedValue({ data: [], error: null }),
 }));
 
 // Reports are a Pro surface: the page is wrapped in <ProGate feature="reports">.
