@@ -15154,6 +15154,22 @@ const ja = {
         "cta": "明確な50席の無料枠でクラス全体の語彙ゲームをホスト"
       }
     },
+    "vsWooclap": {
+      "starter5": {
+        "eyebrow": "無料枠の上限 — honesty foil",
+        "title": "Wooclap Starter: アクティブ設問5 / 30日。LexiClash: アクティブ設問メーターなしの無料クラスルーム。",
+        "lede": "Wooclapヘルプ（2026年6月2日）は Starter 無料で最大5のアクティブ設問、30日で5超はアップグレードと公開。アクティブ＝ユニーク参加者からの3+回答。料金ページは 5 questions per month と Unlimited participants（最大1000）。LexiClash無料にアクティブ設問メーターはありません。",
+        "wooTitle": "Wooclap Starter（無料）— 公開上限",
+        "wooBody": "Help: 最大5アクティブ設問; 30日で5超→アップグレード。アクティブ＝ユニーク参加者3+回答。Pricing: 5 questions per month; Unlimited participants; 最大1000。",
+        "lexiTitle": "LexiClash — アクティブ設問メーターなしの無料クラス",
+        "lexiBody": "5アクティブ/30日の設問クォータなしで無料クラス語彙プレイ。設問クォータのhonesty — 参加者上限の争いではない。",
+        "citePrefix": "Wooclap:",
+        "citeHelpLabel": "Help — pricing（5アクティブ / 30d）",
+        "citePlansLabel": "pricing-education（5 questions/month）",
+        "citeSuffix": " — Starter: アクティブ設問5 / 30日; アクティブ＝ユニーク3+回答; 最大1000参加者。",
+        "cta": "アクティブ設問メーターなしでクラス全体の無料語彙ゲームをホスト"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "無料枠の上限 — honesty foil",

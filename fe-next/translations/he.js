@@ -15009,6 +15009,22 @@ const he = {
         "cta": "הריצו אוצר מילים חינמי לכיתה שלמה עם מגבלה ברורה של 50 מושבים"
       }
     },
+    "vsWooclap": {
+      "starter5": {
+        "eyebrow": "מגבלות חינם — honesty foil",
+        "title": "Wooclap Starter: 5 שאלות פעילות / 30 יום. LexiClash: כיתה בחינם בלי מד שאלות פעילות.",
+        "lede": "העזרה של Wooclap (2 ביוני 2026) מפרסמת Starter חינם עד 5 שאלות פעילות; יותר מ-5 פעילות ב-30 יום → שדרוג. פעילה = 3+ תשובות ממשתתפים ייחודיים. דף המחירים: 5 questions per month ו-Unlimited participants (עד 1000). LexiClash חינם בלי מד שאלות פעילות.",
+        "wooTitle": "Wooclap Starter (חינם) — מגבלות מפורסמות",
+        "wooBody": "Help: עד 5 שאלות פעילות; >5 פעילות ב-30 יום → שדרוג. פעילה = 3+ תשובות ממשתתפים ייחודיים. Pricing: 5 questions per month; Unlimited participants; עד 1000.",
+        "lexiTitle": "LexiClash — כיתה בחינם בלי מד שאלות פעילות",
+        "lexiBody": "אוצר מילים לכיתה בחינם בלי מכסת 5 שאלות פעילות / 30 יום. Honesty של מכסת שאלות — לא מאבק בתקרת משתתפים.",
+        "citePrefix": "Wooclap:",
+        "citeHelpLabel": "Help — pricing (5 פעילות / 30d)",
+        "citePlansLabel": "pricing-education (5 questions/month)",
+        "citeSuffix": " — Starter: 5 שאלות פעילות / 30 יום; פעילה = 3+ תשובות ייחודיות; עד 1000 משתתפים.",
+        "cta": "הריצו אוצר מילים חינמי לכיתה בלי מד שאלות פעילות"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "מגבלות חינם — honesty foil",
