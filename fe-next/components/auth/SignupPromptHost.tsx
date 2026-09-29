@@ -24,6 +24,7 @@ import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSignupPrompt } from '@/components/singleplayer/results/hooks/useSignupPrompt';
+import { GsiClientPreloader } from '@/components/auth/GsiClientPreloader';
 
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), {
   ssr: false,
@@ -46,16 +47,20 @@ export function SignupPromptHost() {
   });
 
   return (
-    <FirstWinSignupModal
-      isOpen={showSignupModal}
-      onClose={dismissSignupModal}
-      // Honor the hook's first-win classification. This used to be hardcoded
-      // to "multiGames", so first-time winners — the largest prompt population
-      // under the default after-first-win variant — got generic copy and no
-      // celebration. PostHog 14d ordered path: prompt 145 → completed 3.
-      variant={isFirstWin ? 'firstWin' : 'multiGames'}
-      surface={frictionVariant === 'control' ? 'dialog' : 'sheet'}
-    />
+    <>
+      {/* Preload GSI on guest sessions so soft-sheet CTA is not an empty frame. */}
+      {!isAuthenticated && <GsiClientPreloader />}
+      <FirstWinSignupModal
+        isOpen={showSignupModal}
+        onClose={dismissSignupModal}
+        // Honor the hook's first-win classification. This used to be hardcoded
+        // to "multiGames", so first-time winners — the largest prompt population
+        // under the default after-first-win variant — got generic copy and no
+        // celebration. PostHog 14d ordered path: prompt 145 → completed 3.
+        variant={isFirstWin ? 'firstWin' : 'multiGames'}
+        surface={frictionVariant === 'control' ? 'dialog' : 'sheet'}
+      />
+    </>
   );
 }
 

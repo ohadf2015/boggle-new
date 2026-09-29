@@ -44,6 +44,11 @@ vi.mock('../auth/hooks/useOAuthSignIn', () => ({
   },
 }));
 
+vi.mock('../auth/GsiClientPreloader', () => ({
+  GsiClientPreloader: () => <div data-testid="gsi-client-preload" />,
+  default: () => <div data-testid="gsi-client-preload" />,
+}));
+
 vi.mock('../auth/shared', () => ({
   OAuthButtonGroup: ({ onSignIn }: { onSignIn: (p: string) => void }) => (
     <button data-testid="oauth-group" onClick={() => onSignIn('google')}>
@@ -175,4 +180,30 @@ describe('MultiplayerSignupSheet', () => {
     const dialog = screen.getByRole('region');
     expect(dialog.style.bottom).toBe('');
   });
+
+  it('raises sheet z above share Dialog z-90 (z-[120]) so OAuth stays clickable', () => {
+    render(
+      <MultiplayerSignupSheet isOpen={true} onClose={vi.fn()} stats={defaultStats} />
+    );
+    const sheet = screen.getByTestId('mp-signup-sheet');
+    expect(sheet.className).toMatch(/z-\[120\]/);
+    expect(sheet.className).not.toMatch(/\bz-50\b/);
+  });
+
+  it('keeps sheet overflow-visible so GSI iframe is not clipped by anti-clickjacking', () => {
+    render(
+      <MultiplayerSignupSheet isOpen={true} onClose={vi.fn()} stats={defaultStats} />
+    );
+    const sheet = screen.getByTestId('mp-signup-sheet');
+    expect(sheet.className).toMatch(/overflow-visible/);
+    expect(sheet.className).not.toMatch(/overflow-hidden/);
+  });
+
+  it('preloads the GSI client while the results stage is mounted', () => {
+    render(
+      <MultiplayerSignupSheet isOpen={false} onClose={vi.fn()} stats={defaultStats} />
+    );
+    expect(screen.getByTestId('gsi-client-preload')).toBeTruthy();
+  });
+
 });
