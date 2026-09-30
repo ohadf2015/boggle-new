@@ -15167,6 +15167,22 @@ const es = {
         "cta": "Organiza vocabulario gratis para toda la clase con un límite claro de 50 plazas"
       }
     },
+    "vsPearDeck": {
+      "teacherFree": {
+        "eyebrow": "Honestidad de respuestas con nombre — Free vs Premium",
+        "title": "Pear Deck Teacher Free: proyector anónimo; nombres vía exportación a hoja. LexiClash: roster de clase + feedback con nombre.",
+        "lede": "Pear Deck Teacher Free publica Sessions/participantes ilimitados y proyecta respuestas de forma anónima. Nombres en Free: exportar a spreadsheet o hover en Flashcard Factory. Premium Teacher Dashboard: nombres, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback. LexiClash free hasta 50 con roster / feedback con nombre.",
+        "pdTitle": "Pear Deck Teacher Free — límites de nombres",
+        "pdBody": "Sessions + participantes ilimitados · proyector anónimo · nombres solo vía spreadsheet o Flashcard Factory hover. Premium: Teacher Dashboard con nombres, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback.",
+        "lexiTitle": "LexiClash — roster de clase + feedback con nombre en free",
+        "lexiBody": "Plan free: hasta 50 estudiantes por clase + roster / feedback con nombre + miss-gap → reteach Live. Sin puerta Premium para ver nombres.",
+        "citePrefix": "Pear Deck:",
+        "citePlansLabel": "peardeck.com/pricing (Teacher Free vs Premium)",
+        "citeHelpLabel": "Handling Inappropriate Responses (Free export / Premium Dashboard)",
+        "citeSuffix": " — Teacher Free: proyector anónimo; nombres vía spreadsheet.",
+        "cta": "Organiza vocabulario gratis con roster + feedback con nombre (límite claro de 50 plazas)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Límites del plan gratis — honesty foil",
