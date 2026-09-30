@@ -15469,6 +15469,22 @@ const sv = {
         "cta": "Håll gratis ordlek med roster + namngiven feedback (tydlig 50-platsgräns)"
       }
     },
+    "vsPadlet": {
+      "neonFree": {
+        "eyebrow": "Ärlighet Neon Free — 3 padlets + 20MB",
+        "title": "Padlet Neon Free: 3 aktiva padlets + 20MB per fil. LexiClash: gratis ordlek för hela klassen (50) — ingen 3-brädsgräns.",
+        "lede": "Padlet Neon Free publicerar 3 aktiva padlets och 20MB uppladdningsgräns per fil (1 användare, video 2 min / ljud 5 min). Platinum: unlimited padlets + 500MB. LexiClash free täcker upp till 50 med miss-gap → reteach Live — ingen Neon Free 3-brädsgräns.",
+        "padletTitle": "Padlet Neon Free — bräd- och uppladdningsgränser",
+        "padletBody": "3 aktiva padlets · 20MB per fil · 1 användare · video 2 min / ljud 5 min. Platinum: unlimited padlets + 500MB.",
+        "lexiTitle": "LexiClash — gratis ordlek för hela klassen utan 3-brädsgräns",
+        "lexiBody": "Free: upp till 50 elever per klass + miss-gap → reteach Live. Ingen Neon Free 3-padlet / 20MB-grind för klasspel.",
+        "citePrefix": "Padlet:",
+        "citeHelpLabel": "padlet.help …/is-it-free (Neon Free: 3 padlets + 20MB)",
+        "citeSubsLabel": "padlet.com/site/subscriptions (Free vs Platinum)",
+        "citeSuffix": " — Neon Free: 3 aktiva padlets + 20MB per fil.",
+        "cta": "Håll gratis ordlek för hela klassen utan 3-brädsgräns (tydlig 50-platsgräns)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Gratisnivåns tak — honesty foil",

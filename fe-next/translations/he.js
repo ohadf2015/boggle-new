@@ -15089,6 +15089,22 @@ const he = {
         "cta": "ארחו אוצר מילים בכיתה שלמה עם רוסטר + משוב עם שם (מגבלת 50 מקומות חינם)"
       }
     },
+    "vsPadlet": {
+      "neonFree": {
+        "eyebrow": "כנות Neon Free — 3 padlets + 20MB",
+        "title": "Padlet Neon Free: 3 פדלטים פעילים + 20MB לקובץ. LexiClash: אוצר מילים חינם לכיתה שלמה (50) — בלי תקרת 3 לוחות.",
+        "lede": "Padlet Neon Free מפרסם 3 פדלטים פעילים ומגבלת 20MB לקובץ (משתמש 1, וידאו 2 דק׳ / אודיו 5 דק׳). Platinum: פדלטים ללא הגבלה + 500MB. LexiClash חינם עד 50 עם miss-gap → reteach Live — בלי תקרת Neon Free של 3 לוחות.",
+        "padletTitle": "Padlet Neon Free — מגבלות לוחות והעלאות",
+        "padletBody": "3 פדלטים פעילים · 20MB לקובץ · משתמש 1 · וידאו 2 דק׳ / אודיו 5 דק׳. Platinum: פדלטים ללא הגבלה + 500MB.",
+        "lexiTitle": "LexiClash — אוצר מילים חינם לכיתה שלמה בלי תקרת 3 לוחות",
+        "lexiBody": "חינם: עד 50 תלמידים בכיתה + miss-gap → reteach Live. בלי שערי Neon Free של 3 פדלטים/20MB למשחק בכיתה.",
+        "citePrefix": "Padlet:",
+        "citeHelpLabel": "padlet.help …/is-it-free (Neon Free: 3 padlets + 20MB)",
+        "citeSubsLabel": "padlet.com/site/subscriptions (Free vs Platinum)",
+        "citeSuffix": " — Neon Free: 3 פדלטים פעילים + 20MB לקובץ.",
+        "cta": "ארחו אוצר מילים בכיתה שלמה בלי תקרת 3 לוחות (מגבלת 50 מקומות חינם)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "מגבלות חינם — honesty foil",

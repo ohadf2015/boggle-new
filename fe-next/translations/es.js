@@ -15183,6 +15183,22 @@ const es = {
         "cta": "Organiza vocabulario gratis con roster + feedback con nombre (límite claro de 50 plazas)"
       }
     },
+    "vsPadlet": {
+      "neonFree": {
+        "eyebrow": "Honestidad Neon Free — 3 padlets + 20MB",
+        "title": "Padlet Neon Free: 3 padlets activos + 20MB por archivo. LexiClash: vocabulario gratis para toda la clase (50) — sin tope de 3 tableros.",
+        "lede": "Padlet Neon Free publica 3 padlets activos / personalizables y un límite de 20MB por archivo (1 usuario, vídeo 2 min / audio 5 min). Platinum: padlets ilimitados + 500MB. LexiClash free hasta 50 con miss-gap → reteach Live — sin tope Neon Free de 3 tableros.",
+        "padletTitle": "Padlet Neon Free — tope de tableros y subidas",
+        "padletBody": "3 padlets activos · 20MB por archivo · 1 usuario · vídeo 2 min / audio 5 min. Platinum: padlets ilimitados + 500MB.",
+        "lexiTitle": "LexiClash — vocabulario gratis para toda la clase sin tope de 3 tableros",
+        "lexiBody": "Plan free: hasta 50 estudiantes por clase + miss-gap → reteach Live. Sin tope Neon Free de 3 padlets activos ni 20MB para el juego en clase.",
+        "citePrefix": "Padlet:",
+        "citeHelpLabel": "padlet.help …/is-it-free (Neon Free: 3 padlets + 20MB)",
+        "citeSubsLabel": "padlet.com/site/subscriptions (Free vs Platinum)",
+        "citeSuffix": " — Neon Free: 3 padlets activos + 20MB por archivo.",
+        "cta": "Organiza vocabulario gratis para toda la clase sin tope de 3 tableros (límite claro de 50 plazas)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Límites del plan gratis — honesty foil",

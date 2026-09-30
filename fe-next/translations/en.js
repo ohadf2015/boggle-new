@@ -13781,6 +13781,22 @@ const en = {
         "cta": "Host whole-class free vocab with roster + named feedback (50-seat free limit)"
       }
     },
+    "vsPadlet": {
+      "neonFree": {
+        "eyebrow": "Neon Free honesty — 3 padlets + 20MB",
+        "title": "Padlet Neon Free: 3 active padlets + 20MB upload/file. LexiClash: whole-class free vocab (50) — no 3-board gate.",
+        "lede": "Padlet Neon Free publishes 3 fully customizable / active padlets and a 20MB upload limit per file (plus 1 user, 2-minute video / 5-minute audio recordings). Platinum unlocks unlimited padlets + 500MB uploads. LexiClash free covers up to 50 for word-formation vocab games with miss-gap → reteach Live — no 3-active-board Neon Free gate.",
+        "padletTitle": "Padlet Neon Free — active-board + upload caps",
+        "padletBody": "3 active padlets · 20MB upload/file · 1 user · 2-min video / 5-min audio recordings. Platinum: unlimited padlets + 500MB uploads.",
+        "lexiTitle": "LexiClash — whole-class free vocab without a 3-board gate",
+        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games, plus miss-gap → reteach Live. No Neon Free 3-active-padlet or 20MB board-upload gate for classroom play.",
+        "citePrefix": "Padlet:",
+        "citeHelpLabel": "padlet.help …/is-it-free (Neon Free: 3 padlets + 20MB)",
+        "citeSubsLabel": "padlet.com/site/subscriptions (Free vs Platinum)",
+        "citeSuffix": " — Neon Free: 3 active padlets + 20MB upload/file.",
+        "cta": "Host whole-class free vocab without a 3-board gate (50-seat free limit)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Free-tier caps — honesty foil",

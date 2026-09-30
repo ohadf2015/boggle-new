@@ -3778,6 +3778,22 @@ const ru = {
         "cta": "Проведите бесплатную словарную игру с roster + именным feedback (лимит 50 мест)"
       }
     },
+    "vsPadlet": {
+      "neonFree": {
+        "eyebrow": "Честность Neon Free — 3 padlets + 20MB",
+        "title": "Padlet Neon Free: 3 активных padlets + 20MB на файл. LexiClash: бесплатная словарная игра на весь класс (50) — без лимита 3 досок.",
+        "lede": "Padlet Neon Free публикует 3 активных padlets и лимит 20MB на файл (1 user, видео 2 мин / аудио 5 мин). Platinum: unlimited padlets + 500MB. LexiClash free — до 50 с miss-gap → reteach Live — без Neon Free лимита 3 досок.",
+        "padletTitle": "Padlet Neon Free — лимиты досок и загрузок",
+        "padletBody": "3 активных padlets · 20MB на файл · 1 user · видео 2 мин / аудио 5 мин. Platinum: unlimited padlets + 500MB.",
+        "lexiTitle": "LexiClash — бесплатная словарная игра на весь класс без лимита 3 досок",
+        "lexiBody": "Free: до 50 учеников в классе + miss-gap → reteach Live. Без Neon Free гейта 3 padlets / 20MB для классной игры.",
+        "citePrefix": "Padlet:",
+        "citeHelpLabel": "padlet.help …/is-it-free (Neon Free: 3 padlets + 20MB)",
+        "citeSubsLabel": "padlet.com/site/subscriptions (Free vs Platinum)",
+        "citeSuffix": " — Neon Free: 3 активных padlets + 20MB на файл.",
+        "cta": "Проведите бесплатную словарную игру на весь класс без лимита 3 досок (лимит 50 мест)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Лимиты бесплатного плана — honesty foil",
