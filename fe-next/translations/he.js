@@ -14171,6 +14171,8 @@ const he = {
       "shareGapCta": "שחקו משחק כיתה",
       "shareGapEyebrow": "פער הכיתה מהיום",
       "shareGapPracticeHome": "מילים לתרגול בבית",
+      "shareGapEmpty": "אין עדיין פער כיתה לשיתוף. שחקו משחק כיתה ואז שתפו את הכרטיס עם הורים.",
+      "shareGapEmptyText": "{{lesson}} — אין עדיין פער כיתה לשיתוף",
       "startReteachLive": "התחלת Live חזרה ל-3 דקות",
       "postReteachGoogleClassroom": "פרסום חזרה ל-3 דקות ב-Google Classroom",
       "postReteachGoogleClassroomTitle": "Live חזרה ל-3 דקות — {{lesson}}",

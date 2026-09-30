@@ -12872,6 +12872,8 @@ const en = {
       "shareGapCta": "Play a class game",
       "shareGapEyebrow": "Today's class gap",
       "shareGapPracticeHome": "Words to practice at home",
+      "shareGapEmpty": "No class gap to share yet. Play a class game, then share this card with parents.",
+      "shareGapEmptyText": "{{lesson}} — no class gap to share yet",
       "startReteachLive": "Start 3-min reteach Live",
       "postReteachGoogleClassroom": "Post 3-min reteach to Google Classroom",
       "postReteachGoogleClassroomTitle": "3-min reteach Live — {{lesson}}",

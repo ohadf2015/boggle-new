@@ -8,7 +8,7 @@
 
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import { parseClassGapShareParams } from '@/lib/education/classGapShare';
+import { classGapCardKind, parseClassGapShareParams } from '@/lib/education/classGapShare';
 
 export const runtime = 'edge';
 
@@ -22,12 +22,13 @@ const C = {
   cream: '#FFFEF0',
 };
 
-const COPY: Record<string, { eyebrow: string; found: string; missed: string; allFound: string; home: string }> = {
+const COPY: Record<string, { eyebrow: string; found: string; missed: string; allFound: string; empty: string; home: string }> = {
   en: {
     eyebrow: "TODAY'S CLASS GAP",
     found: '{found} of {total} lesson words found',
     missed: 'Words to practice at home',
     allFound: 'The class found every lesson word',
+    empty: 'No class gap to share yet',
     home: 'LexiClash',
   },
   he: {
@@ -35,6 +36,7 @@ const COPY: Record<string, { eyebrow: string; found: string; missed: string; all
     found: '{found} מתוך {total} מילות השיעור נמצאו',
     missed: 'מילים לתרגול בבית',
     allFound: 'הכיתה מצאה את כל מילות השיעור',
+    empty: 'אין עדיין פער כיתה לשיתוף',
     home: 'LexiClash',
   },
   sv: {
@@ -42,6 +44,7 @@ const COPY: Record<string, { eyebrow: string; found: string; missed: string; all
     found: '{found} av {total} lektionsord hittades',
     missed: 'Ord att öva hemma',
     allFound: 'Klassen hittade alla lektionsord',
+    empty: 'Inget klassgap att dela ännu',
     home: 'LexiClash',
   },
   ja: {
@@ -49,6 +52,7 @@ const COPY: Record<string, { eyebrow: string; found: string; missed: string; all
     found: 'レッスン単語 {total} 個のうち {found} 個を発見',
     missed: '家庭で練習する単語',
     allFound: 'クラスはすべての単語を見つけました',
+    empty: 'まだ共有するクラスギャップはありません',
     home: 'LexiClash',
   },
   es: {
@@ -56,6 +60,7 @@ const COPY: Record<string, { eyebrow: string; found: string; missed: string; all
     found: '{found} de {total} palabras de la lección encontradas',
     missed: 'Palabras para practicar en casa',
     allFound: 'La clase encontró todas las palabras',
+    empty: 'Aún no hay hueco de clase para compartir',
     home: 'LexiClash',
   },
   ru: {
@@ -63,6 +68,7 @@ const COPY: Record<string, { eyebrow: string; found: string; missed: string; all
     found: 'Найдено {found} из {total} слов урока',
     missed: 'Слова для практики дома',
     allFound: 'Класс нашёл все слова урока',
+    empty: 'Пока нет пробела класса для публикации',
     home: 'LexiClash',
   },
 };
@@ -75,7 +81,10 @@ export async function GET(request: NextRequest) {
   const payload = parseClassGapShareParams(new URL(request.url).searchParams);
   const copy = COPY[payload.locale] || COPY.en;
   const chips = payload.missedWords.slice(0, 8);
-  const hasMissed = chips.length > 0;
+  const kind = classGapCardKind(payload);
+  const hasMissed = kind === 'missed';
+  const statusLine = kind === 'empty' ? copy.empty : fill(copy.found, payload.found, payload.total);
+  const noteLine = kind === 'sweep' ? copy.allFound : null;
 
   return new ImageResponse(
     (
@@ -158,7 +167,7 @@ export async function GET(request: NextRequest) {
               marginBottom: '20px',
             }}
           >
-            {fill(copy.found, payload.found, payload.total)}
+            {statusLine}
           </div>
 
           {hasMissed ? (
@@ -196,7 +205,7 @@ export async function GET(request: NextRequest) {
                 ))}
               </div>
             </div>
-          ) : (
+          ) : noteLine ? (
             <div
               style={{
                 display: 'flex',
@@ -205,9 +214,9 @@ export async function GET(request: NextRequest) {
                 color: C.lime,
               }}
             >
-              {copy.allFound}
+              {noteLine}
             </div>
-          )}
+          ) : null}
 
           <div
             style={{

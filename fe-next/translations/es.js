@@ -14265,6 +14265,8 @@ const es = {
       "shareGapCta": "Jugar una partida de clase",
       "shareGapEyebrow": "El hueco de hoy",
       "shareGapPracticeHome": "Palabras para practicar en casa",
+      "shareGapEmpty": "Aún no hay hueco de clase para compartir. Juega un juego de clase y luego comparte esta tarjeta con los padres.",
+      "shareGapEmptyText": "{{lesson}} — aún no hay hueco de clase para compartir",
       "startReteachLive": "Empezar reteach Live de 3 min",
       "postReteachGoogleClassroom": "Publicar reteach de 3 min en Google Classroom",
       "postReteachGoogleClassroomTitle": "Reteach Live de 3 min — {{lesson}}",

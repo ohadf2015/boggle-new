@@ -16,6 +16,7 @@ import {
   interpClassGapTemplate,
   parseClassGapShareParams,
   toClassGapPayload,
+  classGapCardKind,
 } from '../classGapShare';
 
 const input = {
@@ -91,6 +92,21 @@ describe('classGapShare', () => {
 
   it('falls back to en for an unknown locale', () => {
     expect(toClassGapPayload({ ...input, locale: 'fr' }).locale).toBe('en');
+  });
+
+
+  it('treats bare share params (total=0, no missed) as empty — not a sweep', () => {
+    const bare = parseClassGapShareParams(new URLSearchParams());
+    expect(bare.found).toBe(0);
+    expect(bare.total).toBe(0);
+    expect(bare.missedWords).toEqual([]);
+    expect(classGapCardKind(bare)).toBe('empty');
+  });
+
+  it('classifies a real all-found session as sweep and missed words as missed', () => {
+    expect(classGapCardKind({ total: 3, missedWords: [] })).toBe('sweep');
+    expect(classGapCardKind({ total: 3, missedWords: ['neutron'] })).toBe('missed');
+    expect(classGapCardKind({ total: 0, missedWords: ['neutron'] })).toBe('missed');
   });
 
   it('allows an all-found card with an empty missed list', () => {

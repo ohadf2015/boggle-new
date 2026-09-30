@@ -15,6 +15,7 @@ import {
   parseClassGapShareParams,
   searchRecordToParams,
   type ClassGapSharePayload,
+  classGapCardKind,
 } from '@/lib/education/classGapShare';
 
 export const dynamic = 'force-dynamic';
@@ -46,16 +47,23 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const payload = await payloadFrom(props);
   const t = await loadTranslation(payload.locale);
   const lesson = payload.lesson || readString(t, 'education.results.title', 'Lesson recap');
-  const title = payload.missedWords.length
-    ? interpClassGapTemplate(readString(t, 'education.results.shareGapText', '{{lesson}} — {{found}}/{{total}}'), {
-        lesson,
-        found: payload.found,
-        total: payload.total,
-        missed: payload.missedWords.join(', '),
-      })
-    : interpClassGapTemplate(readString(t, 'education.results.shareGapAllFoundText', '{{lesson}} — every word found'), {
-        lesson,
-      });
+  const kind = classGapCardKind(payload);
+  const title =
+    kind === 'missed'
+      ? interpClassGapTemplate(readString(t, 'education.results.shareGapText', '{{lesson}} — {{found}}/{{total}}'), {
+          lesson,
+          found: payload.found,
+          total: payload.total,
+          missed: payload.missedWords.join(', '),
+        })
+      : kind === 'sweep'
+        ? interpClassGapTemplate(readString(t, 'education.results.shareGapAllFoundText', '{{lesson}} — every word found'), {
+            lesson,
+          })
+        : interpClassGapTemplate(
+            readString(t, 'education.results.shareGapEmptyText', '{{lesson}} — no class gap to share yet'),
+            { lesson },
+          );
   const ogTitle = readString(t, 'education.results.shareGapTitle', 'Class vocabulary gap');
   const description = title;
   const ogImage = buildClassGapOgImageUrl({
@@ -95,6 +103,7 @@ export default async function ClassGapPage(props: PageProps) {
   const t = await loadTranslation(payload.locale);
   const dir = payload.locale === 'he' ? 'rtl' : 'ltr';
   const lesson = payload.lesson || readString(t, 'education.results.title', 'Lesson recap');
+  const kind = classGapCardKind(payload);
   const coverage = interpClassGapTemplate(readString(t, 'education.results.classCoverage', '{{found}} / {{total}}'), {
     found: payload.found,
     total: payload.total,
@@ -123,12 +132,18 @@ export default async function ClassGapPage(props: PageProps) {
   const eyebrow = readString(t, 'education.results.shareGapEyebrow', "Today's class gap");
   const practiceHome = readString(t, 'education.results.shareGapPracticeHome', 'Words to practice at home');
   const allFound = readString(t, 'education.results.allFound', 'The class found every lesson word.');
+  const emptyNote = readString(
+    t,
+    'education.results.shareGapEmpty',
+    'No class gap to share yet. Play a class game, then share this card with parents.',
+  );
 
   return (
     <main
       dir={dir}
       className="min-h-dvh bg-neo-navy flex items-center justify-center px-4 py-10"
       data-testid="class-gap-page"
+      data-gap-kind={kind}
     >
       <article className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light shadow-hard">
         <p className="text-neo-pink font-bold text-xs uppercase tracking-widest mb-2">{eyebrow}</p>
@@ -136,9 +151,9 @@ export default async function ClassGapPage(props: PageProps) {
         {payload.teacher ? (
           <p className="text-neo-white/70 font-neo-body text-sm mt-1">{payload.teacher}</p>
         ) : null}
-        <p className="text-neo-lime font-bold mt-4">{coverage}</p>
+        {kind !== 'empty' ? <p className="text-neo-lime font-bold mt-4">{coverage}</p> : null}
 
-        {payload.missedWords.length > 0 ? (
+        {kind === 'missed' ? (
           <NeoNote tone="alert" className="mt-4">
             <p className="text-neo-white font-bold text-sm mb-2">{practiceHome}</p>
             <ul className="flex flex-wrap gap-2">
@@ -152,9 +167,13 @@ export default async function ClassGapPage(props: PageProps) {
               ))}
             </ul>
           </NeoNote>
-        ) : (
+        ) : kind === 'sweep' ? (
           <NeoNote tone="ok" className="mt-4 text-neo-white font-neo-body text-sm">
             {allFound}
+          </NeoNote>
+        ) : (
+          <NeoNote tone="ok" className="mt-4 text-neo-white font-neo-body text-sm" data-testid="class-gap-empty">
+            {emptyNote}
           </NeoNote>
         )}
 
