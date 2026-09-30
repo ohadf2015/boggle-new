@@ -14551,6 +14551,8 @@ const sv = {
       "shareGapCta": "Spela ett klassspel",
       "shareGapEyebrow": "Dagens klasslucka",
       "shareGapPracticeHome": "Ord att öva hemma",
+      "shareGapEmpty": "Inget klassgap att dela ännu. Spela ett klassspel och dela sedan kortet med föräldrar.",
+      "shareGapEmptyText": "{{lesson}} — inget klassgap att dela ännu",
       "startReteachLive": "Starta 3-minuters reteach Live",
       "postReteachGoogleClassroom": "Publicera 3-minuters reteach i Google Classroom",
       "postReteachGoogleClassroomTitle": "3-minuters reteach Live — {{lesson}}",

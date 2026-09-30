@@ -2851,6 +2851,8 @@ const ru = {
       "shareGapCta": "Сыграть классную игру",
       "shareGapEyebrow": "Пробел класса за сегодня",
       "shareGapPracticeHome": "Слова для практики дома",
+      "shareGapEmpty": "Пока нет пробела класса для публикации. Сыграйте классную игру, затем поделитесь этой карточкой с родителями.",
+      "shareGapEmptyText": "{{lesson}} — пока нет пробела класса для публикации",
       "startReteachLive": "Начать 3-минутный reteach Live",
       "postReteachGoogleClassroom": "Опубликовать 3-мин reteach в Google Classroom",
       "postReteachGoogleClassroomTitle": "3-мин reteach Live — {{lesson}}",

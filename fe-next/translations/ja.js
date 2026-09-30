@@ -14316,6 +14316,8 @@ const ja = {
       "shareGapCta": "クラスゲームをプレイ",
       "shareGapEyebrow": "今日のクラスギャップ",
       "shareGapPracticeHome": "家庭で練習する単語",
+      "shareGapEmpty": "まだ共有するクラスギャップはありません。クラスゲームをプレイしてから、このカードを保護者と共有してください。",
+      "shareGapEmptyText": "{{lesson}} — まだ共有するクラスギャップはありません",
       "startReteachLive": "3分再指導ライブを開始",
       "postReteachGoogleClassroom": "3分再指導を Google Classroom に投稿",
       "postReteachGoogleClassroomTitle": "3分再指導ライブ — {{lesson}}",

@@ -98,6 +98,20 @@ export function buildClassGapOgImageUrl(input: ClassGapShareInput): string {
   return url.toString();
 }
 
+
+/**
+ * Bare /education/class-gap (no share params) parses as found=0,total=0,missed=[].
+ * That must NOT read as a sweep ("every lesson word") — only a real session with
+ * total > 0 and an empty missed list is a sweep.
+ */
+export type ClassGapCardKind = 'missed' | 'sweep' | 'empty';
+
+export function classGapCardKind(payload: Pick<ClassGapSharePayload, 'total' | 'missedWords'>): ClassGapCardKind {
+  if (payload.missedWords.length > 0) return 'missed';
+  if (payload.total > 0) return 'sweep';
+  return 'empty';
+}
+
 export function parseClassGapShareParams(searchParams: URLSearchParams): ClassGapSharePayload {
   const missedRaw = searchParams.get('missed') || '';
   return {

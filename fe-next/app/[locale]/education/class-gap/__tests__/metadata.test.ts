@@ -44,3 +44,11 @@ describe('/education/class-gap metadata — parent/Slack unfurl', () => {
     expect(m.twitter?.card).toBe('summary_large_image');
   });
 });
+
+  it('bare URL (no share params) does not claim every word was found', async () => {
+    const m = await meta('en', {});
+    const blob = JSON.stringify(m);
+    expect(blob).not.toMatch(/every lesson word/i);
+    expect(blob).toMatch(/no class gap to share yet/i);
+  });
+
