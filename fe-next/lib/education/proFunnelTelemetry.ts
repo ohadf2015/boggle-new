@@ -2,8 +2,12 @@
  * Teacher Pro funnel — the client-side steps.
  *
  * Full funnel (all `$host`-visible):
- *   edu_pro_upgrade_clicked        client  — pricing page or dashboard trial CTA tap
- *   edu_pro_checkout_started       server  — /api/subscription/checkout made a Polar checkout
+ *   trial_cta_view                 client  — Polar 14-day trial CTA rendered
+ *   trial_cta_tap                  client  — trial CTA tap (HQ banner or upgrade page)
+ *   checkout_started               server  — Polar trial checkout session created
+ *   trial_activated                server  — Polar webhook status=trialing (teacher row upgraded)
+ *   edu_pro_upgrade_clicked        client  — pricing page or dashboard *paid* CTA tap
+ *   edu_pro_checkout_started       server  — /api/subscription/checkout made a paid Polar checkout
  *   edu_pro_checkout_succeeded     server  — Polar webhook `subscription.active` (authoritative)
  *   edu_pro_checkout_success_seen  client  — teacher landed back on Teacher HQ, Pro welcome shown
  *
@@ -30,6 +34,16 @@ export type ProUpgradeSource =
   | 'pricing_page'
   | 'dashboard_trial_lifecycle'
   | 'dashboard_trial_ended';
+
+export type TrialCtaSource = 'dashboard_trial_offer' | 'upgrade_page';
+
+export function trackTrialCtaView(args: { source: TrialCtaSource }): void {
+  safeCapture('trial_cta_view', { source: args.source, product: 'teacher_pro' });
+}
+
+export function trackTrialCtaTap(args: { source: TrialCtaSource }): void {
+  safeCapture('trial_cta_tap', { source: args.source, product: 'teacher_pro' });
+}
 
 export function trackEduProUpgradeClicked(args: { source: ProUpgradeSource }): void {
   safeCapture('edu_pro_upgrade_clicked', { source: args.source });

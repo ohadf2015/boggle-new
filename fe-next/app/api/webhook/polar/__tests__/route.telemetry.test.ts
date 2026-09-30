@@ -70,20 +70,20 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     }
   )
 
-  it('Given subscription.created while trialing, When handled, Then it fires edu_pro_trial_succeeded not a paid conversion', async () => {
+  it('Given subscription.created while trialing, When handled, Then it fires edu_pro_trial_succeeded and trial_activated not a paid conversion', async () => {
     const res = await POST(polarEvent('subscription.created', sub({ status: 'trialing' })))
     expect(res.status).toBe(200)
-    expect(capture).toHaveBeenCalledTimes(1)
-    const arg = capture.mock.calls[0][0]
-    expect(arg.event).toBe('edu_pro_trial_succeeded')
-    expect(arg.properties.subscription_id).toBe('sub_1')
-    expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST)
+    const events = capture.mock.calls.map((c) => c[0].event)
+    expect(events).toEqual(['edu_pro_trial_succeeded', 'trial_activated'])
+    expect(capture.mock.calls[0][0].properties.subscription_id).toBe('sub_1')
+    expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
   it('Given subscription.active while still trialing, When handled, Then it is a trial not a paid conversion', async () => {
     await POST(polarEvent('subscription.active', sub({ status: 'trialing' })))
-    expect(capture).toHaveBeenCalledTimes(1)
-    expect(capture.mock.calls[0][0].event).toBe('edu_pro_trial_succeeded')
+    const events = capture.mock.calls.map((c) => c[0].event)
+    expect(events).toEqual(['edu_pro_trial_succeeded', 'trial_activated'])
   })
 
   it('Given a non-Pro product, When active, Then nothing fires', async () => {

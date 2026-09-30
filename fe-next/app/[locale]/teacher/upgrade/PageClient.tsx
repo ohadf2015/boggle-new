@@ -19,6 +19,7 @@ import {
 } from '@/lib/teacher/resumeCheckout';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { polarTrialUx } from '@/lib/education/polarTrial';
+import { trackTrialCtaTap, trackTrialCtaView } from '@/lib/education/proFunnelTelemetry';
 import { ShieldCheck, BellRing, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -67,9 +68,25 @@ export default function UpgradePricingPageClient() {
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
   }, []);
 
+  useEffect(() => {
+    if (!offerTrial) return;
+    try {
+      trackTrialCtaView({ source: 'upgrade_page' });
+    } catch {
+      /* analytics must never block the till */
+    }
+  }, [offerTrial]);
+
   const handleUpgrade = useCallback(async (trial: boolean) => {
     pendingTrial.current = trial;
     setPending(trial ? 'trial' : 'paid');
+    if (trial) {
+      try {
+        trackTrialCtaTap({ source: 'upgrade_page' });
+      } catch {
+        /* analytics must never block the till */
+      }
+    }
     try {
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
