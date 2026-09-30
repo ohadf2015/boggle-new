@@ -15234,6 +15234,22 @@ const ja = {
         "cta": "名簿 + 記名フィードバック付きでクラス全体の語彙ゲームをホスト（明確な50席無料枠）"
       }
     },
+    "vsPadlet": {
+      "neonFree": {
+        "eyebrow": "Neon Freeの正直さ — 3 padlets + 20MB",
+        "title": "Padlet Neon Free: 有効パッドレット3つ + ファイル20MB。LexiClash: クラス全体の無料語彙（50）— 3ボード上限なし。",
+        "lede": "Padlet Neon Freeは有効パッドレット3つとファイルあたり20MB上限（1ユーザー、動画2分/音声5分）。Platinumは無制限パッドレット+500MB。LexiClash無料は最大50人の語彙ゲーム + miss-gap → reteach Live — Neon Freeの3ボード上限なし。",
+        "padletTitle": "Padlet Neon Free — ボード数とアップロード上限",
+        "padletBody": "有効パッドレット3つ · ファイル20MB · 1ユーザー · 動画2分/音声5分。Platinum: 無制限パッドレット + 500MB。",
+        "lexiTitle": "LexiClash — 3ボード上限なしのクラス全体無料語彙",
+        "lexiBody": "無料: クラス最大50人の語彙ゲーム + miss-gap → reteach Live。Neon Freeの有効3パッドレット/20MBゲートなし。",
+        "citePrefix": "Padlet:",
+        "citeHelpLabel": "padlet.help …/is-it-free (Neon Free: 3 padlets + 20MB)",
+        "citeSubsLabel": "padlet.com/site/subscriptions (Free vs Platinum)",
+        "citeSuffix": " — Neon Free: 有効パッドレット3つ + ファイル20MB。",
+        "cta": "3ボード上限なしでクラス全体の語彙ゲームをホスト（明確な50席無料枠）"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "無料枠の上限 — honesty foil",
