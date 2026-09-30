@@ -242,8 +242,9 @@ vi.mock('@/components/CrazyGamesBanner', () => ({
 }));
 
 // ── Navigation context ──────────────────────────────────────────────────────
+const setIsInGameSpy = vi.fn();
 vi.mock('@/contexts/NavigationContext', () => ({
-  useHideNavigation: () => vi.fn(),
+  useHideNavigation: () => setIsInGameSpy,
 }));
 
 // ── Practice flag ──────────────────────────────────────────────────────────
@@ -351,32 +352,35 @@ describe('DailyWordHuntResults - banner/tab-bar clearance', () => {
     vi.clearAllMocks();
   });
 
-  // Bug: the fixed Results/Stats tab bar sat at `bottom-0`. On native the AdMob
-  // banner composites a SurfaceView above the WebView pinned to the viewport
-  // bottom, so it covered the tab bar — the daily-challenge (Word Hunt) CTA was
-  // hidden behind the banner. GlobalBottomNav is hidden on /daily, so the lift
-  // must use --admob-banner-height directly (NOT --bottom-stack-height, whose
-  // --bottom-nav-height stays at its ~64px :root fallback here and would float
-  // the bar). Mirrors DailyWordHuntSurvival's word-forming-area offset.
-  it('lifts the mobile tab bar above the AdMob banner (not a bare bottom-0)', () => {
+  // Bug: the results screen hid the global Quests/Friends/Home tabs for as long
+  // as it was shown, so players finishing the daily had no way to reach the rest
+  // of the app from the screen they land on. The Results/Stats bar now stacks
+  // ABOVE the global nav instead of replacing it.
+  it('never hides the global bottom nav while results are shown', () => {
+    render(<DailyWordHuntResults {...baseProps} />);
+    expect(setIsInGameSpy).not.toHaveBeenCalledWith(true);
+  });
+
+  // The fixed Results/Stats tab bar must clear BOTH the global nav (published as
+  // --bottom-nav-height, 0 when the nav is hidden e.g. CrazyGames / >=sm) and the
+  // native AdMob banner overlay, never sit at a bare bottom-0.
+  it('lifts the mobile tab bar above the global nav and the AdMob banner', () => {
     render(<DailyWordHuntResults {...baseProps} />);
     const wrapper = screen.getByTestId('mobile-tab-bar').parentElement;
     expect(wrapper).not.toBeNull();
     const cls = wrapper!.className;
     expect(cls).toContain('fixed');
-    expect(cls).toMatch(/bottom-\[var\(--admob-banner-height/);
+    expect(cls).toMatch(/--bottom-nav-height/);
+    expect(cls).toMatch(/--admob-banner-height/);
     expect(cls).not.toMatch(/(^|\s)bottom-0(\s|$)/);
   });
 
-  // The scroller's old `pb-bottom-stack` (nav + banner) under-reserves: it omits
-  // the ~80px tab-bar height (--mobile-bottom-safe), so the last CTA (retry /
-  // share) clipped behind the now-lifted bar. Padding must clear tab bar + banner.
-  it('reserves scroller bottom space for the tab bar height AND the banner', () => {
+  // Body padding (has-global-bottom-nav) already reserves nav + banner for the
+  // page, so the scroller only has to clear the tab bar itself.
+  it('reserves scroller bottom space for the tab bar height', () => {
     const { container } = render(<DailyWordHuntResults {...baseProps} />);
     const scroller = container.querySelector('.scrollable-area');
     expect(scroller).not.toBeNull();
-    const cls = (scroller as HTMLElement).className;
-    expect(cls).toMatch(/--mobile-bottom-safe/);
-    expect(cls).toMatch(/--admob-banner-height/);
+    expect((scroller as HTMLElement).className).toMatch(/--mobile-tab-bar-height|--mobile-bottom-safe/);
   });
 });
