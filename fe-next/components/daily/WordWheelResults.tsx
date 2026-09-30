@@ -42,10 +42,6 @@ interface WordWheelResultsProps {
   puzzleDate: string;
   language: Language;
   hasPlayedWordHunt: boolean;
-  /** True when today's Connections (Word Bridge) daily is done — the results
-   *  follow-up CTA nudges Connections first (Ohad directive 2026-09-13), so an
-   *  unfinished Connections suppresses the back-to-hub state. */
-  hasPlayedConnections?: boolean;
   currentPlayerId?: string | null;
   currentGuestFingerprint?: string | null;
   /**
@@ -148,7 +144,6 @@ const CONFETTI_COLORS = ['#BFFF00', '#00FFFF', '#FF1493', '#8B5CF6', '#FFD700', 
 
 const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   result, puzzleNumber, puzzleDate, language: gameLang, hasPlayedWordHunt,
-  hasPlayedConnections = false,
   currentPlayerId, currentGuestFingerprint, leaderboardKey = 0,
   isAuthenticated = false, streakDays = 0, isFirstCompletion = false, alreadyPlayed = false,
   isCatchup = false, onPracticeAgain,

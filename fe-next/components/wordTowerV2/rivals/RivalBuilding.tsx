@@ -27,9 +27,25 @@ interface Props {
   /** The floor they called, so the swing can mark it. */
   onWreck: (targetIndex: number | null) => void;
   onClose: () => void;
+  /** Coins in the bank, and what a wrecking ball costs — the way past "no charges". */
+  coins?: number;
+  ballCost?: number;
+  onBuyBall?: () => Promise<{ ok: true } | { ok: false; reason: string }>;
 }
 
-export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onWreck, onClose }: Props) {
+export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onWreck, onClose, coins = 0, ballCost = 0, onBuyBall }: Props) {
+  const [buying, setBuying] = useState(false);
+  const [buyError, setBuyError] = useState<string | null>(null);
+  const canBuy = !revenge && charges <= 0 && !!onBuyBall && ballCost > 0;
+  const afford = coins >= ballCost;
+  const buyBall = async () => {
+    if (!onBuyBall || buying) return;
+    setBuying(true);
+    setBuyError(null);
+    const r = await onBuyBall();
+    setBuying(false);
+    if (!r.ok) setBuyError(r.reason === 'coins' ? 'wordTowerV2.dailyTower.ballPoor' : 'wordTowerV2.dailyTower.ballError');
+  };
   const name = rivalName(rival, t);
   // Exactly what the round will build — never a taller preview than the target.
   const tower = wreckableTower(rival.lastTower);
@@ -189,6 +205,30 @@ export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onW
                   ? t('wordTowerV2.rivals.wreckFloor', { word: targetWord })
                   : t('wordTowerV2.rivals.wreckName', { name })}
             </button>
+            {canBuy ? (
+              <>
+                <button
+                  type="button"
+                  onClick={buyBall}
+                  disabled={buying || !afford}
+                  data-wt2-buy-ball
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50 disabled:shadow-none md:text-xl"
+                >
+                  <Coins className="h-5 w-5 shrink-0" aria-hidden />
+                  {t('wordTowerV2.dailyTower.buyBall', { n: ballCost })}
+                </button>
+                {!afford ? (
+                  <p className="mt-1 text-center font-neo-display text-[11px] font-bold text-neo-yellow md:text-sm">
+                    {t('wordTowerV2.dailyTower.ballPoor', { n: ballCost - coins })}
+                  </p>
+                ) : null}
+                {buyError && afford ? (
+                  <p role="alert" className="mt-1 text-center font-neo-display text-[11px] font-bold text-neo-pink md:text-sm">
+                    {t(buyError, { n: ballCost })}
+                  </p>
+                ) : null}
+              </>
+            ) : null}
             {/* Say the price out loud. On a payback it is "nothing, they
                 started it"; on an ordinary raid it is one banked run. */}
             {/* The mute FAB floats over this corner on a phone, so the price

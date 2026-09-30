@@ -145,14 +145,14 @@ describe('V2Results — getting out of the modal', () => {
     expect(scroller?.contains(homeBtn)).toBe(false);
   });
 
-  it('given dailyLocked is true, then home button is in actions bar but play again is not', () => {
-    const { container } = render(results({ dailyLocked: true }));
+  it('given a daily tower, then home and keep-building are both in the actions bar (nothing is locked)', () => {
+    const { container } = render(results({ daily: { growthM: 3, targetM: 9, totalM: 30, rank: null } }));
 
     const actionsBar = container.querySelector('[data-wt2-results-actions]');
     const homeBtn = screen.getByLabelText('wordTowerV2.results.home');
-    const playAgainBtn = screen.queryByText('common.playAgain');
+    const keepBuilding = screen.getByText('wordTowerV2.dailyTower.keepBuilding');
 
     expect(actionsBar?.contains(homeBtn)).toBe(true);
-    expect(playAgainBtn).toBeNull();
+    expect(actionsBar?.contains(keepBuilding)).toBe(true);
   });
 });

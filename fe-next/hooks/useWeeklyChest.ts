@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { getWithAuth } from '@/utils/authFetch'
+import { getWithAuth, postWithAuth } from '@/utils/authFetch'
 import { useAuth } from '@/contexts/AuthContext'
 import posthog from '@/lib/analytics/lazyPosthog'
 
@@ -31,6 +31,10 @@ export interface WeeklyChestState {
   projectedTier: ChestTier
   /** 0-100 average performance score across this cycle's completed days. */
   weekScore: number
+  /** True while a claim request is in flight (disable the claim button). */
+  claiming: boolean
+  /** True when the last claim attempt failed (network / server error). */
+  claimError: boolean
   claim: () => Promise<PendingChest | null>
   refresh: () => void
 }
@@ -137,14 +141,24 @@ export function useWeeklyChest(): WeeklyChestState {
   const { isAuthenticated, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState(DEFAULTS)
+  const [claiming, setClaiming] = useState(false)
+  const [claimError, setClaimError] = useState(false)
   const mountedRef = useRef(true)
+  const hasLoadedRef = useRef(false)
+  const claimInFlightRef = useRef(false)
 
   const refresh = useCallback((force = false) => {
-    setLoading(true)
+    // Only show the loading state for the first load. Background refreshes
+    // (e.g. after a claim) keep the card mounted instead of blinking it out —
+    // which would also swallow any claim error message.
+    if (!hasLoadedRef.current) setLoading(true)
     fetchWeeklyChestStatus(force)
       .then(status => {
         if (!mountedRef.current) return
-        if (status !== null) setData(status)
+        if (status !== null) {
+          hasLoadedRef.current = true
+          setData(status)
+        }
         setLoading(false)
       })
       .catch(() => { if (mountedRef.current) setLoading(false) })
@@ -166,25 +180,36 @@ export function useWeeklyChest(): WeeklyChestState {
   }, [refresh, isAuthenticated, authLoading])
 
   const claim = useCallback(async (): Promise<PendingChest | null> => {
-    // Claim attempt event
+    // In-flight guard: a double-click must never fire two POSTs.
+    if (claimInFlightRef.current) return null
+    claimInFlightRef.current = true
+    setClaiming(true)
+    setClaimError(false)
+
     posthog.capture('growth:weekly_chest_claim_attempt', {
       cycleNumber: data.cycleNumber,
     })
 
     try {
-      const res = await fetch('/api/daily/weekly-chest/claim', { method: 'POST' })
+      // postWithAuth attaches the bearer token (native app / token sessions);
+      // a bare fetch only carries cookies and 401s for bearer-only sessions.
+      const res = await postWithAuth('/api/daily/weekly-chest/claim')
 
       if (!res.ok) {
-        // Claim error event
-        posthog.capture('growth:weekly_chest_claim_error', {
-          status: res.status,
-        })
+        posthog.capture('growth:weekly_chest_claim_error', { status: res.status })
+        // 409 = already claimed (another tab / retry won), 400 = not ready: the
+        // local state is stale, not the request broken — resync, no error toast.
+        if (res.status === 409 || res.status === 400) {
+          cachedStatus = null
+          refresh(true)
+        } else if (mountedRef.current) {
+          setClaimError(true)
+        }
         return null
       }
 
       const json = await res.json()
 
-      // Claim success event
       posthog.capture('growth:weekly_chest_claim_success', {
         tier: json.tier,
         coins: json.coins,
@@ -195,14 +220,15 @@ export function useWeeklyChest(): WeeklyChestState {
       cachedStatus = null
       refresh(true)
       return json as PendingChest
-    } catch (error) {
-      // Claim error event
-      posthog.capture('growth:weekly_chest_claim_error', {
-        status: 0,
-      })
+    } catch {
+      posthog.capture('growth:weekly_chest_claim_error', { status: 0 })
+      if (mountedRef.current) setClaimError(true)
       return null
+    } finally {
+      claimInFlightRef.current = false
+      if (mountedRef.current) setClaiming(false)
     }
   }, [refresh, data.cycleNumber])
 
-  return { loading, ...data, claim, refresh }
+  return { loading, ...data, claiming, claimError, claim, refresh }
 }

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { getSupabaseAdmin } from '@/lib/email'
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import {
   computeCycleProgress,
   computeCurrentStreak,
   computeChestTierForCycle,
   findCompletedCycles,
-  type HuntScoreRow,
-  type WheelScoreRow,
-  type PuzzleScoreRow,
 } from '@/lib/daily/weeklyChest'
+import { loadChestActivity } from '@/lib/daily/weeklyChestData'
 import logger from '@/utils/logger'
 
 /**
@@ -26,59 +24,35 @@ import logger from '@/utils/logger'
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
     const user = await getAuthedUser(request)
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Service client: bearer-only sessions (native app) carry no cookie, so a
+    // cookie client would return RLS-empty rows. Every query below is filtered
+    // strictly by user.id.
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      logger.error('Weekly chest status: admin client unavailable')
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+
     const today = new Date().toISOString().split('T')[0]
 
-    // Fetch only *completed* attempts across the three daily modes. A day counts
-    // toward the streak only if the player actually finished the challenge —
-    // a failed Word Hunt or an abandoned (zero-word) puzzle/wheel does not.
-    const [puzzleRes, huntRes, wheelRes] = await Promise.all([
-      supabase
-        .from('daily_puzzle_attempts')
-        .select('puzzle_date,score,time_seconds')
-        .eq('player_id', user.id)
-        .gt('word_count', 0),
-      supabase
-        .from('daily_word_hunt_attempts')
-        .select('puzzle_date,efficiency_score')
-        .eq('player_id', user.id)
-        .eq('solved', true)
-        .eq('is_catchup', false), // catch-up plays don't count toward the chest cycle
-      supabase
-        .from('daily_word_wheel_attempts')
-        .select('puzzle_date,score,time_seconds')
-        .eq('player_id', user.id)
-        .gt('word_count', 0),
-    ])
-
-    // Frozen days: a freeze the player spent to protect the chest cycle. They
-    // bridge continuity but carry no score row, so they never inflate the tier.
-    const { data: freezeRows } = await supabase
-      .from('daily_streak_freezes')
-      .select('frozen_date')
-      .eq('player_id', user.id)
-
-    // Combine all attempt dates + frozen (bridged) dates.
-    const allDates = [
-      ...(puzzleRes.data ?? []).map((r: any) => r.puzzle_date),
-      ...(huntRes.data ?? []).map((r: any) => r.puzzle_date),
-      ...(wheelRes.data ?? []).map((r: any) => r.puzzle_date),
-      ...(freezeRows ?? []).map((r: any) => r.frozen_date),
-    ]
+    // One shared loader (also used by /claim) so status and claim can never
+    // diverge on which days count.
+    const { huntRows, wheelRows, puzzleRows, allDates } = await loadChestActivity(supabase, user.id)
 
     // Pull every chest row this player owns so we can detect prior unclaimed
     // cycles — chests that became claimable but never got picked up before a
     // new week started.
-    const { data: chestRows } = await supabase
+    const { data: chestRows, error: chestErr } = await supabase
       .from('daily_weekly_chests')
       .select('cycle_start, tier, contents, opened_at')
       .eq('player_id', user.id)
+    if (chestErr) throw new Error(chestErr.message)
 
     const openedCycleStarts = new Set(
       (chestRows ?? [])
@@ -114,9 +88,9 @@ export async function GET(request: NextRequest) {
     // contribute equally so daily-puzzle-only players can still earn gold.
     const { weekScore, tier: projectedTier } = computeChestTierForCycle(
       progress.completedDates,
-      (huntRes.data ?? []) as HuntScoreRow[],
-      (wheelRes.data ?? []) as WheelScoreRow[],
-      (puzzleRes.data ?? []) as PuzzleScoreRow[],
+      huntRows,
+      wheelRows,
+      puzzleRows,
     )
 
     const existingChest = (chestRows ?? []).find(

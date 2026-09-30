@@ -81,6 +81,44 @@ describe('GET /api/word-tower/estate/rivals', () => {
     }
   });
 
+  it('given a rival ruined lately, when listed, then the ruin (who + whether it was me) rides on their tower', async () => {
+    const mine = row({ best_m: 30 });
+    const db = fakeDb({
+      word_tower_estates: (ops: Op[]) => {
+        if (has(ops, 'eq', 'player_id', ME)) return { data: mine, error: null };
+        if (has(ops, 'gte')) return { data: [row({ player_id: THEM, best_m: 31 })], error: null };
+        return { data: [], error: null };
+      },
+      word_tower_raids: (ops: Op[]) =>
+        has(ops, 'eq', 'blocked', false)
+          ? {
+              data: [
+                { attacker_id: R2, defender_id: THEM, created_at: '2026-09-30T10:00:00Z' },
+                { attacker_id: ME, defender_id: THEM, created_at: '2026-09-30T09:00:00Z' },
+              ],
+              error: null,
+            }
+          : { data: [], error: null },
+      profiles: (ops: Op[]) => ({
+        data: (argOf(ops, 'in', 1) as string[]).map((id) => profile(id, `name-${id.slice(0, 1)}`)),
+        error: null,
+      }),
+    });
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    const b = await body(await getRivals(getReq()));
+    const ruined = b.rivals.find((r: { userId: string }) => r.userId === THEM);
+    expect(ruined.ruins).toEqual({ count: 2, by: ['name-3'], byYou: true });
+    const q = db.calls.find((c) => c.table === 'word_tower_raids' && has(c.ops, 'eq', 'blocked', false))!;
+    expect(has(q.ops, 'in', 'defender_id', [THEM])).toBe(true);
+  });
+
+  it('given no recent raids, when listed, then ruins is empty (never undefined)', async () => {
+    const db = rivalsDb();
+    (getSupabaseAdmin as any).mockReturnValue(db.client);
+    const b = await body(await getRivals(getReq()));
+    expect(b.rivals[0].ruins).toEqual({ count: 0, by: [], byYou: false });
+  });
+
   it('given rivals, when listed, then each carries userId + avatar fields from a SEPARATE profiles query', async () => {
     const db = rivalsDb();
     (getSupabaseAdmin as any).mockReturnValue(db.client);

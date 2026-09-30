@@ -1,6 +1,9 @@
 /**
  * Daily quest pool — deterministic daily rotation of IN-GAMEPLAY ACHIEVEMENT
- * quests (find a long word, win vs a human, hit a score), NOT mode grinds.
+ * quests (find a long word, climb the tower, solve connections), NOT mode grinds.
+ * Most quests are completable from the Daily Challenge hub (/daily,
+ * /word-tower/daily, /connections/daily); `getDailyQuests` guarantees at least
+ * two such quests per day so a daily-only player can always progress.
  *
  * Each day picks 3 quests from the pool (slots 0/1/2) via a seeded shuffle so
  * frontend and backend always agree without storing config. Completion is
@@ -11,8 +14,10 @@
  * DB columns word_hunt/adventure/community_completed remain SLOT containers
  * (0/1/2) — their names are legacy; they no longer imply a mode.
  *
- * Beta modes (adventure, blast, wheel-rush, word-tower, sealed-bid,
+ * Beta SOCKET modes (adventure, blast, wheel-rush, word-tower versus, sealed-bid,
  * crossword) are NEVER referenced here — quests only steer to public routes.
+ * The DAILY Word Tower is public and reports through its own seam with the mode
+ * label 'word-tower-daily' (distinct from the beta socket mode 'word-tower').
  */
 
 export type QuestConditionType =
@@ -22,12 +27,22 @@ export type QuestConditionType =
   | 'combo' // peak combo this game >= target
   | 'mpWin' // top human in a game with >=1 human opponent
   | 'beatHuman' // outscored at least one real human opponent
+  | 'towerMetres' // metres climbed in today's daily Word Tower >= target
+  | 'towerFloors' // floors built in today's daily Word Tower >= target
+  | 'puzzlesSolved' // daily Connections puzzles solved >= target
   | 'playMode'; // played a specific public mode (discovery)
 
 export type QuestFamily = 'skill' | 'pvp' | 'discovery';
 
 /** Public mode labels a `playMode` quest may reference. NO beta modes. */
-export const QUEST_PUBLIC_MODES = ['multiplayer', 'brain', 'word-hunt', 'word-wheel'] as const;
+export const QUEST_PUBLIC_MODES = [
+  'multiplayer',
+  'brain',
+  'word-hunt',
+  'word-wheel',
+  'word-tower-daily',
+  'connections-daily',
+] as const;
 export type QuestPublicMode = (typeof QUEST_PUBLIC_MODES)[number];
 
 /**
@@ -37,6 +52,10 @@ export type QuestPublicMode = (typeof QUEST_PUBLIC_MODES)[number];
  * daily/weekly skill quests — even though the quest pool never steers players
  * there. `isQuestEligibleMode` gates that seam so beta play grants no quest
  * progress. Keep this list in sync with the header-comment enumeration above.
+ *
+ * 'word-tower' here is the beta SOCKET (versus) mode only. The public daily
+ * tower posts to /api/word-tower/daily/score and reports as 'word-tower-daily'
+ * straight to `completeDailyQuestsForResult`, which is not gated by this list.
  */
 export const QUEST_BETA_MODES = [
   'adventure',
@@ -87,6 +106,12 @@ export interface QuestGameResult {
   wordsFound: number;
   /** Peak combo level reached this game. */
   maxCombo: number;
+  /** Metres climbed in today's daily Word Tower (whole metres). */
+  towerMetres: number;
+  /** Floors built in today's daily Word Tower. */
+  towerFloors: number;
+  /** Daily Connections puzzles solved. */
+  puzzlesSolved: number;
   /** Number of OTHER human players in the game. */
   humanOpponentCount: number;
   /** This player is #1 among the humans. */
@@ -105,6 +130,9 @@ export function emptyQuestResult(
     longestWordLength: 0,
     wordsFound: 0,
     maxCombo: 0,
+    towerMetres: 0,
+    towerFloors: 0,
+    puzzlesSolved: 0,
     humanOpponentCount: 0,
     isTopHuman: false,
     beatHumanOpponent: false,
@@ -157,40 +185,80 @@ export function questResultForWordWheel(run: {
   });
 }
 
+const wholeNonNegative = (n: unknown): number => {
+  const v = Math.floor(Number(n));
+  return Number.isFinite(v) && v > 0 ? v : 0;
+};
+
+/**
+ * Quest facts for a daily Word Tower climb. `heightM` is the DELTA climbed today
+ * (the daily score route stores best climb today, not tower height), so it is a
+ * fair per-day target. Solo, never PvP. Pure, testable without Supabase.
+ */
+export function questResultForWordTower(run: {
+  heightM?: number | null;
+  floors?: number | null;
+}): QuestGameResult {
+  return emptyQuestResult({
+    mode: 'word-tower-daily',
+    towerMetres: wholeNonNegative(run.heightM),
+    towerFloors: wholeNonNegative(run.floors),
+  });
+}
+
+/** Quest facts for a submitted daily Connections (Word Bridge) result. */
+export function questResultForConnections(run: {
+  puzzlesSolved?: number | null;
+}): QuestGameResult {
+  return emptyQuestResult({
+    mode: 'connections-daily',
+    puzzlesSolved: wholeNonNegative(run.puzzlesSolved),
+  });
+}
+
+/** Routes from the Daily Challenge hub that can credit quests. */
+export const DAILY_QUEST_HREFS = ['/daily', '/word-tower/daily', '/connections/daily'] as const;
+
+/** True when the quest can be finished inside the Daily Challenge modes. */
+export function isDailyCompletable(quest: DailyQuest): boolean {
+  return (DAILY_QUEST_HREFS as readonly string[]).includes(quest.href);
+}
+
 export const DAILY_QUEST_POOL: DailyQuest[] = [
-  // SKILL — achieve something inside the gameplay. All steer to /multiplayer:
-  // the classic socket seam (gameResults.ts) is the ONLY game-end that credits
-  // every skill metric (score, longest word, words found, peak combo), and it
-  // works solo-vs-bots (skill quests don't require a real opponent). Word Hunt
-  // (/daily) emits no score/combo and can't guarantee a 7-letter target or 15
-  // words; single-player never reaches a seam at all — so steering skill quests
-  // there left them silently uncompletable.
-  // Longest-word target capped at 6: a 7+ letter word was too hard for the
-  // casual audience (many games' best word never hits 7). 6 stays achievable.
-  // longWord and wordsInGame ARE reported by the daily seams (word-hunt and
-  // word-wheel both send a word list), so these steer to /daily: the hub
-  // advertises "Daily Missions" above the daily games, and sending a player who
-  // is standing there off to another mode to finish them is the bug this fixes.
+  // DAILY-COMPLETABLE (href on the Daily Challenge routes). Each seam reports:
+  //   word hunt / word wheel -> longest word + word count (+ score for wheel)
+  //   word tower daily       -> metres climbed today + floors built
+  //   connections daily      -> puzzles solved
+  // Longest-word target capped at 6: a 7+ letter word was too hard for casuals.
   q('long_word_6', 'longWord', 6, 'skill', '/daily', '📏'),
-  // score and combo are NOT reported by any daily seam, so these stay on the
-  // classic socket path, which is the only game-end that credits them.
-  q('score_300', 'score', 300, 'skill', '/multiplayer', '🎯'),
-  q('score_500', 'score', 500, 'skill', '/multiplayer', '🚀'),
-  // Verified against 1,115 real Word Wheel runs before moving this: median run
-  // finds 16 words, 55.9% clear 15, and 27.4% land a 6-letter word. The older
-  // warning in this file about "can't guarantee 15 words" was about Word Hunt,
-  // which is a different board — the wheel comfortably supports both targets.
+  // Verified against 1,115 real Word Wheel runs: median run finds 16 words,
+  // 55.9% clear 15, and 27.4% land a 6-letter word.
   q('words_15', 'wordsInGame', 15, 'skill', '/daily', '⚡'),
-  q('combo_4', 'combo', 4, 'skill', '/multiplayer', '🔥'),
-  q('combo_6', 'combo', 6, 'skill', '/multiplayer', '💥'),
-  // PVP — same-language is guaranteed by matchmaking; beating a human is rare/brag-worthy
-  q('mp_win', 'mpWin', 1, 'pvp', '/multiplayer', '👑'),
-  q('beat_human', 'beatHuman', 1, 'pvp', '/multiplayer', '⚔️'),
-  // DISCOVERY — steer to PUBLIC modes only
-  q('play_mp', 'playMode', 1, 'discovery', '/multiplayer', '🎮', 'multiplayer'),
-  q('play_brain', 'playMode', 1, 'discovery', '/brain', '🧠', 'brain'),
+  // Word Tower daily: first word ~2m, strong days 400m+, so 25m / 8 floors are
+  // a short session for anyone who opens the tower.
+  q('tower_climb_25', 'towerMetres', 25, 'skill', '/word-tower/daily', '🏗️'),
+  q('tower_floors_8', 'towerFloors', 8, 'skill', '/word-tower/daily', '🧱'),
+  // Connections daily has 5 puzzles; solving 3 is a clear but reachable bar.
+  q('connections_solve_3', 'puzzlesSolved', 3, 'skill', '/connections/daily', '🧩'),
+  // Discovery — the daily games are public. Only one playMode quest is served
+  // per day (one quest per condition type), so these never stack.
   q('play_wordhunt', 'playMode', 1, 'discovery', '/daily', '🔎', 'word-hunt'),
   q('play_wordwheel', 'playMode', 1, 'discovery', '/daily', '🎡', 'word-wheel'),
+  q('play_tower_daily', 'playMode', 1, 'discovery', '/word-tower/daily', '🗼', 'word-tower-daily'),
+  q('play_connections_daily', 'playMode', 1, 'discovery', '/connections/daily', '🔗', 'connections-daily'),
+
+  // CLASSIC SOCKET PATH (/multiplayer): the only game-end that credits score and
+  // combo. Not reported by any daily seam, so they stay off the daily routes;
+  // the picker guarantees these can never crowd out the daily-completable ones.
+  q('score_300', 'score', 300, 'skill', '/multiplayer', '🎯'),
+  q('score_500', 'score', 500, 'skill', '/multiplayer', '🚀'),
+  q('combo_4', 'combo', 4, 'skill', '/multiplayer', '🔥'),
+  q('combo_6', 'combo', 6, 'skill', '/multiplayer', '💥'),
+  q('play_mp', 'playMode', 1, 'discovery', '/multiplayer', '🎮', 'multiplayer'),
+  q('play_brain', 'playMode', 1, 'discovery', '/brain', '🧠', 'brain'),
+  // PVP — at most one per day (soloable Grand Slam)
+  q('mp_win', 'mpWin', 1, 'pvp', '/multiplayer', '👑'),
+  q('beat_human', 'beatHuman', 1, 'pvp', '/multiplayer', '⚔️'),
 ];
 
 // LCG shuffle with Murmur3 finalizer to diffuse consecutive integer seeds.
@@ -218,9 +286,12 @@ function seedFor(dateStr?: string): number {
 
 /**
  * Today's 3 quests in slot order (0,1,2). Deterministic per date.
- * Diversity rules: no two quests of the same condition type; at most one PvP
- * quest (so a solo player can still complete all 3 / Grand Slam).
+ * Rules: no two quests of the same condition type; at most one PvP quest (so a
+ * solo player can still complete all 3 / Grand Slam); and at least
+ * MIN_DAILY_COMPLETABLE quests completable from the Daily Challenge routes.
  */
+export const MIN_DAILY_COMPLETABLE = 2;
+
 export function getDailyQuests(
   dateStr?: string,
 ): [DailyQuest, DailyQuest, DailyQuest] {
@@ -229,22 +300,33 @@ export function getDailyQuests(
   const usedTypes = new Set<QuestConditionType>();
   let pvpCount = 0;
 
-  for (const quest of shuffled) {
-    if (picked.length === 3) break;
-    if (usedTypes.has(quest.type)) continue;
-    if (quest.family === 'pvp' && pvpCount >= 1) continue;
+  const tryPick = (quest: DailyQuest): boolean => {
+    if (picked.length === 3 || picked.includes(quest)) return false;
+    if (usedTypes.has(quest.type)) return false;
+    if (quest.family === 'pvp' && pvpCount >= 1) return false;
     picked.push(quest);
     usedTypes.add(quest.type);
     if (quest.family === 'pvp') pvpCount++;
+    return true;
+  };
+
+  // Pass 1: reserve the guaranteed daily-completable quests first.
+  let dailyCount = 0;
+  for (const quest of shuffled) {
+    if (dailyCount >= MIN_DAILY_COMPLETABLE) break;
+    if (isDailyCompletable(quest) && tryPick(quest)) dailyCount++;
   }
+  // Pass 2: fill the remaining slot(s) from the whole shuffled pool.
+  for (const quest of shuffled) tryPick(quest);
   // Relaxation pass (should never be needed with the current pool size, but
   // guarantees exactly 3 rather than a silent short array — Class 4).
   for (const quest of shuffled) {
     if (picked.length === 3) break;
-    if (picked.includes(quest)) continue;
-    picked.push(quest);
+    if (!picked.includes(quest)) picked.push(quest);
   }
 
+  // Keep slot order stable w.r.t. the seeded shuffle (not the reservation order).
+  picked.sort((a, b) => shuffled.indexOf(a) - shuffled.indexOf(b));
   return [picked[0], picked[1], picked[2]];
 }
 
@@ -262,6 +344,12 @@ function isSatisfied(quest: DailyQuest, r: QuestGameResult): boolean {
       return r.isMultiplayer && r.isTopHuman && r.humanOpponentCount >= 1;
     case 'beatHuman':
       return r.beatHumanOpponent;
+    case 'towerMetres':
+      return r.towerMetres >= quest.target;
+    case 'towerFloors':
+      return r.towerFloors >= quest.target;
+    case 'puzzlesSolved':
+      return r.puzzlesSolved >= quest.target;
     case 'playMode':
       if (quest.mode === 'multiplayer') return r.isMultiplayer;
       return r.mode === quest.mode;

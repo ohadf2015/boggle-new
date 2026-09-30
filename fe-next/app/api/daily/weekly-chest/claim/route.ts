@@ -1,68 +1,52 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getAuthedUser } from '@/lib/auth/getAuthedUser'
+import { getSupabaseAdmin } from '@/lib/email'
 import {
   computeCycleProgress,
   computeChestTierForCycle,
   findCompletedCycles,
-  type HuntScoreRow,
-  type WheelScoreRow,
-  type PuzzleScoreRow,
 } from '@/lib/daily/weeklyChest'
+import { loadChestActivity } from '@/lib/daily/weeklyChestData'
 import { selectChestPrize } from '@/lib/daily/chestPrizePool'
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins'
+import logger from '@/utils/logger'
 
-export async function POST() {
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+export async function POST(request: NextRequest) {
+  try {
+    return await claim(request)
+  } catch (error) {
+    logger.error('Weekly chest claim error:', error instanceof Error ? error.message : String(error))
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
 
-  if (authError || !user) {
+async function claim(request: NextRequest) {
+  const user = await getAuthedUser(request)
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Service client so bearer-only sessions (native app) work; every query is
+  // filtered strictly by user.id.
+  const supabase = getSupabaseAdmin()
+  if (!supabase) {
+    logger.error('Weekly chest claim: admin client unavailable')
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 
   const today = new Date().toISOString().split('T')[0]
 
-  // Only *completed* attempts count toward the streak — keep this in sync with
-  // /api/daily/weekly-chest/status.
-  const [puzzleRes, huntRes, wheelRes] = await Promise.all([
-    supabase
-      .from('daily_puzzle_attempts')
-      .select('puzzle_date,score,time_seconds')
-      .eq('player_id', user.id)
-      .gt('word_count', 0),
-    supabase
-      .from('daily_word_hunt_attempts')
-      .select('puzzle_date,efficiency_score')
-      .eq('player_id', user.id)
-      .eq('solved', true)
-      .eq('is_catchup', false), // catch-up plays don't count toward the chest cycle
-    supabase
-      .from('daily_word_wheel_attempts')
-      .select('puzzle_date,score,time_seconds')
-      .eq('player_id', user.id)
-      .gt('word_count', 0),
-  ])
-
-  // Frozen days bridge cycle continuity but carry no score row — keep in sync
-  // with /api/daily/weekly-chest/status + the submit hook.
-  const { data: freezeRows } = await supabase
-    .from('daily_streak_freezes')
-    .select('frozen_date')
-    .eq('player_id', user.id)
-
-  const allDates = [
-    ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
-    ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
-    ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
-    ...(freezeRows ?? []).map((r: { frozen_date: string }) => r.frozen_date),
-  ]
+  // Shared with /weekly-chest/status so both always agree on which days count.
+  const { huntRows, wheelRows, puzzleRows, allDates } = await loadChestActivity(supabase, user.id)
 
   // Pull every chest row for this player so we can resolve which cycle the
   // claim should apply to — current in-progress streak OR an older unclaimed
   // chest that the player never picked up before the next week began.
-  const { data: allChests } = await supabase
+  const { data: allChests, error: chestsErr } = await supabase
     .from('daily_weekly_chests')
     .select('id, cycle_start, opened_at, tier, contents')
     .eq('player_id', user.id)
+  if (chestsErr) throw new Error(chestsErr.message)
 
   const openedCycleStarts = new Set(
     (allChests ?? []).filter((c: any) => !!c.opened_at).map((c: any) => c.cycle_start as string)
@@ -94,9 +78,9 @@ export async function POST() {
 
   const { weekScore, tier } = computeChestTierForCycle(
     progress.completedDates,
-    (huntRes.data ?? []) as HuntScoreRow[],
-    (wheelRes.data ?? []) as WheelScoreRow[],
-    (puzzleRes.data ?? []) as PuzzleScoreRow[],
+    huntRows,
+    wheelRows,
+    puzzleRows,
   )
 
   // Deterministic seed → retry-safe (same user + cycle = same prize).
@@ -112,13 +96,20 @@ export async function POST() {
   }
   const nowIso = new Date().toISOString()
 
-  let dbError: unknown
+  // Race guard: two concurrent claims (double-click, retry) must never both pay
+  // out. Update is conditional on opened_at IS NULL and must match a row; insert
+  // relies on UNIQUE (player_id, cycle_start) — 23505 means someone else won.
   if (existing?.[0]) {
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from('daily_weekly_chests')
       .update({ tier, contents, opened_at: nowIso })
       .eq('id', existing[0].id)
-    dbError = error
+      .is('opened_at', null)
+      .select('id')
+    if (error) return NextResponse.json({ error: 'Failed to save chest' }, { status: 500 })
+    if (!updated || updated.length === 0) {
+      return NextResponse.json({ error: 'Already claimed' }, { status: 409 })
+    }
   } else {
     const { error } = await supabase.from('daily_weekly_chests').insert({
       player_id: user.id,
@@ -128,9 +119,13 @@ export async function POST() {
       contents,
       opened_at: nowIso,
     })
-    dbError = error
+    if (error) {
+      if ((error as { code?: string }).code === '23505') {
+        return NextResponse.json({ error: 'Already claimed' }, { status: 409 })
+      }
+      return NextResponse.json({ error: 'Failed to save chest' }, { status: 500 })
+    }
   }
-  if (dbError) return NextResponse.json({ error: 'Failed to save chest' }, { status: 500 })
 
   await awardCoinsServer(user.id, prize.coins, 'daily_weekly_chest', {
     tier,

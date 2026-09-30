@@ -24,6 +24,7 @@ interface Props {
   /** ImpactBurst flies its coins into this exact rect. */
   coinsRef: RefObject<HTMLDivElement | null>;
   onOpenEstate: () => void;
+  onOpenRivals?: () => void;
   /** Leave the game mid-run. The caller banks the run before navigating. */
   onExit?: () => void;
   /** The band's element — the camera frames the hanging slab under its bottom edge. */
@@ -40,6 +41,8 @@ interface Props {
   dailyDateKey?: string;
   /** Formatted date string to display in daily badge (e.g., "25 Sep" or "25 9月"). */
   dailyDateFormatted?: string;
+  dailyTarget?: { growthM: number; targetM: number };
+  hasTower?: boolean;
 }
 
 /**
@@ -58,6 +61,7 @@ export function V2Hud({
   raids,
   coinsRef,
   onOpenEstate,
+  onOpenRivals,
   onExit,
   barRef,
   wide,
@@ -65,6 +69,8 @@ export function V2Hud({
   daily,
   dailyDateKey,
   dailyDateFormatted,
+  dailyTarget,
+  hasTower,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const coins = estate.coins + runCoins;
@@ -95,6 +101,8 @@ export function V2Hud({
         daily={daily}
         dailyDateKey={dailyDateKey}
         dailyDateFormatted={dailyDateFormatted}
+        dailyTarget={dailyTarget}
+        hasTower={hasTower}
       />
       <V2HudMenu
         t={t}
@@ -105,6 +113,7 @@ export function V2Hud({
         estate={estate}
         raids={raids}
         onOpenEstate={onOpenEstate}
+        onOpenRivals={onOpenRivals}
         reducedMotion={reducedMotion}
       />
     </>

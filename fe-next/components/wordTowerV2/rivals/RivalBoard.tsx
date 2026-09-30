@@ -175,6 +175,7 @@ function Column({
         />
       </div>
       <p className="truncate text-center font-neo-display text-[11px] font-bold">{s.name}</p>
+      {s.rival?.ruins && s.rival.ruins.count > 0 ? <RuinChip t={t} ruins={s.rival.ruins} /> : null}
       <p className="text-center font-neo-display text-sm font-black tabular-nums text-neo-lime">
         {s.heightM.toFixed(0)}
         {t('wordTowerV2.unitM')}
@@ -202,6 +203,30 @@ function Column({
         {t('wordTowerV2.rivals.wreck')}
       </span>
     </button>
+  );
+}
+
+/**
+ * A tower somebody wrecked lately carries a ruin tag that EVERYONE who looks at
+ * it can read — the brag for the wrecker, the warning for the next challenger.
+ */
+function RuinChip({ t, ruins }: { t: T; ruins: NonNullable<RivalView['ruins']> }) {
+  const others = ruins.by.join(', ');
+  const label = ruins.byYou
+    ? others
+      ? t('wordTowerV2.dailyTower.ruinedByYouAnd', { names: others })
+      : t('wordTowerV2.dailyTower.ruinedByYou')
+    : others
+      ? t('wordTowerV2.dailyTower.ruinedBy', { names: others })
+      : t('wordTowerV2.dailyTower.ruinedAnon', { n: ruins.count });
+  return (
+    <p
+      data-wt2-ruin
+      className="mx-auto mt-0.5 line-clamp-2 w-fit max-w-full rounded-sm border-neo border-black bg-neo-orange px-1 text-center font-neo-display text-[10px] font-black uppercase leading-tight text-neo-navy"
+    >
+      <span aria-hidden>💥 </span>
+      {label}
+    </p>
   );
 }
 

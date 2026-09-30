@@ -96,6 +96,10 @@ export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) 
 
     playSound(SOUNDS.shake, 0.35)
 
+    // Safety net: if the timeline stalls (throttled background tab, low-end
+    // device) the player must never be trapped behind an unclosable overlay.
+    const fallbackClose = setTimeout(() => setCanClose(true), 6000)
+
     const tl = gsap.timeline()
 
     // Act 1 — shake/suspense (0–0.84s)
@@ -142,6 +146,7 @@ export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) 
     .add(() => setCanClose(true), '+=0.4')
 
     return () => {
+      clearTimeout(fallbackClose)
       tl.kill()
       if (counterInterval) clearInterval(counterInterval)
     }

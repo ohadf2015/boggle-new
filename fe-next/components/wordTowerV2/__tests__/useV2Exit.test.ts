@@ -450,3 +450,74 @@ describe('useV2Exit', () => {
     });
   });
 });
+
+describe('useV2Exit — daily tower', () => {
+  it('exits mid-run WITHOUT a confirm, saves the tower, banks the run and lands on the daily hub', async () => {
+    const push = vi.fn();
+    const flushDaily = vi.fn();
+    const bankRun = vi.fn().mockResolvedValue(undefined);
+    const { result } = renderHook(() =>
+      useV2Exit({
+        phase: 'composing',
+        floors: 5,
+        daily: true,
+        finish: vi.fn(),
+        bankRun,
+        router: { push } as any,
+        language: 'he',
+        getScreen: () => 'run',
+        t: mockT,
+        flushDaily,
+      }),
+    );
+    await act(async () => {
+      await result.current.requestExit();
+    });
+    expect(result.current.leaveDialog.open).toBe(false);
+    expect(flushDaily).toHaveBeenCalledOnce();
+    expect(bankRun).toHaveBeenCalledOnce();
+    expect(push).toHaveBeenCalledWith('/he/daily');
+  });
+
+  it('a standing tower with no run floors (restored) still exits straight to the hub', async () => {
+    const push = vi.fn();
+    const { result } = renderHook(() =>
+      useV2Exit({
+        phase: 'composing',
+        floors: 0,
+        daily: true,
+        finish: vi.fn(),
+        bankRun: vi.fn().mockResolvedValue(undefined),
+        router: { push } as any,
+        language: 'en',
+        getScreen: () => 'home',
+        t: mockT,
+      }),
+    );
+    await act(async () => {
+      await result.current.requestExit();
+    });
+    expect(push).toHaveBeenCalledWith('/en/daily');
+  });
+
+  it('the free tower still confirms mid-run and goes home', async () => {
+    const push = vi.fn();
+    const { result } = renderHook(() =>
+      useV2Exit({
+        phase: 'over',
+        floors: 5,
+        daily: false,
+        finish: vi.fn(),
+        bankRun: vi.fn().mockResolvedValue(undefined),
+        router: { push } as any,
+        language: 'en',
+        getScreen: () => 'results',
+        t: mockT,
+      }),
+    );
+    await act(async () => {
+      await result.current.requestExit();
+    });
+    expect(push).toHaveBeenCalledWith('/en');
+  });
+});

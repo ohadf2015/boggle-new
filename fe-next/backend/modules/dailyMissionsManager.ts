@@ -1,6 +1,7 @@
 /**
  * Daily Missions Manager
- * Tracks 3 daily missions: Word Hunt, Adventure, Multiplayer
+ * Tracks 3 daily quest SLOTS (word_hunt/adventure/community are legacy column
+ * names; the quest in each slot comes from shared/dailyQuestPool getDailyQuests)
  * Grand Slam bonus (500 XP) when all 3 complete
  */
 

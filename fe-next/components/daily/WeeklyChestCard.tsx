@@ -31,6 +31,8 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
     pendingChest,
     projectedTier,
     weekScore,
+    claiming,
+    claimError,
     claim,
   } = useWeeklyChest()
   const chestRef = useRef<HTMLButtonElement>(null)
@@ -121,6 +123,7 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
   }, [])
 
   const handleClaim = async () => {
+    if (claiming) return
     const result = await claim()
     if (result) onChestClaimed(result)
   }
@@ -255,12 +258,20 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
             exit={{ y: 12, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             onClick={handleClaim}
-            className="mt-3 w-full py-2 rounded-neo border-2 border-black bg-neo-yellow text-neo-navy font-neo-display font-black text-sm shadow-hard active:shadow-hard-pressed active:translate-y-px"
+            disabled={claiming}
+            aria-busy={claiming}
+            className="mt-3 w-full py-2 rounded-neo border-2 border-black bg-neo-yellow text-neo-navy font-neo-display font-black text-sm shadow-hard active:shadow-hard-pressed active:translate-y-px disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {t('daily.weeklyChest.claimButton')}
           </m.button>
         )}
       </AnimatePresence>
+
+      {claimError && (
+        <p role="alert" className="mt-2 text-xs font-bold text-neo-red">
+          {t('daily.weeklyChest.claimError')}
+        </p>
+      )}
 
       {infoOpen && (
         <WeeklyChestInfoModal

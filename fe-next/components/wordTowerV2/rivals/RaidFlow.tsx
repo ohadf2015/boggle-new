@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { wreckingBallCost } from '@/lib/wordTowerV2/estate';
 import { revengeLedger, wreckAccuracy, wreckableTower } from '@/lib/wordTowerV2/wreck';
 import type { RaidResult, RivalView, UseEstate } from '../useEstate';
 import { PaybackChip, type Grievance } from './Payback';
@@ -134,6 +135,9 @@ export function RaidFlow({ t, estate, rival, revenge, grievance, balls, reducedM
         revenge={revenge}
         grievance={grievance ?? null}
         charges={estate.estate.raidCharges}
+        coins={estate.estate.coins}
+        ballCost={wreckingBallCost(estate.estate.district)}
+        onBuyBall={estate.buyCharge}
         busy={busy}
         onWreck={start}
         onClose={onClose}

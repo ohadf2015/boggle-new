@@ -507,10 +507,21 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     dropCountRef.current = seedDemoTower(worldRef.current, labelsRef.current, words);
   }, []);
 
+  /**
+   * Rebuild the persisted daily tower floor by floor (short settle per floor:
+   * up to 100 of them). Returns how many floors stand. Same guard as the demo
+   * seed: a second call (StrictMode) on a built world is a no-op.
+   */
+  const restoreTower = useCallback((words: string[]): number => {
+    if (dropCountRef.current > 0 || words.length === 0) return 0;
+    dropCountRef.current = seedDemoTower(worldRef.current, labelsRef.current, words, 250);
+    return dropCountRef.current;
+  }, []);
+
   return {
     worldRef, labelsRef, fxRef, hangingRef,
     phase, heightM, risk, peakM, bestM, run, callout, banners, shiftBanner, newBest, runBadges, unlockedRef, statsRef,
-    onBeforeStep, getHangVx, getCraneX, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, setPerks, perksRef, adoptBest,
+    onBeforeStep, getHangVx, getCraneX, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, restoreTower, setPerks, perksRef, adoptBest,
     brace, finish, bracesRef,
   };
 }

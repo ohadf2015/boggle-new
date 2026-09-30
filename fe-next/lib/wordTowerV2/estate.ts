@@ -91,7 +91,7 @@ export type RaidOutcome =
 
 export type SpendResult =
   | { ok: true; estate: Estate; cost: number; usedToken: boolean }
-  | { ok: false; reason: 'maxed' | 'damaged' | 'coins' | 'intact' | 'unknown' };
+  | { ok: false; reason: 'maxed' | 'damaged' | 'coins' | 'intact' | 'unknown' | 'full' };
 
 // ── Tuning ───────────────────────────────────────────────────────────────────
 
@@ -338,6 +338,33 @@ export function applyRepair(e: Estate, slot: PlotSlot): SpendResult {
     cost,
     usedToken: useBrick,
     estate: { ...e, coins: e.coins - cost, bricks: e.bricks - (useBrick ? 1 : 0), plots: withPlot(e, slot, { damaged: false }) },
+  };
+}
+
+// ── Wrecking balls ───────────────────────────────────────────────────────────
+
+const WRECKING_BALL_BASE = 90;
+
+/**
+ * Price of one extra wrecking ball (raid charge). A run earns one for free; this
+ * is for the player who wants to ruin a rival's tower NOW. Priced above a
+ * typical run's coin haul so it stays a shortcut, not the default, and scaled
+ * by district so it never becomes pocket change late.
+ */
+export function wreckingBallCost(district: number): number {
+  return Math.round(WRECKING_BALL_BASE * costScale(district));
+}
+
+/** Coins -> one more raid charge, up to the stock cap. */
+export function applyBuyCharge(e: Estate): SpendResult {
+  if (e.raidCharges >= MAX_RAID_CHARGES) return { ok: false, reason: 'full' };
+  const cost = wreckingBallCost(e.district);
+  if (e.coins < cost) return { ok: false, reason: 'coins' };
+  return {
+    ok: true,
+    cost,
+    usedToken: false,
+    estate: { ...e, coins: e.coins - cost, raidCharges: e.raidCharges + 1 },
   };
 }
 

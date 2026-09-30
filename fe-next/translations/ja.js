@@ -1407,6 +1407,7 @@ const ja = {
     "issueProbe": {"prompt": "なぜそう感じましたか？", "botsStrong": "ボットが強すぎる", "technical": "技術的な問題"}
   },
   "wordTowerV2": {
+    "dailyTower": {"exitLabel": "デイリー", "exitA11y": "デイリーチャレンジに戻る — タワーは保存されています", "finishLabel": "終了", "exitFree": "退出", "targetA11y": "今日の目標: {target} m 中 {m} m", "goalToast": "目標達成！ 今日 +{m} m", "grewToday": "今日の伸び", "goal": "今日の目標", "goalHit": "目標達成！", "rankLabel": "今日の順位", "keepBuilding": "建て続ける", "openRivals": "ライバルのタワー", "ruinedBy": "{names} が破壊", "ruinedByYou": "あなたが破壊", "ruinedByYouAnd": "あなたと {names} が破壊", "ruinedAnon": "破壊 ×{n}", "buyBall": "鉄球を購入 · {n} コイン", "ballPoor": "あと {n} コイン必要です", "ballError": "購入できませんでした。もう一度お試しください", "boardTitle": "今日のトップクライマー", "boardEmpty": "まだ誰もタワーを伸ばしていません。一番乗りになろう！"},
     "gear": {"foundation":"基礎","craneYard":"クレーン","vault":"金の装飾","insurance":"鉄骨ブレース","landmark":"屋上","see":{"foundation":"タワーに：1階の下に石の土台。土台が広がり、揺れが減る。","craneYard":"タワーに：塗り直したクレーン。振りがゆっくりで狙いやすい。","vault":"タワーに：各階に金の装飾。毎回もらえるコインが増える。","insurance":"タワーに：側面に鉄骨ブレース。無料の緊急補強とシールド枠が増える。","landmark":"タワーに：アンテナから金の王冠へ育つ屋上。スコアアップ。"}},
     "rescue": {"crumbled":"{n}階を失った！建設を続けよう","counterweight":"カウンターウェイト！タワーが安定","braced":"補強完了！鉄骨が支える","craneSaved":"クレーン強化！広い判定でパーフェクト"},
     "brace": {"button":"補強","freeTag":"無料","explain":"一番上以外の全フロアを固定して、揺れを止める。このランのコインで払うか、救出ワードで勝ち取ろう。","useFree":"無料の補強を使う","buy":"補強する · {n}コイン","poor":"このランのコインが足りない","rescue":"救出ワード：{n}文字以上","rescueLeft":"救出は残り{n}回","rescueNow":"{n}文字以上の単語でタワーを補強！","cancel":"救出をやめる","short":"救出には短すぎる"},
@@ -8607,6 +8608,7 @@ const ja = {
       "daysRemaining": "{tier}チェストまであと{n}日！",
       "claimReady": "{tier}チェストの準備ができました！",
       "claimButton": "チェストを開ける",
+      "claimError": "チェストを開けられませんでした。もう一度お試しください。",
       "tierBronze": "ブロンズ",
       "tierSilver": "シルバー",
       "tierGold": "ゴールド",
@@ -16148,6 +16150,26 @@ const ja = {
       "play_wordwheel": {
         "title": "ホイールを回そう",
         "desc": "今日のワードホイールで遊ぶ"
+      },
+      "tower_climb_25": {
+        "title": "空を目指せ",
+        "desc": "今日のワードタワーで25m登ろう"
+      },
+      "tower_floors_8": {
+        "title": "フロア職人",
+        "desc": "今日のワードタワーで8階分積み上げよう"
+      },
+      "connections_solve_3": {
+        "title": "ブリッジマスター",
+        "desc": "今日のワードブリッジを3問解こう"
+      },
+      "play_tower_daily": {
+        "title": "タワータイム",
+        "desc": "今日のワードタワーをプレイしよう"
+      },
+      "play_connections_daily": {
+        "title": "橋を架けよう",
+        "desc": "今日のワードブリッジをプレイしよう"
       }
     },
     "reward": {
@@ -18029,7 +18051,7 @@ const ja = {
       "twitterDescription": "2つの単語、1つの橋。何がつなぐ?",
       "badge": "無料・登録不要",
       "h1Pre": "2つの単語、1つの橋",
-      "h1Highlight": "つながりを見つけよう",
+      "h1Highlight": "橋を架けよう",
       "h1Sub": "ワードブリッジ — イスラエルの古典ゲーム「ロシュ・ザナヴ」の単語版",
       "introP1": "ワードブリッジは2つの単語をくれる。あなたの仕事:その2つをつなぐ1つの単語を見つけること。火+エンジン?トラック。太陽+輝く?光。シンプルに見えて奥が深い。",
       "introP2": "脳が喜ぶゲーム — サクサク進んで、ひらめきがスッキリ、語彙が自然に増える。無料、ブラウザで、ダウンロード不要。",

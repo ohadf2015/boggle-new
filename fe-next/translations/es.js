@@ -1406,6 +1406,7 @@ const es = {
     "issueProbe": {"prompt": "¿Qué lo hizo sentir así?", "botsStrong": "Bots muy fuertes", "technical": "Problema técnico"}
   },
   "wordTowerV2": {
+    "dailyTower": {"exitLabel": "Diario", "exitA11y": "Volver al reto diario: tu torre está guardada", "finishLabel": "Terminar", "exitFree": "Salir", "targetA11y": "Meta de hoy: {m} de {target} metros", "goalToast": "¡Meta lograda! +{m} m hoy", "grewToday": "Crecimiento hoy", "goal": "Meta de hoy", "goalHit": "¡Meta lograda!", "rankLabel": "Puesto hoy", "keepBuilding": "Seguir construyendo", "openRivals": "Torres rivales", "ruinedBy": "Arruinada por {names}", "ruinedByYou": "La arruinaste tú", "ruinedByYouAnd": "Tú + {names} la arruinaron", "ruinedAnon": "Arruinada ×{n}", "buyBall": "Comprar bola de demolición · {n} monedas", "ballPoor": "Te faltan {n} monedas", "ballError": "No se pudo comprar, inténtalo otra vez", "boardTitle": "Mejores escaladores de hoy", "boardEmpty": "Nadie ha hecho crecer su torre todavía. ¡Sé el primero!"},
     "gear": {"foundation":"Cimientos","craneYard":"Grúa","vault":"Molduras de oro","insurance":"Refuerzos de acero","landmark":"Azotea","see":{"foundation":"En tu torre: un zócalo de piedra bajo la planta baja. Base más ancha, menos vaivén.","craneYard":"En tu torre: una grúa recién pintada con un balanceo más lento y fácil.","vault":"En tu torre: molduras de oro en tus pisos. Más monedas en cada partida.","insurance":"En tu torre: vigas de acero por los lados. Refuerzos de emergencia gratis y más escudos.","landmark":"En tu torre: una azotea que pasa de antena a corona de oro. Más puntos."}},
     "rescue": {"crumbled":"¡Perdiste {n} pisos! Sigue construyendo","counterweight":"¡CONTRAPESO! Torre estabilizada","braced":"¡REFORZADA! El acero aguanta","craneSaved":"¡MEJORA DE GRÚA! Ventana más ancha, caída perfecta"},
     "brace": {"button":"Reforzar","freeTag":"GRATIS","explain":"Suelda todos los pisos menos el de arriba y la torre deja de tambalearse. Paga con las monedas de esta partida o gánatelo con una palabra de rescate.","useFree":"Usar refuerzo gratis","buy":"Reforzar · {n} monedas","poor":"No te alcanzan las monedas de esta partida","rescue":"Palabra de rescate: {n}+ letras","rescueLeft":"Te quedan {n} rescates","rescueNow":"¡Escribe una palabra de {n}+ letras para reforzar la torre!","cancel":"Cancelar rescate","short":"Muy corta para un rescate"},
@@ -8568,6 +8569,7 @@ const es = {
       "daysRemaining": "¡{n} días más para tu cofre {tier}!",
       "claimReady": "¡Tu cofre {tier} está listo!",
       "claimButton": "Abrir cofre",
+      "claimError": "No se pudo abrir el cofre. Inténtalo de nuevo.",
       "tierBronze": "Bronce",
       "tierSilver": "Plata",
       "tierGold": "Oro",
@@ -16400,6 +16402,26 @@ const es = {
       "play_wordwheel": {
         "title": "Dale una vuelta",
         "desc": "Juega la Rueda de Palabras de hoy"
+      },
+      "tower_climb_25": {
+        "title": "Constructor de cielos",
+        "desc": "Sube 25 m en la Torre de Palabras de hoy"
+      },
+      "tower_floors_8": {
+        "title": "Arquitecto de plantas",
+        "desc": "Construye 8 pisos en la Torre de Palabras de hoy"
+      },
+      "connections_solve_3": {
+        "title": "Maestro de puentes",
+        "desc": "Resuelve 3 puzles de el Puente de palabras de hoy"
+      },
+      "play_tower_daily": {
+        "title": "Hora de la torre",
+        "desc": "Juega la Torre de Palabras de hoy"
+      },
+      "play_connections_daily": {
+        "title": "Tiende el puente",
+        "desc": "Juega el Puente de palabras de hoy"
       }
     },
     "reward": {

@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const creditMock = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/daily/questSeams', async (orig) => ({
+  ...(await orig<typeof import('@/lib/daily/questSeams')>()),
+  creditDailyQuests: creditMock,
+}));
+
 import { processConnectionsCompletion, type ProcessConnectionsContext } from '../processCompletion';
 
 interface MockBuilderState {
@@ -198,5 +204,53 @@ describe('processConnectionsCompletion', () => {
       expect(result.status).toBe(500);
       expect(result.error).toMatch(/Failed to/);
     }
+  });
+});
+
+describe('processConnectionsCompletion — daily quest credit', () => {
+  const today = new Date().toISOString().slice(0, 10);
+  const run = async (opts: { puzzleDate: string; userIdForRow: string | null; puzzlesSolved?: number }) => {
+    const builder = makeBuilder();
+    (builder.__queue as unknown[]).push({ data: null }, { data: null });
+    const sub = {
+      puzzleDate: opts.puzzleDate,
+      language: 'en',
+      displayName: 'Alice',
+      score: 500,
+      timeTakenSeconds: 42,
+      puzzlesSolved: opts.puzzlesSolved ?? 3,
+    };
+    return processConnectionsCompletion(sub, {
+      sub,
+      idCol: opts.userIdForRow ? 'player_id' : 'guest_fingerprint',
+      idVal: opts.userIdForRow ?? 'guest-1',
+      userIdForRow: opts.userIdForRow,
+      guestIdForRow: opts.userIdForRow ? null : 'guest-1',
+      profile: null,
+      avatarOverrides: {},
+      admin: { from: () => builder },
+    });
+  };
+
+  beforeEach(() => creditMock.mockClear());
+
+  it('credits today\'s quests for an authed player submitting today\'s daily', async () => {
+    const r = await run({ puzzleDate: today, userIdForRow: 'player-1', puzzlesSolved: 4 });
+    expect(r.ok).toBe(true);
+    expect(creditMock).toHaveBeenCalledTimes(1);
+    const [uid, result] = creditMock.mock.calls[0];
+    expect(uid).toBe('player-1');
+    expect(result.mode).toBe('connections-daily');
+    expect(result.puzzlesSolved).toBe(4);
+  });
+
+  it('does not credit guests', async () => {
+    await run({ puzzleDate: today, userIdForRow: null });
+    expect(creditMock).not.toHaveBeenCalled();
+  });
+
+  it('does not credit a catch-up/replayed submission for a past date', async () => {
+    await run({ puzzleDate: '2020-01-01', userIdForRow: 'player-1' });
+    expect(creditMock).not.toHaveBeenCalled();
   });
 });

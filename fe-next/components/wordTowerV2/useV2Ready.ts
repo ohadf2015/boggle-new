@@ -1,18 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
-import { getWithAuth, postWithAuth } from '@/utils/authFetch';
+import { getWithAuth } from '@/utils/authFetch';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/reviewHooks';
-import {
-  hasPlayedV2DailyToday,
-  playedOnDailyBoard,
-  rankFromDailyBoard,
-  recordV2DailyClimb,
-} from '@/lib/wordTowerV2/daily';
-import { clearRunSnapshot, loadRunSnapshot, shouldConfirmLeave } from '@/lib/wordTowerV2/runPersist';
+import { rankFromDailyBoard } from '@/lib/wordTowerV2/daily';
+import { shouldConfirmLeave } from '@/lib/wordTowerV2/runPersist';
 
 interface Args {
   daily: boolean;
@@ -23,7 +18,6 @@ interface Args {
   floors: number;
   peakM: number;
   score: number;
-  longestWord: string;
   resultsShown: boolean;
   seedDemo: (words?: string[]) => void;
   setForceResults: (v: boolean) => void;
@@ -48,15 +42,12 @@ export function useV2Ready({
   floors,
   peakM,
   score,
-  longestWord,
   resultsShown,
   seedDemo,
   setForceResults,
   setSmashing,
-}: Args): { dailyLocked: boolean; dailyRank: number | null } {
-  const [serverPlayed, setServerPlayed] = useState(false);
+}: Args): { dailyRank: number | null; refreshRank: () => void } {
   const [dailyRank, setDailyRank] = useState<number | null>(null);
-  const dailyLocked = daily && (hasPlayedV2DailyToday() || serverPlayed);
 
   useEffect(() => {
     const hooks = v2ReviewHooksFromSearch(
@@ -68,35 +59,24 @@ export function useV2Ready({
     if (hooks.smash) setSmashing(true);
   }, [canSeeInWorkModes, isAdmin, seedDemo, setForceResults, setSmashing]);
 
+  const [rankTick, setRankTick] = useState(0);
   useEffect(() => {
     if (!daily) return;
     let cancelled = false;
     void fetchDailyBoard(language)
       .then((d) => {
         if (cancelled || !d) return;
-        const rows = d.leaderboard ?? [];
-        if (playedOnDailyBoard(rows)) setServerPlayed(true);
-        setDailyRank(rankFromDailyBoard(rows));
+        setDailyRank(rankFromDailyBoard(d.leaderboard ?? []));
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, [daily, language]);
-
-  useEffect(() => {
-    if (!daily) return;
-    if (dailyLocked) {
-      setForceResults(true);
-      return;
-    }
-    const snap = loadRunSnapshot(true, window.sessionStorage);
-    if (snap && snap.words.length > 0) seedDemo(snap.words);
-  }, [daily, dailyLocked, seedDemo, setForceResults]);
+  }, [daily, language, rankTick]);
 
   useGameStartTelemetry({
     mode: 'word-tower',
-    isGameActive: phase !== 'over' && !dailyLocked,
+    isGameActive: phase !== 'over',
     extras: { v2: true, daily },
   });
   useGameEndTelemetry({
@@ -107,34 +87,16 @@ export function useV2Ready({
     extras: { v2: true, daily, heightM: Math.round(peakM) },
   });
 
-  const submitted = useRef(false);
-  useEffect(() => {
-    if (!daily || !resultsShown || submitted.current) return;
-    submitted.current = true;
-    const body = recordV2DailyClimb(
-      { climbM: peakM, floors, longestWord },
-      { language, guestFingerprint: getGuestFingerprint(), storage: window.localStorage },
-    );
-    clearRunSnapshot(true, window.sessionStorage);
-    if (!body) return;
-    void postWithAuth('/api/word-tower/daily/score', body)
-      .then(() => fetchDailyBoard(language))
-      .then((d) => {
-        if (!d) return;
-        setDailyRank(rankFromDailyBoard(d.leaderboard ?? []));
-      })
-      .catch(() => undefined);
-  }, [daily, resultsShown, peakM, floors, longestWord, language]);
-
   useEffect(() => {
     const onLeave = (e: BeforeUnloadEvent) => {
-      if (!shouldConfirmLeave(phase, floors)) return;
+      // The daily tower saves itself as it grows: leaving loses nothing.
+      if (daily || !shouldConfirmLeave(phase, floors)) return;
       e.preventDefault();
       e.returnValue = '';
     };
     window.addEventListener('beforeunload', onLeave);
     return () => window.removeEventListener('beforeunload', onLeave);
-  }, [phase, floors]);
+  }, [daily, phase, floors]);
 
-  return { dailyLocked, dailyRank };
+  return { dailyRank, refreshRank: () => setRankTick((n) => n + 1) };
 }

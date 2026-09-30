@@ -109,7 +109,7 @@ export function WordTowerLeaderboard({ onClose, t, dir, language }: Props) {
                     <span className="font-neo-body font-bold">{r.username}</span>
                   </span>
                   <span className="flex items-center gap-2">
-                    <span className="font-neo-display font-bold tabular-nums">{Math.round(r.bestHeightM)} m</span>
+                    <span className="font-neo-display font-bold tabular-nums">+{Math.round(r.bestHeightM)} m</span>
                     <span className="text-xs opacity-70">{t('wordTower.leaderboard.floors', { count: r.floors })}</span>
                   </span>
                 </li>
