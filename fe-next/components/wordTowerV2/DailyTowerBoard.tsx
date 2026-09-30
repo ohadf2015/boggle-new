@@ -56,7 +56,7 @@ export function DailyTowerBoard({ t, language, refreshKey = 0 }: { t: T; languag
   const shown = me && !top.includes(me) ? [...top, me] : top;
 
   return (
-    <section data-wt2-board className="mt-4 rounded-neo border-neo-thick border-black bg-neo-navy p-2.5 text-neo-cream shadow-hard">
+    <section data-wt2-board className="mt-4 rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy p-2.5 text-neo-cream shadow-hard">
       <h3 className="flex items-center justify-center gap-1.5 font-neo-display text-sm font-black uppercase tracking-widest text-neo-yellow">
         <Trophy className="h-4 w-4" aria-hidden />
         {t('wordTowerV2.dailyTower.boardTitle')}
