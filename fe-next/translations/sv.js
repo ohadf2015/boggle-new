@@ -32,7 +32,9 @@ const sv = {
         "blast": "Blast",
         "blastBlurb": "Snabba rundor, enorma kombos",
         "wordHunt": "Ordjakt",
-        "wordHuntBlurb": "Jaga orden på listan"
+        "wordHuntBlurb": "Jaga orden på listan",
+        "wordcraft": "Wordcraft",
+        "wordcraftBlurb": "Bygg listans ord och slå klassen"
       },
       "noClassTitle": "Skapa din klass – få en kod på 5 sekunder",
       "createClassCta": "Skapa min klass",
@@ -13568,7 +13570,28 @@ const sv = {
         "wordHunt": "Ordjakt",
         "blast": "Blast",
         "wheelRush": "Hjulrush",
-        "vocabQuiz": "Ordquiz"
+        "vocabQuiz": "Ordquiz",
+        "wordcraft": "Wordcraft"
+      },
+      "pressure": {
+        "title": "Press",
+        "leaderboard": {
+          "title": "Topplista",
+          "full": "Hela",
+          "top3": "Bara topp 3",
+          "hidden": "Visas i slutet"
+        },
+        "timer": {
+          "title": "Timer",
+          "full": "Nedräkning",
+          "gentle": "Mjuk",
+          "off": "Av"
+        },
+        "scoring": {
+          "title": "Poäng",
+          "speed": "Fart räknas",
+          "accuracy": "Bara precision"
+        }
       },
       "huntTarget": {
         "title": "Jaktord",
@@ -13920,6 +13943,8 @@ const sv = {
         "sparklineLabel": "Träffsäkerhet över {{count}} sessioner, från {{first}}% till {{last}}%",
         "requeueStudent": "{{name}}s missade ord ligger redan i kö i repetitionen av missade ord.",
         "attempts": "{{count}} försök",
+        "outcomeCorrect": "Hittade den",
+        "outcomeMissed": "Missade den",
         "trend": {
           "mastered": "Bemästrat",
           "improving": "På god väg",
@@ -14235,7 +14260,8 @@ const sv = {
         "wordHunt": "Tävla med klassen om att gräva fram ett dolt målord ur rutnätet.",
         "blast": "Kedja ord snabbt och spräng brickorna i kombos.",
         "wheelRush": "Snurra bokstavshjulet och skjut iväg ord mot klockan.",
-        "vocabQuiz": "Fyra alternativ, en betydelse — snabbast rätt svar ger mest."
+        "vocabQuiz": "Fyra alternativ, en betydelse — snabbast rätt svar ger mest.",
+        "wordcraft": "Bygg ord på din egen tavla mot Baronen — klassens topplista avgör resten."
       }
     },
     "projectorLobby": {
@@ -14266,7 +14292,29 @@ const sv = {
       "wordHunt": "Knäck det dolda ordet på tio försök",
       "blast": "Kedja ord för att rensa brickor i combos",
       "wheelRush": "Bygg ord från ett enda bokstavshjul",
-      "vocabQuiz": "Frågor med fyra svar från dina egna orddata"
+      "vocabQuiz": "Frågor med fyra svar från dina egna orddata",
+      "wordcraft": "Bygg listans ord på egen tavla mot en botmotståndare"
+    },
+    "wordcraftLive": {
+      "rival": "Baronen",
+      "you": "Du",
+      "vsRival": "Du mot Baronen",
+      "tapLetters": "Tryck på bokstäver för att bygga ett ord",
+      "tapStart": "Tryck på rutan där ordet börjar",
+      "place": "LÄGG",
+      "recall": "Ångra",
+      "switchDirection": "Byt riktning",
+      "lessonWords": "Lektionsord",
+      "tilesLeft": "{count} kvar i säcken",
+      "placing": "Lägger…",
+      "waitingBoard": "Delar ut din tavla…",
+      "builtBy": "{name} byggde {word}",
+      "errors": {
+        "invalidWord": "\"{word}\" är inte ett ord",
+        "disconnected": "Ordet måste röra ett som redan ligger",
+        "cellOccupied": "Rutan är upptagen",
+        "generic": "Det gick inte att lägga — försök igen"
+      }
     },
     "wordTowerPractice": {
       "unavailable": "Lektionens ord kan inte bygga ett torn än. Det behövs minst 4 ord på 4 till 6 bokstäver.",
@@ -14548,6 +14596,7 @@ const sv = {
         "won": "DU VANN!",
         "podium": "PÅ PALLEN!",
         "finished": "RONDEN ÄR SLUT!",
+        "roundComplete": "RONDEN KLAR!",
         "of": "av {{total}}",
         "points": "poäng",
         "beat": "Före {{count}} i klassen",
@@ -15019,6 +15068,10 @@ const sv = {
       "yesterday": "Igår"
     },
     "classroomGame": {
+      "pressure": {
+        "revealAtEnd": "Din lärare avslöjar resultaten i slutet."
+      },
+      "pressureFailed": "Kunde inte spara inställningarna — försök igen.",
       "defaultClassroomName": "Mitt klassrum",
       "questions": "Frågor",
       "perQuestion": "Per fråga",

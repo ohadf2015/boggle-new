@@ -7,6 +7,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
 import { boardSizeLabel, classroomModeLabelKey } from '@/components/education/classroomModeLabels';
+import { isStudentTimerHidden } from '@/shared/utils/classroomPressure';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
@@ -118,6 +119,9 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
     : settings?.timerMinutes ?? null;
   const boardSize = templateSettings?.difficulty ?? settings?.boardSize ?? undefined;
   const allowLateJoin = templateSettings?.allowLateJoin ?? settings?.allowLateJoin ?? true;
+  // The teacher's calm dial: timer=off means the clock is not part of this
+  // round — the settings ticker must not advertise one.
+  const timerOff = settings?.pressure ? isStudentTimerHidden(settings.pressure) : false;
 
   const facts = useMemo(() => {
     const rows: { key: string; icon: React.ReactNode; text: string }[] = [
@@ -137,7 +141,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           text: `${settings.vocabQuizQuestionCount} · ${t('education.classroomGame.questions')}`,
         });
       }
-      if (settings?.vocabQuizSeconds != null) {
+      if (settings?.vocabQuizSeconds != null && !timerOff) {
         rows.push({
           key: 'seconds',
           icon: <Clock className="h-[1em] w-[1em]" aria-hidden="true" />,
@@ -145,7 +149,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         });
       }
     } else {
-      if (timerMinutes != null) {
+      if (timerMinutes != null && !timerOff) {
         rows.push({
           key: 'timer',
           icon: <Clock className="h-[1em] w-[1em]" aria-hidden="true" />,
@@ -166,7 +170,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         : t('education.projectorLobby.lateJoinOff'),
     });
     return rows;
-  }, [allowLateJoin, boardSize, isQuiz, mode, settings, t, timerMinutes]);
+  }, [allowLateJoin, boardSize, isQuiz, mode, settings, t, timerMinutes, timerOff]);
 
   return (
     <div

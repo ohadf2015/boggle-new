@@ -47,6 +47,9 @@ export function buildQuizShellStart(session: VocabQuizSession) {
     boardTheme: null,
     gameMode: QUIZ_SHELL_GAME_MODE,
     goldenLetters: [] as string[],
+    // The dials ride every door (start, late join, reconnect) from this one
+    // builder, so a mid-quiz arrival renders the same calm as everybody else.
+    ...(session.pressure ? { pressure: session.pressure } : {}),
   };
 }
 

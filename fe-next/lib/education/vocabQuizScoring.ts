@@ -25,6 +25,8 @@ export interface ScoreAnswerInput {
   limitMs: number;
   /** The player's consecutive-correct count BEFORE this answer. */
   streakBefore: number;
+  /** Pro pressure dial: OFF zeroes the speed bonus so only accuracy counts. */
+  speedScoring?: boolean;
 }
 
 export interface ScoreAnswerResult {
@@ -42,14 +44,14 @@ const clamp01 = (n: number): number => (n < 0 ? 0 : n > 1 ? 1 : n);
  * A wrong answer is worth nothing and breaks the streak — no consolation
  * points, because the streak flame is the thing students actually chase.
  */
-export function scoreAnswer({ correct, elapsedMs, limitMs, streakBefore }: ScoreAnswerInput): ScoreAnswerResult {
+export function scoreAnswer({ correct, elapsedMs, limitMs, streakBefore, speedScoring = true }: ScoreAnswerInput): ScoreAnswerResult {
   if (!correct) {
     return { points: 0, speedBonus: 0, streakBonus: 0, streakAfter: 0 };
   }
 
   // A non-positive limit means "no clock" rather than an infinite speed bonus.
   const fractionLeft = limitMs > 0 ? clamp01(1 - Math.max(0, elapsedMs) / limitMs) : 0;
-  const speedBonus = Math.round(VOCAB_QUIZ_MAX_SPEED_BONUS * fractionLeft);
+  const speedBonus = speedScoring ? Math.round(VOCAB_QUIZ_MAX_SPEED_BONUS * fractionLeft) : 0;
 
   const streakAfter = Math.max(0, streakBefore) + 1;
   const streakBonus = Math.min((streakAfter - 1) * VOCAB_QUIZ_STREAK_STEP, VOCAB_QUIZ_MAX_STREAK_BONUS);

@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import type { LiveClassroomGameInfo } from '@/lib/education/liveClassroomGameInfo';
+import { isStudentTimerHidden } from '@/shared/utils/classroomPressure';
 import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
 import { SocketContext } from '@/utils/SocketContext';
 import { useIsVocabQuizRoom } from './vocabQuiz/useIsVocabQuizRoom';
@@ -119,6 +120,10 @@ export function ClassroomModeBanner({
   const isQuiz = gameMode === VOCAB_QUIZ_MODE;
   const questionCount = remoteSettings?.vocabQuizQuestionCount ?? null;
   const questionSeconds = remoteSettings?.vocabQuizSeconds ?? null;
+
+  // Teacher turned the clock off: announcing "TIMER 3 min" would describe
+  // pressure nobody is under. Omit the row rather than print a lie.
+  const timerOff = remoteSettings?.pressure ? isStudentTimerHidden(remoteSettings.pressure) : false;
 
   // The class's own name, which the server resolves and the teacher's local copy
   // never carried. The generic label stays as the fallback for a room whose
@@ -330,7 +335,7 @@ export function ClassroomModeBanner({
                         value={String(questionCount)}
                       />
                     )}
-                    {questionSeconds !== null && (
+                    {questionSeconds !== null && !timerOff && (
                       <SummaryTile
                         testId="classroom-quiz-seconds"
                         icon={<Clock className="w-4 h-4" />}
@@ -341,7 +346,7 @@ export function ClassroomModeBanner({
                   </>
                 ) : (
                   <>
-                    {timerMinutes !== null && (
+                    {timerMinutes !== null && !timerOff && (
                       <SummaryTile
                         icon={<Clock className="w-4 h-4" />}
                         label={t('education.template.timer')}

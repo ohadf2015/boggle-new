@@ -28,6 +28,8 @@ export interface LobbyChoiceRowProps<T extends string | number> {
   onChange: (value: T) => void;
   /** Literal class for the selected chip. */
   selectedClassName?: string;
+  /** Freeze the row (e.g. a Pro-gated dial for a free teacher). */
+  disabled?: boolean;
 }
 
 export function LobbyChoiceRow<T extends string | number>({
@@ -39,6 +41,7 @@ export function LobbyChoiceRow<T extends string | number>({
   value,
   onChange,
   selectedClassName = 'bg-neo-cyan border-neo-black text-black shadow-hard',
+  disabled = false,
 }: LobbyChoiceRowProps<T>) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -59,10 +62,12 @@ export function LobbyChoiceRow<T extends string | number>({
               role="radio"
               aria-checked={isSelected}
               aria-label={choice.label}
+              disabled={disabled}
               onClick={() => onChange(choice.value)}
               className={cn(
                 'min-h-9 rounded-neo border-2 px-3 py-1 font-neo-display text-xs font-black uppercase transition-all',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+                disabled && 'cursor-not-allowed opacity-60',
                 isSelected
                   ? selectedClassName
                   : 'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard-sm hover:bg-neo-navy'

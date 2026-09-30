@@ -26,7 +26,7 @@ vi.mock('../../utils/logger', () => ({
   default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
 
-import { setClassroomGameMode } from '../classroomGameSettings';
+import { setClassroomGameMode, setClassroomPressureSettings } from '../classroomGameSettings';
 
 const GAME = {
   gameCode: 'ABC123',
@@ -64,6 +64,57 @@ describe('setClassroomGameMode', () => {
   it('reports failure instead of pretending, when the room is gone', async () => {
     mockGetClassroomGame.mockResolvedValue(null);
     expect(await setClassroomGameMode('ABC123', 'blast')).toBe(false);
+    expect(mockSetex).not.toHaveBeenCalled();
+  });
+});
+
+describe('setClassroomPressureSettings', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetClassroomGame.mockResolvedValue(JSON.parse(JSON.stringify(GAME)));
+  });
+
+  it('writes the dials under settings.pressure and keeps every other field', async () => {
+    const ok = await setClassroomPressureSettings('ABC123', {
+      leaderboard: 'hidden',
+      timer: 'gentle',
+      speedScoring: false,
+    });
+
+    expect(ok).toBe(true);
+    const [key, ttl, body] = mockSetex.mock.calls[0];
+    expect(key).toBe('classroom_game:ABC123');
+    expect(ttl).toBe(14400);
+    const written = JSON.parse(body as string);
+    expect(written.settings.pressure).toEqual({
+      leaderboard: 'hidden',
+      timer: 'gentle',
+      speedScoring: false,
+    });
+    // The mode, the quiz round shape and the roster survive the write.
+    expect(written.settings.gameMode).toBe('classic');
+    expect(written.settings.vocabQuizSeconds).toBe(20);
+    expect(written.players).toHaveLength(1);
+  });
+
+  it('normalizes a partial or garbage payload rather than storing it raw', async () => {
+    // The server is the source of truth for what the dials MEAN: a hand-rolled
+    // socket payload with one valid field must land as that field plus the
+    // loud defaults, never as client-supplied junk a renderer trips over.
+    const ok = await setClassroomPressureSettings('ABC123', { timer: 'off', leaderboard: 'bogus' });
+
+    expect(ok).toBe(true);
+    const written = JSON.parse(mockSetex.mock.calls[0][2] as string);
+    expect(written.settings.pressure).toEqual({
+      leaderboard: 'full',
+      timer: 'off',
+      speedScoring: true,
+    });
+  });
+
+  it('reports failure instead of pretending, when the room is gone', async () => {
+    mockGetClassroomGame.mockResolvedValue(null);
+    expect(await setClassroomPressureSettings('ABC123', { timer: 'off' })).toBe(false);
     expect(mockSetex).not.toHaveBeenCalled();
   });
 });

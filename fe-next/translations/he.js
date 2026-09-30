@@ -32,7 +32,9 @@ const he = {
         "blast": "בלאסט",
         "blastBlurb": "סיבובים מהירים, קומבואים ענקיים",
         "wordHunt": "ציד מילים",
-        "wordHuntBlurb": "צדים את המילים מהרשימה"
+        "wordHuntBlurb": "צדים את המילים מהרשימה",
+        "wordcraft": "וורדקראפט",
+        "wordcraftBlurb": "הרכיבו מילי שיעור ונצחו את הכיתה"
       },
       "noClassTitle": "צרו כיתה וקבלו קוד תוך 5 שניות",
       "createClassCta": "יצירת הכיתה שלי",
@@ -13188,7 +13190,28 @@ const he = {
         "wordHunt": "ציד מילים",
         "blast": "בלאסט",
         "wheelRush": "מרוץ הגלגל",
-        "vocabQuiz": "חידון אוצר מילים"
+        "vocabQuiz": "חידון אוצר מילים",
+        "wordcraft": "וורדקראפט"
+      },
+      "pressure": {
+        "title": "לחץ",
+        "leaderboard": {
+          "title": "טבלת מובילים",
+          "full": "מלאה",
+          "top3": "רק 3 הראשונים",
+          "hidden": "חשיפה בסוף"
+        },
+        "timer": {
+          "title": "טיימר",
+          "full": "ספירה לאחור",
+          "gentle": "עדין",
+          "off": "כבוי"
+        },
+        "scoring": {
+          "title": "ניקוד",
+          "speed": "המהירות נחשבת",
+          "accuracy": "דיוק בלבד"
+        }
       },
       "huntTarget": {
         "title": "מילת המטרה",
@@ -13525,7 +13548,7 @@ const he = {
         "unknownStudent": "תלמיד",
         "noEvidenceClass": "שחקו משחק שיעור עם הכיתה וקשת הלמידה של כל תלמיד תופיע כאן.",
         "noEvidenceStudent": "עוד אין מפגשים",
-        "emptyStudent": "ל{{name}} עוד לא היה מפגש עם מילים שנשאלו — הקשת מתחילה במשחק הבא.",
+        "emptyStudent": "ל-{{name}} עוד לא היה מפגש עם מילים שנשאלו — הקשת מתחילה במשחק הבא.",
         "wordsClassMisses": "מילים שהכיתה ממשיכה לפספס",
         "studentsStuck": "{{stuck}} מתוך {{total}} תלמידים",
         "requeueNote": "מילים שפוספסו כבר חוזרות לתור בסקירת המילים שפוספסו של כל תלמיד.",
@@ -13537,9 +13560,11 @@ const he = {
         "viewStudent": "צפייה בקשת של {{name}}",
         "accuracyOverTime": "דיוק לאורך זמן",
         "growth": "מ-{{first}}% ל-{{last}}%",
-        "sparklineLabel": "דיוק על פני {{count}} מפגשים, מ{{first}}% עד {{last}}%",
-        "requeueStudent": "המילים ש{{name}} פספס כבר בתור לסקירת המילים שפוספסו.",
+        "sparklineLabel": "דיוק על פני {{count}} מפגשים, מ-{{first}}% עד {{last}}%",
+        "requeueStudent": "המילים ש-{{name}} פספס/ה כבר בתור לסקירת המילים שפוספסו.",
         "attempts": "{{count}} ניסיונות",
+        "outcomeCorrect": "מצא/ה",
+        "outcomeMissed": "פספס/ה",
         "trend": {
           "mastered": "נשלט",
           "improving": "בדרך לשם",
@@ -13855,7 +13880,8 @@ const he = {
         "wordHunt": "מתחרים מי ראשון מוצא את מילת המטרה החבויה בלוח.",
         "blast": "משרשרים מילים מהר ומפוצצים אריחים בשרשרת קומבו.",
         "wheelRush": "מסובבים את גלגל האותיות ויורים מילים נגד השעון.",
-        "vocabQuiz": "ארבע אפשרויות, משמעות אחת — התשובה הנכונה המהירה שווה הכי הרבה."
+        "vocabQuiz": "ארבע אפשרויות, משמעות אחת — התשובה הנכונה המהירה שווה הכי הרבה.",
+        "wordcraft": "מרכיבים מילים על לוח אישי מול הברון — טבלת הכיתה תכריע את כל השאר."
       }
     },
     "projectorLobby": {
@@ -13886,7 +13912,29 @@ const he = {
       "wordHunt": "לפצח את המילה הנסתרת בעשרה ניסיונות",
       "blast": "שרשור מילים לניקוי אריחים בקומבו",
       "wheelRush": "לבנות מילים מגלגל אותיות אחד",
-      "vocabQuiz": "שאלות אמריקאיות מנתוני המילים שלכם"
+      "vocabQuiz": "שאלות אמריקאיות מנתוני המילים שלכם",
+      "wordcraft": "הרכבת מילי השיעור על לוח אישי מול יריב בוט"
+    },
+    "wordcraftLive": {
+      "rival": "הברון",
+      "you": "אתה",
+      "vsRival": "אתה מול הברון",
+      "tapLetters": "מקישים על אותיות כדי לבנות מילה",
+      "tapStart": "מקישים על המשבצת שבה המילה מתחילה",
+      "place": "להניח",
+      "recall": "ביטול",
+      "switchDirection": "החלפת כיוון",
+      "lessonWords": "מילי השיעור",
+      "tilesLeft": "{count} בשרבול",
+      "placing": "מניח…",
+      "waitingBoard": "מחלקים את הלוח…",
+      "builtBy": "{name} הרכיב/ה את {word}",
+      "errors": {
+        "invalidWord": "\"{word}\" היא לא מילה",
+        "disconnected": "המילה חייבת לגעת במילה שכבר על הלוח",
+        "cellOccupied": "המשבצת תפוסה",
+        "generic": "לא הצלחנו להניח — נסו שוב"
+      }
     },
     "wordTowerPractice": {
       "unavailable": "המילים בשיעור הזה עדיין לא בונות מגדל. צריך לפחות 4 מילים באורך 4 עד 6 אותיות.",
@@ -14168,6 +14216,7 @@ const he = {
         "won": "ניצחת!",
         "podium": "על הפודיום!",
         "finished": "הסיבוב נגמר!",
+        "roundComplete": "הסיבוב הושלם!",
         "of": "מתוך {{total}}",
         "points": "נקודות",
         "beat": "לפני {{count}} בכיתה",
@@ -14639,6 +14688,10 @@ const he = {
       "yesterday": "אתמול"
     },
     "classroomGame": {
+      "pressure": {
+        "revealAtEnd": "המורה יחשוף את התוצאות בסוף."
+      },
+      "pressureFailed": "לא הצלחנו לשמור את ההגדרות — נסו שוב.",
       "defaultClassroomName": "הכיתה שלי",
       "questions": "שאלות",
       "perQuestion": "לכל שאלה",

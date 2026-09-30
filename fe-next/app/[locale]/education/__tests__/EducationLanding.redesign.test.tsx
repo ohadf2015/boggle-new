@@ -102,9 +102,10 @@ describe('Education Landing — redesign (WU-9)', () => {
       expect(screen.queryByText('education.landing.studentCta')).not.toBeInTheDocument();
     });
 
-    it('shows a "Start a Game" shortcut button', () => {
+    it('sends the teacher to the live lobby instead of a start-game button on the catalog', () => {
       render(<EducationPageClient />);
-      expect(screen.getByText('education.landing.startGame')).toBeInTheDocument();
+      expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+      expect(screen.queryByText('education.landing.startGame')).not.toBeInTheDocument();
     });
 
     it('does NOT show DuelTeaserCard', () => {

@@ -19,6 +19,8 @@ import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage
 import logger from '@/utils/logger';
 import { isVocabularyLevel } from '@/lib/education/differentiation';
 import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
+import { pressureFromStartPayload } from '@/shared/utils/classroomPressure';
+import { useClassroomPressureStore } from '@/hooks/gameState/classroomPressureStore';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
@@ -510,8 +512,11 @@ export function useMultiplayerSocket(
       // round played after the teacher switched to free-for-all must not keep
       // painting last round's teams.
       setClassroomLive((data?.classroom as ClassroomLiveContext | undefined) ?? null);
-      optionsRef.current.onGameStart(data);
-    });
+      // The teacher's pressure dials ride the SAME payload on every path
+      // (start/retry/reconnect/late-join/recovery). Absent = not a classroom
+      // room — clear, so a casual game after a class session inherits nothing.
+      useClassroomPressureStore.getState().setClassroomPressure(pressureFromStartPayload(data));
+      optionsRef.current.onGameStart(data);    });
 
     // ---- Teacher live controls (classroom rooms) ----
     socketInstance.on('gamePaused', () => {

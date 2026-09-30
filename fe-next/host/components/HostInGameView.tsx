@@ -35,6 +35,7 @@ const WordTowerVersus = dynamic(
 );
 import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
 import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVersus';
+import { WordcraftProjectorView } from '@/components/multiplayer/wordcraft/WordcraftProjectorView';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -347,6 +348,25 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       <>
         <Versus socket={socket} username={username} onQuit={handleStopGameClick} />
         {connectionOverlays}
+      </>
+    );
+  }
+
+  // Wordcraft race — the host projects; students race on their own boards.
+  if (gameMode === 'wordcraft') {
+    return (
+      <>
+        {wrapCanvas(
+        <WordcraftProjectorView
+          socket={socket}
+          leaderboard={leaderboard}
+          t={t}
+          remainingTime={remainingTime}
+          onQuit={handleStopGameClick}
+        />
+        )}
+        {connectionOverlays}
+        {stopConfirm}
       </>
     );
   }

@@ -66,9 +66,9 @@ vi.mock('qrcode.react', () => ({ QRCodeCanvas: () => <div data-testid="qr" /> })
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 
 describe('CLASSROOM_GAME_MODES is the single source', () => {
-  it('lists the five live classroom modes', () => {
+  it('lists the six live classroom modes', () => {
     expect([...CLASSROOM_GAME_MODES].sort()).toEqual(
-      ['blast', 'classic', 'vocab-quiz', 'wheel-rush', 'word-hunt'].sort()
+      ['blast', 'classic', 'vocab-quiz', 'wheel-rush', 'word-hunt', 'wordcraft'].sort()
     );
   });
 });

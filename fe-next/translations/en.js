@@ -32,7 +32,9 @@ const en = {
         "blast": "Blast",
         "blastBlurb": "Fast rounds, huge combos",
         "wordHunt": "Word Hunt",
-        "wordHuntBlurb": "Hunt down the list words"
+        "wordHuntBlurb": "Hunt down the list words",
+        "wordcraft": "Wordcraft",
+        "wordcraftBlurb": "Craft list words, outscore the class"
       },
       "noClassTitle": "Create your class, get a code in 5 seconds",
       "createClassCta": "Create my class",
@@ -11738,7 +11740,28 @@ const en = {
         "wordHunt": "Word Hunt",
         "blast": "Blast",
         "wheelRush": "Wheel Rush",
-        "vocabQuiz": "Vocab Quiz"
+        "vocabQuiz": "Vocab Quiz",
+        "wordcraft": "Wordcraft"
+      },
+      "pressure": {
+        "title": "Pressure",
+        "leaderboard": {
+          "title": "Leaderboard",
+          "full": "Full",
+          "top3": "Top 3 only",
+          "hidden": "Reveal at end"
+        },
+        "timer": {
+          "title": "Timer",
+          "full": "Countdown",
+          "gentle": "Gentle",
+          "off": "Off"
+        },
+        "scoring": {
+          "title": "Scoring",
+          "speed": "Speed counts",
+          "accuracy": "Accuracy only"
+        }
       },
       "huntTarget": {
         "title": "Hunted Word",
@@ -12090,6 +12113,8 @@ const en = {
         "sparklineLabel": "Accuracy across {{count}} sessions, from {{first}}% to {{last}}%",
         "requeueStudent": "{{name}}'s missed words are already queued in their Missed Words review.",
         "attempts": "{{count}} tries",
+        "outcomeCorrect": "Found it",
+        "outcomeMissed": "Missed it",
         "trend": {
           "mastered": "Mastered",
           "improving": "Getting there",
@@ -12556,7 +12581,8 @@ const en = {
         "wordHunt": "Race the class to dig one hidden target word out of the grid.",
         "blast": "Chain words fast and blow the tiles up in cascading combos.",
         "wheelRush": "Spin the letter wheel and fire off words against the clock.",
-        "vocabQuiz": "Four choices, one meaning — the fastest right answer scores most."
+        "vocabQuiz": "Four choices, one meaning — the fastest right answer scores most.",
+        "wordcraft": "Craft words on your own board against the Baron — the class leaderboard decides the rest."
       }
     },
     "projectorLobby": {
@@ -12587,7 +12613,29 @@ const en = {
       "wordHunt": "Crack the hidden word in ten tries",
       "blast": "Chain words to clear tiles in combos",
       "wheelRush": "Build words from one wheel of letters",
-      "vocabQuiz": "Four-choice questions from your own word data"
+      "vocabQuiz": "Four-choice questions from your own word data",
+      "wordcraft": "Craft list words on your own board vs a bot rival"
+    },
+    "wordcraftLive": {
+      "rival": "The Baron",
+      "you": "You",
+      "vsRival": "You vs the Baron",
+      "tapLetters": "Tap letters to build a word",
+      "tapStart": "Tap the square where it starts",
+      "place": "PLACE",
+      "recall": "Recall",
+      "switchDirection": "Switch direction",
+      "lessonWords": "Lesson words",
+      "tilesLeft": "{count} in the sack",
+      "placing": "Placing…",
+      "waitingBoard": "Dealing your board…",
+      "builtBy": "{name} crafted {word}",
+      "errors": {
+        "invalidWord": "\"{word}\" isn't a word",
+        "disconnected": "Your word has to touch one already down",
+        "cellOccupied": "That square is taken",
+        "generic": "That didn't place — try again"
+      }
     },
     "wordTowerPractice": {
       "unavailable": "This lesson's words can't build a tower yet. It needs at least 4 words of 4 to 6 letters.",
@@ -12869,6 +12917,7 @@ const en = {
         "won": "YOU WON!",
         "podium": "ON THE PODIUM!",
         "finished": "ROUND DONE!",
+        "roundComplete": "ROUND COMPLETE!",
         "of": "of {{total}}",
         "points": "points",
         "beat": "Ahead of {{count}} in the class",
@@ -13331,6 +13380,10 @@ const en = {
       "yesterday": "Yesterday"
     },
     "classroomGame": {
+      "pressure": {
+        "revealAtEnd": "Your teacher will reveal the results at the end."
+      },
+      "pressureFailed": "Couldn't save those settings — try again.",
       "questions": "Questions",
       "perQuestion": "Per question",
       "namePrompt": {

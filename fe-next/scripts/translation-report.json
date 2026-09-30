@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 7432,
+    "totalKeysInCode": 7545,
     "keyCountByLanguage": {
-      "en": 14477,
-      "es": 14765,
-      "he": 14687,
-      "ja": 14746,
-      "ru": 14519,
-      "sv": 14743
+      "en": 14618,
+      "es": 14906,
+      "he": 14828,
+      "ja": 14887,
+      "ru": 14660,
+      "sv": 14884
     },
-    "missingFromEnglish": 100,
+    "missingFromEnglish": 101,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 391,
+      "templateLiterals": 392,
       "fallbackUsages": 1,
       "variableKeys": 118
     }
@@ -464,7 +464,7 @@
         "pattern": "`adventure.worlds.${worldCfg.name}`",
         "type": "template_literal",
         "file": "components/adventure/play/AdventureLevel.tsx",
-        "line": 364,
+        "line": 368,
         "context": "worldName={worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : ''}"
       },
       {
@@ -681,14 +681,14 @@
         "pattern": "`adventurePlay.combat.elite.w${world}`",
         "type": "template_literal",
         "file": "components/adventure/play/stage/ArenaStage.tsx",
-        "line": 71,
+        "line": 72,
         "context": "const name = boss ? t(boss.displayName) : t(`adventurePlay.combat.elite.w${world}`);"
       },
       {
         "pattern": "`adventurePlay.combat.status.${status.kind}`",
         "type": "template_literal",
         "file": "components/adventure/play/stage/ArenaStage.tsx",
-        "line": 231,
+        "line": 232,
         "context": "{status.kind === 'phase' && combat.phase < 2 ? t('adventurePlay.combat.phaseTwo') : t(`adventurePlay"
       },
       {
@@ -1311,7 +1311,7 @@
         "pattern": "`education.access.role_${value}`",
         "type": "template_literal",
         "file": "components/education/AccessRequestForm.tsx",
-        "line": 216,
+        "line": 249,
         "context": "<span className=\"text-sm\">{t(`education.access.role_${value}`)}</span>"
       },
       {
@@ -1367,7 +1367,7 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 321,
+        "line": 326,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}"
       },
       {
@@ -1563,7 +1563,7 @@
         "pattern": "`vocabQuiz.focus.${question.focus}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizView.tsx",
-        "line": 78,
+        "line": 85,
         "context": "() => (question ? t(`vocabQuiz.focus.${question.focus}`) : ''),"
       },
       {
@@ -2137,14 +2137,14 @@
         "pattern": "`teacher.proGate.${feature}.title`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 103,
+        "line": 107,
         "context": "{t(`teacher.proGate.${feature}.title`)}"
       },
       {
         "pattern": "`teacher.proGate.${feature}.body`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 106,
+        "line": 110,
         "context": "{t(`teacher.proGate.${feature}.body`)}"
       },
       {
@@ -2186,21 +2186,21 @@
         "pattern": "`education.vocabFocus.focus.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 298,
+        "line": 353,
         "context": "{t(`education.vocabFocus.focus.${option}`)}"
       },
       {
         "pattern": "`education.vocabFocus.instructions.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 304,
+        "line": 359,
         "context": "skill: t(`education.vocabFocus.instructions.${option}`),"
       },
       {
         "pattern": "`education.vocabFocus.unlock.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 306,
+        "line": 361,
         "context": ": t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}"
       },
       {
@@ -2244,6 +2244,13 @@
         "file": "components/teacher/report/StudentDrillDownPanel.tsx",
         "line": 102,
         "context": "{t(`teacher.classReport.practice.${drill.practiceKey}`)}"
+      },
+      {
+        "pattern": "`teacher.reports.arc.trend.${word.trend}`",
+        "type": "template_literal",
+        "file": "components/teacher/reports/StudentArcView.tsx",
+        "line": 202,
+        "context": "{t(`teacher.reports.arc.trend.${word.trend}`)}"
       },
       {
         "pattern": "`training.analysis.skills.${skill}`",
@@ -2814,14 +2821,14 @@
         "variable": "CLASSROOM_ROOM_GONE_KEY",
         "type": "variable_key",
         "file": "app/[locale]/multiplayer/useMpPageState.ts",
-        "line": 181,
+        "line": 191,
         "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });"
       },
       {
         "pattern": "t(CLASSROOM_ROOM_GONE_KEY)",
         "variable": "CLASSROOM_ROOM_GONE_KEY",
         "file": "app/[locale]/multiplayer/useMpPageState.ts",
-        "line": 181,
+        "line": 191,
         "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });",
         "type": "variable_key"
       },
@@ -2854,7 +2861,7 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 353,
+        "line": 358,
         "context": "<h3 className=\"text-sm font-bold text-neo-cyan mb-1\">{t(q)}</h3>"
       },
       {
@@ -2862,7 +2869,7 @@
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 355,
+        "line": 360,
         "context": "{t(a)}"
       },
       {
@@ -2926,7 +2933,7 @@
         "variable": "taunt",
         "type": "variable_key",
         "file": "components/adventure/play/stage/ArenaStage.tsx",
-        "line": 217,
+        "line": 218,
         "context": "{t(taunt, { requirement: t('adventurePlay.longerWords') })}"
       },
       {
@@ -2958,7 +2965,7 @@
         "variable": "subtitleKey",
         "type": "variable_key",
         "file": "components/auth/FirstWinSignupModal.tsx",
-        "line": 247,
+        "line": 257,
         "context": "{t(subtitleKey)}"
       },
       {
@@ -2966,7 +2973,7 @@
         "variable": "subtitleKey",
         "type": "variable_key",
         "file": "components/auth/FirstWinSignupModal.tsx",
-        "line": 346,
+        "line": 361,
         "context": "{t(subtitleKey)}"
       },
       {
@@ -2998,7 +3005,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/auth/MultiplayerSignupSheet.tsx",
-        "line": 184,
+        "line": 200,
         "context": "{t(key)}"
       },
       {
@@ -3126,7 +3133,7 @@
         "variable": "startError",
         "type": "variable_key",
         "file": "components/education/ClassroomGameLobby.tsx",
-        "line": 395,
+        "line": 407,
         "context": "{t(startError)}"
       },
       {
@@ -3446,7 +3453,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/results/ResultsMainContent.tsx",
-        "line": 420,
+        "line": 425,
         "context": "return t(key, params);"
       },
       {
@@ -3582,7 +3589,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "hooks/useWordSubmission.ts",
-        "line": 345,
+        "line": 351,
         "context": "const msg = params ? t(errorKey, params) : t(errorKey);"
       },
       {
@@ -3590,7 +3597,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "hooks/useWordSubmission.ts",
-        "line": 345,
+        "line": 351,
         "context": "const msg = params ? t(errorKey, params) : t(errorKey);"
       },
       {
@@ -3614,7 +3621,7 @@
         "variable": "nameKey",
         "type": "variable_key",
         "file": "host/components/pre-game/BattleModeCard.tsx",
-        "line": 113,
+        "line": 112,
         "context": "{t(nameKey)}"
       },
       {
@@ -4644,6 +4651,15 @@
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
           "line": 83
+        }
+      ]
+    },
+    {
+      "key": "common.stop",
+      "usages": [
+        {
+          "file": "components/multiplayer/wordcraft/WordcraftProjectorView.tsx",
+          "line": 122
         }
       ]
     },

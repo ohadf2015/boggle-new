@@ -32,7 +32,9 @@ const es = {
         "blast": "Blast",
         "blastBlurb": "Rondas rápidas, combos enormes",
         "wordHunt": "Caza de palabras",
-        "wordHuntBlurb": "Caza las palabras de la lista"
+        "wordHuntBlurb": "Caza las palabras de la lista",
+        "wordcraft": "Wordcraft",
+        "wordcraftBlurb": "Forma las palabras y supera a la clase"
       },
       "noClassTitle": "Crea tu clase y ten un código en 5 segundos",
       "createClassCta": "Crear mi clase",
@@ -13261,7 +13263,28 @@ const es = {
         "wordHunt": "Caza de palabras",
         "blast": "Blast",
         "wheelRush": "Carrera de Ruleta",
-        "vocabQuiz": "Test de Vocabulario"
+        "vocabQuiz": "Test de Vocabulario",
+        "wordcraft": "Wordcraft"
+      },
+      "pressure": {
+        "title": "Presión",
+        "leaderboard": {
+          "title": "Clasificación",
+          "full": "Completa",
+          "top3": "Solo top 3",
+          "hidden": "Se revela al final"
+        },
+        "timer": {
+          "title": "Temporizador",
+          "full": "Cuenta atrás",
+          "gentle": "Suave",
+          "off": "Apagado"
+        },
+        "scoring": {
+          "title": "Puntuación",
+          "speed": "La velocidad cuenta",
+          "accuracy": "Solo precisión"
+        }
       },
       "huntTarget": {
         "title": "Palabra objetivo",
@@ -13540,6 +13563,8 @@ const es = {
         "sparklineLabel": "Precisión en {{count}} sesiones, de {{first}}% a {{last}}%",
         "requeueStudent": "Las palabras que {{name}} falló ya están en cola en su repaso de palabras falladas.",
         "attempts": "{{count}} intentos",
+        "outcomeCorrect": "Acertó",
+        "outcomeMissed": "Falló",
         "trend": {
           "mastered": "Dominada",
           "improving": "Por buen camino",
@@ -13949,7 +13974,8 @@ const es = {
         "wordHunt": "Compite con la clase por sacar del tablero la palabra escondida.",
         "blast": "Encadena palabras rápido y revienta las fichas en combos.",
         "wheelRush": "Gira la rueda de letras y dispara palabras contra el reloj.",
-        "vocabQuiz": "Cuatro opciones, un significado: gana quien acierta más rápido."
+        "vocabQuiz": "Cuatro opciones, un significado: gana quien acierta más rápido.",
+        "wordcraft": "Forma palabras en tu propio tablero contra el Barón — la tabla de la clase decide lo demás."
       }
     },
     "projectorLobby": {
@@ -13980,7 +14006,29 @@ const es = {
       "wordHunt": "Descifra la palabra oculta en diez intentos",
       "blast": "Encadena palabras para despejar fichas en combos",
       "wheelRush": "Forma palabras con una sola rueda de letras",
-      "vocabQuiz": "Preguntas de cuatro opciones con tus propias palabras"
+      "vocabQuiz": "Preguntas de cuatro opciones con tus propias palabras",
+      "wordcraft": "Forma las palabras de la lista en tu tablero contra un bot"
+    },
+    "wordcraftLive": {
+      "rival": "El Barón",
+      "you": "Tú",
+      "vsRival": "Tú contra el Barón",
+      "tapLetters": "Toca las letras para formar una palabra",
+      "tapStart": "Toca la casilla donde empieza",
+      "place": "PONER",
+      "recall": "Retirar",
+      "switchDirection": "Cambiar dirección",
+      "lessonWords": "Palabras de la lección",
+      "tilesLeft": "quedan {count}",
+      "placing": "Colocando…",
+      "waitingBoard": "Repartiendo tu tablero…",
+      "builtBy": "{name} formó {word}",
+      "errors": {
+        "invalidWord": "«{word}» no es una palabra",
+        "disconnected": "Tu palabra debe tocar una ya colocada",
+        "cellOccupied": "Esa casilla está ocupada",
+        "generic": "No se pudo colocar — inténtalo de nuevo"
+      }
     },
     "wordTowerPractice": {
       "unavailable": "Las palabras de esta lección aún no pueden construir una torre. Hacen falta al menos 4 palabras de 4 a 6 letras.",
@@ -14262,6 +14310,7 @@ const es = {
         "won": "¡GANASTE!",
         "podium": "¡EN EL PODIO!",
         "finished": "¡RONDA TERMINADA!",
+        "roundComplete": "¡RONDA COMPLETADA!",
         "of": "de {{total}}",
         "points": "puntos",
         "beat": "Por delante de {{count}} de la clase",
@@ -14733,6 +14782,10 @@ const es = {
       "yesterday": "Ayer"
     },
     "classroomGame": {
+      "pressure": {
+        "revealAtEnd": "Tu profesor revelará los resultados al final."
+      },
+      "pressureFailed": "No se pudieron guardar los ajustes. Inténtalo de nuevo.",
       "defaultClassroomName": "Mi aula",
       "questions": "Preguntas",
       "perQuestion": "Por pregunta",

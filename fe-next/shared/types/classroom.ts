@@ -37,6 +37,27 @@ export interface ClassroomAccessibility {
 /** Points every human player gets when participationPoints is on. */
 export const PARTICIPATION_BONUS = 10;
 
+/**
+ * The teacher's pressure dials — the same game as a hyped game-show or a calm
+ * mastery check. Set per launch in the lobby (Pro), stored on the classroom
+ * game record under `settings.pressure`, echoed to every client in the
+ * startGame payload so no client ever recomputes the teacher's intent.
+ *
+ * Every field optional: absent means the loud default, resolved by
+ * `shared/utils/classroomPressure` — the ONLY place defaults live.
+ */
+export interface ClassroomPressure {
+  /** full = live standings · top3 = podium only until results · hidden = reveal at the end. */
+  leaderboard?: 'full' | 'top3' | 'hidden';
+  /** full = countdown escalates · gentle = counts without shouting · off = no student clock. */
+  timer?: 'full' | 'gentle' | 'off';
+  /** true = reflexes count (quiz speed bonus) · false = accuracy only. */
+  speedScoring?: boolean;
+}
+
+/** The dials with every default applied — what payloads and renderers use. */
+export type ResolvedClassroomPressure = Required<ClassroomPressure>;
+
 /** One row of the whole-session leaderboard. */
 export interface ClassroomSessionStanding {
   username: string;

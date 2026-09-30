@@ -66,6 +66,8 @@ export interface MpTimerProps {
   colorFamily?: MpTimerColor;
   /** Hide the m:ss digits (ring only). */
   hideDigits?: boolean;
+  /** Teacher's gentle-timer dial: keep counting, never turn pink. */
+  suppressUrgency?: boolean;
   className?: string;
 }
 
@@ -74,9 +76,9 @@ export interface MpTimerProps {
  * digits punch ONCE per tick (the span re-keys per second, so the keyframe
  * runs once — never an infinite loop).
  */
-function MpTimerImpl({ remainingSec, totalSec, size, colorFamily = 'cyan', hideDigits, className }: MpTimerProps) {
+function MpTimerImpl({ remainingSec, totalSec, size, colorFamily = 'cyan', hideDigits, suppressUrgency = false, className }: MpTimerProps) {
   const { t } = useLanguage();
-  const urgent = remainingSec <= MP_TIMER_URGENT_SEC;
+  const urgent = !suppressUrgency && remainingSec <= MP_TIMER_URGENT_SEC;
   const clock = formatClock(remainingSec);
   const whole = Math.max(0, Math.round(remainingSec));
   return (

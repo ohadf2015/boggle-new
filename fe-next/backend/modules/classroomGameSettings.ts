@@ -13,6 +13,8 @@
 
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
+import { normalizeClassroomPressure } from '@/shared/utils/classroomPressure';
+import type { ClassroomPressure } from '@/shared/types/classroom';
 import {
   CLASSROOM_GAME_TTL,
   getClassroomGame,
@@ -75,3 +77,55 @@ async function setClassroomGameModeUnlocked(
 }
 
 export default setClassroomGameMode;
+
+/**
+ * Write the teacher's pressure dials onto a live room.
+ *
+ * The dials cannot ride `createClassroomGame` — that handler whitelists every
+ * settings key and is owned by another change — so they land here instead,
+ * the same way the in-lobby mode switch does: the lobby emits once the room
+ * exists, and `startGame` later reads them back off this record.
+ *
+ * The value is NORMALIZED before it is stored: the server is the source of
+ * truth for what the dials mean, and a partial or hand-rolled payload must
+ * land as valid fields plus the loud defaults, never as raw client junk.
+ *
+ * The settings type lives in classroomGameManager (separate ownership), so
+ * the write goes through a local intersection — runtime spread carries the
+ * field either way.
+ */
+export function setClassroomPressureSettings(
+  gameCode: string,
+  pressure: ClassroomPressure
+): Promise<boolean> {
+  return withClassroomGameLock(gameCode, async () => {
+    try {
+      const redis = getRedisClient();
+      if (!redis) {
+        logger.error('CLASSROOM_GAME', `No Redis client; cannot set pressure on ${gameCode}`);
+        return false;
+      }
+      const game = await getClassroomGame(gameCode);
+      if (!game) {
+        logger.warn('CLASSROOM_GAME', `Cannot set pressure: game ${gameCode} not found`);
+        return false;
+      }
+
+      type SettingsWithPressure = ClassroomGameSettings & { pressure?: ClassroomPressure };
+      const settings: SettingsWithPressure = { ...(game.settings ?? {}) };
+      settings.pressure = normalizeClassroomPressure(pressure);
+      game.settings = settings;
+
+      await redis.setex(
+        `classroom_game:${gameCode}`,
+        CLASSROOM_GAME_TTL,
+        JSON.stringify(game)
+      );
+      logger.info('CLASSROOM_GAME', `Game ${gameCode} pressure dials updated`);
+      return true;
+    } catch (error) {
+      logger.error('CLASSROOM_GAME', `Failed to set pressure for ${gameCode}: ${error}`);
+      return false;
+    }
+  });
+}

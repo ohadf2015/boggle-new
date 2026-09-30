@@ -12,6 +12,7 @@ import { wheelRushMode } from './wheelRush';
 import { wordTowerMode } from './wordTower';
 import { sealedBidMode } from './sealedBid';
 import { crosswordMode } from './crossword';
+import { wordcraftMode } from './wordcraft';
 
 const MODES: Partial<Record<GameMode, GameModeModule>> = {
   classic: classicMode,
@@ -21,6 +22,7 @@ const MODES: Partial<Record<GameMode, GameModeModule>> = {
   'word-tower': wordTowerMode,
   'sealed-bid': sealedBidMode,
   crossword: crosswordMode,
+  wordcraft: wordcraftMode,
 };
 
 export function getGameModeModule(mode: string | null | undefined): GameModeModule {

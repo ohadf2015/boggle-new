@@ -144,6 +144,7 @@ function ArcHeader({ t, name }: { t: T; name?: string }) {
 
 /** Accuracy-per-session sparkline. Static SVG — no motion on a calm deck. */
 function ArcSparkline({ points, label }: { points: number[]; label: string }) {
+  // Charts stay LTR in every locale: time runs left→right on purpose.
   const W = 300;
   const H = 64;
   const PAD = 6;
@@ -158,7 +159,7 @@ function ArcSparkline({ points, label }: { points: number[]; label: string }) {
       role="img"
       aria-label={label}
       viewBox={`0 0 ${W} ${H}`}
-      className="h-16 w-full rounded-neo border-2 border-neo-cream/25 bg-neo-navy"
+      className="h-16 w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy"
       preserveAspectRatio="none"
     >
       {points.length > 1 && (
@@ -178,21 +179,24 @@ function WordRow({ word, t }: { word: WordTrajectory; t: T }) {
       <span className="min-w-0 flex-1 break-words font-bold text-neo-white" dir="auto">
         {word.display}
       </span>
-      <span aria-hidden="true" className="flex items-center gap-1" dir="ltr">
+      <span
+        role="img"
+        aria-label={t('teacher.reports.arc.attempts', { count: word.attempts })}
+        className="flex items-center gap-1"
+        dir="ltr"
+      >
         {dots.map((ok, i) => (
           <span
             key={i}
             data-testid="student-arc-outcome"
             data-ok={ok}
+            title={t(ok ? 'teacher.reports.arc.outcomeCorrect' : 'teacher.reports.arc.outcomeMissed')}
             className={cn(
               'size-2.5 rounded-full border-2',
               ok ? 'border-neo-lime bg-neo-lime' : 'border-neo-cream/50 bg-transparent'
             )}
           />
         ))}
-      </span>
-      <span className="sr-only">
-        {t('teacher.reports.arc.attempts', { count: word.attempts })}
       </span>
       <span className={cn('rounded-neo border-2 px-2 py-0.5 text-xs font-black', TREND_CHIP[word.trend])}>
         {t(`teacher.reports.arc.trend.${word.trend}`)}

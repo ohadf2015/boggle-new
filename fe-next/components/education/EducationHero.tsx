@@ -106,7 +106,7 @@ export function EducationHero() {
 
       <div
         ref={rootRef}
-        className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:py-20 lg:grid-cols-2 lg:gap-12"
+        className="relative mx-auto grid max-w-6xl items-start gap-8 px-4 py-4 sm:py-8 lg:grid-cols-2 lg:gap-12"
       >
         {/* Left column: copy + single CTA */}
         <div className="text-center lg:text-start">
@@ -118,7 +118,7 @@ export function EducationHero() {
           </p>
           <h1
             data-hero-item
-            className="mt-3 text-4xl sm:text-5xl font-neo-display font-black leading-tight text-neo-cream md:text-6xl"
+            className="mt-3 text-4xl sm:text-5xl font-neo-display font-black leading-tight text-neo-cream"
           >
             {t('education.landing.hero.h1')}
           </h1>
@@ -129,17 +129,15 @@ export function EducationHero() {
             {t('education.landing.hero.sub', undefined, { count: LANGUAGE_COUNT })}
           </p>
 
-          <div
-            data-hero-item
-            className="mt-8 flex flex-col items-center gap-3 lg:items-start"
-          >
+          <div data-hero-item className="mt-5 flex flex-col items-center gap-3 lg:items-start">
+            <div className="flex flex-col items-center gap-3 lg:flex-row lg:items-center">
             <Link
-              href={`/${language}/education/access`}
+              href={`/${language}/teacher`}
               data-testid="education-hero-free-cta"
               onClick={() => trackLandingCtaClick('education_hero')}
-              className="group inline-flex items-center gap-3 rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-8 py-4 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-xl transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-hard motion-safe:animate-pulse-subtle"
+              className="group inline-flex items-center gap-3 rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-8 py-4 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-xl transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-hard active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-safe:animate-pulse-subtle"
             >
-              {t('education.landing.hero.cta_primary', 'Start free — request teacher access')}
+              {t('education.landing.hero.cta_primary')}
               <span
                 aria-hidden
                 className="text-xl transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
@@ -147,6 +145,15 @@ export function EducationHero() {
                 →
               </span>
             </Link>
+            <Link
+              href={`/${language}/student/join`}
+              data-testid="education-hero-join-cta"
+              onClick={() => trackLandingCtaClick('education_hero_join')}
+              className="inline-flex min-h-11 items-center gap-2 rounded-neo border-neo border-neo-cyan bg-neo-cyan px-6 py-3 text-base font-black uppercase tracking-wide text-neo-navy shadow-hard transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-hard-sm active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+            >
+              {t('education.landing.studentJoinCta')}
+            </Link>
+            </div>
             <Link
               href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
               data-testid="education-hero-pro-cta"

@@ -86,27 +86,16 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
   });
 
-  it('shows teacher dashboard link for teacher role', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      loading: false,
-      profile: { display_name: 'Mr. Smith', user_role: 'teacher', is_admin: true },
-    });
-    render(<EducationPageClient />);
-    const link = screen.getByTestId('go-to-dashboard-link');
-    expect(link).toHaveAttribute('href', '/en/teacher');
-  });
-
-  it('shows always-visible create classroom shortcut for teachers', () => {
+  it('sends an approved teacher straight to the live classroom lobby', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       loading: false,
       profile: { display_name: 'Mr. Smith', user_role: 'teacher' },
     });
     render(<EducationPageClient />);
-    const shortcut = screen.getByTestId('create-classroom-shortcut');
-    expect(shortcut).toHaveAttribute('href', '/en/teacher');
-    expect(shortcut).toHaveTextContent('education.landing.createClassroom');
+    expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+    expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
   });
 
   it('does NOT show create classroom shortcut when unauthenticated', () => {
@@ -119,25 +108,14 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     expect(screen.queryByTestId('create-classroom-shortcut')).not.toBeInTheDocument();
   });
 
-  it('shows teacher dashboard link when is_admin flag is set', () => {
+  it('sends an admin to the live classroom lobby too', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       loading: false,
       profile: { display_name: 'Ms. Jones', user_role: undefined, is_admin: true },
     });
     render(<EducationPageClient />);
-    const link = screen.getByTestId('go-to-dashboard-link');
-    expect(link).toHaveAttribute('href', '/en/teacher');
-  });
-
-  it('displays the authenticated user display name', () => {
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      loading: false,
-      profile: { display_name: 'Alice Learner', user_role: 'teacher', is_admin: true },
-    });
-    render(<EducationPageClient />);
-    expect(screen.getByText('Alice Learner')).toBeInTheDocument();
+    expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
   });
 
   it('does NOT show shortcut while auth is loading', () => {
@@ -150,15 +128,15 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
   });
 
-  it('shows for-schools link for authenticated teachers', () => {
+  it('does not keep a teacher on the marketing catalog', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       loading: false,
       profile: { display_name: 'Mr. Smith', user_role: 'teacher' },
     });
     render(<EducationPageClient />);
-    const link = screen.getByTestId('teacher-hub-for-schools-link');
-    expect(link).toHaveAttribute('href', '/en/education/for-schools');
+    expect(screen.queryByTestId('teacher-hub-for-schools-link')).not.toBeInTheDocument();
+    expect(screen.queryByText('education.landing.modes.title')).not.toBeInTheDocument();
   });
 
   it('does NOT show for-schools link for unauthenticated visitors', () => {

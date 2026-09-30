@@ -55,7 +55,9 @@ export const GAME_MODE_RULES: Record<GameMode, GameModeRules> = {
   'sealed-bid': { ...BOARD, betaName: 'Sealed Bid', fixedTimerSec: 210, languages: ['en', 'he'], humanOnly: true },
   // Generous race cap (a 5x5 can take minutes).
   crossword: { ...BOARD, betaName: 'Crossword', fixedTimerSec: 420, humanOnly: true },
-  wordcraft: { ...BOARD },
+  // Per-student lesson-dealt race: 5min clock, no classic bots, shared list
+  // words bank at full value for everyone who crafts them.
+  wordcraft: { ...BOARD, defaultTimerSec: 300, humanOnly: true, duplicatesAllowed: true, rarityScoring: false },
 };
 
 export function getGameModeRules(mode: string | null | undefined): GameModeRules {

@@ -43,6 +43,12 @@ export interface StudentRoundOutcomeProps {
    * chip is always better than a confident wrong chip.
    */
   momentum?: RoundMomentum | null;
+  /**
+   * The teacher hid the leaderboard: no placing, no beaten count, no gap —
+   * the student's own score and words only. The class position is the
+   * teacher's to reveal on the final screen, not ours to leak a round early.
+   */
+  hideClassPosition?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -55,6 +61,7 @@ export function StudentRoundOutcome({
   standings,
   mastery,
   momentum,
+  hideClassPosition = false,
   t,
 }: StudentRoundOutcomeProps) {
   // Count the room the way the server's podium counts it: `buildClassroomPodium`
@@ -75,8 +82,9 @@ export function StudentRoundOutcome({
   const ahead = index > 0 ? humans[index - 1] : null;
   const gap = ahead ? Math.max(0, ahead.score - entry.score) : 0;
 
-  const headline =
-    rank === 1
+  const headline = hideClassPosition
+    ? t('education.results.you.roundComplete')
+    : rank === 1
       ? t('education.results.you.won')
       : rank <= 3
         ? t('education.results.you.podium')
@@ -85,35 +93,43 @@ export function StudentRoundOutcome({
   return (
     <section
       data-testid="student-round-outcome"
-      data-rank={String(rank)}
+      {...(hideClassPosition ? {} : { 'data-rank': String(rank) })}
       className={cn(
         'mb-5 p-4 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard'
       )}
     >
       <div className="flex items-center gap-4">
-        {/* The placing, as an object rather than a statistic. */}
+        {/* The placing, as an object rather than a statistic. Under a hidden
+            leaderboard the tile carries a star, not a number: the count is the
+            teacher's to reveal. */}
         <div
           className={cn(
             'relative shrink-0 flex flex-col items-center justify-center',
             'w-24 h-24 -rotate-2 rounded-neo border-[2px] border-neo-black shadow-hard',
             'text-neo-black',
-            RANK_FILL[rank] ?? 'bg-neo-lime'
+            hideClassPosition ? 'bg-neo-cyan' : (RANK_FILL[rank] ?? 'bg-neo-lime')
           )}
         >
-          {rank === 1 && (
-            <Crown
-              className="absolute -top-5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-9 h-9 text-neo-yellow animate-neo-wobble motion-reduce:animate-none"
-              aria-hidden
-            />
+          {hideClassPosition ? (
+            <Star className="w-10 h-10" aria-hidden />
+          ) : (
+            <>
+              {rank === 1 && (
+                <Crown
+                  className="absolute -top-5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-9 h-9 text-neo-yellow animate-neo-wobble motion-reduce:animate-none"
+                  aria-hidden
+                />
+              )}
+              <span className="font-neo-display font-black text-5xl leading-none tabular-nums">
+                {rank}
+              </span>
+              {/* No opacity: 70% black on the pink third-place fill is 4.20:1 at
+                  10px, under AA. The hierarchy is carried by size, not by fade. */}
+              <span className="font-neo-body font-bold text-[0.65rem] uppercase tracking-widest">
+                {t('education.results.you.of', { total: humans.length })}
+              </span>
+            </>
           )}
-          <span className="font-neo-display font-black text-5xl leading-none tabular-nums">
-            {rank}
-          </span>
-          {/* No opacity: 70% black on the pink third-place fill is 4.20:1 at
-              10px, under AA. The hierarchy is carried by size, not by fade. */}
-          <span className="font-neo-body font-bold text-[0.65rem] uppercase tracking-widest">
-            {t('education.results.you.of', { total: humans.length })}
-          </span>
         </div>
 
         <div className="min-w-0 flex-1">
@@ -130,7 +146,7 @@ export function StudentRoundOutcome({
             </span>
           </p>
 
-          {beaten > 0 && (
+          {beaten > 0 && !hideClassPosition && (
             <p
               data-testid="student-outcome-beat"
               className="mt-2 flex items-center gap-1.5 font-neo-body font-bold text-neo-white/80 text-sm"
@@ -180,7 +196,7 @@ export function StudentRoundOutcome({
             </span>
           )}
 
-          {momentum.rankDelta > 0 && (
+          {momentum.rankDelta > 0 && !hideClassPosition && (
             <span
               data-testid="student-outcome-climb"
               className={cn(CHIP, 'bg-neo-cyan text-neo-black')}
@@ -209,7 +225,7 @@ export function StudentRoundOutcome({
             {t('education.results.you.words', { found: mastery.found, total: mastery.total })}
           </span>
         )}
-        {ahead && (
+        {ahead && !hideClassPosition && (
           <span
             data-testid="student-outcome-gap"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-white font-bold text-sm shadow-hard-sm"

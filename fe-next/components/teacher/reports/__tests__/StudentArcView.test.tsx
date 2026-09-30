@@ -89,4 +89,15 @@ describe('<StudentArcView>', () => {
     render(<StudentArcView studentId="s1" classroomId="c1" studentName="Sam" />);
     expect(screen.getByTestId('student-arc-requeue')).toHaveTextContent('teacher.reports.arc.requeueStudent:Sam');
   });
+
+  it('gives every outcome dot a state title and the dot group an accessible label', () => {
+    render(<StudentArcView studentId="s1" classroomId="c1" studentName="Sam" />);
+    const rows = screen.getAllByTestId('student-arc-word');
+    const stuckDots = rows[0].querySelectorAll('[data-testid="student-arc-outcome"]');
+    expect(stuckDots[0]).toHaveAttribute('title', 'teacher.reports.arc.outcomeMissed');
+    const improvingDots = rows[1].querySelectorAll('[data-testid="student-arc-outcome"]');
+    expect(improvingDots[1]).toHaveAttribute('title', 'teacher.reports.arc.outcomeCorrect');
+    const group = rows[0].querySelector('[role="img"]');
+    expect(group).toHaveAttribute('aria-label', 'teacher.reports.arc.attempts:2');
+  });
 });

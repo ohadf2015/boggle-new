@@ -3,6 +3,7 @@ import { z } from 'zod';
 import logger from '@/utils/logger';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
+import { readClassroomPressure } from '@/shared/utils/classroomPressure';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 const querySchema = z.object({ code: z.string().min(1).max(10) });
@@ -102,6 +103,7 @@ export async function GET(request: NextRequest) {
           allowLateJoin: settings.allowLateJoin ?? true,
           vocabQuizQuestionCount: settings.vocabQuizQuestionCount ?? null,
           vocabQuizSeconds: settings.vocabQuizSeconds ?? null,
+          pressure: settings.pressure ? readClassroomPressure(settings) : null,
         },
       },
       { status: 200 }

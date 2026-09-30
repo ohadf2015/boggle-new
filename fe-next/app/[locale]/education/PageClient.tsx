@@ -4,11 +4,9 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Script from 'next/script';
-import { m, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { EducationHero } from '@/components/education/EducationHero';
 import { MoatTrifectaSection } from '@/components/education/MoatTrifectaSection';
@@ -19,7 +17,6 @@ import { TeacherSetupSection } from '@/components/education/TeacherSetupSection'
 import { EducationFAQ } from '@/components/education/EducationFAQ';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import { speakableJsonLd } from '@/lib/seo/educationStructuredData';
 import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { TeacherProCheckoutCta } from '@/components/education/TeacherProCheckoutCta';
@@ -31,34 +28,15 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 
 /**
  * Education Landing - Master page rebuilt with scroll reveals
- * Auth-aware: teachers see shortcut dashboard; students auto-redirect; anons see full marketing
+ * Auth-aware: approved teachers go to the live lobby; students auto-redirect; anons see full marketing
  * Sections: Hero → Role Cards → Moat → Modes → Comparison → Setup → Pricing → FAQ
  * All scroll animations respect prefers-reduced-motion
  */
-
-// Staggered cascade for the teacher shortcut bars (pattern: playful-staggered-list)
-const teacherStaggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
-};
-const teacherBarVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
-  },
-};
-const teacherBarVariantsReduced = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.15 } },
-};
 
 export function PageClient() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { isAuthenticated, loading, profile } = useAuth();
-  const shouldReduceMotion = useReducedMotion();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Auto-redirect authenticated students to /student dashboard
@@ -71,8 +49,19 @@ export function PageClient() {
   // Determine if user has teacher/admin access
   const hasTeacherAccess = isAuthenticated && !loading && isTeacherProfile(profile);
 
+  // Approved teachers host from the live lobby. This page is the public catalog.
+  useEffect(() => {
+    if (hasTeacherAccess) {
+      router.replace(`/${language}/education/classroom-game`);
+    }
+  }, [hasTeacherAccess, language, router]);
+
   // If student is redirecting, return null
   if (!loading && isAuthenticated && profile?.user_role === 'student') {
+    return null;
+  }
+
+  if (hasTeacherAccess) {
     return null;
   }
 
@@ -84,22 +73,8 @@ export function PageClient() {
     '.education-faq-q',
   ]);
 
-  const teacherBar = shouldReduceMotion
-    ? teacherBarVariantsReduced
-    : teacherBarVariants;
-
   return (
     <main className="min-h-screen bg-neo-navy">
-      <TopBackLink className="mb-4" />
-
-      {/* SSR money path (#1057): the Pro checkout ships in the HTML
-          unconditionally, OUTSIDE the `hasTeacherAccess` gate, so a signed-in
-          free teacher — the upsell target — still sees it. Guarded by
-          TeacherProCheckoutCta.ssr.test.ts; do not move it into the gate. */}
-      <div className="mx-auto w-full max-w-6xl px-4 pb-2 sm:px-6 lg:px-8">
-        <TeacherProCheckoutCta locale={language} />
-      </div>
-
       {/* Sign in. Every other CTA on this page is signup-flavoured ("Get Teacher
           Access", "Get Teacher Pro"), so a teacher who already HAS an account had
           to click through the create-account modal to find the sign-in link. */}
@@ -122,124 +97,10 @@ export function PageClient() {
         <AuthModal isOpen onClose={() => setShowAuthModal(false)} initialMode="signin" />
       )}
 
-      {/* Teacher view: cascading shortcut bars + relevant redesign content */}
-      {hasTeacherAccess && (
-        <>
-          <m.div
-            variants={teacherStaggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Teacher welcome banner for newly-approved teachers */}
-            <m.div variants={teacherBar} className="px-4 py-4">
-              <div className="mx-auto max-w-4xl">
-                <TeacherWelcomeBanner hasAccess={hasTeacherAccess} />
-              </div>
-            </m.div>
-
-            {/* Auth-aware shortcut */}
-            <m.div
-              variants={teacherBar}
-              data-testid="auth-dashboard-shortcut"
-              className="bg-neo-lime/10 border-b-2 border-neo-lime px-4 py-3 sm:py-4"
-            >
-              <div className="mx-auto max-w-3xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm text-neo-white">
-                    {t('education.landing.welcomeBack')}
-                  </p>
-                  <p className="text-neo-white font-neo-display text-lg font-bold">
-                    {profile?.display_name}
-                  </p>
-                </div>
-                {/* Link, never a raw <a>: a document navigation reboots the
-                    Supabase auth bootstrap on /teacher, which reads to the
-                    teacher as "the button just refreshed the page". */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                  <Link
-                    href={`/${language}/teacher`}
-                    data-testid="create-classroom-shortcut"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow border-3 border-black"
-                  >
-                    {t('education.landing.createClassroom', 'Create classroom')}
-                  </Link>
-                  <Link
-                    href={`/${language}/teacher/upgrade`}
-                    data-testid="teacher-hub-pro-upgrade-link"
-                    onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_hub_pro' })}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-pink text-neo-white font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow border-3 border-black"
-                  >
-                    {t('education.landing.pro.chooseNow', 'Get Teacher Pro')}
-                  </Link>
-                  <Link
-                    href={`/${language}/teacher`}
-                    data-testid="go-to-dashboard-link"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-cyan text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
-                  >
-                    {t('education.landing.openDashboard')}
-                    <DirectionalIcon icon={ArrowRight} className="inline size-4" />
-                  </Link>
-                </div>
-              </div>
-            </m.div>
-
-            {/* Start Game shortcut */}
-            <m.div
-              variants={teacherBar}
-              className="bg-neo-navy-light border-b border-neo-cream/40 px-4 py-3"
-            >
-              <div className="mx-auto max-w-3xl">
-                <Link
-                  href={`/${language}/multiplayer`}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-neo-cyan text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
-                >
-                  {t('education.landing.startGame')}
-                </Link>
-              </div>
-            </m.div>
-          </m.div>
-
-          {/* Fill the page with teacher-relevant content (no "request access" noise) */}
-          <div id="modes">
-            <SixModeTour />
-          </div>
-          <ComparisonStrip />
-          {/* School / district plan CTA: teachers are highest-intent advocates for school purchases */}
-          <div className="mx-auto my-8 max-w-3xl px-4">
-            <aside className="rounded-neo border-neo border-neo-purple/90 bg-neo-navy-light px-6 py-5 shadow-hard">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h3 className="text-lg font-neo-display font-black text-neo-purple">
-                    {t('education.landing.districtCta.title')}
-                  </h3>
-                  <p className="mt-1 text-sm text-neo-white/80">
-                    {t('education.landing.districtCta.body')}
-                  </p>
-                </div>
-                <Link
-                  href={`/${language}/education/for-schools`}
-                  data-testid="teacher-hub-for-schools-link"
-                  onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_hub_district' })}
-                  className="shrink-0 rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-purple/30 hover:shadow-hard"
-                >
-                  {t('education.landing.districtCta.button')}
-                </Link>
-              </div>
-            </aside>
-          </div>
-          <EducationFAQ jsonLd={false} />
-        </>
-      )}
-
       {/* Marketing landing: the pessimistic/safe default. `hasTeacherAccess` is
-          `false` while `loading` is true, so this — not the teacher shortcut
-          bar above — is what SSR and first client paint render. It only hides
-          once auth resolves to an actual teacher; a redirecting student never
-          sees it flash because of the early `return null` above. Trade-off:
-          a teacher sees this marketing view for one render before their
-          dashboard shortcuts replace it, which beats a crawler/slow-connection
-          visitor seeing no H1 at all (Class 1 pitfall run in reverse — the
-          pessimistic state for an anon marketing page IS the marketing page). */}
+          `false` while `loading` is true, so this is what SSR and first paint
+          render. An approved teacher returns null above and is sent to the
+          live lobby; a redirecting student never sees it flash. */}
       {!hasTeacherAccess && (
         <>
           <EducationHero />
@@ -297,7 +158,18 @@ export function PageClient() {
               </div>
             </div>
           </section>
+        </>
+      )}
 
+      {/* Checkout stays in the HTML for every visitor, including a signed-in
+          free teacher whose marketing block unmounts. It follows the host/join
+          decision so the first screen is the classroom, not the price. */}
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+        <TeacherProCheckoutCta locale={language} />
+      </div>
+
+      {!hasTeacherAccess && (
+        <>
           <MoatTrifectaSection />
           {/* Pricing used to sit here, third, before a first-time visitor had seen
               what the product actually does — and it was the first of two upsells

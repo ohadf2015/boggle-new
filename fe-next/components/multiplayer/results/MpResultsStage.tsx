@@ -24,6 +24,8 @@ import { useLockedBranch, useResultBeats } from './useResultBeats';
 import { MpResultsHeader } from './MpResultsHeader';
 import { MpStandingsBoard } from './MpStandingsBoard';
 import { MpMyCard } from './MpMyCard';
+import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
+import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { MpNextModeCard } from './MpNextModeCard';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
 import MpResultsDetails from './MpResultsDetails';
@@ -60,6 +62,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     series: { roundNumber: seriesRoundNumber, standings: seriesStandings },
   }), [data.sortedScores, username, data.normalizeUsername, seriesRoundNumber, seriesStandings]);
   const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
+  // The teacher's hidden dial means TRUE hidden — the final screen IS the reveal.
+  const pressure = useClassroomPressure();
+  const hideOutcome = branch !== 'final' && pressure != null && isLeaderboardHidden(pressure);
   // The final screen of a series is judged on the series: the board becomes the
   // series ladder, and my card, the verdict (sound/confetti/share) and the
   // champion chip all read my one placing on it. (The branch locks on the TIME!
@@ -192,13 +197,22 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             <span className="uppercase">· {t('mpUi.results.seriesChampion')}</span>
           </p>
         )}
-        <MpStandingsBoard
-          rows={visible.rows}
-          hiddenCount={visible.hiddenCount}
-          isRevealed={(pos) => seen(`row-${pos}`)}
-          t={t}
-          className="min-h-0 flex-1 lg:max-h-[calc(560px*var(--mp-u,1))]"
-        />
+        {hideOutcome ? (
+          <p
+            data-testid="mp-results-reveal-note"
+            className="m-auto rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 text-center font-neo-body font-bold text-neo-cream"
+          >
+            {t('education.classroomGame.pressure.revealAtEnd')}
+          </p>
+        ) : (
+          <MpStandingsBoard
+            rows={visible.rows}
+            hiddenCount={visible.hiddenCount}
+            isRevealed={(pos) => seen(`row-${pos}`)}
+            t={t}
+            className="min-h-0 flex-1 lg:max-h-[calc(560px*var(--mp-u,1))]"
+          />
+        )}
       </div>
       <div className="shrink-0 flex flex-col gap-[calc(10px*var(--mp-u,1))] lg:justify-center">
         <div className="relative">
@@ -228,6 +242,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           gap={gap}
           revealed={seen('card')}
           series={!!series}
+          hideClassPosition={hideOutcome}
           t={t}
         />
         </div>
@@ -242,7 +257,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         )}
         {seen('card') && (grid ? (
           <MpSeriesGrid grid={grid} t={t} className={cn('hidden lg:block', fx.cardIn)} />
-        ) : awards ? (
+        ) : awards && !hideOutcome ? (
           <MpRoundAwards awards={awards} t={t} className="hidden lg:block" />
         ) : null)}
         {/* Native AdMob banner / CrazyGames banner. The web dev placeholder

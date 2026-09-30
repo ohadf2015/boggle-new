@@ -377,6 +377,7 @@ function resetGameForNewRound(gameCode: string): boolean {
   game.sealedBidState = null;
   game.crosswordMpState = null;
   game.wordTowerVersusState = null;
+  game.wordcraftState = null;
   // ---- Round-scoped scoring state ----
   // These are all written behind a MODE branch at round start — the round-event
   // and rush-tile pair only for `classic` with 2+ players (gameStartHandler),

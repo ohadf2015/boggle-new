@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   lessonTargetsFor,
+  lessonTargetsWithDrops,
   wordCraftLocaleFor,
   seedOpeningRack,
   drawTowardTarget,
@@ -36,6 +37,25 @@ describe('wordCraftLocaleFor', () => {
   it('Given a Russian lesson (no Word Craft bag/dictionary), When resolved, Then it falls back to the UI locale UNSEEDED', () => {
     expect(wordCraftLocaleFor('ru', 'sv')).toEqual({ locale: 'sv', seeded: false });
     expect(wordCraftLocaleFor('ru', 'ru')).toEqual({ locale: 'en', seeded: false });
+  });
+});
+
+describe('lessonTargetsWithDrops', () => {
+  it('names every word the rack filter silently drops, as the teacher wrote it', () => {
+    const { targets, dropped } = lessonTargetsWithDrops(['juxtapose', 'anachronism', 'cat'], 'en', 9);
+    expect(targets).toEqual(['CAT', 'JUXTAPOSE']);
+    expect(dropped).toEqual(['anachronism']);
+  });
+
+  it('drops nothing silently — an empty dropped list when everything fits', () => {
+    const { dropped } = lessonTargetsWithDrops(['cat', 'dog'], 'en', 9);
+    expect(dropped).toEqual([]);
+  });
+
+  it('reports a word with no tiles in this locale as dropped, same as an overlong one', () => {
+    const { targets, dropped } = lessonTargetsWithDrops(['cat', 'café'], 'en', 9);
+    expect(targets).toEqual(['CAT']);
+    expect(dropped).toEqual(['café']);
   });
 });
 

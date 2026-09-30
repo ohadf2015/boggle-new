@@ -31,7 +31,7 @@ vi.mock('@/components/results/HighlightsBar', () => ({
   __esModule: true, default: () => null,
 }));
 vi.mock('@/components/results/ResultsRevengeSection', () => ({
-  ResultsRevengeSection: () => null,
+  ResultsRevengeSection: () => <div data-testid="revenge-section" />,
 }));
 vi.mock('@/components/results/SeriesStandingsBanner', () => ({
   __esModule: true, default: () => null,
@@ -91,5 +91,17 @@ describe('ResultsMainContent hideStandings', () => {
   it('keeps the rest of the recap (hero) when standings are hidden', () => {
     render(<ResultsMainContent {...baseProps} hideStandings />);
     expect(screen.getByTestId('results-hero')).toBeInTheDocument();
+  });
+
+  it('keeps the revenge card under plain hideStandings (the wheel-rush contract)', () => {
+    render(<ResultsMainContent {...baseProps} hideStandings />);
+    expect(screen.getByTestId('revenge-section')).toBeInTheDocument();
+  });
+
+  it('suppressRevenge drops the revenge card — it names the winner and the gap', () => {
+    // A hidden classroom leaderboard means TRUE hidden until the final reveal;
+    // the revenge card's "+N ahead of {name}" / VS framing IS a class placing.
+    render(<ResultsMainContent {...baseProps} hideStandings suppressRevenge />);
+    expect(screen.queryByTestId('revenge-section')).not.toBeInTheDocument();
   });
 });

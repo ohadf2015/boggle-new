@@ -105,7 +105,7 @@ export function LobbyRoundSettings({
   }
 
   return (
-    <div className="space-y-3">
+    <div data-testid="lobby-round-settings" className="space-y-3">
       <LobbyChoiceRow
         id="lobby-timer-label"
         label={t('teacher.classroom.timer.title')}

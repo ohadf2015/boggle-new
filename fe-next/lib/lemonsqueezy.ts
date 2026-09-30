@@ -93,6 +93,11 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
       'Unlimited classes',
       'Unlimited students',
       'Analytics & printable reports',
+      // First word ("pressure") must stay: tierLimits.parity.test.ts and
+      // proGating.test.ts match this bullet against the `pressureDials` key
+      // ProGate refuses. Wording avoids every free-matrix label word
+      // (classrooms/students/lists/ads) or planMatrix.test.ts fails.
+      'Pressure dials (calm mode)',
     ],
     variantId: process.env.LEMONSQUEEZY_PRO_VARIANT_ID,
   },

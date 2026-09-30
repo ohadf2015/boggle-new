@@ -185,6 +185,10 @@ export default function UpgradePricingPageClient() {
     t('teacher.subscription.featureOutcome2'), // Add students without waiting/headaches
     t('teacher.subscription.featureOutcome3'), // Real-time progress tracking
     t('teacher.subscription.featureOutcome4'), // Compare strategies across all your classes
+    // The pedagogic one, deliberately not last-worded as a feature: the SAME
+    // game de-gameified for anxious students is why a department pays, not a
+    // fifth toggle.
+    t('teacher.subscription.featureOutcome5'), // Calm mode: timer/leaderboard/speed dials
   ];
 
   // ponytail: no per-student anchor here on purpose. Dividing the Pro price by the

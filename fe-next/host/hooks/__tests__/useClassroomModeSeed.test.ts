@@ -14,11 +14,20 @@ import { useClassroomModeSeed, classroomBoardMode, __resetClassroomModeSeeds } f
 const hostMode = () => useGameStore.getState().hostSelectedGameMode;
 
 describe('classroomBoardMode', () => {
-  it('passes the four board modes through', () => {
+  it('passes the five board modes through', () => {
     expect(classroomBoardMode('classic')).toBe('classic');
     expect(classroomBoardMode('word-hunt')).toBe('word-hunt');
     expect(classroomBoardMode('blast')).toBe('blast');
     expect(classroomBoardMode('wheel-rush')).toBe('wheel-rush');
+    expect(classroomBoardMode('wordcraft')).toBe('wordcraft');
+  });
+
+  it('a wordcraft room starts as wordcraft, never a server-rolled random mode', () => {
+    __resetClassroomModeSeeds();
+    useGameStore.getState().setHostSelectedGameMode('random');
+    renderHook(() => useClassroomModeSeed({ isClassroomMode: true, gameCode: 'WC1234', classroomGameMode: 'wordcraft' }));
+    expect(hostMode()).toBe('wordcraft');
+    expect(useGameStore.getState().gameMode).toBe('wordcraft');
   });
 
   it('returns null for the quiz (the server starts it from the room record) and for nothing', () => {

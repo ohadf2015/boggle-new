@@ -32,7 +32,9 @@ const ja = {
         "blast": "ブラスト",
         "blastBlurb": "速攻ラウンドで特大コンボ",
         "wordHunt": "ワードハント",
-        "wordHuntBlurb": "リストの単語をハントしよう"
+        "wordHuntBlurb": "リストの単語をハントしよう",
+        "wordcraft": "ワードクラフト",
+        "wordcraftBlurb": "リストの単語を作ってクラスに勝とう"
       },
       "noClassTitle": "クラスを作れば、5秒でコード発行",
       "createClassCta": "クラスを作成",
@@ -13333,7 +13335,28 @@ const ja = {
         "wordHunt": "ワードハント",
         "blast": "ブラスト",
         "wheelRush": "ホイールラッシュ",
-        "vocabQuiz": "単語クイズ"
+        "vocabQuiz": "単語クイズ",
+        "wordcraft": "ワードクラフト"
+      },
+      "pressure": {
+        "title": "プレッシャー",
+        "leaderboard": {
+          "title": "ランキング",
+          "full": "全員表示",
+          "top3": "上位3名のみ",
+          "hidden": "最後に発表"
+        },
+        "timer": {
+          "title": "タイマー",
+          "full": "カウントダウン",
+          "gentle": "やさしめ",
+          "off": "なし"
+        },
+        "scoring": {
+          "title": "スコア",
+          "speed": "スピード重視",
+          "accuracy": "正確さのみ"
+        }
       },
       "huntTarget": {
         "title": "ターゲットの単語",
@@ -13685,6 +13708,8 @@ const ja = {
         "sparklineLabel": "{{count}}回のセッションの正確さ（{{first}}%から{{last}}%へ）",
         "requeueStudent": "{{name}}さんが間違えた単語はすでに「まちがえた単語」復習にキューされています。",
         "attempts": "{{count}}回",
+        "outcomeCorrect": "見つけた",
+        "outcomeMissed": "見逃した",
         "trend": {
           "mastered": "習得済み",
           "improving": "上達中",
@@ -14000,7 +14025,8 @@ const ja = {
         "wordHunt": "盤に隠れたお題の単語を、クラスでいちばん早く掘り当てる。",
         "blast": "素早く単語をつなげて、タイルを連鎖で爆発させる。",
         "wheelRush": "文字ホイールを回して、時間と勝負で単語を撃ち出す。",
-        "vocabQuiz": "4択で意味をあてる。正解が早いほど高得点。"
+        "vocabQuiz": "4択で意味をあてる。正解が早いほど高得点。",
+        "wordcraft": "自分のボードでバロンと単語づくり。あとはクラスのランキングが決める。"
       }
     },
     "projectorLobby": {
@@ -14031,7 +14057,29 @@ const ja = {
       "wordHunt": "隠れた単語を10回以内で当てる",
       "blast": "単語をつないでタイルを消すコンボ",
       "wheelRush": "1つの文字ホイールから単語を作る",
-      "vocabQuiz": "先生の単語データから作る4択問題"
+      "vocabQuiz": "先生の単語データから作る4択問題",
+      "wordcraft": "リストの単語を自分のボードで作り、ボットと競う"
+    },
+    "wordcraftLive": {
+      "rival": "バロン",
+      "you": "あなた",
+      "vsRival": "あなた vs バロン",
+      "tapLetters": "タイルをタップして単語を作ろう",
+      "tapStart": "始めたいマスをタップ",
+      "place": "置く",
+      "recall": "戻す",
+      "switchDirection": "向きを変える",
+      "lessonWords": "レッスンの単語",
+      "tilesLeft": "残り {count} 枚",
+      "placing": "配置中…",
+      "waitingBoard": "ボードを配布中…",
+      "builtBy": "{name} が {word} を作成",
+      "errors": {
+        "invalidWord": "「{word}」は単語ではありません",
+        "disconnected": "すでにある単語に接する必要があります",
+        "cellOccupied": "そのマスは埋まっています",
+        "generic": "置けませんでした — もう一度"
+      }
     },
     "wordTowerPractice": {
       "unavailable": "このレッスンの単語ではまだタワーを作れません。4〜6文字の単語が4つ以上必要です。",
@@ -14313,6 +14361,7 @@ const ja = {
         "won": "ゆうしょう！",
         "podium": "にゅうしょう！",
         "finished": "ラウンドしゅうりょう！",
+        "roundComplete": "ラウンドかんりょう！",
         "of": "{{total}}人中",
         "points": "点",
         "beat": "クラスの{{count}}人に勝ち",
@@ -14784,6 +14833,10 @@ const ja = {
       "yesterday": "昨日"
     },
     "classroomGame": {
+      "pressure": {
+        "revealAtEnd": "結果は最後に先生が発表します。"
+      },
+      "pressureFailed": "設定を保存できませんでした。もう一度お試しください。",
       "defaultClassroomName": "マイクラス",
       "questions": "問題数",
       "perQuestion": "1問あたり",

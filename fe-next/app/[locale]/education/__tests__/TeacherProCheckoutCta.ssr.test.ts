@@ -20,12 +20,18 @@ describe('Teacher Pro checkout CTAs on education surfaces', () => {
     const src = readFileSync(PAGE_CLIENT, 'utf8');
     expect(src).toMatch(/<TeacherProCheckoutCta\b/);
     expect(src).toMatch(/from '@\/components\/education\/TeacherProCheckoutCta'/);
-    // Must appear before the marketing block gated on teacher access.
+    // The module root is /education. A "back one level" control resolves to the
+    // consumer homepage and dumps a teacher out of the classroom product.
+    expect(src).not.toContain('TopBackLink');
+    // Host and join come first. The checkout card stays in the document for
+    // every visitor, after that decision, and outside both auth branches.
     const ctaIdx = src.indexOf('<TeacherProCheckoutCta');
-    const gatedIdx = src.indexOf('!hasTeacherAccess');
-    expect(ctaIdx).toBeGreaterThan(-1);
-    expect(gatedIdx).toBeGreaterThan(-1);
-    expect(ctaIdx).toBeLessThan(gatedIdx);
+    const heroIdx = src.indexOf('<EducationHero');
+    const joinIdx = src.indexOf('student-card-join-link');
+    expect(heroIdx).toBeGreaterThan(-1);
+    expect(joinIdx).toBeGreaterThan(-1);
+    expect(ctaIdx).toBeGreaterThan(heroIdx);
+    expect(ctaIdx).toBeGreaterThan(joinIdx);
   });
 
   it('shared CTA module targets teacher/upgrade and uses TEACHER_PRO_PRICE_USD', () => {

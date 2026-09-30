@@ -41,6 +41,7 @@ import { initializePlayerData } from './playerDataInit.js';
 import { startVocabQuizForClassroom } from './vocabQuizHandler.js';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
 import { beginClassroomRound } from '../modules/classroomGameManager.js';
+import { readClassroomPressure } from '@/shared/utils/classroomPressure';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
 import { startRushTiles } from '../modules/rushTiles/rushTilesManager.js';
@@ -225,6 +226,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
       // Classroom game? Reads the record AND marks the code live for this round.
       const classroomGame = await beginClassroomRound(gameCode);
+      // The teacher's pressure dials, resolved ONCE here and stashed on the
+      // game state: buildRoundPayload echoes them into every start-shaped
+      // payload of the round (start/retry/reconnect/late-join/recovery), so
+      // the calm room stays calm for the student who rejoins mid-round too.
+      if (classroomGame) {
+        game.classroomPressure = readClassroomPressure(classroomGame.settings);
+      }
       // Normalized per language so the live lesson-word match can actually hit.
       const lessonVocabulary = classroomGame?.vocabularyWords
         ? buildLessonVocabulary(classroomGame.vocabularyWords, gameLang)

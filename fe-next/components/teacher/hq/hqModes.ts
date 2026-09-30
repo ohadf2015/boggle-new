@@ -9,7 +9,7 @@
  * Every mode pairs its accent colour with a DISTINCT icon: colour is never the
  * only signal carrying "which game is this" (the Kahoot colour+shape bar).
  */
-import { Bomb, Grid3x3, ListChecks, Target, type LucideIcon } from 'lucide-react';
+import { Bomb, Grid3x3, Hammer, ListChecks, Target, type LucideIcon } from 'lucide-react';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 
 export type HqModeAccent = 'cyan' | 'lime' | 'pink' | 'purple';
@@ -60,6 +60,15 @@ export const HQ_MODES: readonly HqMode[] = [
     blurbKey: 'academy.hq.modes.wordHuntBlurb',
     blurbFallback: 'Hunt down the list words',
     accent: 'purple',
+  },
+  {
+    id: 'wordcraft',
+    icon: Hammer,
+    labelKey: 'academy.hq.modes.wordcraft',
+    labelFallback: 'Wordcraft',
+    blurbKey: 'academy.hq.modes.wordcraftBlurb',
+    blurbFallback: 'Craft list words, outscore the class',
+    accent: 'cyan',
   },
 ];
 

@@ -82,14 +82,9 @@ describe('Education Landing — teacher shortcuts navigate client-side', () => {
     });
   });
 
-  it('renders the Open Teacher Dashboard CTA as a client-side link, not a document reload', () => {
+  it('sends the teacher to the classroom lobby with a client navigation, not a document reload', () => {
     render(<EducationPageClient />);
-    expect(screen.getByTestId('go-to-dashboard-link')).toHaveAttribute('data-client-nav', 'true');
-  });
-
-  it('renders the Start Game shortcut as a client-side link too', () => {
-    render(<EducationPageClient />);
-    const startGame = screen.getByRole('link', { name: /education\.landing\.startGame/i });
-    expect(startGame).toHaveAttribute('data-client-nav', 'true');
+    expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+    expect(mockPush).not.toHaveBeenCalled();
   });
 });

@@ -6,6 +6,7 @@
 import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState, WheelRushModeState as SharedWheelRushModeState, SealedBidModeState as SharedSealedBidModeState, CrosswordMpModeState as SharedCrosswordMpModeState } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { VersusMatchState } from '@/lib/wordTower/versusMatch';
+import type { WordcraftLiveSession } from '../wordcraftClassroomManager';
 
 // Redis client interface
 export interface RedisClient {
@@ -111,6 +112,14 @@ export interface GameState {
   isPrivate: boolean;
   /** Classroom-mode rooms skip auto-host-transfer. See audit T4 (2026-05-10). */
   isClassroom: boolean;
+  /**
+   * The teacher's pressure dials, resolved once at round start from the
+   * classroom record and stashed HERE so every start-shaped payload of the
+   * round — start, retry, reconnect, late-join, recovery — carries the same
+   * value without a Redis read per payload (pitfall class 3). Absent on
+   * non-classroom rooms: presence is the signal.
+   */
+  classroomPressure?: import('@/shared/types/classroom').ResolvedClassroomPressure;
   allowLateJoin: boolean;
   aiApprovedWords: AiApprovedWord[];
   peerValidationWord: AiApprovedWord | null;
@@ -144,6 +153,8 @@ export interface GameState {
   sealedBidState?: SealedBidState | null;
   crosswordMpState?: CrosswordMpState | null;
   wordTowerVersusState?: VersusMatchState | null;
+  /** Live classroom Wordcraft race (per-student boards), rebuilt every round. */
+  wordcraftState?: WordcraftLiveSession | null;
   kickedPlayers?: Set<string>;
   /** O(1) duplicate-word lookup set, parallel to playerWords (not persisted to Redis) */
   playerWordsSet?: Record<string, Set<string>>;

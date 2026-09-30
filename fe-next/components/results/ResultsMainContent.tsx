@@ -116,6 +116,10 @@ export interface ResultsMainContentProps {
    *  where WheelRushResultsScene already shows every placement on the wheel, so
    *  the standings here would just duplicate names/scores/avatars/ranks. */
   hideStandings?: boolean;
+  /** Suppress the revenge/defend card: it names the winner (or runner-up) and
+   *  the points gap, which IS a class placing. Set when the teacher hid the
+   *  leaderboard and the final reveal has not happened yet. */
+  suppressRevenge?: boolean;
   /** Set by the page when a mode-specific scene below already prints the
    *  current player's best word (blast), so the highlights strip drops its
    *  duplicate chip. Same contract as hideStandings. */
@@ -183,6 +187,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   isCurrentUserWinner,
   hideDetailsToggle,
   hideStandings,
+  suppressRevenge,
   hideBestWord,
   shareCardStats,
   detailsSlot,
@@ -760,7 +765,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           where RivalsPanel is suppressed (blast/wheel-rush, hideStandings): those
           modes' own scenes carry the standings, so Revenge adds the charm layer
           without duplicating the rival deltas RivalsPanel already shows. */}
-      {isMultiplayer && hideStandings && currentPlayerData && sortedScores.length > 1 && (
+      {isMultiplayer && hideStandings && !suppressRevenge && currentPlayerData && sortedScores.length > 1 && (
         <ResultsRevengeSection
           sortedScores={sortedScores}
           currentPlayerData={currentPlayerData}
