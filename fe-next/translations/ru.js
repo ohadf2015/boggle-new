@@ -3726,6 +3726,22 @@ const ru = {
         "cta": "Проведите бесплатную словарную игру для всего класса с лимитом 50 мест"
       }
     },
+    "vsClassPoint": {
+      "basicFree": {
+        "eyebrow": "Лимиты бесплатного плана — честный foil",
+        "title": "ClassPoint Basic Free: Max-25-class-size / 5 вопросов на PPT. LexiClash: весь класс бесплатно (50) + miss→Live.",
+        "lede": "ClassPoint публикует Basic Free: Max-25-class-size, 5 вопросов на PPT, 5 типов, 3 Draggable, 3 сохранённых класса. Отлично от Socrative Free 5/1/50. LexiClash free — до 50 в классе + miss→Live.",
+        "cpTitle": "ClassPoint Basic Free — опубликованные лимиты",
+        "cpBody": "Pricing Basic Free: Max-25-class-size · 5 Questions/PPT · 5 types · 3 Draggable · 3 saved classes.",
+        "lexiTitle": "LexiClash — весь класс бесплатно + miss→Live",
+        "lexiBody": "Free: до 50 учеников в классе + miss-gap → reteach Live. Без потолка Max-25 / 5 вопросов на PPT.",
+        "citePrefix": "ClassPoint:",
+        "citePlansLabel": "classpoint.io/pricing (Basic Free: 25 / 5 Q)",
+        "citeSchoolsLabel": "Schools & districts (Premium contrast)",
+        "citeSuffix": " — Basic Free: Max-25-class-size · 5 Questions per PPT.",
+        "cta": "Проведите бесплатную словарную игру для всего класса с лимитом 50 мест"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Лимиты бесплатного плана — honesty foil",
