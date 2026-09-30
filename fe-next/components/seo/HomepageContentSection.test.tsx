@@ -51,6 +51,7 @@ describe('HomepageContentSection', () => {
     render(<HomepageContentSection content={content} locale="he" />);
     const hrefs = Array.from(document.querySelectorAll('a')).map((a) => a.getAttribute('href'));
     expect(hrefs).toContain('/he/how-to-play');
+    expect(hrefs).toContain('/he/online-word-games-with-friends');
     expect(hrefs).toContain('/he/blog');
     expect(hrefs).toContain('/he/guides');
   });

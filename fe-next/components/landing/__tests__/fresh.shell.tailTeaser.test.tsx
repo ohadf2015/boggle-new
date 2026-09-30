@@ -80,7 +80,12 @@ describe('HomepageContentSection: no duplicate link row', () => {
     const line = container.querySelector('p[data-home-tail="readmore"]') as HTMLElement;
     expect(line).not.toBeNull();
     const hrefs = [...line.querySelectorAll('a')].map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(['/he/how-to-play', '/he/guides', '/he/blog']);
+    expect(hrefs).toEqual([
+      '/he/how-to-play',
+      '/he/online-word-games-with-friends',
+      '/he/guides',
+      '/he/blog',
+    ]);
   });
 
   it('no longer holds the locale cross-link', () => {

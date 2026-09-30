@@ -350,9 +350,10 @@ const es = {
       "faqMore": "{count} preguntas más",
       "faqAll": "Todas las preguntas",
       "crossLink": "Jugar Scrabble online gratis",
-      "readMore": "¿Primera vez por aquí? Aprende {howToPlay}, descubre trucos en las {guides} o date una vuelta por {blog}.",
+      "readMore": "¿Primera vez por aquí? Aprende {howToPlay}, juega {withFriends}, descubre trucos en las {guides} o date una vuelta por {blog}.",
       "readMoreLinks": {
         "howToPlay": "cómo se juega",
+        "withFriends": "juegos de palabras con amigos",
         "guides": "guías de estrategia",
         "blog": "el blog"
       },

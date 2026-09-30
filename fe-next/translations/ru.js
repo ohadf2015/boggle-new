@@ -350,9 +350,10 @@ const ru = {
       "faqMore": "Ещё вопросы: {count}",
       "faqAll": "Все вопросы",
       "crossLink": "Играть бесплатно онлайн",
-      "readMore": "Впервые здесь? Узнайте, {howToPlay}, подсмотрите приёмы в {guides} или загляните в {blog}.",
+      "readMore": "Впервые здесь? Узнайте, {howToPlay}, сыграйте в {withFriends}, подсмотрите приёмы в {guides} или загляните в {blog}.",
       "readMoreLinks": {
         "howToPlay": "как играть",
+        "withFriends": "словесные игры с друзьями",
         "guides": "гайдах по стратегии",
         "blog": "блог"
       },

@@ -350,9 +350,10 @@ const sv = {
       "faqMore": "{count} frågor till",
       "faqAll": "Alla frågor",
       "crossLink": "Spela Scrabble online gratis",
-      "readMore": "Ny här? Läs {howToPlay}, lär dig knep i våra {guides} eller bläddra i {blog}.",
+      "readMore": "Ny här? Läs {howToPlay}, spela {withFriends}, lär dig knep i våra {guides} eller bläddra i {blog}.",
       "readMoreLinks": {
         "howToPlay": "hur man spelar",
+        "withFriends": "ordspel med vänner",
         "guides": "strategiguider",
         "blog": "bloggen"
       },
