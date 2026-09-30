@@ -322,11 +322,24 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     // profile collapses lobby/beforeGame/inGame/bossa onto ONE file). Keep it
     // rolling; restarting the identical track from zero on every page/phase is
     // the regression this guards against. Subsumes the old same-key check.
-    if (
-      isSameResolvedTrack(currentTrackRef.current, trackKey, styleKeyRef.current) &&
-      currentHowlRef.current?.playing()
-    ) {
-      return;
+    //
+    // "Already playing" must also cover a track that was requested but is still
+    // LOADING (Howler reports playing() === false until load drains its queue)
+    // and one paused by tab blur/hide (resumeAudio restarts it). Without this,
+    // every repeat request during a slow load queued another stop → volume →
+    // play → fade batch that replayed on load: the bed started, was killed and
+    // restarted N times in a burst.
+    if (isSameResolvedTrack(currentTrackRef.current, trackKey, styleKeyRef.current)) {
+      const current = currentHowlRef.current;
+      if (
+        current &&
+        (current.playing() ||
+          current.state() === 'loading' ||
+          pausedByVisibilityRef.current ||
+          pausedByBlurRef.current)
+      ) {
+        return;
+      }
     }
 
     const newHowl = getOrCreateHowl(trackKey);
@@ -497,6 +510,16 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
         howl.stop();
       }
     });
+    // Drop every queued request too: a track held for unlock or for the end of a
+    // crossfade belongs to the page being left, and would otherwise start on the
+    // next page (first tap / when the old fade window expires).
+    pendingUnlockTrackRef.current = null;
+    pendingTrackRef.current = null;
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+      transitionTimeoutRef.current = null;
+    }
+    isTransitioningRef.current = false;
     currentHowlRef.current = null;
     currentTrackRef.current = null;
     setCurrentTrack(null);

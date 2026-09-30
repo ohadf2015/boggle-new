@@ -35,7 +35,6 @@ import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import StreakSavedCelebration from './StreakSavedCelebration';
 import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator';
 import { useAuth } from '@/contexts/AuthContext';
-import { useHideNavigation } from '@/contexts/NavigationContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WinCinematic } from './WinCinematic';
@@ -81,18 +80,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
-
-  // This screen ships its own Results/Stats MobileTabBar (below) sized against
-  // --mobile-bottom-safe. GlobalBottomNav only hides while DailyWordHuntSurvival
-  // reports active gameplay, so once the game ends it re-mounts UNDER/behind
-  // that custom bar — two fixed bottom bars stacked, and the sticky CTA's lift
-  // (calibrated for one bar) ends up looking gapped against whichever renders
-  // on top. Keep it hidden for as long as this results screen is shown too.
-  const setIsInGame = useHideNavigation();
-  useEffect(() => {
-    setIsInGame(true);
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
 
   // Ads + leaderboard on mount
   useEffect(() => {
@@ -389,11 +376,11 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       </div>
 
       {/* Main Content - flex-1 min-h-0 fills remaining space after compact header */}
-      {/* Bottom padding clears BOTH the fixed MobileTabBar (--mobile-bottom-safe
-          ≈ 80px + safe-area) AND the AdMob banner it now sits above, so the last
-          CTA (retry/share) is never clipped. pb-bottom-stack omitted the tab-bar
-          height — its lying comment is now true. */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-[calc(var(--admob-banner-height,0px)+var(--mobile-bottom-safe))] md:pb-6">
+      {/* Bottom padding clears the fixed MobileTabBar (--mobile-bottom-safe ≈ 80px
+          + safe-area) so the last CTA (retry/share) is never clipped. The global
+          nav + AdMob banner band is already reserved by the body's
+          has-global-bottom-nav padding, so it is not added again here. */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-[var(--mobile-bottom-safe)] md:pb-6">
         {isPractice && (
           <div className="max-w-md mx-auto pt-3">
             <PracticeChainCta currentMode="wordHunt" />
@@ -441,13 +428,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         <ResultsBannerSlot placement="word-hunt-complete" className="px-4" />
       </div>
 
-      {/* Mobile Tab Bar — lifted above the native AdMob banner (a SurfaceView
-          composited above the WebView, pinned to the viewport bottom) so the
-          Results/Stats CTA is never hidden behind the ad. GlobalBottomNav is
-          hidden on /daily, so offset by --admob-banner-height directly — NOT
-          --bottom-stack-height, whose phantom ~64px --bottom-nav-height fallback
-          (never reset here) would float the bar above empty space. */}
-      <div className="shrink-0 fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">
+      {/* Mobile Tab Bar — stacked ABOVE the global bottom nav (--bottom-nav-height,
+          0 when the nav is hidden) and the native AdMob banner (a SurfaceView
+          composited above the WebView, pinned to the viewport bottom) so neither
+          covers the Results/Stats CTA. --bottom-stack-height is not used: its
+          16px floor would float the bar above empty space when the nav is hidden. */}
+      <div className="shrink-0 fixed bottom-[calc(var(--bottom-nav-height,0px)+var(--admob-banner-height,0px))] inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">
         <MobileTabBar
           tabs={[
             { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') },
