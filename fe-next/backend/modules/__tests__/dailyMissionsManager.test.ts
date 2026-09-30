@@ -4,7 +4,7 @@
 
 import { vi } from 'vitest';
 import { getDailyMissions, completeMission, completeDailyQuestsForResult, checkAndClaimGrandSlam, checkAndClaimAllQuestsComplete, markCelebrated, GRAND_SLAM_COIN_REWARD, PER_MISSION_XP, ALL_QUESTS_COMPLETE_XP, ALL_QUESTS_COMPLETE_COIN_REWARD } from '../dailyMissionsManager';
-import { getDailyQuests, emptyQuestResult, type QuestGameResult } from '../../../shared/dailyQuestPool';
+import { getDailyQuests, emptyQuestResult, questResultForWordTower, questResultForConnections, type QuestGameResult } from '../../../shared/dailyQuestPool';
 
 const { mockAwardCoins } = vi.hoisted(() => {
   const mockAwardCoins = vi.fn();
@@ -268,6 +268,67 @@ describe('completeDailyQuestsForResult', () => {
     // Should have called at least one update (for the satisfied quest)
     // The exact number depends on which quests are in today's rotation and what the result satisfies
     expect(updateCallCount).toBeGreaterThan(0);
+  });
+});
+
+describe('completeDailyQuestsForResult — new daily-mode results', () => {
+  const COLS = ['word_hunt_completed', 'adventure_completed', 'community_completed'];
+  const dateWith = (id: string): string => {
+    for (let d = 0; d < 400; d++) {
+      const date = new Date(Date.UTC(2026, 0, 1) + d * 86_400_000).toISOString().split('T')[0];
+      if (getDailyQuests(date).some((q) => q.id === id)) return date;
+    }
+    throw new Error(`no date serves ${id}`);
+  };
+  const setup = () => {
+    mockMaybeSingle.mockImplementation(() => Promise.resolve({ data: EMPTY_ROW, error: null }));
+    mockUpdate.mockImplementation((patch: Record<string, unknown>) => {
+      const selectFn = vi.fn().mockResolvedValue({ data: [{ ok: true }], error: null });
+      const chain: Record<string, unknown> = { eq: () => chain, select: selectFn };
+      (chain as { patch?: unknown }).patch = patch;
+      return chain;
+    });
+    mockRpc.mockResolvedValue({ error: null });
+  };
+  const updatedColumns = () =>
+    mockUpdate.mock.calls.map((c) => Object.keys(c[0] as object)[0]).filter((k) => COLS.includes(k));
+
+  it('a big daily Word Tower climb completes exactly the tower-slot quest(s), and only those', async () => {
+    const date = dateWith('tower_climb_25');
+    setup();
+    await completeDailyQuestsForResult(PLAYER_ID, questResultForWordTower({ heightM: 60, floors: 20 }), date);
+    const quests = getDailyQuests(date);
+    const expectedCols = quests
+      .map((q, i) => ({ q, i }))
+      .filter(({ q }) => q.href === '/word-tower/daily')
+      .map(({ i }) => COLS[i]);
+    expect(updatedColumns().sort()).toEqual(expectedCols.sort());
+    expect(expectedCols.length).toBeGreaterThan(0);
+  });
+
+  it('a Word Tower result below every target completes only the play quest (if served)', async () => {
+    const date = dateWith('tower_climb_25');
+    setup();
+    await completeDailyQuestsForResult(PLAYER_ID, questResultForWordTower({ heightM: 2, floors: 1 }), date);
+    const quests = getDailyQuests(date);
+    const idx = quests.findIndex((q) => q.id === 'tower_climb_25');
+    expect(updatedColumns()).not.toContain(COLS[idx]);
+  });
+
+  it('a Connections result completes the connections-slot quest', async () => {
+    const date = dateWith('connections_solve_3');
+    setup();
+    await completeDailyQuestsForResult(PLAYER_ID, questResultForConnections({ puzzlesSolved: 5 }), date);
+    const idx = getDailyQuests(date).findIndex((q) => q.id === 'connections_solve_3');
+    expect(updatedColumns()).toContain(COLS[idx]);
+  });
+
+  it('an empty Connections submit (0 solved) does not complete the solve quest', async () => {
+    const date = dateWith('connections_solve_3');
+    setup();
+    await completeDailyQuestsForResult(PLAYER_ID, questResultForConnections({ puzzlesSolved: 0 }), date);
+    const idx = getDailyQuests(date).findIndex((q) => q.id === 'connections_solve_3');
+    expect(updatedColumns()).not.toContain(COLS[idx]);
   });
 });
 

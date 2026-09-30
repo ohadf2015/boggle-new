@@ -27,6 +27,7 @@ import { POST as postRun } from '../run/route';
 import { POST as postUpgrade } from '../upgrade/route';
 import { POST as postRepair } from '../repair/route';
 import { POST as postSeen } from '../seen/route';
+import { POST as postCharge } from '../charge/route';
 import { GET as getRivals } from '../rivals/route';
 import { POST as postRaid } from '../raid/route';
 import { POST as postClaim } from '../claim/route';
@@ -53,6 +54,7 @@ describe('every estate route', () => {
     ['POST /upgrade', () => postUpgrade(postReq({ plot: 'vault' }))],
     ['POST /repair', () => postRepair(postReq({ plot: 'vault' }))],
     ['POST /seen', () => postSeen(postReq({}))],
+    ['POST /charge', () => postCharge(postReq({}))],
     ['GET /rivals', () => getRivals(getReq())],
     ['POST /raid', () => postRaid(postReq({ defenderId: THEM, accuracy: 1 }))],
     ['POST /claim', () => postClaim(postReq({ estate: {} }))],
@@ -287,6 +289,33 @@ describe('POST /api/word-tower/estate/repair', () => {
     const res = await postRepair(postReq({ plot: 'vault' }));
     expect(status(res)).toBe(400);
     expect((await body(res)).reason).toBe('intact');
+  });
+});
+
+describe('POST /api/word-tower/estate/charge', () => {
+  it('given enough coins, when a wrecking ball is bought, then a charge is added', async () => {
+    const est = estatesTable(row({ coins: 500, raid_charges: 0 }));
+    (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: est.handler }, undefined, { [ME]: 500 }).client);
+    const res = await postCharge(postReq({}));
+    expect(status(res)).toBe(200);
+    expect((await body(res)).estate.raidCharges).toBe(1);
+    expect(est.get()!.raid_charges).toBe(1);
+  });
+
+  it('given too few coins, when bought, then 400 coins and no charge', async () => {
+    const est = estatesTable(row({ coins: 3, raid_charges: 0 }));
+    (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: est.handler }).client);
+    const res = await postCharge(postReq({}));
+    expect(status(res)).toBe(400);
+    expect((await body(res)).reason).toBe('coins');
+  });
+
+  it('given a full stock, when bought, then 400 full', async () => {
+    const est = estatesTable(row({ coins: 5000, raid_charges: 3 }));
+    (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: est.handler }, undefined, { [ME]: 5000 }).client);
+    const res = await postCharge(postReq({}));
+    expect(status(res)).toBe(400);
+    expect((await body(res)).reason).toBe('full');
   });
 });
 

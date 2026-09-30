@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor, act } from '@testing-library/react'
 import { useWeeklyChest, _resetWeeklyChestCache } from '../useWeeklyChest'
 
 const authState = { isAuthenticated: true, loading: false }
@@ -105,5 +105,92 @@ describe('useWeeklyChest', () => {
     expect(result.current.daysCompleted).toBe(0)
     expect(result.current.completedDates).toEqual([])
     expect(result.current.cycleStart).toBe('')
+  })
+
+  describe('claim flow', () => {
+    const statusBody = { daysCompleted: 7, isClaimable: true, completedDates: [], cycleStart: '2026-05-06', cycleNumber: 1, pendingChest: null }
+    const okJson = (body: object) => ({ ok: true, status: 200, json: async () => body })
+
+    it('claim() goes through the authed fetch helper (bearer token attached)', async () => {
+      const authFetch = await import('@/utils/authFetch')
+      const spy = vi.spyOn(authFetch, 'postWithAuth').mockResolvedValue(
+        okJson({ tier: 'silver', coins: 300, badgeId: 'b', cycleNumber: 1 }) as unknown as Response,
+      )
+      global.fetch = vi.fn().mockResolvedValue(okJson(statusBody))
+      const { result } = renderHook(() => useWeeklyChest())
+      await waitFor(() => expect(result.current.loading).toBe(false))
+      await act(async () => { await result.current.claim() })
+      expect(spy).toHaveBeenCalledWith('/api/daily/weekly-chest/claim')
+      spy.mockRestore()
+    })
+
+    it('ignores a second claim() while one is in flight (double-click guard)', async () => {
+      let resolvePost: (r: unknown) => void = () => {}
+      const authFetch = await import('@/utils/authFetch')
+      const spy = vi.spyOn(authFetch, 'postWithAuth').mockImplementation(
+        () => new Promise(r => { resolvePost = r }) as Promise<Response>,
+      )
+      global.fetch = vi.fn().mockResolvedValue(okJson(statusBody))
+      const { result } = renderHook(() => useWeeklyChest())
+      await waitFor(() => expect(result.current.loading).toBe(false))
+      let first: Promise<unknown> = Promise.resolve()
+      let second: unknown
+      await act(async () => {
+        first = result.current.claim()
+        second = await result.current.claim()
+      })
+      expect(second).toBeNull()
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(result.current.claiming).toBe(true)
+      await act(async () => {
+        resolvePost(okJson({ tier: 'gold', coins: 600, badgeId: 'b', cycleNumber: 1 }))
+        await first
+      })
+      expect(result.current.claiming).toBe(false)
+      spy.mockRestore()
+    })
+
+    it('sets claimError on a failed claim and clears it on the next attempt', async () => {
+      const authFetch = await import('@/utils/authFetch')
+      const spy = vi.spyOn(authFetch, 'postWithAuth')
+        .mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({}) } as unknown as Response)
+        .mockResolvedValueOnce(okJson({ tier: 'gold', coins: 600, badgeId: 'b', cycleNumber: 1 }) as unknown as Response)
+      global.fetch = vi.fn().mockResolvedValue(okJson(statusBody))
+      const { result } = renderHook(() => useWeeklyChest())
+      await waitFor(() => expect(result.current.loading).toBe(false))
+      await act(async () => { await result.current.claim() })
+      expect(result.current.claimError).toBe(true)
+      await act(async () => { await result.current.claim() })
+      expect(result.current.claimError).toBe(false)
+      spy.mockRestore()
+    })
+
+    it('treats 409 (already claimed) as a refresh, not an error', async () => {
+      const authFetch = await import('@/utils/authFetch')
+      const spy = vi.spyOn(authFetch, 'postWithAuth').mockResolvedValue(
+        { ok: false, status: 409, json: async () => ({ error: 'Already claimed' }) } as unknown as Response,
+      )
+      global.fetch = vi.fn().mockResolvedValue(okJson(statusBody))
+      const { result } = renderHook(() => useWeeklyChest())
+      await waitFor(() => expect(result.current.loading).toBe(false))
+      const before = (global.fetch as any).mock.calls.length
+      await act(async () => { await result.current.claim() })
+      expect(result.current.claimError).toBe(false)
+      expect((global.fetch as any).mock.calls.length).toBeGreaterThan(before)
+      spy.mockRestore()
+    })
+
+    it('background refresh after claim does not flip loading back to true (card must not blink out)', async () => {
+      const authFetch = await import('@/utils/authFetch')
+      const spy = vi.spyOn(authFetch, 'postWithAuth').mockResolvedValue(
+        okJson({ tier: 'gold', coins: 600, badgeId: 'b', cycleNumber: 1 }) as unknown as Response,
+      )
+      global.fetch = vi.fn().mockResolvedValue(okJson(statusBody))
+      const { result } = renderHook(() => useWeeklyChest())
+      await waitFor(() => expect(result.current.loading).toBe(false))
+      act(() => { result.current.refresh() })
+      expect(result.current.loading).toBe(false)
+      spy.mockRestore()
+    })
   })
 })

@@ -38,12 +38,17 @@ interface Props {
   onShare?: () => void;
   /** Extra actions under the buttons (the empire entry lives here). */
   extra?: ReactNode;
+  /** Daily: what to play next (the shared next-quest CTA). */
+  nextSlot?: ReactNode;
+  /** Daily: today's climbers board. */
+  boardSlot?: ReactNode;
   /** Graphic recap PNG (doctrine: recap is a picture, not emoji text). */
   recapSrc?: string;
-  /** Daily one-run lock — hide play-again. */
-  dailyLocked?: boolean;
-  /** Rank on today's daily board after the one attempt. */
-  dailyRank?: number | null;
+  /**
+   * Daily tower: the day's score is how much you GREW it (not its height), next
+   * to the goal and your rank on today's board.
+   */
+  daily?: { growthM: number; targetM: number; totalM: number; rank: number | null };
   /** Everything the rival board + raid round need; absent = no board (tests, demo). */
   rivals?: {
     estate: UseEstate;
@@ -92,7 +97,7 @@ function ResultsMute() {
   );
 }
 
-export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, payoutStatus, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals, recapSrc, dailyLocked, dailyRank }: Props) {
+export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, payoutStatus, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, nextSlot, boardSlot, rivals, recapSrc, daily }: Props) {
   // Own mute in the card header → the global FAB stands down (no end-14 race
   // against the FAB's 2.5s/5s re-probes).
   useRegisterHeaderAudioControl();
@@ -121,6 +126,25 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
     { label: t('wordTowerV2.results.tenants'), value: String(run.tenants), cls: 'bg-neo-cyan' },
     { label: t('wordTowerV2.results.crates'), value: String(run.crates), cls: 'bg-neo-yellow' },
   ];
+
+  if (daily) {
+    const hit = daily.targetM > 0 && daily.growthM >= daily.targetM;
+    cells.unshift(
+      {
+        label: t('wordTowerV2.dailyTower.grewToday'),
+        value: `+${daily.growthM}${t('wordTowerV2.unitM')}`,
+        cls: hit ? 'bg-neo-lime' : 'bg-neo-yellow',
+      },
+      {
+        label: hit ? t('wordTowerV2.dailyTower.goalHit') : t('wordTowerV2.dailyTower.goal'),
+        value: `${Math.min(daily.growthM, daily.targetM)}/${daily.targetM}${t('wordTowerV2.unitM')}`,
+        cls: hit ? 'bg-neo-lime' : 'bg-neo-cream',
+      },
+    );
+    if (daily.rank) {
+      cells.push({ label: t('wordTowerV2.dailyTower.rankLabel'), value: `#${daily.rank}`, cls: 'bg-neo-purple' });
+    }
+  }
 
   // Add coins cell based on payout status
   if (payoutStatus) {
@@ -247,6 +271,8 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
             </div>
           </div>
         ) : null}
+        {nextSlot ? <div className="mt-4 text-start">{nextSlot}</div> : null}
+        {boardSlot}
         </div>
         <div className={rivals ? 'md:min-w-0 md:flex-1' : 'contents'}>
         {rivals ? (
@@ -281,28 +307,17 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
       {/* Sticky bottom bar: Home and Play Again buttons never scroll away. */}
       <div data-wt2-results-actions className="shrink-0 border-t border-neo-navy bg-neo-navy/75 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
         <div className="mx-auto flex max-w-sm items-center justify-between gap-2">
-          {dailyLocked ? (
-            <>
-              <div className="flex-1">
-                <p className="font-neo-display text-sm font-bold text-neo-cream">{t('wordTowerV2.dailyPlayed')}</p>
-                {dailyRank ? (
-                  <p className="font-neo-display text-base font-black text-neo-cream">{t('wordTowerV2.dailyRank', { rank: dailyRank })}</p>
-                ) : null}
-              </div>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRestart();
-              }}
-              autoFocus
-              className="flex-1 rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-            >
-              {t('common.playAgain')}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRestart();
+            }}
+            autoFocus
+            className="flex-1 rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          >
+            {daily ? t('wordTowerV2.dailyTower.keepBuilding') : t('common.playAgain')}
+          </button>
           <button
             type="button"
             onClick={(e) => {

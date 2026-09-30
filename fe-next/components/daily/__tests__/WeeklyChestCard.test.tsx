@@ -178,4 +178,49 @@ describe('WeeklyChestCard', () => {
     expect(screen.getByTestId('chest-day-counter').textContent).toBe('7/7')
     expect(screen.getByTestId('chest-progress-bar').getAttribute('aria-valuenow')).toBe('7')
   })
+
+  describe('claim flow', () => {
+    const claimable = { ...defaultMockData, daysCompleted: 7, isClaimable: true, claiming: false, claimError: false }
+
+    it('calls onChestClaimed with the result on success', async () => {
+      const chest = { tier: 'gold', coins: 600, badgeId: 'b' }
+      const claim = vi.fn().mockResolvedValue(chest)
+      const onChestClaimed = vi.fn()
+      mockUseWeeklyChest.mockReturnValue({ ...claimable, claim })
+      render(<WeeklyChestCard onChestClaimed={onChestClaimed} />)
+      fireEvent.click(screen.getByText('daily.weeklyChest.claimButton'))
+      await Promise.resolve()
+      await Promise.resolve()
+      expect(onChestClaimed).toHaveBeenCalledWith(chest)
+    })
+
+    it('disables the claim button while a claim is in flight', () => {
+      mockUseWeeklyChest.mockReturnValue({ ...claimable, claiming: true })
+      render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+      const btn = screen.getByText('daily.weeklyChest.claimButton').closest('button') as HTMLButtonElement
+      expect(btn.disabled).toBe(true)
+      expect(btn.getAttribute('aria-busy')).toBe('true')
+    })
+
+    it('does not invoke claim when the button is clicked while claiming', () => {
+      const claim = vi.fn()
+      mockUseWeeklyChest.mockReturnValue({ ...claimable, claiming: true, claim })
+      render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+      fireEvent.click(screen.getByText('daily.weeklyChest.claimButton'))
+      expect(claim).not.toHaveBeenCalled()
+    })
+
+    it('shows a translated error message when the claim failed', () => {
+      mockUseWeeklyChest.mockReturnValue({ ...claimable, claimError: true })
+      render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+      const alert = screen.getByRole('alert')
+      expect(alert.textContent).toBe('daily.weeklyChest.claimError')
+    })
+
+    it('shows no error message by default', () => {
+      mockUseWeeklyChest.mockReturnValue(claimable)
+      render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+      expect(screen.queryByRole('alert')).toBeNull()
+    })
+  })
 })

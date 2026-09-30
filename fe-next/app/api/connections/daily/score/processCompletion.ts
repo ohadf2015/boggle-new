@@ -14,6 +14,8 @@
  *    where status>=500 is retryable (transient) and <500 is permanent.
  */
 import { resolveDailySubmission, type DailySubmission } from '@/lib/connections/dailyScore';
+import { creditDailyQuests, isTodayUTC } from '@/lib/daily/questSeams';
+import { questResultForConnections } from '@/shared/dailyQuestPool';
 import { nextStreakValue, yesterdayISO } from '@/lib/connections/streak';
 
 type SupabaseLike = any;
@@ -129,6 +131,14 @@ export async function processConnectionsCompletion(
       .from('connections_daily_scores')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', sub.puzzleDate);
+
+    // Credit TODAY'S daily quests (authed players, today's puzzle only — a
+    // replayed offline-sync submit for a past date must not credit today's set).
+    // This function is shared by the live route and the offline-sync path, so
+    // both are covered by this single call. Fire-and-forget; failures are logged.
+    if (userIdForRow && isTodayUTC(sub.puzzleDate)) {
+      creditDailyQuests(userIdForRow, questResultForConnections({ puzzlesSolved: sub.puzzlesSolved }));
+    }
 
     return {
       ok: true,

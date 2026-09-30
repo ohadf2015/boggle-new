@@ -424,12 +424,14 @@ export type GrowthEvent =
   //     Props: { cost: number }.
   //   wt2_raid_played: fires when player raids a rival.
   //     Props: { won: boolean, coins: number }.
+  //   wt2_wrecking_ball_bought: fires when a player buys a wrecking ball. Props: { cost: number }.
   //   wt2_exit: fires when player leaves any WT2 screen.
   //     Props: { from: 'home'|'run'|'crash'|'results'|'rivals'|'raid'|'upgrades'|'loading'|'error' }.
   | 'wt2_run_ended'
   | 'wt2_upgrade_bought'
   | 'wt2_continue_used'
   | 'wt2_raid_played'
+  | 'wt2_wrecking_ball_bought'
   | 'wt2_exit'
   // Word Craft Run card-pick funnel — was fully uninstrumented (rageclicks on
   // /word-craft had no signal to attribute). Also verifies the 2026-08-24

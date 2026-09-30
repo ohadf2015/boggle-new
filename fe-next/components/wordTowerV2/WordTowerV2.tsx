@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import type { Language } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -16,7 +17,6 @@ import { impactThunk } from '@/lib/wordTowerV2/juice';
 import { MIN_WORD_LEN, isAcceptedWord, spinWheel } from '@/lib/wordTowerV2/wheel';
 import { spendScramble, totalScore } from '@/lib/wordTowerV2/run';
 import { v2DailyNumericSeed, v2DailySeed } from '@/lib/wordTowerV2/daily';
-import { saveRunSnapshot } from '@/lib/wordTowerV2/runPersist';
 import { v2ShareCardPath } from '@/lib/wordTowerV2/shareCard';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { type TowerGear, gearFromEstate } from '@/lib/wordTowerV2/gear';
@@ -26,6 +26,7 @@ import { V2Hud } from './V2Hud';
 import { V2Dock } from './V2Dock';
 import { V2Results } from './V2Results';
 import { RevengeHome } from './rivals/RevengeHome';
+import { RivalsScreen } from './rivals/RivalsScreen';
 import { towerBlocksFrom } from './rewards/useRunPayout';
 import { RunRewards } from './rewards/RunRewards';
 import { useRewardsFlow } from './rewards/useRewardsFlow';
@@ -35,12 +36,15 @@ import { EstateButton } from './estate/EstateButton';
 import { useRivalTower } from './useRivalTower';
 import { useTowerRun } from './useTowerRun';
 import { useV2Ready } from './useV2Ready';
+import { useDailyTower } from './useDailyTower';
+import { DailyTowerBoard } from './DailyTowerBoard';
 import { BraceControl } from './rescue/BraceControl';
 import { StabilityBrace } from './rescue/StabilityBrace';
 import { type RescueReject, useBrace } from './rescue/useBrace';
 import { WreckScene } from './WreckScene';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useV2Exit } from './useV2Exit';
+import { NextQuestCta } from '@/components/daily/results/NextQuestCta';
 import { resolveWt2Screen } from '@/lib/wordTowerV2/exitTracking';
 
 /**
@@ -90,7 +94,47 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   /** The empire: one instance for the whole screen (perks, coins, district). */
   const estateApi = useEstate();
   const [district, setDistrict] = useState(false);
+  const [rivalsOpen, setRivalsOpen] = useState(false);
   const { phase, heightM, run, hoist, cancelHoist, drop, restart, setScrambles, previewWidth, seedDemo } = game;
+
+  // The daily tower persists across days: restored on open, saved as it grows.
+  const hangingIdRef = useMemo(
+    () => ({
+      get current() {
+        return game.hangingRef.current?.id ?? null;
+      },
+    }),
+    [game.hangingRef],
+  );
+  const dailyTower = useDailyTower({
+    daily,
+    language,
+    phase,
+    worldRef: game.worldRef,
+    labelsRef: game.labelsRef,
+    hangingIdRef,
+    restoreTower: game.restoreTower,
+  });
+  // One-time cheer the moment today's goal is reached (not for a goal already hit on open).
+  const goalSeen = useRef<boolean | null>(null);
+  const [goalToast, setGoalToast] = useState(false);
+  useEffect(() => {
+    if (!daily || dailyTower.targetM === 0) return;
+    if (goalSeen.current === null) {
+      goalSeen.current = dailyTower.targetHit;
+      return;
+    }
+    if (dailyTower.targetHit && !goalSeen.current) {
+      goalSeen.current = true;
+      playSound('questComplete');
+      setGoalToast(true);
+      const id = window.setTimeout(() => setGoalToast(false), 3200);
+      return () => window.clearTimeout(id);
+    }
+    return undefined;
+  }, [daily, dailyTower.targetM, dailyTower.targetHit, playSound]);
+  /** Floors standing right now: this run's plus the ones restored from earlier days. */
+  const towerFloors = run.floors + (daily ? dailyTower.restoredFloors : 0);
 
   /**
    * Desktop/TV: the wheel moves to a SIDE panel and the canvas becomes the play
@@ -160,14 +204,18 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
    * Once per run (useRunPayout), keepalive so the POST outlives the page.
    */
   const bankRun = rewardsFlow.bank;
+  const flushDaily = dailyTower.flush;
   useEffect(() => {
-    const onHide = () => void bankRun(true);
+    const onHide = () => {
+      flushDaily({ keepalive: true });
+      void bankRun(true);
+    };
     window.addEventListener('pagehide', onHide);
     return () => {
       window.removeEventListener('pagehide', onHide);
       void bankRun(true);
     };
-  }, [bankRun]);
+  }, [bankRun, flushDaily]);
   /**
    * A tower still standing is never "game over" any more — only a total
    * collapse is. So the exit is the CASH OUT: it ends the run on purpose and
@@ -187,13 +235,13 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       district,
       raiding,
       smashing,
-      floors: run.floors,
+      floors: towerFloors,
     });
-  }, [dictError, dictReady, phase, rewardsFlow.resultsReady, forceResults, district, raiding, smashing, run.floors]);
+  }, [dictError, dictReady, phase, rewardsFlow.resultsReady, forceResults, district, raiding, smashing, towerFloors]);
 
   const exitFlow = useV2Exit({
     phase,
-    floors: run.floors,
+    floors: towerFloors,
     daily,
     finish,
     bankRun,
@@ -201,6 +249,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     language,
     getScreen,
     t,
+    flushDaily: () => flushDaily({ keepalive: false }),
   });
 
 
@@ -471,7 +520,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (isTypingTarget(event) || phase === 'over' || smashing) return;
+      if (isTypingTarget(event) || phase === 'over' || smashing || rivalsOpen || raiding) return;
       if (event.code === 'Space') {
         event.preventDefault();
         if (phase === 'swinging') dropFloor();
@@ -495,7 +544,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, dropFloor, submit, wheel, takeSlot, smashing, putBack]);
+  }, [phase, dropFloor, submit, wheel, takeSlot, smashing, putBack, rivalsOpen, raiding]);
 
   // Hold the results a beat so the player watches their tower come down.
   // The player closed the results card to look at the tower that fell. Cleared
@@ -517,7 +566,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const longestWord = myWords.reduce((a, w) => (w.length > a.length ? w : a), '');
   const scoreMultEarly = estateApi.perks.scoreMult;
   const liveScore = Math.round(totalScore(heightM, run.bonus) * scoreMultEarly);
-  const { dailyLocked, dailyRank } = useV2Ready({
+  const { dailyRank, refreshRank } = useV2Ready({
     daily,
     isAdmin: !!isAdmin,
     canSeeInWorkModes: !!canSeeInWorkModes,
@@ -526,20 +575,27 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     floors: run.floors,
     peakM: game.peakM,
     score: liveScore,
-    longestWord,
     resultsShown: showOver || forceResults,
     seedDemo,
     setForceResults,
     setSmashing,
   });
 
-  useEffect(() => {
-    if (phase === 'over' || run.floors <= 0) return;
-    saveRunSnapshot(
-      { daily, date: utcDateKey(), words: myWords, peakM: game.peakM, floors: run.floors },
-      window.sessionStorage,
-    );
-  }, [daily, phase, run.floors, game.peakM, myWords]);
+  /**
+   * New run. The daily tower comes back as the day's checkpoint (a collapse
+   * only costs today's growth); the free tower starts from an empty lot.
+   */
+  const restartRun = useCallback(() => {
+    preSubmitRef.current = null;
+    undoGuardRef.current = null;
+    restart();
+    setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
+    if (daily) {
+      dailyTower.resume();
+      refreshRank();
+    }
+  }, [restart, daily, language, dailyTower, refreshRank]);
+
 
   // Smash round target: only the friend who sent the link. Wrecking your OWN
   // tower was removed — there is no reason to knock down what you just built.
@@ -608,6 +664,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           raids={estateApi.inbox.length}
           coinsRef={coinsRef}
           onOpenEstate={() => setDistrict(true)}
+          onOpenRivals={phase === 'composing' ? () => setRivalsOpen(true) : undefined}
           onExit={exitFlow.goHome}
           barRef={setBarEl}
           wide={wide}
@@ -615,6 +672,8 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           daily={daily}
           dailyDateKey={daily ? utcDateKey() : undefined}
           dailyDateFormatted={dailyDateFormatted}
+          dailyTarget={daily ? { growthM: dailyTower.growthM, targetM: dailyTower.targetM } : undefined}
+          hasTower={towerFloors > 0}
         />
       ) : null}
       <RunRewards
@@ -640,6 +699,15 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       {rival && phase === 'composing' && run.floors === 0 ? (
         <div className="pointer-events-none absolute inset-x-4 top-[calc(var(--wt2-hud,7rem)+0.5rem)] z-20 mx-auto max-w-sm rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-2 text-center font-neo-display text-base font-bold text-neo-navy shadow-hard animate-neo-pop">
           {t('wordTowerV2.wreck.challenge', { name: rivalName })}
+        </div>
+      ) : null}
+      {goalToast ? (
+        <div
+          role="status"
+          data-wt2-goal-toast
+          className="pointer-events-none absolute inset-x-0 top-1/4 z-[60] mx-auto w-fit max-w-[90%] rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-2 text-center font-neo-display text-lg font-black text-neo-navy shadow-hard animate-neo-pop"
+        >
+          {t('wordTowerV2.dailyTower.goalToast', { m: dailyTower.growthM })}
         </div>
       ) : null}
       {copied ? (
@@ -702,13 +770,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           unlocked={game.unlockedRef.current}
           stats={game.statsRef.current}
           payoutStatus={rewardsFlow.payoutStatus}
-          onRestart={() => {
-            if (dailyLocked) return;
-            preSubmitRef.current = null;
-            undoGuardRef.current = null;
-            restart();
-            setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
-          }}
+          onRestart={restartRun}
           onHome={exitFlow.goHome}
           onClose={() => {
             setForceResults(false);
@@ -717,6 +779,10 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           smashLabel={t('wordTowerV2.wreck.smash', { name: rivalName })}
           onSmash={smashWords ? () => setSmashing(true) : undefined}
           onShare={myWords.length >= 3 ? shareMine : undefined}
+          boardSlot={daily ? <DailyTowerBoard t={t} language={language} refreshKey={dailyTower.growthM} /> : undefined}
+          nextSlot={
+            daily ? <NextQuestCta justFinished="word-tower" currentLanguage={language as Language} source="word_tower_results" /> : undefined
+          }
           recapSrc={v2ShareCardPath({
             heightM: game.peakM,
             floors: run.floors,
@@ -724,8 +790,11 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
             topWord: longestWord,
             name: profile?.display_name ?? profile?.username ?? '',
           })}
-          dailyLocked={dailyLocked}
-          dailyRank={dailyRank}
+          daily={
+            daily
+              ? { growthM: dailyTower.growthM, targetM: dailyTower.targetM, totalM: dailyTower.totalM, rank: dailyRank }
+              : undefined
+          }
           rivals={{
             estate: estateApi,
             balls: run.balls,
@@ -756,18 +825,13 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           >
             {t('wordTowerV2.results.badges')}
           </button>
-          {!dailyLocked ? (
           <button
             type="button"
-            onClick={() => {
-              restart();
-              setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
-            }}
+            onClick={restartRun}
             className="rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-1.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
           >
             {t('common.playAgain')}
           </button>
-          ) : null}
           <button
             type="button"
             onClick={exitFlow.goHome}
@@ -779,13 +843,26 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         </div>
       ) : null}
 
+      {rivalsOpen && phase !== 'over' ? (
+        <RivalsScreen
+          t={t}
+          estate={estateApi}
+          myTower={towerBlocksFrom(game.worldRef.current, game.labelsRef.current)}
+          myHeightM={heightM}
+          balls={run.balls}
+          reducedMotion={reducedMotion}
+          onClose={() => setRivalsOpen(false)}
+          onRaidOpen={setRaiding}
+        />
+      ) : null}
+
       {district ? <DistrictScreen t={t} estate={estateApi} onClose={() => setDistrict(false)} /> : null}
 
       <ConfirmationDialog {...exitFlow.leaveDialog} />
 
       {/* Someone raided you while you were away: their tower, the grievance and
           a free REVENGE — before any run, not after one. */}
-      {phase !== 'over' && !smashing && !district && !showOver && !forceResults && run.floors === 0 ? (
+      {phase !== 'over' && !smashing && !district && !showOver && !forceResults && towerFloors === 0 ? (
         /* Only with nothing standing. `raiding` unmounts TowerCanvas, so opening
            a raid ON TOP of a live run would tear down the Pixi loop mid-tower —
            an entry point this flow has never had. Surfacing the pill mid-run is
@@ -803,10 +880,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           onShare={shareMine}
           onClose={() => {
             setSmashing(false);
-            preSubmitRef.current = null;
-            undoGuardRef.current = null;
-            restart();
-            setRunSeed(daily ? v2DailySeed(undefined, language) : `wt2-${Date.now()}`);
+            restartRun();
           }}
         />
       ) : null}

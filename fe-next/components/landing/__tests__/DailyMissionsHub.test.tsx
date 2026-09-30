@@ -228,4 +228,29 @@ describe('DailyMissionsHub', () => {
     expect(hrefs).toContain('/en/multiplayer');
     expect(hrefs).toContain('/en/brain');
   });
+
+  it('links new daily-mode quests (tower, connections) to their locale-prefixed daily routes', () => {
+    mockUseDailyMissions.mockReturnValue({
+      missions: [
+        { ...baseMissions[0], questId: 'tower_climb_25', type: 'towerMetres' as const, href: '/word-tower/daily',
+          titleKey: 'quests.daily.tower_climb_25.title', descKey: 'quests.daily.tower_climb_25.desc', icon: '🏗️' },
+        { ...baseMissions[1], slot: 1, questId: 'connections_solve_3', type: 'puzzlesSolved' as const,
+          family: 'skill' as const, href: '/connections/daily',
+          titleKey: 'quests.daily.connections_solve_3.title', descKey: 'quests.daily.connections_solve_3.desc', icon: '🧩' },
+        baseMissions[2],
+      ],
+      completedCount: 0,
+      isGrandSlam: false,
+      grandSlamClaimed: false,
+      loading: false,
+      refresh: vi.fn(),
+    });
+
+    render(<DailyMissionsHub />);
+
+    const hrefs = screen.getAllByRole('link').map(l => l.getAttribute('href'));
+    expect(hrefs).toContain('/en/word-tower/daily');
+    expect(hrefs).toContain('/en/connections/daily');
+    expect(screen.getByText('quests.daily.tower_climb_25.title')).toBeInTheDocument();
+  });
 });

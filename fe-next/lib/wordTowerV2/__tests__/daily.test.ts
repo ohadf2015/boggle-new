@@ -106,12 +106,13 @@ describe('v2 daily', () => {
     expect(src).toContain('daily_word_tower_attempts');
   });
 
-  it('given WordTowerV2 daily, when the run ends, then restart is gated and the crate/swing seed is the hashed UTC key', () => {
+  it('given WordTowerV2 daily, then the tower persists (never locked) and the crate/swing seed is the hashed UTC key', () => {
     const src = readFileSync(join(__dirname, '../../../components/wordTowerV2/WordTowerV2.tsx'), 'utf8');
     expect(src).toContain('v2DailyNumericSeed');
     expect(src).toContain('scriptedSwing: daily');
-    expect(src).toContain('if (dailyLocked) return;');
-    expect(src).toContain('{!dailyLocked ? (');
+    // The daily tower persists across days: no one-run lock, the run restores and saves it.
+    expect(src).not.toContain('dailyLocked');
+    expect(src).toContain('useDailyTower');
     const runSrc = readFileSync(join(__dirname, '../../../components/wordTowerV2/useTowerRun.ts'), 'utf8');
     expect(runSrc).toContain('v2DailySwing');
     expect(runSrc).toContain('createRun(dailySeed ?? Date.now())');

@@ -291,3 +291,35 @@ describe('applyRun', () => {
     expect(second.bestM).toBe(36);
   });
 });
+
+describe('buying a wrecking ball (raid charge)', () => {
+  it('costs coins, scales with the district, and is never free', async () => {
+    const { wreckingBallCost } = await import('../estate');
+    expect(wreckingBallCost(1)).toBeGreaterThan(0);
+    expect(wreckingBallCost(4)).toBeGreaterThan(wreckingBallCost(1));
+  });
+
+  it('Given enough coins, when buying, then one charge is added and coins are spent', async () => {
+    const { applyBuyCharge, wreckingBallCost } = await import('../estate');
+    const e = { ...emptyEstate(), coins: 1000, raidCharges: 1 };
+    const r = applyBuyCharge(e);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.estate.raidCharges).toBe(2);
+      expect(r.estate.coins).toBe(1000 - wreckingBallCost(e.district));
+      expect(r.cost).toBe(wreckingBallCost(e.district));
+    }
+  });
+
+  it('Given too few coins, then it refuses with reason coins and changes nothing', async () => {
+    const { applyBuyCharge } = await import('../estate');
+    const e = { ...emptyEstate(), coins: 1 };
+    expect(applyBuyCharge(e)).toEqual({ ok: false, reason: 'coins' });
+  });
+
+  it('Given the stock is full, then it refuses with reason full (no coins lost)', async () => {
+    const { applyBuyCharge, MAX_RAID_CHARGES } = await import('../estate');
+    const e = { ...emptyEstate(), coins: 99999, raidCharges: MAX_RAID_CHARGES };
+    expect(applyBuyCharge(e)).toEqual({ ok: false, reason: 'full' });
+  });
+});

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, type RefObject } from 'react';
-import { ArrowLeft, Flag, Menu, Trophy } from 'lucide-react';
+import { ArrowLeft, Flag, Menu, Target, Trophy } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
 import type { RunState } from '@/lib/wordTowerV2/run';
@@ -38,6 +38,10 @@ interface Props {
   dailyDateKey?: string;
   /** Formatted date string to display in daily badge (e.g., "25 Sep" or "25 9月"). */
   dailyDateFormatted?: string;
+  /** Daily: metres grown today vs today's goal. */
+  dailyTarget?: { growthM: number; targetM: number };
+  /** A tower already stands (restored from an earlier day) even if this run built nothing yet. */
+  hasTower?: boolean;
 }
 
 
@@ -67,6 +71,8 @@ export const V2TopBar = memo(function V2TopBar({
   daily = false,
   dailyDateKey,
   dailyDateFormatted,
+  dailyTarget,
+  hasTower,
 }: Props) {
   const floors = Math.floor(floorsAt(heightM) + 0.05);
 
@@ -86,16 +92,35 @@ export const V2TopBar = memo(function V2TopBar({
           `pe-12` reserves the corner for the global mute FAB.
           NO flex-wrap: width is constrained and items are compact. */}
       <div data-wt2-topbar-row className="flex items-center gap-2 pe-12">
-        {/* The exit leads the row. */}
+        {/* The exit leads the row: an icon AND a word, so it reads as "leave" at a glance.
+            Daily: it goes back to the daily hub and the tower is already saved.
+            Free tower with floors: it is the cash-out (the run ends, the chest follows). */}
         {onExit ? (
           <button
             type="button"
             onClick={onExit}
-            // A standing tower makes this the cash-out (the run ends, the chest follows).
-            aria-label={run.floors > 0 ? t('wordTowerV2.hud.exit') : t('wordTowerV2.results.home')}
-            className="pointer-events-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed lg:h-12 lg:w-12"
+            data-wt2-exit
+            aria-label={
+              daily
+                ? t('wordTowerV2.dailyTower.exitA11y')
+                : run.floors > 0
+                  ? t('wordTowerV2.hud.exit')
+                  : t('wordTowerV2.results.home')
+            }
+            className="pointer-events-auto flex h-9 shrink-0 items-center justify-center gap-1 rounded-neo border-neo-thick border-black bg-neo-cream px-2 text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed lg:h-12 lg:px-3"
           >
-            {run.floors > 0 ? <Flag className="h-5 w-5 lg:h-7 lg:w-7" aria-hidden /> : <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 lg:h-7 lg:w-7" />}
+            {!daily && run.floors > 0 ? (
+              <Flag className="h-5 w-5 lg:h-7 lg:w-7" aria-hidden />
+            ) : (
+              <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 lg:h-7 lg:w-7" />
+            )}
+            <span className="font-neo-display text-xs font-black uppercase leading-none lg:text-base" aria-hidden>
+              {daily
+                ? t('wordTowerV2.dailyTower.exitLabel')
+                : run.floors > 0
+                  ? t('wordTowerV2.dailyTower.finishLabel')
+                  : t('wordTowerV2.dailyTower.exitFree')}
+            </span>
           </button>
         ) : null}
 
@@ -131,6 +156,21 @@ export const V2TopBar = memo(function V2TopBar({
             <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-xs font-bold leading-tight tabular-nums text-neo-cream lg:text-base">
               {score.toLocaleString()}
             </div>
+            {daily && dailyTarget && dailyTarget.targetM > 0 ? (
+              <div
+                data-wt2-daily-target
+                className={`flex items-center gap-0.5 rounded-neo border-neo border-black px-1 font-neo-display text-[9px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-xs ${
+                  dailyTarget.growthM >= dailyTarget.targetM ? 'bg-neo-lime' : 'bg-neo-yellow'
+                }`}
+                aria-label={t('wordTowerV2.dailyTower.targetA11y', { m: dailyTarget.growthM, target: dailyTarget.targetM })}
+              >
+                <Target className="h-2.5 w-2.5 lg:h-3 lg:w-3" aria-hidden />
+                <span aria-hidden className="tabular-nums">
+                  {Math.min(dailyTarget.growthM, dailyTarget.targetM)}/{dailyTarget.targetM}
+                  {t('wordTowerV2.unitM')}
+                </span>
+              </div>
+            ) : null}
             {!daily && bestM > 0.5 ? (
               <div
                 className="flex items-center gap-0.5 rounded-neo border-neo border-black bg-neo-yellow px-1 font-neo-display text-[9px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-xs"

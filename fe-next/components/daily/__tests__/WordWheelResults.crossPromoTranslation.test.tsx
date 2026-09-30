@@ -114,7 +114,6 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
           puzzleDate="2026-04-21"
           language="en"
           hasPlayedWordHunt={false}
-          hasPlayedConnections={true}
         />
       );
       const ctaLink = screen.getByTestId('next-quest-cta');
@@ -179,7 +178,6 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
           puzzleDate="2026-04-21"
           language="en"
           hasPlayedWordHunt={true}
-          hasPlayedConnections={true}
         />
       );
       const link = screen.getByTestId('next-quest-all-clear');
@@ -213,7 +211,6 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
           puzzleDate="2026-04-21"
           language="en"
           hasPlayedWordHunt={true}
-          hasPlayedConnections={true}
         />
       );
       const cls = screen.getByTestId('next-quest-all-clear').className;

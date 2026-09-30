@@ -12,6 +12,7 @@ import {
   type Perks,
   type RunSummary,
   advanceDistrict,
+  applyBuyCharge,
   applyRepair,
   applyRun,
   applyUpgrade,
@@ -65,6 +66,8 @@ export interface RivalView {
   shields: number;
   bestM: number;
   lastTower: TowerBlock[];
+  /** Recent damaging raids on this tower — visible to everyone who battled it. */
+  ruins?: { count: number; by: string[]; byYou: boolean };
 }
 
 export interface RevengeEntry {
@@ -98,6 +101,8 @@ export interface UseEstate {
   reportRun: (summary: RunSummary, opts?: { keepalive?: boolean }) => Promise<{ coins: number; chest: ChestRoll } | null>;
   upgrade: (slot: PlotSlot) => Promise<SpendOutcome>;
   repair: (slot: PlotSlot) => Promise<SpendOutcome>;
+  /** Coins -> one more wrecking ball (raid charge). Signed in only: guests cannot raid. */
+  buyCharge: () => Promise<{ ok: true } | { ok: false; reason: string }>;
   /** null for guests (show the sign-in CTA). */
   rivals: () => Promise<{ rivals: RivalView[]; revenge: RevengeEntry[] } | null>;
   /** null for guests. `accuracy` 0..1 from the wreck mini-game; the server clamps it. */
@@ -307,6 +312,23 @@ export function useEstate(): UseEstate {
     [loading, isAuthenticated, refresh, setEstate, fromServer],
   );
 
+  const buyCharge = useCallback(async (): Promise<{ ok: true } | { ok: false; reason: string }> => {
+    if (loading) return { ok: false, reason: 'loading' };
+    if (!isAuthenticated) return { ok: false, reason: 'guest' };
+    const local = applyBuyCharge(estateRef.current);
+    if (!local.ok) return { ok: false, reason: local.reason };
+    setEstate(local.estate);
+    const res = await postWithAuth(`${API}/charge`, {}, { requireSession: true });
+    const body = await readJson(res);
+    if (!res.ok || !body?.estate) {
+      await refresh();
+      return { ok: false, reason: String(body?.reason ?? 'error') };
+    }
+    fromServer(body.estate);
+    trackGrowthEvent('wt2_wrecking_ball_bought', { cost: local.cost });
+    return { ok: true };
+  }, [loading, isAuthenticated, refresh, setEstate, fromServer]);
+
   const upgrade = useCallback((slot: PlotSlot) => spend('upgrade', slot), [spend]);
   const repair = useCallback((slot: PlotSlot) => spend('repair', slot), [spend]);
 
@@ -369,6 +391,7 @@ export function useEstate(): UseEstate {
     reportRun,
     upgrade,
     repair,
+    buyCharge,
     rivals,
     raid,
     markSeen,

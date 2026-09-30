@@ -18,6 +18,8 @@ import type { DailyPlayedStatus } from '@/app/api/daily/status/route';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import { getDailyStreak } from '@/utils/dailyChallenge/streaks';
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
+import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
+import { utcDateKey } from '@/lib/wordTower/dailySeed';
 
 /**
  * Get guest's played state from localStorage
@@ -30,12 +32,14 @@ function getGuestPlayedStatus(): DailyPlayedStatus {
   const wordHuntPlayed = !!localStorage.getItem(`wh_played_${today}`);
   const wordWheelPlayed = !!localStorage.getItem(`ww_played_${today}`);
   const connectionsPlayed = !!localStorage.getItem(`connections_played_${today}`);
+  // Tower keeps a per-UTC-day best climb; >0 means the daily was played.
+  const wordTowerPlayed = isDailyTowerPlayed(localStorage.getItem(dailyBestKey(utcDateKey())));
 
   return {
     today: {
       wordHunt: wordHuntPlayed,
       wordWheel: wordWheelPlayed,
-      wordTower: false, // Guests off-limits or localStorage unmarked
+      wordTower: wordTowerPlayed,
       connections: connectionsPlayed,
     },
     streak: {

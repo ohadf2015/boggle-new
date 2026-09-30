@@ -191,6 +191,38 @@ describe('useDailyMissions', () => {
     expect(hrefs).toEqual(['/daily', '/multiplayer', '/brain']);
   });
 
+  it('passes new daily-mode quest types and hrefs through to missions', async () => {
+    const pool = await import('@/shared/dailyQuestPool');
+    const original = vi.mocked(pool.getDailyQuests).getMockImplementation();
+    const originalReturn = pool.getDailyQuests();
+    vi.mocked(pool.getDailyQuests).mockReturnValue([
+      { id: 'tower_climb_25', type: 'towerMetres', target: 25, family: 'skill',
+        titleKey: 'quests.daily.tower_climb_25.title', descKey: 'quests.daily.tower_climb_25.desc',
+        href: '/word-tower/daily', icon: '🏗️' },
+      { id: 'connections_solve_3', type: 'puzzlesSolved', target: 3, family: 'skill',
+        titleKey: 'quests.daily.connections_solve_3.title', descKey: 'quests.daily.connections_solve_3.desc',
+        href: '/connections/daily', icon: '🧩' },
+      { id: 'long_word_6', type: 'longWord', target: 6, family: 'skill',
+        titleKey: 'quests.daily.long_word_6.title', descKey: 'quests.daily.long_word_6.desc',
+        href: '/daily', icon: '📏' },
+    ] as never);
+    mockSingle.mockResolvedValueOnce({ data: EMPTY_DATA, error: null });
+
+    try {
+      const { result } = renderHook(() => useDailyMissions());
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      expect(result.current.missions.map(m => [m.type, m.href])).toEqual([
+        ['towerMetres', '/word-tower/daily'],
+        ['puzzlesSolved', '/connections/daily'],
+        ['longWord', '/daily'],
+      ]);
+    } finally {
+      if (original) vi.mocked(pool.getDailyQuests).mockImplementation(original);
+      else vi.mocked(pool.getDailyQuests).mockReturnValue(originalReturn);
+    }
+  });
+
   it('sets grandSlamClaimed from DB data', async () => {
     mockSingle.mockResolvedValueOnce({
       data: { ...FULL_DATA, grand_slam_claimed: true },

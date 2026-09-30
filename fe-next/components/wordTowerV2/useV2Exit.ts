@@ -14,6 +14,8 @@ export interface UseV2ExitArgs {
   language: string;
   getScreen: () => Wt2Screen;
   t: (key: string) => string;
+  /** Daily: save the tower and score before leaving. */
+  flushDaily?: () => void;
 }
 
 export interface LeaveDialogProps {
@@ -39,6 +41,7 @@ export function useV2Exit({
   language,
   getScreen,
   t,
+  flushDaily,
 }: UseV2ExitArgs) {
   const [leaveOpen, setLeaveOpen] = useState(false);
   const exitingRef = useRef(false);
@@ -64,9 +67,13 @@ export function useV2Exit({
     analyticsExtras: { daily },
   }), [leaveOpen, daily, t, titleKey, descKey, finish]);
 
+  // A daily tower saves itself, so leaving it is safe and returns to the daily
+  // hub (the next quest is one tap away); the free tower goes to the home screen.
+  const destination = daily ? `/${language}/daily` : `/${language}`;
+
   const requestExit = useCallback(async () => {
-    // Mid-run: open confirmation dialog
-    if (phase !== 'over' && floors > 0) {
+    // Mid-run on the FREE tower: leaving is a cash-out, so ask first.
+    if (!daily && phase !== 'over' && floors > 0) {
       setLeaveOpen(true);
       return Promise.resolve();
     }
@@ -76,10 +83,11 @@ export function useV2Exit({
       exitingRef.current = true;
       const screen = getScreen();
       trackWt2Exit(screen);
+      flushDaily?.();
       await Promise.race([bankRun(), new Promise((r) => window.setTimeout(r, 1500))]);
-      router.push(`/${language}`);
+      router.push(destination);
     }
-  }, [phase, floors, bankRun, router, language, getScreen]);
+  }, [daily, phase, floors, bankRun, router, destination, getScreen, flushDaily]);
 
   const confirmLeave = useCallback(() => {
     setLeaveOpen(false);

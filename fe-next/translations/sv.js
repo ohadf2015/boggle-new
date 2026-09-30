@@ -1692,6 +1692,7 @@ const sv = {
     "issueProbe": {"prompt": "Vad fick det att kännas så?", "botsStrong": "Bottar för starka", "technical": "Tekniskt problem"}
   },
   "wordTowerV2": {
+    "dailyTower": {"exitLabel": "Dagens", "exitA11y": "Tillbaka till dagens utmaning – ditt torn är sparat", "finishLabel": "Avsluta", "exitFree": "Lämna", "targetA11y": "Dagens mål: {m} av {target} meter", "goalToast": "Målet nått! +{m} m idag", "grewToday": "Växte idag", "goal": "Dagens mål", "goalHit": "Målet nått!", "rankLabel": "Placering idag", "keepBuilding": "Bygg vidare", "openRivals": "Rivalernas torn", "ruinedBy": "Förstört av {names}", "ruinedByYou": "Du förstörde det", "ruinedByYouAnd": "Du + {names} förstörde det", "ruinedAnon": "Förstört ×{n}", "buyBall": "Köp rivningskula · {n} mynt", "ballPoor": "Du behöver {n} mynt till", "ballError": "Köpet misslyckades – försök igen", "boardTitle": "Dagens bästa byggare", "boardEmpty": "Ingen har byggt på sitt torn än – bli först!"},
     "gear": {"foundation":"Grund","craneYard":"Kran","vault":"Guldlister","insurance":"Stålstag","landmark":"Taktopp","see":{"foundation":"På tornet: en stensockel under bottenvåningen. Bredare bas, mindre gungning.","craneYard":"På tornet: en nymålad kran med långsammare, lättare sving.","vault":"På tornet: guldlister på våningarna. Fler mynt varje runda.","insurance":"På tornet: stålstag längs sidorna. Gratis nödstag och fler sköldar.","landmark":"På tornet: en taktopp som växer från antenn till guldkrona. Högre poäng."}},
     "rescue": {"crumbled":"Du tappade {n} våningar! Bygg vidare","counterweight":"MOTVIKT! Tornet står stadigt","braced":"STAGAT! Stålet håller","craneSaved":"KRANUPPGRADERING! Bredare fönster, perfekt släpp"},
     "brace": {"button":"Staga","freeTag":"GRATIS","explain":"Svetsa fast alla våningar utom den översta så slutar tornet gunga. Betala med rundans mynt, eller förtjäna det med ett räddningsord.","useFree":"Använd ett gratis stag","buy":"Staga · {n} mynt","poor":"Inte nog med mynt den här rundan","rescue":"Räddningsord: {n}+ bokstäver","rescueLeft":"{n} räddningar kvar","rescueNow":"Stava ett ord på {n}+ bokstäver för att staga tornet!","cancel":"Avbryt räddningen","short":"För kort för en räddning"},
@@ -8842,6 +8843,7 @@ const sv = {
       "daysRemaining": "{n} dagar kvar för din {tier}-kista!",
       "claimReady": "Din {tier}-kista är klar!",
       "claimButton": "Öppna kista",
+      "claimError": "Kunde inte öppna kistan. Försök igen.",
       "tierBronze": "Brons",
       "tierSilver": "Silver",
       "tierGold": "Guld",
@@ -16418,6 +16420,26 @@ const sv = {
       "play_wordwheel": {
         "title": "Ta ett varv",
         "desc": "Spela dagens Ordhjul"
+      },
+      "tower_climb_25": {
+        "title": "Skyskrapsbyggare",
+        "desc": "Klättra 25 m i dagens Ordtorn"
+      },
+      "tower_floors_8": {
+        "title": "Våningsplanerare",
+        "desc": "Bygg 8 våningar i dagens Ordtorn"
+      },
+      "connections_solve_3": {
+        "title": "Brobyggare",
+        "desc": "Lös 3 pussel i dagens Ordbro"
+      },
+      "play_tower_daily": {
+        "title": "Dags för tornet",
+        "desc": "Spela dagens Ordtorn"
+      },
+      "play_connections_daily": {
+        "title": "Bygg bron",
+        "desc": "Spela dagens Ordbro"
       }
     },
     "reward": {

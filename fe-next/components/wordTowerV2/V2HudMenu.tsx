@@ -19,6 +19,8 @@ interface Props {
   estate: Estate;
   raids: number;
   onOpenEstate: () => void;
+  /** Open the rival board (see their towers, buy a wrecking ball, ruin one). */
+  onOpenRivals?: () => void;
   reducedMotion?: boolean;
 }
 
@@ -42,6 +44,7 @@ export function V2HudMenu({
   estate,
   raids,
   onOpenEstate,
+  onOpenRivals,
   reducedMotion,
 }: Props) {
   const effects: Array<{ id: 'steady' | 'plumb' | 'wide'; n: number }> = [];
@@ -151,6 +154,22 @@ export function V2HudMenu({
                 })}
               </div>
             </div>
+          ) : null}
+
+          {/* Rivals: their towers, and the wrecking ball to ruin one. */}
+          {onOpenRivals ? (
+            <button
+              type="button"
+              data-wt2-open-rivals
+              onClick={() => {
+                onOpenRivals();
+                onClose();
+              }}
+              className="w-full rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-3 font-neo-display font-bold text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+            >
+              <span aria-hidden>⚒️ </span>
+              {t('wordTowerV2.dailyTower.openRivals')}
+            </button>
           ) : null}
 
           {/* Estate entry */}

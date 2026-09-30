@@ -3,7 +3,8 @@
  */
 import { describe, it, expect, vi, beforeEach, afterAll, beforeAll } from 'vitest'
 
-vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }))
+vi.mock('@/lib/auth/getAuthedUser', () => ({ getAuthedUser: vi.fn() }))
+vi.mock('@/lib/email', () => ({ getSupabaseAdmin: vi.fn() }))
 vi.mock('@/utils/logger', () => ({ __esModule: true, default: { error: vi.fn(), log: vi.fn(), warn: vi.fn() } }))
 
 // Fixed "today" so date-dependent assertions stay stable as real time advances
@@ -15,108 +16,62 @@ afterAll(() => {
   vi.useRealTimers()
 })
 
-import { createClient } from '@/utils/supabase/server'
+import { NextRequest } from 'next/server'
+import { getAuthedUser } from '@/lib/auth/getAuthedUser'
+import { getSupabaseAdmin } from '@/lib/email'
 import { GET } from './route'
 
+const eqCalls: Array<[string, string, unknown]> = []
+
+// Table-driven admin-client mock. Every builder chains .eq/.gt to any depth and
+// resolves on await; eq() calls are recorded so tests can assert user scoping.
 function makeMockSupabase(opts: {
   user?: { id: string } | null
   puzzleAttempts?: Array<{ puzzle_date: string }>
   huntAttempts?: Array<{ puzzle_date: string; efficiency_score?: number }>
   wheelAttempts?: Array<{ puzzle_date: string }>
+  towerAttempts?: Array<{ puzzle_date: string }>
+  connectionsAttempts?: Array<{ puzzle_date: string }>
   frozenDates?: Array<{ frozen_date: string }>
   existingChests?: Array<{ cycle_start?: string; tier: string; contents: any; opened_at: string | null }>
 } = {}) {
   const user = opts.user !== undefined ? opts.user : { id: 'user-1' }
-
-  return {
-    auth: {
-      getUser: vi.fn().mockResolvedValue(
-        user
-          ? { data: { user }, error: null }
-          : { data: { user: null }, error: new Error('Unauthorized') }
-      ),
-    },
+  vi.mocked(getAuthedUser).mockResolvedValue(user as any)
+  const rows: Record<string, unknown[]> = {
+    daily_puzzle_attempts: opts.puzzleAttempts ?? [],
+    daily_word_hunt_attempts: opts.huntAttempts ?? [],
+    daily_word_wheel_attempts: opts.wheelAttempts ?? [],
+    daily_word_tower_attempts: opts.towerAttempts ?? [],
+    connections_daily_scores: opts.connectionsAttempts ?? [],
+    daily_streak_freezes: opts.frozenDates ?? [],
+    daily_weekly_chests: opts.existingChests ?? [],
+  }
+  const admin = {
     from: vi.fn((table: string) => {
-      if (table === 'daily_puzzle_attempts') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              gt: vi.fn().mockResolvedValue({
-                data: opts.puzzleAttempts ?? [],
-                error: null,
-              }),
-            }),
-          }),
-        }
+      const chain: any = {
+        select: vi.fn(() => chain),
+        eq: vi.fn((c: string, v: unknown) => { eqCalls.push([table, c, v]); return chain }),
+        gt: vi.fn(() => chain),
+        then: (ok: any) => Promise.resolve({ data: rows[table] ?? [], error: null }).then(ok),
       }
-      if (table === 'daily_word_hunt_attempts') {
-        // Route chains .eq('player_id').eq('solved').eq('is_catchup') — make the
-        // builder a self-returning thenable so any chain depth resolves.
-        const huntResolved = { data: opts.huntAttempts ?? [], error: null }
-        const huntChain: any = {
-          eq: vi.fn(() => huntChain),
-          then: (onFulfilled: any) => Promise.resolve(huntResolved).then(onFulfilled),
-        }
-        return { select: vi.fn().mockReturnValue(huntChain) }
-      }
-      if (table === 'daily_word_wheel_attempts') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              gt: vi.fn().mockResolvedValue({
-                data: opts.wheelAttempts ?? [],
-                error: null,
-              }),
-            }),
-          }),
-        }
-      }
-      if (table === 'daily_streak_freezes') {
-        // Route does .select('frozen_date').eq('player_id', …) then awaits.
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue({ data: opts.frozenDates ?? [], error: null }),
-          }),
-        }
-      }
-      if (table === 'daily_weekly_chests') {
-        // Route now does a single `.eq('player_id', …)` and awaits — so the
-        // outer `.eq` itself must resolve. Keep `.eq().eq()` working as a
-        // fallback for any caller still chaining.
-        const resolved = { data: opts.existingChests ?? [], error: null }
-        const thenable = {
-          ...resolved,
-          eq: vi.fn().mockResolvedValue(resolved),
-          then: (onFulfilled: any) => Promise.resolve(resolved).then(onFulfilled),
-        }
-        return {
-          select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue(thenable) }),
-        }
-      }
-      return {
-        select: vi.fn().mockReturnValue({
-          eq: vi
-            .fn()
-            .mockReturnValue({
-              eq: vi.fn().mockResolvedValue({
-                data: [],
-                error: null,
-              }),
-            }),
-        }),
-      }
+      return chain
     }),
   }
+  vi.mocked(getSupabaseAdmin).mockReturnValue(admin as any)
+  return admin
 }
+
+const req = () => new NextRequest('http://localhost/api/daily/weekly-chest/status')
 
 describe('GET /api/daily/weekly-chest/status', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    eqCalls.length = 0
   })
 
   it('returns 401 when unauthenticated', async () => {
-    vi.mocked(createClient).mockResolvedValue(makeMockSupabase({ user: null }) as any)
-    const res = await GET()
+    makeMockSupabase({ user: null })
+    const res = await GET(req())
     expect(res.status).toBe(401)
     const body = await res.json()
     expect(body.error).toBe('Unauthorized')
@@ -125,8 +80,7 @@ describe('GET /api/daily/weekly-chest/status', () => {
   it('a freeze bridges a single missed day so the cycle completes — and the frozen day does NOT pollute scoring', async () => {
     // Cycle ending today (2026-05-12): days 05-06..05-12. Played 6 of them
     // (missed 05-11) all at efficiency 900 → 90; a freeze row covers 05-11.
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         huntAttempts: [
           { puzzle_date: '2026-05-06', efficiency_score: 900 },
           { puzzle_date: '2026-05-07', efficiency_score: 900 },
@@ -136,9 +90,8 @@ describe('GET /api/daily/weekly-chest/status', () => {
           { puzzle_date: '2026-05-12', efficiency_score: 900 },
         ],
         frozenDates: [{ frozen_date: '2026-05-11' }],
-      }) as any,
-    )
-    const res = await GET()
+      })
+    const res = await GET(req())
     const body = await res.json()
     expect(body.daysCompleted).toBe(7)
     expect(body.isClaimable).toBe(true)
@@ -149,8 +102,8 @@ describe('GET /api/daily/weekly-chest/status', () => {
   })
 
   it('returns daysCompleted 0 when no attempts', async () => {
-    vi.mocked(createClient).mockResolvedValue(makeMockSupabase() as any)
-    const res = await GET()
+    makeMockSupabase()
+    const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.daysCompleted).toBe(0)
@@ -166,10 +119,8 @@ describe('GET /api/daily/weekly-chest/status', () => {
       d.setUTCDate(d.getUTCDate() + i)
       return d.toISOString().slice(0, 10)
     })
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({ huntAttempts: tenDays.map(d => ({ puzzle_date: d })) }) as any,
-    )
-    const res = await GET()
+    makeMockSupabase({ huntAttempts: tenDays.map(d => ({ puzzle_date: d })) })
+    const res = await GET(req())
     const body = await res.json()
     expect(body.currentStreak).toBe(10)
   })
@@ -177,12 +128,10 @@ describe('GET /api/daily/weekly-chest/status', () => {
   it('keeps currentStreak alive on a grace day (played through yesterday, not today)', async () => {
     // Played 05-08..05-11; today (05-12) not yet played. Streak must stay 4
     // while the chest cycle (today-anchored) shows no progress yet.
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         huntAttempts: ['2026-05-08','2026-05-09','2026-05-10','2026-05-11'].map(d => ({ puzzle_date: d })),
-      }) as any,
-    )
-    const res = await GET()
+      })
+    const res = await GET(req())
     const body = await res.json()
     expect(body.currentStreak).toBe(4)
     expect(body.daysCompleted).toBe(0)
@@ -190,12 +139,10 @@ describe('GET /api/daily/weekly-chest/status', () => {
 
   it('returns daysCompleted 1 for single day attempt', async () => {
     const today = '2026-05-12'
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         puzzleAttempts: [{ puzzle_date: today }],
-      }) as any
-    )
-    const res = await GET()
+      })
+    const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.daysCompleted).toBe(1)
@@ -213,12 +160,10 @@ describe('GET /api/daily/weekly-chest/status', () => {
       '2026-05-11',
       '2026-05-12',
     ]
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         huntAttempts: dates.map((d) => ({ puzzle_date: d })),
-      }) as any
-    )
-    const res = await GET()
+      })
+    const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.daysCompleted).toBe(7)
@@ -226,14 +171,12 @@ describe('GET /api/daily/weekly-chest/status', () => {
   })
 
   it('combines attempts from all three daily modes', async () => {
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         puzzleAttempts: [{ puzzle_date: '2026-05-12' }],
         huntAttempts: [{ puzzle_date: '2026-05-11' }],
         wheelAttempts: [{ puzzle_date: '2026-05-10' }],
-      }) as any
-    )
-    const res = await GET()
+      })
+    const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.completedDates).toContain('2026-05-12')
@@ -250,8 +193,7 @@ describe('GET /api/daily/weekly-chest/status', () => {
       return d.toISOString().split('T')[0]
     })
 
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         huntAttempts: dates.map((d) => ({ puzzle_date: d })),
         existingChests: [
           {
@@ -261,10 +203,9 @@ describe('GET /api/daily/weekly-chest/status', () => {
             opened_at: null,
           },
         ],
-      }) as any
-    )
+      })
 
-    const res = await GET()
+    const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.isClaimable).toBe(true)
@@ -282,14 +223,12 @@ describe('GET /api/daily/weekly-chest/status', () => {
       '2026-05-01','2026-05-02','2026-05-03','2026-05-04',
       '2026-05-05','2026-05-06','2026-05-07',
     ]
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         huntAttempts: [...priorCycle, '2026-05-12'].map(d => ({ puzzle_date: d })),
         // No chest row at all — never claimed.
         existingChests: [],
-      }) as any
-    )
-    const res = await GET()
+      })
+    const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.isClaimable).toBe(true)
@@ -303,15 +242,13 @@ describe('GET /api/daily/weekly-chest/status', () => {
       '2026-05-01','2026-05-02','2026-05-03','2026-05-04',
       '2026-05-05','2026-05-06','2026-05-07',
     ]
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         huntAttempts: [...priorCycle, '2026-05-12'].map(d => ({ puzzle_date: d })),
         existingChests: [
           { cycle_start: '2026-05-01', tier: 'silver', contents: { coins: 250 }, opened_at: '2026-05-08T10:00:00Z' },
         ],
-      }) as any
-    )
-    const res = await GET()
+      })
+    const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.isClaimable).toBe(false)
@@ -328,8 +265,7 @@ describe('GET /api/daily/weekly-chest/status', () => {
       return d.toISOString().split('T')[0]
     })
 
-    vi.mocked(createClient).mockResolvedValue(
-      makeMockSupabase({
+    makeMockSupabase({
         huntAttempts: dates.map((d) => ({ puzzle_date: d })),
         existingChests: [
           {
@@ -339,13 +275,56 @@ describe('GET /api/daily/weekly-chest/status', () => {
             opened_at: '2026-05-12T10:00:00Z',
           },
         ],
-      }) as any
-    )
+      })
 
-    const res = await GET()
+    const res = await GET(req())
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.isClaimable).toBe(false)
     expect(body.pendingChest).toBe(null)
+  })
+
+  it('authenticates via getAuthedUser (bearer-capable) and reads with the admin client scoped to user.id', async () => {
+    makeMockSupabase({ user: { id: 'bearer-user' }, huntAttempts: [{ puzzle_date: '2026-05-12' }] })
+    const res = await GET(req())
+    expect(res.status).toBe(200)
+    expect(getAuthedUser).toHaveBeenCalled()
+    const tables = new Set(eqCalls.map(([t]) => t))
+    expect(tables.size).toBeGreaterThanOrEqual(7)
+    for (const [, col, val] of eqCalls.filter(([, c]) => c === 'player_id')) {
+      expect(col).toBe('player_id')
+      expect(val).toBe('bearer-user')
+    }
+  })
+
+  it('returns 500 (not a silent empty chest) when the admin client is unavailable', async () => {
+    makeMockSupabase()
+    vi.mocked(getSupabaseAdmin).mockReturnValue(null as any)
+    const res = await GET(req())
+    expect(res.status).toBe(500)
+  })
+
+  it('counts Word Tower and Connections days toward the chest cycle', async () => {
+    makeMockSupabase({
+      towerAttempts: [{ puzzle_date: '2026-05-11' }],
+      connectionsAttempts: [{ puzzle_date: '2026-05-12' }],
+    })
+    const res = await GET(req())
+    const body = await res.json()
+    expect(body.completedDates).toEqual(['2026-05-11', '2026-05-12'])
+    expect(body.daysCompleted).toBe(2)
+    expect(body.currentStreak).toBe(2)
+  })
+
+  it('tower/connections days do not dilute the tier score', async () => {
+    const dates = ['2026-05-06','2026-05-07','2026-05-08','2026-05-09','2026-05-10','2026-05-11','2026-05-12']
+    makeMockSupabase({
+      huntAttempts: dates.slice(0, 5).map(d => ({ puzzle_date: d, efficiency_score: 900 })),
+      towerAttempts: [{ puzzle_date: dates[5] }],
+      connectionsAttempts: [{ puzzle_date: dates[6] }],
+    })
+    const body = await (await GET(req())).json()
+    expect(body.isClaimable).toBe(true)
+    expect(body.weekScore).toBe(90)
   })
 })

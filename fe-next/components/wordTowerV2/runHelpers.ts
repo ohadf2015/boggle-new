@@ -70,7 +70,13 @@ export function dampSway(world: TowerWorld, swayMult: number): void {
 /** `?demo=1` review tower: drops `words` as settled floors, stepping physics between each. */
 const DEMO_WORDS = ['tower', 'slab', 'anchor', 'crane', 'brick', 'ledge', 'beam', 'stack'];
 
-export function seedDemoTower(world: TowerWorld, labels: Map<string, string>, words: string[] = DEMO_WORDS): number {
+export function seedDemoTower(
+  world: TowerWorld,
+  labels: Map<string, string>,
+  words: string[] = DEMO_WORDS,
+  /** Physics time each floor gets to settle. A long restored tower passes less. */
+  settleMs = 900,
+): number {
   words.forEach((word, index) => {
     const id = `r0-b${index}`;
     labels.set(id, word);
@@ -85,9 +91,27 @@ export function seedDemoTower(world: TowerWorld, labels: Map<string, string>, wo
       heightPx: BLOCK_HEIGHT_PX,
       vx: 0,
     });
-    for (let t = 0; t < 900; t += 16.667) stepWorld(world, 16.667);
+    for (let t = 0; t < settleMs; t += 16.667) stepWorld(world, 16.667);
   });
+  if (settleMs < 900) for (let t = 0; t < 900; t += 16.667) stepWorld(world, 16.667);
   return words.length;
+}
+
+/**
+ * Every landed floor's word, lowest first, and the height those floors reach —
+ * what the persistent daily tower saves. Unlike `towerBlocksFrom` (a rival's
+ * 60-floor copy, lowest first) nothing is cut off the TOP.
+ */
+export function standingTower(
+  world: TowerWorld,
+  labels: Map<string, string>,
+  skipId: string | null,
+): { words: string[]; standingM: number } {
+  const blocks = standing(world, skipId).sort((a, b) => b.y - a.y);
+  return {
+    words: blocks.map((b) => labels.get(b.id) ?? '').filter((w) => w.length > 0),
+    standingM: getTowerHeightM(world),
+  };
 }
 
 export interface Hanging {

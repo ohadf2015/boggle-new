@@ -23,6 +23,9 @@ export const runtime = 'nodejs';
  */
 const RIVALS = 3;
 const REVENGE = 5;
+/** A ruin stays on a tower for this long — long enough that everyone who battled it sees it. */
+const RUIN_WINDOW_MS = 72 * 3_600_000;
+const RUIN_NAMES = 2;
 type Row = Record<string, unknown>;
 
 async function rows(q: PromiseLike<{ data: unknown; error: unknown }>): Promise<Row[]> {
@@ -87,7 +90,38 @@ export async function GET(request: NextRequest) {
     const missing = [...attackers].filter((id) => !nearIds.has(id));
     const extra = missing.length ? await rows(db.from(ESTATES).select(ESTATE_COLS).in('player_id', missing)) : [];
     const estates = new Map([...near, ...extra].map((r) => [String(r.player_id), r]));
-    const profiles = await profilesByIds(db, [...new Set([...nearIds, ...attackers])]);
+
+    // Ruins: raids that actually damaged a rival's building lately. Fail-soft — the
+    // board is still useful without them — but never silent (Class 4).
+    let ruinRows: Row[] = [];
+    if (nearIds.size) {
+      try {
+        ruinRows = await rows(
+          db.from(RAIDS)
+            .select('attacker_id, defender_id, created_at')
+            .in('defender_id', [...nearIds])
+            .eq('blocked', false)
+            .gte('created_at', new Date(Date.now() - RUIN_WINDOW_MS).toISOString())
+            .order('created_at', { ascending: false })
+            .limit(60),
+        );
+      } catch (e) {
+        captureApiError(e as Error, 'word-tower-estate-rivals-ruins');
+      }
+    }
+    const ruinAttackers = new Set(ruinRows.map((r) => String(r.attacker_id)));
+    const profiles = await profilesByIds(db, [...new Set([...nearIds, ...attackers, ...ruinAttackers])]);
+
+    const ruinsOf = (id: string) => {
+      const mine = ruinRows.filter((r) => String(r.defender_id) === id);
+      const byNames: string[] = [];
+      for (const r of mine) {
+        const a = String(r.attacker_id);
+        const name = a === user.id ? null : profiles.get(a)?.displayName;
+        if (name && !byNames.includes(name) && byNames.length < RUIN_NAMES) byNames.push(name);
+      }
+      return { count: mine.length, by: byNames, byYou: mine.some((r) => String(r.attacker_id) === user.id) };
+    };
 
     const view = (id: string) => {
       const r = estates.get(id);
@@ -99,6 +133,7 @@ export async function GET(request: NextRequest) {
         shields: e?.shields ?? 0,
         bestM: e?.bestM ?? 0,
         lastTower: e?.lastTower ?? [],
+        ruins: ruinsOf(id),
       };
     };
 

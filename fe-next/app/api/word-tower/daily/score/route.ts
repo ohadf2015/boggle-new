@@ -36,6 +36,8 @@ import { getSupabaseAdmin } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import { mergeDailyBest } from '@/lib/wordTower/dailyBest';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
+import { creditDailyQuests } from '@/lib/daily/questSeams';
+import { questResultForWordTower } from '@/shared/dailyQuestPool';
 
 export const runtime = 'nodejs';
 
@@ -110,6 +112,11 @@ export async function POST(request: NextRequest) {
         captureApiError(error as unknown as Error, 'word-tower-daily-score-update');
         return NextResponse.json({ error: 'failed to save' }, { status: 500 });
       }
+      // Daily quests (authed only): today's best climb + floors. Fire-and-forget.
+      creditDailyQuests(user?.id, questResultForWordTower({
+        heightM: merged,
+        floors: Math.max(Number(existing.floors) || 0, Math.floor(Number(body.floors) || 0)),
+      }));
       return NextResponse.json({ ok: true, bestHeightM: merged, improved: true });
     }
 
@@ -129,6 +136,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'failed to save' }, { status: 500 });
     }
 
+    creditDailyQuests(user?.id, questResultForWordTower({
+      heightM,
+      floors: Math.floor(Number(body.floors) || 0),
+    }));
     return NextResponse.json({ ok: true, bestHeightM: heightM, improved: true });
   } catch (err) {
     captureApiError(err as Error, 'word-tower-daily-score');

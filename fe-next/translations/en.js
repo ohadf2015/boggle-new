@@ -1351,6 +1351,7 @@ const en = {
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss","issueProbe":{"prompt":"What made it feel that way?","botsStrong":"Bots too strong","technical":"Technical issue"}},
   "wordTowerV2": {
+    "dailyTower": {"exitLabel": "Daily", "exitA11y": "Back to the daily challenge — your tower is saved", "finishLabel": "Finish", "exitFree": "Exit", "targetA11y": "Today's goal: {m} of {target} metres", "goalToast": "Goal reached! +{m} m today", "grewToday": "Grew today", "goal": "Today's goal", "goalHit": "Goal reached!", "rankLabel": "Rank today", "keepBuilding": "Keep building", "openRivals": "Rival towers", "ruinedBy": "Ruined by {names}", "ruinedByYou": "You ruined it", "ruinedByYouAnd": "You + {names} ruined it", "ruinedAnon": "Ruined ×{n}", "buyBall": "Buy wrecking ball · {n} coins", "ballPoor": "Need {n} more coins", "ballError": "Couldn't buy — try again", "boardTitle": "Today's top climbers", "boardEmpty": "Nobody has grown their tower yet — be first!"},
     "gear": {"foundation":"Foundation","craneYard":"Crane","vault":"Gold Trim","insurance":"Steel Braces","landmark":"Rooftop","see":{"foundation":"On your tower: a stone plinth under the ground floor. Wider base, less sway.","craneYard":"On your tower: a freshly painted crane with a slower, easier swing.","vault":"On your tower: gold trim on your floors. More coins every run.","insurance":"On your tower: steel braces up the sides. Free emergency braces and more shields.","landmark":"On your tower: a rooftop that grows from an antenna into a golden crown. Higher score."}},
     "rescue": {"crumbled":"Lost {n} floors! Keep building","counterweight":"COUNTERWEIGHT! Tower steadied","braced":"BRACED! The steel holds","craneSaved":"CRANE UPGRADE! Wider window, perfect drop"},
     "brace": {"button":"Brace","freeTag":"FREE","explain":"Weld every floor except the top one and the tower stops rocking. Pay with this run's coins, or earn it with a rescue word.","useFree":"Use a free brace","buy":"Brace it · {n} coins","poor":"Not enough coins this run","rescue":"Rescue word: {n}+ letters","rescueLeft":"{n} rescues left this run","rescueNow":"Spell a {n}+ letter word to brace the tower!","cancel":"Cancel rescue","short":"Too short for a rescue"},
@@ -8005,6 +8006,7 @@ const en = {
       "daysRemaining": "{n} more days for your {tier} Chest!",
       "claimReady": "Your {tier} Chest is ready!",
       "claimButton": "Claim Chest",
+      "claimError": "Couldn't open your chest. Please try again.",
       "tierBronze": "Bronze",
       "tierSilver": "Silver",
       "tierGold": "Gold",
@@ -8197,7 +8199,7 @@ const en = {
       "completeDailyDesc": "Play Word Wheel to complete your Daily Challenge",
       "nextUpBadge": "NEXT UP",
       "playConnectionsTitle": "Next up: Word Bridge",
-      "playConnectionsDesc": "Solve today's Connections puzzle to finish your daily set",
+      "playConnectionsDesc": "Solve today's Word Bridge puzzle to finish your daily set",
       "dailyComplete": "Daily Challenge complete!",
       "dailyCompleteDesc": "Both games done. Come back tomorrow!",
       "backToDaily": "Back to Daily Hub",
@@ -14693,7 +14695,12 @@ const en = {
       "play_mp": { "title": "Enter the Arena", "desc": "Play a multiplayer match" },
       "play_brain": { "title": "Brain Boost", "desc": "Finish a Brain Drill session" },
       "play_wordhunt": { "title": "On the Hunt", "desc": "Play today's Word Hunt" },
-      "play_wordwheel": { "title": "Give It a Spin", "desc": "Play today's Word Wheel" }
+      "play_wordwheel": { "title": "Give It a Spin", "desc": "Play today's Word Wheel" },
+      "tower_climb_25": { "title": "Sky Builder", "desc": "Climb 25 m in today's Word Tower" },
+      "tower_floors_8": { "title": "Floor Planner", "desc": "Build 8 floors in today's Word Tower" },
+      "connections_solve_3": { "title": "Bridge Builder", "desc": "Solve 3 puzzles in today's Word Bridge" },
+      "play_tower_daily": { "title": "Tower Time", "desc": "Play today's Word Tower" },
+      "play_connections_daily": { "title": "Span the Gap", "desc": "Play today's Word Bridge" }
     },
     "reward": {
       "xp": "+{{xp}} XP",
