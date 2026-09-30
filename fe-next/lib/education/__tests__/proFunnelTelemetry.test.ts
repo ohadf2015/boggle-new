@@ -21,6 +21,8 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({
 import {
   trackEduProUpgradeClicked,
   trackEduProCheckoutSuccessSeen,
+  trackTrialCtaView,
+  trackTrialCtaTap,
   PRO_SUCCESS_SEEN_STORAGE_KEY,
 } from '../proFunnelTelemetry';
 
@@ -102,5 +104,36 @@ describe('trackEduProMissedHomeworkAssigned', () => {
       word_count: 3,
       lesson_count: 1,
     });
+  });
+});
+
+describe('trial CTA funnel events', () => {
+  beforeEach(() => captureMock.mockReset());
+
+  it('Given the HQ trial banner mounts, When viewed, Then it fires trial_cta_view', () => {
+    trackTrialCtaView({ source: 'dashboard_trial_offer' });
+    expect(captureMock).toHaveBeenCalledWith('trial_cta_view', {
+      source: 'dashboard_trial_offer',
+      product: 'teacher_pro',
+    });
+  });
+
+  it('Given a trial CTA tap, When tracked, Then it fires trial_cta_tap with the surface', () => {
+    trackTrialCtaTap({ source: 'upgrade_page' });
+    expect(captureMock).toHaveBeenCalledWith('trial_cta_tap', {
+      source: 'upgrade_page',
+      product: 'teacher_pro',
+    });
+  });
+
+  it('Given PostHog throws, When a trial CTA is tracked, Then it never throws', () => {
+    captureMock.mockImplementationOnce(() => {
+      throw new Error('posthog down');
+    });
+    expect(() => trackTrialCtaView({ source: 'dashboard_trial_offer' })).not.toThrow();
+    captureMock.mockImplementationOnce(() => {
+      throw new Error('posthog down');
+    });
+    expect(() => trackTrialCtaTap({ source: 'dashboard_trial_offer' })).not.toThrow();
   });
 });

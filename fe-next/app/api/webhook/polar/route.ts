@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -175,14 +175,16 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
 }
 
 /**
- * `edu_pro_trial_succeeded` — Polar actually opened the 14-day trial.
- * Distinct from paid `edu_pro_checkout_succeeded`. Never throws.
+ * `edu_pro_trial_succeeded` + `trial_activated` — Polar opened the 14-day trial
+ * and upserted the teacher row. Distinct from paid conversion. Never throws.
  */
 function trackProTrial(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     if (mapStatus(payload?.data?.status) !== 'trialing') return
-    captureProFunnelServerEvent(buildProTrialSucceededEvent(userId, String(payload?.data?.id ?? '')))
+    const subId = String(payload?.data?.id ?? '')
+    captureProFunnelServerEvent(buildProTrialSucceededEvent(userId, subId))
+    captureProFunnelServerEvent(buildTrialActivatedEvent(userId, subId))
   } catch (err) {
     console.error('[Polar] trial telemetry threw:', err)
   }

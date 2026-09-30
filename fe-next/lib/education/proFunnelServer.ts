@@ -33,10 +33,24 @@ export function buildProTrialStartedEvent(userId: string): EduServerEvent {
   return { distinctId: userId, event: 'edu_pro_trial_started', properties: { ...BASE } };
 }
 
+/** Measurable trial funnel step 3 — same moment as `edu_pro_trial_started`. */
+export function buildTrialCheckoutStartedEvent(userId: string): EduServerEvent {
+  return { distinctId: userId, event: 'checkout_started', properties: { ...BASE } };
+}
+
 export function buildProTrialSucceededEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {
     distinctId: userId,
     event: 'edu_pro_trial_succeeded',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
+}
+
+/** Measurable trial funnel step 4 — Polar actually opened the 14-day trial. */
+export function buildTrialActivatedEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'trial_activated',
     properties: { ...BASE, subscription_id: subscriptionId },
   };
 }

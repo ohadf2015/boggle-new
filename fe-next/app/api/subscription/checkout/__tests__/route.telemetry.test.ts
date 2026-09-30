@@ -82,7 +82,7 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
   })
 
-  it('Given { trial: true }, When Polar creates checkout, Then it fires edu_pro_trial_started not checkout_started', async () => {
+  it('Given { trial: true }, When Polar creates checkout, Then it fires edu_pro_trial_started and checkout_started, not the paid event', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
     const res = await POST(new Request('http://localhost/api/subscription/checkout', {
@@ -91,8 +91,9 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
       body: JSON.stringify({ trial: true }),
     }) as never)
     expect(res.status).toBe(200)
-    expect(capture).toHaveBeenCalledTimes(1)
-    expect(capture.mock.calls[0][0].event).toBe('edu_pro_trial_started')
+    const events = capture.mock.calls.map((c) => c[0].event)
+    expect(events).toEqual(['edu_pro_trial_started', 'checkout_started'])
     expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 })

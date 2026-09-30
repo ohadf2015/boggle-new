@@ -16,6 +16,8 @@ import {
   buildProCheckoutSucceededEvent,
   buildProTrialStartedEvent,
   buildProTrialSucceededEvent,
+  buildTrialCheckoutStartedEvent,
+  buildTrialActivatedEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
 
@@ -38,10 +40,26 @@ describe('Pro funnel server events', () => {
     });
   });
 
+  it('Given a Polar trial checkout, When the measurable funnel step is built, Then it is checkout_started', () => {
+    expect(buildTrialCheckoutStartedEvent('u-1')).toEqual({
+      distinctId: 'u-1',
+      event: 'checkout_started',
+      properties: { product: 'teacher_pro', provider: 'polar' },
+    });
+  });
+
   it('Given a trialing subscription, When built, Then it is edu_pro_trial_succeeded with the id', () => {
     expect(buildProTrialSucceededEvent('u-1', 'sub-9')).toEqual({
       distinctId: 'u-1',
       event: 'edu_pro_trial_succeeded',
+      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
+    });
+  });
+
+  it('Given a trialing subscription, When the measurable funnel step is built, Then it is trial_activated', () => {
+    expect(buildTrialActivatedEvent('u-1', 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'trial_activated',
       properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
     });
   });

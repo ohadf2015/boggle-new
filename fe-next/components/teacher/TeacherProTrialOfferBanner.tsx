@@ -1,44 +1,59 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import {
+  goToPolarCheckout,
+  postTeacherProCheckout,
+} from '@/lib/education/postTeacherProCheckout';
+import {
+  trackTrialCtaTap,
+  trackTrialCtaView,
+} from '@/lib/education/proFunnelTelemetry';
 
 /**
  * Visibility for the Polar 14-day Teacher Pro trial on HQ.
  *
  * PR #1143 already POSTs `{ trial: true }` from /teacher/upgrade. Teachers
  * never opened that page (0 trials / 65 approved). One primary action hits
- * the same endpoint. Dismiss is a week-long "not now", not a permanent hide.
+ * the same till via postTeacherProCheckout({ trial: true }). Dismiss is a
+ * week-long "not now", not a permanent hide.
  */
 export function TeacherProTrialOfferBanner({ onDismiss }: { onDismiss?: () => void }) {
   const { t } = useLanguage();
   const [pending, setPending] = useState(false);
 
+  useEffect(() => {
+    try {
+      trackTrialCtaView({ source: 'dashboard_trial_offer' });
+    } catch {
+      /* analytics must never block the till */
+    }
+  }, []);
+
   const startTrial = useCallback(async () => {
     if (pending) return;
+    try {
+      trackTrialCtaTap({ source: 'dashboard_trial_offer' });
+    } catch {
+      /* analytics must never block the till */
+    }
     setPending(true);
     try {
-      const response = await fetch('/api/subscription/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trial: true }),
-      });
-      if (!response.ok) {
-        if (response.status === 503) {
+      const result = await postTeacherProCheckout(fetch, { trial: true });
+      if (!result.ok) {
+        if (result.status === 401) {
+          toast.error(t('teacher.subscription.signInRequired'));
+        } else if (result.status === 503) {
           toast.error(t('teacher.subscription.checkoutUnavailable'));
-          return;
+        } else {
+          toast.error(t('teacher.subscription.checkoutError'));
         }
-        toast.error(t('teacher.subscription.checkoutError'));
         return;
       }
-      const { url } = await response.json();
-      if (typeof url === 'string' && url) {
-        window.location.href = url;
-        return;
-      }
-      toast.error(t('teacher.subscription.checkoutError'));
+      goToPolarCheckout(result.url);
     } catch {
       toast.error(t('teacher.subscription.checkoutError'));
     } finally {
