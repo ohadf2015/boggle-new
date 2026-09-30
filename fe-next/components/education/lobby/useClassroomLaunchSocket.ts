@@ -180,7 +180,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
       if (pressureAckTimerRef.current) clearTimeout(pressureAckTimerRef.current);
       socketInstance?.disconnect();
     };
-  }, [t, language, router]);
+  }, [t, language, router, gameCode]);
 
   const launch = useCallback(
     (payload: ClassroomLaunchPayload) => {
