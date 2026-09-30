@@ -350,9 +350,10 @@ const en = {
       "faqMore": "{count} more questions",
       "faqAll": "All questions",
       "crossLink": "Play Boggle online free",
-      "readMore": "New here? Learn {howToPlay}, pick up tricks in our {guides}, or browse {blog}.",
+      "readMore": "New here? Learn {howToPlay}, play {withFriends}, pick up tricks in our {guides}, or browse {blog}.",
       "readMoreLinks": {
         "howToPlay": "how to play",
+        "withFriends": "word games with friends",
         "guides": "strategy guides",
         "blog": "the blog"
       },

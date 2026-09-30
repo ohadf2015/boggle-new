@@ -350,9 +350,10 @@ const he = {
       "faqMore": "עוד {count} שאלות",
       "faqAll": "כל השאלות",
       "crossLink": "לשחק אונליין בחינם",
-      "readMore": "חדשים כאן? תתחילו ב{howToPlay}, תלמדו טריקים מ{guides} או תקראו את {blog}.",
+      "readMore": "חדשים כאן? תתחילו ב{howToPlay}, תשחקו {withFriends}, תלמדו טריקים מ{guides} או תקראו את {blog}.",
       "readMoreLinks": {
         "howToPlay": "חוקי המשחק",
+        "withFriends": "משחקי מילים עם חברים",
         "guides": "מדריכי האסטרטגיה",
         "blog": "הבלוג"
       },

@@ -16,9 +16,9 @@ import { FINE_BODY, FINE_LINK } from './FreshFinePrint';
  * - FreshFaqAll: "See the full FAQ", visible at rest (same pattern as the
  *   blog's "All articles").
  * - FreshReadMore: ONE sentence with the editorial links inline (how to play,
- *   strategy guides, blog). The AdSense remediation needs them on the page
- *   (HomepageContentSection.test); as prose they no longer read as a third
- *   list of links stacked onto the site footer.
+ *   word games with friends, strategy guides, blog). The AdSense remediation
+ *   needs them on the page (HomepageContentSection.test); as prose they no
+ *   longer read as a third list of links stacked onto the site footer.
  *
  * useLanguageSafe: HomepageContentSection is a server component that is also
  * rendered standalone in tests, outside any LanguageProvider.
@@ -38,16 +38,17 @@ export function FreshFaqAll({ locale }: { locale: string }) {
   );
 }
 
-const READ_MORE = ['howToPlay', 'guides', 'blog'] as const;
+const READ_MORE = ['howToPlay', 'withFriends', 'guides', 'blog'] as const;
 type ReadMoreKey = (typeof READ_MORE)[number];
 
 const READ_MORE_PATH: Record<ReadMoreKey, string> = {
   howToPlay: 'how-to-play',
+  withFriends: 'online-word-games-with-friends',
   guides: 'guides',
   blog: 'blog',
 };
 
-const TOKEN = /\{(howToPlay|guides|blog)\}/;
+const TOKEN = /\{(howToPlay|withFriends|guides|blog)\}/;
 
 export function FreshReadMore({ locale, className }: { locale: string; className?: string }) {
   const { t } = useLanguageSafe();
@@ -57,10 +58,10 @@ export function FreshReadMore({ locale, className }: { locale: string; className
     </Link>
   );
 
-  // The sentence carries {howToPlay} {guides} {blog} placeholders so each
-  // locale orders them naturally. split() with a capture group alternates
-  // text and token names. Any token a template lacks is appended, so the
-  // links can never silently drop out of the page.
+  // The sentence carries {howToPlay} {withFriends} {guides} {blog}
+  // placeholders so each locale orders them naturally. split() with a
+  // capture group alternates text and token names. Any token a template
+  // lacks is appended, so the links can never silently drop out of the page.
   const parts = t('homeFresh.close.readMore').split(TOKEN);
   const used = new Set<string>();
   const nodes: ReactNode[] = parts.map((part, i) => {

@@ -350,9 +350,10 @@ const ja = {
       "faqMore": "ほかの質問（{count}件）",
       "faqAll": "すべての質問",
       "crossLink": "無料でオンラインプレイ",
-      "readMore": "はじめてなら{howToPlay}をチェック。{guides}でコツをつかんだり、{blog}を読んだりもできます。",
+      "readMore": "はじめてなら{howToPlay}をチェック。{withFriends}で遊んだり、{guides}でコツをつかんだり、{blog}を読んだりもできます。",
       "readMoreLinks": {
         "howToPlay": "遊び方",
+        "withFriends": "友だちと単語ゲーム",
         "guides": "攻略ガイド",
         "blog": "ブログ"
       },
