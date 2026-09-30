@@ -138,6 +138,7 @@ function captureJoinHandler(verifiedUserId?: string) {
     leave: vi.fn(),
     data: verifiedUserId ? { verifiedUserId } : {},
     on: vi.fn((event: string, cb: (...args: unknown[]) => unknown) => { listeners[event] = cb; }),
+    once: vi.fn((event: string, cb: (...args: unknown[]) => unknown) => { listeners[`once:${event}`] = cb; }),
   } as unknown as Socket;
   const io = { emit: vi.fn(), to: vi.fn().mockReturnThis() } as unknown as Server;
   registerPlayerJoinHandlers(io, socket);

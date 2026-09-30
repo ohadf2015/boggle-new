@@ -105,9 +105,10 @@ export function useMultiplayerFlowState({
 
   // Get user profile data for auto-join
   const getProfileData = useCallback(() => {
-    if (displayName) return { username: displayName };
+    if (isAuthenticated && displayName) return { username: displayName };
+    if (isClassroomMode && displayName) return { username: displayName };
     return { username: getStoredUsername() || '' };
-  }, [displayName]);
+  }, [isAuthenticated, displayName, isClassroomMode]);
 
   // Handle auto-join for invitation links
   const handleInvitationAutoJoin = useCallback(
@@ -155,7 +156,7 @@ export function useMultiplayerFlowState({
         dispatchFlow({ type: 'OPEN_JOIN', room: codeTicket(roomCode, defaultLanguage) });
       }
     },
-    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host, isAuthenticated, isClassroomMode]
+    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host, isAuthenticated, isClassroomMode, displayName]
   );
 
   // The student typed a name. Persist it (so a refresh mid-lesson does not ask
