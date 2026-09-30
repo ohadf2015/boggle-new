@@ -11,6 +11,7 @@ import {
   buildEducationBreadcrumbJsonLd,
   buildEducationCourseJsonLd,
   buildEducationWebApplicationJsonLd,
+  buildEducationPageJsonLd,
 } from '@/lib/seo/educationJsonLd';
 import { PageClient as EducationPageClient } from './PageClient';
 import { educationSeoContent } from './seoContent';
@@ -43,6 +44,7 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
   const breadcrumbSchema = buildEducationBreadcrumbJsonLd(locale);
   const courseSchema = buildEducationCourseJsonLd(locale);
   const webAppSchema = buildEducationWebApplicationJsonLd(locale);
+  const pageSchema = buildEducationPageJsonLd(locale);
   // Safe: schemas built from static seoContent + locale enum, not user input.
   // JSON.stringify escapes content for <script> context; same pattern as
   // app/[locale]/guides/page.tsx:73 and components/seo/FaqPageJsonLd.tsx.
@@ -55,22 +57,26 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
       {faqSchema && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       )}
-      <EducationPageClient />
-      {content.geoAnswer && (
-        <section
-          data-answer
-          className="mx-auto mt-8 w-full max-w-4xl px-4 font-neo-body text-neo-white"
-        >
-          <div className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-8">
-            <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
-              {content.geoAnswer.question}
-            </h2>
-            <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">
-              {content.geoAnswer.answer}
-            </p>
-          </div>
-        </section>
-      )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
+      <EducationPageClient
+        answer={
+          content.geoAnswer ? (
+            <section
+              data-answer
+              className="mx-auto mt-2 w-full max-w-4xl px-4 font-neo-body text-neo-white"
+            >
+              <div className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-8">
+                <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
+                  {content.geoAnswer.question}
+                </h2>
+                <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">
+                  {content.geoAnswer.answer}
+                </p>
+              </div>
+            </section>
+          ) : null
+        }
+      />
       <EducationResourceLinks locale={locale} />
       <GamePageSeoContent
         title={content.title}
@@ -246,9 +252,9 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/duels`}
           className="group rounded-neo border-3 border-neo-black bg-neo-pink p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <h3 className="font-neo-display text-lg font-black uppercase text-neo-white">{t.cards.duels.title}</h3>
-          <p className="mt-2 text-sm text-neo-white">{t.cards.duels.desc}</p>
-          <DirectionalIcon icon={ArrowRight} className="mt-3 inline-block size-4 text-neo-lime" />
+          <h3 className="font-neo-display text-lg font-black uppercase text-neo-black">{t.cards.duels.title}</h3>
+          <p className="mt-2 text-sm text-neo-black">{t.cards.duels.desc}</p>
+          <DirectionalIcon icon={ArrowRight} className="mt-3 inline-block size-4 text-neo-black" />
         </Link>
         <Link
           href={`/${locale}/education/classroom-game`}
@@ -287,7 +293,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/games-for-teachers`}
           className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white">{rc.teachers.badge}</span>
+          <span className="inline-block border-2 border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-black">{rc.teachers.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.teachers.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.teachers.desc}</p>
         </Link>
@@ -295,7 +301,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/spelling-bee-practice`}
           className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white">{rc.spelling.badge}</span>
+          <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-black">{rc.spelling.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.spelling.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.spelling.desc}</p>
         </Link>
@@ -359,10 +365,10 @@ const MOMENTS_HEADING: Record<string, { heading: string; subhead: string }> = {
 const MOMENT_ACCENT: Record<string, string> = {
   'brain-breaks-word-games': 'text-neo-lime',
   'indoor-recess-games': 'text-neo-cyan',
-  'end-of-year-classroom-activities': 'text-neo-pink',
-  'first-day-of-school-icebreakers': 'text-neo-purple',
+  'end-of-year-classroom-activities': 'text-neo-pink-light',
+  'first-day-of-school-icebreakers': 'text-neo-purple-light',
   'early-finishers-activities': 'text-neo-lime',
-  'middle-school-word-games': 'text-neo-pink',
+  'middle-school-word-games': 'text-neo-pink-light',
 };
 
 function TeacherMomentLinks({ locale, lang }: { locale: string; lang: string }) {
@@ -424,8 +430,8 @@ const LEARNER_SLUGS = [
 
 const LEARNER_ACCENT: Record<(typeof LEARNER_SLUGS)[number], string> = {
   'english-games-elementary': 'text-neo-lime',
-  'english-games-middle-school': 'text-neo-pink',
-  'english-games-adults': 'text-neo-purple',
+  'english-games-middle-school': 'text-neo-pink-light',
+  'english-games-adults': 'text-neo-purple-light',
   'irregular-verbs-games': 'text-neo-cyan',
   'english-vocabulary-topics': 'text-neo-lime',
 };

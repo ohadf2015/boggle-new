@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "fe-next/components/education/EducationHeader.tsx"
+        ],
+        "createdAt": "2026-09-30T18:56:42.951Z",
+        "reason": "4px border is the inner edge of the mobile drawer, the same neo-brutalist black outline as the rest of the header. RTL flips the side. Not a colored accent stripe."
+      }
+    ]
+  }
+}

@@ -1,9 +1,8 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Script from 'next/script';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,7 +16,6 @@ import { TeacherSetupSection } from '@/components/education/TeacherSetupSection'
 import { EducationFAQ } from '@/components/education/EducationFAQ';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { speakableJsonLd } from '@/lib/seo/educationStructuredData';
 import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { TeacherProCheckoutCta } from '@/components/education/TeacherProCheckoutCta';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
@@ -33,7 +31,7 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
  * All scroll animations respect prefers-reduced-motion
  */
 
-export function PageClient() {
+export function PageClient({ answer }: { answer?: ReactNode }) {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { isAuthenticated, loading, profile } = useAuth();
@@ -64,14 +62,6 @@ export function PageClient() {
   if (hasTeacherAccess) {
     return null;
   }
-
-  // Organization + BreadcrumbList JSON-LD are emitted server-side in page.tsx
-  // (canonical .live entity). Only the speakable WebPage hint is client-unique.
-  const speakLd = speakableJsonLd([
-    'h1',
-    '.education-hero-sub',
-    '.education-faq-q',
-  ]);
 
   return (
     <main className="min-h-screen bg-neo-navy">
@@ -104,14 +94,15 @@ export function PageClient() {
       {!hasTeacherAccess && (
         <>
           <EducationHero />
-          
-          {/* Role cards: teacher host path is PRIMARY (lime), student join is secondary */}
+          {answer}
+
+          {/* Role cards: one shared edge. The lime button is the only fill. */}
           <section className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
             <div className="grid gap-6 md:grid-cols-2">
               {/* Teacher card — PRIMARY path: hosts live games */}
-              <div className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-6 shadow-hard flex flex-col gap-4">
+              <div className="flex flex-col gap-4 rounded-neo border-2 border-neo-cream bg-neo-navy-light p-6">
                 <div>
-                  <h3 className="text-2xl font-neo-display font-black text-neo-lime">
+                  <h3 className="text-2xl font-neo-display font-black text-neo-cream">
                     {t('education.landing.teacher')}
                   </h3>
                   <p className="mt-3 text-neo-white">
@@ -122,7 +113,7 @@ export function PageClient() {
                   href={`/${language}/education/access`}
                   data-testid="teacher-card-access-link"
                   onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_card_access' })}
-                  className="self-start rounded-neo border-neo border-neo-lime bg-neo-lime px-5 py-2.5 font-bold text-neo-navy shadow-hard-sm transition-all hover:shadow-hard"
+                  className="self-start rounded-neo border-neo border-neo-black bg-neo-lime px-5 py-2.5 font-bold text-neo-navy transition-transform duration-150 hover:translate-x-0.5 hover:translate-y-0.5 motion-reduce:transition-none"
                 >
                   {t('education.landing.teacherLeadCta.button')}
                 </Link>
@@ -130,7 +121,7 @@ export function PageClient() {
                   href={`/${language}/education/for-schools`}
                   data-testid="district-role-card-link"
                   onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'district_role_card' })}
-                  className="self-start inline-flex items-center gap-1 text-sm font-bold text-neo-purple underline underline-offset-2 hover:text-neo-purple/80 transition-colors"
+                  className="self-start inline-flex items-center gap-1 text-sm font-bold text-neo-purple-light underline underline-offset-2 hover:text-neo-cream transition-colors"
                 >
                   {t('education.landing.districtCta.title')}
                   <DirectionalIcon icon={ArrowRight} className="inline size-3.5" />
@@ -138,9 +129,9 @@ export function PageClient() {
               </div>
               
               {/* Student card — SECONDARY path: join with a class code */}
-              <div className="flex flex-col gap-4 rounded-neo border-neo border-neo-cyan bg-neo-navy-light p-6 shadow-hard">
+              <div className="flex flex-col gap-4 rounded-neo border-2 border-neo-cream bg-neo-navy-light p-6">
                 <div>
-                  <h3 className="text-2xl font-neo-display font-black text-neo-cyan">
+                  <h3 className="text-2xl font-neo-display font-black text-neo-cream">
                     {t('education.landing.student')}
                   </h3>
                   <p className="mt-3 text-neo-white">
@@ -151,7 +142,7 @@ export function PageClient() {
                   href={`/${language}/student/join`}
                   data-testid="student-card-join-link"
                   onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'student_card_join' })}
-                  className="self-start rounded-neo border-neo border-neo-cyan bg-neo-cyan/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-cyan/30 hover:shadow-hard"
+                  className="self-start text-base font-bold text-neo-cream underline decoration-2 underline-offset-4 hover:text-neo-white"
                 >
                   {t('education.landing.studentJoinCta')}
                 </Link>
@@ -250,13 +241,6 @@ export function PageClient() {
         </>
       )}
 
-      <Script
-        id="education-speakable-ld"
-        type="application/ld+json"
-        strategy="afterInteractive"
-      >
-        {JSON.stringify(speakLd)}
-      </Script>
     </main>
   );
 }

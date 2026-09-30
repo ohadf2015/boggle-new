@@ -5,6 +5,7 @@ import {
   buildEducationBreadcrumbJsonLd,
   buildEducationCourseJsonLd,
   buildEducationWebApplicationJsonLd,
+  buildEducationPageJsonLd,
 } from '../educationJsonLd';
 
 describe('educationJsonLd', () => {
@@ -131,6 +132,26 @@ describe('educationJsonLd', () => {
       const schema = buildEducationWebApplicationJsonLd('es');
       expect(schema.url).toBe('https://www.lexiclash.live/es/education');
       expect(schema['@id']).toBe('https://www.lexiclash.live/es/education#webapp');
+    });
+
+    it('does not deny the paid tier — Teacher Pro exists in every locale feature list', () => {
+      for (const loc of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
+        const joined = buildEducationWebApplicationJsonLd(loc).featureList.join('\n');
+        expect(joined, loc).not.toMatch(/betalspärrar|ペイウォールなし|muros de pago|no paywall/i);
+        expect(joined, loc).toMatch(/Teacher Pro/);
+      }
+    });
+  });
+
+  describe('buildEducationPageJsonLd', () => {
+    it('marks the cite-able answer speakable for crawlers that do not run JavaScript', () => {
+      const schema = buildEducationPageJsonLd('en');
+      expect(schema['@type']).toBe('WebPage');
+      expect(schema['@id']).toBe('https://www.lexiclash.live/en/education#page');
+      expect(schema.speakable).toMatchObject({
+        '@type': 'SpeakableSpecification',
+        cssSelector: expect.arrayContaining(['[data-answer]', 'h1']),
+      });
     });
   });
 

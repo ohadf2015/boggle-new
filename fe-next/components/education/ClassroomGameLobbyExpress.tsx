@@ -380,7 +380,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
       className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo-lg border-4 border-neo-cream bg-neo-navy p-5 shadow-hard-lg sm:p-8"
     >
       <div className="flex items-center justify-center gap-3">
-        <Rocket className="size-9 shrink-0 text-neo-lime motion-safe:animate-bounce" strokeWidth={3} aria-hidden="true" />
+        <Rocket className="size-9 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
         <h1 className="font-neo-display text-3xl font-black uppercase tracking-tight text-neo-lime sm:text-4xl">
           {t('teacher.playNow.goingLive')}
         </h1>

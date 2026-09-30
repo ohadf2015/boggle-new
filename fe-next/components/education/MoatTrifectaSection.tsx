@@ -1,32 +1,23 @@
 'use client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 
 /**
  * Design: 3 cards with mode-specific accent colors (neo-lime, neo-cyan, neo-pink)
  * The h2/subtitle sit on the page's dark navy background — they must use light
  * text. The cards themselves are cream, so internal text stays navy.
- * GSAP staggers the heading, subtitle, then cards on scroll-in.
  */
 
 const PILLARS = [
-  { key: 'native_multilingual', accent: 'bg-neo-pink', borderAccent: 'border-neo-pink' },
-  { key: 'local_inventory', accent: 'bg-neo-cyan', borderAccent: 'border-neo-cyan' },
-  { key: 'ad_free', accent: 'bg-neo-lime', borderAccent: 'border-neo-lime' },
+  { key: 'native_multilingual', accent: 'bg-neo-pink', ink: 'text-neo-black' },
+  { key: 'local_inventory', accent: 'bg-neo-cyan', ink: 'text-neo-navy' },
+  { key: 'ad_free', accent: 'bg-neo-lime', ink: 'text-neo-navy' },
 ];
 
 export function MoatTrifectaSection() {
   const { t } = useLanguage();
-  const ref = useGsapReveal<HTMLDivElement>({
-    selector: '[data-moat-item]',
-    y: 28,
-    stagger: 0.12,
-    duration: 0.7,
-  });
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
-      <div ref={ref}>
         <h2
           data-moat-item
           className="text-3xl font-neo-display font-black text-neo-white text-center"
@@ -45,9 +36,9 @@ export function MoatTrifectaSection() {
             <article
               key={p.key}
               data-moat-item
-              className={`rounded-neo border-neo-thick ${p.borderAccent} bg-neo-cream p-6 shadow-hard-lg transition-transform hover:-translate-y-1`}
+              className="rounded-neo border-2 border-neo-navy bg-neo-cream p-6"
             >
-              <div className={`mb-4 inline-block rounded-full ${p.accent} px-3 py-1 text-xs font-bold text-neo-navy uppercase`}>
+              <div className={`mb-4 inline-block rounded-full ${p.accent} px-3 py-1 text-xs font-bold uppercase ${p.ink}`}>
                 {t(`education.landing.moat.${p.key}.tag`)}
               </div>
               <h3 className="text-lg font-neo-display font-black text-neo-navy">
@@ -59,7 +50,6 @@ export function MoatTrifectaSection() {
             </article>
           ))}
         </div>
-      </div>
     </section>
   );
 }

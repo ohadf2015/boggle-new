@@ -51,7 +51,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, className }: Cla
         <header className="flex shrink-0 flex-col items-center gap-1 text-center">
           <h1
             data-testid="lobby-stage-title"
-            className="-rotate-1 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-4 py-1 font-neo-display text-2xl font-black uppercase leading-tight tracking-tight text-neo-black shadow-hard lg:px-6 lg:text-5xl"
+            className="rounded-neo border-[3px] border-neo-black bg-neo-yellow px-4 py-1 font-neo-display text-2xl font-black uppercase leading-tight tracking-tight text-neo-black lg:px-6 lg:text-4xl"
           >
             {tr(t, 'academy.launch.title', 'Start a live game')}
           </h1>

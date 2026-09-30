@@ -199,7 +199,7 @@ const WEBAPP_FEATURES: Record<string, string[]> = {
     'Lärarpanel: anpassade ordlistor, framstegsspårning, klassanalys',
     `${LANGUAGE_COUNT} språk inklusive hebreiska (RTL) och japanska, var och en med egen ordbok`,
     'Läroplansanpassad svårighetsgrad för grundskola, gymnasium och ESL/EFL',
-    'Körs i valfri webbläsare — inga nedladdningar, inga betalspärrar',
+    'Körs i valfri webbläsare — inga nedladdningar och ingen reklam i klassrummet; Teacher Pro är valfritt',
   ],
   ja: [
     `生徒の登録不要 — ${JOIN_CODE_LENGTH}文字のコードでクラスに参加`,
@@ -207,7 +207,7 @@ const WEBAPP_FEATURES: Record<string, string[]> = {
     '教師ダッシュボード：カスタム単語リスト、進捗追跡、クラス分析',
     `ヘブライ語（RTL）と日本語を含む${LANGUAGE_COUNT}言語、それぞれ独自の辞書`,
     '小学校・中等教育・ESL/EFL学習者向けのカリキュラム準拠の難易度',
-    'あらゆるブラウザで動作 — ダウンロード不要、ペイウォールなし',
+    'あらゆるブラウザで動作 — ダウンロード不要、授業中の広告なし。Teacher Pro は任意です',
   ],
   es: [
     `Sin registro de estudiantes — únete a una clase con un código de ${JOIN_CODE_LENGTH} caracteres`,
@@ -215,7 +215,7 @@ const WEBAPP_FEATURES: Record<string, string[]> = {
     'Panel del profesor: listas personalizadas, seguimiento de progreso, análisis de clase',
     `${LANGUAGE_COUNT} idiomas incluyendo hebreo (RTL) y japonés, cada uno con su propio diccionario`,
     'Dificultad alineada al currículo para primaria, secundaria y ESL/EFL',
-    'Funciona en cualquier navegador — sin descargas, sin muros de pago',
+    'Funciona en cualquier navegador — sin descargas y sin anuncios en clase; Teacher Pro es opcional',
   ],
   ru: [
     `Без регистрации учеников — присоединись к классу с кодом из ${JOIN_CODE_LENGTH} символов`,
@@ -259,5 +259,24 @@ export function buildEducationWebApplicationJsonLd(locale: string) {
       url: `${BASE_URL}/${lang}/education`,
     },
     sameAs: SAME_AS,
+  };
+}
+
+/** Server-rendered. AI crawlers do not execute next/script afterInteractive. */
+export function buildEducationPageJsonLd(locale: string) {
+  const lang = safeLocale(locale);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage' as const,
+    '@id': `${BASE_URL}/${lang}/education#page`,
+    url: `${BASE_URL}/${lang}/education`,
+    name: 'LexiClash Education',
+    inLanguage: lang,
+    dateModified: '2026-09-30',
+    isPartOf: { '@id': `${BASE_URL}/${lang}/education#org` },
+    speakable: {
+      '@type': 'SpeakableSpecification' as const,
+      cssSelector: ['[data-answer]', 'h1', '.education-hero-sub', '.education-faq-q'],
+    },
   };
 }

@@ -9,8 +9,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
  * real-time class leaderboard).
  *
  * Decorative — marked role="img" with a localized label so screen readers get
- * one concise description instead of reading every faux tile. Float/glow is
- * gated behind `motion-safe:` so it fully respects prefers-reduced-motion.
+ * one concise description instead of reading every faux tile. It sits still:
+ * a floating frame next to the CTA is the thing the eye follows instead.
  */
 
 // 4x4 board spelling-friendly letters. Static + decorative (not translated).
@@ -22,7 +22,7 @@ const PATH = new Set([0, 1, 2, 3]); // C-L-A-S(S)
 const LEADERS = [
   { nameKey: 's1', score: 1280, medal: 'bg-neo-yellow', text: 'text-neo-navy' },
   { nameKey: 's2', score: 1140, medal: 'bg-neo-cyan', text: 'text-neo-navy' },
-  { nameKey: 's3', score: 980, medal: 'bg-neo-pink', text: 'text-neo-white' },
+  { nameKey: 's3', score: 980, medal: 'bg-neo-pink', text: 'text-neo-black' },
 ] as const;
 
 export function EducationModeMock() {
@@ -32,7 +32,7 @@ export function EducationModeMock() {
     <figure
       role="img"
       aria-label={t('education.landing.mock.caption')}
-      className="relative mx-auto w-full max-w-md motion-safe:animate-float"
+      className="relative mx-auto w-full max-w-md"
     >
       {/* Browser-window frame */}
       <div className="overflow-hidden rounded-neo border-neo-thick border-neo-navy bg-neo-navy shadow-hard-xl">
@@ -53,8 +53,8 @@ export function EducationModeMock() {
             <span className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-white">
               {t('education.landing.mock.tab')}
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-neo-navy bg-neo-red px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">
-              <span className="h-1.5 w-1.5 rounded-full bg-neo-white motion-safe:animate-pulse-subtle" aria-hidden />
+            <span className="inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-neo-navy bg-neo-red px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-black">
+              <span className="h-1.5 w-1.5 rounded-full bg-neo-white" aria-hidden />
               {t('education.landing.mock.live')}
             </span>
           </div>

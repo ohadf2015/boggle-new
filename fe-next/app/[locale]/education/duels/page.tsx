@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import Script from 'next/script';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { buildEducationDuelsJsonLd, getEducationSubpageContent } from '@/lib/seo/educationSubpageJsonLd';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
@@ -20,9 +19,9 @@ export default async function DuelsPage({ params }: { params: Promise<{ locale: 
 
   return (
     <>
-      <Script id="ld-edu-duels-howto" type="application/ld+json">{JSON.stringify(howTo)}</Script>
-      <Script id="ld-edu-duels-resource" type="application/ld+json">{JSON.stringify(resource)}</Script>
-      <Script id="ld-edu-duels-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumb)}</Script>
+      <script id="ld-edu-duels-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }} />
+      <script id="ld-edu-duels-resource" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(resource) }} />
+      <script id="ld-edu-duels-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <Suspense
         fallback={
           <div className="flex h-[100dvh] items-center justify-center overflow-hidden bg-neo-navy">

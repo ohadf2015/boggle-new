@@ -77,17 +77,17 @@ describe('EducationHero', () => {
     expect(mockTrackLandingCtaClick).toHaveBeenCalledWith('hero_for_schools');
   });
 
-  it('renders free CTA as primary (lime, large, pulsing) and Pro as secondary (outlined)', () => {
+  it('renders free CTA as the one still lime action and Pro as a quiet outline', () => {
     render(<EducationHero />);
     const free = screen.getByTestId('education-hero-free-cta');
+    const join = screen.getByTestId('education-hero-join-cta');
     const pro = screen.getByTestId('education-hero-pro-cta');
 
-    // Free CTA should be primary: lime background, large text
     expect(free.className).toMatch(/bg-neo-lime/);
     expect(free.className).toMatch(/text-lg/);
-    expect(free.className).toMatch(/animate-pulse/);
+    expect(free.className).not.toMatch(/animate-pulse/);
 
-    // Pro CTA should be secondary: outlined style, no pulse
+    expect(join.className).not.toMatch(/\bbg-neo-cyan\b/);
     expect(pro.className).toMatch(/border-neo-cyan/);
     expect(pro.className).not.toMatch(/bg-neo-lime/);
     expect(pro.className).not.toMatch(/animate-pulse/);
