@@ -16,7 +16,9 @@ import {
   updateClassroomGameStatus,
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
-import { bindSocketToGame } from '../modules/gameStateManager.js';
+import { bindSocketToGame, getGameUsers } from '../modules/gameStateManager.js';
+import { getGameRoom } from '../utils/socketHelpers.js';
+import { getWaitingClassroomStudents } from './classroomMissingRoom.js';
 import {
   resolveClassroomTeacher,
   resolveClassroomRole,
@@ -223,8 +225,9 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       // Create the game in Redis
       await createClassroomGame(gameData);
 
-      // Join classroom room for notifications
+      // Join classroom room for notifications and game room for live lobby roster
       socket.join(`classroom:${payload.classroomId}`);
+      socket.join(getGameRoom(payload.gameCode));
 
       // Broadcast to classroom that a game has been created. The classroom name
       // is resolved server-side and travels WITH the game, so the banner that
@@ -525,6 +528,29 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to start game: ${error}`);
       socket.emit('classroomGameError', { error: 'Failed to start game' });
+    }
+  });
+
+  // Request current live lobby users (waiting students + active game users)
+  socket.on('getLobbyUsers', (data: { gameCode?: string }) => {
+    try {
+      const code = data?.gameCode?.trim()?.toUpperCase();
+      if (!code) return;
+      socket.join(getGameRoom(code));
+      const waiting = getWaitingClassroomStudents(code);
+      const active = getGameUsers(code) || [];
+      const userMap = new Map<string, { username: string; avatar?: unknown }>();
+      for (const u of active) {
+        if (u.username) userMap.set(u.username, u);
+      }
+      for (const w of waiting) {
+        if (w.username && !userMap.has(w.username)) {
+          userMap.set(w.username, w);
+        }
+      }
+      socket.emit('updateUsers', { users: Array.from(userMap.values()) });
+    } catch (err) {
+      logger.warn('CLASSROOM_GAME', `Failed to get lobby users: ${(err as Error)?.message ?? err}`);
     }
   });
 

@@ -341,7 +341,10 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
   const blockedKey = cannotStart ? 'education.modePicker.needsLesson' : null;
 
   // After the room is created, show the live lobby instead of the setup screen
-  if (roomCreatedGameCode && socket) {
+  if (roomCreatedGameCode) {
+    if (!socket) {
+      return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
+    }
     return <ClassroomLiveLobby gameCode={roomCreatedGameCode} socket={socket} onStart={startLiveGame} />;
   }
 

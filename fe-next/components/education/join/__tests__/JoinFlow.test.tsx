@@ -16,12 +16,13 @@ import '@testing-library/jest-dom';
  *   - a bad code and a server fault rendered as the same sentence,
  *   - an error that exists only as a toast, gone before it is read.
  */
-const { mockJoin, mockResolve, mockUseAuth, mockPush, mockToast } = vi.hoisted(() => ({
+const { mockJoin, mockResolve, mockUseAuth, mockPush, mockToast, mockSetStoredUsername } = vi.hoisted(() => ({
   mockJoin: vi.fn(),
   mockResolve: vi.fn(),
   mockUseAuth: vi.fn(),
   mockPush: vi.fn(),
   mockToast: { success: vi.fn(), error: vi.fn() },
+  mockSetStoredUsername: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
@@ -38,6 +39,9 @@ vi.mock('@/hooks/useJoinClassroom', () => ({ useJoinClassroom: () => ({ joinClas
 vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: mockToast }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
+vi.mock('@/utils/profileStorage', () => ({
+  setStoredUsername: (...args: unknown[]) => mockSetStoredUsername(...args),
+}));
 
 import JoinFlow from '../JoinFlow';
 
@@ -92,6 +96,15 @@ describe('<JoinFlow> — code step', () => {
     render(<JoinFlow initialCode="AB1" />);
     expect(onNameStep()).toBe(false);
     expect(codeField()).toBeInTheDocument();
+  });
+
+  it('advances directly to nickname step when initialCode resolves late after mount', () => {
+    const { rerender } = render(<JoinFlow initialCode="" />);
+    expect(onNameStep()).toBe(false);
+
+    rerender(<JoinFlow initialCode="P45KRT" />);
+    expect(onNameStep()).toBe(true);
+    expect(screen.getByText('P45KRT')).toBeInTheDocument();
   });
 });
 
@@ -176,12 +189,26 @@ describe('<JoinFlow> — submitting', () => {
     fireEvent.click(goButton());
   };
 
-  it('walks a live-game joiner straight into the room', async () => {
+  it('walks a live-game joiner straight into the room and stores nickname', async () => {
     mockJoin.mockResolvedValue({ success: true, classroomId: 'c1', gameCode: 'P45KRT' });
-    await join();
-    await waitFor(() =>
-      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=P45KRT&classroom=true')
-    );
+    await join('Maya');
+    await waitFor(() => {
+      expect(mockSetStoredUsername).toHaveBeenCalledWith('Maya');
+      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=P45KRT&classroom=true');
+    });
+  });
+
+  it('falls back to target gameCode when join result omits it', async () => {
+    mockResolve.mockResolvedValue({ verdict: 'game', gameCode: 'P45KRT' });
+    mockJoin.mockResolvedValue({ success: true, classroomId: 'c1' });
+    render(<JoinFlow initialCode="P45KRT" />);
+    await waitFor(() => expect(mockResolve).toHaveBeenCalled());
+    fireEvent.change(nameField(), { target: { value: 'Maya' } });
+    fireEvent.click(goButton());
+    await waitFor(() => {
+      expect(mockSetStoredUsername).toHaveBeenCalledWith('Maya');
+      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=P45KRT&classroom=true');
+    });
   });
 
   it('sends a roster joiner to the student hub', async () => {

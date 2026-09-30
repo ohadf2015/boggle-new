@@ -105,18 +105,19 @@ export function useMultiplayerFlowState({
 
   // Get user profile data for auto-join
   const getProfileData = useCallback(() => {
-    if (isAuthenticated && displayName) return { username: displayName };
+    if (displayName) return { username: displayName };
     return { username: getStoredUsername() || '' };
-  }, [isAuthenticated, displayName]);
+  }, [displayName]);
 
   // Handle auto-join for invitation links
   const handleInvitationAutoJoin = useCallback(
     (roomCode: string) => {
       // A classroom student needs a NAME and nothing else — the lobby generates
-      // their avatar on arrival. `hasProfile()` additionally demands an avatar id,
-      // which the classroom prompt has no honest value to write.
+      // their avatar on arrival. If displayName or getStoredUsername() is available,
+      // they can auto-join without being prompted again.
+      const classroomName = displayName || getStoredUsername();
       const canAutoJoin =
-        hasProfile() || (isClassroomMode && !isAuthenticated && !!getStoredUsername());
+        hasProfile() || (isClassroomMode && !!classroomName);
 
       if (canAutoJoin) {
         // Auth resolves a beat after mount, so a signed-in student can reach the

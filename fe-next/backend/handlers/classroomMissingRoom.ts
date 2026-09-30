@@ -31,7 +31,26 @@ import { getClassroomGame, type ClassroomGame } from '../modules/classroomGameMa
 import { isClassroomSessionEnded } from '../modules/classroomGameSessionState.js';
 import { buildClassroomJoinRefusedEvent, captureEduServerEvents } from '../utils/educationTelemetry.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
+import { getGameRoom } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
+
+interface WaitingStudent {
+  username: string;
+  avatar?: unknown;
+  socketId: string;
+}
+
+const waitingStudents = new Map<string, Map<string, WaitingStudent>>();
+
+export function getWaitingClassroomStudents(gameCode: string): Array<{ username: string; avatar?: unknown }> {
+  const map = waitingStudents.get(gameCode);
+  if (!map) return [];
+  return Array.from(map.values()).map((s) => ({ username: s.username, avatar: s.avatar }));
+}
+
+export function clearWaitingClassroomStudents(gameCode: string): void {
+  waitingStudents.delete(gameCode);
+}
 
 /** Where sockets told CLASSROOM_NOT_OPEN are parked until the room opens. */
 export function classroomWaitRoom(gameCode: string): string {
@@ -46,6 +65,7 @@ export function classroomWaitRoom(gameCode: string): string {
  */
 export function announceClassroomRoomOpened(io: Server, gameCode: string): void {
   try {
+    clearWaitingClassroomStudents(gameCode);
     const room = classroomWaitRoom(gameCode);
     io.to(room).emit('classroomRoomOpened', { gameCode });
     io.in(room).socketsLeave(room);
@@ -60,7 +80,13 @@ export function isClassroomAwaitingRoom(record: ClassroomGame | null | undefined
 }
 
 /** Answer a `join` whose code has no room in memory or in Redis. Never throws. */
-export async function answerMissingRoom(socket: Socket, gameCode: string): Promise<void> {
+export async function answerMissingRoom(
+  socket: Socket,
+  gameCode: string,
+  username?: string,
+  avatar?: unknown,
+  io?: Server
+): Promise<void> {
   let record: ClassroomGame | null = null;
   try {
     record = await getClassroomGame(gameCode);
@@ -71,6 +97,44 @@ export async function answerMissingRoom(socket: Socket, gameCode: string): Promi
   if (isClassroomAwaitingRoom(record)) {
     logger.info('CLASSROOM_GAME', `Early join for ${gameCode}: room not open yet, client will wait`);
     void socket.join(classroomWaitRoom(gameCode));
+
+    if (username) {
+      let map = waitingStudents.get(gameCode);
+      if (!map) {
+        map = new Map();
+        waitingStudents.set(gameCode, map);
+      }
+      map.set(socket.id, { username, avatar, socketId: socket.id });
+
+      const roster = getWaitingClassroomStudents(gameCode);
+      const targetRoom = getGameRoom(gameCode);
+      if (io) {
+        io.to(targetRoom).emit('updateUsers', { users: roster });
+        if (record?.classroomId) {
+          io.to(`classroom:${record.classroomId}`).emit('updateUsers', { users: roster });
+        }
+      } else {
+        socket.to(targetRoom).emit('updateUsers', { users: roster });
+        if (record?.classroomId) {
+          socket.to(`classroom:${record.classroomId}`).emit('updateUsers', { users: roster });
+        }
+      }
+
+      socket.once('disconnect', () => {
+        const currentMap = waitingStudents.get(gameCode);
+        if (currentMap && currentMap.has(socket.id)) {
+          currentMap.delete(socket.id);
+          const updatedRoster = getWaitingClassroomStudents(gameCode);
+          if (io) {
+            io.to(targetRoom).emit('updateUsers', { users: updatedRoster });
+            if (record?.classroomId) {
+              io.to(`classroom:${record.classroomId}`).emit('updateUsers', { users: updatedRoster });
+            }
+          }
+        }
+      });
+    }
+
     emitError(socket, ErrorCodes.CLASSROOM_NOT_OPEN);
     return;
   }
