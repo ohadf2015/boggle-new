@@ -15073,6 +15073,22 @@ const he = {
         "cta": "ארחו אוצר מילים בכיתה שלמה עם מגבלת 50 מקומות חינם ברורה"
       }
     },
+    "vsPearDeck": {
+      "teacherFree": {
+        "eyebrow": "כנות תשובות עם שם — Free מול Premium",
+        "title": "Pear Deck Teacher Free: מקרן אנונימי; שמות בייצוא לגיליון. LexiClash: רוסטר כיתה + משוב עם שם.",
+        "lede": "Pear Deck Teacher Free מפרסם Sessions/משתתפים ללא הגבלה ומקרין תשובות אנונימית. שמות ב-Free: ייצוא ל-spreadsheet או hover ב-Flashcard Factory. Premium Teacher Dashboard: שמות, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback. LexiClash חינם עד 50 עם רוסטר / משוב עם שם.",
+        "pdTitle": "Pear Deck Teacher Free — מגבלות שמות",
+        "pdBody": "Sessions + משתתפים ללא הגבלה · מקרן אנונימי · שמות רק דרך spreadsheet או Flashcard Factory hover. Premium: Teacher Dashboard עם שמות, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback.",
+        "lexiTitle": "LexiClash — רוסטר כיתה + משוב עם שם בחינם",
+        "lexiBody": "חינם: עד 50 תלמידים בכיתה + רוסטר / משוב עם שם + miss-gap → reteach Live. בלי שערי Premium לשמות.",
+        "citePrefix": "Pear Deck:",
+        "citePlansLabel": "peardeck.com/pricing (Teacher Free vs Premium)",
+        "citeHelpLabel": "Handling Inappropriate Responses (Free export / Premium Dashboard)",
+        "citeSuffix": " — Teacher Free: מקרן אנונימי; שמות בייצוא לגיליון.",
+        "cta": "ארחו אוצר מילים בכיתה שלמה עם רוסטר + משוב עם שם (מגבלת 50 מקומות חינם)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "מגבלות חינם — honesty foil",

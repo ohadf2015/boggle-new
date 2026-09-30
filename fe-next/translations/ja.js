@@ -15218,6 +15218,22 @@ const ja = {
         "cta": "明確な50席の無料枠でクラス全体の語彙ゲームをホスト"
       }
     },
+    "vsPearDeck": {
+      "teacherFree": {
+        "eyebrow": "記名レスポンスの正直さ — Free vs Premium",
+        "title": "Pear Deck Teacher Free: 匿名プロジェクター；名前はスプレッドシート書き出し。LexiClash: クラス名簿 + 記名フィードバック。",
+        "lede": "Pear Deck Teacher Freeは無制限Sessions/参加者・匿名プロジェクター。Freeで名前を知る方法はスプレッドシート書き出しまたはFlashcard Factory hoverのみ。Premium Teacher Dashboardは名前表示・hide/block・Drawing/Draggable・Reflect & Review・Teacher Feedback。LexiClash無料は最大50 + 名簿/記名フィードバック。",
+        "pdTitle": "Pear Deck Teacher Free — 記名の上限",
+        "pdBody": "無制限Sessions + 参加者 · 匿名プロジェクター · 名前はスプレッドシート/Flashcard Factory hoverのみ。Premium: 記名Teacher Dashboard、hide/block、Drawing/Draggable、Reflect & Review、Teacher Feedback。",
+        "lexiTitle": "LexiClash — クラス名簿 + 記名フィードバック（無料）",
+        "lexiBody": "無料: クラス最大50人の語彙ゲーム + 名簿/記名フィードバック + miss-gap → reteach Live。記名のためのPremiumゲートなし。",
+        "citePrefix": "Pear Deck:",
+        "citePlansLabel": "peardeck.com/pricing (Teacher Free vs Premium)",
+        "citeHelpLabel": "Handling Inappropriate Responses (Free export / Premium Dashboard)",
+        "citeSuffix": " — Teacher Free: 匿名プロジェクター；名前はスプレッドシート。",
+        "cta": "名簿 + 記名フィードバック付きでクラス全体の語彙ゲームをホスト（明確な50席無料枠）"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "無料枠の上限 — honesty foil",

@@ -3762,6 +3762,22 @@ const ru = {
         "cta": "Проведите бесплатную словарную игру для всего класса с лимитом 50 мест"
       }
     },
+    "vsPearDeck": {
+      "teacherFree": {
+        "eyebrow": "Честность именных ответов — Free vs Premium",
+        "title": "Pear Deck Teacher Free: анонимный проектор; имена через экспорт в таблицу. LexiClash: roster класса + именной feedback.",
+        "lede": "Pear Deck Teacher Free публикует unlimited Sessions/participants и показывает ответы анонимно. Имена на Free: export to spreadsheet или Flashcard Factory hover. Premium Teacher Dashboard: имена, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback. LexiClash free — до 50 с roster / именным feedback.",
+        "pdTitle": "Pear Deck Teacher Free — лимиты имен",
+        "pdBody": "Unlimited Sessions + participants · анонимный проектор · имена только через spreadsheet или Flashcard Factory hover. Premium: named Teacher Dashboard, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback.",
+        "lexiTitle": "LexiClash — roster класса + именной feedback на free",
+        "lexiBody": "Free: до 50 учеников в классе + roster / именной feedback + miss-gap → reteach Live. Без Premium-гейта для имен.",
+        "citePrefix": "Pear Deck:",
+        "citePlansLabel": "peardeck.com/pricing (Teacher Free vs Premium)",
+        "citeHelpLabel": "Handling Inappropriate Responses (Free export / Premium Dashboard)",
+        "citeSuffix": " — Teacher Free: анонимный проектор; имена через spreadsheet.",
+        "cta": "Проведите бесплатную словарную игру с roster + именным feedback (лимит 50 мест)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Лимиты бесплатного плана — honesty foil",

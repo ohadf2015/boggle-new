@@ -15453,6 +15453,22 @@ const sv = {
         "cta": "Håll gratis ordlek för hela klassen med en tydlig 50-platsgräns"
       }
     },
+    "vsPearDeck": {
+      "teacherFree": {
+        "eyebrow": "Ärlighet kring namngivna svar — Free vs Premium",
+        "title": "Pear Deck Teacher Free: anonym projektor; namn via kalkylbladsexport. LexiClash: klassroster + namngiven feedback.",
+        "lede": "Pear Deck Teacher Free publicerar unlimited Sessions/deltagare och visar svar anonymt. Namn på Free: export till spreadsheet eller Flashcard Factory hover. Premium Teacher Dashboard: namn, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback. LexiClash free täcker upp till 50 med roster / namngiven feedback.",
+        "pdTitle": "Pear Deck Teacher Free — namngräns",
+        "pdBody": "Unlimited Sessions + deltagare · anonym projektor · namn endast via spreadsheet eller Flashcard Factory hover. Premium: named Teacher Dashboard, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback.",
+        "lexiTitle": "LexiClash — klassroster + namngiven feedback på free",
+        "lexiBody": "Free: upp till 50 elever per klass + roster / namngiven feedback + miss-gap → reteach Live. Ingen Premium-grind för namn.",
+        "citePrefix": "Pear Deck:",
+        "citePlansLabel": "peardeck.com/pricing (Teacher Free vs Premium)",
+        "citeHelpLabel": "Handling Inappropriate Responses (Free export / Premium Dashboard)",
+        "citeSuffix": " — Teacher Free: anonym projektor; namn via spreadsheet.",
+        "cta": "Håll gratis ordlek med roster + namngiven feedback (tydlig 50-platsgräns)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Gratisnivåns tak — honesty foil",

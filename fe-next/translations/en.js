@@ -13765,6 +13765,22 @@ const en = {
         "cta": "Host whole-class free vocab with a clear 50-seat free limit"
       }
     },
+    "vsPearDeck": {
+      "teacherFree": {
+        "eyebrow": "Named-response honesty — Free vs Premium",
+        "title": "Pear Deck Teacher Free: anonymous projector; names via spreadsheet export. LexiClash: classroom roster + named feedback.",
+        "lede": "Pear Deck Teacher Free publishes unlimited Sessions/participants and projects answers anonymously. Named responses on Free: export to spreadsheet or Flashcard Factory hover. Premium Teacher Dashboard shows names, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback. LexiClash free covers up to 50 with classroom roster / named feedback — no Premium named-dashboard gate.",
+        "pdTitle": "Pear Deck Teacher Free — named-response caps",
+        "pdBody": "Unlimited Sessions + participants · anonymous projector · names only via spreadsheet export or Flashcard Factory hover. Premium: live named Teacher Dashboard, hide/block, Drawing/Draggable, Reflect & Review, Teacher Feedback.",
+        "lexiTitle": "LexiClash — classroom roster + named feedback on free",
+        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games, plus classroom roster / named feedback disclosure and miss-gap → reteach Live. No Premium Teacher Dashboard gate for names.",
+        "citePrefix": "Pear Deck:",
+        "citePlansLabel": "peardeck.com/pricing (Teacher Free vs Premium)",
+        "citeHelpLabel": "Handling Inappropriate Responses (Free export / Premium Dashboard)",
+        "citeSuffix": " — Teacher Free: anonymous projector; names via spreadsheet export.",
+        "cta": "Host whole-class free vocab with roster + named feedback (50-seat free limit)"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Free-tier caps — honesty foil",
