@@ -13749,6 +13749,22 @@ const en = {
         "cta": "Host whole-class free vocab with a clear 50-seat free limit"
       }
     },
+    "vsClassPoint": {
+      "basicFree": {
+        "eyebrow": "Free-tier caps — honesty foil",
+        "title": "ClassPoint Basic Free: Max-25-class-size / 5 Questions per PPT. LexiClash: whole-class free (50) + miss→reteach Live.",
+        "lede": "ClassPoint pricing publishes Basic Free: Max-25-class-size, 5 Questions per PPT, 5 Question types, 3 Draggable objects, 3 saved classes. Distinct from Socrative Free 5 Quizzes / 1 Room / 50. LexiClash free covers up to 50 students per class with miss-gap → reteach Live — no Max-25 / 5-question PowerPoint ceiling.",
+        "cpTitle": "ClassPoint Basic Free — published caps",
+        "cpBody": "Pricing Basic Free: Max-25-class-size · 5 Questions per PPT · 5 Question types · 3 Draggable objects · 3 saved classes (plus 20 free AI quiz credits).",
+        "lexiTitle": "LexiClash — whole-class free + miss→Live",
+        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games, plus miss-gap → reteach Live. No Max-25 / 5-Questions-per-PPT Free ceiling.",
+        "citePrefix": "ClassPoint:",
+        "citePlansLabel": "classpoint.io/pricing (Basic Free: 25 / 5 Q)",
+        "citeSchoolsLabel": "Schools & districts (Premium contrast)",
+        "citeSuffix": " — Basic Free: Max-25-class-size · 5 Questions per PPT.",
+        "cta": "Host whole-class free vocab with a clear 50-seat free limit"
+      }
+    },
     "vsNearpod": {
       "silverFree": {
         "eyebrow": "Free-tier caps — honesty foil",
