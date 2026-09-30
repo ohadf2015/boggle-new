@@ -163,6 +163,26 @@ export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
   safeCapture('edu_classroom_created', props);
 }
 
+export interface EduJoinCodeArgs {
+  classroomId: string;
+}
+
+/**
+ * Class-created → first-student funnel. Never send the join code itself
+ * (shared secret). `classroom_id` is enough to stitch shown → copied → joined.
+ */
+export function trackEduJoinCodeShown(args: EduJoinCodeArgs): void {
+  safeCapture('edu_join_code_shown', { classroom_id: args.classroomId });
+}
+
+export function trackEduJoinCodeCopied(args: EduJoinCodeArgs): void {
+  safeCapture('edu_join_code_copied', { classroom_id: args.classroomId });
+}
+
+export function trackEduFirstStudentJoined(args: EduJoinCodeArgs): void {
+  safeCapture('edu_first_student_joined', { classroom_id: args.classroomId });
+}
+
 export interface EduTeacherOnboardingStepArgs {
   step: number;
   totalSteps: number;

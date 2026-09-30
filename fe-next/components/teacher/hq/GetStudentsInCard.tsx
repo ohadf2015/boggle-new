@@ -10,6 +10,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 import { classroomJoinUrl } from "@/lib/education/classroomInvitePayload";
+import {
+  trackEduFirstStudentJoined,
+  trackEduJoinCodeCopied,
+  trackEduJoinCodeShown,
+} from "@/lib/education/telemetry";
 import { useClassRoster } from "./useClassRoster";
 import { RosterSeats } from "./RosterSeats";
 import { useHqJuice } from "./useHqJuice";
@@ -67,6 +72,7 @@ export function GetStudentsInCard({
     ? classroomJoinUrl(origin, language, classroom.join_code)
     : "";
   const count = students.length;
+  const empty = !rosterLoading && count === 0;
   // Steps up only when someone ARRIVES; the first read is simply true.
   const shownCount = useRisingCount(count, !reduced && arrivals.length > 0);
   // Seat size is a visual choice only; SSR/first paint uses the phone size.
@@ -86,6 +92,29 @@ export function GetStudentsInCard({
     sfx.playPlayerJoinedSound();
   }, [arrivals, sfx]);
 
+  const shownFor = useRef<string | null>(null);
+  const prevCount = useRef<number | null>(null);
+  const trackedClassroomId = useRef(classroom.id);
+  if (trackedClassroomId.current !== classroom.id) {
+    trackedClassroomId.current = classroom.id;
+    shownFor.current = null;
+    prevCount.current = null;
+  }
+  useEffect(() => {
+    if (!empty) return;
+    if (shownFor.current === classroom.id) return;
+    shownFor.current = classroom.id;
+    trackEduJoinCodeShown({ classroomId: classroom.id });
+  }, [empty, classroom.id]);
+
+  useEffect(() => {
+    if (rosterLoading) return;
+    if (prevCount.current === 0 && count >= 1) {
+      trackEduFirstStudentJoined({ classroomId: classroom.id });
+    }
+    prevCount.current = count;
+  }, [rosterLoading, count, classroom.id]);
+
   const copyLink = useCallback(async () => {
     const url = classroomJoinUrl(
       window.location.origin,
@@ -97,11 +126,12 @@ export function GetStudentsInCard({
       sfx.playButtonClickSound();
       setCopied(true);
       toast.success(t("share.linkCopied"));
+      trackEduJoinCodeCopied({ classroomId: classroom.id });
       setTimeout(() => setCopied(false), 1800);
     } catch {
       toast.error(t("share.codeCopyError"));
     }
-  }, [classroom.join_code, language, sfx, t]);
+  }, [classroom.id, classroom.join_code, language, sfx, t]);
 
   const openProjector = useCallback(() => {
     sfx.playButtonClickSound();
@@ -219,12 +249,35 @@ export function GetStudentsInCard({
         >
           {waiting ? (
             <div
-              data-testid="hq-roster-waiting"
+              data-testid={empty ? "hq-first-student-panel" : "hq-roster-waiting"}
               className="flex w-full min-w-0 items-center gap-3 lg:h-full lg:flex-col lg:justify-center lg:gap-4"
             >
-              <span className="relative flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan shadow-hard-sm lg:size-20">
-                <UsersRound className="size-5 text-black lg:size-10" strokeWidth={3} aria-hidden="true" />
-              </span>
+              {empty && joinUrl ? (
+                <span
+                  data-testid="hq-first-student-qr"
+                  className="hidden size-28 shrink-0 rounded-neo border-2 border-neo-black bg-neo-white p-1.5 shadow-hard-sm lg:block"
+                >
+                  <QRCodeSVG
+                    value={joinUrl}
+                    size={160}
+                    level="L"
+                    style={{ width: "100%", height: "100%" }}
+                    aria-hidden="true"
+                  />
+                </span>
+              ) : (
+                <span className="relative flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan shadow-hard-sm lg:size-20">
+                  <UsersRound className="size-5 text-black lg:size-10" strokeWidth={3} aria-hidden="true" />
+                </span>
+              )}
+              {empty ? (
+                <p
+                  data-testid="hq-first-student-title"
+                  className="hidden font-neo-display text-sm font-black uppercase tracking-tight text-neo-lime lg:block lg:text-center lg:text-base"
+                >
+                  {t("academy.hq.firstStudentTitle", "Get your first student in")}
+                </p>
+              ) : null}
               <JoinedCount
                 loading={rosterLoading}
                 count={count}
