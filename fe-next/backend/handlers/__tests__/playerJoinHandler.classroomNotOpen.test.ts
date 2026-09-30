@@ -127,6 +127,7 @@ vi.mock('../../modules/supabase/classroomMembership', () => ({
 import { registerPlayerJoinHandlers } from '../playerJoinHandler';
 import { handleReconnection } from '../playerReconnectHandler';
 import { addUserToGame } from '../../modules/gameStateManager';
+import { clearWaitingClassroomStudents } from '../classroomMissingRoom';
 
 function captureJoinHandler(verifiedUserId?: string) {
   const listeners: Record<string, (...args: unknown[]) => unknown> = {};
@@ -137,6 +138,7 @@ function captureJoinHandler(verifiedUserId?: string) {
     leave: vi.fn(),
     data: verifiedUserId ? { verifiedUserId } : {},
     on: vi.fn((event: string, cb: (...args: unknown[]) => unknown) => { listeners[event] = cb; }),
+    once: vi.fn((event: string, cb: (...args: unknown[]) => unknown) => { listeners[`once:${event}`] = cb; }),
   } as unknown as Socket;
   const io = { emit: vi.fn(), to: vi.fn().mockReturnThis() } as unknown as Server;
   registerPlayerJoinHandlers(io, socket);
@@ -153,6 +155,7 @@ const errorCodes = () => mockEmitError.mock.calls.map((c) => c[1]);
 describe("base 'join' — a classroom code whose room is not open yet", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearWaitingClassroomStudents('ABC123');
     mockGetGame.mockReturnValue(undefined);
     mockRestoreGameFromRedis.mockResolvedValue(null);
     mockGetGameUsers.mockReturnValue([]);
@@ -162,7 +165,7 @@ describe("base 'join' — a classroom code whose room is not open yet", () => {
   it('tells an early joiner to wait (CLASSROOM_NOT_OPEN), never GAME_NOT_FOUND', async () => {
     mockGetClassroomGame.mockResolvedValue(waitingClassroom);
 
-    const { socket, join } = captureJoinHandler('student-1');
+    const { socket, io, join } = captureJoinHandler('student-1');
     await join({ gameCode: 'ABC123', username: 'Ada' });
     await flush();
 
@@ -173,6 +176,11 @@ describe("base 'join' — a classroom code whose room is not open yet", () => {
     expect(mockCapture).not.toHaveBeenCalled();
     // Parked where the room-open announcement will reach it.
     expect(socket.join).toHaveBeenCalledWith('classroomRoomWait:ABC123');
+    // Broadcasts waiting student on the live lobby roster before the room opens
+    expect(io.to).toHaveBeenCalledWith('game:ABC123');
+    expect(io.emit).toHaveBeenCalledWith('updateUsers', {
+      users: [{ username: 'Ada', avatar: undefined }],
+    });
   });
 
   it('still answers GAME_NOT_FOUND for an ENDED session (no new oracle, no endless wait)', async () => {

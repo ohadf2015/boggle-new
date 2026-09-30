@@ -27,6 +27,7 @@ export interface ClassroomLiveLobbyProps {
 
 interface Player {
   username: string;
+  displayName?: string;
   score?: number;
   avatar?: Avatar;
   isHost?: boolean;
@@ -34,22 +35,51 @@ interface Player {
   isWindowFocused?: boolean;
 }
 
+/**
+ * Format the name shown on the classroom lobby roster.
+ * If displayName is present, use it directly. If username carries a guest
+ * suffix from deriveGuestUsername ("priya-x7k2ab"), strip the 6-char random suffix
+ * and format words cleanly ("Priya").
+ */
+export function formatStudentDisplayName(student: { username: string; displayName?: string }): string {
+  if (student.displayName && student.displayName.trim()) {
+    return student.displayName.trim();
+  }
+  const raw = (student.username || '').trim();
+  const match = raw.match(/^([a-zA-Z0-9_]+)-[a-z0-9]{6}$/i);
+  if (match) {
+    return match[1]
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+  return raw;
+}
+
 export function ClassroomLiveLobby({ gameCode, socket, onStart }: ClassroomLiveLobbyProps) {
   const { t, language } = useLanguage();
   const joinUrl = typeof window === 'undefined' ? '' : `${window.location.origin}/${language}/join/${gameCode}`;
   const [playersInRoom, setPlayersInRoom] = useState<Player[]>([]);
 
-  // Listen to socket updateUsers event to sync roster
+  // Listen to socket updateUsers and playerListUpdate events to sync roster,
+  // and request current users immediately on mount.
   useEffect(() => {
-    const handleUpdateUsers = (users: Player[]) => {
-      setPlayersInRoom(users || []);
+    const handleUpdateUsers = (data: { users?: Player[] } | Player[]) => {
+      const users = Array.isArray(data) ? data : data?.users || [];
+      setPlayersInRoom(users);
     };
 
     socket.on('updateUsers', handleUpdateUsers);
+    socket.on('playerListUpdate', handleUpdateUsers);
+
+    // Request current users so the teacher sees the live roster immediately
+    socket.emit('getLobbyUsers', { gameCode });
+
     return () => {
       socket.off('updateUsers', handleUpdateUsers);
+      socket.off('playerListUpdate', handleUpdateUsers);
     };
-  }, [socket]);
+  }, [socket, gameCode]);
 
   // Filter out the host from the displayed roster
   const studentRoster = useMemo(
@@ -129,7 +159,7 @@ export function ClassroomLiveLobby({ gameCode, socket, onStart }: ClassroomLiveL
                     </span>
                   )}
                   <span className="font-neo-body font-bold text-neo-white flex-1">
-                    {student.username}
+                    {formatStudentDisplayName(student)}
                   </span>
                 </li>
               ))}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { suggestAvailableGuestName } from '@/lib/education/guestNameCollision';
+import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import logger from '@/utils/logger';
 
 /**
@@ -60,19 +61,31 @@ export async function POST(request: Request) {
   }
 
   try {
+    let classroomId: string | null = null;
     const { data: classroomRow, error: classroomError } = await admin
       .from('classrooms')
       .select('id')
       .eq('join_code', joinCode)
       .maybeSingle();
 
-    // An unknown code is the join route's problem to report, not ours — and it
-    // must not read as "that name is taken".
-    if (classroomError || !classroomRow) {
-      return NextResponse.json({ available: true, name });
+    if (classroomRow?.id) {
+      classroomId = (classroomRow as { id: string }).id;
+    } else {
+      try {
+        const liveGame = await lookupLiveClassroomGame(joinCode);
+        if (liveGame?.classroomId) {
+          classroomId = liveGame.classroomId;
+        }
+      } catch (err) {
+        logger.warn('guest-name: lookupLiveClassroomGame failed', err);
+      }
     }
 
-    const classroomId = (classroomRow as { id: string }).id;
+    // An unknown code is the join route's problem to report, not ours — and it
+    // must not read as "that name is taken".
+    if (!classroomId) {
+      return NextResponse.json({ available: true, name });
+    }
 
     // TWO reads, not an embed. `classroom_memberships` has exactly two foreign
     // keys — `classroom_id` -> `public.classrooms` and `student_id` ->

@@ -10,6 +10,7 @@ import { trackEduClassroomJoin } from '@/lib/education/telemetry';
 import logger from '@/utils/logger';
 import { resolveJoinTarget, type JoinTarget } from './joinTarget';
 import { sanitizeJoinCode, JOIN_CODE_LENGTH } from './JoinCodeField';
+import { setStoredUsername } from '@/utils/profileStorage';
 
 export type JoinStep = 'code' | 'name';
 
@@ -97,6 +98,15 @@ export function useJoinFlow(
   );
   const [name, setNameState] = useState('');
   const [target, setTarget] = useState<JoinTarget | null>(null);
+
+  // If initialCode resolves late (e.g. useParams hydration), sync it to state
+  useEffect(() => {
+    const sanitized = sanitizeJoinCode(initialCode);
+    if (sanitized.length === JOIN_CODE_LENGTH) {
+      setCodeState(sanitized);
+      setStep('name');
+    }
+  }, [initialCode]);
   const [isChecking, setIsChecking] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeErrorKey, setCodeErrorKey] = useState<string | null>(null);
@@ -279,6 +289,11 @@ export function useJoinFlow(
             });
             toast.success(t('education.student.join.success'));
 
+            // Store the student nickname so multiplayer entry recognizes it immediately
+            if (trimmedName) {
+              setStoredUsername(trimmedName);
+            }
+
             // Call the success callback (e.g. to show confetti) before navigating
             if (onSuccessBeforeNavigation) {
               try {
@@ -292,9 +307,12 @@ export function useJoinFlow(
 
             // A student who typed the LIVE GAME code came to PLAY, not to be
             // enrolled. Walk them straight in; the enrolment already happened.
+            const targetGameCode =
+              result.gameCode ||
+              (target?.verdict === 'game' ? target.gameCode || trimmedCode : null);
             router.push(
-              result.gameCode
-                ? `/${language}/multiplayer?room=${result.gameCode}&classroom=true`
+              targetGameCode
+                ? `/${language}/multiplayer?room=${targetGameCode}&classroom=true`
                 : `/${language}/student`
             );
             return;

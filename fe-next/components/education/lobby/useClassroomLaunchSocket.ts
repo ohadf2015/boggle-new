@@ -90,7 +90,8 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
       socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
         if (data.success) {
           toast.success(t('education.classroomGame.gameCreated'));
-          setRoomCreatedGameCode(data.gameCode);
+          setRoomCreatedGameCode(data.gameCode || gameCode);
+          setIsStarting(false);
         }
       });
       // The server's error text is internal English ("Invalid payload: …").

@@ -180,4 +180,45 @@ describe('ClassroomLiveLobby', () => {
     fireEvent.click(screen.getByTestId('classroom-lobby-start'));
     expect(onStart).toHaveBeenCalled();
   });
+
+  it('requests current lobby users from socket on mount', () => {
+    render(
+      <ClassroomLiveLobby
+        gameCode="XJXEFN"
+        socket={mockSocket}
+        onStart={() => {}}
+      />
+    );
+
+    expect(mockSocket.emit).toHaveBeenCalledWith('getLobbyUsers', { gameCode: 'XJXEFN' });
+  });
+
+  it('formats guest slug usernames into clean display names and handles object payload', async () => {
+    render(
+      <ClassroomLiveLobby
+        gameCode="XJXEFN"
+        socket={mockSocket}
+        onStart={() => {}}
+      />
+    );
+
+    const updateUsersCallback = (mockSocket.on as any).mock.calls.find(
+      (call: any[]) => call[0] === 'updateUsers'
+    )?.[1];
+
+    updateUsersCallback?.({
+      users: [
+        { username: 'priya-x7k2ab' },
+        { username: 'maya_kohn-7f2k9a' },
+        { username: 'user_raw', displayName: 'Custom Display' },
+      ],
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Priya')).toBeInTheDocument();
+      expect(screen.getByText('Maya Kohn')).toBeInTheDocument();
+      expect(screen.getByText('Custom Display')).toBeInTheDocument();
+      expect(screen.queryByText('priya-x7k2ab')).not.toBeInTheDocument();
+    });
+  });
 });

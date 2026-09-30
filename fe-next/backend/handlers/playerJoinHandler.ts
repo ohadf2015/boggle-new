@@ -122,7 +122,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       } else {
         // No room. A classroom still on its "Join the game" screen is told to
         // wait (CLASSROOM_NOT_OPEN); everything else is GAME_NOT_FOUND.
-        await answerMissingRoom(socket, gameCode);
+        await answerMissingRoom(socket, gameCode, username, avatar, io);
         return;
       }
     }
