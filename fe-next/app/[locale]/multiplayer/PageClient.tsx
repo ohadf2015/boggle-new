@@ -12,11 +12,6 @@ import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
-import { EducationHeader } from '@/components/education/EducationHeader';
-import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
-import { TeacherLiveControls } from '@/components/education/TeacherLiveControls';
-import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
-import { StudentWordBank } from '@/components/education/StudentWordBank';
 import { hideClassroomChrome, classroomPanelExpanded } from '@/lib/education/classroomLobbyChrome';
 import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
 import { ConnectionQualityChip } from '@/components/multiplayer/ConnectionQualityChip';
@@ -35,6 +30,31 @@ export { VALID_MODES, applyMpPreselectMode } from './preselectMode';
 // paint — lazy-load to keep it out of the multiplayer route's initial parse.
 const HostLeftGraceModal = nextDynamic(
   () => import('@/components/multiplayer/HostLeftGraceModal').then((m) => m.HostLeftGraceModal),
+  { ssr: false },
+);
+
+// Classroom-only chrome (1375 combined lines): every non-classroom multiplayer
+// visitor — the vast majority — was parsing all four regardless. None render
+// until isClassroomMode/gameActive gates pass below, so lazy-load like the
+// grace modal above.
+const EducationHeader = nextDynamic(
+  () => import('@/components/education/EducationHeader').then((m) => m.EducationHeader),
+  { ssr: false },
+);
+const ClassroomModeBanner = nextDynamic(
+  () => import('@/components/education/ClassroomModeBanner').then((m) => m.ClassroomModeBanner),
+  { ssr: false },
+);
+const TeacherLiveControls = nextDynamic(
+  () => import('@/components/education/TeacherLiveControls').then((m) => m.TeacherLiveControls),
+  { ssr: false },
+);
+const GamePausedOverlay = nextDynamic(
+  () => import('@/components/education/GamePausedOverlay').then((m) => m.GamePausedOverlay),
+  { ssr: false },
+);
+const StudentWordBank = nextDynamic(
+  () => import('@/components/education/StudentWordBank').then((m) => m.StudentWordBank),
   { ssr: false },
 );
 

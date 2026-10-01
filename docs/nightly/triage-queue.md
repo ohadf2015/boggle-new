@@ -2442,3 +2442,20 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: open
   - why: M-effort (find the quit-confirm dialog, pass `useExperiment('exp-game-abandon-confirm-v1').variant` through, wire score/wordCount), skipped tonight for time budget.
   - recommended owner: lane 03 next run, or human if it keeps rolling over
+
+## 2026-10-01
+- [PostHog] IMPACT CHECK: `exp-teacher-gate-redirect-clarity-v1` rage-click rate on /en/teacher — REGRESSED
+  - since 2026-09-01: control 1/81 pageviews rage-clicked (1.2%, 6 users), redirect-status 2/18 (11.1%, 6 users)
+  - denominator plausible (18 views, 6 distinct users on variant side — not a zero/near-zero read)
+  - status: deferred
+  - why: experiment UX judgment call (does the redirect-status banner itself provoke rage-clicks?) — small-n (2 events) so needs either more data or a design read of the banner before acting; not a code bug to blind-revert
+  - recommended owner: design/review-by-eod — re-check this metric again in a few days once variant exposure grows past ~50 views
+- [PostHog] IMPACT CHECK: EducationHeroBanner hero img eager+fetchPriority=high LCP /education — IMPROVED, closed
+  - before (08-18→08-25): /he/education p75 LCP 2580ms (needs_improvement, no /en/education in top-20)
+  - after (09-24→10-01): /en/education p75 LCP 340ms (good)
+  - status: shipped (verified, no action needed)
+  - recommended owner: none (closed finding)
+- [PostHog] RangeError "Maximum call stack size exceeded" (posthog-issue 01a0f1a6-0a3a-7db2-a416-b372d6789d67) — NOT OUR BUG
+  - 2 occurrences, 1 user, 2026-09-30; stack resolves to source url `https://imposketch.io/`, a different site sharing this PostHog project (known cross-app noise, see memory posthog-shared-by-12-apps)
+  - status: closed, no fix
+  - recommended owner: none

@@ -16382,7 +16382,8 @@ const he = {
     "sealedBid": {
       "title": "הצעה סודית",
       "step1": "בחר את המילה הכי חזקה שלך",
-      "step2": "מילה שאף אחד לא בחר = כפול!"
+      "step2": "מילה שאף אחד לא בחר = כפול!",
+      "step3": "נעל מהר — הבונוס דועך עם הזמן"
     },
     "adventure": {
       "title": "כבוש את השלבים",
@@ -18180,6 +18181,7 @@ const he = {
       "foundHeader": "נמצאו",
       "fogHeader": "ערפל",
       "fogLabel": "ערפל מלחמה",
+      "fogAriaLabel": "ערפל {percent} אחוז",
       "myStatsHeader": "הסטטיסטיקה שלך",
       "bestWord": "הכי טוב",
       "wordsPerMin": "קצב",

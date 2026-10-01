@@ -1209,7 +1209,8 @@ const sv = {
     "sealedBid": {
       "title": "Hemligt bud",
       "step1": "Välj ditt starkaste ord",
-      "step2": "Unikt bud = dubbelt poäng"
+      "step2": "Unikt bud = dubbelt poäng",
+      "step3": "Lås snabbt — bonusen minskar med tiden"
     },
     "adventure": {
       "title": "Äventyret",
@@ -18294,6 +18295,7 @@ const sv = {
       "foundHeader": "Hittade",
       "fogHeader": "Dimma",
       "fogLabel": "Krigsdimma",
+      "fogAriaLabel": "Dimma {percent} procent",
       "myStatsHeader": "Din statistik",
       "bestWord": "Bäst",
       "wordsPerMin": "Tempo",

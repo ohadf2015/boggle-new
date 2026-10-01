@@ -18009,6 +18009,7 @@ const ja = {
       "foundHeader": "発見",
       "fogHeader": "霧",
       "fogLabel": "戦場の霧",
+      "fogAriaLabel": "霧 {percent}パーセント",
       "myStatsHeader": "あなたの統計",
       "bestWord": "ベスト",
       "wordsPerMin": "ペース",
@@ -18564,7 +18565,8 @@ const ja = {
     "sealedBid": {
       "title": "秘密入札",
       "step1": "最高の単語をひそかに入札",
-      "step2": "他とかぶらないと2倍ゲット！"
+      "step2": "他とかぶらないと2倍ゲット！",
+      "step3": "早くロック——ボーナスは時間で減る"
     },
     "adventure": {
       "title": "アドベンチャー",

@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/lib/tutorial/modeCoachContent.ts, fe-next/translations/en.js, fe-next/translations/he.js, fe-next/translations/sv.js, fe-next/translations/ja.js, fe-next/translations/es.js, fe-next/translations/ru.js
+next_steps: Sealed Bid onboarding coach now has 3 steps (was 2) — added the speed-bonus mechanic (3x-to-1x multiplier over 15s) that was previously invisible to first-timers. Rotation for tomorrow: sealed-bid is now most-recent, skip it; touch wheel-rush or word-craft next. Admin-gated set has shrunk to just {sealed-bid, word-craft, wheel-rush} — word-tower/connections/brain-drill (the /brain hub) all graduated to public in past GAs; stop treating them as STEP-0 targets in future nightly runs.

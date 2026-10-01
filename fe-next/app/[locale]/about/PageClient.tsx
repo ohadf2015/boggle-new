@@ -135,7 +135,24 @@ export default function AboutPageClient(): React.ReactElement {
       <section className="mb-8">
         <h2 className={sectionHeadingClass}>{c.whatWeDo.title}</h2>
         <p className={cn(paragraphClass, 'mb-4')}>{c.whatWeDo.content}</p>
-        <p className={paragraphClass}>{c.whatWeDo.content2}</p>
+        <p className={paragraphClass}>
+          {(() => {
+            const parts = c.whatWeDo.content2.split('competitive leaderboards');
+            if (parts.length !== 2) return c.whatWeDo.content2;
+            return (
+              <>
+                {parts[0]}
+                <Link
+                  href={`/${locale}/leaderboard`}
+                  className={cn('underline font-bold', isDarkMode ? 'text-neo-cyan' : 'text-neo-pink-dark')}
+                >
+                  competitive leaderboards
+                </Link>
+                {parts[1]}
+              </>
+            );
+          })()}
+        </p>
       </section>
 
       {/* Section 6: Technology */}

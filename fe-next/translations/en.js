@@ -15026,7 +15026,8 @@ const en = {
     "sealedBid": {
       "title": "Bid in Secret",
       "step1": "Pick your strongest word",
-      "step2": "Words nobody else picks score double"
+      "step2": "Words nobody else picks score double",
+      "step3": "Lock fast — bonus shrinks over time"
     },
     "adventure": {
       "title": "Beat the Levels",
@@ -16651,6 +16652,7 @@ const en = {
       "foundHeader": "Found",
       "fogHeader": "Fog",
       "fogLabel": "Fog of War",
+      "fogAriaLabel": "Fog {percent} percent",
       "myStatsHeader": "Your stats",
       "bestWord": "Best",
       "wordsPerMin": "Pace",

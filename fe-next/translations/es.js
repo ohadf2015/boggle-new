@@ -16183,7 +16183,8 @@ const es = {
     "sealedBid": {
       "title": "Puja Secreta",
       "step1": "Elige tu palabra más fuerte",
-      "step2": "Palabras únicas valen el doble"
+      "step2": "Palabras únicas valen el doble",
+      "step3": "Bloquea rápido — el bono se reduce con el tiempo"
     },
     "adventure": {
       "title": "Bate Niveles",
@@ -18306,6 +18307,7 @@ const es = {
       "foundHeader": "Encontradas",
       "fogHeader": "Niebla",
       "fogLabel": "Niebla de guerra",
+      "fogAriaLabel": "Niebla {percent} por ciento",
       "myStatsHeader": "Tus estadísticas",
       "bestWord": "Mejor",
       "wordsPerMin": "Ritmo",

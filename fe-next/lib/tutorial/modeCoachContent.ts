@@ -146,6 +146,7 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
     steps: [
       { demo: 'icon', emoji: '🤫', captionKey: 'modeCoach.sealedBid.step1' },
       { demo: 'icon', emoji: '💎', captionKey: 'modeCoach.sealedBid.step2' },
+      { demo: 'icon', emoji: '⚡', captionKey: 'modeCoach.sealedBid.step3' },
     ],
   },
   adventure: {
