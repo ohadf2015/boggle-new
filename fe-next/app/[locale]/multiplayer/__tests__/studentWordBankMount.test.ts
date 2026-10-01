@@ -12,7 +12,8 @@ describe('multiplayer PageClient mounts StudentWordBank from the socket hook', (
   const src = readMpPageSource();
 
   it('imports the component and reads both fields off useMultiplayerSocket', () => {
-    expect(src).toMatch(/import \{ StudentWordBank \} from '@\/components\/education\/StudentWordBank'/);
+    // Accepts both static import and nextDynamic() lazy import of the same module
+    expect(src).toMatch(/'@\/components\/education\/StudentWordBank'/);
     expect(src).toMatch(/classroomLevel,\s*classroomWordBank,?\s*\n?\s*\} = useMultiplayerSocket\(/);
   });
 
