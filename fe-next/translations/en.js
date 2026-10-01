@@ -18105,6 +18105,59 @@ const en = {
       "total": "Total",
       "player": "Player"
     }
+  },
+  "eduStudent": {
+    "mode": {
+      "vocabQuiz": {
+        "rule": "Read the clue, tap the matching word. Quick and correct scores most."
+      },
+      "wordcraft": {
+        "rule": "Spell lesson words with your tiles and drop them on the board."
+      },
+      "pending": "Game on!",
+      "pendingRule": "Eyes up, your teacher is starting the round."
+    },
+    "lobby": {
+      "pickLook": "Pick a look",
+      "shuffleLooks": "Shuffle looks",
+      "buildLook": "Make your own look",
+      "readySticker": "Ready!"
+    },
+    "exit": {
+      "title": "Leave the game?",
+      "body": "You'll drop out of this round. The same code gets you back in.",
+      "stay": "Keep playing",
+      "leave": "Leave"
+    },
+    "join": {
+      "surpriseMe": "Surprise me",
+      "funNames": "Pixel Panda|Captain Otter|Turbo Toast|Disco Llama|Ninja Noodle|Rocket Raccoon|Cosmic Kiwi|Sneaky Sloth|Mega Mango|Laser Lemur|Bubble Bison|Jazzy Jaguar|Waffle Wizard|Thunder Duck|Comet Cat|Glitter Gecko|Banana Boss|Turbo Turtle|Quantum Quokka|Fuzzy Falcon"
+    },
+    "results": {
+      "nextUp": "Next up: {mode}",
+      "missedTitle": "Catch these next time",
+      "missedNone": "You found every lesson word. Legend!",
+      "hear": "Hear {word}",
+      "practiceThese": "Practice these",
+      "tapToHear": "Tap a word to hear it"
+    },
+    "wordcraft": {
+      "hintFirst": "Tap letters to build a word. It lands in the middle.",
+      "hintMore": "Add one more letter. Words need at least 2.",
+      "hintAnchor": "Now tap a square next to a tile on the board.",
+      "hintReady": "Looks good. Hit PLACE!",
+      "targetsProgress": "{found}/{total} lesson words",
+      "showTargets": "Show lesson words",
+      "hideTargets": "Hide lesson words"
+    },
+    "practice": {
+      "answerIs": "It's spelled",
+      "next": "Next word",
+      "finish": "See my results"
+    },
+    "cookie": {
+      "message": "We use cookies to count plays and show ads."
+    }
   }
 };
 

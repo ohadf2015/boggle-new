@@ -9,7 +9,7 @@ import { useGameMode } from '@/hooks/gameState/selectors';
 import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
 import { cn } from '@/lib/utils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { MODE_FILL, MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta } from './roundModes';
+import { MODE_FILL, MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, classroomRoundModeMeta } from './roundModes';
 import styles from './round.module.css';
 
 /** Max avatars in the "who am I about to play?" row; the rest become "+N". */
@@ -30,6 +30,8 @@ export interface MpCountdownStageProps {
   onComplete?: () => void;
   t?: (key: string) => string;
   players?: ReadonlyArray<CountdownPlayer>;
+  /** A classroom room: the teacher's mode wins over the store's board mode (null = not resolved yet). */
+  classroom?: { mode: string | null } | null;
 }
 
 
@@ -61,7 +63,7 @@ export function __resetCountdownDupGuard(): void {
  * hidden until GO. Mode badge + one-line rule tell you what you're about to
  * play; the roster row tells you who. Only the numeral animates (transform).
  */
-function MpCountdownStageImpl({ onComplete, t: tProp, players }: MpCountdownStageProps) {
+function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCountdownStageProps) {
   const { t: tCtx } = useLanguage();
   const t = tProp ?? tCtx;
   const [isDuplicate] = useState(() => Date.now() - lastCompletedAt < DUP_GUARD_MS);
@@ -70,7 +72,8 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players }: MpCountdownStag
   const { playCountdownBeep } = useSoundEffects();
   const reduceMotion = useShouldReduceMotion();
   const [staticLayer] = useState(() => prefersStaticFullscreenOverlay());
-  const mode = roundModeMeta(useGameMode());
+  const storeMode = useGameMode();
+  const mode = classroom ? classroomRoundModeMeta(classroom.mode) : roundModeMeta(storeMode);
 
   // onComplete in a ref: parent re-renders (timeUpdate) pass new callbacks and
   // must never reset the countdown clock (the old "stuck at 3" bug).

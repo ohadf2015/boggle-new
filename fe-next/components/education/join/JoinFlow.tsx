@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Dices, Sparkles } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { JoinCodeField, JOIN_CODE_LENGTH, sanitizeJoinCode } from './JoinCodeField';
 import { useJoinFlow } from './useJoinFlow';
 import { useFitStage } from './fitStage';
+import { pickFunName } from './funName';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { PopPressButton } from '@/components/motion/PopPressButton';
 
@@ -75,6 +76,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
   const flow = useJoinFlow(initialCode, handleSuccessBeforeNavigation);
   const nameRef = useRef<HTMLInputElement>(null);
   const [pasteNoteKey, setPasteNoteKey] = useState<string | null>(null);
+  const [diceSpin, setDiceSpin] = useState(0);
 
   // Land on the nickname with the keyboard already up: on the QR path this is
   // the only field between the student and the game.
@@ -124,7 +126,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
         dir={dir}
         className={cn(
           'flex flex-col overflow-hidden bg-neo-navy text-neo-white',
-          fit ? 'fixed inset-0 items-center justify-center' : 'relative min-h-dvh'
+          fit ? 'fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] items-center justify-center' : 'relative min-h-dvh pb-[var(--cookie-consent-height,0px)]'
         )}
       >
         {/* Loud, cheap, and behind everything — no layout cost, no tween. */}
@@ -286,21 +288,37 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
                 >
                   {t(`${K}.nameLabel`)}
                 </label>
-                <input
-                  id="join-nickname"
-                  ref={nameRef}
-                  value={flow.name}
-                  onChange={(e) => flow.setName(e.target.value)}
-                  maxLength={40}
-                  autoComplete="off"
-                  enterKeyHint="go"
-                  placeholder={t(`${K}.namePlaceholder`)}
-                  aria-invalid={flow.nameError || undefined}
-                  className={cn(
-                    'w-full rounded-neo border-3 border-neo-black bg-neo-cream px-4 py-4 text-center font-neo-display text-2xl font-black text-neo-navy shadow-hard outline-none placeholder:font-neo-body placeholder:text-xl placeholder:font-bold placeholder:text-neo-navy/40',
-                    flow.nameError && 'bg-neo-red/20 shadow-hard-pink'
-                  )}
-                />
+                <div className="relative">
+                  <input
+                    id="join-nickname"
+                    ref={nameRef}
+                    value={flow.name}
+                    onChange={(e) => flow.setName(e.target.value)}
+                    maxLength={40}
+                    autoComplete="off"
+                    enterKeyHint="go"
+                    placeholder={t(`${K}.namePlaceholder`)}
+                    aria-invalid={flow.nameError || undefined}
+                    className={cn(
+                      'w-full rounded-neo border-3 border-neo-black bg-neo-cream py-4 pe-16 ps-4 text-center font-neo-display text-2xl font-black text-neo-navy shadow-hard outline-none placeholder:font-neo-body placeholder:text-xl placeholder:font-bold placeholder:text-neo-navy/40',
+                      flow.nameError && 'border-neo-red shadow-hard-pink motion-safe:animate-neo-shake'
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      flow.setName(pickFunName(t('eduStudent.join.funNames'), flow.name));
+                      setDiceSpin((n) => n + 1);
+                      nameRef.current?.focus();
+                    }}
+                    aria-label={t('eduStudent.join.surpriseMe')}
+                    title={t('eduStudent.join.surpriseMe')}
+                    className="absolute end-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm transition-transform active:translate-y-[-45%] active:shadow-none"
+                  >
+                    <Dices key={diceSpin} aria-hidden="true" className="size-6 motion-safe:animate-[lc-join-dice_450ms_ease-out]" strokeWidth={2.5} />
+                  </button>
+                  <style>{'@keyframes lc-join-dice{0%{transform:rotate(0) scale(.8)}60%{transform:rotate(300deg) scale(1.15)}100%{transform:rotate(360deg) scale(1)}}'}</style>
+                </div>
                 <p className="font-neo-body text-sm text-neo-white/70">{t(`${K}.nameHint`)}</p>
               </div>
             ) : (

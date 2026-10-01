@@ -19060,6 +19060,59 @@ const es = {
       "total": "Total",
       "player": "Jugador"
     }
+  },
+  "eduStudent": {
+    "mode": {
+      "vocabQuiz": {
+        "rule": "Lee la pista y toca la palabra que encaja. Rápido y bien es lo que más puntúa."
+      },
+      "wordcraft": {
+        "rule": "Forma palabras de la lección con tus fichas y colócalas en el tablero."
+      },
+      "pending": "¡A jugar!",
+      "pendingRule": "Atentos, tu profe está empezando la ronda."
+    },
+    "lobby": {
+      "pickLook": "Elige un look",
+      "shuffleLooks": "Mezclar looks",
+      "buildLook": "Crea tu propio look",
+      "readySticker": "¡Listo!"
+    },
+    "exit": {
+      "title": "¿Salir del juego?",
+      "body": "Saldrás de esta ronda. Con el mismo código puedes volver.",
+      "stay": "Seguir jugando",
+      "leave": "Salir"
+    },
+    "join": {
+      "surpriseMe": "Sorpréndeme",
+      "funNames": "Panda Píxel|Capitán Nutria|Tostada Turbo|Llama Disco|Fideo Ninja|Mapache Cohete|Kiwi Cósmico|Perezoso Sigiloso|Mango Mega|Lémur Láser|Bisonte Burbuja|Jaguar Jazzero|Mago Gofre|Pato Trueno|Gato Cometa|Geco Brillante|Jefe Banana|Tortuga Turbo|Quokka Cuántico|Halcón Peludo"
+    },
+    "results": {
+      "nextUp": "Lo siguiente: {mode}",
+      "missedTitle": "Atrapa estas la próxima vez",
+      "missedNone": "Encontraste todas las palabras de la lección. ¡Crack!",
+      "hear": "Escuchar {word}",
+      "practiceThese": "Practicarlas",
+      "tapToHear": "Toca una palabra para escucharla"
+    },
+    "wordcraft": {
+      "hintFirst": "Toca letras para formar una palabra. Caerá en el centro.",
+      "hintMore": "Una letra más. Las palabras necesitan al menos 2.",
+      "hintAnchor": "Ahora toca una casilla junto a una ficha del tablero.",
+      "hintReady": "¡Bien! Pulsa PONER.",
+      "targetsProgress": "{found}/{total} palabras de la lección",
+      "showTargets": "Ver palabras de la lección",
+      "hideTargets": "Ocultar palabras de la lección"
+    },
+    "practice": {
+      "answerIs": "Se escribe",
+      "next": "Siguiente palabra",
+      "finish": "Ver mis resultados"
+    },
+    "cookie": {
+      "message": "Usamos cookies para contar partidas y mostrar anuncios."
+    }
   }
 };
 

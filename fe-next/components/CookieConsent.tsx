@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { markPromoShown } from '@/lib/landing/promoOverlaySession';
 import { createPortal } from 'react-dom';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -56,8 +57,12 @@ function useModalOwnsScreen(): boolean {
  * Still non-blocking: no backdrop, no scroll-lock, no Escape dismiss. Choice is
  * still required before non-essential scripts fire.
  */
+/** Student phone pages: one short line and one row of choices, so GO and READY stay clear. */
+const STUDENT_ROUTE = /^\/(?:en|he|sv|ja|es|ru)\/(?:join|student)(?:\/|$)/;
+
 export default function CookieConsent() {
   const { t, language } = useLanguage();
+  const dense = STUDENT_ROUTE.test(usePathname() ?? '');
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [visible, setVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -209,6 +214,7 @@ export default function CookieConsent() {
       aria-modal="false"
       aria-label={t('cookieConsent.title')}
       data-cookie-consent="compact-bar"
+      data-density={dense ? 'dense' : 'regular'}
       className={cn(
         'fixed bottom-0 left-0 right-0',
         // z-[200] wins every stacking contest — including the ones it should
@@ -221,11 +227,12 @@ export default function CookieConsent() {
         // No min-h-[280px]: that forced the fold-stealing ~350px band.
         showDetails ? 'max-h-[50vh] overflow-y-auto' : 'overflow-visible',
         'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-hard-lg',
-        'px-3 py-2 sm:px-4 sm:py-3 animate-slide-up pointer-events-auto'
+        dense ? 'px-2.5 py-1.5 sm:px-4 sm:py-2' : 'px-3 py-2 sm:px-4 sm:py-3',
+        'animate-slide-up pointer-events-auto'
       )}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+      <div className={cn('flex flex-col sm:flex-row sm:items-center sm:gap-3', dense ? 'gap-1.5' : 'gap-2')}>
         <div className="flex min-w-0 flex-1 items-start gap-2.5 sm:items-center">
           {/* Small inline mascot — brand personality without owning the fold.
               Hidden on mobile to reduce reserved height; visible on tablet+ */}
@@ -237,11 +244,11 @@ export default function CookieConsent() {
             className="hidden sm:block mt-0.5 h-10 w-10 shrink-0 object-contain sm:mt-0"
           />
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-bold font-neo-display text-neo-white sm:text-base">
+            <h2 className={cn('text-sm font-bold font-neo-display text-neo-white sm:text-base', dense && 'sr-only')}>
               {t('cookieConsent.title')}
             </h2>
             <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 sm:text-[13px]">
-              {t('cookieConsent.message')}{' '}
+              {t(dense ? 'eduStudent.cookie.message' : 'cookieConsent.message')}{' '}
               <a
                 href={`/${language}/legal/cookies`}
                 className="font-bold text-neo-cyan hover:underline"
@@ -257,7 +264,7 @@ export default function CookieConsent() {
             (Accept, Decline, Customize) have equal weight (border-3, text-sm) so
             users have a lawful choice. Customize uses cyan borders to distinguish
             its affordance from the other two. */}
-        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+        <div className={cn('shrink-0 items-center sm:flex sm:justify-end', dense ? 'grid grid-cols-3 gap-1.5' : 'flex flex-wrap gap-2')}>
           <button
             type="button"
             onClick={handleAcceptAll}
@@ -266,7 +273,8 @@ export default function CookieConsent() {
               'bg-neo-cyan text-neo-black',
               'border-3 border-neo-black rounded-neo shadow-hard-sm',
               'hover:shadow-hard active:shadow-hard-pressed',
-              'transition-all duration-100'
+              'transition-all duration-100',
+              dense && 'min-w-0 px-1 normal-case leading-tight sm:px-3 sm:uppercase'
             )}
           >
             {t('cookieConsent.accept')}
@@ -277,7 +285,8 @@ export default function CookieConsent() {
             className={cn(
               'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase sm:flex-none',
               'text-neo-cyan hover:text-neo-white',
-              'border-3 border-neo-cyan rounded-neo transition-colors duration-100'
+              'border-3 border-neo-cyan rounded-neo transition-colors duration-100',
+              dense && 'min-w-0 px-1 normal-case leading-tight sm:px-3 sm:uppercase'
             )}
           >
             {t('cookieConsent.customize')}
@@ -288,7 +297,8 @@ export default function CookieConsent() {
             className={cn(
               'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase sm:flex-none',
               'text-neo-white',
-              'border-3 border-neo-cream rounded-neo transition-colors duration-100'
+              'border-3 border-neo-cream rounded-neo transition-colors duration-100',
+              dense && 'min-w-0 px-1 normal-case leading-tight sm:px-3 sm:uppercase'
             )}
           >
             {t('cookieConsent.decline')}
