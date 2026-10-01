@@ -1912,12 +1912,12 @@ const en = {
     },
     "education": {
       "title": "LexiClash Education - Word Games for Classrooms & Teachers",
-      "description": "Bring word games into the classroom! LexiClash Education helps teachers create vocabulary lessons, track student progress, and make learning engaging with multiplayer word battles.",
+      "description": "Word games for classrooms — create vocabulary lessons, track progress, and run multiplayer word battles. No student logins needed. Free.",
       "ogTitle": "LexiClash Education - Classroom Word Games",
       "ogDescription": "Word games for classrooms! Create lessons, track progress, and make vocabulary learning fun."
     },
     "educationClassroomGame": {
-      "title": "Classroom Word Game Live - Teacher-Led Multiplayer | LexiClash",
+      "title": "Classroom Word Game Live — Teacher Multiplayer | LexiClash",
       "description": "Launch a live word game for your classroom. The teacher dashboard runs a real-time multiplayer round — students join from any device, no signup needed.",
       "ogTitle": "Classroom Word Game Live - Teacher Dashboard",
       "ogDescription": "Start a live multiplayer word round for your class — join from any device, no signup."
