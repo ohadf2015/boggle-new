@@ -15,6 +15,20 @@ import {
 } from '@/lib/supabase/education';
 import logger from '@/utils/logger';
 import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
+import { isMissingColumnError } from '@/lib/education/libraryTypes';
+
+/** Discover metadata; dropped silently on a DB without the library migration. */
+export interface LibraryFieldsInput {
+  gradeBand?: string | null;
+  topic?: string | null;
+}
+
+function libraryColumns(data: LibraryFieldsInput): Record<string, string | null> {
+  const cols: Record<string, string | null> = {};
+  if (data.gradeBand !== undefined) cols.grade_band = data.gradeBand;
+  if (data.topic !== undefined) cols.topic = data.topic;
+  return cols;
+}
 
 interface UseLessonsState {
   lessons: VocabularyLesson[];
@@ -32,18 +46,25 @@ interface UseLessonsActions {
     classroomId?: string;
     isPublic?: boolean;
     sourceGameCode?: string;
-  }) => Promise<{ success: boolean; data?: VocabularyLesson; error?: string }>;
+  } & LibraryFieldsInput) => Promise<{ success: boolean; data?: VocabularyLesson; error?: string }>;
   updateLesson: (id: string, updates: Partial<{
     name: string;
     description: string | null;
     words: VocabularyWord[];
     classroomId: string | null;
     isPublic: boolean;
-  }>) => Promise<{ success: boolean; error?: string }>;
+  }> & LibraryFieldsInput) => Promise<{ success: boolean; error?: string }>;
   deleteLesson: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export type UseLessonsReturn = UseLessonsState & UseLessonsActions;
+
+// Every useLessons() keeps a private copy; a write anywhere must refresh them all.
+const lessonListSubscribers = new Set<() => void>();
+
+export function notifyLessonsChanged(): void {
+  lessonListSubscribers.forEach((notify) => notify());
+}
 
 /**
  * Hook for managing vocabulary lessons
@@ -55,6 +76,7 @@ export type UseLessonsReturn = UseLessonsState & UseLessonsActions;
  */
 export function useLessons(classroomId?: string): UseLessonsReturn {
   const { isAuthenticated, user } = useAuth();
+  const userId = user?.id;
   const isMounted = useMounted();
 
   const [state, setState] = useState<UseLessonsState>({
@@ -65,7 +87,7 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
 
   // Fetch all lessons for the current teacher
   const fetchLessons = useCallback(async () => {
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !userId) {
       setState(prev => ({
         ...prev,
         lessons: [],
@@ -75,7 +97,7 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
     }
 
     try {
-      const { data, error } = await getLessons(user.id, classroomId);
+      const { data, error } = await getLessons(userId, classroomId);
 
       if (isMounted.current) {
         setState({
@@ -94,7 +116,14 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
         }));
       }
     }
-  }, [isAuthenticated, user, classroomId, isMounted]);
+  }, [isAuthenticated, userId, classroomId, isMounted]);
+
+  // Background reconcile when another list (or a library copy) writes; no spinner flash.
+  useEffect(() => {
+    const notify = () => { void fetchLessons(); };
+    lessonListSubscribers.add(notify);
+    return () => { lessonListSubscribers.delete(notify); };
+  }, [fetchLessons]);
 
   // Refresh lesson list
   const refresh = useCallback(async () => {
@@ -111,13 +140,13 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
     classroomId?: string;
     isPublic?: boolean;
     sourceGameCode?: string;
-  }): Promise<{ success: boolean; data?: VocabularyLesson; error?: string }> => {
+  } & LibraryFieldsInput): Promise<{ success: boolean; data?: VocabularyLesson; error?: string }> => {
     if (!user) {
       return { success: false, error: 'Not authenticated' };
     }
 
     try {
-      const { data: lesson, error } = await createLessonAPI({
+      const base = {
         teacher_id: user.id,
         classroom_id: data.classroomId || null,
         name: data.name,
@@ -126,7 +155,12 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
         words: data.words,
         is_public: data.isPublic || false,
         source_game_code: data.sourceGameCode || null,
-      });
+      };
+      const extra = libraryColumns(data);
+      let { data: lesson, error } = await createLessonAPI({ ...base, ...extra } as typeof base);
+      if (error && Object.keys(extra).length > 0 && isMissingColumnError(error)) {
+        ({ data: lesson, error } = await createLessonAPI(base));
+      }
 
       if (error) {
         trackEduTeacherActionFailed({ action: 'create_lesson', reason: error.message });
@@ -141,6 +175,7 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
         }));
       }
 
+      notifyLessonsChanged();
       return { success: true, data: lesson || undefined };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to create lesson';
@@ -159,7 +194,7 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
       words: VocabularyWord[];
       classroomId: string | null;
       isPublic: boolean;
-    }>
+    }> & LibraryFieldsInput
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       // Map friendly names to database column names
@@ -169,8 +204,12 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
       if (updates.words !== undefined) dbUpdates.words = updates.words;
       if (updates.classroomId !== undefined) dbUpdates.classroom_id = updates.classroomId;
       if (updates.isPublic !== undefined) dbUpdates.is_public = updates.isPublic;
+      const extra = libraryColumns(updates);
 
-      const { error } = await updateLessonAPI(id, dbUpdates);
+      let { error } = await updateLessonAPI(id, { ...dbUpdates, ...extra });
+      if (error && Object.keys(extra).length > 0 && isMissingColumnError(error)) {
+        ({ error } = await updateLessonAPI(id, dbUpdates));
+      }
 
       if (error) {
         return { success: false, error: error.message };
@@ -189,12 +228,14 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
                   ...(updates.words !== undefined && { words: updates.words }),
                   ...(updates.classroomId !== undefined && { classroom_id: updates.classroomId }),
                   ...(updates.isPublic !== undefined && { is_public: updates.isPublic }),
+                  ...extra,
                 }
               : l
           ),
         }));
       }
 
+      notifyLessonsChanged();
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to update lesson';
@@ -220,6 +261,7 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
         }));
       }
 
+      notifyLessonsChanged();
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to delete lesson';
@@ -378,6 +420,7 @@ export function useLesson(lessonId: string | undefined): UseLessonReturn {
         }));
       }
 
+      notifyLessonsChanged();
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to update lesson';
@@ -425,6 +468,7 @@ export function useLesson(lessonId: string | undefined): UseLessonReturn {
         });
       }
 
+      notifyLessonsChanged();
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to delete lesson';

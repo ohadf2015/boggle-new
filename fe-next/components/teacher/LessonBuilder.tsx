@@ -1,465 +1,303 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { Compass, Plus } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useLessonDraft } from '@/hooks/useLessonDraft';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { BulkImportEnhanced } from './lesson-creation';
-import LessonBuilderCreateDialog from './LessonBuilderCreateDialog';
-import LessonBuilderEditDialog from './LessonBuilderEditDialog';
-import LessonBuilderDraftPrompt from './LessonBuilderDraftPrompt';
-import { Plus, CheckCircle, AlertCircle, Pencil, Play } from 'lucide-react';
-import toast from 'react-hot-toast';
-import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/education';
+import type { Language } from '@/lib/supabase/education';
 import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
+import { createLessonAndAssign } from '@/lib/education/createLessonWithAssignment';
+import { publishList } from '@/lib/education/libraryClient';
+import { paginate } from '@/lib/education/library';
+import type { LibraryLesson } from '@/lib/education/libraryTypes';
+import LessonBuilderDraftPrompt from './LessonBuilderDraftPrompt';
+import ListEditorSheet, { emptyListDraft, type ListDraft } from './lesson-creation/ListEditorSheet';
+import MyListCard from './lesson-creation/MyListCard';
 import { StarterPacksSection } from './StarterPacksSection';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
-import { createLessonAndAssign } from '@/lib/education/createLessonWithAssignment';
 
 export interface LessonBuilderProps {
-  /**
-   * Words the teacher's class just missed, arriving from `?reviewWords=` via the
-   * "Practice these words" button on the after-game insights card. Non-empty
-   * opens the create dialog pre-filled, so the CTA lands on a half-written
-   * lesson instead of a reloaded page with the words dropped.
-   */
+  /** `?reviewWords=` from the after-game card; non-empty opens the editor pre-filled. */
   initialReviewWords?: string[];
+  onBrowseDiscover?: () => void;
+  hideDiscoverLink?: boolean;
 }
 
-export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps = {}) {
+const PAGE_SIZE = 9;
+
+function lessonToDraft(lesson: LibraryLesson): ListDraft {
+  return {
+    id: lesson.id,
+    name: lesson.name,
+    description: lesson.description ?? '',
+    language: lesson.language,
+    gradeBand: lesson.grade_band ?? null,
+    topic: lesson.topic ?? null,
+    classroomId: lesson.classroom_id ?? '',
+    isPublic: lesson.is_public === true,
+    words: [...lesson.words],
+  };
+}
+
+export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hideDiscoverLink }: LessonBuilderProps = {}) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { lessons, isLoading, createLesson, updateLesson } = useLessons();
   const { classrooms } = useClassrooms();
   const { user } = useAuth();
-
   const { hasRestorableDraft, saveDraft, clearDraft, restoreDraft, draftAge } = useLessonDraft();
 
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    language: language as Language,
-    classroomId: '',
-    isPublic: false,
-  });
-  const [words, setWords] = useState<VocabularyWord[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorInitial, setEditorInitial] = useState<ListDraft>(() => emptyListDraft(language as Language));
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
-  // Collapsed by default: pasting a list is the path teachers actually take, and
-  // an expanded template picker sat on top of it. The review-words path already
-  // relied on this being false.
-  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
-
-  const [editingLesson, setEditingLesson] = useState<VocabularyLesson | null>(null);
-  const [editWords, setEditWords] = useState<VocabularyWord[]>([]);
-  const [isEditSaving, setIsEditSaving] = useState(false);
-
   const [isCreatingFromPack, setIsCreatingFromPack] = useState(false);
+  const [sharingId, setSharingId] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [editorKey, setEditorKey] = useState(0);
+  const latestDraft = useRef<ListDraft | null>(null);
 
-  // Offer to resume only work from an EARLIER session. Keying this on
-  // `hasDraft` made the 30-second autosave below flip it true again and
-  // re-open the prompt mid-edit, blocking the form every half minute.
+  const openCreate = useCallback((seed?: Partial<ListDraft>) => {
+    setEditorInitial({ ...emptyListDraft(language as Language), ...seed });
+    setEditorKey((k) => k + 1);
+    setEditorOpen(true);
+  }, [language]);
+
   useEffect(() => {
-    if (isCreateDialogOpen && hasRestorableDraft) setShowDraftPrompt(true);
-  }, [isCreateDialogOpen, hasRestorableDraft]);
+    if (editorOpen && !editorInitial.id && hasRestorableDraft) setShowDraftPrompt(true);
+  }, [editorOpen, editorInitial.id, hasRestorableDraft]);
 
-  // Arrive-with-words: open the creator already holding the class's missed
-  // words. Runs once per set of words — reopening the dialog by hand later must
-  // not re-seed it, and the template picker is skipped because the word list is
-  // already the point.
   const seededReviewWordsRef = useRef<string | null>(null);
   useEffect(() => {
     if (!initialReviewWords?.length) return;
     const signature = initialReviewWords.join('|');
     if (seededReviewWordsRef.current === signature) return;
     seededReviewWordsRef.current = signature;
-
-    setFormData((prev) => ({
-      ...prev,
-      name: prev.name || t('teacher.lesson.reviewSetName'),
-      description: prev.description || t('teacher.lesson.reviewSetDescription'),
-    }));
-    setWords(initialReviewWords.map((word) => ({ word, canIntegrate: true })));
-    setShowTemplateSelector(false);
-    setIsCreateDialogOpen(true);
-  }, [initialReviewWords, t]);
+    openCreate({
+      name: t('teacher.lesson.reviewSetName'),
+      description: t('teacher.lesson.reviewSetDescription'),
+      words: initialReviewWords.map((word) => ({ word, canIntegrate: true })),
+    });
+  }, [initialReviewWords, t, openCreate]);
 
   useEffect(() => {
-    if (!isCreateDialogOpen) return;
-    if (!formData.name && words.length === 0) return;
+    if (!editorOpen || editorInitial.id) return;
     const interval = setInterval(() => {
-      saveDraft({ name: formData.name, description: formData.description, language: formData.language, classroomId: formData.classroomId, words });
+      const d = latestDraft.current;
+      if (!d || (!d.name && d.words.length === 0)) return;
+      saveDraft({ name: d.name, description: d.description, language: d.language, classroomId: d.classroomId, words: d.words });
     }, 30000);
     return () => clearInterval(interval);
-  }, [isCreateDialogOpen, formData, words, saveDraft]);
-
-  const handleBulkImport = useCallback((importedWords: VocabularyWord[]) => {
-    setWords((prev) => [...prev, ...importedWords]);
-    toast.success(t('teacher.lesson.bulkImportDetected', { count: importedWords.length }));
-  }, [t]);
-
-  const handleTemplateSelect = useCallback((template: {
-    id: string; name: string; description: string; language: Language; wordCount: number; category: string; words: VocabularyWord[];
-  }) => {
-    setFormData(prev => ({ ...prev, name: template.name, description: template.description, language: template.language }));
-    setWords(template.words);
-    setShowTemplateSelector(false);
-    toast.success(t('teacher.lesson.templateLoaded', { count: template.words.length }));
-  }, [t]);
+  }, [editorOpen, editorInitial.id, saveDraft]);
 
   const handleRestoreDraft = useCallback(() => {
-    const draftData = restoreDraft();
-    if (draftData) {
-      setFormData({ name: draftData.name, description: draftData.description, language: draftData.language, classroomId: draftData.classroomId, isPublic: false });
-      setWords(draftData.words);
+    const d = restoreDraft();
+    if (d) {
+      setEditorInitial({ ...emptyListDraft(d.language), name: d.name, description: d.description, classroomId: d.classroomId, words: d.words, id: undefined });
+      setEditorKey((k) => k + 1);
       toast.success(t('teacher.lesson.resumeDraft'));
     }
     setShowDraftPrompt(false);
   }, [restoreDraft, t]);
 
-  const handleDiscardDraft = useCallback(() => { clearDraft(); setShowDraftPrompt(false); }, [clearDraft]);
-
-  const formatDraftAge = useCallback((ageMs: number | null): string => {
+  const formatDraftAge = (ageMs: number | null): string => {
     if (!ageMs) return '';
     const minutes = Math.floor(ageMs / 60000);
-    if (minutes < 60) return `${minutes}m ago`;
-    return `${Math.floor(minutes / 60)}h ago`;
-  }, []);
+    return minutes < 60 ? `${minutes}m ago` : `${Math.floor(minutes / 60)}h ago`;
+  };
 
-  const handleStartGame = (lesson: VocabularyLesson) => {
-    router.push(`/${language}/education/classroom-game?lessonId=${lesson.id}`);
+  const shareResultToast = useCallback((result: Awaited<ReturnType<typeof publishList>>, isPublic: boolean) => {
+    if (result.ok) toast.success(isPublic ? t('eduLibrary.share.nowPublic') : t('eduLibrary.share.nowPrivate'));
+    else if (result.reason === 'moderation') toast.error(t('eduLibrary.share.blocked'));
+    else toast.error(t('eduLibrary.share.failed'));
+  }, [t]);
+
+  const handleSave = async (draft: ListDraft): Promise<boolean> => {
+    const extras = { gradeBand: draft.gradeBand, topic: draft.topic };
+    if (draft.id) {
+      const before = lessons.find((l) => l.id === draft.id) as LibraryLesson | undefined;
+      const result = await updateLesson(draft.id, { name: draft.name, description: draft.description || null, words: draft.words, ...extras });
+      if (!result.success) {
+        toast.error(result.error || t('teacher.lesson.error.updateFailed'));
+        return false;
+      }
+      if ((before?.is_public === true) !== draft.isPublic) {
+        shareResultToast(await publishList(draft.id, draft.isPublic), draft.isPublic);
+      } else {
+        toast.success(t('eduLibrary.editor.savedToast', { name: draft.name }));
+      }
+      setEditorOpen(false);
+      return true;
+    }
+
+    const result = await createLessonAndAssign({
+      lesson: {
+        name: draft.name,
+        description: draft.description || undefined,
+        language: draft.language,
+        words: draft.words,
+        classroomId: draft.classroomId || undefined,
+      },
+      teacherId: user?.id ?? '',
+      createLesson: (data) => createLesson({ ...data, ...extras }),
+    });
+    if (!result.success) {
+      toast.error(result.error || t('teacher.lesson.error.createFailed'));
+      return false;
+    }
+    const classroomName = classrooms.find((c) => c.id === draft.classroomId)?.name;
+    if (result.assigned && classroomName) toast.success(t('teacher.lesson.savedAndAssigned', { classroom: classroomName }));
+    else if (result.assignmentError) toast.error(t('teacher.lesson.savedNotAssigned', { classroom: classroomName ?? '' }));
+    else toast.success(t('eduLibrary.editor.savedToast', { name: draft.name }));
+    if (draft.isPublic && result.lesson?.id) shareResultToast(await publishList(result.lesson.id, true), true);
+    clearDraft();
+    setEditorOpen(false);
+    setPage(0);
+    return true;
+  };
+
+  const handleToggleShare = async (lesson: LibraryLesson) => {
+    setSharingId(lesson.id);
+    const next = lesson.is_public !== true;
+    shareResultToast(await publishList(lesson.id, next), next);
+    setSharingId(null);
   };
 
   const handleSelectStarterPack = useCallback(
-    async (pack: { name: string; description: string; language: string; words: any[] }) => {
+    async (pack: { name: string; description: string; language: string; words: Parameters<typeof convertPackWordsToLessonWords>[0] }) => {
       setIsCreatingFromPack(true);
-      try {
-        const vocabularyWords = convertPackWordsToLessonWords(pack.words);
-
-        const result = await createLesson({
-          name: pack.name,
-          description: pack.description,
-          language: pack.language as Language,
-          words: vocabularyWords,
-        });
-
-        if (result.success && result.data) {
-          toast.success(t('education.lesson.created'));
-          // Reset and show the new lesson in the list
-        } else {
-          toast.error(result.error || t('education.lesson.creationFailed'));
-        }
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-        toast.error(t('education.lesson.creationFailed'));
-      } finally {
-        setIsCreatingFromPack(false);
-      }
+      const result = await createLesson({
+        name: pack.name,
+        description: pack.description,
+        language: pack.language as Language,
+        words: convertPackWordsToLessonWords(pack.words),
+      });
+      setIsCreatingFromPack(false);
+      if (result.success) toast.success(t('education.lesson.created'));
+      else toast.error(result.error || t('education.lesson.creationFailed'));
     },
-    [createLesson, t]
+    [createLesson, t],
   );
 
-  const handleOpenEdit = (lesson: VocabularyLesson) => {
-    setEditingLesson(lesson);
-    setEditWords([...lesson.words]);
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editingLesson) return;
-    setIsEditSaving(true);
-    const result = await updateLesson(editingLesson.id, { words: editWords });
-    setIsEditSaving(false);
-    if (result.success) { toast.success(t('teacher.lesson.saved')); setEditingLesson(null); }
-    else { toast.error(result.error || t('teacher.lesson.error.updateFailed')); }
-  };
-
-  const handleCreate = async () => {
-    if (!formData.name.trim()) { toast.error(t('teacher.lesson.validation.nameRequired')); return; }
-    if (words.length === 0) { toast.error(t('teacher.lesson.validation.wordsRequired')); return; }
-
-    setIsSaving(true);
-    // Picking a classroom here must ALSO assign the lesson to it. Setting only
-    // `vocabulary_lessons.classroom_id` left students on "no lessons assigned".
-    const result = await createLessonAndAssign({
-      lesson: {
-        name: formData.name.trim(),
-        description: formData.description.trim() || undefined,
-        language: formData.language,
-        words,
-        classroomId: formData.classroomId || undefined,
-        isPublic: formData.isPublic,
-      },
-      teacherId: user?.id ?? '',
-      createLesson,
-    });
-    setIsSaving(false);
-
-    if (!result.success) {
-      toast.error(result.error || t('teacher.lesson.error.createFailed'));
-      return;
-    }
-
-    const classroomName = classrooms.find((c) => c.id === formData.classroomId)?.name;
-    if (result.assigned && classroomName) {
-      // Say where it went, so "did my class get this?" needs no second guess.
-      toast.success(t('teacher.lesson.savedAndAssigned', { classroom: classroomName }));
-    } else if (result.assignmentError) {
-      // The lesson exists but the class cannot see it — never a plain success.
-      toast.error(t('teacher.lesson.savedNotAssigned', { classroom: classroomName ?? '' }));
-    } else {
-      toast.success(t('teacher.lesson.saved'));
-    }
-
-    clearDraft();
-    setIsCreateDialogOpen(false);
-    setFormData({ name: '', description: '', language: language as Language, classroomId: '', isPublic: false });
-    setWords([]);
-  };
+  const browseDiscover = onBrowseDiscover ?? (() => router.push(`/${language}/teacher/curriculum?tab=discover`));
+  const paged = useMemo(() => paginate(lessons as LibraryLesson[], page, PAGE_SIZE), [lessons, page]);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="h-10 w-40 bg-neo-white/10 rounded animate-pulse" />
-        </div>
-        <SkeletonGrid count={3} skeleton={LessonCardSkeleton} />
-      </div>
-    );
+    return <SkeletonGrid count={3} skeleton={LessonCardSkeleton} />;
   }
 
   return (
-    <div className="space-y-6">
-      {/* What a lesson is, in one line — "lesson", "word list", "assignment" and
-          "classroom game" otherwise meet a new teacher with no definition. */}
-      <div className="flex flex-wrap justify-between items-end gap-3">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-xl font-neo-display text-neo-white text-balance">
-            {t('teacher.lesson.sectionTitle')}
-          </h2>
-          <p className="text-sm text-neo-white/80 text-pretty max-w-prose">{t('teacher.lesson.sectionHint')}</p>
+          <h2 className="font-neo-display text-xl text-neo-white text-balance">{t('teacher.lesson.sectionTitle')}</h2>
+          <p className="max-w-prose text-sm text-neo-white/80 text-pretty">{t('teacher.lesson.sectionHint')}</p>
         </div>
-        <Button
-          onClick={() => {
-            setFormData({ name: '', description: '', language: language as Language, classroomId: '', isPublic: false });
-            setWords([]);
-            setIsCreateDialogOpen(true);
-          }}
-          className={cn(
-            'bg-neo-cyan text-neo-black font-neo-body font-bold',
-            'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed',
-            'transition-all'
-          )}
-        >
-          <Plus className="w-5 h-5 me-2" />
-          {t('teacher.lesson.create')}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {!hideDiscoverLink && <button
+            type="button"
+            onClick={browseDiscover}
+            data-testid="lessons-browse-discover"
+            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 font-neo-display text-sm font-bold uppercase text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
+          >
+            <Compass className="size-4 text-neo-pink" aria-hidden="true" />
+            {t('eduLibrary.tabs.discover')}
+          </button>}
+          <button
+            type="button"
+            data-testid="lessons-create"
+            onClick={() => openCreate()}
+            className={cn(
+              'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cyan px-4 font-neo-display text-sm font-bold uppercase text-neo-black',
+              'shadow-hard transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none',
+            )}
+          >
+            <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
+            {t('eduLibrary.editor.newList')}
+          </button>
+        </div>
       </div>
 
-      {/* Lessons Grid */}
       {lessons.length === 0 ? (
-        <div className={isCreatingFromPack ? 'opacity-50 pointer-events-none' : ''}>
-          <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50 mb-6">
-            <CardContent className="p-6">
-              <StarterPacksSection onSelectPack={handleSelectStarterPack} />
-            </CardContent>
-          </Card>
-          {isCreatingFromPack && (
-            <div className="text-center mb-6">
-              <div className="inline-block">
-                <div className="animate-spin">
-                  <Plus className="w-6 h-6 text-neo-cyan" />
-                </div>
-              </div>
-              <p className="text-neo-white mt-2">{t('teacher.classroom.settingUp')}</p>
-            </div>
-          )}
-          <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50">
-            <CardContent className="py-12 text-center">
-              <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
-                {t('teacher.lesson.noLessons')}
-              </h3>
-              <p className="text-neo-white mb-6 text-pretty">{t('teacher.lesson.createFirst')}</p>
-              <Button
-                onClick={() => setIsCreateDialogOpen(true)}
-                className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-              >
-                <Plus className="w-5 h-5 me-2" />
-                {t('teacher.lesson.create')}
-              </Button>
-            </CardContent>
-          </Card>
+        <div className={cn('space-y-4', isCreatingFromPack && 'pointer-events-none opacity-60')}>
+          <div className="rounded-neo border-3 border-dashed border-neo-cream/40 bg-neo-navy-light/60 px-4 py-6 text-center">
+            <h3 className="font-neo-display text-xl text-neo-white text-balance">{t('teacher.lesson.noLessons')}</h3>
+            <p className="mx-auto mt-1 max-w-prose text-sm text-neo-white/80 text-pretty">{t('eduLibrary.myLists.emptyHint')}</p>
+          </div>
+          <StarterPacksSection onSelectPack={handleSelectStarterPack} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {lessons.map((lesson) => {
-            const defCount = lesson.words.filter((w) => w.definition).length;
-            const totalWords = lesson.words.length;
-            const classroomName = lesson.classroom_id
-              ? classrooms.find((c) => c.id === lesson.classroom_id)?.name
-              : undefined;
-            return (
-              <Card
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {paged.items.map((lesson, i) => (
+              <MyListCard
                 key={lesson.id}
-                className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/80 hover:shadow-hard-lg transition-all flex flex-col"
-              >
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-xl font-neo-display text-neo-white text-balance">
-                    {lesson.name}
-                  </CardTitle>
-                  {lesson.description && (
-                    <p className="text-sm text-neo-white mt-1">{lesson.description}</p>
-                  )}
-                  <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-neo-white">
-                    <span className="font-bold">
-                      {lesson.language.toUpperCase()} •{' '}
-                      {lesson.words.length === 1
-                        ? t('teacher.lesson.word')
-                        : t('teacher.lesson.words', { count: lesson.words.length })}
-                    </span>
-                    <span
-                      className={cn(
-                        'text-xs font-bold px-1.5 py-0.5 rounded shrink-0',
-                        defCount === totalWords && totalWords > 0
-                          ? 'text-neo-cyan bg-neo-cyan/15'
-                          : defCount > 0
-                            ? 'text-neo-lime bg-neo-lime/15'
-                            : 'text-neo-white bg-neo-white/10'
-                      )}
-                    >
-                      {t('teacher.lesson.definitionCoverage', { count: defCount, total: totalWords })}
-                    </span>
-                    {classroomName && (
-                      <span
-                        data-testid={`lesson-classroom-${lesson.id}`}
-                        className="text-xs font-bold px-1.5 py-0.5 rounded shrink-0 text-neo-lime bg-neo-lime/15"
-                      >
-                        {classroomName}
-                      </span>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
-                  <div className="space-y-2 flex-1">
-                    {lesson.words.slice(0, 5).map((word, idx) => (
-                      <div key={`word-${idx}-${word.word}`} className="flex items-center gap-2 text-sm">
-                        {word.canIntegrate ? (
-                          <CheckCircle className="w-4 h-4 text-neo-cyan shrink-0" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4 text-neo-lime shrink-0" />
-                        )}
-                        <span className="text-neo-white font-neo-body">{word.word}</span>
-                        {word.definition && (
-                          <span className="text-xs text-neo-white truncate max-w-[120px]">
-                            — {word.definition}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                    {lesson.words.length > 5 && (
-                      <p className="text-xs text-neo-white mt-2 font-bold">
-                        {t('teacher.lesson.moreWords', { count: lesson.words.length - 5 })}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Host / Practice / Results, on the card. The three things a
-                      teacher does with a word list, none of them a tab away. */}
-                  <div className="mt-4 flex flex-wrap gap-2 border-t border-neo-black/30 pt-4">
-                    <Button
-                      size="sm"
-                      data-testid={`lesson-host-${lesson.id}`}
-                      onClick={() => handleStartGame(lesson)}
-                      className={cn('flex-1 basis-full bg-neo-cyan text-neo-black font-bold', 'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed', 'transition-all text-xs')}
-                    >
-                      <Play className="w-4 h-4 me-1" />
-                      {t('education.template.startGame')}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      data-testid={`lesson-practice-${lesson.id}`}
-                      onClick={() => router.push(`/${language}/student/lessons/${lesson.id}`)}
-                      className={cn('flex-1 border-neo border-neo-cream shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all text-xs')}
-                    >
-                      {t('education.practice.title')}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      data-testid={`lesson-results-${lesson.id}`}
-                      onClick={() =>
-                        router.push(
-                          lesson.classroom_id
-                            ? `/${language}/teacher/reports?classroomId=${lesson.classroom_id}`
-                            : `/${language}/teacher/reports`
-                        )
-                      }
-                      className={cn('flex-1 border-neo border-neo-cream shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all text-xs')}
-                    >
-                      {t('teacher.dashboard.viewReports')}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleOpenEdit(lesson)} className={cn('border-neo border-neo-cream shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all')} aria-label={t('teacher.lesson.editLesson')}>
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                lesson={lesson}
+                index={i}
+                classroomName={lesson.classroom_id ? classrooms.find((c) => c.id === lesson.classroom_id)?.name : undefined}
+                sharing={sharingId === lesson.id}
+                onHost={() => router.push(`/${language}/education/classroom-game?lessonId=${lesson.id}`)}
+                onPractice={() => router.push(`/${language}/student/lessons/${lesson.id}`)}
+                onResults={() =>
+                  router.push(
+                    lesson.classroom_id
+                      ? `/${language}/teacher/reports?classroomId=${lesson.classroom_id}`
+                      : `/${language}/teacher/reports`,
+                  )
+                }
+                onEdit={() => {
+                  setEditorInitial(lessonToDraft(lesson));
+                  setEditorKey((k) => k + 1);
+                  setEditorOpen(true);
+                }}
+                onToggleShare={() => void handleToggleShare(lesson)}
+              />
+            ))}
+          </div>
+          {paged.pageCount > 1 && (
+            <nav className="flex items-center justify-center gap-3" aria-label={t('eduLibrary.pager.label')}>
+              <button type="button" disabled={paged.page === 0} onClick={() => setPage(paged.page - 1)} className="min-h-10 rounded-neo border-2 border-neo-cream px-3 font-bold text-neo-white disabled:opacity-40">
+                {t('eduLibrary.pager.prev')}
+              </button>
+              <span className="text-sm font-bold tabular-nums text-neo-white">
+                {t('eduLibrary.pager.status', { page: paged.page + 1, total: paged.pageCount })}
+              </span>
+              <button type="button" disabled={paged.page >= paged.pageCount - 1} onClick={() => setPage(paged.page + 1)} className="min-h-10 rounded-neo border-2 border-neo-cream px-3 font-bold text-neo-white disabled:opacity-40">
+                {t('eduLibrary.pager.next')}
+              </button>
+            </nav>
+          )}
+        </>
       )}
 
-      {/* Create Dialog */}
-      <LessonBuilderCreateDialog
-        isOpen={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        formData={formData}
-        onFormDataChange={setFormData}
-        words={words}
-        onWordsChange={setWords}
+      <ListEditorSheet
+        key={editorKey}
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        initial={editorInitial}
         classrooms={classrooms}
-        isSaving={isSaving}
-        showTemplateSelector={showTemplateSelector}
-        onToggleTemplateSelector={() => setShowTemplateSelector(!showTemplateSelector)}
-        onTemplateSelect={handleTemplateSelect}
-        onBulkImportOpen={() => setIsBulkImportOpen(true)}
-        onCreate={handleCreate}
-        t={t}
+        onSave={handleSave}
+        remixedFrom={
+          editorInitial.id
+            ? (() => {
+                const l = lessons.find((x) => x.id === editorInitial.id) as LibraryLesson | undefined;
+                return l?.remixed_from_title ? { title: l.remixed_from_title, author: l.remixed_from_author ?? null } : null;
+              })()
+            : null
+        }
+        onDraftChange={(d) => { latestDraft.current = d; }}
       />
 
-      {/* Edit Lesson Dialog */}
-      <LessonBuilderEditDialog
-        editingLesson={editingLesson}
-        onClose={() => setEditingLesson(null)}
-        editWords={editWords}
-        onEditWordsChange={setEditWords}
-        isEditSaving={isEditSaving}
-        onSaveEdit={handleSaveEdit}
-        t={t}
-      />
-
-      {/* Bulk Word Importer */}
-      <BulkImportEnhanced
-        isOpen={isBulkImportOpen}
-        onClose={() => setIsBulkImportOpen(false)}
-        onImport={handleBulkImport}
-        language={formData.language}
-      />
-
-      {/* Draft Resume Prompt */}
       <LessonBuilderDraftPrompt
         open={showDraftPrompt}
         onOpenChange={setShowDraftPrompt}
         onRestore={handleRestoreDraft}
-        onDiscard={handleDiscardDraft}
+        onDiscard={() => { clearDraft(); setShowDraftPrompt(false); }}
         formattedAge={formatDraftAge(draftAge)}
         t={t}
       />

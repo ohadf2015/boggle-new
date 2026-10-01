@@ -6,12 +6,11 @@
  * of PageClient (FOUNDATION 2026-09-26); the code moved verbatim.
  */
 import { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
-import toast from 'react-hot-toast';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useClassroomLiveGame } from '@/hooks/useLiveClassroomGameInfo';
 import { useTeacherStripState } from '@/components/education/controls/useTeacherStripState';
 import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
-import { resolveClassroomContext, classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY, type ClassroomContext } from '@/lib/education/classroomRoomGone';
+import { resolveClassroomContext, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -35,7 +34,6 @@ import { multiplayerExitDestination, mpExit, type MpExitReason } from '@/lib/mul
 import { readPreviousInAppPath } from '@/hooks/useMpExit';
 import { resolveMpPagePhase } from '@/lib/multiplayer/mpPhase';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 import { ENTRY_HIDES_GLOBAL_CHROME } from '@/components/multiplayer/entry/entryChrome';
 import type { Language, ActiveRoom, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
@@ -184,13 +182,20 @@ export function useMpPageState() {
   const classroomDecisionRef = useRef<{ context: ClassroomContext; isHost: boolean }>({ context: 'pending', isHost: false });
   classroomDecisionRef.current = { context: classroomContext, isHost: isHost || isClassroomHost };
 
+  // The room code a classroom student was turned away from; null = not ended.
+  const [classroomEnded, setClassroomEnded] = useState<string | null>(null);
   const exitClassroomStudentToHub = useCallback(() => {
+    const endedCode = gameCode || prefilledRoomCode || searchParams?.get('room') || '';
+    // The page stays mounted under the ended card, so leave explicitly.
+    if (gameCode) {
+      try { socketRef.current?.emit('leaveRoom', { gameCode, username }); } catch { /* socket gone */ }
+    }
+    try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* storage blocked */ }
     clearSessionPreservingUsername(username);
     setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
     setShowResults(false); setResultsData(null);
-    toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });
-    router.push(classroomStudentHomePath(language));
-  }, [username, t, router, language, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
+    setClassroomEnded(endedCode);
+  }, [gameCode, prefilledRoomCode, searchParams, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
   // Early classroom joiner: the teacher's code is up but her room is not open yet — wait, never bounce.
   const roomWait = useClassroomRoomWait({ socketRef, isActive, onGiveUp: exitClassroomStudentToHub,
     rejoin: (code) => handleJoin(false, null, code, undefined, username) });
@@ -301,6 +306,12 @@ export function useMpPageState() {
     setUsername, setError, setIsJoining,
   });
 
+  const retryClassroomRoom = useCallback((code: string) => {
+    setClassroomEnded(null);
+    try { sessionStorage.removeItem('boggle_intentional_exit'); } catch { /* storage blocked */ }
+    handleJoin(false, null, code, undefined, username);
+  }, [handleJoin, username]);
+
   useMpPageEffects({
     socket, t, username, isActive, gameCode, showResults, resultsData, showStartAnimation,
     playersInRoom, mpSounds, seriesTracker, audioCuesActive: !!classroomAccessibility?.audioCues,
@@ -356,7 +367,7 @@ export function useMpPageState() {
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
     classroomAccessibility, classroomLevel, classroomWordBank, teacherStrip, quizOwnsScreen,
     socketContextValue, hostLeftState, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
-    handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
+    classroomEnded, retryClassroomRoom, handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
     routerProps,
   };
 }

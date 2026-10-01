@@ -4,7 +4,6 @@ import { useMemo, useEffect, useRef, useCallback } from 'react';
 import { Sparkles } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { getRandomScoreFlyPath, type ScoreFlyPath } from './blastEffectVariations';
-import { pickHypePrefix } from './scoreFlyHype';
 
 export interface ScoreFlyEvent {
   id: string;
@@ -87,11 +86,10 @@ function hashId(s: string): number {
 
 function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id: string) => void }) {
   // Deterministic tilt seeded by fly.id keeps render pure (react-hooks/purity).
-  const { path, hype, initialTilt } = useMemo(() => ({
+  const { path, initialTilt } = useMemo(() => ({
     path: getRandomScoreFlyPath(),
-    hype: pickHypePrefix(fly.tier),
     initialTilt: ((Math.abs(hashId(fly.id)) % 2400) / 100) - 12,
-  }), [fly.tier, fly.id]);
+  }), [fly.id]);
 
   // Path functions expect pixel coords; use 0 as origin and TARGET as dest,
   // then apply deltas from the percentage-positioned element.
@@ -160,7 +158,7 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
           aria-hidden="true"
         />
       )}
-      {hype && <span className="opacity-90 mr-1 text-[0.85em]">{hype}</span>}+{fly.score}
+      +{fly.score}
       {fly.bonus != null && fly.bonus > 0 && (
         <span
           data-testid="score-fly-bonus"

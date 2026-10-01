@@ -105,11 +105,13 @@ export interface MpFinalFooterProps {
   onRematch: () => void;
   onLeave: () => void;
   onShare: () => void;
+  /** Exit label key; a classroom host's exit goes back to class. */
+  leaveKey?: string;
   t: TFn;
 }
 
 /** Final results: [REMATCH] [LEAVE] [share]. One primary; the rest are quiet. */
-export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, t }: MpFinalFooterProps) {
+export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, leaveKey = 'mpUi.results.leave', t }: MpFinalFooterProps) {
   const quiet = 'shrink-0 inline-flex flex-col items-center justify-center gap-0.5 rounded-neo border-[3px] border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm font-bold uppercase w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))] text-[calc(10px*var(--mp-u,1))] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none';
   return (
     <div className="flex items-center gap-[calc(10px*var(--mp-u,1))]">
@@ -118,9 +120,9 @@ export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, t 
       ) : (
         <MpPrimaryCta tone="lime" label={t('mpUi.results.rematch')} sublabel={isHost ? t('mpUi.results.newSeries') : undefined} onPress={onRematch} className="flex-1 min-w-0" />
       )}
-      <button type="button" data-testid="mp-results-leave" onClick={onLeave} className={quiet}>
+      <button type="button" data-testid="mp-results-leave" onClick={onLeave} className={cn(quiet, leaveKey !== 'mpUi.results.leave' && 'w-auto px-3')}>
         <DirectionalIcon icon={LogOut} mirror className="w-5 h-5" />
-        {t('mpUi.results.leave')}
+        {t(leaveKey)}
       </button>
       <button type="button" data-testid="mp-results-share" onClick={onShare} className={cn(quiet, 'bg-neo-pink text-neo-black')}>
         <Share2 aria-hidden="true" className="w-5 h-5" />

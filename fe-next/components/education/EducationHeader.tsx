@@ -29,6 +29,7 @@ import { SearchIconButton } from './SearchIconButton';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
+import { educationBackHref } from '@/lib/navigation/educationBackHref';
 
 interface EducationHeaderProps {
   /** Additional class names */
@@ -38,8 +39,10 @@ interface EducationHeaderProps {
   /** Custom title override */
   title?: string;
   /**
-   * Where back goes (default `/{locale}/education`). A classroom game passes its own hub
-   * via `multiplayerExitDestination` — the education landing is wrong mid-game.
+   * Override where the back button goes. Defaults to `educationBackHref`.
+   * A classroom multiplayer game passes its own hub here (teacher dashboard /
+   * student hub via `multiplayerExitDestination`) — the education landing is
+   * the wrong place mid-game.
    */
   backHref?: string;
   /** Replaces the navigation entirely, e.g. a live host who must confirm leaving first. */
@@ -124,8 +127,9 @@ export const EducationHeader = memo<EducationHeaderProps>(({
 
   const handleBackClick = useCallback(() => {
     if (onBack) return onBack();
-    router.push(backHref || `/${language}/education`);
-  }, [backHref, language, router, onBack]);
+    const role = isTeacher ? 'teacher' : profile?.user_role === 'student' ? 'student' : null;
+    router.push(backHref || educationBackHref({ pathname, locale: language, role }));
+  }, [backHref, language, router, pathname, isTeacher, profile?.user_role, onBack]);
 
   // Handle sign out
   const handleSignOut = useCallback(async () => {

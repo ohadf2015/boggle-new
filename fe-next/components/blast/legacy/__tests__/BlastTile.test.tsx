@@ -119,13 +119,23 @@ describe('BlastTile', () => {
       expect(button?.style.transform).toContain('scaleX(0.15)');
     });
 
-    it('standard clearing uses default spin+scale', () => {
+    it('standard clearing pops: swell, flash lime, shrink-spin to nothing', () => {
       const { container } = render(
         <BlastTile {...baseProps} type="standard" phase="clearing" clearRotate={10} />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(1.3)');
-      expect(button?.style.transform).toContain('rotate(10deg)');
+      expect(button?.style.animation).toContain('blastTilePop');
+      expect(button?.style.getPropertyValue('--pop-rot')).toBe('30deg');
+      expect(button?.style.opacity).not.toBe('0');
+    });
+
+    it('standard anticipation charges the tile lime before it pops', () => {
+      const { container } = render(
+        <BlastTile {...baseProps} type="standard" phase="anticipation" />
+      );
+      const button = container.querySelector('button');
+      expect(button?.style.background).toMatch(/rgb\(191, 255, 0\)|#BFFF00/i);
+      expect(button?.style.transform).toContain('scale(1.12)');
     });
 
     it('magnet clearing implodes (shrinks + spins)', () => {

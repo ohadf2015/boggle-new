@@ -6,8 +6,8 @@ import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
-import { TILE_VISUALS, CLEARING_COLORS, CLEARING_ANIMS } from './blastTileVisuals';
-import { getCascadeFallStyle } from './blastCascadeStyle';
+import { TILE_VISUALS } from './blastTileVisuals';
+import { getPhaseStyles, getSelectionStyles } from './blastCascadeStyle';
 import { BlastJellyOverlay } from './BlastJellyOverlay';
 import { BlastCakeOverlay } from './BlastCakeOverlay';
 import { BlastChocolateOverlay } from './BlastChocolateOverlay';
@@ -141,62 +141,6 @@ const RARE_LETTERS = new Set(['Q', 'Z', 'X', 'J']);
 
 const ANIMATED_PHASES = new Set<TilePhase>(['anticipation', 'clearing', 'falling', 'appearing', 'landing']);
 
-function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: number, clearRotate?: number, spawnOffset?: number, col?: number): React.CSSProperties {
-  const clearing = CLEARING_COLORS[type];
-  switch (phase) {
-    case 'anticipation':
-      return { filter: 'brightness(1.4)', transform: 'scale(1.1)', transition: 'all 120ms ease-out' };
-    case 'clearing': {
-      const clearingAnim = CLEARING_ANIMS[type];
-      const isLightning = type === 'lightning';
-      return {
-        transform: clearingAnim?.transform ?? `scale(1.3) rotate(${clearRotate ?? 0}deg)`,
-        opacity: 0,
-        filter: clearingAnim?.filter,
-        transition: clearingAnim?.transition ?? 'all 180ms ease-in',
-        ...(clearing && { background: clearing.background, border: clearing.border }),
-        ...(isLightning && {
-          background: 'white',
-          boxShadow: '0 0 24px 8px rgba(0,255,255,0.7), 0 0 48px 16px rgba(255,255,255,0.4)',
-          animation: 'blastLightningFlash 160ms ease-in forwards',
-        }),
-      };
-    }
-    case 'falling': {
-      const dist = fallOffset ?? 0;
-      return getCascadeFallStyle(dist, col ?? 0);
-    }
-    case 'appearing':
-      return {
-        '--spawn-from': `${-(spawnOffset ?? 60)}px`,
-        opacity: 0,
-        animation: 'blastTileAppear 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
-      } as React.CSSProperties;
-    case 'landing':
-      // Impact squash — a landed tile compresses SHORT-and-wide (scaleY<1), not
-      // taller. Same for every tile type (standard, ice, bomb…) so gravity reads
-      // identically across the board. The overshoot ease springs it back to rest.
-      return {
-        transform: 'scaleY(0.88) scaleX(1.1)',
-        transition: 'transform 110ms cubic-bezier(0.34, 1.7, 0.5, 1)',
-      };
-    default:
-      return {};
-  }
-}
-
-/**
- * Compute progressive selection scale: first tile 1.10x, last tile 1.22x.
- * Larger than the old 1.05–1.12 so the current word visibly "lifts" off the
- * board — selection should read at a glance, even on a busy TV/party screen.
- */
-function getSelectionScale(selectionIndex?: number, selectionTotal?: number): number {
-  if (selectionIndex == null || !selectionTotal || selectionTotal <= 1) return 1.1;
-  const t = selectionIndex / (selectionTotal - 1);
-  // Round to 3 decimals to avoid floating point noise
-  return Math.round((1.1 + t * 0.12) * 1000) / 1000;
-}
-
 function getPhaseClasses(phase: TilePhase, isSelected: boolean): string {
   if (phase === 'selected' || (phase === 'idle' && isSelected)) {
     // The selection ring + lift + hard shadow are applied INLINE
@@ -217,33 +161,6 @@ function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
   };
   return colorMap[colorTag] || '';
 }
-
-/**
- * Inline styles for selected tiles. The selection is an OVERLAY on top of the
- * tile's own face (so a selected bomb still looks like a bomb), amplified to
- * read by VALUE contrast:
- *  - real lift (translateY) + progressive scale → the active word rises,
- *  - a lime "active" ring wrapped in a thick navy ink ring → the navy gives the
- *    high value-contrast that makes selection unmistakable against BOTH the
- *    white standard face (where lime alone is too low-contrast) AND the bright
- *    special faces,
- *  - a hard (blur-free) drop shadow → neo-brutalist depth,
- *  - z-index lift so the scaled tile never hides behind a neighbour.
- */
-function getSelectionStyles(isSelected: boolean, selectionIndex?: number, selectionTotal?: number): React.CSSProperties {
-  if (!isSelected) return {};
-  const scale = getSelectionScale(selectionIndex, selectionTotal);
-  return {
-    transform: `translateY(-6px) scale(${scale})`,
-    boxShadow:
-      '0 0 0 3px #BFFF00, 0 0 0 6px #0b1530, 5px 6px 0 0 rgba(11,21,48,0.92), inset 0 2px 0 rgba(255,255,255,0.35)',
-    // Brightness lift + a small lime energy glow — secondary juice, not the
-    // primary signal (the hard rings above carry that).
-    filter: 'brightness(1.06) drop-shadow(0 0 7px rgba(191,255,0,0.5))',
-    zIndex: 20,
-  };
-}
-
 
 export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
@@ -309,7 +226,7 @@ export const BlastTile = memo(function BlastTile({
         }
       }}
       className={[
-        'relative aspect-square flex items-center justify-center',
+        'blast-tile-face relative aspect-square flex items-center justify-center',
         'rounded-neo',
         'font-neo-display font-black uppercase',
         'select-none',
