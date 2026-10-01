@@ -1,5 +1,174 @@
 // Sv translations
 const sv = {
+  // @eduLibrary:start
+  "eduLibrary": {
+    "title": "Bibliotek",
+    "tabs": {
+      "mine": "Mina listor",
+      "discover": "Upptäck"
+    },
+    "editor": {
+      "createTitle": "Ny ordlista",
+      "editTitle": "Redigera ordlista",
+      "description": "Klistra in ord, lägg till betydelser, spara.",
+      "newList": "Ny lista",
+      "titleLabel": "Listans namn",
+      "titlePlaceholder": "Döp din lista…",
+      "pasteLabel": "Klistra in eller skriv ord",
+      "pastePlaceholder": "äpple, banan, körsbär – eller ett per rad. ”ord - betydelse” lägger till en förklaring.",
+      "addedWords": "+{count} tillagda",
+      "skippedDuplicates": "{count} fanns redan",
+      "importFile": "CSV / TSV",
+      "starterPack": "Startpaket",
+      "fileError": "Vi hittade inga ord i filen. Ett ord per rad och betydelsen i andra kolumnen.",
+      "wordsHeading": "Ord",
+      "wordsLabel": "Ord i listan",
+      "viewLabel": "Visning",
+      "view": {
+        "chips": "Brickor",
+        "details": "Detaljer"
+      },
+      "emptyWords": "Dina ord dyker upp här.",
+      "removeWord": "Ta bort {word}",
+      "noDefinition": "Ingen förklaring än",
+      "word": "Ord",
+      "definition": "Betydelse (valfritt)",
+      "definitionPlaceholder": "Vad betyder det?",
+      "done": "Klar",
+      "needTitle": "Ge listan ett namn för att spara.",
+      "needWords": "Lägg till minst ett ord.",
+      "save": "Spara",
+      "saving": "Sparar…",
+      "saved": "Sparad",
+      "savedToast": "”{name}” sparad"
+    },
+    "issue": {
+      "digits": "Innehåller en siffra",
+      "tooLong": "För långt för spelet",
+      "wrongScript": "Ser inte ut att vara listans språk",
+      "blocked": "Inte tillåtet i elevspel"
+    },
+    "meta": {
+      "language": "Språk",
+      "grade": "Årskurs",
+      "topic": "Ämne",
+      "assignTo": "Tilldela",
+      "noClass": "Ingen klass än"
+    },
+    "grade": {
+      "any": "Alla årskurser",
+      "k2": "F–2",
+      "g35": "Åk 3–5",
+      "g68": "Åk 6–8",
+      "g912": "Åk 9 och gymnasiet"
+    },
+    "topic": {
+      "none": "Inget ämne",
+      "all": "Alla ämnen",
+      "general": "Allmänt",
+      "english": "Engelska",
+      "hebrew": "Hebreiska",
+      "science": "NO",
+      "math": "Matte",
+      "history": "Historia",
+      "geography": "Geografi",
+      "language": "Språkinlärning"
+    },
+    "share": {
+      "toggle": "Dela i Upptäck",
+      "help": "Andra lärare kan hitta, köra och kopiera den. Bara ditt visningsnamn syns.",
+      "blocked": "Vissa ord kan inte delas med elever. Ta bort dem för att dela.",
+      "share": "Dela",
+      "shared": "Delad",
+      "nowPublic": "Delad i Upptäck",
+      "nowPrivate": "Privat igen",
+      "failed": "Kunde inte ändra delningen. Försök igen."
+    },
+    "remixedFrom": "Remix av {title} från {author}",
+    "remixedFromNoAuthor": "Remix av {title}",
+    "myLists": {
+      "emptyHint": "Klistra in en lista, börja från ett startpaket eller hämta en från Upptäck."
+    },
+    "card": {
+      "practice": "Öva",
+      "words": "{count} ord",
+      "by": "av {author}",
+      "aTeacher": "en lärare",
+      "new": "Ny",
+      "plays": "{count} spelningar",
+      "copies": "{count} kopior",
+      "results": "Resultat"
+    },
+    "badge": {
+      "verified": "Verifierad",
+      "teacher": "Lärargjord",
+      "yours": "Din"
+    },
+    "discover": {
+      "searchLabel": "Sök listor",
+      "searchPlaceholder": "Sök listor, ord eller lärare",
+      "clearSearch": "Rensa sökningen",
+      "filters": "Filter",
+      "allLanguages": "Alla",
+      "sourceLabel": "Vem gjorde den",
+      "source": {
+        "all": "Alla",
+        "verified": "Verifierad av LexiClash",
+        "teacher": "Lärargjorda"
+      },
+      "count": "{count} listor",
+      "sortLabel": "Sortera",
+      "sort": {
+        "popular": "Populärast",
+        "newest": "Nyast"
+      },
+      "loadError": "Kunde inte ladda Upptäck.",
+      "retry": "Försök igen",
+      "emptyTitle": "Inga listor matchar än",
+      "emptyHint": "Prova ett annat filter – eller dela en egen så att nästa lärare hittar den.",
+      "tryAllLanguages": "Visa alla språk",
+      "shareFirst": "Dela en lista",
+      "beFirstTitle": "Bli först här.",
+      "beFirstHint": "Dela en av dina listor så syns den för alla lärare på det här språket."
+    },
+    "preview": {
+      "host": "Kör live",
+      "assign": "Tilldela",
+      "copy": "Gör en kopia",
+      "copied": "Kopierad",
+      "copiedHint": "Den ligger i Mina listor – tryck på Kopierad för att öppna.",
+      "copiedToast": "”{name}” kopierad till Mina listor",
+      "copyFailed": "Kunde inte kopiera listan. Försök igen."
+    },
+    "report": {
+      "action": "Anmäl listan",
+      "title": "Anmäl lista",
+      "description": "Vad är fel med ”{name}”? Vi går igenom varje anmälan.",
+      "reason": {
+        "inappropriate": "Passar inte elever",
+        "offensive": "Kränkande ord",
+        "unplayable": "Fel eller ospelbara ord",
+        "spam": "Spam eller skräp"
+      },
+      "detailsPlaceholder": "Något mer? (valfritt)",
+      "submit": "Skicka anmälan",
+      "thanks": "Tack – vi tittar på det.",
+      "failed": "Anmälan skickades inte. Försök igen."
+    },
+    "assign": {
+      "title": "Tilldela en klass",
+      "pickClass": "Vilken klass ska få den?",
+      "noClasses": "Skapa en klass först – det tar 5 sekunder.",
+      "createClass": "Skapa klass"
+    },
+    "pager": {
+      "label": "Sidor",
+      "prev": "Föregående",
+      "next": "Nästa",
+      "status": "{page} / {total}"
+    }
+  },
+  // @eduLibrary:end
   // @academy:start (generated by /tmp/edu-play/merge-i18n.mjs)
   "academy": {
     "teacher": {

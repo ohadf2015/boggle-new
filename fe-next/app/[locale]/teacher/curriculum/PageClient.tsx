@@ -1,58 +1,35 @@
 /**
- * Teacher Curriculum PageClient
- *
- * Client-side component for the teacher curriculum page.
- * Displays curriculum-aligned word lists that teachers can import to their lessons.
+ * Teacher Library PageClient (route kept at /teacher/curriculum — the shell's Library tab).
+ * My lists + Discover: teacher-made and LexiClash-verified word lists.
  */
 
 'use client';
 
 import React, { useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { CurriculumWordListBrowser } from '@/components/teacher/curriculum/CurriculumWordListBrowser';
+import { TeacherLibrary } from '@/components/teacher/lesson-creation/library/TeacherLibrary';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { EducationHeader } from '@/components/education/EducationHeader';
-import { VocabularyLesson } from '@/lib/supabase/education';
+import type { LibraryLesson } from '@/lib/education/libraryTypes';
+import logger from '@/utils/logger';
 
-/**
- * TeacherCurriculumInner - Teacher Curriculum Page
- *
- * Shows curriculum-aligned word lists with filtering and import functionality.
- */
 function TeacherCurriculumInner() {
-  const { language } = useLanguage();
   const { user } = useAuth();
-  const router = useRouter();
   const searchParams = useSearchParams();
-
-  // Get optional classroom context from URL
   const classroomId = searchParams.get('classroomId') || undefined;
 
-  // Handle successful import - navigate to lesson or show success
+  // Never route here: the copy is already in My lists on this page, and `/classroom/{id}/lesson/{id}` 404s to the homepage.
   const handleImportSuccess = useCallback(
-    (_lesson: VocabularyLesson) => {
-      // There is no `/teacher/classroom/{id}/lesson/{id}` route — that 404s,
-      // and the 404 boundary used to bounce the teacher to the main app
-      // homepage (education homepage-bounce audit). The teacher dashboard is
-      // the real place lessons are viewed/edited: LessonBuilder renders there
-      // and already shows the lesson that was just imported.
-      router.push(`/${language}/teacher`);
-    },
-    [language, router]
+    (lesson: LibraryLesson) => logger.debug('library copy landed in My lists', { lessonId: lesson.id, classroomId }),
+    [classroomId],
   );
 
-  // The browser is a long filtered list — exactly the content the shell's one
-  // scrolling region is for. The page itself stays put, so the filters at the
-  // top of the list never scroll out of a teacher's reach.
+  // The shell owns the one scroll region; Discover's search bar is sticky inside it.
   return (
     <main className="max-w-6xl mx-auto">
-      <CurriculumWordListBrowser
-        teacherId={user?.id}
-        classroomId={classroomId}
-        onImportSuccess={handleImportSuccess}
-      />
+      <TeacherLibrary teacherId={user?.id} classroomId={classroomId} onImportSuccess={handleImportSuccess} />
     </main>
   );
 }
