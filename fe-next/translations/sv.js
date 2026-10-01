@@ -38,7 +38,10 @@ const sv = {
       },
       "noClassTitle": "Skapa din klass – få en kod på 5 sekunder",
       "createClassCta": "Skapa min klass",
-      "codeReady": "Koden är klar"
+      "codeReady": "Koden är klar",
+      "firstAssignmentTitle": "Skapa deras första uppgift",
+      "firstAssignmentBody": "Eleverna är på listan. Ge dem en övning så klassen har något att göra när du inte sänder live.",
+      "firstAssignmentCta": "Skapa första uppgiften"
     },
     "modes": {
       "workshop": {

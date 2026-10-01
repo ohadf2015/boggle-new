@@ -38,7 +38,10 @@ const he = {
       },
       "noClassTitle": "צרו כיתה וקבלו קוד תוך 5 שניות",
       "createClassCta": "יצירת הכיתה שלי",
-      "codeReady": "הקוד מוכן"
+      "codeReady": "הקוד מוכן",
+      "firstAssignmentTitle": "צרו את המטלה הראשונה",
+      "firstAssignmentBody": "יש תלמידים ברשימה. שייכו תרגול כדי שיהיה להם מה לעשות כשאתם לא בשידור חי.",
+      "firstAssignmentCta": "צרו מטלה ראשונה"
     },
     "modes": {
       "workshop": {

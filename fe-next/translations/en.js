@@ -38,7 +38,10 @@ const en = {
       },
       "noClassTitle": "Create your class, get a code in 5 seconds",
       "createClassCta": "Create my class",
-      "codeReady": "Code ready"
+      "codeReady": "Code ready",
+      "firstAssignmentTitle": "Assign their first game",
+      "firstAssignmentBody": "Students are in. Send one assignment so they play before the next class.",
+      "firstAssignmentCta": "Create assignment"
     },
     "modes": {
       "workshop": {

@@ -32,7 +32,10 @@ import {
   firstAssignmentTemplatesFor,
   type FirstAssignmentTemplate,
 } from '@/lib/education/firstAssignmentTemplates';
-import { trackTeacherFirstAssignmentTemplate } from '@/lib/education/telemetry';
+import {
+  trackTeacherFirstAssignmentTemplate,
+  trackEduFirstAssignmentCreated,
+} from '@/lib/education/telemetry';
 import type { Language } from '@/lib/supabase/education/types';
 
 interface AssignmentCreatorProps {
@@ -162,6 +165,9 @@ export default function AssignmentCreator({
 
     if (result.success) {
       toast.success(t('teacher.assignment.created'));
+      if (assignmentCount === 0) {
+        trackEduFirstAssignmentCreated({ classroomId });
+      }
       onComplete();
       onClose();
     } else {
@@ -187,6 +193,9 @@ export default function AssignmentCreator({
     setIsSubmitting(false);
     if (result.success && result.assigned) {
       toast.success(t('teacher.assignment.created'));
+      if (assignmentCount === 0) {
+        trackEduFirstAssignmentCreated({ classroomId });
+      }
       onComplete();
       onClose();
       return;

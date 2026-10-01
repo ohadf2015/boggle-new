@@ -50,6 +50,8 @@ import {
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { GetStudentsInCard } from './hq/GetStudentsInCard';
 import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
+import { FirstAssignmentPanel } from './hq/FirstAssignmentPanel';
+import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
 import { HqDock } from './hq/HqDock';
 import { HqToolsContent } from './hq/HqToolsContent';
@@ -151,6 +153,9 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
 
   // Derived, not a second piece of state (pitfall class 1).
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId) ?? null;
+  const { assignmentCount, hasActiveRoom } = useFirstAssignmentCta(
+    selectedClassroomId || null,
+  );
   const reportsHref = selectedClassroomId
     ? `/${language}/teacher/reports?classroomId=${selectedClassroomId}`
     : `/${language}/teacher/reports`;
@@ -364,14 +369,23 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                   initialJoinCode={newlyCreatedJoinCode}
                 />
               ) : selectedClassroom ? (
-                <GetStudentsInCard
-                  className="flex-1"
-                  classroom={{
-                    ...selectedClassroom,
-                    join_code: selectedClassroom.join_code || '',
-                  }}
-                  onOpenProjector={() => setProjectorOpen(true)}
-                />
+                <div className="flex min-h-0 flex-1 flex-col gap-2">
+                  <FirstAssignmentPanel
+                    classroomId={selectedClassroom.id}
+                    studentCount={selectedClassroom.member_count ?? 0}
+                    assignmentCount={assignmentCount}
+                    hasActiveRoom={hasActiveRoom}
+                    onCta={() => setShowAssignmentCreator(true)}
+                  />
+                  <GetStudentsInCard
+                    className="flex-1"
+                    classroom={{
+                      ...selectedClassroom,
+                      join_code: selectedClassroom.join_code || '',
+                    }}
+                    onOpenProjector={() => setProjectorOpen(true)}
+                  />
+                </div>
               ) : (
                 <GetStudentsInSkeleton className="flex-1" />
               )}
