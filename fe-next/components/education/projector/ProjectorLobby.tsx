@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Clock, GraduationCap, Grid3x3, Play, UserPlus, Zap } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, GraduationCap, Grid3x3, Hourglass, Play, UserPlus, Zap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
@@ -13,6 +13,7 @@ import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { canStartProjectorRound } from './projectorLobbyModel';
 import { LobbyModeSwitcher } from '@/components/education/lobby/LobbyModeSwitcher';
+import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 
 interface ProjectorLobbyProps {
@@ -106,7 +107,11 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
    * in-place switch it still described the old game, and the chips said
    * "10 · Questions" beside a BLAST room (measured live 2026-09-11).
    */
-  const [switchedMode, setSwitchedMode] = useState<ClassroomGameMode | null>(null);
+  // The shell reads lessonGameData once at mount, so a lobby remounted after a round would revert to the launch mode.
+  const [switchedMode, setSwitchedMode] = useState<ClassroomGameMode | null>(() => {
+    const local = readLocalGameMode();
+    return local && local !== classroomGameMode ? local : null;
+  });
   const mode: ClassroomGameMode = switchedMode ?? classroomGameMode ?? liveGame?.gameMode ?? 'classic';
   const isQuiz = mode === VOCAB_QUIZ_MODE;
   const settings = liveGame?.settings ?? null;
@@ -156,11 +161,14 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           text: `${timerMinutes} ${t('common.minutes')}`,
         });
       }
-      rows.push({
-        key: 'board',
-        icon: <Grid3x3 className="h-[1em] w-[1em]" aria-hidden="true" />,
-        text: boardSizeLabel(boardSize),
-      });
+      // Wordcraft deals every student its own fixed board; the grid setting never reaches it.
+      if (mode !== 'wordcraft') {
+        rows.push({
+          key: 'board',
+          icon: <Grid3x3 className="h-[1em] w-[1em]" aria-hidden="true" />,
+          text: boardSizeLabel(boardSize),
+        });
+      }
     }
     rows.push({
       key: 'late',
@@ -297,32 +305,38 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           )}
         </ul>
 
-        <div className="flex w-full min-w-0 flex-col gap-1.5 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
-          {/* The visible reason is START's own label; this keeps it announced (pitfall class 4). */}
+        <div className="flex w-full min-w-0 flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
+          {/* Empty room: Start itself says "waiting"; the reason and the practice run sit beside it as quiet text, so nothing competes with it. */}
           {!canStart && (
-            <p data-testid="projector-start-reason" role="status" className="sr-only">
-              {t('education.projectorLobby.startBlocked')}
-            </p>
-          )}
-          {practiceRoundFailed && (
-            <p
-              data-testid="projector-practice-failed"
-              role="status"
-              className="text-center font-neo-body text-[2.8vw] font-bold text-neo-pink md:max-w-[28ch] md:text-start md:text-[1vw]"
-            >
-              {t('tvLobby.practiceRoundFailed')}
-            </p>
-          )}
-          {onStartPracticeRound && !canStart && (
-            <button
-              type="button"
-              data-testid="projector-practice-round"
-              onClick={onStartPracticeRound}
-              disabled={practiceRoundPending}
-              className="order-last self-center rounded-sm px-2 py-0.5 font-neo-body text-[3.2vw] font-bold text-neo-cream/75 underline decoration-neo-lime decoration-2 underline-offset-4 transition-colors hover:text-neo-lime focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan disabled:opacity-50 md:order-none md:text-[1vw]"
-            >
-              {practiceRoundPending ? t('common.loading') : t('eduHq.lobby.practiceLink')}
-            </button>
+            <div className="flex flex-col items-start gap-1 md:max-w-[34ch] md:items-end md:text-end">
+              <p
+                data-testid="projector-start-reason"
+                role="status"
+                className="font-neo-body text-[3.2vw] font-bold leading-tight text-neo-cream/75 md:text-[0.95vw]"
+              >
+                {t('education.projectorLobby.startBlocked')}
+              </p>
+              {practiceRoundFailed && (
+                <p
+                  data-testid="projector-practice-failed"
+                  role="status"
+                  className="font-neo-body text-[2.6vw] font-bold text-neo-pink md:text-[0.95vw]"
+                >
+                  {t('tvLobby.practiceRoundFailed')}
+                </p>
+              )}
+              {onStartPracticeRound && (
+                <button
+                  type="button"
+                  data-testid="projector-practice-round"
+                  onClick={onStartPracticeRound}
+                  disabled={practiceRoundPending}
+                  className="rounded-sm font-neo-body text-[3.2vw] font-black text-neo-lime underline decoration-2 underline-offset-4 transition-colors hover:text-neo-cream focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan disabled:opacity-50 md:text-[0.95vw]"
+                >
+                  {practiceRoundPending ? t('common.loading') : t('tvLobby.tryPracticeRound')}
+                </button>
+              )}
+            </div>
           )}
           {/* Once someone is in, Start breathes — a transform-only scale loop. */}
           <m.div
@@ -348,19 +362,18 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                 : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl hover:-translate-y-0.5'
             )}
           >
-            {!canStart && !starting ? (
-              <span aria-hidden="true" className="relative flex size-[0.55em] shrink-0">
-                <span className="absolute inset-0 rounded-full bg-neo-lime motion-safe:animate-ping" />
-                <span className="relative size-full rounded-full bg-neo-lime" />
-              </span>
-            ) : (
+            {canStart ? (
               <Play className="h-[0.8em] w-[0.8em] shrink-0" aria-hidden="true" />
+            ) : (
+              <Hourglass className="h-[0.8em] w-[0.8em] shrink-0 motion-safe:animate-neo-wobble" aria-hidden="true" />
             )}
-            {/* Recomputed from the LIVE mode: the prop still described the old game after an in-place switch. */}
+            {/* Recomputed from the LIVE mode, not the prop: the prop is
+                derived upstream from the same stale `lessonGameData`, so after
+                a switch to a board game it still read START QUIZ. */}
             {starting
               ? t('hostView.creatingTournament')
               : !canStart
-                ? t('eduHq.lobby.waitingOne')
+                ? t('eduLive.lobby.waitingForStudents')
                 : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
           </button>
           </m.div>

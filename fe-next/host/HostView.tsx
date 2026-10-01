@@ -99,6 +99,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
             (p.allWords ?? []).map(w => ({ word: w.word, score: w.score ?? 0, foundBy: [p.username] }))
           )}
           gameMode={currentGameMode}
+          onExitRoom={isClassroomMode ? actions.handleExitRoom : undefined}
         />
       )}
 
@@ -138,6 +139,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
         onOpenChange={state.setShowExitConfirm}
         onConfirm={actions.confirmExitRoom}
         t={t}
+        classroom={isClassroomMode}
       />
 
       <SoloStartConfirmDialog
@@ -273,6 +275,8 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
           classroomLive={classroomLive}
+          lessonWords={lessonData?.vocabularyWords}
+          onExitRoom={isClassroomMode ? actions.handleExitRoom : undefined}
           onQuizPlayAgain={() => actions.handleStartNewGame({ gameMode: currentGameMode })} // same rematch as TvResultsView
         />
       )}

@@ -19109,6 +19109,58 @@ const he = {
     }
   },
   // @eduHq:end
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "לסיים את המשחק לכיתה?",
+      "body": "החדר ייסגר לכל התלמידים ותחזרו למרכז הכיתה.",
+      "stay": "ממשיכים לשחק",
+      "confirm": "סיום המשחק"
+    },
+    "live": {
+      "panelTitle": "סבב חי",
+      "wordsFound": "מילים נמצאו",
+      "lessonFound": "מילי השיעור: {{found}}/{{total}}",
+      "wordOfRound": "המילה של הסבב",
+      "wordOfRoundEmpty": "המילה הארוכה הראשונה תתפוס כאן מקום",
+      "bestWordBy": "{{count}} אותיות · של {{name}}",
+      "exitLabel": "יציאה מהמשחק"
+    },
+    "results": {
+      "backToClass": "חזרה לכיתה",
+      "switchGame": "החלפת משחק",
+      "soloTitle": "סבב סולו!",
+      "tieTitle": "תיקו!",
+      "zeroTitle": "אין נקודות בסבב הזה",
+      "zeroBody": "החימום מאחורינו. הסבב הבא נחשב.",
+      "zeroNoteTitle": "עוד אף אחד לא קלע",
+      "zeroNoteHint": "נסו טיימר ארוך יותר או לוח קל יותר. אותו קוד, בלי להצטרף מחדש.",
+      "lineupTitle": "מי שיחק בסבב",
+      "emptyTitle": "סבב האימון הסתיים",
+      "emptyHeadline": "אף תלמיד לא שיחק הפעם",
+      "emptyBody": "הציגו את הקוד על הלוח. הסבב הבא כבר נחשב באמת.",
+      "podiumLessonWords": "{{found}}/{{total}} מילים מהשיעור",
+      "noLessonTitle": "הפעם לא נמצאו מילים מהשיעור",
+      "noLessonBody": "הנקודות הגיעו ממילים אחרות על הלוח. המילים הכי טובות שהכיתה מצאה:",
+      "noLessonBodyEmpty": "הנקודות הגיעו ממילים אחרות על הלוח.",
+      "noLessonHint": "לוח גדול יותר או זמן ארוך יותר ייתנו למילים מהשיעור יותר מקום.",
+      "noLessonReteach": "מילים מהשיעור שעוד צריך לתרגל"
+    },
+    "reteach": {
+      "playNow": "משחקים עכשיו",
+      "sendHome": "שולחים הביתה",
+      "printShare": "הדפסה ושיתוף",
+      "googleClassroom": "פרסום ב-Google Classroom"
+    },
+    "lobby": {
+      "waitingForStudents": "מחכים לתלמידים"
+    },
+    "wordcraft": {
+      "bingo": "בינגו!",
+      "waiting": "מחכים למילה הראשונה…"
+    }
+  },
+  // @eduLive:end
 };
 
 export { he };

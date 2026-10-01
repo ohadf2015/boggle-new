@@ -6,6 +6,7 @@ import { Users } from 'lucide-react';
 import { m } from 'framer-motion';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 import { tvJoinAddress } from '../../../lib/education/tvJoinAddress';
+import { cn } from '../../../lib/utils';
 
 interface TvJoinBarProps {
   gameCode: string;
@@ -14,6 +15,10 @@ interface TvJoinBarProps {
   language: string;
   baseUrl?: string;
   t: (path: string, params?: Record<string, string | number>) => string;
+  /** Phone-first: the code and QR carry the row; the address returns from md up. */
+  dense?: boolean;
+  /** In-flow controls at the row's end (e.g. fullscreen), so nothing floats over the QR. */
+  trailing?: React.ReactNode;
 }
 
 /**
@@ -27,6 +32,8 @@ const TvJoinBar = memo<TvJoinBarProps>(({
   language,
   baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live',
   t,
+  dense = false,
+  trailing,
 }) => {
   // Generate join URL with locale prefix
   const joinUrl = useMemo(() => {
@@ -40,7 +47,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="w-full bg-neo-purple border-b-4 border-neo-black relative z-40"
     >
-      <div className="max-w-7xl mx-auto px-4 py-4 md:py-5">
+      <div className={dense ? 'max-w-7xl mx-auto px-3 py-2 md:px-4 md:py-4 md:medium-short:py-2' : 'max-w-7xl mx-auto px-4 py-4 md:py-5'}>
         {/* Main row: Join info + Code + QR */}
         {/* Wraps below md: on a teacher's phone the code + QR alone fill the
             row, so the join address takes its own line above them. */}
@@ -49,14 +56,14 @@ const TvJoinBar = memo<TvJoinBarProps>(({
           className="flex flex-wrap md:flex-nowrap items-center justify-between gap-x-4 gap-y-2"
         >
           {/* Left: Join URL */}
-          <div className="basis-full md:basis-auto md:flex-1 min-w-0 text-center md:text-start">
+          <div className={dense ? 'hidden md:block md:flex-1 min-w-0 text-start' : 'basis-full md:basis-auto md:flex-1 min-w-0 text-center md:text-start'}>
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
               {t('tvBroadcast.joinAt')}
             </p>
             {/* The address must carry the code. A bare "lexiclash.live" has no
                 game-code input anywhere on it, so a student who cannot scan the
                 QR had the code and nowhere to type it. */}
-            <p className="text-neo-cream text-xl md:text-2xl lg:text-3xl font-black tracking-wide break-all">
+            <p className={cn('text-neo-cream text-xl md:text-2xl lg:text-3xl font-black tracking-wide break-all', dense && 'md:medium-short:text-xl lg:whitespace-nowrap lg:break-normal lg:text-[clamp(1rem,1.45vw,1.875rem)]')}>
               {tvJoinAddress(baseUrl, language, gameCode)}
             </p>
           </div>
@@ -74,7 +81,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
               role="status"
               aria-labelledby="game-code-label"
             >
-              <span className="text-4xl md:text-6xl lg:text-7xl font-black tracking-[0.1em] md:tracking-[0.15em] uppercase" aria-label={`Game code: ${gameCode.split('').join(' ')}`}>
+              <span className={dense ? 'text-3xl md:text-5xl lg:text-6xl font-black tracking-[0.1em] md:tracking-[0.15em] uppercase' : 'text-4xl md:text-6xl lg:text-7xl font-black tracking-[0.1em] md:tracking-[0.15em] uppercase'} aria-label={`Game code: ${gameCode.split('').join(' ')}`}>
                 {gameCode}
               </span>
             </m.div>
@@ -114,12 +121,13 @@ const TvJoinBar = memo<TvJoinBarProps>(({
             >
               <QRCodeSVG
                 value={joinUrl}
-                size={80}
+                size={dense ? 64 : 80}
                 level="M"
                 bgColor="#ffffff"
                 fgColor="#000000"
               />
             </m.div>
+            {trailing}
           </div>
         </div>
 

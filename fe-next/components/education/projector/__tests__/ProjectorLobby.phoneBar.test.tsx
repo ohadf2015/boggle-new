@@ -27,13 +27,13 @@ const baseProps = {
 };
 
 describe('ProjectorLobby — one bottom bar, one START', () => {
-  it('Given an empty room, Then START itself says what it is waiting for, and no separate warning banner is painted', () => {
+  it('Given an empty room, Then START itself says what it is waiting for, and the reason is a quiet caption, not a warning banner', () => {
     render(<ProjectorLobby {...baseProps} />);
     const start = screen.getByTestId('projector-start');
     expect(start).toBeDisabled();
-    expect(start).toHaveTextContent('eduHq.lobby.waitingOne');
+    expect(start).toHaveTextContent('eduLive.lobby.waitingForStudents');
     expect(start).not.toHaveTextContent('hostView.startClassGame');
-    expect(screen.getByTestId('projector-start-reason').className).toMatch(/(^|\s)sr-only(\s|$)/);
+    expect(screen.getByTestId('projector-start-reason').className).not.toMatch(/border-neo-pink|bg-neo-pink/);
   });
 
   it('Given one student, Then START reads the start label again', () => {
@@ -41,7 +41,7 @@ describe('ProjectorLobby — one bottom bar, one START', () => {
     const start = screen.getByTestId('projector-start');
     expect(start).not.toBeDisabled();
     expect(start).toHaveTextContent('hostView.startClassGame');
-    expect(start).not.toHaveTextContent('eduHq.lobby.waitingOne');
+    expect(start).not.toHaveTextContent('eduLive.lobby.waitingForStudents');
   });
 
   it('Given starting, Then the creating label wins over the waiting one', () => {
@@ -53,7 +53,7 @@ describe('ProjectorLobby — one bottom bar, one START', () => {
     const onPractice = vi.fn();
     render(<ProjectorLobby {...baseProps} onStartPracticeRound={onPractice} />);
     const link = screen.getByTestId('projector-practice-round');
-    expect(link).toHaveTextContent('eduHq.lobby.practiceLink');
+    expect(link).toHaveTextContent('tvLobby.tryPracticeRound');
     expect(link.className).toMatch(/(^|\s)underline(\s|$)/);
     expect(link.className).not.toMatch(/(^|\s)(border-3|w-full|shadow-hard-sm|uppercase)(\s|$)/);
     fireEvent.click(link);

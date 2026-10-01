@@ -31,6 +31,7 @@ export function ClassroomSessionStandings({
   if (!standings.length) return null;
 
   const winner = standings[0];
+  const crowned = winner.totalScore > 0 && standings[1]?.totalScore !== winner.totalScore;
 
   return (
     <section
@@ -54,12 +55,14 @@ export function ClassroomSessionStandings({
 
       {/* The one line the teacher was missing, said in words rather than left
           to be inferred from a sorted list. */}
-      <p
-        data-testid="classroom-session-winner"
-        className="mt-2 rounded-neo border-2 border-neo-yellow bg-neo-yellow/10 px-3 py-2 font-neo-display text-lg text-neo-yellow"
-      >
-        {t('education.results.session.winner', { name: winner.username })}
-      </p>
+      {crowned && (
+        <p
+          data-testid="classroom-session-winner"
+          className="mt-2 rounded-neo border-2 border-neo-yellow bg-neo-yellow/10 px-3 py-2 font-neo-display text-lg text-neo-yellow"
+        >
+          {t('education.results.session.winner', { name: winner.username })}
+        </p>
+      )}
 
       <ol className="mt-3 flex flex-col gap-1">
         {standings.map((row) => (
@@ -68,7 +71,7 @@ export function ClassroomSessionStandings({
             data-testid="classroom-session-row"
             className={cn(
               'flex items-center gap-3 rounded-neo px-3 py-1.5 font-neo-body',
-              row.rank === 1
+              crowned && row.rank === 1
                 ? 'bg-neo-yellow/15 text-neo-cream'
                 : 'text-neo-cream/85'
             )}

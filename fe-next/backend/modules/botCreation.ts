@@ -65,7 +65,12 @@ export function resetBotIdCounter(gameCode: string): void {
 /**
  * Generate a bot name and avatar based on difficulty and language
  */
-export function generateBotName(difficulty: string, existingNames: string[] = [], language: string = 'en'): BotNameResult {
+export interface BotNameOptions {
+  /** False in classrooms: a projector in front of kids never shows politician caricatures. */
+  celebrities?: boolean;
+}
+
+export function generateBotName(difficulty: string, existingNames: string[] = [], language: string = 'en', { celebrities = true }: BotNameOptions = {}): BotNameResult {
   const langNames = BOT_CONFIG.NAMES[language] || BOT_CONFIG.NAMES.en;
   const namePool = langNames[difficulty] || langNames.medium;
   const botSuffix = langNames.botSuffix || 'Bot';
@@ -73,7 +78,7 @@ export function generateBotName(difficulty: string, existingNames: string[] = []
   // Funny viral twist: sometimes the opponent is a celebrity/politician lookalike
   // (Trump Bot, Bibi Bot, Einstein Bot...) with a handcrafted avatar that caricatures them.
   // Keeps the requested difficulty for timing — only name/avatar/emoji change.
-  const availableCelebs = CELEBRITY_BOTS.filter((celeb) =>
+  const availableCelebs = !celebrities ? [] : CELEBRITY_BOTS.filter((celeb) =>
     !existingNames.some((existing) => existing.toLowerCase().includes(celeb.name.toLowerCase()))
   );
   if (availableCelebs.length > 0 && Math.random() < CELEBRITY_CHANCE) {
@@ -171,11 +176,11 @@ export function getRandomPersonality(): string {
 /**
  * Create a bot player object
  */
-export function createBot(gameCode: string, difficulty: string = 'medium', existingUsers: Record<string, GameUser> = {}, language: string = 'en'): Bot {
+export function createBot(gameCode: string, difficulty: string = 'medium', existingUsers: Record<string, GameUser> = {}, language: string = 'en', nameOptions: BotNameOptions = {}): Bot {
   const existingNames = Object.keys(existingUsers);
 
   const botId = generateBotId(gameCode);
-  const { name: botName, avatar } = generateBotName(difficulty, existingNames, language);
+  const { name: botName, avatar } = generateBotName(difficulty, existingNames, language, nameOptions);
   const personality = getRandomPersonality();
   const personalityTraits = BOT_CONFIG.PERSONALITIES[personality];
 

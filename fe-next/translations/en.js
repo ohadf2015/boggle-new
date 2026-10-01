@@ -18242,6 +18242,58 @@ const en = {
     }
   },
   // @eduHq:end
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "End the class game?",
+      "body": "The room closes for every student and you'll be back in your class HQ.",
+      "stay": "Keep playing",
+      "confirm": "End game"
+    },
+    "live": {
+      "panelTitle": "Live round",
+      "wordsFound": "words found",
+      "lessonFound": "Lesson words: {{found}}/{{total}}",
+      "wordOfRound": "Word of the round",
+      "wordOfRoundEmpty": "The first long word grabs this spot",
+      "bestWordBy": "{{count}} letters · found by {{name}}",
+      "exitLabel": "Leave the game"
+    },
+    "results": {
+      "backToClass": "Back to class",
+      "switchGame": "Switch game",
+      "soloTitle": "Solo round!",
+      "tieTitle": "It's a tie!",
+      "zeroTitle": "No points this round",
+      "zeroBody": "Warm-up done. The next round counts.",
+      "zeroNoteTitle": "Nobody scored yet",
+      "zeroNoteHint": "Try a longer timer or an easier board. Same code, nobody rejoins.",
+      "lineupTitle": "This round's line-up",
+      "emptyTitle": "Practice round done",
+      "emptyHeadline": "No students played this one",
+      "emptyBody": "Put the code up on the board. The next round counts for real.",
+      "podiumLessonWords": "{{found}}/{{total}} lesson words",
+      "noLessonTitle": "No lesson words this round",
+      "noLessonBody": "The points came from other words on the board. The class's best finds:",
+      "noLessonBodyEmpty": "The points came from other words on the board.",
+      "noLessonHint": "A bigger board or a longer timer gives the lesson words more room.",
+      "noLessonReteach": "Lesson words still to teach"
+    },
+    "reteach": {
+      "playNow": "Play it now",
+      "sendHome": "Send it home",
+      "printShare": "Print & share",
+      "googleClassroom": "Post to Google Classroom"
+    },
+    "lobby": {
+      "waitingForStudents": "Waiting for students"
+    },
+    "wordcraft": {
+      "bingo": "BINGO!",
+      "waiting": "Waiting for the first word…"
+    }
+  },
+  // @eduLive:end
 };
 
 export { en };

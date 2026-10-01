@@ -45,6 +45,8 @@ interface EducationHeaderProps {
    * the wrong place mid-game.
    */
   backHref?: string;
+  /** Replaces the navigation entirely, e.g. a live host who must confirm leaving first. */
+  onBack?: () => void;
 }
 
 /**
@@ -69,6 +71,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   showBackButton = false,
   title,
   backHref,
+  onBack,
 }) => {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
@@ -81,12 +84,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const [mounted, setMounted] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Track client-side mounting for portal
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
@@ -99,7 +100,6 @@ export const EducationHeader = memo<EducationHeaderProps>(({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMobileMenu]);
 
-  // Close mobile menu on escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -118,16 +118,15 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   // itself gates on.
   const isTeacher = isTeacherProfile(profile);
 
-  // Determine current section for active state
   const isOnTeacherSection = pathname?.includes('/teacher');
   const isOnStudentSection = pathname?.includes('/student');
 
   const handleBackClick = useCallback(() => {
+    if (onBack) return onBack();
     const role = isTeacher ? 'teacher' : profile?.user_role === 'student' ? 'student' : null;
     router.push(backHref || educationBackHref({ pathname, locale: language, role }));
-  }, [backHref, language, router, pathname, isTeacher, profile?.user_role]);
+  }, [backHref, language, router, pathname, isTeacher, profile?.user_role, onBack]);
 
-  // Handle sign out
   const handleSignOut = useCallback(async () => {
     setShowMobileMenu(false);
     await signOut();

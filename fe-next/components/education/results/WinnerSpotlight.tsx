@@ -29,6 +29,8 @@ import { cn } from '@/lib/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireRankConfetti, cleanupConfetti } from '@/utils/confettiUtils';
 import { playRoundEndCue, ROUND_WIN_SOUND } from '@/lib/education/roundEndSound';
+import { useCountUp } from '@/hooks/useCountUp';
+import type { RoundOutcomeKind } from './roundOutcome';
 
 const TROPHY_STILL = '/mascot/teacher/badge-trophy.webp';
 /**
@@ -53,8 +55,20 @@ export interface WinnerSpotlightProps {
    */
   cue?: boolean;
   size?: 'card' | 'projector';
+  /** What kind of round this was; a zero top score is always read as `zero`. */
+  outcome?: RoundOutcomeKind;
+  /** Everyone sharing first place, for a tie. */
+  leaders?: string[];
   t: (key: string, params?: Record<string, string | number>) => string;
 }
+
+const BANNER: Record<RoundOutcomeKind, string> = {
+  winner: 'education.results.moment.winnerBanner',
+  tie: 'eduLive.results.tieTitle',
+  solo: 'eduLive.results.soloTitle',
+  zero: 'eduLive.results.zeroTitle',
+  empty: 'eduLive.results.zeroTitle',
+};
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
@@ -70,16 +84,22 @@ export function WinnerSpotlight({
   active,
   cue = true,
   size = 'card',
+  outcome = 'winner',
+  leaders,
   t,
 }: WinnerSpotlightProps) {
   const projector = size === 'projector';
+  const kind: RoundOutcomeKind = !winner || winner.score <= 0 ? 'zero' : outcome;
+  const earned = kind !== 'zero' && kind !== 'empty';
+  const names = kind === 'tie' && leaders && leaders.length > 1 ? leaders : winner ? [winner.username] : [];
   const { sfxMuted, sfxVolume } = useSoundEffects();
   const celebratedRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const calm = prefersReducedMotion();
+  const shownScore = useCountUp({ target: active && earned ? winner?.score ?? 0 : 0, duration: 900, immediate: calm });
 
   useEffect(() => {
-    if (!active || !winner || !cue || celebratedRef.current) return;
+    if (!active || !winner || !earned || !cue || celebratedRef.current) return;
     celebratedRef.current = true;
     if (!calm) fireRankConfetti(1);
     audioRef.current = playRoundEndCue(ROUND_WIN_SOUND, {
@@ -87,7 +107,7 @@ export function WinnerSpotlight({
       muted: sfxMuted,
       volume: sfxVolume,
     });
-  }, [active, winner, cue, calm, sfxMuted, sfxVolume]);
+  }, [active, winner, earned, cue, calm, sfxMuted, sfxVolume]);
 
   // A rematch remounts this surface. Leave nothing of the last round running.
   useEffect(
@@ -105,6 +125,7 @@ export function WinnerSpotlight({
     <div
       data-testid="winner-spotlight"
       data-active={String(active)}
+      data-outcome={kind}
       className={cn(
         'flex items-center gap-4 rounded-neo border-[2px] border-neo-cream shadow-hard',
         'bg-neo-navy-elevated text-neo-white',
@@ -120,9 +141,9 @@ export function WinnerSpotlight({
         // reveal). Then the trophy is a photograph, and two shots a second
         // apart are identical — half of why round 4's five frames matched.
         // This CSS pulse does not care whether the video decodes.
-        data-trophy-pulse={active && !calm ? 'on' : 'off'}
+        data-trophy-pulse={active && earned && !calm ? 'on' : 'off'}
         style={
-          active && !calm
+          active && earned && !calm
             ? {
                 animation: 'lc-trophy-pulse 1.8s ease-in-out infinite',
               }
@@ -136,10 +157,10 @@ export function WinnerSpotlight({
           projector ? 'w-28 h-28 min-[2200px]:w-44 min-[2200px]:h-44' : 'w-16 h-16'
         )}
       >
-        {active && !calm && (
+        {active && earned && !calm && (
           <style>{`@keyframes lc-trophy-pulse{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.08) rotate(-3deg)}}`}</style>
         )}
-        {calm ? (
+        {calm || (active && !earned) ? (
           // The still IS the video's own poster frame; routing it through
           // next/image would request a second, differently-encoded copy of an
           // asset the browser already has.
@@ -177,26 +198,38 @@ export function WinnerSpotlight({
             projector ? 'text-3xl min-[2200px]:text-5xl' : 'text-sm'
           )}
         >
-          {active
-            ? t('education.results.moment.winnerBanner')
-            : t('education.results.moment.drumroll')}
+          {active ? t(BANNER[kind]) : t('education.results.moment.drumroll')}
         </p>
-        {active && (
+        {active && earned && (
           <p
             className={cn(
               'mt-1 flex items-baseline gap-3 font-neo-display font-black text-neo-white truncate',
               projector ? 'text-5xl min-[2200px]:text-8xl' : 'text-2xl'
             )}
           >
-            <span className="truncate">{winner.username}</span>
+            <span data-testid="winner-names" dir="auto" className="truncate">
+              {names.join(' & ')}
+            </span>
             <span
               className={cn(
                 'shrink-0 tabular-nums text-neo-lime',
                 projector ? 'text-4xl min-[2200px]:text-6xl' : 'text-xl'
               )}
             >
-              {winner.score}
+              {shownScore}
+              <span className="sr-only">{winner.score}</span>
             </span>
+          </p>
+        )}
+        {active && !earned && (
+          <p
+            data-testid="winner-zero-body"
+            className={cn(
+              'mt-1 font-neo-body font-bold leading-snug text-neo-cream',
+              projector ? 'text-xl min-[2200px]:text-4xl' : 'text-sm'
+            )}
+          >
+            {t('eduLive.results.zeroBody')}
           </p>
         )}
       </div>

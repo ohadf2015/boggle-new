@@ -19179,6 +19179,58 @@ const ja = {
     }
   },
   // @eduHq:end
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "クラスのゲームを終了しますか？",
+      "body": "生徒全員のルームが閉じて、クラスのホームに戻ります。",
+      "stay": "続ける",
+      "confirm": "ゲームを終了"
+    },
+    "live": {
+      "panelTitle": "ライブラウンド",
+      "wordsFound": "語みつけた",
+      "lessonFound": "授業の単語：{{found}}/{{total}}",
+      "wordOfRound": "今回のベストワード",
+      "wordOfRoundEmpty": "最初の長い単語がここに入ります",
+      "bestWordBy": "{{count}}文字・{{name}}さん",
+      "exitLabel": "ゲームを終了"
+    },
+    "results": {
+      "backToClass": "クラスに戻る",
+      "switchGame": "ゲームを変える",
+      "soloTitle": "ソロラウンド！",
+      "tieTitle": "同点！",
+      "zeroTitle": "このラウンドは得点なし",
+      "zeroBody": "ウォームアップ完了。次のラウンドが本番です。",
+      "zeroNoteTitle": "まだ誰も得点していません",
+      "zeroNoteHint": "タイマーを長くするか、やさしいボードを試してみましょう。コードはそのまま、参加し直す必要はありません。",
+      "lineupTitle": "このラウンドの参加者",
+      "emptyTitle": "練習ラウンド終了",
+      "emptyHeadline": "今回は生徒が誰も参加しませんでした",
+      "emptyBody": "黒板にコードを映しましょう。次のラウンドから本番です。",
+      "podiumLessonWords": "授業の単語 {{found}}/{{total}}",
+      "noLessonTitle": "今回は授業の単語が見つかりませんでした",
+      "noLessonBody": "得点はボード上のほかの単語から。クラスのベスト発見：",
+      "noLessonBodyEmpty": "得点はボード上のほかの単語から入りました。",
+      "noLessonHint": "ボードを大きくするか時間を延ばすと、授業の単語が入りやすくなります。",
+      "noLessonReteach": "これから教える授業の単語"
+    },
+    "reteach": {
+      "playNow": "今すぐ遊ぶ",
+      "sendHome": "宿題にする",
+      "printShare": "印刷・共有",
+      "googleClassroom": "Google Classroom に投稿"
+    },
+    "lobby": {
+      "waitingForStudents": "生徒の参加を待っています"
+    },
+    "wordcraft": {
+      "bingo": "ビンゴ！",
+      "waiting": "最初の単語を待っています…"
+    }
+  },
+  // @eduLive:end
 };
 
 export { ja };

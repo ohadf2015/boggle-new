@@ -106,6 +106,12 @@ export function LobbyModeSwitcher({
           <Shuffle className="h-[1em] w-[1em] shrink-0" strokeWidth={3} aria-hidden="true" />
         )}
         {liveName}
+        <span
+          data-testid="lobby-change-mode-tag"
+          className="rounded-md border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase leading-none tracking-wide text-neo-black md:px-[0.4vw] md:text-[0.72vw]"
+        >
+          {t('education.modePicker.change')}
+        </span>
       </button>
 
       {open && (
