@@ -122,22 +122,18 @@ describe('the finale is the last thing on the page', () => {
     expect(column.className).toMatch(/\bmax-w-/);
   });
 
-  // Browser finding (390, dev): the 80px mobile-tab-bar reserve (page-content-safe)
-  // on a wrapper opened a navy strip between the band and the footer, and on the
-  // band it left ~150px of empty lime under PLAY once cookies were accepted
-  // (html.has-global-bottom-nav is gone then). Fresh visitors have no tab bar on
-  // the homepage (tree CSS below), so their ending needs no reserve at all;
-  // returning visitors keep theirs at the end of their page (the finale is hidden
-  // for them), on a spacer only they see.
-  it('keeps the tab-bar reserve out of the fresh ending; returning visitors keep theirs', () => {
+  // The tab bar now shows for every visitor on the homepage, so the 80px
+  // mobile-tab-bar reserve (page-content-safe) sits on ONE spacer for everyone,
+  // never on the band/wrapper (that opened a navy strip above the footer).
+  it('keeps the tab-bar reserve on a single spacer shown to every visitor', () => {
     const { root, finale } = renderEnding();
     const band = finale.querySelector('[data-fresh-section="close"]') as HTMLElement;
     expect(band.className).not.toMatch(/\bpage-content-safe\b/);
     expect(finale.className).not.toMatch(/\bpage-content-safe\b/);
     expect(root.className).not.toMatch(/\bpage-content-safe\b/);
-    const spacer = root.querySelector('[data-home-only="returning"]') as HTMLElement;
+    const spacer = root.querySelector('.page-content-safe') as HTMLElement;
     expect(spacer).not.toBeNull();
-    expect(spacer.className).toMatch(/\bpage-content-safe\b/);
+    expect(spacer.hasAttribute('data-home-only')).toBe(false);
     expect(spacer.getAttribute('aria-hidden')).toBe('true');
     expect(spacer.childElementCount).toBe(0);
     // still before the finale: the finale stays the last element
@@ -231,11 +227,7 @@ describe('homepage tree CSS', () => {
     );
   });
 
-  it('hides the app tab bar for fresh visitors, by visibility so its height cache stays true', () => {
-    const c = css();
-    expect(c).toContain('html:not([data-home="returning"]) [data-global-bottom-nav]{visibility:hidden}');
-    // display:none would make GlobalBottomNav measure 0 and cache lc_bottom_nav_h=0,
-    // which the layout's prime script replays on the NEXT page (a bottom jump there).
-    expect(c).not.toMatch(/\[data-global-bottom-nav\]\s*\{\s*display\s*:\s*none/);
+  it('never hides the app tab bar on the homepage, for any visitor', () => {
+    expect(css()).not.toMatch(/data-global-bottom-nav/);
   });
 });

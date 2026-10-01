@@ -188,11 +188,9 @@ export function HomepageContentSection({ content, locale }: HomepageContentSecti
         </section>
       </section>
 
-      {/* The mobile-tab-bar reserve ends RETURNING visitors' page (they keep
-          the tab bar; the finale is hidden for them). Fresh visitors have no tab
-          bar on the homepage (homeTree CSS), so nothing pads their ending: a
-          reserve there opened a navy strip, or empty lime, above the footer. */}
-      <div data-home-only="returning" aria-hidden="true" className="page-content-safe" />
+      {/* The mobile-tab-bar reserve ends the page for every visitor: the tab bar
+          shows on the homepage for fresh and returning alike. */}
+      <div aria-hidden="true" className="page-content-safe" />
 
       <FreshClose locale={locale} />
     </div>

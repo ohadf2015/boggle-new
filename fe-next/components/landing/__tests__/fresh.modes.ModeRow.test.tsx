@@ -24,6 +24,7 @@ vi.mock('@/utils/growthTracking', () => ({
 import { ModeRow, FRESH_MODE_KEYS } from '../fresh/ModeRow';
 
 const PUBLIC_HREFS = [
+  '/en/multiplayer',
   '/en/word-craft',
   '/en/connections/pyramid',
   '/en/brain',
@@ -67,7 +68,7 @@ describe('ModeRow (fresh section 4)', () => {
   it('localises links by the current language', () => {
     lang.language = 'he';
     const { container } = render(<ModeRow />);
-    expect(cards(container)[0].getAttribute('href')).toBe('/he/word-craft');
+    expect(cards(container)[1].getAttribute('href')).toBe('/he/word-craft');
   });
 
   it('each card carries its own homeFresh title and one line', () => {
@@ -81,7 +82,7 @@ describe('ModeRow (fresh section 4)', () => {
 
   it('a card click keeps the hub instrumentation (mode_card + mode_selected)', () => {
     const { container } = render(<ModeRow />);
-    fireEvent.click(cards(container)[1]);
+    fireEvent.click(cards(container)[2]);
     expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'connections' }));
     expect(trackModeSelected).toHaveBeenCalledWith('connections', 'home');
   });
