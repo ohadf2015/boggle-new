@@ -19015,7 +19015,24 @@ const he = {
       "showAll": "הצגת כל ה-{count}",
       "showFewer": "הצגת פחות",
       "hiddenWords": "+{count} מילים קשות נוספות ב-Pro",
-      "previewNote": "תצוגה חינמית: שלוש הראשונות. ב-Pro רואים את כל העשר ואת כל התלמידים."
+      "previewNote": "תצוגה חינמית: שלוש הראשונות. ב-Pro רואים את כל העשר ואת כל התלמידים.",
+      "phoneHint": "המילים הקשות ראשונות, ולצד כל אחת מי פספס אותה.",
+      "needsHelpColumn": "צריכים עזרה",
+      "needsHelpLabel": "{name}: {count} מילים לחזרה",
+      "missedRow": "פספסו",
+      "wordMissedLabel": "{word}: {count} מתוך {total} תלמידים פספסו",
+      "missedByCount": "{count} מתוך {total} פספסו",
+      "missedNames": "פספסו: {names}",
+      "shakyNames": "מתנדנדים: {names}",
+      "everyoneGotIt": "כולם הצליחו",
+      "needsHelpTitle": "צריכים עזרה",
+      "needsHelpChip": "{name} ({count})",
+      "allClear": "אף אחד לא נתקע על המילים האלה. יפה.",
+      "unlock": {
+        "allWords": "כל 10 המילים הקשות, מדורגות",
+        "heatmap": "מי פספס איזו מילה, תלמיד אחרי תלמיד",
+        "practice": "תרגול של המילים שפוספסו בלחיצה אחת, בפריסה על פני שבוע"
+      }
     },
     "practice": {
       "cta": "תרגול מילים שפוספסו",

@@ -19085,7 +19085,24 @@ const sv = {
       "showAll": "Visa alla {count}",
       "showFewer": "Visa färre",
       "hiddenWords": "+{count} fler svåra ord i Pro",
-      "previewNote": "Gratisvy: dina tre svåraste. Pro visar alla tio och varje elev."
+      "previewNote": "Gratisvy: dina tre svåraste. Pro visar alla tio och varje elev.",
+      "phoneHint": "Svåraste orden först, med vem som missade varje ord.",
+      "needsHelpColumn": "Behöver hjälp",
+      "needsHelpLabel": "{name}: {count} ord att repetera",
+      "missedRow": "Missat av",
+      "wordMissedLabel": "{word}: missat av {count} av {total} elever",
+      "missedByCount": "missat av {count} av {total}",
+      "missedNames": "Missade: {names}",
+      "shakyNames": "Osäkra: {names}",
+      "everyoneGotIt": "Alla klarade det",
+      "needsHelpTitle": "Behöver hjälp",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Ingen har fastnat på de här orden. Snyggt.",
+      "unlock": {
+        "allWords": "Hela topp 10 över de svåraste orden, rankad",
+        "heatmap": "Vem som missade vilket ord, elev för elev",
+        "practice": "Öva missade ord med ett klick, utspritt över en vecka"
+      }
     },
     "practice": {
       "cta": "Öva missade ord",

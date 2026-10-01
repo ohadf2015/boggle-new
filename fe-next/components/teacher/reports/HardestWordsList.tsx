@@ -15,7 +15,8 @@ function barTone(missRate: number) {
 
 export const HARDEST_VISIBLE = 6;
 
-export function HardestWordsList({ words }: { words: HardWord[] }) {
+/** `trailing` renders extra rows inside the same grid (the free preview's locked ghosts). */
+export function HardestWordsList({ words, trailing }: { words: HardWord[]; trailing?: React.ReactNode }) {
   const { t } = useLanguage();
   const reduceMotion = useReducedMotion();
   const [showAll, setShowAll] = useState(false);
@@ -31,7 +32,7 @@ export function HardestWordsList({ words }: { words: HardWord[] }) {
             initial={reduceMotion ? false : { x: -10 }}
             animate={{ x: 0 }}
             transition={{ type: 'spring', stiffness: 500, damping: 30, delay: i * 0.04 }}
-            className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 border-black/60 bg-neo-navy px-2.5 py-1.5"
+            className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2.5 py-1.5"
           >
             <span
               aria-hidden="true"
@@ -64,6 +65,7 @@ export function HardestWordsList({ words }: { words: HardWord[] }) {
             <span className="font-neo-display text-lg font-black text-neo-white tabular-nums">{w.missRate}%</span>
           </m.li>
         ))}
+        {trailing}
       </ol>
       {words.length > HARDEST_VISIBLE && (
         <button

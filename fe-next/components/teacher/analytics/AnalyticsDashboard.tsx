@@ -28,6 +28,8 @@ export interface AnalyticsDashboardProps {
   onCreateReviewLesson?: (words: string[]) => void;
   /** False when the host page already carries the analytics title. */
   showHeader?: boolean;
+  /** Metric cards only — for a host page whose own tabs carry the table, chart and heatmap. */
+  summaryOnly?: boolean;
 }
 
 // ============================================
@@ -58,6 +60,7 @@ export function AnalyticsDashboard({
   onViewStudents,
   onCreateReviewLesson,
   showHeader = true,
+  summaryOnly = false,
 }: AnalyticsDashboardProps) {
   const { t } = useLanguage();
   const { metrics, isLoading, error, refresh } = useClassroomAnalytics({ classroomId });
@@ -181,13 +184,14 @@ export function AnalyticsDashboard({
       )}
 
       {/* Metric Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={cn('grid lg:grid-cols-4', summaryOnly ? 'grid-cols-2 gap-3 sm:gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4')}>
         {/* Metric 1: Students Needing Help (Urgent) */}
         <MetricCard
           title={t('education.analytics.studentsNeedingHelp')}
           value={metrics.studentsNeedingHelp}
           icon={<AlertTriangle className="w-6 h-6" />}
           severity="urgent"
+          compact={summaryOnly}
           testId="metric-students-needing-help"
           actionable={{
             label: t('education.analytics.viewStudents'),
@@ -202,6 +206,7 @@ export function AnalyticsDashboard({
           icon={<TrendingUp className="w-6 h-6" />}
           severity="info"
           testId="metric-class-average-xp"
+          compact={summaryOnly}
         />
 
         {/* Metric 3: Active Students Today (Info) */}
@@ -213,6 +218,7 @@ export function AnalyticsDashboard({
           trendValue={`${engagementPercent}%`}
           trend={engagementPercent >= 70 ? 'up' : engagementPercent >= 50 ? 'neutral' : 'down'}
           testId="metric-active-students"
+          compact={summaryOnly}
         />
 
         {/* Metric 4: Common Mistakes (Warning) */}
@@ -222,6 +228,7 @@ export function AnalyticsDashboard({
           icon={<AlertCircle className="w-6 h-6" />}
           severity="warning"
           testId="metric-common-mistakes"
+          compact={summaryOnly}
           actionable={
             onCreateReviewLesson && commonMistakesCount > 0
               ? {
@@ -233,6 +240,7 @@ export function AnalyticsDashboard({
         />
       </div>
 
+      {!summaryOnly && (<>
       {/* Student Progress Table */}
       <div ref={studentTableRef} className="mt-6">
         <div className="flex justify-between items-center mb-4">
@@ -309,6 +317,7 @@ export function AnalyticsDashboard({
       <div className="mt-6">
         <VocabularyHeatmap classroomId={classroomId} />
       </div>
+      </>)}
 
       {/* Student Detail Dialog */}
       <Dialog open={!!selectedStudentId} onOpenChange={(open) => { if (!open) setSelectedStudentId(null); }}>

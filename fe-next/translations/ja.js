@@ -19085,7 +19085,24 @@ const ja = {
       "showAll": "{count}語すべて表示",
       "showFewer": "表示を減らす",
       "hiddenWords": "Proでさらに{count}語の難しい単語",
-      "previewNote": "無料プレビュー:上位3語まで。Proなら10語すべてと生徒全員が見られます。"
+      "previewNote": "無料プレビュー:上位3語まで。Proなら10語すべてと生徒全員が見られます。",
+      "phoneHint": "難しい単語から順に、誰が間違えたかも表示します。",
+      "needsHelpColumn": "要サポート",
+      "needsHelpLabel": "{name}:復習する単語 {count}語",
+      "missedRow": "間違えた人数",
+      "wordMissedLabel": "{word}:{total}人中{count}人が間違えました",
+      "missedByCount": "{total}人中{count}人ミス",
+      "missedNames": "ミス:{names}",
+      "shakyNames": "あやふや:{names}",
+      "everyoneGotIt": "全員正解",
+      "needsHelpTitle": "要サポート",
+      "needsHelpChip": "{name}・{count}",
+      "allClear": "この単語でつまずいている生徒はいません。いい感じ!",
+      "unlock": {
+        "allWords": "難しい単語トップ10をすべてランキングで",
+        "heatmap": "誰がどの単語を間違えたか、生徒ごとに",
+        "practice": "間違えた単語の練習をワンクリックで、1週間かけて間隔をあけて"
+      }
     },
     "practice": {
       "cta": "ミスした単語を練習",

@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
 import { Flame, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { MasteryStatCards } from './MasteryStatCards';
 import { HardestWordsList } from './HardestWordsList';
 import { MasteryHeatmap } from './MasteryHeatmap';
+import { MasteryLockedTeaser } from './MasteryLockedTeaser';
 import { MissedPracticeAction } from './MissedPracticeAction';
 import { useRosterNames, useWordMasteryReport } from './useWordMasteryReport';
 
@@ -76,14 +75,8 @@ export function WordMasteryReport({ classroomId, classroomName }: WordMasteryRep
         <div className="space-y-4">
           <MasteryStatCards totals={totals} />
           <HardestBlock>
-            {preview.hardestWords.length > 0 ? (
-              <HardestWordsList words={preview.hardestWords} />
-            ) : (
-              <p className="text-sm font-bold text-neo-cream/70">{t('eduPro.mastery.noneMissed')}</p>
-            )}
-            <LockedTeaser hidden={preview.hiddenWords} />
+            <MasteryLockedTeaser words={preview.hardestWords} hidden={preview.hiddenWords} />
           </HardestBlock>
-          <MissedPracticeAction classroomId={classroomId} classroomName={classroomName} locked />
         </div>
       </Shell>
     );
@@ -122,41 +115,6 @@ function HardestBlock({ children }: { children: React.ReactNode }) {
         {t('eduPro.mastery.hardestTitle')}
       </h3>
       {children}
-    </div>
-  );
-}
-
-/** Placeholder shapes, not data: blur is not a security boundary. */
-function LockedTeaser({ hidden }: { hidden: number }) {
-  const { t, language } = useLanguage();
-  return (
-    <div className="relative mt-2 overflow-hidden rounded-neo border-2 border-neo-lime bg-neo-navy">
-      <div aria-hidden="true" className="pointer-events-none select-none space-y-1.5 p-2.5 blur-[3px]">
-        {[70, 55, 40].map((w) => (
-          <div key={w} className="flex items-center gap-3 rounded-neo border-2 border-black/40 bg-neo-navy-light px-2.5 py-2">
-            <span className="size-6 rounded-neo bg-neo-cream/40" />
-            <span className="h-3 rounded-full bg-neo-pink/60" style={{ width: `${w}%` }} />
-          </div>
-        ))}
-        <div className="grid grid-cols-8 gap-1 pt-1">
-          {Array.from({ length: 16 }, (_, i) => (
-            <span key={i} className={i % 3 === 0 ? 'h-5 rounded bg-neo-pink/60' : i % 3 === 1 ? 'h-5 rounded bg-neo-lime/60' : 'h-5 rounded bg-neo-cyan/60'} />
-          ))}
-        </div>
-      </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-neo-navy/70 p-3 text-center">
-        <Lock className="size-5 text-neo-lime" aria-hidden="true" />
-        <p className="font-neo-display text-base font-black text-neo-white">{t('teacher.proGate.mastery.title')}</p>
-        {hidden > 0 && <p className="text-xs font-black text-neo-lime">{t('eduPro.mastery.hiddenWords', { count: hidden })}</p>}
-        <p className="max-w-sm text-xs font-bold text-neo-white/80">{t('eduPro.mastery.previewNote')}</p>
-        <Link
-          href={`/${language}/teacher/upgrade`}
-          onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'pro_gate_mastery' })}
-          className="mt-1 inline-block rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 text-sm font-black text-neo-navy shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none motion-reduce:transition-none"
-        >
-          {t('teacher.proGate.cta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
-        </Link>
-      </div>
     </div>
   );
 }

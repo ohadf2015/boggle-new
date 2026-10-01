@@ -28,6 +28,8 @@ export interface MetricCardProps {
   };
   /** Test ID for testing */
   testId?: string;
+  /** Smaller icon and value on phones, for a two-up grid. */
+  compact?: boolean;
 }
 
 // ============================================
@@ -63,6 +65,7 @@ export function MetricCard({
   severity,
   actionable,
   testId = 'metric-card',
+  compact = false,
 }: MetricCardProps) {
   // ==================== STYLING ====================
 
@@ -110,20 +113,21 @@ export function MetricCard({
       )}
     >
       {/* Colored header */}
-      <div className={cn('px-4 pt-4 pb-3 flex items-center gap-3', cardBg)}>
+      <div className={cn('flex items-center', compact ? 'gap-2 px-3 pt-3 pb-2.5 sm:gap-3 sm:px-4 sm:pt-4 sm:pb-3' : 'px-4 pt-4 pb-3 gap-3', cardBg)}>
         <div className={cn(
-          'w-11 h-11 rounded-neo border-3 border-black flex items-center justify-center shrink-0 shadow-hard-sm',
+          'rounded-neo border-3 border-black flex items-center justify-center shrink-0 shadow-hard-sm',
+          compact ? 'size-9 sm:size-11 [&_svg]:size-5 sm:[&_svg]:size-6' : 'w-11 h-11',
           iconBg
         )}>
           <span className={iconFg}>{icon}</span>
         </div>
-        <div className="text-4xl font-neo-display font-black text-black tabular-nums leading-none">
+        <div className={cn('font-neo-display font-black text-black tabular-nums leading-none', compact ? 'min-w-0 text-2xl sm:text-4xl' : 'text-4xl')}>
           {value}
         </div>
       </div>
 
       {/* White body */}
-      <div className="bg-neo-cream px-4 py-3 flex flex-col gap-2 flex-1 border-t-3 border-black">
+      <div className={cn('bg-neo-cream flex flex-col gap-2 flex-1 border-t-3 border-black', compact ? 'px-3 py-2.5 sm:px-4 sm:py-3' : 'px-4 py-3')}>
         {/* Title */}
         <div className="text-sm font-neo-body font-bold text-black">{title}</div>
 

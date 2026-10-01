@@ -19103,7 +19103,24 @@ const es = {
       "showAll": "Ver las {count}",
       "showFewer": "Ver menos",
       "hiddenWords": "+{count} palabras difíciles más en Pro",
-      "previewNote": "Vista gratuita: tus 3 primeras. Pro muestra las diez y a cada alumno."
+      "previewNote": "Vista gratuita: tus 3 primeras. Pro muestra las diez y a cada alumno.",
+      "phoneHint": "Las palabras más difíciles primero, con quién falló cada una.",
+      "needsHelpColumn": "Necesita ayuda",
+      "needsHelpLabel": "{name}: {count} palabras para repasar",
+      "missedRow": "Fallada por",
+      "wordMissedLabel": "{word}: la fallaron {count} de {total} alumnos",
+      "missedByCount": "fallada por {count} de {total}",
+      "missedNames": "Fallaron: {names}",
+      "shakyNames": "Con dudas: {names}",
+      "everyoneGotIt": "Todos la acertaron",
+      "needsHelpTitle": "Necesitan ayuda",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Nadie se ha atascado con estas palabras. ¡Bien!",
+      "unlock": {
+        "allWords": "El top 10 completo de palabras más difíciles",
+        "heatmap": "Quién falló cada palabra, alumno por alumno",
+        "practice": "Repaso de las palabras falladas con un clic, repartido en una semana"
+      }
     },
     "practice": {
       "cta": "Practicar palabras falladas",

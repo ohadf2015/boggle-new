@@ -18148,7 +18148,24 @@ const en = {
       "showAll": "Show all {count}",
       "showFewer": "Show fewer",
       "hiddenWords": "+{count} more hard words in Pro",
-      "previewNote": "Free preview: your top 3. Pro shows all ten and every student."
+      "previewNote": "Free preview: your top 3. Pro shows all ten and every student.",
+      "phoneHint": "Hardest words first, with who missed each one.",
+      "needsHelpColumn": "Needs help",
+      "needsHelpLabel": "{name}: {count} words to review",
+      "missedRow": "Missed by",
+      "wordMissedLabel": "{word}: missed by {count} of {total} students",
+      "missedByCount": "missed by {count} of {total}",
+      "missedNames": "Missed: {names}",
+      "shakyNames": "Shaky: {names}",
+      "everyoneGotIt": "Everyone got it",
+      "needsHelpTitle": "Needs help",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Nobody is stuck on these words. Nice.",
+      "unlock": {
+        "allWords": "The full top 10 hardest words, ranked",
+        "heatmap": "Who missed which word, student by student",
+        "practice": "One-click practice of missed words, spaced over a week"
+      }
     },
     "practice": {
       "cta": "Practice missed words",

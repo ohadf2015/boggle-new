@@ -18818,7 +18818,24 @@ const ru = {
       "showAll": "Показать все ({count})",
       "showFewer": "Свернуть",
       "hiddenWords": "Ещё трудных слов в Pro: {count}",
-      "previewNote": "Бесплатный просмотр: первые три. В Pro — все десять и каждый ученик."
+      "previewNote": "Бесплатный просмотр: первые три. В Pro — все десять и каждый ученик.",
+      "phoneHint": "Сначала самые трудные слова — и кто в каждом ошибся.",
+      "needsHelpColumn": "Нужна помощь",
+      "needsHelpLabel": "{name}: слов на повторение — {count}",
+      "missedRow": "Ошиблись",
+      "wordMissedLabel": "{word}: ошиблись {count} из {total} учеников",
+      "missedByCount": "ошиблись {count} из {total}",
+      "missedNames": "Ошиблись: {names}",
+      "shakyNames": "Не уверены: {names}",
+      "everyoneGotIt": "Все справились",
+      "needsHelpTitle": "Нужна помощь",
+      "needsHelpChip": "{name} ({count})",
+      "allClear": "На этих словах никто не застрял. Отлично.",
+      "unlock": {
+        "allWords": "Полный топ-10 самых трудных слов",
+        "heatmap": "Кто ошибся в каком слове — по каждому ученику",
+        "practice": "Повторение пропущенных слов в один клик, с интервалами на неделю"
+      }
     },
     "practice": {
       "cta": "Повторить трудные слова",

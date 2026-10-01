@@ -13,7 +13,7 @@
 
 'use client';
 
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,6 +21,8 @@ import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgre
 import { AnalyticsDashboard } from '@/components/teacher/analytics/AnalyticsDashboard';
 import { ProGate } from '@/components/teacher/ProGate';
 import { StudentProgressTable } from '@/components/teacher/analytics/StudentProgressTable';
+import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
+import { getClassroom } from '@/lib/supabase/education/classrooms';
 import dynamic from 'next/dynamic';
 const LessonEffectivenessChart = dynamic(
   () => import('@/components/teacher/analytics/LessonEffectivenessChart'),
@@ -55,6 +57,22 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   const { user, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
+  const [tab, setTab] = useState('students');
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const masteryRef = useRef<HTMLDivElement>(null);
+  const [classroomName, setClassroomName] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    getClassroom(classroomId)
+      .then(({ data }) => {
+        if (!cancelled && data?.name) setClassroomName(data.name);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [classroomId]);
 
   // ==================== REALTIME CONNECTION ====================
 
@@ -106,15 +124,17 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   };
 
   const handleViewStudents = (_filter: 'struggling') => {
-    // Navigate to students tab with filter
+    setTab('students');
+    tabsRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   };
 
   const handleCreateReviewLesson = (_words: string[]) => {
-    // Navigate to lesson creation with pre-filled words
+    masteryRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   };
 
-  const handleStudentClick = (_studentId: string) => {
-    // Navigate to individual student detail
+  const handleStudentClick = (studentId: string) => {
+    const params = new URLSearchParams({ classroomId, studentId });
+    router.push(`/${locale}/teacher/reports?${params.toString()}`);
   };
 
   // ==================== RENDER ====================
@@ -169,18 +189,21 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
             being sold; gating only the summary card left them open to free teachers. */}
         <ProGate feature="analytics">
-          {/* Metrics Dashboard */}
-          <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
+          <div ref={masteryRef} className="scroll-mt-4">
+            <WordMasteryReport classroomId={classroomId} classroomName={classroomName} />
+          </div>
+
+          <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-3 sm:p-6">
             <AnalyticsDashboard
               classroomId={classroomId}
               onViewStudents={handleViewStudents}
               onCreateReviewLesson={handleCreateReviewLesson}
               showHeader={false}
+              summaryOnly
             />
           </div>
 
-          {/* Detailed Views Tabs */}
-          <Tabs defaultValue="students" className="space-y-4">
+          <Tabs ref={tabsRef} value={tab} onValueChange={setTab} className="scroll-mt-4 space-y-4">
             <TabsList
               className={cn(
                 'grid h-auto w-full grid-cols-2 gap-2 sm:grid-cols-4',
