@@ -1,5 +1,174 @@
 // Es translations
 const es = {
+  // @eduLibrary:start
+  "eduLibrary": {
+    "title": "Biblioteca",
+    "tabs": {
+      "mine": "Mis listas",
+      "discover": "Descubrir"
+    },
+    "editor": {
+      "createTitle": "Nueva lista de palabras",
+      "editTitle": "Editar lista",
+      "description": "Pega palabras, añade significados y guarda.",
+      "newList": "Nueva lista",
+      "titleLabel": "Nombre de la lista",
+      "titlePlaceholder": "Ponle nombre a tu lista…",
+      "pasteLabel": "Pega o escribe palabras",
+      "pastePlaceholder": "manzana, plátano, cereza — o una por línea. «palabra - significado» añade la definición.",
+      "addedWords": "+{count} añadidas",
+      "skippedDuplicates": "{count} ya estaban en la lista",
+      "importFile": "CSV / TSV",
+      "starterPack": "Pack inicial",
+      "fileError": "No encontramos palabras en el archivo. Una palabra por fila y la definición en la segunda columna.",
+      "wordsHeading": "Palabras",
+      "wordsLabel": "Palabras de la lista",
+      "viewLabel": "Vista",
+      "view": {
+        "chips": "Fichas",
+        "details": "Detalles"
+      },
+      "emptyWords": "Tus palabras aparecerán aquí.",
+      "removeWord": "Quitar {word}",
+      "noDefinition": "Sin definición todavía",
+      "word": "Palabra",
+      "definition": "Definición (opcional)",
+      "definitionPlaceholder": "¿Qué significa?",
+      "done": "Listo",
+      "needTitle": "Ponle nombre a la lista para guardarla.",
+      "needWords": "Añade al menos una palabra.",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "saved": "Guardada",
+      "savedToast": "«{name}» guardada"
+    },
+    "issue": {
+      "digits": "Tiene un número",
+      "tooLong": "Demasiado larga para jugar",
+      "wrongScript": "No parece del idioma de la lista",
+      "blocked": "No permitida en juegos de alumnos"
+    },
+    "meta": {
+      "language": "Idioma",
+      "grade": "Curso",
+      "topic": "Tema",
+      "assignTo": "Asignar a",
+      "noClass": "Sin clase por ahora"
+    },
+    "grade": {
+      "any": "Todos los cursos",
+      "k2": "Infantil–2.º",
+      "g35": "3.º–5.º",
+      "g68": "6.º–8.º",
+      "g912": "9.º–12.º"
+    },
+    "topic": {
+      "none": "Sin tema",
+      "all": "Todos los temas",
+      "general": "General",
+      "english": "Inglés",
+      "hebrew": "Hebreo",
+      "science": "Ciencias",
+      "math": "Matemáticas",
+      "history": "Historia",
+      "geography": "Geografía",
+      "language": "Idiomas"
+    },
+    "share": {
+      "toggle": "Compartir en Descubrir",
+      "help": "Otros docentes podrán encontrarla, jugarla y copiarla. Solo se muestra tu nombre visible.",
+      "blocked": "Hay palabras que no se pueden compartir con alumnos. Quítalas para compartir.",
+      "share": "Compartir",
+      "shared": "Compartida",
+      "nowPublic": "Compartida en Descubrir",
+      "nowPrivate": "Vuelve a ser privada",
+      "failed": "No se pudo cambiar. Inténtalo de nuevo."
+    },
+    "remixedFrom": "Remix de {title} de {author}",
+    "remixedFromNoAuthor": "Remix de {title}",
+    "myLists": {
+      "emptyHint": "Pega una lista, empieza con un pack inicial o toma una de Descubrir."
+    },
+    "card": {
+      "practice": "Practicar",
+      "words": "{count} palabras",
+      "by": "de {author}",
+      "aTeacher": "un docente",
+      "new": "Nueva",
+      "plays": "{count} partidas",
+      "copies": "{count} copias",
+      "results": "Resultados"
+    },
+    "badge": {
+      "verified": "Verificada",
+      "teacher": "De docente",
+      "yours": "Tuya"
+    },
+    "discover": {
+      "searchLabel": "Buscar listas",
+      "searchPlaceholder": "Busca listas, palabras o docentes",
+      "clearSearch": "Borrar búsqueda",
+      "filters": "Filtros",
+      "allLanguages": "Todos",
+      "sourceLabel": "Quién la hizo",
+      "source": {
+        "all": "Todas",
+        "verified": "Verificadas por LexiClash",
+        "teacher": "De docentes"
+      },
+      "count": "{count} listas",
+      "sortLabel": "Ordenar",
+      "sort": {
+        "popular": "Más populares",
+        "newest": "Más nuevas"
+      },
+      "loadError": "No se pudo cargar Descubrir.",
+      "retry": "Reintentar",
+      "emptyTitle": "Aún no hay listas que coincidan",
+      "emptyHint": "Prueba otro filtro, o comparte una tuya para que la encuentre el próximo docente.",
+      "tryAllLanguages": "Ver todos los idiomas",
+      "shareFirst": "Compartir una lista",
+      "beFirstTitle": "Sé el primer docente aquí.",
+      "beFirstHint": "Comparte una de tus listas y la verán todos los docentes de este idioma."
+    },
+    "preview": {
+      "host": "Jugar en vivo",
+      "assign": "Asignar",
+      "copy": "Hacer una copia",
+      "copied": "Copiada",
+      "copiedHint": "Ya está en Mis listas: toca Copiada para abrirla.",
+      "copiedToast": "«{name}» copiada a Mis listas",
+      "copyFailed": "No se pudo copiar. Inténtalo de nuevo."
+    },
+    "report": {
+      "action": "Denunciar esta lista",
+      "title": "Denunciar lista",
+      "description": "¿Qué le pasa a «{name}»? Revisamos todas las denuncias.",
+      "reason": {
+        "inappropriate": "No es apropiada para alumnos",
+        "offensive": "Palabras ofensivas",
+        "unplayable": "Palabras incorrectas o injugables",
+        "spam": "Spam o basura"
+      },
+      "detailsPlaceholder": "¿Algo más? (opcional)",
+      "submit": "Enviar denuncia",
+      "thanks": "Gracias, lo revisaremos.",
+      "failed": "No se pudo enviar. Inténtalo de nuevo."
+    },
+    "assign": {
+      "title": "Asignar a una clase",
+      "pickClass": "¿Qué clase la recibe?",
+      "noClasses": "Primero crea una clase: tarda 5 segundos.",
+      "createClass": "Crear clase"
+    },
+    "pager": {
+      "label": "Páginas",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "status": "{page} / {total}"
+    }
+  },
+  // @eduLibrary:end
   // @academy:start (generated by /tmp/edu-play/merge-i18n.mjs)
   "academy": {
     "teacher": {
