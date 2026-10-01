@@ -252,6 +252,7 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
               mode={mode}
               label={t(mode.labelKey, mode.labelFallback)}
               blurb={t(mode.blurbKey, mode.blurbFallback)}
+              tagline={t(hqModeFacts(mode.id).tagKey)}
               selected={liveMode === mode.id}
               disabled={mode.id === 'vocab-quiz' && !!armed && !quizReady && !quizSwapsToPack}
               reduced={reduced}

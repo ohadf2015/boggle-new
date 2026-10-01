@@ -19110,7 +19110,19 @@ const sv = {
     },
     "hq": {
       "assigned": "{{count}} tilldelade",
-      "assignedAria": "Läxor: {{count}} tilldelade. Öppna läxor"
+      "assignedAria": "Läxor: {{count}} tilldelade. Öppna läxor",
+      "assignNudge": "Ge läxa"
+    },
+    "modeTags": {
+      "vocabQuiz": "Välj betydelse",
+      "classic": "Hitta ord",
+      "blast": "Kedja kombos",
+      "wordHunt": "Jaga listord",
+      "wordcraft": "Bygg och stava"
+    },
+    "lobby": {
+      "waitingOne": "Väntar på 1 elev",
+      "practiceLink": "Ingen här än? Öva mot bottar"
     }
   },
   // @eduHq:end

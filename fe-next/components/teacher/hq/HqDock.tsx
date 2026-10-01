@@ -139,7 +139,7 @@ export function HqDock({
               strokeWidth={2.5}
               aria-hidden="true"
             />
-            <span className="min-w-0 truncate">
+            <span className="min-w-0 truncate max-sm:sr-only">
               {t("teacher.dashboard.tools")}
             </span>
           </>

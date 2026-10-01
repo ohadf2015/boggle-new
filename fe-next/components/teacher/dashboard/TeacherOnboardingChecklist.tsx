@@ -99,10 +99,11 @@ export function TeacherOnboardingChecklist({
     hasProgressReport,
   });
 
+  const currentStep = result.current;
   useEffect(() => {
-    if (!result.current) return;
-    trackTeacherOnboardingStep({ step: result.current, action: 'view' });
-  }, [result.current]);
+    if (!currentStep) return;
+    trackTeacherOnboardingStep({ step: currentStep, action: 'view' });
+  }, [currentStep]);
 
   if (result.complete) return null;
 

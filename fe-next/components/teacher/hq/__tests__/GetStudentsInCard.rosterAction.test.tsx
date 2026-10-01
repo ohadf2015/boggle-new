@@ -1,6 +1,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 const roster = vi.fn();
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -25,12 +25,19 @@ describe('<GetStudentsInCard> — roster-row action slot', () => {
     roster.mockReturnValue({ students: [{ id: 's1', name: 'Ava', avatar: null }], loading: false, arrivals: [] });
   });
 
-  it('Given students and a roster action, Then the action sits in the roster row and the count steps aside on phones', () => {
+  it('Given a roster action, Then it rides in the roster row beside the joined count, never squeezed into the card header', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} rosterAction={<button data-testid="inline-cta" />} />);
     const row = screen.getByTestId('hq-roster-row');
     expect(row).toContainElement(screen.getByTestId('inline-cta'));
     expect(row).toContainElement(screen.getByTestId('hq-joined-count'));
-    expect(screen.getByTestId('hq-joined-count').parentElement?.className).toMatch(/max-sm:hidden/);
+    const heading = screen.getByRole('heading', { name: 'academy.hq.getStudentsIn' });
+    expect(heading.parentElement).not.toContainElement(screen.getByTestId('inline-cta'));
+  });
+
+  it('Given a roster action, Then the count and the code-ready pill both stay visible on phones', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} rosterAction={<button data-testid="inline-cta" />} />);
+    expect(screen.getByTestId('hq-join-status').className).not.toMatch(/max-sm:hidden/);
+    expect(screen.getByTestId('hq-joined-count').parentElement?.className ?? '').not.toMatch(/max-sm:hidden/);
   });
 
   it('Given no roster action, Then the count shows on every width', () => {

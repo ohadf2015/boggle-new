@@ -19128,7 +19128,19 @@ const es = {
     },
     "hq": {
       "assigned": "{{count}} asignadas",
-      "assignedAria": "Tareas: {{count}} asignadas. Abrir tareas"
+      "assignedAria": "Tareas: {{count}} asignadas. Abrir tareas",
+      "assignNudge": "Poner tarea"
+    },
+    "modeTags": {
+      "vocabQuiz": "Elige el sentido",
+      "classic": "Busca palabras",
+      "blast": "Combos en cadena",
+      "wordHunt": "Caza la lista",
+      "wordcraft": "Arma palabras"
+    },
+    "lobby": {
+      "waitingOne": "Esperando a 1 alumno",
+      "practiceLink": "¿Nadie aún? Practica con bots"
     }
   },
   // @eduHq:end

@@ -60,6 +60,15 @@ describe('eduHq translations resolve through the imported bundles', () => {
     }
   });
 
+  it.each(Object.keys(BUNDLES))('Given %s, Then each mode tile tagline resolves and stays short enough for one line on a 390px tile', (loc) => {
+    for (const m of HQ_MODES) {
+      const { tagKey } = hqModeFacts(m.id);
+      const value = resolve(BUNDLES[loc], tagKey);
+      expect(typeof value, `${loc}:${tagKey}`).toBe('string');
+      expect(Array.from(value as string).length, `${loc}:${tagKey}`).toBeLessThanOrEqual(18);
+    }
+  });
+
   it('Given source code, Then every literal eduHq key it names exists in en', () => {
     const files = [
       ...sourceFiles(path.join(ROOT, 'components', 'teacher')),

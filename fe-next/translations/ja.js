@@ -19110,7 +19110,19 @@ const ja = {
     },
     "hq": {
       "assigned": "宿題 {{count}}件",
-      "assignedAria": "宿題：{{count}}件を配布中。宿題を開く"
+      "assignedAria": "宿題：{{count}}件を配布中。宿題を開く",
+      "assignNudge": "宿題を出す"
+    },
+    "modeTags": {
+      "vocabQuiz": "意味をえらぶ",
+      "classic": "単語をさがす",
+      "blast": "コンボで連鎖",
+      "wordHunt": "リストの単語を探す",
+      "wordcraft": "つづりを組み立て"
+    },
+    "lobby": {
+      "waitingOne": "生徒1人を待っています",
+      "practiceLink": "まだ誰もいない？ボットと練習"
     }
   },
   // @eduHq:end

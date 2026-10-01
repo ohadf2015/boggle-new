@@ -25,7 +25,7 @@ export interface HqClassroom {
 export interface GetStudentsInCardProps {
   classroom: HqClassroom;
   onOpenProjector: () => void;
-  /** Phone-only action in the roster row (the first-assignment nudge) — no extra row on a 390px deck. */
+  /** Phone-only action in the roster row (the first-assignment nudge): no extra row, header left calm. */
   rosterAction?: ReactNode;
   className?: string;
 }
@@ -261,7 +261,7 @@ export function GetStudentsInCard({
               <p className="hidden font-neo-body text-sm font-bold text-neo-white/60 lg:order-3 lg:mt-auto lg:block lg:[@media(max-height:800px)]:hidden">
                 {t("teacher.activation.shareBody")}
               </p>
-              <div className={cn(rosterAction && "max-sm:hidden")}>
+              <div className={cn(rosterAction && "max-sm:me-auto")}>
                 <JoinedCount
                   loading={false}
                   count={count}

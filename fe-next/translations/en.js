@@ -18173,7 +18173,19 @@ const en = {
     },
     "hq": {
       "assigned": "{{count}} assigned",
-      "assignedAria": "Homework: {{count}} assigned. Open homework"
+      "assignedAria": "Homework: {{count}} assigned. Open homework",
+      "assignNudge": "Assign homework"
+    },
+    "modeTags": {
+      "vocabQuiz": "Pick the meaning",
+      "classic": "Spot hidden words",
+      "blast": "Chain combos",
+      "wordHunt": "Find list words",
+      "wordcraft": "Build and spell"
+    },
+    "lobby": {
+      "waitingOne": "Waiting for 1 student",
+      "practiceLink": "No one yet? Practice with bots"
     }
   },
   // @eduHq:end

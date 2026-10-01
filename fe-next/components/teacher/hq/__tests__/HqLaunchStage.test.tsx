@@ -46,6 +46,17 @@ describe('<HqLaunchStage> — GO LIVE never shows a bare splash', () => {
     expect(steps[2]).not.toHaveAttribute('data-state', 'done');
   });
 
+  it('Given the reel is rolling, Then its glyphs are blurred so no screenshot passes off a made-up code as the real one', () => {
+    vi.useFakeTimers();
+    render(<HqLaunchStage modeLabel="Blast" />);
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    const slots = [...screen.getByTestId('hq-launch-slots').children];
+    expect(slots).toHaveLength(6);
+    slots.forEach((slot) => expect(slot.firstElementChild?.className ?? '').toMatch(/(^|\s)blur-\[/));
+  });
+
   it('Given reduced motion, Then the code slots hold still', () => {
     reduced = true;
     vi.useFakeTimers();

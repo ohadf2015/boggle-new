@@ -97,6 +97,8 @@ export interface HqModeFacts {
   maxPlayers: number;
   skillKey: string;
   pitchKey: string;
+  /** `eduHq.modeTags.<x>` — the tile's one-line description on every width. */
+  tagKey: string;
 }
 
 const PITCH_SUFFIX: Record<string, string> = {
@@ -116,5 +118,6 @@ export function hqModeFacts(id: ClassroomGameMode): HqModeFacts {
     maxPlayers: MAX_PLAYERS_PER_ROOM,
     skillKey: `eduHq.modes.skill.${mode?.skill ?? 'spotting'}`,
     pitchKey: `eduHq.modes.pitch.${PITCH_SUFFIX[id] ?? 'classic'}`,
+    tagKey: `eduHq.modeTags.${PITCH_SUFFIX[id] ?? 'classic'}`,
   };
 }

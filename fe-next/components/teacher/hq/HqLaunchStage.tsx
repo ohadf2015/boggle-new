@@ -38,6 +38,7 @@ export function HqLaunchStage({ modeLabel, listTitle, poster, className }: HqLau
   const { t } = useLanguage();
   const { reduced } = useHqJuice();
   const [code, setCode] = useState('??????');
+  const rolling = code !== '??????';
   // Words are already in hand at GO LIVE; the code step stays open until the lobby replaces this stage.
   const [active, setActive] = useState(1);
 
@@ -102,9 +103,10 @@ export function HqLaunchStage({ modeLabel, listTitle, poster, className }: HqLau
           {code.split('').map((ch, i) => (
             <span
               key={i}
-              className="flex h-12 w-9 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream font-mono text-2xl font-black text-neo-black shadow-hard-sm sm:h-14 sm:w-11 sm:text-3xl"
+              className="flex h-12 w-9 items-center justify-center overflow-hidden rounded-neo border-3 border-neo-black bg-neo-cream font-mono text-2xl font-black text-neo-black shadow-hard-sm sm:h-14 sm:w-11 sm:text-3xl"
             >
-              {ch}
+              {/* A reel, not a code: the real one only exists once the room opens. */}
+              <span className={cn(rolling && 'blur-[2.5px] scale-y-125 text-neo-black/70')}>{ch}</span>
             </span>
           ))}
         </div>

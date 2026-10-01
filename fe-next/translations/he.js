@@ -19040,7 +19040,19 @@ const he = {
     },
     "hq": {
       "assigned": "{{count}} משימות",
-      "assignedAria": "שיעורי בית: {{count}} משימות. פתיחה"
+      "assignedAria": "שיעורי בית: {{count}} משימות. פתיחה",
+      "assignNudge": "לתת שיעורי בית"
+    },
+    "modeTags": {
+      "vocabQuiz": "בוחרים פירוש",
+      "classic": "מוצאים מילים",
+      "blast": "שרשרת קומבו",
+      "wordHunt": "צדים מילים",
+      "wordcraft": "בונים ומאייתים"
+    },
+    "lobby": {
+      "waitingOne": "מחכים לתלמיד אחד",
+      "practiceLink": "עוד אין אף אחד? סיבוב אימון עם בוטים"
     }
   },
   // @eduHq:end

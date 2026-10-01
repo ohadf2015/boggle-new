@@ -11,6 +11,8 @@ export interface HqModeCardProps {
   mode: HqMode;
   label: string;
   blurb: string;
+  /** Two or three words, shown under the name below desktop where the blurb has no room. */
+  tagline?: string;
   selected: boolean;
   disabled?: boolean;
   /** When motion is reduced, the tile snaps instead of springing. */
@@ -37,6 +39,7 @@ export const HqModeCard = memo(function HqModeCard({
   mode,
   label,
   blurb,
+  tagline,
   selected,
   disabled = false,
   reduced = false,
@@ -102,9 +105,20 @@ export const HqModeCard = memo(function HqModeCard({
         </span>
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="line-clamp-2 font-neo-display text-[0.7rem] font-black uppercase leading-tight tracking-wide sm:text-sm lg:text-base">
+        <span className={cn("font-neo-display text-[0.7rem] font-black uppercase leading-tight tracking-wide sm:text-sm lg:line-clamp-2 lg:text-base", tagline ? "line-clamp-1" : "line-clamp-2")}>
           {label}
         </span>
+        {tagline ? (
+          <span
+            data-testid={`hq-tile-tag-${mode.id}`}
+            className={cn(
+              "truncate font-neo-body text-[0.62rem] font-bold leading-none sm:text-xs lg:hidden",
+              selected ? "text-black/70" : "text-neo-white/65",
+            )}
+          >
+            {tagline}
+          </span>
+        ) : null}
         <span
           className={cn(
             "hidden font-neo-body text-xs font-bold leading-snug lg:line-clamp-2",

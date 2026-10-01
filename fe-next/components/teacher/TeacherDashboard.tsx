@@ -36,6 +36,7 @@ import {
   type QuickLaunchIntent,
 } from './dashboard/quickLaunchIntent';
 import { useClassrooms } from '@/hooks/useClassroom';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { AssignmentCreator } from './assignments';
 import { TeacherStatusRow } from './dashboard/TeacherStatusRow';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
@@ -216,6 +217,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
 
   const upsell = pickHqUpsell({ hasBanner: !!banner, pinBanner: !!pinBanner, hasUsagePrompt: !!usagePrompt });
   const hasProChip = upsell.chip !== null;
+  const smUp = useMediaQuery('(min-width: 640px)');
   const firstRun = !classroomsLoading && (classrooms.length === 0 || !!newlyCreatedJoinCode);
 
   return (
@@ -291,7 +293,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
             ) : selectedClassroom ? (
               <span
                 data-testid="hq-class-chip"
-                className="inline-flex min-h-9 max-w-full items-center rounded-neo border-2 border-black bg-neo-cyan px-3 font-neo-display text-xs font-bold uppercase tracking-wide text-black shadow-hard-sm"
+                className="inline-flex min-h-9 max-w-full items-center rounded-neo border-2 border-black bg-neo-cyan px-3 font-neo-display text-xs font-bold uppercase tracking-wide text-black shadow-hard-sm max-sm:border-transparent max-sm:bg-transparent max-sm:px-0 max-sm:text-sm max-sm:text-neo-cyan max-sm:shadow-none"
               >
                 {/* Class names are DATA, often in the other script (a Latin
                     name under Hebrew UI): `dir="auto"` isolates it and makes
@@ -323,7 +325,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
               'shrink-0',
               hasProChip
                 ? 'w-36 max-[360px]:w-28 sm:w-60 md:w-72'
-                : 'w-28 max-[360px]:w-24 sm:w-36 md:w-44',
+                : 'w-10 sm:w-36 md:w-44',
             )}
           />
         </div>
@@ -385,14 +387,16 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                 />
               ) : selectedClassroom ? (
                 <div className="flex min-h-0 flex-1 flex-col gap-2">
-                  <FirstAssignmentPanel
-                    classroomId={selectedClassroom.id}
-                    studentCount={selectedClassroom.member_count ?? 0}
-                    assignmentCount={assignmentCount}
-                    hasActiveRoom={hasActiveRoom}
-                    onCta={() => setShowAssignmentCreator(true)}
-                    className="max-sm:hidden"
-                  />
+                  {/* Mounted, not CSS-hidden, by width: a display:none twin still reads as a covered "Create assignment" to hit tests. */}
+                  {smUp ? (
+                    <FirstAssignmentPanel
+                      classroomId={selectedClassroom.id}
+                      studentCount={selectedClassroom.member_count ?? 0}
+                      assignmentCount={assignmentCount}
+                      hasActiveRoom={hasActiveRoom}
+                      onCta={() => setShowAssignmentCreator(true)}
+                    />
+                  ) : null}
                   <GetStudentsInCard
                     className="flex-1"
                     classroom={{
@@ -401,7 +405,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                     }}
                     onOpenProjector={() => setProjectorOpen(true)}
                     rosterAction={
-                      shouldShowFirstAssignmentCta({
+                      !smUp && shouldShowFirstAssignmentCta({
                         studentCount: selectedClassroom.member_count ?? 0,
                         assignmentCount,
                         hasActiveRoom,

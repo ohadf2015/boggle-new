@@ -262,18 +262,16 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         </div>
       )}
 
-      {/* Settings ticker + the one Start control. Stacks on a phone — the
+      {/* The one bottom bar: settings ticker + the single Start control. The
           teacher's own screen is often the projector, mirrored. */}
-      <footer className="relative flex shrink-0 flex-col gap-[1.5vw] rounded-neo-lg border-4 border-neo-cream bg-neo-navy/90 p-[2vw] shadow-hard-lg md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-[1vw] md:px-[0.8vw] md:py-[0.5vw]">
-        <ul className="flex flex-wrap items-center gap-[0.8vw] font-neo-body">
+      <footer
+        data-testid="projector-start-bar"
+        className="relative flex shrink-0 flex-col gap-2 rounded-neo-lg border-4 border-neo-cream bg-neo-navy/95 p-2.5 shadow-hard-lg md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-[1vw] md:px-[0.8vw] md:py-[0.5vw]"
+      >
+        <ul className="flex flex-wrap items-center gap-1.5 font-neo-body md:gap-[0.8vw]">
           {facts.map((fact) =>
-            // The chip that NAMES the game is the control that changes it.
-            // Round 1 shipped a picker that only existed before the room, so a
-            // teacher who wanted a different game had to exit — ending the room
-            // for every student in it — and come back with a new code. This
-            // surface is `fixed inset-0 z-[65]`, i.e. it IS the teacher's
-            // screen in the lobby, so the control has to be on it; everything
-            // behind it is unreachable. Same room, same code, no rejoining.
+            // The chip that NAMES the game is the control that changes it:
+            // same room, same code, no rejoining.
             fact.key === 'mode' ? (
               <li key={fact.key} className="inline-flex">
                 <LobbyModeSwitcher
@@ -287,7 +285,10 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             ) : (
               <li
                 key={fact.key}
-                className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-[1vw] py-[0.4vw] text-[2.6vw] font-bold text-neo-cream/85 md:text-[1vw]"
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-[1vw] py-[0.4vw] text-[2.6vw] font-bold text-neo-cream/85 md:text-[1vw]',
+                  fact.key === 'late' && 'max-md:hidden'
+                )}
               >
                 {fact.icon}
                 {fact.text}
@@ -296,16 +297,10 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           )}
         </ul>
 
-        <div className="flex w-full min-w-0 flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
-          {/* The reason sits BESIDE the control it explains, not under it: a
-              disabled button with no stated cause is the silent no-op this
-              repo keeps shipping (recurring pitfall class 4). */}
+        <div className="flex w-full min-w-0 flex-col gap-1.5 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
+          {/* The visible reason is START's own label; this keeps it announced (pitfall class 4). */}
           {!canStart && (
-            <p
-              data-testid="projector-start-reason"
-              role="status"
-              className="rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-3 py-2 text-start font-neo-body text-[3.2vw] font-bold leading-tight text-neo-pink md:max-w-[34ch] md:px-[1vw] md:py-[0.5vw] md:text-[1vw]"
-            >
+            <p data-testid="projector-start-reason" role="status" className="sr-only">
               {t('education.projectorLobby.startBlocked')}
             </p>
           )}
@@ -313,7 +308,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             <p
               data-testid="projector-practice-failed"
               role="status"
-              className="max-w-[28ch] text-start font-neo-body text-[2.6vw] font-bold text-neo-pink md:text-[1vw]"
+              className="text-center font-neo-body text-[2.8vw] font-bold text-neo-pink md:max-w-[28ch] md:text-start md:text-[1vw]"
             >
               {t('tvLobby.practiceRoundFailed')}
             </p>
@@ -324,14 +319,12 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               data-testid="projector-practice-round"
               onClick={onStartPracticeRound}
               disabled={practiceRoundPending}
-              className="w-full rounded-neo border-3 border-neo-lime bg-neo-lime/10 px-3 py-2 font-neo-display text-[3.4vw] font-black uppercase text-neo-lime shadow-hard-sm transition-all active:translate-y-0.5 active:shadow-none disabled:opacity-50 md:w-auto md:px-[1.4vw] md:py-[0.7vw] md:text-[1.05vw]"
+              className="order-last self-center rounded-sm px-2 py-0.5 font-neo-body text-[3.2vw] font-bold text-neo-cream/75 underline decoration-neo-lime decoration-2 underline-offset-4 transition-colors hover:text-neo-lime focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan disabled:opacity-50 md:order-none md:text-[1vw]"
             >
-              {practiceRoundPending ? t('common.loading') : t('tvLobby.tryPracticeRound')}
+              {practiceRoundPending ? t('common.loading') : t('eduHq.lobby.practiceLink')}
             </button>
           )}
-          {/* Once someone is in, Start breathes — a transform-only scale loop,
-              still under reduced motion. It is the one thing the teacher has
-              to find from across the room. */}
+          {/* Once someone is in, Start breathes — a transform-only scale loop. */}
           <m.div
             className="w-full md:w-auto"
             animate={startReady && !reduceMotion ? { scale: [1, 1.05, 1] } : { scale: 1 }}
@@ -349,28 +342,26 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               'md:px-[2.4vw] md:py-[0.7vw] md:text-[2vw]',
               'transition-all active:translate-y-1 active:shadow-hard',
               'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-              // Locked, not muddy: a 40%-opacity lime on navy reads as a dead
-              // olive slab, so "not yet" is said in the palette instead. And
-              // the locked state keeps a FULL cream edge with cream ink —
-              // measured 2026-09-11, the old `disabled:` pair rendered black
-              // ink on navy-light: text 1.32:1, edge 1.23:1, i.e. a Start
-              // button that did not read as a control at all.
-              //
-              // Branched in JS rather than through `disabled:` variants: the
-              // black base colours are what those variants have to beat, and
-              // stating one colour per state leaves nothing to beat.
+              // Locked keeps a full cream edge and cream ink: a 40% lime on navy read as a dead olive slab.
               !canStart || starting
                 ? 'cursor-not-allowed border-neo-cream bg-neo-navy-light text-neo-cream opacity-80 shadow-none'
                 : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl hover:-translate-y-0.5'
             )}
           >
-            <Play className="h-[0.8em] w-[0.8em] shrink-0" aria-hidden="true" />
-            {/* Recomputed from the LIVE mode, not the prop: the prop is
-                derived upstream from the same stale `lessonGameData`, so after
-                a switch to a board game it still read START QUIZ. */}
+            {!canStart && !starting ? (
+              <span aria-hidden="true" className="relative flex size-[0.55em] shrink-0">
+                <span className="absolute inset-0 rounded-full bg-neo-lime motion-safe:animate-ping" />
+                <span className="relative size-full rounded-full bg-neo-lime" />
+              </span>
+            ) : (
+              <Play className="h-[0.8em] w-[0.8em] shrink-0" aria-hidden="true" />
+            )}
+            {/* Recomputed from the LIVE mode: the prop still described the old game after an in-place switch. */}
             {starting
               ? t('hostView.creatingTournament')
-              : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
+              : !canStart
+                ? t('eduHq.lobby.waitingOne')
+                : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
           </button>
           </m.div>
         </div>

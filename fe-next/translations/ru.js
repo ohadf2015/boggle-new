@@ -18843,7 +18843,19 @@ const ru = {
     },
     "hq": {
       "assigned": "Задано: {{count}}",
-      "assignedAria": "Домашние задания: {{count}}. Открыть"
+      "assignedAria": "Домашние задания: {{count}}. Открыть",
+      "assignNudge": "Дать задание"
+    },
+    "modeTags": {
+      "vocabQuiz": "Выбери значение",
+      "classic": "Ищи слова",
+      "blast": "Цепочки комбо",
+      "wordHunt": "Охота на слова",
+      "wordcraft": "Собери слово"
+    },
+    "lobby": {
+      "waitingOne": "Ждём 1 ученика",
+      "practiceLink": "Пока никого? Потренируйтесь с ботами"
     }
   },
   // @eduHq:end
