@@ -70,7 +70,7 @@ function makeSounds() {
 }
 
 function makeSequencer() {
-  return { animateWordClear: vi.fn(() => Promise.resolve()) };
+  return { animateWordClear: vi.fn((_tiles: unknown, _onClearStart?: () => void) => Promise.resolve()) };
 }
 
 function setup(overrides: Partial<Parameters<typeof useBlastWordHandler>[0]> = {}) {
@@ -154,6 +154,35 @@ describe('useBlastWordHandler', () => {
     );
     expect(runCascade).toHaveBeenCalledWith(3);
     expect(lastPathRef.current).toEqual([]);
+  });
+
+  it('bursts FX and plays the pop sound the moment tiles start clearing, before scoring', async () => {
+    const { params, sequencer, effects, sounds, engine } = setup();
+    const seen: { fx: number; pop: number; submitted: number }[] = [];
+    sequencer.animateWordClear = vi.fn(async (_tiles: unknown, onClearStart?: () => void) => {
+      onClearStart?.();
+      seen.push({
+        fx: effects.setClearedTilesForEffects.mock.calls.length,
+        pop: sounds.playTileClear.mock.calls.length,
+        submitted: engine.submitWord.mock.calls.length,
+      });
+    });
+    const { result } = renderHook(() => useBlastWordHandler(params));
+    await act(async () => {
+      await result.current.handleWordAccepted({ word: 'cat', score: 5 });
+    });
+    expect(seen).toEqual([{ fx: 1, pop: 1, submitted: 0 }]);
+    expect(effects.setClearedTilesForEffects.mock.calls[0][0]).toHaveLength(3);
+  });
+
+  it('does not re-burst the word path after scoring when nothing else cleared', async () => {
+    const { params, sequencer, effects } = setup();
+    sequencer.animateWordClear = vi.fn(async (_tiles: unknown, onClearStart?: () => void) => { onClearStart?.(); });
+    const { result } = renderHook(() => useBlastWordHandler(params));
+    await act(async () => {
+      await result.current.handleWordAccepted({ word: 'cat', score: 5 });
+    });
+    expect(effects.setClearedTilesForEffects).toHaveBeenCalledTimes(1);
   });
 
   it('plays tile clear and long-word bonus sounds at the end', async () => {

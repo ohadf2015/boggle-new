@@ -306,7 +306,8 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
   useEffect(() => {
     if (!liveGameCode) return;
     clearQuickLaunchIntent();
-    router.push(classroomMultiplayerPath(language, liveGameCode));
+    // Replace, not push: a launch page left in history re-launches on Back.
+    router.replace(classroomMultiplayerPath(language, liveGameCode));
   }, [liveGameCode, router, language]);
 
   const retry = useCallback(() => {

@@ -55,3 +55,23 @@ describe('BlastTileFirstUseCallout — multiplayer auto-dismiss', () => {
     unmount();
   });
 });
+
+describe('BlastTileFirstUseCallout — single-player auto-dismiss', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('clears off the board within 4.5s so it does not hide the top rows', () => {
+    const onDismiss = vi.fn();
+    render(<BlastTileFirstUseCallout type="bomb" onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(4500); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('BlastTileFirstUseCallout — placement', () => {
+  it('hangs below the board instead of covering its top rows', () => {
+    render(<BlastTileFirstUseCallout type="bomb" onDismiss={vi.fn()} />);
+    const wrapper = screen.getByTestId('blast-tile-first-use').parentElement!;
+    expect(wrapper.className).toContain('top-full');
+  });
+});

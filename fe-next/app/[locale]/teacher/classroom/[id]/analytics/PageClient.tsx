@@ -29,6 +29,7 @@ const LessonEffectivenessChart = dynamic(
 import { VocabularyHeatmap } from '@/components/teacher/analytics/VocabularyHeatmap';
 import { LiveActivityIndicator } from '@/components/teacher/analytics/LiveActivityIndicator';
 import { AssignmentTrackingPanel } from '@/components/teacher/assignments';
+import { teacherAssignHref } from '@/hooks/useTeacherDashboardDeepLink';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
@@ -278,10 +279,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
                 <AssignmentTrackingPanel
                   classroomId={classroomId}
-                  onCreateAssignment={() => {
-                    // Navigate to dashboard with assignment creator open
-                    router.push(`/${locale}/teacher`);
-                  }}
+                  onCreateAssignment={() => router.push(teacherAssignHref(locale, classroomId))}
                 />
               </div>
             </TabsContent>

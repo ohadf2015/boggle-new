@@ -304,6 +304,24 @@ describe('useBlastPixiOverlays', () => {
     expect(camera.children.length).toBeLessThanOrEqual(20);
   });
 
+  it('afterglow is a brief flash, gone within 400ms so it never muddies the falling tiles', () => {
+    const camera = makeMockCamera();
+    let now = 0;
+    const rafs: FrameRequestCallback[] = [];
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => { rafs.push(cb); return rafs.length; });
+    const { result } = renderHook(() =>
+      useBlastPixiOverlays({ camera: camera as unknown as never, width: 400, height: 400, gridSize: 8, cellSize: 50, chainLevel: 0 }),
+    );
+    act(() => { result.current.spawnAfterglow(10, 10); });
+    expect(camera.children.length).toBe(1);
+    now = 400;
+    for (let i = 0; i < 5 && rafs.length; i++) rafs.shift()!(now);
+    expect(camera.children.length).toBe(0);
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
   it('caps concurrent light sweeps under MP burst', () => {
     const camera = makeMockCamera();
     const { result } = renderHook(() =>

@@ -309,15 +309,15 @@ export function useBlastPixiOverlays({
     camera.addChild(g);
 
     const start = performance.now();
-    const duration = 800;
+    const duration = 360;
     const tick = () => {
       if (camera.destroyed || g.destroyed) {
         afterglowRef.current.delete(g);
         return;
       }
       const t = Math.min((performance.now() - start) / duration, 1);
-      g.alpha = 0.35 * (1 - t * t); // quadratic fade
-      g.scale.set(1 + t * 0.4); // gentle expand
+      g.alpha = 0.35 * (1 - t) * (1 - t);
+      g.scale.set(1 + t * 0.7);
       if (t >= 1) {
         try { camera.removeChild(g); } catch { /* */ }
         g.destroy();

@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { Zap, Gift, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,6 +13,7 @@ import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { accessReturnPath } from '@/lib/education/accessReturnPath';
 
 const TRUST = [
   { key: 'trust_instant', Icon: Zap, chip: 'bg-neo-lime' },
@@ -29,6 +30,16 @@ export function PageClient() {
   // TeacherGate encodes the page it blocked as `?from=`. Reading it back is what
   // turns a silent teleport into an explanation — see AccessRedirectNotice.
   const redirectedFrom = useSearchParams()?.get('from') ?? null;
+  const router = useRouter();
+
+  // Same predicate TeacherGate admits on, so the two can never bounce each other.
+  // Only a TeacherGate bounce (`?from=`) auto-continues: a teacher bounced while
+  // auth was settling, or who signed in here, returns to where they were headed.
+  // Direct visits from marketing CTAs keep the approved card.
+  const returnTo = accessReturnPath(redirectedFrom);
+  useEffect(() => {
+    if (returnTo && !isLoading && hasAccess) router.replace(returnTo);
+  }, [returnTo, isLoading, hasAccess, router]);
 
   // Guardrail for exp-teacher-gate-redirect-clarity-v1: confirms the
   // TeacherGate → /education/access redirect actually lands, regardless of

@@ -51,7 +51,8 @@ export default function StudentPageClient() {
       // Not the main app home — a no-session visitor on the student hub
       // belongs at the auth-free student entry, not the marketing homepage
       // (education homepage-bounce audit).
-      router.push(`/${language}/student/join`);
+      // Replace: a pushed /student would bounce Back straight to join again.
+      router.replace(`/${language}/student/join`);
       return;
     }
     if (!profile) return;

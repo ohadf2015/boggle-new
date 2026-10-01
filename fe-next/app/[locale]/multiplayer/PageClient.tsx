@@ -20,6 +20,7 @@ import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
+import { classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
 import { useMpPageState } from './useMpPageState';
 import { MpPhaseRouter } from './MpPhaseRouter';
 import { MpExitProvider } from '@/hooks/useMpExit';
@@ -35,7 +36,7 @@ const HostLeftGraceModal = nextDynamic(
 
 // Classroom-only chrome (1375 combined lines): every non-classroom multiplayer
 // visitor — the vast majority — was parsing all four regardless. None render
-// until isClassroomMode/gameActive gates pass below, so lazy-load like the
+// until classroom/gameActive gates pass below, so lazy-load like the
 // grace modal above.
 const EducationHeader = nextDynamic(
   () => import('@/components/education/EducationHeader').then((m) => m.EducationHeader),
@@ -53,6 +54,10 @@ const GamePausedOverlay = nextDynamic(
   () => import('@/components/education/GamePausedOverlay').then((m) => m.GamePausedOverlay),
   { ssr: false },
 );
+const ClassroomGameEndedState = nextDynamic(
+  () => import('@/components/education/ClassroomGameEndedState').then((m) => m.ClassroomGameEndedState),
+  { ssr: false },
+);
 const StudentWordBank = nextDynamic(
   () => import('@/components/education/StudentWordBank').then((m) => m.StudentWordBank),
   { ssr: false },
@@ -60,15 +65,16 @@ const StudentWordBank = nextDynamic(
 
 export default function MultiplayerPageClient(): React.JSX.Element {
   const {
-    t, language, router, isClassroomMode, isClassroomHost, username, hostUsername, gameCode, prefilledRoomCode,
+    t, language, router, isClassroomHost, username, hostUsername, gameCode, prefilledRoomCode,
     isActive, isHost, showResults, gameActive, liveGameMode, playersInRoom, lessonDataState, liveClassroomGame,
     socket, isConnected, isSpectator, spectators, handleUpgradeToPlayer, signalIntentionalLeave,
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
     classroomAccessibility, classroomLevel, classroomWordBank, teacherStrip, quizOwnsScreen,
     socketContextValue, hostLeftState, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
-    handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
+    classroomEnded, retryClassroomRoom, handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
     routerProps,
   } = useMpPageState();
+  const inClassroom = classroomContext === 'classroom';
 
   return (
     <SocketContext.Provider value={socketContextValue}>
@@ -129,7 +135,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
               <ConnectionQualityChip />
             </div>
           )}
-          {isClassroomMode ? (
+          {inClassroom ? (
             // Gated on `gameActive`, NOT `isActive`: `onJoined` sets `isActive`
             // the moment the host lands in the LOBBY, so the old predicate hid
             // the join code exactly when the teacher needed it on a projector.
@@ -145,7 +151,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
                   // homepage-bounce audit).
                   backHref={
                     multiplayerExitDestination({
-                      isClassroomMode,
+                      isClassroomMode: inClassroom,
                       isHost: isHost || isClassroomHost,
                       locale: language,
                     }) || `/${language}/education`
@@ -217,6 +223,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
               setHostLeftState(null);
             }}
           />
+          {classroomEnded !== null && (
+            <ClassroomGameEndedState
+              roomCode={classroomEnded}
+              message={t(CLASSROOM_ROOM_GONE_KEY)}
+              hubHref={classroomStudentHomePath(language)}
+              onRetry={retryClassroomRoom}
+            />
+          )}
         </div>
       </ErrorBoundary>
       </MpExitProvider>

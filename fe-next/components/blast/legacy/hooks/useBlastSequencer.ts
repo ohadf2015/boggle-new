@@ -30,7 +30,7 @@ export interface SequencerState {
 
 export interface UseBlastSequencerReturn {
   state: SequencerState;
-  animateWordClear: (clearedTiles: Array<{ row: number; col: number; type: string }>) => Promise<void>;
+  animateWordClear: (clearedTiles: Array<{ row: number; col: number; type: string }>, onClearStart?: () => void) => Promise<void>;
   animateCascade: (gravity: GravityResult, chainLevel: number, commitFn?: () => void) => Promise<void>;
   reset: () => void;
 }
@@ -118,6 +118,7 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
 
   const animateWordClear = useCallback(async (
     clearedTiles: Array<{ row: number; col: number; type: string }>,
+    onClearStart?: () => void,
   ): Promise<void> => {
     if (runningRef.current) return; // guard against concurrent execution
     runningRef.current = true;
@@ -143,6 +144,7 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
         clearRotate: Math.round((Math.random() - 0.5) * 24), // -12 to 12 degrees
       }));
       commit({ ...workingRef.current, phase: 'clearing', activeTiles: clearTiles }, token);
+      onClearStart?.();
       const clearDur = ANIM_TIMING.clearing + ANIM_TIMING.clearStagger * clearedTiles.length;
       await wait(clearDur, timersRef.current);
       if (cancelled()) return;

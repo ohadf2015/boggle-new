@@ -135,11 +135,26 @@ export function useBlastWordHandler({
       col: p.col,
       type: engine.tileStates[p.row]?.[p.col]?.type ?? 'standard',
     }));
-    await sequencer.animateWordClear(clearedInfo);
-
-    // 1b. FX feed is deferred until AFTER submitWord (below): only then is the full
-    // cleared set — word path PLUS bomb/lightning/prism chain neighbours — known.
-    // Feeding the word path alone here left chain-cleared tiles vanishing silently.
+    const clearedTypes = new Set(clearedInfo.map(c => c.type));
+    let popped = false;
+    const pop = () => {
+      if (popped) return;
+      popped = true;
+      effects.setClearedTilesForEffects(clearedInfo.map(c => {
+        const hits = preGrid[c.row]?.[c.col]?.hitsRemaining;
+        return { row: c.row, col: c.col, type: c.type as BlastTileType, ...(hits != null && { hitsRemaining: hits - 1 }) };
+      }));
+      if (clearedTypes.has('bomb')) vibrateBlastBomb();
+      else if (clearedTypes.has('lightning')) vibrateBlastLightning();
+      else if (clearedTypes.has('prism')) vibrateBlastPrism();
+      for (const type of clearedTypes) {
+        if (type !== 'standard') sounds.playSpecialTileSound(type);
+      }
+      sounds.playTileClear(clearedInfo.length);
+      sounds.playLongWordBonus(path.length);
+    };
+    await sequencer.animateWordClear(clearedInfo, pop);
+    pop();
 
     // 2. Submit to engine — fold in the deterministic letter-value bonus (organic,
     // non-round totals; matches the server's MP total exactly), then apply the
@@ -169,16 +184,12 @@ export function useBlastWordHandler({
     // 2a. Capture post-grid snapshot after engine processing
     const postGrid = structuredClone(engine.tileStates);
 
-    // 2b. Feed the FULL cleared set to the PixiJS FX layer — word path AND every
-    // bomb/lightning/prism chain neighbour the engine cleared. Diffing pre→post
-    // (gravity hasn't run yet) recovers them; without this, chain-cleared tiles
-    // disappeared with no shatter/debris (Bug: "tiles vanish without effect").
-    const clearedForFx = diffClearedTiles(preGrid, postGrid);
-    effects.setClearedTilesForEffects(
-      clearedForFx.length > 0
-        ? clearedForFx.map(c => ({ row: c.row, col: c.col, type: c.type }))
-        : clearedInfo.map(c => ({ row: c.row, col: c.col, type: c.type as BlastTileType })),
-    );
+    // 2b. The path already burst at pop(); only bomb/lightning/prism chain neighbours are new here.
+    const pathKeys = new Set(path.map(p => `${p.row},${p.col}`));
+    const chainCleared = diffClearedTiles(preGrid, postGrid).filter(c => !pathKeys.has(`${c.row},${c.col}`));
+    if (chainCleared.length > 0) {
+      effects.setClearedTilesForEffects(chainCleared.map(c => ({ row: c.row, col: c.col, type: c.type })));
+    }
 
     // 3. Score fly effect
     const avgRow = path.reduce((s, p) => s + p.row, 0) / path.length;
@@ -254,15 +265,6 @@ export function useBlastWordHandler({
       effects.setComboParticle(c => c + 1);
     }
 
-    // 5. Haptic + sound feedback
-    const clearedTypes = new Set(clearedInfo.map(c => c.type));
-    if (clearedTypes.has('bomb')) vibrateBlastBomb();
-    else if (clearedTypes.has('lightning')) vibrateBlastLightning();
-    else if (clearedTypes.has('prism')) vibrateBlastPrism();
-    for (const type of clearedTypes) {
-      if (type !== 'standard') sounds.playSpecialTileSound(type);
-    }
-
     // 5b. Screen shake
     const hasBombExplosion = clearedTypes.has('bomb') || clearedTypes.has('countdown');
     const countdownExplosionCount = result.countdownExplosions?.length ?? 0;
@@ -302,9 +304,6 @@ export function useBlastWordHandler({
         effectsFired: result.explosions.map(e => e.type),
       });
     }
-
-    sounds.playTileClear(clearedInfo.length);
-    sounds.playLongWordBonus(path.length);
 
     // 8. Mascot reaction — fire after the cascade settles so HUD timing matches
     // the visual finale, not the initial pop. Decorative-only; failure here
