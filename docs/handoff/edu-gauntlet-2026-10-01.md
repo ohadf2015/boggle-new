@@ -1,4 +1,27 @@
-# Education gauntlet vs Blooket: handoff (2026-10-01)
+# Education gauntlet vs Blooket: handoff
+
+## FINAL STATE (2026-10-02)
+
+Everything is on master:
+- **4862a8c31**: Piece 0 (navigation and access) and B (word list editor + Discover UGC).
+- **95c89805c**: A (Teacher HQ), C (projector lobby, host view and honest podium), D (student phone flow), E (Teacher Pro mastery and missed-words practice).
+
+Every piece won the blind side-by-side against Blooket. A, C and E then had a polish round on the gap the critic named.
+
+Gate on the integrated branch:
+- tsc, lint, the frontend suite (4214 files), the repo-wide guards and the build are all green.
+- The backend suite still has 7 failing tests: `mpBotRounds` (×4) and `boggleSolver.trieLanguages` (×3). They fail the same way on a clean origin/master, so they are PRE-EXISTING. That needs its own investigation: the bots create nothing, and the ru/es tries fail.
+
+### Still open
+- [ ] A fresh teacher once saw the student "Join your game" form on /education/classroom-game right after sign-in. It needed a reload, which suggests a race.
+- [ ] Unused keys `eduHq.lobby.waitingOne` and `eduHq.lobby.practiceLink`. C's projector footer won the A/C merge.
+- [ ] Discover: show play and copy counts when they are > 0, and hide lists whose author has `is_test_account`. The 4 test lists were unpublished by hand on 10-01.
+- [ ] Piece 0 leftovers: an Android back loop from classroom-game, the URL flag in MpPhaseRouter, and `/auth/signin` with no page.
+- [ ] QA cleanup: the accounts `edu-g-1001-{free,pro}-{1..4}`, `edu-g-fresh-*` and the gate-minted students (`gate-*`) still exist. Purge them scoped to those emails, not the global `is_test_account` predicate, because other sessions' QA accounts share it. Clear the NO ACTION FK children first (see .claude/rules/70-test-accounts.md).
+- [ ] Remove the worktrees `~/git/boggle-new-worktrees/edu-{gauntlet,nav,a,b,c,d,e}` when you're done.
+
+---
+
 
 **Goal (owner):** make the education module simple to manage, fun and polished to play, with micro-animations and little scrolling, good at 390px, built on the multiplayer modes that already work (Wordcraft included), with content teachers can customize and that grows through UGC, plus more Pro value. The bar is Blooket.
 
