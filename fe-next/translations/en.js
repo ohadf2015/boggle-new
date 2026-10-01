@@ -14111,6 +14111,12 @@ const en = {
         "title": "Join a Class"
       },
       "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
+      "gameEnded": {
+        "title": "This game has ended",
+        "retry": "Try again",
+        "toClass": "Go to my class",
+        "newCode": "Enter a new code"
+      },
       "lessonsAssigned": "Lessons Assigned",
       "feel": {
         "points": "pts",
@@ -14293,6 +14299,7 @@ const en = {
       "auth_required_title": "Sign up to request teacher access",
       "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",
       "auth_required_cta": "Create my free teacher account",
+      "auth_signin_cta": "Already have an account? Sign in",
       "trust_instant": "Instant access — no review queue",
       "trust_free": "Free teacher plan, no expiry",
       "trust_nologins": "No student logins, no setup",
@@ -17910,6 +17917,9 @@ const en = {
       "share": "Share",
       "seriesChampion": "Series champion",
       "teacherPaced": "Your teacher starts the next game",
+      "backToClass": "Back to class",
+      "endClassTitle": "End the class game?",
+      "endClassBody": "The room closes for everyone and you go back to your class dashboard.",
       "roundPoints": "Points this round",
       "yourRank": "Your place",
       "lessonRecap": "Lesson recap",

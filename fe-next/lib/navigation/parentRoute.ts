@@ -24,14 +24,18 @@ import { locales as LOCALES } from '@/lib/i18n';
  * is not the main app home; it's /{locale}/education. These overrides ensure
  * Android back button + navigation fallbacks send users to the right place.
  *
- * Anchored with ^..$ so nested paths like /teacher/classroom/abc fall through
- * to the default "drop one segment" rule instead of being collapsed to /education.
+ * Anchored with ^..$ so nested paths fall through to the default "drop one
+ * segment" rule unless their parent has no page.
  */
 const PARENT_OVERRIDES: { test: RegExp; parent: string }[] = [
   { test: /^\/teacher\/?$/, parent: '/education' },
   { test: /^\/student\/?$/, parent: '/education' },
   { test: /^\/join\/?$/, parent: '/education' },
   { test: /^\/classroom\/?$/, parent: '/education' },
+  // No page at /teacher/classroom/[id]; its children go back to Teacher HQ.
+  { test: /^\/teacher\/classroom\/[^/]+\/.+$/, parent: '/teacher' },
+  // /student bounces a signed-out visitor straight back to /student/join.
+  { test: /^\/student\/join\/?$/, parent: '/education' },
 ];
 
 export function parentRoute(pathname: string): string {

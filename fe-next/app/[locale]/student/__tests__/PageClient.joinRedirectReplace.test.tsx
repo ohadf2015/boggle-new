@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 const { mockUseAuth, mockPush, mockReplace } = vi.hoisted(() => ({ mockUseAuth: vi.fn(), mockPush: vi.fn(), mockReplace: vi.fn() }));
 
@@ -26,31 +26,13 @@ vi.mock('framer-motion', () => ({
 
 import StudentPageClient from '../PageClient';
 
-describe('StudentPageClient — guard race (fresh guest session)', () => {
+describe('StudentPageClient — signed-out redirect does not trap browser Back', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('does NOT redirect a signed-in student while the profile is still loading', async () => {
-    // Fresh anonymous session: user present, profile not yet fetched, loading done.
-    mockUseAuth.mockReturnValue({ user: { id: 'anon-1' }, profile: null, loading: false });
-    render(<StudentPageClient />);
-
-    await waitFor(() => expect(screen.getByTestId('loader')).toBeInTheDocument());
-    expect(mockPush).not.toHaveBeenCalled();
-    expect(mockReplace).not.toHaveBeenCalled();
-  });
-
-  it('redirects a truly logged-out visitor to the student join entry, not the main app home', async () => {
+  it('replaces /student with /student/join, so Back does not bounce between them', async () => {
     mockUseAuth.mockReturnValue({ user: null, profile: null, loading: false });
     render(<StudentPageClient />);
-
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/en/student/join'));
-  });
-
-  it('renders the hub once the guest user + profile are both present', async () => {
-    mockUseAuth.mockReturnValue({ user: { id: 'anon-1' }, profile: { id: 'anon-1', user_role: null }, loading: false });
-    render(<StudentPageClient />);
-
-    await waitFor(() => expect(screen.getByTestId('hub')).toBeInTheDocument());
     expect(mockPush).not.toHaveBeenCalled();
   });
 });

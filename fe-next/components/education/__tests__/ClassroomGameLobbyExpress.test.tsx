@@ -14,7 +14,7 @@ const handlers = new Map<string, Array<(payload: unknown) => void>>();
 const fire = (event: string, payload: unknown) =>
   handlers.get(event)?.forEach((cb) => cb(payload));
 const emit = vi.fn();
-const push = vi.fn();
+const replace = vi.fn();
 const ioOpts = vi.fn();
 
 vi.mock('@/utils/supabase/client', () => ({
@@ -35,7 +35,7 @@ vi.mock('socket.io-client', () => ({
   },
 }));
 vi.mock('@/utils/SocketContext', () => ({ getSocketURL: () => 'http://localhost:3010' }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), replace }) }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
@@ -79,7 +79,7 @@ describe('<ClassroomGameLobbyExpress>', () => {
     handlers.clear();
     emit.mockClear();
     ioOpts.mockClear();
-    push.mockClear();
+    replace.mockClear();
     sessionStorage.clear();
     getClassrooms.mockResolvedValue({ data: [{ id: 'c-1', name: 'My Class', language: 'en' }] });
     getLesson.mockResolvedValue({ data: LESSON, error: null });
@@ -95,7 +95,7 @@ describe('<ClassroomGameLobbyExpress>', () => {
 
     fire('classroomGameCreated', { success: true, gameCode: payload.gameCode });
     await waitFor(() =>
-      expect(push).toHaveBeenCalledWith(`/en/multiplayer?room=${payload.gameCode}&classroom=true&host=true`)
+      expect(replace).toHaveBeenCalledWith(`/en/multiplayer?room=${payload.gameCode}&classroom=true&host=true`)
     );
   });
 
@@ -118,7 +118,7 @@ describe('<ClassroomGameLobbyExpress>', () => {
 
     fire('classroomGameCreated', { success: true, gameCode: payload.gameCode });
     await waitFor(() =>
-      expect(push).toHaveBeenCalledWith(`/en/multiplayer?room=${payload.gameCode}&classroom=true&host=true`)
+      expect(replace).toHaveBeenCalledWith(`/en/multiplayer?room=${payload.gameCode}&classroom=true&host=true`)
     );
   });
 
@@ -207,6 +207,6 @@ describe('<ClassroomGameLobbyExpress>', () => {
     render(<ClassroomGameLobbyExpress intent={intent} onOpenFullSetup={vi.fn()} />);
     fire('classroomGameCreated', { success: true, gameCode: 'ZZZ999' });
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith('/en/multiplayer?room=ZZZ999&classroom=true&host=true'));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/en/multiplayer?room=ZZZ999&classroom=true&host=true'));
   });
 });

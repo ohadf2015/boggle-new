@@ -15513,6 +15513,12 @@ const es = {
         "guestError": "No se pudo iniciar. Inténtalo de nuevo o pide ayuda a tu profe."
       },
       "classroomRoomGone": "El juego de tu clase terminó. Pídele a tu profe que empiece otro.",
+      "gameEnded": {
+        "title": "Este juego terminó",
+        "retry": "Reintentar",
+        "toClass": "Ir a mi clase",
+        "newCode": "Poner otro código"
+      },
       "lessonsAssigned": "Lecciones asignadas",
       "feel": {
         "points": "pts",
@@ -15686,6 +15692,7 @@ const es = {
       "auth_required_title": "Regístrate para solicitar acceso docente",
       "auth_required_body": "El acceso docente está vinculado a una cuenta verificada. Crea una cuenta gratis o inicia sesión y seguimos justo aquí.",
       "auth_required_cta": "Crear mi cuenta docente gratis",
+      "auth_signin_cta": "¿Ya tienes cuenta? Inicia sesión",
       "trust_instant": "Acceso al instante — sin cola de revisión",
       "trust_free": "Plan docente gratuito, sin caducidad",
       "trust_nologins": "Sin cuentas de estudiantes, sin configuración",
@@ -18865,6 +18872,9 @@ const es = {
       "share": "Compartir",
       "seriesChampion": "Campeón de la serie",
       "teacherPaced": "Tu profe empieza la siguiente partida",
+      "backToClass": "Volver a la clase",
+      "endClassTitle": "¿Terminar el juego de la clase?",
+      "endClassBody": "La sala se cierra para todos y vuelves al panel de tu clase.",
       "roundPoints": "Puntos de esta ronda",
       "yourRank": "Tu puesto",
       "lessonRecap": "Resumen de la lección",

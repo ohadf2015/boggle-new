@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getWithAuth } from '@/utils/authFetch';
 import type { TeacherAccessRequest, TeacherAccessStatus } from './types';
@@ -16,7 +16,7 @@ interface UseTeacherAccessResult {
 }
 
 export function useTeacherAccess(): UseTeacherAccessResult {
-  const { profile, user, loading: authLoading } = useAuth();
+  const { profile, user, loading: authLoading, refreshProfile } = useAuth();
   const [latestRequest, setLatestRequest] = useState<TeacherAccessRequest | null>(null);
   const [reqLoading, setReqLoading] = useState(false);
   // Tick a clock so the trial countdown stays live without re-deriving Date.now()
@@ -42,6 +42,23 @@ export function useTeacherAccess(): UseTeacherAccessResult {
     return () => clearInterval(id);
   }, []);
 
+  // The request says approved but the profile has not been promoted yet: the gate
+  // would bounce, the access page would link back. Refresh once before answering.
+  const [refreshedFor, setRefreshedFor] = useState<string | null>(null);
+  const canRefresh = typeof refreshProfile === 'function';
+  const profileStale =
+    !hasAccess && !!profile && !!user?.id && latestRequest?.status === 'approved' && canRefresh && refreshedFor !== user.id;
+  const refreshStartedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!profileStale || !user?.id || !refreshProfile || refreshStartedFor.current === user.id) return;
+    const id = user.id;
+    refreshStartedFor.current = id;
+    Promise.resolve()
+      .then(() => refreshProfile())
+      .catch(() => {})
+      .finally(() => setRefreshedFor(id));
+  }, [profileStale, user?.id, refreshProfile]);
+
   const status: TeacherAccessStatus | 'none' = hasAccess
     ? 'approved'
     : (latestRequest?.status as TeacherAccessStatus) || 'none';
@@ -65,6 +82,6 @@ export function useTeacherAccess(): UseTeacherAccessResult {
     status,
     latestRequest,
     trial,
-    isLoading: authLoading || reqLoading || profileLoading,
+    isLoading: authLoading || reqLoading || profileLoading || profileStale,
   };
 }
