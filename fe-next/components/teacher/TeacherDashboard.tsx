@@ -51,7 +51,9 @@ import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { GetStudentsInCard } from './hq/GetStudentsInCard';
 import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
 import { FirstAssignmentPanel } from './hq/FirstAssignmentPanel';
+import { StartLiveClassCta } from './hq/StartLiveClassCta';
 import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
+import { liveClassroomHref } from '@/lib/education/startLiveClassCta';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
 import { HqDock } from './hq/HqDock';
 import { HqToolsContent } from './hq/HqToolsContent';
@@ -376,6 +378,15 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                     assignmentCount={assignmentCount}
                     hasActiveRoom={hasActiveRoom}
                     onCta={() => setShowAssignmentCreator(true)}
+                  />
+                  <StartLiveClassCta
+                    classroomId={selectedClassroom.id}
+                    studentCount={selectedClassroom.member_count ?? 0}
+                    assignmentCount={assignmentCount}
+                    joinCode={selectedClassroom.join_code || ''}
+                    onStart={() =>
+                      router.push(liveClassroomHref(language, selectedClassroom.id))
+                    }
                   />
                   <GetStudentsInCard
                     className="flex-1"

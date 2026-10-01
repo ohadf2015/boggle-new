@@ -61,6 +61,8 @@ import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
 
 export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
+  /** Pre-select this class in the lobby (deep-link from HQ start-live CTA). */
+  initialClassroomId?: string;
   /** 'repeatLast' → prefill classroom + lessons + settings from the last game. */
   initialFlow?: string;
   /**
@@ -72,7 +74,7 @@ export interface ClassroomGameLobbyProps {
   onBack: () => void;
 }
 
-export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, onBack }: ClassroomGameLobbyProps) {
+export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initialFlow, cefrLevel, onBack }: ClassroomGameLobbyProps) {
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const router = useRouter();
@@ -88,7 +90,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
     setSelectedClassroomId,
     createLessonFromPack,
     fetchTeacherData,
-  } = useTeacherLobbyData(user?.id, t, initialLessonId);
+  } = useTeacherLobbyData(user?.id, t, initialLessonId, initialClassroomId);
 
   const { createClassroom } = useClassrooms();
 

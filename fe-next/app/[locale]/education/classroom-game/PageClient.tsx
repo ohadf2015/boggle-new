@@ -59,6 +59,7 @@ function ClassroomGameInner() {
 
   // Optional lesson ID from URL params (pre-selects a lesson in the lobby)
   const lessonId = searchParams?.get('lessonId') || '';
+  const classroomIdParam = searchParams?.get('classroomId') || '';
   // 'repeatLast' (dashboard Repeat-last hero) prefills the whole last setup.
   const flow = searchParams?.get('flow') || '';
   // ?cefr=A1|A2|B1 — the ESL page demo's "Run this list with the class" CTA.
@@ -155,6 +156,7 @@ function ClassroomGameInner() {
         ) : (
           <ClassroomGameLobby
             initialLessonId={lessonId}
+            initialClassroomId={classroomIdParam || undefined}
             initialFlow={flow}
             cefrLevel={cefrLevel}
             onBack={handleBack}

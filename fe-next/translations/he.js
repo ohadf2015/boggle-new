@@ -41,7 +41,12 @@ const he = {
       "codeReady": "הקוד מוכן",
       "firstAssignmentTitle": "צרו את המטלה הראשונה",
       "firstAssignmentBody": "יש תלמידים ברשימה. שייכו תרגול כדי שיהיה להם מה לעשות כשאתם לא בשידור חי.",
-      "firstAssignmentCta": "צרו מטלה ראשונה"
+      "firstAssignmentCta": "צרו מטלה ראשונה",
+      "startLiveTitle": "הפעילו שיעור חי",
+      "startLiveBody": "המטלה כבר יצאה. התחילו משחק חי כדי שהכיתה תשחק ביחד.",
+      "startLiveCta": "התחילו משחק כיתה חי",
+      "copyJoinCode": "העתיקו קישור הצטרפות",
+      "joinCodeCopied": "קישור ההצטרפות הועתק"
     },
     "modes": {
       "workshop": {

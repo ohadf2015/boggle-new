@@ -117,6 +117,8 @@ export function HqToolsContent({
           </ProGate>
           <AssignmentTrackingPanel
             classroomId={id}
+            joinCode={selectedClassroom?.join_code}
+            studentCount={selectedClassroom?.member_count || 0}
             onCreateAssignment={onCreateAssignment}
           />
           <ProGate feature="analytics" active={open}>

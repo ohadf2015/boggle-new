@@ -41,7 +41,12 @@ const ru = {
       "codeReady": "Код готов",
       "firstAssignmentTitle": "Создайте первое задание",
       "firstAssignmentBody": "Ученики уже в списке. Назначьте практику, чтобы классу было чем заняться, когда вы не в эфире.",
-      "firstAssignmentCta": "Создать первое задание"
+      "firstAssignmentCta": "Создать первое задание",
+      "startLiveTitle": "Начать живой урок",
+      "startLiveBody": "Задание уже выдано. Запустите живую игру, чтобы класс играл вместе.",
+      "startLiveCta": "Начать живую игру в классе",
+      "copyJoinCode": "Скопировать ссылку",
+      "joinCodeCopied": "Ссылка скопирована"
     },
     "modes": {
       "workshop": {

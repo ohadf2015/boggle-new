@@ -41,7 +41,12 @@ const en = {
       "codeReady": "Code ready",
       "firstAssignmentTitle": "Assign their first game",
       "firstAssignmentBody": "Students are in. Send one assignment so they play before the next class.",
-      "firstAssignmentCta": "Create assignment"
+      "firstAssignmentCta": "Create assignment",
+      "startLiveTitle": "Play a live class",
+      "startLiveBody": "The assignment is out. Start a live game so the class plays together.",
+      "startLiveCta": "Start live classroom game",
+      "copyJoinCode": "Copy join link",
+      "joinCodeCopied": "Join link copied"
     },
     "modes": {
       "workshop": {

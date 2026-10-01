@@ -4,6 +4,14 @@ import '@testing-library/jest-dom';
 import AssignmentTrackingPanel from './AssignmentTrackingPanel';
 import { useAssignments } from '@/hooks/useAssignments';
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}));
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
+  default: { capture: vi.fn(), register: vi.fn(), __loaded: true },
+}));
+vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
+
 // Mock hooks
 vi.mock('@/hooks/useAssignments');
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -129,6 +137,17 @@ describe('AssignmentTrackingPanel', () => {
     render(<AssignmentTrackingPanel classroomId="classroom-1" />);
 
     expect(screen.getByText('teacher.tracking.noAssignments')).toBeInTheDocument();
+  });
+
+  it('shows the start-live CTA when the class has students and assignments', () => {
+    render(
+      <AssignmentTrackingPanel
+        classroomId="classroom-1"
+        joinCode="AB12CD"
+        studentCount={5}
+      />,
+    );
+    expect(screen.getByTestId('hq-start-live-class')).toBeInTheDocument();
   });
 
   it('shows loading state with skeletons', () => {

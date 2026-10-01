@@ -41,7 +41,12 @@ const ja = {
       "codeReady": "コード準備OK",
       "firstAssignmentTitle": "最初の課題を作る",
       "firstAssignmentBody": "名簿に生徒がいます。ライブ中でないときも取り組める練習課題を出しましょう。",
-      "firstAssignmentCta": "最初の課題を作成"
+      "firstAssignmentCta": "最初の課題を作成",
+      "startLiveTitle": "ライブ授業を始める",
+      "startLiveBody": "課題は出しています。ライブゲームを始めてクラスで一緒に遊びましょう。",
+      "startLiveCta": "ライブ授業ゲームを開始",
+      "copyJoinCode": "参加リンクをコピー",
+      "joinCodeCopied": "参加リンクをコピーしました"
     },
     "modes": {
       "workshop": {

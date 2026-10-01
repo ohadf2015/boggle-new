@@ -413,3 +413,20 @@ export function trackEduFirstAssignmentCtaClicked(args: EduFirstAssignmentCtaArg
 export function trackEduFirstAssignmentCreated(args: EduFirstAssignmentCtaArgs): void {
   safeCapture('edu_first_assignment_created', { classroom_id: args.classroomId });
 }
+
+export interface EduStartLiveClassArgs {
+  classroomId: string;
+}
+
+/** Assignment/classroom view: start the existing live-room flow. */
+export function trackEduAssignmentStartLiveClicked(args: EduStartLiveClassArgs): void {
+  safeCapture('edu_assignment_start_live_clicked', { classroom_id: args.classroomId });
+}
+
+/**
+ * Copy of the roster join code/link. Never send the code itself (shared secret).
+ * Same event name as the first-student join panel so one funnel counts copies.
+ */
+export function trackEduJoinCodeCopied(args: EduStartLiveClassArgs): void {
+  safeCapture('edu_join_code_copied', { classroom_id: args.classroomId });
+}

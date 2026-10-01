@@ -41,7 +41,12 @@ const sv = {
       "codeReady": "Koden är klar",
       "firstAssignmentTitle": "Skapa deras första uppgift",
       "firstAssignmentBody": "Eleverna är på listan. Ge dem en övning så klassen har något att göra när du inte sänder live.",
-      "firstAssignmentCta": "Skapa första uppgiften"
+      "firstAssignmentCta": "Skapa första uppgiften",
+      "startLiveTitle": "Spela en livelektion",
+      "startLiveBody": "Uppgiften är ute. Starta ett livespel så klassen spelar tillsammans.",
+      "startLiveCta": "Starta liveklasspel",
+      "copyJoinCode": "Kopiera länk",
+      "joinCodeCopied": "Länken kopierades"
     },
     "modes": {
       "workshop": {
