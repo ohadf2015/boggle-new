@@ -8,6 +8,8 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { Howl } from 'howler';
 import logger from '@/utils/logger';
+import { isHowlStalled, restartStalledHowl } from './howlStall';
+import { REWARD_AD_ACTIVE_EVENT } from '@/hooks/useRewardAdPause';
 
 /** Cached Howler global — populated lazily */
 let _cachedHowler: typeof import('howler')['Howler'] | null = null;
@@ -89,6 +91,11 @@ export function useMusicFocusManager({
         }
       });
 
+      if (restartStalledHowl(currentHowlRef.current)) {
+        logger.log(`[Music] ${reason} - restarted a track the OS had paused`);
+        return;
+      }
+
       if (currentHowlRef.current && !currentHowlRef.current.playing() && currentTrackRef.current) {
         try {
           const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
@@ -164,9 +171,18 @@ export function useMusicFocusManager({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    let stalledPolls = 0;
     const checkFocus = (): void => {
       const hasFocus = document.hasFocus();
       if (document.visibilityState !== 'visible') return;
+
+      const stalled =
+        hasFocus && audioUnlockedRef.current && !isMutedRef.current && isHowlStalled(currentHowlRef.current);
+      stalledPolls = stalled ? stalledPolls + 1 : 0;
+      if (stalledPolls >= 2) {
+        stalledPolls = 0;
+        resumeAudio('Stalled track (polling)');
+      }
 
       if (!hasFocus && windowFocusedRef.current) {
         windowFocusedRef.current = false;
@@ -207,6 +223,25 @@ export function useMusicFocusManager({
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('focus', handleFocus);
     };
+  }, [suspendAudio, resumeAudio, audioUnlockedRef, isMutedRef, currentHowlRef]);
+
+  // A fullscreen ad (AdMob rewarded/interstitial) owns the screen and audio focus.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let pausedByAd = false;
+
+    const handleAd = (event: Event): void => {
+      const active = (event as CustomEvent<{ active: boolean }>).detail?.active;
+      if (active) {
+        pausedByAd = suspendAudio('Fullscreen ad') || pausedByAd;
+      } else if (pausedByAd) {
+        pausedByAd = false;
+        resumeAudio('Fullscreen ad closed');
+      }
+    };
+
+    window.addEventListener(REWARD_AD_ACTIVE_EVENT, handleAd);
+    return () => window.removeEventListener(REWARD_AD_ACTIVE_EVENT, handleAd);
   }, [suspendAudio, resumeAudio]);
 
   // Handle iOS Safari audio device errors

@@ -89,6 +89,12 @@ export function readReturningSignals(
   return false;
 }
 
+/** The native app is never a marketing visitor; resolveClientHomeTree re-checks if the bridge lands late. */
+export function isNativeShell(): boolean {
+  const cap = (globalThis as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return !!(cap && cap.isNativePlatform && cap.isNativePlatform());
+}
+
 /**
  * Inline <script> body. Sets `data-home` on <html> synchronously while the
  * parser is still above the homepage trees. Any failure (storage blocked,
@@ -96,7 +102,7 @@ export function readReturningSignals(
  * crawler/server default.
  */
 export const HOME_TREE_SCRIPT =
-  '(function(){try{var r=(' +
+  '(function(){try{var c=window.Capacitor;var r=!!(c&&c.isNativePlatform&&c.isNativePlatform())||(' +
   readReturningSignals.toString() +
   ')(window.localStorage,document.cookie,' +
   JSON.stringify(ONBOARDING_FLAG_KEY) +
