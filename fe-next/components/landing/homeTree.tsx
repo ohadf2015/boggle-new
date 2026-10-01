@@ -15,7 +15,7 @@
  */
 import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import { hasCompletedOnboarding, hasSupabaseSession } from '@/utils/onboardingStorage';
-import { HOME_TREE_SCRIPT } from '@/utils/returningVisitor';
+import { HOME_TREE_SCRIPT, isNativeShell } from '@/utils/returningVisitor';
 
 export type HomeTreeName = 'fresh' | 'returning';
 export type HomeTree = HomeTreeName | 'ssr';
@@ -44,13 +44,14 @@ const TREE_CSS =
 const INERT_HTML = { __html: '' };
 
 /**
- * Client-side decision. Same predicate as `isReturningVisitor()` (spelled out
+ * Client-side decision: the native app, or `isReturningVisitor()` (spelled out
  * via its two halves so module mocks that stub only those resolve the same way).
  * Also syncs `html[data-home]`: after a client-side navigation the inline
  * script never ran, and the attribute may be stale from an earlier load.
  */
 export function resolveClientHomeTree(): HomeTreeName {
-  const tree: HomeTreeName = hasCompletedOnboarding() || hasSupabaseSession() ? 'returning' : 'fresh';
+  const tree: HomeTreeName =
+    isNativeShell() || hasCompletedOnboarding() || hasSupabaseSession() ? 'returning' : 'fresh';
   try {
     document.documentElement.setAttribute('data-home', tree);
   } catch {
