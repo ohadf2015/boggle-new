@@ -38,7 +38,10 @@ const es = {
       },
       "noClassTitle": "Crea tu clase y ten un código en 5 segundos",
       "createClassCta": "Crear mi clase",
-      "codeReady": "Código listo"
+      "codeReady": "Código listo",
+      "firstAssignmentTitle": "Crea su primera tarea",
+      "firstAssignmentBody": "Ya hay estudiantes en la lista. Asigna una práctica para que la clase tenga algo que hacer cuando no estés en directo.",
+      "firstAssignmentCta": "Crear primera tarea"
     },
     "modes": {
       "workshop": {

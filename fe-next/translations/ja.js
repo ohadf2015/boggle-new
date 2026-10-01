@@ -38,7 +38,10 @@ const ja = {
       },
       "noClassTitle": "クラスを作れば、5秒でコード発行",
       "createClassCta": "クラスを作成",
-      "codeReady": "コード準備OK"
+      "codeReady": "コード準備OK",
+      "firstAssignmentTitle": "最初の課題を作る",
+      "firstAssignmentBody": "名簿に生徒がいます。ライブ中でないときも取り組める練習課題を出しましょう。",
+      "firstAssignmentCta": "最初の課題を作成"
     },
     "modes": {
       "workshop": {

@@ -38,7 +38,10 @@ const ru = {
       },
       "noClassTitle": "Создайте класс — код будет готов через 5 секунд",
       "createClassCta": "Создать класс",
-      "codeReady": "Код готов"
+      "codeReady": "Код готов",
+      "firstAssignmentTitle": "Создайте первое задание",
+      "firstAssignmentBody": "Ученики уже в списке. Назначьте практику, чтобы классу было чем заняться, когда вы не в эфире.",
+      "firstAssignmentCta": "Создать первое задание"
     },
     "modes": {
       "workshop": {
