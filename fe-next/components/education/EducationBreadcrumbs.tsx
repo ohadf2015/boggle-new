@@ -85,6 +85,12 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
         case 'classrooms':
           label = t('education.header.breadcrumbs.classrooms');
           break;
+        case 'classroom':
+          label = t('education.header.breadcrumbs.classrooms');
+          break;
+        case 'upgrade':
+          label = t('teacher.subscription.proPlanName');
+          break;
         case 'classroom-game':
           label = t('education.header.breadcrumbs.classroomGame');
           break;

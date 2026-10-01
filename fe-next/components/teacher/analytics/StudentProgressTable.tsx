@@ -23,6 +23,31 @@ interface StudentProgressTableProps {
 
 const columnHelper = createColumnHelper<StudentProgressSummary>();
 
+const IMAGE_SRC = /^(https?:\/\/|\/)/;
+
+// avatarUrl can hold the profiles.avatar_emoji default ('😊') or an avatar_config object; next/image throws on both.
+function StudentAvatar({ avatar, name }: { avatar: unknown; name: string }) {
+  if (typeof avatar === 'string' && IMAGE_SRC.test(avatar)) {
+    return (
+      <Image
+        src={avatar}
+        alt={name}
+        width={32}
+        height={32}
+        className="w-8 h-8 rounded-full border-neo border-neo-black"
+      />
+    );
+  }
+  const emoji = typeof avatar === 'string' && avatar.trim() ? avatar.trim() : null;
+  return (
+    <div className="w-8 h-8 shrink-0 rounded-full bg-neo-cyan/20 border-neo border-neo-cream/60 flex items-center justify-center">
+      <span className={emoji ? 'text-base leading-none' : 'text-neo-white font-neo-body text-sm'} aria-hidden={emoji ? true : undefined}>
+        {emoji ?? (name[0]?.toUpperCase() || '?')}
+      </span>
+    </div>
+  );
+}
+
 export function StudentProgressTable({ classroomId, onStudentClick }: StudentProgressTableProps) {
   const { t } = useLanguage();
   const { students, isLoading, error } = useStudentProgressMetrics({ classroomId });
@@ -52,21 +77,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
         const student = row.original;
         return (
           <div className="flex items-center gap-2">
-            {student.avatarUrl ? (
-              <Image
-                src={student.avatarUrl}
-                alt={student.displayName}
-                width={32}
-                height={32}
-                className="w-8 h-8 rounded-full border-neo border-neo-black"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-neo-cyan/20 border-neo border-neo-cream/60 flex items-center justify-center">
-                <span className="text-neo-white font-neo-body text-sm">
-                  {student.displayName[0].toUpperCase()}
-                </span>
-              </div>
-            )}
+            <StudentAvatar avatar={student.avatarUrl} name={student.displayName} />
             <span className="text-neo-white font-neo-body">
               {student.displayName}
               {student.isStruggling && (

@@ -36,11 +36,13 @@ export interface ClassArcPanelProps {
   classroomLanguage: Language;
   /** Name included when known, so the drill-down header can greet the student. */
   onStudentClick: (studentId: string, name?: string) => void;
+  /** Inside a report disclosure that already shows a title and frame. */
+  embedded?: boolean;
 }
 
 type AssignStatus = 'idle' | 'saving' | 'done' | 'failed';
 
-export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, onStudentClick }: ClassArcPanelProps) {
+export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, onStudentClick, embedded = false }: ClassArcPanelProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { mastery, isLoading: masteryLoading, error } = useWordMasteryTrend({ classroomId });
@@ -109,7 +111,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
 
   if (masteryLoading || profiles === null) {
     return (
-      <Shell title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
+      <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
         <div data-testid="class-arc-loading" aria-busy="true" className="space-y-2">
           <span className="sr-only" role="status">{t('teacher.reports.loading')}</span>
           {[0, 1, 2].map((i) => (
@@ -122,7 +124,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
 
   if (error) {
     return (
-      <Shell title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
+      <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
         <p role="alert" className="rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-bold text-neo-white">
           {t('teacher.reports.error')}
         </p>
@@ -132,7 +134,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
 
   if (!mastery || mastery.sessionsAnalyzed === 0) {
     return (
-      <Shell title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
+      <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
         <p data-testid="class-arc-empty" className="rounded-neo border-2 border-dashed border-neo-cream/30 p-6 text-center text-sm text-neo-cream/80">
           {t('teacher.reports.arc.noEvidenceClass')}
         </p>
@@ -141,7 +143,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
   }
 
   return (
-    <Shell title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
+    <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
       {mastery.classStuckWords.length > 0 && (
         <div className="mb-5">
           <h3 className="mb-2 text-sm font-bold text-neo-cream/80">{t('teacher.reports.arc.wordsClassMisses')}</h3>
@@ -256,20 +258,22 @@ function TrendPill({ tone, count, label }: { tone: 'lime' | 'cyan' | 'pink'; cou
   );
 }
 
-function Shell({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
+function Shell({ embedded, title, subtitle, children }: { embedded: boolean; title: string; subtitle: string; children: React.ReactNode }) {
   return (
     <section
       data-testid="class-arc-panel"
       aria-label={title}
-      className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-6"
+      className={embedded ? undefined : 'rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-6'}
     >
-      <h2 className="flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white">
-        <span className="grid size-8 shrink-0 place-items-center rounded-neo border-2 border-neo-cyan bg-neo-cyan/15">
-          <BookMarked className="size-4 text-neo-cyan" aria-hidden="true" />
-        </span>
+      <h2 className={embedded ? 'sr-only' : 'flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white'}>
+        {!embedded && (
+          <span className="grid size-8 shrink-0 place-items-center rounded-neo border-2 border-neo-cyan bg-neo-cyan/15">
+            <BookMarked className="size-4 text-neo-cyan" aria-hidden="true" />
+          </span>
+        )}
         {title}
       </h2>
-      <p className="mb-4 mt-1 text-sm text-neo-cream/70">{subtitle}</p>
+      <p className={cn('mb-4 text-sm text-neo-cream/70', !embedded && 'mt-1')}>{subtitle}</p>
       {children}
     </section>
   );

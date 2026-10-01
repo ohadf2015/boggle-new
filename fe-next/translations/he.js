@@ -13110,6 +13110,14 @@ const he = {
       "trialEnded": "הניסיון הסתיים"
     },
     "proGate": {
+      "mastery": {
+        "title": "רואים כל מילה שהכיתה מפספסת",
+        "body": "Pro מדרג את עשר המילים שהכיתה מפספסת הכי הרבה וממפה כל תלמיד מול כל מילה, בכל המשחקים — כך יודעים בדיוק מה ללמד שוב, ולמי."
+      },
+      "missedPractice": {
+        "title": "הופכים פספוסים לתרגול מרווח",
+        "body": "קליק אחד שולח לכיתה את המילים שפוספסו בשלושה סבבים קצרים — מחר, בעוד 3 ימים ובעוד שבוע. המרווחים האלה הם מה שגורם למילים להיקלט."
+      },
       "analytics": {
         "title": "לראות איך הכיתה באמת מתקדמת",
         "body": "עם Pro כל משחק הופך לתמונת מצב של הכיתה: אילו מילים נקלטו, אילו תלמידים תקועים וכמה כל אחד התקדם מתחילת השנה. אפשר להביא את זה לאסיפת הורים או לישיבת צוות."
@@ -13144,10 +13152,10 @@ const he = {
       "regionLabel": "תקציר התקדמות עבור {{classroom}}",
       "scheduleReteachCta": "לקבוע Live לחזרה בעוד ~{{days}} ימים",
       "scheduleReteachConfirm": "Live לחזרה נקבע ל־{{date}} (~{{days}} ימים). הזמנה ליומן נפתחה.",
-      "scheduleReteachHint": "לבנות מחדש את המילים הקשות ולשחק שוב בעוד כשבועיים — חזרה מרווחת בסגנון Kahoot.",
+      "scheduleReteachHint": "בונים מחדש את המילים הקשות ומשחקים שוב בעוד כשבועיים — חזרה מרווחת שנשארת.",
       "unpluggedReteachLiveCta": "התחלת Unplugged Live לחיזוק",
       "reteachLiveCta": "התחלת Live חיזוק ל־3 דקות",
-      "unpluggedReteachLiveFoil": "מול Kahoot Unplugged (Teacher Takeover, 21 בספט׳ 2026 — כשאין מכשירי תלמידים) — מקרינים את המילים החסרות; התלמידים עונים על נייר, בלי מכשירים."
+      "unpluggedReteachLiveFoil": "אין היום מכשירים לתלמידים? מקרינים את הפספוסים — והתלמידים עונים על דף."
     },
     "windowProgress": {
       "title": "הכיתה השבוע",
@@ -13247,6 +13255,8 @@ const he = {
       "proHeroAlt": "מורה מסתכלת על טבלת מובילים חיה של הכיתה על הלוח בזמן שהתלמידים משחקים מהמקום.",
       "valueHeadline": "הכי מתאים לחזרה יומית ולכרטיס יציאה. בדיקה לכל הכיתה בסיבוב אחד.",
       "matrix": {
+        "mastery": "מפת שליטה ומילים קשות",
+        "missedPractice": "תרגול פספוסים, במרווחים של 1-3-7 ימים",
         "title": "השוואת מסלולים",
         "featureColumn": "מה כלול",
         "unlimited": "ללא הגבלה",
@@ -14810,7 +14820,7 @@ const he = {
       "inviteStudents": "הזמן תלמידים",
       "lastActive": "פעילות אחרונה",
       "lessonEffectiveness": "יעילות שיעורים",
-      "level": "רמה {{level}}",
+      "level": "רמה",
       "live": "שידור חי",
       "loading": "טוען אנליטיקה...",
       "mastery": "שליטה",
@@ -14826,7 +14836,7 @@ const he = {
       "retry": "נסו שוב",
       "shareParentReport": "שתפו עם הורה",
       "shareParentReportFailed": "לא הצלחנו ליצור את הקישור. נסו שוב.",
-      "streak": "רצף {{count}} ימים",
+      "streak": "רצף",
       "struggling": "זקוק/ה לעזרה",
       "mastered": "שולט/ת",
       "practicing": "בתרגול",
@@ -19161,6 +19171,96 @@ const he = {
     }
   },
   // @eduLive:end
+  "eduPro": {
+    "mastery": {
+      "title": "שליטה במילים",
+      "subtitle": "אילו מילים הכיתה מפספסת שוב ושוב — בכל המשחקים.",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "דיוק כיתתי",
+        "words": "מילים במעקב",
+        "sessions": "תוצאות משחק",
+        "students": "תלמידים"
+      },
+      "hardestTitle": "המילים הקשות ביותר",
+      "missedOf": "פוספסה {missed} מתוך {attempts}",
+      "studentsMissing": "{count} מתוך {total} תלמידים",
+      "noneMissed": "אף אחד עוד לא פספס מילה פעמיים. יפה!",
+      "empty": "שחקו עם הכיתה חידון אוצר מילים או סבב Wordcraft — מפת השליטה תתמלא אחרי המשחק הראשון.",
+      "loading": "טוענים את מפת השליטה…",
+      "error": "לא הצלחנו לטעון את נתוני השליטה. רעננו ונסו שוב.",
+      "heatmapToggle": "מפת חום: תלמיד × מילה",
+      "heatmapHint": "כל משבצת היא תלמיד אחד מול מילה אחת.",
+      "studentColumn": "תלמיד/ה",
+      "legend": {
+        "solid": "יודע/ת",
+        "shaky": "מתנדנד",
+        "missed": "פוספס",
+        "unseen": "לא נשאל"
+      },
+      "cellLabel": "{name}, {word}: {correct} מתוך {attempts} נכון",
+      "cellUnseen": "{name}, {word}: עוד לא נשאל",
+      "showAll": "הצגת כל ה-{count}",
+      "showFewer": "הצגת פחות",
+      "hiddenWords": "+{count} מילים קשות נוספות ב-Pro",
+      "previewNote": "תצוגה חינמית: שלוש הראשונות. ב-Pro רואים את כל העשר ואת כל התלמידים.",
+      "phoneHint": "המילים הקשות ראשונות, ולצד כל אחת מי פספס אותה.",
+      "needsHelpColumn": "צריכים עזרה",
+      "needsHelpLabel": "{name}: {count} מילים לחזרה",
+      "missedRow": "פספסו",
+      "wordMissedLabel": "{word}: {count} מתוך {total} תלמידים פספסו",
+      "missedByCount": "{count} מתוך {total} פספסו",
+      "missedNames": "פספסו: {names}",
+      "shakyNames": "מתנדנדים: {names}",
+      "everyoneGotIt": "כולם הצליחו",
+      "needsHelpTitle": "צריכים עזרה",
+      "needsHelpChip": "{name} ({count})",
+      "allClear": "אף אחד לא נתקע על המילים האלה. יפה.",
+      "unlock": {
+        "allWords": "כל 10 המילים הקשות, מדורגות",
+        "heatmap": "מי פספס איזו מילה, תלמיד אחרי תלמיד",
+        "practice": "תרגול של המילים שפוספסו בלחיצה אחת, בפריסה על פני שבוע"
+      }
+    },
+    "practice": {
+      "cta": "תרגול מילים שפוספסו",
+      "hint": "שלושה סבבים מרווחים של המילים האלה: מחר, בעוד 3 ימים ובעוד שבוע.",
+      "assigning": "שולחים…",
+      "assigned": "נשלח!",
+      "assignedBody": "{count} מילים, שלושה סבבים. התלמידים ימצאו אותם בשיעורים שלהם.",
+      "round": "סבב {n}",
+      "roundName": "מילים שפוספסו · {classroom} · סבב {n}/3 · {date}",
+      "failed": "לא הצלחנו לשלוח את הסבבים. שום דבר לא נשמר — נסו שוב.",
+      "already": "כבר נשלח היום. התלמידים רואים את זה בשיעורים שלהם.",
+      "nothing": "עוד אין מילים שפוספסו לתרגול.",
+      "inDays": "בעוד {count} ימים",
+      "tomorrow": "מחר",
+      "whyNote": "שליפה מרווחת עדיפה על חזרה אחת ארוכה: כל סבב חוזר בדיוק כשהמילה מתחילה להישכח."
+    },
+    "reports": {
+      "classEyebrow": "דוח כיתה",
+      "moreDetail": "דוח מלא להדפסה",
+      "moreDetailHint": "ייצוא ל-PDF, פירוט לכל תלמיד והעברת ציונים ל-Google Classroom.",
+      "assignmentsTitle": "מי הגיש מה",
+      "assignmentsHint": "מי סיים כל מטלה — כולל ייצוא ל-CSV.",
+      "arcTitle": "תלמיד אחרי תלמיד",
+      "arcHint": "מי מתקדם, מי נתקע, ואילו מילים מעכבות אותו.",
+      "digestTitle": "המשחק האחרון בכיתה",
+      "digestHint": "מה קרה במשחק האחרון שלכם, במבט אחד."
+    },
+    "upgrade": {
+      "featureMastery": "10 המילים שהכי מפוספסות + מפת חום תלמיד × מילה",
+      "featureMissedPractice": "קליק אחד: תרגול מרווח של הפספוסים (1, 3, 7 ימים)",
+      "freeMastery": "מפת שליטה במילים",
+      "freePractice": "תרגול מרווח של מילים שפוספסו"
+    },
+    "assign": {
+      "required": "חובה",
+      "needLessonAndDate": "בחרו שיעור ותאריך הגשה כדי לשלוח.",
+      "needLesson": "בחרו שיעור כדי לשלוח.",
+      "needDate": "בחרו תאריך הגשה כדי לשלוח."
+    }
+  }
 };
 
 export { he };

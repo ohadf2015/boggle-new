@@ -13,7 +13,7 @@
 
 'use client';
 
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,6 +21,8 @@ import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgre
 import { AnalyticsDashboard } from '@/components/teacher/analytics/AnalyticsDashboard';
 import { ProGate } from '@/components/teacher/ProGate';
 import { StudentProgressTable } from '@/components/teacher/analytics/StudentProgressTable';
+import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
+import { getClassroom } from '@/lib/supabase/education/classrooms';
 import dynamic from 'next/dynamic';
 const LessonEffectivenessChart = dynamic(
   () => import('@/components/teacher/analytics/LessonEffectivenessChart'),
@@ -55,6 +57,22 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   const { user, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
+  const [tab, setTab] = useState('students');
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const masteryRef = useRef<HTMLDivElement>(null);
+  const [classroomName, setClassroomName] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    getClassroom(classroomId)
+      .then(({ data }) => {
+        if (!cancelled && data?.name) setClassroomName(data.name);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [classroomId]);
 
   // ==================== REALTIME CONNECTION ====================
 
@@ -106,15 +124,17 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   };
 
   const handleViewStudents = (_filter: 'struggling') => {
-    // Navigate to students tab with filter
+    setTab('students');
+    tabsRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   };
 
   const handleCreateReviewLesson = (_words: string[]) => {
-    // Navigate to lesson creation with pre-filled words
+    masteryRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   };
 
-  const handleStudentClick = (_studentId: string) => {
-    // Navigate to individual student detail
+  const handleStudentClick = (studentId: string) => {
+    const params = new URLSearchParams({ classroomId, studentId });
+    router.push(`/${locale}/teacher/reports?${params.toString()}`);
   };
 
   // ==================== RENDER ====================
@@ -169,76 +189,48 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
             being sold; gating only the summary card left them open to free teachers. */}
         <ProGate feature="analytics">
-          {/* Metrics Dashboard */}
-          <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
+          <div ref={masteryRef} className="scroll-mt-4">
+            <WordMasteryReport classroomId={classroomId} classroomName={classroomName} />
+          </div>
+
+          <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-3 sm:p-6">
             <AnalyticsDashboard
               classroomId={classroomId}
               onViewStudents={handleViewStudents}
               onCreateReviewLesson={handleCreateReviewLesson}
+              showHeader={false}
+              summaryOnly
             />
           </div>
 
-          {/* Detailed Views Tabs */}
-          <Tabs defaultValue="students" className="space-y-4">
+          <Tabs ref={tabsRef} value={tab} onValueChange={setTab} className="scroll-mt-4 space-y-4">
             <TabsList
               className={cn(
-                'grid w-full grid-cols-4 gap-2',
+                'grid h-auto w-full grid-cols-2 gap-2 sm:grid-cols-4',
                 'bg-neo-navy/50 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-2'
               )}
             >
               <TabsTrigger
                 value="students"
-                className={cn(
-                  // Selected differs by FILL, not only by text colour; unselected
-                  // still carries a 2px cream edge so it reads as tappable at all
-                  // (it used to be bare text on navy — `edge<3`).
-                  'font-neo-body font-bold rounded-neo border-[2px]',
-                  'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                  'transition-all duration-200'
-                )}
+                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
               >
                 {t('education.analytics.viewStudents')}
               </TabsTrigger>
               <TabsTrigger
                 value="lessons"
-                className={cn(
-                  // Selected differs by FILL, not only by text colour; unselected
-                  // still carries a 2px cream edge so it reads as tappable at all
-                  // (it used to be bare text on navy — `edge<3`).
-                  'font-neo-body font-bold rounded-neo border-[2px]',
-                  'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white data-[state=active]:border-neo-black',
-                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                  'transition-all duration-200'
-                )}
+                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white data-[state=active]:border-neo-black')}
               >
                 {t('education.analytics.viewLessons')}
               </TabsTrigger>
               <TabsTrigger
                 value="vocabulary"
-                className={cn(
-                  // Selected differs by FILL, not only by text colour; unselected
-                  // still carries a 2px cream edge so it reads as tappable at all
-                  // (it used to be bare text on navy — `edge<3`).
-                  'font-neo-body font-bold rounded-neo border-[2px]',
-                  'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                  'transition-all duration-200'
-                )}
+                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
               >
                 {t('education.analytics.viewVocabulary')}
               </TabsTrigger>
               <TabsTrigger
                 value="assignments"
-                className={cn(
-                  // Selected differs by FILL, not only by text colour; unselected
-                  // still carries a 2px cream edge so it reads as tappable at all
-                  // (it used to be bare text on navy — `edge<3`).
-                  'font-neo-body font-bold rounded-neo border-[2px]',
-                  'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                  'transition-all duration-200'
-                )}
+                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
               >
                 {t('education.analytics.viewAssignments')}
               </TabsTrigger>
@@ -329,6 +321,10 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 }
 
 import { TeacherGate } from '@/components/education/TeacherGate';
+
+// Selected differs by FILL, not only text colour; unselected keeps a 2px cream edge so it reads as tappable.
+const TAB_BASE =
+  'min-h-11 h-auto whitespace-normal px-2 py-2 text-sm leading-tight font-neo-body font-bold rounded-neo border-[2px] data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream transition-all duration-200 active:translate-y-px motion-reduce:transition-none';
 
 /**
  * Shell above gate — see `components/education/shell/__tests__/gatedShellOrder.test.ts`.

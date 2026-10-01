@@ -13203,6 +13203,14 @@ const es = {
       "trialEnded": "La prueba terminó"
     },
     "proGate": {
+      "mastery": {
+        "title": "Mira cada palabra que falla tu clase",
+        "body": "Pro ordena las diez palabras que más falla tu clase y cruza a cada alumno con cada palabra, en todos los juegos: sabrás exactamente qué repasar y con quién."
+      },
+      "missedPractice": {
+        "title": "Convierte los fallos en práctica espaciada",
+        "body": "Con un clic, asigna las palabras falladas en tres rondas cortas: mañana, en 3 días y en una semana. Ese espaciado es lo que hace que se queden."
+      },
       "analytics": {
         "title": "Mira cómo va de verdad tu clase",
         "body": "Con Pro cada partida se convierte en una radiografía de tu clase: qué palabras se afianzan, qué alumnos se atascan y cuánto ha avanzado cada uno desde septiembre. Llévalo a una reunión de padres o de departamento."
@@ -13238,10 +13246,10 @@ const es = {
       "regionLabel": "Resumen de progreso de {{classroom}}",
       "scheduleReteachCta": "Programar Live de repaso en ~{{days}} días",
       "scheduleReteachConfirm": "Live de repaso programado para {{date}} (~{{days}} días). Se abrió la invitación del calendario.",
-      "scheduleReteachHint": "Reconstruye las palabras difíciles y vuelve a jugar en unas dos semanas — repaso espaciado al estilo Kahoot.",
+      "scheduleReteachHint": "Reconstruye las palabras difíciles y vuelve a jugar en unas dos semanas: repaso espaciado que se queda.",
       "unpluggedReteachLiveCta": "Empezar Unplugged reteach Live",
       "reteachLiveCta": "Empezar reteach Live de 3 min",
-      "unpluggedReteachLiveFoil": "Alternativa a Kahoot Unplugged (Teacher Takeover, 21 sep 2026 — cuando no hay dispositivos de alumnado) — proyecta las fallas; el alumnado responde en papel, sin dispositivos."
+      "unpluggedReteachLiveFoil": "¿Hoy sin dispositivos para el alumnado? Proyecta los fallos y que respondan en papel."
     },
     "windowProgress": {
       "title": "La clase esta semana",
@@ -13341,6 +13349,8 @@ const es = {
       "proHeroAlt": "Una profesora mira la clasificación de la clase en directo en la pizarra mientras el alumnado juega desde sus sitios.",
       "valueHeadline": "Ideal para el repaso diario y tickets de salida. Comprueba a toda la clase en una ronda.",
       "matrix": {
+        "mastery": "Mapa de dominio y palabras difíciles",
+        "missedPractice": "Práctica de fallos, espaciada 1-3-7 días",
         "title": "Comparar planes",
         "featureColumn": "Función",
         "unlimited": "Ilimitado",
@@ -14904,7 +14914,7 @@ const es = {
       "inviteStudents": "Invitar estudiantes",
       "lastActive": "Última actividad",
       "lessonEffectiveness": "Eficacia",
-      "level": "Nivel {{level}}",
+      "level": "Nivel",
       "live": "En vivo",
       "loading": "Cargando...",
       "mastery": "Dominio",
@@ -14920,7 +14930,7 @@ const es = {
       "retry": "Reintentar",
       "shareParentReport": "Compartir con un familiar",
       "shareParentReportFailed": "No se pudo crear el enlace. Inténtalo de nuevo.",
-      "streak": "Racha: {{count}} días",
+      "streak": "Racha",
       "struggling": "Necesita apoyo",
       "mastered": "Dominado",
       "practicing": "Practicando",
@@ -19249,6 +19259,96 @@ const es = {
     }
   },
   // @eduLive:end
+  "eduPro": {
+    "mastery": {
+      "title": "Dominio de palabras",
+      "subtitle": "Qué palabras falla tu clase una y otra vez, en todos los juegos.",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "Precisión de la clase",
+        "words": "Palabras seguidas",
+        "sessions": "Resultados de juego",
+        "students": "Alumnos"
+      },
+      "hardestTitle": "Palabras más difíciles",
+      "missedOf": "falló {missed} de {attempts}",
+      "studentsMissing": "{count} de {total} alumnos",
+      "noneMissed": "Nadie ha fallado una palabra dos veces todavía. ¡Bien!",
+      "empty": "Juega un quiz de vocabulario o una ronda de Wordcraft con esta clase: el dominio aparece tras la primera partida.",
+      "loading": "Cargando dominio de palabras…",
+      "error": "No pudimos cargar el dominio de palabras. Recarga para intentarlo de nuevo.",
+      "heatmapToggle": "Mapa de calor: alumno × palabra",
+      "heatmapHint": "Cada casilla es un alumno con una palabra.",
+      "studentColumn": "Alumno",
+      "legend": {
+        "solid": "La domina",
+        "shaky": "Dudosa",
+        "missed": "Fallada",
+        "unseen": "Sin preguntar"
+      },
+      "cellLabel": "{name}, {word}: {correct} de {attempts} correctas",
+      "cellUnseen": "{name}, {word}: aún no preguntada",
+      "showAll": "Ver las {count}",
+      "showFewer": "Ver menos",
+      "hiddenWords": "+{count} palabras difíciles más en Pro",
+      "previewNote": "Vista gratuita: tus 3 primeras. Pro muestra las diez y a cada alumno.",
+      "phoneHint": "Las palabras más difíciles primero, con quién falló cada una.",
+      "needsHelpColumn": "Necesita ayuda",
+      "needsHelpLabel": "{name}: {count} palabras para repasar",
+      "missedRow": "Fallada por",
+      "wordMissedLabel": "{word}: la fallaron {count} de {total} alumnos",
+      "missedByCount": "fallada por {count} de {total}",
+      "missedNames": "Fallaron: {names}",
+      "shakyNames": "Con dudas: {names}",
+      "everyoneGotIt": "Todos la acertaron",
+      "needsHelpTitle": "Necesitan ayuda",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Nadie se ha atascado con estas palabras. ¡Bien!",
+      "unlock": {
+        "allWords": "El top 10 completo de palabras más difíciles",
+        "heatmap": "Quién falló cada palabra, alumno por alumno",
+        "practice": "Repaso de las palabras falladas con un clic, repartido en una semana"
+      }
+    },
+    "practice": {
+      "cta": "Practicar palabras falladas",
+      "hint": "Tres rondas espaciadas con estas palabras: mañana, en 3 días y en una semana.",
+      "assigning": "Asignando…",
+      "assigned": "¡Asignado!",
+      "assignedBody": "{count} palabras, tres rondas. Tus alumnos las verán en sus lecciones.",
+      "round": "Ronda {n}",
+      "roundName": "Palabras falladas · {classroom} · ronda {n}/3 · {date}",
+      "failed": "No pudimos asignar las rondas. No se guardó nada; inténtalo de nuevo.",
+      "already": "Ya lo asignaste hoy. Tus alumnos lo tienen en sus lecciones.",
+      "nothing": "Todavía no hay palabras falladas que practicar.",
+      "inDays": "en {count} días",
+      "tomorrow": "Mañana",
+      "whyNote": "Recordar a intervalos funciona mejor que un repaso largo: cada ronda vuelve justo cuando la palabra empieza a olvidarse."
+    },
+    "reports": {
+      "classEyebrow": "Informe de la clase",
+      "moreDetail": "Informe completo imprimible",
+      "moreDetailHint": "Exportación a PDF, detalle por alumno y envío de notas a Google Classroom.",
+      "assignmentsTitle": "Quién ha hecho qué",
+      "assignmentsHint": "Quién ha terminado cada tarea, con exportación a CSV.",
+      "arcTitle": "Alumno por alumno",
+      "arcHint": "Quién avanza, quién se ha atascado y qué palabras lo frenan.",
+      "digestTitle": "Última partida de la clase",
+      "digestHint": "Lo que pasó en vuestra partida más reciente, de un vistazo."
+    },
+    "upgrade": {
+      "featureMastery": "Las 10 palabras más falladas + mapa alumno × palabra",
+      "featureMissedPractice": "Un clic: práctica espaciada de los fallos (1, 3, 7 días)",
+      "freeMastery": "Mapa de dominio de palabras",
+      "freePractice": "Práctica espaciada de palabras falladas"
+    },
+    "assign": {
+      "required": "obligatorio",
+      "needLessonAndDate": "Elige una lección y una fecha de entrega para asignar.",
+      "needLesson": "Elige una lección para asignar.",
+      "needDate": "Elige una fecha de entrega para asignar."
+    }
+  }
 };
 
 export { es };

@@ -12505,6 +12505,14 @@ const en = {
       "lastUpdated": "Last Updated"
     },
     "proGate": {
+      "mastery": {
+        "title": "See every word your class misses",
+        "body": "Pro ranks the ten words your class misses most and maps each student against each word, across every game — so you know exactly what to reteach, and to whom."
+      },
+      "missedPractice": {
+        "title": "Turn misses into spaced practice",
+        "body": "One click assigns your class's missed words as three short rounds — tomorrow, in 3 days and in a week. That spacing is what makes words stick."
+      },
       "analytics": {
         "title": "See how your class is really doing",
         "body": "Pro turns every game into a picture of your class: which words are sticking, which students are stuck, and how far each one has come since September. Bring it to a parent evening or a department meeting."
@@ -12539,10 +12547,10 @@ const en = {
       "regionLabel": "Progress digest for {{classroom}}",
       "scheduleReteachCta": "Schedule reteach Live in ~{{days}} days",
       "scheduleReteachConfirm": "Reteach Live scheduled for {{date}} (~{{days}} days). Calendar invite opened.",
-      "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks — Kahoot-style spaced reteach.",
+      "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks — spaced reteach that sticks.",
       "unpluggedReteachLiveCta": "Start Unplugged reteach Live",
       "reteachLiveCta": "Start 3-min reteach Live",
-      "unpluggedReteachLiveFoil": "Kahoot Unplugged foil (Teacher Takeover, Sep 21 2026 — when student devices aren’t an option) — project the misses; students answer on paper, no devices."
+      "unpluggedReteachLiveFoil": "No student devices today? Project the misses — students answer on paper."
     },
     "windowProgress": {
       "title": "This week's class",
@@ -12642,6 +12650,8 @@ const en = {
       "proHeroAlt": "A teacher watching a live class leaderboard on the board while students play from their seats.",
       "valueHeadline": "Best for everyday review and exit tickets. Run a whole-class check in one round.",
       "matrix": {
+        "mastery": "Mastery heatmap & hardest words",
+        "missedPractice": "Missed practice, spaced 1-3-7 days",
         "title": "Compare plans",
         "featureColumn": "Feature",
         "unlimited": "Unlimited",
@@ -13502,7 +13512,7 @@ const en = {
       "inviteStudents": "Invite Students",
       "lastActive": "Last Active",
       "lessonEffectiveness": "Lesson Impact",
-      "level": "Level {{level}}",
+      "level": "Level",
       "live": "Live",
       "loading": "Loading analytics...",
       "mastery": "Mastery",
@@ -13518,7 +13528,7 @@ const en = {
       "retry": "Retry",
       "shareParentReport": "Share with parent",
       "shareParentReportFailed": "Couldn't create the link. Try again.",
-      "streak": "{{count}}-day streak",
+      "streak": "Streak",
       "struggling": "Needs Help",
       "mastered": "Mastered",
       "practicing": "Practicing",
@@ -18294,6 +18304,96 @@ const en = {
     }
   },
   // @eduLive:end
+  "eduPro": {
+    "mastery": {
+      "title": "Word mastery",
+      "subtitle": "Which words your class keeps missing — across every game.",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "Class accuracy",
+        "words": "Words tracked",
+        "sessions": "Game results",
+        "students": "Students"
+      },
+      "hardestTitle": "Hardest words",
+      "missedOf": "missed {missed} of {attempts}",
+      "studentsMissing": "{count} of {total} students",
+      "noneMissed": "Nobody has missed a word twice yet. Nice.",
+      "empty": "Play a vocab quiz or a Wordcraft round with this class — mastery fills in after the first game.",
+      "loading": "Loading word mastery…",
+      "error": "Couldn't load word mastery. Refresh to try again.",
+      "heatmapToggle": "Student × word heatmap",
+      "heatmapHint": "Each cell is one student on one word.",
+      "studentColumn": "Student",
+      "legend": {
+        "solid": "Got it",
+        "shaky": "Shaky",
+        "missed": "Missed",
+        "unseen": "Not asked"
+      },
+      "cellLabel": "{name}, {word}: {correct} of {attempts} correct",
+      "cellUnseen": "{name}, {word}: not asked yet",
+      "showAll": "Show all {count}",
+      "showFewer": "Show fewer",
+      "hiddenWords": "+{count} more hard words in Pro",
+      "previewNote": "Free preview: your top 3. Pro shows all ten and every student.",
+      "phoneHint": "Hardest words first, with who missed each one.",
+      "needsHelpColumn": "Needs help",
+      "needsHelpLabel": "{name}: {count} words to review",
+      "missedRow": "Missed by",
+      "wordMissedLabel": "{word}: missed by {count} of {total} students",
+      "missedByCount": "missed by {count} of {total}",
+      "missedNames": "Missed: {names}",
+      "shakyNames": "Shaky: {names}",
+      "everyoneGotIt": "Everyone got it",
+      "needsHelpTitle": "Needs help",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Nobody is stuck on these words. Nice.",
+      "unlock": {
+        "allWords": "The full top 10 hardest words, ranked",
+        "heatmap": "Who missed which word, student by student",
+        "practice": "One-click practice of missed words, spaced over a week"
+      }
+    },
+    "practice": {
+      "cta": "Practice missed words",
+      "hint": "Three spaced rounds of these words: tomorrow, in 3 days and in a week.",
+      "assigning": "Assigning…",
+      "assigned": "Assigned!",
+      "assignedBody": "{count} words, three rounds. Students find them in their lessons.",
+      "round": "Round {n}",
+      "roundName": "Missed words · {classroom} · round {n}/3 · {date}",
+      "failed": "Couldn't assign the rounds. Nothing was saved — try again.",
+      "already": "Already assigned today. Students have it in their lessons.",
+      "nothing": "No missed words to practise yet.",
+      "inDays": "in {count} days",
+      "tomorrow": "Tomorrow",
+      "whyNote": "Spaced retrieval beats one long review: each round comes back just as the word starts to fade."
+    },
+    "reports": {
+      "classEyebrow": "Class report",
+      "moreDetail": "Full printable report",
+      "moreDetailHint": "PDF export, per-student detail and Google Classroom grade passback.",
+      "assignmentsTitle": "Who's done what",
+      "assignmentsHint": "Who has finished each assignment — CSV export inside.",
+      "arcTitle": "Student by student",
+      "arcHint": "Who's climbing, who's stuck, and the words holding them back.",
+      "digestTitle": "Last class game",
+      "digestHint": "What happened in your most recent game, at a glance."
+    },
+    "upgrade": {
+      "featureMastery": "Top 10 missed words + a student × word heatmap",
+      "featureMissedPractice": "One click: spaced practice of the misses (1, 3, 7 days)",
+      "freeMastery": "Word mastery heatmap",
+      "freePractice": "Spaced missed-words practice"
+    },
+    "assign": {
+      "required": "required",
+      "needLessonAndDate": "Pick a lesson and a due date to assign.",
+      "needLesson": "Pick a lesson to assign.",
+      "needDate": "Pick a due date to assign."
+    }
+  }
 };
 
 export { en };

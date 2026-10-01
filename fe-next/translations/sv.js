@@ -13491,6 +13491,14 @@ const sv = {
       "trialEnded": "Provperioden är slut"
     },
     "proGate": {
+      "mastery": {
+        "title": "Se varje ord klassen missar",
+        "body": "Pro rangordnar de tio ord klassen missar mest och visar varje elev mot varje ord, i alla spel – så du vet exakt vad som behöver repeteras, och för vem."
+      },
+      "missedPractice": {
+        "title": "Gör missar till utspridd övning",
+        "body": "Ett klick delar ut klassens missade ord som tre korta omgångar – i morgon, om 3 dagar och om en vecka. Det är mellanrummen som får orden att fastna."
+      },
       "analytics": {
         "title": "Se hur din klass faktiskt ligger till",
         "body": "Med Pro blir varje spel en bild av klassen: vilka ord som sitter, vilka elever som kör fast och hur långt var och en har kommit sedan terminsstarten. Ta med det till utvecklingssamtalet eller ämneskonferensen."
@@ -13525,10 +13533,10 @@ const sv = {
       "regionLabel": "Fortgångssammandrag för {{classroom}}",
       "scheduleReteachCta": "Schemalägg reteach-Live om ~{{days}} dagar",
       "scheduleReteachConfirm": "Reteach-Live schemalagd till {{date}} (~{{days}} dagar). Kalenderinbjudan öppnades.",
-      "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor — mellanslagsrepetition à la Kahoot.",
+      "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor – utspridd repetition som fastnar.",
       "unpluggedReteachLiveCta": "Starta Unplugged reteach Live",
       "reteachLiveCta": "Starta 3-minuters reteach Live",
-      "unpluggedReteachLiveFoil": "Kahoot Unplugged-foil (Teacher Takeover, 21 sep 2026 — när elevernas enheter inte är ett alternativ) — projicera missarna; eleverna svarar på papper, utan enheter."
+      "unpluggedReteachLiveFoil": "Inga elevenheter i dag? Projicera missarna – eleverna svarar på papper."
     },
     "windowProgress": {
       "title": "Klassen den här veckan",
@@ -13628,6 +13636,8 @@ const sv = {
       "proHeroAlt": "En lärare tittar på klassens live-topplista på tavlan medan eleverna spelar från sina platser.",
       "valueHeadline": "Bäst för daglig repetition och exit tickets. Kolla hela klassen på en runda.",
       "matrix": {
+        "mastery": "Värmekarta och svåraste orden",
+        "missedPractice": "Missade ord, utspritt över 1-3-7 dagar",
         "title": "Jämför planer",
         "featureColumn": "Funktion",
         "unlimited": "Obegränsat",
@@ -15191,7 +15201,7 @@ const sv = {
       "inviteStudents": "Bjud in elever",
       "lastActive": "Senast aktiv",
       "lessonEffectiveness": "Lektionens resultat",
-      "level": "Nivå {{level}}",
+      "level": "Nivå",
       "live": "Live",
       "loading": "Laddar statistik...",
       "mastery": "Behärskat",
@@ -15207,7 +15217,7 @@ const sv = {
       "retry": "Försök igen",
       "shareParentReport": "Dela med förälder",
       "shareParentReportFailed": "Kunde inte skapa länken. Försök igen.",
-      "streak": "{{count}} dagars träning",
+      "streak": "Svit",
       "struggling": "Behöver stöd",
       "mastered": "Behärskar",
       "practicing": "Övar",
@@ -19231,6 +19241,96 @@ const sv = {
     }
   },
   // @eduLive:end
+  "eduPro": {
+    "mastery": {
+      "title": "Ordbehärskning",
+      "subtitle": "Vilka ord klassen missar gång på gång – i alla spel.",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "Klassens träffsäkerhet",
+        "words": "Ord som följs",
+        "sessions": "Spelresultat",
+        "students": "Elever"
+      },
+      "hardestTitle": "Svåraste orden",
+      "missedOf": "missat {missed} av {attempts}",
+      "studentsMissing": "{count} av {total} elever",
+      "noneMissed": "Ingen har missat ett ord två gånger än. Snyggt!",
+      "empty": "Kör ett ordförrådsquiz eller en Wordcraft-runda med klassen – kartan fylls i efter första spelet.",
+      "loading": "Laddar ordbehärskning…",
+      "error": "Kunde inte ladda ordbehärskningen. Ladda om och försök igen.",
+      "heatmapToggle": "Värmekarta: elev × ord",
+      "heatmapHint": "Varje ruta är en elev på ett ord.",
+      "studentColumn": "Elev",
+      "legend": {
+        "solid": "Sitter",
+        "shaky": "Osäkert",
+        "missed": "Missat",
+        "unseen": "Inte frågat"
+      },
+      "cellLabel": "{name}, {word}: {correct} av {attempts} rätt",
+      "cellUnseen": "{name}, {word}: inte frågat än",
+      "showAll": "Visa alla {count}",
+      "showFewer": "Visa färre",
+      "hiddenWords": "+{count} fler svåra ord i Pro",
+      "previewNote": "Gratisvy: dina tre svåraste. Pro visar alla tio och varje elev.",
+      "phoneHint": "Svåraste orden först, med vem som missade varje ord.",
+      "needsHelpColumn": "Behöver hjälp",
+      "needsHelpLabel": "{name}: {count} ord att repetera",
+      "missedRow": "Missat av",
+      "wordMissedLabel": "{word}: missat av {count} av {total} elever",
+      "missedByCount": "missat av {count} av {total}",
+      "missedNames": "Missade: {names}",
+      "shakyNames": "Osäkra: {names}",
+      "everyoneGotIt": "Alla klarade det",
+      "needsHelpTitle": "Behöver hjälp",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Ingen har fastnat på de här orden. Snyggt.",
+      "unlock": {
+        "allWords": "Hela topp 10 över de svåraste orden, rankad",
+        "heatmap": "Vem som missade vilket ord, elev för elev",
+        "practice": "Öva missade ord med ett klick, utspritt över en vecka"
+      }
+    },
+    "practice": {
+      "cta": "Öva missade ord",
+      "hint": "Tre utspridda omgångar med de här orden: i morgon, om 3 dagar och om en vecka.",
+      "assigning": "Delar ut…",
+      "assigned": "Utdelat!",
+      "assignedBody": "{count} ord, tre omgångar. Eleverna hittar dem bland sina lektioner.",
+      "round": "Omgång {n}",
+      "roundName": "Missade ord · {classroom} · omgång {n}/3 · {date}",
+      "failed": "Kunde inte dela ut omgångarna. Inget sparades – försök igen.",
+      "already": "Redan utdelat i dag. Eleverna har det bland sina lektioner.",
+      "nothing": "Inga missade ord att öva på än.",
+      "inDays": "om {count} dagar",
+      "tomorrow": "I morgon",
+      "whyNote": "Utspridd repetition slår en lång genomgång: varje omgång kommer tillbaka precis när ordet börjar blekna."
+    },
+    "reports": {
+      "classEyebrow": "Klassrapport",
+      "moreDetail": "Fullständig utskrivbar rapport",
+      "moreDetailHint": "PDF-export, detaljer per elev och resultat till Google Classroom.",
+      "assignmentsTitle": "Vem har gjort vad",
+      "assignmentsHint": "Vem som är klar med varje uppgift – med CSV-export.",
+      "arcTitle": "Elev för elev",
+      "arcHint": "Vem som klättrar, vem som fastnat och vilka ord som sätter stopp.",
+      "digestTitle": "Senaste klasspelet",
+      "digestHint": "Vad som hände i ert senaste spel, i en snabb överblick."
+    },
+    "upgrade": {
+      "featureMastery": "Topp 10 missade ord + värmekarta elev × ord",
+      "featureMissedPractice": "Ett klick: utspridd övning på missarna (1, 3, 7 dagar)",
+      "freeMastery": "Värmekarta för ordbehärskning",
+      "freePractice": "Utspridd övning på missade ord"
+    },
+    "assign": {
+      "required": "obligatoriskt",
+      "needLessonAndDate": "Välj en lektion och ett slutdatum för att dela ut.",
+      "needLesson": "Välj en lektion för att dela ut.",
+      "needDate": "Välj ett slutdatum för att dela ut."
+    }
+  }
 };
 
 export { sv };
