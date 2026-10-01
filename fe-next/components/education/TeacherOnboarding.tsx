@@ -1,6 +1,7 @@
 'use client';
 
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { X, Check, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,6 +22,10 @@ export interface TeacherOnboardingProps {
   forceShow?: boolean;
   /** Called after any dismissal when forceShow is used */
   onDismiss?: () => void;
+  /** 'chip': first visit shows a small trigger; the walkthrough opens only on tap, never over the page. */
+  presentation?: 'modal' | 'chip';
+  /** Chip mode: reports the walkthrough opening and closing. */
+  onOpenChange?: (open: boolean) => void;
 }
 
 /**
@@ -47,6 +52,8 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
   onSkip,
   forceShow = false,
   onDismiss,
+  presentation = 'modal',
+  onOpenChange,
 }) => {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
@@ -58,7 +65,15 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
     skip,
   } = useTeacherOnboardingState();
 
-  const isVisible = forceShow || shouldShowOnboarding;
+  const isChip = presentation === 'chip';
+  const [chipOpen, setChipOpen] = useState(false);
+  const isVisible = forceShow || (isChip ? chipOpen : shouldShowOnboarding);
+
+  const closeChip = useCallback(() => {
+    if (!isChip) return;
+    setChipOpen(false);
+    onOpenChange?.(false);
+  }, [isChip, onOpenChange]);
 
   // Funnel top: one view event per open; later steps report as they come on screen.
   const seenSteps = useRef(new Set<number>());
@@ -74,7 +89,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
     trackEduTeacherOnboardingStep({ step, totalSteps: TOTAL_STEPS, action: 'view' });
   }, []);
 
-  useFocusTrap(modalRef, isVisible, onSkip);
+  useFocusTrap(modalRef, isVisible, isChip ? closeChip : onSkip);
 
   // Dismiss via the primary CTA — marks onboarding complete (persisted)
   const handleComplete = useCallback(() => {
@@ -84,9 +99,10 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
       action: 'complete',
     });
     complete();
+    closeChip();
     onComplete?.();
     onDismiss?.();
-  }, [complete, onComplete, onDismiss]);
+  }, [complete, closeChip, onComplete, onDismiss]);
 
   // Dismiss via the X — marks onboarding skipped (persisted)
   const handleSkip = useCallback(() => {
@@ -96,15 +112,41 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
       action: 'skip',
     });
     skip();
+    closeChip();
     onSkip?.();
     onDismiss?.();
-  }, [skip, onSkip, onDismiss]);
+  }, [skip, closeChip, onSkip, onDismiss]);
+
+  if (isChip && !isVisible) {
+    if (!shouldShowOnboarding) return null;
+    return (
+      <button
+        type="button"
+        data-testid="teacher-onboarding-chip"
+        onClick={() => {
+          setChipOpen(true);
+          onOpenChange?.(true);
+        }}
+        className={cn(
+          'inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-navy px-3',
+          'font-neo-display text-xs font-black uppercase tracking-wide text-neo-lime shadow-hard-sm',
+          'motion-safe:animate-[hq-card-pop_260ms_cubic-bezier(.2,1.4,.4,1)_both]',
+          'transition-all duration-100 hover:-translate-y-px hover:bg-neo-lime hover:text-black hover:shadow-hard',
+          'active:translate-y-px active:shadow-none',
+          'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
+        )}
+      >
+        <Sparkles className="size-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+        <span className="min-w-0 truncate">{t('education.onboarding.showTutorial')}</span>
+      </button>
+    );
+  }
 
   if (!isVisible) {
     return null;
   }
 
-  return (
+  const modal = (
     <div
       // Class-5: an opacity-from-0 entrance on a FULLSCREEN layer promotes a
       // page-sized GPU layer and flashes on the Chromium mobile renderer. The
@@ -184,6 +226,9 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
       </div>
     </div>
   );
+
+  // On-demand opens (chip, header "?") portal out: the header's backdrop-blur became the fixed modal's containing block and put its X off-screen.
+  return isChip || forceShow ? createPortal(modal, document.body) : modal;
 });
 
 TeacherOnboarding.displayName = 'TeacherOnboarding';

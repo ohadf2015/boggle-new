@@ -15104,7 +15104,7 @@ const es = {
         "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para {count} idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo",
-        "cta_note": "Plan gratis para empezar • Aprobado en ~24 h",
+        "cta_note": "Plan gratis para empezar • Acceso al instante",
         "cta_schools": "¿Escuela o distrito? Ver planes →"
       },
       "mock": {
@@ -19113,7 +19113,90 @@ const es = {
     "cookie": {
       "message": "Usamos cookies para contar partidas y mostrar anuncios."
     }
-  }
+  },
+  // @eduHq:start
+  "eduHq": {
+    "modes": {
+      "minutes": "{{minutes}} min",
+      "players": "Hasta {{count}}",
+      "skill": {
+        "meaning": "Significado",
+        "spotting": "Encontrar palabras",
+        "speed": "Rapidez",
+        "hunting": "Repaso de la lista",
+        "building": "Ortografía"
+      },
+      "pitch": {
+        "vocabQuiz": "Compite con la clase por el significado correcto.",
+        "classic": "Un tablero para todos. Gana quien encuentre más palabras.",
+        "blast": "Rondas rápidas. Encadena palabras para combos enormes.",
+        "wordHunt": "Las palabras de tu lista están escondidas. Cázalas primero.",
+        "wordcraft": "Forma las palabras de la lista con fichas de letras. Gana el mejor artesano."
+      }
+    },
+    "launch": {
+      "titleMode": "Lanzando {{mode}}",
+      "generic": "Preparando tu partida",
+      "codeLabel": "Tu código para unirse",
+      "step": {
+        "words": "Palabras listas",
+        "room": "Abriendo la sala",
+        "code": "Generando el código"
+      }
+    },
+    "lists": {
+      "label": "Listas de palabras",
+      "more": "Más"
+    },
+    "checklist": {
+      "firstStudent": "Se unió tu primer estudiante",
+      "firstGame": "Juega tu primera partida en vivo",
+      "firstGameCta": "Ver tus informes"
+    },
+    "tools": {
+      "students": "Estudiantes",
+      "studentsStat": "en esta clase",
+      "progress": "Progreso",
+      "progressStat": "Últimos 7 y 30 días",
+      "lastGame": "Última partida",
+      "assignments": "Tareas",
+      "assignmentsStat": "asignadas",
+      "assignmentsUnknown": "Ver entregas",
+      "analytics": "Analíticas",
+      "analyticsStat": "Tendencias por estudiante",
+      "proBadge": "Pro",
+      "classes": "Clases",
+      "classesStat": "Gestionar y renombrar",
+      "back": "Todas las herramientas"
+    },
+    "auth": {
+      "titleSignup": "Crea tu cuenta de docente",
+      "titleSignin": "Qué bueno verte de nuevo",
+      "subtitle": "Tus clases, códigos e informes, a un inicio de sesión.",
+      "tabSignup": "Soy nuevo",
+      "tabSignin": "Ya tengo cuenta"
+    },
+    "access": {
+      "haveAccount": "¿Ya tienes cuenta? Inicia sesión"
+    },
+    "hq": {
+      "assigned": "{{count}} asignadas",
+      "assignedAria": "Tareas: {{count}} asignadas. Abrir tareas",
+      "assignNudge": "Poner tarea"
+    },
+    "modeTags": {
+      "vocabQuiz": "Elige el sentido",
+      "classic": "Busca palabras",
+      "blast": "Combos en cadena",
+      "wordHunt": "Caza la lista",
+      "wordcraft": "Arma palabras"
+    },
+    "lobby": {
+      "waitingOne": "Esperando a 1 alumno",
+      "practiceLink": "¿Nadie aún? Practica con bots"
+    }
+  },
+  // @eduHq:end
 };
 
 export { es };

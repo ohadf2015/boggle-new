@@ -15155,7 +15155,7 @@ const ja = {
         "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。{count}言語にネイティブ対応。先生は無料の基本プランを利用でき、Teacher Proは月$9でクラスと生徒数が無制限になります。",
         "cta_primary": "先生アクセスを申請する",
         "cta_secondary": "デモを見る",
-        "cta_note": "無料プランで開始 • 約24時間で承認",
+        "cta_note": "無料プランで開始 • すぐに使えます",
         "cta_schools": "学校または学区のご担当者様はこちら →"
       },
       "mock": {
@@ -19095,7 +19095,90 @@ const ja = {
     "cookie": {
       "message": "プレイ数の集計と広告表示のためにクッキーを使います。"
     }
-  }
+  },
+  // @eduHq:start
+  "eduHq": {
+    "modes": {
+      "minutes": "{{minutes}}分",
+      "players": "最大{{count}}人",
+      "skill": {
+        "meaning": "意味",
+        "spotting": "単語探し",
+        "speed": "スピード",
+        "hunting": "リストの記憶",
+        "building": "つづり"
+      },
+      "pitch": {
+        "vocabQuiz": "正しい意味をクラスのみんなと早押しで競う。",
+        "classic": "みんなで1つの盤面。いちばん多く単語を見つけよう。",
+        "blast": "テンポの速いラウンド。単語をつなげて大コンボ。",
+        "wordHunt": "リストの単語が隠れている。先に見つけた人の勝ち。",
+        "wordcraft": "文字タイルでリストの単語を作ろう。一番の職人が勝ち。"
+      }
+    },
+    "launch": {
+      "titleMode": "{{mode}}を開始中",
+      "generic": "ゲームを準備しています",
+      "codeLabel": "参加コード",
+      "step": {
+        "words": "単語を読み込みました",
+        "room": "ルームを開いています",
+        "code": "参加コードを発行中"
+      }
+    },
+    "lists": {
+      "label": "単語リスト",
+      "more": "もっと見る"
+    },
+    "checklist": {
+      "firstStudent": "最初の生徒が参加",
+      "firstGame": "初めてのライブゲームを開催",
+      "firstGameCta": "レポートを見る"
+    },
+    "tools": {
+      "students": "生徒",
+      "studentsStat": "人が在籍",
+      "progress": "進み具合",
+      "progressStat": "直近7日と30日",
+      "lastGame": "前回のゲーム",
+      "assignments": "宿題",
+      "assignmentsStat": "件を配布中",
+      "assignmentsUnknown": "提出状況を見る",
+      "analytics": "分析",
+      "analyticsStat": "生徒ごとの傾向",
+      "proBadge": "Pro",
+      "classes": "クラス",
+      "classesStat": "管理・名前の変更",
+      "back": "クラスツール一覧"
+    },
+    "auth": {
+      "titleSignup": "先生用アカウントを作成",
+      "titleSignin": "おかえりなさい",
+      "subtitle": "クラス、参加コード、レポートにすぐアクセス。",
+      "tabSignup": "はじめて",
+      "tabSignin": "アカウントあり"
+    },
+    "access": {
+      "haveAccount": "アカウントをお持ちですか？ログイン"
+    },
+    "hq": {
+      "assigned": "宿題 {{count}}件",
+      "assignedAria": "宿題：{{count}}件を配布中。宿題を開く",
+      "assignNudge": "宿題を出す"
+    },
+    "modeTags": {
+      "vocabQuiz": "意味をえらぶ",
+      "classic": "単語をさがす",
+      "blast": "コンボで連鎖",
+      "wordHunt": "リストの単語を探す",
+      "wordcraft": "つづりを組み立て"
+    },
+    "lobby": {
+      "waitingOne": "生徒1人を待っています",
+      "practiceLink": "まだ誰もいない？ボットと練習"
+    }
+  },
+  // @eduHq:end
 };
 
 export { ja };

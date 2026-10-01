@@ -15391,7 +15391,7 @@ const sv = {
         "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för {count} språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
-        "cta_note": "Gratis basplan att börja med • Godkänd inom ~24 h",
+        "cta_note": "Gratis basplan att börja med • Direkt åtkomst",
         "cta_schools": "Skola eller distrikt? Se planer →"
       },
       "mock": {
@@ -19095,7 +19095,90 @@ const sv = {
     "cookie": {
       "message": "Vi använder kakor för att räkna spel och visa annonser."
     }
-  }
+  },
+  // @eduHq:start
+  "eduHq": {
+    "modes": {
+      "minutes": "{{minutes}} min",
+      "players": "Upp till {{count}}",
+      "skill": {
+        "meaning": "Betydelse",
+        "spotting": "Hitta ord",
+        "speed": "Snabbhet",
+        "hunting": "Minnas listan",
+        "building": "Stavning"
+      },
+      "pitch": {
+        "vocabQuiz": "Tävla mot klassen om rätt betydelse.",
+        "classic": "En gemensam bräda. Hitta flest ord.",
+        "blast": "Snabba rundor. Kedja ord för jättekombos.",
+        "wordHunt": "Listans ord gömmer sig. Jaga dem först.",
+        "wordcraft": "Bygg listans ord av bokstavsbrickor. Bästa byggaren vinner."
+      }
+    },
+    "launch": {
+      "titleMode": "Startar {{mode}}",
+      "generic": "Gör i ordning spelet",
+      "codeLabel": "Er anslutningskod",
+      "step": {
+        "words": "Orden är laddade",
+        "room": "Öppnar rummet",
+        "code": "Hämtar anslutningskoden"
+      }
+    },
+    "lists": {
+      "label": "Ordlistor",
+      "more": "Fler"
+    },
+    "checklist": {
+      "firstStudent": "Första eleven är med",
+      "firstGame": "Kör ert första livespel",
+      "firstGameCta": "Se dina rapporter"
+    },
+    "tools": {
+      "students": "Elever",
+      "studentsStat": "i klassen",
+      "progress": "Framsteg",
+      "progressStat": "Senaste 7 och 30 dagarna",
+      "lastGame": "Senaste spelet",
+      "assignments": "Läxor",
+      "assignmentsStat": "tilldelade",
+      "assignmentsUnknown": "Se vad som ska lämnas in",
+      "analytics": "Analys",
+      "analyticsStat": "Trender per elev",
+      "proBadge": "Pro",
+      "classes": "Klasser",
+      "classesStat": "Hantera och byt namn",
+      "back": "Alla klassverktyg"
+    },
+    "auth": {
+      "titleSignup": "Skapa ditt lärarkonto",
+      "titleSignin": "Välkommen tillbaka",
+      "subtitle": "Dina klasser, koder och rapporter, en inloggning bort.",
+      "tabSignup": "Jag är ny",
+      "tabSignin": "Jag har ett konto"
+    },
+    "access": {
+      "haveAccount": "Har du redan ett konto? Logga in"
+    },
+    "hq": {
+      "assigned": "{{count}} tilldelade",
+      "assignedAria": "Läxor: {{count}} tilldelade. Öppna läxor",
+      "assignNudge": "Ge läxa"
+    },
+    "modeTags": {
+      "vocabQuiz": "Välj betydelse",
+      "classic": "Hitta ord",
+      "blast": "Kedja kombos",
+      "wordHunt": "Jaga listord",
+      "wordcraft": "Bygg och stava"
+    },
+    "lobby": {
+      "waitingOne": "Väntar på 1 elev",
+      "practiceLink": "Ingen här än? Öva mot bottar"
+    }
+  },
+  // @eduHq:end
 };
 
 export { sv };

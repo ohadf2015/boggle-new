@@ -13702,7 +13702,7 @@ const en = {
         "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
-        "cta_note": "Free plan to start • Approved in ~24h",
+        "cta_note": "Free plan to start • Instant access",
         "cta_schools": "School or district? See plans →"
       },
       "mock": {
@@ -18158,7 +18158,90 @@ const en = {
     "cookie": {
       "message": "We use cookies to count plays and show ads."
     }
-  }
+  },
+  // @eduHq:start
+  "eduHq": {
+    "modes": {
+      "minutes": "{{minutes}} min",
+      "players": "Up to {{count}}",
+      "skill": {
+        "meaning": "Meaning",
+        "spotting": "Word spotting",
+        "speed": "Speed",
+        "hunting": "List recall",
+        "building": "Spelling"
+      },
+      "pitch": {
+        "vocabQuiz": "Race the class to the right meaning.",
+        "classic": "One shared board. Find more words than anyone.",
+        "blast": "Quick-fire rounds. Chain words for huge combos.",
+        "wordHunt": "Your list words are hiding. Hunt them first.",
+        "wordcraft": "Build list words from letter tiles. Top crafter wins."
+      }
+    },
+    "launch": {
+      "titleMode": "Launching {{mode}}",
+      "generic": "Setting up your game",
+      "codeLabel": "Your join code",
+      "step": {
+        "words": "Words loaded",
+        "room": "Opening the room",
+        "code": "Getting your join code"
+      }
+    },
+    "lists": {
+      "label": "Word lists",
+      "more": "More"
+    },
+    "checklist": {
+      "firstStudent": "Get your first student in",
+      "firstGame": "Run your first live game",
+      "firstGameCta": "See your reports"
+    },
+    "tools": {
+      "students": "Students",
+      "studentsStat": "in this class",
+      "progress": "Progress",
+      "progressStat": "Last 7 and 30 days",
+      "lastGame": "Last game",
+      "assignments": "Homework",
+      "assignmentsStat": "assigned",
+      "assignmentsUnknown": "See what is due",
+      "analytics": "Analytics",
+      "analyticsStat": "Trends per student",
+      "proBadge": "Pro",
+      "classes": "Classes",
+      "classesStat": "Manage & rename",
+      "back": "All class tools"
+    },
+    "auth": {
+      "titleSignup": "Create your teacher account",
+      "titleSignin": "Welcome back",
+      "subtitle": "Your classes, join codes and reports, one sign-in away.",
+      "tabSignup": "I'm new",
+      "tabSignin": "I have an account"
+    },
+    "access": {
+      "haveAccount": "Already have an account? Sign in"
+    },
+    "hq": {
+      "assigned": "{{count}} assigned",
+      "assignedAria": "Homework: {{count}} assigned. Open homework",
+      "assignNudge": "Assign homework"
+    },
+    "modeTags": {
+      "vocabQuiz": "Pick the meaning",
+      "classic": "Spot hidden words",
+      "blast": "Chain combos",
+      "wordHunt": "Find list words",
+      "wordcraft": "Build and spell"
+    },
+    "lobby": {
+      "waitingOne": "Waiting for 1 student",
+      "practiceLink": "No one yet? Practice with bots"
+    }
+  },
+  // @eduHq:end
 };
 
 export { en };

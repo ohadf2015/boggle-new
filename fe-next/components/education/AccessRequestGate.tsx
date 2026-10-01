@@ -58,17 +58,17 @@ export function AccessRequestGate() {
             className="h-5 w-5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
           />
         </button>
-        <p className="mt-3 text-center text-sm font-semibold text-neo-white/60">
-          {t('education.access.cta_micro')}
-        </p>
         <button
           type="button"
           onClick={() => setAuthMode('signin')}
-          className="mt-4 block w-full min-h-11 text-center font-bold text-neo-cyan underline decoration-2 underline-offset-4 hover:text-neo-lime"
+          className="mt-3 flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-4 font-neo-display text-sm font-black text-neo-white shadow-hard-sm transition-[box-shadow] hover:shadow-hard focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t('education.access.auth_signin_cta')}
         </button>
-        {authMode && <AuthModal isOpen onClose={() => setAuthMode(null)} initialMode={authMode} />}
+        <p className="mt-3 text-center text-sm font-semibold text-neo-white/60">
+          {t('education.access.cta_micro')}
+        </p>
+        {authMode && <AuthModal isOpen onClose={() => setAuthMode(null)} initialMode={authMode} audience="teacher" />}
       </div>
     );
   }
