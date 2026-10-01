@@ -13086,6 +13086,14 @@ const ja = {
       "trialEnded": "トライアル終了"
     },
     "proGate": {
+      "mastery": {
+        "title": "クラスがミスする単語がすべて見える",
+        "body": "Proはクラスが最もミスする10語をランキングし、すべてのゲームを通して生徒×単語の結果をマップにします。何を誰に教え直せばいいかが一目でわかります。"
+      },
+      "missedPractice": {
+        "title": "ミスを間隔練習に変える",
+        "body": "ワンクリックで、クラスのミス単語を短い3ラウンド(明日・3日後・1週間後)として配信。この間隔こそが単語を定着させます。"
+      },
       "analytics": {
         "title": "クラスの本当の理解度が見えます",
         "body": "Proでは、毎回のゲームがクラスの記録になります。どの単語が定着したか、どの生徒がつまずいているか、学期はじめからどれだけ伸びたかが一目でわかります。保護者面談や教科会議にそのまま使えます。"
@@ -13120,10 +13128,10 @@ const ja = {
       "regionLabel": "{{classroom}} の進捗ダイジェスト",
       "scheduleReteachCta": "約{{days}}日後に再指導Liveを予定",
       "scheduleReteachConfirm": "{{date}}（約{{days}}日後）に再指導Liveを予定しました。カレンダー招待を開きました。",
-      "scheduleReteachHint": "苦手な語を組み直して約2週間後にもう一度 — Kahoot風の間隔再指導。",
+      "scheduleReteachHint": "苦手な語を組み直して約2週間後にもう一度 — 定着する間隔復習。",
       "unpluggedReteachLiveCta": "アンプラグドリティーチLiveを開始",
       "reteachLiveCta": "3分リティーチLiveを開始",
-      "unpluggedReteachLiveFoil": "Kahoot Unplugged対抗（Teacher Takeover, 2026-09-21 — 生徒端末がないとき）— 抜けた語を投影し、生徒は紙で解答（端末不要）。"
+      "unpluggedReteachLiveFoil": "今日は生徒の端末が使えない?ミスした語を映して、生徒は紙で答えます。"
     },
     "windowProgress": {
       "title": "今週のクラス",
@@ -13223,6 +13231,8 @@ const ja = {
       "proHeroAlt": "生徒が席からプレイする中、教師が黒板のライブ順位表を見ている様子。",
       "valueHeadline": "毎日の復習と出口チケットに最適。1ラウンドでクラス全員を確認。",
       "matrix": {
+        "mastery": "定着度ヒートマップと難しい単語",
+        "missedPractice": "ミス単語の練習(1・3・7日間隔)",
         "title": "プラン比較",
         "featureColumn": "機能",
         "unlimited": "無制限",
@@ -14786,7 +14796,7 @@ const ja = {
       "inviteStudents": "生徒を招待",
       "lastActive": "最終アクティブ",
       "lessonEffectiveness": "レッスンの効果",
-      "level": "レベル{{level}}",
+      "level": "レベル",
       "live": "ライブ",
       "loading": "分析を読み込み中...",
       "mastery": "習熟度",
@@ -14802,7 +14812,7 @@ const ja = {
       "retry": "リトライ",
       "shareParentReport": "保護者と共有",
       "shareParentReportFailed": "リンクを作成できませんでした。もう一度お試しください。",
-      "streak": "{{count}}日連続",
+      "streak": "連続日数",
       "struggling": "サポートが必要",
       "mastered": "習得済み",
       "practicing": "練習中",
@@ -18862,6 +18872,79 @@ const ja = {
       "roundShort": "R{n}",
       "total": "合計",
       "player": "プレイヤー"
+    }
+  },
+  "eduPro": {
+    "mastery": {
+      "title": "単語の定着度",
+      "subtitle": "クラスが何度もつまずく単語を、すべてのゲームから。",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "クラス正答率",
+        "words": "記録中の単語",
+        "sessions": "ゲーム結果",
+        "students": "生徒"
+      },
+      "hardestTitle": "いちばん難しい単語",
+      "missedOf": "{attempts}回中{missed}回ミス",
+      "studentsMissing": "{total}人中{count}人",
+      "noneMissed": "まだ2回ミスした単語はありません。いい調子!",
+      "empty": "このクラスで語彙クイズかワードクラフトを1回遊ぶと、定着度がここに表示されます。",
+      "loading": "定着度を読み込み中…",
+      "error": "定着度を読み込めませんでした。再読み込みしてください。",
+      "heatmapToggle": "ヒートマップ:生徒 × 単語",
+      "heatmapHint": "1マス=1人の生徒の1単語の結果です。",
+      "studentColumn": "生徒",
+      "legend": {
+        "solid": "定着",
+        "shaky": "あやふや",
+        "missed": "ミス",
+        "unseen": "未出題"
+      },
+      "cellLabel": "{name}・{word}:{attempts}回中{correct}回正解",
+      "cellUnseen": "{name}・{word}:まだ出題されていません",
+      "showAll": "{count}語すべて表示",
+      "showFewer": "表示を減らす",
+      "hiddenWords": "Proでさらに{count}語の難しい単語",
+      "previewNote": "無料プレビュー:上位3語まで。Proなら10語すべてと生徒全員が見られます。"
+    },
+    "practice": {
+      "cta": "ミスした単語を練習",
+      "hint": "この単語を間隔をあけて3回:明日、3日後、1週間後。",
+      "assigning": "配信中…",
+      "assigned": "配信しました!",
+      "assignedBody": "{count}語・3ラウンド。生徒のレッスン一覧に表示されます。",
+      "round": "ラウンド{n}",
+      "roundName": "ミスした単語・{classroom}・ラウンド{n}/3・{date}",
+      "failed": "ラウンドを配信できませんでした。何も保存されていません。もう一度お試しください。",
+      "already": "今日はすでに配信済みです。生徒のレッスンに入っています。",
+      "nothing": "練習するミス単語はまだありません。",
+      "inDays": "{count}日後",
+      "tomorrow": "明日",
+      "whyNote": "まとめて復習するより、間隔をあけて思い出すほうが定着します。各ラウンドは忘れかけたころに戻ってきます。"
+    },
+    "reports": {
+      "classEyebrow": "クラスレポート",
+      "moreDetail": "印刷用フルレポート",
+      "moreDetailHint": "PDF出力、生徒ごとの詳細、Google Classroomへの成績連携。",
+      "assignmentsTitle": "提出チェック",
+      "assignmentsHint": "誰がどの課題を終えたか。CSVでも書き出せます。",
+      "arcTitle": "生徒ひとりずつ",
+      "arcHint": "伸びている子、つまずいている子、そのつまずきの原因になっている単語。",
+      "digestTitle": "前回のクラスゲーム",
+      "digestHint": "直近のゲームで何が起きたかをひと目で。"
+    },
+    "upgrade": {
+      "featureMastery": "ミスの多い上位10語+生徒×単語ヒートマップ",
+      "featureMissedPractice": "ワンクリックでミスを間隔練習(1・3・7日後)",
+      "freeMastery": "単語の定着度ヒートマップ",
+      "freePractice": "ミス単語の間隔練習"
+    },
+    "assign": {
+      "required": "必須",
+      "needLessonAndDate": "レッスンと締切日を選ぶと配信できます。",
+      "needLesson": "レッスンを選ぶと配信できます。",
+      "needDate": "締切日を選ぶと配信できます。"
     }
   }
 };

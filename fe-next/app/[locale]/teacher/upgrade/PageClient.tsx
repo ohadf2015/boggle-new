@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
-import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -24,6 +23,7 @@ import { ShieldCheck, BellRing, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { PricingCards } from '@/components/teacher/PricingCards';
+import { PlanComparisonMatrix } from '@/components/teacher/PlanComparisonMatrix';
 
 const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -175,6 +175,8 @@ export default function UpgradePricingPageClient() {
     // the product. The page sold the same thing on both sides of its own table, then the
     // dashboard upsold what the pricing page had already given away.
     { label: t('education.landing.pro.analytics'), included: false },
+    { label: t('eduPro.upgrade.freeMastery'), included: false },
+    { label: t('eduPro.upgrade.freePractice'), included: false },
   ];
 
   // Pro leads with outcome-driven value propositions, not just features.
@@ -189,6 +191,8 @@ export default function UpgradePricingPageClient() {
     // game de-gameified for anxious students is why a department pays, not a
     // fifth toggle.
     t('teacher.subscription.featureOutcome5'), // Calm mode: timer/leaderboard/speed dials
+    t('eduPro.upgrade.featureMastery'),
+    t('eduPro.upgrade.featureMissedPractice'),
   ];
 
   // ponytail: no per-student anchor here on purpose. Dividing the Pro price by the
@@ -196,6 +200,29 @@ export default function UpgradePricingPageClient() {
   // unlimited, so a real class of 30 is $0.30 and a hundred is $0.09. It anchored
   // against the sale. "About $0.30 a day" below is true, simpler, and already the
   // strongest framing on the card; a second anchor only competed with it.
+
+  const legalLinks = (
+    <>
+        <Link
+          href={`/${language}/legal/terms`}
+          className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
+        >
+          {t('legal.termsOfService')}
+        </Link>
+        <Link
+          href={`/${language}/legal/refund`}
+          className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
+        >
+          {t('legal.refundPolicy')}
+        </Link>
+        <Link
+          href={`/${language}/legal/privacy`}
+          className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
+        >
+          {t('legal.privacyPolicy')}
+        </Link>
+    </>
+  );
 
   const trustChips = [
     { icon: ShieldCheck, label: t('teacher.subscription.trustCancel') },
@@ -211,31 +238,12 @@ export default function UpgradePricingPageClient() {
       footer={
         <div
           data-testid="upgrade-footer"
-          className="shrink-0 border-t border-neo-cream/20 pt-3 pb-3 px-4 text-center"
+          className="hidden lg:block shrink-0 border-t border-neo-cream/20 pt-3 pb-3 px-4 text-center"
         >
           <p className="text-neo-white/70 font-bold text-xs mb-1.5">
             {t('teacher.subscription.legalNote')}
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              href={`/${language}/legal/terms`}
-              className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
-            >
-              {t('legal.termsOfService')}
-            </Link>
-            <Link
-              href={`/${language}/legal/refund`}
-              className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
-            >
-              {t('legal.refundPolicy')}
-            </Link>
-            <Link
-              href={`/${language}/legal/privacy`}
-              className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
-            >
-              {t('legal.privacyPolicy')}
-            </Link>
-          </div>
+          <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
         </div>
       }
       className="bg-neo-navy"
@@ -262,21 +270,82 @@ export default function UpgradePricingPageClient() {
         {/* Two-column layout: image left, pricing cards + metadata right */}
         <div
           data-testid="upgrade-hero-section"
-          className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-6 items-stretch mb-3"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-6 items-stretch mb-3 lg:mb-0"
         >
-          {/* Hero image — capped by height on lg to preserve vertical budget. The trial
-              and $9 CTAs live in the Pro card, so this stays decorative and shrinks
-              first when the pricing column is taller. */}
-          <div className="flex justify-center order-2 lg:order-1">
-            <Image
-              src="/images/education/pro-hero-poster.webp"
-              alt={t('teacher.subscription.proHeroAlt')}
-              width={960}
-              height={540}
-              priority
-              sizes="(max-width: 1024px) 100vw, (max-width: 1920px) 50vw, 960px"
-              className="w-full max-w-sm h-auto max-h-40 lg:max-h-full rounded-neo border-neo border-black shadow-hard-lg object-cover"
-            />
+          {/* The aligned Free vs Pro rows take the slot the decorative poster held:
+              the cards cannot be read across, the matrix can. */}
+          <div className="order-2 lg:order-1 min-w-0 flex flex-col gap-3">
+            <div className="hidden lg:block">
+              <PlanComparisonMatrix compact />
+            </div>
+            {/* Trust / risk-reversal row — compact single row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-2">
+              {trustChips.map(({ icon: Icon, label }) => (
+                <div
+                  key={label}
+                  data-testid="trust-chip"
+                  className="flex items-center justify-center lg:justify-start gap-2 bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo px-2.5 py-1 text-center lg:text-start"
+                >
+                  <Icon
+                    className="w-3.5 h-3.5 text-neo-lime flex-shrink-0"
+                    strokeWidth={2.5}
+                  />
+                  <span className="text-xs font-bold text-neo-white leading-snug">
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* District / school pricing — a plain text link, deliberately NOT a bordered
+                card. The trial and $9 buttons live in the Pro card; a CTA-shaped box
+                here would compete with them. */}
+            <p className="text-center text-xs font-bold text-neo-white/60 mb-1.5">
+              {t('teacher.subscription.districtTitle')}{' '}
+              <Link
+                href={`/${language}/education/for-schools`}
+                onClick={() => trackGrowthEvent('iap_viewed', { product: 'district_inquiry' })}
+                className="text-neo-cyan hover:text-neo-lime underline"
+              >
+                {t('teacher.subscription.districtCta')}
+              </Link>
+            </p>
+
+            {/* FAQ Section — behind a disclosure (collapsed by default) — compact */}
+            <details className="mb-0">
+              <summary className="cursor-pointer bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo p-2 hover:bg-neo-navy transition-colors">
+                <h2 className="text-sm lg:text-base font-neo-display font-black text-neo-white inline-flex items-center gap-2">
+                  {t('teacher.subscription.faqTitle')}
+                  <span className="text-xs text-neo-lime font-bold">▼</span>
+                </h2>
+              </summary>
+
+              <div className="bg-neo-navy-light border-2 border-t-0 border-neo-cream/40 rounded-b-neo p-4 shadow-hard">
+                <div className="space-y-3">
+                  {[
+                    {
+                      q: 'teacher.subscription.faqCancel',
+                      a: 'teacher.subscription.faqCancelAnswer',
+                    },
+                    {
+                      q: 'teacher.subscription.faqAutoRenew',
+                      a: 'teacher.subscription.faqAutoRenewAnswer',
+                    },
+                    {
+                      q: 'teacher.subscription.faqDataLoss',
+                      a: 'teacher.subscription.faqDataLossAnswer',
+                    },
+                  ].map(({ q, a }) => (
+                    <div key={q}>
+                      <h3 className="text-sm font-bold text-neo-cyan mb-1">{t(q)}</h3>
+                      <p className="text-xs text-neo-white/90 font-bold leading-relaxed">
+                        {t(a)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </details>
           </div>
 
           {/* Pricing cards + reassurance text — right side on lg */}
@@ -310,77 +379,13 @@ export default function UpgradePricingPageClient() {
               onTrialClick={() => { void handleUpgrade(true); }}
               onUpgradeClick={() => { void handleUpgrade(false); }}
             />
+            <div data-testid="upgrade-legal-inline" className="lg:hidden -mt-2 text-center">
+              <p className="text-neo-white/70 font-bold text-xs mb-1">{t('teacher.subscription.legalNote')}</p>
+              <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
+            </div>
           </div>
         </div>
 
-        {/* Trust / risk-reversal row — compact single row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
-          {trustChips.map(({ icon: Icon, label }) => (
-            <div
-              key={label}
-              data-testid="trust-chip"
-              className="flex items-center justify-center lg:justify-start gap-2 bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo px-2.5 py-1 text-center lg:text-start"
-            >
-              <Icon
-                className="w-3.5 h-3.5 text-neo-lime flex-shrink-0"
-                strokeWidth={2.5}
-              />
-              <span className="text-xs font-bold text-neo-white leading-snug">
-                {label}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* District / school pricing — a plain text link, deliberately NOT a bordered
-            card. The trial and $9 buttons live in the Pro card; a CTA-shaped box
-            here would compete with them. */}
-        <p className="text-center text-xs font-bold text-neo-white/60 mb-1.5">
-          {t('teacher.subscription.districtTitle')}{' '}
-          <Link
-            href={`/${language}/education/for-schools`}
-            onClick={() => trackGrowthEvent('iap_viewed', { product: 'district_inquiry' })}
-            className="text-neo-cyan hover:text-neo-lime underline"
-          >
-            {t('teacher.subscription.districtCta')}
-          </Link>
-        </p>
-
-        {/* FAQ Section — behind a disclosure (collapsed by default) — compact */}
-        <details className="mb-0">
-          <summary className="cursor-pointer bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo p-2 hover:bg-neo-navy transition-colors">
-            <h2 className="text-sm lg:text-base font-neo-display font-black text-neo-white inline-flex items-center gap-2">
-              {t('teacher.subscription.faqTitle')}
-              <span className="text-xs text-neo-lime font-bold">▼</span>
-            </h2>
-          </summary>
-
-          <div className="bg-neo-navy-light border-2 border-t-0 border-neo-cream/40 rounded-b-neo p-4 shadow-hard">
-            <div className="space-y-3">
-              {[
-                {
-                  q: 'teacher.subscription.faqCancel',
-                  a: 'teacher.subscription.faqCancelAnswer',
-                },
-                {
-                  q: 'teacher.subscription.faqAutoRenew',
-                  a: 'teacher.subscription.faqAutoRenewAnswer',
-                },
-                {
-                  q: 'teacher.subscription.faqDataLoss',
-                  a: 'teacher.subscription.faqDataLossAnswer',
-                },
-              ].map(({ q, a }) => (
-                <div key={q}>
-                  <h3 className="text-sm font-bold text-neo-cyan mb-1">{t(q)}</h3>
-                  <p className="text-xs text-neo-white/90 font-bold leading-relaxed">
-                    {t(a)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </details>
       </div>
 
       {/* Auth modal for unauthenticated checkout attempts (401). onAuthSuccess is a

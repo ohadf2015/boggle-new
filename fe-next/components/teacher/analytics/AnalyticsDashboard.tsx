@@ -26,6 +26,8 @@ export interface AnalyticsDashboardProps {
   onViewStudents?: (filter: 'struggling') => void;
   /** Callback when creating review lesson with mistake words */
   onCreateReviewLesson?: (words: string[]) => void;
+  /** False when the host page already carries the analytics title. */
+  showHeader?: boolean;
 }
 
 // ============================================
@@ -55,6 +57,7 @@ export function AnalyticsDashboard({
   classroomId,
   onViewStudents,
   onCreateReviewLesson,
+  showHeader = true,
 }: AnalyticsDashboardProps) {
   const { t } = useLanguage();
   const { metrics, isLoading, error, refresh } = useClassroomAnalytics({ classroomId });
@@ -161,20 +164,21 @@ export function AnalyticsDashboard({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-neo bg-neo-cyan border-3 border-black flex items-center justify-center shadow-hard-sm">
-            <TrendingUp className="w-5 h-5 text-black" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-neo-display font-black text-neo-white">
-              {t('education.analytics.title')}
-            </h2>
-            <p className="text-neo-white text-sm font-bold">{t('education.analytics.subtitle')}</p>
+      {showHeader && (
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-neo bg-neo-cyan border-3 border-black flex items-center justify-center shadow-hard-sm">
+              <TrendingUp className="w-5 h-5 text-black" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-neo-display font-black text-neo-white">
+                {t('education.analytics.title')}
+              </h2>
+              <p className="text-neo-white text-sm font-bold">{t('education.analytics.subtitle')}</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

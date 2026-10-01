@@ -174,6 +174,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               classroomId={classroomId}
               onViewStudents={handleViewStudents}
               onCreateReviewLesson={handleCreateReviewLesson}
+              showHeader={false}
             />
           </div>
 
@@ -181,63 +182,31 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           <Tabs defaultValue="students" className="space-y-4">
             <TabsList
               className={cn(
-                'grid w-full grid-cols-4 gap-2',
+                'grid h-auto w-full grid-cols-2 gap-2 sm:grid-cols-4',
                 'bg-neo-navy/50 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-2'
               )}
             >
               <TabsTrigger
                 value="students"
-                className={cn(
-                  // Selected differs by FILL, not only by text colour; unselected
-                  // still carries a 2px cream edge so it reads as tappable at all
-                  // (it used to be bare text on navy — `edge<3`).
-                  'font-neo-body font-bold rounded-neo border-[2px]',
-                  'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                  'transition-all duration-200'
-                )}
+                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
               >
                 {t('education.analytics.viewStudents')}
               </TabsTrigger>
               <TabsTrigger
                 value="lessons"
-                className={cn(
-                  // Selected differs by FILL, not only by text colour; unselected
-                  // still carries a 2px cream edge so it reads as tappable at all
-                  // (it used to be bare text on navy — `edge<3`).
-                  'font-neo-body font-bold rounded-neo border-[2px]',
-                  'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white data-[state=active]:border-neo-black',
-                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                  'transition-all duration-200'
-                )}
+                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white data-[state=active]:border-neo-black')}
               >
                 {t('education.analytics.viewLessons')}
               </TabsTrigger>
               <TabsTrigger
                 value="vocabulary"
-                className={cn(
-                  // Selected differs by FILL, not only by text colour; unselected
-                  // still carries a 2px cream edge so it reads as tappable at all
-                  // (it used to be bare text on navy — `edge<3`).
-                  'font-neo-body font-bold rounded-neo border-[2px]',
-                  'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                  'transition-all duration-200'
-                )}
+                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
               >
                 {t('education.analytics.viewVocabulary')}
               </TabsTrigger>
               <TabsTrigger
                 value="assignments"
-                className={cn(
-                  // Selected differs by FILL, not only by text colour; unselected
-                  // still carries a 2px cream edge so it reads as tappable at all
-                  // (it used to be bare text on navy — `edge<3`).
-                  'font-neo-body font-bold rounded-neo border-[2px]',
-                  'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
-                  'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
-                  'transition-all duration-200'
-                )}
+                className={cn(TAB_BASE, 'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black')}
               >
                 {t('education.analytics.viewAssignments')}
               </TabsTrigger>
@@ -331,6 +300,10 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 }
 
 import { TeacherGate } from '@/components/education/TeacherGate';
+
+// Selected differs by FILL, not only text colour; unselected keeps a 2px cream edge so it reads as tappable.
+const TAB_BASE =
+  'min-h-11 h-auto whitespace-normal px-2 py-2 text-sm leading-tight font-neo-body font-bold rounded-neo border-[2px] data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream transition-all duration-200 active:translate-y-px motion-reduce:transition-none';
 
 /**
  * Shell above gate — see `components/education/shell/__tests__/gatedShellOrder.test.ts`.
