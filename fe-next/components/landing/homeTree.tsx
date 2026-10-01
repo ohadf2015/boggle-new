@@ -26,15 +26,11 @@ export type HomeTree = HomeTreeName | 'ssr';
  *
  * - The two trees: exactly one is displayed.
  * - `[data-home-only]`: single-audience blocks outside the tree slots, in
- *   HomepageContentSection: the finale PLAY band ("fresh") and the tab-bar
- *   reserve ("returning"). Returning-only is hidden by default, so no script
+ *   HomepageContentSection: the finale PLAY band ("fresh") and any
+ *   returning-only block. Returning-only is hidden by default, so no script
  *   (crawlers, no JS) reads as fresh, like the trees.
- * - The app tab bar (GlobalBottomNav: QUESTS / FRIENDS / HOME) is hidden for
- *   fresh visitors: the logged-out homepage is a marketing page (the Duolingo
- *   bar has no tab bar), and in a phone capture it sat pinned over the section
- *   under the hero. `visibility`, not `display`: display:none would make the
- *   nav measure 0 and cache lc_bottom_nav_h=0, which the layout's prime
- *   script replays on the NEXT page as a bottom-reserve jump.
+ * - The app tab bar (GlobalBottomNav: QUESTS / FRIENDS / HOME) shows for every
+ *   visitor: it is the mobile way into every mode, so it is never hidden here.
  */
 const TREE_CSS =
   '[data-home-tree="returning"]{display:none}' +
@@ -42,8 +38,7 @@ const TREE_CSS =
   'html[data-home="returning"] [data-home-tree="fresh"]{display:none}' +
   'html[data-home="returning"] [data-home-only="fresh"]{display:none}' +
   '[data-home-only="returning"]{display:none}' +
-  'html[data-home="returning"] [data-home-only="returning"]{display:block}' +
-  'html:not([data-home="returning"]) [data-global-bottom-nav]{visibility:hidden}';
+  'html[data-home="returning"] [data-home-only="returning"]{display:block}';
 
 /** Stable identity: a new object each render would make React rewrite innerHTML. */
 const INERT_HTML = { __html: '' };
