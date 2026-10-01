@@ -182,3 +182,30 @@ describe('MpResultsScreen - classroom student leaving', () => {
     expect(h.mpExit).toHaveBeenCalled();
   });
 });
+
+describe('MpResultsScreen - the teacher is not a classmate', () => {
+  it('Given the teacher in the round scores, When a student sees results, Then the teacher is not ranked', () => {
+    renderScreen({ classroomSummary: SUMMARY as never, finalScores: [...SCORES, { username: 'Ms Levy', score: 0, allWords: [] }] as never });
+    skip();
+    const stage = screen.getByTestId('mp-results-stage');
+    expect(within(stage).queryByText('Ms Levy')).toBeNull();
+    expect(stage.textContent).not.toContain('"total":4');
+  });
+});
+
+describe('MpResultsScreen - what the teacher switched to next', () => {
+  it('Given the teacher switched game, When the student waits on results, Then the footer names the next game', async () => {
+    renderScreen({ classroomSummary: SUMMARY as never, classroomNextMode: 'vocab-quiz' } as never);
+    skip();
+    const footer = await screen.findByTestId('mp-teacher-paced');
+    expect(footer.textContent).toContain('eduStudent.results.nextUp');
+    expect(footer.textContent).toContain('teacher.classroom.gameModes.vocabQuiz');
+  });
+
+  it('Given no switch, Then the footer keeps the plain teacher-paced line', async () => {
+    renderScreen({ classroomSummary: SUMMARY as never });
+    skip();
+    const footer = await screen.findByTestId('mp-teacher-paced');
+    expect(footer.textContent).not.toContain('eduStudent.results.nextUp');
+  });
+});

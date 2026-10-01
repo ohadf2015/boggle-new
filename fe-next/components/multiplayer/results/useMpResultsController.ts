@@ -18,6 +18,7 @@ import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { getGuestStatsSummary } from '@/utils/guestManager';
 import { useGameMode, useGameModeConfirmed, useHostSelectedGameMode, useGameActions } from '@/hooks/gameState/store';
 import { playedGameMode } from '@/lib/education/roundEndResultsRoute';
+import { standingsWithoutHost } from '@/lib/education/roundEndPodium';
 import { shouldShowDailyInvite } from '@/lib/results/shouldShowDailyInvite';
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -97,8 +98,13 @@ export function useMpResultsController(props: MpResultsProps) {
   // between games → the game isn't waiting" report). Same gate as the lobby's.
   const adGate = useLobbyAdGate({ socket: socket ?? null });
 
+  // The server ranks every socket in the room; in a class the teacher hosts, not plays.
+  const rankedScores = useMemo(
+    () => (classroomSummary && finalScores ? standingsWithoutHost(finalScores, classroomSummary.teacherName) : finalScores),
+    [finalScores, classroomSummary]
+  );
   const data = useResultsData({
-    finalScores,
+    finalScores: rankedScores,
     username,
     gameDuration,
     gameMode: resolvedGameMode,

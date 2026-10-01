@@ -19089,6 +19089,7 @@ const es = {
       "funNames": "Panda Píxel|Capitán Nutria|Tostada Turbo|Llama Disco|Fideo Ninja|Mapache Cohete|Kiwi Cósmico|Perezoso Sigiloso|Mango Mega|Lémur Láser|Bisonte Burbuja|Jaguar Jazzero|Mago Gofre|Pato Trueno|Gato Cometa|Geco Brillante|Jefe Banana|Tortuga Turbo|Quokka Cuántico|Halcón Peludo"
     },
     "results": {
+      "nextUp": "Lo siguiente: {mode}",
       "missedTitle": "Atrapa estas la próxima vez",
       "missedNone": "Encontraste todas las palabras de la lección. ¡Crack!",
       "hear": "Escuchar {word}",

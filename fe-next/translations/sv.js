@@ -19071,6 +19071,7 @@ const sv = {
       "funNames": "Pixel-Panda|Kapten Utter|Turbo-Rostis|Disco-Lama|Ninja-Nudel|Raket-Tvättbjörn|Kosmisk Kiwi|Smygande Sengångare|Mega-Mango|Laser-Lemur|Bubbel-Bison|Jazzig Jaguar|Våffelvisard|Åsk-Anka|Komet-Katt|Glitter-Gecko|Banan-Bossen|Turbo-Sköldis|Kvant-Quokka|Fluffig Falk"
     },
     "results": {
+      "nextUp": "Nästa: {mode}",
       "missedTitle": "Fånga de här nästa gång",
       "missedNone": "Du hittade alla lektionsord. Legend!",
       "hear": "Lyssna på {word}",

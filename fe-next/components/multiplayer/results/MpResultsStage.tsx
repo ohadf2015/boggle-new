@@ -34,6 +34,7 @@ import { roundAwards, seriesGrid } from './mpResultsStory';
 import type { MpResultsController } from './useMpResultsController';
 import fx from './mpResults.module.css';
 import { useOpenLessonPractice } from './useOpenLessonPractice';
+import { classroomRoundModeMeta } from '../round/roundModes';
 import { StudentMissedWords } from '@/components/student/live/StudentMissedWords';
 import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 import { myMissedWords } from '@/components/student/live/missedWords';
@@ -163,6 +164,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const classroomStudent = c.isClassroom && !isHost && !!props.classroomSummary;
   const missedWords = useMemo(() => myMissedWords(props.classroomSummary, username), [props.classroomSummary, username]);
   const practiceLessonId = props.classroomSummary?.lessonIds?.[0];
+  const switchedTo = classroomStudent && props.classroomNextMode && props.classroomNextMode !== c.resolvedGameMode ? props.classroomNextMode : null;
+  const nextModeLabel = switchedTo ? t(classroomRoundModeMeta(switchedTo).nameKey) : undefined;
   const me = data.currentPlayerData;
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
   const roundGap = useMemo(() => rivalGap(rows), [rows]);
@@ -311,6 +314,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
               adHold={c.adGate.anyAdActive}
               onStart={startNext}
               onReady={markReady}
+              nextModeLabel={nextModeLabel}
               t={t}
             />
           )}

@@ -62,16 +62,23 @@ export interface MpIntermissionFooterProps {
   adHold?: boolean;
   onStart: () => void;
   onReady: () => void;
+  /** A classroom student's view of the game the teacher switched the room to. */
+  nextModeLabel?: string;
   t: TFn;
 }
 
 /** Between rounds: [auto ring] [START NEXT (host) | I'M IN (joiner)] + ready status. */
-export function MpIntermissionFooter({ isHost, isClassroom, isReady, ready, total, auto, adHold = false, onStart, onReady, t }: MpIntermissionFooterProps) {
+export function MpIntermissionFooter({ isHost, isClassroom, isReady, ready, total, auto, adHold = false, onStart, onReady, nextModeLabel, t }: MpIntermissionFooterProps) {
   const status = total > 0 ? t('mpUi.results.readyCount', { ready, total }) : undefined;
   if (isClassroom && !isHost) {
     return (
       <p role="status" data-testid="mp-teacher-paced" className="px-4 py-3 text-center font-neo-display font-bold text-neo-white/90">
-        {t('mpUi.results.teacherPaced')}
+        {nextModeLabel && (
+          <span className={cn('mb-1 inline-block rounded-full border-2 border-neo-black bg-neo-cyan px-3 py-0.5 text-sm uppercase tracking-wide text-neo-black shadow-hard-sm', fx.stamp)}>
+            {t('eduStudent.results.nextUp', { mode: nextModeLabel })}
+          </span>
+        )}
+        <span className="block">{t('mpUi.results.teacherPaced')}</span>
       </p>
     );
   }

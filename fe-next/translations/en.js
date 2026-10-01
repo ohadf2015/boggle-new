@@ -18134,6 +18134,7 @@ const en = {
       "funNames": "Pixel Panda|Captain Otter|Turbo Toast|Disco Llama|Ninja Noodle|Rocket Raccoon|Cosmic Kiwi|Sneaky Sloth|Mega Mango|Laser Lemur|Bubble Bison|Jazzy Jaguar|Waffle Wizard|Thunder Duck|Comet Cat|Glitter Gecko|Banana Boss|Turbo Turtle|Quantum Quokka|Fuzzy Falcon"
     },
     "results": {
+      "nextUp": "Next up: {mode}",
       "missedTitle": "Catch these next time",
       "missedNone": "You found every lesson word. Legend!",
       "hear": "Hear {word}",
