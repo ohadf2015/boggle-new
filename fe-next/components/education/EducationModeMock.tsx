@@ -67,9 +67,10 @@ export function EducationModeMock() {
               </span>
               <span
                 data-testid="mock-join-code"
-                className="font-mono text-2xl font-black tracking-[0.3em] text-neo-white"
+                dir="ltr"
+                className="font-mono text-2xl font-black tracking-[0.2em] text-neo-white"
               >
-                4821
+                K7QM4P
               </span>
             </div>
             <span className="shrink-0 text-end font-neo-display text-xs font-bold text-neo-cyan">

@@ -6188,3 +6188,13 @@ html.modal-open ins.adsbygoogle[data-anchor-status] {
   0%, 100% { opacity: .65; }
   50% { opacity: 1; }
 }
+
+/* Teacher HQ class-tool cards: a transform-only pop (no opacity — Class 5). */
+@keyframes hq-card-pop {
+  0% { transform: translateY(6px) scale(0.94); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes hq-sheet-up {
+  0% { transform: translateY(28px); }
+  100% { transform: translateY(0); }
+}

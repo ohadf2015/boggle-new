@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { TV_STAGE_ZOOM_CLASS } from '@/components/education/lobby/tvStageScale';
 import { LaunchStageBackdrop } from '@/components/education/lobby/LaunchStageBackdrop';
+import { QuickLaunchStage } from '@/components/teacher/hq/QuickLaunchStage';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
 import { ClassroomGameLobbyExpress } from '@/components/education/ClassroomGameLobbyExpress';
@@ -119,6 +120,7 @@ function ClassroomGameInner() {
   }, [setIsInGame]);
 
   if (isChecking || authLoading) {
+    if (flow === QUICK_LAUNCH_FLOW) return <QuickLaunchStage />;
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
         <PageLoader
@@ -183,6 +185,7 @@ export default function ClassroomGamePage() {
   }
 
   if (loading) {
+    if (searchParams?.get('flow') === QUICK_LAUNCH_FLOW) return <QuickLaunchStage />;
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
         <PageLoader size="lg" text={t('common.loading')} />

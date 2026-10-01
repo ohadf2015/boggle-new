@@ -29,7 +29,7 @@ function formatDate(iso: string | null, language: string): string {
  * are on. Nothing renders while the entitlement is unknown (no flash, no false
  * upsell).
  */
-export function TeacherPlanBadge({ className }: { className?: string }) {
+export function TeacherPlanBadge({ className, quiet = false }: { className?: string; quiet?: boolean }) {
   const { t, language } = useLanguage();
   const { hasPro, loading, source, status, periodEnd, trialExpires, trialUsed, grant, grantExpired } = useTeacherPro();
   // Capture once — React Compiler treats Date.now() during render as impure.
@@ -115,7 +115,9 @@ export function TeacherPlanBadge({ className }: { className?: string }) {
             ? t('teacher.plan.giftEnded')
             : t('teacher.plan.free')}
       </span>
-      <span className="text-xs font-bold underline underline-offset-2">{t('teacher.plan.upgrade')}</span>
+      {quiet ? null : (
+        <span className="text-xs font-bold underline underline-offset-2">{t('teacher.plan.upgrade')}</span>
+      )}
     </Link>
   );
 }

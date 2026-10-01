@@ -1,10 +1,11 @@
 "use client";
 
 import { memo } from "react";
+import Image from "next/image";
 import { m } from "framer-motion";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { HQ_ACCENT_BG, HQ_ACCENT_TEXT, type HqMode } from "./hqModes";
+import { HQ_ACCENT_BG, HQ_ACCENT_TEXT, hqModeFacts, type HqMode } from "./hqModes";
 
 export interface HqModeCardProps {
   mode: HqMode;
@@ -12,25 +13,25 @@ export interface HqModeCardProps {
   blurb: string;
   selected: boolean;
   disabled?: boolean;
-  /** When motion is reduced, the chip snaps instead of springing. */
+  /** When motion is reduced, the tile snaps instead of springing. */
   reduced?: boolean;
   onSelect: () => void;
 }
 
+/** Faint accent wash behind the idle sticker — literal classes so Tailwind emits them. */
+const STAGE_IDLE: Record<HqMode["accent"], string> = {
+  cyan: "bg-neo-cyan/15",
+  lime: "bg-neo-lime/15",
+  pink: "bg-neo-pink/15",
+  purple: "bg-neo-purple/20",
+};
+
 /**
- * One game mode as a calm, compact chip — a radio, not a launch button:
- * selecting a chip changes what START will run; START stays the one launch
- * control on the deck.
- *
- * Deliberately NOT an illustrated poster: four saturated art tiles at equal
- * weight competed with GO LIVE for the teacher's eye. The chip carries the
- * mode's identity in two channels instead — its accent colour (idle: the
- * icon's ink; selected: the chip's fill) and its own icon shape — so the row
- * reads in one glance and colour-blindness costs nothing.
- *
- * Content-sized and `self-start` in EVERY data state: a chip may never
- * stretch into whatever height the grid row happens to have (the r3 capture
- * defect, kept honest by TeacherDashboard.loading.test).
+ * One game mode as an illustrated tile — a radio, never a launch button:
+ * GO LIVE stays the one launch control. The catalog poster pops out of the
+ * tile like a sticker; the icon badge keeps colour from being the only signal.
+ * Fixed heights and `self-start` in every data state, so a tile never
+ * stretches into a grid row (TeacherDashboard.loading.test).
  */
 export const HqModeCard = memo(function HqModeCard({
   mode,
@@ -43,6 +44,7 @@ export const HqModeCard = memo(function HqModeCard({
 }: HqModeCardProps) {
   const still = reduced || disabled;
   const Icon = mode.icon;
+  const poster = hqModeFacts(mode.id).poster;
   return (
     <m.button
       type="button"
@@ -54,41 +56,58 @@ export const HqModeCard = memo(function HqModeCard({
       data-testid={`hq-mode-${mode.id}`}
       onClick={onSelect}
       whileHover={still ? undefined : { y: -2 }}
-      whileTap={still ? undefined : { scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 520, damping: 24 }}
+      whileTap={still ? undefined : { scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 520, damping: 22 }}
       className={cn(
-        "group relative flex h-14 w-full min-w-0 items-center gap-2.5 self-start rounded-neo border-2 px-2.5 text-start sm:h-16 sm:gap-3 sm:px-3 lg:h-[4.5rem]",
-        // globals.css pads every landscape-phone <button> (unlayered, so it
-        // beats utilities) — keep the chip compact there.
-        "[@media(orientation:landscape)_and_(max-height:500px)]:h-11 [@media(orientation:landscape)_and_(max-height:600px)]:px-2! [@media(orientation:landscape)_and_(max-height:600px)]:py-0.5!",
+        "group relative flex h-[3.25rem] w-full min-w-0 items-center gap-2 self-start rounded-neo border-2 ps-1.5 pe-2 text-start sm:h-16 sm:gap-2.5 lg:h-24 lg:gap-3 lg:ps-2",
+        "max-sm:[@media(max-height:740px)]:h-12",
+        "[@media(orientation:landscape)_and_(max-height:500px)]:h-10! [@media(orientation:landscape)_and_(max-height:600px)]:px-2! [@media(orientation:landscape)_and_(max-height:600px)]:py-0.5!",
         "transition-[box-shadow,border-color,background-color] duration-150",
         "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
         selected
-          ? cn(HQ_ACCENT_BG[mode.accent], "border-neo-black text-black shadow-hard-sm")
-          : "border-neo-cream/40 bg-neo-navy text-neo-white hover:border-neo-cream",
+          ? cn(HQ_ACCENT_BG[mode.accent], "border-neo-black text-black shadow-hard")
+          : "border-neo-cream/40 bg-neo-navy text-neo-white shadow-hard-sm hover:border-neo-cream",
         disabled && "cursor-not-allowed opacity-45",
       )}
     >
       <span
-        data-mode-icon={mode.id}
         aria-hidden="true"
         className={cn(
-          "flex size-9 shrink-0 items-center justify-center rounded-neo border-2 sm:size-10",
-          "[@media(orientation:landscape)_and_(max-height:500px)]:size-8",
-          selected
-            ? "border-neo-black/60 text-black"
-            : cn("border-neo-cream/40 bg-neo-navy-light", HQ_ACCENT_TEXT[mode.accent]),
+          "relative flex size-12 shrink-0 items-end justify-center rounded-full sm:size-14 lg:size-20",
+          "max-sm:[@media(max-height:740px)]:size-10 [@media(orientation:landscape)_and_(max-height:500px)]:size-8",
+          selected ? "bg-neo-white/80" : STAGE_IDLE[mode.accent],
         )}
       >
-        <Icon className="size-5" strokeWidth={2.5} />
+        <m.span
+          className="absolute -inset-x-1 -top-2 -bottom-0.5 sm:-top-3 lg:-top-5"
+          animate={still ? undefined : selected ? { scale: 1.14, rotate: -5, y: -2 } : { scale: 1, rotate: 0, y: 0 }}
+          transition={{ type: "spring", stiffness: 420, damping: 14 }}
+        >
+          <Image
+            src={poster}
+            alt=""
+            width={96}
+            height={96}
+            className="size-full select-none object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.55)]"
+          />
+        </m.span>
+        <span
+          data-mode-icon={mode.id}
+          className={cn(
+            "absolute -bottom-1.5 -end-1.5 flex size-5 items-center justify-center rounded-full border-2 border-neo-black lg:size-7",
+            selected ? "bg-neo-white text-black" : cn("bg-neo-navy-light", HQ_ACCENT_TEXT[mode.accent]),
+          )}
+        >
+          <Icon className="size-3 lg:size-4" strokeWidth={3} />
+        </span>
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate font-neo-display text-xs font-bold uppercase leading-tight tracking-wide sm:text-sm">
+        <span className="line-clamp-2 font-neo-display text-[0.7rem] font-black uppercase leading-tight tracking-wide sm:text-sm lg:text-base">
           {label}
         </span>
         <span
           className={cn(
-            "hidden truncate font-neo-body text-xs font-bold lg:block",
+            "hidden font-neo-body text-xs font-bold leading-snug lg:line-clamp-2",
             selected ? "text-black/70" : "text-neo-white/60",
           )}
         >

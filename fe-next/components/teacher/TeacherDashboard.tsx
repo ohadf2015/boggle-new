@@ -41,7 +41,6 @@ import { TeacherStatusRow } from './dashboard/TeacherStatusRow';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
-import { useTeacherOnboardingState } from '@/hooks/useOnboardingState';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import {
   trackEduTeacherDashboardViewed,
@@ -54,7 +53,11 @@ import { FirstAssignmentPanel } from './hq/FirstAssignmentPanel';
 import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
 import { HqDock } from './hq/HqDock';
-import { HqToolsContent } from './hq/HqToolsContent';
+import { HqToolsContent, type HqToolsPanel } from './hq/HqToolsContent';
+import { pickHqUpsell } from './hq/pickHqUpsell';
+import { HqAssignmentsPill } from './hq/HqAssignmentsPill';
+import { FirstAssignmentInlineCta } from './hq/FirstAssignmentInlineCta';
+import { shouldShowFirstAssignmentCta } from '@/lib/education/firstAssignmentCta';
 
 export interface TeacherDashboardProps {
   /**
@@ -81,17 +84,13 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
   const deepLink = useTeacherDashboardDeepLink();
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [toolsPanel, setToolsPanel] = useState<HqToolsPanel>('home');
   const [lessonsOpen, setLessonsOpen] = useState(() => deepLink.reviewWords.length > 0);
   const [proOpen, setProOpen] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
   const [newlyCreatedJoinCode, setNewlyCreatedJoinCode] = useState<string | null>(null);
-  // Only ONE fixed overlay at a time: the Pro welcome waits for the first-run
-  // walkthrough. Read pessimistically — `completed || skipped` is only true once
-  // the flag has actually resolved (pitfall class 1).
-  const { isCompleted: onboardingCompleted, isSkipped: onboardingSkipped } =
-    useTeacherOnboardingState();
-  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
-  const onboardingClear = onboardingCompleted || onboardingSkipped || onboardingDismissed;
+  // Only ONE fixed overlay at a time: the Pro welcome stands down while the teacher has the walkthrough open.
+  const [walkthroughOpen, setWalkthroughOpen] = useState(false);
   const {
     classrooms,
     isLoading: classroomsLoading,
@@ -163,6 +162,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
   const openTools = useCallback(
     (open: boolean) => {
       if (open && !toolsOpen) trackEduTeacherToolsOpened(snapshot);
+      if (!open) setToolsPanel('home');
       setToolsOpen(open);
     },
     [toolsOpen, snapshot],
@@ -206,8 +206,8 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
 
   const closeProjector = useCallback(() => setProjectorOpen(false), []);
 
-  const chipBanner = pinBanner ? undefined : banner;
-  const hasProChip = !!(chipBanner || usagePrompt);
+  const upsell = pickHqUpsell({ hasBanner: !!banner, pinBanner: !!pinBanner, hasUsagePrompt: !!usagePrompt });
+  const hasProChip = upsell.chip !== null;
   const firstRun = !classroomsLoading && (classrooms.length === 0 || !!newlyCreatedJoinCode);
 
   return (
@@ -215,16 +215,11 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
       className={cn(TEACHER_TV_SCALE, isRTL && 'rtl')}
       scrollRegionLabel={t('teacher.dashboard.title')}
       header={<EducationHeader />}
-      statusRow={<TeacherStatusRow />}
-      contentClassName="relative"
+      statusRow={<TeacherStatusRow quietPlan={!upsell.planUpgradeWord} />}
+      // HQ fits one tall screen: there the cookie sheet overlays it until a choice is made instead of padding it into a scroll; sideways phones keep the padding so GO LIVE can scroll clear.
+      contentClassName="relative [@media(min-height:501px)]:[html.has-cookie-consent_&]:pb-0!"
     >
-      {/* The walkthrough is gated on having NO classroom: a teacher who has one
-          is not first-run, and a fullscreen modal over START is the defect the
-          addendum names. Read pessimistically (never while loading). */}
-      {!classroomsLoading && classrooms.length === 0 && (
-        <TeacherOnboarding onDismiss={() => setOnboardingDismissed(true)} />
-      )}
-      {!proLoading && onboardingClear && (
+      {!proLoading && !walkthroughOpen && (
         <ProWelcomeCelebration
           grant={proGrant}
           paid={checkoutSuccess && hasPro && proSource === 'polar'}
@@ -244,7 +239,8 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
       <div
         data-testid="teacher-dashboard-grid"
         className={cn(
-          'relative mx-auto flex h-full min-h-0 min-w-0 w-full max-w-[1640px] flex-col gap-2 px-3 py-2',
+          // Phones: at least the viewport, and allowed taller — a short phone scrolls the one shell region instead of clipping the join card.
+          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1640px] flex-col gap-2 px-3 py-2 lg:h-full lg:min-h-0 [@media(orientation:landscape)_and_(max-height:500px)]:h-full [@media(orientation:landscape)_and_(max-height:500px)]:min-h-0',
           'sm:gap-3 sm:px-5 sm:py-3',
           'lg:grid lg:grid-cols-5 lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-4 lg:px-8 lg:py-4',
           // A phone turned sideways (844x390) is short, not narrow: the stacked
@@ -252,7 +248,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
           '[@media(orientation:landscape)_and_(max-height:500px)]:grid [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-5 [@media(orientation:landscape)_and_(max-height:500px)]:grid-rows-[auto_minmax(0,1fr)] [@media(orientation:landscape)_and_(max-height:500px)]:gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:py-1.5',
         )}
       >
-        {pinBanner && banner ? (
+        {upsell.pinned ? (
           <div
             data-testid="teacher-dashboard-pinned-banner"
             className="lg:col-span-5 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-5"
@@ -298,7 +294,18 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                 </span>
               </span>
             ) : null}
+            {/* First-run only, and a chip in the empty class slot: a modal here covered GO LIVE on first visit. */}
+            {!classroomsLoading && classrooms.length === 0 && (
+              <TeacherOnboarding onDismiss={() => setWalkthroughOpen(false)} presentation="chip" onOpenChange={setWalkthroughOpen} />
+            )}
           </div>
+          <HqAssignmentsPill
+            count={selectedClassroom ? assignmentCount : null}
+            onOpen={() => {
+              setToolsPanel('assignments');
+              openTools(true);
+            }}
+          />
           {/* Room for the absolute dock at this row's end. Narrow phones
               cannot spare w-60 for a chip row — keep Tools (+ Go Pro)
               reachable without shoving the class chip off-canvas. */}
@@ -376,6 +383,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                     assignmentCount={assignmentCount}
                     hasActiveRoom={hasActiveRoom}
                     onCta={() => setShowAssignmentCreator(true)}
+                    className="max-sm:hidden"
                   />
                   <GetStudentsInCard
                     className="flex-1"
@@ -384,6 +392,18 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                       join_code: selectedClassroom.join_code || '',
                     }}
                     onOpenProjector={() => setProjectorOpen(true)}
+                    rosterAction={
+                      shouldShowFirstAssignmentCta({
+                        studentCount: selectedClassroom.member_count ?? 0,
+                        assignmentCount,
+                        hasActiveRoom,
+                      }) ? (
+                        <FirstAssignmentInlineCta
+                          classroomId={selectedClassroom.id}
+                          onCta={() => setShowAssignmentCreator(true)}
+                        />
+                      ) : undefined
+                    }
                   />
                 </div>
               ) : (
@@ -402,10 +422,15 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
           lessons={<LessonBuilder initialReviewWords={deepLink.reviewWords} />}
           toolsOpen={toolsOpen}
           onToolsOpenChange={openTools}
+          onLastGame={() => setToolsPanel('lastGame')}
+          hideShortcuts={toolsPanel !== 'home'}
           tools={
             hasTeacherAccess ? (
               <HqToolsContent
                 open={toolsOpen}
+                panel={toolsPanel}
+                onPanelChange={setToolsPanel}
+                assignmentCount={assignmentCount}
                 classroomCount={classrooms.length}
                 selectedClassroom={selectedClassroom}
                 reportsHref={reportsHref}
@@ -419,13 +444,10 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
             ) : undefined
           }
           pro={
-            chipBanner || usagePrompt ? (
-              <>
-                {chipBanner}
-                {usagePrompt ? (
-                  <div data-testid="teacher-dashboard-usage-prompt">{usagePrompt}</div>
-                ) : null}
-              </>
+            upsell.chip === 'banner' ? (
+              banner
+            ) : upsell.chip === 'usage' ? (
+              <div data-testid="teacher-dashboard-usage-prompt">{usagePrompt}</div>
             ) : undefined
           }
           proOpen={proOpen}

@@ -3,7 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { Zap, Gift, ShieldCheck } from 'lucide-react';
+import { Zap, Gift, ShieldCheck, ArrowRight } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AccessRedirectNotice } from '@/components/education/AccessRedirectNotice';
 import { AccessRequestGate } from '@/components/education/AccessRequestGate';
@@ -48,6 +49,7 @@ export function PageClient() {
   // access directly has no access_requests row, so status stays 'none' while
   // hasAccess is true — that pair must show the approved card, not the pitch.
   const showPitch = !isLoading && status === 'none' && !hasAccess;
+  const approved = !isLoading && (hasAccess || status === 'approved');
 
   // Steps + escape hatch reveal on scroll. The hero itself is NOT animated:
   // an opacity-0 start on the h1 flashes on mobile Chromium above the fold.
@@ -63,25 +65,6 @@ export function PageClient() {
     <>
       {isLoading && (
         <div aria-hidden="true" className="h-44 animate-pulse rounded-neo bg-neo-navy-light" />
-      )}
-
-      {!isLoading && (hasAccess || status === 'approved') && (
-        <div className="rounded-neo border-neo-thick border-black bg-neo-lime p-6 text-neo-navy shadow-hard-lg">
-          <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
-            {t('education.access.already_approved_title')}
-          </h2>
-          {trial && !hasPro && !proLoading && (
-            <div className="mt-4">
-              <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
-            </div>
-          )}
-          <Link
-            href={`/${language}/teacher`}
-            className="mt-4 inline-block rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
-          >
-            {t('education.access.go_to_teacher')}
-          </Link>
-        </div>
       )}
 
       {!isLoading && status === 'pending' && (
@@ -140,6 +123,36 @@ export function PageClient() {
     </>
   );
 
+  // A returning teacher came here for one thing: their HQ. No re-pitch, no steps, no upsell strip.
+  if (approved) {
+    return (
+      <main className="min-h-screen bg-neo-navy text-neo-white">
+        <section className="mx-auto flex min-h-[80dvh] max-w-xl flex-col justify-center px-4 pb-10 pt-16">
+          <div className="relative rounded-neo-xl border-neo-thick border-black bg-neo-lime p-6 pt-14 text-neo-navy shadow-hard-xl sm:p-8 sm:pt-16">
+            <span className="absolute -top-12 start-1/2 flex size-24 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-neo-thick border-black bg-neo-cyan shadow-hard rtl:translate-x-1/2">
+              <Image src="/mascot/teacher/teacher-hero.webp" alt="" aria-hidden="true" width={96} height={96} priority className="size-full object-contain" />
+            </span>
+            <h1 className="text-center font-neo-display text-[clamp(1.75rem,6vw,2.5rem)] font-black leading-tight tracking-[-0.02em] text-balance">
+              {t('education.access.already_approved_title')}
+            </h1>
+            <Link
+              href={`/${language}/teacher`}
+              className="group mt-6 flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-cream bg-neo-navy px-5 py-3 font-neo-display text-lg font-black uppercase tracking-wide text-neo-white shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            >
+              {t('education.access.go_to_teacher')}
+              <DirectionalIcon icon={ArrowRight} className="size-5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+            </Link>
+            {trial && !hasPro && !proLoading && (
+              <div className="mt-5">
+                <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
       <section
@@ -159,6 +172,9 @@ export function PageClient() {
             <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85">
               {t('education.access.lede')}
             </p>
+
+            {/* The action (sign up, or sign in in one tap) sits right under the lede — on a phone the trust list used to push it below the fold. */}
+            <div className="mt-6">{statusCard}</div>
 
             {/* Only for someone who still has to apply — an approved teacher who
                 happens to carry a `from` needs their status, not this. */}
@@ -185,7 +201,6 @@ export function PageClient() {
               </ul>
             )}
 
-            <div className="mt-8">{statusCard}</div>
           </div>
 
           {/* Support art, not the message: on a phone the CTA comes first and the

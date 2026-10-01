@@ -32,13 +32,13 @@ const TOP_CHIP = cn(
  * Exported so the sheet's four shortcuts share one shape.
  */
 export const DOCK_TILE = cn(
-  "flex h-full min-h-20 w-full min-w-0 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream",
-  "bg-neo-navy-light px-2 py-2 text-center font-neo-display text-xs font-bold uppercase leading-tight text-neo-white",
-  "shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard sm:text-sm",
+  "flex h-full min-h-16 w-full min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-neo border-2 border-neo-cream sm:min-h-20 sm:gap-1.5",
+  "bg-neo-navy-light px-1 py-1.5 text-center font-neo-display text-[0.65rem] font-bold uppercase leading-tight text-neo-white sm:px-2 sm:py-2",
+  "shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-none sm:text-sm",
   "focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan",
 );
 
-const TILE_ICON = "size-6 shrink-0";
+const TILE_ICON = "size-5 shrink-0 sm:size-6";
 const LABEL = "line-clamp-2 min-w-0 break-words";
 
 export interface HqDockProps {
@@ -55,6 +55,10 @@ export interface HqDockProps {
   pro?: ReactNode;
   proOpen: boolean;
   onProOpenChange: (open: boolean) => void;
+  /** Point the open Tools sheet at its last-game section. */
+  onLastGame?: () => void;
+  /** Drilled into a class tool: the shortcut row steps aside for its section. */
+  hideShortcuts?: boolean;
   className?: string;
 }
 
@@ -82,6 +86,8 @@ export function HqDock({
   pro,
   proOpen,
   onProOpenChange,
+  onLastGame,
+  hideShortcuts = false,
   className,
 }: HqDockProps) {
   const { t, language } = useLanguage();
@@ -91,14 +97,9 @@ export function HqDock({
     onLessonsOpenChange(true);
   };
 
-  // Inside the open sheet, "Last game" jumps to the last-game card below.
   const openLastGame = () => {
     onToolsOpenChange(true);
-    requestAnimationFrame(() =>
-      document
-        .querySelector<HTMLElement>('[data-hq-sheet="tools"] [data-testid="last-game-insights"]')
-        ?.scrollIntoView({ block: "start" }),
-    );
+    onLastGame?.();
   };
 
   return (
@@ -144,10 +145,11 @@ export function HqDock({
           </>
         }
       >
+        <div hidden={hideShortcuts || undefined}>
         <nav
           data-testid="teacher-shortcuts"
           aria-label={t("teacher.playNow.shortcutsLabel")}
-          className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3"
+          className="grid grid-cols-4 gap-1.5 sm:gap-3"
         >
           <button
             type="button"
@@ -193,6 +195,7 @@ export function HqDock({
             </span>
           </Link>
         </nav>
+        </div>
         {tools}
       </HqSheet>
 

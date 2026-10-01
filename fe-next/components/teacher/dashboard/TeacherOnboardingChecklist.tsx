@@ -43,13 +43,13 @@ const STEP_COPY: Record<
     testId: 'teacher-onboarding-cta-create-assignment',
   },
   share_join_link: {
-    labelKey: 'teacher.onboardingChecklist.shareJoin',
+    labelKey: 'eduHq.checklist.firstStudent',
     ctaKey: 'teacher.onboardingChecklist.shareJoinCta',
     testId: 'teacher-onboarding-cta-share-join',
   },
   view_first_progress_report: {
-    labelKey: 'teacher.onboardingChecklist.viewReport',
-    ctaKey: 'teacher.onboardingChecklist.viewReportCta',
+    labelKey: 'eduHq.checklist.firstGame',
+    ctaKey: 'eduHq.checklist.firstGameCta',
     testId: 'teacher-onboarding-cta-view-report',
   },
 };
@@ -130,18 +130,33 @@ export function TeacherOnboardingChecklist({
       shadow="md"
       data-testid="teacher-onboarding-checklist"
       data-current={result.current ?? ''}
-      className={cn('p-4', className)}
+      className={cn('p-3', className)}
     >
-      <p className="font-neo-display text-base font-black uppercase tracking-tight text-neo-white">
-        {t('teacher.onboardingChecklist.title')}
-      </p>
-      <p className="mt-1 font-neo-body text-xs font-bold text-neo-white/70">
-        {t('teacher.onboardingChecklist.progress', {
-          done: result.doneCount,
-          total: TEACHER_ONBOARDING_STEPS.length,
-        })}
-      </p>
-      <ol className="mt-3 space-y-2">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="font-neo-display text-sm font-black uppercase tracking-tight text-neo-white">
+          {t('teacher.onboardingChecklist.title')}
+        </p>
+        <p className="shrink-0 font-neo-body text-xs font-bold text-neo-white/70">
+          {t('teacher.onboardingChecklist.progress', {
+            done: result.doneCount,
+            total: TEACHER_ONBOARDING_STEPS.length,
+          })}
+        </p>
+      </div>
+      <div
+        role="progressbar"
+        aria-label={t('teacher.onboardingChecklist.title')}
+        aria-valuemin={0}
+        aria-valuemax={TEACHER_ONBOARDING_STEPS.length}
+        aria-valuenow={result.doneCount}
+        className="mt-2 h-2.5 overflow-hidden rounded-full border-2 border-neo-cream/50 bg-neo-navy"
+      >
+        <span
+          className="block h-full rounded-full bg-neo-lime transition-[width] duration-700 ease-out motion-reduce:transition-none"
+          style={{ width: `${(result.doneCount / TEACHER_ONBOARDING_STEPS.length) * 100}%` }}
+        />
+      </div>
+      <ol className="mt-3 grid gap-1.5 sm:grid-cols-2">
         {result.steps.map((step, index) => {
           const copy = STEP_COPY[step.id];
           const Icon = STEP_ICON[step.id];
@@ -152,7 +167,8 @@ export function TeacherOnboardingChecklist({
               data-testid={`teacher-onboarding-step-${step.id}`}
               data-status={step.status}
               className={cn(
-                'flex items-start gap-2 rounded-neo border-2 px-3 py-2',
+                'flex items-start gap-2 rounded-neo border-2 px-2.5 py-1.5',
+                isCurrent && 'sm:col-span-2',
                 step.status === 'done'
                   ? 'border-neo-lime/60 bg-neo-navy-light'
                   : isCurrent

@@ -1,23 +1,16 @@
 /**
- * START A GAME — the hero of Teacher HQ.
+ * START A GAME — the hero of Teacher HQ, a host picker that is armed on arrival.
  *
- * The bar is Kahoot: a teacher who just walked into a noisy room gets a join
- * code on the projector before the bell stops ringing. This panel arms itself
- * on arrival — a word list picked, a game picked, defaults chosen — so the
- * whole flow is still a single press of one enormous button.
- *
- * The game is a visible but CALM choice: four compact chips (colour + icon,
- * never four saturated posters) sit above START, one always pre-selected —
- * the game the armed words can actually carry — so choosing is optional and
- * START stays one tap. What it deliberately still does NOT ask for: a roster,
- * a lesson (a starter pack or a pasted list becomes one on the way), a timer
- * or a board size. The class comes from the deck's class chips, never from
- * here.
+ * Illustrated mode tiles with a facts card in the grid's sixth cell, the word
+ * lists as chips on the deck, and one enormous GO LIVE: list → mode → lobby is
+ * at most three taps, and the default is one. The class comes from the deck's
+ * class chips, never from here.
  */
 
 'use client';
 
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Rocket, X, ChevronUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -34,9 +27,12 @@ import {
 } from './quickLaunchIntent';
 import { SourceSwitch, PickRow, PastePanel, type PlayNowSource } from './PlayNowSources';
 import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
-import { HQ_MODES } from '../hq/hqModes';
+import { HQ_MODES, hqModeFacts } from '../hq/hqModes';
 import { HqModeCard } from '../hq/HqModeCard';
+import { HqModeFacts } from '../hq/HqModeFacts';
+import { HqLaunchStage } from '../hq/HqLaunchStage';
 import { useHqJuice } from '../hq/useHqJuice';
+import { PlayNowListChips, type ListChip } from './PlayNowListChips';
 
 /**
  * How many saved lists fit on the panel before it stops being one glance.
@@ -73,6 +69,7 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
   const [pickedPackKey, setPickedPackKey] = useState<string | null>(null);
   const [pickedMode, setPickedMode] = useState<ClassroomGameMode | null>(null);
   const [pasted, setPasted] = useState('');
+  const [launching, setLaunching] = useState<{ modeLabel: string; listTitle: string; poster: string } | null>(null);
 
   // Lists the teacher actually hosted recently float above the ones they merely
   // saved — "recent" should mean recent play, not recent typing.
@@ -177,8 +174,43 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
   const handleGo = useCallback(() => {
     if (!armed || !liveMode) return;
     sfx.playMatchStartSound();
+    const hqMode = HQ_MODES.find((md) => md.id === liveMode);
+    setLaunching({
+      modeLabel: hqMode ? t(hqMode.labelKey, hqMode.labelFallback) : '',
+      listTitle: armed.intent.title,
+      poster: hqModeFacts(liveMode).poster,
+    });
     onLaunch({ ...armed.intent, mode: liveMode });
-  }, [armed, liveMode, onLaunch, sfx]);
+  }, [armed, liveMode, onLaunch, sfx, t]);
+
+  const chipKind: 'lessons' | 'packs' = hasRecent ? 'lessons' : 'packs';
+  const chips = useMemo<ListChip[]>(
+    () =>
+      hasRecent
+        ? recentLessons.map((l) => ({ id: l.id, title: l.name, count: l.words?.length ?? 0 }))
+                // The two general packs; the language-learner packs stay one "More" away.
+        : STARTER_LESSON_PACKS.slice(0, 2).map((p) => ({ id: p.nameKey, title: t(p.nameKey), count: p.words.length })),
+    [hasRecent, recentLessons, t]
+  );
+  const chipCandidate =
+    !armed ? null : source === 'recent' ? activeLesson?.id ?? null : source === 'packs' ? activePack?.nameKey ?? null : null;
+  const chipSelectedId = chipCandidate && chips.some((c) => c.id === chipCandidate) ? chipCandidate : null;
+  const pickChip = useCallback(
+    (id: string) => {
+      sfx.playTileSelectSound();
+      if (chipKind === 'lessons') {
+        setPickedSource('recent');
+        setPickedLessonId(id);
+      } else {
+        setPickedSource('packs');
+        setPickedPackKey(id);
+      }
+    },
+    [chipKind, sfx]
+  );
+  const openChange = useCallback(() => {
+    if (changeRef.current) changeRef.current.open = true;
+  }, []);
 
   return (
     <section
@@ -186,7 +218,7 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
       aria-labelledby="play-now-heading"
       className="@container relative flex h-full min-h-0 flex-col overflow-hidden rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard"
     >
-      <div className="flex shrink-0 items-center gap-2 border-b-2 border-neo-cream/40 px-3 py-2 sm:px-4 [@media(orientation:landscape)_and_(max-height:500px)]:py-1.5">
+      <div className="flex shrink-0 items-center gap-2 border-b-2 border-neo-cream/40 px-3 py-1.5 sm:px-4 sm:py-2 [@media(orientation:landscape)_and_(max-height:500px)]:sr-only">
         {/* Step 1 of 2 — HQ reads as a sequence: pick + GO LIVE, then get them in. */}
         <span
           data-testid="hq-step-badge-1"
@@ -206,13 +238,13 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
         </p>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col justify-evenly gap-3 p-3 sm:gap-4 sm:p-4">
+      <div className="flex min-h-0 flex-1 flex-col justify-evenly gap-2 p-2.5 sm:gap-4 sm:p-4 [@media(orientation:landscape)_and_(max-height:500px)]:gap-1.5! [@media(orientation:landscape)_and_(max-height:500px)]:p-2!">
         <div
           role="radiogroup"
           aria-label={t('academy.hq.pickGame', 'Pick a game')}
           // Two per row at desktop: four-in-a-row squeezes a chip to ~150px
           // and the mode's NAME truncates — the verb must get the pixels.
-          className="grid shrink-0 grid-cols-2 gap-2 sm:gap-3"
+          className="grid shrink-0 grid-cols-2 gap-2 pt-1 sm:gap-3 sm:pt-1.5 lg:pt-3 [@media(orientation:landscape)_and_(max-height:500px)]:gap-1.5! [@media(orientation:landscape)_and_(max-height:500px)]:pt-0.5!"
         >
           {HQ_MODES.map((mode) => (
             <HqModeCard
@@ -226,17 +258,21 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
               onSelect={() => pickMode(mode.id)}
             />
           ))}
+          <HqModeFacts modeId={liveMode} reduced={reduced} />
         </div>
 
-        {/* What is already loaded, said BEFORE the button. */}
-        <p
-          data-testid="play-now-armed"
-          className="shrink-0 truncate text-center font-neo-body text-xs font-bold text-neo-white/80 sm:text-sm"
-        >
-          {armed
-            ? t('teacher.playNow.armedWith', { title: armed.intent.title, count: armed.words.length })
-            : t('teacher.playNow.pickSomething')}
-        </p>
+        <PlayNowListChips
+          kind={chipKind}
+          chips={chips}
+          selectedId={chipSelectedId}
+          offChipLabel={
+            armed
+              ? t('teacher.playNow.armedWith', { title: armed.intent.title, count: armed.words.length })
+              : t('teacher.playNow.pickSomething')
+          }
+          onSelect={pickChip}
+          onMore={openChange}
+        />
 
         {/* The ONE shout on HQ: solid lime, the biggest type, a hard shadow.
             Nothing else on the deck is allowed to out-shout it. */}
@@ -249,7 +285,7 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
             // min-w-0 + overflow-hidden: flex children default to min-width:auto,
             // so a long locale ("יוצאים לדרך") at text-3xl blew past a 320px
             // phone and forced the shell to scroll sideways (#1173).
-            'relative flex min-h-16 w-full min-w-0 shrink-0 items-center justify-center gap-3 overflow-hidden rounded-neo border-3 border-black px-3 py-2 sm:px-6',
+            'relative flex min-h-14 w-full min-w-0 shrink-0 items-center justify-center gap-3 overflow-hidden rounded-neo border-3 border-black px-3 py-1.5 sm:min-h-16 sm:px-6 sm:py-2',
             'font-neo-display text-3xl font-black uppercase tracking-tight max-[360px]:text-xl sm:min-h-20 sm:text-4xl lg:min-h-24 lg:text-5xl',
             // `!`: globals.css pads every landscape-phone <button> 0.75rem, unlayered,
             // which beats any layered utility.
@@ -273,7 +309,8 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
         <details ref={changeRef} data-testid="play-now-change-disclosure" className="group shrink-0">
           <summary
             data-testid="play-now-change-summary"
-            className="flex cursor-pointer list-none items-center justify-center gap-1.5 marker:content-none"
+            // Phones reach this sheet from the chips' "More"; the link stays for keyboards (visible on focus).
+            className="flex cursor-pointer list-none items-center justify-center gap-1.5 marker:content-none max-sm:sr-only max-sm:focus-visible:not-sr-only [@media(orientation:landscape)_and_(max-height:500px)]:sr-only [@media(orientation:landscape)_and_(max-height:500px)]:focus-visible:not-sr-only"
           >
             <ChevronUp className="size-4 text-neo-white/60" aria-hidden="true" />
             <p className="font-neo-body text-xs font-bold text-neo-white/60 underline decoration-1 underline-offset-2">
@@ -283,7 +320,7 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
 
           <div
             data-hq-sheet="change-words"
-            className="absolute inset-0 z-20 flex flex-col gap-3 overflow-y-auto overscroll-contain bg-neo-navy p-3"
+            className="absolute inset-0 z-20 hidden flex-col gap-3 overflow-y-auto group-open:flex overscroll-contain bg-neo-navy p-3"
             onKeyDown={(e) => {
               if (e.key === 'Escape') closeChange();
             }}
@@ -315,7 +352,10 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
                       accent="bg-neo-cyan"
                       recommendedLabel={i === 0 ? t('teacher.playNow.recommended') : undefined}
                       selected={activeLesson?.id === l.id}
-                      onSelect={() => setPickedLessonId(l.id)}
+                      onSelect={() => {
+                        setPickedLessonId(l.id);
+                        closeChange();
+                      }}
                     />
                   </li>
                 ))}
@@ -333,7 +373,10 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
                       accent="bg-neo-lime"
                       recommendedLabel={i === 0 ? t('teacher.playNow.recommended') : undefined}
                       selected={activePack?.nameKey === p.nameKey}
-                      onSelect={() => setPickedPackKey(p.nameKey)}
+                      onSelect={() => {
+                        setPickedPackKey(p.nameKey);
+                        closeChange();
+                      }}
                     />
                   </li>
                 ))}
@@ -344,6 +387,8 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
           </div>
         </details>
       </div>
+      {/* Portalled: the section is a size container, which would trap a fixed layer inside it. */}
+      {launching ? createPortal(<HqLaunchStage {...launching} />, document.body) : null}
     </section>
   );
 }
