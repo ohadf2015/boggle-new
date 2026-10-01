@@ -43,6 +43,9 @@ import {
   isTestAccountEmail,
   trackEduLiveGameStarted,
   trackEduReportsViewed,
+  trackEduFirstAssignmentCtaShown,
+  trackEduFirstAssignmentCtaClicked,
+  trackEduFirstAssignmentCreated,
 } from '../telemetry';
 
 describe('education telemetry', () => {
@@ -337,6 +340,21 @@ describe('education telemetry', () => {
     expect(captureMock).toHaveBeenLastCalledWith('edu_reports_viewed', {
       classroom_id: 'cls-1',
       student_id: 'stu-9',
+    });
+  });
+
+  it('first-assignment CTA events keep the three funnel names', () => {
+    trackEduFirstAssignmentCtaShown({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_first_assignment_cta_shown', {
+      classroom_id: 'cls-1',
+    });
+    trackEduFirstAssignmentCtaClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_first_assignment_cta_clicked', {
+      classroom_id: 'cls-1',
+    });
+    trackEduFirstAssignmentCreated({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_first_assignment_created', {
+      classroom_id: 'cls-1',
     });
   });
 });

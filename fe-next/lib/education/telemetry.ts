@@ -395,3 +395,21 @@ export function trackEduReportsViewed(args: EduReportsViewedArgs = {}): void {
   if (args.studentId) props.student_id = args.studentId;
   safeCapture('edu_reports_viewed', props);
 }
+
+export interface EduFirstAssignmentCtaArgs {
+  classroomId: string;
+}
+
+/** HQ panel: class has students, 0 assignments, no live room. */
+export function trackEduFirstAssignmentCtaShown(args: EduFirstAssignmentCtaArgs): void {
+  safeCapture('edu_first_assignment_cta_shown', { classroom_id: args.classroomId });
+}
+
+export function trackEduFirstAssignmentCtaClicked(args: EduFirstAssignmentCtaArgs): void {
+  safeCapture('edu_first_assignment_cta_clicked', { classroom_id: args.classroomId });
+}
+
+/** First assignment actually created (dialog or starter pack). */
+export function trackEduFirstAssignmentCreated(args: EduFirstAssignmentCtaArgs): void {
+  safeCapture('edu_first_assignment_created', { classroom_id: args.classroomId });
+}
