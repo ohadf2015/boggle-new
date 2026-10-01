@@ -15514,6 +15514,12 @@ const ja = {
         "title": "クラスに参加"
       },
       "classroomRoomGone": "クラスのゲームが終了しました。先生に新しいゲームを始めてもらってね。",
+      "gameEnded": {
+        "title": "このゲームは終了しました",
+        "retry": "もう一度試す",
+        "toClass": "自分のクラスへ",
+        "newCode": "新しいコードを入力"
+      },
       "lessonsAssigned": "割り当てられたレッスン",
       "feel": {
         "points": "点",
@@ -15764,6 +15770,7 @@ const ja = {
       "auth_required_title": "教師アクセスの申請には登録が必要です",
       "auth_required_body": "教師アクセスは認証済みアカウントに紐づきます。無料アカウントを作成するかログインすると、このまま続けられます。",
       "auth_required_cta": "無料の先生アカウントを作成",
+      "auth_signin_cta": "アカウントをお持ちの方はログイン",
       "trust_instant": "即時アクセス — 審査待ちなし",
       "trust_free": "教師向け無料プラン、期限なし",
       "trust_nologins": "生徒のログインも設定も不要",
@@ -18847,6 +18854,9 @@ const ja = {
       "share": "シェア",
       "seriesChampion": "シリーズ王者",
       "teacherPaced": "先生が次のゲームを始めます",
+      "backToClass": "クラスに戻る",
+      "endClassTitle": "クラスのゲームを終了しますか？",
+      "endClassBody": "全員のルームが閉じられ、クラスのダッシュボードに戻ります。",
       "roundPoints": "このラウンドの得点",
       "yourRank": "あなたの順位",
       "lessonRecap": "レッスンのふりかえり",

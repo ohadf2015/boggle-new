@@ -21,6 +21,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { isNative } from '../utils/platform';
 import { parentRoute } from '../lib/navigation/parentRoute';
 import { isNavigationGuardActive } from '../lib/navigation/navigationGuardRegistry';
+import { isEducationPath } from '../lib/navigation/sectionHome';
 
 const ROOT_PATH_PATTERNS: RegExp[] = [
   /^\/[a-z]{2}\/?$/,
@@ -33,6 +34,7 @@ const ROOT_PATH_PATTERNS: RegExp[] = [
 ];
 
 const EXIT_DOUBLE_TAP_WINDOW_MS = 2000;
+const LOCALE_ROOT_RE = /^\/(?:[a-z]{2})?$/;
 
 function isRootPath(pathname: string | null): boolean {
   if (!pathname) return true;
@@ -83,7 +85,7 @@ export function useAndroidBackButton(): void {
           }
           return;
         }
-        if (isRootPath(pathRef.current)) {
+        const exitOnSecondTap = () => {
           const now = Date.now();
           if (now - lastBackPressAtRef.current < EXIT_DOUBLE_TAP_WINDOW_MS) {
             AppPlugin.exitApp?.().catch(() => {});
@@ -92,6 +94,9 @@ export function useAndroidBackButton(): void {
           lastBackPressAtRef.current = now;
           // Lightweight feedback toast via custom event (consumer can render)
           window.dispatchEvent(new CustomEvent('lexiclash:exit-hint'));
+        };
+        if (isRootPath(pathRef.current)) {
+          exitOnSecondTap();
           return;
         }
         if (data.canGoBack || window.history.length > 1) {
@@ -100,7 +105,14 @@ export function useAndroidBackButton(): void {
         }
         // Deep-link / refresh on a non-root route: no history to pop. Go one
         // level up the URL hierarchy instead of exiting the app outright.
-        router.push(parentRoute(pathRef.current || '/'));
+        const current = pathRef.current || '/';
+        const parent = parentRoute(current);
+        // The education home is the top of its section; the consumer home is not "up" from it.
+        if (isEducationPath(current) && LOCALE_ROOT_RE.test(parent)) {
+          exitOnSecondTap();
+          return;
+        }
+        router.push(parent);
       } catch (err) {
         console.error('[useAndroidBackButton] handler error:', err);
       }

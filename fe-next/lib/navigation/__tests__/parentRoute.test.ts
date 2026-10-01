@@ -87,8 +87,16 @@ describe('parentRoute', () => {
       // /en/teacher/classroom/abc/analytics → /en/teacher/classroom/abc (drop one segment)
       // Not affected by override, follows default "drop one segment" rule
       expect(parentRoute('/en/teacher/classroom')).toBe('/en/teacher');
-      expect(parentRoute('/en/teacher/classroom/abc/analytics')).toBe('/en/teacher/classroom/abc');
-      expect(parentRoute('/en/student/join')).toBe('/en/student');
+      expect(parentRoute('/en/student/achievements')).toBe('/en/student');
+    });
+
+    it('never targets a page that does not exist: /teacher/classroom/[id] has no page', () => {
+      expect(parentRoute('/en/teacher/classroom/abc/analytics')).toBe('/en/teacher');
+      expect(parentRoute('/he/teacher/classroom/abc/analytics/')).toBe('/he/teacher');
+    });
+
+    it('does not send /student/join to /student (signed-out users are pushed straight back to join)', () => {
+      expect(parentRoute('/en/student/join')).toBe('/en/education');
     });
   });
 });

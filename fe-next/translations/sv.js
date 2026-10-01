@@ -15803,6 +15803,12 @@ const sv = {
         "title": "Gå med i klassrummet"
       },
       "classroomRoomGone": "Klassens spel är slut. Be din lärare starta ett nytt.",
+      "gameEnded": {
+        "title": "Det här spelet är slut",
+        "retry": "Försök igen",
+        "toClass": "Till min klass",
+        "newCode": "Skriv en ny kod"
+      },
       "lessonsAssigned": "Tilldelade lektioner",
       "feel": {
         "points": "p",
@@ -16000,6 +16006,7 @@ const sv = {
       "auth_required_title": "Registrera dig för att ansöka om läraråtkomst",
       "auth_required_body": "Läraråtkomst är kopplad till ett verifierat konto. Skapa ett gratiskonto eller logga in, så fortsätter vi direkt här.",
       "auth_required_cta": "Skapa mitt gratis lärarkonto",
+      "auth_signin_cta": "Har du redan ett konto? Logga in",
       "trust_instant": "Direkt åtkomst — ingen granskningskö",
       "trust_free": "Gratis lärarplan, utan slutdatum",
       "trust_nologins": "Inga elevkonton, ingen installation",
@@ -18847,6 +18854,9 @@ const sv = {
       "share": "Dela",
       "seriesChampion": "Seriemästare",
       "teacherPaced": "Din lärare startar nästa spel",
+      "backToClass": "Tillbaka till klassen",
+      "endClassTitle": "Avsluta klassens spel?",
+      "endClassBody": "Rummet stängs för alla och du går tillbaka till din klassöversikt.",
       "roundPoints": "Poäng den här rundan",
       "yourRank": "Din placering",
       "lessonRecap": "Lektionssammanfattning",
