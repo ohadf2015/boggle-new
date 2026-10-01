@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvBroadcastView from '@/host/components/TvBroadcastView';
 import type { Language } from '@/shared/types/game';
@@ -148,6 +148,11 @@ describe('TvBroadcastView — the classroom host screen', () => {
     expect(screen.getByTestId('tv-momentum-slot').className).toContain('md:block');
   });
 
+  it('Given a classroom round on a short projector, Then the commentary ticker gives its row to the leaderboard', () => {
+    render(<TvBroadcastView {...props()} />);
+    expect(screen.getByTestId('tv-momentum-slot').className).toContain('md:medium-short:hidden');
+  });
+
   it('Given a room whose classroom context has not arrived (host reload), Then the board still scrolls above the strip', () => {
     render(<TvBroadcastView {...props({ classroomLive: null })} />);
     expect(screen.getByTestId('tv-classroom-body')).toContainElement(screen.getByTestId('tv-leaderboard-card'));
@@ -157,5 +162,24 @@ describe('TvBroadcastView — the classroom host screen', () => {
   it('Given an arcade room, Then the help button is still offered', () => {
     render(<TvBroadcastView {...props({ classroomLive: null })} />);
     expect(screen.getByTestId('tv-help-button')).toBeInTheDocument();
+  });
+  it('Given a classroom round on a tall projector, Then the commentary ticker gives its row to a bigger leaderboard', () => {
+    render(<TvBroadcastView {...props()} />);
+    expect(screen.getByTestId('tv-momentum-slot').className).toContain('lg:[@media(min-height:851px)]:hidden');
+  });
+
+  it('Given a classroom round with the site header gone, Then the host still has a confirmed exit inside the join bar', () => {
+    const onExitRoom = vi.fn();
+    render(<TvBroadcastView {...props({ onExitRoom })} />);
+    const exit = screen.getByTestId('tv-classroom-exit');
+    expect(screen.getByTestId('tv-join-row')).toContainElement(exit);
+    expect(exit).toHaveAttribute('aria-label', 'eduLive.live.exitLabel');
+    fireEvent.click(exit);
+    expect(onExitRoom).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given an arcade room, Then no classroom exit is added to the join bar', () => {
+    render(<TvBroadcastView {...props({ classroomLive: null, onExitRoom: vi.fn() })} />);
+    expect(screen.queryByTestId('tv-classroom-exit')).toBeNull();
   });
 });

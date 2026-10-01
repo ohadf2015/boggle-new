@@ -18790,7 +18790,8 @@ const ru = {
       "lessonFound": "Слова урока: {{found}}/{{total}}",
       "wordOfRound": "Слово раунда",
       "wordOfRoundEmpty": "Первое длинное слово займёт это место",
-      "bestWordBy": "Длина {{count}} · {{name}}"
+      "bestWordBy": "Длина {{count}} · {{name}}",
+      "exitLabel": "Выйти из игры"
     },
     "results": {
       "backToClass": "Назад к классу",
@@ -18801,13 +18802,25 @@ const ru = {
       "zeroBody": "Разминка окончена. Следующий раунд — всерьёз.",
       "zeroNoteTitle": "Пока никто не набрал очков",
       "zeroNoteHint": "Попробуйте таймер подольше или поле попроще. Код тот же, заново входить не нужно.",
-      "lineupTitle": "Кто играл в раунде"
+      "lineupTitle": "Кто играл в раунде",
+      "emptyTitle": "Тренировочный раунд окончен",
+      "emptyHeadline": "В этот раз не играл ни один ученик",
+      "emptyBody": "Выведите код на доску. Следующий раунд уже по-настоящему.",
+      "podiumLessonWords": "Слова урока: {{found}}/{{total}}",
+      "noLessonTitle": "В этом раунде слов из урока не нашли",
+      "noLessonBody": "Очки принесли другие слова на поле. Лучшие находки класса:",
+      "noLessonBodyEmpty": "Очки принесли другие слова на поле.",
+      "noLessonHint": "На поле побольше или с таймером подлиннее словам урока хватит места.",
+      "noLessonReteach": "Слова урока, которые стоит повторить"
     },
     "reteach": {
       "playNow": "Сыграть сейчас",
       "sendHome": "Задать на дом",
       "printShare": "Печать и ссылка",
       "googleClassroom": "Опубликовать в Google Classroom"
+    },
+    "lobby": {
+      "waitingForStudents": "Ждём учеников"
     },
     "wordcraft": {
       "bingo": "БИНГО!",

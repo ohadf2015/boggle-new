@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Clock, GraduationCap, Grid3x3, Play, UserPlus, Zap } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, GraduationCap, Grid3x3, Hourglass, Play, UserPlus, Zap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
@@ -161,11 +161,14 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           text: `${timerMinutes} ${t('common.minutes')}`,
         });
       }
-      rows.push({
-        key: 'board',
-        icon: <Grid3x3 className="h-[1em] w-[1em]" aria-hidden="true" />,
-        text: boardSizeLabel(boardSize),
-      });
+      // Wordcraft deals every student its own fixed board; the grid setting never reaches it.
+      if (mode !== 'wordcraft') {
+        rows.push({
+          key: 'board',
+          icon: <Grid3x3 className="h-[1em] w-[1em]" aria-hidden="true" />,
+          text: boardSizeLabel(boardSize),
+        });
+      }
     }
     rows.push({
       key: 'late',
@@ -302,37 +305,37 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         </ul>
 
         <div className="flex w-full min-w-0 flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
-          {/* The reason sits BESIDE the control it explains, not under it: a
-              disabled button with no stated cause is the silent no-op this
-              repo keeps shipping (recurring pitfall class 4). */}
+          {/* Empty room: Start itself says "waiting"; the reason and the practice run sit beside it as quiet text, so nothing competes with it. */}
           {!canStart && (
-            <p
-              data-testid="projector-start-reason"
-              role="status"
-              className="rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-3 py-2 text-start font-neo-body text-[3.2vw] font-bold leading-tight text-neo-pink md:max-w-[34ch] md:px-[1vw] md:py-[0.5vw] md:text-[1vw]"
-            >
-              {t('education.projectorLobby.startBlocked')}
-            </p>
-          )}
-          {practiceRoundFailed && (
-            <p
-              data-testid="projector-practice-failed"
-              role="status"
-              className="max-w-[28ch] text-start font-neo-body text-[2.6vw] font-bold text-neo-pink md:text-[1vw]"
-            >
-              {t('tvLobby.practiceRoundFailed')}
-            </p>
-          )}
-          {onStartPracticeRound && !canStart && (
-            <button
-              type="button"
-              data-testid="projector-practice-round"
-              onClick={onStartPracticeRound}
-              disabled={practiceRoundPending}
-              className="w-full rounded-neo border-3 border-neo-lime bg-neo-lime/10 px-3 py-2 font-neo-display text-[3.4vw] font-black uppercase text-neo-lime shadow-hard-sm transition-all active:translate-y-0.5 active:shadow-none disabled:opacity-50 md:w-auto md:px-[1.4vw] md:py-[0.7vw] md:text-[1.05vw]"
-            >
-              {practiceRoundPending ? t('common.loading') : t('tvLobby.tryPracticeRound')}
-            </button>
+            <div className="flex flex-col items-start gap-1 md:max-w-[34ch] md:items-end md:text-end">
+              <p
+                data-testid="projector-start-reason"
+                role="status"
+                className="font-neo-body text-[3.2vw] font-bold leading-tight text-neo-cream/75 md:text-[0.95vw]"
+              >
+                {t('education.projectorLobby.startBlocked')}
+              </p>
+              {practiceRoundFailed && (
+                <p
+                  data-testid="projector-practice-failed"
+                  role="status"
+                  className="font-neo-body text-[2.6vw] font-bold text-neo-pink md:text-[0.95vw]"
+                >
+                  {t('tvLobby.practiceRoundFailed')}
+                </p>
+              )}
+              {onStartPracticeRound && (
+                <button
+                  type="button"
+                  data-testid="projector-practice-round"
+                  onClick={onStartPracticeRound}
+                  disabled={practiceRoundPending}
+                  className="rounded-sm font-neo-body text-[3.2vw] font-black text-neo-lime underline decoration-2 underline-offset-4 transition-colors hover:text-neo-cream focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan disabled:opacity-50 md:text-[0.95vw]"
+                >
+                  {practiceRoundPending ? t('common.loading') : t('tvLobby.tryPracticeRound')}
+                </button>
+              )}
+            </div>
           )}
           {/* Once someone is in, Start breathes — a transform-only scale loop,
               still under reduced motion. It is the one thing the teacher has
@@ -369,13 +372,19 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                 : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl hover:-translate-y-0.5'
             )}
           >
-            <Play className="h-[0.8em] w-[0.8em] shrink-0" aria-hidden="true" />
+            {canStart ? (
+              <Play className="h-[0.8em] w-[0.8em] shrink-0" aria-hidden="true" />
+            ) : (
+              <Hourglass className="h-[0.8em] w-[0.8em] shrink-0 motion-safe:animate-neo-wobble" aria-hidden="true" />
+            )}
             {/* Recomputed from the LIVE mode, not the prop: the prop is
                 derived upstream from the same stale `lessonGameData`, so after
                 a switch to a board game it still read START QUIZ. */}
             {starting
               ? t('hostView.creatingTournament')
-              : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
+              : !canStart
+                ? t('eduLive.lobby.waitingForStudents')
+                : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
           </button>
           </m.div>
         </div>

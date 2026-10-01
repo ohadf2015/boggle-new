@@ -19075,7 +19075,8 @@ const es = {
       "lessonFound": "Palabras de la lección: {{found}}/{{total}}",
       "wordOfRound": "Palabra de la ronda",
       "wordOfRoundEmpty": "La primera palabra larga se queda con este sitio",
-      "bestWordBy": "{{count}} letras · de {{name}}"
+      "bestWordBy": "{{count}} letras · de {{name}}",
+      "exitLabel": "Salir del juego"
     },
     "results": {
       "backToClass": "Volver a la clase",
@@ -19086,13 +19087,25 @@ const es = {
       "zeroBody": "Calentamiento hecho. La próxima ronda cuenta.",
       "zeroNoteTitle": "Nadie ha puntuado todavía",
       "zeroNoteHint": "Prueba con más tiempo o un tablero más fácil. Mismo código, nadie tiene que volver a entrar.",
-      "lineupTitle": "Quién jugó esta ronda"
+      "lineupTitle": "Quién jugó esta ronda",
+      "emptyTitle": "Ronda de práctica terminada",
+      "emptyHeadline": "Esta vez no jugó ningún estudiante",
+      "emptyBody": "Proyecta el código en la pizarra. La próxima ronda ya cuenta de verdad.",
+      "podiumLessonWords": "{{found}}/{{total}} palabras de la lección",
+      "noLessonTitle": "Esta ronda no salió ninguna palabra de la lección",
+      "noLessonBody": "Los puntos vinieron de otras palabras del tablero. Los mejores hallazgos de la clase:",
+      "noLessonBodyEmpty": "Los puntos vinieron de otras palabras del tablero.",
+      "noLessonHint": "Con un tablero más grande o más tiempo, las palabras de la lección tienen más sitio.",
+      "noLessonReteach": "Palabras de la lección por repasar"
     },
     "reteach": {
       "playNow": "Jugar ahora",
       "sendHome": "Mandar a casa",
       "printShare": "Imprimir y compartir",
       "googleClassroom": "Publicar en Google Classroom"
+    },
+    "lobby": {
+      "waitingForStudents": "Esperando a los alumnos"
     },
     "wordcraft": {
       "bingo": "¡BINGO!",

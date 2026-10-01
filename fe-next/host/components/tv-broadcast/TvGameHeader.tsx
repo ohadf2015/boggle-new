@@ -57,7 +57,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
   const showHeartbeat = urgencyLevel !== 'normal';
 
   return (
-    <div className={compact ? 'w-full px-4 py-1 md:py-3' : 'w-full px-4 py-3'}>
+    <div className={compact ? 'w-full px-4 py-1 md:py-3 md:medium-short:py-1' : 'w-full px-4 py-3'}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left: LIVE badge + Mode badge */}
         <m.div
@@ -105,7 +105,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
         </m.div>
 
         {/* Center: Timer with heartbeat pulse */}
-        <div data-testid="tv-timer-slot" className={compact ? 'flex-1 flex justify-center max-md:[zoom:0.6]' : 'flex-1 flex justify-center'}>
+        <div data-testid="tv-timer-slot" className={compact ? 'flex-1 flex justify-center max-md:[zoom:0.6] md:medium-short:[zoom:0.55] lg:[@media(min-height:851px)]:[zoom:1.2]' : 'flex-1 flex justify-center'}>
           {remainingTime !== null && (
             showHeartbeat ? (
               <m.div

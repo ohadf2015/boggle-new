@@ -3,7 +3,8 @@
 import { memo, useMemo, useState, useRef, useEffect } from 'react';
 import { fireConfetti } from '@/utils/confettiUtils';
 import type { Socket } from 'socket.io-client';
-import { Maximize, Minimize } from 'lucide-react';
+import { LogOut, Maximize, Minimize } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { m } from 'framer-motion';
 import TvTutorialOverlay, { TvHelpButton } from './tv-broadcast/TvTutorialOverlay';
 import TvJoinBar from './tv-broadcast/TvJoinBar';
@@ -282,6 +283,19 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
     </m.button>
   ) : null;
+  // The site header is gone during a live classroom round, so its confirmed exit moves into the join bar.
+  const exitButton = isClassroom && onExitRoom ? (
+    <button
+      type="button"
+      onClick={onExitRoom}
+      data-testid="tv-classroom-exit"
+      aria-label={t('eduLive.live.exitLabel')}
+      title={t('eduLive.live.exitLabel')}
+      className="bg-neo-black/80 hover:bg-neo-pink hover:text-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors active:translate-y-0.5 active:shadow-none focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+    >
+      <DirectionalIcon icon={LogOut} mirror className="w-6 h-6" />
+    </button>
+  ) : null;
   // Classroom: the fullscreen toggle rides inside the join bar so nothing floats over the code or QR.
   const joinBar = (
     <TvJoinBar
@@ -291,7 +305,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       language={roomLanguage}
       t={t}
       dense={isClassroom}
-      trailing={isClassroom ? fullscreenButton : undefined}
+      trailing={isClassroom ? <>{fullscreenButton}{exitButton}</> : undefined}
     />
   );
 
@@ -367,7 +381,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       <TvBattleBar classroom={classroomLive} players={leaderboardData} t={t} />
 
       {/* Momentum Ticker — auto-generated commentary */}
-      <div data-testid="tv-momentum-slot" className={isClassroom ? 'hidden md:block' : undefined}>
+      <div data-testid="tv-momentum-slot" className={isClassroom ? 'hidden md:block md:medium-short:hidden lg:[@media(min-height:851px)]:hidden' : undefined}>
         <TvMomentumTicker
           playerScores={playerScores}
           playerWordCounts={playerWordCounts}

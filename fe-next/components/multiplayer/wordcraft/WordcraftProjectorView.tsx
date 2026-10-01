@@ -152,7 +152,7 @@ export function WordcraftProjectorView({
           {/* 30 chips wrap to ~450px on a phone, so there they ride one sideways row. */}
           <div
             data-testid="lesson-targets-row"
-            className="flex min-w-0 flex-1 items-center gap-2 pb-1 max-md:flex-nowrap max-md:overflow-x-auto max-md:overscroll-x-contain max-md:[scrollbar-width:none] md:flex-wrap"
+            className="flex min-w-0 flex-1 items-center gap-2 pb-1 max-md:flex-nowrap max-md:overflow-x-auto max-md:overscroll-x-contain max-md:[scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,#000_80%,transparent)] max-md:rtl:[mask-image:linear-gradient(to_left,#000_80%,transparent)] md:flex-wrap"
           >
             {targets.map((target) => (
               <m.span

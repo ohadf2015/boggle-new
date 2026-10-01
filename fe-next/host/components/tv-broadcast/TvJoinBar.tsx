@@ -6,6 +6,7 @@ import { Users } from 'lucide-react';
 import { m } from 'framer-motion';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 import { tvJoinAddress } from '../../../lib/education/tvJoinAddress';
+import { cn } from '../../../lib/utils';
 
 interface TvJoinBarProps {
   gameCode: string;
@@ -46,7 +47,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       className="w-full bg-neo-purple border-b-4 border-neo-black relative z-40"
     >
-      <div className={dense ? 'max-w-7xl mx-auto px-3 py-2 md:px-4 md:py-4' : 'max-w-7xl mx-auto px-4 py-4 md:py-5'}>
+      <div className={dense ? 'max-w-7xl mx-auto px-3 py-2 md:px-4 md:py-4 md:medium-short:py-2' : 'max-w-7xl mx-auto px-4 py-4 md:py-5'}>
         {/* Main row: Join info + Code + QR */}
         {/* Wraps below md: on a teacher's phone the code + QR alone fill the
             row, so the join address takes its own line above them. */}
@@ -62,7 +63,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
             {/* The address must carry the code. A bare "lexiclash.live" has no
                 game-code input anywhere on it, so a student who cannot scan the
                 QR had the code and nowhere to type it. */}
-            <p className="text-neo-cream text-xl md:text-2xl lg:text-3xl font-black tracking-wide break-all">
+            <p className={cn('text-neo-cream text-xl md:text-2xl lg:text-3xl font-black tracking-wide break-all', dense && 'md:medium-short:text-xl lg:whitespace-nowrap lg:break-normal lg:text-[clamp(1rem,1.45vw,1.875rem)]')}>
               {tvJoinAddress(baseUrl, language, gameCode)}
             </p>
           </div>

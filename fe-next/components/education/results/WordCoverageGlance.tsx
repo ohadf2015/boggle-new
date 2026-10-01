@@ -80,6 +80,8 @@ export interface WordCoverageGlanceProps {
    * 595px viewport).
    */
   maxChips?: number;
+  /** Replaces the found/total meter with a plain heading, for a round where that meter would read 0 beside real points. */
+  heading?: string;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -95,9 +97,12 @@ export function WordCoverageGlance({
   classSwept,
   missedOnly = false,
   maxChips,
+  heading,
   t,
 }: WordCoverageGlanceProps) {
   const projector = size === 'projector';
+  // Under a heading the list shares its panel with other content, so it skips the 2xl wall upscale.
+  const wallXL = projector && heading === undefined;
   const [expanded, setExpanded] = useState(false);
   // A late joiner has no mastery row; treat them as having found nothing rather
   // than crashing or hiding the card.
@@ -162,88 +167,100 @@ export function WordCoverageGlance({
 
   return (
     <section className={projector ? 'h-full min-h-0 flex flex-col' : 'mb-4'}>
-      <div className="shrink-0 flex items-end gap-3 mb-2">
-        <span
-          className={cn(
-            'font-neo-display font-black leading-none tabular-nums',
-            // Gold is reserved for celebration, and a full sweep is the only
-            // thing on this card that earns it.
-            swept ? 'text-neo-yellow' : 'text-neo-lime',
-            projector ? 'text-7xl 2xl:text-9xl' : 'text-4xl'
-          )}
-        >
-          {found}
-          <span className={cn('text-neo-white/50', projector ? 'text-4xl 2xl:text-6xl' : 'text-2xl')}>
-            /{total}
-          </span>
-        </span>
+      {heading !== undefined ? (
         <p
-          className={cn(
-            'flex-1 text-neo-white font-neo-body font-bold leading-tight pb-1',
-            projector ? 'text-2xl 2xl:text-4xl' : 'text-sm'
-          )}
+          data-testid="coverage-heading"
+          dir="auto"
+          className={cn('shrink-0 mb-2 font-neo-display font-black uppercase tracking-wide text-neo-white/85', projector ? 'text-xl 2xl:text-2xl' : 'text-sm')}
         >
-          {isTeacher
-            ? t('education.results.classCoverage', { found, total })
-            : t('education.results.yourMastery', { found, total })}
+          {heading}
         </p>
+      ) : (
+        <>
+          <div className="shrink-0 flex items-end gap-3 mb-2">
+            <span
+              className={cn(
+                'font-neo-display font-black leading-none tabular-nums',
+                // Gold is reserved for celebration, and a full sweep is the only
+                // thing on this card that earns it.
+                swept ? 'text-neo-yellow' : 'text-neo-lime',
+                projector ? 'text-7xl 2xl:text-9xl' : 'text-4xl'
+              )}
+            >
+              {found}
+              <span className={cn('text-neo-white/50', projector ? 'text-4xl 2xl:text-6xl' : 'text-2xl')}>
+                /{total}
+              </span>
+            </span>
+            <p
+              className={cn(
+                'flex-1 text-neo-white font-neo-body font-bold leading-tight pb-1',
+                projector ? 'text-2xl 2xl:text-4xl' : 'text-sm'
+              )}
+            >
+              {isTeacher
+                ? t('education.results.classCoverage', { found, total })
+                : t('education.results.yourMastery', { found, total })}
+            </p>
 
-        {swept && (
-          <span
-            data-testid="coverage-sweep"
+            {swept && (
+              <span
+                data-testid="coverage-sweep"
+                className={cn(
+                  'shrink-0 flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black shadow-hard-sm',
+                  'bg-neo-yellow text-neo-black font-neo-display font-black uppercase tracking-wide',
+                  // Transform-only wobble on a tag — nothing large, nothing faded.
+                  'animate-neo-wobble motion-reduce:animate-none',
+                  projector ? 'px-4 py-2 text-2xl' : 'px-2.5 py-1 text-xs'
+                )}
+              >
+                <Sparkles className={projector ? 'w-6 h-6' : 'w-3.5 h-3.5'} aria-hidden />
+                {t('education.results.moment.sweepTag')}
+              </span>
+            )}
+          </div>
+
+          {/* The room's line. A student who found two of four gets no gold on
+              their own meter — and should not — but the class sweep is the one
+              celebration on this screen that is theirs too, so it lands on their
+              phone on the same beat it lands on the wall. Painted, never tweened. */}
+          {showClassLine && (
+            <p
+              data-testid="class-sweep-tag"
+              className={cn(
+                'mb-2 flex items-center gap-2 rounded-neo border-[2px] border-neo-black shadow-hard-sm',
+                'bg-neo-yellow text-neo-black font-neo-display font-black uppercase tracking-wide',
+                projector ? 'px-4 py-2 text-2xl' : 'px-3 py-1.5 text-xs'
+              )}
+            >
+              <Sparkles className={projector ? 'w-6 h-6 shrink-0' : 'w-4 h-4 shrink-0'} aria-hidden />
+              {t('education.results.moment.classSweptTag', { total: summary.totalWords })}
+            </p>
+          )}
+
+          <div
+            data-testid="coverage-meter"
+            role="progressbar"
+            aria-valuenow={found}
+            aria-valuemin={0}
+            aria-valuemax={total}
+            aria-label={t('education.results.coverageMeterLabel', { percent: pct })}
             className={cn(
-              'shrink-0 flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black shadow-hard-sm',
-              'bg-neo-yellow text-neo-black font-neo-display font-black uppercase tracking-wide',
-              // Transform-only wobble on a tag — nothing large, nothing faded.
-              'animate-neo-wobble motion-reduce:animate-none',
-              projector ? 'px-4 py-2 text-2xl' : 'px-2.5 py-1 text-xs'
+              'w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden mb-3',
+              projector ? 'h-8 2xl:h-10' : 'h-4'
             )}
           >
-            <Sparkles className={projector ? 'w-6 h-6' : 'w-3.5 h-3.5'} aria-hidden />
-            {t('education.results.moment.sweepTag')}
-          </span>
-        )}
-      </div>
-
-      {/* The room's line. A student who found two of four gets no gold on
-          their own meter — and should not — but the class sweep is the one
-          celebration on this screen that is theirs too, so it lands on their
-          phone on the same beat it lands on the wall. Painted, never tweened. */}
-      {showClassLine && (
-        <p
-          data-testid="class-sweep-tag"
-          className={cn(
-            'mb-2 flex items-center gap-2 rounded-neo border-[2px] border-neo-black shadow-hard-sm',
-            'bg-neo-yellow text-neo-black font-neo-display font-black uppercase tracking-wide',
-            projector ? 'px-4 py-2 text-2xl' : 'px-3 py-1.5 text-xs'
-          )}
-        >
-          <Sparkles className={projector ? 'w-6 h-6 shrink-0' : 'w-4 h-4 shrink-0'} aria-hidden />
-          {t('education.results.moment.classSweptTag', { total: summary.totalWords })}
-        </p>
+            <div
+              data-testid="coverage-fill"
+              className={cn(
+                'h-full transition-[width] duration-700 ease-out motion-reduce:transition-none',
+                swept ? 'bg-neo-yellow' : 'bg-neo-lime'
+              )}
+              style={{ width: `${fill ? pct : 0}%` }}
+            />
+          </div>
+        </>
       )}
-
-      <div
-        data-testid="coverage-meter"
-        role="progressbar"
-        aria-valuenow={found}
-        aria-valuemin={0}
-        aria-valuemax={total}
-        aria-label={t('education.results.coverageMeterLabel', { percent: pct })}
-        className={cn(
-          'w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden mb-3',
-          projector ? 'h-8 2xl:h-10' : 'h-4'
-        )}
-      >
-        <div
-          data-testid="coverage-fill"
-          className={cn(
-            'h-full transition-[width] duration-700 ease-out motion-reduce:transition-none',
-            swept ? 'bg-neo-yellow' : 'bg-neo-lime'
-          )}
-          style={{ width: `${fill ? pct : 0}%` }}
-        />
-      </div>
 
       <ul
         data-testid="coverage-words"
@@ -266,7 +283,7 @@ export function WordCoverageGlance({
               data-placed={unplaced ? 'false' : 'true'}
               className={cn(
                 'flex items-center gap-1.5 rounded-neo font-bold',
-                projector ? 'px-4 py-2.5 text-2xl 2xl:px-6 2xl:py-4 2xl:text-5xl' : 'px-3 py-1.5 text-sm',
+                projector ? cn('px-4 py-2.5 text-2xl', wallXL && '2xl:px-6 2xl:py-4 2xl:text-5xl') : 'px-3 py-1.5 text-sm',
                 hit && 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
                 !hit && !unplaced && 'border-[2px] border-neo-cream bg-neo-navy-light text-neo-white/60',
                 // A word the board never carried is still a word a teacher
@@ -277,15 +294,15 @@ export function WordCoverageGlance({
               )}
             >
               {hit ? (
-                <Check className={projector ? 'w-6 h-6 2xl:w-11 2xl:h-11' : 'w-4 h-4'} aria-hidden />
+                <Check className={projector ? cn('w-6 h-6', wallXL && '2xl:w-11 2xl:h-11') : 'w-4 h-4'} aria-hidden />
               ) : unplaced ? (
-                <EyeOff className={projector ? 'w-6 h-6 2xl:w-11 2xl:h-11' : 'w-4 h-4'} aria-hidden />
+                <EyeOff className={projector ? cn('w-6 h-6', wallXL && '2xl:w-11 2xl:h-11') : 'w-4 h-4'} aria-hidden />
               ) : (
-                <X className={projector ? 'w-6 h-6 2xl:w-11 2xl:h-11' : 'w-4 h-4'} aria-hidden />
+                <X className={projector ? cn('w-6 h-6', wallXL && '2xl:w-11 2xl:h-11') : 'w-4 h-4'} aria-hidden />
               )}
               <span>{entry.word}</span>
               {isTeacher && entry.foundBy.length > 0 && (
-                <span className={cn('ms-1 opacity-70', projector ? 'text-lg 2xl:text-2xl' : 'text-xs')}>
+                <span className={cn('ms-1 opacity-70', projector ? cn('text-lg', wallXL && '2xl:text-2xl') : 'text-xs')}>
                   {entry.foundBy.length}
                 </span>
               )}

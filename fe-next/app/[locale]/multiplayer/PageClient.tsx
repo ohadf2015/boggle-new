@@ -146,7 +146,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             // Gated on `gameActive`, NOT `isActive`: `onJoined` sets `isActive`
             // the moment the host lands in the LOBBY, so the old predicate hid
             // the join code exactly when the teacher needed it on a projector.
-            hideClassroomChrome({ gameActive: gameActive || quizOwnsScreen, showResults }) ? null : (
+            hideClassroomChrome({ gameActive: gameActive || quizOwnsScreen || teacherStrip.visible, showResults }) ? null : (
               <>
                 <EducationHeader
                   showBackButton

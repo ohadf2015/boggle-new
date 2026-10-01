@@ -31,6 +31,7 @@ import ClassroomTvResults from '@/components/education/results/ClassroomTvResult
 import { PROJECTOR_RESULTS_Z } from '@/lib/education/roundEndLayer';
 import { useTvFullscreen } from '../../hooks/useTvFullscreen';
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import type { PlayerResult } from '@/types/components';
 
 export interface ClassroomTvResultsScreenProps {
   summary: ClassroomSummary;
@@ -47,6 +48,7 @@ export interface ClassroomTvResultsScreenProps {
   /** The host's confirmed exit (room closes, teacher lands on HQ). */
   onExitRoom?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  players?: PlayerResult[];
 }
 
 export function ClassroomTvResultsScreen({
@@ -55,6 +57,7 @@ export function ClassroomTvResultsScreen({
   onClose,
   onExitRoom,
   t,
+  players,
 }: ClassroomTvResultsScreenProps) {
   const { isFullscreen, toggleFullscreen, isSupported } = useTvFullscreen({ enabled: true });
 
@@ -108,6 +111,7 @@ export function ClassroomTvResultsScreen({
           onRematch={onRematch}
           onChangeGame={onClose}
           onBackToClass={onExitRoom}
+          players={players}
           t={t}
         />
       </div>

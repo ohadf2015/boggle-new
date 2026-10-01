@@ -12,7 +12,7 @@
 
 'use client';
 
-import type { ReactNode } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 import Link from 'next/link';
 import {
   Check,
@@ -45,9 +45,16 @@ export interface ReteachActionsProps {
    * `stack` (default, the phone card): the pink reteach round is its own
    * button and the rest fold below it. `more` (the projector wall): Play again
    * is the wall's ONE loud action, so the reteach round folds in too, behind a
-   * single quiet "More" control whose panel opens upward over the recap.
+   * single quiet "More" control: its panel opens up on the wall, down on a phone.
    */
   variant?: 'stack' | 'more';
+}
+
+function revealOpenPanel(event: SyntheticEvent<HTMLDetailsElement>) {
+  const details = event.currentTarget;
+  if (!details.open) return;
+  const calm = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  details.querySelector('[data-testid="reteach-more-panel"]')?.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
 }
 
 export function ReteachActions({ links, onReteach, t, variant = 'stack' }: ReteachActionsProps) {
@@ -57,7 +64,7 @@ export function ReteachActions({ links, onReteach, t, variant = 'stack' }: Retea
       // "More" (the caller makes that row `relative`), never to this small
       // button. Anchored to the button, a 40rem panel hung off the right edge
       // of a 1024–1366px wall and took the reteach round with it.
-      <details data-testid="reteach-more" className="group static">
+      <details data-testid="reteach-more" className="group static" onToggle={revealOpenPanel}>
         <summary
           data-testid="reteach-more-actions"
           className={cn(
@@ -69,11 +76,11 @@ export function ReteachActions({ links, onReteach, t, variant = 'stack' }: Retea
         >
           <MoreHorizontal className="size-5 shrink-0 lg:size-6 min-[2200px]:size-9" aria-hidden />
           {t('common.more')}
-          <ChevronUp className="size-4 shrink-0 transition-transform group-open:rotate-180 lg:size-5" aria-hidden />
+          <ChevronUp data-testid="reteach-more-chevron" className="size-4 shrink-0 transition-transform group-open:rotate-180 max-lg:rotate-180 max-lg:group-open:rotate-0 lg:size-5" aria-hidden />
         </summary>
         <div
           data-testid="reteach-more-panel"
-          className="absolute inset-x-0 bottom-full z-30 mb-2 max-h-[min(60dvh,34rem)] overflow-y-auto overscroll-contain rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard-lg"
+          className="absolute inset-x-0 z-30 max-lg:top-full max-lg:bottom-auto max-lg:mt-2 lg:bottom-full lg:mb-2 max-h-[min(60dvh,34rem)] overflow-y-auto overscroll-contain rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard-lg"
         >
           <p className="mb-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream lg:text-base">
             {t('education.results.moreWaysToReteach')}

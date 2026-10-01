@@ -68,10 +68,14 @@ import { ResultsPrimaryActions } from './ResultsPrimaryActions';
 import { cn } from '@/lib/utils';
 import { roundOutcome } from './roundOutcome';
 import { ZeroRoundNote } from './ZeroRoundNote';
+import { EmptyRoundCard } from './EmptyRoundCard';
 import { useReteachLinks } from './useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { orderPodiumByScore } from './podiumOrder';
 import { useIsPhoneRecap } from './useIsPhoneRecap';
+import { classFoundWords, lessonWordsLanded, podiumLessonCount } from './lessonTally';
+import { NoLessonWordsPanel } from './NoLessonWordsPanel';
+import type { PlayerResult } from '@/types/components';
 
 export interface ClassroomTvResultsProps {
   summary: ClassroomSummary;
@@ -88,6 +92,8 @@ export interface ClassroomTvResultsProps {
   onChangeGame?: () => void;
   /** The host's confirmed exit to the teacher HQ. */
   onBackToClass?: () => void;
+  /** Final scores, for the words the class really found when no lesson word landed. */
+  players?: PlayerResult[];
 }
 
 export function ClassroomTvResults({
@@ -97,6 +103,7 @@ export function ClassroomTvResults({
   revealSettled = false,
   onChangeGame,
   onBackToClass,
+  players,
 }: ClassroomTvResultsProps) {
   // This screen only mounts for the non-playing classroom host. The inputs
   // are that fact. The predicate still calls hostLeavesProjectorRecap, so if
@@ -127,15 +134,17 @@ export function ClassroomTvResults({
   useOverlayQuietZoneClaim(true, 'classroom-tv-results');
 
   const phone = useIsPhoneRecap();
-  const podium: PodiumEntry[] = orderPodiumByScore(podiumWithoutHost(summary.podium, summary.teacherName).map((p) => ({
-    username: p.username,
-    score: p.score,
-    rank: p.rank,
-    detail:
-      typeof p.wordsFound === 'number' && typeof p.totalWords === 'number'
-        ? t('education.results.podium.wordsFound', { found: p.wordsFound, total: p.totalWords })
-        : undefined,
-  })));
+  // Score counts every valid word, lesson counts only lesson words: a "0 of 30" beside 44 points read as a lie.
+  const landed = lessonWordsLanded(summary);
+  const podium: PodiumEntry[] = orderPodiumByScore(podiumWithoutHost(summary.podium, summary.teacherName).map((p) => {
+    const lesson = podiumLessonCount(p, landed);
+    return {
+      username: p.username,
+      score: p.score,
+      rank: p.rank,
+      detail: lesson ? t('eduLive.results.podiumLessonWords', lesson) : undefined,
+    };
+  }));
   const hostKey = (summary.teacherName ?? '').trim().toLowerCase();
   const studentCount = Object.keys(summary.masteryByPlayer ?? {}).filter(
     (name) => name.trim().toLowerCase() !== hostKey
@@ -173,6 +182,7 @@ export function ClassroomTvResults({
   // this same array, so gold and "winner" can never name two different
   // children (Pitfall Class 3). PodiumStage re-sorts defensively as well.
   const winnerBeat = outcome.celebrate && isRevealed(1, stage);
+  const pointsWithoutLesson = !landed && outcome.celebrate;
 
   return (
     <div
@@ -186,7 +196,9 @@ export function ClassroomTvResults({
     >
       <header className="shrink-0 max-lg:mt-auto flex flex-wrap items-baseline justify-center gap-x-4 px-12 md:px-16">
         <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-lg md:text-2xl min-[2200px]:text-5xl">
-          {outcome.celebrate ? t('education.results.podium.title') : t('eduLive.results.lineupTitle')}
+          {outcome.celebrate
+            ? t('education.results.podium.title')
+            : t(outcome.kind === 'empty' ? 'eduLive.results.emptyTitle' : 'eduLive.results.lineupTitle')}
         </p>
         <p className="font-neo-body font-bold text-neo-white/80 text-sm md:text-xl min-[2200px]:text-4xl truncate max-w-full">
           {summary.lessonNames.join(' · ')}
@@ -221,6 +233,7 @@ export function ClassroomTvResults({
               CLASS's chest on the same stage. Width is capped by the viewport
               height so the art, the spotlight and the header all fit a 16:9
               wall without the column growing a scrollbar. */}
+          {outcome.kind === 'empty' && <EmptyRoundCard t={t} />}
           {podium.length > 0 && (
             <PodiumStage
               entries={podium}
@@ -229,12 +242,14 @@ export function ClassroomTvResults({
               t={t}
               className="lg:w-[min(100%,calc((100dvh_-_19rem)*1.768))]"
             >
-              <ClassChest
-                found={summary.classFoundCount}
-                total={summary.totalWords}
-                open={winnerBeat}
-                t={t}
-              />
+              {landed && (
+                <ClassChest
+                  found={summary.classFoundCount}
+                  total={summary.totalWords}
+                  open={winnerBeat}
+                  t={t}
+                />
+              )}
               {!outcome.celebrate && <ZeroRoundNote t={t} />}
             </PodiumStage>
           )}
@@ -285,18 +300,38 @@ export function ClassroomTvResults({
                 per-player mastery lookup is never consulted. Only the words
                 still to teach are printed, capped — the wall is for the next
                 lesson, not for a register of what already went right. */}
-            <WordCoverageGlance
-              summary={summary}
-              username=""
-              isTeacher
-              neverPlaced={neverPlaced}
-              size={phone ? 'card' : 'projector'}
-              fill={sweepReached(stage)}
-              celebrate={sweepReached(stage)}
-              missedOnly
-              maxChips={phone ? 6 : 12}
-              t={t}
-            />
+            {!pointsWithoutLesson ? (
+              <WordCoverageGlance
+                summary={summary}
+                username=""
+                isTeacher
+                neverPlaced={neverPlaced}
+                size={phone ? 'card' : 'projector'}
+                fill={sweepReached(stage)}
+                celebrate={sweepReached(stage)}
+                missedOnly
+                maxChips={phone ? 6 : 12}
+                t={t}
+              />
+            ) : (
+              <NoLessonWordsPanel
+                words={classFoundWords(players, { exclude: [summary.teacherName], limit: phone ? 6 : 8 })}
+                size={phone ? 'card' : 'projector'}
+                t={t}
+              >
+                <WordCoverageGlance
+                  summary={summary}
+                  username=""
+                  isTeacher
+                  neverPlaced={neverPlaced}
+                  size={phone ? 'card' : 'projector'}
+                  missedOnly
+                  maxChips={phone ? 4 : 8}
+                  heading={t('eduLive.results.noLessonReteach')}
+                  t={t}
+                />
+              </NoLessonWordsPanel>
+            )}
           </section>
 
           <HostNextActions

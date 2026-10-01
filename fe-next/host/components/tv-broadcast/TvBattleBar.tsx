@@ -60,7 +60,7 @@ const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t }) => {
           {t('tvBroadcast.classroom.round', { number: classroom.round })}
         </span>
         {classroom.lessonName && (
-          <span className="font-neo-display font-bold text-neo-cream text-base sm:text-lg md:text-3xl truncate min-w-0">
+          <span className="font-neo-display font-bold text-neo-cream text-base sm:text-lg md:text-3xl md:medium-short:text-2xl truncate min-w-0">
             {classroom.lessonName}
           </span>
         )}

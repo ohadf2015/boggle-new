@@ -6,6 +6,7 @@
  */
 
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import type { PlayerResult } from '@/types/components';
 
 const WORDS = [
   'journey', 'crystal', 'harvest', 'thunder', 'whisper', 'island', 'forest',
@@ -18,9 +19,10 @@ const NAMES = [
   'Kai', 'Mila', 'Theo', 'Ella', 'Ben', 'Lior', 'Sara', 'Finn', 'Nora', 'Ivo',
 ];
 
-export type PreviewOutcome = 'winner' | 'zero' | 'solo' | 'tie';
+export type PreviewOutcome = 'winner' | 'zero' | 'solo' | 'tie' | 'nolesson';
 
 export function sampleClassroomSummary(variant: PreviewOutcome = 'winner'): ClassroomSummary {
+  if (variant === 'nolesson') return noLessonSummary();
   if (variant !== 'winner') return outcomeSummary(variant);
   const coverage = WORDS.map((word, i) => ({
     word,
@@ -50,7 +52,38 @@ export function sampleClassroomSummary(variant: PreviewOutcome = 'winner'): Clas
   };
 }
 
-function outcomeSummary(variant: Exclude<PreviewOutcome, 'winner'>): ClassroomSummary {
+function noLessonSummary(): ClassroomSummary {
+  const total = WORDS.length;
+  const scores: Array<[string, number]> = [['Maya', 44], ['Noam', 5], ['Liam', 0]];
+  return {
+    teacherName: 'Ms. Rivera',
+    lessonNames: ['Weekly Vocabulary'],
+    lessonIds: ['preview-lesson'],
+    totalWords: total,
+    coverage: WORDS.map((word) => ({ word, foundBy: [] })),
+    missedWords: [...WORDS],
+    neverPlacedWords: WORDS.slice(0, 10),
+    classFoundCount: 0,
+    masteryByPlayer: Object.fromEntries(scores.map(([name]) => [name, { found: 0, total }])),
+    podium: scores.map(([username, score], i) => ({ username, score, rank: i + 1, wordsFound: 0, totalWords: total })),
+  };
+}
+
+const FOUND: Record<string, string[]> = {
+  Maya: ['stone', 'notes', 'tones', 'nest', 'rest', 'tons', 'note', 'rose'],
+  Noam: ['tons', 'one', 'net'],
+};
+
+export function samplePreviewPlayers(variant: PreviewOutcome): PlayerResult[] {
+  if (variant !== 'nolesson') return [];
+  return Object.entries(FOUND).map(([username, words]) => ({
+    username,
+    score: 0,
+    allWords: words.map((word) => ({ word, score: word.length, validated: true, isDuplicate: false })),
+  }));
+}
+
+function outcomeSummary(variant: Exclude<PreviewOutcome, 'winner' | 'nolesson'>): ClassroomSummary {
   const teacherName = 'Ms. Rivera';
   const found = variant === 'zero' ? 0 : variant === 'solo' ? 3 : 4;
   const coverage = WORDS.map((word, i) => ({

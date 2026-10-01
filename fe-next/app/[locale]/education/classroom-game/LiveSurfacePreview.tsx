@@ -6,7 +6,7 @@
  *
  *   /en/education/classroom-game?preview=podium     — the projector results podium (animated reveal)
  *   /en/education/classroom-game?preview=podium&settled=1 — the same podium, reveal already finished
- *   &outcome=zero|solo|tie — the honest round-end variants (nobody scored, one player, a shared first)
+ *   &outcome=zero|solo|tie|nolesson — the honest round-end variants (nobody scored, one player, a shared first, points but no lesson word)
  *   /en/education/classroom-game?preview=projector  — the projector lobby, students popping in
  *   /en/education/classroom-game?preview=waiting    — a student's waiting-for-teacher stage
  *   (&count=N sets the projector roster size, default 12)
@@ -29,6 +29,7 @@ import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWai
 import { EducationHeader } from '@/components/education/EducationHeader';
 import {
   sampleClassroomSummary,
+  samplePreviewPlayers,
   sampleProjectorStudents,
   type PreviewOutcome,
 } from '@/components/education/results/previewFixtures';
@@ -42,8 +43,9 @@ function PodiumPreview() {
   const settled = params?.get('settled') === '1';
   const outcomeParam = params?.get('outcome');
   const outcome: PreviewOutcome =
-    outcomeParam === 'zero' || outcomeParam === 'solo' || outcomeParam === 'tie' ? outcomeParam : 'winner';
+    outcomeParam === 'zero' || outcomeParam === 'solo' || outcomeParam === 'tie' || outcomeParam === 'nolesson' ? outcomeParam : 'winner';
   const summary = useMemo(() => sampleClassroomSummary(outcome), [outcome]);
+  const players = useMemo(() => samplePreviewPlayers(outcome), [outcome]);
   return (
     <div data-preview="podium" className="fixed inset-0 z-[80] overflow-hidden bg-neo-navy p-3 md:p-6">
       <ClassroomTvResults
@@ -52,6 +54,7 @@ function PodiumPreview() {
         onChangeGame={() => toast('Preview: switch game')}
         onBackToClass={() => toast('Preview: back to class')}
         t={t}
+        players={players}
         revealSettled={settled}
       />
     </div>

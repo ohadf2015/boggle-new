@@ -123,7 +123,6 @@ const TvResultsView = memo<TvResultsViewProps>(({
   const { sfxMuted, sfxVolume } = useSoundEffects();
   const { isMuted: musicMuted, audioUnlocked } = useMusic();
 
-  // Fullscreen mode support
   const { isFullscreen, toggleFullscreen, isSupported: isFullscreenSupported } = useTvFullscreen({
     enabled: true,
   });
@@ -205,7 +204,6 @@ const TvResultsView = memo<TvResultsViewProps>(({
     };
   }, []);
 
-  // Prepare data for sub-components
   const podiumPlayers = useMemo(() => {
     return filteredScores.slice(0, 3).map(p => ({
       username: p.username,
@@ -248,13 +246,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
   // The general game's results are untouched below.
   if (classroomSummary) {
     return (
-      <ClassroomTvResultsScreen
-        summary={classroomSummary}
-        onRematch={onStartNewGame}
-        onClose={onClose}
-        onExitRoom={onExitRoom}
-        t={t}
-      />
+      <ClassroomTvResultsScreen summary={classroomSummary} players={finalScores} onRematch={onStartNewGame} onClose={onClose} onExitRoom={onExitRoom} t={t} />
     );
   }
 
