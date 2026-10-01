@@ -18,6 +18,8 @@ interface TvGameHeaderProps {
   gameMode?: string | null;
   wordHuntTargetLength?: number;
   wordHuntAliveCount?: number;
+  /** Classroom host on a phone: a smaller timer so the leaderboard stays on screen. */
+  compact?: boolean;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -48,13 +50,14 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
   gameMode,
   wordHuntTargetLength = 0,
   wordHuntAliveCount = 0,
+  compact = false,
   t,
 }) => {
   const totalTimeSeconds = timerValue * 60;
   const showHeartbeat = urgencyLevel !== 'normal';
 
   return (
-    <div className="w-full px-4 py-3">
+    <div className={compact ? 'w-full px-4 py-1 md:py-3' : 'w-full px-4 py-3'}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left: LIVE badge + Mode badge */}
         <m.div
@@ -102,7 +105,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
         </m.div>
 
         {/* Center: Timer with heartbeat pulse */}
-        <div className="flex-1 flex justify-center">
+        <div data-testid="tv-timer-slot" className={compact ? 'flex-1 flex justify-center max-md:[zoom:0.6]' : 'flex-1 flex justify-center'}>
           {remainingTime !== null && (
             showHeartbeat ? (
               <m.div

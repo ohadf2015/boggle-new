@@ -6,6 +6,7 @@
  *
  *   /en/education/classroom-game?preview=podium     — the projector results podium (animated reveal)
  *   /en/education/classroom-game?preview=podium&settled=1 — the same podium, reveal already finished
+ *   &outcome=zero|solo|tie — the honest round-end variants (nobody scored, one player, a shared first)
  *   /en/education/classroom-game?preview=projector  — the projector lobby, students popping in
  *   /en/education/classroom-game?preview=waiting    — a student's waiting-for-teacher stage
  *   (&count=N sets the projector roster size, default 12)
@@ -26,7 +27,11 @@ import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
 import Avatar from '@/components/Avatar';
 import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
 import { EducationHeader } from '@/components/education/EducationHeader';
-import { sampleClassroomSummary, sampleProjectorStudents } from '@/components/education/results/previewFixtures';
+import {
+  sampleClassroomSummary,
+  sampleProjectorStudents,
+  type PreviewOutcome,
+} from '@/components/education/results/previewFixtures';
 
 export type LiveSurfacePreviewKind = 'podium' | 'projector' | 'waiting';
 
@@ -35,12 +40,17 @@ function PodiumPreview() {
   const params = useSearchParams();
   // `&settled=1` skips the drumroll so a static capture shows the winner on #1.
   const settled = params?.get('settled') === '1';
-  const summary = useMemo(() => sampleClassroomSummary(), []);
+  const outcomeParam = params?.get('outcome');
+  const outcome: PreviewOutcome =
+    outcomeParam === 'zero' || outcomeParam === 'solo' || outcomeParam === 'tie' ? outcomeParam : 'winner';
+  const summary = useMemo(() => sampleClassroomSummary(outcome), [outcome]);
   return (
-    <div className="fixed inset-0 z-[80] overflow-hidden bg-neo-navy p-3 md:p-6">
+    <div data-preview="podium" className="fixed inset-0 z-[80] overflow-hidden bg-neo-navy p-3 md:p-6">
       <ClassroomTvResults
         summary={summary}
         onRematch={() => toast('Preview: rematch')}
+        onChangeGame={() => toast('Preview: switch game')}
+        onBackToClass={() => toast('Preview: back to class')}
         t={t}
         revealSettled={settled}
       />

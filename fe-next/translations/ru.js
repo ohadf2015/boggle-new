@@ -18596,7 +18596,46 @@ const ru = {
       "total": "Итого",
       "player": "Игрок"
     }
-  }
+  },
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "Завершить игру для класса?",
+      "body": "Комната закроется для всех учеников, а вы вернётесь на главную класса.",
+      "stay": "Продолжить игру",
+      "confirm": "Завершить"
+    },
+    "live": {
+      "panelTitle": "Раунд в эфире",
+      "wordsFound": "найдено слов",
+      "lessonFound": "Слова урока: {{found}}/{{total}}",
+      "wordOfRound": "Слово раунда",
+      "wordOfRoundEmpty": "Первое длинное слово займёт это место",
+      "bestWordBy": "Длина {{count}} · {{name}}"
+    },
+    "results": {
+      "backToClass": "Назад к классу",
+      "switchGame": "Сменить игру",
+      "soloTitle": "Соло-раунд!",
+      "tieTitle": "Ничья!",
+      "zeroTitle": "В этом раунде без очков",
+      "zeroBody": "Разминка окончена. Следующий раунд — всерьёз.",
+      "zeroNoteTitle": "Пока никто не набрал очков",
+      "zeroNoteHint": "Попробуйте таймер подольше или поле попроще. Код тот же, заново входить не нужно.",
+      "lineupTitle": "Кто играл в раунде"
+    },
+    "reteach": {
+      "playNow": "Сыграть сейчас",
+      "sendHome": "Задать на дом",
+      "printShare": "Печать и ссылка",
+      "googleClassroom": "Опубликовать в Google Classroom"
+    },
+    "wordcraft": {
+      "bingo": "БИНГО!",
+      "waiting": "Ждём первое слово…"
+    }
+  },
+  // @eduLive:end
 };
 
 export { ru };

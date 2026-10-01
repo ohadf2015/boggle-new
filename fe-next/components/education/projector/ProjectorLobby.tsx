@@ -13,6 +13,7 @@ import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { canStartProjectorRound } from './projectorLobbyModel';
 import { LobbyModeSwitcher } from '@/components/education/lobby/LobbyModeSwitcher';
+import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 
 interface ProjectorLobbyProps {
@@ -106,7 +107,11 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
    * in-place switch it still described the old game, and the chips said
    * "10 · Questions" beside a BLAST room (measured live 2026-09-11).
    */
-  const [switchedMode, setSwitchedMode] = useState<ClassroomGameMode | null>(null);
+  // The shell reads lessonGameData once at mount, so a lobby remounted after a round would revert to the launch mode.
+  const [switchedMode, setSwitchedMode] = useState<ClassroomGameMode | null>(() => {
+    const local = readLocalGameMode();
+    return local && local !== classroomGameMode ? local : null;
+  });
   const mode: ClassroomGameMode = switchedMode ?? classroomGameMode ?? liveGame?.gameMode ?? 'classic';
   const isQuiz = mode === VOCAB_QUIZ_MODE;
   const settings = liveGame?.settings ?? null;

@@ -4,7 +4,7 @@ import { memo, useMemo, useState, useRef, useEffect } from 'react';
 import { fireConfetti } from '@/utils/confettiUtils';
 import type { Socket } from 'socket.io-client';
 import { Maximize, Minimize } from 'lucide-react';
-import { AnimatePresence, m } from 'framer-motion';
+import { m } from 'framer-motion';
 import TvTutorialOverlay, { TvHelpButton } from './tv-broadcast/TvTutorialOverlay';
 import TvJoinBar from './tv-broadcast/TvJoinBar';
 import TvGameHeader from './tv-broadcast/TvGameHeader';
@@ -24,6 +24,10 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { VocabQuizHostView } from '@/components/education/vocabQuiz/VocabQuizHostView';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { TEACHER_CONTROLS_INSET } from '@/components/education/controls/teacherBarInset';
+import { ClassroomLivePanel } from '@/components/education/projector/ClassroomLivePanel';
+import TvRoundFxLayers from './tv-broadcast/TvRoundFxLayers';
+import TvWordcraftBroadcast from './tv-broadcast/TvWordcraftBroadcast';
+import TvBodyScroller from './tv-broadcast/TvBodyScroller';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import {
   useGameMode,
@@ -41,6 +45,8 @@ const MODE_BACKGROUNDS: Record<string, string> = {
   blast: '/images/tv-broadcast/bg-blast-volcano.png',
   'word-hunt': '/images/tv-broadcast/bg-wordhunt-jungle.png',
 };
+
+const EMPTY_WORDS: string[] = [];
 
 // ==================== Types ====================
 
@@ -83,6 +89,10 @@ interface TvBroadcastViewProps {
   classroomLive?: ClassroomLiveContext | null;
   /** Quiz finale "Play Again" — the host's rematch; without it the teacher is stranded. */
   onQuizPlayAgain?: () => void;
+  /** Classroom only: the lesson's words, for the live "lesson words found" meter. */
+  lessonWords?: string[];
+  /** Classroom only: the host's confirmed exit, offered on the quiz finale. */
+  onExitRoom?: () => void;
 }
 
 // ==================== Component ====================
@@ -122,6 +132,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   fireRoundRemaining = 0,
   classroomLive = null,
   onQuizPlayAgain,
+  lessonWords = EMPTY_WORDS,
+  onExitRoom,
 }) => {
   // Mode-overlay state read directly from store — keeps HostView from
   // re-rendering on word-hunt updates when the host isn't using TV broadcast.
@@ -246,20 +258,55 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           joinCode={gameCode}
           playerCount={leaderboardData.length}
           onPlayAgain={onQuizPlayAgain}
+          onBackToClass={onExitRoom}
           t={t}
         />
       </div>
     );
   }
 
+  const isClassroom = !!classroomLive;
+  const roomWordTotal = leaderboardData.reduce((sum, p) => sum + p.wordCount, 0);
+  const fullscreenButton = showFullscreenButton ? (
+    <m.button
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={toggleFullscreen}
+      data-testid="tv-fullscreen-toggle"
+      className="bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
+      title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+      aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+    >
+      {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
+    </m.button>
+  ) : null;
+  // Classroom: the fullscreen toggle rides inside the join bar so nothing floats over the code or QR.
+  const joinBar = (
+    <TvJoinBar
+      gameCode={gameCode}
+      roomName={roomName}
+      playerCount={leaderboardData.length}
+      language={roomLanguage}
+      t={t}
+      dense={isClassroom}
+      trailing={isClassroom ? fullscreenButton : undefined}
+    />
+  );
+
+  if (gameMode === 'wordcraft') {
+    return <TvWordcraftBroadcast joinBar={joinBar} socket={socket} leaderboard={leaderboardData} remainingTime={remainingTime} t={t} />;
+  }
+
   return (
     <div
-      className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden relative"
+      className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden relative isolate"
       style={TEACHER_CONTROLS_INSET}
     >
-      {/* Dynamic mode background */}
+      {/* Mode art at -z-10 inside an isolated root: under the board, never a 60% navy veil over it. */}
       {gameMode && MODE_BACKGROUNDS[gameMode] && (
-        <div className="absolute inset-0 z-0" aria-hidden="true">
+        <div data-testid="tv-mode-backdrop" className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
           <Image
             src={MODE_BACKGROUNDS[gameMode]}
             alt=""
@@ -273,81 +320,21 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         </div>
       )}
 
-      {/* Earthquake cracks overlay */}
-      <AnimatePresence>
-        {earthquakeState === 'shaking' && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-15 pointer-events-none mix-blend-screen"
-            aria-hidden="true"
-          >
-            <Image
-              src="/images/tv-broadcast/fx-earthquake-cracks.png"
-              alt=""
-              fill
-              className="object-cover"
-              sizes="100vw"
-            />
-          </m.div>
-        )}
-      </AnimatePresence>
+      <TvRoundFxLayers
+        earthquakeShaking={earthquakeState === 'shaking'}
+        bgTintClass={bgTintClass}
+        showFinalMinuteBanner={showFinalMinuteBanner}
+        fireRoundActive={fireRoundActive}
+        t={t}
+      />
 
-      {/* Background tint overlay for final minute urgency */}
-      {bgTintClass && (
-        <div
-          className={`absolute inset-0 ${bgTintClass} pointer-events-none z-10 transition-colors duration-1000`}
-          data-testid="urgency-tint"
-        />
+      {/* Top Right Controls: Help + Fullscreen (arcade; a classroom carries fullscreen in the join bar) */}
+      {!isClassroom && (
+        <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+          <TvHelpButton onClick={handleShowTutorial} t={t} />
+          {fullscreenButton}
+        </div>
       )}
-
-      {/* Final Minute Banner */}
-      <AnimatePresence>
-        {showFinalMinuteBanner && (
-          <m.div
-            initial={{ y: -80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -80, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="absolute top-16 left-1/2 -translate-x-1/2 z-40 bg-neo-red text-neo-cream px-8 py-4 rounded-neo border-3 border-neo-black shadow-hard-lg"
-            data-testid="final-minute-banner"
-          >
-            <p className="font-black text-2xl uppercase tracking-wider text-center">
-              {t('tvBroadcast.notifications.finalMinute')}
-            </p>
-            <p className="text-sm font-bold text-center opacity-80">
-              {t('tvBroadcast.notifications.everySecondCounts')}
-            </p>
-          </m.div>
-        )}
-      </AnimatePresence>
-
-      {/* Top Right Controls: Help + Fullscreen */}
-      <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-        {/* Tutorial Help Button */}
-        <TvHelpButton onClick={handleShowTutorial} t={t} />
-
-        {/* Fullscreen Toggle Button - Hidden on CrazyGames (they manage fullscreen) */}
-        {showFullscreenButton && (
-          <m.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleFullscreen}
-            className="bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
-            title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
-            aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
-          >
-            {isFullscreen ? (
-              <Minimize className="w-6 h-6" />
-            ) : (
-              <Maximize className="w-6 h-6" />
-            )}
-          </m.button>
-        )}
-      </div>
 
       {/* Join Bar (Kahoot-style) - Always visible, even in fullscreen */}
       <m.div
@@ -355,17 +342,13 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 380, damping: 26 }}
       >
-        <TvJoinBar
-          gameCode={gameCode}
-          roomName={roomName}
-          playerCount={leaderboardData.length}
-          language={roomLanguage}
-          t={t}
-        />
+        {joinBar}
       </m.div>
 
+      <TvBodyScroller>
       {/* Game Header with Timer - Always visible */}
       <TvGameHeader
+        compact={isClassroom}
         remainingTime={remainingTime}
         timerValue={timerValue}
         fireRoundActive={fireRoundActive}
@@ -384,60 +367,25 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       <TvBattleBar classroom={classroomLive} players={leaderboardData} t={t} />
 
       {/* Momentum Ticker — auto-generated commentary */}
-      <TvMomentumTicker
-        playerScores={playerScores}
-        playerWordCounts={playerWordCounts}
-        t={t}
-      />
+      <div data-testid="tv-momentum-slot" className={isClassroom ? 'hidden md:block' : undefined}>
+        <TvMomentumTicker
+          playerScores={playerScores}
+          playerWordCounts={playerWordCounts}
+          t={t}
+        />
+      </div>
 
-      {/* Fire Round Overlay — dramatic flame image + edge gradients */}
-      <AnimatePresence>
-        {fireRoundActive && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute inset-0 pointer-events-none z-20"
-            data-testid="fire-round-overlay"
-            aria-hidden="true"
-          >
-            {/* Fire frame overlay — illustrated flames on all edges */}
-            <m.div
-              className="absolute inset-0"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <Image
-                src="/images/tv-broadcast/fx-fire-frame.png"
-                alt=""
-                fill
-                className="object-cover mix-blend-screen"
-                sizes="100vw"
-              />
-            </m.div>
-            {/* Bottom fire flames */}
-            <m.div
-              className="absolute bottom-0 left-0 right-0 h-48"
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <Image
-                src="/images/tv-broadcast/tv-fire-overlay.png"
-                alt=""
-                fill
-                className="object-cover object-top mix-blend-screen"
-                sizes="100vw"
-              />
-            </m.div>
-            {/* Heat vignette */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(255,80,0,0.2)_100%)]" />
-          </m.div>
-        )}
-      </AnimatePresence>
-
-      <div className={`flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[1fr_1fr] md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
-        <div className="min-h-[180px] md:min-h-0 overflow-hidden">
+      <div className={`${isClassroom ? 'shrink-0 md:shrink md:flex-1 md:min-h-0 grid-rows-[auto_auto]' : 'flex-1 min-h-0 grid-rows-[1fr_1fr]'} grid grid-cols-1 md:grid-cols-2 md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
+        <div className={isClassroom ? 'md:min-h-0 md:overflow-hidden' : 'min-h-[180px] md:min-h-0 overflow-hidden'}>
+          {isClassroom && gameMode !== 'word-hunt' ? (
+            <ClassroomLivePanel
+              socket={socket}
+              totalWords={roomWordTotal}
+              lessonWords={lessonWords}
+              hostUsername={username}
+              t={t}
+            />
+          ) : (
           <TvActivityPanel
             playerScores={playerScores}
             playerWordCounts={playerWordCounts}
@@ -449,8 +397,12 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             wordHuntAliveCount={Object.keys(wordHuntPlayerLives).length - wordHuntEliminatedPlayers.length}
             wordHuntTotalPlayers={Object.keys(wordHuntPlayerLives).length}
           />
+          )}
         </div>
-        <div className="min-h-[120px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-auto">
+        <div
+          data-testid="tv-leaderboard-card"
+          className={`min-h-[120px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg ${isClassroom ? 'md:overflow-auto' : 'overflow-auto'}`}
+        >
           <TvLeaderboard
             players={leaderboardData}
             teams={classroomLive?.teams}
@@ -464,6 +416,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           />
         </div>
       </div>
+      </TvBodyScroller>
 
       {/* Countdown + TIME'S UP overlay */}
       <TvTimesUpOverlay
@@ -471,7 +424,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         t={t}
         onTimesUp={() => {
           playTimesUpSound();
-          fireConfetti();
+          // A round nobody scored in ends on the buzzer, not a party.
+          if (leaderboardData.some((p) => p.score > 0)) fireConfetti();
         }}
       />
 

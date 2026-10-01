@@ -446,33 +446,45 @@ interface ExitConfirmDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
+  /** Classroom host: no host hand-off exists, so the copy says the room closes. */
+  classroom?: boolean;
 }
 
 export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function ExitConfirmDialog({
   open,
   onOpenChange,
   onConfirm,
-  t
+  t,
+  classroom = false,
 }) { return (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
-    <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-red-500/30">
+    <AlertDialogContent
+      data-testid={classroom ? 'classroom-exit-confirm' : undefined}
+      className={classroom
+        ? 'bg-neo-navy text-neo-cream border-[3px] border-neo-cream shadow-hard-lg'
+        : 'bg-white text-neo-black dark:bg-neo-navy dark:text-white border-red-500/30'}
+    >
       <AlertDialogHeader>
-        <AlertDialogTitle className="text-slate-900 dark:text-white">
-          {t('hostView.confirmExit')}
+        <AlertDialogTitle className={classroom ? 'font-neo-display font-black uppercase text-neo-cream' : 'text-slate-900 dark:text-white'}>
+          {t(classroom ? 'eduLive.exit.title' : 'hostView.confirmExit')}
         </AlertDialogTitle>
-        <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
-          {t('hostView.exitWarning')}
+        <AlertDialogDescription className={classroom ? 'font-bold text-neo-cream/90' : 'text-slate-600 dark:text-gray-300'}>
+          {t(classroom ? 'eduLive.exit.body' : 'hostView.exitWarning')}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel className="bg-neo-navy/30 dark:bg-neo-navy text-slate-900 dark:text-white border-neo-white/30 dark:border-neo-black/50">
-          {t('common.cancel')}
+        <AlertDialogCancel
+          className={classroom
+            ? 'bg-neo-lime text-neo-black font-bold border-3 border-neo-black shadow-hard'
+            : 'bg-neo-navy/30 dark:bg-neo-navy text-slate-900 dark:text-white border-neo-white/30 dark:border-neo-black/50'}
+        >
+          {t(classroom ? 'eduLive.exit.stay' : 'common.cancel')}
         </AlertDialogCancel>
         <AlertDialogAction
           onClick={onConfirm}
           className="bg-neo-red text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
         >
-          {t('common.confirm')}
+          {t(classroom ? 'eduLive.exit.confirm' : 'common.confirm')}
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>

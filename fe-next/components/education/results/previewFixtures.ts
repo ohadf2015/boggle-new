@@ -18,7 +18,10 @@ const NAMES = [
   'Kai', 'Mila', 'Theo', 'Ella', 'Ben', 'Lior', 'Sara', 'Finn', 'Nora', 'Ivo',
 ];
 
-export function sampleClassroomSummary(): ClassroomSummary {
+export type PreviewOutcome = 'winner' | 'zero' | 'solo' | 'tie';
+
+export function sampleClassroomSummary(variant: PreviewOutcome = 'winner'): ClassroomSummary {
+  if (variant !== 'winner') return outcomeSummary(variant);
   const coverage = WORDS.map((word, i) => ({
     word,
     foundBy: i % 4 === 3 ? [] : [NAMES[i % 5]],
@@ -44,6 +47,38 @@ export function sampleClassroomSummary(): ClassroomSummary {
       { username: 'Leo', score: 112, rank: 2, wordsFound: 4, totalWords: WORDS.length },
       { username: 'Noa', score: 87, rank: 3, wordsFound: 3, totalWords: WORDS.length },
     ],
+  };
+}
+
+function outcomeSummary(variant: Exclude<PreviewOutcome, 'winner'>): ClassroomSummary {
+  const teacherName = 'Ms. Rivera';
+  const found = variant === 'zero' ? 0 : variant === 'solo' ? 3 : 4;
+  const coverage = WORDS.map((word, i) => ({
+    word,
+    foundBy: i < found ? [variant === 'tie' ? NAMES[i % 2] : 'Zoe'] : [],
+  }));
+  const missedWords = coverage.filter((c) => c.foundBy.length === 0).map((c) => c.word);
+  const total = WORDS.length;
+  const players =
+    variant === 'tie'
+      ? [
+          { username: 'Maya', score: 96, rank: 1, wordsFound: 2, totalWords: total },
+          { username: 'Leo', score: 96, rank: 2, wordsFound: 2, totalWords: total },
+          { username: 'Noa', score: 41, rank: 3, wordsFound: 0, totalWords: total },
+        ]
+      : [{ username: 'Zoe', score: variant === 'solo' ? 130 : 0, rank: 1, wordsFound: found, totalWords: total }];
+  return {
+    teacherName,
+    lessonNames: ['Weekly Vocabulary'],
+    lessonIds: ['preview-lesson'],
+    totalWords: total,
+    coverage,
+    missedWords,
+    classFoundCount: coverage.length - missedWords.length,
+    masteryByPlayer: Object.fromEntries(
+      [...players.map((p) => [p.username, { found: p.wordsFound, total }]), [teacherName, { found: 0, total }]]
+    ),
+    podium: [...players, { username: teacherName, score: 0, rank: players.length + 1, wordsFound: 0, totalWords: total }],
   };
 }
 

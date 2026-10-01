@@ -84,6 +84,8 @@ interface TvResultsViewProps {
    * means this view is the teacher's whole end-of-game moment.
    */
   classroomSummary?: ClassroomSummary;
+  /** Classroom only: the host's confirmed exit, offered as "Back to class". */
+  onExitRoom?: () => void;
 }
 
 /**
@@ -113,6 +115,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
   allWords = [],
   gameMode: gameModeOverride,
   classroomSummary,
+  onExitRoom,
 }) => {
   const storeGameMode = useGameMode();
   const gameMode = gameModeOverride || storeGameMode;
@@ -245,7 +248,13 @@ const TvResultsView = memo<TvResultsViewProps>(({
   // The general game's results are untouched below.
   if (classroomSummary) {
     return (
-      <ClassroomTvResultsScreen summary={classroomSummary} onRematch={onStartNewGame} onClose={onClose} t={t} />
+      <ClassroomTvResultsScreen
+        summary={classroomSummary}
+        onRematch={onStartNewGame}
+        onClose={onClose}
+        onExitRoom={onExitRoom}
+        t={t}
+      />
     );
   }
 

@@ -18863,7 +18863,46 @@ const ja = {
       "total": "合計",
       "player": "プレイヤー"
     }
-  }
+  },
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "クラスのゲームを終了しますか？",
+      "body": "生徒全員のルームが閉じて、クラスのホームに戻ります。",
+      "stay": "続ける",
+      "confirm": "ゲームを終了"
+    },
+    "live": {
+      "panelTitle": "ライブラウンド",
+      "wordsFound": "語みつけた",
+      "lessonFound": "授業の単語：{{found}}/{{total}}",
+      "wordOfRound": "今回のベストワード",
+      "wordOfRoundEmpty": "最初の長い単語がここに入ります",
+      "bestWordBy": "{{count}}文字・{{name}}さん"
+    },
+    "results": {
+      "backToClass": "クラスに戻る",
+      "switchGame": "ゲームを変える",
+      "soloTitle": "ソロラウンド！",
+      "tieTitle": "同点！",
+      "zeroTitle": "このラウンドは得点なし",
+      "zeroBody": "ウォームアップ完了。次のラウンドが本番です。",
+      "zeroNoteTitle": "まだ誰も得点していません",
+      "zeroNoteHint": "タイマーを長くするか、やさしいボードを試してみましょう。コードはそのまま、参加し直す必要はありません。",
+      "lineupTitle": "このラウンドの参加者"
+    },
+    "reteach": {
+      "playNow": "今すぐ遊ぶ",
+      "sendHome": "宿題にする",
+      "printShare": "印刷・共有",
+      "googleClassroom": "Google Classroom に投稿"
+    },
+    "wordcraft": {
+      "bingo": "ビンゴ！",
+      "waiting": "最初の単語を待っています…"
+    }
+  },
+  // @eduLive:end
 };
 
 export { ja };

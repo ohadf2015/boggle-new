@@ -37,10 +37,12 @@ export interface VocabQuizHostViewProps {
   playerCount?: number;
   /** Host restart (same room/code/quiz); renders the finale's one loud action. */
   onPlayAgain?: () => void;
+  /** Classroom host's confirmed exit, offered on the finale. */
+  onBackToClass?: () => void;
   t: TranslateFn;
 }
 
-export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, t }: VocabQuizHostViewProps) {
+export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, onBackToClass, t }: VocabQuizHostViewProps) {
   const quiz = useVocabQuiz(socket);
   const { question, reveal, phase } = quiz;
 
@@ -225,6 +227,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
           standings={quiz.standings}
           totalQuestions={quiz.totalQuestions}
           onPlayAgain={onPlayAgain}
+          onBackToClass={onBackToClass}
           t={t}
         />
       )}

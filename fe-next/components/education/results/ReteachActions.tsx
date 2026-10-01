@@ -12,6 +12,7 @@
 
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import {
   Check,
@@ -74,25 +75,30 @@ export function ReteachActions({ links, onReteach, t, variant = 'stack' }: Retea
           data-testid="reteach-more-panel"
           className="absolute inset-x-0 bottom-full z-30 mb-2 max-h-[min(60dvh,34rem)] overflow-y-auto overscroll-contain rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard-lg"
         >
-          <p className="mb-2 font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream lg:text-base">
+          <p className="mb-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream lg:text-base">
             {t('education.results.moreWaysToReteach')}
           </p>
-          {onReteach && (
-            <button
-              type="button"
-              data-testid="play-reteach-round"
-              onClick={onReteach}
-              className={cn(
-                'mb-2 w-full flex items-center justify-center gap-2 px-4 py-3 font-neo-display font-bold text-base',
-                'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
-                'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
-              )}
-            >
-              <Play className="w-5 h-5" aria-hidden />
-              {t('education.results.playReteachRound')}
-            </button>
-          )}
-          <ReteachOptionGrid links={links} t={t} />
+          <ReteachOptionGrid
+            links={links}
+            t={t}
+            reteachSlot={
+              onReteach && (
+                <button
+                  type="button"
+                  data-testid="play-reteach-round"
+                  onClick={onReteach}
+                  className={cn(
+                    'w-full flex items-center justify-center gap-2 px-4 py-3 font-neo-display font-bold text-base',
+                    'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
+                    'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                  )}
+                >
+                  <Play className="w-5 h-5" aria-hidden />
+                  {t('education.results.playReteachRound')}
+                </button>
+              )
+            }
+          />
         </div>
       </details>
     );
@@ -139,148 +145,113 @@ export function ReteachActions({ links, onReteach, t, variant = 'stack' }: Retea
   );
 }
 
+const ROW =
+  'flex w-full items-center gap-2.5 rounded-neo border-[2px] border-neo-cream/70 bg-neo-navy-elevated px-3 py-2 ' +
+  'text-start font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream hover:bg-neo-navy-light';
+
+const ICON = 'grid size-7 shrink-0 place-items-center rounded-md border-2 border-neo-black text-neo-black [&>svg]:size-4';
+
+function RowContent({ icon, tone, label }: { icon: ReactNode; tone: string; label: string }) {
+  return (
+    <>
+      <span aria-hidden className={cn(ICON, tone)}>{icon}</span>
+      <span className="min-w-0 flex-1 leading-tight">{label}</span>
+    </>
+  );
+}
+
+function Group({ testId, title, children }: { testId: string; title: string; children: ReactNode }) {
+  return (
+    <section data-testid={testId} className="flex flex-col gap-1.5">
+      <h3 className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-yellow lg:text-sm">{title}</h3>
+      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">{children}</div>
+    </section>
+  );
+}
+
 function ReteachOptionGrid({
   links,
   t,
   className,
-}: Pick<ReteachActionsProps, 'links' | 't'> & { className?: string }) {
+  reteachSlot,
+}: Pick<ReteachActionsProps, 'links' | 't'> & { className?: string; reteachSlot?: ReactNode }) {
+  const googleLinks = [
+    { href: links.googleClassroomReteachHref, testId: 'post-reteach-google-classroom', key: 'education.results.postReteachGoogleClassroom' },
+    { href: links.googleClassroomAssignHref, testId: 'assign-practice-google-classroom', key: 'education.results.assignPracticeGoogleClassroom' },
+    { href: links.googleClassroomLiveAssignHref, testId: 'assign-miss-gap-live-google-classroom', key: 'education.results.assignMissGapLiveGoogleClassroom' },
+    { href: links.googleClassroomUnpluggedAssignHref, testId: 'assign-unplugged-google-classroom', key: 'education.results.assignUnpluggedGoogleClassroom' },
+  ].filter((g): g is { href: string; testId: string; key: string } => !!g.href);
+
   return (
-    <div className={cn('grid grid-cols-1 sm:grid-cols-2 gap-2', className)}>
-      {links.canLaunchMissGapQuestionPack && (
-        <button
-          type="button"
-          data-testid="launch-miss-gap-question-pack-live"
-          onClick={links.onLaunchMissGapQuestionPack}
-          className={cn(ACTION, 'bg-neo-lime sm:col-span-2')}
-        >
-          <ListChecks className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.launchMissGapQuestionPackLive')}
-        </button>
-      )}
-      {links.unpluggedReteachHref && (
-        <Link
-          href={links.unpluggedReteachHref}
-          data-testid="start-unplugged-reteach-live"
-          className={cn(ACTION, 'bg-neo-pink/90')}
-        >
-          <Play className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.startUnpluggedReteachLive')}
-        </Link>
-      )}
-      {links.classicUnpluggedHref && (
-        <Link
-          href={links.classicUnpluggedHref}
-          data-testid="start-classic-unplugged"
-          className={cn(ACTION, 'bg-neo-cyan')}
-        >
-          <MonitorPlay className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.startClassicUnplugged')}
-        </Link>
-      )}
-      {links.teamTilesUnpluggedHref && (
-        <Link
-          href={links.teamTilesUnpluggedHref}
-          data-testid="start-team-tiles-unplugged"
-          className={cn(ACTION, 'bg-neo-yellow')}
-        >
-          <LayoutGrid className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.startTeamTilesUnplugged')}
-        </Link>
-      )}
-      {links.missGapAsyncAssignHref && (
-        <Link
-          href={links.missGapAsyncAssignHref}
-          data-testid="assign-miss-gap-async-homework"
-          className={cn(ACTION, 'bg-neo-pink')}
-        >
-          <ClipboardList className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.assignMissGapAsyncHomework')}
-        </Link>
-      )}
-      {links.googleClassroomReteachHref && (
-        <a
-          href={links.googleClassroomReteachHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="post-reteach-google-classroom"
-          className={cn(ACTION, 'bg-neo-white')}
-        >
-          <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.postReteachGoogleClassroom')}
-        </a>
-      )}
-      {links.googleClassroomAssignHref && (
-        <a
-          href={links.googleClassroomAssignHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="assign-practice-google-classroom"
-          className={cn(ACTION, 'bg-neo-cyan')}
-        >
-          <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.assignPracticeGoogleClassroom')}
-        </a>
-      )}
-      {links.googleClassroomLiveAssignHref && (
-        <a
-          href={links.googleClassroomLiveAssignHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="assign-miss-gap-live-google-classroom"
-          className={cn(ACTION, 'bg-neo-lime')}
-        >
-          <Play className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.assignMissGapLiveGoogleClassroom')}
-        </a>
-      )}
-      {links.googleClassroomUnpluggedAssignHref && (
-        <a
-          href={links.googleClassroomUnpluggedAssignHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid="assign-unplugged-google-classroom"
-          className={cn(ACTION, 'bg-neo-yellow')}
-        >
-          <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
-          {t('education.results.assignUnpluggedGoogleClassroom')}
-        </a>
-      )}
-      <button
-        type="button"
-        data-testid="print-missed-words-practice-sheet"
-        onClick={links.onPrintPracticeSheet}
-        className={cn(ACTION, 'bg-neo-cream')}
-      >
-        <Printer className="w-4 h-4 shrink-0" aria-hidden />
-        {t('education.results.printPracticeSheet')}
-      </button>
-      <button
-        type="button"
-        data-testid="print-unplugged-reteach-pack"
-        onClick={links.onPrintUnpluggedPack}
-        className={cn(ACTION, 'bg-neo-cyan')}
-      >
-        <QrCode className="w-4 h-4 shrink-0" aria-hidden />
-        {t('education.results.printUnpluggedReteachPack')}
-      </button>
-      <button
-        type="button"
-        data-testid="share-miss-gap-practice"
-        onClick={links.onShareMissGapPractice}
-        className={cn(ACTION, 'bg-neo-white')}
-      >
-        {links.missGapShareState === 'idle' ? (
-          <>
-            <Share2 className="w-4 h-4 shrink-0" aria-hidden />
-            {t('education.results.shareMissGapPractice')}
-          </>
-        ) : (
-          <>
-            <Check className="w-4 h-4 shrink-0" aria-hidden />
-            {t('education.results.shareMissGapPracticeCopied')}
-          </>
+    <div className={cn('flex flex-col gap-3', className)}>
+      <Group testId="reteach-group-play" title={t('eduLive.reteach.playNow')}>
+        {reteachSlot && <div className="sm:col-span-2">{reteachSlot}</div>}
+        {links.canLaunchMissGapQuestionPack && (
+          <button
+            type="button"
+            data-testid="launch-miss-gap-question-pack-live"
+            onClick={links.onLaunchMissGapQuestionPack}
+            className={cn(ACTION, 'bg-neo-lime sm:col-span-2')}
+          >
+            <ListChecks className="w-4 h-4 shrink-0" aria-hidden />
+            {t('education.results.launchMissGapQuestionPackLive')}
+          </button>
         )}
-      </button>
+        {links.unpluggedReteachHref && (
+          <Link href={links.unpluggedReteachHref} data-testid="start-unplugged-reteach-live" className={ROW}>
+            <RowContent icon={<Play />} tone="bg-neo-pink" label={t('education.results.startUnpluggedReteachLive')} />
+          </Link>
+        )}
+        {links.classicUnpluggedHref && (
+          <Link href={links.classicUnpluggedHref} data-testid="start-classic-unplugged" className={ROW}>
+            <RowContent icon={<MonitorPlay />} tone="bg-neo-cyan" label={t('education.results.startClassicUnplugged')} />
+          </Link>
+        )}
+        {links.teamTilesUnpluggedHref && (
+          <Link href={links.teamTilesUnpluggedHref} data-testid="start-team-tiles-unplugged" className={ROW}>
+            <RowContent icon={<LayoutGrid />} tone="bg-neo-yellow" label={t('education.results.startTeamTilesUnplugged')} />
+          </Link>
+        )}
+      </Group>
+
+      <Group testId="reteach-group-send" title={t('eduLive.reteach.sendHome')}>
+        {links.missGapAsyncAssignHref && (
+          <Link href={links.missGapAsyncAssignHref} data-testid="assign-miss-gap-async-homework" className={ROW}>
+            <RowContent icon={<ClipboardList />} tone="bg-neo-pink" label={t('education.results.assignMissGapAsyncHomework')} />
+          </Link>
+        )}
+        {googleLinks.length > 0 && (
+          <details data-testid="reteach-google-classroom" className="group/gc rounded-neo">
+            <summary className={cn(ROW, 'cursor-pointer list-none [&::-webkit-details-marker]:hidden')}>
+              <RowContent icon={<GraduationCap />} tone="bg-neo-white" label={t('eduLive.reteach.googleClassroom')} />
+              <ChevronDown className="size-4 shrink-0 transition-transform group-open/gc:rotate-180" aria-hidden />
+            </summary>
+            <div className="mt-1.5 flex flex-col gap-1.5 ps-3">
+              {googleLinks.map((g) => (
+                <a key={g.testId} href={g.href} target="_blank" rel="noopener noreferrer" data-testid={g.testId} className={ROW}>
+                  <RowContent icon={<GraduationCap />} tone="bg-neo-cyan" label={t(g.key)} />
+                </a>
+              ))}
+            </div>
+          </details>
+        )}
+      </Group>
+
+      <Group testId="reteach-group-print" title={t('eduLive.reteach.printShare')}>
+        <button type="button" data-testid="print-missed-words-practice-sheet" onClick={links.onPrintPracticeSheet} className={ROW}>
+          <RowContent icon={<Printer />} tone="bg-neo-cream" label={t('education.results.printPracticeSheet')} />
+        </button>
+        <button type="button" data-testid="print-unplugged-reteach-pack" onClick={links.onPrintUnpluggedPack} className={ROW}>
+          <RowContent icon={<QrCode />} tone="bg-neo-cyan" label={t('education.results.printUnpluggedReteachPack')} />
+        </button>
+        <button type="button" data-testid="share-miss-gap-practice" onClick={links.onShareMissGapPractice} className={ROW}>
+          <RowContent
+            icon={links.missGapShareState === 'idle' ? <Share2 /> : <Check />}
+            tone={links.missGapShareState === 'idle' ? 'bg-neo-white' : 'bg-neo-lime'}
+            label={t(links.missGapShareState === 'idle' ? 'education.results.shareMissGapPractice' : 'education.results.shareMissGapPracticeCopied')}
+          />
+        </button>
+      </Group>
     </div>
   );
 }

@@ -18863,7 +18863,46 @@ const sv = {
       "total": "Totalt",
       "player": "Spelare"
     }
-  }
+  },
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "Avsluta klassens spel?",
+      "body": "Rummet stängs för alla elever och du kommer tillbaka till klassens startsida.",
+      "stay": "Fortsätt spela",
+      "confirm": "Avsluta spelet"
+    },
+    "live": {
+      "panelTitle": "Liverunda",
+      "wordsFound": "ord hittade",
+      "lessonFound": "Lektionsord: {{found}}/{{total}}",
+      "wordOfRound": "Rundans ord",
+      "wordOfRoundEmpty": "Första långa ordet tar den här platsen",
+      "bestWordBy": "{{count}} bokstäver · av {{name}}"
+    },
+    "results": {
+      "backToClass": "Tillbaka till klassen",
+      "switchGame": "Byt spel",
+      "soloTitle": "Solorunda!",
+      "tieTitle": "Oavgjort!",
+      "zeroTitle": "Inga poäng den här rundan",
+      "zeroBody": "Uppvärmningen är klar. Nästa runda räknas.",
+      "zeroNoteTitle": "Ingen har fått poäng än",
+      "zeroNoteHint": "Prova en längre timer eller en enklare bricka. Samma kod, ingen behöver gå med igen.",
+      "lineupTitle": "Med i rundan"
+    },
+    "reteach": {
+      "playNow": "Spela nu",
+      "sendHome": "Skicka hem",
+      "printShare": "Skriv ut och dela",
+      "googleClassroom": "Lägg upp i Google Classroom"
+    },
+    "wordcraft": {
+      "bingo": "BINGO!",
+      "waiting": "Väntar på första ordet…"
+    }
+  },
+  // @eduLive:end
 };
 
 export { sv };

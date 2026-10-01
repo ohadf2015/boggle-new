@@ -44,13 +44,10 @@
 
 'use client';
 
-import { Flame, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 import type { PodiumEntry } from './ResultsPodium';
 import { PodiumStage } from './PodiumStage';
 import { ClassChest } from './ClassChest';
-import { tr } from '@/components/education/lobby/eduText';
 import ClassroomSessionStandings from './ClassroomSessionStandings';
 import { TeamBattleStandings } from '../TeamBattleStandings';
 import { WordCoverageGlance } from './WordCoverageGlance';
@@ -65,11 +62,14 @@ import { stageReteachLessonData } from '@/lib/education/classroomGameHandoff';
 import { projectorRecapShowsTeacherFollowUp } from '@/lib/education/roundEndResultsRoute';
 import { useSessionRoundHistory } from '@/hooks/useSessionRoundHistory';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
+import { HostNextActions } from './HostNextActions';
 import { ReteachActions } from './ReteachActions';
 import { ResultsPrimaryActions } from './ResultsPrimaryActions';
+import { cn } from '@/lib/utils';
+import { roundOutcome } from './roundOutcome';
+import { ZeroRoundNote } from './ZeroRoundNote';
 import { useReteachLinks } from './useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
-import { trackResultsAction } from './trackResultsAction';
 import { orderPodiumByScore } from './podiumOrder';
 import { useIsPhoneRecap } from './useIsPhoneRecap';
 
@@ -84,9 +84,20 @@ export interface ClassroomTvResultsProps {
    * round always plays the reveal.
    */
   revealSettled?: boolean;
+  /** Back to the lobby (mode switcher). Absent = no way back is offered. */
+  onChangeGame?: () => void;
+  /** The host's confirmed exit to the teacher HQ. */
+  onBackToClass?: () => void;
 }
 
-export function ClassroomTvResults({ summary, onRematch, t, revealSettled = false }: ClassroomTvResultsProps) {
+export function ClassroomTvResults({
+  summary,
+  onRematch,
+  t,
+  revealSettled = false,
+  onChangeGame,
+  onBackToClass,
+}: ClassroomTvResultsProps) {
   // This screen only mounts for the non-playing classroom host. The inputs
   // are that fact. The predicate still calls hostLeavesProjectorRecap, so if
   // that rule starts sending this host to ResultsPage the wall drops the
@@ -115,7 +126,23 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
   // in-game body class ever protected it. It raises the quiet zone itself.
   useOverlayQuietZoneClaim(true, 'classroom-tv-results');
 
-  const stage = useRoundEndReveal(!revealSettled);
+  const phone = useIsPhoneRecap();
+  const podium: PodiumEntry[] = orderPodiumByScore(podiumWithoutHost(summary.podium, summary.teacherName).map((p) => ({
+    username: p.username,
+    score: p.score,
+    rank: p.rank,
+    detail:
+      typeof p.wordsFound === 'number' && typeof p.totalWords === 'number'
+        ? t('education.results.podium.wordsFound', { found: p.wordsFound, total: p.totalWords })
+        : undefined,
+  })));
+  const hostKey = (summary.teacherName ?? '').trim().toLowerCase();
+  const studentCount = Object.keys(summary.masteryByPlayer ?? {}).filter(
+    (name) => name.trim().toLowerCase() !== hostKey
+  ).length;
+  const outcome = roundOutcome(podium, studentCount);
+  // A scoreless round has nothing to reveal, so it skips the drumroll.
+  const stage = useRoundEndReveal(!revealSettled && outcome.celebrate);
   // Discounts the lesson words the board never carried. Without that, a sweep
   // was arithmetically impossible on any partial board — see lib/education/
   // roundEndSweep — which is why this burst has never been seen.
@@ -145,16 +172,7 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
   // Rank follows SCORE, once, here — and the pedestals AND the winner bar read
   // this same array, so gold and "winner" can never name two different
   // children (Pitfall Class 3). PodiumStage re-sorts defensively as well.
-  const phone = useIsPhoneRecap();
-  const podium: PodiumEntry[] = orderPodiumByScore(podiumWithoutHost(summary.podium, summary.teacherName).map((p) => ({
-    username: p.username,
-    score: p.score,
-    rank: p.rank,
-    detail:
-      typeof p.wordsFound === 'number' && typeof p.totalWords === 'number'
-        ? t('education.results.podium.wordsFound', { found: p.wordsFound, total: p.totalWords })
-        : undefined,
-  })));
+  const winnerBeat = outcome.celebrate && isRevealed(1, stage);
 
   return (
     <div
@@ -163,11 +181,12 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
       // the finished frame instead of catching the podium mid-beat and calling
       // it broken. Every stage is painted; `done` is simply the whole story.
       data-round-end-stage={stage}
+      data-outcome={outcome.kind}
       className="h-full overflow-y-auto lg:overflow-hidden flex flex-col gap-2 lg:gap-3 bg-neo-navy text-neo-white"
     >
-      <header className="shrink-0 max-lg:mt-auto flex flex-wrap items-baseline justify-center gap-x-4">
+      <header className="shrink-0 max-lg:mt-auto flex flex-wrap items-baseline justify-center gap-x-4 px-12 md:px-16">
         <p className="font-neo-display font-black uppercase tracking-widest text-neo-yellow text-lg md:text-2xl min-[2200px]:text-5xl">
-          {t('education.results.podium.title')}
+          {outcome.celebrate ? t('education.results.podium.title') : t('eduLive.results.lineupTitle')}
         </p>
         <p className="font-neo-body font-bold text-neo-white/80 text-sm md:text-xl min-[2200px]:text-4xl truncate max-w-full">
           {summary.lessonNames.join(' · ')}
@@ -197,7 +216,7 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
               up. `fireRankConfetti` still fires its one live burst for the
               people in the room; this is what a shutter that opens four
               seconds later actually photographs. */}
-          <CelebrationLoop active={isRevealed(1, stage)} />
+          <CelebrationLoop active={winnerBeat} />
           {/* The podium stands on the painted pedestals of podium-bg, with the
               CLASS's chest on the same stage. Width is capped by the viewport
               height so the art, the spotlight and the header all fit a 16:9
@@ -205,6 +224,7 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
           {podium.length > 0 && (
             <PodiumStage
               entries={podium}
+              muted={!outcome.celebrate}
               stage={stage}
               t={t}
               className="lg:w-[min(100%,calc((100dvh_-_19rem)*1.768))]"
@@ -212,15 +232,18 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
               <ClassChest
                 found={summary.classFoundCount}
                 total={summary.totalWords}
-                open={isRevealed(1, stage)}
+                open={winnerBeat}
                 t={t}
               />
+              {!outcome.celebrate && <ZeroRoundNote t={t} />}
             </PodiumStage>
           )}
 
           {podium[0] && (
             <WinnerSpotlight
               winner={{ username: podium[0].username, score: podium[0].score }}
+              outcome={outcome.kind}
+              leaders={outcome.leaders}
               active={isRevealed(1, stage)}
               // ONE sound per screen. When the class swept it, the sweep chime
               // 500ms later owns the moment — one child winning is one child's
@@ -276,93 +299,34 @@ export function ClassroomTvResults({ summary, onRematch, t, revealSettled = fals
             />
           </section>
 
-          {onRematch || summary.missedWords.length > 0 || showTeacherFollowUp ? (
-            <div className="shrink-0 flex flex-col gap-2">
-              {onRematch && (
-                <button
-                  type="button"
-                  data-testid="classroom-tv-rematch"
-                  onClick={() => {
-                    trackResultsAction('rematch', 'projector');
-                    onRematch();
-                  }}
-                  className={cn(
-                    'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4 min-[2200px]:gap-6 min-[2200px]:py-7',
-                    'font-neo-display font-black text-2xl md:text-4xl min-[2200px]:text-7xl',
-                    'bg-neo-lime text-neo-black border-4 border-neo-black rounded-neo-lg',
-                    'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 transition-all'
-                  )}
+          <HostNextActions
+            language={language}
+            t={t}
+            onRematch={onRematch}
+            onChangeGame={onChangeGame}
+            onBackToClass={onBackToClass}
+            roundNumber={summary.roundsPlayed ?? roundNumber}
+            sweepStreak={sweepStreak}
+            reteachSlot={
+              showTeacherFollowUp && summary.missedWords.length > 0 ? (
+                <div data-testid="classroom-tv-reteach">
+                  <ReteachActions links={links} onReteach={handleReteach} t={t} variant="more" />
+                </div>
+              ) : null
+            }
+            followUpSlot={
+              // Small, unfilled, held until the 5.8s celebration beat; transform-only arrival (Class 5).
+              showTeacherFollowUp ? (
+                <div
+                  data-testid="tv-followup-after-celebration"
+                  className={cn('flex justify-center', !revealSettled && 'motion-safe:animate-[lc-quiet-arrive_360ms_ease-out_5.8s_both]')}
                 >
-                  <RotateCcw className="w-8 h-8 shrink-0 min-[2200px]:w-14 min-[2200px]:h-14" aria-hidden />
-                  <span className="flex flex-col items-start leading-none">
-                    <span className="uppercase">{tr(t, 'academy.results.playAgain', 'Play again')}</span>
-                    <span className="mt-1 font-neo-body text-sm font-bold normal-case md:text-base min-[2200px]:mt-3 min-[2200px]:text-3xl">
-                      {tr(t, 'academy.results.playAgainHint', 'Same words, same code. Nobody rejoins.')}
-                    </span>
-                  </span>
-                </button>
-              )}
-
-              {/* Everything after Play again is SECONDARY and shares one row:
-                  every reteach option behind a single "More", the momentum
-                  chips, and the quiet Pro ask — never a second loud button. */}
-              <div
-                data-testid="tv-secondary-row"
-                // `relative`: the "More" panel anchors here, spanning the row.
-                className="relative flex flex-wrap items-center justify-center gap-2 lg:gap-3"
-              >
-                {showTeacherFollowUp && summary.missedWords.length > 0 && (
-                  <div data-testid="classroom-tv-reteach">
-                    <ReteachActions links={links} onReteach={handleReteach} t={t} variant="more" />
-                  </div>
-                )}
-
-                {/* Momentum, not decoration: a room that can see it is on round
-                    three plays round four. Both chips are silent in round one. */}
-                {roundNumber > 1 && (
-                  <span
-                    data-testid="classroom-tv-round"
-                    className="px-3 py-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream font-neo-display font-bold text-sm lg:px-4 lg:py-2 lg:text-xl min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl shadow-hard-sm"
-                  >
-                    {t('education.results.moment.roundOfSession', { round: roundNumber })}
-                  </span>
-                )}
-                {sweepStreak > 1 && (
-                  <span
-                    data-testid="classroom-tv-sweep-streak"
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-neo border-[2px] border-neo-black bg-neo-orange text-neo-black font-neo-display font-black text-sm lg:px-4 lg:py-2 lg:text-xl min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl shadow-hard-sm"
-                  >
-                    <Flame className="w-5 h-5 shrink-0 lg:w-6 lg:h-6" aria-hidden />
-                    {t('education.results.moment.sweepStreak', { count: sweepStreak })}
-                  </span>
-                )}
-
-                {/* No onRematch: this wall already has the loud Rematch above.
-                    The shared component still owns the Pro check, so a free
-                    teacher gets the upgrade ask and a Pro teacher gets the
-                    report — the same branch the phone card uses.
-                    LAST, small and unfilled, and it pops in only after the
-                    celebration beat (5.8s = the reveal's `done`): the room's
-                    moment is the winner and Play again, never a price tag.
-                    Transform-only arrival on a small element (never an
-                    opacity fade, Class 5); static under reduced motion or a
-                    settled reveal. The mount — and so the impression — is
-                    unchanged. */}
-                {showTeacherFollowUp && (
-                  <div
-                    data-testid="tv-followup-after-celebration"
-                    className={cn(
-                      'flex justify-center',
-                      !revealSettled && 'motion-safe:animate-[lc-quiet-arrive_360ms_ease-out_5.8s_both]'
-                    )}
-                  >
-                    <style>{`@keyframes lc-quiet-arrive{0%{transform:scale(0)}70%{transform:scale(1.06)}100%{transform:scale(1)}}`}</style>
-                    <ResultsPrimaryActions language={language} t={t} surface="projector" tone="quiet" />
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : null}
+                  <style>{`@keyframes lc-quiet-arrive{0%{transform:scale(0)}70%{transform:scale(1.06)}100%{transform:scale(1)}}`}</style>
+                  <ResultsPrimaryActions language={language} t={t} surface="projector" tone="quiet" />
+                </div>
+              ) : null
+            }
+          />
         </div>
       </div>
     </div>

@@ -18881,7 +18881,46 @@ const es = {
       "total": "Total",
       "player": "Jugador"
     }
-  }
+  },
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "¿Terminar el juego de la clase?",
+      "body": "La sala se cierra para todo el alumnado y vuelves al panel de tu clase.",
+      "stay": "Seguir jugando",
+      "confirm": "Terminar juego"
+    },
+    "live": {
+      "panelTitle": "Ronda en vivo",
+      "wordsFound": "palabras encontradas",
+      "lessonFound": "Palabras de la lección: {{found}}/{{total}}",
+      "wordOfRound": "Palabra de la ronda",
+      "wordOfRoundEmpty": "La primera palabra larga se queda con este sitio",
+      "bestWordBy": "{{count}} letras · de {{name}}"
+    },
+    "results": {
+      "backToClass": "Volver a la clase",
+      "switchGame": "Cambiar de juego",
+      "soloTitle": "¡Ronda en solitario!",
+      "tieTitle": "¡Empate!",
+      "zeroTitle": "Sin puntos en esta ronda",
+      "zeroBody": "Calentamiento hecho. La próxima ronda cuenta.",
+      "zeroNoteTitle": "Nadie ha puntuado todavía",
+      "zeroNoteHint": "Prueba con más tiempo o un tablero más fácil. Mismo código, nadie tiene que volver a entrar.",
+      "lineupTitle": "Quién jugó esta ronda"
+    },
+    "reteach": {
+      "playNow": "Jugar ahora",
+      "sendHome": "Mandar a casa",
+      "printShare": "Imprimir y compartir",
+      "googleClassroom": "Publicar en Google Classroom"
+    },
+    "wordcraft": {
+      "bingo": "¡BINGO!",
+      "waiting": "Esperando la primera palabra…"
+    }
+  },
+  // @eduLive:end
 };
 
 export { es };

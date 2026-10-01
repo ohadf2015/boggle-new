@@ -38,12 +38,12 @@ interface EducationHeaderProps {
   /** Custom title override */
   title?: string;
   /**
-   * Override where the back button goes. Defaults to `/{locale}/education`.
-   * A classroom multiplayer game passes its own hub here (teacher dashboard /
-   * student hub via `multiplayerExitDestination`) — the education landing is
-   * the wrong place mid-game.
+   * Where back goes (default `/{locale}/education`). A classroom game passes its own hub
+   * via `multiplayerExitDestination` — the education landing is wrong mid-game.
    */
   backHref?: string;
+  /** Replaces the navigation entirely, e.g. a live host who must confirm leaving first. */
+  onBack?: () => void;
 }
 
 /**
@@ -68,6 +68,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   showBackButton = false,
   title,
   backHref,
+  onBack,
 }) => {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
@@ -121,10 +122,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const isOnTeacherSection = pathname?.includes('/teacher');
   const isOnStudentSection = pathname?.includes('/student');
 
-  // Handle back to education landing (or the caller-supplied override)
   const handleBackClick = useCallback(() => {
+    if (onBack) return onBack();
     router.push(backHref || `/${language}/education`);
-  }, [backHref, language, router]);
+  }, [backHref, language, router, onBack]);
 
   // Handle sign out
   const handleSignOut = useCallback(async () => {
