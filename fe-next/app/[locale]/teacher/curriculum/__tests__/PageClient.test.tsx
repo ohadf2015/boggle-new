@@ -16,8 +16,8 @@ import CurriculumPageClient from '../PageClient';
 vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header" />,
 }));
-vi.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({
-  CurriculumWordListBrowser: ({
+vi.mock('@/components/teacher/lesson-creation/library/TeacherLibrary', () => ({
+  TeacherLibrary: ({
     teacherId,
     classroomId,
     onImportSuccess,
@@ -31,7 +31,7 @@ vi.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({
       data-teacher-id={teacherId}
       data-classroom-id={classroomId}
     >
-      Curriculum Word List Browser Mock
+      Teacher Library Mock
       {onImportSuccess && (
         <button
           type="button"
@@ -144,18 +144,18 @@ describe('CurriculumPageClient', () => {
   });
 
   describe('Import Success Navigation', () => {
-    it('navigates to the teacher dashboard, never a nonexistent classroom lesson route, after a classroom import', () => {
+    it('stays on the library after a classroom import, never a nonexistent classroom lesson route', () => {
       mockSearchParams.set('classroomId', 'classroom-456');
       render(<CurriculumPageClient />);
 
       fireEvent.click(screen.getByTestId('trigger-import-success'));
 
-      // The route `/teacher/classroom/{id}/lesson/{id}` does not exist — it
-      // 404s, and the 404 boundary used to bounce the teacher to the
-      // homepage. The dashboard (`/teacher`) is real: LessonBuilder there
-      // shows the lesson that was just imported.
-      expect(mockPush).toHaveBeenCalledWith('/en/teacher');
+      // `/teacher/classroom/{id}/lesson/{id}` does not exist — it 404s and the
+      // 404 boundary used to bounce the teacher to the homepage. The copy now
+      // lands in My lists on this same page, so the page must not route at all.
       expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/lesson/'));
+      expect(mockPush).not.toHaveBeenCalled();
+      expect(screen.getByTestId('curriculum-word-list-browser')).toBeInTheDocument();
     });
   });
 

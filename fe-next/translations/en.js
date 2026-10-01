@@ -1,5 +1,174 @@
 // EN translations
 const en = {
+  // @eduLibrary:start
+  "eduLibrary": {
+    "title": "Library",
+    "tabs": {
+      "mine": "My lists",
+      "discover": "Discover"
+    },
+    "editor": {
+      "createTitle": "New word list",
+      "editTitle": "Edit word list",
+      "description": "Paste words, add definitions, save.",
+      "newList": "New list",
+      "titleLabel": "List title",
+      "titlePlaceholder": "Name your list…",
+      "pasteLabel": "Paste or type words",
+      "pastePlaceholder": "apple, banana, cherry — or one per line. \"word - meaning\" adds a definition.",
+      "addedWords": "+{count} added",
+      "skippedDuplicates": "{count} already in the list",
+      "importFile": "CSV / TSV",
+      "starterPack": "Starter pack",
+      "fileError": "That file had no words we could read. Use one word per row, with the definition in the second column.",
+      "wordsHeading": "Words",
+      "wordsLabel": "Words in this list",
+      "viewLabel": "View",
+      "view": {
+        "chips": "Chips",
+        "details": "Details"
+      },
+      "emptyWords": "Your words will pop in here.",
+      "removeWord": "Remove {word}",
+      "noDefinition": "No definition yet",
+      "word": "Word",
+      "definition": "Definition (optional)",
+      "definitionPlaceholder": "What does it mean?",
+      "done": "Done",
+      "needTitle": "Give your list a name to save it.",
+      "needWords": "Add at least one word.",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "savedToast": "\"{name}\" saved"
+    },
+    "issue": {
+      "digits": "Has a number",
+      "tooLong": "Too long to play",
+      "wrongScript": "Doesn't look like this list's language",
+      "blocked": "Not allowed in student games"
+    },
+    "meta": {
+      "language": "Language",
+      "grade": "Grade",
+      "topic": "Topic",
+      "assignTo": "Assign to",
+      "noClass": "No class yet"
+    },
+    "grade": {
+      "any": "Any grade",
+      "k2": "K–2",
+      "g35": "Grades 3–5",
+      "g68": "Grades 6–8",
+      "g912": "Grades 9–12"
+    },
+    "topic": {
+      "none": "No topic",
+      "all": "All topics",
+      "general": "General",
+      "english": "English",
+      "hebrew": "Hebrew",
+      "science": "Science",
+      "math": "Math",
+      "history": "History",
+      "geography": "Geography",
+      "language": "Language learning"
+    },
+    "share": {
+      "toggle": "Share to Discover",
+      "help": "Other teachers can find, host and copy it. Only your display name is shown.",
+      "blocked": "Some words can't be shared with students. Remove them to share.",
+      "share": "Share",
+      "shared": "Shared",
+      "nowPublic": "Shared to Discover",
+      "nowPrivate": "Back to private",
+      "failed": "Couldn't change sharing. Try again."
+    },
+    "remixedFrom": "Remixed from {title} by {author}",
+    "remixedFromNoAuthor": "Remixed from {title}",
+    "myLists": {
+      "emptyHint": "Paste a list, start from a starter pack, or grab one from Discover."
+    },
+    "card": {
+      "practice": "Practice",
+      "words": "{count} words",
+      "by": "by {author}",
+      "aTeacher": "a teacher",
+      "new": "New",
+      "plays": "{count} plays",
+      "copies": "{count} copies",
+      "results": "Results"
+    },
+    "badge": {
+      "verified": "Verified",
+      "teacher": "Teacher made",
+      "yours": "Yours"
+    },
+    "discover": {
+      "searchLabel": "Search lists",
+      "searchPlaceholder": "Search lists, words or teachers",
+      "clearSearch": "Clear search",
+      "filters": "Filters",
+      "allLanguages": "All",
+      "sourceLabel": "Who made it",
+      "source": {
+        "all": "All",
+        "verified": "LexiClash verified",
+        "teacher": "Teacher made"
+      },
+      "count": "{count} lists",
+      "sortLabel": "Sort",
+      "sort": {
+        "popular": "Most popular",
+        "newest": "Newest"
+      },
+      "loadError": "Couldn't load Discover.",
+      "retry": "Retry",
+      "emptyTitle": "No lists match yet",
+      "emptyHint": "Try another filter — or share one of yours so the next teacher finds it.",
+      "tryAllLanguages": "Show all languages",
+      "shareFirst": "Share a list",
+      "beFirstTitle": "Be the first teacher here.",
+      "beFirstHint": "Share one of your lists and every teacher in this language will see it."
+    },
+    "preview": {
+      "host": "Host live",
+      "assign": "Assign",
+      "copy": "Make a copy",
+      "copied": "Copied",
+      "copiedHint": "It's in My lists — tap Copied to open it.",
+      "copiedToast": "\"{name}\" copied to My lists",
+      "copyFailed": "Couldn't copy this list. Try again."
+    },
+    "report": {
+      "action": "Report this list",
+      "title": "Report list",
+      "description": "What's wrong with \"{name}\"? We review every report.",
+      "reason": {
+        "inappropriate": "Not right for students",
+        "offensive": "Offensive words",
+        "unplayable": "Wrong or unplayable words",
+        "spam": "Spam or junk"
+      },
+      "detailsPlaceholder": "Anything else? (optional)",
+      "submit": "Send report",
+      "thanks": "Thanks — we'll take a look.",
+      "failed": "Couldn't send the report. Try again."
+    },
+    "assign": {
+      "title": "Assign to a class",
+      "pickClass": "Which class gets it?",
+      "noClasses": "Create a class first — it takes 5 seconds.",
+      "createClass": "Create a class"
+    },
+    "pager": {
+      "label": "Pages",
+      "prev": "Back",
+      "next": "Next",
+      "status": "{page} / {total}"
+    }
+  },
+  // @eduLibrary:end
   // @academy:start (generated by /tmp/edu-play/merge-i18n.mjs)
   "academy": {
     "teacher": {
@@ -14111,6 +14280,12 @@ const en = {
         "title": "Join a Class"
       },
       "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
+      "gameEnded": {
+        "title": "This game has ended",
+        "retry": "Try again",
+        "toClass": "Go to my class",
+        "newCode": "Enter a new code"
+      },
       "lessonsAssigned": "Lessons Assigned",
       "feel": {
         "points": "pts",
@@ -14293,6 +14468,7 @@ const en = {
       "auth_required_title": "Sign up to request teacher access",
       "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",
       "auth_required_cta": "Create my free teacher account",
+      "auth_signin_cta": "Already have an account? Sign in",
       "trust_instant": "Instant access — no review queue",
       "trust_free": "Free teacher plan, no expiry",
       "trust_nologins": "No student logins, no setup",
@@ -17910,6 +18086,9 @@ const en = {
       "share": "Share",
       "seriesChampion": "Series champion",
       "teacherPaced": "Your teacher starts the next game",
+      "backToClass": "Back to class",
+      "endClassTitle": "End the class game?",
+      "endClassBody": "The room closes for everyone and you go back to your class dashboard.",
       "roundPoints": "Points this round",
       "yourRank": "Your place",
       "lessonRecap": "Lesson recap",

@@ -17,7 +17,7 @@ import { AccessRequestGate } from '../AccessRequestGate';
 describe('<AccessRequestGate> — a returning teacher signs in in one tap', () => {
   it('Given a signed-out visitor, When "Already have an account? Sign in" is tapped, Then the teacher modal opens on sign-in', async () => {
     render(<AccessRequestGate />);
-    await userEvent.click(screen.getByRole('button', { name: 'eduHq.access.haveAccount' }));
+    await userEvent.click(screen.getByRole('button', { name: 'education.access.auth_signin_cta' }));
     const modal = await screen.findByTestId('auth-modal');
     expect(modal).toHaveAttribute('data-mode', 'signin');
     expect(modal).toHaveAttribute('data-audience', 'teacher');

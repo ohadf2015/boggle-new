@@ -65,3 +65,13 @@ describe('BlastScoreFly lucky/jackpot bonus tag', () => {
     expect(screen.queryByTestId('score-fly-bonus')).toBeNull();
   });
 });
+
+describe('BlastScoreFly text', () => {
+  it('shows only the number for a big word, never an English interjection', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const big: ScoreFlyEvent = { id: 'fly-big', score: 245, startX: 50, startY: 50, tier: 3 };
+    render(<BlastScoreFly flies={[big]} onComplete={vi.fn()} />);
+    expect(screen.getByTestId('score-fly').textContent).toBe('+245');
+    vi.restoreAllMocks();
+  });
+});

@@ -72,7 +72,6 @@ UI_MEASUREMENTS.txt
 
 # Test scripts (not source code)
 comprehensive-ui-test.js
-ui-test.js
 manual-test-*.spec.ts
 
 # Zip files

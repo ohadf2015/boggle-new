@@ -33,6 +33,7 @@ import {
   Gamepad2,
   BarChart3,
 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -171,11 +172,40 @@ export const TEACHER_SETUP_STEP_COUNT = INFOGRAPHIC_STEPS.length;
  */
 const STEP_DELAY = ['delay-0', 'delay-75', 'delay-150', 'delay-200', 'delay-300'];
 
-export function TeacherSetupSteps({ className }: { className?: string }) {
+export function TeacherSetupSteps({
+  className,
+  onStepVisible,
+}: {
+  className?: string;
+  /** Called with a step's index the first time it is on screen. */
+  onStepVisible?: (index: number) => void;
+}) {
   const { t } = useLanguage();
+  const listRef = useRef<HTMLOListElement>(null);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!onStepVisible || !list) return;
+    const items = Array.from(list.querySelectorAll<HTMLElement>('[data-step-index]'));
+    const indexOf = (el: Element) => Number(el.getAttribute('data-step-index'));
+    if (typeof IntersectionObserver === 'undefined') {
+      items.forEach((el) => onStepVisible(indexOf(el)));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        io.unobserve(entry.target);
+        onStepVisible(indexOf(entry.target));
+      }
+    }, { threshold: 0.5 });
+    items.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [onStepVisible]);
 
   return (
     <ol
+      ref={listRef}
       className={cn(
         'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5',
         className,
@@ -187,6 +217,7 @@ export function TeacherSetupSteps({ className }: { className?: string }) {
           <li
             key={step.id}
             data-testid={`onboarding-step-${step.id}`}
+            data-step-index={idx}
             className={cn(
               'animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards duration-300',
               'motion-reduce:animate-none',

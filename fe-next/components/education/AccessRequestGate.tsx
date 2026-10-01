@@ -34,7 +34,7 @@ const PRIMARY_CTA_CLASS =
 export function AccessRequestGate() {
   const { t } = useLanguage();
   const { user, profile, loading } = useAuth();
-  const [authMode, setAuthMode] = useState<'signin' | 'signup' | null>(null);
+  const [authMode, setAuthMode] = useState<'signup' | 'signin' | null>(null);
   const [resend, setResend] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
   // Wait for auth to resolve before choosing a branch — rendering the sign-up
@@ -63,7 +63,7 @@ export function AccessRequestGate() {
           onClick={() => setAuthMode('signin')}
           className="mt-3 flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-4 font-neo-display text-sm font-black text-neo-white shadow-hard-sm transition-[box-shadow] hover:shadow-hard focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
-          {t('eduHq.access.haveAccount')}
+          {t('education.access.auth_signin_cta')}
         </button>
         <p className="mt-3 text-center text-sm font-semibold text-neo-white/60">
           {t('education.access.cta_micro')}

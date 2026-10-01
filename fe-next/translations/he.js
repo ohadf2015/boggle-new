@@ -1,5 +1,174 @@
 // HE translations
 const he = {
+  // @eduLibrary:start
+  "eduLibrary": {
+    "title": "ספרייה",
+    "tabs": {
+      "mine": "הרשימות שלי",
+      "discover": "גילוי"
+    },
+    "editor": {
+      "createTitle": "רשימת מילים חדשה",
+      "editTitle": "עריכת רשימה",
+      "description": "מדביקים מילים, מוסיפים פירוש, שומרים.",
+      "newList": "רשימה חדשה",
+      "titleLabel": "שם הרשימה",
+      "titlePlaceholder": "איך נקרא לרשימה?",
+      "pasteLabel": "הדביקו או הקלידו מילים",
+      "pastePlaceholder": "תפוח, בננה, דובדבן — או מילה בכל שורה. ״מילה - פירוש״ מוסיף גם פירוש.",
+      "addedWords": "+{count} נוספו",
+      "skippedDuplicates": "{count} כבר ברשימה",
+      "importFile": "CSV / TSV",
+      "starterPack": "חבילת פתיחה",
+      "fileError": "לא מצאנו מילים בקובץ. מילה אחת בכל שורה, והפירוש בעמודה השנייה.",
+      "wordsHeading": "מילים",
+      "wordsLabel": "המילים ברשימה",
+      "viewLabel": "תצוגה",
+      "view": {
+        "chips": "תגיות",
+        "details": "פירוט"
+      },
+      "emptyWords": "המילים שלכם יקפצו לכאן.",
+      "removeWord": "להסיר את {word}",
+      "noDefinition": "עוד אין פירוש",
+      "word": "מילה",
+      "definition": "פירוש (לא חובה)",
+      "definitionPlaceholder": "מה זה אומר?",
+      "done": "סיום",
+      "needTitle": "תנו לרשימה שם כדי לשמור.",
+      "needWords": "הוסיפו לפחות מילה אחת.",
+      "save": "שמירה",
+      "saving": "שומרים…",
+      "saved": "נשמר",
+      "savedToast": "״{name}״ נשמרה"
+    },
+    "issue": {
+      "digits": "יש בה ספרה",
+      "tooLong": "ארוכה מדי למשחק",
+      "wrongScript": "לא נראית בשפת הרשימה",
+      "blocked": "אסורה במשחקי תלמידים"
+    },
+    "meta": {
+      "language": "שפה",
+      "grade": "כיתה",
+      "topic": "נושא",
+      "assignTo": "להקצות ל־",
+      "noClass": "בלי כיתה בינתיים"
+    },
+    "grade": {
+      "any": "כל הכיתות",
+      "k2": "גן–ב׳",
+      "g35": "ג׳–ה׳",
+      "g68": "ו׳–ח׳",
+      "g912": "ט׳–י״ב"
+    },
+    "topic": {
+      "none": "בלי נושא",
+      "all": "כל הנושאים",
+      "general": "כללי",
+      "english": "אנגלית",
+      "hebrew": "עברית",
+      "science": "מדעים",
+      "math": "מתמטיקה",
+      "history": "היסטוריה",
+      "geography": "גאוגרפיה",
+      "language": "לימוד שפה"
+    },
+    "share": {
+      "toggle": "שיתוף בגילוי",
+      "help": "מורים אחרים יוכלו למצוא, להפעיל ולהעתיק. רק שם התצוגה שלכם מופיע.",
+      "blocked": "יש מילים שאי אפשר לשתף עם תלמידים. הסירו אותן כדי לשתף.",
+      "share": "שיתוף",
+      "shared": "משותפת",
+      "nowPublic": "שותפה בגילוי",
+      "nowPrivate": "חזרה להיות פרטית",
+      "failed": "לא הצלחנו לשנות את השיתוף. נסו שוב."
+    },
+    "remixedFrom": "רמיקס של {title} מאת {author}",
+    "remixedFromNoAuthor": "רמיקס של {title}",
+    "myLists": {
+      "emptyHint": "הדביקו רשימה, התחילו מחבילת פתיחה, או קחו רשימה מהגילוי."
+    },
+    "card": {
+      "practice": "תרגול",
+      "words": "{count} מילים",
+      "by": "מאת {author}",
+      "aTeacher": "מורה",
+      "new": "חדש",
+      "plays": "{count} הפעלות",
+      "copies": "{count} העתקות",
+      "results": "תוצאות"
+    },
+    "badge": {
+      "verified": "מאומת",
+      "teacher": "של מורה",
+      "yours": "שלך"
+    },
+    "discover": {
+      "searchLabel": "חיפוש רשימות",
+      "searchPlaceholder": "חפשו רשימה, מילה או מורה",
+      "clearSearch": "ניקוי החיפוש",
+      "filters": "סינון",
+      "allLanguages": "הכול",
+      "sourceLabel": "מי הכין",
+      "source": {
+        "all": "הכול",
+        "verified": "מאומת על ידי LexiClash",
+        "teacher": "של מורים"
+      },
+      "count": "{count} רשימות",
+      "sortLabel": "מיון",
+      "sort": {
+        "popular": "הכי פופולריות",
+        "newest": "החדשות ביותר"
+      },
+      "loadError": "לא הצלחנו לטעון את הגילוי.",
+      "retry": "לנסות שוב",
+      "emptyTitle": "עוד אין רשימות שמתאימות",
+      "emptyHint": "נסו סינון אחר — או שתפו רשימה שלכם כדי שהמורה הבא ימצא אותה.",
+      "tryAllLanguages": "להציג את כל השפות",
+      "shareFirst": "לשתף רשימה",
+      "beFirstTitle": "היו המורים הראשונים כאן.",
+      "beFirstHint": "שתפו רשימה אחת, והיא תופיע לכל מורה בשפה הזו."
+    },
+    "preview": {
+      "host": "להפעיל משחק חי",
+      "assign": "להקצות",
+      "copy": "ליצור עותק",
+      "copied": "הועתקה",
+      "copiedHint": "היא כבר ב״הרשימות שלי״ — לחצו על ״הועתקה״ כדי לפתוח.",
+      "copiedToast": "״{name}״ הועתקה לרשימות שלך",
+      "copyFailed": "לא הצלחנו להעתיק. נסו שוב."
+    },
+    "report": {
+      "action": "דיווח על הרשימה",
+      "title": "דיווח על רשימה",
+      "description": "מה הבעיה ב״{name}״? אנחנו בודקים כל דיווח.",
+      "reason": {
+        "inappropriate": "לא מתאימה לתלמידים",
+        "offensive": "מילים פוגעניות",
+        "unplayable": "מילים שגויות או לא שמישות",
+        "spam": "ספאם או זבל"
+      },
+      "detailsPlaceholder": "עוד משהו? (לא חובה)",
+      "submit": "שליחת דיווח",
+      "thanks": "תודה — נבדוק את זה.",
+      "failed": "הדיווח לא נשלח. נסו שוב."
+    },
+    "assign": {
+      "title": "הקצאה לכיתה",
+      "pickClass": "איזו כיתה מקבלת?",
+      "noClasses": "קודם צרו כיתה — זה לוקח 5 שניות.",
+      "createClass": "יצירת כיתה"
+    },
+    "pager": {
+      "label": "עמודים",
+      "prev": "הקודם",
+      "next": "הבא",
+      "status": "{page} / {total}"
+    }
+  },
+  // @eduLibrary:end
   // @academy:start (generated by /tmp/edu-play/merge-i18n.mjs)
   "academy": {
     "teacher": {
@@ -15418,6 +15587,12 @@ const he = {
         "title": "הצטרף לכיתה"
       },
       "classroomRoomGone": "משחק הכיתה הסתיים. בקשו מהמורה להתחיל משחק חדש.",
+      "gameEnded": {
+        "title": "המשחק הזה נגמר",
+        "retry": "נסו שוב",
+        "toClass": "חזרה לכיתה שלי",
+        "newCode": "הזינו קוד חדש"
+      },
       "lessonsAssigned": "שיעורים שהוקצו",
       "feel": {
         "points": "נק'",
@@ -15615,6 +15790,7 @@ const he = {
       "auth_required_title": "הירשמו כדי לבקש גישת מורה",
       "auth_required_body": "גישת מורה מחוברת לחשבון מאומת. פִּתחו חשבון חינם או התחברו, ונמשיך בדיוק מכאן.",
       "auth_required_cta": "פתחו לי חשבון מורה בחינם",
+      "auth_signin_cta": "כבר יש לכם חשבון? התחברו",
       "trust_instant": "גישה מיידית — בלי תור לאישור",
       "trust_free": "תוכנית מורה חינמית, ללא תפוגה",
       "trust_nologins": "בלי חשבונות לתלמידים, בלי התקנות",
@@ -18777,6 +18953,9 @@ const he = {
       "share": "שיתוף",
       "seriesChampion": "אלוף/ת הסדרה",
       "teacherPaced": "המורה יתחיל/תתחיל את המשחק הבא",
+      "backToClass": "חזרה לכיתה",
+      "endClassTitle": "לסיים את משחק הכיתה?",
+      "endClassBody": "החדר ייסגר לכל התלמידים ותחזרו ללוח הכיתה שלכם.",
       "roundPoints": "נקודות בסיבוב",
       "yourRank": "המקום שלך",
       "lessonRecap": "סיכום השיעור",

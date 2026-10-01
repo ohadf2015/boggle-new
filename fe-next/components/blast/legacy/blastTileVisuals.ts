@@ -6,11 +6,11 @@ import {
 } from 'lucide-react';
 import type { BlastTileType } from './types';
 
-/* Neo-brutalist tile frame: a hard (blur-free) offset drop shadow + a soft
- * inner top-highlight for a "physical key" bevel. Shared by every tile so the
+/* Neo-brutalist keycap frame: a hard (blur-free) drop straight down + a hard
+ * top highlight and a darker bottom lip, so every tile reads as a pressable candy key. Shared by every tile so the
  * standard face and the colourful specials read as siblings of one set. */
 const INK = '#0b1530';
-const HARD_SHADOW = `3px 3px 0 0 ${INK}, inset 0 2px 0 rgba(255,255,255,0.35), inset 0 -3px 0 rgba(0,0,0,0.12)`;
+const HARD_SHADOW = `3px 4px 0 0 ${INK}, inset 0 3px 0 rgba(255,255,255,0.55), inset 0 -6px 0 rgba(11,21,48,0.18)`;
 
 /** Build a solid special-tile face: one flat brand colour + a thick ink-shade
  *  border + the shared hard frame. No gradients — the colour + lucide icon

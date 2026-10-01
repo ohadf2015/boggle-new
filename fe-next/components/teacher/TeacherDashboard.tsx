@@ -82,7 +82,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
   // `?reviewWords=` is written by the "Practice these words" CTA on the
   // after-game insights card and read here, once, on first render.
   const deepLink = useTeacherDashboardDeepLink();
-  const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
+  const [showAssignmentCreator, setShowAssignmentCreator] = useState(() => deepLink.openAssignment);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [toolsPanel, setToolsPanel] = useState<HqToolsPanel>('home');
   const [lessonsOpen, setLessonsOpen] = useState(() => deepLink.reviewWords.length > 0);
@@ -111,6 +111,14 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
   const checkoutSuccess = searchParams?.get('checkout') === 'success';
   // "Start game" on a Classes card lands here with its class preselected.
   const requestedClassroomId = searchParams?.get('classroomId') ?? null;
+  // One-shot: drop ?assign=1 once read so a refresh doesn't reopen the creator.
+  useEffect(() => {
+    if (!deepLink.openAssignment) return;
+    const rest = new URLSearchParams(searchParams?.toString() ?? '');
+    rest.delete('assign');
+    const query = rest.toString();
+    router.replace(`/${language}/teacher${query ? `?${query}` : ''}`, { scroll: false });
+  }, [deepLink.openAssignment, searchParams, router, language]);
   useEffect(() => {
     if (!checkoutSuccess || proLoading || hasPro) return;
     let tries = 0;

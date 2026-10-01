@@ -44,7 +44,7 @@ export interface TeacherOnboardingProps {
  * Features:
  * - Dismissible + persisted (shows only on first visit)
  * - Reopenable from the teacher dashboard "?" button (forceShow)
- * - Fires edu_teacher_onboarding_step telemetry (view / complete / skip)
+ * - Fires edu_teacher_onboarding_step telemetry (per-step view / complete / skip)
  * - Neo-brutalist styling, RTL-aware
  */
 export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
@@ -75,12 +75,19 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
     onOpenChange?.(false);
   }, [isChip, onOpenChange]);
 
-  // Funnel top: one view event per open
+  // Funnel top: one view event per open; later steps report as they come on screen.
+  const seenSteps = useRef(new Set<number>());
   useEffect(() => {
     if (isVisible) {
+      seenSteps.current = new Set();
       trackEduTeacherOnboardingStep({ step: 0, totalSteps: TOTAL_STEPS, action: 'view' });
     }
   }, [isVisible]);
+  const handleStepVisible = useCallback((step: number) => {
+    if (step === 0 || seenSteps.current.has(step)) return;
+    seenSteps.current.add(step);
+    trackEduTeacherOnboardingStep({ step, totalSteps: TOTAL_STEPS, action: 'view' });
+  }, []);
 
   useFocusTrap(modalRef, isVisible, isChip ? closeChip : onSkip);
 
@@ -190,7 +197,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
 
         {/* The five steps, shared with the public /education section so a
             teacher reads one explanation of the product, not two. */}
-        <TeacherSetupSteps className="px-6 pb-4 sm:px-10" />
+        <TeacherSetupSteps className="px-6 pb-4 sm:px-10" onStepVisible={handleStepVisible} />
 
         {/* Primary CTA */}
         <div className="flex justify-center px-6 pb-8 pt-2 sm:px-10">
