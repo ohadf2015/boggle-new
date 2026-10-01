@@ -14,7 +14,7 @@ const BASE_URL = 'https://www.lexiclash.live';
 const SV_TITLE = 'Alfapet online gratis — inget konto | LexiClash';
 /** Answer in the first 120 chars so Google does not fall back to FAQ body (live snippet was game-mode FAQ). */
 const SV_DESCRIPTION =
-  'Spela Alfapet på svenska gratis i webbläsaren — inget konto, ingen app. Realtid mot vänner, 10 000+ svenska ord. Starta ett rum nu.';
+  'Spela Alfapet & anagram på svenska gratis — inget konto, ingen app. Realtid mot vänner, 10 000+ svenska ord. Starta ett rum nu.';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
