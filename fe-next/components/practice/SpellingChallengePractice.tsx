@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { ArrowLeft, Lightbulb, Check, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Lightbulb, Check, X } from 'lucide-react';
 import { useSpellingGame } from './hooks/useSpellingGame';
 import PracticeResultsCard from './PracticeResultsCard';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
@@ -78,8 +78,9 @@ export function SpellingChallengePractice({
     attempts,
     accuracy,
     isComplete,
+    advance,
     resetGame,
-  } = useSpellingGame(usable);
+  } = useSpellingGame(usable, { manualAdvanceOnWrong: true });
 
   // Mirror the hook's sort-by-length so wordIndex maps to the right enriched
   // word — including the hook's drop of entries with no `word`, or the two
@@ -135,14 +136,15 @@ export function SpellingChallengePractice({
       setFeedback(result);
       setInputValue('');
 
-      // Clear feedback after auto-advance delay
-      const delay = result.correct ? 1000 : 2000;
-      setTimeout(() => {
-        setFeedback(null);
-      }, delay);
+      if (result.correct) setTimeout(() => setFeedback(null), 1000);
     },
     [inputValue, feedback, submitAnswer, sfx]
   );
+
+  const handleNext = useCallback(() => {
+    setFeedback(null);
+    advance();
+  }, [advance]);
 
   const handleRestart = useCallback(() => {
     resetGame();
@@ -307,59 +309,7 @@ export function SpellingChallengePractice({
           </Button>
         </div>
 
-        {/* Feedback display */}
-        <AdaptiveAnimatePresence>
-          {feedback && (
-            <AdaptiveMotion.div
-              data-testid="feedback-display"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 1] }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ duration: 0.25, times: [0, 0.6, 1] }}
-              className={cn(
-                'p-4 rounded-neo border-[3px] text-center',
-                feedback.correct
-                  ? 'bg-neo-green/20 border-neo-green'
-                  : 'bg-neo-pink/20 border-neo-pink animate-neo-shake'
-              )}
-            >
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <AdaptiveMotion.div
-                  initial={{ rotate: -180, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  transition={{ delay: 0.1, duration: 0.2 }}
-                >
-                  {feedback.correct ? (
-                    <Check className="w-6 h-6 text-neo-green" />
-                  ) : (
-                    <X className="w-6 h-6 text-neo-pink" />
-                  )}
-                </AdaptiveMotion.div>
-                <AdaptiveMotion.span
-                  initial={{ x: -10, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.15, duration: 0.15 }}
-                  className={cn(
-                    'font-neo-display text-lg',
-                    feedback.correct ? 'text-neo-green' : 'text-neo-pink'
-                  )}
-                >
-                  {feedback.correct
-                    ? (t('education.practice.correct'))
-                    : (t('education.practice.incorrect'))}
-                </AdaptiveMotion.span>
-              </div>
-              {!feedback.correct && (
-                <p className="text-neo-white font-neo-body">
-                  {t('student.practiceFun.answerLabel')}{' '}
-                  <span className="text-neo-lime font-black">{feedback.correctWord}</span>
-                </p>
-              )}
-            </AdaptiveMotion.div>
-          )}
-        </AdaptiveAnimatePresence>
-
-        {/* Input form */}
+        <div data-testid="spelling-answer-zone" className="relative min-h-[152px]">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             ref={inputRef}
@@ -407,6 +357,45 @@ export function SpellingChallengePractice({
             {t('education.practice.submit')}
           </button>
         </form>
+        {feedback && (
+          <div
+            data-testid="feedback-display"
+            role="status"
+            className={cn(
+              'absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black p-3 text-center shadow-hard-lg',
+              'motion-safe:animate-[lc-verdict-in_260ms_cubic-bezier(.34,1.56,.64,1)]',
+              feedback.correct ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black motion-safe:animate-neo-shake'
+            )}
+          >
+            <style>{'@keyframes lc-verdict-in{0%{transform:scale(.85) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}'}</style>
+            <p className="flex items-center gap-2 font-neo-display text-2xl font-black uppercase">
+              {feedback.correct ? <Check className="size-7" strokeWidth={3.5} /> : <X className="size-7" strokeWidth={3.5} />}
+              {feedback.correct ? t('education.practice.correct') : t('education.practice.incorrect')}
+            </p>
+            {feedback.correct ? (
+              <p className="font-neo-display text-xl font-black tracking-wider" dir="auto">{feedback.correctWord}</p>
+            ) : (
+              <>
+                <p className="flex flex-wrap items-baseline justify-center gap-2 font-neo-body text-sm font-bold">
+                  <span>{t('eduStudent.practice.answerIs')}</span>
+                  <span dir="auto" className="rounded-neo border-[3px] border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-2xl font-black tracking-[0.15em] text-neo-black shadow-hard-sm">
+                    {feedback.correctWord}
+                  </span>
+                </p>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  autoFocus
+                  className="mt-1 inline-flex items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-navy px-5 py-2 font-neo-display text-lg font-black uppercase text-neo-lime shadow-hard transition-transform active:translate-y-0.5 active:shadow-none"
+                >
+                  {wordIndex + 1 >= totalWords ? t('eduStudent.practice.finish') : t('eduStudent.practice.next')}
+                  <DirectionalIcon icon={ArrowRight} className="size-5" />
+                </button>
+              </>
+            )}
+          </div>
+        )}
+        </div>
       </div>
     </div>
   );

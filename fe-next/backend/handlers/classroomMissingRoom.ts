@@ -28,6 +28,7 @@
 import type { Server, Socket } from 'socket.io';
 
 import { getClassroomGame, type ClassroomGame } from '../modules/classroomGameManager.js';
+import { getGame } from '../modules/gameStateManager.js';
 import { isClassroomSessionEnded } from '../modules/classroomGameSessionState.js';
 import { buildClassroomJoinRefusedEvent, captureEduServerEvents } from '../utils/educationTelemetry.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
@@ -79,20 +80,25 @@ export function isClassroomAwaitingRoom(record: ClassroomGame | null | undefined
   return !!record && record.status === 'waiting' && !isClassroomSessionEnded(record);
 }
 
-/** Answer a `join` whose code has no room in memory or in Redis. Never throws. */
+/**
+ * Answer a `join` whose code has no room in memory or in Redis. Never throws.
+ * Resolves 'opened' when the room appeared meanwhile, so the caller seats the child now.
+ */
 export async function answerMissingRoom(
   socket: Socket,
   gameCode: string,
   username?: string,
   avatar?: unknown,
   io?: Server
-): Promise<void> {
+): Promise<'opened' | void> {
   let record: ClassroomGame | null = null;
   try {
     record = await getClassroomGame(gameCode);
   } catch (err) {
     logger.warn('CLASSROOM_GAME', `Could not read classroom record for missing room ${gameCode}: ${(err as Error)?.message ?? err}`);
   }
+  // createGame may have run (and announced) during the await, before this socket could be parked.
+  if (getGame(gameCode)) return 'opened';
 
   if (isClassroomAwaitingRoom(record)) {
     logger.info('CLASSROOM_GAME', `Early join for ${gameCode}: room not open yet, client will wait`);

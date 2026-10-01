@@ -160,6 +160,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
                   // own share code would blink out of existence on every reload.
                   isHost={isHost || isClassroomHost}
                   liveGame={liveClassroomGame}
+                  showResults={showResults}
                 />
               </>
             )

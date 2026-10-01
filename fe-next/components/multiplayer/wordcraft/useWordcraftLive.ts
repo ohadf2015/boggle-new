@@ -67,6 +67,18 @@ export function placementsFit(
   );
 }
 
+/** The server needs two tiles for an opening word; one lone letter is never a move. */
+export const MIN_OPENING_TILES = 2;
+
+export type WordcraftHint = 'first' | 'more' | 'anchor' | 'ready' | null;
+
+/** On an empty board the word is centred over the middle square, so the first move needs no board tap. */
+export function centredAnchor(boardSize: number, length: number, direction: WordcraftDirection): { row: number; col: number } {
+  const center = Math.floor(boardSize / 2);
+  const start = Math.max(0, center - Math.floor((length - 1) / 2));
+  return direction === 'across' ? { row: center, col: start } : { row: start, col: center };
+}
+
 const MAX_ACTIVITY = 12;
 
 export function useWordcraftLive(opts: { socket: WordcraftLiveSocket | null }) {
@@ -77,6 +89,7 @@ export function useWordcraftLive(opts: { socket: WordcraftLiveSocket | null }) {
   const [direction, setDirection] = useState<WordcraftDirection>('across');
   const [lastError, setLastError] = useState<string | null>(null);
   const [activity, setActivity] = useState<WordcraftLiveActivity[]>([]);
+  const [lastPlaced, setLastPlaced] = useState<{ word: string; score: number; bingo: boolean; at: number } | null>(null);
   const snapshotRef = useRef(snapshot);
   snapshotRef.current = snapshot;
 
@@ -96,6 +109,7 @@ export function useWordcraftLive(opts: { socket: WordcraftLiveSocket | null }) {
         setStagedIds([]);
         setAnchor(null);
         setLastError(null);
+        setLastPlaced({ word: r.words?.[0]?.word ?? '', score: r.score ?? 0, bingo: !!r.bingo, at: Date.now() });
       } else {
         // Tiles stay staged so the student adjusts instead of re-tapping.
         setLastError(r.error ?? 'INVALID_WORD');
@@ -156,11 +170,25 @@ export function useWordcraftLive(opts: { socket: WordcraftLiveSocket | null }) {
     setDirection((d) => (d === 'across' ? 'down' : 'across'));
   }, []);
 
+  const boardEmpty = (snapshot?.cells.length ?? 0) === 0;
+  const autoCentered = !anchor && boardEmpty && !!snapshot && staged.length >= MIN_OPENING_TILES;
+  const effectiveAnchor = useMemo(
+    () => (autoCentered && snapshot ? centredAnchor(snapshot.boardSize, staged.length, direction) : anchor),
+    [autoCentered, snapshot, staged.length, direction, anchor],
+  );
   const placements = useMemo(
-    () => buildPlacements(staged, anchor, direction),
-    [staged, anchor, direction],
+    () => buildPlacements(staged, effectiveAnchor, direction),
+    [staged, effectiveAnchor, direction],
   );
   const canSubmit = placementsFit(placements, snapshot);
+
+  const hint: WordcraftHint = !snapshot
+    ? null
+    : canSubmit
+      ? 'ready'
+      : boardEmpty
+        ? staged.length === 0 ? 'first' : !anchor ? 'more' : null
+        : staged.length > 0 && !anchor ? 'anchor' : null;
 
   const submit = useCallback(() => {
     if (!socket || !placements || !placementsFit(placements, snapshotRef.current)) return;
@@ -177,6 +205,9 @@ export function useWordcraftLive(opts: { socket: WordcraftLiveSocket | null }) {
     activity,
     placements,
     canSubmit,
+    autoCentered,
+    hint,
+    lastPlaced,
     tapRackTile,
     recallTile,
     clearStage,

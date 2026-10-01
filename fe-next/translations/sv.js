@@ -18863,6 +18863,58 @@ const sv = {
       "total": "Totalt",
       "player": "Spelare"
     }
+  },
+  "eduStudent": {
+    "mode": {
+      "vocabQuiz": {
+        "rule": "Läs ledtråden och tryck på ordet som passar. Snabbt och rätt ger mest poäng."
+      },
+      "wordcraft": {
+        "rule": "Stava ord från lektionen med dina brickor och lägg dem på brädet."
+      },
+      "pending": "Nu kör vi!",
+      "pendingRule": "Titta upp, din lärare startar rundan."
+    },
+    "lobby": {
+      "pickLook": "Välj en look",
+      "shuffleLooks": "Blanda looks",
+      "buildLook": "Skapa din egen look",
+      "readySticker": "Redo!"
+    },
+    "exit": {
+      "title": "Lämna spelet?",
+      "body": "Du hoppar av den här rundan. Samma kod tar dig tillbaka.",
+      "stay": "Fortsätt spela",
+      "leave": "Lämna"
+    },
+    "join": {
+      "surpriseMe": "Överraska mig",
+      "funNames": "Pixel-Panda|Kapten Utter|Turbo-Rostis|Disco-Lama|Ninja-Nudel|Raket-Tvättbjörn|Kosmisk Kiwi|Smygande Sengångare|Mega-Mango|Laser-Lemur|Bubbel-Bison|Jazzig Jaguar|Våffelvisard|Åsk-Anka|Komet-Katt|Glitter-Gecko|Banan-Bossen|Turbo-Sköldis|Kvant-Quokka|Fluffig Falk"
+    },
+    "results": {
+      "missedTitle": "Fånga de här nästa gång",
+      "missedNone": "Du hittade alla lektionsord. Legend!",
+      "hear": "Lyssna på {word}",
+      "practiceThese": "Öva på dem",
+      "tapToHear": "Tryck på ett ord för att höra det"
+    },
+    "wordcraft": {
+      "hintFirst": "Tryck på bokstäver för att bygga ett ord. Det hamnar i mitten.",
+      "hintMore": "En bokstav till. Ord behöver minst 2.",
+      "hintAnchor": "Tryck nu på en ruta bredvid en bricka på brädet.",
+      "hintReady": "Snyggt. Tryck på LÄGG!",
+      "targetsProgress": "{found}/{total} lektionsord",
+      "showTargets": "Visa lektionsorden",
+      "hideTargets": "Dölj lektionsorden"
+    },
+    "practice": {
+      "answerIs": "Det stavas",
+      "next": "Nästa ord",
+      "finish": "Se mitt resultat"
+    },
+    "cookie": {
+      "message": "Vi använder kakor för att räkna spel och visa annonser."
+    }
   }
 };
 

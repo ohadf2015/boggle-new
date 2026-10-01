@@ -22,6 +22,7 @@ import { PlayerLobbyScreen } from '@/components/multiplayer/lobby/PlayerLobbyScr
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { usePlayerPhase } from './hooks/usePlayerPhase';
+import { MODE_TRANSLATION_KEY } from '@/components/education/classroomModeLabels';
 import type { PlayerViewProps } from './types';
 
 const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
@@ -45,7 +46,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
   const showGameView = gameActive || (hasGameData && !boardWaiting);
 
   // Map game mode to display label
-  const modeRevealLabel = gameMode === 'blast' ? t('countdown.modeReveal.blast') : gameMode === 'word-hunt' ? t('countdown.modeReveal.wordHunt') : gameMode === 'wheel-rush' ? t('countdown.modeReveal.wheelRush') : t('countdown.modeReveal.classic');
+  const modeRevealLabel = isClassroomMode && classroomGameMode
+    ? t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[classroomGameMode] ?? 'classic'}`)
+    : gameMode === 'blast' ? t('countdown.modeReveal.blast') : gameMode === 'word-hunt' ? t('countdown.modeReveal.wordHunt') : gameMode === 'wheel-rush' ? t('countdown.modeReveal.wheelRush') : t('countdown.modeReveal.classic');
 
   // The mode-reveal / countdown sequence always routes through the main
   // in-game-view return below, so GoRipplesAnimation (and ModeRevealOverlay)
@@ -149,6 +152,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
           }}
           t={t}
           players={playersReady}
+          classroom={isClassroomMode ? { mode: classroomGameMode ?? null } : null}
         />
         </MpCountdown>
       )}

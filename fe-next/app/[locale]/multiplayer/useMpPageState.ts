@@ -9,6 +9,7 @@ import { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'r
 import toast from 'react-hot-toast';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useClassroomLiveGame } from '@/hooks/useLiveClassroomGameInfo';
+import { useFollowedClassroomGame } from '@/components/student/live/useFollowedClassroomGame';
 import { useTeacherStripState } from '@/components/education/controls/useTeacherStripState';
 import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { resolveClassroomContext, classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY, type ClassroomContext } from '@/lib/education/classroomRoomGone';
@@ -156,7 +157,7 @@ export function useMpPageState() {
   // typed a classroom code into the arcade lobby has no URL flag, and this
   // record (404 for arcade rooms) is the only signal that their exits must
   // stay in education.
-  const { info: liveClassroomGame, status: liveClassroomGameStatus } = useClassroomLiveGame(gameCode || prefilledRoomCode, true);
+  const { info: liveClassroomRecord, status: liveClassroomGameStatus } = useClassroomLiveGame(gameCode || prefilledRoomCode, true);
   // Tri-state: 'pending' while the record is still out, so the irreversible
   // classroom decisions (host transfer, room-gone, host-left) defer instead of
   // guessing arcade (pitfall class 1 — an optimistic default a later source
@@ -292,6 +293,8 @@ export function useMpPageState() {
   useReloadRejoin({ pending: reloadRejoinPending, socket, isConnected, isActive, onSettled: settleReloadRejoin });
 
   useAchievementSocketBridge(socket);
+  // The record is fetched once; a teacher who changes game in the same room changes the mode.
+  const liveClassroomGame = useFollowedClassroomGame(socket, gameCode || prefilledRoomCode, liveClassroomRecord);
 
   const handleJoin = useMultiplayerJoin({
     socket, gameCode, username, roomName, hostUsername,
