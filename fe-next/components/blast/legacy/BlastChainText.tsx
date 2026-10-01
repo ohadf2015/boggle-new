@@ -7,8 +7,6 @@ import { getRandomChainEntrance } from './blastEffectVariations';
 interface BlastChainTextProps {
   /** Current chain level (0 = none, 1+ = show text) */
   chainLevel: number;
-  /** Word length that triggered this (for word-length celebrations) */
-  wordLength?: number;
   /** Translation function */
   t: (key: string) => string | undefined;
 }
@@ -27,27 +25,12 @@ function getChainTier(chainLevel: number) {
   return TIERS[Math.min(chainLevel, 5)]!;
 }
 
-function getWordTier(wordLength: number | undefined) {
-  if (!wordLength || wordLength <= 4) return null;
-  if (wordLength === 5) return TIERS[2]!;
-  if (wordLength === 6) return TIERS[3]!;
-  return TIERS[4]!;
-}
-
-function getTier(chainLevel: number, wordLength?: number) {
-  const chain = getChainTier(chainLevel);
-  const word = getWordTier(wordLength);
-  if (!chain) return word;
-  if (!word) return chain;
-  return chain.scale >= word.scale ? chain : word;
-}
-
-export default function BlastChainText({ chainLevel, wordLength, t }: BlastChainTextProps) {
+export default function BlastChainText({ chainLevel, t }: BlastChainTextProps) {
   const [visible, setVisible] = useState(false);
   const [animKey, setAnimKey] = useState(0);
   const entranceRef = useRef(getRandomChainEntrance());
 
-  const tier = getTier(chainLevel, wordLength);
+  const tier = getChainTier(chainLevel);
 
   const dismiss = useCallback(() => setVisible(false), []);
 
@@ -58,7 +41,7 @@ export default function BlastChainText({ chainLevel, wordLength, t }: BlastChain
     setAnimKey(k => k + 1);
     const id = setTimeout(dismiss, 800);
     return () => clearTimeout(id);
-  }, [chainLevel, wordLength, tier, dismiss]);
+  }, [chainLevel, tier, dismiss]);
 
   return (
     <div className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center">

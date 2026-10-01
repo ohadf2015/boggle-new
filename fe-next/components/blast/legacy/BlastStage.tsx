@@ -456,16 +456,16 @@ export const BlastStage = memo(function BlastStage({
                 />
               </div>
             )}
-            {/* First-use teaching: names a special tile + what it does the
-                first time the player meets it (once per tile, persisted). */}
-            {firstUseTeaching && (
-              <BlastTileFirstUseCallout
-                type={firstUseTeaching}
-                onDismiss={dismissFirstUse}
-                isMultiplayer={isMultiplayer}
-              />
-            )}
           </div>
+          {/* First-use teaching: names a special tile + what it does the
+              first time the player meets it (once per tile, persisted). */}
+          {firstUseTeaching && (
+            <BlastTileFirstUseCallout
+              type={firstUseTeaching}
+              onDismiss={dismissFirstUse}
+              isMultiplayer={isMultiplayer}
+            />
+          )}
         </div>
         {/* Cascade word discovery banner */}
         <AdaptiveAnimatePresence>
@@ -486,7 +486,7 @@ export const BlastStage = memo(function BlastStage({
           )}
         </AdaptiveAnimatePresence>
         {/* Chain escalation text — scoped within board area */}
-        <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} wordLength={lastWordLength} t={t} />
+        <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
         <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} />
         <BlastCurrencyBurst burst={currencyBurst} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />

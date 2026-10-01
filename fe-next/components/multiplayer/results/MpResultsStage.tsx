@@ -33,6 +33,7 @@ import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
 import { roundAwards, seriesGrid } from './mpResultsStory';
 import type { MpResultsController } from './useMpResultsController';
 import fx from './mpResults.module.css';
+import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
@@ -164,6 +165,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const grid = useMemo(() => seriesGrid({ ladder, standings: seriesStandings, rounds: seriesRoundNumber }), [ladder, seriesStandings, seriesRoundNumber]);
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
 
+  const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
+
   const header = (
     <MpResultsHeader
       branch={branch}
@@ -280,7 +283,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
-            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} t={t} />
+            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} leaveKey={exitCopy.leaveKey} t={t} />
           ) : (
             <MpIntermissionFooter
               isHost={isHost}
@@ -328,8 +331,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       <ConfirmationDialog
         open={c.showExitConfirm}
         onOpenChange={c.setShowExitConfirm}
-        title={t('playerView.exitConfirmation')}
-        description={t('results.exitWarning')}
+        title={t(exitCopy.titleKey)}
+        description={t(exitCopy.bodyKey)}
         confirmText={t('common.confirm')}
         cancelText={t('common.cancel')}
         onConfirm={c.confirmExitRoom}

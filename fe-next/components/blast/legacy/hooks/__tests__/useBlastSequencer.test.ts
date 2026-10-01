@@ -60,3 +60,29 @@ describe('useBlastSequencer — commit is never skipped', () => {
     expect(commit).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('useBlastSequencer — animateWordClear onClearStart', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  });
+
+  it('fires onClearStart once, as the tiles enter the clearing phase', async () => {
+    const { result } = renderHook(() => useBlastSequencer());
+    const onClearStart = vi.fn(() => {
+      expect(result.current.state.phase).not.toBe('idle');
+    });
+    let done = false;
+    act(() => {
+      void result.current.animateWordClear([{ row: 0, col: 0, type: 'standard' }], onClearStart).then(() => { done = true; });
+    });
+    expect(onClearStart).not.toHaveBeenCalled();
+    await act(async () => { await vi.advanceTimersByTimeAsync(140); });
+    expect(onClearStart).toHaveBeenCalledTimes(1);
+    expect(done).toBe(false);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(done).toBe(true);
+    expect(onClearStart).toHaveBeenCalledTimes(1);
+  });
+});

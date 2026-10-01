@@ -34,7 +34,7 @@ const PRIMARY_CTA_CLASS =
 export function AccessRequestGate() {
   const { t } = useLanguage();
   const { user, profile, loading } = useAuth();
-  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState<'signup' | 'signin' | null>(null);
   const [resend, setResend] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
   // Wait for auth to resolve before choosing a branch — rendering the sign-up
@@ -51,7 +51,7 @@ export function AccessRequestGate() {
           {t('education.access.auth_required_title')}
         </h2>
         <p className="mt-2 text-neo-white/80">{t('education.access.auth_required_body')}</p>
-        <button type="button" onClick={() => setShowAuth(true)} className={`mt-5 ${PRIMARY_CTA_CLASS}`}>
+        <button type="button" onClick={() => setAuthMode('signup')} className={`mt-5 ${PRIMARY_CTA_CLASS}`}>
           {t('education.access.auth_required_cta')}
           <DirectionalIcon
             icon={ArrowRight}
@@ -61,7 +61,14 @@ export function AccessRequestGate() {
         <p className="mt-3 text-center text-sm font-semibold text-neo-white/60">
           {t('education.access.cta_micro')}
         </p>
-        {showAuth && <AuthModal isOpen onClose={() => setShowAuth(false)} initialMode="signup" />}
+        <button
+          type="button"
+          onClick={() => setAuthMode('signin')}
+          className="mt-4 block w-full min-h-11 text-center font-bold text-neo-cyan underline decoration-2 underline-offset-4 hover:text-neo-lime"
+        >
+          {t('education.access.auth_signin_cta')}
+        </button>
+        {authMode && <AuthModal isOpen onClose={() => setAuthMode(null)} initialMode={authMode} />}
       </div>
     );
   }

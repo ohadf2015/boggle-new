@@ -158,7 +158,8 @@ export function buildClassroomGameCompletedEvents(
         o.lessonWordsAskedCount > 0
           ? o.lessonWordsFoundCount / o.lessonWordsAskedCount
           : null,
-      player_count: game.players?.length ?? 0,
+      // The live roster is often already emptied at teardown; outcomes are who was recorded.
+      player_count: outcomes.length,
     },
   }));
 }

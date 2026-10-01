@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import type { BlastTileType } from './types';
 import { getTileTooltip } from './utils/blastTileTooltips';
 
-const AUTO_DISMISS_MS = 6500;
+const AUTO_DISMISS_MS = 4500;
 /** MP is time-pressured + hands-busy: dismiss sooner and never demand a tap. */
 const AUTO_DISMISS_MS_MP = 3500;
 
@@ -42,7 +42,7 @@ export function BlastTileFirstUseCallout({ type, onDismiss, isMultiplayer = fals
 
   return (
     <div
-      className="pointer-events-none absolute inset-x-0 top-2 z-30 flex justify-center px-3"
+      className="pointer-events-none absolute inset-x-0 top-full mt-3 z-30 flex justify-center px-3"
       aria-live="polite"
     >
       <div

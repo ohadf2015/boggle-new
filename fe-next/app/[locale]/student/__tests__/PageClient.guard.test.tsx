@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
-const { mockUseAuth, mockPush } = vi.hoisted(() => ({ mockUseAuth: vi.fn(), mockPush: vi.fn() }));
+const { mockUseAuth, mockPush, mockReplace } = vi.hoisted(() => ({ mockUseAuth: vi.fn(), mockPush: vi.fn(), mockReplace: vi.fn() }));
 
 // usePathname is what EducationShell reads to decide whether this screen has
 // tabs. A bare factory mock without it does not return undefined — vitest
 // throws on the unknown export — so every partial mock of this module must
 // name it.
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }), usePathname: () => '/en/student' }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush, replace: mockReplace }), usePathname: () => '/en/student' }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
 vi.mock('@/hooks/useStudentClassroom', () => ({ useStudentClassroom: () => ({ classroomId: null }) }));
@@ -36,13 +36,14 @@ describe('StudentPageClient — guard race (fresh guest session)', () => {
 
     await waitFor(() => expect(screen.getByTestId('loader')).toBeInTheDocument());
     expect(mockPush).not.toHaveBeenCalled();
+    expect(mockReplace).not.toHaveBeenCalled();
   });
 
   it('redirects a truly logged-out visitor to the student join entry, not the main app home', async () => {
     mockUseAuth.mockReturnValue({ user: null, profile: null, loading: false });
     render(<StudentPageClient />);
 
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en/student/join'));
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/en/student/join'));
   });
 
   it('renders the hub once the guest user + profile are both present', async () => {

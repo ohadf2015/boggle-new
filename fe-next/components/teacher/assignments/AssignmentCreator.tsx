@@ -44,6 +44,8 @@ interface AssignmentCreatorProps {
   onComplete: () => void;
   isOpen: boolean;
   onClose: () => void;
+  /** Preselect a lesson (e.g. a list just copied from Discover). */
+  initialLessonId?: string;
 }
 
 /**
@@ -58,6 +60,7 @@ export default function AssignmentCreator({
   onComplete,
   isOpen,
   onClose,
+  initialLessonId,
 }: AssignmentCreatorProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -120,12 +123,12 @@ export default function AssignmentCreator({
   useEffect(() => {
     if (isOpen) {
       setSelectedType('wordcraft');
-      setSelectedLessonId('');
+      setSelectedLessonId(initialLessonId ?? '');
       setDueDate('');
       setInstructions('');
       setFocus('any');
     }
-  }, [isOpen]);
+  }, [isOpen, initialLessonId]);
 
   // A focus the newly chosen lesson cannot support falls back to "any"
   useEffect(() => {
