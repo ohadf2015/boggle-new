@@ -301,7 +301,9 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     // a single-purpose student screen where three tabs are three ways out of it (/student/join
     // already hid it). Game lobbies keep the nav; gameplay hides it via `isInGame`.
     const shouldHideOnCurrentPath = useMemo(() => {
-        const pathsWithOwnNav = ['/admin', '/student', '/teacher', '/join'];
+        const pathsWithOwnNav = ['/admin', '/student', '/teacher', '/join', '/education/access'];
+        // Exact match: the teacher landing has its own header; /education/* SEO pages keep the nav.
+        if (cleanPath === '/education') return true;
         return pathsWithOwnNav.some(p => matchesPrefix(cleanPath, p));
     }, [cleanPath]);
 

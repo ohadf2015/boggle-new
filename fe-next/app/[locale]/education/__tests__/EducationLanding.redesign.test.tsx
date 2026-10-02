@@ -65,15 +65,16 @@ describe('Education Landing — redesign (WU-9)', () => {
     vi.clearAllMocks();
   });
 
-  describe('authenticated student auto-redirect', () => {
-    it('redirects student to student dashboard immediately', () => {
+  describe('signed-in account without teacher access', () => {
+    it('stays on the landing and is asked to finish teacher setup, not sent to the student hub', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         loading: false,
         profile: { user_role: 'student', is_admin: false },
       });
       render(<EducationPageClient />);
-      expect(mockReplace).toHaveBeenCalledWith('/en/student');
+      expect(mockReplace).not.toHaveBeenCalled();
+      expect(screen.getByTestId('education-hero-free-cta')).toHaveAttribute('href', '/en/education/access');
     });
 
     it('does not redirect while auth is loading', () => {
@@ -123,12 +124,8 @@ describe('Education Landing — redesign (WU-9)', () => {
       });
     });
 
-    it('shows role cards without feature checklists', () => {
+    it('has no feature checklists', () => {
       render(<EducationPageClient />);
-      // Cards should exist
-      expect(screen.getByText('education.landing.teacher')).toBeInTheDocument();
-      expect(screen.getByText('education.landing.student')).toBeInTheDocument();
-      // Feature items should NOT exist
       expect(screen.queryByText('education.landing.teacherFeature1')).not.toBeInTheDocument();
       expect(screen.queryByText('education.landing.studentFeature1')).not.toBeInTheDocument();
     });
@@ -138,16 +135,15 @@ describe('Education Landing — redesign (WU-9)', () => {
       expect(screen.queryByText('education.landing.duelTeaser.headline')).not.toBeInTheDocument();
     });
 
-    it('shows social proof banner', () => {
+    it('shows the product proof strip instead of an unverifiable social-proof line', () => {
       render(<EducationPageClient />);
-      expect(screen.getByText('education.landing.socialProof')).toBeInTheDocument();
+      expect(screen.queryByText('education.landing.socialProof')).not.toBeInTheDocument();
+      expect(screen.getByText('eg2Land.proof.noLogins')).toBeInTheDocument();
     });
 
-    it('teacher role card links to the access request page', () => {
+    it('the closing CTA links to the access request page', () => {
       render(<EducationPageClient />);
-      const teacherAccessLink = screen.getByTestId('teacher-card-access-link');
-      expect(teacherAccessLink).toBeInTheDocument();
-      expect(teacherAccessLink).toHaveAttribute('href', expect.stringContaining('/education/access'));
+      expect(screen.getByTestId('landing-final-start')).toHaveAttribute('href', expect.stringContaining('/education/access'));
     });
 
     /**

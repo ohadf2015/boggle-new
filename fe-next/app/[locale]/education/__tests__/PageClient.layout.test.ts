@@ -10,12 +10,12 @@ import { join } from 'path';
  */
 const SOURCE = readFileSync(join(__dirname, '..', 'PageClient.tsx'), 'utf8');
 
-/** The <section …> tag that wraps a given translation key. */
+/** The block tag (<section> or <p>) that wraps a given translation key. */
 function sectionTagFor(key: string): string {
   const keyAt = SOURCE.indexOf(key);
   expect(keyAt, `translation key ${key} is not in PageClient.tsx`).toBeGreaterThan(-1);
-  const openAt = SOURCE.lastIndexOf('<section', keyAt);
-  expect(openAt, `no <section> wraps ${key}`).toBeGreaterThan(-1);
+  const openAt = Math.max(SOURCE.lastIndexOf('<section', keyAt), SOURCE.lastIndexOf('<p ', keyAt));
+  expect(openAt, `no block wraps ${key}`).toBeGreaterThan(-1);
   return SOURCE.slice(openAt, SOURCE.indexOf('>', openAt) + 1);
 }
 
@@ -23,10 +23,7 @@ describe('education landing — page-level horizontal rhythm', () => {
   // Every full-width section on this page must be inset the same way. A section without a
   // container is not "slightly off"; it touches the edge of the screen while its neighbours
   // are centred, which reads as a broken page rather than a design choice.
-  const SECTION_KEYS = [
-    'education.landing.trust.title',
-    'education.landing.furtherReading.title',
-  ];
+  const SECTION_KEYS = ['eg2Land.studentNote'];
 
   it.each(SECTION_KEYS)('%s sits in a centred, padded container', (key) => {
     const tag = sectionTagFor(key);

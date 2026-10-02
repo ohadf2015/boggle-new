@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock contexts
+vi.mock('@/components/education/landing/LandingHeader', () => ({
+  LandingHeader: () => <header data-testid="landing-header" />,
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
@@ -221,8 +224,8 @@ describe('<PageClient> (access page state machine)', () => {
       expect(screen.getByText('education.access.next.step1_title')).toBeInTheDocument();
       expect(screen.getByText('education.access.next.step2_title')).toBeInTheDocument();
       expect(screen.getByText('education.access.next.step3_title')).toBeInTheDocument();
-      // Try-a-game block should also be present
-      expect(screen.getByText('education.access.regular_game_title')).toBeInTheDocument();
+      // The consumer try-a-game block is gone from the teacher signup page.
+      expect(screen.queryByText('education.access.regular_game_title')).not.toBeInTheDocument();
     });
 
     it('tightened: loading state has skeleton AND form is absent AND steps present', () => {

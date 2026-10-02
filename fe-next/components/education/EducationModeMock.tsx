@@ -32,7 +32,7 @@ export function EducationModeMock() {
     <figure
       role="img"
       aria-label={t('education.landing.mock.caption')}
-      className="relative mx-auto w-full max-w-md"
+      className="relative mx-auto w-full max-w-[18rem] sm:max-w-md"
     >
       {/* Browser-window frame */}
       <div className="overflow-hidden rounded-neo border-neo-thick border-neo-navy bg-neo-navy shadow-hard-xl">

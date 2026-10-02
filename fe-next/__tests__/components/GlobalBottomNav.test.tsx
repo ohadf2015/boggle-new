@@ -479,8 +479,8 @@ describe('GlobalBottomNav', () => {
             expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
 
-        it('should remain visible on education path (general learning hub, not a dedicated app)', () => {
-            (usePathname as Mock).mockReturnValue('/en/education');
+        it('should remain visible on education SEO pages (general learning hub, not a dedicated app)', () => {
+            (usePathname as Mock).mockReturnValue('/en/education/vocabulary-games-classroom');
 
             render(<GlobalBottomNav />);
             expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -512,6 +512,18 @@ describe('GlobalBottomNav', () => {
 
             const { container } = render(<GlobalBottomNav />);
             expect(container.firstChild).toBeNull();
+        });
+
+        it.each(['/en/education', '/en/education/access'])('hides the consumer tabs on the teacher landing %s', (path) => {
+            (usePathname as Mock).mockReturnValue(path);
+            const { container } = render(<GlobalBottomNav />);
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('keeps the nav on other education pages (they are not the teacher landing)', () => {
+            (usePathname as Mock).mockReturnValue('/en/education/esl-word-games');
+            render(<GlobalBottomNav />);
+            expect(screen.getByRole('navigation')).toBeInTheDocument();
         });
     });
 

@@ -15,6 +15,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { accessReturnPath } from '@/lib/education/accessReturnPath';
+import { LandingHeader } from '@/components/education/landing/LandingHeader';
 
 const TRUST = [
   { key: 'trust_instant', Icon: Zap, chip: 'bg-neo-lime' },
@@ -138,6 +139,7 @@ export function PageClient() {
   if (approved) {
     return (
       <main className="min-h-screen bg-neo-navy text-neo-white">
+        <LandingHeader showStart={false} />
         <section className="mx-auto flex min-h-[80dvh] max-w-xl flex-col justify-center px-4 pb-10 pt-16">
           <div className="relative rounded-neo-xl border-neo-thick border-black bg-neo-lime p-6 pt-14 text-neo-navy shadow-hard-xl sm:p-8 sm:pt-16">
             <span className="absolute -top-12 start-1/2 flex size-24 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-neo-thick border-black bg-neo-cyan shadow-hard rtl:translate-x-1/2">
@@ -166,6 +168,7 @@ export function PageClient() {
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
+      <LandingHeader showStart={false} />
       <section
         className={`mx-auto px-4 py-10 sm:py-14 ${showPitch ? 'max-w-6xl' : 'max-w-2xl'}`}
       >
@@ -253,38 +256,6 @@ export function PageClient() {
               </li>
             ))}
           </ol>
-
-          <div
-            data-access-reveal
-            className="mt-10 flex flex-col gap-3 border-t-2 border-neo-white/15 pt-8 sm:flex-row sm:items-baseline sm:justify-between"
-          >
-            <p className="text-sm text-neo-white/70">
-              <span className="font-bold text-neo-white">
-                {t('education.access.regular_game_title')}
-              </span>{' '}
-              {t('education.access.regular_game_body')}
-            </p>
-            {/* White, not mode-coded: neo-pink (4.2:1) and neo-purple (3.2:1) on
-                navy both fail AA at this size, and colour here would compete with
-                the one CTA this page exists for. */}
-            <div className="flex shrink-0 flex-wrap gap-x-5 gap-y-2 text-sm font-bold">
-              {(
-                [
-                  ['multiplayer', 'try_mp', 'decoration-neo-pink'],
-                  ['blast', 'try_blast', 'decoration-neo-cyan'],
-                  ['daily', 'try_daily', 'decoration-neo-purple'],
-                ] as const
-              ).map(([route, key, accent]) => (
-                <Link
-                  key={route}
-                  href={`/${language}/${route}`}
-                  className={`text-neo-white underline decoration-2 underline-offset-4 transition-colors ${accent} hover:text-neo-lime hover:decoration-neo-lime`}
-                >
-                  {t(`education.access.${key}`)}
-                </Link>
-              ))}
-            </div>
-          </div>
 
           <DistrictUpsellStrip hideTeacherCta />
         </div>

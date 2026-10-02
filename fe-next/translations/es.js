@@ -1,5 +1,74 @@
 // Es translations
 const es = {
+  // @eg2Land:start
+  "eg2Land": {
+    "header": {
+      "home": "Inicio de LexiClash",
+      "tag": "para docentes",
+      "start": "Empieza gratis"
+    },
+    "hero": {
+      "eyebrow": "Para docentes de idiomas y vocabulario",
+      "h1": "Convierte la lista de palabras de esta semana en un juego para toda la clase.",
+      "sub": "El alumnado entra desde cualquier navegador con un código de 6 caracteres: sin cuentas de estudiante, sin anuncios y sin instalar nada. Hecho de forma nativa para {count} idiomas, incluido el hebreo de derecha a izquierda.",
+      "ctaPrimary": "Empieza gratis como docente",
+      "ctaFinishSetup": "Termina tu registro docente",
+      "note": "Plan gratuito sin límite de tiempo · Sin tarjeta"
+    },
+    "studentNote": "¿Eres estudiante?",
+    "studentLink": "Ir a tus clases",
+    "proof": {
+      "label": "Lo que recibe gratis cada docente",
+      "noLogins": "El alumnado entra con un código: sin correo ni cuentas",
+      "languages": "Diccionarios nativos en 6 idiomas, con hebreo de derecha a izquierda",
+      "ownLists": "Tus propias listas: pega, importa un CSV o usa un paquete inicial",
+      "noAds": "Sin anuncios en los juegos de clase del alumnado",
+      "anyDevice": "Chromebook, tableta o móvil: nada que instalar"
+    },
+    "how": {
+      "eyebrow": "Así funciona una clase",
+      "title": "De la lista de palabras al juego en vivo en cinco pasos"
+    },
+    "modes": {
+      "eyebrow": "Modos de clase en vivo",
+      "title": "Seis formas de jugar con la misma lista",
+      "sub": "Elige un modo en la sala, proyéctalo en la pizarra y el alumnado juega desde sus dispositivos. Cambia de modo para que el repaso nunca aburra.",
+      "minutes": "{minutes} min"
+    },
+    "school": {
+      "eyebrow": "Departamentos y centros",
+      "title": "¿Quieres sumar a todo tu departamento?",
+      "body": "Cuéntanos tu centro y cuántos estudiantes tenéis, más o menos. Te enviaremos un presupuesto por correo y resolveremos tus dudas.",
+      "b1": "El alumnado entra con un código: no hay cuentas que crear",
+      "b2": "Un presupuesto de Teacher Pro para tu departamento o centro",
+      "b3": "El panel de administración y el SSO están en nuestra hoja de ruta. Cuéntanos qué necesitas",
+      "plansLink": "Ver planes para centros",
+      "formTeaser": "Recibe un presupuesto por correo",
+      "formNote": "Se rellena en un minuto. Respondemos por correo.",
+      "cta": "Pedir presupuesto para el centro"
+    },
+    "faq": {
+      "title": "Preguntas de docentes"
+    },
+    "final": {
+      "title": "Lanza hoy tu primer juego de clase",
+      "body": "El plan gratuito incluye 3 clases de hasta 50 estudiantes, todos los modos en vivo y tus propias listas. Sin límite de tiempo, sin tarjeta.",
+      "schoolLink": "¿Necesitas un presupuesto para tu centro?"
+    },
+    "checkEmail": {
+      "title": "Revisa tu correo",
+      "sentTo": "Te enviamos un enlace de confirmación a:",
+      "next": "Ábrelo en este dispositivo. Iniciará tu sesión y te traerá de vuelta aquí para terminar tu cuenta docente.",
+      "open": "Abrir {inbox}",
+      "spam": "¿No llega en un minuto? Busca en Spam o Promociones un correo de LexiClash.",
+      "resend": "Reenviar el enlace",
+      "sending": "Enviando…",
+      "resent": "Reenviado: revisa tu bandeja",
+      "change": "Usar otro correo",
+      "resendError": "No pudimos reenviarlo ahora. Espera un minuto y vuelve a intentarlo."
+    }
+  },
+  // @eg2Land:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Biblioteca",
@@ -15846,10 +15915,10 @@ const es = {
       "learnMore": "Saber Más"
     },
     "access": {
-      "h1": "Solicitar acceso de maestro",
-      "lede": "Cuéntanos sobre tu aula. El acceso se concede al instante — sin esperar revisión.",
+      "h1": "Crea tu cuenta docente gratis",
+      "lede": "Regístrate con Google o con tu correo, confirma la dirección y responde dos preguntas rápidas. Entras al instante, sin esperar revisión.",
       "redirect_title": "Esa página necesita acceso de maestro",
-      "redirect_body": "Ibas a {{dest}}. La aprobación es instantánea: el formulario de abajo la desbloquea.",
+      "redirect_body": "Ibas a {{dest}}. Crea abajo tu cuenta docente gratis y se abrirá: los docentes entran al instante.",
       "redirect_dest_fallback": "tus herramientas de clase",
       "full_name": "Tu nombre completo",
       "email": "Tu email",
@@ -15883,8 +15952,8 @@ const es = {
       "go_to_teacher": "Ir al panel",
       "status_unknown_title": "No pudimos leer el estado de tu acceso",
       "status_unknown_body": "Algo falló por nuestra parte. Abre tu panel de profesor o recarga esta página para volver a comprobarlo.",
-      "auth_required_title": "Regístrate para solicitar acceso docente",
-      "auth_required_body": "El acceso docente está vinculado a una cuenta verificada. Crea una cuenta gratis o inicia sesión y seguimos justo aquí.",
+      "auth_required_title": "Empieza con tu cuenta",
+      "auth_required_body": "Con Google es lo más rápido. También con correo: te enviamos un enlace que te trae de vuelta aquí.",
       "auth_required_cta": "Crear mi cuenta docente gratis",
       "auth_signin_cta": "¿Ya tienes cuenta? Inicia sesión",
       "trust_instant": "Acceso al instante — sin cola de revisión",
@@ -15916,12 +15985,12 @@ const es = {
       "school_q": "¿Dónde está tu aula? (opcional)",
       "school_placeholder": "Escuela, centro de refuerzo o educación en casa",
       "next": {
-        "step1_title": "Envía el formulario",
-        "step1_body": "5 campos, 60 segundos.",
-        "step2_title": "Aprobación instantánea",
-        "step2_body": "Sin revisión manual — los profes verificados obtienen acceso al momento.",
-        "step3_title": "¡Acceso inmediato!",
-        "step3_body": "Tu panel se abre de inmediato — además de una nota personal de Ohad."
+        "step1_title": "Crea tu cuenta",
+        "step1_body": "Con Google o con tu correo. Sin tarjeta.",
+        "step2_title": "Confirma y responde 2 preguntas",
+        "step2_body": "Pulsa el enlace que te enviamos y cuéntanos tu función y cómo usarás LexiClash. El acceso es inmediato.",
+        "step3_title": "Crea una clase y comparte el código",
+        "step3_body": "Añade una lista de palabras, inicia un juego y el alumnado entra desde cualquier navegador."
       },
       "regular_game_title": "¿No eres maestro/a? Sin problema.",
       "regular_game_body": "LexiClash es gratis para todos. Juega primero, solicita acceso después.",

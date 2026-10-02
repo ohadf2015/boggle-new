@@ -65,8 +65,12 @@ vi.mock('@/components/education/ComparisonStrip', () => ({
   ComparisonStrip: () => <div data-testid="comparison-strip" />,
 }));
 
-vi.mock('@/components/education/TeacherSetupSection', () => ({
-  TeacherSetupSection: () => (
+vi.mock('@/components/education/tour/TeacherTourDialog', () => ({
+  TeacherTourDialog: () => <button type="button" data-testid="teacher-tour" />,
+}));
+
+vi.mock('@/components/education/TeacherSetupSteps', () => ({
+  TeacherSetupSteps: () => (
     <div data-testid="teacher-setup">
       <div data-testid="onboarding-step-create" />
       <div data-testid="onboarding-step-share" />
@@ -111,21 +115,17 @@ describe('Education Landing — first-screen declutter (R1)', () => {
   });
 
   describe('teacher host path is primary', () => {
-    it('shows a lime (neo-neo-lime) CTA for free teacher access', () => {
+    it('shows a lime free-start CTA in the sticky header', () => {
       render(<EducationPageClient />);
-      const teaCta = screen.getByTestId('teacher-card-access-link');
-      expect(teaCta).toBeInTheDocument();
-      // Lime button = neo-lime bg
-      expect(teaCta).toHaveClass('bg-neo-lime');
+      const start = screen.getByTestId('landing-header-start');
+      expect(start).toHaveClass('bg-neo-lime');
+      expect(start).toHaveAttribute('href', '/en/education/access');
     });
 
-    it('shows the teacher request link in the hero section near the top', () => {
+    it('puts the hero before the Pro checkout card', () => {
       render(<EducationPageClient />);
       const hero = screen.getByTestId('education-hero');
-      const teaCta = screen.getByTestId('teacher-card-access-link');
       const pro = screen.getByTestId('teacher-pro-checkout');
-      expect(hero).toBeInTheDocument();
-      expect(teaCta).toBeInTheDocument();
       expect(hero.compareDocumentPosition(pro) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
@@ -153,12 +153,12 @@ describe('Education Landing — first-screen declutter (R1)', () => {
     });
   });
 
-  describe('role cards remain', () => {
-    it('shows teacher and student role cards', () => {
+  describe('each audience has its own way in', () => {
+    it('offers teachers a free start, schools a quote, and students the no-account join', () => {
       render(<EducationPageClient />);
-      // The role cards are in a specific grid
-      expect(screen.getByTestId('teacher-card-access-link')).toBeInTheDocument();
-      expect(screen.getByTestId('student-card-join-link')).toBeInTheDocument();
+      expect(screen.getByTestId('landing-header-start')).toBeInTheDocument();
+      expect(screen.getByTestId('landing-school-quote-open')).toBeInTheDocument();
+      expect(screen.getByTestId('no-account-cta')).toBeInTheDocument();
     });
   });
 });

@@ -1,5 +1,74 @@
 // EN translations
 const en = {
+  // @eg2Land:start
+  "eg2Land": {
+    "header": {
+      "home": "LexiClash home",
+      "tag": "for teachers",
+      "start": "Start free"
+    },
+    "hero": {
+      "eyebrow": "For language and vocabulary teachers",
+      "h1": "Turn this week's word list into a game your whole class plays.",
+      "sub": "Students join from any browser with a 6-character code — no student accounts, no ads, nothing to install. Built natively for {count} languages, Hebrew right-to-left included.",
+      "ctaPrimary": "Start free as a teacher",
+      "ctaFinishSetup": "Finish teacher setup",
+      "note": "Free plan, no time limit · No credit card"
+    },
+    "studentNote": "Here as a student?",
+    "studentLink": "Go to your classes",
+    "proof": {
+      "label": "What every teacher gets, free",
+      "noLogins": "Students join with a code — no emails, no accounts",
+      "languages": "Native dictionaries in 6 languages, Hebrew right-to-left included",
+      "ownLists": "Your own word lists — paste, import a CSV, or use a starter pack",
+      "noAds": "No ads in student class games",
+      "anyDevice": "Chromebooks, tablets, phones — nothing to install"
+    },
+    "how": {
+      "eyebrow": "How a class runs",
+      "title": "From word list to live game in five steps"
+    },
+    "modes": {
+      "eyebrow": "Live class modes",
+      "title": "Six ways to play the same word list",
+      "sub": "Pick a mode in the lobby, put it on the board, and students play on their own devices. Switch modes so review never goes stale.",
+      "minutes": "{minutes} min"
+    },
+    "school": {
+      "eyebrow": "Departments & schools",
+      "title": "Bringing your whole department?",
+      "body": "Tell us your school and roughly how many students. We'll email you a quote and answer your questions.",
+      "b1": "Students join with a code: no accounts to set up",
+      "b2": "A quote for Teacher Pro across your department or school",
+      "b3": "Admin dashboards and SSO are on our roadmap. Tell us what you need",
+      "plansLink": "See school plans",
+      "formTeaser": "Get a quote by email",
+      "formNote": "About a minute to fill in. We reply by email.",
+      "cta": "Get a school quote"
+    },
+    "faq": {
+      "title": "Teacher questions"
+    },
+    "final": {
+      "title": "Run your first class game today",
+      "body": "The free plan covers 3 classes of up to 50 students, every live mode and your own word lists. No time limit, no credit card.",
+      "schoolLink": "Need a quote for your school?"
+    },
+    "checkEmail": {
+      "title": "Check your inbox",
+      "sentTo": "We sent a confirmation link to:",
+      "next": "Open the link on this device. It signs you in and brings you back to finish your teacher account.",
+      "open": "Open {inbox}",
+      "spam": "Nothing after a minute? Look in Spam or Promotions for an email from LexiClash.",
+      "resend": "Resend the link",
+      "sending": "Sending…",
+      "resent": "Sent again — check your inbox",
+      "change": "Use a different email",
+      "resendError": "Couldn't resend right now. Wait a minute and try again."
+    }
+  },
+  // @eg2Land:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Library",
@@ -14453,10 +14522,10 @@ const en = {
       "vocabScore": "You found {{found}} of {{total}} vocabulary words!"
     },
     "access": {
-      "h1": "Apply for free teacher access",
-      "lede": "Tell us a bit about your classroom. Access is granted instantly — no review wait.",
+      "h1": "Create your free teacher account",
+      "lede": "Sign up with Google or email, confirm your address, and answer two quick questions. You're in instantly — no review queue.",
       "redirect_title": "Teacher access unlocks that page",
-      "redirect_body": "You were heading to {{dest}}. Teachers are approved instantly — the short form below opens it.",
+      "redirect_body": "You were heading to {{dest}}. Create your free teacher account below to open it — teachers get in instantly.",
       "redirect_dest_fallback": "your classroom tools",
       "full_name": "Your full name",
       "email": "Email address",
@@ -14490,8 +14559,8 @@ const en = {
       "go_to_teacher": "Open Teacher Dashboard",
       "status_unknown_title": "We couldn't read your access status",
       "status_unknown_body": "Something went wrong on our side. Open your teacher dashboard, or reload this page to check again.",
-      "auth_required_title": "Sign up to request teacher access",
-      "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",
+      "auth_required_title": "Start with your account",
+      "auth_required_body": "Google is the fastest way in. Email works too: we send a link that brings you right back here.",
       "auth_required_cta": "Create my free teacher account",
       "auth_signin_cta": "Already have an account? Sign in",
       "trust_instant": "Instant access — no review queue",
@@ -14523,12 +14592,12 @@ const en = {
       "school_q": "Where's your classroom? (optional)",
       "school_placeholder": "School, tutoring center, or homeschool",
       "next": {
-        "step1_title": "Apply",
-        "step1_body": "Fill the form below — takes 60 seconds.",
-        "step2_title": "Instant approval",
-        "step2_body": "No manual review — verified teachers get access the moment they apply.",
-        "step3_title": "You get access",
-        "step3_body": "Your dashboard opens right away — plus a personal note from Ohad."
+        "step1_title": "Create your account",
+        "step1_body": "Google or email. No credit card.",
+        "step2_title": "Confirm + 2 questions",
+        "step2_body": "Click the link we email you, then tell us your role and how you'll use LexiClash. Access is granted on the spot.",
+        "step3_title": "Make a class, share the code",
+        "step3_body": "Add a word list, start a game, and students join from any browser."
       },
       "regular_game_title": "Not a teacher? No worries.",
       "regular_game_body": "LexiClash is free to play for anyone. Try the regular game and come back if you want classroom features.",

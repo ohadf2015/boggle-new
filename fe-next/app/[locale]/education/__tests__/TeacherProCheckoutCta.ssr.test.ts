@@ -23,15 +23,13 @@ describe('Teacher Pro checkout CTAs on education surfaces', () => {
     // The module root is /education. A "back one level" control resolves to the
     // consumer homepage and dumps a teacher out of the classroom product.
     expect(src).not.toContain('TopBackLink');
-    // Host and join come first. The checkout card stays in the document for
-    // every visitor, after that decision, and outside both auth branches.
+    // The free start comes first; the checkout card follows the plans, for every visitor.
     const ctaIdx = src.indexOf('<TeacherProCheckoutCta');
     const heroIdx = src.indexOf('<EducationHero');
-    const joinIdx = src.indexOf('student-card-join-link');
+    const plansIdx = src.indexOf('<ProFramingSection');
     expect(heroIdx).toBeGreaterThan(-1);
-    expect(joinIdx).toBeGreaterThan(-1);
-    expect(ctaIdx).toBeGreaterThan(heroIdx);
-    expect(ctaIdx).toBeGreaterThan(joinIdx);
+    expect(plansIdx).toBeGreaterThan(heroIdx);
+    expect(ctaIdx).toBeGreaterThan(plansIdx);
   });
 
   it('shared CTA module targets teacher/upgrade and uses TEACHER_PRO_PRICE_USD', () => {
