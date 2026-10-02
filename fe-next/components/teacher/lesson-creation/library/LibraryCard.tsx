@@ -4,6 +4,7 @@ import { BadgeCheck, Copy, Play, User } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { LibraryItem } from '@/lib/education/libraryTypes';
+import { countKey } from '@/lib/education/library';
 
 const COVERS = ['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-purple', 'bg-neo-yellow', 'bg-neo-orange'];
 
@@ -36,22 +37,24 @@ export function SourceBadge({ item, className }: { item: Pick<LibraryItem, 'sour
   );
 }
 
-export function ItemStats({ item, className }: { item: LibraryItem; className?: string }) {
-  const { t } = useLanguage();
+export function ItemStats({ item, className, verbose = false }: { item: LibraryItem; className?: string; verbose?: boolean }) {
+  const { t, language } = useLanguage();
   if (item.source !== 'teacher' || item.playCount === null || item.copyCount === null) return null;
   if (item.playCount === 0 && item.copyCount === 0) {
     return <span className={cn('text-[11px] font-black uppercase text-neo-lime', className)}>{t('eduLibrary.card.new')}</span>;
   }
+  const stats = [
+    { count: item.playCount, label: t(countKey('plays', item.playCount, language), { count: item.playCount }), icon: <Play className="size-3 fill-current" aria-hidden="true" /> },
+    { count: item.copyCount, label: t(countKey('copies', item.copyCount, language), { count: item.copyCount }), icon: <Copy className="size-3" aria-hidden="true" /> },
+  ].filter((s) => s.count > 0);
   return (
     <span className={cn('inline-flex items-center gap-2 text-[11px] font-bold tabular-nums text-neo-white/80', className)}>
-      <span className="inline-flex items-center gap-0.5" aria-label={t('eduLibrary.card.plays', { count: item.playCount })}>
-        <Play className="size-3 fill-current" aria-hidden="true" />
-        {item.playCount}
-      </span>
-      <span className="inline-flex items-center gap-0.5" aria-label={t('eduLibrary.card.copies', { count: item.copyCount })}>
-        <Copy className="size-3" aria-hidden="true" />
-        {item.copyCount}
-      </span>
+      {stats.map((s) => (
+        <span key={s.label} className="inline-flex items-center gap-0.5" aria-label={s.label} title={s.label}>
+          {s.icon}
+          {verbose ? s.label : s.count}
+        </span>
+      ))}
     </span>
   );
 }

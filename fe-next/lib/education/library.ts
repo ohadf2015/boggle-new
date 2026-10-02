@@ -172,3 +172,20 @@ export function paginate<T>(items: T[], page: number, pageSize: number): { items
   const safe = Math.min(Math.max(0, page), pageCount - 1);
   return { items: items.slice(safe * pageSize, safe * pageSize + pageSize), page: safe, pageCount };
 }
+
+// Only the plural categories a bundle defines get their own key; everything else uses the base key.
+const COUNT_FORMS: Record<string, Partial<Record<Intl.LDMLPluralRule, string>>> = {
+  en: { one: 'One' },
+  sv: { one: 'One' },
+  es: { one: 'One' },
+  he: { one: 'One' },
+  ru: { one: 'One', few: 'Few' },
+};
+
+export function countKey(noun: 'plays' | 'copies', count: number, language: string): string {
+  const base = `eduLibrary.card.${noun}`;
+  const forms = COUNT_FORMS[language];
+  if (!forms) return base;
+  const suffix = forms[new Intl.PluralRules(language).select(count)];
+  return suffix ? `${base}${suffix}` : base;
+}

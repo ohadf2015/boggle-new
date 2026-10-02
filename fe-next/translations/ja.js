@@ -96,7 +96,9 @@ const ja = {
       "aTeacher": "先生",
       "new": "NEW",
       "plays": "{count}回プレイ",
+      "playsOne": "{count}回プレイ",
       "copies": "{count}回コピー",
+      "copiesOne": "{count}回コピー",
       "results": "結果"
     },
     "badge": {
@@ -19187,10 +19189,6 @@ const ja = {
       "blast": "コンボで連鎖",
       "wordHunt": "リストの単語を探す",
       "wordcraft": "つづりを組み立て"
-    },
-    "lobby": {
-      "waitingOne": "生徒1人を待っています",
-      "practiceLink": "まだ誰もいない？ボットと練習"
     }
   },
   // @eduHq:end

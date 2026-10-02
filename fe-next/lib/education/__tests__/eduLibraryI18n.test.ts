@@ -77,3 +77,10 @@ describe('eduLibrary translations', () => {
     }
   });
 });
+
+describe('retired eduHq lobby keys', () => {
+  it.each(Object.keys(BUNDLES))('%s: eduHq.lobby.waitingOne and eduHq.lobby.practiceLink are gone', (lang) => {
+    expect(resolve(BUNDLES[lang], 'eduHq.lobby.waitingOne')).toBeUndefined();
+    expect(resolve(BUNDLES[lang], 'eduHq.lobby.practiceLink')).toBeUndefined();
+  });
+});

@@ -96,7 +96,9 @@ const he = {
       "aTeacher": "מורה",
       "new": "חדש",
       "plays": "{count} הפעלות",
+      "playsOne": "הפעלה אחת",
       "copies": "{count} העתקות",
+      "copiesOne": "העתקה אחת",
       "results": "תוצאות"
     },
     "badge": {
@@ -19117,10 +19119,6 @@ const he = {
       "blast": "שרשרת קומבו",
       "wordHunt": "צדים מילים",
       "wordcraft": "בונים ומאייתים"
-    },
-    "lobby": {
-      "waitingOne": "מחכים לתלמיד אחד",
-      "practiceLink": "עוד אין אף אחד? סיבוב אימון עם בוטים"
     }
   },
   // @eduHq:end

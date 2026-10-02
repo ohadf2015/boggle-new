@@ -22,6 +22,9 @@ import { isNative } from '../utils/platform';
 import { parentRoute } from '../lib/navigation/parentRoute';
 import { isNavigationGuardActive } from '../lib/navigation/navigationGuardRegistry';
 import { isEducationPath } from '../lib/navigation/sectionHome';
+import { educationHomeFor } from '../lib/navigation/educationBackHref';
+import { isTeacherProfile } from '../lib/education/teacherRole';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ROOT_PATH_PATTERNS: RegExp[] = [
   /^\/[a-z]{2}\/?$/,
@@ -35,6 +38,7 @@ const ROOT_PATH_PATTERNS: RegExp[] = [
 
 const EXIT_DOUBLE_TAP_WINDOW_MS = 2000;
 const LOCALE_ROOT_RE = /^\/(?:[a-z]{2})?$/;
+const CLASSROOM_GAME_RE = /^\/([a-z]{2})\/education\/classroom-game\/?$/;
 
 function isRootPath(pathname: string | null): boolean {
   if (!pathname) return true;
@@ -46,10 +50,16 @@ export function useAndroidBackButton(): void {
   const pathname = usePathname();
   const lastBackPressAtRef = useRef(0);
   const pathRef = useRef(pathname);
+  const { profile } = useAuth();
+  const isTeacherRef = useRef(false);
 
   useEffect(() => {
     pathRef.current = pathname;
   }, [pathname]);
+
+  useEffect(() => {
+    isTeacherRef.current = isTeacherProfile(profile);
+  }, [profile]);
 
   useEffect(() => {
     if (!isNative()) return;
@@ -97,6 +107,12 @@ export function useAndroidBackButton(): void {
         };
         if (isRootPath(pathRef.current)) {
           exitOnSecondTap();
+          return;
+        }
+        // The /education landing replaces a teacher straight back here, so neither history nor the URL parent is "up".
+        const classroomGame = CLASSROOM_GAME_RE.exec(pathRef.current || '');
+        if (classroomGame && isTeacherRef.current) {
+          router.push(educationHomeFor(classroomGame[1], 'teacher'));
           return;
         }
         if (data.canGoBack || window.history.length > 1) {

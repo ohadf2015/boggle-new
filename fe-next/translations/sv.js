@@ -95,8 +95,10 @@ const sv = {
       "by": "av {author}",
       "aTeacher": "en lärare",
       "new": "Ny",
-      "plays": "{count} spelningar",
+      "plays": "Spelad {count} gånger",
+      "playsOne": "Spelad {count} gång",
       "copies": "{count} kopior",
+      "copiesOne": "{count} kopia",
       "results": "Resultat"
     },
     "badge": {
@@ -19187,10 +19189,6 @@ const sv = {
       "blast": "Kedja kombos",
       "wordHunt": "Jaga listord",
       "wordcraft": "Bygg och stava"
-    },
-    "lobby": {
-      "waitingOne": "Väntar på 1 elev",
-      "practiceLink": "Ingen här än? Öva mot bottar"
     }
   },
   // @eduHq:end

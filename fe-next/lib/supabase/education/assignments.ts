@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import type { LessonAssignment, TeacherAssignment } from './types';
 import { isVocabFocus } from '@/lib/education/vocabFocus';
+import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
 import { WORDCRAFT_FOCUS, isAssignmentFocusValue, type AssignmentFocusValue } from '@/lib/education/wordcraftAssignment';
 
 /**
@@ -30,6 +31,7 @@ export async function assignLesson(
       return { data: null, error: { message: error.message } };
     }
 
+    void recordLessonPlays([lessonId]);
     return { data: assignment, error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
@@ -130,6 +132,7 @@ export async function createAssignment(data: {
       return { data: null, error: { message: error.message } };
     }
 
+    void recordLessonPlays([data.lesson_id]);
     return { data: assignment, error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';

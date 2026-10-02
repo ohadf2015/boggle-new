@@ -4,6 +4,7 @@ import logger from '@/utils/logger';
 import { notifyLessonsChanged } from '@/hooks/useVocabularyLesson';
 import type { Language } from '@/lib/supabase/education/types';
 import type { ModerationIssue } from './library';
+import { bumpLessonStat } from './lessonPlayStat';
 import { isMissingColumnError, type LibraryItem, type LibraryLesson } from './libraryTypes';
 
 export const VERIFIED_AUTHOR = 'LexiClash';
@@ -56,13 +57,6 @@ export async function reportList(lessonId: string, reason: ReportReason, details
     return false;
   }
   return data === true;
-}
-
-export function recordPlay(item: Pick<LibraryItem, 'id' | 'source'>): void {
-  if (!supabase || item.source !== 'teacher') return;
-  void supabase.rpc('bump_vocabulary_lesson_stat', { p_lesson_id: item.id, p_kind: 'play' }).then(({ error }) => {
-    if (error) logger.debug('recordPlay skipped', error.message);
-  });
 }
 
 async function findExistingCopy(item: LibraryItem, teacherId: string): Promise<LibraryLesson | null> {
@@ -118,7 +112,7 @@ export async function copyToMine(
   if (error || !data) return { lesson: null, reused: false, error: error?.message ?? 'copy failed' };
 
   if (item.source === 'teacher') {
-    void supabase.rpc('bump_vocabulary_lesson_stat', { p_lesson_id: item.id, p_kind: 'copy' });
+    void bumpLessonStat(item.id, 'copy');
   }
   notifyLessonsChanged();
   return { lesson: data as LibraryLesson, reused: false };
