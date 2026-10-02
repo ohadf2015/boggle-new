@@ -50,7 +50,7 @@ function previewKind(value: string | null | undefined): LiveSurfacePreviewKind |
  * lessonId is optional — when omitted, the lobby lets the teacher pick lessons.
  */
 function ClassroomGameInner() {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -86,13 +86,13 @@ function ClassroomGameInner() {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!isAuthenticated) {
+    if (!user) {
       router.push(`/${language}/education`);
       return;
     }
 
     setIsChecking(false);
-  }, [isAuthenticated, authLoading, router, language]);
+  }, [user, authLoading, router, language]);
 
   // Only reachable inside <TeacherGate>, so the caller is always a teacher who
   // came from the dashboard's GO LIVE. `/education` is the marketing landing.
@@ -174,7 +174,7 @@ function ClassroomGameInner() {
  * teachers keep the gated lobby below.
  */
 export default function ClassroomGamePage() {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, loading } = useAuth();
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const preview = previewKind(searchParams?.get('preview'));
@@ -193,7 +193,8 @@ export default function ClassroomGamePage() {
     );
   }
 
-  if (!isAuthenticated) {
+  // `isAuthenticated` also needs the profile, which lands after the user: a signed-in teacher is not a guest.
+  if (!user) {
     return <ClassroomGuestDemo />;
   }
 

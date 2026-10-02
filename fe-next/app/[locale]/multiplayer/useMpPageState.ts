@@ -345,7 +345,8 @@ export function useMpPageState() {
   const phase = resolveMpPagePhase({ showResults, quizEndsThisRound, isActive, isHost });
 
   const routerProps: MpPhaseRouterProps = {
-    phase, gameCode, username, isHost, socket, roomLanguage, isClassroomMode,
+    phase, gameCode, username, isHost, socket, roomLanguage,
+    isClassroomMode: classroomContext === 'classroom',
     classroomGameMode: liveClassroomGame?.gameMode,
     onExitToLobby: handleExitToLobby, onUsernameChange: setUsername,
     resultsData, handleReturnToRoom, gameDuration, seriesTracker,

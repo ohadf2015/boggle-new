@@ -16,6 +16,7 @@ import { AnalyticsPageClient } from '../PageClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgress';
 import { useRouter } from 'next/navigation';
+import { accessReturnPath } from '@/lib/education/accessReturnPath';
 
 // ============================================
 // MOCKS
@@ -259,7 +260,7 @@ describe('AnalyticsPageClient', () => {
     expect(screen.getByText('common.loading')).toBeInTheDocument();
   });
 
-  it('should redirect to signin when not authenticated', () => {
+  it('sends a signed-out visitor to the education access sign-in, returning here after', () => {
     (useAuth as Mock).mockReturnValue({
       user: null,
       loading: false,
@@ -267,9 +268,10 @@ describe('AnalyticsPageClient', () => {
 
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
-    expect(mockPush).toHaveBeenCalledWith(
-      '/en/auth/signin?redirect=/teacher/classroom/classroom-1/analytics'
-    );
+    const target = '/en/teacher/classroom/classroom-1/analytics';
+    expect(mockPush).toHaveBeenCalledWith(`/en/education/access?from=${encodeURIComponent(target)}`);
+    expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/auth/signin'));
+    expect(accessReturnPath(target)).toBe(target);
   });
 
   // ============================================

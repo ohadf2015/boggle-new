@@ -94,7 +94,8 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push(`/${locale}/auth/signin?redirect=/teacher/classroom/${classroomId}/analytics`);
+      const from = encodeURIComponent(`/${locale}/teacher/classroom/${classroomId}/analytics`);
+      router.push(`/${locale}/education/access?from=${from}`);
     }
   }, [user, authLoading, router, locale, classroomId]);
 
