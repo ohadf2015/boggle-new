@@ -364,11 +364,11 @@ const content: Record<EducationLocale, LocaleContent> = {
     ],
   },
   es: {
-    metaTitle: 'Juegos de inglés gratis para el aula — online | LexiClash',
-    metaDescription: 'Juegos de vocabulario en inglés gratis para el aula: los alumnos entran con un código, sin cuentas ni descargas, y juegan en el proyector. Nivel por alumno y 6 idiomas.',
-    ogTitle: 'Juegos ESL de palabras para el aula',
-    ogDescription: 'Juegos ESL para toda la clase: código al móvil, tablero en el proyector, nivel por alumno. Gratis, sin cuentas.',
-    twitterDescription: 'Juegos ESL para el aula: código, proyector, nivel por alumno. Gratis.',
+    metaTitle: 'ESL Word Games para el aula — en vivo | LexiClash',
+    metaDescription: 'ESL word games para toda la clase: código al móvil, tablero en el proyector, sin cuentas ni descargas. Nivel por alumno y 6 idiomas.',
+    ogTitle: 'ESL Word Games para el aula',
+    ogDescription: 'ESL word games para toda la clase: código al móvil, tablero en el proyector, nivel por alumno. Gratis, sin cuentas.',
+    twitterDescription: 'ESL word games para el aula: código, proyector, nivel por alumno. Gratis.',
     heroTag: '★ Inglés ESL/EFL ★ Gratis Siempre ★',
     heroH1: {
       highlight: 'Juegos de palabras en inglés',
