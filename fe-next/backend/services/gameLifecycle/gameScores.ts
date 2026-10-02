@@ -29,7 +29,7 @@ import { hasQuizSession } from '../../modules/vocabQuizStore.js';
 import { buildClassroomSummary } from '../../modules/classroomSummary';
 import { buildClassroomPodium, splitNeverPlacedWords } from '../../modules/classroomResultsExtras';
 import { accumulateSessionScores, toSessionStandings } from '../../modules/classroomSessionScores';
-import { persistClassroomGameScores, playerScoresFromGameResults } from '../../handlers/classroomGamePersistence';
+import { persistClassroomGameScores, playerScoresFromGameResults, roundHasStudents } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import { clampTeamCount, reconcileTeams } from '@/shared/utils/teamBattle';
 import { PARTICIPATION_BONUS } from '@/shared/types/classroom';
@@ -463,14 +463,16 @@ export async function calculateAndBroadcastFinalScores(
       `Board end path reached ${gameCode} while its vocab quiz is live — leaving persistence to the quiz`
     );
   } else if (classroomGame) {
+    const roomUsers = (game.users ?? {}) as Record<string, { authUserId?: string | null; isBot?: boolean } | undefined>;
     try {
       await updateClassroomGameStatus(gameCode, 'finished');
+      if (!roundHasStudents(resultsWithIconAchievements, roomUsers, classroomGame.teacherId)) {
+        logger.info('CLASSROOM_GAME', `Game ${gameCode}: practice round (teacher and bots only) — nothing to record`);
+        return;
+      }
       const rewards = await persistClassroomGameScores(
         classroomGame,
-        playerScoresFromGameResults(
-          resultsWithIconAchievements,
-          (game.users ?? {}) as Record<string, { authUserId?: string | null; isBot?: boolean } | undefined>,
-        ),
+        playerScoresFromGameResults(resultsWithIconAchievements, roomUsers, gameCode),
       );
       io.to(`classroom:${classroomGame.classroomId}`).emit('classroomGameEnded', { gameCode, rewards });
     } catch (err) {

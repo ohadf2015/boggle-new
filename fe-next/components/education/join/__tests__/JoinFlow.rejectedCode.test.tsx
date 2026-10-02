@@ -62,7 +62,8 @@ const changeCodeButton = () =>
 async function backOnTheCodeStepWithARejectedCode() {
   render(<JoinFlow initialCode="ZZZZZZ" />);
   await screen.findByRole('alert');
-  fireEvent.click(changeCodeButton());
+  // The rejection now returns the student to the code step on its own.
+  if (onNameStep()) fireEvent.click(changeCodeButton());
   expect(onNameStep()).toBe(false);
 }
 
@@ -95,7 +96,7 @@ describe('<JoinFlow> — a code already known to be wrong', () => {
     render(<JoinFlow />);
     typeCode('ZZZZZZ');
     await screen.findByRole('alert');
-    fireEvent.click(changeCodeButton());
+    if (onNameStep()) fireEvent.click(changeCodeButton());
 
     fireEvent.click(nextButton());
 

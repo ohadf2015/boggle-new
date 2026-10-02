@@ -21,6 +21,7 @@ import {
 import { MODAL_OPEN_CLASS } from '@/lib/native/modalOpenSignal';
 import { useInGameSurface } from '@/lib/inGameSurface';
 import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
+import { isAdFreeRoute } from '@/lib/admob-routes';
 
 /**
  * True while a modal owns the screen (`html.modal-open`, the ref-counted flag
@@ -62,7 +63,10 @@ const STUDENT_ROUTE = /^\/(?:en|he|sv|ja|es|ru)\/(?:join|student)(?:\/|$)/;
 
 export default function CookieConsent() {
   const { t, language } = useLanguage();
-  const dense = STUDENT_ROUTE.test(usePathname() ?? '');
+  const pathname = usePathname() ?? '';
+  const dense = STUDENT_ROUTE.test(pathname);
+  // Same gate the ad loaders use, so the copy cannot promise ads where none run.
+  const adFree = isAdFreeRoute(pathname, typeof window === 'undefined' ? null : new URLSearchParams(window.location.search));
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [visible, setVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -248,7 +252,7 @@ export default function CookieConsent() {
               {t('cookieConsent.title')}
             </h2>
             <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 sm:text-[13px]">
-              {t(dense ? 'eduStudent.cookie.message' : 'cookieConsent.message')}{' '}
+              {t(dense ? 'eduStudent.cookie.message' : adFree ? 'eg2Fix.cookie.adFreeMessage' : 'cookieConsent.message')}{' '}
               <a
                 href={`/${language}/legal/cookies`}
                 className="font-bold text-neo-cyan hover:underline"

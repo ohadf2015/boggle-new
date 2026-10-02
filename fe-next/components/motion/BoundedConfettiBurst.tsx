@@ -50,7 +50,8 @@ export function BoundedConfettiBurst({
 
   if (shouldSkip && !anchorDimensions) {
     // Mobile viewport with no explicit bounds — skip confetti entirely
-    return <div data-testid="bounded-confetti-anchor">{children}</div>;
+    // Same class as the server render: the skip is client-only, so a bare div would mismatch on hydration.
+    return <div data-testid="bounded-confetti-anchor" className="relative overflow-hidden">{children}</div>;
   }
 
   const styleOverrides: React.CSSProperties = anchorDimensions

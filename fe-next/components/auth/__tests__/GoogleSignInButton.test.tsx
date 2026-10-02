@@ -86,13 +86,11 @@ describe('GoogleSignInButton', () => {
     expect(frame.className).toMatch(/bg-white/);
   });
 
-  it('renders the Google button auto-sized (no forced width) so its content stays centered', async () => {
+  it('falls back to an auto-sized, centered button when the frame has no measurable width', async () => {
     const renderButton = stubGoogleId();
     render(<GoogleSignInButton />);
     await waitFor(() => expect(renderButton).toHaveBeenCalled());
     const opts = renderButton.mock.calls[0][1] as Record<string, unknown>;
-    // A forced width wider than the content makes GSL float the logo+text off-center
-    // (drifts to the "end" in RTL). Omitting width lets GSI size to content.
     expect(opts.width).toBeUndefined();
     expect(opts.logo_alignment).toBe('center');
   });

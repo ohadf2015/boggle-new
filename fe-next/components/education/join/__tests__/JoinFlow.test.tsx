@@ -162,16 +162,21 @@ describe('<JoinFlow> — a code we are sure is wrong', () => {
     render(<JoinFlow initialCode="ZZZZZZ" />);
     await screen.findByRole('alert');
 
-    fireEvent.click(screen.getByRole('button', { name: /education\.student\.join\.flow\.changeCode/ }));
+    if (onNameStep()) fireEvent.click(screen.getByRole('button', { name: /education\.student\.join\.flow\.changeCode/ }));
 
     expect(onNameStep()).toBe(false);
     expect(codeField()).toHaveValue('ZZZZZZ');
   });
 
-  it('does not yank the student off the nickname field on its own', async () => {
+  it('does not yank the student off the nickname field once they have started typing', async () => {
+    let answer: (v: unknown) => void = () => {};
+    mockResolve.mockImplementation(() => new Promise((r) => { answer = r; }));
     render(<JoinFlow initialCode="ZZZZZZ" />);
+    fireEvent.change(nameField(), { target: { value: 'Maya' } });
+
+    answer({ verdict: 'invalid' });
     await screen.findByRole('alert');
-    // Still on the name step: the verdict decorates, the student decides.
+
     expect(onNameStep()).toBe(true);
   });
 });

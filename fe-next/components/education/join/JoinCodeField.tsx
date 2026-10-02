@@ -12,6 +12,10 @@ export function sanitizeJoinCode(raw: string): string {
   return raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, JOIN_CODE_LENGTH);
 }
 
+export function joinCodeOverflows(raw: string): boolean {
+  return raw.toUpperCase().replace(/[^A-Z0-9]/g, '').length > JOIN_CODE_LENGTH;
+}
+
 interface JoinCodeFieldProps {
   value: string;
   onChange: (next: string) => void;
@@ -23,6 +27,8 @@ interface JoinCodeFieldProps {
   onComplete?: (code: string) => void;
   /** Called when user clicks paste button. */
   onPaste?: () => void;
+  /** A paste longer than a code: `maxLength` would cut it silently. */
+  onOverflow?: () => void;
 }
 
 /**
@@ -50,6 +56,7 @@ export function JoinCodeField({
   autoFocus = false,
   onComplete,
   onPaste,
+  onOverflow,
 }: JoinCodeFieldProps) {
   const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -65,6 +72,25 @@ export function JoinCodeField({
       if (next.length === JOIN_CODE_LENGTH) onComplete?.(next);
     },
     [onChange, onComplete]
+  );
+
+  // `maxLength` cuts the RAW paste, so "P45 KRT" would land as "P45 KR": sanitize first.
+  const handleNativePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLInputElement>) => {
+      const raw = e.clipboardData.getData('text');
+      if (joinCodeOverflows(raw)) {
+        if (!onOverflow) return;
+        e.preventDefault();
+        onOverflow();
+        return;
+      }
+      const cleaned = sanitizeJoinCode(raw);
+      if (cleaned.length !== JOIN_CODE_LENGTH) return;
+      e.preventDefault();
+      onChange(cleaned);
+      onComplete?.(cleaned);
+    },
+    [onOverflow, onChange, onComplete]
   );
 
   return (
@@ -121,6 +147,7 @@ export function JoinCodeField({
         type="text"
         value={value}
         onChange={handleChange}
+        onPaste={handleNativePaste}
         aria-label={label}
         aria-describedby={describedBy}
         aria-invalid={invalid || undefined}

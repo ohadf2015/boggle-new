@@ -21,7 +21,7 @@ import {
   scoreUnpluggedReteach,
 } from '@/lib/education/unpluggedReteachGradePassback';
 import { UNPLUGGED_FIRE_STREAK } from '@/lib/education/teamTilesUnpluggedGame';
-import type { ClassGapSharePayload } from '@/lib/education/classGapShare';
+import { classGapCardKind, type ClassGapSharePayload } from '@/lib/education/classGapShare';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { UnpluggedFinishCard } from './unplugged/UnpluggedFinishCard';
 import { UnpluggedHud } from './unplugged/UnpluggedHud';
@@ -29,6 +29,7 @@ import { UnpluggedToolsBar } from './unplugged/UnpluggedToolsBar';
 import type { UnpluggedMood } from './unplugged/UnpluggedMascot';
 import { TeamTilesStage } from './teamTiles/TeamTilesStage';
 import { useTeamTilesRun } from './teamTiles/useTeamTilesRun';
+import { ClassicUnpluggedExitLink } from './ClassicUnpluggedExitLink';
 
 export interface TeamTilesUnpluggedLiveProps {
   payload: ClassGapSharePayload;
@@ -139,8 +140,13 @@ export function TeamTilesUnpluggedLive({
         data-testid="team-tiles-unplugged-live"
         className="fixed inset-0 z-40 overflow-hidden bg-neo-navy flex items-center justify-center px-4"
       >
+        <ClassicUnpluggedExitLink
+          href={homeHref}
+          label={t('education.results.teamTilesExit')}
+          className="absolute top-3 start-3"
+        />
         <div className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream bg-neo-navy-light shadow-hard text-center">
-          <p className="text-neo-white font-neo-body mb-4">{t('education.results.allFound')}</p>
+          <p className="text-neo-white font-neo-body mb-4">{t(classGapCardKind(payload) === 'sweep' ? 'education.results.allFound' : 'eg2Fix.gap.empty')}</p>
           <Link
             href={homeHref}
             className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard"

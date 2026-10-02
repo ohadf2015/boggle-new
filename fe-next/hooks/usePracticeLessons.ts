@@ -116,11 +116,14 @@ export function usePracticeLesson(lessonId: string | undefined): {
   lesson: PracticeLesson | null;
   isLoading: boolean;
   error: string | null;
+  /** The server said this lesson cannot exist (400) or does not (404): retrying is pointless. */
+  isDeadLink: boolean;
 } {
   const isMounted = useMounted();
   const [lesson, setLesson] = useState<PracticeLesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDeadLink, setIsDeadLink] = useState(false);
 
   useEffect(() => {
     if (!lessonId) {
@@ -141,6 +144,7 @@ export function usePracticeLesson(lessonId: string | undefined): {
           if (!cancelled && isMounted.current) {
             setLesson(null);
             setError(message);
+            setIsDeadLink(response.status === 400 || response.status === 404);
             setIsLoading(false);
           }
           return;
@@ -149,6 +153,7 @@ export function usePracticeLesson(lessonId: string | undefined): {
         if (!cancelled && isMounted.current) {
           setLesson(body?.lesson ?? null);
           setError(null);
+          setIsDeadLink(false);
           setIsLoading(false);
         }
       } catch (err) {
@@ -156,6 +161,7 @@ export function usePracticeLesson(lessonId: string | undefined): {
         if (!cancelled && isMounted.current) {
           setLesson(null);
           setError('Failed to load lesson');
+          setIsDeadLink(false);
           setIsLoading(false);
         }
       }
@@ -166,5 +172,5 @@ export function usePracticeLesson(lessonId: string | undefined): {
     };
   }, [lessonId, isMounted]);
 
-  return { lesson, isLoading, error };
+  return { lesson, isLoading, error, isDeadLink };
 }

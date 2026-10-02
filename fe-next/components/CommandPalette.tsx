@@ -20,7 +20,7 @@ interface CommandItem {
   group: string;
 }
 
-const NAV_ITEMS: CommandItem[] = [
+export const NAV_ITEMS: CommandItem[] = [
   { id: 'home', labelKey: 'nav.home', icon: Home, href: '/', group: 'navigation' },
   { id: 'multiplayer', labelKey: 'nav.play', icon: Swords, href: '/multiplayer', group: 'navigation' },
   { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Gamepad2, href: '/singleplayer', group: 'navigation' },
@@ -31,11 +31,11 @@ const NAV_ITEMS: CommandItem[] = [
   { id: 'profile', labelKey: 'nav.profile', icon: User, href: '/profile', group: 'account' },
   { id: 'settings', labelKey: 'nav.settings', icon: Settings, href: '/settings', group: 'account' },
   { id: 'leaderboard', labelKey: 'nav.leaderboard', icon: Trophy, href: '/leaderboard', group: 'navigation' },
-  { id: 'glossary', labelKey: 'nav.glossary', icon: BookOpen, href: '/glossary', group: 'navigation' },
-  { id: 'admin', labelKey: 'nav.admin', icon: ShieldCheck, href: '/admin', group: 'admin' },
+  { id: 'glossary', labelKey: 'eg2Fix.palette.glossary', icon: BookOpen, href: '/glossary', group: 'navigation' },
+  { id: 'admin', labelKey: 'eg2Fix.palette.admin', icon: ShieldCheck, href: '/admin', group: 'admin' },
 ];
 
-const TEACHER_ITEMS: CommandItem[] = [
+export const TEACHER_ITEMS: CommandItem[] = [
   { id: 'teacher-play', labelKey: 'teacher.nav.play', icon: Gamepad2, href: '/teacher', group: 'teacher' },
   { id: 'teacher-classes', labelKey: 'teacher.nav.classes', icon: Users, href: '/teacher/classroom', group: 'teacher' },
   { id: 'teacher-lessons', labelKey: 'teacher.nav.lessons', icon: BookOpen, href: '/teacher/curriculum', group: 'teacher' },

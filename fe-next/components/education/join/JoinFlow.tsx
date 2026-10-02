@@ -5,7 +5,7 @@ import { ArrowLeft, Dices, Sparkles } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { JoinCodeField, JOIN_CODE_LENGTH, sanitizeJoinCode } from './JoinCodeField';
+import { JoinCodeField, JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } from './JoinCodeField';
 import { useJoinFlow } from './useJoinFlow';
 import { useFitStage } from './fitStage';
 import { pickFunName } from './funName';
@@ -94,6 +94,11 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
+      if (joinCodeOverflows(text)) {
+        setPasteNoteKey(null);
+        flow.refuseTooLong();
+        return;
+      }
       const cleaned = sanitizeJoinCode(text);
       if (!cleaned) {
         setPasteNoteKey(`${K}.emptyClipboard`);
@@ -119,7 +124,6 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
   return (
     <BoundedConfettiBurst
       trigger={showSuccessCelebration}
-      anchorDimensions={{ width: 390, height: 844 }}
       colors={['#22C55E', '#EC4899', '#06B6D4', '#D946EF']}
     >
       <div
@@ -189,6 +193,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
                 onChange={flow.setCode}
                 onComplete={(next) => flow.advance(next)}
                 onPaste={handlePaste}
+                onOverflow={flow.refuseTooLong}
                 label={t(`${K}.codeLabel`)}
                 describedBy="join-code-note"
                 invalid={!!flow.codeErrorKey || flow.codeRejected}

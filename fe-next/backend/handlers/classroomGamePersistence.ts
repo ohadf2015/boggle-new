@@ -34,7 +34,9 @@ import {
   type ClassroomPlayerOutcome,
 } from '../utils/educationTelemetry';
 
-type PlayerScore = { userId: string; score: number; wordsFound?: string[]; username?: string };
+import type { PlayerScore } from './classroomRoundParticipants.js';
+
+export { playerScoresFromGameResults, roundHasStudents } from './classroomRoundParticipants.js';
 
 /**
  * Per-player reward summary returned from persistClassroomGameScores.
@@ -277,36 +279,6 @@ async function upsertLessonProgress(
 }
 
 /**
- * Adapter for the server-side game-end path (gameLifecycle/gameScores.ts):
- * turns the validated results payload + the room's user map into the
- * `playerScores` shape `persistClassroomGameScores` consumes. Bots and
- * guests (no auth user id) are dropped — neither has lesson progress.
- * A duplicate word scores zero but the student DID find it, so it counts;
- * only the validator's rejection means "not found".
- */
-export function playerScoresFromGameResults(
-  results: Array<{
-    username: string;
-    totalScore: number;
-    wordDetails?: Array<{ word: string; validated: boolean; isDuplicate?: boolean }>;
-  }>,
-  users: Record<string, { authUserId?: string | null; isBot?: boolean } | undefined>
-): PlayerScore[] {
-  const scores: PlayerScore[] = [];
-  for (const result of results) {
-    const user = users[result.username];
-    if (!user || user.isBot || !user.authUserId) continue;
-    scores.push({
-      userId: user.authUserId,
-      username: result.username,
-      score: result.totalScore,
-      wordsFound: (result.wordDetails ?? []).filter((d) => d.validated).map((d) => d.word),
-    });
-  }
-  return scores;
-}
-
-/**
  * Everyone whose round should be recorded.
  *
  * `game.players` is the CLASSROOM roster, filled ONLY by the
@@ -391,6 +363,12 @@ export async function persistClassroomGameScores(
   }
 
   const participants = collectParticipants(game, playerScores);
+  const teacherOnly = !!playerScores?.length && playerScores.every((s) => s.userId === game.teacherId);
+  if (participants.length === 0 && teacherOnly) {
+    logger.info('CLASSROOM_GAME', `Game ${game.gameCode}: practice round, only the teacher scored — nothing to record`);
+    await releaseIdempotency();
+    return [];
+  }
   if (participants.length === 0) {
     logger.warn(
       'CLASSROOM_GAME',

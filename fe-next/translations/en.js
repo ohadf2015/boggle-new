@@ -69,6 +69,31 @@ const en = {
     }
   },
   // @eg2Land:end
+  // @eg2Fix:start
+  "eg2Fix": {
+    "cookie": {
+      "adFreeMessage": "We use cookies for sign-in and to see which features help teachers most. No ads on teacher or student pages. Accept all, or pick below."
+    },
+    "palette": {
+      "glossary": "Glossary",
+      "admin": "Admin"
+    },
+    "gap": {
+      "empty": "No class results yet. Play a class game first, then the words they missed show up here."
+    },
+    "review": {
+      "joinClass": "Join my class"
+    },
+    "join": {
+      "codeTooLong": "That code is too long. Class codes have 6 characters: type the one your teacher shows."
+    },
+    "unplugged": {
+      "classic": "Classic Unplugged",
+      "teamTiles": "Team Tiles Unplugged",
+      "reteach": "Unplugged Reteach"
+    }
+  },
+  // @eg2Fix:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Library",
@@ -18250,7 +18275,7 @@ const en = {
       "finish": "See my results"
     },
     "cookie": {
-      "message": "We use cookies to count plays and show ads."
+      "message": "Cookies help us count plays and keep the game running smoothly."
     }
   },
   // @eduHq:start

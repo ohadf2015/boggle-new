@@ -71,15 +71,10 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
     const container = containerRef.current;
     if (!container) return;
     renderedRef.current = true;
-    // 'outline' = white button (white bg, dark text). The colored "G" can't be
-    // recolored — Google's branding rules forbid a monochrome logo, so a black G
-    // is impossible. White button inside our black frame = neo-brutalist look.
-    //
-    // No forced width by default: a width wider than the content makes GSI float
-    // the logo+text off-center (it drifts to the "end", glaringly so with RTL
-    // locales). Auto-sizing keeps the button snug to its content so the content
-    // stays centered; the full-width white frame below supplies the full-width
-    // look. An explicit `width` prop still wins for callers that need a fixed size.
+    // A snug GSI button draws its own grey box inside our white frame; filling the
+    // frame (logo_alignment 'center' keeps he/en content centered) leaves one box.
+    const frameWidth = container.parentElement?.clientWidth ?? 0;
+    const fitWidth = width ?? (frameWidth > 0 ? frameWidth : undefined);
     google.accounts.id.renderButton(container, {
       type: 'standard',
       theme: 'outline',
@@ -91,7 +86,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
       // on /he with a Dutch browser gets "Doorgaan met Google". `locale` is a
       // renderButton option (it is NOT part of the initialize config).
       locale: language,
-      ...(width != null ? { width: Math.min(width, GSI_MAX_WIDTH) } : {}),
+      ...(fitWidth != null ? { width: Math.min(fitWidth, GSI_MAX_WIDTH) } : {}),
     });
   }, [clientId, width, language]);
 

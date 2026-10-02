@@ -69,6 +69,31 @@ const ja = {
     }
   },
   // @eg2Land:end
+  // @eg2Fix:start
+  "eg2Fix": {
+    "cookie": {
+      "adFreeMessage": "ログインの維持と、先生に役立つ機能を知るためにCookieを使っています。先生・生徒向けのページに広告は出ません。「すべて承認」か、下から選んでください。"
+    },
+    "palette": {
+      "glossary": "用語集",
+      "admin": "管理"
+    },
+    "gap": {
+      "empty": "まだクラスの結果がありません。先にクラスでゲームをすると、取りこぼした単語がここに表示されます。"
+    },
+    "review": {
+      "joinClass": "クラスに参加する"
+    },
+    "join": {
+      "codeTooLong": "このコードは長すぎます。クラスのコードは6文字だよ。先生が見せているコードを入力してね。"
+    },
+    "unplugged": {
+      "classic": "クラシック・アンプラグド",
+      "teamTiles": "チームタイル・アンプラグド",
+      "reteach": "アンプラグド復習"
+    }
+  },
+  // @eg2Fix:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "ライブラリ",
@@ -19187,7 +19212,7 @@ const ja = {
       "finish": "結果を見る"
     },
     "cookie": {
-      "message": "プレイ数の集計と広告表示のためにクッキーを使います。"
+      "message": "プレイ数の集計と、ゲームをスムーズに動かすためにクッキーを使います。"
     }
   },
   // @eduHq:start

@@ -61,7 +61,7 @@ export default function LessonPracticePageClient() {
   // Word Craft assignment deep link: ?mode=solo_board&variant=wordcraft
   const initialVariant = initialMode === 'solo_board' && searchParams?.get('variant') === 'wordcraft' ? 'wordcraft' : null;
 
-  const { lesson, isLoading: isLoadingLesson, error: lessonError } = usePracticeLesson(lessonId);
+  const { lesson, isLoading: isLoadingLesson, isDeadLink } = usePracticeLesson(lessonId);
   const totalWords = lesson?.words?.length ?? 0;
   const { progress, mastery, startSession, isLoading: isLoadingProgress } =
     usePracticeProgress(lessonId, undefined, { totalWords });
@@ -96,13 +96,8 @@ export default function LessonPracticePageClient() {
     );
   }
 
-  /*
-    A dead link is a sentence, not a spinner — and a retry, not only an exit.
-    The r2 capture watched this flow dead-end twice on a lesson that was fine
-    two minutes later, with nothing on screen to try again with. `border-3` is
-    also not a Tailwind width (preflight zeroes it), so the card and its button
-    were drawing no border at all.
-  */
+  // A failed load can recover, so it keeps TRY AGAIN; a 400/404 never will.
+  // `border-[3px]`, not `border-3`: preflight zeroes the latter.
   if (!lesson) {
     return (
       <EducationShell header={<EducationHeader showBackButton title={t('education.practicePicker.title')} />} contentClassName="flex items-center justify-center px-4">
@@ -111,22 +106,29 @@ export default function LessonPracticePageClient() {
             {t('education.practice.lessonUnavailable')}
           </h1>
           <p className="mb-5 font-neo-body text-neo-black/80">
-            {lessonError ?? t('education.practice.lessonUnavailableBody')}
+            {t('education.practice.lessonUnavailableBody')}
           </p>
+          {!isDeadLink && (
+            <button
+              type="button"
+              data-primary="true"
+              data-testid="practice-lesson-retry"
+              onClick={() => window.location.reload()}
+              className="min-h-[52px] w-full rounded-neo border-[3px] border-black bg-neo-black px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-lime shadow-hard-sm"
+            >
+              {t('student.practiceFun.tryAgain')}
+            </button>
+          )}
           <button
             type="button"
-            data-primary="true"
-            data-testid="practice-lesson-retry"
-            onClick={() => window.location.reload()}
-            className="min-h-[52px] w-full rounded-neo border-[3px] border-black bg-neo-black px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-lime shadow-hard-sm"
-          >
-            {t('student.practiceFun.tryAgain')}
-          </button>
-          <button
-            type="button"
+            data-primary={isDeadLink ? 'true' : undefined}
             data-testid="practice-lesson-exit"
             onClick={() => router.push(`/${language}/student`)}
-            className="mx-auto mt-2 block min-h-[40px] w-3/5 rounded-neo border-[2px] border-black bg-neo-cream px-4 font-neo-body text-xs font-bold uppercase text-neo-black"
+            className={
+              isDeadLink
+                ? 'min-h-[52px] w-full rounded-neo border-[3px] border-black bg-neo-black px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-lime shadow-hard-sm'
+                : 'mx-auto mt-2 block min-h-[40px] w-3/5 rounded-neo border-[2px] border-black bg-neo-cream px-4 font-neo-body text-xs font-bold uppercase text-neo-black'
+            }
           >
             {t('student.practiceFun.myLessons')}
           </button>

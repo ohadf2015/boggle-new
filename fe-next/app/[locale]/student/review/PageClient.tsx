@@ -129,6 +129,7 @@ export default function MissedWordsReviewPageClient() {
         art={ACADEMY_ART.lesson}
         heading={t('academy.modes.review.signedOutTitle', 'Join your class to unlock reviews')}
         body={t('academy.modes.review.signedOutBody', 'Your missed words are saved to your student account. Sign in or join a class first.')}
+        primaryAction={{ label: t('eg2Fix.review.joinClass'), onClick: () => router.push(`/${language}/join`) }}
         onBack={onBack}
       />
     );

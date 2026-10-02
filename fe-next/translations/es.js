@@ -69,6 +69,31 @@ const es = {
     }
   },
   // @eg2Land:end
+  // @eg2Fix:start
+  "eg2Fix": {
+    "cookie": {
+      "adFreeMessage": "Usamos cookies para iniciar sesión y ver qué funciones ayudan más al profesorado. Sin anuncios en las páginas de docentes y alumnos. Acepta todas o elige abajo."
+    },
+    "palette": {
+      "glossary": "Glosario",
+      "admin": "Administración"
+    },
+    "gap": {
+      "empty": "Aún no hay resultados de la clase. Juega primero una partida en clase y aquí aparecerán las palabras que se les escaparon."
+    },
+    "review": {
+      "joinClass": "Unirme a mi clase"
+    },
+    "join": {
+      "codeTooLong": "Ese código es demasiado largo. Los códigos de clase tienen 6 caracteres: escribe el que muestra tu profe."
+    },
+    "unplugged": {
+      "classic": "Clásico sin pantallas",
+      "teamTiles": "Fichas en equipo sin pantallas",
+      "reteach": "Repaso sin pantallas"
+    }
+  },
+  // @eg2Fix:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Biblioteca",
@@ -19205,7 +19230,7 @@ const es = {
       "finish": "Ver mis resultados"
     },
     "cookie": {
-      "message": "Usamos cookies para contar partidas y mostrar anuncios."
+      "message": "Usamos cookies para contar partidas y que el juego funcione sin tropiezos."
     }
   },
   // @eduHq:start
