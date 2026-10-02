@@ -124,8 +124,10 @@ export function isPracticeFocusSetting(value: unknown): value is PracticeFocusSe
 /** Whole-word, case-insensitive match of `word` inside `sentence`. */
 function wordPattern(word: string): RegExp {
   const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // Japanese has no spaces and particles attach directly, so word edges cannot be detected.
+  if (/^[\u3040-\u30ff\u3400-\u9fff]+$/u.test(word)) return new RegExp(`()(${escaped})`, 'u');
   // \b is Latin-only; fall back to lookarounds on whitespace/punctuation so
-  // Hebrew/Japanese words still match.
+  // Hebrew words still match.
   return new RegExp(`(^|[\\s"'(.,;:!?¿¡«»„“”‘’-])(${escaped})(?=$|[\\s"').,;:!?«»„“”‘’-])`, 'iu');
 }
 

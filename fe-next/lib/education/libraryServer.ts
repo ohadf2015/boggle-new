@@ -10,6 +10,7 @@ import {
   type WordEntry,
 } from './library';
 import type { LibraryItem } from './libraryTypes';
+import { isVocabularyLevel } from './differentiation';
 
 function profane(text: string | null | undefined): boolean {
   if (!text) return false;
@@ -90,13 +91,32 @@ export interface CurriculumRow {
   word_count?: number | null;
 }
 
+const nonEmpty = (list: unknown): string[] | null => {
+  const items = Array.isArray(list) ? list.filter((v): v is string => typeof v === 'string' && v.trim().length > 0) : [];
+  return items.length > 0 ? items : null;
+};
+
+function curriculumWord(w: VocabularyWord | WordEntry): VocabularyWord {
+  const src = w as Partial<VocabularyWord>;
+  const synonyms = nonEmpty(src.synonyms);
+  const antonyms = nonEmpty(src.antonyms);
+  const meanings = nonEmpty(src.meanings);
+  return {
+    word: w.word,
+    canIntegrate: true,
+    ...(src.definition ? { definition: src.definition } : {}),
+    ...(src.example ? { example: src.example } : {}),
+    ...(isVocabularyLevel(src.level) ? { level: src.level } : {}),
+    ...(synonyms ? { synonyms } : {}),
+    ...(antonyms ? { antonyms } : {}),
+    ...(meanings ? { meanings } : {}),
+    ...(src.morphology && typeof src.morphology === 'object' ? { morphology: src.morphology } : {}),
+  };
+}
+
 export function curriculumRowsToItems(rows: CurriculumRow[]): LibraryItem[] {
   return rows.map((r) => {
-    const words = (Array.isArray(r.words) ? r.words : []).map((w) => ({
-      word: w.word,
-      canIntegrate: true,
-      ...(w.definition ? { definition: w.definition } : {}),
-    }));
+    const words = (Array.isArray(r.words) ? r.words : []).map(curriculumWord);
     return {
       id: `curriculum:${r.id}`,
       source: 'verified',
