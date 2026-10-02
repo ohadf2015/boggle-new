@@ -96,7 +96,9 @@ const ja = {
       "aTeacher": "先生",
       "new": "NEW",
       "plays": "{count}回プレイ",
+      "playsOne": "{count}回プレイ",
       "copies": "{count}回コピー",
+      "copiesOne": "{count}回コピー",
       "results": "結果"
     },
     "badge": {
