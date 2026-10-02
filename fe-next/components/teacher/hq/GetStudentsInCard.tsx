@@ -10,6 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 import { classroomJoinUrl } from "@/lib/education/classroomInvitePayload";
+import { trackEduJoinCodeCopied } from "@/lib/education/telemetry";
 import { useClassRoster } from "./useClassRoster";
 import { RosterSeats } from "./RosterSeats";
 import { useHqJuice } from "./useHqJuice";
@@ -97,6 +98,7 @@ export function GetStudentsInCard({
     );
     try {
       await navigator.clipboard.writeText(url);
+      trackEduJoinCodeCopied({ classroomId: classroom.id });
       sfx.playButtonClickSound();
       setCopied(true);
       toast.success(t("share.linkCopied"));
@@ -104,7 +106,7 @@ export function GetStudentsInCard({
     } catch {
       toast.error(t("share.codeCopyError"));
     }
-  }, [classroom.join_code, language, sfx, t]);
+  }, [classroom.id, classroom.join_code, language, sfx, t]);
 
   const openProjector = useCallback(() => {
     sfx.playButtonClickSound();

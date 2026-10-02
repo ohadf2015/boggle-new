@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,6 +18,7 @@ export interface ClassProgressStripProps {
   submittedCount: number | null;
   hasPro: boolean;
   className?: string;
+  action?: ReactNode;
 }
 
 /**
@@ -31,6 +32,7 @@ export function ClassProgressStrip({
   submittedCount,
   hasPro,
   className,
+  action,
 }: ClassProgressStripProps) {
   const { t, language } = useLanguage();
   const show = shouldShowClassProgressStrip({ studentCount, assignmentCount });
@@ -65,11 +67,21 @@ export function ClassProgressStrip({
         className,
       )}
     >
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-black shadow-hard-sm">
+      <span
+        className={cn(
+          'flex size-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-black shadow-hard-sm',
+          action && 'max-sm:hidden',
+        )}
+      >
         <TrendingUp className="size-4" strokeWidth={3} aria-hidden="true" />
       </span>
       <h2 className="sr-only">{t('academy.hq.progressTitle', 'Class progress')}</h2>
-      <ul className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-0.5 font-neo-display text-xs font-black uppercase tracking-wide text-neo-white sm:text-sm">
+      <ul
+        className={cn(
+          'flex min-w-0 flex-1 items-center gap-y-0.5 font-neo-display font-black uppercase text-neo-white sm:text-sm',
+          action ? 'gap-x-1.5 whitespace-nowrap text-[0.65rem] tracking-normal max-sm:flex-nowrap max-sm:overflow-hidden sm:flex-wrap sm:gap-x-3' : 'flex-wrap gap-x-3 text-xs tracking-wide',
+        )}
+      >
         <li data-testid="hq-class-progress-students">
           <span className="text-neo-cyan">{studentCount}</span>{' '}
           {t('academy.hq.progressStudents', 'students')}
@@ -83,6 +95,7 @@ export function ClassProgressStrip({
           {t('academy.hq.progressSubmitted', 'submitted')}
         </li>
       </ul>
+      {action}
       {hasPro ? null : (
         <Link
           href={upgradeHref}

@@ -21,6 +21,8 @@ export interface StartLiveClassCtaProps {
   joinCode: string;
   onStart: () => void;
   className?: string;
+  /** `inline`: only the start button, for the HQ progress row on phones. */
+  variant?: 'card' | 'inline';
 }
 
 /**
@@ -35,6 +37,7 @@ export function StartLiveClassCta({
   joinCode,
   onStart,
   className,
+  variant = 'card',
 }: StartLiveClassCtaProps) {
   const { t, language } = useLanguage();
   const show = shouldShowStartLiveClassCta({ studentCount, assignmentCount });
@@ -61,23 +64,42 @@ export function StartLiveClassCta({
 
   const joinUrl = origin && joinCode ? classroomJoinUrl(origin, language, joinCode) : '';
 
+  if (variant === 'inline') {
+    return (
+      <button
+        type="button"
+        data-testid="hq-start-live-cta"
+        onClick={onStartClick}
+        className={cn(
+          'inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-neo border-2 border-black bg-neo-cyan px-2.5',
+          'font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-black shadow-hard-sm',
+          'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+          className,
+        )}
+      >
+        <MonitorPlay className="size-4" strokeWidth={3} aria-hidden="true" />
+        {t('eg2Rep.hq.liveShort')}
+      </button>
+    );
+  }
+
   return (
     <section
       data-testid="hq-start-live-class"
       className={cn(
-        '@container flex shrink-0 flex-col gap-2 rounded-neo-lg border-2 border-neo-cyan/70 bg-neo-navy-light/95 p-3 shadow-hard sm:p-4',
+        '@container flex shrink-0 flex-col gap-2 rounded-neo-lg border-2 border-neo-cyan/70 bg-neo-navy-light/95 p-3 shadow-hard max-sm:flex-row max-sm:items-center max-sm:p-2 sm:p-4',
         className,
       )}
     >
-      <div className="flex items-start gap-2">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-black shadow-hard-sm">
+      <div className="flex min-w-0 items-start gap-2 max-sm:flex-1 max-sm:items-center">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-black shadow-hard-sm max-sm:size-7">
           <MonitorPlay className="size-5" strokeWidth={3} aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="font-neo-display text-base font-black uppercase leading-tight text-neo-white">
+          <h2 className="font-neo-display text-base font-black uppercase leading-tight text-neo-white max-sm:text-sm">
             {t('academy.hq.startLiveTitle', 'Play a live class')}
           </h2>
-          <p className="mt-1 font-neo-body text-sm font-bold text-neo-white/70 text-pretty">
+          <p data-testid="hq-start-live-body" className="mt-1 font-neo-body text-sm font-bold text-neo-white/70 text-pretty max-sm:hidden">
             {t(
               'academy.hq.startLiveBody',
               'The assignment is out. Start a live game so the class plays together.',
@@ -86,7 +108,7 @@ export function StartLiveClassCta({
         </div>
       </div>
       {joinCode ? (
-        <div className="flex flex-wrap items-center gap-2">
+        <div data-testid="hq-start-live-join-row" className="flex flex-wrap items-center gap-2 max-sm:hidden">
           <code
             data-testid="hq-start-live-join-code"
             className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2 py-1 font-neo-display text-sm font-black tracking-widest text-neo-lime"
@@ -109,7 +131,7 @@ export function StartLiveClassCta({
         </div>
       ) : null}
       {joinUrl ? (
-        <p data-testid="hq-start-live-join-url" className="truncate font-neo-body text-xs text-neo-white/50">
+        <p data-testid="hq-start-live-join-url" className="truncate font-neo-body text-xs text-neo-white/50 max-sm:hidden">
           {joinUrl}
         </p>
       ) : null}
@@ -118,7 +140,7 @@ export function StartLiveClassCta({
         data-testid="hq-start-live-cta"
         onClick={onStartClick}
         className={cn(
-          'inline-flex min-h-11 w-full items-center justify-center rounded-neo border-3 border-black',
+          'inline-flex min-h-11 w-full items-center justify-center rounded-neo border-3 border-black max-sm:w-auto max-sm:shrink-0 max-sm:px-3 max-sm:text-xs',
           'bg-neo-cyan px-4 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard-sm',
           'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
           'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',

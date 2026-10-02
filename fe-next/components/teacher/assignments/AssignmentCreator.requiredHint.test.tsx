@@ -101,7 +101,7 @@ describe('AssignmentCreator — the disabled submit explains itself', () => {
     renderCreator();
     fireEvent.click(screen.getByText('teacher.assignment.selectDate'));
     fireEvent.click(screen.getByText('teacher.assignment.tomorrow'));
-    expect(screen.getByText('2026-10-03')).toBeInTheDocument();
+    expect(document.querySelector('time')?.getAttribute('datetime')).toBe('2026-10-03');
     vi.useRealTimers();
   });
 });

@@ -19569,6 +19569,69 @@ const sv = {
       "cta": "Starta Teacher Pro — {price}/mån",
       "note": "Avsluta när du vill · Gratisplanen förblir gratis"
     }
+  },
+  "eg2Rep": {
+    "report": {
+      "belowGoal": "Under målet {goal} % · {count}",
+      "onTrack": "På rätt spår · {count}",
+      "missesLabel": "Missar:",
+      "noMisses": "Inga missar än",
+      "trend": {
+        "up": "Går framåt",
+        "down": "Tappar",
+        "steady": "Stabil",
+        "new": "Första spelet"
+      },
+      "stats": {
+        "needHelp": "Under {goal} %",
+        "mastered": "Ord som sitter"
+      },
+      "state": {
+        "stuck": "Fast",
+        "improving": "På väg",
+        "mastered": "Sitter",
+        "new": "Ny"
+      },
+      "tabs": {
+        "students": "Elever",
+        "words": "Ord",
+        "grid": "Rutnät",
+        "label": "Rapportvyer"
+      },
+      "share": "Dela",
+      "print": "Skriv ut",
+      "copied": "Sammanfattningen kopierad",
+      "summary": {
+        "title": "{classroom} – klassrapport",
+        "accuracy": "Klassens träffsäkerhet: {accuracy} % över {games} spelresultat",
+        "mastered": "Ord som sitter: {mastered} av {words}",
+        "needHelp": "Under målet {goal} % ({count})",
+        "hardest": "Ord att repetera: {words}"
+      },
+      "empty": {
+        "title": "Inga spelresultat än",
+        "live": "Starta ett livespel",
+        "assign": "Ge en läxa"
+      },
+      "title": "Klassens puls",
+      "subtitle": "Vem som ligger under målet och vilka ord som behöver repeteras – från varje spel.",
+      "noClasses": {
+        "cta": "Skapa din första klass"
+      }
+    },
+    "hq": {
+      "accuracy": "träffsäkerhet",
+      "needHelp": "Behöver hjälp: {count}",
+      "allOnTrack": "Alla på rätt spår",
+      "whoNeedsHelp": "Vem behöver hjälp?",
+      "hardest": "Svårast:",
+      "openReport": "Öppna klassrapporten",
+      "liveShort": "Livelektion"
+    },
+    "assign": {
+      "who": "Vem får den",
+      "students": "Elever: {count}"
+    }
   }
 };
 

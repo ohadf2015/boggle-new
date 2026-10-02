@@ -104,4 +104,18 @@ describe('<ClassProgressStrip>', () => {
       classroom_id: 'c1',
     });
   });
+
+  it('Given an action, Then it renders inside the strip row', () => {
+    render(
+      <ClassProgressStrip
+        classroomId="c1"
+        studentCount={2}
+        assignmentCount={1}
+        submittedCount={0}
+        hasPro={true}
+        action={<button type="button">go</button>}
+      />,
+    );
+    expect(screen.getByTestId('hq-class-progress')).toContainElement(screen.getByRole('button', { name: 'go' }));
+  });
 });

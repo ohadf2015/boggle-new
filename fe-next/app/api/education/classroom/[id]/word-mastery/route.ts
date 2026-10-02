@@ -3,6 +3,7 @@ import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { buildWordMasteryReport, toFreePreview } from '@/lib/education/wordMasteryReport';
 import { authorizeClassroomOwner } from '@/lib/education/ownedClassroomRoute';
+import { buildClassInsights } from '@/components/teacher/reports/classInsights';
 import logger from '@/utils/logger';
 
 /**
@@ -32,5 +33,5 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       { status: 402 },
     );
   }
-  return NextResponse.json({ ok: true, locked: false, report });
+  return NextResponse.json({ ok: true, locked: false, report, insights: buildClassInsights(mastery.data) });
 }

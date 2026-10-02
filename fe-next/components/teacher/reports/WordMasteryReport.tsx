@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Flame, Lock } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { MasteryStatCards } from './MasteryStatCards';
@@ -10,17 +12,22 @@ import { MasteryHeatmap } from './MasteryHeatmap';
 import { MasteryLockedTeaser } from './MasteryLockedTeaser';
 import { MissedPracticeAction } from './MissedPracticeAction';
 import { useRosterNames, useWordMasteryReport } from './useWordMasteryReport';
+import { StudentInsightList } from './StudentInsightList';
+import { ReportShareActions, ReportPrintStyles, buildReportSummary } from './ReportShareActions';
+import { ReportEmptyState } from './ReportEmptyState';
+import type { ClassInsights, WordState } from './classInsights';
 
 export interface WordMasteryReportProps {
   classroomId: string;
   classroomName: string;
+  onStudentClick?: (studentId: string, name: string) => void;
 }
 
 /**
  * Teacher Pro per-word mastery. The API decides what a free teacher may see
  * (top 3 words + totals); this component never receives more than that.
  */
-export function WordMasteryReport({ classroomId, classroomName }: WordMasteryReportProps) {
+export function WordMasteryReport({ classroomId, classroomName, onStudentClick }: WordMasteryReportProps) {
   const { t } = useLanguage();
   const state = useWordMasteryReport(classroomId);
   const names = useRosterNames(classroomId, state.status === 'ready', t('teacher.reports.arc.unknownStudent'));
@@ -33,7 +40,9 @@ export function WordMasteryReport({ classroomId, classroomName }: WordMasteryRep
     return (
       <Shell>
         <div data-testid="word-mastery-loading" aria-busy="true" className="space-y-3">
-          <span className="sr-only" role="status">{t('eduPro.mastery.loading')}</span>
+          <span className="sr-only" role="status">
+            {t('eduPro.mastery.loading')}
+          </span>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[0, 1, 2, 3].map((i) => (
               <div key={i} aria-hidden="true" className="h-24 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
@@ -61,9 +70,7 @@ export function WordMasteryReport({ classroomId, classroomName }: WordMasteryRep
   if (totals.sessions === 0) {
     return (
       <Shell locked={state.status === 'locked'}>
-        <p className="rounded-neo border-2 border-dashed border-neo-cream/30 p-6 text-center text-sm font-bold text-neo-cream/80">
-          {t('eduPro.mastery.empty')}
-        </p>
+        <ReportEmptyState classroomId={classroomId} />
       </Shell>
     );
   }
@@ -82,27 +89,123 @@ export function WordMasteryReport({ classroomId, classroomName }: WordMasteryRep
     );
   }
 
-  const { report } = state;
+  const { report, insights } = state;
+  const reteach = report.hardestWords.length > 0 && (
+    <div data-print-hide className="rounded-neo border-2 border-neo-lime/50 bg-neo-lime/5 p-3">
+      <MissedPracticeAction classroomId={classroomId} classroomName={classroomName} locked={false} />
+      <p className="mt-2 text-xs font-bold text-neo-cream/60">{t('eduPro.practice.whyNote')}</p>
+    </div>
+  );
+  const hardest = (
+    <HardestBlock>
+      {report.hardestWords.length > 0 ? (
+        <HardestWordsList words={report.hardestWords} states={insights ? statesOf(insights) : undefined} />
+      ) : (
+        <p className="text-sm font-bold text-neo-cream/70">{t('eduPro.mastery.noneMissed')}</p>
+      )}
+    </HardestBlock>
+  );
+  const summary = () => buildReportSummary({ t, classroomName, report, insights, names });
+
   return (
-    <Shell>
+    <Shell actions={<ReportShareActions summary={summary} />}>
       <div className="space-y-4">
-        <MasteryStatCards totals={totals} />
-        <HardestBlock>
-          {report.hardestWords.length > 0 ? (
-            <HardestWordsList words={report.hardestWords} />
-          ) : (
-            <p className="text-sm font-bold text-neo-cream/70">{t('eduPro.mastery.noneMissed')}</p>
-          )}
-        </HardestBlock>
-        {report.hardestWords.length > 0 && (
-          <div className="rounded-neo border-2 border-neo-lime/50 bg-neo-lime/5 p-3">
-            <MissedPracticeAction classroomId={classroomId} classroomName={classroomName} locked={false} />
-            <p className="mt-2 text-xs font-bold text-neo-cream/60">{t('eduPro.practice.whyNote')}</p>
-          </div>
+        <MasteryStatCards totals={totals} insights={insights} />
+        {insights ? (
+          <ReportTabs
+            studentCount={insights.students.length}
+            wordCount={report.hardestWords.length}
+            students={
+              <StudentInsightList
+                students={insights.students}
+                names={names}
+                goal={insights.goal}
+                fallbackName={t('teacher.reports.arc.unknownStudent')}
+                onStudentClick={onStudentClick}
+              />
+            }
+            words={hardest}
+            grid={<MasteryHeatmap report={report} names={names} />}
+          />
+        ) : (
+          <>
+            {hardest}
+            <MasteryHeatmap report={report} names={names} />
+          </>
         )}
-        <MasteryHeatmap report={report} names={names} />
+        {reteach}
       </div>
     </Shell>
+  );
+}
+
+function statesOf(insights: ClassInsights): Record<string, WordState> {
+  const out: Record<string, WordState> = {};
+  for (const [word, w] of Object.entries(insights.words)) out[word] = w.state;
+  return out;
+}
+
+type ReportTab = 'students' | 'words' | 'grid';
+
+function ReportTabs({
+  studentCount,
+  wordCount,
+  students,
+  words,
+  grid,
+}: {
+  studentCount: number;
+  wordCount: number;
+  students: React.ReactNode;
+  words: React.ReactNode;
+  grid: React.ReactNode;
+}) {
+  const { t } = useLanguage();
+  const [tab, setTab] = useState<ReportTab>('students');
+  const tabs: { id: ReportTab; label: string; count?: number }[] = [
+    {
+      id: 'students',
+      label: t('eg2Rep.report.tabs.students'),
+      count: studentCount,
+    },
+    { id: 'words', label: t('eg2Rep.report.tabs.words'), count: wordCount },
+    { id: 'grid', label: t('eg2Rep.report.tabs.grid') },
+  ];
+  const panels: Record<ReportTab, React.ReactNode> = { students, words, grid };
+  return (
+    <Tabs value={tab} onValueChange={(v) => setTab(v as ReportTab)}>
+      <TabsList
+        aria-label={t('eg2Rep.report.tabs.label')}
+        data-print-hide
+        className="grid h-auto w-full grid-cols-3 gap-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1"
+      >
+        {tabs.map(({ id, label, count }) => (
+          <TabsTrigger
+            key={id}
+            value={id}
+            className={cn(
+              'min-h-10 rounded-neo px-2 font-neo-display text-xs font-black uppercase text-neo-cream/80 sm:text-sm',
+              'data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:shadow-hard-sm',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime',
+            )}
+          >
+            {label}
+            {typeof count === 'number' && <span className="ms-1 tabular-nums opacity-70">{count}</span>}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {tabs.map(({ id }) => (
+        <TabsContent
+          key={id}
+          value={id}
+          forceMount
+          data-print-hide={id === 'grid' ? '' : undefined}
+          className="mt-3 data-[state=inactive]:hidden print:block!"
+        >
+          {panels[id]}
+        </TabsContent>
+      ))}
+    </Tabs>
   );
 }
 
@@ -119,23 +222,28 @@ function HardestBlock({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Shell({ children, locked = false }: { children: React.ReactNode; locked?: boolean }) {
+function Shell({ children, locked = false, actions }: { children: React.ReactNode; locked?: boolean; actions?: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <section
       data-testid="word-mastery-report"
-      aria-label={t('eduPro.mastery.title')}
+      data-report-print
+      aria-label={t('eg2Rep.report.title')}
       className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-6"
     >
-      <div className="mb-4">
-        <h2 className="flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white sm:text-2xl">
-          {t('eduPro.mastery.title')}
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-body text-xs font-black uppercase text-neo-black shadow-hard-sm">
-            {locked && <Lock className="size-3" aria-hidden="true" />}
-            {t('eduPro.mastery.proBadge')}
-          </span>
-        </h2>
-        <p className="mt-0.5 text-sm text-neo-cream/70">{t('eduPro.mastery.subtitle')}</p>
+      {actions && <ReportPrintStyles />}
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+        <div className="min-w-0">
+          <h2 className="flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white sm:text-2xl">
+            {t('eg2Rep.report.title')}
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-body text-xs font-black uppercase text-neo-black shadow-hard-sm">
+              {locked && <Lock className="size-3" aria-hidden="true" />}
+              {t('eduPro.mastery.proBadge')}
+            </span>
+          </h2>
+          <p className="mt-0.5 text-sm text-neo-cream/70">{t('eg2Rep.report.subtitle')}</p>
+        </div>
+        {actions}
       </div>
       {children}
     </section>

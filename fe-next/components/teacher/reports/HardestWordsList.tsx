@@ -6,6 +6,14 @@ import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { HardWord } from '@/lib/education/wordMasteryReport';
 import { cn } from '@/lib/utils';
+import type { WordState } from './classInsights';
+
+const STATE_TONE: Record<WordState, string> = {
+  stuck: 'border-neo-pink text-neo-pink',
+  improving: 'border-neo-yellow text-neo-yellow',
+  mastered: 'border-neo-lime text-neo-lime',
+  new: 'border-neo-cream/50 text-neo-cream/80',
+};
 
 function barTone(missRate: number) {
   if (missRate >= 60) return 'bg-neo-pink';
@@ -16,7 +24,15 @@ function barTone(missRate: number) {
 export const HARDEST_VISIBLE = 6;
 
 /** `trailing` renders extra rows inside the same grid (the free preview's locked ghosts). */
-export function HardestWordsList({ words, trailing }: { words: HardWord[]; trailing?: React.ReactNode }) {
+export function HardestWordsList({
+  words,
+  trailing,
+  states,
+}: {
+  words: HardWord[];
+  trailing?: React.ReactNode;
+  states?: Record<string, WordState>;
+}) {
   const { t } = useLanguage();
   const reduceMotion = useReducedMotion();
   const [showAll, setShowAll] = useState(false);
@@ -44,8 +60,18 @@ export function HardestWordsList({ words, trailing }: { words: HardWord[]; trail
               {i + 1}
             </span>
             <span className="min-w-0">
-              <span className="block truncate font-neo-display text-base font-bold text-neo-white" dir="auto">
-                {w.display}
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span className="truncate font-neo-display text-base font-bold text-neo-white" dir="auto">
+                  {w.display}
+                </span>
+                {states?.[w.word] && (
+                  <span
+                    data-testid="report-word-state"
+                    className={cn('shrink-0 rounded-neo border px-1 text-[10px] font-black uppercase leading-4', STATE_TONE[states[w.word]])}
+                  >
+                    {t(`eg2Rep.report.state.${states[w.word]}`)}
+                  </span>
+                )}
               </span>
               <span className="relative mt-0.5 block h-1.5 overflow-hidden rounded-full bg-neo-white/10">
                 <m.span
@@ -72,6 +98,7 @@ export function HardestWordsList({ words, trailing }: { words: HardWord[]; trail
           type="button"
           onClick={() => setShowAll((v) => !v)}
           aria-expanded={showAll}
+          data-print-hide
           className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-neo px-2 text-sm font-black text-neo-cyan underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
         >
           {showAll ? t('eduPro.mastery.showFewer') : t('eduPro.mastery.showAll', { count: words.length })}

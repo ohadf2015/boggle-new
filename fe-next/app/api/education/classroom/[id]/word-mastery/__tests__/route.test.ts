@@ -85,6 +85,22 @@ describe('GET /api/education/classroom/[id]/word-mastery', () => {
     expect(body.report.heatmap.cells.s1.a1).toEqual({ attempts: 1, correct: 0 });
   });
 
+  it('gives a Pro teacher per-student insights, weakest first, with the words each one misses', async () => {
+    vi.mocked(createRequestClient).mockResolvedValue({ supabase: userClient({ user: { id: 't' }, owns: true }), token: null } as never);
+    vi.mocked(checkTeacherSubscription).mockResolvedValue(pro(true));
+    const body = await (await GET(req(), ctx())).json();
+    expect(body.insights.students[0]).toMatchObject({ studentId: 's1', accuracy: 0, belowGoal: true });
+    expect(body.insights.students[0].missedWords).toHaveLength(3);
+    expect(body.insights.belowGoalCount).toBe(2);
+  });
+
+  it('never sends insights to a free teacher', async () => {
+    vi.mocked(createRequestClient).mockResolvedValue({ supabase: userClient({ user: { id: 't' }, owns: true }), token: null } as never);
+    vi.mocked(checkTeacherSubscription).mockResolvedValue(pro(false));
+    const body = await (await GET(req(), ctx())).json();
+    expect(body.insights).toBeUndefined();
+  });
+
   it('500s, loudly, when the evidence read fails', async () => {
     vi.mocked(createRequestClient).mockResolvedValue({ supabase: userClient({ user: { id: 't' }, owns: true }), token: null } as never);
     vi.mocked(checkTeacherSubscription).mockResolvedValue(pro(true));
