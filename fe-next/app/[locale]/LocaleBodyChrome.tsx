@@ -16,7 +16,7 @@ import { usePathname } from 'next/navigation';
 import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
 import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
 import ChunkErrorBoundary from '@/components/ChunkErrorBoundary';
-import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
+import { rendersSiteChrome } from '@/lib/perf/heavyGamePath';
 import { ConditionalProviders } from '../conditional-providers';
 import type { Language } from '@/shared/types/game';
 
@@ -32,7 +32,7 @@ interface LocaleBodyChromeProps {
 
 export default function LocaleBodyChrome({ lang, children }: LocaleBodyChromeProps) {
   const pathname = usePathname();
-  const heavyGame = isHeavyGamePath(pathname);
+  const siteChrome = rendersSiteChrome(pathname);
 
   const inner = (
     <>
@@ -48,7 +48,7 @@ export default function LocaleBodyChrome({ lang, children }: LocaleBodyChromePro
             <ChunkErrorBoundary>{children}</ChunkErrorBoundary>
           </div>
         </main>
-        {!heavyGame && <SiteExtras lang={lang} />}
+        {siteChrome && <SiteExtras lang={lang} />}
       </div>
     </>
   );
