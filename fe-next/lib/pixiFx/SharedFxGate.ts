@@ -13,6 +13,8 @@
 // When the gate is not held (tests, or any caller that never holds it) mount()
 // behaves exactly as before.
 
+import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
+
 const FIRST_USE_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const;
 const MAX_HELD_CALLS = 16;
 // A celebration replayed long after its trigger reads as a glitch; skip it.
@@ -33,7 +35,8 @@ let held: HeldCall[] = [];
 const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 
 function onFirstUse(): void {
-  openFxGate();
+  removeFirstUseListeners();
+  runWhenScrollSettles(openFxGate);
 }
 
 function removeFirstUseListeners(): void {

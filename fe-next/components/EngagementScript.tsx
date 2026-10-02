@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
 
 /** First-engagement signals. pointermove covers desktop visitors who only read. */
 export const ENGAGEMENT_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'scroll'] as const;
@@ -39,10 +40,15 @@ export function EngagementScript({
   useEffect(() => {
     const opts = { capture: true, passive: true } as const;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let cancelPending: (() => void) | undefined;
     const detach = () => {
       clearTimeout(timer);
-      for (const type of events) window.removeEventListener(type, inject, opts);
+      for (const type of events) window.removeEventListener(type, onEngage, opts);
     };
+    function onEngage() {
+      detach();
+      cancelPending ??= runWhenScrollSettles(inject);
+    }
     function inject() {
       detach();
       if (document.querySelector(`script[src="${src}"]`)) return;
@@ -51,11 +57,14 @@ export function EngagementScript({
       script.async = true;
       document.head.appendChild(script);
     }
-    for (const type of events) window.addEventListener(type, inject, opts);
+    for (const type of events) window.addEventListener(type, onEngage, opts);
     if (fallbackMs != null) {
-      timer = setTimeout(inject, fallbackMs);
+      timer = setTimeout(onEngage, fallbackMs);
     }
-    return detach;
+    return () => {
+      detach();
+      cancelPending?.();
+    };
   }, [src, fallbackMs, events]);
 
   return null;
