@@ -9,7 +9,7 @@ interface LayoutParams {
 const rulesMetadata: Record<string, { title: string; description: string; ogDescription: string }> = {
     en: {
         title: 'How to Play LexiClash: Rules, Scoring & 7 Winning Tips',
-        description: 'The complete 2026 LexiClash guide: game rules, scoring system, 7 proven beginner tips, and pro strategies to climb the leaderboard. Free, real-time multiplayer word game — no download.',
+        description: 'Complete LexiClash guide: rules, scoring, 7 beginner tips, and pro strategies to rank up. Free real-time multiplayer — no download.',
         ogDescription: 'Rules + scoring + 7 winning tips. The up-to-date LexiClash playbook.',
     },
     he: {
@@ -29,7 +29,7 @@ const rulesMetadata: Record<string, { title: string; description: string; ogDesc
     },
     es: {
         title: 'Como Jugar LexiClash - Reglas del Juego y Guia de Estrategia',
-        description: 'Aprende a jugar LexiClash, el juego de palabras multijugador en tiempo real. Guía completa con reglas del juego, sistema de puntuación, estrategias ganadoras y consejos para principiantes.',
+        description: 'Aprende a jugar LexiClash en tiempo real. Reglas, puntuación, estrategias y 7 consejos para principiantes. Gratis, sin descarga.',
         ogDescription: 'Aprende a jugar LexiClash, el juego de palabras multijugador en tiempo real. Guía completa con reglas y estrategias ganadoras.',
     },
 };

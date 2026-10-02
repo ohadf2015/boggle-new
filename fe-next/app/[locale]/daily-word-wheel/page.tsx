@@ -27,8 +27,8 @@ const KEYWORDS: Record<Locale, string> = {
 // Per-locale metadata fallbacks — kills cross-locale dup-title flagging when translation keys missing
 const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitle: string; ogDescription: string }> = {
   en: {
-    title: 'Daily Word Wheel Puzzle — Free Online Daily Challenge | LexiClash',
-    description: 'Play the free Daily Word Wheel puzzle — spin the letter wheel, find every hidden word. New challenge every day, streak tracking, global leaderboard. No signup, no download.',
+    title: 'Daily Word Wheel — Free Daily Puzzle | LexiClash',
+    description: 'Play the free Daily Word Wheel — find every hidden word, track your streak, rank globally. New puzzle every day. No signup, no download.',
     ogTitle: 'Daily Word Wheel Puzzle — Free Daily Challenge',
     ogDescription: 'Spin the word wheel, find all hidden words. New free puzzle every day — streak tracking, global leaderboard!',
   },
@@ -58,7 +58,7 @@ const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitl
   },
   ru: {
     title: 'Ежедневное колесо слов — Бесплатная онлайн-головоломка | LexiClash',
-    description: 'Играйте в бесплатную головоломку Daily Word Wheel — крутите колесо букв, найдите все скрытые слова. Новая задача каждый день, отслеживание полос, глобальная таблица лидеров. Без регистрации, без скачивания.',
+    description: 'Бесплатная головоломка Daily Word Wheel — крутите колесо, находите слова. Новая задача каждый день, таблица лидеров. Без регистрации.',
     ogTitle: 'Ежедневное колесо слов — Бесплатная головоломка',
     ogDescription: 'Крутите колесо слов, найдите все слова. Новая бесплатная головоломка каждый день — отслеживание полос, глобальная таблица лидеров!',
   },
