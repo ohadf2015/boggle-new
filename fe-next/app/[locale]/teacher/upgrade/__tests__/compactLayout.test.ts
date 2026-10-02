@@ -21,33 +21,24 @@ import { join } from 'path';
 
 const pagePath = join(__dirname, '../PageClient.tsx');
 const pageSource = readFileSync(pagePath, 'utf8');
-const cardsPath = join(__dirname, '../../../../../components/teacher/PricingCards.tsx');
+const cardsPath = join(__dirname, '../../../../../components/teacher/pro/UpgradePlanCards.tsx');
 const cardsSource = readFileSync(cardsPath, 'utf8');
 
 describe('Upgrade page — compact one-screen layout', () => {
   it('gives the pricing cards compact padding, not the original oversized p-7 sm:p-8', () => {
     expect(cardsSource).not.toContain('p-7 sm:p-8');
-    expect(cardsSource).toContain('p-4 sm:p-5');
+    expect(cardsSource).toMatch(/p-4 [^"]*sm:p-5/);
   });
 
-  it('has exactly one button-styled CTA — the district pricing link is plain text, not a bordered card', () => {
-    // The old district block was its own bordered/shadowed box (a second CTA-shaped
-    // element competing with "Upgrade to Pro Now"). It is now an inline text link.
-    expect(pageSource).not.toMatch(
-      /border-2 border-neo-lime rounded-neo p-4 shadow-hard bg-neo-lime\/10/,
+  it('sends schools to a quote form, never to a second checkout button', () => {
+    const plansSource = readFileSync(
+      join(__dirname, '../../../../../components/teacher/pro/UpgradePlanCards.tsx'),
+      'utf8',
     );
-    expect(pageSource).toContain('teacher.subscription.districtTitle');
-    expect(pageSource).toContain('teacher.subscription.districtCta');
-  });
-
-  it('reserves real clearance above the pricing cards for the "Most Popular" badge', () => {
-    // The badge is absolutely positioned above the Pro card's top edge. Without margin
-    // here (relying on the flex gap alone), it overlaps the reassurance line's last
-    // wrapped words — verified visually via agent-browser screenshot during this fix.
-    const valuePropBlock = pageSource.match(
-      /<div className="mb-4">\s*<p\s+data-testid="upgrade-value-prop"/,
-    );
-    expect(valuePropBlock).not.toBeNull();
+    expect(plansSource).toContain('onClick={onSchool} data-testid="plan-school-cta"');
+    expect(plansSource).not.toContain('/api/subscription/checkout');
+    expect(pageSource).toMatch(/onSchool=\{openSchool\}/);
+    expect(pageSource).toMatch(/setTab\('school'\)/);
   });
 
   it('keeps the legal footer compact so it does not crowd out the CTA on mobile', () => {

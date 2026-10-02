@@ -12,7 +12,8 @@ describe('upgrade page at 390px', () => {
   });
 
   it('keeps the consent line beside the buy buttons on mobile, in the scroll flow', () => {
-    const cards = src.indexOf('<PricingCards');
+    const cards = src.indexOf('<UpgradePlanCards');
+    expect(cards).toBeGreaterThan(-1);
     const inline = src.indexOf('data-testid="upgrade-legal-inline"');
     expect(inline).toBeGreaterThan(cards);
     expect(src).toMatch(/data-testid="upgrade-legal-inline"[\s\S]{0,80}lg:hidden/);

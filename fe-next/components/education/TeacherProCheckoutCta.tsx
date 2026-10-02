@@ -1,6 +1,9 @@
+'use client';
+
 import * as React from 'react';
 import Link from 'next/link';
-import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 
 /**
  * Hard Teacher Pro checkout CTA for SSR classroom traffic.
@@ -10,9 +13,7 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
  * soft "$9/month" copy in SEO JSON-LD. This block needs no auth state, mirrors
  * NoAccountCta's self-contained locale copy, and always ships in HTML.
  *
- * Destination is the live Polar front door (`/{locale}/teacher/upgrade`).
- * Do not invent a billing provider; the upgrade page no-ops when Polar env is
- * missing.
+ * Destination is the upgrade page (`/{locale}/teacher/upgrade`), which owns the checkout POST.
  */
 
 export type TeacherProCheckoutCopy = {
@@ -24,10 +25,16 @@ export type TeacherProCheckoutCopy = {
 
 export const TEACHER_PRO_CHECKOUT_PATH = '/teacher/upgrade';
 
-/** Compact in-product upgrade label (classrooms header, trial nudge CTA). */
+const LRI = '⁦';
+const PDI = '⁩';
+/** Left-to-right isolate: keeps "$9" and "Teacher Pro" whole inside RTL sentences. */
+const ltr = (s: string) => `${LRI}${s}${PDI}`;
+const PRO = ltr('Teacher Pro');
+
+// First-paint fallback only: the locale-root landing ships a partial catalogue without eg2Pro.*.
 const UPGRADE_CTA: Record<string, string> = {
   en: 'Upgrade to Teacher Pro',
-  he: 'שדרגו ל-Teacher Pro',
+  he: `שדרגו ל-${PRO}`,
   es: 'Mejora a Teacher Pro',
   sv: 'Uppgradera till Teacher Pro',
   ja: 'Teacher Proにアップグレード',
@@ -40,45 +47,66 @@ export function teacherProUpgradeCtaLabel(locale: string): string {
 
 const COPY: Record<string, TeacherProCheckoutCopy> = {
   en: {
-    heading: `Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mo`,
-    body: 'Unlimited classes, analytics, and printable reports. Free tier stays: 3 classes × 50 students.',
-    cta: `Start Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mo`,
-    note: 'Polar checkout · Cancel anytime · Free plan stays free',
+    heading: 'Teacher Pro — {price}/mo',
+    body: 'Unlimited classes, analytics, and printable reports. Free stays free: {classes} classes × {students} students.',
+    cta: 'Start Teacher Pro — {price}/mo',
+    note: 'Cancel anytime · Free plan stays free',
   },
   he: {
-    heading: `Teacher Pro — $${TEACHER_PRO_PRICE_USD}/חודש`,
-    body: 'כיתות ללא הגבלה, אנליטיקה ודוחות להדפסה. התוכנית החינמית נשארת: 3 כיתות × 50 תלמידים.',
-    cta: `התחלת Teacher Pro — $${TEACHER_PRO_PRICE_USD}/חודש`,
-    note: 'תשלום Polar · ביטול בכל עת · התוכנית החינמית נשארת',
+    heading: `${PRO} — {price} לחודש`,
+    body: 'כיתות ללא הגבלה, אנליטיקה ודוחות להדפסה. התוכנית החינמית נשארת: {classes} כיתות × {students} תלמידים.',
+    cta: `התחלת ${PRO} — {price} לחודש`,
+    note: 'ביטול בכל עת · התוכנית החינמית נשארת חינמית',
   },
   es: {
-    heading: `Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mes`,
-    body: 'Clases ilimitadas, analíticas e informes imprimibles. El plan gratis sigue: 3 clases × 50 estudiantes.',
-    cta: `Empezar Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mes`,
-    note: 'Pago Polar · Cancela cuando quieras · El plan gratis sigue gratis',
+    heading: 'Teacher Pro — {price}/mes',
+    body: 'Clases ilimitadas, analíticas e informes imprimibles. El plan gratis sigue: {classes} clases × {students} estudiantes.',
+    cta: 'Empezar Teacher Pro — {price}/mes',
+    note: 'Cancela cuando quieras · El plan gratis sigue gratis',
   },
   sv: {
-    heading: `Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mån`,
-    body: 'Obegränsade klasser, analys och utskrivbara rapporter. Gratisplanen finns kvar: 3 klasser × 50 elever.',
-    cta: `Starta Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mån`,
-    note: 'Polar-kassa · Avsluta när som helst · Gratisplanen förblir gratis',
+    heading: 'Teacher Pro — {price}/mån',
+    body: 'Obegränsade klasser, analys och utskrivbara rapporter. Gratisplanen finns kvar: {classes} klasser × {students} elever.',
+    cta: 'Starta Teacher Pro — {price}/mån',
+    note: 'Avsluta när du vill · Gratisplanen förblir gratis',
   },
   ja: {
-    heading: `Teacher Pro — $${TEACHER_PRO_PRICE_USD}/月`,
-    body: 'クラス無制限、分析、印刷可能なレポート。無料枠はそのまま：3クラス × 50人。',
-    cta: `Teacher Proを始める — $${TEACHER_PRO_PRICE_USD}/月`,
-    note: 'Polar決済 · いつでも解約 · 無料プランはそのまま',
+    heading: 'Teacher Pro — 月{price}',
+    body: 'クラス無制限、分析、印刷できるレポート。無料プランはそのまま：{classes}クラス × {students}人。',
+    cta: 'Teacher Proを始める — 月{price}',
+    note: 'いつでも解約できます · 無料プランはそのまま',
   },
   ru: {
-    heading: `Teacher Pro — $${TEACHER_PRO_PRICE_USD}/мес`,
-    body: 'Безлимитные классы, аналитика и печатные отчёты. Бесплатный план остаётся: 3 класса × 50 учеников.',
-    cta: `Подключить Teacher Pro — $${TEACHER_PRO_PRICE_USD}/мес`,
-    note: 'Оплата Polar · Отмена в любой момент · Бесплатный план остаётся',
+    heading: 'Teacher Pro — {price}/мес',
+    body: 'Безлимитные классы, аналитика и печатные отчёты. Бесплатный план остаётся: {classes} класса × {students} учеников.',
+    cta: 'Подключить Teacher Pro — {price}/мес',
+    note: 'Отмена в любой момент · Бесплатный план остаётся бесплатным',
   },
 };
 
-export function teacherProCheckoutCopy(locale: string): TeacherProCheckoutCopy {
+const RTL = new Set(['he']);
+
+function ctaParams(locale: string): Record<string, string> {
+  const price = `$${TEACHER_PRO_PRICE_USD}`;
+  return {
+    price: RTL.has(locale.toLowerCase().split('-')[0]) ? ltr(price) : price,
+    classes: String(FREE_TIER_LIMITS.classes),
+    students: String(FREE_TIER_LIMITS.studentsPerClass),
+  };
+}
+
+function fill(text: string, params: Record<string, string>): string {
+  return text.replace(/\{(\w+)\}/g, (m, k: string) => params[k] ?? m);
+}
+
+function rawCopy(locale: string): TeacherProCheckoutCopy {
   return COPY[locale.toLowerCase().split('-')[0]] ?? COPY.en;
+}
+
+export function teacherProCheckoutCopy(locale: string): TeacherProCheckoutCopy {
+  const raw = rawCopy(locale);
+  const p = ctaParams(locale);
+  return { heading: fill(raw.heading, p), body: fill(raw.body, p), cta: fill(raw.cta, p), note: fill(raw.note, p) };
 }
 
 /** Short label for compact CTAs (homepage hero, secondary buttons). */
@@ -95,7 +123,15 @@ export function TeacherProCheckoutCta({
   className?: string;
   copy?: TeacherProCheckoutCopy;
 }): React.JSX.Element {
-  const c = copy ?? teacherProCheckoutCopy(locale);
+  const { t } = useLanguage();
+  const raw = rawCopy(locale);
+  const p = ctaParams(locale);
+  const tr = (field: keyof TeacherProCheckoutCopy) => {
+    const key = `eg2Pro.checkoutCta.${field}`;
+    const value = t(key, raw[field], p);
+    return value && value !== key ? value : fill(raw[field], p);
+  };
+  const c = copy ?? { heading: tr('heading'), body: tr('body'), cta: tr('cta'), note: tr('note') };
   return (
     <div
       data-testid="teacher-pro-checkout-cta"

@@ -2,12 +2,15 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { ShieldCheck, Lock, Smile, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import {
@@ -19,44 +22,42 @@ import {
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { polarTrialUx } from '@/lib/education/polarTrial';
 import { trackTrialCtaTap, trackTrialCtaView } from '@/lib/education/proFunnelTelemetry';
-import { ShieldCheck, BellRing, Lock } from 'lucide-react';
-import toast from 'react-hot-toast';
-import Link from 'next/link';
-import { PricingCards } from '@/components/teacher/PricingCards';
+import { upgradeViewer, showTrialOffer } from '@/lib/education/pro/upgradeViewer';
+import { resumeDecision } from '@/lib/education/pro/resumeDecision';
+import { readAskSchoolParams, type UpgradeTab } from '@/lib/education/pro/askSchool';
 import { PlanComparisonMatrix } from '@/components/teacher/PlanComparisonMatrix';
+import { UpgradePlanCards } from '@/components/teacher/pro/UpgradePlanCards';
+import { AskSchoolPanel } from '@/components/teacher/pro/AskSchoolPanel';
+import { SchoolPlanSection } from '@/components/teacher/pro/SchoolPlanSection';
+import { ProPreviewStrip } from '@/components/teacher/pro/ProPreviewStrip';
+import { UpgradeFaq } from '@/components/teacher/pro/UpgradeFaq';
+import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 
 const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
+  const searchParams = useSearchParams();
+  const { tab: linkTab, requester } = readAskSchoolParams(new URLSearchParams(searchParams?.toString() ?? ''));
+  const [tab, setTab] = useState<UpgradeTab>(linkTab);
+  const [askOpen, setAskOpen] = useState(false);
   const [pending, setPending] = useState<null | 'trial' | 'paid'>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const pendingTrial = useRef(false);
-  const { hasPro, loading: proLoading, status, source, trialUsed, known } = useTeacherPro();
-  // Hide the trial until status has actually loaded. A failed read stays on the
-  // paid CTA — offering a free trial we could not check is a second trial.
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh } = useTeacherPro();
+
   const offerTrial = known === true && !proLoading && polarTrialUx({
     hasPro,
     status: status ?? 'active',
     source,
     trialUsed: trialUsed === true,
   }).offerTrial;
-  // ponytail: no client-side checkout flag. There used to be one
-  // (`NEXT_PUBLIC_CHECKOUT_ENABLED === 'true'`) and it shipped the only revenue button in the
-  // product as `disabled` in production while the server was ready to sell — `NEXT_PUBLIC_*` is
-  // inlined at BUILD time, so the bundle held a frozen copy of a value the API re-reads on every
-  // request. Two readers of one value, and the stale one won the render.
-  //
-  // /api/subscription/checkout already refuses with 503 when the till is shut, and that gate sits
-  // BEFORE its auth check, so nobody can reach Polar past it. One gate, server-side, always fresh.
-  // A 503 is surfaced below instead of being pre-empted here.
+  const viewer = upgradeViewer({ authLoading, signedIn: Boolean(user), proLoading, known: known === true, hasPro });
+  const showTrial = showTrialOffer(viewer, offerTrial);
 
-  // Mark this page as a conversion surface to suppress modals that would block the CTA.
-  // This runtime signal is read by PWAInstallPrompt and ComebackBonusWrapper before
-  // they render, preventing them from creating overlays on a payment page.
-  // See: Route blocklists don't converge — use the runtime signal lesson.
+  // Conversion surface: PWAInstallPrompt and ComebackBonusWrapper read this and stay closed.
   useEffect(() => {
     document.body.classList.add('conversion-surface');
     return () => {
@@ -69,16 +70,15 @@ export default function UpgradePricingPageClient() {
   }, []);
 
   useEffect(() => {
-    if (!offerTrial) return;
+    if (!showTrial) return;
     try {
       trackTrialCtaView({ source: 'upgrade_page' });
     } catch {
       /* analytics must never block the till */
     }
-  }, [offerTrial]);
+  }, [showTrial]);
 
   const handleUpgrade = useCallback(async (trial: boolean) => {
-    pendingTrial.current = trial;
     setPending(trial ? 'trial' : 'paid');
     if (trial) {
       try {
@@ -94,59 +94,58 @@ export default function UpgradePricingPageClient() {
           ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trial: true }) }
           : {}),
       });
-
       if (!response.ok) {
-        // 401 means the user is not authenticated. Show the auth modal instead of a generic error.
         if (response.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));
           markResumeCheckoutIntent({ trial });
           setShowAuthModal(true);
           return;
         }
-        // 503 is the server's own "till is shut" refusal. Retrying cannot fix it, so the generic
-        // "please try again" would loop the teacher forever.
+        // 503 is the server's own "till is shut": retrying cannot fix it, so say where to go instead.
         if (response.status === 503) {
-          toast.error(t('teacher.subscription.checkoutUnavailable'));
+          toast.error(
+            <span>
+              {t('eg2Pro.upgrade.checkoutOffline')}{' '}
+              <a href={`/${language}/contact`} className="font-black underline">{t('eg2Pro.upgrade.contactUs')}</a>
+            </span>,
+            { duration: 8000 },
+          );
           return;
         }
         toast.error(t('teacher.subscription.checkoutError'));
         return;
       }
-
       clearResumeCheckoutIntent();
       const { url } = await response.json();
       window.location.href = url;
-    } catch (err) {
+    } catch {
       toast.error(t('teacher.subscription.checkoutError'));
     } finally {
       setPending(null);
     }
-  }, [t]);
+  }, [t, language]);
 
-  // Resumes checkout once the teacher is authenticated and a resume flag is pending.
-  // This is the mechanism of record — it survives BOTH ways auth can leave this
-  // component: a magic-link / email-confirmation click (navigates to /auth/callback,
-  // which redirects back to this exact page via its `next` param, remounting it with
-  // a fresh session) and the plain window.location.reload() that
-  // useAuthInitialization fires on every guest -> authenticated sign-in on this page
-  // (see the AuthModal usage below). AuthModal's onAuthSuccess is only a fast-path
-  // attempt for when no reload intervenes; this effect is what actually guarantees
-  // the resume.
+  // Resume after sign-in only once the entitlement is read: the server turns an ineligible
+  // trial into a paid checkout, and a Pro account must not be sent to buy Pro again.
   useEffect(() => {
-    if (authLoading || !user) return;
+    if (authLoading || !user || proLoading || known !== true) return;
     if (!consumeResumeCheckoutIntent()) return;
     const trial = consumeResumeTrialFlag();
-    pendingTrial.current = trial;
     setShowAuthModal(false);
-    handleUpgrade(trial);
-  }, [user, authLoading, handleUpgrade]);
+    const decision = resumeDecision({ trial, proLoading, known: true, hasPro, offerTrial });
+    if (decision === 'checkout-trial') void handleUpgrade(true);
+    else if (decision === 'checkout-paid') void handleUpgrade(false);
+    else if (decision === 'trial-used') toast(t('eg2Pro.upgrade.trialUsed'));
+    else if (decision === 'already-pro') toast.success(t('eg2Pro.upgrade.alreadyPro'));
+  }, [user, authLoading, proLoading, known, hasPro, offerTrial, handleUpgrade, t]);
 
-  // Free tier is deliberately framed as a starting point: the two caps a
-  // growing teacher hits first are shown as explicit "missing" rows (loss framing).
-  // The two caps are INTERPOLATED from the tier config, never retyped. They used to be
-  // baked into the copy as "2"/"30" in six locales, so tightening the paywall would have
-  // advertised one limit while enforcing another — on the only page in the portfolio that
-  // can take money. Change the numbers in lib/lemonsqueezy.ts and every locale follows.
+  const openSchool = () => {
+    setTab('school');
+    trackGrowthEvent('iap_viewed', { product: 'district_inquiry' });
+    tabsRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  };
+
+  // The two caps are interpolated from the tier config, never retyped into copy.
   const freeFeatures = [
     {
       label: t('teacher.subscription.freeClasses', {
@@ -160,75 +159,65 @@ export default function UpgradePricingPageClient() {
       }),
       included: true,
     },
-    // These two are genuinely free. Custom lists (19 created in prod, per usage data)
-    // and ad-free play work today. Duels is a dead feature (0 student_duels rows ever),
-    // so we don't advertise it as part of any tier.
-    //
-    // The `education.landing.pro.*` namespace is already translated into six locales.
     { label: t('education.landing.pro.customLists'), included: true },
     { label: t('education.landing.pro.noAds'), included: true },
     { label: t('teacher.subscription.unlimitedClasses'), included: false },
     { label: t('teacher.subscription.unlimitedStudents'), included: false },
-    // The one crossed-out FEATURE, and the reason the $9 is legible at all. Until 2026-08-25
-    // this column instead promised "Basic word tracking" and "Daily progress reports" as free
-    // — while the Pro column beside it sold reporting, and while ProGate refuses analytics in
-    // the product. The page sold the same thing on both sides of its own table, then the
-    // dashboard upsold what the pricing page had already given away.
     { label: t('education.landing.pro.analytics'), included: false },
     { label: t('eduPro.upgrade.freeMastery'), included: false },
     { label: t('eduPro.upgrade.freePractice'), included: false },
   ];
 
-  // Pro leads with outcome-driven value propositions, not just features.
-  // These are reordered from feature-speak to outcome-speak: what a teacher can *do*,
-  // not what they *get*. The first two are the pain points Free can't address.
   const proFeatures = [
-    t('teacher.subscription.featureOutcome1'), // Unlimited classes without cap worry
-    t('teacher.subscription.featureOutcome2'), // Add students without waiting/headaches
-    t('teacher.subscription.featureOutcome3'), // Real-time progress tracking
-    t('teacher.subscription.featureOutcome4'), // Compare strategies across all your classes
-    // The pedagogic one, deliberately not last-worded as a feature: the SAME
-    // game de-gameified for anxious students is why a department pays, not a
-    // fifth toggle.
-    t('teacher.subscription.featureOutcome5'), // Calm mode: timer/leaderboard/speed dials
+    t('teacher.subscription.featureOutcome1'),
+    t('teacher.subscription.featureOutcome2'),
+    t('teacher.subscription.featureOutcome3'),
+    t('teacher.subscription.featureOutcome4'),
+    // Calm mode is the pedagogic reason a department pays, not a fifth toggle.
+    t('teacher.subscription.featureOutcome5'),
     t('eduPro.upgrade.featureMastery'),
     t('eduPro.upgrade.featureMissedPractice'),
+    t('eg2Pro.plans.featureParentPack'),
   ];
-
-  // ponytail: no per-student anchor here on purpose. Dividing the Pro price by the
-  // FREE tier's student cap quotes the worst per-student rate Pro can have — Pro is
-  // unlimited, so a real class of 30 is $0.30 and a hundred is $0.09. It anchored
-  // against the sale. "About $0.30 a day" below is true, simpler, and already the
-  // strongest framing on the card; a second anchor only competed with it.
 
   const legalLinks = (
     <>
+      {(['terms', 'refund', 'privacy'] as const).map((page) => (
         <Link
-          href={`/${language}/legal/terms`}
+          key={page}
+          href={`/${language}/legal/${page}`}
           className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
         >
-          {t('legal.termsOfService')}
+          {t(page === 'terms' ? 'legal.termsOfService' : page === 'refund' ? 'legal.refundPolicy' : 'legal.privacyPolicy')}
         </Link>
-        <Link
-          href={`/${language}/legal/refund`}
-          className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
-        >
-          {t('legal.refundPolicy')}
-        </Link>
-        <Link
-          href={`/${language}/legal/privacy`}
-          className="text-neo-cyan hover:text-neo-lime font-bold text-xs underline transition-colors"
-        >
-          {t('legal.privacyPolicy')}
-        </Link>
+      ))}
     </>
   );
 
   const trustChips = [
     { icon: ShieldCheck, label: t('teacher.subscription.trustCancel') },
     { icon: Lock, label: t('teacher.subscription.trustDataSafe') },
-    { icon: BellRing, label: t('teacher.subscription.trustReminder') },
+    { icon: Smile, label: t('eg2Pro.upgrade.trustStudents') },
   ];
+
+  const tabButton = (value: UpgradeTab, label: string) => (
+    <button
+      type="button"
+      role="tab"
+      id={`upgrade-tab-${value}`}
+      aria-selected={tab === value}
+      aria-controls={`upgrade-panel-${value}`}
+      onClick={() => setTab(value)}
+      className={cn(
+        'min-h-11 flex-1 rounded-neo border-2 px-4 font-neo-display text-sm font-black transition-colors sm:flex-none sm:px-6',
+        tab === value
+          ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm'
+          : 'border-neo-cream/40 bg-neo-navy-light text-neo-white hover:border-neo-lime',
+      )}
+    >
+      {label}
+    </button>
+  );
 
   return (
     <EducationShell
@@ -240,172 +229,113 @@ export default function UpgradePricingPageClient() {
           data-testid="upgrade-footer"
           className="hidden lg:block shrink-0 border-t border-neo-cream/20 pt-3 pb-3 px-4 text-center"
         >
-          <p className="text-neo-white/70 font-bold text-xs mb-1.5">
-            {t('teacher.subscription.legalNote')}
-          </p>
+          <p className="text-neo-white/70 font-bold text-xs mb-1.5">{t('teacher.subscription.legalNote')}</p>
           <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
         </div>
       }
       className="bg-neo-navy"
     >
-      {/* Two-column layout at lg: hero/image on left, pricing/CTA on right.
-          Stacks to single column on smaller screens. */}
-      <div className="max-w-7xl mx-auto">
-        {/* Compact header — eyebrow + h1 only. Value prop and reassure fold into pricing column. */}
-        <div className="text-center mb-2 lg:mb-3">
-          <p
-            data-testid="upgrade-value-eyebrow"
-            className="text-xs font-black uppercase tracking-widest text-neo-cyan mb-1"
-          >
-            {t('teacher.subscription.proPlanName')}
-          </p>
-          <h1
-            className="text-2xl md:text-3xl font-neo-display font-black text-neo-white"
-            style={{ textWrap: 'balance' }}
-          >
-            {t('teacher.subscription.upgradePricingTitle')}
-          </h1>
+      <div className="mx-auto max-w-6xl pb-8">
+        {viewer === 'pro' && (
+          <section data-testid="pro-tools" className="mb-6">
+            <p className="text-xs font-black uppercase tracking-widest text-neo-lime">{t('eg2Pro.tools.eyebrow')}</p>
+            <h1 className="mb-3 font-neo-display text-2xl font-black text-neo-white md:text-3xl">{t('eg2Pro.tools.title')}</h1>
+            <ParentReportPack />
+          </section>
+        )}
+
+        <div ref={tabsRef} className="mb-4 flex flex-col gap-3 scroll-mt-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <p data-testid="upgrade-value-eyebrow" className="text-xs font-black uppercase tracking-widest text-neo-cyan">
+              {t('teacher.subscription.proPlanName')}
+            </p>
+            {viewer === 'pro' ? (
+              <h2 className="font-neo-display text-xl font-black text-neo-white md:text-2xl">{t('eg2Pro.tools.plansTitle')}</h2>
+            ) : (
+              <h1 className="font-neo-display text-2xl font-black text-neo-white md:text-3xl" style={{ textWrap: 'balance' }}>
+                {t('teacher.subscription.upgradePricingTitle')}
+              </h1>
+            )}
+            <p data-testid="upgrade-value-prop" className="mt-0.5 text-sm font-bold text-neo-lime">
+              {t('teacher.subscription.valueHeadline')}
+            </p>
+          </div>
+          <div role="tablist" aria-label={t('eg2Pro.tabs.label')} className="flex gap-2">
+            {tabButton('teacher', t('eg2Pro.tabs.teacher'))}
+            {tabButton('school', t('eg2Pro.tabs.school'))}
+          </div>
         </div>
 
-        {/* Two-column layout: image left, pricing cards + metadata right */}
-        <div
-          data-testid="upgrade-hero-section"
-          className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-6 items-stretch mb-3 lg:mb-0"
-        >
-          {/* The aligned Free vs Pro rows take the slot the decorative poster held:
-              the cards cannot be read across, the matrix can. */}
-          <div className="order-2 lg:order-1 min-w-0 flex flex-col gap-3">
-            <div className="hidden lg:block">
-              <PlanComparisonMatrix compact />
+        {tab === 'teacher' ? (
+          <div id="upgrade-panel-teacher" role="tabpanel" aria-labelledby="upgrade-tab-teacher" data-testid="upgrade-hero-section">
+            <UpgradePlanCards
+              viewer={viewer}
+              freeFeatures={freeFeatures}
+              proFeatures={proFeatures}
+              showTrial={showTrial}
+              pending={pending}
+              onTrial={() => { void handleUpgrade(true); }}
+              onBuy={() => { void handleUpgrade(false); }}
+              onSchool={openSchool}
+              manageBillingHref={portalUrl}
+              askSchool={
+                askOpen ? (
+                  <AskSchoolPanel
+                    requesterName={String((profile as { display_name?: string } | null)?.display_name ?? '')}
+                    origin={typeof window !== 'undefined' ? window.location.origin : ''}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    data-testid="ask-school-toggle"
+                    onClick={() => {
+                      setAskOpen(true);
+                      trackGrowthEvent('landing_cta_clicked', { cta: 'ask_school_open', source: 'teacher_upgrade' });
+                    }}
+                    className="inline-flex items-center justify-center gap-1 text-sm font-black text-neo-black underline decoration-2 underline-offset-2"
+                  >
+                    {t('eg2Pro.plans.askSchool')} <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden />
+                  </button>
+                )
+              }
+            />
+            <div data-testid="upgrade-legal-inline" className="lg:hidden mt-3 text-center">
+              <p className="text-neo-white/70 font-bold text-xs mb-1">{t('teacher.subscription.legalNote')}</p>
+              <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
             </div>
-            {/* Trust / risk-reversal row — compact single row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-2">
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {trustChips.map(({ icon: Icon, label }) => (
                 <div
                   key={label}
                   data-testid="trust-chip"
-                  className="flex items-center justify-center lg:justify-start gap-2 bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo px-2.5 py-1 text-center lg:text-start"
+                  className="flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2"
                 >
-                  <Icon
-                    className="w-3.5 h-3.5 text-neo-lime flex-shrink-0"
-                    strokeWidth={2.5}
-                  />
-                  <span className="text-xs font-bold text-neo-white leading-snug">
-                    {label}
-                  </span>
+                  <Icon className="h-4 w-4 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden />
+                  <span className="text-xs font-bold leading-snug text-neo-white">{label}</span>
                 </div>
               ))}
             </div>
-
-            {/* District / school pricing — a plain text link, deliberately NOT a bordered
-                card. The trial and $9 buttons live in the Pro card; a CTA-shaped box
-                here would compete with them. */}
-            <p className="text-center text-xs font-bold text-neo-white/60 mb-1.5">
-              {t('teacher.subscription.districtTitle')}{' '}
-              <Link
-                href={`/${language}/education/for-schools`}
-                onClick={() => trackGrowthEvent('iap_viewed', { product: 'district_inquiry' })}
-                className="text-neo-cyan hover:text-neo-lime underline"
-              >
-                {t('teacher.subscription.districtCta')}
-              </Link>
-            </p>
-
-            {/* FAQ Section — behind a disclosure (collapsed by default) — compact */}
-            <details className="mb-0">
-              <summary className="cursor-pointer bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo p-2 hover:bg-neo-navy transition-colors">
-                <h2 className="text-sm lg:text-base font-neo-display font-black text-neo-white inline-flex items-center gap-2">
-                  {t('teacher.subscription.faqTitle')}
-                  <span className="text-xs text-neo-lime font-bold">▼</span>
-                </h2>
-              </summary>
-
-              <div className="bg-neo-navy-light border-2 border-t-0 border-neo-cream/40 rounded-b-neo p-4 shadow-hard">
-                <div className="space-y-3">
-                  {[
-                    {
-                      q: 'teacher.subscription.faqCancel',
-                      a: 'teacher.subscription.faqCancelAnswer',
-                    },
-                    {
-                      q: 'teacher.subscription.faqAutoRenew',
-                      a: 'teacher.subscription.faqAutoRenewAnswer',
-                    },
-                    {
-                      q: 'teacher.subscription.faqDataLoss',
-                      a: 'teacher.subscription.faqDataLossAnswer',
-                    },
-                  ].map(({ q, a }) => (
-                    <div key={q}>
-                      <h3 className="text-sm font-bold text-neo-cyan mb-1">{t(q)}</h3>
-                      <p className="text-xs text-neo-white/90 font-bold leading-relaxed">
-                        {t(a)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </details>
-          </div>
-
-          {/* Pricing cards + reassurance text — right side on lg */}
-          <div className="order-1 lg:order-2 flex flex-col gap-2">
-            {/* Value prop + reassurance fit above pricing cards. mb-4 (not the flex gap
-                alone) is load-bearing: the "Most Popular" badge is absolutely positioned
-                above the Pro card's top edge (-top-3, plus the card's own md:scale-105),
-                so this block needs real clearance or the badge overlaps the reassure
-                line's last wrapped words. */}
-            <div className="mb-4">
-              <p
-                data-testid="upgrade-value-prop"
-                className="text-sm lg:text-base text-neo-lime font-black mb-1"
-                style={{ textWrap: 'balance' }}
-              >
-                {t('teacher.subscription.valueHeadline')}
-              </p>
-              <p className="text-xs text-neo-white/80 font-bold leading-snug">
-                {t('teacher.subscription.upgradePricingReassure')}
-              </p>
-            </div>
-
-            {/* Trial is the low-friction action. $9/mo stays the paid checkout. */}
-            <PricingCards
-              freeFeatures={freeFeatures}
-              proFeatures={proFeatures}
-              isLoading={pending !== null}
-              pending={pending}
-              showTrial={offerTrial}
-              currentTier={hasPro ? 'pro' : 'free'}
-              onTrialClick={() => { void handleUpgrade(true); }}
-              onUpgradeClick={() => { void handleUpgrade(false); }}
-            />
-            <div data-testid="upgrade-legal-inline" className="lg:hidden -mt-2 text-center">
-              <p className="text-neo-white/70 font-bold text-xs mb-1">{t('teacher.subscription.legalNote')}</p>
-              <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
+            <ProPreviewStrip />
+            <div className="mt-8">
+              <PlanComparisonMatrix compact />
             </div>
           </div>
-        </div>
+        ) : (
+          <div id="upgrade-panel-school" role="tabpanel" aria-labelledby="upgrade-tab-school">
+            <SchoolPlanSection requester={requester} />
+          </div>
+        )}
 
+        <UpgradeFaq />
       </div>
 
-      {/* Auth modal for unauthenticated checkout attempts (401). onAuthSuccess is a
-          fast-path retry for the paths that authenticate inside the modal (OAuth,
-          password, OTP) instead of leaving the teacher to press "Upgrade Now" a second
-          time. It is NOT the only path: a genuine guest -> authenticated sign-in on
-          this page also fires useAuthInitialization's one-shot window.location.reload()
-          (contexts/auth/hooks/useAuthInitialization.ts), which can race and cancel
-          this fetch. That's fine — the resume effect above survives the reload (the
-          flag lives in localStorage, not React state) and finishes the job once the
-          page comes back with a session. Cancelling the modal deliberately does NOT
-          clear the flag: it only clears once checkout actually succeeds, so a reload
-          mid-flow can't strand the teacher short one click. The 15-minute TTL bounds
-          the cost of that choice. */}
+      {/* onAuthSuccess re-reads the entitlement; the resume effect above then decides. */}
       {showAuthModal && (
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           initialMode="signin"
-          onAuthSuccess={() => { void handleUpgrade(pendingTrial.current); }}
+          onAuthSuccess={() => { void refresh(); }}
         />
       )}
     </EducationShell>

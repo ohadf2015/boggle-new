@@ -1,16 +1,6 @@
 /**
- * A locked Pro surface must show the SHAPE of what is behind it.
- *
- * Live at /en/teacher, a free teacher's Analytics section was a bare upsell
- * card — a heading, a paragraph and a price. Nothing suggested there were
- * per-student rows behind it, so the audit read the whole report as "paywalled
- * with zero preview" and could not tell the gate from an empty panel.
- *
- * The gate now renders two blurred placeholder rows in the shape of the real
- * per-student table. Deliberately placeholders and not the real rows: blur is
- * not a security boundary, and a free teacher's browser should not be sent the
- * data the gate exists to sell. They are aria-hidden so a screen reader hears
- * the offer, not decoration.
+ * A locked Pro surface shows a concrete, clearly labelled SAMPLE of what it unlocks
+ * (sample class data per feature), never the teacher's own gated data.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -23,37 +13,36 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => mockPro }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
-import { ProGate } from '../ProGate';
+import { ProGate, PRO_FEATURES } from '../ProGate';
 
-describe('ProGate — the locked panel is not empty', () => {
+describe('ProGate — the locked panel previews the real feature', () => {
   beforeEach(() => {
     mockPro.hasPro = false;
     mockPro.loading = false;
   });
 
-  it('shows two blurred placeholder rows to a free teacher', () => {
-    render(<ProGate feature="analytics"><div>real rows</div></ProGate>);
-
+  it.each(PRO_FEATURES)('shows the %s sample preview, unblurred and labelled as a sample', (feature) => {
+    render(<ProGate feature={feature}><div>real rows</div></ProGate>);
     const preview = screen.getByTestId('pro-gate-preview');
-    expect(preview).toBeInTheDocument();
-    expect(preview.querySelectorAll('[data-testid="pro-gate-preview-row"]')).toHaveLength(2);
-    expect(preview.className).toMatch(/blur/);
+    expect(preview.querySelector(`[data-testid="pro-preview-${feature}"]`)).not.toBeNull();
+    expect(preview.className).not.toMatch(/blur/);
+    expect(preview.textContent).toContain('eg2Pro.sample.badge');
   });
 
-  it('never sends the gated content to a free teacher, blurred or not', () => {
+  it('never sends the gated content to a free teacher', () => {
     render(<ProGate feature="analytics"><div>real rows</div></ProGate>);
     expect(screen.queryByText('real rows')).not.toBeInTheDocument();
   });
 
-  it('hides the placeholder from assistive tech', () => {
-    render(<ProGate feature="analytics"><div>real rows</div></ProGate>);
-    expect(screen.getByTestId('pro-gate-preview')).toHaveAttribute('aria-hidden', 'true');
+  it('offers exactly one action', () => {
+    render(<ProGate feature="mastery"><div>real rows</div></ProGate>);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
 
-  it('shows the real content and no placeholder to a Pro teacher', () => {
+  it('shows the real content and no preview to a Pro teacher', () => {
     mockPro.hasPro = true;
     render(<ProGate feature="analytics"><div>real rows</div></ProGate>);
-
     expect(screen.getByText('real rows')).toBeInTheDocument();
     expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
   });

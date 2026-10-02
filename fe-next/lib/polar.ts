@@ -14,6 +14,7 @@
  */
 
 import { createHmac, timingSafeEqual } from 'crypto'
+import { TEACHER_PRO_TRIAL_DAYS } from '@/lib/education/pro/trialDays'
 
 // ---- Environment ----
 
@@ -37,7 +38,7 @@ export function getProProductId(): string {
 }
 
 /** Teacher Pro introductory trial. Paid checkouts send `allow_trial: false`. */
-export const POLAR_PRO_TRIAL_DAYS = 14
+export const POLAR_PRO_TRIAL_DAYS = TEACHER_PRO_TRIAL_DAYS
 
 // ---- API Client ----
 
