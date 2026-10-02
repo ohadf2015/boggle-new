@@ -6,6 +6,8 @@ import {
   educationRelatedPages,
 } from '@/lib/seo/educationPageLinks';
 import type { EducationAccent } from '@/lib/seo/educationLanding';
+import { wordListRail } from '@/lib/seo/wordLists/rail';
+import { tr } from '@/lib/seo/wordLists/i18n';
 
 /**
  * The "Related" rail every education landing page renders.
@@ -69,24 +71,47 @@ export function EducationRelatedLinks({
     .slice(0, Math.max(0, count - extra.length));
 
   const links = [...extra, ...rotation];
-  if (links.length === 0) return null;
+  const rail = slug === 'lists' ? [] : wordListRail(slug, locale);
+  if (links.length === 0 && rail.length === 0) return null;
 
   return (
-    <nav className="mt-16" aria-label={title}>
-      <h2 className="mb-4 font-neo-display text-xl font-black uppercase tracking-wide text-neo-white">
-        {title}
-      </h2>
-      <div className="flex flex-wrap gap-3 text-sm font-bold">
-        {links.map((r) => (
-          <Link
-            key={r.href}
-            href={`/${locale}${r.href}`}
-            className={`rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-4 py-2 ${ACCENT_TEXT[r.accent]} transition-colors hover:bg-neo-navy`}
-          >
-            {r.label}
-          </Link>
-        ))}
-      </div>
-    </nav>
+    <>
+      {rail.length > 0 && (
+        <nav data-word-list-rail className="mt-16" aria-label={tr(locale, 'rail.title')}>
+          <h2 className="mb-4 font-neo-display text-xl font-black uppercase tracking-wide text-neo-white">
+            {tr(locale, 'rail.title')}
+          </h2>
+          <div className="flex flex-wrap gap-3 text-sm font-bold">
+            {rail.map((r) => (
+              <Link
+                key={r.href}
+                href={r.href}
+                className="rounded-neo border-2 border-neo-black bg-neo-cream px-4 py-2 text-neo-navy shadow-hard-sm transition-transform hover:-translate-y-0.5"
+              >
+                {r.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
+      {links.length > 0 && (
+        <nav className="mt-16" aria-label={title}>
+          <h2 className="mb-4 font-neo-display text-xl font-black uppercase tracking-wide text-neo-white">
+            {title}
+          </h2>
+          <div className="flex flex-wrap gap-3 text-sm font-bold">
+            {links.map((r) => (
+              <Link
+                key={r.href}
+                href={`/${locale}${r.href}`}
+                className={`rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-4 py-2 ${ACCENT_TEXT[r.accent]} transition-colors hover:bg-neo-navy`}
+              >
+                {r.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
+    </>
   );
 }

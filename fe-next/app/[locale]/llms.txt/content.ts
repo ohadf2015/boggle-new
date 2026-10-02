@@ -3,6 +3,8 @@
 // localized URLs for en/he. Hebrew prose intentionally minimal pending
 // human-translated native copy (auto-translation rejected per project policy).
 
+import { wordListLlmsSection } from '@/lib/seo/wordLists/llms';
+
 const BASE = 'https://www.lexiclash.live';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
@@ -391,5 +393,5 @@ const BUILDERS: Record<Locale, () => string> = {
 
 export function buildLocaleLlms(locale: string): string {
     const key = (['en', 'he', 'sv', 'ja', 'es', 'ru'].includes(locale) ? locale : 'en') as Locale;
-    return BUILDERS[key]();
+    return BUILDERS[key]() + wordListLlmsSection(key);
 }

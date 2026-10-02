@@ -51,6 +51,7 @@ const LABELS: Record<string, Record<EducationLinkLocale, string>> = {
   'english-games-middle-school': { en: 'English games for middle school', he: 'משחקי אנגלית לחטיבת ביניים', es: 'Juegos de inglés para secundaria', sv: 'Engelsklekar för högstadiet', ja: '中学生向け英語ゲーム', ru: 'Игры на английском для средней школы' },
   'english-games-adults': { en: 'English games for adults', he: 'משחקי אנגלית למבוגרים', es: 'Aprender inglés jugando para adultos', sv: 'Engelsklekar för vuxna', ja: '大人向け英語ゲーム', ru: 'Игры на английском для взрослых' },
   'irregular-verbs-games': { en: 'Irregular verb games', he: 'משחקי פעלים חריגים', es: 'Juegos de verbos irregulares', sv: 'Oregelbundna verb-lekar', ja: '不規則動詞ゲーム', ru: 'Игры на неправильные глаголы' },
+  lists: { en: 'Free word lists by grade', he: 'רשימות מילים לפי שכבה', es: 'Listas de palabras por grado', sv: 'Ordlistor per årskurs', ja: '学年別の単語リスト', ru: 'Списки слов по классам' },
   'english-vocabulary-topics': { en: 'English vocabulary by topic', he: 'אוצר מילים באנגלית לפי נושאים', es: 'Vocabulario en inglés por temas', sv: 'Engelskt ordförråd efter tema', ja: 'テーマ別英単語', ru: 'Английский словарь по темам' },
 };
 
@@ -77,6 +78,7 @@ export const EDUCATION_PAGES: readonly EducationPageLink[] = [
   { slug: 'english-games-adults', accent: 'purple', label: LABELS['english-games-adults'] },
   { slug: 'irregular-verbs-games', accent: 'cyan', label: LABELS['irregular-verbs-games'] },
   { slug: 'english-vocabulary-topics', accent: 'lime', label: LABELS['english-vocabulary-topics'] },
+  { slug: 'lists', accent: 'cyan', label: LABELS.lists },
 ] as const;
 
 function linkLocale(locale: string): EducationLinkLocale {

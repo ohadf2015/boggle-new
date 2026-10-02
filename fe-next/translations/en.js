@@ -94,6 +94,171 @@ const en = {
     }
   },
   // @eg2Fix:end
+  // @eg2Seo:start
+  "eg2Seo": {
+    "rail": {
+      "title": "Free word lists to play"
+    },
+    "nav": {
+      "breadcrumb": "Breadcrumb",
+      "education": "Education",
+      "lists": "Word lists"
+    },
+    "lang": {
+      "en": "English",
+      "he": "Hebrew",
+      "es": "Spanish",
+      "sv": "Swedish",
+      "ja": "Japanese"
+    },
+    "vocab": {
+      "en": "English vocabulary",
+      "he": "Hebrew vocabulary",
+      "es": "Spanish vocabulary",
+      "sv": "Swedish vocabulary",
+      "ja": "Japanese vocabulary"
+    },
+    "wordsIn": {
+      "en": "English words",
+      "he": "Hebrew words",
+      "es": "Spanish words",
+      "sv": "Swedish words",
+      "ja": "Japanese words"
+    },
+    "grade": "Grade {n}",
+    "count": {
+      "words": "{count} words",
+      "lists": "{count} lists"
+    },
+    "gloss": {
+      "definitions": "definitions",
+      "translations": {
+        "he": "Hebrew translations",
+        "en": "English translations",
+        "es": "Spanish translations",
+        "sv": "Swedish translations",
+        "ja": "Japanese translations"
+      },
+      "definitionsIn": {
+        "he": "Hebrew definitions",
+        "en": "English definitions",
+        "es": "Spanish definitions",
+        "sv": "Swedish definitions",
+        "ja": "Japanese definitions"
+      }
+    },
+    "detail": {
+      "boardTitle": "One board from this list",
+      "boardHidden": "Hidden on this board:",
+      "metaTitle": "{grade} {name}: {language} word list and class game",
+      "metaTitleNoGrade": "{name}: {language} word list and class game",
+      "metaTitleShort": "{grade} {name}: {language} word list",
+      "metaTitleShortNoGrade": "{name}: {language} word list",
+      "metaDescription": "{count} {wordsIn} with {gloss}: {sample}… Play them as a live class game or practise solo. Free, no student accounts.",
+      "metaDescriptionPlain": "{count} {wordsIn}: {sample}… Play them as a live class game or practise solo. Free, no student accounts.",
+      "intro": "{count} {wordsIn} for {grade}, starting with {sample}. Put them on the big screen as a live class game, or practise solo right here. Every word is on this page, no sign-up needed to read it.",
+      "introNoGrade": "{count} {wordsIn}, starting with {sample}. Put them on the big screen as a live class game, or practise solo right here. Every word is on this page, no sign-up needed to read it.",
+      "playClass": "Play with your class",
+      "playClassSub": "Free teacher account · students join with a code",
+      "practiceSolo": "Practise solo",
+      "practiceSoloSub": "Right here, no sign-up",
+      "modesTitle": "Three ways to practise it solo",
+      "modes": {
+        "grid": "Word grid",
+        "gridSub": "Hunt the list words in a letter board",
+        "spelling": "Spelling",
+        "spellingSub": "Read the clue, type the word",
+        "matching": "Matching",
+        "matchingSub": "Pair each word with its meaning"
+      },
+      "wordsTitle": "All {count} words",
+      "howTitle": "Run it with your class in three steps",
+      "how1Title": "Start the game",
+      "how1": "Tap Play with your class. The list is saved to your teacher library and a game room opens.",
+      "how2Title": "Students join",
+      "how2": "Put the six-character code on the board. Students join from any browser, with no accounts and no app.",
+      "how3Title": "Play the round",
+      "how3": "Everyone races to find and spell the list words. Play again, or change the words in your library first.",
+      "leadTitle": "Make this list yours",
+      "leadBody": "A free teacher account saves this list to your library, where you can add your own words and run it live with your class whenever you like.",
+      "leadCta": "Get a free teacher account",
+      "leadPro": "See what Teacher Pro adds",
+      "relatedTitle": "More lists like this",
+      "browseTitle": "Keep browsing",
+      "faqTitle": "Questions teachers ask",
+      "faq1q": "How do I play “{title}” with my class?",
+      "faq1a": "Tap Play with your class at the top of this page. With a free teacher account the list opens straight into a game room; you put the code on the board and the class joins.",
+      "faq2q": "Do my students need accounts?",
+      "faq2a": "No. Students type the room code and a nickname in any browser. There is nothing to install and no email to collect.",
+      "faq3q": "Can I change the words?",
+      "faq3a": "Yes. Once you start a game the list is saved to your teacher library, where you can add, remove or rewrite words before the next round.",
+      "curated": "Curated by LexiClash",
+      "byAuthor": "Shared by {author}"
+    },
+    "practice": {
+      "close": "Close",
+      "title": "Practise: {title}",
+      "pick": "Pick a game"
+    },
+    "hub": {
+      "metaTitle": "Free word lists for the classroom, by grade and topic",
+      "metaDescription": "{lists} ready-to-play word lists in {languages} languages, {words} words. Pick a grade or a topic, then play any list as a live class game or practise solo.",
+      "eyebrow": "Free library",
+      "h1": "Word lists ready to play",
+      "intro": "{lists} lists and {words} words, every one of them visible right here. Pick a grade or a topic, then put the list on the big screen as a live class game. Students join with a code, no accounts.",
+      "byLanguage": "Browse by language",
+      "byTopic": "Browse by topic",
+      "byGrade": "Browse by grade",
+      "viewAll": "See all {count}",
+      "eflNote": "Teaching English? The words stay in English; everything around them is in your language.",
+      "langTitle": {
+        "en": "English word lists",
+        "he": "Hebrew word lists",
+        "es": "Spanish word lists",
+        "sv": "Swedish word lists",
+        "ja": "Japanese word lists"
+      },
+      "langMetaDescription": "{lists} lists of {wordsIn} sorted by grade, {words} words in all. Play any list as a live class game or practise solo. Free.",
+      "langIntro": "{lists} lists of {wordsIn}, sorted by grade. Open one to see every word, then play it with your class or on your own.",
+      "gradeTitle": "{grade} {language} word lists",
+      "gradeMetaDescription": "{lists} {language} word lists for {grade}: {topics}. Ready to play as a class game.",
+      "gradeIntro": "{lists} lists for {grade}, {words} words in all. Open a list to see every word, or start a game with it straight away.",
+      "topicTitle": "Word lists: {topic}",
+      "topicMetaDescription": "{lists} word lists about {topic} across grades and languages, {words} words in all. Play any of them as a live class game or practise solo.",
+      "topicIntro": "{lists} lists about {topic}, from the youngest grades up. Open one to see every word, then play it with your class.",
+      "otherGrades": "Other grades",
+      "otherTopics": "Other topics",
+      "langCard": "{lists} lists · {words} words"
+    },
+    "topic": {
+      "animals": "Animals",
+      "food": "Food",
+      "body": "The body",
+      "colors": "Colors & shapes",
+      "numbers": "Numbers",
+      "family": "Family & people",
+      "clothes": "Clothes",
+      "school": "School",
+      "home": "Home",
+      "weather-seasons": "Weather & seasons",
+      "calendar": "Days & months",
+      "emotions": "Feelings",
+      "verbs": "Verbs",
+      "adjectives": "Describing words",
+      "transportation": "Transport",
+      "jobs": "Jobs",
+      "technology": "Technology",
+      "question-words": "Question words",
+      "literature": "Literature",
+      "academic": "Academic words",
+      "science": "Science",
+      "math": "Math",
+      "history": "History",
+      "geography": "Geography",
+      "everyday-words": "Everyday words"
+    }
+  },
+  // @eg2Seo:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Library",

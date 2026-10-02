@@ -55,8 +55,8 @@ describe('sitemap', () => {
   const EDUCATION_LANDINGS = EDUCATION_PAGES.map((p) => `/education/${p.slug}`);
   const ALL_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
-  it('emits every EDUCATION_PAGES slug for all six locales (17×6)', () => {
-    expect(EDUCATION_PAGES).toHaveLength(17);
+  it('emits every EDUCATION_PAGES slug for all six locales (18×6)', () => {
+    expect(EDUCATION_PAGES).toHaveLength(18);
     const urls = new Set(sitemap().map((e) => e.url));
     let present = 0;
     for (const path of EDUCATION_LANDINGS) {

@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { hreflangAlternates } from '@/lib/seo/hreflang';
 import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
+import { wordListSitemapRoutes } from '@/lib/seo/wordLists/sitemapRoutes';
+import { WORD_LISTS_GENERATED_AT } from '@/lib/seo/wordLists/catalog';
 import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 
 const BASE_URL = 'https://www.lexiclash.live';
@@ -186,6 +188,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
       images: [`${BASE_URL}/og-image-en.webp`],
     });
   });
+
+  // ─── Public word lists (/education/lists/**): hubs + one page per curated list ───
+  // The library hub itself is in EDUCATION_PAGES above. Locales and alternates come
+  // from the same cluster function as each page's own head.
+  routes.push(...wordListSitemapRoutes(WORD_LISTS_GENERATED_AT));
 
   // ─── WordCraft marketing landing (English-only target; non-EN hreflang → the
   //     localized playable game at /word-craft) ───

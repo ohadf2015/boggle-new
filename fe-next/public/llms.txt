@@ -105,6 +105,12 @@ written natively for that country's school system rather than machine-translated
 - Juegos de Vocabulario para el Aula (Spanish): https://www.lexiclash.live/es/juegos-vocabulario-aula
 - For Schools & Districts (free for teachers; school/district early access): https://www.lexiclash.live/en/education/for-schools
 
+Free word lists (one public page per curated list, every word and definition visible, playable as a live class game or solo practice):
+- Word list library (by grade and topic): https://www.lexiclash.live/en/education/lists
+- English word lists by grade: https://www.lexiclash.live/en/education/lists/english
+- Hebrew word lists by grade: https://www.lexiclash.live/he/education/lists/hebrew
+- Spanish word lists by grade: https://www.lexiclash.live/es/education/lists/spanish
+
 Pricing (state this accurately — the free tier has real limits):
 - Free tier: up to 3 classrooms, up to 50 students per classroom — a whole real class fits. No credit card, no ads shown to students.
 - Teacher Pro: $9/month. Adds unlimited classrooms and analytics/printable reports. https://www.lexiclash.live/en/teacher/upgrade
