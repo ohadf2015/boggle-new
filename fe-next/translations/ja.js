@@ -212,7 +212,12 @@ const ja = {
       "codeReady": "コード準備OK",
       "firstAssignmentTitle": "最初の課題を作る",
       "firstAssignmentBody": "名簿に生徒がいます。ライブ中でないときも取り組める練習課題を出しましょう。",
-      "firstAssignmentCta": "最初の課題を作成"
+      "firstAssignmentCta": "最初の課題を作成",
+      "progressTitle": "クラスの進捗",
+      "progressStudents": "生徒",
+      "progressAssignments": "課題",
+      "progressSubmitted": "提出済み",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {

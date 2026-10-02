@@ -214,7 +214,12 @@ const ru = {
       "codeReady": "Код готов",
       "firstAssignmentTitle": "Создайте первое задание",
       "firstAssignmentBody": "Ученики уже в списке. Назначьте практику, чтобы классу было чем заняться, когда вы не в эфире.",
-      "firstAssignmentCta": "Создать первое задание"
+      "firstAssignmentCta": "Создать первое задание",
+      "progressTitle": "Прогресс класса",
+      "progressStudents": "ученики",
+      "progressAssignments": "задания",
+      "progressSubmitted": "сдано",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {

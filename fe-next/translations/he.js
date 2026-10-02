@@ -212,7 +212,12 @@ const he = {
       "codeReady": "הקוד מוכן",
       "firstAssignmentTitle": "צרו את המטלה הראשונה",
       "firstAssignmentBody": "יש תלמידים ברשימה. שייכו תרגול כדי שיהיה להם מה לעשות כשאתם לא בשידור חי.",
-      "firstAssignmentCta": "צרו מטלה ראשונה"
+      "firstAssignmentCta": "צרו מטלה ראשונה",
+      "progressTitle": "התקדמות הכיתה",
+      "progressStudents": "תלמידים",
+      "progressAssignments": "מטלות",
+      "progressSubmitted": "הוגשו",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {

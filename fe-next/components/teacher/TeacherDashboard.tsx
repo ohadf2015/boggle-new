@@ -51,6 +51,7 @@ import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { GetStudentsInCard } from './hq/GetStudentsInCard';
 import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
 import { FirstAssignmentPanel } from './hq/FirstAssignmentPanel';
+import { ClassProgressStrip } from './hq/ClassProgressStrip';
 import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
 import { HqDock } from './hq/HqDock';
@@ -161,7 +162,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
 
   // Derived, not a second piece of state (pitfall class 1).
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId) ?? null;
-  const { assignmentCount, hasActiveRoom } = useFirstAssignmentCta(
+  const { assignmentCount, submittedCount, hasActiveRoom } = useFirstAssignmentCta(
     selectedClassroomId || null,
   );
   const reportsHref = selectedClassroomId
@@ -397,6 +398,13 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                       onCta={() => setShowAssignmentCreator(true)}
                     />
                   ) : null}
+                  <ClassProgressStrip
+                    classroomId={selectedClassroom.id}
+                    studentCount={selectedClassroom.member_count ?? 0}
+                    assignmentCount={assignmentCount}
+                    submittedCount={submittedCount}
+                    hasPro={hasPro}
+                  />
                   <GetStudentsInCard
                     className="flex-1"
                     classroom={{

@@ -212,7 +212,12 @@ const en = {
       "codeReady": "Code ready",
       "firstAssignmentTitle": "Assign their first game",
       "firstAssignmentBody": "Students are in. Send one assignment so they play before the next class.",
-      "firstAssignmentCta": "Create assignment"
+      "firstAssignmentCta": "Create assignment",
+      "progressTitle": "Class progress",
+      "progressStudents": "students",
+      "progressAssignments": "assignments",
+      "progressSubmitted": "submitted",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {
