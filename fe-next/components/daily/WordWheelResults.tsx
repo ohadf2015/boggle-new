@@ -22,6 +22,8 @@ import WordWheelReplayCta from './WordWheelReplayCta';
 import CatchUpSuggestion from './CatchUpSuggestion';
 import { STICKY_CTA_WORD_WHEEL } from './stickyCta';
 import { NextQuestCta } from './results/NextQuestCta';
+import { GuestNameEditor } from './results/GuestNameEditor';
+import { getGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import MpModeCrossPromo from './MpModeCrossPromo';
@@ -167,6 +169,11 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   // Resolution-aware: gating on the `isAuthenticated` prop alone would flash the
   // stripped layout at a logged-in player on first paint (rules/60 Class 1).
   const isGuest = useIsGuest(isAuthenticated);
+  const [guestName, setGuestName] = useState<string | null>(null);
+  const [renameCount, setRenameCount] = useState(0);
+  useEffect(() => {
+    if (isGuest) void getGuestDailyPlayer().then(p => setGuestName(p.displayName));
+  }, [isGuest]);
 
   // Funnel anchor: fire once on mount so PostHog can measure results-page drop-off
   useEffect(() => {
@@ -523,8 +530,19 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
         >
+          {isGuest && guestName && (
+            <GuestNameEditor
+              name={guestName}
+              guestFingerprint={currentGuestFingerprint ?? null}
+              onRenamed={(name) => {
+                setGuestName(name);
+                setRenameCount(c => c + 1);
+              }}
+              t={t}
+            />
+          )}
           <TabbedDailyLeaderboard
-            key={leaderboardKey}
+            key={`${leaderboardKey}-${renameCount}`}
             puzzleDate={puzzleDate}
             language={gameLang}
             currentPlayerId={currentPlayerId}

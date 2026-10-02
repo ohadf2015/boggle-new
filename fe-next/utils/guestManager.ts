@@ -5,6 +5,8 @@
 
 import logger from '@/utils/logger';
 import { getFromStorage, saveToStorage, removeFromStorage, getJsonFromStorage, saveJsonToStorage } from '@/utils/storageHelpers';
+import { setStoredUsername } from '@/utils/profileStorage';
+import { updateGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
 
 const GUEST_SESSION_KEY = 'boggle_guest_session_id';
 const GUEST_STATS_KEY = 'boggle_guest_stats';
@@ -287,6 +289,13 @@ export function setGuestName(name: string): void {
   } catch (error) {
     logger.error('Error saving guest name:', error);
   }
+}
+
+/** A guest's name lives in three stores; write all of them so lobbies, menus and daily submits agree. */
+export function saveGuestNameEverywhere(name: string): void {
+  setStoredUsername(name);
+  setGuestName(name);
+  updateGuestDailyPlayer({ displayName: name });
 }
 
 /**

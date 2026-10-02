@@ -23,9 +23,8 @@ import { ManageCookiesButton } from '@/components/CookieConsent';
 import GetAppMenuRow from '@/components/android-install/GetAppMenuRow';
 import { teacherMenuEntry } from '@/lib/education/teacherRole';
 import AvatarLite from '@/components/AvatarLite';
-import { getStoredCustomAvatar, getStoredUsername, setStoredUsername } from '../../utils/profileStorage';
-import { setGuestName } from '../../utils/guestManager';
-import { updateGuestDailyPlayer } from '../../utils/dailyChallenge/guestPlayer';
+import { getStoredCustomAvatar, getStoredUsername } from '../../utils/profileStorage';
+import { saveGuestNameEverywhere } from '../../utils/guestManager';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
@@ -126,9 +125,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const handleSaveGuestName = useCallback(() => {
         const trimmed = editGuestNameValue.trim().slice(0, 20);
         if (trimmed) {
-            setStoredUsername(trimmed);
-            setGuestName(trimmed);
-            updateGuestDailyPlayer({ displayName: trimmed });
+            saveGuestNameEverywhere(trimmed);
             setGuestNameState(trimmed);
         }
         setIsEditingGuestName(false);

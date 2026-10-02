@@ -26,6 +26,7 @@ import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { NextQuestCta } from './results/NextQuestCta';
+import { GuestNameEditor } from './results/GuestNameEditor';
 import { STICKY_CTA_WORD_HUNT } from './stickyCta';
 import { useExperiment } from '@/hooks/useExperiment';
 import { getPastWordHuntPerformance } from '@/utils/dailyChallenge';
@@ -98,6 +99,8 @@ export interface WordHuntResultsContentProps {
   leaderboardKey: number;
   profile: { id: string } | null;
   guestFingerprint: string | null;
+  guestName?: string;
+  onGuestRenamed?: (name: string) => void;
   onGameLanguageChange?: (lang: Language) => void;
   onShowCreatePuzzle: () => void;
   onSpendStart: (position: { x: number; y: number }, amount: number) => void;
@@ -127,6 +130,8 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   leaderboardKey,
   profile,
   guestFingerprint,
+  guestName,
+  onGuestRenamed,
   onGameLanguageChange,
   onShowCreatePuzzle,
   onSpendStart,
@@ -278,6 +283,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
   const leaderboardNode = (
     <>
+      {isGuest && guestName && onGuestRenamed && (
+        <GuestNameEditor name={guestName} guestFingerprint={guestFingerprint} onRenamed={onGuestRenamed} t={t} />
+      )}
       {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
       <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>
         <TabbedDailyLeaderboard
