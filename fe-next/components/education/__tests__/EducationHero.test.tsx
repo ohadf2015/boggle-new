@@ -39,8 +39,8 @@ describe('EducationHero', () => {
   it('renders a primary free-access path and a secondary Teacher Pro checkout CTA', () => {
     render(<EducationHero />);
     const free = screen.getByTestId('education-hero-free-cta');
-    expect(free).toHaveAttribute('href', '/en/teacher');
-    expect(free).toHaveTextContent('education.landing.hero.cta_primary');
+    expect(free).toHaveAttribute('href', '/en/education/access');
+    expect(free).toHaveTextContent('eg2Land.hero.ctaPrimary');
     const pro = screen.getByTestId('education-hero-pro-cta');
     expect(pro).toHaveAttribute('href', '/en/teacher/upgrade');
     expect(pro.textContent).toMatch(/\$9/);
@@ -132,5 +132,29 @@ describe('EducationHero', () => {
     expect(className).not.toMatch(/\border-first\b/);
     expect(className).not.toMatch(/\border-last\b/);
     expect(className).not.toMatch(/\border-\d+\b/);
+  });
+
+  it('never sends the free CTA through the /teacher gate, so no ?from= bounce notice', () => {
+    render(<EducationHero />);
+    const href = screen.getByTestId('education-hero-free-cta').getAttribute('href') ?? '';
+    expect(href).not.toMatch(/\/teacher(\?|$)/);
+    expect(href).not.toMatch(/from=/);
+  });
+
+  it('asks a signed-in account without teacher access to finish setup instead of signing up again', () => {
+    render(<EducationHero setupPending />);
+    const free = screen.getByTestId('education-hero-free-cta');
+    expect(free).toHaveAttribute('href', '/en/education/access');
+    expect(free).toHaveTextContent('eg2Land.hero.ctaFinishSetup');
+  });
+
+  it('hangs the mascot off the outer edge of the mock, clear of the leaderboard rank badges', () => {
+    render(<EducationHero />);
+    const mascot = Array.from(document.querySelectorAll('img')).find((img) =>
+      (img.getAttribute('src') ?? '').includes('scholar'),
+    );
+    const wrap = mascot?.closest('[aria-hidden="true"]') as HTMLElement;
+    expect(wrap.className).not.toMatch(/-bottom-/);
+    expect(wrap.style.insetInlineStart).toMatch(/- 5\.5rem/);
   });
 });

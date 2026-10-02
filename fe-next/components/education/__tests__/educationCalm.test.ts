@@ -40,15 +40,4 @@ describe('education surfaces stay calm', () => {
     expect(read('components/education/lobby/LaunchStageBackdrop.tsx')).toContain('bg-neo-navy/80');
     expect(read('components/education/ClassroomGameLobbyExpress.tsx')).not.toMatch(/animate-bounce/);
   });
-
-  it('gives the role cards one shared edge, and only the teacher path a fill', () => {
-    const client = read('app/[locale]/education/PageClient.tsx');
-    const roles = client.slice(
-      client.indexOf('Role cards'),
-      client.indexOf('TeacherProCheckoutCta locale'),
-    );
-    expect(roles).not.toMatch(/border-neo-lime|border-neo-cyan/);
-    expect(roles).toContain('border-neo-cream');
-    expect(roles).not.toMatch(/bg-neo-cyan/);
-  });
 });

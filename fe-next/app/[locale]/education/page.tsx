@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { LandingFaq } from '@/components/education/landing/LandingFaq';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { translateKey } from '@/lib/i18n/serverTranslate';
 import {
@@ -59,32 +59,10 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
       )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
       <EducationPageClient
-        answer={
-          content.geoAnswer ? (
-            <section
-              data-answer
-              className="mx-auto mt-2 w-full max-w-4xl px-4 font-neo-body text-neo-white"
-            >
-              <div className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-8">
-                <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
-                  {content.geoAnswer.question}
-                </h2>
-                <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">
-                  {content.geoAnswer.answer}
-                </p>
-              </div>
-            </section>
-          ) : null
-        }
+        geo={content.geoAnswer}
+        faq={<LandingFaq title={translateKey('eg2Land.faq.title', locale, 'Teacher questions')} items={content.faq} />}
       />
       <EducationResourceLinks locale={locale} />
-      <GamePageSeoContent
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-        faqAsHeadings
-      />
     </>
   );
 }

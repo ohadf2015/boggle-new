@@ -75,14 +75,15 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
   });
 
-  it('redirects authenticated students instead of showing shortcut', () => {
+  it('keeps a student-role account on the landing (every new profile is student) with a link to its classes', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       loading: false,
       profile: { display_name: 'Alice', user_role: 'student' },
     });
     render(<EducationPageClient />);
-    expect(mockReplace).toHaveBeenCalledWith('/en/student');
+    expect(mockReplace).not.toHaveBeenCalled();
+    expect(screen.getByTestId('landing-student-classes-link')).toHaveAttribute('href', '/en/student');
     expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
   });
 
@@ -149,14 +150,14 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     expect(screen.queryByTestId('teacher-hub-for-schools-link')).not.toBeInTheDocument();
   });
 
-  it('shows district role card link to for-schools for unauthenticated visitors', () => {
+  it('links schools to the for-schools page from the school quote section', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       loading: false,
       profile: null,
     });
     render(<EducationPageClient />);
-    const link = screen.getByTestId('district-role-card-link');
+    const link = screen.getByTestId('landing-school-plans-link');
     expect(link).toHaveAttribute('href', '/en/education/for-schools');
   });
 });

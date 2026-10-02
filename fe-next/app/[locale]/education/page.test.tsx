@@ -48,20 +48,22 @@ describe('education main page', () => {
   });
 
   /**
-   * #1155 (2026-09-27) replaced the collapsed <details> SEO card with a GEO
-   * answer block (visible H2) + FAQ rendered as heading articles — nothing is
-   * collapsed anymore. The crawler invariant stays: all copy is in the server
-   * HTML inside the card section.
+   * #1155 made the GEO answer a visible H2 (never collapsed); that stays. The FAQ used to
+   * render twice (client accordion + SEO heading list, overlapping questions). Now it renders
+   * once, server-side, from the same items as the FAQPage JSON-LD: answers ship in the HTML.
    */
-  it('renders the SEO card copy in the server HTML (GEO answer + FAQ headings, nothing collapsed)', async () => {
+  it('ships the GEO answer visible and each FAQ answer once in the server HTML', async () => {
     const { container } = render(await Page({ params: Promise.resolve({ locale: 'en' }) }));
-    const card = [...container.querySelectorAll('section')].find((s) =>
-      s.getAttribute('aria-label')?.includes('Free Vocabulary Games for the Classroom'),
-    );
-    expect(card).toBeTruthy();
-    expect(card?.textContent).toContain('Free Vocabulary Games for the Classroom');
-    expect(card?.textContent).toContain('Do students need an account to play?');
-    // The accordion wrapper is gone — content must not sit in a closed <details>.
-    expect(card?.querySelector('details')).toBeNull();
+    const how = container.querySelector('section#how-it-works');
+    expect(how?.querySelector('h2')?.textContent).toContain('How do I run a free vocabulary game in class');
+    expect(how?.closest('details')).toBeNull();
+    const faqs = container.querySelectorAll('section#faq');
+    expect(faqs).toHaveLength(1);
+    expect(faqs[0].textContent).toContain('Do students need an account to play?');
+    expect(faqs[0].textContent).toContain('Students join a classroom session with a 6-character code');
+    const clone = container.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll('script').forEach((el) => el.remove());
+    const text = clone.textContent ?? '';
+    expect(text.split('Do students need an account to play?').length - 1).toBe(1);
   });
 });

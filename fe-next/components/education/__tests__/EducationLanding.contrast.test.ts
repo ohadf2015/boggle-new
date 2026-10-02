@@ -64,8 +64,6 @@ describe('education landing contrast', () => {
 
     expect(client).not.toMatch(/text-neo-purple(?!-light)/);
     expect(client).not.toContain('hover:text-neo-purple');
-    expect(client).toContain('text-neo-purple-light');
-    expect(client).toContain('hover:text-neo-cream');
 
     expect(upsell).not.toContain('text-neo-purple"');
     expect(upsell).toContain('text-neo-purple-light');

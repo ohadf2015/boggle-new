@@ -17,6 +17,7 @@ import { isNative } from '../../utils/platform';
 
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { AuthModalTeacherHeader } from './AuthModalTeacherHeader';
+import { TeacherCheckEmail } from '@/components/education/landing/TeacherCheckEmail';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -90,6 +91,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   // "login rejected" feedback without firing while the user types.
   const errorShake = useErrorShake(error);
   const [success, setSuccess] = useState<string | null>(null);
+  const [teacherCheckEmail, setTeacherCheckEmail] = useState<{ email: string; magic: boolean } | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
@@ -158,6 +160,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       setPasswordError(null);
       setError(null);
       setSuccess(null);
+      setTeacherCheckEmail(null);
       setOtpStep('enter-email');
       setOtpCode('');
       setOtpCooldown(0);
@@ -299,7 +302,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
       if (authMode === 'signup') {
         trackEvent('funnel_sign_up', { method: 'password' });
-        setSuccess(t('auth.inlineSignup.checkEmail'));
+        if (isTeacher) setTeacherCheckEmail({ email, magic: false });
+        else setSuccess(t('auth.inlineSignup.checkEmail'));
         setIsLoading(null);
         return;
       }
@@ -334,7 +338,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         setError(result.error.message);
       } else {
         trackEvent('funnel_sign_up', { method: 'magic_link' });
-        setSuccess(t('auth.magicLink.checkEmail'));
+        if (isTeacher) setTeacherCheckEmail({ email, magic: true });
+        else setSuccess(t('auth.magicLink.checkEmail'));
       }
       setIsLoading(null);
     } catch (err) {
@@ -527,7 +532,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
             )}
           </AnimatePresence>
 
-          {!success && (
+          {teacherCheckEmail && (
+            <TeacherCheckEmail
+              email={teacherCheckEmail.email}
+              onResend={teacherCheckEmail.magic ? signInWithMagicLink : undefined}
+              onChangeEmail={() => setTeacherCheckEmail(null)}
+            />
+          )}
+
+          {!success && !teacherCheckEmail && (
             <>
               {/* OAuth Buttons */}
               {isOnCrazyGamesPlatform ? (

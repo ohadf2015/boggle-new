@@ -39,6 +39,7 @@ vi.mock('../../../lib/supabase', () => ({
   signUpWithEmail: (...args: any[]) => mockSignUpWithEmail(...args),
   signInWithEmail: (...args: any[]) => mockSignInWithEmail(...args),
   signInWithMagicLink: (...args: any[]) => mockSignInWithMagicLink(...args),
+  resendEmailVerification: vi.fn().mockResolvedValue({ error: null }),
 }));
 
 vi.mock('../GoogleSignInButton', () => ({
@@ -176,5 +177,28 @@ describe('AuthModal — teacher audience', () => {
     expect(screen.getByText('Sign in to save progress!')).toBeInTheDocument();
     expect(screen.getByText('Continue as guest')).toBeInTheDocument();
     expect(screen.queryByTestId('auth-teacher-tab-signin')).toBeNull();
+  });
+
+  it('Given a teacher password signup that needs email confirmation, Then the modal names the address and offers resend + change, not a bare "check your email"', async () => {
+    mockSignUpWithEmail.mockResolvedValue({ data: { session: null, user: { identities: [{}] } }, error: null });
+    render(<AuthModal isOpen onClose={vi.fn()} audience="teacher" initialMode="signup" />);
+    fireEvent.click(screen.getByText('Use password instead'));
+    fireEvent.change(document.querySelector('#pwd-email-input')!, { target: { value: 'ms.k@school.org' } });
+    fireEvent.change(document.querySelector('#pwd-password-input')!, { target: { value: 'Password123!' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Create Account' }));
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('ms.k@school.org'));
+    expect(screen.getByTestId('teacher-check-email-resend')).toBeInTheDocument();
+    expect(screen.queryByText('Check your email to verify your account!')).toBeNull();
+    fireEvent.click(screen.getByTestId('teacher-check-email-change'));
+    expect(document.querySelector('#pwd-email-input')).not.toBeNull();
+  });
+
+  it('Given a teacher magic-link signup, Then the same check-email panel names the address', async () => {
+    mockSignInWithMagicLink.mockResolvedValue({ error: null });
+    render(<AuthModal isOpen onClose={vi.fn()} audience="teacher" initialMode="signup" />);
+    const input = screen.getByPlaceholderText('Email address');
+    fireEvent.change(input, { target: { value: 'mr.l@school.org' } });
+    fireEvent.submit(input.closest('form')!);
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('mr.l@school.org'));
   });
 });

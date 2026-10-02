@@ -23,14 +23,18 @@ const FIELD_CLASS =
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
 const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
 
-export function SchoolLeadForm({ plan = 'school' }: { plan?: EducationLeadPlan }) {
+const LEAD_LOCALES: readonly TeacherLocale[] = ['en', 'he', 'sv', 'ja', 'es'];
+
+export function SchoolLeadForm({ plan = 'school', surface }: { plan?: EducationLeadPlan; surface?: string }) {
   const { t, language } = useLanguage();
+  // school_leads.locale has a CHECK on these five; ru answers 400 without the fallback.
+  const leadLocale: TeacherLocale = LEAD_LOCALES.includes(language as TeacherLocale) ? (language as TeacherLocale) : 'en';
   const shouldReduceMotion = useReducedMotion();
   const pkg = packageById(plan === 'classroom' ? 'classroom' : 'school');
 
   useEffect(() => {
-    trackGrowthEvent('school_lead_form_viewed', { locale: language, plan });
-  }, [language, plan]);
+    trackGrowthEvent('school_lead_form_viewed', { locale: language, plan, ...(surface ? { surface } : {}) });
+  }, [language, plan, surface]);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [school, setSchool] = useState('');
@@ -77,7 +81,7 @@ export function SchoolLeadForm({ plan = 'school' }: { plan?: EducationLeadPlan }
           interests,
           country: country || undefined,
           message: message || undefined,
-          locale: language as TeacherLocale,
+          locale: leadLocale,
           source: pkg.leadSource,
         } satisfies SchoolLeadPayload),
       });
@@ -86,7 +90,13 @@ export function SchoolLeadForm({ plan = 'school' }: { plan?: EducationLeadPlan }
         return;
       }
       setSuccess(true);
-      trackGrowthEvent('school_lead_submitted', { role, student_count: studentCount, locale: language, plan });
+      trackGrowthEvent('school_lead_submitted', {
+        role,
+        student_count: studentCount,
+        locale: language,
+        plan,
+        ...(surface ? { surface } : {}),
+      });
     } catch {
       setError(t('education.forSchools.form.submit_error'));
     } finally {

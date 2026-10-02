@@ -1,5 +1,74 @@
 // Sv translations
 const sv = {
+  // @eg2Land:start
+  "eg2Land": {
+    "header": {
+      "home": "LexiClash startsida",
+      "tag": "för lärare",
+      "start": "Kom igång gratis"
+    },
+    "hero": {
+      "eyebrow": "För lärare i språk och ordförråd",
+      "h1": "Gör veckans ordlista till ett spel som hela klassen spelar.",
+      "sub": "Eleverna ansluter från valfri webbläsare med en kod på 6 tecken — inga elevkonton, ingen reklam, inget att installera. Byggt från grunden för {count} språk, inklusive hebreiska från höger till vänster.",
+      "ctaPrimary": "Kom igång gratis som lärare",
+      "ctaFinishSetup": "Slutför lärarkontot",
+      "note": "Gratisplan utan tidsgräns · Inget kort behövs"
+    },
+    "studentNote": "Är du elev?",
+    "studentLink": "Till dina klasser",
+    "proof": {
+      "label": "Det här får alla lärare gratis",
+      "noLogins": "Eleverna går med via kod — ingen e-post, inga konton",
+      "languages": "Egna ordböcker för 6 språk, hebreiska från höger till vänster inräknat",
+      "ownLists": "Dina egna ordlistor — klistra in, importera CSV eller välj ett startpaket",
+      "noAds": "Ingen reklam i elevernas klasspel",
+      "anyDevice": "Chromebook, surfplatta eller mobil — inget att installera"
+    },
+    "how": {
+      "eyebrow": "Så går en lektion till",
+      "title": "Från ordlista till livespel i fem steg"
+    },
+    "modes": {
+      "eyebrow": "Livelägen för klassen",
+      "title": "Sex sätt att spela samma ordlista",
+      "sub": "Välj ett läge i lobbyn, visa det på tavlan, och eleverna spelar på sina egna enheter. Byt läge så att repetitionen aldrig blir tråkig.",
+      "minutes": "{minutes} min"
+    },
+    "school": {
+      "eyebrow": "Arbetslag och skolor",
+      "title": "Vill du ta med hela arbetslaget?",
+      "body": "Berätta om din skola och ungefär hur många elever ni har. Vi mejlar en offert och svarar på dina frågor.",
+      "b1": "Eleverna går med via kod — inga konton att sätta upp",
+      "b2": "En offert på Teacher Pro för hela arbetslaget eller skolan",
+      "b3": "Adminpanel och SSO finns på vår färdplan. Berätta vad ni behöver",
+      "plansLink": "Se skolplaner",
+      "formTeaser": "Få en offert via mejl",
+      "formNote": "Tar ungefär en minut. Vi svarar via mejl.",
+      "cta": "Få en skoloffert"
+    },
+    "faq": {
+      "title": "Frågor från lärare"
+    },
+    "final": {
+      "title": "Kör ditt första klasspel i dag",
+      "body": "Gratisplanen räcker till 3 klasser med upp till 50 elever, alla livelägen och dina egna ordlistor. Ingen tidsgräns, inget kort.",
+      "schoolLink": "Behöver du en offert till skolan?"
+    },
+    "checkEmail": {
+      "title": "Kolla din inkorg",
+      "sentTo": "Vi skickade en bekräftelselänk till:",
+      "next": "Öppna länken på den här enheten. Den loggar in dig och tar dig tillbaka hit för att slutföra ditt lärarkonto.",
+      "open": "Öppna {inbox}",
+      "spam": "Inget efter en minut? Titta under Skräppost eller Kampanjer efter ett mejl från LexiClash.",
+      "resend": "Skicka länken igen",
+      "sending": "Skickar…",
+      "resent": "Skickat igen — kolla inkorgen",
+      "change": "Använd en annan e-postadress",
+      "resendError": "Det gick inte att skicka igen just nu. Vänta en minut och försök igen."
+    }
+  },
+  // @eg2Land:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Bibliotek",
@@ -16160,10 +16229,10 @@ const sv = {
       }
     },
     "access": {
-      "h1": "Begär gratis lärargång",
-      "lede": "Berätta lite om ditt klassrum. Åtkomst ges direkt — ingen väntan på granskning.",
+      "h1": "Skapa ditt gratis lärarkonto",
+      "lede": "Registrera dig med Google eller e-post, bekräfta adressen och svara på två snabba frågor. Du kommer in direkt — ingen granskningskö.",
       "redirect_title": "Den sidan kräver lärarbehörighet",
-      "redirect_body": "Du var på väg till {{dest}}. Godkännandet sker direkt — det korta formuläret nedan låser upp den.",
+      "redirect_body": "Du var på väg till {{dest}}. Skapa ditt gratis lärarkonto nedan så öppnas sidan — lärare kommer in direkt.",
       "redirect_dest_fallback": "dina klassrumsverktyg",
       "full_name": "Dit namn",
       "email": "Din e-postadress",
@@ -16197,8 +16266,8 @@ const sv = {
       "go_to_teacher": "Till lärarpanelen",
       "status_unknown_title": "Vi kunde inte läsa din åtkomststatus",
       "status_unknown_body": "Något gick fel hos oss. Öppna lärarpanelen eller ladda om sidan för att kolla igen.",
-      "auth_required_title": "Registrera dig för att ansöka om läraråtkomst",
-      "auth_required_body": "Läraråtkomst är kopplad till ett verifierat konto. Skapa ett gratiskonto eller logga in, så fortsätter vi direkt här.",
+      "auth_required_title": "Börja med ditt konto",
+      "auth_required_body": "Snabbast med Google. E-post går också: vi skickar en länk som tar dig direkt tillbaka hit.",
       "auth_required_cta": "Skapa mitt gratis lärarkonto",
       "auth_signin_cta": "Har du redan ett konto? Logga in",
       "trust_instant": "Direkt åtkomst — ingen granskningskö",
@@ -16230,12 +16299,12 @@ const sv = {
       "school_q": "Var finns ditt klassrum? (valfritt)",
       "school_placeholder": "Skola, läxhjälp eller hemundervisning",
       "next": {
-        "step1_title": "Steg 1: Ansöka",
-        "step1_body": "Fyll formuläret. Två minuter.",
-        "step2_title": "Steg 2: Direktgodkännande",
-        "step2_body": "Ingen manuell granskning — verifierade lärare får åtkomst samma sekund de ansöker.",
-        "step3_title": "Steg 3: Du får åtkomst",
-        "step3_body": "Din panel öppnas direkt — plus en personlig hälsning från Ohad."
+        "step1_title": "Steg 1: Skapa konto",
+        "step1_body": "Med Google eller e-post. Inget kort behövs.",
+        "step2_title": "Steg 2: Bekräfta + 2 frågor",
+        "step2_body": "Klicka på länken vi mejlar och berätta vilken roll du har och hur du ska använda LexiClash. Åtkomsten ges direkt.",
+        "step3_title": "Steg 3: Skapa en klass, dela koden",
+        "step3_body": "Lägg till en ordlista, starta ett spel, och eleverna går med från valfri webbläsare."
       },
       "regular_game_title": "Inte lärare?",
       "regular_game_body": "Spela LexiClash gratis. Börja här, ansök om lärargång senare.",

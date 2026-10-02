@@ -21,19 +21,19 @@ describe('education hub GEO placement', () => {
     expect(client).not.toContain('education-speakable-ld');
   });
 
-  it('places the cite-able answer directly under the hero', () => {
+  it('places the cite-able answer right under the hero and proof strip', () => {
     const hero = client.indexOf('<EducationHero');
-    const slot = client.indexOf('{answer}');
-    const roles = client.indexOf('education.landing.teacher');
+    const answer = client.indexOf('<LandingHowItWorks geo={geo}');
+    const modes = client.indexOf('<SixModeTour');
     expect(hero).toBeGreaterThan(-1);
-    expect(slot).toBeGreaterThan(hero);
-    expect(slot).toBeLessThan(roles);
+    expect(answer).toBeGreaterThan(hero);
+    expect(answer).toBeLessThan(modes);
 
     const open = page.indexOf('<EducationPageClient');
-    const answer = page.indexOf('data-answer');
+    const geo = page.indexOf('geo={content.geoAnswer}');
     const resources = page.indexOf('<EducationResourceLinks');
-    expect(answer).toBeGreaterThan(open);
-    expect(answer).toBeLessThan(resources);
+    expect(geo).toBeGreaterThan(open);
+    expect(geo).toBeLessThan(resources);
   });
 
   it('ships duels and classroom HowTo schema in the first HTML', () => {

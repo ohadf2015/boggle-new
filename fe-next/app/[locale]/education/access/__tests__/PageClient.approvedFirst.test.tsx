@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock contexts
+vi.mock('@/components/education/landing/LandingHeader', () => ({
+  LandingHeader: () => <header data-testid="landing-header" />,
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
