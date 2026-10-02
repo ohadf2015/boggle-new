@@ -181,7 +181,12 @@ export function HqToolsContent({
           {section(
             "assignments",
             t("eduHq.tools.assignments"),
-            <AssignmentTrackingPanel classroomId={id} onCreateAssignment={onCreateAssignment} />,
+            <AssignmentTrackingPanel
+              classroomId={id}
+              joinCode={selectedClassroom.join_code}
+              studentCount={students}
+              onCreateAssignment={onCreateAssignment}
+            />,
           )}
           {section(
             "analytics",

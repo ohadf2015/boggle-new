@@ -46,6 +46,8 @@ import {
   trackEduFirstAssignmentCtaShown,
   trackEduFirstAssignmentCtaClicked,
   trackEduFirstAssignmentCreated,
+  trackEduAssignmentStartLiveClicked,
+  trackEduJoinCodeCopied,
   trackTeacherHqProgressViewed,
   trackTeacherHqUpgradeClicked,
 } from '../telemetry';
@@ -358,6 +360,18 @@ describe('education telemetry', () => {
     expect(captureMock).toHaveBeenLastCalledWith('edu_first_assignment_created', {
       classroom_id: 'cls-1',
     });
+  });
+
+  it('start-live-class CTA events keep the two funnel names and omit the join code', () => {
+    trackEduAssignmentStartLiveClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_assignment_start_live_clicked', {
+      classroom_id: 'cls-1',
+    });
+    trackEduJoinCodeCopied({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_join_code_copied', {
+      classroom_id: 'cls-1',
+    });
+    expect(JSON.stringify(captureMock.mock.calls)).not.toContain('AB12CD');
   });
 
   it('HQ class-progress events keep teacher_hq_progress_viewed and teacher_hq_upgrade_clicked', () => {

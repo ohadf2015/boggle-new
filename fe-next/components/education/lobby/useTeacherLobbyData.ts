@@ -35,7 +35,8 @@ export interface StarterPackInput {
 export function useTeacherLobbyData(
   userId: string | undefined,
   t: Translate,
-  initialLessonId?: string
+  initialLessonId?: string,
+  initialClassroomId?: string
 ) {
   const [lessons, setLessons] = useState<VocabularyLesson[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
@@ -44,7 +45,9 @@ export function useTeacherLobbyData(
   const [selectedLessonIds, setSelectedLessonIds] = useState<string[]>(
     initialLessonId ? [initialLessonId] : []
   );
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
+  const [selectedClassroomId, setSelectedClassroomId] = useState<string>(
+    initialClassroomId ?? ''
+  );
 
   const fetchTeacherData = useCallback(async () => {
     if (!userId) return;
@@ -75,7 +78,10 @@ export function useTeacherLobbyData(
           // Functional update so this callback does not depend on
           // selectedClassroomId — that dependency re-created the callback,
           // re-ran the effect and re-fetched forever.
-          setSelectedClassroomId((prev) => prev || classroomsResult.data![0].id);
+          setSelectedClassroomId((prev) => {
+            if (prev && classroomsResult.data!.some((c) => c.id === prev)) return prev;
+            return classroomsResult.data![0].id;
+          });
         }
       }
     } catch (error) {
