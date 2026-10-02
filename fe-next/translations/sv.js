@@ -1,5 +1,170 @@
 // Sv translations
 const sv = {
+  // @eg2Seo:start
+  "eg2Seo": {
+    "rail": {
+      "title": "Gratis ordlistor att spela"
+    },
+    "nav": {
+      "breadcrumb": "Brödsmulor",
+      "education": "Utbildning",
+      "lists": "Ordlistor"
+    },
+    "lang": {
+      "en": "Engelska",
+      "he": "Hebreiska",
+      "es": "Spanska",
+      "sv": "Svenska",
+      "ja": "Japanska"
+    },
+    "vocab": {
+      "en": "Engelskt ordförråd",
+      "he": "Hebreiskt ordförråd",
+      "es": "Spanskt ordförråd",
+      "sv": "Svenskt ordförråd",
+      "ja": "Japanskt ordförråd"
+    },
+    "wordsIn": {
+      "en": "engelska ord",
+      "he": "hebreiska ord",
+      "es": "spanska ord",
+      "sv": "svenska ord",
+      "ja": "japanska ord"
+    },
+    "grade": "Årskurs {n}",
+    "count": {
+      "words": "{count} ord",
+      "lists": "{count} listor"
+    },
+    "gloss": {
+      "definitions": "förklaringar",
+      "translations": {
+        "he": "översättningar till hebreiska",
+        "en": "översättningar till engelska",
+        "es": "översättningar till spanska",
+        "sv": "översättningar till svenska",
+        "ja": "översättningar till japanska"
+      },
+      "definitionsIn": {
+        "he": "förklaringar på hebreiska",
+        "en": "förklaringar på engelska",
+        "es": "förklaringar på spanska",
+        "sv": "förklaringar på svenska",
+        "ja": "förklaringar på japanska"
+      }
+    },
+    "detail": {
+      "boardTitle": "Ett bräde från listan",
+      "boardHidden": "Gömda på brädet:",
+      "metaTitle": "{name}, {grade}: ordlista med {wordsIn} och klasspel",
+      "metaTitleNoGrade": "{name}: ordlista med {wordsIn} och klasspel",
+      "metaTitleShort": "{name}, {grade}: ordlista med {wordsIn}",
+      "metaTitleShortNoGrade": "{name}: ordlista med {wordsIn}",
+      "metaDescription": "{count} {wordsIn} med {gloss}: {sample}… Spela dem som ett live-spel i klassen eller öva själv. Gratis, inga elevkonton.",
+      "metaDescriptionPlain": "{count} {wordsIn}: {sample}… Spela dem som ett live-spel i klassen eller öva själv. Gratis, inga elevkonton.",
+      "intro": "{count} {wordsIn} för {grade}, med början på {sample}. Visa dem på storskärmen som ett live-spel för hela klassen, eller öva själv här. Alla ord står på sidan, ingen inloggning krävs för att läsa dem.",
+      "introNoGrade": "{count} {wordsIn}, med början på {sample}. Visa dem på storskärmen som ett live-spel för hela klassen, eller öva själv här. Alla ord står på sidan, ingen inloggning krävs för att läsa dem.",
+      "playClass": "Spela med klassen",
+      "playClassSub": "Gratis lärarkonto · eleverna går med via en kod",
+      "practiceSolo": "Öva själv",
+      "practiceSoloSub": "Direkt här, utan konto",
+      "modesTitle": "Tre sätt att öva själv",
+      "modes": {
+        "grid": "Bokstavsrutnät",
+        "gridSub": "Leta efter listans ord på brädet",
+        "spelling": "Stavning",
+        "spellingSub": "Läs ledtråden och skriv ordet",
+        "matching": "Para ihop",
+        "matchingSub": "Para ihop varje ord med dess betydelse"
+      },
+      "wordsTitle": "Alla {count} ord",
+      "howTitle": "Spela med klassen i tre steg",
+      "how1Title": "Starta spelet",
+      "how1": "Tryck på Spela med klassen. Listan sparas i ditt lärarbibliotek och ett spelrum öppnas.",
+      "how2Title": "Eleverna går med",
+      "how2": "Skriv den sexteckens koden på tavlan. Eleverna går med från valfri webbläsare, utan konton och utan app.",
+      "how3Title": "Spela rundan",
+      "how3": "Alla tävlar om att hitta och stava listans ord. Kör igen, eller ändra orden i biblioteket först.",
+      "leadTitle": "Gör listan till din",
+      "leadBody": "Med ett gratis lärarkonto sparas listan i ditt bibliotek. Där lägger du till egna ord och kör den live med klassen när du vill.",
+      "leadCta": "Skapa gratis lärarkonto",
+      "leadPro": "Se vad Teacher Pro tillför",
+      "relatedTitle": "Fler listor som den här",
+      "browseTitle": "Fortsätt bläddra",
+      "faqTitle": "Frågor från lärare",
+      "faq1q": "Hur spelar jag ”{title}” med klassen?",
+      "faq1a": "Tryck på Spela med klassen högst upp på sidan. Med ett gratis lärarkonto öppnas listan direkt i ett spelrum; du skriver koden på tavlan och klassen går med.",
+      "faq2q": "Behöver eleverna konton?",
+      "faq2a": "Nej. Eleverna skriver rummets kod och ett smeknamn i valfri webbläsare. Inget att installera och inga mejladresser att samla in.",
+      "faq3q": "Kan jag ändra orden?",
+      "faq3a": "Ja. När du startar ett spel sparas listan i ditt lärarbibliotek, där du kan lägga till, ta bort eller skriva om ord före nästa runda.",
+      "curated": "Utvald av LexiClash",
+      "byAuthor": "Delad av {author}"
+    },
+    "practice": {
+      "close": "Stäng",
+      "title": "Öva: {title}",
+      "pick": "Välj ett spel"
+    },
+    "hub": {
+      "metaTitle": "Gratis ordlistor för klassrummet, efter årskurs och tema",
+      "metaDescription": "{lists} färdiga ordlistor på {languages} språk, {words} ord. Välj årskurs eller tema och spela valfri lista live i klassen eller öva själv.",
+      "eyebrow": "Gratis bibliotek",
+      "h1": "Ordlistor redo att spela",
+      "intro": "{lists} listor och {words} ord, alla synliga här. Välj årskurs eller tema och visa listan på storskärmen som ett live-spel. Eleverna går med via en kod, utan konton.",
+      "byLanguage": "Efter språk",
+      "byTopic": "Efter tema",
+      "byGrade": "Efter årskurs",
+      "viewAll": "Visa alla {count}",
+      "eflNote": "Undervisar du i engelska? Orden står kvar på engelska, resten av sidan är på svenska.",
+      "langTitle": {
+        "en": "Engelska ordlistor",
+        "he": "Hebreiska ordlistor",
+        "es": "Spanska ordlistor",
+        "sv": "Svenska ordlistor",
+        "ja": "Japanska ordlistor"
+      },
+      "langMetaDescription": "{lists} listor med {wordsIn} sorterade efter årskurs, {words} ord totalt. Spela valfri lista live i klassen eller öva själv. Gratis.",
+      "langIntro": "{lists} listor med {wordsIn}, sorterade efter årskurs. Öppna en för att se alla ord och spela den med klassen eller själv.",
+      "gradeTitle": "{language} ordlistor för {grade}",
+      "gradeMetaDescription": "{lists} listor med {wordsIn} för {grade}: {topics}. Redo att spelas i klassen.",
+      "gradeIntro": "{lists} listor för {grade}, {words} ord totalt. Öppna en lista för att se alla ord eller starta ett spel direkt.",
+      "topicTitle": "Ordlistor: {topic}",
+      "topicMetaDescription": "{lists} ordlistor om {topic} i flera årskurser och språk, {words} ord. Spela valfri lista live i klassen eller öva själv.",
+      "topicIntro": "{lists} listor om {topic}, från de yngsta årskurserna och uppåt. Öppna en för att se alla ord och spela den med klassen.",
+      "otherGrades": "Andra årskurser",
+      "otherTopics": "Andra teman",
+      "langCard": "{lists} listor · {words} ord"
+    },
+    "topic": {
+      "animals": "Djur",
+      "food": "Mat",
+      "body": "Kroppen",
+      "colors": "Färger och former",
+      "numbers": "Siffror",
+      "family": "Familj och människor",
+      "clothes": "Kläder",
+      "school": "Skolan",
+      "home": "Hemmet",
+      "weather-seasons": "Väder och årstider",
+      "calendar": "Dagar och månader",
+      "emotions": "Känslor",
+      "verbs": "Verb",
+      "adjectives": "Adjektiv",
+      "transportation": "Transport",
+      "jobs": "Yrken",
+      "technology": "Teknik",
+      "question-words": "Frågeord",
+      "literature": "Litteratur",
+      "academic": "Akademiska ord",
+      "science": "Naturvetenskap",
+      "math": "Matematik",
+      "history": "Historia",
+      "geography": "Geografi",
+      "everyday-words": "Vardagsord"
+    }
+  },
+  // @eg2Seo:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Bibliotek",

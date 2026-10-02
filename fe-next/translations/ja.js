@@ -1,5 +1,170 @@
 // Ja translations
 const ja = {
+  // @eg2Seo:start
+  "eg2Seo": {
+    "rail": {
+      "title": "すぐ遊べる無料の単語リスト"
+    },
+    "nav": {
+      "breadcrumb": "パンくずリスト",
+      "education": "教育",
+      "lists": "単語リスト"
+    },
+    "lang": {
+      "en": "英語",
+      "he": "ヘブライ語",
+      "es": "スペイン語",
+      "sv": "スウェーデン語",
+      "ja": "日本語"
+    },
+    "vocab": {
+      "en": "英語の語彙",
+      "he": "ヘブライ語の語彙",
+      "es": "スペイン語の語彙",
+      "sv": "スウェーデン語の語彙",
+      "ja": "日本語の語彙"
+    },
+    "wordsIn": {
+      "en": "英単語",
+      "he": "ヘブライ語の単語",
+      "es": "スペイン語の単語",
+      "sv": "スウェーデン語の単語",
+      "ja": "日本語の単語"
+    },
+    "grade": "{n}年生",
+    "count": {
+      "words": "{count}語",
+      "lists": "{count}リスト"
+    },
+    "gloss": {
+      "definitions": "意味",
+      "translations": {
+        "he": "ヘブライ語訳",
+        "en": "英語訳",
+        "es": "スペイン語訳",
+        "sv": "スウェーデン語訳",
+        "ja": "日本語訳"
+      },
+      "definitionsIn": {
+        "he": "ヘブライ語の定義",
+        "en": "英語の定義",
+        "es": "スペイン語の定義",
+        "sv": "スウェーデン語の定義",
+        "ja": "日本語の定義"
+      }
+    },
+    "detail": {
+      "boardTitle": "このリストから作った文字盤",
+      "boardHidden": "この文字盤に隠れている単語：",
+      "metaTitle": "{name}（{grade}）：{wordsIn}リストとクラスゲーム",
+      "metaTitleNoGrade": "{name}：{wordsIn}リストとクラスゲーム",
+      "metaTitleShort": "{name}（{grade}）：{wordsIn}リスト",
+      "metaTitleShortNoGrade": "{name}：{wordsIn}リスト",
+      "metaDescription": "{gloss}つきの{wordsIn}{count}語（{sample}…）。クラス全員でのライブゲームにも、ひとりでの練習にも。無料、生徒のアカウント不要。",
+      "metaDescriptionPlain": "{wordsIn}{count}語（{sample}…）。クラス全員でのライブゲームにも、ひとりでの練習にも。無料、生徒のアカウント不要。",
+      "intro": "{grade}向けの{wordsIn}{count}語。{sample}から始まります。大きな画面に映してクラスのライブゲームにするか、このページでひとりで練習できます。登録しなくても、すべての単語をこのページで確認できます。",
+      "introNoGrade": "{wordsIn}{count}語。{sample}から始まります。大きな画面に映してクラスのライブゲームにするか、このページでひとりで練習できます。登録しなくても、すべての単語をこのページで確認できます。",
+      "playClass": "クラスで遊ぶ",
+      "playClassSub": "無料の教師アカウント・生徒はコードで参加",
+      "practiceSolo": "ひとりで練習",
+      "practiceSoloSub": "このページで、登録なしで",
+      "modesTitle": "ひとりで練習する3つの方法",
+      "modes": {
+        "grid": "文字盤",
+        "gridSub": "文字盤からリストの単語を探す",
+        "spelling": "スペル",
+        "spellingSub": "ヒントを読んで単語を入力",
+        "matching": "マッチング",
+        "matchingSub": "単語と意味を組み合わせる"
+      },
+      "wordsTitle": "全{count}語",
+      "howTitle": "クラスで遊ぶ3ステップ",
+      "how1Title": "ゲームを開始",
+      "how1": "「クラスで遊ぶ」をタップ。リストが教師用ライブラリに保存され、ゲームルームが開きます。",
+      "how2Title": "生徒が参加",
+      "how2": "6文字のコードを黒板に書きます。生徒はどのブラウザからでも参加でき、アカウントもアプリも不要です。",
+      "how3Title": "ラウンド開始",
+      "how3": "みんなでリストの単語を見つけてつづる速さを競います。もう一度遊ぶことも、先にライブラリで単語を編集することもできます。",
+      "leadTitle": "このリストを自分のものに",
+      "leadBody": "無料の教師アカウントでリストをライブラリに保存。自分の単語を加えて、好きなときにクラスのライブゲームとして遊べます。",
+      "leadCta": "無料の教師アカウントを作成",
+      "leadPro": "Teacher Proでできること",
+      "relatedTitle": "似ているリスト",
+      "browseTitle": "ほかのリストを見る",
+      "faqTitle": "先生からのよくある質問",
+      "faq1q": "「{title}」をクラスで遊ぶには？",
+      "faq1a": "ページ上部の「クラスで遊ぶ」をタップします。無料の教師アカウントがあれば、リストがそのままゲームルームで開きます。コードを黒板に書けば、クラスが参加できます。",
+      "faq2q": "生徒にアカウントは必要ですか？",
+      "faq2a": "いいえ。生徒はどのブラウザでもルームコードとニックネームを入力するだけです。インストールもメールアドレスの収集も不要です。",
+      "faq3q": "単語を変更できますか？",
+      "faq3a": "はい。ゲームを始めるとリストが教師用ライブラリに保存され、次のラウンドの前に単語を追加・削除・修正できます。",
+      "curated": "LexiClash厳選",
+      "byAuthor": "共有者：{author}"
+    },
+    "practice": {
+      "close": "閉じる",
+      "title": "練習：{title}",
+      "pick": "ゲームを選ぶ"
+    },
+    "hub": {
+      "metaTitle": "教室で使える無料の単語リスト（学年・テーマ別）",
+      "metaDescription": "すぐ遊べる単語リスト{lists}件、{languages}言語、{words}語。学年かテーマを選んで、クラスのライブゲームやひとり練習に。",
+      "eyebrow": "無料ライブラリ",
+      "h1": "すぐ遊べる単語リスト",
+      "intro": "{lists}リスト、{words}語。すべてこのページで見られます。学年かテーマを選び、大きな画面に映してクラスのライブゲームに。生徒はコードで参加、アカウント不要です。",
+      "byLanguage": "言語から探す",
+      "byTopic": "テーマから探す",
+      "byGrade": "学年から探す",
+      "viewAll": "全{count}件を見る",
+      "eflNote": "英語を教えていますか？単語は英語のまま、まわりの説明は日本語で表示されます。",
+      "langTitle": {
+        "en": "英語の単語リスト",
+        "he": "ヘブライ語の単語リスト",
+        "es": "スペイン語の単語リスト",
+        "sv": "スウェーデン語の単語リスト",
+        "ja": "日本語の単語リスト"
+      },
+      "langMetaDescription": "学年別の{wordsIn}リスト{lists}件、全{words}語。クラスのライブゲームにも、ひとり練習にも。無料。",
+      "langIntro": "学年別に並んだ{wordsIn}のリストが{lists}件。リストを開いてすべての単語を確認し、クラスでもひとりでも遊べます。",
+      "gradeTitle": "{grade}向け{language}単語リスト",
+      "gradeMetaDescription": "{grade}向けの{wordsIn}リスト{lists}件：{topics}。クラスゲームにすぐ使えます。",
+      "gradeIntro": "{grade}向けのリストが{lists}件、全{words}語。リストを開いて単語を確認するか、すぐにゲームを始めましょう。",
+      "topicTitle": "単語リスト：{topic}",
+      "topicMetaDescription": "「{topic}」の単語リスト{lists}件（複数の学年・言語）、{words}語。クラスのライブゲームにも、ひとり練習にも。",
+      "topicIntro": "「{topic}」のリストが{lists}件、低学年から。リストを開いてすべての単語を確認し、クラスで遊びましょう。",
+      "otherGrades": "ほかの学年",
+      "otherTopics": "ほかのテーマ",
+      "langCard": "{lists}リスト・{words}語"
+    },
+    "topic": {
+      "animals": "動物",
+      "food": "食べ物",
+      "body": "体",
+      "colors": "色と形",
+      "numbers": "数",
+      "family": "家族と人",
+      "clothes": "服",
+      "school": "学校",
+      "home": "家",
+      "weather-seasons": "天気と季節",
+      "calendar": "曜日と月",
+      "emotions": "気持ち",
+      "verbs": "動詞",
+      "adjectives": "形容詞",
+      "transportation": "乗り物",
+      "jobs": "仕事",
+      "technology": "テクノロジー",
+      "question-words": "疑問詞",
+      "literature": "文学",
+      "academic": "アカデミック語彙",
+      "science": "理科",
+      "math": "数学",
+      "history": "歴史",
+      "geography": "地理",
+      "everyday-words": "日常の単語"
+    }
+  },
+  // @eg2Seo:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "ライブラリ",

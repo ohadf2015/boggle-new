@@ -168,6 +168,7 @@ A: Real-time simultaneous play (not turn-based like Scrabble), no download neede
 - English Games for Adults: https://www.lexiclash.live/en/education/english-games-adults
 - Irregular Verb Games: https://www.lexiclash.live/en/education/irregular-verbs-games
 - English Vocabulary by Topic: https://www.lexiclash.live/en/education/english-vocabulary-topics
+- Free Word Lists by Grade and Topic (every curated list as its own page, words and definitions visible, playable live or solo): https://www.lexiclash.live/en/education/lists
 - Word Games for Teachers: https://www.lexiclash.live/en/education/games-for-teachers
 - For Schools & Districts: https://www.lexiclash.live/en/education/for-schools
 - Spelling Bee Practice: https://www.lexiclash.live/en/education/spelling-bee-practice

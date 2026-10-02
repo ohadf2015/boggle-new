@@ -1,5 +1,170 @@
 // Es translations
 const es = {
+  // @eg2Seo:start
+  "eg2Seo": {
+    "rail": {
+      "title": "Listas de palabras gratis para jugar"
+    },
+    "nav": {
+      "breadcrumb": "Ruta de navegación",
+      "education": "Educación",
+      "lists": "Listas de palabras"
+    },
+    "lang": {
+      "en": "Inglés",
+      "he": "Hebreo",
+      "es": "Español",
+      "sv": "Sueco",
+      "ja": "Japonés"
+    },
+    "vocab": {
+      "en": "Vocabulario en inglés",
+      "he": "Vocabulario en hebreo",
+      "es": "Vocabulario en español",
+      "sv": "Vocabulario en sueco",
+      "ja": "Vocabulario en japonés"
+    },
+    "wordsIn": {
+      "en": "palabras en inglés",
+      "he": "palabras en hebreo",
+      "es": "palabras en español",
+      "sv": "palabras en sueco",
+      "ja": "palabras en japonés"
+    },
+    "grade": "Grado {n}",
+    "count": {
+      "words": "{count} palabras",
+      "lists": "{count} listas"
+    },
+    "gloss": {
+      "definitions": "definiciones",
+      "translations": {
+        "he": "traducciones al hebreo",
+        "en": "traducciones al inglés",
+        "es": "traducciones al español",
+        "sv": "traducciones al sueco",
+        "ja": "traducciones al japonés"
+      },
+      "definitionsIn": {
+        "he": "definiciones en hebreo",
+        "en": "definiciones en inglés",
+        "es": "definiciones en español",
+        "sv": "definiciones en sueco",
+        "ja": "definiciones en japonés"
+      }
+    },
+    "detail": {
+      "boardTitle": "Un tablero de esta lista",
+      "boardHidden": "Escondidas en este tablero:",
+      "metaTitle": "{name} ({grade}): lista de {wordsIn} y juego para la clase",
+      "metaTitleNoGrade": "{name}: lista de {wordsIn} y juego para la clase",
+      "metaTitleShort": "{name} ({grade}): {wordsIn}",
+      "metaTitleShortNoGrade": "{name}: {wordsIn}",
+      "metaDescription": "{count} {wordsIn} con {gloss}: {sample}… Juégalas en clase en directo o practica por tu cuenta. Gratis y sin cuentas para los alumnos.",
+      "metaDescriptionPlain": "{count} {wordsIn}: {sample}… Juégalas en clase en directo o practica por tu cuenta. Gratis y sin cuentas para los alumnos.",
+      "intro": "{count} {wordsIn} para {grade}, empezando por {sample}. Proyéctalas como juego en directo para toda la clase o practica aquí mismo. Todas las palabras están en esta página, sin registrarte.",
+      "introNoGrade": "{count} {wordsIn}, empezando por {sample}. Proyéctalas como juego en directo para toda la clase o practica aquí mismo. Todas las palabras están en esta página, sin registrarte.",
+      "playClass": "Jugar con tu clase",
+      "playClassSub": "Cuenta docente gratis · los alumnos entran con un código",
+      "practiceSolo": "Practicar solo",
+      "practiceSoloSub": "Aquí mismo, sin registro",
+      "modesTitle": "Tres formas de practicar por tu cuenta",
+      "modes": {
+        "grid": "Tablero de letras",
+        "gridSub": "Busca las palabras de la lista en el tablero",
+        "spelling": "Ortografía",
+        "spellingSub": "Lee la pista y escribe la palabra",
+        "matching": "Emparejar",
+        "matchingSub": "Une cada palabra con su significado"
+      },
+      "wordsTitle": "Las {count} palabras",
+      "howTitle": "Juégala con tu clase en tres pasos",
+      "how1Title": "Abre la partida",
+      "how1": "Pulsa «Jugar con tu clase». La lista se guarda en tu biblioteca docente y se abre una sala de juego.",
+      "how2Title": "Los alumnos entran",
+      "how2": "Escribe en la pizarra el código de seis caracteres. Los alumnos entran desde cualquier navegador, sin cuentas ni apps.",
+      "how3Title": "Jugad la ronda",
+      "how3": "Todos compiten por encontrar y escribir las palabras de la lista. Repetid, o cambia antes las palabras en tu biblioteca.",
+      "leadTitle": "Haz tuya esta lista",
+      "leadBody": "Con una cuenta docente gratuita la lista se guarda en tu biblioteca, donde puedes añadir tus propias palabras y jugarla en directo con tu clase cuando quieras.",
+      "leadCta": "Crear cuenta docente gratis",
+      "leadPro": "Qué añade Teacher Pro",
+      "relatedTitle": "Más listas como esta",
+      "browseTitle": "Sigue explorando",
+      "faqTitle": "Preguntas de docentes",
+      "faq1q": "¿Cómo juego «{title}» con mi clase?",
+      "faq1a": "Pulsa «Jugar con tu clase» arriba del todo. Con una cuenta docente gratuita la lista se abre directamente en una sala de juego; escribes el código en la pizarra y la clase entra.",
+      "faq2q": "¿Mis alumnos necesitan cuenta?",
+      "faq2a": "No. Escriben el código de la sala y un apodo en cualquier navegador. No hay nada que instalar ni correos que recoger.",
+      "faq3q": "¿Puedo cambiar las palabras?",
+      "faq3a": "Sí. Al empezar una partida la lista se guarda en tu biblioteca docente, donde puedes añadir, quitar o reescribir palabras antes de la siguiente ronda.",
+      "curated": "Seleccionada por LexiClash",
+      "byAuthor": "Compartida por {author}"
+    },
+    "practice": {
+      "close": "Cerrar",
+      "title": "Practicar: {title}",
+      "pick": "Elige un juego"
+    },
+    "hub": {
+      "metaTitle": "Listas de palabras gratis para el aula, por grado y tema",
+      "metaDescription": "{lists} listas de palabras listas para jugar en {languages} idiomas, {words} palabras. Elige un grado o un tema y juega cualquier lista en clase o practica solo.",
+      "eyebrow": "Biblioteca gratuita",
+      "h1": "Listas de palabras listas para jugar",
+      "intro": "{lists} listas y {words} palabras, todas visibles aquí mismo. Elige un grado o un tema y proyecta la lista como juego en directo para la clase. Los alumnos entran con un código, sin cuentas.",
+      "byLanguage": "Por idioma",
+      "byTopic": "Por tema",
+      "byGrade": "Por grado",
+      "viewAll": "Ver las {count}",
+      "eflNote": "¿Enseñas inglés? Las palabras siguen en inglés; todo lo demás está en tu idioma.",
+      "langTitle": {
+        "en": "Listas de palabras en inglés",
+        "he": "Listas de palabras en hebreo",
+        "es": "Listas de palabras en español",
+        "sv": "Listas de palabras en sueco",
+        "ja": "Listas de palabras en japonés"
+      },
+      "langMetaDescription": "{lists} listas de {wordsIn} ordenadas por grado, {words} palabras en total. Juega cualquier lista en clase o practica solo. Gratis.",
+      "langIntro": "{lists} listas de {wordsIn}, ordenadas por grado. Abre una para ver todas sus palabras y juégala con tu clase o por tu cuenta.",
+      "gradeTitle": "Listas de {wordsIn} de {grade}",
+      "gradeMetaDescription": "{lists} listas de {wordsIn} para {grade}: {topics}. Listas para jugar en clase.",
+      "gradeIntro": "{lists} listas para {grade}, {words} palabras en total. Abre una lista para ver todas las palabras o empieza una partida ya.",
+      "topicTitle": "Listas de palabras: {topic}",
+      "topicMetaDescription": "{lists} listas de palabras sobre {topic} en varios grados e idiomas, {words} palabras. Juega cualquiera en clase o practica solo.",
+      "topicIntro": "{lists} listas sobre {topic}, desde los primeros grados. Abre una para ver todas sus palabras y juégala con tu clase.",
+      "otherGrades": "Otros grados",
+      "otherTopics": "Otros temas",
+      "langCard": "{lists} listas · {words} palabras"
+    },
+    "topic": {
+      "animals": "Animales",
+      "food": "Comida",
+      "body": "El cuerpo",
+      "colors": "Colores y formas",
+      "numbers": "Números",
+      "family": "Familia y personas",
+      "clothes": "Ropa",
+      "school": "La escuela",
+      "home": "La casa",
+      "weather-seasons": "Clima y estaciones",
+      "calendar": "Días y meses",
+      "emotions": "Emociones",
+      "verbs": "Verbos",
+      "adjectives": "Adjetivos",
+      "transportation": "Transporte",
+      "jobs": "Profesiones",
+      "technology": "Tecnología",
+      "question-words": "Palabras interrogativas",
+      "literature": "Literatura",
+      "academic": "Vocabulario académico",
+      "science": "Ciencias",
+      "math": "Matemáticas",
+      "history": "Historia",
+      "geography": "Geografía",
+      "everyday-words": "Palabras cotidianas"
+    }
+  },
+  // @eg2Seo:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Biblioteca",

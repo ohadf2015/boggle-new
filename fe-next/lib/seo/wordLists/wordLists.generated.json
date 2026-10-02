@@ -1,0 +1,8587 @@
+{
+ "generatedAt": "2026-10-02",
+ "lists": [
+  {
+   "id": "001d9788-168a-41a9-bbda-7d76c2ebb81e",
+   "origin": "curriculum",
+   "name": "Grade 4 - Growing Vocabulary",
+   "description": "Expanding vocabulary for 4th grade students",
+   "language": "en",
+   "grade": 4,
+   "subject": "english",
+   "words": [
+    {
+     "w": "ancient",
+     "d": "Very old, from long ago"
+    },
+    {
+     "w": "brave",
+     "d": "Not afraid of danger"
+    },
+    {
+     "w": "curious",
+     "d": "Wanting to know about things"
+    },
+    {
+     "w": "delicious",
+     "d": "Tasting very good"
+    },
+    {
+     "w": "enormous",
+     "d": "Very very big"
+    },
+    {
+     "w": "fantastic",
+     "d": "Wonderful and amazing"
+    },
+    {
+     "w": "gentle",
+     "d": "Soft and kind"
+    },
+    {
+     "w": "honest",
+     "d": "Always telling the truth"
+    },
+    {
+     "w": "incredible",
+     "d": "Hard to believe, amazing"
+    },
+    {
+     "w": "joyful",
+     "d": "Full of happiness"
+    }
+   ]
+  },
+  {
+   "id": "016f8737-27a6-4f33-a61a-a8aab2ce50ab",
+   "origin": "curriculum",
+   "name": "Farm Animals - חיות משק",
+   "description": "Farm animals vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "dog",
+     "d": "כלב - A pet that barks"
+    },
+    {
+     "w": "cat",
+     "d": "חתול - A pet that meows"
+    },
+    {
+     "w": "cow",
+     "d": "פרה - Gives us milk"
+    },
+    {
+     "w": "horse",
+     "d": "סוס - You can ride it"
+    },
+    {
+     "w": "pig",
+     "d": "חזיר - Pink farm animal"
+    },
+    {
+     "w": "chicken",
+     "d": "תרנגולת - Gives us eggs"
+    },
+    {
+     "w": "duck",
+     "d": "ברווז - Bird that swims"
+    },
+    {
+     "w": "sheep",
+     "d": "כבשה - Gives us wool"
+    },
+    {
+     "w": "bird",
+     "d": "ציפור - Has wings and flies"
+    },
+    {
+     "w": "fish",
+     "d": "דג - Lives in water"
+    }
+   ]
+  },
+  {
+   "id": "01f32f8a-a9ff-468d-b988-7c198a3bc2d9",
+   "origin": "curriculum",
+   "name": "כיתה ה׳ — מתמטיקה",
+   "description": "אוצר מילים במתמטיקה לכיתה ה׳: צורות, מדידות וחישובים בסיסיים.",
+   "language": "he",
+   "grade": 5,
+   "subject": "math",
+   "words": [
+    {
+     "w": "מספר",
+     "d": "סימן המייצג כמות"
+    },
+    {
+     "w": "ספרה",
+     "d": "סימן בודד המשמש לכתיבת מספרים"
+    },
+    {
+     "w": "חיבור",
+     "d": "פעולה מתמטית של הוספה"
+    },
+    {
+     "w": "חיסור",
+     "d": "פעולה מתמטית של הקטנה"
+    },
+    {
+     "w": "כפל",
+     "d": "פעולה מתמטית של חזרה על מספר"
+    },
+    {
+     "w": "חילוק",
+     "d": "פעולה מתמטית של חלוקה לחלקים שווים"
+    },
+    {
+     "w": "שבר",
+     "d": "חלק מכמות שלמה"
+    },
+    {
+     "w": "עשרוני",
+     "d": "מספר שחלקו השברי מסומן בנקודה"
+    },
+    {
+     "w": "מדידה",
+     "d": "קביעת גודל או מרחק"
+    },
+    {
+     "w": "סנטימטר",
+     "d": "יחידת אורך קטנה"
+    },
+    {
+     "w": "קילוגרם",
+     "d": "יחידת משקל"
+    },
+    {
+     "w": "משולש",
+     "d": "צורה בעלת שלוש צלעות"
+    },
+    {
+     "w": "ריבוע",
+     "d": "צורה בעלת ארבע צלעות שוות וארבע זוויות ישרות"
+    },
+    {
+     "w": "מעגל",
+     "d": "צורה עגולה בעלת מרכז ורדיוס שווה"
+    },
+    {
+     "w": "זוית",
+     "d": "מקום המפגש של שני קווים"
+    },
+    {
+     "w": "שטח",
+     "d": "מדידת פנים של צורה דו-ממדית"
+    }
+   ]
+  },
+  {
+   "id": "03925ca7-692e-4c33-bb74-dc8597716951",
+   "origin": "curriculum",
+   "name": "כיתה ז׳ — גיאוגרפיה פוליטית",
+   "description": "גיאוגרפיה פוליטית לכיתה ז׳: גבולות, מדינות ותרבויות.",
+   "language": "he",
+   "grade": 7,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "גבול",
+     "d": "קו הפרדה בין מדינות"
+    },
+    {
+     "w": "מדינה",
+     "d": "אדמה בעלת ממשלה וגבולות"
+    },
+    {
+     "w": "בירה",
+     "d": "העיר הראשית של מדינה"
+    },
+    {
+     "w": "אוכלוסיה",
+     "d": "כמות האנשים בתחום מסוים"
+    },
+    {
+     "w": "דחיסות",
+     "d": "מספר אנשים בשטח אחד"
+    },
+    {
+     "w": "דלא קצר",
+     "d": "אנשים שעברו מעיר לעיר"
+    },
+    {
+     "w": "קו רוחק",
+     "d": "קו דמיוני שחוצה כדור הארץ"
+    },
+    {
+     "w": "קו אורך",
+     "d": "קו דמיוני שעובר צפון-דרום"
+    },
+    {
+     "w": "מפה",
+     "d": "ציור של אדמה או עולם"
+    },
+    {
+     "w": "קנה מידה",
+     "d": "יחס בין מרחקים במפה למציאות"
+    },
+    {
+     "w": "תחזוקה",
+     "d": "תנועה של אנשים בין מדינות"
+    },
+    {
+     "w": "סחור",
+     "d": "תנועה של סחורות בין מקומות"
+    },
+    {
+     "w": "תיעול",
+     "d": "תנועה של כסף בין מקומות"
+    },
+    {
+     "w": "שפה",
+     "d": "דרך התקשורת של עם"
+    },
+    {
+     "w": "דת",
+     "d": "אמונה בכוח או כוחות גבוהים"
+    }
+   ]
+  },
+  {
+   "id": "04188fdb-86cd-47af-bfba-f6c9d008bc3f",
+   "origin": "curriculum",
+   "name": "History - Ancient Civilizations ציביליזציות עתיקות",
+   "description": "Ancient history vocabulary with Hebrew",
+   "language": "en",
+   "grade": 5,
+   "subject": "history",
+   "words": [
+    {
+     "w": "civilization",
+     "d": "ציביליזציה - Organized society with culture"
+    },
+    {
+     "w": "ancient",
+     "d": "עתיק - Very old, from long ago"
+    },
+    {
+     "w": "empire",
+     "d": "אימפריה - Large group of lands under one ruler"
+    },
+    {
+     "w": "pharaoh",
+     "d": "פרעה - King of ancient Egypt"
+    },
+    {
+     "w": "pyramid",
+     "d": "פירמידה - Triangle-shaped Egyptian building"
+    },
+    {
+     "w": "archaeology",
+     "d": "ארכאולוגיה - Study of ancient objects"
+    },
+    {
+     "w": "artifact",
+     "d": "ממצא - Object from the past"
+    },
+    {
+     "w": "hieroglyphics",
+     "d": "כתב חרטומים - Ancient Egyptian writing"
+    },
+    {
+     "w": "temple",
+     "d": "מקדש - Religious building"
+    },
+    {
+     "w": "monarchy",
+     "d": "מלוכה - Government ruled by king"
+    }
+   ]
+  },
+  {
+   "id": "0536aad5-914d-40d0-b58d-2a2cea636c57",
+   "origin": "curriculum",
+   "name": "Grade 9 - Environmental Geography",
+   "description": "Environmental geography for 9th grade",
+   "language": "en",
+   "grade": 9,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "climate change",
+     "d": "Long term change in weather patterns"
+    },
+    {
+     "w": "greenhouse effect",
+     "d": "Warming from trapped heat"
+    },
+    {
+     "w": "carbon footprint",
+     "d": "Amount of carbon dioxide produced"
+    },
+    {
+     "w": "ecosystem services",
+     "d": "Benefits nature provides"
+    },
+    {
+     "w": "conservation",
+     "d": "Protecting natural resources"
+    },
+    {
+     "w": "biodiversity hotspot",
+     "d": "Area with many species at risk"
+    },
+    {
+     "w": "pollution",
+     "d": "Harmful substances in environment"
+    },
+    {
+     "w": "ozone layer",
+     "d": "Protective layer in atmosphere"
+    },
+    {
+     "w": "sea level rise",
+     "d": "Increase in ocean height"
+    },
+    {
+     "w": "fossil fuels",
+     "d": "Oil coal and natural gas"
+    }
+   ]
+  },
+  {
+   "id": "05930b1c-30d4-4fa7-81c5-3cba989135f7",
+   "origin": "curriculum",
+   "name": "Grade 6 - Transition Vocabulary",
+   "description": "Vocabulary for students transitioning to middle school",
+   "language": "en",
+   "grade": 6,
+   "subject": "english",
+   "words": [
+    {
+     "w": "accomplish",
+     "d": "To complete something successfully"
+    },
+    {
+     "w": "beneficial",
+     "d": "Helpful or good for you"
+    },
+    {
+     "w": "challenge",
+     "d": "Something difficult to do"
+    },
+    {
+     "w": "determined",
+     "d": "Having a strong will to succeed"
+    },
+    {
+     "w": "essential",
+     "d": "Absolutely necessary"
+    },
+    {
+     "w": "flexible",
+     "d": "Able to change or adapt"
+    },
+    {
+     "w": "generate",
+     "d": "To create or produce"
+    },
+    {
+     "w": "hesitate",
+     "d": "To pause before doing something"
+    },
+    {
+     "w": "influence",
+     "d": "To have an effect on something"
+    },
+    {
+     "w": "justify",
+     "d": "To give reasons for something"
+    }
+   ]
+  },
+  {
+   "id": "06304575-17e0-4266-9519-9e63473f86a5",
+   "origin": "curriculum",
+   "name": "Grade 9 - Biology",
+   "description": "Biology vocabulary for 9th grade",
+   "language": "en",
+   "grade": 9,
+   "subject": "science",
+   "words": [
+    {
+     "w": "genetics",
+     "d": "Study of heredity and genes"
+    },
+    {
+     "w": "gene",
+     "d": "Unit of heredity on chromosome"
+    },
+    {
+     "w": "mutation",
+     "d": "Change in genetic material"
+    },
+    {
+     "w": "natural selection",
+     "d": "Survival of the fittest"
+    },
+    {
+     "w": "species",
+     "d": "Group that can breed together"
+    },
+    {
+     "w": "biodiversity",
+     "d": "Variety of life forms"
+    },
+    {
+     "w": "ecology",
+     "d": "Study of organisms and environment"
+    },
+    {
+     "w": "symbiosis",
+     "d": "Close relationship between species"
+    },
+    {
+     "w": "homeostasis",
+     "d": "Body maintaining stable conditions"
+    },
+    {
+     "w": "metabolism",
+     "d": "Chemical processes in living things"
+    }
+   ]
+  },
+  {
+   "id": "06ce2670-f58b-49bc-bfab-3cf6c9cc0c38",
+   "origin": "curriculum",
+   "name": "אוצר מילים - צבעים",
+   "description": "Hebrew colors vocabulary",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "אָדֹם",
+     "d": "Red - צבע האש"
+    },
+    {
+     "w": "כָּחֹל",
+     "d": "Blue - צבע השמים"
+    },
+    {
+     "w": "יָרֹק",
+     "d": "Green - צבע הדשא"
+    },
+    {
+     "w": "צָהֹב",
+     "d": "Yellow - צבע השמש"
+    },
+    {
+     "w": "כָּתֹם",
+     "d": "Orange - צבע התפוז"
+    },
+    {
+     "w": "סָגֹל",
+     "d": "Purple - תערובת אדום וכחול"
+    },
+    {
+     "w": "וָרֹד",
+     "d": "Pink - אדום בהיר"
+    },
+    {
+     "w": "שָׁחֹר",
+     "d": "Black - הצבע הכהה ביותר"
+    },
+    {
+     "w": "לָבָן",
+     "d": "White - הצבע הבהיר ביותר"
+    },
+    {
+     "w": "חוּם",
+     "d": "Brown - צבע השוקולד"
+    }
+   ]
+  },
+  {
+   "id": "070e2a83-c52e-427d-b009-3ab464842171",
+   "origin": "curriculum",
+   "name": "Grado 6 — Conceptos Abstractos y Valores",
+   "description": "Palabras abstractas sobre valores, conceptos filosóficos y principios morales.",
+   "language": "es",
+   "grade": 6,
+   "subject": "general",
+   "words": [
+    {
+     "w": "libertad",
+     "d": "Capacidad de actuar sin restricciones"
+    },
+    {
+     "w": "igualdad",
+     "d": "Trato equitativo para todas las personas"
+    },
+    {
+     "w": "verdad",
+     "d": "Lo que corresponde con la realidad"
+    },
+    {
+     "w": "sabiduría",
+     "d": "Conocimiento profundo y buen juicio"
+    },
+    {
+     "w": "imaginación",
+     "d": "Capacidad de crear cosas nuevas en la mente"
+    },
+    {
+     "w": "inspiración",
+     "d": "Impulso interior para crear o actuar"
+    },
+    {
+     "w": "perseverancia",
+     "d": "Esfuerzo continuo para lograr un objetivo"
+    },
+    {
+     "w": "unidad",
+     "d": "Acción de estar juntos y conectados"
+    },
+    {
+     "w": "curiosidad",
+     "d": "Fuerte deseo de conocer y explorar"
+    },
+    {
+     "w": "empatía",
+     "d": "Habilidad de entender los sentimientos de otros"
+    },
+    {
+     "w": "integridad",
+     "d": "Honestidad y adherencia a valores morales"
+    },
+    {
+     "w": "dedicación",
+     "d": "Compromiso total hacia una causa o meta"
+    },
+    {
+     "w": "esperanza",
+     "d": "Creencia de que cosas buenas sucederán"
+    },
+    {
+     "w": "agradecimiento",
+     "d": "Apreciación y gratitud por lo recibido"
+    },
+    {
+     "w": "comprensión",
+     "d": "Capacidad de aceptar a otros con sus diferencias"
+    }
+   ]
+  },
+  {
+   "id": "07a90eef-2b73-4aae-bfa4-ff93d51a422f",
+   "origin": "curriculum",
+   "name": "כיתה ג - הרחבת אוצר מילים",
+   "description": "הרחבת אוצר המילים לתלמידי כיתה ג",
+   "language": "he",
+   "grade": 3,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "משפחה",
+     "d": "אנשים קרובים שגרים יחד"
+    },
+    {
+     "w": "חבר",
+     "d": "מישהו שאוהבים לבלות איתו"
+    },
+    {
+     "w": "חברה",
+     "d": "מישהי שאוהבים לבלות איתה"
+    },
+    {
+     "w": "מורה",
+     "d": "אדם שמלמד בבית הספר"
+    },
+    {
+     "w": "תלמיד",
+     "d": "ילד שלומד בבית הספר"
+    },
+    {
+     "w": "שיעור",
+     "d": "זמן של לימוד בכיתה"
+    },
+    {
+     "w": "הפסקה",
+     "d": "זמן מנוחה בין השיעורים"
+    },
+    {
+     "w": "משחק",
+     "d": "פעילות מהנה"
+    },
+    {
+     "w": "סיפור",
+     "d": "דברים שמספרים או קוראים"
+    },
+    {
+     "w": "שיר",
+     "d": "מילים עם מנגינה"
+    }
+   ]
+  },
+  {
+   "id": "0a640450-4abc-4c85-89eb-ca60f8e31e71",
+   "origin": "curriculum",
+   "name": "More Verbs - עוד פעלים",
+   "description": "Extended verbs vocabulary",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "think",
+     "d": "לחשוב - Use your mind"
+    },
+    {
+     "w": "know",
+     "d": "לדעת - Have information"
+    },
+    {
+     "w": "want",
+     "d": "לרצות - Wish to have"
+    },
+    {
+     "w": "need",
+     "d": "להזדקק - Must have"
+    },
+    {
+     "w": "like",
+     "d": "לאהוב - Enjoy something"
+    },
+    {
+     "w": "love",
+     "d": "לאהוב מאוד - Strong feeling"
+    },
+    {
+     "w": "help",
+     "d": "לעזור - Give assistance"
+    },
+    {
+     "w": "give",
+     "d": "לתת - Pass to someone"
+    },
+    {
+     "w": "take",
+     "d": "לקחת - Get in your hand"
+    },
+    {
+     "w": "make",
+     "d": "לעשות - Create something"
+    }
+   ]
+  },
+  {
+   "id": "0d108e94-c76b-41a9-ae86-789310781399",
+   "origin": "curriculum",
+   "name": "כיתה ו׳ — מתמטיקה מתקדמת",
+   "description": "מתמטיקה מתקדמת לכיתה ו׳: שברים, אחוזים ואלגברה בסיסית.",
+   "language": "he",
+   "grade": 6,
+   "subject": "math",
+   "words": [
+    {
+     "w": "אחוז",
+     "d": "חלק מ-100 של כמות כלשהי"
+    },
+    {
+     "w": "יחס",
+     "d": "השוואה בין שתי כמויות"
+    },
+    {
+     "w": "ממוצע",
+     "d": "סכום כל המספרים חלקי כמותם"
+    },
+    {
+     "w": "חזקה",
+     "d": "מספר מוכפל בעצמו מספר פעמים"
+    },
+    {
+     "w": "שורש",
+     "d": "הפוך של חזקה"
+    },
+    {
+     "w": "משתנה",
+     "d": "סימן המייצג מספר לא ידוע"
+    },
+    {
+     "w": "משוואה",
+     "d": "ביטוי שווה משני צדדים"
+    },
+    {
+     "w": "פרופורציה",
+     "d": "יחס שוויון בין שתי כמויות"
+    },
+    {
+     "w": "הסתברות",
+     "d": "מדידת סיכוי קרות אירוע"
+    },
+    {
+     "w": "גרף",
+     "d": "ציור המציג קשר בין משתנים"
+    },
+    {
+     "w": "קוארדינטה",
+     "d": "זוג מספרים המציינים מקום בגרף"
+    },
+    {
+     "w": "מרחק",
+     "d": "אורך הדרך בין שתי נקודות"
+    },
+    {
+     "w": "היקף",
+     "d": "אורך הקו סביב צורה"
+    },
+    {
+     "w": "נפח",
+     "d": "מדידת החלל בתוך צורה תלת-ממדית"
+    },
+    {
+     "w": "סדרה",
+     "d": "רצף של מספרים בעלי חוק"
+    }
+   ]
+  },
+  {
+   "id": "0ff467db-0ed1-4af7-83f1-b2d2a962ff78",
+   "origin": "curriculum",
+   "name": "Grade 2 - Everyday Words",
+   "description": "Common everyday English words for 2nd grade",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "tree",
+     "d": "A tall plant with branches and leaves"
+    },
+    {
+     "w": "bird",
+     "d": "An animal with wings that can fly"
+    },
+    {
+     "w": "fish",
+     "d": "An animal that lives in water"
+    },
+    {
+     "w": "milk",
+     "d": "A white drink from cows"
+    },
+    {
+     "w": "bread",
+     "d": "Food made from flour"
+    },
+    {
+     "w": "table",
+     "d": "Furniture you eat on"
+    },
+    {
+     "w": "chair",
+     "d": "Furniture you sit on"
+    },
+    {
+     "w": "door",
+     "d": "What you open to enter a room"
+    },
+    {
+     "w": "window",
+     "d": "Glass in the wall to see outside"
+    },
+    {
+     "w": "bed",
+     "d": "Where you sleep at night"
+    }
+   ]
+  },
+  {
+   "id": "10a0135e-bf02-4439-8db9-8925b0b968b7",
+   "origin": "curriculum",
+   "name": "אוצר מילים - חיות בר",
+   "description": "Hebrew wild animals vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "אַרְיֵה",
+     "d": "Lion - מלך החיות"
+    },
+    {
+     "w": "פִּיל",
+     "d": "Elephant - החיה הגדולה ביבשה"
+    },
+    {
+     "w": "קוֹף",
+     "d": "Monkey - מטפס על עצים"
+    },
+    {
+     "w": "נָחָשׁ",
+     "d": "Snake - אין לו רגליים"
+    },
+    {
+     "w": "דֹּב",
+     "d": "Bear - חיה גדולה ופרוותית"
+    },
+    {
+     "w": "אַרְנֶבֶת",
+     "d": "Rabbit - אוזניים ארוכות"
+    },
+    {
+     "w": "צְפַרְדֵּעַ",
+     "d": "Frog - קופצת ואומרת קרקר"
+    },
+    {
+     "w": "פַּרְפַּר",
+     "d": "Butterfly - חרק עם כנפיים צבעוניות"
+    },
+    {
+     "w": "צָב",
+     "d": "Turtle - יש לו שריון"
+    },
+    {
+     "w": "זְאֵב",
+     "d": "Wolf - מילל בלילה"
+    }
+   ]
+  },
+  {
+   "id": "12072446-c087-4653-afda-fc545607f14e",
+   "origin": "curriculum",
+   "name": "Basic Food - אוכל בסיסי",
+   "description": "Basic food vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "apple",
+     "d": "תפוח - Red or green fruit"
+    },
+    {
+     "w": "banana",
+     "d": "בננה - Yellow curved fruit"
+    },
+    {
+     "w": "bread",
+     "d": "לחם - Made from flour"
+    },
+    {
+     "w": "milk",
+     "d": "חלב - White drink from cows"
+    },
+    {
+     "w": "egg",
+     "d": "ביצה - From a chicken"
+    },
+    {
+     "w": "water",
+     "d": "מים - Clear liquid to drink"
+    },
+    {
+     "w": "rice",
+     "d": "אורז - Small white grains"
+    },
+    {
+     "w": "cheese",
+     "d": "גבינה - Made from milk"
+    },
+    {
+     "w": "orange",
+     "d": "תפוז - Orange citrus fruit"
+    },
+    {
+     "w": "chicken",
+     "d": "עוף - Meat from a bird"
+    }
+   ]
+  },
+  {
+   "id": "125ff129-2be8-4498-a890-54850616fe77",
+   "origin": "curriculum",
+   "name": "Grado 1 — Palabras Básicas",
+   "description": "Vocabulario fundamental para primer grado: sustantivos, animales y acciones cotidianas.",
+   "language": "es",
+   "grade": 1,
+   "subject": "general",
+   "words": [
+    {
+     "w": "gato",
+     "d": "Pequeño animal doméstico con bigotes que maúlla"
+    },
+    {
+     "w": "perro",
+     "d": "Animal leal que ladra y es amigo del hombre"
+    },
+    {
+     "w": "casa",
+     "d": "Edificio donde vive la gente"
+    },
+    {
+     "w": "libro",
+     "d": "Objeto hecho de páginas con palabras o dibujos"
+    },
+    {
+     "w": "agua",
+     "d": "Líquido transparente esencial para la vida"
+    },
+    {
+     "w": "pan",
+     "d": "Alimento hecho con harina y cocido al horno"
+    },
+    {
+     "w": "sol",
+     "d": "Estrella que brilla durante el día y nos calienta"
+    },
+    {
+     "w": "luna",
+     "d": "Cuerpo celeste que brilla en la noche"
+    },
+    {
+     "w": "árbol",
+     "d": "Planta grande con tronco, ramas y hojas"
+    },
+    {
+     "w": "flor",
+     "d": "Parte colorida de la planta que huele bien"
+    },
+    {
+     "w": "niño",
+     "d": "Persona joven del sexo masculino"
+    },
+    {
+     "w": "niña",
+     "d": "Persona joven del sexo femenino"
+    },
+    {
+     "w": "mamá",
+     "d": "Madre, la mujer que cuida a los hijos"
+    },
+    {
+     "w": "papá",
+     "d": "Padre, el hombre que cuida a los hijos"
+    },
+    {
+     "w": "cama",
+     "d": "Mueble donde dormimos"
+    }
+   ]
+  },
+  {
+   "id": "14c510f8-12f2-4213-836b-a83ca483023c",
+   "origin": "curriculum",
+   "name": "אוצר מילים - תחבורה",
+   "description": "Hebrew transportation vocabulary",
+   "language": "he",
+   "grade": 3,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "מְכוֹנִית",
+     "d": "Car - רכב עם 4 גלגלים"
+    },
+    {
+     "w": "אוֹטוֹבּוּס",
+     "d": "Bus - רכב גדול להרבה אנשים"
+    },
+    {
+     "w": "רַכֶּבֶת",
+     "d": "Train - נוסע על פסים"
+    },
+    {
+     "w": "מָטוֹס",
+     "d": "Airplane - טס בשמים"
+    },
+    {
+     "w": "אוֹפַנַּיִם",
+     "d": "Bicycle - 2 גלגלים לדיווש"
+    },
+    {
+     "w": "סִירָה",
+     "d": "Boat - נעה על המים"
+    },
+    {
+     "w": "אֳנִיָּה",
+     "d": "Ship - סירה גדולה"
+    },
+    {
+     "w": "אוֹפָנוֹעַ",
+     "d": "Motorcycle - 2 גלגלים עם מנוע"
+    },
+    {
+     "w": "מָסוֹק",
+     "d": "Helicopter - טס עם מדחף למעלה"
+    },
+    {
+     "w": "מוֹנִית",
+     "d": "Taxi - מכונית בתשלום"
+    }
+   ]
+  },
+  {
+   "id": "164e00ba-c5b6-44f5-b1a8-aa4c56bfa41b",
+   "origin": "curriculum",
+   "name": "כיתה ח - מילים מתקדמות לחטיבה",
+   "description": "אוצר מילים מתקדם לכיתה ח",
+   "language": "he",
+   "grade": 8,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "מורכבות",
+     "d": "מצב של הרבה חלקים שונים"
+    },
+    {
+     "w": "סתירה",
+     "d": "כשדברים לא מסתדרים יחד"
+    },
+    {
+     "w": "הקשר",
+     "d": "המצב והנסיבות סביב משהו"
+    },
+    {
+     "w": "פרשנות",
+     "d": "הסבר או הבנה של משהו"
+    },
+    {
+     "w": "ביקורת",
+     "d": "הערכה של יתרונות וחסרונות"
+    },
+    {
+     "w": "מגמה",
+     "d": "כיוון שדברים נעים אליו"
+    },
+    {
+     "w": "עמדה",
+     "d": "דעה או גישה לנושא"
+    },
+    {
+     "w": "היבט",
+     "d": "צד או זווית של נושא"
+    },
+    {
+     "w": "מושג",
+     "d": "רעיון או הגדרה מופשטת"
+    },
+    {
+     "w": "תובנה",
+     "d": "הבנה עמוקה של משהו"
+    }
+   ]
+  },
+  {
+   "id": "17006e6a-ff51-4846-a284-e90cec799090",
+   "origin": "curriculum",
+   "name": "Bagrut - Society & Culture",
+   "description": "Social studies vocabulary for Bagrut",
+   "language": "en",
+   "grade": 11,
+   "subject": "english",
+   "words": [
+    {
+     "w": "culture",
+     "d": "תרבות - Beliefs and customs of a group"
+    },
+    {
+     "w": "tradition",
+     "d": "מסורת - Customs passed down"
+    },
+    {
+     "w": "community",
+     "d": "קהילה - Group of people living together"
+    },
+    {
+     "w": "diversity",
+     "d": "גיוון - Variety of different things"
+    },
+    {
+     "w": "equality",
+     "d": "שוויון - Being equal in rights"
+    },
+    {
+     "w": "discrimination",
+     "d": "אפליה - Unfair treatment"
+    },
+    {
+     "w": "identity",
+     "d": "זהות - Who someone is"
+    },
+    {
+     "w": "globalization",
+     "d": "גלובליזציה - World becoming connected"
+    },
+    {
+     "w": "stereotype",
+     "d": "סטריאוטיפ - Fixed idea about a group"
+    },
+    {
+     "w": "integration",
+     "d": "אינטגרציה - Bringing together"
+    }
+   ]
+  },
+  {
+   "id": "18aa0c15-5541-4a36-a793-d9d93088babd",
+   "origin": "curriculum",
+   "name": "Grado 2 — Naturaleza y Animales",
+   "description": "Palabras sobre la naturaleza, animales y elementos del entorno natural.",
+   "language": "es",
+   "grade": 2,
+   "subject": "general",
+   "words": [
+    {
+     "w": "pájaro",
+     "d": "Animal que vuela con alas y plumas"
+    },
+    {
+     "w": "pez",
+     "d": "Animal que vive en el agua y nada"
+    },
+    {
+     "w": "mariposa",
+     "d": "Insecto de colores que vuela en el jardín"
+    },
+    {
+     "w": "bosque",
+     "d": "Lugar con muchos árboles grandes"
+    },
+    {
+     "w": "mar",
+     "d": "Agua salada muy grande que rodea continentes"
+    },
+    {
+     "w": "lluvia",
+     "d": "Agua que cae del cielo en gotas"
+    },
+    {
+     "w": "nube",
+     "d": "Masa blanca que flota en el cielo"
+    },
+    {
+     "w": "viento",
+     "d": "Aire que se mueve y hace cosas volar"
+    },
+    {
+     "w": "montaña",
+     "d": "Tierra muy alta que se eleva mucho"
+    },
+    {
+     "w": "río",
+     "d": "Agua que corre en la tierra hacia el mar"
+    },
+    {
+     "w": "salamandra",
+     "d": "Pequeño animal que vive entre rocas y tierra"
+    },
+    {
+     "w": "hormiga",
+     "d": "Insecto pequeño que trabaja en grupo"
+    },
+    {
+     "w": "abeja",
+     "d": "Insecto que hace miel y vuela con zumbido"
+    },
+    {
+     "w": "tortuga",
+     "d": "Animal lento con un caparazón duro"
+    },
+    {
+     "w": "león",
+     "d": "Felino fuerte y poderoso de África"
+    }
+   ]
+  },
+  {
+   "id": "1dca7eb3-6c55-41f6-95e9-4127c86df693",
+   "origin": "curriculum",
+   "name": "כיתה ד׳ — בית הספר והקהילה",
+   "description": "מילים מעולם בית הספר, החברים והקהילה לכיתה ד׳.",
+   "language": "he",
+   "grade": 4,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "מורה",
+     "d": "אדם שמלמד תלמידים"
+    },
+    {
+     "w": "תלמיד",
+     "d": "מי שלומד בבית הספר"
+    },
+    {
+     "w": "שיעור",
+     "d": "זמן של לימוד נושא"
+    },
+    {
+     "w": "ספרייה",
+     "d": "מקום עם הרבה ספרים לקריאה ולהשאלה"
+    },
+    {
+     "w": "שכן",
+     "d": "מי שגר לידך"
+    },
+    {
+     "w": "קהילה",
+     "d": "קבוצת אנשים שחיים יחד במקום אחד"
+    },
+    {
+     "w": "מתנדב",
+     "d": "מי שעוזר בלי לקבל תשלום"
+    },
+    {
+     "w": "חבר",
+     "d": "אדם קרוב שאוהבים ובוטחים בו"
+    },
+    {
+     "w": "כלל",
+     "d": "חוק שמסכימים לפעול לפיו"
+    },
+    {
+     "w": "אחריות",
+     "d": "מחויבות לעשות משהו כמו שצריך"
+    },
+    {
+     "w": "כבוד",
+     "d": "יחס מכבד כלפי אדם אחר"
+    },
+    {
+     "w": "שיתוף",
+     "d": "לחלוק ולעבוד יחד"
+    },
+    {
+     "w": "הגינות",
+     "d": "התנהגות צודקת והוגנת"
+    },
+    {
+     "w": "סובלנות",
+     "d": "קבלה של מי ששונה ממך"
+    },
+    {
+     "w": "עזרה",
+     "d": "פעולה שמקלה על אדם אחר"
+    }
+   ]
+  },
+  {
+   "id": "1eb37afe-85aa-4cdb-8c19-0e1ef00a4843",
+   "origin": "curriculum",
+   "name": "Rooms in the House - חדרים בבית",
+   "description": "Rooms and furniture vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "kitchen",
+     "d": "מטבח - Room for cooking"
+    },
+    {
+     "w": "bedroom",
+     "d": "חדר שינה - Room for sleeping"
+    },
+    {
+     "w": "bathroom",
+     "d": "חדר אמבטיה - Room for washing"
+    },
+    {
+     "w": "living room",
+     "d": "סלון - Room for sitting together"
+    },
+    {
+     "w": "garden",
+     "d": "גינה - Plants outside house"
+    },
+    {
+     "w": "stairs",
+     "d": "מדרגות - Go up and down"
+    },
+    {
+     "w": "sofa",
+     "d": "ספה - Big soft chair"
+    },
+    {
+     "w": "lamp",
+     "d": "מנורה - Gives light"
+    },
+    {
+     "w": "mirror",
+     "d": "מראה - See yourself"
+    },
+    {
+     "w": "clock",
+     "d": "שעון - Shows the time"
+    }
+   ]
+  },
+  {
+   "id": "1f38ea2a-3cff-4e6c-a338-aadc42bed18a",
+   "origin": "curriculum",
+   "name": "אוצר מילים - מילות קישור",
+   "description": "Hebrew connecting words for older students",
+   "language": "he",
+   "grade": 5,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "וְ",
+     "d": "And - מחבר בין דברים"
+    },
+    {
+     "w": "אֲבָל",
+     "d": "But - ניגוד"
+    },
+    {
+     "w": "כִּי",
+     "d": "Because - סיבה"
+    },
+    {
+     "w": "אִם",
+     "d": "If - תנאי"
+    },
+    {
+     "w": "כַּאֲשֶׁר",
+     "d": "When - זמן"
+    },
+    {
+     "w": "לָכֵן",
+     "d": "Therefore - תוצאה"
+    },
+    {
+     "w": "גַּם",
+     "d": "Also - הוספה"
+    },
+    {
+     "w": "אוֹ",
+     "d": "Or - אפשרות"
+    },
+    {
+     "w": "לִפְנֵי",
+     "d": "Before - קודם לכן"
+    },
+    {
+     "w": "אַחֲרֵי",
+     "d": "After - לאחר מכן"
+    }
+   ]
+  },
+  {
+   "id": "1fb613e1-7d45-41ef-b28e-f3da23149b66",
+   "origin": "curriculum",
+   "name": "Grade 3 - Numbers and Operations",
+   "description": "Basic math vocabulary for 3rd grade",
+   "language": "en",
+   "grade": 3,
+   "subject": "math",
+   "words": [
+    {
+     "w": "addition",
+     "d": "Combining numbers together"
+    },
+    {
+     "w": "subtraction",
+     "d": "Taking one number from another"
+    },
+    {
+     "w": "multiplication",
+     "d": "Adding a number many times"
+    },
+    {
+     "w": "division",
+     "d": "Splitting into equal parts"
+    },
+    {
+     "w": "even",
+     "d": "Number divisible by 2"
+    },
+    {
+     "w": "odd",
+     "d": "Number not divisible by 2"
+    },
+    {
+     "w": "digit",
+     "d": "Single number symbol 0-9"
+    },
+    {
+     "w": "place value",
+     "d": "Value based on position"
+    },
+    {
+     "w": "sum",
+     "d": "Result of addition"
+    },
+    {
+     "w": "difference",
+     "d": "Result of subtraction"
+    }
+   ]
+  },
+  {
+   "id": "1fddc4cb-712c-43d6-887f-93b7f1704b58",
+   "origin": "curriculum",
+   "name": "Transportation - תחבורה",
+   "description": "Transportation vocabulary",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "car",
+     "d": "מכונית - Vehicle with 4 wheels"
+    },
+    {
+     "w": "bus",
+     "d": "אוטובוס - Large vehicle for many people"
+    },
+    {
+     "w": "train",
+     "d": "רכבת - Runs on tracks"
+    },
+    {
+     "w": "airplane",
+     "d": "מטוס - Flies in the sky"
+    },
+    {
+     "w": "bicycle",
+     "d": "אופניים - 2 wheels, you pedal"
+    },
+    {
+     "w": "boat",
+     "d": "סירה - Moves on water"
+    },
+    {
+     "w": "ship",
+     "d": "אונייה - Large boat"
+    },
+    {
+     "w": "motorcycle",
+     "d": "אופנוע - 2 wheels with engine"
+    },
+    {
+     "w": "helicopter",
+     "d": "מסוק - Flies with propeller on top"
+    },
+    {
+     "w": "taxi",
+     "d": "מונית - Car you pay to ride"
+    }
+   ]
+  },
+  {
+   "id": "23fa302e-84d2-4924-95ba-69c0e565f265",
+   "origin": "curriculum",
+   "name": "כיתה יא - מילים לבגרות",
+   "description": "אוצר מילים מתקדם לבגרות בעברית",
+   "language": "he",
+   "grade": 11,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "אלגוריה",
+     "d": "סיפור עם משמעות סמלית"
+    },
+    {
+     "w": "פרודיה",
+     "d": "חיקוי מגוחך של יצירה"
+    },
+    {
+     "w": "גרוטסקה",
+     "d": "עיוות מוגזם של מציאות"
+    },
+    {
+     "w": "אוקסימורון",
+     "d": "צירוף של מילים סותרות"
+    },
+    {
+     "w": "פרסוניפיקציה",
+     "d": "האנשה של דברים דוממים"
+    },
+    {
+     "w": "סינקדוכה",
+     "d": "חלק המייצג את השלם"
+    },
+    {
+     "w": "מטונימיה",
+     "d": "החלפת שם בשם קשור"
+    },
+    {
+     "w": "ליטוטס",
+     "d": "הקטנה לשם הגדלה"
+    },
+    {
+     "w": "היפרבולה",
+     "d": "הגזמה לשם הדגשה"
+    },
+    {
+     "w": "אפוריזם",
+     "d": "משפט קצר וחכם"
+    }
+   ]
+  },
+  {
+   "id": "25bee4e4-8ced-4ab3-ace8-87a0c1e9da58",
+   "origin": "curriculum",
+   "name": "Grade 8 - Advanced Academic",
+   "description": "Advanced academic vocabulary for 8th grade",
+   "language": "en",
+   "grade": 8,
+   "subject": "english",
+   "words": [
+    {
+     "w": "advocate",
+     "d": "To publicly support or recommend"
+    },
+    {
+     "w": "comprehensive",
+     "d": "Including all or nearly all aspects"
+    },
+    {
+     "w": "consequently",
+     "d": "As a result of something"
+    },
+    {
+     "w": "distinction",
+     "d": "A difference or contrast between things"
+    },
+    {
+     "w": "elaborate",
+     "d": "Detailed and complicated"
+    },
+    {
+     "w": "fundamental",
+     "d": "Basic and essential"
+    },
+    {
+     "w": "implication",
+     "d": "A possible effect or result"
+    },
+    {
+     "w": "integration",
+     "d": "Combining things into a whole"
+    },
+    {
+     "w": "phenomenon",
+     "d": "A fact or situation that exists"
+    },
+    {
+     "w": "substantial",
+     "d": "Large in size, value, or importance"
+    }
+   ]
+  },
+  {
+   "id": "25d0cec0-8266-4c35-9586-b9834c142d3e",
+   "origin": "curriculum",
+   "name": "כיתה ה׳ — גיאוגרפיה וסביבה",
+   "description": "אוצר מילים בגיאוגרפיה לכיתה ה׳: יבשות, אקלים וכלים.",
+   "language": "he",
+   "grade": 5,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "יבשת",
+     "d": "קטע אדמה גדול מאוד"
+    },
+    {
+     "w": "אוקיינוס",
+     "d": "מים מלוחים גדולים במיוחד"
+    },
+    {
+     "w": "חוף",
+     "d": "הגבול בין יבשה ומים"
+    },
+    {
+     "w": "מדבר",
+     "d": "אדמה יבשה בעלת מעט גשם"
+    },
+    {
+     "w": "יער",
+     "d": "אדמה עם עצים רבים"
+    },
+    {
+     "w": "קטב",
+     "d": "הנקודות הקרות ביותר בעולם"
+    },
+    {
+     "w": "אקלים",
+     "d": "מזג אוויר רגיל של מקום"
+    },
+    {
+     "w": "גשם",
+     "d": "מים שיורדים מהשמיים"
+    },
+    {
+     "w": "טיול",
+     "d": "זרם חם או קר בים"
+    },
+    {
+     "w": "רום",
+     "d": "גובה מקום מעל פני הים"
+    },
+    {
+     "w": "קרקע",
+     "d": "החומר העליון של הארץ"
+    },
+    {
+     "w": "מינרל",
+     "d": "חומר טבעי שנמצא בקרקע"
+    },
+    {
+     "w": "משאבי",
+     "d": "דברים טבעיים שיש ערך"
+    },
+    {
+     "w": "זריעה",
+     "d": "גדילת גידולים לאוכל"
+    },
+    {
+     "w": "עיור",
+     "d": "תהליך היצירה של ערים"
+    }
+   ]
+  },
+  {
+   "id": "2609abb4-a632-4bb9-96c1-c74bb5e711fd",
+   "origin": "curriculum",
+   "name": "אוצר מילים - עונות השנה",
+   "description": "Hebrew seasons vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "קַיִץ",
+     "d": "Summer - עונה חמה"
+    },
+    {
+     "w": "חֹרֶף",
+     "d": "Winter - עונה קרה"
+    },
+    {
+     "w": "אָבִיב",
+     "d": "Spring - פרחים פורחים"
+    },
+    {
+     "w": "סְתָיו",
+     "d": "Fall/Autumn - עלים נושרים"
+    },
+    {
+     "w": "שָׁנָה",
+     "d": "Year - 12 חודשים"
+    },
+    {
+     "w": "חֹדֶשׁ",
+     "d": "Month - כ-30 ימים"
+    },
+    {
+     "w": "שָׁבוּעַ",
+     "d": "Week - 7 ימים"
+    },
+    {
+     "w": "יוֹם",
+     "d": "Day - 24 שעות"
+    },
+    {
+     "w": "לַיְלָה",
+     "d": "Night - כשחשוך בחוץ"
+    },
+    {
+     "w": "בֹּקֶר",
+     "d": "Morning - תחילת היום"
+    }
+   ]
+  },
+  {
+   "id": "26a5428c-14c9-4431-9189-70bd57967c4c",
+   "origin": "curriculum",
+   "name": "Grade 4 - Earth Science",
+   "description": "Earth science vocabulary for 4th grade",
+   "language": "en",
+   "grade": 4,
+   "subject": "science",
+   "words": [
+    {
+     "w": "mineral",
+     "d": "Natural solid material from Earth"
+    },
+    {
+     "w": "rock",
+     "d": "Hard material made of minerals"
+    },
+    {
+     "w": "volcano",
+     "d": "Mountain that can erupt lava"
+    },
+    {
+     "w": "earthquake",
+     "d": "Shaking of the ground"
+    },
+    {
+     "w": "erosion",
+     "d": "Wearing away of land by water or wind"
+    },
+    {
+     "w": "fossil",
+     "d": "Remains of ancient living things"
+    },
+    {
+     "w": "atmosphere",
+     "d": "Layer of air around Earth"
+    },
+    {
+     "w": "climate",
+     "d": "Weather patterns over long time"
+    },
+    {
+     "w": "continent",
+     "d": "Large land mass on Earth"
+    },
+    {
+     "w": "gravity",
+     "d": "Force that pulls things down"
+    }
+   ]
+  },
+  {
+   "id": "26c22b4e-f57e-4858-859b-e60694e20b74",
+   "origin": "curriculum",
+   "name": "Grade 12 - Advanced Calculus",
+   "description": "Advanced calculus for Bagrut 5 units",
+   "language": "en",
+   "grade": 12,
+   "subject": "math",
+   "words": [
+    {
+     "w": "chain rule",
+     "d": "Derivative of composite functions"
+    },
+    {
+     "w": "product rule",
+     "d": "Derivative of multiplied functions"
+    },
+    {
+     "w": "quotient rule",
+     "d": "Derivative of divided functions"
+    },
+    {
+     "w": "antiderivative",
+     "d": "Function whose derivative is given"
+    },
+    {
+     "w": "definite integral",
+     "d": "Integral with bounds"
+    },
+    {
+     "w": "indefinite integral",
+     "d": "Integral without bounds"
+    },
+    {
+     "w": "optimization",
+     "d": "Finding maximum or minimum"
+    },
+    {
+     "w": "concavity",
+     "d": "Direction curve bends"
+    },
+    {
+     "w": "inflection point",
+     "d": "Where concavity changes"
+    },
+    {
+     "w": "convergence",
+     "d": "Approaching a specific value"
+    }
+   ]
+  },
+  {
+   "id": "296cb067-114a-4973-987e-ca69c44621d5",
+   "origin": "curriculum",
+   "name": "כיתה ד - מילים מתקדמות",
+   "description": "אוצר מילים מתקדם לתלמידי כיתה ד",
+   "language": "he",
+   "grade": 4,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "התרגשות",
+     "d": "תחושה חזקה של שמחה או פחד"
+    },
+    {
+     "w": "הפתעה",
+     "d": "משהו שלא ציפינו לו"
+    },
+    {
+     "w": "סקרנות",
+     "d": "רצון לדעת ולהבין דברים"
+    },
+    {
+     "w": "אומץ",
+     "d": "להיות לא פוחד"
+    },
+    {
+     "w": "סבלנות",
+     "d": "יכולת לחכות בשקט"
+    },
+    {
+     "w": "חריצות",
+     "d": "עבודה קשה ומאומצת"
+    },
+    {
+     "w": "יצירתיות",
+     "d": "יכולת להמציא דברים חדשים"
+    },
+    {
+     "w": "אחריות",
+     "d": "לדאוג למשהו או למישהו"
+    },
+    {
+     "w": "כבוד",
+     "d": "יחס טוב לאחרים"
+    },
+    {
+     "w": "הצלחה",
+     "d": "להשיג מה שרצינו"
+    }
+   ]
+  },
+  {
+   "id": "2b848ecb-7e2b-4480-9149-ec928143aa07",
+   "origin": "curriculum",
+   "name": "כיתה א - מילים ראשונות",
+   "description": "מילים ראשונות בעברית לתלמידי כיתה א",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "אמא",
+     "d": "האישה שילדה אותך"
+    },
+    {
+     "w": "אבא",
+     "d": "האיש שהוליד אותך"
+    },
+    {
+     "w": "בית",
+     "d": "מקום שגרים בו"
+    },
+    {
+     "w": "ילד",
+     "d": "בן אדם צעיר"
+    },
+    {
+     "w": "ילדה",
+     "d": "בת אדם צעירה"
+    },
+    {
+     "w": "כלב",
+     "d": "חיית מחמד שנובחת"
+    },
+    {
+     "w": "חתול",
+     "d": "חיית מחמד שמיילת"
+    },
+    {
+     "w": "שמש",
+     "d": "הכוכב שמאיר ביום"
+    },
+    {
+     "w": "ירח",
+     "d": "מה שמאיר בלילה"
+    },
+    {
+     "w": "מים",
+     "d": "נוזל שאנחנו שותים"
+    }
+   ]
+  },
+  {
+   "id": "2d6e5e1c-939b-41ef-b882-0f7f2792363a",
+   "origin": "curriculum",
+   "name": "Transition Words - Band 2",
+   "description": "Connecting words for writing",
+   "language": "en",
+   "grade": 9,
+   "subject": "english",
+   "words": [
+    {
+     "w": "however",
+     "d": "אולם - But, on the other hand"
+    },
+    {
+     "w": "therefore",
+     "d": "לכן - For this reason"
+    },
+    {
+     "w": "although",
+     "d": "למרות - Even though"
+    },
+    {
+     "w": "moreover",
+     "d": "יתר על כן - In addition"
+    },
+    {
+     "w": "furthermore",
+     "d": "יתרה מזאת - Also, what is more"
+    },
+    {
+     "w": "meanwhile",
+     "d": "בינתיים - At the same time"
+    },
+    {
+     "w": "consequently",
+     "d": "כתוצאה מכך - As a result"
+    },
+    {
+     "w": "nevertheless",
+     "d": "עם זאת - Despite that"
+    },
+    {
+     "w": "in addition",
+     "d": "בנוסף - Also"
+    },
+    {
+     "w": "for instance",
+     "d": "לדוגמה - For example"
+    }
+   ]
+  },
+  {
+   "id": "324a4c48-5ac9-4928-857d-8783f4e6c30f",
+   "origin": "curriculum",
+   "name": "Abstract Nouns - Band 2",
+   "description": "Abstract concepts for junior high",
+   "language": "en",
+   "grade": 8,
+   "subject": "english",
+   "words": [
+    {
+     "w": "opinion",
+     "d": "דעה - What you think"
+    },
+    {
+     "w": "reason",
+     "d": "סיבה - Why something happens"
+    },
+    {
+     "w": "problem",
+     "d": "בעיה - Something difficult"
+    },
+    {
+     "w": "solution",
+     "d": "פתרון - Answer to a problem"
+    },
+    {
+     "w": "example",
+     "d": "דוגמה - Something that shows"
+    },
+    {
+     "w": "effect",
+     "d": "השפעה - Result of something"
+    },
+    {
+     "w": "cause",
+     "d": "גורם - What makes something happen"
+    },
+    {
+     "w": "difference",
+     "d": "הבדל - Not the same"
+    },
+    {
+     "w": "advantage",
+     "d": "יתרון - Good point"
+    },
+    {
+     "w": "disadvantage",
+     "d": "חיסרון - Bad point"
+    }
+   ]
+  },
+  {
+   "id": "34ab9cfd-cb5d-4779-88d6-4c2f3b797fd9",
+   "origin": "curriculum",
+   "name": "Bagrut - Environment & Nature",
+   "description": "Environment vocabulary for Bagrut",
+   "language": "en",
+   "grade": 10,
+   "subject": "english",
+   "words": [
+    {
+     "w": "environment",
+     "d": "סביבה - The natural world around us"
+    },
+    {
+     "w": "pollution",
+     "d": "זיהום - Harmful substances in nature"
+    },
+    {
+     "w": "renewable",
+     "d": "מתחדש - Can be used again"
+    },
+    {
+     "w": "sustainable",
+     "d": "בר קיימא - Can continue long term"
+    },
+    {
+     "w": "conservation",
+     "d": "שימור - Protecting nature"
+    },
+    {
+     "w": "ecosystem",
+     "d": "מערכת אקולוגית - Living things and environment"
+    },
+    {
+     "w": "endangered",
+     "d": "בסכנת הכחדה - At risk of dying out"
+    },
+    {
+     "w": "biodiversity",
+     "d": "מגוון ביולוגי - Variety of life forms"
+    },
+    {
+     "w": "recycle",
+     "d": "למחזר - Use materials again"
+    },
+    {
+     "w": "climate change",
+     "d": "שינוי אקלים - Global temperature changes"
+    }
+   ]
+  },
+  {
+   "id": "35087ad9-108b-4c0f-8777-e67a0f75fe58",
+   "origin": "curriculum",
+   "name": "Fruits & Vegetables - פירות וירקות",
+   "description": "Fruits and vegetables vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "tomato",
+     "d": "עגבנייה - Red vegetable for salad"
+    },
+    {
+     "w": "cucumber",
+     "d": "מלפפון - Green and crunchy"
+    },
+    {
+     "w": "carrot",
+     "d": "גזר - Orange root vegetable"
+    },
+    {
+     "w": "potato",
+     "d": "תפוח אדמה - Brown root vegetable"
+    },
+    {
+     "w": "grape",
+     "d": "ענב - Small round fruit"
+    },
+    {
+     "w": "strawberry",
+     "d": "תות - Small red fruit"
+    },
+    {
+     "w": "watermelon",
+     "d": "אבטיח - Large green fruit, red inside"
+    },
+    {
+     "w": "onion",
+     "d": "בצל - Makes you cry when cutting"
+    },
+    {
+     "w": "lettuce",
+     "d": "חסה - Green salad leaf"
+    },
+    {
+     "w": "pepper",
+     "d": "פלפל - Can be red, yellow, green"
+    }
+   ]
+  },
+  {
+   "id": "367577ee-004b-4cfd-9526-6b30d040c1bd",
+   "origin": "curriculum",
+   "name": "אוצר מילים - מילים מופשטות",
+   "description": "Hebrew abstract concepts for middle school",
+   "language": "he",
+   "grade": 7,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "חֵרוּת",
+     "d": "Freedom - היכולת לבחור"
+    },
+    {
+     "w": "צֶדֶק",
+     "d": "Justice - מה שנכון"
+    },
+    {
+     "w": "אֱמֶת",
+     "d": "Truth - מה שאמיתי"
+    },
+    {
+     "w": "כָּבוֹד",
+     "d": "Honor/Respect - הערכה"
+    },
+    {
+     "w": "אַחֲרָיוּת",
+     "d": "Responsibility - חובה לטפל"
+    },
+    {
+     "w": "חֲבֵרוּת",
+     "d": "Friendship - קשר טוב בין אנשים"
+    },
+    {
+     "w": "סַבְלָנוּת",
+     "d": "Patience - יכולת לחכות"
+    },
+    {
+     "w": "אֹמֶץ",
+     "d": "Courage - להיות אמיץ"
+    },
+    {
+     "w": "חָכְמָה",
+     "d": "Wisdom - ידע ותבונה"
+    },
+    {
+     "w": "שָׁלוֹם",
+     "d": "Peace - ללא מלחמה"
+    }
+   ]
+  },
+  {
+   "id": "382bd7fd-2e6a-4a00-a425-6eb80fc7d9bd",
+   "origin": "curriculum",
+   "name": "כיתה ו׳ — מילים מופשטות וערכים",
+   "description": "מושגים מופשטים וערכים להעשרת השפה והדיון בכיתה ו׳.",
+   "language": "he",
+   "grade": 6,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "חירות",
+     "d": "חופש לבחור ולפעול"
+    },
+    {
+     "w": "צדק",
+     "d": "מצב שבו נוהגים בהגינות"
+    },
+    {
+     "w": "שוויון",
+     "d": "יחס שווה לכל אדם"
+    },
+    {
+     "w": "אמת",
+     "d": "מה שתואם את המציאות"
+    },
+    {
+     "w": "חוכמה",
+     "d": "ידע עמוק ושיקול דעת"
+    },
+    {
+     "w": "דמיון",
+     "d": "היכולת לחשוב על דברים חדשים"
+    },
+    {
+     "w": "השראה",
+     "d": "דחף פנימי ליצור או לפעול"
+    },
+    {
+     "w": "התמדה",
+     "d": "המשך מאמץ למרות קשיים"
+    },
+    {
+     "w": "אחדות",
+     "d": "מצב של חיבור ושיתוף"
+    },
+    {
+     "w": "סקרנות",
+     "d": "רצון עז לדעת ולחקור"
+    },
+    {
+     "w": "אמפתיה",
+     "d": "היכולת להבין את רגשות הזולת"
+    },
+    {
+     "w": "יושרה",
+     "d": "דבקות בערכים ובאמת"
+    },
+    {
+     "w": "מסירות",
+     "d": "נאמנות ומאמץ למען מטרה"
+    },
+    {
+     "w": "תקווה",
+     "d": "אמונה שדברים טובים יקרו"
+    },
+    {
+     "w": "הוקרה",
+     "d": "הערכה ותודה על מה שקיבלת"
+    }
+   ]
+  },
+  {
+   "id": "38ca4220-9745-47b2-8edb-0b80b7f3d6f3",
+   "origin": "curriculum",
+   "name": "אוצר מילים - עוד פעלים",
+   "description": "More Hebrew verbs vocabulary",
+   "language": "he",
+   "grade": 3,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "לַחְשֹׁב",
+     "d": "To think - להשתמש במוח"
+    },
+    {
+     "w": "לָדַעַת",
+     "d": "To know - להיות בעל מידע"
+    },
+    {
+     "w": "לִרְצוֹת",
+     "d": "To want - לחפוץ משהו"
+    },
+    {
+     "w": "לְהִצְטָרֵךְ",
+     "d": "To need - חייבים משהו"
+    },
+    {
+     "w": "לֶאֱהֹב",
+     "d": "To love - רגש חזק"
+    },
+    {
+     "w": "לַעֲזֹר",
+     "d": "To help - לתת סיוע"
+    },
+    {
+     "w": "לָתֵת",
+     "d": "To give - להעביר למישהו"
+    },
+    {
+     "w": "לָקַחַת",
+     "d": "To take - לקבל ליד"
+    },
+    {
+     "w": "לַעֲשׂוֹת",
+     "d": "To do/make - ליצור משהו"
+    },
+    {
+     "w": "לִרְאוֹת",
+     "d": "To see - להסתכל"
+    }
+   ]
+  },
+  {
+   "id": "39375aa5-3684-4fe1-9f13-ce5299f361d7",
+   "origin": "curriculum",
+   "name": "Months of the Year - חודשי השנה",
+   "description": "Months vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "January",
+     "d": "ינואר - First month"
+    },
+    {
+     "w": "February",
+     "d": "פברואר - Second month"
+    },
+    {
+     "w": "March",
+     "d": "מרץ - Third month"
+    },
+    {
+     "w": "April",
+     "d": "אפריל - Fourth month"
+    },
+    {
+     "w": "May",
+     "d": "מאי - Fifth month"
+    },
+    {
+     "w": "June",
+     "d": "יוני - Sixth month"
+    },
+    {
+     "w": "July",
+     "d": "יולי - Seventh month"
+    },
+    {
+     "w": "August",
+     "d": "אוגוסט - Eighth month"
+    },
+    {
+     "w": "September",
+     "d": "ספטמבר - Ninth month"
+    },
+    {
+     "w": "October",
+     "d": "אוקטובר - Tenth month"
+    }
+   ]
+  },
+  {
+   "id": "3977e4ac-be79-41f5-ab03-131b58c75d49",
+   "origin": "curriculum",
+   "name": "כיתה ב׳ — טבע ובעלי חיים",
+   "description": "מילים מעולם הטבע ובעלי החיים לכיתה ב׳.",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "ציפור",
+     "d": "בעל חיים שעף ויש לו כנפיים"
+    },
+    {
+     "w": "דג",
+     "d": "חיה שחיה במים ושוחה"
+    },
+    {
+     "w": "פרפר",
+     "d": "חרק צבעוני בעל כנפיים"
+    },
+    {
+     "w": "יער",
+     "d": "מקום עם הרבה עצים"
+    },
+    {
+     "w": "ים",
+     "d": "שטח גדול של מים מלוחים"
+    },
+    {
+     "w": "גשם",
+     "d": "טיפות מים שיורדות מהשמיים"
+    },
+    {
+     "w": "ענן",
+     "d": "אדים לבנים שמרחפים בשמיים"
+    },
+    {
+     "w": "רוח",
+     "d": "אוויר שנע ומזיז דברים"
+    },
+    {
+     "w": "דבורה",
+     "d": "חרק שמייצר דבש"
+    },
+    {
+     "w": "נמלה",
+     "d": "חרק קטן וחרוץ"
+    },
+    {
+     "w": "שמיים",
+     "d": "החלל הכחול שמעל הראש"
+    },
+    {
+     "w": "הר",
+     "d": "מקום גבוה מאוד באדמה"
+    },
+    {
+     "w": "נהר",
+     "d": "מים זורמים ביבשה"
+    },
+    {
+     "w": "אריה",
+     "d": "חיה חזקה שנקראת מלך החיות"
+    },
+    {
+     "w": "צב",
+     "d": "חיה איטית עם שריון"
+    }
+   ]
+  },
+  {
+   "id": "3b3cf3db-dad0-4760-bb7c-673bae21540f",
+   "origin": "curriculum",
+   "name": "כיתה ה׳ — שפה עשירה ומילים נרדפות",
+   "description": "מילים מתארות ומילים נרדפות להעשרת אוצר המילים בכיתה ה׳.",
+   "language": "he",
+   "grade": 5,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "מהיר",
+     "d": "נע בקצב גבוה"
+    },
+    {
+     "w": "איטי",
+     "d": "נע לאט"
+    },
+    {
+     "w": "ענק",
+     "d": "גדול מאוד"
+    },
+    {
+     "w": "זעיר",
+     "d": "קטן מאוד"
+    },
+    {
+     "w": "יפהפה",
+     "d": "יפה במיוחד"
+    },
+    {
+     "w": "נדיר",
+     "d": "לא שכיח, קשה למצוא"
+    },
+    {
+     "w": "מרהיב",
+     "d": "מרשים ומלא יופי"
+    },
+    {
+     "w": "מורכב",
+     "d": "בנוי מהרבה חלקים, לא פשוט"
+    },
+    {
+     "w": "ברור",
+     "d": "קל להבנה"
+    },
+    {
+     "w": "מעורפל",
+     "d": "לא ברור ומטושטש"
+    },
+    {
+     "w": "שקט",
+     "d": "בלי רעש"
+    },
+    {
+     "w": "רועש",
+     "d": "מלא רעש"
+    },
+    {
+     "w": "עתיק",
+     "d": "ישן מאוד, מימים עברו"
+    },
+    {
+     "w": "חדיש",
+     "d": "חדש ומתקדם"
+    },
+    {
+     "w": "מופלא",
+     "d": "נפלא ומדהים"
+    }
+   ]
+  },
+  {
+   "id": "3de8a66d-2dff-4b80-ae5e-474f0e043f0e",
+   "origin": "curriculum",
+   "name": "אוצר מילים - ציוד לימודי",
+   "description": "Hebrew school supplies vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "לוּחַ",
+     "d": "Board - המורה כותב עליו"
+    },
+    {
+     "w": "מָחָק",
+     "d": "Eraser - למחיקת עיפרון"
+    },
+    {
+     "w": "סַרְגֵּל",
+     "d": "Ruler - למדידה"
+    },
+    {
+     "w": "מִסְפָּרַיִם",
+     "d": "Scissors - לחיתוך"
+    },
+    {
+     "w": "דֶּבֶק",
+     "d": "Glue - להדבקה"
+    },
+    {
+     "w": "נְיָר",
+     "d": "Paper - לכתיבה"
+    },
+    {
+     "w": "תִּיק",
+     "d": "Bag - לנשיאת חפצים"
+    },
+    {
+     "w": "מִילוֹן",
+     "d": "Dictionary - להבנת מילים"
+    },
+    {
+     "w": "שִׁיעוּר",
+     "d": "Lesson - זמן ללמידה"
+    },
+    {
+     "w": "הַפְסָקָה",
+     "d": "Break - זמן מנוחה"
+    }
+   ]
+  },
+  {
+   "id": "3fea48d2-421a-44cb-a1eb-ba1fcf658297",
+   "origin": "curriculum",
+   "name": "Academic Verbs - Band 2",
+   "description": "Academic verbs for junior high aligned with Band 2",
+   "language": "en",
+   "grade": 7,
+   "subject": "english",
+   "words": [
+    {
+     "w": "analyze",
+     "d": "לנתח - Examine in detail"
+    },
+    {
+     "w": "compare",
+     "d": "להשוות - Find similarities and differences"
+    },
+    {
+     "w": "describe",
+     "d": "לתאר - Tell about something"
+    },
+    {
+     "w": "explain",
+     "d": "להסביר - Make clear"
+    },
+    {
+     "w": "discuss",
+     "d": "לדון - Talk about"
+    },
+    {
+     "w": "create",
+     "d": "ליצור - Make something new"
+    },
+    {
+     "w": "develop",
+     "d": "לפתח - Grow or improve"
+    },
+    {
+     "w": "include",
+     "d": "לכלול - Have as part"
+    },
+    {
+     "w": "provide",
+     "d": "לספק - Give or supply"
+    },
+    {
+     "w": "require",
+     "d": "לדרוש - Need or demand"
+    }
+   ]
+  },
+  {
+   "id": "411c7a43-c3e5-49d9-9a40-9f66a534b72f",
+   "origin": "curriculum",
+   "name": "Grade 9 - Modern History",
+   "description": "Modern history vocabulary for 9th grade",
+   "language": "en",
+   "grade": 9,
+   "subject": "history",
+   "words": [
+    {
+     "w": "imperialism",
+     "d": "Policy of building empires"
+    },
+    {
+     "w": "colonialism",
+     "d": "Controlling foreign territories"
+    },
+    {
+     "w": "nationalism",
+     "d": "Pride in ones nation"
+    },
+    {
+     "w": "industrialization",
+     "d": "Growth of factories and machines"
+    },
+    {
+     "w": "capitalism",
+     "d": "Economic system of private ownership"
+    },
+    {
+     "w": "socialism",
+     "d": "Economic system of shared ownership"
+    },
+    {
+     "w": "totalitarianism",
+     "d": "Government with total control"
+    },
+    {
+     "w": "propaganda",
+     "d": "Information to influence opinion"
+    },
+    {
+     "w": "genocide",
+     "d": "Deliberate killing of a group"
+    },
+    {
+     "w": "holocaust",
+     "d": "Nazi murder of Jews"
+    }
+   ]
+  },
+  {
+   "id": "45f002e7-40e2-47d3-8a49-c163aa9cfa32",
+   "origin": "curriculum",
+   "name": "אוצר מילים - פעלים מתקדמים",
+   "description": "Hebrew advanced verbs for high school",
+   "language": "he",
+   "grade": 9,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "לְנַתֵּחַ",
+     "d": "To analyze - לבחון בפירוט"
+    },
+    {
+     "w": "לְהַשְׁווֹת",
+     "d": "To compare - למצוא דומה ושונה"
+    },
+    {
+     "w": "לְתָאֵר",
+     "d": "To describe - לספר על משהו"
+    },
+    {
+     "w": "לְהַסְבִּיר",
+     "d": "To explain - להבהיר"
+    },
+    {
+     "w": "לְדוּן",
+     "d": "To discuss - לדבר על נושא"
+    },
+    {
+     "w": "לִיצוֹר",
+     "d": "To create - לעשות משהו חדש"
+    },
+    {
+     "w": "לְפַתֵּחַ",
+     "d": "To develop - לשפר ולהרחיב"
+    },
+    {
+     "w": "לְסַפֵּק",
+     "d": "To provide - לתת"
+    },
+    {
+     "w": "לְהָגִיב",
+     "d": "To respond - לענות"
+    },
+    {
+     "w": "לְהַעֲרִיךְ",
+     "d": "To evaluate - לשפוט ערך"
+    }
+   ]
+  },
+  {
+   "id": "471335dc-73dd-42f0-90ae-ffed2e2e900f",
+   "origin": "curriculum",
+   "name": "More Clothes - עוד בגדים",
+   "description": "Extended clothing vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "sweater",
+     "d": "סוודר - Warm knit top"
+    },
+    {
+     "w": "boots",
+     "d": "מגפיים - Tall shoes"
+    },
+    {
+     "w": "gloves",
+     "d": "כפפות - Cover your hands"
+    },
+    {
+     "w": "scarf",
+     "d": "צעיף - Wraps around neck"
+    },
+    {
+     "w": "belt",
+     "d": "חגורה - Holds up pants"
+    },
+    {
+     "w": "pajamas",
+     "d": "פיג׳מה - Sleep clothes"
+    },
+    {
+     "w": "sandals",
+     "d": "סנדלים - Open summer shoes"
+    },
+    {
+     "w": "umbrella",
+     "d": "מטרייה - Keeps you dry from rain"
+    },
+    {
+     "w": "pocket",
+     "d": "כיס - Small bag in clothes"
+    },
+    {
+     "w": "button",
+     "d": "כפתור - Closes your shirt"
+    }
+   ]
+  },
+  {
+   "id": "4955c5c6-8c1a-45df-83e1-412c7b5705cd",
+   "origin": "curriculum",
+   "name": "כיתה ה - מילים ספרותיות",
+   "description": "אוצר מילים ספרותי לתלמידי כיתה ה",
+   "language": "he",
+   "grade": 5,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "דמות",
+     "d": "אדם בסיפור או בהצגה"
+    },
+    {
+     "w": "עלילה",
+     "d": "מה שקורה בסיפור"
+    },
+    {
+     "w": "תיאור",
+     "d": "מילים שמציירות תמונה"
+    },
+    {
+     "w": "דו-שיח",
+     "d": "שיחה בין דמויות"
+    },
+    {
+     "w": "משל",
+     "d": "סיפור עם מסר חינוכי"
+    },
+    {
+     "w": "אגדה",
+     "d": "סיפור עתיק עם קסם"
+    },
+    {
+     "w": "שורש",
+     "d": "הבסיס של מילה בעברית"
+    },
+    {
+     "w": "משפט",
+     "d": "קבוצת מילים עם משמעות"
+    },
+    {
+     "w": "פסקה",
+     "d": "חלק מטקסט על נושא אחד"
+    },
+    {
+     "w": "כותרת",
+     "d": "שם של טקסט או פרק"
+    }
+   ]
+  },
+  {
+   "id": "496139ef-7889-4966-a490-5df700b64b79",
+   "origin": "curriculum",
+   "name": "Grade 6 - Pre-Algebra",
+   "description": "Pre-algebra vocabulary for 6th grade",
+   "language": "en",
+   "grade": 6,
+   "subject": "math",
+   "words": [
+    {
+     "w": "negative",
+     "d": "Number less than zero"
+    },
+    {
+     "w": "positive",
+     "d": "Number greater than zero"
+    },
+    {
+     "w": "absolute value",
+     "d": "Distance from zero"
+    },
+    {
+     "w": "exponent",
+     "d": "Number showing how many times to multiply"
+    },
+    {
+     "w": "base",
+     "d": "Number being multiplied by exponent"
+    },
+    {
+     "w": "order of operations",
+     "d": "Rules for solving expressions"
+    },
+    {
+     "w": "distributive",
+     "d": "Property for multiplying sums"
+    },
+    {
+     "w": "inequality",
+     "d": "Statement comparing with < or >"
+    },
+    {
+     "w": "simplify",
+     "d": "Make expression easier"
+    },
+    {
+     "w": "evaluate",
+     "d": "Find the value of expression"
+    }
+   ]
+  },
+  {
+   "id": "4967302b-dc7a-4465-8e72-04c50a2e78ce",
+   "origin": "curriculum",
+   "name": "Grade 3 - Basic English Vocabulary",
+   "description": "Foundational English vocabulary for 3rd grade students aligned with Israeli MOE standards",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "apple",
+     "d": "A round fruit that is red, green, or yellow"
+    },
+    {
+     "w": "book",
+     "d": "Pages with writing or pictures bound together"
+    },
+    {
+     "w": "cat",
+     "d": "A small furry animal that meows"
+    },
+    {
+     "w": "dog",
+     "d": "A furry animal that barks"
+    },
+    {
+     "w": "eat",
+     "d": "To put food in your mouth and swallow it"
+    },
+    {
+     "w": "friend",
+     "d": "A person you like and enjoy being with"
+    },
+    {
+     "w": "good",
+     "d": "Of high quality or pleasant"
+    },
+    {
+     "w": "happy",
+     "d": "Feeling joy or pleasure"
+    },
+    {
+     "w": "house",
+     "d": "A building where people live"
+    },
+    {
+     "w": "jump",
+     "d": "To push yourself up into the air"
+    }
+   ]
+  },
+  {
+   "id": "4bb48369-a228-43ae-83bf-7a4b4e8dadab",
+   "origin": "curriculum",
+   "name": "More Body Parts - עוד חלקי גוף",
+   "description": "Extended body parts vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "hair",
+     "d": "שיער - Grows on your head"
+    },
+    {
+     "w": "face",
+     "d": "פנים - Front of your head"
+    },
+    {
+     "w": "teeth",
+     "d": "שיניים - You chew with these"
+    },
+    {
+     "w": "tongue",
+     "d": "לשון - Inside your mouth"
+    },
+    {
+     "w": "neck",
+     "d": "צוואר - Connects head to body"
+    },
+    {
+     "w": "shoulder",
+     "d": "כתף - Top of your arm"
+    },
+    {
+     "w": "knee",
+     "d": "ברך - Middle of your leg"
+    },
+    {
+     "w": "back",
+     "d": "גב - Behind your body"
+    },
+    {
+     "w": "stomach",
+     "d": "בטן - Where food goes"
+    },
+    {
+     "w": "heart",
+     "d": "לב - Pumps blood in your body"
+    }
+   ]
+  },
+  {
+   "id": "4d6d0033-2e4f-418b-83ba-fb396895d6d4",
+   "origin": "curriculum",
+   "name": "Seasons - עונות השנה",
+   "description": "Seasons and weather vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "summer",
+     "d": "קיץ - Hot season"
+    },
+    {
+     "w": "winter",
+     "d": "חורף - Cold season"
+    },
+    {
+     "w": "spring",
+     "d": "אביב - Flowers bloom"
+    },
+    {
+     "w": "fall",
+     "d": "סתיו - Leaves fall"
+    },
+    {
+     "w": "warm",
+     "d": "חמים - A little hot"
+    },
+    {
+     "w": "cool",
+     "d": "קריר - A little cold"
+    },
+    {
+     "w": "windy",
+     "d": "סוער - With much wind"
+    },
+    {
+     "w": "cloudy",
+     "d": "מעונן - Many clouds"
+    },
+    {
+     "w": "storm",
+     "d": "סערה - Bad weather with wind and rain"
+    },
+    {
+     "w": "rainbow",
+     "d": "קשת - Colors in the sky after rain"
+    }
+   ]
+  },
+  {
+   "id": "4e66985c-9157-45da-a857-e419246bd623",
+   "origin": "curriculum",
+   "name": "Body Parts - חלקי הגוף",
+   "description": "Basic body parts vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "head",
+     "d": "ראש - Top part of your body"
+    },
+    {
+     "w": "eye",
+     "d": "עין - You see with this"
+    },
+    {
+     "w": "ear",
+     "d": "אוזן - You hear with this"
+    },
+    {
+     "w": "nose",
+     "d": "אף - You smell with this"
+    },
+    {
+     "w": "mouth",
+     "d": "פה - You eat and talk with this"
+    },
+    {
+     "w": "hand",
+     "d": "יד - At the end of your arm"
+    },
+    {
+     "w": "foot",
+     "d": "רגל - At the end of your leg"
+    },
+    {
+     "w": "arm",
+     "d": "זרוע - Between shoulder and hand"
+    },
+    {
+     "w": "leg",
+     "d": "רגל - You walk with these"
+    },
+    {
+     "w": "finger",
+     "d": "אצבע - Five on each hand"
+    }
+   ]
+  },
+  {
+   "id": "4fdbe665-8e57-4b24-b694-981997f2dfe7",
+   "origin": "curriculum",
+   "name": "Grade 6 - History Terms",
+   "description": "Historical vocabulary for 6th grade",
+   "language": "en",
+   "grade": 6,
+   "subject": "history",
+   "words": [
+    {
+     "w": "civilization",
+     "d": "Advanced society with cities and writing"
+    },
+    {
+     "w": "empire",
+     "d": "Group of nations under one ruler"
+    },
+    {
+     "w": "democracy",
+     "d": "Government by the people"
+    },
+    {
+     "w": "monarchy",
+     "d": "Government by a king or queen"
+    },
+    {
+     "w": "revolution",
+     "d": "Major change in government or society"
+    },
+    {
+     "w": "artifact",
+     "d": "Object made by humans long ago"
+    },
+    {
+     "w": "archaeology",
+     "d": "Study of ancient objects and places"
+    },
+    {
+     "w": "primary source",
+     "d": "Document from the time being studied"
+    },
+    {
+     "w": "chronology",
+     "d": "Arrangement of events by time"
+    },
+    {
+     "w": "era",
+     "d": "Period of time with shared characteristics"
+    }
+   ]
+  },
+  {
+   "id": "514752e7-4341-4035-a012-51722fd0ba0a",
+   "origin": "curriculum",
+   "name": "אוצר מילים - עוד חלקי גוף",
+   "description": "More Hebrew body parts vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "לֵב",
+     "d": "Heart - שואב דם"
+    },
+    {
+     "w": "בֶּטֶן",
+     "d": "Stomach - לשם הולך האוכל"
+    },
+    {
+     "w": "גַּב",
+     "d": "Back - מאחורי הגוף"
+    },
+    {
+     "w": "צַוָּאר",
+     "d": "Neck - מחבר ראש לגוף"
+    },
+    {
+     "w": "כָּתֵף",
+     "d": "Shoulder - למעלה מהזרוע"
+    },
+    {
+     "w": "בֶּרֶךְ",
+     "d": "Knee - באמצע הרגל"
+    },
+    {
+     "w": "שִׁינַּיִם",
+     "d": "Teeth - לועסים איתם"
+    },
+    {
+     "w": "לָשׁוֹן",
+     "d": "Tongue - בתוך הפה"
+    },
+    {
+     "w": "זְרוֹעַ",
+     "d": "Arm - בין כתף ליד"
+    },
+    {
+     "w": "בֹּהֶן",
+     "d": "Thumb - אצבע גדולה"
+    }
+   ]
+  },
+  {
+   "id": "519849a6-a2ba-475d-908a-6e4261394775",
+   "origin": "curriculum",
+   "name": "Adjectives - שמות תואר",
+   "description": "Common adjectives aligned with Band 1",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "big",
+     "d": "גדול - Large in size"
+    },
+    {
+     "w": "small",
+     "d": "קטן - Little in size"
+    },
+    {
+     "w": "happy",
+     "d": "שמח - Feeling good"
+    },
+    {
+     "w": "sad",
+     "d": "עצוב - Not happy"
+    },
+    {
+     "w": "good",
+     "d": "טוב - Positive quality"
+    },
+    {
+     "w": "bad",
+     "d": "רע - Negative quality"
+    },
+    {
+     "w": "new",
+     "d": "חדש - Not old"
+    },
+    {
+     "w": "old",
+     "d": "ישן - Not new"
+    },
+    {
+     "w": "fast",
+     "d": "מהיר - Quick"
+    },
+    {
+     "w": "slow",
+     "d": "איטי - Not fast"
+    }
+   ]
+  },
+  {
+   "id": "51ba1cfc-b3a5-4981-a0ce-ecb1f88906d7",
+   "origin": "curriculum",
+   "name": "Colors - צבעים",
+   "description": "Basic colors vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "red",
+     "d": "אדום - The color of fire and blood"
+    },
+    {
+     "w": "blue",
+     "d": "כחול - The color of the sky"
+    },
+    {
+     "w": "green",
+     "d": "ירוק - The color of grass"
+    },
+    {
+     "w": "yellow",
+     "d": "צהוב - The color of the sun"
+    },
+    {
+     "w": "orange",
+     "d": "כתום - The color of an orange fruit"
+    },
+    {
+     "w": "purple",
+     "d": "סגול - Mix of red and blue"
+    },
+    {
+     "w": "pink",
+     "d": "ורוד - Light red color"
+    },
+    {
+     "w": "black",
+     "d": "שחור - The darkest color"
+    },
+    {
+     "w": "white",
+     "d": "לבן - The lightest color"
+    },
+    {
+     "w": "brown",
+     "d": "חום - The color of chocolate"
+    }
+   ]
+  },
+  {
+   "id": "53d170d5-e5b2-4538-90b0-5ed4b34a4410",
+   "origin": "curriculum",
+   "name": "Grade 11 - Academic Writing",
+   "description": "Vocabulary for academic writing and essays",
+   "language": "en",
+   "grade": 11,
+   "subject": "english",
+   "words": [
+    {
+     "w": "corroborate",
+     "d": "To confirm or support with evidence"
+    },
+    {
+     "w": "discrepancy",
+     "d": "A difference between things that should match"
+    },
+    {
+     "w": "eloquent",
+     "d": "Fluent and persuasive in speaking"
+    },
+    {
+     "w": "hypothetical",
+     "d": "Based on possible situations, not real"
+    },
+    {
+     "w": "impartial",
+     "d": "Treating all sides equally, fair"
+    },
+    {
+     "w": "juxtapose",
+     "d": "To place close together for comparison"
+    },
+    {
+     "w": "meticulous",
+     "d": "Showing great attention to detail"
+    },
+    {
+     "w": "nuance",
+     "d": "A subtle difference in meaning"
+    },
+    {
+     "w": "pragmatic",
+     "d": "Dealing with things practically"
+    },
+    {
+     "w": "substantiate",
+     "d": "To provide evidence to prove"
+    }
+   ]
+  },
+  {
+   "id": "5471c11d-dbec-4b3f-af28-b188d768b61a",
+   "origin": "curriculum",
+   "name": "כיתה יב - מילים לבגרות מתקדמת",
+   "description": "אוצר מילים לבגרות ברמה גבוהה",
+   "language": "he",
+   "grade": 12,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "דיכוטומיה",
+     "d": "חלוקה לשני חלקים מנוגדים"
+    },
+    {
+     "w": "אפיסטמולוגיה",
+     "d": "תורת הידיעה והמדע"
+    },
+    {
+     "w": "אונטולוגיה",
+     "d": "תורת המציאות והיש"
+    },
+    {
+     "w": "הרמנויטיקה",
+     "d": "תורת הפרשנות"
+    },
+    {
+     "w": "דיאלקטיקה",
+     "d": "שיטת מחשבה של ניגודים"
+    },
+    {
+     "w": "רדוקציה",
+     "d": "פישוט והקטנה של מורכבות"
+    },
+    {
+     "w": "דטרמיניזם",
+     "d": "גישה שהכל נקבע מראש"
+    },
+    {
+     "w": "רלטיביזם",
+     "d": "גישה שאין אמת מוחלטת"
+    },
+    {
+     "w": "אקזיסטנציאליזם",
+     "d": "פילוסופיה של הקיום"
+    },
+    {
+     "w": "פוסטמודרניזם",
+     "d": "ביקורת על הנרטיב הגדול"
+    }
+   ]
+  },
+  {
+   "id": "58b45b5f-c74c-4f6b-a77e-e53c6e73c544",
+   "origin": "curriculum",
+   "name": "כיתה ט - מילים לתיכון",
+   "description": "אוצר מילים להכנה לתיכון",
+   "language": "he",
+   "grade": 9,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "אידיאולוגיה",
+     "d": "מערכת של אמונות ורעיונות"
+    },
+    {
+     "w": "דילמה",
+     "d": "בחירה קשה בין אפשרויות"
+    },
+    {
+     "w": "פרדוקס",
+     "d": "משהו שנראה סותר את עצמו"
+    },
+    {
+     "w": "אמביוולנטי",
+     "d": "תחושות מעורבות של כן ולא"
+    },
+    {
+     "w": "רלוונטי",
+     "d": "קשור ומתאים לנושא"
+    },
+    {
+     "w": "אובייקטיבי",
+     "d": "ללא דעה אישית, ניטרלי"
+    },
+    {
+     "w": "סובייקטיבי",
+     "d": "מבוסס על דעה אישית"
+    },
+    {
+     "w": "אמפיריה",
+     "d": "ידע המבוסס על ניסיון"
+    },
+    {
+     "w": "היפותזה",
+     "d": "השערה שאפשר לבדוק"
+    },
+    {
+     "w": "אנלוגיה",
+     "d": "השוואה בין דברים דומים"
+    }
+   ]
+  },
+  {
+   "id": "5c312e62-5851-4d79-afd2-9fda1962f8b3",
+   "origin": "curriculum",
+   "name": "אוצר מילים - רגשות",
+   "description": "Hebrew emotions vocabulary",
+   "language": "he",
+   "grade": 3,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "שִׂמְחָה",
+     "d": "Happiness - רגש טוב"
+    },
+    {
+     "w": "עֶצֶב",
+     "d": "Sadness - רגש רע"
+    },
+    {
+     "w": "כַּעַס",
+     "d": "Anger - רגש של זעם"
+    },
+    {
+     "w": "פַּחַד",
+     "d": "Fear - רגש של דאגה"
+    },
+    {
+     "w": "אַהֲבָה",
+     "d": "Love - רגש חם וחיובי"
+    },
+    {
+     "w": "הַפְתָּעָה",
+     "d": "Surprise - לא ציפית"
+    },
+    {
+     "w": "גַּאֲוָה",
+     "d": "Pride - רגש של הישג"
+    },
+    {
+     "w": "בּוּשָׁה",
+     "d": "Shame - רגש של מבוכה"
+    },
+    {
+     "w": "קִנְאָה",
+     "d": "Jealousy - לרצות משהו של אחר"
+    },
+    {
+     "w": "תִּקְוָה",
+     "d": "Hope - אמונה בטוב"
+    }
+   ]
+  },
+  {
+   "id": "5e141001-57d1-4abf-82b2-a4bc9af21437",
+   "origin": "curriculum",
+   "name": "כיתה ב - מילים יומיומיות",
+   "description": "אוצר מילים יומיומי לתלמידי כיתה ב",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "ספר",
+     "d": "דפים עם כתב או תמונות"
+    },
+    {
+     "w": "עיפרון",
+     "d": "כלי לכתיבה וציור"
+    },
+    {
+     "w": "מחברת",
+     "d": "דפים לכתיבה בבית הספר"
+    },
+    {
+     "w": "שולחן",
+     "d": "רהיט שעליו אוכלים או כותבים"
+    },
+    {
+     "w": "כיסא",
+     "d": "רהיט שיושבים עליו"
+    },
+    {
+     "w": "חלון",
+     "d": "פתח בקיר עם זכוכית"
+    },
+    {
+     "w": "דלת",
+     "d": "פתח לכניסה ויציאה"
+    },
+    {
+     "w": "פרח",
+     "d": "צמח יפה וצבעוני"
+    },
+    {
+     "w": "עץ",
+     "d": "צמח גבוה עם גזע וענפים"
+    },
+    {
+     "w": "ציפור",
+     "d": "חיה עם כנפיים שעפה"
+    }
+   ]
+  },
+  {
+   "id": "6019b77f-f90d-4146-b6c0-4959a3d2e23e",
+   "origin": "curriculum",
+   "name": "אוצר מילים - חלקי הגוף",
+   "description": "Hebrew body parts vocabulary",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "רֹאשׁ",
+     "d": "Head - חלק עליון של הגוף"
+    },
+    {
+     "w": "עַיִן",
+     "d": "Eye - רואים איתה"
+    },
+    {
+     "w": "אֹזֶן",
+     "d": "Ear - שומעים איתה"
+    },
+    {
+     "w": "אַף",
+     "d": "Nose - מריחים איתו"
+    },
+    {
+     "w": "פֶּה",
+     "d": "Mouth - אוכלים ומדברים"
+    },
+    {
+     "w": "יָד",
+     "d": "Hand - בסוף הזרוע"
+    },
+    {
+     "w": "רֶגֶל",
+     "d": "Leg/Foot - הולכים איתה"
+    },
+    {
+     "w": "אֶצְבַּע",
+     "d": "Finger - חמש בכל יד"
+    },
+    {
+     "w": "שֵׂעָר",
+     "d": "Hair - גדל על הראש"
+    },
+    {
+     "w": "פָּנִים",
+     "d": "Face - חלק קדמי של הראש"
+    }
+   ]
+  },
+  {
+   "id": "61b50b7d-fd14-43bd-bfa0-7492d2243cc8",
+   "origin": "curriculum",
+   "name": "Grado 5 — Vocabulario Descriptivo",
+   "description": "Palabras descriptivas y adjetivos para expresar matices del lenguaje.",
+   "language": "es",
+   "grade": 5,
+   "subject": "general",
+   "words": [
+    {
+     "w": "veloz",
+     "d": "Que se mueve muy rápido"
+    },
+    {
+     "w": "lento",
+     "d": "Que se mueve despacio"
+    },
+    {
+     "w": "enorme",
+     "d": "Muy grande en tamaño"
+    },
+    {
+     "w": "diminuto",
+     "d": "Muy pequeño"
+    },
+    {
+     "w": "hermoso",
+     "d": "Que es muy bonito o agradable a la vista"
+    },
+    {
+     "w": "feo",
+     "d": "Que no es agradable de ver"
+    },
+    {
+     "w": "raro",
+     "d": "Que es poco común o extraño"
+    },
+    {
+     "w": "brillante",
+     "d": "Que brilla o es muy inteligente"
+    },
+    {
+     "w": "oscuro",
+     "d": "Que tiene poca luz"
+    },
+    {
+     "w": "claro",
+     "d": "Que tiene mucha luz"
+    },
+    {
+     "w": "silencioso",
+     "d": "Que no hace ruido"
+    },
+    {
+     "w": "suave",
+     "d": "Que es liso y agradable al tacto"
+    },
+    {
+     "w": "áspero",
+     "d": "Que es rudo al tacto"
+    },
+    {
+     "w": "antiguo",
+     "d": "Que es muy viejo"
+    },
+    {
+     "w": "moderno",
+     "d": "Que es nuevo y contemporáneo"
+    }
+   ]
+  },
+  {
+   "id": "62ccb8ee-d951-44c4-b632-18e241a69cb7",
+   "origin": "curriculum",
+   "name": "Action Verbs - פעלים",
+   "description": "Basic action verbs aligned with Band 1",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "run",
+     "d": "לרוץ - Move fast on feet"
+    },
+    {
+     "w": "walk",
+     "d": "ללכת - Move on feet slowly"
+    },
+    {
+     "w": "jump",
+     "d": "לקפוץ - Go up in the air"
+    },
+    {
+     "w": "eat",
+     "d": "לאכול - Put food in mouth"
+    },
+    {
+     "w": "drink",
+     "d": "לשתות - Swallow liquid"
+    },
+    {
+     "w": "sleep",
+     "d": "לישון - Rest at night"
+    },
+    {
+     "w": "play",
+     "d": "לשחק - Have fun"
+    },
+    {
+     "w": "sing",
+     "d": "לשיר - Make music with voice"
+    },
+    {
+     "w": "dance",
+     "d": "לרקוד - Move to music"
+    },
+    {
+     "w": "swim",
+     "d": "לשחות - Move in water"
+    }
+   ]
+  },
+  {
+   "id": "66611538-0488-4823-934f-05bb89c1159c",
+   "origin": "curriculum",
+   "name": "Grado 3 — Emociones y Características",
+   "description": "Palabras sobre emociones, sentimientos y cualidades del carácter.",
+   "language": "es",
+   "grade": 3,
+   "subject": "general",
+   "words": [
+    {
+     "w": "feliz",
+     "d": "Que siente alegría y bienestar"
+    },
+    {
+     "w": "triste",
+     "d": "Que siente dolor o melancolía"
+    },
+    {
+     "w": "enojado",
+     "d": "Que siente ira o irritación"
+    },
+    {
+     "w": "miedo",
+     "d": "Emoción de temor ante algo peligroso"
+    },
+    {
+     "w": "valiente",
+     "d": "Que no tiene miedo y es atrevido"
+    },
+    {
+     "w": "amable",
+     "d": "Que es bondadoso y trata bien a los demás"
+    },
+    {
+     "w": "trabajador",
+     "d": "Que trabaja mucho sin pereza"
+    },
+    {
+     "w": "honesto",
+     "d": "Que dice la verdad siempre"
+    },
+    {
+     "w": "paciente",
+     "d": "Que puede esperar sin molestarse"
+    },
+    {
+     "w": "orgulloso",
+     "d": "Que tiene mucho amor propio o estima"
+    },
+    {
+     "w": "tímido",
+     "d": "Que tiene vergüenza de hablar o actuar"
+    },
+    {
+     "w": "curioso",
+     "d": "Que quiere saber y explorar nuevas cosas"
+    },
+    {
+     "w": "generoso",
+     "d": "Que gusta dar y compartir con otros"
+    },
+    {
+     "w": "calmado",
+     "d": "Que está tranquilo y sin prisa"
+    },
+    {
+     "w": "ruidoso",
+     "d": "Que hace mucho ruido"
+    }
+   ]
+  },
+  {
+   "id": "67ee3d31-969c-4fee-a167-6b39407a443e",
+   "origin": "curriculum",
+   "name": "Grade 5 - Math Terms",
+   "description": "Mathematical vocabulary for 5th grade",
+   "language": "en",
+   "grade": 5,
+   "subject": "math",
+   "words": [
+    {
+     "w": "fraction",
+     "d": "Part of a whole number"
+    },
+    {
+     "w": "decimal",
+     "d": "Number with a point separating wholes"
+    },
+    {
+     "w": "percent",
+     "d": "Parts per hundred"
+    },
+    {
+     "w": "numerator",
+     "d": "Top number in a fraction"
+    },
+    {
+     "w": "denominator",
+     "d": "Bottom number in a fraction"
+    },
+    {
+     "w": "equation",
+     "d": "Math statement with equals sign"
+    },
+    {
+     "w": "variable",
+     "d": "Letter representing an unknown number"
+    },
+    {
+     "w": "perimeter",
+     "d": "Distance around a shape"
+    },
+    {
+     "w": "area",
+     "d": "Space inside a flat shape"
+    },
+    {
+     "w": "volume",
+     "d": "Space inside a 3D shape"
+    }
+   ]
+  },
+  {
+   "id": "6887abd8-5cd6-4248-9406-e08a7d7b72b3",
+   "origin": "curriculum",
+   "name": "אוצר מילים - מקצועות",
+   "description": "Hebrew professions vocabulary",
+   "language": "he",
+   "grade": 4,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "רוֹפֵא",
+     "d": "Doctor - עוזר לחולים"
+    },
+    {
+     "w": "אָח/אָחוֹת",
+     "d": "Nurse - עוזר לרופא"
+    },
+    {
+     "w": "כַּבַּאי",
+     "d": "Firefighter - מכבה שריפות"
+    },
+    {
+     "w": "שׁוֹטֵר",
+     "d": "Police officer - שומר על הסדר"
+    },
+    {
+     "w": "שֶׁף",
+     "d": "Chef - מבשל אוכל"
+    },
+    {
+     "w": "חַקְלַאי",
+     "d": "Farmer - מגדל אוכל"
+    },
+    {
+     "w": "טַיָּס",
+     "d": "Pilot - מטיס מטוסים"
+    },
+    {
+     "w": "רוֹפֵא שִׁינַּיִם",
+     "d": "Dentist - מטפל בשיניים"
+    },
+    {
+     "w": "מְהַנְדֵּס",
+     "d": "Engineer - מתכנן ובונה"
+    },
+    {
+     "w": "מַדְעָן",
+     "d": "Scientist - חוקר ומגלה"
+    }
+   ]
+  },
+  {
+   "id": "69049efd-78ab-4e94-80bd-31e85cdd877f",
+   "origin": "curriculum",
+   "name": "כיתה ג׳ — רגשות ותכונות",
+   "description": "מילות רגש ותכונות אופי לכיתה ג׳.",
+   "language": "he",
+   "grade": 3,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "שמח",
+     "d": "מרגיש טוב ומלא חדווה"
+    },
+    {
+     "w": "עצוב",
+     "d": "מרגיש רע ולא טוב"
+    },
+    {
+     "w": "כועס",
+     "d": "מרגיש כעס ורוגז"
+    },
+    {
+     "w": "מפחד",
+     "d": "חושש ממשהו"
+    },
+    {
+     "w": "גאה",
+     "d": "מרוצה מעצמו או מאחר"
+    },
+    {
+     "w": "אמיץ",
+     "d": "לא נכנע לפחד ומתמודד"
+    },
+    {
+     "w": "נדיב",
+     "d": "אוהב לתת ולשתף"
+    },
+    {
+     "w": "סקרן",
+     "d": "רוצה לדעת ולגלות"
+    },
+    {
+     "w": "חרוץ",
+     "d": "עובד קשה ולא מתעצל"
+    },
+    {
+     "w": "ישר",
+     "d": "אומר אמת ולא משקר"
+    },
+    {
+     "w": "סבלני",
+     "d": "יודע לחכות ברוגע"
+    },
+    {
+     "w": "רגוע",
+     "d": "נינוח ולא לחוץ"
+    },
+    {
+     "w": "ביישן",
+     "d": "מתבייש לדבר מול אחרים"
+    },
+    {
+     "w": "נלהב",
+     "d": "מלא התלהבות ושמחה"
+    },
+    {
+     "w": "אכפתי",
+     "d": "דואג לאחרים"
+    }
+   ]
+  },
+  {
+   "id": "692b2df8-cdf7-4dce-8f22-61070824675a",
+   "origin": "curriculum",
+   "name": "Grade 4 - Maps and Places",
+   "description": "Basic geography vocabulary for 4th grade",
+   "language": "en",
+   "grade": 4,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "map",
+     "d": "Drawing of an area from above"
+    },
+    {
+     "w": "globe",
+     "d": "Round model of Earth"
+    },
+    {
+     "w": "compass",
+     "d": "Tool showing directions"
+    },
+    {
+     "w": "north",
+     "d": "Direction toward top of map"
+    },
+    {
+     "w": "equator",
+     "d": "Line around middle of Earth"
+    },
+    {
+     "w": "island",
+     "d": "Land surrounded by water"
+    },
+    {
+     "w": "peninsula",
+     "d": "Land surrounded by water on three sides"
+    },
+    {
+     "w": "mountain",
+     "d": "Very high land formation"
+    },
+    {
+     "w": "valley",
+     "d": "Low land between mountains"
+    },
+    {
+     "w": "river",
+     "d": "Large flowing body of water"
+    }
+   ]
+  },
+  {
+   "id": "69c908b4-d736-40b8-bc9a-61e22c4039b9",
+   "origin": "curriculum",
+   "name": "אוצר מילים - פעילויות בית ספר",
+   "description": "Hebrew school activities vocabulary",
+   "language": "he",
+   "grade": 3,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "לִקְרוֹא",
+     "d": "To read - להסתכל במילים"
+    },
+    {
+     "w": "לִכְתּוֹב",
+     "d": "To write - ליצור מילים"
+    },
+    {
+     "w": "לִלְמוֹד",
+     "d": "To learn - לקבל ידע"
+    },
+    {
+     "w": "לְצַיֵּר",
+     "d": "To draw - ליצור תמונות"
+    },
+    {
+     "w": "לִסְפּוֹר",
+     "d": "To count - לומר מספרים"
+    },
+    {
+     "w": "מִבְחָן",
+     "d": "Test - בדיקת ידע"
+    },
+    {
+     "w": "שִׁיעוּרֵי בַּיִת",
+     "d": "Homework - עבודה בבית"
+    },
+    {
+     "w": "תְּשׁוּבָה",
+     "d": "Answer - מענה לשאלה"
+    },
+    {
+     "w": "שְׁאֵלָה",
+     "d": "Question - מה שואלים"
+    },
+    {
+     "w": "לְהַקְשִׁיב",
+     "d": "To listen - לשמוע בתשומת לב"
+    }
+   ]
+  },
+  {
+   "id": "6a41dae1-1e45-48c6-9303-822154a0e283",
+   "origin": "curriculum",
+   "name": "כיתה ה׳ — מדע וטבע",
+   "description": "אוצר מילים במדע לכיתה ה׳: ביולוגיה, כימיה וקדמי.",
+   "language": "he",
+   "grade": 5,
+   "subject": "science",
+   "words": [
+    {
+     "w": "אורגניזם",
+     "d": "יצור חי או בעל חיים"
+    },
+    {
+     "w": "תא",
+     "d": "יחידה קטנה של כל חיים"
+    },
+    {
+     "w": "מטבוליזם",
+     "d": "תהליך שינוי חומרים בגוף"
+    },
+    {
+     "w": "פוטוסינתזה",
+     "d": "תהליך שבו צמחים עושים מזון מאור"
+    },
+    {
+     "w": "חלבון",
+     "d": "חומר חיוני לבנייה וחלקי הגוף"
+    },
+    {
+     "w": "פחמימה",
+     "d": "חומר שנותן אנרגיה"
+    },
+    {
+     "w": "ליפיד",
+     "d": "שומן או חומר שומני"
+    },
+    {
+     "w": "ביטחון",
+     "d": "נוזל שמזיז דברים בתוך הגוף"
+    },
+    {
+     "w": "הדום",
+     "d": "מה שמרגישים עם החושים"
+    },
+    {
+     "w": "אקוסיסטם",
+     "d": "קבוצת אורגניזמים וסביבתם"
+    },
+    {
+     "w": "מזון",
+     "d": "שרשרת של מקורות אנרגיה בטבע"
+    },
+    {
+     "w": "טורף",
+     "d": "יצור שאוכל בעלי חיים אחרים"
+    },
+    {
+     "w": "טרף",
+     "d": "יצור שנאכל על ידי טורף"
+    },
+    {
+     "w": "בעבור",
+     "d": "מקום בו חיים בעלי חיים"
+    },
+    {
+     "w": "גן",
+     "d": "מרחב טבעי עם סוג מסוים של סביבה"
+    }
+   ]
+  },
+  {
+   "id": "6b8b0e2f-8128-45bc-a538-ff028c20b987",
+   "origin": "curriculum",
+   "name": "אוצר מילים - בית ספר",
+   "description": "Hebrew school vocabulary for elementary students",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "בֵּית סֵפֶר",
+     "d": "School - מקום ללמידה"
+    },
+    {
+     "w": "מוֹרֶה",
+     "d": "Teacher - מי שמלמד"
+    },
+    {
+     "w": "תַּלְמִיד",
+     "d": "Student - מי שלומד"
+    },
+    {
+     "w": "כִּיתָה",
+     "d": "Classroom - חדר ללימוד"
+    },
+    {
+     "w": "סֵפֶר",
+     "d": "Book - יש בו דפים לקריאה"
+    },
+    {
+     "w": "מַחְבֶּרֶת",
+     "d": "Notebook - לכתיבת הערות"
+    },
+    {
+     "w": "עִפָּרוֹן",
+     "d": "Pencil - לכתיבה"
+    },
+    {
+     "w": "עֵט",
+     "d": "Pen - כותב בדיו"
+    },
+    {
+     "w": "שֻׁלְחָן",
+     "d": "Desk/Table - משטח לעבודה"
+    },
+    {
+     "w": "כִּיסֵא",
+     "d": "Chair - לישיבה"
+    }
+   ]
+  },
+  {
+   "id": "6e2c66e8-0cbc-4a53-b365-9ce2d73762d0",
+   "origin": "curriculum",
+   "name": "אוצר מילים - טכנולוגיה",
+   "description": "Hebrew technology vocabulary",
+   "language": "he",
+   "grade": 4,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "מַחְשֵׁב",
+     "d": "Computer - מכשיר אלקטרוני"
+    },
+    {
+     "w": "טֶלֶפוֹן",
+     "d": "Phone - מכשיר לדיבור"
+    },
+    {
+     "w": "אִינְטֶרְנֶט",
+     "d": "Internet - רשת מחשבים"
+    },
+    {
+     "w": "מָסָךְ",
+     "d": "Screen - תצוגה במכשיר"
+    },
+    {
+     "w": "מִקְלֶדֶת",
+     "d": "Keyboard - להקלדת אותיות"
+    },
+    {
+     "w": "עַכְבָּר",
+     "d": "Mouse - ללחיצה על המסך"
+    },
+    {
+     "w": "טַאבְּלֶט",
+     "d": "Tablet - מכשיר מסך מגע"
+    },
+    {
+     "w": "מַצְלֵמָה",
+     "d": "Camera - לצילום תמונות"
+    },
+    {
+     "w": "וִידֵאוֹ",
+     "d": "Video - תמונות נעות"
+    },
+    {
+     "w": "מִשְׂחָק",
+     "d": "Game - לשחק להנאה"
+    }
+   ]
+  },
+  {
+   "id": "7184e4cf-cef5-45d4-ba00-c6a512e8a96d",
+   "origin": "curriculum",
+   "name": "Grado 8 — Matemáticas Avanzadas",
+   "description": "Vocabulario matemático para octavo grado: álgebra, geometría y proporciones.",
+   "language": "es",
+   "grade": 8,
+   "subject": "math",
+   "words": [
+    {
+     "w": "ecuación",
+     "d": "Expresión matemática que muestra igualdad"
+    },
+    {
+     "w": "variable",
+     "d": "Símbolo que representa un número desconocido"
+    },
+    {
+     "w": "coeficiente",
+     "d": "Número que multiplica una variable"
+    },
+    {
+     "w": "álgebra",
+     "d": "Rama de las matemáticas que usa símbolos y letras"
+    },
+    {
+     "w": "geometría",
+     "d": "Rama de las matemáticas que estudia formas y espacios"
+    },
+    {
+     "w": "ángulo",
+     "d": "Espacio formado por dos líneas que se encuentran"
+    },
+    {
+     "w": "trigonometría",
+     "d": "Estudio de ángulos y triángulos"
+    },
+    {
+     "w": "función",
+     "d": "Relación entre dos cantidades"
+    },
+    {
+     "w": "gráfico",
+     "d": "Dibujo que muestra relación entre números"
+    },
+    {
+     "w": "proporcionalidad",
+     "d": "Relación donde dos cantidades aumentan o disminuyen juntas"
+    },
+    {
+     "w": "porcentaje",
+     "d": "Parte de 100"
+    },
+    {
+     "w": "probabilidad",
+     "d": "Chance o posibilidad de que algo ocurra"
+    },
+    {
+     "w": "estadística",
+     "d": "Ciencia de recopilar y analizar datos numéricos"
+    },
+    {
+     "w": "media",
+     "d": "Promedio de un conjunto de números"
+    },
+    {
+     "w": "mediana",
+     "d": "Número del medio en una lista ordenada"
+    }
+   ]
+  },
+  {
+   "id": "743c2837-8503-4949-b981-82b4447b60ed",
+   "origin": "curriculum",
+   "name": "אוצר מילים - שמות תואר",
+   "description": "Hebrew adjectives vocabulary",
+   "language": "he",
+   "grade": 3,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "גָּדוֹל",
+     "d": "Big - בגודל רב"
+    },
+    {
+     "w": "קָטָן",
+     "d": "Small - בגודל מועט"
+    },
+    {
+     "w": "שָׂמֵחַ",
+     "d": "Happy - מרגיש טוב"
+    },
+    {
+     "w": "עָצוּב",
+     "d": "Sad - לא שמח"
+    },
+    {
+     "w": "טוֹב",
+     "d": "Good - איכות חיובית"
+    },
+    {
+     "w": "רַע",
+     "d": "Bad - איכות שלילית"
+    },
+    {
+     "w": "חָדָשׁ",
+     "d": "New - לא ישן"
+    },
+    {
+     "w": "יָשָׁן",
+     "d": "Old - לא חדש"
+    },
+    {
+     "w": "מָהִיר",
+     "d": "Fast - מהירות גבוהה"
+    },
+    {
+     "w": "אִיטִי",
+     "d": "Slow - מהירות נמוכה"
+    }
+   ]
+  },
+  {
+   "id": "77162640-d7de-495a-b16c-06e442bfac1b",
+   "origin": "curriculum",
+   "name": "Professions - מקצועות",
+   "description": "Jobs and professions vocabulary",
+   "language": "en",
+   "grade": 4,
+   "subject": "english",
+   "words": [
+    {
+     "w": "doctor",
+     "d": "רופא - Helps sick people"
+    },
+    {
+     "w": "nurse",
+     "d": "אח/אחות - Helps doctors"
+    },
+    {
+     "w": "firefighter",
+     "d": "כבאי - Puts out fires"
+    },
+    {
+     "w": "police officer",
+     "d": "שוטר - Keeps people safe"
+    },
+    {
+     "w": "chef",
+     "d": "שף - Cooks food"
+    },
+    {
+     "w": "farmer",
+     "d": "חקלאי - Grows food"
+    },
+    {
+     "w": "pilot",
+     "d": "טייס - Flies airplanes"
+    },
+    {
+     "w": "dentist",
+     "d": "רופא שיניים - Fixes teeth"
+    },
+    {
+     "w": "engineer",
+     "d": "מהנדס - Designs and builds"
+    },
+    {
+     "w": "scientist",
+     "d": "מדען - Studies and discovers"
+    }
+   ]
+  },
+  {
+   "id": "7819990c-80f7-418b-ad68-66993e4224c8",
+   "origin": "curriculum",
+   "name": "כיתה ו׳ — היסטוריה ותרבות",
+   "description": "מילים היסטוריות וערכים תרבותיים לכיתה ו׳.",
+   "language": "he",
+   "grade": 6,
+   "subject": "history",
+   "words": [
+    {
+     "w": "תרבות",
+     "d": "דרכי חיים, אמונות וממנהגי עם"
+    },
+    {
+     "w": "קדום",
+     "d": "מזמן עתיק מאוד"
+    },
+    {
+     "w": "ממלכה",
+     "d": "ארץ שנשלטת על ידי מלך"
+    },
+    {
+     "w": "אימפריה",
+     "d": "קבוצה גדולה של ממלכות תחת שלטון אחד"
+    },
+    {
+     "w": "עדי",
+     "d": "קבוצת אנשים עם מוצא משותף"
+    },
+    {
+     "w": "אזרח",
+     "d": "תושב של מדינה עם זכויות"
+    },
+    {
+     "w": "מהיגרה",
+     "d": "תנועה של אנשים לארץ חדשה"
+    },
+    {
+     "w": "סוד",
+     "d": "מלחמה בעלת משמעות היסטורית"
+    },
+    {
+     "w": "שלום",
+     "d": "עצירה של קונפליקט או מלחמה"
+    },
+    {
+     "w": "מדיניות",
+     "d": "כללי ממשלה או ארגון"
+    },
+    {
+     "w": "זכויות",
+     "d": "חופשויות שמגיעות לאדם"
+    },
+    {
+     "w": "חובה",
+     "d": "אחריות שצריך לקיימה"
+    },
+    {
+     "w": "מוסד",
+     "d": "ארגון או הקמה מסודרת"
+    },
+    {
+     "w": "דמוקרטיה",
+     "d": "ממשלה שבה העם יש כוח"
+    },
+    {
+     "w": "סמל",
+     "d": "דבר המייצג דבר אחר"
+    }
+   ]
+  },
+  {
+   "id": "78834c68-ed7d-4b0b-8c1b-202277239a6c",
+   "origin": "curriculum",
+   "name": "Extended Family - משפחה מורחבת",
+   "description": "Extended family vocabulary for Band 1",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "grandmother",
+     "d": "סבתא - Mother of your parent"
+    },
+    {
+     "w": "grandfather",
+     "d": "סבא - Father of your parent"
+    },
+    {
+     "w": "aunt",
+     "d": "דודה - Sister of your parent"
+    },
+    {
+     "w": "uncle",
+     "d": "דוד - Brother of your parent"
+    },
+    {
+     "w": "cousin",
+     "d": "בן/בת דוד - Child of aunt or uncle"
+    },
+    {
+     "w": "parent",
+     "d": "הורה - Mother or father"
+    },
+    {
+     "w": "child",
+     "d": "ילד - A young person"
+    },
+    {
+     "w": "children",
+     "d": "ילדים - More than one child"
+    },
+    {
+     "w": "people",
+     "d": "אנשים - More than one person"
+    },
+    {
+     "w": "neighbor",
+     "d": "שכן - Person living nearby"
+    }
+   ]
+  },
+  {
+   "id": "78d661ab-42b8-4ffc-abc4-fb831f3df7a3",
+   "origin": "curriculum",
+   "name": "Grade 7 - Ancient History",
+   "description": "Ancient history vocabulary for 7th grade",
+   "language": "en",
+   "grade": 7,
+   "subject": "history",
+   "words": [
+    {
+     "w": "pharaoh",
+     "d": "Ancient Egyptian ruler"
+    },
+    {
+     "w": "pyramid",
+     "d": "Ancient Egyptian tomb structure"
+    },
+    {
+     "w": "hieroglyphics",
+     "d": "Ancient Egyptian writing"
+    },
+    {
+     "w": "mesopotamia",
+     "d": "Ancient land between rivers"
+    },
+    {
+     "w": "dynasty",
+     "d": "Family line of rulers"
+    },
+    {
+     "w": "polytheism",
+     "d": "Belief in many gods"
+    },
+    {
+     "w": "monotheism",
+     "d": "Belief in one god"
+    },
+    {
+     "w": "temple",
+     "d": "Building for worship"
+    },
+    {
+     "w": "conquest",
+     "d": "Taking over by force"
+    },
+    {
+     "w": "tribute",
+     "d": "Payment to a ruler"
+    }
+   ]
+  },
+  {
+   "id": "7bf8d8f6-0cc1-4918-8de3-4eafa1325c38",
+   "origin": "curriculum",
+   "name": "Geography - World גאוגרפיה עולמית",
+   "description": "World geography vocabulary with Hebrew",
+   "language": "en",
+   "grade": 5,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "continent",
+     "d": "יבשת - Large land mass"
+    },
+    {
+     "w": "ocean",
+     "d": "אוקיינוס - Largest body of water"
+    },
+    {
+     "w": "equator",
+     "d": "קו המשווה - Line around middle of Earth"
+    },
+    {
+     "w": "climate",
+     "d": "אקלים - Weather over long time"
+    },
+    {
+     "w": "population",
+     "d": "אוכלוסייה - Number of people"
+    },
+    {
+     "w": "island",
+     "d": "אי - Land surrounded by water"
+    },
+    {
+     "w": "peninsula",
+     "d": "חצי אי - Land surrounded by water on 3 sides"
+    },
+    {
+     "w": "hemisphere",
+     "d": "חצי כדור - Half of Earth"
+    },
+    {
+     "w": "latitude",
+     "d": "קו רוחב - Lines going east-west"
+    },
+    {
+     "w": "longitude",
+     "d": "קו אורך - Lines going north-south"
+    }
+   ]
+  },
+  {
+   "id": "7e53f345-6d0f-4e9a-a612-4dcf9d32380d",
+   "origin": "curriculum",
+   "name": "Science - Human Body גוף האדם",
+   "description": "Human body science vocabulary with Hebrew",
+   "language": "en",
+   "grade": 5,
+   "subject": "science",
+   "words": [
+    {
+     "w": "skeleton",
+     "d": "שלד - Bones in the body"
+    },
+    {
+     "w": "muscle",
+     "d": "שריר - Helps body move"
+    },
+    {
+     "w": "heart",
+     "d": "לב - Pumps blood"
+    },
+    {
+     "w": "lung",
+     "d": "ריאה - For breathing"
+    },
+    {
+     "w": "brain",
+     "d": "מוח - Controls the body"
+    },
+    {
+     "w": "blood",
+     "d": "דם - Red liquid in body"
+    },
+    {
+     "w": "organ",
+     "d": "איבר - Body part with a function"
+    },
+    {
+     "w": "digest",
+     "d": "לעכל - Break down food"
+    },
+    {
+     "w": "breathe",
+     "d": "לנשום - Take in air"
+    },
+    {
+     "w": "cell",
+     "d": "תא - Smallest unit of life"
+    }
+   ]
+  },
+  {
+   "id": "7eb9c46c-da51-48f3-b035-cf32248377c2",
+   "origin": "curriculum",
+   "name": "אוצר מילים - אוכל בסיסי",
+   "description": "Hebrew basic food vocabulary",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "לֶחֶם",
+     "d": "Bread - עשוי מקמח"
+    },
+    {
+     "w": "חָלָב",
+     "d": "Milk - משקה לבן מפרות"
+    },
+    {
+     "w": "בֵּיצָה",
+     "d": "Egg - מתרנגולת"
+    },
+    {
+     "w": "מַיִם",
+     "d": "Water - נוזל שקוף לשתייה"
+    },
+    {
+     "w": "תַּפּוּחַ",
+     "d": "Apple - פרי אדום או ירוק"
+    },
+    {
+     "w": "בָּנָנָה",
+     "d": "Banana - פרי צהוב ומעוקל"
+    },
+    {
+     "w": "גְּבִינָה",
+     "d": "Cheese - עשוי מחלב"
+    },
+    {
+     "w": "אֹרֶז",
+     "d": "Rice - גרגרים לבנים קטנים"
+    },
+    {
+     "w": "עוֹף",
+     "d": "Chicken (meat) - בשר מציפור"
+    },
+    {
+     "w": "תַּפּוּז",
+     "d": "Orange - פרי הדרים כתום"
+    }
+   ]
+  },
+  {
+   "id": "7f268693-f187-4224-b76c-06b08d76fdfb",
+   "origin": "curriculum",
+   "name": "אוצר מילים - פירות וירקות",
+   "description": "Hebrew fruits and vegetables vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "עַגְבָנִיָּה",
+     "d": "Tomato - ירק אדום לסלט"
+    },
+    {
+     "w": "מְלָפְפוֹן",
+     "d": "Cucumber - ירוק ופריך"
+    },
+    {
+     "w": "גֶּזֶר",
+     "d": "Carrot - ירק שורש כתום"
+    },
+    {
+     "w": "תַּפּוּחַ אֲדָמָה",
+     "d": "Potato - ירק שורש חום"
+    },
+    {
+     "w": "עֲנָבִים",
+     "d": "Grapes - פירות קטנים ועגולים"
+    },
+    {
+     "w": "תּוּת",
+     "d": "Strawberry - פרי קטן ואדום"
+    },
+    {
+     "w": "אֲבַטִּיחַ",
+     "d": "Watermelon - פרי גדול ירוק ואדום מבפנים"
+    },
+    {
+     "w": "בָּצָל",
+     "d": "Onion - גורם לדמעות בחיתוך"
+    },
+    {
+     "w": "חַסָּה",
+     "d": "Lettuce - עלה ירוק לסלט"
+    },
+    {
+     "w": "פִּלְפֵּל",
+     "d": "Pepper - יכול להיות אדום צהוב או ירוק"
+    }
+   ]
+  },
+  {
+   "id": "80e50f45-d9ef-43a4-b28c-86d760af817f",
+   "origin": "curriculum",
+   "name": "Grade 6 - Physical Science",
+   "description": "Physical science vocabulary for 6th grade",
+   "language": "en",
+   "grade": 6,
+   "subject": "science",
+   "words": [
+    {
+     "w": "atom",
+     "d": "Smallest particle of an element"
+    },
+    {
+     "w": "molecule",
+     "d": "Two or more atoms bonded together"
+    },
+    {
+     "w": "element",
+     "d": "Pure substance made of one type of atom"
+    },
+    {
+     "w": "compound",
+     "d": "Substance made of different elements"
+    },
+    {
+     "w": "mixture",
+     "d": "Two substances mixed but not bonded"
+    },
+    {
+     "w": "solution",
+     "d": "Mixture where one dissolves in another"
+    },
+    {
+     "w": "density",
+     "d": "How much mass in a given space"
+    },
+    {
+     "w": "force",
+     "d": "Push or pull on an object"
+    },
+    {
+     "w": "motion",
+     "d": "Change in position over time"
+    },
+    {
+     "w": "friction",
+     "d": "Force that slows moving objects"
+    }
+   ]
+  },
+  {
+   "id": "8117f0d4-7659-428c-b1f0-b784c77633d0",
+   "origin": "curriculum",
+   "name": "Grado 11 — Literatura y Lengua",
+   "description": "Vocabulario literario y del lenguaje avanzado para undécimo grado.",
+   "language": "es",
+   "grade": 11,
+   "subject": "general",
+   "words": [
+    {
+     "w": "narrativa",
+     "d": "Relato de una historia"
+    },
+    {
+     "w": "protagonista",
+     "d": "Personaje principal de una historia"
+    },
+    {
+     "w": "antagonista",
+     "d": "Personaje que se opone al protagonista"
+    },
+    {
+     "w": "trama",
+     "d": "Secuencia de eventos en una historia"
+    },
+    {
+     "w": "conflicto",
+     "d": "Problema central en una narrativa"
+    },
+    {
+     "w": "clímax",
+     "d": "Punto de mayor tensión en una historia"
+    },
+    {
+     "w": "desenlace",
+     "d": "Conclusión o final de una historia"
+    },
+    {
+     "w": "metáfora",
+     "d": "Comparación implícita entre dos cosas diferentes"
+    },
+    {
+     "w": "símil",
+     "d": "Comparación explícita usando como o parecido a"
+    },
+    {
+     "w": "ironía",
+     "d": "Expresión que significa lo opuesto de lo que se dice"
+    },
+    {
+     "w": "personificación",
+     "d": "Dar características humanas a cosas no humanas"
+    },
+    {
+     "w": "hipérbole",
+     "d": "Exageración deliberada para efecto"
+    },
+    {
+     "w": "prosa",
+     "d": "Escritura ordinaria sin ritmo específico"
+    },
+    {
+     "w": "poesía",
+     "d": "Expresión artística en verso con ritmo y rima"
+    },
+    {
+     "w": "estrofa",
+     "d": "Grupo de versos en un poema"
+    }
+   ]
+  },
+  {
+   "id": "831adc67-1fa3-4558-905e-1fd9bc6f9c62",
+   "origin": "curriculum",
+   "name": "אוצר מילים - מילות שאלה",
+   "description": "Hebrew question words vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "מָה",
+     "d": "What - שואלים על דבר"
+    },
+    {
+     "w": "מִי",
+     "d": "Who - שואלים על אדם"
+    },
+    {
+     "w": "אֵיפֹה",
+     "d": "Where - שואלים על מקום"
+    },
+    {
+     "w": "מָתַי",
+     "d": "When - שואלים על זמן"
+    },
+    {
+     "w": "לָמָּה",
+     "d": "Why - שואלים על סיבה"
+    },
+    {
+     "w": "אֵיךְ",
+     "d": "How - שואלים על אופן"
+    },
+    {
+     "w": "כַּמָּה",
+     "d": "How many/much - שואלים על כמות"
+    },
+    {
+     "w": "אֵיזֶה",
+     "d": "Which - שואלים על בחירה"
+    },
+    {
+     "w": "הַאִם",
+     "d": "Is/Are - שאלת כן או לא"
+    },
+    {
+     "w": "שֶׁל מִי",
+     "d": "Whose - שואלים על בעלות"
+    }
+   ]
+  },
+  {
+   "id": "838d9cb4-bad0-4d96-a077-8197f1fb258b",
+   "origin": "curriculum",
+   "name": "History - Israeli History היסטוריה ישראלית",
+   "description": "Israeli and Jewish history vocabulary",
+   "language": "en",
+   "grade": 6,
+   "subject": "history",
+   "words": [
+    {
+     "w": "independence",
+     "d": "עצמאות - Freedom to govern yourself"
+    },
+    {
+     "w": "declaration",
+     "d": "הכרזה - Official announcement"
+    },
+    {
+     "w": "Zionism",
+     "d": "ציונות - Movement for Jewish homeland"
+    },
+    {
+     "w": "immigration",
+     "d": "עלייה - Moving to a new country"
+    },
+    {
+     "w": "pioneer",
+     "d": "חלוץ - First settler in new land"
+    },
+    {
+     "w": "kibbutz",
+     "d": "קיבוץ - Communal settlement"
+    },
+    {
+     "w": "Holocaust",
+     "d": "שואה - Murder of Jews in WWII"
+    },
+    {
+     "w": "democracy",
+     "d": "דמוקרטיה - Government by the people"
+    },
+    {
+     "w": "parliament",
+     "d": "כנסת - Israeli legislature"
+    },
+    {
+     "w": "heritage",
+     "d": "מורשת - Traditions from the past"
+    }
+   ]
+  },
+  {
+   "id": "8480953d-10f0-4375-9592-41f6e98518ac",
+   "origin": "curriculum",
+   "name": "אוצר מילים - אנשים",
+   "description": "Hebrew people vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "יֶלֶד",
+     "d": "Boy - ילד זכר"
+    },
+    {
+     "w": "יַלְדָּה",
+     "d": "Girl - ילד נקבה"
+    },
+    {
+     "w": "חָבֵר",
+     "d": "Friend (m) - מי שאוהבים"
+    },
+    {
+     "w": "חֲבֵרָה",
+     "d": "Friend (f) - מי שאוהבים"
+    },
+    {
+     "w": "שָׁכֵן",
+     "d": "Neighbor - גר ליד"
+    },
+    {
+     "w": "אִישׁ",
+     "d": "Man - זכר מבוגר"
+    },
+    {
+     "w": "אִישָׁה",
+     "d": "Woman - נקבה מבוגרת"
+    },
+    {
+     "w": "אֲנָשִׁים",
+     "d": "People - הרבה בני אדם"
+    },
+    {
+     "w": "יְלָדִים",
+     "d": "Children - הרבה ילדים"
+    },
+    {
+     "w": "הוֹרִים",
+     "d": "Parents - אמא ואבא"
+    }
+   ]
+  },
+  {
+   "id": "8ba17654-c180-40dd-956c-5655073c123f",
+   "origin": "curriculum",
+   "name": "Meals & Drinks - ארוחות ומשקאות",
+   "description": "Meals and drinks vocabulary",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "breakfast",
+     "d": "ארוחת בוקר - Morning meal"
+    },
+    {
+     "w": "lunch",
+     "d": "ארוחת צהריים - Midday meal"
+    },
+    {
+     "w": "dinner",
+     "d": "ארוחת ערב - Evening meal"
+    },
+    {
+     "w": "juice",
+     "d": "מיץ - Drink from fruit"
+    },
+    {
+     "w": "soup",
+     "d": "מרק - Hot liquid food"
+    },
+    {
+     "w": "salad",
+     "d": "סלט - Mixed vegetables"
+    },
+    {
+     "w": "sandwich",
+     "d": "כריך - Food between bread"
+    },
+    {
+     "w": "cake",
+     "d": "עוגה - Sweet dessert"
+    },
+    {
+     "w": "ice cream",
+     "d": "גלידה - Cold sweet treat"
+    },
+    {
+     "w": "pizza",
+     "d": "פיצה - Italian food with cheese"
+    }
+   ]
+  },
+  {
+   "id": "8c28e789-1c90-4f38-841e-865b5e2ab786",
+   "origin": "curriculum",
+   "name": "Sea Animals - חיות ים",
+   "description": "Sea and ocean animals vocabulary",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "whale",
+     "d": "לווייתן - Largest sea mammal"
+    },
+    {
+     "w": "dolphin",
+     "d": "דולפין - Smart sea mammal"
+    },
+    {
+     "w": "shark",
+     "d": "כריש - Has many teeth"
+    },
+    {
+     "w": "octopus",
+     "d": "תמנון - Has eight arms"
+    },
+    {
+     "w": "crab",
+     "d": "סרטן - Has claws"
+    },
+    {
+     "w": "jellyfish",
+     "d": "מדוזה - Transparent sea animal"
+    },
+    {
+     "w": "starfish",
+     "d": "כוכב ים - Star-shaped sea animal"
+    },
+    {
+     "w": "seal",
+     "d": "כלב ים - Sea mammal with flippers"
+    },
+    {
+     "w": "penguin",
+     "d": "פינגווין - Black and white bird"
+    },
+    {
+     "w": "seahorse",
+     "d": "סוסון ים - Fish shaped like a horse"
+    }
+   ]
+  },
+  {
+   "id": "8ddf8764-b7ca-4bbf-8ecb-f5aca497023a",
+   "origin": "curriculum",
+   "name": "כיתה ה - אנגלית עם הגדרות בעברית",
+   "description": "מילים באנגלית עם הגדרות בעברית לכיתה ה",
+   "language": "he",
+   "grade": 5,
+   "subject": "english",
+   "words": [
+    {
+     "w": "weather",
+     "d": "מזג אוויר - מה שקורה בחוץ"
+    },
+    {
+     "w": "vacation",
+     "d": "חופשה - זמן חופשי מהעבודה"
+    },
+    {
+     "w": "birthday",
+     "d": "יום הולדת - היום שבו נולדת"
+    },
+    {
+     "w": "homework",
+     "d": "שיעורי בית - עבודה לבית"
+    },
+    {
+     "w": "breakfast",
+     "d": "ארוחת בוקר - אוכל בבוקר"
+    },
+    {
+     "w": "lunch",
+     "d": "ארוחת צהריים - אוכל באמצע היום"
+    },
+    {
+     "w": "dinner",
+     "d": "ארוחת ערב - אוכל בערב"
+    },
+    {
+     "w": "summer",
+     "d": "קיץ - העונה החמה"
+    },
+    {
+     "w": "winter",
+     "d": "חורף - העונה הקרה"
+    },
+    {
+     "w": "spring",
+     "d": "אביב - העונה אחרי החורף"
+    }
+   ]
+  },
+  {
+   "id": "91523134-f51e-4410-b22c-094dd66ea330",
+   "origin": "curriculum",
+   "name": "Wild Animals - חיות בר",
+   "description": "Wild animals vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "lion",
+     "d": "אריה - King of the jungle"
+    },
+    {
+     "w": "elephant",
+     "d": "פיל - Largest land animal"
+    },
+    {
+     "w": "monkey",
+     "d": "קוף - Climbs trees"
+    },
+    {
+     "w": "snake",
+     "d": "נחש - Has no legs"
+    },
+    {
+     "w": "tiger",
+     "d": "נמר - Orange with stripes"
+    },
+    {
+     "w": "bear",
+     "d": "דוב - Large furry animal"
+    },
+    {
+     "w": "rabbit",
+     "d": "ארנב - Has long ears"
+    },
+    {
+     "w": "frog",
+     "d": "צפרדע - Jumps and says ribbit"
+    },
+    {
+     "w": "butterfly",
+     "d": "פרפר - Insect with colorful wings"
+    },
+    {
+     "w": "turtle",
+     "d": "צב - Has a shell"
+    }
+   ]
+  },
+  {
+   "id": "915a6a7b-da86-4ca1-a77d-15db8be75283",
+   "origin": "curriculum",
+   "name": "Bagrut Academic Words 2",
+   "description": "More academic words for Bagrut exam",
+   "language": "en",
+   "grade": 11,
+   "subject": "english",
+   "words": [
+    {
+     "w": "context",
+     "d": "הקשר - Surrounding circumstances"
+    },
+    {
+     "w": "contribute",
+     "d": "לתרום - Give to help"
+    },
+    {
+     "w": "crucial",
+     "d": "קריטי - Very important"
+    },
+    {
+     "w": "derive",
+     "d": "לגזור - Get from a source"
+    },
+    {
+     "w": "distinct",
+     "d": "מובחן - Clearly different"
+    },
+    {
+     "w": "establish",
+     "d": "להקים - Set up"
+    },
+    {
+     "w": "evidence",
+     "d": "ראיות - Proof"
+    },
+    {
+     "w": "factor",
+     "d": "גורם - Something that influences"
+    },
+    {
+     "w": "function",
+     "d": "תפקיד - Purpose or role"
+    },
+    {
+     "w": "identify",
+     "d": "לזהות - Recognize"
+    }
+   ]
+  },
+  {
+   "id": "94e91031-3d04-410d-948d-26a65f30c7e0",
+   "origin": "curriculum",
+   "name": "Grade 8 - Middle Ages",
+   "description": "Medieval history vocabulary for 8th grade",
+   "language": "en",
+   "grade": 8,
+   "subject": "history",
+   "words": [
+    {
+     "w": "feudalism",
+     "d": "Medieval social system"
+    },
+    {
+     "w": "knight",
+     "d": "Armored warrior on horseback"
+    },
+    {
+     "w": "crusade",
+     "d": "Religious war for holy land"
+    },
+    {
+     "w": "serf",
+     "d": "Peasant bound to land"
+    },
+    {
+     "w": "manor",
+     "d": "Lord estate with village"
+    },
+    {
+     "w": "guild",
+     "d": "Organization of craftsmen"
+    },
+    {
+     "w": "plague",
+     "d": "Deadly widespread disease"
+    },
+    {
+     "w": "cathedral",
+     "d": "Large important church"
+    },
+    {
+     "w": "renaissance",
+     "d": "Rebirth of art and learning"
+    },
+    {
+     "w": "reformation",
+     "d": "Religious reform movement"
+    }
+   ]
+  },
+  {
+   "id": "96234980-a693-4770-9cd3-c11ffd3c4835",
+   "origin": "curriculum",
+   "name": "אוצר מילים - חיות בית",
+   "description": "Hebrew pets and farm animals vocabulary",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "כֶּלֶב",
+     "d": "Dog - חיית מחמד שנובחת"
+    },
+    {
+     "w": "חָתוּל",
+     "d": "Cat - חיית מחמד שמיילת"
+    },
+    {
+     "w": "פָּרָה",
+     "d": "Cow - נותנת חלב"
+    },
+    {
+     "w": "סוּס",
+     "d": "Horse - אפשר לרכוב עליו"
+    },
+    {
+     "w": "תַּרְנְגֹלֶת",
+     "d": "Chicken - נותנת ביצים"
+    },
+    {
+     "w": "בַּרְוָז",
+     "d": "Duck - ציפור ששוחה"
+    },
+    {
+     "w": "כֶּבֶשׂ",
+     "d": "Sheep - נותן צמר"
+    },
+    {
+     "w": "עֵז",
+     "d": "Goat - נותנת חלב"
+    },
+    {
+     "w": "צִיפּוֹר",
+     "d": "Bird - יש לה כנפיים"
+    },
+    {
+     "w": "דָּג",
+     "d": "Fish - חי במים"
+    }
+   ]
+  },
+  {
+   "id": "9850763b-601b-46df-b6e5-db2c57d55311",
+   "origin": "curriculum",
+   "name": "אוצר מילים - הבית",
+   "description": "Hebrew home vocabulary",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "בַּיִת",
+     "d": "House - מקום מגורים"
+    },
+    {
+     "w": "חֶדֶר",
+     "d": "Room - מרחב בתוך בית"
+    },
+    {
+     "w": "דֶּלֶת",
+     "d": "Door - נפתחת ונסגרת"
+    },
+    {
+     "w": "חַלּוֹן",
+     "d": "Window - רואים דרכו החוצה"
+    },
+    {
+     "w": "מִיטָּה",
+     "d": "Bed - לשינה"
+    },
+    {
+     "w": "רִצְפָּה",
+     "d": "Floor - תחתית החדר"
+    },
+    {
+     "w": "קִיר",
+     "d": "Wall - צד החדר"
+    },
+    {
+     "w": "גַּג",
+     "d": "Roof - חלק עליון של הבית"
+    },
+    {
+     "w": "מִטְבָּח",
+     "d": "Kitchen - חדר לבישול"
+    },
+    {
+     "w": "סָלוֹן",
+     "d": "Living room - חדר לישיבה ביחד"
+    }
+   ]
+  },
+  {
+   "id": "9dd6049c-af62-41ba-a365-7b88b2a9dd28",
+   "origin": "curriculum",
+   "name": "Numbers 1-20 - מספרים",
+   "description": "Basic numbers vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "one",
+     "d": "אחד - 1"
+    },
+    {
+     "w": "two",
+     "d": "שניים - 2"
+    },
+    {
+     "w": "three",
+     "d": "שלוש - 3"
+    },
+    {
+     "w": "four",
+     "d": "ארבע - 4"
+    },
+    {
+     "w": "five",
+     "d": "חמש - 5"
+    },
+    {
+     "w": "six",
+     "d": "שש - 6"
+    },
+    {
+     "w": "seven",
+     "d": "שבע - 7"
+    },
+    {
+     "w": "eight",
+     "d": "שמונה - 8"
+    },
+    {
+     "w": "nine",
+     "d": "תשע - 9"
+    },
+    {
+     "w": "ten",
+     "d": "עשר - 10"
+    }
+   ]
+  },
+  {
+   "id": "9faf9c14-b5c9-4b87-8f47-33d62c87a494",
+   "origin": "curriculum",
+   "name": "כיתה ז׳ — היסטוריה עתיקה",
+   "description": "מילים המתייחסות לתרבויות עתיקות ותקופות היסטוריות.",
+   "language": "he",
+   "grade": 7,
+   "subject": "history",
+   "words": [
+    {
+     "w": "ציוויליזציה",
+     "d": "חברה מתורבתת עם כתיבה ומשפט"
+    },
+    {
+     "w": "שתלטון",
+     "d": "כוח שליטה על אנשים או ארצות"
+    },
+    {
+     "w": "פרעה",
+     "d": "מלך מצרי עתיק"
+    },
+    {
+     "w": "פירמידה",
+     "d": "קברו של פרעה במצרים"
+    },
+    {
+     "w": "אריכטקטורה",
+     "d": "אמנות של בניה"
+    },
+    {
+     "w": "יומר",
+     "d": "אמן או מוזיקאי בעתיקות"
+    },
+    {
+     "w": "הערכה",
+     "d": "מחשבה דתית שעמים התקבלו"
+    },
+    {
+     "w": "זיכרון",
+     "d": "דבר שמזכיר אנשים עתיקים"
+    },
+    {
+     "w": "כתב ידות",
+     "d": "טקסט כתוב בעתיקות"
+    },
+    {
+     "w": "ארכיאולוגיה",
+     "d": "מדע שחוקר עדויות מהעבר"
+    },
+    {
+     "w": "חפר",
+     "d": "תהליך חצייה בקרקע"
+    },
+    {
+     "w": "שרידים",
+     "d": "עדויות שנשארו מהעבר"
+    },
+    {
+     "w": "דור",
+     "d": "קבוצת אנשים מתקופה אחת"
+    },
+    {
+     "w": "תחזוקה",
+     "d": "שמירה על משהו על ידי טיפול"
+    },
+    {
+     "w": "עדיפות",
+     "d": "מה שנוצר ולא טבעי"
+    }
+   ]
+  },
+  {
+   "id": "9fdc9d06-3cc1-4505-962f-a6276264e627",
+   "origin": "curriculum",
+   "name": "Home Basics - הבית שלי",
+   "description": "Basic home vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "house",
+     "d": "בית - Where you live"
+    },
+    {
+     "w": "room",
+     "d": "חדר - Space inside a house"
+    },
+    {
+     "w": "door",
+     "d": "דלת - Opens and closes"
+    },
+    {
+     "w": "window",
+     "d": "חלון - See outside through it"
+    },
+    {
+     "w": "bed",
+     "d": "מיטה - Where you sleep"
+    },
+    {
+     "w": "table",
+     "d": "שולחן - Put things on it"
+    },
+    {
+     "w": "chair",
+     "d": "כיסא - Sit on it"
+    },
+    {
+     "w": "floor",
+     "d": "רצפה - Bottom of the room"
+    },
+    {
+     "w": "wall",
+     "d": "קיר - Side of the room"
+    },
+    {
+     "w": "roof",
+     "d": "גג - Top of the house"
+    }
+   ]
+  },
+  {
+   "id": "a03370e7-c058-4bc8-b098-58a3a74a4caf",
+   "origin": "curriculum",
+   "name": "כיתה י - מילים לבגרות",
+   "description": "אוצר מילים להכנה לבגרות בעברית",
+   "language": "he",
+   "grade": 10,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "רטוריקה",
+     "d": "אומנות השכנוע בדיבור"
+    },
+    {
+     "w": "אירוניה",
+     "d": "אמירת ההיפך מהכוונה"
+    },
+    {
+     "w": "סאטירה",
+     "d": "ביקורת באמצעות הומור"
+    },
+    {
+     "w": "מטאפורה",
+     "d": "השוואה ללא כמו או כ"
+    },
+    {
+     "w": "סמל",
+     "d": "משהו שמייצג רעיון אחר"
+    },
+    {
+     "w": "מוטיב",
+     "d": "רעיון חוזר ביצירה"
+    },
+    {
+     "w": "קונפליקט",
+     "d": "עימות או התנגשות"
+    },
+    {
+     "w": "קתרזיס",
+     "d": "שחרור רגשי דרך אמנות"
+    },
+    {
+     "w": "פרוטגוניסט",
+     "d": "הדמות הראשית ביצירה"
+    },
+    {
+     "w": "אנטגוניסט",
+     "d": "הדמות שמתנגדת לגיבור"
+    }
+   ]
+  },
+  {
+   "id": "a0aa9518-422c-42c4-b34d-4cd7bf9ddc48",
+   "origin": "curriculum",
+   "name": "Grade 10 - Trigonometry",
+   "description": "Trigonometry vocabulary for 10th grade",
+   "language": "en",
+   "grade": 10,
+   "subject": "math",
+   "words": [
+    {
+     "w": "sine",
+     "d": "Ratio of opposite to hypotenuse"
+    },
+    {
+     "w": "cosine",
+     "d": "Ratio of adjacent to hypotenuse"
+    },
+    {
+     "w": "tangent",
+     "d": "Ratio of opposite to adjacent"
+    },
+    {
+     "w": "hypotenuse",
+     "d": "Longest side of right triangle"
+    },
+    {
+     "w": "radian",
+     "d": "Unit of angle measurement"
+    },
+    {
+     "w": "unit circle",
+     "d": "Circle with radius of one"
+    },
+    {
+     "w": "amplitude",
+     "d": "Height of wave from center"
+    },
+    {
+     "w": "period",
+     "d": "Length of one complete cycle"
+    },
+    {
+     "w": "identity",
+     "d": "Equation true for all values"
+    },
+    {
+     "w": "inverse",
+     "d": "Opposite operation"
+    }
+   ]
+  },
+  {
+   "id": "a229540a-d23c-46fd-8001-0c309491e503",
+   "origin": "curriculum",
+   "name": "כיתה ו - מילים אקדמיות",
+   "description": "אוצר מילים אקדמי לתלמידי כיתה ו",
+   "language": "he",
+   "grade": 6,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "השוואה",
+     "d": "בדיקת הדמיון והשוני בין דברים"
+    },
+    {
+     "w": "מסקנה",
+     "d": "מה שלמדנו או הבנו בסוף"
+    },
+    {
+     "w": "הסבר",
+     "d": "להבהיר משהו במילים"
+    },
+    {
+     "w": "דוגמה",
+     "d": "משהו שמראה רעיון"
+    },
+    {
+     "w": "סיבה",
+     "d": "למה משהו קרה"
+    },
+    {
+     "w": "תוצאה",
+     "d": "מה שקורה בגלל משהו"
+    },
+    {
+     "w": "טענה",
+     "d": "דעה שאומרים ומנמקים"
+    },
+    {
+     "w": "הוכחה",
+     "d": "עובדות שמראות שמשהו נכון"
+    },
+    {
+     "w": "סיכום",
+     "d": "הנקודות העיקריות בקצרה"
+    },
+    {
+     "w": "ניתוח",
+     "d": "בחינה מעמיקה של משהו"
+    }
+   ]
+  },
+  {
+   "id": "a25b4ab7-d889-4e65-978d-76000cb92a76",
+   "origin": "curriculum",
+   "name": "Grade 9 - High School Foundation",
+   "description": "Foundation vocabulary for high school English",
+   "language": "en",
+   "grade": 9,
+   "subject": "english",
+   "words": [
+    {
+     "w": "ambiguous",
+     "d": "Having more than one meaning, unclear"
+    },
+    {
+     "w": "contemporary",
+     "d": "Belonging to the present time"
+    },
+    {
+     "w": "controversy",
+     "d": "Public disagreement or debate"
+    },
+    {
+     "w": "dilemma",
+     "d": "A difficult choice between options"
+    },
+    {
+     "w": "empirical",
+     "d": "Based on observation or experience"
+    },
+    {
+     "w": "ideology",
+     "d": "A system of ideas and beliefs"
+    },
+    {
+     "w": "inevitable",
+     "d": "Certain to happen, unavoidable"
+    },
+    {
+     "w": "paradox",
+     "d": "A statement that seems contradictory"
+    },
+    {
+     "w": "paradigm",
+     "d": "A typical example or pattern"
+    },
+    {
+     "w": "rhetoric",
+     "d": "The art of persuasive speaking"
+    }
+   ]
+  },
+  {
+   "id": "a5def524-6d0d-4152-b623-a983235a9df7",
+   "origin": "curriculum",
+   "name": "Grade 8 - Linear Equations",
+   "description": "Linear equations vocabulary for 8th grade",
+   "language": "en",
+   "grade": 8,
+   "subject": "math",
+   "words": [
+    {
+     "w": "linear",
+     "d": "Making a straight line"
+    },
+    {
+     "w": "intercept",
+     "d": "Where line crosses an axis"
+    },
+    {
+     "w": "origin",
+     "d": "Point (0,0) on graph"
+    },
+    {
+     "w": "quadrant",
+     "d": "One of four sections of graph"
+    },
+    {
+     "w": "system",
+     "d": "Two or more equations together"
+    },
+    {
+     "w": "solution",
+     "d": "Value that makes equation true"
+    },
+    {
+     "w": "substitution",
+     "d": "Replacing variable with value"
+    },
+    {
+     "w": "elimination",
+     "d": "Removing a variable"
+    },
+    {
+     "w": "parallel lines",
+     "d": "Lines with same slope"
+    },
+    {
+     "w": "intersection",
+     "d": "Point where lines cross"
+    }
+   ]
+  },
+  {
+   "id": "aac6b9c2-2007-4c47-98c3-65ec9e61bea2",
+   "origin": "curriculum",
+   "name": "Grado 4 — Escuela y Comunidad",
+   "description": "Palabras sobre la escuela, amigos, comunidad y responsabilidades.",
+   "language": "es",
+   "grade": 4,
+   "subject": "general",
+   "words": [
+    {
+     "w": "maestro",
+     "d": "Persona que enseña en la escuela"
+    },
+    {
+     "w": "estudiante",
+     "d": "Persona que aprende en la escuela"
+    },
+    {
+     "w": "clase",
+     "d": "Salón donde aprenden los estudiantes"
+    },
+    {
+     "w": "biblioteca",
+     "d": "Lugar con muchos libros para leer y prestar"
+    },
+    {
+     "w": "amigo",
+     "d": "Persona a quien queremos y que nos quiere"
+    },
+    {
+     "w": "vecino",
+     "d": "Persona que vive cerca de nosotros"
+    },
+    {
+     "w": "comunidad",
+     "d": "Grupo de personas que viven juntas"
+    },
+    {
+     "w": "voluntario",
+     "d": "Persona que ayuda sin pedir dinero"
+    },
+    {
+     "w": "regla",
+     "d": "Norma que todos deben seguir"
+    },
+    {
+     "w": "responsabilidad",
+     "d": "Deber de hacer algo bien"
+    },
+    {
+     "w": "respeto",
+     "d": "Trato cuidadoso hacia otra persona"
+    },
+    {
+     "w": "justicia",
+     "d": "Trato justo para todos"
+    },
+    {
+     "w": "ayuda",
+     "d": "Acción que facilita algo a otra persona"
+    },
+    {
+     "w": "compasión",
+     "d": "Sentimiento de lástima hacia otro"
+    },
+    {
+     "w": "compartir",
+     "d": "Dar a otros parte de lo que tenemos"
+    }
+   ]
+  },
+  {
+   "id": "ae493af4-4ce9-4b26-ad05-5ca627ccb8c2",
+   "origin": "curriculum",
+   "name": "Grade 2 - General Words",
+   "description": "General vocabulary for 2nd grade",
+   "language": "en",
+   "grade": 2,
+   "subject": "general",
+   "words": [
+    {
+     "w": "today",
+     "d": "This day right now"
+    },
+    {
+     "w": "tomorrow",
+     "d": "The day after today"
+    },
+    {
+     "w": "yesterday",
+     "d": "The day before today"
+    },
+    {
+     "w": "morning",
+     "d": "Early part of the day"
+    },
+    {
+     "w": "evening",
+     "d": "Late part of the day"
+    },
+    {
+     "w": "always",
+     "d": "Every time"
+    },
+    {
+     "w": "never",
+     "d": "Not at any time"
+    },
+    {
+     "w": "sometimes",
+     "d": "Not always but not never"
+    },
+    {
+     "w": "together",
+     "d": "With each other"
+    },
+    {
+     "w": "different",
+     "d": "Not the same"
+    }
+   ]
+  },
+  {
+   "id": "aeb2cd5f-4b20-4462-bf8c-1e8d4ee0b969",
+   "origin": "curriculum",
+   "name": "School Activities - פעילויות בבית הספר",
+   "description": "School activities and subjects vocabulary",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "homework",
+     "d": "שיעורי בית - Work done at home"
+    },
+    {
+     "w": "test",
+     "d": "מבחן - Shows what you learned"
+    },
+    {
+     "w": "lesson",
+     "d": "שיעור - Time for learning"
+    },
+    {
+     "w": "break",
+     "d": "הפסקה - Time to rest"
+    },
+    {
+     "w": "read",
+     "d": "לקרוא - Look at words"
+    },
+    {
+     "w": "write",
+     "d": "לכתוב - Make letters and words"
+    },
+    {
+     "w": "draw",
+     "d": "לצייר - Make pictures"
+    },
+    {
+     "w": "count",
+     "d": "לספור - Say numbers in order"
+    },
+    {
+     "w": "learn",
+     "d": "ללמוד - Get new knowledge"
+    },
+    {
+     "w": "answer",
+     "d": "תשובה - Reply to a question"
+    }
+   ]
+  },
+  {
+   "id": "af73baee-7b86-404f-ab49-5805461eace2",
+   "origin": "curriculum",
+   "name": "Grade 9 - Quadratics",
+   "description": "Quadratic functions vocabulary for 9th grade",
+   "language": "en",
+   "grade": 9,
+   "subject": "math",
+   "words": [
+    {
+     "w": "quadratic",
+     "d": "Equation with x squared"
+    },
+    {
+     "w": "parabola",
+     "d": "U-shaped curve"
+    },
+    {
+     "w": "vertex",
+     "d": "Highest or lowest point of parabola"
+    },
+    {
+     "w": "axis of symmetry",
+     "d": "Line dividing parabola in half"
+    },
+    {
+     "w": "roots",
+     "d": "Where parabola crosses x-axis"
+    },
+    {
+     "w": "discriminant",
+     "d": "Part that shows number of roots"
+    },
+    {
+     "w": "factoring",
+     "d": "Breaking into multiplied parts"
+    },
+    {
+     "w": "completing the square",
+     "d": "Method to solve quadratics"
+    },
+    {
+     "w": "quadratic formula",
+     "d": "Formula to find roots"
+    },
+    {
+     "w": "maximum",
+     "d": "Highest point"
+    }
+   ]
+  },
+  {
+   "id": "b01fb452-5b96-4875-b13f-ffbc6f33b8fb",
+   "origin": "curriculum",
+   "name": "Grado 12 — Filosofía y Ética",
+   "description": "Vocabulario filosófico y ético para duodécimo grado: valores, moral y pensamiento crítico.",
+   "language": "es",
+   "grade": 12,
+   "subject": "general",
+   "words": [
+    {
+     "w": "ética",
+     "d": "Rama de la filosofía que estudia la moral"
+    },
+    {
+     "w": "moral",
+     "d": "Principios sobre lo correcto e incorrecto"
+    },
+    {
+     "w": "virtud",
+     "d": "Cualidad moral positiva"
+    },
+    {
+     "w": "vicio",
+     "d": "Hábito malo o comportamiento incorrecto"
+    },
+    {
+     "w": "justicia",
+     "d": "Principio de equidad y trato justo"
+    },
+    {
+     "w": "libertad",
+     "d": "Capacidad de actuar sin restricciones injustas"
+    },
+    {
+     "w": "responsabilidad",
+     "d": "Obligación moral de responder por nuestras acciones"
+    },
+    {
+     "w": "consciencia",
+     "d": "Capacidad de distinguir el bien del mal"
+    },
+    {
+     "w": "valores",
+     "d": "Principios que guían nuestras acciones"
+    },
+    {
+     "w": "dilema",
+     "d": "Situación difícil con opciones complicadas"
+    },
+    {
+     "w": "argumento",
+     "d": "Razonamiento para apoyar una posición"
+    },
+    {
+     "w": "lógica",
+     "d": "Rama de la filosofía que estudia el razonamiento"
+    },
+    {
+     "w": "pensamiento crítico",
+     "d": "Análisis cuidadoso de información"
+    },
+    {
+     "w": "integridad",
+     "d": "Honestidad y adhesión a valores morales"
+    },
+    {
+     "w": "compasión",
+     "d": "Sentimiento de simpatía y preocupación por otros"
+    }
+   ]
+  },
+  {
+   "id": "b0f9eadc-bb45-4828-be65-c50e19e3c49d",
+   "origin": "curriculum",
+   "name": "Basic Clothes - בגדים בסיסיים",
+   "description": "Basic clothing vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "shirt",
+     "d": "חולצה - Top for your body"
+    },
+    {
+     "w": "pants",
+     "d": "מכנסיים - Cover your legs"
+    },
+    {
+     "w": "shoes",
+     "d": "נעליים - Cover your feet"
+    },
+    {
+     "w": "hat",
+     "d": "כובע - Cover your head"
+    },
+    {
+     "w": "socks",
+     "d": "גרביים - Inside your shoes"
+    },
+    {
+     "w": "dress",
+     "d": "שמלה - One piece for girls"
+    },
+    {
+     "w": "coat",
+     "d": "מעיל - Warm outer clothing"
+    },
+    {
+     "w": "shorts",
+     "d": "מכנסיים קצרים - Short pants"
+    },
+    {
+     "w": "skirt",
+     "d": "חצאית - Bottom clothing for girls"
+    },
+    {
+     "w": "jacket",
+     "d": "ג׳קט - Light outer clothing"
+    }
+   ]
+  },
+  {
+   "id": "b2905ff1-7a7d-4108-80bc-839638dbe511",
+   "origin": "curriculum",
+   "name": "Grade 10 - Physics",
+   "description": "Physics vocabulary for 10th grade",
+   "language": "en",
+   "grade": 10,
+   "subject": "science",
+   "words": [
+    {
+     "w": "velocity",
+     "d": "Speed in a specific direction"
+    },
+    {
+     "w": "acceleration",
+     "d": "Rate of change in velocity"
+    },
+    {
+     "w": "momentum",
+     "d": "Mass times velocity"
+    },
+    {
+     "w": "inertia",
+     "d": "Resistance to change in motion"
+    },
+    {
+     "w": "kinetic energy",
+     "d": "Energy of moving objects"
+    },
+    {
+     "w": "potential energy",
+     "d": "Stored energy due to position"
+    },
+    {
+     "w": "wavelength",
+     "d": "Distance between wave peaks"
+    },
+    {
+     "w": "frequency",
+     "d": "Number of waves per second"
+    },
+    {
+     "w": "electromagnetic",
+     "d": "Related to electricity and magnetism"
+    },
+    {
+     "w": "refraction",
+     "d": "Bending of light through material"
+    }
+   ]
+  },
+  {
+   "id": "b4bb76fb-cfd8-408d-8b57-98a8eaba3c6d",
+   "origin": "curriculum",
+   "name": "Grado 9 — Historia y Geografía",
+   "description": "Vocabulario histórico y geográfico para noveno grado: civilizaciones y culturas.",
+   "language": "es",
+   "grade": 9,
+   "subject": "history",
+   "words": [
+    {
+     "w": "civilización",
+     "d": "Sociedad avanzada con escritura y gobierno organizado"
+    },
+    {
+     "w": "imperio",
+     "d": "Grupo de tierras gobernadas por un solo poder"
+    },
+    {
+     "w": "monarquía",
+     "d": "Gobierno liderado por un rey o reina"
+    },
+    {
+     "w": "democracia",
+     "d": "Gobierno donde el pueblo tiene poder"
+    },
+    {
+     "w": "dictadura",
+     "d": "Gobierno controlado por una persona con poder total"
+    },
+    {
+     "w": "revolución",
+     "d": "Cambio drástico y violento en la sociedad"
+    },
+    {
+     "w": "constitución",
+     "d": "Documento fundamental de leyes de un país"
+    },
+    {
+     "w": "derechos humanos",
+     "d": "Libertades y derechos básicos de toda persona"
+    },
+    {
+     "w": "ciudadanía",
+     "d": "Estatus de ser miembro de un estado o país"
+    },
+    {
+     "w": "conflicto",
+     "d": "Desacuerdo o lucha entre grupos"
+    },
+    {
+     "w": "tratado",
+     "d": "Acuerdo formal entre países"
+    },
+    {
+     "w": "colonización",
+     "d": "Establecimiento de colonias en nuevas tierras"
+    },
+    {
+     "w": "migración",
+     "d": "Movimiento de gente de un lugar a otro"
+    },
+    {
+     "w": "arqueología",
+     "d": "Estudio científico de civilizaciones antiguas"
+    },
+    {
+     "w": "patrimonio",
+     "d": "Herencia cultural e histórica de un pueblo"
+    }
+   ]
+  },
+  {
+   "id": "b4ff69a9-159b-4f22-a636-1635b93fec7d",
+   "origin": "curriculum",
+   "name": "Grade 8 - Chemistry Basics",
+   "description": "Introduction to chemistry for 8th grade",
+   "language": "en",
+   "grade": 8,
+   "subject": "science",
+   "words": [
+    {
+     "w": "proton",
+     "d": "Positive particle in atom nucleus"
+    },
+    {
+     "w": "neutron",
+     "d": "Neutral particle in atom nucleus"
+    },
+    {
+     "w": "electron",
+     "d": "Negative particle orbiting nucleus"
+    },
+    {
+     "w": "periodic table",
+     "d": "Chart organizing all elements"
+    },
+    {
+     "w": "chemical reaction",
+     "d": "Process that changes substances"
+    },
+    {
+     "w": "catalyst",
+     "d": "Substance that speeds up reactions"
+    },
+    {
+     "w": "acid",
+     "d": "Substance with pH below 7"
+    },
+    {
+     "w": "base",
+     "d": "Substance with pH above 7"
+    },
+    {
+     "w": "oxidation",
+     "d": "Reaction with oxygen"
+    },
+    {
+     "w": "bonding",
+     "d": "How atoms connect together"
+    }
+   ]
+  },
+  {
+   "id": "b9494ce5-5943-412c-a311-4f5ab40a8dab",
+   "origin": "curriculum",
+   "name": "Geography - Israel גאוגרפיה של ישראל",
+   "description": "Israeli geography vocabulary with Hebrew",
+   "language": "en",
+   "grade": 4,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "desert",
+     "d": "מדבר - Dry area with little rain"
+    },
+    {
+     "w": "mountain",
+     "d": "הר - Very high land"
+    },
+    {
+     "w": "valley",
+     "d": "עמק - Low land between mountains"
+    },
+    {
+     "w": "sea",
+     "d": "ים - Large body of salt water"
+    },
+    {
+     "w": "lake",
+     "d": "אגם - Body of water surrounded by land"
+    },
+    {
+     "w": "river",
+     "d": "נהר - Flowing water to the sea"
+    },
+    {
+     "w": "coast",
+     "d": "חוף - Land next to the sea"
+    },
+    {
+     "w": "border",
+     "d": "גבול - Line between countries"
+    },
+    {
+     "w": "capital",
+     "d": "בירה - Main city of a country"
+    },
+    {
+     "w": "region",
+     "d": "אזור - Area with similar features"
+    }
+   ]
+  },
+  {
+   "id": "b994b6a3-46ed-4f41-b575-36897d95e370",
+   "origin": "curriculum",
+   "name": "Grade 4 - Geometry Basics",
+   "description": "Basic geometry vocabulary for 4th grade",
+   "language": "en",
+   "grade": 4,
+   "subject": "math",
+   "words": [
+    {
+     "w": "angle",
+     "d": "Space between two lines that meet"
+    },
+    {
+     "w": "triangle",
+     "d": "Shape with three sides"
+    },
+    {
+     "w": "rectangle",
+     "d": "Shape with four right angles"
+    },
+    {
+     "w": "square",
+     "d": "Rectangle with equal sides"
+    },
+    {
+     "w": "circle",
+     "d": "Round shape with no corners"
+    },
+    {
+     "w": "parallel",
+     "d": "Lines that never meet"
+    },
+    {
+     "w": "perpendicular",
+     "d": "Lines that meet at right angle"
+    },
+    {
+     "w": "symmetry",
+     "d": "Same on both sides"
+    },
+    {
+     "w": "vertex",
+     "d": "Corner point of a shape"
+    },
+    {
+     "w": "polygon",
+     "d": "Closed shape with straight sides"
+    }
+   ]
+  },
+  {
+   "id": "b9fa3540-5b1e-4654-aaef-0e2215b17641",
+   "origin": "curriculum",
+   "name": "אוצר מילים - משפחה",
+   "description": "Hebrew family vocabulary",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "אִמָּא",
+     "d": "Mother - הורה נקבה"
+    },
+    {
+     "w": "אַבָּא",
+     "d": "Father - הורה זכר"
+    },
+    {
+     "w": "אָח",
+     "d": "Brother - בן באותה משפחה"
+    },
+    {
+     "w": "אָחוֹת",
+     "d": "Sister - בת באותה משפחה"
+    },
+    {
+     "w": "סָבָא",
+     "d": "Grandfather - אבא של ההורה"
+    },
+    {
+     "w": "סָבְתָא",
+     "d": "Grandmother - אמא של ההורה"
+    },
+    {
+     "w": "דּוֹד",
+     "d": "Uncle - אח של ההורה"
+    },
+    {
+     "w": "דּוֹדָה",
+     "d": "Aunt - אחות של ההורה"
+    },
+    {
+     "w": "מִשְׁפָּחָה",
+     "d": "Family - הורים וילדים"
+    },
+    {
+     "w": "תִּינוֹק",
+     "d": "Baby - ילד קטן מאוד"
+    }
+   ]
+  },
+  {
+   "id": "ba494a5f-f3c9-4517-9a81-033a6f93360f",
+   "origin": "curriculum",
+   "name": "Grade 5 - Intermediate English Vocabulary",
+   "description": "Intermediate English vocabulary for 5th grade students",
+   "language": "en",
+   "grade": 5,
+   "subject": "english",
+   "words": [
+    {
+     "w": "adventure",
+     "d": "An exciting experience or journey"
+    },
+    {
+     "w": "beautiful",
+     "d": "Very pleasing to look at"
+    },
+    {
+     "w": "celebrate",
+     "d": "To do something special for an occasion"
+    },
+    {
+     "w": "discover",
+     "d": "To find something for the first time"
+    },
+    {
+     "w": "environment",
+     "d": "The natural world around us"
+    },
+    {
+     "w": "favorite",
+     "d": "The one you like best"
+    },
+    {
+     "w": "grateful",
+     "d": "Feeling thankful"
+    },
+    {
+     "w": "history",
+     "d": "Events that happened in the past"
+    },
+    {
+     "w": "important",
+     "d": "Having great value or meaning"
+    },
+    {
+     "w": "journey",
+     "d": "A trip from one place to another"
+    }
+   ]
+  },
+  {
+   "id": "bae889a5-4dec-4e20-ac42-fa7d0e8d6eac",
+   "origin": "curriculum",
+   "name": "Grade 6 - World Geography",
+   "description": "World geography vocabulary for 6th grade",
+   "language": "en",
+   "grade": 6,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "latitude",
+     "d": "Distance north or south of equator"
+    },
+    {
+     "w": "longitude",
+     "d": "Distance east or west of prime meridian"
+    },
+    {
+     "w": "hemisphere",
+     "d": "Half of the Earth"
+    },
+    {
+     "w": "tropics",
+     "d": "Warm region near equator"
+    },
+    {
+     "w": "desert",
+     "d": "Very dry region"
+    },
+    {
+     "w": "rainforest",
+     "d": "Dense forest with heavy rain"
+    },
+    {
+     "w": "tundra",
+     "d": "Cold treeless region"
+    },
+    {
+     "w": "population",
+     "d": "Number of people in an area"
+    },
+    {
+     "w": "urbanization",
+     "d": "Growth of cities"
+    },
+    {
+     "w": "migration",
+     "d": "Movement of people to new places"
+    }
+   ]
+  },
+  {
+   "id": "c1bc6c8c-5cb9-431f-bbe8-d04d480f12b5",
+   "origin": "curriculum",
+   "name": "Bagrut Academic Words 1",
+   "description": "High-frequency academic words for Bagrut exam",
+   "language": "en",
+   "grade": 10,
+   "subject": "english",
+   "words": [
+    {
+     "w": "achieve",
+     "d": "להשיג - Reach a goal"
+    },
+    {
+     "w": "approach",
+     "d": "גישה - Way of dealing with"
+    },
+    {
+     "w": "assessment",
+     "d": "הערכה - Evaluation"
+    },
+    {
+     "w": "assume",
+     "d": "להניח - Suppose to be true"
+    },
+    {
+     "w": "authority",
+     "d": "סמכות - Power to make decisions"
+    },
+    {
+     "w": "available",
+     "d": "זמין - Able to be used"
+    },
+    {
+     "w": "benefit",
+     "d": "תועלת - Good result"
+    },
+    {
+     "w": "concept",
+     "d": "מושג - Idea or principle"
+    },
+    {
+     "w": "consistent",
+     "d": "עקבי - Always the same"
+    },
+    {
+     "w": "constitute",
+     "d": "להוות - Form or make up"
+    }
+   ]
+  },
+  {
+   "id": "c2c25679-604c-4c3a-a9f2-133a9a55e5ae",
+   "origin": "curriculum",
+   "name": "Grade 1 - First Words",
+   "description": "First English words for 1st grade beginners",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "mom",
+     "d": "Your mother"
+    },
+    {
+     "w": "dad",
+     "d": "Your father"
+    },
+    {
+     "w": "ball",
+     "d": "A round toy you can throw"
+    },
+    {
+     "w": "sun",
+     "d": "The bright star in the sky"
+    },
+    {
+     "w": "red",
+     "d": "A color like an apple"
+    },
+    {
+     "w": "blue",
+     "d": "A color like the sky"
+    },
+    {
+     "w": "one",
+     "d": "The number 1"
+    },
+    {
+     "w": "two",
+     "d": "The number 2"
+    },
+    {
+     "w": "yes",
+     "d": "Agreeing with something"
+    },
+    {
+     "w": "no",
+     "d": "Not agreeing with something"
+    }
+   ]
+  },
+  {
+   "id": "c872b12e-e437-4f4f-b591-9e480a4c22f8",
+   "origin": "curriculum",
+   "name": "Grade 7 - Academic English Vocabulary",
+   "description": "Academic vocabulary for 7th grade middle school students",
+   "language": "en",
+   "grade": 7,
+   "subject": "english",
+   "words": [
+    {
+     "w": "analyze",
+     "d": "To examine something in detail"
+    },
+    {
+     "w": "communicate",
+     "d": "To share information with others"
+    },
+    {
+     "w": "demonstrate",
+     "d": "To show how something works"
+    },
+    {
+     "w": "evaluate",
+     "d": "To judge the quality or value of something"
+    },
+    {
+     "w": "hypothesis",
+     "d": "An educated guess that can be tested"
+    },
+    {
+     "w": "investigate",
+     "d": "To examine and discover facts"
+    },
+    {
+     "w": "perspective",
+     "d": "A particular way of viewing things"
+    },
+    {
+     "w": "significant",
+     "d": "Important or notable"
+    },
+    {
+     "w": "summarize",
+     "d": "To give a brief statement of main points"
+    },
+    {
+     "w": "technology",
+     "d": "Tools and machines created by science"
+    }
+   ]
+  },
+  {
+   "id": "c96318c9-74a3-4b4a-8902-6540f48bd926",
+   "origin": "curriculum",
+   "name": "Days of the Week - ימות השבוע",
+   "description": "Days and time vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "Sunday",
+     "d": "יום ראשון - First day of the week"
+    },
+    {
+     "w": "Monday",
+     "d": "יום שני - Second day"
+    },
+    {
+     "w": "Tuesday",
+     "d": "יום שלישי - Third day"
+    },
+    {
+     "w": "Wednesday",
+     "d": "יום רביעי - Fourth day"
+    },
+    {
+     "w": "Thursday",
+     "d": "יום חמישי - Fifth day"
+    },
+    {
+     "w": "Friday",
+     "d": "יום שישי - Sixth day"
+    },
+    {
+     "w": "Saturday",
+     "d": "שבת - Last day, Shabbat"
+    },
+    {
+     "w": "today",
+     "d": "היום - This day"
+    },
+    {
+     "w": "tomorrow",
+     "d": "מחר - The next day"
+    },
+    {
+     "w": "yesterday",
+     "d": "אתמול - The day before"
+    }
+   ]
+  },
+  {
+   "id": "cb7a7093-6835-41e4-8088-95a8967d978f",
+   "origin": "curriculum",
+   "name": "Weather - מזג אוויר",
+   "description": "Basic weather vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "sun",
+     "d": "שמש - Bright star in the sky"
+    },
+    {
+     "w": "rain",
+     "d": "גשם - Water falling from sky"
+    },
+    {
+     "w": "cloud",
+     "d": "ענן - White or gray in sky"
+    },
+    {
+     "w": "wind",
+     "d": "רוח - Moving air"
+    },
+    {
+     "w": "hot",
+     "d": "חם - High temperature"
+    },
+    {
+     "w": "cold",
+     "d": "קר - Low temperature"
+    },
+    {
+     "w": "sunny",
+     "d": "שמשי - Full of sunshine"
+    },
+    {
+     "w": "rainy",
+     "d": "גשום - With rain"
+    },
+    {
+     "w": "snow",
+     "d": "שלג - White frozen water"
+    },
+    {
+     "w": "sky",
+     "d": "שמיים - Above the earth"
+    }
+   ]
+  },
+  {
+   "id": "ce0d9e98-3043-4c1a-ada3-84424e9a3a8a",
+   "origin": "curriculum",
+   "name": "Kitchen Items - פריטי מטבח",
+   "description": "Kitchen and eating vocabulary",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "plate",
+     "d": "צלחת - Put food on it"
+    },
+    {
+     "w": "cup",
+     "d": "כוס - Drink from it"
+    },
+    {
+     "w": "spoon",
+     "d": "כף - Eat soup with it"
+    },
+    {
+     "w": "fork",
+     "d": "מזלג - Poke food with it"
+    },
+    {
+     "w": "knife",
+     "d": "סכין - Cut food with it"
+    },
+    {
+     "w": "bowl",
+     "d": "קערה - Deep dish for soup"
+    },
+    {
+     "w": "glass",
+     "d": "כוס זכוכית - Drink water from it"
+    },
+    {
+     "w": "pot",
+     "d": "סיר - Cook in it"
+    },
+    {
+     "w": "refrigerator",
+     "d": "מקרר - Keeps food cold"
+    },
+    {
+     "w": "oven",
+     "d": "תנור - Bake in it"
+    }
+   ]
+  },
+  {
+   "id": "cefadb37-2872-424f-9a53-54521debb4c8",
+   "origin": "curriculum",
+   "name": "כיתה א׳ — מילים ראשונות",
+   "description": "אוצר מילים בסיסי לכיתה א׳: עצמים, בעלי חיים ופעולות מהיומיום.",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "שמש",
+     "d": "הכוכב הגדול שמאיר ומחמם ביום"
+    },
+    {
+     "w": "ירח",
+     "d": "הגוף שמאיר בשמיים בלילה"
+    },
+    {
+     "w": "בית",
+     "d": "המקום שבו גרים"
+    },
+    {
+     "w": "ילד",
+     "d": "בן צעיר"
+    },
+    {
+     "w": "ילדה",
+     "d": "בת צעירה"
+    },
+    {
+     "w": "ספר",
+     "d": "דפים עם סיפור או מידע"
+    },
+    {
+     "w": "חתול",
+     "d": "חיה קטנה שאומרת מיאו"
+    },
+    {
+     "w": "כלב",
+     "d": "חיה שנובחת ושומרת על הבית"
+    },
+    {
+     "w": "מים",
+     "d": "נוזל שקוף ששותים"
+    },
+    {
+     "w": "לחם",
+     "d": "מאכל שאופים מקמח"
+    },
+    {
+     "w": "אמא",
+     "d": "ההורָה של הילד"
+    },
+    {
+     "w": "אבא",
+     "d": "ההורֶה של הילד"
+    },
+    {
+     "w": "כדור",
+     "d": "צעצוע עגול שמשחקים בו"
+    },
+    {
+     "w": "פרח",
+     "d": "צמח צבעוני וריחני"
+    },
+    {
+     "w": "עץ",
+     "d": "צמח גבוה עם גזע וענפים"
+    }
+   ]
+  },
+  {
+   "id": "cf120aff-974f-4ce5-9642-11014ca12a04",
+   "origin": "curriculum",
+   "name": "כיתה ז׳ — מדע פיזיקלי",
+   "description": "מדע פיזיקלי לכיתה ז׳: כוח, אנרגיה וגלים.",
+   "language": "he",
+   "grade": 7,
+   "subject": "science",
+   "words": [
+    {
+     "w": "כוח",
+     "d": "דחיפה או משיכה המעבירה משהו"
+    },
+    {
+     "w": "מסה",
+     "d": "כמות החומר בגוף"
+    },
+    {
+     "w": "משקל",
+     "d": "כוח הכבידה על גוף"
+    },
+    {
+     "w": "תאוצה",
+     "d": "שינוי במהירות"
+    },
+    {
+     "w": "עבודה",
+     "d": "כוח כפול מרחק"
+    },
+    {
+     "w": "אנרגיה",
+     "d": "כושר לעשות עבודה"
+    },
+    {
+     "w": "חום",
+     "d": "אנרגיה של תנועת חלקיקים"
+    },
+    {
+     "w": "טמפרטורה",
+     "d": "מדידת כמה חם משהו"
+    },
+    {
+     "w": "אור",
+     "d": "קרינה שאנחנו רואים"
+    },
+    {
+     "w": "צליל",
+     "d": "גל שאנחנו שומעים"
+    },
+    {
+     "w": "חשמל",
+     "d": "זרימת אלקטרונים"
+    },
+    {
+     "w": "מגנט",
+     "d": "חומר שמושך מתכות"
+    },
+    {
+     "w": "גל",
+     "d": "תנועה של אנרגיה דרך חומר"
+    },
+    {
+     "w": "תדירות",
+     "d": "מספר גלים בשנייה"
+    },
+    {
+     "w": "משקעת",
+     "d": "חלקיקים שיורדים לתחתית נוזל"
+    }
+   ]
+  },
+  {
+   "id": "d0bd9d42-6ed4-4190-8244-c32490c1a286",
+   "origin": "curriculum",
+   "name": "School Supplies - ציוד לימודים",
+   "description": "School supplies vocabulary",
+   "language": "en",
+   "grade": 2,
+   "subject": "english",
+   "words": [
+    {
+     "w": "notebook",
+     "d": "מחברת - Book for writing notes"
+    },
+    {
+     "w": "eraser",
+     "d": "מחק - Removes pencil marks"
+    },
+    {
+     "w": "ruler",
+     "d": "סרגל - Measures and draws lines"
+    },
+    {
+     "w": "scissors",
+     "d": "מספריים - For cutting paper"
+    },
+    {
+     "w": "glue",
+     "d": "דבק - Sticks things together"
+    },
+    {
+     "w": "paper",
+     "d": "נייר - You write on it"
+    },
+    {
+     "w": "bag",
+     "d": "תיק - Carry your things"
+    },
+    {
+     "w": "crayon",
+     "d": "צבע שעווה - Colored stick for drawing"
+    },
+    {
+     "w": "marker",
+     "d": "טוש - Thick colored pen"
+    },
+    {
+     "w": "dictionary",
+     "d": "מילון - Book of word meanings"
+    }
+   ]
+  },
+  {
+   "id": "d0fe8a87-90a4-4dbe-bcc0-8fcd5fedc573",
+   "origin": "curriculum",
+   "name": "Technology - טכנולוגיה",
+   "description": "Technology vocabulary for modern students",
+   "language": "en",
+   "grade": 4,
+   "subject": "english",
+   "words": [
+    {
+     "w": "computer",
+     "d": "מחשב - Electronic device for work"
+    },
+    {
+     "w": "phone",
+     "d": "טלפון - Device for talking"
+    },
+    {
+     "w": "internet",
+     "d": "אינטרנט - Network connecting computers"
+    },
+    {
+     "w": "screen",
+     "d": "מסך - Display on device"
+    },
+    {
+     "w": "keyboard",
+     "d": "מקלדת - For typing letters"
+    },
+    {
+     "w": "mouse",
+     "d": "עכבר - For clicking on screen"
+    },
+    {
+     "w": "tablet",
+     "d": "טאבלט - Touch screen device"
+    },
+    {
+     "w": "camera",
+     "d": "מצלמה - Takes pictures"
+    },
+    {
+     "w": "video",
+     "d": "וידאו - Moving pictures"
+    },
+    {
+     "w": "game",
+     "d": "משחק - Play for fun"
+    }
+   ]
+  },
+  {
+   "id": "d1591df4-6e99-448e-b724-2dea4c780866",
+   "origin": "curriculum",
+   "name": "Grado 10 — Geografía Política y Economía",
+   "description": "Vocabulario sobre geografía política, economía y recursos para décimo grado.",
+   "language": "es",
+   "grade": 10,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "geopolítica",
+     "d": "Estudio de la relación entre geografía y política"
+    },
+    {
+     "w": "soberanía",
+     "d": "Poder independiente de una nación sobre su territorio"
+    },
+    {
+     "w": "frontera",
+     "d": "Línea que divide dos territorios o países"
+    },
+    {
+     "w": "territorio",
+     "d": "Área de tierra bajo control de una entidad"
+    },
+    {
+     "w": "población",
+     "d": "Número total de personas en un lugar"
+    },
+    {
+     "w": "densidad poblacional",
+     "d": "Número de personas por unidad de área"
+    },
+    {
+     "w": "urbanización",
+     "d": "Proceso de desarrollo de ciudades"
+    },
+    {
+     "w": "rural",
+     "d": "Relacionado con el campo o áreas agrícolas"
+    },
+    {
+     "w": "recursos naturales",
+     "d": "Materiales valiosos que existen en la naturaleza"
+    },
+    {
+     "w": "energía renovable",
+     "d": "Energía que se puede reponer naturalmente"
+    },
+    {
+     "w": "comercio",
+     "d": "Intercambio de bienes entre regiones o países"
+    },
+    {
+     "w": "infraestructura",
+     "d": "Sistemas básicos como carreteras y puentes"
+    },
+    {
+     "w": "cambio climático",
+     "d": "Alteración del clima terrestre a largo plazo"
+    },
+    {
+     "w": "sostenibilidad",
+     "d": "Capacidad de mantener algo sin agotar recursos"
+    },
+    {
+     "w": "biodiversidad",
+     "d": "Variedad de vida en un ecosistema"
+    }
+   ]
+  },
+  {
+   "id": "d1b20cca-8dae-4b9d-a87b-1b726a29fd77",
+   "origin": "curriculum",
+   "name": "Grade 5 - Science Basics",
+   "description": "Basic science vocabulary for 5th grade",
+   "language": "en",
+   "grade": 5,
+   "subject": "science",
+   "words": [
+    {
+     "w": "energy",
+     "d": "The ability to do work or cause change"
+    },
+    {
+     "w": "matter",
+     "d": "Anything that takes up space and has mass"
+    },
+    {
+     "w": "solid",
+     "d": "Matter with a fixed shape"
+    },
+    {
+     "w": "liquid",
+     "d": "Matter that flows and takes container shape"
+    },
+    {
+     "w": "gas",
+     "d": "Matter that spreads to fill any space"
+    },
+    {
+     "w": "plant",
+     "d": "Living thing that makes its own food"
+    },
+    {
+     "w": "animal",
+     "d": "Living thing that eats other things"
+    },
+    {
+     "w": "habitat",
+     "d": "Place where an animal or plant lives"
+    },
+    {
+     "w": "ecosystem",
+     "d": "Community of living things and their environment"
+    },
+    {
+     "w": "photosynthesis",
+     "d": "How plants make food from sunlight"
+    }
+   ]
+  },
+  {
+   "id": "d2a3579c-5eae-4055-8ad4-f583a50e78fe",
+   "origin": "curriculum",
+   "name": "School Basics - בית ספר בסיסי",
+   "description": "Basic school vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "school",
+     "d": "בית ספר - Place where you learn"
+    },
+    {
+     "w": "teacher",
+     "d": "מורה - Person who teaches"
+    },
+    {
+     "w": "student",
+     "d": "תלמיד - Person who learns"
+    },
+    {
+     "w": "book",
+     "d": "ספר - Has pages to read"
+    },
+    {
+     "w": "pencil",
+     "d": "עיפרון - You write with it"
+    },
+    {
+     "w": "pen",
+     "d": "עט - Writes in ink"
+    },
+    {
+     "w": "desk",
+     "d": "שולחן - Table for working"
+    },
+    {
+     "w": "chair",
+     "d": "כיסא - You sit on it"
+    },
+    {
+     "w": "class",
+     "d": "כיתה - Room for learning"
+    },
+    {
+     "w": "board",
+     "d": "לוח - Teacher writes on it"
+    }
+   ]
+  },
+  {
+   "id": "d3e8cd5c-22f0-46c2-801f-ecbca399a265",
+   "origin": "curriculum",
+   "name": "אוצר מילים - מספרים",
+   "description": "Hebrew numbers vocabulary",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "אֶחָד",
+     "d": "One - 1"
+    },
+    {
+     "w": "שְׁנַיִם",
+     "d": "Two - 2"
+    },
+    {
+     "w": "שָׁלוֹשׁ",
+     "d": "Three - 3"
+    },
+    {
+     "w": "אַרְבַּע",
+     "d": "Four - 4"
+    },
+    {
+     "w": "חָמֵשׁ",
+     "d": "Five - 5"
+    },
+    {
+     "w": "שֵׁשׁ",
+     "d": "Six - 6"
+    },
+    {
+     "w": "שֶׁבַע",
+     "d": "Seven - 7"
+    },
+    {
+     "w": "שְׁמוֹנֶה",
+     "d": "Eight - 8"
+    },
+    {
+     "w": "תֵּשַׁע",
+     "d": "Nine - 9"
+    },
+    {
+     "w": "עֶשֶׂר",
+     "d": "Ten - 10"
+    }
+   ]
+  },
+  {
+   "id": "d5e18210-40bd-4161-862c-0ae7fbfa13c2",
+   "origin": "curriculum",
+   "name": "Science - Earth & Space כדור הארץ והחלל",
+   "description": "Earth and space vocabulary with Hebrew",
+   "language": "en",
+   "grade": 6,
+   "subject": "science",
+   "words": [
+    {
+     "w": "planet",
+     "d": "כוכב לכת - Orbits around a star"
+    },
+    {
+     "w": "sun",
+     "d": "שמש - Star at center of solar system"
+    },
+    {
+     "w": "moon",
+     "d": "ירח - Orbits around Earth"
+    },
+    {
+     "w": "star",
+     "d": "כוכב - Ball of hot gas in space"
+    },
+    {
+     "w": "solar system",
+     "d": "מערכת השמש - Sun and its planets"
+    },
+    {
+     "w": "gravity",
+     "d": "כוח משיכה - Force that pulls objects"
+    },
+    {
+     "w": "orbit",
+     "d": "מסלול - Path around a star or planet"
+    },
+    {
+     "w": "earthquake",
+     "d": "רעידת אדמה - When the ground shakes"
+    },
+    {
+     "w": "volcano",
+     "d": "הר געש - Mountain that erupts"
+    },
+    {
+     "w": "atmosphere",
+     "d": "אטמוספירה - Air around Earth"
+    }
+   ]
+  },
+  {
+   "id": "d89613ab-0608-451b-884c-223a3e3fa555",
+   "origin": "curriculum",
+   "name": "Grade 7 - Physical Geography",
+   "description": "Physical geography vocabulary for 7th grade",
+   "language": "en",
+   "grade": 7,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "tectonic plates",
+     "d": "Large pieces of Earths crust"
+    },
+    {
+     "w": "fault line",
+     "d": "Crack where plates meet"
+    },
+    {
+     "w": "tsunami",
+     "d": "Giant wave from underwater earthquake"
+    },
+    {
+     "w": "monsoon",
+     "d": "Seasonal wind bringing rain"
+    },
+    {
+     "w": "hurricane",
+     "d": "Large rotating storm"
+    },
+    {
+     "w": "glacier",
+     "d": "Large mass of moving ice"
+    },
+    {
+     "w": "delta",
+     "d": "Land formed at river mouth"
+    },
+    {
+     "w": "plateau",
+     "d": "Flat elevated land"
+    },
+    {
+     "w": "watershed",
+     "d": "Area drained by a river"
+    },
+    {
+     "w": "biome",
+     "d": "Large ecosystem type"
+    }
+   ]
+  },
+  {
+   "id": "da010a7a-ab77-40e5-bac9-54d24c86228c",
+   "origin": "curriculum",
+   "name": "כיתה ז - מילים לחטיבה",
+   "description": "אוצר מילים לתלמידי חטיבת הביניים",
+   "language": "he",
+   "grade": 7,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "התפתחות",
+     "d": "שינוי והתקדמות לאורך זמן"
+    },
+    {
+     "w": "השפעה",
+     "d": "הכוח לשנות משהו או מישהו"
+    },
+    {
+     "w": "תופעה",
+     "d": "משהו שקורה ואפשר לראות"
+    },
+    {
+     "w": "מאפיין",
+     "d": "תכונה מיוחדת של משהו"
+    },
+    {
+     "w": "תהליך",
+     "d": "סדרה של פעולות או שלבים"
+    },
+    {
+     "w": "מבנה",
+     "d": "הצורה והארגון של משהו"
+    },
+    {
+     "w": "יחסים",
+     "d": "הקשר בין אנשים או דברים"
+    },
+    {
+     "w": "ערכים",
+     "d": "עקרונות חשובים בחיים"
+    },
+    {
+     "w": "זהות",
+     "d": "מי אנחנו ומה מייחד אותנו"
+    },
+    {
+     "w": "תרבות",
+     "d": "המנהגים והאמונות של עם"
+    }
+   ]
+  },
+  {
+   "id": "dca0b6ff-5100-47e9-a53e-a50d71087792",
+   "origin": "curriculum",
+   "name": "Grade 12 - Bagrut Science",
+   "description": "Science vocabulary for Bagrut exam",
+   "language": "en",
+   "grade": 12,
+   "subject": "science",
+   "words": [
+    {
+     "w": "quantum",
+     "d": "Smallest unit of energy"
+    },
+    {
+     "w": "relativity",
+     "d": "Theory of space time and gravity"
+    },
+    {
+     "w": "nuclear fission",
+     "d": "Splitting atomic nuclei"
+    },
+    {
+     "w": "nuclear fusion",
+     "d": "Combining atomic nuclei"
+    },
+    {
+     "w": "radioactivity",
+     "d": "Emission from unstable atoms"
+    },
+    {
+     "w": "half-life",
+     "d": "Time for half to decay"
+    },
+    {
+     "w": "thermodynamics",
+     "d": "Study of heat and energy"
+    },
+    {
+     "w": "electromagnetic spectrum",
+     "d": "Range of all radiation types"
+    },
+    {
+     "w": "photon",
+     "d": "Particle of light"
+    },
+    {
+     "w": "isotope",
+     "d": "Atom with different neutron count"
+    }
+   ]
+  },
+  {
+   "id": "dfc2d73b-e355-4cf7-9ad0-1b5e32f64d19",
+   "origin": "curriculum",
+   "name": "Science - Living Things מדע החיים",
+   "description": "Science vocabulary about living things with Hebrew",
+   "language": "en",
+   "grade": 4,
+   "subject": "science",
+   "words": [
+    {
+     "w": "animal",
+     "d": "חיה - A living creature that moves"
+    },
+    {
+     "w": "plant",
+     "d": "צמח - A living thing that grows in soil"
+    },
+    {
+     "w": "mammal",
+     "d": "יונק - Animal that drinks mother milk"
+    },
+    {
+     "w": "reptile",
+     "d": "זוחל - Cold-blooded animal with scales"
+    },
+    {
+     "w": "insect",
+     "d": "חרק - Small animal with six legs"
+    },
+    {
+     "w": "habitat",
+     "d": "בית גידול - Where an animal lives"
+    },
+    {
+     "w": "food chain",
+     "d": "שרשרת מזון - Who eats what in nature"
+    },
+    {
+     "w": "predator",
+     "d": "טורף - Animal that hunts others"
+    },
+    {
+     "w": "prey",
+     "d": "טרף - Animal that is hunted"
+    },
+    {
+     "w": "ecosystem",
+     "d": "מערכת אקולוגית - Living things and their environment"
+    }
+   ]
+  },
+  {
+   "id": "e009cd23-8a4b-42e6-af98-27aa180fcd7d",
+   "origin": "curriculum",
+   "name": "Grade 11 - Advanced Chemistry",
+   "description": "Advanced chemistry vocabulary for 11th grade",
+   "language": "en",
+   "grade": 11,
+   "subject": "science",
+   "words": [
+    {
+     "w": "organic",
+     "d": "Carbon-based chemistry"
+    },
+    {
+     "w": "inorganic",
+     "d": "Chemistry without carbon chains"
+    },
+    {
+     "w": "polymer",
+     "d": "Large molecule of repeating units"
+    },
+    {
+     "w": "isomer",
+     "d": "Same formula different structure"
+    },
+    {
+     "w": "equilibrium",
+     "d": "Balance of forward and reverse reactions"
+    },
+    {
+     "w": "entropy",
+     "d": "Measure of disorder"
+    },
+    {
+     "w": "enthalpy",
+     "d": "Heat content of system"
+    },
+    {
+     "w": "oxidation",
+     "d": "Loss of electrons"
+    },
+    {
+     "w": "reduction",
+     "d": "Gain of electrons"
+    },
+    {
+     "w": "electronegativity",
+     "d": "Attraction for electrons"
+    }
+   ]
+  },
+  {
+   "id": "e26cb8f7-5bbe-4fc7-8fc4-fc0b68e525a5",
+   "origin": "curriculum",
+   "name": "Grado 7 — Ciencias Naturales",
+   "description": "Vocabulario de ciencias para séptimo grado: biología, química y física básica.",
+   "language": "es",
+   "grade": 7,
+   "subject": "science",
+   "words": [
+    {
+     "w": "célula",
+     "d": "Unidad más pequeña de la vida"
+    },
+    {
+     "w": "organismos",
+     "d": "Seres vivos como plantas y animales"
+    },
+    {
+     "w": "fotosíntesis",
+     "d": "Proceso por el cual las plantas hacen su propio alimento"
+    },
+    {
+     "w": "metabolismo",
+     "d": "Proceso de cambio de sustancias en el cuerpo"
+    },
+    {
+     "w": "proteína",
+     "d": "Sustancia necesaria para construir músculos y tejidos"
+    },
+    {
+     "w": "carbohidrato",
+     "d": "Sustancia que proporciona energía al cuerpo"
+    },
+    {
+     "w": "lípido",
+     "d": "Grasa o sustancia grasosa"
+    },
+    {
+     "w": "ADN",
+     "d": "Molécula que contiene la información genética"
+    },
+    {
+     "w": "ecosistema",
+     "d": "Grupo de organismos y su ambiente"
+    },
+    {
+     "w": "cadena alimenticia",
+     "d": "Orden de quién come a quién en la naturaleza"
+    },
+    {
+     "w": "depredador",
+     "d": "Animal que caza y come a otros"
+    },
+    {
+     "w": "presa",
+     "d": "Animal que es cazado por otro"
+    },
+    {
+     "w": "hábitat",
+     "d": "Lugar donde vive un animal"
+    },
+    {
+     "w": "evolución",
+     "d": "Cambio gradual de los seres vivos a lo largo del tiempo"
+    },
+    {
+     "w": "adaptación",
+     "d": "Característica que ayuda a un animal a sobrevivir"
+    }
+   ]
+  },
+  {
+   "id": "e34a514e-f561-4b20-b01c-a53b879cb68a",
+   "origin": "curriculum",
+   "name": "Grade 3 - Nature and Animals",
+   "description": "Basic science vocabulary about nature for 3rd grade",
+   "language": "en",
+   "grade": 3,
+   "subject": "science",
+   "words": [
+    {
+     "w": "mammal",
+     "d": "Animal that feeds milk to babies"
+    },
+    {
+     "w": "reptile",
+     "d": "Cold-blooded animal with scales"
+    },
+    {
+     "w": "insect",
+     "d": "Small animal with six legs"
+    },
+    {
+     "w": "seed",
+     "d": "What plants grow from"
+    },
+    {
+     "w": "root",
+     "d": "Part of plant underground"
+    },
+    {
+     "w": "leaf",
+     "d": "Green part of plant that makes food"
+    },
+    {
+     "w": "weather",
+     "d": "What it is like outside"
+    },
+    {
+     "w": "season",
+     "d": "Time of year like summer or winter"
+    },
+    {
+     "w": "ocean",
+     "d": "Very large body of salt water"
+    },
+    {
+     "w": "forest",
+     "d": "Area with many trees"
+    }
+   ]
+  },
+  {
+   "id": "e7eab21c-37fd-4b4e-954a-5de00196770d",
+   "origin": "curriculum",
+   "name": "Grade 10 - Literary Analysis",
+   "description": "Vocabulary for literary analysis and advanced reading",
+   "language": "en",
+   "grade": 10,
+   "subject": "english",
+   "words": [
+    {
+     "w": "allegory",
+     "d": "A story with hidden meaning"
+    },
+    {
+     "w": "catharsis",
+     "d": "Emotional release through art"
+    },
+    {
+     "w": "connotation",
+     "d": "Implied meaning beyond literal"
+    },
+    {
+     "w": "dichotomy",
+     "d": "Division into two contrasting parts"
+    },
+    {
+     "w": "ephemeral",
+     "d": "Lasting for a very short time"
+    },
+    {
+     "w": "foreshadow",
+     "d": "To hint at future events"
+    },
+    {
+     "w": "juxtaposition",
+     "d": "Placing things side by side for contrast"
+    },
+    {
+     "w": "metaphor",
+     "d": "Comparison without using like or as"
+    },
+    {
+     "w": "motif",
+     "d": "Recurring element in literature"
+    },
+    {
+     "w": "symbolism",
+     "d": "Use of symbols to represent ideas"
+    }
+   ]
+  },
+  {
+   "id": "e83ef19d-0703-45b3-ba7b-aa865a7f8c84",
+   "origin": "curriculum",
+   "name": "אוצר מילים - פעלים בסיסיים",
+   "description": "Hebrew basic verbs vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "לָרוּץ",
+     "d": "To run - לנוע מהר על רגליים"
+    },
+    {
+     "w": "לָלֶכֶת",
+     "d": "To walk - לנוע לאט על רגליים"
+    },
+    {
+     "w": "לִקְפּוֹץ",
+     "d": "To jump - לעלות באוויר"
+    },
+    {
+     "w": "לֶאֱכֹל",
+     "d": "To eat - להכניס אוכל לפה"
+    },
+    {
+     "w": "לִשְׁתּוֹת",
+     "d": "To drink - לבלוע נוזל"
+    },
+    {
+     "w": "לִישֹׁן",
+     "d": "To sleep - לנוח בלילה"
+    },
+    {
+     "w": "לְשַׂחֵק",
+     "d": "To play - ליהנות"
+    },
+    {
+     "w": "לָשִׁיר",
+     "d": "To sing - לעשות מוזיקה בקול"
+    },
+    {
+     "w": "לִרְקֹד",
+     "d": "To dance - לנוע למוזיקה"
+    },
+    {
+     "w": "לִשְׂחוֹת",
+     "d": "To swim - לנוע במים"
+    }
+   ]
+  },
+  {
+   "id": "ee30c1f9-d177-4842-9975-190550b72d7b",
+   "origin": "curriculum",
+   "name": "Grade 11 - Calculus Intro",
+   "description": "Introduction to calculus for 11th grade",
+   "language": "en",
+   "grade": 11,
+   "subject": "math",
+   "words": [
+    {
+     "w": "limit",
+     "d": "Value a function approaches"
+    },
+    {
+     "w": "derivative",
+     "d": "Rate of change at a point"
+    },
+    {
+     "w": "integral",
+     "d": "Area under a curve"
+    },
+    {
+     "w": "continuous",
+     "d": "No breaks in the function"
+    },
+    {
+     "w": "differentiation",
+     "d": "Finding the derivative"
+    },
+    {
+     "w": "integration",
+     "d": "Finding the integral"
+    },
+    {
+     "w": "tangent line",
+     "d": "Line touching curve at one point"
+    },
+    {
+     "w": "instantaneous",
+     "d": "At a single moment"
+    },
+    {
+     "w": "infinity",
+     "d": "Without end or limit"
+    },
+    {
+     "w": "asymptote",
+     "d": "Line a curve approaches"
+    }
+   ]
+  },
+  {
+   "id": "eeb18493-d43a-45a7-876f-ae85e2f4987c",
+   "origin": "curriculum",
+   "name": "Bagrut Academic Words 3",
+   "description": "Advanced academic words for Bagrut exam",
+   "language": "en",
+   "grade": 12,
+   "subject": "english",
+   "words": [
+    {
+     "w": "implement",
+     "d": "ליישם - Put into action"
+    },
+    {
+     "w": "implication",
+     "d": "משמעות - Possible effect"
+    },
+    {
+     "w": "indicate",
+     "d": "להצביע על - Show or suggest"
+    },
+    {
+     "w": "interpret",
+     "d": "לפרש - Explain meaning"
+    },
+    {
+     "w": "justify",
+     "d": "להצדיק - Give reasons for"
+    },
+    {
+     "w": "maintain",
+     "d": "לשמור על - Keep in condition"
+    },
+    {
+     "w": "obtain",
+     "d": "להשיג - Get or acquire"
+    },
+    {
+     "w": "perceive",
+     "d": "לתפוס - Become aware of"
+    },
+    {
+     "w": "potential",
+     "d": "פוטנציאל - Possible ability"
+    },
+    {
+     "w": "significant",
+     "d": "משמעותי - Important"
+    }
+   ]
+  },
+  {
+   "id": "f112b732-157e-4ff4-8e54-d5e8daabd27d",
+   "origin": "curriculum",
+   "name": "Grade 8 - Human Geography",
+   "description": "Human geography vocabulary for 8th grade",
+   "language": "en",
+   "grade": 8,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "demography",
+     "d": "Study of population statistics"
+    },
+    {
+     "w": "infrastructure",
+     "d": "Basic systems like roads and power"
+    },
+    {
+     "w": "globalization",
+     "d": "Worldwide economic connection"
+    },
+    {
+     "w": "sustainable",
+     "d": "Able to continue long term"
+    },
+    {
+     "w": "renewable",
+     "d": "Can be replaced naturally"
+    },
+    {
+     "w": "nonrenewable",
+     "d": "Cannot be replaced when used"
+    },
+    {
+     "w": "deforestation",
+     "d": "Cutting down forests"
+    },
+    {
+     "w": "desertification",
+     "d": "Land becoming desert"
+    },
+    {
+     "w": "urbanization",
+     "d": "Growth of cities"
+    },
+    {
+     "w": "agriculture",
+     "d": "Farming and growing food"
+    }
+   ]
+  },
+  {
+   "id": "f2b98ea4-fc6e-4b34-b25c-cba663ca079d",
+   "origin": "curriculum",
+   "name": "Grade 12 - Bagrut Preparation",
+   "description": "Advanced vocabulary for Bagrut English exam",
+   "language": "en",
+   "grade": 12,
+   "subject": "english",
+   "words": [
+    {
+     "w": "ameliorate",
+     "d": "To make something bad better"
+    },
+    {
+     "w": "circumvent",
+     "d": "To find a way around an obstacle"
+    },
+    {
+     "w": "disseminate",
+     "d": "To spread information widely"
+    },
+    {
+     "w": "exacerbate",
+     "d": "To make a problem worse"
+    },
+    {
+     "w": "hierarchy",
+     "d": "A system ranked by authority"
+    },
+    {
+     "w": "mitigate",
+     "d": "To make something less severe"
+    },
+    {
+     "w": "paradigm",
+     "d": "A model or pattern of something"
+    },
+    {
+     "w": "proliferate",
+     "d": "To increase rapidly in number"
+    },
+    {
+     "w": "scrutinize",
+     "d": "To examine very carefully"
+    },
+    {
+     "w": "ubiquitous",
+     "d": "Present everywhere at once"
+    }
+   ]
+  },
+  {
+   "id": "f441462d-0f8a-41fc-9fdd-9c6ca6e31771",
+   "origin": "curriculum",
+   "name": "כיתה ג - אוצר מילים בסיסי",
+   "description": "אוצר מילים בסיסי באנגלית לתלמידי כיתה ג",
+   "language": "he",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "school",
+     "d": "בית ספר - מקום שבו לומדים"
+    },
+    {
+     "w": "teacher",
+     "d": "מורה - אדם שמלמד"
+    },
+    {
+     "w": "student",
+     "d": "תלמיד - אדם שלומד"
+    },
+    {
+     "w": "pencil",
+     "d": "עיפרון - כלי לכתיבה"
+    },
+    {
+     "w": "notebook",
+     "d": "מחברת - דפים לכתיבה"
+    },
+    {
+     "w": "family",
+     "d": "משפחה - אנשים קרובים"
+    },
+    {
+     "w": "water",
+     "d": "מים - נוזל שאנחנו שותים"
+    },
+    {
+     "w": "food",
+     "d": "אוכל - דברים שאנחנו אוכלים"
+    },
+    {
+     "w": "play",
+     "d": "לשחק - לעשות משחקים"
+    },
+    {
+     "w": "read",
+     "d": "לקרוא - להבין טקסט כתוב"
+    }
+   ]
+  },
+  {
+   "id": "f86216aa-b7bb-4ee6-baf2-ad68c3949828",
+   "origin": "curriculum",
+   "name": "Emotions - רגשות",
+   "description": "English emotions vocabulary with Hebrew",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "happy",
+     "d": "שמח - Feeling good"
+    },
+    {
+     "w": "sad",
+     "d": "עצוב - Feeling bad"
+    },
+    {
+     "w": "angry",
+     "d": "כועס - Very upset"
+    },
+    {
+     "w": "scared",
+     "d": "מפחד - Feeling afraid"
+    },
+    {
+     "w": "excited",
+     "d": "נרגש - Very happy about something"
+    },
+    {
+     "w": "tired",
+     "d": "עייף - Need to rest"
+    },
+    {
+     "w": "hungry",
+     "d": "רעב - Need to eat"
+    },
+    {
+     "w": "thirsty",
+     "d": "צמא - Need to drink"
+    },
+    {
+     "w": "surprised",
+     "d": "מופתע - Did not expect it"
+    },
+    {
+     "w": "proud",
+     "d": "גאה - Happy about achievement"
+    }
+   ]
+  },
+  {
+   "id": "f8c11d86-12c4-4171-9310-a4b0de17d14b",
+   "origin": "curriculum",
+   "name": "Family & People - משפחה",
+   "description": "Basic family members and people vocabulary aligned with Band 1",
+   "language": "en",
+   "grade": 1,
+   "subject": "english",
+   "words": [
+    {
+     "w": "mother",
+     "d": "אמא - A female parent"
+    },
+    {
+     "w": "father",
+     "d": "אבא - A male parent"
+    },
+    {
+     "w": "sister",
+     "d": "אחות - A female sibling"
+    },
+    {
+     "w": "brother",
+     "d": "אח - A male sibling"
+    },
+    {
+     "w": "baby",
+     "d": "תינוק - A very young child"
+    },
+    {
+     "w": "family",
+     "d": "משפחה - Parents and their children"
+    },
+    {
+     "w": "friend",
+     "d": "חבר/חברה - Someone you like"
+    },
+    {
+     "w": "boy",
+     "d": "ילד - A male child"
+    },
+    {
+     "w": "girl",
+     "d": "ילדה - A female child"
+    },
+    {
+     "w": "person",
+     "d": "אדם - A human being"
+    }
+   ]
+  },
+  {
+   "id": "f9a37abf-f852-450d-a796-ddd2d41bfabd",
+   "origin": "curriculum",
+   "name": "אוצר מילים - מזג אוויר",
+   "description": "Hebrew weather vocabulary",
+   "language": "he",
+   "grade": 2,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "שֶׁמֶשׁ",
+     "d": "Sun - כוכב בהיר בשמים"
+    },
+    {
+     "w": "גֶּשֶׁם",
+     "d": "Rain - מים יורדים מהשמים"
+    },
+    {
+     "w": "עָנָן",
+     "d": "Cloud - לבן או אפור בשמים"
+    },
+    {
+     "w": "רוּחַ",
+     "d": "Wind - אוויר נע"
+    },
+    {
+     "w": "שֶׁלֶג",
+     "d": "Snow - מים קפואים לבנים"
+    },
+    {
+     "w": "חַם",
+     "d": "Hot - טמפרטורה גבוהה"
+    },
+    {
+     "w": "קַר",
+     "d": "Cold - טמפרטורה נמוכה"
+    },
+    {
+     "w": "שָׁמַיִם",
+     "d": "Sky - מעל הארץ"
+    },
+    {
+     "w": "קֶשֶׁת",
+     "d": "Rainbow - צבעים בשמים אחרי גשם"
+    },
+    {
+     "w": "סְעָרָה",
+     "d": "Storm - מזג אוויר רע עם רוח וגשם"
+    }
+   ]
+  },
+  {
+   "id": "f9e26395-e06c-481e-835d-53561959c822",
+   "origin": "curriculum",
+   "name": "Grade 7 - Life Science",
+   "description": "Life science vocabulary for 7th grade",
+   "language": "en",
+   "grade": 7,
+   "subject": "science",
+   "words": [
+    {
+     "w": "cell",
+     "d": "The basic unit of all living things"
+    },
+    {
+     "w": "organism",
+     "d": "Any living thing"
+    },
+    {
+     "w": "nucleus",
+     "d": "Control center of a cell"
+    },
+    {
+     "w": "chromosome",
+     "d": "Structure that carries genetic information"
+    },
+    {
+     "w": "DNA",
+     "d": "Molecule that contains genetic instructions"
+    },
+    {
+     "w": "protein",
+     "d": "Molecule that does work in cells"
+    },
+    {
+     "w": "mitosis",
+     "d": "Cell division for growth"
+    },
+    {
+     "w": "respiration",
+     "d": "Process of releasing energy from food"
+    },
+    {
+     "w": "adaptation",
+     "d": "Feature that helps survival"
+    },
+    {
+     "w": "evolution",
+     "d": "Change in species over time"
+    }
+   ]
+  },
+  {
+   "id": "fa7e963f-2e9e-4ce0-bcb3-c2970ca9c6cd",
+   "origin": "curriculum",
+   "name": "Grade 5 - Israel Geography",
+   "description": "Geography of Israel for 5th grade",
+   "language": "en",
+   "grade": 5,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "negev",
+     "d": "Desert in southern Israel"
+    },
+    {
+     "w": "galilee",
+     "d": "Region in northern Israel"
+    },
+    {
+     "w": "mediterranean",
+     "d": "Sea on Israel west coast"
+    },
+    {
+     "w": "dead sea",
+     "d": "Lowest point on Earth"
+    },
+    {
+     "w": "jordan river",
+     "d": "River flowing to Dead Sea"
+    },
+    {
+     "w": "kibbutz",
+     "d": "Collective community in Israel"
+    },
+    {
+     "w": "moshav",
+     "d": "Cooperative village in Israel"
+    },
+    {
+     "w": "jerusalem",
+     "d": "Capital city of Israel"
+    },
+    {
+     "w": "tel aviv",
+     "d": "Largest city in Israel"
+    },
+    {
+     "w": "haifa",
+     "d": "Major port city in Israel"
+    }
+   ]
+  },
+  {
+   "id": "fa950990-1970-4025-bd3b-c18cfcd82d7c",
+   "origin": "curriculum",
+   "name": "Bagrut - Technology & Innovation",
+   "description": "Technology vocabulary for Bagrut",
+   "language": "en",
+   "grade": 12,
+   "subject": "english",
+   "words": [
+    {
+     "w": "innovation",
+     "d": "חדשנות - New idea or method"
+    },
+    {
+     "w": "artificial intelligence",
+     "d": "בינה מלאכותית - Computer thinking"
+    },
+    {
+     "w": "digital",
+     "d": "דיגיטלי - Using computer technology"
+    },
+    {
+     "w": "automation",
+     "d": "אוטומציה - Machines doing work"
+    },
+    {
+     "w": "cybersecurity",
+     "d": "אבטחת סייבר - Protecting computers"
+    },
+    {
+     "w": "algorithm",
+     "d": "אלגוריתם - Step-by-step process"
+    },
+    {
+     "w": "virtual reality",
+     "d": "מציאות מדומה - Computer-created world"
+    },
+    {
+     "w": "data",
+     "d": "נתונים - Information"
+    },
+    {
+     "w": "network",
+     "d": "רשת - Connected computers"
+    },
+    {
+     "w": "application",
+     "d": "אפליקציה - Computer program"
+    }
+   ]
+  },
+  {
+   "id": "fdd6fd7b-9551-48f6-9587-f8db5e2a4745",
+   "origin": "curriculum",
+   "name": "Grade 7 - Algebra Basics",
+   "description": "Algebra vocabulary for 7th grade",
+   "language": "en",
+   "grade": 7,
+   "subject": "math",
+   "words": [
+    {
+     "w": "expression",
+     "d": "Numbers and operations without equals"
+    },
+    {
+     "w": "coefficient",
+     "d": "Number multiplying a variable"
+    },
+    {
+     "w": "constant",
+     "d": "Number that does not change"
+    },
+    {
+     "w": "integer",
+     "d": "Positive or negative whole number"
+    },
+    {
+     "w": "rational",
+     "d": "Number that can be a fraction"
+    },
+    {
+     "w": "proportion",
+     "d": "Equal ratios"
+    },
+    {
+     "w": "ratio",
+     "d": "Comparison of two quantities"
+    },
+    {
+     "w": "slope",
+     "d": "Steepness of a line"
+    },
+    {
+     "w": "coordinate",
+     "d": "Number pair showing position"
+    },
+    {
+     "w": "function",
+     "d": "Rule connecting input to output"
+    }
+   ]
+  },
+  {
+   "id": "ffc7fc60-aa4f-4517-ae02-26d97a2247b2",
+   "origin": "curriculum",
+   "name": "כיתה ז - אנגלית עם הגדרות בעברית",
+   "description": "מילים באנגלית עם הגדרות בעברית לכיתה ז",
+   "language": "he",
+   "grade": 7,
+   "subject": "english",
+   "words": [
+    {
+     "w": "responsibility",
+     "d": "אחריות - לדאוג למשהו"
+    },
+    {
+     "w": "opportunity",
+     "d": "הזדמנות - אפשרות לעשות משהו"
+    },
+    {
+     "w": "experience",
+     "d": "ניסיון - מה שלמדנו מהחיים"
+    },
+    {
+     "w": "achievement",
+     "d": "הישג - משהו שהצלחנו בו"
+    },
+    {
+     "w": "imagination",
+     "d": "דמיון - היכולת לחשוב דברים חדשים"
+    },
+    {
+     "w": "conversation",
+     "d": "שיחה - דיבור בין אנשים"
+    },
+    {
+     "w": "education",
+     "d": "חינוך - לימוד והכשרה"
+    },
+    {
+     "w": "government",
+     "d": "ממשלה - מי שמנהל את המדינה"
+    },
+    {
+     "w": "environment",
+     "d": "סביבה - העולם סביבנו"
+    },
+    {
+     "w": "technology",
+     "d": "טכנולוגיה - מכונות וכלים חדשים"
+    }
+   ]
+  }
+ ]
+}
