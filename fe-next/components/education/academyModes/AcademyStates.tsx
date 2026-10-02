@@ -35,6 +35,7 @@ export function AcademyNotice({
   art,
   onBack,
   onRetry,
+  primaryAction,
   testId,
   theme,
 }: {
@@ -44,6 +45,7 @@ export function AcademyNotice({
   art: string;
   onBack: () => void;
   onRetry?: () => void;
+  primaryAction?: { label: string; onClick: () => void };
   testId?: string;
   theme?: SceneTheme;
 }) {
@@ -55,12 +57,17 @@ export function AcademyNotice({
         <img src={art} alt="" className="mb-3 h-44 w-44 object-contain drop-shadow-[6px_6px_0_#000] lg:h-80 lg:w-80" />
         <h2 className="mb-2 font-neo-display text-3xl font-black uppercase text-neo-white lg:text-6xl" style={{ textShadow: '3px 3px 0 #000' }}>{heading}</h2>
         <p className="mb-5 font-neo-body text-base text-neo-cream lg:text-2xl">{body}</p>
+        {primaryAction && (
+          <button type="button" onClick={primaryAction.onClick} className={cn(primaryButtonClass, 'mb-2 w-full lg:max-w-xl')}>
+            {primaryAction.label}
+          </button>
+        )}
         {onRetry && (
           <button type="button" onClick={onRetry} className={cn(primaryButtonClass, 'mb-2 w-full lg:max-w-xl')}>
             {t('academy.modes.tryAgain', 'Try again')}
           </button>
         )}
-        <button type="button" onClick={onBack} className={cn(onRetry ? secondaryButtonClass : primaryButtonClass, 'w-full lg:max-w-xl')}>
+        <button type="button" onClick={onBack} className={cn(onRetry || primaryAction ? secondaryButtonClass : primaryButtonClass, 'w-full lg:max-w-xl')}>
           {t('academy.modes.backToAcademy', 'Back to Academy')}
         </button>
       </div>

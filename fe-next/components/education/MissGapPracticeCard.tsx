@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { Check, Printer, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { ClassGapSharePayload } from '@/lib/education/classGapShare';
+import { classGapCardKind, type ClassGapSharePayload } from '@/lib/education/classGapShare';
 import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { buildUnpluggedReteachPath } from '@/lib/education/unpluggedReteachLive';
@@ -81,7 +81,7 @@ export function MissGapPracticeCard({ payload }: MissGapPracticeCardProps) {
         data-testid="miss-gap-practice-card"
         className="w-full max-w-xl p-6 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard text-center"
       >
-        <p className="text-neo-white font-neo-body mb-4">{t('education.results.allFound')}</p>
+        <p className="text-neo-white font-neo-body mb-4">{t(classGapCardKind(payload) === 'sweep' ? 'education.results.allFound' : 'eg2Fix.gap.empty')}</p>
         <Link
           href={`/${locale}/education`}
           className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard"

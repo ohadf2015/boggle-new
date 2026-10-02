@@ -9,7 +9,9 @@ import { useJoinClassroom } from '@/hooks/useJoinClassroom';
 import { trackEduClassroomJoin } from '@/lib/education/telemetry';
 import logger from '@/utils/logger';
 import { resolveJoinTarget, type JoinTarget } from './joinTarget';
-import { sanitizeJoinCode, JOIN_CODE_LENGTH } from './JoinCodeField';
+import { sanitizeJoinCode, joinCodeOverflows, JOIN_CODE_LENGTH } from './JoinCodeField';
+
+const CODE_TOO_LONG = 'eg2Fix.join.codeTooLong';
 import { setStoredUsername } from '@/utils/profileStorage';
 
 export type JoinStep = 'code' | 'name';
@@ -75,6 +77,7 @@ export interface JoinFlowState {
   setName: (next: string) => void;
   /** Pass the freshest code when the caller has it (the sixth keystroke). */
   advance: (codeArg?: string) => void;
+  refuseTooLong: () => void;
   backToCode: () => void;
   submit: (overrideName?: string) => void;
 }
@@ -88,7 +91,8 @@ export function useJoinFlow(
   const { user, loading: authLoading } = useAuth();
   const { joinClassroom } = useJoinClassroom();
 
-  const seedCode = sanitizeJoinCode(initialCode);
+  const seedTooLong = joinCodeOverflows(initialCode);
+  const seedCode = seedTooLong ? '' : sanitizeJoinCode(initialCode);
   const [code, setCodeState] = useState(seedCode);
   // The QR path lands here already: pre-filled code, straight to the nickname.
   // Computed in the initializer, not an effect, so there is no code-step frame
@@ -98,9 +102,17 @@ export function useJoinFlow(
   );
   const [name, setNameState] = useState('');
   const [target, setTarget] = useState<JoinTarget | null>(null);
+  /** The code `target` describes; a verdict about another code must not act. */
+  const [targetCode, setTargetCode] = useState('');
 
   // If initialCode resolves late (e.g. useParams hydration), sync it to state
   useEffect(() => {
+    if (joinCodeOverflows(initialCode)) {
+      setCodeState('');
+      setStep('code');
+      setCodeErrorKey(CODE_TOO_LONG);
+      return;
+    }
     const sanitized = sanitizeJoinCode(initialCode);
     if (sanitized.length === JOIN_CODE_LENGTH) {
       setCodeState(sanitized);
@@ -109,7 +121,7 @@ export function useJoinFlow(
   }, [initialCode]);
   const [isChecking, setIsChecking] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [codeErrorKey, setCodeErrorKey] = useState<string | null>(null);
+  const [codeErrorKey, setCodeErrorKey] = useState<string | null>(seedTooLong ? CODE_TOO_LONG : null);
   const [formErrorKey, setFormErrorKey] = useState<string | null>(null);
   const [nameError, setNameError] = useState(false);
   const [suggestedName, setSuggestedName] = useState<string | null>(null);
@@ -161,9 +173,19 @@ export function useJoinFlow(
       // A slower answer for an older code must not overwrite a newer one.
       if (seq !== lookupSeq.current) return;
       setTarget(result);
+      setTargetCode(code);
       setIsChecking(false);
     })();
   }, [code]);
+
+  // A confident `invalid` sends the student back to fix the code, unless they
+  // have already started typing a name: then the verdict only decorates.
+  useEffect(() => {
+    if (step !== 'name' || target?.verdict !== 'invalid' || targetCode !== code) return;
+    if (isSubmitting || name.trim()) return;
+    setStep('code');
+    setCodeErrorKey('education.student.join.invalidCode');
+  }, [step, target, targetCode, code, isSubmitting, name]);
 
   /* ── Keep the sign-in return path alive from every entry point. ──────── */
   useEffect(() => {
@@ -223,6 +245,12 @@ export function useJoinFlow(
     },
     [code, target]
   );
+
+  const refuseTooLong = useCallback(() => {
+    setCodeState('');
+    setStep('code');
+    setCodeErrorKey(CODE_TOO_LONG);
+  }, []);
 
   const backToCode = useCallback(() => {
     setStep('code');
@@ -432,6 +460,7 @@ export function useJoinFlow(
     setCode,
     setName,
     advance,
+    refuseTooLong,
     backToCode,
     submit,
   };

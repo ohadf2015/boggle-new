@@ -1,5 +1,30 @@
 // HE translations
 const he = {
+  // @eg2Fix:start
+  "eg2Fix": {
+    "cookie": {
+      "adFreeMessage": "אנחנו משתמשים בעוגיות לכניסה לחשבון וכדי להבין אילו כלים הכי עוזרים למורים. אין פרסומות בעמודי מורים ותלמידים. אשרו הכול, או בחרו למטה."
+    },
+    "palette": {
+      "glossary": "מילון מונחים",
+      "admin": "ניהול"
+    },
+    "gap": {
+      "empty": "עדיין אין תוצאות כיתה. שחקו קודם משחק כיתתי, והמילים שפספסו יופיעו כאן."
+    },
+    "review": {
+      "joinClass": "להצטרף לכיתה"
+    },
+    "join": {
+      "codeTooLong": "הקוד הזה ארוך מדי. לקוד כיתה יש 6 תווים: הקלידו את הקוד שהמורה מראה."
+    },
+    "unplugged": {
+      "classic": "קלאסי בלי מסכים",
+      "teamTiles": "אריחי צוות בלי מסכים",
+      "reteach": "חזרה בלי מסכים"
+    }
+  },
+  // @eg2Fix:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "ספרייה",
@@ -14499,7 +14524,7 @@ const he = {
       "classicUnpluggedReveal": "חשוף מילה",
       "classicUnpluggedSubmitGotIt": "שלח: הצליחו",
       "classicUnpluggedSubmitNotYet": "שלח: עדיין לא",
-      "classicUnpluggedExit": "צא מ-Classic Unplugged",
+      "classicUnpluggedExit": "יציאה מ-Classic Unplugged",
       "classicUnpluggedMascotAlt": "לקסי מנחה Classic Unplugged",
       "classicUnpluggedMascotWinAlt": "לקסי חוגגת Classic Unplugged",
       "classicUnpluggedWinHeadline": "Classic Unplugged הושלם!",
@@ -19048,7 +19073,7 @@ const he = {
       "finish": "לתוצאות שלי"
     },
     "cookie": {
-      "message": "אנחנו משתמשים בעוגיות כדי לספור משחקים ולהציג פרסומות."
+      "message": "אנחנו משתמשים בעוגיות כדי לספור משחקים ולשמור שהמשחק ירוץ חלק."
     }
   },
   // @eduHq:start

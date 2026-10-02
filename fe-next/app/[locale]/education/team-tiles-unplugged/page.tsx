@@ -6,6 +6,7 @@
  */
 
 import type { Metadata } from 'next';
+import { unpluggedTitle } from '../classic-unplugged/unpluggedTitle';
 import { TeamTilesUnpluggedLive } from '@/components/education/TeamTilesUnpluggedLive';
 import {
   parseClassGapShareParams,
@@ -31,7 +32,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const payload = await payloadFrom(props);
   return {
     robots: { index: false, follow: true },
-    title: payload.lesson || undefined,
+    title: await unpluggedTitle(payload, 'teamTiles'),
   };
 }
 

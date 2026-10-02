@@ -98,3 +98,32 @@ describe('usePracticeLesson', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe('usePracticeLesson: dead link vs a failure worth retrying', () => {
+  const respond = (status: number, body: unknown) =>
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(body), { status })));
+
+  it.each([
+    [400, 'Invalid lessonId'],
+    [404, 'Lesson not found'],
+  ])('flags a %i as a dead link', async (status, error) => {
+    respond(status, { error });
+    const { result } = renderHook(() => usePracticeLesson(LESSON.id));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isDeadLink).toBe(true);
+  });
+
+  it('does not flag a server error as a dead link', async () => {
+    respond(500, { error: 'boom' });
+    const { result } = renderHook(() => usePracticeLesson(LESSON.id));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isDeadLink).toBe(false);
+  });
+
+  it('does not flag a network failure as a dead link', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+    const { result } = renderHook(() => usePracticeLesson(LESSON.id));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isDeadLink).toBe(false);
+  });
+});

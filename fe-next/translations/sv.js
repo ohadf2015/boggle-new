@@ -1,5 +1,30 @@
 // Sv translations
 const sv = {
+  // @eg2Fix:start
+  "eg2Fix": {
+    "cookie": {
+      "adFreeMessage": "Vi använder cookies för inloggning och för att se vilka funktioner som hjälper lärare mest. Inga annonser på lärar- eller elevsidor. Godkänn alla eller välj nedan."
+    },
+    "palette": {
+      "glossary": "Ordlista",
+      "admin": "Admin"
+    },
+    "gap": {
+      "empty": "Inga klassresultat än. Spela ett klasspel först, så dyker orden de missade upp här."
+    },
+    "review": {
+      "joinClass": "Gå med i min klass"
+    },
+    "join": {
+      "codeTooLong": "Den koden är för lång. Klasskoder har 6 tecken: skriv koden som läraren visar."
+    },
+    "unplugged": {
+      "classic": "Klassisk utan skärm",
+      "teamTiles": "Lagbrickor utan skärm",
+      "reteach": "Repetition utan skärm"
+    }
+  },
+  // @eg2Fix:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Bibliotek",
@@ -19118,7 +19143,7 @@ const sv = {
       "finish": "Se mitt resultat"
     },
     "cookie": {
-      "message": "Vi använder kakor för att räkna spel och visa annonser."
+      "message": "Vi använder kakor för att räkna spel och hålla spelet igång smidigt."
     }
   },
   // @eduHq:start

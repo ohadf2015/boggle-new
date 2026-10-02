@@ -148,16 +148,13 @@ export async function answerMissingRoom(
   emitError(socket, ErrorCodes.GAME_NOT_FOUND);
   if (!record) return;
 
-  // The room is gone from memory AND from Redis while the class session is
-  // live. For a class this is the most common way a child is turned away — 43
-  // on production in the three weeks to 2026-09-16. Distinct from
-  // SESSION_ENDED: the teacher never ended it; the ROOM stopped existing
-  // (restart, redeploy, or an instance that never held it).
+  // Ending a session tears its room down, so an ended session lands here, not
+  // at the seat gate; only a LIVE session without a room is a real ROOM_GONE.
   try {
     const event = buildClassroomJoinRefusedEvent({
       gameCode,
       classroomId: record.classroomId,
-      reason: 'ROOM_GONE',
+      reason: isClassroomSessionEnded(record) ? 'SESSION_ENDED' : 'ROOM_GONE',
       door: 'join',
       actorId: (socket.data?.verifiedUserId as string | undefined) ?? null,
     });

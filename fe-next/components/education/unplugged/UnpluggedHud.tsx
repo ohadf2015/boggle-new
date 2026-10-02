@@ -6,9 +6,8 @@
  */
 'use client';
 
-import Link from 'next/link';
-import { ArrowLeft, Flame, Volume2, VolumeX } from 'lucide-react';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { Flame, Volume2, VolumeX } from 'lucide-react';
+import { ClassicUnpluggedExitLink } from '../ClassicUnpluggedExitLink';
 import { cn } from '@/lib/utils';
 import { UnpluggedMascot, type UnpluggedMood } from './UnpluggedMascot';
 
@@ -54,18 +53,7 @@ export function UnpluggedHud({
       data-testid="unplugged-hud"
       className="shrink-0 flex items-center gap-2 sm:gap-4 px-2 sm:px-4 py-2 border-b-neo border-neo-cream/40 bg-neo-navy-light"
     >
-      <Link
-        href={homeHref}
-        aria-label={exitLabel}
-        title={exitLabel}
-        data-testid="unplugged-exit"
-        // Cream edge, not black: a black border on this navy-light header scores
-        // ~1.2:1 and the control disappears (DESIGN-ADDENDUM). `border-[3px]`,
-        // not `border-neo` — see the BTN note in UnpluggedStage.
-        className="shrink-0 grid place-items-center w-9 h-9 sm:w-11 sm:h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream shadow-hard-sm"
-      >
-        <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 sm:w-5 sm:h-5" />
-      </Link>
+      <ClassicUnpluggedExitLink href={homeHref} label={exitLabel} />
 
       <div className="min-w-0 flex-1">
         <p className="truncate font-neo-display font-bold text-neo-white text-[clamp(0.85rem,1.6vw,1.5rem)] leading-tight">

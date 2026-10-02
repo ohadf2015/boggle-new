@@ -131,6 +131,8 @@ function checkAutoKickInactive(io: Server, forEachGame: (cb: (gameCode: string, 
   forEachGame((gameCode: string, game: any) => {
     // Only auto-kick in lobby (waiting state), not during active games
     if (game.gameState !== 'waiting') return;
+    // A class lobby is a queue for the teacher's START; a kick here also blocks the rejoin.
+    if (game.isClassroom) return;
 
     const usernames = Object.keys(game.users || {});
     for (const username of usernames) {
@@ -157,7 +159,7 @@ function checkAfkWarnings(io: Server, forEachGame: (cb: (gameCode: string, game:
   const warningThresholdMs = AUTO_KICK_AFK_MS - AFK_WARNING_BEFORE_KICK_MS;
 
   forEachGame((gameCode: string, game: any) => {
-    if (game.gameState !== 'waiting') return;
+    if (game.gameState !== 'waiting' || game.isClassroom) return;
 
     const usernames = Object.keys(game.users || {});
     for (const username of usernames) {

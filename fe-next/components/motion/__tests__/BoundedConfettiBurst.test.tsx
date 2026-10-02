@@ -108,4 +108,22 @@ describe('BoundedConfettiBurst', () => {
     expect(anchor).toHaveStyle('width: 200px');
     expect(anchor).toHaveStyle('height: 100px');
   });
+
+  it('renders the same anchor on a mobile client as the server did, so hydration matches', async () => {
+    const { prefersStaticFullscreenOverlay } = await import('@/lib/native/webViewLayerFlash');
+    const anchorClass = (skip: boolean) => {
+      vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(skip);
+      const { container, unmount } = render(
+        <BoundedConfettiBurst trigger={false}>
+          <div>Content</div>
+        </BoundedConfettiBurst>
+      );
+      const cls = container.querySelector('[data-testid="bounded-confetti-anchor"]')?.getAttribute('class');
+      unmount();
+      return cls;
+    };
+    expect(anchorClass(true)).toBe(anchorClass(false));
+    vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(false);
+  });
 });
+
