@@ -1,11 +1,12 @@
 'use client';
 
 import { m, useReducedMotion } from 'framer-motion';
-import { BookA, Gamepad2, Target, Users, type LucideIcon } from 'lucide-react';
+import { BookA, Gamepad2, LifeBuoy, Target, Users, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { MasteryTotals } from '@/lib/education/wordMasteryReport';
 import { cn } from '@/lib/utils';
 import { useCountUp } from './useCountUp';
+import type { ClassInsights } from './classInsights';
 
 const TONES = {
   lime: 'text-neo-lime border-neo-lime',
@@ -55,9 +56,27 @@ function StatCard({
   );
 }
 
-export function MasteryStatCards({ totals }: { totals: MasteryTotals }) {
+export function MasteryStatCards({ totals, insights }: { totals: MasteryTotals; insights?: ClassInsights | null }) {
   const { t } = useLanguage();
   const accuracyTone = totals.classAccuracy >= 80 ? 'lime' : totals.classAccuracy >= 50 ? 'cyan' : 'pink';
+  if (insights) {
+    return (
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+        <StatCard id="accuracy" index={0} icon={Target} tone={accuracyTone} value={totals.classAccuracy} suffix="%" label={t('eduPro.mastery.stats.accuracy')} />
+        <StatCard
+          id="needHelp"
+          index={1}
+          icon={LifeBuoy}
+          tone={insights.belowGoalCount > 0 ? 'pink' : 'lime'}
+          value={insights.belowGoalCount}
+          suffix={`/${totals.students}`}
+          label={t('eg2Rep.report.stats.needHelp', { goal: insights.goal })}
+        />
+        <StatCard id="mastered" index={2} icon={BookA} tone="cyan" value={insights.masteredWords} suffix={`/${totals.words}`} label={t('eg2Rep.report.stats.mastered')} />
+        <StatCard id="sessions" index={3} icon={Gamepad2} tone="purple" value={totals.sessions} label={t('eduPro.mastery.stats.sessions')} />
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
       <StatCard id="accuracy" index={0} icon={Target} tone={accuracyTone} value={totals.classAccuracy} suffix="%" label={t('eduPro.mastery.stats.accuracy')} />

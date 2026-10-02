@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Swords, BookOpen, Crosshair, Lock, Grid2x2 } from 'lucide-react';
 import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
+import { AssignmentStep } from './AssignmentStep';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import {
@@ -106,8 +107,8 @@ export default function AssignmentCreator({
   );
   const supportedFocuses = focusCounts ? VOCAB_FOCUSES.filter((f) => focusCounts[f] > 0) : [];
 
-  const classroomLanguage: Language =
-    classrooms.find((c) => c.id === classroomId)?.language ?? 'en';
+  const classroom = classrooms.find((c) => c.id === classroomId);
+  const classroomLanguage: Language = classroom?.language ?? 'en';
   const starterPacks = useMemo(
     () => firstAssignmentTemplatesFor(classroomLanguage),
     [classroomLanguage],
@@ -230,11 +231,34 @@ export default function AssignmentCreator({
           />
         ) : (
         <div className="space-y-5">
-            {/* Assignment Type Selector */}
-            <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
-                {t('teacher.assignment.typeLabel')}
-              </label>
+            <AssignmentStep step="list" n={1} label={t('teacher.assignment.lessonLabel')}>
+              <select
+                value={selectedLessonId}
+                onChange={(e) => setSelectedLessonId(e.target.value)}
+                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body"
+                disabled={isLoadingLessons}
+              >
+                <option value="">{t('teacher.assignment.selectLesson')}</option>
+                {lessons.map((lesson) => (
+                  <option key={lesson.id} value={lesson.id}>
+                    {lessonLabels.get(lesson.id) ?? lesson.name} ({lesson.words.length} {t('teacher.assignment.words')})
+                  </option>
+                ))}
+              </select>
+            </AssignmentStep>
+
+            <AssignmentStep step="who" n={2} label={t('eg2Rep.assign.who')}>
+              <p
+                data-testid="assignment-who"
+                className="flex flex-wrap items-center gap-2 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light px-3 py-2 font-neo-body text-sm text-neo-white"
+              >
+                <span dir="auto" className="font-bold">{classroom?.name}</span>
+                <span className="text-neo-cream/70">·</span>
+                <span className="text-neo-cream/80">{t('eg2Rep.assign.students', { count: classroom?.member_count ?? 0 })}</span>
+              </p>
+            </AssignmentStep>
+
+            <AssignmentStep step="mode" n={3} label={t('teacher.assignment.typeLabel')}>
               <button
                 type="button"
                 data-testid="assignment-mode-wordcraft"
@@ -286,27 +310,7 @@ export default function AssignmentCreator({
                   <span className="font-bold">{t('teacher.assignment.duelChallenge')}</span>
                 </button>
               </div>
-            </div>
-
-            {/* Lesson Selector */}
-            <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
-                {t('teacher.assignment.lessonLabel')}
-              </label>
-              <select
-                value={selectedLessonId}
-                onChange={(e) => setSelectedLessonId(e.target.value)}
-                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body"
-                disabled={isLoadingLessons}
-              >
-                <option value="">{t('teacher.assignment.selectLesson')}</option>
-                {lessons.map((lesson) => (
-                  <option key={lesson.id} value={lesson.id}>
-                    {lessonLabels.get(lesson.id) ?? lesson.name} ({lesson.words.length} {t('teacher.assignment.words')})
-                  </option>
-                ))}
-              </select>
-            </div>
+            </AssignmentStep>
 
             {/* Vocabulary focus (practice only, once a lesson is chosen) */}
             {selectedType === 'practice' && selectedLesson && (
@@ -374,7 +378,9 @@ export default function AssignmentCreator({
               </div>
             )}
 
-            <AssignmentCreatorDueDate value={dueDate} onChange={setDueDate} />
+            <AssignmentStep step="due" n={4} label={t('teacher.assignment.dueDate')}>
+              <AssignmentCreatorDueDate value={dueDate} onChange={setDueDate} />
+            </AssignmentStep>
 
             {/* Optional Instructions */}
             <div>

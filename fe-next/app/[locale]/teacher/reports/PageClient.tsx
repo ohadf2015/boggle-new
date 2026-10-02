@@ -33,6 +33,7 @@ import { ProGate } from '@/components/teacher/ProGate';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
+import { ReportsNoClasses } from '@/components/teacher/reports/ReportsNoClasses';
 import { FullReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
@@ -233,9 +234,7 @@ function TeacherReportsInner() {
             ))}
           </ul>
         ) : (
-          <p className="rounded-neo border-2 border-dashed border-neo-cream/30 p-8 text-center text-neo-cream/80">
-            {t('teacher.reports.noClassroomsFound')}
-          </p>
+          <ReportsNoClasses />
         )}
       </>
     );
@@ -276,7 +275,11 @@ function TeacherReportsInner() {
           </div>
           <TeacherPlanBadge />
         </div>
-        <WordMasteryReport classroomId={selectedClassroomId} classroomName={selectedClassroom?.name ?? ''} />
+        <WordMasteryReport
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+          onStudentClick={handleStudentClick}
+        />
         <div className="space-y-3">
           <SectionDisclosure section="assignments">
             <AssignmentProgressReport

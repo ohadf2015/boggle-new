@@ -19341,6 +19341,69 @@ const ja = {
       "needLesson": "レッスンを選ぶと配信できます。",
       "needDate": "締切日を選ぶと配信できます。"
     }
+  },
+  "eg2Rep": {
+    "report": {
+      "belowGoal": "目標{goal}%未満・{count}人",
+      "onTrack": "順調・{count}人",
+      "missesLabel": "間違えた単語:",
+      "noMisses": "まだミスなし",
+      "trend": {
+        "up": "上昇中",
+        "down": "低下中",
+        "steady": "横ばい",
+        "new": "初回"
+      },
+      "stats": {
+        "needHelp": "{goal}%未満",
+        "mastered": "習得した単語"
+      },
+      "state": {
+        "stuck": "つまずき",
+        "improving": "改善中",
+        "mastered": "習得",
+        "new": "新規"
+      },
+      "tabs": {
+        "students": "生徒",
+        "words": "単語",
+        "grid": "一覧表",
+        "label": "レポートの表示"
+      },
+      "share": "共有",
+      "print": "印刷",
+      "copied": "要約をコピーしました",
+      "summary": {
+        "title": "{classroom} クラスレポート",
+        "accuracy": "クラスの正答率：{accuracy}%（ゲーム結果{games}件）",
+        "mastered": "習得した単語：{words}語中{mastered}語",
+        "needHelp": "目標{goal}%未満（{count}人）",
+        "hardest": "復習する単語：{words}"
+      },
+      "empty": {
+        "title": "まだゲーム結果がありません",
+        "live": "ライブゲームを始める",
+        "assign": "宿題を出す"
+      },
+      "title": "クラスの様子",
+      "subtitle": "目標に届いていない生徒と、復習すべき単語がすべてのゲームからわかります。",
+      "noClasses": {
+        "cta": "最初のクラスを作る"
+      }
+    },
+    "hq": {
+      "accuracy": "正答率",
+      "needHelp": "要サポート {count}人",
+      "allOnTrack": "全員順調",
+      "whoNeedsHelp": "つまずいているのは誰？",
+      "hardest": "最難関:",
+      "openReport": "クラスレポートを開く",
+      "liveShort": "ライブ授業"
+    },
+    "assign": {
+      "who": "配布先",
+      "students": "生徒数：{count}人"
+    }
   }
 };
 

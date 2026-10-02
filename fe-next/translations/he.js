@@ -19271,6 +19271,69 @@ const he = {
       "needLesson": "בחרו שיעור כדי לשלוח.",
       "needDate": "בחרו תאריך הגשה כדי לשלוח."
     }
+  },
+  "eg2Rep": {
+    "report": {
+      "belowGoal": "מתחת ליעד {goal}% · {count}",
+      "onTrack": "בדרך הנכונה · {count}",
+      "missesLabel": "מתבלבלים ב:",
+      "noMisses": "אין טעויות עדיין",
+      "trend": {
+        "up": "משתפר",
+        "down": "בירידה",
+        "steady": "יציב",
+        "new": "משחק ראשון"
+      },
+      "stats": {
+        "needHelp": "מתחת ל-{goal}%",
+        "mastered": "מילים שנרכשו"
+      },
+      "state": {
+        "stuck": "תקועה",
+        "improving": "משתפרת",
+        "mastered": "נרכשה",
+        "new": "חדשה"
+      },
+      "tabs": {
+        "students": "תלמידים",
+        "words": "מילים",
+        "grid": "טבלה",
+        "label": "תצוגות הדוח"
+      },
+      "share": "שיתוף",
+      "print": "הדפסה",
+      "copied": "הסיכום הועתק",
+      "summary": {
+        "title": "{classroom} — דוח כיתה",
+        "accuracy": "דיוק כיתתי: {accuracy}% מתוך {games} תוצאות משחק",
+        "mastered": "מילים שנרכשו: {mastered} מתוך {words}",
+        "needHelp": "מתחת ליעד {goal}% ({count})",
+        "hardest": "מילים לחזרה: {words}"
+      },
+      "empty": {
+        "title": "עוד אין תוצאות משחק",
+        "live": "הפעלת משחק חי",
+        "assign": "מתן שיעורי בית"
+      },
+      "title": "הדופק של הכיתה",
+      "subtitle": "מי מתחת ליעד ואילו מילים כדאי ללמד שוב — מכל המשחקים.",
+      "noClasses": {
+        "cta": "יצירת הכיתה הראשונה"
+      }
+    },
+    "hq": {
+      "accuracy": "דיוק",
+      "needHelp": "צריכים עזרה: {count}",
+      "allOnTrack": "כולם בדרך הנכונה",
+      "whoNeedsHelp": "מי צריך עזרה?",
+      "hardest": "הכי קשה:",
+      "openReport": "פתיחת דוח הכיתה",
+      "liveShort": "שיעור חי"
+    },
+    "assign": {
+      "who": "למי זה הולך",
+      "students": "תלמידים: {count}"
+    }
   }
 };
 

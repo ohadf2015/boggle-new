@@ -19359,6 +19359,69 @@ const es = {
       "needLesson": "Elige una lección para asignar.",
       "needDate": "Elige una fecha de entrega para asignar."
     }
+  },
+  "eg2Rep": {
+    "report": {
+      "belowGoal": "Por debajo de la meta del {goal} % · {count}",
+      "onTrack": "Van bien · {count}",
+      "missesLabel": "Falla:",
+      "noMisses": "Sin fallos todavía",
+      "trend": {
+        "up": "Mejorando",
+        "down": "Bajando",
+        "steady": "Estable",
+        "new": "Primer juego"
+      },
+      "stats": {
+        "needHelp": "Bajo el {goal} %",
+        "mastered": "Palabras dominadas"
+      },
+      "state": {
+        "stuck": "Atascada",
+        "improving": "Mejorando",
+        "mastered": "Dominada",
+        "new": "Nueva"
+      },
+      "tabs": {
+        "students": "Estudiantes",
+        "words": "Palabras",
+        "grid": "Tabla",
+        "label": "Vistas del informe"
+      },
+      "share": "Compartir",
+      "print": "Imprimir",
+      "copied": "Resumen copiado",
+      "summary": {
+        "title": "{classroom}: informe de la clase",
+        "accuracy": "Precisión de la clase: {accuracy} % en {games} resultados de juego",
+        "mastered": "Palabras dominadas: {mastered} de {words}",
+        "needHelp": "Por debajo de la meta del {goal} % ({count})",
+        "hardest": "Palabras para repasar: {words}"
+      },
+      "empty": {
+        "title": "Aún no hay resultados de juego",
+        "live": "Jugar en vivo",
+        "assign": "Asignar tarea"
+      },
+      "title": "El pulso de la clase",
+      "subtitle": "Quién está por debajo de la meta y qué palabras repasar, a partir de cada juego.",
+      "noClasses": {
+        "cta": "Crea tu primera clase"
+      }
+    },
+    "hq": {
+      "accuracy": "precisión",
+      "needHelp": "Necesitan ayuda: {count}",
+      "allOnTrack": "Todos van bien",
+      "whoNeedsHelp": "¿Quién necesita ayuda?",
+      "hardest": "La más difícil:",
+      "openReport": "Abrir el informe de la clase",
+      "liveShort": "Clase en vivo"
+    },
+    "assign": {
+      "who": "Para quién",
+      "students": "Estudiantes: {count}"
+    }
   }
 };
 

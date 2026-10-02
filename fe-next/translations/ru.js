@@ -19076,6 +19076,69 @@ const ru = {
       "needLesson": "Выберите урок, чтобы назначить.",
       "needDate": "Выберите срок сдачи, чтобы назначить."
     }
+  },
+  "eg2Rep": {
+    "report": {
+      "belowGoal": "Ниже цели {goal}% · {count}",
+      "onTrack": "В норме · {count}",
+      "missesLabel": "Ошибки:",
+      "noMisses": "Пока без ошибок",
+      "trend": {
+        "up": "Растёт",
+        "down": "Снижается",
+        "steady": "Стабильно",
+        "new": "Первая игра"
+      },
+      "stats": {
+        "needHelp": "Ниже {goal}%",
+        "mastered": "Освоено слов"
+      },
+      "state": {
+        "stuck": "Трудное",
+        "improving": "Улучшается",
+        "mastered": "Освоено",
+        "new": "Новое"
+      },
+      "tabs": {
+        "students": "Ученики",
+        "words": "Слова",
+        "grid": "Таблица",
+        "label": "Разделы отчёта"
+      },
+      "share": "Поделиться",
+      "print": "Печать",
+      "copied": "Сводка скопирована",
+      "summary": {
+        "title": "{classroom} — отчёт по классу",
+        "accuracy": "Точность класса: {accuracy}% по {games} результатам игр",
+        "mastered": "Освоено слов: {mastered} из {words}",
+        "needHelp": "Ниже цели {goal}% ({count})",
+        "hardest": "Слова для повторения: {words}"
+      },
+      "empty": {
+        "title": "Пока нет результатов игр",
+        "live": "Начать живую игру",
+        "assign": "Задать домашнее задание"
+      },
+      "title": "Пульс класса",
+      "subtitle": "Кто ниже цели и какие слова стоит повторить — по всем играм.",
+      "noClasses": {
+        "cta": "Создать первый класс"
+      }
+    },
+    "hq": {
+      "accuracy": "точность",
+      "needHelp": "Нужна помощь: {count}",
+      "allOnTrack": "Все в норме",
+      "whoNeedsHelp": "Кому нужна помощь?",
+      "hardest": "Сложнее всего:",
+      "openReport": "Открыть отчёт по классу",
+      "liveShort": "Живой урок"
+    },
+    "assign": {
+      "who": "Кому",
+      "students": "Учеников: {count}"
+    }
   }
 };
 

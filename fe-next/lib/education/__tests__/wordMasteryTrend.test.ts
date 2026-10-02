@@ -154,6 +154,18 @@ describe('buildClassMastery — identity and normalization', () => {
     expect(out.students[0]?.words.find((w) => w.word === 'tacit')?.attempts).toBe(1);
   });
 
+  it('Given a rematch that reuses the room code, When building, Then each round counts', () => {
+    const out = buildClassMastery([
+      askedRow('s1', '2026-09-01T10:00:00Z', 'S2WN68', ['tacit'], []),
+      askedRow('s1', '2026-09-01T10:04:00Z', 'S2WN68', ['tacit'], ['tacit']),
+    ]);
+
+    const word = out.students[0]?.words.find((w) => w.word === 'tacit');
+    expect(word?.attempts).toBe(2);
+    expect(word?.trend).toBe('improving');
+    expect(out.sessionsAnalyzed).toBe(2);
+  });
+
   it('Given mixed casing, When building, Then words fold to one key', () => {
     const out = buildClassMastery([
       askedRow('s1', '2026-09-01T10:00:00Z', 'AAA111', ['Lucid'], []),

@@ -5,12 +5,13 @@ import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { resolveDisplayName } from '@/lib/displayName';
 import { getWithAuth } from '@/utils/authFetch';
 import type { WordMasteryPreview, WordMasteryReport } from '@/lib/education/wordMasteryReport';
+import type { ClassInsights } from './classInsights';
 
 export type MasteryState =
   | { status: 'loading' }
   | { status: 'error' }
   | { status: 'locked'; preview: WordMasteryPreview }
-  | { status: 'ready'; report: WordMasteryReport };
+  | { status: 'ready'; report: WordMasteryReport; insights: ClassInsights | null };
 
 export function useWordMasteryReport(classroomId: string): MasteryState {
   const [state, setState] = useState<MasteryState>({ status: 'loading' });
@@ -24,7 +25,7 @@ export function useWordMasteryReport(classroomId: string): MasteryState {
         if (cancelled) return;
         if (res.status === 402 && body?.locked && body.preview) return setState({ status: 'locked', preview: body.preview });
         if (!res.ok || !body?.ok || !body.report) return setState({ status: 'error' });
-        setState({ status: 'ready', report: body.report });
+        setState({ status: 'ready', report: body.report, insights: body.insights ?? null });
       })
       .catch(() => {
         if (!cancelled) setState({ status: 'error' });

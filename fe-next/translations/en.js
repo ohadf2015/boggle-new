@@ -220,7 +220,7 @@ const en = {
       "joinCodeCopied": "Join link copied",
       "progressTitle": "Class progress",
       "progressStudents": "students",
-      "progressAssignments": "assignments",
+      "progressAssignments": "assigned",
       "progressSubmitted": "submitted",
       "progressUpgrade": "Teacher Pro"
     },
@@ -18403,6 +18403,69 @@ const en = {
       "needLessonAndDate": "Pick a lesson and a due date to assign.",
       "needLesson": "Pick a lesson to assign.",
       "needDate": "Pick a due date to assign."
+    }
+  },
+  "eg2Rep": {
+    "report": {
+      "belowGoal": "Below the {goal}% goal · {count}",
+      "onTrack": "On track · {count}",
+      "missesLabel": "Misses:",
+      "noMisses": "No misses yet",
+      "trend": {
+        "up": "Improving",
+        "down": "Slipping",
+        "steady": "Holding steady",
+        "new": "First game"
+      },
+      "stats": {
+        "needHelp": "Below {goal}%",
+        "mastered": "Words mastered"
+      },
+      "state": {
+        "stuck": "Stuck",
+        "improving": "Improving",
+        "mastered": "Mastered",
+        "new": "New"
+      },
+      "tabs": {
+        "students": "Students",
+        "words": "Words",
+        "grid": "Grid",
+        "label": "Report views"
+      },
+      "share": "Share",
+      "print": "Print",
+      "copied": "Summary copied",
+      "summary": {
+        "title": "{classroom} — class report",
+        "accuracy": "Class accuracy: {accuracy}% across {games} game results",
+        "mastered": "Words mastered: {mastered} of {words}",
+        "needHelp": "Below the {goal}% goal ({count})",
+        "hardest": "Words to reteach: {words}"
+      },
+      "empty": {
+        "title": "No game results yet",
+        "live": "Play a live game",
+        "assign": "Assign homework"
+      },
+      "title": "Class pulse",
+      "subtitle": "Who is below goal and which words to reteach — from every game.",
+      "noClasses": {
+        "cta": "Create your first class"
+      }
+    },
+    "hq": {
+      "accuracy": "accuracy",
+      "needHelp": "Need help: {count}",
+      "allOnTrack": "All on track",
+      "whoNeedsHelp": "Who needs help?",
+      "hardest": "Hardest:",
+      "openReport": "Open class report",
+      "liveShort": "Live class"
+    },
+    "assign": {
+      "who": "Who gets it",
+      "students": "Students: {count}"
     }
   }
 };

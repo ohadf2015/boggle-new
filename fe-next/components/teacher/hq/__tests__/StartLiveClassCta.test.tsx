@@ -110,4 +110,37 @@ describe('<StartLiveClassCta>', () => {
     });
     expect(JSON.stringify(capture.mock.calls)).not.toContain('AB12CD');
   });
+
+  it('Given a phone, Then the panel is one row: the join code and body copy sit with Get students in, not twice', () => {
+    render(
+      <StartLiveClassCta
+        classroomId="c1"
+        studentCount={2}
+        assignmentCount={1}
+        joinCode="AB12CD"
+        onStart={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId('hq-start-live-join-row').className).toContain('max-sm:hidden');
+    expect(screen.getByTestId('hq-start-live-body').className).toContain('max-sm:hidden');
+    expect(screen.getByTestId('hq-start-live-class').className).toContain('max-sm:flex-row');
+  });
+
+  it('Given the inline variant, Then only the start button renders, still tracked, for the progress row on phones', () => {
+    const onStart = vi.fn();
+    render(
+      <StartLiveClassCta
+        classroomId="c1"
+        studentCount={2}
+        assignmentCount={1}
+        joinCode="AB12CD"
+        onStart={onStart}
+        variant="inline"
+      />,
+    );
+    expect(screen.queryByTestId('hq-start-live-join-code')).toBeNull();
+    fireEvent.click(screen.getByTestId('hq-start-live-cta'));
+    expect(onStart).toHaveBeenCalledTimes(1);
+    expect(capture).toHaveBeenCalledWith('edu_assignment_start_live_clicked', { classroom_id: 'c1' });
+  });
 });

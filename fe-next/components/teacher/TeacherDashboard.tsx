@@ -1,14 +1,4 @@
-/**
- * TeacherDashboard — "Teacher HQ", the one-screen command deck.
- *
- * Zero scroll at phone and desktop, on a calm navy canvas. Class chips pick
- * the class; the hero is START A GAME (one armed button, a quiet row of mode
- * chips above it, the express lobby on the other side — a teacher reaches a
- * joinable room in ≤3 taps with the class preselected); the second hero is
- * GET STUDENTS IN (70% of classes never get a student — the join code, link
- * and projector are the product). Lessons, class tools and the Pro ask open
- * as sheets from the dock; nothing stacks into a long column.
- */
+/** Teacher HQ: one-screen command deck — START A GAME, GET STUDENTS IN, and the class pulse; the rest opens as dock sheets. */
 'use client';
 
 import { type ReactNode, useState, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -53,6 +43,7 @@ import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
 import { FirstAssignmentPanel } from './hq/FirstAssignmentPanel';
 import { StartLiveClassCta } from './hq/StartLiveClassCta';
 import { ClassProgressStrip } from './hq/ClassProgressStrip';
+import { ClassPulseRow } from './hq/ClassPulseRow';
 import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
 import { liveClassroomHref } from '@/lib/education/startLiveClassCta';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
@@ -83,8 +74,6 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
   const { profile } = useAuth();
   const router = useRouter();
   const isRTL = language === 'he';
-  // `?reviewWords=` is written by the "Practice these words" CTA on the
-  // after-game insights card and read here, once, on first render.
   const deepLink = useTeacherDashboardDeepLink();
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(() => deepLink.openAssignment);
   const [toolsOpen, setToolsOpen] = useState(false);
@@ -203,8 +192,6 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
     [router, language],
   );
 
-  // The whole hand-off: stash what to play (and for which class), then go.
-  // The express lobby does the rest — room and code — without another screen.
   const handleQuickLaunch = useCallback(
     (intent: Omit<QuickLaunchIntent, 'createdAt'>) => {
       writeQuickLaunchIntent({
@@ -222,6 +209,15 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
   const hasProChip = upsell.chip !== null;
   const smUp = useMediaQuery('(min-width: 640px)');
   const firstRun = !classroomsLoading && (classrooms.length === 0 || !!newlyCreatedJoinCode);
+  const startLive = selectedClassroom
+    ? {
+        classroomId: selectedClassroom.id,
+        studentCount: selectedClassroom.member_count ?? 0,
+        assignmentCount,
+        joinCode: selectedClassroom.join_code || '',
+        onStart: () => router.push(liveClassroomHref(language, selectedClassroom.id)),
+      }
+    : null;
 
   return (
     <EducationShell
@@ -239,11 +235,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         />
       )}
 
-      {/* Calm canvas: flat navy with a whisper of light from the top. The
-          full-bleed observatory art + scrim used to sit behind every pixel of
-          the deck — permanent visual noise competing with the two surfaces a
-          teacher actually reads. No transform anywhere on this subtree — the
-          sheets below are `position: fixed`. */}
+      {/* No transform anywhere on this subtree — the sheets below are `position: fixed`. */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(255,254,240,0.05),transparent_60%)]"
         aria-hidden="true"
@@ -364,9 +356,6 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
           </div>
         ) : (
           <>
-            {/* Phone: the hero sizes to its CONTENT (mode cards hold a fixed
-                aspect) and the join slot takes what is left — neither column
-                may stretch into space the other hasn't claimed yet. */}
             <div
               data-testid="teacher-dashboard-main"
               className="min-w-0 shrink-0 lg:col-span-3 lg:min-h-0 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-3 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-0"
@@ -400,21 +389,17 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                       onCta={() => setShowAssignmentCreator(true)}
                     />
                   ) : null}
+                  <ClassPulseRow
+                    classroomId={selectedClassroom.id}
+                    studentCount={selectedClassroom.member_count ?? 0}
+                  />
                   <ClassProgressStrip
                     classroomId={selectedClassroom.id}
                     studentCount={selectedClassroom.member_count ?? 0}
                     assignmentCount={assignmentCount}
                     submittedCount={submittedCount}
                     hasPro={hasPro}
-                  />
-                  <StartLiveClassCta
-                    classroomId={selectedClassroom.id}
-                    studentCount={selectedClassroom.member_count ?? 0}
-                    assignmentCount={assignmentCount}
-                    joinCode={selectedClassroom.join_code || ''}
-                    onStart={() =>
-                      router.push(liveClassroomHref(language, selectedClassroom.id))
-                    }
+                    action={startLive ? <StartLiveClassCta variant="inline" {...startLive} /> : undefined}
                   />
                   <GetStudentsInCard
                     className="flex-1"

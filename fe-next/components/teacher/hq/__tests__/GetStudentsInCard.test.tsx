@@ -19,6 +19,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('../useClassRoster', () => ({ useClassRoster: () => roster() }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
+const joinCodeCopied = vi.fn();
+vi.mock('@/lib/education/telemetry', async (orig) => ({
+  ...(await orig<object>()),
+  trackEduJoinCodeCopied: (...a: unknown[]) => joinCodeCopied(...a),
+}));
 
 import { GetStudentsInCard } from '../GetStudentsInCard';
 
@@ -49,6 +54,7 @@ describe('<GetStudentsInCard>', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
     fireEvent.click(screen.getByTestId('hq-copy-link'));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/en/join/AB12CD`));
+    expect(joinCodeCopied).toHaveBeenCalledWith({ classroomId: 'c1' });
   });
 
   it('When projector is tapped, Then the projector opens', () => {
