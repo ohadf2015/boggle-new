@@ -5231,7 +5231,8 @@ html[data-cosy='true'] .animate-neo-press {
   to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 .cube-reveal { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: no-preference) {
+/* Touch screens get still tiles: the scroll-linked rise stepped on Android WebView and read as tiles jumping. */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   @supports (animation-timeline: view()) {
     .cube-reveal {
       animation: cube-rise linear both;
@@ -5286,7 +5287,7 @@ html[data-cosy='true'] .animate-neo-press {
    depth (the individual `rotate` property carries no perspective of its own).
    All motion-gated: reduced-motion users get a flat, still grid (the coloured
    hover shadow still applies via Tailwind, so hover is not feedback-less). */
-@media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   .cube-deck {
     perspective: 1400px;
     perspective-origin: center 40%;
