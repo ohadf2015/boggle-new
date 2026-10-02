@@ -46,6 +46,11 @@ vi.mock('@/lib/education/telemetry', async (importOriginal) => ({
   trackEduLiveGameStarted: (...a: unknown[]) => trackEduLiveGameStarted(...a),
 }));
 
+const recordLessonPlays = vi.fn();
+vi.mock('@/lib/education/lessonPlayStat', () => ({
+  recordLessonPlays: (...a: unknown[]) => recordLessonPlays(...a),
+}));
+
 const getClassrooms = vi.fn();
 const getLesson = vi.fn();
 vi.mock('@/lib/supabase/education', () => ({
@@ -83,6 +88,7 @@ describe('<ClassroomGameLobbyExpress> edu_live_game_started', () => {
     handlers.clear();
     emit.mockClear();
     trackEduLiveGameStarted.mockClear();
+    recordLessonPlays.mockClear();
     getClassrooms.mockResolvedValue({ data: [{ id: 'c-1', name: 'My Class', language: 'en' }] });
     getLesson.mockResolvedValue({ data: LESSON, error: null });
   });
@@ -117,5 +123,15 @@ describe('<ClassroomGameLobbyExpress> edu_live_game_started', () => {
     await launch();
     fire('classroomGameError', { error: 'nope' });
     expect(trackEduLiveGameStarted).not.toHaveBeenCalled();
+  });
+
+  it('Given the server confirms the room, When confirmed, Then the hosted lesson is counted as a library play once', async () => {
+    const payload = await launch();
+    expect(recordLessonPlays).not.toHaveBeenCalled();
+
+    fire('classroomGameCreated', { success: true, gameCode: payload.gameCode });
+    fire('classroomGameCreated', { success: true, gameCode: payload.gameCode });
+    expect(recordLessonPlays).toHaveBeenCalledTimes(1);
+    expect(recordLessonPlays).toHaveBeenCalledWith(['l-1']);
   });
 });

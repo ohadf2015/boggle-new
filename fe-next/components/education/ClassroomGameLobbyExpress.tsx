@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
 import type { Classroom, Language } from '@/lib/supabase/education/types';
 import { trackEduClassroomCreated, trackEduLiveGameStarted } from '@/lib/education/telemetry';
+import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
 import {
   abandonLaunch,
   ensureLaunch,
@@ -122,6 +123,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
       let socket: Socket | null = null;
       // Set just before the room is asked for; read when the server confirms.
       let startedMeta: { classroomId: string; lessonCount: number } | null = null;
+      let startedLessonIds: string[] = [];
       let startedTracked = false;
       const watchdog = setTimeout(
         () => {
@@ -172,6 +174,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             if (startedMeta && !startedTracked) {
               startedTracked = true;
               trackEduLiveGameStarted({ ...startedMeta, source: 'hq_express' });
+              void recordLessonPlays(startedLessonIds);
             }
             control.succeed(data.gameCode);
           });
@@ -267,6 +270,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             classroomId: result.payload.classroomId,
             lessonCount: result.payload.lessonIds.length,
           };
+          startedLessonIds = result.payload.lessonIds;
           live.emit('createClassroomGame', result.payload);
 
           // Bookkeeping only, and AFTER the room is asked for: a throw in the

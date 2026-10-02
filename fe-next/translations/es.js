@@ -96,7 +96,9 @@ const es = {
       "aTeacher": "un docente",
       "new": "Nueva",
       "plays": "{count} partidas",
+      "playsOne": "{count} partida",
       "copies": "{count} copias",
+      "copiesOne": "{count} copia",
       "results": "Resultados"
     },
     "badge": {
@@ -19200,10 +19202,6 @@ const es = {
       "blast": "Combos en cadena",
       "wordHunt": "Caza la lista",
       "wordcraft": "Arma palabras"
-    },
-    "lobby": {
-      "waitingOne": "Esperando a 1 alumno",
-      "practiceLink": "¿Nadie aún? Practica con bots"
     }
   },
   // @eduHq:end

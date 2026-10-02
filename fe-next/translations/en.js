@@ -96,7 +96,9 @@ const en = {
       "aTeacher": "a teacher",
       "new": "New",
       "plays": "{count} plays",
+      "playsOne": "{count} play",
       "copies": "{count} copies",
+      "copiesOne": "{count} copy",
       "results": "Results"
     },
     "badge": {
@@ -18245,10 +18247,6 @@ const en = {
       "blast": "Chain combos",
       "wordHunt": "Find list words",
       "wordcraft": "Build and spell"
-    },
-    "lobby": {
-      "waitingOne": "Waiting for 1 student",
-      "practiceLink": "No one yet? Practice with bots"
     }
   },
   // @eduHq:end

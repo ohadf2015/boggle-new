@@ -38,7 +38,6 @@ vi.mock('@/components/teacher/LessonBuilder', () => ({
 vi.mock('@/lib/education/libraryClient', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/education/libraryClient')>()),
   copyToMine: (...args: unknown[]) => copyToMine(...args),
-  recordPlay: vi.fn(),
 }));
 
 const item: LibraryItem = {
