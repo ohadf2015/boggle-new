@@ -13856,6 +13856,11 @@ const he = {
         "untitled": "שיעור ללא שם",
         "anonymousStudent": "תלמיד {{id}}"
       },
+      "assignmentCompletion": {
+        "title": "השלמת משימות",
+        "submitted": "{{submitted}} / {{roster}} הוגשו",
+        "upgrade": "Teacher Pro {{price}}"
+      },
       "exportAllClasses": {
         "button": "ייצוא כל הכיתות",
         "downloading": "מייצא...",

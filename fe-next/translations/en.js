@@ -12396,6 +12396,11 @@ const en = {
         "untitled": "Untitled lesson",
         "anonymousStudent": "Student {{id}}"
       },
+      "assignmentCompletion": {
+        "title": "Assignment completion",
+        "submitted": "{{submitted}} / {{roster}} submitted",
+        "upgrade": "Teacher Pro {{price}}"
+      },
       "exportAllClasses": {
         "button": "Export all classes",
         "downloading": "Exporting…",

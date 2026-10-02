@@ -13856,6 +13856,11 @@ const es = {
         "untitled": "Lección sin título",
         "anonymousStudent": "Alumno {{id}}"
       },
+      "assignmentCompletion": {
+        "title": "Entrega de tareas",
+        "submitted": "{{submitted}} / {{roster}} entregadas",
+        "upgrade": "Teacher Pro {{price}}"
+      },
       "exportAllClasses": {
         "button": "Exportar todas las clases",
         "downloading": "Exportando…",

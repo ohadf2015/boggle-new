@@ -14237,6 +14237,11 @@ const sv = {
         "untitled": "Namnlös lektion",
         "anonymousStudent": "Elev {{id}}"
       },
+      "assignmentCompletion": {
+        "title": "Inlämning av uppgifter",
+        "submitted": "{{submitted}} / {{roster}} inlämnade",
+        "upgrade": "Teacher Pro {{price}}"
+      },
       "exportAllClasses": {
         "button": "Exportera alla klasser",
         "downloading": "Exporterar…",
