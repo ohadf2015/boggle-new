@@ -24,10 +24,13 @@ function builder() {
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: () => builder(),
-    rpc: (...args: unknown[]) => {
-      rpcs.push(args);
-      return Promise.resolve({ data: true, error: null });
-    },
+    // Lazy like postgrest: only an awaited builder sends the request.
+    rpc: (...args: unknown[]) => ({
+      then: (ok: (v: unknown) => unknown, fail?: (e: unknown) => unknown) => {
+        rpcs.push(args);
+        return Promise.resolve({ data: null, error: null }).then(ok, fail);
+      },
+    }),
   },
 }));
 vi.mock('@/utils/authFetch', () => ({ fetchWithAuth: vi.fn() }));
@@ -67,6 +70,7 @@ describe('copyToMine', () => {
 
   it('copies a teacher list with remix credit, bumps its copy count and refreshes every lesson list', async () => {
     const { lesson, reused } = await copyToMine(item(), 'me');
+    await new Promise((r) => setTimeout(r, 0));
     expect(reused).toBe(false);
     expect(lesson?.id).toBe('new');
     expect(inserts[0]).toMatchObject({

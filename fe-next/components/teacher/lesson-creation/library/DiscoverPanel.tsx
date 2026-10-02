@@ -6,7 +6,7 @@ import { Globe2, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { copyToMine, recordPlay } from '@/lib/education/libraryClient';
+import { copyToMine } from '@/lib/education/libraryClient';
 import type { LibraryItem, LibraryLesson } from '@/lib/education/libraryTypes';
 import LibraryCard from './LibraryCard';
 import DiscoverFilters from './DiscoverFilters';
@@ -45,7 +45,6 @@ export default function DiscoverPanel({ onOpenMyLists, onShareFirst, onCopied }:
     const lesson = await ensureCopy(open, true);
     setBusy(null);
     if (!lesson) return;
-    recordPlay(open);
     router.push(`/${language}/education/classroom-game?lessonId=${lesson.id}`);
   };
 

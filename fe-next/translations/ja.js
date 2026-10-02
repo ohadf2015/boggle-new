@@ -19182,10 +19182,6 @@ const ja = {
       "blast": "コンボで連鎖",
       "wordHunt": "リストの単語を探す",
       "wordcraft": "つづりを組み立て"
-    },
-    "lobby": {
-      "waitingOne": "生徒1人を待っています",
-      "practiceLink": "まだ誰もいない？ボットと練習"
     }
   },
   // @eduHq:end

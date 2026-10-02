@@ -63,7 +63,7 @@ export default function ListPreviewSheet({ item, onClose, busy, copied, onHost, 
                     <SourceBadge item={item} />
                     <span dir="auto">{t('eduLibrary.card.by', { author })}</span>
                     <span className="font-bold tabular-nums text-neo-cyan">{t('eduLibrary.card.words', { count: item.wordCount })}</span>
-                    <ItemStats item={item} />
+                    <ItemStats item={item} verbose />
                   </div>
                 </DialogDescription>
                 {item.description && <p dir="auto" className="mt-2 text-sm text-neo-white/85 text-pretty">{item.description}</p>}

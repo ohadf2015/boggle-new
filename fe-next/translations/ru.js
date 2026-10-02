@@ -95,8 +95,12 @@ const ru = {
       "by": "автор: {author}",
       "aTeacher": "учитель",
       "new": "Новый",
-      "plays": "Запусков: {count}",
-      "copies": "Копий: {count}",
+      "plays": "{count} запусков",
+      "playsOne": "{count} запуск",
+      "playsFew": "{count} запуска",
+      "copies": "{count} копий",
+      "copiesOne": "{count} копия",
+      "copiesFew": "{count} копии",
       "results": "Итоги"
     },
     "badge": {
@@ -18915,10 +18919,6 @@ const ru = {
       "blast": "Цепочки комбо",
       "wordHunt": "Охота на слова",
       "wordcraft": "Собери слово"
-    },
-    "lobby": {
-      "waitingOne": "Ждём 1 ученика",
-      "practiceLink": "Пока никого? Потренируйтесь с ботами"
     }
   },
   // @eduHq:end
