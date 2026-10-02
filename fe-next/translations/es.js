@@ -19359,7 +19359,118 @@ const es = {
       "needLesson": "Elige una lección para asignar.",
       "needDate": "Elige una fecha de entrega para asignar."
     }
+  },
+  // @eg2Help:start
+  "eg2Help": {
+    "meta": {
+      "homeTitle": "Centro de ayuda para docentes: guías y tutoriales de 5 minutos | LexiClash",
+      "homeDescription": "Respuestas a cada «¿cómo hago…?» de los docentes en LexiClash: lanzar un juego de palabras en directo, sumar alumnos sin cuentas, poner deberes, leer informes y gestionar Teacher Pro.",
+      "articleSuffix": "Ayuda para docentes de LexiClash"
+    },
+    "home": {
+      "eyebrow": "Centro de ayuda para docentes",
+      "title": "¿Cómo",
+      "titleHighlight": "hago…?",
+      "lead": "Respuestas cortas y sinceras, escritas desde la app tal como es. Cada paso está probado con una clase de verdad, capturas incluidas.",
+      "searchLabel": "Buscar en el centro de ayuda",
+      "searchPlaceholder": "Prueba «código» o «deberes»",
+      "searchNoResults": "Todavía no hay una guía para eso. Prueba otra palabra o mira los temas de abajo.",
+      "searchResults": "{count} guías encontradas",
+      "popular": "Lo que más preguntan los docentes",
+      "tutorialsTitle": "Tu primera clase en 5 minutos",
+      "tutorialsLead": "Cuatro guías cortas con un reloj en cada paso. Elige una y pruébala hoy con tu clase.",
+      "categoriesTitle": "Explora por tema",
+      "articlesCount": "{count} guías",
+      "faqTitle": "Respuestas rápidas",
+      "ctaTitle": "Tu clase está a un toque",
+      "ctaBody": "Gratis para docentes, sin cuentas para el alumnado y sin tarjeta. Abre la Central del profe y pulsa ¡En directo!",
+      "ctaPrimary": "Abrir la Central del profe, gratis",
+      "ctaSecondary": "Ver antes un juego en directo",
+      "stuckTitle": "¿Sigues atascado?",
+      "stuckBody": "Cuéntanos qué intentabas hacer. Te responde una persona real del equipo.",
+      "stuckCta": "Contacto"
+    },
+    "categories": {
+      "gettingStarted": {
+        "title": "Primeros pasos",
+        "blurb": "Tu cuenta, la Central del profe y tu primera clase."
+      },
+      "liveGame": {
+        "title": "Juegos en directo",
+        "blurb": "Lanzar el juego, sumar alumnos, elegir modo y llevar la sala."
+      },
+      "assign": {
+        "title": "Deberes y práctica",
+        "blurb": "Tareas que el alumnado juega por su cuenta, con fecha de entrega."
+      },
+      "reports": {
+        "title": "Informes",
+        "blurb": "Quién se ha atascado y qué palabras repasar."
+      },
+      "wordLists": {
+        "title": "Listas de palabras",
+        "blurb": "Crea tus listas o toma una de la Biblioteca."
+      },
+      "privacy": {
+        "title": "Alumnado y privacidad",
+        "blurb": "Sin cuentas para el alumnado, qué se guarda y atención a niveles."
+      },
+      "billing": {
+        "title": "Teacher Pro y pagos",
+        "blurb": "Qué añade Pro, la prueba gratis, cancelar y compra por el centro."
+      }
+    },
+    "article": {
+      "breadcrumb": "Centro de ayuda",
+      "minRead": "{count} min de lectura",
+      "minutes": "{count} min",
+      "tested": "Probado en la app",
+      "updated": "Actualizado el {date}",
+      "onThisPage": "En esta guía",
+      "related": "Guías relacionadas",
+      "step": "Paso {count}",
+      "tutorial": "Tutorial",
+      "guide": "Guía",
+      "tip": "Consejo para docentes",
+      "pro": "Gratis y Pro",
+      "helpfulQ": "¿Hemos resuelto tu duda?",
+      "yes": "Sí",
+      "no": "No del todo",
+      "thanks": "¡Gracias! Así sabemos qué páginas mejorar.",
+      "thanksNo": "Gracias. Cuéntanos qué faltaba y lo añadimos.",
+      "back": "Todos los temas de ayuda"
+    },
+    "next": {
+      "eyebrow": "Tu siguiente paso",
+      "startClass": {
+        "title": "Pruébalo hoy con tu clase",
+        "body": "La Central del profe es gratis. Pulsa ¡En directo! y el código aparece en la pizarra en segundos.",
+        "cta": "Abrir la Central del profe"
+      },
+      "liveGame": {
+        "title": "Lanza un juego en directo ya",
+        "body": "Elige juego, elige palabras y un minuto después tu clase está jugando.",
+        "cta": "Empezar un juego en directo"
+      },
+      "upgrade": {
+        "title": "Mira lo que te enseña Pro",
+        "body": "Dominio de palabras, informes imprimibles y modo calma. Prueba antes gratis todas las funciones Pro.",
+        "cta": "Ver Teacher Pro"
+      },
+      "schools": {
+        "title": "Lleva LexiClash a tu centro",
+        "body": "Un presupuesto para todo el profesorado que necesite Pro, por email y sin llamadas comerciales.",
+        "cta": "LexiClash para centros"
+      },
+      "secondary": "O empieza un juego en directo"
+    },
+    "link": {
+      "title": "Centro de ayuda para docentes",
+      "body": "Guías paso a paso, tutoriales de 5 minutos y respuestas rápidas.",
+      "cta": "Ver ayuda"
+    }
   }
+  // @eg2Help:end
 };
 
 export { es };

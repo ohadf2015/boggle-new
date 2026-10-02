@@ -19341,7 +19341,118 @@ const ja = {
       "needLesson": "レッスンを選ぶと配信できます。",
       "needDate": "締切日を選ぶと配信できます。"
     }
+  },
+  // @eg2Help:start
+  "eg2Help": {
+    "meta": {
+      "homeTitle": "先生向けヘルプセンター：使い方ガイドと5分チュートリアル | LexiClash",
+      "homeDescription": "LexiClashを使う先生の「どうやるの？」にすべてお答えします。ライブの単語ゲームの始め方、アカウントなしでの生徒の参加、宿題の出し方、レポートの見方、Teacher Proの管理まで。",
+      "articleSuffix": "LexiClash 先生向けヘルプ"
+    },
+    "home": {
+      "eyebrow": "先生向けヘルプセンター",
+      "title": "どうやって",
+      "titleHighlight": "やるの？",
+      "lead": "実際のアプリをもとに書いた、短くて正直な答え。どの手順も実際のクラス設定で試し、スクリーンショットも載せています。",
+      "searchLabel": "ヘルプセンターを検索",
+      "searchPlaceholder": "「参加コード」「宿題」などで検索",
+      "searchNoResults": "まだ該当するガイドがありません。別の言葉で試すか、下のトピックから探してください。",
+      "searchResults": "{count}件のガイド",
+      "popular": "よくある質問",
+      "tutorialsTitle": "5分でできる最初の授業",
+      "tutorialsLead": "各ステップに時間の目安がついた4つの短いチュートリアル。ひとつ選んで、今日の授業で試してみましょう。",
+      "categoriesTitle": "トピックから探す",
+      "articlesCount": "{count}件のガイド",
+      "faqTitle": "すぐわかるQ&A",
+      "ctaTitle": "クラスはワンタップで始められます",
+      "ctaBody": "先生は無料、生徒のアカウントもカードも不要。先生HQを開いて「スタート」を押すだけ。",
+      "ctaPrimary": "先生HQを開く（無料）",
+      "ctaSecondary": "まずライブゲームを見る",
+      "stuckTitle": "それでも解決しない場合は",
+      "stuckBody": "何をしようとしていたか教えてください。チームのスタッフが直接お返事します。",
+      "stuckCta": "お問い合わせ"
+    },
+    "categories": {
+      "gettingStarted": {
+        "title": "はじめに",
+        "blurb": "アカウント、先生HQ、最初のクラス。"
+      },
+      "liveGame": {
+        "title": "ライブゲームの進め方",
+        "blurb": "スタート、生徒の参加、モード選び、ゲームの進行。"
+      },
+      "assign": {
+        "title": "宿題・練習の配信",
+        "blurb": "生徒が自分で取り組む課題を、期限つきで。"
+      },
+      "reports": {
+        "title": "レポート",
+        "blurb": "つまずいている生徒と、復習すべき単語がわかります。"
+      },
+      "wordLists": {
+        "title": "単語リスト",
+        "blurb": "自分で作るか、ライブラリから選ぶ。"
+      },
+      "privacy": {
+        "title": "生徒とプライバシー",
+        "blurb": "生徒アカウント不要、保存される情報、レベル別の指導。"
+      },
+      "billing": {
+        "title": "Teacher Proとお支払い",
+        "blurb": "Proでできること、無料体験、解約、学校での購入。"
+      }
+    },
+    "article": {
+      "breadcrumb": "ヘルプセンター",
+      "minRead": "約{count}分で読めます",
+      "minutes": "{count}分",
+      "tested": "アプリで動作確認済み",
+      "updated": "{date}更新",
+      "onThisPage": "このガイドの内容",
+      "related": "関連ガイド",
+      "step": "ステップ{count}",
+      "tutorial": "チュートリアル",
+      "guide": "ガイド",
+      "tip": "先生向けのヒント",
+      "pro": "無料プランとPro",
+      "helpfulQ": "疑問は解決しましたか？",
+      "yes": "はい",
+      "no": "いまひとつ",
+      "thanks": "ありがとうございます！改善すべきページの参考にします。",
+      "thanksNo": "ありがとうございます。足りなかった点を教えていただければ追記します。",
+      "back": "ヘルプのトピック一覧"
+    },
+    "next": {
+      "eyebrow": "次のステップ",
+      "startClass": {
+        "title": "今日のクラスで試してみましょう",
+        "body": "先生HQは無料です。「スタート」を押せば、数秒で参加コードが黒板に。",
+        "cta": "先生HQを開く"
+      },
+      "liveGame": {
+        "title": "今すぐライブゲームを",
+        "body": "ゲームと単語を選べば、1分後にはクラスがプレイ中です。",
+        "cta": "ライブゲームを始める"
+      },
+      "upgrade": {
+        "title": "Proでわかること",
+        "body": "単語の定着度、印刷できるレポート、落ち着きモード。すべてのPro機能をまず無料で試せます。",
+        "cta": "Teacher Proを見る"
+      },
+      "schools": {
+        "title": "学校でLexiClashを",
+        "body": "Proが必要な先生全員分の見積もりを、営業電話なしでメールでお送りします。",
+        "cta": "学校向けLexiClash"
+      },
+      "secondary": "またはライブゲームを始める"
+    },
+    "link": {
+      "title": "先生向けヘルプセンター",
+      "body": "使い方ガイド、5分チュートリアル、すぐわかるQ&A。",
+      "cta": "ヘルプを見る"
+    }
   }
+  // @eg2Help:end
 };
 
 export { ja };

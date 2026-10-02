@@ -19341,7 +19341,118 @@ const sv = {
       "needLesson": "Välj en lektion för att dela ut.",
       "needDate": "Välj ett slutdatum för att dela ut."
     }
+  },
+  // @eg2Help:start
+  "eg2Help": {
+    "meta": {
+      "homeTitle": "Hjälpcenter för lärare: guider och 5-minutersintroduktioner | LexiClash",
+      "homeDescription": "Svar på alla ”hur gör jag…” för lärare i LexiClash: starta ett live-ordspel, få in eleverna utan konton, dela ut läxor, läs rapporter och hantera Teacher Pro.",
+      "articleSuffix": "LexiClash lärarhjälp"
+    },
+    "home": {
+      "eyebrow": "Hjälpcenter för lärare",
+      "title": "Hur gör jag",
+      "titleHighlight": "…?",
+      "lead": "Korta, ärliga svar skrivna utifrån appen som den faktiskt ser ut. Varje steg är testat med en riktig klassuppsättning, skärmbilder inräknade.",
+      "searchLabel": "Sök i hjälpcentret",
+      "searchPlaceholder": "Testa ”kod” eller ”läxa”",
+      "searchNoResults": "Ingen guide matchar det än. Prova ett annat ord eller bläddra bland ämnena nedan.",
+      "searchResults": "{count} guider som matchar",
+      "popular": "Det lärare frågar mest",
+      "tutorialsTitle": "Din första lektion på 5 minuter",
+      "tutorialsLead": "Fyra korta genomgångar med en klocka vid varje steg. Välj en och gör den med klassen i dag.",
+      "categoriesTitle": "Bläddra efter ämne",
+      "articlesCount": "{count} guider",
+      "faqTitle": "Snabba svar",
+      "ctaTitle": "Din klass är ett tryck bort",
+      "ctaBody": "Gratis för lärare, inga elevkonton, inget kort. Öppna Lärarbasen och tryck Kör igång.",
+      "ctaPrimary": "Öppna Lärarbasen, gratis",
+      "ctaSecondary": "Se ett livespel först",
+      "stuckTitle": "Fastnat ändå?",
+      "stuckBody": "Berätta vad du försökte göra. En riktig person i teamet svarar.",
+      "stuckCta": "Kontakta oss"
+    },
+    "categories": {
+      "gettingStarted": {
+        "title": "Kom igång",
+        "blurb": "Ditt konto, Lärarbasen och din första klass."
+      },
+      "liveGame": {
+        "title": "Spela live",
+        "blurb": "Kör igång, få in eleverna, välj spel och styr rummet."
+      },
+      "assign": {
+        "title": "Läxor och övning",
+        "blurb": "Uppgifter som eleverna spelar på egen hand, med slutdatum."
+      },
+      "reports": {
+        "title": "Rapporter",
+        "blurb": "Se vem som har fastnat och vilka ord du ska repetera."
+      },
+      "wordLists": {
+        "title": "Ordlistor",
+        "blurb": "Gör egna listor eller hämta en ur biblioteket."
+      },
+      "privacy": {
+        "title": "Elever och integritet",
+        "blurb": "Inga elevkonton, vad som sparas och nivåanpassning."
+      },
+      "billing": {
+        "title": "Teacher Pro och betalning",
+        "blurb": "Vad Pro ger, provperioden, uppsägning och köp via skolan."
+      }
+    },
+    "article": {
+      "breadcrumb": "Hjälpcenter",
+      "minRead": "{count} min läsning",
+      "minutes": "{count} min",
+      "tested": "Testat i appen",
+      "updated": "Uppdaterad {date}",
+      "onThisPage": "I den här guiden",
+      "related": "Relaterade guider",
+      "step": "Steg {count}",
+      "tutorial": "Genomgång",
+      "guide": "Guide",
+      "tip": "Lärartips",
+      "pro": "Gratis och Pro",
+      "helpfulQ": "Fick du svar på din fråga?",
+      "yes": "Ja",
+      "no": "Inte riktigt",
+      "thanks": "Tack! Det hjälper oss att förbättra rätt sidor.",
+      "thanksNo": "Tack. Berätta vad som saknades så lägger vi till det.",
+      "back": "Alla hjälpämnen"
+    },
+    "next": {
+      "eyebrow": "Nästa steg",
+      "startClass": {
+        "title": "Testa med klassen i dag",
+        "body": "Lärarbasen är gratis. Tryck Kör igång så står koden på tavlan på några sekunder.",
+        "cta": "Öppna Lärarbasen"
+      },
+      "liveGame": {
+        "title": "Kör ett livespel nu",
+        "body": "Välj spel, välj ord, och en minut senare spelar klassen.",
+        "cta": "Starta ett livespel"
+      },
+      "upgrade": {
+        "title": "Se vad Pro visar dig",
+        "body": "Ordbehärskning, utskrivbara rapporter och lugnt läge. Testa alla Pro-funktioner gratis först.",
+        "cta": "Se Teacher Pro"
+      },
+      "schools": {
+        "title": "Ta LexiClash till din skola",
+        "body": "En offert för alla lärare som behöver Pro, via mejl, utan säljsamtal.",
+        "cta": "LexiClash för skolor"
+      },
+      "secondary": "Eller starta ett livespel"
+    },
+    "link": {
+      "title": "Hjälpcenter för lärare",
+      "body": "Guider, 5-minutersintroduktioner och snabba svar.",
+      "cta": "Få hjälp"
+    }
   }
+  // @eg2Help:end
 };
 
 export { sv };

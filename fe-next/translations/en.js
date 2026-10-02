@@ -18404,7 +18404,118 @@ const en = {
       "needLesson": "Pick a lesson to assign.",
       "needDate": "Pick a due date to assign."
     }
+  },
+  // @eg2Help:start
+  "eg2Help": {
+    "meta": {
+      "homeTitle": "Teacher Help Center: How-To Guides & 5-Minute Tutorials | LexiClash",
+      "homeDescription": "Answers to every 'how do I…' for LexiClash teachers: start a live word game, get students in without accounts, assign homework, read reports and manage Teacher Pro.",
+      "articleSuffix": "LexiClash Teacher Help"
+    },
+    "home": {
+      "eyebrow": "Teacher help center",
+      "title": "How do I",
+      "titleHighlight": "…?",
+      "lead": "Short, honest answers written from the real app. Every step was tested with a real class setup, screenshots included.",
+      "searchLabel": "Search the help center",
+      "searchPlaceholder": "Try “join code” or “homework”",
+      "searchNoResults": "No guide matches that yet. Try another word, or browse the topics below.",
+      "searchResults": "{count} matching guides",
+      "popular": "Teachers ask most",
+      "tutorialsTitle": "Your first lesson in 5 minutes",
+      "tutorialsLead": "Four short walkthroughs with a clock on every step. Pick one and do it with your class today.",
+      "categoriesTitle": "Browse by topic",
+      "articlesCount": "{count} guides",
+      "faqTitle": "Quick answers",
+      "ctaTitle": "Your class is one tap away",
+      "ctaBody": "Free for teachers, no student accounts, no card. Open Teacher HQ and press Go live.",
+      "ctaPrimary": "Open Teacher HQ, free",
+      "ctaSecondary": "See a live game first",
+      "stuckTitle": "Still stuck?",
+      "stuckBody": "Tell us what you were trying to do. A real person from the team answers.",
+      "stuckCta": "Contact us"
+    },
+    "categories": {
+      "gettingStarted": {
+        "title": "Getting started",
+        "blurb": "Your account, Teacher HQ and your first class."
+      },
+      "liveGame": {
+        "title": "Running a live game",
+        "blurb": "Go live, get students in, pick a mode, run the room."
+      },
+      "assign": {
+        "title": "Assigning practice",
+        "blurb": "Homework students play on their own, with due dates."
+      },
+      "reports": {
+        "title": "Reports",
+        "blurb": "See who is stuck and which words to reteach."
+      },
+      "wordLists": {
+        "title": "Word lists",
+        "blurb": "Make your own lists or grab one from the Library."
+      },
+      "privacy": {
+        "title": "Students & privacy",
+        "blurb": "No student accounts, what is stored, differentiation."
+      },
+      "billing": {
+        "title": "Teacher Pro & billing",
+        "blurb": "What Pro adds, the free trial, cancelling, school purchase."
+      }
+    },
+    "article": {
+      "breadcrumb": "Help center",
+      "minRead": "{count} min read",
+      "minutes": "{count} min",
+      "tested": "Tested in the app",
+      "updated": "Updated {date}",
+      "onThisPage": "In this guide",
+      "related": "Related guides",
+      "step": "Step {count}",
+      "tutorial": "Tutorial",
+      "guide": "Guide",
+      "tip": "Teacher tip",
+      "pro": "Free and Pro",
+      "helpfulQ": "Did this answer your question?",
+      "yes": "Yes",
+      "no": "Not quite",
+      "thanks": "Thanks! That helps us fix the right pages.",
+      "thanksNo": "Thanks. Tell us what was missing and we will add it.",
+      "back": "All help topics"
+    },
+    "next": {
+      "eyebrow": "Your next step",
+      "startClass": {
+        "title": "Try it with your class today",
+        "body": "Teacher HQ is free. Press Go live and your join code is on the board in seconds.",
+        "cta": "Open Teacher HQ"
+      },
+      "liveGame": {
+        "title": "Run a live game now",
+        "body": "Pick a game, pick the words, and your class is playing a minute later.",
+        "cta": "Start a live game"
+      },
+      "upgrade": {
+        "title": "See what Pro shows you",
+        "body": "Word mastery, printable reports and calm mode. Try every Pro feature free first.",
+        "cta": "See Teacher Pro"
+      },
+      "schools": {
+        "title": "Bring LexiClash to your school",
+        "body": "One quote for every teacher who needs Pro, by email, no sales call.",
+        "cta": "LexiClash for schools"
+      },
+      "secondary": "Or start a live game"
+    },
+    "link": {
+      "title": "Teacher help center",
+      "body": "How-to guides, 5-minute tutorials and quick answers.",
+      "cta": "Get help"
+    }
   }
+  // @eg2Help:end
 };
 
 export { en };
