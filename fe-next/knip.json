@@ -12,7 +12,6 @@
     "e2e/helpers/*.ts",
     "playwright.config.ts",
     "vitest.backend.config.ts",
-    "vitest.backend.setup.ts",
     "remotion-root/index.ts",
     "remotion-root/Root.tsx"
   ],
