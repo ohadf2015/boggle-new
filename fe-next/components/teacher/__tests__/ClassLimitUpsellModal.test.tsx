@@ -105,4 +105,10 @@ describe('ClassLimitUpsellModal', () => {
       limit: 2,
     });
   });
+
+  it('shows a concrete sample of what Pro adds to every class, not just a bullet list', () => {
+    render(<ClassLimitUpsellModal isOpen onClose={() => {}} currentCount={3} limit={3} />);
+    expect(screen.getByTestId('pro-preview-analytics')).toBeInTheDocument();
+    expect(screen.getAllByTestId('pro-preview-student-row').length).toBeGreaterThan(1);
+  });
 });

@@ -33,12 +33,14 @@ export interface TeacherProState {
   grant: TeacherProGrant | null;
   /** A gift that has run out — the teacher is free again and should be told why. */
   grantExpired: boolean;
+  /** Polar customer portal for a paying teacher, when the status read returned one. */
+  portalUrl: string | null;
   /** Re-read the entitlement (after a grant lands, after checkout returns). */
   refresh: () => Promise<void>;
 }
 
 const FREE: Omit<TeacherProState, 'loading' | 'refresh'> = {
-  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, trialUsed: false, known: false, grant: null, grantExpired: false,
+  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null,
 };
 
 // The dashboard mounts several consumers at once (plan badge, ProGate, the
@@ -97,6 +99,7 @@ export function useTeacherPro(): TeacherProState {
         known: true,
         grant: (data?.grant as TeacherProGrant | null) ?? null,
         grantExpired: data?.grant_expired === true,
+        portalUrl: typeof data?.portal_url === 'string' ? data.portal_url : null,
       });
     } catch {
       // Stays free — see the fail-closed note above.

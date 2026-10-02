@@ -85,8 +85,8 @@ vi.mock('@/contexts/MusicContext', () => ({
   useMusicContext: () => ({ isPlaying: false }),
 }));
 
-vi.mock('@/components/teacher/PricingCards', () => ({
-  PricingCards: () => (
+vi.mock('@/components/teacher/pro/UpgradePlanCards', () => ({
+  UpgradePlanCards: () => (
     <div data-testid="pricing-cards" style={{ minHeight: '800px' }}>
       Mock Pricing Cards
     </div>

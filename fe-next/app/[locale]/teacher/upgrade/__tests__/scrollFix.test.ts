@@ -32,15 +32,18 @@ describe('UpgradePricingPageClient scroll fix', () => {
     expect(pageSource).toContain('data-testid="upgrade-footer"');
   });
 
-  it('has a two-column hero layout for desktop', () => {
-    // The hero section should use grid layout responsive columns
-    expect(pageSource).toContain('grid-cols-1 lg:grid-cols-2');
+  it('lays the plans out side by side from md up', () => {
+    const cards = readFileSync(join(process.cwd(), 'components/teacher/pro/UpgradePlanCards.tsx'), 'utf8');
+    expect(cards).toContain('grid-cols-1');
+    expect(cards).toContain('md:grid-cols-3');
     expect(pageSource).toContain('data-testid="upgrade-hero-section"');
   });
 
-  it('keeps FAQ in a collapsed details element', () => {
-    expect(pageSource).toContain('<details');
-    expect(pageSource).toContain('teacher.subscription.faqTitle');
+  it('keeps FAQ answers in collapsed details elements', () => {
+    const faq = readFileSync(join(process.cwd(), 'components/teacher/pro/UpgradeFaq.tsx'), 'utf8');
+    expect(pageSource).toContain('<UpgradeFaq');
+    expect(faq).toContain('<details');
+    expect(faq).toContain('teacher.subscription.faqTitle');
   });
 
   it('has trust chips rendered with test IDs', () => {

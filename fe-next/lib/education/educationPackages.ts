@@ -58,5 +58,6 @@ export const SCHOOL_LEAD_SOURCES = [
   'for-schools-page',
   'classroom-plan',
   'school-district',
+  'teacher-upgrade',
 ] as const;
 export type SchoolLeadSource = (typeof SCHOOL_LEAD_SOURCES)[number];

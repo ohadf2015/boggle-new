@@ -5,6 +5,7 @@ import {
   buildTeacherProProductJsonLd,
   buildTeacherUpgradeFaqJsonLd,
 } from '@/lib/seo/teacherUpgradeJsonLd';
+import { buildUpgradeFaqEntries } from '@/lib/education/pro/upgradeFaq';
 import UpgradePricingPageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -17,10 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return generatePageMetadata({ seoKey: 'teacherUpgrade', path: '/teacher/upgrade', locale });
 }
 
-// Server component wrapper: emits Product + Offer ($9/month) and FAQPage
-// JSON-LD for the pricing page — the site's only revenue surface previously
-// had zero structured data. FAQ items come from the SAME translation keys the
-// client renders, so structured data always matches visible content.
+// FAQ JSON-LD is built from the same keys and parameters UpgradeFaq renders, so it matches the page.
 export default async function UpgradePricingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const validLocale: SupportedLocale = (SUPPORTED_LOCALES as readonly string[]).includes(locale)
@@ -30,11 +28,7 @@ export default async function UpgradePricingPage({ params }: { params: Promise<{
   const sub = (t?.teacher?.subscription ?? {}) as Record<string, string>;
   const seo = (t?.seo?.teacherUpgrade ?? {}) as Record<string, string>;
 
-  const faq = ['faqCancel', 'faqAutoRenew', 'faqDataLoss']
-    .map((key) => ({ question: sub[key], answer: sub[`${key}Answer`] }))
-    .filter((item): item is { question: string; answer: string } =>
-      Boolean(item.question && item.answer),
-    );
+  const faq = buildUpgradeFaqEntries(t);
 
   const productSchema = buildTeacherProProductJsonLd(validLocale, {
     name: sub.proPlanName || 'Teacher Pro',

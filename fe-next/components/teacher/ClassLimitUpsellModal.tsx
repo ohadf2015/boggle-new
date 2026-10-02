@@ -8,6 +8,7 @@ import { TEACHER_PRO_PRICE_USD, FREE_TIER_LIMITS } from '@/lib/education/freeTie
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { X, Zap } from 'lucide-react';
+import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
 
 interface ClassLimitUpsellModalProps {
   isOpen: boolean;
@@ -90,19 +91,19 @@ export default function ClassLimitUpsellModal({
               </p>
             </div>
 
-            <div className="bg-neo-lime/20 border-2 border-neo-cream/60 rounded-neo p-4">
-              <h3 className="font-neo-display font-black text-black mb-2 text-lg">
+            <div className="space-y-2">
+              <h3 className="font-neo-display font-black text-black text-lg">
                 {t('teacher.subscription.proFeatures')}
               </h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2 font-bold text-black">
-                  <span className="w-1 h-1 bg-black rounded-full" />
-                  {t('teacher.subscription.unlimitedClasses')}
-                </li>
-                <li className="flex items-center gap-2 font-bold text-black">
-                  <span className="w-1 h-1 bg-black rounded-full" />
-                  {t('teacher.subscription.unlimitedStudents')}
-                </li>
+              <div aria-hidden="true" className="pointer-events-none select-none">
+                <ProFeaturePreview feature="analytics" />
+              </div>
+              <ul className="flex flex-wrap gap-2 text-sm">
+                {['teacher.subscription.unlimitedClasses', 'teacher.subscription.unlimitedStudents'].map((key) => (
+                  <li key={key} className="rounded-neo border-2 border-black bg-neo-lime px-2 py-0.5 font-bold text-black">
+                    {t(key)}
+                  </li>
+                ))}
               </ul>
             </div>
 
