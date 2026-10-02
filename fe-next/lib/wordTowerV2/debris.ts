@@ -46,17 +46,27 @@ export function despawnBounds(world: TowerWorld): { left: number; right: number;
  * Despawn blocks that fell outside the playfield and are not part of the standing chain.
  * Prevents debris from accumulating off-screen indefinitely.
  * Does NOT modify collapse tracking (peakHeightPx, collapseHeldMs).
+ *
+ * `standingChainIds` is a supplier, not a Set: the chain walk is the costly part
+ * and this runs every frame, while a block is almost never outside the playfield.
+ * It is only evaluated once there is something to remove.
  */
-export function cleanupDebris(world: TowerWorld, chainIds: Set<string>): void {
+export function cleanupDebris(world: TowerWorld, standingChainIds: () => Set<string>): void {
   const bounds = despawnBounds(world);
 
+  let outside: string[] | null = null;
   for (const [id, body] of world.blocks) {
-    // Never despawn chain blocks or hanging blocks (static, not landed)
-    if (chainIds.has(id) || (body.isStatic && !world.landed.has(id))) continue;
-
     const outsideH = body.bounds.max.x < bounds.left || body.bounds.min.x > bounds.right;
     const belowG = body.bounds.min.y > bounds.groundY;
+    if (outsideH || belowG) (outside ??= []).push(id);
+  }
+  if (!outside) return;
 
-    if (outsideH || belowG) removeBlockBody(world, id);
+  const chainIds = standingChainIds();
+  for (const id of outside) {
+    const body = world.blocks.get(id);
+    // Never despawn chain blocks or hanging blocks (static, not landed)
+    if (!body || chainIds.has(id) || (body.isStatic && !world.landed.has(id))) continue;
+    removeBlockBody(world, id);
   }
 }
