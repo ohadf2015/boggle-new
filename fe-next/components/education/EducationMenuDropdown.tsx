@@ -167,7 +167,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                     )}
                   >
                     <Home className="w-4 h-4" />
-                    {t('common.backToHome')}
+                    {t('education.header.exitEducation')}
                   </Link>
                 </div>
               </>

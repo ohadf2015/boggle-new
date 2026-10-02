@@ -45,6 +45,8 @@ import { LobbyExitButton, LobbyChatButton, LobbyChatPanel, HowToPlaySheet, ChatS
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
+import { AvatarQuickPick } from '@/components/student/live/AvatarQuickPick';
+import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 
@@ -149,6 +151,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
         initialConfig={currentAvatar}
         premium={avatarPremium}
       />
+      {isClassroomMode ? (
+        <StudentExitDialog open={showExitConfirm} onOpenChange={setShowExitConfirm} onConfirm={onConfirmExit} t={t} />
+      ) : (
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
         <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
           <AlertDialogHeader>
@@ -161,6 +166,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      )}
     </>
   );
 
@@ -173,8 +179,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
           onEditAvatar={openAvatarBuilder}
           nameSlot={<ClassroomNameEditor username={username} canEdit={!isAuthenticated} onSave={handleSelfNameChange} t={t} />}
           readySlot={readyButton}
-          statusSlot={status}
           emoteSlot={emote}
+          quickPickSlot={<AvatarQuickPick onPick={handleAvatarSave} onOpenBuilder={openAvatarBuilder} t={t} />}
+          isReady={isReady}
           instructionsSlot={howToMode ? <GameInstructions selectedGameMode={howToMode} t={t} defaultOpen={false} lang={lang} /> : null}
           classmates={playersReady
             .map((p) => (typeof p === 'string' ? { username: p } : p))

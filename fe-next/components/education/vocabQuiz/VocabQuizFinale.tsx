@@ -34,6 +34,7 @@ import type { VocabQuizStanding, TranslateFn } from '@/shared/types/vocabQuiz';
 import { classFinaleStats } from './vocabQuizJuice';
 import { VocabQuizStandings } from './VocabQuizStandings';
 import { trackResultsAction } from '../results/trackResultsAction';
+import { SchoolGlyph } from '../results/resultsGlyphs';
 
 export interface VocabQuizFinaleProps {
   standings: VocabQuizStanding[];
@@ -45,6 +46,8 @@ export interface VocabQuizFinaleProps {
    * that do nothing.
    */
   onPlayAgain?: () => void;
+  /** Classroom host's confirmed exit to HQ; the finale's quiet way out. */
+  onBackToClass?: () => void;
   t: TranslateFn;
 }
 
@@ -80,7 +83,7 @@ function StatTile({
   );
 }
 
-export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, t }: VocabQuizFinaleProps) {
+export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBackToClass, t }: VocabQuizFinaleProps) {
   const stats = classFinaleStats(standings, totalQuestions);
 
   // One burst, on arrival. Latched in a ref rather than keyed on render, because
@@ -88,11 +91,11 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, t }: V
   // and confetti that re-fires is confetti that never stops (Class 2).
   const burstRef = useRef(false);
   useEffect(() => {
-    if (burstRef.current) return;
+    if (burstRef.current || stats.correct === 0) return;
     burstRef.current = true;
     // No-ops under `prefers-reduced-motion` — the helper checks it itself.
     fireVictoryConfetti();
-  }, []);
+  }, [stats.correct]);
 
   return (
     <section
@@ -182,6 +185,17 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, t }: V
         >
           <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />
           {t('education.results.rematch')}
+        </button>
+      )}
+      {onBackToClass && (
+        <button
+          type="button"
+          data-testid="quiz-finale-back-to-class"
+          onClick={onBackToClass}
+          className="shrink-0 self-center flex items-center gap-2 px-4 py-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream font-neo-display font-black uppercase shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5"
+        >
+          <SchoolGlyph className="size-5 shrink-0" />
+          {t('eduLive.results.backToClass')}
         </button>
       )}
     </section>

@@ -32,6 +32,8 @@ import { TeacherGate } from '@/components/education/TeacherGate';
 import { ProGate } from '@/components/teacher/ProGate';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
+import { FullReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 32;
@@ -264,32 +266,55 @@ function TeacherReportsInner() {
   } else {
     const selectedClassroom = classrooms?.find((c) => c.id === selectedClassroomId);
     view = (
-      <div className="space-y-8">
-        <ClassArcPanel
-          classroomId={selectedClassroomId}
-          classroomName={selectedClassroom?.name ?? ''}
-          classroomLanguage={selectedClassroom?.language ?? 'en'}
-          onStudentClick={handleStudentClick}
-        />
-        <ProgressDigestDashboard
-          classroomId={selectedClassroomId}
-          classroomName={selectedClassroom?.name ?? ''}
-          rosterCount={selectedClassroom?.member_count ?? 0}
-        />
-        <AssignmentProgressReport
-          classroomId={selectedClassroomId}
-          classroomName={selectedClassroom?.name ?? ''}
-        />
-        <ProGate feature="reports">
-          <div className="mb-4 flex justify-end">
-            {/* Reuses this screen's own ProGate — the button's own internal
-                ProGate only ever mounts once the teacher is already Pro, so a
-                free teacher never sees two upsell cards stacked here. */}
-            <ExportAllClassesButton />
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-black uppercase tracking-wide text-neo-cyan">{t('eduPro.reports.classEyebrow')}</p>
+            <h1 className="break-words font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">
+              {selectedClassroom?.name ?? t('teacher.reports.title')}
+            </h1>
           </div>
-          <GoogleClassroomGradePassback classroomId={selectedClassroomId} />
-          <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
-        </ProGate>
+          <TeacherPlanBadge />
+        </div>
+        <WordMasteryReport classroomId={selectedClassroomId} classroomName={selectedClassroom?.name ?? ''} />
+        <div className="space-y-3">
+          <SectionDisclosure section="assignments">
+            <AssignmentProgressReport
+              classroomId={selectedClassroomId}
+              classroomName={selectedClassroom?.name ?? ''}
+            />
+          </SectionDisclosure>
+          <SectionDisclosure section="arc">
+            <ClassArcPanel
+              classroomId={selectedClassroomId}
+              classroomName={selectedClassroom?.name ?? ''}
+              classroomLanguage={selectedClassroom?.language ?? 'en'}
+              onStudentClick={handleStudentClick}
+              embedded
+            />
+          </SectionDisclosure>
+          <SectionDisclosure section="digest">
+            <ProgressDigestDashboard
+              classroomId={selectedClassroomId}
+              classroomName={selectedClassroom?.name ?? ''}
+              rosterCount={selectedClassroom?.member_count ?? 0}
+            />
+          </SectionDisclosure>
+          <FullReportDisclosure>
+            {(open) => (
+              <ProGate feature="reports" active={open}>
+                <div className="mb-4 flex justify-end">
+                  {/* Reuses this screen's own ProGate — the button's own internal
+                      ProGate only ever mounts once the teacher is already Pro, so a
+                      free teacher never sees two upsell cards stacked here. */}
+                  <ExportAllClassesButton />
+                </div>
+                <GoogleClassroomGradePassback classroomId={selectedClassroomId} />
+                <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
+              </ProGate>
+            )}
+          </FullReportDisclosure>
+        </div>
       </div>
     );
   }

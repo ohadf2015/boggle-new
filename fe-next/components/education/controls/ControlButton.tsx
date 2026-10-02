@@ -68,9 +68,9 @@ export function ControlButton({
       data-armed={dataArmed === undefined ? undefined : dataArmed ? 'true' : 'false'}
       onClick={onClick}
       className={cn(
-        // `min-w-0` + a truncating label is what lets five controls hold ONE row
+        // `min-w-0` + a two-line label is what lets five controls hold ONE row
         // from `lg` up (the bar sets `lg:flex-nowrap`): a long label in Hebrew or
-        // Russian shortens instead of wrapping the strip into a second row that
+        // Russian breaks onto a second LINE inside the button, never a second row that
         // would eat a third of the projector.
         'inline-flex min-w-0 items-center justify-center',
         'rounded-neo border-3 lg:border-4 border-neo-black shadow-hard lg:shadow-hard-lg',
@@ -93,7 +93,7 @@ export function ControlButton({
       >
         {icon}
       </span>
-      <span className="truncate">{label}</span>
+      <span className="line-clamp-2 min-w-0 text-balance text-center leading-[1.05] [overflow-wrap:anywhere]">{label}</span>
     </button>
   );
 }

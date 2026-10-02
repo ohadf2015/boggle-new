@@ -33,6 +33,12 @@ import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
 import { roundAwards, seriesGrid } from './mpResultsStory';
 import type { MpResultsController } from './useMpResultsController';
 import fx from './mpResults.module.css';
+import { useOpenLessonPractice } from './useOpenLessonPractice';
+import { classroomRoundModeMeta } from '../round/roundModes';
+import { StudentMissedWords } from '@/components/student/live/StudentMissedWords';
+import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
+import { myMissedWords } from '@/components/student/live/missedWords';
+import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
@@ -154,6 +160,12 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   }, [isHost, c, handleMarkReady]);
 
   const nextMode = nextModeForViewer<GameModeOption>({ isHost, hostPick: c.selectedGameMode });
+  const openLessonPractice = useOpenLessonPractice();
+  const classroomStudent = c.isClassroom && !isHost && !!props.classroomSummary;
+  const missedWords = useMemo(() => myMissedWords(props.classroomSummary, username), [props.classroomSummary, username]);
+  const practiceLessonId = props.classroomSummary?.lessonIds?.[0];
+  const switchedTo = classroomStudent && props.classroomNextMode && props.classroomNextMode !== c.resolvedGameMode ? props.classroomNextMode : null;
+  const nextModeLabel = switchedTo ? t(classroomRoundModeMeta(switchedTo).nameKey) : undefined;
   const me = data.currentPlayerData;
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
   const roundGap = useMemo(() => rivalGap(rows), [rows]);
@@ -163,6 +175,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   // otherwise the round is told as three awards.
   const grid = useMemo(() => seriesGrid({ ladder, standings: seriesStandings, rounds: seriesRoundNumber }), [ladder, seriesStandings, seriesRoundNumber]);
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
+
+  const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
 
   const header = (
     <MpResultsHeader
@@ -246,7 +260,15 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           t={t}
         />
         </div>
-        {branch === 'intermission' && (
+        {classroomStudent ? (
+          <StudentMissedWords
+            words={missedWords}
+            language={props.roomLanguage ?? c.language}
+            t={t}
+            onPractice={practiceLessonId && missedWords.length > 0 ? () => openLessonPractice(practiceLessonId) : undefined}
+            className={cn('shrink-0', !seen('card') && 'invisible', seen('card') && fx.cardIn)}
+          />
+        ) : branch === 'intermission' && (
           <MpNextModeCard
             mode={nextMode}
             onChange={isHost && !c.isClassroom ? c.setSelectedGameMode : undefined}
@@ -280,7 +302,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
-            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} t={t} />
+            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} leaveKey={exitCopy.leaveKey} t={t} />
           ) : (
             <MpIntermissionFooter
               isHost={isHost}
@@ -292,6 +314,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
               adHold={c.adGate.anyAdActive}
               onStart={startNext}
               onReady={markReady}
+              nextModeLabel={nextModeLabel}
               t={t}
             />
           )}
@@ -325,17 +348,21 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         </>
       )}
       <MpResultsDetails open={detailsOpen} onClose={() => setDetailsOpen(false)} c={c} />
+      {classroomStudent ? (
+        <StudentExitDialog open={c.showExitConfirm} onOpenChange={c.setShowExitConfirm} onConfirm={c.confirmExitRoom} t={t} analyticsId="exit_room_confirm" />
+      ) : (
       <ConfirmationDialog
         open={c.showExitConfirm}
         onOpenChange={c.setShowExitConfirm}
-        title={t('playerView.exitConfirmation')}
-        description={t('results.exitWarning')}
+        title={t(exitCopy.titleKey)}
+        description={t(exitCopy.bodyKey)}
         confirmText={t('common.confirm')}
         cancelText={t('common.cancel')}
         onConfirm={c.confirmExitRoom}
         variant="default"
         analyticsId="exit_room_confirm"
       />
+      )}
     </>
   );
 }

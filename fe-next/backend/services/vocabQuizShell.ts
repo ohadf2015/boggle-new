@@ -18,7 +18,7 @@ import { getQuizSession } from '../modules/vocabQuizStore.js';
 import type { Socket } from 'socket.io';
 
 import { addQuizPlayer, snapshotFor, type VocabQuizSession } from './vocabQuizEngine.js';
-import { VOCAB_QUIZ_EVENTS } from '@/shared/types/vocabQuiz';
+import { VOCAB_QUIZ_EVENTS, VOCAB_QUIZ_MODE } from '@/shared/types/vocabQuiz';
 
 /**
  * The mode reported to the client shells. The quiz is not a `GameMode`, but
@@ -46,6 +46,8 @@ export function buildQuizShellStart(session: VocabQuizSession) {
     minWordLength: 3,
     boardTheme: null,
     gameMode: QUIZ_SHELL_GAME_MODE,
+    // The shell mode above is a mount fiction; this is what the student countdown names.
+    classroomMode: VOCAB_QUIZ_MODE,
     goldenLetters: [] as string[],
     // The dials ride every door (start, late join, reconnect) from this one
     // builder, so a mid-quiz arrival renders the same calm as everybody else.

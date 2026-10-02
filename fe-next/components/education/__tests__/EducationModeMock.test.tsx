@@ -16,7 +16,8 @@ describe('EducationModeMock', () => {
 
   it('shows the classroom join code', () => {
     render(<EducationModeMock />);
-    expect(screen.getByTestId('mock-join-code')).toHaveTextContent('4821');
+    // Same shape as a real code from generate_join_code(): six chars, no I/O/0/1.
+    expect(screen.getByTestId('mock-join-code').textContent?.trim()).toMatch(/^[A-HJ-NP-Z2-9]{6}$/);
     expect(screen.getByText('education.landing.mock.join_label')).toBeInTheDocument();
   });
 

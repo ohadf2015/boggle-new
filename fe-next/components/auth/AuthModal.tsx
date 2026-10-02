@@ -16,6 +16,7 @@ import { trackEvent } from '@/components/GoogleAnalytics';
 import { isNative } from '../../utils/platform';
 
 import { getGuestStatsSummary } from '../../utils/guestManager';
+import { AuthModalTeacherHeader } from './AuthModalTeacherHeader';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -61,6 +62,8 @@ interface AuthModalProps {
    * can omit it and get the old close-only behavior.
    */
   onAuthSuccess?: () => void;
+  /** 'teacher' when opened from education: teacher copy, a one-tap sign-in switch, no guest exit. */
+  audience?: 'player' | 'teacher';
 }
 
 interface GuestStats {
@@ -77,7 +80,8 @@ interface Provider {
 
 type AuthMode = 'signin' | 'signup';
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats = false, initialMode = 'signin', onAuthSuccess }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats = false, initialMode = 'signin', onAuthSuccess, audience = 'player' }) => {
+  const isTeacher = audience === 'teacher';
   const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -146,7 +150,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   useEffect(() => {
     if (isOpen) {
       setAuthMode(initialMode);
-      setUsePassword(false);
+      // A returning teacher signs in with a password — land on that form, not the magic link.
+      setUsePassword(isTeacher && initialMode === 'signin');
       setEmail('');
       setPassword('');
       setEmailError(null);
@@ -157,7 +162,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       setOtpCode('');
       setOtpCooldown(0);
     }
-  }, [isOpen, initialMode]);
+  }, [isOpen, initialMode, isTeacher]);
 
   // Focus trap and keyboard handling
   // Escape is handled by useFocusTrap — only handle Tab here
@@ -418,7 +423,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     },
   ];
   // On native, only show Google (Discord requires browser OAuth which leaves the app)
-  const providers = isNative() ? allProviders.filter(p => p.id === 'google') : allProviders;
+  // Teachers sign in with a school Google account or email — no Discord in a teacher gate.
+  const providers = isNative() || isTeacher ? allProviders.filter(p => p.id === 'google') : allProviders;
   // On web with a Google web client, use Google's in-page token button
   // (signInWithIdToken) so the consent screen shows OUR domain, not <ref>.supabase.co.
   const useGsiGoogleButton = !isNative() && !!process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
@@ -446,7 +452,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-start justify-between gap-3 mb-5">
+            {isTeacher ? (
+              <AuthModalTeacherHeader
+                mode={authMode}
+                onModeChange={(next) => {
+                  setAuthMode(next);
+                  setUsePassword(next === 'signin');
+                  setError(null);
+                }}
+              />
+            ) : (
             <div>
               <h2
                 id="auth-modal-title"
@@ -458,6 +474,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                 {t('auth.upgradePrompt')}
               </p>
             </div>
+            )}
             <button
               type="button"
               onClick={onClose}
@@ -855,6 +872,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           )}
 
           {/* Continue as Guest */}
+          {isTeacher ? null : (
           <div className="mt-5 text-center">
             <button
               type="button"
@@ -864,6 +882,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               {t('auth.continueAsGuest')}
             </button>
           </div>
+          )}
 
           {/* Trust Signal + Terms */}
           <div className="mt-4 flex flex-col items-center gap-2">

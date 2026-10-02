@@ -17,7 +17,7 @@ import { PLAN_MATRIX_ROWS, type PlanMatrixCell } from '@/lib/education/planMatri
  * arbitrary and the paid one thin. The three shared ticks that ARE here do real work: a
  * column of nothing but crosses reads as a crippled free tier, and ours genuinely is not.
  */
-export function PlanComparisonMatrix() {
+export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } = {}) {
   const { t } = useLanguage();
 
   /**
@@ -25,6 +25,8 @@ export function PlanComparisonMatrix() {
    * is decorative and hidden; the word beside it carries the meaning. A glyph-only column
    * is silent to a screen reader and blank in any font missing ✓/✗.
    */
+  const pad = compact ? 'px-3 py-1.5 text-sm' : 'p-3 sm:p-4';
+
   function Cell({ value }: { value: PlanMatrixCell }) {
     if (typeof value === 'number') {
       return <span className="font-neo-display font-black text-lg">{value}</span>;
@@ -57,8 +59,14 @@ export function PlanComparisonMatrix() {
   }
 
   return (
-    <section data-testid="plan-comparison-matrix" className="mb-12">
-      <h2 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white text-center mb-6">
+    <section data-testid="plan-comparison-matrix" className={compact ? 'mb-0' : 'mb-12'}>
+      <h2
+        className={
+          compact
+            ? 'text-base font-neo-display font-black text-neo-white text-start mb-2'
+            : 'text-2xl sm:text-3xl font-neo-display font-black text-neo-white text-center mb-6'
+        }
+      >
         {t('teacher.subscription.matrix.title')}
       </h2>
 
@@ -71,13 +79,13 @@ export function PlanComparisonMatrix() {
             <tr className="border-b-2 border-black">
               <th
                 scope="col"
-                className="p-3 sm:p-4 text-start font-neo-display font-black text-neo-white/80 text-sm sm:text-base"
+                className={`${pad} text-start font-neo-display font-black text-neo-white/80 text-sm sm:text-base`}
               >
                 {t('teacher.subscription.matrix.featureColumn')}
               </th>
               <th
                 scope="col"
-                className="p-3 sm:p-4 text-center font-neo-display font-black text-neo-white text-sm sm:text-base"
+                className={`${pad} text-center font-neo-display font-black text-neo-white text-sm sm:text-base`}
               >
                 {t('teacher.subscription.freePlanName')}
               </th>
@@ -85,7 +93,7 @@ export function PlanComparisonMatrix() {
                   through means the eye lands on it without the table needing a badge. */}
               <th
                 scope="col"
-                className="p-3 sm:p-4 text-center font-neo-display font-black bg-neo-lime text-neo-navy text-sm sm:text-base"
+                className={`${pad} text-center font-neo-display font-black bg-neo-lime text-neo-navy text-sm sm:text-base`}
               >
                 {t('teacher.subscription.proPlanName')}
               </th>
@@ -96,14 +104,14 @@ export function PlanComparisonMatrix() {
               <tr key={row.key} className="border-b border-neo-white/15 last:border-b-0">
                 <th
                   scope="row"
-                  className="p-3 sm:p-4 text-start font-bold text-neo-white text-sm sm:text-base"
+                  className={`${pad} text-start font-bold text-neo-white text-sm sm:text-base`}
                 >
                   {t(`teacher.subscription.matrix.${row.key}`)}
                 </th>
-                <td className="p-3 sm:p-4 text-center text-neo-white">
+                <td className={`${pad} text-center text-neo-white`}>
                   <Cell value={row.free} />
                 </td>
-                <td className="p-3 sm:p-4 text-center text-neo-white bg-neo-lime/10">
+                <td className={`${pad} text-center text-neo-white bg-neo-lime/10`}>
                   <Cell value={row.pro} />
                 </td>
               </tr>

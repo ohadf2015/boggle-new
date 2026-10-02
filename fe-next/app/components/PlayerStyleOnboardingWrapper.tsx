@@ -20,6 +20,7 @@ import {
   hasPlayerStyleModalBeenShown,
   markPlayerStyleModalShown,
 } from '@/lib/playerStyle/playerStyleStorage';
+import { isEducationPath } from '@/lib/navigation/sectionHome';
 import { shouldShowStylePopup } from '@/lib/playerStyle/shouldShowStylePopup';
 import { isCrawler } from '@/lib/seo/isCrawler';
 import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
@@ -122,6 +123,7 @@ export default function PlayerStyleOnboardingWrapper() {
         hasPlayedAtLeastOneGame,
         // Never over a board, a lobby, a round-end recap or the projector.
         overlayQuietZone,
+        onEducationRoute: isEducationPath(pathname ?? ''),
       });
       // Only ever OPEN from the effect; dismissal owns closing. This prevents a
       // dep change while the modal is open from yanking it shut mid-choice, and

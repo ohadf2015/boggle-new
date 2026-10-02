@@ -430,3 +430,26 @@ export function trackEduAssignmentStartLiveClicked(args: EduStartLiveClassArgs):
 export function trackEduJoinCodeCopied(args: EduStartLiveClassArgs): void {
   safeCapture('edu_join_code_copied', { classroom_id: args.classroomId });
 }
+
+export interface TeacherHqProgressViewedArgs {
+  classroomId: string;
+  studentCount: number;
+  assignmentCount: number;
+  submittedCount: number;
+  hasPro: boolean;
+}
+
+/** HQ class-progress strip impression — evidence of value before the Pro ask. */
+export function trackTeacherHqProgressViewed(args: TeacherHqProgressViewedArgs): void {
+  safeCapture('teacher_hq_progress_viewed', {
+    classroom_id: args.classroomId,
+    student_count: args.studentCount,
+    assignment_count: args.assignmentCount,
+    submitted_count: args.submittedCount,
+    has_pro: args.hasPro,
+  });
+}
+
+export function trackTeacherHqUpgradeClicked(args: { classroomId: string }): void {
+  safeCapture('teacher_hq_upgrade_clicked', { classroom_id: args.classroomId });
+}

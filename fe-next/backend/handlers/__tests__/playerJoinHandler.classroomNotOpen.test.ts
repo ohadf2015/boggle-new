@@ -183,6 +183,21 @@ describe("base 'join' — a classroom code whose room is not open yet", () => {
     });
   });
 
+  it('seats the child at once when the teacher opens the room while the join is being answered', async () => {
+    mockGetClassroomGame.mockResolvedValue(waitingClassroom);
+    mockGetGame
+      .mockReturnValueOnce(undefined)
+      .mockReturnValue({ gameCode: 'ABC123', users: {}, gameState: 'waiting', hostSocketId: 'host-sock' });
+
+    const { socket, join } = captureJoinHandler('student-1');
+    await join({ gameCode: 'ABC123', username: 'Ada' });
+    await flush();
+
+    expect(errorCodes()).not.toContain('CLASSROOM_NOT_OPEN');
+    expect(socket.join).not.toHaveBeenCalledWith('classroomRoomWait:ABC123');
+    expect(addUserToGame).toHaveBeenCalled();
+  });
+
   it('still answers GAME_NOT_FOUND for an ENDED session (no new oracle, no endless wait)', async () => {
     mockGetClassroomGame.mockResolvedValue({ ...waitingClassroom, status: 'ended', endedAt: '2026-09-19T10:00:00Z' });
 

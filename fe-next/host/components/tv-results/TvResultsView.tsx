@@ -84,6 +84,8 @@ interface TvResultsViewProps {
    * means this view is the teacher's whole end-of-game moment.
    */
   classroomSummary?: ClassroomSummary;
+  /** Classroom only: the host's confirmed exit, offered as "Back to class". */
+  onExitRoom?: () => void;
 }
 
 /**
@@ -113,6 +115,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
   allWords = [],
   gameMode: gameModeOverride,
   classroomSummary,
+  onExitRoom,
 }) => {
   const storeGameMode = useGameMode();
   const gameMode = gameModeOverride || storeGameMode;
@@ -120,7 +123,6 @@ const TvResultsView = memo<TvResultsViewProps>(({
   const { sfxMuted, sfxVolume } = useSoundEffects();
   const { isMuted: musicMuted, audioUnlocked } = useMusic();
 
-  // Fullscreen mode support
   const { isFullscreen, toggleFullscreen, isSupported: isFullscreenSupported } = useTvFullscreen({
     enabled: true,
   });
@@ -202,7 +204,6 @@ const TvResultsView = memo<TvResultsViewProps>(({
     };
   }, []);
 
-  // Prepare data for sub-components
   const podiumPlayers = useMemo(() => {
     return filteredScores.slice(0, 3).map(p => ({
       username: p.username,
@@ -245,7 +246,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
   // The general game's results are untouched below.
   if (classroomSummary) {
     return (
-      <ClassroomTvResultsScreen summary={classroomSummary} onRematch={onStartNewGame} onClose={onClose} t={t} />
+      <ClassroomTvResultsScreen summary={classroomSummary} players={finalScores} onRematch={onStartNewGame} onClose={onClose} onExitRoom={onExitRoom} t={t} />
     );
   }
 

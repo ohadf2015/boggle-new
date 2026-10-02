@@ -25,13 +25,13 @@
 
 'use client';
 
-import { ArrowLeft, Maximize, Minimize } from 'lucide-react';
+import { Maximize, Minimize } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import ClassroomTvResults from '@/components/education/results/ClassroomTvResults';
 import { PROJECTOR_RESULTS_Z } from '@/lib/education/roundEndLayer';
 import { useTvFullscreen } from '../../hooks/useTvFullscreen';
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import type { PlayerResult } from '@/types/components';
 
 export interface ClassroomTvResultsScreenProps {
   summary: ClassroomSummary;
@@ -45,14 +45,19 @@ export interface ClassroomTvResultsScreenProps {
    * recap's one primary action is still REMATCH.
    */
   onClose?: () => void;
+  /** The host's confirmed exit (room closes, teacher lands on HQ). */
+  onExitRoom?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  players?: PlayerResult[];
 }
 
 export function ClassroomTvResultsScreen({
   summary,
   onRematch,
   onClose,
+  onExitRoom,
   t,
+  players,
 }: ClassroomTvResultsScreenProps) {
   const { isFullscreen, toggleFullscreen, isSupported } = useTvFullscreen({ enabled: true });
 
@@ -71,26 +76,6 @@ export function ClassroomTvResultsScreen({
         'z-[75]'
       )}
     >
-      {onClose && (
-        <button
-          type="button"
-          onClick={onClose}
-          data-testid="classroom-tv-dismiss"
-          // Secondary, and it looks it: no fill of its own, a 3px cream edge
-          // (16.8:1 on navy) so it still reads as a control from the back of
-          // the room. The primary action is REMATCH, inside the recap.
-          className={cn(
-            'absolute top-4 start-4 z-10 flex items-center gap-2 px-4 py-3 rounded-neo',
-            'bg-neo-navy-elevated text-neo-cream font-neo-display font-bold uppercase text-lg',
-            'border-[3px] border-neo-cream shadow-hard-sm',
-            'hover:bg-neo-navy-light transition-colors'
-          )}
-        >
-          <DirectionalIcon icon={ArrowLeft} className="w-6 h-6 shrink-0" aria-hidden="true" />
-          {t('education.results.backToLobby')}
-        </button>
-      )}
-
       {isSupported && (
         <button
           type="button"
@@ -104,7 +89,7 @@ export function ClassroomTvResultsScreen({
           // (16.8:1 on navy). A black border on navy measures 1.23:1 and
           // disappears — see the border-by-surface rule in the design cards.
           className={cn(
-            'absolute top-4 end-4 z-10 p-3 rounded-neo',
+            'absolute top-3 end-3 z-10 p-2 md:top-4 md:end-4 md:p-3 rounded-neo',
             'bg-neo-navy-elevated text-neo-cream',
             'border-[3px] border-neo-cream shadow-hard-sm',
             'hover:bg-neo-navy-light transition-colors'
@@ -121,7 +106,14 @@ export function ClassroomTvResultsScreen({
       {/* The shell is locked; this is the one region allowed to scroll (it
           rarely needs to — the recap is built to fit a 16:9 wall). */}
       <div className="h-full px-3 pt-20 pb-4 md:px-8 md:pt-6 md:pb-6">
-        <ClassroomTvResults summary={summary} onRematch={onRematch} t={t} />
+        <ClassroomTvResults
+          summary={summary}
+          onRematch={onRematch}
+          onChangeGame={onClose}
+          onBackToClass={onExitRoom}
+          players={players}
+          t={t}
+        />
       </div>
     </div>
   );

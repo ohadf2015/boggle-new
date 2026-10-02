@@ -1,5 +1,176 @@
 // Sv translations
 const sv = {
+  // @eduLibrary:start
+  "eduLibrary": {
+    "title": "Bibliotek",
+    "tabs": {
+      "mine": "Mina listor",
+      "discover": "Upptäck"
+    },
+    "editor": {
+      "createTitle": "Ny ordlista",
+      "editTitle": "Redigera ordlista",
+      "description": "Klistra in ord, lägg till betydelser, spara.",
+      "newList": "Ny lista",
+      "titleLabel": "Listans namn",
+      "titlePlaceholder": "Döp din lista…",
+      "pasteLabel": "Klistra in eller skriv ord",
+      "pastePlaceholder": "äpple, banan, körsbär – eller ett per rad. ”ord - betydelse” lägger till en förklaring.",
+      "addedWords": "+{count} tillagda",
+      "skippedDuplicates": "{count} fanns redan",
+      "importFile": "CSV / TSV",
+      "starterPack": "Startpaket",
+      "fileError": "Vi hittade inga ord i filen. Ett ord per rad och betydelsen i andra kolumnen.",
+      "wordsHeading": "Ord",
+      "wordsLabel": "Ord i listan",
+      "viewLabel": "Visning",
+      "view": {
+        "chips": "Brickor",
+        "details": "Detaljer"
+      },
+      "emptyWords": "Dina ord dyker upp här.",
+      "removeWord": "Ta bort {word}",
+      "noDefinition": "Ingen förklaring än",
+      "word": "Ord",
+      "definition": "Betydelse (valfritt)",
+      "definitionPlaceholder": "Vad betyder det?",
+      "done": "Klar",
+      "needTitle": "Ge listan ett namn för att spara.",
+      "needWords": "Lägg till minst ett ord.",
+      "save": "Spara",
+      "saving": "Sparar…",
+      "saved": "Sparad",
+      "savedToast": "”{name}” sparad"
+    },
+    "issue": {
+      "digits": "Innehåller en siffra",
+      "tooLong": "För långt för spelet",
+      "wrongScript": "Ser inte ut att vara listans språk",
+      "blocked": "Inte tillåtet i elevspel"
+    },
+    "meta": {
+      "language": "Språk",
+      "grade": "Årskurs",
+      "topic": "Ämne",
+      "assignTo": "Tilldela",
+      "noClass": "Ingen klass än"
+    },
+    "grade": {
+      "any": "Alla årskurser",
+      "k2": "F–2",
+      "g35": "Åk 3–5",
+      "g68": "Åk 6–8",
+      "g912": "Åk 9 och gymnasiet"
+    },
+    "topic": {
+      "none": "Inget ämne",
+      "all": "Alla ämnen",
+      "general": "Allmänt",
+      "english": "Engelska",
+      "hebrew": "Hebreiska",
+      "science": "NO",
+      "math": "Matte",
+      "history": "Historia",
+      "geography": "Geografi",
+      "language": "Språkinlärning"
+    },
+    "share": {
+      "toggle": "Dela i Upptäck",
+      "help": "Andra lärare kan hitta, köra och kopiera den. Bara ditt visningsnamn syns.",
+      "blocked": "Vissa ord kan inte delas med elever. Ta bort dem för att dela.",
+      "share": "Dela",
+      "shared": "Delad",
+      "nowPublic": "Delad i Upptäck",
+      "nowPrivate": "Privat igen",
+      "failed": "Kunde inte ändra delningen. Försök igen."
+    },
+    "remixedFrom": "Remix av {title} från {author}",
+    "remixedFromNoAuthor": "Remix av {title}",
+    "myLists": {
+      "emptyHint": "Klistra in en lista, börja från ett startpaket eller hämta en från Upptäck."
+    },
+    "card": {
+      "practice": "Öva",
+      "words": "{count} ord",
+      "by": "av {author}",
+      "aTeacher": "en lärare",
+      "new": "Ny",
+      "plays": "Spelad {count} gånger",
+      "playsOne": "Spelad {count} gång",
+      "copies": "{count} kopior",
+      "copiesOne": "{count} kopia",
+      "results": "Resultat"
+    },
+    "badge": {
+      "verified": "Verifierad",
+      "teacher": "Lärargjord",
+      "yours": "Din"
+    },
+    "discover": {
+      "searchLabel": "Sök listor",
+      "searchPlaceholder": "Sök listor, ord eller lärare",
+      "clearSearch": "Rensa sökningen",
+      "filters": "Filter",
+      "allLanguages": "Alla",
+      "sourceLabel": "Vem gjorde den",
+      "source": {
+        "all": "Alla",
+        "verified": "Verifierad av LexiClash",
+        "teacher": "Lärargjorda"
+      },
+      "count": "{count} listor",
+      "sortLabel": "Sortera",
+      "sort": {
+        "popular": "Populärast",
+        "newest": "Nyast"
+      },
+      "loadError": "Kunde inte ladda Upptäck.",
+      "retry": "Försök igen",
+      "emptyTitle": "Inga listor matchar än",
+      "emptyHint": "Prova ett annat filter – eller dela en egen så att nästa lärare hittar den.",
+      "tryAllLanguages": "Visa alla språk",
+      "shareFirst": "Dela en lista",
+      "beFirstTitle": "Bli först här.",
+      "beFirstHint": "Dela en av dina listor så syns den för alla lärare på det här språket."
+    },
+    "preview": {
+      "host": "Kör live",
+      "assign": "Tilldela",
+      "copy": "Gör en kopia",
+      "copied": "Kopierad",
+      "copiedHint": "Den ligger i Mina listor – tryck på Kopierad för att öppna.",
+      "copiedToast": "”{name}” kopierad till Mina listor",
+      "copyFailed": "Kunde inte kopiera listan. Försök igen."
+    },
+    "report": {
+      "action": "Anmäl listan",
+      "title": "Anmäl lista",
+      "description": "Vad är fel med ”{name}”? Vi går igenom varje anmälan.",
+      "reason": {
+        "inappropriate": "Passar inte elever",
+        "offensive": "Kränkande ord",
+        "unplayable": "Fel eller ospelbara ord",
+        "spam": "Spam eller skräp"
+      },
+      "detailsPlaceholder": "Något mer? (valfritt)",
+      "submit": "Skicka anmälan",
+      "thanks": "Tack – vi tittar på det.",
+      "failed": "Anmälan skickades inte. Försök igen."
+    },
+    "assign": {
+      "title": "Tilldela en klass",
+      "pickClass": "Vilken klass ska få den?",
+      "noClasses": "Skapa en klass först – det tar 5 sekunder.",
+      "createClass": "Skapa klass"
+    },
+    "pager": {
+      "label": "Sidor",
+      "prev": "Föregående",
+      "next": "Nästa",
+      "status": "{page} / {total}"
+    }
+  },
+  // @eduLibrary:end
   // @academy:start (generated by /tmp/edu-play/merge-i18n.mjs)
   "academy": {
     "teacher": {
@@ -46,7 +217,12 @@ const sv = {
       "startLiveBody": "Uppgiften är ute. Starta ett livespel så klassen spelar tillsammans.",
       "startLiveCta": "Starta liveklasspel",
       "copyJoinCode": "Kopiera länk",
-      "joinCodeCopied": "Länken kopierades"
+      "joinCodeCopied": "Länken kopierades",
+      "progressTitle": "Klassens framsteg",
+      "progressStudents": "elever",
+      "progressAssignments": "uppgifter",
+      "progressSubmitted": "inlämnade",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {
@@ -13327,6 +13503,14 @@ const sv = {
       "trialEnded": "Provperioden är slut"
     },
     "proGate": {
+      "mastery": {
+        "title": "Se varje ord klassen missar",
+        "body": "Pro rangordnar de tio ord klassen missar mest och visar varje elev mot varje ord, i alla spel – så du vet exakt vad som behöver repeteras, och för vem."
+      },
+      "missedPractice": {
+        "title": "Gör missar till utspridd övning",
+        "body": "Ett klick delar ut klassens missade ord som tre korta omgångar – i morgon, om 3 dagar och om en vecka. Det är mellanrummen som får orden att fastna."
+      },
       "analytics": {
         "title": "Se hur din klass faktiskt ligger till",
         "body": "Med Pro blir varje spel en bild av klassen: vilka ord som sitter, vilka elever som kör fast och hur långt var och en har kommit sedan terminsstarten. Ta med det till utvecklingssamtalet eller ämneskonferensen."
@@ -13361,10 +13545,10 @@ const sv = {
       "regionLabel": "Fortgångssammandrag för {{classroom}}",
       "scheduleReteachCta": "Schemalägg reteach-Live om ~{{days}} dagar",
       "scheduleReteachConfirm": "Reteach-Live schemalagd till {{date}} (~{{days}} dagar). Kalenderinbjudan öppnades.",
-      "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor — mellanslagsrepetition à la Kahoot.",
+      "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor – utspridd repetition som fastnar.",
       "unpluggedReteachLiveCta": "Starta Unplugged reteach Live",
       "reteachLiveCta": "Starta 3-minuters reteach Live",
-      "unpluggedReteachLiveFoil": "Kahoot Unplugged-foil (Teacher Takeover, 21 sep 2026 — när elevernas enheter inte är ett alternativ) — projicera missarna; eleverna svarar på papper, utan enheter."
+      "unpluggedReteachLiveFoil": "Inga elevenheter i dag? Projicera missarna – eleverna svarar på papper."
     },
     "windowProgress": {
       "title": "Klassen den här veckan",
@@ -13464,6 +13648,8 @@ const sv = {
       "proHeroAlt": "En lärare tittar på klassens live-topplista på tavlan medan eleverna spelar från sina platser.",
       "valueHeadline": "Bäst för daglig repetition och exit tickets. Kolla hela klassen på en runda.",
       "matrix": {
+        "mastery": "Värmekarta och svåraste orden",
+        "missedPractice": "Missade ord, utspritt över 1-3-7 dagar",
         "title": "Jämför planer",
         "featureColumn": "Funktion",
         "unlimited": "Obegränsat",
@@ -15027,7 +15213,7 @@ const sv = {
       "inviteStudents": "Bjud in elever",
       "lastActive": "Senast aktiv",
       "lessonEffectiveness": "Lektionens resultat",
-      "level": "Nivå {{level}}",
+      "level": "Nivå",
       "live": "Live",
       "loading": "Laddar statistik...",
       "mastery": "Behärskat",
@@ -15043,7 +15229,7 @@ const sv = {
       "retry": "Försök igen",
       "shareParentReport": "Dela med förälder",
       "shareParentReportFailed": "Kunde inte skapa länken. Försök igen.",
-      "streak": "{{count}} dagars träning",
+      "streak": "Svit",
       "struggling": "Behöver stöd",
       "mastered": "Behärskar",
       "practicing": "Övar",
@@ -15227,7 +15413,7 @@ const sv = {
         "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för {count} språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
-        "cta_note": "Gratis basplan att börja med • Godkänd inom ~24 h",
+        "cta_note": "Gratis basplan att börja med • Direkt åtkomst",
         "cta_schools": "Skola eller distrikt? Se planer →"
       },
       "mock": {
@@ -15808,6 +15994,12 @@ const sv = {
         "title": "Gå med i klassrummet"
       },
       "classroomRoomGone": "Klassens spel är slut. Be din lärare starta ett nytt.",
+      "gameEnded": {
+        "title": "Det här spelet är slut",
+        "retry": "Försök igen",
+        "toClass": "Till min klass",
+        "newCode": "Skriv en ny kod"
+      },
       "lessonsAssigned": "Tilldelade lektioner",
       "feel": {
         "points": "p",
@@ -16005,6 +16197,7 @@ const sv = {
       "auth_required_title": "Registrera dig för att ansöka om läraråtkomst",
       "auth_required_body": "Läraråtkomst är kopplad till ett verifierat konto. Skapa ett gratiskonto eller logga in, så fortsätter vi direkt här.",
       "auth_required_cta": "Skapa mitt gratis lärarkonto",
+      "auth_signin_cta": "Har du redan ett konto? Logga in",
       "trust_instant": "Direkt åtkomst — ingen granskningskö",
       "trust_free": "Gratis lärarplan, utan slutdatum",
       "trust_nologins": "Inga elevkonton, ingen installation",
@@ -18852,6 +19045,9 @@ const sv = {
       "share": "Dela",
       "seriesChampion": "Seriemästare",
       "teacherPaced": "Din lärare startar nästa spel",
+      "backToClass": "Tillbaka till klassen",
+      "endClassTitle": "Avsluta klassens spel?",
+      "endClassBody": "Rummet stängs för alla och du går tillbaka till din klassöversikt.",
       "roundPoints": "Poäng den här rundan",
       "yourRank": "Din placering",
       "lessonRecap": "Lektionssammanfattning",
@@ -18867,6 +19063,280 @@ const sv = {
       "roundShort": "R{n}",
       "total": "Totalt",
       "player": "Spelare"
+    }
+  },
+  "eduStudent": {
+    "mode": {
+      "vocabQuiz": {
+        "rule": "Läs ledtråden och tryck på ordet som passar. Snabbt och rätt ger mest poäng."
+      },
+      "wordcraft": {
+        "rule": "Stava ord från lektionen med dina brickor och lägg dem på brädet."
+      },
+      "pending": "Nu kör vi!",
+      "pendingRule": "Titta upp, din lärare startar rundan."
+    },
+    "lobby": {
+      "pickLook": "Välj en look",
+      "shuffleLooks": "Blanda looks",
+      "buildLook": "Skapa din egen look",
+      "readySticker": "Redo!"
+    },
+    "exit": {
+      "title": "Lämna spelet?",
+      "body": "Du hoppar av den här rundan. Samma kod tar dig tillbaka.",
+      "stay": "Fortsätt spela",
+      "leave": "Lämna"
+    },
+    "join": {
+      "surpriseMe": "Överraska mig",
+      "funNames": "Pixel-Panda|Kapten Utter|Turbo-Rostis|Disco-Lama|Ninja-Nudel|Raket-Tvättbjörn|Kosmisk Kiwi|Smygande Sengångare|Mega-Mango|Laser-Lemur|Bubbel-Bison|Jazzig Jaguar|Våffelvisard|Åsk-Anka|Komet-Katt|Glitter-Gecko|Banan-Bossen|Turbo-Sköldis|Kvant-Quokka|Fluffig Falk"
+    },
+    "results": {
+      "nextUp": "Nästa: {mode}",
+      "missedTitle": "Fånga de här nästa gång",
+      "missedNone": "Du hittade alla lektionsord. Legend!",
+      "hear": "Lyssna på {word}",
+      "practiceThese": "Öva på dem",
+      "tapToHear": "Tryck på ett ord för att höra det"
+    },
+    "wordcraft": {
+      "hintFirst": "Tryck på bokstäver för att bygga ett ord. Det hamnar i mitten.",
+      "hintMore": "En bokstav till. Ord behöver minst 2.",
+      "hintAnchor": "Tryck nu på en ruta bredvid en bricka på brädet.",
+      "hintReady": "Snyggt. Tryck på LÄGG!",
+      "targetsProgress": "{found}/{total} lektionsord",
+      "showTargets": "Visa lektionsorden",
+      "hideTargets": "Dölj lektionsorden"
+    },
+    "practice": {
+      "answerIs": "Det stavas",
+      "next": "Nästa ord",
+      "finish": "Se mitt resultat"
+    },
+    "cookie": {
+      "message": "Vi använder kakor för att räkna spel och visa annonser."
+    }
+  },
+  // @eduHq:start
+  "eduHq": {
+    "modes": {
+      "minutes": "{{minutes}} min",
+      "players": "Upp till {{count}}",
+      "skill": {
+        "meaning": "Betydelse",
+        "spotting": "Hitta ord",
+        "speed": "Snabbhet",
+        "hunting": "Minnas listan",
+        "building": "Stavning"
+      },
+      "pitch": {
+        "vocabQuiz": "Tävla mot klassen om rätt betydelse.",
+        "classic": "En gemensam bräda. Hitta flest ord.",
+        "blast": "Snabba rundor. Kedja ord för jättekombos.",
+        "wordHunt": "Listans ord gömmer sig. Jaga dem först.",
+        "wordcraft": "Bygg listans ord av bokstavsbrickor. Bästa byggaren vinner."
+      }
+    },
+    "launch": {
+      "titleMode": "Startar {{mode}}",
+      "generic": "Gör i ordning spelet",
+      "codeLabel": "Er anslutningskod",
+      "step": {
+        "words": "Orden är laddade",
+        "room": "Öppnar rummet",
+        "code": "Hämtar anslutningskoden"
+      }
+    },
+    "lists": {
+      "label": "Ordlistor",
+      "more": "Fler"
+    },
+    "checklist": {
+      "firstStudent": "Första eleven är med",
+      "firstGame": "Kör ert första livespel",
+      "firstGameCta": "Se dina rapporter"
+    },
+    "tools": {
+      "students": "Elever",
+      "studentsStat": "i klassen",
+      "progress": "Framsteg",
+      "progressStat": "Senaste 7 och 30 dagarna",
+      "lastGame": "Senaste spelet",
+      "assignments": "Läxor",
+      "assignmentsStat": "tilldelade",
+      "assignmentsUnknown": "Se vad som ska lämnas in",
+      "analytics": "Analys",
+      "analyticsStat": "Trender per elev",
+      "proBadge": "Pro",
+      "classes": "Klasser",
+      "classesStat": "Hantera och byt namn",
+      "back": "Alla klassverktyg"
+    },
+    "auth": {
+      "titleSignup": "Skapa ditt lärarkonto",
+      "titleSignin": "Välkommen tillbaka",
+      "subtitle": "Dina klasser, koder och rapporter, en inloggning bort.",
+      "tabSignup": "Jag är ny",
+      "tabSignin": "Jag har ett konto"
+    },
+    "access": {
+      "haveAccount": "Har du redan ett konto? Logga in"
+    },
+    "hq": {
+      "assigned": "{{count}} tilldelade",
+      "assignedAria": "Läxor: {{count}} tilldelade. Öppna läxor",
+      "assignNudge": "Ge läxa"
+    },
+    "modeTags": {
+      "vocabQuiz": "Välj betydelse",
+      "classic": "Hitta ord",
+      "blast": "Kedja kombos",
+      "wordHunt": "Jaga listord",
+      "wordcraft": "Bygg och stava"
+    }
+  },
+  // @eduHq:end
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "Avsluta klassens spel?",
+      "body": "Rummet stängs för alla elever och du kommer tillbaka till klassens startsida.",
+      "stay": "Fortsätt spela",
+      "confirm": "Avsluta spelet"
+    },
+    "live": {
+      "panelTitle": "Liverunda",
+      "wordsFound": "ord hittade",
+      "lessonFound": "Lektionsord: {{found}}/{{total}}",
+      "wordOfRound": "Rundans ord",
+      "wordOfRoundEmpty": "Första långa ordet tar den här platsen",
+      "bestWordBy": "{{count}} bokstäver · av {{name}}",
+      "exitLabel": "Lämna spelet"
+    },
+    "results": {
+      "backToClass": "Tillbaka till klassen",
+      "switchGame": "Byt spel",
+      "soloTitle": "Solorunda!",
+      "tieTitle": "Oavgjort!",
+      "zeroTitle": "Inga poäng den här rundan",
+      "zeroBody": "Uppvärmningen är klar. Nästa runda räknas.",
+      "zeroNoteTitle": "Ingen har fått poäng än",
+      "zeroNoteHint": "Prova en längre timer eller en enklare bricka. Samma kod, ingen behöver gå med igen.",
+      "lineupTitle": "Med i rundan",
+      "emptyTitle": "Övningsrundan klar",
+      "emptyHeadline": "Inga elever spelade den här gången",
+      "emptyBody": "Visa koden på tavlan. Nästa runda räknas på riktigt.",
+      "podiumLessonWords": "{{found}}/{{total}} lektionsord",
+      "noLessonTitle": "Inga lektionsord den här rundan",
+      "noLessonBody": "Poängen kom från andra ord på brädet. Klassens bästa fynd:",
+      "noLessonBodyEmpty": "Poängen kom från andra ord på brädet.",
+      "noLessonHint": "Ett större bräde eller längre tid ger lektionsorden mer plats.",
+      "noLessonReteach": "Lektionsord att öva vidare på"
+    },
+    "reteach": {
+      "playNow": "Spela nu",
+      "sendHome": "Skicka hem",
+      "printShare": "Skriv ut och dela",
+      "googleClassroom": "Lägg upp i Google Classroom"
+    },
+    "lobby": {
+      "waitingForStudents": "Väntar på elever"
+    },
+    "wordcraft": {
+      "bingo": "BINGO!",
+      "waiting": "Väntar på första ordet…"
+    }
+  },
+  // @eduLive:end
+  "eduPro": {
+    "mastery": {
+      "title": "Ordbehärskning",
+      "subtitle": "Vilka ord klassen missar gång på gång – i alla spel.",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "Klassens träffsäkerhet",
+        "words": "Ord som följs",
+        "sessions": "Spelresultat",
+        "students": "Elever"
+      },
+      "hardestTitle": "Svåraste orden",
+      "missedOf": "missat {missed} av {attempts}",
+      "studentsMissing": "{count} av {total} elever",
+      "noneMissed": "Ingen har missat ett ord två gånger än. Snyggt!",
+      "empty": "Kör ett ordförrådsquiz eller en Wordcraft-runda med klassen – kartan fylls i efter första spelet.",
+      "loading": "Laddar ordbehärskning…",
+      "error": "Kunde inte ladda ordbehärskningen. Ladda om och försök igen.",
+      "heatmapToggle": "Värmekarta: elev × ord",
+      "heatmapHint": "Varje ruta är en elev på ett ord.",
+      "studentColumn": "Elev",
+      "legend": {
+        "solid": "Sitter",
+        "shaky": "Osäkert",
+        "missed": "Missat",
+        "unseen": "Inte frågat"
+      },
+      "cellLabel": "{name}, {word}: {correct} av {attempts} rätt",
+      "cellUnseen": "{name}, {word}: inte frågat än",
+      "showAll": "Visa alla {count}",
+      "showFewer": "Visa färre",
+      "hiddenWords": "+{count} fler svåra ord i Pro",
+      "previewNote": "Gratisvy: dina tre svåraste. Pro visar alla tio och varje elev.",
+      "phoneHint": "Svåraste orden först, med vem som missade varje ord.",
+      "needsHelpColumn": "Behöver hjälp",
+      "needsHelpLabel": "{name}: {count} ord att repetera",
+      "missedRow": "Missat av",
+      "wordMissedLabel": "{word}: missat av {count} av {total} elever",
+      "missedByCount": "missat av {count} av {total}",
+      "missedNames": "Missade: {names}",
+      "shakyNames": "Osäkra: {names}",
+      "everyoneGotIt": "Alla klarade det",
+      "needsHelpTitle": "Behöver hjälp",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Ingen har fastnat på de här orden. Snyggt.",
+      "unlock": {
+        "allWords": "Hela topp 10 över de svåraste orden, rankad",
+        "heatmap": "Vem som missade vilket ord, elev för elev",
+        "practice": "Öva missade ord med ett klick, utspritt över en vecka"
+      }
+    },
+    "practice": {
+      "cta": "Öva missade ord",
+      "hint": "Tre utspridda omgångar med de här orden: i morgon, om 3 dagar och om en vecka.",
+      "assigning": "Delar ut…",
+      "assigned": "Utdelat!",
+      "assignedBody": "{count} ord, tre omgångar. Eleverna hittar dem bland sina lektioner.",
+      "round": "Omgång {n}",
+      "roundName": "Missade ord · {classroom} · omgång {n}/3 · {date}",
+      "failed": "Kunde inte dela ut omgångarna. Inget sparades – försök igen.",
+      "already": "Redan utdelat i dag. Eleverna har det bland sina lektioner.",
+      "nothing": "Inga missade ord att öva på än.",
+      "inDays": "om {count} dagar",
+      "tomorrow": "I morgon",
+      "whyNote": "Utspridd repetition slår en lång genomgång: varje omgång kommer tillbaka precis när ordet börjar blekna."
+    },
+    "reports": {
+      "classEyebrow": "Klassrapport",
+      "moreDetail": "Fullständig utskrivbar rapport",
+      "moreDetailHint": "PDF-export, detaljer per elev och resultat till Google Classroom.",
+      "assignmentsTitle": "Vem har gjort vad",
+      "assignmentsHint": "Vem som är klar med varje uppgift – med CSV-export.",
+      "arcTitle": "Elev för elev",
+      "arcHint": "Vem som klättrar, vem som fastnat och vilka ord som sätter stopp.",
+      "digestTitle": "Senaste klasspelet",
+      "digestHint": "Vad som hände i ert senaste spel, i en snabb överblick."
+    },
+    "upgrade": {
+      "featureMastery": "Topp 10 missade ord + värmekarta elev × ord",
+      "featureMissedPractice": "Ett klick: utspridd övning på missarna (1, 3, 7 dagar)",
+      "freeMastery": "Värmekarta för ordbehärskning",
+      "freePractice": "Utspridd övning på missade ord"
+    },
+    "assign": {
+      "required": "obligatoriskt",
+      "needLessonAndDate": "Välj en lektion och ett slutdatum för att dela ut.",
+      "needLesson": "Välj en lektion för att dela ut.",
+      "needDate": "Välj ett slutdatum för att dela ut."
     }
   }
 };

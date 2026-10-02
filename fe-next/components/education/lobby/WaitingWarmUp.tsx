@@ -29,9 +29,9 @@ export function WaitingWarmUp({ username, t }: { username: string; t: EduT }) {
     <section
       data-testid="waiting-warmup"
       aria-label={tr(t, 'academy.live.warmUpTitle', 'Warm-up')}
-      className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2.5 shadow-hard [@media(max-height:620px)]:hidden"
+      className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2 shadow-hard [@media(max-height:620px)]:hidden"
     >
-      <div className="mb-2 flex items-center justify-between gap-2">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
         <p className="min-w-0 truncate font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream lg:text-sm">
           {tr(t, 'academy.live.warmUpHint', 'Warm-up: tap the glowing letter!')}
         </p>
@@ -66,7 +66,7 @@ export function WaitingWarmUp({ username, t }: { username: string; t: EduT }) {
               aria-label={hot ? tr(t, 'academy.live.warmUpTapThis', 'Tap this one') : letter}
               onClick={() => dispatch({ type: 'tap', index: i })}
               className={cn(
-                'grid aspect-square place-items-center rounded-neo border-[3px] font-neo-display text-xl font-black leading-none transition-transform duration-100 motion-reduce:transition-none lg:text-2xl',
+                'grid h-10 place-items-center rounded-neo lg:aspect-square lg:h-auto border-[3px] font-neo-display text-xl font-black leading-none transition-transform duration-100 motion-reduce:transition-none lg:text-2xl',
                 'motion-safe:active:scale-90',
                 hot
                   ? 'z-10 scale-110 border-neo-black bg-neo-lime text-neo-black shadow-hard-sm motion-safe:animate-[lc-tile-glow_900ms_ease-in-out_infinite]'

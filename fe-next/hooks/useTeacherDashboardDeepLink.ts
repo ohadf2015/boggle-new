@@ -38,23 +38,38 @@ export function parseReviewWords(raw: string | null | undefined): string[] {
   return [...seen];
 }
 
+/** `?assign=1` — open the assignment creator (written by `teacherAssignHref`). */
+export function parseOpenAssignment(raw: string | null | undefined): boolean {
+  return raw === '1';
+}
+
+/** The dashboard with `classroomId` preselected and its assignment creator open. */
+export function teacherAssignHref(locale: string, classroomId: string): string {
+  const params = new URLSearchParams({ classroomId, assign: '1' });
+  return `/${locale}/teacher?${params.toString()}`;
+}
+
 export interface TeacherDashboardDeepLink {
   /** The tab named in `?tab=`, or null when absent or not a real tab id. */
   tab: TeacherTab | null;
   /** Words from `?reviewWords=`, ready to seed a lesson draft. */
   reviewWords: string[];
+  /** `?assign=1`: open the assignment creator on arrival. */
+  openAssignment: boolean;
 }
 
 export function useTeacherDashboardDeepLink(): TeacherDashboardDeepLink {
   const searchParams = useSearchParams();
   const tabParam = searchParams?.get('tab') ?? null;
   const wordsParam = searchParams?.get('reviewWords') ?? null;
+  const assignParam = searchParams?.get('assign') ?? null;
 
   return useMemo(
     () => ({
       tab: isTeacherTab(tabParam) ? tabParam : null,
       reviewWords: parseReviewWords(wordsParam),
+      openAssignment: parseOpenAssignment(assignParam),
     }),
-    [tabParam, wordsParam]
+    [tabParam, wordsParam, assignParam]
   );
 }

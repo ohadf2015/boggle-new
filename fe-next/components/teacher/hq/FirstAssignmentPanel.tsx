@@ -60,19 +60,19 @@ export function FirstAssignmentPanel({
     <section
       data-testid="hq-first-assignment"
       className={cn(
-        '@container flex shrink-0 flex-col gap-2 rounded-neo-lg border-2 border-neo-lime/70 bg-neo-navy-light/95 p-3 shadow-hard sm:p-4',
+        '@container flex shrink-0 items-center gap-2 rounded-neo-lg border-2 border-neo-lime/70 bg-neo-navy-light/95 p-2 shadow-hard sm:flex-col sm:items-stretch sm:p-4 [@media(orientation:landscape)_and_(max-height:500px)]:flex-row [@media(orientation:landscape)_and_(max-height:500px)]:items-center [@media(orientation:landscape)_and_(max-height:500px)]:p-1.5',
         className,
       )}
     >
-      <div className="flex items-start gap-2">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime text-black shadow-hard-sm">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:items-start">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime text-black shadow-hard-sm sm:size-9">
           <ClipboardList className="size-5" strokeWidth={3} aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="font-neo-display text-base font-black uppercase leading-tight text-neo-white">
+          <h2 className="font-neo-display text-xs font-black uppercase leading-tight text-neo-white sm:text-base">
             {t('academy.hq.firstAssignmentTitle', 'Assign their first game')}
           </h2>
-          <p className="mt-1 font-neo-body text-sm font-bold text-neo-white/70 text-pretty">
+          <p className="mt-1 hidden font-neo-body text-sm font-bold text-neo-white/70 text-pretty sm:block [@media(orientation:landscape)_and_(max-height:500px)]:hidden">
             {t(
               'academy.hq.firstAssignmentBody',
               'Students are in. Send one assignment so they play before the next class.',
@@ -85,8 +85,8 @@ export function FirstAssignmentPanel({
         data-testid="hq-first-assignment-cta"
         onClick={onClick}
         className={cn(
-          'inline-flex min-h-11 w-full items-center justify-center rounded-neo border-3 border-black',
-          'bg-neo-lime px-4 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard-sm',
+          'inline-flex min-h-10 shrink-0 items-center justify-center rounded-neo border-3 border-black sm:min-h-11 sm:w-full [@media(orientation:landscape)_and_(max-height:500px)]:w-auto [@media(orientation:landscape)_and_(max-height:500px)]:min-h-9',
+          'bg-neo-lime px-3 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm sm:px-4 sm:text-sm',
           'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
           'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
         )}

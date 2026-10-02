@@ -76,6 +76,9 @@ const SHEEN: Record<1 | 2 | 3, string> = {
   3: 'linear-gradient(160deg, #ffd0a3 0%, #e8894b 42%, #b85a24 78%, #8a3d12 100%)',
 };
 
+/** Nobody scored: a plain slate plate, so no metal hands out a place nobody earned. */
+const MUTED_PLATE = 'bg-neo-navy-light text-neo-cream';
+
 /** The medal disc's face — same metal, deeper, with a darker rim. */
 const DISC: Record<1 | 2 | 3, { face: string; rim: string; ribbon: string }> = {
   1: { face: 'radial-gradient(circle at 35% 30%, #fffbd1 0%, #ffd400 45%, #d19a00 100%)', rim: '#8a6200', ribbon: '#ff1493' },
@@ -90,6 +93,8 @@ export interface PodiumStageProps {
   /** Extra art-space overlays (the class chest). Rendered inside the locked box. */
   children?: ReactNode;
   className?: string;
+  /** Nobody scored: no crown, no god rays — the plinths stay, the party does not. */
+  muted?: boolean;
 }
 
 function rankOf(entry: PodiumEntry): 1 | 2 | 3 {
@@ -126,7 +131,7 @@ function MedalDisc({ rank }: { rank: 1 | 2 | 3 }) {
   );
 }
 
-function Placing({ entry, stage, floor }: { entry: PodiumEntry; stage: RoundEndStage; floor: number }) {
+function Placing({ entry, stage, floor, muted }: { entry: PodiumEntry; stage: RoundEndStage; floor: number; muted: boolean }) {
   const reduceMotion = useReducedMotion();
   const rank = rankOf(entry);
   const spot = PEDESTALS[rank];
@@ -147,7 +152,7 @@ function Placing({ entry, stage, floor }: { entry: PodiumEntry; stage: RoundEndS
       data-rank={String(rank)}
       data-plinth-height={String(spot.plinth)}
       data-revealed={String(revealed)}
-      data-medal={MEDAL[rank]}
+      data-medal={muted ? undefined : MEDAL[rank]}
       aria-hidden={revealed ? undefined : true}
       className="contents"
     >
@@ -157,7 +162,7 @@ function Placing({ entry, stage, floor }: { entry: PodiumEntry; stage: RoundEndS
         data-testid={`podium-plate-${rank}`}
         className={cn(
           'absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-neo border-[3px] border-neo-black px-[1cqw] pt-[1.6cqw] shadow-[0.35cqw_0.35cqw_0_#000]',
-          PLATE[rank]
+          muted ? MUTED_PLATE : PLATE[rank]
         )}
         style={{
           left: `${spot.x}%`,
@@ -165,12 +170,12 @@ function Placing({ entry, stage, floor }: { entry: PodiumEntry; stage: RoundEndS
           minWidth: `${spot.width * 0.62}%`,
           maxWidth: `${spot.width * 0.9}%`,
           minHeight: `${spot.plinth * 0.6}cqw`,
-          backgroundImage: SHEEN[rank],
+          backgroundImage: muted ? undefined : SHEEN[rank],
           // An inner trim line in the metal's own dark tone: a plate, not a sticker.
           boxShadow: `inset 0 0 0 0.3cqw rgba(255,255,255,0.55), inset 0 -0.6cqw 0 rgba(0,0,0,0.18), 0.35cqw 0.35cqw 0 #000`,
         }}
       >
-        <MedalDisc rank={rank} />
+        {!muted && <MedalDisc rank={rank} />}
         <span
           aria-hidden="true"
           className="font-neo-display font-black tabular-nums leading-none"
@@ -197,7 +202,7 @@ function Placing({ entry, stage, floor }: { entry: PodiumEntry; stage: RoundEndS
         animate={revealed ? { scale: 1, y: 0 } : { scale: 0.85, y: 6 }}
         transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 13 }}
       >
-        {winner && revealed && (
+        {winner && revealed && !muted && (
           <Crown
             data-testid="podium-crown"
             className="mb-[-0.6cqw] text-neo-yellow drop-shadow-[0.25cqw_0.25cqw_0_#000] motion-safe:animate-neo-wobble"
@@ -210,7 +215,7 @@ function Placing({ entry, stage, floor }: { entry: PodiumEntry; stage: RoundEndS
           aria-hidden="true"
           className={cn(
             'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy shadow-[0.4cqw_0.4cqw_0_#000] [&_svg]:h-full [&_svg]:w-full',
-            winner ? 'ring-[0.4cqw] ring-neo-yellow' : ''
+            winner && !muted ? 'ring-[0.4cqw] ring-neo-yellow' : ''
           )}
           style={{ width: winner ? '10cqw' : '8cqw', height: winner ? '10cqw' : '8cqw' }}
         >
@@ -233,12 +238,12 @@ function Placing({ entry, stage, floor }: { entry: PodiumEntry; stage: RoundEndS
   );
 }
 
-export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, className }: PodiumStageProps) {
+export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, className, muted = false }: PodiumStageProps) {
   const reduceMotion = useReducedMotion();
   // Rank follows SCORE here too (not only at the call site): a pedestal must
   // never hold more points than the one above it, whatever the payload says.
   const ordered = orderPodiumByScore(entries);
-  const winnerUp = isRevealed(1, stage);
+  const winnerUp = isRevealed(1, stage) && !muted;
 
   return (
     <div
@@ -257,7 +262,12 @@ export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, classNa
         aria-hidden="true"
         loading="eager"
         decoding="async"
-        className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover"
+        data-muted={muted ? 'true' : undefined}
+        className={cn(
+          'pointer-events-none absolute inset-0 h-full w-full select-none object-cover',
+          // The painting has confetti and spotlights baked in; a scoreless round turns the lights down.
+          muted && 'brightness-[0.45] grayscale-[0.85]'
+        )}
       />
 
       {/* God rays wheel out from behind the gold pedestal once the winner lands.
@@ -289,7 +299,7 @@ export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, classNa
 
       <ol aria-label={t('education.results.podium.title')} className="absolute inset-0 m-0 list-none p-0">
         {ordered.map((entry) => (
-          <Placing key={entry.username} entry={entry} stage={stage} floor={podiumCountFloor(ordered, entry.rank)} />
+          <Placing key={entry.username} entry={entry} stage={stage} floor={podiumCountFloor(ordered, entry.rank)} muted={muted} />
         ))}
       </ol>
 

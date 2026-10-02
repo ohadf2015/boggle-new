@@ -84,7 +84,7 @@ export function PageClient({ answer }: { answer?: ReactNode }) {
         </div>
       )}
       {showAuthModal && (
-        <AuthModal isOpen onClose={() => setShowAuthModal(false)} initialMode="signin" />
+        <AuthModal isOpen onClose={() => setShowAuthModal(false)} initialMode="signin" audience="teacher" />
       )}
 
       {/* Marketing landing: the pessimistic/safe default. `hasTeacherAccess` is

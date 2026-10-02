@@ -61,8 +61,14 @@ describe('Upgrade page — honest feature advertising', () => {
       'utf-8'
     );
 
-    // Should only enforce analytics + reports + pressureDials (not customLists, duels, noAds)
-    expect(gateSource).toContain("PRO_FEATURES = ['analytics', 'reports', 'pressureDials']");
+    // Should only enforce analytics + reports + pressureDials + mastery + missedPractice (not customLists, duels, noAds)
+    expect(gateSource).toContain(
+      "PRO_FEATURES = ['analytics', 'reports', 'pressureDials', 'mastery', 'missedPractice']",
+    );
+    const enforced = gateSource.match(/PRO_FEATURES = \[([^\]]*)\]/)![1];
+    for (const free of ['customLists', 'noAds', 'duels']) {
+      expect(enforced).not.toContain(free);
+    }
   });
 
   it('sells the calm-mode dials as a Pro outcome, not a paywall ornament', () => {

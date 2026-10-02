@@ -11,6 +11,7 @@ async function getHowler(): Promise<typeof import('howler')['Howler']> {
   return mod.Howler;
 }
 import { useMusicFocusManager } from '@/lib/audio/useMusicFocusManager';
+import { restartStalledHowl } from '@/lib/audio/howlStall';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import { resolveStyleTrack } from '@/lib/playerStyle/styles';
 
@@ -338,6 +339,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
           pausedByVisibilityRef.current ||
           pausedByBlurRef.current)
       ) {
+        restartStalledHowl(current);
         return;
       }
     }

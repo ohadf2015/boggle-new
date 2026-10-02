@@ -11,13 +11,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { render, act } from '@testing-library/react';
 import { EngagementScript, ENGAGEMENT_FALLBACK_MS } from '../EngagementScript';
+import { SCROLL_QUIET_MS } from '@/lib/perf/runWhenScrollSettles';
 
 const SRC = 'https://www.googletagmanager.com/gtag/js?id=G-TEST';
 const scriptsFor = (src: string) =>
   Array.from(document.querySelectorAll('script')).filter((s) => s.getAttribute('src') === src);
 
+const settle = () => act(() => { vi.advanceTimersByTime(SCROLL_QUIET_MS + 50); });
+
 describe('EngagementScript', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
   afterEach(() => {
+    vi.useRealTimers();
     scriptsFor(SRC).forEach((s) => s.remove());
   });
 
@@ -35,6 +42,7 @@ describe('EngagementScript', () => {
       act(() => {
         window.dispatchEvent(new Event(type));
       });
+      settle();
       const [script] = scriptsFor(SRC);
       expect(script).toBeTruthy();
       expect(script.async).toBe(true);
@@ -50,6 +58,7 @@ describe('EngagementScript', () => {
       act(() => {
         vi.advanceTimersByTime(ENGAGEMENT_FALLBACK_MS);
       });
+      settle();
       // THEN gtag.js still loads, so the pageview is not silently lost
       expect(scriptsFor(SRC)).toHaveLength(1);
     } finally {
@@ -77,6 +86,23 @@ describe('EngagementScript', () => {
       window.dispatchEvent(new Event('scroll'));
       window.dispatchEvent(new Event('keydown'));
     });
+    settle();
+    expect(scriptsFor(SRC)).toHaveLength(1);
+  });
+
+  it('shouldNotEvaluateTheScriptWhileTheVisitorIsStillScrolling', () => {
+    render(<EngagementScript src={SRC} />);
+    act(() => {
+      window.dispatchEvent(new Event('touchstart'));
+    });
+    for (let i = 0; i < 8; i++) {
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+        vi.advanceTimersByTime(150);
+      });
+    }
+    expect(scriptsFor(SRC)).toHaveLength(0);
+    settle();
     expect(scriptsFor(SRC)).toHaveLength(1);
   });
 

@@ -23,3 +23,12 @@ export function isHeavyGamePath(pathname: string | null | undefined): boolean {
   const path = stripLocalePrefix(pathname);
   return HEAVY_GAME_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 }
+
+// Hubs under a heavy prefix that are menus, not game shells: they keep the perf deferrals but need the tab bar and footer.
+const SITE_CHROME_HUBS: ReadonlySet<string> = new Set(['/daily']);
+
+export function rendersSiteChrome(pathname: string | null | undefined): boolean {
+  if (!isHeavyGamePath(pathname)) return true;
+  const path = stripLocalePrefix(pathname as string).replace(/(.)\/+$/, '$1');
+  return SITE_CHROME_HUBS.has(path);
+}

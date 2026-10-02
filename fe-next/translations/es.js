@@ -1,5 +1,176 @@
 // Es translations
 const es = {
+  // @eduLibrary:start
+  "eduLibrary": {
+    "title": "Biblioteca",
+    "tabs": {
+      "mine": "Mis listas",
+      "discover": "Descubrir"
+    },
+    "editor": {
+      "createTitle": "Nueva lista de palabras",
+      "editTitle": "Editar lista",
+      "description": "Pega palabras, añade significados y guarda.",
+      "newList": "Nueva lista",
+      "titleLabel": "Nombre de la lista",
+      "titlePlaceholder": "Ponle nombre a tu lista…",
+      "pasteLabel": "Pega o escribe palabras",
+      "pastePlaceholder": "manzana, plátano, cereza — o una por línea. «palabra - significado» añade la definición.",
+      "addedWords": "+{count} añadidas",
+      "skippedDuplicates": "{count} ya estaban en la lista",
+      "importFile": "CSV / TSV",
+      "starterPack": "Pack inicial",
+      "fileError": "No encontramos palabras en el archivo. Una palabra por fila y la definición en la segunda columna.",
+      "wordsHeading": "Palabras",
+      "wordsLabel": "Palabras de la lista",
+      "viewLabel": "Vista",
+      "view": {
+        "chips": "Fichas",
+        "details": "Detalles"
+      },
+      "emptyWords": "Tus palabras aparecerán aquí.",
+      "removeWord": "Quitar {word}",
+      "noDefinition": "Sin definición todavía",
+      "word": "Palabra",
+      "definition": "Definición (opcional)",
+      "definitionPlaceholder": "¿Qué significa?",
+      "done": "Listo",
+      "needTitle": "Ponle nombre a la lista para guardarla.",
+      "needWords": "Añade al menos una palabra.",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "saved": "Guardada",
+      "savedToast": "«{name}» guardada"
+    },
+    "issue": {
+      "digits": "Tiene un número",
+      "tooLong": "Demasiado larga para jugar",
+      "wrongScript": "No parece del idioma de la lista",
+      "blocked": "No permitida en juegos de alumnos"
+    },
+    "meta": {
+      "language": "Idioma",
+      "grade": "Curso",
+      "topic": "Tema",
+      "assignTo": "Asignar a",
+      "noClass": "Sin clase por ahora"
+    },
+    "grade": {
+      "any": "Todos los cursos",
+      "k2": "Infantil–2.º",
+      "g35": "3.º–5.º",
+      "g68": "6.º–8.º",
+      "g912": "9.º–12.º"
+    },
+    "topic": {
+      "none": "Sin tema",
+      "all": "Todos los temas",
+      "general": "General",
+      "english": "Inglés",
+      "hebrew": "Hebreo",
+      "science": "Ciencias",
+      "math": "Matemáticas",
+      "history": "Historia",
+      "geography": "Geografía",
+      "language": "Idiomas"
+    },
+    "share": {
+      "toggle": "Compartir en Descubrir",
+      "help": "Otros docentes podrán encontrarla, jugarla y copiarla. Solo se muestra tu nombre visible.",
+      "blocked": "Hay palabras que no se pueden compartir con alumnos. Quítalas para compartir.",
+      "share": "Compartir",
+      "shared": "Compartida",
+      "nowPublic": "Compartida en Descubrir",
+      "nowPrivate": "Vuelve a ser privada",
+      "failed": "No se pudo cambiar. Inténtalo de nuevo."
+    },
+    "remixedFrom": "Remix de {title} de {author}",
+    "remixedFromNoAuthor": "Remix de {title}",
+    "myLists": {
+      "emptyHint": "Pega una lista, empieza con un pack inicial o toma una de Descubrir."
+    },
+    "card": {
+      "practice": "Practicar",
+      "words": "{count} palabras",
+      "by": "de {author}",
+      "aTeacher": "un docente",
+      "new": "Nueva",
+      "plays": "{count} partidas",
+      "playsOne": "{count} partida",
+      "copies": "{count} copias",
+      "copiesOne": "{count} copia",
+      "results": "Resultados"
+    },
+    "badge": {
+      "verified": "Verificada",
+      "teacher": "De docente",
+      "yours": "Tuya"
+    },
+    "discover": {
+      "searchLabel": "Buscar listas",
+      "searchPlaceholder": "Busca listas, palabras o docentes",
+      "clearSearch": "Borrar búsqueda",
+      "filters": "Filtros",
+      "allLanguages": "Todos",
+      "sourceLabel": "Quién la hizo",
+      "source": {
+        "all": "Todas",
+        "verified": "Verificadas por LexiClash",
+        "teacher": "De docentes"
+      },
+      "count": "{count} listas",
+      "sortLabel": "Ordenar",
+      "sort": {
+        "popular": "Más populares",
+        "newest": "Más nuevas"
+      },
+      "loadError": "No se pudo cargar Descubrir.",
+      "retry": "Reintentar",
+      "emptyTitle": "Aún no hay listas que coincidan",
+      "emptyHint": "Prueba otro filtro, o comparte una tuya para que la encuentre el próximo docente.",
+      "tryAllLanguages": "Ver todos los idiomas",
+      "shareFirst": "Compartir una lista",
+      "beFirstTitle": "Sé el primer docente aquí.",
+      "beFirstHint": "Comparte una de tus listas y la verán todos los docentes de este idioma."
+    },
+    "preview": {
+      "host": "Jugar en vivo",
+      "assign": "Asignar",
+      "copy": "Hacer una copia",
+      "copied": "Copiada",
+      "copiedHint": "Ya está en Mis listas: toca Copiada para abrirla.",
+      "copiedToast": "«{name}» copiada a Mis listas",
+      "copyFailed": "No se pudo copiar. Inténtalo de nuevo."
+    },
+    "report": {
+      "action": "Denunciar esta lista",
+      "title": "Denunciar lista",
+      "description": "¿Qué le pasa a «{name}»? Revisamos todas las denuncias.",
+      "reason": {
+        "inappropriate": "No es apropiada para alumnos",
+        "offensive": "Palabras ofensivas",
+        "unplayable": "Palabras incorrectas o injugables",
+        "spam": "Spam o basura"
+      },
+      "detailsPlaceholder": "¿Algo más? (opcional)",
+      "submit": "Enviar denuncia",
+      "thanks": "Gracias, lo revisaremos.",
+      "failed": "No se pudo enviar. Inténtalo de nuevo."
+    },
+    "assign": {
+      "title": "Asignar a una clase",
+      "pickClass": "¿Qué clase la recibe?",
+      "noClasses": "Primero crea una clase: tarda 5 segundos.",
+      "createClass": "Crear clase"
+    },
+    "pager": {
+      "label": "Páginas",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "status": "{page} / {total}"
+    }
+  },
+  // @eduLibrary:end
   // @academy:start (generated by /tmp/edu-play/merge-i18n.mjs)
   "academy": {
     "teacher": {
@@ -46,7 +217,12 @@ const es = {
       "startLiveBody": "La tarea ya está. Empieza un juego en vivo para que la clase juegue junta.",
       "startLiveCta": "Empezar juego en vivo",
       "copyJoinCode": "Copiar enlace",
-      "joinCodeCopied": "Enlace copiado"
+      "joinCodeCopied": "Enlace copiado",
+      "progressTitle": "Progreso de la clase",
+      "progressStudents": "estudiantes",
+      "progressAssignments": "tareas",
+      "progressSubmitted": "entregadas",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {
@@ -13039,6 +13215,14 @@ const es = {
       "trialEnded": "La prueba terminó"
     },
     "proGate": {
+      "mastery": {
+        "title": "Mira cada palabra que falla tu clase",
+        "body": "Pro ordena las diez palabras que más falla tu clase y cruza a cada alumno con cada palabra, en todos los juegos: sabrás exactamente qué repasar y con quién."
+      },
+      "missedPractice": {
+        "title": "Convierte los fallos en práctica espaciada",
+        "body": "Con un clic, asigna las palabras falladas en tres rondas cortas: mañana, en 3 días y en una semana. Ese espaciado es lo que hace que se queden."
+      },
       "analytics": {
         "title": "Mira cómo va de verdad tu clase",
         "body": "Con Pro cada partida se convierte en una radiografía de tu clase: qué palabras se afianzan, qué alumnos se atascan y cuánto ha avanzado cada uno desde septiembre. Llévalo a una reunión de padres o de departamento."
@@ -13074,10 +13258,10 @@ const es = {
       "regionLabel": "Resumen de progreso de {{classroom}}",
       "scheduleReteachCta": "Programar Live de repaso en ~{{days}} días",
       "scheduleReteachConfirm": "Live de repaso programado para {{date}} (~{{days}} días). Se abrió la invitación del calendario.",
-      "scheduleReteachHint": "Reconstruye las palabras difíciles y vuelve a jugar en unas dos semanas — repaso espaciado al estilo Kahoot.",
+      "scheduleReteachHint": "Reconstruye las palabras difíciles y vuelve a jugar en unas dos semanas: repaso espaciado que se queda.",
       "unpluggedReteachLiveCta": "Empezar Unplugged reteach Live",
       "reteachLiveCta": "Empezar reteach Live de 3 min",
-      "unpluggedReteachLiveFoil": "Alternativa a Kahoot Unplugged (Teacher Takeover, 21 sep 2026 — cuando no hay dispositivos de alumnado) — proyecta las fallas; el alumnado responde en papel, sin dispositivos."
+      "unpluggedReteachLiveFoil": "¿Hoy sin dispositivos para el alumnado? Proyecta los fallos y que respondan en papel."
     },
     "windowProgress": {
       "title": "La clase esta semana",
@@ -13177,6 +13361,8 @@ const es = {
       "proHeroAlt": "Una profesora mira la clasificación de la clase en directo en la pizarra mientras el alumnado juega desde sus sitios.",
       "valueHeadline": "Ideal para el repaso diario y tickets de salida. Comprueba a toda la clase en una ronda.",
       "matrix": {
+        "mastery": "Mapa de dominio y palabras difíciles",
+        "missedPractice": "Práctica de fallos, espaciada 1-3-7 días",
         "title": "Comparar planes",
         "featureColumn": "Función",
         "unlimited": "Ilimitado",
@@ -14740,7 +14926,7 @@ const es = {
       "inviteStudents": "Invitar estudiantes",
       "lastActive": "Última actividad",
       "lessonEffectiveness": "Eficacia",
-      "level": "Nivel {{level}}",
+      "level": "Nivel",
       "live": "En vivo",
       "loading": "Cargando...",
       "mastery": "Dominio",
@@ -14756,7 +14942,7 @@ const es = {
       "retry": "Reintentar",
       "shareParentReport": "Compartir con un familiar",
       "shareParentReportFailed": "No se pudo crear el enlace. Inténtalo de nuevo.",
-      "streak": "Racha: {{count}} días",
+      "streak": "Racha",
       "struggling": "Necesita apoyo",
       "mastered": "Dominado",
       "practicing": "Practicando",
@@ -14940,7 +15126,7 @@ const es = {
         "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para {count} idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo",
-        "cta_note": "Plan gratis para empezar • Aprobado en ~24 h",
+        "cta_note": "Plan gratis para empezar • Acceso al instante",
         "cta_schools": "¿Escuela o distrito? Ver planes →"
       },
       "mock": {
@@ -15518,6 +15704,12 @@ const es = {
         "guestError": "No se pudo iniciar. Inténtalo de nuevo o pide ayuda a tu profe."
       },
       "classroomRoomGone": "El juego de tu clase terminó. Pídele a tu profe que empiece otro.",
+      "gameEnded": {
+        "title": "Este juego terminó",
+        "retry": "Reintentar",
+        "toClass": "Ir a mi clase",
+        "newCode": "Poner otro código"
+      },
       "lessonsAssigned": "Lecciones asignadas",
       "feel": {
         "points": "pts",
@@ -15691,6 +15883,7 @@ const es = {
       "auth_required_title": "Regístrate para solicitar acceso docente",
       "auth_required_body": "El acceso docente está vinculado a una cuenta verificada. Crea una cuenta gratis o inicia sesión y seguimos justo aquí.",
       "auth_required_cta": "Crear mi cuenta docente gratis",
+      "auth_signin_cta": "¿Ya tienes cuenta? Inicia sesión",
       "trust_instant": "Acceso al instante — sin cola de revisión",
       "trust_free": "Plan docente gratuito, sin caducidad",
       "trust_nologins": "Sin cuentas de estudiantes, sin configuración",
@@ -18870,6 +19063,9 @@ const es = {
       "share": "Compartir",
       "seriesChampion": "Campeón de la serie",
       "teacherPaced": "Tu profe empieza la siguiente partida",
+      "backToClass": "Volver a la clase",
+      "endClassTitle": "¿Terminar el juego de la clase?",
+      "endClassBody": "La sala se cierra para todos y vuelves al panel de tu clase.",
       "roundPoints": "Puntos de esta ronda",
       "yourRank": "Tu puesto",
       "lessonRecap": "Resumen de la lección",
@@ -18885,6 +19081,280 @@ const es = {
       "roundShort": "R{n}",
       "total": "Total",
       "player": "Jugador"
+    }
+  },
+  "eduStudent": {
+    "mode": {
+      "vocabQuiz": {
+        "rule": "Lee la pista y toca la palabra que encaja. Rápido y bien es lo que más puntúa."
+      },
+      "wordcraft": {
+        "rule": "Forma palabras de la lección con tus fichas y colócalas en el tablero."
+      },
+      "pending": "¡A jugar!",
+      "pendingRule": "Atentos, tu profe está empezando la ronda."
+    },
+    "lobby": {
+      "pickLook": "Elige un look",
+      "shuffleLooks": "Mezclar looks",
+      "buildLook": "Crea tu propio look",
+      "readySticker": "¡Listo!"
+    },
+    "exit": {
+      "title": "¿Salir del juego?",
+      "body": "Saldrás de esta ronda. Con el mismo código puedes volver.",
+      "stay": "Seguir jugando",
+      "leave": "Salir"
+    },
+    "join": {
+      "surpriseMe": "Sorpréndeme",
+      "funNames": "Panda Píxel|Capitán Nutria|Tostada Turbo|Llama Disco|Fideo Ninja|Mapache Cohete|Kiwi Cósmico|Perezoso Sigiloso|Mango Mega|Lémur Láser|Bisonte Burbuja|Jaguar Jazzero|Mago Gofre|Pato Trueno|Gato Cometa|Geco Brillante|Jefe Banana|Tortuga Turbo|Quokka Cuántico|Halcón Peludo"
+    },
+    "results": {
+      "nextUp": "Lo siguiente: {mode}",
+      "missedTitle": "Atrapa estas la próxima vez",
+      "missedNone": "Encontraste todas las palabras de la lección. ¡Crack!",
+      "hear": "Escuchar {word}",
+      "practiceThese": "Practicarlas",
+      "tapToHear": "Toca una palabra para escucharla"
+    },
+    "wordcraft": {
+      "hintFirst": "Toca letras para formar una palabra. Caerá en el centro.",
+      "hintMore": "Una letra más. Las palabras necesitan al menos 2.",
+      "hintAnchor": "Ahora toca una casilla junto a una ficha del tablero.",
+      "hintReady": "¡Bien! Pulsa PONER.",
+      "targetsProgress": "{found}/{total} palabras de la lección",
+      "showTargets": "Ver palabras de la lección",
+      "hideTargets": "Ocultar palabras de la lección"
+    },
+    "practice": {
+      "answerIs": "Se escribe",
+      "next": "Siguiente palabra",
+      "finish": "Ver mis resultados"
+    },
+    "cookie": {
+      "message": "Usamos cookies para contar partidas y mostrar anuncios."
+    }
+  },
+  // @eduHq:start
+  "eduHq": {
+    "modes": {
+      "minutes": "{{minutes}} min",
+      "players": "Hasta {{count}}",
+      "skill": {
+        "meaning": "Significado",
+        "spotting": "Encontrar palabras",
+        "speed": "Rapidez",
+        "hunting": "Repaso de la lista",
+        "building": "Ortografía"
+      },
+      "pitch": {
+        "vocabQuiz": "Compite con la clase por el significado correcto.",
+        "classic": "Un tablero para todos. Gana quien encuentre más palabras.",
+        "blast": "Rondas rápidas. Encadena palabras para combos enormes.",
+        "wordHunt": "Las palabras de tu lista están escondidas. Cázalas primero.",
+        "wordcraft": "Forma las palabras de la lista con fichas de letras. Gana el mejor artesano."
+      }
+    },
+    "launch": {
+      "titleMode": "Lanzando {{mode}}",
+      "generic": "Preparando tu partida",
+      "codeLabel": "Tu código para unirse",
+      "step": {
+        "words": "Palabras listas",
+        "room": "Abriendo la sala",
+        "code": "Generando el código"
+      }
+    },
+    "lists": {
+      "label": "Listas de palabras",
+      "more": "Más"
+    },
+    "checklist": {
+      "firstStudent": "Se unió tu primer estudiante",
+      "firstGame": "Juega tu primera partida en vivo",
+      "firstGameCta": "Ver tus informes"
+    },
+    "tools": {
+      "students": "Estudiantes",
+      "studentsStat": "en esta clase",
+      "progress": "Progreso",
+      "progressStat": "Últimos 7 y 30 días",
+      "lastGame": "Última partida",
+      "assignments": "Tareas",
+      "assignmentsStat": "asignadas",
+      "assignmentsUnknown": "Ver entregas",
+      "analytics": "Analíticas",
+      "analyticsStat": "Tendencias por estudiante",
+      "proBadge": "Pro",
+      "classes": "Clases",
+      "classesStat": "Gestionar y renombrar",
+      "back": "Todas las herramientas"
+    },
+    "auth": {
+      "titleSignup": "Crea tu cuenta de docente",
+      "titleSignin": "Qué bueno verte de nuevo",
+      "subtitle": "Tus clases, códigos e informes, a un inicio de sesión.",
+      "tabSignup": "Soy nuevo",
+      "tabSignin": "Ya tengo cuenta"
+    },
+    "access": {
+      "haveAccount": "¿Ya tienes cuenta? Inicia sesión"
+    },
+    "hq": {
+      "assigned": "{{count}} asignadas",
+      "assignedAria": "Tareas: {{count}} asignadas. Abrir tareas",
+      "assignNudge": "Poner tarea"
+    },
+    "modeTags": {
+      "vocabQuiz": "Elige el sentido",
+      "classic": "Busca palabras",
+      "blast": "Combos en cadena",
+      "wordHunt": "Caza la lista",
+      "wordcraft": "Arma palabras"
+    }
+  },
+  // @eduHq:end
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "¿Terminar el juego de la clase?",
+      "body": "La sala se cierra para todo el alumnado y vuelves al panel de tu clase.",
+      "stay": "Seguir jugando",
+      "confirm": "Terminar juego"
+    },
+    "live": {
+      "panelTitle": "Ronda en vivo",
+      "wordsFound": "palabras encontradas",
+      "lessonFound": "Palabras de la lección: {{found}}/{{total}}",
+      "wordOfRound": "Palabra de la ronda",
+      "wordOfRoundEmpty": "La primera palabra larga se queda con este sitio",
+      "bestWordBy": "{{count}} letras · de {{name}}",
+      "exitLabel": "Salir del juego"
+    },
+    "results": {
+      "backToClass": "Volver a la clase",
+      "switchGame": "Cambiar de juego",
+      "soloTitle": "¡Ronda en solitario!",
+      "tieTitle": "¡Empate!",
+      "zeroTitle": "Sin puntos en esta ronda",
+      "zeroBody": "Calentamiento hecho. La próxima ronda cuenta.",
+      "zeroNoteTitle": "Nadie ha puntuado todavía",
+      "zeroNoteHint": "Prueba con más tiempo o un tablero más fácil. Mismo código, nadie tiene que volver a entrar.",
+      "lineupTitle": "Quién jugó esta ronda",
+      "emptyTitle": "Ronda de práctica terminada",
+      "emptyHeadline": "Esta vez no jugó ningún estudiante",
+      "emptyBody": "Proyecta el código en la pizarra. La próxima ronda ya cuenta de verdad.",
+      "podiumLessonWords": "{{found}}/{{total}} palabras de la lección",
+      "noLessonTitle": "Esta ronda no salió ninguna palabra de la lección",
+      "noLessonBody": "Los puntos vinieron de otras palabras del tablero. Los mejores hallazgos de la clase:",
+      "noLessonBodyEmpty": "Los puntos vinieron de otras palabras del tablero.",
+      "noLessonHint": "Con un tablero más grande o más tiempo, las palabras de la lección tienen más sitio.",
+      "noLessonReteach": "Palabras de la lección por repasar"
+    },
+    "reteach": {
+      "playNow": "Jugar ahora",
+      "sendHome": "Mandar a casa",
+      "printShare": "Imprimir y compartir",
+      "googleClassroom": "Publicar en Google Classroom"
+    },
+    "lobby": {
+      "waitingForStudents": "Esperando a los alumnos"
+    },
+    "wordcraft": {
+      "bingo": "¡BINGO!",
+      "waiting": "Esperando la primera palabra…"
+    }
+  },
+  // @eduLive:end
+  "eduPro": {
+    "mastery": {
+      "title": "Dominio de palabras",
+      "subtitle": "Qué palabras falla tu clase una y otra vez, en todos los juegos.",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "Precisión de la clase",
+        "words": "Palabras seguidas",
+        "sessions": "Resultados de juego",
+        "students": "Alumnos"
+      },
+      "hardestTitle": "Palabras más difíciles",
+      "missedOf": "falló {missed} de {attempts}",
+      "studentsMissing": "{count} de {total} alumnos",
+      "noneMissed": "Nadie ha fallado una palabra dos veces todavía. ¡Bien!",
+      "empty": "Juega un quiz de vocabulario o una ronda de Wordcraft con esta clase: el dominio aparece tras la primera partida.",
+      "loading": "Cargando dominio de palabras…",
+      "error": "No pudimos cargar el dominio de palabras. Recarga para intentarlo de nuevo.",
+      "heatmapToggle": "Mapa de calor: alumno × palabra",
+      "heatmapHint": "Cada casilla es un alumno con una palabra.",
+      "studentColumn": "Alumno",
+      "legend": {
+        "solid": "La domina",
+        "shaky": "Dudosa",
+        "missed": "Fallada",
+        "unseen": "Sin preguntar"
+      },
+      "cellLabel": "{name}, {word}: {correct} de {attempts} correctas",
+      "cellUnseen": "{name}, {word}: aún no preguntada",
+      "showAll": "Ver las {count}",
+      "showFewer": "Ver menos",
+      "hiddenWords": "+{count} palabras difíciles más en Pro",
+      "previewNote": "Vista gratuita: tus 3 primeras. Pro muestra las diez y a cada alumno.",
+      "phoneHint": "Las palabras más difíciles primero, con quién falló cada una.",
+      "needsHelpColumn": "Necesita ayuda",
+      "needsHelpLabel": "{name}: {count} palabras para repasar",
+      "missedRow": "Fallada por",
+      "wordMissedLabel": "{word}: la fallaron {count} de {total} alumnos",
+      "missedByCount": "fallada por {count} de {total}",
+      "missedNames": "Fallaron: {names}",
+      "shakyNames": "Con dudas: {names}",
+      "everyoneGotIt": "Todos la acertaron",
+      "needsHelpTitle": "Necesitan ayuda",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Nadie se ha atascado con estas palabras. ¡Bien!",
+      "unlock": {
+        "allWords": "El top 10 completo de palabras más difíciles",
+        "heatmap": "Quién falló cada palabra, alumno por alumno",
+        "practice": "Repaso de las palabras falladas con un clic, repartido en una semana"
+      }
+    },
+    "practice": {
+      "cta": "Practicar palabras falladas",
+      "hint": "Tres rondas espaciadas con estas palabras: mañana, en 3 días y en una semana.",
+      "assigning": "Asignando…",
+      "assigned": "¡Asignado!",
+      "assignedBody": "{count} palabras, tres rondas. Tus alumnos las verán en sus lecciones.",
+      "round": "Ronda {n}",
+      "roundName": "Palabras falladas · {classroom} · ronda {n}/3 · {date}",
+      "failed": "No pudimos asignar las rondas. No se guardó nada; inténtalo de nuevo.",
+      "already": "Ya lo asignaste hoy. Tus alumnos lo tienen en sus lecciones.",
+      "nothing": "Todavía no hay palabras falladas que practicar.",
+      "inDays": "en {count} días",
+      "tomorrow": "Mañana",
+      "whyNote": "Recordar a intervalos funciona mejor que un repaso largo: cada ronda vuelve justo cuando la palabra empieza a olvidarse."
+    },
+    "reports": {
+      "classEyebrow": "Informe de la clase",
+      "moreDetail": "Informe completo imprimible",
+      "moreDetailHint": "Exportación a PDF, detalle por alumno y envío de notas a Google Classroom.",
+      "assignmentsTitle": "Quién ha hecho qué",
+      "assignmentsHint": "Quién ha terminado cada tarea, con exportación a CSV.",
+      "arcTitle": "Alumno por alumno",
+      "arcHint": "Quién avanza, quién se ha atascado y qué palabras lo frenan.",
+      "digestTitle": "Última partida de la clase",
+      "digestHint": "Lo que pasó en vuestra partida más reciente, de un vistazo."
+    },
+    "upgrade": {
+      "featureMastery": "Las 10 palabras más falladas + mapa alumno × palabra",
+      "featureMissedPractice": "Un clic: práctica espaciada de los fallos (1, 3, 7 días)",
+      "freeMastery": "Mapa de dominio de palabras",
+      "freePractice": "Práctica espaciada de palabras falladas"
+    },
+    "assign": {
+      "required": "obligatorio",
+      "needLessonAndDate": "Elige una lección y una fecha de entrega para asignar.",
+      "needLesson": "Elige una lección para asignar.",
+      "needDate": "Elige una fecha de entrega para asignar."
     }
   }
 };

@@ -17,7 +17,8 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Calendar, Swords, BookOpen, ChevronDown, Crosshair, Lock, Grid2x2 } from 'lucide-react';
+import { Swords, BookOpen, Crosshair, Lock, Grid2x2 } from 'lucide-react';
+import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import {
@@ -43,6 +44,8 @@ interface AssignmentCreatorProps {
   onComplete: () => void;
   isOpen: boolean;
   onClose: () => void;
+  /** Preselect a lesson (e.g. a list just copied from Discover). */
+  initialLessonId?: string;
 }
 
 /**
@@ -57,6 +60,7 @@ export default function AssignmentCreator({
   onComplete,
   isOpen,
   onClose,
+  initialLessonId,
 }: AssignmentCreatorProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -89,7 +93,6 @@ export default function AssignmentCreator({
   const [instructions, setInstructions] = useState<string>('');
   const [focus, setFocus] = useState<PracticeFocusSetting>('any');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const selectedLesson = lessons.find(l => l.id === selectedLessonId);
   // How many questions each skill can really build off this lesson. The teacher
@@ -120,12 +123,12 @@ export default function AssignmentCreator({
   useEffect(() => {
     if (isOpen) {
       setSelectedType('wordcraft');
-      setSelectedLessonId('');
+      setSelectedLessonId(initialLessonId ?? '');
       setDueDate('');
       setInstructions('');
       setFocus('any');
     }
-  }, [isOpen]);
+  }, [isOpen, initialLessonId]);
 
   // A focus the newly chosen lesson cannot support falls back to "any"
   useEffect(() => {
@@ -136,12 +139,7 @@ export default function AssignmentCreator({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLessonId, focus]);
 
-  const handleQuickDate = (days: number) => {
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    setDueDate(date.toISOString().split('T')[0]);
-    setShowDatePicker(false);
-  };
+  const submitHint = assignmentSubmitHintKey(Boolean(selectedLessonId), Boolean(dueDate));
 
   const handleSubmit = async () => {
     if (!selectedLessonId || !dueDate || !user) {
@@ -376,68 +374,7 @@ export default function AssignmentCreator({
               </div>
             )}
 
-            {/* Due Date Picker */}
-            <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
-                {t('teacher.assignment.dueDate')}
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowDatePicker(!showDatePicker)}
-                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>{dueDate || t('teacher.assignment.selectDate')}</span>
-                </div>
-                <ChevronDown className={cn('w-5 h-5 transition-transform', showDatePicker && 'rotate-180')} />
-              </button>
-              {showDatePicker && (
-                <div className="mt-2 p-4 bg-neo-navy border-neo border-neo-cream/40 rounded-neo shadow-hard space-y-3">
-                  <div className="text-sm font-neo-body text-neo-white mb-2">
-                    {t('teacher.assignment.quickSelect')}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      onClick={() => handleQuickDate(0)}
-                      className="bg-neo-cyan/20 border-neo border-neo-cyan text-neo-cyan hover:bg-neo-cyan/30"
-                    >
-                      {t('teacher.assignment.today')}
-                    </Button>
-                    <Button
-                      onClick={() => handleQuickDate(1)}
-                      className="bg-neo-cyan/20 border-neo border-neo-cyan text-neo-cyan hover:bg-neo-cyan/30"
-                    >
-                      {t('teacher.assignment.tomorrow')}
-                    </Button>
-                    <Button
-                      onClick={() => handleQuickDate(7)}
-                      className="bg-neo-cyan/20 border-neo border-neo-cyan text-neo-cyan hover:bg-neo-cyan/30"
-                    >
-                      {t('teacher.assignment.nextWeek')}
-                    </Button>
-                    <Button
-                      onClick={() => handleQuickDate(30)}
-                      className="bg-neo-cyan/20 border-neo border-neo-cyan text-neo-cyan hover:bg-neo-cyan/30"
-                    >
-                      {t('teacher.assignment.nextMonth')}
-                    </Button>
-                  </div>
-                  <div className="border-t border-neo-black/30 pt-3">
-                    <label className="block text-xs text-neo-white mb-1">
-                      {t('teacher.assignment.customDate')}
-                    </label>
-                    <input
-                      type="date"
-                      value={dueDate}
-                      onChange={(e) => setDueDate(e.target.value)}
-                      aria-label={t('teacher.assignment.customDate')}
-                      className="w-full p-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white text-sm"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            <AssignmentCreatorDueDate value={dueDate} onChange={setDueDate} />
 
             {/* Optional Instructions */}
             <div>
@@ -455,9 +392,20 @@ export default function AssignmentCreator({
             </div>
 
             {/* Actions */}
+            {submitHint && (
+              <p
+                id="assignment-submit-hint"
+                data-testid="assignment-submit-hint"
+                role="status"
+                className="-mb-2 text-sm font-bold text-neo-cream/80"
+              >
+                {t(submitHint)}
+              </p>
+            )}
             <div className="flex gap-3 pt-4 border-t border-neo-black/30">
               <Button
                 onClick={handleSubmit}
+                aria-describedby={submitHint ? 'assignment-submit-hint' : undefined}
                 disabled={isSubmitting || !selectedLessonId || !dueDate}
                 className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed disabled:opacity-50"
               >

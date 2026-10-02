@@ -98,6 +98,10 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
       // ProGate refuses. Wording avoids every free-matrix label word
       // (classrooms/students/lists/ads) or planMatrix.test.ts fails.
       'Pressure dials (calm mode)',
+      // First words ("mastery", "missed") are ProGate keys — see the note above.
+      // No "word"/"list"/"student": free rows ("Your own word lists", "Ad-free for students") would collide.
+      'Mastery heatmap, class-wide',
+      'Missed practice, spaced over 1-3-7 days',
     ],
     variantId: process.env.LEMONSQUEEZY_PRO_VARIANT_ID,
   },

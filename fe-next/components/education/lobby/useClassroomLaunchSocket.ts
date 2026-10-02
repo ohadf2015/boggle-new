@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
 import { getSocketURL } from '@/utils/SocketContext';
 import { classroomMultiplayerPath } from '@/lib/education/classroomGameHandoff';
+import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
 import type { ClassroomGameMode, PracticeFocusSetting } from '@/shared/types/vocabQuiz';
 import type { PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility, ClassroomPressure } from '@/shared/types/classroom';
@@ -72,6 +73,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
   const pendingRef = useRef<ClassroomLaunchPayload | null>(null);
   /** The dials of the in-flight launch, emitted once the room exists. */
   const pressureRef = useRef<ClassroomPressure | null>(null);
+  const launchedLessonIdsRef = useRef<string[] | null>(null);
   /** Watchdog on the pressure write ack (see classroomGameCreated above). */
   const pressureAckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pressureAckGameCodeRef = useRef<string | null>(null);
@@ -101,6 +103,11 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
       });
       socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
         if (data.success) {
+          const lessonIds = launchedLessonIdsRef.current;
+          if (lessonIds) {
+            launchedLessonIdsRef.current = null;
+            void recordLessonPlays(lessonIds);
+          }
           // The dials ride a follow-up emit, never the whitelisted create
           // payload — the room must exist before they can be written to it.
           const pressure = pressureRef.current;
@@ -192,6 +199,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
       // to the room the moment the created ack lands.
       const { pressure, ...createSettings } = payload.settings;
       pressureRef.current = pressure ?? null;
+      launchedLessonIdsRef.current = payload.lessonIds;
       const createPayload = { ...payload, settings: createSettings };
       if (socket) {
         socket.emit('createClassroomGame', createPayload);
