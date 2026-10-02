@@ -1900,10 +1900,10 @@ const en = {
       "description": "Play LexiClash for free — a real-time multiplayer word game with up to 4 players. Build word combos, climb the global leaderboard, no download, no signup. Play now in your browser."
     },
     "leaderboard": {
-      "title": "Best Competitive Word Games with Global Leaderboards 2026 | LexiClash",
-      "description": "The best competitive word games with global leaderboards. Live daily, weekly, and all-time rankings across 8 modes. Filter by language, country, or mode. Updated in real time.",
-      "ogTitle": "Best Competitive Word Games with Global Leaderboards 2026",
-      "ogDescription": "Climb the global word game leaderboard. Daily, weekly, and all-time rankings across 8 modes. Free, no signup."
+      "title": "Word Game Leaderboard — Live Global Rankings | LexiClash",
+      "description": "Live word game leaderboard with daily, weekly, and all-time rankings. Filter by language, country, or mode. Free to play, updated in real time.",
+      "ogTitle": "Word Game Leaderboard — Live Global Rankings",
+      "ogDescription": "Live word game leaderboard — daily, weekly, and all-time ranks across 8 modes. Filter by language or country. Free, no signup."
     },
     "profile": {
       "title": "Your Player Profile, Stats & Game Achievements",

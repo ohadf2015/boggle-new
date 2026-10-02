@@ -18,9 +18,9 @@ const seoContent: Record<string, {
   faq: { question: string; answer: string }[];
 }> = {
   en: {
-    title: 'Best Competitive Word Games — Global Leaderboards & Live Rankings',
+    title: 'Word Game Leaderboard — Live Daily, Weekly & All-Time Rankings',
     description:
-      'Comparing the best competitive word games with global leaderboards in 2026. LexiClash runs real-time multiplayer across Classic, Blast, Word Hunt, and Daily Challenge modes in six languages. No signup required — browser-based, instant play. Global score rankings are in live testing.',
+      'Live word game leaderboard with daily, weekly, and all-time rankings. Filter by language, country, or mode. Real-time multiplayer across Classic, Blast, Word Hunt, and Daily Challenge. No signup — browser play.',
     features: [
       'Real-time multiplayer in Classic, Blast, Word Hunt, and Daily Challenge modes',
       'Play against opponents in six languages: English, Hebrew, Spanish, Swedish, Japanese, Russian',
