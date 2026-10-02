@@ -14,6 +14,7 @@ import {
   readAssignmentFocus,
   focusPracticeHref,
   isVocabFocus,
+  withBlank,
 } from '../vocabFocus';
 
 const w = (word: string, extra: Partial<VocabularyWord> = {}): VocabularyWord => ({
@@ -255,5 +256,23 @@ describe('vocabFocus', () => {
       expect(focusPracticeHref('en', 'abc', 'context')).toBe('/en/student/lessons/abc?mode=vocab_focus&focus=context');
       expect(focusPracticeHref('he', 'abc', null)).toBe('/he/student/lessons/abc?mode=vocab_focus');
     });
+  });
+});
+
+describe('withBlank — scripts without spaces', () => {
+  it('blanks a Japanese word attached to particles and full-width punctuation', () => {
+    expect(withBlank('きょうは てんきが いいので、こうえんに いきます。', 'てんき')).toBe('きょうは ___が いいので、こうえんに いきます。');
+  });
+
+  it('blanks a hiragana word inside a kanji sentence', () => {
+    expect(withBlank('理科のじっけんで、氷がとける時間をはかりました。', 'じっけん')).toBe('理科の___で、氷がとける時間をはかりました。');
+  });
+
+  it('still returns null when the Japanese word is absent', () => {
+    expect(withBlank('ねこが ねています。', 'いぬ')).toBeNull();
+  });
+
+  it('keeps whole-word matching for Latin scripts', () => {
+    expect(withBlank('The category was wrong.', 'cat')).toBeNull();
   });
 });

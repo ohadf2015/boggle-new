@@ -81,4 +81,28 @@ describe('curriculumRowsToItems', () => {
     ]);
     expect(item).toMatchObject({ id: 'curriculum:c1', source: 'verified', gradeBand: 'g35', topic: 'science', wordCount: 1, authorName: null });
   });
+
+  it('keeps the example, level and practice fields so a copied list can drive context and tiered practice', () => {
+    const [item] = curriculumRowsToItems([
+      {
+        id: 'c2', name: 'Weather', description: null, language: 'en', grade_level: 'grade_3', subject: 'science', word_count: 1,
+        words: [{ word: 'storm', definition: 'Strong wind with rain or snow', example: 'The storm knocked down a tree.', level: 'challenge', synonyms: ['tempest'], antonyms: [], canIntegrate: true }],
+      },
+    ]);
+    expect(item.words[0]).toEqual({
+      word: 'storm',
+      canIntegrate: true,
+      definition: 'Strong wind with rain or snow',
+      example: 'The storm knocked down a tree.',
+      level: 'challenge',
+      synonyms: ['tempest'],
+    });
+  });
+
+  it('drops an unknown level instead of passing junk into differentiation', () => {
+    const [item] = curriculumRowsToItems([
+      { id: 'c3', name: 'x', description: null, language: 'en', grade_level: 'grade_3', subject: 'general', words: [{ word: 'cat', level: 'expert' } as never] },
+    ]);
+    expect(item.words[0]).toEqual({ word: 'cat', canIntegrate: true });
+  });
 });
