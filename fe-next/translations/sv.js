@@ -210,7 +210,12 @@ const sv = {
       "codeReady": "Koden är klar",
       "firstAssignmentTitle": "Skapa deras första uppgift",
       "firstAssignmentBody": "Eleverna är på listan. Ge dem en övning så klassen har något att göra när du inte sänder live.",
-      "firstAssignmentCta": "Skapa första uppgiften"
+      "firstAssignmentCta": "Skapa första uppgiften",
+      "progressTitle": "Klassens framsteg",
+      "progressStudents": "elever",
+      "progressAssignments": "uppgifter",
+      "progressSubmitted": "inlämnade",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {

@@ -210,7 +210,12 @@ const es = {
       "codeReady": "Código listo",
       "firstAssignmentTitle": "Crea su primera tarea",
       "firstAssignmentBody": "Ya hay estudiantes en la lista. Asigna una práctica para que la clase tenga algo que hacer cuando no estés en directo.",
-      "firstAssignmentCta": "Crear primera tarea"
+      "firstAssignmentCta": "Crear primera tarea",
+      "progressTitle": "Progreso de la clase",
+      "progressStudents": "estudiantes",
+      "progressAssignments": "tareas",
+      "progressSubmitted": "entregadas",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {
