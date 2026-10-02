@@ -3,6 +3,7 @@ import { hreflangAlternates } from '@/lib/seo/hreflang';
 import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
 import { wordListSitemapRoutes } from '@/lib/seo/wordLists/sitemapRoutes';
 import { WORD_LISTS_GENERATED_AT } from '@/lib/seo/wordLists/catalog';
+import { helpSitemapEntries } from '@/components/education/help/helpSitemap';
 import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 
 const BASE_URL = 'https://www.lexiclash.live';
@@ -163,6 +164,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // so omitted from the sitemap to avoid GSC "Submitted URL marked noindex".
   addForAllLocales(routes, '/education/duels', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
   addForAllLocales(routes, '/education/classroom-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
+  routes.push(...helpSitemapEntries(LAST_DEPLOYED));
 
   // ─── Teacher Pro pricing (the paywall's front door) ───
   // Fully SSR'd (price, features, FAQ in raw HTML) and carries Product+Offer
