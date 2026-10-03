@@ -67,12 +67,11 @@ vi.mock('@/components/teacher/hq/GetStudentsInCard', () => ({
 import TeacherDashboard from '../TeacherDashboard';
 
 describe('Teacher HQ — chrome above the two steps on a phone', () => {
-  it('Given one class, Then its name is a quiet label on phones (no filled pill competing with step 1), and keeps its truncation', () => {
+  it('Given one class, Then its name is a quiet label at every width (no filled pill competing with the primary action), and keeps its truncation', () => {
     media.wide = false;
     render(<TeacherDashboard />);
     const chip = screen.getByTestId('hq-class-chip');
-    expect(chip.className).toMatch(/(^|\s)max-sm:bg-transparent(\s|$)/);
-    expect(chip.className).toMatch(/(^|\s)max-sm:shadow-none(\s|$)/);
+    expect(chip.className).not.toMatch(/(^|\s)(bg-neo-cyan|shadow-hard-sm|border-2)(\s|$)/);
     expect(chip.querySelector('[dir="auto"]')?.className).toMatch(/(^|\s)truncate(\s|$)/);
   });
 });

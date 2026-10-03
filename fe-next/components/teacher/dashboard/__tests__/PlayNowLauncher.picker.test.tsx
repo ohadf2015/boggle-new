@@ -1,7 +1,7 @@
 /**
- * The host picker on HQ: illustrated mode tiles with a facts card, the lists
- * one tap away on the deck, and a designed launch — list → mode → GO LIVE is
- * three taps from HQ.
+ * The host picker on HQ: illustrated mode tiles with a facts card behind
+ * "Change", the lists one tap away inside it, and a designed launch —
+ * Change → list → mode → GO LIVE is four taps; the remembered default is one.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
@@ -37,6 +37,7 @@ describe('<PlayNowLauncher> — host picker', () => {
 
   it('Given the five modes, Then every tile wears its own catalog poster', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     for (const id of ['vocab-quiz', 'classic', 'blast', 'word-hunt', 'wordcraft'] as const) {
       const img = screen.getByTestId(`hq-mode-${id}`).querySelector('img');
       expect(img?.getAttribute('src')).toContain(hqModeFacts(id).poster.split('/').pop()!.replace('.webp', ''));
@@ -45,6 +46,7 @@ describe('<PlayNowLauncher> — host picker', () => {
 
   it('Given a selected mode, Then the facts card names its time, player cap, skill and pitch — and follows the selection', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const card = () => screen.getByTestId('hq-mode-facts');
     const quiz = hqModeFacts('vocab-quiz');
     expect(card()).toHaveTextContent(quiz.pitchKey);
@@ -57,7 +59,7 @@ describe('<PlayNowLauncher> — host picker', () => {
     expect(card()).toHaveTextContent(hqModeFacts('blast').skillKey);
   });
 
-  it('Given saved lists, Then up to three sit on the deck above GO LIVE and one tap arms another', () => {
+  it('Given saved lists, Then up to three sit in the picker under GO LIVE (which never moves) and one tap arms another', () => {
     mockLessons.mockReturnValue({
       lessons: [lesson('l1', 'Unit 4 verbs'), lesson('l2', 'Fruits'), lesson('l3', 'Space'), lesson('l4', 'Hidden')],
       isLoading: false,
@@ -65,10 +67,11 @@ describe('<PlayNowLauncher> — host picker', () => {
     });
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const row = screen.getByTestId('play-now-list-chips');
     const chips = within(row).getAllByRole('button');
     expect(chips).toHaveLength(3);
-    expect(row.compareDocumentPosition(screen.getByTestId('play-now-go')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(row.compareDocumentPosition(screen.getByTestId('play-now-go')) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
 
     fireEvent.click(within(row).getByText('Fruits'));
     expect(screen.getByTestId('play-now-armed')).toHaveTextContent('Fruits');
@@ -78,12 +81,13 @@ describe('<PlayNowLauncher> — host picker', () => {
 
   it('Given no saved lists, Then the deck chips offer starter packs instead', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const chips = within(screen.getByTestId('play-now-list-chips')).getAllByRole('button');
     expect(chips.length).toBeGreaterThanOrEqual(2);
     expect(chips[0]).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('Given a different list and a different mode, Then HQ reaches the lobby hand-off in three taps', () => {
+  it('Given a different list and a different mode, Then HQ reaches the lobby hand-off in four taps (Change, list, mode, GO LIVE)', () => {
     mockLessons.mockReturnValue({
       lessons: [lesson('l1', 'Unit 4 verbs'), lesson('l2', 'Fruits')],
       isLoading: false,
@@ -91,6 +95,7 @@ describe('<PlayNowLauncher> — host picker', () => {
     });
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     fireEvent.click(within(screen.getByTestId('play-now-list-chips')).getByText('Fruits'));
     fireEvent.click(screen.getByTestId('hq-mode-blast'));
     fireEvent.click(screen.getByTestId('play-now-go'));
@@ -104,6 +109,7 @@ describe('<PlayNowLauncher> — host picker', () => {
       error: null,
     });
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const details = screen.getByTestId('play-now-change-disclosure') as HTMLDetailsElement;
     fireEvent.click(screen.getByTestId('play-now-change-summary'));
     expect(details.open).toBe(true);
@@ -115,6 +121,7 @@ describe('<PlayNowLauncher> — host picker', () => {
   it('When GO LIVE is pressed, Then a designed launch stage names the game instead of a bare splash', () => {
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     expect(screen.queryByTestId('hq-launch-stage')).toBeNull();
     fireEvent.click(screen.getByTestId('hq-mode-blast'));
     fireEvent.click(screen.getByTestId('play-now-go'));

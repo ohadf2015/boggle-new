@@ -1,7 +1,7 @@
 /**
  * Teacher HQ "start live classroom game" CTA after the first assignment.
  *
- * FirstAssignmentPanel owns students + 0 assignments. GetStudentsInCard (PR
+ * HQ's first-homework link owns students + 0 assignments. GetStudentsInCard (PR
  * #1207) owns the empty-roster join panel. This helper is the next step:
  * students are in AND at least one assignment exists — start a live class
  * before Teacher Pro conversion.

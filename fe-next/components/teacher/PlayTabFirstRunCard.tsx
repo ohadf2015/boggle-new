@@ -130,30 +130,9 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
           </>
         ) : (
           <>
-            {/* Where the code will be: six empty slots, so the promise is visible. */}
-            <div
-              aria-hidden="true"
-              className="flex shrink-0 flex-col items-center justify-center gap-1 rounded-neo border-3 border-dashed border-neo-cream/40 bg-neo-navy px-2 py-1.5 lg:gap-2 lg:py-3"
-            >
-              <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-neo-white/60 lg:text-sm">
-                {t('academy.hq.classCode', 'Class code')}
-              </span>
-              <span dir="ltr" className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
-                {Array.from({ length: 6 }, (_, i) => (
-                  <span
-                    key={i}
-                    className="flex h-10 w-8 items-center justify-center rounded-md border-2 border-dashed border-neo-cream/40 font-mono text-2xl font-black text-neo-white/40 sm:h-12 sm:w-10 lg:h-16 lg:w-14 lg:text-4xl"
-                  >
-                    ?
-                  </span>
-                ))}
-              </span>
-            </div>
-
-            {/* Phones: the button leads, so the cookie sheet over the bottom of a first visit covers only the placeholder slots. */}
             <div
               data-first-run-cta-row
-              className="flex min-h-0 shrink-0 items-center gap-3 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-2 max-sm:order-first lg:flex-1 lg:flex-col lg:justify-center lg:gap-4 lg:p-4"
+              className="flex min-h-0 shrink-0 items-center gap-3 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-2 lg:flex-1 lg:flex-col lg:justify-center lg:gap-4 lg:p-4"
             >
               {/* Lexi minding an empty room. Decorative — the copy carries the meaning. */}
               <Image

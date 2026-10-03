@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { m, useReducedMotion } from 'framer-motion';
-import { Activity, ChevronRight, Lock } from 'lucide-react';
+import { Activity, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
@@ -47,7 +47,7 @@ export function summarizeHqPulse(state: MasteryState): HqPulse | null {
   return null;
 }
 
-function PulseLink({ classroomId }: { classroomId: string }) {
+function PulseHero({ classroomId }: { classroomId: string }) {
   const { t, language } = useLanguage();
   const reduceMotion = useReducedMotion();
   const pulse = summarizeHqPulse(useWordMasteryReport(classroomId));
@@ -55,70 +55,65 @@ function PulseLink({ classroomId }: { classroomId: string }) {
   if (!pulse) return null;
   const who = pulse.needHelpIds.map((id) => names[id]).filter(Boolean);
   const more = (pulse.needHelp ?? 0) - who.length;
-
   const alarm = (pulse.needHelp ?? 0) > 0;
+
   return (
-    <Link
-      href={`/${language}/teacher/reports?classroomId=${classroomId}`}
-      data-testid="hq-class-pulse"
-      aria-label={t('eg2Rep.hq.openReport')}
-      className={cn(
-        'flex shrink-0 items-center gap-2 rounded-neo border-2 bg-neo-navy-light/95 px-2 py-1.5 shadow-hard-sm sm:gap-3 sm:px-3',
-        alarm ? 'border-neo-pink' : 'border-neo-lime/70',
-        'transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-0 motion-reduce:transition-none',
+    <div data-testid="hq-class-pulse" className="flex flex-col gap-3">
+      <p className="flex items-center gap-2 font-neo-display text-xs font-bold uppercase leading-none tracking-widest text-neo-white/60">
+        <Activity className={cn('size-4', alarm ? 'text-neo-pink' : 'text-neo-lime')} strokeWidth={3} aria-hidden="true" />
+        {t('hqCalm.pulseTitle')}
+      </p>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <p data-testid="hq-class-pulse-accuracy" className="flex items-baseline gap-2 font-neo-display font-black uppercase text-neo-white">
+          <span className="text-4xl leading-none tabular-nums text-neo-cyan sm:text-5xl">{pulse.accuracy}%</span>
+          <span className="text-sm tracking-wide text-neo-white/70">{t('eg2Rep.hq.accuracy')}</span>
+        </p>
+        {pulse.locked ? null : (
+          <m.span
+            key={pulse.needHelp ?? 0}
+            data-testid="hq-class-pulse-need-help"
+            initial={reduceMotion ? false : { scale: 0.6 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 520, damping: 14 }}
+            className={cn(
+              'inline-flex items-center rounded-neo border-2 border-black px-2 py-0.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-black',
+              alarm ? 'bg-neo-pink' : 'bg-neo-lime',
+            )}
+          >
+            {alarm ? t('eg2Rep.hq.needHelp', { count: pulse.needHelp ?? 0 }) : t('eg2Rep.hq.allOnTrack')}
+          </m.span>
+        )}
+      </div>
+      {who.length > 0 && (
+        <p className="font-neo-body text-base font-bold text-neo-pink">
+          <bdi data-testid="hq-class-pulse-names">{who.join(', ')}</bdi>
+          {more > 0 && <span className="tabular-nums"> +{more}</span>}
+        </p>
       )}
-    >
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-pink text-black shadow-hard-sm">
-        <Activity className="size-4" strokeWidth={3} aria-hidden="true" />
-      </span>
-      <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5 font-neo-display text-xs font-black uppercase tracking-wide text-neo-white sm:text-sm">
-        <span>
-          <span className="text-neo-cyan tabular-nums">{pulse.accuracy}%</span> {t('eg2Rep.hq.accuracy')}
-        </span>
-        <m.span
-          key={pulse.needHelp ?? 'locked'}
-          data-testid="hq-class-pulse-need-help"
-          initial={reduceMotion ? false : { scale: 0.6 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 520, damping: 14 }}
-          className={cn(
-            'inline-flex items-center gap-1 rounded-neo border-2 px-1.5 leading-5',
-            pulse.locked
-              ? 'border-neo-lime bg-neo-navy text-neo-lime'
-              : alarm
-                ? 'border-black bg-neo-pink text-neo-black'
-                : 'border-black bg-neo-lime text-neo-black',
-          )}
-        >
-          {pulse.locked && <Lock className="size-3" aria-hidden="true" />}
-          {pulse.locked
-            ? t('eg2Rep.hq.whoNeedsHelp')
-            : alarm
-              ? t('eg2Rep.hq.needHelp', { count: pulse.needHelp ?? 0 })
-              : t('eg2Rep.hq.allOnTrack')}
-        </m.span>
-        {who.length > 0 && (
-          <span className="min-w-0 truncate normal-case tracking-normal text-neo-pink">
-            <bdi data-testid="hq-class-pulse-names">{who.join(', ')}</bdi>
-            {more > 0 && <span className="tabular-nums"> +{more}</span>}
-          </span>
+      {pulse.hardest && (
+        <p data-testid="hq-class-pulse-hardest" className="font-neo-body text-sm font-bold text-neo-white/70">
+          {t('eg2Rep.hq.hardest')} <bdi className="font-neo-display text-base font-black text-neo-white">{pulse.hardest}</bdi>
+        </p>
+      )}
+      <Link
+        href={`/${language}/teacher/reports?classroomId=${classroomId}`}
+        data-testid="hq-class-pulse-action"
+        className={cn(
+          'inline-flex min-h-11 items-center gap-1.5 self-start rounded-neo border-2 border-neo-cream/60 px-4 font-neo-display text-sm font-bold uppercase tracking-wide text-neo-white',
+          'transition-colors hover:border-neo-cream hover:bg-neo-white/5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
         )}
-        {pulse.hardest && (
-          <span className="min-w-0 truncate normal-case tracking-normal text-neo-cream/80">
-            {t('eg2Rep.hq.hardest')}{' '}
-            <bdi className="font-black text-neo-white">{pulse.hardest}</bdi>
-          </span>
-        )}
-      </span>
-      <DirectionalIcon icon={ChevronRight} className="size-5 shrink-0 text-neo-cream/80" />
-    </Link>
+      >
+        {t('eg2Rep.hq.openReport')}
+        <DirectionalIcon icon={ChevronRight} className="size-4 shrink-0" />
+      </Link>
+    </div>
   );
 }
 
-/** HQ glance at the selected class: accuracy, who is below goal, the word to reteach — one tap into the report. */
+/** HQ pulse for the selected class: accuracy, who is below goal, the word to reteach, and one way into the report. */
 export function ClassPulseRow({ classroomId, studentCount }: { classroomId: string; studentCount: number }) {
   if (studentCount < 1) return null;
-  return <PulseLink classroomId={classroomId} />;
+  return <PulseHero classroomId={classroomId} />;
 }
 
 export default ClassPulseRow;

@@ -19832,8 +19832,19 @@ const ru = {
       "body": "Инструкции, уроки за 5 минут и быстрые ответы.",
       "cta": "Помощь"
     }
-  }
+  },
   // @eg2Help:end
+  // @hqCalm:start
+  "hqCalm": {
+    "playWithoutClass": "Или сыграть без класса",
+    "startAnyway": "Всё равно начать игру",
+    "pulseUpsell": "Кому нужна помощь · Pro",
+    "change": "Изменить",
+    "done": "Готово",
+    "pulseTitle": "Пульс класса",
+    "projector": "Проектор"
+  }
+  // @hqCalm:end
 };
 
 export { ru };

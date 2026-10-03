@@ -20027,8 +20027,19 @@ const he = {
       "body": "מדריכים, שיעור ראשון ב-5 דקות ותשובות מהירות.",
       "cta": "לעזרה"
     }
-  }
+  },
   // @eg2Help:end
+  // @hqCalm:start
+  "hqCalm": {
+    "playWithoutClass": "או לשחק משחק בלי כיתה",
+    "startAnyway": "להתחיל משחק בכל זאת",
+    "pulseUpsell": "לראות מי צריך עזרה · Pro",
+    "change": "שינוי",
+    "done": "סיום",
+    "pulseTitle": "דופק הכיתה",
+    "projector": "מקרן"
+  }
+  // @hqCalm:end
 };
 
 export { he };

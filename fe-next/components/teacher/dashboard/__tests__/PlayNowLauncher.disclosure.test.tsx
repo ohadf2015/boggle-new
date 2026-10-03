@@ -40,6 +40,7 @@ describe('<PlayNowLauncher> — disclosure pattern', () => {
 
   it('hides "Change Words" section behind a closed <details> by default', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
 
     // The disclosure exists and is closed
     const details = screen.getByTestId('play-now-change-disclosure');
@@ -49,6 +50,7 @@ describe('<PlayNowLauncher> — disclosure pattern', () => {
 
   it('shows the "Change Words" label in the disclosure summary', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
 
     const summary = screen.getByTestId('play-now-change-summary');
     expect(summary).toHaveTextContent('teacher.playNow.changeWords');
@@ -61,6 +63,7 @@ describe('<PlayNowLauncher> — disclosure pattern', () => {
       error: null,
     });
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
 
     const details = screen.getByTestId('play-now-change-disclosure');
     const summary = screen.getByTestId('play-now-change-summary');
@@ -80,6 +83,7 @@ describe('<PlayNowLauncher> — disclosure pattern', () => {
 
   it('GO LIVE button remains visible above the fold (not in the disclosure)', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
 
     const button = screen.getByTestId('play-now-go');
     const disclosure = screen.getByTestId('play-now-change-disclosure');
@@ -96,6 +100,7 @@ describe('<PlayNowLauncher> — disclosure pattern', () => {
       error: null,
     });
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
 
     const disclosure = screen.getByTestId('play-now-change-disclosure');
 

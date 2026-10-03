@@ -146,9 +146,9 @@ describe('<GetStudentsInCard>', () => {
     expect(row.contains(screen.getByTestId('hq-join-code'))).toBe(false);
   });
 
-  it('Given HQ sequencing, Then this card is step 2 and says the code is ready', () => {
+  it('Given HQ shows one step at a time, Then this card carries no step number and says the code is ready', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
-    expect(screen.getByTestId('hq-step-badge-2')).toHaveTextContent('2');
+    expect(screen.queryByTestId('hq-step-badge-2')).toBeNull();
     expect(screen.getByTestId('hq-join-status')).toHaveTextContent('academy.hq.codeReady');
   });
 

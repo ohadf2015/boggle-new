@@ -33,6 +33,7 @@ describe('<PlayNowLauncher> — mode cards', () => {
 
   it('Given the hero, Then it is titled "Start a game" and offers five modes, each with its own icon', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     expect(screen.getByRole('heading', { name: 'Start a game' })).toBeInTheDocument();
     const group = screen.getByRole('radiogroup');
     const radios = screen.getAllByRole('radio');
@@ -53,6 +54,7 @@ describe('<PlayNowLauncher> — mode cards', () => {
 
   it('Given desktop width, Then chips lay out two per row and each names itself in full — truncation can never hide the verb', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const group = screen.getByRole('radiogroup');
     // Five chips in one row squeezes each to ~150px and the label dies
     // ("VOC…"). Never more than two per row, at any breakpoint.
@@ -75,6 +77,7 @@ describe('<PlayNowLauncher> — mode cards', () => {
 
   it('Given starter packs in the change-words sheet, Then every pack name renders in full — wraps, never truncates silently', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const rows = screen
       .getAllByTestId(/^play-now-pack-/)
       .filter((el) => el.tagName === 'BUTTON');
@@ -94,6 +97,7 @@ describe('<PlayNowLauncher> — mode cards', () => {
   it('Given a starter pack with definitions, Then the quiz is pre-selected and one tap launches it', () => {
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     expect(screen.getByTestId('hq-mode-vocab-quiz')).toHaveAttribute('aria-checked', 'true');
     fireEvent.click(screen.getByTestId('play-now-go'));
     expect(onLaunch).toHaveBeenCalledWith(expect.objectContaining({ source: 'pack', mode: 'vocab-quiz' }));
@@ -102,6 +106,7 @@ describe('<PlayNowLauncher> — mode cards', () => {
   it('When the teacher taps Blast, Then START launches Blast', () => {
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     fireEvent.click(screen.getByTestId('hq-mode-blast'));
     expect(screen.getByTestId('hq-mode-blast')).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByTestId('hq-mode-vocab-quiz')).toHaveAttribute('aria-checked', 'false');
@@ -112,6 +117,7 @@ describe('<PlayNowLauncher> — mode cards', () => {
   it('Given pasted bare words, Then the quiz card is unavailable and a board mode is armed', () => {
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     fireEvent.click(screen.getByTestId('play-now-source-paste'));
     fireEvent.change(screen.getByTestId('play-now-paste-input'), {
       target: { value: 'photosynthesis, mitosis, osmosis' },
@@ -125,6 +131,7 @@ describe('<PlayNowLauncher> — mode cards', () => {
   it('Given the teacher picked the quiz and then pasted bare words, Then it falls back instead of arming a dead quiz', () => {
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     fireEvent.click(screen.getByTestId('hq-mode-vocab-quiz'));
     fireEvent.click(screen.getByTestId('play-now-source-paste'));
     fireEvent.change(screen.getByTestId('play-now-paste-input'), { target: { value: 'a, b, c' } });
@@ -140,6 +147,7 @@ describe('<PlayNowLauncher> — mode cards', () => {
     });
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const quiz = screen.getByTestId('hq-mode-vocab-quiz');
     // The most-played mode is never greyed out on arrival.
     expect(quiz).not.toBeDisabled();
@@ -150,10 +158,9 @@ describe('<PlayNowLauncher> — mode cards', () => {
     expect(onLaunch).toHaveBeenCalledWith(expect.objectContaining({ source: 'pack', mode: 'vocab-quiz' }));
   });
 
-  it('Given HQ sequencing, Then this hero is step 1 and GO LIVE is its launch control', () => {
+  it('Given HQ shows one step at a time, Then the hero carries no step number and GO LIVE is its launch control', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
-    expect(screen.getByTestId('hq-step-badge-1')).toHaveTextContent('1');
-    // The badge is decoration beside the heading, never part of its name.
+    expect(screen.queryByTestId('hq-step-badge-1')).toBeNull();
     expect(screen.getByRole('heading', { name: 'Start a game' })).toBeInTheDocument();
     expect(screen.getByTestId('play-now-go').className).toMatch(/shadow-hard-(lg|xl)/);
   });

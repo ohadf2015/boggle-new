@@ -27,9 +27,9 @@ describe('<FirstAssignmentInlineCta> — the phone nudge in the roster row', () 
     expect(onCta).toHaveBeenCalledTimes(1);
   });
 
-  it('Given phones only, Then it hides from sm up where the full panel shows', () => {
+  it('Given it is the only first-homework control on HQ now, Then it shows at every width', () => {
     render(<FirstAssignmentInlineCta classroomId="c1" onCta={vi.fn()} />);
-    expect(screen.getByTestId('hq-first-assignment-inline').className).toMatch(/(^|\s)sm:hidden(\s|$)/);
+    expect(screen.getByTestId('hq-first-assignment-inline').className).not.toMatch(/(^|\s)(sm|md|lg):hidden(\s|$)/);
   });
 
   it('Given it is on screen, Then it reports the funnel impression once per class, like the panel does on wider screens', () => {

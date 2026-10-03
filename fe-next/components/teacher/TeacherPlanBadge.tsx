@@ -103,8 +103,11 @@ export function TeacherPlanBadge({ className, quiet = false }: { className?: str
         // A lime edge, not a black one: `border-black/40` on `bg-neo-navy-light`
         // sitting on `bg-neo-navy` separates from the page by 1.07:1 — the chip
         // is the only route to the upgrade page and it was invisible.
-        'inline-flex items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-navy-light px-3 py-1.5 text-neo-white',
-        'hover:bg-neo-lime hover:text-black transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
+        'inline-flex items-center gap-2 rounded-neo border-2 px-3 py-1.5 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
+        // Quiet = a plan label while another Pro ask owns the screen, not a second ask.
+        quiet
+          ? 'border-transparent text-neo-white/60 hover:text-neo-white'
+          : 'border-neo-lime bg-neo-navy-light text-neo-white hover:bg-neo-lime hover:text-black',
         className,
       )}
     >

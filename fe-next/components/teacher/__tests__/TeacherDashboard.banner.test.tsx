@@ -24,7 +24,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 }));
 vi.mock('@/hooks/useClassroom', () => ({
   useClassrooms: () => ({
-    classrooms: [{ id: 'c1', name: 'Class 1' }],
+    classrooms: [{ id: 'c1', name: 'Class 1', member_count: 3 }],
     isLoading: false,
     error: null,
     refresh: vi.fn(),
