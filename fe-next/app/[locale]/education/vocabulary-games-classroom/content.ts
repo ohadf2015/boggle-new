@@ -209,7 +209,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['1v1 vocabulary duels', '✓', '✓ paid', '✗', '✗'],
       ['6 languages incl. RTL', '✓', '✗', '✗', '✗'],
       ['Custom word lists', '✓', '✓', '✓', '✓'],
-      ['Class analytics dashboard', '✓ free', '✓ paid', 'Basic', '✓ paid'],
+      ['Class analytics dashboard', 'Teacher Pro', '✓ paid', 'Basic', '✓ paid'],
     ],
     useCases: [
       { tag: 'WARM-UP', title: '5-minute opener', desc: 'Spin a quick Word Wheel from yesterday\'s vocabulary list to wake the class up.' },

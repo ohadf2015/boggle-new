@@ -5,6 +5,7 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
 import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
+import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 import { ACCENT, EducationSectionRenderer } from '@/components/education/EducationLandingSections';
 import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
@@ -193,6 +194,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
 
         {footerCta?.position !== 'beforeRelated' && footerCtaBlock}
 
+        <TeacherProCompareCheckoutStrip locale={locale} />
         {showTeacherCta && <TeacherAccessCTA />}
         {showUpsell && <DistrictUpsellStrip hideTeacherCta={content.districtUpsellHideTeacherCta ?? true} />}
       </div>
