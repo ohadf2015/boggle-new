@@ -68,7 +68,7 @@ test.describe('Teacher Pro money path', () => {
 
     await expect(page).toHaveURL(/\/en\/teacher\/upgrade/);
 
-    const cta = page.getByRole('button', { name: /Upgrade to Pro Now/i });
+    const cta = page.getByRole('button', { name: /^Upgrade to Pro$/i });
     await expect(cta).toBeVisible();
     await expect(cta).toBeEnabled();
     await cta.scrollIntoViewIfNeeded();

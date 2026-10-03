@@ -33,7 +33,7 @@ describe('education CTA tickets', () => {
   // neo-pink-light #ff6bb8 is ~6.0:1.
   it('uses the light pink for the Teacher Pro heading on navy', () => {
     render(<TeacherProCheckoutCta locale="en" />);
-    const heading = screen.getByText(/Teacher Pro — \$/, { selector: 'p' });
+    const heading = screen.getByText(/Teacher Pro: \$/, { selector: 'p' });
     expect(heading.className).toContain('text-neo-pink-light');
   });
 

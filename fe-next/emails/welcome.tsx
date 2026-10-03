@@ -92,7 +92,7 @@ const COPY: Record<string, WelcomeCopy> = {
   },
   he: {
     heading: (n) => `היי ${n} 👋`,
-    intro: 'יאללה, את/ה בפנים. בחר/י מצב, בחר/י קרב.',
+    intro: 'יאללה, אתם בפנים. בחרו מצב, בחרו קרב.',
     videoLabel: 'ככה זה נראה',
     videoSub: '↑ זה המשחק עצמו',
     modesHeader: 'בחרו את הקרב',
@@ -100,7 +100,7 @@ const COPY: Record<string, WelcomeCopy> = {
     ps: 'אזהרה: זה ממכר.',
     androidLabel: 'בדרכים? LexiClash גם בנייד שלך.',
     androidCta: 'הורידו מ-Google Play',
-    footerReason: 'הרגע הצטרפת ל-LexiClash.',
+    footerReason: 'הרגע הצטרפתם ל-LexiClash.',
     unsubscribe: 'ביטול הרשמה',
     privacy: 'פרטיות',
   },
@@ -148,7 +148,7 @@ const COPY: Record<string, WelcomeCopy> = {
   },
   ru: {
     heading: (n) => `Привет, ${n} 👋`,
-    intro: 'Добро пожаловать. Выбирай режим, начинай игру.',
+    intro: 'Ты в игре. Выбирай режим и вперёд.',
     videoLabel: 'Смотри в действии',
     videoSub: '↑ вот так это работает',
     modesHeader: 'ВЫБЕРИ БОЕВОЙ РЕЖИМ',
@@ -166,7 +166,7 @@ const COPY: Record<string, WelcomeCopy> = {
 
 const SUBJECTS: Record<string, (name: string) => string> = {
   en: (n) => `Hi ${n}, glad you're here`,
-  he: (n) => `היי ${n}, כיף שהצטרפת`,
+  he: (n) => `היי ${n}, ברוכים הבאים`,
   sv: (n) => `Hej ${n}, kul att du hittade hit`,
   ja: (n) => `${n}さん、来てくれてうれしいです`,
   es: (n) => `Hola ${n}, qué bueno tenerte por aquí`,

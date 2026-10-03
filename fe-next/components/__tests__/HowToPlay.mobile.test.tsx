@@ -88,7 +88,7 @@ describe('HowToPlay Neo-Brutalist Design', () => {
       expect(header).toBeInTheDocument();
 
       // Header should contain step title
-      expect(header?.textContent).toContain('Basics');
+      expect(header?.textContent).toContain('basics');
     });
 
     it('should not have a separate title-banner element', () => {
