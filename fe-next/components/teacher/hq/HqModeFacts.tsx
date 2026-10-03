@@ -55,7 +55,7 @@ export const HqModeFacts = memo(function HqModeFacts({ modeId, reduced = false }
         <p className="line-clamp-2 font-neo-body text-[0.68rem] font-bold leading-[1.15] text-neo-white sm:text-xs lg:text-sm [@media(orientation:landscape)_and_(max-height:500px)]:line-clamp-1!">
           {t(facts.pitchKey)}
         </p>
-        <div className="flex min-w-0 flex-nowrap gap-2 overflow-hidden lg:flex-wrap lg:gap-1.5">
+        <div className="flex min-w-0 flex-nowrap gap-2 overflow-hidden lg:gap-1.5">
           <span className={FACT}>
             <Clock className="size-3 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
             {t("eduHq.modes.minutes", { minutes: facts.minutes })}

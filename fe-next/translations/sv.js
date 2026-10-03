@@ -20097,8 +20097,19 @@ const sv = {
       "body": "Guider, 5-minutersintroduktioner och snabba svar.",
       "cta": "Få hjälp"
     }
-  }
+  },
   // @eg2Help:end
+  // @hqCalm:start
+  "hqCalm": {
+    "playWithoutClass": "Eller spela utan klass",
+    "startAnyway": "Starta ett spel ändå",
+    "pulseUpsell": "Se vem som behöver hjälp · Pro",
+    "change": "Ändra",
+    "done": "Klar",
+    "pulseTitle": "Klasspuls",
+    "projector": "Projektor"
+  }
+  // @hqCalm:end
 };
 
 export { sv };

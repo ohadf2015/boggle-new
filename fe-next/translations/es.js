@@ -20115,8 +20115,19 @@ const es = {
       "body": "Guías paso a paso, tutoriales de 5 minutos y respuestas rápidas.",
       "cta": "Ver ayuda"
     }
-  }
+  },
   // @eg2Help:end
+  // @hqCalm:start
+  "hqCalm": {
+    "playWithoutClass": "O juega sin crear una clase",
+    "startAnyway": "Empezar un juego de todos modos",
+    "pulseUpsell": "Ver quién necesita ayuda · Pro",
+    "change": "Cambiar",
+    "done": "Listo",
+    "pulseTitle": "Pulso de la clase",
+    "projector": "Proyector"
+  }
+  // @hqCalm:end
 };
 
 export { es };

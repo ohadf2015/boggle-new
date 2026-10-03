@@ -20097,8 +20097,19 @@ const ja = {
       "body": "使い方ガイド、5分チュートリアル、すぐわかるQ&A。",
       "cta": "ヘルプを見る"
     }
-  }
+  },
   // @eg2Help:end
+  // @hqCalm:start
+  "hqCalm": {
+    "playWithoutClass": "クラスなしでゲームをする",
+    "startAnyway": "このままゲームを始める",
+    "pulseUpsell": "助けが必要な生徒を見る · Pro",
+    "change": "変更",
+    "done": "完了",
+    "pulseTitle": "クラスの様子",
+    "projector": "プロジェクター"
+  }
+  // @hqCalm:end
 };
 
 export { ja };

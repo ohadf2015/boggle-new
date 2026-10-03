@@ -11,6 +11,13 @@ import {
   trackTeacherHqUpgradeClicked,
 } from '@/lib/education/telemetry';
 
+const UPGRADE = cn(
+  'inline-flex min-h-9 shrink-0 items-center justify-center rounded-neo border-2 border-black',
+  'bg-neo-lime px-2.5 font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-black shadow-hard-sm sm:px-3 sm:text-xs',
+  'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
+  'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+);
+
 export interface ClassProgressStripProps {
   classroomId: string;
   studentCount: number;
@@ -19,6 +26,15 @@ export interface ClassProgressStripProps {
   hasPro: boolean;
   className?: string;
   action?: ReactNode;
+  /** Inside another frame (the HQ pulse): no own edge or icon. */
+  bare?: boolean;
+  /** Defaults to free teachers only. */
+  showUpgrade?: boolean;
+  /** Open an in-page Pro sheet instead of navigating to the upgrade page. */
+  onUpgrade?: () => void;
+  upgradeLabel?: string;
+  /** The assignments count opens the homework panel. */
+  onOpenAssignments?: () => void;
 }
 
 /**
@@ -33,6 +49,11 @@ export function ClassProgressStrip({
   hasPro,
   className,
   action,
+  bare = false,
+  showUpgrade = !hasPro,
+  onUpgrade,
+  upgradeLabel,
+  onOpenAssignments,
 }: ClassProgressStripProps) {
   const { t, language } = useLanguage();
   const show = shouldShowClassProgressStrip({ studentCount, assignmentCount });
@@ -63,7 +84,8 @@ export function ClassProgressStrip({
     <section
       data-testid="hq-class-progress"
       className={cn(
-        'flex shrink-0 flex-wrap items-center gap-2 rounded-neo border-2 border-neo-cyan/60 bg-neo-navy-light/95 px-2 py-1.5 shadow-hard-sm sm:gap-3 sm:px-3',
+        'flex shrink-0 flex-wrap items-center gap-2 sm:gap-3',
+        bare ? 'px-1' : 'rounded-neo border-2 border-neo-cyan/60 bg-neo-navy-light/95 px-2 py-1.5 shadow-hard-sm sm:px-3',
         className,
       )}
     >
@@ -71,6 +93,7 @@ export function ClassProgressStrip({
         className={cn(
           'flex size-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-black shadow-hard-sm',
           action && 'max-sm:hidden',
+          bare && 'hidden',
         )}
       >
         <TrendingUp className="size-4" strokeWidth={3} aria-hidden="true" />
@@ -87,8 +110,23 @@ export function ClassProgressStrip({
           {t('academy.hq.progressStudents', 'students')}
         </li>
         <li data-testid="hq-class-progress-assignments">
-          <span className="text-neo-lime">{assignmentCount}</span>{' '}
-          {t('academy.hq.progressAssignments', 'assignments')}
+          {onOpenAssignments ? (
+            <button
+              type="button"
+              data-testid="hq-assignments-open"
+              onClick={onOpenAssignments}
+              aria-label={t('eduHq.hq.assignedAria', { count: assignmentCount ?? 0 })}
+              className="uppercase underline decoration-neo-lime/60 decoration-2 underline-offset-4 hover:decoration-neo-lime focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            >
+              <span className="text-neo-lime">{assignmentCount}</span>{' '}
+              {t('academy.hq.progressAssignments', 'assignments')}
+            </button>
+          ) : (
+            <>
+              <span className="text-neo-lime">{assignmentCount}</span>{' '}
+              {t('academy.hq.progressAssignments', 'assignments')}
+            </>
+          )}
         </li>
         <li data-testid="hq-class-progress-submitted">
           <span className="text-neo-white">{submitted}</span>{' '}
@@ -96,21 +134,32 @@ export function ClassProgressStrip({
         </li>
       </ul>
       {action}
-      {hasPro ? null : (
-        <Link
-          href={upgradeHref}
-          data-testid="hq-class-progress-upgrade"
-          onClick={() => trackTeacherHqUpgradeClicked({ classroomId })}
-          className={cn(
-            'inline-flex min-h-9 shrink-0 items-center justify-center rounded-neo border-2 border-black',
-            'bg-neo-lime px-2.5 font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-black shadow-hard-sm sm:px-3 sm:text-xs',
-            'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
-            'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-          )}
-        >
-          {t('academy.hq.progressUpgrade', 'Teacher Pro')}
-        </Link>
-      )}
+      {showUpgrade ? (
+        onUpgrade ? (
+          <button
+            type="button"
+            data-testid="hq-class-progress-upgrade"
+            data-hq-upsell="pulse"
+            onClick={() => {
+              trackTeacherHqUpgradeClicked({ classroomId });
+              onUpgrade();
+            }}
+            className={UPGRADE}
+          >
+            {upgradeLabel ?? t('academy.hq.progressUpgrade', 'Teacher Pro')}
+          </button>
+        ) : (
+          <Link
+            href={upgradeHref}
+            data-testid="hq-class-progress-upgrade"
+            data-hq-upsell="pulse"
+            onClick={() => trackTeacherHqUpgradeClicked({ classroomId })}
+            className={UPGRADE}
+          >
+            {upgradeLabel ?? t('academy.hq.progressUpgrade', 'Teacher Pro')}
+          </Link>
+        )
+      ) : null}
     </section>
   );
 }

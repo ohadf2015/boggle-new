@@ -66,18 +66,12 @@ vi.mock('@/components/teacher/hq/GetStudentsInCard', () => ({
 
 import TeacherDashboard from '../TeacherDashboard';
 
-describe('Teacher HQ — first-assignment nudge on a phone', () => {
-  it('Given a phone, Then the only Create assignment control is the one in the roster row (no hidden twin on the deck)', () => {
-    media.wide = false;
+describe('Teacher HQ — first-homework nudge', () => {
+  it.each([false, true])('Given wide=%s, Then the only Create assignment control is one quiet link beside GO LIVE (no panel, no twin)', (wide) => {
+    media.wide = wide;
     render(<TeacherDashboard />);
     expect(screen.queryByTestId('hq-first-assignment')).toBeNull();
-    expect(screen.getByTestId('get-students-in')).toContainElement(screen.getByTestId('hq-first-assignment-inline'));
-  });
-
-  it('Given a tablet or wider, Then the full panel shows above the join card and the roster twin is not passed', () => {
-    media.wide = true;
-    render(<TeacherDashboard />);
-    expect(screen.getByTestId('hq-first-assignment')).toBeTruthy();
-    expect(screen.queryByTestId('hq-first-assignment-inline')).toBeNull();
+    expect(screen.getAllByTestId('hq-first-assignment-inline')).toHaveLength(1);
+    expect(screen.getByTestId('teacher-dashboard-aside')).toContainElement(screen.getByTestId('hq-first-assignment-inline'));
   });
 });

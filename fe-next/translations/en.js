@@ -19160,8 +19160,19 @@ const en = {
       "body": "How-to guides, 5-minute tutorials and quick answers.",
       "cta": "Get help"
     }
-  }
+  },
   // @eg2Help:end
+  // @hqCalm:start
+  "hqCalm": {
+    "playWithoutClass": "Or play a game without a class",
+    "startAnyway": "Start a game anyway",
+    "pulseUpsell": "See who needs help · Pro",
+    "change": "Change",
+    "done": "Done",
+    "pulseTitle": "Class pulse",
+    "projector": "Projector"
+  }
+  // @hqCalm:end
 };
 
 export { en };
