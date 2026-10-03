@@ -2,16 +2,17 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import fs from 'fs';
 import { withBlank } from '@/lib/education/vocabFocus';
 import { buildCurriculumMigration, loadCurriculumSeed, migrationPath, type CurriculumSeedFile } from '../curriculumSeed';
-import { dictionaryKey, loadShippedDictionary } from '../curriculumDictCheck';
+import { dictionaryKey, hasShippedDictionary, loadShippedDictionary } from '../curriculumDictCheck';
 
 const K1_WORDS = ['apple', 'book', 'cat', 'dog', 'house', 'jump', 'eat', 'good', 'happy', 'play', 'food', 'water'];
 
 let seed: CurriculumSeedFile;
+const hasDict = hasShippedDictionary('en');
 let dict: Set<string>;
 
 beforeAll(() => {
   seed = loadCurriculumSeed('en-grade3');
-  dict = loadShippedDictionary('en');
+  if (hasDict) dict = loadShippedDictionary('en');
 }, 60_000);
 
 describe('en grade-3 tier', () => {
@@ -30,7 +31,7 @@ describe('en grade-3 tier', () => {
     }
   });
 
-  it('plays every word from the shipped en dictionary as one lowercase token', () => {
+  it.skipIf(!hasDict)('plays every word from the shipped en dictionary as one lowercase token (needs public/dicts/en.dict.gz, a build artifact)', () => {
     for (const list of seed.lists) {
       for (const w of list.words) {
         expect(w.word, w.word).toMatch(/^[a-z]+$/);

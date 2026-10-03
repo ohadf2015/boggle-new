@@ -12,6 +12,10 @@ export function dictionaryKey(word: string, language: Language): string {
   return normalizeWord(sanitizeWord(word.normalize('NFKC'), language), language);
 }
 
+export function hasShippedDictionary(language: Language): boolean {
+  return fs.existsSync(path.join(DICT_DIR, `${language}.dict.gz`));
+}
+
 export function loadShippedDictionary(language: Language): Set<string> {
   const raw = gunzipSync(fs.readFileSync(path.join(DICT_DIR, `${language}.dict.gz`))).toString('utf8');
   return new Set(raw.split('\n').filter(Boolean));
