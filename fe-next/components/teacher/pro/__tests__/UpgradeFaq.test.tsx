@@ -37,4 +37,10 @@ describe('UpgradeFaq', () => {
   it('covers the questions a buyer asks: trial, cancel, downgrade, players, school pays', () => {
     expect(UPGRADE_FAQ_KEYS).toEqual(expect.arrayContaining(['trial', 'cancel', 'downgrade', 'players', 'schoolPays']));
   });
+
+  it('answers "Do you offer school pricing?" with the constant-driven price and minimum', () => {
+    expect(UPGRADE_FAQ_KEYS).toContain('schoolPrice');
+    render(<UpgradeFaq />);
+    expect(screen.getByText(/eg2Pro\.faq\.schoolPriceA\|.*\$49\|5/)).toBeInTheDocument();
+  });
 });

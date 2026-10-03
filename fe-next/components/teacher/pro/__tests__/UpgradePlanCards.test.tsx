@@ -33,6 +33,15 @@ function setup(viewer: UpgradeViewer, extra: Partial<UpgradePlanCardsProps> = {}
   return props;
 }
 
+describe('UpgradePlanCards school price', () => {
+  it('shows the indicative school price on the school card', () => {
+    setup('free');
+    const card = screen.getByTestId('plan-card-school');
+    expect(card).toContainElement(screen.getByTestId('school-price'));
+    expect(screen.getByTestId('school-price-amount')).toHaveTextContent('$49');
+  });
+});
+
 describe('UpgradePlanCards', () => {
   it('never tells a logged-out visitor they are on a plan; offers Start free instead', () => {
     setup('anon');

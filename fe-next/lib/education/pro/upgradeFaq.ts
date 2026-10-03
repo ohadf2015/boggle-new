@@ -1,8 +1,9 @@
 import { TEACHER_PRO_TRIAL_DAYS } from '@/lib/education/pro/trialDays';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { SCHOOL_PRICING, schoolPriceLabel } from '@/lib/education/pro/schoolPricing';
 import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 
-export const UPGRADE_FAQ_KEYS = ['trial', 'cancel', 'downgrade', 'players', 'students', 'schoolPays', 'tax'] as const;
+export const UPGRADE_FAQ_KEYS = ['trial', 'cancel', 'downgrade', 'players', 'students', 'schoolPays', 'schoolPrice', 'tax'] as const;
 
 export type FaqParams = Record<string, string | number>;
 
@@ -10,6 +11,8 @@ export function upgradeFaqParams(): FaqParams {
   return {
     days: TEACHER_PRO_TRIAL_DAYS,
     price: `$${TEACHER_PRO_PRICE_USD}`,
+    schoolPrice: schoolPriceLabel(),
+    schoolMin: SCHOOL_PRICING.minTeachers,
     players: MAX_PLAYERS_PER_ROOM,
     classes: FREE_TIER_LIMITS.classes,
     students: FREE_TIER_LIMITS.studentsPerClass,

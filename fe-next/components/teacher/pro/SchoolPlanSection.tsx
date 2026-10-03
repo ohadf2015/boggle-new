@@ -2,6 +2,7 @@
 
 import { Mail, ListChecks, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SchoolPriceTag } from './SchoolPriceTag';
 import { SchoolQuoteForm } from './SchoolQuoteForm';
 
 const STEPS = [
@@ -20,6 +21,7 @@ export function SchoolPlanSection({ requester }: { requester: string }) {
           {t('eg2Pro.school.title')}
         </h2>
         <p className="mt-2 text-sm font-bold leading-relaxed text-neo-white/80">{t('eg2Pro.school.lead')}</p>
+        <SchoolPriceTag className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-purple px-4 py-3 text-neo-white shadow-hard-sm" />
         <ol className="mt-5 space-y-3">
           {STEPS.map(({ icon: Icon, key }, i) => (
             <li key={key} className="flex items-start gap-3">
