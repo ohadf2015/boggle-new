@@ -6,15 +6,16 @@ import { getCatalog, relatedLists } from '@/lib/seo/wordLists/catalog';
 import { listGraph } from '@/lib/seo/wordLists/jsonLd';
 import { playableWord, type WordList } from '@/lib/seo/wordLists/model';
 import { LISTS_PATH, gradeHubPath, langHubPath, listPath, pickLocale, topicHubPath } from '@/lib/seo/wordLists/paths';
-import { displayTitle, glossPhrase, gradeLabel, langName, metaName, sampleWords, topicLabel, tr, wordsIn } from '@/lib/seo/wordLists/i18n';
+import { displayTitle, glossPhrase, gradeLabel, langName, metaName, nameHead, sampleWords, topicLabel, tr, wordsIn } from '@/lib/seo/wordLists/i18n';
 import { wordListMetadata } from '@/lib/seo/wordLists/metadata';
 import { CardGrid, ChipLink, LANG_ACCENT, ListsFrame, PageHeader, SectionTitle, Tag } from '../_components/ui';
 import { ListActions } from '../_components/ListActions';
 import { BoardPreview } from '../_components/BoardPreview';
 import { baseCrumbs, gradeCrumb, langCrumb } from './shared';
 
-/** Past ~60 characters a results page cuts the title; drop the class-game tail first. */
+/** Past ~60 characters a results page cuts the title; drop the class-game tail first, and the name's tail only past 65. */
 const MAX_TITLE = 60;
+const HARD_MAX_TITLE = 65;
 
 function copy(list: WordList, locale: string) {
   const { title, subtitle } = displayTitle(list, locale);
@@ -28,15 +29,19 @@ function copy(list: WordList, locale: string) {
     grade: grade ?? '',
   };
   const suffix = grade ? '' : 'NoGrade';
-  const titleVars = { ...vars, name: metaName(list, locale) };
-  const long = tr(locale, `detail.metaTitle${suffix}`, titleVars);
+  const name = metaName(list, locale);
+  const long = tr(locale, `detail.metaTitle${suffix}`, { ...vars, name });
+  const short = tr(locale, `detail.metaTitleShort${suffix}`, { ...vars, name });
+  const metaTitle =
+    [long, short].find((t) => t.length <= MAX_TITLE) ??
+    (short.length <= HARD_MAX_TITLE ? short : tr(locale, `detail.metaTitleShort${suffix}`, { ...vars, name: nameHead(name) }));
   const gloss = glossPhrase(list, locale);
   return {
     title,
     subtitle,
     grade,
     vars,
-    metaTitle: long.length <= MAX_TITLE ? long : tr(locale, `detail.metaTitleShort${suffix}`, titleVars),
+    metaTitle,
     description: gloss ? tr(locale, 'detail.metaDescription', { ...vars, gloss }) : tr(locale, 'detail.metaDescriptionPlain', vars),
     // Isolate the sample so foreign-script words do not reorder an RTL sentence.
     intro: tr(locale, grade ? 'detail.intro' : 'detail.introNoGrade', { ...vars, sample: `\u2068${vars.sample}\u2069` }),

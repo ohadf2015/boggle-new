@@ -56,14 +56,18 @@ export function titleCase(locale: string, text: string): string {
     .join(' ');
 }
 
+const NATIVE_GRADE_PREFIX = /^\s*(?:åk\s*\d+|\d+\.?\s*º\s*de\s+\S+|secundaria\s*\([^)]*\)|[小中高]学\s*\d+\s*年)\s*[-—:]\s*/i;
+
 /** The list's own name for a title: never the built "language: topic" fallback, which repeats both. */
 export function metaName(list: WordList, locale: string): string {
   const { title } = displayTitle(list, locale);
   const built = `${tr(locale, `vocab.${list.lang}`)}: ${topicLabel(locale, list.topic)}`;
   const labelOnly = !list.name.latin && list.lang !== 'he';
-  const name = title === built || labelOnly ? topicLabel(locale, list.topic) : title;
+  const name = title === built || labelOnly ? topicLabel(locale, list.topic) : title.replace(NATIVE_GRADE_PREFIX, '');
   return name.replace(/\s*[:：]\s*/g, ' - ');
 }
+
+export const nameHead = (name: string) => name.split(' - ')[0];
 
 const HEBREW_SCRIPT = /[֐-׿]/;
 const LATIN_SCRIPT = /[A-Za-z]/;

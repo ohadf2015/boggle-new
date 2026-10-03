@@ -56,6 +56,28 @@ describe('list page titles', () => {
     expect(t).not.toContain(l.name.hebrew);
   });
 
+  it('does not repeat a native grade prefix the template already states', async () => {
+    const prefix = /Åk \d|de primaria|Secundaria \(|[小中高]学\d+年/;
+    const native = catalog.lists.filter((l) => l.lang === 'es' || l.lang === 'sv' || l.lang === 'ja');
+    for (const l of native)
+      for (const locale of l.locales) {
+        const t = bareTitle(titleOf(await listMeta(l, locale)));
+        expect(t, `${locale} ${l.slug}`).not.toMatch(prefix);
+      }
+  });
+
+  it('cuts a long native name to its head before dropping the grade', async () => {
+    const sv = catalog.lists.find((x) => x.lang === 'sv' && x.name.raw.startsWith('Åk 8 — Historia'))!;
+    expect(bareTitle(titleOf(await listMeta(sv, 'sv')))).toBe('Historia, Årskurs 8: ordlista med svenska ord');
+    const es = catalog.lists.find((x) => x.lang === 'es' && x.name.raw.startsWith('Secundaria (13-14 años)'))!;
+    expect(bareTitle(titleOf(await listMeta(es, 'es')))).toBe('Historia (Grado 8): palabras en español');
+  });
+
+  it('keeps the whole name when the short title already fits the hard limit', async () => {
+    const l = catalog.lists.find((x) => x.slug.startsWith('bagrut-technology-and-innovation-grade-12'))!;
+    expect(bareTitle(titleOf(await listMeta(l, 'he')))).toContain('Bagrut - Technology & Innovation');
+  });
+
   it('stays short enough to survive a results page', async () => {
     const over: string[] = [];
     for (const l of catalog.lists)

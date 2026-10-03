@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import sitemap from '@/app/sitemap';
 import { getCatalog } from '../catalog';
+import type { PageLocale } from '../model';
 import { absoluteUrl, clusterAlternates, gradeHubPath, langHubPath, listPath, topicHubPath } from '../paths';
 
+const PAGE_LOCALES: PageLocale[] = ['en', 'he', 'es', 'sv', 'ja', 'ru'];
 const routes = sitemap();
 const byUrl = new Map(routes.map((r) => [r.url, r]));
 const catalog = getCatalog();
@@ -15,8 +17,14 @@ describe('word lists in /sitemap.xml', () => {
         expect(entry, `${locale}${listPath(l)}`).toBeTruthy();
         expect(entry!.alternates?.languages).toEqual(clusterAlternates(listPath(l), l.locales));
       }
-      expect(byUrl.has(absoluteUrl('ja', listPath(l)))).toBe(false);
+      for (const locale of PAGE_LOCALES.filter((x) => !l.locales.includes(x)))
+        expect(byUrl.has(absoluteUrl(locale, listPath(l))), `${locale}${listPath(l)}`).toBe(false);
     }
+  });
+
+  it('renders Japanese-language lists in ja, and never an English list', () => {
+    expect(catalog.lists.some((l) => l.lang === 'ja' && byUrl.has(absoluteUrl('ja', listPath(l))))).toBe(true);
+    for (const l of catalog.lists.filter((x) => x.lang === 'en')) expect(byUrl.has(absoluteUrl('ja', listPath(l))), listPath(l)).toBe(false);
   });
 
   it('lists every language, grade and topic hub in each of its locales', () => {

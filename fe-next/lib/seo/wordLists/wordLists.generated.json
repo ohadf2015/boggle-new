@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-02",
+ "generatedAt": "2026-10-03",
  "lists": [
   {
    "id": "001d9788-168a-41a9-bbda-7d76c2ebb81e",
@@ -454,6 +454,81 @@
    ]
   },
   {
+   "id": "0696e3fa-325d-5b29-a75e-99f9d374065a",
+   "origin": "curriculum",
+   "name": "6.º de primaria — Geografía: relieve y mapas",
+   "description": "Conceptos para leer un mapa y describir el relieve, con ejemplos de España y de América: los Andes, la Pampa, el Sahara y la península ibérica.",
+   "language": "es",
+   "grade": 6,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "mapa",
+     "d": "Un dibujo de un lugar visto desde arriba, con caminos, ciudades y fronteras"
+    },
+    {
+     "w": "norte",
+     "d": "El punto cardinal hacia el que señala la aguja de la brújula"
+    },
+    {
+     "w": "sur",
+     "d": "El punto cardinal opuesto al norte"
+    },
+    {
+     "w": "isla",
+     "d": "Una porción de tierra rodeada de agua por todas partes"
+    },
+    {
+     "w": "costa",
+     "d": "La zona donde la tierra se encuentra con el mar"
+    },
+    {
+     "w": "montaña",
+     "d": "Una elevación muy alta del terreno"
+    },
+    {
+     "w": "desierto",
+     "d": "Una zona muy seca, con poca lluvia y pocas plantas"
+    },
+    {
+     "w": "llanura",
+     "d": "Un terreno grande y plano, sin montañas"
+    },
+    {
+     "w": "volcán",
+     "d": "Una montaña con una abertura por la que pueden salir lava, ceniza y gases"
+    },
+    {
+     "w": "frontera",
+     "d": "La línea que separa un país de otro"
+    },
+    {
+     "w": "océano",
+     "d": "Una enorme extensión de agua salada, más grande que cualquier mar"
+    },
+    {
+     "w": "clima",
+     "d": "El tiempo que suele hacer en un lugar a lo largo de muchos años"
+    },
+    {
+     "w": "cordillera",
+     "d": "Una cadena larga de montañas unidas"
+    },
+    {
+     "w": "península",
+     "d": "Una porción de tierra rodeada de agua por todos lados menos por uno"
+    },
+    {
+     "w": "continente",
+     "d": "Cada una de las grandes masas de tierra del planeta, como América o África"
+    },
+    {
+     "w": "población",
+     "d": "El conjunto de personas que viven en un lugar"
+    }
+   ]
+  },
+  {
    "id": "06ce2670-f58b-49bc-bfab-3cf6c9cc0c38",
    "origin": "curriculum",
    "name": "אוצר מילים - צבעים",
@@ -678,6 +753,168 @@
    ]
   },
   {
+   "id": "0aa30e71-c9bd-5c55-8704-ad5e43ae7a1a",
+   "origin": "curriculum",
+   "name": "כיתה ג׳ — רגשות ותכונות",
+   "description": "מילים לתאר איך מרגישים ואיך מתנהגים, לשיחות כיתה ולכתיבה אישית. כל מילה מופיעה במשפט עם דמות.",
+   "language": "he",
+   "grade": 3,
+   "subject": "general",
+   "words": [
+    {
+     "w": "שמח",
+     "d": "מרגיש טוב, מחייך ורוצה לצחוק"
+    },
+    {
+     "w": "עצוב",
+     "d": "מרגיש רע בלב, לפעמים עד כדי בכי"
+    },
+    {
+     "w": "כועס",
+     "d": "מרגיש רוגז חזק כשמשהו נראה לא הוגן"
+    },
+    {
+     "w": "מפחד",
+     "d": "מרגיש שמשהו רע עלול לקרות"
+    },
+    {
+     "w": "רגוע",
+     "d": "שקט ונינוח, לא לחוץ ולא עצבני"
+    },
+    {
+     "w": "גאה",
+     "d": "מרגיש טוב עם משהו שעשה הוא או מישהו קרוב לו"
+    },
+    {
+     "w": "אמיץ",
+     "d": "עושה את מה שנכון גם כשמפחיד"
+    },
+    {
+     "w": "נדיב",
+     "d": "אוהב לתת ולחלוק עם אחרים"
+    },
+    {
+     "w": "סקרן",
+     "d": "רוצה לדעת, לשאול ולגלות דברים חדשים"
+    },
+    {
+     "w": "חרוץ",
+     "d": "עובד קשה ומתאמץ עד שהוא מסיים"
+    },
+    {
+     "w": "ישר",
+     "d": "אומר את האמת ולא מרמה"
+    },
+    {
+     "w": "ביישן",
+     "d": "מתבייש ומתקשה לדבר מול אנשים שהוא לא מכיר"
+    },
+    {
+     "w": "סבלני",
+     "d": "יודע לחכות בשקט בלי להתעצבן"
+    },
+    {
+     "w": "נלהב",
+     "d": "מלא התלהבות ומחכה למשהו בקוצר רוח"
+    },
+    {
+     "w": "אכפתי",
+     "d": "דואג לאחרים ושם לב לאיך שהם מרגישים"
+    },
+    {
+     "w": "מאוכזב",
+     "d": "מרגיש רע כשמשהו שקיווה לו לא קרה"
+    }
+   ]
+  },
+  {
+   "id": "0c4f0537-7bc0-5299-9047-b1587db0bc4f",
+   "origin": "curriculum",
+   "name": "Grade 3 — Communities and Places",
+   "description": "Social-studies words for 3rd graders: who lives where, the places a town shares and the people who keep it running.",
+   "language": "en",
+   "grade": 3,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "village",
+     "d": "A small group of houses and shops, smaller than a town"
+    },
+    {
+     "w": "city",
+     "d": "A very large, busy town where many people live and work"
+    },
+    {
+     "w": "map",
+     "d": "A drawing that shows where places, roads and rivers are"
+    },
+    {
+     "w": "market",
+     "d": "A place where people buy and sell food and other goods"
+    },
+    {
+     "w": "neighbor",
+     "d": "A person who lives next door or close to you"
+    },
+    {
+     "w": "bridge",
+     "d": "A road or path built over a river, road or valley"
+    },
+    {
+     "w": "community",
+     "d": "People who live in the same area and help each other"
+    },
+    {
+     "w": "library",
+     "d": "A building where you can borrow books for free"
+    },
+    {
+     "w": "museum",
+     "d": "A building where people look at art or old, special things"
+    },
+    {
+     "w": "mayor",
+     "d": "The leader chosen to run a town or city"
+    },
+    {
+     "w": "country",
+     "d": "A land with its own people, leaders and flag"
+    },
+    {
+     "w": "factory",
+     "d": "A building where workers and machines make things"
+    },
+    {
+     "w": "volunteer",
+     "d": "A person who helps without getting paid for it"
+    },
+    {
+     "w": "continent",
+     "d": "One of the seven giant areas of land on Earth"
+    },
+    {
+     "w": "population",
+     "d": "The number of people who live in a place"
+    },
+    {
+     "w": "tradition",
+     "d": "Something a family or group has done the same way for years"
+    },
+    {
+     "w": "rural",
+     "d": "In the countryside, with farms and open land, far from cities"
+    },
+    {
+     "w": "urban",
+     "d": "In a city, with lots of buildings and people close together"
+    },
+    {
+     "w": "ancestor",
+     "d": "A family member who lived a long, long time ago"
+    }
+   ]
+  },
+  {
    "id": "0d108e94-c76b-41a9-ae86-789310781399",
    "origin": "curriculum",
    "name": "כיתה ו׳ — מתמטיקה מתקדמת",
@@ -745,6 +982,156 @@
     {
      "w": "סדרה",
      "d": "רצף של מספרים בעלי חוק"
+    }
+   ]
+  },
+  {
+   "id": "0e1bcc22-023e-5213-b185-8e40b0ec5ec9",
+   "origin": "curriculum",
+   "name": "小学4年 — 学校と まちの ことば",
+   "description": "学校生活と、まちのくらしをささえる人たちのことば。きまり・きょうりょく・せきにんなど、学級活動で話し合うことばも入っています。",
+   "language": "ja",
+   "grade": 4,
+   "subject": "general",
+   "words": [
+    {
+     "w": "せんせい",
+     "d": "学校で 子どもたちに 勉強を 教える 人"
+    },
+    {
+     "w": "きょうしつ",
+     "d": "クラスの みんなが 授業を うける へや"
+    },
+    {
+     "w": "しゅくだい",
+     "d": "家で やってくるように 出される 勉強"
+    },
+    {
+     "w": "きゅうしょく",
+     "d": "学校で みんなで 食べる お昼ごはん"
+    },
+    {
+     "w": "としょかん",
+     "d": "たくさんの 本を 読んだり かりたり できる ところ"
+    },
+    {
+     "w": "じゅぎょう",
+     "d": "先生が 教えて、みんなで 学ぶ 時間"
+    },
+    {
+     "w": "そうじ",
+     "d": "ごみを はいたり ふいたりして、きれいに すること"
+    },
+    {
+     "w": "とうばん",
+     "d": "順番に まわってくる 仕事や やくわり"
+    },
+    {
+     "w": "きまり",
+     "d": "みんなが 守ると 約束した ルール"
+    },
+    {
+     "w": "あいさつ",
+     "d": "人と 会ったときや 別れるときに かける ことば"
+    },
+    {
+     "w": "なかま",
+     "d": "同じことを いっしょに する 友だち"
+    },
+    {
+     "w": "やくそく",
+     "d": "これから することを 相手と 決めて、守ること"
+    },
+    {
+     "w": "けいさつ",
+     "d": "町の あんぜんを 守り、事故や 事件の とき かけつける 人たち"
+    },
+    {
+     "w": "しょうぼうしょ",
+     "d": "火事の とき、消防車で 火を 消しに 行く 人たちが いる ところ"
+    },
+    {
+     "w": "きょうりょく",
+     "d": "力を 合わせて、いっしょに 一つのことを すること"
+    },
+    {
+     "w": "せきにん",
+     "d": "まかされたことを、さいごまで きちんと やりとげる つとめ"
+    }
+   ]
+  },
+  {
+   "id": "0f4ae670-6769-520d-98bb-0b13fd0ff04d",
+   "origin": "curriculum",
+   "name": "小学5年 — 理科：実験と 生き物",
+   "description": "植物の発芽、花のつくり、ふりこ、電磁石など5年理科の重要語。よそう→じっけん→けっかの流れもことばで確認できます。",
+   "language": "ja",
+   "grade": 5,
+   "subject": "science",
+   "words": [
+    {
+     "w": "しょくぶつ",
+     "d": "根から 水を すい、日光を あびて そだつ 生き物。草や 木など"
+    },
+    {
+     "w": "こんちゅう",
+     "d": "体が 頭・むね・はらの 三つに 分かれ、あしが 六本ある 虫"
+    },
+    {
+     "w": "でんき",
+     "d": "電線を 通って 流れ、明かりや 機械を 動かす 力"
+    },
+    {
+     "w": "じしゃく",
+     "d": "鉄を 引きつける 性質を もつ 物"
+    },
+    {
+     "w": "じっけん",
+     "d": "考えが 正しいか、実際に ためして たしかめること"
+    },
+    {
+     "w": "かんさつ",
+     "d": "物や 生き物の ようすを、よく 見て 記録すること"
+    },
+    {
+     "w": "よそう",
+     "d": "実験の 前に、どうなるかを 考えて おくこと"
+    },
+    {
+     "w": "けっか",
+     "d": "実験や 観察で、じっさいに わかったこと"
+    },
+    {
+     "w": "はつが",
+     "d": "種から 芽が 出ること"
+    },
+    {
+     "w": "かふん",
+     "d": "花の おしべで つくられる こな。めしべに つくと 実が できる"
+    },
+    {
+     "w": "ふりこ",
+     "d": "糸の 先に おもりを つるして、左右に ゆれるように した もの"
+    },
+    {
+     "w": "さんそ",
+     "d": "空気の 中に ある 気体で、生き物が 息を するのに 必要な もの"
+    },
+    {
+     "w": "ほにゅうるい",
+     "d": "子どもを 母親の 乳で 育てる 動物の なかま"
+    },
+    {
+     "w": "はちゅうるい",
+     "d": "体が うろこで おおわれ、まわりの 温度で 体温が 変わる 動物の なかま"
+    },
+    {
+     "w": "じょうはつ",
+     "d": "水が 水面から 目に 見えない 水じょう気に なって、空気中に 出ていくこと"
+    },
+    {
+     "w": "けんびきょう",
+     "d": "小さな 物を 大きく して 見る 道具"
     }
    ]
   },
@@ -847,6 +1234,81 @@
     {
      "w": "זְאֵב",
      "d": "Wolf - מילל בלילה"
+    }
+   ]
+  },
+  {
+   "id": "116646ba-221f-5c1e-aa93-6267af89d200",
+   "origin": "curriculum",
+   "name": "小学5年 — 社会：日本の 国土と 世界",
+   "description": "地図と地球ぎで日本の位置や地形を学ぶことば。へいや・ぼんち・はんとうなど、日本の地名を使った例文で覚えられます。",
+   "language": "ja",
+   "grade": 5,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "みなみ",
+     "d": "昼に 太陽が いちばん 高く のぼる 方角"
+    },
+    {
+     "w": "ひがし",
+     "d": "太陽が のぼってくる 方角"
+    },
+    {
+     "w": "かざん",
+     "d": "地下の マグマが ふき出して できた 山"
+    },
+    {
+     "w": "かいがん",
+     "d": "陸と 海が 接している ところ"
+    },
+    {
+     "w": "ちきゅうぎ",
+     "d": "地球を 小さく した、丸い もけい"
+    },
+    {
+     "w": "たいりく",
+     "d": "海に かこまれた、とても 広い 陸地。世界には 六つ ある"
+    },
+    {
+     "w": "たいへいよう",
+     "d": "日本の 東に 広がる、世界で いちばん 大きい 海"
+    },
+    {
+     "w": "せきどう",
+     "d": "北極と 南極から 同じ きょりの ところを、地球を ぐるりと 一周する 線"
+    },
+    {
+     "w": "しまぐに",
+     "d": "まわりを 海に かこまれた 国"
+    },
+    {
+     "w": "さんみゃく",
+     "d": "山が 長く つらなっている ところ"
+    },
+    {
+     "w": "へいや",
+     "d": "川の 下流などに 広がる、低くて たいらな 土地"
+    },
+    {
+     "w": "ぼんち",
+     "d": "まわりを 山に かこまれた、たいらな 土地"
+    },
+    {
+     "w": "はんとう",
+     "d": "三方を 海に かこまれ、海に つき出た 陸地"
+    },
+    {
+     "w": "きこう",
+     "d": "ある 地いきで、長い 年月を 通して 見られる 天気の とくちょう"
+    },
+    {
+     "w": "じんこう",
+     "d": "ある 地いきに すんでいる 人の 数"
+    },
+    {
+     "w": "こくど",
+     "d": "その 国が おさめている 土地"
     }
    ]
   },
@@ -1024,6 +1486,81 @@
    ]
   },
   {
+   "id": "15f10118-c5c6-5a5e-94b4-e765159fbfb4",
+   "origin": "curriculum",
+   "name": "Grade 6 — Earth and Space",
+   "description": "Astronomy words for the solar system unit: planets, gravity, eclipses and the tools we use to study the sky.",
+   "language": "en",
+   "grade": 6,
+   "subject": "science",
+   "words": [
+    {
+     "w": "planet",
+     "d": "A huge round object in space that travels around a star"
+    },
+    {
+     "w": "telescope",
+     "d": "A tool that makes faraway objects, like stars, look bigger and closer"
+    },
+    {
+     "w": "astronaut",
+     "d": "A person trained to travel and work in space"
+    },
+    {
+     "w": "solar",
+     "d": "Having to do with the Sun"
+    },
+    {
+     "w": "lunar",
+     "d": "Having to do with the Moon"
+    },
+    {
+     "w": "orbit",
+     "d": "To travel in a curved path around a planet or star; also the path itself"
+    },
+    {
+     "w": "gravity",
+     "d": "The invisible pull that draws objects toward each other and keeps our feet on the ground"
+    },
+    {
+     "w": "galaxy",
+     "d": "A giant group of billions of stars held together in space"
+    },
+    {
+     "w": "comet",
+     "d": "A ball of ice and dust that grows a glowing tail when it passes near the Sun"
+    },
+    {
+     "w": "crater",
+     "d": "A bowl-shaped hole made when a rock from space crashes into a surface"
+    },
+    {
+     "w": "rotate",
+     "d": "To spin around a center line, like a top"
+    },
+    {
+     "w": "meteor",
+     "d": "A space rock that burns up in Earth's air as a streak of light; also called a shooting star"
+    },
+    {
+     "w": "atmosphere",
+     "d": "The layer of gases that surrounds a planet"
+    },
+    {
+     "w": "eclipse",
+     "d": "When one object in space blocks the light of another, as when the Moon hides the Sun"
+    },
+    {
+     "w": "satellite",
+     "d": "An object that travels around a planet, like the Moon or a machine sent into space"
+    },
+    {
+     "w": "axis",
+     "d": "An imaginary line through the middle of a planet that it spins around"
+    }
+   ]
+  },
+  {
    "id": "164e00ba-c5b6-44f5-b1a8-aa4c56bfa41b",
    "origin": "curriculum",
    "name": "כיתה ח - מילים מתקדמות לחטיבה",
@@ -1197,73 +1734,77 @@
    ]
   },
   {
-   "id": "1dca7eb3-6c55-41f6-95e9-4127c86df693",
+   "id": "1d536ec0-a02b-56e9-9474-ca4126caf7a9",
    "origin": "curriculum",
-   "name": "כיתה ד׳ — בית הספר והקהילה",
-   "description": "מילים מעולם בית הספר, החברים והקהילה לכיתה ד׳.",
+   "name": "כיתה ה׳ — שפה עשירה: תארים ומילים נרדפות",
+   "description": "תארים שמעשירים כתיבה ודיבור, בזוגות של הפכים ונרדפות. מתאים לשיעורי הבעה ולהעשרת חיבורים.",
    "language": "he",
-   "grade": 4,
+   "grade": 5,
    "subject": "hebrew",
    "words": [
     {
-     "w": "מורה",
-     "d": "אדם שמלמד תלמידים"
+     "w": "מהיר",
+     "d": "נע או פועל בקצב גבוה"
     },
     {
-     "w": "תלמיד",
-     "d": "מי שלומד בבית הספר"
+     "w": "ענק",
+     "d": "גדול מאוד, הרבה יותר מהרגיל"
     },
     {
-     "w": "שיעור",
-     "d": "זמן של לימוד נושא"
+     "w": "זעיר",
+     "d": "קטן מאוד, כמעט שלא רואים אותו"
     },
     {
-     "w": "ספרייה",
-     "d": "מקום עם הרבה ספרים לקריאה ולהשאלה"
+     "w": "שקט",
+     "d": "בלי רעש, או עם מעט מאוד רעש"
     },
     {
-     "w": "שכן",
-     "d": "מי שגר לידך"
+     "w": "רועש",
+     "d": "מלא רעש וקולות חזקים"
     },
     {
-     "w": "קהילה",
-     "d": "קבוצת אנשים שחיים יחד במקום אחד"
+     "w": "ברור",
+     "d": "קל להבנה, בלי ספקות"
     },
     {
-     "w": "מתנדב",
-     "d": "מי שעוזר בלי לקבל תשלום"
+     "w": "נדיר",
+     "d": "לא קורה הרבה, וקשה למצוא אותו"
     },
     {
-     "w": "חבר",
-     "d": "אדם קרוב שאוהבים ובוטחים בו"
+     "w": "עתיק",
+     "d": "ישן מאוד, מתקופות רחוקות"
     },
     {
-     "w": "כלל",
-     "d": "חוק שמסכימים לפעול לפיו"
+     "w": "חדיש",
+     "d": "חדש ומודרני, לפי הרעיונות האחרונים"
     },
     {
-     "w": "אחריות",
-     "d": "מחויבות לעשות משהו כמו שצריך"
+     "w": "יפהפה",
+     "d": "יפה מאוד, עד שקשה להוריד ממנו את העיניים"
     },
     {
-     "w": "כבוד",
-     "d": "יחס מכבד כלפי אדם אחר"
+     "w": "מורכב",
+     "d": "בנוי מהרבה חלקים, ולכן לא פשוט להבין אותו"
     },
     {
-     "w": "שיתוף",
-     "d": "לחלוק ולעבוד יחד"
+     "w": "עדין",
+     "d": "רך ונעים, לא חזק ולא גס"
     },
     {
-     "w": "הגינות",
-     "d": "התנהגות צודקת והוגנת"
+     "w": "מרהיב",
+     "d": "יפה ומרשים כל כך שעוצרים להסתכל"
     },
     {
-     "w": "סובלנות",
-     "d": "קבלה של מי ששונה ממך"
+     "w": "מעורפל",
+     "d": "לא ברור ולא חד, כמו מאחורי ערפל"
     },
     {
-     "w": "עזרה",
-     "d": "פעולה שמקלה על אדם אחר"
+     "w": "מופלא",
+     "d": "מדהים ונפלא, כמעט כמו קסם"
+    },
+    {
+     "w": "צלול",
+     "d": "שקוף ונקי, או ברור וחד כמו צליל של פעמון"
     }
    ]
   },
@@ -1472,6 +2013,81 @@
    ]
   },
   {
+   "id": "21fec24a-2e63-59b2-90e4-742a6e73f4f9",
+   "origin": "curriculum",
+   "name": "Åk 5 — NO: växter, djur och experiment",
+   "description": "Grundord för biologi, fysik och kemi på mellanstadiet — och för hela gången i ett experiment, från hypotes till slutsats.",
+   "language": "sv",
+   "grade": 5,
+   "subject": "science",
+   "words": [
+    {
+     "w": "växt",
+     "d": "Något levande som har rötter i jorden och behöver vatten och ljus"
+    },
+    {
+     "w": "frö",
+     "d": "Den lilla delen som en ny växt kan gro ur"
+    },
+    {
+     "w": "rot",
+     "d": "Den del av växten som sitter under jorden och suger upp vatten"
+    },
+    {
+     "w": "insekt",
+     "d": "Ett litet djur med tre par ben, till exempel en myra eller en skalbagge"
+    },
+    {
+     "w": "magnet",
+     "d": "Ett föremål som drar till sig järn"
+    },
+    {
+     "w": "syre",
+     "d": "En gas i luften som vi behöver för att kunna andas"
+    },
+    {
+     "w": "energi",
+     "d": "Det som gör att saker kan röra sig, växa, lysa eller bli varma"
+    },
+    {
+     "w": "experiment",
+     "d": "Ett försök man gör för att ta reda på om en idé stämmer"
+    },
+    {
+     "w": "däggdjur",
+     "d": "Ett djur vars ungar dricker mjölk från sin mamma"
+    },
+    {
+     "w": "kräldjur",
+     "d": "Ett djur med fjäll och växelvarm kropp, till exempel en ödla eller en orm"
+    },
+    {
+     "w": "kretslopp",
+     "d": "När något går runt och kommer tillbaka, som vatten som blir moln och sedan regn"
+    },
+    {
+     "w": "avdunsta",
+     "d": "När vatten värms upp och blir till ånga i luften"
+    },
+    {
+     "w": "hypotes",
+     "d": "En gissning med en förklaring, som man testar i ett experiment"
+    },
+    {
+     "w": "observation",
+     "d": "Att noggrant titta på något och skriva ner det man ser"
+    },
+    {
+     "w": "slutsats",
+     "d": "Det man förstår efter ett experiment, utifrån resultatet"
+    },
+    {
+     "w": "fotosyntes",
+     "d": "När växter gör socker av ljus, vatten och koldioxid och samtidigt släpper ut syre"
+    }
+   ]
+  },
+  {
    "id": "23fa302e-84d2-4924-95ba-69c0e565f265",
    "origin": "curriculum",
    "name": "כיתה יא - מילים לבגרות",
@@ -1519,6 +2135,85 @@
     {
      "w": "אפוריזם",
      "d": "משפט קצר וחכם"
+    }
+   ]
+  },
+  {
+   "id": "24056a45-f890-5bf1-82a0-0b8478105956",
+   "origin": "curriculum",
+   "name": "Grade 7 — Academic Words for Every Subject",
+   "description": "The thinking words middle schoolers see in science labs, essays and test questions: analyze, infer, evaluate and more.",
+   "language": "en",
+   "grade": 7,
+   "subject": "english",
+   "words": [
+    {
+     "w": "communicate",
+     "d": "To share ideas or feelings by talking, writing, signing or using gestures"
+    },
+    {
+     "w": "technology",
+     "d": "Tools, machines and inventions people create with science to solve problems"
+    },
+    {
+     "w": "compare",
+     "d": "To look at two or more things to see how they are alike and different"
+    },
+    {
+     "w": "predict",
+     "d": "To say what you think will happen before it happens"
+    },
+    {
+     "w": "analyze",
+     "d": "To study something closely, piece by piece, to understand how it works or why it happened"
+    },
+    {
+     "w": "demonstrate",
+     "d": "To show how something works or prove that something is true"
+    },
+    {
+     "w": "investigate",
+     "d": "To search for facts to find out what happened or how something works"
+    },
+    {
+     "w": "summarize",
+     "d": "To retell the main ideas in a few words, leaving out small details"
+    },
+    {
+     "w": "evidence",
+     "d": "Facts or objects that show whether something is true"
+    },
+    {
+     "w": "conclude",
+     "d": "To decide something is true after thinking about all the facts"
+    },
+    {
+     "w": "sequence",
+     "d": "The order in which events or steps happen"
+    },
+    {
+     "w": "evaluate",
+     "d": "To judge how good, useful or correct something is after looking at it carefully"
+    },
+    {
+     "w": "hypothesis",
+     "d": "A possible explanation that you can test with an experiment"
+    },
+    {
+     "w": "perspective",
+     "d": "The way a person sees a situation, shaped by who they are and what they have lived through"
+    },
+    {
+     "w": "significant",
+     "d": "Large or important enough to make a real difference"
+    },
+    {
+     "w": "infer",
+     "d": "To figure out something that is not said directly, using clues and what you already know"
+    },
+    {
+     "w": "relevant",
+     "d": "Closely connected to the topic you are talking about"
     }
    ]
   },
@@ -1692,6 +2387,85 @@
     {
      "w": "בֹּקֶר",
      "d": "Morning - תחילת היום"
+    }
+   ]
+  },
+  {
+   "id": "26916905-9d1d-5152-b434-9ee6f9d30143",
+   "origin": "curriculum",
+   "name": "Åk 1 — Mina första ord",
+   "description": "Vardagsord från hemmet, förskolan och familjen för nya läsare. Varje ord har en enkel förklaring och en kort mening att läsa högt.",
+   "language": "sv",
+   "grade": 1,
+   "subject": "general",
+   "words": [
+    {
+     "w": "hus",
+     "d": "En byggnad där man bor"
+    },
+    {
+     "w": "katt",
+     "d": "Ett mjukt husdjur med morrhår som spinner och säger mjau"
+    },
+    {
+     "w": "hund",
+     "d": "Ett husdjur som skäller, viftar på svansen och gillar att leka"
+    },
+    {
+     "w": "sol",
+     "d": "Den stora, heta stjärnan som lyser och värmer på dagen"
+    },
+    {
+     "w": "boll",
+     "d": "En rund leksak som man kastar, sparkar eller studsar"
+    },
+    {
+     "w": "bok",
+     "d": "Sidor med ord eller bilder som sitter ihop i ett omslag och som man läser"
+    },
+    {
+     "w": "mamma",
+     "d": "Den förälder som är kvinna"
+    },
+    {
+     "w": "pappa",
+     "d": "Den förälder som är man"
+    },
+    {
+     "w": "äpple",
+     "d": "En krispig frukt med rött, grönt eller gult skal som växer på träd"
+    },
+    {
+     "w": "vatten",
+     "d": "Den genomskinliga vätska som man dricker när man är törstig"
+    },
+    {
+     "w": "bröd",
+     "d": "Mat som bakas av mjöl och som man gör smörgåsar av"
+    },
+    {
+     "w": "stol",
+     "d": "En möbel att sitta på, med ben och ryggstöd"
+    },
+    {
+     "w": "blomma",
+     "d": "Den färgglada delen av en växt, som ofta doftar gott"
+    },
+    {
+     "w": "måne",
+     "d": "Det runda ljuset som man ser på himlen på natten"
+    },
+    {
+     "w": "familj",
+     "d": "Människor som hör ihop, till exempel föräldrar, barn, syskon och far- och morföräldrar"
+    },
+    {
+     "w": "bebis",
+     "d": "Ett väldigt litet barn som inte kan gå eller prata än"
+    },
+    {
+     "w": "kompis",
+     "d": "Någon som man tycker om och gärna leker med"
     }
    ]
   },
@@ -1951,6 +2725,81 @@
    ]
   },
   {
+   "id": "2e34bddc-3c23-511f-bcce-3be9115bf9e0",
+   "origin": "curriculum",
+   "name": "כיתה ב׳ — טבע ובעלי חיים",
+   "description": "בעלי חיים, מזג אוויר ונוף שילדים פוגשים בטיול ובחצר. הסברים קצרים ומשפטים מחיי היום־יום.",
+   "language": "he",
+   "grade": 2,
+   "subject": "science",
+   "words": [
+    {
+     "w": "ציפור",
+     "d": "בעל חיים עם נוצות וכנפיים, שרובם יודעים לעוף"
+    },
+    {
+     "w": "פרפר",
+     "d": "חרק עם כנפיים צבעוניות, שבהתחלה היה זחל"
+    },
+    {
+     "w": "גשם",
+     "d": "טיפות מים שיורדות מהעננים"
+    },
+    {
+     "w": "ענן",
+     "d": "ערימה לבנה או אפורה של טיפות מים זעירות שמרחפת בשמיים"
+    },
+    {
+     "w": "שלג",
+     "d": "פתיתים לבנים וקרים שיורדים מהשמיים כשקר מאוד"
+    },
+    {
+     "w": "רוח",
+     "d": "אוויר שזז ומזיז עלים, עננים ועפיפונים"
+    },
+    {
+     "w": "יער",
+     "d": "שטח גדול שיש בו הרבה מאוד עצים"
+    },
+    {
+     "w": "נהר",
+     "d": "מים מתוקים שזורמים כל הזמן ביבשה, עד לים או לאגם"
+    },
+    {
+     "w": "חוף",
+     "d": "רצועת החול או האבנים בין היבשה לים"
+    },
+    {
+     "w": "דבורה",
+     "d": "חרק מזמזם שאוסף צוף מפרחים ומייצר דבש"
+    },
+    {
+     "w": "נמלה",
+     "d": "חרק קטן וחרוץ שחי בקן עם המון חברים"
+    },
+    {
+     "w": "אריה",
+     "d": "חתול פרא גדול וחזק; לזכר יש רעמה סביב הראש"
+    },
+    {
+     "w": "ארנב",
+     "d": "בעל חיים פרוותי עם אוזניים ארוכות, שקופץ מהר"
+    },
+    {
+     "w": "גבעה",
+     "d": "הר קטן ונמוך"
+    },
+    {
+     "w": "שמיים",
+     "d": "כל מה שמעלינו, איפה שנמצאים העננים, השמש והכוכבים"
+    },
+    {
+     "w": "צפרדע",
+     "d": "בעל חיים קטן שקופץ, מקרקר וחי ליד מים"
+    }
+   ]
+  },
+  {
    "id": "324a4c48-5ac9-4928-857d-8783f4e6c30f",
    "origin": "curriculum",
    "name": "Abstract Nouns - Band 2",
@@ -1998,6 +2847,93 @@
     {
      "w": "disadvantage",
      "d": "חיסרון - Bad point"
+    }
+   ]
+  },
+  {
+   "id": "34aafa7e-5a4b-5981-84ef-2fb1cccc2a4f",
+   "origin": "curriculum",
+   "name": "Grade 3 — Plants, Animals and Our Earth",
+   "description": "Life- and earth-science words 8–9 year olds read in science units: plant parts, animal groups, volcanoes and how living things survive.",
+   "language": "en",
+   "grade": 3,
+   "subject": "science",
+   "words": [
+    {
+     "w": "insect",
+     "d": "A tiny animal with six legs and a body in three parts"
+    },
+    {
+     "w": "soil",
+     "d": "The dark, loose dirt that plants grow in"
+    },
+    {
+     "w": "root",
+     "d": "The part of a plant that grows underground and drinks up water"
+    },
+    {
+     "w": "seed",
+     "d": "The small part of a plant that a new plant grows from"
+    },
+    {
+     "w": "valley",
+     "d": "Low land between hills or mountains, often with a river"
+    },
+    {
+     "w": "mammal",
+     "d": "A warm-blooded animal with hair that feeds its babies milk"
+    },
+    {
+     "w": "reptile",
+     "d": "A cold-blooded animal with dry, scaly skin, like a snake or lizard"
+    },
+    {
+     "w": "fossil",
+     "d": "Rock holding the shape of a plant or animal from long ago"
+    },
+    {
+     "w": "volcano",
+     "d": "A mountain that can blow out hot melted rock, ash and smoke"
+    },
+    {
+     "w": "harvest",
+     "d": "To pick and gather crops when they are ready to eat"
+    },
+    {
+     "w": "pollen",
+     "d": "Yellow dust in flowers that bees carry from plant to plant"
+    },
+    {
+     "w": "survive",
+     "d": "To stay alive, even when things are hard or dangerous"
+    },
+    {
+     "w": "recycle",
+     "d": "To turn used things like cans and paper into something new"
+    },
+    {
+     "w": "energy",
+     "d": "The power that makes things move, grow, light up or warm up"
+    },
+    {
+     "w": "island",
+     "d": "A piece of land with water all around it"
+    },
+    {
+     "w": "predator",
+     "d": "An animal that hunts and eats other animals"
+    },
+    {
+     "w": "extinct",
+     "d": "No longer living anywhere on Earth"
+    },
+    {
+     "w": "adapt",
+     "d": "To change over time to fit a new place"
+    },
+    {
+     "w": "erosion",
+     "d": "The slow wearing away of land by water, wind or ice"
     }
    ]
   },
@@ -2155,77 +3091,6 @@
    ]
   },
   {
-   "id": "382bd7fd-2e6a-4a00-a425-6eb80fc7d9bd",
-   "origin": "curriculum",
-   "name": "כיתה ו׳ — מילים מופשטות וערכים",
-   "description": "מושגים מופשטים וערכים להעשרת השפה והדיון בכיתה ו׳.",
-   "language": "he",
-   "grade": 6,
-   "subject": "hebrew",
-   "words": [
-    {
-     "w": "חירות",
-     "d": "חופש לבחור ולפעול"
-    },
-    {
-     "w": "צדק",
-     "d": "מצב שבו נוהגים בהגינות"
-    },
-    {
-     "w": "שוויון",
-     "d": "יחס שווה לכל אדם"
-    },
-    {
-     "w": "אמת",
-     "d": "מה שתואם את המציאות"
-    },
-    {
-     "w": "חוכמה",
-     "d": "ידע עמוק ושיקול דעת"
-    },
-    {
-     "w": "דמיון",
-     "d": "היכולת לחשוב על דברים חדשים"
-    },
-    {
-     "w": "השראה",
-     "d": "דחף פנימי ליצור או לפעול"
-    },
-    {
-     "w": "התמדה",
-     "d": "המשך מאמץ למרות קשיים"
-    },
-    {
-     "w": "אחדות",
-     "d": "מצב של חיבור ושיתוף"
-    },
-    {
-     "w": "סקרנות",
-     "d": "רצון עז לדעת ולחקור"
-    },
-    {
-     "w": "אמפתיה",
-     "d": "היכולת להבין את רגשות הזולת"
-    },
-    {
-     "w": "יושרה",
-     "d": "דבקות בערכים ובאמת"
-    },
-    {
-     "w": "מסירות",
-     "d": "נאמנות ומאמץ למען מטרה"
-    },
-    {
-     "w": "תקווה",
-     "d": "אמונה שדברים טובים יקרו"
-    },
-    {
-     "w": "הוקרה",
-     "d": "הערכה ותודה על מה שקיבלת"
-    }
-   ]
-  },
-  {
    "id": "38ca4220-9745-47b2-8edb-0b80b7f3d6f3",
    "origin": "curriculum",
    "name": "אוצר מילים - עוד פעלים",
@@ -2324,148 +3189,6 @@
     {
      "w": "October",
      "d": "אוקטובר - Tenth month"
-    }
-   ]
-  },
-  {
-   "id": "3977e4ac-be79-41f5-ab03-131b58c75d49",
-   "origin": "curriculum",
-   "name": "כיתה ב׳ — טבע ובעלי חיים",
-   "description": "מילים מעולם הטבע ובעלי החיים לכיתה ב׳.",
-   "language": "he",
-   "grade": 2,
-   "subject": "hebrew",
-   "words": [
-    {
-     "w": "ציפור",
-     "d": "בעל חיים שעף ויש לו כנפיים"
-    },
-    {
-     "w": "דג",
-     "d": "חיה שחיה במים ושוחה"
-    },
-    {
-     "w": "פרפר",
-     "d": "חרק צבעוני בעל כנפיים"
-    },
-    {
-     "w": "יער",
-     "d": "מקום עם הרבה עצים"
-    },
-    {
-     "w": "ים",
-     "d": "שטח גדול של מים מלוחים"
-    },
-    {
-     "w": "גשם",
-     "d": "טיפות מים שיורדות מהשמיים"
-    },
-    {
-     "w": "ענן",
-     "d": "אדים לבנים שמרחפים בשמיים"
-    },
-    {
-     "w": "רוח",
-     "d": "אוויר שנע ומזיז דברים"
-    },
-    {
-     "w": "דבורה",
-     "d": "חרק שמייצר דבש"
-    },
-    {
-     "w": "נמלה",
-     "d": "חרק קטן וחרוץ"
-    },
-    {
-     "w": "שמיים",
-     "d": "החלל הכחול שמעל הראש"
-    },
-    {
-     "w": "הר",
-     "d": "מקום גבוה מאוד באדמה"
-    },
-    {
-     "w": "נהר",
-     "d": "מים זורמים ביבשה"
-    },
-    {
-     "w": "אריה",
-     "d": "חיה חזקה שנקראת מלך החיות"
-    },
-    {
-     "w": "צב",
-     "d": "חיה איטית עם שריון"
-    }
-   ]
-  },
-  {
-   "id": "3b3cf3db-dad0-4760-bb7c-673bae21540f",
-   "origin": "curriculum",
-   "name": "כיתה ה׳ — שפה עשירה ומילים נרדפות",
-   "description": "מילים מתארות ומילים נרדפות להעשרת אוצר המילים בכיתה ה׳.",
-   "language": "he",
-   "grade": 5,
-   "subject": "hebrew",
-   "words": [
-    {
-     "w": "מהיר",
-     "d": "נע בקצב גבוה"
-    },
-    {
-     "w": "איטי",
-     "d": "נע לאט"
-    },
-    {
-     "w": "ענק",
-     "d": "גדול מאוד"
-    },
-    {
-     "w": "זעיר",
-     "d": "קטן מאוד"
-    },
-    {
-     "w": "יפהפה",
-     "d": "יפה במיוחד"
-    },
-    {
-     "w": "נדיר",
-     "d": "לא שכיח, קשה למצוא"
-    },
-    {
-     "w": "מרהיב",
-     "d": "מרשים ומלא יופי"
-    },
-    {
-     "w": "מורכב",
-     "d": "בנוי מהרבה חלקים, לא פשוט"
-    },
-    {
-     "w": "ברור",
-     "d": "קל להבנה"
-    },
-    {
-     "w": "מעורפל",
-     "d": "לא ברור ומטושטש"
-    },
-    {
-     "w": "שקט",
-     "d": "בלי רעש"
-    },
-    {
-     "w": "רועש",
-     "d": "מלא רעש"
-    },
-    {
-     "w": "עתיק",
-     "d": "ישן מאוד, מימים עברו"
-    },
-    {
-     "w": "חדיש",
-     "d": "חדש ומתקדם"
-    },
-    {
-     "w": "מופלא",
-     "d": "נפלא ומדהים"
     }
    ]
   },
@@ -2619,6 +3342,156 @@
     {
      "w": "holocaust",
      "d": "Nazi murder of Jews"
+    }
+   ]
+  },
+  {
+   "id": "41e5b8e0-0d23-5d07-a924-292ac4a9b704",
+   "origin": "curriculum",
+   "name": "小学2年 — いきものと しぜん",
+   "description": "生活科で出会う花・虫・動物と天気のことば。春のたんぽぽから夏のあさがお、秋のどんぐりまで、季節を感じる例文つき。",
+   "language": "ja",
+   "grade": 2,
+   "subject": "science",
+   "words": [
+    {
+     "w": "あさがお",
+     "d": "なつの あさに さいて、ひるには しぼむ ラッパの かたちの はな"
+    },
+    {
+     "w": "ひまわり",
+     "d": "なつに さく、せが たかくて おおきな きいろい はな"
+    },
+    {
+     "w": "たんぽぽ",
+     "d": "はるに さく きいろい はなで、あとから わたげが とぶ"
+    },
+    {
+     "w": "かえる",
+     "d": "みずべに すみ、ぴょんと とんで ゲロゲロと なく いきもの"
+    },
+    {
+     "w": "とんぼ",
+     "d": "ほそながい からだと 4まいの はねで すいすい とぶ むし"
+    },
+    {
+     "w": "かたつむり",
+     "d": "うずまきの からを せおって、ゆっくり すすむ いきもの"
+    },
+    {
+     "w": "きつね",
+     "d": "ふさふさの しっぽと とがった みみを もつ、やまに すむ どうぶつ"
+    },
+    {
+     "w": "たぬき",
+     "d": "まるい からだで、めの まわりが くろい どうぶつ"
+    },
+    {
+     "w": "ふくろう",
+     "d": "よるに えものを さがす、めの おおきな とり"
+    },
+    {
+     "w": "すずめ",
+     "d": "ちゃいろい からだの ちいさな とりで、チュンチュンと なく"
+    },
+    {
+     "w": "どんぐり",
+     "d": "かしや くぬぎなどの きに なる、かたい からの きのみ"
+    },
+    {
+     "w": "はやし",
+     "d": "きが たくさん はえて いる ところ"
+    },
+    {
+     "w": "みずうみ",
+     "d": "まわりを りくに かこまれた、とても おおきな いけ"
+    },
+    {
+     "w": "かみなり",
+     "d": "くもの なかで でんきが ひかって、ゴロゴロと おおきな おとが する こと"
+    },
+    {
+     "w": "たいふう",
+     "d": "みなみの うみで うまれる、つよい かぜと あめを つれた あらし"
+    },
+    {
+     "w": "おたまじゃくし",
+     "d": "かえるの こどもで、しっぽを ふって みずの なかを およぐ もの"
+    }
+   ]
+  },
+  {
+   "id": "44b81f17-9940-5d41-b1f2-74fc3e0e47bd",
+   "origin": "curriculum",
+   "name": "Grade 3 — Math Words",
+   "description": "The words of operations, shapes and measurement that 3rd graders need to read and explain math problems.",
+   "language": "en",
+   "grade": 3,
+   "subject": "math",
+   "words": [
+    {
+     "w": "add",
+     "d": "To put numbers together to find how many there are in all"
+    },
+    {
+     "w": "equal",
+     "d": "Exactly the same in amount or size"
+    },
+    {
+     "w": "sum",
+     "d": "The answer you get when you add numbers"
+    },
+    {
+     "w": "shape",
+     "d": "The outline or form of something, like a circle or a square"
+    },
+    {
+     "w": "circle",
+     "d": "A perfectly round flat figure with no corners"
+    },
+    {
+     "w": "subtract",
+     "d": "To take one number away from another"
+    },
+    {
+     "w": "multiply",
+     "d": "To find the total of equal groups quickly, like 3 groups of 4 making 12"
+    },
+    {
+     "w": "divide",
+     "d": "To split an amount into equal groups"
+    },
+    {
+     "w": "triangle",
+     "d": "A flat figure with three straight sides and three corners"
+    },
+    {
+     "w": "measure",
+     "d": "To find the size, length or amount of something"
+    },
+    {
+     "w": "pattern",
+     "d": "Shapes, numbers or colors that repeat in a regular way"
+    },
+    {
+     "w": "even",
+     "d": "A number that can be split into two equal groups, like 2, 4 or 6"
+    },
+    {
+     "w": "difference",
+     "d": "The answer you get when you take one number away from another"
+    },
+    {
+     "w": "fraction",
+     "d": "A number that names part of a whole, like one half or three quarters"
+    },
+    {
+     "w": "estimate",
+     "d": "A smart guess about an amount, made without counting exactly"
+    },
+    {
+     "w": "digit",
+     "d": "Any one of the ten symbols 0 to 9 used to write numbers"
     }
    ]
   },
@@ -2827,57 +3700,6 @@
    ]
   },
   {
-   "id": "4967302b-dc7a-4465-8e72-04c50a2e78ce",
-   "origin": "curriculum",
-   "name": "Grade 3 - Basic English Vocabulary",
-   "description": "Foundational English vocabulary for 3rd grade students aligned with Israeli MOE standards",
-   "language": "en",
-   "grade": 3,
-   "subject": "english",
-   "words": [
-    {
-     "w": "apple",
-     "d": "A round fruit that is red, green, or yellow"
-    },
-    {
-     "w": "book",
-     "d": "Pages with writing or pictures bound together"
-    },
-    {
-     "w": "cat",
-     "d": "A small furry animal that meows"
-    },
-    {
-     "w": "dog",
-     "d": "A furry animal that barks"
-    },
-    {
-     "w": "eat",
-     "d": "To put food in your mouth and swallow it"
-    },
-    {
-     "w": "friend",
-     "d": "A person you like and enjoy being with"
-    },
-    {
-     "w": "good",
-     "d": "Of high quality or pleasant"
-    },
-    {
-     "w": "happy",
-     "d": "Feeling joy or pleasure"
-    },
-    {
-     "w": "house",
-     "d": "A building where people live"
-    },
-    {
-     "w": "jump",
-     "d": "To push yourself up into the air"
-    }
-   ]
-  },
-  {
    "id": "4bb48369-a228-43ae-83bf-7a4b4e8dadab",
    "origin": "curriculum",
    "name": "More Body Parts - עוד חלקי גוף",
@@ -2929,6 +3751,81 @@
    ]
   },
   {
+   "id": "4c9212f2-6c38-574f-b17e-746edd510f1e",
+   "origin": "curriculum",
+   "name": "כיתה ז׳ — גאוגרפיה: נוף ומפה",
+   "description": "מושגי יסוד לקריאת מפה ולתיאור נוף, עם דוגמאות מארץ ישראל: הנגב, הכרמל, הכנרת ועמק יזרעאל.",
+   "language": "he",
+   "grade": 7,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "מפה",
+     "d": "ציור של מקום מלמעלה, שמראה דרכים, ערים וגבולות"
+    },
+    {
+     "w": "צפון",
+     "d": "הכיוון שאליו מצביעה מחט המצפן"
+    },
+    {
+     "w": "דרום",
+     "d": "הכיוון ההפוך לצפון"
+    },
+    {
+     "w": "מדבר",
+     "d": "אזור יבש מאוד, עם מעט גשם ומעט צמחים"
+    },
+    {
+     "w": "אגם",
+     "d": "גוף מים גדול שמוקף יבשה מכל הצדדים"
+    },
+    {
+     "w": "נחל",
+     "d": "מים שזורמים בערוץ, לפעמים רק בחורף"
+    },
+    {
+     "w": "מעיין",
+     "d": "מקום שבו מים יוצאים מתוך האדמה"
+    },
+    {
+     "w": "עמק",
+     "d": "שטח נמוך ושטוח בין הרים או גבעות"
+    },
+    {
+     "w": "מישור",
+     "d": "שטח גדול ושטוח, בלי הרים"
+    },
+    {
+     "w": "רכס",
+     "d": "שורה ארוכה של הרים מחוברים"
+    },
+    {
+     "w": "גבול",
+     "d": "הקו שמפריד בין מדינה למדינה או בין שטח לשטח"
+    },
+    {
+     "w": "יבשת",
+     "d": "אחד מגושי היבשה הגדולים בעולם, כמו אסיה או אפריקה"
+    },
+    {
+     "w": "אקלים",
+     "d": "מזג האוויר הרגיל באזור לאורך הרבה שנים"
+    },
+    {
+     "w": "מכתש",
+     "d": "עמק עמוק וסגור שנוצר כשמים סחפו סלעים רכים במשך מיליוני שנים"
+    },
+    {
+     "w": "אוקיינוס",
+     "d": "גוף מים מלוח וענק, גדול מכל ים"
+    },
+    {
+     "w": "אוכלוסייה",
+     "d": "כל האנשים שגרים במקום מסוים"
+    }
+   ]
+  },
+  {
    "id": "4d6d0033-2e4f-418b-83ba-fb396895d6d4",
    "origin": "curriculum",
    "name": "Seasons - עונות השנה",
@@ -2976,6 +3873,81 @@
     {
      "w": "rainbow",
      "d": "קשת - Colors in the sky after rain"
+    }
+   ]
+  },
+  {
+   "id": "4da188d7-0a31-557b-98fe-28aa08847f9c",
+   "origin": "curriculum",
+   "name": "4.º de primaria — La escuela y la comunidad",
+   "description": "Palabras sobre la vida en el aula, en el barrio y en la comunidad, junto con valores como el respeto y la convivencia.",
+   "language": "es",
+   "grade": 4,
+   "subject": "general",
+   "words": [
+    {
+     "w": "maestro",
+     "d": "Persona que enseña a los alumnos en la escuela"
+    },
+    {
+     "w": "alumno",
+     "d": "Persona que estudia en una escuela"
+    },
+    {
+     "w": "recreo",
+     "d": "El descanso entre clases para salir a jugar"
+    },
+    {
+     "w": "vecino",
+     "d": "Persona que vive cerca de ti, en tu misma calle o edificio"
+    },
+    {
+     "w": "ayuda",
+     "d": "Lo que haces para que a otra persona algo le resulte más fácil"
+    },
+    {
+     "w": "biblioteca",
+     "d": "Un lugar con muchísimos libros para leer allí o llevarlos prestados"
+    },
+    {
+     "w": "barrio",
+     "d": "Una parte de la ciudad con sus calles, casas y vecinos"
+    },
+    {
+     "w": "norma",
+     "d": "Algo que todos acordamos cumplir"
+    },
+    {
+     "w": "equipo",
+     "d": "Grupo de personas que trabajan o juegan juntas por la misma meta"
+    },
+    {
+     "w": "compartir",
+     "d": "Dejar que otros también usen o disfruten algo tuyo"
+    },
+    {
+     "w": "respeto",
+     "d": "Tratar a los demás como personas importantes: escucharlas y no ofenderlas"
+    },
+    {
+     "w": "amistad",
+     "d": "El lazo de cariño y confianza entre dos o más personas"
+    },
+    {
+     "w": "justo",
+     "d": "Que trata a todos por igual y da a cada uno lo que le corresponde"
+    },
+    {
+     "w": "voluntario",
+     "d": "Persona que ayuda a otros porque quiere, sin cobrar"
+    },
+    {
+     "w": "convivencia",
+     "d": "Vivir y estar juntos respetándose unos a otros"
+    },
+    {
+     "w": "colaborar",
+     "d": "Trabajar junto con otros para conseguir algo"
     }
    ]
   },
@@ -3439,6 +4411,156 @@
    ]
   },
   {
+   "id": "5c7dcf45-4d71-5413-a780-827cc4c213b2",
+   "origin": "curriculum",
+   "name": "小学6年 — 社会：日本の 歴史",
+   "description": "こふんから江戸時代、かいこくまで、6年社会の歴史学習に出てくることば。実在の人物や遺跡を使った正確な例文つき。",
+   "language": "ja",
+   "grade": 6,
+   "subject": "history",
+   "words": [
+    {
+     "w": "れきし",
+     "d": "むかしから 今までに おきた できごとの うつりかわり"
+    },
+    {
+     "w": "おしろ",
+     "d": "大名などが すんだ、石がきや 天守を もつ 大きな 建物"
+    },
+    {
+     "w": "さむらい",
+     "d": "むかし 刀を もち、とのさまに つかえて 戦った 人たち"
+    },
+    {
+     "w": "へいわ",
+     "d": "戦争が なく、おだやかに くらせる ようす"
+    },
+    {
+     "w": "せんそう",
+     "d": "国と 国などが 武器を もって 戦うこと"
+    },
+    {
+     "w": "ねんぴょう",
+     "d": "できごとを 年の じゅんに ならべた 表"
+    },
+    {
+     "w": "いせき",
+     "d": "むかしの 人の くらしの あとが のこっている 場所"
+    },
+    {
+     "w": "こふん",
+     "d": "むかしの 力の ある 人の ために、土を もり上げて つくった 大きな 墓"
+    },
+    {
+     "w": "はにわ",
+     "d": "古墳の まわりに ならべられた、土で つくった 人や 動物の 焼き物"
+    },
+    {
+     "w": "きぞく",
+     "d": "平安時代などに、天皇に つかえて 政治を おこなった 身分の 高い 人たち"
+    },
+    {
+     "w": "しょうぐん",
+     "d": "武士の かしらとして、幕府を ひらいて 国を おさめた 人"
+    },
+    {
+     "w": "だいみょう",
+     "d": "広い 領地を おさめ、多くの 家来を もった 武士"
+    },
+    {
+     "w": "ばくふ",
+     "d": "将軍が 中心と なって 政治を おこなった しくみ"
+    },
+    {
+     "w": "ぼうえき",
+     "d": "外国と 品物を 売ったり 買ったり すること"
+    },
+    {
+     "w": "さこく",
+     "d": "江戸時代に、外国との 行き来を きびしく 制限した 政策"
+    },
+    {
+     "w": "かいこく",
+     "d": "閉じていた 国を ひらき、外国と つきあいを はじめること"
+    }
+   ]
+  },
+  {
+   "id": "5da5b2c6-a9e3-583c-b2d7-9ec7a98a2074",
+   "origin": "curriculum",
+   "name": "中学3年 — 公民：民主主義と 人権",
+   "description": "選挙・憲法・三権分立など、中学公民の中心となる用語。高校入試にも出る基本語を、正確でわかりやすい説明で。",
+   "language": "ja",
+   "grade": 9,
+   "subject": "history",
+   "words": [
+    {
+     "w": "せんきょ",
+     "d": "代表者を 投票で えらぶこと"
+    },
+    {
+     "w": "ほうりつ",
+     "d": "国会で 決められた、国の きまり"
+    },
+    {
+     "w": "けんり",
+     "d": "だれもが 当然に もっている、してよいこと・してもらえること"
+    },
+    {
+     "w": "じゆう",
+     "d": "ほかの 人に しばられず、自分の 考えで 行動できること"
+    },
+    {
+     "w": "とうひょう",
+     "d": "選挙などで、えらびたい 人や 案を 紙に 書いて 出すこと"
+    },
+    {
+     "w": "けんぽう",
+     "d": "国の しくみや 国民の 権利を 定めた、いちばん 上の 法"
+    },
+    {
+     "w": "こっかい",
+     "d": "国民が 選挙で えらんだ 議員が、法律を つくる ところ"
+    },
+    {
+     "w": "ないかく",
+     "d": "総理大臣と 大臣たちで つくり、法律に したがって 国の 仕事を 進める 機関"
+    },
+    {
+     "w": "さいばんしょ",
+     "d": "争いや 犯罪について、法律に もとづいて 判断する ところ"
+    },
+    {
+     "w": "じんけん",
+     "d": "人が 生まれながらに もっている、人間らしく 生きる ための 権利"
+    },
+    {
+     "w": "びょうどう",
+     "d": "性別や 生まれに 関係なく、だれもが 同じように あつかわれること"
+    },
+    {
+     "w": "ぜいきん",
+     "d": "学校や 道路など、みんなの ための 仕事に 使うため、国や 市に おさめる お金"
+    },
+    {
+     "w": "たすうけつ",
+     "d": "いちばん 多くの 人が さんせいした 意見に 決める 方法"
+    },
+    {
+     "w": "せいとう",
+     "d": "政治に ついて 同じ 考えを もつ 人たちが つくる 団体"
+    },
+    {
+     "w": "ちほうじち",
+     "d": "住民が 自分たちの 地域の ことを、自分たちで 決めて 進める しくみ"
+    },
+    {
+     "w": "みんしゅしゅぎ",
+     "d": "国の ことを、国民が 話し合いと 選挙で 決める 考え方"
+    }
+   ]
+  },
+  {
    "id": "5e141001-57d1-4abf-82b2-a4bc9af21437",
    "origin": "curriculum",
    "name": "כיתה ב - מילים יומיומיות",
@@ -3836,77 +4958,6 @@
    ]
   },
   {
-   "id": "69049efd-78ab-4e94-80bd-31e85cdd877f",
-   "origin": "curriculum",
-   "name": "כיתה ג׳ — רגשות ותכונות",
-   "description": "מילות רגש ותכונות אופי לכיתה ג׳.",
-   "language": "he",
-   "grade": 3,
-   "subject": "hebrew",
-   "words": [
-    {
-     "w": "שמח",
-     "d": "מרגיש טוב ומלא חדווה"
-    },
-    {
-     "w": "עצוב",
-     "d": "מרגיש רע ולא טוב"
-    },
-    {
-     "w": "כועס",
-     "d": "מרגיש כעס ורוגז"
-    },
-    {
-     "w": "מפחד",
-     "d": "חושש ממשהו"
-    },
-    {
-     "w": "גאה",
-     "d": "מרוצה מעצמו או מאחר"
-    },
-    {
-     "w": "אמיץ",
-     "d": "לא נכנע לפחד ומתמודד"
-    },
-    {
-     "w": "נדיב",
-     "d": "אוהב לתת ולשתף"
-    },
-    {
-     "w": "סקרן",
-     "d": "רוצה לדעת ולגלות"
-    },
-    {
-     "w": "חרוץ",
-     "d": "עובד קשה ולא מתעצל"
-    },
-    {
-     "w": "ישר",
-     "d": "אומר אמת ולא משקר"
-    },
-    {
-     "w": "סבלני",
-     "d": "יודע לחכות ברוגע"
-    },
-    {
-     "w": "רגוע",
-     "d": "נינוח ולא לחוץ"
-    },
-    {
-     "w": "ביישן",
-     "d": "מתבייש לדבר מול אחרים"
-    },
-    {
-     "w": "נלהב",
-     "d": "מלא התלהבות ושמחה"
-    },
-    {
-     "w": "אכפתי",
-     "d": "דואג לאחרים"
-    }
-   ]
-  },
-  {
    "id": "692b2df8-cdf7-4dce-8f22-61070824675a",
    "origin": "curriculum",
    "name": "Grade 4 - Maps and Places",
@@ -4131,6 +5182,81 @@
    ]
   },
   {
+   "id": "6dc491c1-f915-527c-a748-a69c19c8f13f",
+   "origin": "curriculum",
+   "name": "כיתה ד׳ — בית הספר והקהילה",
+   "description": "מילים על החיים המשותפים בכיתה, בשכונה ובקהילה, יחד עם ערכים כמו אחריות וכבוד.",
+   "language": "he",
+   "grade": 4,
+   "subject": "general",
+   "words": [
+    {
+     "w": "מורה",
+     "d": "אדם שמלמד בכיתה ועוזר לתלמידים להבין"
+    },
+    {
+     "w": "תלמיד",
+     "d": "מי שלומד בבית ספר"
+    },
+    {
+     "w": "שיעור",
+     "d": "זמן קבוע שבו לומדים נושא אחד בכיתה"
+    },
+    {
+     "w": "חבר",
+     "d": "מישהו שאוהבים, סומכים עליו ונהנים להיות איתו"
+    },
+    {
+     "w": "שכן",
+     "d": "מי שגר קרוב אליך, בבית או בדירה סמוכה"
+    },
+    {
+     "w": "ספרייה",
+     "d": "מקום עם הרבה ספרים שאפשר לקרוא ולשאול הביתה"
+    },
+    {
+     "w": "שכונה",
+     "d": "חלק מהעיר עם רחובות, בתים ואנשים שגרים קרוב"
+    },
+    {
+     "w": "כלל",
+     "d": "הוראה שכולם מסכימים לפעול לפיה"
+    },
+    {
+     "w": "עזרה",
+     "d": "מה שנותנים למישהו כדי להקל עליו"
+    },
+    {
+     "w": "שיתוף",
+     "d": "לחלוק עם אחרים ולעבוד יחד"
+    },
+    {
+     "w": "כבוד",
+     "d": "יחס שמראה שאדם אחר חשוב לך, למשל להקשיב לו ולא להעליב"
+    },
+    {
+     "w": "קהילה",
+     "d": "קבוצת אנשים שגרים או פועלים יחד ודואגים זה לזה"
+    },
+    {
+     "w": "מתנדב",
+     "d": "מי שעוזר לאחרים מרצונו, בלי לקבל כסף"
+    },
+    {
+     "w": "אחריות",
+     "d": "לדאוג שמשהו ייעשה כמו שצריך, ולעמוד מאחורי מה שעשית"
+    },
+    {
+     "w": "הגינות",
+     "d": "התנהגות צודקת שבה כל אחד מקבל את מה שמגיע לו"
+    },
+    {
+     "w": "סובלנות",
+     "d": "קבלה של אנשים שחושבים או נראים אחרת ממך"
+    }
+   ]
+  },
+  {
    "id": "6e2c66e8-0cbc-4a53-b365-9ce2d73762d0",
    "origin": "curriculum",
    "name": "אוצר מילים - טכנולוגיה",
@@ -4351,6 +5477,85 @@
     {
      "w": "scientist",
      "d": "מדען - Studies and discovers"
+    }
+   ]
+  },
+  {
+   "id": "77a8c6bf-5d7f-5247-8a42-6f9713ee5436",
+   "origin": "curriculum",
+   "name": "Grade 4 — Feelings and Character",
+   "description": "Social-emotional vocabulary for naming feelings precisely and describing character traits in stories and in class.",
+   "language": "en",
+   "grade": 4,
+   "subject": "general",
+   "words": [
+    {
+     "w": "excited",
+     "d": "Very happy and eager about something that is going to happen"
+    },
+    {
+     "w": "nervous",
+     "d": "Worried or a little scared about something"
+    },
+    {
+     "w": "proud",
+     "d": "Feeling good about something you or someone close to you did well"
+    },
+    {
+     "w": "honest",
+     "d": "Always telling the truth and never cheating or stealing"
+    },
+    {
+     "w": "calm",
+     "d": "Peaceful and not upset or worried"
+    },
+    {
+     "w": "jealous",
+     "d": "Upset because someone has something you want"
+    },
+    {
+     "w": "lonely",
+     "d": "Sad because you are alone or feel that nobody is with you"
+    },
+    {
+     "w": "embarrassed",
+     "d": "Feeling silly or shy because others saw you make a mistake"
+    },
+    {
+     "w": "confident",
+     "d": "Sure that you can do something well"
+    },
+    {
+     "w": "generous",
+     "d": "Happy to give or share what you have with others"
+    },
+    {
+     "w": "grumpy",
+     "d": "In a bad mood and easily annoyed"
+    },
+    {
+     "w": "cheerful",
+     "d": "Happy, bright and full of good spirits"
+    },
+    {
+     "w": "respect",
+     "d": "Treating someone as important and caring about their feelings and ideas"
+    },
+    {
+     "w": "frustrated",
+     "d": "Annoyed and upset because something is not working the way you want"
+    },
+    {
+     "w": "responsible",
+     "d": "Doing what you are supposed to do, so others can count on you"
+    },
+    {
+     "w": "determined",
+     "d": "Not giving up, even when something is very hard"
+    },
+    {
+     "w": "empathy",
+     "d": "Understanding how someone else feels, as if you were in their place"
     }
    ]
   },
@@ -4681,6 +5886,85 @@
    ]
   },
   {
+   "id": "7efd3284-348c-50e0-bdc4-927f4b7a34a9",
+   "origin": "curriculum",
+   "name": "Grade 3 — Everyday Words",
+   "description": "High-use words for 8–9 year olds: home, school, friends and feelings. Each word has a kid-friendly definition and a sentence to read aloud.",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "apple",
+     "d": "A crunchy fruit with red, green or yellow skin that grows on trees"
+    },
+    {
+     "w": "book",
+     "d": "Pages with words or pictures, held together inside a cover, that you read"
+    },
+    {
+     "w": "cat",
+     "d": "A small furry pet with whiskers that purrs when it is happy"
+    },
+    {
+     "w": "dog",
+     "d": "A furry pet that barks, wags its tail and loves to fetch"
+    },
+    {
+     "w": "house",
+     "d": "A building where a family lives"
+    },
+    {
+     "w": "jump",
+     "d": "To push off the ground with your legs so your whole body goes up in the air"
+    },
+    {
+     "w": "eat",
+     "d": "To chew and swallow food"
+    },
+    {
+     "w": "friend",
+     "d": "Someone you like, trust and enjoy spending time with"
+    },
+    {
+     "w": "good",
+     "d": "Nice, helpful or done well; the opposite of bad"
+    },
+    {
+     "w": "happy",
+     "d": "Feeling glad, the way you feel when you smile or laugh"
+    },
+    {
+     "w": "kind",
+     "d": "Gentle and caring; acting in ways that help others feel good"
+    },
+    {
+     "w": "quiet",
+     "d": "Making little or no noise"
+    },
+    {
+     "w": "share",
+     "d": "To let someone else use or have part of something that is yours"
+    },
+    {
+     "w": "laugh",
+     "d": "To make happy sounds because something is funny"
+    },
+    {
+     "w": "brave",
+     "d": "Ready to do something scary or hard even when you feel afraid"
+    },
+    {
+     "w": "borrow",
+     "d": "To take something for a short time and then give it back"
+    },
+    {
+     "w": "careful",
+     "d": "Paying close attention so you do not make a mistake or get hurt"
+    }
+   ]
+  },
+  {
    "id": "7f268693-f187-4224-b76c-06b08d76fdfb",
    "origin": "curriculum",
    "name": "אוצר מילים - פירות וירקות",
@@ -4779,6 +6063,81 @@
     {
      "w": "friction",
      "d": "Force that slows moving objects"
+    }
+   ]
+  },
+  {
+   "id": "81130b71-ce57-54b0-9012-5a068a5a1b5b",
+   "origin": "curriculum",
+   "name": "3.º de primaria — Emociones y carácter",
+   "description": "Palabras para hablar de cómo nos sentimos y de cómo tratamos a los demás. Ideales para la asamblea de clase y la escritura personal.",
+   "language": "es",
+   "grade": 3,
+   "subject": "general",
+   "words": [
+    {
+     "w": "feliz",
+     "d": "Que se siente contento y con ganas de sonreír o reír"
+    },
+    {
+     "w": "triste",
+     "d": "Que siente pena y a veces tiene ganas de llorar"
+    },
+    {
+     "w": "asustado",
+     "d": "Que siente miedo porque cree que puede pasar algo malo"
+    },
+    {
+     "w": "amable",
+     "d": "Que trata a los demás con cariño y buenos modales"
+    },
+    {
+     "w": "tranquilo",
+     "d": "Que está en calma, sin nervios ni prisa"
+    },
+    {
+     "w": "orgulloso",
+     "d": "Que se siente contento por algo que hizo él mismo o alguien cercano"
+    },
+    {
+     "w": "valiente",
+     "d": "Que hace lo correcto aunque tenga miedo"
+    },
+    {
+     "w": "generoso",
+     "d": "Que le gusta dar y compartir con los demás"
+    },
+    {
+     "w": "curioso",
+     "d": "Que quiere saber, preguntar y descubrir cosas nuevas"
+    },
+    {
+     "w": "tímido",
+     "d": "Que le cuesta hablar con gente que no conoce"
+    },
+    {
+     "w": "honesto",
+     "d": "Que dice la verdad y no hace trampa"
+    },
+    {
+     "w": "paciente",
+     "d": "Que sabe esperar sin perder la calma"
+    },
+    {
+     "w": "nervioso",
+     "d": "Que está inquieto porque algo le preocupa o le emociona mucho"
+    },
+    {
+     "w": "sorprendido",
+     "d": "Que no se esperaba lo que acaba de pasar"
+    },
+    {
+     "w": "celoso",
+     "d": "Que teme perder el cariño o la atención de alguien"
+    },
+    {
+     "w": "agradecido",
+     "d": "Que siente gratitud y quiere dar las gracias por lo que recibió"
     }
    ]
   },
@@ -4905,6 +6264,85 @@
    ]
   },
   {
+   "id": "833bd841-26dc-559e-8c5a-6e83c0dc79f5",
+   "origin": "curriculum",
+   "name": "Secundaria (15-16 años) — Ciudadanía: democracia y derechos",
+   "description": "Conceptos centrales de educación cívica: elecciones, constitución, derechos y deberes, mayoría y minoría. Definiciones precisas para secundaria.",
+   "language": "es",
+   "grade": 10,
+   "subject": "history",
+   "words": [
+    {
+     "w": "ley",
+     "d": "Una norma que todas las personas de un país deben cumplir"
+    },
+    {
+     "w": "voto",
+     "d": "La forma en que cada persona elige una opción en unas elecciones"
+    },
+    {
+     "w": "deber",
+     "d": "Algo que tenemos que hacer porque lo manda la ley o la conciencia"
+    },
+    {
+     "w": "poder",
+     "d": "La capacidad de mandar y de tomar decisiones que afectan a otros"
+    },
+    {
+     "w": "democracia",
+     "d": "Sistema de gobierno en el que el pueblo elige a sus líderes en elecciones libres"
+    },
+    {
+     "w": "elecciones",
+     "d": "El proceso en que la ciudadanía vota para elegir a sus representantes"
+    },
+    {
+     "w": "ciudadano",
+     "d": "Persona que pertenece a un país y tiene en él derechos y obligaciones"
+    },
+    {
+     "w": "gobierno",
+     "d": "El grupo de personas que dirige un país y aplica las leyes"
+    },
+    {
+     "w": "constitución",
+     "d": "La ley más importante de un país, que fija sus reglas básicas y protege los derechos"
+    },
+    {
+     "w": "derecho",
+     "d": "Algo que le corresponde a toda persona, como la educación o la salud"
+    },
+    {
+     "w": "mayoría",
+     "d": "Más de la mitad de los votos o de las personas"
+    },
+    {
+     "w": "minoría",
+     "d": "Un grupo más pequeño dentro de una sociedad, o menos de la mitad de los votos"
+    },
+    {
+     "w": "libertad",
+     "d": "Poder pensar, hablar y actuar sin que nadie te lo impida injustamente"
+    },
+    {
+     "w": "parlamento",
+     "d": "La asamblea de representantes elegidos que debate y aprueba las leyes"
+    },
+    {
+     "w": "censura",
+     "d": "Cuando el poder prohíbe o borra textos, imágenes u opiniones"
+    },
+    {
+     "w": "corrupción",
+     "d": "Cuando alguien con poder recibe sobornos o hace trampas para su propio beneficio"
+    },
+    {
+     "w": "impuesto",
+     "d": "Dinero que la gente paga al Estado para costear escuelas, hospitales y carreteras"
+    }
+   ]
+  },
+  {
    "id": "838d9cb4-bad0-4d96-a077-8197f1fb258b",
    "origin": "curriculum",
    "name": "History - Israeli History היסטוריה ישראלית",
@@ -5003,6 +6441,81 @@
     {
      "w": "הוֹרִים",
      "d": "Parents - אמא ואבא"
+    }
+   ]
+  },
+  {
+   "id": "85e5da63-7e24-5134-8550-7becf3945f54",
+   "origin": "curriculum",
+   "name": "Grade 3 — Weather and Seasons",
+   "description": "Earth-science words for talking about the sky, storms and the four seasons, plus a few forecast words for the stretch tier.",
+   "language": "en",
+   "grade": 3,
+   "subject": "science",
+   "words": [
+    {
+     "w": "weather",
+     "d": "What the air outside is like right now: sunny, rainy, windy, hot or cold"
+    },
+    {
+     "w": "season",
+     "d": "One of the four parts of the year: spring, summer, fall and winter"
+    },
+    {
+     "w": "cloud",
+     "d": "A white or gray shape in the sky made of tiny drops of water"
+    },
+    {
+     "w": "rainbow",
+     "d": "An arch of colors in the sky when sunlight shines through raindrops"
+    },
+    {
+     "w": "puddle",
+     "d": "A small pool of water on the ground after it rains"
+    },
+    {
+     "w": "thunder",
+     "d": "The loud booming sound you hear after lightning flashes"
+    },
+    {
+     "w": "lightning",
+     "d": "A bright flash of electricity in the sky during a storm"
+    },
+    {
+     "w": "breeze",
+     "d": "A light, gentle wind"
+    },
+    {
+     "w": "freeze",
+     "d": "To turn hard and icy because it is very cold"
+    },
+    {
+     "w": "melt",
+     "d": "To turn from a solid into a liquid as it warms up"
+    },
+    {
+     "w": "autumn",
+     "d": "The season after summer, when leaves change color and drop; also called fall"
+    },
+    {
+     "w": "shiver",
+     "d": "To shake a little because you are cold or scared"
+    },
+    {
+     "w": "forecast",
+     "d": "A report that says what the weather will probably be like soon"
+    },
+    {
+     "w": "temperature",
+     "d": "How hot or cold something is, measured with a thermometer"
+    },
+    {
+     "w": "drought",
+     "d": "A long time with little or no rain, when the land becomes very dry"
+    },
+    {
+     "w": "humid",
+     "d": "Damp and sticky because there is a lot of water in the air"
     }
    ]
   },
@@ -5160,6 +6673,81 @@
    ]
   },
   {
+   "id": "8ea1698b-4232-5025-8551-1b3e702f3cd1",
+   "origin": "curriculum",
+   "name": "כיתה י׳ — אזרחות: מושגי יסוד",
+   "description": "המושגים שחוזרים בכל שיעור אזרחות: רוב ומיעוט, זכויות וחובות, רשויות השלטון והחוקה. הסברים מדויקים בשפה של תלמידי תיכון.",
+   "language": "he",
+   "grade": 10,
+   "subject": "history",
+   "words": [
+    {
+     "w": "רוב",
+     "d": "יותר ממחצית מהקולות או מהאנשים"
+    },
+    {
+     "w": "מיעוט",
+     "d": "קבוצה קטנה יותר בתוך חברה גדולה, או פחות ממחצית הקולות"
+    },
+    {
+     "w": "אזרח",
+     "d": "אדם ששייך רשמית למדינה, ויש לו בה זכויות וחובות"
+    },
+    {
+     "w": "חובה",
+     "d": "דבר שחייבים לעשות לפי החוק או לפי המצפון"
+    },
+    {
+     "w": "בחירות",
+     "d": "התהליך שבו אזרחים מצביעים ובוחרים את נציגיהם"
+    },
+    {
+     "w": "כנסת",
+     "d": "בית הנבחרים של מדינת ישראל, שבו מחוקקים חוקים"
+    },
+    {
+     "w": "ממשלה",
+     "d": "קבוצת השרים שמנהלת את המדינה ומבצעת את ההחלטות"
+    },
+    {
+     "w": "חוקה",
+     "d": "מסמך עליון שקובע את כללי היסוד של המדינה"
+    },
+    {
+     "w": "זכויות",
+     "d": "מה שמגיע לכל אדם, כמו חופש ביטוי וחינוך"
+    },
+    {
+     "w": "שלטון",
+     "d": "מי שמנהל את המדינה ומקבל החלטות בשמה"
+    },
+    {
+     "w": "סמכות",
+     "d": "הזכות והכוח הרשמי לקבל החלטות"
+    },
+    {
+     "w": "מחאה",
+     "d": "פעולה של אנשים שמביעים בפומבי שהם לא מסכימים"
+    },
+    {
+     "w": "דמוקרטיה",
+     "d": "שיטת שלטון שבה העם בוחר את מנהיגיו בבחירות חופשיות"
+    },
+    {
+     "w": "ריבונות",
+     "d": "השליטה המלאה של מדינה על השטח שלה ועל ההחלטות שלה"
+    },
+    {
+     "w": "חקיקה",
+     "d": "התהליך של כתיבת חוקים ואישורם"
+    },
+    {
+     "w": "ביקורת",
+     "d": "בדיקה של פעולות השלטון כדי לחשוף טעויות ולמנוע שחיתות"
+    }
+   ]
+  },
+  {
    "id": "91523134-f51e-4410-b22c-094dd66ea330",
    "origin": "curriculum",
    "name": "Wild Animals - חיות בר",
@@ -5258,6 +6846,160 @@
     {
      "w": "identify",
      "d": "לזהות - Recognize"
+    }
+   ]
+  },
+  {
+   "id": "9277323c-82fc-51cd-af38-a67d9a482485",
+   "origin": "curriculum",
+   "name": "Grade 5 — Words for Stories and Life",
+   "description": "Words 10–11 year olds meet in novels, class discussions and writing prompts, from adventure to opinion.",
+   "language": "en",
+   "grade": 5,
+   "subject": "english",
+   "words": [
+    {
+     "w": "beautiful",
+     "d": "Very lovely to look at or listen to"
+    },
+    {
+     "w": "favorite",
+     "d": "Liked the most, more than all the others"
+    },
+    {
+     "w": "important",
+     "d": "Mattering a lot; something you should pay attention to"
+    },
+    {
+     "w": "describe",
+     "d": "To tell what someone or something is like using words"
+    },
+    {
+     "w": "explore",
+     "d": "To travel around a place to find out what it is like"
+    },
+    {
+     "w": "adventure",
+     "d": "An exciting trip or experience full of new things, sometimes with a little danger"
+    },
+    {
+     "w": "celebrate",
+     "d": "To do something fun and special because of an important day or event"
+    },
+    {
+     "w": "discover",
+     "d": "To find or learn something for the first time"
+    },
+    {
+     "w": "grateful",
+     "d": "Feeling thankful when someone helps you or gives you something"
+    },
+    {
+     "w": "history",
+     "d": "The study of things that happened in the past"
+    },
+    {
+     "w": "journey",
+     "d": "A long trip from one place to another"
+    },
+    {
+     "w": "curious",
+     "d": "Wanting to know or learn about something"
+    },
+    {
+     "w": "environment",
+     "d": "The air, water, land, plants and animals around us that living things need"
+    },
+    {
+     "w": "challenge",
+     "d": "Something hard that tests how strong, smart or skillful you are"
+    },
+    {
+     "w": "opinion",
+     "d": "What you think or believe about something, which others may not agree with"
+    },
+    {
+     "w": "solution",
+     "d": "The answer to a problem or a way to fix it"
+    },
+    {
+     "w": "patient",
+     "d": "Able to wait calmly without getting upset"
+    }
+   ]
+  },
+  {
+   "id": "9376e0c5-3209-5f81-b5a8-7c729ee5147b",
+   "origin": "curriculum",
+   "name": "Secundaria (13-14 años) — Historia: de la Antigüedad a la Edad Moderna",
+   "description": "Palabras clave para estudiar Egipto, Roma, la Edad Media, las culturas mesoamericanas y la llegada de los europeos a América.",
+   "language": "es",
+   "grade": 8,
+   "subject": "history",
+   "words": [
+    {
+     "w": "rey",
+     "d": "El hombre que gobierna un reino, casi siempre porque heredó el trono"
+    },
+    {
+     "w": "guerra",
+     "d": "Lucha armada entre países o grupos"
+    },
+    {
+     "w": "paz",
+     "d": "Cuando no hay guerra y se convive sin violencia"
+    },
+    {
+     "w": "siglo",
+     "d": "Un período de cien años"
+    },
+    {
+     "w": "comercio",
+     "d": "Comprar, vender o intercambiar productos"
+    },
+    {
+     "w": "imperio",
+     "d": "Un estado muy grande que gobierna muchos territorios y pueblos"
+    },
+    {
+     "w": "castillo",
+     "d": "Una construcción fuerte, con murallas y torres, hecha para defenderse"
+    },
+    {
+     "w": "monasterio",
+     "d": "Un edificio donde viven monjes o monjas dedicados a su fe"
+    },
+    {
+     "w": "pirámide",
+     "d": "Una gran construcción de base cuadrada cuyos lados en triángulo se juntan arriba"
+    },
+    {
+     "w": "faraón",
+     "d": "El rey del antiguo Egipto"
+    },
+    {
+     "w": "colonia",
+     "d": "Un territorio gobernado por un país lejano"
+    },
+    {
+     "w": "tratado",
+     "d": "Un acuerdo escrito y firmado entre países"
+    },
+    {
+     "w": "civilización",
+     "d": "Una sociedad avanzada con ciudades, leyes, escritura y arte propios"
+    },
+    {
+     "w": "arqueología",
+     "d": "La ciencia que estudia el pasado a partir de restos antiguos, como ruinas y objetos"
+    },
+    {
+     "w": "revolución",
+     "d": "Un cambio rápido y profundo, por ejemplo cuando el pueblo derroca a un gobernante"
+    },
+    {
+     "w": "códice",
+     "d": "Un libro antiguo escrito o pintado a mano"
     }
    ]
   },
@@ -5364,6 +7106,81 @@
    ]
   },
   {
+   "id": "96d6761b-bb4c-519d-9169-849ffa39bf86",
+   "origin": "curriculum",
+   "name": "Grade 2 — Animals and Where They Live",
+   "description": "Life-science words for 7–8 year olds: animal homes, body coverings and how animals survive the seasons.",
+   "language": "en",
+   "grade": 2,
+   "subject": "science",
+   "words": [
+    {
+     "w": "nest",
+     "d": "A cozy home birds build from twigs, grass and mud to hold their eggs"
+    },
+    {
+     "w": "pond",
+     "d": "A small, still body of water, smaller than a lake"
+    },
+    {
+     "w": "forest",
+     "d": "A large area covered with many trees"
+    },
+    {
+     "w": "ocean",
+     "d": "The huge body of salt water that covers most of Earth"
+    },
+    {
+     "w": "fur",
+     "d": "The thick, soft hair that covers many animals"
+    },
+    {
+     "w": "burrow",
+     "d": "A hole or tunnel in the ground that an animal digs to live in"
+    },
+    {
+     "w": "desert",
+     "d": "A very dry place that gets almost no rain"
+    },
+    {
+     "w": "feathers",
+     "d": "The soft, light parts covering a bird's body that help it fly and stay warm"
+    },
+    {
+     "w": "scales",
+     "d": "Small, hard, flat pieces that cover the skin of fish and snakes"
+    },
+    {
+     "w": "herd",
+     "d": "A large group of animals, like cows or elephants, that live and move together"
+    },
+    {
+     "w": "tadpole",
+     "d": "A baby frog that lives in water and swims with its tail"
+    },
+    {
+     "w": "shelter",
+     "d": "A place that keeps you safe from bad weather or danger"
+    },
+    {
+     "w": "habitat",
+     "d": "The natural home where a plant or animal finds the food, water and shelter it needs"
+    },
+    {
+     "w": "hibernate",
+     "d": "To sleep deeply through the cold winter months"
+    },
+    {
+     "w": "prey",
+     "d": "An animal that is hunted and eaten by another animal"
+    },
+    {
+     "w": "migrate",
+     "d": "To travel far away when the seasons change, usually to find food or warmth"
+    }
+   ]
+  },
+  {
    "id": "9850763b-601b-46df-b6e5-db2c57d55311",
    "origin": "curriculum",
    "name": "אוצר מילים - הבית",
@@ -5411,6 +7228,81 @@
     {
      "w": "סָלוֹן",
      "d": "Living room - חדר לישיבה ביחד"
+    }
+   ]
+  },
+  {
+   "id": "9a1b453a-2cd9-581d-ac2a-b17c96aec60e",
+   "origin": "curriculum",
+   "name": "Grade 10 — Words for Building an Argument",
+   "description": "The vocabulary of debate, persuasive essays and source analysis for 15–16 year olds. Definitions are precise enough to grade against, and examples come from real classroom tasks.",
+   "language": "en",
+   "grade": 10,
+   "subject": "english",
+   "words": [
+    {
+     "w": "claim",
+     "d": "A statement that something is true, which you then have to back up with reasons and evidence"
+    },
+    {
+     "w": "reason",
+     "d": "An explanation of why something is true or why someone acts a certain way"
+    },
+    {
+     "w": "source",
+     "d": "A book, article, person or website that information comes from"
+    },
+    {
+     "w": "audience",
+     "d": "The people who will read, hear or watch what you create"
+    },
+    {
+     "w": "thesis",
+     "d": "The main point an essay sets out to prove, usually stated in the introduction"
+    },
+    {
+     "w": "persuade",
+     "d": "To get someone to believe or do something by giving them good reasons"
+    },
+    {
+     "w": "bias",
+     "d": "A one-sided leaning that stops a person or source from treating all sides fairly"
+    },
+    {
+     "w": "credible",
+     "d": "Trustworthy and believable, usually because of expertise or strong evidence"
+    },
+    {
+     "w": "logic",
+     "d": "Clear, step-by-step reasoning in which each idea follows from the one before"
+    },
+    {
+     "w": "valid",
+     "d": "Built on sound reasoning, so the conclusion really follows from the reasons"
+    },
+    {
+     "w": "objective",
+     "d": "Based on facts rather than personal feelings"
+    },
+    {
+     "w": "premise",
+     "d": "An idea that an argument accepts as true and builds on"
+    },
+    {
+     "w": "counterclaim",
+     "d": "An argument against your claim, which a strong essay names and then answers"
+    },
+    {
+     "w": "rebuttal",
+     "d": "A reply that shows why an opposing argument is wrong or weak"
+    },
+    {
+     "w": "fallacy",
+     "d": "A mistake in reasoning that makes an argument seem convincing when it is not"
+    },
+    {
+     "w": "concede",
+     "d": "To admit that part of the other side's argument is true"
     }
    ]
   },
@@ -5690,6 +7582,81 @@
    ]
   },
   {
+   "id": "a1227f8d-61f8-571a-b7c3-160a3a1d4191",
+   "origin": "curriculum",
+   "name": "小学3年 — 気もちを あらわす ことば",
+   "description": "うれしい・くやしい・ほこらしいなど、心のようすを言葉にする語。道徳や作文、帰りの会のふり返りに使えます。",
+   "language": "ja",
+   "grade": 3,
+   "subject": "general",
+   "words": [
+    {
+     "w": "うれしい",
+     "d": "よいことが あって、心が はずむような 気もち"
+    },
+    {
+     "w": "かなしい",
+     "d": "つらいことが あって、なみだが 出そうな 気もち"
+    },
+    {
+     "w": "たのしい",
+     "d": "おもしろくて、心が はずむ 気もち"
+    },
+    {
+     "w": "こわい",
+     "d": "よくないことが おこりそうで、にげたくなる 気もち"
+    },
+    {
+     "w": "げんき",
+     "d": "体の ちょうしが よく、力が いっぱい ある ようす"
+    },
+    {
+     "w": "やさしい",
+     "d": "人の 気もちを 思って、親切に する ようす"
+    },
+    {
+     "w": "しんぱい",
+     "d": "この先 よくないことが おきないか、気に なって おちつかないこと"
+    },
+    {
+     "w": "あんしん",
+     "d": "心配が なくなって、ほっと すること"
+    },
+    {
+     "w": "ゆうき",
+     "d": "こわくても、正しいことに 立ちむかう 強い 心"
+    },
+    {
+     "w": "がまん",
+     "d": "つらいことや ほしい 気もちを、じっと おさえること"
+    },
+    {
+     "w": "わくわく",
+     "d": "楽しみで、心が うきうき する ようす"
+    },
+    {
+     "w": "さびしい",
+     "d": "一人ぼっちで、だれかに そばに いてほしい 気もち"
+    },
+    {
+     "w": "くやしい",
+     "d": "負けたり うまく いかなかったりして、心から ざんねんに 思う 気もち"
+    },
+    {
+     "w": "はずかしい",
+     "d": "人に 見られて、顔が 赤くなるような 気もち"
+    },
+    {
+     "w": "おもいやり",
+     "d": "相手の 気もちを 考えて、親切に すること"
+    },
+    {
+     "w": "ほこらしい",
+     "d": "自分や なかまの したことを、むねを はって じまんしたい 気もち"
+    }
+   ]
+  },
+  {
    "id": "a229540a-d23c-46fd-8001-0c309491e503",
    "origin": "curriculum",
    "name": "כיתה ו - מילים אקדמיות",
@@ -5839,6 +7806,93 @@
     {
      "w": "intersection",
      "d": "Point where lines cross"
+    }
+   ]
+  },
+  {
+   "id": "a78fc7cd-80a3-5f60-8857-d4e5ea667101",
+   "origin": "curriculum",
+   "name": "Grade 3 — Words for Thinking and Learning",
+   "description": "The words 3rd graders hear in every lesson and see on worksheets: observe, explain, solve, revise and more.",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "idea",
+     "d": "A thought or plan that comes into your mind"
+    },
+    {
+     "w": "question",
+     "d": "Something you ask when you want to know or find out"
+    },
+    {
+     "w": "answer",
+     "d": "What you say or write back when someone asks you something"
+    },
+    {
+     "w": "choose",
+     "d": "To pick one thing from a group of things"
+    },
+    {
+     "w": "notice",
+     "d": "To see or hear something and pay attention to it"
+    },
+    {
+     "w": "remember",
+     "d": "To keep something in your mind or bring it back later"
+    },
+    {
+     "w": "explain",
+     "d": "To tell about something clearly so others understand it"
+    },
+    {
+     "w": "imagine",
+     "d": "To make a picture of something in your mind"
+    },
+    {
+     "w": "observe",
+     "d": "To watch something carefully to learn about it"
+    },
+    {
+     "w": "practice",
+     "d": "To do something again and again to get better at it"
+    },
+    {
+     "w": "problem",
+     "d": "Something hard or wrong that needs to be worked out or fixed"
+    },
+    {
+     "w": "detail",
+     "d": "A small fact or piece of information about something"
+    },
+    {
+     "w": "solve",
+     "d": "To find the answer or the way to fix something"
+    },
+    {
+     "w": "decide",
+     "d": "To make up your mind and choose what to do"
+    },
+    {
+     "w": "topic",
+     "d": "What a story, talk or piece of writing is mostly about"
+    },
+    {
+     "w": "research",
+     "d": "To look for facts in books or online to learn about something"
+    },
+    {
+     "w": "organize",
+     "d": "To put things neatly in order so they are easy to find"
+    },
+    {
+     "w": "paragraph",
+     "d": "A group of sentences about one main idea"
+    },
+    {
+     "w": "revise",
+     "d": "To change your writing to make it clearer or better"
     }
    ]
   },
@@ -6138,6 +8192,85 @@
    ]
   },
   {
+   "id": "b0de49cb-dc44-50a5-acc3-26293bcb1071",
+   "origin": "curriculum",
+   "name": "1.º de primaria — Mis primeras palabras",
+   "description": "Palabras cotidianas de la casa, la escuela y la familia para quienes empiezan a leer. Cada palabra trae una explicación sencilla y una frase corta para leer en voz alta.",
+   "language": "es",
+   "grade": 1,
+   "subject": "general",
+   "words": [
+    {
+     "w": "casa",
+     "d": "El lugar donde vive una familia"
+    },
+    {
+     "w": "gato",
+     "d": "Un animal de compañía suave, con bigotes, que ronronea y maúlla"
+    },
+    {
+     "w": "perro",
+     "d": "Un animal de compañía que ladra, mueve la cola y cuida la casa"
+    },
+    {
+     "w": "sol",
+     "d": "La estrella grande y caliente que nos da luz y calor de día"
+    },
+    {
+     "w": "pelota",
+     "d": "Un juguete redondo que se lanza, se patea o se hace rebotar"
+    },
+    {
+     "w": "libro",
+     "d": "Hojas con palabras o dibujos, unidas dentro de una tapa, que sirven para leer"
+    },
+    {
+     "w": "mamá",
+     "d": "Forma cariñosa de llamar a la madre"
+    },
+    {
+     "w": "papá",
+     "d": "Forma cariñosa de llamar al padre"
+    },
+    {
+     "w": "agua",
+     "d": "El líquido transparente que bebemos cuando tenemos sed"
+    },
+    {
+     "w": "pan",
+     "d": "Alimento horneado hecho con harina, con el que se preparan sándwiches"
+    },
+    {
+     "w": "manzana",
+     "d": "Una fruta crujiente de piel roja, verde o amarilla que crece en los árboles"
+    },
+    {
+     "w": "flor",
+     "d": "La parte de colores de una planta, que muchas veces huele bien"
+    },
+    {
+     "w": "silla",
+     "d": "Un mueble con patas y respaldo para sentarse"
+    },
+    {
+     "w": "luna",
+     "d": "La bola brillante que vemos en el cielo por la noche"
+    },
+    {
+     "w": "familia",
+     "d": "Personas unidas entre sí, como padres, hijos, hermanos y abuelos"
+    },
+    {
+     "w": "bebé",
+     "d": "Un niño muy pequeño que todavía no camina ni habla"
+    },
+    {
+     "w": "amigo",
+     "d": "Alguien que te cae bien, en quien confías y con quien te gusta estar"
+    }
+   ]
+  },
+  {
    "id": "b0f9eadc-bb45-4828-be65-c50e19e3c49d",
    "origin": "curriculum",
    "name": "Basic Clothes - בגדים בסיסיים",
@@ -6185,6 +8318,81 @@
     {
      "w": "jacket",
      "d": "ג׳קט - Light outer clothing"
+    }
+   ]
+  },
+  {
+   "id": "b1fa7aff-d227-59af-b217-a1258649c6c3",
+   "origin": "curriculum",
+   "name": "Åk 9 — Samhällskunskap: demokrati och rättigheter",
+   "description": "Centrala begrepp i samhällskunskap: val, grundlagar, rättigheter och skyldigheter, majoritet och minoritet. Exakta förklaringar för högstadiet.",
+   "language": "sv",
+   "grade": 9,
+   "subject": "history",
+   "words": [
+    {
+     "w": "val",
+     "d": "När medborgare röstar fram vilka som ska bestämma"
+    },
+    {
+     "w": "lag",
+     "d": "En regel som alla i ett land måste följa"
+    },
+    {
+     "w": "skatt",
+     "d": "Pengar som invånarna betalar till staten och kommunen för gemensamma saker"
+    },
+    {
+     "w": "medborgare",
+     "d": "En person som tillhör ett land och har rättigheter och skyldigheter där"
+    },
+    {
+     "w": "demokrati",
+     "d": "Ett styrelseskick där folket väljer sina ledare i fria val"
+    },
+    {
+     "w": "regering",
+     "d": "Statsministern och ministrarna som styr landet och genomför riksdagens beslut"
+    },
+    {
+     "w": "rösträtt",
+     "d": "Rätten att rösta i allmänna val"
+    },
+    {
+     "w": "grundlag",
+     "d": "En av de viktigaste lagarna, som bestämmer hur landet ska styras och skyddar våra friheter"
+    },
+    {
+     "w": "rättighet",
+     "d": "Något som varje människa har rätt till, till exempel att gå i skolan"
+    },
+    {
+     "w": "skyldighet",
+     "d": "Något som man måste göra enligt lag eller enligt ett löfte"
+    },
+    {
+     "w": "majoritet",
+     "d": "Fler än hälften av rösterna eller personerna"
+    },
+    {
+     "w": "minoritet",
+     "d": "En mindre grupp i ett samhälle, eller färre än hälften av rösterna"
+    },
+    {
+     "w": "kompromiss",
+     "d": "En lösning där båda sidor ger efter lite för att komma överens"
+    },
+    {
+     "w": "opinion",
+     "d": "Det som många människor tycker i en fråga"
+    },
+    {
+     "w": "censur",
+     "d": "När makthavare förbjuder eller stoppar texter, bilder eller åsikter"
+    },
+    {
+     "w": "korruption",
+     "d": "När någon med makt tar emot mutor eller fuskar för egen vinning"
     }
    ]
   },
@@ -6515,57 +8723,6 @@
    ]
   },
   {
-   "id": "ba494a5f-f3c9-4517-9a81-033a6f93360f",
-   "origin": "curriculum",
-   "name": "Grade 5 - Intermediate English Vocabulary",
-   "description": "Intermediate English vocabulary for 5th grade students",
-   "language": "en",
-   "grade": 5,
-   "subject": "english",
-   "words": [
-    {
-     "w": "adventure",
-     "d": "An exciting experience or journey"
-    },
-    {
-     "w": "beautiful",
-     "d": "Very pleasing to look at"
-    },
-    {
-     "w": "celebrate",
-     "d": "To do something special for an occasion"
-    },
-    {
-     "w": "discover",
-     "d": "To find something for the first time"
-    },
-    {
-     "w": "environment",
-     "d": "The natural world around us"
-    },
-    {
-     "w": "favorite",
-     "d": "The one you like best"
-    },
-    {
-     "w": "grateful",
-     "d": "Feeling thankful"
-    },
-    {
-     "w": "history",
-     "d": "Events that happened in the past"
-    },
-    {
-     "w": "important",
-     "d": "Having great value or meaning"
-    },
-    {
-     "w": "journey",
-     "d": "A trip from one place to another"
-    }
-   ]
-  },
-  {
    "id": "bae889a5-4dec-4e20-ac42-fa7d0e8d6eac",
    "origin": "curriculum",
    "name": "Grade 6 - World Geography",
@@ -6613,6 +8770,160 @@
     {
      "w": "migration",
      "d": "Movement of people to new places"
+    }
+   ]
+  },
+  {
+   "id": "bf90ff79-1281-584b-8e47-b183fb6b7d03",
+   "origin": "curriculum",
+   "name": "כיתה א׳ — מילים ראשונות",
+   "description": "מילים ראשונות מהבית, מהגן ומהמשפחה, לקוראים צעירים. לכל מילה הסבר פשוט ומשפט קצר להקראה בכיתה.",
+   "language": "he",
+   "grade": 1,
+   "subject": "hebrew",
+   "words": [
+    {
+     "w": "שמש",
+     "d": "הכוכב הגדול שמאיר ומחמם אותנו ביום"
+    },
+    {
+     "w": "ירח",
+     "d": "הכדור המאיר שרואים בשמיים בלילה"
+    },
+    {
+     "w": "בית",
+     "d": "המקום שבו גרים עם המשפחה"
+    },
+    {
+     "w": "ילד",
+     "d": "בן צעיר שעוד לא גדל להיות מבוגר"
+    },
+    {
+     "w": "ילדה",
+     "d": "בת צעירה שעוד לא גדלה להיות מבוגרת"
+    },
+    {
+     "w": "ספר",
+     "d": "דפים עם מילים או ציורים, כרוכים יחד, שקוראים בהם"
+    },
+    {
+     "w": "חתול",
+     "d": "חיית מחמד רכה עם שפם, שמגרגרת ואומרת מיאו"
+    },
+    {
+     "w": "כלב",
+     "d": "חיית מחמד שנובחת, מכשכשת בזנב ושומרת על הבית"
+    },
+    {
+     "w": "מים",
+     "d": "נוזל שקוף ששותים כשצמאים"
+    },
+    {
+     "w": "לחם",
+     "d": "מאכל שאופים מקמח, ומכינים ממנו כריכים"
+    },
+    {
+     "w": "אימא",
+     "d": "ההורה שהיא אישה"
+    },
+    {
+     "w": "אבא",
+     "d": "ההורה שהוא גבר"
+    },
+    {
+     "w": "כדור",
+     "d": "צעצוע עגול שזורקים, בועטים או מקפיצים"
+    },
+    {
+     "w": "פרח",
+     "d": "החלק הצבעוני והריחני של הצמח"
+    },
+    {
+     "w": "כיסא",
+     "d": "רהיט שיושבים עליו, עם רגליים ומשענת לגב"
+    },
+    {
+     "w": "משפחה",
+     "d": "אנשים שקשורים זה לזה, כמו הורים, ילדים, אחים וסבים"
+    },
+    {
+     "w": "תינוק",
+     "d": "ילד קטן מאוד שעוד לא הולך ולא מדבר"
+    }
+   ]
+  },
+  {
+   "id": "c1935937-c985-5523-ab5e-7eb3d83ac1d4",
+   "origin": "curriculum",
+   "name": "小学3年 — さんすうの ことば",
+   "description": "文章題を読むために必要な、計算・図形・はかり方のことば。説明には数を使った例がついています。",
+   "language": "ja",
+   "grade": 3,
+   "subject": "math",
+   "words": [
+    {
+     "w": "たしざん",
+     "d": "数と 数を あわせて、ぜんぶで いくつかを 出す 計算。れい：3+4=7"
+    },
+    {
+     "w": "ひきざん",
+     "d": "ある数から 数を とって、のこりを 出す 計算。れい：9−2=7"
+    },
+    {
+     "w": "すうじ",
+     "d": "数を あらわす 字。0から9まで ある"
+    },
+    {
+     "w": "とけい",
+     "d": "今の 時こくを しらせる きかい"
+    },
+    {
+     "w": "こたえ",
+     "d": "問題を といて 出た 数や ことば"
+    },
+    {
+     "w": "かけざん",
+     "d": "同じ数を 何回か たす 計算を、まとめて する 方法。れい：3×4=12"
+    },
+    {
+     "w": "けいさん",
+     "d": "数を たしたり ひいたりして、答えを 出すこと"
+    },
+    {
+     "w": "はんぶん",
+     "d": "二つに 同じ 大きさで 分けた うちの 一つ"
+    },
+    {
+     "w": "さんかく",
+     "d": "三本の まっすぐな 線で かこまれた 形"
+    },
+    {
+     "w": "しかく",
+     "d": "四本の まっすぐな 線で かこまれた 形"
+    },
+    {
+     "w": "ながさ",
+     "d": "はしから はしまで どれくらい 長いか ということ。センチメートルや メートルで あらわす"
+    },
+    {
+     "w": "おもさ",
+     "d": "物が どれくらい 重いか ということ。グラムや キログラムで あらわす"
+    },
+    {
+     "w": "ものさし",
+     "d": "長さを はかったり、まっすぐな 線を ひいたりする どうぐ"
+    },
+    {
+     "w": "わりざん",
+     "d": "ある数を 同じ数ずつ 分ける 計算。れい：12÷3=4"
+    },
+    {
+     "w": "ぶんすう",
+     "d": "1を 同じ 大きさに 分けた うちの いくつ分かを あらわす 数。れい：1/2"
+    },
+    {
+     "w": "しょうすう",
+     "d": "1より 小さい 数を、0.5の ように 点を つかって あらわした 数"
     }
    ]
   },
@@ -6719,57 +9030,6 @@
    ]
   },
   {
-   "id": "c872b12e-e437-4f4f-b591-9e480a4c22f8",
-   "origin": "curriculum",
-   "name": "Grade 7 - Academic English Vocabulary",
-   "description": "Academic vocabulary for 7th grade middle school students",
-   "language": "en",
-   "grade": 7,
-   "subject": "english",
-   "words": [
-    {
-     "w": "analyze",
-     "d": "To examine something in detail"
-    },
-    {
-     "w": "communicate",
-     "d": "To share information with others"
-    },
-    {
-     "w": "demonstrate",
-     "d": "To show how something works"
-    },
-    {
-     "w": "evaluate",
-     "d": "To judge the quality or value of something"
-    },
-    {
-     "w": "hypothesis",
-     "d": "An educated guess that can be tested"
-    },
-    {
-     "w": "investigate",
-     "d": "To examine and discover facts"
-    },
-    {
-     "w": "perspective",
-     "d": "A particular way of viewing things"
-    },
-    {
-     "w": "significant",
-     "d": "Important or notable"
-    },
-    {
-     "w": "summarize",
-     "d": "To give a brief statement of main points"
-    },
-    {
-     "w": "technology",
-     "d": "Tools and machines created by science"
-    }
-   ]
-  },
-  {
    "id": "c96318c9-74a3-4b4a-8902-6540f48bd926",
    "origin": "curriculum",
    "name": "Days of the Week - ימות השבוע",
@@ -6817,6 +9077,231 @@
     {
      "w": "yesterday",
      "d": "אתמול - The day before"
+    }
+   ]
+  },
+  {
+   "id": "c9dddcd0-276f-549d-a37e-0c8f14338daa",
+   "origin": "curriculum",
+   "name": "Åk 8 — Historia: från vikingatid till industrialisering",
+   "description": "Nyckelord för Sveriges historia från vikingatiden via stormaktstiden till emigrationen och industrins genombrott.",
+   "language": "sv",
+   "grade": 8,
+   "subject": "history",
+   "words": [
+    {
+     "w": "kung",
+     "d": "En man som styr ett land, ofta för att han har ärvt makten"
+    },
+    {
+     "w": "krig",
+     "d": "När länder eller grupper strider mot varandra med vapen"
+    },
+    {
+     "w": "fred",
+     "d": "När det inte är krig"
+    },
+    {
+     "w": "handel",
+     "d": "Att köpa, sälja eller byta varor"
+    },
+    {
+     "w": "bonde",
+     "d": "En person som odlar jorden och föder upp djur"
+    },
+    {
+     "w": "viking",
+     "d": "En person från Norden under vikingatiden, ungefär år 800–1050, som reste för att handla, plundra eller bosätta sig"
+    },
+    {
+     "w": "runsten",
+     "d": "En sten med inristade runor, ofta till minne av en död person"
+    },
+    {
+     "w": "kloster",
+     "d": "En plats där munkar eller nunnor bor och lever för sin tro"
+    },
+    {
+     "w": "adel",
+     "d": "Familjer som förr hade särskilda rättigheter och titlar, som greve eller friherre"
+    },
+    {
+     "w": "riksdag",
+     "d": "Sveriges folkvalda församling, som stiftar lagar"
+    },
+    {
+     "w": "fabrik",
+     "d": "En byggnad där varor tillverkas med maskiner"
+    },
+    {
+     "w": "industri",
+     "d": "Tillverkning av varor i stor skala med hjälp av maskiner"
+    },
+    {
+     "w": "stormakt",
+     "d": "Ett land med stor makt över andra länder"
+    },
+    {
+     "w": "reformation",
+     "d": "När kyrkan splittrades och protestantiska kyrkor bröt sig loss från påven i Rom"
+    },
+    {
+     "w": "emigration",
+     "d": "När människor lämnar sitt land för att bo i ett annat"
+    },
+    {
+     "w": "revolution",
+     "d": "En snabb och stor förändring, till exempel när folket störtar en härskare"
+    }
+   ]
+  },
+  {
+   "id": "ca54dc64-4836-5c0a-9db4-4a28908cb620",
+   "origin": "curriculum",
+   "name": "Åk 2 — Djur och natur",
+   "description": "Djur, väder och natur som barn möter i skogen och på skolgården — från älg och igelkott till regn och snö.",
+   "language": "sv",
+   "grade": 2,
+   "subject": "science",
+   "words": [
+    {
+     "w": "fågel",
+     "d": "Ett djur med fjädrar och vingar; de flesta kan flyga"
+    },
+    {
+     "w": "regn",
+     "d": "Vattendroppar som faller från molnen"
+    },
+    {
+     "w": "snö",
+     "d": "Vita, kalla flingor som faller när det är kallt ute"
+    },
+    {
+     "w": "moln",
+     "d": "En samling pyttesmå vattendroppar som svävar på himlen"
+    },
+    {
+     "w": "skog",
+     "d": "Ett stort område där det växer massor av träd"
+    },
+    {
+     "w": "sjö",
+     "d": "Mycket sött vatten som har land runt omkring sig på alla sidor"
+    },
+    {
+     "w": "älg",
+     "d": "Sveriges största vilda djur, med långa ben; hanen har stora horn"
+    },
+    {
+     "w": "räv",
+     "d": "Ett rödbrunt rovdjur med lång, yvig svans"
+    },
+    {
+     "w": "björn",
+     "d": "Ett stort, kraftigt rovdjur med päls som sover i ett ide hela vintern"
+    },
+    {
+     "w": "ekorre",
+     "d": "Ett litet djur med yvig svans som klättrar i träd och samlar kottar och nötter"
+    },
+    {
+     "w": "fjäril",
+     "d": "En insekt med färgglada vingar som först var en larv"
+    },
+    {
+     "w": "myra",
+     "d": "En liten, flitig insekt som bor i en stack tillsammans med tusentals andra"
+    },
+    {
+     "w": "hare",
+     "d": "Ett djur som liknar en kanin, med långa öron och starka bakben"
+    },
+    {
+     "w": "igelkott",
+     "d": "Ett litet djur med taggar på ryggen som rullar ihop sig till en boll när den känner sig hotad"
+    },
+    {
+     "w": "uggla",
+     "d": "En fågel med stora ögon som jagar på natten och kan vrida huvudet långt bakåt"
+    },
+    {
+     "w": "groda",
+     "d": "Ett litet djur som hoppar, kväker och lever nära vatten"
+    }
+   ]
+  },
+  {
+   "id": "cad72b5f-944a-513d-9cea-ae9f669f6e64",
+   "origin": "curriculum",
+   "name": "כיתה ה׳ — מדע: ניסויים וטבע",
+   "description": "מילות יסוד לשיעורי מדע וטכנולוגיה: צמחים, בעלי חיים, אנרגיה ושלבי הניסוי — מהשערה ועד מסקנה.",
+   "language": "he",
+   "grade": 5,
+   "subject": "science",
+   "words": [
+    {
+     "w": "צמח",
+     "d": "יצור חי שגדל באדמה, שותה מים ומשתמש באור השמש"
+    },
+    {
+     "w": "זרע",
+     "d": "החלק הקטן שממנו צומח צמח חדש"
+    },
+    {
+     "w": "שורש",
+     "d": "החלק של הצמח שמתחת לאדמה, שסופג מים"
+    },
+    {
+     "w": "חרק",
+     "d": "בעל חיים קטן עם שש רגליים, כמו נמלה או חיפושית"
+    },
+    {
+     "w": "מגנט",
+     "d": "חפץ שמושך אליו ברזל"
+    },
+    {
+     "w": "ניסוי",
+     "d": "בדיקה שעושים כדי לגלות אם רעיון נכון"
+    },
+    {
+     "w": "מעבדה",
+     "d": "חדר עם כלים מיוחדים שבו חוקרים ועושים ניסויים"
+    },
+    {
+     "w": "חשמל",
+     "d": "אנרגיה שזורמת בחוטים ומפעילה מנורות ומכשירים"
+    },
+    {
+     "w": "חמצן",
+     "d": "גז שנמצא באוויר ושאנחנו צריכים כדי לנשום"
+    },
+    {
+     "w": "יונק",
+     "d": "בעל חיים שהגורים שלו שותים חלב מגוף האם"
+    },
+    {
+     "w": "זוחל",
+     "d": "בעל חיים עם קשקשים ודם קר, כמו לטאה או נחש"
+    },
+    {
+     "w": "אנרגיה",
+     "d": "הכוח שמאפשר לדברים לזוז, לגדול, להאיר או להתחמם"
+    },
+    {
+     "w": "תצפית",
+     "d": "התבוננות זהירה ורישום של מה שרואים"
+    },
+    {
+     "w": "השערה",
+     "d": "ניחוש מנומק שבודקים בניסוי"
+    },
+    {
+     "w": "מסקנה",
+     "d": "מה שמבינים בסוף הניסוי לפי התוצאות"
+    },
+    {
+     "w": "אידוי",
+     "d": "מה שקורה כשמים מתחממים והופכים לאדים"
     }
    ]
   },
@@ -6919,77 +9404,6 @@
     {
      "w": "oven",
      "d": "תנור - Bake in it"
-    }
-   ]
-  },
-  {
-   "id": "cefadb37-2872-424f-9a53-54521debb4c8",
-   "origin": "curriculum",
-   "name": "כיתה א׳ — מילים ראשונות",
-   "description": "אוצר מילים בסיסי לכיתה א׳: עצמים, בעלי חיים ופעולות מהיומיום.",
-   "language": "he",
-   "grade": 1,
-   "subject": "hebrew",
-   "words": [
-    {
-     "w": "שמש",
-     "d": "הכוכב הגדול שמאיר ומחמם ביום"
-    },
-    {
-     "w": "ירח",
-     "d": "הגוף שמאיר בשמיים בלילה"
-    },
-    {
-     "w": "בית",
-     "d": "המקום שבו גרים"
-    },
-    {
-     "w": "ילד",
-     "d": "בן צעיר"
-    },
-    {
-     "w": "ילדה",
-     "d": "בת צעירה"
-    },
-    {
-     "w": "ספר",
-     "d": "דפים עם סיפור או מידע"
-    },
-    {
-     "w": "חתול",
-     "d": "חיה קטנה שאומרת מיאו"
-    },
-    {
-     "w": "כלב",
-     "d": "חיה שנובחת ושומרת על הבית"
-    },
-    {
-     "w": "מים",
-     "d": "נוזל שקוף ששותים"
-    },
-    {
-     "w": "לחם",
-     "d": "מאכל שאופים מקמח"
-    },
-    {
-     "w": "אמא",
-     "d": "ההורָה של הילד"
-    },
-    {
-     "w": "אבא",
-     "d": "ההורֶה של הילד"
-    },
-    {
-     "w": "כדור",
-     "d": "צעצוע עגול שמשחקים בו"
-    },
-    {
-     "w": "פרח",
-     "d": "צמח צבעוני וריחני"
-    },
-    {
-     "w": "עץ",
-     "d": "צמח גבוה עם גזע וענפים"
     }
    ]
   },
@@ -7289,6 +9703,160 @@
    ]
   },
   {
+   "id": "d1bc4621-6a1e-5b05-8135-a2394fbce5c4",
+   "origin": "curriculum",
+   "name": "כיתה ו׳ — ערכים ומילים מופשטות",
+   "description": "מושגים מופשטים לשיחה, לוויכוח ולכתיבה טיעונית. ההסברים קושרים כל ערך למעשה מוחשי.",
+   "language": "he",
+   "grade": 6,
+   "subject": "general",
+   "words": [
+    {
+     "w": "אמת",
+     "d": "מה שנכון ותואם למה שקרה, בלי שקר"
+    },
+    {
+     "w": "צדק",
+     "d": "מצב שבו כל אחד מקבל יחס הוגן"
+    },
+    {
+     "w": "תקווה",
+     "d": "אמונה שבעתיד יקרו דברים טובים"
+    },
+    {
+     "w": "חכמה",
+     "d": "ידע עמוק יחד עם היכולת להחליט נכון"
+    },
+    {
+     "w": "דמיון",
+     "d": "היכולת לראות בראש דברים שלא קיימים ולהמציא רעיונות חדשים"
+    },
+    {
+     "w": "שוויון",
+     "d": "מצב שבו לכל אדם יש אותן זכויות ואותן הזדמנויות"
+    },
+    {
+     "w": "חירות",
+     "d": "חופש לבחור ולפעול בלי שאיש ישעבד אותך"
+    },
+    {
+     "w": "סקרנות",
+     "d": "רצון חזק לדעת, לשאול ולחקור"
+    },
+    {
+     "w": "התמדה",
+     "d": "להמשיך להתאמץ גם כשקשה, עד שמצליחים"
+    },
+    {
+     "w": "אחדות",
+     "d": "תחושה שכולם ביחד, למרות ההבדלים"
+    },
+    {
+     "w": "השראה",
+     "d": "רעיון או הרגשה שגורמים לך לרצות ליצור או לפעול"
+    },
+    {
+     "w": "אמפתיה",
+     "d": "היכולת להרגיש ולהבין מה מישהו אחר מרגיש"
+    },
+    {
+     "w": "יושרה",
+     "d": "לעמוד מאחורי האמת והערכים שלך גם כשאף אחד לא רואה"
+    },
+    {
+     "w": "מסירות",
+     "d": "נאמנות ומאמץ גדול למען מישהו או למען מטרה"
+    },
+    {
+     "w": "הוקרה",
+     "d": "הבעת תודה והערכה על מה שמישהו עשה"
+    },
+    {
+     "w": "נחישות",
+     "d": "החלטה חזקה לא לוותר עד שמגיעים למטרה"
+    }
+   ]
+  },
+  {
+   "id": "d235acda-f9c3-51db-8c5c-1a55558f5f4e",
+   "origin": "curriculum",
+   "name": "3.º de primaria — Palabras de matemáticas",
+   "description": "Las palabras que hacen falta para entender un problema escrito: operaciones, figuras y medidas. Cada explicación lleva un ejemplo con números.",
+   "language": "es",
+   "grade": 3,
+   "subject": "math",
+   "words": [
+    {
+     "w": "número",
+     "d": "Un signo o una palabra que dice cuántos hay, por ejemplo 7 o 25"
+    },
+    {
+     "w": "sumar",
+     "d": "Juntar cantidades para saber cuántas hay en total, por ejemplo 3 + 4"
+    },
+    {
+     "w": "restar",
+     "d": "Quitar una cantidad de otra, por ejemplo 9 − 2"
+    },
+    {
+     "w": "reloj",
+     "d": "Un aparato con agujas o con números que nos dice en qué momento del día estamos"
+    },
+    {
+     "w": "regla",
+     "d": "Una tira recta con marcas para medir y trazar líneas"
+    },
+    {
+     "w": "metro",
+     "d": "Una unidad de longitud que equivale a cien centímetros"
+    },
+    {
+     "w": "mitad",
+     "d": "Cada una de las dos partes iguales en que se divide algo"
+    },
+    {
+     "w": "doble",
+     "d": "Dos veces una cantidad"
+    },
+    {
+     "w": "triángulo",
+     "d": "Una figura con tres lados y tres esquinas"
+    },
+    {
+     "w": "cuadrado",
+     "d": "Una figura con cuatro lados iguales y cuatro esquinas rectas"
+    },
+    {
+     "w": "rectángulo",
+     "d": "Una figura con cuatro esquinas rectas, dos lados largos y dos cortos"
+    },
+    {
+     "w": "círculo",
+     "d": "Una figura totalmente redonda, sin esquinas"
+    },
+    {
+     "w": "suma",
+     "d": "La operación de juntar números, o el resultado de juntarlos"
+    },
+    {
+     "w": "resta",
+     "d": "La operación de quitar un número a otro, o lo que queda después"
+    },
+    {
+     "w": "multiplicar",
+     "d": "Sumar el mismo número varias veces, por ejemplo 3 × 4 = 3 + 3 + 3 + 3"
+    },
+    {
+     "w": "dividir",
+     "d": "Repartir una cantidad en partes iguales, por ejemplo 12 ÷ 3"
+    },
+    {
+     "w": "fracción",
+     "d": "Una parte de un entero, como un medio o un cuarto"
+    }
+   ]
+  },
+  {
    "id": "d2a3579c-5eae-4055-8ad4-f583a50e78fe",
    "origin": "curriculum",
    "name": "School Basics - בית ספר בסיסי",
@@ -7391,6 +9959,81 @@
    ]
   },
   {
+   "id": "d5bab4b7-d52b-5d66-a803-660525b97388",
+   "origin": "curriculum",
+   "name": "כיתה ג׳ — מילים בחשבון",
+   "description": "המילים שילדים צריכים כדי לקרוא שאלה מילולית: פעולות, צורות ומדידה. כל הסבר מגיע עם דוגמה במספרים.",
+   "language": "he",
+   "grade": 3,
+   "subject": "math",
+   "words": [
+    {
+     "w": "מספר",
+     "d": "סימן שמראה כמה יש, למשל 5 או 12"
+    },
+    {
+     "w": "חיבור",
+     "d": "פעולה שבה מצרפים מספרים יחד, למשל 3+4"
+    },
+    {
+     "w": "חיסור",
+     "d": "פעולה שבה מורידים מספר אחד ממספר אחר, למשל 9-2"
+    },
+    {
+     "w": "שעון",
+     "d": "מכשיר שמראה מה השעה"
+    },
+    {
+     "w": "סרגל",
+     "d": "פס ישר עם סימנים, שמודדים בו אורך ומותחים קווים"
+    },
+    {
+     "w": "כפל",
+     "d": "חיבור של אותו מספר כמה פעמים, למשל 3×4"
+    },
+    {
+     "w": "חילוק",
+     "d": "פעולה שבה מחלקים כמות לחלקים שווים, למשל 12:3"
+    },
+    {
+     "w": "משולש",
+     "d": "צורה עם שלוש צלעות ושלוש פינות"
+    },
+    {
+     "w": "ריבוע",
+     "d": "צורה עם ארבע צלעות שוות וארבע פינות ישרות"
+    },
+    {
+     "w": "מלבן",
+     "d": "צורה עם ארבע פינות ישרות: שתי צלעות ארוכות ושתיים קצרות"
+    },
+    {
+     "w": "עיגול",
+     "d": "צורה עגולה בלי פינות, כמו גלגל"
+    },
+    {
+     "w": "סכום",
+     "d": "התוצאה שמקבלים אחרי חיבור"
+    },
+    {
+     "w": "מטר",
+     "d": "יחידה למדידת אורך: מאה סנטימטרים"
+    },
+    {
+     "w": "שבר",
+     "d": "חלק משלם, למשל חצי או רבע"
+    },
+    {
+     "w": "הפרש",
+     "d": "התוצאה שמקבלים אחרי חיסור: בכמה מספר אחד גדול מהשני"
+    },
+    {
+     "w": "מכפלה",
+     "d": "התוצאה שמקבלים אחרי כפל"
+    }
+   ]
+  },
+  {
    "id": "d5e18210-40bd-4161-862c-0ae7fbfa13c2",
    "origin": "curriculum",
    "name": "Science - Earth & Space כדור הארץ והחלל",
@@ -7438,6 +10081,81 @@
     {
      "w": "atmosphere",
      "d": "אטמוספירה - Air around Earth"
+    }
+   ]
+  },
+  {
+   "id": "d84d90ca-fdfe-5715-8938-e1d635bbcdea",
+   "origin": "curriculum",
+   "name": "Åk 6 — Geografi: Sveriges natur och kartan",
+   "description": "Begrepp för att läsa en karta och beskriva Sveriges natur, med exempel från fjällen, skärgården och Skåneslätten.",
+   "language": "sv",
+   "grade": 6,
+   "subject": "geography",
+   "words": [
+    {
+     "w": "karta",
+     "d": "En bild av ett område sett uppifrån, med vägar, städer och gränser"
+    },
+    {
+     "w": "norr",
+     "d": "Väderstrecket som kompassnålen pekar mot"
+    },
+    {
+     "w": "söder",
+     "d": "Väderstrecket som är motsatt till norr"
+    },
+    {
+     "w": "hav",
+     "d": "Ett enormt stort område med salt vatten"
+    },
+    {
+     "w": "kust",
+     "d": "Där land möter hav"
+    },
+    {
+     "w": "fjäll",
+     "d": "Höga berg, ofta utan träd, som finns i norra och västra Sverige"
+    },
+    {
+     "w": "älv",
+     "d": "En stor flod som rinner från fjällen ut i havet"
+    },
+    {
+     "w": "slätt",
+     "d": "Ett stort och platt landområde utan berg"
+    },
+    {
+     "w": "halvö",
+     "d": "Land som är omgivet av vatten på tre sidor"
+    },
+    {
+     "w": "skärgård",
+     "d": "Ett område med massor av små öar och skär längs kusten"
+    },
+    {
+     "w": "gräns",
+     "d": "Linjen som skiljer ett land eller område från ett annat"
+    },
+    {
+     "w": "kompass",
+     "d": "Ett instrument med en nål som visar åt vilket håll norr ligger"
+    },
+    {
+     "w": "klimat",
+     "d": "Hur vädret brukar vara i ett område under många år"
+    },
+    {
+     "w": "kontinent",
+     "d": "En av jordens stora landmassor, till exempel Europa eller Afrika"
+    },
+    {
+     "w": "landskap",
+     "d": "En av Sveriges 25 gamla landsdelar, som Skåne eller Lappland"
+    },
+    {
+     "w": "befolkning",
+     "d": "Alla människor som bor på en plats"
     }
    ]
   },
@@ -7591,6 +10309,235 @@
     {
      "w": "isotope",
      "d": "Atom with different neutron count"
+    }
+   ]
+  },
+  {
+   "id": "dd1f4327-21d3-5b40-ae76-cd6574647de0",
+   "origin": "curriculum",
+   "name": "כיתה ג׳ — אנגלית: מילים מבית הספר",
+   "description": "מילים באנגלית לתלמידים דוברי עברית: הגדרה בעברית ומשפט לדוגמה באנגלית. משחקים על לוח באנגלית.",
+   "language": "en",
+   "grade": 3,
+   "subject": "english",
+   "words": [
+    {
+     "w": "school",
+     "d": "בית ספר — המקום שבו לומדים עם מורים וחברים לכיתה"
+    },
+    {
+     "w": "teacher",
+     "d": "מורה — האדם שמלמד אותנו בכיתה"
+    },
+    {
+     "w": "pencil",
+     "d": "עיפרון — כלי כתיבה שאפשר למחוק את מה שכותבים בו"
+    },
+    {
+     "w": "family",
+     "d": "משפחה — ההורים, האחים והאחיות, הסבים והסבתות"
+    },
+    {
+     "w": "water",
+     "d": "מים — הנוזל השקוף שאנחנו שותים כשאנחנו צמאים"
+    },
+    {
+     "w": "play",
+     "d": "לשחק — לעשות משהו בשביל הכיף, למשל משחק או ספורט"
+    },
+    {
+     "w": "student",
+     "d": "תלמיד או תלמידה — מי שלומד בבית הספר"
+    },
+    {
+     "w": "notebook",
+     "d": "מחברת — דפים כרוכים יחד שכותבים בהם"
+    },
+    {
+     "w": "food",
+     "d": "אוכל — מה שאוכלים כדי לגדול ולקבל כוח"
+    },
+    {
+     "w": "read",
+     "d": "לקרוא — להסתכל על מילים כתובות ולהבין אותן"
+    },
+    {
+     "w": "write",
+     "d": "לכתוב — לרשום אותיות ומילים על דף או במחשב"
+    },
+    {
+     "w": "ruler",
+     "d": "סרגל — כלי ישר למדידה ולציור קווים"
+    },
+    {
+     "w": "lunch",
+     "d": "ארוחת צהריים — הארוחה שאוכלים באמצע היום"
+    },
+    {
+     "w": "eraser",
+     "d": "מחק — חפץ קטן שמוחק סימני עיפרון"
+    },
+    {
+     "w": "homework",
+     "d": "שיעורי בית — משימות שעושים בבית אחרי הלימודים"
+    },
+    {
+     "w": "classroom",
+     "d": "כיתה — החדר שבו לומדים"
+    }
+   ]
+  },
+  {
+   "id": "ddf6b9ae-4d6e-5d69-908c-33a31aab40c1",
+   "origin": "curriculum",
+   "name": "Åk 3 — Matteord",
+   "description": "Orden eleverna behöver för att läsa en textuppgift: räknesätt, former och mätning. Förklaringarna har exempel med siffror.",
+   "language": "sv",
+   "grade": 3,
+   "subject": "math",
+   "words": [
+    {
+     "w": "tal",
+     "d": "Ett värde som visar hur många eller hur mycket, till exempel 7 eller 25"
+    },
+    {
+     "w": "siffra",
+     "d": "Ett av tecknen 0 till 9 som man skriver tal med"
+    },
+    {
+     "w": "plus",
+     "d": "Tecknet + som betyder att man lägger ihop"
+    },
+    {
+     "w": "minus",
+     "d": "Tecknet − som betyder att man tar bort"
+    },
+    {
+     "w": "klocka",
+     "d": "En sak som visar vad tiden är"
+    },
+    {
+     "w": "linjal",
+     "d": "En rak list med streck som man mäter längd och drar raka linjer med"
+    },
+    {
+     "w": "meter",
+     "d": "En längdenhet som är lika lång som hundra centimeter"
+    },
+    {
+     "w": "hälften",
+     "d": "En av två lika stora delar"
+    },
+    {
+     "w": "dubbelt",
+     "d": "Två gånger så mycket"
+    },
+    {
+     "w": "triangel",
+     "d": "En form med tre sidor och tre hörn"
+    },
+    {
+     "w": "kvadrat",
+     "d": "En form med fyra lika långa sidor och fyra räta hörn"
+    },
+    {
+     "w": "rektangel",
+     "d": "En form med fyra räta hörn, där två sidor är långa och två är korta"
+    },
+    {
+     "w": "cirkel",
+     "d": "En helt rund form utan hörn"
+    },
+    {
+     "w": "addera",
+     "d": "Att räkna plus, alltså lägga ihop tal"
+    },
+    {
+     "w": "summa",
+     "d": "Svaret man får när man lägger ihop tal"
+    },
+    {
+     "w": "differens",
+     "d": "Svaret man får när man tar bort ett tal från ett annat"
+    },
+    {
+     "w": "subtrahera",
+     "d": "Att räkna minus, alltså ta bort ett tal från ett annat"
+    }
+   ]
+  },
+  {
+   "id": "dec377a4-9251-5724-a905-22bf84a4461c",
+   "origin": "curriculum",
+   "name": "5.º de primaria — Ciencias: seres vivos y experimentos",
+   "description": "Vocabulario básico de ciencias naturales: plantas, animales, energía y los pasos de un experimento, de la hipótesis a la conclusión.",
+   "language": "es",
+   "grade": 5,
+   "subject": "science",
+   "words": [
+    {
+     "w": "planta",
+     "d": "Un ser vivo que crece en la tierra y necesita agua y luz"
+    },
+    {
+     "w": "semilla",
+     "d": "La parte pequeña de la que nace una planta nueva"
+    },
+    {
+     "w": "raíz",
+     "d": "La parte de la planta que está bajo tierra y absorbe el agua"
+    },
+    {
+     "w": "insecto",
+     "d": "Un animal pequeño de seis patas, como la hormiga o el escarabajo"
+    },
+    {
+     "w": "imán",
+     "d": "Un objeto que atrae el hierro"
+    },
+    {
+     "w": "oxígeno",
+     "d": "Un gas del aire que necesitamos para respirar"
+    },
+    {
+     "w": "energía",
+     "d": "Lo que permite que las cosas se muevan, crezcan, den luz o se calienten"
+    },
+    {
+     "w": "experimento",
+     "d": "Una prueba que se hace para averiguar si una idea es cierta"
+    },
+    {
+     "w": "mamífero",
+     "d": "Un animal cuyas crías toman leche de su madre"
+    },
+    {
+     "w": "reptil",
+     "d": "Un animal de piel con escamas y sangre fría, como el lagarto o la serpiente"
+    },
+    {
+     "w": "laboratorio",
+     "d": "Una sala con instrumentos especiales donde se investiga y se hacen pruebas"
+    },
+    {
+     "w": "evaporación",
+     "d": "Cuando el agua se calienta y se convierte en vapor"
+    },
+    {
+     "w": "hipótesis",
+     "d": "Una suposición razonada que se pone a prueba con un experimento"
+    },
+    {
+     "w": "observación",
+     "d": "Mirar algo con atención y anotar lo que se ve"
+    },
+    {
+     "w": "conclusión",
+     "d": "Lo que se entiende al final de un experimento a partir de los resultados"
+    },
+    {
+     "w": "fotosíntesis",
+     "d": "Proceso con el que las plantas fabrican su alimento usando luz, agua y dióxido de carbono"
     }
    ]
   },
@@ -7768,6 +10715,85 @@
    ]
   },
   {
+   "id": "e330e9fb-4149-590d-b544-c5d25cde2b60",
+   "origin": "curriculum",
+   "name": "2.º de primaria — Animales y naturaleza",
+   "description": "Animales, tiempo y paisajes que los niños ven en el parque, en el campo y en la excursión: del búho y la ardilla a la lluvia y la nieve.",
+   "language": "es",
+   "grade": 2,
+   "subject": "science",
+   "words": [
+    {
+     "w": "pájaro",
+     "d": "Un animal con plumas y alas; casi todos pueden volar"
+    },
+    {
+     "w": "lluvia",
+     "d": "Gotas de agua que caen de las nubes"
+    },
+    {
+     "w": "nube",
+     "d": "Un montón blanco o gris de gotitas de agua que flota en el cielo"
+    },
+    {
+     "w": "nieve",
+     "d": "Copos blancos y fríos que caen del cielo cuando hace mucho frío"
+    },
+    {
+     "w": "árbol",
+     "d": "Una planta alta con tronco, ramas y hojas"
+    },
+    {
+     "w": "viento",
+     "d": "Aire que se mueve y empuja las hojas, las nubes y los barcos de vela"
+    },
+    {
+     "w": "bosque",
+     "d": "Un lugar grande con muchísimos árboles"
+    },
+    {
+     "w": "río",
+     "d": "Agua dulce que corre sin parar hasta el mar o hasta un lago"
+    },
+    {
+     "w": "mariposa",
+     "d": "Un insecto de alas de colores que antes fue oruga"
+    },
+    {
+     "w": "hormiga",
+     "d": "Un insecto pequeño y trabajador que vive en un hormiguero con muchísimas otras"
+    },
+    {
+     "w": "abeja",
+     "d": "Un insecto que zumba, recoge néctar de las flores y produce miel"
+    },
+    {
+     "w": "conejo",
+     "d": "Un animal peludo de orejas largas que salta muy rápido"
+    },
+    {
+     "w": "león",
+     "d": "Un felino salvaje, grande y fuerte; el macho tiene melena"
+    },
+    {
+     "w": "rana",
+     "d": "Un animal pequeño que salta, croa y vive cerca del agua"
+    },
+    {
+     "w": "tortuga",
+     "d": "Un animal lento que lleva un caparazón duro en la espalda"
+    },
+    {
+     "w": "ardilla",
+     "d": "Un animal pequeño de cola peluda que trepa a los árboles y guarda nueces"
+    },
+    {
+     "w": "búho",
+     "d": "Un ave de ojos grandes que caza de noche y puede girar mucho la cabeza"
+    }
+   ]
+  },
+  {
    "id": "e34a514e-f561-4b20-b01c-a53b879cb68a",
    "origin": "curriculum",
    "name": "Grade 3 - Nature and Animals",
@@ -7815,6 +10841,85 @@
     {
      "w": "forest",
      "d": "Area with many trees"
+    }
+   ]
+  },
+  {
+   "id": "e6828e76-7456-5074-873e-af01ce4ee6be",
+   "origin": "curriculum",
+   "name": "小学1年 — はじめての ことば",
+   "description": "家や学校、家族の身近なことば。ゲームの盤面と同じひらがなで、1年生が読めるわかち書きの例文つき。",
+   "language": "ja",
+   "grade": 1,
+   "subject": "general",
+   "words": [
+    {
+     "w": "たいよう",
+     "d": "ひるま そらで あかるく かがやいて、ちきゅうを あたためる おおきな ほし"
+    },
+    {
+     "w": "うさぎ",
+     "d": "ながい みみと ふわふわの けを もち、ぴょんぴょん はねる どうぶつ"
+    },
+    {
+     "w": "さかな",
+     "d": "みずの なかに すみ、ひれを うごかして およぐ いきもの"
+    },
+    {
+     "w": "りんご",
+     "d": "あかい かわで、かむと しゃきっと する あまずっぱい くだもの"
+    },
+    {
+     "w": "たまご",
+     "d": "にわとりなどが うむ、からに つつまれた まるい もの"
+    },
+    {
+     "w": "くるま",
+     "d": "エンジンで うごき、みちを はしって ひとや にもつを はこぶ のりもの"
+    },
+    {
+     "w": "つくえ",
+     "d": "べんきょうや しごとを する ときに つかう だい"
+    },
+    {
+     "w": "かばん",
+     "d": "きょうかしょや ものを いれて もちはこぶ いれもの"
+    },
+    {
+     "w": "えんぴつ",
+     "d": "しんが はいって いて、じや えを かく どうぐ"
+    },
+    {
+     "w": "がっこう",
+     "d": "こどもたちが あつまって べんきょうする ところ"
+    },
+    {
+     "w": "ともだち",
+     "d": "なかよしで、いっしょに あそんだり はなしたり する ひと"
+    },
+    {
+     "w": "おかあさん",
+     "d": "ははおやを ていねいに よぶ ことば"
+    },
+    {
+     "w": "おとうさん",
+     "d": "ちちおやを ていねいに よぶ ことば"
+    },
+    {
+     "w": "かぞく",
+     "d": "いっしょに くらす おやや きょうだいなどの あつまり"
+    },
+    {
+     "w": "でんしゃ",
+     "d": "せんろの うえを でんきの ちからで はしる のりもの"
+    },
+    {
+     "w": "ひこうき",
+     "d": "つばさが あり、そらを とんで とおくへ いく のりもの"
+    },
+    {
+     "w": "あかちゃん",
+     "d": "うまれて まもない、とても ちいさい こども"
     }
    ]
   },
@@ -7917,6 +11022,81 @@
     {
      "w": "לִשְׂחוֹת",
      "d": "To swim - לנוע במים"
+    }
+   ]
+  },
+  {
+   "id": "e8466add-1099-52a8-b87e-d94e3eeca6cd",
+   "origin": "curriculum",
+   "name": "Grade 8 — Government and Citizenship",
+   "description": "Civics vocabulary for how laws are made, how leaders are chosen and what rights and duties citizens share.",
+   "language": "en",
+   "grade": 8,
+   "subject": "history",
+   "words": [
+    {
+     "w": "citizen",
+     "d": "A person who legally belongs to a country and has its rights and duties"
+    },
+    {
+     "w": "vote",
+     "d": "To make an official choice, for example by marking a ballot"
+    },
+    {
+     "w": "election",
+     "d": "An organized event where people cast ballots to choose leaders"
+    },
+    {
+     "w": "law",
+     "d": "A rule made by a government that everyone must follow"
+    },
+    {
+     "w": "freedom",
+     "d": "Being able to act, speak and think without being controlled by others"
+    },
+    {
+     "w": "democracy",
+     "d": "A system of government in which people choose their leaders by voting"
+    },
+    {
+     "w": "rights",
+     "d": "Freedoms and protections that every person should have"
+    },
+    {
+     "w": "justice",
+     "d": "Fair treatment for everyone, especially under the law"
+    },
+    {
+     "w": "debate",
+     "d": "A discussion in which people give reasons for different sides of an issue"
+    },
+    {
+     "w": "tax",
+     "d": "Money people and businesses pay to the government to fund things like schools and roads"
+    },
+    {
+     "w": "candidate",
+     "d": "A person who is trying to be chosen in an election"
+    },
+    {
+     "w": "protest",
+     "d": "To show publicly that you strongly disagree with something"
+    },
+    {
+     "w": "constitution",
+     "d": "The written set of basic laws that explains how a country is governed"
+    },
+    {
+     "w": "legislature",
+     "d": "The group of elected people who make the laws for a country or state"
+    },
+    {
+     "w": "amendment",
+     "d": "An official change or addition to a law or a constitution"
+    },
+    {
+     "w": "veto",
+     "d": "The power of a leader to reject a law that lawmakers have passed"
     }
    ]
   },
@@ -8125,53 +11305,77 @@
    ]
   },
   {
-   "id": "f441462d-0f8a-41fc-9fdd-9c6ca6e31771",
+   "id": "f5aa56bf-ce63-58eb-82ff-e60056227ebb",
    "origin": "curriculum",
-   "name": "כיתה ג - אוצר מילים בסיסי",
-   "description": "אוצר מילים בסיסי באנגלית לתלמידי כיתה ג",
-   "language": "he",
+   "name": "Åk 3 — Känslor och egenskaper",
+   "description": "Ord för att prata om hur man mår och hur man är mot andra. Passar värdegrundsarbete och elevernas egna berättelser.",
+   "language": "sv",
    "grade": 3,
-   "subject": "english",
+   "subject": "general",
    "words": [
     {
-     "w": "school",
-     "d": "בית ספר - מקום שבו לומדים"
+     "w": "glad",
+     "d": "Man känner sig lycklig och vill le eller skratta"
     },
     {
-     "w": "teacher",
-     "d": "מורה - אדם שמלמד"
+     "w": "ledsen",
+     "d": "Man känner sig tung i hjärtat och vill kanske gråta"
     },
     {
-     "w": "student",
-     "d": "תלמיד - אדם שלומד"
+     "w": "arg",
+     "d": "Man känner sig upprörd när något känns orättvist"
     },
     {
-     "w": "pencil",
-     "d": "עיפרון - כלי לכתיבה"
+     "w": "rädd",
+     "d": "Man känner att något farligt eller otäckt kan hända"
     },
     {
-     "w": "notebook",
-     "d": "מחברת - דפים לכתיבה"
+     "w": "lugn",
+     "d": "Stilla och avslappnad, inte stressad"
     },
     {
-     "w": "family",
-     "d": "משפחה - אנשים קרובים"
+     "w": "snäll",
+     "d": "Vänlig och omtänksam mot andra"
     },
     {
-     "w": "water",
-     "d": "מים - נוזל שאנחנו שותים"
+     "w": "stolt",
+     "d": "Man känner sig nöjd över något man själv eller någon nära har gjort"
     },
     {
-     "w": "food",
-     "d": "אוכל - דברים שאנחנו אוכלים"
+     "w": "modig",
+     "d": "Man vågar göra det rätta fast det känns läskigt"
     },
     {
-     "w": "play",
-     "d": "לשחק - לעשות משחקים"
+     "w": "nyfiken",
+     "d": "Man vill veta mer, fråga och upptäcka nya saker"
     },
     {
-     "w": "read",
-     "d": "לקרוא - להבין טקסט כתוב"
+     "w": "blyg",
+     "d": "Man tycker att det är jobbigt att prata med människor man inte känner"
+    },
+    {
+     "w": "generös",
+     "d": "Man tycker om att ge och dela med sig"
+    },
+    {
+     "w": "tacksam",
+     "d": "Man känner sig glad över något man fått och vill säga tack"
+    },
+    {
+     "w": "orolig",
+     "d": "Man tänker mycket på att något dåligt kan hända"
+    },
+    {
+     "w": "förvånad",
+     "d": "Man blir överraskad av något man inte väntat sig"
+    },
+    {
+     "w": "besviken",
+     "d": "Man känner sig nere när något man hoppats på inte blir av"
+    },
+    {
+     "w": "avundsjuk",
+     "d": "Man önskar att man hade det som någon annan har"
     }
    ]
   },
@@ -8478,6 +11682,81 @@
     {
      "w": "application",
      "d": "אפליקציה - Computer program"
+    }
+   ]
+  },
+  {
+   "id": "fd932570-d3ee-5363-8117-3c18911a4508",
+   "origin": "curriculum",
+   "name": "Åk 4 — Skolan och samhället",
+   "description": "Ord om livet i klassrummet, i kvarteret och i kommunen, tillsammans med värden som ansvar och respekt.",
+   "language": "sv",
+   "grade": 4,
+   "subject": "general",
+   "words": [
+    {
+     "w": "lärare",
+     "d": "En person som undervisar elever"
+    },
+    {
+     "w": "elev",
+     "d": "En person som går i skolan"
+    },
+    {
+     "w": "rast",
+     "d": "En paus mellan lektionerna när man går ut och leker"
+    },
+    {
+     "w": "läxa",
+     "d": "Uppgifter som man gör hemma efter skolan"
+    },
+    {
+     "w": "granne",
+     "d": "Någon som bor nära dig, i huset eller lägenheten bredvid"
+    },
+    {
+     "w": "klassrum",
+     "d": "Rummet där en klass har sina lektioner"
+    },
+    {
+     "w": "bibliotek",
+     "d": "Ett ställe med massor av böcker som man kan läsa och låna hem"
+    },
+    {
+     "w": "regel",
+     "d": "Något som alla har kommit överens om att följa"
+    },
+    {
+     "w": "hjälp",
+     "d": "Det man gör för att göra det lättare för någon annan"
+    },
+    {
+     "w": "vänskap",
+     "d": "Bandet mellan människor som tycker om och litar på varandra"
+    },
+    {
+     "w": "respekt",
+     "d": "Att visa att andra människor är viktiga, till exempel genom att lyssna och inte kränka"
+    },
+    {
+     "w": "kommun",
+     "d": "Ett område med egen ledning som sköter till exempel skolor, bibliotek och sophämtning"
+    },
+    {
+     "w": "ansvar",
+     "d": "Att se till att något blir gjort på rätt sätt och stå för det man gör"
+    },
+    {
+     "w": "frivillig",
+     "d": "Någon som hjälper till av egen vilja, utan att få betalt"
+    },
+    {
+     "w": "samarbete",
+     "d": "Att jobba tillsammans mot samma mål"
+    },
+    {
+     "w": "rättvis",
+     "d": "Att behandla alla lika och ge alla det de har rätt till"
     }
    ]
   },
