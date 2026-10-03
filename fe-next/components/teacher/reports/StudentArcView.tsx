@@ -2,7 +2,7 @@
  * StudentArcView — the free per-student learning arc (reports drill-down).
  *
  * What a teacher gets here that the printable report cannot give: the TIME
- * axis. Accuracy per asked session as a sparkline, each word's outcome
+ * axis. Accuracy per asked session as a dated chart against the 80% goal, each word's outcome
  * history as dots, and trend language that is firm but never scary — a word
  * is "needs a re-teach", not "failed". The error-correction loop closes
  * in-product: missed words already re-queue in the student's own Missed Words
@@ -20,6 +20,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentArc } from '@/hooks/useStudentArc';
 import type { WordTrajectory, WordTrend } from '@/lib/education/wordMasteryTrend';
 import { cn } from '@/lib/utils';
+import { ArcChart, shortDate } from './ArcChart';
+import { StudentPracticeAction } from './StudentPracticeAction';
+import { CLASS_GOAL } from './classInsights';
 
 export interface StudentArcViewProps {
   studentId: string;
@@ -39,7 +42,7 @@ const TREND_CHIP: Record<WordTrend, string> = {
 const MAX_DOTS = 8;
 
 export function StudentArcView({ studentId, classroomId, studentName }: StudentArcViewProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { arc, isLoading, error } = useStudentArc({ classroomId, studentId });
 
   const words = useMemo(
@@ -48,6 +51,10 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
         (a, b) => TREND_ORDER[a.trend] - TREND_ORDER[b.trend] || a.display.localeCompare(b.display)
       ),
     [arc]
+  );
+  const practiceWords = useMemo(
+    () => words.filter((w) => w.trend !== 'mastered' && w.correct < w.attempts).map((w) => w.display),
+    [words]
   );
 
   if (isLoading) {
@@ -102,8 +109,11 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
               {t('teacher.reports.arc.growth', { first, last })}
             </p>
           </div>
-          <ArcSparkline
-            points={points.map((p) => p.accuracy)}
+          <ArcChart
+            points={points}
+            goal={CLASS_GOAL}
+            language={language}
+            goalLabel={t('eg2Polish.arc.goal', { goal: CLASS_GOAL })}
             label={t('teacher.reports.arc.sparklineLabel', { count: points.length, first, last })}
           />
         </div>
@@ -118,9 +128,13 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
         </p>
       )}
 
+      <div className="mb-4">
+        <StudentPracticeAction classroomId={classroomId} studentName={studentName ?? ''} words={practiceWords} />
+      </div>
+
       <ul className="divide-y divide-neo-cream/15">
         {words.map((word) => (
-          <WordRow key={word.word} word={word} t={t} />
+          <WordRow key={word.word} word={word} t={t} language={language} />
         ))}
       </ul>
     </section>
@@ -142,42 +156,23 @@ function ArcHeader({ t, name }: { t: T; name?: string }) {
   );
 }
 
-/** Accuracy-per-session sparkline. Static SVG — no motion on a calm deck. */
-function ArcSparkline({ points, label }: { points: number[]; label: string }) {
-  // Charts stay LTR in every locale: time runs left→right on purpose.
-  const W = 300;
-  const H = 64;
-  const PAD = 6;
-  const x = (i: number) =>
-    points.length === 1 ? W / 2 : PAD + (i / (points.length - 1)) * (W - PAD * 2);
-  const y = (v: number) => H - PAD - (Math.max(0, Math.min(100, v)) / 100) * (H - PAD * 2);
-  const line = points.map((v, i) => `${x(i)},${y(v)}`).join(' ');
-
-  return (
-    <svg
-      data-testid="student-arc-sparkline"
-      role="img"
-      aria-label={label}
-      viewBox={`0 0 ${W} ${H}`}
-      className="h-16 w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy"
-      preserveAspectRatio="none"
-    >
-      {points.length > 1 && (
-        <polyline points={line} fill="none" stroke="var(--color-neo-lime, #BFFF00)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-      )}
-      {points.map((v, i) => (
-        <circle key={i} cx={x(i)} cy={y(v)} r="4" fill={v >= 50 ? 'var(--color-neo-lime, #BFFF00)' : 'var(--color-neo-pink, #FF1493)'} stroke="#1a1a2e" strokeWidth="1.5" />
-      ))}
-    </svg>
-  );
-}
-
-function WordRow({ word, t }: { word: WordTrajectory; t: T }) {
+function WordRow({ word, t, language }: { word: WordTrajectory; t: T; language: string }) {
   const dots = word.outcomes.slice(-MAX_DOTS);
   return (
     <li data-testid="student-arc-word" className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5">
-      <span className="min-w-0 flex-1 break-words font-bold text-neo-white" dir="auto">
-        {word.display}
+      <span className="min-w-0 flex-1 basis-32">
+        <span className="block break-words font-bold text-neo-white" dir="auto">
+          {word.display}
+        </span>
+        <span className="block text-xs font-bold text-neo-cream/70">
+          {t('eg2Polish.arc.word.attempts', { count: word.attempts, correct: word.correct })}
+          {' · '}
+          <span className={word.lastCorrect ? 'text-neo-lime' : 'text-neo-pink'}>
+            {t(word.lastCorrect ? 'eg2Polish.arc.word.lastCorrect' : 'eg2Polish.arc.word.lastMissed')}
+          </span>
+          {' · '}
+          <time dateTime={word.lastSeen}>{shortDate(word.lastSeen, language)}</time>
+        </span>
       </span>
       <span
         role="img"

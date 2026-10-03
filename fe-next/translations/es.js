@@ -94,6 +94,55 @@ const es = {
     }
   },
   // @eg2Fix:end
+  // @eg2Polish:start
+  "eg2Polish": {
+    "arc": {
+      "goal": "Meta {goal} %",
+      "word": {
+        "attempts": "Bien {correct} de {count}",
+        "lastCorrect": "última vez: bien",
+        "lastMissed": "última vez: fallada"
+      },
+      "practice": {
+        "cta": "Practicar estas palabras para {name} ({count})",
+        "hint": "Tres rondas cortas de repaso: mañana, en 3 días y en 7 días. Las ve toda la clase.",
+        "proHint": "Asignar rondas de repaso es parte de Teacher Pro.",
+        "roundName": "Repaso para {name}: ronda {n} ({date})",
+        "done": "Listo: {count} palabras para {name}, en tres rondas de repaso.",
+        "already": "Estas rondas de repaso ya se asignaron hoy.",
+        "nothing": "No quedan palabras falladas que practicar con este alumno."
+      }
+    },
+    "words": {
+      "missRate": "{pct} % fallado"
+    },
+    "classes": {
+      "rosterTitle": "Alumnos de un vistazo",
+      "status": {
+        "below": "Bajo la meta · {pct} %",
+        "onTrack": "Va bien · {pct} %",
+        "notYet": "Aún no ha jugado",
+        "played": "Ya jugó"
+      },
+      "openReport": "Abrir informe de la clase",
+      "moreInReport": "+{count} más en el informe de la clase"
+    },
+    "pack": {
+      "noStudents": "Los enlaces para familias necesitan alumnos. Comparte el código de la clase; cuando se unan, sus enlaces se crean aquí."
+    },
+    "plans": {
+      "freeNote": "Sin tarjeta y sin límite de tiempo. Gratis siempre para los alumnos.",
+      "freeIncluded": "Todo esto está incluido en tu plan Pro."
+    },
+    "library": {
+      "notAssigned": "No asignar todavía"
+    },
+    "header": {
+      "brand": "LexiClash",
+      "section": "Educación"
+    }
+  },
+  // @eg2Polish:end
   // @eg2Seo:start
   "eg2Seo": {
     "rail": {
@@ -15315,7 +15364,7 @@ const es = {
       "studentDashboard": "Mi panel",
       "subtitle": "Aprende jugando",
       "teacherDashboard": "Mi panel",
-      "title": "LexiClash Education"
+      "title": "LexiClash Educación"
     },
     "home": {
       "badge_teacher": "Profesor",
@@ -15339,8 +15388,8 @@ const es = {
         "comparisonAlt": "Comparación entre el plan Gratis y Teacher Pro",
         "freeTier": "Gratis",
         "perMonth": "/mes",
-        "classLimit": "Hasta {count} clase",
-        "studentLimit": "Hasta {count} estudiantes en ella",
+        "classLimit": "Hasta {count} clases",
+        "studentLimit": "Hasta {count} estudiantes en cada una",
         "noAds": "Sin anuncios para tus estudiantes",
         "customLists": "Tus propias listas de palabras",
         "duels": "Duelos de palabras en vivo",
@@ -19544,7 +19593,7 @@ const es = {
       "missedOf": "falló {missed} de {attempts}",
       "studentsMissing": "{count} de {total} alumnos",
       "noneMissed": "Nadie ha fallado una palabra dos veces todavía. ¡Bien!",
-      "empty": "Juega un quiz de vocabulario o una ronda de Wordcraft con esta clase: el dominio aparece tras la primera partida.",
+      "empty": "El dominio se mide con las palabras de tus listas. Juega un quiz de vocabulario, una ronda de Wordcraft o una partida en vivo con una de tus listas y se completará después.",
       "loading": "Cargando dominio de palabras…",
       "error": "No pudimos cargar el dominio de palabras. Recarga para intentarlo de nuevo.",
       "heatmapToggle": "Mapa de calor: alumno × palabra",

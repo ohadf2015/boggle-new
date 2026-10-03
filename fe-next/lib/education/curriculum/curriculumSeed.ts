@@ -6,6 +6,10 @@ import type { CurriculumSubject, GradeLevel, Language, VocabularyLevel } from '@
 
 export const CURRICULUM_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 export type CurriculumLocale = (typeof CURRICULUM_LOCALES)[number];
+/** Extra seed files that add lists to a locale through their own migration. */
+export const CURRICULUM_SUPPLEMENTS = ['en-grade3'] as const;
+export type CurriculumSeedName = CurriculumLocale | (typeof CURRICULUM_SUPPLEMENTS)[number];
+export const CURRICULUM_SEEDS: readonly CurriculumSeedName[] = [...CURRICULUM_LOCALES, ...CURRICULUM_SUPPLEMENTS];
 
 export interface CurriculumSeedWord {
   word: string;
@@ -29,6 +33,8 @@ export interface CurriculumSeedList {
 
 export interface CurriculumSeedFile {
   language: CurriculumLocale;
+  /** Data file name when it differs from the language, e.g. a supplement. */
+  source?: string;
   migration: string;
   lists: CurriculumSeedList[];
 }
@@ -48,8 +54,8 @@ export function curriculumListId(code: string): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-export function loadCurriculumSeed(lang: CurriculumLocale): CurriculumSeedFile {
-  return JSON.parse(fs.readFileSync(path.join(DATA_DIR, `${lang}.json`), 'utf8')) as CurriculumSeedFile;
+export function loadCurriculumSeed(name: CurriculumSeedName): CurriculumSeedFile {
+  return JSON.parse(fs.readFileSync(path.join(DATA_DIR, `${name}.json`), 'utf8')) as CurriculumSeedFile;
 }
 
 export function migrationPath(seed: CurriculumSeedFile): string {
@@ -87,7 +93,7 @@ export function buildCurriculumMigration(seed: CurriculumSeedFile): string {
   const replaced = seed.lists.flatMap((l) => l.replaces ?? []);
   const out = [
     `-- Curriculum word lists v2 (${seed.language}): kid-level definitions, one example sentence and a`,
-    '-- support/core/challenge tier per word. GENERATED from lib/education/curriculum/data/' + `${seed.language}.json`,
+    '-- support/core/challenge tier per word. GENERATED from lib/education/curriculum/data/' + `${seed.source ?? seed.language}.json`,
     '-- by scripts/curriculum/build-curriculum-migrations.ts; edit the JSON, not this file.',
     '-- Every word is checked against public/dicts/<lang>.dict.gz by curriculumContent.test.ts.',
     '-- Fixed ids + ON CONFLICT make it safe to re-run. Replaced lists are deactivated, not deleted.',

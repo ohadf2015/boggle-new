@@ -27,14 +27,14 @@ export const TEACHER_PRO_CHECKOUT_PATH = '/teacher/upgrade';
 
 const LRI = '⁦';
 const PDI = '⁩';
-/** Left-to-right isolate: keeps "$9" and "Teacher Pro" whole inside RTL sentences. */
+/** Left-to-right isolate: keeps "$9" whole inside RTL sentences. */
 const ltr = (s: string) => `${LRI}${s}${PDI}`;
-const PRO = ltr('Teacher Pro');
+const PRO_HE = 'פרו למורים';
 
 // First-paint fallback only: the locale-root landing ships a partial catalogue without eg2Pro.*.
 const UPGRADE_CTA: Record<string, string> = {
   en: 'Upgrade to Teacher Pro',
-  he: `שדרגו ל-${PRO}`,
+  he: `שדרגו ל${PRO_HE}`,
   es: 'Mejora a Teacher Pro',
   sv: 'Uppgradera till Teacher Pro',
   ja: 'Teacher Proにアップグレード',
@@ -53,9 +53,9 @@ const COPY: Record<string, TeacherProCheckoutCopy> = {
     note: 'Cancel anytime · Free plan stays free',
   },
   he: {
-    heading: `${PRO} — {price} לחודש`,
+    heading: `${PRO_HE} — {price} לחודש`,
     body: 'כיתות ללא הגבלה, אנליטיקה ודוחות להדפסה. התוכנית החינמית נשארת: {classes} כיתות × {students} תלמידים.',
-    cta: `התחלת ${PRO} — {price} לחודש`,
+    cta: `התחלת ${PRO_HE} — {price} לחודש`,
     note: 'ביטול בכל עת · התוכנית החינמית נשארת חינמית',
   },
   es: {

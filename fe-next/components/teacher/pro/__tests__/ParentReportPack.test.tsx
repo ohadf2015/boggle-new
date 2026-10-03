@@ -32,6 +32,28 @@ describe('ParentReportPack — every parent link for a class in one click', () =
   });
   afterEach(() => vi.unstubAllGlobals());
 
+  it('offers only classes that have students, so an empty class name never fills the pick list', async () => {
+    getClassrooms.mockResolvedValue({
+      data: [
+        { id: 'empty', name: 'EG2 QA class', member_count: 0 },
+        { id: CLASS_ID, name: '4B', member_count: 2 },
+      ],
+      error: null,
+    });
+    render(<ParentReportPack />);
+    const select = await screen.findByRole('combobox');
+    expect(select).toHaveValue(CLASS_ID);
+    expect(screen.queryByText(/EG2 QA class/)).toBeNull();
+  });
+
+  it('with no students anywhere, says how to get them in instead of listing empty classes', async () => {
+    getClassrooms.mockResolvedValue({ data: [{ id: 'empty', name: 'EG2 QA class', member_count: 0 }], error: null });
+    render(<ParentReportPack />);
+    expect(await screen.findByTestId('parent-pack-no-students')).toHaveTextContent('eg2Polish.pack.noStudents');
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByText(/EG2 QA class/)).toBeNull();
+  });
+
   it('mints links for the chosen class and lists every student', async () => {
     fetchMock.mockResolvedValue({
       ok: true,

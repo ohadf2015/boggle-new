@@ -43,8 +43,8 @@ export function AccessRequestGate() {
     return <div aria-hidden="true" className="h-40 animate-pulse rounded-neo bg-neo-navy/40" />;
   }
 
-  // Not signed up / signed in yet.
-  if (!user) {
+  // Not signed up / signed in yet. An anonymous arcade session has no email to verify.
+  if (!user || user.is_anonymous || !user.email) {
     return (
       <div className="text-neo-white">
         <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">

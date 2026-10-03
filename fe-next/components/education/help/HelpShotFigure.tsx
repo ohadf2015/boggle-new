@@ -1,19 +1,21 @@
 import Image from 'next/image';
-import { HELP_SHOTS, type HelpShotId } from './shots';
+import { helpShot, type HelpShotId } from './shots';
 
 export function HelpShotFigure({
   id,
+  locale,
   alt,
   caption,
   priority = false,
 }: {
   id: HelpShotId;
+  locale: string;
   alt: string;
   caption?: string;
   priority?: boolean;
 }) {
-  const shot = HELP_SHOTS[id];
-  const phone = 'phone' in shot && shot.phone;
+  const shot = helpShot(id, locale);
+  const phone = shot.phone;
   return (
     <figure className={phone ? 'mx-auto max-w-[300px]' : 'w-full'}>
       <div className="overflow-hidden rounded-neo border-4 border-neo-cream/50 bg-neo-navy-light shadow-hard-lg">

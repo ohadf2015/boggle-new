@@ -18,8 +18,9 @@ describe('Teacher Pro CTA copy — Hebrew bidi and t()', () => {
     expect(label).not.toMatch(/\$9\/חודש/);
   });
 
-  it('isolates the Latin product name inside Hebrew copy', () => {
-    expect(teacherProCheckoutCtaLabel('he')).toContain(`${LRI}Teacher Pro${PDI}`);
+  it('names the plan in Hebrew, with no Latin "Teacher Pro" left to isolate', () => {
+    expect(teacherProCheckoutCtaLabel('he')).toContain('פרו למורים');
+    expect(teacherProCheckoutCtaLabel('he')).not.toMatch(/Teacher Pro/);
   });
 
   it('no longer shows teachers the payment processor name', () => {

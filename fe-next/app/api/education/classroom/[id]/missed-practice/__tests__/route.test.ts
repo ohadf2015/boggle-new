@@ -155,6 +155,23 @@ describe('POST /api/education/classroom/[id]/missed-practice', () => {
     expect(d.inserted.assignments.every((a) => a.classroom_id === CLASSROOM)).toBe(true);
   });
 
+  it('assigns a requested missed word even when it ranks below the class top ten, but never a word nobody missed', async () => {
+    const asked = Array.from({ length: 12 }, (_, i) => `word${i}`);
+    vi.mocked(getClassMastery).mockResolvedValue({
+      data: buildClassMastery([
+        { studentId: 's1', startedAt: '2026-09-01T10:00:00Z', results: { gameCode: 'G1', lessonWordsAsked: [...asked, 'apple'], lessonWordsFound: ['apple'] } },
+        { studentId: 's2', startedAt: '2026-09-01T10:00:00Z', results: { gameCode: 'G1', lessonWordsAsked: asked.slice(0, 11), lessonWordsFound: [] } },
+        { studentId: 's1', startedAt: '2026-09-02T10:00:00Z', results: { gameCode: 'G2', lessonWordsAsked: ['zebra'], lessonWordsFound: [] } },
+      ]),
+      error: null,
+    });
+    const d = db();
+    vi.mocked(createRequestClient).mockResolvedValue({ supabase: d.client, token: null } as never);
+    const res = await POST(req({ today: TODAY, names: NAMES, words: ['zebra', 'apple'] }), ctx);
+    expect(res.status).toBe(200);
+    expect((await res.json()).words).toEqual(['zebra']);
+  });
+
   it('422s when the class has no missed words to practise', async () => {
     vi.mocked(createRequestClient).mockResolvedValue({ supabase: db().client, token: null } as never);
     vi.mocked(getClassMastery).mockResolvedValue({ data: buildClassMastery([]), error: null });

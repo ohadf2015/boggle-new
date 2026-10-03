@@ -39,6 +39,16 @@ describe('<AccessRequestGate>', () => {
     expect(await screen.findByTestId('auth-modal')).toBeInTheDocument();
   });
 
+  it.each([
+    ['an anonymous arcade guest', { is_anonymous: true, email: null, email_confirmed_at: null }],
+    ['a session with no email address', { email: '', email_confirmed_at: null }],
+  ])('treats %s as signed out, never "we sent a link to ."', (_label, user) => {
+    mockAuth = { user, loading: false };
+    render(<AccessRequestGate />);
+    expect(screen.getByRole('button', { name: /auth_required_cta/i })).toBeInTheDocument();
+    expect(screen.queryByText(/verify_email_body/)).toBeNull();
+  });
+
   it('blocks signed-in but unverified users and offers a resend', async () => {
     mockAuth = { user: { email: 'jane@school.edu', email_confirmed_at: null }, loading: false };
     render(<AccessRequestGate />);

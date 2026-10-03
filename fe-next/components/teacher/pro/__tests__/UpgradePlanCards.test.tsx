@@ -40,6 +40,16 @@ describe('UpgradePlanCards', () => {
     expect(screen.getByRole('link', { name: 'eg2Pro.plans.startFree' })).toHaveAttribute('href', '/en/education/access');
   });
 
+  it.each(['anon', 'free', 'pro', 'loading'] as UpgradeViewer[])('gives the Free card a price note for %s, like the Pro card has', (viewer) => {
+    setup(viewer);
+    expect(screen.getByTestId('plan-free-note')).toHaveTextContent('eg2Polish.plans.freeNote');
+  });
+
+  it('fills the Free card action slot for a Pro teacher instead of leaving it blank', () => {
+    setup('pro');
+    expect(screen.getByTestId('plan-free-included')).toHaveTextContent('eg2Polish.plans.freeIncluded');
+  });
+
   it('marks Free as current only for a signed-in free teacher', () => {
     setup('free');
     expect(screen.getByTestId('pricing-free-current')).toBeDisabled();

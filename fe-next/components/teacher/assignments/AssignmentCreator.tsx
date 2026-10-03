@@ -210,11 +210,11 @@ export default function AssignmentCreator({
         noDescription
         closeButtonLabel={t('common.close')}
         className={cn(
-          'w-full max-w-xl sm:max-w-xl lg:max-w-xl xl:max-w-xl p-6',
+          'w-full max-w-xl sm:max-w-xl lg:max-w-xl xl:max-w-xl p-6 sm:max-h-[94vh]',
           'bg-neo-navy border-neo-cream text-neo-white'
         )}
       >
-        <DialogTitle className="text-2xl font-neo-display text-neo-white mb-4 normal-case tracking-normal">
+        <DialogTitle className="text-2xl font-neo-display text-neo-white mb-3 normal-case tracking-normal">
           {atAssignmentCap
             ? t('teacher.subscription.assignmentLimitTitle')
             : t('teacher.assignment.createTitle')}
@@ -230,7 +230,7 @@ export default function AssignmentCreator({
             onClose={onClose}
           />
         ) : (
-        <div className="space-y-5">
+        <div className="space-y-4">
             <AssignmentStep step="list" n={1} label={t('teacher.assignment.lessonLabel')}>
               <select
                 value={selectedLessonId}
@@ -265,7 +265,7 @@ export default function AssignmentCreator({
                 aria-pressed={selectedType === 'wordcraft'}
                 onClick={() => setSelectedType('wordcraft')}
                 className={cn(
-                  'w-full mb-3 p-4 rounded-neo border-neo transition-all flex items-center gap-3 text-start',
+                  'w-full mb-3 px-4 py-3 rounded-neo border-neo transition-all flex items-center gap-3 text-start',
                   selectedType === 'wordcraft'
                     ? 'bg-neo-lime border-neo-lime text-neo-black shadow-hard-sm'
                     : 'bg-neo-navy/50 border-neo-cream/40 text-neo-white hover:bg-neo-navy/80'
@@ -285,28 +285,28 @@ export default function AssignmentCreator({
                   type="button"
                   onClick={() => setSelectedType('practice')}
                   className={cn(
-                    'p-4 rounded-neo border-neo transition-all',
-                    'flex flex-col items-center gap-2',
+                    'px-4 py-3 rounded-neo border-neo transition-all',
+                    'flex items-center justify-center gap-2',
                     selectedType === 'practice'
                       ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
                       : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
                   )}
                 >
-                  <BookOpen className="w-8 h-8" />
+                  <BookOpen className="w-6 h-6 shrink-0" aria-hidden="true" />
                   <span className="font-bold">{t('teacher.assignment.practiceMode')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedType('duel')}
                   className={cn(
-                    'p-4 rounded-neo border-neo transition-all',
-                    'flex flex-col items-center gap-2',
+                    'px-4 py-3 rounded-neo border-neo transition-all',
+                    'flex items-center justify-center gap-2',
                     selectedType === 'duel'
                       ? 'bg-neo-pink border-neo-pink text-neo-black shadow-hard-sm'
                       : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
                   )}
                 >
-                  <Swords className="w-8 h-8" />
+                  <Swords className="w-6 h-6 shrink-0" aria-hidden="true" />
                   <span className="font-bold">{t('teacher.assignment.duelChallenge')}</span>
                 </button>
               </div>
@@ -390,7 +390,7 @@ export default function AssignmentCreator({
               <textarea
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
-                rows={3}
+                rows={2}
                 aria-label={t('teacher.assignment.instructionsLabel')}
                 className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body resize-none"
                 placeholder={t('teacher.assignment.instructionsPlaceholder')}
@@ -408,7 +408,7 @@ export default function AssignmentCreator({
                 {t(submitHint)}
               </p>
             )}
-            <div className="flex gap-3 pt-4 border-t border-neo-black/30">
+            <div data-testid="assignment-actions" className="sticky -bottom-6 z-10 -mx-6 -mb-6 flex gap-3 border-t-2 border-neo-cream/60 bg-neo-navy px-6 pb-6 pt-4">
               <Button
                 onClick={handleSubmit}
                 aria-describedby={submitHint ? 'assignment-submit-hint' : undefined}

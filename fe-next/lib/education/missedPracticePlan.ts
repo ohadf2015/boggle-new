@@ -1,8 +1,25 @@
 import { normalizeForStorage, type VocabularyWord } from '@/lib/supabase/education/types';
 import type { HardWord } from '@/lib/education/wordMasteryReport';
+import type { ClassMastery } from '@/lib/education/wordMasteryTrend';
+
+type MissedWord = Pick<HardWord, 'display' | 'missed'>;
+
+/** Every word any student in the class has missed at least once, unranked and uncapped. */
+export function missedWordPool(mastery: ClassMastery): MissedWord[] {
+  const pool = new Map<string, MissedWord>();
+  for (const student of mastery.students) {
+    for (const w of student.words) {
+      const missed = w.attempts - w.correct;
+      if (missed <= 0) continue;
+      const prev = pool.get(w.word);
+      pool.set(w.word, { display: prev?.display ?? w.display, missed: (prev?.missed ?? 0) + missed });
+    }
+  }
+  return [...pool.values()];
+}
 
 /** Ranked missed words, optionally narrowed by the teacher; never widened by the client. */
-export function pickMissedPracticeWords(ranked: readonly HardWord[], requested?: readonly string[]): string[] {
+export function pickMissedPracticeWords(ranked: readonly MissedWord[], requested?: readonly string[]): string[] {
   const all = ranked.filter((w) => w.missed > 0).map((w) => w.display);
   if (!requested || requested.length === 0) return all;
   const wanted = new Set(requested.map((w) => normalizeForStorage(w)));
