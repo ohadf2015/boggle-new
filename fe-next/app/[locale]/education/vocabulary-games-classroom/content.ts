@@ -383,7 +383,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['דו־קרבות 1v1', '✓', '✓ בתשלום', '✗', '✗'],
       ['6 שפות + RTL', '✓', '✗', '✗', '✗'],
       ['רשימות מילים משלכם', '✓', '✓', '✓', '✓'],
-      ['לוח אנליטיקה למורה', '✓ חינם', '✓ בתשלום', 'בסיסי', '✓ בתשלום'],
+      ['לוח אנליטיקה למורה', 'פרו למורים', '✓ בתשלום', 'בסיסי', '✓ בתשלום'],
     ],
     useCases: [
       { tag: 'חימום', title: 'פתיחה של 5 דקות', desc: 'Word Wheel מהיר מהרשימה של אתמול — מעיר את הכיתה.' },
@@ -557,7 +557,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['Duelos 1v1', '✓', '✓ pago', '✗', '✗'],
       ['6 idiomas + RTL', '✓', '✗', '✗', '✗'],
       ['Tus listas', '✓', '✓', '✓', '✓'],
-      ['Panel analítico', '✓ gratis', '✓ pago', 'Básico', '✓ pago'],
+      ['Panel analítico', 'Teacher Pro', '✓ pago', 'Básico', '✓ pago'],
     ],
     useCases: [
       { tag: 'CALENTAMIENTO', title: 'Apertura de 5 minutos', desc: 'Word Wheel rápida de la lista de ayer — despierta la clase.' },
@@ -731,7 +731,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['1v1 dueller', '✓', '✓ betald', '✗', '✗'],
       ['6 språk + RTL', '✓', '✗', '✗', '✗'],
       ['Dina ordlistor', '✓', '✓', '✓', '✓'],
-      ['Analyspanel', '✓ gratis', '✓ betald', 'Grund', '✓ betald'],
+      ['Analyspanel', 'Teacher Pro', '✓ betald', 'Grund', '✓ betald'],
     ],
     useCases: [
       { tag: 'UPPVÄRMNING', title: '5-minutersöppnare', desc: 'Snabbt Word Wheel från gårdagens lista — väcker klassen.' },
@@ -905,7 +905,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['1v1デュエル', '✓', '✓ 有料', '✗', '✗'],
       ['6言語 + RTL', '✓', '✗', '✗', '✗'],
       ['自分のリスト', '✓', '✓', '✓', '✓'],
-      ['ダッシュボード', '✓ 無料', '✓ 有料', '基本', '✓ 有料'],
+      ['ダッシュボード', 'Teacher Pro', '✓ 有料', '基本', '✓ 有料'],
     ],
     useCases: [
       { tag: 'ウォームアップ', title: '5分のオープナー', desc: '昨日の単語リストから Word Wheel — クラスを起こします。' },
@@ -1079,7 +1079,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['Дуэли 1v1', '✓', '✓ платно', '✗', '✗'],
       ['6 языков + RTL', '✓', '✗', '✗', '✗'],
       ['Собственные списки', '✓', '✓', '✓', '✓'],
-      ['Аналитическая панель', '✓ бесплатно', '✓ платно', 'Базовое', '✓ платно'],
+      ['Аналитическая панель', 'Teacher Pro', '✓ платно', 'Базовое', '✓ платно'],
     ],
     useCases: [
       { tag: 'РАЗМИНКА', title: '5-минутный старт', desc: 'Быстрый Word Wheel из вчерашнего списка — разбудит класс.' },
