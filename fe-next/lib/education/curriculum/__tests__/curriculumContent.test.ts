@@ -4,7 +4,7 @@ import { isVocabularyLevel } from '@/lib/education/differentiation';
 import { gradeLevelToBand, GRADE_BANDS, wordIssue } from '@/lib/education/library';
 import { moderateForPublish } from '@/lib/education/libraryServer';
 import { CURRICULUM_LOCALES, CURRICULUM_SEEDS, loadCurriculumSeed, type CurriculumSeedFile, type CurriculumSeedName } from '../curriculumSeed';
-import { dictionaryKey, loadShippedDictionary } from '../curriculumDictCheck';
+import { dictionaryKey, hasShippedDictionary, loadShippedDictionary } from '../curriculumDictCheck';
 
 const GRADES = ['grade_1', 'grade_2', 'grade_3', 'grade_4', 'grade_5', 'grade_6', 'grade_7', 'grade_8', 'grade_9', 'grade_10', 'grade_11', 'grade_12'];
 const SUBJECTS = ['english', 'hebrew', 'science', 'math', 'history', 'geography', 'general'];
@@ -16,9 +16,11 @@ beforeAll(() => {
   for (const name of CURRICULUM_SEEDS) {
     const seed = loadCurriculumSeed(name);
     seeds.set(name, seed);
-    for (const list of seed.lists) if (!dicts.has(list.language)) dicts.set(list.language, loadShippedDictionary(list.language));
+    for (const list of seed.lists) if (hasShippedDictionary(list.language) && !dicts.has(list.language)) dicts.set(list.language, loadShippedDictionary(list.language));
   }
 }, 60_000);
+
+const seedLanguages = (name: CurriculumSeedName) => [...new Set(loadCurriculumSeed(name).lists.map((l) => l.language))];
 
 describe.each(CURRICULUM_SEEDS)('%s curriculum seed', (name) => {
   const seed = () => seeds.get(name)!;
@@ -37,7 +39,7 @@ describe.each(CURRICULUM_SEEDS)('%s curriculum seed', (name) => {
     }
   });
 
-  it('every word is in the shipped dictionary the game plays from', () => {
+  it.skipIf(!seedLanguages(name).every(hasShippedDictionary))('every word is in the shipped dictionary the game plays from (needs public/dicts/*.dict.gz, build artifacts)', () => {
     const missing: string[] = [];
     for (const list of seed().lists) {
       const dict = dicts.get(list.language)!;
