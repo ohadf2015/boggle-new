@@ -18,6 +18,20 @@ import results from './results.webp';
 import studentJoin from './student-join.webp';
 import teacherSignup from './teacher-signup.webp';
 import wordListEditor from './word-list-editor.webp';
+import heAssignFocus from './he/assign-focus.webp';
+import heAssignType from './he/assign-type.webp';
+import heClassTools from './he/class-tools.webp';
+import heClassesActions from './he/classes-actions.webp';
+import heCreateClass from './he/create-class.webp';
+import heHqGetStudentsIn from './he/hq-get-students-in.webp';
+import heHqOverview from './he/hq-overview.webp';
+import heHqPasteWords from './he/hq-paste-words.webp';
+import heHqStartGame from './he/hq-start-game.webp';
+import heLibraryDiscover from './he/library-discover.webp';
+import heReportsClass from './he/reports-class.webp';
+import heStudentJoin from './he/student-join.webp';
+import heTeacherSignup from './he/teacher-signup.webp';
+import heWordListEditor from './he/word-list-editor.webp';
 
 export interface HelpShot {
   src: StaticImageData | string;
@@ -51,3 +65,27 @@ export const HELP_SHOTS = {
 } satisfies Record<string, HelpShot>;
 
 export type HelpShotId = keyof typeof HELP_SHOTS;
+
+/** Shots that need a running live game (lobby, host, results) have no Hebrew capture yet and fall back to English. */
+const HELP_SHOTS_HE: Partial<Record<HelpShotId, HelpShot>> = {
+  'assign-focus': { src: heAssignFocus, width: 560, height: 312 },
+  'assign-type': { src: heAssignType, width: 560, height: 236 },
+  'class-tools': { src: heClassTools, width: 912, height: 665 },
+  'classes-actions': { src: heClassesActions, width: 1166, height: 496 },
+  'create-class': { src: heCreateClass, width: 692, height: 387 },
+  'hq-get-students-in': { src: heHqGetStudentsIn, width: 461, height: 514 },
+  'hq-overview': { src: heHqOverview, width: 1440, height: 900 },
+  'hq-paste-words': { src: heHqPasteWords, width: 691, height: 326 },
+  'hq-start-game': { src: heHqStartGame, width: 691, height: 644 },
+  'library-discover': { src: heLibraryDiscover, width: 1160, height: 800 },
+  'reports-class': { src: heReportsClass, width: 1044, height: 684 },
+  'student-join': { src: heStudentJoin, width: 390, height: 480, phone: true },
+  'teacher-signup': { src: heTeacherSignup, width: 366, height: 518, phone: true },
+  'word-list-editor': { src: heWordListEditor, width: 780, height: 840 },
+};
+
+const HELP_SHOTS_BY_LOCALE: Record<string, Partial<Record<HelpShotId, HelpShot>>> = { he: HELP_SHOTS_HE };
+
+export function helpShot(id: HelpShotId, locale: string): HelpShot {
+  return HELP_SHOTS_BY_LOCALE[locale]?.[id] ?? HELP_SHOTS[id];
+}

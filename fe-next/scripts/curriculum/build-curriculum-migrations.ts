@@ -6,7 +6,7 @@
  *   node_modules/.bin/tsx scripts/curriculum/build-curriculum-migrations.ts [--report <file>]
  */
 import fs from 'fs';
-import { CURRICULUM_LOCALES, buildCurriculumMigration, loadCurriculumSeed, migrationPath } from '../../lib/education/curriculum/curriculumSeed';
+import { CURRICULUM_SEEDS, buildCurriculumMigration, loadCurriculumSeed, migrationPath } from '../../lib/education/curriculum/curriculumSeed';
 import { dictionaryKey, loadShippedDictionary } from '../../lib/education/curriculum/curriculumDictCheck';
 
 const reportIdx = process.argv.indexOf('--report');
@@ -15,11 +15,11 @@ const lines: string[] = [];
 const dicts = new Map<string, Set<string>>();
 let missingTotal = 0;
 
-for (const lang of CURRICULUM_LOCALES) {
-  const seed = loadCurriculumSeed(lang);
+for (const name of CURRICULUM_SEEDS) {
+  const seed = loadCurriculumSeed(name);
   fs.writeFileSync(migrationPath(seed), buildCurriculumMigration(seed));
   const words = seed.lists.reduce((n, l) => n + l.words.length, 0);
-  lines.push(`== ${lang}: ${seed.lists.length} lists, ${words} words -> supabase/migrations/${seed.migration}`);
+  lines.push(`== ${name}: ${seed.lists.length} lists, ${words} words -> supabase/migrations/${seed.migration}`);
   for (const list of seed.lists) {
     if (!dicts.has(list.language)) dicts.set(list.language, loadShippedDictionary(list.language));
     const dict = dicts.get(list.language)!;

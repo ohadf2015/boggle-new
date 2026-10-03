@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { buildWordMasteryReport, buildSpacedReviewDates, SPACED_REVIEW_DAYS } from '@/lib/education/wordMasteryReport';
-import { pickMissedPracticeWords, enrichReviewWords, isPlausibleLocalDay } from '@/lib/education/missedPracticePlan';
+import { pickMissedPracticeWords, enrichReviewWords, isPlausibleLocalDay, missedWordPool } from '@/lib/education/missedPracticePlan';
 import { authorizeClassroomOwner } from '@/lib/education/ownedClassroomRoute';
 import logger from '@/utils/logger';
 
@@ -40,7 +40,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     logger.error('[missed-practice] evidence read failed', mastery.error);
     return NextResponse.json({ ok: false, error: 'Could not read class results' }, { status: 500 });
   }
-  const words = pickMissedPracticeWords(buildWordMasteryReport(mastery.data).hardestWords, requested);
+  const pool = requested?.length ? missedWordPool(mastery.data) : buildWordMasteryReport(mastery.data).hardestWords;
+  const words = pickMissedPracticeWords(pool, requested);
   if (words.length === 0) {
     return NextResponse.json({ ok: false, error: 'no_missed_words' }, { status: 422 });
   }

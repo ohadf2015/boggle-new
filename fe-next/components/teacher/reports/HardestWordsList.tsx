@@ -88,7 +88,12 @@ export function HardestWordsList({
                 {t('eduPro.mastery.studentsMissing', { count: w.studentsMissing, total: w.studentsAsked })}
               </span>
             </span>
-            <span className="font-neo-display text-lg font-black text-neo-white tabular-nums">{w.missRate}%</span>
+            <span
+              data-testid="report-word-missrate"
+              className="text-end font-neo-display text-sm font-black leading-tight text-neo-white tabular-nums"
+            >
+              {t('eg2Polish.words.missRate', { pct: w.missRate })}
+            </span>
           </m.li>
         ))}
         {trailing}

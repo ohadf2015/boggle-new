@@ -3,30 +3,25 @@ import { withBlank } from '@/lib/education/vocabFocus';
 import { isVocabularyLevel } from '@/lib/education/differentiation';
 import { gradeLevelToBand, GRADE_BANDS, wordIssue } from '@/lib/education/library';
 import { moderateForPublish } from '@/lib/education/libraryServer';
-import { CURRICULUM_LOCALES, loadCurriculumSeed, type CurriculumSeedFile, type CurriculumLocale } from '../curriculumSeed';
+import { CURRICULUM_LOCALES, CURRICULUM_SEEDS, loadCurriculumSeed, type CurriculumSeedFile, type CurriculumSeedName } from '../curriculumSeed';
 import { dictionaryKey, loadShippedDictionary } from '../curriculumDictCheck';
 
 const GRADES = ['grade_1', 'grade_2', 'grade_3', 'grade_4', 'grade_5', 'grade_6', 'grade_7', 'grade_8', 'grade_9', 'grade_10', 'grade_11', 'grade_12'];
 const SUBJECTS = ['english', 'hebrew', 'science', 'math', 'history', 'geography', 'general'];
 
-const seeds = new Map<CurriculumLocale, CurriculumSeedFile>();
+const seeds = new Map<CurriculumSeedName, CurriculumSeedFile>();
 const dicts = new Map<string, Set<string>>();
 
 beforeAll(() => {
-  for (const lang of CURRICULUM_LOCALES) {
-    const seed = loadCurriculumSeed(lang);
-    seeds.set(lang, seed);
+  for (const name of CURRICULUM_SEEDS) {
+    const seed = loadCurriculumSeed(name);
+    seeds.set(name, seed);
     for (const list of seed.lists) if (!dicts.has(list.language)) dicts.set(list.language, loadShippedDictionary(list.language));
   }
 }, 60_000);
 
-describe.each(CURRICULUM_LOCALES)('%s curriculum seed', (lang) => {
-  const seed = () => seeds.get(lang)!;
-  const ownLists = () => seed().lists.filter((l) => l.language === lang);
-
-  it('has at least 8 lists in its own language', () => {
-    expect(ownLists().length).toBeGreaterThanOrEqual(8);
-  });
+describe.each(CURRICULUM_SEEDS)('%s curriculum seed', (name) => {
+  const seed = () => seeds.get(name)!;
 
   it('every list is 15-25 distinct words with valid enums and honest codes', () => {
     for (const list of seed().lists) {
@@ -87,13 +82,20 @@ describe.each(CURRICULUM_LOCALES)('%s curriculum seed', (lang) => {
   });
 });
 
-describe.each(CURRICULUM_LOCALES)('%s curriculum seed — teacher trust', (lang) => {
+describe.each(CURRICULUM_LOCALES)('%s curriculum seed — coverage', (lang) => {
   const ownLists = () => seeds.get(lang)!.lists.filter((l) => l.language === lang);
+
+  it('has at least 8 lists in its own language', () => {
+    expect(ownLists().length).toBeGreaterThanOrEqual(8);
+  });
 
   it('covers every grade band (K-2, 3-5, 6-8, 9-12) in its own language', () => {
     const bands = new Set(ownLists().map((l) => gradeLevelToBand(l.grade)));
     expect([...GRADE_BANDS].filter((b) => !bands.has(b))).toEqual([]);
   });
+});
+
+describe.each(CURRICULUM_SEEDS)('%s curriculum seed — teacher trust', (lang) => {
 
   it('passes the same moderation a teacher hits when publishing a copy', () => {
     for (const list of seeds.get(lang)!.lists) {
@@ -121,7 +123,7 @@ describe('ja curriculum seed script', () => {
 
 describe('curriculum seed codes', () => {
   it('are unique across every locale', () => {
-    const codes = CURRICULUM_LOCALES.flatMap((l) => loadCurriculumSeed(l).lists.map((x) => x.code));
+    const codes = CURRICULUM_SEEDS.flatMap((l) => loadCurriculumSeed(l).lists.map((x) => x.code));
     expect(new Set(codes).size).toBe(codes.length);
   });
 });

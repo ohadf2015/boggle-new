@@ -71,7 +71,7 @@ export default function ListMetaFields({ draft, classrooms, onChange }: ListMeta
             onChange={(e) => onChange({ classroomId: e.target.value })}
             className={SELECT}
           >
-            <option value="">{t('eduLibrary.meta.noClass')}</option>
+            <option value="">{t('eg2Polish.library.notAssigned')}</option>
             {classrooms.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}

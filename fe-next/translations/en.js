@@ -94,6 +94,55 @@ const en = {
     }
   },
   // @eg2Fix:end
+  // @eg2Polish:start
+  "eg2Polish": {
+    "arc": {
+      "goal": "{goal}% goal",
+      "word": {
+        "attempts": "Right {correct} of {count}",
+        "lastCorrect": "last time: right",
+        "lastMissed": "last time: missed"
+      },
+      "practice": {
+        "cta": "Practice these words for {name} ({count})",
+        "hint": "Three short review rounds: tomorrow, in 3 days and in 7 days. The whole class sees them.",
+        "proHint": "Assigning review rounds is part of Teacher Pro.",
+        "roundName": "Review for {name}: round {n} ({date})",
+        "done": "Done: {count} words for {name}, in three review rounds.",
+        "already": "These review rounds were already assigned today.",
+        "nothing": "No missed words left to practise for this student."
+      }
+    },
+    "words": {
+      "missRate": "{pct}% missed"
+    },
+    "classes": {
+      "rosterTitle": "Students at a glance",
+      "status": {
+        "below": "Below goal · {pct}%",
+        "onTrack": "On track · {pct}%",
+        "notYet": "Not played yet",
+        "played": "Played"
+      },
+      "openReport": "Open class report",
+      "moreInReport": "+{count} more in the class report"
+    },
+    "pack": {
+      "noStudents": "Parent links need students. Share your class code; once students join, their links are made here."
+    },
+    "plans": {
+      "freeNote": "No card, no time limit. Students always free.",
+      "freeIncluded": "Everything here is part of your Pro plan."
+    },
+    "library": {
+      "notAssigned": "Don't assign yet"
+    },
+    "header": {
+      "brand": "LexiClash",
+      "section": "Education"
+    }
+  },
+  // @eg2Polish:end
   // @eg2Seo:start
   "eg2Seo": {
     "rail": {
@@ -13937,8 +13986,8 @@ const en = {
         "comparisonAlt": "Side-by-side comparison of the Free plan and Teacher Pro",
         "freeTier": "Free",
         "perMonth": "/month",
-        "classLimit": "Up to {count} classroom",
-        "studentLimit": "Up to {count} students in it",
+        "classLimit": "Up to {count} classes",
+        "studentLimit": "Up to {count} students in each",
         "noAds": "No advertising for your students",
         "customLists": "Your own word lists",
         "duels": "Live word duels",
@@ -18589,7 +18638,7 @@ const en = {
       "missedOf": "missed {missed} of {attempts}",
       "studentsMissing": "{count} of {total} students",
       "noneMissed": "Nobody has missed a word twice yet. Nice.",
-      "empty": "Play a vocab quiz or a Wordcraft round with this class — mastery fills in after the first game.",
+      "empty": "Mastery counts the words from your word lists. Play a vocab quiz, a Wordcraft round or a live game with one of your lists, and it fills in after that game.",
       "loading": "Loading word mastery…",
       "error": "Couldn't load word mastery. Refresh to try again.",
       "heatmapToggle": "Student × word heatmap",

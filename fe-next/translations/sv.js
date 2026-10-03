@@ -94,6 +94,55 @@ const sv = {
     }
   },
   // @eg2Fix:end
+  // @eg2Polish:start
+  "eg2Polish": {
+    "arc": {
+      "goal": "Mål {goal} %",
+      "word": {
+        "attempts": "Rätt {correct} av {count}",
+        "lastCorrect": "senast: rätt",
+        "lastMissed": "senast: missad"
+      },
+      "practice": {
+        "cta": "Öva de här orden för {name} ({count})",
+        "hint": "Tre korta repetitionsrundor: i morgon, om 3 dagar och om 7 dagar. Hela klassen ser dem.",
+        "proHint": "Att dela ut repetitionsrundor ingår i Teacher Pro.",
+        "roundName": "Repetition för {name}: runda {n} ({date})",
+        "done": "Klart: {count} ord för {name}, i tre repetitionsrundor.",
+        "already": "De här repetitionsrundorna delades redan ut i dag.",
+        "nothing": "Inga missade ord kvar att öva för den här eleven."
+      }
+    },
+    "words": {
+      "missRate": "{pct} % missat"
+    },
+    "classes": {
+      "rosterTitle": "Eleverna i korthet",
+      "status": {
+        "below": "Under målet · {pct} %",
+        "onTrack": "På rätt spår · {pct} %",
+        "notYet": "Har inte spelat än",
+        "played": "Har spelat"
+      },
+      "openReport": "Öppna klassrapporten",
+      "moreInReport": "+{count} till i klassrapporten"
+    },
+    "pack": {
+      "noStudents": "Föräldralänkar kräver elever. Dela klasskoden; när eleverna har gått med skapas deras länkar här."
+    },
+    "plans": {
+      "freeNote": "Inget kort, ingen tidsgräns. Alltid gratis för elever.",
+      "freeIncluded": "Allt här ingår i din Pro-plan."
+    },
+    "library": {
+      "notAssigned": "Dela inte ut än"
+    },
+    "header": {
+      "brand": "LexiClash",
+      "section": "Utbildning"
+    }
+  },
+  // @eg2Polish:end
   // @eg2Seo:start
   "eg2Seo": {
     "rail": {
@@ -15626,8 +15675,8 @@ const sv = {
         "comparisonAlt": "Jämförelse mellan gratisplanen och Teacher Pro",
         "freeTier": "Gratis",
         "perMonth": "/månad",
-        "classLimit": "Upp till {count} klass",
-        "studentLimit": "Upp till {count} elever i den",
+        "classLimit": "Upp till {count} klasser",
+        "studentLimit": "Upp till {count} elever i varje",
         "noAds": "Inga annonser för dina elever",
         "customLists": "Dina egna ordlistor",
         "duels": "Orddueller i realtid",
@@ -19526,7 +19575,7 @@ const sv = {
       "missedOf": "missat {missed} av {attempts}",
       "studentsMissing": "{count} av {total} elever",
       "noneMissed": "Ingen har missat ett ord två gånger än. Snyggt!",
-      "empty": "Kör ett ordförrådsquiz eller en Wordcraft-runda med klassen – kartan fylls i efter första spelet.",
+      "empty": "Behärskning räknas på orden i dina ordlistor. Spela ett ordquiz, en Wordcraft-runda eller ett liveläge med en av dina listor, så fylls den i efter spelet.",
       "loading": "Laddar ordbehärskning…",
       "error": "Kunde inte ladda ordbehärskningen. Ladda om och försök igen.",
       "heatmapToggle": "Värmekarta: elev × ord",

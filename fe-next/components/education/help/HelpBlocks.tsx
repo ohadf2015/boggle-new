@@ -63,7 +63,7 @@ export function HelpBlocks({ blocks, locale, t }: { blocks: HelpBlock[]; locale:
             );
           }
           case 'shot':
-            return <HelpShotFigure key={i} id={b.id} alt={b.caption} caption={b.caption} priority={takeFirst()} />;
+            return <HelpShotFigure key={i} id={b.id} locale={locale} alt={b.caption} caption={b.caption} priority={takeFirst()} />;
           case 'steps':
             return (
               <ol key={i} className="space-y-10">
@@ -95,7 +95,7 @@ export function HelpBlocks({ blocks, locale, t }: { blocks: HelpBlock[]; locale:
                     </div>
                     {s.shot ? (
                       <div className="mt-5 sm:ps-15">
-                        <HelpShotFigure id={s.shot} alt={plain(s.title)} priority={takeFirst()} />
+                        <HelpShotFigure id={s.shot} locale={locale} alt={plain(s.title)} priority={takeFirst()} />
                       </div>
                     ) : null}
                   </li>

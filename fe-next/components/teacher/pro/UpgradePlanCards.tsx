@@ -114,6 +114,9 @@ export function UpgradePlanCards({
         <h2 className="font-neo-display text-lg font-black text-neo-white">{t('teacher.subscription.freePlanName')}</h2>
         <p className="mb-3 text-xs font-bold text-neo-white/65">{t('teacher.subscription.freeForever')}</p>
         <Price amount="$0" per={perMonth} />
+        <p data-testid="plan-free-note" className="mt-1.5 text-xs font-bold text-neo-white/65">
+          {t('eg2Polish.plans.freeNote')}
+        </p>
         <div className="mt-4 min-h-12">
           {viewer === 'anon' && (
             <Link href={`/${language}/education/access`} className={cn(BTN, 'bg-neo-white text-neo-black')}>
@@ -124,6 +127,12 @@ export function UpgradePlanCards({
             <button type="button" disabled data-testid="pricing-free-current" className={cn(BTN, 'cursor-default bg-transparent text-neo-white/70 shadow-none hover:translate-y-0 border-neo-cream/40')}>
               {t('teacher.subscription.currentPlan')}
             </button>
+          )}
+          {viewer === 'pro' && (
+            <p data-testid="plan-free-included" className="flex min-h-12 items-center gap-2 rounded-neo border-2 border-dashed border-neo-cream/40 px-3 text-sm font-bold text-neo-white/80">
+              <Check className="h-4 w-4 shrink-0 text-neo-cyan" strokeWidth={3} aria-hidden />
+              {t('eg2Polish.plans.freeIncluded')}
+            </p>
           )}
         </div>
         <BestFor text={t('eg2Pro.plans.freeBestFor')} />

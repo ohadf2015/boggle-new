@@ -43,4 +43,13 @@ describe('EducationHeader — fits a 390px phone for teachers', () => {
     render(<EducationHeader />);
     expect(phoneHidden(screen.getByTestId('help'))).toBe(false);
   });
+
+  it('never truncates the title on phones: brand over a short section label instead of "LEXICLASH EDUC…"', () => {
+    render(<EducationHeader />);
+    expect(phoneHidden(screen.getByText('education.header.title'))).toBe(true);
+    const phone = screen.getByTestId('edu-header-phone-title');
+    expect(phone).toHaveTextContent('eg2Polish.header.brand');
+    expect(phone).toHaveTextContent('eg2Polish.header.section');
+    expect(phone.className).toMatch(/(^|\s)sm:hidden(\s|$)/);
+  });
 });

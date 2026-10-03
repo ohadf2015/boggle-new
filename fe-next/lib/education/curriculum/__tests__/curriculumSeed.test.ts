@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import {
-  CURRICULUM_LOCALES,
+  CURRICULUM_SEEDS,
   buildCurriculumMigration,
   curriculumListId,
   loadCurriculumSeed,
@@ -66,12 +66,12 @@ describe('buildCurriculumMigration', () => {
 });
 
 describe('committed migrations', () => {
-  it.each(CURRICULUM_LOCALES)('%s migration matches its seed data (regenerate with scripts/curriculum/build-curriculum-migrations.ts)', (lang) => {
+  it.each(CURRICULUM_SEEDS)('%s migration matches its seed data (regenerate with scripts/curriculum/build-curriculum-migrations.ts)', (lang) => {
     const seed = loadCurriculumSeed(lang);
     expect(fs.readFileSync(migrationPath(seed), 'utf8')).toBe(buildCurriculumMigration(seed));
   });
 
-  it.each(CURRICULUM_LOCALES)('%s migration stays under the 500-line file cap', (lang) => {
+  it.each(CURRICULUM_SEEDS)('%s migration stays under the 500-line file cap', (lang) => {
     const seed = loadCurriculumSeed(lang);
     expect(fs.readFileSync(migrationPath(seed), 'utf8').split('\n').length).toBeLessThanOrEqual(500);
   });

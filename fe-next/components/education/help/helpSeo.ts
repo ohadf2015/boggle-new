@@ -4,7 +4,7 @@ import { educationBreadcrumbLabels, educationProviderNode } from '@/lib/seo/educ
 import type { HelpArticleText, HelpQuickAnswer } from './helpTypes';
 import { HELP_BASE_URL, helpAlternates, helpUrl } from './helpUrls';
 import { HELP_PATH, HELP_UPDATED } from './helpRegistry';
-import { HELP_SHOTS } from './shots';
+import { helpShot, type HelpShotId } from './shots';
 import { helpPlainText } from './helpText';
 
 type JsonLdNode = Record<string, unknown>;
@@ -63,8 +63,8 @@ export function helpBreadcrumbJsonLd(args: {
   };
 }
 
-function shotUrl(id: keyof typeof HELP_SHOTS): string {
-  const src = HELP_SHOTS[id].src;
+function shotUrl(id: HelpShotId, locale: string): string {
+  const src = helpShot(id, locale).src;
   const path = typeof src === 'string' ? src : src.src;
   return path.startsWith('http') ? path : `${HELP_BASE_URL}${path}`;
 }
@@ -93,7 +93,7 @@ export function helpHowToJsonLd(args: {
       name: plain(s.title),
       text: plain(s.body ?? s.title),
       url: `${url}#step-${i + 1}`,
-      ...(s.shot ? { image: shotUrl(s.shot) } : {}),
+      ...(s.shot ? { image: shotUrl(s.shot, locale) } : {}),
     })),
   };
 }

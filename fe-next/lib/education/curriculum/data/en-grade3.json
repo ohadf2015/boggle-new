@@ -1,0 +1,379 @@
+{
+  "language": "en",
+  "source": "en-grade3",
+  "migration": "20261003100000_curriculum_v2_en_grade3.sql",
+  "lists": [
+    {
+      "code": "LC-EN-G3-NATURE",
+      "name": "Grade 3 — Plants, Animals and Our Earth",
+      "description": "Life- and earth-science words 8–9 year olds read in science units: plant parts, animal groups, volcanoes and how living things survive.",
+      "language": "en",
+      "grade": "grade_3",
+      "subject": "science",
+      "words": [
+        {
+          "word": "insect",
+          "definition": "A tiny animal with six legs and a body in three parts",
+          "example": "A ladybug is an insect with red wings and black spots.",
+          "level": "support"
+        },
+        {
+          "word": "soil",
+          "definition": "The dark, loose dirt that plants grow in",
+          "example": "We pressed the bean seeds into the wet soil.",
+          "level": "support"
+        },
+        {
+          "word": "root",
+          "definition": "The part of a plant that grows underground and drinks up water",
+          "example": "The carrot is the root of the plant, so we eat it.",
+          "level": "support"
+        },
+        {
+          "word": "seed",
+          "definition": "The small part of a plant that a new plant grows from",
+          "example": "Mia planted a sunflower seed in a paper cup.",
+          "level": "support"
+        },
+        {
+          "word": "valley",
+          "definition": "Low land between hills or mountains, often with a river",
+          "example": "Our bus drove down into a green valley full of farms.",
+          "level": "support"
+        },
+        {
+          "word": "mammal",
+          "definition": "A warm-blooded animal with hair that feeds its babies milk",
+          "example": "A whale lives in the sea, but it is a mammal, not a fish.",
+          "level": "core"
+        },
+        {
+          "word": "reptile",
+          "definition": "A cold-blooded animal with dry, scaly skin, like a snake or lizard",
+          "example": "The turtle is a reptile that can hide inside its shell.",
+          "level": "core"
+        },
+        {
+          "word": "fossil",
+          "definition": "Rock holding the shape of a plant or animal from long ago",
+          "example": "Ben found a fossil of a tiny shell at the beach.",
+          "level": "core"
+        },
+        {
+          "word": "volcano",
+          "definition": "A mountain that can blow out hot melted rock, ash and smoke",
+          "example": "The volcano rumbled, and red lava poured down its side.",
+          "level": "core"
+        },
+        {
+          "word": "harvest",
+          "definition": "To pick and gather crops when they are ready to eat",
+          "example": "In the fall, farmers harvest pumpkins from the fields.",
+          "level": "core"
+        },
+        {
+          "word": "pollen",
+          "definition": "Yellow dust in flowers that bees carry from plant to plant",
+          "example": "The bee's fuzzy legs were covered in pollen.",
+          "level": "core"
+        },
+        {
+          "word": "survive",
+          "definition": "To stay alive, even when things are hard or dangerous",
+          "example": "Camels can survive many days in the desert without water.",
+          "level": "core"
+        },
+        {
+          "word": "recycle",
+          "definition": "To turn used things like cans and paper into something new",
+          "example": "We recycle our milk jugs so they can become new bottles.",
+          "level": "core"
+        },
+        {
+          "word": "energy",
+          "definition": "The power that makes things move, grow, light up or warm up",
+          "example": "Plants get energy from sunlight to help them grow.",
+          "level": "core"
+        },
+        {
+          "word": "island",
+          "definition": "A piece of land with water all around it",
+          "example": "We took a boat to a small island in the middle of the lake.",
+          "level": "core"
+        },
+        {
+          "word": "predator",
+          "definition": "An animal that hunts and eats other animals",
+          "example": "The owl is a predator that hunts mice at night.",
+          "level": "challenge"
+        },
+        {
+          "word": "extinct",
+          "definition": "No longer living anywhere on Earth",
+          "example": "Dinosaurs became extinct millions of years ago.",
+          "level": "challenge"
+        },
+        {
+          "word": "adapt",
+          "definition": "To change over time to fit a new place",
+          "example": "Animals adapt to cold places by growing thick fur.",
+          "level": "challenge"
+        },
+        {
+          "word": "erosion",
+          "definition": "The slow wearing away of land by water, wind or ice",
+          "example": "Waves cause erosion that slowly eats away the cliff.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-G3-COMMUNITY",
+      "name": "Grade 3 — Communities and Places",
+      "description": "Social-studies words for 3rd graders: who lives where, the places a town shares and the people who keep it running.",
+      "language": "en",
+      "grade": "grade_3",
+      "subject": "geography",
+      "words": [
+        {
+          "word": "village",
+          "definition": "A small group of houses and shops, smaller than a town",
+          "example": "Everyone in the village came to the summer fair.",
+          "level": "support"
+        },
+        {
+          "word": "city",
+          "definition": "A very large, busy town where many people live and work",
+          "example": "The city has tall buildings, busy streets and a big zoo.",
+          "level": "support"
+        },
+        {
+          "word": "map",
+          "definition": "A drawing that shows where places, roads and rivers are",
+          "example": "We used a map to find the way to the park.",
+          "level": "support"
+        },
+        {
+          "word": "market",
+          "definition": "A place where people buy and sell food and other goods",
+          "example": "Grandma buys fresh peaches at the market every Saturday.",
+          "level": "support"
+        },
+        {
+          "word": "neighbor",
+          "definition": "A person who lives next door or close to you",
+          "example": "Our neighbor waters our plants when we go away.",
+          "level": "support"
+        },
+        {
+          "word": "bridge",
+          "definition": "A road or path built over a river, road or valley",
+          "example": "We walked across the bridge and watched the boats below.",
+          "level": "support"
+        },
+        {
+          "word": "community",
+          "definition": "People who live in the same area and help each other",
+          "example": "Our community planted trees along Main Street.",
+          "level": "core"
+        },
+        {
+          "word": "library",
+          "definition": "A building where you can borrow books for free",
+          "example": "I took home three books about dragons from the library.",
+          "level": "core"
+        },
+        {
+          "word": "museum",
+          "definition": "A building where people look at art or old, special things",
+          "example": "At the museum we saw a giant dinosaur skeleton.",
+          "level": "core"
+        },
+        {
+          "word": "mayor",
+          "definition": "The leader chosen to run a town or city",
+          "example": "The mayor cut the ribbon to open the new playground.",
+          "level": "core"
+        },
+        {
+          "word": "country",
+          "definition": "A land with its own people, leaders and flag",
+          "example": "Canada is a big country with lots of lakes and forests.",
+          "level": "core"
+        },
+        {
+          "word": "factory",
+          "definition": "A building where workers and machines make things",
+          "example": "The chocolate factory makes thousands of candy bars a day.",
+          "level": "core"
+        },
+        {
+          "word": "volunteer",
+          "definition": "A person who helps without getting paid for it",
+          "example": "Dad is a volunteer who reads stories at the hospital.",
+          "level": "core"
+        },
+        {
+          "word": "continent",
+          "definition": "One of the seven giant areas of land on Earth",
+          "example": "Africa is the continent where wild lions and giraffes live.",
+          "level": "core"
+        },
+        {
+          "word": "population",
+          "definition": "The number of people who live in a place",
+          "example": "Our town's population grew when the new houses were built.",
+          "level": "challenge"
+        },
+        {
+          "word": "tradition",
+          "definition": "Something a family or group has done the same way for years",
+          "example": "Making pancakes on Sunday is a tradition in our house.",
+          "level": "challenge"
+        },
+        {
+          "word": "rural",
+          "definition": "In the countryside, with farms and open land, far from cities",
+          "example": "My cousin lives in a rural area with cows and corn fields.",
+          "level": "challenge"
+        },
+        {
+          "word": "urban",
+          "definition": "In a city, with lots of buildings and people close together",
+          "example": "Urban parks give city kids a place to run and play.",
+          "level": "challenge"
+        },
+        {
+          "word": "ancestor",
+          "definition": "A family member who lived a long, long time ago",
+          "example": "My ancestor sailed across the ocean over a hundred years ago.",
+          "level": "challenge"
+        }
+      ]
+    },
+    {
+      "code": "LC-EN-G3-THINK",
+      "name": "Grade 3 — Words for Thinking and Learning",
+      "description": "The words 3rd graders hear in every lesson and see on worksheets: observe, explain, solve, revise and more.",
+      "language": "en",
+      "grade": "grade_3",
+      "subject": "english",
+      "words": [
+        {
+          "word": "idea",
+          "definition": "A thought or plan that comes into your mind",
+          "example": "Lily had a great idea for our class art project.",
+          "level": "support"
+        },
+        {
+          "word": "question",
+          "definition": "Something you ask when you want to know or find out",
+          "example": "Raise your hand if you have a question about the story.",
+          "level": "support"
+        },
+        {
+          "word": "answer",
+          "definition": "What you say or write back when someone asks you something",
+          "example": "Write your answer in the box below the math problem.",
+          "level": "support"
+        },
+        {
+          "word": "choose",
+          "definition": "To pick one thing from a group of things",
+          "example": "You may choose a red, blue or green folder.",
+          "level": "support"
+        },
+        {
+          "word": "notice",
+          "definition": "To see or hear something and pay attention to it",
+          "example": "Did you notice the bird's nest in the tree?",
+          "level": "support"
+        },
+        {
+          "word": "remember",
+          "definition": "To keep something in your mind or bring it back later",
+          "example": "Remember to bring your library book back tomorrow.",
+          "level": "support"
+        },
+        {
+          "word": "explain",
+          "definition": "To tell about something clearly so others understand it",
+          "example": "Can you explain how you got the answer?",
+          "level": "core"
+        },
+        {
+          "word": "imagine",
+          "definition": "To make a picture of something in your mind",
+          "example": "Imagine you could fly over your school like a bird.",
+          "level": "core"
+        },
+        {
+          "word": "observe",
+          "definition": "To watch something carefully to learn about it",
+          "example": "We observe the caterpillar every day to see how it changes.",
+          "level": "core"
+        },
+        {
+          "word": "practice",
+          "definition": "To do something again and again to get better at it",
+          "example": "I practice my spelling words before every test.",
+          "level": "core"
+        },
+        {
+          "word": "problem",
+          "definition": "Something hard or wrong that needs to be worked out or fixed",
+          "example": "Our problem was that the boat kept sinking, so we added foam.",
+          "level": "core"
+        },
+        {
+          "word": "detail",
+          "definition": "A small fact or piece of information about something",
+          "example": "Add one more detail about how the dragon looked.",
+          "level": "core"
+        },
+        {
+          "word": "solve",
+          "definition": "To find the answer or the way to fix something",
+          "example": "It took us ten minutes to solve the riddle.",
+          "level": "core"
+        },
+        {
+          "word": "decide",
+          "definition": "To make up your mind and choose what to do",
+          "example": "We could not decide whether to play tag or soccer.",
+          "level": "core"
+        },
+        {
+          "word": "topic",
+          "definition": "What a story, talk or piece of writing is mostly about",
+          "example": "The topic of my report is sea turtles.",
+          "level": "core"
+        },
+        {
+          "word": "research",
+          "definition": "To look for facts in books or online to learn about something",
+          "example": "We will research penguins and share three facts with the class.",
+          "level": "challenge"
+        },
+        {
+          "word": "organize",
+          "definition": "To put things neatly in order so they are easy to find",
+          "example": "Let's organize the crayons by color.",
+          "level": "challenge"
+        },
+        {
+          "word": "paragraph",
+          "definition": "A group of sentences about one main idea",
+          "example": "Start a new paragraph when you write about the next day.",
+          "level": "challenge"
+        },
+        {
+          "word": "revise",
+          "definition": "To change your writing to make it clearer or better",
+          "example": "After reading it aloud, I decided to revise my ending.",
+          "level": "challenge"
+        }
+      ]
+    }
+  ]
+}

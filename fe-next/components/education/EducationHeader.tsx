@@ -213,11 +213,22 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 className={cn(
                   'truncate text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight',
                   'text-neo-black dark:text-neo-white',
-                  'leading-none'
+                  'leading-none',
+                  !title && 'hidden sm:block'
                 )}
               >
                 {title || t('education.header.title')}
               </span>
+              {!title && (
+                <span data-testid="edu-header-phone-title" className="flex min-w-0 flex-col leading-none sm:hidden">
+                  <span className="truncate text-lg font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
+                    {t('eg2Polish.header.brand')}
+                  </span>
+                  <span className="truncate text-[0.65rem] font-black uppercase tracking-wide text-neo-cyan">
+                    {t('eg2Polish.header.section')}
+                  </span>
+                </span>
+              )}
               <span
                 className={cn(
                   'hidden sm:block',

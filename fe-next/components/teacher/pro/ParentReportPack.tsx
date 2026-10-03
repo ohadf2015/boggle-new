@@ -19,6 +19,7 @@ export function ParentReportPack() {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const [classes, setClasses] = useState<ClassOption[] | null>(null);
+  const [hasAnyClass, setHasAnyClass] = useState(false);
   const [classId, setClassId] = useState('');
   const [links, setLinks] = useState<ParentLink[] | null>(null);
   const [className, setClassName] = useState('');
@@ -30,7 +31,9 @@ export function ParentReportPack() {
     let live = true;
     void getClassrooms(user.id).then(({ data }) => {
       if (!live) return;
-      const list = (data ?? []).map((c) => ({ id: c.id, name: c.name, member_count: c.member_count }));
+      const all = (data ?? []).map((c) => ({ id: c.id, name: c.name, member_count: c.member_count }));
+      const list = all.filter((c) => c.member_count > 0);
+      setHasAnyClass(all.length > 0);
       setClasses(list);
       setClassId((prev) => prev || list[0]?.id || '');
     });
@@ -95,7 +98,11 @@ export function ParentReportPack() {
       </div>
 
       {classes && classes.length === 0 ? (
-        <p className="mt-3 text-sm font-bold">{t('eg2Pro.pack.noClasses')}</p>
+        hasAnyClass ? (
+          <p data-testid="parent-pack-no-students" className="mt-3 text-sm font-bold">{t('eg2Polish.pack.noStudents')}</p>
+        ) : (
+          <p className="mt-3 text-sm font-bold">{t('eg2Pro.pack.noClasses')}</p>
+        )
       ) : (
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <label className="flex-1 text-xs font-black uppercase tracking-wide">

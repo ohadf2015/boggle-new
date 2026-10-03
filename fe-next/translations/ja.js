@@ -94,6 +94,55 @@ const ja = {
     }
   },
   // @eg2Fix:end
+  // @eg2Polish:start
+  "eg2Polish": {
+    "arc": {
+      "goal": "目標 {goal}%",
+      "word": {
+        "attempts": "{count}回中{correct}回正解",
+        "lastCorrect": "前回: 正解",
+        "lastMissed": "前回: 不正解"
+      },
+      "practice": {
+        "cta": "{name}さんのためにこの単語を練習 ({count})",
+        "hint": "短い復習を3回: 明日、3日後、7日後。クラス全員に表示されます。",
+        "proHint": "復習ラウンドの配信は Teacher Pro の機能です。",
+        "roundName": "{name}さんの復習: 第{n}回 ({date})",
+        "done": "完了: {name}さんの{count}語を3回の復習に入れました。",
+        "already": "この復習は今日すでに配信済みです。",
+        "nothing": "この生徒が練習する不正解の単語はもうありません。"
+      }
+    },
+    "words": {
+      "missRate": "不正解 {pct}%"
+    },
+    "classes": {
+      "rosterTitle": "生徒の様子",
+      "status": {
+        "below": "目標未満 · {pct}%",
+        "onTrack": "順調 · {pct}%",
+        "notYet": "まだプレイしていない",
+        "played": "プレイ済み"
+      },
+      "openReport": "クラスのレポートを開く",
+      "moreInReport": "ほか{count}人はクラスのレポートで"
+    },
+    "pack": {
+      "noStudents": "保護者リンクには生徒が必要です。クラスコードを共有してください。生徒が参加すると、ここでリンクを作れます。"
+    },
+    "plans": {
+      "freeNote": "カード不要・期限なし。生徒はいつでも無料。",
+      "freeIncluded": "ここにある機能はすべて Pro プランに含まれます。"
+    },
+    "library": {
+      "notAssigned": "まだ配信しない"
+    },
+    "header": {
+      "brand": "LexiClash",
+      "section": "教育"
+    }
+  },
+  // @eg2Polish:end
   // @eg2Seo:start
   "eg2Seo": {
     "rail": {
@@ -19526,7 +19575,7 @@ const ja = {
       "missedOf": "{attempts}回中{missed}回ミス",
       "studentsMissing": "{total}人中{count}人",
       "noneMissed": "まだ2回ミスした単語はありません。いい調子!",
-      "empty": "このクラスで語彙クイズかワードクラフトを1回遊ぶと、定着度がここに表示されます。",
+      "empty": "習熟度は単語リストの単語で数えます。リストを使って単語クイズ、Wordcraft、またはライブゲームを1回遊ぶと表示されます。",
       "loading": "定着度を読み込み中…",
       "error": "定着度を読み込めませんでした。再読み込みしてください。",
       "heatmapToggle": "ヒートマップ:生徒 × 単語",
