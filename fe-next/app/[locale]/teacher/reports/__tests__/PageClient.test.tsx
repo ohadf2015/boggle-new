@@ -64,6 +64,12 @@ vi.mock('@/components/teacher/reports/AssignmentProgressReport', () => ({
   ),
 }));
 
+vi.mock('@/components/teacher/reports/AssignmentCompletionReport', () => ({
+  AssignmentCompletionReport: ({ classroomId }: { classroomId: string }) => (
+    <div data-testid="assignment-completion-report" data-classroom-id={classroomId} />
+  ),
+}));
+
 // Mock useLanguage
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({

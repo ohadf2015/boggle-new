@@ -7,6 +7,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const roster = vi.fn();
+const trackShown = vi.fn();
+const trackCopied = vi.fn();
+const trackJoined = vi.fn();
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (k: string, a?: unknown, p?: Record<string, unknown>) => {
@@ -19,10 +22,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('../useClassRoster', () => ({ useClassRoster: () => roster() }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
-const joinCodeCopied = vi.fn();
-vi.mock('@/lib/education/telemetry', async (orig) => ({
-  ...(await orig<object>()),
-  trackEduJoinCodeCopied: (...a: unknown[]) => joinCodeCopied(...a),
+vi.mock('@/lib/education/telemetry', () => ({
+  trackEduJoinCodeShown: (a: unknown) => trackShown(a),
+  trackEduJoinCodeCopied: (a: unknown) => trackCopied(a),
+  trackEduFirstStudentJoined: (a: unknown) => trackJoined(a),
 }));
 
 import { GetStudentsInCard } from '../GetStudentsInCard';
@@ -31,6 +34,9 @@ const CLASS = { id: 'c1', name: 'Period 3', join_code: 'AB12CD', member_count: 2
 
 describe('<GetStudentsInCard>', () => {
   beforeEach(() => {
+    trackShown.mockClear();
+    trackCopied.mockClear();
+    trackJoined.mockClear();
     roster.mockReturnValue({
       students: [
         { id: 's1', name: 'Ava', avatar: null },
@@ -54,7 +60,7 @@ describe('<GetStudentsInCard>', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
     fireEvent.click(screen.getByTestId('hq-copy-link'));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/en/join/AB12CD`));
-    expect(joinCodeCopied).toHaveBeenCalledWith({ classroomId: 'c1' });
+    expect(trackCopied).toHaveBeenCalledWith({ classroomId: 'c1' });
   });
 
   it('When projector is tapped, Then the projector opens', () => {
@@ -115,11 +121,14 @@ describe('<GetStudentsInCard>', () => {
 
   // Round 2 (critic cp1): dashed empty circles at 0 read as broken, and four
   // equal join affordances competed with the code.
-  it('Given nobody yet, Then a friendly waiting state replaces the dashed ghost seats', () => {
+  it('Given nobody yet, Then a first-student join panel replaces the dashed ghost seats', async () => {
     roster.mockReturnValue({ students: [], loading: false, arrivals: [] });
     render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 0 }} onOpenProjector={vi.fn()} />);
-    expect(screen.getByTestId('hq-roster-waiting')).toBeInTheDocument();
+    expect(screen.getByTestId('hq-first-student-panel')).toBeInTheDocument();
     expect(screen.queryAllByTestId('hq-roster-ghost')).toHaveLength(0);
+    await waitFor(() => expect(screen.getByTestId('hq-first-student-qr')).toBeInTheDocument());
+    await waitFor(() => expect(trackShown).toHaveBeenCalledWith({ classroomId: 'c1' }));
+    expect(trackJoined).not.toHaveBeenCalled();
   });
 
   it('Given the roster is still loading, Then no dashed ghost seats paint either', () => {
@@ -148,5 +157,29 @@ describe('<GetStudentsInCard>', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={onOpen} />);
     fireEvent.click(screen.getByTestId('hq-open-qr'));
     expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given students already in, Then the first-student panel is gone and shown is not fired', () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    expect(screen.queryByTestId('hq-first-student-panel')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('hq-first-student-qr')).not.toBeInTheDocument();
+    expect(trackShown).not.toHaveBeenCalled();
+  });
+
+  it('When the first student arrives, Then edu_first_student_joined fires once', async () => {
+    roster.mockReturnValue({ students: [], loading: false, arrivals: [] });
+    const { rerender } = render(
+      <GetStudentsInCard classroom={{ ...CLASS, member_count: 0 }} onOpenProjector={vi.fn()} />,
+    );
+    await waitFor(() => expect(trackShown).toHaveBeenCalledTimes(1));
+
+    roster.mockReturnValue({
+      students: [{ id: 's9', name: 'Lior', avatar: null }],
+      loading: false,
+      arrivals: ['s9'],
+    });
+    rerender(<GetStudentsInCard classroom={{ ...CLASS, member_count: 1 }} onOpenProjector={vi.fn()} />);
+    await waitFor(() => expect(trackJoined).toHaveBeenCalledWith({ classroomId: 'c1' }));
+    expect(screen.queryByTestId('hq-first-student-panel')).not.toBeInTheDocument();
   });
 });

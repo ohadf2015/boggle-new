@@ -500,6 +500,7 @@ const es = {
       "openProjector": "Abrir proyector",
       "joinedLabel": "dentro",
       "nobodyYet": "Nadie aún: comparte el código",
+      "firstStudentTitle": "Mete a tu primer estudiante",
       "proTitle": "Teacher Pro",
       "proChip": "Ir a Pro",
       "projectorTitle": "Únete a {name}",
@@ -14163,6 +14164,11 @@ const es = {
         "fileName": "{{name}} – progreso de tareas",
         "untitled": "Lección sin título",
         "anonymousStudent": "Alumno {{id}}"
+      },
+      "assignmentCompletion": {
+        "title": "Entrega de tareas",
+        "submitted": "{{submitted}} / {{roster}} entregadas",
+        "upgrade": "Teacher Pro {{price}}"
       },
       "exportAllClasses": {
         "button": "Exportar todas las clases",

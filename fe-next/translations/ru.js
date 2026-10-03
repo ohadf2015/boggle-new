@@ -419,6 +419,7 @@ const ru = {
       "openProjector": "На проектор",
       "joinedLabel": "в игре",
       "nobodyYet": "Пока никого — поделитесь кодом",
+      "firstStudentTitle": "Добавьте первого ученика",
       "proTitle": "Teacher Pro",
       "proChip": "На Pro",
       "projectorTitle": "Присоединяйся: {name}",
@@ -13347,6 +13348,11 @@ const ru = {
         "fileName": "{{name}} – прогресс по заданиям",
         "untitled": "Урок без названия",
         "anonymousStudent": "Ученик {{id}}"
+      },
+      "assignmentCompletion": {
+        "title": "Сдача заданий",
+        "submitted": "{{submitted}} / {{roster}} сдано",
+        "upgrade": "Teacher Pro {{price}}"
       },
       "exportAllClasses": {
         "button": "Экспортировать все классы",

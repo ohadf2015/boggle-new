@@ -500,6 +500,7 @@ const sv = {
       "openProjector": "Öppna projektor",
       "joinedLabel": "inne",
       "nobodyYet": "Ingen här än – dela koden",
+      "firstStudentTitle": "Få in din första elev",
       "proTitle": "Teacher Pro",
       "proChip": "Bli Pro",
       "projectorTitle": "Gå med i {name}",
@@ -14544,6 +14545,11 @@ const sv = {
         "fileName": "{{name}} – uppgiftsprogress",
         "untitled": "Namnlös lektion",
         "anonymousStudent": "Elev {{id}}"
+      },
+      "assignmentCompletion": {
+        "title": "Inlämning av uppgifter",
+        "submitted": "{{submitted}} / {{roster}} inlämnade",
+        "upgrade": "Teacher Pro {{price}}"
       },
       "exportAllClasses": {
         "button": "Exportera alla klasser",

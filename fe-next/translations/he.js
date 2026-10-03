@@ -500,6 +500,7 @@ const he = {
       "openProjector": "למסך המקרן",
       "joinedLabel": "בפנים",
       "nobodyYet": "עוד אף אחד — שתפו את הקוד",
+      "firstStudentTitle": "הכניסו את התלמיד הראשון",
       "proTitle": "פרו למורים",
       "proChip": "שדרוג",
       "projectorTitle": "הצטרפו אל {name}",
@@ -14163,6 +14164,11 @@ const he = {
         "fileName": "{{name}} – התקדמות במשימות",
         "untitled": "שיעור ללא שם",
         "anonymousStudent": "תלמיד {{id}}"
+      },
+      "assignmentCompletion": {
+        "title": "השלמת משימות",
+        "submitted": "{{submitted}} / {{roster}} הוגשו",
+        "upgrade": "Teacher Pro {{price}}"
       },
       "exportAllClasses": {
         "button": "ייצוא כל הכיתות",

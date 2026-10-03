@@ -79,6 +79,9 @@ vi.mock('@/components/teacher/reports/StudentArcView', () => ({
 vi.mock('@/components/teacher/reports/AssignmentProgressReport', () => ({
   AssignmentProgressReport: () => <div data-testid="assignment-report" />,
 }));
+vi.mock('@/components/teacher/reports/AssignmentCompletionReport', () => ({
+  AssignmentCompletionReport: () => <div data-testid="assignment-completion-report" />,
+}));
 vi.mock('@/components/teacher/reports/GoogleClassroomGradePassback', () => ({
   GoogleClassroomGradePassback: () => <div />,
 }));
