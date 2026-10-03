@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -141,6 +142,8 @@ export default async function Page({ params }: PageProps) {
             </Link>
           </div>
         </section>
+
+      <TeacherProCompareCheckoutStrip locale={locale} />
 
         <section className="mt-16 sm:mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
