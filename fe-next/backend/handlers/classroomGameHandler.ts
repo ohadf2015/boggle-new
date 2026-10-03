@@ -59,6 +59,7 @@ const createClassroomGameSchema = z.object({
     boardSize: z.enum(['small', 'medium', 'large']).optional(),
     allowLateJoin: z.boolean().optional(),
     gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'vocab-quiz', 'wordcraft']).optional(),
+    vocabQuizVariant: z.enum(['classic', 'boss']).optional(),
     // Word Hunt: teacher-pinned target. Length/charset is re-checked against the
     // lesson at game start (shared/utils/classroomHuntTarget), so this bound is
     // only a payload-size guard.
@@ -159,6 +160,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       settings?: {
         timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean;
         gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft'; targetWord?: string;
+        vocabQuizVariant?: 'classic' | 'boss';
         vocabQuizFocus?: PracticeFocusSetting;
         vocabQuizQuestionCount?: number; vocabQuizSeconds?: number;
         treasureChestsEnabled?: boolean;
@@ -215,6 +217,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           vocabQuizFocus: payload.settings?.vocabQuizFocus,
           vocabQuizQuestionCount: payload.settings?.vocabQuizQuestionCount,
           vocabQuizSeconds: payload.settings?.vocabQuizSeconds,
+          vocabQuizVariant: payload.settings?.gameMode === 'vocab-quiz' ? payload.settings?.vocabQuizVariant : undefined,
           treasureChestsEnabled: payload.settings?.treasureChestsEnabled ?? true,
           playStyle: payload.settings?.playStyle,
           teamCount: payload.settings?.teamCount,

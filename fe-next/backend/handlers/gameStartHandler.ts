@@ -195,7 +195,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // startGameTimer — any of which would run a board game underneath the quiz
     // and fire its own endGame mid-round. Returns false for every non-quiz room.
     try {
-      if (await startVocabQuizForClassroom(io, gameCode)) {
+      const quizStart = await startVocabQuizForClassroom(io, gameCode);
+      if (quizStart === 'refused') {
+        game.gameState = 'waiting';
+        gamesStarting.delete(gameCode);
+        logger.warn('SOCKET', `Game ${gameCode} quiz start refused, room left in the lobby`);
+        return;
+      }
+      if (quizStart) {
         gamesStarting.delete(gameCode);
         logger.info('SOCKET', `Game ${gameCode} started as a live vocab quiz`);
         return;

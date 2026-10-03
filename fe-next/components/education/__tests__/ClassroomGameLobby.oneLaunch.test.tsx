@@ -43,7 +43,7 @@ vi.mock('@/contexts/AuthContext', () => ({
     profile: { display_name: 'Ms Plant' },
   }),
 }));
-const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: vi.fn() } }));
+const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: vi.fn(), replace: vi.fn() } }));
 vi.mock('next/navigation', () => ({ useRouter: () => stableRouter }));
 vi.mock('socket.io-client', () => ({ io: vi.fn() }));
 vi.mock('@/lib/supabase/education', () => ({
@@ -114,11 +114,8 @@ describe('ClassroomGameLobby — posters choose, GO LIVE launches', () => {
     await screen.findByTestId('lobby-go-live');
     await waitFor(() => expect(socketHandlers['classroomGameError']).toBeDefined());
 
-    fireEvent.click(screen.getByTestId('more-modes-toggle'));
     fireEvent.click(screen.getByTestId('mode-tile-blast'));
-    // Re-open and tap it again: the promoted hero is a poster too, and a
-    // second or third tap must still not mint a room.
-    fireEvent.click(screen.getByTestId('more-modes-toggle'));
+    // A second and third tap, on a selected card too, must still not mint a room.
     fireEvent.click(screen.getByTestId('mode-tile-wheel-rush'));
     fireEvent.click(screen.getByTestId('mode-tile-wheel-rush'));
 
@@ -130,7 +127,6 @@ describe('ClassroomGameLobby — posters choose, GO LIVE launches', () => {
     render(<ClassroomGameLobby initialLessonId="lesson-defs" onBack={vi.fn()} />);
     await screen.findByTestId('lobby-go-live');
 
-    fireEvent.click(screen.getByTestId('more-modes-toggle'));
     fireEvent.click(screen.getByTestId('mode-tile-blast'));
     const go = screen.getByTestId('lobby-go-live');
     expect(go).toHaveTextContent('blast');

@@ -55,14 +55,21 @@ export interface ResultsPodiumProps {
    * is readable from the first frame — the static podium, unchanged.
    */
   stage?: RoundEndStage;
+  layout?: 'auto' | 'row';
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 /** Plinth height in rem — the whole point of a podium is that 1st is tallest. */
-const HEIGHT: Record<number, { card: number; projector: number }> = {
-  1: { card: 6.5, projector: 12 },
-  2: { card: 5, projector: 9 },
-  3: { card: 4, projector: 7 },
+const HEIGHT: Record<number, { card: number; row: number; projector: number }> = {
+  1: { card: 6.5, row: 5, projector: 12 },
+  2: { card: 5, row: 4, projector: 9 },
+  3: { card: 4, row: 3.25, projector: 7 },
+};
+
+const MIN_HEIGHT_CLASS: Record<number, { card: string; row: string; projector: string }> = {
+  1: { card: 'min-h-[6.5rem]', row: 'min-h-[5rem]', projector: 'min-h-[min(12rem,15dvh)]' },
+  2: { card: 'min-h-[5rem]', row: 'min-h-[4rem]', projector: 'min-h-[min(9rem,12dvh)]' },
+  3: { card: 'min-h-[4rem]', row: 'min-h-[3.25rem]', projector: 'min-h-[min(7rem,9dvh)]' },
 };
 
 /**
@@ -88,6 +95,12 @@ const COLUMN: Record<number, string> = {
   3: 'sm:order-3',
 };
 
+const ROW_COLUMN: Record<number, string> = {
+  1: 'order-2',
+  2: 'order-1',
+  3: 'order-3',
+};
+
 
 /**
  * The placard's two states, both transform-only. A plinth waiting its turn sits
@@ -97,18 +110,25 @@ const COLUMN: Record<number, string> = {
 const REVEAL_MOTION =
   'transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] motion-reduce:transition-none';
 
-export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }: ResultsPodiumProps) {
+export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, layout = 'auto', t }: ResultsPodiumProps) {
   if (entries.length === 0) return null;
   const projector = size === 'projector';
+  const row = !projector && layout === 'row';
+  const scale = projector ? 'projector' : row ? 'row' : 'card';
 
   return (
     <ol
       aria-label={t('education.results.podium.title')}
-      className="flex flex-col sm:flex-row sm:items-end justify-center gap-3 sm:gap-4"
+      className={cn(
+        'flex justify-center',
+        row ? 'flex-row items-end gap-2' : 'flex-col sm:flex-row sm:items-end gap-3 sm:gap-4',
+        projector && 'pt-10'
+      )}
     >
       {entries.map((entry) => {
         const rank = entry.rank;
-        const height = (HEIGHT[rank] ?? HEIGHT[3])[projector ? 'projector' : 'card'];
+        const height = (HEIGHT[rank] ?? HEIGHT[3])[scale];
+        const minHeightClass = (MIN_HEIGHT_CLASS[rank] ?? MIN_HEIGHT_CLASS[3])[scale];
         const revealed = isRevealed(rank, stage);
         return (
           <li
@@ -121,15 +141,15 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
             // time: a plinth whose name has not landed yet is not readable.
             aria-hidden={revealed ? undefined : true}
             className={cn(
-              'flex-1 sm:max-w-[14rem] flex flex-col items-center',
-              COLUMN[rank] ?? 'sm:order-3'
+              'flex-1 flex flex-col items-center',
+              row ? cn('min-w-0 max-w-[8rem]', ROW_COLUMN[rank] ?? 'order-3') : cn('sm:max-w-[14rem]', COLUMN[rank] ?? 'sm:order-3')
             )}
           >
             {/* Name cap — sits on the plinth like a placard. */}
             <div
               className={cn(
                 'relative z-10 w-full rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated',
-                'px-3 py-2 text-center shadow-hard-sm',
+                row ? 'px-2 py-1 text-center shadow-hard-sm' : 'px-3 py-2 text-center shadow-hard-sm',
                 TILT[rank],
                 REVEAL_MOTION,
                 revealed ? 'scale-100' : 'scale-95'
@@ -157,7 +177,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
               <p
                 className={cn(
                   'font-neo-display font-bold text-neo-white truncate',
-                  projector ? 'text-3xl' : 'text-base'
+                  projector ? 'text-2xl [@media(min-height:1000px)]:text-3xl' : row ? 'text-sm' : 'text-base'
                 )}
               >
                 {/* An em-dash placeholder, not a blank: the placard keeps its
@@ -176,9 +196,11 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
               // them hang out of the bottom of it — seen on a real wall with
               // three players. The step between the three placings is what the
               // number is for; it is not a promise the content has to keep.
-              style={{ minHeight: `${height}rem` }}
+              data-plinth
               className={cn(
-                '-mt-1 w-full flex flex-col items-center justify-center gap-0.5 py-2',
+                '-mt-1 w-full flex flex-col items-center justify-center gap-0.5',
+                row ? 'py-1' : 'py-2',
+                minHeightClass,
                 'rounded-neo border-[2px] border-neo-black shadow-hard',
                 'text-neo-black',
                 RANK_FILL[rank] ?? RANK_FILL[3]
@@ -189,7 +211,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
                   // 60% black on the pink third-place fill measured 3.47:1.
                   // 80% clears AA on all three fills (4.91 / 10.57 / 11.01).
                   'font-neo-display font-black leading-none opacity-80',
-                  projector ? 'text-2xl' : 'text-sm'
+                  projector ? 'text-xl [@media(min-height:1000px)]:text-2xl' : row ? 'text-xs' : 'text-sm'
                 )}
                 aria-hidden
               >
@@ -200,7 +222,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
                   'font-neo-display font-black tabular-nums leading-none',
                   REVEAL_MOTION,
                   revealed ? 'scale-100' : 'scale-90',
-                  projector ? 'text-6xl' : 'text-3xl'
+                  projector ? 'text-5xl [@media(min-height:1000px)]:text-6xl' : row ? 'text-2xl' : 'text-3xl'
                 )}
               >
                 {revealed ? entry.score : '·····'}
@@ -208,7 +230,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
               {entry.detail && revealed && (
                 <span
                   data-testid={`podium-detail-${rank}`}
-                  className={cn('font-neo-body font-bold opacity-80', projector ? 'text-xl' : 'text-xs')}
+                  className={cn('font-neo-body font-bold opacity-80', projector ? 'text-lg [@media(min-height:1000px)]:text-xl' : row ? 'text-[11px] leading-tight' : 'text-xs')}
                 >
                   {entry.detail}
                 </span>

@@ -34,7 +34,10 @@ vi.mock('@/hooks/gameState/store', () => ({
 }));
 vi.mock('@/components/education/vocabQuiz/useIsVocabQuizRoom', () => ({ useIsVocabQuizRoom: () => false }));
 vi.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({ __esModule: true, default: () => <div /> }));
-vi.mock('@/host/components/tv-broadcast/TvNotificationQueue', () => ({ __esModule: true, default: () => null }));
+vi.mock('@/host/components/tv-broadcast/TvNotificationQueue', () => ({
+  __esModule: true,
+  default: ({ placement }: { placement?: string }) => <div data-testid="tv-toast-queue" data-placement={placement ?? 'overlay'} />,
+}));
 vi.mock('@/host/components/tv-broadcast/TvGameHeader', () => ({
   __esModule: true,
   default: (p: Record<string, unknown>) => {
@@ -181,5 +184,17 @@ describe('TvBroadcastView — the classroom host screen', () => {
   it('Given an arcade room, Then no classroom exit is added to the join bar', () => {
     render(<TvBroadcastView {...props({ classroomLive: null, onExitRoom: vi.fn() })} />);
     expect(screen.queryByTestId('tv-classroom-exit')).toBeNull();
+  });
+  it('Given a classroom round, Then toasts render in the header slot beside the timer, never floating over the leaderboard', () => {
+    render(<TvBroadcastView {...props()} />);
+    const slot = headerProps.current?.toastSlot as React.ReactElement<{ placement?: string }> | undefined;
+    expect(slot?.props.placement).toBe('inline');
+    expect(screen.queryByTestId('tv-toast-queue')).toBeNull();
+  });
+
+  it('Given an arcade room, Then toasts keep their floating overlay', () => {
+    render(<TvBroadcastView {...props({ classroomLive: null })} />);
+    expect(headerProps.current?.toastSlot).toBeUndefined();
+    expect(screen.getByTestId('tv-toast-queue')).toHaveAttribute('data-placement', 'overlay');
   });
 });

@@ -170,6 +170,26 @@ describe('ClassroomGameHandler', () => {
       });
     });
 
+    it('keeps the Boss Battle variant on a vocab quiz room, and only there', async () => {
+      (classroomGameManager.createClassroomGame as Mock).mockResolvedValue(undefined);
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const createHandler = mockSocket.on.mock.calls.find((call: any[]) => call[0] === 'createClassroomGame')[1];
+      const base = {
+        gameCode: 'BOS123',
+        classroomId: '00000000-0000-4000-8000-000000000002',
+        teacherId: '00000000-0000-4000-8000-000000000001',
+        teacherName: 'Mr Smith',
+        lessonIds: ['00000000-0000-4000-8000-000000000003'],
+      };
+
+      await createHandler({ ...base, settings: { gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' } });
+      await createHandler({ ...base, gameCode: 'BOS124', settings: { gameMode: 'classic', vocabQuizVariant: 'boss' } });
+
+      const calls = (classroomGameManager.createClassroomGame as Mock).mock.calls.map((c) => c[0].settings);
+      expect(calls[0].vocabQuizVariant).toBe('boss');
+      expect(calls[1].vocabQuizVariant).toBeUndefined();
+    });
+
     it('should emit error if creation fails', async () => {
       // GIVEN
       const gameData = {

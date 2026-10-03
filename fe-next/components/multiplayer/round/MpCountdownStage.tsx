@@ -31,7 +31,7 @@ export interface MpCountdownStageProps {
   t?: (key: string) => string;
   players?: ReadonlyArray<CountdownPlayer>;
   /** A classroom room: the teacher's mode wins over the store's board mode (null = not resolved yet). */
-  classroom?: { mode: string | null } | null;
+  classroom?: { mode: string | null; vocabQuizVariant?: string | null } | null;
 }
 
 
@@ -73,7 +73,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
   const reduceMotion = useShouldReduceMotion();
   const [staticLayer] = useState(() => prefersStaticFullscreenOverlay());
   const storeMode = useGameMode();
-  const mode = classroom ? classroomRoundModeMeta(classroom.mode) : roundModeMeta(storeMode);
+  const mode = classroom ? classroomRoundModeMeta(classroom.mode, classroom.vocabQuizVariant) : roundModeMeta(storeMode);
 
   // onComplete in a ref: parent re-renders (timeUpdate) pass new callbacks and
   // must never reset the countdown clock (the old "stuck at 3" bug).

@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export type ControlTone = 'go' | 'time' | 'neutral' | 'danger' | 'armed';
@@ -12,7 +12,9 @@ const TONE_CLASSES: Record<ControlTone, string> = {
   // Black, not white: white on neo-pink measures 3.64:1, under the 4.5:1 the
   // contrast sweep enforces (flagged on the quiz projector, 1440x900).
   danger: 'bg-neo-pink text-neo-black',
-  armed: 'bg-neo-red text-neo-white animate-pulse',
+  // No `animate-pulse`: the app-wide pulse keyframes scale the box, so the
+  // confirm tap would chase a moving target.
+  armed: 'bg-neo-red text-neo-white ring-4 ring-neo-yellow',
 };
 
 interface ControlButtonProps {
@@ -29,7 +31,26 @@ interface ControlButtonProps {
    * strip gives its extra height back to the game surface.
    */
   compact?: boolean;
+  /** While set, a bar drains across the button over this many ms. */
+  drainMs?: number;
+  drainTestId?: string;
   className?: string;
+}
+
+function DrainBar({ ms, testId }: { ms: number; testId?: string }) {
+  const [draining, setDraining] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setDraining(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <span
+      aria-hidden="true"
+      data-testid={testId}
+      className="pointer-events-none absolute inset-x-0 bottom-0 h-1.5 lg:h-2 origin-left rtl:origin-right bg-neo-yellow"
+      style={{ transform: `scaleX(${draining ? 0 : 1})`, transition: `transform ${ms}ms linear` }}
+    />
+  );
 }
 
 /** Height + type ladder for a projector, and the flat fallback for a short window. */
@@ -58,6 +79,8 @@ export function ControlButton({
   ariaPressed,
   dataArmed,
   compact = false,
+  drainMs,
+  drainTestId,
   className,
 }: ControlButtonProps) {
   return (
@@ -72,7 +95,7 @@ export function ControlButton({
         // from `lg` up (the bar sets `lg:flex-nowrap`): a long label in Hebrew or
         // Russian breaks onto a second LINE inside the button, never a second row that
         // would eat a third of the projector.
-        'inline-flex min-w-0 items-center justify-center',
+        'relative overflow-hidden inline-flex min-w-0 items-center justify-center',
         'rounded-neo border-3 lg:border-4 border-neo-black shadow-hard lg:shadow-hard-lg',
         'font-neo-display font-black uppercase tracking-wide',
         // A classroom projector is usually 1280-1920px wide and read from 5m —
@@ -94,6 +117,7 @@ export function ControlButton({
         {icon}
       </span>
       <span className="line-clamp-2 min-w-0 text-balance text-center leading-[1.05] [overflow-wrap:anywhere]">{label}</span>
+      {drainMs ? <DrainBar ms={drainMs} testId={drainTestId} /> : null}
     </button>
   );
 }

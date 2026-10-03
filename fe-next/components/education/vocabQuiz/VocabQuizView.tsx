@@ -3,9 +3,8 @@
  *
  * One screen, four states: question, locked-in, reveal, finished. The shell
  * never scrolls: header, clock and prompt are fixed-height, the answer grid
- * takes whatever is left, and the reveal arrives as a strip OVER the grid
- * rather than as four more blocks under it. That is what keeps a 390×844 phone
- * whole — the old reveal pushed the round off the bottom of the screen.
+ * takes whatever is left, and at the reveal it shrinks to make room for the
+ * verdict strip beneath it.
  *
  * The payoff layer lives in `useVocabQuizJuice`: a tick tightening under five
  * seconds, a chime or a buzz the instant the server judges, a stinger at three
@@ -25,6 +24,8 @@ import type { Socket } from 'socket.io-client';
 import { PauseCircle, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
+import { ClassroomBossBar } from '../ClassroomBossBar';
+import { ClassroomBossOutcome } from '../ClassroomBossOutcome';
 import { useVocabQuiz } from './useVocabQuiz';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import {
@@ -103,6 +104,11 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
   // Keyed on the question index so the same total twice still re-animates.
   const pop = myAnswer ? { points: myAnswer.points, key: myAnswer.index } : null;
 
+  // A chest is offered in place of the spent answer grid, so the verdict
+  // beneath it stays readable.
+  const ownChestOpen = !!quiz.myChest && quiz.myChest.actor === username;
+  const chestOffered = quiz.chestPending && !ownChestOpen && phase !== 'ended';
+
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy text-neo-white p-3 gap-2.5">
       <VocabQuizStudentHeader
@@ -121,6 +127,16 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
         }
         t={t}
       />
+
+      {phase !== 'ended' && (
+        <ClassroomBossBar
+          boss={quiz.boss}
+          phase={phase}
+          surface="student"
+          myHit={myAnswer?.bossHit ?? (phase === 'reveal' ? 0 : null)}
+          t={t}
+        />
+      )}
 
       {/* Timer bar — it does not just shrink, it tightens: the last five
           seconds pulse in time with the tick the student is hearing. */}
@@ -171,12 +187,27 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
             </p>
           )}
 
-          {/* The one region that owns the leftover height. The reveal strip
-              sits inside it, over the tiles — so the page height is identical
-              in both phases and nothing ever scrolls. */}
-          <div className="relative flex-1 min-h-0">
+          {/* The one region that owns the leftover height. At the reveal the
+              tiles give up height to the verdict below them — nothing is ever
+              drawn on top of an answer. */}
+          <div className="flex-1 min-h-0 flex flex-col gap-2">
+            {chestOffered ? (
+              <div className="flex-1 min-h-0">
+                <VocabQuizChestFlow
+                  picker="inline"
+                  socket={socket}
+                  chestPending={quiz.chestPending}
+                  myChest={quiz.myChest}
+                  chestHit={quiz.chestHit}
+                  questionIndex={quiz.question?.index ?? quiz.questionNumber - 1}
+                  ended={false}
+                  username={username}
+                  t={t}
+                />
+              </div>
+            ) : (
             <VocabQuizAnswerGrid
-              className="h-full"
+              className="flex-1 min-h-0"
               choices={question.choices}
               selectedIndex={myAnswer?.choiceIndex ?? pendingChoice}
               correctIndex={phase === 'reveal' && reveal ? reveal.answerIndex : null}
@@ -184,6 +215,7 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
               onSelect={quiz.answer}
               t={t}
             />
+            )}
 
             {phase === 'reveal' && reveal && (
               <VocabQuizRevealBanner
@@ -192,6 +224,8 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
                 word={reveal.word}
                 definition={reveal.definition}
                 sweep={juice.sweep}
+                points={myAnswer?.points ?? null}
+                streak={quiz.myStreak}
                 t={t}
               />
             )}
@@ -200,17 +234,16 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
       )}
 
       {/* Finished — the same shape a board round ends on: my own placing
-          first, then the room's top three on plinths. Layout is pinned to
-          prevent actions from scrolling off-screen: only standings scroll. */}
+          first, then the room's top three on plinths. */}
       {phase === 'ended' && (
-        <div className="flex-1 min-h-0 flex flex-col gap-4">
-          {/* Title — always visible */}
+        <div data-testid="vocab-quiz-ended" className="flex-1 min-h-0 flex flex-col gap-4 overflow-y-auto overscroll-contain">
           <h2 className="shrink-0 flex items-center gap-2 font-neo-display font-bold text-2xl">
             <Trophy className="w-7 h-7 text-neo-yellow" aria-hidden />
             {t('vocabQuiz.finished.title')}
           </h2>
 
-          {/* Outcome — always visible */}
+          <ClassroomBossOutcome boss={quiz.boss} compact t={t} />
+
           <div className="shrink-0">
             {myStanding ? (
               <StudentRoundOutcome
@@ -246,9 +279,8 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
             )}
           </div>
 
-          {/* Standings — the only scrollable region. A hidden leaderboard
-              turns it into the reveal beat: the teacher owns the standings. */}
-          <div className="flex-1 min-h-0 overflow-y-auto">
+          {/* A hidden leaderboard turns this into the reveal beat: the teacher owns the standings. */}
+          <div className="shrink-0">
             {leaderboardHidden ? (
               <p
                 data-testid="vocab-quiz-reveal-note"
@@ -261,7 +293,13 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
             )}
           </div>
 
-          {/* Finale — always visible (badges/streak) */}
+          <div data-testid="vocab-quiz-ended-actions" className="shrink-0">
+            <StudentNextActions
+              onPlayAgain={onPlayAgain}
+              onPractice={quiz.missed.length > 0 ? () => setPracticeFor(quiz.missed) : undefined}
+              t={t}
+            />
+          </div>
           <div className="shrink-0">
             <VocabQuizOwnFinale
               correct={myStanding?.correctCount ?? 0}
@@ -271,14 +309,6 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
             />
           </div>
 
-          {/* Primary actions — always visible (wait for teacher + in-place practice) */}
-          <div className="shrink-0">
-            <StudentNextActions
-              onPlayAgain={onPlayAgain}
-              onPractice={quiz.missed.length > 0 ? () => setPracticeFor(quiz.missed) : undefined}
-              t={t}
-            />
-          </div>
           {practiceOpen && (
             <VocabQuizMissedSheet missed={quiz.missed} onClose={() => setPracticeFor(null)} t={t} />
           )}
@@ -287,6 +317,7 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
 
       {/* Treasure chest flow — picker and reveal overlay */}
       <VocabQuizChestFlow
+        picker="none"
         socket={socket}
         chestPending={quiz.chestPending}
         myChest={quiz.myChest}

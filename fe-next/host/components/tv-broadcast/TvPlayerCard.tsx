@@ -301,7 +301,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           {gameMode === 'word-hunt' && lives != null && !isEliminated && (
             <span className="flex items-center gap-0.5 text-neo-red text-sm font-bold">
               <Heart className="w-3.5 h-3.5 fill-neo-red" />
-              {lives}
+              {Math.round(lives)}
             </span>
           )}
         </div>

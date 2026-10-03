@@ -28,6 +28,7 @@ interface LessonData {
    * the host crashed on.
    */
   gameMode?: ClassroomGameMode;
+  vocabQuizVariant?: 'classic' | 'boss';
   templateSettings?: {
     timerSeconds: number;
     difficulty: string;
@@ -253,6 +254,7 @@ export function ClassroomModeBanner({
       {showPanel && !isHost && (
         <StudentModeStrip
           gameMode={gameMode}
+          vocabQuizVariant={lessonData?.vocabQuizVariant ?? liveGame?.settings?.vocabQuizVariant}
           lessonName={lessonName}
           questionCount={questionCount}
           questionSeconds={questionSeconds}

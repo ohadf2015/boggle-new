@@ -45,6 +45,20 @@ describe('setClassroomGameMode', () => {
     mockGetClassroomGame.mockResolvedValue(JSON.parse(JSON.stringify(GAME)));
   });
 
+  it('switches a room into Boss Battle by carrying the variant', async () => {
+    await setClassroomGameMode('ABC123', 'vocab-quiz', 'boss');
+    const written = JSON.parse(mockSetex.mock.calls[0][2] as string);
+    expect(written.settings).toMatchObject({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' });
+  });
+
+  it('drops a stale Boss Battle variant when the room switches to the plain quiz', async () => {
+    mockGetClassroomGame.mockResolvedValue({ ...GAME, settings: { ...GAME.settings, gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' } });
+    await setClassroomGameMode('ABC123', 'vocab-quiz');
+    const written = JSON.parse(mockSetex.mock.calls[0][2] as string);
+    expect(written.settings.gameMode).toBe('vocab-quiz');
+    expect(written.settings.vocabQuizVariant).toBeUndefined();
+  });
+
   it('writes the new mode back under the same key and keeps everything else', async () => {
     const ok = await setClassroomGameMode('ABC123', 'vocab-quiz');
 

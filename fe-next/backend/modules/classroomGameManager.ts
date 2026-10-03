@@ -62,6 +62,7 @@ export interface ClassroomGameSettings {
    * mode rolls, quick-play matchmaking and every board-engine mode branch.
    */
   gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft';
+  vocabQuizVariant?: 'classic' | 'boss';
   /**
    * Word Hunt only: the lesson word the teacher pinned as the hunted target.
    * Empty/absent means "let the game pick". Re-validated against the lesson at

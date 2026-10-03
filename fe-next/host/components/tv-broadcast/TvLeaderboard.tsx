@@ -7,6 +7,7 @@ import { Users } from 'lucide-react';
 import TvPlayerCard from './TvPlayerCard';
 import TvGapIndicator from './TvGapIndicator';
 import LiveClassroomLeaderboard from '@/components/education/duels/LiveClassroomLeaderboard';
+import { useRowsThatFit } from './useRowsThatFit';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { ClassroomTeam } from '@/shared/utils/teamBattle';
 
@@ -70,6 +71,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   t,
 }) => {
   const parentRef = useRef<HTMLDivElement>(null);
+  const classroomRowsRef = useRef<HTMLDivElement>(null);
   // The `classroom` prop derives from the start payload, and a coordinator
   // retry `startGame` arrives without it — the host keeps the last value, so it
   // went null after round 1. The teacher's URL carries `classroom=true` for the
@@ -113,6 +115,10 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
     // Could be enhanced to scroll to players who just scored
   }, [sortedPlayers]);
 
+  const showClassroomBoard = !!(classroom || classroomUrl) && !teams?.length && gameMode !== 'word-hunt';
+  const classroomStudents = sortedPlayers.filter((p) => !p.isHost).length;
+  const classroomRows = useRowsThatFit(classroomRowsRef, Math.min(CLASSROOM_TOP_N, classroomStudents));
+
   if (sortedPlayers.length === 0) {
     return (
       <div
@@ -127,19 +133,30 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
     );
   }
 
-  if ((classroom || classroomUrl) && !teams?.length && gameMode !== 'word-hunt') {
+  if (showClassroomBoard) {
+    const hiddenStudents = classroomStudents - classroomRows;
     return (
       <div className="h-full overflow-hidden p-4 flex flex-col" data-testid="tv-classroom-standings">
         <h3 className="text-xl font-black uppercase text-neo-black mb-2 text-center border-b-2 border-neo-black pb-2 shrink-0">
           {t('tvBroadcast.leaderboard')}
         </h3>
-        <LiveClassroomLeaderboard
-          variant="projector"
-          leaderboard={sortedPlayers}
-          topN={CLASSROOM_TOP_N}
-          gameMode={gameMode}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
-        />
+        <div ref={classroomRowsRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <LiveClassroomLeaderboard
+            variant="projector"
+            leaderboard={sortedPlayers}
+            topN={classroomRows}
+            gameMode={gameMode}
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+          />
+        </div>
+        {hiddenStudents > 0 && (
+          <p
+            data-testid="tv-classroom-more"
+            className="shrink-0 pt-1 text-center font-neo-display text-lg font-black uppercase text-neo-black/70"
+          >
+            {t('tvBroadcast.moreStudents', { count: hiddenStudents })}
+          </p>
+        )}
       </div>
     );
   }

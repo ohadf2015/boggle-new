@@ -6,10 +6,8 @@
  * the tests can drive a whole round deterministically. Keeping the rules here
  * is what makes pause/advance and the reconnect payload testable at all.
  *
- * The engine is the sole authority on scoring. The student UI shows the
- * breakdown using the same pure helpers from `lib/education/vocabQuizScoring`,
- * but it never computes a total of its own — Class 3 in
- * .claude/rules/60-recurring-pitfalls.md is precisely that drift.
+ * The engine is the sole authority on scoring; the UI never computes a total
+ * of its own (Class 3 in .claude/rules/60-recurring-pitfalls.md).
  */
 
 import type { VocabularyWord } from '@/lib/supabase/education/types';
@@ -21,6 +19,7 @@ import {
   type PracticeFocusSetting,
 } from '@/lib/education/vocabQuizQuestions';
 import { scoreAnswer, sortStandings } from '@/lib/education/vocabQuizScoring';
+import { withBoss } from './vocabQuizBoss.js';
 import {
   VOCAB_QUIZ_REVEAL_MS,
   VOCAB_QUIZ_MIN_SECONDS,
@@ -218,7 +217,8 @@ function elapsedMs(session: VocabQuizSession, now: number): number {
 }
 
 export function questionRemainingMs(session: VocabQuizSession, now: number): number {
-  return Math.max(0, session.limitMs - elapsedMs(session, now));
+  const lead = session.paused ? 0 : Math.max(0, session.questionStartedAt - now);
+  return Math.max(0, session.limitMs - elapsedMs(session, now)) + lead;
 }
 
 export function questionExpired(session: VocabQuizSession, now: number): boolean {
@@ -266,11 +266,8 @@ export interface SubmitAnswerInput {
 }
 
 /**
- * Score one answer, or return null when it must be ignored.
- *
- * Every rejection here is a normal race, not an error: a packet for the
- * previous question, a double tap, an answer that crossed the timer. The
- * caller tells the sender nothing, because there is nothing to say.
+ * Score one answer, or return null when it must be ignored. Every rejection
+ * is a normal race (stale packet, double tap, crossed the timer), not an error.
  */
 export function submitQuizAnswer(
   session: VocabQuizSession,
@@ -359,7 +356,7 @@ export function quizStandings(session: VocabQuizSession): VocabQuizStanding[] {
  */
 export function buildQuestionPayload(session: VocabQuizSession, now: number): VocabQuizQuestionPayload {
   const question = session.questions[session.index];
-  return {
+  return withBoss(session, {
     gameCode: session.gameCode,
     index: session.index,
     total: session.questions.length,
@@ -369,7 +366,7 @@ export function buildQuestionPayload(session: VocabQuizSession, now: number): Vo
     limitMs: session.limitMs,
     remainingMs: questionRemainingMs(session, now),
     serverNow: now,
-  };
+  });
 }
 
 export function buildReveal(session: VocabQuizSession): VocabQuizReveal {
@@ -381,7 +378,7 @@ export function buildReveal(session: VocabQuizSession): VocabQuizReveal {
     }
   }
 
-  return {
+  return withBoss(session, {
     gameCode: session.gameCode,
     index: session.index,
     total: session.questions.length,
@@ -393,7 +390,7 @@ export function buildReveal(session: VocabQuizSession): VocabQuizReveal {
     standings: quizStandings(session),
     nextInMs: VOCAB_QUIZ_REVEAL_MS,
     isLast: session.index >= session.questions.length - 1,
-  };
+  });
 }
 
 /**
@@ -423,12 +420,8 @@ export function endQuiz(session: VocabQuizSession): void {
 }
 
 /**
- * Everything a reconnecting or late-joining client needs, in ONE event.
- *
- * The reconnect bug this avoids is Class 3 in the recurring-pitfalls rules:
- * two paths into the same state that carry different fields. There is exactly
- * one snapshot shape, so "fresh join", "mid-question refresh", "refresh during
- * the reveal" and "arrived after it ended" all restore identically.
+ * Everything a reconnecting or late-joining client needs, in ONE event: one
+ * snapshot shape for every way back in (Class 3 in the recurring-pitfalls rules).
  */
 export function snapshotFor(
   session: VocabQuizSession,
@@ -442,7 +435,7 @@ export function snapshotFor(
   const chestKey = `${session.index}:${username}`;
   const myChest = session.chestResults.get(chestKey);
 
-  return {
+  return withBoss(session, {
     gameCode: session.gameCode,
     active: session.phase !== 'ended',
     phase: session.phase,
@@ -470,14 +463,9 @@ export function snapshotFor(
     myScore: player?.score ?? 0,
     myStreak: player?.streak ?? 0,
     standings: quizStandings(session),
-  };
+  });
 }
 
-/**
- * Lesson words each student answered correctly, keyed by Supabase auth id —
- * the exact `wordsFound` shape `persistClassroomGameScores` consumes. Guests
- * and bots are dropped: neither has lesson progress to write.
- */
 /**
  * The lesson words this round actually ASKED, in order.
  *

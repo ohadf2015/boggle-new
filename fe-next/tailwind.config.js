@@ -446,6 +446,11 @@ module.exports = {
           "60%": { transform: "translateY(5px) rotate(1deg)" },
           "100%": { transform: "translateY(0) rotate(0deg)", opacity: "1" },
         },
+        "feedback-spark": {
+          "0%":   { transform: "translate(0, 0) scale(0.3) rotate(0deg)" },
+          "25%":  { transform: "translate(calc(var(--spark-x) * 0.35), calc(var(--spark-y) * 0.35)) scale(1.15) rotate(60deg)" },
+          "100%": { transform: "translate(var(--spark-x), var(--spark-y)) scale(0) rotate(180deg)" },
+        },
         "neo-shake": {
           "0%":   { transform: "translateX(0) rotate(0deg)" },
           "8%":   { transform: "translateX(-8px) rotate(1.5deg)" },
@@ -623,6 +628,7 @@ module.exports = {
         "fadeIn": "fadeIn 0.2s ease-out forwards",
         "neo-slide-in": "neo-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-shake": "neo-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
+        "feedback-spark": "feedback-spark 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both",
         "neo-damage-drip": "neo-damage-drip 0.8s ease-out",
         "neo-reject-flash": "neo-reject-flash 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",

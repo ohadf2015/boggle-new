@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Brain, Clock, Grid2x2, Grid3x3, LayoutGrid, RotateCw, Search, Zap, type LucideIcon } from 'lucide-react';
+import { BookOpen, Brain, Clock, Grid2x2, Grid3x3, LayoutGrid, RotateCw, Search, Swords, Zap, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
@@ -43,7 +43,10 @@ const TONE: Record<string, string> = {
   'vocab-quiz': 'bg-neo-cyan',
 };
 
-export function studentModeCopy(mode: ClassroomGameMode | string): StudentModeCopy {
+export function studentModeCopy(mode: ClassroomGameMode | string, vocabQuizVariant?: string | null): StudentModeCopy {
+  if (mode === 'vocab-quiz' && vocabQuizVariant === 'boss') {
+    return { nameKey: 'eg2Modes.boss.name', ruleKey: 'eg2Modes.boss.how', icon: Swords, tone: 'bg-neo-pink' };
+  }
   const nameKey = `teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[mode] ?? 'classic'}`;
   const ruleKey =
     mode === 'vocab-quiz'
@@ -56,6 +59,8 @@ export function studentModeCopy(mode: ClassroomGameMode | string): StudentModeCo
 
 export interface StudentModeStripProps {
   gameMode: ClassroomGameMode;
+  /** 'boss' when the room is a Boss Battle (the quiz engine as class vs boss). */
+  vocabQuizVariant?: string | null;
   lessonName: string;
   questionCount: number | null;
   questionSeconds: number | null;
@@ -68,6 +73,7 @@ export interface StudentModeStripProps {
 /** What a student needs before the whistle: the game, how to win it, and nothing to configure. */
 export function StudentModeStrip({
   gameMode,
+  vocabQuizVariant,
   lessonName,
   questionCount,
   questionSeconds,
@@ -76,7 +82,7 @@ export function StudentModeStrip({
   boardSize,
   t,
 }: StudentModeStripProps) {
-  const copy = studentModeCopy(gameMode);
+  const copy = studentModeCopy(gameMode, vocabQuizVariant);
   const Icon = copy.icon;
   const isQuiz = gameMode === 'vocab-quiz';
 

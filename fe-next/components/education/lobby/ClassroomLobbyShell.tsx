@@ -45,17 +45,17 @@ export function ClassroomLobbyShell({ pinned, children, footer, className }: Cla
           a short lobby sits in the middle of a 900px desktop instead of
           stranding 500px of empty navy under it, and a tall one still gets its
           own scrollbar without ever handing the scroll to the page. */}
-      <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-1 flex-col justify-center-safe gap-3 px-1 py-2 lg:max-w-4xl lg:gap-4">
+      <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-1 flex-col justify-center-safe gap-2 px-1 py-1 lg:max-w-5xl lg:gap-3">
         {/* The stage title: what this screen is for, in one line, on a
             show-card — the arena behind it says the rest. */}
-        <header className="flex shrink-0 flex-col items-center gap-1 text-center">
+        <header className="flex shrink-0 flex-col items-center gap-1 text-center lg:flex-row lg:justify-center lg:gap-3">
           <h1
             data-testid="lobby-stage-title"
-            className="rounded-neo border-[3px] border-neo-black bg-neo-yellow px-4 py-1 font-neo-display text-2xl font-black uppercase leading-tight tracking-tight text-neo-black lg:px-6 lg:text-4xl"
+            className="rounded-neo border-[3px] border-neo-black bg-neo-yellow px-3 py-0.5 font-neo-display text-lg font-black uppercase leading-tight tracking-tight text-neo-black lg:px-4 lg:text-2xl"
           >
             {tr(t, 'academy.launch.title', 'Start a live game')}
           </h1>
-          <p className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-sm font-bold text-neo-cream lg:text-lg">
+          <p className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-xs font-bold text-neo-cream lg:text-base">
             {tr(t, 'academy.launch.subtitle', 'Pick a game. Your class joins with one code.')}
           </p>
         </header>

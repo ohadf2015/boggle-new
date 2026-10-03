@@ -127,6 +127,7 @@ export interface TvNotificationData {
 interface TvNotificationProps {
   notification: TvNotificationData;
   onDismiss: (id: string) => void;
+  compact?: boolean;
 }
 
 // Notification type configurations
@@ -263,6 +264,7 @@ const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
 const TvNotification = memo<TvNotificationProps>(({
   notification,
   onDismiss,
+  compact = false,
 }) => {
   const config = NOTIFICATION_CONFIGS[notification.type];
 
@@ -289,6 +291,19 @@ const TvNotification = memo<TvNotificationProps>(({
 
   // Hype banner image for overtake/comeback
   const hypeBanner = HYPE_BANNER_IMAGES[notification.type];
+
+  if (compact) {
+    return (
+      <MinimalToastLayout
+        headline={layoutProps.headline}
+        player={layoutProps.player}
+        icon={layoutProps.icon}
+        bgGradient={layoutProps.bgGradient}
+        textColor={layoutProps.textColor}
+        borderColor={layoutProps.borderColor}
+      />
+    );
+  }
 
   // Render appropriate layout based on notification type
   const content = (() => {

@@ -36,7 +36,7 @@ vi.mock('@/contexts/AuthContext', () => ({
     profile: { display_name: 'Ms Plant' },
   }),
 }));
-const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: vi.fn() } }));
+const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: vi.fn(), replace: vi.fn() } }));
 vi.mock('next/navigation', () => ({ useRouter: () => stableRouter }));
 vi.mock('socket.io-client', () => ({ io: vi.fn() }));
 vi.mock('@/lib/supabase/education', () => ({
@@ -51,6 +51,7 @@ vi.mock('@/utils/supabase/client', () => ({
   }),
 }));
 
+import { catalogueModes } from '../ClassroomModeCatalogueData';
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
 
 const socketHandlers: Record<string, (data?: unknown) => void> = {};
@@ -113,37 +114,29 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     expect(screen.getByTestId('lobby-go-live')).not.toBeDisabled();
   });
 
-  // Round 2 (2026-09-24, lead's spec change): the launch screen shows the three
-  // most-played modes as big selectable cards; only the less-played two fold.
-  it('shows the three most-played modes as cards, the quiz selected, the rest folded', async () => {
+  it('shows the whole catalogue at once, the quiz selected and nothing folded away', async () => {
     await renderLobby();
-    expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(3);
+    expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(catalogueModes().length);
     expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-selected', 'true');
     expect(screen.getByTestId('mode-tile-classic')).toHaveAttribute('data-selected', 'false');
     expect(screen.getByTestId('mode-tile-blast')).toHaveAttribute('data-selected', 'false');
-    expect(screen.queryByTestId('mode-tile-word-hunt')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('mode-tile-wheel-rush')).not.toBeInTheDocument();
+    expect(screen.getByTestId('mode-tile-word-hunt')).toHaveAttribute('data-selected', 'false');
+    expect(screen.getByTestId('mode-tile-wheel-rush')).toHaveAttribute('data-selected', 'false');
+    expect(screen.queryByTestId('more-modes-toggle')).not.toBeInTheDocument();
   });
 
-  it('keeps the folded modes one tap away and names how many', async () => {
+  it('keeps every alternate one tap away', async () => {
     await renderLobby();
-    const more = screen.getByTestId('more-modes-toggle');
-    expect(more).toHaveTextContent('3');
-
-    fireEvent.click(more);
-
     for (const id of ALTERNATES) {
       expect(screen.getByTestId(`mode-tile-${id}`)).toBeInTheDocument();
     }
   });
 
-  /** Picking a folded mode selects it, keeps it on screen, and folds the rest. */
-  it('selects a folded mode, keeps it visible, and closes the fold', async () => {
+  it('selects any mode in place and keeps the whole catalogue on screen', async () => {
     await renderLobby();
-    fireEvent.click(screen.getByTestId('more-modes-toggle'));
     fireEvent.click(screen.getByTestId('mode-tile-wheel-rush'));
 
-    await waitFor(() => expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(3));
+    await waitFor(() => expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(catalogueModes().length));
     expect(screen.getByTestId('mode-tile-wheel-rush')).toHaveAttribute('data-selected', 'true');
     expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-selected', 'false');
     expect(screen.getByTestId('lobby-go-live')).toHaveTextContent(/wheel/i);
@@ -158,7 +151,6 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
    */
   it('never describes a mode that is not the one on the hero', async () => {
     await renderLobby();
-    fireEvent.click(screen.getByTestId('more-modes-toggle'));
     fireEvent.click(screen.getByTestId('mode-tile-word-hunt'));
 
     const panel = screen.getByTestId('lobby-go-live-panel');

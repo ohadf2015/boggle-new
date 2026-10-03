@@ -15,7 +15,7 @@
  * Everything else moved into `lobby/` so this file stays a coordinator:
  *  - `useTeacherLobbyData`      — classes, lessons, starter packs
  *  - `useClassroomLaunchSocket` — the socket, the emit, the failure paths
- *  - `LobbyModeHero`            — the pinned picker
+ *  - `ClassroomModeCatalogue`   — the pinned spotlight + mode cards
  *  - `LobbySetupPanel` / `LobbyRoundSettings` — the fine-tuning that scrolls
  */
 
@@ -28,9 +28,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
-import { socketTeacherName } from '@/lib/education/classroomGameHandoff';
+import { classroomMultiplayerPath, socketTeacherName } from '@/lib/education/classroomGameHandoff';
 import { useClassrooms } from '@/hooks/useClassroom';
-import type { Language } from '@/lib/supabase/education/types';
+import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
 import { cefrLessonPack, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import {
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
@@ -47,14 +47,15 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { configuredRoundMinutes, recommendedModeBadge } from '@/lib/education/gameModes';
+import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { availableFocuses } from '@/lib/education/vocabFocus';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
-import { LobbyModeHero } from './lobby/LobbyModeHero';
+import { ClassroomModeCatalogue } from './ClassroomModeCatalogue';
 import { LobbySetupPanel } from './lobby/LobbySetupPanel';
 import { LobbyRoundSettings } from './lobby/LobbyRoundSettings';
 import { LobbySetupDisclosure } from './lobby/LobbySetupDisclosure';
 import { LobbyPressureDials } from './lobby/LobbyPressureDials';
 import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
-import { ClassroomLiveLobby } from './lobby/ClassroomLiveLobby';
 import { useTeacherLobbyData } from './lobby/useTeacherLobbyData';
 import { useClassroomLaunchSocket } from './lobby/useClassroomLaunchSocket';
 import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
@@ -111,7 +112,12 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
     }
   }, [cefrLevel, isLoading, lessons, createLessonFromPack, setSelectedLessonIds]);
 
-  const { gameCode, isStarting, startError, setStartError, launch, socket, roomCreatedGameCode, startLiveGame } = useClassroomLaunchSocket(t, language);
+  const { gameCode, isStarting, startError, setStartError, launch, roomCreatedGameCode, pressurePending } = useClassroomLaunchSocket(t, language);
+
+  // Same single hop as the express launch; held while a pressure write awaits its ack so a refusal is still shown.
+  useEffect(() => {
+    if (roomCreatedGameCode && !pressurePending) router.replace(classroomMultiplayerPath(language, roomCreatedGameCode));
+  }, [roomCreatedGameCode, pressurePending, router, language]);
 
   // Create classroom from the empty-state button
   const handleCreateClassroom = useCallback(async () => {
@@ -137,7 +143,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   // The mode the teacher explicitly picked. `null` means untouched, and the
   // default below is derived at render from whether a lesson is attached — ONE
   // source of truth, nothing that can flip it late (pitfalls class 1).
-  const [pickedGameMode, setPickedGameMode] = useState<ClassroomGameMode | null>(null);
+  const [pickedGameMode, setPickedGameMode] = useState<ClassroomCatalogueId | null>(null);
   const [vocabQuizFocus, setVocabQuizFocus] = useState<PracticeFocusSetting>('any');
   const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState(VOCAB_QUIZ_DEFAULT_QUESTION_COUNT);
   const [vocabQuizSeconds, setVocabQuizSeconds] = useState(VOCAB_QUIZ_DEFAULT_SECONDS);
@@ -154,11 +160,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   const [pressure, setPressure] = useState<ClassroomPressure>(DEFAULT_CLASSROOM_PRESSURE);
   const { hasPro: hasTeacherPro } = useTeacherPro();
   const [activePreset, setActivePreset] = useState<ClassroomPresetId | null>(null);
-  /**
-   * Both folds start SHUT, and neither is remembered across visits: the screen
-   * a teacher opens in front of a class is the one-tap one, every time.
-   */
-  const [modesExpanded, setModesExpanded] = useState(false);
+  /** Starts shut every visit: the screen a teacher opens in front of a class is the one-tap one. */
   const [setupOpen, setSetupOpen] = useState(false);
 
   const { saveConfig } = useRecentGameSettings();
@@ -222,8 +224,14 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   // A lesson attached means the teacher came to drill THOSE words, and Classic
   // cannot: a 6×6 board carried 1 of 9 lesson words because a straight run caps
   // at six letters. Classic stays the default with nothing attached.
-  const gameMode: ClassroomGameMode =
-    pickedGameMode ?? (selectedLessonIds.length > 0 ? VOCAB_QUIZ_MODE : 'classic');
+  // The same focus scan the server's question builder runs, so "can this list be quizzed" has one answer.
+  const quizPlayable = useMemo(
+    () => availableFocuses(lessonWords as VocabularyWord[], { language: lessonLanguage }).length > 0,
+    [lessonWords, lessonLanguage]
+  );
+  const pickedId: ClassroomCatalogueId =
+    pickedGameMode ?? (selectedLessonIds.length > 0 && quizPlayable ? VOCAB_QUIZ_MODE : 'classic');
+  const { gameMode, vocabQuizVariant } = launchOf(pickedId);
   const recommended = useMemo(() => recommendedModeBadge(lessonWords), [lessonWords]);
   // The poster's minute chip quotes THIS room, not the catalog, so it cannot
   // promise five minutes and open a three-minute round (pitfall class 3).
@@ -233,13 +241,20 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
     vocabQuizSeconds,
   });
 
+  const minutesFor = useCallback(
+    (id: ClassroomCatalogueId) =>
+      configuredRoundMinutes(launchOf(id).gameMode, { timerMinutes, vocabQuizQuestionCount, vocabQuizSeconds }),
+    [timerMinutes, vocabQuizQuestionCount, vocabQuizSeconds]
+  );
+
   const cannotStart =
     selectedLessonIds.length === 0 || !selectedClassroomId || allPlayableWords.length === 0;
 
   const startGame = useCallback(
-    (mode: ClassroomGameMode) => {
+    (mode: ClassroomGameMode, variant?: typeof vocabQuizVariant) => {
       setStartError(null);
       const classroom = classrooms.find((c) => c.id === selectedClassroomId);
+      if (mode === VOCAB_QUIZ_MODE && !quizPlayable) return;
       if (!user || !classroom || selectedLessonIds.length === 0) {
         toast.error(t('education.classroomGame.missingRequirements'));
         setStartError('education.classroomGame.missingRequirements');
@@ -259,6 +274,8 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             vocabularyWords: playableWords,
             language,
             gameMode: mode,
+            ...(variant ? { vocabQuizVariant: variant } : {}),
+            quizPlayable,
             targetWord,
             playStyle,
             teamCount,
@@ -300,7 +317,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           gameMode: mode,
           targetWord: targetWord || undefined,
           ...(mode === VOCAB_QUIZ_MODE
-            ? { vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled }
+            ? { vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled, ...(variant ? { vocabQuizVariant: variant } : {}) }
             : {}),
           playStyle,
           teamCount: playStyle === 'teams' ? clampTeamCount(teamCount) : undefined,
@@ -326,7 +343,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       allPlayableWords, activePreset, gameCode, language, t, launch, saveConfig, setStartError,
       targetWord, minWordLength, timerMinutes, boardSize, playStyle, teamCount, accessibility,
       vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled,
-      pressure, hasTeacherPro,
+      pressure, hasTeacherPro, quizPlayable,
     ]
   );
 
@@ -340,11 +357,8 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
    * one. GO LIVE is that one, it names the chosen mode, and the recommended
    * mode is already chosen, so the teacher who agrees with us still taps once.
    */
-  const pickMode = useCallback((mode: ClassroomGameMode) => {
+  const pickMode = useCallback((mode: ClassroomCatalogueId) => {
     setPickedGameMode(mode);
-    // The chosen poster becomes the hero, so leaving the list open would show
-    // it twice and re-open the decision the teacher just closed.
-    setModesExpanded(false);
   }, []);
 
   /**
@@ -352,14 +366,14 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
    * primary action with no sentence beside it is the silent no-op of
    * recurring pitfall class 4.
    */
-  const blockedKey = cannotStart ? 'education.modePicker.needsLesson' : null;
+  const blockedKey = cannotStart
+    ? 'education.modePicker.needsLesson'
+    : gameMode === VOCAB_QUIZ_MODE && !quizPlayable
+      ? 'eg2Modes.needsMeanings'
+      : null;
 
-  // After the room is created, show the live lobby instead of the setup screen
   if (roomCreatedGameCode) {
-    if (!socket) {
-      return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
-    }
-    return <ClassroomLiveLobby gameCode={roomCreatedGameCode} socket={socket} onStart={startLiveGame} />;
+    return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
   }
 
   // `repeatPending` is part of the gate on purpose: the restored lesson decides
@@ -389,17 +403,16 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   return (
     <ClassroomLobbyShell
       pinned={
-        <LobbyModeHero
-          selected={gameMode}
+        <ClassroomModeCatalogue
+          selected={pickedId}
           recommended={recommended}
           minutes={roundMinutes}
-          roundFacts={{ vocabQuizQuestionCount, vocabQuizSeconds, boardSize, minWordLength }}
+          minutesFor={minutesFor}
+          playStyle={playStyle}
           busy={isStarting}
           blockedKey={blockedKey}
-          expanded={modesExpanded}
-          onToggleExpanded={() => setModesExpanded((v) => !v)}
           onPick={pickMode}
-          onGoLive={() => startGame(gameMode)}
+          onGoLive={() => startGame(gameMode, vocabQuizVariant)}
         />
       }
     >
@@ -457,6 +470,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           vocabQuizQuestionCount={vocabQuizQuestionCount}
           vocabQuizSeconds={vocabQuizSeconds}
           treasureChestsEnabled={treasureChestsEnabled}
+          treasureChestsAvailable={vocabQuizVariant !== 'boss'}
           onTimerChange={setTimerMinutes}
           onBoardSizeChange={setBoardSize}
           onMinWordLengthChange={setMinWordLength}

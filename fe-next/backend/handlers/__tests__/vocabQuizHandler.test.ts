@@ -45,7 +45,7 @@ import {
   getActiveQuiz,
   stopAllQuizzesForTest,
 } from '../vocabQuizHandler';
-import { VOCAB_QUIZ_EVENTS } from '@/shared/types/vocabQuiz';
+import { VOCAB_QUIZ_EVENTS, VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS } from '@/shared/types/vocabQuiz';
 
 const word = (over: Partial<VocabularyWord> & { word: string }): VocabularyWord => ({
   canIntegrate: true,
@@ -201,8 +201,12 @@ describe('startVocabQuizForClassroom', () => {
     (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(classroomGame('vocab-quiz'));
     const { io, emit } = makeIo();
 
-    expect(await startVocabQuizForClassroom(io, GAME_CODE)).toBe(false);
+    expect(await startVocabQuizForClassroom(io, GAME_CODE)).toBe('refused');
     expect(emit.mock.calls.some((c) => c[0] === 'classroomGameError')).toBe(true);
+    expect(emit).toHaveBeenCalledWith(
+      VOCAB_QUIZ_EVENTS.startRefused,
+      expect.objectContaining({ gameCode: GAME_CODE, reason: 'noQuestions' })
+    );
     expect(getActiveQuiz(GAME_CODE)).toBeUndefined();
   });
 });
@@ -247,7 +251,7 @@ describe('answering', () => {
     const { socket, listeners, emitted } = makeSocket();
     registerVocabQuizHandlers(makeIo().io, socket);
 
-    vi.advanceTimersByTime(6_000);
+    vi.advanceTimersByTime(VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS + 6_000);
     listeners.get(VOCAB_QUIZ_EVENTS.requestState)!();
 
     const state = emitted.mock.calls.find((c) => c[0] === VOCAB_QUIZ_EVENTS.state);
@@ -323,7 +327,7 @@ describe('round progression', () => {
     const { io, emit } = makeIo();
     await startVocabQuizForClassroom(io, GAME_CODE);
 
-    await vi.advanceTimersByTimeAsync(10_100);
+    await vi.advanceTimersByTimeAsync(VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS + 10_100);
     expect(emit.mock.calls.some((c) => c[0] === VOCAB_QUIZ_EVENTS.reveal)).toBe(true);
     expect(getActiveQuiz(GAME_CODE)!.phase).toBe('reveal');
 
@@ -357,6 +361,7 @@ describe('end of round persistence', () => {
     );
     const { io, emit } = makeIo();
     await startVocabQuizForClassroom(io, GAME_CODE);
+    await vi.advanceTimersByTimeAsync(VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS);
 
     const session = getActiveQuiz(GAME_CODE)!;
     const correctWords: string[] = [];
@@ -425,7 +430,7 @@ describe('end of round persistence', () => {
     await startVocabQuizForClassroom(io, GAME_CODE);
     const asked = getActiveQuiz(GAME_CODE)!.questions.map((q) => q.word);
 
-    await vi.advanceTimersByTimeAsync(4 * 13_200);
+    await vi.advanceTimersByTimeAsync(VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS + 4 * 13_200);
 
     const [, , options] = (persistence.persistClassroomGameScores as Mock).mock.calls[0];
     expect(options.askedWords).toEqual(asked);
@@ -441,7 +446,7 @@ describe('end of round persistence', () => {
     );
     const { io } = makeIo();
     await startVocabQuizForClassroom(io, GAME_CODE);
-    await vi.advanceTimersByTimeAsync(4 * 13_200);
+    await vi.advanceTimersByTimeAsync(VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS + 4 * 13_200);
 
     expect(gameStateManager.transitionGameState).toHaveBeenCalledWith(
       GAME_CODE,

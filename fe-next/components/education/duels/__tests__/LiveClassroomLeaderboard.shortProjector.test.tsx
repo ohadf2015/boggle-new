@@ -15,8 +15,8 @@ describe('LiveClassroomLeaderboard — projector rows on a short wall (1366x768)
       />
     );
     const row = screen.getAllByTestId('live-board-row')[0];
-    expect(row.className).toContain('md:medium-short:py-1.5');
-    expect(screen.getAllByTestId('live-board-rank')[0].className).toContain('md:medium-short:h-9');
-    expect(screen.getByText('Ada').className).toContain('md:medium-short:text-2xl');
+    expect(row.className).toContain('md:[@media(max-height:1000px)]:py-1.5');
+    expect(screen.getAllByTestId('live-board-rank')[0].className).toContain('md:[@media(max-height:1000px)]:h-9');
+    expect(screen.getByText('Ada').className).toContain('md:[@media(max-height:1000px)]:text-2xl');
   });
 });

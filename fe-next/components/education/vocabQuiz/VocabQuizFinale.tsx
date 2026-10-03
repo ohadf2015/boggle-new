@@ -100,13 +100,13 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
   return (
     <section
       data-testid="vocab-quiz-finale"
-      className="flex flex-col gap-3 md:gap-5 md:flex-1 md:min-h-0 md:overflow-hidden bg-neo-navy"
+      className="flex flex-col gap-3 md:gap-5 md:flex-1 md:min-h-fit bg-neo-navy"
     >
       <div className="shrink-0 flex items-center gap-3 md:gap-6 flex-wrap rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-3 md:p-5 shadow-hard">
         <div data-testid="quiz-finale-mascot" className="shrink-0">
           <InteractiveMascot
             variant="trophy"
-            sizeClassName="w-16 h-16 md:w-28 md:h-28"
+            sizeClassName="w-16 h-16 md:w-20 md:h-20 md:[@media(min-height:1000px)]:w-28 md:[@media(min-height:1000px)]:h-28"
             clipShape="rounded-square"
             clipBorder="lime"
             clipBg="var(--neo-navy, #141a33)"
@@ -163,7 +163,7 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
           screen that had failed to finish loading. */}
       <div
         data-testid="vocab-quiz-finale-stage"
-        className="flex flex-col justify-center md:flex-1 md:min-h-0 md:overflow-hidden"
+        className="flex flex-col justify-center md:flex-1 md:min-h-fit"
       >
         <VocabQuizStandings standings={standings} limit={5} size="projector" podium t={t} />
       </div>

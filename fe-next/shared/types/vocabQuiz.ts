@@ -48,6 +48,21 @@ export const CLASSROOM_GAME_MODES: readonly ClassroomGameMode[] = [
   'wordcraft',
 ] as const;
 
+/** Boss Battle is a quiz setting, not a mode: the server owns the HP; clients only display it. */
+export const VOCAB_QUIZ_VARIANTS = ['classic', 'boss'] as const;
+export type VocabQuizVariant = (typeof VOCAB_QUIZ_VARIANTS)[number];
+export const BOSS_HP_PER_ANSWER = 0.6;
+export const BOSS_MIN_HP = 3;
+export const BOSS_CRIT_STREAK = 3;
+
+export interface VocabQuizBoss {
+  maxHp: number;
+  hp: number;
+  /** Hits the class landed on the question just revealed. */
+  lastHits: number;
+  defeated: boolean;
+}
+
 // ---------------------------------------------------------------------------
 // Round shape
 // ---------------------------------------------------------------------------
@@ -62,6 +77,9 @@ export const VOCAB_QUIZ_MAX_SECONDS = 90;
 
 /** The "answer reveal + standings" beat between questions. */
 export const VOCAB_QUIZ_REVEAL_MS = 3_000;
+
+/** Question 1 holds its clock through the client's 3-2-1-GO (3 × 1000 + 650 ms). */
+export const VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS = 3_650;
 /**
  * Longest the reveal waits past VOCAB_QUIZ_REVEAL_MS for a student who got it
  * right to open their chest. Without the hold, a fast class cut to the next
@@ -97,6 +115,7 @@ export interface VocabQuizQuestionPayload {
   remainingMs: number;
   /** Server clock at emit, so a client can drift-correct its own countdown. */
   serverNow: number;
+  boss?: VocabQuizBoss;
 }
 
 export interface VocabQuizStanding {
@@ -130,6 +149,7 @@ export interface VocabQuizReveal {
    * next question early).
    */
   nextHint?: VocabQuizNextHint;
+  boss?: VocabQuizBoss;
 }
 
 /** First letter + length of the next question's word. */
@@ -168,6 +188,8 @@ export interface VocabQuizAnswerResult {
   totalScore: number;
   /** Whether this correct answer unlocks a treasure chest reveal. */
   chestPending?: boolean;
+  /** Boss Battle: damage this answer dealt (2 = critical). */
+  bossHit?: number;
 }
 
 /**
@@ -195,12 +217,14 @@ export interface VocabQuizStateSnapshot {
   standings: VocabQuizStanding[];
   /** The resolved chest outcome for this question, if the player picked a chest. */
   myChest?: TreasureChestState;
+  boss?: VocabQuizBoss;
 }
 
 export interface VocabQuizEnded {
   gameCode: string;
   standings: VocabQuizStanding[];
   totalQuestions: number;
+  boss?: VocabQuizBoss;
 }
 
 // ---------------------------------------------------------------------------
@@ -294,6 +318,8 @@ export const VOCAB_QUIZ_EVENTS = {
   openChest: 'vocabQuiz:openChest',
   /** Student → server: my chest reveal has been seen (ends the reveal hold early). */
   chestSeen: 'vocabQuiz:chestSeen',
+  /** Room-wide: the quiz would not start and nothing else did either; the host must act. */
+  startRefused: 'vocabQuiz:startRefused',
 } as const;
 
 /**

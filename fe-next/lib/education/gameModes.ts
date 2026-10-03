@@ -16,6 +16,7 @@
 import {
   CLASSROOM_GAME_MODES,
   VOCAB_QUIZ_MODE,
+  VOCAB_QUIZ_REVEAL_MS,
   type ClassroomGameMode,
 } from '@/shared/types/vocabQuiz';
 import { MIN_WORDS_PER_FOCUS } from '@/lib/education/vocabFocus';
@@ -184,7 +185,7 @@ export function configuredRoundMinutes(
     const count = settings.vocabQuizQuestionCount;
     const seconds = settings.vocabQuizSeconds;
     if (!count || !seconds) return modeDurationMinutes(id);
-    return Math.max(1, Math.round((count * seconds) / 60));
+    return Math.max(1, Math.round((count * (seconds + VOCAB_QUIZ_REVEAL_MS / 1000)) / 60));
   }
   if (settings.timerMinutes === undefined) return modeDurationMinutes(id);
   return Math.max(1, Math.round(settings.timerMinutes));

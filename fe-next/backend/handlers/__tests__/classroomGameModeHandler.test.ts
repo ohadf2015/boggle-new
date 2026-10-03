@@ -169,6 +169,21 @@ describe('updateClassroomGameMode — the room keeps its code', () => {
     );
   });
 
+  it('switches into Boss Battle and tells the room which variant it now is', async () => {
+    const socket = makeSocket(TEACHER_ID);
+    registerClassroomGameModeHandlers(makeIo(), socket as never);
+
+    await handlerOf(socket)({ gameCode: CODE, gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' });
+
+    expect(mockSetMode).toHaveBeenCalledWith(CODE, 'vocab-quiz', 'boss');
+    expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+      expect.anything(),
+      `game:${CODE}`,
+      'classroomGameModeChanged',
+      expect.objectContaining({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' })
+    );
+  });
+
   it('refuses a teacher who does not own the room, out loud', async () => {
     const socket = makeSocket(OTHER_ID);
     registerClassroomGameModeHandlers(makeIo(), socket as never);

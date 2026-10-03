@@ -251,7 +251,7 @@ export function TeacherLiveControls({
             icon={<DirectionalIcon icon={SkipForward} mirror />}
             label={t(isQuizRound ? 'education.liveControls.skipQuestion' : 'education.liveControls.skipWord')}
             onClick={onSkipWord}
-            className="flex-1 basis-[7.5rem] bg-neo-cream"
+            className="flex-[1.4_1_9rem] bg-neo-cream"
           />
         )}
 
@@ -260,6 +260,8 @@ export function TeacherLiveControls({
           testId="teacher-end-round"
           tone={endArmed ? 'armed' : 'danger'}
           dataArmed={endArmed}
+          drainMs={endArmed ? END_ROUND_CONFIRM_MS : undefined}
+          drainTestId="teacher-end-round-drain"
           icon={<Square />}
           label={endArmed ? t('education.liveControls.endRoundConfirm') : t('education.liveControls.endRound')}
           onClick={handleEndRound}
