@@ -24,6 +24,8 @@ import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import type { ExtendedMascotVariant } from '@/components/ui/mascotUtils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import { useVocabQuiz } from './useVocabQuiz';
+import { ClassroomBossBar } from '../ClassroomBossBar';
+import { ClassroomBossOutcome } from '../ClassroomBossOutcome';
 import { useVocabQuizJuice } from './useVocabQuizJuice';
 import { VocabQuizFinale } from './VocabQuizFinale';
 import { VocabQuizChoiceBars } from './VocabQuizChoiceBars';
@@ -101,7 +103,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
     // fit a 16:9 layout and clipping REMATCH/the podium is worse than scrolling.
     <div
       data-testid="vocab-quiz-host"
-      className="flex-1 flex flex-col min-h-0 overflow-y-auto md:overflow-hidden bg-neo-navy text-neo-white p-3 gap-3 md:p-6 md:gap-5"
+      className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-neo-navy text-neo-white p-3 gap-3 md:p-6 md:gap-5"
     >
       <header className="flex items-center gap-2 md:gap-4 flex-wrap shrink-0">
         <InteractiveMascot
@@ -148,6 +150,8 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
           </span>
         </span>
       </header>
+
+      {phase !== 'ended' && <ClassroomBossBar boss={quiz.boss} phase={phase} surface="host" t={t} />}
 
       {phase === 'question' && (
         <div
@@ -222,6 +226,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
       {/* The payoff the whole round was building towards: the class's own three
           numbers, Lexi with the trophy, and the podium — not a list under a
           heading. See VocabQuizFinale. */}
+      {phase === 'ended' && <ClassroomBossOutcome boss={quiz.boss} t={t} />}
       {phase === 'ended' && (
         <VocabQuizFinale
           standings={quiz.standings}

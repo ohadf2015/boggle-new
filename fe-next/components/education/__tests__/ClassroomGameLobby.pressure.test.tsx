@@ -33,7 +33,7 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
-const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: mockPush } }));
+const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: mockPush, replace: vi.fn() } }));
 vi.mock('next/navigation', () => ({ useRouter: () => stableRouter }));
 vi.mock('socket.io-client');
 vi.mock('@/lib/supabase/education', () => ({
@@ -70,7 +70,16 @@ function emitCall(event: string) {
 }
 
 const mockLessons = [
-  { id: 'lesson-1', name: 'Unit 1', words: [{ word: 'red', canIntegrate: true }] },
+  {
+    id: 'lesson-1',
+    name: 'Unit 1',
+    words: [
+      { word: 'osmosis', definition: 'water moving across a membrane', canIntegrate: true },
+      { word: 'enzyme', definition: 'a protein that speeds a reaction', canIntegrate: true },
+      { word: 'nucleus', definition: 'the control centre of a cell', canIntegrate: true },
+      { word: 'ribosome', definition: 'where protein is built', canIntegrate: true },
+    ],
+  },
 ];
 const mockClassrooms = [{ id: 'class-1', name: 'Class A', member_count: 24 }];
 
@@ -135,6 +144,14 @@ describe('ClassroomGameLobby — pressure dials wiring', () => {
         pressure: { ...DEFAULT_CLASSROOM_PRESSURE, leaderboard: 'hidden', timer: 'off' },
       })
     );
+    // The lobby holds until the write is acked, so a refusal still reaches the teacher.
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 100));
+    });
+    expect(screen.getByText('teacher.classroom.settingUp')).toBeInTheDocument();
+    expect(stableRouter.replace).not.toHaveBeenCalled();
+    listeners.get('classroomGamePressureChanged')?.({ gameCode: created.gameCode });
+    await waitFor(() => expect(stableRouter.replace).toHaveBeenCalledWith(expect.stringContaining(`room=${created.gameCode}`)));
   });
 
   it('screams when the pressure write is never acked — never a silent loud round', async () => {
@@ -246,7 +263,7 @@ describe('ClassroomGameLobby — pressure dials wiring', () => {
     expect(created.settings).not.toHaveProperty('pressure');
 
     listeners.get('classroomGameCreated')?.({ success: true, gameCode: created.gameCode });
-    await waitFor(() => expect(screen.getByTestId('classroom-lobby-code')).toBeInTheDocument());
+    await waitFor(() => expect(stableRouter.replace).toHaveBeenCalledWith(expect.stringContaining(`room=${created.gameCode}`)));
     expect(mockSocket.emit).not.toHaveBeenCalledWith(
       'updateClassroomGamePressure',
       expect.anything()

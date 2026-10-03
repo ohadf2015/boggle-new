@@ -363,6 +363,14 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       {/* Game Header with Timer - Always visible */}
       <TvGameHeader
         compact={isClassroom}
+        toastSlot={isClassroom ? (
+          <TvNotificationQueue
+            notifications={notifications}
+            onDismiss={dismissNotification}
+            maxVisible={1}
+            placement="inline"
+          />
+        ) : undefined}
         remainingTime={remainingTime}
         timerValue={timerValue}
         fireRoundActive={fireRoundActive}
@@ -443,12 +451,13 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         }}
       />
 
-      {/* Notification Overlay */}
-      <TvNotificationQueue
-        notifications={notifications}
-        onDismiss={dismissNotification}
-        maxVisible={1}
-      />
+      {!isClassroom && (
+        <TvNotificationQueue
+          notifications={notifications}
+          onDismiss={dismissNotification}
+          maxVisible={1}
+        />
+      )}
 
       {/* Tutorial Overlay - shown on first visit or when help button clicked */}
       <TvTutorialOverlay

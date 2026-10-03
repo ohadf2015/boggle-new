@@ -18,7 +18,7 @@ import logger from '@/utils/logger';
 import { getSocketURL } from '@/utils/SocketContext';
 import { classroomMultiplayerPath } from '@/lib/education/classroomGameHandoff';
 import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
-import type { ClassroomGameMode, PracticeFocusSetting } from '@/shared/types/vocabQuiz';
+import type { ClassroomGameMode, PracticeFocusSetting, VocabQuizVariant } from '@/shared/types/vocabQuiz';
 import type { PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility, ClassroomPressure } from '@/shared/types/classroom';
 
@@ -41,6 +41,7 @@ export interface ClassroomLaunchPayload {
     vocabQuizFocus?: PracticeFocusSetting;
     vocabQuizQuestionCount?: number;
     vocabQuizSeconds?: number;
+    vocabQuizVariant?: VocabQuizVariant;
     playStyle: PlayStyle;
     teamCount?: number;
     accessibility?: ClassroomAccessibility;
@@ -68,6 +69,8 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
   const [startError, setStartError] = useState<string | null>(null);
   const [gameCode] = useState<string>(() => randomGameCode());
   const [roomCreatedGameCode, setRoomCreatedGameCode] = useState<string | null>(null);
+  // True while a pressure write awaits its ack; the caller holds navigation so a refusal is still shown.
+  const [pressurePending, setPressurePending] = useState(false);
 
   /** A launch asked for before the socket existed. Flushed on connect. */
   const pendingRef = useRef<ClassroomLaunchPayload | null>(null);
@@ -117,6 +120,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
               gameCode: data.gameCode,
               pressure,
             });
+            setPressurePending(true);
             // The two-step has a drop window: if the ack never lands the room
             // runs loud while the teacher believes they launched calm. A calm
             // setup that silently didn't apply is worse than none — scream.
@@ -127,6 +131,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
                 `Pressure dials write never acked for ${expectedCode} — room runs the loud default`
               );
               toast.error(t('education.classroomGame.pressureFailed'));
+              setPressurePending(false);
             }, 5_000);
             pressureAckGameCodeRef.current = expectedCode;
           }
@@ -140,6 +145,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
           clearTimeout(pressureAckTimerRef.current);
           pressureAckTimerRef.current = null;
           pressureAckGameCodeRef.current = null;
+          setPressurePending(false);
         }
       });
       // The server's error text is internal English ("Invalid payload: …").
@@ -159,6 +165,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
             pressureAckGameCodeRef.current = null;
           }
           toast.error(t('education.classroomGame.pressureFailed'));
+          setPressurePending(false);
           return;
         }
         toast.error(t('education.classroomGame.startFailed'));
@@ -226,6 +233,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
     launch,
     socket,
     roomCreatedGameCode,
+    pressurePending,
     startLiveGame,
   };
 }

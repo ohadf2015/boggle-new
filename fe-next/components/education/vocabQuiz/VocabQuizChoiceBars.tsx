@@ -18,7 +18,7 @@
 
 'use client';
 
-import { Check, Sparkles } from 'lucide-react';
+import { Check, Sparkles, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 
@@ -54,6 +54,8 @@ export function VocabQuizChoiceBars({
   const revealed = answerIndex !== null;
   const votes = distribution.reduce((a, b) => a + b, 0);
   const denominator = revealed ? Math.max(1, votes) : Math.max(1, totalPlayers);
+  const classTotal = Math.max(totalPlayers, votes);
+  const classGot = revealed ? (distribution[answerIndex] ?? 0) : 0;
 
   return (
     // The bars OWN the wall: `flex-1` plus `auto-rows-fr` below is what stops
@@ -75,6 +77,17 @@ export function VocabQuizChoiceBars({
         </div>
       )}
 
+      {revealed && !sweep && classTotal > 0 && (
+        <p
+          data-testid="vocab-quiz-class-verdict"
+          className="animate-neo-pop self-start flex items-center gap-3 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 py-2 md:px-5 md:py-2.5 font-neo-display font-black text-xl md:text-3xl text-neo-black shadow-hard"
+          role="status"
+        >
+          <Users className="w-6 h-6 md:w-8 md:h-8 shrink-0" aria-hidden />
+          {t('eg2Modes.reveal.classGotIt', { got: classGot, total: classTotal })}
+        </p>
+      )}
+
       <ul className="grid grid-cols-1 md:grid-cols-2 auto-rows-fr gap-2 md:gap-4 md:flex-1 md:min-h-0">
         {choices.map((choice, index) => {
           const style = OPTION_BARS[index % OPTION_BARS.length];
@@ -89,7 +102,7 @@ export function VocabQuizChoiceBars({
               className={cn(
                 'relative overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard',
                 faded && 'opacity-60',
-                isCorrect && 'ring-4 ring-neo-yellow'
+                isCorrect && 'border-neo-black ring-4 ring-neo-yellow shadow-hard-lg'
               )}
             >
               {/* Which one was RIGHT, stated independently of how many picked
@@ -100,7 +113,7 @@ export function VocabQuizChoiceBars({
               {isCorrect && (
                 <div
                   data-testid="vocab-quiz-answer-wash"
-                  className="absolute inset-0 bg-neo-lime opacity-25"
+                  className="absolute inset-0 bg-neo-lime"
                   aria-hidden
                 />
               )}
@@ -118,7 +131,7 @@ export function VocabQuizChoiceBars({
                 data-testid={`vocab-quiz-bar-${index}`}
                 className={cn(
                   'absolute inset-y-0 start-0 transition-[width] duration-300 ease-out',
-                  isCorrect ? cn(style.fill, 'opacity-55') : cn(style.fill, 'opacity-30')
+                  isCorrect ? 'bg-neo-black/15' : cn(style.fill, 'opacity-30')
                 )}
                 style={{ width: `${Math.min(1, share) * 100}%` }}
                 aria-hidden
@@ -133,12 +146,12 @@ export function VocabQuizChoiceBars({
                 >
                   {style.glyph}
                 </span>
-                <span className="flex-1 min-w-0 font-neo-display font-bold text-lg md:text-2xl break-words">{choice}</span>
+                <span className={cn('flex-1 min-w-0 font-neo-display font-bold text-lg md:text-2xl break-words', isCorrect && 'font-black text-neo-black')}>{choice}</span>
                 {isCorrect && (
-                  <Check data-testid="vocab-quiz-bar-correct" className="w-8 h-8 shrink-0 text-neo-yellow" aria-hidden />
+                  <Check data-testid="vocab-quiz-bar-correct" className="w-8 h-8 shrink-0 text-neo-black" strokeWidth={3.5} aria-hidden />
                 )}
                 {count > 0 && (
-                  <span className="shrink-0 font-neo-display font-bold text-2xl tabular-nums animate-neo-pop">
+                  <span className={cn('shrink-0 font-neo-display font-bold text-2xl tabular-nums animate-neo-pop', isCorrect && 'text-neo-black')}>
                     {count}
                   </span>
                 )}

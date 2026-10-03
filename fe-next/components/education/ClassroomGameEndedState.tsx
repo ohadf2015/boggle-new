@@ -13,10 +13,10 @@ interface ClassroomGameEndedStateProps {
   onRetry: (roomCode: string) => void;
 }
 
-const SECONDARY =
-  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-black bg-neo-white px-6 py-3 font-neo-display font-black text-neo-black shadow-hard-sm transition-all hover:shadow-hard active:translate-y-[2px] active:shadow-hard-pressed';
+const PRIMARY =
+  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]';
 
-/** Shown to a classroom student whose room is gone: what happened, a retry, and a way on. */
+/** Shown to a classroom student whose room is gone: what happened, a way on, and a quiet retry. */
 export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }: ClassroomGameEndedStateProps) {
   const { t, language } = useLanguage();
   const { classroomId, isLoading } = useStudentClassroom();
@@ -33,25 +33,26 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
         </h1>
         <p className="mb-5 font-neo-body text-neo-black/80">{message}</p>
         <div className="flex flex-col gap-3">
-          {roomCode && (
-            <button
-              type="button"
-              onClick={() => onRetry(roomCode)}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]"
-            >
-              <RotateCcw className="h-5 w-5" aria-hidden="true" />
-              {t('education.student.gameEnded.retry')}
-            </button>
-          )}
           {!isLoading && classroomId && (
-            <Link href={hubHref} className={SECONDARY}>
+            <Link data-testid="ended-primary" href={hubHref} className={PRIMARY}>
               {t('education.student.gameEnded.toClass')}
             </Link>
           )}
           {!isLoading && !classroomId && (
-            <Link href={`/${language}/join`} className={SECONDARY}>
+            <Link data-testid="ended-primary" href={`/${language}/join`} className={PRIMARY}>
               {t('education.student.gameEnded.newCode')}
             </Link>
+          )}
+          {/* Kept for a room that dropped on a restart and is re-hosted under the same code; quiet, because after a teacher ends the class it can only fail. */}
+          {roomCode && (
+            <button
+              type="button"
+              onClick={() => onRetry(roomCode)}
+              className="mx-auto inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo px-3 font-neo-display text-sm font-black text-neo-black underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-black"
+            >
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
+              {t('education.student.gameEnded.retry')}
+            </button>
           )}
         </div>
       </div>

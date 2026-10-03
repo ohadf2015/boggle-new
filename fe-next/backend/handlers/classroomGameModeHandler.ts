@@ -33,7 +33,7 @@ import type { Server, Socket } from 'socket.io';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { setClassroomGameMode } from '../modules/classroomGameSettings.js';
 import type { SwitchableClassroomMode } from '../modules/classroomGameSettings';
-import { CLASSROOM_GAME_MODES, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import { CLASSROOM_GAME_MODES, VOCAB_QUIZ_VARIANTS, type ClassroomGameMode, type VocabQuizVariant } from '@/shared/types/vocabQuiz';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
@@ -46,6 +46,7 @@ const updateModeSchema = z.object({
   // mode becomes switchable the day it is added, instead of being silently
   // rejected here (recurring pitfall class 3).
   gameMode: z.enum(CLASSROOM_GAME_MODES as unknown as [ClassroomGameMode, ...ClassroomGameMode[]]),
+  vocabQuizVariant: z.enum(VOCAB_QUIZ_VARIANTS).optional(),
 });
 
 /**
@@ -69,7 +70,8 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
       return;
     }
     // CLASSROOM_GAME_MODES (the zod enum above) is exactly the switchable set, so the narrower type is a fact, not a cast of convenience.
-    const payload = validation.data as { gameCode: string; gameMode: SwitchableClassroomMode };
+    const payload = validation.data as { gameCode: string; gameMode: SwitchableClassroomMode; vocabQuizVariant?: VocabQuizVariant };
+    const boss = payload.gameMode === 'vocab-quiz' && payload.vocabQuizVariant === 'boss';
 
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {
@@ -95,13 +97,15 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
         return;
       }
 
-      const applied = await setClassroomGameMode(payload.gameCode, payload.gameMode);
+      const applied = boss
+        ? await setClassroomGameMode(payload.gameCode, payload.gameMode, 'boss')
+        : await setClassroomGameMode(payload.gameCode, payload.gameMode);
       if (!applied) {
         socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
         return;
       }
 
-      const announcement = { gameCode: payload.gameCode, gameMode: payload.gameMode };
+      const announcement = { gameCode: payload.gameCode, gameMode: payload.gameMode, ...(boss ? { vocabQuizVariant: 'boss' as const } : {}) };
 
       // The teacher's own confirmation carries the code it applied to, so the
       // client can ignore an ack for a room it is no longer in.

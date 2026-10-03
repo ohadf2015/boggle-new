@@ -308,6 +308,110 @@ const en = {
     }
   },
   // @eg2Seo:end
+  // @eg2Modes:start
+  "eg2Modes": {
+    "title": "Pick a game mode",
+    "spec": {
+      "duration": "Duration",
+      "complexity": "Complexity",
+      "style": "Style"
+    },
+    "bestForLabel": "Best for",
+    "howItPlays": "How it plays",
+    "hideHowItPlays": "Hide the steps",
+    "previewLabel": "Preview of {{mode}}",
+    "category": {
+      "meaning": "Know the meaning",
+      "board": "Race the board"
+    },
+    "complexity": {
+      "simple": "Simple",
+      "medium": "Medium",
+      "tricky": "Tricky"
+    },
+    "style": {
+      "ffa": "Everyone vs everyone",
+      "teams": "Team battle",
+      "solo": "Solo vs a bot",
+      "class": "Whole class vs the boss"
+    },
+    "bestFor": {
+      "meanings": "Learning meanings",
+      "review": "Quick review",
+      "testPrep": "Test prep",
+      "spelling": "Spelling",
+      "warmup": "Warm-ups",
+      "energy": "Friday energy",
+      "focus": "One target word",
+      "lessonWords": "Every lesson word",
+      "independent": "Self-paced",
+      "mixedLevels": "Mixed levels",
+      "teamwork": "Class teamwork"
+    },
+    "steps": {
+      "vocabQuiz": {
+        "1": "A meaning goes up on the big screen.",
+        "2": "Everyone taps one of four words on their phone.",
+        "3": "Right and fast scores most — streaks and chests stack up."
+      },
+      "wordcraft": {
+        "1": "Each student gets their own board, dealt from your list.",
+        "2": "They craft lesson words to out-score the Baron, a bot rival.",
+        "3": "Every win lands on the class leaderboard on the big screen."
+      },
+      "classic": {
+        "1": "The whole class shares one letter grid.",
+        "2": "Trace words through touching letters.",
+        "3": "Longer and rarer words score more."
+      },
+      "blast": {
+        "1": "Find a word and its tiles blow up.",
+        "2": "Fresh letters drop in — chain words into combos.",
+        "3": "Bigger chains, bigger points."
+      },
+      "wordHunt": {
+        "1": "One secret target word hides in the grid.",
+        "2": "Every word you find on the way tops up your life bar.",
+        "3": "First to trace the target wins the round."
+      },
+      "wheelRush": {
+        "1": "A wheel of letters spins up.",
+        "2": "Build as many words as you can from those letters.",
+        "3": "The clock is short — every word counts."
+      },
+      "bossBattle": {
+        "1": "A meaning goes up — everyone answers on their phone.",
+        "2": "Every right answer hits the dragon; a streak of three hits double.",
+        "3": "Knock its HP to zero before the questions run out."
+      }
+    },
+    "boss": {
+      "name": "Boss Battle",
+      "how": "The whole class vs the Word Dragon — every right answer lands a hit.",
+      "dragon": "Word Dragon",
+      "hp": "{{hp}} / {{max}} HP",
+      "yourHit": "You hit the dragon! −{{hits}}",
+      "yourCrit": "Critical hit! −{{hits}}",
+      "noHit": "No hit this time — the class has your back.",
+      "classHits": "Class hits: −{{hits}}",
+      "defeatedTitle": "Boss defeated!",
+      "defeatedBody": "Your class beat the Word Dragon together.",
+      "escapedTitle": "The dragon got away",
+      "escapedBody": "{{hp}} HP left — one more round and it's yours.",
+      "start": "Start the boss battle"
+    },
+    "feedback": {
+      "streak": "{{count}} in a row!"
+    },
+    "reveal": {
+      "classGotIt": "{{got}} of {{total}} got it"
+    },
+    "swipeHint": "{{count}} games · swipe",
+    "needsMeanings": "This list has no meanings to quiz on — add definitions, or pick a board game.",
+    "noQuizWords": "This list has no words that work as quiz questions — pick another list or play Classic.",
+    "playClassicInstead": "Play Classic instead"
+  },
+  // @eg2Modes:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Library",
@@ -3890,6 +3994,7 @@ const en = {
     "languageChangedNotification": "{{name}} changed the game language to {{language}}"
   },
   "tvBroadcast": {
+    "moreStudents": "+{{count}} more",
     "classroom": {
       "round": "Round {number}",
       "teamBattle": "Team battle",

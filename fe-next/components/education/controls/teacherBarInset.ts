@@ -21,3 +21,7 @@ export const TEACHER_BAR_HEIGHT_VAR = '--lc-teacher-bar-h';
 export const TEACHER_CONTROLS_INSET: CSSProperties = Object.freeze({
   paddingBottom: `var(${TEACHER_BAR_HEIGHT_VAR}, 0px)`,
 });
+
+export const TEACHER_CONTROLS_TOAST_OFFSET: CSSProperties = Object.freeze({
+  bottom: `calc(var(${TEACHER_BAR_HEIGHT_VAR}, 0px) + 2rem)`,
+});

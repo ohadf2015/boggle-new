@@ -308,6 +308,110 @@ const sv = {
     }
   },
   // @eg2Seo:end
+  // @eg2Modes:start
+  "eg2Modes": {
+    "title": "Välj spelläge",
+    "spec": {
+      "duration": "Längd",
+      "complexity": "Svårighet",
+      "style": "Stil"
+    },
+    "bestForLabel": "Passar för",
+    "howItPlays": "Så spelar man",
+    "hideHowItPlays": "Dölj stegen",
+    "previewLabel": "Förhandsvisning av {{mode}}",
+    "category": {
+      "meaning": "Kan betydelsen",
+      "board": "Tävla på brädet"
+    },
+    "complexity": {
+      "simple": "Enkel",
+      "medium": "Medel",
+      "tricky": "Klurig"
+    },
+    "style": {
+      "ffa": "Alla mot alla",
+      "teams": "Lagkamp",
+      "solo": "Solo mot en bot",
+      "class": "Hela klassen mot bossen"
+    },
+    "bestFor": {
+      "meanings": "Lära sig betydelser",
+      "review": "Snabb repetition",
+      "testPrep": "Inför provet",
+      "spelling": "Stavning",
+      "warmup": "Lektionsstart",
+      "energy": "Fredagsenergi",
+      "focus": "Ett målord",
+      "lessonWords": "Alla ord i listan",
+      "independent": "I egen takt",
+      "mixedLevels": "Blandade nivåer",
+      "teamwork": "Lagarbete i klassen"
+    },
+    "steps": {
+      "vocabQuiz": {
+        "1": "En betydelse visas på storskärmen.",
+        "2": "Alla trycker på ett av fyra ord i mobilen.",
+        "3": "Rätt och snabbt ger mest poäng — sviter och kistor staplas."
+      },
+      "wordcraft": {
+        "1": "Varje elev får ett eget bräde, givet ur din lista.",
+        "2": "De bygger ord ur lektionen för att slå Baronen, en bot.",
+        "3": "Varje vinst hamnar på klassens topplista på storskärmen."
+      },
+      "classic": {
+        "1": "Hela klassen delar ett bokstavsbräde.",
+        "2": "Dra ord genom bokstäver som rör vid varandra.",
+        "3": "Längre och ovanligare ord ger mer poäng."
+      },
+      "blast": {
+        "1": "Hitta ett ord så sprängs dess brickor.",
+        "2": "Nya bokstäver faller in — kedja ord till kombos.",
+        "3": "Längre kedjor, fler poäng."
+      },
+      "wordHunt": {
+        "1": "Ett hemligt målord gömmer sig i brädet.",
+        "2": "Varje ord du hittar på vägen fyller på din livmätare.",
+        "3": "Först att dra målordet vinner rundan."
+      },
+      "wheelRush": {
+        "1": "Ett hjul med bokstäver snurrar igång.",
+        "2": "Bygg så många ord du kan av de bokstäverna.",
+        "3": "Klockan är kort — varje ord räknas."
+      },
+      "bossBattle": {
+        "1": "En betydelse visas — alla svarar i mobilen.",
+        "2": "Varje rätt svar träffar draken; tre i rad ger dubbel träff.",
+        "3": "Få ner dess HP till noll innan frågorna tar slut."
+      }
+    },
+    "boss": {
+      "name": "Bosstrid",
+      "how": "Hela klassen mot Orddraken — varje rätt svar är en träff.",
+      "dragon": "Orddraken",
+      "hp": "{{hp}} / {{max}} HP",
+      "yourHit": "Du träffade draken! −{{hits}}",
+      "yourCrit": "Kritisk träff! −{{hits}}",
+      "noHit": "Ingen träff den här gången — klassen har din rygg.",
+      "classHits": "Klassens träffar: −{{hits}}",
+      "defeatedTitle": "Bossen besegrad!",
+      "defeatedBody": "Er klass besegrade Orddraken tillsammans.",
+      "escapedTitle": "Draken kom undan",
+      "escapedBody": "{{hp}} HP kvar — en runda till så är den er.",
+      "start": "Starta bosstriden"
+    },
+    "feedback": {
+      "streak": "{{count}} i rad!"
+    },
+    "reveal": {
+      "classGotIt": "{{got}} av {{total}} hade rätt"
+    },
+    "swipeHint": "{{count}} spel · svep",
+    "needsMeanings": "Listan har inga betydelser att fråga om — lägg till definitioner eller välj ett brädspel.",
+    "noQuizWords": "Den här listan har inga ord som går att göra frågor av — välj en annan lista eller spela Klassiskt.",
+    "playClassicInstead": "Spela Klassiskt istället"
+  },
+  // @eg2Modes:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Bibliotek",
@@ -4564,6 +4668,7 @@ const sv = {
     "requestSent": "Förfrågan skickad"
   },
   "tvBroadcast": {
+    "moreStudents": "+{{count}} till",
     "classroom": {
       "round": "Omgång {number}",
       "teamBattle": "Lagkamp",

@@ -308,6 +308,110 @@ const es = {
     }
   },
   // @eg2Seo:end
+  // @eg2Modes:start
+  "eg2Modes": {
+    "title": "Elige un modo de juego",
+    "spec": {
+      "duration": "Duración",
+      "complexity": "Dificultad",
+      "style": "Estilo"
+    },
+    "bestForLabel": "Ideal para",
+    "howItPlays": "Cómo se juega",
+    "hideHowItPlays": "Ocultar los pasos",
+    "previewLabel": "Vista previa de {{mode}}",
+    "category": {
+      "meaning": "Conoce el significado",
+      "board": "Carrera en el tablero"
+    },
+    "complexity": {
+      "simple": "Fácil",
+      "medium": "Media",
+      "tricky": "Difícil"
+    },
+    "style": {
+      "ffa": "Todos contra todos",
+      "teams": "Batalla por equipos",
+      "solo": "En solitario contra un bot",
+      "class": "Toda la clase contra el jefe"
+    },
+    "bestFor": {
+      "meanings": "Aprender significados",
+      "review": "Repaso rápido",
+      "testPrep": "Preparar el examen",
+      "spelling": "Ortografía",
+      "warmup": "Arrancar la clase",
+      "energy": "Energía de viernes",
+      "focus": "Una palabra objetivo",
+      "lessonWords": "Todas las palabras de la lista",
+      "independent": "A su ritmo",
+      "mixedLevels": "Niveles mezclados",
+      "teamwork": "Trabajo en equipo de la clase"
+    },
+    "steps": {
+      "vocabQuiz": {
+        "1": "Aparece un significado en la pantalla grande.",
+        "2": "Cada alumno toca una de cuatro palabras en su móvil.",
+        "3": "Acertar rápido da más puntos — las rachas y los cofres suman."
+      },
+      "wordcraft": {
+        "1": "Cada alumno recibe su propio tablero, repartido de tu lista.",
+        "2": "Forman palabras de la lección para superar al Barón, un bot rival.",
+        "3": "Cada victoria sube a la clasificación de la clase en la pantalla grande."
+      },
+      "classic": {
+        "1": "Toda la clase comparte un tablero de letras.",
+        "2": "Trazan palabras uniendo letras que se tocan.",
+        "3": "Las palabras más largas y raras valen más."
+      },
+      "blast": {
+        "1": "Encuentra una palabra y sus fichas explotan.",
+        "2": "Caen letras nuevas — encadena palabras para hacer combos.",
+        "3": "Cadenas más grandes, más puntos."
+      },
+      "wordHunt": {
+        "1": "Una palabra objetivo secreta se esconde en el tablero.",
+        "2": "Cada palabra que encuentras por el camino recarga tu barra de vida.",
+        "3": "Quien trace primero la palabra objetivo gana la ronda."
+      },
+      "wheelRush": {
+        "1": "Empieza a girar una rueda de letras.",
+        "2": "Forma todas las palabras que puedas con esas letras.",
+        "3": "El tiempo es corto — cada palabra cuenta."
+      },
+      "bossBattle": {
+        "1": "Aparece un significado y todos responden en el móvil.",
+        "2": "Cada acierto golpea al dragón; una racha de tres golpea doble.",
+        "3": "Bajadle la vida a cero antes de que se acaben las preguntas."
+      }
+    },
+    "boss": {
+      "name": "Batalla contra el jefe",
+      "how": "Toda la clase contra el Dragón de las Palabras: cada acierto es un golpe.",
+      "dragon": "Dragón de las Palabras",
+      "hp": "{{hp}} / {{max}} PV",
+      "yourHit": "¡Le diste al dragón! −{{hits}}",
+      "yourCrit": "¡Golpe crítico! −{{hits}}",
+      "noHit": "Esta vez no hubo golpe: la clase te cubre.",
+      "classHits": "Golpes de la clase: −{{hits}}",
+      "defeatedTitle": "¡Jefe derrotado!",
+      "defeatedBody": "Vuestra clase venció al Dragón de las Palabras en equipo.",
+      "escapedTitle": "El dragón escapó",
+      "escapedBody": "Le quedan {{hp}} PV: una ronda más y es vuestro.",
+      "start": "Empezar la batalla"
+    },
+    "feedback": {
+      "streak": "¡{{count}} seguidas!"
+    },
+    "reveal": {
+      "classGotIt": "{{got}} de {{total}} acertaron"
+    },
+    "swipeHint": "{{count}} juegos · desliza",
+    "needsMeanings": "Esta lista no tiene significados para preguntar: añade definiciones o elige un juego de tablero.",
+    "noQuizWords": "Esta lista no tiene palabras que sirvan como preguntas de test: elige otra lista o juega Clásico.",
+    "playClassicInstead": "Jugar Clásico en su lugar"
+  },
+  // @eg2Modes:end
   // @eduLibrary:start
   "eduLibrary": {
     "title": "Biblioteca",
@@ -4337,6 +4441,7 @@ const es = {
     "requestSent": "Solicitud enviada"
   },
   "tvBroadcast": {
+    "moreStudents": "+{{count}} más",
     "classroom": {
       "round": "Ronda {number}",
       "teamBattle": "Batalla por equipos",

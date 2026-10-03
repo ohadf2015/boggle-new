@@ -25,6 +25,7 @@ import {
   type VocabQuizEnded,
   type VocabQuizPhase,
   type VocabQuizLockIn,
+  type VocabQuizBoss,
   type TreasureChestState,
   type TreasureChestHit,
 } from '@/shared/types/vocabQuiz';
@@ -80,6 +81,8 @@ export interface VocabQuizClientState {
    * index 0) starts a fresh array.
    */
   missed: VocabQuizMissedWord[];
+  /** Boss Battle: the server's boss, or null on a plain quiz. Display only. */
+  boss: VocabQuizBoss | null;
 }
 
 export interface VocabQuizMissedWord {
@@ -110,6 +113,7 @@ const IDLE: VocabQuizClientState = {
   chestEvents: [],
   chestHit: null,
   missed: [],
+  boss: null,
 };
 
 export interface UseVocabQuizResult extends VocabQuizClientState {
@@ -167,6 +171,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         chestEvents: [],
         chestHit: null,
         missed: payload.index === 0 && prev.questionNumber !== 1 ? [] : prev.missed,
+        boss: payload.boss ?? null,
       }));
     };
 
@@ -183,6 +188,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         secondsLeft: 0,
         fractionLeft: 0,
         lockIn: null,
+        boss: payload.boss ?? prev.boss,
         missed:
           prev.myAnswer?.correct || prev.missed.some((m) => m.index === payload.index)
             ? prev.missed
@@ -268,6 +274,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         chestHit: null,
         // A reconnect keeps what this phone already saw of the current quiz.
         missed: prev.missed,
+        boss: snap.boss ?? null,
       }));
     };
 
@@ -285,6 +292,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         finished: true,
         lockIn: null,
         chestPending: false,
+        boss: payload.boss ?? prev.boss,
       }));
     };
 

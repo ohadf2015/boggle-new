@@ -19,6 +19,8 @@ export interface LiveClassroomGameSettingsInfo {
   allowLateJoin: boolean;
   vocabQuizQuestionCount: number | null;
   vocabQuizSeconds: number | null;
+  /** 'boss' for a Boss Battle room; absent until the live-game route forwards it. */
+  vocabQuizVariant?: 'classic' | 'boss' | null;
   /** Null for a room launched without the dials — read as the loud default. */
   pressure: ResolvedClassroomPressure | null;
 }

@@ -36,7 +36,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 }));
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
 vi.mock('socket.io-client');
@@ -102,8 +102,34 @@ describe('ClassroomGameLobby — the lesson the teacher actually assigned', () =
     });
   });
 
-  it('defaults to the vocab quiz once a lesson is attached', async () => {
+  it('opens on Classic when the attached words carry no meanings a quiz could ask', async () => {
+    // These three words have no definitions: the server would refuse the quiz
+    // ("no quizzable words") and silently play a board game instead.
+    const payload = await openLessonAndStart();
+    expect(payload.settings.gameMode).toBe('classic');
+  });
+
+  it('records that the attached words cannot be quizzed, so the live lobby can guard Start', async () => {
+    await openLessonAndStart();
+    expect(JSON.parse(sessionStorage.getItem('lessonGameData')!).quizPlayable).toBe(false);
+  });
+
+  it('defaults to the vocab quiz once a lesson whose words carry meanings is attached', async () => {
+    (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
+      data: [
+        {
+          ...ecologyLesson,
+          words: [
+            { word: 'osmosis', definition: 'water moving across a membrane', canIntegrate: true },
+            { word: 'enzyme', definition: 'a protein that speeds a reaction', canIntegrate: true },
+            { word: 'nucleus', definition: 'the control centre of a cell', canIntegrate: true },
+            { word: 'ribosome', definition: 'where protein is built', canIntegrate: true },
+          ],
+        },
+      ],
+    });
     const payload = await openLessonAndStart();
     expect(payload.settings.gameMode).toBe('vocab-quiz');
+    expect(JSON.parse(sessionStorage.getItem('lessonGameData')!).quizPlayable).toBe(true);
   });
 });

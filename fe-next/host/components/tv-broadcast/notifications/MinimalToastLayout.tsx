@@ -33,20 +33,20 @@ const MinimalToastLayout = memo<MinimalToastLayoutProps>(({
       exit={{ opacity: 0, y: -10, scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       className={cn(
-        'px-5 py-3 rounded-neo border-3',
+        'max-w-full px-5 py-3 rounded-neo border-3',
         `bg-linear-to-r ${bgGradient}`,
         textColor,
         borderColor,
         'shadow-hard',
       )}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         <Icon className="w-5 h-5 shrink-0" />
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           {player && (
-            <span className="font-black text-base">{player}</span>
+            <span className="truncate font-black text-base">{player}</span>
           )}
-          <span className="font-bold text-sm opacity-80">{headline}</span>
+          <span className="truncate font-bold text-sm opacity-80">{headline}</span>
         </div>
       </div>
     </m.div>

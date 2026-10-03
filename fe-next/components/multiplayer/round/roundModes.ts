@@ -4,7 +4,7 @@
  * on the countdown live in `mpUi.round.mode.<slug>` so every live mode
  * (crossword included) has copy in all six locales.
  */
-import { Brain, Building2, Gavel, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Sparkles, Target, Zap, type LucideIcon } from 'lucide-react';
+import { Brain, Building2, Gavel, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Sparkles, Swords, Target, Zap, type LucideIcon } from 'lucide-react';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 
 export interface RoundModeMeta {
@@ -41,7 +41,10 @@ export function roundModeMeta(mode: string | null | undefined): RoundModeMeta {
  * A classroom room announces the TEACHER's mode: a quiz or wordcraft never sets
  * the store's board mode, which then reads Classic. Unresolved = neutral badge.
  */
-export function classroomRoundModeMeta(mode: string | null | undefined): RoundModeMeta {
+export function classroomRoundModeMeta(mode: string | null | undefined, vocabQuizVariant?: string | null): RoundModeMeta {
+  if (mode === 'vocab-quiz' && vocabQuizVariant === 'boss') {
+    return { slug: 'boss-battle', color: 'pink', icon: 'Swords', nameKey: 'eg2Modes.boss.name', ruleKey: 'eg2Modes.boss.how' };
+  }
   if (!mode) {
     return { slug: 'pending', color: 'lime', icon: 'Sparkles', nameKey: 'eduStudent.mode.pending', ruleKey: 'eduStudent.mode.pendingRule' };
   }
@@ -55,7 +58,7 @@ export function classroomRoundModeMeta(mode: string | null | undefined): RoundMo
 }
 
 /** The registry's icon names → lucide components (look up; unknown → `Shuffle`). */
-export const MODE_ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Gavel, Grid3x3, Grid2x2, Shuffle, Brain, Sparkles };
+export const MODE_ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Gavel, Grid3x3, Grid2x2, Shuffle, Brain, Sparkles, Swords };
 export const FALLBACK_MODE_ICON: LucideIcon = Shuffle;
 
 /** Text + fill classes per colour family (dark-only surfaces). */

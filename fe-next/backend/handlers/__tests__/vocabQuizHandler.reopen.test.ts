@@ -108,15 +108,13 @@ describe('startVocabQuizForClassroom reopens the classroom code', () => {
   });
 
   it('does not reopen when the lesson has no quizzable words', async () => {
-    // The quiz refuses to start and the room falls back to a board game, which
-    // reopens the code on its own path. Reopening here would advertise a round
-    // that never began.
+    // Reopening here would advertise a round that never began.
     (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(quizRoom('vocab-quiz'));
     (lessonWords.loadLessonVocabulary as Mock).mockResolvedValue({ words: [], language: 'en' });
 
     const started = await startVocabQuizForClassroom(io, CODE);
 
-    expect(started).toBe(false);
+    expect(started).toBe('refused');
     expect(classroomGameManager.reopenClassroomGameForRound).not.toHaveBeenCalled();
   });
 });

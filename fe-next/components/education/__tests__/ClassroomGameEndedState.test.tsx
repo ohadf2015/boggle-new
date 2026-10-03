@@ -52,3 +52,20 @@ describe('<ClassroomGameEndedState>', () => {
     expect(screen.queryByRole('button', { name: 'education.student.gameEnded.retry' })).not.toBeInTheDocument();
   });
 });
+
+describe('<ClassroomGameEndedState> — a way on first, the retry second', () => {
+  it('leads with the class hub as the loud action; retry is a quiet text button', () => {
+    render(<ClassroomGameEndedState {...base} roomCode="ABC123" />);
+    const primary = screen.getByTestId('ended-primary');
+    expect(primary).toHaveTextContent('education.student.gameEnded.toClass');
+    const retry = screen.getByRole('button', { name: 'education.student.gameEnded.retry' });
+    expect(retry.className).not.toMatch(/bg-neo-black/);
+    expect(primary.compareDocumentPosition(retry) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('makes a new code the loud action for a student without a class', () => {
+    mockClassroomId = null;
+    render(<ClassroomGameEndedState {...base} roomCode="ABC123" />);
+    expect(screen.getByTestId('ended-primary')).toHaveTextContent('education.student.gameEnded.newCode');
+  });
+});

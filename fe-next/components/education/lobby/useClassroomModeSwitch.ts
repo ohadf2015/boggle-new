@@ -26,20 +26,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { useGameActions } from '@/hooks/gameState';
-import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import { VOCAB_QUIZ_MODE, type ClassroomGameMode, type VocabQuizVariant } from '@/shared/types/vocabQuiz';
+import { catalogueIdOf, launchOf, writeLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { catalogueEntry } from '../ClassroomModeCatalogueData';
 import type { GameMode } from '@/shared/types/game';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
 export interface ClassroomModeSwitchArgs {
   gameCode: string;
-  /** What the room is playing before any switch — the caller's own precedence. */
-  currentMode: ClassroomGameMode;
+  /** What the room is playing before any switch — the caller's own precedence. A catalogue id, so Boss Battle and the plain quiz are told apart. */
+  currentMode: ClassroomCatalogueId;
   socket: Socket | null;
   t: Translate;
   /** Called with the server-confirmed mode, so the surrounding surface can
    *  re-describe the room in the same tick. */
-  onApplied?: (mode: ClassroomGameMode) => void;
+  onApplied?: (mode: ClassroomCatalogueId) => void;
 }
 
 /**
@@ -79,9 +81,9 @@ export function useClassroomModeSwitch({
 }: ClassroomModeSwitchArgs) {
   const { setGameMode, setHostSelectedGameMode } = useGameActions();
   /** Set once the SERVER has confirmed; null means "whatever the caller says". */
-  const [appliedMode, setAppliedMode] = useState<ClassroomGameMode | null>(null);
-  const [pendingMode, setPendingMode] = useState<ClassroomGameMode | null>(null);
-  const pendingRef = useRef<ClassroomGameMode | null>(null);
+  const [appliedMode, setAppliedMode] = useState<ClassroomCatalogueId | null>(null);
+  const [pendingMode, setPendingMode] = useState<ClassroomCatalogueId | null>(null);
+  const pendingRef = useRef<ClassroomCatalogueId | null>(null);
   pendingRef.current = pendingMode;
   // Held in a ref so a caller passing an inline arrow does not tear the socket
   // listeners down and rebuild them on every render.
@@ -92,7 +94,7 @@ export function useClassroomModeSwitch({
     if (!socket) return;
 
     const onChanged = (data?: unknown) => {
-      const payload = data as { gameCode?: string; gameMode?: ClassroomGameMode } | undefined;
+      const payload = data as { gameCode?: string; gameMode?: ClassroomGameMode; vocabQuizVariant?: VocabQuizVariant } | undefined;
       // An ack for another room is not ours to paint.
       if (!payload?.gameMode || (payload.gameCode && payload.gameCode !== gameCode)) return;
 
@@ -100,7 +102,9 @@ export function useClassroomModeSwitch({
       // The server acks the teacher directly AND through the room broadcast; only the first ack of OUR switch speaks.
       const announce = pendingRef.current !== null;
       pendingRef.current = null;
+      const id = catalogueIdOf(mode, payload.vocabQuizVariant);
       writeLocalGameMode(mode);
+      writeLocalQuizVariant(payload.vocabQuizVariant ?? null);
       // `vocab-quiz` is deliberately NOT a member of the board `GameMode`
       // union (see shared/types/vocabQuiz): it has no grid, no submitted words
       // and no rarity scoring, so writing it into the board store would drag
@@ -109,12 +113,12 @@ export function useClassroomModeSwitch({
         setGameMode(mode as GameMode);
         setHostSelectedGameMode(mode as GameMode);
       }
-      setAppliedMode(mode);
+      setAppliedMode(id);
       setPendingMode(null);
-      appliedCbRef.current?.(mode);
+      appliedCbRef.current?.(id);
       if (announce) {
         toast.success(
-          t('education.modePicker.switched', { mode: t(`teacher.classroom.gameModes.${modeKeySuffix(mode)}`) }),
+          t('education.modePicker.switched', { mode: t(catalogueEntry(id)?.nameKey ?? `teacher.classroom.gameModes.${modeKeySuffix(mode)}`) }),
           { id: `classroom-mode-switch-${gameCode}` }
         );
       }
@@ -138,7 +142,7 @@ export function useClassroomModeSwitch({
   }, [socket, gameCode, setGameMode, setHostSelectedGameMode, t]);
 
   const switchTo = useCallback(
-    (mode: ClassroomGameMode) => {
+    (mode: ClassroomCatalogueId) => {
       if (mode === (appliedMode ?? currentMode)) return;
       if (!socket) {
         // Loud, not a no-op: a teacher who taps and sees nothing cannot tell a
@@ -148,7 +152,7 @@ export function useClassroomModeSwitch({
       }
       setPendingMode(mode);
       pendingRef.current = mode;
-      socket.emit('updateClassroomGameMode', { gameCode, gameMode: mode });
+      socket.emit('updateClassroomGameMode', { gameCode, ...launchOf(mode) });
     },
     [appliedMode, currentMode, gameCode, socket, t]
   );

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { TEACHER_BAR_HEIGHT_VAR, TEACHER_CONTROLS_INSET } from '../teacherBarInset';
+import { TEACHER_BAR_HEIGHT_VAR, TEACHER_CONTROLS_INSET, TEACHER_CONTROLS_TOAST_OFFSET } from '../teacherBarInset';
 
 /**
  * The docked strip must never sit on top of the board or the leaderboard.
@@ -25,6 +25,10 @@ describe('teacher control strip inset', () => {
 
   it('reserves the published strip height', () => {
     expect(TEACHER_CONTROLS_INSET.paddingBottom).toBe(`var(${TEACHER_BAR_HEIGHT_VAR}, 0px)`);
+  });
+
+  it('lifts a floating toast clear of the strip, and leaves it at 2rem when no strip is mounted', () => {
+    expect(TEACHER_CONTROLS_TOAST_OFFSET.bottom).toBe(`calc(var(${TEACHER_BAR_HEIGHT_VAR}, 0px) + 2rem)`);
   });
 
   it('applies it on every TvBroadcastView return branch', () => {

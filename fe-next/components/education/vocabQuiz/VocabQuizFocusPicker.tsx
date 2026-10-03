@@ -239,38 +239,40 @@ export function VocabQuizFocusPicker({
         </div>
       </div>
 
-      {/* Advanced: Treasure Chests toggle */}
-      <div className="border-t-2 border-neo-cream/20 pt-6">
-        <button
-          type="button"
-          role="switch"
-          aria-checked={!!treasureChestsEnabled}
-          onClick={() => onTreasureChestsChange?.(!treasureChestsEnabled)}
-          className={cn(
-            'w-full flex items-center gap-3 px-4 py-3 rounded-neo border-[2px] transition-all',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2',
-            treasureChestsEnabled
-              ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow shadow-hard'
-              : 'bg-neo-navy/50 border-neo-cream text-neo-white hover:bg-neo-navy shadow-hard-sm'
-          )}
-        >
-          <Gift className="w-5 h-5 flex-shrink-0" aria-hidden />
-          <span className="flex-1 text-start font-bold">
-            {t('vocabQuiz.setup.treasureChests')}
-          </span>
-          <span
+      {/* Advanced: Treasure Chests toggle — absent when the mode never deals chests */}
+      {onTreasureChestsChange && (
+        <div className="border-t-2 border-neo-cream/20 pt-6">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={!!treasureChestsEnabled}
+            onClick={() => onTreasureChestsChange?.(!treasureChestsEnabled)}
             className={cn(
-              'flex-shrink-0 px-2 py-1 rounded text-xs font-bold',
+              'w-full flex items-center gap-3 px-4 py-3 rounded-neo border-[2px] transition-all',
+              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2',
               treasureChestsEnabled
-                ? 'bg-neo-yellow text-neo-black'
-                : 'bg-neo-navy text-neo-white'
+                ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow shadow-hard'
+                : 'bg-neo-navy/50 border-neo-cream text-neo-white hover:bg-neo-navy shadow-hard-sm'
             )}
           >
-            {treasureChestsEnabled ? t('vocabQuiz.setup.on') : t('vocabQuiz.setup.off')}
-          </span>
-        </button>
-        <p className="mt-2 text-sm text-neo-white/70">{t('vocabQuiz.setup.treasureChestsHint')}</p>
-      </div>
+            <Gift className="w-5 h-5 flex-shrink-0" aria-hidden />
+            <span className="flex-1 text-start font-bold">
+              {t('vocabQuiz.setup.treasureChests')}
+            </span>
+            <span
+              className={cn(
+                'flex-shrink-0 px-2 py-1 rounded text-xs font-bold',
+                treasureChestsEnabled
+                  ? 'bg-neo-yellow text-neo-black'
+                  : 'bg-neo-navy text-neo-white'
+              )}
+            >
+              {treasureChestsEnabled ? t('vocabQuiz.setup.on') : t('vocabQuiz.setup.off')}
+            </span>
+          </button>
+          <p className="mt-2 text-sm text-neo-white/70">{t('vocabQuiz.setup.treasureChestsHint')}</p>
+        </div>
+      )}
     </div>
   );
 }

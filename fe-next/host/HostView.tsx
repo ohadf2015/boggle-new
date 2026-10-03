@@ -32,6 +32,8 @@ import { HostLobbyScreen } from '@/components/multiplayer/lobby/HostLobbyScreen'
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { useHostPhase } from './hooks/useHostPhase';
+import { useClassroomSettingsSeed } from './hooks/useClassroomSettingsSeed';
+import { readLocalQuizVariant } from '@/lib/education/classroomCatalogueId';
 import type { HostViewProps } from './hostViewTypes';
 
 export type { HostViewProps } from './hostViewTypes';
@@ -48,6 +50,15 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
     handleHostNameChange, handleHostAvatarChange,
   } = useHostPhase(props);
 
+  useClassroomSettingsSeed({
+    isClassroomMode,
+    gameCode,
+    templateSettings: lessonData?.templateSettings,
+    setTimerValue: state.setTimerValue,
+    setDifficulty: state.setDifficulty,
+    setMinWordLength: state.setMinWordLength,
+  });
+
   // Navigation hiding is managed by PageClient based on isActive/showResults
 
   return (
@@ -63,6 +74,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
           }}
           t={t}
           players={players.playersReady as unknown as React.ComponentProps<typeof GoRipplesAnimation>['players']}
+          classroom={isClassroomMode ? { mode: resolvedClassroomGameMode ?? null, vocabQuizVariant: readLocalQuizVariant() } : null}
         />
         </MpCountdown>
       )}

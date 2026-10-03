@@ -13,6 +13,9 @@ import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { canStartProjectorRound } from './projectorLobbyModel';
 import { LobbyModeSwitcher } from '@/components/education/lobby/LobbyModeSwitcher';
+import { BOSS_BATTLE_ID, catalogueIdOf, launchOf, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { ProjectorQuizBlocked, useQuizStartRefused } from './ProjectorQuizBlocked';
+import { catalogueEntry } from '@/components/education/ClassroomModeCatalogueData';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 
@@ -97,9 +100,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   // costs a label, never the lobby.
   const liveGame = useLiveClassroomGameInfo(gameCode, true);
 
-  const canStart = canStartProjectorRound(students.length);
   const reduceMotion = useReducedMotion();
-  const startReady = canStart && !starting;
   /**
    * A mode the teacher switched to from THIS surface outranks both sources
    * below. `classroomGameMode` is derived from `lessonGameData`, which the
@@ -108,12 +109,25 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
    * "10 · Questions" beside a BLAST room (measured live 2026-09-11).
    */
   // The shell reads lessonGameData once at mount, so a lobby remounted after a round would revert to the launch mode.
-  const [switchedMode, setSwitchedMode] = useState<ClassroomGameMode | null>(() => {
+  const [switchedMode, setSwitchedMode] = useState<ClassroomCatalogueId | null>(() => {
     const local = readLocalGameMode();
-    return local && local !== classroomGameMode ? local : null;
+    const id = local ? catalogueIdOf(local, readLocalQuizVariant()) : null;
+    return id && id !== classroomGameMode ? id : null;
   });
-  const mode: ClassroomGameMode = switchedMode ?? classroomGameMode ?? liveGame?.gameMode ?? 'classic';
+  const modeId: ClassroomCatalogueId =
+    switchedMode ??
+    catalogueIdOf(
+      classroomGameMode ?? liveGame?.gameMode ?? 'classic',
+      readLocalQuizVariant() ?? liveGame?.settings?.vocabQuizVariant
+    );
+  const mode: ClassroomGameMode = launchOf(modeId).gameMode;
   const isQuiz = mode === VOCAB_QUIZ_MODE;
+  const [quizRefused, clearQuizRefused] = useQuizStartRefused(gameCode, t);
+  const [quizPlayable] = useState(readLocalQuizPlayable);
+  const quizBlocked = isQuiz && (quizRefused || quizPlayable === false);
+  const canStart = canStartProjectorRound(students.length);
+  const startLocked = !canStart || starting || quizBlocked;
+  const startReady = !startLocked;
   const settings = liveGame?.settings ?? null;
 
   const sessionName = liveGame?.classroomName || t('education.classroomGame.classroomSession');
@@ -133,7 +147,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
       {
         key: 'mode',
         icon: <Zap className="h-[1em] w-[1em]" aria-hidden="true" />,
-        text: t(classroomModeLabelKey(mode)),
+        text: t(catalogueEntry(modeId)?.nameKey ?? classroomModeLabelKey(mode)),
       },
     ];
     // A quiz has no grid and no round clock — printing a board size and
@@ -178,7 +192,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         : t('education.projectorLobby.lateJoinOff'),
     });
     return rows;
-  }, [allowLateJoin, boardSize, isQuiz, mode, settings, t, timerMinutes, timerOff]);
+  }, [allowLateJoin, boardSize, isQuiz, mode, modeId, settings, t, timerMinutes, timerOff]);
 
   return (
     <div
@@ -284,10 +298,13 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               <li key={fact.key} className="inline-flex">
                 <LobbyModeSwitcher
                   gameCode={gameCode}
-                  currentMode={mode}
+                  currentMode={modeId}
                   socket={getSharedSocketIfExists()}
                   t={t}
-                  onModeApplied={setSwitchedMode}
+                  onModeApplied={(id) => {
+                    clearQuizRefused();
+                    setSwitchedMode(id);
+                  }}
                 />
               </li>
             ) : (
@@ -307,6 +324,17 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
 
         <div className="flex w-full min-w-0 flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
           {/* Empty room: Start itself says "waiting"; the reason and the practice run sit beside it as quiet text, so nothing competes with it. */}
+          {quizBlocked && (
+            <ProjectorQuizBlocked
+              gameCode={gameCode}
+              currentMode={modeId}
+              t={t}
+              onApplied={(id) => {
+                clearQuizRefused();
+                setSwitchedMode(id);
+              }}
+            />
+          )}
           {!canStart && (
             <div className="flex flex-col items-start gap-1 md:max-w-[34ch] md:items-end md:text-end">
               <p
@@ -338,28 +366,34 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               )}
             </div>
           )}
-          {/* Once someone is in, Start breathes — a transform-only scale loop. */}
-          <m.div
-            className="w-full md:w-auto"
-            animate={startReady && !reduceMotion ? { scale: [1, 1.05, 1] } : { scale: 1 }}
-            transition={startReady && !reduceMotion ? { duration: 1.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0 }}
-          >
+          {/* The halo breathes, never the button: a scaling target is one a
+              quick tap (or a test driver) keeps missing. */}
+          <div className="relative w-full md:w-auto">
+          {startReady && (
+            <m.span
+              aria-hidden="true"
+              data-testid="projector-start-halo"
+              className="pointer-events-none absolute -inset-1.5 rounded-neo bg-neo-lime/50"
+              animate={reduceMotion ? { opacity: 0.35 } : { scale: [1, 1.08, 1], opacity: [0.55, 0, 0.55] }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          )}
           <button
             type="button"
             data-testid="projector-start"
             data-ready={startReady ? 'true' : 'false'}
             onClick={onStartGame}
-            disabled={!canStart || starting}
+            disabled={startLocked}
             className={cn(
-              'flex w-full items-center justify-center gap-[0.6vw] rounded-neo border-4 md:w-auto',
+              'relative flex w-full items-center justify-center gap-[0.6vw] rounded-neo border-4 md:w-auto',
               'px-4 py-3 font-neo-display text-[5vw] font-black uppercase tracking-tight',
               'md:px-[2.4vw] md:py-[0.7vw] md:text-[2vw]',
               'transition-all active:translate-y-1 active:shadow-hard',
               'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
               // Locked keeps a full cream edge and cream ink: a 40% lime on navy read as a dead olive slab.
-              !canStart || starting
+              startLocked
                 ? 'cursor-not-allowed border-neo-cream bg-neo-navy-light text-neo-cream opacity-80 shadow-none'
-                : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl hover:-translate-y-0.5'
+                : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl'
             )}
           >
             {canStart ? (
@@ -374,9 +408,9 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               ? t('hostView.creatingTournament')
               : !canStart
                 ? t('eduLive.lobby.waitingForStudents')
-                : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
+                : t(modeId === BOSS_BATTLE_ID ? 'eg2Modes.boss.start' : switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
           </button>
-          </m.div>
+          </div>
         </div>
       </footer>
     </div>

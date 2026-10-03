@@ -139,22 +139,22 @@ describe('configuredRoundMinutes — the poster quotes the room, not the catalog
     }
   });
 
-  it('derives the quiz length from its own two settings, never the board timer', () => {
-    // 10 questions x 20s = 200s -> 3 min, whatever the board timer says.
+  it('derives the quiz length from its own two settings plus the reveal beat, never the board timer', () => {
+    // 10 questions x (20s + 3s reveal) = 230s -> 4 min, whatever the board timer says.
     expect(
       configuredRoundMinutes(VOCAB_QUIZ_MODE, {
         timerMinutes: 9,
         vocabQuizQuestionCount: 10,
         vocabQuizSeconds: 20,
       })
-    ).toBe(3);
+    ).toBe(4);
     expect(
       configuredRoundMinutes(VOCAB_QUIZ_MODE, {
         timerMinutes: 9,
         vocabQuizQuestionCount: 20,
         vocabQuizSeconds: 30,
       })
-    ).toBe(10);
+    ).toBe(11);
   });
 
   /** A chip reading "0 min" is worse than a rough one. */

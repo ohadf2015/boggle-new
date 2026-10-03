@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Flame, Crosshair } from 'lucide-react';
 import CircularTimer from '../../../components/CircularTimer';
@@ -20,6 +20,7 @@ interface TvGameHeaderProps {
   wordHuntAliveCount?: number;
   /** Classroom host on a phone: a smaller timer so the leaderboard stays on screen. */
   compact?: boolean;
+  toastSlot?: ReactNode;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -51,6 +52,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
   wordHuntTargetLength = 0,
   wordHuntAliveCount = 0,
   compact = false,
+  toastSlot,
   t,
 }) => {
   const totalTimeSeconds = timerValue * 60;
@@ -63,7 +65,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
         <m.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="flex items-center gap-2"
+          className={compact ? 'flex-1 min-w-0 flex items-center gap-2' : 'flex items-center gap-2'}
         >
           <m.div
             data-testid="live-badge"
@@ -136,7 +138,10 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
         </div>
 
         {/* Right: Fire Round / Earthquake indicator */}
-        <div className="flex items-center gap-3">
+        <div
+          data-testid="tv-header-end"
+          className={compact ? 'flex-1 min-w-0 flex items-center justify-end gap-3' : 'flex items-center gap-3'}
+        >
           {/* Earthquake Warning */}
           <AnimatePresence>
             {earthquakeState === 'warning' && (
@@ -196,6 +201,12 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                 </span>
               </div>
             </m.div>
+          )}
+
+          {toastSlot && (
+            <div data-testid="tv-header-toast-slot" className="min-w-0 flex justify-end">
+              {toastSlot}
+            </div>
           )}
         </div>
       </div>

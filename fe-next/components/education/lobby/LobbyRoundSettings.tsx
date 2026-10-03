@@ -40,6 +40,8 @@ export interface LobbyRoundSettingsProps {
   vocabQuizQuestionCount: number;
   vocabQuizSeconds: number;
   treasureChestsEnabled?: boolean;
+  /** False for Boss Battle: the server never deals chests in a co-op round. */
+  treasureChestsAvailable?: boolean;
   onTimerChange: (minutes: number) => void;
   onBoardSizeChange: (size: 'small' | 'medium' | 'large') => void;
   onMinWordLengthChange: (length: number) => void;
@@ -63,6 +65,7 @@ export function LobbyRoundSettings({
   vocabQuizQuestionCount,
   vocabQuizSeconds,
   treasureChestsEnabled,
+  treasureChestsAvailable = true,
   onTimerChange,
   onBoardSizeChange,
   onMinWordLengthChange,
@@ -98,7 +101,7 @@ export function LobbyRoundSettings({
         onFocusChange={onVocabQuizFocusChange}
         onQuestionCountChange={onVocabQuizQuestionCountChange}
         onSecondsChange={onVocabQuizSecondsChange}
-        onTreasureChestsChange={onTreasureChestsChange}
+        onTreasureChestsChange={treasureChestsAvailable ? onTreasureChestsChange : undefined}
         t={t}
       />
     );

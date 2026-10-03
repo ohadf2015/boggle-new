@@ -30,15 +30,15 @@ import { useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import { Shuffle, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { teacherGameMode } from '@/lib/education/gameModes';
-import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
-import { ModePickerStrip } from '../modePicker/ModePickerStrip';
+import { ClassroomModeCardRow } from '../ClassroomModeCatalogue';
+import { catalogueEntry } from '../ClassroomModeCatalogueData';
+import type { ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { useClassroomModeSwitch } from './useClassroomModeSwitch';
 
 export interface LobbyModeSwitcherProps {
   gameCode: string;
   /** What the room is playing, by the caller's own source precedence. */
-  currentMode: ClassroomGameMode;
+  currentMode: ClassroomCatalogueId;
   socket: Socket | null;
   /**
    * Translator, passed in rather than read from context: `ProjectorLobby` is
@@ -55,7 +55,7 @@ export interface LobbyModeSwitcherProps {
    * button still said START QUIZ (measured live 2026-09-11). Both mirrors are
    * written from the same ack, in the same tick, so they cannot disagree.
    */
-  onModeApplied?: (mode: ClassroomGameMode) => void;
+  onModeApplied?: (mode: ClassroomCatalogueId) => void;
 }
 
 export function LobbyModeSwitcher({
@@ -73,8 +73,7 @@ export function LobbyModeSwitcher({
     t,
     onApplied: onModeApplied,
   });
-  const live = teacherGameMode(liveMode);
-  const liveName = t(live?.nameKey ?? 'teacher.classroom.gameModes.classic');
+  const liveName = t(catalogueEntry(liveMode)?.nameKey ?? 'teacher.classroom.gameModes.classic');
 
   return (
     <span data-testid="lobby-mode-switcher" className="contents">
@@ -122,7 +121,7 @@ export function LobbyModeSwitcher({
           aria-label={t('education.modePicker.sheetTitle')}
           className="fixed inset-0 z-[80] flex items-center justify-center bg-neo-navy/90 p-4"
         >
-          <div className="w-full max-w-md rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-4 shadow-hard-lg">
+          <div className="w-full max-w-md rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-4 shadow-hard-lg md:max-w-4xl">
             <div className="mb-1 flex items-start justify-between gap-3">
               <h2 className="font-neo-display text-base font-black uppercase leading-tight text-neo-cream">
                 {t('education.modePicker.sheetTitle')}
@@ -143,14 +142,14 @@ export function LobbyModeSwitcher({
               {t('education.modePicker.sameCode')}
             </p>
 
-            <ModePickerStrip
+            <ClassroomModeCardRow
               selected={liveMode}
-              recommended={null}
               busy={!!pendingMode}
               onPick={(mode) => {
                 switchTo(mode);
                 setOpen(false);
               }}
+              t={t}
             />
           </div>
         </div>

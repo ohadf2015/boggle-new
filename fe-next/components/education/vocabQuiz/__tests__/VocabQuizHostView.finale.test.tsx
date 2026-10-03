@@ -76,4 +76,13 @@ describe('VocabQuizHostView — the wall after the last question', () => {
     expect(stage.className).toContain('justify-center');
     expect(stage.className).toContain('flex-1');
   });
+
+  it('never clips the podium: the stage keeps its content height and a short wall scrolls instead', () => {
+    render(<VocabQuizHostView socket={null} joinCode="H9M5YJ" playerCount={2} t={t} />);
+    const stage = screen.getByTestId('vocab-quiz-finale-stage');
+    expect(stage.className).not.toContain('overflow-hidden');
+    expect(stage.className).toContain('md:min-h-fit');
+    expect(screen.getByTestId('vocab-quiz-host').className).toContain('overflow-y-auto');
+    expect(screen.getByTestId('vocab-quiz-host').className).not.toContain('md:overflow-hidden');
+  });
 });

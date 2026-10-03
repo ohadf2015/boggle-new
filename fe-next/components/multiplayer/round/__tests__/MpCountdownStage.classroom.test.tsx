@@ -47,3 +47,13 @@ describe('MpCountdownStage in a classroom room', () => {
     expect(screen.getByTestId('mp-countdown-mode')).toHaveTextContent('mpUi.round.mode.blast.name');
   });
 });
+
+describe('classroomRoundModeMeta — Boss Battle', () => {
+  it('announces the boss fight, not the quiz engine under it', async () => {
+    const { classroomRoundModeMeta } = await import('../roundModes');
+    const meta = classroomRoundModeMeta('vocab-quiz', 'boss');
+    expect(meta.nameKey).toBe('eg2Modes.boss.name');
+    expect(meta.ruleKey).toBe('eg2Modes.boss.how');
+    expect(classroomRoundModeMeta('vocab-quiz').nameKey).toBe('teacher.classroom.gameModes.vocabQuiz');
+  });
+});

@@ -3,11 +3,13 @@
 import { memo, useCallback, useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import TvNotification, { TvNotificationData } from './TvNotification';
+import { TEACHER_CONTROLS_TOAST_OFFSET } from '@/components/education/controls/teacherBarInset';
 
 interface TvNotificationQueueProps {
   notifications: TvNotificationData[];
   onDismiss: (id: string) => void;
   maxVisible?: number;
+  placement?: 'overlay' | 'inline';
 }
 
 // Minimum gap between notifications in milliseconds
@@ -23,6 +25,7 @@ const TvNotificationQueue = memo<TvNotificationQueueProps>(({
   notifications,
   onDismiss,
   maxVisible = 1,
+  placement = 'overlay',
 }) => {
   const [isGapActive, setIsGapActive] = useState(false);
   const gapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -56,19 +59,34 @@ const TvNotificationQueue = memo<TvNotificationQueueProps>(({
   const shouldShow = !isGapActive && notifications.length > 0;
   const visibleNotifications = shouldShow ? notifications.slice(0, maxVisible) : [];
 
-  return (
-    <div className="fixed inset-x-0 bottom-8 pointer-events-none z-50 flex justify-center">
-      <div className="relative">
-        <AnimatePresence mode="wait">
-          {visibleNotifications.map((notification) => (
-            <TvNotification
-              key={notification.id}
-              notification={notification}
-              onDismiss={handleDismiss}
-            />
-          ))}
-        </AnimatePresence>
+  const compact = placement === 'inline';
+  const toasts = (
+    <AnimatePresence mode="wait">
+      {visibleNotifications.map((notification) => (
+        <TvNotification
+          key={notification.id}
+          notification={notification}
+          onDismiss={handleDismiss}
+          compact={compact}
+        />
+      ))}
+    </AnimatePresence>
+  );
+
+  if (compact) {
+    return (
+      <div data-testid="tv-toast-inline" className="pointer-events-none flex min-w-0 max-w-full items-center justify-end">
+        {toasts}
       </div>
+    );
+  }
+
+  return (
+    <div
+      className="fixed inset-x-0 pointer-events-none z-50 flex justify-center"
+      style={TEACHER_CONTROLS_TOAST_OFFSET}
+    >
+      <div className="relative">{toasts}</div>
     </div>
   );
 });

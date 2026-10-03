@@ -67,6 +67,7 @@ export function VocabQuizStandings({
       {top.length > 0 && (
         <ResultsPodium
           size={projector ? 'projector' : 'card'}
+          layout={projector ? 'auto' : 'row'}
           entries={top.map((player, index) => ({
             username: player.username,
             score: player.score,

@@ -34,6 +34,7 @@ import {
   answersByUser,
   type VocabQuizSession,
 } from './vocabQuizEngine.js';
+import { withBoss } from './vocabQuizBoss.js';
 import { getQuizSession, deleteQuizSession } from '../modules/vocabQuizStore.js';
 import { VOCAB_QUIZ_EVENTS, VOCAB_QUIZ_REVEAL_MS } from '@/shared/types/vocabQuiz';
 import { getGameRoom } from '../utils/socketHelpers.js';
@@ -70,11 +71,11 @@ export async function finishQuiz(io: Server, gameCode: string): Promise<void> {
   deleteQuizSession(gameCode);
 
   const standings = quizStandings(session);
-  toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.ended, {
+  toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.ended, withBoss(session, {
     gameCode,
     standings,
     totalQuestions: session.questions.length,
-  });
+  }));
 
   // Retire the room in the board engine's state machine too, so its timeout
   // path can never fire a second, board-shaped end for this room.

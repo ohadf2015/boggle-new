@@ -34,6 +34,11 @@ export interface VocabQuizChestFlowProps {
   ended: boolean;
   username: string;
   t: TranslateFn;
+  /**
+   * `overlay` (default) covers the screen; `inline` renders only the picker,
+   * for the caller to place in flow; `none` leaves the picker to an inline twin.
+   */
+  picker?: 'overlay' | 'inline' | 'none';
 }
 
 /** Matches the server's fallback beat, so an un-tapped reveal acks as it ends. */
@@ -49,6 +54,7 @@ export function VocabQuizChestFlow({
   ended,
   username,
   t,
+  picker = 'overlay',
 }: VocabQuizChestFlowProps) {
   // Local UI state is keyed by the question it belongs to, so a new question
   // resets it without an effect.
@@ -91,6 +97,15 @@ export function VocabQuizChestFlow({
 
   if (ended) return null;
 
+  if (picker === 'inline') {
+    if (!chestPending || ownChest) return null;
+    return (
+      <div className="w-full h-full grid place-items-center rounded-neo border-[3px] border-neo-yellow bg-neo-navy-elevated shadow-hard">
+        <TreasureChestPicker onPick={handlePick} disabled={pickedChest !== null} pickedIndex={pickedChest} t={t} />
+      </div>
+    );
+  }
+
   const hitBanner = showHit && chestHit && (
     <div
       role="status"
@@ -113,7 +128,7 @@ export function VocabQuizChestFlow({
     );
   }
 
-  if (chestPending && !ownChest) {
+  if (picker === 'overlay' && chestPending && !ownChest) {
     return (
       <>
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-neo-navy px-4">

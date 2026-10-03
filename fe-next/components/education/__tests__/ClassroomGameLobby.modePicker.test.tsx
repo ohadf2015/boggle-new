@@ -37,7 +37,7 @@ vi.mock('@/contexts/AuthContext', () => ({
     profile: { display_name: 'Ms Plant' },
   }),
 }));
-const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: vi.fn() } }));
+const { stableRouter } = vi.hoisted(() => ({ stableRouter: { push: vi.fn(), replace: vi.fn() } }));
 vi.mock('next/navigation', () => ({ useRouter: () => stableRouter }));
 vi.mock('socket.io-client', () => ({ io: vi.fn() }));
 vi.mock('@/lib/supabase/education', () => ({
@@ -94,9 +94,9 @@ async function renderLobby(lessonId = '') {
   await screen.findByTestId('lobby-go-live');
 }
 
-/** Open the fold (the less-played modes live behind it). */
+/** The catalogue folds nothing away: every mode is already a card on screen. */
 function openModes() {
-  fireEvent.click(screen.getByTestId('more-modes-toggle'));
+  expect(screen.queryByTestId('more-modes-toggle')).not.toBeInTheDocument();
 }
 
 describe('ClassroomGameLobby — the picker is the first thing and the launch button', () => {

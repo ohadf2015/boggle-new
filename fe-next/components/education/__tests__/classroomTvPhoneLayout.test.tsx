@@ -81,11 +81,11 @@ const summary = () => ({
 afterEach(cleanup);
 
 describe('classroom TV mode on a phone', () => {
-  it('quiz projector scrolls on a phone and locks on the wall', () => {
+  it('quiz projector scrolls on a phone, and on a wall too short for the finale, instead of clipping it', () => {
     render(<VocabQuizHostView socket={null} joinCode="H9M5YJ" playerCount={1} t={t} />);
     const root = tokens(screen.getByTestId('vocab-quiz-host'));
     expect(root).toContain('overflow-y-auto');
-    expect(root).toContain('md:overflow-hidden');
+    expect(root).not.toContain('md:overflow-hidden');
     expect(root).not.toContain('overflow-hidden');
     expect(root).toContain('p-3');
     expect(root).toContain('md:p-6');
@@ -94,9 +94,10 @@ describe('classroom TV mode on a phone', () => {
   it('quiz finale scrolls on a phone and scales its headline down', () => {
     render(<VocabQuizHostView socket={null} joinCode="H9M5YJ" playerCount={1} t={t} />);
     const finale = tokens(screen.getByTestId('vocab-quiz-finale'));
-    expect(finale).toContain('md:overflow-hidden');
+    expect(finale).not.toContain('md:overflow-hidden');
     expect(finale).not.toContain('overflow-hidden');
     expect(finale).not.toContain('min-h-0');
+    expect(finale).toContain('md:min-h-fit');
     const title = tokens(screen.getByRole('heading', { level: 2 }));
     expect(title).toContain('text-3xl');
     expect(title).toContain('md:text-5xl');

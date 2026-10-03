@@ -47,6 +47,7 @@ import {
   type VocabQuizSession,
 } from '../services/vocabQuizEngine.js';
 import { buildLockIn, decorateReveal } from '../services/vocabQuizJuice.js';
+import { armBoss, settleBossReveal, withBossHit } from '../services/vocabQuizBoss.js';
 import { buildQuizShellStart, QUIZ_SHELL_GAME_MODE } from '../services/vocabQuizShell.js';
 import { registerTreasureChestHandlers } from './treasureChestHandler.js';
 import { chestsStillOpening } from '../services/treasureChestResolver.js';
@@ -61,6 +62,7 @@ import {
   VOCAB_QUIZ_EVENTS,
   VOCAB_QUIZ_MODE,
   VOCAB_QUIZ_REVEAL_MS,
+  VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS,
   VOCAB_QUIZ_CHEST_HOLD_MS,
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
@@ -117,6 +119,7 @@ function beginReveal(io: Server, session: VocabQuizSession, now: number): void {
   session.phase = 'reveal';
   session.revealEndsAt = now + VOCAB_QUIZ_REVEAL_MS;
   session.chestHoldEndsAt = session.revealEndsAt + VOCAB_QUIZ_CHEST_HOLD_MS;
+  settleBossReveal(session);
   emitReveal(io, session);
 }
 
@@ -175,8 +178,11 @@ function readQuizSettings(settings: Record<string, unknown> | undefined) {
   const focus = isPracticeFocusSetting(focusRaw) ? focusRaw : 'any';
   const count = Number(settings?.vocabQuizQuestionCount);
   const seconds = Number(settings?.vocabQuizSeconds);
-  const treasureChestsEnabled = settings?.treasureChestsEnabled ?? true;
+  const boss = settings?.vocabQuizVariant === 'boss';
+  // Chests steal and swap between students; a class-vs-boss round is co-op.
+  const treasureChestsEnabled = !boss && (settings?.treasureChestsEnabled ?? true);
   return {
+    boss,
     focus,
     questionCount: Number.isFinite(count) && count > 0 ? count : VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
     secondsPerQuestion: Number.isFinite(seconds) && seconds > 0 ? seconds : VOCAB_QUIZ_DEFAULT_SECONDS,
@@ -190,9 +196,10 @@ function readQuizSettings(settings: Record<string, unknown> | undefined) {
  * Returns true when the quiz has taken over the room — the caller (the
  * `startGame` handler) must then return without generating a grid or starting
  * the room timer. Returns false for every other room so the board path runs
- * exactly as before.
+ * exactly as before. Returns 'refused' when the teacher chose the quiz but it
+ * cannot run: the caller must abandon the start, never fall back to a board.
  */
-export async function startVocabQuizForClassroom(io: Server, gameCode: string): Promise<boolean> {
+export async function startVocabQuizForClassroom(io: Server, gameCode: string): Promise<boolean | 'refused'> {
   // Whatever starts next in this room owns it from here. A finished quiz keeps
   // answering `hasQuizSession` for a grace window (so the board's end path
   // cannot steal the persistence key from `finishQuiz`); a board round hosted
@@ -212,7 +219,7 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   const settings = (classroomGame.settings ?? {}) as Record<string, unknown>;
   if (settings.gameMode !== VOCAB_QUIZ_MODE) return false;
 
-  const { focus, questionCount, secondsPerQuestion, treasureChestsEnabled } = readQuizSettings(settings);
+  const { focus, questionCount, secondsPerQuestion, treasureChestsEnabled, boss } = readQuizSettings(settings);
   // The calm dial: accuracy-only scoring when the teacher launched it so.
   const pressure = readClassroomPressure(settings);
   const { words, language } = await loadLessonVocabulary(classroomGame.lessonIds ?? []);
@@ -233,8 +240,6 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   });
 
   if (session.questions.length === 0) {
-    // Loud, not silent: a teacher standing in front of a class needs to know
-    // WHY nothing started, and needs the board game not to have been skipped.
     logger.error(
       'VOCAB_QUIZ',
       `Refusing to start quiz ${gameCode}: lesson has no quizzable words ` +
@@ -245,7 +250,8 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
       gameCode,
     });
     toRoom(io, gameCode, 'classroomGameError', { error: 'vocabQuiz.errors.noQuestions', gameCode });
-    return false;
+    toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.startRefused, { gameCode, reason: 'noQuestions' });
+    return 'refused';
   }
 
   // Enrol the humans already in the room. Bots have no vocabulary to learn and
@@ -257,6 +263,7 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
     if (gameUser.isHost) continue; // the teacher hosts, they do not compete
     addQuizPlayer(session, { username, userId: gameUser.authUserId ?? null });
   }
+  if (boss) armBoss(session);
 
   // This room is running a round again, so its code is joinable again. The
   // board path does the same from `gameStartHandler`, but the quiz branch
@@ -271,7 +278,7 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   startTicking(io, gameCode);
 
   const now = Date.now();
-  session.questionStartedAt = now;
+  session.questionStartedAt = now + VOCAB_QUIZ_FIRST_QUESTION_LEAD_MS;
 
   // Move every client out of the lobby FIRST.
   //
@@ -359,7 +366,7 @@ export function registerVocabQuizHandlers(io: Server, socket: Socket): void {
     // correct here, and there is no state for them to repair.
     if (!result) return;
 
-    socket.emit(VOCAB_QUIZ_EVENTS.answerResult, result);
+    socket.emit(VOCAB_QUIZ_EVENTS.answerResult, withBossHit(ctx.session, result));
 
     // BEFORE the everyone-answered cut, never after: a lock-in that lands once
     // the reveal has already gone out would repaint the reveal bars with the

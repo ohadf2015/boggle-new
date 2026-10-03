@@ -185,4 +185,31 @@ describe('VocabQuizView — the quiz ends on a moment', () => {
     // StudentNextActions should be mounted and visible
     expect(screen.getByTestId('wait-for-teacher-message')).toBeVisible();
   });
+
+  it('puts the podium in the end screen\'s one scroller, side by side, instead of a squeezed inner box', () => {
+    const { socket, server } = makeSocket();
+    render(<VocabQuizView socket={socket} username="bo" t={t} />);
+    server(VOCAB_QUIZ_EVENTS.ended, ENDED);
+
+    const ended = screen.getByTestId('vocab-quiz-ended');
+    expect(ended.className).toContain('overflow-y-auto');
+    const podium = screen.getByTestId('podium-place-1').closest('ol')!;
+    expect(podium.className).toContain('flex-row');
+    let node: HTMLElement | null = podium.parentElement;
+    while (node && node !== ended) {
+      expect(node.className).not.toContain('overflow-y-auto');
+      expect(node.className).not.toContain('min-h-0');
+      node = node.parentElement;
+    }
+  });
+
+  it('puts the teacher-wait action straight under the podium, ahead of the badge card, so a phone sees both without scrolling', () => {
+    const { socket, server } = makeSocket();
+    render(<VocabQuizView socket={socket} username="bo" t={t} />);
+    server(VOCAB_QUIZ_EVENTS.ended, ENDED);
+    const actions = screen.getByTestId('vocab-quiz-ended-actions');
+    const badges = screen.getByTestId('vocab-quiz-own-finale');
+    expect(actions.compareDocumentPosition(badges) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(actions).toContainElement(screen.getByTestId('wait-for-teacher-message'));
+  });
 });
