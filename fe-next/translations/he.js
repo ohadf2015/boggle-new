@@ -14168,7 +14168,7 @@ const he = {
       "assignmentCompletion": {
         "title": "השלמת משימות",
         "submitted": "{{submitted}} / {{roster}} הוגשו",
-        "upgrade": "Teacher Pro {{price}}"
+        "upgrade": "פרו למורים {{price}}"
       },
       "exportAllClasses": {
         "button": "ייצוא כל הכיתות",
