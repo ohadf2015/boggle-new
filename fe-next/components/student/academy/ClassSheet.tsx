@@ -10,6 +10,8 @@ import { m } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ClassroomLeaderboard from '@/components/education/ClassroomLeaderboard';
+import { StudentAssignmentPlayCta } from '@/components/student/StudentAssignmentPlayCta';
+import type { NextOpenAssignment } from '@/components/student/nextOpenAssignment';
 
 interface Props {
   classroomId: string;
@@ -17,9 +19,11 @@ interface Props {
   className?: string | null;
   onClose: () => void;
   reducedMotion: boolean;
+  /** Next unfinished homework; null/omitted hides the Play CTA. */
+  nextOpenAssignment?: NextOpenAssignment | null;
 }
 
-export function ClassSheet({ classroomId, userId, className, onClose, reducedMotion }: Props) {
+export function ClassSheet({ classroomId, userId, className, onClose, reducedMotion, nextOpenAssignment = null }: Props) {
   const { t } = useLanguage();
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={t('student.dashboard.leaderboard', 'Leaderboard')}>
@@ -47,6 +51,7 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
           </button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
+          <StudentAssignmentPlayCta next={nextOpenAssignment} />
           <ClassroomLeaderboard classroomId={classroomId} currentUserId={userId} />
         </div>
       </m.div>

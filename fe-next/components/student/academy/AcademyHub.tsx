@@ -43,6 +43,7 @@ import { AcademySidePanel } from './AcademySidePanel';
 import { AcademyDock } from './AcademyDock';
 import { DailyChest } from './DailyChest';
 import { ClassSheet } from './ClassSheet';
+import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
 import { InkPanel } from './chrome';
 import { useNodeLabel } from './AcademyNodeButton';
 import { cn } from '@/lib/utils';
@@ -175,6 +176,10 @@ export function AcademyHub(props: AcademyHubProps) {
     [data.lessons, data.reviewLessonId, data.reviewCount, language, level, classroomId, isLive, layout],
   );
   const action = pickNextAction({ hasClass: !!classroomId, live: isLive, islands, boss });
+  const nextAssignment = useMemo(
+    () => nextOpenAssignment(data.lessons, language, classroomId),
+    [data.lessons, language, classroomId],
+  );
   const mascotMood = academyMascotMood({
     kind: action.kind,
     streakAtRisk: data.streakAtRisk,
@@ -423,6 +428,7 @@ export function AcademyHub(props: AcademyHubProps) {
           className={classroomName}
           onClose={() => setClassOpen(false)}
           reducedMotion={reducedMotion}
+          nextOpenAssignment={nextAssignment}
         />
       )}
     </div>
