@@ -100,6 +100,8 @@ export interface StylePopupGateInput {
    * while being the exact moment the round pays off.
    */
   overlayQuietZone?: boolean;
+  /** An education page (student hub, join, teacher): a classroom is not the place for an arcade music picker. */
+  onEducationRoute?: boolean;
 }
 
 /**
@@ -112,6 +114,7 @@ export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   if (!input.isMounted) return false;
   // Search-engine crawlers must reach the page content, never a blocking modal.
   if (input.isCrawler) return false;
+  if (input.onEducationRoute) return false;
   // Once shown this session, never show again — even if the persisted "shown"
   // marker hasn't caught up yet (authed profile refetch lag after dismiss).
   if (input.alreadyShownThisSession) return false;

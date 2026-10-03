@@ -4,6 +4,8 @@ import { memo, useMemo, useRef, type ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import { toMpRoster, rankOf, type MpRosterPlayer, type MpRosterScoreLike, type MpRosterUserLike } from '@/lib/multiplayer/roster';
+import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
+import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { cn } from '@/lib/utils';
 import { MpCallouts, MpRosterStrip } from '../shell';
 import { WordsLadder, type LadderWord } from '../desktop/WordsLadder';
@@ -97,6 +99,14 @@ function MpRoundLayoutImpl({
   const { rank, total } = rankOf(roster, meId);
   const myScore = roster.find((p) => p.id === meId)?.score ?? 0;
 
+  // TRUE hidden: alphabetical seats — the score order itself is the leak.
+  const pressure = useClassroomPressure();
+  const hideStandings = pressure != null && isLeaderboardHidden(pressure);
+  const displayRoster = useMemo(
+    () => (hideStandings ? [...roster].sort((a, b) => a.name.localeCompare(b.name)) : roster),
+    [roster, hideStandings],
+  );
+
   const juice = useRoundJuice({ meId, standings, remainingTime, socket });
   // react-hot-toast leaves the HUD row for this frame's lane (phone: under the roster strip; desktop/TV: start rail).
   useRoundFrameToastLane();
@@ -139,12 +149,12 @@ function MpRoundLayoutImpl({
             four seats a name only fits as "P…", so names go screen-reader-only and
             the avatars + scores carry the strip. */}
         <MpRosterStrip
-          players={roster}
+          players={displayRoster}
           meId={meId}
           layout="row"
           max={4}
-          showScores
-          className={cn('justify-center gap-1.5', roster.length >= 4 && '[&_[data-player]>span[dir=auto]]:sr-only')}
+          showScores={!hideStandings}
+          className={cn('justify-center gap-1.5', displayRoster.length >= 4 && '[&_[data-player]>span[dir=auto]]:sr-only')}
         />
       </div>
 
@@ -154,10 +164,10 @@ function MpRoundLayoutImpl({
         {/* Full height, like YOUR WORDS opposite: the column is framed, never a void under a short roster. */}
         <div data-testid="mp-rail-roster" className="flex-1 min-h-0 overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3 tv:p-4">
           <MpRosterStrip
-            players={roster}
+            players={displayRoster}
             meId={meId}
             layout="rail"
-            showScores
+            showScores={!hideStandings}
             className={cn(
               // A name shows whole or wraps to two lines (handles have no spaces:
               // break anywhere) — never "RndHostclassicho…". The score keeps its width.

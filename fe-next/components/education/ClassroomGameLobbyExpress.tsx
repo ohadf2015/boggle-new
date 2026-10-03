@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
 import type { Classroom, Language } from '@/lib/supabase/education/types';
 import { trackEduClassroomCreated, trackEduLiveGameStarted } from '@/lib/education/telemetry';
+import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
 import {
   abandonLaunch,
   ensureLaunch,
@@ -122,6 +123,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
       let socket: Socket | null = null;
       // Set just before the room is asked for; read when the server confirms.
       let startedMeta: { classroomId: string; lessonCount: number } | null = null;
+      let startedLessonIds: string[] = [];
       let startedTracked = false;
       const watchdog = setTimeout(
         () => {
@@ -172,6 +174,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             if (startedMeta && !startedTracked) {
               startedTracked = true;
               trackEduLiveGameStarted({ ...startedMeta, source: 'hq_express' });
+              void recordLessonPlays(startedLessonIds);
             }
             control.succeed(data.gameCode);
           });
@@ -267,6 +270,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             classroomId: result.payload.classroomId,
             lessonCount: result.payload.lessonIds.length,
           };
+          startedLessonIds = result.payload.lessonIds;
           live.emit('createClassroomGame', result.payload);
 
           // Bookkeeping only, and AFTER the room is asked for: a throw in the
@@ -306,7 +310,8 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
   useEffect(() => {
     if (!liveGameCode) return;
     clearQuickLaunchIntent();
-    router.push(classroomMultiplayerPath(language, liveGameCode));
+    // Replace, not push: a launch page left in history re-launches on Back.
+    router.replace(classroomMultiplayerPath(language, liveGameCode));
   }, [liveGameCode, router, language]);
 
   const retry = useCallback(() => {
@@ -380,7 +385,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
       className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo-lg border-4 border-neo-cream bg-neo-navy p-5 shadow-hard-lg sm:p-8"
     >
       <div className="flex items-center justify-center gap-3">
-        <Rocket className="size-9 shrink-0 text-neo-lime motion-safe:animate-bounce" strokeWidth={3} aria-hidden="true" />
+        <Rocket className="size-9 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
         <h1 className="font-neo-display text-3xl font-black uppercase tracking-tight text-neo-lime sm:text-4xl">
           {t('teacher.playNow.goingLive')}
         </h1>

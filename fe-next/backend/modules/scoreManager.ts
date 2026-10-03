@@ -25,6 +25,8 @@ export interface ScoreGameBase {
   startTime?: number;
   /** Maps word to the first player who found it (for first-to-find scoring) */
   firstFinderMap?: Record<string, FirstFinderEntry>;
+  /** Teacher-run room: the host is a spectator, never a contestant. */
+  isClassroom?: boolean;
 }
 
 // Leaderboard throttling - maps gameCode to timeout ID
@@ -278,7 +280,8 @@ export function getLeaderboard(game: ScoreGameBase | null, gameCode?: string): L
       isBot: game.users[username]?.isBot || false,
       comboLevel: game.playerCombos?.[username] || 0,
     }))
-    // Host is always visible as a player — no broadcast mode filtering
+    // A classroom teacher spectates; an idle host must not rank as "0" on every student's board.
+    .filter((p) => !(game.isClassroom && p.isHost && p.wordCount === 0))
     .sort((a, b) => b.score - a.score);
 
   // Cache the result

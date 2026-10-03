@@ -1,5 +1,176 @@
 // HE translations
 const he = {
+  // @eduLibrary:start
+  "eduLibrary": {
+    "title": "ספרייה",
+    "tabs": {
+      "mine": "הרשימות שלי",
+      "discover": "גילוי"
+    },
+    "editor": {
+      "createTitle": "רשימת מילים חדשה",
+      "editTitle": "עריכת רשימה",
+      "description": "מדביקים מילים, מוסיפים פירוש, שומרים.",
+      "newList": "רשימה חדשה",
+      "titleLabel": "שם הרשימה",
+      "titlePlaceholder": "איך נקרא לרשימה?",
+      "pasteLabel": "הדביקו או הקלידו מילים",
+      "pastePlaceholder": "תפוח, בננה, דובדבן — או מילה בכל שורה. ״מילה - פירוש״ מוסיף גם פירוש.",
+      "addedWords": "+{count} נוספו",
+      "skippedDuplicates": "{count} כבר ברשימה",
+      "importFile": "CSV / TSV",
+      "starterPack": "חבילת פתיחה",
+      "fileError": "לא מצאנו מילים בקובץ. מילה אחת בכל שורה, והפירוש בעמודה השנייה.",
+      "wordsHeading": "מילים",
+      "wordsLabel": "המילים ברשימה",
+      "viewLabel": "תצוגה",
+      "view": {
+        "chips": "תגיות",
+        "details": "פירוט"
+      },
+      "emptyWords": "המילים שלכם יקפצו לכאן.",
+      "removeWord": "להסיר את {word}",
+      "noDefinition": "עוד אין פירוש",
+      "word": "מילה",
+      "definition": "פירוש (לא חובה)",
+      "definitionPlaceholder": "מה זה אומר?",
+      "done": "סיום",
+      "needTitle": "תנו לרשימה שם כדי לשמור.",
+      "needWords": "הוסיפו לפחות מילה אחת.",
+      "save": "שמירה",
+      "saving": "שומרים…",
+      "saved": "נשמר",
+      "savedToast": "״{name}״ נשמרה"
+    },
+    "issue": {
+      "digits": "יש בה ספרה",
+      "tooLong": "ארוכה מדי למשחק",
+      "wrongScript": "לא נראית בשפת הרשימה",
+      "blocked": "אסורה במשחקי תלמידים"
+    },
+    "meta": {
+      "language": "שפה",
+      "grade": "כיתה",
+      "topic": "נושא",
+      "assignTo": "להקצות ל־",
+      "noClass": "בלי כיתה בינתיים"
+    },
+    "grade": {
+      "any": "כל הכיתות",
+      "k2": "גן–ב׳",
+      "g35": "ג׳–ה׳",
+      "g68": "ו׳–ח׳",
+      "g912": "ט׳–י״ב"
+    },
+    "topic": {
+      "none": "בלי נושא",
+      "all": "כל הנושאים",
+      "general": "כללי",
+      "english": "אנגלית",
+      "hebrew": "עברית",
+      "science": "מדעים",
+      "math": "מתמטיקה",
+      "history": "היסטוריה",
+      "geography": "גאוגרפיה",
+      "language": "לימוד שפה"
+    },
+    "share": {
+      "toggle": "שיתוף בגילוי",
+      "help": "מורים אחרים יוכלו למצוא, להפעיל ולהעתיק. רק שם התצוגה שלכם מופיע.",
+      "blocked": "יש מילים שאי אפשר לשתף עם תלמידים. הסירו אותן כדי לשתף.",
+      "share": "שיתוף",
+      "shared": "משותפת",
+      "nowPublic": "שותפה בגילוי",
+      "nowPrivate": "חזרה להיות פרטית",
+      "failed": "לא הצלחנו לשנות את השיתוף. נסו שוב."
+    },
+    "remixedFrom": "רמיקס של {title} מאת {author}",
+    "remixedFromNoAuthor": "רמיקס של {title}",
+    "myLists": {
+      "emptyHint": "הדביקו רשימה, התחילו מחבילת פתיחה, או קחו רשימה מהגילוי."
+    },
+    "card": {
+      "practice": "תרגול",
+      "words": "{count} מילים",
+      "by": "מאת {author}",
+      "aTeacher": "מורה",
+      "new": "חדש",
+      "plays": "{count} הפעלות",
+      "playsOne": "הפעלה אחת",
+      "copies": "{count} העתקות",
+      "copiesOne": "העתקה אחת",
+      "results": "תוצאות"
+    },
+    "badge": {
+      "verified": "מאומת",
+      "teacher": "של מורה",
+      "yours": "שלך"
+    },
+    "discover": {
+      "searchLabel": "חיפוש רשימות",
+      "searchPlaceholder": "חפשו רשימה, מילה או מורה",
+      "clearSearch": "ניקוי החיפוש",
+      "filters": "סינון",
+      "allLanguages": "הכול",
+      "sourceLabel": "מי הכין",
+      "source": {
+        "all": "הכול",
+        "verified": "מאומת על ידי LexiClash",
+        "teacher": "של מורים"
+      },
+      "count": "{count} רשימות",
+      "sortLabel": "מיון",
+      "sort": {
+        "popular": "הכי פופולריות",
+        "newest": "החדשות ביותר"
+      },
+      "loadError": "לא הצלחנו לטעון את הגילוי.",
+      "retry": "לנסות שוב",
+      "emptyTitle": "עוד אין רשימות שמתאימות",
+      "emptyHint": "נסו סינון אחר — או שתפו רשימה שלכם כדי שהמורה הבא ימצא אותה.",
+      "tryAllLanguages": "להציג את כל השפות",
+      "shareFirst": "לשתף רשימה",
+      "beFirstTitle": "היו המורים הראשונים כאן.",
+      "beFirstHint": "שתפו רשימה אחת, והיא תופיע לכל מורה בשפה הזו."
+    },
+    "preview": {
+      "host": "להפעיל משחק חי",
+      "assign": "להקצות",
+      "copy": "ליצור עותק",
+      "copied": "הועתקה",
+      "copiedHint": "היא כבר ב״הרשימות שלי״ — לחצו על ״הועתקה״ כדי לפתוח.",
+      "copiedToast": "״{name}״ הועתקה לרשימות שלך",
+      "copyFailed": "לא הצלחנו להעתיק. נסו שוב."
+    },
+    "report": {
+      "action": "דיווח על הרשימה",
+      "title": "דיווח על רשימה",
+      "description": "מה הבעיה ב״{name}״? אנחנו בודקים כל דיווח.",
+      "reason": {
+        "inappropriate": "לא מתאימה לתלמידים",
+        "offensive": "מילים פוגעניות",
+        "unplayable": "מילים שגויות או לא שמישות",
+        "spam": "ספאם או זבל"
+      },
+      "detailsPlaceholder": "עוד משהו? (לא חובה)",
+      "submit": "שליחת דיווח",
+      "thanks": "תודה — נבדוק את זה.",
+      "failed": "הדיווח לא נשלח. נסו שוב."
+    },
+    "assign": {
+      "title": "הקצאה לכיתה",
+      "pickClass": "איזו כיתה מקבלת?",
+      "noClasses": "קודם צרו כיתה — זה לוקח 5 שניות.",
+      "createClass": "יצירת כיתה"
+    },
+    "pager": {
+      "label": "עמודים",
+      "prev": "הקודם",
+      "next": "הבא",
+      "status": "{page} / {total}"
+    }
+  },
+  // @eduLibrary:end
   // @academy:start (generated by /tmp/edu-play/merge-i18n.mjs)
   "academy": {
     "teacher": {
@@ -33,11 +204,26 @@ const he = {
         "blast": "בלאסט",
         "blastBlurb": "סיבובים מהירים, קומבואים ענקיים",
         "wordHunt": "ציד מילים",
-        "wordHuntBlurb": "צדים את המילים מהרשימה"
+        "wordHuntBlurb": "צדים את המילים מהרשימה",
+        "wordcraft": "וורדקראפט",
+        "wordcraftBlurb": "הרכיבו מילי שיעור ונצחו את הכיתה"
       },
       "noClassTitle": "צרו כיתה וקבלו קוד תוך 5 שניות",
       "createClassCta": "יצירת הכיתה שלי",
-      "codeReady": "הקוד מוכן"
+      "codeReady": "הקוד מוכן",
+      "firstAssignmentTitle": "צרו את המטלה הראשונה",
+      "firstAssignmentBody": "יש תלמידים ברשימה. שייכו תרגול כדי שיהיה להם מה לעשות כשאתם לא בשידור חי.",
+      "firstAssignmentCta": "צרו מטלה ראשונה",
+      "startLiveTitle": "הפעילו שיעור חי",
+      "startLiveBody": "המטלה כבר יצאה. התחילו משחק חי כדי שהכיתה תשחק ביחד.",
+      "startLiveCta": "התחילו משחק כיתה חי",
+      "copyJoinCode": "העתיקו קישור הצטרפות",
+      "joinCodeCopied": "קישור ההצטרפות הועתק",
+      "progressTitle": "התקדמות הכיתה",
+      "progressStudents": "תלמידים",
+      "progressAssignments": "מטלות",
+      "progressSubmitted": "הוגשו",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {
@@ -9056,6 +9242,9 @@ const he = {
       "playerWordsTitle": "הנתיב של {{name}}",
       "youMissedWords": "מילים שהחמצת",
       "tapPlayerHint": "לחץ על שחקן כדי לראות את נתיבו",
+      "guestNameLabel": "בטבלה בתור",
+      "guestNameRejected": "בחרו שם אחר",
+      "guestNameFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
       "wordsFound": "מילים שנמצאו",
       "masteryRatingLabel": "דירוג",
       "masteryRatingChangeLabel": "שינוי",
@@ -12937,6 +13126,14 @@ const he = {
       "trialEnded": "הניסיון הסתיים"
     },
     "proGate": {
+      "mastery": {
+        "title": "רואים כל מילה שהכיתה מפספסת",
+        "body": "Pro מדרג את עשר המילים שהכיתה מפספסת הכי הרבה וממפה כל תלמיד מול כל מילה, בכל המשחקים — כך יודעים בדיוק מה ללמד שוב, ולמי."
+      },
+      "missedPractice": {
+        "title": "הופכים פספוסים לתרגול מרווח",
+        "body": "קליק אחד שולח לכיתה את המילים שפוספסו בשלושה סבבים קצרים — מחר, בעוד 3 ימים ובעוד שבוע. המרווחים האלה הם מה שגורם למילים להיקלט."
+      },
       "analytics": {
         "title": "לראות איך הכיתה באמת מתקדמת",
         "body": "עם Pro כל משחק הופך לתמונת מצב של הכיתה: אילו מילים נקלטו, אילו תלמידים תקועים וכמה כל אחד התקדם מתחילת השנה. אפשר להביא את זה לאסיפת הורים או לישיבת צוות."
@@ -12944,6 +13141,10 @@ const he = {
       "reports": {
         "title": "דוחות התקדמות הם תכונת Pro",
         "body": "ראו איך כל תלמיד מתקדם בכל הכיתות ובכל המשחקים: מילים שהושגו, שלבים, XP ודוחות PDF להדפסה לערב הורים. שדרגו ל-Teacher Pro כדי לפתוח דוחות כיתה ותלמיד."
+      },
+      "pressureDials": {
+        "title": "מצב רגוע לתלמידים חרדים",
+        "body": "Pro מעביר אליך את בוררי הלחץ: להסתיר את טבלת המובילים עד הסוף, לעמעם או לכבות את הטיימר, ולתת ניקוד על דיוק במקום על מהירות. אותו משחק יכול לרוץ כמופע מלהיב או כבדיקת שליטה רגועה."
       },
       "cta": "לפתוח עם Pro — {{price}} לחודש"
     },
@@ -12967,10 +13168,10 @@ const he = {
       "regionLabel": "תקציר התקדמות עבור {{classroom}}",
       "scheduleReteachCta": "לקבוע Live לחזרה בעוד ~{{days}} ימים",
       "scheduleReteachConfirm": "Live לחזרה נקבע ל־{{date}} (~{{days}} ימים). הזמנה ליומן נפתחה.",
-      "scheduleReteachHint": "לבנות מחדש את המילים הקשות ולשחק שוב בעוד כשבועיים — חזרה מרווחת בסגנון Kahoot.",
+      "scheduleReteachHint": "בונים מחדש את המילים הקשות ומשחקים שוב בעוד כשבועיים — חזרה מרווחת שנשארת.",
       "unpluggedReteachLiveCta": "התחלת Unplugged Live לחיזוק",
       "reteachLiveCta": "התחלת Live חיזוק ל־3 דקות",
-      "unpluggedReteachLiveFoil": "מול Kahoot Unplugged (Teacher Takeover, 21 בספט׳ 2026 — כשאין מכשירי תלמידים) — מקרינים את המילים החסרות; התלמידים עונים על נייר, בלי מכשירים."
+      "unpluggedReteachLiveFoil": "אין היום מכשירים לתלמידים? מקרינים את הפספוסים — והתלמידים עונים על דף."
     },
     "windowProgress": {
       "title": "הכיתה השבוע",
@@ -13065,10 +13266,13 @@ const he = {
       "featureOutcome2": "להוסיף את כל הכיתות שאתם מלמדים, לא רק 3 הראשונות",
       "featureOutcome3": "לראות בזמן אמת מי נתקע, מילה־מילה",
       "featureOutcome4": "להשוות התקדמות בין כל הכיתות שלכם",
+      "featureOutcome5": "מצב רגוע לתלמידים חרדים — הטיימר, טבלת המובילים והניקוד על מהירות בידיים שלך",
       "priceTaxNote": "ייתכן שיתווספו מסים בתשלום.",
       "proHeroAlt": "מורה מסתכלת על טבלת מובילים חיה של הכיתה על הלוח בזמן שהתלמידים משחקים מהמקום.",
       "valueHeadline": "הכי מתאים לחזרה יומית ולכרטיס יציאה. בדיקה לכל הכיתה בסיבוב אחד.",
       "matrix": {
+        "mastery": "מפת שליטה ומילים קשות",
+        "missedPractice": "תרגול פספוסים, במרווחים של 1-3-7 ימים",
         "title": "השוואת מסלולים",
         "featureColumn": "מה כלול",
         "unlimited": "ללא הגבלה",
@@ -13184,7 +13388,28 @@ const he = {
         "wordHunt": "ציד מילים",
         "blast": "בלאסט",
         "wheelRush": "מרוץ הגלגל",
-        "vocabQuiz": "חידון אוצר מילים"
+        "vocabQuiz": "חידון אוצר מילים",
+        "wordcraft": "וורדקראפט"
+      },
+      "pressure": {
+        "title": "לחץ",
+        "leaderboard": {
+          "title": "טבלת מובילים",
+          "full": "מלאה",
+          "top3": "רק 3 הראשונים",
+          "hidden": "חשיפה בסוף"
+        },
+        "timer": {
+          "title": "טיימר",
+          "full": "ספירה לאחור",
+          "gentle": "עדין",
+          "off": "כבוי"
+        },
+        "scoring": {
+          "title": "ניקוד",
+          "speed": "המהירות נחשבת",
+          "accuracy": "דיוק בלבד"
+        }
       },
       "huntTarget": {
         "title": "מילת המטרה",
@@ -13514,6 +13739,37 @@ const he = {
       "failedToSaveLesson": "שמירת השיעור נכשלה"
     },
     "reports": {
+      "arc": {
+        "title": "קשת הלמידה",
+        "subtitle": "כל תלמיד, לאורך כל המפגשים",
+        "studentSubtitle": "{{name}}, לאורך כל המפגשים",
+        "unknownStudent": "תלמיד",
+        "noEvidenceClass": "שחקו משחק שיעור עם הכיתה וקשת הלמידה של כל תלמיד תופיע כאן.",
+        "noEvidenceStudent": "עוד אין מפגשים",
+        "emptyStudent": "ל-{{name}} עוד לא היה מפגש עם מילים שנשאלו — הקשת מתחילה במשחק הבא.",
+        "wordsClassMisses": "מילים שהכיתה ממשיכה לפספס",
+        "studentsStuck": "{{stuck}} מתוך {{total}} תלמידים",
+        "requeueNote": "מילים שפוספסו כבר חוזרות לתור בסקירת המילים שפוספסו של כל תלמיד.",
+        "assignFollowUp": "הקצאת תרגול המשך",
+        "assigning": "מקצה...",
+        "followUpDone": "הוקצה — מחכה ברשימת השיעורים שלהם.",
+        "followUpFailed": "לא הצלחנו להקצות. נסו שוב.",
+        "followUpName": "{{classroom}} — מילים ללמוד מחדש ({{date}})",
+        "viewStudent": "צפייה בקשת של {{name}}",
+        "accuracyOverTime": "דיוק לאורך זמן",
+        "growth": "מ-{{first}}% ל-{{last}}%",
+        "sparklineLabel": "דיוק על פני {{count}} מפגשים, מ-{{first}}% עד {{last}}%",
+        "requeueStudent": "המילים ש-{{name}} פספס/ה כבר בתור לסקירת המילים שפוספסו.",
+        "attempts": "{{count}} ניסיונות",
+        "outcomeCorrect": "מצא/ה",
+        "outcomeMissed": "פספס/ה",
+        "trend": {
+          "mastered": "נשלט",
+          "improving": "בדרך לשם",
+          "stuck": "צריך שיעור חוזר",
+          "insufficient": "מפגש אחד בינתיים"
+        }
+      },
       "title": "דוח התקדמות",
       "studentReport": "דוח תלמיד",
       "classReport": "דוח כיתה",
@@ -13600,6 +13856,11 @@ const he = {
         "fileName": "{{name}} – התקדמות במשימות",
         "untitled": "שיעור ללא שם",
         "anonymousStudent": "תלמיד {{id}}"
+      },
+      "assignmentCompletion": {
+        "title": "השלמת משימות",
+        "submitted": "{{submitted}} / {{roster}} הוגשו",
+        "upgrade": "Teacher Pro {{price}}"
       },
       "exportAllClasses": {
         "button": "ייצוא כל הכיתות",
@@ -13822,7 +14083,8 @@ const he = {
         "wordHunt": "מתחרים מי ראשון מוצא את מילת המטרה החבויה בלוח.",
         "blast": "משרשרים מילים מהר ומפוצצים אריחים בשרשרת קומבו.",
         "wheelRush": "מסובבים את גלגל האותיות ויורים מילים נגד השעון.",
-        "vocabQuiz": "ארבע אפשרויות, משמעות אחת — התשובה הנכונה המהירה שווה הכי הרבה."
+        "vocabQuiz": "ארבע אפשרויות, משמעות אחת — התשובה הנכונה המהירה שווה הכי הרבה.",
+        "wordcraft": "מרכיבים מילים על לוח אישי מול הברון — טבלת הכיתה תכריע את כל השאר."
       }
     },
     "projectorLobby": {
@@ -13853,7 +14115,29 @@ const he = {
       "wordHunt": "לפצח את המילה הנסתרת בעשרה ניסיונות",
       "blast": "שרשור מילים לניקוי אריחים בקומבו",
       "wheelRush": "לבנות מילים מגלגל אותיות אחד",
-      "vocabQuiz": "שאלות אמריקאיות מנתוני המילים שלכם"
+      "vocabQuiz": "שאלות אמריקאיות מנתוני המילים שלכם",
+      "wordcraft": "הרכבת מילי השיעור על לוח אישי מול יריב בוט"
+    },
+    "wordcraftLive": {
+      "rival": "הברון",
+      "you": "אתה",
+      "vsRival": "אתה מול הברון",
+      "tapLetters": "מקישים על אותיות כדי לבנות מילה",
+      "tapStart": "מקישים על המשבצת שבה המילה מתחילה",
+      "place": "להניח",
+      "recall": "ביטול",
+      "switchDirection": "החלפת כיוון",
+      "lessonWords": "מילי השיעור",
+      "tilesLeft": "{count} בשרבול",
+      "placing": "מניח…",
+      "waitingBoard": "מחלקים את הלוח…",
+      "builtBy": "{name} הרכיב/ה את {word}",
+      "errors": {
+        "invalidWord": "\"{word}\" היא לא מילה",
+        "disconnected": "המילה חייבת לגעת במילה שכבר על הלוח",
+        "cellOccupied": "המשבצת תפוסה",
+        "generic": "לא הצלחנו להניח — נסו שוב"
+      }
     },
     "wordTowerPractice": {
       "unavailable": "המילים בשיעור הזה עדיין לא בונות מגדל. צריך לפחות 4 מילים באורך 4 עד 6 אותיות.",
@@ -14135,6 +14419,7 @@ const he = {
         "won": "ניצחת!",
         "podium": "על הפודיום!",
         "finished": "הסיבוב נגמר!",
+        "roundComplete": "הסיבוב הושלם!",
         "of": "מתוך {{total}}",
         "points": "נקודות",
         "beat": "לפני {{count}} בכיתה",
@@ -14556,7 +14841,7 @@ const he = {
       "inviteStudents": "הזמן תלמידים",
       "lastActive": "פעילות אחרונה",
       "lessonEffectiveness": "יעילות שיעורים",
-      "level": "רמה {{level}}",
+      "level": "רמה",
       "live": "שידור חי",
       "loading": "טוען אנליטיקה...",
       "mastery": "שליטה",
@@ -14572,7 +14857,7 @@ const he = {
       "retry": "נסו שוב",
       "shareParentReport": "שתפו עם הורה",
       "shareParentReportFailed": "לא הצלחנו ליצור את הקישור. נסו שוב.",
-      "streak": "רצף {{count}} ימים",
+      "streak": "רצף",
       "struggling": "זקוק/ה לעזרה",
       "mastered": "שולט/ת",
       "practicing": "בתרגול",
@@ -14606,6 +14891,10 @@ const he = {
       "yesterday": "אתמול"
     },
     "classroomGame": {
+      "pressure": {
+        "revealAtEnd": "המורה יחשוף את התוצאות בסוף."
+      },
+      "pressureFailed": "לא הצלחנו לשמור את ההגדרות — נסו שוב.",
       "defaultClassroomName": "הכיתה שלי",
       "questions": "שאלות",
       "perQuestion": "לכל שאלה",
@@ -14752,7 +15041,7 @@ const he = {
         "sub": "משחקי מילים רב-משתתפים לכל הכיתה עם רשימות המילים שלכם. בלי חשבונות, בלי פרסומות, בלי הורדות — משחקים בכל דפדפן. נבנה במקור ל-{count} שפות. מסלול בסיסי חינם למורים; מסלול Teacher Pro עולה $9 לחודש לכיתות ותלמידים ללא הגבלה.",
         "cta_primary": "בקשו גישת מורה",
         "cta_secondary": "צפו בהדגמה",
-        "cta_note": "מסלול חינם להתחלה • אישור תוך כ-24 שעות",
+        "cta_note": "מסלול חינם להתחלה • גישה מיידית",
         "cta_schools": "בית ספר או מחוז? ראו תוכניות ←"
       },
       "mock": {
@@ -15329,6 +15618,12 @@ const he = {
         "title": "הצטרף לכיתה"
       },
       "classroomRoomGone": "משחק הכיתה הסתיים. בקשו מהמורה להתחיל משחק חדש.",
+      "gameEnded": {
+        "title": "המשחק הזה נגמר",
+        "retry": "נסו שוב",
+        "toClass": "חזרה לכיתה שלי",
+        "newCode": "הזינו קוד חדש"
+      },
       "lessonsAssigned": "שיעורים שהוקצו",
       "feel": {
         "points": "נק'",
@@ -15526,6 +15821,7 @@ const he = {
       "auth_required_title": "הירשמו כדי לבקש גישת מורה",
       "auth_required_body": "גישת מורה מחוברת לחשבון מאומת. פִּתחו חשבון חינם או התחברו, ונמשיך בדיוק מכאן.",
       "auth_required_cta": "פתחו לי חשבון מורה בחינם",
+      "auth_signin_cta": "כבר יש לכם חשבון? התחברו",
       "trust_instant": "גישה מיידית — בלי תור לאישור",
       "trust_free": "תוכנית מורה חינמית, ללא תפוגה",
       "trust_nologins": "בלי חשבונות לתלמידים, בלי התקנות",
@@ -16296,7 +16592,8 @@ const he = {
     "sealedBid": {
       "title": "הצעה סודית",
       "step1": "בחר את המילה הכי חזקה שלך",
-      "step2": "מילה שאף אחד לא בחר = כפול!"
+      "step2": "מילה שאף אחד לא בחר = כפול!",
+      "step3": "נעל מהר — הבונוס דועך עם הזמן"
     },
     "adventure": {
       "title": "כבוש את השלבים",
@@ -18094,6 +18391,7 @@ const he = {
       "foundHeader": "נמצאו",
       "fogHeader": "ערפל",
       "fogLabel": "ערפל מלחמה",
+      "fogAriaLabel": "ערפל {percent} אחוז",
       "myStatsHeader": "הסטטיסטיקה שלך",
       "bestWord": "הכי טוב",
       "wordsPerMin": "קצב",
@@ -18686,6 +18984,9 @@ const he = {
       "share": "שיתוף",
       "seriesChampion": "אלוף/ת הסדרה",
       "teacherPaced": "המורה יתחיל/תתחיל את המשחק הבא",
+      "backToClass": "חזרה לכיתה",
+      "endClassTitle": "לסיים את משחק הכיתה?",
+      "endClassBody": "החדר ייסגר לכל התלמידים ותחזרו ללוח הכיתה שלכם.",
       "roundPoints": "נקודות בסיבוב",
       "yourRank": "המקום שלך",
       "lessonRecap": "סיכום השיעור",
@@ -18701,6 +19002,280 @@ const he = {
       "roundShort": "ס׳{n}",
       "total": "סה״כ",
       "player": "שחקן"
+    }
+  },
+  "eduStudent": {
+    "mode": {
+      "vocabQuiz": {
+        "rule": "קוראים את הרמז ולוחצים על המילה שמתאימה. מהר ונכון = הכי הרבה נקודות."
+      },
+      "wordcraft": {
+        "rule": "בונים מילים מהשיעור מהאותיות שלכם ומניחים אותן על הלוח."
+      },
+      "pending": "מתחילים!",
+      "pendingRule": "עיניים קדימה, המורה מתחיל את הסיבוב."
+    },
+    "lobby": {
+      "pickLook": "בחרו לוק",
+      "shuffleLooks": "ערבבו לוקים",
+      "buildLook": "עצבו לוק משלכם",
+      "readySticker": "מוכן!"
+    },
+    "exit": {
+      "title": "לצאת מהמשחק?",
+      "body": "תצאו מהסיבוב הזה. עם אותו קוד אפשר לחזור.",
+      "stay": "ממשיכים לשחק",
+      "leave": "יציאה"
+    },
+    "join": {
+      "surpriseMe": "תפתיעו אותי",
+      "funNames": "קפטן לוטרה|נינג'ה פנדה|טורבו צב|לאמה בדיסקו|דוקטור בננה|רקטה סגולה|חתול קוסמי|עצלן ערמומי|מנגו על|למור לייזר|ביזון בועות|קוסם וופל|ברווז רעם|שביט זריז|שף טוסט|בוס בננה|קוקה קוונטית|נץ פרוותי|כוכב פופקורן|זיקית נוצצת"
+    },
+    "results": {
+      "nextUp": "הבא בתור: {mode}",
+      "missedTitle": "את אלה תתפסו בפעם הבאה",
+      "missedNone": "מצאתם את כל המילים של השיעור. אלופים!",
+      "hear": "השמעת {word}",
+      "practiceThese": "לתרגל אותן",
+      "tapToHear": "לחצו על מילה כדי לשמוע אותה"
+    },
+    "wordcraft": {
+      "hintFirst": "לחצו על אותיות כדי לבנות מילה. היא תנחת באמצע.",
+      "hintMore": "עוד אות אחת. מילה צריכה לפחות 2 אותיות.",
+      "hintAnchor": "עכשיו לחצו על משבצת ליד אות שכבר על הלוח.",
+      "hintReady": "נראה מעולה. לחצו \"להניח\"!",
+      "targetsProgress": "{found}/{total} מילים מהשיעור",
+      "showTargets": "הצגת מילות השיעור",
+      "hideTargets": "הסתרת מילות השיעור"
+    },
+    "practice": {
+      "answerIs": "ככה כותבים",
+      "next": "למילה הבאה",
+      "finish": "לתוצאות שלי"
+    },
+    "cookie": {
+      "message": "אנחנו משתמשים בעוגיות כדי לספור משחקים ולהציג פרסומות."
+    }
+  },
+  // @eduHq:start
+  "eduHq": {
+    "modes": {
+      "minutes": "{{minutes}} דק׳",
+      "players": "עד {{count}}",
+      "skill": {
+        "meaning": "משמעות",
+        "spotting": "זיהוי מילים",
+        "speed": "מהירות",
+        "hunting": "שליפה מהרשימה",
+        "building": "איות"
+      },
+      "pitch": {
+        "vocabQuiz": "מי מהכיתה יגיע ראשון לפירוש הנכון?",
+        "classic": "לוח אחד לכולם. מי ימצא הכי הרבה מילים?",
+        "blast": "סבבים מהירים. שרשרו מילים לקומבו ענק.",
+        "wordHunt": "מילות הרשימה מתחבאות בלוח. מי יצוד אותן ראשון?",
+        "wordcraft": "בונים את מילות הרשימה מאריחי אותיות. הבנאי הטוב ביותר מנצח."
+      }
+    },
+    "launch": {
+      "titleMode": "מזניקים את {{mode}}",
+      "generic": "מכינים את המשחק",
+      "codeLabel": "קוד ההצטרפות שלכם",
+      "step": {
+        "words": "המילים מוכנות",
+        "room": "פותחים את החדר",
+        "code": "מייצרים קוד הצטרפות"
+      }
+    },
+    "lists": {
+      "label": "רשימות מילים",
+      "more": "עוד"
+    },
+    "checklist": {
+      "firstStudent": "התלמיד הראשון הצטרף",
+      "firstGame": "המשחק החי הראשון שלכם",
+      "firstGameCta": "לדוחות שלכם"
+    },
+    "tools": {
+      "students": "תלמידים",
+      "studentsStat": "בכיתה הזו",
+      "progress": "התקדמות",
+      "progressStat": "7 ו־30 הימים האחרונים",
+      "lastGame": "המשחק האחרון",
+      "assignments": "שיעורי בית",
+      "assignmentsStat": "משימות",
+      "assignmentsUnknown": "מה צריך להגיש",
+      "analytics": "ניתוח נתונים",
+      "analyticsStat": "מגמות לכל תלמיד",
+      "proBadge": "Pro",
+      "classes": "כיתות",
+      "classesStat": "ניהול ושינוי שם",
+      "back": "כל כלי הכיתה"
+    },
+    "auth": {
+      "titleSignup": "פתיחת חשבון מורה",
+      "titleSignin": "טוב שחזרתם",
+      "subtitle": "הכיתות, קודי ההצטרפות והדוחות שלכם – במרחק התחברות אחת.",
+      "tabSignup": "אני חדש/ה",
+      "tabSignin": "יש לי חשבון"
+    },
+    "access": {
+      "haveAccount": "כבר יש לכם חשבון? התחברו"
+    },
+    "hq": {
+      "assigned": "{{count}} משימות",
+      "assignedAria": "שיעורי בית: {{count}} משימות. פתיחה",
+      "assignNudge": "לתת שיעורי בית"
+    },
+    "modeTags": {
+      "vocabQuiz": "בוחרים פירוש",
+      "classic": "מוצאים מילים",
+      "blast": "שרשרת קומבו",
+      "wordHunt": "צדים מילים",
+      "wordcraft": "בונים ומאייתים"
+    }
+  },
+  // @eduHq:end
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "לסיים את המשחק לכיתה?",
+      "body": "החדר ייסגר לכל התלמידים ותחזרו למרכז הכיתה.",
+      "stay": "ממשיכים לשחק",
+      "confirm": "סיום המשחק"
+    },
+    "live": {
+      "panelTitle": "סבב חי",
+      "wordsFound": "מילים נמצאו",
+      "lessonFound": "מילי השיעור: {{found}}/{{total}}",
+      "wordOfRound": "המילה של הסבב",
+      "wordOfRoundEmpty": "המילה הארוכה הראשונה תתפוס כאן מקום",
+      "bestWordBy": "{{count}} אותיות · של {{name}}",
+      "exitLabel": "יציאה מהמשחק"
+    },
+    "results": {
+      "backToClass": "חזרה לכיתה",
+      "switchGame": "החלפת משחק",
+      "soloTitle": "סבב סולו!",
+      "tieTitle": "תיקו!",
+      "zeroTitle": "אין נקודות בסבב הזה",
+      "zeroBody": "החימום מאחורינו. הסבב הבא נחשב.",
+      "zeroNoteTitle": "עוד אף אחד לא קלע",
+      "zeroNoteHint": "נסו טיימר ארוך יותר או לוח קל יותר. אותו קוד, בלי להצטרף מחדש.",
+      "lineupTitle": "מי שיחק בסבב",
+      "emptyTitle": "סבב האימון הסתיים",
+      "emptyHeadline": "אף תלמיד לא שיחק הפעם",
+      "emptyBody": "הציגו את הקוד על הלוח. הסבב הבא כבר נחשב באמת.",
+      "podiumLessonWords": "{{found}}/{{total}} מילים מהשיעור",
+      "noLessonTitle": "הפעם לא נמצאו מילים מהשיעור",
+      "noLessonBody": "הנקודות הגיעו ממילים אחרות על הלוח. המילים הכי טובות שהכיתה מצאה:",
+      "noLessonBodyEmpty": "הנקודות הגיעו ממילים אחרות על הלוח.",
+      "noLessonHint": "לוח גדול יותר או זמן ארוך יותר ייתנו למילים מהשיעור יותר מקום.",
+      "noLessonReteach": "מילים מהשיעור שעוד צריך לתרגל"
+    },
+    "reteach": {
+      "playNow": "משחקים עכשיו",
+      "sendHome": "שולחים הביתה",
+      "printShare": "הדפסה ושיתוף",
+      "googleClassroom": "פרסום ב-Google Classroom"
+    },
+    "lobby": {
+      "waitingForStudents": "מחכים לתלמידים"
+    },
+    "wordcraft": {
+      "bingo": "בינגו!",
+      "waiting": "מחכים למילה הראשונה…"
+    }
+  },
+  // @eduLive:end
+  "eduPro": {
+    "mastery": {
+      "title": "שליטה במילים",
+      "subtitle": "אילו מילים הכיתה מפספסת שוב ושוב — בכל המשחקים.",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "דיוק כיתתי",
+        "words": "מילים במעקב",
+        "sessions": "תוצאות משחק",
+        "students": "תלמידים"
+      },
+      "hardestTitle": "המילים הקשות ביותר",
+      "missedOf": "פוספסה {missed} מתוך {attempts}",
+      "studentsMissing": "{count} מתוך {total} תלמידים",
+      "noneMissed": "אף אחד עוד לא פספס מילה פעמיים. יפה!",
+      "empty": "שחקו עם הכיתה חידון אוצר מילים או סבב Wordcraft — מפת השליטה תתמלא אחרי המשחק הראשון.",
+      "loading": "טוענים את מפת השליטה…",
+      "error": "לא הצלחנו לטעון את נתוני השליטה. רעננו ונסו שוב.",
+      "heatmapToggle": "מפת חום: תלמיד × מילה",
+      "heatmapHint": "כל משבצת היא תלמיד אחד מול מילה אחת.",
+      "studentColumn": "תלמיד/ה",
+      "legend": {
+        "solid": "יודע/ת",
+        "shaky": "מתנדנד",
+        "missed": "פוספס",
+        "unseen": "לא נשאל"
+      },
+      "cellLabel": "{name}, {word}: {correct} מתוך {attempts} נכון",
+      "cellUnseen": "{name}, {word}: עוד לא נשאל",
+      "showAll": "הצגת כל ה-{count}",
+      "showFewer": "הצגת פחות",
+      "hiddenWords": "+{count} מילים קשות נוספות ב-Pro",
+      "previewNote": "תצוגה חינמית: שלוש הראשונות. ב-Pro רואים את כל העשר ואת כל התלמידים.",
+      "phoneHint": "המילים הקשות ראשונות, ולצד כל אחת מי פספס אותה.",
+      "needsHelpColumn": "צריכים עזרה",
+      "needsHelpLabel": "{name}: {count} מילים לחזרה",
+      "missedRow": "פספסו",
+      "wordMissedLabel": "{word}: {count} מתוך {total} תלמידים פספסו",
+      "missedByCount": "{count} מתוך {total} פספסו",
+      "missedNames": "פספסו: {names}",
+      "shakyNames": "מתנדנדים: {names}",
+      "everyoneGotIt": "כולם הצליחו",
+      "needsHelpTitle": "צריכים עזרה",
+      "needsHelpChip": "{name} ({count})",
+      "allClear": "אף אחד לא נתקע על המילים האלה. יפה.",
+      "unlock": {
+        "allWords": "כל 10 המילים הקשות, מדורגות",
+        "heatmap": "מי פספס איזו מילה, תלמיד אחרי תלמיד",
+        "practice": "תרגול של המילים שפוספסו בלחיצה אחת, בפריסה על פני שבוע"
+      }
+    },
+    "practice": {
+      "cta": "תרגול מילים שפוספסו",
+      "hint": "שלושה סבבים מרווחים של המילים האלה: מחר, בעוד 3 ימים ובעוד שבוע.",
+      "assigning": "שולחים…",
+      "assigned": "נשלח!",
+      "assignedBody": "{count} מילים, שלושה סבבים. התלמידים ימצאו אותם בשיעורים שלהם.",
+      "round": "סבב {n}",
+      "roundName": "מילים שפוספסו · {classroom} · סבב {n}/3 · {date}",
+      "failed": "לא הצלחנו לשלוח את הסבבים. שום דבר לא נשמר — נסו שוב.",
+      "already": "כבר נשלח היום. התלמידים רואים את זה בשיעורים שלהם.",
+      "nothing": "עוד אין מילים שפוספסו לתרגול.",
+      "inDays": "בעוד {count} ימים",
+      "tomorrow": "מחר",
+      "whyNote": "שליפה מרווחת עדיפה על חזרה אחת ארוכה: כל סבב חוזר בדיוק כשהמילה מתחילה להישכח."
+    },
+    "reports": {
+      "classEyebrow": "דוח כיתה",
+      "moreDetail": "דוח מלא להדפסה",
+      "moreDetailHint": "ייצוא ל-PDF, פירוט לכל תלמיד והעברת ציונים ל-Google Classroom.",
+      "assignmentsTitle": "מי הגיש מה",
+      "assignmentsHint": "מי סיים כל מטלה — כולל ייצוא ל-CSV.",
+      "arcTitle": "תלמיד אחרי תלמיד",
+      "arcHint": "מי מתקדם, מי נתקע, ואילו מילים מעכבות אותו.",
+      "digestTitle": "המשחק האחרון בכיתה",
+      "digestHint": "מה קרה במשחק האחרון שלכם, במבט אחד."
+    },
+    "upgrade": {
+      "featureMastery": "10 המילים שהכי מפוספסות + מפת חום תלמיד × מילה",
+      "featureMissedPractice": "קליק אחד: תרגול מרווח של הפספוסים (1, 3, 7 ימים)",
+      "freeMastery": "מפת שליטה במילים",
+      "freePractice": "תרגול מרווח של מילים שפוספסו"
+    },
+    "assign": {
+      "required": "חובה",
+      "needLessonAndDate": "בחרו שיעור ותאריך הגשה כדי לשלוח.",
+      "needLesson": "בחרו שיעור כדי לשלוח.",
+      "needDate": "בחרו תאריך הגשה כדי לשלוח."
     }
   }
 };

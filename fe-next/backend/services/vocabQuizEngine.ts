@@ -13,6 +13,7 @@
  */
 
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { ResolvedClassroomPressure } from '@/shared/types/classroom';
 import {
   buildQuizQuestions,
   type FocusQuestion,
@@ -87,6 +88,10 @@ export interface VocabQuizSession {
   startedAt: number;
   /** Whether treasure chests are enabled for this quiz. */
   treasureChestsEnabled: boolean;
+  /** Pro pressure dial: OFF = accuracy-only scoring for the whole round. */
+  speedScoring: boolean;
+  /** The teacher's dials, echoed into every start payload so the quiz surface honors them. */
+  pressure?: ResolvedClassroomPressure;
   /** Hard stop for the reveal's chest hold (absolute wall clock). */
   chestHoldEndsAt: number;
   /** Treasure chest results, keyed by `${questionIndex}:${username}`. */
@@ -106,6 +111,10 @@ export interface CreateQuizSessionInput {
   language?: string;
   /** Whether to enable treasure chests for this quiz. */
   treasureChestsEnabled?: boolean;
+  /** Pro pressure dial: OFF = accuracy-only scoring. Defaults ON. */
+  speedScoring?: boolean;
+  /** The teacher's dials for this quiz, echoed to students at start. */
+  pressure?: ResolvedClassroomPressure;
 }
 
 const clampInt = (n: number, min: number, max: number, fallback: number): number => {
@@ -161,6 +170,8 @@ export function createQuizSession(input: CreateQuizSessionInput): VocabQuizSessi
     answers: new Map(),
     startedAt: input.now,
     treasureChestsEnabled: input.treasureChestsEnabled ?? true,
+    speedScoring: input.speedScoring ?? true,
+    ...(input.pressure ? { pressure: input.pressure } : {}),
     chestResults: new Map(),
     chestHoldEndsAt: 0,
   };
@@ -284,6 +295,7 @@ export function submitQuizAnswer(
     elapsedMs: elapsed,
     limitMs: session.limitMs,
     streakBefore: player.streak,
+    speedScoring: session.speedScoring,
   });
 
   session.answers.set(username, { choiceIndex, correct, points, speedBonus, streakBonus, elapsedMs: elapsed });

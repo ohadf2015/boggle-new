@@ -310,6 +310,11 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     leaderboardKey,
     profile,
     guestFingerprint,
+    guestName: guestPlayer?.displayName,
+    onGuestRenamed: (name: string) => {
+      setGuestPlayer(prev => (prev ? { ...prev, displayName: name } : prev));
+      setLeaderboardKey(prev => prev + 1);
+    },
     onGameLanguageChange,
     onShowCreatePuzzle: () => setShowCreatePuzzle(true),
     onSpendStart: spendAnimation.start,

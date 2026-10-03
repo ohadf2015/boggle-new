@@ -28,18 +28,18 @@ export const metadata: Metadata = {
         },
     },
     title: {
-        default: 'Free Boggle Online — No Download | LexiClash Multiplayer Word Game',
+        default: 'Free Boggle Online — No Download | LexiClash',
         template: '%s | LexiClash',
     },
-    description: 'LexiClash — the free multiplayer word game. Play boggle online with friends, no download needed. Real-time word battles for 2-20+ players. Daily word wheel, adventure mode, brain training. Like Words With Friends but everyone plays at once. 6 languages.',
+    description: 'Play boggle online free — no download, no signup. Real-time word battles for 2–20+ players. Adventure mode, daily challenges, 6 languages. Start now →',
     // Open Graph meta tags for social sharing (WhatsApp, Facebook, Discord, etc.)
     // These are essential for link previews when sharing root URLs like lexiclash.live?room=1234
     openGraph: {
         type: 'website',
         locale: 'en_US',
         url: 'https://www.lexiclash.live',
-        title: 'Free Boggle Online — No Download | LexiClash Multiplayer Word Game',
-        description: 'Play boggle online free — no download, no signup. Real-time multiplayer word battles with friends. Like Words With Friends but everyone plays at once. Daily challenges, 6 languages.',
+        title: 'Free Boggle Online — No Download | LexiClash',
+        description: 'Play boggle online free — no download, no signup. Real-time word battles for 2–20+ players. Adventure mode, daily challenges, 6 languages. Start now →',
         siteName: 'LexiClash',
         images: [
             {

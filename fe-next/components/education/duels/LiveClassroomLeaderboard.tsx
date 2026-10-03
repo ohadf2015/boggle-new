@@ -238,13 +238,14 @@ function ProjectorBoard({
           const rank = index + 1;
           const pop = pops[row.username];
           return (
-            <div className="py-1.5">
+            <div className="py-1.5 max-md:py-1 md:medium-short:py-1 lg:[@media(min-height:851px)]:py-1">
               <BoundedConfettiBurst trigger={!!pop} size="md">
                 <div
                   data-testid="live-board-row"
                   data-player={row.username}
                   className={cn(
                     'relative flex items-center gap-4 rounded-neo border-4 px-5 py-3 shadow-hard',
+                    'max-md:gap-3 max-md:border-[3px] max-md:px-3 max-md:py-1.5 md:medium-short:gap-3 md:medium-short:py-1.5 lg:[@media(min-height:851px)]:gap-5 lg:[@media(min-height:851px)]:py-2',
                     'bg-neo-navy text-neo-cream',
                     rank === 1 ? 'border-neo-yellow' : rank <= 3 ? 'border-neo-lime' : 'border-neo-black'
                   )}
@@ -253,18 +254,18 @@ function ProjectorBoard({
                     data-testid="live-board-rank"
                     className={cn(
                       'flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black',
-                      'font-neo-display text-2xl font-black text-neo-black',
+                      'font-neo-display text-2xl font-black text-neo-black max-md:h-9 max-md:w-9 max-md:text-xl md:medium-short:h-9 md:medium-short:w-9 md:medium-short:text-xl lg:[@media(min-height:851px)]:h-14 lg:[@media(min-height:851px)]:w-14 lg:[@media(min-height:851px)]:text-3xl',
                       rank === 1 ? 'bg-neo-yellow' : rank <= 3 ? 'bg-neo-lime' : 'bg-neo-cream'
                     )}
                   >
                     {rank}
                   </span>
-                  <span className="min-w-0 flex-1 truncate font-neo-display text-3xl font-black">{row.username}</span>
+                  <span className="min-w-0 flex-1 truncate font-neo-display text-3xl font-black max-md:text-xl md:medium-short:text-2xl lg:[@media(min-height:851px)]:text-4xl">{row.username}</span>
                   <span className="relative flex shrink-0 items-baseline gap-2">
                     <AdaptiveMotion.span
                       animate={{ scale: pop ? [1, 1.35, 1] : 1 }}
                       transition={{ duration: 0.35 }}
-                      className="font-neo-display text-4xl font-black tabular-nums text-neo-lime"
+                      className="font-neo-display text-4xl font-black tabular-nums text-neo-lime max-md:text-2xl md:medium-short:text-3xl lg:[@media(min-height:851px)]:text-5xl"
                     >
                       {row.score}
                     </AdaptiveMotion.span>

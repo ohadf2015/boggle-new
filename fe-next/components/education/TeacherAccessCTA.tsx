@@ -2,7 +2,6 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export function TeacherAccessCTA() {
@@ -12,20 +11,8 @@ export function TeacherAccessCTA() {
     trackGrowthEvent('education_upsell_impression', { cta: 'teacher_individual' });
   }, []);
 
-  const ref = useGsapReveal<HTMLElement>({
-    selector: '[data-cta-item]',
-    y: 18,
-    scale: 0.97,
-    stagger: 0.1,
-    duration: 0.55,
-    ease: 'back.out(1.6)',
-  });
-
   return (
-    <aside
-      ref={ref}
-      className="mx-auto my-12 max-w-3xl rounded-neo border-neo-thick border-neo-navy bg-neo-cream p-6 sm:p-8 shadow-hard-lg"
-    >
+    <aside className="mx-auto my-12 max-w-3xl rounded-neo border-neo-thick border-neo-navy bg-neo-cream p-6 sm:p-8 shadow-hard-lg">
       <h2
         data-cta-item
         className="text-2xl font-neo-display font-black text-neo-navy"

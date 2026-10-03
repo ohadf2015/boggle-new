@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import toast from "react-hot-toast";
 import { AnimatePresence, m } from "framer-motion";
@@ -30,6 +30,8 @@ export interface HqClassroom {
 export interface GetStudentsInCardProps {
   classroom: HqClassroom;
   onOpenProjector: () => void;
+  /** Phone-only action in the roster row (the first-assignment nudge): no extra row, header left calm. */
+  rosterAction?: ReactNode;
   className?: string;
 }
 
@@ -53,6 +55,7 @@ const SECONDARY =
 export function GetStudentsInCard({
   classroom,
   onOpenProjector,
+  rosterAction,
   className,
 }: GetStudentsInCardProps) {
   const { t, language } = useLanguage();
@@ -241,6 +244,7 @@ export function GetStudentsInCard({
 
         {/* Who is in. Desktop spends the QR's old space on a real roster. */}
         <div
+          data-testid="hq-roster-row"
           className={cn(
             "flex shrink-0 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-1.5",
             "lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-3 lg:overflow-hidden lg:p-3",
@@ -299,7 +303,7 @@ export function GetStudentsInCard({
                 reduced={reduced}
                 // Phone: one row with a few empty chairs. Desktop: every
                 // student, named — no empty chairs at all.
-                seats={wide ? Math.min(Math.max(count, 1), 15) : 5}
+                seats={wide ? Math.min(Math.max(count, 1), 15) : rosterAction ? Math.min(Math.max(count, 1), 2) : 5}
                 size={wide ? (roomy ? 64 : 48) : 34}
                 showNames={wide}
                 // Seats never shrink: at 1280x720 a shrinkable row collapsed
@@ -310,14 +314,17 @@ export function GetStudentsInCard({
               <p className="hidden font-neo-body text-sm font-bold text-neo-white/60 lg:order-3 lg:mt-auto lg:block lg:[@media(max-height:800px)]:hidden">
                 {t("teacher.activation.shareBody")}
               </p>
-              <JoinedCount
-                loading={false}
-                count={count}
-                shown={shownCount}
-                reduced={reduced}
-                label={t("academy.hq.joinedLabel", "joined")}
-                empty={t("academy.hq.nobodyYet", "No one yet — share the code")}
-              />
+              <div className={cn(rosterAction && "max-sm:me-auto")}>
+                <JoinedCount
+                  loading={false}
+                  count={count}
+                  shown={shownCount}
+                  reduced={reduced}
+                  label={t("academy.hq.joinedLabel", "joined")}
+                  empty={t("academy.hq.nobodyYet", "No one yet — share the code")}
+                />
+              </div>
+              {rosterAction}
             </>
           )}
         </div>

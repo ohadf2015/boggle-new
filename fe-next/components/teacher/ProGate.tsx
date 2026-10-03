@@ -31,6 +31,15 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
  * Current enforcement:
  * - `analytics`: /teacher/classroom/[id]/analytics (per-classroom progress dashboard)
  * - `reports`: /teacher/reports (printable class reports + post-game details)
+ * - `pressureDials`: the lobby's calm-mode dials (leaderboard / timer / speed-scoring
+ *   per launch). A free teacher keeps the default hyped game-show; Pro unlocks
+ *   de-gameifying for anxious students. Gated inline in LobbyPressureDials —
+ *   the full-page gate below would evict the whole settings sheet.
+ * - `mastery`: the per-word mastery report (hardest words + student x word
+ *   heatmap). Refused server-side (402) by /api/education/classroom/[id]/word-mastery,
+ *   whose 402 body still carries the top 3 words and class totals as a preview.
+ * - `missedPractice`: one-click spaced rounds (+1/+3/+7 days) of the class's
+ *   missed words. Refused server-side (402) by .../missed-practice.
  *
  * NOT here (and never locked):
  * - customLists: free teachers create vocab lessons (19 active in prod)
@@ -43,7 +52,7 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
  * either. `proGateCopy.contract.test.ts` iterates THIS array, so adding a
  * feature here fails that test until its copy exists in all six locales.
  */
-export const PRO_FEATURES = ['analytics', 'reports'] as const;
+export const PRO_FEATURES = ['analytics', 'reports', 'pressureDials', 'mastery', 'missedPractice'] as const;
 
 export type ProFeature = (typeof PRO_FEATURES)[number];
 

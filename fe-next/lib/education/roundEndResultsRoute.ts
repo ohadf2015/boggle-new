@@ -36,6 +36,7 @@ export const NEXT_ROUND_MODES = [
   'classic',
   'wheel-rush',
   'blast',
+  'wordcraft',
   'random',
 ] as const;
 

@@ -1,4 +1,5 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
+import { SCROLL_QUIET_MS } from '@/lib/perf/runWhenScrollSettles';
 import { act, render } from '@testing-library/react';
 import FeedbackDevtoolsWidget, {
     FEEDBACK_WIDGET_INTENT_EVENTS,
@@ -31,9 +32,16 @@ async function flushEffects(): Promise<void> {
     });
 }
 
+beforeEach(() => {
+    vi.useFakeTimers();
+});
+
 afterEach(() => {
+    vi.useRealTimers();
     widgetScript()?.remove();
 });
+
+const settle = () => act(() => { vi.advanceTimersByTime(SCROLL_QUIET_MS + 50); });
 
 describe('<FeedbackDevtoolsWidget>', () => {
     it('does not inject widget.js on first paint (no script tag until intent)', async () => {
@@ -49,6 +57,7 @@ describe('<FeedbackDevtoolsWidget>', () => {
         await act(async () => {
             window.dispatchEvent(new Event('pointerdown'));
         });
+        settle();
         const script = widgetScript();
         expect(script).not.toBeNull();
         const src = script!.getAttribute('src') || '';
@@ -66,6 +75,7 @@ describe('<FeedbackDevtoolsWidget>', () => {
         await act(async () => {
             window.dispatchEvent(new Event('keydown'));
         });
+        settle();
         const script = widgetScript();
         expect(script).not.toBeNull();
         expect(script!.getAttribute('data-token')).toBe(FEEDBACK_WIDGET_TOKEN);
@@ -92,6 +102,7 @@ describe('<FeedbackDevtoolsWidget>', () => {
             window.dispatchEvent(new Event('touchstart'));
             window.dispatchEvent(new Event('keydown'));
         });
+        settle();
         expect(document.querySelectorAll(`script[src="${FEEDBACK_WIDGET_SRC}"]`).length).toBe(1);
     });
 });

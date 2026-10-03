@@ -61,7 +61,26 @@ describe('Upgrade page — honest feature advertising', () => {
       'utf-8'
     );
 
-    // Should only enforce analytics + reports (not customLists, duels, noAds)
-    expect(gateSource).toContain("PRO_FEATURES = ['analytics', 'reports']");
+    // Should only enforce analytics + reports + pressureDials + mastery + missedPractice (not customLists, duels, noAds)
+    expect(gateSource).toContain(
+      "PRO_FEATURES = ['analytics', 'reports', 'pressureDials', 'mastery', 'missedPractice']",
+    );
+    const enforced = gateSource.match(/PRO_FEATURES = \[([^\]]*)\]/)![1];
+    for (const free of ['customLists', 'noAds', 'duels']) {
+      expect(enforced).not.toContain(free);
+    }
+  });
+
+  it('sells the calm-mode dials as a Pro outcome, not a paywall ornament', () => {
+    // The dials are the pedagogic Pro feature (§8.8: the same game as a hyped
+    // game-show or a calm mastery check). If the value prop disappears from the
+    // Pro column, Pro is back to selling only headroom and reporting.
+    const pageSource = readFileSync(
+      join(__dirname, '../PageClient.tsx'),
+      'utf-8'
+    );
+    const proMatch = pageSource.match(/const proFeatures = \[([\s\S]*?)\];/);
+    expect(proMatch).not.toBeNull();
+    expect(proMatch![0]).toContain('teacher.subscription.featureOutcome5');
   });
 });

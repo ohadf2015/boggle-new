@@ -17,6 +17,8 @@ interface CircularTimerProps {
   size?: 'xs' | 'sm' | 'md' | 'lg';
   /** Called when timer urgency state changes — used by parent to render screen glow effect */
   onTimerState?: (state: 'normal' | 'low' | 'veryLow' | 'critical') => void;
+  /** Teacher's gentle-timer dial: keep counting, stop shouting. ORed with the cosy context. */
+  suppressUrgency?: boolean;
 }
 
 // Size configurations - frameClasses removed since we no longer have a background frame
@@ -32,11 +34,11 @@ const SIZES = {
  * Memoized to prevent unnecessary re-renders when parent updates
  * Respects prefers-reduced-motion for accessibility
  */
-const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md', onTimerState }) => {
+const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md', onTimerState, suppressUrgency: suppressUrgencyProp = false }) => {
   const reduceMotion = useReducedMotion();
   const isSelecting = useIsSelecting();
   // Cosy / Calm mode: keep the timer counting but stop it shouting.
-  const suppressUrgency = useSuppressTimerUrgency();
+  const suppressUrgency = useSuppressTimerUrgency() || suppressUrgencyProp;
   const prevStateRef = useRef<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
   const config = SIZES[size];
 

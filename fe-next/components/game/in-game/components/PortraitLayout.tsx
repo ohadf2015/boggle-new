@@ -4,6 +4,13 @@ import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { MobileRankIndicator } from './MobileRankIndicator';
 import { StudentRankRail } from '@/components/education/StudentRankRail';
+import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
+import {
+  isLeaderboardHidden,
+  isStudentTimerHidden,
+  shouldSuppressTimerUrgency,
+  trimLeaderboardForPressure,
+} from '@/shared/utils/classroomPressure';
 import { cn } from '@/lib/utils';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
 import { Trophy } from 'lucide-react';
@@ -293,6 +300,13 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   // Single responsive timer size — replaces the prior 4 CSS-hidden CircularTimer
   // mounts that all re-rendered every 1s tick. Resolves the exact size each
   // viewport showed before (see timerSize.ts).
+  // The teacher's pressure dials (null outside a classroom room). Hidden
+  // leaderboard swaps the rail for the reveal beat; timer off drops the
+  // countdown; a gentle timer stops the urgency escalation.
+  const classroomPressure = useClassroomPressure();
+  const leaderboardHidden = classroomPressure ? isLeaderboardHidden(classroomPressure) : false;
+  const timerHidden = classroomPressure ? isStudentTimerHidden(classroomPressure) : false;
+  const timerGentle = classroomPressure ? shouldSuppressTimerUrgency(classroomPressure) : false;
   const timerSize = useTimerSize();
 
   // Memoize derived counts to avoid recomputation on every render tick
@@ -505,8 +519,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   variant="desktop"
                 />
 
-                {/* Timer (center) */}
-                {!inDesktopShell && (
+                {/* Timer (center) — absent entirely under the calm dial */}
+                {!inDesktopShell && !timerHidden && (
                   <AdaptiveMotion.div
                     data-tutorial="timer"
                     data-testid="timer-container"
@@ -523,6 +537,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                       totalTime={timerValue * 60}
                       size={timerSize}
                       onTimerState={onTimerState}
+                      suppressUrgency={timerGentle}
                     />
                   </AdaptiveMotion.div>
                 )}
@@ -723,7 +738,16 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {/* Mobile rank rail — always visible in MP (even in gameplayFocusMode,
               which hides the full mobile leaderboard below). Gives phone players a
               clear "You're #N" plus a transient "{name} passed you!" cue. */}
-          {isPlaying && !mpChrome && deferredLeaderboard && deferredLeaderboard.length > 1 && (
+          {isPlaying && !mpChrome && leaderboardHidden && (
+            <p
+              data-testid="leaderboard-reveal-note"
+              className="mt-0.5 text-center text-sm font-neo-body text-neo-cream/80"
+            >
+              {t('education.classroomGame.pressure.revealAtEnd')}
+            </p>
+          )}
+
+          {isPlaying && !mpChrome && !leaderboardHidden && deferredLeaderboard && deferredLeaderboard.length > 1 && (
             <div className="mt-0.5 flex justify-center">
               {isClassroomStudentPlay ? (
                 /* A class session swaps the absolute pill for local framing:
@@ -731,9 +755,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                    alert. Constant visible whole-class rank is the documented
                    harm (it demotivates the bottom half and widens the gap);
                    points are not. End-of-round standings are untouched — bounded
-                   exposure is the form the research permits. */
+                   exposure is the form the research permits. The top-3 dial
+                   trims to the podium; hidden never reaches here — the reveal
+                   beat replaces the whole rail above. */
                 <StudentRankRail
-                  leaderboard={deferredLeaderboard}
+                  leaderboard={classroomPressure ? trimLeaderboardForPressure(deferredLeaderboard, classroomPressure) : deferredLeaderboard}
                   currentUsername={username}
                   wordsFound={foundWords.length}
                   feedback={currentFeedback}

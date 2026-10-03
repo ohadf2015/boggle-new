@@ -124,7 +124,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
 
     // Create the bot with the game's language for localized names
     // Type assertion needed: gameStateManager.GameUser and botManager.GameUser have slightly different avatar types
-    const bot: Bot = botManager.addBot(gameCode, difficulty, game.users as unknown as Record<string, botManager.GameUser>, game.language || 'en');
+    const bot: Bot = botManager.addBot(gameCode, difficulty, game.users as unknown as Record<string, botManager.GameUser>, game.language || 'en', { celebrities: !game.isClassroom });
 
     // Add bot as a user
     addUserToGame(gameCode, bot.username, `bot-${bot.id}`, {
@@ -373,7 +373,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
       // Rotate through difficulties for variety
       const difficulty = difficulties[i % difficulties.length];
       // Type assertion needed: gameStateManager.GameUser and botManager.GameUser have slightly different avatar types
-      const bot: Bot = botManager.addBot(gameCode, difficulty, game.users as unknown as Record<string, botManager.GameUser>, game.language || 'en');
+      const bot: Bot = botManager.addBot(gameCode, difficulty, game.users as unknown as Record<string, botManager.GameUser>, game.language || 'en', { celebrities: !game.isClassroom });
 
       addUserToGame(gameCode, bot.username, `bot-${bot.id}`, {
         avatar: bot.avatar,

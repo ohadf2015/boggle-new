@@ -58,6 +58,7 @@ const MODE_KEY_SUFFIX: Record<string, string> = {
   blast: 'blast',
   'wheel-rush': 'wheelRush',
   [VOCAB_QUIZ_MODE]: 'vocabQuiz',
+  wordcraft: 'wordcraft',
 };
 
 interface ModeShape {
@@ -73,6 +74,7 @@ const MODE_SHAPE: Record<string, ModeShape> = {
   blast: { poster: '/mascot/teacher/mode-blast-nobg.webp', accent: 'pink', minutes: 3, needsDefinitions: false },
   'wheel-rush': { poster: '/mascot/teacher/mode-wheel-rush-v2-nobg.webp', accent: 'purple', minutes: 4, needsDefinitions: false },
   [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/mode-vocab-quiz-nobg.webp', accent: 'cyan', minutes: 5, needsDefinitions: true },
+  wordcraft: { poster: '/mascot/teacher/mode-wordcraft-nobg.webp', accent: 'lime', minutes: 5, needsDefinitions: false },
 };
 
 /** A round with no catalog entry still needs a plannable number on screen. */

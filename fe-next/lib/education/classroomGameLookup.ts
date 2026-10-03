@@ -37,6 +37,7 @@ export interface LiveClassroomGameSettings {
   gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz';
   vocabQuizQuestionCount?: number;
   vocabQuizSeconds?: number;
+  pressure?: import('@/shared/types/classroom').ClassroomPressure;
 }
 
 export interface LiveClassroomGame {

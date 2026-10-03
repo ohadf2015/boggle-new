@@ -65,6 +65,13 @@ export interface ClassroomResultsCardProps {
    * re-rank — `summary.podium` remains the one ranking in the system.
    */
   standings?: ResultsStanding[];
+  /**
+   * The teacher hid the leaderboard and the final reveal has not happened yet:
+   * no podium, no winner spotlight, no rank on the student's own hero — the
+   * pedagogy (coverage, needs-help, reteach) stays. Never set on the final
+   * screen, which IS the reveal.
+   */
+  hideClassPlacings?: boolean;
 }
 
 export function ClassroomResultsCard({
@@ -76,6 +83,7 @@ export function ClassroomResultsCard({
   onRematch,
   onPlayAgain,
   standings,
+  hideClassPlacings = false,
 }: ClassroomResultsCardProps) {
   // Nothing may cover this. A "Make LexiClash yours" style picker opened
   // full-screen over a student's "YOU WON! 257 POINTS" here on a phone — the
@@ -175,11 +183,12 @@ export function ClassroomResultsCard({
           standings={classmates}
           mastery={summary.masteryByPlayer[username]}
           momentum={momentum}
+          hideClassPosition={hideClassPlacings}
           t={t}
         />
       )}
 
-      {podium.length > 0 && (
+      {podium.length > 0 && !hideClassPlacings && (
         <div className="relative mb-5">
           {/* `relative` above bounds the celebration to this block: it never
               covers the actions below it and is never fullscreen.

@@ -36,6 +36,7 @@
  */
 
 import { useEffect, type ReactNode } from 'react';
+import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
 
 export const FEEDBACK_WIDGET_SRC =
     'https://server-production-14a9.up.railway.app/widget.js';
@@ -78,16 +79,18 @@ function injectFeedbackWidget(): void {
 
 export default function FeedbackDevtoolsWidget(): ReactNode {
     useEffect(() => {
+        let cancelPending: (() => void) | undefined;
         const onIntent = () => {
-            injectFeedbackWidget();
             for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
                 window.removeEventListener(ev, onIntent);
             }
+            cancelPending = runWhenScrollSettles(injectFeedbackWidget);
         };
         for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
             window.addEventListener(ev, onIntent, { once: true, passive: true });
         }
         return () => {
+            cancelPending?.();
             for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
                 window.removeEventListener(ev, onIntent);
             }

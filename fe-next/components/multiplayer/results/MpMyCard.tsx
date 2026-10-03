@@ -29,6 +29,12 @@ export interface MpMyCardProps {
    * verdict), labelled as such; the rows keep the round numbers.
    */
   series?: boolean;
+  /**
+   * The teacher hid the leaderboard and this is not the final reveal: no rank
+   * stamp, no winner gold, no tied/ahead/behind — own numbers only, and the
+   * mascot keeps a neutral face (a victory or loser face IS the placing).
+   */
+  hideClassPosition?: boolean;
   t: TFn;
   className?: string;
 }
@@ -38,9 +44,11 @@ export interface MpMyCardProps {
  * up, the best word and what I earned. Numbers are the server's (the counter
  * only animates the display, from 0 to `score`).
  */
-function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, revealed, series = false, t, className }: MpMyCardProps) {
-  const mood = mascotFor(rank, total, score);
-  const gapLine = !gap
+function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, revealed, series = false, hideClassPosition = false, t, className }: MpMyCardProps) {
+  const calm = hideClassPosition;
+  const mood = calm ? 'cheer' : mascotFor(rank, total, score);
+  const showWinner = !calm && winner;
+  const gapLine = calm || !gap
     ? null
     : gap.kind === 'tied'
       ? gap.more > 0
@@ -53,14 +61,14 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
   return (
     <section
       data-testid="mp-my-card"
-      data-winner={String(winner)}
+      data-winner={String(showWinner)}
       data-series={String(series)}
       aria-label={t('mpUi.results.yourRank')}
       className={cn(
         'relative flex items-center min-w-0 rounded-neo-lg border-[3px] border-neo-black shadow-hard',
         // pt clears the DETAILS tab that overhangs the card's top edge.
         'gap-[calc(12px*var(--mp-u,1))] p-[calc(10px*var(--mp-u,1))] pt-[calc(20px*var(--mp-u,1))]',
-        winner ? 'bg-neo-yellow text-neo-black' : 'bg-neo-cream text-neo-black',
+        showWinner ? 'bg-neo-yellow text-neo-black' : 'bg-neo-cream text-neo-black',
         !revealed && 'invisible',
         revealed && fx.cardIn,
         className,
@@ -74,27 +82,31 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
           height={152}
           className={cn('w-full h-full object-contain drop-shadow-[3px_3px_0_#000]', revealed && fx.mascotHop)}
         />
-        <span
-          data-testid="mp-my-rank"
-          className={cn(
-            'absolute -bottom-1 -end-2 grid place-items-center rounded-neo border-[3px] border-neo-black shadow-hard-sm font-neo-display font-bold tabular-nums',
-            'min-w-[calc(40px*var(--mp-u,1))] h-[calc(34px*var(--mp-u,1))] px-1 text-[calc(20px*var(--mp-u,1))]',
-            winner ? 'bg-neo-lime' : score > 0 && rank <= 3 ? 'bg-neo-cyan' : 'bg-neo-pink',
-            revealed && fx.stamp,
-          )}
-        >
-          #{rank}
-        </span>
+        {!calm && (
+          <span
+            data-testid="mp-my-rank"
+            className={cn(
+              'absolute -bottom-1 -end-2 grid place-items-center rounded-neo border-[3px] border-neo-black shadow-hard-sm font-neo-display font-bold tabular-nums',
+              'min-w-[calc(40px*var(--mp-u,1))] h-[calc(34px*var(--mp-u,1))] px-1 text-[calc(20px*var(--mp-u,1))]',
+              winner ? 'bg-neo-lime' : score > 0 && rank <= 3 ? 'bg-neo-cyan' : 'bg-neo-pink',
+              revealed && fx.stamp,
+            )}
+          >
+            #{rank}
+          </span>
+        )}
       </div>
 
       <div className="min-w-0 flex-1 flex flex-col gap-[calc(4px*var(--mp-u,1))]">
         <div className="flex items-baseline gap-2 min-w-0">
           <span className="font-neo-display font-bold uppercase leading-none text-[calc(15px*var(--mp-u,1))] truncate">
-            {winner
-              ? t(series ? 'mpUi.results.seriesChampion' : 'mpUi.results.winner')
-              : series
-                ? t('mpUi.results.seriesPlace', { rank, total })
-                : `#${rank} ${t('mpUi.results.placeOf', { total })}`}
+            {calm
+              ? t(series ? 'mpUi.results.seriesPts' : 'mpUi.results.roundPoints')
+              : showWinner
+                ? t(series ? 'mpUi.results.seriesChampion' : 'mpUi.results.winner')
+                : series
+                  ? t('mpUi.results.seriesPlace', { rank, total })
+                  : `#${rank} ${t('mpUi.results.placeOf', { total })}`}
           </span>
         </div>
         <div className="flex items-baseline gap-1.5 min-w-0">

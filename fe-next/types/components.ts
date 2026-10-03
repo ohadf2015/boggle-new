@@ -1,4 +1,5 @@
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 /**
  * Component Prop Type Definitions
  * Types for major view components
@@ -112,6 +113,8 @@ export interface ResultsPageProps {
    * (whose sessionStorage used to be the only source).
    */
   classroomSummary?: ClassroomSummary;
+  /** The game the teacher has the room on now, which may differ from the round just played. */
+  classroomNextMode?: ClassroomGameMode | null;
   /** Room language for starting new games */
   roomLanguage?: Language;
   /** Grid size for cognitive scoring */

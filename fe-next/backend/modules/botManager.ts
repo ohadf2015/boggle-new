@@ -19,6 +19,7 @@ import {
   generateBotName as _generateBotName,
   resetBotIdCounter,
   type GameUser,
+  type BotNameOptions,
 } from './botCreation';
 import { stopBot as _stopBot } from './botLifecycle';
 import { BOT_CONFIG } from './botConfig';
@@ -102,9 +103,9 @@ export function initializeGameBots(gameCode: string): Map<string, Bot> {
   return gameBots.get(gameCode)!;
 }
 
-export function addBot(gameCode: string, difficulty: string = 'medium', existingUsers: Record<string, GameUser> = {}, language: string = 'en'): Bot {
+export function addBot(gameCode: string, difficulty: string = 'medium', existingUsers: Record<string, GameUser> = {}, language: string = 'en', nameOptions: BotNameOptions = {}): Bot {
   const bots = initializeGameBots(gameCode);
-  const bot = createBot(gameCode, difficulty, existingUsers, language);
+  const bot = createBot(gameCode, difficulty, existingUsers, language, nameOptions);
 
   bots.set(bot.id, bot);
   logger.info('BOT', `Added ${difficulty} bot "${bot.username}" (${language}) to game ${gameCode}`);

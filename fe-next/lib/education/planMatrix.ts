@@ -47,4 +47,6 @@ export const PLAN_MATRIX_ROWS: readonly PlanMatrixRow[] = [
   { key: 'customLists', free: true, pro: true },
   { key: 'noAds', free: true, pro: true },
   { key: 'analytics', free: false, pro: true },
+  { key: 'mastery', free: false, pro: true },
+  { key: 'missedPractice', free: false, pro: true },
 ] as const;

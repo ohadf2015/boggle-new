@@ -29,6 +29,7 @@ import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
 import { holdFxUntilFirstUse } from '@/lib/pixiFx/SharedFxGate';
+import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
 // Season claim/announcement are home-only, interaction-gated popups (never SSR/SEO
 // content) — lazy-load so their ~35KB stays out of the synchronous initial parse on
 // every route. ssr:false: they render nothing visible when there's nothing to claim,
@@ -197,7 +198,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
         const events = ['click', 'touchstart', 'keydown', 'scroll'] as const;
         const handleInteraction = () => {
             clearTimeout(timeoutId);
-            initLogRocket();
+            runWhenScrollSettles(initLogRocket);
             events.forEach(event => {
                 window.removeEventListener(event, handleInteraction);
             });

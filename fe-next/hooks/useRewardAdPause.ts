@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-const REWARD_AD_ACTIVE_EVENT = 'rewardAdActiveChange';
+export const REWARD_AD_ACTIVE_EVENT = 'rewardAdActiveChange';
 
 /** Module-level mirror of the bus, for gates that can't hook into React — the
  *  mobile visibilitychange → 5s → socket.disconnect() guard reads this when the

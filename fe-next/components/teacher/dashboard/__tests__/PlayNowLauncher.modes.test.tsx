@@ -1,5 +1,5 @@
 /**
- * Teacher HQ: "Start a game" offers the four modes as calm, compact chips.
+ * Teacher HQ: "Start a game" offers the five modes as calm, compact chips.
  *
  * The chips are a choice, not a step: one is always pre-selected (the mode the
  * armed words can carry), so START stays a single tap. The quiz chip is only
@@ -31,30 +31,34 @@ describe('<PlayNowLauncher> — mode cards', () => {
     mockRecent.mockReturnValue({ recentConfigs: [], hasRecentConfig: false });
   });
 
-  it('Given the hero, Then it is titled "Start a game" and offers four modes, each with its own icon', () => {
+  it('Given the hero, Then it is titled "Start a game" and offers five modes, each with its own icon', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
     expect(screen.getByRole('heading', { name: 'Start a game' })).toBeInTheDocument();
     const group = screen.getByRole('radiogroup');
     const radios = screen.getAllByRole('radio');
-    expect(radios).toHaveLength(4);
+    expect(radios).toHaveLength(5);
     radios.forEach((r) => {
       expect(group.contains(r)).toBe(true);
       expect(r.querySelector('svg')).not.toBeNull();
     });
-    // Four distinct shapes — the icon channel carries the mode identity, so
-    // colour is never the only signal.
+    // Five distinct shapes — the icon channel carries the mode identity, so
+    // colour is never the only signal. Wordcraft's hammer must not collide
+    // with the bomb/target/grid/list shapes already on the bar.
     const icons = radios.map((r) => r.querySelector('[data-mode-icon]')?.getAttribute('data-mode-icon'));
-    expect(new Set(icons).size).toBe(4);
+    expect(new Set(icons).size).toBe(5);
+    expect(
+      screen.getByTestId('hq-mode-wordcraft').querySelector('[data-mode-icon]')?.getAttribute('data-mode-icon'),
+    ).toBeTruthy();
   });
 
   it('Given desktop width, Then chips lay out two per row and each names itself in full — truncation can never hide the verb', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
     const group = screen.getByRole('radiogroup');
-    // Four chips in one row squeezes each to ~150px and the label dies
+    // Five chips in one row squeezes each to ~150px and the label dies
     // ("VOC…"). Never more than two per row, at any breakpoint.
     expect(group.className).toMatch(/(^|\s)grid-cols-2(\s|$)/);
     expect(group.className).not.toMatch(/grid-cols-[3-9]/);
-    for (const id of ['vocab-quiz', 'classic', 'blast', 'word-hunt']) {
+    for (const id of ['vocab-quiz', 'classic', 'blast', 'word-hunt', 'wordcraft']) {
       const chip = screen.getByTestId(`hq-mode-${id}`);
       const label = chip.getAttribute('aria-label');
       // If the visible label ever truncates again, the full name still

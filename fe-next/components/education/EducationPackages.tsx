@@ -137,7 +137,7 @@ function PackageCard({
           className={
             highlighted
               ? 'mt-6 rounded-neo border-4 border-neo-cream bg-neo-navy px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard'
-              : 'mt-6 rounded-neo border-4 border-neo-black bg-neo-pink px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard'
+              : 'mt-6 rounded-neo border-4 border-neo-black bg-neo-pink px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-black shadow-hard'
           }
         >
           {t(`education.packages.${ns}.cta`)}

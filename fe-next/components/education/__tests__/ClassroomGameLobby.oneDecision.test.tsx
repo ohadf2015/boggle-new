@@ -80,7 +80,7 @@ const OLDER_LESSON = {
 };
 const CLASSROOMS = [{ id: 'class-1', name: 'ELA (7th)', member_count: 12 }];
 
-const ALTERNATES = ['classic', 'word-hunt', 'blast', 'wheel-rush'];
+const ALTERNATES = ['classic', 'word-hunt', 'blast', 'wheel-rush', 'wordcraft'];
 
 function emitted() {
   return mockSocket.emit.mock.calls.find((c) => c[0] === 'createClassroomGame')?.[1] as
@@ -128,7 +128,7 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
   it('keeps the folded modes one tap away and names how many', async () => {
     await renderLobby();
     const more = screen.getByTestId('more-modes-toggle');
-    expect(more).toHaveTextContent('2');
+    expect(more).toHaveTextContent('3');
 
     fireEvent.click(more);
 

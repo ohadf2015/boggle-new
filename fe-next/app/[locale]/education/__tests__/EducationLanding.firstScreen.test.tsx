@@ -123,9 +123,15 @@ describe('Education Landing — first-screen declutter (R1)', () => {
       render(<EducationPageClient />);
       const hero = screen.getByTestId('education-hero');
       const teaCta = screen.getByTestId('teacher-card-access-link');
-      // Both should exist in the document
+      const pro = screen.getByTestId('teacher-pro-checkout');
       expect(hero).toBeInTheDocument();
       expect(teaCta).toBeInTheDocument();
+      expect(hero.compareDocumentPosition(pro) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('has no back control on the module root', () => {
+      render(<EducationPageClient />);
+      expect(screen.queryByTestId('top-back-link')).toBeNull();
     });
   });
 

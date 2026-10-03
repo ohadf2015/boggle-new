@@ -66,6 +66,7 @@ import {
   VOCAB_QUIZ_DEFAULT_SECONDS,
 } from '@/shared/types/vocabQuiz';
 import { isPracticeFocusSetting } from '@/lib/education/vocabFocus';
+import { readClassroomPressure } from '@/shared/utils/classroomPressure';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
@@ -212,6 +213,8 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   if (settings.gameMode !== VOCAB_QUIZ_MODE) return false;
 
   const { focus, questionCount, secondsPerQuestion, treasureChestsEnabled } = readQuizSettings(settings);
+  // The calm dial: accuracy-only scoring when the teacher launched it so.
+  const pressure = readClassroomPressure(settings);
   const { words, language } = await loadLessonVocabulary(classroomGame.lessonIds ?? []);
 
   const session = createQuizSession({
@@ -225,6 +228,8 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
     now: Date.now(),
     language,
     treasureChestsEnabled,
+    speedScoring: pressure.speedScoring,
+    pressure,
   });
 
   if (session.questions.length === 0) {

@@ -24,6 +24,7 @@ import { registerEarthquakeHandlers } from './earthquakeHandler.js';
 import { registerScorecardHandlers } from './scorecardHandler.js';
 import { registerVocabularyHandlers } from './vocabularyHandler.js';
 import { registerClassroomGameHandlers } from './classroomGameHandler.js';
+import { registerClassroomPressureHandlers } from './classroomPressureHandler.js';
 import { registerAvatarHandlers } from './avatarHandler.js';
 import { registerWordHuntHandlers } from './wordHuntHandler.js';
 import { registerWheelRushHandlers } from './wheelRushHandler.js';
@@ -39,6 +40,7 @@ import { registerGiftHandlers } from './giftHandler.js';
 import { registerBoostHandlers } from './boostHandler.js';
 import { registerTeacherControlsHandlers } from './teacherControlsHandler.js';
 import { registerVocabQuizHandlers } from './vocabQuizHandler.js';
+import { registerWordcraftClassroomHandlers } from './wordcraftClassroomHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -68,6 +70,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
     return getGame(code);
   });
   registerClassroomGameHandlers(io, socket);
+  registerClassroomPressureHandlers(io, socket);
   registerAvatarHandlers(io, socket);
   registerWordHuntHandlers(io, socket);
   registerWheelRushHandlers(io, socket);
@@ -87,6 +90,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   // the quiz one when the room has no quiz session, the board one when the room
   // has no running board timer.
   registerVocabQuizHandlers(io, socket);
+  registerWordcraftClassroomHandlers(io, socket);
 }
 
 export {

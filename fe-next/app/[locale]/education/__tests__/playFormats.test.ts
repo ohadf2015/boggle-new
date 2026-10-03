@@ -56,10 +56,10 @@ describe('the count is derived', () => {
     );
   });
 
-  it('is the 5 + 7 + 6 the code currently ships', () => {
-    expect(LIVE_MODE_COUNT).toBe(5);
+  it('is the 6 + 7 + 6 the code currently ships', () => {
+    expect(LIVE_MODE_COUNT).toBe(6);
     expect(PRACTICE_FORMAT_COUNT).toBe(13);
-    expect(PLAY_FORMAT_COUNT).toBe(18);
+    expect(PLAY_FORMAT_COUNT).toBe(19);
   });
 });
 

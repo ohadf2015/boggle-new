@@ -1,14 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 
 /**
  * Design: 6 cards in 2x3 grid on desktop, 1 col on mobile.
  * Accent colors mapped statically to avoid Tailwind purging.
  * Heading sits on the page dark-navy bg, so it must be light text;
  * cards keep their cream bg with navy text inside.
- * GSAP cascades heading then each card on scroll-in.
  */
 
 const ACCENT_BG: Record<string, string> = {
@@ -22,7 +20,7 @@ const ACCENT_TEXT: Record<string, string> = {
   lime: 'text-neo-navy',
   pink: 'text-neo-navy',
   cyan: 'text-neo-navy',
-  purple: 'text-neo-white',
+  purple: 'text-neo-black',
 };
 
 const MODES = [
@@ -36,15 +34,9 @@ const MODES = [
 
 export function SixModeTour() {
   const { t, language } = useLanguage();
-  const ref = useGsapReveal<HTMLElement>({
-    selector: '[data-mode-item]',
-    y: 24,
-    stagger: 0.08,
-    duration: 0.55,
-  });
 
   return (
-    <section ref={ref} className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
+    <section className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
       <h2
         data-mode-item
         className="text-3xl font-neo-display font-black text-neo-white"
@@ -58,7 +50,7 @@ export function SixModeTour() {
             key={m.key}
             data-mode-item
             href={`/${language}${m.href}`}
-            className="group block rounded-neo border-neo-thick border-neo-navy bg-neo-cream p-5 shadow-hard-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-hard"
+            className="group block rounded-neo border-2 border-neo-navy bg-neo-cream p-5 transition-transform duration-150 hover:-translate-y-0.5 motion-reduce:transition-none"
           >
             <div
               className={`mb-3 inline-block rounded-full px-2.5 py-1 text-xs font-bold uppercase ${
@@ -73,7 +65,7 @@ export function SixModeTour() {
             <p className="mt-2 text-xs text-neo-navy/70">
               {t(`education.landing.modes.${m.key}.body`)}
             </p>
-            <p className="mt-2.5 text-xs font-bold text-neo-navy/50">
+            <p className="mt-2.5 text-xs font-bold text-neo-navy/80">
               {t('education.landing.modes.teaches')}: {t(`education.landing.modes.${m.key}.teaches`)}
             </p>
           </Link>

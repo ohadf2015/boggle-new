@@ -146,4 +146,29 @@ describe('MusicContext — repeat request while a track is still loading', () =>
     expect(lobby._stopsAfterPlay).toBe(0);
     expect(lobby.playing()).toBe(true);
   });
+
+  it('a repeat request restarts the same track when the OS paused its element under Howler', async () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <MusicProvider>{children}</MusicProvider>
+    );
+    const { result } = renderHook(() => useMusic(), { wrapper });
+    act(() => {
+      result.current.unlockAudio();
+    });
+    await act(async () => {
+      result.current.fadeToTrack(result.current.TRACKS.LOBBY, 50, 50);
+      await wait(700);
+    });
+    const lobby = getHowl('/music/in_lobby.mp3');
+    lobby._sounds = [{ _paused: false, _ended: false, _node: { paused: true } }];
+
+    await act(async () => {
+      result.current.fadeToTrack(result.current.TRACKS.LOBBY, 50, 50);
+      await wait(50);
+    });
+
+    expect(lobby.pause).toHaveBeenCalled();
+    expect(lobby._playStarts).toBe(2);
+    expect(lobby._stopsAfterPlay).toBe(0);
+  });
 });

@@ -13,7 +13,7 @@ import { render } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { HOME_TREE_SCRIPT } from '@/utils/returningVisitor';
 import { isReturningVisitor, hasSupabaseSession } from '@/utils/onboardingStorage';
-import { HomeTreeSlot, HomeTreeBoot } from '../homeTree';
+import { HomeTreeSlot, HomeTreeBoot, resolveClientHomeTree } from '../homeTree';
 
 const LIVE = JSON.stringify({ access_token: 'abc', refresh_token: 'r' });
 
@@ -47,13 +47,24 @@ describe('homepage tree predicate — script and runtime agree', () => {
   beforeEach(() => {
     localStorage.clear();
     clearCookies();
+    delete (window as any).Capacitor;
     document.documentElement.removeAttribute('data-home');
   });
 
   it.each(FIXTURES)('$name', ({ setup, returning }) => {
     setup();
     expect(isReturningVisitor()).toBe(returning);
+    expect(resolveClientHomeTree()).toBe(returning ? 'returning' : 'fresh');
     expect(runScript()).toBe(returning ? 'returning' : 'fresh');
+  });
+
+  it.each([
+    { name: 'native app shell', native: true, tree: 'returning' },
+    { name: 'Capacitor web shim', native: false, tree: 'fresh' },
+  ])('$name with empty storage gets the $tree tree', ({ native, tree }) => {
+    (window as any).Capacitor = { isNativePlatform: () => native };
+    expect(resolveClientHomeTree()).toBe(tree);
+    expect(runScript()).toBe(tree);
   });
 
   it('hasSupabaseSession ignores the onboarding flag (session only)', () => {

@@ -36,8 +36,16 @@ export interface UseSpellingGameReturn {
   accuracy: number;
   isComplete: boolean;
 
+  /** Move to the next word now (the manual path after a wrong answer). */
+  advance: () => void;
+
   // Reset
   resetGame: () => void;
+}
+
+export interface UseSpellingGameOptions {
+  /** A wrong answer waits for the student to tap Next instead of timing out. */
+  manualAdvanceOnWrong?: boolean;
 }
 
 // ============================================
@@ -54,7 +62,8 @@ export interface UseSpellingGameReturn {
  * - Auto-advance after answers
  * - Hebrew normalization support
  */
-export function useSpellingGame(words: VocabularyWord[]): UseSpellingGameReturn {
+export function useSpellingGame(words: VocabularyWord[], options: UseSpellingGameOptions = {}): UseSpellingGameReturn {
+  const { manualAdvanceOnWrong = false } = options;
   // Sort words by length for progressive difficulty.
   // Entries with no `word` are dropped rather than sorted: a lesson row can
   // reach here with the field missing, and `a.word.length` then throws inside
@@ -106,6 +115,17 @@ export function useSpellingGame(words: VocabularyWord[]): UseSpellingGameReturn 
     }
   }, [currentWord, currentHintIndex]);
 
+  const advanceFrom = useCallback((index: number) => {
+    const nextIndex = index + 1;
+    if (nextIndex < sortedWords.current.length) {
+      setWordIndex(nextIndex);
+      setCurrentHintIndex(1);
+      setHintsUsed(0);
+    } else {
+      setIsComplete(true);
+    }
+  }, []);
+
   /**
    * Submit answer and check correctness
    */
@@ -142,24 +162,21 @@ export function useSpellingGame(words: VocabularyWord[]): UseSpellingGameReturn 
       timeTaken: 0, // TODO: track time
     };
 
-    // Auto-advance after delay
-    const delay = isCorrect ? 1000 : 2000; // 1s for correct, 2s for incorrect
-    advanceTimeoutRef.current = setTimeout(() => {
-      const nextIndex = wordIndex + 1;
-      if (nextIndex < sortedWords.current.length) {
-        setWordIndex(nextIndex);
-        setCurrentHintIndex(1); // Reset to first letter
-        setHintsUsed(0); // Reset hints counter
-      } else {
-        setIsComplete(true);
-      }
-    }, delay);
+    if (isCorrect || !manualAdvanceOnWrong) {
+      const delay = isCorrect ? 1000 : 2000;
+      advanceTimeoutRef.current = setTimeout(() => advanceFrom(wordIndex), delay);
+    }
 
     return {
       correct: isCorrect,
       correctWord: currentWord.word,
     };
-  }, [currentWord, wordIndex, hintsUsed]);
+  }, [currentWord, wordIndex, hintsUsed, manualAdvanceOnWrong, advanceFrom]);
+
+  const advance = useCallback(() => {
+    if (advanceTimeoutRef.current) clearTimeout(advanceTimeoutRef.current);
+    advanceFrom(wordIndex);
+  }, [advanceFrom, wordIndex]);
 
   /**
    * Reset game to initial state
@@ -204,6 +221,7 @@ export function useSpellingGame(words: VocabularyWord[]): UseSpellingGameReturn 
     attempts,
     accuracy,
     isComplete,
+    advance,
     resetGame,
   };
 }

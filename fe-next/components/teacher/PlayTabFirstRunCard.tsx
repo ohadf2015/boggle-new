@@ -150,7 +150,11 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
               </span>
             </div>
 
-            <div className="flex min-h-0 shrink-0 items-center gap-3 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-2 lg:flex-1 lg:flex-col lg:justify-center lg:gap-4 lg:p-4">
+            {/* Phones: the button leads, so the cookie sheet over the bottom of a first visit covers only the placeholder slots. */}
+            <div
+              data-first-run-cta-row
+              className="flex min-h-0 shrink-0 items-center gap-3 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-2 max-sm:order-first lg:flex-1 lg:flex-col lg:justify-center lg:gap-4 lg:p-4"
+            >
               {/* Lexi minding an empty room. Decorative — the copy carries the meaning. */}
               <Image
                 src="/mascot/teacher/hero-empty-classroom.webp"

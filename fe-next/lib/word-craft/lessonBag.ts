@@ -41,21 +41,30 @@ export function wordCraftLocaleFor(
  * letters, every letter a real tile in this locale's bag, deduped, shortest
  * first (the easiest wins come first).
  */
+export function lessonTargetsWithDrops(
+  words: readonly string[],
+  locale: SupportedLocale,
+  maxLength: number = RACK_SIZE,
+): { targets: string[]; dropped: string[] } {
+  const { values } = getTileBag(locale);
+  const out: string[] = [];
+  const dropped: string[] = [];
+  for (const raw of words) {
+    const canon = canonLessonWord(raw, locale as Language);
+    const chars = [...canon];
+    if (chars.length < 2 || chars.length > maxLength) { dropped.push(raw); continue; }
+    if (!chars.every((ch) => ch !== BLANK_LETTER && values[ch] !== undefined)) { dropped.push(raw); continue; }
+    if (!out.includes(canon)) out.push(canon);
+  }
+  return { targets: out.sort((a, b) => [...a].length - [...b].length), dropped };
+}
+
 export function lessonTargetsFor(
   words: readonly string[],
   locale: SupportedLocale,
   maxLength: number = RACK_SIZE,
 ): string[] {
-  const { values } = getTileBag(locale);
-  const out: string[] = [];
-  for (const raw of words) {
-    const canon = canonLessonWord(raw, locale as Language);
-    const chars = [...canon];
-    if (chars.length < 2 || chars.length > maxLength) continue;
-    if (!chars.every((ch) => ch !== BLANK_LETTER && values[ch] !== undefined)) continue;
-    if (!out.includes(canon)) out.push(canon);
-  }
-  return out.sort((a, b) => [...a].length - [...b].length);
+  return lessonTargetsWithDrops(words, locale, maxLength).targets;
 }
 
 /** First target the player has not built yet (bot words never count). */

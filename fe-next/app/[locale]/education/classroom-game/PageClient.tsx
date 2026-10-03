@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { TV_STAGE_ZOOM_CLASS } from '@/components/education/lobby/tvStageScale';
 import { LaunchStageBackdrop } from '@/components/education/lobby/LaunchStageBackdrop';
+import { QuickLaunchStage } from '@/components/teacher/hq/QuickLaunchStage';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
 import { ClassroomGameLobbyExpress } from '@/components/education/ClassroomGameLobbyExpress';
@@ -49,7 +50,7 @@ function previewKind(value: string | null | undefined): LiveSurfacePreviewKind |
  * lessonId is optional — when omitted, the lobby lets the teacher pick lessons.
  */
 function ClassroomGameInner() {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -59,6 +60,7 @@ function ClassroomGameInner() {
 
   // Optional lesson ID from URL params (pre-selects a lesson in the lobby)
   const lessonId = searchParams?.get('lessonId') || '';
+  const classroomIdParam = searchParams?.get('classroomId') || '';
   // 'repeatLast' (dashboard Repeat-last hero) prefills the whole last setup.
   const flow = searchParams?.get('flow') || '';
   // ?cefr=A1|A2|B1 — the ESL page demo's "Run this list with the class" CTA.
@@ -85,13 +87,13 @@ function ClassroomGameInner() {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!isAuthenticated) {
+    if (!user) {
       router.push(`/${language}/education`);
       return;
     }
 
     setIsChecking(false);
-  }, [isAuthenticated, authLoading, router, language]);
+  }, [user, authLoading, router, language]);
 
   // Only reachable inside <TeacherGate>, so the caller is always a teacher who
   // came from the dashboard's GO LIVE. `/education` is the marketing landing.
@@ -119,6 +121,7 @@ function ClassroomGameInner() {
   }, [setIsInGame]);
 
   if (isChecking || authLoading) {
+    if (flow === QUICK_LAUNCH_FLOW) return <QuickLaunchStage />;
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
         <PageLoader
@@ -155,6 +158,7 @@ function ClassroomGameInner() {
         ) : (
           <ClassroomGameLobby
             initialLessonId={lessonId}
+            initialClassroomId={classroomIdParam || undefined}
             initialFlow={flow}
             cefrLevel={cefrLevel}
             onBack={handleBack}
@@ -172,7 +176,7 @@ function ClassroomGameInner() {
  * teachers keep the gated lobby below.
  */
 export default function ClassroomGamePage() {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, loading } = useAuth();
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const preview = previewKind(searchParams?.get('preview'));
@@ -183,6 +187,7 @@ export default function ClassroomGamePage() {
   }
 
   if (loading) {
+    if (searchParams?.get('flow') === QUICK_LAUNCH_FLOW) return <QuickLaunchStage />;
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
         <PageLoader size="lg" text={t('common.loading')} />
@@ -190,7 +195,8 @@ export default function ClassroomGamePage() {
     );
   }
 
-  if (!isAuthenticated) {
+  // `isAuthenticated` also needs the profile, which lands after the user: a signed-in teacher is not a guest.
+  if (!user) {
     return <ClassroomGuestDemo />;
   }
 

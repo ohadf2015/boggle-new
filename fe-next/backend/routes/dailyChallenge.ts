@@ -16,6 +16,7 @@ import type { Language } from '../../types';
 import wordHuntRouter from './dailyChallenge/wordHuntRoutes';
 import wordWheelRouter from './dailyChallenge/wordWheelRoutes';
 import { seasonsListHandler } from './dailyChallenge/seasonLeaderboard';
+import { renameGuestDailyName } from './dailyChallenge/guestNameRoutes';
 import { rerankSequential, dedupeByPlayerKeepBest, sortClassicPuzzleRowsGlobally } from './dailyChallenge/leaderboardSort';
 import { updateQuestProgress } from '../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../lib/daily/questCredit';
@@ -563,6 +564,8 @@ router.post('/suggest-word', async (req: Request, res: Response): Promise<void> 
 // Seasons that have started (newest first) + the current one — feeds the
 // daily leaderboard's season picker.
 router.get('/seasons', seasonsListHandler);
+
+router.post('/guest-name', renameGuestDailyName);
 
 // Mount Word Hunt routes
 router.use('/word-hunt', wordHuntRouter);

@@ -26,6 +26,13 @@ import { PauseCircle, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import { useVocabQuiz } from './useVocabQuiz';
+import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
+import {
+  isLeaderboardHidden,
+  isStudentTimerHidden,
+  shouldSuppressTimerUrgency,
+  trimLeaderboardForPressure,
+} from '@/shared/utils/classroomPressure';
 import { useVocabQuizJuice } from './useVocabQuizJuice';
 import { VocabQuizAnswerGrid } from './VocabQuizAnswerGrid';
 import { VocabQuizStandings } from './VocabQuizStandings';
@@ -79,9 +86,18 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
     [question, t]
   );
 
+  // The teacher's calm dials (null outside a classroom room): timer off drops
+  // the question clock, gentle keeps its colour calm to the last second, and
+  // a hidden leaderboard turns every rank surface into the reveal beat.
+  const pressure = useClassroomPressure();
+  const timerHidden = pressure ? isStudentTimerHidden(pressure) : false;
+  const timerGentle = pressure ? shouldSuppressTimerUrgency(pressure) : false;
+  const leaderboardHidden = pressure ? isLeaderboardHidden(pressure) : false;
+  const endStandings = pressure ? trimLeaderboardForPressure(quiz.standings, pressure) : quiz.standings;
+
   // The clock turns orange in the last five seconds — urgency is a reserved
   // semantic for that colour, and it reads without needing to parse a number.
-  const urgent = quiz.secondsLeft <= 5 && quiz.secondsLeft > 0;
+  const urgent = !timerGentle && quiz.secondsLeft <= 5 && quiz.secondsLeft > 0;
 
   // Points fly into the header counter instead of being explained in prose.
   // Keyed on the question index so the same total twice still re-animates.
@@ -99,7 +115,7 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
         finished={phase === 'ended'}
         lockedIn={phase === 'question' ? quiz.lockIn : null}
         rank={
-          phase === 'reveal' && myIndex >= 0
+          phase === 'reveal' && !leaderboardHidden && myIndex >= 0
             ? { position: myIndex + 1, total: quiz.standings.length }
             : null
         }
@@ -108,11 +124,11 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
 
       {/* Timer bar — it does not just shrink, it tightens: the last five
           seconds pulse in time with the tick the student is hearing. */}
-      {phase === 'question' && (
+      {phase === 'question' && !timerHidden && (
         <div
           className={cn(
             'h-3 w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden',
-            juice.ticking && 'animate-pulse'
+            juice.ticking && !timerGentle && 'animate-pulse'
           )}
           role="timer"
           aria-label={t('vocabQuiz.timeLeft', { seconds: quiz.secondsLeft })}
@@ -201,6 +217,7 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
                 username={username}
                 standings={quiz.standings}
                 mastery={{ found: myStanding.correctCount, total: quiz.totalQuestions }}
+                hideClassPosition={leaderboardHidden}
                 t={t}
               />
             ) : (
@@ -229,9 +246,19 @@ export function VocabQuizView({ socket, username, t, onPlayAgain }: VocabQuizVie
             )}
           </div>
 
-          {/* Standings — the only scrollable region */}
+          {/* Standings — the only scrollable region. A hidden leaderboard
+              turns it into the reveal beat: the teacher owns the standings. */}
           <div className="flex-1 min-h-0 overflow-y-auto">
-            <VocabQuizStandings standings={quiz.standings} meUsername={username} limit={5} podium t={t} />
+            {leaderboardHidden ? (
+              <p
+                data-testid="vocab-quiz-reveal-note"
+                className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 text-center font-neo-body font-bold text-neo-cream"
+              >
+                {t('education.classroomGame.pressure.revealAtEnd')}
+              </p>
+            ) : (
+              <VocabQuizStandings standings={endStandings} meUsername={username} limit={5} podium t={t} />
+            )}
           </div>
 
           {/* Finale — always visible (badges/streak) */}

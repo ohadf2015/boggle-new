@@ -41,7 +41,9 @@ import {
 } from '@/shared/types/vocabQuiz';
 import { getPresetValues, applyVocabularyCap, type ClassroomPresetId } from '@/lib/education/classroomPresets';
 import { clampTeamCount, type PlayStyle } from '@/shared/utils/teamBattle';
-import type { ClassroomAccessibility } from '@/shared/types/classroom';
+import type { ClassroomAccessibility, ClassroomPressure } from '@/shared/types/classroom';
+import { DEFAULT_CLASSROOM_PRESSURE } from '@/shared/utils/classroomPressure';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { configuredRoundMinutes, recommendedModeBadge } from '@/lib/education/gameModes';
@@ -50,6 +52,7 @@ import { LobbyModeHero } from './lobby/LobbyModeHero';
 import { LobbySetupPanel } from './lobby/LobbySetupPanel';
 import { LobbyRoundSettings } from './lobby/LobbyRoundSettings';
 import { LobbySetupDisclosure } from './lobby/LobbySetupDisclosure';
+import { LobbyPressureDials } from './lobby/LobbyPressureDials';
 import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
 import { ClassroomLiveLobby } from './lobby/ClassroomLiveLobby';
 import { useTeacherLobbyData } from './lobby/useTeacherLobbyData';
@@ -58,6 +61,8 @@ import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
 
 export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
+  /** Pre-select this class in the lobby (deep-link from HQ start-live CTA). */
+  initialClassroomId?: string;
   /** 'repeatLast' → prefill classroom + lessons + settings from the last game. */
   initialFlow?: string;
   /**
@@ -69,7 +74,7 @@ export interface ClassroomGameLobbyProps {
   onBack: () => void;
 }
 
-export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, onBack }: ClassroomGameLobbyProps) {
+export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initialFlow, cefrLevel, onBack }: ClassroomGameLobbyProps) {
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const router = useRouter();
@@ -85,7 +90,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
     setSelectedClassroomId,
     createLessonFromPack,
     fetchTeacherData,
-  } = useTeacherLobbyData(user?.id, t, initialLessonId);
+  } = useTeacherLobbyData(user?.id, t, initialLessonId, initialClassroomId);
 
   const { createClassroom } = useClassrooms();
 
@@ -144,6 +149,10 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
   const [playStyle, setPlayStyle] = useState<PlayStyle>('ffa');
   const [teamCount, setTeamCount] = useState(2);
   const [accessibility, setAccessibility] = useState<ClassroomAccessibility>({});
+  // The Pro pressure dials. State starts on the loud defaults; the launch
+  // carries them only for a Pro teacher — the loud game-show IS the free tier.
+  const [pressure, setPressure] = useState<ClassroomPressure>(DEFAULT_CLASSROOM_PRESSURE);
+  const { hasPro: hasTeacherPro } = useTeacherPro();
   const [activePreset, setActivePreset] = useState<ClassroomPresetId | null>(null);
   /**
    * Both folds start SHUT, and neither is remembered across visits: the screen
@@ -299,6 +308,10 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
             accessibility.largeText || accessibility.audioCues || accessibility.participationPoints
               ? accessibility
               : undefined,
+          // Peeled off in the launch hook and emitted to the room once it
+          // exists (the create handler whitelists its settings keys). Absent
+          // for a free teacher — the loud default is the free tier.
+          ...(hasTeacherPro ? { pressure } : {}),
         },
       });
 
@@ -313,6 +326,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
       allPlayableWords, activePreset, gameCode, language, t, launch, saveConfig, setStartError,
       targetWord, minWordLength, timerMinutes, boardSize, playStyle, teamCount, accessibility,
       vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled,
+      pressure, hasTeacherPro,
     ]
   );
 
@@ -425,6 +439,11 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
           onAccessibilityChange={(next) => { setAccessibility(next); setActivePreset(null); }}
         />
 
+        {/* The Pro dials lead the fine-tuning: the lock chip is the
+            monetization entry, so it is visible on first expand — never
+            below the sheet's scroll window. */}
+        <LobbyPressureDials pressure={pressure} onChange={setPressure} />
+
         <LobbyRoundSettings
           gameMode={gameMode}
           timerMinutes={timerMinutes}
@@ -447,6 +466,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, cefrLevel, on
           onVocabQuizSecondsChange={setVocabQuizSeconds}
           onTreasureChestsChange={setTreasureChestsEnabled}
         />
+
       </LobbySetupDisclosure>
     </ClassroomLobbyShell>
   );

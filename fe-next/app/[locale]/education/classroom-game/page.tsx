@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { Suspense } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -40,9 +39,9 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
 
   return (
     <>
-      <Script id="ld-edu-classroom-howto" type="application/ld+json">{JSON.stringify(howTo)}</Script>
-      <Script id="ld-edu-classroom-resource" type="application/ld+json">{JSON.stringify(resource)}</Script>
-      <Script id="ld-edu-classroom-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumb)}</Script>
+      <script id="ld-edu-classroom-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }} />
+      <script id="ld-edu-classroom-resource" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(resource) }} />
+      <script id="ld-edu-classroom-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <Suspense
         fallback={
           <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">

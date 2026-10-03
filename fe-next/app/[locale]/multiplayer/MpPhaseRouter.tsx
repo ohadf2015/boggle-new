@@ -118,6 +118,7 @@ export function MpPhaseRouter({
       blastSummary: resultsData?.blastSummary,
       wheelRushSummary: resultsData?.wheelRushSummary,
       classroomSummary: resultsData?.classroomSummary,
+      classroomNextMode: isClassroomMode ? classroomGameMode ?? null : null,
     } as MpResultsScreenProps;
     return (
       <FeatureErrorBoundary featureName="Results">

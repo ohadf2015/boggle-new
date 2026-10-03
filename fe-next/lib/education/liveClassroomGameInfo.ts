@@ -1,4 +1,5 @@
 import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import type { ResolvedClassroomPressure } from '@/shared/types/classroom';
 
 /**
  * What `/api/education/classroom/live-game` tells a client about a live
@@ -18,6 +19,8 @@ export interface LiveClassroomGameSettingsInfo {
   allowLateJoin: boolean;
   vocabQuizQuestionCount: number | null;
   vocabQuizSeconds: number | null;
+  /** Null for a room launched without the dials — read as the loud default. */
+  pressure: ResolvedClassroomPressure | null;
 }
 
 export interface LiveClassroomGameInfo {

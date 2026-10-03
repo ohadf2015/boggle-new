@@ -254,7 +254,7 @@ export function AcademyHub(props: AcademyHubProps) {
       data-testid="academy-hub"
       data-chrome={hub.chrome}
       data-scale={hub.scale}
-      className="fixed inset-0 overflow-hidden bg-neo-navy text-neo-white"
+      className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] overflow-hidden bg-neo-navy text-neo-white"
     >
       {classroomId && <LiveGameBridge classroomId={classroomId} onChange={setLive} />}
 

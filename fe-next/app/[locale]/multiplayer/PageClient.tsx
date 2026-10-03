@@ -12,11 +12,6 @@ import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
-import { EducationHeader } from '@/components/education/EducationHeader';
-import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
-import { TeacherLiveControls } from '@/components/education/TeacherLiveControls';
-import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
-import { StudentWordBank } from '@/components/education/StudentWordBank';
 import { hideClassroomChrome, classroomPanelExpanded } from '@/lib/education/classroomLobbyChrome';
 import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
 import { ConnectionQualityChip } from '@/components/multiplayer/ConnectionQualityChip';
@@ -25,6 +20,7 @@ import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
+import { classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
 import { useMpPageState } from './useMpPageState';
 import { MpPhaseRouter } from './MpPhaseRouter';
 import { MpExitProvider } from '@/hooks/useMpExit';
@@ -38,17 +34,54 @@ const HostLeftGraceModal = nextDynamic(
   { ssr: false },
 );
 
+// Classroom-only chrome (1375 combined lines): every non-classroom multiplayer
+// visitor — the vast majority — was parsing all four regardless. None render
+// until classroom/gameActive gates pass below, so lazy-load like the
+// grace modal above.
+const EducationHeader = nextDynamic(
+  () => import('@/components/education/EducationHeader').then((m) => m.EducationHeader),
+  { ssr: false },
+);
+const ClassroomModeBanner = nextDynamic(
+  () => import('@/components/education/ClassroomModeBanner').then((m) => m.ClassroomModeBanner),
+  { ssr: false },
+);
+const TeacherLiveControls = nextDynamic(
+  () => import('@/components/education/TeacherLiveControls').then((m) => m.TeacherLiveControls),
+  { ssr: false },
+);
+const GamePausedOverlay = nextDynamic(
+  () => import('@/components/education/GamePausedOverlay').then((m) => m.GamePausedOverlay),
+  { ssr: false },
+);
+const ExitConfirmDialog = nextDynamic(
+  () => import('@/host/components/HostDialogs').then((m) => m.ExitConfirmDialog),
+  { ssr: false },
+);
+const ClassroomGameEndedState = nextDynamic(
+  () => import('@/components/education/ClassroomGameEndedState').then((m) => m.ClassroomGameEndedState),
+  { ssr: false },
+);
+const StudentWordBank = nextDynamic(
+  () => import('@/components/education/StudentWordBank').then((m) => m.StudentWordBank),
+  { ssr: false },
+);
+
 export default function MultiplayerPageClient(): React.JSX.Element {
   const {
-    t, language, router, isClassroomMode, isClassroomHost, username, hostUsername, gameCode, prefilledRoomCode,
+    t, language, router, isClassroomHost, username, hostUsername, gameCode, prefilledRoomCode,
     isActive, isHost, showResults, gameActive, liveGameMode, playersInRoom, lessonDataState, liveClassroomGame,
     socket, isConnected, isSpectator, spectators, handleUpgradeToPlayer, signalIntentionalLeave,
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
     classroomAccessibility, classroomLevel, classroomWordBank, teacherStrip, quizOwnsScreen,
     socketContextValue, hostLeftState, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
-    handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
+    classroomEnded, retryClassroomRoom, handleExitToLobby, exitMp, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
     routerProps,
   } = useMpPageState();
+  // A classroom host's header Back closes the room for every student, so it asks first.
+  const [hostExitOpen, setHostExitOpen] = React.useState(false);
+  const hostGuardsBack = isActive && (isHost || isClassroomHost);
+  const inClassroom = classroomContext === 'classroom';
 
   return (
     <SocketContext.Provider value={socketContextValue}>
@@ -109,11 +142,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
               <ConnectionQualityChip />
             </div>
           )}
-          {isClassroomMode ? (
+          {inClassroom ? (
             // Gated on `gameActive`, NOT `isActive`: `onJoined` sets `isActive`
             // the moment the host lands in the LOBBY, so the old predicate hid
             // the join code exactly when the teacher needed it on a projector.
-            hideClassroomChrome({ gameActive: gameActive || quizOwnsScreen, showResults }) ? null : (
+            hideClassroomChrome({ gameActive: gameActive || quizOwnsScreen || teacherStrip.visible, showResults }) ? null : (
               <>
                 <EducationHeader
                   showBackButton
@@ -125,11 +158,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
                   // homepage-bounce audit).
                   backHref={
                     multiplayerExitDestination({
-                      isClassroomMode,
+                      isClassroomMode: inClassroom,
                       isHost: isHost || isClassroomHost,
                       locale: language,
                     }) || `/${language}/education`
                   }
+                  onBack={hostGuardsBack ? () => setHostExitOpen(true) : undefined}
                 />
                 <ClassroomModeBanner
                   lessonData={lessonDataState}
@@ -140,6 +174,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
                   // own share code would blink out of existence on every reload.
                   isHost={isHost || isClassroomHost}
                   liveGame={liveClassroomGame}
+                  showResults={showResults}
                 />
               </>
             )
@@ -177,6 +212,15 @@ export default function MultiplayerPageClient(): React.JSX.Element {
               students={playersInRoom} hostUsername={hostUsername || username} socket={socket}
             />
           )}
+          {hostGuardsBack && inClassroom && (
+            <ExitConfirmDialog
+              open={hostExitOpen}
+              onOpenChange={setHostExitOpen}
+              onConfirm={handleExitToLobby}
+              t={t}
+              classroom
+            />
+          )}
           <HostLeftGraceModal
             isOpen={!!hostLeftState}
             seconds={10}
@@ -196,6 +240,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
               setHostLeftState(null);
             }}
           />
+          {classroomEnded !== null && (
+            <ClassroomGameEndedState
+              roomCode={classroomEnded}
+              message={t(CLASSROOM_ROOM_GONE_KEY)}
+              hubHref={classroomStudentHomePath(language)}
+              onRetry={retryClassroomRoom}
+            />
+          )}
         </div>
       </ErrorBoundary>
       </MpExitProvider>

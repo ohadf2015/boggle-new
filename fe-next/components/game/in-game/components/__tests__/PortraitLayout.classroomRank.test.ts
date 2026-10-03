@@ -50,7 +50,9 @@ describe('PortraitLayout — classroom students get the local-rank rail', () => 
   });
 
   it('feeds the rail the same deferred leaderboard, not the raw socket burst', () => {
-    expect(SRC).toMatch(/<StudentRankRail[\s\S]{0,300}leaderboard=\{deferredLeaderboard\}/);
+    // The Pro top-3 dial may wrap it in a trim — still the deferred list in,
+    // never the raw socket burst.
+    expect(SRC).toMatch(/<StudentRankRail[\s\S]{0,400}leaderboard=\{[^}]*deferredLeaderboard[^}]*\}/);
   });
 
   it('feeds the rail the live word feedback so the mascot can react', () => {

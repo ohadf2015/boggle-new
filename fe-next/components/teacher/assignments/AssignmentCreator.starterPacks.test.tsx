@@ -37,6 +37,7 @@ vi.mock('@/hooks/useTeacherPro', () => ({
 vi.mock('@/lib/education/telemetry', () => ({
   trackTeacherFirstAssignmentTemplate: vi.fn(),
   trackEduTeacherActionFailed: vi.fn(),
+  trackEduFirstAssignmentCreated: vi.fn(),
 }));
 vi.mock('react-hot-toast', () => ({
   __esModule: true,

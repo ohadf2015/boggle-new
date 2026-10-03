@@ -58,6 +58,12 @@ export function buildRoundPayload(gameCode: string, game: GameState, opts: Round
 
   if (kind === 'retry') payload.retry = true;
 
+  // The teacher's pressure dials, stashed on the game state at round start.
+  // Riding the ONE builder is what makes the dials identical on start, retry,
+  // reconnect, late-join and recovery — presence is the signal ("this is a
+  // classroom room"), so a casual room never carries the field.
+  if (game.classroomPressure) payload.pressure = game.classroomPressure;
+
   if (resume) {
     payload[kind === 'lateJoin' ? 'lateJoin' : 'reconnect'] = true;
     payload.skipAck = true;

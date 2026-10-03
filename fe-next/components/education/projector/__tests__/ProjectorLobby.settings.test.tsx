@@ -85,6 +85,59 @@ describe('ProjectorLobby — board size label matches the setup screen', () => {
   });
 });
 
+describe('ProjectorLobby — the calm dial hides the round clock', () => {
+  beforeEach(() => { mockLiveGame = null; });
+
+  const CLASSIC_OFF = {
+    gameCode: 'JATS5Z',
+    classroomId: 'c1',
+    classroomName: 'ELA Period 3',
+    lessonNames: ['Week 3'],
+    gameMode: 'classic',
+    settings: {
+      timerMinutes: 3,
+      boardSize: 'medium',
+      allowLateJoin: true,
+      vocabQuizQuestionCount: null,
+      vocabQuizSeconds: null,
+      pressure: { leaderboard: 'full', timer: 'off', speedScoring: true },
+    },
+  };
+
+  it('timer=off: no minutes row, even though the room record carries a timer', () => {
+    mockLiveGame = CLASSIC_OFF;
+    render(<ProjectorLobby {...baseProps} />);
+    expect(screen.queryByText('3 common.minutes')).not.toBeInTheDocument();
+  });
+
+  it('timer=off on a quiz: no per-question seconds row', () => {
+    mockLiveGame = {
+      ...CLASSIC_OFF,
+      gameMode: 'vocab-quiz',
+      settings: {
+        timerMinutes: null,
+        boardSize: null,
+        allowLateJoin: true,
+        vocabQuizQuestionCount: 8,
+        vocabQuizSeconds: 25,
+        pressure: { leaderboard: 'full', timer: 'off', speedScoring: true },
+      },
+    };
+    render(<ProjectorLobby {...baseProps} classroomGameMode="vocab-quiz" />);
+    expect(screen.queryByText('vocabQuiz.setup.seconds:25')).not.toBeInTheDocument();
+    expect(screen.getByText('8 · education.classroomGame.questions')).toBeInTheDocument();
+  });
+
+  it('timer=full: the clock row stays — the dial is a display choice, not a timer delete', () => {
+    mockLiveGame = {
+      ...CLASSIC_OFF,
+      settings: { ...CLASSIC_OFF.settings, pressure: { leaderboard: 'full', timer: 'full', speedScoring: true } },
+    };
+    render(<ProjectorLobby {...baseProps} />);
+    expect(screen.getByText('3 common.minutes')).toBeInTheDocument();
+  });
+});
+
 describe('ProjectorLobby — local settings beat the server record, never a default', () => {
   beforeEach(() => { mockLiveGame = null; });
 

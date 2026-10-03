@@ -46,6 +46,7 @@ const MODE_KEY: Record<string, string> = {
   blast: 'blast',
   'wheel-rush': 'wheelRush',
   'vocab-quiz': 'vocabQuiz',
+  wordcraft: 'wordcraft',
 };
 
 const PRACTICE_KEY: Record<BasePracticeMode, string> = {

@@ -5,7 +5,7 @@
  * (chainable query stub); teacher ownership is enforced by RLS, not here.
  */
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
-import { getClassMastery } from '../wordMastery';
+import { getClassMastery, getStudentMasterySeries } from '../wordMastery';
 import { supabase } from '@/lib/supabase';
 
 vi.mock('@/lib/supabase', () => ({
@@ -97,6 +97,67 @@ describe('getClassMastery', () => {
     mockTable({ error: { message: 'boom' } });
 
     const { data, error } = await getClassMastery('class-1');
+
+    expect(data).toBeNull();
+    expect(error).toEqual({ message: 'boom' });
+  });
+});
+
+describe('getStudentMasterySeries — the per-student arc read', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('filters to the classroom AND the student, asked-word rows only', async () => {
+    const q = mockTable({ data: [] });
+
+    await getStudentMasterySeries('class-1', 'stu-1');
+
+    expect(q.eq).toHaveBeenCalledWith('classroom_id', 'class-1');
+    expect(q.eq).toHaveBeenCalledWith('student_id', 'stu-1');
+    expect(q.not).toHaveBeenCalledWith('results->>lessonWordsAsked', 'is', null);
+  });
+
+  it('returns the accuracy series and this student\'s word trajectories', async () => {
+    mockTable({
+      data: [
+        {
+          student_id: 'stu-1',
+          started_at: '2026-09-01T10:00:00Z',
+          results: { gameCode: 'g1', lessonWordsAsked: ['cat', 'dog'], lessonWordsFound: ['cat'] },
+        },
+        {
+          student_id: 'stu-1',
+          started_at: '2026-09-02T10:00:00Z',
+          results: { gameCode: 'g2', lessonWordsAsked: ['cat', 'dog'], lessonWordsFound: ['cat', 'dog'] },
+        },
+      ],
+    });
+
+    const { data, error } = await getStudentMasterySeries('class-1', 'stu-1');
+
+    expect(error).toBeNull();
+    expect(data?.points).toHaveLength(2);
+    expect(data?.points[0]).toMatchObject({ gameCode: 'g1', accuracy: 50 });
+    expect(data?.points[1]).toMatchObject({ gameCode: 'g2', accuracy: 100 });
+    const dog = data?.mastery?.words.find((w) => w.word === 'dog');
+    expect(dog?.trend).toBe('improving');
+    expect(dog?.outcomes).toEqual([false, true]);
+  });
+
+  it('returns an empty arc (not null) when the student has no evidence', async () => {
+    mockTable({ data: [] });
+
+    const { data, error } = await getStudentMasterySeries('class-1', 'stu-quiet');
+
+    expect(error).toBeNull();
+    expect(data).toEqual({ points: [], mastery: null });
+  });
+
+  it('surfaces the query error without throwing', async () => {
+    mockTable({ error: { message: 'boom' } });
+
+    const { data, error } = await getStudentMasterySeries('class-1', 'stu-1');
 
     expect(data).toBeNull();
     expect(error).toEqual({ message: 'boom' });

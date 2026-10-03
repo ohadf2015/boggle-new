@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Education Gauntlet — Progress</title>
+<meta http-equiv="refresh" content="30">
+<style>
+  :root { --bg:#0f1420; --panel:#182032; --ink:#e8ecf4; --dim:#8b94a8; --lime:#c8f04a; --pink:#ff5d8f; --cyan:#4ad8f0; --purple:#a78bfa; --line:#2a3550; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 -apple-system, "SF Pro", system-ui, sans-serif; padding:32px 20px 64px; }
+  main { max-width:860px; margin:0 auto; }
+  h1 { font-size:30px; margin:0 0 4px; }
+  .sub { color:var(--dim); margin:0 0 28px; font-size:12px; }
+  .phase { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin-bottom:14px; }
+  .phase h2 { font-size:20px; text-transform:uppercase; letter-spacing:.08em; margin:0 0 10px; color:var(--cyan); }
+  .phase.done h2 { color:var(--lime); }
+  .phase.active h2::after { content:" ●"; color:var(--pink); animation:pulse 1.2s infinite; }
+  @keyframes pulse { 50% { opacity:.25; } }
+  ul { margin:0; padding-left:18px; }
+  li { margin:3px 0; color:var(--dim); }
+  li b { color:var(--ink); font-weight:600; }
+  .piece { display:flex; gap:10px; align-items:baseline; padding:6px 0; border-top:1px solid var(--line); }
+  .piece:first-of-type { border-top:0; }
+  .dot { width:9px; height:9px; border-radius:50%; background:var(--dim); flex:none; position:relative; top:-1px; }
+  .dot.build { background:var(--pink); animation:pulse 1.2s infinite; }
+  .dot.judge { background:var(--purple); animation:pulse 1.2s infinite; }
+  .dot.win { background:var(--lime); }
+  .dot.wait { background:var(--line); }
+  .piece span { color:var(--dim); font-size:12px; }
+  .piece b { color:var(--ink); }
+  #log { font:12px/1.6 ui-monospace, Menlo, monospace; color:var(--dim); white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Education Module Gauntlet</h1>
+  <p class="sub">Bar: Kahoot! EDU host live (lobby, PIN, question, leaderboard, podium, reports) · updated <span id="ts">2026-09-30</span> · auto-refresh 30s</p>
+
+  <div class="phase done" id="ph-recon">
+    <h2>Phase 1 — Recon &amp; Evidence ✓</h2>
+    <ul>
+      <li><b>Education module map ✓</b> — 15+ routes, HQ renders ~10+ competing surfaces, nav bug traced to lib/navigation/sectionHome.ts allowlist, wordcraft = missing live classroom mode, cosy calm theme exists</li>
+      <li><b>Kahoot evidence pack ✓</b> — wk/evidence-pack/NOTES.md + 11 screenshots. Bar: match Kahoot's live ceremony, beat it on longitudinal analytics, remediation loops, pressure dials.</li>
+    </ul>
+  </div>
+
+  <div class="phase active" id="ph-pieces">
+    <h2>Phase 2 — Pieces (build → blind judge → loop)</h2>
+    <div id="pieces">
+      <div class="piece"><div class="dot win"></div><div><b>P1 · Nav integrity ✓</b> <span>— 3 rounds. Prefix rule + tri-state classroom context + deferred flush + 429 retry. Critic verified by state incl. revert experiment</span></div></div>
+      <div class="piece"><div class="dot win"></div><div><b>P2 · Teacher HQ declutter ✓</b> <span>— critic WIN round 2 (all verified live in fresh profile). Final nits closing: starter-pack + mobile-chip truncation</span></div></div>
+      <div class="piece"><div class="dot win"></div><div><b>P1b · access-request 500 ✓</b> <span>— trim root cause + truthful 202 + truthful form state (6 locales, he/ja verified native) + loud admin-notify + retry affordance</span></div></div>
+      <div class="piece"><div class="dot win"></div><div><b>P3 · Classroom management ✓</b> <span>— critic: "beats Kahoot's post-create interstitial — code and GO already on screen, zero extra clicks". Kindness nit closing: "Period 3 (2)"</span></div></div>
+      <div class="piece"><div class="dot win"></div><div><b>P4 · Student hub engagement ✓</b> <span>— critic WIN round 2 (keeps judged principled, fs-contract pins the class). Final nits: h1 semantics, title fallback, div→button</span></div></div>
+      <div class="piece"><div class="dot win"></div><div><b>P5 · Reports → student arc ✓</b> <span>— critic WIN + round-2 nits done (he maqaf ×3 w/ guard test, dot aria ×6 locales, sparkline keep-LTR documented). r2 commit queued behind the in-flight push</span></div></div>
+      <div class="piece"><div class="dot build"></div><div><b>P6 · Wordcraft live classroom mode</b> <span>— 2026-09-30: piece tests  green (frontend 33 + backend 44) and repo tsc RC=0. Not re-judged live: the :3100 process has been up since 01:14 and will not have loaded backend handler edits.</span></div></div>
+      <div class="piece"><div class="dot build"></div><div><b>P7 · Pro pressure dials</b> <span>— 2026-09-30: hidden-standings tests green (StudentRoundOutcome, ClassroomResultsCard, MpResults, round HUD, vocab quiz). Live re-judge still open.</span></div></div>
+      <div class="piece"><div class="dot lose"></div><div><b>P8 · Landing first screen</b> <span>— stalled. Critic picked Kahoot: the lime control is the access request, because an unapproved teacher cannot host. A “Start Game” label was tried and reverted — it opened the same form. Join sits in the hero. Back is off the module root.</span></div></div>
+      <div class="piece"><div class="dot win"></div><div><b>P9 · Teacher opens the lobby ✓</b> <span>— r1 lost: the signed-in home was still a catalog. r2: approved teacher is sent to the live lobby (pick a game, one go-live, one join code). Critic picked that over the Kahoot store frames. A logged-in Kahoot host lobby is still unseen in the bar.</span></div></div>
+    </div>
+  </div>
+
+  <div class="phase" id="ph-gate">
+    <h2>Phase 3 — Gate &amp; Push</h2>
+    <ul>
+      <li><b>LIVE on origin/master ✓</b> — P1 a62511c2d · P2 962c8c3f9 · P1b e3fc9a809 · P3 c875bb9b6 · P4 602d8f552 · P5 8ff6c9cbc (push in flight, pre-push shards running)</li>
+      <li>Incident: company-brain auto-stashed whole tree mid-push 21:42 → P5 commit orphaned → recovered via cherry-pick; wk/ restored; P7 self-restored from stash@{0}; P6 restore pending (wordcraft files stranded in stash)</li>
+      <li>Incident 2: main-tree push blocked by P6's mode-count reds (landingTextParity ×12 + four-modes icon test — wordcraft makes 5→6 live modes; snapshot regen assigned to P6 as deliberate copy change). P5 pushing from clean gauntlet-verify worktree instead. Incident 3: stale messagesManifest in P5 commit (surgical staging left derived artifact behind) — fixed as 40a75b0fb; origin drifted to 194b9254e during hook run, rebase may follow</li>
+      <li>Remaining: P6/P7 commit+push when critics clear them, P5-r2 maqaf commit after push, then final full gate</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <h2>Log</h2>
+    <div id="log">[P9 ✓] critic r2 picked the live lobby over Kahoot store frames. Approved teacher opening /education lands on classroom-game (EN, HE, phone). r1 catalog lost. Kahoot host lobby still unseen. Piece tests 37 green. Full lint/test/build not run.
+[P9] approved teacher Start Game → /education/classroom-game lobby. Was /multiplayer. Lime is the only primary. 31 landing tests green. Live: EN + HE + phone. Critic on unlabeled shots.
+[2026-09-30] resumed. Kahoot host article still bot-walled; evidence pack reused. P6/P7 piece tests + tsc green, live re-judge not run.
+[P8] education landing: no TopBackLink, join CTA in the hero, Pro card after the decision. Piece tests + eslint on touched files green. Full npm test/build not run (dirty tree from other sessions).
+[start] gauntlet launched — recon fan-out: module map + Kahoot evidence pack
+[P1 ✓] nav integrity closed after 3 rounds — prefix rule, tri-state classroom context, deferred flush, 429 retry; critic ran the revert experiment to prove the wiring pin
+[P1b] access-request 500 root-caused: admin client built from untrimmed env key (trailing newline poisoned apikey header) → truthful 202 approvalPending; critic verifying
+[P2 r2] builder closing truncated-chip + dead-void gaps; [P4 r1] student hub builder running
+[env] dev server :3100 · test teacher p2critic-0929@lexiclash.test · class CA3ZBR</div>
+  </div>
+</main>
+</body>
+</html>

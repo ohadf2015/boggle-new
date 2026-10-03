@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAssignments } from '@/hooks/useAssignments';
 import type { TeacherAssignment, AssignmentStatus } from '@/lib/supabase/education/types';
@@ -8,13 +9,17 @@ import { cn } from '@/lib/utils';
 import { Plus, BookOpen, Swords, ChevronDown, ChevronUp, Crosshair, Grid2x2 } from 'lucide-react';
 import { readAssignmentMode } from '@/lib/education/wordcraftAssignment';
 import { readAssignmentFocus } from '@/lib/education/vocabFocus';
+import { liveClassroomHref } from '@/lib/education/startLiveClassCta';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
 import CompletionTracker from './CompletionTracker';
+import { StartLiveClassCta } from '../hq/StartLiveClassCta';
 
 interface AssignmentTrackingPanelProps {
   classroomId: string;
   onCreateAssignment?: () => void;
+  joinCode?: string;
+  studentCount?: number;
 }
 
 type FilterTab = 'all' | 'active' | 'overdue' | 'completed';
@@ -146,8 +151,11 @@ function AssignmentCard({
 export default function AssignmentTrackingPanel({
   classroomId,
   onCreateAssignment,
+  joinCode = '',
+  studentCount,
 }: AssignmentTrackingPanelProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const router = useRouter();
   const { assignments, isLoading, error, getAssignmentStatus } = useAssignments(classroomId);
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -208,6 +216,13 @@ export default function AssignmentTrackingPanel({
 
   return (
     <div className="space-y-4">
+      <StartLiveClassCta
+        classroomId={classroomId}
+        studentCount={studentCount ?? assignments[0]?.student_count ?? 0}
+        assignmentCount={assignments.length}
+        joinCode={joinCode}
+        onStart={() => router.push(liveClassroomHref(language, classroomId))}
+      />
       {/* Header with tabs and create button */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-2 flex-wrap flex-1">

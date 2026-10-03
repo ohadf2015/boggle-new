@@ -28,6 +28,7 @@ const WordTowerVersus = dynamic(
 // dynamic above because it pulls the pixi scene.
 import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
 import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVersus';
+import { WordcraftLiveView } from '@/components/multiplayer/wordcraft/WordcraftLiveView';
 import type { LetterGrid, Language, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
@@ -260,6 +261,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Crossword race — all players solve the same puzzle, no letter grid
   if (gameMode === 'crossword') {
     return <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} />;
+  }
+
+  // Wordcraft — lesson-dealt solo race vs the Baron, no shared grid
+  if (gameMode === 'wordcraft') {
+    return <WordcraftLiveView socket={socket} username={username} t={t} remainingTime={remainingTime} />;
   }
 
   // Use letterGrid or shufflingGrid

@@ -13,6 +13,9 @@ import { stageReteachLessonData } from '@/lib/education/classroomGameHandoff';
 import { modeSceneOwnsHeroSlot } from '@/lib/education/roundEndResultsRoute';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useBlastBoardClearedByLocal } from '@/hooks/gameState/store';
+import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
+import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
+import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { MpResultsController } from './useMpResultsController';
 import { useOpenLessonPractice } from './useOpenLessonPractice';
 
@@ -120,6 +123,11 @@ function DetailsBody({ c }: { c: MpResultsController }) {
   const classroomStandings = useMemo(() => toStandings(sortedScores), [sortedScores]);
   const openLessonPractice = useOpenLessonPractice();
 
+  // TRUE hidden: the recap keeps the pedagogy, drops the placings (final = reveal).
+  const pressure = useClassroomPressure();
+  const isFinalRound = (props.seriesRoundNumber ?? 0) >= (props.seriesTotalGames ?? SERIES_TOTAL_GAMES);
+  const hideClassPlacings = pressure != null && isLeaderboardHidden(pressure) && !isFinalRound;
+
   // A classroom recap reaches account-less students (they join with a code), so it is NOT guest-gated.
   const postGameWordReviewNode = classroomSummary ? (
     <>
@@ -133,6 +141,7 @@ function DetailsBody({ c }: { c: MpResultsController }) {
         username={username}
         isTeacher={isHost}
         standings={classroomStandings}
+        hideClassPlacings={hideClassPlacings}
         onReteach={isHost && classroomSummary.missedWords.length > 0 ? handleReteachRound : undefined}
         onRematch={isHost ? handleRematch : undefined}
         onPractice={classroomSummary.lessonIds[0] ? () => openLessonPractice(classroomSummary.lessonIds[0]) : undefined}
@@ -198,6 +207,8 @@ function DetailsBody({ c }: { c: MpResultsController }) {
     shareCardStats: data.shareCardStats,
     // The reveal screen already owns the standings; the sheet is the deep dive.
     hideStandings: true,
+    // TRUE hidden: the revenge card names the winner and the gap — a placing.
+    suppressRevenge: hideClassPlacings,
     hideInlineCta: true,
     hideBestWord: resolvedGameMode === 'blast' && !!blastPlayerStats[username]?.bestWord,
   };

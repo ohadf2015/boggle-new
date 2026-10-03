@@ -26,7 +26,7 @@ import { trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking'
 import { cn } from '@/lib/utils';
 import { NewModesSpotlight } from '../NewModesSpotlight';
 
-export const FRESH_MODE_KEYS = ['wordCraft', 'connections', 'brainGym', 'blast'] as const;
+export const FRESH_MODE_KEYS = ['arena', 'wordCraft', 'connections', 'brainGym', 'blast'] as const;
 type FreshModeKey = (typeof FRESH_MODE_KEYS)[number];
 
 /** Literal class strings (Tailwind v4 only sees literals). Neighbours never share a colour. */
@@ -41,7 +41,7 @@ const CARD_TILT = ['-rotate-1', 'rotate-1'] as const;
  * bleeds its FX to the edge and brainGym is already tall, so they stay at 1.
  */
 const ART_ZOOM: Record<FreshModeKey, number> = {
-  wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
+  arena: 1, wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
 };
 
 function prefersReducedMotion(): boolean {

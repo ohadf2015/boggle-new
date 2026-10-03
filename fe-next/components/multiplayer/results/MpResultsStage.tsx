@@ -24,6 +24,8 @@ import { useLockedBranch, useResultBeats } from './useResultBeats';
 import { MpResultsHeader } from './MpResultsHeader';
 import { MpStandingsBoard } from './MpStandingsBoard';
 import { MpMyCard } from './MpMyCard';
+import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
+import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { MpNextModeCard } from './MpNextModeCard';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
 import MpResultsDetails from './MpResultsDetails';
@@ -31,6 +33,12 @@ import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
 import { roundAwards, seriesGrid } from './mpResultsStory';
 import type { MpResultsController } from './useMpResultsController';
 import fx from './mpResults.module.css';
+import { useOpenLessonPractice } from './useOpenLessonPractice';
+import { classroomRoundModeMeta } from '../round/roundModes';
+import { StudentMissedWords } from '@/components/student/live/StudentMissedWords';
+import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
+import { myMissedWords } from '@/components/student/live/missedWords';
+import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
@@ -60,6 +68,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     series: { roundNumber: seriesRoundNumber, standings: seriesStandings },
   }), [data.sortedScores, username, data.normalizeUsername, seriesRoundNumber, seriesStandings]);
   const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
+  // The teacher's hidden dial means TRUE hidden — the final screen IS the reveal.
+  const pressure = useClassroomPressure();
+  const hideOutcome = branch !== 'final' && pressure != null && isLeaderboardHidden(pressure);
   // The final screen of a series is judged on the series: the board becomes the
   // series ladder, and my card, the verdict (sound/confetti/share) and the
   // champion chip all read my one placing on it. (The branch locks on the TIME!
@@ -149,6 +160,12 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   }, [isHost, c, handleMarkReady]);
 
   const nextMode = nextModeForViewer<GameModeOption>({ isHost, hostPick: c.selectedGameMode });
+  const openLessonPractice = useOpenLessonPractice();
+  const classroomStudent = c.isClassroom && !isHost && !!props.classroomSummary;
+  const missedWords = useMemo(() => myMissedWords(props.classroomSummary, username), [props.classroomSummary, username]);
+  const practiceLessonId = props.classroomSummary?.lessonIds?.[0];
+  const switchedTo = classroomStudent && props.classroomNextMode && props.classroomNextMode !== c.resolvedGameMode ? props.classroomNextMode : null;
+  const nextModeLabel = switchedTo ? t(classroomRoundModeMeta(switchedTo).nameKey) : undefined;
   const me = data.currentPlayerData;
   const bestWord = useMemo(() => pickBestWord(me?.allWords), [me]);
   const roundGap = useMemo(() => rivalGap(rows), [rows]);
@@ -158,6 +175,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   // otherwise the round is told as three awards.
   const grid = useMemo(() => seriesGrid({ ladder, standings: seriesStandings, rounds: seriesRoundNumber }), [ladder, seriesStandings, seriesRoundNumber]);
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
+
+  const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
 
   const header = (
     <MpResultsHeader
@@ -192,13 +211,22 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             <span className="uppercase">· {t('mpUi.results.seriesChampion')}</span>
           </p>
         )}
-        <MpStandingsBoard
-          rows={visible.rows}
-          hiddenCount={visible.hiddenCount}
-          isRevealed={(pos) => seen(`row-${pos}`)}
-          t={t}
-          className="min-h-0 flex-1 lg:max-h-[calc(560px*var(--mp-u,1))]"
-        />
+        {hideOutcome ? (
+          <p
+            data-testid="mp-results-reveal-note"
+            className="m-auto rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 text-center font-neo-body font-bold text-neo-cream"
+          >
+            {t('education.classroomGame.pressure.revealAtEnd')}
+          </p>
+        ) : (
+          <MpStandingsBoard
+            rows={visible.rows}
+            hiddenCount={visible.hiddenCount}
+            isRevealed={(pos) => seen(`row-${pos}`)}
+            t={t}
+            className="min-h-0 flex-1 lg:max-h-[calc(560px*var(--mp-u,1))]"
+          />
+        )}
       </div>
       <div className="shrink-0 flex flex-col gap-[calc(10px*var(--mp-u,1))] lg:justify-center">
         <div className="relative">
@@ -228,10 +256,19 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           gap={gap}
           revealed={seen('card')}
           series={!!series}
+          hideClassPosition={hideOutcome}
           t={t}
         />
         </div>
-        {branch === 'intermission' && (
+        {classroomStudent ? (
+          <StudentMissedWords
+            words={missedWords}
+            language={props.roomLanguage ?? c.language}
+            t={t}
+            onPractice={practiceLessonId && missedWords.length > 0 ? () => openLessonPractice(practiceLessonId) : undefined}
+            className={cn('shrink-0', !seen('card') && 'invisible', seen('card') && fx.cardIn)}
+          />
+        ) : branch === 'intermission' && (
           <MpNextModeCard
             mode={nextMode}
             onChange={isHost && !c.isClassroom ? c.setSelectedGameMode : undefined}
@@ -242,7 +279,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         )}
         {seen('card') && (grid ? (
           <MpSeriesGrid grid={grid} t={t} className={cn('hidden lg:block', fx.cardIn)} />
-        ) : awards ? (
+        ) : awards && !hideOutcome ? (
           <MpRoundAwards awards={awards} t={t} className="hidden lg:block" />
         ) : null)}
         {/* Native AdMob banner / CrazyGames banner. The web dev placeholder
@@ -265,7 +302,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
-            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} t={t} />
+            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} leaveKey={exitCopy.leaveKey} t={t} />
           ) : (
             <MpIntermissionFooter
               isHost={isHost}
@@ -277,6 +314,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
               adHold={c.adGate.anyAdActive}
               onStart={startNext}
               onReady={markReady}
+              nextModeLabel={nextModeLabel}
               t={t}
             />
           )}
@@ -310,17 +348,21 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         </>
       )}
       <MpResultsDetails open={detailsOpen} onClose={() => setDetailsOpen(false)} c={c} />
+      {classroomStudent ? (
+        <StudentExitDialog open={c.showExitConfirm} onOpenChange={c.setShowExitConfirm} onConfirm={c.confirmExitRoom} t={t} analyticsId="exit_room_confirm" />
+      ) : (
       <ConfirmationDialog
         open={c.showExitConfirm}
         onOpenChange={c.setShowExitConfirm}
-        title={t('playerView.exitConfirmation')}
-        description={t('results.exitWarning')}
+        title={t(exitCopy.titleKey)}
+        description={t(exitCopy.bodyKey)}
         confirmText={t('common.confirm')}
         cancelText={t('common.cancel')}
         onConfirm={c.confirmExitRoom}
         variant="default"
         analyticsId="exit_room_confirm"
       />
+      )}
     </>
   );
 }

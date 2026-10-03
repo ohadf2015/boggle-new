@@ -7,7 +7,7 @@
  * last featured slot instead of disappearing.
  */
 
-const RANKED = ['vocab-quiz', 'classic', 'blast', 'word-hunt', 'wheel-rush'];
+const RANKED = ['vocab-quiz', 'classic', 'blast', 'word-hunt', 'wheel-rush', 'wordcraft'];
 
 export const FEATURED_MODE_COUNT = 3;
 

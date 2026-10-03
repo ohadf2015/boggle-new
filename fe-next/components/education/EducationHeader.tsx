@@ -29,6 +29,7 @@ import { SearchIconButton } from './SearchIconButton';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
+import { educationBackHref } from '@/lib/navigation/educationBackHref';
 
 interface EducationHeaderProps {
   /** Additional class names */
@@ -38,12 +39,14 @@ interface EducationHeaderProps {
   /** Custom title override */
   title?: string;
   /**
-   * Override where the back button goes. Defaults to `/{locale}/education`.
+   * Override where the back button goes. Defaults to `educationBackHref`.
    * A classroom multiplayer game passes its own hub here (teacher dashboard /
    * student hub via `multiplayerExitDestination`) — the education landing is
    * the wrong place mid-game.
    */
   backHref?: string;
+  /** Replaces the navigation entirely, e.g. a live host who must confirm leaving first. */
+  onBack?: () => void;
 }
 
 /**
@@ -68,6 +71,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   showBackButton = false,
   title,
   backHref,
+  onBack,
 }) => {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
@@ -80,12 +84,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const [mounted, setMounted] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Track client-side mounting for portal
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
@@ -98,7 +100,6 @@ export const EducationHeader = memo<EducationHeaderProps>(({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMobileMenu]);
 
-  // Close mobile menu on escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -117,16 +118,15 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   // itself gates on.
   const isTeacher = isTeacherProfile(profile);
 
-  // Determine current section for active state
   const isOnTeacherSection = pathname?.includes('/teacher');
   const isOnStudentSection = pathname?.includes('/student');
 
-  // Handle back to education landing (or the caller-supplied override)
   const handleBackClick = useCallback(() => {
-    router.push(backHref || `/${language}/education`);
-  }, [backHref, language, router]);
+    if (onBack) return onBack();
+    const role = isTeacher ? 'teacher' : profile?.user_role === 'student' ? 'student' : null;
+    router.push(backHref || educationBackHref({ pathname, locale: language, role }));
+  }, [backHref, language, router, pathname, isTeacher, profile?.user_role, onBack]);
 
-  // Handle sign out
   const handleSignOut = useCallback(async () => {
     setShowMobileMenu(false);
     await signOut();
@@ -403,7 +403,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                             : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-neo-cream shadow-hard-sm hover:shadow-hard'
                         )}
                       >
-                        <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-cream/60 text-neo-black">
+                        <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink border-3 border-neo-black text-neo-black">
                           <BookOpen className="w-4 h-4" aria-hidden="true" />
                         </span>
                         <span>{t('education.header.studentDashboard')}</span>
@@ -446,7 +446,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                             'shadow-hard-sm hover:shadow-hard'
                           )}
                         >
-                          <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-cream/60 text-neo-black">
+                          <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink border-3 border-neo-black text-neo-black">
                             <LogOut className="w-4 h-4" aria-hidden="true" />
                           </span>
                           <span>{t('auth.signOut')}</span>

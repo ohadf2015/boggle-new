@@ -61,7 +61,7 @@ export interface ClassroomGameSettings {
    * duplicate/rarity scoring, so widening that union would drag it into random
    * mode rolls, quick-play matchmaking and every board-engine mode branch.
    */
-  gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz';
+  gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft';
   /**
    * Word Hunt only: the lesson word the teacher pinned as the hunted target.
    * Empty/absent means "let the game pick". Re-validated against the lesson at

@@ -40,7 +40,7 @@ function WheelRushDesktopAdapterImpl({ fogProgress, currentSpin, totalSpins, las
             <div
               className={cn('h-full rounded-full origin-left rtl:origin-right transition-transform duration-500', fogPct > 0 ? 'bg-neo-pink' : 'bg-neo-lime/30')}
               style={{ transform: `scaleX(${(fogPct > 0 ? fogPct : 100) / 100})` }}
-              aria-label={`fog ${Math.round(fogPct)} percent`}
+              aria-label={t('mp.insights.fogAriaLabel', { percent: Math.round(fogPct) })}
             />
           </div>
         </ThemedPanel>

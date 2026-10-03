@@ -6,6 +6,7 @@ import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { MpHudBar } from '../shell/MpHudBar';
 import { MpBackButton } from '../shell/MpBackButton';
 import { getModePresentation } from '@/lib/multiplayer/modePresentation';
+import { classroomRoundModeMeta } from '../round/roundModes';
 import { cn } from '@/lib/utils';
 import { MODE_TONE } from './MpNextModeCard';
 import fx from './mpResults.module.css';
@@ -31,7 +32,9 @@ export interface MpResultsHeaderProps {
  */
 export function MpResultsHeader({ branch, round, totalRounds, playedMode, onLeave, t }: MpResultsHeaderProps) {
   const mode = getModePresentation(playedMode);
-  const tone = MODE_TONE[mode.color];
+  const classroomOnly = playedMode === 'wordcraft' || playedMode === 'vocab-quiz' ? classroomRoundModeMeta(playedMode) : null;
+  const tone = MODE_TONE[classroomOnly?.color ?? mode.color];
+  const modeLabelKey = classroomOnly?.nameKey ?? mode.labelKey;
   return (
     <MpHudBar
       className="border-b-[3px] border-neo-black bg-neo-navy"
@@ -51,7 +54,7 @@ export function MpResultsHeader({ branch, round, totalRounds, playedMode, onLeav
               {branch === 'final' ? t('mpUi.results.finalTitle') : t('mpUi.results.roundDone', { round, total: totalRounds })}
             </span>
             <span className="flex items-center gap-1.5">
-              {playedMode && <span className={cn('text-[calc(11px*var(--mp-u,1))] font-bold uppercase tracking-wider', tone.text)}>{t(mode.labelKey)}</span>}
+              {playedMode && <span className={cn('text-[calc(11px*var(--mp-u,1))] font-bold uppercase tracking-wider', tone.text)}>{t(modeLabelKey)}</span>}
               {branch === 'intermission' && totalRounds > 1 && (
                 <span aria-hidden="true" className="flex items-center gap-0.5">
                   {Array.from({ length: totalRounds }, (_, i) => (

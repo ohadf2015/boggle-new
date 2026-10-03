@@ -46,6 +46,14 @@ import {
   trackEduJoinCodeShown,
   trackEduJoinCodeCopied,
   trackEduFirstStudentJoined,
+  trackEduFirstAssignmentCtaShown,
+  trackEduFirstAssignmentCtaClicked,
+  trackEduFirstAssignmentCreated,
+  trackEduAssignmentStartLiveClicked,
+  trackTeacherHqProgressViewed,
+  trackTeacherHqUpgradeClicked,
+  trackTeacherAssignmentReportViewed,
+  trackTeacherAssignmentReportUpgradeClicked,
 } from '../telemetry';
 
 describe('education telemetry', () => {
@@ -358,5 +366,70 @@ describe('education telemetry', () => {
       classroom_id: 'cls-1',
     });
     expect(JSON.stringify(captureMock.mock.calls)).not.toContain('AB12CD');
+  });
+
+  it('first-assignment CTA events keep the three funnel names', () => {
+    trackEduFirstAssignmentCtaShown({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_first_assignment_cta_shown', {
+      classroom_id: 'cls-1',
+    });
+    trackEduFirstAssignmentCtaClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_first_assignment_cta_clicked', {
+      classroom_id: 'cls-1',
+    });
+    trackEduFirstAssignmentCreated({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_first_assignment_created', {
+      classroom_id: 'cls-1',
+    });
+  });
+
+  it('start-live-class CTA events keep the two funnel names and omit the join code', () => {
+    trackEduAssignmentStartLiveClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_assignment_start_live_clicked', {
+      classroom_id: 'cls-1',
+    });
+    trackEduJoinCodeCopied({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_join_code_copied', {
+      classroom_id: 'cls-1',
+    });
+    expect(JSON.stringify(captureMock.mock.calls)).not.toContain('AB12CD');
+  });
+
+  it('HQ class-progress events keep teacher_hq_progress_viewed and teacher_hq_upgrade_clicked', () => {
+    trackTeacherHqProgressViewed({
+      classroomId: 'cls-1',
+      studentCount: 4,
+      assignmentCount: 2,
+      submittedCount: 0,
+      hasPro: false,
+    });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_hq_progress_viewed', {
+      classroom_id: 'cls-1',
+      student_count: 4,
+      assignment_count: 2,
+      submitted_count: 0,
+      has_pro: false,
+    });
+    trackTeacherHqUpgradeClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_hq_upgrade_clicked', {
+      classroom_id: 'cls-1',
+    });
+  });
+
+  it('assignment-completion report events keep teacher_assignment_report_viewed and teacher_assignment_report_upgrade_clicked', () => {
+    trackTeacherAssignmentReportViewed({
+      classroomId: 'cls-1',
+      assignmentCount: 2,
+      hasPro: false,
+    });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_assignment_report_viewed', {
+      classroom_id: 'cls-1',
+      assignment_count: 2,
+      has_pro: false,
+    });
+    trackTeacherAssignmentReportUpgradeClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_assignment_report_upgrade_clicked', {
+      classroom_id: 'cls-1',
+    });
   });
 });

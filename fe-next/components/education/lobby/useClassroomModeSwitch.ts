@@ -59,6 +59,17 @@ function writeLocalGameMode(mode: ClassroomGameMode): void {
   }
 }
 
+/** The mode an in-place switch last wrote, or null when storage is empty or blocked. */
+export function readLocalGameMode(): ClassroomGameMode | null {
+  try {
+    const raw = sessionStorage.getItem('lessonGameData');
+    const mode = raw ? (JSON.parse(raw) as { gameMode?: unknown }).gameMode : null;
+    return typeof mode === 'string' && mode ? (mode as ClassroomGameMode) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function useClassroomModeSwitch({
   gameCode,
   currentMode,
@@ -86,6 +97,9 @@ export function useClassroomModeSwitch({
       if (!payload?.gameMode || (payload.gameCode && payload.gameCode !== gameCode)) return;
 
       const mode = payload.gameMode;
+      // The server acks the teacher directly AND through the room broadcast; only the first ack of OUR switch speaks.
+      const announce = pendingRef.current !== null;
+      pendingRef.current = null;
       writeLocalGameMode(mode);
       // `vocab-quiz` is deliberately NOT a member of the board `GameMode`
       // union (see shared/types/vocabQuiz): it has no grid, no submitted words
@@ -98,7 +112,12 @@ export function useClassroomModeSwitch({
       setAppliedMode(mode);
       setPendingMode(null);
       appliedCbRef.current?.(mode);
-      toast.success(t('education.modePicker.switched', { mode: t(`teacher.classroom.gameModes.${modeKeySuffix(mode)}`) }));
+      if (announce) {
+        toast.success(
+          t('education.modePicker.switched', { mode: t(`teacher.classroom.gameModes.${modeKeySuffix(mode)}`) }),
+          { id: `classroom-mode-switch-${gameCode}` }
+        );
+      }
     };
 
     const onError = (data?: unknown) => {
@@ -128,6 +147,7 @@ export function useClassroomModeSwitch({
         return;
       }
       setPendingMode(mode);
+      pendingRef.current = mode;
       socket.emit('updateClassroomGameMode', { gameCode, gameMode: mode });
     },
     [appliedMode, currentMode, gameCode, socket, t]

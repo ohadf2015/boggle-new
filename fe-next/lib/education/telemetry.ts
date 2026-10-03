@@ -170,6 +170,7 @@ export interface EduJoinCodeArgs {
 /**
  * Class-created → first-student funnel. Never send the join code itself
  * (shared secret). `classroom_id` is enough to stitch shown → copied → joined.
+ * Copy is also used by the start-live-class CTA so one funnel counts copies.
  */
 export function trackEduJoinCodeShown(args: EduJoinCodeArgs): void {
   safeCapture('edu_join_code_shown', { classroom_id: args.classroomId });
@@ -414,4 +415,73 @@ export function trackEduReportsViewed(args: EduReportsViewedArgs = {}): void {
   if (args.classroomId) props.classroom_id = args.classroomId;
   if (args.studentId) props.student_id = args.studentId;
   safeCapture('edu_reports_viewed', props);
+}
+
+export interface EduFirstAssignmentCtaArgs {
+  classroomId: string;
+}
+
+/** HQ panel: class has students, 0 assignments, no live room. */
+export function trackEduFirstAssignmentCtaShown(args: EduFirstAssignmentCtaArgs): void {
+  safeCapture('edu_first_assignment_cta_shown', { classroom_id: args.classroomId });
+}
+
+export function trackEduFirstAssignmentCtaClicked(args: EduFirstAssignmentCtaArgs): void {
+  safeCapture('edu_first_assignment_cta_clicked', { classroom_id: args.classroomId });
+}
+
+/** First assignment actually created (dialog or starter pack). */
+export function trackEduFirstAssignmentCreated(args: EduFirstAssignmentCtaArgs): void {
+  safeCapture('edu_first_assignment_created', { classroom_id: args.classroomId });
+}
+
+export interface EduStartLiveClassArgs {
+  classroomId: string;
+}
+
+/** Assignment/classroom view: start the existing live-room flow. */
+export function trackEduAssignmentStartLiveClicked(args: EduStartLiveClassArgs): void {
+  safeCapture('edu_assignment_start_live_clicked', { classroom_id: args.classroomId });
+}
+
+export interface TeacherHqProgressViewedArgs {
+  classroomId: string;
+  studentCount: number;
+  assignmentCount: number;
+  submittedCount: number;
+  hasPro: boolean;
+}
+
+/** HQ class-progress strip impression — evidence of value before the Pro ask. */
+export function trackTeacherHqProgressViewed(args: TeacherHqProgressViewedArgs): void {
+  safeCapture('teacher_hq_progress_viewed', {
+    classroom_id: args.classroomId,
+    student_count: args.studentCount,
+    assignment_count: args.assignmentCount,
+    submitted_count: args.submittedCount,
+    has_pro: args.hasPro,
+  });
+}
+
+export function trackTeacherHqUpgradeClicked(args: { classroomId: string }): void {
+  safeCapture('teacher_hq_upgrade_clicked', { classroom_id: args.classroomId });
+}
+
+export interface TeacherAssignmentReportViewedArgs {
+  classroomId: string;
+  assignmentCount: number;
+  hasPro: boolean;
+}
+
+/** Classroom report/assignments compact completion strip — last-mile before Pro. */
+export function trackTeacherAssignmentReportViewed(args: TeacherAssignmentReportViewedArgs): void {
+  safeCapture('teacher_assignment_report_viewed', {
+    classroom_id: args.classroomId,
+    assignment_count: args.assignmentCount,
+    has_pro: args.hasPro,
+  });
+}
+
+export function trackTeacherAssignmentReportUpgradeClicked(args: { classroomId: string }): void {
+  safeCapture('teacher_assignment_report_upgrade_clicked', { classroom_id: args.classroomId });
 }

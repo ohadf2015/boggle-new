@@ -10,9 +10,11 @@ import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import type { LiveClassroomGameInfo } from '@/lib/education/liveClassroomGameInfo';
+import { isStudentTimerHidden } from '@/shared/utils/classroomPressure';
 import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
 import { SocketContext } from '@/utils/SocketContext';
 import { useIsVocabQuizRoom } from './vocabQuiz/useIsVocabQuizRoom';
+import { StudentModeStrip } from './ClassroomModeBannerStudent';
 
 interface LessonData {
   lessonId: string;
@@ -55,6 +57,8 @@ interface ClassroomModeBannerProps {
    * below fell through to a default (mode "Classic", 6×6, no lesson name).
    */
   liveGame?: LiveClassroomGameInfo | null;
+  /** The round's results are up: the student's podium owns the phone, so their mode strip stands down. */
+  showResults?: boolean;
 }
 
 /**
@@ -93,6 +97,7 @@ export function ClassroomModeBanner({
   expanded = false,
   isHost = true,
   liveGame = null,
+  showResults = false,
 }: ClassroomModeBannerProps) {
   const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
@@ -119,6 +124,10 @@ export function ClassroomModeBanner({
   const isQuiz = gameMode === VOCAB_QUIZ_MODE;
   const questionCount = remoteSettings?.vocabQuizQuestionCount ?? null;
   const questionSeconds = remoteSettings?.vocabQuizSeconds ?? null;
+
+  // Teacher turned the clock off: announcing "TIMER 3 min" would describe
+  // pressure nobody is under. Omit the row rather than print a lie.
+  const timerOff = remoteSettings?.pressure ? isStudentTimerHidden(remoteSettings.pressure) : false;
 
   // The class's own name, which the server resolves and the teacher's local copy
   // never carried. The generic label stays as the fallback for a room whose
@@ -163,7 +172,7 @@ export function ClassroomModeBanner({
   // detector the shell uses to hide this chrome during play releases on the
   // next board round (Class 3: one signal, not a second guess).
   const quizOwnsScreen = useIsVocabQuizRoom(useContext(SocketContext)?.socket ?? null);
-  const showPanel = expanded && !quizOwnsScreen && !!gameCode && (isHost || !!liveGame);
+  const showPanel = expanded && !quizOwnsScreen && !!gameCode && (isHost || (!!liveGame && !showResults));
 
   const previewWords = useMemo(
     () => (lessonData?.vocabularyWords || []).slice(0, 12),
@@ -241,8 +250,21 @@ export function ClassroomModeBanner({
         )}
       </div>
 
+      {showPanel && !isHost && (
+        <StudentModeStrip
+          gameMode={gameMode}
+          lessonName={lessonName}
+          questionCount={questionCount}
+          questionSeconds={questionSeconds}
+          timerMinutes={timerMinutes}
+          timerOff={timerOff}
+          boardSize={boardSize}
+          t={t}
+        />
+      )}
+
       <AnimatePresence initial={false}>
-        {showPanel && (
+        {showPanel && isHost && (
           <m.div
             key="classroom-lobby-panel"
             initial={{ opacity: 0, y: -12 }}
@@ -330,7 +352,7 @@ export function ClassroomModeBanner({
                         value={String(questionCount)}
                       />
                     )}
-                    {questionSeconds !== null && (
+                    {questionSeconds !== null && !timerOff && (
                       <SummaryTile
                         testId="classroom-quiz-seconds"
                         icon={<Clock className="w-4 h-4" />}
@@ -341,7 +363,7 @@ export function ClassroomModeBanner({
                   </>
                 ) : (
                   <>
-                    {timerMinutes !== null && (
+                    {timerMinutes !== null && !timerOff && (
                       <SummaryTile
                         icon={<Clock className="w-4 h-4" />}
                         label={t('education.template.timer')}

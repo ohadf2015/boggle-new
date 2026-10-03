@@ -1,25 +1,27 @@
 {
-  "date": "2026-09-26",
-  "note": "Supabase MCP connected tonight (unlike 09-24/09-25). Brief's frontend LCP items (imposketch.io/r/FOX4 etc, 28688ms) confirmed CROSS-TENANT NOISE -- $host breakdown shows imposketch.io=435 web_vitals events/24h vs www.lexiclash.live=44, dominating the un-filtered phase-0 aggregate. Filtered to lexiclash host: 44 total events, no single route clears n>50 -- correctly DEFERRED, no regression verdict possible. Backend: pg_stat_statements top-6 by total_exec_time are PostgREST's own schema-cache introspection queries (pg_timezone_names, base_types/pks_fks recursive CTEs, ~20k calls each -- not app-fixable) plus one real app query on analytics_events (event_type=ANY() AND created_at>=X ORDER BY created_at DESC, 12255 calls, mean 36ms) which already has the optimal composite index idx_analytics_events_type_created(event_type, created_at DESC) -- nothing to add. vocabulary_lessons_classroom_id_fkey unindexed advisor item re-checked: table has 23 rows -- an index would be pure write-cost with zero read benefit (seq scan on 23 rows is sub-millisecond), correctly skipped per hard rule (advisor-flagged alone isn't sufficient, needs EXPLAIN ANALYZE justification, and there's no query to EXPLAIN against a 23-row table). auth_db_connections_absolute is a dashboard toggle, not code -- human queue, unchanged. Net: research-only night, no code shipped -- confirmed absence of a real regression is itself the useful result (prevents chasing a phantom fix).",
+  "date": "2026-10-01",
+  "note": "Brief's top-ranked items: he/multiplayer LCP 11220ms, sv/singleplayer LCP 6940ms (imposketch.io/r/* items excluded -- different app sharing this PostHog project, confirmed 09-26). Shipped: PageClient.tsx for /multiplayer statically imported 4 classroom-only components (EducationHeader/ClassroomModeBanner/TeacherLiveControls/GamePausedOverlay/StudentWordBank, 1375 combined lines) that only render behind isClassroomMode/gameActive gates -- every non-classroom visitor (the vast majority) parsed all of them regardless. Converted to next/dynamic(ssr:false), matching the existing HostLeftGraceModal lazy pattern already in the same file. No JSON-LD/SEO/hero-preload changes -- those were already tuned (arena-hub-hero.jpg ReactDOM.preload from 09-2x). Backend: re-checked vocabulary_lessons_classroom_id_fkey (28 rows, was 23 on 09-26) and analytics_events hot query (still covered by idx_analytics_events_type_created) -- both re-confirmed no-action, no new advisor findings. sv/singleplayer: PageClient is a 20-line thin wrapper already, no JS-parse fix found -- likely image/network bound, needs PostHog per-route breakdown time budget in a future lane.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
     "closed": {
-      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified 09-26: table is 23 rows. Index would add write cost for zero measurable read benefit. Advisor INFO-level lint fires regardless of table size -- not a real regression, skip.",
-      "analytics_events_hot_query": "top real app query by total_exec_time (12255 calls, mean 36ms) already covered by idx_analytics_events_type_created(event_type, created_at DESC) matching its WHERE+ORDER BY exactly -- no action needed."
+      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified 10-01: table is 28 rows (was 23 on 09-26). Index would add write cost for zero measurable read benefit at this scale. Advisor INFO-level lint fires regardless of table size -- not a real regression, skip.",
+      "analytics_events_hot_query": "still covered by idx_analytics_events_type_created(event_type, created_at DESC) matching its WHERE+ORDER BY exactly -- no action needed."
     },
     "deferred": {
-      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
+      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue",
       "realtime_wal_json_parser_cpu": "systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- founder-scope publication-membership call, not this lane's fix"
     }
   },
   "frontend": {
     "by_route": [],
-    "shipped": [],
-    "note": "lexiclash.live $host total = 44 web_vitals events in 24h across ALL routes -- below the 50-sample floor for even one route. No regression verdict possible tonight. Brief's imposketch.io routes (435 events, dominant in the unfiltered aggregate) are a different app sharing this PostHog project -- excluded, not ours."
+    "shipped": [
+      { "route": "/multiplayer", "fix": "lazy-load 4 classroom-only components via next/dynamic ssr:false", "baseline_lcp_ms": 11220, "route_variant": "/he/multiplayer" }
+    ],
+    "note": "Brief items were used directly per brief-first contract -- no fresh PostHog query run tonight. Re-measure he/multiplayer p75 LCP in 3 days per impact-ledger entry 02-perf-2026-10-01-mp-education-chrome-lazy."
   },
   "bundle": {
-    "note": "not re-measured tonight (time budget spent on backend/frontend verification+debunking above) -- carrying 09-24 baseline numbers unchanged, no fresh .next build available",
+    "note": "not re-measured tonight (no fresh .next build in time budget) -- carrying 09-26 numbers unchanged. Next lane with a fresh build should confirm the education-chrome split shows as new lazy chunks, not folded into the main /multiplayer route chunk.",
     "total_kb": 34104,
     "top_chunks": [
       { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },

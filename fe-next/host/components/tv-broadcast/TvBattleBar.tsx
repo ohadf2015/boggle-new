@@ -52,7 +52,7 @@ const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t }) => {
     // Dark-only surface: hardcoded navy, never `bg-neo-cream dark:bg-neo-navy`.
     // The projector mounts lazily and that pair flashes cream first.
     <div className="w-full px-4 pb-2 bg-neo-navy" data-testid="tv-battle-bar">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="max-w-7xl mx-auto flex flex-wrap max-md:flex-nowrap items-center gap-x-4 max-md:gap-x-2 gap-y-2">
         {/* The round marker is the one filled chip up here: a lesson IS a
             sequence, so the number carries real information. Lime on black is
             ~20:1 — legible from the back row. */}
@@ -60,7 +60,7 @@ const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t }) => {
           {t('tvBroadcast.classroom.round', { number: classroom.round })}
         </span>
         {classroom.lessonName && (
-          <span className="font-neo-display font-bold text-neo-cream text-lg md:text-3xl truncate min-w-0">
+          <span className="font-neo-display font-bold text-neo-cream text-base sm:text-lg md:text-3xl md:medium-short:text-2xl truncate min-w-0">
             {classroom.lessonName}
           </span>
         )}
@@ -68,7 +68,7 @@ const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t }) => {
             it should be the only one. A solid cream border on navy is 3.74:1
             and clears the non-text contrast floor; an accent fill here would
             fight the bar for the room's attention. */}
-        <span className="ms-auto px-3 py-1 rounded-neo border-neo-thick border-neo-cream text-neo-cream font-neo-body font-bold text-xs md:text-base uppercase tracking-widest shrink-0">
+        <span className="ms-auto px-3 max-md:px-2 py-1 rounded-neo border-neo-thick border-neo-cream text-neo-cream font-neo-body font-bold text-xs max-md:text-[10px] md:text-base uppercase tracking-widest max-md:tracking-wide shrink-0">
           {formatLabel}
         </span>
       </div>

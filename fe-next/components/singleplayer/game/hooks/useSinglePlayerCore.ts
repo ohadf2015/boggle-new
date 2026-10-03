@@ -51,6 +51,8 @@ import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { FoundWord, TrainingState, DirectionGuidanceState, KeyboardInputState } from '../types';
 import { roundEventsEnabled, startsBehindGate } from './roundGates';
 import { isFirstSessionPlayer } from '@/lib/retention/firstWin';
+import { useExperiment } from '@/hooks/useExperiment';
+import { resolveQuitConfirmDescription } from '@/lib/experiments/quitConfirmDescription';
 
 interface UseSinglePlayerCoreOptions {
   settings: SinglePlayerGameState;
@@ -234,14 +236,26 @@ export function useSinglePlayerCore({
     onTimeUp: () => { if (!gameOverCalledRef.current) setIsGameOver(true); },
   });
 
+  const quitConfirmExperiment = useExperiment('exp-game-abandon-confirm-v1');
+  const quitConfirmMessage = resolveQuitConfirmDescription(quitConfirmExperiment.variant, {
+    baseMessage: t('singlePlayer.quitConfirmMessage', 'You will lose your current progress. Are you sure you want to quit?'),
+    statsTemplate: t('singlePlayer.quitConfirmMessageWithStats'),
+    score,
+    wordCount: foundWords.filter((fw) => fw.isValid === true).length,
+  });
+
   useNavigationGuard({
     enabled: !!grid && !isGameOver && score > 0 && !quitting,
     // Only skip the phantom pop when quitting actually navigates away — a
     // caller that stays on the page (quitStaysOnPage) must have it popped,
     // or every confirmed quit strands an extra same-URL history entry.
     leaving: quitting && !quitStaysOnPage,
-    message: t('singlePlayer.quitConfirmMessage', 'You will lose your current progress. Are you sure you want to quit?'),
-    onNavigationAttempt: () => { setShowQuitConfirm(true); return false; },
+    message: quitConfirmMessage,
+    onNavigationAttempt: () => {
+      quitConfirmExperiment.trackExposure();
+      setShowQuitConfirm(true);
+      return false;
+    },
   });
 
   const gameActive = !!grid && !held && !isGameOver && timer.remainingTime > 0;
@@ -554,8 +568,13 @@ export function useSinglePlayerCore({
   const handleQuitRequest = useCallback(() => {
     if (settings.mode === 'practice') { setIsGameOver(true); return; }
     trackGrowthEvent('game_abandon_attempted', { mode: settings.mode, score, hadScore: score > 0 });
-    score > 0 ? setShowQuitConfirm(true) : onQuit();
-  }, [score, onQuit, settings.mode]);
+    if (score > 0) {
+      quitConfirmExperiment.trackExposure();
+      setShowQuitConfirm(true);
+    } else {
+      onQuit();
+    }
+  }, [score, onQuit, settings.mode, quitConfirmExperiment]);
   // Confirm path: disarm the guard (leaving) BEFORE the exit nav so its teardown
   // doesn't race-cancel the router push (black screen on native). The score===0
   // path above skips this — the guard is already disabled (enabled needs score>0).

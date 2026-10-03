@@ -33,6 +33,23 @@ describe('Teacher Pro gating', () => {
     expect(src).toContain("'reports'");
   });
 
+  it('enforces the pressure dials in code through ProGate.tsx', () => {
+    // The calm-mode dials (leaderboard / timer / speed-scoring) are the Pro
+    // pedagogic feature: a free teacher keeps the default hyped game-show,
+    // Pro unlocks de-gameifying for anxious students. The enforcement truth
+    // is the PRO_FEATURES array, and this pins the dials inside it.
+    expect(PRO_FEATURES).toContain('pressureDials');
+    const src = readFileSync(PROGATES_FILE, 'utf8');
+    expect(src).toContain("'pressureDials'");
+  });
+
+  it('sells the pressure dials on the Pro tier config', () => {
+    // tierLimits.parity.test.ts then forces the first word of the bullet to
+    // appear in ProGate.tsx — the advertisement cannot drift from the gate.
+    const pro = getTierConfig('pro');
+    expect(pro.features.some((f) => f.toLowerCase().startsWith('pressure'))).toBe(true);
+  });
+
   it('does not advertise any feature on the upgrade page that ProGate cannot refuse', () => {
     const proConfig = getTierConfig('pro');
     const proFeatures = proConfig.features.filter(

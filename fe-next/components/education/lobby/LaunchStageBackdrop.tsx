@@ -19,7 +19,7 @@ export function LaunchStageBackdrop() {
         decoding="async"
         className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover object-bottom"
       />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-neo-navy/55" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-neo-navy/80" />
     </>
   );
 }

@@ -1,10 +1,7 @@
 'use client';
-import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { gsap } from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
-import { isReducedMotionPreferred } from '@/utils/accessibility';
 import { locales } from '@/lib/i18n';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { EducationModeMock } from './EducationModeMock';
@@ -38,76 +35,16 @@ const LANGUAGE_COUNT = String(locales.length);
  * - Secondary CTA: Teacher Pro checkout ($TEACHER_PRO_PRICE_USD/mo) → /teacher/upgrade.
  *   Revenue path stays visible and above the fold.
  * - Right column shows EducationModeMock — a live "see it in action" preview.
- * - Decorative dots: neo-lime/neo-pink at low opacity for personality
- *
- * Entry: GSAP timeline cascades eyebrow → h1 → sub → CTA, then floats the
- * background dots on a slow loop. Decorative only; respects reduced-motion.
+ * The copy is painted on first frame. A fade-in and a pulsing button
+ * both compete with the one lime action.
  */
 
 export function EducationHero() {
   const { t, language } = useLanguage();
-  const rootRef = useRef<HTMLDivElement>(null);
-  const dotsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    const dots = dotsRef.current;
-    if (!root) return;
-
-    const rm = isReducedMotionPreferred();
-    const targets = root.querySelectorAll<HTMLElement>('[data-hero-item]');
-    if (targets.length === 0) return;
-
-    if (rm) {
-      gsap.set(targets, { opacity: 1, y: 0 });
-      return;
-    }
-
-    const tl = gsap.timeline();
-    tl.set(targets, { opacity: 0, y: 24 });
-    tl.to(targets, {
-      opacity: 1,
-      y: 0,
-      duration: 0.7,
-      ease: 'power3.out',
-      stagger: 0.1,
-    });
-
-    let dotsTween: gsap.core.Tween | null = null;
-    if (dots) {
-      dotsTween = gsap.to(dots, {
-        backgroundPosition: '40px 30px, -40px -30px',
-        duration: 14,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-      });
-    }
-
-    return () => {
-      tl.kill();
-      dotsTween?.kill();
-    };
-  }, []);
 
   return (
     <section className="relative overflow-hidden bg-neo-navy">
-      {/* Decorative background dots */}
-      <div
-        ref={dotsRef}
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle at 20% 30%, rgba(191, 255, 0, 0.08), transparent 50%), ' +
-            'radial-gradient(circle at 80% 70%, rgba(255, 20, 147, 0.08), transparent 50%)',
-        }}
-      />
-
-      <div
-        ref={rootRef}
-        className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:py-20 lg:grid-cols-2 lg:gap-12"
-      >
+      <div className="relative mx-auto grid max-w-6xl items-start gap-8 px-4 py-4 sm:py-8 lg:grid-cols-2 lg:gap-12">
         {/* Left column: copy + single CTA */}
         <div className="text-center lg:text-start">
           <p
@@ -118,7 +55,7 @@ export function EducationHero() {
           </p>
           <h1
             data-hero-item
-            className="mt-3 text-4xl sm:text-5xl font-neo-display font-black leading-tight text-neo-cream md:text-6xl"
+            className="mt-3 text-4xl sm:text-5xl font-neo-display font-black leading-tight text-neo-cream"
           >
             {t('education.landing.hero.h1')}
           </h1>
@@ -129,17 +66,15 @@ export function EducationHero() {
             {t('education.landing.hero.sub', undefined, { count: LANGUAGE_COUNT })}
           </p>
 
-          <div
-            data-hero-item
-            className="mt-8 flex flex-col items-center gap-3 lg:items-start"
-          >
+          <div data-hero-item className="mt-5 flex flex-col items-center gap-3 lg:items-start">
+            <div className="flex flex-col items-center gap-3 lg:flex-row lg:flex-wrap lg:items-center">
             <Link
-              href={`/${language}/education/access`}
+              href={`/${language}/teacher`}
               data-testid="education-hero-free-cta"
               onClick={() => trackLandingCtaClick('education_hero')}
-              className="group inline-flex items-center gap-3 rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-8 py-4 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-xl transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-hard motion-safe:animate-pulse-subtle"
+              className="group inline-flex items-center gap-3 rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-8 py-4 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform duration-150 hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none"
             >
-              {t('education.landing.hero.cta_primary', 'Start free — request teacher access')}
+              {t('education.landing.hero.cta_primary')}
               <span
                 aria-hidden
                 className="text-xl transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
@@ -147,6 +82,15 @@ export function EducationHero() {
                 →
               </span>
             </Link>
+            <Link
+              href={`/${language}/student/join`}
+              data-testid="education-hero-join-cta"
+              onClick={() => trackLandingCtaClick('education_hero_join')}
+              className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap text-base font-bold text-neo-cream underline decoration-2 underline-offset-4 hover:text-neo-white"
+            >
+              {t('education.landing.studentJoinCta')}
+            </Link>
+            </div>
             <Link
               href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
               data-testid="education-hero-pro-cta"

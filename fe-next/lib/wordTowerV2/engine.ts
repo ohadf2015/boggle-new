@@ -447,8 +447,7 @@ export function stepWorld(world: TowerWorld, elapsedMs: number): number {
     }
 
     updateCollapse(world, simulatedMs);
-    const chainIds = new Set(standingChain(snapshotWorld(world).blocks));
-    cleanupDebris(world, chainIds);
+    cleanupDebris(world, () => new Set(standingChain(snapshotWorld(world).blocks)));
   }
 
   return substeps;

@@ -213,6 +213,8 @@ vi.mock('@/lib/education/telemetry', () => ({
   trackEduTeacherDashboardViewed: vi.fn(),
   trackEduTeacherToolsOpened: vi.fn(),
   trackTeacherOnboardingStep: vi.fn(),
+  trackEduFirstAssignmentCtaShown: vi.fn(),
+  trackEduFirstAssignmentCtaClicked: vi.fn(),
 }));
 
 // ── Helper to count visible buttons by testid ────────────────────────────────

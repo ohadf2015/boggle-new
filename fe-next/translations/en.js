@@ -1,5 +1,176 @@
 // EN translations
 const en = {
+  // @eduLibrary:start
+  "eduLibrary": {
+    "title": "Library",
+    "tabs": {
+      "mine": "My lists",
+      "discover": "Discover"
+    },
+    "editor": {
+      "createTitle": "New word list",
+      "editTitle": "Edit word list",
+      "description": "Paste words, add definitions, save.",
+      "newList": "New list",
+      "titleLabel": "List title",
+      "titlePlaceholder": "Name your list…",
+      "pasteLabel": "Paste or type words",
+      "pastePlaceholder": "apple, banana, cherry — or one per line. \"word - meaning\" adds a definition.",
+      "addedWords": "+{count} added",
+      "skippedDuplicates": "{count} already in the list",
+      "importFile": "CSV / TSV",
+      "starterPack": "Starter pack",
+      "fileError": "That file had no words we could read. Use one word per row, with the definition in the second column.",
+      "wordsHeading": "Words",
+      "wordsLabel": "Words in this list",
+      "viewLabel": "View",
+      "view": {
+        "chips": "Chips",
+        "details": "Details"
+      },
+      "emptyWords": "Your words will pop in here.",
+      "removeWord": "Remove {word}",
+      "noDefinition": "No definition yet",
+      "word": "Word",
+      "definition": "Definition (optional)",
+      "definitionPlaceholder": "What does it mean?",
+      "done": "Done",
+      "needTitle": "Give your list a name to save it.",
+      "needWords": "Add at least one word.",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "savedToast": "\"{name}\" saved"
+    },
+    "issue": {
+      "digits": "Has a number",
+      "tooLong": "Too long to play",
+      "wrongScript": "Doesn't look like this list's language",
+      "blocked": "Not allowed in student games"
+    },
+    "meta": {
+      "language": "Language",
+      "grade": "Grade",
+      "topic": "Topic",
+      "assignTo": "Assign to",
+      "noClass": "No class yet"
+    },
+    "grade": {
+      "any": "Any grade",
+      "k2": "K–2",
+      "g35": "Grades 3–5",
+      "g68": "Grades 6–8",
+      "g912": "Grades 9–12"
+    },
+    "topic": {
+      "none": "No topic",
+      "all": "All topics",
+      "general": "General",
+      "english": "English",
+      "hebrew": "Hebrew",
+      "science": "Science",
+      "math": "Math",
+      "history": "History",
+      "geography": "Geography",
+      "language": "Language learning"
+    },
+    "share": {
+      "toggle": "Share to Discover",
+      "help": "Other teachers can find, host and copy it. Only your display name is shown.",
+      "blocked": "Some words can't be shared with students. Remove them to share.",
+      "share": "Share",
+      "shared": "Shared",
+      "nowPublic": "Shared to Discover",
+      "nowPrivate": "Back to private",
+      "failed": "Couldn't change sharing. Try again."
+    },
+    "remixedFrom": "Remixed from {title} by {author}",
+    "remixedFromNoAuthor": "Remixed from {title}",
+    "myLists": {
+      "emptyHint": "Paste a list, start from a starter pack, or grab one from Discover."
+    },
+    "card": {
+      "practice": "Practice",
+      "words": "{count} words",
+      "by": "by {author}",
+      "aTeacher": "a teacher",
+      "new": "New",
+      "plays": "{count} plays",
+      "playsOne": "{count} play",
+      "copies": "{count} copies",
+      "copiesOne": "{count} copy",
+      "results": "Results"
+    },
+    "badge": {
+      "verified": "Verified",
+      "teacher": "Teacher made",
+      "yours": "Yours"
+    },
+    "discover": {
+      "searchLabel": "Search lists",
+      "searchPlaceholder": "Search lists, words or teachers",
+      "clearSearch": "Clear search",
+      "filters": "Filters",
+      "allLanguages": "All",
+      "sourceLabel": "Who made it",
+      "source": {
+        "all": "All",
+        "verified": "LexiClash verified",
+        "teacher": "Teacher made"
+      },
+      "count": "{count} lists",
+      "sortLabel": "Sort",
+      "sort": {
+        "popular": "Most popular",
+        "newest": "Newest"
+      },
+      "loadError": "Couldn't load Discover.",
+      "retry": "Retry",
+      "emptyTitle": "No lists match yet",
+      "emptyHint": "Try another filter — or share one of yours so the next teacher finds it.",
+      "tryAllLanguages": "Show all languages",
+      "shareFirst": "Share a list",
+      "beFirstTitle": "Be the first teacher here.",
+      "beFirstHint": "Share one of your lists and every teacher in this language will see it."
+    },
+    "preview": {
+      "host": "Host live",
+      "assign": "Assign",
+      "copy": "Make a copy",
+      "copied": "Copied",
+      "copiedHint": "It's in My lists — tap Copied to open it.",
+      "copiedToast": "\"{name}\" copied to My lists",
+      "copyFailed": "Couldn't copy this list. Try again."
+    },
+    "report": {
+      "action": "Report this list",
+      "title": "Report list",
+      "description": "What's wrong with \"{name}\"? We review every report.",
+      "reason": {
+        "inappropriate": "Not right for students",
+        "offensive": "Offensive words",
+        "unplayable": "Wrong or unplayable words",
+        "spam": "Spam or junk"
+      },
+      "detailsPlaceholder": "Anything else? (optional)",
+      "submit": "Send report",
+      "thanks": "Thanks — we'll take a look.",
+      "failed": "Couldn't send the report. Try again."
+    },
+    "assign": {
+      "title": "Assign to a class",
+      "pickClass": "Which class gets it?",
+      "noClasses": "Create a class first — it takes 5 seconds.",
+      "createClass": "Create a class"
+    },
+    "pager": {
+      "label": "Pages",
+      "prev": "Back",
+      "next": "Next",
+      "status": "{page} / {total}"
+    }
+  },
+  // @eduLibrary:end
   // @academy:start (generated by /tmp/edu-play/merge-i18n.mjs)
   "academy": {
     "teacher": {
@@ -33,11 +204,26 @@ const en = {
         "blast": "Blast",
         "blastBlurb": "Fast rounds, huge combos",
         "wordHunt": "Word Hunt",
-        "wordHuntBlurb": "Hunt down the list words"
+        "wordHuntBlurb": "Hunt down the list words",
+        "wordcraft": "Wordcraft",
+        "wordcraftBlurb": "Craft list words, outscore the class"
       },
       "noClassTitle": "Create your class, get a code in 5 seconds",
       "createClassCta": "Create my class",
-      "codeReady": "Code ready"
+      "codeReady": "Code ready",
+      "firstAssignmentTitle": "Assign their first game",
+      "firstAssignmentBody": "Students are in. Send one assignment so they play before the next class.",
+      "firstAssignmentCta": "Create assignment",
+      "startLiveTitle": "Play a live class",
+      "startLiveBody": "The assignment is out. Start a live game so the class plays together.",
+      "startLiveCta": "Start live classroom game",
+      "copyJoinCode": "Copy join link",
+      "joinCodeCopied": "Join link copied",
+      "progressTitle": "Class progress",
+      "progressStudents": "students",
+      "progressAssignments": "assignments",
+      "progressSubmitted": "submitted",
+      "progressUpgrade": "Teacher Pro"
     },
     "modes": {
       "workshop": {
@@ -1715,10 +1901,10 @@ const en = {
       "description": "Play LexiClash for free — a real-time multiplayer word game with up to 4 players. Build word combos, climb the global leaderboard, no download, no signup. Play now in your browser."
     },
     "leaderboard": {
-      "title": "Best Competitive Word Games with Global Leaderboards 2026 | LexiClash",
-      "description": "The best competitive word games with global leaderboards. Live daily, weekly, and all-time rankings across 8 modes. Filter by language, country, or mode. Updated in real time.",
-      "ogTitle": "Best Competitive Word Games with Global Leaderboards 2026",
-      "ogDescription": "Climb the global word game leaderboard. Daily, weekly, and all-time rankings across 8 modes. Free, no signup."
+      "title": "Word Game Leaderboard — Live Global Rankings | LexiClash",
+      "description": "Live word game leaderboard with daily, weekly, and all-time rankings. Filter by language, country, or mode. Free to play, updated in real time.",
+      "ogTitle": "Word Game Leaderboard — Live Global Rankings",
+      "ogDescription": "Live word game leaderboard — daily, weekly, and all-time ranks across 8 modes. Filter by language or country. Free, no signup."
     },
     "profile": {
       "title": "Your Player Profile, Stats & Game Achievements",
@@ -1911,12 +2097,12 @@ const en = {
     },
     "education": {
       "title": "LexiClash Education - Word Games for Classrooms & Teachers",
-      "description": "Bring word games into the classroom! LexiClash Education helps teachers create vocabulary lessons, track student progress, and make learning engaging with multiplayer word battles.",
+      "description": "Word games for classrooms — create vocabulary lessons, track progress, and run multiplayer word battles. No student logins needed. Free.",
       "ogTitle": "LexiClash Education - Classroom Word Games",
       "ogDescription": "Word games for classrooms! Create lessons, track progress, and make vocabulary learning fun."
     },
     "educationClassroomGame": {
-      "title": "Classroom Word Game Live - Teacher-Led Multiplayer | LexiClash",
+      "title": "Classroom Word Game Live — Teacher Multiplayer | LexiClash",
       "description": "Launch a live word game for your classroom. The teacher dashboard runs a real-time multiplayer round — students join from any device, no signup needed.",
       "ogTitle": "Classroom Word Game Live - Teacher Dashboard",
       "ogDescription": "Start a live multiplayer word round for your class — join from any device, no signup."
@@ -8530,6 +8716,9 @@ const en = {
       "playerWordsTitle": "{{name}}'s path",
       "youMissedWords": "Words you missed",
       "tapPlayerHint": "Tap a player to see their path",
+      "guestNameLabel": "On the leaderboard as",
+      "guestNameRejected": "Pick a different name",
+      "guestNameFailed": "Couldn't save your name. Try again.",
       "wordsFound": "Words found",
       "masteryRatingLabel": "Rating",
       "masteryRatingChangeLabel": "Change",
@@ -11739,7 +11928,28 @@ const en = {
         "wordHunt": "Word Hunt",
         "blast": "Blast",
         "wheelRush": "Wheel Rush",
-        "vocabQuiz": "Vocab Quiz"
+        "vocabQuiz": "Vocab Quiz",
+        "wordcraft": "Wordcraft"
+      },
+      "pressure": {
+        "title": "Pressure",
+        "leaderboard": {
+          "title": "Leaderboard",
+          "full": "Full",
+          "top3": "Top 3 only",
+          "hidden": "Reveal at end"
+        },
+        "timer": {
+          "title": "Timer",
+          "full": "Countdown",
+          "gentle": "Gentle",
+          "off": "Off"
+        },
+        "scoring": {
+          "title": "Scoring",
+          "speed": "Speed counts",
+          "accuracy": "Accuracy only"
+        }
       },
       "huntTarget": {
         "title": "Hunted Word",
@@ -12069,6 +12279,37 @@ const en = {
       "failedToSaveLesson": "Failed to save lesson"
     },
     "reports": {
+      "arc": {
+        "title": "Learning arc",
+        "subtitle": "Each student, across every session",
+        "studentSubtitle": "{{name}}, across every session",
+        "unknownStudent": "Student",
+        "noEvidenceClass": "Play a lesson game with this class and each student's arc lands here.",
+        "noEvidenceStudent": "No sessions yet",
+        "emptyStudent": "{{name}} has not had a session with asked words yet — their arc starts with the next game.",
+        "wordsClassMisses": "Words the class keeps missing",
+        "studentsStuck": "{{stuck}} of {{total}} students",
+        "requeueNote": "Missed words already re-queue in each student's Missed Words review.",
+        "assignFollowUp": "Assign follow-up practice",
+        "assigning": "Assigning...",
+        "followUpDone": "Assigned — it's on their lesson list.",
+        "followUpFailed": "Couldn't assign it. Try again.",
+        "followUpName": "{{classroom}} — words to re-learn ({{date}})",
+        "viewStudent": "View {{name}}'s arc",
+        "accuracyOverTime": "Accuracy over time",
+        "growth": "{{first}}% → {{last}}%",
+        "sparklineLabel": "Accuracy across {{count}} sessions, from {{first}}% to {{last}}%",
+        "requeueStudent": "{{name}}'s missed words are already queued in their Missed Words review.",
+        "attempts": "{{count}} tries",
+        "outcomeCorrect": "Found it",
+        "outcomeMissed": "Missed it",
+        "trend": {
+          "mastered": "Mastered",
+          "improving": "Getting there",
+          "stuck": "Needs a re-teach",
+          "insufficient": "One session so far"
+        }
+      },
       "title": "Progress Report",
       "studentReport": "Student Progress Report",
       "classReport": "Class Progress Report",
@@ -12155,6 +12396,11 @@ const en = {
         "fileName": "{{name}} – assignment progress",
         "untitled": "Untitled lesson",
         "anonymousStudent": "Student {{id}}"
+      },
+      "assignmentCompletion": {
+        "title": "Assignment completion",
+        "submitted": "{{submitted}} / {{roster}} submitted",
+        "upgrade": "Teacher Pro {{price}}"
       },
       "exportAllClasses": {
         "button": "Export all classes",
@@ -12280,6 +12526,14 @@ const en = {
       "lastUpdated": "Last Updated"
     },
     "proGate": {
+      "mastery": {
+        "title": "See every word your class misses",
+        "body": "Pro ranks the ten words your class misses most and maps each student against each word, across every game — so you know exactly what to reteach, and to whom."
+      },
+      "missedPractice": {
+        "title": "Turn misses into spaced practice",
+        "body": "One click assigns your class's missed words as three short rounds — tomorrow, in 3 days and in a week. That spacing is what makes words stick."
+      },
       "analytics": {
         "title": "See how your class is really doing",
         "body": "Pro turns every game into a picture of your class: which words are sticking, which students are stuck, and how far each one has come since September. Bring it to a parent evening or a department meeting."
@@ -12287,6 +12541,10 @@ const en = {
       "reports": {
         "title": "Progress reports are a Pro feature",
         "body": "See how every student is doing across all your classes and games: words mastered, levels, XP, and printable PDFs for parent evenings. Upgrade to Teacher Pro to unlock class and student reports."
+      },
+      "pressureDials": {
+        "title": "Calm mode for anxious students",
+        "body": "Pro hands you the pressure dials: hide the leaderboard until the end, soften or switch off the timer, and score accuracy instead of speed. The same game runs as a hyped game-show or a calm mastery check."
       },
       "cta": "Unlock this with Pro — {{price}}/month"
     },
@@ -12310,10 +12568,10 @@ const en = {
       "regionLabel": "Progress digest for {{classroom}}",
       "scheduleReteachCta": "Schedule reteach Live in ~{{days}} days",
       "scheduleReteachConfirm": "Reteach Live scheduled for {{date}} (~{{days}} days). Calendar invite opened.",
-      "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks — Kahoot-style spaced reteach.",
+      "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks — spaced reteach that sticks.",
       "unpluggedReteachLiveCta": "Start Unplugged reteach Live",
       "reteachLiveCta": "Start 3-min reteach Live",
-      "unpluggedReteachLiveFoil": "Kahoot Unplugged foil (Teacher Takeover, Sep 21 2026 — when student devices aren’t an option) — project the misses; students answer on paper, no devices."
+      "unpluggedReteachLiveFoil": "No student devices today? Project the misses — students answer on paper."
     },
     "windowProgress": {
       "title": "This week's class",
@@ -12408,10 +12666,13 @@ const en = {
       "featureOutcome2": "Add every section you teach, not just the first 3 classes",
       "featureOutcome3": "See who is stuck, word by word, live",
       "featureOutcome4": "Compare progress across all your classes",
+      "featureOutcome5": "Calm mode for anxious students — timer, leaderboard and speed-scoring are yours to dial",
       "priceTaxNote": "Taxes may be added at checkout.",
       "proHeroAlt": "A teacher watching a live class leaderboard on the board while students play from their seats.",
       "valueHeadline": "Best for everyday review and exit tickets. Run a whole-class check in one round.",
       "matrix": {
+        "mastery": "Mastery heatmap & hardest words",
+        "missedPractice": "Missed practice, spaced 1-3-7 days",
         "title": "Compare plans",
         "featureColumn": "Feature",
         "unlimited": "Unlimited",
@@ -12523,7 +12784,8 @@ const en = {
         "wordHunt": "Race the class to dig one hidden target word out of the grid.",
         "blast": "Chain words fast and blow the tiles up in cascading combos.",
         "wheelRush": "Spin the letter wheel and fire off words against the clock.",
-        "vocabQuiz": "Four choices, one meaning — the fastest right answer scores most."
+        "vocabQuiz": "Four choices, one meaning — the fastest right answer scores most.",
+        "wordcraft": "Craft words on your own board against the Baron — the class leaderboard decides the rest."
       }
     },
     "projectorLobby": {
@@ -12554,7 +12816,29 @@ const en = {
       "wordHunt": "Crack the hidden word in ten tries",
       "blast": "Chain words to clear tiles in combos",
       "wheelRush": "Build words from one wheel of letters",
-      "vocabQuiz": "Four-choice questions from your own word data"
+      "vocabQuiz": "Four-choice questions from your own word data",
+      "wordcraft": "Craft list words on your own board vs a bot rival"
+    },
+    "wordcraftLive": {
+      "rival": "The Baron",
+      "you": "You",
+      "vsRival": "You vs the Baron",
+      "tapLetters": "Tap letters to build a word",
+      "tapStart": "Tap the square where it starts",
+      "place": "PLACE",
+      "recall": "Recall",
+      "switchDirection": "Switch direction",
+      "lessonWords": "Lesson words",
+      "tilesLeft": "{count} in the sack",
+      "placing": "Placing…",
+      "waitingBoard": "Dealing your board…",
+      "builtBy": "{name} crafted {word}",
+      "errors": {
+        "invalidWord": "\"{word}\" isn't a word",
+        "disconnected": "Your word has to touch one already down",
+        "cellOccupied": "That square is taken",
+        "generic": "That didn't place — try again"
+      }
     },
     "wordTowerPractice": {
       "unavailable": "This lesson's words can't build a tower yet. It needs at least 4 words of 4 to 6 letters.",
@@ -12836,6 +13120,7 @@ const en = {
         "won": "YOU WON!",
         "podium": "ON THE PODIUM!",
         "finished": "ROUND DONE!",
+        "roundComplete": "ROUND COMPLETE!",
         "of": "of {{total}}",
         "points": "points",
         "beat": "Ahead of {{count}} in the class",
@@ -13248,7 +13533,7 @@ const en = {
       "inviteStudents": "Invite Students",
       "lastActive": "Last Active",
       "lessonEffectiveness": "Lesson Impact",
-      "level": "Level {{level}}",
+      "level": "Level",
       "live": "Live",
       "loading": "Loading analytics...",
       "mastery": "Mastery",
@@ -13264,7 +13549,7 @@ const en = {
       "retry": "Retry",
       "shareParentReport": "Share with parent",
       "shareParentReportFailed": "Couldn't create the link. Try again.",
-      "streak": "{{count}}-day streak",
+      "streak": "Streak",
       "struggling": "Needs Help",
       "mastered": "Mastered",
       "practicing": "Practicing",
@@ -13298,6 +13583,10 @@ const en = {
       "yesterday": "Yesterday"
     },
     "classroomGame": {
+      "pressure": {
+        "revealAtEnd": "Your teacher will reveal the results at the end."
+      },
+      "pressureFailed": "Couldn't save those settings — try again.",
       "questions": "Questions",
       "perQuestion": "Per question",
       "namePrompt": {
@@ -13444,7 +13733,7 @@ const en = {
         "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
-        "cta_note": "Free plan to start • Approved in ~24h",
+        "cta_note": "Free plan to start • Instant access",
         "cta_schools": "School or district? See plans →"
       },
       "mock": {
@@ -14022,6 +14311,12 @@ const en = {
         "title": "Join a Class"
       },
       "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
+      "gameEnded": {
+        "title": "This game has ended",
+        "retry": "Try again",
+        "toClass": "Go to my class",
+        "newCode": "Enter a new code"
+      },
       "lessonsAssigned": "Lessons Assigned",
       "feel": {
         "points": "pts",
@@ -14204,6 +14499,7 @@ const en = {
       "auth_required_title": "Sign up to request teacher access",
       "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",
       "auth_required_cta": "Create my free teacher account",
+      "auth_signin_cta": "Already have an account? Sign in",
       "trust_instant": "Instant access — no review queue",
       "trust_free": "Free teacher plan, no expiry",
       "trust_nologins": "No student logins, no setup",
@@ -14940,7 +15236,8 @@ const en = {
     "sealedBid": {
       "title": "Bid in Secret",
       "step1": "Pick your strongest word",
-      "step2": "Words nobody else picks score double"
+      "step2": "Words nobody else picks score double",
+      "step3": "Lock fast — bonus shrinks over time"
     },
     "adventure": {
       "title": "Beat the Levels",
@@ -16565,6 +16862,7 @@ const en = {
       "foundHeader": "Found",
       "fogHeader": "Fog",
       "fogLabel": "Fog of War",
+      "fogAriaLabel": "Fog {percent} percent",
       "myStatsHeader": "Your stats",
       "bestWord": "Best",
       "wordsPerMin": "Pace",
@@ -17819,6 +18117,9 @@ const en = {
       "share": "Share",
       "seriesChampion": "Series champion",
       "teacherPaced": "Your teacher starts the next game",
+      "backToClass": "Back to class",
+      "endClassTitle": "End the class game?",
+      "endClassBody": "The room closes for everyone and you go back to your class dashboard.",
       "roundPoints": "Points this round",
       "yourRank": "Your place",
       "lessonRecap": "Lesson recap",
@@ -17834,6 +18135,280 @@ const en = {
       "roundShort": "R{n}",
       "total": "Total",
       "player": "Player"
+    }
+  },
+  "eduStudent": {
+    "mode": {
+      "vocabQuiz": {
+        "rule": "Read the clue, tap the matching word. Quick and correct scores most."
+      },
+      "wordcraft": {
+        "rule": "Spell lesson words with your tiles and drop them on the board."
+      },
+      "pending": "Game on!",
+      "pendingRule": "Eyes up, your teacher is starting the round."
+    },
+    "lobby": {
+      "pickLook": "Pick a look",
+      "shuffleLooks": "Shuffle looks",
+      "buildLook": "Make your own look",
+      "readySticker": "Ready!"
+    },
+    "exit": {
+      "title": "Leave the game?",
+      "body": "You'll drop out of this round. The same code gets you back in.",
+      "stay": "Keep playing",
+      "leave": "Leave"
+    },
+    "join": {
+      "surpriseMe": "Surprise me",
+      "funNames": "Pixel Panda|Captain Otter|Turbo Toast|Disco Llama|Ninja Noodle|Rocket Raccoon|Cosmic Kiwi|Sneaky Sloth|Mega Mango|Laser Lemur|Bubble Bison|Jazzy Jaguar|Waffle Wizard|Thunder Duck|Comet Cat|Glitter Gecko|Banana Boss|Turbo Turtle|Quantum Quokka|Fuzzy Falcon"
+    },
+    "results": {
+      "nextUp": "Next up: {mode}",
+      "missedTitle": "Catch these next time",
+      "missedNone": "You found every lesson word. Legend!",
+      "hear": "Hear {word}",
+      "practiceThese": "Practice these",
+      "tapToHear": "Tap a word to hear it"
+    },
+    "wordcraft": {
+      "hintFirst": "Tap letters to build a word. It lands in the middle.",
+      "hintMore": "Add one more letter. Words need at least 2.",
+      "hintAnchor": "Now tap a square next to a tile on the board.",
+      "hintReady": "Looks good. Hit PLACE!",
+      "targetsProgress": "{found}/{total} lesson words",
+      "showTargets": "Show lesson words",
+      "hideTargets": "Hide lesson words"
+    },
+    "practice": {
+      "answerIs": "It's spelled",
+      "next": "Next word",
+      "finish": "See my results"
+    },
+    "cookie": {
+      "message": "We use cookies to count plays and show ads."
+    }
+  },
+  // @eduHq:start
+  "eduHq": {
+    "modes": {
+      "minutes": "{{minutes}} min",
+      "players": "Up to {{count}}",
+      "skill": {
+        "meaning": "Meaning",
+        "spotting": "Word spotting",
+        "speed": "Speed",
+        "hunting": "List recall",
+        "building": "Spelling"
+      },
+      "pitch": {
+        "vocabQuiz": "Race the class to the right meaning.",
+        "classic": "One shared board. Find more words than anyone.",
+        "blast": "Quick-fire rounds. Chain words for huge combos.",
+        "wordHunt": "Your list words are hiding. Hunt them first.",
+        "wordcraft": "Build list words from letter tiles. Top crafter wins."
+      }
+    },
+    "launch": {
+      "titleMode": "Launching {{mode}}",
+      "generic": "Setting up your game",
+      "codeLabel": "Your join code",
+      "step": {
+        "words": "Words loaded",
+        "room": "Opening the room",
+        "code": "Getting your join code"
+      }
+    },
+    "lists": {
+      "label": "Word lists",
+      "more": "More"
+    },
+    "checklist": {
+      "firstStudent": "Get your first student in",
+      "firstGame": "Run your first live game",
+      "firstGameCta": "See your reports"
+    },
+    "tools": {
+      "students": "Students",
+      "studentsStat": "in this class",
+      "progress": "Progress",
+      "progressStat": "Last 7 and 30 days",
+      "lastGame": "Last game",
+      "assignments": "Homework",
+      "assignmentsStat": "assigned",
+      "assignmentsUnknown": "See what is due",
+      "analytics": "Analytics",
+      "analyticsStat": "Trends per student",
+      "proBadge": "Pro",
+      "classes": "Classes",
+      "classesStat": "Manage & rename",
+      "back": "All class tools"
+    },
+    "auth": {
+      "titleSignup": "Create your teacher account",
+      "titleSignin": "Welcome back",
+      "subtitle": "Your classes, join codes and reports, one sign-in away.",
+      "tabSignup": "I'm new",
+      "tabSignin": "I have an account"
+    },
+    "access": {
+      "haveAccount": "Already have an account? Sign in"
+    },
+    "hq": {
+      "assigned": "{{count}} assigned",
+      "assignedAria": "Homework: {{count}} assigned. Open homework",
+      "assignNudge": "Assign homework"
+    },
+    "modeTags": {
+      "vocabQuiz": "Pick the meaning",
+      "classic": "Spot hidden words",
+      "blast": "Chain combos",
+      "wordHunt": "Find list words",
+      "wordcraft": "Build and spell"
+    }
+  },
+  // @eduHq:end
+  // @eduLive:start
+  "eduLive": {
+    "exit": {
+      "title": "End the class game?",
+      "body": "The room closes for every student and you'll be back in your class HQ.",
+      "stay": "Keep playing",
+      "confirm": "End game"
+    },
+    "live": {
+      "panelTitle": "Live round",
+      "wordsFound": "words found",
+      "lessonFound": "Lesson words: {{found}}/{{total}}",
+      "wordOfRound": "Word of the round",
+      "wordOfRoundEmpty": "The first long word grabs this spot",
+      "bestWordBy": "{{count}} letters · found by {{name}}",
+      "exitLabel": "Leave the game"
+    },
+    "results": {
+      "backToClass": "Back to class",
+      "switchGame": "Switch game",
+      "soloTitle": "Solo round!",
+      "tieTitle": "It's a tie!",
+      "zeroTitle": "No points this round",
+      "zeroBody": "Warm-up done. The next round counts.",
+      "zeroNoteTitle": "Nobody scored yet",
+      "zeroNoteHint": "Try a longer timer or an easier board. Same code, nobody rejoins.",
+      "lineupTitle": "This round's line-up",
+      "emptyTitle": "Practice round done",
+      "emptyHeadline": "No students played this one",
+      "emptyBody": "Put the code up on the board. The next round counts for real.",
+      "podiumLessonWords": "{{found}}/{{total}} lesson words",
+      "noLessonTitle": "No lesson words this round",
+      "noLessonBody": "The points came from other words on the board. The class's best finds:",
+      "noLessonBodyEmpty": "The points came from other words on the board.",
+      "noLessonHint": "A bigger board or a longer timer gives the lesson words more room.",
+      "noLessonReteach": "Lesson words still to teach"
+    },
+    "reteach": {
+      "playNow": "Play it now",
+      "sendHome": "Send it home",
+      "printShare": "Print & share",
+      "googleClassroom": "Post to Google Classroom"
+    },
+    "lobby": {
+      "waitingForStudents": "Waiting for students"
+    },
+    "wordcraft": {
+      "bingo": "BINGO!",
+      "waiting": "Waiting for the first word…"
+    }
+  },
+  // @eduLive:end
+  "eduPro": {
+    "mastery": {
+      "title": "Word mastery",
+      "subtitle": "Which words your class keeps missing — across every game.",
+      "proBadge": "Pro",
+      "stats": {
+        "accuracy": "Class accuracy",
+        "words": "Words tracked",
+        "sessions": "Game results",
+        "students": "Students"
+      },
+      "hardestTitle": "Hardest words",
+      "missedOf": "missed {missed} of {attempts}",
+      "studentsMissing": "{count} of {total} students",
+      "noneMissed": "Nobody has missed a word twice yet. Nice.",
+      "empty": "Play a vocab quiz or a Wordcraft round with this class — mastery fills in after the first game.",
+      "loading": "Loading word mastery…",
+      "error": "Couldn't load word mastery. Refresh to try again.",
+      "heatmapToggle": "Student × word heatmap",
+      "heatmapHint": "Each cell is one student on one word.",
+      "studentColumn": "Student",
+      "legend": {
+        "solid": "Got it",
+        "shaky": "Shaky",
+        "missed": "Missed",
+        "unseen": "Not asked"
+      },
+      "cellLabel": "{name}, {word}: {correct} of {attempts} correct",
+      "cellUnseen": "{name}, {word}: not asked yet",
+      "showAll": "Show all {count}",
+      "showFewer": "Show fewer",
+      "hiddenWords": "+{count} more hard words in Pro",
+      "previewNote": "Free preview: your top 3. Pro shows all ten and every student.",
+      "phoneHint": "Hardest words first, with who missed each one.",
+      "needsHelpColumn": "Needs help",
+      "needsHelpLabel": "{name}: {count} words to review",
+      "missedRow": "Missed by",
+      "wordMissedLabel": "{word}: missed by {count} of {total} students",
+      "missedByCount": "missed by {count} of {total}",
+      "missedNames": "Missed: {names}",
+      "shakyNames": "Shaky: {names}",
+      "everyoneGotIt": "Everyone got it",
+      "needsHelpTitle": "Needs help",
+      "needsHelpChip": "{name} · {count}",
+      "allClear": "Nobody is stuck on these words. Nice.",
+      "unlock": {
+        "allWords": "The full top 10 hardest words, ranked",
+        "heatmap": "Who missed which word, student by student",
+        "practice": "One-click practice of missed words, spaced over a week"
+      }
+    },
+    "practice": {
+      "cta": "Practice missed words",
+      "hint": "Three spaced rounds of these words: tomorrow, in 3 days and in a week.",
+      "assigning": "Assigning…",
+      "assigned": "Assigned!",
+      "assignedBody": "{count} words, three rounds. Students find them in their lessons.",
+      "round": "Round {n}",
+      "roundName": "Missed words · {classroom} · round {n}/3 · {date}",
+      "failed": "Couldn't assign the rounds. Nothing was saved — try again.",
+      "already": "Already assigned today. Students have it in their lessons.",
+      "nothing": "No missed words to practise yet.",
+      "inDays": "in {count} days",
+      "tomorrow": "Tomorrow",
+      "whyNote": "Spaced retrieval beats one long review: each round comes back just as the word starts to fade."
+    },
+    "reports": {
+      "classEyebrow": "Class report",
+      "moreDetail": "Full printable report",
+      "moreDetailHint": "PDF export, per-student detail and Google Classroom grade passback.",
+      "assignmentsTitle": "Who's done what",
+      "assignmentsHint": "Who has finished each assignment — CSV export inside.",
+      "arcTitle": "Student by student",
+      "arcHint": "Who's climbing, who's stuck, and the words holding them back.",
+      "digestTitle": "Last class game",
+      "digestHint": "What happened in your most recent game, at a glance."
+    },
+    "upgrade": {
+      "featureMastery": "Top 10 missed words + a student × word heatmap",
+      "featureMissedPractice": "One click: spaced practice of the misses (1, 3, 7 days)",
+      "freeMastery": "Word mastery heatmap",
+      "freePractice": "Spaced missed-words practice"
+    },
+    "assign": {
+      "required": "required",
+      "needLessonAndDate": "Pick a lesson and a due date to assign.",
+      "needLesson": "Pick a lesson to assign.",
+      "needDate": "Pick a due date to assign."
     }
   }
 };

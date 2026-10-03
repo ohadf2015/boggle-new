@@ -7,6 +7,7 @@ import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendS
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useMpResultsController, type MpResultsProps, type MpResultsController } from './useMpResultsController';
 import { MpResultsStage } from './MpResultsStage';
+import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 
 export type MpResultsScreenProps = MpResultsProps;
 
@@ -55,6 +56,7 @@ function MpResultsScreenInner(props: MpResultsScreenProps) {
 
 function CalculatingScreen({ c }: { c: MpResultsController }) {
   const { t, props } = c;
+  const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost: !!props.isHost });
   return (
     <>
       <MpScreen
@@ -82,8 +84,8 @@ function CalculatingScreen({ c }: { c: MpResultsController }) {
       <ConfirmationDialog
         open={c.showExitConfirm}
         onOpenChange={c.setShowExitConfirm}
-        title={t('playerView.exitConfirmation')}
-        description={t('results.exitWarning')}
+        title={t(exitCopy.titleKey)}
+        description={t(exitCopy.bodyKey)}
         confirmText={t('common.confirm')}
         cancelText={t('common.cancel')}
         onConfirm={c.confirmExitRoom}

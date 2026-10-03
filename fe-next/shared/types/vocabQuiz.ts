@@ -42,6 +42,10 @@ export const CLASSROOM_GAME_MODES: readonly ClassroomGameMode[] = [
   'blast',
   'wheel-rush',
   VOCAB_QUIZ_MODE,
+  // Wordcraft: every student races their own lesson-dealt board vs a personal
+  // bot; the room leaderboard aggregates. It IS a GameMode already (the solo
+  // engine ships as one) — here it only joins the classroom offer.
+  'wordcraft',
 ] as const;
 
 // ---------------------------------------------------------------------------
