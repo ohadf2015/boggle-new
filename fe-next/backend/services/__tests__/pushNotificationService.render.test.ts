@@ -39,7 +39,7 @@ describe('renderNotification', () => {
       'en'
     );
     expect(out.title).toContain('gift');
-    expect(out.body).toBe('Alice sent you 50 XP!');
+    expect(out.body).toBe('Alice sent you 50 XP');
   });
 
   it('renders Hebrew for he locale', () => {

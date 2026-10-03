@@ -12,7 +12,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 const push = vi.fn();
 
-const classroomsState = { classrooms: [{ id: 'c1', name: 'Class 1' }] };
+const classroomsState = { classrooms: [{ id: 'c1', name: 'Class 1', member_count: 3 }] };
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -63,7 +63,7 @@ describe('<TeacherDashboard> — play now in one tap', () => {
   beforeEach(() => {
     push.mockClear();
     sessionStorage.clear();
-    classroomsState.classrooms = [{ id: 'c1', name: 'Class 1' }];
+    classroomsState.classrooms = [{ id: 'c1', name: 'Class 1', member_count: 3 }];
   });
 
   it('leads with the PLAY NOW panel, above everything else on the page', () => {

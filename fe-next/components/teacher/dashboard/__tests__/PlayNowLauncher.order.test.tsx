@@ -14,7 +14,7 @@
  * reader hits the action before the menu too.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -44,6 +44,7 @@ const order = (a: Element, b: Element) =>
 describe('<PlayNowLauncher> — the action precedes the menu', () => {
   it('puts GO LIVE before the source switch and the picker', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const go = screen.getByTestId('play-now-go');
     const switcher = screen.getByTestId('play-now-source-recent');
     expect(order(go, switcher), 'GO LIVE must come before the source switch').toBe(-1);
@@ -54,13 +55,14 @@ describe('<PlayNowLauncher> — the action precedes the menu', () => {
 
   it('still says what it is armed with, above the button', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
-    const armed = screen.getByTestId('play-now-armed');
+    const armed = screen.getByTestId('play-now-next-list');
     expect(armed.textContent).toContain('Unit 4 verbs');
     expect(order(armed, screen.getByTestId('play-now-go'))).toBe(-1);
   });
 
   it('labels the section below the button as a way to change the words', () => {
     render(<PlayNowLauncher onLaunch={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
     const change = screen.getByTestId('play-now-change-disclosure');
     expect(order(screen.getByTestId('play-now-go'), change)).toBe(-1);
   });

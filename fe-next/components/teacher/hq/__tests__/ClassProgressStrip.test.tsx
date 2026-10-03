@@ -105,6 +105,47 @@ describe('<ClassProgressStrip>', () => {
     });
   });
 
+  it('Given an in-page Pro sheet, Then the one upgrade control opens it and still fires teacher_hq_upgrade_clicked', () => {
+    const onUpgrade = vi.fn();
+    render(
+      <ClassProgressStrip
+        classroomId="c1"
+        studentCount={2}
+        assignmentCount={1}
+        submittedCount={0}
+        hasPro={false}
+        bare
+        onUpgrade={onUpgrade}
+        upgradeLabel="See who needs help"
+      />,
+    );
+    const btn = screen.getByTestId('hq-class-progress-upgrade');
+    expect(btn.tagName).toBe('BUTTON');
+    expect(btn).toHaveTextContent('See who needs help');
+    fireEvent.click(btn);
+    expect(onUpgrade).toHaveBeenCalledTimes(1);
+    expect(capture).toHaveBeenCalledWith('teacher_hq_upgrade_clicked', { classroom_id: 'c1' });
+  });
+
+  it('Given another ask already owns the page, Then a free teacher sees no upgrade control here', () => {
+    render(
+      <ClassProgressStrip classroomId="c1" studentCount={2} assignmentCount={1} submittedCount={0} hasPro={false} showUpgrade={false} />,
+    );
+    expect(screen.queryByTestId('hq-class-progress-upgrade')).toBeNull();
+  });
+
+  it('Given a way to open homework, Then the assignments count itself opens it (no second assignments pill)', () => {
+    const onOpen = vi.fn();
+    render(
+      <ClassProgressStrip classroomId="c1" studentCount={2} assignmentCount={3} submittedCount={1} hasPro onOpenAssignments={onOpen} />,
+    );
+    const btn = screen.getByTestId('hq-assignments-open');
+    expect(screen.getByTestId('hq-class-progress-assignments')).toContainElement(btn);
+    expect(btn).toHaveTextContent('3');
+    fireEvent.click(btn);
+    expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
   it('Given an action, Then it renders inside the strip row', () => {
     render(
       <ClassProgressStrip

@@ -62,7 +62,7 @@ describe('wordTowerPushNotifications', () => {
       await notifyWordTowerWreck('defender-id', 'Ohad', 25);
 
       expect(mockSendToUser).toHaveBeenCalledWith('defender-id', expect.objectContaining({
-        title: '💥 Tower Wrecked!',
+        title: '💥 Your tower got hit',
         body: expect.stringContaining('Ohad'),
         body: expect.stringContaining('25'),
         data: {
@@ -79,7 +79,7 @@ describe('wordTowerPushNotifications', () => {
         expect.objectContaining({
           user_id: 'defender-id',
           notification_type: 'social',
-          title: expect.stringContaining('Wrecked'),
+          title: expect.stringContaining('got hit'),
         })
       );
     });
@@ -103,7 +103,7 @@ describe('wordTowerPushNotifications', () => {
       await notifyWordTowerPass('rival-id', 'Bob');
 
       expect(mockSendToUser).toHaveBeenCalledWith('rival-id', expect.objectContaining({
-        title: '🏗️ Tower Topped!',
+        title: '🏗️ Your tower got passed',
         body: expect.stringContaining('Bob'),
         data: {
           type: 'word_tower_pass',
@@ -119,7 +119,7 @@ describe('wordTowerPushNotifications', () => {
         expect.objectContaining({
           user_id: 'rival-id',
           notification_type: 'social',
-          title: expect.stringContaining('Tower Topped'),
+          title: expect.stringContaining('got passed'),
         })
       );
     });

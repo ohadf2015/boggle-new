@@ -23,7 +23,7 @@ vi.mock('@/hooks/useClassroom', () => ({
   useClassrooms: () => ({
     classrooms: [
       { id: 'c1', name: 'Period 1', join_code: 'AAA111', member_count: 3 },
-      { id: 'c2', name: 'Period 2', join_code: 'BBB222', member_count: 0 },
+      { id: 'c2', name: 'Period 2', join_code: 'BBB222', member_count: 2 },
     ],
     isLoading: false,
     error: null,

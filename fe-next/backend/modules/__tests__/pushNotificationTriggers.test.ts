@@ -84,8 +84,8 @@ describe('pushNotificationTriggers', () => {
       await notifyFriendRequest('target-user-id', 'Ohad');
 
       expect(mockSendToUser).toHaveBeenCalledWith('target-user-id', expect.objectContaining({
-        title: 'Friend Request',
-        body: 'Ohad sent you a friend request!',
+        title: 'New friend request',
+        body: 'Ohad wants to be friends',
         data: {
           type: 'friend_request',
           deepLink: '/friends?tab=requests',
@@ -100,8 +100,8 @@ describe('pushNotificationTriggers', () => {
         expect.objectContaining({
           user_id: 'target-user-id',
           notification_type: 'social',
-          title: 'Friend Request',
-          body: 'Ohad sent you a friend request!',
+          title: 'New friend request',
+          body: 'Ohad wants to be friends',
         })
       );
     });
@@ -117,8 +117,8 @@ describe('pushNotificationTriggers', () => {
       await notifyFriendAccepted('original-sender-id', 'Maya');
 
       expect(mockSendToUser).toHaveBeenCalledWith('original-sender-id', expect.objectContaining({
-        title: 'Friend Request Accepted',
-        body: 'Maya accepted your friend request!',
+        title: 'You have a new friend',
+        body: 'Maya accepted your friend request',
         data: {
           type: 'friend_accepted',
           deepLink: '/friends?tab=friends',
@@ -133,7 +133,7 @@ describe('pushNotificationTriggers', () => {
       await notifyCuratorAssigned('new-curator-id', 'he', 2);
 
       expect(mockSendToUser).toHaveBeenCalledWith('new-curator-id', expect.objectContaining({
-        title: "🎉 You're a Language Curator!",
+        title: "🎉 You're a language curator",
         // {language} is filled with the curated language's autonym, not its code,
         // so it reads naturally regardless of the recipient's own locale.
         body: expect.stringContaining('עברית'),
@@ -166,8 +166,8 @@ describe('pushNotificationTriggers', () => {
       await notifyDailyChallengeReminder('target-user-id');
 
       expect(mockSendToUser).toHaveBeenCalledWith('target-user-id', expect.objectContaining({
-        title: '🎯 Daily Challenge awaits',
-        body: 'Keep your streak alive — 60 seconds to play!',
+        title: "🎯 Today's challenge is up",
+        body: '60 seconds keeps your streak alive.',
         data: {
           type: 'daily_challenge',
           deepLink: '/daily',
@@ -201,8 +201,8 @@ describe('pushNotificationTriggers', () => {
     it('notifyAchievement pushes AND saves in-app row', async () => {
       await notifyAchievement('uid', 'Word Wizard');
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: '🏅 Achievement Unlocked!',
-        body: 'Nailed it — Word Wizard is yours!',
+        title: '🏅 Achievement unlocked',
+        body: 'You earned Word Wizard',
       }));
       expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({ user_id: 'uid', notification_type: 'achievement' })
@@ -236,8 +236,8 @@ describe('pushNotificationTriggers', () => {
       await notifyFriendRequest('target-user-id', 'Ohad');
 
       expect(mockSendToUser).toHaveBeenCalledWith('target-user-id', expect.objectContaining({
-        title: 'בקשת חברות',
-        body: '!שלח/ה לך בקשת חברות Ohad',
+        title: 'בקשת חברות חדשה',
+        body: 'בקשת חברות מ-Ohad',
       }));
     });
 
@@ -246,8 +246,8 @@ describe('pushNotificationTriggers', () => {
       await notifyFriendRequest('target-user-id', 'Ohad');
 
       expect(mockSendToUser).toHaveBeenCalledWith('target-user-id', expect.objectContaining({
-        title: 'Friend Request',
-        body: 'Ohad sent you a friend request!',
+        title: 'New friend request',
+        body: 'Ohad wants to be friends',
       }));
     });
 
@@ -256,7 +256,7 @@ describe('pushNotificationTriggers', () => {
       await notifyFriendRequest('target-user-id', 'Ohad');
 
       expect(mockSendToUser).toHaveBeenCalledWith('target-user-id', expect.objectContaining({
-        title: 'Friend Request',
+        title: 'New friend request',
       }));
     });
   });
@@ -326,8 +326,8 @@ describe('pushNotificationTriggers', () => {
       await notifyGameInvite('target-user-id', 'Ohad', 'ABC123');
 
       expect(mockSendToUser).toHaveBeenCalledWith('target-user-id', expect.objectContaining({
-        title: 'Game Invite',
-        body: 'Ohad invited you to play!',
+        title: 'Game invite',
+        body: 'Ohad wants a game. You in?',
         data: {
           type: 'game_invite',
           deepLink: '/multiplayer?room=ABC123',
@@ -341,8 +341,8 @@ describe('pushNotificationTriggers', () => {
       await notifySeasonStart('uid', 5, 4);
 
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: '🏆 Season 5 is here!',
-        body: 'Season 4 ended — claim your rewards now!',
+        title: '🏆 Season 5 starts now',
+        body: 'Season 4 is over. Your rewards are waiting.',
         data: {
           type: 'season_start',
           deepLink: '/leaderboard?seasonModal=1',
@@ -354,8 +354,8 @@ describe('pushNotificationTriggers', () => {
       await notifySeasonStart('uid', 1);
 
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: '🏆 Season 1 is here!',
-        body: 'A new season has begun — climb the ranks!',
+        title: '🏆 Season 1 starts now',
+        body: 'New season, fresh leaderboard. Start climbing.',
       }));
     });
 
@@ -366,7 +366,7 @@ describe('pushNotificationTriggers', () => {
         expect.objectContaining({
           user_id: 'uid',
           notification_type: 'system',
-          title: '🏆 Season 5 is here!',
+          title: '🏆 Season 5 starts now',
         }),
       );
     });
@@ -393,7 +393,7 @@ describe('pushNotificationTriggers', () => {
       await notifyAchievement('uid', 'WORD_MASTER');
 
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        body: 'Nailed it — Word Master is yours!',
+        body: 'You earned Word Master',
       }));
     });
 
@@ -402,7 +402,7 @@ describe('pushNotificationTriggers', () => {
       await notifyAchievement('uid', 'UNKNOWN_TEST_KEY');
 
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        body: 'Nailed it — UNKNOWN TEST KEY is yours!',
+        body: 'You earned UNKNOWN TEST KEY',
       }));
     });
   });
@@ -419,8 +419,8 @@ describe('pushNotificationTriggers', () => {
 
       expect(mockSendToUser).toHaveBeenCalledTimes(1);
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: '🏅 Achievement Unlocked!',
-        body: 'Nailed it — Word Master is yours!',
+        title: '🏅 Achievement unlocked',
+        body: 'You earned Word Master',
       }));
     });
 
@@ -429,8 +429,8 @@ describe('pushNotificationTriggers', () => {
 
       expect(mockSendToUser).toHaveBeenCalledTimes(1);
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: '🏅 2 Achievements in One Go!',
-        body: 'You earned: Word Master & Combo King',
+        title: '🏅 2 achievements at once',
+        body: 'You earned Word Master and Combo King',
       }));
     });
 
@@ -444,8 +444,8 @@ describe('pushNotificationTriggers', () => {
 
       expect(mockSendToUser).toHaveBeenCalledTimes(1);
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: '🏅 4 Achievements in One Go!',
-        body: 'You earned: Word Master, Combo King +2 more',
+        title: '🏅 4 achievements at once',
+        body: 'You earned Word Master, Combo King and 2 more',
       }));
     });
 

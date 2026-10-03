@@ -1,11 +1,10 @@
-/** Teacher HQ: one-screen command deck — START A GAME, GET STUDENTS IN, and the class pulse; the rest opens as dock sheets. */
+/** Teacher HQ: one primary action chosen by the class's state (create class → get students in → go live + pulse); the rest opens as dock sheets. */
 'use client';
 
 import { type ReactNode, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
@@ -26,7 +25,6 @@ import {
   type QuickLaunchIntent,
 } from './dashboard/quickLaunchIntent';
 import { useClassrooms } from '@/hooks/useClassroom';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { AssignmentCreator } from './assignments';
 import { TeacherStatusRow } from './dashboard/TeacherStatusRow';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
@@ -40,19 +38,20 @@ import {
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { GetStudentsInCard } from './hq/GetStudentsInCard';
 import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
-import { FirstAssignmentPanel } from './hq/FirstAssignmentPanel';
-import { StartLiveClassCta } from './hq/StartLiveClassCta';
-import { ClassProgressStrip } from './hq/ClassProgressStrip';
-import { ClassPulseRow } from './hq/ClassPulseRow';
 import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
-import { liveClassroomHref } from '@/lib/education/startLiveClassCta';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
 import { HqDock } from './hq/HqDock';
 import { HqToolsContent, type HqToolsPanel } from './hq/HqToolsContent';
 import { pickHqUpsell } from './hq/pickHqUpsell';
-import { HqAssignmentsPill } from './hq/HqAssignmentsPill';
 import { FirstAssignmentInlineCta } from './hq/FirstAssignmentInlineCta';
-import { shouldShowFirstAssignmentCta } from '@/lib/education/firstAssignmentCta';
+import { HqClassPulse } from './hq/HqClassPulse';
+import { HqJoinStrip } from './hq/HqJoinStrip';
+import { HqLoadError } from './hq/HqLoadError';
+import { pickHqStep } from './hq/hqStep';
+import { shouldShowClassProgressStrip } from '@/lib/education/classProgressStrip';
+
+const QUIET_LINK =
+  'inline-flex min-h-10 items-center rounded-neo px-3 font-neo-body text-sm font-bold text-neo-white/70 underline decoration-1 underline-offset-4 transition-colors hover:text-neo-white focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 export interface TeacherDashboardProps {
   /**
@@ -205,19 +204,37 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
 
   const closeProjector = useCallback(() => setProjectorOpen(false), []);
 
-  const upsell = pickHqUpsell({ hasBanner: !!banner, pinBanner: !!pinBanner, hasUsagePrompt: !!usagePrompt });
-  const hasProChip = upsell.chip !== null;
-  const smUp = useMediaQuery('(min-width: 640px)');
-  const firstRun = !classroomsLoading && (classrooms.length === 0 || !!newlyCreatedJoinCode);
-  const startLive = selectedClassroom
-    ? {
-        classroomId: selectedClassroom.id,
-        studentCount: selectedClassroom.member_count ?? 0,
-        assignmentCount,
-        joinCode: selectedClassroom.join_code || '',
-        onStart: () => router.push(liveClassroomHref(language, selectedClassroom.id)),
-      }
-    : null;
+  const [launcherOpen, setLauncherOpen] = useState(false);
+  const studentCount = selectedClassroom?.member_count ?? 0;
+  const { step, offerFirstAssignment } = pickHqStep({
+    classroomsLoading,
+    classroomsError: !!classroomsError,
+    classroomCount: classrooms.length,
+    justCreatedClass: !!newlyCreatedJoinCode,
+    hasSelectedClass: !!selectedClassroom,
+    studentCount,
+    assignmentCount,
+    hasActiveRoom,
+  });
+  const upsell = pickHqUpsell({
+    hasBanner: !!banner,
+    pinBanner: !!pinBanner,
+    hasUsagePrompt: !!usagePrompt,
+    hasPro,
+    pulseHome:
+      step !== 'goLive' ? false : assignmentCount === null ? null : shouldShowClassProgressStrip({ studentCount, assignmentCount }),
+  });
+  const deck = step === 'goLive';
+  // Nothing to put beside the launcher until the class has homework or games: one calm column instead of a half-empty rail.
+  const split = deck && !offerFirstAssignment;
+  const launcher = <PlayNowLauncher onLaunch={handleQuickLaunch} />;
+  const LANDSCAPE = '[@media(orientation:landscape)_and_(max-height:500px)]';
+  const showLauncherLink = (label: string) =>
+    launcherOpen ? null : (
+      <button type="button" data-testid="hq-show-launcher" onClick={() => setLauncherOpen(true)} className={QUIET_LINK}>
+        {label}
+      </button>
+    );
 
   return (
     <EducationShell
@@ -237,45 +254,31 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
 
       {/* No transform anywhere on this subtree — the sheets below are `position: fixed`. */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgba(255,254,240,0.05),transparent_60%)]"
-        aria-hidden="true"
-      />
-
-      <div
         data-testid="teacher-dashboard-grid"
         className={cn(
-          // Phones: at least the viewport, and allowed taller — a short phone scrolls the one shell region instead of clipping the join card.
-          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1640px] flex-col gap-2 px-3 py-2 lg:h-full lg:min-h-0 [@media(orientation:landscape)_and_(max-height:500px)]:h-full [@media(orientation:landscape)_and_(max-height:500px)]:min-h-0',
-          'sm:gap-3 sm:px-5 sm:py-3',
-          'lg:grid lg:grid-cols-5 lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-4 lg:px-8 lg:py-4',
-          // A phone turned sideways (844x390) is short, not narrow: the stacked
-          // column would be ~2x its height. It gets the desktop split instead.
-          '[@media(orientation:landscape)_and_(max-height:500px)]:grid [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-5 [@media(orientation:landscape)_and_(max-height:500px)]:grid-rows-[auto_minmax(0,1fr)] [@media(orientation:landscape)_and_(max-height:500px)]:gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:py-1.5',
+          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1640px] flex-col gap-3 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3 lg:px-8 lg:py-4',
+          deck && !split && 'lg:max-w-2xl',
+          split && [
+            'lg:grid lg:min-h-0 lg:grid-cols-2 lg:content-start lg:items-start lg:gap-x-8 lg:gap-y-5',
+            // A phone turned sideways (844x390) is short, not narrow: it gets the desktop split.
+            `${LANDSCAPE}:grid ${LANDSCAPE}:min-h-0 ${LANDSCAPE}:grid-cols-2 ${LANDSCAPE}:content-start ${LANDSCAPE}:items-start ${LANDSCAPE}:gap-2 ${LANDSCAPE}:py-1.5`,
+          ],
         )}
       >
         {upsell.pinned ? (
-          <div
-            data-testid="teacher-dashboard-pinned-banner"
-            className="lg:col-span-5 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-5"
-          >
+          <div data-testid="teacher-dashboard-pinned-banner" data-hq-upsell="pinned" className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)}>
             {banner}
           </div>
         ) : null}
-        {/* Top row: which class, and the ONE Tools entry (+ Go Pro chip).
-            The shell's tab bar is the nav; nothing else competes with it. The
-            dock sits in this row's end but is rendered LAST, so keyboard and
-            screen-reader order still meet START before any secondary surface. */}
-        <div className="flex min-h-9 shrink-0 items-center gap-2 lg:col-span-5 lg:min-h-10 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-5">
-          {/* `contain: inline-size` — a long class name must truncate here, not
-              widen the whole shell column past a 390px phone. */}
+        {/* Top row: which class, and the ONE Tools entry (+ Go Pro chip). The dock is rendered LAST so keyboard order meets the primary action first. */}
+        <div className={cn('flex min-h-9 shrink-0 items-center gap-2 lg:col-span-full lg:min-h-10', `${LANDSCAPE}:col-span-full`)}>
+          {/* `contain: inline-size` — a long class name must truncate here, not widen the shell past a 390px phone. */}
           <div className="min-w-0 flex-1 [contain:inline-size]">
             {classroomsLoading ? (
-              // The chip's slot while the class read is open — the row keeps
-              // its height and the name lands in place, never pushes in.
               <span
                 data-testid="hq-class-chip-skeleton"
                 aria-hidden="true"
-                className="block h-9 w-28 animate-pulse rounded-neo border-2 border-neo-cyan/60 bg-neo-navy motion-reduce:animate-none"
+                className="block h-9 w-28 animate-pulse rounded-neo bg-neo-navy-light motion-reduce:animate-none"
               />
             ) : classrooms.length > 1 ? (
               <ClassSwitcher
@@ -288,144 +291,92 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
             ) : selectedClassroom ? (
               <span
                 data-testid="hq-class-chip"
-                className="inline-flex min-h-9 max-w-full items-center rounded-neo border-2 border-black bg-neo-cyan px-3 font-neo-display text-xs font-bold uppercase tracking-wide text-black shadow-hard-sm max-sm:border-transparent max-sm:bg-transparent max-sm:px-0 max-sm:text-sm max-sm:text-neo-cyan max-sm:shadow-none"
+                className="inline-flex min-h-9 max-w-full items-center font-neo-display text-sm font-bold uppercase tracking-wide text-neo-cyan lg:text-base"
               >
-                {/* Class names are DATA, often in the other script (a Latin
-                    name under Hebrew UI): `dir="auto"` isolates it and makes
-                    the ellipsis land at the name's own end, never a leading
-                    "…ERA'S CLASS". `text-start` follows that resolved dir. */}
+                {/* Class names are DATA, often in another script: `dir="auto"` isolates it so the ellipsis lands at the name's own end. */}
                 <span dir="auto" className="min-w-0 truncate text-start">
                   {selectedClassroom.name}
                 </span>
               </span>
             ) : null}
-            {/* First-run only, and a chip in the empty class slot: a modal here covered GO LIVE on first visit. */}
+            {/* First-run only, and a chip in the empty class slot: a modal here covered the first action on first visit. */}
             {!classroomsLoading && classrooms.length === 0 && (
               <TeacherOnboarding onDismiss={() => setWalkthroughOpen(false)} presentation="chip" onOpenChange={setWalkthroughOpen} />
             )}
           </div>
-          <HqAssignmentsPill
-            count={selectedClassroom ? assignmentCount : null}
-            onOpen={() => {
-              setToolsPanel('assignments');
-              openTools(true);
-            }}
-          />
-          {/* Room for the absolute dock at this row's end. Narrow phones
-              cannot spare w-60 for a chip row — keep Tools (+ Go Pro)
-              reachable without shoving the class chip off-canvas. */}
+          {/* Room for the absolute dock at this row's end. */}
           <div
             aria-hidden="true"
-            className={cn(
-              'shrink-0',
-              hasProChip
-                ? 'w-36 max-[360px]:w-28 sm:w-60 md:w-72'
-                : 'w-10 sm:w-36 md:w-44',
-            )}
+            className={cn('shrink-0', upsell.chipVisible ? 'w-36 max-[360px]:w-28 sm:w-60 md:w-72' : 'w-10 sm:w-36 md:w-44')}
           />
         </div>
 
-        {classroomsError ? (
-          // Pessimistic: never an empty deck while the classroom read is broken.
-          <div
-            data-testid="play-tab-error-card"
-            className="rounded-neo border-3 border-neo-red bg-neo-cream px-6 py-8 text-center shadow-hard lg:col-span-5 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-5"
-          >
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-2 border-neo-red bg-neo-red/10 shadow-hard-sm">
-              <BarChart3 className="h-8 w-8 text-neo-red" />
+        {step === 'error' ? (
+          <HqLoadError onRetry={() => refreshClassrooms()} className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)} />
+        ) : step === 'loading' ? (
+          <GetStudentsInSkeleton className="mx-auto w-full max-w-2xl" />
+        ) : step === 'createClass' || step === 'getStudents' ? (
+          <div className="mx-auto flex w-full max-w-2xl flex-col gap-3">
+            {step === 'createClass' ? (
+              <div data-hq-primary="createClass" className="flex flex-col">
+                <PlayTabFirstRunCard onJoinCodeCreated={setNewlyCreatedJoinCode} initialJoinCode={newlyCreatedJoinCode} />
+              </div>
+            ) : selectedClassroom ? (
+              <div data-hq-primary="getStudents" className="flex flex-col">
+                <GetStudentsInCard
+                  classroom={{ ...selectedClassroom, join_code: selectedClassroom.join_code || '' }}
+                  onOpenProjector={() => setProjectorOpen(true)}
+                />
+              </div>
+            ) : null}
+            <div className="flex justify-center">
+              {showLauncherLink(t(step === 'createClass' ? 'hqCalm.playWithoutClass' : 'hqCalm.startAnyway'))}
             </div>
-            <p className="font-neo-body text-lg font-black text-black text-balance">
-              {t('teacher.dashboard.classroomLoadError')}
-            </p>
-            <p className="mt-1 text-sm font-bold text-black/60 text-pretty">
-              {t('teacher.dashboard.classroomLoadErrorHint')}
-            </p>
-            <button
-              type="button"
-              onClick={() => refreshClassrooms()}
-              data-testid="play-tab-error-retry-button"
-              className={cn(
-                'mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-neo px-6 py-2.5',
-                'border-3 border-black bg-neo-cyan font-neo-display font-black text-black shadow-hard',
-                'transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
-                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
-              )}
-            >
-              {t('teacher.dashboard.retry')}
-            </button>
+            {launcherOpen ? launcher : null}
           </div>
         ) : (
           <>
             <div
               data-testid="teacher-dashboard-main"
-              className="min-w-0 shrink-0 lg:col-span-3 lg:min-h-0 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-3 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-0"
+              data-hq-primary="goLive"
+              className={cn('min-w-0 shrink-0 lg:col-span-1', `${LANDSCAPE}:col-span-1`)}
             >
-              <PlayNowLauncher onLaunch={handleQuickLaunch} />
+              {launcher}
             </div>
-
-            <div
-              data-testid="teacher-dashboard-aside"
-              className="flex min-h-0 min-w-0 flex-1 flex-col lg:col-span-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2"
-            >
-              {/* Step 2 is ALWAYS mounted, in one frame: skeleton while the
-                  class read is open (or the default class is a render away),
-                  "create your class" for a teacher with none, else the card. */}
-              {firstRun ? (
-                // A teacher with no class yet needs a join code before anything.
-                <PlayTabFirstRunCard
-                  className="flex-1"
-                  onJoinCodeCreated={setNewlyCreatedJoinCode}
-                  initialJoinCode={newlyCreatedJoinCode}
-                />
-              ) : selectedClassroom ? (
-                <div className="flex min-h-0 flex-1 flex-col gap-2">
-                  {/* Mounted, not CSS-hidden, by width: a display:none twin still reads as a covered "Create assignment" to hit tests. */}
-                  {smUp ? (
-                    <FirstAssignmentPanel
-                      classroomId={selectedClassroom.id}
-                      studentCount={selectedClassroom.member_count ?? 0}
-                      assignmentCount={assignmentCount}
-                      hasActiveRoom={hasActiveRoom}
-                      onCta={() => setShowAssignmentCreator(true)}
-                    />
-                  ) : null}
-                  <ClassPulseRow
+            {selectedClassroom ? (
+              <>
+                <div
+                  data-testid="teacher-dashboard-aside"
+                  className={cn('flex min-w-0 flex-col gap-3 lg:col-span-1 lg:row-span-2', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:row-span-2`)}
+                >
+                  <HqClassPulse
                     classroomId={selectedClassroom.id}
-                    studentCount={selectedClassroom.member_count ?? 0}
-                  />
-                  <ClassProgressStrip
-                    classroomId={selectedClassroom.id}
-                    studentCount={selectedClassroom.member_count ?? 0}
+                    studentCount={studentCount}
                     assignmentCount={assignmentCount}
                     submittedCount={submittedCount}
                     hasPro={hasPro}
-                    action={startLive ? <StartLiveClassCta variant="inline" {...startLive} /> : undefined}
-                  />
-                  <GetStudentsInCard
-                    className="flex-1"
-                    classroom={{
-                      ...selectedClassroom,
-                      join_code: selectedClassroom.join_code || '',
+                    upsell={upsell.pulse}
+                    onUpgrade={upsell.chip ? () => setProOpen(true) : undefined}
+                    onOpenAssignments={() => {
+                      setToolsPanel('assignments');
+                      openTools(true);
                     }}
-                    onOpenProjector={() => setProjectorOpen(true)}
-                    rosterAction={
-                      !smUp && shouldShowFirstAssignmentCta({
-                        studentCount: selectedClassroom.member_count ?? 0,
-                        assignmentCount,
-                        hasActiveRoom,
-                      }) ? (
-                        <FirstAssignmentInlineCta
-                          classroomId={selectedClassroom.id}
-                          onCta={() => setShowAssignmentCreator(true)}
-                        />
-                      ) : undefined
-                    }
                   />
+                  {offerFirstAssignment ? (
+                    <div className="flex">
+                      <FirstAssignmentInlineCta classroomId={selectedClassroom.id} onCta={() => setShowAssignmentCreator(true)} />
+                    </div>
+                  ) : null}
                 </div>
-              ) : (
-                <GetStudentsInSkeleton className="flex-1" />
-              )}
-            </div>
+                <HqJoinStrip
+                  className={cn('lg:col-span-1 lg:col-start-1', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:col-start-1`)}
+                  classroomId={selectedClassroom.id}
+                  joinCode={selectedClassroom.join_code || ''}
+                  studentCount={studentCount}
+                  onOpenProjector={() => setProjectorOpen(true)}
+                />
+              </>
+            ) : null}
           </>
         )}
 
@@ -454,7 +405,10 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                 onCreateClassroom={focusCreateClassroom}
                 onCreateAssignment={() => setShowAssignmentCreator(true)}
                 onInvite={() => focusDeck('hq-copy-link')}
-                onPlay={() => focusDeck('play-now-go')}
+                onPlay={() => {
+                  setLauncherOpen(true);
+                  focusDeck('play-now-go');
+                }}
                 onReviewWords={openReviewLesson}
               />
             ) : undefined
@@ -466,6 +420,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
               <div data-testid="teacher-dashboard-usage-prompt">{usagePrompt}</div>
             ) : undefined
           }
+          proChipHidden={!upsell.chipVisible}
           proOpen={proOpen}
           onProOpenChange={setProOpen}
         />

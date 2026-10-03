@@ -377,7 +377,7 @@ export default function AndroidReleaseLaunchEmail({
                     <td align="center" style={{ padding: '24px 16px 8px' }}>
                       {/* recipientName is escaped at substitution time by the lib */}
                       <p style={{ margin: '0 0 6px', fontFamily: FONT_STACK, fontSize: '13px', color: C.muted }}>
-                        {recipientName ? `${recipientName} — ` : ''}
+                        {recipientName ? `${recipientName}: ` : ''}
                         {t.footer}
                       </p>
                       <a

@@ -42,7 +42,7 @@ const COPY: Record<string, {
     teaser: "Today's word starts with...",
     question: 'Bet you can\'t crack it 😏',
     cta: 'Prove Me Wrong',
-    urgency: 'Gone by midnight — no pressure',
+    urgency: 'Gone by midnight, no pressure',
     social: 'Meanwhile, your friends won\'t stop flexing on the leaderboard',
     footerReason: 'You signed up for this (literally).',
     unsubscribe: 'Unsubscribe',
@@ -52,9 +52,9 @@ const COPY: Record<string, {
     greeting: (n) => `?${n} ,לאן נעלמת`,
     streak: 'הרצף שלך הגיש תלונה על נטישה',
     teaser: '...המילה של היום מתחילה ב',
-    question: '😏 בטוח/ה שתצליח/י?',
+    question: '😏 בטוחים שתצליחו?',
     cta: 'תוכיח/י לי',
-    urgency: 'נעלם בחצות — בלי לחץ',
+    urgency: 'נעלם בחצות, בלי לחץ',
     social: 'בינתיים, החברים שלך לא מפסיקים להתגאות בטבלה',
     footerReason: '.נרשמת לזה (ברצון)',
     unsubscribe: 'ביטול הרשמה',
@@ -66,7 +66,7 @@ const COPY: Record<string, {
     teaser: 'Dagens ord börjar med...',
     question: 'Klarar du det? Tveksamt 😏',
     cta: 'Bevisa motsatsen',
-    urgency: 'Borta vid midnatt — ingen stress',
+    urgency: 'Borta vid midnatt, ingen stress',
     social: 'Under tiden skryter dina vänner på topplistan',
     footerReason: 'Du anmälde dig till detta (frivilligt).',
     unsubscribe: 'Avprenumerera',
@@ -78,7 +78,7 @@ const COPY: Record<string, {
     teaser: '今日の単語の最初の文字は...',
     question: '解ける？ …無理かもね 😏',
     cta: 'やれるもんならどうぞ',
-    urgency: '深夜0時に消滅 — 焦らないで',
+    urgency: '深夜0時に消滅。焦らないで',
     social: 'あなたがいない間、フレンドがランキング爆上げ中',
     footerReason: '自分で登録したんですよ。',
     unsubscribe: '配信停止',
@@ -90,7 +90,7 @@ const COPY: Record<string, {
     teaser: 'La palabra de hoy empieza con...',
     question: '¿Seguro que puedes? 😏',
     cta: 'Demuéstramelo',
-    urgency: 'Desaparece a medianoche — sin presión',
+    urgency: 'Desaparece a medianoche, sin presión',
     social: 'Mientras tanto, tus amigos no paran de presumir en la tabla',
     footerReason: 'Te apuntaste a esto (voluntariamente).',
     unsubscribe: 'Cancelar suscripción',
@@ -250,7 +250,7 @@ export default function ReengagementEmail({
         </Head>
 
         <Preview>
-          {t.teaser} {firstLetter} — {t.question}
+          {t.teaser} {firstLetter}. {t.question}
         </Preview>
 
         <Body className="body" style={{

@@ -80,6 +80,7 @@ describe('<PlayNowLauncher>', () => {
   it('launches pasted words as their own round, in a mode a bare list can carry', () => {
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
 
     fireEvent.click(screen.getByTestId('play-now-source-paste'));
     fireEvent.change(screen.getByTestId('play-now-paste-input'), {
@@ -95,6 +96,7 @@ describe('<PlayNowLauncher>', () => {
   it('refuses to launch a paste too short to make a round, and says why', () => {
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
 
     fireEvent.click(screen.getByTestId('play-now-source-paste'));
     fireEvent.change(screen.getByTestId('play-now-paste-input'), { target: { value: 'cat' } });
@@ -107,6 +109,7 @@ describe('<PlayNowLauncher>', () => {
     mockLessons.mockReturnValue({ lessons: [lesson('l1', 'Unit 5')], isLoading: false, error: null });
     const onLaunch = vi.fn();
     render(<PlayNowLauncher onLaunch={onLaunch} />);
+    fireEvent.click(screen.getByTestId('play-now-change'));
 
     fireEvent.click(screen.getByTestId('play-now-source-packs'));
     fireEvent.click(screen.getByTestId('play-now-go'));

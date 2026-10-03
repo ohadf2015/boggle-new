@@ -55,18 +55,18 @@ const COPY: Record<string, BetaCopy> = {
     title: 'LEXICLASH ON ANDROID',
     tagline: 'You were hand-picked for the closed beta',
     intro: (n) =>
-      `${n}, we picked you. The LexiClash Android app is in closed beta — tap install and be one of the first to play on your phone.`,
-    reminderTitle: 'Quick reminder — what is LexiClash?',
+      `${n}, we picked you. The LexiClash Android app is in closed beta. Tap install and be one of the first to play on your phone.`,
+    reminderTitle: 'Quick reminder: what is LexiClash?',
     reminder:
-      'A loud, word-powered arena: Word Hunt duels, Blast combos, Adventure quests, Connections puzzles, a daily challenge, gold, XP, streaks and a marshmallow mascot that cheers you on.',
-    features: ['Faster Launch', 'Native Feel', 'Same Account'],
+      'A loud word arena: Word Hunt duels, Blast combos, Adventure quests, Connections puzzles, a daily challenge, gold, XP, streaks and a marshmallow mascot who cheers for you.',
+    features: ['Faster launch', 'Native feel', 'Same account'],
     featureDescriptions: [
-      'Starts in a blink — no browser tax',
+      'Opens in a blink, no browser needed',
       'Haptics, offline puzzles, push nudges',
       'Your progress, coins & streaks carry over',
     ],
-    cta: 'Install the Android App',
-    urgency: 'Beta seats are limited — grab yours before it fills up',
+    cta: 'Install the Android app',
+    urgency: "Beta seats are limited. Grab yours before they're gone",
     footerReason: 'You subscribed to LexiClash updates.',
     unsubscribe: 'Unsubscribe',
     privacy: 'Privacy',
@@ -74,21 +74,21 @@ const COPY: Record<string, BetaCopy> = {
   he: {
     badge: 'בטא סגורה',
     title: 'לקסיקלאש על אנדרואיד',
-    tagline: 'נבחרת אישית לבטא הסגורה',
+    tagline: 'נבחרתם אישית לבטא הסגורה',
     intro: (n) =>
-      `${n}, בחרנו בך. אפליקציית LexiClash לאנדרואיד בבטא סגורה — הורד/הורידי והיה/י מהראשונים לשחק.`,
-    reminderTitle: 'תזכורת קצרה — מה זה LexiClash?',
+      `${n}, בחרנו בכם. אפליקציית LexiClash לאנדרואיד בבטא סגורה. הורידו והיו מהראשונים לשחק.`,
+    reminderTitle: 'תזכורת קצרה: מה זה LexiClash?',
     reminder:
-      'זירת מילים רועשת: דו-קרבות ווורד האנט, קומבואים של בלאסט, הרפתקאות, חידות קונקשנז, אתגר יומי, זהב, XP, רצפים, ומסקוט מרשמלו שמעודד אותך.',
+      'זירת מילים רועשת: דו-קרבות ווורד האנט, קומבואים של בלאסט, הרפתקאות, חידות קונקשנז, אתגר יומי, זהב, XP, רצפים, ומסקוט מרשמלו שמעודד אתכם.',
     features: ['הפעלה מהירה', 'תחושה טבעית', 'אותו חשבון'],
     featureDescriptions: [
-      'נפתח מיד — בלי דפדפן',
+      'נפתח מיד, בלי דפדפן',
       'רטט, חידות אופליין, התראות',
       'ההתקדמות, המטבעות והרצפים נשמרים',
     ],
-    cta: 'התקן/י את האפליקציה',
-    urgency: 'מקומות הבטא מוגבלים — תפוס/י לפני שייגמר',
-    footerReason: 'נרשמת לעדכוני LexiClash.',
+    cta: 'התקינו את האפליקציה',
+    urgency: 'מקומות הבטא מוגבלים. תפסו לפני שייגמרו',
+    footerReason: 'נרשמתם לעדכוני LexiClash.',
     unsubscribe: 'ביטול הרשמה',
     privacy: 'פרטיות',
   },
@@ -97,19 +97,19 @@ const COPY: Record<string, BetaCopy> = {
     title: 'LEXICLASH PÅ ANDROID',
     tagline: 'Du är handplockad till den stängda betan',
     intro: (n) =>
-      `${n}, vi valde dig. LexiClash Android-appen är i stängd beta — installera och var bland de första att spela.`,
-    reminderTitle: 'Snabb påminnelse — vad är LexiClash?',
+      `${n}, vi valde dig. LexiClash-appen för Android är i stängd beta. Installera och var bland de första att spela.`,
+    reminderTitle: 'Snabb påminnelse: vad är LexiClash?',
     reminder:
       'En högljudd ord-arena: Word Hunt-dueller, Blast-combos, Adventure-uppdrag, Connections-pussel, daglig utmaning, guld, XP, streaks och en marshmallow-maskot.',
     features: ['Snabb start', 'Native-känsla', 'Samma konto'],
     featureDescriptions: [
-      'Startar direkt — ingen webbläsar-skatt',
+      'Startar direkt, ingen webbläsare behövs',
       'Haptik, offlinepussel, notiser',
       'Framsteg, mynt och streaks följer med',
     ],
     cta: 'Installera Android-appen',
-    urgency: 'Beta-platserna är begränsade — ta din nu',
-    footerReason: 'Du prenumererar på LexiClash-uppdateringar.',
+    urgency: 'Betaplatserna är begränsade. Ta din nu',
+    footerReason: 'Du prenumererar på uppdateringar från LexiClash.',
     unsubscribe: 'Avprenumerera',
     privacy: 'Integritet',
   },
@@ -118,8 +118,8 @@ const COPY: Record<string, BetaCopy> = {
     title: 'Android版LexiClash',
     tagline: 'クローズドベータに招待されました',
     intro: (n) =>
-      `${n}さん、あなたを選びました。LexiClashのAndroidアプリはクローズドベータ中 — インストールしていち早く遊ぼう。`,
-    reminderTitle: 'おさらい — LexiClashって？',
+      `${n}さん、あなたを選びました。LexiClashのAndroidアプリはクローズドベータ中。インストールして、いち早く遊ぼう。`,
+    reminderTitle: 'おさらい：LexiClashって？',
     reminder:
       '騒がしい言葉のアリーナ：ワードハント、ブラスト、アドベンチャー、コネクションズ、毎日チャレンジ、ゴールド、XP、連勝、マシュマロマスコット。',
     features: ['高速起動', 'ネイティブ体感', '同じアカウント'],
@@ -129,7 +129,7 @@ const COPY: Record<string, BetaCopy> = {
       '進行度・コイン・連勝が引き継がれます',
     ],
     cta: 'Androidアプリを入手',
-    urgency: 'ベータ枠には限りあり — 早めに確保',
+    urgency: 'ベータ枠には限りあり。早めにどうぞ',
     footerReason: 'LexiClashのアップデートを購読しています。',
     unsubscribe: '配信停止',
     privacy: 'プライバシー',
@@ -137,20 +137,20 @@ const COPY: Record<string, BetaCopy> = {
   es: {
     badge: 'BETA CERRADA',
     title: 'LEXICLASH EN ANDROID',
-    tagline: 'Fuiste elegido para la beta cerrada',
+    tagline: 'Te elegimos para la beta cerrada',
     intro: (n) =>
-      `${n}, te elegimos. La app de LexiClash para Android está en beta cerrada — instálala y sé de los primeros en jugar.`,
-    reminderTitle: 'Recordatorio rápido — ¿qué es LexiClash?',
+      `${n}, te elegimos. La app de LexiClash para Android está en beta cerrada. Instálala y sé de los primeros en jugar.`,
+    reminderTitle: 'Recordatorio rápido: ¿qué es LexiClash?',
     reminder:
       'Una arena ruidosa de palabras: duelos Word Hunt, combos Blast, misiones Adventure, puzles Connections, reto diario, oro, XP, rachas y una mascota malvavisco.',
     features: ['Arranque rápido', 'Sensación nativa', 'Misma cuenta'],
     featureDescriptions: [
-      'Abre al instante — sin navegador',
+      'Abre al instante, sin navegador',
       'Vibración, puzles offline, notificaciones',
       'Tu progreso, monedas y rachas se mantienen',
     ],
     cta: 'Instalar app de Android',
-    urgency: 'Los cupos de beta son limitados — asegura el tuyo',
+    urgency: 'Los cupos de beta son limitados. Asegura el tuyo',
     footerReason: 'Te suscribiste a las novedades de LexiClash.',
     unsubscribe: 'Cancelar suscripción',
     privacy: 'Privacidad',
@@ -160,7 +160,7 @@ const COPY: Record<string, BetaCopy> = {
 /* ───────────────────────── Subject lines ───────────────────────── */
 
 const SUBJECTS: Record<string, (name: string) => string> = {
-  en: (n) => `${n}, you're in — Android beta is yours`,
+  en: (n) => `${n}, you're in the Android beta`,
   he: (n) => `${n}, אתם בפנים. בטא אנדרואיד מחכה לכם`,
   sv: (n) => `${n}, du är med. Android-betan är din`,
   ja: (n) => `${n}さん、当選です。Androidベータへようこそ`,
@@ -247,7 +247,7 @@ export default function AndroidBetaLaunchEmail({
         </Head>
 
         <Preview>
-          {t.title} — {t.tagline}
+          {t.title}: {t.tagline}
         </Preview>
 
         <Body
