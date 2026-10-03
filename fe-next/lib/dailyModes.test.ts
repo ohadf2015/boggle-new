@@ -155,4 +155,26 @@ describe('pickNextUnplayedMode', () => {
     };
     expect(pickNextUnplayedMode(state, 'word-wheel')).toBe('word-tower');
   });
+
+  describe('follows the chain from the mode just finished', () => {
+    const allNew: DailyModePlayState = {
+      wordHunt: 'new',
+      wordWheel: 'new',
+      wordTower: false,
+      connections: false,
+    };
+
+    it('Word Wheel points at Word Tower even when Word Hunt is unplayed', () => {
+      expect(pickNextUnplayedMode(allNew, 'word-wheel')).toBe('word-tower');
+    });
+
+    it('Word Tower points at Connections even when Word Hunt/Wheel are unplayed', () => {
+      expect(pickNextUnplayedMode(allNew, 'word-tower')).toBe('connections');
+    });
+
+    it('wraps around to earlier modes once the later ones are played', () => {
+      const state: DailyModePlayState = { ...allNew, wordTower: true, connections: true };
+      expect(pickNextUnplayedMode(state, 'word-tower')).toBe('word-hunt');
+    });
+  });
 });

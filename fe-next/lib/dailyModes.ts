@@ -174,9 +174,9 @@ function isModePlayed(state: DailyModePlayState, id: DailyModeId): boolean {
 }
 
 /**
- * What to play NEXT once `justFinished` is done — the same priority order as
- * {@link pickPrimaryMode}, minus the mode just completed, and `null` when the
- * whole day is cleared.
+ * What to play NEXT once `justFinished` is done — the next unplayed mode along
+ * the Hunt → Wheel → Tower → Connections chain (wrapping), minus the mode just
+ * completed, and `null` when the whole day is cleared.
  *
  * Distinct from pickPrimaryMode on purpose: that one falls back to 'word-hunt'
  * when everything is played, which is the right answer for a hub that must
@@ -192,7 +192,11 @@ export function pickNextUnplayedMode(
   state: DailyModePlayState,
   justFinished: DailyModeId,
 ): DailyModeId | null {
-  return (
-    MODE_PRIORITY.find((id) => id !== justFinished && !isModePlayed(state, id)) ?? null
-  );
+  // Walk the chain starting AFTER the mode just finished and wrapping around, so
+  // Word Wheel hands off to Word Tower and Word Tower to Connections regardless
+  // of whether Word Hunt is still open. Earlier modes are only offered once
+  // everything later is done.
+  const start = MODE_PRIORITY.indexOf(justFinished) + 1;
+  const chain = [...MODE_PRIORITY.slice(start), ...MODE_PRIORITY.slice(0, start - 1)];
+  return chain.find((id) => !isModePlayed(state, id)) ?? null;
 }
