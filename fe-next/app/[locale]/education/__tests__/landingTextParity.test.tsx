@@ -36,7 +36,13 @@ import Icebreakers, { generateMetadata as metaIcebreakers } from '../first-day-o
  * English `FAQ`. The old heading used `faqHeading.split(/FAQ/)` and `split`
  * returns `[whole]` on no match, so the literal was appended to every heading
  * that did not already contain it. `en` and `ja` were unaffected and are
- * untouched. Every other snapshot on every page is the pre-migration render.
+ * untouched. Every other snapshot on every page is the pre-migration render,
+ * except the visible-text snapshots for landings that render
+ * `EducationLandingTemplate`: those now include `TeacherProCompareCheckoutStrip`
+ * (`/{locale}/teacher/upgrade`, Start Teacher Pro — $9/mo). On
+ * `vocabulary-games-classroom` the class-analytics cell is Teacher Pro
+ * (Hebrew: פרו למורים) instead of a free claim. JSON-LD and metadata snapshots
+ * are unchanged, and `for-schools` does not use the template.
  *
  * Regenerate them only when the copy itself is meant to change:
  *
