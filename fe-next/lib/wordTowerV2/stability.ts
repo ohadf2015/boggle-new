@@ -109,16 +109,20 @@ export function standingChain(blocks: IdBlock[], baseId?: string): string[] {
   let best: IdBlock[] = [];
   for (const start of grounded) {
     const chain = [start];
+    // Set, not chain.includes(): the walk is O(floors) steps x O(floors) scan,
+    // and an array lookup on top made it cubic — it ran every frame.
+    const inChain = new Set<IdBlock>(chain);
     for (;;) {
       const top = chain[chain.length - 1];
       const next = sorted.find(
         (b) =>
-          !chain.includes(b) &&
+          !inChain.has(b) &&
           Math.abs(bottomOf(b) - topOf(top)) < top.heightPx * 0.5 &&
           Math.abs(b.x - top.x) < (b.widthPx + top.widthPx) / 2,
       );
       if (!next) break;
       chain.push(next);
+      inChain.add(next);
     }
     if (chain.length > best.length) best = chain;
   }
