@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { WaygroundStarterLimitHonestyStrip } from '@/components/education/WaygroundStarterLimitHonestyStrip';
+import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 
 export const revalidate = 86400;
 
@@ -142,6 +143,8 @@ export default async function Page({ params }: PageProps) {
           : “Store up to 20 resources.” LexiClash free classroom vocab has no 20-resource ceiling.
         </p>
       </header>
+
+      <TeacherProCompareCheckoutStrip locale={locale} />
 
       <WaygroundStarterLimitHonestyStrip locale={locale} />
 

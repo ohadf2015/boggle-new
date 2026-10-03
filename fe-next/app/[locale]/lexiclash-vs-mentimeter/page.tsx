@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { MentimeterFreeTierHonestyStrip } from '@/components/education/MentimeterFreeTierHonestyStrip';
+import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 
 export const revalidate = 86400;
 
@@ -147,6 +148,8 @@ export default async function Page({ params }: PageProps) {
           .
         </p>
       </header>
+
+      <TeacherProCompareCheckoutStrip locale={locale} />
 
       <MentimeterFreeTierHonestyStrip locale={locale} />
 

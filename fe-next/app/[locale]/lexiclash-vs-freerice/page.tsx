@@ -6,6 +6,7 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { englishComparisonRedirect } from '@/lib/comparison/enOnlyRedirect';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { buildComparisonRows, FREERICE_ROW_DEFS } from '@/lib/comparison/comparisonTable';
+import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 
 export const dynamic = 'force-dynamic';
 
@@ -107,6 +108,8 @@ export default async function Page({ params }: PageProps) {
           (spell and build real words, not pick a definition), custom word lists, a teacher dashboard, and six languages.
           Different jobs — keep Freerice for solo do-good practice, run LexiClash for the live review game.
         </p>
+
+      <TeacherProCompareCheckoutStrip locale={locale} />
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">

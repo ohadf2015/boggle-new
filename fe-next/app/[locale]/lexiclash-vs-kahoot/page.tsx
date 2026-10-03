@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { KahootGoLimitHonestyStrip } from '@/components/education/KahootGoLimitHonestyStrip';
+import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 
 export const revalidate = 86400;
 
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: 'LexiClash vs Kahoot — Free Alternative',
-      description: 'Vocabulary word games. No signup. No paywall. Free.',
+      description: 'Vocabulary word games. Free class play (3 classes × 50). Teacher Pro is $9/mo for teacher tools.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -60,14 +61,14 @@ const faqs = [
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
-  ['Free tier (full features)', '✓ Whole class free (50)', '✗ Kahoot+ $4-15/mo'],
+  ['Free class play', '✓ 3 classes × 50 students', '✗ Kahoot+ $4-15/mo'],
   ['No student signup', '✓ 6-character join code', '✓ PIN code'],
   ['Game type', 'Word-formation (Boggle/Wheel/Anagram)', 'Quiz / multiple choice'],
   ['Best for', 'Vocabulary, spelling, ESL', 'Trivia, fact recall, review quizzes'],
   ['1v1 duels', '✓ Built-in', '✗'],
   ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'Question text any language; no dictionaries'],
   ['Custom curriculum content', '✓ Word lists', '✓ Quiz questions'],
-  ['Class analytics', '✓ Free', 'Limited free; Kahoot+ for full'],
+  ['Class analytics', 'Teacher Pro ($9/mo)', 'Limited free; Kahoot+ for full'],
   ['Ad-free in classroom', '✓ Free', 'Free shows promos; Kahoot+ ad-free'],
   ['Mobile + browser', 'Browser-only', 'Apps + web'],
   ['Whole-class multiplayer', '✓ Up to 50 students free', 'Go Free: table 40 / FAQ 10'],
@@ -114,6 +115,8 @@ export default async function Page({ params }: PageProps) {
           with native dictionaries, and the same 5-minute classroom flow Kahoot pioneered.
         </p>
 
+      <TeacherProCompareCheckoutStrip locale={locale} />
+
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">
             Try LexiClash Free
@@ -158,7 +161,7 @@ export default async function Page({ params }: PageProps) {
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { title: 'Word games, not quizzes', desc: 'For vocabulary, spelling, and language practice, students need to find, build, and recognize words — not pick from A/B/C/D. Different cognitive workout, better fit for the goal.' },
-              { title: 'Free, no Kahoot+ ceiling', desc: 'Kahoot pushes you to Kahoot+ for advanced reports, larger games, and certain modes. LexiClash gives you everything in the free tier — no upgrade screen, ever.' },
+              { title: 'Free play, Teacher Pro for teacher tools', desc: 'Kahoot pushes you to Kahoot+ for advanced reports, larger games, and certain modes. LexiClash class play stays free: 3 classes × 50 students, no student signup. Teacher Pro ($9/mo) is the paid upgrade for teacher tools — class analytics, printable reports, and calm-mode pressure dials.' },
               { title: 'One published free seat cap', desc: 'Kahoot! Go Free shows Participant limit 40 in the plans table and “Go up to 10” in the same-page FAQ (kahoot.com/schools/plans). LexiClash free is a clear 50 students per class — the join code matches the plan page.' },
               { title: 'Native multilingual dictionaries', desc: 'For ESL/EFL, Hebrew immersion, Spanish bilingual classrooms — LexiClash has full dictionaries in 6 languages. Kahoot supports any text but doesn’t have language-game mechanics.' },
               { title: '1v1 vocabulary duels', desc: 'Pair students for 2-3 minute head-to-head word battles. Kahoot’s format doesn’t support paired-student practice the same way.' },
