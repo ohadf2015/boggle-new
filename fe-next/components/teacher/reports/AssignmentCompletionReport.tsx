@@ -57,7 +57,7 @@ export function AssignmentCompletionReport({ classroomId }: AssignmentCompletion
   return (
     <section
       data-testid="assignment-completion-report"
-      className="space-y-3 rounded-neo border-2 border-neo-cream/25 bg-neo-navy/40 p-4"
+      className="space-y-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/40 p-4"
     >
       <h3 className="font-neo-display text-lg font-bold text-neo-white">
         {t('teacher.reports.assignmentCompletion.title')}
