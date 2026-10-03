@@ -94,7 +94,7 @@ export function TeacherProCompareCheckoutStrip({
   return (
     <aside
       data-testid="teacher-pro-compare-checkout-strip"
-      className={`mb-12 rounded-neo border-3 border-neo-pink/60 bg-neo-navy/60 p-5 shadow-hard sm:p-6 ${className}`}
+      className={`mb-12 rounded-neo border-3 border-neo-pink bg-neo-navy/60 p-5 shadow-hard sm:p-6 ${className}`}
     >
       <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-pink">Teacher Pro</p>
       <h2 className="mb-2 font-neo-display text-2xl font-bold text-neo-white">{c.heading}</h2>
