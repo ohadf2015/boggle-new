@@ -5,6 +5,7 @@ import { CheckCircle2, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { SCHOOL_LEAD_ROLES, type SchoolLeadRole } from '@/lib/education/schoolLead';
+import { estimateSchoolAnnualUsd } from '@/lib/education/pro/schoolPricing';
 import { buildSchoolQuotePayload, schoolQuoteErrorKey, clampTeachers, MAX_QUOTE_TEACHERS } from '@/lib/education/pro/schoolQuote';
 
 const FIELD =
@@ -24,6 +25,9 @@ export function SchoolQuoteForm({ requester }: { requester: string }) {
   const [error, setError] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
+  const teacherCount = clampTeachers(Number(teachers));
+  const annualEstimate = teachers.trim() === '' ? null : estimateSchoolAnnualUsd(teacherCount);
+
   const canSubmit =
     fullName.trim().length >= 2 && EMAIL_RE.test(email.trim()) && school.trim().length >= 2 && !submitting;
 
@@ -37,7 +41,7 @@ export function SchoolQuoteForm({ requester }: { requester: string }) {
       email,
       school,
       role,
-      teachers: clampTeachers(Number(teachers)),
+      teachers: teacherCount,
       message,
       requester,
       locale: language,
@@ -127,6 +131,11 @@ export function SchoolQuoteForm({ requester }: { requester: string }) {
             onChange={(e) => setTeachers(e.target.value)}
           />
         </label>
+        {annualEstimate !== null && (
+          <p data-testid="school-quote-estimate" className="self-end rounded-neo border-2 border-neo-black bg-neo-yellow px-3 py-2 text-sm font-black">
+            {t('eg2Pro.school.estimate', { teachers: teacherCount, total: `\u2066$${annualEstimate}\u2069` })}
+          </p>
+        )}
         <label className={`${LABEL} sm:col-span-2`}>
           {t('eg2Pro.school.fieldMessage')}
           <textarea

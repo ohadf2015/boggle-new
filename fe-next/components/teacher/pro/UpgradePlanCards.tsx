@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { TEACHER_PRO_TRIAL_DAYS } from '@/lib/education/pro/trialDays';
 import { trackEduProUpgradeClicked } from '@/lib/education/proFunnelTelemetry';
+import { SCHOOL_PRICING } from '@/lib/education/pro/schoolPricing';
+import { SchoolPriceTag } from './SchoolPriceTag';
 import type { UpgradeViewer } from '@/lib/education/pro/upgradeViewer';
 
 export interface UpgradePlanCardsProps {
@@ -199,8 +201,8 @@ export function UpgradePlanCards({
         <h2 className="flex items-center gap-2 font-neo-display text-lg font-black">
           <School className="h-5 w-5" aria-hidden /> {t('eg2Pro.plans.schoolName')}
         </h2>
-        <p className="mb-3 text-xs font-bold text-neo-white/80">{t('eg2Pro.plans.schoolTagline')}</p>
-        <p className="font-neo-display text-3xl font-black leading-none">{t('eg2Pro.plans.schoolPrice')}</p>
+        <p className="mb-3 text-xs font-bold text-neo-white/80">{t('eg2Pro.plans.schoolTagline', { min: SCHOOL_PRICING.minTeachers })}</p>
+        <SchoolPriceTag />
         <div className="mt-4 min-h-12">
           <button type="button" onClick={onSchool} data-testid="plan-school-cta" className={cn(BTN, 'bg-neo-yellow text-neo-black')}>
             {t('eg2Pro.plans.schoolCta')}

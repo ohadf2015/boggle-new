@@ -66,4 +66,17 @@ describe('SchoolQuoteForm', () => {
     rerender(<SchoolQuoteForm requester="Ms Rivera" />);
     expect(screen.getByTestId('school-quote-requester').textContent).toContain('Ms Rivera');
   });
+
+  it('shows a live annual estimate from the teacher count, only at or above the minimum', () => {
+    render(<SchoolQuoteForm requester="" />);
+    const teachers = screen.getByLabelText('eg2Pro.school.fieldTeachers');
+    expect(screen.getByTestId('school-quote-estimate')).toHaveTextContent('"teachers":5');
+    expect(screen.getByTestId('school-quote-estimate')).toHaveTextContent('245');
+    fireEvent.change(teachers, { target: { value: '12' } });
+    expect(screen.getByTestId('school-quote-estimate')).toHaveTextContent('588');
+    fireEvent.change(teachers, { target: { value: '3' } });
+    expect(screen.queryByTestId('school-quote-estimate')).not.toBeInTheDocument();
+    fireEvent.change(teachers, { target: { value: '' } });
+    expect(screen.queryByTestId('school-quote-estimate')).not.toBeInTheDocument();
+  });
 });
