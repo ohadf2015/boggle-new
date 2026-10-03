@@ -14001,6 +14001,11 @@ const ja = {
         "untitled": "無題のレッスン",
         "anonymousStudent": "生徒 {{id}}"
       },
+      "assignmentCompletion": {
+        "title": "課題の提出状況",
+        "submitted": "{{submitted}} / {{roster}} 提出",
+        "upgrade": "Teacher Pro {{price}}"
+      },
       "exportAllClasses": {
         "button": "全クラスを書き出す",
         "downloading": "書き出し中…",

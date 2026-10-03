@@ -50,6 +50,8 @@ import {
   trackEduJoinCodeCopied,
   trackTeacherHqProgressViewed,
   trackTeacherHqUpgradeClicked,
+  trackTeacherAssignmentReportViewed,
+  trackTeacherAssignmentReportUpgradeClicked,
 } from '../telemetry';
 
 describe('education telemetry', () => {
@@ -391,6 +393,23 @@ describe('education telemetry', () => {
     });
     trackTeacherHqUpgradeClicked({ classroomId: 'cls-1' });
     expect(captureMock).toHaveBeenLastCalledWith('teacher_hq_upgrade_clicked', {
+      classroom_id: 'cls-1',
+    });
+  });
+
+  it('assignment-completion report events keep teacher_assignment_report_viewed and teacher_assignment_report_upgrade_clicked', () => {
+    trackTeacherAssignmentReportViewed({
+      classroomId: 'cls-1',
+      assignmentCount: 2,
+      hasPro: false,
+    });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_assignment_report_viewed', {
+      classroom_id: 'cls-1',
+      assignment_count: 2,
+      has_pro: false,
+    });
+    trackTeacherAssignmentReportUpgradeClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_assignment_report_upgrade_clicked', {
       classroom_id: 'cls-1',
     });
   });

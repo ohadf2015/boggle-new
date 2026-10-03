@@ -453,3 +453,22 @@ export function trackTeacherHqProgressViewed(args: TeacherHqProgressViewedArgs):
 export function trackTeacherHqUpgradeClicked(args: { classroomId: string }): void {
   safeCapture('teacher_hq_upgrade_clicked', { classroom_id: args.classroomId });
 }
+
+export interface TeacherAssignmentReportViewedArgs {
+  classroomId: string;
+  assignmentCount: number;
+  hasPro: boolean;
+}
+
+/** Classroom report/assignments compact completion strip — last-mile before Pro. */
+export function trackTeacherAssignmentReportViewed(args: TeacherAssignmentReportViewedArgs): void {
+  safeCapture('teacher_assignment_report_viewed', {
+    classroom_id: args.classroomId,
+    assignment_count: args.assignmentCount,
+    has_pro: args.hasPro,
+  });
+}
+
+export function trackTeacherAssignmentReportUpgradeClicked(args: { classroomId: string }): void {
+  safeCapture('teacher_assignment_report_upgrade_clicked', { classroom_id: args.classroomId });
+}

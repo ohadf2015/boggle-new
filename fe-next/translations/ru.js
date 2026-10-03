@@ -13123,6 +13123,11 @@ const ru = {
         "untitled": "Урок без названия",
         "anonymousStudent": "Ученик {{id}}"
       },
+      "assignmentCompletion": {
+        "title": "Сдача заданий",
+        "submitted": "{{submitted}} / {{roster}} сдано",
+        "upgrade": "Teacher Pro {{price}}"
+      },
       "exportAllClasses": {
         "button": "Экспортировать все классы",
         "downloading": "Экспорт…",
