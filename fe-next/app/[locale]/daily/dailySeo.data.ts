@@ -16,7 +16,7 @@ export interface DailySeoEntry {
 
 export const dailySeoContent: Record<string, DailySeoEntry> = {
   en: {
-    title: 'Daily Word Wheel & Word Hunt — Free Daily Word Puzzle | LexiClash',
+    title: 'Daily Word Wheel & Word Hunt — Free Daily Puzzle | LexiClash',
     description: 'Play today\'s Daily Word Wheel and Word Hunt free — a brand-new puzzle every day at midnight UTC, and every player worldwide gets the exact same board. Word Hunt Survival gives you ten attempts to uncover the hidden target word, with each wrong guess narrowing the field; the Daily Word Wheel deals a wheel of letters where every word you build must include the center letter, and longer words score higher. Results copy as an emoji grid you can share without spoilers, daily streaks reward consistent play, and the global leaderboard resets with each fresh puzzle. No download, no signup, no app store — open the page and you are playing today\'s challenge in seconds.',
     features: [
       'New puzzle every day at midnight UTC',
@@ -75,8 +75,8 @@ export const dailySeoContent: Record<string, DailySeoEntry> = {
     ],
   },
   sv: {
-    title: 'Dagligt Ordhjul & Ordjakt — Gratis Dagligt Ordpussel | LexiClash',
-    description: 'Spela dagens Ordhjul och Ordjakt gratis — nytt pussel varje dag. Samma braede foer alla, ingen nedladdning, ingen registrering. Taevla paa den globala dagliga topplistan.',
+    title: 'Dagligt Ordhjul & Ordjakt — Gratis Ordpussel | LexiClash',
+    description: 'Spela Ordhjul och Ordjakt gratis — nytt pussel varje dag. Samma braede foer alla, ingen nedladdning, ingen registrering. Taevla paa den globala topplistan.',
     features: [
       'Nytt pussel varje dag vid midnatt UTC',
       'Samma braede foer alla spelare vaerldsomspaennande',
@@ -92,8 +92,8 @@ export const dailySeoContent: Record<string, DailySeoEntry> = {
     ],
   },
   es: {
-    title: 'Rueda de Palabras & Caza de Palabras Diaria — Puzzle Gratis | LexiClash',
-    description: 'Juega la Rueda de Palabras y Caza de Palabras diarias gratis — nuevo puzzle cada dia a medianoche UTC. Mismo tablero mundial, sin descargas ni registro. Compite en el ranking global.',
+    title: 'Rueda & Caza de Palabras Diaria — Puzzle Gratis | LexiClash',
+    description: 'Rueda de Palabras y Caza de Palabras diarias gratis — nuevo puzzle cada dia. Mismo tablero, sin descargas ni registro. Compite en el ranking global.',
     features: [
       'Nuevo puzzle cada dia a medianoche UTC',
       'Mismo tablero para todos los jugadores del mundo',
@@ -109,8 +109,8 @@ export const dailySeoContent: Record<string, DailySeoEntry> = {
     ],
   },
   ru: {
-    title: 'Ежедневное Колесо Слов и Охота за Словами — бесплатный пазл | LexiClash',
-    description: 'Играйте в ежедневное Колесо Слов и Охоту за Словами бесплатно — новый пазл каждый день в полночь по UTC. Одинаковое поле для всех игроков мира, без скачивания и регистрации. Соревнуйтесь в глобальном рейтинге.',
+    title: 'Колесо Слов и Охота за Словами — бесплатно | LexiClash',
+    description: 'Колесо Слов и Охота за Словами — бесплатный пазл каждый день. Одно поле для всех, без скачивания и регистрации. Соревнуйтесь в глобальном рейтинге.',
     features: [
       'Новый пазл каждый день в полночь по UTC',
       'Одинаковое поле для всех игроков мира — честная конкуренция',
