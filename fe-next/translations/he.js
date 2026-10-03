@@ -192,6 +192,7 @@ const he = {
       "openProjector": "למסך המקרן",
       "joinedLabel": "בפנים",
       "nobodyYet": "עוד אף אחד — שתפו את הקוד",
+      "firstStudentTitle": "הכניסו את התלמיד הראשון",
       "proTitle": "Teacher Pro",
       "proChip": "שדרוג",
       "projectorTitle": "הצטרפו אל {name}",

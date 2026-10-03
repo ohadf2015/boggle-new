@@ -163,6 +163,27 @@ export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
   safeCapture('edu_classroom_created', props);
 }
 
+export interface EduJoinCodeArgs {
+  classroomId: string;
+}
+
+/**
+ * Class-created → first-student funnel. Never send the join code itself
+ * (shared secret). `classroom_id` is enough to stitch shown → copied → joined.
+ * Copy is also used by the start-live-class CTA so one funnel counts copies.
+ */
+export function trackEduJoinCodeShown(args: EduJoinCodeArgs): void {
+  safeCapture('edu_join_code_shown', { classroom_id: args.classroomId });
+}
+
+export function trackEduJoinCodeCopied(args: EduJoinCodeArgs): void {
+  safeCapture('edu_join_code_copied', { classroom_id: args.classroomId });
+}
+
+export function trackEduFirstStudentJoined(args: EduJoinCodeArgs): void {
+  safeCapture('edu_first_student_joined', { classroom_id: args.classroomId });
+}
+
 export interface EduTeacherOnboardingStepArgs {
   step: number;
   totalSteps: number;
@@ -421,14 +442,6 @@ export interface EduStartLiveClassArgs {
 /** Assignment/classroom view: start the existing live-room flow. */
 export function trackEduAssignmentStartLiveClicked(args: EduStartLiveClassArgs): void {
   safeCapture('edu_assignment_start_live_clicked', { classroom_id: args.classroomId });
-}
-
-/**
- * Copy of the roster join code/link. Never send the code itself (shared secret).
- * Same event name as the first-student join panel so one funnel counts copies.
- */
-export function trackEduJoinCodeCopied(args: EduStartLiveClassArgs): void {
-  safeCapture('edu_join_code_copied', { classroom_id: args.classroomId });
 }
 
 export interface TeacherHqProgressViewedArgs {

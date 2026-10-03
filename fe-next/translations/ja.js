@@ -192,6 +192,7 @@ const ja = {
       "openProjector": "プロジェクター表示",
       "joinedLabel": "人参加中",
       "nobodyYet": "まだ誰もいません — コードを共有しましょう",
+      "firstStudentTitle": "最初の生徒を入れましょう",
       "proTitle": "Teacher Pro",
       "proChip": "Proへ",
       "projectorTitle": "{name}に参加しよう",

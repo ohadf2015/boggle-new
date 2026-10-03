@@ -43,11 +43,13 @@ import {
   isTestAccountEmail,
   trackEduLiveGameStarted,
   trackEduReportsViewed,
+  trackEduJoinCodeShown,
+  trackEduJoinCodeCopied,
+  trackEduFirstStudentJoined,
   trackEduFirstAssignmentCtaShown,
   trackEduFirstAssignmentCtaClicked,
   trackEduFirstAssignmentCreated,
   trackEduAssignmentStartLiveClicked,
-  trackEduJoinCodeCopied,
   trackTeacherHqProgressViewed,
   trackTeacherHqUpgradeClicked,
   trackTeacherAssignmentReportViewed,
@@ -347,6 +349,23 @@ describe('education telemetry', () => {
       classroom_id: 'cls-1',
       student_id: 'stu-9',
     });
+  });
+
+  it('first-student join funnel never includes the join code', () => {
+    trackEduJoinCodeShown({ classroomId: 'cls-1' });
+    trackEduJoinCodeCopied({ classroomId: 'cls-1' });
+    trackEduFirstStudentJoined({ classroomId: 'cls-1' });
+
+    expect(captureMock).toHaveBeenNthCalledWith(1, 'edu_join_code_shown', {
+      classroom_id: 'cls-1',
+    });
+    expect(captureMock).toHaveBeenNthCalledWith(2, 'edu_join_code_copied', {
+      classroom_id: 'cls-1',
+    });
+    expect(captureMock).toHaveBeenNthCalledWith(3, 'edu_first_student_joined', {
+      classroom_id: 'cls-1',
+    });
+    expect(JSON.stringify(captureMock.mock.calls)).not.toContain('AB12CD');
   });
 
   it('first-assignment CTA events keep the three funnel names', () => {

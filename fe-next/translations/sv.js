@@ -192,6 +192,7 @@ const sv = {
       "openProjector": "Öppna projektor",
       "joinedLabel": "inne",
       "nobodyYet": "Ingen här än – dela koden",
+      "firstStudentTitle": "Få in din första elev",
       "proTitle": "Teacher Pro",
       "proChip": "Bli Pro",
       "projectorTitle": "Gå med i {name}",

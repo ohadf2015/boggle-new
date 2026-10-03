@@ -192,6 +192,7 @@ const es = {
       "openProjector": "Abrir proyector",
       "joinedLabel": "dentro",
       "nobodyYet": "Nadie aún: comparte el código",
+      "firstStudentTitle": "Mete a tu primer estudiante",
       "proTitle": "Teacher Pro",
       "proChip": "Ir a Pro",
       "projectorTitle": "Únete a {name}",

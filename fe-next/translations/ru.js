@@ -194,6 +194,7 @@ const ru = {
       "openProjector": "На проектор",
       "joinedLabel": "в игре",
       "nobodyYet": "Пока никого — поделитесь кодом",
+      "firstStudentTitle": "Добавьте первого ученика",
       "proTitle": "Teacher Pro",
       "proChip": "На Pro",
       "projectorTitle": "Присоединяйся: {name}",

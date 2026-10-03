@@ -192,6 +192,7 @@ const en = {
       "openProjector": "Open projector",
       "joinedLabel": "joined",
       "nobodyYet": "No one yet — share the code",
+      "firstStudentTitle": "Get your first student in",
       "proTitle": "Teacher Pro",
       "proChip": "Go Pro",
       "projectorTitle": "Join {name}",
