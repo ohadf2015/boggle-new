@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 
 export const revalidate = 86400;
 
@@ -110,6 +111,8 @@ export default async function Page({ params }: PageProps) {
           (6-character join code), live whole-class multiplayer in the free tier, and six languages with native
           dictionaries. Same vocabulary goal, opposite philosophy.
         </p>
+
+      <TeacherProCompareCheckoutStrip locale={locale} />
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">
