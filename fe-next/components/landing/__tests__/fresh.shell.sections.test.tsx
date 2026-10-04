@@ -58,7 +58,7 @@ describe('fresh sections: one bespoke visual each', () => {
     expect(art.querySelectorAll('[data-streak-day]')).toHaveLength(7);
     expect(art.querySelectorAll('[data-streak-day="today"]')).toHaveLength(1);
     expect(within(art).getByText('homeFresh.sections.daily.streak')).toBeTruthy();
-    expect(s.querySelector('a[href="/en/daily"]')).not.toBeNull();
+    expect(s.querySelector('a[href="/en/daily/word-wheel"]')).not.toBeNull();
     expectCssArt(s);
   });
 

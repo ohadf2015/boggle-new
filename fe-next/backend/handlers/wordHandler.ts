@@ -42,6 +42,7 @@ import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/grac
 import { WORD_SUBMIT_GRACE_PERIOD_MS } from '../utils/graceWindow.js';
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
+import { classicMinWordLength } from '@/shared/utils/classicWordRules';
 import type { Language } from '@/shared/types';
 
 // Rate limit weights
@@ -294,8 +295,12 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Validate minimum word length
-      const minLength = game.minWordLength || 2;
+      // Classic (non-Japanese) never scores a 2-letter word. Other modes keep
+      // their own floor, including a real 2-letter word at 5 points.
+      const classicFloor = game.gameMode === 'classic'
+        ? classicMinWordLength(game.language)
+        : 2;
+      const minLength = Math.max(game.minWordLength || classicFloor, classicFloor);
       if (normalizedWord.length < minLength) {
         socket.emit('wordTooShort', {
           word: normalizedWord,

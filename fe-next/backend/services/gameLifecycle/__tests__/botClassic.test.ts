@@ -19,6 +19,7 @@ vi.mock('../../../modules/gameStateManager', () => ({ ...gsm, getGame: vi.fn() }
 vi.mock('../../../utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() } }));
 
 import { quoteBoardWord, isScoringWord, classicBotRules } from '../botClassic';
+import { getGame } from '../../../modules/gameStateManager';
 import { calculateWordScore } from '@/shared/utils/scoring';
 import type { BotRoundContext } from '../botEngine';
 import type { Bot } from '../../../modules/botBehavior';
@@ -41,6 +42,18 @@ describe('board-word bot pricing', () => {
   it('community/scoring-valid words count, as they do at results', () => {
     expect(isScoringWord('slang', 'en')).toBe(true);
     expect(quoteBoardWord(ctx, bot, 'slang')).not.toBeNull();
+  });
+
+  it('aaa never scores, and classic does not pay for a 2-letter word', () => {
+    dict.valid = new Set(['aaa', 'at']);
+    vi.mocked(getGame).mockReturnValue({ gameMode: 'classic' } as never);
+    expect(isScoringWord('aaa', 'en', 'classic')).toBe(false);
+    expect(quoteBoardWord(ctx, bot, 'aaa')).toBeNull();
+    expect(isScoringWord('at', 'en', 'classic')).toBe(false);
+    expect(quoteBoardWord(ctx, bot, 'at')).toBeNull();
+    vi.mocked(getGame).mockReturnValue({ gameMode: 'blast' } as never);
+    expect(isScoringWord('at', 'en', 'blast')).toBe(true);
+    expect(quoteBoardWord(ctx, bot, 'at')).not.toBeNull();
   });
 
   it('a missed (wrong) word is still recorded at 0 — visible in results and in the peer-validation pool, never credited', () => {

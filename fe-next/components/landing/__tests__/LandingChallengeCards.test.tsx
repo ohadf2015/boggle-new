@@ -157,22 +157,25 @@ describe('LandingChallengeCards', () => {
     });
   });
 
-  describe('all modes always surfaced — no newcomer collapse', () => {
+  describe('two modes up front — the rest stay reachable', () => {
     afterEach(() => {
       mockIsVeteran.mockReturnValue(false);
     });
 
-    it('brand-new player (0 games) sees every mode — no More-Game-Modes expander', () => {
+    it('brand-new player sees the live race up front and the rest under More', () => {
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+      const more = container.querySelector('[data-testid="landing-cubes-more"]');
+      expect(more).not.toBeNull();
+      expect(more!.contains(container.querySelector('[data-cube-key="arena"]'))).toBe(false);
     });
 
-    it('connections + brainGym render above the fold for a brand-new player', () => {
+    it('connections + brainGym stay in the document, parked under More', () => {
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      // No expander, so the discovery modes live directly in the grid.
-      expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+      const more = container.querySelector('[data-testid="landing-cubes-more"]');
       expect(container.textContent).toContain('landing.wordChainMode');
       expect(container.textContent).toContain('landing.brainTraining');
+      expect(more!.contains(container.querySelector('[data-cube-key="connections"]'))).toBe(true);
+      expect(more!.contains(container.querySelector('[data-cube-key="brainGym"]'))).toBe(true);
     });
   });
 });

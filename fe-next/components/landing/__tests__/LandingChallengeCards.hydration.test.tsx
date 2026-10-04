@@ -52,13 +52,19 @@ const baseProps: any = {
 };
 
 describe('LandingChallengeCards - hydration safety', () => {
-  it('SSR/first render has no <details> expander (even for a newbie)', () => {
+  it('SSR already parks the extra modes in the same More disclosure the client renders', () => {
     const html = renderToString(<LandingChallengeCards {...baseProps} />);
-    expect(html).not.toContain('landing-cubes-more');
+    expect(html).toContain('landing-cubes-more');
+    expect(html).toContain('data-cube-key="arena"');
+    expect(html).toContain('data-cube-key="blast"');
   });
 
-  it('has no <details> expander after mount either — all modes surfaced directly', () => {
+  it('keeps Adventure, Word Tower and Blast inside More after mount', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+    const more = container.querySelector('[data-testid="landing-cubes-more"]');
+    expect(more).not.toBeNull();
+    for (const key of ['blast', 'adventure', 'wordTowerV2']) {
+      expect(more!.contains(container.querySelector(`[data-cube-key="${key}"]`))).toBe(true);
+    }
   });
 });

@@ -199,15 +199,29 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     }
   }, [phase, isAuthenticated, profile]);
 
-  const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
-    mode: 'solo-bots',
-    difficulty: 'MEDIUM',
-    language: (uiLanguage as Language) || 'en',
-    grid: null,
-    timerSeconds: 120,
-    bots: [DEFAULT_MEDIUM_BOT],
-    minWordLength: 2,
-  }));
+  const [gameState, setGameState] = useState<SinglePlayerGameState>(() => {
+    if (searchParams?.get('autoStart') === 'coach') {
+      return {
+        mode: 'challenge',
+        difficulty: 'EASY',
+        language: (uiLanguage as Language) || 'en',
+        grid: null,
+        timerSeconds: 60,
+        bots: [],
+        minWordLength: getMinWordLength(uiLanguage, 'EASY'),
+        coach: true,
+      };
+    }
+    return {
+      mode: 'solo-bots',
+      difficulty: 'MEDIUM',
+      language: (uiLanguage as Language) || 'en',
+      grid: null,
+      timerSeconds: 120,
+      bots: [DEFAULT_MEDIUM_BOT],
+      minWordLength: getMinWordLength(uiLanguage, 'MEDIUM'),
+    };
+  });
 
   const hasAutoStartedRef = useRef(false);
   const wasFirstTimerPracticeRef = useRef(false);
@@ -255,6 +269,24 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
       }
     }
   }, [autoStart, uiLanguage, masteryPractice]);
+
+  // First screen: one coached classic round. Not bots, and not the returning-player redirect.
+  useEffect(() => {
+    if (autoStart !== 'coach' || hasAutoStartedRef.current) return;
+    hasAutoStartedRef.current = true;
+    const difficulty = 'EASY' as const;
+    setGameState({
+      mode: 'challenge',
+      difficulty,
+      timerSeconds: 60,
+      bots: [],
+      language: (uiLanguage as Language) || 'en',
+      grid: null,
+      minWordLength: getMinWordLength(uiLanguage, difficulty),
+      coach: true,
+    });
+    setPhase('playing');
+  }, [autoStart, uiLanguage]);
 
   // Auto-start bot game (autoStart=bots)
   useEffect(() => {

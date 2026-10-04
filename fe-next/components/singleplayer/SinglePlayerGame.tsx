@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo, useEffect, useRef, useCallback, useState } from 'react';
+import Link from 'next/link';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { shouldShowScorePopup } from '@/lib/singleplayer/scorePopup';
 import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
@@ -465,9 +467,14 @@ function SinglePlayerGame({
     ) : null;
 
   const modeCoachElement =
-    settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart ? (
+    settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart && !settings.coach ? (
       <ModeCoach mode="classic" />
     ) : null;
+
+  const validCoachWords = core.foundWords.filter((fw) => fw.isValid === true).length;
+  const firstRoundCoach = settings.coach ? (
+    <FirstRoundCoach validWords={validCoachWords} />
+  ) : null;
 
   // Rendered from ONE place for all three layouts — portrait, landscape and
   // desktop reaching the same overlay separately is how one of them silently
@@ -502,6 +509,7 @@ function SinglePlayerGame({
       {scorePopupElement}
       {practicePromptElement}
       {modeCoachElement}
+      {firstRoundCoach}
       {stuckCoachElement}
       <SinglePlayerShell
         grid={core.grid as LetterGrid}
@@ -536,6 +544,23 @@ function SinglePlayerGame({
         soloMissions={core.soloMissions}
         soloChrome={practiceCoachElement}
       />
+    </div>
+  );
+}
+
+
+function FirstRoundCoach({ validWords }: { validWords: number }) {
+  const { t, language } = useLanguage();
+  return (
+    <div data-testid="first-round-coach" className="flex flex-col items-center gap-1 bg-neo-navy px-3 py-2 text-center">
+      {validWords < 1 && (
+        <p className="font-neo-body text-sm font-semibold text-neo-cream">
+          {t('singlePlayer.coach.findWord', 'Find a short word. The clock starts when you do.')}
+        </p>
+      )}
+      <Link href={`/${language}/multiplayer`} className="font-neo-body text-sm font-bold text-neo-lime underline underline-offset-2">
+        {t('homeFresh.hero.playFriend', 'Play a friend')}
+      </Link>
     </div>
   );
 }

@@ -23,16 +23,12 @@ vi.mock('@/utils/growthTracking', () => ({
 
 import { ModeRow, FRESH_MODE_KEYS } from '../fresh/ModeRow';
 
-const PUBLIC_HREFS = [
-  '/en/multiplayer',
-  '/en/word-craft',
-  '/en/connections/pyramid',
-  '/en/brain',
-  '/en/blast',
-];
+const PUBLIC_HREFS = ['/en/multiplayer'];
 
 function cards(container: HTMLElement) {
-  return [...container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')];
+  const ul = container.querySelector('[data-fresh-section="modes"] ul');
+  if (!ul) throw new Error('no lead row');
+  return [...ul.querySelectorAll<HTMLAnchorElement>('a')];
 }
 
 describe('ModeRow (fresh section 4)', () => {
@@ -61,14 +57,17 @@ describe('ModeRow (fresh section 4)', () => {
       expect(a.getAttribute('href')).not.toMatch(/crossword|quick-play|sealed-bid|blast\/v2/);
     }
     // Adventure is now public (GA) and should appear for guests
-    expect(FRESH_MODE_KEYS).not.toContain('adventure'); // featured in the spotlight above the row
+    expect(FRESH_MODE_KEYS).not.toContain('adventure');
+    expect(container.querySelector('[data-parked-mode="adventure"]')).not.toBeNull();
+    expect(container.querySelector('[data-parked-mode="wordTowerV2"]')).not.toBeNull();
+    expect(container.querySelector('[data-parked-mode="blast"]')).not.toBeNull();
     expect(FRESH_MODE_KEYS).not.toContain('crossword');
   });
 
   it('localises links by the current language', () => {
     lang.language = 'he';
     const { container } = render(<ModeRow />);
-    expect(cards(container)[1].getAttribute('href')).toBe('/he/word-craft');
+    expect(cards(container)[0].getAttribute('href')).toBe('/he/multiplayer');
   });
 
   it('each card carries its own homeFresh title and one line', () => {
@@ -82,9 +81,9 @@ describe('ModeRow (fresh section 4)', () => {
 
   it('a card click keeps the hub instrumentation (mode_card + mode_selected)', () => {
     const { container } = render(<ModeRow />);
-    fireEvent.click(cards(container)[2]);
-    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'connections' }));
-    expect(trackModeSelected).toHaveBeenCalledWith('connections', 'home');
+    fireEvent.click(cards(container)[0]);
+    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'arena' }));
+    expect(trackModeSelected).toHaveBeenCalledWith('arena', 'home');
   });
 
   it('is a scroll-snap row whose first card clears the gutter', () => {
@@ -119,21 +118,14 @@ describe('ModeRow (fresh section 4)', () => {
     }
   });
 
-  it('wordCraft, connections, brainGym all render with art', () => {
+  it('wordCraft, connections and brainGym stay parked, not on the lead row', () => {
     const { container } = render(<ModeRow />);
-    const cardsByMode = new Map<string, HTMLElement>();
-    for (const link of container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] li a')) {
-      const mode = link.getAttribute('data-mode');
-      if (mode) cardsByMode.set(mode, link);
-    }
-    for (const mode of ['wordCraft', 'connections', 'brainGym']) {
-      const card = cardsByMode.get(mode);
+    const more = container.querySelector('[data-testid="fresh-modes-more"]');
+    expect(more).not.toBeNull();
+    for (const mode of ['wordCraft', 'connections', 'brainGym', 'blast', 'adventure', 'wordTowerV2']) {
+      const card = container.querySelector(`[data-parked-mode="${mode}"]`);
       expect(card).toBeTruthy();
-      const img = card?.querySelector('img');
-      expect(img).toBeTruthy();
-      const src = img?.getAttribute('src');
-      expect(src).toBeTruthy();
-      expect(src).toMatch(/cubes/);
+      expect(more!.contains(card)).toBe(true);
     }
   });
 
