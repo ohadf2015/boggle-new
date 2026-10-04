@@ -3,7 +3,8 @@
  *
  * Mobile users see a peek (next card visible at edge) via auto-cols-[74%] on
  * mobile, which signals the row is scrollable. No soft gradients (brand
- * anti-reference). Cards are snap-aligned.
+ * anti-reference). Lead carousel cards are snap-aligned; the compact More
+ * links below are not part of that carousel.
  */
 
 import React from 'react';
@@ -38,7 +39,7 @@ describe('ModeRow (fresh) — swipe affordance', () => {
 
   it('each card has snap-start for alignment', () => {
     const { container } = render(<ModeRow />);
-    const items = container.querySelectorAll('[data-fresh-section="modes"] li');
+    const items = container.querySelectorAll('[data-fresh-section="modes"] > ul > li');
     expect(items.length).toBeGreaterThan(0);
     for (const li of items) {
       expect(li.className).toMatch(/\bsnap-start\b/);
