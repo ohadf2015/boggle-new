@@ -12,8 +12,10 @@
  */
 
 import React from 'react';
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import type { LetterGrid } from '@/shared/types/game';
 
 const trackGameStart = vi.fn();
@@ -139,5 +141,26 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     rerender(baseOptions({ mode: 'classic', grid: grid5, score: 100 }));
 
     expect(trackGameStart).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not read the dead guestUsername key', () => {
+    const src = readFileSync(path.resolve(__dirname, '../useSinglePlayerEffects.ts'), 'utf8');
+    expect(src).not.toMatch(/guestUsername/);
+  });
+
+  it('heartbeats a generated fun name instead of Guest', async () => {
+    renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'solo-bots' })));
+
+    await waitFor(() => {
+      const calls = (global.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls;
+      expect(calls.some((c) => String(c[0]).includes('/api/single-player/heartbeat'))).toBe(true);
+    });
+
+    const [, init] = (global.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.find(
+      (c) => String(c[0]).includes('/api/single-player/heartbeat') && c[1]?.method !== 'DELETE',
+    ) as [string, RequestInit];
+    const body = JSON.parse(String(init.body));
+    expect(body.username).toBeTruthy();
+    expect(String(body.username).toLowerCase()).not.toBe('guest');
   });
 });

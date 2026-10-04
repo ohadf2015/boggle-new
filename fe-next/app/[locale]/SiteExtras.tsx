@@ -38,7 +38,7 @@ export default function SiteExtras({ lang }: SiteExtrasProps) {
     <>
       <SocialMediaPixels />
       <WebVitalsReporter />
-      <PagePresenceReporter />
+      <PagePresenceReporter language={lang} />
       <AnimationsLoader />
       <DictionaryPrewarmer lang={lang} />
       <NativeOAuthInitializer />

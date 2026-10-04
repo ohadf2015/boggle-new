@@ -6,8 +6,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import logger from '@/utils/logger';
-import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
-import { getStoredUsername, setStoredUsername } from '@/utils/profileStorage';
+import { getAvatarForName } from '@/utils/defaultNames';
+import { ensureGuestDisplayName } from '@/utils/guestManager';
 import type { Language } from '@/shared/types/game';
 
 interface UseMultiplayerAuthReturn {
@@ -66,23 +66,16 @@ export function useMultiplayerAuth(language: Language): UseMultiplayerAuthReturn
         usernameManuallySetRef.current = true;
       }
     } else if (!hasSetRandomNameRef.current) {
-      // Guest user - check if we need to generate a random name
-      const savedUsername = getStoredUsername() || '';
-
-      // Only generate random name if BOTH saved and current username are empty
-      if (!savedUsername.trim() && !username.trim()) {
-        const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-        logger.log('[AUTH] Generated random name for guest:', name, 'avatar:', avatar.emoji);
+      const name = ensureGuestDisplayName(language);
+      if (name && !username.trim()) {
+        logger.log('[AUTH] Using guest default name:', name);
         setUsername(name);
-        setGuestAvatar(avatar);
+        setGuestAvatar(getAvatarForName(name));
         hasSetRandomNameRef.current = true;
-      } else if (savedUsername.trim() && !username.trim()) {
-        logger.log('[AUTH] Using saved username:', savedUsername);
-        setUsername(savedUsername);
-        setGuestAvatar(getAvatarForName(savedUsername));
       } else if (username.trim()) {
         logger.log('[AUTH] Preserving user-entered username:', username);
         setGuestAvatar(getAvatarForName(username));
+        hasSetRandomNameRef.current = true;
       }
     }
   }, [user, profile?.display_name, loading, language, username]);

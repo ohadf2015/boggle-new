@@ -5,7 +5,7 @@
 
 import logger from '@/utils/logger';
 import { getFromStorage, saveToStorage, removeFromStorage, getJsonFromStorage, saveJsonToStorage } from '@/utils/storageHelpers';
-import { setStoredUsername } from '@/utils/profileStorage';
+import { getOrCreateStoredUsername, getStoredUsername, setStoredUsername } from '@/utils/profileStorage';
 import { updateGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
 
 const GUEST_SESSION_KEY = 'boggle_guest_session_id';
@@ -281,10 +281,18 @@ export function setGuestName(name: string): void {
   if (typeof window === 'undefined') return;
 
   try {
-    saveToStorage(GUEST_NAME_KEY, name);
+    const trimmed = name.trim();
+    if (!trimmed) {
+      removeFromStorage(GUEST_NAME_KEY);
+      const stats = getGuestStats();
+      stats.guestName = null;
+      saveGuestStats(stats);
+      return;
+    }
+    saveToStorage(GUEST_NAME_KEY, trimmed);
     // Also update in stats
     const stats = getGuestStats();
-    stats.guestName = name;
+    stats.guestName = trimmed;
     saveGuestStats(stats);
   } catch (error) {
     logger.error('Error saving guest name:', error);
@@ -296,6 +304,34 @@ export function saveGuestNameEverywhere(name: string): void {
   setStoredUsername(name);
   setGuestName(name);
   updateGuestDailyPlayer({ displayName: name });
+}
+
+/**
+ * Guest identity for live presence, solo heartbeats, and first-visit chrome.
+ *
+ * Fun default names used to exist only on the multiplayer join/create path, so a
+ * first-time visitor playing solo (or just sitting on a page) reported as the
+ * literal "Guest". Invent + persist one here so every surface shares it.
+ */
+export function ensureGuestDisplayName(language: string = 'en'): string {
+  const stored = getStoredUsername()?.trim();
+  if (stored) {
+    if (!getGuestName()?.trim()) setGuestName(stored);
+    return stored;
+  }
+
+  const existing = getGuestName()?.trim();
+  if (existing) {
+    saveGuestNameEverywhere(existing);
+    return existing;
+  }
+
+  const generated = getOrCreateStoredUsername(language);
+  if (generated) {
+    saveGuestNameEverywhere(generated);
+    return generated;
+  }
+  return '';
 }
 
 /**

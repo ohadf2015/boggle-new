@@ -6,6 +6,7 @@ import type { FoundWord } from '../types';
 import { trackGameStart } from '@/utils/growthTracking';
 import { useAuth } from '@/contexts/AuthContext';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
+import { ensureGuestDisplayName } from '@/utils/guestManager';
 
 interface UseSinglePlayerEffectsOptions {
   grid: LetterGrid | null;
@@ -124,7 +125,7 @@ export function useSinglePlayerEffects({
         : Math.random().toString(36).substring(2) + Date.now().toString(36);
     const sendHeartbeat = async () => {
       try {
-        const username = profile?.display_name || profile?.username || (typeof window !== 'undefined' ? window.localStorage?.getItem('guestUsername') ?? undefined : undefined);
+        const username = profile?.display_name || profile?.username || (typeof window !== 'undefined' ? ensureGuestDisplayName(language) || undefined : undefined);
         const avatar = profile
           ? {
               avatarImage: profile.avatar_image,

@@ -151,8 +151,9 @@ vi.mock('@/hooks/useExperiment', () => ({
 vi.mock('@/utils/guestManager', () => ({
   updateGuestStatsAfterGame: vi.fn(),
   getGuestStats: () => ({ games: 0 }),
-  getGuestName: () => 'Guest',
+  getGuestName: () => 'Sly Fox',
   getGuestSessionId: () => null,
+  ensureGuestDisplayName: () => 'Sly Fox',
 }));
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));

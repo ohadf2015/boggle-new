@@ -11,7 +11,7 @@ import { getChallenge, parseGridSeed, recordChallengeAttempt, type ScoreChalleng
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
-import { getGuestSessionId } from '@/utils/guestManager';
+import { getGuestSessionId, ensureGuestDisplayName } from '@/utils/guestManager';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from '@/components/singleplayer/SinglePlayerView';
@@ -96,7 +96,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
     setResultsData(results);
 
     // Record the attempt
-    const username = profile?.username || 'Guest';
+    const username = profile?.display_name || profile?.username || ensureGuestDisplayName(language) || 'Player';
     const attempt = await recordChallengeAttempt({
       challengeId: challenge.id,
       username,
@@ -122,7 +122,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
     }
 
     setPhase('results');
-  }, [challenge, user, profile, isAuthenticated]);
+  }, [challenge, user, profile, isAuthenticated, language]);
 
   // Handle quit
   const handleQuit = useCallback(() => {

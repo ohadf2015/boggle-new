@@ -9,12 +9,13 @@
  * page. Admin pages are skipped both here and server-side.
  *
  * Identity is best-effort: authed users include playerId so the admin view can
- * deep-link; guests are anonymous (tracked only by a tab-stable session id).
+ * deep-link; guests get a persisted fun default name (never the literal "Guest").
  */
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { ensureGuestDisplayName } from '@/utils/guestManager';
 
 const HEARTBEAT_INTERVAL_MS = 20000;
 const SID_KEY = 'lc_presence_sid';
@@ -36,7 +37,7 @@ function getSessionId(): string {
   }
 }
 
-export default function PagePresenceReporter() {
+export default function PagePresenceReporter({ language = 'en' }: { language?: string } = {}) {
   const pathname = usePathname();
   const { user, profile } = useAuth();
 
@@ -59,9 +60,7 @@ export default function PagePresenceReporter() {
       const username =
         p?.display_name ||
         p?.username ||
-        (typeof window !== 'undefined'
-          ? window.localStorage?.getItem('guestUsername') ?? null
-          : null);
+        (typeof window !== 'undefined' ? ensureGuestDisplayName(language) || null : null);
       try {
         fetch('/api/presence/heartbeat', {
           method: 'POST',
@@ -92,7 +91,7 @@ export default function PagePresenceReporter() {
     return () => {
       clearInterval(interval);
     };
-  }, [pathname]);
+  }, [pathname, language]);
 
   return null;
 }

@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { getGuestSessionId, getGuestName } from '@/utils/guestManager';
+import { getGuestSessionId, ensureGuestDisplayName } from '@/utils/guestManager';
 import logger from '@/utils/logger';
 import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 
@@ -50,7 +50,7 @@ export function useLeaderboardSync({
           return;
         }
 
-        const guestName = getGuestName() || 'Guest';
+        const guestName = ensureGuestDisplayName() || 'Player';
         const validWords = results.playerWordData?.filter(w => w.isValid) || [];
         const longestWord = validWords.reduce<string | undefined>(
           (longest, w) => (w.word.length > (longest?.length || 0) ? w.word : longest),
