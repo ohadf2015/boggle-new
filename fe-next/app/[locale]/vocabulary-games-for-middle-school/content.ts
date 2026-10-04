@@ -283,7 +283,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Är dessa ordförrådslekar verkligen gratis för mellanstadiet?',
-        a: 'Ja — LexiClash är helt gratis utan premiumnivå. Hel-klass-multiplayer, 1v1-dueller, anpassade ordlistor och lärardashboarden är alla gratis, utan per-elev- eller per-klasssgräns bortom 30 elever per live-spel.'
+        a: 'Ja — hel-klass-multiplayer, 1v1-dueller, anpassade ordlistor och lärardashboarden är alla gratis, för upp till 3 klasser med 50 elever. Teacher Pro ($9/månad) ger obegränsade klasser och progressrapporter; ett live-spel rymmer 50 spelare.'
       },
       {
         q: 'Behöver mina mellanstadieelever konton eller inloggningar?',
@@ -568,7 +568,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Эти словарные игры действительно бесплатны для средней школы?',
-        a: 'Да — LexiClash полностью бесплатен без премиум-уровня. Мультиплеер для целого класса, дуэли 1v1, пользовательские списки слов и панель инструментов учителя — все бесплатно, без ограничений на одного ученика или на класс, кроме 30 учащихся за живую игру.'
+        a: 'Да — мультиплеер для всего класса, дуэли 1v1, свои списки слов и панель учителя бесплатны до 3 классов по 50 учеников. Teacher Pro ($9/месяц) добавляет безлимитные классы и отчёты о прогрессе; живая игра вмещает 50 игроков.'
       },
       {
         q: 'Нужны ли учащимся средней школы учетные записи или входы?',

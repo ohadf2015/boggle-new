@@ -215,7 +215,7 @@ const FORBIDDEN: Array<[string, RegExp]> = [
     'denies the premium tier or a per-seat limit that lib/education/freeTierLimits.ts enforces',
     // Same widening as above: `ingen premiumtier` (sv), `בלי פרימיום` (he) and
     // `プレミアム層なし` (ja) each denied the paid tier in a phrasing this list did not name.
-    /no premium (tier|upsell)|free tier covers everything|free tier = full features|fully free, no premium|sin (plan |versión )?premium|プレミアム(層|版)?なし|בלי (גרסת )?פרימיום|ingen premium ?tier|без премиума|no participant cap|no player or student cap/i,
+    /no premium (tier|upsell|version)|free tier covers everything|free tier = full features|fully free, no premium|sin (plan |versión )?premium|プレミアム(層|版)?なし|בלי (גרסת )?פרימיום|ingen premium ?(?:tier|nivå|version)|utan premiumnivå|нет премиум|без платного тариф|никакого премиума|no participant cap|no player or student cap/i,
   ],
   [
     `advertises a per-class student number that is not FREE_TIER_LIMITS.studentsPerClass (${FREE_TIER_LIMITS.studentsPerClass})`,
