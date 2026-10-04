@@ -2751,8 +2751,8 @@ const es = {
       "ogDescription": "Practica la búsqueda de palabras solo, desafía bots de IA y supera tus mejores puntuaciones."
     },
     "daily": {
-      "title": "Palabra del Día — Puzzle Diario de Palabras Gratis (Caza & Rueda) | LexiClash",
-      "description": "Juega la Palabra del Día — puzzle diario de palabras gratis. Dos modos: Caza de Palabras (10 intentos, estilo Wordle) y Rueda de Palabras Diaria. Mismo tablero en todo el mundo. Comparte resultados emoji, sube en el ranking global. Nuevo puzzle cada día, sin registro.",
+      "title": "Rueda & Caza de Palabras Diaria — Gratis | LexiClash",
+      "description": "Rueda & Caza de Palabras diarias gratis — mismo tablero mundial, 10 intentos, comparte emoji. Nuevo puzzle cada día, sin registro.",
       "ogTitle": "Palabra del Día — Puzzle Diario Gratis",
       "ogDescription": "Palabra del Día: Caza + Rueda de Palabras. Mismo puzzle mundial, comparte resultados, construye una racha diaria. Gratis, sin registro."
     },

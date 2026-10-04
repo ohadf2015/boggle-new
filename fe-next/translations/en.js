@@ -2355,8 +2355,8 @@ const en = {
       "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
     },
     "daily": {
-      "title": "Daily Word Wheel & Word Hunt — Free Daily Puzzles, Same Board Worldwide | LexiClash",
-      "description": "Daily Word Wheel + Word Hunt Survival — free, no signup. Same board worldwide, 10 attempts (Wordle-style), share emoji results, climb the global leaderboard. New puzzle every 24h.",
+      "title": "Daily Word Wheel & Word Hunt — Free Daily Puzzle | LexiClash",
+      "description": "Daily Word Wheel + Word Hunt — free, no signup. Same board worldwide, 10 attempts, share emoji results, global leaderboard. New puzzle every day.",
       "ogTitle": "Daily Word Wheel — Today's Free Word Puzzle",
       "ogDescription": "Daily Word Wheel + Word Hunt. Same puzzle worldwide, share emoji results, build a streak. Free, no signup."
     },

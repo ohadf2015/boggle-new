@@ -105,6 +105,10 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
       q: 'Vilka spellägen finns?',
       a: 'Spela multiplayer-rum, dagliga utmaningar (ordhjul och ordjakt), ordletare, blastläge och mer. Varje läge har unika regler och poängberäkning. Ordhjulet är en daglig pussel där alla bokstäver ska inkludera mittenbokstaven.',
     },
+    {
+      q: 'Hur bildar man ord av bokstäver i LexiClash?',
+      a: 'I LexiClash ser alla spelare samma rutnät av bokstäver. Klicka eller dra för att bilda ord — ju längre ord, desto fler poäng. Spelet stödjer 10 000+ svenska ord inklusive flerordsformer och dialektord.',
+    },
   ];
 
   return (

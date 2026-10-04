@@ -3032,8 +3032,8 @@ const sv = {
       "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge."
     },
     "daily": {
-      "title": "Dagligt Ordhjul & Ordjakt — Gratis Dagliga Ordpussel, Samma Bräde Över Hela Världen | LexiClash",
-      "description": "Snurra dagliga ordhjulet och hitta alla ord — gratis, ingen registrering. Nytt pussel varje dag, samma bräde för alla spelare. Plus Ordjakt: gissa det dolda ordet på 10 försök.",
+      "title": "Dagligt Ordhjul & Ordjakt — Gratis Ordpussel | LexiClash",
+      "description": "Ordhjul & Ordjakt gratis — nytt pussel varje dag, samma bräde för alla. Gissa det dolda ordet på 10 försök. Ingen registrering.",
       "ogTitle": "Dagligt Ordhjul — Snurra och hitta alla ord",
       "ogDescription": "Dagliga ordhjulspussel gratis. Snurra hjulet, hitta alla ord, dela resultaten. Nytt pussel varje dag!"
     },
