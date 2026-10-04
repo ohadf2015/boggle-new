@@ -32,12 +32,13 @@ vi.mock('next/navigation', () => ({
   useParams: () => ({ locale: 'en' }),
 }));
 vi.mock('@/utils/onboardingStorage', () => ({
-  hasCompletedOnboarding: () => true,
-  hasSupabaseSession: () => false,
+  hasCompletedOnboarding: vi.fn(() => true),
+  hasSupabaseSession: vi.fn(() => false),
   markOnboardingComplete: vi.fn(),
   markOnboardingSkipped: vi.fn(),
 }));
 vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => false }));
+import { hasCompletedOnboarding, hasSupabaseSession } from '@/utils/onboardingStorage';
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ enableComplexAnimations: false, prefersReducedMotion: true }),
 }));
@@ -92,6 +93,8 @@ describe('LandingView — music init', () => {
   beforeEach(() => {
     playTrack.mockClear();
     unlockAudio.mockClear();
+    vi.mocked(hasCompletedOnboarding).mockReturnValue(true);
+    vi.mocked(hasSupabaseSession).mockReturnValue(false);
     (useAuth as unknown as vi.Mock).mockReturnValue({ isAuthenticated: false, loading: false, profile: null });
     (useLanguage as unknown as vi.Mock).mockReturnValue({ t: (k: string) => k, language: 'en', dir: 'ltr' });
     (useMusic as unknown as vi.Mock).mockReturnValue({
@@ -100,6 +103,16 @@ describe('LandingView — music init', () => {
   });
 
   it('calls playTrack(BOSSA) exactly once on mount, without requiring a user gesture', () => {
+    render(<LandingView />, { wrapper });
+
+    const bossaCalls = playTrack.mock.calls.filter((c) => c[0] === 'bossa');
+    expect(bossaCalls).toHaveLength(1);
+  });
+
+  it('still queues BOSSA for a fresh visitor (ReturningHome never mounts)', () => {
+    vi.mocked(hasCompletedOnboarding).mockReturnValue(false);
+    vi.mocked(hasSupabaseSession).mockReturnValue(false);
+
     render(<LandingView />, { wrapper });
 
     const bossaCalls = playTrack.mock.calls.filter((c) => c[0] === 'bossa');
