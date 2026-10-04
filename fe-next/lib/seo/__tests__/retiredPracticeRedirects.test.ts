@@ -32,10 +32,19 @@ function rules(): RedirectRule[] {
 /**
  * Resolve a concrete path through the rules the way Next does: first match wins.
  *
- * Translating a Next `source` to a RegExp has one trap worth spelling out — a
- * naive `:param` pass eats the `:en` inside an already-expanded `(?:en|he|…)`
- * group and yields a pattern that silently matches the wrong things. So the
- * locale alternation is substituted LAST, after the generic params are gone.
+ * Translating a Next `source` to a RegExp has two traps worth spelling out:
+ *
+ * 1. A naive `:param` pass eats the `:en` inside an already-expanded `(?:en|he|…)`
+ *    group and yields a pattern that silently matches the wrong things. So the
+ *    locale alternation is substituted LAST, after the generic params are gone.
+ *
+ * 2. Next's optional catch-all `:param*` matches ZERO or more segments — including
+ *    the bare parent path with no trailing slash/segment. A naive `:*` → `.*`
+ *    after a required `/` does NOT match `/en/practice`, so a hub rule listed
+ *    AFTER a `:rest*` catch-all would falsely pass here while Next would send
+ *    `/en/practice` to the catch-all (bare singleplayer / bots). Map `/ :param*`
+ *    to `(?:/.*)?` so that regression is caught. Prefer `:param+` in the real
+ *    rules so the catch-all cannot swallow the hub even if order slips.
  */
 function sourceToRegExp(source: string): RegExp {
   const LOCALE_TOKEN = 'LOCALE_ALTERNATION_TOKEN';
@@ -45,7 +54,10 @@ function sourceToRegExp(source: string): RegExp {
       alternation = group;
       return LOCALE_TOKEN;
     })
-    .replace(/:\w+\*/g, '.*')
+    // Optional catch-all (:param*) — zero or more segments, like Next.
+    .replace(/\/:\w+\*/g, '(?:/.*)?')
+    // Required catch-all (:param+) — one or more segments.
+    .replace(/\/:\w+\+/g, '/.+')
     .replace(/:\w+/g, '[^/]+')
     .replace(LOCALE_TOKEN, `(?:${alternation})`);
   return new RegExp(`^${pattern}$`);
@@ -68,7 +80,10 @@ describe('retired practice routes', () => {
     expect(match(all, '/de/practice')).toBeUndefined(); // unsupported locale
   });
 
-  it('sends the practice hub to the real single-player game', () => {
+  it('sends the practice hub to a coached single-player round (not bots)', () => {
+    // Live bug after #1229: catch-all `:rest*` before the hub made
+    // GET /en/practice → 308 /en/singleplayer (bots). Intent + classic sibling
+    // both require ?autoStart=coach.
     const rule = match(rules(), '/en/practice');
     expect(rule).toBeDefined();
     expect(rule?.destination).toBe('/:locale/singleplayer?autoStart=coach');
@@ -90,10 +105,22 @@ describe('retired practice routes', () => {
     expect(rule?.destination).toBe('/:locale/singleplayer');
   });
 
+  it('lists hub before catch-all and uses :rest+ so order cannot swallow the hub', () => {
+    const all = rules();
+    const hubIdx = all.findIndex((r) => r.source.endsWith('/practice'));
+    const catchIdx = all.findIndex((r) => /:rest[+*]/.test(r.source));
+    expect(hubIdx).toBeGreaterThanOrEqual(0);
+    expect(catchIdx).toBeGreaterThanOrEqual(0);
+    expect(hubIdx).toBeLessThan(catchIdx);
+    expect(all[catchIdx]?.source).toMatch(/:rest\+/);
+  });
+
   it('covers every supported locale, not just English', () => {
     const all = rules();
     for (const locale of ['he', 'sv', 'ja', 'es', 'ru']) {
-      expect(match(all, `/${locale}/practice`)).toBeDefined();
+      expect(match(all, `/${locale}/practice`)?.destination).toBe(
+        '/:locale/singleplayer?autoStart=coach',
+      );
       expect(match(all, `/${locale}/practice/wheelRush`)?.destination).toBe(
         '/:locale/daily/word-wheel',
       );
